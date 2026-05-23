@@ -2,6 +2,27 @@
 
 # 版本发布说明
 
+## 2.7.9 - 2026年5月23日
+
+**🚀 新增特性**
+
+* feat(indicator): 新增 FACTOR 指标，支持将 Factor 对象转换为 Indicator，使其可以在指标系统中使用
+* feat(indicator): 新增 ADJ_FACTOR 复权因子指标，基于股票权息数据计算后复权因子序列
+* feat(indicator): 新增 ADJ_OPEN/ADJ_HIGH/ADJ_LOW/ADJ_CLOSE/ADJ_VOL 复权价格和成交量指标
+* feat(KQuery): 添加ktype到秒数转换功能
+
+**⚡️ 优化改进**
+
+* feat(factor): 改善因子值存储，直接使用 Float64。注意：无法自动升级。
+
+**🐞 缺陷修复**
+
+* fix(indicator): 修复 FINANCE 指标中季报和年报在同一天发布可能冲突的问题
+* fix(KData): 复权移除不必要的四舍五入，分钟级别除权日前一日最后一分钟后向复权计算错误
+* fix(trade_sys): 修复MultiFactorBase中变量名拼写错误
+* fix(trade_sys): 修复多因子系统中特殊标准化功能的因子名称匹配问题
+* fix(factor): update_all_factors_values 增加数据一致性检查
+
 ## 2.7.8 - 2026年4月18日
 
 **🚀 新增特性**
