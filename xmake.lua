@@ -24,9 +24,6 @@ option("mysql")
     end        
 option_end()
 
--- boost mysql 同步模式下大数据量批量获取比 libmysqlclient 慢很多，可根据场景自行配置
-option("disable_libmysqlclient", {description = "Disable use libmysqlclient", default = false})
-
 option("hdf5", {description = "Enable hdf5 kdata engine.", default = true})
 option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
 option("tdx", {description = "Enable tdx kdata engine.", default = true})
@@ -56,6 +53,10 @@ option("serialize", {description = "Enable support serialize object and pickle i
 option("http_client_ssl", {description = "enable https support for http client", default = false})
 option("http_client_zip", {description = "enable http support gzip", default = false})
 -- option("node", {description = "enable node reqrep server/client", default = true})
+
+-- boost mysql 同步模式下大数据量批量获取比 libmysqlclient 慢很多，可根据场景自行配置
+option("disable_libmysqlclient", {description = "Disable use libmysqlclient", default = false})
+option("local", {description = "Enhance local vectorized compilation", default = false})
 
 option("ta_lib")
     add_deps("low_precision")
@@ -265,11 +266,9 @@ if is_plat("linux", "cross") then
     add_cxflags("-fcoroutines")
 end    
 
--- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
---   -- fedora或者ubuntu，并且不是交叉编译
---   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
--- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
--- end
+if has_config("local") then
+    add_vectorexts("all")
+end
 
 includes("./copy_dependents.lua")
 includes("./hikyuu_cpp/hikyuu")
