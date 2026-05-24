@@ -444,7 +444,7 @@ const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {
 }
 
 Indicator MultiFactorBase::getIC(int ndays) {
-    HKU_WARN_IF_RETURN(getParam<bool>("save_all_factors"), Indicator(),
+    HKU_WARN_IF_RETURN(!getParam<bool>("save_all_factors"), Indicator(),
                        htr("mf param \"save_all_factors\" is false, can't get all factors!, please "
                            "set it to true if you want to get IC/ICIR!"));
 
