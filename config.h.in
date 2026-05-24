@@ -7,6 +7,9 @@
 // Debug 模式
 #define HKU_DEBUG_MODE ${HKU_DEBUG_MODE}
 
+// 是否启用本地最大向量化
+#define HKU_LOCAL_VECTORIZE ${HKU_LOCAL_VECTORIZE}
+
 // support serialization
 #define HKU_SUPPORT_SERIALIZATION  ${SUPPORT_SERIALIZATION}
 

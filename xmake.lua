@@ -88,6 +88,7 @@ if is_mode("debug") then
 else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
+set_configvar("HKU_LOCAL_VECTORIZE", get_config("local") and 1 or 0)
 set_configvar("CHECK_ACCESS_BOUND", 1)
 set_configvar("SUPPORT_SERIALIZATION", get_config("serialize") and 1 or 0)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 1)
@@ -192,7 +193,6 @@ add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc 2.11.0", {system = false})
-add_requires("xsimd", {system = false})
 
 if is_plat("windows", "linux", "cross") then
     add_requires("mimalloc", {system = false, configs ={shared = true}})
