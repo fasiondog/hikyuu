@@ -909,7 +909,6 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     Stock stk2 = getStock("sz000002");
     KData k1, k2;
     Indicator result, a, b, expect;
-    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2) */
     k1 = stk1.getKData(KQuery(-1));
@@ -1034,7 +1033,6 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     Stock stk3 = getStock("sh000001");
     KData k1, k2, k3;
     Indicator result, a, b;
-    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
     k1 = stk1.getKData(KQuery(-1));
@@ -1210,7 +1208,6 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     Stock stk3 = getStock("sh000001");
     KData k1, k2, k3;
     Indicator result, a, b;
-    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
     k1 = stk1.getKData(KQuery(-1));
@@ -1376,7 +1373,6 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     KData k1, k2;
     Indicator result, a, b;
     KQuery query;
-    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2) */
     k1 = stk1.getKData(KQuery(-1));
@@ -1504,7 +1500,6 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     KData k1, k2, k3;
     Indicator result, a, b;
     KQuery query;
-    double nan = Null<double>();
 
     /** @arg a,b 长度都为1 (长度相等且小于2) */
     k1 = stk1.getKData(KQuery(-1));

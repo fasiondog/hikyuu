@@ -235,9 +235,17 @@ TEST_CASE("test_FactorSet_shallow_copy") {
     CHECK_EQ(fs5.name(), "ORIGINAL");
     CHECK_EQ(fs5.size(), 1);
 
+#if defined(_MSC_VER) && defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 4552)  // MSVC 自身赋值编号
+#pragma clang diagnostic ignored "-Wself-assign-overloaded"
+#endif
     // 测试自赋值（浅拷贝情况下自赋值应该是安全的）
     fs1 = fs1;
     CHECK_EQ(fs1.size(), 1);
+#if defined(_MSC_VER) && defined(__clang__)
+#pragma warning(pop)
+#endif
 }
 
 /** @par 检测点：测试FactorSet迭代器功能 */

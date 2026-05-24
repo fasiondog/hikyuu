@@ -13,6 +13,9 @@ set_warnings("all")
 -- set language: C99, c++ standard
 set_languages("c++20")
 
+if is_plat("windows") then
+    set_toolchains("clang-cl")
+end
 
 option("mysql")
     set_default(true)
@@ -264,7 +267,7 @@ end
 
 if is_plat("linux", "cross") then
     add_cxflags("-fcoroutines")
-end    
+end
 
 if has_config("local") then
     add_vectorexts("all")

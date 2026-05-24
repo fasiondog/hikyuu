@@ -1795,7 +1795,6 @@ TEST_CASE("test_KData_getOtherFromSelf_subfunctions") {
     CHECK_NE(kdata2.getQuery(), kdata1.getQuery());  // 应该创建新的实例
 
     /** @arg 测试_getOtherFromSelfByIndex: 新查询的开始位置在旧数据范围内但结束位置超出 */
-    size_t old_size = kdata1.size();
     KQuery query_extend_end(kdata1.startPos() + 2, kdata1.endPos() + 5, KQuery::DAY);
     KData kdata3 = stock.getKData(query_extend_end);   // 重新获取以确保数据完整
     KData kdata4 = kdata3.getKData(query_extend_end);  // 这里会触发_getOtherFromSelfByIndex的分支
@@ -2071,11 +2070,19 @@ TEST_CASE("test_KData_other") {
     // k1 = k1;
     // CHECK_KDATA_EQUAL(k1, k2);
 
+#if defined(_MSC_VER) && defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 4101)
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
     size_t count = 0;
     for (const auto& r : k1) {
         count++;
     }
     CHECK_EQ(count, k1.size());
+#if defined(_MSC_VER) && defined(__clang__)
+#pragma warning(pop)
+#endif
 
     count = 0;
     KData::const_iterator iter = k1.cbegin();
