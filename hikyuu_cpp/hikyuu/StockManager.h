@@ -94,9 +94,6 @@ public:
     /** 获取证券数量 */
     size_t size() const noexcept;
 
-    /** 是否所有数据准备完毕 */
-    bool dataReady() const;
-    bool initializing() const;
     /**
      * 根据"市场简称证券代码"获取对应的证券实例
      * @param querystr 格式：“市场简称证券代码”，如"sh000001"
@@ -262,6 +259,15 @@ public:
      * @param code
      */
     void removeTempCsvStock(const string& code);
+
+    /** 是否所有数据准备完毕 */
+    bool dataReady() const;
+
+    /** 简单阻塞，等待所有数据准备完毕 */
+    void waitDataReady() const;
+
+    /** 是否正在初始化 */
+    bool initializing() const;
 
     /**
      * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
