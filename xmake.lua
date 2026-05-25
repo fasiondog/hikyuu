@@ -141,7 +141,6 @@ if get_config("hdf5") then
 end
 
 if has_config("mysql") then 
-    add_requires("openssl3", {system = false, configs = {shared = true}})
     if not has_config("disable_libmysqlclient") then 
         local mysql_version = "8.0.31"
         if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
@@ -213,7 +212,7 @@ if has_config("http_client_zip") then
 end
 
 if has_config("http_client_ssl") or has_config("mysql") then
-    add_requires("openssl3", {system = is_plat("linux"), configs = {shared = true}})
+    add_requires("openssl3", {system = is_plat("linux"), configs = {shared = not is_plat("macosx")}})
 end
 
 
