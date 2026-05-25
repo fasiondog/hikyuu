@@ -45,7 +45,7 @@ void IndicatorImp::initEngine() {
 #endif
 
 #if HKU_LOCAL_VECTORIZE
-    fmt::print("eigen simd instruction sets in use: {}\n", Eigen::SimdInstructionSetsInUse());
+    fmt::print("simd instruction sets in use: {}\n", Eigen::SimdInstructionSetsInUse());
 #endif
 }
 
