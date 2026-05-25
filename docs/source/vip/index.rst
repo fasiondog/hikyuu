@@ -3,7 +3,7 @@
 
 .. toctree::
 
-   donate-plan.md
+   vip-plan.md
    indicator
    backtest
    dataserver
