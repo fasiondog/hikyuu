@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.1
+## Created by: Qt User Interface Compiler version 6.10.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -1391,9 +1391,9 @@ class Ui_MainWindow(object):
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"\u521d\u6b21\u5bfc\u51651\u5206\u949f\u7ebf\u8d77\u59cb\u65e5\u671f\uff1a", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u8bbe\u7f6e", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("MainWindow", u"\u5b58\u50a8\u5f15\u64ce\u8bbe\u7f6e", None))
-        self.enable_hdf55_radioButton.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528HDF5\uff08\u63a8\u8350\uff09", None))
-        self.enable_mysql_radioButton.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528MYSQL", None))
-        self.enable_clickhouse_radioButton.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528Clickhouse(\u6350\u8d60\u6743\u76ca\uff09", None))
+        self.enable_hdf55_radioButton.setText(QCoreApplication.translate("MainWindow", u"HDF5(\u63a8\u8350)", None))
+        self.enable_mysql_radioButton.setText(QCoreApplication.translate("MainWindow", u"MYSQL(\u4e0d\u9002\u5408\u5927\u6570\u636e)", None))
+        self.enable_clickhouse_radioButton.setText(QCoreApplication.translate("MainWindow", u"Clickhouse(\u6350\u8d60\u6743\u76ca)", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"HDF5\u5b58\u50a8\u8bbe\u7f6e", None))
         self.hdf5_dir_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u9009\u62e9", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u76ee\u6807\u6570\u636e\uff08HDF5\uff09\u5b58\u653e\u76ee\u5f55\uff1a", None))

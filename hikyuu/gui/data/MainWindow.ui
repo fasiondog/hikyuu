@@ -497,21 +497,21 @@
              <item>
               <widget class="QRadioButton" name="enable_hdf55_radioButton">
                <property name="text">
-                <string>使用HDF5（推荐）</string>
+                <string>HDF5(推荐)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="enable_mysql_radioButton">
                <property name="text">
-                <string>使用MYSQL</string>
+                <string>MYSQL(不适合大数据)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="enable_clickhouse_radioButton">
                <property name="text">
-                <string>使用Clickhouse(捐赠权益）</string>
+                <string>Clickhouse(捐赠权益)</string>
                </property>
               </widget>
              </item>
