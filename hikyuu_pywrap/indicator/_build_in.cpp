@@ -1060,6 +1060,9 @@ void export_Indicator_build_in(py::module& m) {
     Beta = Cov(stock_return, market_return) / Var(market_return)
     与 BETA(ref_ind, n)(ind) 等效。
 
+    .. note:: BETA本身不会对输入数据进行收益率转换(pct_change)处理，
+              输入的指标应为已经计算好的收益率数据。
+
     :param Indicator ind: 输入指标，如股票收益率指标
     :param Indicator ref_ind: 对照指标，如市场收益率指标
     :param int n: 滚动窗口大小（大于2或等于0）。如果为0，使用输入的ind长度。

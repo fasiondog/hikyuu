@@ -15,6 +15,8 @@ namespace hku {
  * 计算 Beta 系数，如衡量资产收益与市场收益之间的敏感性
  * Beta = Cov(stock_return, market_return) / Var(market_return)
  *
+ * @note BETA本身不会对输入数据进行收益率转换(pct_change)处理，
+ *       输入的指标应为已经计算好的收益率数据。
  * @param ind1 输入指标, 如股票收益率指标
  * @param ind2 对照指标, 如市场收益率指标
  * @param n 滚动窗口 （大于2或等于0），等于0时使用输入的ind实际长度。
