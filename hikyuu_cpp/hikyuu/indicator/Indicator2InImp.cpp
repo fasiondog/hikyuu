@@ -82,6 +82,9 @@ Indicator Indicator2InImp::prepare(const Indicator& ind) {
             ref = SLICE(ref, ref.size() - ind.size(), ref.size());
         } else if (ref.size() < ind.size()) {
             ref = CVAL(ind, 0.) + ref;
+            if (ref.size() < ind.size()) {
+                ref = ref(ind.getContext());
+            }
         }
     } else if (k != ind.getContext()) {
         // 如果是时间序列，当两者的上下文不同，则按日期对齐
