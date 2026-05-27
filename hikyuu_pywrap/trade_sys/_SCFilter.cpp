@@ -57,7 +57,9 @@ void export_SCFilter(py::module& m) {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &ScoresFilterBase::setParam<const boost::any&>,
+      .def("set_param",
+           static_cast<void (ScoresFilterBase::*)(const std::string&, const boost::any&)>(
+             &ScoresFilterBase::setParam),
            R"(set_param(self, name, value)
 
     设置参数

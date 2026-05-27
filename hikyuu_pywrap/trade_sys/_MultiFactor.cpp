@@ -167,7 +167,9 @@ void export_MultiFactor(py::module& m) {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &MultiFactorBase::setParam<const boost::any&>,
+      .def("set_param",
+           static_cast<void (MultiFactorBase::*)(const std::string&, const boost::any&)>(
+             &MultiFactorBase::setParam),
            R"(set_param(self, name, value)
 
     设置参数

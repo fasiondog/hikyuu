@@ -31,7 +31,10 @@ void export_KDataDriver(py::module& m) {
       .def("__repr__", to_py_str<KDataDriver>)
 
       .def("get_param", &KDataDriver::getParam<boost::any>, "获取指定参数的值")
-      .def("set_param", &KDataDriver::setParam<const boost::any&>, "设置参数")
+      .def("set_param",
+           static_cast<void (KDataDriver::*)(const std::string&, const boost::any&)>(
+             &KDataDriver::setParam),
+           "设置参数")
       .def("have_param", &KDataDriver::haveParam, "指定参数是否存在")
 
       .def("clone", &KDataDriver::clone)
