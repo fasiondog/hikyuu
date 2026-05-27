@@ -252,7 +252,7 @@ void ICycle::_calculate(const Indicator& data) {
         calculate_no_delay(datelist, adjust_cycle, adjust_mode, buf);
     }
 
-    Indicator tmpind = ALIGN(PRICELIST(buf, datelist), k);
+    Indicator tmpind = ALIGN(PRICELIST(buf, std::move(datelist)), k);
     const auto* src = tmpind.data();
     auto* dst = this->data();
     HKU_ASSERT(tmpind.size() == total);

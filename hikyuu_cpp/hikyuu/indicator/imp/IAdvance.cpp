@@ -80,7 +80,7 @@ void IAdvance::_calculate(const Indicator& ind) {
                      q.kType(), q.recoverType());
 
     auto* dst = this->data();
-    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates, getParam<bool>("fill_null"));
+    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), std::move(dates), getParam<bool>("fill_null"));
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
         if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
             (market != "" && iter->market() != market)) {
@@ -126,7 +126,7 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     StockManager& sm = StockManager::instance();
     auto* dst = this->data();
-    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), dates, getParam<bool>("fill_null"));
+    Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), std::move(dates), getParam<bool>("fill_null"));
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
         if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
             (market != "" && iter->market() != market)) {

@@ -62,7 +62,7 @@ void IPriceList::_calculate(const Indicator& data) {
 
     if (k != Null<KData>() && align_dates.size() > 0) {
         // 如果本身是时间序列，则使用时间进行对齐
-        auto tmp = ALIGN(PRICELIST(x, align_dates, x_discard), k);
+        auto tmp = ALIGN(PRICELIST(x, std::move(align_dates), x_discard), k);
         HKU_ASSERT(tmp.size() == total);
         auto* dst = this->data();
         auto* src = x.data();

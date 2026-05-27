@@ -260,7 +260,7 @@ void IInSum::_calculate(const Indicator& ind) {
         // 指标值越大排名值越低，即指标最大的值对应排名值为1
         auto nind = ind;
         if (ind.size() != total) {
-            nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
+            nind = ALIGN(ind, std::move(dates), getParam<bool>("fill_null"));
             HKU_CHECK(nind.size() == total, "ind size: {}  != total: {}", ind.size(), total);
         }
         insum_rank_desc(inds, dst, nind, total);
@@ -268,7 +268,7 @@ void IInSum::_calculate(const Indicator& ind) {
         // 指标值越高排名值越高，即指标值最低的排名值为1
         auto nind = ind;
         if (ind.size() != total) {
-            nind = ALIGN(ind, dates, getParam<bool>("fill_null"));
+            nind = ALIGN(ind, std::move(dates), getParam<bool>("fill_null"));
             HKU_CHECK(nind.size() == total, "ind size: {}  != total: {}", ind.size(), total);
         }
         insum_rank_asc(inds, dst, nind, total);
