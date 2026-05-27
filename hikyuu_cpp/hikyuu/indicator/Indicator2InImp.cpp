@@ -67,7 +67,7 @@ Indicator Indicator2InImp::prepare(const Indicator& ind) {
     } else {
         const auto& ind_k = ind.getContext();
         const auto& ref_k = m_ref_ind.getContext();
-        if (ind_k.getStock() == ref_k.getStock()) {
+        if (ref_k == Null<KData>() || ind_k.getStock() == ref_k.getStock()) {
             m_ref_ind.setContext(ind_k);
         } else {
             is_value = true;

@@ -22,7 +22,8 @@ void export_Parameter(py::module& m) {
       .def("__repr__", to_py_str<Parameter>)
 
       .def("__contains__", &Parameter::have)
-      .def("__setitem__", &Parameter::set<const boost::any&>)
+      .def("__setitem__",
+           static_cast<void (Parameter::*)(const std::string&, const boost::any&)>(&Parameter::set))
       .def("__getitem__", &Parameter::get<boost::any>)
       .def("have", &Parameter::have, "Return True if there is a parameter for the specified name.")
       .def("set",
