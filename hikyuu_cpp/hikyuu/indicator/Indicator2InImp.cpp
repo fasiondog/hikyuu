@@ -9,6 +9,7 @@
 #include "hikyuu/indicator/crt/CVAL.h"
 #include "hikyuu/indicator/crt/SLICE.h"
 #include "hikyuu/indicator/crt/CONTEXT.h"
+#include "hikyuu/indicator/imp/IContext.h"
 #include "Indicator2InImp.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -59,15 +60,23 @@ void Indicator2InImp::getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& 
 }
 
 Indicator Indicator2InImp::prepare(const Indicator& ind) {
-    auto k = getContext();
-    if (k == Null<KData>()) {
-        k = ind.getContext();
+    bool is_value = false;
+    const auto& k = getContext();
+    if (k != Null<KData>()) {
+        m_ref_ind.setContext(k);
+    } else {
+        const auto& ind_k = ind.getContext();
+        const auto& ref_k = m_ref_ind.getContext();
+        if (ind_k.getStock() == ref_k.getStock()) {
+            m_ref_ind.setContext(ind_k);
+        } else {
+            is_value = true;
+        }
     }
-    m_ref_ind.setContext(k);
 
     Indicator ref = m_ref_ind;
     auto dates = ref.getDatetimeList();
-    if (dates.empty()) {
+    if (is_value || dates.empty()) {
         // 如果不是时间序列，则以 ind 为基准，按右端对齐，不足用 nan 填充, 超长则截断左端
         if (ref.size() > ind.size()) {
             ref = SLICE(ref, ref.size() - ind.size(), ref.size());
