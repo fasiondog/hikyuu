@@ -88,7 +88,7 @@ void export_IndicatorImp(py::module& m) {
 
       .def("have_param", &IndicatorImp::haveParam)
       .def("get_param", &IndicatorImp::getParam<boost::any>)
-      .def("set_param", &IndicatorImp::setParam<boost::any>)
+      .def("set_param", &IndicatorImp::setParam<const boost::any&>)
       .def("have_ind_param", &IndicatorImp::haveIndParam)
       .def("get_ind_param", &IndicatorImp::getIndParam)
       .def("set_ind_param", set_ind_param1)

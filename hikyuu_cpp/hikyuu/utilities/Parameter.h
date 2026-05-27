@@ -149,6 +149,9 @@ public:
      * @param value 参数值
      */
     template <typename ValueType>
+    void set(const string& name, ValueType&& value);
+
+    template <typename ValueType>
     void set(const string& name, const ValueType& value);
 
     /**
@@ -340,6 +343,10 @@ public:                                                                     \
     void setParam(const string& name, const ValueType& value) {             \
         m_params.set<ValueType>(name, value);                               \
     }                                                                       \
+    template <typename ValueType>                                           \
+    void setParam(const string& name, ValueType& value) {                   \
+        m_params.set<ValueType>(name, std::forward<ValueType>(value));      \
+    }                                                                       \
                                                                             \
     template <typename ValueType>                                           \
     ValueType getParam(const string& name) const {                          \
@@ -408,6 +415,12 @@ public:                                                                      \
         checkParam(name);                                                    \
         paramChanged();                                                      \
     }                                                                        \
+    template <typename ValueType>                                            \
+    void setParam(const string& name, ValueType&& value) {                   \
+        m_params.set<ValueType>(name, std::forward<ValueType>(value));       \
+        checkParam(name);                                                    \
+        paramChanged();                                                      \
+    }                                                                        \
                                                                              \
     template <typename ValueType>                                            \
     ValueType getParam(const string& name) const {                           \
@@ -456,27 +469,86 @@ ValueType Parameter::tryGet(const string& name, const ValueType& val) const {
 
 template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
-    if (!have(name)) {
-        if (!support(value)) {
-            throw std::logic_error("Unsuport Type! input valut type: " +
-                                   string(typeid(ValueType).name()));
+    if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
+        if (!have(name)) {
+            m_params[name] = value;
+            return;
         }
-        m_params[name] = value;
-        return;
-    }
 
-    if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
-        if ((m_params[name].type() == typeid(int) || m_params[name].type() == typeid(int64_t)) &&
-            (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
-            // 忽略，允许设定
-        } else {
+        if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
             throw std::logic_error("Mismatching type! need type " +
                                    string(m_params[name].type().name()) + " but value type is " +
-                                   string(typeid(ValueType).name()));
+                                   string(value.type().name()));
         }
-    }
 
-    m_params[name] = value;
+        m_params[name] = value;
+
+    } else {
+        if (!have(name)) {
+            if (!support(value)) {
+                throw std::logic_error("Unsuport Type! input valut type: " +
+                                       string(typeid(ValueType).name()));
+            }
+            m_params[name] = value;
+            return;
+        }
+
+        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
+            if ((m_params[name].type() == typeid(int) ||
+                 m_params[name].type() == typeid(int64_t)) &&
+                (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
+                // 忽略，允许设定
+            } else {
+                throw std::logic_error("Mismatching type! need type " +
+                                       string(m_params[name].type().name()) +
+                                       " but value type is " + string(typeid(ValueType).name()));
+            }
+        }
+
+        m_params[name] = value;
+    }
+}
+
+template <typename ValueType>
+void Parameter::set(const string& name, ValueType&& value) {
+    if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
+        if (!have(name)) {
+            m_params[name] = std::forward<ValueType>(value);
+            return;
+        }
+
+        if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
+            throw std::logic_error("Mismatching type! need type " +
+                                   string(m_params[name].type().name()) + " but value type is " +
+                                   string(value.type().name()));
+        }
+
+        m_params[name] = std::forward<ValueType>(value);
+
+    } else {
+        if (!have(name)) {
+            if (!support(value)) {
+                throw std::logic_error("Unsuport Type! input valut type: " +
+                                       string(typeid(ValueType).name()));
+            }
+            m_params[name] = std::forward<ValueType>(value);
+            return;
+        }
+
+        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
+            if ((m_params[name].type() == typeid(int) ||
+                 m_params[name].type() == typeid(int64_t)) &&
+                (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
+                // 忽略，允许设定
+            } else {
+                throw std::logic_error("Mismatching type! need type " +
+                                       string(m_params[name].type().name()) +
+                                       " but value type is " + string(typeid(ValueType).name()));
+            }
+        }
+
+        m_params[name] = std::forward<ValueType>(value);
+    }
 }
 
 template <>
@@ -489,21 +561,21 @@ inline boost::any Parameter::get<boost::any>(const std::string& name) const {
     return iter->second;
 }
 
-template <>
-inline void Parameter::set(const string& name, const boost::any& value) {
-    if (!have(name)) {
-        m_params[name] = value;
-        return;
-    }
+// template <>
+// inline void Parameter::set(const string& name, const boost::any& value) {
+//     if (!have(name)) {
+//         m_params[name] = value;
+//         return;
+//     }
 
-    if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
-        throw std::logic_error("Mismatching type! need type " +
-                               string(m_params[name].type().name()) + " but value type is " +
-                               string(value.type().name()));
-    }
+//     if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
+//         throw std::logic_error("Mismatching type! need type " +
+//                                string(m_params[name].type().name()) + " but value type is " +
+//                                string(value.type().name()));
+//     }
 
-    m_params[name] = value;
-}
+//     m_params[name] = value;
+// }
 
 template <>
 inline int64_t Parameter::get(const string& name) const {

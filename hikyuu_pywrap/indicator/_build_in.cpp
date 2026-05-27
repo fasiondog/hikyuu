@@ -726,7 +726,7 @@ void export_Indicator_build_in(py::module& m) {
               const auto& x = obj.cast<py::sequence>();
               auto values = python_list_to_vector<price_t>(x);
               if (pyalign_dates.is_none()) {
-                  return PRICELIST(values, discard);
+                  return PRICELIST(std::move(values), discard);
               } else {
                   py::sequence align_dates = pyalign_dates.cast<py::sequence>();
                   auto total = len(align_dates);
@@ -734,7 +734,7 @@ void export_Indicator_build_in(py::module& m) {
                   for (auto i = 0; i < total; ++i) {
                       dates[i] = pydatetime_to_Datetime(align_dates[i]);
                   }
-                  return PRICELIST(values, dates, discard);
+                  return PRICELIST(std::move(values), std::move(dates), discard);
               }
           } else {
               HKU_THROW("Invalid input data type!");
