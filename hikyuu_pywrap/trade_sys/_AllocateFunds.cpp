@@ -97,7 +97,8 @@ void export_AllocateFunds(py::module& m) {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &AllocateFundsBase::setParam<boost::any>, R"(set_param(self, name, value)
+      .def("set_param", &AllocateFundsBase::setParam<const boost::any&>,
+           R"(set_param(self, name, value)
 
     设置参数
 
