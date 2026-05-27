@@ -24,6 +24,7 @@
 #include "crt/AVEDEV.h"
 #include "crt/BACKSET.h"
 #include "crt/BARSCOUNT.h"
+#include "crt/BETA.h"
 #include "crt/BARSLAST.h"
 #include "crt/BARSLASTS.h"
 #include "crt/BARSLASTCOUNT.h"

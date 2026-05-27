@@ -448,6 +448,26 @@
     :rtype: Indicator
 
 
+.. py:function:: BETA(ind, ref_ind[, n=10, fill_null=True])
+
+    计算 Beta 系数，如衡量资产收益与市场收益之间的敏感性。
+
+    计算公式：Beta = Cov(stock_return, market_return) / Var(market_return)
+
+    :param Indicator ind: 输入指标，如股票收益率指标
+    :param Indicator ref_ind: 对照指标，如市场收益率指标
+    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度
+    :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
+    :rtype: Indicator
+
+    **使用示例**::
+
+        # 计算股票相对于市场的Beta系数
+        stock_return = ROC(CLOSE(), 1)
+        market_return = ROC(INDEXC(), 1)
+        beta = BETA(stock_return, market_return, 60)
+
+
 .. py:function:: BETWEEN(a, b, c)
 
     介于(介于两个数之间)

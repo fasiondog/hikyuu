@@ -125,6 +125,7 @@
 **统计指标**
 
 * :py:func:`AVEDEV` - 平均绝对偏差
+* :py:func:`BETA` - Beta系数，衡量资产收益与市场收益之间的敏感性
 * :py:func:`DEVSQ` - 数据偏差平方和
 * :py:func:`STD` - 估算标准差，同 STDEV
 * :py:func:`STDEV` - 计算N周期内样本标准差
@@ -228,4 +229,3 @@
 
 * :py:func:`concat_to_df` - 合并指标列表为 DateFrame
 * :py:func:`df_to_ind` - 将 DataFrame 指定列转为指标
-
