@@ -20,6 +20,10 @@
 #include <mimalloc.h>
 #endif
 
+#if HKU_LOCAL_VECTORIZE
+#include <Eigen/Dense>
+#endif
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IndicatorImp)
 #endif
@@ -38,6 +42,10 @@ void IndicatorImp::initEngine() {
 
     mi_stats_reset();
 // mi_stats_print(NULL);
+#endif
+
+#if HKU_LOCAL_VECTORIZE
+    fmt::print("simd instruction sets in use: {}\n", Eigen::SimdInstructionSetsInUse());
 #endif
 }
 

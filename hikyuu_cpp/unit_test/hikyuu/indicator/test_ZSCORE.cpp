@@ -79,7 +79,8 @@ TEST_CASE("test_ZSCORE_benchmark") {
     int cycle = 1000;  // 测试循环次数
 
     {
-        BENCHMARK_TIME_MSG(test_ZSCORE_benchmark, cycle, fmt::format("data len: {}", c.size()));
+        BENCHMARK_TIME_MSG(test_ZSCORE_benchmark, cycle,
+                           fmt::format(fmt::runtime("data len: {}"), c.size()));
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
             Indicator ind = ZSCORE();

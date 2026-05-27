@@ -101,7 +101,7 @@ private:
 
     void* getFunciton(const char* symbol) noexcept {
 #if HKU_OS_WINDOWS
-        void* func = GetProcAddress(m_handle, symbol);
+        void* func = (void*)GetProcAddress(m_handle, symbol);
 #else
         void* func = dlsym(m_handle, symbol);
 #endif

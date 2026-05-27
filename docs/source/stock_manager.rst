@@ -156,19 +156,32 @@ StockManager/Block/Stock
 
     证券信息管理类
     
+    .. py:attribute:: data_ready
+    
+        是否所有数据已准备就绪（加载完毕）
+        
     .. py:staticmethod:: instance()
     
         获取StockManager单例实例
         
-    .. py:method:: init(self, baseInfoParam, blockParam, kdataParam, preloadParam, hkuParam)
+    .. py:method:: init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param[, context])
     
-        初始化
+        初始化函数，必须在程序入口调用
         
-        :param Parameter baseInfoParam: 基础信息数据驱动参数
-        :param Parameter blockParam: 板块信息数据驱动参数
-        :param Parameter kdataParam: K线数据驱动参数
-        :param Parameter preloadParam: 预加载参数
-        :param Parameter hkuParam: 其他hikyuu参数
+        :param Parameter base_info_param: 基础信息数据驱动参数
+        :param Parameter block_param: 板块信息数据驱动参数
+        :param Parameter kdata_param: K线数据驱动参数
+        :param Parameter preload_param: 预加载参数
+        :param Parameter hikyuu_param: 其他hikyuu参数
+        :param StrategyContext context: 策略上下文, 默认加载全部证券
+        
+    .. py:method:: wait_data_ready(self)
+    
+        简单阻塞，等待所有数据准备就绪（加载完毕）
+        
+    .. py:method:: cancel_load(self)
+    
+        取消所有数据加载
        
     .. py:method:: get_base_info_parameter(self)
     
@@ -199,6 +212,19 @@ StockManager/Block/Stock
 
         :return: 获取当前上下文
         :rtype: StrategyContext
+
+    .. py:method:: set_plugin_path(self, path)
+    
+        设置插件路径，仅在初始化之前设置有效
+        
+    .. py:method:: get_plugin_path(self)
+    
+        :return: 获取插件路径
+        :rtype: str
+        
+    .. py:method:: set_language_path(self, path)
+    
+        设置多语言支持的翻译文件所在路径，仅在初始化之前设置有效
     
     .. py:method:: reload(self)
     
@@ -232,6 +258,14 @@ StockManager/Block/Stock
         :return: 相应的市场信息，如果相应的市场信息不存在，则返回Null<MarketInfo>()
         :rtype: MarketInfo
     
+    .. py:method:: get_market_stock(self, market)
+    
+        获取指定市场的代表指数（可能为空）
+        
+        :param string market: 指定的市场标识（市场简称）
+        :return: 相应的市场代表指数，如果相应的市场信息不存在，则返回Null<Stock>()
+        :rtype: Stock
+    
     .. py:method:: get_stock_type_info(self, stk_type)
     
         获取相应的证券类型详细信息
@@ -255,9 +289,30 @@ StockManager/Block/Stock
         :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
         :rtype: Stock
     
+    .. py:method:: get_stock_list(self[, filter=None])
+    
+        获取证券列表
+        
+        :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数
+        
     .. py:method:: __getitem__
 
         同 get_stock
+        
+    .. py:method:: __len__
+    
+        返回证券数量
+        
+    .. py:method:: __iter__
+    
+        遍历所有证券
+        
+    .. py:method:: get_category_list(self)
+    
+        获取所有板块分类
+        
+        :return: 所有板块分类
+        :rtype: StringList
     
     .. py:method:: get_block(self, category, name)
     
@@ -270,9 +325,15 @@ StockManager/Block/Stock
 
     .. py:method:: add_block(self, block)
 
-        将新增独立的板块加入到数据库系统中。注意，如 block 发生变化，需要调用 save_block 进行保存。
+        将独立的板块加入到数据库中，板块通过 category+name 区分，数据库中相同板块将被覆盖。注意，如果板块发生变化，需要调用 save_block 重新保存。
 
         :param Block block: 新增的板块
+        
+    .. py:method:: save_block(self, block)
+    
+        保存发生变化后的板块至数据库
+        
+        :param Block block: 板块实例
 
     .. py:method:: remove_block(self, block)
 
@@ -297,11 +358,21 @@ StockManager/Block/Stock
         :rtype: BlockList        
     
     .. py:method:: get_trading_calendar(self, query[, market='SH'])
+                  get_trading_calendar(self, stk_list, query)
     
-        获取指定市场的交易日日历
+        获取交易日历
+        
+        **方式一：** 获取指定市场的交易日历
         
         :param Query query: Query查询条件
-        :param str market: 市场简称
+        :param str market: 市场简称，默认为'SH'
+        :return: 日期列表
+        :rtype: DatetimeList
+        
+        **方式二：** 根据指定的证券列表获取叠加后的交易日历（主要用于包含不同市场证券时）
+        
+        :param StockList stk_list: 股票列表
+        :param Query query: Query查询条件
         :return: 日期列表
         :rtype: DatetimeList
         
@@ -705,7 +776,3 @@ StockManager/Block/Stock
     .. py:attribute:: description :描述说明
     .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
     .. py:attribute:: last_datetime : 该市场K线数据最后交易日期
-
-
-
-

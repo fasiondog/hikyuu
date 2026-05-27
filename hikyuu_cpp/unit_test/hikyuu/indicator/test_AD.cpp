@@ -20,8 +20,6 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_AD") {
-    StockManager& sm = StockManager::instance();
-
     Stock stk = getStock("SH600004");
     KQuery query = KQueryByIndex(-10);
     KData k = stk.getKData(query);

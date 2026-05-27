@@ -22,8 +22,6 @@ using namespace hku;
 
 /** @par 检测点，不自动调仓 */
 TEST_CASE("test_AF_EqualWeight_not_adjust_hold") {
-    StockManager& sm = StockManager::instance();
-
     SEPtr se = SE_Fixed();
     AFPtr af = AF_EqualWeight();
     TMPtr tm = crtTM(Datetime(200101010000L), 100000);

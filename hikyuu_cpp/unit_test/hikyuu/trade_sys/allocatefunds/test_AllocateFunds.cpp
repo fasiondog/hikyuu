@@ -22,8 +22,6 @@ using namespace hku;
 
 /** @par 检测点 */
 TEST_CASE("test_AllocateFunds") {
-    StockManager& sm = StockManager::instance();
-
     SEPtr se = SE_Fixed();
     AFPtr af = AF_EqualWeight();
     TMPtr tm = crtTM(Datetime(200101010000L), 100000);

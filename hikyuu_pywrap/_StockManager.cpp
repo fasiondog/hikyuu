@@ -34,6 +34,9 @@ void export_StockManager(py::module& m) {
       .def_property_readonly("data_ready", &StockManager::dataReady,
                              "是否所有数据已准备就绪（加载完毕）")
 
+      .def("wait_data_ready", &StockManager::waitDataReady,
+           "简单阻塞，等待所有数据准备就绪（加载完毕）")
+
       .def("cancel_load", &StockManager::cancelLoad, "取消所有数据加载")
 
       .def("reload", &StockManager::reload, "重新加载所有证券数据")

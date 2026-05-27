@@ -35,11 +35,7 @@ namespace hku {
  * @details
  * @ingroup ThreadPool
  */
-#ifdef _MSC_VER
-class GlobalStealThreadPool {
-#else
 class HKU_UTILS_API GlobalStealThreadPool {
-#endif
 public:
     /**
      * 默认构造函数，创建和当前系统CPU数一致的线程数
@@ -342,7 +338,14 @@ private:
     std::vector<std::unique_ptr<WorkStealQueue> > m_queues;  // 任务队列（每个工作线程一个）
     std::vector<std::thread> m_threads;                      // 工作线程
 
-    // 线程本地变量
+// 线程本地变量
+#if HKU_OS_WINDOWS
+    static WorkStealQueue* m_local_work_queue;  // 本地任务队列
+    static int m_index;                         // 在线程池中的序号
+    static InterruptFlag m_thread_need_stop;    // 线程停止运行指示
+    static std::thread::id m_thread_id;
+
+#else
 #if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
     inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // 本地任务队列
     inline static thread_local int m_index = -1;                              // 在线程池中的序号
@@ -353,6 +356,7 @@ private:
     static thread_local int m_index;                         // 在线程池中的序号
     static thread_local InterruptFlag m_thread_need_stop;    // 线程停止运行指示
     static thread_local std::thread::id m_thread_id;
+#endif
 #endif
 
     void worker_thread(int index) {

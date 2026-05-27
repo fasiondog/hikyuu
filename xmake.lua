@@ -13,6 +13,9 @@ set_warnings("all")
 -- set language: C99, c++ standard
 set_languages("c++20")
 
+if is_plat("windows") then
+    set_toolchains("clang-cl")
+end
 
 option("mysql")
     set_default(true)
@@ -23,9 +26,6 @@ option("mysql")
         add_defines("NOMINMAX")
     end        
 option_end()
-
--- boost mysql 同步模式下大数据量批量获取比 libmysqlclient 慢很多，可根据场景自行配置
-option("disable_libmysqlclient", {description = "Disable use libmysqlclient", default = false})
 
 option("hdf5", {description = "Enable hdf5 kdata engine.", default = true})
 option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
@@ -57,6 +57,10 @@ option("http_client_ssl", {description = "enable https support for http client",
 option("http_client_zip", {description = "enable http support gzip", default = false})
 -- option("node", {description = "enable node reqrep server/client", default = true})
 
+-- boost mysql 同步模式下大数据量批量获取比 libmysqlclient 慢很多，可根据场景自行配置
+option("disable_libmysqlclient", {description = "Disable use libmysqlclient", default = false})
+option("local", {description = "Enhance local vectorized compilation", default = false})
+
 option("ta_lib")
     add_deps("low_precision")
     set_default(true)
@@ -87,6 +91,7 @@ if is_mode("debug") then
 else
     set_configvar("HKU_DEBUG_MODE", 0)
 end
+set_configvar("HKU_LOCAL_VECTORIZE", get_config("local") and 1 or 0)
 set_configvar("CHECK_ACCESS_BOUND", 1)
 set_configvar("SUPPORT_SERIALIZATION", get_config("serialize") and 1 or 0)
 set_configvar("SUPPORT_TEXT_ARCHIVE", 1)
@@ -136,7 +141,6 @@ if get_config("hdf5") then
 end
 
 if has_config("mysql") then 
-    add_requires("openssl3", {system = false, configs = {shared = true}})
     if not has_config("disable_libmysqlclient") then 
         local mysql_version = "8.0.31"
         if is_plat("windows") or (is_plat("linux", "cross") and is_arch("aarch64", "arm64.*")) then 
@@ -208,7 +212,7 @@ if has_config("http_client_zip") then
 end
 
 if has_config("http_client_ssl") or has_config("mysql") then
-    add_requires("openssl3", {system = is_plat("linux"), configs = {shared = true}})
+    add_requires("openssl3", {system = is_plat("linux"), configs = {shared = not is_plat("macosx")}})
 end
 
 
@@ -262,13 +266,11 @@ end
 
 if is_plat("linux", "cross") then
     add_cxflags("-fcoroutines")
-end    
+end
 
--- if not is_plat("cross") and (os.host() == "linux" and is_arch("x86_64", "x64")) then
---   -- fedora或者ubuntu，并且不是交叉编译
---   add_vectorexts("sse", "sse2", "ssse3", "avx", "avx2")
--- --   add_defines("HKU_ENABLE_SSE2", "HKU_ENABLE_SSE3", "HKU_ENABLE_SSE41", "HKU_ENABLE_AVX", "HKU_ENABLE_AVX2")
--- end
+if has_config("local") then
+    add_vectorexts("all")
+end
 
 includes("./copy_dependents.lua")
 includes("./hikyuu_cpp/hikyuu")

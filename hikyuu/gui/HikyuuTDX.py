@@ -370,8 +370,8 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 </style></head><body style="font-weight:400; font-style:normal;">
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu </span><span style="font-weight:700;">专注于量化交易领域的核心技术构建，涵盖交易模型开发、极速计算引擎、高效回测框架及实盘拓展能力</span><span>，定位为量化交易计算引擎，为量化交易爱好者提供高性能底层架构支持。随着社区规模扩大，分散了作者在策略研究上的精力。为保障项目的可持续性，现对捐赠用户提供部分额外功能作为回馈，感谢社区伙伴的支持！</span></p>
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠功能以插件的方式提供，采用独立授权许可，完全在 hikyuu 之外，对喜欢自行编译扩展的朋友没有影响。因插件许可授权需要采集硬件信息，如有疑虑只要不申请试用许可和正式许可授权，不会触发硬件信息采集，如申请，视为同意采集。</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu 是一款</span><span style="font-weight:700;">遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。</span><span>为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。捐赠插件授权需要采集部分硬件信息，如申请，视为同意采集。</span></p>
 <p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>详情参见：</span><a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">捐赠权益</span></a><span style="font-weight:700;"> ，感谢大家的支持！</span></p></body></html>
 """
         self.label_46.setText(label_46_txt)

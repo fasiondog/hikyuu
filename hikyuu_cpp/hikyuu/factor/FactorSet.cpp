@@ -5,9 +5,10 @@
  *      Author: fasiondog
  */
 
-#include "FactorSet.h"
+#include "hikyuu/StockManager.h"
 #include "hikyuu/plugin/factor.h"
 #include "hikyuu/plugin/device.h"
+#include "FactorSet.h"
 
 namespace hku {
 

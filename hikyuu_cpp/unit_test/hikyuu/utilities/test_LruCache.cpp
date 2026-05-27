@@ -246,6 +246,11 @@ TEST_CASE("test_LruCache_thread_safety") {
               });
         }
 
+#if defined(_MSC_VER) && defined(__clang__)
+#pragma warning(push)
+#pragma warning(disable : 4101)
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
         // 读线程
         for (int r = 0; r < 3; ++r) {
             rw_threads.emplace_back(
@@ -260,6 +265,10 @@ TEST_CASE("test_LruCache_thread_safety") {
                   }
               });
         }
+
+#if defined(_MSC_VER) && defined(__clang__)
+#pragma warning(pop)
+#endif
 
         // 运行一段时间后停止
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

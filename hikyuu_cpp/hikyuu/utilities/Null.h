@@ -99,7 +99,8 @@ public:
 };
 
 #if (HKU_OS_ANDROID && HKU_ARCH_ARM64) || (HKU_OS_LINUX && HKU_ARCH_ARM64) || HKU_OS_OSX || \
-  HKU_OS_IOS || (defined(__GNUC__) && __GNUC__ >= 8) || (defined(__clang__) && !HKU_OS_ANDROID)
+  HKU_OS_IOS || (defined(__GNUC__) && __GNUC__ >= 8) ||                                     \
+  (defined(__clang__) && !HKU_OS_ANDROID && !HKU_OS_WINDOWS)
 /**
  * 提供size_t的Null值
  */

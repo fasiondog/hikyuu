@@ -135,6 +135,7 @@ TEST_CASE("test_operator_add_benchmark") {
         SPEND_TIME_CONTROL(false);
         for (int i = 0; i < cycle; i++) {
             Indicator result = data1 + data2;
+            DO_NOT_OPTIMIZE(result);
         }
     }
 }

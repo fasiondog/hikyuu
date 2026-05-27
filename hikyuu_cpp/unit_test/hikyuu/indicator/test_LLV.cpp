@@ -80,7 +80,6 @@ TEST_CASE("test_LLV_dyn") {
     CHECK_EQ(result[8], data[0]);
     CHECK_EQ(result[9], data[1]);
 
-    int n = 20;
     Indicator expect = LLV(data, 3);
     result = LLV(data, CVAL(data, 3));
     CHECK_EQ(expect.size(), result.size());
