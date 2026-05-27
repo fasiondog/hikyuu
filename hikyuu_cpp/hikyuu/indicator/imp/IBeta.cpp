@@ -69,13 +69,10 @@ void IBeta::_calculate(const Indicator& ind) {
         exy += ix * iy;
     }
 
+    value_t null_price = Null<price_t>();
     vary = ey2 - ey * ey / n;
     cov = exy - ex * ey / n;
-    if (vary == 0.0) {
-        dst[first_end - 1] = Null<price_t>();
-    } else {
-        dst[first_end - 1] = cov / vary;
-    }
+    dst[first_end - 1] = vary == 0.0 ? null_price : cov / vary;
 
     for (size_t i = first_end; i < total; i++) {
         ix = datax[i] - kx;
@@ -87,11 +84,7 @@ void IBeta::_calculate(const Indicator& ind) {
         exy += ix * iy - (datax[i - n] - kx) * preiy;
         vary = (ey2 - ey * ey / n);
         cov = (exy - ex * ey / n);
-        if (vary == 0.0) {
-            dst[i] = Null<price_t>();
-        } else {
-            dst[i] = cov / vary;
-        }
+        dst[i] = vary == 0.0 ? null_price : cov / vary;
     }
 }
 
@@ -135,6 +128,7 @@ void IBeta::_increment_calculate(const Indicator& ind, size_t start_pos) {
     vary = ey2 - ey * ey / n;
     cov = exy - ex * ey / n;
 
+    value_t null_price = Null<price_t>();
     for (size_t i = first_end; i < total; i++) {
         ix = datax[i] - kx;
         iy = datay[i] - ky;
@@ -145,11 +139,7 @@ void IBeta::_increment_calculate(const Indicator& ind, size_t start_pos) {
         exy += ix * iy - (datax[i - n] - kx) * preiy;
         vary = (ey2 - ey * ey / n);
         cov = (exy - ex * ey / n);
-        if (vary == 0.0) {
-            dst[i] = Null<price_t>();
-        } else {
-            dst[i] = cov / vary;
-        }
+        dst[i] = vary == 0.0 ? null_price : cov / vary;
     }
 }
 
