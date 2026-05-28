@@ -357,11 +357,8 @@ def import_one_stock_data(
                         return (0, False, Datetime(last_datetime))
                 continue
 
-            # 不产生实际交易的数据不保留，计算时根据需要对齐更方便
             # 日线忽略成交金额为0的(量可为0，额不为0)，通常为停牌或错误，停牌数据不保留计算时可以根据时间需要进行对齐计算
-            # 日线以下成交量和成交量只保留都不为0的数据
-            # 日线（手 + 万元）：只要成交额 > 0 就保留
-            # 分钟线（股 + 元): 量、额必须都大于0
+            # 日线以下成交量和成交量如果过滤掉0，使用事件回测方式时指标不方便处理，不做过滤处理
             if (
                 bar_datetime not in seen_keys
                     and today_datetime >= bar_datetime > last_datetime
@@ -372,9 +369,6 @@ def import_one_stock_data(
             ):
                 if ktype == "DAY":
                     if int(roundEx(bar["amount"], 0)) == 0:
-                        continue
-                else:
-                    if int(roundEx(bar["amount"], 0)) == 0 or int(roundEx(bar["vol"], 3)*1000) == 0:
                         continue
                 try:
                     buf.append(

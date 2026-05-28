@@ -399,9 +399,6 @@ def import_one_stock_data(
                 if ktype == "DAY":
                     if bar["amount"] == 0:
                         continue
-                else:
-                    if bar["amount"] == 0 or round(bar['vol']) == 0:
-                        continue
                 try:
                     buf.append(
                         (
