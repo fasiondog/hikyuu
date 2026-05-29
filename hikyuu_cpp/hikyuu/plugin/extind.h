@@ -17,6 +17,28 @@ namespace hku {
  */
 
 /**
+ * @brief 固定指标计算时使用的查询范围的起始索引
+ * @param start_index 起始索引位置
+ * @param factor_name 因子名称（如不为空时，优先使用该因子值）
+ * @return Indicator
+ * @note 对某些随时间起点变化的指标（如AD），固定起始索引确保从股票第一条数据开始计算。
+ *       示例：FIXED_START_INDEX(AD())(getKData("sz000001", Query(-500)))
+ */
+Indicator HKU_API FIXED_START_INDEX(int start_index = 0, const string& factor_name = "");
+
+/**
+ * @brief 固定指标计算时使用的查询范围的起始索引
+ * @param ind 输入指标
+ * @param start_index 起始索引位置
+ * @param factor_name 因子名称（如不为空时，优先使用该因子值）
+ * @return Indicator
+ * @note 对某些随时间起点变化的指标（如AD），固定起始索引确保从股票第一条数据开始计算。
+ *       示例：FIXED_START_INDEX(AD(), 0)(getKData("sz000001", Query(-500)))
+ */
+Indicator HKU_API FIXED_START_INDEX(const Indicator& ind, int start_index = 0,
+                                    const string& factor_name = "");
+
+/**
  * @brief 将指标数据转换到指定周期
  * @param ktype 指定周期
  * @param fill_null 扩展时填充null数据，否则为使用最近值填充

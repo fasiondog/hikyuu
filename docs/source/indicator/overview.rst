@@ -13,6 +13,7 @@
 * :py:func:`CONTEXT` - 独立上下文
 * :py:func:`DISCARD` - 以指标公式的方式设置指标结果的丢弃数据量。
 * :py:func:`DROPNA` - 删除 nan 值
+* :py:func:`FIXED_START_INDEX` - [捐赠用户]固定指标计算时使用的查询范围的起始索引
 * :py:func:`INBLOCK` - 当前上下文证券是否在指定的板块中。
 * :py:func:`ISNA` - 判断是否为 nan 值
 * :py:func:`ISINF` - 判断是否为 +inf 值

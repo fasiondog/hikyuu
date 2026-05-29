@@ -29,6 +29,18 @@ static Indicator getExtIndicator(const string& name, const Indicator& ref_ind,
     return plugin->getIndicator(name, ref_ind, params);
 }
 
+Indicator HKU_API FIXED_START_INDEX(int start_index, const string& factor_name) {
+    Parameter params;
+    params.set<int>("index", start_index);
+    params.set<string>("factor_name", factor_name);
+    return getExtIndicator("FIXED_START_INDEX", params);
+}
+
+Indicator HKU_API FIXED_START_INDEX(const Indicator& ind, int start_index,
+                                    const string& factor_name) {
+    return FIXED_START_INDEX(start_index, factor_name)(ind);
+}
+
 Indicator HKU_API WITHKTYPE(const KQuery::KType& ktype, bool fill_null) {
     Parameter params;
     params.set<string>("ktype", ktype);
