@@ -797,7 +797,7 @@
     对某些随时间起点变化的指标（如 AD），固定起始索引确保从股票第一条数据开始计算。
 
     :param Indicator ind: 输入指标
-    :param int start_index: 起始索引位置，默认为 0
+    :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
     :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :rtype: Indicator
 

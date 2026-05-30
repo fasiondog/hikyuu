@@ -18,7 +18,7 @@ namespace hku {
 
 /**
  * @brief 固定指标计算时使用的查询范围的起始索引
- * @param start_index 起始索引位置
+ * @param start_index 起始索引位置，为负数时，表示从当前最新的往前移 index 个时间点开始计算
  * @param factor_name 因子名称（如不为空时，优先使用该因子值）
  * @return Indicator
  * @note 对某些随时间起点变化的指标（如AD），固定起始索引确保从股票第一条数据开始计算。
@@ -29,7 +29,7 @@ Indicator HKU_API FIXED_START_INDEX(int start_index = 0, const string& factor_na
 /**
  * @brief 固定指标计算时使用的查询范围的起始索引
  * @param ind 输入指标
- * @param start_index 起始索引位置
+ * @param start_index 起始索引位置，为负数时，表示从当前最新的往前移 index 个时间点开始计算
  * @param factor_name 因子名称（如不为空时，优先使用该因子值）
  * @return Indicator
  * @note 对某些随时间起点变化的指标（如AD），固定起始索引确保从股票第一条数据开始计算。
