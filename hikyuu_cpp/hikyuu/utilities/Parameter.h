@@ -482,7 +482,11 @@ template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
     if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
         if (!have(name)) {
-            m_params[name] = value;
+            if (value.type() == typeid(int)) {
+                m_params[name] = static_cast<int64_t>(boost::any_cast<int>(value));
+            } else {
+                m_params[name] = value;
+            }
             return;
         }
 
@@ -496,7 +500,7 @@ void Parameter::set(const string& name, const ValueType& value) {
 
     } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
         if (!have(name)) {
-            m_params[name] = value;
+            m_params[name] = static_cast<int64_t>(value);
             return;
         }
 

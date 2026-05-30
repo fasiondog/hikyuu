@@ -183,7 +183,7 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
               iter1->first != iter2->first || iter1->second.type() != iter2->second.type(), false);
             HKU_IF_RETURN(
               iter1->second.type() == typeid(int) &&
-                boost::any_cast<int64_t>(iter1->second) != boost::any_cast<int64_t>(iter2->second),
+                boost::any_cast<int>(iter1->second) != boost::any_cast<int>(iter2->second),
               false);
             HKU_IF_RETURN(
               iter1->second.type() == typeid(int64_t) &&
