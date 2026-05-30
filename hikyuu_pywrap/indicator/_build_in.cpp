@@ -939,8 +939,6 @@ void export_Indicator_build_in(py::module& m) {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
-    m.def("POS", POS, py::arg("block"), py::arg("query"), py::arg("sg"));
-
     m.def("HHV", HHV_1, py::arg("n") = 20);
     m.def("HHV", HHV_2, py::arg("n"));
     m.def("HHV", HHV_3, py::arg("data"), py::arg("n"));

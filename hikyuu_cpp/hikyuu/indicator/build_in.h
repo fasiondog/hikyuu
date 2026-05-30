@@ -93,7 +93,6 @@
 #include "crt/MRR.h"
 #include "crt/NDAY.h"
 #include "crt/NOT.h"
-#include "crt/POS.h"
 #include "crt/POW.h"
 #include "crt/PRICELIST.h"
 #include "crt/RECOVER.h"
