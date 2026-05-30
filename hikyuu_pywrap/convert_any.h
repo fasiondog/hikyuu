@@ -131,7 +131,11 @@ public:
             return true;
         }
 
-        if (isinstance<Stock>(obj)) {
+        if (isinstance<Datetime>(obj)) {
+            value = obj.cast<Datetime>();
+            return true;
+
+        } else if (isinstance<Stock>(obj)) {
             value = obj.cast<Stock>();
             return true;
 
@@ -203,6 +207,20 @@ public:
             std::string s(boost::any_cast<std::string>(x));
             return Py_BuildValue("s", s.c_str());
 
+        } else if (x.type() == typeid(Datetime)) {
+            Datetime d = boost::any_cast<Datetime>(x);
+            std::stringstream cmd;
+            if (d.isNull()) {
+                cmd << "Datetime()";
+            } else {
+                cmd << "Datetime(" << d.year() << "," << d.month() << "," << d.day() << ","
+                    << d.hour() << "," << d.minute() << "," << d.second() << "," << d.millisecond()
+                    << "," << d.microsecond() << ")";
+            }
+            object o = eval(cmd.str());
+            o.inc_ref();
+            return o;
+
         } else if (x.type() == typeid(KData)) {
             const KData& k = boost::any_cast<KData>(x);
             std::stringstream cmd;
@@ -229,7 +247,7 @@ public:
             return o;
 
         } else if (x.type() == typeid(Stock)) {
-            const Stock& stk = boost::any_cast<Stock>(x);
+            const Stock& stk = boost::any_cast<const Stock&>(x);
             std::stringstream cmd;
             if (stk.isNull()) {
                 cmd << "Stock()";

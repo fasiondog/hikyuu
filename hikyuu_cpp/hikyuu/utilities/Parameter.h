@@ -47,6 +47,93 @@ using std::vector;
 typedef vector<string> StringList;
 #endif
 
+#if HKU_SUPPORT_SERIALIZATION
+struct ParamItemRecord {
+    friend class boost::serialization::access;
+
+    ParamItemRecord() {}
+    ParamItemRecord(const string& name, const boost::any& arg) : name(name) {
+        if (arg.type() == typeid(bool)) {
+            type = "bool";
+            bool x = boost::any_cast<bool>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (arg.type() == typeid(int)) {
+            type = "int";
+            int x = boost::any_cast<int>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (arg.type() == typeid(int64_t)) {
+            type = "int64";
+            int64_t x = boost::any_cast<int64_t>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (arg.type() == typeid(double)) {
+            type = "double";
+            double x = boost::any_cast<double>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (strcmp(arg.type().name(), typeid(string).name()) == 0) {
+            type = "string";
+            value = boost::any_cast<string>(arg);
+        } else if (strcmp(arg.type().name(), typeid(Datetime).name()) == 0) {
+            type = "Datetime";
+            datetime = boost::any_cast<Datetime>(arg);
+        } else if (strcmp(arg.type().name(), typeid(Stock).name()) == 0) {
+            type = "stock";
+            value = "stock";
+            stock = boost::any_cast<Stock>(arg);
+        } else if (strcmp(arg.type().name(), typeid(Block).name()) == 0) {
+            type = "block";
+            value = "block";
+            block = boost::any_cast<Block>(arg);
+        } else if (strcmp(arg.type().name(), typeid(KQuery).name()) == 0) {
+            type = "query";
+            value = "query";
+            query = boost::any_cast<KQuery>(arg);
+        } else if (strcmp(arg.type().name(), typeid(KData).name()) == 0) {
+            type = "kdata";
+            value = "kdata";
+            kdata = boost::any_cast<KData>(arg);
+        } else if (strcmp(arg.type().name(), typeid(PriceList).name()) == 0) {
+            type = "PriceList";
+            value = "price_list";
+            price_list = boost::any_cast<PriceList>(arg);
+        } else if (strcmp(arg.type().name(), typeid(DatetimeList).name()) == 0) {
+            type = "DatetimeList";
+            value = "date_list";
+            date_list = boost::any_cast<DatetimeList>(arg);
+        } else {
+            type = "Unknown";
+            value = "Unknown";
+        }
+    }
+
+    string name;
+    string type;
+    string value;
+    Datetime datetime;
+    Stock stock;
+    Block block;
+    KQuery query;
+    KData kdata;
+    PriceList price_list;
+    DatetimeList date_list;
+
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(name);
+        ar& BOOST_SERIALIZATION_NVP(type);
+        ar& BOOST_SERIALIZATION_NVP(value);
+        ar& BOOST_SERIALIZATION_NVP(stock);
+        ar& BOOST_SERIALIZATION_NVP(block);
+        ar& BOOST_SERIALIZATION_NVP(query);
+        ar& BOOST_SERIALIZATION_NVP(kdata);
+        ar& BOOST_SERIALIZATION_NVP(price_list);
+        ar& BOOST_SERIALIZATION_NVP(date_list);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(datetime);
+        }
+    }
+};
+#endif
+
 /**
  * 供需要命名参数设定的类使用
  * @details 在需要命名参数设定的类定义中，增加宏PARAMETER_SUPPORT，如：
@@ -192,84 +279,6 @@ private:
 private:
     friend class boost::serialization::access;
 
-    struct ItemRecord {
-        friend class boost::serialization::access;
-
-        ItemRecord() {}
-        ItemRecord(const string& name, const boost::any& arg) : name(name) {
-            if (arg.type() == typeid(bool)) {
-                type = "bool";
-                bool x = boost::any_cast<bool>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(int)) {
-                type = "int";
-                int x = boost::any_cast<int>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(int64_t)) {
-                type = "int64";
-                int64_t x = boost::any_cast<int64_t>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(double)) {
-                type = "double";
-                double x = boost::any_cast<double>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (strcmp(arg.type().name(), typeid(string).name()) == 0) {
-                type = "string";
-                value = boost::any_cast<string>(arg);
-            } else if (strcmp(arg.type().name(), typeid(Stock).name()) == 0) {
-                type = "stock";
-                value = "stock";
-                stock = boost::any_cast<Stock>(arg);
-            } else if (strcmp(arg.type().name(), typeid(Block).name()) == 0) {
-                type = "block";
-                value = "block";
-                block = boost::any_cast<Block>(arg);
-            } else if (strcmp(arg.type().name(), typeid(KQuery).name()) == 0) {
-                type = "query";
-                value = "query";
-                query = boost::any_cast<KQuery>(arg);
-            } else if (strcmp(arg.type().name(), typeid(KData).name()) == 0) {
-                type = "kdata";
-                value = "kdata";
-                kdata = boost::any_cast<KData>(arg);
-            } else if (strcmp(arg.type().name(), typeid(PriceList).name()) == 0) {
-                type = "PriceList";
-                value = "price_list";
-                price_list = boost::any_cast<PriceList>(arg);
-            } else if (strcmp(arg.type().name(), typeid(DatetimeList).name()) == 0) {
-                type = "DatetimeList";
-                value = "date_list";
-                date_list = boost::any_cast<DatetimeList>(arg);
-            } else {
-                type = "Unknown";
-                value = "Unknown";
-            }
-        }
-
-        string name;
-        string type;
-        string value;
-        Stock stock;
-        Block block;
-        KQuery query;
-        KData kdata;
-        PriceList price_list;
-        DatetimeList date_list;
-
-        template <class Archive>
-        void serialize(Archive& ar, const unsigned int version) {
-            ar& BOOST_SERIALIZATION_NVP(name);
-            ar& BOOST_SERIALIZATION_NVP(type);
-            ar& BOOST_SERIALIZATION_NVP(value);
-            ar& BOOST_SERIALIZATION_NVP(stock);
-            ar& BOOST_SERIALIZATION_NVP(block);
-            ar& BOOST_SERIALIZATION_NVP(query);
-            ar& BOOST_SERIALIZATION_NVP(kdata);
-            ar& BOOST_SERIALIZATION_NVP(price_list);
-            ar& BOOST_SERIALIZATION_NVP(date_list);
-        }
-    };
-
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
         namespace bs = boost::serialization;
@@ -277,8 +286,8 @@ private:
         ar& bs::make_nvp<size_t>("count", total);
         param_map_t::const_iterator iter = m_params.begin();
         for (; iter != m_params.end(); ++iter) {
-            ItemRecord record(iter->first, iter->second);
-            ar& bs::make_nvp<ItemRecord>("Item", record);
+            ParamItemRecord record(iter->first, iter->second);
+            ar& bs::make_nvp<ParamItemRecord>("Item", record);
         }
     }
 
@@ -287,9 +296,9 @@ private:
         namespace bs = boost::serialization;
         size_t total = 0;
         ar& bs::make_nvp<size_t>("count", total);
-        ItemRecord record;
+        ParamItemRecord record;
         for (size_t i = 0; i < total; i++) {
-            ar& bs::make_nvp<ItemRecord>("Item", record);
+            ar& bs::make_nvp<ParamItemRecord>("Item", record);
 
             if (record.type == "bool") {
                 m_params[record.name] = boost::lexical_cast<bool>(record.value);
@@ -301,6 +310,8 @@ private:
                 m_params[record.name] = boost::lexical_cast<double>(record.value);
             } else if (record.type == "string") {
                 m_params[record.name] = record.value;
+            } else if (record.type == "Datetime") {
+                m_params[record.name] = record.datetime;
             } else if (record.type == "stock") {
                 m_params[record.name] = record.stock;
             } else if (record.type == "block") {
@@ -599,4 +610,9 @@ HKU_API bool operator!=(const Parameter&, const Parameter&);
 HKU_API bool operator<(const Parameter&, const Parameter&);
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_VERSION(::hku::ParamItemRecord, 1)
+#endif
+
 #endif /* PARAMETER_H_ */

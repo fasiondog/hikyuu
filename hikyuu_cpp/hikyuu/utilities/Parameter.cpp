@@ -35,6 +35,8 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Parameter& param) {
             os << "(double): " << boost::any_cast<double>(iter->second) << strip;
         } else if (isType<string>(iter->second)) {
             os << "(string): " << boost::any_cast<string>(iter->second) << strip;
+        } else if (isType<Datetime>(iter->second)) {
+            os << "(Datetime): " << boost::any_cast<Datetime>(iter->second) << strip;
         } else if (isType<Stock>(iter->second)) {
             os << "(Stock): " << boost::any_cast<Stock>(iter->second).market_code() << strip;
         } else if (isType<Block>(iter->second)) {
@@ -91,7 +93,7 @@ bool Parameter::support(const boost::any& value) {
            value.type() == typeid(bool) || value.type() == typeid(double) ||
            isType<string>(value) || isType<Stock>(value) || isType<Block>(value) ||
            isType<KQuery>(value) || isType<KData>(value) || isType<PriceList>(value) ||
-           isType<DatetimeList>(value);
+           isType<DatetimeList>(value) || isType<Datetime>(value);
 }
 
 string Parameter::type(const string& name) const {
@@ -103,6 +105,7 @@ string Parameter::type(const string& name) const {
     HKU_IF_RETURN(iter->second.type() == typeid(bool), "bool");
     HKU_IF_RETURN(iter->second.type() == typeid(double), "double");
     HKU_IF_RETURN(isType<string>(iter->second), "string");
+    HKU_IF_RETURN(isType<Datetime>(iter->second), "Datetime");
     HKU_IF_RETURN(isType<Stock>(iter->second), "Stock");
     HKU_IF_RETURN(isType<Block>(iter->second), "Block");
     HKU_IF_RETURN(isType<KQuery>(iter->second), "KQuery");
@@ -137,6 +140,8 @@ string Parameter::getNameValueList() const {
             os << iter->first << equal << boost::any_cast<double>(iter->second);
         } else if (isType<string>(iter->second)) {
             os << "\"" << iter->first << "\"" << equal << boost::any_cast<string>(iter->second);
+        } else if (isType<Datetime>(iter->second)) {
+            os << iter->first << equal << boost::any_cast<Datetime>(iter->second);
         } else if (isType<Stock>(iter->second)) {
             os << iter->first << equal << boost::any_cast<Stock>(iter->second);
         } else if (isType<Block>(iter->second)) {
@@ -196,6 +201,12 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
             if (iter1->second.type() == typeid(string)) {
                 const string* x1 = boost::any_cast<string>(&iter1->second);
                 const string* x2 = boost::any_cast<string>(&iter2->second);
+                HKU_IF_RETURN(*x1 != *x2, false);
+            }
+
+            if (iter1->second.type() == typeid(Datetime)) {
+                const Datetime* x1 = boost::any_cast<Datetime>(&iter1->second);
+                const Datetime* x2 = boost::any_cast<Datetime>(&iter2->second);
                 HKU_IF_RETURN(*x1 != *x2, false);
             }
 

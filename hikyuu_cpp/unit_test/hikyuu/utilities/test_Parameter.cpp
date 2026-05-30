@@ -34,11 +34,13 @@ TEST_CASE("test_Parameter") {
     param.set<bool>("bool", true);
     param.set<double>("double", 10);
     param.set<string>("string", "test");
+    param.set<Datetime>("datetime", Datetime(2023, 1, 1));
     CHECK(param.get<int>("n") == 1);
     CHECK(param.get<int64_t>("n64") == 21474836480ll);
     CHECK(param.get<bool>("bool") == true);
     CHECK(param.get<double>("double") == 10.0);
     CHECK(param.get<string>("string") == "test");
+    CHECK(param.get<Datetime>("datetime") == Datetime(2023, 1, 1));
     param.set<int>("n", 10);
     param.set<int64_t>("n64", -21474836480ll);
     param.set<bool>("bool", false);
@@ -178,6 +180,7 @@ TEST_CASE("test_Parameter_serialize") {
     p1.set<bool>("bool", true);
     p1.set<double>("p", 0.101);
     p1.set<string>("string", "This is string!");
+    p1.set<Datetime>("date", Datetime(20260101));
     Stock stk = getStock("sh600000");
     KQuery q = KQueryByDate(Datetime(200001041025), Datetime(200001041100), KQuery::MIN5);
     KData k = stk.getKData(q);
@@ -214,6 +217,7 @@ TEST_CASE("test_Parameter_serialize") {
     CHECK(p2.get<Stock>("stk") == stk);
     CHECK(p2.get<Block>("blk") == Block());
     CHECK(p2.get<KQuery>("query") == q);
+    CHECK(p2.get<Datetime>("date") == Datetime(20260101));
     KData k2 = p2.get<KData>("kdata");
     CHECK(k.size() == k2.size());
     CHECK(k.getStock() == k2.getStock());
