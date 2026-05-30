@@ -97,6 +97,23 @@ void export_extend_Indicator(py::module& m) {
     :return: 指标数据
     :rtype: Indicator)");
 
+    m.def("FIXED_START_DATE", py::overload_cast<const Datetime&, const string&>(FIXED_START_DATE),
+          py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "");
+    m.def("FIXED_START_DATE",
+          py::overload_cast<const Indicator&, const Datetime&, const string&>(FIXED_START_DATE),
+          py::arg("ind"), py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "",
+          R"(FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+
+    固定指标计算时使用的查询范围的起始日期。
+
+    对某些随时间起点变化的指标（如 AD），固定起始日期确保从指定日期开始计算。
+
+    :param Indicator ind: 输入指标
+    :param Datetime start_date: 起始日期，默认为 Datetime.min()
+    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
+    :return: 指标数据
+    :rtype: Indicator)");
+
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
           py::arg("fill_null") = false);
     m.def("WITHKTYPE", py::overload_cast<const Indicator&, const KQuery::KType&, bool>(WITHKTYPE),

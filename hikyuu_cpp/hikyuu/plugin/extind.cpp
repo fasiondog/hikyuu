@@ -41,6 +41,18 @@ Indicator HKU_API FIXED_START_INDEX(const Indicator& ind, int start_index,
     return FIXED_START_INDEX(start_index, factor_name)(ind);
 }
 
+Indicator HKU_API FIXED_START_DATE(const Datetime& start_date, const string& factor_name) {
+    Parameter params;
+    params.set<Datetime>("start_date", start_date);
+    params.set<string>("factor_name", factor_name);
+    return getExtIndicator("FIXED_START_DATE", params);
+}
+
+Indicator HKU_API FIXED_START_DATE(const Indicator& ind, const Datetime& start_date,
+                                   const string& factor_name) {
+    return FIXED_START_DATE(start_date, factor_name)(ind);
+}
+
 Indicator HKU_API WITHKTYPE(const KQuery::KType& ktype, bool fill_null) {
     Parameter params;
     params.set<string>("ktype", ktype);
