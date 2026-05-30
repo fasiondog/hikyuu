@@ -105,12 +105,7 @@ public:
 
         if (PyLong_Check(src)) {
             long long ll_val = PyLong_AsLongLong(src);
-            if (ll_val < std::numeric_limits<int>::min() ||
-                ll_val > std::numeric_limits<int>::max()) {
-                value = static_cast<int64_t>(ll_val);
-            } else {
-                value = static_cast<int>(ll_val);
-            }
+            value = static_cast<int64_t>(ll_val);
             return true;
         }
 

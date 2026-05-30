@@ -58,7 +58,7 @@ struct ParamItemRecord {
             bool x = boost::any_cast<bool>(arg);
             value = boost::lexical_cast<string>(x);
         } else if (arg.type() == typeid(int)) {
-            type = "int";
+            type = "int64";
             int x = boost::any_cast<int>(arg);
             value = boost::lexical_cast<string>(x);
         } else if (arg.type() == typeid(int64_t)) {
@@ -303,7 +303,7 @@ private:
             if (record.type == "bool") {
                 m_params[record.name] = boost::lexical_cast<bool>(record.value);
             } else if (record.type == "int") {
-                m_params[record.name] = boost::lexical_cast<int>(record.value);
+                m_params[record.name] = boost::lexical_cast<int64_t>(record.value);
             } else if (record.type == "int64") {
                 m_params[record.name] = boost::lexical_cast<int64_t>(record.value);
             } else if (record.type == "double") {
@@ -494,6 +494,19 @@ void Parameter::set(const string& name, const ValueType& value) {
 
         m_params[name] = value;
 
+    } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
+        if (!have(name)) {
+            m_params[name] = value;
+            return;
+        }
+
+        if (m_params[name].type() != typeid(int64_t) && m_params[name].type() != typeid(int)) {
+            throw std::logic_error(
+              "Mismatching type! need type int or int64_t, but value type is " +
+              string(typeid(ValueType).name()));
+        }
+        m_params[name] = static_cast<int64_t>(value);
+
     } else {
         if (!have(name)) {
             if (!support(value)) {
@@ -528,13 +541,32 @@ void Parameter::set(const string& name, ValueType&& value) {
             return;
         }
 
-        if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
-            throw std::logic_error("Mismatching type! need type " +
-                                   string(m_params[name].type().name()) + " but value type is " +
-                                   string(value.type().name()));
+        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
+            if ((m_params[name].type() == typeid(int64_t) ||
+                 m_params[name].type() == typeid(int)) &&
+                (typeid(ValueType) == typeid(int64_t) || typeid(ValueType) == typeid(int))) {
+                // 忽略，允许设定
+            } else {
+                throw std::logic_error("Mismatching type! need type " +
+                                       string(m_params[name].type().name()) +
+                                       " but value type is " + string(typeid(ValueType).name()));
+            }
         }
 
         m_params[name] = std::forward<ValueType>(value);
+
+    } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
+        if (!have(name)) {
+            m_params[name] = value;
+            return;
+        }
+
+        if (m_params[name].type() != typeid(int64_t) && m_params[name].type() != typeid(int)) {
+            throw std::logic_error(
+              "Mismatching type! need type int or int64_t, but value type is " +
+              string(typeid(ValueType).name()));
+        }
+        m_params[name] = static_cast<int64_t>(value);
 
     } else {
         if (!have(name)) {
@@ -572,24 +604,8 @@ inline boost::any Parameter::get<boost::any>(const std::string& name) const {
     return iter->second;
 }
 
-// template <>
-// inline void Parameter::set(const string& name, const boost::any& value) {
-//     if (!have(name)) {
-//         m_params[name] = value;
-//         return;
-//     }
-
-//     if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
-//         throw std::logic_error("Mismatching type! need type " +
-//                                string(m_params[name].type().name()) + " but value type is " +
-//                                string(value.type().name()));
-//     }
-
-//     m_params[name] = value;
-// }
-
 template <>
-inline int64_t Parameter::get(const string& name) const {
+inline int Parameter::get(const string& name) const {
     param_map_t::const_iterator iter;
     iter = m_params.find(name);
     if (iter == m_params.end()) {
@@ -599,7 +615,7 @@ inline int64_t Parameter::get(const string& name) const {
         if (iter->second.type() == typeid(int)) {
             return boost::any_cast<int>(iter->second);
         }
-        return boost::any_cast<int64_t>(iter->second);
+        return static_cast<int>(boost::any_cast<int64_t>(iter->second));
     } catch (...) {
         throw std::runtime_error("failed conversion param: " + name);
     }
