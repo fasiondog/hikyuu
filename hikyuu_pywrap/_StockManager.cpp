@@ -250,13 +250,13 @@ void export_StockManager(py::module& m) {
     
     :param Block block: 板块实例)")
 
-      .def("get_block_list", py::overload_cast<>(&StockManager::getBlockList))
       .def("get_block_list", py::overload_cast<const string&>(&StockManager::getBlockList),
+           py::arg("category") = "",
            R"(get_block_list(self[, category])
 
     获取指定分类的板块列表
 
-    :param str category: 板块分类
+    :param str category: 板块分类, 如为空字符串，返回所有板块列表
     :return: 板块列表
     :rtype: BlockList)")
 

@@ -156,16 +156,10 @@ public:
 
     /**
      * 获取指定分类的板块列表
-     * @param category 板块分类
+     * @param category 板块分类, 如为空字符串，所有板块列表
      * @return 板块列表
      */
-    BlockList getBlockList(const string& category);
-
-    /**
-     * 获取所有板块
-     * @return 板块列表
-     */
-    BlockList getBlockList();
+    BlockList getBlockList(const string& category = "");
 
     /**
      * 获取指定指数的板块列表, 如果不存在返回空列表
@@ -337,6 +331,9 @@ private:
     /* 加载所有证券 */
     void loadAllStocks();
 
+    /* 加载内部自生成的板块 */
+    void loadInnerBlocks();
+
     /* 加载所有权息数据 */
     void loadAllStockWeights();
 
@@ -360,6 +357,9 @@ private:
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;
     BlockInfoDriverPtr m_blockDriver;
+
+    // 内部自生成的板块，初始化时生成，不从数据库取
+    std::unordered_map<string, Block> m_innerBlocks;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
     std::shared_mutex* m_stockDict_mutex;
