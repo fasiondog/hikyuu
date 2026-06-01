@@ -229,6 +229,7 @@ zsbk_sh50 = None
 zsbk_sh180 = None
 zsbk_hs300 = None
 zsbk_zz100 = None
+blocketf = None
 
 
 def load_hikyuu(**kwargs):
@@ -389,6 +390,7 @@ def load_hikyuu(**kwargs):
     global zsbk_sh180
     global zsbk_hs300
     global zsbk_zz100
+    global blocketf
 
     blocka = sm.get_block("A", "ALL")  # 全A，含北交所
     zsbk_a = blocka
@@ -416,6 +418,8 @@ def load_hikyuu(**kwargs):
     zsbk_sh180 = sm.get_block("指数板块", "上证180")
     zsbk_hs300 = sm.get_block("指数板块", "沪深300")
     zsbk_zz100 = sm.get_block("指数板块", "中证100")
+
+    blocketf = sm.get_block("ETF", "ALL")
 
     set_global_context(sm['sh000001'], Query(-150))
 
@@ -616,7 +620,7 @@ def auto_sync_globals(func):
                     caller_globals = caller_frame.f_globals
                     # 检查是否是从hikyuu导入的全局变量且值为None
                     var_names = ['blocka', 'blocka_shsz', 'zsbk_a', 'blocksh', 'zsbk_sh', 'blocksz', 'zsbk_sz',
-                                 'blockbj', 'zsbk_bj', 'blockg', 'zsbk_cyb', 'blockstart', 'blockzxb',
+                                 'blockbj', 'zsbk_bj', 'blockg', 'zsbk_cyb', 'blockstart', 'blockzxb', 'blocketf',
                                  'zsbk_zxb', 'zsbk_sh50', 'zsbk_sh180', 'zsbk_hs300', 'zsbk_zz100']
 
                     updated_vars = []

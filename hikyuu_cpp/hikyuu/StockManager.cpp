@@ -860,6 +860,7 @@ void StockManager::loadInnerBlocks() {
     Block blockzxb = Block("A", "中小板");
     Block blockg = Block("G", "创业板");
     Block blockstart = Block("START", "科创板");
+    Block blocketf = Block("ETF", "ALL");
 
     std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     auto iter = m_stockDict.begin();
@@ -883,6 +884,8 @@ void StockManager::loadInnerBlocks() {
             blockg.add(stock);
         } else if (stock.type() == STOCKTYPE_START) {
             blockstart.add(stock);
+        } else if (stock.type() == STOCKTYPE_ETF) {
+            blocketf.add(stock);
         }
     }
 
@@ -922,6 +925,7 @@ void StockManager::loadInnerBlocks() {
     m_innerBlocks["A_中小板"] = std::move(blockzxb);
     m_innerBlocks["G_创业板"] = std::move(blockg);
     m_innerBlocks["START_科创板"] = std::move(blockstart);
+    m_innerBlocks["ETF_ALL"] = std::move(blocketf);
 }
 
 void StockManager::loadAllStockWeights() {
