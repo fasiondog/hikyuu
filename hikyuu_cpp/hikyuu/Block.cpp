@@ -186,6 +186,21 @@ uint64_t Block::strongHash() const {
     return result;
 }
 
+bool Block::operator==(const Block& blk) const noexcept {
+    HKU_IF_RETURN(this == &blk || m_data == blk.m_data, true);
+    HKU_IF_RETURN(category() != blk.category() || name() != blk.name() || size() != blk.size() ||
+                    getIndexStock() != blk.getIndexStock(),
+                  false);
+    unordered_map<string, string> self_dict;
+    for (const auto& stk : getStockList()) {
+        self_dict[stk.market_code()] = stk.market_code();
+    }
+    for (const auto& stk : blk.getStockList()) {
+        HKU_IF_RETURN(self_dict.count(stk.market_code()) == 0, false);
+    }
+    return true;
+}
+
 HKU_API Block getBlock(const string& category, const string& name) {
     auto& sm = StockManager::instance();
     return sm.getBlock(category, name);

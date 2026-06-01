@@ -51,12 +51,10 @@ public:
         return m_data ? (uint64_t)m_data.get() : 0;
     }
 
-    bool operator==(const Block& blk) const noexcept {
-        return m_data == blk.m_data;
-    }
+    bool operator==(const Block& blk) const noexcept;
 
     bool operator!=(const Block& blk) const noexcept {
-        return m_data != blk.m_data;
+        return !(*this == blk);
     }
 
     /** 获取板块类别 */
