@@ -265,14 +265,11 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
     HKU_WARN_IF(!norm && category.empty() && style_inds.empty(),
                 "No special handling is specified!");
 
-    string upper_name = name;
-    to_upper(upper_name);
     bool found = false;
     string found_name;
     for (const auto& ind : m_factorset) {
-        string ind_name = ind.name();
-        to_upper(ind_name);
-        if (ind_name == upper_name) {
+        // 指标可以是中文名，但Factor不可以
+        if (utf8_fold_equal(ind.name(), name)) {
             found = true;
             found_name = ind.name();
             break;
