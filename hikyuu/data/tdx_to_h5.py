@@ -137,6 +137,27 @@ def tdx_import_stock_name_from_file(connect, filename, market, quotations=None):
     return count
 
 
+def get_day_price_multiplier(code):
+    """根据股票代码判断TDX日线价格整数的精度倍数
+
+    TDX日线整数精度因品种而异:
+    - A股/北交所/深B: 精度/100，存入HDF5时需 ×10
+    - ETF/沪B/LOF/REIT/债券: 精度/1000，存入HDF5时需 ×1
+
+    :param code: 股票代码（不含市场前缀）
+    :return: 价格乘数（1 或 10）
+    """
+    # 15/51/56/58=ETF, 16=LOF, 18=REIT, 50=SH LOF/基金
+    # 900=沪B, 10/11/12=债券
+    # 这些品种精度已是/1000，×1即可
+    # 注意: 深B(200xxx)精度为/100，需要×10，不要加入此列表
+    if code.startswith(('15', '16', '18', '50', '51', '56', '58',
+                        '900', '10', '11', '12')):
+        return 1
+    # A股、深B、北交所、指数等: 精度为/100，需要×10转为/1000
+    return 10
+
+
 def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_record):
     """从通达信盘后数据导入日K线
 
@@ -152,6 +173,9 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
 
     stockid, marketid, code, valid, stktype = stock_record[0], stock_record[1], stock_record[
         2], stock_record[3], stock_record[4]
+
+    # 根据品种获取日线价格倍数，修复ETF/B股/LOF/REIT精度问题
+    price_mult = get_day_price_multiplier(code)
 
     table = get_h5table(h5file, market, code)
     if table.nrows > 0:
@@ -172,10 +196,10 @@ def tdx_import_day_data_from_file(connect, filename, h5file, market, stock_recor
                 if record[2] >= record[1] >= record[3] \
                         and record[2] >= record[4] >= record[3]:
                     row['datetime'] = record[0] * 10000
-                    row['openPrice'] = record[1] * 10
-                    row['highPrice'] = record[2] * 10
-                    row['lowPrice'] = record[3] * 10
-                    row['closePrice'] = record[4] * 10
+                    row['openPrice'] = record[1] * price_mult
+                    row['highPrice'] = record[2] * price_mult
+                    row['lowPrice'] = record[3] * price_mult
+                    row['closePrice'] = record[4] * price_mult
                     row['transAmount'] = round(record[5] * 0.001)
                     if stktype == 2:
                         # 指数
