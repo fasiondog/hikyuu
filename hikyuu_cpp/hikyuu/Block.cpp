@@ -175,6 +175,8 @@ uint64_t Block::strongHash() const {
     XXH64_update(state, m_data->m_name.data(), m_data->m_name.size());
 
     StockList stocks = getStockList();
+    std::sort(stocks.begin(), stocks.end(),
+              [](const Stock& a, const Stock& b) { return a.market_code() < b.market_code(); });
     for (const auto& stk : stocks) {
         auto stkid = stk.id();
         XXH64_update(state, &stkid, sizeof(stkid));
