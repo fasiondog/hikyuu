@@ -243,8 +243,7 @@ inline const string& FactorSet::name() const noexcept {
 }
 
 inline void FactorSet::name(const string& name) {
-    m_data->name = name;
-    to_upper(m_data->name);
+    m_data->name = utf8_to_upper(name);
 }
 
 inline const string& FactorSet::ktype() const noexcept {

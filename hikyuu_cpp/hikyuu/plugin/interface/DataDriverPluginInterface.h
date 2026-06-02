@@ -24,6 +24,7 @@ public:
     virtual BlockInfoDriverPtr getBlockInfoDriver() = 0;
     virtual BaseInfoDriverPtr getBaseInfoDriver() = 0;
 
+    virtual bool isValidFactorName(const string& name) noexcept = 0;
     virtual FactorList getAllFactors() = 0;
     virtual FactorSetList getAllFactorSets() = 0;
     virtual void updateAllFactorsValues(const KQuery::KType& ktype) = 0;

@@ -22,14 +22,14 @@ HKU_API std::ostream& operator<<(std::ostream& os, const Factor& factor) {
 
 string Factor::str() const {
     std::ostringstream os;
-    string strip("  \n");
-    os << "Factor(";
+    string strip("\n");
+    os << "Factor{";
     os << strip << "name: " << name() << strip << "ktype: " << ktype() << strip
        << "recover_type: " << KQuery::getRecoverTypeName(recoverType()) << strip
        << "need_save_value: " << needSaveValue() << strip << "create_at: " << createAt().str()
        << strip << "update_at: " << updateAt().str() << strip << "formula: " << formula().formula()
        << strip << "brief: " << brief() << strip << "detail: " << details() << strip
-       << "start_date: " << startDate() << strip << "block: " << block() << ")";
+       << "start_date: " << startDate() << strip << "block: " << block() << "}";
     return os.str();
 }
 
@@ -49,7 +49,27 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
                const string& brief, const string& details, bool need_save_value,
                const Datetime& start_date, const Block& block, KQuery::RecoverType recover_type)
 : m_data(make_shared<Data>(name, formula, ktype, brief, details, need_save_value, start_date, block,
-                           recover_type)) {}
+                           recover_type)) {
+    // 使用保存因子值时,因子名称必须是英文字母、数字、_ 组成，且首字母不能为数字
+    HKU_CHECK(need_save_value && isValidFactorName(m_data->name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
+}
+
+void Factor::name(const string& name) {
+    HKU_CHECK(m_data->need_save_value && isValidFactorName(name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
+    m_data->name = utf8_to_upper(name);
+    m_data->formula.name(m_data->name);
+}
+
+void Factor::needSaveValue(bool flag) {
+    HKU_CHECK(flag && isValidFactorName(m_data->name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
+    m_data->need_save_value = flag;
+}
 
 Factor::Factor(const Factor& other) noexcept : m_data(other.m_data) {}
 

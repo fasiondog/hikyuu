@@ -43,6 +43,8 @@ void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype);
 /** 获取因子集合 */
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
+bool isValidFactorName(const string& name);
+
 IndicatorList getValues(const Factor& factor, const StockList& stocks, const KQuery& query,
                         bool align, bool fill_null, bool tovalue, const DatetimeList& align_dates);
 

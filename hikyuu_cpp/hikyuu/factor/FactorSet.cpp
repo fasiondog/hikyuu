@@ -43,9 +43,7 @@ FactorSet::FactorSet(const std::unordered_map<string, Indicator>& inds, const KQ
 
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
 : m_data(make_shared<Data>()) {
-    string upper_name = name;
-    to_upper(upper_name);
-    m_data->name = upper_name;
+    m_data->name = utf8_to_upper(name);
     m_data->ktype = ktype;
     m_data->block = block;
 }

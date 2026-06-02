@@ -126,6 +126,19 @@ FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype) {
     return ret;
 }
 
+bool isValidFactorName(const string& name) {
+    auto& sm = StockManager::instance();
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+
+    // 非clickhouse驱动不限制因子名称
+    HKU_IF_RETURN(driver_type != "clickhouse", true);
+
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_IF_RETURN(!plugin, true);  // 如果没有数据驱动插件，则不限制因子名称
+    return plugin->isValidFactorName(name);
+}
+
 IndicatorList getValues(const Factor& factor, const StockList& stocks, const KQuery& query,
                         bool align, bool fill_null, bool tovalue, const DatetimeList& align_dates) {
     IndicatorList ret;
