@@ -67,7 +67,7 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
 void FactorSet::add(const Factor& factor) {
     HKU_CHECK(!factor.isNull(), "Factor is null!");
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
-    HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
+    HKU_CHECK(factor.block() == m_data->block, "block not match!");
 
     const string& factor_name = factor.name();
 
