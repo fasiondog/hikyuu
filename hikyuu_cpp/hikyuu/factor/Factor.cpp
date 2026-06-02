@@ -51,23 +51,30 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
 : m_data(make_shared<Data>(name, formula, ktype, brief, details, need_save_value, start_date, block,
                            recover_type)) {
     // 使用保存因子值时,因子名称必须是英文字母、数字、_ 组成，且首字母不能为数字
-    HKU_CHECK(need_save_value && isValidFactorName(m_data->name), "{}",
-              htr("When saving factor values, factor names must consist of English letters, "
-                  "numbers and underscores, and cannot start with a number!"));
+    if (need_save_value) {
+        HKU_CHECK(isValidFactorName(name), "{}",
+                  htr("When saving factor values, factor names must consist of English letters, "
+                      "numbers and underscores, and cannot start with a number!"));
+    }
 }
 
 void Factor::name(const string& name) {
-    HKU_CHECK(m_data->need_save_value && isValidFactorName(name), "{}",
-              htr("When saving factor values, factor names must consist of English letters, "
-                  "numbers and underscores, and cannot start with a number!"));
+    if (m_data->need_save_value) {
+        HKU_CHECK(isValidFactorName(name), "{}",
+                  htr("When saving factor values, factor names must consist of English letters, "
+                      "numbers and underscores, and cannot start with a number!"));
+    }
     m_data->name = utf8_to_upper(name);
     m_data->formula.name(m_data->name);
 }
 
 void Factor::needSaveValue(bool flag) {
-    HKU_CHECK(flag && isValidFactorName(m_data->name), "{}",
-              htr("When saving factor values, factor names must consist of English letters, "
-                  "numbers and underscores, and cannot start with a number!"));
+    if (flag) {
+        // 保存因子值时,因子名称必须是英文字母、数字、_ 组成，且首字母不能为数字
+        HKU_CHECK(isValidFactorName(m_data->name), "{}",
+                  htr("When saving factor values, factor names must consist of English letters, "
+                      "numbers and underscores, and cannot start with a number!"));
+    }
     m_data->need_save_value = flag;
 }
 

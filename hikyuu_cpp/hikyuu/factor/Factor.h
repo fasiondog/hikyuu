@@ -349,6 +349,10 @@ inline const string& Factor::details() const noexcept {
     return m_data->details;
 }
 
+inline bool Factor::needSaveValue() const noexcept {
+    return m_data->need_save_value;
+}
+
 inline void Factor::details(const string& details) {
     m_data->details = details;
 }
