@@ -36,7 +36,7 @@ Factor()
 Factor(name, ktype=KQuery.DAY)
 
 # 创建新的因子对象
-Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=False, start_date=Datetime.min(), block=Block())
+Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=False, start_date=Datetime.min(), block=Block(), recover_type=KQuery.NO_RECOVER)
 ```
 
 **参数说明:**
@@ -50,6 +50,7 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 
 - `start_date` (Datetime): 开始日期，数据存储时的起始日期，默认为最小日期
 - `block` (Block): 板块信息，证券集合，如果为空则为全部，默认为空
+- `recover_type` (KQuery.RecoverType): 恢复类型，默认为 NO_RECOVER
 
 **注意:** 因子名称不区分大小写，以 `name + ktype` 作为唯一标识
 
