@@ -130,8 +130,8 @@ bool Block::add(const Stock& stock) {
 bool Block::add(const string& market_code) {
     const StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock(market_code);
-    HKU_WARN_IF_RETURN(stock.isNull(), false, "Can't find stock: {}", market_code);
-    HKU_IF_RETURN(have(stock), false);
+    // stock 为空时不打印日志，防止打印过多，尤其是部分累积不用的板块在初始化时会打印很多日志
+    HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data) [[unlikely]]
         m_data = make_shared<Data>();
 

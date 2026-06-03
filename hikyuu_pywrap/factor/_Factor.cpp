@@ -27,8 +27,14 @@ void export_Factor(py::module& m) {
     :param KQuery.KType ktype: K线类型，默认为日线)")
 
       .def(
-        py::init<const string&, const Indicator&, const KQuery::KType&, const string&,
-                 const string&, bool, const Datetime&, const Block&, KQuery::RecoverType>(),
+        py::init([](const string& name, const Indicator& formula, const KQuery::KType& ktype,
+                    const string& brief, const string& details, bool save_value,
+                    const Datetime& start_date, const py::object& block,
+                    KQuery::RecoverType recover_type) {
+            Block c_block = get_block_from_python(block);
+            return Factor(name, formula, ktype, brief, details, save_value, start_date, c_block,
+                          recover_type);
+        }),
         py::arg("name"), py::arg("formula"), py::arg("ktype") = KQuery::DAY, py::arg("brief") = "",
         py::arg("details") = "", py::arg("need_save_value") = false,
         py::arg("start_date") = Datetime::min(), py::arg("block") = Block(),
