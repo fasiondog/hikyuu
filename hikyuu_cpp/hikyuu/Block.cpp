@@ -22,12 +22,12 @@ Block::Block() noexcept {}
 
 Block::~Block() {}
 
-Block::Block(const string& category, const string& name) noexcept : m_data(make_shared<Data>()) {
+Block::Block(const string& category, const string& name) : m_data(make_shared<Data>()) {
     m_data->m_category = category;
     m_data->m_name = name;
 }
 
-Block::Block(const string& category, const string& name, const string& indexCode) noexcept
+Block::Block(const string& category, const string& name, const string& indexCode)
 : Block(category, name) {
     if (!indexCode.empty()) {
         auto stock = StockManager::instance().getStock(indexCode);
@@ -50,6 +50,18 @@ Block::Block(Block&& block) noexcept {
     if (!block.m_data)
         return;
     m_data = std::move(block.m_data);
+}
+
+Block::Block(const StockList& stocks) : m_data(make_shared<Data>()) {
+    for (const auto& stock : stocks) {
+        add(stock);
+    }
+}
+
+Block::Block(const StringList& market_codes) : m_data(make_shared<Data>()) {
+    for (const auto& market_code : market_codes) {
+        add(market_code);
+    }
 }
 
 Block& Block::operator=(const Block& block) noexcept {
@@ -118,8 +130,9 @@ bool Block::add(const Stock& stock) {
 bool Block::add(const string& market_code) {
     const StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock(market_code);
-    HKU_IF_RETURN(stock.isNull() || have(stock), false);
-    if (!m_data)
+    HKU_WARN_IF_RETURN(stock.isNull(), false, "Can't find stock: {}", market_code);
+    HKU_IF_RETURN(have(stock), false);
+    if (!m_data) [[unlikely]]
         m_data = make_shared<Data>();
 
     m_data->m_stockDict[stock.market_code()] = stock;

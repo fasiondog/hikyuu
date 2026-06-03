@@ -27,6 +27,8 @@ void export_Block(py::module& m) {
       .def(py::init<const string&, const string&, const string&>(), py::arg("category"),
            py::arg("name"), py::arg("index_code"))
       .def(py::init<const Block&>())
+      .def(py::init<const StockList&>())
+      .def(py::init<const StringList&>())
 
       .def("__str__", to_py_str<Block>)
       .def("__repr__", to_py_str<Block>)
