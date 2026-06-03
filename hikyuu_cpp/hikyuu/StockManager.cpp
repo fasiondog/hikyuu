@@ -568,7 +568,6 @@ void StockManager::saveBlock(const Block& blk) {
     if (m_blockDriver) {
         HKU_CHECK(!blk.category().empty(), "block's category can not be empty!");
         HKU_CHECK(!blk.name().empty(), "block's name can not be empty!");
-        HKU_CHECK(!blk.empty(), "Can't save empty block!");
         m_blockDriver->save(blk);
     }
 }
