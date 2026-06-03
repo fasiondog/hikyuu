@@ -89,12 +89,14 @@ void export_Factor(py::module& m) {
                     py::overload_cast<KQuery::RecoverType>(&Factor::recoverType),
                     py::return_value_policy::copy, "复权类型")
 
-      .def("save_to_db", &Factor::save_to_db,
-           R"(save_to_db(self)
+      .def("save_to_db", &Factor::save_to_db, py::arg("update_before") = true,
+           R"(save_to_db(self[, update_before=True])
     
     保存因子元数据到数据库，如果因子已存在则更新，否则插入新记录
     
-    :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
+    :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识
+    
+    :param bool update_before: 是否在保存前，检查并更新已有因子，默认True)。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新)")
 
       .def(
         "save_special_values_to_db",

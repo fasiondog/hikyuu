@@ -404,12 +404,12 @@ weekly_factor = get_factor("MA5", KQuery.WEEK)
 
 **返回值:** 因子对象，如果不存在则返回空因子
 
-#### save_factor(factor) ⚠️ 捐赠用户功能
+#### save_factor(factor[, update_before=True]) ⚠️ 捐赠用户功能
 
 保存因子到数据库
 
 ```python
-# 创建并保存因子 ⚠️ 捐赠用户功能
+# 创建并保存因子（默认会检查并更新已有因子）⚠️ 捐赠用户功能
 ma5 = MA(CLOSE(), 5)
 ma5.name = "MA5"
 ma5_factor = Factor("MA5", ma5)
@@ -419,6 +419,7 @@ save_factor(ma5_factor)
 **参数说明:**
 
 - `factor` (Factor): 要保存的因子对象
+- `update_before` (bool): 是否在保存前检查并更新已有因子，默认为True。注意：通常必须为true，否则会导致数据错误，除非确定所有因子值都已更新
 
 **注意:** 以 `name + ktype` 作为唯一标识
 

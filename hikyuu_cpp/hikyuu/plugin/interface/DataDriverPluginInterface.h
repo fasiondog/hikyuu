@@ -30,7 +30,7 @@ public:
     virtual void updateAllFactorsValues(const KQuery::KType& ktype) = 0;
 
     virtual Factor getFactor(const string& name, const KQuery::KType& ktype) = 0;
-    virtual void saveFactor(const Factor& factor) = 0;
+    virtual void saveFactor(const Factor& factor, bool update_before) = 0;
     virtual void removeFactor(const string& name, const KQuery::KType& ktype) = 0;
     virtual void saveSpecialFactorValues(const Factor& factor, const Stock& stock,
                                          const DatetimeList& dates, const PriceList& values,

@@ -22,7 +22,7 @@ Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
     return ret;
 }
 
-void HKU_API saveFactor(const Factor& factor) {
+void HKU_API saveFactor(const Factor& factor, bool update_before) {
     auto& sm = StockManager::instance();
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
@@ -30,7 +30,7 @@ void HKU_API saveFactor(const Factor& factor) {
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
     HKU_ERROR_IF_RETURN(!plugin, void(),
                         htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
-    plugin->saveFactor(factor);
+    plugin->saveFactor(factor, update_before);
 }
 
 void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,

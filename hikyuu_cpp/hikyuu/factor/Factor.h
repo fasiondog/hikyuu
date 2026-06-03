@@ -151,8 +151,10 @@ public:
     /**
      * 保存因子即其所有计算结果到数据库，如果因子已存在则更新，否则插入新记录
      * @note 因子名称不区分大小写，以 name + ktype 作为唯一标识
+     * @param update_before 是否在保存前，检查并更新已有因子，默认
+     * true。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新
      */
-    void save_to_db();
+    void save_to_db(bool update_before = true);
 
     /**
      * 特殊因子保存值到数据库, 其值不是不通过指标计算，如: PRICELIST，需要自行指定设置

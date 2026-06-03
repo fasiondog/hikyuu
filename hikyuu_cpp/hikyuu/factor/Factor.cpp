@@ -150,8 +150,8 @@ IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_nu
     return getValues(stocks, query, align, fill_null, tovalue, false, align_dates);
 }
 
-void Factor::save_to_db() {
-    saveFactor(*this);
+void Factor::save_to_db(bool update_before) {
+    saveFactor(*this, update_before);
 }
 
 void Factor::save_special_values_to_db(const Stock& stock, const DatetimeList& dates,

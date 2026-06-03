@@ -12,7 +12,7 @@
 namespace hku {
 
 /** 保存因子 */
-void HKU_API saveFactor(const Factor& factor);
+void HKU_API saveFactor(const Factor& factor, bool update_before = true);
 
 /** 保存特殊因子值 */
 void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
