@@ -72,10 +72,23 @@ TEST_CASE("test_BARSLASTS") {
     result = BARSLASTS(data, 0);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
 
     result = BARSLASTS(data, -1);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+
+    result = BARSLASTS(data, -100);
+    CHECK_EQ(result.size(), data.size());
+    CHECK_EQ(result.discard(), data.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
 
     /** @arg 空数据测试 */
     PriceList empty;
