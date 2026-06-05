@@ -43,24 +43,59 @@ TEST_CASE("test_BETA") {
     CHECK_THROWS_AS(BETA(stock_ind, market_ind, -1), std::exception);
     CHECK_THROWS_AS(BETA(stock_ind, market_ind, 1), std::exception);
 
-    // 正常情况，n = 0
+    // 正常情况，n = 0（全样本计算）
     result = BETA(stock_ind, market_ind, 0);
     CHECK_EQ(result.name(), "BETA");
     CHECK_EQ(result.size(), stock_returns.size());
-
-    // 验证计算结果
-    // Beta = Cov(stock, market) / Var(market)
-    // 手动计算期望值用于验证
-    price_t nan = Null<price_t>();
+    CHECK_EQ(result.discard(), 9);
+    // 根据 IBeta 实现，kx = first_stock_value, ky = first_market_value
+    // 从第二个数据点开始累加计算
+    // stock: [0.01, 0.02, -0.01, 0.015, 0.005, -0.02, 0.012, 0.018, -0.008, 0.02]
+    // market: [0.008, 0.015, -0.005, 0.012, 0.003, -0.015, 0.008, 0.012, -0.003, 0.015]
+    CHECK_EQ(result[9], doctest::Approx(1.41516).epsilon(0.001));
 
     // 测试滚动窗口 n = 8
     result = BETA(stock_ind, market_ind, 8);
     CHECK_EQ(result.name(), "BETA");
     CHECK_EQ(result.size(), stock_returns.size());
+    CHECK_EQ(result.discard(), 7);
 
     // 验证前几个值为 nan（需要足够数据才能计算）
-    CHECK_UNARY(std::isnan(result[0]));
-    CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = 0; i < result.discard(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+
+    // 验证具体计算结果
+    // 窗口 [0:8) 的 Beta 值
+    CHECK_EQ(result[7], doctest::Approx(1.38916).epsilon(0.001));
+    // 窗口 [1:9) 的 Beta 值
+    CHECK_EQ(result[8], doctest::Approx(1.42331).epsilon(0.001));
+    // 窗口 [2:10) 的 Beta 值
+    CHECK_EQ(result[9], doctest::Approx(1.42331).epsilon(0.001));
+}
+
+TEST_CASE("test_BETA_stock") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-100));
+    Indicator stock_close = CLOSE(kdata);
+    Indicator market_close = OPEN(kdata);
+
+    Indicator result = BETA(stock_close, market_close, 60);
+    CHECK_EQ(result.name(), "BETA");
+    CHECK_EQ(result.size(), stock_close.size());
+    CHECK_EQ(result.discard(), 59);
+
+    for (size_t i = 0; i < result.discard(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+
+    CHECK_EQ(result[59], doctest::Approx(0.992).epsilon(0.001));
+    CHECK_EQ(result[79], doctest::Approx(0.926).epsilon(0.001));
+    CHECK_EQ(result[99], doctest::Approx(0.924).epsilon(0.001));
 }
 
 //-----------------------------------------------------------------------------
