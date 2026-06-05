@@ -357,8 +357,7 @@ def import_one_stock_data(
                         return (0, False, Datetime(last_datetime))
                 continue
 
-            # 日线忽略成交金额为0的(量可为0，额不为0)，通常为停牌或错误，停牌数据不保留计算时可以根据时间需要进行对齐计算
-            # 日线以下成交量和成交量如果过滤掉0，使用事件回测方式时指标不方便处理，不做过滤处理
+            # 保留停牌数据
             if (
                 bar_datetime not in seen_keys
                     and today_datetime >= bar_datetime > last_datetime
@@ -367,20 +366,17 @@ def import_one_stock_data(
                     and bar["vol"] >= 0
                     and bar["amount"] >= 0
             ):
-                if ktype == "DAY":
-                    if int(roundEx(bar["amount"], 0)) == 0:
-                        continue
                 try:
                     buf.append(
                         (
                             table[1], table[2],
                             Datetime(bar_datetime).timestamp_utc()//1000000,
-                            int(roundEx(bar["open"], 3)*1000),
-                            int(roundEx(bar["high"], 3)*1000),
-                            int(roundEx(bar["low"], 3)*1000),
-                            int(roundEx(bar["close"], 3)*1000),
-                            int(roundEx(bar["amount"], 0)),
-                            int(roundEx(bar["vol"], 3)*1000)
+                            int(bar["open"]*1000),
+                            int(bar["high"]*1000),
+                            int(bar["low"]*1000),
+                            int(bar["close"]*1000),
+                            int(bar["amount"]),
+                            int(bar["vol"]*1000)
                             # bar['vol'] if stktype == 2 else round(bar['vol'] * 0.01)
                         )
                     )
@@ -722,7 +718,7 @@ def import_on_stock_trans(connect, api, market, stock_record, max_days):
                         (
                             market, code,
                             Datetime(bar_datetime).timestamp_utc()//1000000,
-                            int(roundEx(record["price"], 3) * 1000.0),
+                            int(record["price"]*1000),
                             int(record["vol"]),
                             record["buyorsell"],
                         )
@@ -886,7 +882,7 @@ def import_on_stock_time(connect, api, market, stock_record, max_days):
                     # 检查是否重复
                     if bar_datetime not in seen_datetimes:
                         time_buf.append((market, code, Datetime(bar_datetime).timestamp_utc() //
-                                         ticks, int(roundEx(record['price'], 3) * 1000.0), int(record['vol'])))
+                                         ticks, int(record['price']*1000.0), int(record['vol'])))
                         # 标记为已处理
                         seen_datetimes.add(bar_datetime)
                 time += 1
