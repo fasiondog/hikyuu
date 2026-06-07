@@ -194,7 +194,7 @@ add_requires("nng", {system = false, configs = {NNG_ENABLE_TLS = has_config("htt
 add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
-add_requires("utf8proc 2.11.0", {system = false})
+add_requires("utf8proc", {system = false})
 
 if is_plat("windows", "linux", "cross") then
     add_requires("mimalloc", {system = false, configs ={shared = true}})

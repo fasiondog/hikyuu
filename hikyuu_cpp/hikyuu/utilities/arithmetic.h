@@ -227,6 +227,9 @@ std::string HKU_UTILS_API utf8_to_upper(const std::string &s) noexcept;
 /** UTF-8字符串大小写折叠比较 */
 bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2) noexcept;
 
+/** UTF-8字符串包含子字符串 */
+bool HKU_UTILS_API utf8_contains(const std::string &s, const std::string &sub) noexcept;
+
 /** 删除字符串两端空格 */
 inline void trim(std::string &s) {
     if (s.empty()) {

@@ -339,4 +339,54 @@ bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2)
     }
 }
 
+/* UTF-8字符串包含子字符串 */
+bool HKU_UTILS_API utf8_contains(const std::string &s, const std::string &sub) noexcept {
+    if (sub.empty()) {
+        return true;
+    }
+    if (s.empty()) {
+        return false;
+    }
+
+    const uint8_t *str = reinterpret_cast<const uint8_t *>(s.data());
+    utf8proc_ssize_t len = s.size();
+    const uint8_t *sub_str = reinterpret_cast<const uint8_t *>(sub.data());
+    utf8proc_ssize_t sub_len = sub.size();
+
+    utf8proc_int32_t codepoint;
+    utf8proc_ssize_t pos = 0;
+
+    while ((pos = utf8proc_iterate(str, len, &codepoint)) > 0) {
+        const uint8_t *tmp_str = str;
+        utf8proc_ssize_t tmp_len = len;
+        const uint8_t *tmp_sub = sub_str;
+        utf8proc_ssize_t tmp_sub_len = sub_len;
+
+        utf8proc_int32_t cp1, cp2;
+        utf8proc_ssize_t p1, p2;
+
+        bool match = true;
+        while ((p2 = utf8proc_iterate(tmp_sub, tmp_sub_len, &cp2)) > 0) {
+            p1 = utf8proc_iterate(tmp_str, tmp_len, &cp1);
+            if (p1 <= 0 || cp1 != cp2) {
+                match = false;
+                break;
+            }
+            tmp_str += p1;
+            tmp_len -= p1;
+            tmp_sub += p2;
+            tmp_sub_len -= p2;
+        }
+
+        if (match) {
+            return true;
+        }
+
+        str += pos;
+        len -= pos;
+    }
+
+    return false;
+}
+
 }  // namespace hku
