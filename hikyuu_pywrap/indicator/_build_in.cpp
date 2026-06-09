@@ -261,6 +261,13 @@ Indicator (*POW_4)(const Indicator&, const IndParam&) = POW;
 Indicator (*POW_5)(const Indicator&, const Indicator&) = POW;
 Indicator (*POW_6)(Indicator::value_t, int) = POW;
 
+Indicator (*SIGNED_POWER_1)(int) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_2)(const IndParam&) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_3)(const Indicator&, int) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_4)(const Indicator&, const IndParam&) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_5)(const Indicator&, const Indicator&) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_6)(Indicator::value_t, int) = SIGNED_POWER;
+
 Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
 Indicator (*SQRT_3)(Indicator::value_t) = SQRT;
@@ -1248,6 +1255,23 @@ void export_Indicator_build_in(py::module& m) {
     用法：POW(A,B)返回A的B次幂
 
     例如：POW(CLOSE,3)求得收盘价的3次方
+
+    :param data: 输入数据
+    :param int|Indicator|IndParam n: 幂
+    :rtype: Indicator)");
+
+    m.def("SIGNED_POWER", SIGNED_POWER_1, py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_2, py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_3, py::arg("data"), py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_4, py::arg("data"), py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_5, py::arg("data"), py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_6, py::arg("data"), py::arg("n"), R"(SIGNED_POWER(data, n)
+
+    带符号乘幂
+
+    用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
+
+    例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 幂

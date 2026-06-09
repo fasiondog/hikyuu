@@ -114,6 +114,7 @@
 * :py:func:`MIN` - 最小值
 * :py:func:`MOD` - 取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符。
 * :py:func:`POW` - 乘幂
+* :py:func:`SIGNED_POWER` - 带符号乘幂
 * :py:func:`REVERSE` - 求相反数
 * :py:func:`ROUND` - 四舍五入
 * :py:func:`ROUNDUP` -  向上截取，如10.1截取后为11

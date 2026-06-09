@@ -111,6 +111,7 @@
 #include "crt/RSI.h"
 #include "crt/SAFTYLOSS.h"
 #include "crt/SIN.h"
+#include "crt/SIGNED_POWER.h"
 #include "crt/SLICE.h"
 #include "crt/SGN.h"
 #include "crt/SLOPE.h"

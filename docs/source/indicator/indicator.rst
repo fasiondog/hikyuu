@@ -1449,6 +1449,19 @@
     :rtype: Indicator
 
 
+.. py:function:: SIGNED_POWER(data, n)
+
+    带符号乘幂
+    
+    用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
+    
+    例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
+    
+    :param data: 输入数据
+    :param int|Indicator|IndParam n: 幂
+    :rtype: Indicator
+
+
 .. py:function:: PRICELIST([data=None, discard=0, align_dates=None])
     
     将 list、tuple、Indicator 转化为普通的 Indicator
