@@ -691,11 +691,12 @@
     :rtype: Indicator
 
 
-.. py:function:: DIFF([data])
+.. py:function:: DIFF([data, n=1])
 
-    差分指标，即data[i] - data[i-1]
+    差分指标，即data[i] - data[i-n]
     
     :param Indicator data: 输入数据
+    :param int n: 差分周期，默认1
     :rtype: Indicator
 
 

@@ -91,8 +91,8 @@ Indicator (*AMA_3)(const Indicator&, int, int, int) = AMA;
 Indicator (*AMA_4)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = AMA;
 Indicator (*AMA_5)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = AMA;
 
-Indicator (*DIFF_1)() = DIFF;
-Indicator (*DIFF_2)(const Indicator&) = DIFF;
+Indicator (*DIFF_1)(int) = DIFF;
+Indicator (*DIFF_2)(const Indicator&, int) = DIFF;
 
 Indicator (*MA_1)(int) = MA;
 Indicator (*MA_2)(const IndParam&) = MA;
@@ -900,12 +900,13 @@ void export_Indicator_build_in(py::module& m) {
     :param float|Indicator|IndParam p: 噪音系数
     :rtype: Indicator)");
 
-    m.def("DIFF", DIFF_1);
-    m.def("DIFF", DIFF_2, R"(DIFF([data])
+    m.def("DIFF", DIFF_1, py::arg("n") = 1);
+    m.def("DIFF", DIFF_2, py::arg("data"), py::arg("n") = 1, R"(DIFF([data, n=1])
 
-    差分指标，即data[i] - data[i-1]
+    差分指标，即data[i] - data[i-n]
 
     :param Indicator data: 输入数据
+    :param int n: 差分周期，默认1
     :rtype: Indicator)");
 
     m.def("REF", REF_1, py::arg("n"));
