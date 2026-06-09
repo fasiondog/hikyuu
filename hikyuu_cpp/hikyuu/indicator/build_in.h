@@ -36,6 +36,7 @@
 #include "crt/CYCLE.h"
 #include "crt/CONTEXT.h"
 #include "crt/CORR.h"
+#include "crt/COV.h"
 #include "crt/COS.h"
 #include "crt/COST.h"
 #include "crt/COUNT.h"

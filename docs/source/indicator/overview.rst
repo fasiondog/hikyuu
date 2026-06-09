@@ -136,6 +136,7 @@
 * :py:func:`VAR` - 估算样本方差
 * :py:func:`VARP` - 总体样本方差
 * :py:func:`CORR` - 样本相关系数与协方差
+* :py:func:`COV` - 样本协方差
 * :py:func:`SPEARMAN` - Spearman相关系数
 
 **横向统计**

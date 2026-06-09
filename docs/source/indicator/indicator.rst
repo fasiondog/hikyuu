@@ -569,6 +569,16 @@
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator    
 
+.. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
+
+    计算 ind1 和 ind2 的样本协方差。
+
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
+    :rtype: Indicator
+
 
 .. py:function:: COS([data])
 

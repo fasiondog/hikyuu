@@ -504,6 +504,9 @@ Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 Indicator (*CORR_1)(const Indicator&, int, bool) = CORR;
 Indicator (*CORR_2)(const Indicator&, const Indicator&, int, bool) = CORR;
 
+Indicator (*COV_1)(const Indicator&, int, bool) = COV;
+Indicator (*COV_2)(const Indicator&, const Indicator&, int, bool) = COV;
+
 Indicator (*BETA_1)(const Indicator&, int, bool) = BETA;
 Indicator (*BETA_2)(const Indicator&, const Indicator&, int, bool) = BETA;
 
@@ -1054,6 +1057,20 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ind: 指标1
     :param Indicator ref_ind: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时缺失日期填充nan值
+    :rtype: Indicator)");
+
+    m.def("COV", COV_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
+    m.def("COV", COV_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
+          py::arg("fill_null") = true,
+          R"(COV(ind, ref_ind[, n=10, fill_null=True])
+
+    计算 ind 和 ref_ind 的样本协方差。
+    与 COV(ref_ind, n)(ind) 等效。
+
+    :param Indicator ind: 指标1
+    :param Indicator ref_ind: 指标2
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据协方差。如果为0，使用输入的ind长度。
     :param bool fill_null: 日期对齐时缺失日期填充nan值
     :rtype: Indicator)");
 
