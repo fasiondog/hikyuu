@@ -1833,6 +1833,24 @@
     :rtype: Indicator
 
 
+.. py:function:: TS_RANK([data, n=20])
+
+    时间序列排名，计算当前值在过去N个周期内的排名比例（Alpha101）
+
+    用法：TS_RANK(X,N)，表示X在过去N个周期内的排名（从1到N）除以N。
+    例如：TS_RANK(CLOSE,20)表示收盘价在过去20个周期内的排名比例。
+
+    Alpha101中的定义：
+    TS_RANK(x, n) = (rank of x in the last n observations) / n
+    其中rank为升序排名，即较小的值排名靠前，输出为0～1的百分位值。
+
+    该指标是单只股票在时间轴上的滚动排名，用于衡量当前值在历史序列中的相对位置。
+
+    :param Indicator data: 待计算的数据
+    :param int n: 周期数，默认20
+    :rtype: Indicator
+
+
 .. py:function:: UPNDAY(data[, n=3])
 
     连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期

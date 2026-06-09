@@ -179,6 +179,7 @@
 * :py:func:`SUM` - 求总和
 * :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
 * :py:func:`TR` - 真实波动幅度
+* :py:func:`TS_RANK` - 时间序列排名（Alpha101），计算当前值在过去N个周期内的排名比例
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
 
 

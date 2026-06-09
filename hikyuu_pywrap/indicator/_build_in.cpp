@@ -2291,6 +2291,23 @@ void export_Indicator_build_in(py::module& m) {
 
     :param int n: 时间窗口)");
 
+    m.def("TS_RANK", py::overload_cast<int>(TS_RANK), py::arg("n") = 20);
+    m.def("TS_RANK", py::overload_cast<const Indicator&, int>(TS_RANK), py::arg("data"),
+          py::arg("n") = 20, R"(TS_RANK([data, n=20])
+
+    时间序列排名，计算当前值在过去N个周期内的排名比例（Alpha101）
+
+    用法：TS_RANK(X,N)，表示X在过去N个周期内的排名（从1到N）除以N
+    例如：TS_RANK(CLOSE,20)表示收盘价在过去20个周期内的排名比例
+
+    Alpha101中的定义：
+    TS_RANK(x, n) = (rank of x in the last n observations) / n
+    其中rank为升序排名，即较小的值排名靠前，输出为0～1的百分位值
+
+    :param Indicator data: 待计算的数据
+    :param int n: 周期数，默认20
+    :rtype: Indicator)");
+
     m.def("RESULT", py::overload_cast<int>(RESULT));
     m.def("RESULT", py::overload_cast<const Indicator&, int>(RESULT), py::arg("data"),
           py::arg("result_ix"), R"(RESULT(data, result_ix)
