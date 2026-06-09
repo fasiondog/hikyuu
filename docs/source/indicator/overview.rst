@@ -138,6 +138,7 @@
 * :py:func:`CORR` - 样本相关系数与协方差
 * :py:func:`COV` - 样本协方差
 * :py:func:`SPEARMAN` - Spearman相关系数
+* :py:func:`SKEW` - 总体偏度
 
 **横向统计**
 

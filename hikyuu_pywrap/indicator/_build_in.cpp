@@ -513,6 +513,12 @@ Indicator (*BETA_2)(const Indicator&, const Indicator&, int, bool) = BETA;
 Indicator (*SPEARMAN_1)(const Indicator&, int, bool) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int, bool) = SPEARMAN;
 
+Indicator (*SKEW_1)(int) = SKEW;
+Indicator (*SKEW_2)(const IndParam&) = SKEW;
+Indicator (*SKEW_3)(const Indicator&, int) = SKEW;
+Indicator (*SKEW_4)(const Indicator&, const IndParam&) = SKEW;
+Indicator (*SKEW_5)(const Indicator&, const Indicator&) = SKEW;
+
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 
@@ -2208,6 +2214,18 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ref_ind: 输入参数2
     :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
     :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据)");
+
+    m.def("SKEW", SKEW_1, py::arg("n") = 10);
+    m.def("SKEW", SKEW_2, py::arg("n"));
+    m.def("SKEW", SKEW_4, py::arg("data"), py::arg("n"));
+    m.def("SKEW", SKEW_5, py::arg("data"), py::arg("n"));
+    m.def("SKEW", SKEW_3, py::arg("data"), py::arg("n") = 10, R"(SKEW([data, n=10])
+
+    计算N周期内未调整的总体偏度
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于3或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator)");
 
     // IR(const Indicator& p, const Indicator& b, int n = 100)
     m.def("IR", IR, py::arg("p"), py::arg("b"), py::arg("n") = 100, R"(IR(p, b[, n])
