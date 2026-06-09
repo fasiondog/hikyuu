@@ -119,6 +119,7 @@
 #include "crt/SMA.h"
 #include "crt/SPEARMAN.h"
 #include "crt/SKEW.h"
+#include "crt/KURT.h"
 #include "crt/SQRT.h"
 #include "crt/STDEV.h"
 #include "crt/STDP.h"

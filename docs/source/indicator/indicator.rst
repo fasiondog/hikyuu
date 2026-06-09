@@ -1729,6 +1729,19 @@
     :rtype: Indicator
 
 
+.. py:function:: KURT([data, n=10])
+
+    计算N周期内的超额峰度（未调整的总体峰度 - 3）
+
+    超额峰度（Excess Kurtosis）是衡量数据分布峰态的指标，用于描述数据分布的尾部厚度。
+    正态分布的超额峰度为0。正的超额峰度表示分布比正态分布有更厚的尾部（尖峰厚尾），
+    负的超额峰度表示分布比正态分布有更薄的尾部（平峰薄尾）。
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于4或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator
+
+
 .. py:function:: SQRT([data])
 
     开平方

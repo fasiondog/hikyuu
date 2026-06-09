@@ -519,6 +519,12 @@ Indicator (*SKEW_3)(const Indicator&, int) = SKEW;
 Indicator (*SKEW_4)(const Indicator&, const IndParam&) = SKEW;
 Indicator (*SKEW_5)(const Indicator&, const Indicator&) = SKEW;
 
+Indicator (*KURT_1)(int) = KURT;
+Indicator (*KURT_2)(const IndParam&) = KURT;
+Indicator (*KURT_3)(const Indicator&, int) = KURT;
+Indicator (*KURT_4)(const Indicator&, const IndParam&) = KURT;
+Indicator (*KURT_5)(const Indicator&, const Indicator&) = KURT;
+
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 
@@ -2225,6 +2231,18 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator data: 输入数据
     :param int n: N日时间窗口（大于等于3或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator)");
+
+    m.def("KURT", KURT_1, py::arg("n") = 10);
+    m.def("KURT", KURT_2, py::arg("n"));
+    m.def("KURT", KURT_4, py::arg("data"), py::arg("n"));
+    m.def("KURT", KURT_5, py::arg("data"), py::arg("n"));
+    m.def("KURT", KURT_3, py::arg("data"), py::arg("n") = 10, R"(KURT([data, n=10])
+
+    计算N周期内的超额峰度（未调整的总体峰度 - 3）
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于4或等于0），等于0时使用输入的data实际长度
     :rtype: Indicator)");
 
     // IR(const Indicator& p, const Indicator& b, int n = 100)
