@@ -53,7 +53,7 @@ Welcome to Hikyuu's documentation!
    :caption: Release
 
    release.md
-   release_history
+   release_history.rst
 
    
 Indices and tables

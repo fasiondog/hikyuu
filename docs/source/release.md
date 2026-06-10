@@ -2,6 +2,44 @@
 
 # 版本发布说明
 
+## 2.8.0 - 2026年6月10日
+
+**🚀 新增特性**
+
+* feat(HikyuuTdx): 补充 689 科创板号段
+* feat(indicator): 新增指标 BETA、KURT(超额峰度)、SKEW(总体偏度)、COV(样本协方差)
+* feat(indicator): 新增指标 TS_RANK(计算时间序列排名比例)、SIGNED_POWER(带符号乘幂运算)
+* feat(indicator): 更新 DIFF 函数以支持自定义差分周期n
+* feat(indicator): 新增固定起始日期指标 FIXED_START_DATE、固定起始索引指标 FIXED_START_INDEX
+* feat(regression): 添加多元线性回归及其完整版本的实现
+* feat(Factor): 添加保存因子时的更新选项，允许在保存前检查并更新已有因子
+* feat(Block): 添加从证券列表和证券代码列表创建临时板块的构造函数
+* feat(block): 增加内置 ETF 板块 blocketf Block("ETF", "ALL")
+* feat(stock_manager): 添加wait_data_ready方法，等待预加载数据完成
+
+**⚡️ 优化改进**
+
+* performance: windows 下切换至 clang-cl 编译，windows下综合性能提升10%~20%
+* feat(Indicator): RANK增加模式4,5(直接返回0~1表示百分位比)
+* feat(parameter): Parameter添加对 Datetime 类型的支持，int内部使用int64_t统一保存
+* feat(stock): python中预定义的内部板块移至C++内部，以便C++中亦可直接获取
+* feat(factor)优化: 因子值加载和保存时，自动尝试绑定的板块信息
+* feat(factor): 增强因子名称验证，确保因子名称符合规范并支持 UTF-8 处理
+* feat(multifactor): 改进 MF 获取因子 IC 警告信息提示
+* feat(build): 添加编译选项本地最大向量化支持
+
+**🐞 缺陷修复**
+
+* fix(IBarsLasts): 优化参数验证逻辑，确保 n <= 0 时返回全 NaN 序列
+* fix(Indicator): INDEXC 等公式在 kdata 有停牌缺少日期的时候出错的问题
+* fix(HikyuuTdx): 修复 TDX 本地日线导入 ETF/B股/LOF/REIT 等品种价格精度10倍偏差
+* fix(factor): python接口添加恢复类型参数到因子构造函数
+* fix(data import): 调整导入策略，移除非日线时对成交量和成交额为0的过滤
+* fix(indicator): 修复双输入指标计算 prepare 方法中的上下文获取逻辑
+* fix(multifactor): 修正获取 IC 时对 "save_all_factors" 参数的检查逻辑
+* fix(build): 修正查找系统 python 如果没有 python 只有 python3 的问题
+* fix(build): 修复 openssl3 依赖配置，避免在 macosx 平台上使用共享库
+
 ## 2.7.9 - 2026年5月23日
 
 **🚀 新增特性**
