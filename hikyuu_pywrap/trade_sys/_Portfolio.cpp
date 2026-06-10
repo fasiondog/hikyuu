@@ -32,10 +32,6 @@ void PyPortfolio::_readyForRun() {
     PYBIND11_OVERLOAD(void, PyPortfolio, _readyForRun);
 }
 
-void PyPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    PYBIND11_OVERLOAD(void, PyPortfolio, _runMoment, date, nextCycle, adjust);
-}
-
 void PyPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     PYBIND11_OVERLOAD(void, PyPortfolio, _runMomentOnOpen, date, nextCycle, adjust);
 }

@@ -345,11 +345,6 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
     }
 }
 
-void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    _runMomentOnOpen(date, nextCycle, adjust);
-    _runMomentOnClose(date, nextCycle, adjust);
-}
-
 json SimplePortfolio::lastSuggestion() const {
     json sys_json_list = json::array();
     for (const auto& sys : m_running_sys_set) {

@@ -111,7 +111,6 @@ public:
     }
 
     virtual void _readyForRun() {}
-    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
     virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
     virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
 
@@ -190,14 +189,17 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-#define PORTFOLIO_IMP(classname)              \
-public:                                       \
-    virtual PortfolioPtr _clone() override {  \
-        return std::make_shared<classname>(); \
-    }                                         \
-    virtual void _reset() override;           \
-    virtual void _readyForRun() override;     \
-    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) override;
+#define PORTFOLIO_IMP(classname)                                                                 \
+public:                                                                                          \
+    virtual PortfolioPtr _clone() override {                                                     \
+        return std::make_shared<classname>();                                                    \
+    }                                                                                            \
+    virtual void _reset() override;                                                              \
+    virtual void _readyForRun() override;                                                        \
+    virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust)  \
+      override;                                                                                  \
+    virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) \
+      override;
 
 /**
  * 客户程序都应使用该指针类型

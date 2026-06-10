@@ -87,16 +87,6 @@ void WithoutAFPortfolio::_readyForRun() {
     m_se->calculate(se_sys_list, m_query);
 }
 
-void WithoutAFPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    _runMomentOnOpen(date, nextCycle, adjust);
-    _runMomentOnClose(date, nextCycle, adjust);
-    // if (getParam<bool>("sell_at_not_selected")) {
-    //     _runMomentWithoutAFForceSell(date, nextCycle, adjust);
-    // } else {
-    //     _runMomentWithoutAFNotForceSell(date, nextCycle, adjust);
-    // }
-}
-
 void WithoutAFPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
                                           bool adjust) {
     // m_force_sell_sys_list 此处用于缓存本轮未选中但仍在运行中的系统

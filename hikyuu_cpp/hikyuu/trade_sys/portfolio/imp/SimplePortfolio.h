@@ -28,11 +28,6 @@ public:
     SimplePortfolio(const TradeManagerPtr& tm, const SelectorPtr& se, const AFPtr& af);
     virtual ~SimplePortfolio();
 
-    virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
-                                  bool adjust) override;
-    virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle,
-                                   bool adjust) override;
-
     virtual json lastSuggestion() const override;
 
 private:
