@@ -117,6 +117,21 @@ void export_Portfolio(py::module& m) {
       .def("reset", &Portfolio::reset, "复位操作")
       .def("clone", &Portfolio::clone, "克隆操作")
 
+      .def("get_running_dates", &Portfolio::getRunningDates, "获取运行日期列表")
+      .def("get_adjust_dates", &Portfolio::getAdjustDates, "获取调仓日列表")
+      .def("get_cycle_end_dates", &Portfolio::getCycleEndDates, "获取调仓周期结束日期列表")
+      .def(
+        "get_adjust_turnover",
+        [](const Portfolio& pf) {
+            const auto& turnover = pf.getAdjustTurnover();
+            py::list ret;
+            for (const auto& item : turnover) {
+                ret.append(py::make_tuple(item.first, item.second));
+            }
+            return ret;
+        },
+        "获取调仓换手率列表")
+
       .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false,
            R"(run(self, query[, force=false])
     

@@ -176,6 +176,10 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
         }
     }
 
+    size_t running_sys_count = m_running_sys_list.size();
+    size_t out_sys_count = will_remove_sys_list.size();
+    size_t in_sys_count = 0;
+
     for (auto& sys : will_remove_sys_list) {
         HKU_INFO_IF(trace, htr("[PF] will remove system: {}", sys->name()));
         m_running_sys_set.erase(sys);
@@ -201,6 +205,7 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
             m_running_sys_list.emplace_back(sys);
             auto sg = sys->getSG();
             sg->startCycle(date, nextCycle);
+            in_sys_count++;
         }
     }
 
@@ -227,6 +232,12 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
                 m_force_sell_sys_list.emplace_back(sys);
             }
         }
+    }
+
+    // 计算调仓换手率
+    if (running_sys_count > 0) {
+        m_adjust_turnover.emplace_back(
+          date, static_cast<double>(in_sys_count + out_sys_count) / running_sys_count);
     }
 }
 

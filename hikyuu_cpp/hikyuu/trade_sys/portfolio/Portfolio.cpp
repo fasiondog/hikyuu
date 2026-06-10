@@ -121,6 +121,7 @@ void Portfolio::reset() {
     m_dates.clear();
     m_adjust_flags.clear();
     m_cycle_end_dates.clear();
+    m_adjust_turnover.clear();
     _reset();
 }
 
