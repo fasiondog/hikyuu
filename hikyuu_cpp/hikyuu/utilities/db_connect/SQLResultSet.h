@@ -54,8 +54,7 @@ public:
             return;
         }
 
-        std::string tmp(m_where);
-        to_upper(tmp);
+        std::string tmp = utf8_to_upper(m_where);
         size_t pos = tmp.rfind("ORDER");
         if (pos != std::string::npos) {
             m_orderby_inner = fmt::format("{}, id ASC", m_where.substr(pos));

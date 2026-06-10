@@ -25,6 +25,11 @@ IPriceList::IPriceList(const PriceList& data, int in_discard) : IndicatorImp("PR
     setParam<int>("discard", in_discard);
 }
 
+IPriceList::IPriceList(PriceList&& data, int in_discard) : IndicatorImp("PRICELIST", 1) {
+    setParam<PriceList>("data", std::move(data));
+    setParam<int>("discard", in_discard);
+}
+
 IPriceList::IPriceList(size_t size, double value, int discard) {
     setParam<PriceList>("data", PriceList(size, value));
     setParam<int>("discard", discard);
@@ -57,7 +62,7 @@ void IPriceList::_calculate(const Indicator& data) {
 
     if (k != Null<KData>() && align_dates.size() > 0) {
         // 如果本身是时间序列，则使用时间进行对齐
-        auto tmp = ALIGN(PRICELIST(x, align_dates, x_discard), k);
+        auto tmp = ALIGN(PRICELIST(x, std::move(align_dates), x_discard), k);
         HKU_ASSERT(tmp.size() == total);
         auto* dst = this->data();
         auto* src = x.data();
@@ -98,11 +103,23 @@ Indicator HKU_API PRICELIST(const PriceList& data, int discard) {
     return make_shared<IPriceList>(data, discard)->calculate();
 }
 
+Indicator HKU_API PRICELIST(PriceList&& data, int discard) {
+    return make_shared<IPriceList>(std::move(data), discard)->calculate();
+}
+
 Indicator HKU_API PRICELIST(const PriceList& data, const DatetimeList& ds, int discard) {
-    auto ret = PRICELIST(data, discard);
     HKU_CHECK(data.size() == ds.size(),
               "The data length must be the same as the length of the reference date list");
+    auto ret = PRICELIST(data, discard);
     ret.setParam<DatetimeList>("align_date_list", ds);
+    return ret;
+}
+
+Indicator HKU_API PRICELIST(PriceList&& data, const DatetimeList&& ds, int discard) {
+    HKU_CHECK(data.size() == ds.size(),
+              "The data length must be the same as the length of the reference date list");
+    auto ret = PRICELIST(std::move(data), discard);
+    ret.setParam<DatetimeList>("align_date_list", std::move(ds));
     return ret;
 }
 
@@ -118,6 +135,12 @@ Indicator HKU_API PRICELIST(size_t size, double value, int discard) {
 Indicator HKU_API PRICELIST(const DatetimeList& dates, double value, int discard) {
     IndicatorImpPtr ptr = make_shared<IPriceList>(dates.size(), value, discard);
     ptr->setParam<DatetimeList>("align_date_list", dates);
+    return ptr->calculate();
+}
+
+Indicator HKU_API PRICELIST(DatetimeList&& dates, double value, int discard) {
+    IndicatorImpPtr ptr = make_shared<IPriceList>(dates.size(), value, discard);
+    ptr->setParam<DatetimeList>("align_date_list", std::move(dates));
     return ptr->calculate();
 }
 

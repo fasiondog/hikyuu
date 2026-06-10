@@ -552,7 +552,6 @@
     Indicator HKU_API func(const Indicator &ind1, const Indicator &ind2, int n,                \
                            bool fill_null = true) {                                            \
         auto p = make_shared<Cls_##func>(ind2, n, fill_null);                                  \
-        HKU_WARN_IF(ind2.size() == 0, "The lenght of ind2 is zero!");                          \
         Indicator result(p);                                                                   \
         return result(ind1);                                                                   \
     }

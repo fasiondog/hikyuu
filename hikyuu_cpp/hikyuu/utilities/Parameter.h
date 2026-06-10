@@ -47,6 +47,93 @@ using std::vector;
 typedef vector<string> StringList;
 #endif
 
+#if HKU_SUPPORT_SERIALIZATION
+struct ParamItemRecord {
+    friend class boost::serialization::access;
+
+    ParamItemRecord() {}
+    ParamItemRecord(const string& name, const boost::any& arg) : name(name) {
+        if (arg.type() == typeid(bool)) {
+            type = "bool";
+            bool x = boost::any_cast<bool>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (arg.type() == typeid(int)) {
+            type = "int64";
+            int x = boost::any_cast<int>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (arg.type() == typeid(int64_t)) {
+            type = "int64";
+            int64_t x = boost::any_cast<int64_t>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (arg.type() == typeid(double)) {
+            type = "double";
+            double x = boost::any_cast<double>(arg);
+            value = boost::lexical_cast<string>(x);
+        } else if (strcmp(arg.type().name(), typeid(string).name()) == 0) {
+            type = "string";
+            value = boost::any_cast<string>(arg);
+        } else if (strcmp(arg.type().name(), typeid(Datetime).name()) == 0) {
+            type = "Datetime";
+            datetime = boost::any_cast<Datetime>(arg);
+        } else if (strcmp(arg.type().name(), typeid(Stock).name()) == 0) {
+            type = "stock";
+            value = "stock";
+            stock = boost::any_cast<Stock>(arg);
+        } else if (strcmp(arg.type().name(), typeid(Block).name()) == 0) {
+            type = "block";
+            value = "block";
+            block = boost::any_cast<Block>(arg);
+        } else if (strcmp(arg.type().name(), typeid(KQuery).name()) == 0) {
+            type = "query";
+            value = "query";
+            query = boost::any_cast<KQuery>(arg);
+        } else if (strcmp(arg.type().name(), typeid(KData).name()) == 0) {
+            type = "kdata";
+            value = "kdata";
+            kdata = boost::any_cast<KData>(arg);
+        } else if (strcmp(arg.type().name(), typeid(PriceList).name()) == 0) {
+            type = "PriceList";
+            value = "price_list";
+            price_list = boost::any_cast<PriceList>(arg);
+        } else if (strcmp(arg.type().name(), typeid(DatetimeList).name()) == 0) {
+            type = "DatetimeList";
+            value = "date_list";
+            date_list = boost::any_cast<DatetimeList>(arg);
+        } else {
+            type = "Unknown";
+            value = "Unknown";
+        }
+    }
+
+    string name;
+    string type;
+    string value;
+    Datetime datetime;
+    Stock stock;
+    Block block;
+    KQuery query;
+    KData kdata;
+    PriceList price_list;
+    DatetimeList date_list;
+
+    template <class Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar& BOOST_SERIALIZATION_NVP(name);
+        ar& BOOST_SERIALIZATION_NVP(type);
+        ar& BOOST_SERIALIZATION_NVP(value);
+        ar& BOOST_SERIALIZATION_NVP(stock);
+        ar& BOOST_SERIALIZATION_NVP(block);
+        ar& BOOST_SERIALIZATION_NVP(query);
+        ar& BOOST_SERIALIZATION_NVP(kdata);
+        ar& BOOST_SERIALIZATION_NVP(price_list);
+        ar& BOOST_SERIALIZATION_NVP(date_list);
+        if (version >= 1) {
+            ar& BOOST_SERIALIZATION_NVP(datetime);
+        }
+    }
+};
+#endif
+
 /**
  * 供需要命名参数设定的类使用
  * @details 在需要命名参数设定的类定义中，增加宏PARAMETER_SUPPORT，如：
@@ -149,6 +236,9 @@ public:
      * @param value 参数值
      */
     template <typename ValueType>
+    void set(const string& name, ValueType&& value);
+
+    template <typename ValueType>
     void set(const string& name, const ValueType& value);
 
     /**
@@ -189,84 +279,6 @@ private:
 private:
     friend class boost::serialization::access;
 
-    struct ItemRecord {
-        friend class boost::serialization::access;
-
-        ItemRecord() {}
-        ItemRecord(const string& name, const boost::any& arg) : name(name) {
-            if (arg.type() == typeid(bool)) {
-                type = "bool";
-                bool x = boost::any_cast<bool>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(int)) {
-                type = "int";
-                int x = boost::any_cast<int>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(int64_t)) {
-                type = "int64";
-                int64_t x = boost::any_cast<int64_t>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (arg.type() == typeid(double)) {
-                type = "double";
-                double x = boost::any_cast<double>(arg);
-                value = boost::lexical_cast<string>(x);
-            } else if (strcmp(arg.type().name(), typeid(string).name()) == 0) {
-                type = "string";
-                value = boost::any_cast<string>(arg);
-            } else if (strcmp(arg.type().name(), typeid(Stock).name()) == 0) {
-                type = "stock";
-                value = "stock";
-                stock = boost::any_cast<Stock>(arg);
-            } else if (strcmp(arg.type().name(), typeid(Block).name()) == 0) {
-                type = "block";
-                value = "block";
-                block = boost::any_cast<Block>(arg);
-            } else if (strcmp(arg.type().name(), typeid(KQuery).name()) == 0) {
-                type = "query";
-                value = "query";
-                query = boost::any_cast<KQuery>(arg);
-            } else if (strcmp(arg.type().name(), typeid(KData).name()) == 0) {
-                type = "kdata";
-                value = "kdata";
-                kdata = boost::any_cast<KData>(arg);
-            } else if (strcmp(arg.type().name(), typeid(PriceList).name()) == 0) {
-                type = "PriceList";
-                value = "price_list";
-                price_list = boost::any_cast<PriceList>(arg);
-            } else if (strcmp(arg.type().name(), typeid(DatetimeList).name()) == 0) {
-                type = "DatetimeList";
-                value = "date_list";
-                date_list = boost::any_cast<DatetimeList>(arg);
-            } else {
-                type = "Unknown";
-                value = "Unknown";
-            }
-        }
-
-        string name;
-        string type;
-        string value;
-        Stock stock;
-        Block block;
-        KQuery query;
-        KData kdata;
-        PriceList price_list;
-        DatetimeList date_list;
-
-        template <class Archive>
-        void serialize(Archive& ar, const unsigned int version) {
-            ar& BOOST_SERIALIZATION_NVP(name);
-            ar& BOOST_SERIALIZATION_NVP(type);
-            ar& BOOST_SERIALIZATION_NVP(value);
-            ar& BOOST_SERIALIZATION_NVP(stock);
-            ar& BOOST_SERIALIZATION_NVP(block);
-            ar& BOOST_SERIALIZATION_NVP(query);
-            ar& BOOST_SERIALIZATION_NVP(kdata);
-            ar& BOOST_SERIALIZATION_NVP(price_list);
-            ar& BOOST_SERIALIZATION_NVP(date_list);
-        }
-    };
-
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
         namespace bs = boost::serialization;
@@ -274,8 +286,8 @@ private:
         ar& bs::make_nvp<size_t>("count", total);
         param_map_t::const_iterator iter = m_params.begin();
         for (; iter != m_params.end(); ++iter) {
-            ItemRecord record(iter->first, iter->second);
-            ar& bs::make_nvp<ItemRecord>("Item", record);
+            ParamItemRecord record(iter->first, iter->second);
+            ar& bs::make_nvp<ParamItemRecord>("Item", record);
         }
     }
 
@@ -284,20 +296,22 @@ private:
         namespace bs = boost::serialization;
         size_t total = 0;
         ar& bs::make_nvp<size_t>("count", total);
-        ItemRecord record;
+        ParamItemRecord record;
         for (size_t i = 0; i < total; i++) {
-            ar& bs::make_nvp<ItemRecord>("Item", record);
+            ar& bs::make_nvp<ParamItemRecord>("Item", record);
 
             if (record.type == "bool") {
                 m_params[record.name] = boost::lexical_cast<bool>(record.value);
             } else if (record.type == "int") {
-                m_params[record.name] = boost::lexical_cast<int>(record.value);
+                m_params[record.name] = boost::lexical_cast<int64_t>(record.value);
             } else if (record.type == "int64") {
                 m_params[record.name] = boost::lexical_cast<int64_t>(record.value);
             } else if (record.type == "double") {
                 m_params[record.name] = boost::lexical_cast<double>(record.value);
             } else if (record.type == "string") {
                 m_params[record.name] = record.value;
+            } else if (record.type == "Datetime") {
+                m_params[record.name] = record.datetime;
             } else if (record.type == "stock") {
                 m_params[record.name] = record.stock;
             } else if (record.type == "block") {
@@ -339,6 +353,10 @@ public:                                                                     \
     template <typename ValueType>                                           \
     void setParam(const string& name, const ValueType& value) {             \
         m_params.set<ValueType>(name, value);                               \
+    }                                                                       \
+    template <typename ValueType>                                           \
+    void setParam(const string& name, ValueType& value) {                   \
+        m_params.set<ValueType>(name, std::forward<ValueType>(value));      \
     }                                                                       \
                                                                             \
     template <typename ValueType>                                           \
@@ -408,6 +426,12 @@ public:                                                                      \
         checkParam(name);                                                    \
         paramChanged();                                                      \
     }                                                                        \
+    template <typename ValueType>                                            \
+    void setParam(const string& name, ValueType&& value) {                   \
+        m_params.set<ValueType>(name, std::forward<ValueType>(value));       \
+        checkParam(name);                                                    \
+        paramChanged();                                                      \
+    }                                                                        \
                                                                              \
     template <typename ValueType>                                            \
     ValueType getParam(const string& name) const {                           \
@@ -456,27 +480,122 @@ ValueType Parameter::tryGet(const string& name, const ValueType& val) const {
 
 template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
-    if (!have(name)) {
-        if (!support(value)) {
-            throw std::logic_error("Unsuport Type! input valut type: " +
-                                   string(typeid(ValueType).name()));
+    if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
+        if (!have(name)) {
+            if (value.type() == typeid(int)) {
+                m_params[name] = static_cast<int64_t>(boost::any_cast<int>(value));
+            } else {
+                m_params[name] = value;
+            }
+            return;
         }
-        m_params[name] = value;
-        return;
-    }
 
-    if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
-        if ((m_params[name].type() == typeid(int) || m_params[name].type() == typeid(int64_t)) &&
-            (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
-            // 忽略，允许设定
-        } else {
+        if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
             throw std::logic_error("Mismatching type! need type " +
                                    string(m_params[name].type().name()) + " but value type is " +
-                                   string(typeid(ValueType).name()));
+                                   string(value.type().name()));
         }
-    }
 
-    m_params[name] = value;
+        m_params[name] = value;
+
+    } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
+        if (!have(name)) {
+            m_params[name] = static_cast<int64_t>(value);
+            return;
+        }
+
+        if (m_params[name].type() != typeid(int64_t) && m_params[name].type() != typeid(int)) {
+            throw std::logic_error(
+              "Mismatching type! need type int or int64_t, but value type is " +
+              string(typeid(ValueType).name()));
+        }
+        m_params[name] = static_cast<int64_t>(value);
+
+    } else {
+        if (!have(name)) {
+            if (!support(value)) {
+                throw std::logic_error("Unsuport Type! input valut type: " +
+                                       string(typeid(ValueType).name()));
+            }
+            m_params[name] = value;
+            return;
+        }
+
+        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
+            if ((m_params[name].type() == typeid(int) ||
+                 m_params[name].type() == typeid(int64_t)) &&
+                (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
+                // 忽略，允许设定
+            } else {
+                throw std::logic_error("Mismatching type! need type " +
+                                       string(m_params[name].type().name()) +
+                                       " but value type is " + string(typeid(ValueType).name()));
+            }
+        }
+
+        m_params[name] = value;
+    }
+}
+
+template <typename ValueType>
+void Parameter::set(const string& name, ValueType&& value) {
+    if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
+        if (!have(name)) {
+            m_params[name] = std::forward<ValueType>(value);
+            return;
+        }
+
+        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
+            if ((m_params[name].type() == typeid(int64_t) ||
+                 m_params[name].type() == typeid(int)) &&
+                (typeid(ValueType) == typeid(int64_t) || typeid(ValueType) == typeid(int))) {
+                // 忽略，允许设定
+            } else {
+                throw std::logic_error("Mismatching type! need type " +
+                                       string(m_params[name].type().name()) +
+                                       " but value type is " + string(typeid(ValueType).name()));
+            }
+        }
+
+        m_params[name] = std::forward<ValueType>(value);
+
+    } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
+        if (!have(name)) {
+            m_params[name] = value;
+            return;
+        }
+
+        if (m_params[name].type() != typeid(int64_t) && m_params[name].type() != typeid(int)) {
+            throw std::logic_error(
+              "Mismatching type! need type int or int64_t, but value type is " +
+              string(typeid(ValueType).name()));
+        }
+        m_params[name] = static_cast<int64_t>(value);
+
+    } else {
+        if (!have(name)) {
+            if (!support(value)) {
+                throw std::logic_error("Unsuport Type! input valut type: " +
+                                       string(typeid(ValueType).name()));
+            }
+            m_params[name] = std::forward<ValueType>(value);
+            return;
+        }
+
+        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
+            if ((m_params[name].type() == typeid(int) ||
+                 m_params[name].type() == typeid(int64_t)) &&
+                (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
+                // 忽略，允许设定
+            } else {
+                throw std::logic_error("Mismatching type! need type " +
+                                       string(m_params[name].type().name()) +
+                                       " but value type is " + string(typeid(ValueType).name()));
+            }
+        }
+
+        m_params[name] = std::forward<ValueType>(value);
+    }
 }
 
 template <>
@@ -490,23 +609,7 @@ inline boost::any Parameter::get<boost::any>(const std::string& name) const {
 }
 
 template <>
-inline void Parameter::set(const string& name, const boost::any& value) {
-    if (!have(name)) {
-        m_params[name] = value;
-        return;
-    }
-
-    if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
-        throw std::logic_error("Mismatching type! need type " +
-                               string(m_params[name].type().name()) + " but value type is " +
-                               string(value.type().name()));
-    }
-
-    m_params[name] = value;
-}
-
-template <>
-inline int64_t Parameter::get(const string& name) const {
+inline int Parameter::get(const string& name) const {
     param_map_t::const_iterator iter;
     iter = m_params.find(name);
     if (iter == m_params.end()) {
@@ -516,7 +619,7 @@ inline int64_t Parameter::get(const string& name) const {
         if (iter->second.type() == typeid(int)) {
             return boost::any_cast<int>(iter->second);
         }
-        return boost::any_cast<int64_t>(iter->second);
+        return static_cast<int>(boost::any_cast<int64_t>(iter->second));
     } catch (...) {
         throw std::runtime_error("failed conversion param: " + name);
     }
@@ -527,4 +630,9 @@ HKU_API bool operator!=(const Parameter&, const Parameter&);
 HKU_API bool operator<(const Parameter&, const Parameter&);
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_VERSION(::hku::ParamItemRecord, 1)
+#endif
+
 #endif /* PARAMETER_H_ */

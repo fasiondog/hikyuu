@@ -20,13 +20,19 @@ namespace hku {
 class HKU_API Block {
 public:
     Block() noexcept;
-    Block(const string& category, const string& name) noexcept;
-    Block(const string& category, const string& name, const string& indexCode) noexcept;
+    Block(const string& category, const string& name);
+    Block(const string& category, const string& name, const string& indexCode);
     Block(const Block&) noexcept;
     Block(Block&&) noexcept;
     Block& operator=(const Block&) noexcept;
     Block& operator=(Block&&) noexcept;
     virtual ~Block();
+
+    /** 从证券列表创建板块，分类和名称为空，通常用于临时板块 */
+    explicit Block(const StockList& stocks);
+
+    /** 从证券代码列表创建板块，分类和名称为空，通常用于临时板块 */
+    explicit Block(const StringList& market_codes);
 
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -51,12 +57,10 @@ public:
         return m_data ? (uint64_t)m_data.get() : 0;
     }
 
-    bool operator==(const Block& blk) const noexcept {
-        return m_data == blk.m_data;
-    }
+    bool operator==(const Block& blk) const noexcept;
 
     bool operator!=(const Block& blk) const noexcept {
-        return m_data != blk.m_data;
+        return !(*this == blk);
     }
 
     /** 获取板块类别 */

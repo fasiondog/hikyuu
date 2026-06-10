@@ -141,6 +141,25 @@ inline StockList get_stock_list_from_python(const py::object& stks) {
     return ret;
 }
 
+inline Block get_block_from_python(const py::object& blk) {
+    Block ret;
+    HKU_IF_RETURN(blk.is_none(), ret);
+
+    if (py::isinstance<StockList>(blk)) {
+        ret = Block(blk.cast<StockList>());
+    } else if (py::isinstance<Block>(blk)) {
+        ret = blk.cast<Block>();
+    } else if (py::isinstance<StockManager>(blk)) {
+        const auto& sm = blk.cast<StockManager&>();
+        ret = Block(sm.getStockList());
+    } else if (py::isinstance<py::sequence>(blk)) {
+        ret = Block(python_list_to_vector<Stock>(blk));
+    } else {
+        HKU_THROW("Failed get Block! Input blk must be Block, sm or sequenc(Stock)!");
+    }
+    return ret;
+}
+
 }  // namespace hku
 
 #endif  // HIKYUU_PYTHON_BIND_UTILS_H

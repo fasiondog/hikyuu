@@ -12,7 +12,7 @@
 namespace hku {
 
 /** 保存因子 */
-void HKU_API saveFactor(const Factor& factor);
+void HKU_API saveFactor(const Factor& factor, bool update_before = true);
 
 /** 保存特殊因子值 */
 void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
@@ -42,6 +42,8 @@ void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype);
 
 /** 获取因子集合 */
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+
+bool isValidFactorName(const string& name);
 
 IndicatorList getValues(const Factor& factor, const StockList& stocks, const KQuery& query,
                         bool align, bool fill_null, bool tovalue, const DatetimeList& align_dates);

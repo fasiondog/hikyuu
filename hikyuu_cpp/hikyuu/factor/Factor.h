@@ -151,8 +151,10 @@ public:
     /**
      * 保存因子即其所有计算结果到数据库，如果因子已存在则更新，否则插入新记录
      * @note 因子名称不区分大小写，以 name + ktype 作为唯一标识
+     * @param update_before 是否在保存前，检查并更新已有因子，默认
+     * true。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新
      */
-    void save_to_db();
+    void save_to_db(bool update_before = true);
 
     /**
      * 特殊因子保存值到数据库, 其值不是不通过指标计算，如: PRICELIST，需要自行指定设置
@@ -191,7 +193,7 @@ private:
         Data(const string& name, const Indicator& formula, const KQuery::KType& ktype,
              const string& brief, const string& details, bool need_save_value,
              const Datetime& start_date, const Block& block, KQuery::RecoverType recover_type)
-        : name(name),
+        : name(utf8_to_upper(name)),
           ktype(ktype),
           brief(brief),
           details(details),
@@ -200,7 +202,6 @@ private:
           block(block),
           need_save_value(need_save_value),
           recover_type(recover_type) {
-            to_upper(this->name);
             this->formula.setContext(KData());
             this->formula.name(this->name);
             if (this->start_date == Null<Datetime>()) {
@@ -281,12 +282,6 @@ inline const string& Factor::name() const noexcept {
     return m_data->name;
 }
 
-inline void Factor::name(const string& name) {
-    m_data->name = name;
-    to_upper(m_data->name);
-    m_data->formula.name(m_data->name);
-}
-
 inline const string& Factor::ktype() const noexcept {
     return m_data->ktype;
 }
@@ -344,14 +339,6 @@ inline void Factor::updateAt(const Datetime& datetime) {
     m_data->update_at = datetime;
 }
 
-inline bool Factor::needSaveValue() const noexcept {
-    return m_data->need_save_value;
-}
-
-inline void Factor::needSaveValue(bool flag) {
-    m_data->need_save_value = flag;
-}
-
 inline const string& Factor::brief() const noexcept {
     return m_data->brief;
 }
@@ -362,6 +349,10 @@ inline void Factor::brief(const string& brief) {
 
 inline const string& Factor::details() const noexcept {
     return m_data->details;
+}
+
+inline bool Factor::needSaveValue() const noexcept {
+    return m_data->need_save_value;
 }
 
 inline void Factor::details(const string& details) {

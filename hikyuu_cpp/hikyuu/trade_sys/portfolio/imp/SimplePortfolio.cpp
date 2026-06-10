@@ -220,6 +220,10 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             }
         }
 
+        size_t running_sys_count = m_running_sys_set.size();
+        size_t out_sys_count = m_tmp_will_remove_sys.size();
+        size_t in_sys_count = 0;
+
         for (auto& sw : m_tmp_will_remove_sys) {
             m_running_sys_set.erase(sw.sys);
         }
@@ -267,6 +271,7 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
                 if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
                     if (sys.sys->getTM()->cash(date, m_query.kType()) > 0.0) {
                         m_running_sys_set.insert(sys.sys);
+                        in_sys_count++;
                     }
                 }
             }
@@ -284,8 +289,15 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             }
         }
 
+        out_sys_count += m_tmp_will_remove_sys.size();
         for (auto& sw : m_tmp_will_remove_sys) {
             m_running_sys_set.erase(sw.sys);
+        }
+
+        // 计算调仓换手率
+        if (running_sys_count > 0) {
+            m_adjust_turnover.emplace_back(
+              date, static_cast<double>(in_sys_count + out_sys_count) / running_sys_count);
         }
     }
 
@@ -343,11 +355,6 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
                  htr("total assets"), funds.total_assets(), htr("cash"), funds.cash,
                  htr("market_value"), funds.market_value);
     }
-}
-
-void SimplePortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    _runMomentOnOpen(date, nextCycle, adjust);
-    _runMomentOnClose(date, nextCycle, adjust);
 }
 
 json SimplePortfolio::lastSuggestion() const {

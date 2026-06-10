@@ -163,6 +163,8 @@ void AsyncMySQLConnect::close() {
         }
         m_impl->conn->close();
         m_impl->conn.reset();
+        m_impl->io_context_ptr = nullptr;
+        m_impl->initialized = false;
     }
 }
 

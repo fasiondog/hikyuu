@@ -32,10 +32,6 @@ void PyPortfolio::_readyForRun() {
     PYBIND11_OVERLOAD(void, PyPortfolio, _readyForRun);
 }
 
-void PyPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    PYBIND11_OVERLOAD(void, PyPortfolio, _runMoment, date, nextCycle, adjust);
-}
-
 void PyPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {
     PYBIND11_OVERLOAD(void, PyPortfolio, _runMomentOnOpen, date, nextCycle, adjust);
 }
@@ -105,7 +101,10 @@ void export_Portfolio(py::module& m) {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &Portfolio::setParam<boost::any>, R"(set_param(self, name, value)
+      .def("set_param",
+           static_cast<void (Portfolio::*)(const std::string&, const boost::any&)>(
+             &Portfolio::setParam),
+           R"(set_param(self, name, value)
 
     设置参数
 
@@ -117,6 +116,21 @@ void export_Portfolio(py::module& m) {
 
       .def("reset", &Portfolio::reset, "复位操作")
       .def("clone", &Portfolio::clone, "克隆操作")
+
+      .def("get_running_dates", &Portfolio::getRunningDates, "获取运行日期列表")
+      .def("get_adjust_dates", &Portfolio::getAdjustDates, "获取调仓日列表")
+      .def("get_cycle_end_dates", &Portfolio::getCycleEndDates, "获取调仓周期结束日期列表")
+      .def(
+        "get_adjust_turnover",
+        [](const Portfolio& pf) {
+            const auto& turnover = pf.getAdjustTurnover();
+            py::list ret;
+            for (const auto& item : turnover) {
+                ret.append(py::make_tuple(item.first, item.second));
+            }
+            return ret;
+        },
+        "获取调仓换手率列表")
 
       .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false,
            R"(run(self, query[, force=false])

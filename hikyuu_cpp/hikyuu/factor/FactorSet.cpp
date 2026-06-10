@@ -43,9 +43,7 @@ FactorSet::FactorSet(const std::unordered_map<string, Indicator>& inds, const KQ
 
 FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block& block)
 : m_data(make_shared<Data>()) {
-    string upper_name = name;
-    to_upper(upper_name);
-    m_data->name = upper_name;
+    m_data->name = utf8_to_upper(name);
     m_data->ktype = ktype;
     m_data->block = block;
 }
@@ -69,7 +67,7 @@ FactorSet& FactorSet::operator=(FactorSet&& other) {
 void FactorSet::add(const Factor& factor) {
     HKU_CHECK(!factor.isNull(), "Factor is null!");
     HKU_CHECK(factor.ktype() == m_data->ktype, "ktype not match!");
-    HKU_CHECK(factor.block().strongHash() == m_data->block.strongHash(), "block not match!");
+    HKU_CHECK(factor.block() == m_data->block, "block not match!");
 
     const string& factor_name = factor.name();
 

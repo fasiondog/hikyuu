@@ -80,6 +80,40 @@ private:
 };
 
 void export_extend_Indicator(py::module& m) {
+    m.def("FIXED_START_INDEX", py::overload_cast<int, const string&>(FIXED_START_INDEX),
+          py::arg("start_index") = 0, py::arg("factor_name") = "");
+    m.def("FIXED_START_INDEX",
+          py::overload_cast<const Indicator&, int, const string&>(FIXED_START_INDEX),
+          py::arg("ind"), py::arg("start_index") = 0, py::arg("factor_name") = "",
+          R"(FIXED_START_INDEX([ind, start_index=0, factor_name=''])
+
+    固定指标计算时使用的查询范围的起始索引。
+
+    对某些随时间起点变化的指标（如 AD），固定起始索引确保从股票第一条数据开始计算。
+
+    :param Indicator ind: 输入指标
+    :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
+    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
+    :return: 指标数据
+    :rtype: Indicator)");
+
+    m.def("FIXED_START_DATE", py::overload_cast<const Datetime&, const string&>(FIXED_START_DATE),
+          py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "");
+    m.def("FIXED_START_DATE",
+          py::overload_cast<const Indicator&, const Datetime&, const string&>(FIXED_START_DATE),
+          py::arg("ind"), py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "",
+          R"(FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+
+    固定指标计算时使用的查询范围的起始日期。
+
+    对某些随时间起点变化的指标（如 AD），固定起始日期确保从指定日期开始计算。
+
+    :param Indicator ind: 输入指标
+    :param Datetime start_date: 起始日期，默认为 Datetime.min()
+    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
+    :return: 指标数据
+    :rtype: Indicator)");
+
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
           py::arg("fill_null") = false);
     m.def("WITHKTYPE", py::overload_cast<const Indicator&, const KQuery::KType&, bool>(WITHKTYPE),
@@ -271,7 +305,7 @@ void export_extend_Indicator(py::module& m) {
 
     :param stks: 指定证券列表 或 Block
     :param ref_ind: 参考指标
-    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比
+    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比, 4-降序排名百分比(0~1), 5-升序排名百分比(0~1)
     :param fill_null: 是否填充缺失值
     :param market: 板块所属市场
     :return: 指标值在指定板块中的排名

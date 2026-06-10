@@ -184,3 +184,57 @@
     :param list pf_list: 投资组合列表
     :param Query query: 查询条件
     :param bool force: 强制重新计算
+
+
+.. py:function:: multi_regression(stk, query, *inds) -> list
+
+    对股票进行多元线性回归分析，使用股票收盘价的收益率作为因变量，输入的指标作为自变量进行多元线性回归。
+
+    回归模型为：Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
+
+    .. note::
+
+        NaN值处理策略：如果某个时间点的任何因子或收益率为NaN，则该时间点的数据被舍弃，但不会影响其他时间点的数据和其他因子。
+
+    :param Stock stk: 股票对象
+    :param KQuery query: K线查询条件，用于获取回归分析所需的时间范围和数据类型
+    :param Indicator \*inds: 一个或多个指标作为自变量（因子）
+    :return: 回归系数列表，第一个元素是alpha(截距)，后续是各个beta系数
+    :rtype: list
+
+    ::
+
+        >>> stk = getStock('sh000001')
+        >>> result = multi_regression(stk, KQuery(-252), MA(CLOSE(), 5), MACD(CLOSE())[0], RSI(CLOSE(), 14))
+        >>> alpha = result[0]  # 截距项
+        >>> beta1 = result[1]  # 第一个因子的系数
+        >>> beta2 = result[2]  # 第二个因子的系数
+        >>> beta3 = result[3]  # 第三个因子的系数
+
+
+.. py:function:: multi_regression_full(stk, query, \*inds) -> list
+
+    对股票进行多元线性回归分析（完整版本），返回完整的回归结果，包括系数、残差序列、残差平方和和R²值
+
+    :param Stock stk: 股票对象
+    :param KQuery query: K线查询条件
+    :param Indicator \*inds: 一个或多个指标作为自变量（因子）
+    :return: 回归结果列表，格式为：
+             [alpha, beta1, beta2, ..., betan, e1, e2, ..., en, RSS, R²]
+             - alpha: 截距项
+             - beta1~betan: 各因子系数
+             - e1~en: 各数据点的残差（实际值-预测值）
+             - RSS: 残差平方和
+             - R²: 决定系数
+    :rtype: list
+
+    ::
+
+        >>> stk = getStock('sh000001')
+        >>> result = multi_regression_full(stk, KQuery(-252), MA(CLOSE(), 5), MA(CLOSE(), 10))
+        >>> alpha = result[0]
+        >>> beta1 = result[1]
+        >>> beta2 = result[2]
+        >>> residuals = result[3:-2]  # 残差序列
+        >>> RSS = result[-2]
+        >>> R_squared = result[-1]

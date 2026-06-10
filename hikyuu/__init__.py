@@ -177,7 +177,7 @@ def hku_load(filename):
     将通过 hku_save 保存的变量，读取到var中。
 
     :param str filename: 待载入的序列化文件。
-    :return: 之前被序列化保存的文件    
+    :return: 之前被序列化保存的文件
     """
     with open(filename, 'rb') as f:
         out = pickle.load(f)
@@ -212,6 +212,7 @@ def get_global_context():
 
 # 预定义block变量的只有load_hikyuu后，才会生效
 blocka = None  # 全部A股
+blocka_shsz = None  # 沪深A股
 zsbk_a = None  # 指数板块A股
 blocksh = None  # 全部沪市
 zsbk_sh = None  # 指数板块上证
@@ -228,6 +229,7 @@ zsbk_sh50 = None
 zsbk_sh180 = None
 zsbk_hs300 = None
 zsbk_zz100 = None
+blocketf = None
 
 
 def load_hikyuu(**kwargs):
@@ -372,6 +374,7 @@ def load_hikyuu(**kwargs):
 
     global blocka
     global zsbk_a
+    global blocka_shsz
     global blocksh
     global zsbk_sh
     global blocksz
@@ -387,59 +390,36 @@ def load_hikyuu(**kwargs):
     global zsbk_sh180
     global zsbk_hs300
     global zsbk_zz100
+    global blocketf
 
-    blocka = Block("A", "ALL")
-    for s in sm:
-        if s.type in (constant.STOCKTYPE_A, constant.STOCKTYPE_A_BJ):
-            blocka.add(s)
-    blocka.index_stock = sm["SH000001"]
+    blocka = sm.get_block("A", "ALL")  # 全A，含北交所
     zsbk_a = blocka
 
-    blocksh = Block("A", "SH")
-    for s in blocka:
-        if s.market == "SH":
-            blocksh.add(s)
-    blocksh.index_stock = sm["SH000001"]
+    blocka_shsz = sm.get_block("A", "沪深")
+
+    blocksh = sm.get_block("A", "SH")
     zsbk_sh = blocksh
 
-    blocksz = Block("A", "SZ")
-    for s in blocka:
-        if s.market == "SZ":
-            blocksz.add(s)
-    blocksz.index_stock = sm["SZ399001"]
+    blocksz = sm.get_block("A", "SZ")
     zsbk_sz = blocksz
 
-    blockbj = Block("A", "BJ")
-    for s in blocka:
-        if s.market == "BJ":
-            blockbj.add(s)
-    blockbj.index_stock = sm["BJ899050"]
+    blockbj = sm.get_block("A", "BJ")
     zsbk_bj = blockbj
 
-    blockg = Block("G", "创业板")
-    for s in sm:
-        if s.type == constant.STOCKTYPE_GEM:
-            blockg.add(s)
-    blockg.index_stock = sm["SZ399006"]
+    blockg = sm.get_block("G", "创业板")
     zsbk_cyb = blockg
 
-    blockstart = Block("START", "科创板")
-    for s in sm:
-        if s.type == constant.STOCKTYPE_START:
-            blockstart.add(s)
-    blockstart.index_stock = sm["SH000688"]
+    blockstart = sm.get_block("START", "科创板")
 
-    blockzxb = Block("A", "中小板")
-    for s in blocksz:
-        if s.code[:3] == "002":
-            blockzxb.add(s)
-    blockzxb.index_stock = sm["SZ399005"]
+    blockzxb = sm.get_block("A", "中小板")
     zsbk_zxb = blockzxb
 
     zsbk_sh50 = sm.get_block("指数板块", "上证50")
     zsbk_sh180 = sm.get_block("指数板块", "上证180")
     zsbk_hs300 = sm.get_block("指数板块", "沪深300")
     zsbk_zz100 = sm.get_block("指数板块", "中证100")
+
+    blocketf = sm.get_block("ETF", "ALL")
 
     set_global_context(sm['sh000001'], Query(-150))
 
@@ -639,8 +619,8 @@ def auto_sync_globals(func):
                 while caller_frame:
                     caller_globals = caller_frame.f_globals
                     # 检查是否是从hikyuu导入的全局变量且值为None
-                    var_names = ['blocka', 'zsbk_a', 'blocksh', 'zsbk_sh', 'blocksz', 'zsbk_sz',
-                                 'blockbj', 'zsbk_bj', 'blockg', 'zsbk_cyb', 'blockstart', 'blockzxb',
+                    var_names = ['blocka', 'blocka_shsz', 'zsbk_a', 'blocksh', 'zsbk_sh', 'blocksz', 'zsbk_sz',
+                                 'blockbj', 'zsbk_bj', 'blockg', 'zsbk_cyb', 'blockstart', 'blockzxb', 'blocketf',
                                  'zsbk_zxb', 'zsbk_sh50', 'zsbk_sh180', 'zsbk_hs300', 'zsbk_zz100']
 
                     updated_vars = []

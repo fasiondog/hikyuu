@@ -183,4 +183,10 @@ KData HKU_API CONTEXT_K(const Indicator& ind) {
     return ind.getContext();
 }
 
+bool HKU_API is_standalone_context(const Indicator& ind) {
+    auto imp = ind.getImp();
+    IContext const* p = dynamic_cast<IContext const*>(imp.get());
+    return p != nullptr;
+}
+
 }  // namespace hku

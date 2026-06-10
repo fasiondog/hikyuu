@@ -76,7 +76,6 @@ void IIndex::_calculate(const Indicator& ind) {
                          query.recoverType());
 
     KData index_k = getKData(market_code, query);
-    HKU_ASSERT(index_k.size() == total);
     Indicator index =
       ALIGN(KDATA_PART(index_k, getParam<string>("kpart")), k, getParam<bool>("fill_null"));
 

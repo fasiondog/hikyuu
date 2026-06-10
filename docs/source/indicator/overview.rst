@@ -13,6 +13,8 @@
 * :py:func:`CONTEXT` - 独立上下文
 * :py:func:`DISCARD` - 以指标公式的方式设置指标结果的丢弃数据量。
 * :py:func:`DROPNA` - 删除 nan 值
+* :py:func:`FIXED_START_INDEX` - [捐赠用户]固定指标计算时使用的查询范围的起始索引
+* :py:func:`FIXED_START_DATE` - [捐赠用户]固定指标计算时使用的查询范围的起始日期
 * :py:func:`INBLOCK` - 当前上下文证券是否在指定的板块中。
 * :py:func:`ISNA` - 判断是否为 nan 值
 * :py:func:`ISINF` - 判断是否为 +inf 值
@@ -112,6 +114,7 @@
 * :py:func:`MIN` - 最小值
 * :py:func:`MOD` - 取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符。
 * :py:func:`POW` - 乘幂
+* :py:func:`SIGNED_POWER` - 带符号乘幂
 * :py:func:`REVERSE` - 求相反数
 * :py:func:`ROUND` - 四舍五入
 * :py:func:`ROUNDUP` -  向上截取，如10.1截取后为11
@@ -125,6 +128,7 @@
 **统计指标**
 
 * :py:func:`AVEDEV` - 平均绝对偏差
+* :py:func:`BETA` - Beta系数，衡量资产收益与市场收益之间的敏感性
 * :py:func:`DEVSQ` - 数据偏差平方和
 * :py:func:`STD` - 估算标准差，同 STDEV
 * :py:func:`STDEV` - 计算N周期内样本标准差
@@ -132,7 +136,10 @@
 * :py:func:`VAR` - 估算样本方差
 * :py:func:`VARP` - 总体样本方差
 * :py:func:`CORR` - 样本相关系数与协方差
+* :py:func:`COV` - 样本协方差
 * :py:func:`SPEARMAN` - Spearman相关系数
+* :py:func:`SKEW` - 总体偏度
+* :py:func:`KURT` - 超额峰度
 
 **横向统计**
 
@@ -153,7 +160,7 @@
 * :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
 * :py:func:`COUNT` - 统计满足条件的周期数
 * :py:func:`COST` - 成本分布
-* :py:func:`DIFF` - 差分指标，即data[i] - data[i-1]
+* :py:func:`DIFF` - 差分指标，即data[i] - data[i-n]
 * :py:func:`DMA` - 动态移动平均
 * :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
 * :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
@@ -175,6 +182,7 @@
 * :py:func:`SUM` - 求总和
 * :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
 * :py:func:`TR` - 真实波动幅度
+* :py:func:`TS_RANK` - 时间序列排名（Alpha101），计算当前值在过去N个周期内的排名比例
 * :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
 
 
@@ -228,4 +236,3 @@
 
 * :py:func:`concat_to_df` - 合并指标列表为 DateFrame
 * :py:func:`df_to_ind` - 将 DataFrame 指定列转为指标
-

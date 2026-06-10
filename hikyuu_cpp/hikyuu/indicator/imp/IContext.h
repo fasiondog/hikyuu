@@ -26,6 +26,16 @@ public:
 
     KData getContextKdata() const;
 
+    // 强制设定自身上下文数据
+    void setSelfContext(const KData& kdata) {
+        m_ref_ind.setContext(kdata);
+    }
+
+    // 获取自身上下文数据
+    KData getSelfContext() const {
+        return m_ref_ind.getContext();
+    }
+
 private:
     Indicator m_ref_ind;
 

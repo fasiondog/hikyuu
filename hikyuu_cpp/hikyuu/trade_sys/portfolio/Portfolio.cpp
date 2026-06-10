@@ -121,6 +121,7 @@ void Portfolio::reset() {
     m_dates.clear();
     m_adjust_flags.clear();
     m_cycle_end_dates.clear();
+    m_adjust_turnover.clear();
     _reset();
 }
 
@@ -389,11 +390,10 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     // 开盘前，调整账户权息
     m_tm->updateWithWeight(date);
 
-    _runMoment(date, nextCycle, adjust);
+    _runMomentOnOpen(date, nextCycle, adjust);
+    traceMomentTMAfterRunAtOpen(date);
 
-    //----------------------------------------------------------------------
-    // 跟踪打印各运行中子系统持仓情况
-    //----------------------------------------------------------------------
+    _runMomentOnClose(date, nextCycle, adjust);
     traceMomentTMAfterRunAtClose(date);
 
     // 跟踪打印当前账户资产

@@ -22,12 +22,12 @@ Block::Block() noexcept {}
 
 Block::~Block() {}
 
-Block::Block(const string& category, const string& name) noexcept : m_data(make_shared<Data>()) {
+Block::Block(const string& category, const string& name) : m_data(make_shared<Data>()) {
     m_data->m_category = category;
     m_data->m_name = name;
 }
 
-Block::Block(const string& category, const string& name, const string& indexCode) noexcept
+Block::Block(const string& category, const string& name, const string& indexCode)
 : Block(category, name) {
     if (!indexCode.empty()) {
         auto stock = StockManager::instance().getStock(indexCode);
@@ -50,6 +50,18 @@ Block::Block(Block&& block) noexcept {
     if (!block.m_data)
         return;
     m_data = std::move(block.m_data);
+}
+
+Block::Block(const StockList& stocks) : m_data(make_shared<Data>()) {
+    for (const auto& stock : stocks) {
+        add(stock);
+    }
+}
+
+Block::Block(const StringList& market_codes) : m_data(make_shared<Data>()) {
+    for (const auto& market_code : market_codes) {
+        add(market_code);
+    }
 }
 
 Block& Block::operator=(const Block& block) noexcept {
@@ -118,8 +130,9 @@ bool Block::add(const Stock& stock) {
 bool Block::add(const string& market_code) {
     const StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock(market_code);
+    // stock 为空时不打印日志，防止打印过多，尤其是部分累积不用的板块在初始化时会打印很多日志
     HKU_IF_RETURN(stock.isNull() || have(stock), false);
-    if (!m_data)
+    if (!m_data) [[unlikely]]
         m_data = make_shared<Data>();
 
     m_data->m_stockDict[stock.market_code()] = stock;
@@ -175,6 +188,8 @@ uint64_t Block::strongHash() const {
     XXH64_update(state, m_data->m_name.data(), m_data->m_name.size());
 
     StockList stocks = getStockList();
+    std::sort(stocks.begin(), stocks.end(),
+              [](const Stock& a, const Stock& b) { return a.market_code() < b.market_code(); });
     for (const auto& stk : stocks) {
         auto stkid = stk.id();
         XXH64_update(state, &stkid, sizeof(stkid));
@@ -184,6 +199,21 @@ uint64_t Block::strongHash() const {
     uint64_t result = XXH64_digest(state);
     XXH64_freeState(state);
     return result;
+}
+
+bool Block::operator==(const Block& blk) const noexcept {
+    HKU_IF_RETURN(this == &blk || m_data == blk.m_data, true);
+    HKU_IF_RETURN(category() != blk.category() || name() != blk.name() || size() != blk.size() ||
+                    getIndexStock() != blk.getIndexStock(),
+                  false);
+    unordered_map<string, string> self_dict;
+    for (const auto& stk : getStockList()) {
+        self_dict[stk.market_code()] = stk.market_code();
+    }
+    for (const auto& stk : blk.getStockList()) {
+        HKU_IF_RETURN(self_dict.count(stk.market_code()) == 0, false);
+    }
+    return true;
 }
 
 HKU_API Block getBlock(const string& category, const string& name) {

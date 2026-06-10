@@ -177,6 +177,7 @@ void StockManager::loadData() {
     loadAllMarketInfos();
     loadAllStockTypeInfo();
     loadAllStocks();
+    loadInnerBlocks();
     loadAllStockWeights();
     loadAllZhBond10();
     loadHistoryFinanceField();
@@ -553,14 +554,20 @@ StringList StockManager::getAllCategory() {
 }
 
 Block StockManager::getBlock(const string& category, const string& name) {
-    return m_blockDriver ? m_blockDriver->getBlock(category, name) : Block();
+    Block result;
+    HKU_IF_RETURN(!m_blockDriver || category.empty() || name.empty(), result);
+    auto iter = m_innerBlocks.find(fmt::format("{}_{}", category, name));
+    if (iter != m_innerBlocks.end()) {
+        return iter->second;
+    }
+    result = m_blockDriver->getBlock(category, name);
+    return result;
 }
 
 void StockManager::saveBlock(const Block& blk) {
     if (m_blockDriver) {
         HKU_CHECK(!blk.category().empty(), "block's category can not be empty!");
         HKU_CHECK(!blk.name().empty(), "block's name can not be empty!");
-        HKU_CHECK(!blk.empty(), "Can't save empty block!");
         m_blockDriver->save(blk);
     }
 }
@@ -571,11 +578,23 @@ void StockManager::removeBlock(const string& category, const string& name) {
 }
 
 BlockList StockManager::getBlockList(const string& category) {
-    return m_blockDriver ? m_blockDriver->getBlockList(category) : BlockList();
-}
-
-BlockList StockManager::getBlockList() {
-    return m_blockDriver ? m_blockDriver->getBlockList() : BlockList();
+    BlockList result;
+    HKU_IF_RETURN(!m_blockDriver, BlockList());
+    result =
+      category.empty() ? m_blockDriver->getBlockList() : m_blockDriver->getBlockList(category);
+    auto iter = m_innerBlocks.begin();
+    if (category.empty()) {
+        for (; iter != m_innerBlocks.end(); ++iter) {
+            result.push_back(iter->second);
+        }
+    } else {
+        for (; iter != m_innerBlocks.end(); ++iter) {
+            if (iter->first == category) {
+                result.push_back(iter->second);
+            }
+        }
+    }
+    return result;
 }
 
 BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
@@ -590,7 +609,14 @@ BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
 }
 
 BlockList StockManager::getStockBelongs(const Stock& stk, const string& category) {
-    return m_blockDriver ? m_blockDriver->getStockBelongs(stk, category) : BlockList();
+    BlockList result;
+    BlockList all = getBlockList(category);
+    for (const auto& blk : all) {
+        if (blk.getIndexStock() == stk) {
+            result.push_back(blk);
+        }
+    }
+    return result;
 }
 
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
@@ -822,6 +848,83 @@ void StockManager::loadAllHolidays() {
     auto holidays = m_baseInfoDriver->getAllHolidays();
     std::unordered_set<Datetime> tmp_holidays(holidays.begin(), holidays.end());
     m_holidays = std::move(tmp_holidays);
+}
+
+void StockManager::loadInnerBlocks() {
+    Block blocka = Block("A", "ALL");
+    Block blocksh = Block("A", "SH");
+    Block blocksz = Block("A", "SZ");
+    Block blockbj = Block("A", "BJ");
+    Block blocka_shsz = Block("A", "沪深");
+    Block blockzxb = Block("A", "中小板");
+    Block blockg = Block("G", "创业板");
+    Block blockstart = Block("START", "科创板");
+    Block blocketf = Block("ETF", "ALL");
+
+    std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+    auto iter = m_stockDict.begin();
+    for (; iter != m_stockDict.end(); ++iter) {
+        const Stock& stock = iter->second;
+        if (stock.type() == STOCKTYPE_A) {
+            blocka.add(stock);
+            blocka_shsz.add(stock);
+            if (stock.market() == "SH") {
+                blocksh.add(stock);
+            } else if (stock.market() == "SZ") {
+                blocksz.add(stock);
+                if (stock.code().size() >= 3 && stock.code().substr(0, 3) == "002") {
+                    blockzxb.add(stock);
+                }
+            }
+        } else if (stock.type() == STOCKTYPE_A_BJ) {
+            blocka.add(stock);
+            blockbj.add(stock);
+        } else if (stock.type() == STOCKTYPE_GEM) {
+            blockg.add(stock);
+        } else if (stock.type() == STOCKTYPE_START) {
+            blockstart.add(stock);
+        } else if (stock.type() == STOCKTYPE_ETF) {
+            blocketf.add(stock);
+        }
+    }
+
+    iter = m_stockDict.find("SH000001");
+    if (iter != m_stockDict.end()) {
+        blocka.setIndexStock(iter->second);
+        blocka_shsz.setIndexStock(iter->second);
+        blocksh.setIndexStock(iter->second);
+    }
+    iter = m_stockDict.find("SZ399001");
+    if (iter != m_stockDict.end()) {
+        blocksz.setIndexStock(iter->second);
+    }
+    iter = m_stockDict.find("BJ899050");
+    if (iter != m_stockDict.end()) {
+        blockbj.setIndexStock(iter->second);
+    }
+    iter = m_stockDict.find("SZ399005");
+    if (iter != m_stockDict.end()) {
+        blockzxb.setIndexStock(iter->second);
+    }
+    iter = m_stockDict.find("SZ399006");
+    if (iter != m_stockDict.end()) {
+        blockg.setIndexStock(iter->second);
+    }
+    iter = m_stockDict.find("SH000688");
+    if (iter != m_stockDict.end()) {
+        blockstart.setIndexStock(iter->second);
+    }
+
+    m_innerBlocks.clear();
+    m_innerBlocks["A_ALL"] = std::move(blocka);
+    m_innerBlocks["A_沪深"] = std::move(blocka_shsz);
+    m_innerBlocks["A_SH"] = std::move(blocksh);
+    m_innerBlocks["A_SZ"] = std::move(blocksz);
+    m_innerBlocks["A_BJ"] = std::move(blockbj);
+    m_innerBlocks["A_中小板"] = std::move(blockzxb);
+    m_innerBlocks["G_创业板"] = std::move(blockg);
+    m_innerBlocks["START_科创板"] = std::move(blockstart);
+    m_innerBlocks["ETF_ALL"] = std::move(blocketf);
 }
 
 void StockManager::loadAllStockWeights() {

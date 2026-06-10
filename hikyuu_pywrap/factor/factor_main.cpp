@@ -28,12 +28,13 @@ void export_factor_main(py::module& m) {
     :return: 因子对象，如果不存在则返回空因子
     :rtype: Factor)");
 
-    m.def("save_factor", &saveFactor, py::arg("factor"),
-          R"(save_factor(factor)
+    m.def("save_factor", &saveFactor, py::arg("factor"), py::arg("update_before") = true,
+          R"(save_factor(factor[, update_before=True])
     
     保存因子到数据库
 
     :param Factor factor: 要保存的因子对象
+    :param bool update_before: 是否在保存前，检查并更新已有因子，默认True)。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新
     :note: 以 name + ktype 作为唯一标识)");
 
     m.def("remove_factor", &removeFactor, py::arg("name"), py::arg("ktype"),

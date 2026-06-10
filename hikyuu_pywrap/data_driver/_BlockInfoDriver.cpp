@@ -38,7 +38,10 @@ void export_BlockInfoDriver(py::module& m) {
       .def("__repr__", BlockInfoDriver_to_str)
 
       .def("get_param", &BlockInfoDriver::getParam<boost::any>, "获取指定参数")
-      .def("set_param", &BlockInfoDriver::setParam<boost::any>, "设置指定参数")
+      .def("set_param",
+           static_cast<void (BlockInfoDriver::*)(const std::string&, const boost::any&)>(
+             &BlockInfoDriver::setParam),
+           "设置指定参数")
       .def("have_param", &BlockInfoDriver::haveParam, "指定参数是否存在")
 
       .def("_init", &BlockInfoDriver::_init, "【子类接口（必须）】驱动初始化")

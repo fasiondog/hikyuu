@@ -66,7 +66,13 @@ target("core")
             local python = assert(find_tool("python", {version = true}), "python not found, please install it first! note: python version must > 3.0")
             assert(python.version > "3", python.version .. " python version must > 3.0, please use python3.0 or later!")
             -- find python include and libs directory
-            local pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            local pydir
+            if os.getenv("CONDA_PREFIX") ~= nil then
+                pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
+            else
+                -- 直接用 python.program 在 conda 环境下切换有问题
+                pydir = os.iorunv(python.program, {"-c", "import sys; print(sys.executable)"})
+            end
             pydir = path.directory(pydir)
             if pydir:endswith("Scripts") then
                 -- if venv is activated, find the real python directory

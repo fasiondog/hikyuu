@@ -22,18 +22,18 @@ IBarsLasts::IBarsLasts() : IndicatorImp("BARSLASTS", 1) {
 IBarsLasts::~IBarsLasts() {}
 
 void IBarsLasts::_calculate(const Indicator& ind) {
+    size_t total = ind.size();
+    size_t ind_discard = ind.discard();
+    if (ind_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
     // 获取参数N
     int n = getParam<int>("n");
 
     // 参数验证：如果n <= 0，返回全NaN序列
     if (n <= 0) {
-        m_discard = ind.size();
-        return;
-    }
-
-    size_t total = ind.size();
-    size_t ind_discard = ind.discard();
-    if (ind_discard >= total) {
         m_discard = total;
         return;
     }

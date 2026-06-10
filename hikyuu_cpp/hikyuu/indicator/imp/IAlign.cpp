@@ -198,4 +198,11 @@ Indicator HKU_API ALIGN(const DatetimeList& ref, bool fill_null) {
     return Indicator(p);
 }
 
+Indicator HKU_API ALIGN(DatetimeList&& ref, bool fill_null) {
+    IndicatorImpPtr p = make_shared<IAlign>();
+    p->setParam<DatetimeList>("align_date_list", std::move(ref));
+    p->setParam<bool>("fill_null", fill_null);
+    return Indicator(p);
+}
+
 } /* namespace hku */

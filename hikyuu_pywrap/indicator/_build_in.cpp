@@ -91,8 +91,8 @@ Indicator (*AMA_3)(const Indicator&, int, int, int) = AMA;
 Indicator (*AMA_4)(const Indicator&, const IndParam&, const IndParam&, const IndParam&) = AMA;
 Indicator (*AMA_5)(const Indicator&, const Indicator&, const Indicator&, const Indicator&) = AMA;
 
-Indicator (*DIFF_1)() = DIFF;
-Indicator (*DIFF_2)(const Indicator&) = DIFF;
+Indicator (*DIFF_1)(int) = DIFF;
+Indicator (*DIFF_2)(const Indicator&, int) = DIFF;
 
 Indicator (*MA_1)(int) = MA;
 Indicator (*MA_2)(const IndParam&) = MA;
@@ -260,6 +260,13 @@ Indicator (*POW_3)(const Indicator&, int) = POW;
 Indicator (*POW_4)(const Indicator&, const IndParam&) = POW;
 Indicator (*POW_5)(const Indicator&, const Indicator&) = POW;
 Indicator (*POW_6)(Indicator::value_t, int) = POW;
+
+Indicator (*SIGNED_POWER_1)(int) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_2)(const IndParam&) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_3)(const Indicator&, int) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_4)(const Indicator&, const IndParam&) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_5)(const Indicator&, const Indicator&) = SIGNED_POWER;
+Indicator (*SIGNED_POWER_6)(Indicator::value_t, int) = SIGNED_POWER;
 
 Indicator (*SQRT_1)() = SQRT;
 Indicator (*SQRT_2)(const Indicator&) = SQRT;
@@ -497,8 +504,26 @@ Indicator (*ZHBOND10_4)(const Indicator&, double) = ZHBOND10;
 Indicator (*CORR_1)(const Indicator&, int, bool) = CORR;
 Indicator (*CORR_2)(const Indicator&, const Indicator&, int, bool) = CORR;
 
+Indicator (*COV_1)(const Indicator&, int, bool) = COV;
+Indicator (*COV_2)(const Indicator&, const Indicator&, int, bool) = COV;
+
+Indicator (*BETA_1)(const Indicator&, int, bool) = BETA;
+Indicator (*BETA_2)(const Indicator&, const Indicator&, int, bool) = BETA;
+
 Indicator (*SPEARMAN_1)(const Indicator&, int, bool) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int, bool) = SPEARMAN;
+
+Indicator (*SKEW_1)(int) = SKEW;
+Indicator (*SKEW_2)(const IndParam&) = SKEW;
+Indicator (*SKEW_3)(const Indicator&, int) = SKEW;
+Indicator (*SKEW_4)(const Indicator&, const IndParam&) = SKEW;
+Indicator (*SKEW_5)(const Indicator&, const Indicator&) = SKEW;
+
+Indicator (*KURT_1)(int) = KURT;
+Indicator (*KURT_2)(const IndParam&) = KURT;
+Indicator (*KURT_3)(const Indicator&, int) = KURT;
+Indicator (*KURT_4)(const Indicator&, const IndParam&) = KURT;
+Indicator (*KURT_5)(const Indicator&, const Indicator&) = KURT;
 
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
@@ -726,7 +751,7 @@ void export_Indicator_build_in(py::module& m) {
               const auto& x = obj.cast<py::sequence>();
               auto values = python_list_to_vector<price_t>(x);
               if (pyalign_dates.is_none()) {
-                  return PRICELIST(values, discard);
+                  return PRICELIST(std::move(values), discard);
               } else {
                   py::sequence align_dates = pyalign_dates.cast<py::sequence>();
                   auto total = len(align_dates);
@@ -734,7 +759,7 @@ void export_Indicator_build_in(py::module& m) {
                   for (auto i = 0; i < total; ++i) {
                       dates[i] = pydatetime_to_Datetime(align_dates[i]);
                   }
-                  return PRICELIST(values, dates, discard);
+                  return PRICELIST(std::move(values), std::move(dates), discard);
               }
           } else {
               HKU_THROW("Invalid input data type!");
@@ -890,12 +915,13 @@ void export_Indicator_build_in(py::module& m) {
     :param float|Indicator|IndParam p: 噪音系数
     :rtype: Indicator)");
 
-    m.def("DIFF", DIFF_1);
-    m.def("DIFF", DIFF_2, R"(DIFF([data])
+    m.def("DIFF", DIFF_1, py::arg("n") = 1);
+    m.def("DIFF", DIFF_2, py::arg("data"), py::arg("n") = 1, R"(DIFF([data, n=1])
 
-    差分指标，即data[i] - data[i-1]
+    差分指标，即data[i] - data[i-n]
 
     :param Indicator data: 输入数据
+    :param int n: 差分周期，默认1
     :rtype: Indicator)");
 
     m.def("REF", REF_1, py::arg("n"));
@@ -935,8 +961,6 @@ void export_Indicator_build_in(py::module& m) {
     :param data: 输入数据
     :param int n: 时间窗口
     :rtype: Indicator)");
-
-    m.def("POS", POS, py::arg("block"), py::arg("query"), py::arg("sg"));
 
     m.def("HHV", HHV_1, py::arg("n") = 20);
     m.def("HHV", HHV_2, py::arg("n"));
@@ -1046,6 +1070,38 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ref_ind: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :param bool fill_null: 日期对齐时缺失日期填充nan值
+    :rtype: Indicator)");
+
+    m.def("COV", COV_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
+    m.def("COV", COV_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
+          py::arg("fill_null") = true,
+          R"(COV(ind, ref_ind[, n=10, fill_null=True])
+
+    计算 ind 和 ref_ind 的样本协方差。
+    与 COV(ref_ind, n)(ind) 等效。
+
+    :param Indicator ind: 指标1
+    :param Indicator ref_ind: 指标2
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据协方差。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时缺失日期填充nan值
+    :rtype: Indicator)");
+
+    m.def("BETA", BETA_1, py::arg("ref_ind"), py::arg("n") = 10, py::arg("fill_null") = true);
+    m.def("BETA", BETA_2, py::arg("ind"), py::arg("ref_ind"), py::arg("n") = 10,
+          py::arg("fill_null") = true,
+          R"(BETA(ind, ref_ind[, n=10, fill_null=True])
+
+    计算 Beta 系数，如衡量资产收益与市场收益之间的敏感性。
+    Beta = Cov(stock_return, market_return) / Var(market_return)
+    与 BETA(ref_ind, n)(ind) 等效。
+
+    .. note:: BETA本身不会对输入数据进行收益率转换(pct_change)处理，
+              输入的指标应为已经计算好的收益率数据。
+
+    :param Indicator ind: 输入指标，如股票收益率指标
+    :param Indicator ref_ind: 对照指标，如市场收益率指标
+    :param int n: 滚动窗口大小（大于2或等于0）。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时，缺失日期填充nan值
     :rtype: Indicator)");
 
     m.def("IF", IF_1);
@@ -1229,6 +1285,23 @@ void export_Indicator_build_in(py::module& m) {
     用法：POW(A,B)返回A的B次幂
 
     例如：POW(CLOSE,3)求得收盘价的3次方
+
+    :param data: 输入数据
+    :param int|Indicator|IndParam n: 幂
+    :rtype: Indicator)");
+
+    m.def("SIGNED_POWER", SIGNED_POWER_1, py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_2, py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_3, py::arg("data"), py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_4, py::arg("data"), py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_5, py::arg("data"), py::arg("n"));
+    m.def("SIGNED_POWER", SIGNED_POWER_6, py::arg("data"), py::arg("n"), R"(SIGNED_POWER(data, n)
+
+    带符号乘幂
+
+    用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
+
+    例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 幂
@@ -2148,6 +2221,30 @@ void export_Indicator_build_in(py::module& m) {
     :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
     :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据)");
 
+    m.def("SKEW", SKEW_1, py::arg("n") = 10);
+    m.def("SKEW", SKEW_2, py::arg("n"));
+    m.def("SKEW", SKEW_4, py::arg("data"), py::arg("n"));
+    m.def("SKEW", SKEW_5, py::arg("data"), py::arg("n"));
+    m.def("SKEW", SKEW_3, py::arg("data"), py::arg("n") = 10, R"(SKEW([data, n=10])
+
+    计算N周期内未调整的总体偏度
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于3或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator)");
+
+    m.def("KURT", KURT_1, py::arg("n") = 10);
+    m.def("KURT", KURT_2, py::arg("n"));
+    m.def("KURT", KURT_4, py::arg("data"), py::arg("n"));
+    m.def("KURT", KURT_5, py::arg("data"), py::arg("n"));
+    m.def("KURT", KURT_3, py::arg("data"), py::arg("n") = 10, R"(KURT([data, n=10])
+
+    计算N周期内的超额峰度（未调整的总体峰度 - 3）
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于4或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator)");
+
     // IR(const Indicator& p, const Indicator& b, int n = 100)
     m.def("IR", IR, py::arg("p"), py::arg("b"), py::arg("n") = 100, R"(IR(p, b[, n])
 
@@ -2247,6 +2344,23 @@ void export_Indicator_build_in(py::module& m) {
     换手率=股票成交量/流通股股数×100%
 
     :param int n: 时间窗口)");
+
+    m.def("TS_RANK", py::overload_cast<int>(TS_RANK), py::arg("n") = 20);
+    m.def("TS_RANK", py::overload_cast<const Indicator&, int>(TS_RANK), py::arg("data"),
+          py::arg("n") = 20, R"(TS_RANK([data, n=20])
+
+    时间序列排名，计算当前值在过去N个周期内的排名比例（Alpha101）
+
+    用法：TS_RANK(X,N)，表示X在过去N个周期内的排名（从1到N）除以N
+    例如：TS_RANK(CLOSE,20)表示收盘价在过去20个周期内的排名比例
+
+    Alpha101中的定义：
+    TS_RANK(x, n) = (rank of x in the last n observations) / n
+    其中rank为升序排名，即较小的值排名靠前，输出为0～1的百分位值
+
+    :param Indicator data: 待计算的数据
+    :param int n: 周期数，默认20
+    :rtype: Indicator)");
 
     m.def("RESULT", py::overload_cast<int>(RESULT));
     m.def("RESULT", py::overload_cast<const Indicator&, int>(RESULT), py::arg("data"),

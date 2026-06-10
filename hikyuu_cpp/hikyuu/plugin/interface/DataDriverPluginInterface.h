@@ -24,12 +24,13 @@ public:
     virtual BlockInfoDriverPtr getBlockInfoDriver() = 0;
     virtual BaseInfoDriverPtr getBaseInfoDriver() = 0;
 
+    virtual bool isValidFactorName(const string& name) noexcept = 0;
     virtual FactorList getAllFactors() = 0;
     virtual FactorSetList getAllFactorSets() = 0;
     virtual void updateAllFactorsValues(const KQuery::KType& ktype) = 0;
 
     virtual Factor getFactor(const string& name, const KQuery::KType& ktype) = 0;
-    virtual void saveFactor(const Factor& factor) = 0;
+    virtual void saveFactor(const Factor& factor, bool update_before) = 0;
     virtual void removeFactor(const string& name, const KQuery::KType& ktype) = 0;
     virtual void saveSpecialFactorValues(const Factor& factor, const Stock& stock,
                                          const DatetimeList& dates, const PriceList& values,

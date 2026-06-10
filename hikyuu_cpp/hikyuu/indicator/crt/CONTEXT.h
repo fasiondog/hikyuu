@@ -43,4 +43,12 @@ Indicator HKU_API CONTEXT(const Indicator& ind, const Stock& stk, bool fill_null
  */
 KData HKU_API CONTEXT_K(const Indicator& ind);
 
+/**
+ * @brief 判断指标是否为独立上下文指标
+ * @param ind
+ * @return true
+ * @return false
+ */
+bool HKU_API is_standalone_context(const Indicator& ind);
+
 }  // namespace hku

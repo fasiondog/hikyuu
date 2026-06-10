@@ -98,9 +98,14 @@ public:
     /** 获取运行日期列表 */
     const DatetimeList& getRunningDates() const noexcept;
 
+    /** 获取调仓日列表 */
     DatetimeList getAdjustDates() const;
 
+    /** 获取调仓周期结束日期列表 */
     DatetimeList getCycleEndDates() const;
+
+    /** 获取调仓换手率列表 */
+    const std::vector<std::pair<Datetime, double>>& getAdjustTurnover() const noexcept;
 
     /** 用于打印输出 */
     virtual string str() const;
@@ -111,7 +116,6 @@ public:
     }
 
     virtual void _readyForRun() {}
-    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
     virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
     virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
 
@@ -156,6 +160,9 @@ protected:
     vector<uint8_t> m_adjust_flags;  // 调仓日标志
     DatetimeList m_cycle_end_dates;  // 调仓周期结束日期
 
+    std::vector<std::pair<Datetime, double>>
+      m_adjust_turnover;  // 调仓周期换手率（需子类自行实现，未实现则没有）
+
 //============================================
 // 序列化支持
 //============================================
@@ -190,14 +197,17 @@ private:
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
-#define PORTFOLIO_IMP(classname)              \
-public:                                       \
-    virtual PortfolioPtr _clone() override {  \
-        return std::make_shared<classname>(); \
-    }                                         \
-    virtual void _reset() override;           \
-    virtual void _readyForRun() override;     \
-    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) override;
+#define PORTFOLIO_IMP(classname)                                                                 \
+public:                                                                                          \
+    virtual PortfolioPtr _clone() override {                                                     \
+        return std::make_shared<classname>();                                                    \
+    }                                                                                            \
+    virtual void _reset() override;                                                              \
+    virtual void _readyForRun() override;                                                        \
+    virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle, bool adjust)  \
+      override;                                                                                  \
+    virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) \
+      override;
 
 /**
  * 客户程序都应使用该指针类型
@@ -267,6 +277,11 @@ inline const SystemList& Portfolio::getRealSystemList() const {
 
 inline const DatetimeList& Portfolio::getRunningDates() const noexcept {
     return m_dates;
+}
+
+inline const std::vector<std::pair<Datetime, double>>& Portfolio::getAdjustTurnover()
+  const noexcept {
+    return m_adjust_turnover;
 }
 
 } /* namespace hku */

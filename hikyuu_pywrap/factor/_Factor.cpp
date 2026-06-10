@@ -27,11 +27,18 @@ void export_Factor(py::module& m) {
     :param KQuery.KType ktype: K线类型，默认为日线)")
 
       .def(
-        py::init<const string&, const Indicator&, const KQuery::KType&, const string&,
-                 const string&, bool, const Datetime&, const Block&>(),
+        py::init([](const string& name, const Indicator& formula, const KQuery::KType& ktype,
+                    const string& brief, const string& details, bool save_value,
+                    const Datetime& start_date, const py::object& block,
+                    KQuery::RecoverType recover_type) {
+            Block c_block = get_block_from_python(block);
+            return Factor(name, formula, ktype, brief, details, save_value, start_date, c_block,
+                          recover_type);
+        }),
         py::arg("name"), py::arg("formula"), py::arg("ktype") = KQuery::DAY, py::arg("brief") = "",
         py::arg("details") = "", py::arg("need_save_value") = false,
         py::arg("start_date") = Datetime::min(), py::arg("block") = Block(),
+        py::arg("recover_type") = KQuery::NO_RECOVER,
         R"(__init__(self, name, formula[, ktype=KQuery.DAY[, brief=""[, details=""[, need_save_value=False[, start_date=Datetime.min()[, block=Block()]]]]]])
     
     构造函数，创建新的因子对象（因子名称 + K线类型 为因子的唯一标识）
@@ -44,6 +51,7 @@ void export_Factor(py::module& m) {
     :param bool need_save_value: 是否需要持久化保存因子值数据，默认为False
     :param Datetime start_date: 开始日期，数据存储时的起始日期，默认为最小日期
     :param Block block: 板块信息，证券集合，如果为空则为全部，默认为空
+    :param KQuery.RecoverType recover_type: 恢复类型，默认为NO_RECOVER
     :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
 
       .def("__str__", &Factor::str)
@@ -81,12 +89,14 @@ void export_Factor(py::module& m) {
                     py::overload_cast<KQuery::RecoverType>(&Factor::recoverType),
                     py::return_value_policy::copy, "复权类型")
 
-      .def("save_to_db", &Factor::save_to_db,
-           R"(save_to_db(self)
+      .def("save_to_db", &Factor::save_to_db, py::arg("update_before") = true,
+           R"(save_to_db(self[, update_before=True])
     
     保存因子元数据到数据库，如果因子已存在则更新，否则插入新记录
     
-    :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
+    :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识
+    
+    :param bool update_before: 是否在保存前，检查并更新已有因子，默认True)。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新)")
 
       .def(
         "save_special_values_to_db",

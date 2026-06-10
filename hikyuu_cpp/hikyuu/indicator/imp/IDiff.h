@@ -14,7 +14,8 @@
 namespace hku {
 
 /*
- * 差分指标，即 a[i] - a[i-1]
+ * 差分指标，即 a[i] - a[i-n]
+ * 参数：n: 差分周期，默认1
  */
 class IDiff : public hku::IndicatorImp {
     INDICATOR_IMP(IDiff)
@@ -24,6 +25,8 @@ class IDiff : public hku::IndicatorImp {
 public:
     IDiff();
     virtual ~IDiff() override;
+
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

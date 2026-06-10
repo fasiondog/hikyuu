@@ -82,7 +82,10 @@ void export_TradeCost(py::module& m) {
     :return: 参数值
     :raises out_of_range: 无此参数)")
 
-      .def("set_param", &TradeCostBase::setParam<boost::any>, R"(set_param(self, name, value)
+      .def("set_param",
+           static_cast<void (TradeCostBase::*)(const std::string&, const boost::any&)>(
+             &TradeCostBase::setParam),
+           R"(set_param(self, name, value)
 
     设置参数
 

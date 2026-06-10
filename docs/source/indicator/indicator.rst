@@ -448,6 +448,29 @@
     :rtype: Indicator
 
 
+.. py:function:: BETA(ind, ref_ind[, n=10, fill_null=True])
+
+    计算 Beta 系数，如衡量资产收益与市场收益之间的敏感性。
+
+    计算公式：Beta = Cov(stock_return, market_return) / Var(market_return)
+
+    .. note:: BETA本身不会对输入数据进行收益率转换(pct_change)处理，
+              输入的指标应为已经计算好的收益率数据。
+
+    :param Indicator ind: 输入指标，如股票收益率指标
+    :param Indicator ref_ind: 对照指标，如市场收益率指标
+    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度
+    :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
+    :rtype: Indicator
+
+    **使用示例**::
+
+        # 计算股票相对于市场的Beta系数
+        stock_return = ROC(CLOSE(), 1)
+        market_return = ROC(INDEXC(), 1)
+        beta = BETA(stock_return, market_return, 60)
+
+
 .. py:function:: BETWEEN(a, b, c)
 
     介于(介于两个数之间)
@@ -545,6 +568,16 @@
     :param Indicator ind2: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
     :rtype: Indicator    
+
+.. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
+
+    计算 ind1 和 ind2 的样本协方差。
+
+    :param Indicator ind1: 指标1
+    :param Indicator ind2: 指标2
+    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度。
+    :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
+    :rtype: Indicator
 
 
 .. py:function:: COS([data])
@@ -668,11 +701,12 @@
     :rtype: Indicator
 
 
-.. py:function:: DIFF([data])
+.. py:function:: DIFF([data, n=1])
 
-    差分指标，即data[i] - data[i-1]
+    差分指标，即data[i] - data[i-n]
     
     :param Indicator data: 输入数据
+    :param int n: 差分周期，默认1
     :rtype: Indicator
 
 
@@ -764,6 +798,30 @@
     该指标需要设置K线上下文才能进行计算。
 
     :param Factor factor: 因子对象
+    :rtype: Indicator
+
+
+.. py:function:: FIXED_START_INDEX([ind, start_index=0, factor_name=''])
+
+    固定指标计算时使用的查询范围的起始索引
+
+    对某些随时间起点变化的指标（如 AD），固定起始索引确保从股票第一条数据开始计算。
+
+    :param Indicator ind: 输入指标
+    :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
+    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
+    :rtype: Indicator
+
+
+.. py:function:: FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+
+    固定指标计算时使用的查询范围的起始日期
+
+    对某些随时间起点变化的指标（如 AD），固定起始日期确保从指定日期开始计算。
+
+    :param Indicator ind: 输入指标
+    :param Datetime start_date: 起始日期，默认为 Datetime.min()
+    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :rtype: Indicator
 
 
@@ -1402,6 +1460,19 @@
     :rtype: Indicator
 
 
+.. py:function:: SIGNED_POWER(data, n)
+
+    带符号乘幂
+    
+    用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
+    
+    例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
+    
+    :param data: 输入数据
+    :param int|Indicator|IndParam n: 幂
+    :rtype: Indicator
+
+
 .. py:function:: PRICELIST([data=None, discard=0, align_dates=None])
     
     将 list、tuple、Indicator 转化为普通的 Indicator
@@ -1418,11 +1489,11 @@
 
     :param stks: 指定证券列表 或 Block
     :param ref_ind: 参考指标
-    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比
+    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比, 4-降序排名百分比(0~1), 5-升序排名百分比(0~1)
     :param fill_null: 是否填充缺失值
     :param market: 板块所属市场
     :return: 指标值在指定板块中的排名
-    :rtype: Indicato
+    :rtype: Indicator
 
  
 .. py:function:: REF([data, n])
@@ -1649,6 +1720,28 @@
     :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
 
 
+.. py:function:: SKEW([data, n=10])
+
+    计算N周期内未调整的总体偏度
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于3或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator
+
+
+.. py:function:: KURT([data, n=10])
+
+    计算N周期内的超额峰度（未调整的总体峰度 - 3）
+
+    超额峰度（Excess Kurtosis）是衡量数据分布峰态的指标，用于描述数据分布的尾部厚度。
+    正态分布的超额峰度为0。正的超额峰度表示分布比正态分布有更厚的尾部（尖峰厚尾），
+    负的超额峰度表示分布比正态分布有更薄的尾部（平峰薄尾）。
+
+    :param Indicator data: 输入数据
+    :param int n: N日时间窗口（大于等于4或等于0），等于0时使用输入的data实际长度
+    :rtype: Indicator
+
+
 .. py:function:: SQRT([data])
 
     开平方
@@ -1770,6 +1863,24 @@
     3. 当前周期最低价与前一周期收盘价之差的绝对值
 
     :param KData kdata: K线数据
+    :rtype: Indicator
+
+
+.. py:function:: TS_RANK([data, n=20])
+
+    时间序列排名，计算当前值在过去N个周期内的排名比例（Alpha101）
+
+    用法：TS_RANK(X,N)，表示X在过去N个周期内的排名（从1到N）除以N。
+    例如：TS_RANK(CLOSE,20)表示收盘价在过去20个周期内的排名比例。
+
+    Alpha101中的定义：
+    TS_RANK(x, n) = (rank of x in the last n observations) / n
+    其中rank为升序排名，即较小的值排名靠前，输出为0～1的百分位值。
+
+    该指标是单只股票在时间轴上的滚动排名，用于衡量当前值在历史序列中的相对位置。
+
+    :param Indicator data: 待计算的数据
+    :param int n: 周期数，默认20
     :rtype: Indicator
 
 

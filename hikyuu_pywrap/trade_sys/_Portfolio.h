@@ -40,7 +40,6 @@ public:
 
     virtual void _readyForRun() override;
 
-    virtual void _runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) override;
     virtual void _runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
                                   bool adjust) override;
     virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle,

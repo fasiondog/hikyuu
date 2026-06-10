@@ -87,16 +87,6 @@ void WithoutAFPortfolio::_readyForRun() {
     m_se->calculate(se_sys_list, m_query);
 }
 
-void WithoutAFPortfolio::_runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    _runMomentOnOpen(date, nextCycle, adjust);
-    _runMomentOnClose(date, nextCycle, adjust);
-    // if (getParam<bool>("sell_at_not_selected")) {
-    //     _runMomentWithoutAFForceSell(date, nextCycle, adjust);
-    // } else {
-    //     _runMomentWithoutAFNotForceSell(date, nextCycle, adjust);
-    // }
-}
-
 void WithoutAFPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
                                           bool adjust) {
     // m_force_sell_sys_list 此处用于缓存本轮未选中但仍在运行中的系统
@@ -186,6 +176,10 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
         }
     }
 
+    size_t running_sys_count = m_running_sys_list.size();
+    size_t out_sys_count = will_remove_sys_list.size();
+    size_t in_sys_count = 0;
+
     for (auto& sys : will_remove_sys_list) {
         HKU_INFO_IF(trace, htr("[PF] will remove system: {}", sys->name()));
         m_running_sys_set.erase(sys);
@@ -211,6 +205,7 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
             m_running_sys_list.emplace_back(sys);
             auto sg = sys->getSG();
             sg->startCycle(date, nextCycle);
+            in_sys_count++;
         }
     }
 
@@ -237,6 +232,12 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
                 m_force_sell_sys_list.emplace_back(sys);
             }
         }
+    }
+
+    // 计算调仓换手率
+    if (running_sys_count > 0) {
+        m_adjust_turnover.emplace_back(
+          date, static_cast<double>(in_sys_count + out_sys_count) / running_sys_count);
     }
 }
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * util.cpp
  *
  *  Created on: 2009-11-20
@@ -6,6 +6,7 @@
  */
 
 #include <stdexcept>
+#include <utf8proc.h>
 #include "arithmetic.h"
 
 #if defined(_MSC_VER)
@@ -248,6 +249,144 @@ HKU_UTILS_API std::ostream &operator<<(std::ostream &os, const std::vector<float
     }
     os << "]";
     return os;
+}
+
+std::string HKU_UTILS_API utf8_to_lower(const std::string &s) noexcept {
+    if (s.empty()) {
+        return s;
+    }
+    std::string result;
+    result.reserve(s.size());
+    const uint8_t *str = reinterpret_cast<const uint8_t *>(s.data());
+    utf8proc_ssize_t len = s.size();
+    utf8proc_int32_t codepoint;
+    utf8proc_ssize_t pos = 0;
+    while ((pos = utf8proc_iterate(str, len, &codepoint)) > 0) {
+        utf8proc_int32_t lower = utf8proc_tolower(codepoint);
+        uint8_t buf[4];
+        utf8proc_ssize_t encoded_len = utf8proc_encode_char(lower, buf);
+        if (encoded_len > 0) {
+            result.append(reinterpret_cast<const char *>(buf), encoded_len);
+        }
+        str += pos;
+        len -= pos;
+    }
+    return result;
+}
+
+std::string HKU_UTILS_API utf8_to_upper(const std::string &s) noexcept {
+    if (s.empty()) {
+        return s;
+    }
+    std::string result;
+    result.reserve(s.size());
+    const uint8_t *str = reinterpret_cast<const uint8_t *>(s.data());
+    utf8proc_ssize_t len = s.size();
+    utf8proc_int32_t codepoint;
+    utf8proc_ssize_t pos = 0;
+    while ((pos = utf8proc_iterate(str, len, &codepoint)) > 0) {
+        utf8proc_int32_t upper = utf8proc_toupper(codepoint);
+        uint8_t buf[4];
+        utf8proc_ssize_t encoded_len = utf8proc_encode_char(upper, buf);
+        if (encoded_len > 0) {
+            result.append(reinterpret_cast<const char *>(buf), encoded_len);
+        }
+        str += pos;
+        len -= pos;
+    }
+    return result;
+}
+
+/* UTF-8字符串大小写折叠比较 */
+bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2) noexcept {
+    if (s1.empty() && s2.empty()) {
+        return true;
+    }
+    if (s1.empty() || s2.empty()) {
+        return false;
+    }
+
+    const uint8_t *str1 = reinterpret_cast<const uint8_t *>(s1.data());
+    utf8proc_ssize_t len1 = s1.size();
+    const uint8_t *str2 = reinterpret_cast<const uint8_t *>(s2.data());
+    utf8proc_ssize_t len2 = s2.size();
+
+    utf8proc_int32_t codepoint1, codepoint2;
+    utf8proc_ssize_t pos1 = 0, pos2 = 0;
+
+    while (true) {
+        pos1 = utf8proc_iterate(str1, len1, &codepoint1);
+        pos2 = utf8proc_iterate(str2, len2, &codepoint2);
+
+        if (pos1 <= 0 && pos2 <= 0) {
+            return true;
+        }
+        if (pos1 <= 0 || pos2 <= 0) {
+            return false;
+        }
+
+        utf8proc_int32_t upper1 = utf8proc_toupper(codepoint1);
+        utf8proc_int32_t upper2 = utf8proc_toupper(codepoint2);
+
+        if (upper1 != upper2) {
+            return false;
+        }
+
+        str1 += pos1;
+        len1 -= pos1;
+        str2 += pos2;
+        len2 -= pos2;
+    }
+}
+
+/* UTF-8字符串包含子字符串 */
+bool HKU_UTILS_API utf8_contains(const std::string &s, const std::string &sub) noexcept {
+    if (sub.empty()) {
+        return true;
+    }
+    if (s.empty()) {
+        return false;
+    }
+
+    const uint8_t *str = reinterpret_cast<const uint8_t *>(s.data());
+    utf8proc_ssize_t len = s.size();
+    const uint8_t *sub_str = reinterpret_cast<const uint8_t *>(sub.data());
+    utf8proc_ssize_t sub_len = sub.size();
+
+    utf8proc_int32_t codepoint;
+    utf8proc_ssize_t pos = 0;
+
+    while ((pos = utf8proc_iterate(str, len, &codepoint)) > 0) {
+        const uint8_t *tmp_str = str;
+        utf8proc_ssize_t tmp_len = len;
+        const uint8_t *tmp_sub = sub_str;
+        utf8proc_ssize_t tmp_sub_len = sub_len;
+
+        utf8proc_int32_t cp1, cp2;
+        utf8proc_ssize_t p1, p2;
+
+        bool match = true;
+        while ((p2 = utf8proc_iterate(tmp_sub, tmp_sub_len, &cp2)) > 0) {
+            p1 = utf8proc_iterate(tmp_str, tmp_len, &cp1);
+            if (p1 <= 0 || cp1 != cp2) {
+                match = false;
+                break;
+            }
+            tmp_str += p1;
+            tmp_len -= p1;
+            tmp_sub += p2;
+            tmp_sub_len -= p2;
+        }
+
+        if (match) {
+            return true;
+        }
+
+        str += pos;
+        len -= pos;
+    }
+
+    return false;
 }
 
 }  // namespace hku
