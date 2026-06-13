@@ -601,7 +601,7 @@ BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
     BlockList all = getBlockList();
     BlockList result;
     for (const auto& blk : all) {
-        if (blk.have(stk)) {
+        if (blk.getIndexStock() == stk) {
             result.push_back(blk);
         }
     }
