@@ -801,7 +801,7 @@
     :rtype: Indicator
 
 
-.. py:function:: FIXED_START_INDEX([ind, start_index=0, factor_name=''])
+.. py:function:: FIXED_START_INDEX([ind, start_index=0])
 
     固定指标计算时使用的查询范围的起始索引
 
@@ -809,11 +809,10 @@
 
     :param Indicator ind: 输入指标
     :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :rtype: Indicator
 
 
-.. py:function:: FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+.. py:function:: FIXED_START_DATE([ind, start_date=Datetime.min()])
 
     固定指标计算时使用的查询范围的起始日期
 
@@ -821,7 +820,6 @@
 
     :param Indicator ind: 输入指标
     :param Datetime start_date: 起始日期，默认为 Datetime.min()
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :rtype: Indicator
 
 

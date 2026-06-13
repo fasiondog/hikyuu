@@ -80,12 +80,11 @@ private:
 };
 
 void export_extend_Indicator(py::module& m) {
-    m.def("FIXED_START_INDEX", py::overload_cast<int, const string&>(FIXED_START_INDEX),
-          py::arg("start_index") = 0, py::arg("factor_name") = "");
-    m.def("FIXED_START_INDEX",
-          py::overload_cast<const Indicator&, int, const string&>(FIXED_START_INDEX),
-          py::arg("ind"), py::arg("start_index") = 0, py::arg("factor_name") = "",
-          R"(FIXED_START_INDEX([ind, start_index=0, factor_name=''])
+    m.def("FIXED_START_INDEX", py::overload_cast<int>(FIXED_START_INDEX),
+          py::arg("start_index") = 0);
+    m.def("FIXED_START_INDEX", py::overload_cast<const Indicator&, int>(FIXED_START_INDEX),
+          py::arg("ind"), py::arg("start_index") = 0,
+          R"(FIXED_START_INDEX([ind, start_index=0])
 
     固定指标计算时使用的查询范围的起始索引。
 
@@ -93,16 +92,15 @@ void export_extend_Indicator(py::module& m) {
 
     :param Indicator ind: 输入指标
     :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :return: 指标数据
     :rtype: Indicator)");
 
-    m.def("FIXED_START_DATE", py::overload_cast<const Datetime&, const string&>(FIXED_START_DATE),
-          py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "");
+    m.def("FIXED_START_DATE", py::overload_cast<const Datetime&>(FIXED_START_DATE),
+          py::arg("start_date") = Datetime::min());
     m.def("FIXED_START_DATE",
-          py::overload_cast<const Indicator&, const Datetime&, const string&>(FIXED_START_DATE),
-          py::arg("ind"), py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "",
-          R"(FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+          py::overload_cast<const Indicator&, const Datetime&>(FIXED_START_DATE), py::arg("ind"),
+          py::arg("start_date") = Datetime::min(),
+          R"(FIXED_START_DATE([ind, start_date=Datetime.min()])
 
     固定指标计算时使用的查询范围的起始日期。
 
@@ -110,7 +108,6 @@ void export_extend_Indicator(py::module& m) {
 
     :param Indicator ind: 输入指标
     :param Datetime start_date: 起始日期，默认为 Datetime.min()
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :return: 指标数据
     :rtype: Indicator)");
 
