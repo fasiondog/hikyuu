@@ -601,7 +601,7 @@ BlockList StockManager::getBlockListByIndexStock(const Stock& stk) {
     BlockList all = getBlockList();
     BlockList result;
     for (const auto& blk : all) {
-        if (blk.getIndexStock() == stk) {
+        if (blk.have(stk)) {
             result.push_back(blk);
         }
     }
@@ -612,7 +612,7 @@ BlockList StockManager::getStockBelongs(const Stock& stk, const string& category
     BlockList result;
     BlockList all = getBlockList(category);
     for (const auto& blk : all) {
-        if (blk.getIndexStock() == stk) {
+        if (blk.have(stk)) {
             result.push_back(blk);
         }
     }
