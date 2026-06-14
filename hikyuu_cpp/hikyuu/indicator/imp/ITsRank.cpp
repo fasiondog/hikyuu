@@ -55,6 +55,29 @@ void ITsRank::_calculate(const Indicator& ind) {
     });
 }
 
+size_t ITsRank::min_increment_start() const {
+    return getParam<int>("n");
+}
+
+void ITsRank::_increment_calculate(const Indicator& ind, size_t start_pos) {
+    size_t total = ind.size();
+    auto const* src = ind.data();
+    auto* dst = this->data();
+
+    int n = getParam<int>("n");
+    for (size_t i = start_pos; i < total; ++i) {
+        int count = 0;
+        size_t start = i + 1 - n;
+        value_t current = src[i];
+        for (size_t j = start; j <= i; ++j) {
+            if (src[j] <= current) {
+                count++;
+            }
+        }
+        dst[i] = static_cast<price_t>(count) / n;
+    }
+}
+
 void ITsRank::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     if (curPos < ind.discard() + step - 1) {
         return;
