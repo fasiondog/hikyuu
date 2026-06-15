@@ -231,6 +231,9 @@ FactorSet(name, ktype=KQuery.DAY, block=Block())
 
 # 使用指标列表创建因子集合
 FactorSet(inds, ktype=KQuery.DAY)
+
+# 使用因子列表创建因子集合
+FactorSet(factors)
 ```
 
 **参数说明:**
@@ -239,8 +242,9 @@ FactorSet(inds, ktype=KQuery.DAY)
 - `ktype` (KQuery.KType): K线类型，默认为日线
 - `block` (Block): 板块信息，证券集合，默认为空
 - `inds` (list): 指标列表
+- `factors` (list): 因子列表
 
-**注意:** 使用指标列表创建时，同名的指标会被覆盖，最终保留最后一个同名指标
+**注意:** 使用指标列表或因子列表创建时，同名的指标/因子会被覆盖，最终保留最后一个同名指标/因子
 
 ### FactorSet属性
 

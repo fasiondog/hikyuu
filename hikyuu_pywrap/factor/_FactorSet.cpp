@@ -37,6 +37,18 @@ void export_FactorSet(py::module& m) {
     :param list inds: 指标列表
     :param KQuery.KType ktype: 因子集合的K线类型，默认为日线)")
 
+      .def(py::init([](const py::sequence& factors) {
+               FactorList factors_list = python_list_to_vector<Factor>(factors);
+               return FactorSet(factors_list);
+           }),
+           py::arg("factors"),
+           R"(__init__(self, factors)
+    
+    构造函数，使用指定的因子列表创建因子集合
+
+    :note: 同名的因子会被覆盖，最终保留最后一个同名因子
+    :param list factors: 因子列表)")
+
       .def("__str__", &FactorSet::str)
       .def("__repr__", &FactorSet::str)
 

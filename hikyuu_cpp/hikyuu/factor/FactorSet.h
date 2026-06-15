@@ -19,6 +19,12 @@ public:
                        const Block& block = Block());
 
     /**
+     * 构造函数，使用指定的因子列表创建因子集合
+     * @param factors 因子列表
+     */
+    explicit FactorSet(const FactorList& factors);
+
+    /**
      * 构造函数，使用指定的指标列表创建因子集合，因子名称默认为指标名称, 主要用于创建临时的因子集合
      * @note 同名的指标会被覆盖，最终保留最后一个同名指标
      * @param inds 指标列表

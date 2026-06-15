@@ -23,6 +23,10 @@ string FactorSet::str() const {
 
 FactorSet::FactorSet() : m_data(make_shared<Data>()) {}
 
+FactorSet::FactorSet(const FactorList& factors) : m_data(make_shared<Data>()) {
+    add(factors);
+}
+
 FactorSet::FactorSet(const IndicatorList& inds, const KQuery::KType& ktype)
 : m_data(make_shared<Data>()) {
     m_data->name = fmt::format("FSET_{}", Datetime::now().ticks());
