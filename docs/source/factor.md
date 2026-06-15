@@ -395,6 +395,26 @@ mf_equal = MF_EqualWeight(factor_set, stocks, query)
 
 ### 因子数据库操作 ⚠️ 捐赠用户功能
 
+#### has_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
+
+检查指定名称和类型的因子是否存在于数据库中
+
+```python
+from hikyuu import *
+
+# 检查日线因子是否存在 ⚠️ 捐赠用户功能
+exists = has_factor("MA5")
+# 检查周线因子是否存在 ⚠️ 捐赠用户功能
+weekly_exists = has_factor("MA5", KQuery.WEEK)
+```
+
+**参数说明:**
+
+- `name` (str): 因子名称
+- `ktype` (KQuery.KType): K线类型，默认为日线
+
+**返回值:** `bool` - 如果因子存在返回 True，否则返回 False
+
 #### get_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
 
 获取指定名称和类型的因子元数据
@@ -483,6 +503,26 @@ update_all_factors_values(KQuery.WEEK)
 - `ktype` (KQuery.KType): K线类型，默认为日线
 
 **使用场景:** 每日行情数据下载完成后，可以调用此函数更新所有存储的因子值。该操作为增量更新，只计算新增数据部分，提高更新效率。
+
+#### is_valid_factor_name(name)
+
+验证因子名称是否合法
+
+```python
+from hikyuu import *
+
+# 验证因子名称是否合法
+is_valid = is_valid_factor_name("MA5")
+print(f"MA5 是否为合法因子名称: {is_valid}")
+```
+
+**参数说明:**
+
+- `name` (str): 因子名称
+
+**返回值:** `bool` - 如果名称合法返回 True，否则返回 False
+
+**注意:** 该函数主要用于 ClickHouse 数据库驱动，非 ClickHouse 驱动下始终返回 True
 
 ### 因子集数据库操作 ⚠️ 捐赠用户功能
 

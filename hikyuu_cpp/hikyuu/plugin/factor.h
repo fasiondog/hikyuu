@@ -19,6 +19,8 @@ void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
                                      const DatetimeList& dates, const PriceList& values,
                                      bool replace);
 
+bool HKU_API hasFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
+
 /** 获取因子 */
 Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 

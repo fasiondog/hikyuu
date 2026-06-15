@@ -18,6 +18,16 @@ void export_factor_main(py::module& m) {
     export_Factor(m);
     export_FactorSet(m);
 
+    m.def("has_factor", &hasFactor, py::arg("name"), py::arg("ktype") = KQuery::DAY,
+          R"(has_factor(name[, ktype=KQuery.DAY])
+    
+    检查因子是否存在
+
+    :param str name: 因子名称
+    :param KQuery.KType ktype: K线类型，默认为日线
+    :return: 如果因子存在返回 True，否则返回 False
+    :rtype: bool)");
+
     m.def("get_factor", &getFactor, py::arg("name"), py::arg("ktype") = KQuery::DAY,
           R"(get_factor(name[, ktype=KQuery.DAY])
     
