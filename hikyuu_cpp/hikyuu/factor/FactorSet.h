@@ -21,8 +21,12 @@ public:
     /**
      * 构造函数，使用指定的因子列表创建因子集合
      * @param factors 因子列表
+     * @param ktype K线类型，默认为日线
+     * @param block 板块，默认为空
+     * @param name 因子集合名称，默认为空
      */
-    explicit FactorSet(const FactorList& factors);
+    explicit FactorSet(const FactorList& factors, const KQuery::KType& ktype = KQuery::DAY,
+                       const Block& block = Block(), const string& name = "");
 
     /**
      * 构造函数，使用指定的指标列表创建因子集合，因子名称默认为指标名称, 主要用于创建临时的因子集合

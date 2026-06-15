@@ -233,7 +233,7 @@ FactorSet(name, ktype=KQuery.DAY, block=Block())
 FactorSet(inds, ktype=KQuery.DAY)
 
 # 使用因子列表创建因子集合
-FactorSet(factors)
+FactorSet(factors[, ktype=KQuery.DAY[, block=Block(), name='']])
 ```
 
 **参数说明:**

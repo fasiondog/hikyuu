@@ -23,10 +23,6 @@ string FactorSet::str() const {
 
 FactorSet::FactorSet() : m_data(make_shared<Data>()) {}
 
-FactorSet::FactorSet(const FactorList& factors) : m_data(make_shared<Data>()) {
-    add(factors);
-}
-
 FactorSet::FactorSet(const IndicatorList& inds, const KQuery::KType& ktype)
 : m_data(make_shared<Data>()) {
     m_data->name = fmt::format("FSET_{}", Datetime::now().ticks());
@@ -50,6 +46,15 @@ FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block
     m_data->name = utf8_to_upper(name);
     m_data->ktype = ktype;
     m_data->block = block;
+}
+
+FactorSet::FactorSet(const FactorList& factors, const KQuery::KType& ktype, const Block& block,
+                     const string& name)
+: m_data(make_shared<Data>()) {
+    m_data->name = utf8_to_upper(name);
+    m_data->ktype = ktype;
+    m_data->block = block;
+    add(factors);
 }
 
 FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
