@@ -71,6 +71,17 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 
 ### 方法
 
+#### 通用方法
+
+```
+# 检查因子是否为空
+is_null = factor.is_null()
+```
+
+**返回值:**
+
+- `bool`: 如果因子为空返回 True，否则返回 False
+
 #### 数据库操作 ⚠️ 捐赠用户功能
 
 <div class="admonition note">
