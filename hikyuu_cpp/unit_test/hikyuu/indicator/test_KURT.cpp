@@ -45,7 +45,6 @@ TEST_CASE("test_KURT") {
     CHECK_EQ(result.discard(), uniform.size() - 1);
     CHECK_EQ(result.size(), uniform.size());
 
-    price_t nan = Null<price_t>();
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
 

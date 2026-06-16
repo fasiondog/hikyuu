@@ -44,7 +44,6 @@ TEST_CASE("test_SKEW") {
     CHECK_EQ(result.discard(), symmetric.size() - 1);
     CHECK_EQ(result.size(), symmetric.size());
 
-    price_t nan = Null<price_t>();
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
 

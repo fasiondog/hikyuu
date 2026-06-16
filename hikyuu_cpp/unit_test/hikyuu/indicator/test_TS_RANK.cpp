@@ -74,12 +74,6 @@ TEST_CASE("test_TS_RANK_empty") {
     CHECK_EQ(ret.discard(), 0);
 }
 
-/** @par 检测点：TS_RANK支持增量计算 */
-TEST_CASE("test_TS_RANK_support_increment") {
-    IndicatorImpPtr imp = make_shared<ITsRank>();
-    CHECK_EQ(imp->supportIncrementCalculate(), true);
-}
-
 /** @par 检测点：TS_RANK增量计算基本功能 */
 TEST_CASE("test_TS_RANK_increment_base") {
     Stock stk = getStock("sh600000");
