@@ -54,7 +54,25 @@
     :return: :py:class:`TradeCostBase` 子类实例
 
 
+ETF交易成本算法
+^^^^^^^^^^^^^^^
+
+计算规则如下:: python
+
+    买入：佣金（最低5元）
+    卖出：佣金（最低5元）
     
+    无印花税和过户费
+
+.. py:function:: TC_FixedETF([commission=0.0001, lowestCommission=5.0])
+
+    ETF交易成本算法，买卖双向收取佣金，无印花税和过户费
+
+    :param float commission: 佣金比例，默认万分之1
+    :param float lowestCommission: 最低佣金值，默认5元/笔
+    :return: :py:class:`TradeCostBase` 子类实例
+
+
 自定义交易成本算法
 ------------------
 
@@ -120,4 +138,4 @@
         
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口        
+        【重载接口】子类克隆接口
