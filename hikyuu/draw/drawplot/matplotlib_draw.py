@@ -1000,11 +1000,80 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
 
     pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
 
+    yearly_value = monthly.groupby('year').last()['value'].reset_index()
+    yearly_first = data.groupby('year').first()['value'].reset_index()
+
+    yearly_value['year_return'] = ((yearly_value['value'] - yearly_value['value'].shift(1)
+                                    ) / yearly_value['value'].shift(1)) * 100.
+    yearly_value.loc[0, 'year_return'] = (
+        (yearly_value.loc[0, 'value'] - yearly_first.loc[0, 'value']) / yearly_first.loc[0, 'value']) * 100.
+
+    year_return_df = yearly_value.set_index('year')['year_return']
+    pivot_data[''] = np.nan
+    pivot_data['年度收益'] = year_return_df
+
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
     # 设置标题和坐标轴标签
     axes.set_title('年-月度收益率(%)热力图')
     axes.set_xlabel('月度')
     axes.set_ylabel('年份')
+
+
+def tm_year_profit(tm, start_date, end_date=None, axes=None):
+    """
+    绘制账户各年度收益柱状图
+
+    :param tm: 交易账户
+    :param start_date: 开始日期
+    :param end_date: 结束日期，默认为今天
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :return: None
+    """
+    if axes is None:
+        axes = create_figure()
+
+    if end_date is None:
+        end_date = Datetime.today() + Days(1)
+
+    dates = get_date_range(start_date, end_date)
+    if len(dates) == 0:
+        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        return
+
+    funds = tm.get_funds_curve(dates)
+    if len(funds) == 0:
+        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
+                  tm.init_datetime, start_date, end_date)
+        return
+
+    data = pd.DataFrame({'date': dates, 'value': funds})
+    data = data[(data[['value']] != 0).all(axis=1)]
+
+    data['year'] = data['date'].apply(lambda v: v.year)
+
+    yearly = data.groupby('year').last()['value'].reset_index()
+    yearly_first = data.groupby('year').first()['value'].reset_index()
+
+    if len(yearly) < 1:
+        hku_warn("年度数据不足！")
+        return
+
+    yearly['return'] = ((yearly['value'] - yearly['value'].shift(1)) / yearly['value'].shift(1)) * 100.
+    yearly.loc[0, 'return'] = ((yearly.loc[0, 'value'] - yearly_first.loc[0, 'value']) /
+                               yearly_first.loc[0, 'value']) * 100.
+
+    colors = ['green' if x < 0 else 'red' for x in yearly['return']]
+    bars = axes.bar(yearly['year'].astype(str), yearly['return'], color=colors)
+
+    for bar in bars:
+        height = bar.get_height()
+        axes.text(bar.get_x() + bar.get_width() / 2., height,
+                  f'{height:.2f}%', ha='center', va='bottom')
+
+    axes.set_title('年度收益率(%)柱状图')
+    axes.set_xlabel('年份')
+    axes.set_ylabel('收益率(%)')
+    axes.grid(axis='y', linestyle='--', alpha=0.7)
 
 
 def sys_heatmap(sys, axes=None):

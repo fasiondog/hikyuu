@@ -51,6 +51,7 @@ from .matplotlib_draw import adjust_axes_show as mpl_adjust_axes_show
 from .matplotlib_draw import sys_performance as mpl_sys_performance
 from .matplotlib_draw import tm_performance as mpl_tm_performance
 from .matplotlib_draw import tm_heatmap as mpl_tm_heatmap
+from .matplotlib_draw import tm_year_profit as mpl_tm_year_profit
 from .matplotlib_draw import sys_heatmap as mpl_sys_heatmap
 from .matplotlib_draw import iheatmap as mpl_iheatmap
 from .matplotlib_draw import (DRAWNULL, STICKLINE, DRAWBAND, RGB, PLOYLINE,
@@ -135,6 +136,7 @@ def use_draw_with_matplotlib():
     System.performance = mpl_sys_performance
     Portfolio.performance = mpl_sys_performance
     TradeManager.heatmap = mpl_tm_heatmap
+    TradeManager.year_profit_bar = mpl_tm_year_profit
     System.heatmap = mpl_sys_heatmap
     Portfolio.heatmap = mpl_sys_heatmap
 
