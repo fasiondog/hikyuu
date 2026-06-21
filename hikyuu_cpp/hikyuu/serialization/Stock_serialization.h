@@ -25,16 +25,13 @@ template <class Archive>
 
 void save(Archive& ar, const hku::Stock& stock, unsigned int version) {
     hku::string market_code = stock.market_code();
-    hku::string name = stock.name();
     ar& BOOST_SERIALIZATION_NVP(market_code);
-    ar& BOOST_SERIALIZATION_NVP(name);
 }
 
 template <class Archive>
 void load(Archive& ar, hku::Stock& stock, unsigned int version) {
     hku::string market_code, name;
     ar& BOOST_SERIALIZATION_NVP(market_code);
-    ar& BOOST_SERIALIZATION_NVP(name);
     stock = hku::getStock(market_code);
 }
 }  // namespace serialization
