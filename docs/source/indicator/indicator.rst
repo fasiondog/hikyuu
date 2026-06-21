@@ -797,7 +797,8 @@
     将Factor对象转换为Indicator，使其可以在指标系统中使用。
     该指标需要设置K线上下文才能进行计算。
 
-    :param Factor factor: 因子对象
+    :param Factor factor: 因子对象（与name二选一）
+    :param str name: 因子名称（便捷版本，与factor二选一）
     :rtype: Indicator
 
 

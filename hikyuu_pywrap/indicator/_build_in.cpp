@@ -2745,13 +2745,16 @@ void export_Indicator_build_in(py::module& m) {
     :param KData kdata: K线数据
     :rtype: Indicator)");
 
-    m.def("FACTOR", &FACTOR, py::arg("factor"), R"(FACTOR(factor)
+    m.def("FACTOR", py::overload_cast<const string&>(FACTOR), py::arg("factor"));
+    m.def("FACTOR", py::overload_cast<const Factor&>(&FACTOR), py::arg("factor"), R"(FACTOR(factor)
+    FACTOR(name)
 
     因子指标转换
 
     将Factor对象转换为Indicator，使其可以在指标系统中使用。
     该指标需要设置K线上下文才能进行计算。
 
-    :param Factor factor: 因子对象
+    :param Factor factor: 因子对象（与name二选一）
+    :param str name: 因子名称（便捷版本，与factor二选一）
     :rtype: Indicator)");
 }
