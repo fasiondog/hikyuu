@@ -365,7 +365,6 @@ private:
         string value;
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = size();
-            // ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
             ar& BOOST_SERIALIZATION_NVP(count);
             buffer_t& values = *m_pBuffer[i];
             for (size_t j = 0; j < count; j++) {
@@ -408,10 +407,8 @@ private:
         _readyBuffer(0, act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = 0;
-            // ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
             ar& BOOST_SERIALIZATION_NVP(count);
             buffer_t& values = *m_pBuffer[i];
-            HKU_INFO("count: {}", count);
             values.resize(count);
             for (size_t j = 0; j < count; j++) {
                 std::string vstr;
