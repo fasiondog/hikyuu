@@ -985,7 +985,7 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
 }
 
 void StockManager::waitDataReady() const {
-    HKU_INFO_IF(!dataReady(), htr("Waiting for data loading to complete..."));
+    HKU_INFO_IF(!dataReady(), htr("Waiting for preload data loading to complete..."));
     while (!dataReady()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
