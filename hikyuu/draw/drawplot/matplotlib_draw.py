@@ -956,7 +956,7 @@ def sys_performance(sys, ref_stk=None, ext=True):
     return tm_performance(sys.tm, query, ref_stk, ext=ext)
 
 
-def tm_heatmap(tm, start_date, end_date=None, axes=None):
+def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     """
     绘制账户收益年-月收益热力图
 
@@ -964,6 +964,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
     :param start_date: 开始日期
     :param end_date: 结束日期，默认为今天
     :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :param show_high_low: 是否显示月度最高收益和最低收益，默认为False
     :return: None
     """
     if axes is None:
@@ -990,29 +991,61 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
     data['year'] = data['date'].apply(lambda v: v.year)
     data['month'] = data['date'].apply(lambda v: v.month)
 
-    # 获取每个月的收益
-    monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    # 获取每个月的最后值、最高值和最低值
+    monthly = data.groupby(['year', 'month']).agg(
+        last_value=('value', 'last'),
+        max_value=('value', 'max'),
+        min_value=('value', 'min')
+    ).reset_index()
     if len(monthly) < 2:
         hku_warn("月数据不足！")
         return
 
-    monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
+    monthly['return'] = ((monthly['last_value'] - monthly['last_value'].shift(1)) /
+                         monthly['last_value'].shift(1)) * 100.
+    monthly['prev_last'] = monthly['last_value'].shift(1)
+    monthly['max_return'] = ((monthly['max_value'] - monthly['prev_last']) / monthly['prev_last']) * 100.
+    monthly['min_return'] = ((monthly['min_value'] - monthly['prev_last']) / monthly['prev_last']) * 100.
 
     pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
 
-    yearly_value = monthly.groupby('year').last()['value'].reset_index()
+    yearly_value = monthly.groupby('year').last()['last_value'].reset_index()
     yearly_first = data.groupby('year').first()['value'].reset_index()
 
-    yearly_value['year_return'] = ((yearly_value['value'] - yearly_value['value'].shift(1)
-                                    ) / yearly_value['value'].shift(1)) * 100.
+    yearly_value['year_return'] = ((yearly_value['last_value'] - yearly_value['last_value'].shift(1)
+                                    ) / yearly_value['last_value'].shift(1)) * 100.
     yearly_value.loc[0, 'year_return'] = (
-        (yearly_value.loc[0, 'value'] - yearly_first.loc[0, 'value']) / yearly_first.loc[0, 'value']) * 100.
+        (yearly_value.loc[0, 'last_value'] - yearly_first.loc[0, 'value']) / yearly_first.loc[0, 'value']) * 100.
 
     year_return_df = yearly_value.set_index('year')['year_return']
     pivot_data[''] = np.nan
     pivot_data['年度收益'] = year_return_df
 
-    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
+    annot_matrix = []
+    for year in pivot_data.index:
+        row = []
+        for col in pivot_data.columns:
+            if col in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
+                ret = pivot_data.loc[year, col] if year in pivot_data.index and col in pivot_data.columns else np.nan
+                if not np.isnan(ret):
+                    if show_high_low:
+                        max_ret = monthly[(monthly['year'] == year) & (monthly['month'] == col)]['max_return'].values[0]
+                        min_ret = monthly[(monthly['year'] == year) & (monthly['month'] == col)]['min_return'].values[0]
+                        row.append(f"{ret:.2f}\n↑{max_ret:.2f} ↓{min_ret:.2f}")
+                    else:
+                        row.append(f"{ret:.2f}")
+                else:
+                    row.append("")
+            elif col == '':
+                row.append("")
+            elif col == '年度收益':
+                row.append(f"{year_return_df.loc[year]:.2f}" if year in year_return_df.index else "")
+        annot_matrix.append(row)
+
+    max_abs_return = monthly['return'].abs().max()
+    v_limit = max(max_abs_return, 5)
+
+    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, vmin=-v_limit, vmax=v_limit, annot=annot_matrix, fmt='', ax=axes)
     # 设置标题和坐标轴标签
     axes.set_title('年-月度收益率(%)热力图')
     axes.set_xlabel('月度')
