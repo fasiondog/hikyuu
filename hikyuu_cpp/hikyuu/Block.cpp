@@ -206,13 +206,19 @@ bool Block::operator==(const Block& blk) const noexcept {
     HKU_IF_RETURN(category() != blk.category() || name() != blk.name() || size() != blk.size() ||
                     getIndexStock() != blk.getIndexStock(),
                   false);
-    unordered_map<string, string> self_dict;
-    for (const auto& stk : getStockList()) {
-        self_dict[stk.market_code()] = stk.market_code();
+
+    auto self_stocks = getStockList();
+    std::sort(self_stocks.begin(), self_stocks.end(),
+              [](const Stock& a, const Stock& b) { return a.market_code() < b.market_code(); });
+
+    auto blk_stocks = blk.getStockList();
+    std::sort(blk_stocks.begin(), blk_stocks.end(),
+              [](const Stock& a, const Stock& b) { return a.market_code() < b.market_code(); });
+
+    for (size_t i = 0; i < self_stocks.size(); i++) {
+        HKU_IF_RETURN(self_stocks[i].market_code() != blk_stocks[i].market_code(), false);
     }
-    for (const auto& stk : blk.getStockList()) {
-        HKU_IF_RETURN(self_dict.count(stk.market_code()) == 0, false);
-    }
+
     return true;
 }
 
