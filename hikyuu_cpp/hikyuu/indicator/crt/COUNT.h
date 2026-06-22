@@ -37,15 +37,15 @@ Indicator HKU_API COUNT(const IndParam& n);
  * @param n 周期数
  * @ingroup Indicator
  */
-inline Indicator HKU_API COUNT(const Indicator& ind, int n = 20) {
+inline Indicator COUNT(const Indicator& ind, int n = 20) {
     return COUNT(n)(ind);
 }
 
-inline Indicator HKU_API COUNT(const Indicator& ind, const IndParam& n) {
+inline Indicator COUNT(const Indicator& ind, const IndParam& n) {
     return COUNT(n)(ind);
 }
 
-inline Indicator HKU_API COUNT(const Indicator& ind, const Indicator& n) {
+inline Indicator COUNT(const Indicator& ind, const Indicator& n) {
     return COUNT(IndParam(n))(ind);
 }
 

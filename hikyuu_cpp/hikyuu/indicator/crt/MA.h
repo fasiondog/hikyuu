@@ -27,11 +27,11 @@ Indicator HKU_API MA(const IndParam& n);
  * @param n 计算均值的周期窗口，n为0时从第一个有效数据开始计算
  * @ingroup Indicator
  */
-inline Indicator HKU_API MA(const Indicator& ind, int n = 22) {
+inline Indicator MA(const Indicator& ind, int n = 22) {
     return MA(n)(ind);
 }
 
-inline Indicator HKU_API MA(const Indicator& ind, const IndParam& n) {
+inline Indicator MA(const Indicator& ind, const IndParam& n) {
     return MA(n)(ind);
 }
 

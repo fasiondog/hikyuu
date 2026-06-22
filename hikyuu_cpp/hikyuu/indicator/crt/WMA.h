@@ -29,11 +29,11 @@ Indicator HKU_API WMA(const IndParam& n);
  * @param n 计算均值的周期窗口
  * @ingroup Indicator
  */
-inline Indicator HKU_API WMA(const Indicator& ind, int n = 22) {
+inline Indicator WMA(const Indicator& ind, int n = 22) {
     return WMA(n)(ind);
 }
 
-inline Indicator HKU_API WMA(const Indicator& ind, const IndParam& n) {
+inline Indicator WMA(const Indicator& ind, const IndParam& n) {
     return WMA(n)(ind);
 }
 

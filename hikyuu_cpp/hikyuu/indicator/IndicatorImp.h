@@ -366,7 +366,7 @@ private:
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = size();
             ar& BOOST_SERIALIZATION_NVP(count);
-            buffer_t& values = *m_pBuffer[i];
+            const buffer_t& values = *m_pBuffer[i];
             for (size_t j = 0; j < count; j++) {
                 if (std::isnan(values[j])) {
                     ar& boost::serialization::make_nvp<string>("item", nan);

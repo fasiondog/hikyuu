@@ -116,7 +116,7 @@ PriceList Indicator::getResultAsPriceList(size_t num) const {
 
 Indicator Indicator::getResult(size_t num) const {
     HKU_WARN_IF_RETURN(!m_imp, Indicator(), "indicator imptr is null!");
-    return m_imp->getResult(num);
+    return Indicator(m_imp->getResult(num));
 }
 
 Indicator Indicator::operator()(const Indicator& ind) {

@@ -20,14 +20,13 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ROUNDUP(int ndigits = 2);
-Indicator ROUNDUP(Indicator::value_t, int ndigits = 2);
-Indicator ROUNDUP(const Indicator& ind, int ndigits = 2);
+;
 
-inline Indicator ROUNDUP(const Indicator& ind, int n) {
+inline Indicator ROUNDUP(const Indicator& ind, int n = 2) {
     return ROUNDUP(n)(ind);
 }
 
-inline Indicator ROUNDUP(Indicator::value_t val, int n) {
+inline Indicator ROUNDUP(Indicator::value_t val, int n = 2) {
     return ROUNDUP(CVAL(val), n);
 }
 

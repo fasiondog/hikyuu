@@ -27,15 +27,15 @@ Indicator HKU_API EMA(const IndParam& n);
  * @param n 计算均值的周期窗口，必须为大于0的整数
  * @ingroup Indicator
  */
-inline Indicator HKU_API EMA(const Indicator& data, int n = 22) {
+inline Indicator EMA(const Indicator& data, int n = 22) {
     return EMA(n)(data);
 }
 
-inline Indicator HKU_API EMA(const Indicator& data, const IndParam& n) {
+inline Indicator EMA(const Indicator& data, const IndParam& n) {
     return EMA(n)(data);
 }
 
-inline Indicator HKU_API EMA(const Indicator& data, const Indicator& n) {
+inline Indicator EMA(const Indicator& data, const Indicator& n) {
     return EMA(IndParam(n))(data);
 }
 

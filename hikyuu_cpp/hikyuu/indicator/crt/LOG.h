@@ -19,8 +19,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API LOG();
-Indicator LOG(Indicator::value_t);
-Indicator LOG(const Indicator& ind);
 
 inline Indicator LOG(const Indicator& ind) {
     return LOG()(ind);

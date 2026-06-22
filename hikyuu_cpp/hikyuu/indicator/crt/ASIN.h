@@ -20,8 +20,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ASIN();
-Indicator ASIN(Indicator::value_t);
-Indicator ASIN(const Indicator& ind);
 
 inline Indicator ASIN(const Indicator& ind) {
     return ASIN()(ind);

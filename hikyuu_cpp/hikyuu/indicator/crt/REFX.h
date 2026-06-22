@@ -18,7 +18,7 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API REFX(int n);
-inline Indicator HKU_API REFX(const Indicator& ind, int n) {
+inline Indicator REFX(const Indicator& ind, int n) {
     return REFX(n)(ind);
 }
 

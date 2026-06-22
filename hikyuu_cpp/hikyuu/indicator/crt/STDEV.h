@@ -27,15 +27,15 @@ Indicator HKU_API STDEV(const IndParam& n);
  * @param n N日时间窗口
  * @ingroup Indicator
  */
-inline Indicator HKU_API STDEV(const Indicator& data, int n = 10) {
+inline Indicator STDEV(const Indicator& data, int n = 10) {
     return STDEV(n)(data);
 }
 
-inline Indicator HKU_API STDEV(const Indicator& data, const IndParam& n) {
+inline Indicator STDEV(const Indicator& data, const IndParam& n) {
     return STDEV(n)(data);
 }
 
-inline Indicator HKU_API STDEV(const Indicator& data, const Indicator& n) {
+inline Indicator STDEV(const Indicator& data, const Indicator& n) {
     return STDEV(IndParam(n))(data);
 }
 

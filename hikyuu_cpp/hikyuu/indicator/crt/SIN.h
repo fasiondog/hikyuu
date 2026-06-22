@@ -20,8 +20,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API SIN();
-Indicator SIN(Indicator::value_t);
-Indicator SIN(const Indicator& ind);
 
 inline Indicator SIN(const Indicator& ind) {
     return SIN()(ind);

@@ -22,8 +22,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API INTPART();
-Indicator INTPART(Indicator::value_t);
-Indicator INTPART(const Indicator& ind);
 
 inline Indicator INTPART(const Indicator& ind) {
     return INTPART()(ind);

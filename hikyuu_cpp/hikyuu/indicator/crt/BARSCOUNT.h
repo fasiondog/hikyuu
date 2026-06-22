@@ -26,7 +26,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API BARSCOUNT();
-Indicator BARSCOUNT(const Indicator& ind);
 
 inline Indicator BARSCOUNT(const Indicator& ind) {
     return BARSCOUNT()(ind);

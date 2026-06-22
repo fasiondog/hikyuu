@@ -18,8 +18,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API EXP();
-Indicator EXP(Indicator::value_t);
-Indicator EXP(const Indicator& ind);
 
 inline Indicator EXP(const Indicator& ind) {
     return EXP()(ind);

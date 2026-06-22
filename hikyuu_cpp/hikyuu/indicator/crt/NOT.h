@@ -24,8 +24,6 @@ Indicator HKU_API NOT();
  * @param ind 待计算的数据
  * @ingroup Indicator
  */
-Indicator NOT(const Indicator& ind);
-
 inline Indicator NOT(const Indicator& ind) {
     return NOT()(ind);
 }
