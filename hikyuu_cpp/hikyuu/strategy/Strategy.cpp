@@ -410,6 +410,10 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
         ret = buy(stk, 0.0, num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
 
     } else {
+        if (num == -MAX_DOUBLE) {
+            ret = sell(stk, 0.0, MAX_DOUBLE, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+            return ret;
+        }
         double sell_num = int64_t(std::abs(num) / min_trade_num) * min_trade_num;
         if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
             sell_num = max_trade_num;
