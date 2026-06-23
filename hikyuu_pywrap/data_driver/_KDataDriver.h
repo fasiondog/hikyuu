@@ -35,7 +35,7 @@ public:
     }
 
     bool canParallelLoad() override {
-        PYBIND11_OVERLOAD_PURE(bool, KDataDriver, canParallelLoad, );
+        return false;
     }
 
     size_t getCount(const string& market, const string& code, const KQuery::KType& kType) override {
