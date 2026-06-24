@@ -859,13 +859,14 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
         )
 
 
-def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: bool = True):
+def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: bool = True, log: bool = False):
     """
     绘制系统绩效，即账户累积收益率曲线
 
     :param TradeManager tm: 账户实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     :param bool ext: 是否统计扩展信息（捐赠用户，否则仍为默认统计项）
+    :param bool log: Y轴是否使用对数坐标
     :return: None
     """
     if ref_stk is None:
@@ -911,6 +912,9 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     ax1 = fg.add_subplot(gs[:4, :3])
     ax2 = fg.add_subplot(gs[:, 3:])
     ax3 = fg.add_subplot(gs[4:, :3])
+    if log:
+        ax1.set_yscale('log')
+
     ref_return.plot(axes=ax1, legend_on=True, label=f'{ref_stk.name}({ref_stk.market_code}) 收益曲线')
     funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} 累积收益率 {funds_return[-1]*100.:<.2f}%')
     ax1.set_title(f"账户({tm.name}) 累积收益率")
@@ -937,23 +941,30 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     ax3.xaxis.set_visible(False)
     ax3.yaxis.set_visible(False)
     ax3.set_frame_on(False)
+    if log:
+        from matplotlib.ticker import FuncFormatter, NullFormatter
+        ax1.yaxis.set_major_formatter(NullFormatter())
+        ax1.yaxis.set_minor_formatter(NullFormatter())
+        ax1.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}'))
+        ax1.yaxis.set_minor_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}'))
     return ax1  # 返回主图axis
 
 
-def sys_performance(sys, ref_stk=None, ext=True):
+def sys_performance(sys, ref_stk=None, ext=True, log=False):
     """
     绘制系统绩效，即账户累积收益率曲线
 
     :param SystemBase | PortfolioBase sys: SYS或PF实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为默认统计项）
+    :param bool log: Y轴是否使用对数坐标
     :return: None
     """
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
 
     query = sys.query
-    return tm_performance(sys.tm, query, ref_stk, ext=ext)
+    return tm_performance(sys.tm, query, ref_stk, ext=ext, log=log)
 
 
 def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
