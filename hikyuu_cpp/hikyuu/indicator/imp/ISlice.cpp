@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cstring>
 #include "ISlice.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -93,13 +94,13 @@ void ISlice::_calculate(const Indicator& data) {
         for (size_t r = 0; r < ret_num; ++r) {
             auto const* src = data.data(r) + startix;
             auto* dst = this->data(r);
-            std::memcpy(dst, src, (endix - startix) * sizeof(value_t));
+            memcpy(dst, src, (endix - startix) * sizeof(value_t));
         }
     } else {
         _readyBuffer(endix - startix, 1);
         auto const* src = data.data(result_index) + startix;
         auto* dst = this->data();
-        std::memcpy(dst, src, (endix - startix) * sizeof(value_t));
+        memcpy(dst, src, (endix - startix) * sizeof(value_t));
     }
 
     // 更新抛弃数量

@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <cstring>
 #include <tuple>
 #include "SpendTimer.h"
 
@@ -87,7 +88,7 @@ void SpendTimer::show() const {
     std::chrono::duration<double> sec = std::chrono::steady_clock::now() - m_start_time;
     double duration_ = 0.0;
     char outmsg[MAX_SPEND_MSG_LEN];
-    std::memset(outmsg, 0, MAX_SPEND_MSG_LEN);
+    memset(outmsg, 0, MAX_SPEND_MSG_LEN);
 
     if (m_cycle > 1) {
         duration_ = sec.count() * 1000;
