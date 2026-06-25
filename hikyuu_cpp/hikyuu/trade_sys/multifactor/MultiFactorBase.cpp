@@ -669,33 +669,55 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true, m_ref_dates);
 
-    unordered_map<string, IndicatorList> use_style_inds;
+    // 风格因子按 [风格因子名][风格因子][股票] 三维存储（vector<IndicatorList>）。
+    //
+    // 原实现为 [风格因子名][风格因子] 二维，每条风格因子全市场共享同一条时序，
+    // 导致两个独立缺陷：
+    //   1) 并发提取时多线程写同一个 Indicator（对 shared_ptr 对象本身的非原子
+    //      赋值是 C++ UB），是启用风格中性化后 get_ic / get_all_src_factors
+    //      进程直接崩溃（segfault，无 Python 异常）的根因；
+    //   2) 截面回归的自变量对所有股票取同一值，退化为常数列，与截距共线，
+    //      市值/风格中性化在数学上彻底失效（残差≈原值）。
+    //
+    // 补上股票维度后：
+    //   - 写隔离：每个 si 线程只写 per_factor[j][si]，不同 si 写不同槽；
+    //   - 读隔离：每线程对模板 styles[j] 先 clone() 出独立副本再 ALIGN 计算，
+    //     calculate() 只写本线程副本的 buffer，不触碰共享的 styles[j]。
+    //     （IndicatorImp::clone() 对根源对象严格只读，经代码核实，故并发
+    //      styles[j].clone() 安全；此处 styles[j] 为用户传入的根 Indicator。）
+    unordered_map<string, vector<IndicatorList>> use_style_inds;
     for (const auto& [style_ind_name, style_inds] : m_special_style_inds) {
-        use_style_inds[style_ind_name] = IndicatorList(style_inds.size());
+        auto& per_factor = use_style_inds[style_ind_name];
+        per_factor.resize(style_inds.size());
+        for (auto& v : per_factor) {
+            v.resize(stk_count);
+        }
     }
-    global_parallel_for_index_void(
-      0, stk_count, [this, &null_ind, &use_style_inds, fill_null](size_t i) {
-          const auto& stk = m_stks[i];
-          auto kdata = stk.getKData(m_query);
-          for (auto& [style_ind_name, styles] : m_special_style_inds) {
-              auto& cur_style_inds = use_style_inds[style_ind_name];
-              if (kdata.size() == 0) {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] = null_ind;
-                      cur_style_inds[j].name(style_ind_name);
-                  }
-              } else {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] =
-                        ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
-                      cur_style_inds[j].name(style_ind_name);
-                  }
-              }
-          }
-      });
+    if (!m_special_style_inds.empty()) {
+        global_parallel_for_index_void(0, stk_count, [&](size_t si) {
+            const auto& stk = m_stks[si];
+            auto kdata = stk.getKData(m_query);
+            for (auto& [style_ind_name, styles] : m_special_style_inds) {
+                auto& per_factor = use_style_inds[style_ind_name];
+                for (size_t j = 0; j < styles.size(); j++) {
+                    if (kdata.size() == 0) {
+                        per_factor[j][si] = null_ind;
+                    } else {
+                        // 每线程独立 clone：calculate 只写本线程副本的 buffer
+                        per_factor[j][si] =
+                          ALIGN(styles[j].clone(), m_ref_dates, fill_null)(kdata).getResult(0);
+                    }
+                    per_factor[j][si].name(style_ind_name);
+                }
+            }
+        });
+    }
 
     // 时间截面标准化/归一化
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
+        // 压制 Eigen 内部 OpenMP 并行，避免与外层按日线程池叠加导致线程超载；
+        // calculate_residuals 内的 Eigen 矩阵均为栈局部对象，外层按日并行天然可重入。
+        Eigen::setNbThreads(1);
         unordered_map<string, PriceList> ind_dummy_dict = _buildDummyIndex();
         global_parallel_for_index_void(
           0, days_total,
@@ -732,12 +754,14 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
                   auto style_iter = use_style_inds.find(ind_name);
                   if (style_iter != use_style_inds.end()) {
-                      vector<PriceList> style_value_day(style_iter->second.size());
-                      for (size_t j = 0; j < style_iter->second.size(); j++) {
+                      auto& per_factor = style_iter->second;  // [风格因子][股票]
+                      vector<PriceList> style_value_day(per_factor.size());
+                      for (size_t j = 0; j < per_factor.size(); j++) {
                           auto& style_value = style_value_day[j];
                           style_value.resize(stk_count);
                           for (size_t si = 0; si < stk_count; si++) {
-                              style_value[si] = style_iter->second[j][di];
+                              // 取第 si 只股票自己的风格因子值（原实现误取共享值）
+                              style_value[si] = per_factor[j][si][di];
                           }
                       }
                       new_value = calculate_residuals(new_value, style_value_day);
