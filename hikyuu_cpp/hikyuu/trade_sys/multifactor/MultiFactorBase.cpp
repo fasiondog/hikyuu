@@ -773,6 +773,9 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
               }
           });
+
+        // 恢复 Eigen 线程数
+        Eigen::setNbThreads(std::thread::hardware_concurrency());
     }
 
     return all_stk_inds;
