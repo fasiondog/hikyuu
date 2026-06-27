@@ -36,10 +36,6 @@ import sys
 import os
 BASE_DIR = os.path.dirname(__file__)
 
-try:
-    from hikyuu_plugin_private import *
-except ImportError:
-    pass
 
 if sys.platform == 'win32':
     # add_dll_directory() 有时不生效
@@ -121,6 +117,11 @@ except ImportError:
         plugin_path = str(plugin_path)
     else:
         plugin_path = os.path.join(os.path.dirname(__file__), 'plugin')
+
+try:
+    from hikyuu_plugin_private import *
+except ImportError:
+    pass
 
 
 sm.set_plugin_path(plugin_path)
