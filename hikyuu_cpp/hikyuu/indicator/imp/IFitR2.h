@@ -11,7 +11,7 @@
 
 namespace hku {
 
-/* 计算线性回归拟合优度R²，N支持变量 */
+/* 计算线性回归拟合优度R²和斜率，N支持变量 */
 class IFitR2 : public IndicatorImp {
     INDICATOR_IMP(IFitR2)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::IFitR2)
 
 namespace hku {
 
-IFitR2::IFitR2() : IndicatorImp("FITR2", 1) {
+IFitR2::IFitR2() : IndicatorImp("FITR2", 2) {
     setParam<int>("n", 22);
 }
 
@@ -35,7 +35,8 @@ void IFitR2::_calculate(const Indicator& ind) {
     }
 
     auto const* src = ind.data();
-    auto* dst = this->data();
+    auto* r2_dst = this->data();
+    auto* slope_dst = this->data(1);
 
     price_t xsum = 0.0, ysum = 0.0, xysum = 0.0, x2sum = 0.0, y2sum = 0.0;
     size_t first_end = m_discard + 1;
@@ -47,9 +48,13 @@ void IFitR2::_calculate(const Indicator& ind) {
         y2sum += std::pow(src[i], 2);
     }
 
-    price_t numerator = std::pow(n * xysum - xsum * ysum, 2);
-    price_t denominator = (n * x2sum - xsum * xsum) * (n * y2sum - ysum * ysum);
-    dst[m_discard] = denominator == 0 ? 0.0 : numerator / denominator;
+    price_t xy_diff = n * xysum - xsum * ysum;
+    price_t x_diff = n * x2sum - xsum * xsum;
+    price_t y_diff = n * y2sum - ysum * ysum;
+    price_t numerator_r2 = std::pow(xy_diff, 2);
+    price_t denominator_r2 = x_diff * y_diff;
+    r2_dst[m_discard] = denominator_r2 == 0 ? 0.0 : numerator_r2 / denominator_r2;
+    slope_dst[m_discard] = x_diff == 0 ? 0.0 : xy_diff / x_diff;
 
     for (size_t i = first_end; i < total; i++) {
         size_t remove_pos = i - n;
@@ -59,9 +64,13 @@ void IFitR2::_calculate(const Indicator& ind) {
         x2sum += (2 * i - n) * n;
         y2sum += std::pow(src[i], 2) - std::pow(src[remove_pos], 2);
 
-        numerator = std::pow(n * xysum - xsum * ysum, 2);
-        denominator = (n * x2sum - xsum * xsum) * (n * y2sum - ysum * ysum);
-        dst[i] = denominator == 0 ? 0.0 : numerator / denominator;
+        xy_diff = n * xysum - xsum * ysum;
+        x_diff = n * x2sum - xsum * xsum;
+        y_diff = n * y2sum - ysum * ysum;
+        numerator_r2 = std::pow(xy_diff, 2);
+        denominator_r2 = x_diff * y_diff;
+        r2_dst[i] = denominator_r2 == 0 ? 0.0 : numerator_r2 / denominator_r2;
+        slope_dst[i] = x_diff == 0 ? 0.0 : xy_diff / x_diff;
     }
 }
 
@@ -76,7 +85,8 @@ size_t IFitR2::min_increment_start() const {
 void IFitR2::_increment_calculate(const Indicator& ind, size_t start_pos) {
     size_t total = ind.size();
     auto const* src = ind.data();
-    auto* dst = this->data();
+    auto* r2_dst = this->data();
+    auto* slope_dst = this->data(1);
 
     int n = getParam<int>("n");
 
@@ -97,9 +107,13 @@ void IFitR2::_increment_calculate(const Indicator& ind, size_t start_pos) {
         x2sum += (2 * i - n) * n;
         y2sum += std::pow(src[i], 2) - std::pow(src[remove_pos], 2);
 
-        price_t numerator = std::pow(n * xysum - xsum * ysum, 2);
-        price_t denominator = (n * x2sum - xsum * xsum) * (n * y2sum - ysum * ysum);
-        dst[i] = denominator == 0 ? 0.0 : numerator / denominator;
+        price_t xy_diff = n * xysum - xsum * ysum;
+        price_t x_diff = n * x2sum - xsum * xsum;
+        price_t y_diff = n * y2sum - ysum * ysum;
+        price_t numerator_r2 = std::pow(xy_diff, 2);
+        price_t denominator_r2 = x_diff * y_diff;
+        r2_dst[i] = denominator_r2 == 0 ? 0.0 : numerator_r2 / denominator_r2;
+        slope_dst[i] = x_diff == 0 ? 0.0 : xy_diff / x_diff;
     }
 }
 

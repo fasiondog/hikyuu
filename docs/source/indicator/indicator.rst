@@ -1700,11 +1700,16 @@
 
 .. py:function:: FITR2(data, n=22)
 
-    计算线性回归拟合优度R²
+    计算线性回归拟合优度R²和斜率
 
     :param Indicator|sequence data: 输入数据
     :param int n: 时间窗口，需 >= 2
     :rtype: Indicator
+    
+    **结果集**：
+    
+    * 结果集0：R² 值（拟合优度）
+    * 结果集1：斜率（SLOPE）
 
 
 .. py:function:: SMA([data, n=22, m=2])
