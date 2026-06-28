@@ -122,6 +122,7 @@
 * :py:func:`SIN` - 正弦值
 * :py:func:`SGN` - 求符号值
 * :py:func:`SLOPE` - 计算线性回归斜率
+* :py:func:`FITR2` - 计算线性回归拟合优度R²
 * :py:func:`SQRT` - 开平方
 * :py:func:`TAN` - 正切值
 

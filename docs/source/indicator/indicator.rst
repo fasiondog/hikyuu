@@ -1698,6 +1698,15 @@
     :rtype: Indicator
 
 
+.. py:function:: FITR2(data, n=22)
+
+    计算线性回归拟合优度R²
+
+    :param Indicator|sequence data: 输入数据
+    :param int n: 时间窗口，需 >= 2
+    :rtype: Indicator
+
+
 .. py:function:: SMA([data, n=22, m=2])
 
     求移动平均

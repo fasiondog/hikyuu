@@ -496,6 +496,9 @@ Indicator (*SLOPE3)(const Indicator&, int) = SLOPE;
 Indicator (*SLOPE4)(const Indicator&, const IndParam&) = SLOPE;
 Indicator (*SLOPE5)(const Indicator&, const Indicator&) = SLOPE;
 
+Indicator (*FITR2_1)(int) = FITR2;
+Indicator (*FITR2_2)(const Indicator&, int) = FITR2;
+
 Indicator (*ZHBOND10_1)(double) = ZHBOND10;
 Indicator (*ZHBOND10_2)(const DatetimeList&, double) = ZHBOND10;
 Indicator (*ZHBOND10_3)(const KData& k, double) = ZHBOND10;
@@ -2175,6 +2178,15 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator)");
+
+    m.def("FITR2", FITR2_1, py::arg("n") = 22);
+    m.def("FITR2", FITR2_2, py::arg("data"), py::arg("n") = 22, R"(FITR2([data, n=22])
+
+    计算线性回归拟合优度R²
+
+    :param Indicator data: 输入数据
+    :param int n: 时间窗口，需 >= 2
     :rtype: Indicator)");
 
     m.def("MDD", py::overload_cast<int>(&MDD), py::arg("n") = 0);
