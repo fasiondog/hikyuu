@@ -461,7 +461,6 @@ ValueType Parameter::get(const string& name) const {
     if (iter == m_params.end()) {
         throw std::out_of_range("out_of_range in Parameter::get : " + name);
     }
-    // return boost::any_cast<ValueType>(iter->second);
     try {
         return boost::any_cast<ValueType>(iter->second);
     } catch (...) {
@@ -622,6 +621,20 @@ inline int Parameter::get(const string& name) const {
         return static_cast<int>(boost::any_cast<int64_t>(iter->second));
     } catch (...) {
         throw std::runtime_error("failed conversion param: " + name);
+    }
+}
+
+template <>
+inline int64_t Parameter::get(const string& name) const {
+    param_map_t::const_iterator iter;
+    iter = m_params.find(name);
+    if (iter == m_params.end()) {
+        throw std::out_of_range("out_of_range in Parameter::get : " + name);
+    }
+    if (iter->second.type() == typeid(int64_t)) {
+        return boost::any_cast<int64_t>(iter->second);
+    } else {
+        return static_cast<int64_t>(boost::any_cast<int>(iter->second));
     }
 }
 
