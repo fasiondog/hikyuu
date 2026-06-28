@@ -1691,7 +1691,7 @@
 
 .. py:function:: SLOPE(data, n=22)
 
-    计算线性回归斜率，N支持变量
+    计算线性回归斜率、拟合优度R²和相对最大残差，N支持变量
 
     :param Indicator|sequence data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -1701,6 +1701,17 @@
 
     * result(0): 斜率
     * result(1): 拟合优度 R²
+    * result(2): 相对最大残差 RelMaxRes = max|yi - ŷi| / ȳ
+
+    **相对最大残差说明**：
+
+    * 分子：窗口内最大绝对残差（保证没有点严重远离回归线）
+    * 分母：窗口 y 均值（消除股价量纲，百分比含义）
+    * 指标越小 = 整段所有 K 线都紧贴回归线
+
+    **判定阈值举例**：
+
+    * RelMaxRes < 0.03：最远 K 线偏离均价不足 3%，全部点位贴合回归线
 
 
 .. py:function:: SMA([data, n=22, m=2])

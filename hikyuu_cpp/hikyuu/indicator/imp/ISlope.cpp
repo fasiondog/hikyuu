@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::ISlope)
 
 namespace hku {
 
-ISlope::ISlope() : IndicatorImp("SLOPE", 2) {
+ISlope::ISlope() : IndicatorImp("SLOPE", 3) {
     setParam<int>("n", 22);
 }
 
@@ -36,12 +36,14 @@ void ISlope::_calculate(const Indicator& ind) {
     auto const* src = ind.data();
     auto* dst_slope = this->data(0);
     auto* dst_r2 = this->data(1);
+    auto* dst_relmaxres = this->data(2);
 
     int n = getParam<int>("n");
     if (n <= 1) {
         for (size_t i = m_discard; i < total; i++) {
             dst_slope[i] = 0.0;
             dst_r2[i] = 0.0;
+            dst_relmaxres[i] = 0.0;
         }
         return;
     }
@@ -59,10 +61,25 @@ void ISlope::_calculate(const Indicator& ind) {
         y2sum += y * y;
         size_t cnt = i + 1;
         price_t denominator = cnt * x2sum - xsum * xsum;
-        dst_slope[i] = (cnt * xysum - xsum * ysum) / denominator;
+        price_t slope = (cnt * xysum - xsum * ysum) / denominator;
+        dst_slope[i] = slope;
         price_t numerator = std::pow(cnt * xysum - xsum * ysum, 2);
         price_t denominator_r2 = denominator * (cnt * y2sum - ysum * ysum);
         dst_r2[i] = numerator / denominator_r2;
+
+        // 计算相对最大残差
+        price_t y_mean = ysum / cnt;
+        price_t x_mean = xsum / cnt;
+        price_t intercept = y_mean - slope * x_mean;
+        price_t max_residual = 0.0;
+        for (size_t j = startPos; j <= i; j++) {
+            price_t y_hat = intercept + slope * j;
+            price_t residual = std::abs(src[j] - y_hat);
+            if (residual > max_residual) {
+                max_residual = residual;
+            }
+        }
+        dst_relmaxres[i] = max_residual / y_mean;
     }
 
     for (size_t i = first_end; i < total; i++) {
@@ -72,10 +89,25 @@ void ISlope::_calculate(const Indicator& ind) {
         x2sum += (2 * i - n) * n;
         y2sum += src[i] * src[i] - src[i - n] * src[i - n];
         price_t denominator = n * x2sum - xsum * xsum;
-        dst_slope[i] = (n * xysum - xsum * ysum) / denominator;
+        price_t slope = (n * xysum - xsum * ysum) / denominator;
+        dst_slope[i] = slope;
         price_t numerator = std::pow(n * xysum - xsum * ysum, 2);
         price_t denominator_r2 = denominator * (n * y2sum - ysum * ysum);
         dst_r2[i] = numerator / denominator_r2;
+
+        // 计算相对最大残差
+        price_t y_mean = ysum / n;
+        price_t x_mean = xsum / n;
+        price_t intercept = y_mean - slope * x_mean;
+        price_t max_residual = 0.0;
+        for (size_t j = i - n + 1; j <= i; j++) {
+            price_t y_hat = intercept + slope * j;
+            price_t residual = std::abs(src[j] - y_hat);
+            if (residual > max_residual) {
+                max_residual = residual;
+            }
+        }
+        dst_relmaxres[i] = max_residual / y_mean;
     }
 }
 
@@ -92,6 +124,7 @@ void ISlope::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto const* src = ind.data();
     auto* dst_slope = this->data(0);
     auto* dst_r2 = this->data(1);
+    auto* dst_relmaxres = this->data(2);
 
     int n = getParam<int>("n");
 
@@ -113,10 +146,25 @@ void ISlope::_increment_calculate(const Indicator& ind, size_t start_pos) {
         x2sum += (2 * i - n) * n;
         y2sum += src[i] * src[i] - src[i - n] * src[i - n];
         price_t denominator = n * x2sum - xsum * xsum;
-        dst_slope[i] = (n * xysum - xsum * ysum) / denominator;
+        price_t slope = (n * xysum - xsum * ysum) / denominator;
+        dst_slope[i] = slope;
         price_t numerator = std::pow(n * xysum - xsum * ysum, 2);
         price_t denominator_r2 = denominator * (n * y2sum - ysum * ysum);
         dst_r2[i] = numerator / denominator_r2;
+
+        // 计算相对最大残差
+        price_t y_mean = ysum / n;
+        price_t x_mean = xsum / n;
+        price_t intercept = y_mean - slope * x_mean;
+        price_t max_residual = 0.0;
+        for (size_t j = i - n + 1; j <= i; j++) {
+            price_t y_hat = intercept + slope * j;
+            price_t residual = std::abs(src[j] - y_hat);
+            if (residual > max_residual) {
+                max_residual = residual;
+            }
+        }
+        dst_relmaxres[i] = max_residual / y_mean;
     }
 }
 
@@ -125,12 +173,14 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     if (curPos <= ind.discard()) {
         _set(Null<price_t>(), curPos);
         _set(Null<price_t>(), curPos, 1);
+        _set(Null<price_t>(), curPos, 2);
         return;
     }
 
     if (step <= 1) {
         _set(0, curPos);
         _set(0, curPos, 1);
+        _set(0, curPos, 2);
         return;
     }
 
@@ -151,8 +201,24 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     price_t numerator = std::pow(n * xysum - xsum * ysum, 2);
     price_t denominator_r2 = denominator * (n * y2sum - ysum * ysum);
     price_t r2 = numerator / denominator_r2;
+
+    // 计算相对最大残差
+    price_t y_mean = ysum / n;
+    price_t x_mean = xsum / n;
+    price_t intercept = y_mean - slope * x_mean;
+    price_t max_residual = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        price_t y_hat = intercept + slope * i;
+        price_t residual = std::abs(ind[i] - y_hat);
+        if (residual > max_residual) {
+            max_residual = residual;
+        }
+    }
+    price_t relmaxres = max_residual / y_mean;
+
     _set(slope, curPos);
     _set(r2, curPos, 1);
+    _set(relmaxres, curPos, 2);
 }
 
 Indicator HKU_API SLOPE(int n) {
