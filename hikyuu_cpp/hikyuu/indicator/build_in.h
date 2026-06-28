@@ -116,7 +116,6 @@
 #include "crt/SLICE.h"
 #include "crt/SGN.h"
 #include "crt/SLOPE.h"
-#include "crt/FITR2.h"
 #include "crt/SMA.h"
 #include "crt/SPEARMAN.h"
 #include "crt/SKEW.h"

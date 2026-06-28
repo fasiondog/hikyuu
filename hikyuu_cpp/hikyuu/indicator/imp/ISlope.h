@@ -11,7 +11,10 @@
 
 namespace hku {
 
-// 计算线性回归斜率，N支持变量
+// 计算线性回归斜率和拟合优度R²，N支持变量
+// 结果集：
+//   result(0): 斜率
+//   result(1): 拟合优度 R²
 class ISlope : public IndicatorImp {
     INDICATOR_IMP(ISlope)
     INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
