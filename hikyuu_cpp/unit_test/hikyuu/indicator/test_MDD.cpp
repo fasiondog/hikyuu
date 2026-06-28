@@ -6,6 +6,7 @@
  */
 #include "../test_config.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MDD.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -136,6 +137,60 @@ TEST_CASE("test_MDD") {
     for (size_t i = 2; i < mdd1.size(); i++) {
         CHECK_EQ(mdd1[i], doctest::Approx(m[i]));
     }
+
+    /** @arg 反例: 先挖坑再创新高, 锁定 look-ahead bias bug
+     * 原增量算法用窗口全局 max 作回撤基准, 当窗口最高点出现在最低点之后时
+     * 高估回撤。数据 [1.2,1.1,1.0,0.5,1.5,2.0,1.2,1.0] n=5:
+     *   i=6 窗口 [1.0,0.5,1.5,2.0,1.2] 最高 2.0 在最低 0.5 之后,
+     *     标准 MDD=50(0.5 相对其前累计 max 1.0), bug 版=75(0.5 相对全局 max 2.0)
+     *   i=7 窗口 [0.5,1.5,2.0,1.2,1.0] 同理, 标准=50, bug 版=75
+     * 全量计算 n=5<total=8 走分支B(首段变长)+委托 _increment_calculate,
+     * 修复后两段均用标准 run_max 基准, 逐点与标准 MDD 一致。
+     */
+    PriceList lookahead_data{1.2, 1.1, 1.0, 0.5, 1.5, 2.0, 1.2, 1.0};
+    Indicator lookahead = PRICELIST(lookahead_data);
+    Indicator mdd_lookahead = MDD(lookahead, 5);
+    CHECK_EQ(mdd_lookahead[6], doctest::Approx(50.0).epsilon(0.0001));
+    CHECK_EQ(mdd_lookahead[7], doctest::Approx(50.0).epsilon(0.0001));
+}
+
+/** @par 检测点: 全量==增量等价 (复用同一实例连续 setContext 触发 _increment_calculate) */
+TEST_CASE("test_MDD_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("SH600000");
+    KData k_full = stk.getKData(KQuery(-30));
+    KData k_partial = stk.getKData(KQuery(-30, -15));
+
+    // 全量基准
+    Indicator ind_full = MDD(CLOSE(), 5);
+    ind_full.setContext(k_full);
+
+    // 增量: 复用同一实例连续 setContext
+    Indicator ind_inc = MDD(CLOSE(), 5);
+    ind_inc.setContext(k_partial);
+    ind_inc.setContext(k_full);
+
+    CHECK_EQ(ind_full.size(), ind_inc.size());
+    for (size_t i = 0; i < ind_full.size(); ++i) {
+        if (std::isnan(ind_full[i]) && std::isnan(ind_inc[i])) {
+            continue;
+        }
+        CHECK_EQ(ind_inc[i], doctest::Approx(ind_full[i]).epsilon(0.0001));
+    }
+}
+
+/** @par 检测点: 含 NaN/非正数数据防崩溃 (验证方案4 不段错误/除零) */
+TEST_CASE("test_MDD_with_nan") {
+    // 数据四杀: i=1(NaN)命中外层isnan, i=3(-5)命中外层<=0,
+    // i=2窗口含j=1(NaN)命中内层isnan, i=4窗口含j=3(-5)命中内层<=0
+    PriceList data{100.0, std::numeric_limits<double>::quiet_NaN(), 105.0, -5.0, 90.0,
+                    80.0, 110.0};
+    Indicator mdd = MDD(PRICELIST(data), 3);
+    CHECK_EQ(mdd.size(), 7);
+    // i=1 当前点 NaN, 方案4 不写 dst[1], 保持缓冲初值 NaN
+    CHECK(std::isnan(mdd[1]));
+    // i=6 窗口[90,80,110]: run_max=90时dd=(90-80)/90=11.1111, 之后110创新高dd=0
+    CHECK_EQ(mdd[6], doctest::Approx(11.1111).epsilon(0.0001));
 }
 
 //-----------------------------------------------------------------------------

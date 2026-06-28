@@ -7,6 +7,7 @@
 
 #include "../test_config.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MRR.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -115,6 +116,54 @@ TEST_CASE("test_MRR") {
     for (size_t i = 10; i < mrr.size(); i++) {
         CHECK_EQ(mrr[i], doctest::Approx(m[i]));
     }
+
+    /** @arg 反例: 先冲高再挖坑, 锁定 look-ahead bias bug (与 IMdd 对称)
+     * 原增量算法用窗口全局 min 作盈利基准, 当窗口最低点出现在最高点之后时
+     * 高估盈利比率。数据 [1.0, 2.0, 1.5, 0.5, 1.2] n=4:
+     *   i=4 窗口 [2.0, 1.5, 0.5, 1.2] 最低 0.5 在最高 2.0 之后,
+     *     标准 MRR=140(1.2 相对其前累计 min 0.5), bug 版=300(2.0 相对全局 min 0.5)
+     * 全量 n=4<total=5 走分支B(首段变长)+委托 _increment_calculate,
+     * 修复后两段均用标准 run_min 基准, 与标准 MRR 一致。
+     */
+    PriceList mrr_lookahead_data{1.0, 2.0, 1.5, 0.5, 1.2};
+    Indicator mrr_lookahead = MRR(PRICELIST(mrr_lookahead_data), 4);
+    CHECK_EQ(mrr_lookahead[4], doctest::Approx(140.0).epsilon(0.0001));
+}
+
+/** @par 检测点: 全量==增量等价 (复用同一实例连续 setContext 触发 _increment_calculate) */
+TEST_CASE("test_MRR_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("SH600000");
+    KData k_full = stk.getKData(KQuery(-30));
+    KData k_partial = stk.getKData(KQuery(-30, -15));
+
+    Indicator ind_full = MRR(CLOSE(), 5);
+    ind_full.setContext(k_full);
+
+    Indicator ind_inc = MRR(CLOSE(), 5);
+    ind_inc.setContext(k_partial);
+    ind_inc.setContext(k_full);
+
+    CHECK_EQ(ind_full.size(), ind_inc.size());
+    for (size_t i = 0; i < ind_full.size(); ++i) {
+        if (std::isnan(ind_full[i]) && std::isnan(ind_inc[i])) {
+            continue;
+        }
+        CHECK_EQ(ind_inc[i], doctest::Approx(ind_full[i]).epsilon(0.0001));
+    }
+}
+
+/** @par 检测点: 含 NaN/非正数数据防崩溃 (验证方案4 不段错误/除零) */
+TEST_CASE("test_MRR_with_nan") {
+    // 数据四杀: i=1(NaN)命中外层isnan, i=3(-5)命中外层<=0,
+    // i=2窗口含j=1(NaN)命中内层isnan, i=4窗口含j=3(-5)命中内层<=0
+    PriceList data{1.0, std::numeric_limits<double>::quiet_NaN(), 2.0, -5.0, 0.5, 1.5, 1.2};
+    Indicator mrr = MRR(PRICELIST(data), 3);
+    CHECK_EQ(mrr.size(), 7);
+    // i=1 当前点 NaN, 方案4 不写 dst[1], 保持缓冲初值 NaN
+    CHECK(std::isnan(mrr[1]));
+    // i=6 窗口[0.5,1.5,1.2]: run_min=0.5, 1.5/0.5-1=200, 1.2/0.5-1=140, max=200
+    CHECK_EQ(mrr[6], doctest::Approx(200.0).epsilon(0.0001));
 }
 
 //-----------------------------------------------------------------------------
