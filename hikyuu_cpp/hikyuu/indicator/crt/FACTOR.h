@@ -16,6 +16,7 @@ namespace hku {
  * 因子指标转换
  * @details 将Factor对象转换为Indicator，使其可以在指标系统中使用。
  *          该指标需要设置K线上下文才能进行计算。
+ * @note Factor 仅通过名字判断是否相同
  * @param factor 因子对象
  * @return Indicator对象
  * @ingroup Factor
@@ -26,6 +27,7 @@ Indicator HKU_API FACTOR(const Factor& factor);
  * 因子指标转换（便捷版本）
  * @details 通过因子名称创建Indicator，使其可以在指标系统中使用。
  *          该指标需要设置K线上下文才能进行计算。
+ * @note Factor 仅通过名字判断是否相同
  * @param name 因子名称
  * @return Indicator对象
  * @ingroup Factor
