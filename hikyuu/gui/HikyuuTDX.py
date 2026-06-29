@@ -1162,7 +1162,7 @@ if __name__ == "__main__":
             app.setFont(default_font)
     else:
         default_font = QFont()
-        default_font.setPointSize(9)
+        default_font.setPointSize(10 if sys.platform == 'darwin' else 14)
         app.setFont(default_font)
 
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
