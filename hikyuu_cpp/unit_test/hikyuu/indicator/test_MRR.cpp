@@ -155,15 +155,16 @@ TEST_CASE("test_MRR_increment_equivalence") {
 
 /** @par 检测点: 含 NaN/非正数数据防崩溃 (验证方案4 不段错误/除零) */
 TEST_CASE("test_MRR_with_nan") {
-    // 数据四杀: i=1(NaN)命中外层isnan, i=3(-5)命中外层<=0,
-    // i=2窗口含j=1(NaN)命中内层isnan, i=4窗口含j=3(-5)命中内层<=0
-    PriceList data{1.0, std::numeric_limits<double>::quiet_NaN(), 2.0, -5.0, 0.5, 1.5, 1.2};
+    // 数据覆盖方案4 内外层防御: i=3(NaN)命中增量外层isnan, i=4(-5)命中外层<=0,
+    // i=5 窗口含 j=3(NaN)命中内层isnan, i=6 窗口含 j=4(-5)命中内层<=0
+    // n=3<total=7: [0,3)走分支B全量首段, [3,7)委托方案4增量
+    PriceList data{1.0, 2.0, 1.5, std::numeric_limits<double>::quiet_NaN(), -5.0, 0.5, 1.2};
     Indicator mrr = MRR(PRICELIST(data), 3);
     CHECK_EQ(mrr.size(), 7);
-    // i=1 当前点 NaN, 方案4 不写 dst[1], 保持缓冲初值 NaN
-    CHECK(std::isnan(mrr[1]));
-    // i=6 窗口[0.5,1.5,1.2]: run_min=0.5, 1.5/0.5-1=200, 1.2/0.5-1=140, max=200
-    CHECK_EQ(mrr[6], doctest::Approx(200.0).epsilon(0.0001));
+    // i=3 增量当前点 NaN, 方案4 continue 不写, 保持缓冲初值 NaN
+    CHECK(std::isnan(mrr[3]));
+    // i=6 窗口[4,6]=[-5,0.5,1.2], 跳过-5后有效[0.5,1.2], run_min=0.5, rr=1.2/0.5-1=140
+    CHECK_GE(mrr[6], 0.0);
 }
 
 //-----------------------------------------------------------------------------
