@@ -93,74 +93,47 @@ void IMrr::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto const* src = ind.data();
     auto* dst = this->data();
 
-    Indicator::value_t window_min_val = 0.0;  // 当前窗口最小值
-    size_t window_min_idx = 0;                // 当前窗口最小值的索引
-    Indicator::value_t window_max_rr = 0.0;   // 当前窗口最大盈利比率
-
+    // 标准最大盈利比率语义: rr_j = src[j] / run_min_j - 1,
+    // 其中 run_min_j = min(src[window_left..j]) 为到 j 为止的累计最小值。
+    // 原实现错误地用窗口全局 min 作为所有点的盈利基准, 当窗口最低点出现在
+    // 最高点之后时会引入未来数据(look-ahead bias), 高估盈利比率。
+    // 此处放弃原 O(1) 快路径状态机(其 current_rr > window_max_rr 判断在标准
+    // MRR 语义下原理性不成立), 退化为每点 O(n) 暴力扫描, 用 run_min 基准保证
+    // 正确性。与 IMdd 修复对称。
     for (size_t i = start_pos; i < total; ++i) {
         Indicator::value_t current_price = src[i];
-
-        // 处理无效值（NaN/非正数）
-        if (std::isnan(current_price) || current_price <= 0) {
-            window_min_val = 0.0;
-            window_min_idx = i + 1;
-            window_max_rr = 0.0;
+        if (std::isnan(current_price) || current_price <= 0.0) {
+            // 无效点不写 dst[i], 保持原值, 与原语义一致
             continue;
         }
 
         size_t window_left = i + 1 - n;
-
-        bool need_rescan_min = false;
-        // 若最小值索引被移出窗口 → 需要重新扫描窗口找最小值
-        if (window_min_idx < window_left) {
-            need_rescan_min = true;
-        } else if (current_price <= window_min_val || window_min_val == 0.) {
-            // 若当前值小于等于最小值 → 直接更新最小值（无需扫描）
-            window_min_val = current_price;
-            window_min_idx = i;
-        }
-
-        if (need_rescan_min) {
-            window_min_val = current_price;
-            window_min_idx = i;
-            for (size_t j = window_left; j < i; ++j) {
-                if (src[j] < window_min_val || window_min_val == 0.) {
-                    window_min_val = src[j];
-                    window_min_idx = j;
-                }
+        Indicator::value_t run_min = 0.0;  // 首个有效点赋初值, 避免 NaN 污染比较
+        Indicator::value_t window_max_rr = 0.0;
+        bool has_valid = false;
+        for (size_t j = window_left; j <= i; ++j) {
+            Indicator::value_t v = src[j];
+            if (std::isnan(v) || v <= 0.0) {
+                continue;
+            }
+            if (!has_valid) {
+                run_min = v;  // 首个有效点初始化 run_min
+                has_valid = true;
+                continue;  // 首点 rr = v/v - 1 = 0, 跳过
+            }
+            if (v < run_min) {
+                run_min = v;
+            }
+            // run_min 必然 > 0(数据约束为正), 除法安全
+            Indicator::value_t rr = v / run_min - 1.0;
+            if (rr > window_max_rr) {
+                window_max_rr = rr;
             }
         }
 
-        bool need_rescan_rr = false;
-        // 计算当前点的盈利比率
-        Indicator::value_t current_rr =
-          (window_min_val == 0.) ? 0.0 : (current_price / window_min_val - 1.0);
-
-        // 若当前盈利比率更大 → 直接更新（推进式，无需扫描）
-        if (current_rr > window_max_rr) {
-            window_max_rr = current_rr;
-        } else if (i >= n) {
-            // 若窗口左边界移动，且移出的点是当前最大盈利比率的点 → 需重新扫描（极少触发）
-            Indicator::value_t removed_rr =
-              (window_min_val == 0.) ? 0.0 : (src[i - n] / window_min_val - 1.0);
-            if (removed_rr == window_max_rr) {
-                need_rescan_rr = true;
-            }
+        if (has_valid) {
+            dst[i] = window_max_rr * 100.0;
         }
-
-        // 仅在必要时扫描窗口找最大盈利比率
-        if (need_rescan_rr || need_rescan_min) {
-            window_max_rr = 0.0;
-            for (size_t j = window_left; j <= i; ++j) {
-                Indicator::value_t rr =
-                  (window_min_val == 0.) ? 0.0 : (src[j] / window_min_val - 1.0);
-                if (rr > window_max_rr) {
-                    window_max_rr = rr;
-                }
-            }
-        }
-
-        dst[i] = window_max_rr * 100.;
     }
 }
 
