@@ -96,7 +96,7 @@ void IAdvance::_calculate(const Indicator& ind) {
                 break;
             }
 
-            if (xdata[i]) {
+            if (!std::isnan(xdata[i]) && xdata[i] > 0.0) {
                 dst[i] = std::isnan(dst[i]) ? 1 : dst[i] + 1;
             }
         }
@@ -126,6 +126,14 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     StockManager& sm = StockManager::instance();
     auto* dst = this->data();
+    // 强制清理将要重算的 dst 区间, 防止 increment_execute_leaf_or_op 拷贝过来的
+    // 旧汇总值被全市场遍历二次累加(脏读双累加: 旧值非 NaN 时 isnan?1:+1 会再 +1)。
+    // 从 start_pos 起清(而非 start_pos-1): start_pos-1 是旧窗口最后一根的正确汇总,
+    // 增量内层循环从 x.discard()>=1 起写 dst[i+start_pos-1], 最小写 dst[start_pos],
+    // 从不写 dst[start_pos-1], 故保留其旧值。
+    for (size_t i = start_pos; i < this->size(); ++i) {
+        dst[i] = Null<value_t>();
+    }
     Indicator x = ALIGN(CLOSE() > REF(CLOSE(), 1), std::move(dates), getParam<bool>("fill_null"));
     for (auto iter = sm.begin(); iter != sm.end(); ++iter) {
         if ((stk_type <= STOCKTYPE_TMP && iter->type() != stk_type) ||
@@ -142,7 +150,7 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 break;
             }
 
-            if (xdata[i]) {
+            if (!std::isnan(xdata[i]) && xdata[i] > 0.0) {
                 dst[i + start_pos - 1] =
                   std::isnan(dst[i + start_pos - 1]) ? 1 : dst[i + start_pos - 1] + 1;
             }
