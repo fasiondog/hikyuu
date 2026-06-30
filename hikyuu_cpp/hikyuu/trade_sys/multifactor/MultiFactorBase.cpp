@@ -20,6 +20,7 @@
 #include "hikyuu/indicator/crt/ZSCORE.h"
 #include "hikyuu/StockManager.h"
 #include "MultiFactorBase.h"
+#include "industry_neutralize.h"
 
 namespace hku {
 
@@ -483,11 +484,11 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
     return x;
 }
 
-unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
-    // 如果指定了特殊的指标的行业中性化处理，则构建其行业哑变量
-    unordered_map<string, PriceList> stock_dummy_index;
+unordered_map<string, std::pair<PriceList, size_t>> MultiFactorBase::_buildDummyIndex() {
+    // 如果指定了特殊的指标的行业中性化处理，则构建其行业归属标签
+    unordered_map<string, std::pair<PriceList, size_t>> stock_dummy_index;
     for (const auto& [ind_name, catefory] : m_special_category) {
-        stock_dummy_index[ind_name] = PriceList(m_stks.size(), Null<price_t>());
+        stock_dummy_index[ind_name] = {PriceList(m_stks.size(), Null<price_t>()), 0};
         auto blks = StockManager::instance().getBlockList(catefory);
         if (blks.empty()) {
             HKU_WARN("Block list ({}) is empty, please check your block category!", catefory);
@@ -495,9 +496,10 @@ unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
         }
 
         auto iter = stock_dummy_index.find(ind_name);
-        auto& dummy = iter->second;
-
+        auto& dummy = iter->second.first;
         size_t blk_count = blks.size();
+        iter->second.second = blk_count;
+
         for (size_t i = 0; i < m_stks.size(); i++) {
             bool found = false;
             size_t j = 0;
@@ -510,6 +512,8 @@ unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
                 j++;
             }
             if (!found) {
+                // 无归属股票赋 blk_count，下游组内去均值时跳过（残差置 NaN），
+                // 避免将其隐式聚成伪行业簇造成伪回归。
                 dummy[i] = blk_count;
             }
         }
@@ -525,52 +529,8 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     });
 }
 
-// 计算中性化后的因子，y 为因子，x 为行业哑变量（包含常数项）
-static PriceList calculate_residuals(const PriceList& y, const PriceList& x) {
-    HKU_ASSERT(y.size() == x.size());
-
-    const size_t n = x.size();
-    PriceList residuals(n, Null<price_t>());
-
-    // 计算线性回归系数（带常数项）
-    double sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x2 = 0.0;
-    size_t count = 0;
-
-    for (size_t i = 0; i < n; ++i) {
-        if (std::isnan(x[i]) || std::isinf(x[i]) || std::isnan(y[i]) || std::isinf(y[i])) {
-            continue;
-        }
-        sum_x += x[i];
-        sum_y += y[i];
-        sum_xy += x[i] * y[i];
-        sum_x2 += x[i] * x[i];
-        count++;
-    }
-
-    // 数据点不足或分母为0
-    if (count < 2 || sum_x * sum_x - count * sum_x2 == 0) {
-        return residuals;
-    }
-
-    // 计算回归系数 β₀ (截距) 和 β₁ (斜率)
-    double beta1 = (sum_x * sum_y - count * sum_xy) / (sum_x * sum_x - count * sum_x2);
-    double beta0 = (sum_y - beta1 * sum_x) / count;
-
-    if (std::isnan(beta0) || std::isinf(beta0) || std::isnan(beta1) || std::isinf(beta1)) {
-        return residuals;
-    }
-
-    // 计算拟合值和残差
-    for (size_t i = 0; i < n; ++i) {
-        if (std::isnan(x[i]) || std::isinf(x[i]) || std::isnan(y[i]) || std::isinf(y[i])) {
-            continue;
-        }
-        double y_hat = beta0 + beta1 * x[i];  // 拟合值 = β₀ + β₁x
-        residuals[i] = y[i] - y_hat;          // 残差 = 观测值 - 拟合值
-    }
-
-    return residuals;
-}
+// 行业中性化（按行业分组去组内均值）的纯函数实现见 industry_neutralize.h，
+// 提取为内部 inline header 供白盒单元测试直接包含调用。
 
 // 计算多元回归中性化后的因子，y为因子，x为多个解释变量（包含常数项）- Eigen版本
 static PriceList calculate_residuals(const PriceList& y, const std::vector<PriceList>& x) {
@@ -718,7 +678,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         // 压制 Eigen 内部 OpenMP 并行，避免与外层按日线程池叠加导致线程超载；
         // calculate_residuals 内的 Eigen 矩阵均为栈局部对象，外层按日并行天然可重入。
         Eigen::setNbThreads(1);
-        unordered_map<string, PriceList> ind_dummy_dict = _buildDummyIndex();
+        unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();
         global_parallel_for_index_void(
           0, days_total,
           [this, stk_count, ind_count, &all_stk_inds, &ind_dummy_dict, &use_style_inds](size_t di) {
@@ -732,7 +692,14 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                       one_day_data[si] = all_stk_inds[si][ii][di];
                   }
 
-                  auto ind_name = all_stk_inds[0][ii].name();
+                  // 注：经 m_factorset.getValues(align=true) 产出的 all_stk_inds[*][ii]
+                  // 会被 ALIGN 套层改名为 "ALIGN"（运行时实证）。而 addSpecialNormalize
+                  // 存入 m_special_norms/m_special_category 的 key 是 FactorSet 里的因子
+                  // 原名（如 "MA"）。若取 all_stk_inds[0][ii].name() 做 find 的 key，永远
+                  // 不命中，行业/风格/特殊标准化全部静默失效。改用 m_factorset[ii].name()
+                  // 按下标溯源原名：getValues 产出 result[j][i] 严格对应 factors[i]，
+                  // 下标 ii 与 m_factorset[ii] 一一对应，无乱序风险。
+                  auto ind_name = m_factorset[ii].name();
                   auto special_norm_iter = m_special_norms.find(ind_name);
                   if (special_norm_iter != m_special_norms.end()) {
                       special_norm = special_norm_iter->second->clone();
@@ -750,7 +717,11 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
                   auto category_iter = ind_dummy_dict.find(ind_name);
                   if (category_iter != ind_dummy_dict.end()) {
-                      new_value = calculate_residuals(new_value, category_iter->second);
+                      // 行业中性化：组内去均值（O(n)，数学等价于去截距 one-hot 多元回归）。
+                      // 原实现误用单变量 calculate_residuals 对整数板块序号做一元回归，
+                      // 隐含"行业 j 的效应 = β0 + β1·j"的错误假设，结果依赖板块列表排列顺序。
+                      const auto& [labels, blk_count] = category_iter->second;
+                      new_value = calculate_industry_residuals(new_value, labels, blk_count);
                   }
                   auto style_iter = use_style_inds.find(ind_name);
                   if (style_iter != use_style_inds.end()) {
