@@ -39,10 +39,12 @@ void IMa::_calculate(const Indicator& indicator) {
         }
 
         price_t sum = 0.0;
+        size_t valid_count = 0;
         for (size_t i = m_discard; i < total; i++) {
             if (!std::isnan(src[i])) {
                 sum += src[i];
-                dst[i] = sum / (i - m_discard + 1);
+                valid_count++;
+                dst[i] = sum / valid_count;
             }
         }
         return;

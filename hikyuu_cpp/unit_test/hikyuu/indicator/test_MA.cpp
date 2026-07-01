@@ -49,6 +49,31 @@ TEST_CASE("test_MA") {
         CHECK_EQ(ma[i], doctest::Approx(expects[i]).epsilon(0.0001));
     }
 
+    /** @arg n = 0 且数据含 interior NaN（valid_count 分母正确性） */
+    {
+        PriceList d_nan;
+        d_nan.push_back(1.0);
+        d_nan.push_back(2.0);
+        d_nan.push_back(Null<price_t>());  // NaN
+        d_nan.push_back(4.0);
+        d_nan.push_back(Null<price_t>());  // NaN
+        d_nan.push_back(6.0);
+        Indicator ind_nan = PRICELIST(d_nan);
+        Indicator ma_nan = MA(ind_nan, 0);
+        // i=0: sum=1, vc=1, mean=1.0
+        CHECK_EQ(ma_nan[0], doctest::Approx(1.0).epsilon(0.0001));
+        // i=1: sum=3, vc=2, mean=1.5
+        CHECK_EQ(ma_nan[1], doctest::Approx(1.5).epsilon(0.0001));
+        // i=2: NaN skip, 不输出（vc 不变）
+        CHECK_UNARY(std::isnan(ma_nan[2]));
+        // i=3: sum=7, vc=3, mean=7/3≈2.333（旧 bug 会算 7/4=1.75）
+        CHECK_EQ(ma_nan[3], doctest::Approx(2.333333).epsilon(0.0001));
+        // i=4: NaN skip
+        CHECK_UNARY(std::isnan(ma_nan[4]));
+        // i=5: sum=13, vc=4, mean=13/4=3.25（旧 bug 会算 13/6≈2.167）
+        CHECK_EQ(ma_nan[5], doctest::Approx(3.25).epsilon(0.0001));
+    }
+
     /** @arg n = 10 且数据大小刚好为10 时, 正常关联数据 */
     kdata = stock.getKData(KQuery(-10));
     open = OPEN(kdata);
