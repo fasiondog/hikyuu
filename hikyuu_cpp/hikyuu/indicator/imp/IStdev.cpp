@@ -29,73 +29,112 @@ void IStdev::_checkParam(const string& name) const {
 
 void IStdev::_calculate(const Indicator& data) {
     size_t total = data.size();
-    m_discard = data.discard();
+    int n = getParam<int>("n");
+
+    auto const* src = data.data();
+    auto* dst = this->data();
+
+    // n == 0：全量累计标准差（expand-all 语义，每个位置输出到当前位置的累计 std）
+    if (0 == n) {
+        m_discard = data.discard();
+        if (m_discard >= total) {
+            m_discard = total;
+            return;
+        }
+        size_t valid_count = 0;
+        price_t mean = 0.0;
+        price_t M2 = 0.0;
+        for (size_t i = m_discard; i < total; ++i) {
+            if (!std::isnan(src[i])) {
+                valid_count++;
+                if (valid_count == 1) {
+                    mean = src[i];
+                    M2 = 0.0;
+                } else {
+                    price_t delta = src[i] - mean;
+                    mean += delta / valid_count;
+                    M2 += delta * (src[i] - mean);
+                }
+            }
+            if (valid_count > 1) {
+                dst[i] = std::sqrt(std::max(0.0, M2 / (valid_count - 1)));
+            }
+        }
+        return;
+    }
+
+    // n > 0：滚动窗口 Welford 方差，状态 (valid_count, mean, M2)，O(1) 出入队。
+    // 与 IMa 共用相同的 valid_count/mean 更新逻辑，保证 MA/STDEV 基于一致样本集。
+    // 离群值离开窗口时 M2 可能因灾难性相消变为负值或丢失低位精度，
+    // 此时触发 O(k) 单趟重算（k=窗口长度 n）重建精确状态。
+    m_discard = data.discard() + n - 1;
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    int n = getParam<int>("n");
-    if (0 == n) {
-        n = total;
-    }
-
-    auto const* src = data.data();
-    auto* dst = this->data();
-
-    vector<price_t> pow_buf(data.size());
-    price_t ex = 0.0, ex2 = 0.0;
-    size_t num = 0;
-    size_t start_pos = m_discard;
-    size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    price_t k = src[start_pos];
-    for (size_t i = start_pos; i < first_end; i++) {
-        if (!std::isnan(src[i])) {
-            num++;
-            price_t d = src[i] - k;
-            ex += d;
-            price_t d_pow = std::pow(d, 2);
-            pow_buf[i] = d_pow;
-            ex2 += d_pow;
-            // dst[i] = num == 1 ? 0. : std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
-            if (num > 1) {
-                dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
-            }
-        }
-    }
-
-    for (size_t i = first_end; i < total; i++) {
-        if (!std::isnan(src[i])) {
-            size_t j = i - n;
-            for (; j < i; j++) {
-                if (!std::isnan(src[j])) {
-                    break;
+    size_t startPos = data.discard();
+    size_t valid_count = 0;
+    price_t mean = 0.0;
+    price_t M2 = 0.0;
+    for (size_t i = startPos; i < total; ++i) {
+        // 移除 leaving
+        if (i >= static_cast<size_t>(startPos) + static_cast<size_t>(n)) {
+            price_t leaving = src[i - n];
+            if (!std::isnan(leaving)) {
+                if (valid_count > 1) {
+                    price_t old_M2 = M2;
+                    price_t delta = leaving - mean;
+                    mean -= delta / (valid_count - 1);
+                    M2 -= delta * (leaving - mean);
+                    valid_count--;
+                    // 灾难性相消检测：M2 变负或较 remove 前缩减 10^9 倍（float64 有效位坍塌）时重算
+                    if (M2 < 0.0 || M2 < 1e-9 * old_M2) {
+                        // O(n) 单趟 Welford 重算 [i-n+1, i-1]（已移除 leaving，未加入 entering）
+                        size_t vc_r = 0;
+                        price_t mean_r = 0.0, M2_r = 0.0;
+                        size_t lo = i - static_cast<size_t>(n) + 1;
+                        for (size_t j = lo; j < i; ++j) {
+                            if (!std::isnan(src[j])) {
+                                vc_r++;
+                                if (vc_r == 1) {
+                                    mean_r = src[j];
+                                } else {
+                                    price_t d = src[j] - mean_r;
+                                    mean_r += d / vc_r;
+                                    M2_r += d * (src[j] - mean_r);
+                                }
+                            }
+                        }
+                        valid_count = vc_r;
+                        mean = mean_r;
+                        M2 = M2_r;
+                    }
+                } else {
+                    // valid_count == 1，移除后窗口归零
+                    mean = 0.0;
+                    M2 = 0.0;
+                    valid_count = 0;
                 }
             }
-            if (j == i) {
-                continue;
-            }
-            // ex -= src[i - n] - k;
-            // ex2 -= pow_buf[i - n];
-            ex -= src[j] - k;
-            ex2 -= pow_buf[j];
-            price_t d = src[i] - k;
-            ex += d;
-            price_t d_pow = std::pow(d, 2);
-            pow_buf[i] = d_pow;
-            ex2 += d_pow;
-            num = i - j;
-            if (num != 1) {
-                dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
-            }
-            // dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / (n - 1));
         }
-    }
-
-    // 排除第一位的0值
-    if (m_discard < total) {
-        dst[0] = Null<value_t>();
-        m_discard += 1;
+        // 加入 entering
+        price_t entering = src[i];
+        if (!std::isnan(entering)) {
+            valid_count++;
+            if (valid_count == 1) {
+                mean = entering;
+                M2 = 0.0;
+            } else {
+                price_t delta = entering - mean;
+                mean += delta / valid_count;
+                M2 += delta * (entering - mean);
+            }
+        }
+        // 窗口未满或有效值不足时不写输出（缓冲区已是 NaN）
+        if (i >= m_discard && valid_count > 1) {
+            dst[i] = std::sqrt(std::max(0.0, M2 / (valid_count - 1)));
+        }
     }
 }
 
@@ -112,60 +151,93 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n = getParam<int>("n");
     auto const* src = data.data();
     auto* dst = this->data();
+    HKU_ASSERT(start_pos + 1 >= (size_t)n);
 
-    vector<price_t> pow_buf(data.size() + n - start_pos);
-    price_t ex = 0.0, ex2 = 0.0;
-    size_t num = 0;
-    price_t k = src[start_pos - n];
-    for (size_t i = start_pos - n; i < start_pos; i++) {
-        if (!std::isnan(src[i])) {
-            num++;
-            price_t d = src[i] - k;
-            ex += d;
-            price_t d_pow = std::pow(d, 2);
-            pow_buf[i + n - start_pos] = d_pow;
-            ex2 += d_pow;
-        }
-    }
-
-    for (size_t i = start_pos; i < total; i++) {
-        if (!std::isnan(src[i])) {
-            size_t j = i - n;
-            for (; j < i; j++) {
-                if (!std::isnan(src[j])) {
-                    break;
+    // 从窗口起点 start_pos+1-n 单趟重建 Welford 状态，再滚动至 total
+    size_t start = start_pos + 1 - n;
+    size_t valid_count = 0;
+    price_t mean = 0.0;
+    price_t M2 = 0.0;
+    for (size_t i = start; i < total; ++i) {
+        if (i > start_pos) {
+            price_t leaving = src[i - n];
+            if (!std::isnan(leaving)) {
+                if (valid_count > 1) {
+                    price_t old_M2 = M2;
+                    price_t delta = leaving - mean;
+                    mean -= delta / (valid_count - 1);
+                    M2 -= delta * (leaving - mean);
+                    valid_count--;
+                    if (M2 < 0.0 || M2 < 1e-9 * old_M2) {
+                        size_t vc_r = 0;
+                        price_t mean_r = 0.0, M2_r = 0.0;
+                        size_t lo = i - static_cast<size_t>(n) + 1;
+                        for (size_t j = lo; j < i; ++j) {
+                            if (!std::isnan(src[j])) {
+                                vc_r++;
+                                if (vc_r == 1) {
+                                    mean_r = src[j];
+                                } else {
+                                    price_t d = src[j] - mean_r;
+                                    mean_r += d / vc_r;
+                                    M2_r += d * (src[j] - mean_r);
+                                }
+                            }
+                        }
+                        valid_count = vc_r;
+                        mean = mean_r;
+                        M2 = M2_r;
+                    }
+                } else {
+                    mean = 0.0;
+                    M2 = 0.0;
+                    valid_count = 0;
                 }
             }
-            if (j == i) {
-                continue;
+        }
+        price_t entering = src[i];
+        if (!std::isnan(entering)) {
+            valid_count++;
+            if (valid_count == 1) {
+                mean = entering;
+                M2 = 0.0;
+            } else {
+                price_t delta = entering - mean;
+                mean += delta / valid_count;
+                M2 += delta * (entering - mean);
             }
-            ex -= src[j] - k;
-            ex2 -= pow_buf[j + n - start_pos];
-            price_t d = src[i] - k;
-            ex += d;
-            price_t d_pow = std::pow(d, 2);
-            pow_buf[i + n - start_pos] = d_pow;
-            ex2 += d_pow;
-            num = i - j;
-            if (num != 1) {
-                dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1));
-            }
+        }
+        if (i >= start_pos && valid_count > 1) {
+            dst[i] = std::sqrt(std::max(0.0, M2 / (valid_count - 1)));
         }
     }
 }
 
 void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    size_t start = _get_step_start(curPos, step, ind.discard());
-    size_t num = 0;
-    price_t ex = 0.0, ex2 = 0.0;
-    price_t k = ind[start];
-    for (size_t i = start; i <= curPos; i++) {
-        num++;
-        price_t d = ind[i] - k;
-        ex += d;
-        ex2 += std::pow(d, 2);
+    if (curPos + 1 < ind.discard() + step) {
+        return;
     }
-    _set(num <= 1 ? 0.0 : std::sqrt((ex2 - std::pow(ex, 2) / num) / (num - 1)), curPos);
+    size_t start = _get_step_start(curPos, step, ind.discard());
+    // 单趟 Welford（动态窗口左边界跳变，不用 remove，无重算需求）
+    size_t valid_count = 0;
+    price_t mean = 0.0;
+    price_t M2 = 0.0;
+    for (size_t i = start; i <= curPos; i++) {
+        if (!std::isnan(ind[i])) {
+            valid_count++;
+            if (valid_count == 1) {
+                mean = ind[i];
+                M2 = 0.0;
+            } else {
+                price_t delta = ind[i] - mean;
+                mean += delta / valid_count;
+                M2 += delta * (ind[i] - mean);
+            }
+        }
+    }
+    if (valid_count > 1) {
+        _set(std::sqrt(std::max(0.0, M2 / (valid_count - 1))), curPos);
+    }
 }
 
 Indicator HKU_API STDEV(int n) {
