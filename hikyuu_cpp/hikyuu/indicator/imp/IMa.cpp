@@ -59,20 +59,40 @@ void IMa::_calculate(const Indicator& indicator) {
         return;
     }
 
+    // Welford 滚动均值：状态 (valid_count, mean)，O(1) 出入队。
+    // 与 IStdev 共用相同的 valid_count 增减逻辑，保证 MA/STDEV 基于完全一致的样本集。
     size_t startPos = indicator.discard();
-    price_t sum = 0.0;
-    for (size_t i = startPos; i <= m_discard; ++i) {
-        if (!std::isnan(src[i])) {
-            sum += src[i];
+    size_t valid_count = 0;
+    price_t mean = 0.0;
+    for (size_t i = startPos; i < total; ++i) {
+        // 移除 leaving（窗口已满时）
+        if (i >= static_cast<size_t>(startPos) + static_cast<size_t>(n)) {
+            price_t leaving = src[i - n];
+            if (!std::isnan(leaving)) {
+                if (valid_count > 1) {
+                    price_t delta = leaving - mean;
+                    mean -= delta / (valid_count - 1);
+                } else {
+                    // valid_count == 1，移除后窗口归零
+                    mean = 0.0;
+                }
+                valid_count--;
+            }
         }
-    }
-
-    dst[m_discard] = sum / n;
-
-    for (size_t i = m_discard + 1; i < total; ++i) {
-        if (!std::isnan(src[i]) && !std::isnan(src[i - n])) {
-            sum = src[i] + sum - src[i - n];
-            dst[i] = sum / n;
+        // 加入 entering
+        price_t entering = src[i];
+        if (!std::isnan(entering)) {
+            valid_count++;
+            if (valid_count == 1) {
+                mean = entering;
+            } else {
+                price_t delta = entering - mean;
+                mean += delta / valid_count;
+            }
+        }
+        // 窗口未满或无有效值时不写输出（缓冲区已是 NaN）
+        if (i >= m_discard && valid_count > 0) {
+            dst[i] = mean;
         }
     }
 }
@@ -93,21 +113,36 @@ void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
     auto* dst = this->data();
 
     int n = getParam<int>("n");
-    HKU_ASSERT(startPos + 1 >= n);
+    HKU_ASSERT(startPos + 1 >= (size_t)n);
+    // 从窗口起点 startPos+1-n 单趟重建 Welford 均值状态，再滚动至 total
     size_t start = startPos + 1 - n;
-    value_t sum = 0.0;
-    for (size_t i = start; i <= startPos; ++i) {
-        if (!std::isnan(src[i])) {
-            sum += src[i];
+    size_t valid_count = 0;
+    price_t mean = 0.0;
+    for (size_t i = start; i < total; ++i) {
+        if (i > startPos) {
+            price_t leaving = src[i - n];
+            if (!std::isnan(leaving)) {
+                if (valid_count > 1) {
+                    price_t delta = leaving - mean;
+                    mean -= delta / (valid_count - 1);
+                } else {
+                    mean = 0.0;
+                }
+                valid_count--;
+            }
         }
-    }
-
-    dst[startPos] = sum / n;
-
-    for (size_t i = startPos + 1; i < total; ++i) {
-        if (!std::isnan(src[i]) && !std::isnan(src[i - n])) {
-            sum = src[i] + sum - src[i - n];
-            dst[i] = sum / n;
+        price_t entering = src[i];
+        if (!std::isnan(entering)) {
+            valid_count++;
+            if (valid_count == 1) {
+                mean = entering;
+            } else {
+                price_t delta = entering - mean;
+                mean += delta / valid_count;
+            }
+        }
+        if (i >= startPos && valid_count > 0) {
+            dst[i] = mean;
         }
     }
 }
@@ -117,11 +152,23 @@ void IMa::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     if (curPos + 1 < ind.discard() + step) {
         return;
     }
-    price_t sum = 0.0;
+    // 单趟 Welford 均值（动态窗口左边界跳变，不用 remove）
+    size_t valid_count = 0;
+    price_t mean = 0.0;
     for (size_t i = start; i <= curPos; i++) {
-        sum += ind[i];
+        if (!std::isnan(ind[i])) {
+            valid_count++;
+            if (valid_count == 1) {
+                mean = ind[i];
+            } else {
+                price_t delta = ind[i] - mean;
+                mean += delta / valid_count;
+            }
+        }
     }
-    _set(sum / (curPos - start + 1), curPos);
+    if (valid_count > 0) {
+        _set(mean, curPos);
+    }
 }
 
 Indicator HKU_API MA(int n) {
