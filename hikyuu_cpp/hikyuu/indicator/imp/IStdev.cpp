@@ -57,7 +57,7 @@ void IStdev::_calculate(const Indicator& data) {
                 }
             }
             if (valid_count > 1) {
-                dst[i] = std::sqrt(M2 / (valid_count - 1));
+                dst[i] = std::sqrt(std::max(0.0, M2 / (valid_count - 1)));
             }
         }
         return;
@@ -133,7 +133,7 @@ void IStdev::_calculate(const Indicator& data) {
         }
         // 窗口未满或有效值不足时不写输出（缓冲区已是 NaN）
         if (i >= m_discard && valid_count > 1) {
-            dst[i] = std::sqrt(M2 / (valid_count - 1));
+            dst[i] = std::sqrt(std::max(0.0, M2 / (valid_count - 1)));
         }
     }
 }
@@ -208,7 +208,7 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
             }
         }
         if (i >= start_pos && valid_count > 1) {
-            dst[i] = std::sqrt(M2 / (valid_count - 1));
+            dst[i] = std::sqrt(std::max(0.0, M2 / (valid_count - 1)));
         }
     }
 }
@@ -233,7 +233,7 @@ void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
         }
     }
     if (valid_count > 1) {
-        _set(std::sqrt(M2 / (valid_count - 1)), curPos);
+        _set(std::sqrt(std::max(0.0, M2 / (valid_count - 1))), curPos);
     }
 }
 

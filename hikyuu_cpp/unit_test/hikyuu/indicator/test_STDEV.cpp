@@ -331,4 +331,30 @@ TEST_CASE("test_STDEV_dyn_nan_equivalence") {
     }
 }
 
+/** @par 检测点：n=1 参数被拦截（样本标准差无定义，抛异常而非 Inf/崩溃） */
+TEST_CASE("test_STDEV_n1_rejected") {
+    PriceList d;
+    for (int i = 0; i < 5; ++i) {
+        d.push_back(i + 1);
+    }
+    Indicator ind = PRICELIST(d);
+    // n=1: 样本方差除以 N-1=0，_checkParam 拦截（HKU_ASSERT(n==0 || n>=2)）
+    CHECK_THROWS_AS(STDEV(ind, 1), std::exception);
+}
+
+/** @par 检测点：常数序列 Zero Variance（浮点噪声防御） */
+TEST_CASE("test_STDEV_zero_variance") {
+    PriceList d;
+    for (int i = 0; i < 5; ++i) {
+        d.push_back(3.14);
+    }
+    Indicator ind = PRICELIST(d);
+    Indicator dev = STDEV(ind, 3);
+    CHECK_EQ(dev.discard(), 2);
+    // 常数序列方差=0，浮点噪声可能让 M2 微负，max(0,...) 防御确保输出 0.0 而非 NaN
+    for (size_t i = dev.discard(); i < dev.size(); ++i) {
+        CHECK_EQ(dev[i], doctest::Approx(0.0).epsilon(0.0001));
+    }
+}
+
 /** @} */
