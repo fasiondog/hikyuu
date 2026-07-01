@@ -412,10 +412,9 @@ TEST_CASE("test_MA_dyn_nan_equivalence") {
     Indicator expect = MA(ind, 4);
     Indicator result = MA(ind, CVAL(ind, 4));
     CHECK_EQ(expect.size(), result.size());
-    // _dyn 路径的 discard 由 updateDiscard 自动检测，与静态 m_discard 可能不同
-    // 只验证两者 common discard 之后的位置值一致
-    size_t common_discard = std::max(expect.discard(), result.discard());
-    for (size_t i = common_discard; i < result.size(); ++i) {
+    // _dyn 路径 discard 与静态一致（均有窗口未满 guard）
+    CHECK_EQ(expect.discard(), result.discard());
+    for (size_t i = 0; i < result.size(); ++i) {
         if (std::isnan(expect[i])) {
             CHECK_UNARY(std::isnan(result[i]));
         } else {

@@ -148,10 +148,10 @@ void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
 }
 
 void IMa::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    size_t start = _get_step_start(curPos, step, ind.discard());
     if (curPos + 1 < ind.discard() + step) {
         return;
     }
+    size_t start = _get_step_start(curPos, step, ind.discard());
     // 单趟 Welford 均值（动态窗口左边界跳变，不用 remove）
     size_t valid_count = 0;
     price_t mean = 0.0;

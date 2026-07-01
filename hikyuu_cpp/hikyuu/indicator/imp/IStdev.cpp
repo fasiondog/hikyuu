@@ -214,6 +214,9 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    if (curPos + 1 < ind.discard() + step) {
+        return;
+    }
     size_t start = _get_step_start(curPos, step, ind.discard());
     // 单趟 Welford（动态窗口左边界跳变，不用 remove，无重算需求）
     size_t valid_count = 0;
