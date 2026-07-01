@@ -197,6 +197,35 @@ TEST_CASE("test_SUMBARS_dyn") {
     }
 }
 
+/** @par 检测点 */
+TEST_CASE("test_SUMBARS_with_cval_dyn_param") {
+    // 原始触发场景: CVAL 嵌套作 SUMBARS 动态参数.
+    // 修复前: CVAL(one, 10) 中 one=CVAL(10) → 走 Indicator::operator() → alike true
+    //   → 短路返回未计算的空壳(size==0) → SUMBARS 抛
+    //   HKU_CHECK(ind_param.size()==ind.size()) 异常.
+    // 修复后: 复用 ind, CVAL(one,10).size()==1, SUMBARS 正常计算.
+
+    Indicator one = CVAL(10);
+    CHECK_EQ(one.size(), 1);
+    CHECK_EQ(one[0], 10);
+
+    Indicator seq = CVAL(one, 10);
+    CHECK_EQ(seq.size(), one.size());  // 修复前 0
+    CHECK_EQ(seq[0], 10);
+
+    // 可达: ind[0]=10 >= a[0]=10, 首根即满足, 距离 0
+    Indicator r = SUMBARS(one, seq);
+    CHECK_EQ(r.size(), 1);
+    CHECK_EQ(r[0], 0);
+
+    // 不可达: 10 < 20
+    Indicator seq2 = CVAL(one, 20);
+    CHECK_EQ(seq2.size(), one.size());
+    Indicator r2 = SUMBARS(one, seq2);
+    CHECK_EQ(r2.size(), 1);
+    CHECK_UNARY(std::isnan(r2[0]));
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

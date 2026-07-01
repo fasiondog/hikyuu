@@ -968,4 +968,30 @@ TEST_CASE("test_combineCalculateIndicators") {
     check_indicator(result[1], CLOSE(kdata));
 }
 
+/** @par 检测点 */
+TEST_CASE("test_Indicator_operator_alike_non_cval") {
+    // 验证 Indicator::operator() 中 alike 短路修复对非 CVAL 算子同样生效.
+    // PRICELIST 同型同参 leaf, 基类 alike 走 leaf size/data 比较(非 ICval 的 selfAlike)
+    // 两个相同 PRICELIST 嵌套 → alike true → 修复后 return ind(复用入参)
+
+    PriceList d;
+    for (int i = 0; i < 5; i++) {
+        d.push_back(i + 1);  // [1,2,3,4,5]
+    }
+    Indicator pl1 = PRICELIST(d);
+    Indicator pl2 = PRICELIST(d);
+    CHECK_EQ(pl1.size(), 5);
+    CHECK_EQ(pl2.size(), 5);
+    CHECK_NE(pl1.getImp().get(), pl2.getImp().get());  // 两个独立实例
+
+    // pl1(pl2): pl1 作算子, pl2 作被操作数, 两者 alike true → return pl2
+    Indicator result = pl1(pl2);
+    CHECK_EQ(result.size(), pl2.size());
+    for (size_t i = 0; i < pl2.size(); ++i) {
+        CHECK_EQ(result[i], pl2[i]);
+    }
+    // 白盒断言: 复用 pl2(非克隆 pl1)
+    CHECK_EQ(result.getImp().get(), pl2.getImp().get());
+}
+
 /** @} */
