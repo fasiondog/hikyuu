@@ -1063,7 +1063,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     axes.set_ylabel('年份')
 
 
-def tm_year_profit(tm, start_date, end_date=None, axes=None):
+def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=False):
     """
     绘制账户各年度收益柱状图
 
@@ -1071,6 +1071,7 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None):
     :param start_date: 开始日期
     :param end_date: 结束日期，默认为今天
     :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :param show_high_low: 是否显示年度最高收益和最低收益，默认为False
     :return: None
     """
     if axes is None:
@@ -1095,24 +1096,66 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None):
 
     data['year'] = data['date'].apply(lambda v: v.year)
 
-    yearly = data.groupby('year').last()['value'].reset_index()
+    yearly = data.groupby('year').agg(
+        last_value=('value', 'last'),
+        max_value=('value', 'max'),
+        min_value=('value', 'min')
+    ).reset_index()
     yearly_first = data.groupby('year').first()['value'].reset_index()
 
     if len(yearly) < 1:
         hku_warn("年度数据不足！")
         return
 
-    yearly['return'] = ((yearly['value'] - yearly['value'].shift(1)) / yearly['value'].shift(1)) * 100.
-    yearly.loc[0, 'return'] = ((yearly.loc[0, 'value'] - yearly_first.loc[0, 'value']) /
+    yearly['return'] = ((yearly['last_value'] - yearly['last_value'].shift(1)) /
+                        yearly['last_value'].shift(1)) * 100.
+    yearly.loc[0, 'return'] = ((yearly.loc[0, 'last_value'] - yearly_first.loc[0, 'value']) /
                                yearly_first.loc[0, 'value']) * 100.
 
-    colors = ['green' if x < 0 else 'red' for x in yearly['return']]
-    bars = axes.bar(yearly['year'].astype(str), yearly['return'], color=colors)
+    yearly['prev_last'] = yearly['last_value'].shift(1)
+    yearly['max_return'] = ((yearly['max_value'] - yearly['prev_last']) / yearly['prev_last']) * 100.
+    yearly['min_return'] = ((yearly['min_value'] - yearly['prev_last']) / yearly['prev_last']) * 100.
+    yearly.loc[0, 'max_return'] = ((yearly.loc[0, 'max_value'] - yearly_first.loc[0, 'value']) /
+                                   yearly_first.loc[0, 'value']) * 100.
+    yearly.loc[0, 'min_return'] = ((yearly.loc[0, 'min_value'] - yearly_first.loc[0, 'value']) /
+                                   yearly_first.loc[0, 'value']) * 100.
 
-    for bar in bars:
-        height = bar.get_height()
-        axes.text(bar.get_x() + bar.get_width() / 2., height,
-                  f'{height:.2f}%', ha='center', va='bottom')
+    years = yearly['year'].astype(str)
+    returns = yearly['return']
+    max_returns = yearly['max_return']
+    min_returns = yearly['min_return']
+
+    bar_width = 0.8
+    x_pos = range(len(years))
+
+    for i, (ret, max_ret, min_ret) in enumerate(zip(returns, max_returns, min_returns)):
+        base_color = '#FF4444' if ret >= 0 else '#44FF44'
+        max_color = '#FFAAAA' if ret >= 0 else '#AAFFAA'
+        min_color = '#CC0000' if ret >= 0 else '#00CC00'
+
+        if show_high_low:
+            if max_ret > ret:
+                axes.bar(x_pos[i], max_ret - ret, bottom=ret, width=bar_width,
+                         color=max_color, alpha=0.4, label='最高收益范围' if i == 0 else "")
+            if min_ret < ret:
+                axes.bar(x_pos[i], ret - min_ret, bottom=min_ret, width=bar_width,
+                         color=min_color, alpha=0.7, label='最低收益范围' if i == 0 else "")
+
+        axes.bar(x_pos[i], ret, width=bar_width, color=base_color, alpha=0.9)
+
+        if show_high_low:
+            axes.text(x_pos[i], max(ret, max_ret) + (max(ret, max_ret) - min(ret, min_ret)) * 0.05,
+                      f'{ret:.2f}%\n↑{max_ret:.2f} ↓{min_ret:.2f}',
+                      ha='center', va='bottom', fontsize=9)
+        else:
+            axes.text(x_pos[i], ret + (ret if ret >= 0 else -ret) * 0.05,
+                      f'{ret:.2f}%', ha='center', va='bottom', fontsize=9)
+
+    axes.set_xticks(x_pos)
+    axes.set_xticklabels(years)
+
+    if show_high_low:
+        axes.legend()
 
     axes.set_title('年度收益率(%)柱状图')
     axes.set_xlabel('年份')
