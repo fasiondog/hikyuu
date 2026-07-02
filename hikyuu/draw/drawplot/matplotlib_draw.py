@@ -1066,7 +1066,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     axes.set_ylabel('年份')
 
 
-def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=False):
+def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True):
     """
     绘制账户各年度收益柱状图
 
