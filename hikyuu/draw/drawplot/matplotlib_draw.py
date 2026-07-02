@@ -891,6 +891,9 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     # 计算最大回撤百分比
     max_pullback = MDD(funds)[-1]
 
+    # 计算当前点到历史最高点的回撤百分比
+    mdd_current = MDD_CURRENT(funds)[-1]
+
     # 计算 sharp
     bond = ZHBOND10(ref_dates)
     sigma = STDEV(ROCP(funds), 0)  # n=0: 全期样本标准差（expand-all）
@@ -901,8 +904,8 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     cur_fund = per['当前总资产']
     t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
-    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
-        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback)
+    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%    当前距历史最高点回撤: {:<.2f}%'.format(
+        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback, mdd_current)
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
         per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
 
