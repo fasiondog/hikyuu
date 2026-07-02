@@ -129,10 +129,15 @@ Indicator Indicator::operator()(const Indicator& ind) {
         return p->calculate();
     }
 
-    IndicatorImpPtr p = m_imp->clone();
+    // AST 节点裁剪: 算子(m_imp)与被操作数(ind)语义等价时, 复用已计算的 ind
+    // (持有合法 buffer), 而非返回 m_imp 的克隆空壳(m_imp 若未 calculate 则 size==0).
+    // 注: 复用 ind 使返回值与 ind 共享底层节点, 依赖 hikyuu 不可变参数语义
+    // (alike 已校验 m_params 相同, setParam 触发原地重算, 共享安全).
     if (m_imp->alike(*ind.getImp())) {
-        return Indicator(p);
+        return ind;
     }
+
+    IndicatorImpPtr p = m_imp->clone();
     p->add(IndicatorImp::OP, IndicatorImpPtr(), ind.getImp());
     return p->calculate();
 }
