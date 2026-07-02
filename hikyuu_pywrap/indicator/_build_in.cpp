@@ -2203,6 +2203,15 @@ void export_Indicator_build_in(py::module& m) {
     :param int n: 时间窗口
     :rtype: Indicator)");
 
+    m.def("MDD_CURRENT", py::overload_cast<>(&MDD_CURRENT));
+    m.def("MDD_CURRENT", py::overload_cast<const Indicator&>(&MDD_CURRENT), py::arg("data"),
+          R"(MDD_CURRENT([data])
+    
+    当前点到历史最高点的回撤百分比，按行业惯例为正值
+    
+    :param Indicator data: 输入数据
+    :rtype: Indicator)");
+
     m.def("MRR", py::overload_cast<int>(&MRR), py::arg("n") = 0);
     m.def("MRR", py::overload_cast<const Indicator&, int>(&MRR), py::arg("data"), py::arg("n"),
           R"(MRR([data])

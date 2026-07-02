@@ -1345,6 +1345,18 @@
     最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
 
 
+.. py:function:: MDD_CURRENT([data])
+
+    当前点到历史最高点的回撤百分比，按行业惯例为正值
+    
+    计算公式：(历史最高点 - 当前值) / 历史最高点 * 100%
+    
+    与 MDD 的区别：MDD 计算的是到指定窗口内最高点的回撤，而 MDD_CURRENT 计算的是到从序列起始点到当前点的历史最高点的回撤，不设时间窗口限制。
+    
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: MIN(ind1, ind2)
 
     求最小值, MIN(A,B)返回A和B中的较小值。

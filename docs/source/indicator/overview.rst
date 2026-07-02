@@ -172,6 +172,8 @@
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
 * :py:func:`MA`  - 简单移动平均数
 * :py:func:`MACD` - 平滑异同移动平均线
+* :py:func:`MDD` - 最大回撤百分比
+* :py:func:`MDD_CURRENT` - 当前点到历史最高点的回撤百分比
 * :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
