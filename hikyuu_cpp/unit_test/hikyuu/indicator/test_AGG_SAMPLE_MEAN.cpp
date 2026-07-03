@@ -30,7 +30,7 @@ TEST_CASE("test_AGG_SAMPLE_MEAN") {
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
     /** @arg 测试默认参数（9:30-10:00时间段平均值） */
-    auto ind = AGG_SAMPLE_MEAN(CLOSE(), KQuery::MIN);
+    auto ind = AGG_SAMPLE_MEAN(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MEAN");
@@ -60,7 +60,7 @@ TEST_CASE("test_AGG_SAMPLE_MEAN_time_range") {
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
     /** @arg 测试指定时间段参数（10:00-11:00） */
-    auto ind = AGG_SAMPLE_MEAN(CLOSE(), KQuery::MIN, "10:00", "11:00");
+    auto ind = AGG_SAMPLE_MEAN(CLOSE(), "10:00", "11:00");
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MEAN");

@@ -30,7 +30,7 @@ TEST_CASE("test_AGG_SAMPLE_MIN") {
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
     /** @arg 测试默认参数（9:30-10:00时间段最小值） */
-    auto ind = AGG_SAMPLE_MIN(CLOSE(), KQuery::MIN);
+    auto ind = AGG_SAMPLE_MIN(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MIN");
@@ -59,7 +59,7 @@ TEST_CASE("test_AGG_SAMPLE_MIN_time_range") {
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
     /** @arg 测试指定时间段参数（10:00-11:00） */
-    auto ind = AGG_SAMPLE_MIN(CLOSE(), KQuery::MIN, "10:00", "11:00");
+    auto ind = AGG_SAMPLE_MIN(CLOSE(), "10:00", "11:00");
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MIN");

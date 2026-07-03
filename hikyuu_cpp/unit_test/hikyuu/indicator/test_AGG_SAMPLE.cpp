@@ -30,7 +30,7 @@ TEST_CASE("test_AGG_SAMPLE") {
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
     /** @arg 测试默认参数（9:35采样） */
-    auto ind = AGG_SAMPLE(CLOSE(), KQuery::MIN);
+    auto ind = AGG_SAMPLE(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE");
@@ -50,7 +50,7 @@ TEST_CASE("test_AGG_SAMPLE") {
     CHECK_EQ(result[0], doctest::Approx(expected_value));
 
     /** @arg 测试指定时间参数（10:30采样） */
-    ind = AGG_SAMPLE(CLOSE(), KQuery::MIN, "10:30");
+    ind = AGG_SAMPLE(CLOSE(), "10:30");
     result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE");
@@ -77,9 +77,9 @@ TEST_CASE("test_AGG_SAMPLE_time_parameter") {
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
     /** @arg 测试不同时间点采样 */
-    auto ind935 = AGG_SAMPLE(CLOSE(), KQuery::MIN, "9:35");
-    auto ind1000 = AGG_SAMPLE(CLOSE(), KQuery::MIN, "10:00");
-    auto ind1130 = AGG_SAMPLE(CLOSE(), KQuery::MIN, "11:30");
+    auto ind935 = AGG_SAMPLE(CLOSE(), "9:35");
+    auto ind1000 = AGG_SAMPLE(CLOSE(), "10:00");
+    auto ind1130 = AGG_SAMPLE(CLOSE(), "11:30");
 
     auto result935 = ind935(k);
     auto result1000 = ind1000(k);
