@@ -336,6 +336,69 @@ void export_extend_Indicator(py::module& m) {
     :return: 指标数据
     :rtype: Indicator)");
 
+    m.def(
+      "AGG_SAMPLE_MAX",
+      py::overload_cast<const Indicator&, const KQuery::KType&, const string&, const string&, bool,
+                        int>(&AGG_SAMPLE_MAX),
+      py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("start_time") = "9:30",
+      py::arg("last_time") = "10:00", py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_SAMPLE_MAX(ind[, ktype=Query.MIN, start_time="9:30", last_time="10:00", fill_null=False, unit=1])
+
+    时间段最大值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最大值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
+    m.def(
+      "AGG_SAMPLE_MIN",
+      py::overload_cast<const Indicator&, const KQuery::KType&, const string&, const string&, bool,
+                        int>(&AGG_SAMPLE_MIN),
+      py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("start_time") = "9:30",
+      py::arg("last_time") = "10:00", py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_SAMPLE_MIN(ind[, ktype=Query.MIN, start_time="9:30", last_time="10:00", fill_null=False, unit=1])
+
+    时间段最小值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最小值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
+    m.def(
+      "AGG_SAMPLE_MEAN",
+      py::overload_cast<const Indicator&, const KQuery::KType&, const string&, const string&, bool,
+                        int>(&AGG_SAMPLE_MEAN),
+      py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("start_time") = "9:30",
+      py::arg("last_time") = "10:00", py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_SAMPLE_MEAN(ind[, ktype=Query.MIN, start_time="9:30", last_time="10:00", fill_null=False, unit=1])
+
+    时间段平均值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的平均值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
     m.def("AGG_STD",
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_STD),
           py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,

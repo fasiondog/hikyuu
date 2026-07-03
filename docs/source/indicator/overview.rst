@@ -217,6 +217,9 @@
 * :py:func:`AGG_MEDIAN` - 聚合函数: 中位数
 * :py:func:`AGG_PROD` - 聚合函数: 乘积
 * :py:func:`AGG_SAMPLE` - 聚合函数: 时间采样（在指定时间点对指标数据进行采样）
+* :py:func:`AGG_SAMPLE_MAX` - 聚合函数: 时间段最大值（在指定时间段内统计指标数据的最大值）
+* :py:func:`AGG_SAMPLE_MIN` - 聚合函数: 时间段最小值（在指定时间段内统计指标数据的最小值）
+* :py:func:`AGG_SAMPLE_MEAN` - 聚合函数: 时间段平均值（在指定时间段内统计指标数据的平均值）
 * :py:func:`AGG_SUM` - 聚合函数: 总和
 * :py:func:`AGG_STD` - 聚合函数: 标准差
 * :py:func:`AGG_VAR` - 聚合函数: 方差

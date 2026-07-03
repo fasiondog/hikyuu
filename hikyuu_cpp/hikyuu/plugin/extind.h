@@ -239,6 +239,63 @@ AGG_FUNC_DEFINE(AGG_PROD)
 Indicator HKU_API AGG_SAMPLE(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
                              const string& time = "9:35", bool fill_null = false, int unit = 1);
 
+/**
+ * @brief 时间段最大值聚合指标
+ *
+ * 在指定时间段 [start_time, last_time] 内统计指标数据的最大值，
+ * 包含 start_time 和 last_time 本身。
+ *
+ * @param ind 输入指标
+ * @param ktype 指定K线周期
+ * @param start_time 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+ * @param last_time 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+ * @param fill_null 是否填充null数据
+ * @param unit 聚合周期单位
+ * @return Indicator
+ */
+Indicator HKU_API AGG_SAMPLE_MAX(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
+                                 const string& start_time = "9:30",
+                                 const string& last_time = "10:00", bool fill_null = false,
+                                 int unit = 1);
+
+/**
+ * @brief 时间段最小值聚合指标
+ *
+ * 在指定时间段 [start_time, last_time] 内统计指标数据的最小值，
+ * 包含 start_time 和 last_time 本身。
+ *
+ * @param ind 输入指标
+ * @param ktype 指定K线周期
+ * @param start_time 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+ * @param last_time 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+ * @param fill_null 是否填充null数据
+ * @param unit 聚合周期单位
+ * @return Indicator
+ */
+Indicator HKU_API AGG_SAMPLE_MIN(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
+                                 const string& start_time = "9:30",
+                                 const string& last_time = "10:00", bool fill_null = false,
+                                 int unit = 1);
+
+/**
+ * @brief 时间段平均值聚合指标
+ *
+ * 在指定时间段 [start_time, last_time] 内统计指标数据的平均值，
+ * 包含 start_time 和 last_time 本身。
+ *
+ * @param ind 输入指标
+ * @param ktype 指定K线周期
+ * @param start_time 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+ * @param last_time 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+ * @param fill_null 是否填充null数据
+ * @param unit 聚合周期单位
+ * @return Indicator
+ */
+Indicator HKU_API AGG_SAMPLE_MEAN(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
+                                  const string& start_time = "9:30",
+                                  const string& last_time = "10:00", bool fill_null = false,
+                                  int unit = 1);
+
 Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
                           bool fill_null = false, int unit = 1, int ddof = 1);
 Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
