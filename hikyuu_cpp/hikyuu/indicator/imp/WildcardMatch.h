@@ -27,7 +27,7 @@ inline void utf8_to_unicode(const std::string& utf8_str, std::vector<int32_t>& o
     while (len > 0) {
         int32_t codepoint;
         size_t bytes = utf8proc_iterate(ptr, len, &codepoint);
-        if (bytes <= 0) {
+        if (bytes == 0) {
             break;
         }
         out.push_back(codepoint);
