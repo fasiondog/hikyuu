@@ -228,6 +228,16 @@ void export_Strategy(py::module& m) {
       .def("get_current_price", &Strategy::getCurrentPrice, py::arg("stk"), py::arg("ktype"),
            "获取当前价格，无效时返回 constant.null_price")
 
+      .def("get_price_by_time", &Strategy::getPriceByTime, py::arg("stk"), py::arg("time"),
+           py::arg("ktype") = KQuery::MIN,
+           R"(get_price_by_time(self, stk, time, ktype)
+
+    获取当日指定时间点的价格
+    :param Stock stk: 股票对象
+    :param TimeDelta time: 指定时间
+    :param KQuery.KType ktype: K线类型，默认为分钟线
+    :return: 价格，无效时返回 constant.null_price)")
+
       .def("get_kdata", &Strategy::getKData, py::arg("stk"), py::arg("start_date"),
            py::arg("end_date"), py::arg("ktype"), py::arg("recover_type") = KQuery::NO_RECOVER,
            R"(get_kdata(self, stk, start_date, end_date, ktype, recover_type)

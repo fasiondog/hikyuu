@@ -123,6 +123,16 @@ public:
     // 获取当前价格，无效返回 Null<price_t>()
     price_t getCurrentPrice(const Stock& stk, const KQuery::KType& ktype) const;
 
+    /**
+     * @brief 获取当日指定时间点的价格
+     * @param stk 股票对象
+     * @param time 指定时间
+     * @param ktype K线类型，默认为分钟线
+     * @return 价格，无效时返回 Null<price_t>()
+     */
+    price_t getPriceByTime(const Stock& stk, const TimeDelta& time,
+                           const KQuery::KType& ktype = KQuery::MIN) const;
+
     KData getLastKData(const Stock& stk, const Datetime& start_date, const KQuery::KType& ktype,
                        KQuery::RecoverType recover_type = KQuery::NO_RECOVER) const {
         return getKData(stk, start_date, Null<Datetime>(), ktype, recover_type);
