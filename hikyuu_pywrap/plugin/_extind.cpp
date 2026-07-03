@@ -317,6 +317,25 @@ void export_extend_Indicator(py::module& m) {
     PY_AGG_IND_DEFINE(AGG_MEDIAN, "聚合函数: 中位数, 可参考 AGG_STD 帮助")
     PY_AGG_IND_DEFINE(AGG_PROD, "聚合函数: 乘积, 可参考 AGG_STD 帮助")
 
+    m.def("AGG_SAMPLE",
+          py::overload_cast<const Indicator&, const KQuery::KType&, const string&, bool, int>(
+            &AGG_SAMPLE),
+          py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("time") = "9:35",
+          py::arg("fill_null") = false, py::arg("unit") = 1,
+          R"(AGG_SAMPLE(ind[, ktype=Query.MIN, time="9:35", fill_null=False, unit=1])
+
+    时间采样聚合指标，在指定时间点对指标数据进行采样。
+
+    如果找不到精确匹配的时间，会选择最接近目标时间之前的有效数据。
+
+    :param Indicator ind: 输入指标
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param str time: 指定采样时间，格式为 HH:MM，默认为 "9:35"
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
     m.def("AGG_STD",
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_STD),
           py::arg("ind"), py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false,

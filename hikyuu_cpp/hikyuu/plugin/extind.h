@@ -223,6 +223,22 @@ AGG_FUNC_DEFINE(AGG_MAD)
 AGG_FUNC_DEFINE(AGG_MEDIAN)
 AGG_FUNC_DEFINE(AGG_PROD)
 
+/**
+ * @brief 时间采样聚合指标
+ *
+ * 在指定时间点对指标数据进行采样。如果找不到精确匹配的时间，
+ * 会选择最接近目标时间之前的有效数据。
+ *
+ * @param ind 输入指标
+ * @param ktype 指定K线周期
+ * @param time 指定采样时间，格式为 HH:MM，默认为 "9:35"
+ * @param fill_null 是否填充null数据
+ * @param unit 聚合周期单位
+ * @return Indicator
+ */
+Indicator HKU_API AGG_SAMPLE(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
+                             const string& time = "9:35", bool fill_null = false, int unit = 1);
+
 Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,
                           bool fill_null = false, int unit = 1, int ddof = 1);
 Indicator HKU_API AGG_VAR(const Indicator& ind, const KQuery::KType& ktype = KQuery::MIN,

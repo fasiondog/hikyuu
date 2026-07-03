@@ -216,6 +216,7 @@
 * :py:func:`AGG_MEAN` - 聚合函数: 平均值
 * :py:func:`AGG_MEDIAN` - 聚合函数: 中位数
 * :py:func:`AGG_PROD` - 聚合函数: 乘积
+* :py:func:`AGG_SAMPLE` - 聚合函数: 时间采样（在指定时间点对指标数据进行采样）
 * :py:func:`AGG_SUM` - 聚合函数: 总和
 * :py:func:`AGG_STD` - 聚合函数: 标准差
 * :py:func:`AGG_VAR` - 聚合函数: 方差
