@@ -379,7 +379,12 @@ price_t Strategy::getPriceByTime(const Stock& stk, const TimeDelta& time,
                                  const KQuery::KType& ktype) const {
     Datetime start = today() + time;
     Datetime end = start + time;
-    HKU_IF_RETURN(end > now(), Null<price_t>());
+    if ((now() - today()) != TimeDelta()) {
+        // 非日线级别如分钟线，尝试获取当前时间之后的价格，强制限定为当前时间
+        if (end > now()) {
+            end = now();
+        }
+    }
     end = end + Seconds(KQuery::getKTypeInSeconds(ktype));
     KData k = stk.getKData(KQueryByDate(start, end, ktype));
     return k.empty() ? Null<price_t>() : k.back().closePrice;
