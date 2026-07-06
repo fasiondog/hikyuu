@@ -984,7 +984,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     if axes is None:
         axes = create_figure()
 
-    if end_date is None:
+    if end_date is None or end_date == Datetime():
         end_date = Datetime.today() + Days(1)
 
     dates = get_date_range(start_date, end_date)
@@ -1080,7 +1080,7 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
     if axes is None:
         axes = create_figure()
 
-    if end_date is None:
+    if end_date is None or end_date == Datetime():
         end_date = Datetime.today() + Days(1)
 
     dates = get_date_range(start_date, end_date)
