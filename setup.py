@@ -407,6 +407,8 @@ def upload():
     if not os.path.lexists('dist'):
         print("Not found wheel package! Pleae wheel first")
         return
+    if os.path.lexists('dist/.DS_Store'):
+        os.remove('dist/.DS_Store')
     print("current wheel:")
     for bdist in os.listdir('dist'):
         print(bdist)

@@ -20,11 +20,6 @@ namespace hku {
  * 两条线交叉, CROSS(A，B)　表示当A从下方向上穿过B时返回1，否则返回0。
  * @ingroup Indicator
  */
-Indicator CROSS(const Indicator& x, const Indicator& y);
-Indicator CROSS(const Indicator& x, Indicator::value_t);
-Indicator CROSS(Indicator::value_t, const Indicator& y);
-Indicator CROSS(Indicator::value_t, Indicator::value_t);
-
 inline Indicator CROSS(const Indicator& x, const Indicator& y) {
     Indicator result = (REF(x, 1) < REF(y, 1)) & (x > y);
     result.name("CROSS");

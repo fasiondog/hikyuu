@@ -93,6 +93,59 @@ TEST_CASE("test_CVAL") {
     }
 }
 
+/** @par 检测点 */
+TEST_CASE("test_CVAL_nested_size_propagation") {
+    // 修复前: CVAL(one, 10) 中 one=CVAL(10) → 走 Indicator::operator()
+    //   alike(新空壳 ICval, 已计算 CVAL10) 为 true → 短路返回 m_imp 的克隆空壳
+    //   (m_imp 未 calculate, size==0) → 违反 CVAL.h "其长度和输入的ind相同" 契约
+    // 修复后: 复用已计算的 ind, size 正确传播
+
+    Indicator one = CVAL(10);
+    CHECK_EQ(one.size(), 1);
+    CHECK_EQ(one[0], 10);
+    CHECK_EQ(one.discard(), 0);
+
+    // alike==true 嵌套(值相同) → 触发修复后的 return ind
+    Indicator two = CVAL(one, 10);
+    CHECK_EQ(two.size(), one.size());  // 修复前 0, 修复后 1
+    CHECK_EQ(two.discard(), one.discard());
+    CHECK_EQ(two[0], 10);
+    // 白盒断言: 验证走的是 return ind 路径(指针复用), 而非克隆空壳
+    CHECK_EQ(two.getImp().get(), one.getImp().get());
+
+    // alike==false 嵌套(值不同 5!=10) → 走正常分支 B(clone + calculate)
+    Indicator three = CVAL(two, 5);
+    CHECK_EQ(three.size(), 1);
+    CHECK_EQ(three.discard(), 0);
+    CHECK_EQ(three[0], 5);
+    // 白盒断言: 验证未走短路分支(独立克隆)
+    CHECK_NE(three.getImp().get(), two.getImp().get());
+}
+
+/** @par 检测点 */
+TEST_CASE("test_CVAL_nested_state_sharing") {
+    // 修复使 alike==true 时返回 ind(共享底层节点), 而非 m_imp 的独立克隆.
+    // 这是修复引入的语义变更: 返回值与 ind 共享同一 IndicatorImp.
+    // hikyuu 不可变参数语义下, alike 已校验 m_params 相同,
+    // setParam 触发原地重算(不立即改 buffer), 共享安全.
+    // 本用例固化该共享行为为预期不变式.
+
+    Indicator base = CVAL(100);
+    CHECK_EQ(base.size(), 1);
+    CHECK_EQ(base[0], 100);
+
+    // 自嵌套: base.operator()(base) → alike(this==other) true → return ind(即 base)
+    Indicator result = base(base);
+    CHECK_EQ(result.size(), base.size());
+    // 指针完全相同: AST 裁剪直接复用入参
+    CHECK_EQ(result.getImp().get(), base.getImp().get());
+
+    // 状态共享立案: 修改 result 的参数同步影响 base(共享同一 imp)
+    result.setParam<double>("value", 999.0);
+    CHECK_EQ(base.getParam<double>("value"), 999.0);
+    CHECK_EQ(result.getParam<double>("value"), 999.0);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

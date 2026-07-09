@@ -89,6 +89,7 @@
 #include "crt/NAMELIKE.h"
 #include "crt/MAX.h"
 #include "crt/MDD.h"
+#include "crt/MDD_CURRENT.h"
 #include "crt/MIN.h"
 #include "crt/MOD.h"
 #include "crt/MRR.h"

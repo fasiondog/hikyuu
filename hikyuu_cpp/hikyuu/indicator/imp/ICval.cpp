@@ -63,6 +63,11 @@ void ICval::_calculate(const Indicator& data) {
         }
 
         _readyBuffer(total, 1);
+        auto* dst = this->data(0);
+        for (size_t i = 0; i < total; ++i) {
+            dst[i] = value;
+        }
+        return;
 
     } else {
         // 非叶子节点

@@ -121,7 +121,7 @@
 * :py:func:`ROUNDDOWN` - 向下截取，如10.1截取后为10
 * :py:func:`SIN` - 正弦值
 * :py:func:`SGN` - 求符号值
-* :py:func:`SLOPE` - 计算线性回归斜率
+* :py:func:`SLOPE` - 计算线性回归斜率、拟合优度R²和相对最大残差
 * :py:func:`SQRT` - 开平方
 * :py:func:`TAN` - 正切值
 
@@ -172,6 +172,8 @@
 * :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
 * :py:func:`MA`  - 简单移动平均数
 * :py:func:`MACD` - 平滑异同移动平均线
+* :py:func:`MDD` - 最大回撤百分比
+* :py:func:`MDD_CURRENT` - 当前点到历史最高点的回撤百分比
 * :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
@@ -214,6 +216,10 @@
 * :py:func:`AGG_MEAN` - 聚合函数: 平均值
 * :py:func:`AGG_MEDIAN` - 聚合函数: 中位数
 * :py:func:`AGG_PROD` - 聚合函数: 乘积
+* :py:func:`AGG_SAMPLE` - 聚合函数: 时间采样（在指定时间点对指标数据进行采样）
+* :py:func:`AGG_SAMPLE_MAX` - 聚合函数: 时间段最大值（在指定时间段内统计指标数据的最大值）
+* :py:func:`AGG_SAMPLE_MIN` - 聚合函数: 时间段最小值（在指定时间段内统计指标数据的最小值）
+* :py:func:`AGG_SAMPLE_MEAN` - 聚合函数: 时间段平均值（在指定时间段内统计指标数据的平均值）
 * :py:func:`AGG_SUM` - 聚合函数: 总和
 * :py:func:`AGG_STD` - 聚合函数: 标准差
 * :py:func:`AGG_VAR` - 聚合函数: 方差

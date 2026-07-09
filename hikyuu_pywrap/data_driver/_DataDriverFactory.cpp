@@ -7,6 +7,8 @@
 
 #include <hikyuu/data_driver/DataDriverFactory.h>
 #include "_BlockInfoDriver.h"
+#include "_BaseInfoDriver.h"
+#include "_KDataDriver.h"
 
 using namespace hku;
 namespace py = pybind11;
@@ -20,13 +22,13 @@ void export_DataDriverFactory(py::module& m) {
       .def_static("getBlockDriver", &DataDriverFactory::getBlockDriver)
       .def_static("removeBlockDriver", &DataDriverFactory::removeBlockDriver)
 
-      // .def_static("regBaseInfoDriver",
-      //             [](py::object pydriver) {
-      //                 auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
-      //                 auto ptr = pydriver.cast<PyBaseInfoDriver*>();
-      //                 auto driver = BaseInfoDriverPtr(keep_python_state_alive, ptr);
-      //                 DataDriverFactory::regBaseInfoDriver(driver);
-      //             })
+      .def_static("regBaseInfoDriver",
+                  [](py::object pydriver) {
+                      auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+                      auto ptr = pydriver.cast<PyBaseInfoDriver*>();
+                      auto driver = BaseInfoDriverPtr(keep_python_state_alive, ptr);
+                      DataDriverFactory::regBaseInfoDriver(driver);
+                  })
 
       .def_static("regBlockDriver",
                   [](py::object pydriver) {
@@ -36,13 +38,15 @@ void export_DataDriverFactory(py::module& m) {
                       DataDriverFactory::regBlockDriver(driver);
                   })
 
-      // .def_static("regKDataDriver",
-      //             [](py::object pydriver) {
-      //                 auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
-      //                 auto ptr = pydriver.cast<PyKDataDriver*>();
-      //                 auto driver = KDataDriverPtr(keep_python_state_alive, ptr);
-      //                 DataDriverFactory::regKDataDriver(driver);
-      //             })
+      .def_static("regKDataDriver",
+                  [](py::object pydriver) {
+                      auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+                      auto ptr = pydriver.cast<PyKDataDriver*>();
+                      auto driver = KDataDriverPtr(keep_python_state_alive, ptr);
+                      DataDriverFactory::regKDataDriver(driver);
+                  })
 
-      ;
+      .def_static("init", &DataDriverFactory::init, "初始化支持的默认驱动")
+      .def_static("release", &DataDriverFactory::release,
+                  "主动释放资源，主要用于内存泄漏检测，退出时主动清理，避免误报");
 }

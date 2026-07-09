@@ -2171,11 +2171,27 @@ void export_Indicator_build_in(py::module& m) {
     m.def("SLOPE", SLOPE4, py::arg("data"), py::arg("n"));
     m.def("SLOPE", SLOPE5, py::arg("data"), py::arg("n"), R"(SLOPE([data, n=22])
 
-    计算线性回归斜率，N支持变量
+    计算线性回归斜率、拟合优度R²和相对最大残差，N支持变量
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
-    :rtype: Indicator)");
+    :rtype: Indicator
+
+    **结果集**：
+
+    * result(0): 斜率
+    * result(1): 拟合优度 R²
+    * result(2): 相对最大残差 RelMaxRes = max|yi - ŷi| / ȳ
+
+    **相对最大残差说明**：
+
+    * 分子：窗口内最大绝对残差（保证没有点严重远离回归线）
+    * 分母：窗口 y 均值（消除股价量纲，百分比含义）
+    * 指标越小 = 整段所有 K 线都紧贴回归线
+
+    **判定阈值举例**：
+
+    * RelMaxRes < 0.03：最远 K 线偏离均价不足 3%，全部点位贴合回归线)");
 
     m.def("MDD", py::overload_cast<int>(&MDD), py::arg("n") = 0);
     m.def("MDD", py::overload_cast<const Indicator&, int>(&MDD), py::arg("data"), py::arg("n") = 0,
@@ -2185,6 +2201,15 @@ void export_Indicator_build_in(py::module& m) {
     
     :param Indicator data: 输入数据
     :param int n: 时间窗口
+    :rtype: Indicator)");
+
+    m.def("MDD_CURRENT", py::overload_cast<>(&MDD_CURRENT));
+    m.def("MDD_CURRENT", py::overload_cast<const Indicator&>(&MDD_CURRENT), py::arg("data"),
+          R"(MDD_CURRENT([data])
+    
+    当前点到历史最高点的回撤百分比，按行业惯例为正值
+    
+    :param Indicator data: 输入数据
     :rtype: Indicator)");
 
     m.def("MRR", py::overload_cast<int>(&MRR), py::arg("n") = 0);
@@ -2745,13 +2770,16 @@ void export_Indicator_build_in(py::module& m) {
     :param KData kdata: K线数据
     :rtype: Indicator)");
 
-    m.def("FACTOR", &FACTOR, py::arg("factor"), R"(FACTOR(factor)
+    m.def("FACTOR", py::overload_cast<const string&>(FACTOR), py::arg("factor"));
+    m.def("FACTOR", py::overload_cast<const Factor&>(&FACTOR), py::arg("factor"), R"(FACTOR(factor)
+    FACTOR(name)
 
     因子指标转换
 
     将Factor对象转换为Indicator，使其可以在指标系统中使用。
     该指标需要设置K线上下文才能进行计算。
 
-    :param Factor factor: 因子对象
+    :param Factor factor: 因子对象（与name二选一）
+    :param str name: 因子名称（便捷版本，与factor二选一）
     :rtype: Indicator)");
 }

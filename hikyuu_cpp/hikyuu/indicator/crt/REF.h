@@ -31,15 +31,15 @@ Indicator HKU_API REF(const IndParam& n);
  * @param n 引用n周期前的值，即右移n位
  * @ingroup Indicator
  */
-inline Indicator HKU_API REF(const Indicator& ind, int n) {
+inline Indicator REF(const Indicator& ind, int n) {
     return REF(n)(ind);
 }
 
-inline Indicator HKU_API REF(const Indicator& ind, const IndParam& n) {
+inline Indicator REF(const Indicator& ind, const IndParam& n) {
     return REF(n)(ind);
 }
 
-inline Indicator HKU_API REF(const Indicator& ind, const Indicator& n) {
+inline Indicator REF(const Indicator& ind, const Indicator& n) {
     return REF(IndParam(n))(ind);
 }
 

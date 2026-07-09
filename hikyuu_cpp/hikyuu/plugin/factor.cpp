@@ -10,6 +10,16 @@
 
 namespace hku {
 
+bool HKU_API hasFactor(const string& name, const KQuery::KType& ktype) {
+    auto& sm = StockManager::instance();
+    const string& driver_type =
+      StockManager::instance().getKDataDriverParameter().get<const string&>("type");
+    HKU_INFO_IF_RETURN(driver_type != "clickhouse", false, "Not support {} driver!", driver_type);
+    auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
+    HKU_ERROR_IF_RETURN(!plugin, false, htr("Can't find {} plugin!", HKU_PLUGIN_CLICKHOUSE_DRIVER));
+    return plugin->hasFactor(name, ktype);
+}
+
 Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
     Factor ret;
     auto& sm = StockManager::instance();

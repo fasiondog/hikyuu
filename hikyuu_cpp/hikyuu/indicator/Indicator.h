@@ -45,7 +45,7 @@ public:
 
 public:
     Indicator() : m_imp(make_shared<IndicatorImp>()) {}
-    Indicator(const IndicatorImpPtr& imp) noexcept;
+    explicit Indicator(const IndicatorImpPtr& imp) noexcept;
     Indicator(const Indicator& ind) noexcept;
     Indicator(Indicator&& ind) noexcept;
     virtual ~Indicator();

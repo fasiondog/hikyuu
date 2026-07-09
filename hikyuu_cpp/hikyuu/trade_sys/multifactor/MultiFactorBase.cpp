@@ -20,6 +20,7 @@
 #include "hikyuu/indicator/crt/ZSCORE.h"
 #include "hikyuu/StockManager.h"
 #include "MultiFactorBase.h"
+#include "industry_neutralize.h"
 
 namespace hku {
 
@@ -483,11 +484,11 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
     return x;
 }
 
-unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
-    // 如果指定了特殊的指标的行业中性化处理，则构建其行业哑变量
-    unordered_map<string, PriceList> stock_dummy_index;
+unordered_map<string, std::pair<PriceList, size_t>> MultiFactorBase::_buildDummyIndex() {
+    // 如果指定了特殊的指标的行业中性化处理，则构建其行业归属标签
+    unordered_map<string, std::pair<PriceList, size_t>> stock_dummy_index;
     for (const auto& [ind_name, catefory] : m_special_category) {
-        stock_dummy_index[ind_name] = PriceList(m_stks.size(), Null<price_t>());
+        stock_dummy_index[ind_name] = {PriceList(m_stks.size(), Null<price_t>()), 0};
         auto blks = StockManager::instance().getBlockList(catefory);
         if (blks.empty()) {
             HKU_WARN("Block list ({}) is empty, please check your block category!", catefory);
@@ -495,9 +496,10 @@ unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
         }
 
         auto iter = stock_dummy_index.find(ind_name);
-        auto& dummy = iter->second;
-
+        auto& dummy = iter->second.first;
         size_t blk_count = blks.size();
+        iter->second.second = blk_count;
+
         for (size_t i = 0; i < m_stks.size(); i++) {
             bool found = false;
             size_t j = 0;
@@ -510,6 +512,8 @@ unordered_map<string, PriceList> MultiFactorBase::_buildDummyIndex() {
                 j++;
             }
             if (!found) {
+                // 无归属股票赋 blk_count，下游组内去均值时跳过（残差置 NaN），
+                // 避免将其隐式聚成伪行业簇造成伪回归。
                 dummy[i] = blk_count;
             }
         }
@@ -525,52 +529,8 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     });
 }
 
-// 计算中性化后的因子，y 为因子，x 为行业哑变量（包含常数项）
-static PriceList calculate_residuals(const PriceList& y, const PriceList& x) {
-    HKU_ASSERT(y.size() == x.size());
-
-    const size_t n = x.size();
-    PriceList residuals(n, Null<price_t>());
-
-    // 计算线性回归系数（带常数项）
-    double sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x2 = 0.0;
-    size_t count = 0;
-
-    for (size_t i = 0; i < n; ++i) {
-        if (std::isnan(x[i]) || std::isinf(x[i]) || std::isnan(y[i]) || std::isinf(y[i])) {
-            continue;
-        }
-        sum_x += x[i];
-        sum_y += y[i];
-        sum_xy += x[i] * y[i];
-        sum_x2 += x[i] * x[i];
-        count++;
-    }
-
-    // 数据点不足或分母为0
-    if (count < 2 || sum_x * sum_x - count * sum_x2 == 0) {
-        return residuals;
-    }
-
-    // 计算回归系数 β₀ (截距) 和 β₁ (斜率)
-    double beta1 = (sum_x * sum_y - count * sum_xy) / (sum_x * sum_x - count * sum_x2);
-    double beta0 = (sum_y - beta1 * sum_x) / count;
-
-    if (std::isnan(beta0) || std::isinf(beta0) || std::isnan(beta1) || std::isinf(beta1)) {
-        return residuals;
-    }
-
-    // 计算拟合值和残差
-    for (size_t i = 0; i < n; ++i) {
-        if (std::isnan(x[i]) || std::isinf(x[i]) || std::isnan(y[i]) || std::isinf(y[i])) {
-            continue;
-        }
-        double y_hat = beta0 + beta1 * x[i];  // 拟合值 = β₀ + β₁x
-        residuals[i] = y[i] - y_hat;          // 残差 = 观测值 - 拟合值
-    }
-
-    return residuals;
-}
+// 行业中性化（按行业分组去组内均值）的纯函数实现见 industry_neutralize.h，
+// 提取为内部 inline header 供白盒单元测试直接包含调用。
 
 // 计算多元回归中性化后的因子，y为因子，x为多个解释变量（包含常数项）- Eigen版本
 static PriceList calculate_residuals(const PriceList& y, const std::vector<PriceList>& x) {
@@ -669,34 +629,56 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true, m_ref_dates);
 
-    unordered_map<string, IndicatorList> use_style_inds;
+    // 风格因子按 [风格因子名][风格因子][股票] 三维存储（vector<IndicatorList>）。
+    //
+    // 原实现为 [风格因子名][风格因子] 二维，每条风格因子全市场共享同一条时序，
+    // 导致两个独立缺陷：
+    //   1) 并发提取时多线程写同一个 Indicator（对 shared_ptr 对象本身的非原子
+    //      赋值是 C++ UB），是启用风格中性化后 get_ic / get_all_src_factors
+    //      进程直接崩溃（segfault，无 Python 异常）的根因；
+    //   2) 截面回归的自变量对所有股票取同一值，退化为常数列，与截距共线，
+    //      市值/风格中性化在数学上彻底失效（残差≈原值）。
+    //
+    // 补上股票维度后：
+    //   - 写隔离：每个 si 线程只写 per_factor[j][si]，不同 si 写不同槽；
+    //   - 读隔离：每线程对模板 styles[j] 先 clone() 出独立副本再 ALIGN 计算，
+    //     calculate() 只写本线程副本的 buffer，不触碰共享的 styles[j]。
+    //     （IndicatorImp::clone() 对根源对象严格只读，经代码核实，故并发
+    //      styles[j].clone() 安全；此处 styles[j] 为用户传入的根 Indicator。）
+    unordered_map<string, vector<IndicatorList>> use_style_inds;
     for (const auto& [style_ind_name, style_inds] : m_special_style_inds) {
-        use_style_inds[style_ind_name] = IndicatorList(style_inds.size());
+        auto& per_factor = use_style_inds[style_ind_name];
+        per_factor.resize(style_inds.size());
+        for (auto& v : per_factor) {
+            v.resize(stk_count);
+        }
     }
-    global_parallel_for_index_void(
-      0, stk_count, [this, &null_ind, &use_style_inds, fill_null](size_t i) {
-          const auto& stk = m_stks[i];
-          auto kdata = stk.getKData(m_query);
-          for (auto& [style_ind_name, styles] : m_special_style_inds) {
-              auto& cur_style_inds = use_style_inds[style_ind_name];
-              if (kdata.size() == 0) {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] = null_ind;
-                      cur_style_inds[j].name(style_ind_name);
-                  }
-              } else {
-                  for (size_t j = 0; j < styles.size(); j++) {
-                      cur_style_inds[j] =
-                        ALIGN(styles[j], m_ref_dates, fill_null)(kdata).getResult(0);
-                      cur_style_inds[j].name(style_ind_name);
-                  }
-              }
-          }
-      });
+    if (!m_special_style_inds.empty()) {
+        global_parallel_for_index_void(0, stk_count, [&](size_t si) {
+            const auto& stk = m_stks[si];
+            auto kdata = stk.getKData(m_query);
+            for (auto& [style_ind_name, styles] : m_special_style_inds) {
+                auto& per_factor = use_style_inds[style_ind_name];
+                for (size_t j = 0; j < styles.size(); j++) {
+                    if (kdata.size() == 0) {
+                        per_factor[j][si] = null_ind;
+                    } else {
+                        // 每线程独立 clone：calculate 只写本线程副本的 buffer
+                        per_factor[j][si] =
+                          ALIGN(styles[j].clone(), m_ref_dates, fill_null)(kdata).getResult(0);
+                    }
+                    per_factor[j][si].name(style_ind_name);
+                }
+            }
+        });
+    }
 
     // 时间截面标准化/归一化
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
-        unordered_map<string, PriceList> ind_dummy_dict = _buildDummyIndex();
+        // 压制 Eigen 内部 OpenMP 并行，避免与外层按日线程池叠加导致线程超载；
+        // calculate_residuals 内的 Eigen 矩阵均为栈局部对象，外层按日并行天然可重入。
+        Eigen::setNbThreads(1);
+        unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();
         global_parallel_for_index_void(
           0, days_total,
           [this, stk_count, ind_count, &all_stk_inds, &ind_dummy_dict, &use_style_inds](size_t di) {
@@ -710,7 +692,14 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                       one_day_data[si] = all_stk_inds[si][ii][di];
                   }
 
-                  auto ind_name = all_stk_inds[0][ii].name();
+                  // 注：经 m_factorset.getValues(align=true) 产出的 all_stk_inds[*][ii]
+                  // 会被 ALIGN 套层改名为 "ALIGN"（运行时实证）。而 addSpecialNormalize
+                  // 存入 m_special_norms/m_special_category 的 key 是 FactorSet 里的因子
+                  // 原名（如 "MA"）。若取 all_stk_inds[0][ii].name() 做 find 的 key，永远
+                  // 不命中，行业/风格/特殊标准化全部静默失效。改用 m_factorset[ii].name()
+                  // 按下标溯源原名：getValues 产出 result[j][i] 严格对应 factors[i]，
+                  // 下标 ii 与 m_factorset[ii] 一一对应，无乱序风险。
+                  auto ind_name = m_factorset[ii].name();
                   auto special_norm_iter = m_special_norms.find(ind_name);
                   if (special_norm_iter != m_special_norms.end()) {
                       special_norm = special_norm_iter->second->clone();
@@ -728,16 +717,22 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
                   auto category_iter = ind_dummy_dict.find(ind_name);
                   if (category_iter != ind_dummy_dict.end()) {
-                      new_value = calculate_residuals(new_value, category_iter->second);
+                      // 行业中性化：组内去均值（O(n)，数学等价于去截距 one-hot 多元回归）。
+                      // 原实现误用单变量 calculate_residuals 对整数板块序号做一元回归，
+                      // 隐含"行业 j 的效应 = β0 + β1·j"的错误假设，结果依赖板块列表排列顺序。
+                      const auto& [labels, blk_count] = category_iter->second;
+                      new_value = calculate_industry_residuals(new_value, labels, blk_count);
                   }
                   auto style_iter = use_style_inds.find(ind_name);
                   if (style_iter != use_style_inds.end()) {
-                      vector<PriceList> style_value_day(style_iter->second.size());
-                      for (size_t j = 0; j < style_iter->second.size(); j++) {
+                      auto& per_factor = style_iter->second;  // [风格因子][股票]
+                      vector<PriceList> style_value_day(per_factor.size());
+                      for (size_t j = 0; j < per_factor.size(); j++) {
                           auto& style_value = style_value_day[j];
                           style_value.resize(stk_count);
                           for (size_t si = 0; si < stk_count; si++) {
-                              style_value[si] = style_iter->second[j][di];
+                              // 取第 si 只股票自己的风格因子值（原实现误取共享值）
+                              style_value[si] = per_factor[j][si][di];
                           }
                       }
                       new_value = calculate_residuals(new_value, style_value_day);
@@ -749,6 +744,9 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
               }
           });
+
+        // 恢复 Eigen 线程数
+        Eigen::setNbThreads(std::thread::hardware_concurrency());
     }
 
     return all_stk_inds;

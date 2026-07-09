@@ -29,28 +29,24 @@ static Indicator getExtIndicator(const string& name, const Indicator& ref_ind,
     return plugin->getIndicator(name, ref_ind, params);
 }
 
-Indicator HKU_API FIXED_START_INDEX(int start_index, const string& factor_name) {
+Indicator HKU_API FIXED_START_INDEX(int start_index) {
     Parameter params;
     params.set<int>("index", start_index);
-    params.set<string>("factor_name", factor_name);
     return getExtIndicator("FIXED_START_INDEX", params);
 }
 
-Indicator HKU_API FIXED_START_INDEX(const Indicator& ind, int start_index,
-                                    const string& factor_name) {
-    return FIXED_START_INDEX(start_index, factor_name)(ind);
+Indicator HKU_API FIXED_START_INDEX(const Indicator& ind, int start_index) {
+    return FIXED_START_INDEX(start_index)(ind);
 }
 
-Indicator HKU_API FIXED_START_DATE(const Datetime& start_date, const string& factor_name) {
+Indicator HKU_API FIXED_START_DATE(const Datetime& start_date) {
     Parameter params;
     params.set<Datetime>("start_date", start_date);
-    params.set<string>("factor_name", factor_name);
     return getExtIndicator("FIXED_START_DATE", params);
 }
 
-Indicator HKU_API FIXED_START_DATE(const Indicator& ind, const Datetime& start_date,
-                                   const string& factor_name) {
-    return FIXED_START_DATE(start_date, factor_name)(ind);
+Indicator HKU_API FIXED_START_DATE(const Indicator& ind, const Datetime& start_date) {
+    return FIXED_START_DATE(start_date)(ind);
 }
 
 Indicator HKU_API WITHKTYPE(const KQuery::KType& ktype, bool fill_null) {
@@ -89,6 +85,52 @@ AGG_FUNC_IMP(AGG_MIN)
 AGG_FUNC_IMP(AGG_MAD)
 AGG_FUNC_IMP(AGG_MEDIAN)
 AGG_FUNC_IMP(AGG_PROD)
+
+Indicator HKU_API AGG_SAMPLE(const Indicator& ind, const string& time, const KQuery::KType& ktype,
+                             bool fill_null, int unit) {
+    Parameter params;
+    params.set<string>("time", time);
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    params.set<int>("unit", unit);
+    return getExtIndicator("AGG_SAMPLE", ind, params);
+}
+
+Indicator HKU_API AGG_SAMPLE_MAX(const Indicator& ind, const string& start_time,
+                                 const string& last_time, const KQuery::KType& ktype,
+                                 bool fill_null, int unit) {
+    Parameter params;
+    params.set<string>("start_time", start_time);
+    params.set<string>("last_time", last_time);
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    params.set<int>("unit", unit);
+    return getExtIndicator("AGG_SAMPLE_MAX", ind, params);
+}
+
+Indicator HKU_API AGG_SAMPLE_MIN(const Indicator& ind, const string& start_time,
+                                 const string& last_time, const KQuery::KType& ktype,
+                                 bool fill_null, int unit) {
+    Parameter params;
+    params.set<string>("start_time", start_time);
+    params.set<string>("last_time", last_time);
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    params.set<int>("unit", unit);
+    return getExtIndicator("AGG_SAMPLE_MIN", ind, params);
+}
+
+Indicator HKU_API AGG_SAMPLE_MEAN(const Indicator& ind, const string& start_time,
+                                  const string& last_time, const KQuery::KType& ktype,
+                                  bool fill_null, int unit) {
+    Parameter params;
+    params.set<string>("start_time", start_time);
+    params.set<string>("last_time", last_time);
+    params.set<string>("ktype", ktype);
+    params.set<bool>("fill_null", fill_null);
+    params.set<int>("unit", unit);
+    return getExtIndicator("AGG_SAMPLE_MEAN", ind, params);
+}
 
 Indicator HKU_API AGG_STD(const Indicator& ind, const KQuery::KType& ktype, bool fill_null,
                           int unit, int ddof) {

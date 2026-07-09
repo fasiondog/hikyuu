@@ -20,8 +20,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API LN();
-Indicator LN(Indicator::value_t);
-Indicator LN(const Indicator& ind);
 
 inline Indicator LN(const Indicator& ind) {
     return LN()(ind);

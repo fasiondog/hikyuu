@@ -19,7 +19,6 @@ namespace hku {
  */
 Indicator HKU_API ISLASTBAR();
 Indicator HKU_API ISLASTBAR(const KData& kdata);
-Indicator ISLASTBAR(const Indicator& ind);
 
 inline Indicator ISLASTBAR(const Indicator& ind) {
     return ISLASTBAR()(ind);

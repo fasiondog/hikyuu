@@ -22,8 +22,8 @@ namespace hku {
  */
 Indicator HKU_API ZSCORE(bool outExtreme = false, double nsigma = 3.0, bool recursive = false);
 
-inline Indicator HKU_API ZSCORE(const Indicator& data, bool outExtreme = false, double nsigma = 3.0,
-                                bool recursive = false) {
+inline Indicator ZSCORE(const Indicator& data, bool outExtreme = false, double nsigma = 3.0,
+                        bool recursive = false) {
     return ZSCORE(outExtreme, nsigma, recursive)(data);
 }
 

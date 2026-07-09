@@ -303,7 +303,7 @@ void export_TradeManager(py::module& m) {
         
     默认情况下，TradeManager会在执行买入/卖出操作时，调用订单代理执行代理的买入/卖出动作，但这样在实盘操作时会存在问题。因为系统在计算信号指示时，需要回溯历史数据才能得到最新的信号，这样TradeManager会在历史时刻就执行买入/卖出操作，此时如果订单代理本身没有对发出买入/卖出指令的时刻进行控制，会导致代理发送错误的指令。此时，需要指定在某一个时刻之后，才允许指定订单代理的买入/卖出操作。属性 brokeLastDatetime 即用于指定该时刻。)")
 
-      .def("getParam", &TradeManagerBase::getParam<boost::any>, R"(get_param(self, name)
+      .def("get_param", &TradeManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
     获取指定的参数
 

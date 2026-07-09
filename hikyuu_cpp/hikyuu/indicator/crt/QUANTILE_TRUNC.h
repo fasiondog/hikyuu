@@ -22,8 +22,8 @@ namespace hku {
 Indicator HKU_API QUANTILE_TRUNC(int n = 60, double quantile_min = 0.01,
                                  double quantile_max = 0.99);
 
-inline Indicator HKU_API QUANTILE_TRUNC(const Indicator& data, int n = 60,
-                                        double quantile_min = 0.01, double quantile_max = 0.99) {
+inline Indicator QUANTILE_TRUNC(const Indicator& data, int n = 60, double quantile_min = 0.01,
+                                double quantile_max = 0.99) {
     return QUANTILE_TRUNC(n, quantile_min, quantile_max)(data);
 }
 

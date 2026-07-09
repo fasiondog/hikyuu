@@ -20,8 +20,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API COS();
-Indicator COS(Indicator::value_t);
-Indicator COS(const Indicator& ind);
 
 inline Indicator COS(const Indicator& ind) {
     return COS()(ind);

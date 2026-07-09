@@ -22,8 +22,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API CEILING();
-Indicator CEILING(Indicator::value_t);
-Indicator CEILING(const Indicator& ind);
 
 inline Indicator CEILING(const Indicator& ind) {
     return CEILING()(ind);

@@ -18,8 +18,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API SGN();
-Indicator SGN(Indicator::value_t);
-Indicator SGN(const Indicator& ind);
 
 inline Indicator SGN(const Indicator& ind) {
     return SGN()(ind);

@@ -14,6 +14,7 @@
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/device.h>
+#include <hikyuu/indicator/imp/ITsRank.h>
 #include "../plugin_valid.h"
 
 using namespace hku;
@@ -71,6 +72,21 @@ TEST_CASE("test_TS_RANK_empty") {
 
     CHECK_EQ(ret.size(), 0);
     CHECK_EQ(ret.discard(), 0);
+}
+
+/** @par 检测点：TS_RANK增量计算基本功能 */
+TEST_CASE("test_TS_RANK_increment_base") {
+    Stock stk = getStock("sh600000");
+    KData k1 = stk.getKData(KQuery(100, 200));
+    KData k2 = stk.getKData(KQuery(100, 300));
+
+    auto ts_rank = TS_RANK(CLOSE(), 5);
+    auto result_full = ts_rank(k2);
+    auto result_inc = ts_rank(k1);
+
+    result_inc.setContext(k2);
+
+    check_indicator(result_inc, result_full);
 }
 
 //-----------------------------------------------------------------------------

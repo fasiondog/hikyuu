@@ -45,15 +45,15 @@ Indicator HKU_API TS_RANK(const IndParam& n);
  * @param n 周期数
  * @ingroup Indicator
  */
-inline Indicator HKU_API TS_RANK(const Indicator& ind, int n = 20) {
+inline Indicator TS_RANK(const Indicator& ind, int n = 20) {
     return TS_RANK(n)(ind);
 }
 
-inline Indicator HKU_API TS_RANK(const Indicator& ind, const IndParam& n) {
+inline Indicator TS_RANK(const Indicator& ind, const IndParam& n) {
     return TS_RANK(n)(ind);
 }
 
-inline Indicator HKU_API TS_RANK(const Indicator& ind, const Indicator& n) {
+inline Indicator TS_RANK(const Indicator& ind, const Indicator& n) {
     return TS_RANK(IndParam(n))(ind);
 }
 

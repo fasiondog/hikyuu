@@ -859,13 +859,14 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
         )
 
 
-def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: bool = True):
+def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: bool = True, log: bool = False):
     """
     绘制系统绩效，即账户累积收益率曲线
 
     :param TradeManager tm: 账户实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     :param bool ext: 是否统计扩展信息（捐赠用户，否则仍为默认统计项）
+    :param bool log: Y轴是否使用对数坐标
     :return: None
     """
     if ref_stk is None:
@@ -890,9 +891,12 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     # 计算最大回撤百分比
     max_pullback = MDD(funds)[-1]
 
+    # 计算当前点到历史最高点的回撤百分比
+    mdd_current = MDD_CURRENT(funds)[-1]
+
     # 计算 sharp
     bond = ZHBOND10(ref_dates)
-    sigma = STDEV(ROCP(funds), len(ref_dates))
+    sigma = STDEV(ROCP(funds), 0)  # n=0: 全期样本标准差（expand-all）
     sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
     sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
 
@@ -900,8 +904,8 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     cur_fund = per['当前总资产']
     t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
-    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
-        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback)
+    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%    当前距历史最高点回撤: {:<.2f}%'.format(
+        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback, mdd_current)
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
         per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
 
@@ -911,6 +915,9 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     ax1 = fg.add_subplot(gs[:4, :3])
     ax2 = fg.add_subplot(gs[:, 3:])
     ax3 = fg.add_subplot(gs[4:, :3])
+    if log:
+        ax1.set_yscale('log')
+
     ref_return.plot(axes=ax1, legend_on=True, label=f'{ref_stk.name}({ref_stk.market_code}) 收益曲线')
     funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} 累积收益率 {funds_return[-1]*100.:<.2f}%')
     ax1.set_title(f"账户({tm.name}) 累积收益率")
@@ -937,26 +944,33 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     ax3.xaxis.set_visible(False)
     ax3.yaxis.set_visible(False)
     ax3.set_frame_on(False)
+    if log:
+        from matplotlib.ticker import FuncFormatter, NullFormatter
+        ax1.yaxis.set_major_formatter(NullFormatter())
+        ax1.yaxis.set_minor_formatter(NullFormatter())
+        ax1.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}'))
+        ax1.yaxis.set_minor_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}'))
     return ax1  # 返回主图axis
 
 
-def sys_performance(sys, ref_stk=None, ext=True):
+def sys_performance(sys, ref_stk=None, ext=True, log=False):
     """
     绘制系统绩效，即账户累积收益率曲线
 
     :param SystemBase | PortfolioBase sys: SYS或PF实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为默认统计项）
+    :param bool log: Y轴是否使用对数坐标
     :return: None
     """
     if ref_stk is None:
         ref_stk = get_stock('sh000300')
 
     query = sys.query
-    return tm_performance(sys.tm, query, ref_stk, ext=ext)
+    return tm_performance(sys.tm, query, ref_stk, ext=ext, log=log)
 
 
-def tm_heatmap(tm, start_date, end_date=None, axes=None):
+def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     """
     绘制账户收益年-月收益热力图
 
@@ -964,12 +978,13 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
     :param start_date: 开始日期
     :param end_date: 结束日期，默认为今天
     :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :param show_high_low: 是否显示月度最高收益和最低收益，默认为False
     :return: None
     """
     if axes is None:
         axes = create_figure()
 
-    if end_date is None:
+    if end_date is None or end_date == Datetime():
         end_date = Datetime.today() + Days(1)
 
     dates = get_date_range(start_date, end_date)
@@ -990,21 +1005,165 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None):
     data['year'] = data['date'].apply(lambda v: v.year)
     data['month'] = data['date'].apply(lambda v: v.month)
 
-    # 获取每个月的收益
-    monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
+    # 获取每个月的最后值、最高值和最低值
+    monthly = data.groupby(['year', 'month']).agg(
+        last_value=('value', 'last'),
+        max_value=('value', 'max'),
+        min_value=('value', 'min')
+    ).reset_index()
     if len(monthly) < 2:
         hku_warn("月数据不足！")
         return
 
-    monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
+    monthly['return'] = ((monthly['last_value'] - monthly['last_value'].shift(1)) /
+                         monthly['last_value'].shift(1)) * 100.
+    monthly['prev_last'] = monthly['last_value'].shift(1)
+    monthly['max_return'] = ((monthly['max_value'] - monthly['prev_last']) / monthly['prev_last']) * 100.
+    monthly['min_return'] = ((monthly['min_value'] - monthly['prev_last']) / monthly['prev_last']) * 100.
 
     pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
 
-    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
+    yearly_value = monthly.groupby('year').last()['last_value'].reset_index()
+    yearly_first = data.groupby('year').first()['value'].reset_index()
+
+    yearly_value['year_return'] = ((yearly_value['last_value'] - yearly_value['last_value'].shift(1)
+                                    ) / yearly_value['last_value'].shift(1)) * 100.
+    yearly_value.loc[0, 'year_return'] = (
+        (yearly_value.loc[0, 'last_value'] - yearly_first.loc[0, 'value']) / yearly_first.loc[0, 'value']) * 100.
+
+    year_return_df = yearly_value.set_index('year')['year_return']
+    pivot_data[''] = np.nan
+    pivot_data['年度收益'] = year_return_df
+
+    annot_matrix = []
+    for year in pivot_data.index:
+        row = []
+        for col in pivot_data.columns:
+            if col in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
+                ret = pivot_data.loc[year, col] if year in pivot_data.index and col in pivot_data.columns else np.nan
+                if not np.isnan(ret):
+                    if show_high_low:
+                        max_ret = monthly[(monthly['year'] == year) & (monthly['month'] == col)]['max_return'].values[0]
+                        min_ret = monthly[(monthly['year'] == year) & (monthly['month'] == col)]['min_return'].values[0]
+                        row.append(f"{ret:.2f}\n↑{max_ret:.2f} ↓{min_ret:.2f}")
+                    else:
+                        row.append(f"{ret:.2f}")
+                else:
+                    row.append("")
+            elif col == '':
+                row.append("")
+            elif col == '年度收益':
+                row.append(f"{year_return_df.loc[year]:.2f}" if year in year_return_df.index else "")
+        annot_matrix.append(row)
+
+    max_abs_return = monthly['return'].abs().max()
+    v_limit = max(max_abs_return, 5)
+
+    sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, vmin=-v_limit, vmax=v_limit, annot=annot_matrix, fmt='', ax=axes)
     # 设置标题和坐标轴标签
     axes.set_title('年-月度收益率(%)热力图')
     axes.set_xlabel('月度')
     axes.set_ylabel('年份')
+
+
+def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True):
+    """
+    绘制账户各年度收益柱状图
+
+    :param tm: 交易账户
+    :param start_date: 开始日期
+    :param end_date: 结束日期，默认为今天
+    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :param show_high_low: 是否显示年度最高收益和最低收益，默认为False
+    :return: None
+    """
+    if axes is None:
+        axes = create_figure()
+
+    if end_date is None or end_date == Datetime():
+        end_date = Datetime.today() + Days(1)
+
+    dates = get_date_range(start_date, end_date)
+    if len(dates) == 0:
+        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        return
+
+    funds = tm.get_funds_curve(dates)
+    if len(funds) == 0:
+        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
+                  tm.init_datetime, start_date, end_date)
+        return
+
+    data = pd.DataFrame({'date': dates, 'value': funds})
+    data = data[(data[['value']] != 0).all(axis=1)]
+
+    data['year'] = data['date'].apply(lambda v: v.year)
+
+    yearly = data.groupby('year').agg(
+        last_value=('value', 'last'),
+        max_value=('value', 'max'),
+        min_value=('value', 'min')
+    ).reset_index()
+    yearly_first = data.groupby('year').first()['value'].reset_index()
+
+    if len(yearly) < 1:
+        hku_warn("年度数据不足！")
+        return
+
+    yearly['return'] = ((yearly['last_value'] - yearly['last_value'].shift(1)) /
+                        yearly['last_value'].shift(1)) * 100.
+    yearly.loc[0, 'return'] = ((yearly.loc[0, 'last_value'] - yearly_first.loc[0, 'value']) /
+                               yearly_first.loc[0, 'value']) * 100.
+
+    yearly['prev_last'] = yearly['last_value'].shift(1)
+    yearly['max_return'] = ((yearly['max_value'] - yearly['prev_last']) / yearly['prev_last']) * 100.
+    yearly['min_return'] = ((yearly['min_value'] - yearly['prev_last']) / yearly['prev_last']) * 100.
+    yearly.loc[0, 'max_return'] = ((yearly.loc[0, 'max_value'] - yearly_first.loc[0, 'value']) /
+                                   yearly_first.loc[0, 'value']) * 100.
+    yearly.loc[0, 'min_return'] = ((yearly.loc[0, 'min_value'] - yearly_first.loc[0, 'value']) /
+                                   yearly_first.loc[0, 'value']) * 100.
+
+    years = yearly['year'].astype(str)
+    returns = yearly['return']
+    max_returns = yearly['max_return']
+    min_returns = yearly['min_return']
+
+    bar_width = 0.8
+    x_pos = range(len(years))
+
+    for i, (ret, max_ret, min_ret) in enumerate(zip(returns, max_returns, min_returns)):
+        base_color = '#FF4444' if ret >= 0 else '#44FF44'
+        max_color = '#FFAAAA' if ret >= 0 else '#AAFFAA'
+        min_color = '#CC0000' if ret >= 0 else '#00CC00'
+
+        if show_high_low:
+            if max_ret > ret:
+                axes.bar(x_pos[i], max_ret - ret, bottom=ret, width=bar_width,
+                         color=max_color, alpha=0.4, label='最高收益范围' if i == 0 else "")
+            if min_ret < ret:
+                axes.bar(x_pos[i], ret - min_ret, bottom=min_ret, width=bar_width,
+                         color=min_color, alpha=0.7, label='最低收益范围' if i == 0 else "")
+
+        axes.bar(x_pos[i], ret, width=bar_width, color=base_color, alpha=0.9)
+
+        if show_high_low:
+            axes.text(x_pos[i], max(ret, max_ret) + (max(ret, max_ret) - min(ret, min_ret)) * 0.05,
+                      f'{ret:.2f}%\n↑{max_ret:.2f} ↓{min_ret:.2f}',
+                      ha='center', va='bottom', fontsize=9)
+        else:
+            axes.text(x_pos[i], ret + (ret if ret >= 0 else -ret) * 0.05,
+                      f'{ret:.2f}%', ha='center', va='bottom', fontsize=9)
+
+    axes.set_xticks(x_pos)
+    axes.set_xticklabels(years)
+
+    if show_high_low:
+        axes.legend()
+
+    axes.set_title('年度收益率(%)柱状图')
+    axes.set_xlabel('年份')
+    axes.set_ylabel('收益率(%)')
+    axes.grid(axis='y', linestyle='--', alpha=0.7)
 
 
 def sys_heatmap(sys, axes=None):

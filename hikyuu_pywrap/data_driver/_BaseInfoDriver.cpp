@@ -1,107 +1,105 @@
 /*
- * _DataDriverFactory.cpp
+ * _BaseInfoDriver.cpp
  *
  *  Created on: 2017年10月7日
  *      Author: fasiondog
  */
 
-#if 0  // 基本不会在Python中重载，取消引出
-
-#include <boost/python.hpp>
-#include <hikyuu/data_driver/BaseInfoDriver.h>
-#include "../_Parameter.h"
+#include "_BaseInfoDriver.h"
 
 using namespace hku;
-using namespace boost::python;
+namespace py = pybind11;
 
-class BaseInfoDriverWrap : public BaseInfoDriver, public wrapper<BaseInfoDriver> {
-public:
-    BaseInfoDriverWrap(const string& name) : BaseInfoDriver(name) {}
-
-    bool _init() {
-        return this->get_override("_init")();
-    }
-
-    bool _loadMarketInfo() {
-        return this->get_override("_loadMarketInfo")();
-    }
-
-    bool _loadStockTypeInfo() {
-        return this->get_override("_loadStockTypeInfo")();
-    }
-
-    bool _loadStock() {
-        return this->get_override("_loadStock")();
-    }
-
-    Parameter getFinanceInfo(const string& market, const string& code) {
-        if (override call = get_override("getFinanceInfo")) {
-            return call(market, code);
-        }
-        return this->BaseInfoDriver::getFinanceInfo(market, code);
-    }
-
-    Parameter default_getFinanceInfo(const string& market, const string& code) {
-        return this->BaseInfoDriver::getFinanceInfo(market, code);
-    }
-
-    StockWeightList getStockWeightList(const string& market, const string& code, Datetime start,
-                                       Datetime end) {
-        if (override call = get_override("getStockWeightList")) {
-            return call(market, code, start, end);
-        }
-        return this->BaseInfoDriver::getStockWeightList(market, code, start, end);
-    }
-
-    StockWeightList default_getStockWeightList(const string& market, const string& code,
-                                               Datetime start, Datetime end) {
-        return this->BaseInfoDriver::getStockWeightList(market, code, start, end);
-    }
-
-    MarketInfo getMarketInfo(const string& market) {
-        if (override call = get_override("getMarketInfo")) {
-            return call(market);
-        }
-        return this->BaseInfoDriver::getMarketInfo(market);
-    }
-
-    MarketInfo default_getMarketInfo(const string& market) {
-        return this->BaseInfoDriver::getMarketInfo(market);
-    }
-
-    StockTypeInfo getStockTypeInfo(uint32_t type) {
-        if (override call = get_override("getStockTypeInfo")) {
-            return call(type);
-        }
-        return this->BaseInfoDriver::getStockTypeInfo(type);
-    }
-
-    StockTypeInfo default_getStockTypeInfo(uint32_t type) {
-        return this->BaseInfoDriver::getStockTypeInfo(type);
-    }
-};
-
-void export_BaseInfoDriver() {
-    class_<BaseInfoDriverWrap, boost::noncopyable>("BaseInfoDriver", init<const string&>())
-      .def(self_ns::str(self))
-      .add_property(
-        "name", make_function(&BaseInfoDriver::name, return_value_policy<copy_const_reference>()))
-      .def("getParam", &BaseInfoDriver::getParam<boost::any>)
-
-      .def("init", &BaseInfoDriver::init)
-      .def("loadBaseInfo", &BaseInfoDriver::loadBaseInfo)
-      .def("_init", pure_virtual(&BaseInfoDriver::_init))
-      .def("_loadMarketInfo", pure_virtual(&BaseInfoDriver::_loadMarketInfo))
-      .def("_loadStockTypeInfo", pure_virtual(&BaseInfoDriver::_loadStockTypeInfo))
-      .def("_loadStock", pure_virtual(&BaseInfoDriver::_loadStock))
-      .def("getFinanceInfo", &BaseInfoDriver::getFinanceInfo,
-           &BaseInfoDriverWrap::default_getFinanceInfo)
-      .def("getStockWeightList", &BaseInfoDriver::getStockWeightList,
-           &BaseInfoDriverWrap::default_getStockWeightList)
-      .def("getMarketInfo", &BaseInfoDriver::getMarketInfo,
-           &BaseInfoDriverWrap::default_getMarketInfo);
-
-    register_ptr_to_python<BaseInfoDriverPtr>();
+static string BaseInfoDriver_to_str(const BaseInfoDriver& v) {
+    std::stringstream out;
+    out << v;
+    return out.str();
 }
 
-#endif
+void export_BaseInfoDriver(py::module& m) {
+    py::class_<BaseInfoDriver, BaseInfoDriverPtr, PyBaseInfoDriver>(m, "BaseInfoDriver",
+                                                                    R"(基本信息数据获取驱动基类
+
+    子类接口：
+        - _init(self) (必须)
+        - getAllStockInfo(self) (必须)
+        - getStockInfo(self, market, code) (必须)
+        - getMarketInfo(self, market) (必须)
+        - getAllMarketInfo(self) (必须)
+        - getAllStockTypeInfo(self) (必须)
+        - getStockTypeInfo(self, type) (必须)
+        - getAllHolidays(self) (必须)
+        - getAllZhBond10(self) (必须)
+        - getStockWeightList(self, market, code, start, end)
+        - getAllStockWeightList(self)
+        - getHistoryFinance(self, market, code, start, end)
+        - getHistoryFinanceField(self)
+        - getFinanceInfo(self, market, code)
+    )")
+      .def(py::init<const string&>(), R"(初始化
+
+    :param str name: 驱动名称)")
+      .def_property_readonly("name", &BaseInfoDriver::name, py::return_value_policy::copy,
+                             "驱动名称")
+      .def("__str__", BaseInfoDriver_to_str)
+      .def("__repr__", BaseInfoDriver_to_str)
+
+      .def("get_param", &BaseInfoDriver::getParam<boost::any>, "获取指定参数")
+      .def("set_param",
+           static_cast<void (BaseInfoDriver::*)(const std::string&, const boost::any&)>(
+             &BaseInfoDriver::setParam),
+           "设置指定参数")
+      .def("have_param", &BaseInfoDriver::haveParam, "指定参数是否存在")
+
+      .def("_init", &BaseInfoDriver::_init, "【子类接口（必须）】驱动初始化")
+      .def("getAllStockInfo", &BaseInfoDriver::getAllStockInfo,
+           "【子类接口（必须）】获取所有股票详情信息")
+      .def("getStockInfo", &BaseInfoDriver::getStockInfo, py::arg("market"), py::arg("code"),
+           R"(【子类接口（必须）】获取指定的证券信息
+
+    :param str market: 市场简称
+    :param str code: 证券代码)")
+      .def("getStockWeightList", &BaseInfoDriver::getStockWeightList, py::arg("market"),
+           py::arg("code"), py::arg("start"), py::arg("end"),
+           R"(获取指定日期范围内 [start, end) 的权息列表
+
+    :param str market: 市场简称
+    :param str code: 证券代码
+    :param Datetime start: 起始日期
+    :param Datetime end: 结束日期)")
+      .def("getAllStockWeightList", &BaseInfoDriver::getAllStockWeightList,
+           "获取所有股票的权息列表")
+      .def("getHistoryFinance", &BaseInfoDriver::getHistoryFinance, py::arg("market"),
+           py::arg("code"), py::arg("start"), py::arg("end"),
+           R"(获取历史财务信息
+
+    :param str market: 市场简称
+    :param str code: 证券代码
+    :param Datetime start: 财务报告发布起始日期
+    :param Datetime end: 查询结束日期)")
+      .def("getHistoryFinanceField", &BaseInfoDriver::getHistoryFinanceField,
+           "获取历史财务信息字段序号与名称")
+      .def("getFinanceInfo", &BaseInfoDriver::getFinanceInfo, py::arg("market"), py::arg("code"),
+           R"(获取当前财务信息
+
+    :param str market: 市场标识
+    :param str code: 证券代码)")
+      .def("getMarketInfo", &BaseInfoDriver::getMarketInfo, py::arg("market"),
+           R"(【子类接口（必须）】获取指定的MarketInfo
+
+    :param str market: 市场简称
+    :return: 如未找到，则返回 Null<MarketInfo>())")
+      .def("getAllMarketInfo", &BaseInfoDriver::getAllMarketInfo,
+           "【子类接口（必须）】获取全部市场信息")
+      .def("getAllStockTypeInfo", &BaseInfoDriver::getAllStockTypeInfo,
+           "【子类接口（必须）】获取全部证券类型信息")
+      .def("getStockTypeInfo", &BaseInfoDriver::getStockTypeInfo, py::arg("type"),
+           R"(【子类接口（必须）】获取相应的证券类型详细信息
+
+    :param int type: 证券类型
+    :return: 对应的证券类型信息，如果不存在，则返回Null<StockTypeInfo>())")
+      .def("getAllHolidays", &BaseInfoDriver::getAllHolidays,
+           "【子类接口（必须）】获取所有节假日日期")
+      .def("getAllZhBond10", &BaseInfoDriver::getAllZhBond10,
+           "【子类接口（必须）】获取所有中国10年期国债信息");
+}

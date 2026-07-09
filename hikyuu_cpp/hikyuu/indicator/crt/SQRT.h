@@ -25,8 +25,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API SQRT();
-Indicator SQRT(Indicator::value_t);
-Indicator SQRT(const Indicator& ind);
 
 inline Indicator SQRT(const Indicator& ind) {
     return SQRT()(ind);

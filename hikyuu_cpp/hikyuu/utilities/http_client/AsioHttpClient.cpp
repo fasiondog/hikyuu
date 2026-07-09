@@ -12,6 +12,7 @@
 #include "url.h"
 
 #include <sstream>
+#include <cstring>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
@@ -502,13 +503,13 @@ net::awaitable<std::vector<tcp::endpoint>> AsioHttpClient::_resolveDNS() {
         if (ai->ai_family == AF_INET) {
             auto* sin = reinterpret_cast<sockaddr_in*>(ai->ai_addr);
             net::ip::address_v4::bytes_type v4_bytes;
-            std::memcpy(&v4_bytes, &(sin->sin_addr.s_addr), sizeof(v4_bytes));
+            memcpy(&v4_bytes, &(sin->sin_addr.s_addr), sizeof(v4_bytes));
             dns_endpoints.push_back(
               tcp::endpoint(net::ip::make_address_v4(v4_bytes), ntohs(sin->sin_port)));
         } else if (ai->ai_family == AF_INET6) {
             auto* sin6 = reinterpret_cast<sockaddr_in6*>(ai->ai_addr);
             net::ip::address_v6::bytes_type v6_bytes;
-            std::memcpy(&v6_bytes, &(sin6->sin6_addr.s6_addr), sizeof(v6_bytes));
+            memcpy(&v6_bytes, &(sin6->sin6_addr.s6_addr), sizeof(v6_bytes));
             dns_endpoints.push_back(
               tcp::endpoint(net::ip::make_address_v6(v6_bytes), ntohs(sin6->sin6_port)));
         }

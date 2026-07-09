@@ -20,14 +20,12 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ROUND(int ndigits = 2);
-Indicator ROUND(Indicator::value_t, int ndigits = 2);
-Indicator ROUND(const Indicator& ind, int ndigits = 2);
 
-inline Indicator ROUND(const Indicator& ind, int n) {
+inline Indicator ROUND(const Indicator& ind, int n = 2) {
     return ROUND(n)(ind);
 }
 
-inline Indicator ROUND(Indicator::value_t val, int n) {
+inline Indicator ROUND(Indicator::value_t val, int n = 2) {
     return ROUND(CVAL(val), n);
 }
 

@@ -39,73 +39,69 @@ Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, const IndParam&
  * @param slow_n 对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响
  * @ingroup Indicator
  */
-inline Indicator HKU_API AMA(const Indicator& ind, int n = 10, int fast_n = 2, int slow_n = 30) {
+inline Indicator AMA(const Indicator& ind, int n = 10, int fast_n = 2, int slow_n = 30) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, int n, const IndParam& fast_n, int slow_n = 30) {
+inline Indicator AMA(const Indicator& ind, int n, const IndParam& fast_n, int slow_n = 30) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, int n, int fast_n, const IndParam& slow_n) {
+inline Indicator AMA(const Indicator& ind, int n, int fast_n, const IndParam& slow_n) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, int n, const IndParam& fast_n,
-                             const IndParam& slow_n) {
+inline Indicator AMA(const Indicator& ind, int n, const IndParam& fast_n, const IndParam& slow_n) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const IndParam& n, int fast_n = 2,
-                             int slow_n = 30) {
+inline Indicator AMA(const Indicator& ind, const IndParam& n, int fast_n = 2, int slow_n = 30) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const IndParam& n, const IndParam& fast_n,
-                             int slow_n = 30) {
+inline Indicator AMA(const Indicator& ind, const IndParam& n, const IndParam& fast_n,
+                     int slow_n = 30) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const IndParam& n, int fast_n,
-                             const IndParam& slow_n) {
+inline Indicator AMA(const Indicator& ind, const IndParam& n, int fast_n, const IndParam& slow_n) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const IndParam& n, const IndParam& fast_n,
-                             const IndParam& slow_n) {
+inline Indicator AMA(const Indicator& ind, const IndParam& n, const IndParam& fast_n,
+                     const IndParam& slow_n) {
     return AMA(n, fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, int n, const Indicator& fast_n, int slow_n) {
+inline Indicator AMA(const Indicator& ind, int n, const Indicator& fast_n, int slow_n) {
     return AMA(n, IndParam(fast_n), slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, int n, int fast_n, const Indicator& slow_n) {
+inline Indicator AMA(const Indicator& ind, int n, int fast_n, const Indicator& slow_n) {
     return AMA(n, fast_n, IndParam(slow_n))(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, int n, const Indicator& fast_n,
-                             const Indicator& slow_n) {
+inline Indicator AMA(const Indicator& ind, int n, const Indicator& fast_n,
+                     const Indicator& slow_n) {
     return AMA(n, IndParam(fast_n), IndParam(slow_n))(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const Indicator& n, int fast_n = 2,
-                             int slow_n = 30) {
+inline Indicator AMA(const Indicator& ind, const Indicator& n, int fast_n = 2, int slow_n = 30) {
     return AMA(IndParam(n), fast_n, slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const Indicator& n, const Indicator& fast_n,
-                             int slow_n = 30) {
+inline Indicator AMA(const Indicator& ind, const Indicator& n, const Indicator& fast_n,
+                     int slow_n = 30) {
     return AMA(IndParam(n), IndParam(fast_n), slow_n)(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const Indicator& n, int fast_n,
-                             const Indicator& slow_n) {
+inline Indicator AMA(const Indicator& ind, const Indicator& n, int fast_n,
+                     const Indicator& slow_n) {
     return AMA(IndParam(n), fast_n, IndParam(slow_n))(ind);
 }
 
-inline Indicator HKU_API AMA(const Indicator& ind, const Indicator& n, const Indicator& fast_n,
-                             const Indicator& slow_n) {
+inline Indicator AMA(const Indicator& ind, const Indicator& n, const Indicator& fast_n,
+                     const Indicator& slow_n) {
     return AMA(IndParam(n), IndParam(fast_n), IndParam(slow_n))(ind);
 }
 

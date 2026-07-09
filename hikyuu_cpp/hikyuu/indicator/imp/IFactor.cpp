@@ -30,6 +30,13 @@ string IFactor::formula() const {
 IndicatorImpPtr IFactor::_clone() {
     return make_shared<IFactor>(m_factor);
 }
+
+bool IFactor::selfAlike(const IndicatorImp& other) const noexcept {
+    const auto* other_ctx = dynamic_cast<const IFactor*>(&other);
+    HKU_IF_RETURN(other_ctx == nullptr, false);
+    return m_factor.name() == other_ctx->m_factor.name();
+}
+
 void IFactor::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);

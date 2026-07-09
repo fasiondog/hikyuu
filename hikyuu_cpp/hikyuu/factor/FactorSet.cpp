@@ -48,6 +48,15 @@ FactorSet::FactorSet(const string& name, const KQuery::KType& ktype, const Block
     m_data->block = block;
 }
 
+FactorSet::FactorSet(const FactorList& factors, const KQuery::KType& ktype, const Block& block,
+                     const string& name)
+: m_data(make_shared<Data>()) {
+    m_data->name = utf8_to_upper(name);
+    m_data->ktype = ktype;
+    m_data->block = block;
+    add(factors);
+}
+
 FactorSet::FactorSet(const FactorSet& other) : m_data(other.m_data) {}
 
 FactorSet::FactorSet(FactorSet&& other) : m_data(std::move(other.m_data)) {}

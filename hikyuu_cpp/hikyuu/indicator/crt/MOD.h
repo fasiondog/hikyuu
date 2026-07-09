@@ -23,10 +23,6 @@ namespace hku {
  * @param ind2 指标2，将取整
  * @ingroup Indicator
  */
-Indicator MOD(const Indicator& ind1, const Indicator& ind2);
-Indicator MOD(const Indicator& ind1, Indicator::value_t ind2);
-Indicator MOD(Indicator::value_t ind1, const Indicator& ind2);
-Indicator MOD(Indicator::value_t ind1, Indicator::value_t ind2);
 
 inline Indicator MOD(const Indicator& ind1, const Indicator& ind2) {
     return (ind1 % ind2);

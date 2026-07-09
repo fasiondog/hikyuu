@@ -80,12 +80,11 @@ private:
 };
 
 void export_extend_Indicator(py::module& m) {
-    m.def("FIXED_START_INDEX", py::overload_cast<int, const string&>(FIXED_START_INDEX),
-          py::arg("start_index") = 0, py::arg("factor_name") = "");
-    m.def("FIXED_START_INDEX",
-          py::overload_cast<const Indicator&, int, const string&>(FIXED_START_INDEX),
-          py::arg("ind"), py::arg("start_index") = 0, py::arg("factor_name") = "",
-          R"(FIXED_START_INDEX([ind, start_index=0, factor_name=''])
+    m.def("FIXED_START_INDEX", py::overload_cast<int>(FIXED_START_INDEX),
+          py::arg("start_index") = 0);
+    m.def("FIXED_START_INDEX", py::overload_cast<const Indicator&, int>(FIXED_START_INDEX),
+          py::arg("ind"), py::arg("start_index") = 0,
+          R"(FIXED_START_INDEX([ind, start_index=0])
 
     固定指标计算时使用的查询范围的起始索引。
 
@@ -93,16 +92,15 @@ void export_extend_Indicator(py::module& m) {
 
     :param Indicator ind: 输入指标
     :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :return: 指标数据
     :rtype: Indicator)");
 
-    m.def("FIXED_START_DATE", py::overload_cast<const Datetime&, const string&>(FIXED_START_DATE),
-          py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "");
+    m.def("FIXED_START_DATE", py::overload_cast<const Datetime&>(FIXED_START_DATE),
+          py::arg("start_date") = Datetime::min());
     m.def("FIXED_START_DATE",
-          py::overload_cast<const Indicator&, const Datetime&, const string&>(FIXED_START_DATE),
-          py::arg("ind"), py::arg("start_date") = Datetime::min(), py::arg("factor_name") = "",
-          R"(FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+          py::overload_cast<const Indicator&, const Datetime&>(FIXED_START_DATE), py::arg("ind"),
+          py::arg("start_date") = Datetime::min(),
+          R"(FIXED_START_DATE([ind, start_date=Datetime.min()])
 
     固定指标计算时使用的查询范围的起始日期。
 
@@ -110,7 +108,6 @@ void export_extend_Indicator(py::module& m) {
 
     :param Indicator ind: 输入指标
     :param Datetime start_date: 起始日期，默认为 Datetime.min()
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :return: 指标数据
     :rtype: Indicator)");
 
@@ -319,6 +316,88 @@ void export_extend_Indicator(py::module& m) {
     PY_AGG_IND_DEFINE(AGG_MAD, "聚合函数: 平均绝对偏差, 可参考 AGG_STD 帮助")
     PY_AGG_IND_DEFINE(AGG_MEDIAN, "聚合函数: 中位数, 可参考 AGG_STD 帮助")
     PY_AGG_IND_DEFINE(AGG_PROD, "聚合函数: 乘积, 可参考 AGG_STD 帮助")
+
+    m.def("AGG_SAMPLE",
+          py::overload_cast<const Indicator&, const string&, const KQuery::KType&, bool, int>(
+            &AGG_SAMPLE),
+          py::arg("ind"), py::arg("time") = "9:35", py::arg("ktype") = KQuery::MIN,
+          py::arg("fill_null") = false, py::arg("unit") = 1,
+          R"(AGG_SAMPLE(ind[, time="9:35", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间采样聚合指标，在指定时间点对指标数据进行采样。
+
+    如果找不到精确匹配的时间，会选择最接近目标时间之前的有效数据。
+
+    :param Indicator ind: 输入指标
+    :param str time: 指定采样时间，格式为 HH:MM，默认为 "9:35"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
+    m.def(
+      "AGG_SAMPLE_MAX",
+      py::overload_cast<const Indicator&, const string&, const string&, const KQuery::KType&, bool,
+                        int>(&AGG_SAMPLE_MAX),
+      py::arg("ind"), py::arg("start_time") = "9:30", py::arg("last_time") = "10:00",
+      py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_SAMPLE_MAX(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间段最大值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最大值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
+    m.def(
+      "AGG_SAMPLE_MIN",
+      py::overload_cast<const Indicator&, const string&, const string&, const KQuery::KType&, bool,
+                        int>(&AGG_SAMPLE_MIN),
+      py::arg("ind"), py::arg("start_time") = "9:30", py::arg("last_time") = "10:00",
+      py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_SAMPLE_MIN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间段最小值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最小值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
+
+    m.def(
+      "AGG_SAMPLE_MEAN",
+      py::overload_cast<const Indicator&, const string&, const string&, const KQuery::KType&, bool,
+                        int>(&AGG_SAMPLE_MEAN),
+      py::arg("ind"), py::arg("start_time") = "9:30", py::arg("last_time") = "10:00",
+      py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
+      R"(AGG_SAMPLE_MEAN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间段平均值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的平均值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator)");
 
     m.def("AGG_STD",
           py::overload_cast<const Indicator&, const KQuery::KType&, bool, int, int>(&AGG_STD),

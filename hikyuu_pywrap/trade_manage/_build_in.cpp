@@ -70,5 +70,15 @@ void export_build_in(py::module& m) {
     :param float transferfee: 过户费
     :return: :py:class:`TradeCostBase` 子类实例)");
 
+    m.def("TC_FixedETF", TC_FixedETF, py::arg("commission") = 0.0001,
+          py::arg("lowest_commission") = 5.0,
+          R"(TC_FixedETF([commission=0.0001, lowestCommission=5.0])
+
+    ETF交易成本算法，买卖双向收取佣金，无印花税和过户费。
+
+    :param float commission: 佣金比例，默认万分之1
+    :param float lowestCommission: 最低佣金值，默认5元/笔
+    :return: :py:class:`TradeCostBase` 子类实例)");
+
     m.def("TC_Zero", TC_Zero, "零交易成本算法");
 }

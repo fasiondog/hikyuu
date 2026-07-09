@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <cstring>
 #include <vector>
 #include "MySQLStatement.h"
 #include "MySQLConnect.h"
@@ -198,7 +199,7 @@ void MySQLStatement::_bindResult() {
                    field->type == MYSQL_TYPE_TIMESTAMP || field->type == MYSQL_TYPE_TIME ||
                    field->type == MYSQL_TYPE_TIME2) {
             MYSQL_TIME item;
-            std::memset(&item, 0, sizeof(item));
+            memset(&item, 0, sizeof(item));
             m_impl->result_buffer.push_back(item);
             auto& buf = m_impl->result_buffer.back();
             m_impl->result_bind[idx].buffer = boost::any_cast<MYSQL_TIME>(&buf);

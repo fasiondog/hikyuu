@@ -71,6 +71,17 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 
 ### 方法
 
+#### 通用方法
+
+```
+# 检查因子是否为空
+is_null = factor.is_null()
+```
+
+**返回值:**
+
+- `bool`: 如果因子为空返回 True，否则返回 False
+
 #### 数据库操作 ⚠️ 捐赠用户功能
 
 <div class="admonition note">
@@ -220,6 +231,9 @@ FactorSet(name, ktype=KQuery.DAY, block=Block())
 
 # 使用指标列表创建因子集合
 FactorSet(inds, ktype=KQuery.DAY)
+
+# 使用因子列表创建因子集合
+FactorSet(factors[, ktype=KQuery.DAY[, block=Block(), name='']])
 ```
 
 **参数说明:**
@@ -228,8 +242,9 @@ FactorSet(inds, ktype=KQuery.DAY)
 - `ktype` (KQuery.KType): K线类型，默认为日线
 - `block` (Block): 板块信息，证券集合，默认为空
 - `inds` (list): 指标列表
+- `factors` (list): 因子列表
 
-**注意:** 使用指标列表创建时，同名的指标会被覆盖，最终保留最后一个同名指标
+**注意:** 使用指标列表或因子列表创建时，同名的指标/因子会被覆盖，最终保留最后一个同名指标/因子
 
 ### FactorSet属性
 
@@ -384,6 +399,26 @@ mf_equal = MF_EqualWeight(factor_set, stocks, query)
 
 ### 因子数据库操作 ⚠️ 捐赠用户功能
 
+#### has_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
+
+检查指定名称和类型的因子是否存在于数据库中
+
+```python
+from hikyuu import *
+
+# 检查日线因子是否存在 ⚠️ 捐赠用户功能
+exists = has_factor("MA5")
+# 检查周线因子是否存在 ⚠️ 捐赠用户功能
+weekly_exists = has_factor("MA5", KQuery.WEEK)
+```
+
+**参数说明:**
+
+- `name` (str): 因子名称
+- `ktype` (KQuery.KType): K线类型，默认为日线
+
+**返回值:** `bool` - 如果因子存在返回 True，否则返回 False
+
 #### get_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
 
 获取指定名称和类型的因子元数据
@@ -472,6 +507,26 @@ update_all_factors_values(KQuery.WEEK)
 - `ktype` (KQuery.KType): K线类型，默认为日线
 
 **使用场景:** 每日行情数据下载完成后，可以调用此函数更新所有存储的因子值。该操作为增量更新，只计算新增数据部分，提高更新效率。
+
+#### is_valid_factor_name(name)
+
+验证因子名称是否合法
+
+```python
+from hikyuu import *
+
+# 验证因子名称是否合法
+is_valid = is_valid_factor_name("MA5")
+print(f"MA5 是否为合法因子名称: {is_valid}")
+```
+
+**参数说明:**
+
+- `name` (str): 因子名称
+
+**返回值:** `bool` - 如果名称合法返回 True，否则返回 False
+
+**注意:** 该函数主要用于 ClickHouse 数据库驱动，非 ClickHouse 驱动下始终返回 True
 
 ### 因子集数据库操作 ⚠️ 捐赠用户功能
 

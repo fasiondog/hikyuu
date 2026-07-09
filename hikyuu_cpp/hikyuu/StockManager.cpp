@@ -612,7 +612,7 @@ BlockList StockManager::getStockBelongs(const Stock& stk, const string& category
     BlockList result;
     BlockList all = getBlockList(category);
     for (const auto& blk : all) {
-        if (blk.getIndexStock() == stk) {
+        if (blk.have(stk)) {
             result.push_back(blk);
         }
     }
@@ -985,7 +985,7 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
 }
 
 void StockManager::waitDataReady() const {
-    HKU_INFO_IF(!dataReady(), htr("Waiting for data loading to complete..."));
+    HKU_INFO_IF(!dataReady(), htr("Waiting for preload data loading to complete..."));
     while (!dataReady()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }

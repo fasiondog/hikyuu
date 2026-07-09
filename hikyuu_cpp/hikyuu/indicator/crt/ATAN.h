@@ -20,8 +20,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API ATAN();
-Indicator ATAN(Indicator::value_t);
-Indicator ATAN(const Indicator& ind);
 
 inline Indicator ATAN(const Indicator& ind) {
     return ATAN()(ind);

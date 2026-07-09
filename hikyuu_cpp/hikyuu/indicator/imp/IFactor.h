@@ -24,6 +24,8 @@ public:
     virtual void _calculate(const Indicator& data) override;
     virtual IndicatorImpPtr _clone() override;
 
+    virtual bool selfAlike(const IndicatorImp& other) const noexcept override;
+
 private:
     Factor m_factor;
 

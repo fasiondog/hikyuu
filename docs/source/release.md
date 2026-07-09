@@ -2,6 +2,61 @@
 
 # 版本发布说明
 
+## 2.8.1 - 2026年7月10日
+
+**🚀 新增特性**
+
+* feat(strategy): 添加获取当日指定时间点价格的功能及其Python绑定
+* feat(extind): 添加时间采样聚合指标 AGG_SAMPLE、AGG_SAMPLE_MAX、AGG_SAMPLE_MIN、AGG_SAMPLE_MEAN 及其文档和测试
+* feat(tm_performance): 添加当前距历史最高点回撤百分比计算
+* feat(indicator): 添加 MDD_CURRENT 指标及其文档和测试
+* feat(indicator): 更新SLOPE指标以计算斜率、拟合优度R²和相对最大残差
+* feat(indicator): 添加FITR2指标以计算线性回归拟合优度R²
+* feat(matplotlib_draw): 添加对数坐标选项到系统绩效绘图函数, 年度收益率柱状图绘制功能及年月收益热力图添加年收益显示,增加热力图函数参数以显示月度最高和最低收益
+* feat(FACTOR): 添加因子名称参数支持，提供便捷版本的因子指标转换
+* feat(FactorSet): 更新构造函数以支持更多参数，添加使用因子列表创建因子集合的构造函数
+* feat(Factor): 添加has_factor函数和is_null方法以检查因子是否存在或为空
+* feat(WildcardMatch): 重构通配符匹配函数，支持UTF-8编码并优化匹配逻辑
+* feat(ITsRank): 添加增量计算支持及相关测试用例
+* feat(gui): 根据平台调整默认字体大小以改善用户体验
+* feat(ETF交易成本): 添加ETF交易成本算法及相关接口
+* feat(BaseInfoDriver): 补充Python绑定缺失的 `DataDriverFactory.regKDataDriver` 方法
+
+**⚡️ 优化改进**
+
+* refactor(IMdd/IMrr): 将方案4(O(N*n)暴力)替换为SWAG(O(N)双栈摊还)算法
+* refactor(ALIGN): 修正函数声明格式，移除多余括号
+* refactor(TS_RANK): 简化函数声明，移除不必要的增量计算支持测试
+* refactor: 移除FIXED_START_INDEX和FIXED_START_DATE函数中的factor_name参数以简化接口
+* Factor内部存储管理与计算优化
+
+**🐞 缺陷修复**
+
+* fix(trade): 导出TradeManager中 getParam 方法改名为 get_param，和文档保持一致
+* fix(parameter): 添加int64_t类型的get方法以支持64位整数的获取（之前会导致dataserver异常）
+* fix(draw): 修复 tm_heatmap 和 tm_year_profit 函数的结束日期逻辑
+* fix(strategy): 修复获取指定时间点价格时的时间限制逻辑
+* fix(extind): 调整 AGG_SAMPLE 系列函数参数顺序以保持一致性
+* fix(ISumBars): 修复 _dyn_calculate 返回值符号与静态版相反
+* fix(Indicator): 修复 operator() alike 短路返回未计算空壳导致 size=0
+* fix(IMa): n<=0 分支分母用 valid_count 而非物理跨度
+* fix(IStdev): _dyn 加窗口未满 guard，消除与静态 discard 不一致
+* fix(indicator): MA/STDEV NaN 语义统一为 Welford valid mean/std
+* fix(indicator): 在 clone 方法中添加 m_old_context 成员的复制
+* fix(indicator): ISpearman tie-handling 用 Pearson-on-ranks 替换简化公式
+* fix(multifactor): 行业中性化用组内去均值替代整数编码单变量回归，修复 ALIGN 改名导致路由静默失效
+* fix(multifactor): 修复风格因子中性化的数据竞争与数学错误
+* fix(multifactor): 恢复 Eigen 线程数以优化性能
+* fix(IMdd/IMrr): 修复增量计算 look-ahead bias (未来数据污染)
+* fix(ADVANCE/DECLINE): 修复 NaN truthy + 增量脏读双累加
+* fix(IDecline): 修复增量计算运算符反向，对齐 ADVANCE 防护
+* fix(Block): 优化相等比较逻辑，通过排序比较股票市场代码
+* fix(StockManager): 更新数据加载提示信息，明确为预加载数据
+* fix(Strategy): 添加对特殊卖出条件的处理，确保在num为-MAX_DOUBLE时执行卖出操作
+* fix(backtest): 优化回测模式 0 下的结束日期处理, mode 0 时最后一天的买入卖出处理优化
+* 修正 getBlockListByIndexStock 函数中的条件判断逻辑
+* 修正 get_belong_to_block_list 得不到板块的问题
+
 ## 2.8.0 - 2026年6月10日
 
 **🚀 新增特性**

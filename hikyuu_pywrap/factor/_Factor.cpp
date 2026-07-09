@@ -89,6 +89,8 @@ void export_Factor(py::module& m) {
                     py::overload_cast<KQuery::RecoverType>(&Factor::recoverType),
                     py::return_value_policy::copy, "复权类型")
 
+      .def("is_null", &Factor::isNull, "是否为空因子")
+
       .def("save_to_db", &Factor::save_to_db, py::arg("update_before") = true,
            R"(save_to_db(self[, update_before=True])
     

@@ -84,48 +84,6 @@ void ISpearman::_calculate(const Indicator &ind) {
     }
 
     _increment_calculate(ind, m_discard);
-
-#if 0
-    auto levela = std::make_unique<value_t[]>(n);
-    auto levelb = std::make_unique<value_t[]>(n);
-    auto *ptra = levela.get();
-    auto *ptrb = levelb.get();
-
-    // 不处理 n 不足的情况，防止只需要计算全部序列时，过于耗时
-    double back = std::pow(n, 3) - n;
-    vector<IndicatorImp::value_t> tmpa;
-    vector<IndicatorImp::value_t> tmpb;
-    tmpa.reserve(n);
-    tmpa.reserve(n);
-
-    auto *dst = this->data();
-    auto const *a = ind.data() + m_discard + 1 - n;
-    auto const *b = ref.data() + m_discard + 1 - n;
-    for (size_t i = m_discard; i < total; ++i) {
-        tmpa.clear();
-        tmpb.clear();
-        for (int j = 0; j < n; j++) {
-            if (!std::isnan(a[j]) && !std::isnan(b[j])) {
-                tmpa.push_back(a[j]);
-                tmpb.push_back(b[j]);
-            }
-        }
-        int act_count = tmpa.size();
-        if (act_count < 2) {
-            continue;
-        }
-        spearmanLevel(tmpa.data(), ptra, act_count);
-        spearmanLevel(tmpb.data(), ptrb, act_count);
-        value_t sum = 0.0;
-        for (int j = 0; j < act_count; j++) {
-            sum += std::pow(ptra[j] - ptrb[j], 2);
-        }
-        dst[i] = act_count == n ? 1.0 - 6.0 * sum / back
-                                : 1.0 - 6.0 * sum / (std::pow(act_count, 3) - act_count);
-        a++;
-        b++;
-    }
-#endif
 }
 
 bool ISpearman::supportIncrementCalculate() const {
@@ -141,7 +99,6 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
     Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
-    double back = std::pow(n, 3) - n;
     auto *dst = this->data();
     auto const *srca = ind.data() + 1 - n;
     auto const *srcb = ref.data() + 1 - n;
@@ -172,12 +129,29 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
 
           spearmanLevel(tmpa.data(), ptra, act_count);
           spearmanLevel(tmpb.data(), ptrb, act_count);
-          value_t sum = 0.0;
+          // 对 rank 直接计算 Pearson 相关系数（tie-safe）。
+          // 关键性质: average-rank 不改变秩的总和, 故 rank 均值恒为先验常数
+          // (act_count+1)/2, 无需遍历估计, 消除大数相减的 catastrophic cancellation。
+          double mean_rank = (act_count + 1) / 2.0;
+          double var_r = 0.0, var_s = 0.0, cov = 0.0;
           for (int j = 0; j < act_count; j++) {
-              sum += std::pow(ptra[j] - ptrb[j], 2);
+              double dev_r = ptra[j] - mean_rank;
+              double dev_s = ptrb[j] - mean_rank;
+              var_r += dev_r * dev_r;
+              var_s += dev_s * dev_s;
+              cov += dev_r * dev_s;
           }
-          dst[i] = act_count == n ? 1.0 - 6.0 * sum / back
-                                  : 1.0 - 6.0 * sum / (std::pow(act_count, 3) - act_count);
+          // 零方差(因子或收益率在截面上全等)时返回 0.0:
+          // 语义为"无区分度即无预测力"。不返回 NaN, 因下游 MA 指标对 NaN
+          // 为"一 NaN 全 NaN"传染(且首窗口含 NaN 会静默输出偏低错误值),
+          // 加权合成无 NaN 守卫, NaN 会扩散污染约 ic_rolling_n 天的权重。
+          if (var_r == 0.0 || var_s == 0.0) {
+              dst[i] = 0.0;
+          } else {
+              double rho = cov / std::sqrt(var_r * var_s);
+              // 钳位处理浮点误差引发的越界
+              dst[i] = std::max(-1.0, std::min(1.0, rho));
+          }
       },
       100);
 }

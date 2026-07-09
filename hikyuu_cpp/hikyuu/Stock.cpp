@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cstring>
 #include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
@@ -986,8 +987,8 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                        end_ix, total);
     size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
     result.resize(length);
-    std::memcpy((void*)&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
-                sizeof(KRecord) * length);
+    memcpy((void*)&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
+           sizeof(KRecord) * length);
     return result;
 }
 

@@ -178,8 +178,10 @@ public:
 private:
     void initParam();
 
-    // 构造每个指标构造行业哑变量，以便进行行业中性化处理
-    unordered_map<string, PriceList> _buildDummyIndex();
+    // 构造每个指标的行业归属标签（整数板块序号）与板块数，以便进行行业中性化处理。
+    // 返回 {factor_name -> (labels, blk_count)}：
+    //   labels[i] = 股票 i 所属板块在 blks 中的下标（0..blk_count-1），无归属则为 blk_count。
+    unordered_map<string, std::pair<PriceList, size_t>> _buildDummyIndex();
 
     void _buildIndex();  // 计算完成后创建截面索引
 

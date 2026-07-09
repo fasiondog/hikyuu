@@ -226,6 +226,65 @@
 
     聚合函数: 乘积, 可参考 :func:`AGG_STD` 
 
+.. py:function:: AGG_SAMPLE(ind[, time="9:35", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间采样聚合指标，在指定时间点对指标数据进行采样。
+
+    如果找不到精确匹配的时间，会选择最接近目标时间之前的有效数据。
+
+    :param Indicator ind: 输入指标
+    :param str time: 指定采样时间，格式为 HH:MM，默认为 "9:35"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator
+
+.. py:function:: AGG_SAMPLE_MAX(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间段最大值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最大值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator
+
+.. py:function:: AGG_SAMPLE_MIN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间段最小值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最小值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator
+
+.. py:function:: AGG_SAMPLE_MEAN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
+
+    时间段平均值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的平均值。
+
+    包含 start_time 和 last_time 本身。
+
+    :param Indicator ind: 输入指标
+    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
+    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
+    :param KQuery.KType ktype: 聚合的K线周期
+    :param bool fill_null: 是否填充缺失值
+    :param int unit: 聚合周期单位
+    :return: 指标数据
+    :rtype: Indicator
+
 .. py:function:: AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.75])
 
     聚合其他K线周期分位数, 可参考 AGG_STD 帮助
@@ -797,11 +856,12 @@
     将Factor对象转换为Indicator，使其可以在指标系统中使用。
     该指标需要设置K线上下文才能进行计算。
 
-    :param Factor factor: 因子对象
+    :param Factor factor: 因子对象（与name二选一）
+    :param str name: 因子名称（便捷版本，与factor二选一）
     :rtype: Indicator
 
 
-.. py:function:: FIXED_START_INDEX([ind, start_index=0, factor_name=''])
+.. py:function:: FIXED_START_INDEX([ind, start_index=0])
 
     固定指标计算时使用的查询范围的起始索引
 
@@ -809,11 +869,10 @@
 
     :param Indicator ind: 输入指标
     :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :rtype: Indicator
 
 
-.. py:function:: FIXED_START_DATE([ind, start_date=Datetime.min(), factor_name=''])
+.. py:function:: FIXED_START_DATE([ind, start_date=Datetime.min()])
 
     固定指标计算时使用的查询范围的起始日期
 
@@ -821,7 +880,6 @@
 
     :param Indicator ind: 输入指标
     :param Datetime start_date: 起始日期，默认为 Datetime.min()
-    :param str factor_name: 因子名称（如不为空时，优先使用该因子值）
     :rtype: Indicator
 
 
@@ -1346,6 +1404,18 @@
     最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
 
 
+.. py:function:: MDD_CURRENT([data])
+
+    当前点到历史最高点的回撤百分比，按行业惯例为正值
+    
+    计算公式：(历史最高点 - 当前值) / 历史最高点 * 100%
+    
+    与 MDD 的区别：MDD 计算的是到指定窗口内最高点的回撤，而 MDD_CURRENT 计算的是到从序列起始点到当前点的历史最高点的回撤，不设时间窗口限制。
+    
+    :param Indicator data: 输入数据
+    :rtype: Indicator
+
+
 .. py:function:: MIN(ind1, ind2)
 
     求最小值, MIN(A,B)返回A和B中的较小值。
@@ -1692,11 +1762,27 @@
 
 .. py:function:: SLOPE(data, n=22)
 
-    计算线性回归斜率，N支持变量
+    计算线性回归斜率、拟合优度R²和相对最大残差，N支持变量
 
     :param Indicator|sequence data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
+
+    **结果集**：
+
+    * result(0): 斜率
+    * result(1): 拟合优度 R²
+    * result(2): 相对最大残差 RelMaxRes = max|yi - ŷi| / ȳ
+
+    **相对最大残差说明**：
+
+    * 分子：窗口内最大绝对残差（保证没有点严重远离回归线）
+    * 分母：窗口 y 均值（消除股价量纲，百分比含义）
+    * 指标越小 = 整段所有 K 线都紧贴回归线
+
+    **判定阈值举例**：
+
+    * RelMaxRes < 0.03：最远 K 线偏离均价不足 3%，全部点位贴合回归线
 
 
 .. py:function:: SMA([data, n=22, m=2])

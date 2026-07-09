@@ -619,34 +619,34 @@ def import_data(
     if ktype == "DAY":
         update_stock_info(connect, market)
         hku_info(f"更新 {market} 股票信息完毕")
-        connect.command(f"OPTIMIZE TABLE hku_data.year_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.year_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
                         "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.halfyear_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.halfyear_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
                         "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.quarter_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.quarter_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
                         "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.month_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.month_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
                         "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.week_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.week_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
                         "mutations_sync": 0})
-        connect.command(f"OPTIMIZE TABLE hku_data.day_k PARTITION '{market}' FINAL", settings={
+        connect.command(f"OPTIMIZE TABLE hku_data.day_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
                         "mutations_sync": 0})
         hku_info(f"优化 {market} 日线及扩展表数据完毕")
     if ktype == "5MIN":
-        hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.hour2_k PARTITION '{market}' FINAL", settings={
-            "mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+        hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.hour2_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
+            "mutations_sync": 0})
         hku_run_ignore_exception(connect.command,
-                                 f"OPTIMIZE TABLE hku_data.min30_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                                 f"OPTIMIZE TABLE hku_data.min30_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL DEDUPLICATE BY market, code, date", settings={"mutations_sync": 0})
         hku_run_ignore_exception(connect.command,
-                                 f"OPTIMIZE TABLE hku_data.min15_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                                 f"OPTIMIZE TABLE hku_data.min15_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL DEDUPLICATE BY market, code, date", settings={"mutations_sync": 0})
         hku_run_ignore_exception(connect.command,
-                                 f"OPTIMIZE TABLE hku_data.min5_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
-        hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.min60_k PARTITION '{market}' FINAL", settings={
-            "mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                                 f"OPTIMIZE TABLE hku_data.min5_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL DEDUPLICATE BY market, code, date", settings={"mutations_sync": 0})
+        hku_run_ignore_exception(connect.command, f"OPTIMIZE TABLE hku_data.min60_k PARTITION '{market}' FINAL DEDUPLICATE BY market, code, date", settings={
+            "mutations_sync": 0})
         hku_info(f"优化 {market} 5分钟线及扩展表完毕")
     if ktype == "1MIN":
         hku_run_ignore_exception(connect.command,
-                                 f"OPTIMIZE TABLE hku_data.min_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                                 f"OPTIMIZE TABLE hku_data.min_k PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL DEDUPLICATE BY market, code, date", settings={"mutations_sync": 0})
         hku_info(f"优化 {market} 1 分钟线表数据完毕")
 
     return add_record_count
@@ -817,7 +817,7 @@ def import_trans(
 
     cur_year = Datetime.today().year
     hku_run_ignore_exception(connect.command,
-                             f"OPTIMIZE TABLE hku_data.transdata PARTITION ('{market}', {cur_year}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                             f"OPTIMIZE TABLE hku_data.transdata PARTITION ('{market}', {cur_year}) FINAL DEDUPLICATE BY market, code, date", settings={"mutations_sync": 0})
     return add_record_count
 
 
@@ -975,7 +975,7 @@ def import_time(connect, market, quotations, api, dest_dir, max_days=9000, progr
 
     cur_year = Datetime.today().year
     hku_run_ignore_exception(connect.command,
-                             f"OPTIMIZE TABLE hku_data.timeline PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL", settings={"mutations_sync": 0, "optimize_skip_merged_partitions": 1})
+                             f"OPTIMIZE TABLE hku_data.timeline PARTITION ('{market}', {cur_year - cur_year % 10}) FINAL DEDUPLICATE BY market, code, date", settings={"mutations_sync": 0})
     return add_record_count
 
 

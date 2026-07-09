@@ -404,6 +404,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     p->m_discard = m_discard;
     p->m_result_num = m_result_num;
     p->m_context = m_context;
+    p->m_old_context = m_old_context;
     p->m_need_calculate = m_need_calculate;
     p->m_param_changed = m_param_changed;
     p->m_optype = m_optype;

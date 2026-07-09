@@ -20,8 +20,6 @@ namespace hku {
  * @ingroup Indicator
  */
 Indicator HKU_API TAN();
-Indicator TAN(Indicator::value_t);
-Indicator TAN(const Indicator& ind);
 
 inline Indicator TAN(const Indicator& ind) {
     return TAN()(ind);

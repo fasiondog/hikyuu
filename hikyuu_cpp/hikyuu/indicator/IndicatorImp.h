@@ -362,10 +362,11 @@ private:
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         string nan("nan");
         string inf;
+        string value;
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = size();
-            ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
-            buffer_t& values = *m_pBuffer[i];
+            ar& BOOST_SERIALIZATION_NVP(count);
+            const buffer_t& values = *m_pBuffer[i];
             for (size_t j = 0; j < count; j++) {
                 if (std::isnan(values[j])) {
                     ar& boost::serialization::make_nvp<string>("item", nan);
@@ -373,7 +374,8 @@ private:
                     inf = values[j] > 0 ? "+inf" : "-inf";
                     ar& boost::serialization::make_nvp<string>("item", inf);
                 } else {
-                    ar& boost::serialization::make_nvp<value_t>("item", values[j]);
+                    value = std::to_string(values[j]);
+                    ar& boost::serialization::make_nvp<string>("item", value);
                 }
             }
         }
@@ -405,7 +407,7 @@ private:
         _readyBuffer(0, act_result_num);
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = 0;
-            ar& bs::make_nvp<size_t>(format("count_{}", i).c_str(), count);
+            ar& BOOST_SERIALIZATION_NVP(count);
             buffer_t& values = *m_pBuffer[i];
             values.resize(count);
             for (size_t j = 0; j < count; j++) {
@@ -418,7 +420,7 @@ private:
                 } else if (vstr == "-inf") {
                     values[j] = 0.0 - std::numeric_limits<double>::infinity();
                 } else {
-                    values[j] = std::atof(vstr.c_str());
+                    values[j] = std::stod(vstr);
                 }
             }
         }

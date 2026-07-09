@@ -1148,12 +1148,22 @@ if __name__ == "__main__":
     logging.getLogger("pytdx").setLevel(logging.WARNING)
 
     app = QApplication(sys.argv)
+    # 全局设置默认字体，放在创建窗口之前！
     if sys.platform == 'win32':
         # 检查Microsoft YaHei字体是否存在
         if is_font_installed('Microsoft YaHei'):
             f = QFont('Microsoft YaHei')
-            f.setPixelSize(12)
+            f.setPointSize(9)  # 使用pointSize而不是pixelSize，更稳定
             app.setFont(f)
+        else:
+            # 如果找不到字体，使用系统默认但确保设置正确的大小
+            default_font = QFont()
+            default_font.setPointSize(9)
+            app.setFont(default_font)
+    else:
+        default_font = QFont()
+        default_font.setPointSize(10 if sys.platform == 'darwin' else 14)
+        app.setFont(default_font)
 
     if (len(sys.argv) > 1 and sys.argv[1] == '0'):
         FORMAT = '%(asctime)-15s [%(levelname)s]: %(message)s [%(name)s::%(funcName)s]'

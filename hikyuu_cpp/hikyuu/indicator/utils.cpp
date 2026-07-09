@@ -7,6 +7,8 @@
 
 #include <Eigen/Dense>
 #include "hikyuu/utilities/thread/algorithm.h"
+#include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/ROCP.h"
 #include "utils.h"
 
 namespace hku {
