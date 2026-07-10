@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hikyuu\n"
-"POT-Creation-Date: 2026-06-22 14:09+0800\n"
-"PO-Revision-Date: 2026-06-22 14:10+0800\n"
+"POT-Creation-Date: 2026-07-11 00:52+0800\n"
+"PO-Revision-Date: 2026-07-11 00:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: hikyuu.org\n"
 "Language: zh\n"
@@ -139,7 +139,15 @@ msgstr "找不到插件： {}"
 msgid "Unable to obtain context. hikyuu may not be initialized. Please check!"
 msgstr "无法获取策略上下文，hikyuu可能未初始化。请检查！"
 
-#: hikyuu_cpp/hikyuu/trade_sys/multifactor/MultiFactorBase.cpp:445
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:50
+msgid ""
+"code name takeDatetime hold_days number invest market_value bonus "
+"return_rate initial_capital_return\n"
+msgstr ""
+"证券代码 证券名称 建仓日期 持有天数 持有数量 投入资金 当前市值 当前收益 当前"
+"收益率 相对账户初始资金收益率\n"
+
+#: hikyuu_cpp/hikyuu/trade_sys/multifactor/MultiFactorBase.cpp:446
 msgid ""
 "mf param \"save_all_factors\" is false, can't get all factors!, please set "
 "it to true if you want to get IC/ICIR!"

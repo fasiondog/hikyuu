@@ -45,6 +45,11 @@ string TradeManager::str() const {
     KQuery query(-1);
     PositionRecordList position = getPositionList();
     PositionRecordList::const_iterator iter = position.begin();
+    os << "    "
+       << htr(
+            "code name takeDatetime hold_days number invest market_value bonus "
+            "return_rate "
+            "initial_capital_return\n");
     for (; iter != position.end(); ++iter) {
         price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
         KData k = iter->stock.getKData(query);
