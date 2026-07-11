@@ -1061,7 +1061,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, vmin=-v_limit, vmax=v_limit, annot=annot_matrix, fmt='', ax=axes)
     # 设置标题和坐标轴标签
-    axes.set_title('年-月度收益率(%)热力图')
+    axes.set_title(f'{tm.name} 年-月度收益率(%)热力图')
     axes.set_xlabel('月度')
     axes.set_ylabel('年份')
 
@@ -1160,7 +1160,7 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
     if show_high_low:
         axes.legend()
 
-    axes.set_title('年度收益率(%)柱状图')
+    axes.set_title(f'{tm.name} 年度收益率(%)柱状图')
     axes.set_xlabel('年份')
     axes.set_ylabel('收益率(%)')
     axes.grid(axis='y', linestyle='--', alpha=0.7)
