@@ -1,25 +1,25 @@
-#include "IADX.h"
+#include "IAdx.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::IADX)
+BOOST_CLASS_EXPORT(hku::IAdx)
 #endif
 
 namespace hku {
 
-IADX::IADX() : IndicatorImp("ADX", 3) {
+IAdx::IAdx() : IndicatorImp("ADX", 3) {
     m_need_context = true;
     setParam<int>("n", 14);
 }
 
-IADX::~IADX() {}
+IAdx::~IAdx() {}
 
-void IADX::_checkParam(const string& name) const {
+void IAdx::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 2);
     }
 }
 
-void IADX::_calculate(const Indicator& data) {
+void IAdx::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
 
@@ -177,13 +177,13 @@ void IADX::_calculate(const Indicator& data) {
 }
 
 Indicator HKU_API ADX(int n) {
-    auto p = make_shared<IADX>();
+    auto p = make_shared<IAdx>();
     p->setParam<int>("n", n);
     return Indicator(p);
 }
 
 Indicator HKU_API ADX(const KData& kdata, int n) {
-    auto p = make_shared<IADX>();
+    auto p = make_shared<IAdx>();
     p->setParam<int>("n", n);
     p->setContext(kdata);
     return Indicator(p);
