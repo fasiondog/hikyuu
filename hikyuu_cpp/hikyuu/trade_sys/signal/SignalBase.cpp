@@ -69,7 +69,7 @@ SignalPtr SignalBase::clone() {
     p->m_buySig = m_buySig;
     p->m_sellSig = m_sellSig;
     p->m_cycle_start = m_cycle_start;
-    p->m_cycle_end = m_cycle_start;
+    p->m_cycle_end = m_cycle_end;
     return p;
 }
 
