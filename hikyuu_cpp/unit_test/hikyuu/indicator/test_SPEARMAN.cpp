@@ -176,6 +176,56 @@ TEST_CASE("test_SPEARMAN") {
 }
 
 /** @par 检测点 */
+TEST_CASE("test_SPEARMAN_n0_full_window") {
+    // 回归 n=0 默认参数：_calculate 将 n 归一化为 total 后委托
+    // _increment_calculate，后者必须再次归一化，否则窗口长度为 0、全 NaN。
+
+    /** @arg n=0 等价于 n=total 全窗口 */
+    PriceList a{3., 8., 4., 7., 2.};
+    PriceList b{5., 10., 8., 10., 6.};
+    Indicator x = PRICELIST(a);
+    Indicator y = PRICELIST(b);
+    Indicator result = SPEARMAN(x, y, 0);
+    CHECK_EQ(result.name(), "SPEARMAN");
+    CHECK_EQ(result.size(), a.size());
+    CHECK_EQ(result.discard(), 4);
+    // 硬编码期望钉死修复前“全 NaN”退路；并与显式 n=total 对照
+    CHECK_EQ(result[4], doctest::Approx(0.872082));
+    Indicator full = SPEARMAN(x, y, static_cast<int>(a.size()));
+    CHECK_EQ(result.discard(), full.discard());
+    CHECK_EQ(result[4], doctest::Approx(full[4]));
+
+    /** @arg 空序列 n=0：应安全返回空指标，不越界 */
+    result = SPEARMAN(Indicator(), Indicator(), 0);
+    CHECK_UNARY(result.empty());
+
+    /** @arg 极短序列 total=1, n=0：归一化 n=1，m_discard=0+1-1=0；
+     *  act_count=1<2 不写值，result[0] 为 NaN（discard 仍为 0，非全量） */
+    PriceList short_a{1.};
+    PriceList short_b{2.};
+    result = SPEARMAN(PRICELIST(short_a), PRICELIST(short_b), 0);
+    CHECK_EQ(result.size(), 1);
+    CHECK_EQ(result.discard(), 0);
+    CHECK_UNARY(std::isnan(result[0]));
+
+    /** @arg 下界触发 total=2, n=0：归一化 n=2，恰好 act_count==2，完全负相关 */
+    PriceList edge_a{1., 2.};
+    PriceList edge_b{2., 1.};
+    result = SPEARMAN(PRICELIST(edge_a), PRICELIST(edge_b), 0);
+    CHECK_EQ(result.size(), 2);
+    CHECK_EQ(result.discard(), 1);
+    CHECK_EQ(result[1], doctest::Approx(-1.0));
+
+    /** @arg 输入带 discard：有效数据不足以填满全窗口时 discard=total */
+    // total=5, ind.discard=2 → m_discard = 2 + 5 - 1 = 6 > 5 → discard=5
+    PriceList da{1., 2., 3., 4., 5.};
+    PriceList db{5., 4., 3., 2., 1.};
+    result = SPEARMAN(PRICELIST(da, 2), PRICELIST(db, 2), 0);
+    CHECK_EQ(result.size(), 5);
+    CHECK_EQ(result.discard(), 5);
+}
+
+/** @par 检测点 */
 TEST_CASE("test_SPEARMAN_with_ties") {
     // 回归 tie-handling: 当输入存在相同值(average-rank)时, 简化公式
     // 1 - 6*sum_d2/(n^3-n) 不再精确, 必须用 Pearson-on-ranks 计算。

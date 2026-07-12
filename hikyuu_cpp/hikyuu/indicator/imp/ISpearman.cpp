@@ -99,6 +99,11 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
     Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
+    // 与 _calculate 一致：n=0 表示全窗口。_calculate 只把归一化后的 n 用于
+    // m_discard，再委托本函数；本函数重新 getParam 会读到原始 0，必须再次转换。
+    if (n == 0) {
+        n = total;
+    }
     auto *dst = this->data();
     auto const *srca = ind.data() + 1 - n;
     auto const *srcb = ref.data() + 1 - n;
