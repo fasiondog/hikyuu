@@ -1766,6 +1766,58 @@
     :rtype: Indicator
 
 
+.. py:function:: RSRS_BULL([kdata, n=20, m=60])
+
+    RSRS 右偏标准分指标（层级4），基于光大研报进阶版修正 RSRS。
+
+    在修正标准分（Z × R²）基础上再乘一次原始 β，放大多头强势区间的分值、压缩空头弱势分值，专门做多择时用。
+
+    **计算层次**：
+    
+    1. **层次1（β）**：滚动 N 日 OLS 回归计算 β 值，公式：High = α + β · Low
+    2. **层次2（Z）**：滚动 M 日 Z-score 标准化，解决不同阶段 β 中枢漂移问题
+    3. **层次3（修正标准分）**：Z × R²，R² 为回归拟合优度，过滤拟合差的噪音
+    4. **层次4（右偏修正）**：Z × R² × β，放大多头强势区间
+
+    :param KData kdata: K线数据
+    :param int n: 回归窗口，默认为20
+    :param int m: Z-score窗口，默认为60
+    :rtype: Indicator
+
+    **返回结果**：
+
+    * result(0): 层级4修正值（右偏修正 = Z × R² × β）
+    * result(1): β 值（回归斜率）
+    * result(2): R² 值（回归拟合优度）
+    * result(3): Z 值（Z-score 标准化值）
+
+    **使用示例**::
+
+        # 获取K线数据
+        kdata = get_kdata('sh000001', Query(-1000))
+        
+        # 计算RSRS_BULL指标（默认n=20, m=60）
+        bull = RSRS_BULL(kdata)
+        
+        # 获取层级4修正值（结果集0）
+        bull_value = bull.get(-1, 0)
+        
+        # 获取 β 值（结果集1）
+        beta = bull.get(-1, 1)
+        
+        # 获取 R² 值（结果集2）
+        r2 = bull.get(-1, 2)
+        
+        # 获取 Z 值（结果集3）
+        z_score = bull.get(-1, 3)
+        
+        # 只有当 R² > 0.8 时，指标才有效
+        if r2 > 0.8:
+            print(f"有效 RSRS_BULL 值: {bull_value}")
+        else:
+            print("R² 过低，指标不可信")
+
+
 .. py:function:: RSRS_BETA([kdata, n=20])
 
     原始 RSRS（底层 β）指标，基于滚动N日OLS回归。

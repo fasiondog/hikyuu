@@ -513,6 +513,9 @@ Indicator (*BETA_2)(const Indicator&, const Indicator&, int, bool) = BETA;
 Indicator (*RSRS_BETA_1)(int) = RSRS_BETA;
 Indicator (*RSRS_BETA_2)(const KData&, int) = RSRS_BETA;
 
+Indicator (*RSRS_BULL_1)(int, int) = RSRS_BULL;
+Indicator (*RSRS_BULL_2)(const KData&, int, int) = RSRS_BULL;
+
 Indicator (*SPEARMAN_1)(const Indicator&, int, bool) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int, bool) = SPEARMAN;
 
@@ -1170,6 +1173,33 @@ void export_Indicator_build_in(py::module& m) {
 
     :param KData kdata: K线数据
     :param int n: 滚动窗口，默认为20
+    :rtype: Indicator)");
+
+    m.def("RSRS_BULL", RSRS_BULL_1, py::arg("n") = 20, py::arg("m") = 60);
+    m.def("RSRS_BULL", RSRS_BULL_2, py::arg("kdata"), py::arg("n") = 20, py::arg("m") = 60,
+          R"(RSRS_BULL([kdata, n=20, m=60])
+
+    RSRS 右偏标准分指标（层级4），基于光大研报进阶版修正 RSRS。
+
+    在修正标准分（Z × R²）基础上再乘一次原始 β，放大多头强势区间的分值、压缩空头弱势分值，专门做多择时用。
+
+    **计算层次**：
+
+    1. **层次1（β）**：滚动 N 日 OLS 回归计算 β 值，公式：High = α + β · Low
+    2. **层次2（Z）**：滚动 M 日 Z-score 标准化，解决不同阶段 β 中枢漂移问题
+    3. **层次3（修正标准分）**：Z × R²，R² 为回归拟合优度，过滤拟合差的噪音
+    4. **层次4（右偏修正）**：Z × R² × β，放大多头强势区间
+
+    **返回结果**：
+
+    * result(0): 层级4修正值（右偏修正 = Z × R² × β）
+    * result(1): β 值（回归斜率）
+    * result(2): R² 值（回归拟合优度）
+    * result(3): Z 值（Z-score 标准化值）
+
+    :param KData kdata: K线数据
+    :param int n: 回归窗口，默认为20
+    :param int m: Z-score窗口，默认为60
     :rtype: Indicator)");
 
     m.def("IF", IF_1);

@@ -147,5 +147,6 @@
 #include "crt/ZSCORE.h"
 #include "crt/QUANTILE_TRUNC.h"
 #include "crt/RSRS_BETA.h"
+#include "crt/RSRS_BULL.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

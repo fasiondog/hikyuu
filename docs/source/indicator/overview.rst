@@ -180,6 +180,7 @@
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
 * :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
+* :py:func:`RSRS_BULL` - RSRS 右偏标准分指标（层级4），基于光大研报进阶版修正 RSRS
 * :py:func:`RSRS_BETA` - 原始 RSRS（底层 β）指标，基于滚动N日OLS回归
 * :py:func:`RSI` - 相对强弱指标
 * :py:func:`SMA` - 移动平均线
