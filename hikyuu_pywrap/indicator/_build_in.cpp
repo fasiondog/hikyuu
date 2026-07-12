@@ -510,6 +510,9 @@ Indicator (*COV_2)(const Indicator&, const Indicator&, int, bool) = COV;
 Indicator (*BETA_1)(const Indicator&, int, bool) = BETA;
 Indicator (*BETA_2)(const Indicator&, const Indicator&, int, bool) = BETA;
 
+Indicator (*RSRS_BETA_1)(int) = RSRS_BETA;
+Indicator (*RSRS_BETA_2)(const KData&, int) = RSRS_BETA;
+
 Indicator (*SPEARMAN_1)(const Indicator&, int, bool) = SPEARMAN;
 Indicator (*SPEARMAN_2)(const Indicator&, const Indicator&, int, bool) = SPEARMAN;
 
@@ -1151,6 +1154,22 @@ void export_Indicator_build_in(py::module& m) {
     :param Indicator ref_ind: 对照指标，如市场收益率指标
     :param int n: 滚动窗口大小（大于2或等于0）。如果为0，使用输入的ind长度。
     :param bool fill_null: 日期对齐时，缺失日期填充nan值
+    :rtype: Indicator)");
+
+    m.def("RSRS_BETA", RSRS_BETA_1, py::arg("n") = 20);
+    m.def("RSRS_BETA", RSRS_BETA_2, py::arg("kdata"), py::arg("n") = 20,
+          R"(RSRS_BETA([kdata, n=20])
+
+    原始 RSRS（底层 β）指标，基于滚动N日OLS回归。
+
+    每根K线贡献一个坐标点 (Low[i], High[i])，使用滚动窗口内的N个点进行OLS回归。
+    公式：High = α + β · Low
+
+    β 为最原始的 RSRS 斜率，代表支撑阻力强弱。
+    缺陷：不同行情区间 β 中枢波动大，不能跨时段直接对比。
+
+    :param KData kdata: K线数据
+    :param int n: 滚动窗口，默认为20
     :rtype: Indicator)");
 
     m.def("IF", IF_1);

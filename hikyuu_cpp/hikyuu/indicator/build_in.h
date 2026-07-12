@@ -146,5 +146,6 @@
 #include "crt/ZONGGUBEN.h"
 #include "crt/ZSCORE.h"
 #include "crt/QUANTILE_TRUNC.h"
+#include "crt/RSRS_BETA.h"
 
 #endif /* INDICATOR_BUILD_IN_H_ */

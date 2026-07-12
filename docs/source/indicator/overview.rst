@@ -180,6 +180,7 @@
 * :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
 * :py:func:`ROCR` - 变动率指标: (price / prevPrice)
 * :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
+* :py:func:`RSRS_BETA` - 原始 RSRS（底层 β）指标，基于滚动N日OLS回归
 * :py:func:`RSI` - 相对强弱指标
 * :py:func:`SMA` - 移动平均线
 * :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线

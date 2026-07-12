@@ -1766,6 +1766,38 @@
     :rtype: Indicator
 
 
+.. py:function:: RSRS_BETA([kdata, n=20])
+
+    原始 RSRS（底层 β）指标，基于滚动N日OLS回归。
+
+    每根K线贡献一个坐标点 (Low[i], High[i])，使用滚动窗口内的N个点进行OLS回归。
+    公式：High = α + β · Low
+
+    β 为最原始的 RSRS 斜率，代表支撑阻力强弱。
+    缺陷：不同行情区间 β 中枢波动大，不能跨时段直接对比。
+
+    :param KData kdata: K线数据
+    :param int n: 滚动窗口，默认为20
+    :rtype: Indicator
+
+    **计算原理**：
+    
+    1. 每根K线取自身的最低价 Low[i] 和最高价 High[i]，形成坐标点 (Low[i], High[i])
+    2. 使用滚动窗口内的N个点进行OLS线性回归，拟合直线 High = α + β · Low
+    3. β 值即为回归斜率，反映支撑阻力的强弱程度
+
+    **使用示例**::
+
+        # 获取K线数据
+        kdata = get_kdata('sh000001', Query(-200))
+        
+        # 计算RSRS_BETA指标（默认n=20）
+        rsrs_beta = RSRS_BETA(kdata)
+        
+        # 计算RSRS_BETA指标（自定义窗口大小）
+        rsrs_beta = RSRS_BETA(kdata, 10)
+
+
 .. py:function:: ROUND([data, ndigits=2])
 
     四舍五入
