@@ -448,6 +448,46 @@
         mdi_value = adx.get(-1, 2)
 
 
+.. py:function:: ADX2([kdata, n=14])
+
+    平均趋向指数(ADX2) - 使用EMA平滑方式
+
+    ADX2属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。
+    与ADX的区别在于使用EMA（指数移动平均）而非Wilder平滑，对趋势变化更敏感。
+
+    :param KData kdata: 待计算的源数据
+    :param int n: 计算周期，默认14，必须为大于1的整数
+    :rtype: Indicator
+
+    * result(0): ADX2本身（趋势强度，值域0~100）
+    * result(1): +DI（上升动向线，多头力量）
+    * result(2): -DI（下降动向线，空头力量）
+
+    判断标准：
+
+    - ADX2 >= 25：存在清晰单边趋势（上涨/下跌都行）
+    - ADX2 < 25：无趋势，箱体震荡
+    - ADX2数值越大，趋势越猛
+
+    **与ADX的区别**：
+
+    - **ADX**：使用Wilder平滑（平滑系数=1/N），响应较慢但更稳定
+    - **ADX2**：使用EMA平滑（平滑系数=2/(N+1)），对趋势变化更敏感
+
+    **使用示例**::
+
+        # 获取K线数据
+        kdata = get_kdata('sh000001', Query(-200))
+        
+        # 计算ADX2指标
+        adx2 = ADX2(kdata, 14)
+        
+        # 获取ADX2值（索引0）、+DI值（索引1）、-DI值（索引2）
+        adx2_value = adx2.get(-1, 0)
+        pdi_value = adx2.get(-1, 1)
+        mdi_value = adx2.get(-1, 2)
+
+
 .. py:function:: AVEDEV(data[, n=22])
 
     平均绝对偏差，求X的N日平均绝对偏差

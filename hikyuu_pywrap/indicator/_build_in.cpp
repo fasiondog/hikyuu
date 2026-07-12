@@ -531,6 +531,9 @@ Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 Indicator (*ADX_1)(int) = ADX;
 Indicator (*ADX_2)(const KData&, int) = ADX;
 
+Indicator (*ADX2_1)(int) = ADX2;
+Indicator (*ADX2_2)(const KData&, int) = ADX2;
+
 void export_Indicator_build_in(py::module& m) {
     m.def("C_KDATA", KDATA1);
     m.def("C_KDATA", KDATA3, R"(KDATA([data])
@@ -884,6 +887,28 @@ void export_Indicator_build_in(py::module& m) {
     - ADX >= 25：存在清晰单边趋势（上涨/下跌都行）
     - ADX < 25：无趋势，箱体震荡
     - ADX数值越大，趋势越猛)");
+
+    m.def("ADX2", ADX2_1, py::arg("n") = 14);
+    m.def("ADX2", ADX2_2, py::arg("kdata"), py::arg("n") = 14,
+          R"(ADX2([kdata, n=14])
+
+    平均趋向指数(ADX2) - 使用EMA平滑方式
+
+    ADX2属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。
+    与ADX的区别在于使用EMA（指数移动平均）而非Wilder平滑，对趋势变化更敏感。
+
+    :param KData kdata: 待计算的源数据
+    :param int n: 计算周期，默认14，必须为大于1的整数
+    :rtype: 具有三个结果集的 Indicator
+
+    * result(0): ADX2本身（趋势强度，值域0~100）
+    * result(1): +DI（上升动向线，多头力量）
+    * result(2): -DI（下降动向线，空头力量）
+
+    判断标准：
+    - ADX2 >= 25：存在清晰单边趋势（上涨/下跌都行）
+    - ADX2 < 25：无趋势，箱体震荡
+    - ADX2数值越大，趋势越猛)");
 
     m.def("MACD", MACD_1, py::arg("n1") = 12, py::arg("n2") = 26, py::arg("n3") = 9);
     m.def("MACD", MACD_2, py::arg("n1"), py::arg("n2"), py::arg("n3"));

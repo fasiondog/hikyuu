@@ -15,6 +15,7 @@
 #include "crt/ACOS.h"
 #include "crt/AD.h"
 #include "crt/ADX.h"
+#include "crt/ADX2.h"
 #include "crt/ADJ_FACTOR.h"
 #include "crt/ADVANCE.h"
 #include "crt/ALIGN.h"

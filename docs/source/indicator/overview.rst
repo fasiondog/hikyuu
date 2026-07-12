@@ -150,7 +150,8 @@
 **技术指标**
 
 * :py:func:`AD` - 累积/派发线
-* :py:func:`ADX` - 平均趋向指数（Average Directional Index），趋势强度指标
+* :py:func:`ADX` - 平均趋向指数（Average Directional Index），趋势强度指标（Wilder平滑）
+* :py:func:`ADX2` - 平均趋向指数（ADX2），趋势强度指标（EMA平滑）
 * :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
 * :py:func:`ATR` - 平均真实波动幅度，真实波动幅度 TR 的简单移动均值
 * :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
