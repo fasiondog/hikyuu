@@ -528,6 +528,9 @@ Indicator (*KURT_5)(const Indicator&, const Indicator&) = KURT;
 Indicator (*ZSCORE_1)(bool, double, bool) = ZSCORE;
 Indicator (*ZSCORE_2)(const Indicator&, bool, double, bool) = ZSCORE;
 
+Indicator (*ADX_1)(int) = ADX;
+Indicator (*ADX_2)(const KData&, int) = ADX;
+
 void export_Indicator_build_in(py::module& m) {
     m.def("C_KDATA", KDATA1);
     m.def("C_KDATA", KDATA3, R"(KDATA([data])
@@ -860,6 +863,27 @@ void export_Indicator_build_in(py::module& m) {
     :param KData kdata 待计算的源数据
     :param int n: 计算均值的周期窗口，必须为大于1的整数
     :rtype: Indicator)");
+
+    m.def("ADX", ADX_1, py::arg("n") = 14);
+    m.def("ADX", ADX_2, py::arg("kdata"), py::arg("n") = 14,
+          R"(ADX([kdata, n=14])
+
+    平均趋向指数(Average Directional Index)
+
+    ADX属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。采用威尔德（Wilder）原始公式。
+
+    :param KData kdata: 待计算的源数据
+    :param int n: 计算周期，默认14，必须为大于1的整数
+    :rtype: 具有三个结果集的 Indicator
+
+    * result(0): ADX本身（趋势强度，值域0~100）
+    * result(1): +DI（上升动向线，多头力量）
+    * result(2): -DI（下降动向线，空头力量）
+
+    判断标准：
+    - ADX >= 25：存在清晰单边趋势（上涨/下跌都行）
+    - ADX < 25：无趋势，箱体震荡
+    - ADX数值越大，趋势越猛)");
 
     m.def("MACD", MACD_1, py::arg("n1") = 12, py::arg("n2") = 26, py::arg("n3") = 9);
     m.def("MACD", MACD_2, py::arg("n1"), py::arg("n2"), py::arg("n3"));
