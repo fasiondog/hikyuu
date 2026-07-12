@@ -8,6 +8,8 @@
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
+#include <hikyuu/KData.h>
 
 using namespace hku;
 
@@ -160,6 +162,69 @@ TEST_CASE("test_Signal") {
         CHECK_EQ(p->shouldSell(Datetime(200101010000)), false);
         CHECK_EQ(p->shouldSell(Datetime(200101040000)), true);
     }
+}
+
+
+/** @par 检测点 */
+TEST_CASE("test_Signal_clone_cycle_bounds") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData k = stock.getKData(KQuery(-30));
+    REQUIRE(k.size() >= 15);
+
+    SignalPtr p(new SignalTest);
+    p->setParam<bool>("cycle", true);
+    p->setTO(k);
+
+    Datetime t0 = k[0].datetime;
+    Datetime t1 = k[10].datetime;
+    REQUIRE(t0 < t1);
+    p->startCycle(t0, t1);
+
+    CHECK_EQ(p->getCycleStart(), t0);
+    CHECK_EQ(p->getCycleEnd(), t1);
+
+    /** @arg clone 后周期边界必须完整复制，不能把 end 写成 start */
+    SignalPtr c = p->clone();
+    CHECK_NE(p, c);
+    CHECK_EQ(c->getCycleStart(), t0);
+    CHECK_EQ(c->getCycleEnd(), t1);
+}
+
+/** @par 检测点 */
+TEST_CASE("test_Signal_clone_operator_behavior") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData k = stock.getKData(KQuery(-30));
+    REQUIRE(k.size() >= 15);
+
+    Datetime t0 = k[0].datetime;
+    Datetime t1 = k[10].datetime;
+    REQUIRE(t0 < t1);
+
+    // 父信号：cycle=true，已 startCycle（模拟 Operator 父节点持有周期边界）
+    SignalPtr parent(new SignalTest);
+    parent->setParam<bool>("cycle", true);
+    parent->setTO(k);
+    parent->startCycle(t0, t1);
+    CHECK_EQ(parent->getCycleStart(), t0);
+    CHECK_EQ(parent->getCycleEnd(), t1);
+
+    // clone 后边界必须完整；修前 end 会变成 t0
+    SignalPtr cloned = parent->clone();
+    CHECK_EQ(cloned->getCycleStart(), t0);
+    CHECK_EQ(cloned->getCycleEnd(), t1);
+
+    // 模拟 OperatorSignal::sub_sg_calculate 的级联：
+    //   child->startCycle(parent.m_cycle_start, parent.m_cycle_end)
+    // 修前：startCycle(t0, t0) 触发 HKU_CHECK(start < close)
+    // 修后：startCycle(t0, t1) 合法通过并产生买入信号
+    auto child = SG_Cycle();
+    child->setTO(k);
+    REQUIRE_NOTHROW(child->startCycle(cloned->getCycleStart(), cloned->getCycleEnd()));
+    CHECK_EQ(child->getCycleStart(), t0);
+    CHECK_EQ(child->getCycleEnd(), t1);
+    CHECK_EQ(child->getBuyValue(t0), 1.0);
 }
 
 /** @} */
