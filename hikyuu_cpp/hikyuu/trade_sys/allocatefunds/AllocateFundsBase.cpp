@@ -226,12 +226,13 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
             continue;
         }
 
-        // 如果是运行中系统，不使用计算的权重，更新累积权重和
+        // 如果是运行中系统，不使用计算的权重，按子系统实际资产更新累积占用权重
+        // 注意：必须用 sub_tm，不能用总账户 m_tm（否则每个 running 都会把 sum_weight 抬到 ~1）
+        // kType 使用 AF 统一的 m_query，保证与 total_funds 同一估值上下文
         if (running_set.find(iter->sys) != running_set.cend()) {
-            FundsRecord sub_funds = m_tm->getFunds(date, m_query.kType());
-            price_t sub_total_funds = sub_funds.cash + sub_funds.market_value +
-                                      sub_funds.borrow_asset - sub_funds.short_market_value;
-            sum_weight += sub_total_funds / total_funds;
+            TMPtr sub_tm = iter->sys->getTM();
+            FundsRecord sub_funds = sub_tm->getFunds(date, m_query.kType());
+            sum_weight += sub_funds.total_assets() / total_funds;
             continue;
         }
 
