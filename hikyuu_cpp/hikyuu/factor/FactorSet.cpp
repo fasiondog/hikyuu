@@ -242,14 +242,6 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
 
             auto* task_group = get_global_task_group();
             HKU_ASSERT(task_group);
-            if (GlobalStealThreadPool::is_work_thread()) {
-                auto executor = plan.createExecutor();
-                for (size_t i = 0; i < stk_total; ++i) {
-                    result[i] = calculate_one(executor, i);
-                }
-                return result;
-            }
-
             auto ranges = parallelIndexRange(0, stk_total, task_group->worker_num());
             vector<std::future<void>> tasks;
             tasks.reserve(ranges.size());

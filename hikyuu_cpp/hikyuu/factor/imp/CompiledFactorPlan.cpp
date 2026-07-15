@@ -252,9 +252,11 @@ CompiledFactorPlan::CompiledFactorPlan(const IndicatorList& formulas) {
     }
 
     m_roots.reserve(formulas.size());
+    CloneMap clones;
     for (const auto& formula : formulas) {
-        m_roots.emplace_back(formula.clone());
+        m_roots.emplace_back(cloneNode(formula.getImp(), clones));
     }
+    normalizeParents(m_roots);
 
     std::unordered_set<IndicatorImp*> scrubbed;
     for (const auto& root : m_roots) {

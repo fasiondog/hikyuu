@@ -18,6 +18,7 @@
 #include <hikyuu/indicator/crt/EMA.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/REF.h>
 #include <hikyuu/indicator/crt/STDEV.h>
 #include <hikyuu/StockManager.h>
 #include "../test_config.h"
@@ -42,6 +43,7 @@ public:
 };
 
 std::atomic<size_t> g_counting_indicator_calculations{0};
+std::atomic<size_t> g_counting_indicator_clones{0};
 
 class CountingContextIndicatorImp : public IndicatorImp {
 public:
@@ -62,6 +64,7 @@ public:
     }
 
     IndicatorImpPtr _clone() override {
+        ++g_counting_indicator_clones;
         return make_shared<CountingContextIndicatorImp>();
     }
 };
@@ -1211,6 +1214,10 @@ TEST_CASE("test_CompiledFactorPlan_executor_reuse") {
       MA(CLOSE(), IndParam(CVAL(CLOSE(), 7))),
       CORR(CLOSE(), OPEN(), 10),
     };
+    Indicator low = LOW();
+    formulas.emplace_back(CORR(MA(VOL(), 20), low, 5) + (HIGH() + low) / 2.0 - CLOSE());
+    Indicator open_close = OPEN() - CLOSE();
+    formulas.emplace_back(CORR(REF(open_close, 1), CLOSE(), 200) + open_close);
     detail::CompiledFactorPlan plan(formulas);
     REQUIRE_UNARY(plan.isReusable());
     auto executor = plan.createExecutor();
@@ -1234,6 +1241,16 @@ TEST_CASE("test_CompiledFactorPlan_executor_reuse") {
     for (const auto& value : shrunk) {
         CHECK_EQ(value.size(), k1.size());
     }
+}
+
+TEST_CASE("test_CompiledFactorPlan_preserves_shared_formula_dag") {
+    Indicator shared(make_shared<CountingContextIndicatorImp>());
+    Indicator repeated = shared + shared;
+
+    g_counting_indicator_clones = 0;
+    detail::CompiledFactorPlan plan({repeated});
+    REQUIRE_UNARY(plan.isReusable());
+    CHECK_EQ(g_counting_indicator_clones.load(), 1);
 }
 
 TEST_CASE("test_CompiledFactorPlan_fallback_eligibility") {
@@ -1342,8 +1359,12 @@ TEST_CASE("test_FactorSet_formula_results_keep_independent_graphs") {
 }
 
 TEST_CASE("test_FactorSet_compiled_path_nested_invocation") {
-    Stock stock = StockManager::instance().getStock("sh000001");
-    REQUIRE_FALSE(stock.isNull());
+    Stock stock1 = StockManager::instance().getStock("sh000001");
+    Stock stock2 = StockManager::instance().getStock("sz000001");
+    REQUIRE_FALSE(stock1.isNull());
+    REQUIRE_FALSE(stock2.isNull());
+    StockList stocks{stock1, stock2};
+    KQuery query(0, 30, KQuery::DAY);
 
     FactorSet factorset("NESTED_COMPILED", KQuery::DAY);
     factorset.add("MA5", MA(CLOSE(), 5));
@@ -1351,18 +1372,21 @@ TEST_CASE("test_FactorSet_compiled_path_nested_invocation") {
 
     vector<std::future<vector<IndicatorList>>> futures;
     for (size_t i = 0; i < 4; ++i) {
-        futures.emplace_back(global_submit_task([factorset, stock]() {
-            return factorset.getValues({stock}, KQuery(0, 30, KQuery::DAY), false, false, true);
+        futures.emplace_back(global_submit_task([factorset, stocks, query]() {
+            return factorset.getValues(stocks, query, false, false, true);
         }));
     }
 
     for (auto& future : futures) {
         global_wait_task(future);
         auto result = future.get();
-        REQUIRE_EQ(result.size(), 1);
-        REQUIRE_EQ(result[0].size(), 2);
-        CHECK_EQ(result[0][0].size(), 30);
-        CHECK_EQ(result[0][1].size(), 30);
+        REQUIRE_EQ(result.size(), stocks.size());
+        for (size_t i = 0; i < stocks.size(); ++i) {
+            REQUIRE_EQ(result[i].size(), 2);
+            KData kdata = stocks[i].getKData(query);
+            check_indicator(result[i][0], MA(CLOSE(), 5)(kdata).getResult(0));
+            check_indicator(result[i][1], EMA(CLOSE(), 13)(kdata).getResult(0));
+        }
     }
 }
 
