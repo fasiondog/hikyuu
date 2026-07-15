@@ -5,10 +5,15 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
+
 #include "hikyuu/StockManager.h"
+#include "hikyuu/indicator/crt/ALIGN.h"
+#include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/plugin/factor.h"
 #include "hikyuu/plugin/device.h"
 #include "FactorSet.h"
+#include "imp/CompiledFactorPlan.h"
 
 namespace hku {
 
@@ -195,6 +200,73 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
     if (driver_type == "clickhouse") {
         result = hku::getValues(*this, stocks, query, align, fill_null, tovalue, align_dates);
         return result;
+    }
+
+    // Formula-bearing results must keep independent graphs. The compiled plan is therefore an
+    // internal value-only fast path and is not observable through the existing public API.
+    if (tovalue) {
+        const size_t stk_total = stocks.size();
+        const size_t factor_total = m_data->factors.size();
+        result.resize(stk_total, IndicatorList(factor_total));
+        HKU_IF_RETURN(stk_total == 0 || factor_total == 0, result);
+
+        DatetimeList dates;
+        Indicator null_ind;
+        if (align) {
+            dates = align_dates.empty() ? StockManager::instance().getTradingCalendar(query)
+                                        : align_dates;
+            HKU_IF_RETURN(dates.empty(), result);
+            null_ind = PRICELIST(PriceList(dates.size(), Null<price_t>()), dates);
+        }
+
+        IndicatorList formulas;
+        formulas.reserve(factor_total);
+        for (const auto& factor : m_data->factors) {
+            formulas.emplace_back(align ? ALIGN(factor.formula(), dates, fill_null)
+                                        : factor.formula());
+        }
+        const detail::CompiledFactorPlan plan(formulas);
+        if (plan.isReusable()) {
+            auto calculate_one = [&](detail::FactorPlanExecutor& executor, size_t i) {
+                IndicatorList one_result(factor_total);
+                KData kdata = stocks[i].getKData(query);
+                if (kdata.empty()) {
+                    if (align) {
+                        std::fill(one_result.begin(), one_result.end(), null_ind);
+                    }
+                    return one_result;
+                }
+
+                return executor.executeValues(kdata);
+            };
+
+            auto* task_group = get_global_task_group();
+            HKU_ASSERT(task_group);
+            if (GlobalStealThreadPool::is_work_thread()) {
+                auto executor = plan.createExecutor();
+                for (size_t i = 0; i < stk_total; ++i) {
+                    result[i] = calculate_one(executor, i);
+                }
+                return result;
+            }
+
+            auto ranges = parallelIndexRange(0, stk_total, task_group->worker_num());
+            vector<std::future<void>> tasks;
+            tasks.reserve(ranges.size());
+            for (const auto& range : ranges) {
+                tasks.emplace_back(task_group->submit([&, range]() {
+                    auto executor = plan.createExecutor();
+                    for (size_t i = range.first; i < range.second; ++i) {
+                        result[i] = calculate_one(executor, i);
+                    }
+                }));
+            }
+            wait_for_all_non_blocking(*task_group, tasks);
+            for (auto& task : tasks) {
+                task.get();
+            }
+            return result;
+        }
     }
 
     // 创建结果容器，每个股票对应一个 IndicatorList

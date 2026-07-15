@@ -57,6 +57,22 @@ TEST_CASE("test_indicator_alike") {
     CHECK_UNARY(data1.alike(data2));
 }
 
+TEST_CASE("test_indicator_alike_dynamic_parameters") {
+    Indicator ma5 = MA(CLOSE(), IndParam(CVAL(CLOSE(), 5)));
+    Indicator ma10 = MA(CLOSE(), IndParam(CVAL(CLOSE(), 10)));
+    Indicator ma5_copy = MA(CLOSE(), IndParam(CVAL(CLOSE(), 5)));
+
+    CHECK_FALSE(ma5.alike(ma10));
+    CHECK_UNARY(ma5.alike(ma5_copy));
+
+    Indicator corr_close = CORR(CLOSE(), OPEN(), 10);
+    Indicator corr_high = CORR(HIGH(), OPEN(), 10);
+    Indicator corr_close_copy = CORR(CLOSE(), OPEN(), 10);
+
+    CHECK_FALSE(corr_close.alike(corr_high));
+    CHECK_UNARY(corr_close.alike(corr_close_copy));
+}
+
 /** @par 检测点 */
 TEST_CASE("test_operator_add") {
     /** @arg 正常相加*/

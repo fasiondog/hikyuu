@@ -1978,11 +1978,12 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                   false);
 
     if (needSelfAlikeCompare()) {
-        return selfAlike(other);
+        HKU_IF_RETURN(!selfAlike(other), false);
+        HKU_IF_RETURN(isLeaf(), true);
     }
 
     auto iter1 = m_ind_params.cbegin();
-    auto iter2 = other.m_ind_params.cend();
+    auto iter2 = other.m_ind_params.cbegin();
     for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
         HKU_IF_RETURN(iter1->first != iter2->first, false);
         HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
@@ -2001,9 +2002,12 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         return eq;
     }
 
-    HKU_IF_RETURN(m_three && other.m_three && !m_three->alike(*other.m_three), false);
-    HKU_IF_RETURN(m_left && other.m_left && !m_left->alike(*other.m_left), false);
-    HKU_IF_RETURN(m_right && other.m_right && !m_right->alike(*other.m_right), false);
+    HKU_IF_RETURN(bool(m_three) != bool(other.m_three) || bool(m_left) != bool(other.m_left) ||
+                    bool(m_right) != bool(other.m_right),
+                  false);
+    HKU_IF_RETURN(m_three && !m_three->alike(*other.m_three), false);
+    HKU_IF_RETURN(m_left && !m_left->alike(*other.m_left), false);
+    HKU_IF_RETURN(m_right && !m_right->alike(*other.m_right), false);
 
     return true;
 }
