@@ -22,6 +22,10 @@ namespace hku {
 class HKU_API Indicator;
 class HKU_API IndParam;
 
+namespace detail {
+class CompiledFactorPlan;
+}
+
 vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& indicators,
                                                      const KData& kdata, bool tovalue);
 
@@ -32,6 +36,7 @@ vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& in
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT_WITH_CHECK
     friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
+    friend class detail::CompiledFactorPlan;
 
     typedef vector<Indicator> IndicatorList;
     friend IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
@@ -145,6 +150,15 @@ public:
     IndicatorImpPtr clone();
 
     bool isPythonObject() const noexcept;
+
+    /**
+     * Whether this implementation can be fully recalculated on a reusable batch executor.
+
+     * * Custom C++ indicators that retain state outside IndicatorImp buffers should opt out.
+ */
+    bool supportBatchReuse() const;
+
+    void supportBatchReuse(bool enable);
 
     /** 仅用于两个结果集数量相同、长度相同的指标交换数据，不交换其他参数。失败抛出异常 */
     void swap(IndicatorImp* other);
@@ -539,6 +553,15 @@ inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t disc
 
 inline bool IndicatorImp::isPythonObject() const noexcept {
     return m_is_python_object;
+}
+
+inline bool IndicatorImp::supportBatchReuse() const {
+    static const string param_name("_support_batch_reuse");
+    return !m_is_python_object && (!haveParam(param_name) || getParam<bool>(param_name));
+}
+
+inline void IndicatorImp::supportBatchReuse(bool enable) {
+    m_params.set<bool>("_support_batch_reuse", enable);
 }
 
 inline IndicatorImpPtr IndicatorImp::getRightNode() const noexcept {
