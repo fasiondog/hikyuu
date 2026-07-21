@@ -34,14 +34,15 @@ IndicatorImpPtr IFactor::_clone() {
 }
 
 bool IFactor::selfAlike(const IndicatorImp& other) const noexcept {
-    // 设计意图：Factor 仅通过名字判断是否相同（见 Factor.h 文档），故意不比较公式内容。
-    // 因此两个 FACTOR 节点只要名字相同就会被 CompiledFactorPlan 当作同一节点做 CSE 合并。
-    // 上游 FactorSet::add 已通过 nameIndexMap 按名字去重（后加入者覆盖先加入者），
-    // 所以结构良好的 FactorSet 不会把"同名不同公式"的两个因子同时喂进 compiled 路径。
-    // 下面的 dynamic_cast 保证类型安全：非 IFactor 节点永远不会被判定为等价。
+    // Factor 以“名字 + K线类型”作为唯一标识（见 Factor.h 文档），故意不比较公式内容。
+    // 因此两个 FACTOR 节点仅在名字和 K线类型都相同时，才会被 CompiledFactorPlan
+    // 当作同一节点做 CSE 合并。上游 FactorSet::add 已校验 K线类型并按名字去重
+    //（后加入者覆盖先加入者），所以结构良好的 FactorSet 不会把“标识相同但公式不同”
+    // 的两个因子同时喂进 compiled 路径。dynamic_cast 保证非 IFactor 节点不会判等。
     const auto* other_ctx = dynamic_cast<const IFactor*>(&other);
     HKU_IF_RETURN(other_ctx == nullptr, false);
-    return m_factor.name() == other_ctx->m_factor.name();
+    return m_factor.name() == other_ctx->m_factor.name() &&
+           m_factor.ktype() == other_ctx->m_factor.ktype();
 }
 
 void IFactor::_calculate(const Indicator& data) {
