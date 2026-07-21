@@ -198,10 +198,10 @@ void System::reset() {
     m_lastTakeProfit = 0.0;
     m_lastShortTakeProfit = 0.0;
 
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    m_buyRequestList.clear();
+    m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
+    m_buyShortRequestList.clear();
 
     _reset();
 }
@@ -241,10 +241,10 @@ void System::forceResetAll() {
     m_lastTakeProfit = 0.0;
     m_lastShortTakeProfit = 0.0;
 
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    m_buyRequestList.clear();
+    m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
+    m_buyShortRequestList.clear();
 
     _forceResetAll();
 }
@@ -342,10 +342,10 @@ SystemPtr System::clone() {
     p->m_lastTakeProfit = m_lastTakeProfit;
     p->m_lastShortTakeProfit = m_lastShortTakeProfit;
 
-    p->m_buyRequest = m_buyRequest;
-    p->m_sellRequest = m_sellRequest;
-    p->m_sellShortRequest = m_sellShortRequest;
-    p->m_buyShortRequest = m_buyShortRequest;
+    p->m_buyRequestList = m_buyRequestList;
+    p->m_sellRequestList = m_sellRequestList;
+    p->m_sellShortRequestList = m_sellShortRequestList;
+    p->m_buyShortRequestList = m_buyShortRequestList;
 
     return p;
 }
@@ -456,7 +456,7 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
 }
 
 void System::clearDelayBuyRequest() {
-    m_buyRequest.clear();
+    m_buyRequestList.clear();
 }
 
 TradeRecordList System::runMoment(const Datetime& datetime) {
@@ -790,10 +790,13 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     bool trace = getParam<bool>("trace");
 
+    if (m_buyRequestList.empty()) {
+        return result;
+    }
+
     // 如果成交量和成交金额为0，延迟交易
     if (iszero(today.transAmount) || iszero(today.transCount)) {
         HKU_INFO_IF(trace, htr("[{}] delay to buy, current amount == 0 or count == 0", name()));
-        _submitBuyRequest(today, src_today, m_buyRequest.from);
         return result;
     }
 
@@ -802,86 +805,88 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
             HKU_INFO_IF(trace, htr("[{}] delay to buy, one-price board", name()));
-            _submitBuyRequest(today, src_today, m_buyRequest.from);
             return result;
         }
 
         const auto& pre_day = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > pre_day.closePrice) {
             HKU_INFO_IF(trace, htr("[{}] delay to buy, one-price up-limit board", name()));
-            _submitBuyRequest(today, src_today, m_buyRequest.from);
             return result;
         }
     }
 
-    // 延迟操作，取当前时刻开盘价
-    price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
+    // 处理所有延迟请求
+    while (!m_buyRequestList.empty()) {
+        TradeRequest& req = m_buyRequestList.front();
 
-    // 计算止损价和可买入数量
-    price_t stoploss = 0.0;
-    double number = 0.0;
-    price_t goalPrice = 0.0;
-    if (getParam<bool>("delay_use_current_price")) {
-        // 使用当前计划价格计算止损价和可买入数量
-        stoploss = _getStoplossPrice(today, src_today, today.openPrice);
-        number = planPrice <= stoploss ? 0.0
-                                       : _getBuyNumber(today.datetime, planPrice,
-                                                       planPrice - stoploss, m_buyRequest.from);
-        goalPrice = _getGoalPrice(today.datetime, planPrice);
+        // 检查是否超出最大延迟次数
+        if (req.count > getParam<int>("max_delay_count")) {
+            m_buyRequestList.erase(m_buyRequestList.begin());
+            continue;
+        }
+        req.count++;
 
-    } else {
-        stoploss = m_buyRequest.stoploss;
-        number = m_buyRequest.number;
-        goalPrice = m_buyRequest.goal;
+        // 延迟操作，取当前时刻开盘价
+        price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
+
+        // 计算止损价和可买入数量
+        price_t stoploss = 0.0;
+        double number = 0.0;
+        price_t goalPrice = 0.0;
+        if (getParam<bool>("delay_use_current_price")) {
+            // 使用当前计划价格计算止损价和可买入数量
+            stoploss = _getStoplossPrice(today, src_today, today.openPrice);
+            number = planPrice <= stoploss
+                       ? 0.0
+                       : _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, req.from);
+            goalPrice = _getGoalPrice(today.datetime, planPrice);
+
+        } else {
+            stoploss = req.stoploss;
+            number = req.number;
+            goalPrice = req.goal;
+        }
+
+        // 如果计划买入的价格已经小于等于止损价或者买入数量等于0
+        if (planPrice <= stoploss || number <= 0) {
+            m_buyRequestList.erase(m_buyRequestList.begin());
+            continue;
+        }
+
+        double min_num = m_stock.minTradeNumber();
+        number = int64_t(number / min_num) * min_num;
+
+        price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+        TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
+                                       goalPrice, planPrice, req.from);
+        if (BUSINESS_BUY != record.business) {
+            m_buyRequestList.erase(m_buyRequestList.begin());
+            continue;
+        }
+
+        m_buy_days = 0;
+        m_lastTakeProfit = record.realPrice;
+        m_trade_list.push_back(record);
+        _buyNotifyAll(record);
+        m_buyRequestList.erase(m_buyRequestList.begin());
+        result = record;
     }
 
-    // 如果计划买入的价格已经小于等于止损价或者买入数量等于0
-    if (planPrice <= stoploss || number <= 0) {
-        m_buyRequest.clear();
-        return result;
-    }
-
-    double min_num = m_stock.minTradeNumber();
-    number = int64_t(number / min_num) * min_num;
-
-    price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
-    TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
-                                   planPrice, m_buyRequest.from);
-    if (BUSINESS_BUY != record.business) {
-        m_buyRequest.clear();
-        return result;
-    }
-
-    m_buy_days = 0;
-    m_lastTakeProfit = record.realPrice;
-    m_trade_list.push_back(record);
-    _buyNotifyAll(record);
-    m_buyRequest.clear();
-    return record;
+    return result;
 }
 
 void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from) {
-    if (m_buyRequest.valid) {
-        if (m_buyRequest.count > getParam<int>("max_delay_count")) {
-            // 超出最大延迟次数，清除买入请求
-            m_buyRequest.clear();
-            return;
-        }
-        m_buyRequest.count++;
-
-    } else {
-        m_buyRequest.valid = true;
-        m_buyRequest.business = BUSINESS_BUY;
-        m_buyRequest.from = from;
-        m_buyRequest.count = 1;
-    }
-
-    m_buyRequest.datetime = today.datetime;
-    m_buyRequest.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
-    m_buyRequest.goal = _getGoalPrice(today.datetime, src_today.closePrice);
-    m_buyRequest.number =
-      _getBuyNumber(today.datetime, src_today.closePrice,
-                    src_today.closePrice - m_buyRequest.stoploss, m_buyRequest.from);
+    TradeRequest req;
+    req.valid = true;
+    req.business = BUSINESS_BUY;
+    req.from = from;
+    req.count = 1;
+    req.datetime = today.datetime;
+    req.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
+    req.goal = _getGoalPrice(today.datetime, src_today.closePrice);
+    req.number = _getBuyNumber(today.datetime, src_today.closePrice,
+                               src_today.closePrice - req.stoploss, from);
+    m_buyRequestList.push_back(req);
 }
 
 TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {
@@ -1007,9 +1012,13 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
 TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
     bool trace = getParam<bool>("trace");
     TradeRecord result;
+
+    if (m_sellRequestList.empty()) {
+        return result;
+    }
+
     if (iszero(today.transAmount) || iszero(today.transCount)) {
         HKU_INFO_IF(trace, htr("[{}] delay to sell, current amount == 0 or count == 0", name()));
-        _submitSellRequest(today, src_today, m_sellRequest.from);
         return result;
     }
 
@@ -1018,89 +1027,87 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
             HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price board", name()));
-            _submitSellRequest(today, src_today, m_sellRequest.from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
             HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price donw-limint board", name()));
-            _submitSellRequest(today, src_today, m_sellRequest.from);
             return result;
         }
     }
 
-    price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
+    while (!m_sellRequestList.empty()) {
+        TradeRequest& req = m_sellRequestList.front();
 
-    // 发出卖出请求时刻的止损价
-    price_t stoploss = 0.0;
-    double number = 0.0;
-    price_t goalPrice = 0.0;
+        if (req.count > getParam<int>("max_delay_count")) {
+            m_sellRequestList.erase(m_sellRequestList.begin());
+            continue;
+        }
+        req.count++;
 
-    Part from = m_sellRequest.from;
+        price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
 
-    if (getParam<bool>("delay_use_current_price")) {
-        stoploss = _getStoplossPrice(today, src_today, today.openPrice);
-        number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss, from);
-        goalPrice = _getGoalPrice(today.datetime, planPrice);
-    } else {
-        stoploss = m_sellRequest.stoploss;
-        number = m_sellRequest.number;
-        goalPrice = m_sellRequest.goal;
+        // 发出卖出请求时刻的止损价
+        price_t stoploss = 0.0;
+        double number = 0.0;
+        price_t goalPrice = 0.0;
+
+        if (getParam<bool>("delay_use_current_price")) {
+            stoploss = _getStoplossPrice(today, src_today, today.openPrice);
+            number = _getSellNumber(today.datetime, planPrice, planPrice - stoploss, req.from);
+            goalPrice = _getGoalPrice(today.datetime, planPrice);
+        } else {
+            stoploss = req.stoploss;
+            number = req.number;
+            goalPrice = req.goal;
+        }
+
+        if (number <= 0) {
+            m_sellRequestList.erase(m_sellRequestList.begin());
+            continue;
+        }
+
+        price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
+        TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss,
+                                        goalPrice, planPrice, req.from);
+        if (BUSINESS_SELL != record.business) {
+            m_sellRequestList.erase(m_sellRequestList.begin());
+            continue;  // 卖出操作失败
+        }
+
+        // 如果已未持仓，最后的止赢价初始为0
+        if (!m_tm->have(m_stock)) {
+            m_lastTakeProfit = 0.0;
+        } else {
+            m_lastTakeProfit = src_today.openPrice;
+        }
+
+        m_trade_list.push_back(record);
+        _sellNotifyAll(record);
+        m_sellRequestList.erase(m_sellRequestList.begin());
+        result = record;
     }
 
-    if (number <= 0) {
-        m_sellRequest.clear();
-        return result;
-    }
-
-    price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
-    TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice,
-                                    planPrice, m_sellRequest.from);
-    if (BUSINESS_SELL != record.business) {
-        m_sellRequest.clear();
-        return result;  // 卖出操作失败
-    }
-
-    // 如果已未持仓，最后的止赢价初始为0
-    if (!m_tm->have(m_stock)) {
-        m_lastTakeProfit = 0.0;
-    } else {
-        m_lastTakeProfit = src_today.openPrice;
-    }
-
-    m_trade_list.push_back(record);
-    _sellNotifyAll(record);
-    m_sellRequest.clear();
-    return record;
+    return result;
 }
 
 void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, Part from) {
-    if (m_sellRequest.valid) {
-        if (m_sellRequest.count > getParam<int>("max_delay_count")) {
-            // 超出最大延迟次数，清除买入请求
-            m_sellRequest.clear();
-            return;
-        }
-        m_sellRequest.count++;
-
+    TradeRequest req;
+    req.valid = true;
+    req.business = BUSINESS_SELL;
+    req.count = 1;
+    req.from = from;
+    req.datetime = today.datetime;
+    req.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
+    if (src_today.closePrice <= req.stoploss) {
+        req.number = m_tm->getHoldNumber(today.datetime, m_stock);
     } else {
-        m_sellRequest.valid = true;
-        m_sellRequest.business = BUSINESS_SELL;
-        m_sellRequest.count = 1;
+        req.number = _getSellNumber(today.datetime, src_today.closePrice,
+                                    src_today.closePrice - req.stoploss, from);
     }
-
-    m_sellRequest.from = from;
-    m_sellRequest.datetime = today.datetime;
-    m_sellRequest.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
-    if (src_today.closePrice <= m_sellRequest.stoploss) {
-        m_sellRequest.number = m_tm->getHoldNumber(today.datetime, m_stock);
-    } else {
-        m_sellRequest.number = _getSellNumber(today.datetime, src_today.closePrice,
-                                              src_today.closePrice - m_sellRequest.stoploss, from);
-    }
-
-    m_sellRequest.goal = _getGoalPrice(today.datetime, src_today.closePrice);
+    req.goal = _getGoalPrice(today.datetime, src_today.closePrice);
+    m_sellRequestList.push_back(req);
 }
 
 TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Part from) {
@@ -1158,14 +1165,14 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     // 确定数量
     double number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
     if (number <= 0) {
-        m_buyShortRequest.clear();
+        m_buyShortRequestList.clear();
         return result;
     }
 
     // 获取当前空头仓位持有情况
     PositionRecord pos = m_tm->getShortPosition(m_stock);
     if (pos.number <= 0) {
-        m_buyShortRequest.clear();
+        m_buyShortRequestList.clear();
         return result;
     }
 
@@ -1179,7 +1186,7 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, PART_SIGNAL);
     if (BUSINESS_BUY_SHORT != record.business) {
-        m_buyShortRequest.clear();
+        m_buyShortRequestList.clear();
         return result;
     }
 
@@ -1187,17 +1194,21 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     m_lastTakeProfit = realPrice;  // 止赢赋值给买入价格
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
-    m_buyShortRequest.clear();
+    m_buyShortRequestList.clear();
     return record;
 }
 
 TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     bool trace = getParam<bool>("trace");
+
+    if (m_buyShortRequestList.empty()) {
+        return result;
+    }
+
     if (iszero(today.transAmount) || iszero(today.transCount)) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to buy short, current amount == 0 or count == 0", name()));
-        _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
         return result;
     }
 
@@ -1206,90 +1217,89 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
             HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price board", name()));
-            _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > preday.closePrice) {
             HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price up-limint board", name()));
-            _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
             return result;
         }
     }
 
-    price_t planPrice = src_today.openPrice;  // 取当前时刻的收盘价
+    while (!m_buyShortRequestList.empty()) {
+        TradeRequest& req = m_buyShortRequestList.front();
 
-    price_t stoploss = 0.0;
-    double number = 0.0;
-    price_t goalPrice = 0.0;
-    if (getParam<bool>("delay_use_current_price")) {
-        // 取当前时刻的收盘价对应的止损价
-        stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-        number =
-          _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, m_buyRequest.from);
-        goalPrice = _getShortGoalPrice(today.datetime, planPrice);
+        if (req.count > getParam<int>("max_delay_count")) {
+            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+            continue;
+        }
+        req.count++;
 
-    } else {
-        stoploss = m_buyShortRequest.stoploss;
-        number = m_buyShortRequest.number;
-        goalPrice = m_buyShortRequest.goal;
+        price_t planPrice = src_today.openPrice;  // 取当前时刻的收盘价
+
+        price_t stoploss = 0.0;
+        double number = 0.0;
+        price_t goalPrice = 0.0;
+        if (getParam<bool>("delay_use_current_price")) {
+            // 取当前时刻的收盘价对应的止损价
+            stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
+            number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, req.from);
+            goalPrice = _getShortGoalPrice(today.datetime, planPrice);
+
+        } else {
+            stoploss = req.stoploss;
+            number = req.number;
+            goalPrice = req.goal;
+        }
+
+        if (number <= 0) {
+            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+            continue;
+        }
+
+        // 获取当前空头仓位持有情况
+        PositionRecord pos = m_tm->getShortPosition(m_stock);
+        if (pos.number <= 0) {
+            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+            continue;
+        }
+
+        if (number > pos.number) {
+            number = pos.number;
+        }
+
+        price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+        TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
+                                            goalPrice, planPrice, PART_SIGNAL);
+        if (BUSINESS_BUY_SHORT != record.business) {
+            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+            continue;
+        }
+
+        m_sell_short_days = 0;
+        m_lastTakeProfit = realPrice;  // 止赢赋值给买入价格
+        m_trade_list.push_back(record);
+        _buyNotifyAll(record);
+        m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+        result = record;
     }
 
-    if (number <= 0) {
-        m_buyShortRequest.clear();
-        return result;
-    }
-
-    // 获取当前空头仓位持有情况
-    PositionRecord pos = m_tm->getShortPosition(m_stock);
-    if (pos.number <= 0) {
-        m_buyShortRequest.clear();
-        return result;
-    }
-
-    if (number > pos.number) {
-        number = pos.number;
-    }
-
-    price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
-    TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
-                                        goalPrice, planPrice, PART_SIGNAL);
-    if (BUSINESS_BUY_SHORT != record.business) {
-        m_buyShortRequest.clear();
-        return result;
-    }
-
-    m_sell_short_days = 0;
-    m_lastTakeProfit = realPrice;  // 止赢赋值给买入价格
-    m_trade_list.push_back(record);
-    _buyNotifyAll(record);
-    m_buyShortRequest.clear();
     return result;
 }
 
 void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from) {
-    if (m_buyShortRequest.valid) {
-        if (m_buyShortRequest.count > getParam<int>("max_delay_count")) {
-            // 超出最大延迟次数，清除买入请求
-            m_buyRequest.clear();
-            return;
-        }
-        m_buyShortRequest.count++;
-
-    } else {
-        m_buyShortRequest.valid = true;
-        m_buyShortRequest.business = BUSINESS_BUY;
-        m_buyShortRequest.from = from;
-        m_buyShortRequest.count = 1;
-    }
-
-    m_buyShortRequest.datetime = today.datetime;
-    m_buyShortRequest.stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
-    m_buyShortRequest.goal = _getShortGoalPrice(today.datetime, src_today.closePrice);
-    m_buyShortRequest.number =
-      _getBuyShortNumber(today.datetime, src_today.closePrice,
-                         m_buyShortRequest.stoploss - src_today.closePrice, m_buyShortRequest.from);
+    TradeRequest req;
+    req.valid = true;
+    req.business = BUSINESS_BUY;
+    req.from = from;
+    req.count = 1;
+    req.datetime = today.datetime;
+    req.stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
+    req.goal = _getShortGoalPrice(today.datetime, src_today.closePrice);
+    req.number = _getBuyShortNumber(today.datetime, src_today.closePrice,
+                                    req.stoploss - src_today.closePrice, from);
+    m_buyShortRequestList.push_back(req);
 }
 
 TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, Part from) {
@@ -1352,7 +1362,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
 
     double number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
     if (number <= 0) {
-        m_sellShortRequest.clear();
+        m_sellShortRequestList.clear();
         return result;
     }
 
@@ -1361,7 +1371,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                          goalPrice, planPrice, PART_SIGNAL);
     if (BUSINESS_SELL_SHORT != record.business) {
-        m_sellShortRequest.clear();
+        m_sellShortRequestList.clear();
         return result;  // 卖出操作失败
     }
 
@@ -1369,17 +1379,21 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     m_lastShortTakeProfit = realPrice;
     m_trade_list.push_back(record);
     _sellNotifyAll(record);
-    m_sellShortRequest.clear();
+    m_sellShortRequestList.clear();
     return record;
 }
 
 TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_today) {
     TradeRecord result;
     bool trace = getParam<bool>("trace");
+
+    if (m_sellShortRequestList.empty()) {
+        return result;
+    }
+
     if (iszero(today.transAmount) || iszero(today.transCount)) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to sell short, current amount == 0 or count == 0", name()));
-        _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
         return result;
     }
 
@@ -1387,7 +1401,6 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
             HKU_INFO_IF(trace, htr("[{}] delay to sell short, one-price board", name()));
-            _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
             return result;
         }
 
@@ -1395,84 +1408,84 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
         if (today.closePrice < preday.closePrice) {
             HKU_INFO_IF(trace,
                         htr("[{}] delay to sell short, one-price down-limint board", name()));
-            _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
             return result;
         }
     }
 
-    price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
+    while (!m_sellShortRequestList.empty()) {
+        TradeRequest& req = m_sellShortRequestList.front();
 
-    // 发出卖出请求时刻的止损价
-    price_t stoploss = 0.0;
-    double number = 0;
-    price_t goalPrice = 0.0;
-    if (getParam<bool>("delay_use_current_price")) {
-        stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-        number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice,
-                                     m_sellShortRequest.from);
-        goalPrice = _getShortGoalPrice(today.datetime, planPrice);
-    } else {
-        stoploss = m_sellShortRequest.stoploss;
-        number = m_sellShortRequest.number;
-        goalPrice = m_sellShortRequest.goal;
+        if (req.count > getParam<int>("max_delay_count")) {
+            m_sellShortRequestList.erase(m_sellShortRequestList.begin());
+            continue;
+        }
+        req.count++;
+
+        price_t planPrice = src_today.openPrice;  // 取当前时刻的开盘价
+
+        // 发出卖出请求时刻的止损价
+        price_t stoploss = 0.0;
+        double number = 0;
+        price_t goalPrice = 0.0;
+        if (getParam<bool>("delay_use_current_price")) {
+            stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
+            number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice, req.from);
+            goalPrice = _getShortGoalPrice(today.datetime, planPrice);
+        } else {
+            stoploss = req.stoploss;
+            number = req.number;
+            goalPrice = req.goal;
+        }
+
+        if (number <= 0) {
+            m_sellShortRequestList.erase(m_sellShortRequestList.begin());
+            continue;
+        }
+
+        price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
+
+        TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
+                                             goalPrice, planPrice, req.from);
+        if (BUSINESS_SELL_SHORT != record.business) {
+            m_sellShortRequestList.erase(m_sellShortRequestList.begin());
+            continue;  // 卖出操作失败
+        }
+
+        m_sell_short_days = 0;
+        m_lastShortTakeProfit = realPrice;
+        m_trade_list.push_back(record);
+        _sellNotifyAll(record);
+        m_sellShortRequestList.erase(m_sellShortRequestList.begin());
+        result = record;
     }
 
-    if (number <= 0) {
-        m_sellShortRequest.clear();
-        return result;
-    }
-
-    price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
-
-    TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
-                                         goalPrice, planPrice, m_sellShortRequest.from);
-    if (BUSINESS_SELL_SHORT != record.business) {
-        m_sellShortRequest.clear();
-        return result;  // 卖出操作失败
-    }
-
-    m_sell_short_days = 0;
-    m_lastShortTakeProfit = realPrice;
-    m_trade_list.push_back(record);
-    _sellNotifyAll(record);
-    m_sellShortRequest.clear();
-    return record;
+    return result;
 }
 
 void System::_submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from) {
-    if (m_sellShortRequest.valid) {
-        if (m_sellShortRequest.count > getParam<int>("max_delay_count")) {
-            // 超出最大延迟次数，清除买入请求
-            m_sellShortRequest.clear();
-            return;
-        }
-        m_sellShortRequest.count++;
-
-    } else {
-        m_sellShortRequest.valid = true;
-        m_sellShortRequest.business = BUSINESS_SELL_SHORT;
-        m_sellShortRequest.from = from;
-        m_sellShortRequest.count = 1;
-    }
-
-    m_sellShortRequest.datetime = today.datetime;
-    m_sellShortRequest.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
-    m_sellShortRequest.goal = _getGoalPrice(today.datetime, src_today.closePrice);
-    m_sellShortRequest.number =
-      _getSellNumber(today.datetime, src_today.closePrice,
-                     src_today.closePrice - m_sellShortRequest.stoploss, m_sellShortRequest.from);
+    TradeRequest req;
+    req.valid = true;
+    req.business = BUSINESS_SELL_SHORT;
+    req.from = from;
+    req.count = 1;
+    req.datetime = today.datetime;
+    req.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
+    req.goal = _getGoalPrice(today.datetime, src_today.closePrice);
+    req.number = _getSellNumber(today.datetime, src_today.closePrice,
+                                src_today.closePrice - req.stoploss, from);
+    m_sellShortRequestList.push_back(req);
 }
 
 TradeRecord System::_processRequest(const KRecord& today, const KRecord& src_today) {
-    HKU_IF_RETURN(m_buyRequest.valid, _buyDelay(today, src_today));
-    HKU_IF_RETURN(m_sellRequest.valid, _sellDelay(today, src_today));
-    HKU_IF_RETURN(m_sellShortRequest.valid, _sellShortDelay(today, src_today));
-    HKU_IF_RETURN(m_buyShortRequest.valid, _buyShortDelay(today, src_today));
+    HKU_IF_RETURN(!m_buyRequestList.empty(), _buyDelay(today, src_today));
+    HKU_IF_RETURN(!m_sellRequestList.empty(), _sellDelay(today, src_today));
+    HKU_IF_RETURN(!m_sellShortRequestList.empty(), _sellShortDelay(today, src_today));
+    HKU_IF_RETURN(!m_buyShortRequestList.empty(), _buyShortDelay(today, src_today));
     return TradeRecord();
 }
 
 TradeRecord System::pfProcessDelaySellRequest(const Datetime& date) {
-    HKU_IF_RETURN(!m_sellRequest.valid, TradeRecord());
+    HKU_IF_RETURN(m_sellRequestList.empty(), TradeRecord());
     size_t pos = m_kdata.getPos(date);
     HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
     KRecord today = m_kdata.getKRecord(pos);
@@ -1481,7 +1494,7 @@ TradeRecord System::pfProcessDelaySellRequest(const Datetime& date) {
 }
 
 TradeRecord System::pfProcessDelayBuyRequest(const Datetime& date) {
-    HKU_IF_RETURN(!m_buyRequest.valid, TradeRecord());
+    HKU_IF_RETURN(m_buyRequestList.empty(), TradeRecord());
     size_t pos = m_kdata.getPos(date);
     HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
     KRecord today = m_kdata.getKRecord(pos);
@@ -1566,31 +1579,31 @@ json System::lastSuggestion() const {
     }
 
     json delay_on_next_open = json::array();
-    if (m_buyRequest.valid) {
+    for (const auto& req : m_buyRequestList) {
         json buy_request;
         buy_request["stock"] = m_stock.market_code();
-        buy_request["business"] = getBusinessName(m_buyRequest.business);
-        buy_request["datetime"] = m_buyRequest.datetime.str();
-        buy_request["stoploss"] = m_buyRequest.stoploss;
-        buy_request["goal"] = m_buyRequest.goal;
-        buy_request["number"] = m_buyRequest.number;
-        buy_request["from"] = getSystemPartName(m_buyRequest.from);
-        buy_request["remark"] = m_buyRequest.remark;
-        buy_request["count"] = m_buyRequest.count;
+        buy_request["business"] = getBusinessName(req.business);
+        buy_request["datetime"] = req.datetime.str();
+        buy_request["stoploss"] = req.stoploss;
+        buy_request["goal"] = req.goal;
+        buy_request["number"] = req.number;
+        buy_request["from"] = getSystemPartName(req.from);
+        buy_request["remark"] = req.remark;
+        buy_request["count"] = req.count;
         delay_on_next_open.push_back(buy_request);
     }
 
-    if (m_sellRequest.valid) {
+    for (const auto& req : m_sellRequestList) {
         json sell_request;
         sell_request["stock"] = m_stock.market_code();
-        sell_request["business"] = getBusinessName(m_sellRequest.business);
-        sell_request["datetime"] = m_sellRequest.datetime.str();
-        sell_request["stoploss"] = m_sellRequest.stoploss;
-        sell_request["goal"] = m_sellRequest.goal;
-        sell_request["number"] = m_sellRequest.number;
-        sell_request["from"] = getSystemPartName(m_sellRequest.from);
-        sell_request["remark"] = m_sellRequest.remark;
-        sell_request["count"] = m_sellRequest.count;
+        sell_request["business"] = getBusinessName(req.business);
+        sell_request["datetime"] = req.datetime.str();
+        sell_request["stoploss"] = req.stoploss;
+        sell_request["goal"] = req.goal;
+        sell_request["number"] = req.number;
+        sell_request["from"] = getSystemPartName(req.from);
+        sell_request["remark"] = req.remark;
+        sell_request["count"] = req.count;
         delay_on_next_open.push_back(sell_request);
     }
 

@@ -28,8 +28,8 @@ private:
     OrderBrokerPtr m_broker;
     KQuery m_query;
 
-    TradeRequest m_buyRequest;
-    TradeRequest m_sellRequest;
+    std::vector<TradeRequest> m_buyRequestList;
+    std::vector<TradeRequest> m_sellRequestList;
 };
 
 StrategyPtr HKU_API crtSysStrategy(const SYSPtr& sys, const string& stk_market_code,

@@ -19,10 +19,10 @@ void DelegateSystem::_reset() {
     }
 
     m_trade_list.clear();
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    m_buyRequestList.clear();
+    m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
+    m_buyShortRequestList.clear();
 }
 
 void DelegateSystem::_forceResetAll() {
@@ -31,10 +31,10 @@ void DelegateSystem::_forceResetAll() {
     }
 
     m_trade_list.clear();
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    m_buyRequestList.clear();
+    m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
+    m_buyShortRequestList.clear();
 }
 
 SystemPtr DelegateSystem::_clone() {
@@ -59,16 +59,16 @@ void DelegateSystem::run(const KData& kdata, bool reset, bool resetAll) {
     const auto& sys_trade_list = m_sys->getTradeRecordList();
 
     m_trade_list.clear();
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    m_buyRequestList.clear();
+    m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
+    m_buyShortRequestList.clear();
 
     std::copy(sys_trade_list.cbegin(), sys_trade_list.cend(), m_trade_list.begin());
-    m_buyRequest = m_sys->getBuyTradeRequest();
-    m_sellRequest = m_sys->getSellTradeRequest();
-    m_sellShortRequest = m_sys->getSellShortTradeRequest();
-    m_buyShortRequest = m_sys->getBuyShortTradeRequest();
+    m_buyRequestList = m_sys->getBuyTradeRequestList();
+    m_sellRequestList = m_sys->getSellTradeRequestList();
+    m_sellShortRequestList = m_sys->getSellShortTradeRequestList();
+    m_buyShortRequestList = m_sys->getBuyShortTradeRequestList();
 }
 
 TradeRecordList DelegateSystem::runMoment(const Datetime& datetime) {
@@ -100,7 +100,7 @@ TradeRecord DelegateSystem::sellForceOnClose(const Datetime& date, double num, P
 void DelegateSystem::clearDelayBuyRequest() {
     HKU_WARN_IF_RETURN(!m_sys, void(), "No delegated system is specified!");
     m_sys->clearDelayBuyRequest();
-    m_buyRequest.clear();
+    m_buyRequestList.clear();
 }
 
 TradeRecord DelegateSystem::pfProcessDelaySellRequest(const Datetime& date) {

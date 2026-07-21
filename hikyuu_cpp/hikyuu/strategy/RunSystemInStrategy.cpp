@@ -31,33 +31,37 @@ RunSystemInStrategy::RunSystemInStrategy(const SYSPtr& sys, const OrderBrokerPtr
 }
 
 void RunSystemInStrategy::run(const Stock& stock) {
-    if (m_sys->getParam<bool>("buy_delay") && m_buyRequest.valid) {
+    if (m_sys->getParam<bool>("buy_delay") && !m_buyRequestList.empty()) {
         KData k = stock.getKData(
           KQueryByIndex(-1, Null<int64_t>(), m_query.kType(), m_query.recoverType()));
         const auto& stock = m_sys->getStock();
-        m_broker->buy(m_buyRequest.datetime, stock.market(), stock.code(), 10.0,
-                      m_buyRequest.number, m_buyRequest.stoploss, m_buyRequest.goal,
-                      m_buyRequest.from, "");
+        for (const auto& req : m_buyRequestList) {
+            m_broker->buy(req.datetime, stock.market(), stock.code(), 10.0, req.number,
+                          req.stoploss, req.goal, req.from, "");
+        }
+        m_buyRequestList.clear();
     }
 
-    if (m_sys->getParam<bool>("sell_delay") && m_sellRequest.valid) {
+    if (m_sys->getParam<bool>("sell_delay") && !m_sellRequestList.empty()) {
         KData k = stock.getKData(
           KQueryByIndex(-1, Null<int64_t>(), m_query.kType(), m_query.recoverType()));
         const auto& stock = m_sys->getStock();
-        m_broker->sell(m_sellRequest.datetime, stock.market(), stock.code(), 10.0,
-                       m_sellRequest.number, m_sellRequest.stoploss, m_sellRequest.goal,
-                       m_sellRequest.from, "");
+        for (const auto& req : m_sellRequestList) {
+            m_broker->sell(req.datetime, stock.market(), stock.code(), 10.0, req.number,
+                           req.stoploss, req.goal, req.from, "");
+        }
+        m_sellRequestList.clear();
     }
 
     m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);
     m_sys->run(stock, m_query);
 
     if (m_sys->getParam<bool>("buy_delay")) {
-        m_buyRequest = m_sys->getBuyTradeRequest();
+        m_buyRequestList = m_sys->getBuyTradeRequestList();
     }
 
     if (m_sys->getParam<bool>("sell_delay")) {
-        m_sellRequest = m_sys->getSellTradeRequest();
+        m_sellRequestList = m_sys->getSellTradeRequestList();
     }
 }
 

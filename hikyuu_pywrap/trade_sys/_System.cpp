@@ -145,7 +145,7 @@ void export_System(py::module& m) {
       m, "TradeRequest",
       R"(交易请求记录。系统内部在实现延迟操作时登记的交易请求信息。暴露该结构的主要目的是用于
 在“delay”模式（延迟到下一个bar开盘时进行交易）的情况下，系统实际已知下一个Bar将要
-进行交易，此时可通过 System.getBuyTradeRequest() 、 System.getSellTradeRequest()
+进行交易，此时可通过 System.getBuyTradeRequestList() 、 System.getSellTradeRequestList()
 来获知下一个BAR是否需要买入/卖出。主要用于提醒或打印下一个Bar需要进行操作。对于系统
 本身的运行没有影响。)")
 
@@ -261,23 +261,25 @@ void export_System(py::module& m) {
 
     :rtype: TradeRecordList)")
 
-      .def("get_buy_trade_request", &System::getBuyTradeRequest, py::return_value_policy::copy,
-           R"(get_buy_trade_request(self)
+      .def("get_buy_trade_request_list", &System::getBuyTradeRequestList,
+           py::return_value_policy::copy,
+           R"(get_buy_trade_request_list(self)
   
-    获取买入请求，“delay”模式下查看下一时刻是否存在买入操作
+    获取买入请求列表，“delay”模式下查看下一时刻是否存在买入操作
 
-    :rtype: TradeRequest)")
+    :rtype: list[TradeRequest])")
 
-      .def("get_sell_trade_request", &System::getSellTradeRequest, py::return_value_policy::copy,
-           R"(get_sell_trade_request(self)
+      .def("get_sell_trade_request_list", &System::getSellTradeRequestList,
+           py::return_value_policy::copy,
+           R"(get_sell_trade_request_list(self)
 
-    获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作
+    获取卖出请求列表，“delay”模式下查看下一时刻是否存在卖出操作
 
-    :rtype: TradeRequest)")
+    :rtype: list[TradeRequest])")
 
-      .def("get_sell_short_trade_request", &System::getSellShortTradeRequest,
+      .def("get_sell_short_trade_request_list", &System::getSellShortTradeRequestList,
            py::return_value_policy::copy)
-      .def("get_buy_short_trade_request", &System::getBuyShortTradeRequest,
+      .def("get_buy_short_trade_request_list", &System::getBuyShortTradeRequestList,
            py::return_value_policy::copy)
 
       .def("reset", &System::reset,

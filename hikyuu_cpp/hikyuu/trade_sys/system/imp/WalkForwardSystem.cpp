@@ -90,10 +90,10 @@ void WalkForwardSystem::_reset() {
     }
 
     m_trade_list.clear();
-    m_buyRequest.clear();
-    m_sellRequest.clear();
-    m_sellShortRequest.clear();
-    m_buyShortRequest.clear();
+    m_buyRequestList.clear();
+    m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
+    m_buyShortRequestList.clear();
 }
 
 void WalkForwardSystem::_forceResetAll() {
@@ -118,10 +118,10 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, bool isMoment) {
         }
     }
 
-    m_buyRequest = sys->getBuyTradeRequest();
-    m_sellRequest = sys->getSellTradeRequest();
-    m_sellShortRequest = sys->getSellShortTradeRequest();
-    m_buyShortRequest = sys->getBuyShortTradeRequest();
+    m_buyRequestList = sys->getBuyTradeRequestList();
+    m_sellRequestList = sys->getSellTradeRequestList();
+    m_sellShortRequestList = sys->getSellShortTradeRequestList();
+    m_buyShortRequestList = sys->getBuyShortTradeRequestList();
 
     // m_pre_ev_valid = sys->m_pre_ev_valid;
     // m_pre_cn_valid = sys->m_pre_cn_valid;
@@ -133,10 +133,10 @@ void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, bool isMoment) {
 }
 
 void WalkForwardSystem::syncDataToSystem(const SYSPtr& sys) {
-    sys->m_buyRequest = m_buyRequest;
-    sys->m_sellRequest = m_sellRequest;
-    sys->m_sellShortRequest = m_sellShortRequest;
-    sys->m_buyShortRequest = m_buyShortRequest;
+    sys->m_buyRequestList = m_buyRequestList;
+    sys->m_sellRequestList = m_sellRequestList;
+    sys->m_sellShortRequestList = m_sellShortRequestList;
+    sys->m_buyShortRequestList = m_buyShortRequestList;
 
     // sys->m_pre_ev_valid = m_pre_ev_valid;
     // sys->m_pre_cn_valid = m_pre_cn_valid;
@@ -351,7 +351,7 @@ TradeRecord WalkForwardSystem::sellForceOnClose(const Datetime& date, double num
 void WalkForwardSystem::clearDelayBuyRequest() {
     if (m_cur_sys) {
         m_cur_sys->clearDelayBuyRequest();
-        m_buyRequest.clear();
+        m_buyRequestList.clear();
     }
 }
 

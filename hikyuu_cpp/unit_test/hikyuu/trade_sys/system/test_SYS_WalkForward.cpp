@@ -39,10 +39,10 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->run(stk, query);
 
-    auto delay_request = sys->getBuyTradeRequest();
-    CHECK_UNARY(delay_request.valid);
-    CHECK_EQ(delay_request.business, BUSINESS_BUY);
-    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+    auto delay_request_list = sys->getBuyTradeRequestList();
+    CHECK_UNARY(delay_request_list.front().valid);
+    CHECK_EQ(delay_request_list.front().business, BUSINESS_BUY);
+    CHECK_EQ(delay_request_list.front().datetime, Datetime(20111205));
 
     tm = sys->getTM();
     CHECK_EQ(tm->currentCash(), 99328.0);
@@ -67,10 +67,10 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->run(stk, query);
 
-    delay_request = sys->getBuyTradeRequest();
-    CHECK_UNARY(delay_request.valid);
-    CHECK_EQ(delay_request.business, BUSINESS_BUY);
-    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+    delay_request_list = sys->getBuyTradeRequestList();
+    CHECK_UNARY(delay_request_list.front().valid);
+    CHECK_EQ(delay_request_list.front().business, BUSINESS_BUY);
+    CHECK_EQ(delay_request_list.front().datetime, Datetime(20111205));
 
     tm = sys->getTM();
     CHECK_EQ(tm->currentCash(), 1213.0);
@@ -97,10 +97,10 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->run(stk, query);
 
-    auto delay_request = sys->getBuyTradeRequest();
-    CHECK_UNARY(delay_request.valid);
-    CHECK_EQ(delay_request.business, BUSINESS_BUY);
-    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+    auto delay_request_list = sys->getBuyTradeRequestList();
+    CHECK_UNARY(delay_request_list.front().valid);
+    CHECK_EQ(delay_request_list.front().business, BUSINESS_BUY);
+    CHECK_EQ(delay_request_list.front().datetime, Datetime(20111205));
 
     tm = sys->getTM();
     CHECK_EQ(tm->currentCash(), 99328.0);
@@ -125,10 +125,10 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     sys->setParam<bool>("clean_hold_when_select_changed", false);
     sys->run(stk, query);
 
-    delay_request = sys->getBuyTradeRequest();
-    CHECK_UNARY(delay_request.valid);
-    CHECK_EQ(delay_request.business, BUSINESS_BUY);
-    CHECK_EQ(delay_request.datetime, Datetime(20111205));
+    delay_request_list = sys->getBuyTradeRequestList();
+    CHECK_UNARY(delay_request_list.front().valid);
+    CHECK_EQ(delay_request_list.front().business, BUSINESS_BUY);
+    CHECK_EQ(delay_request_list.front().datetime, Datetime(20111205));
 
     tm = sys->getTM();
     CHECK_EQ(tm->currentCash(), 1213.0);

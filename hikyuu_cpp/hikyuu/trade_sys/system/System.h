@@ -149,14 +149,14 @@ public:
     /** 获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录 */
     const TradeRecordList& getTradeRecordList() const;
 
-    /** 获取买入请求，“delay”模式下查看下一时刻是否存在买入操作 */
-    const TradeRequest& getBuyTradeRequest() const;
+    /** 获取买入请求列表，“delay”模式下查看下一时刻是否存在买入操作 */
+    const std::vector<TradeRequest>& getBuyTradeRequestList() const;
 
-    /** 获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作 */
-    const TradeRequest& getSellTradeRequest() const;
+    /** 获取卖出请求列表，“delay”模式下查看下一时刻是否存在卖出操作 */
+    const std::vector<TradeRequest>& getSellTradeRequestList() const;
 
-    const TradeRequest& getSellShortTradeRequest() const;
-    const TradeRequest& getBuyShortTradeRequest() const;
+    const std::vector<TradeRequest>& getSellShortTradeRequestList() const;
+    const std::vector<TradeRequest>& getBuyShortTradeRequestList() const;
 
     /** 将所有组件全部置为非共享 */
     void setNotSharedAll();
@@ -263,11 +263,11 @@ public:
 
     // 当前是否存在延迟的操作请求，供Portfolio
     bool haveDelaySellRequest() const {
-        return m_sellRequest.valid;
+        return !m_sellRequestList.empty();
     }
 
     bool haveDelayBuyRequest() const {
-        return m_buyRequest.valid;
+        return !m_buyRequestList.empty();
     }
 
     // 处理延迟买入请求，仅供 PF 调用
@@ -362,10 +362,10 @@ protected:
     price_t m_lastTakeProfit;       // 上一次多头止损价，用于保证止赢价单调递增
     price_t m_lastShortTakeProfit;  // 上一次空头止赢价
 
-    TradeRequest m_buyRequest;
-    TradeRequest m_sellRequest;
-    TradeRequest m_sellShortRequest;
-    TradeRequest m_buyShortRequest;
+    std::vector<TradeRequest> m_buyRequestList;
+    std::vector<TradeRequest> m_sellRequestList;
+    std::vector<TradeRequest> m_sellShortRequestList;
+    std::vector<TradeRequest> m_buyShortRequestList;
 
 private:
     void initParam();  // 初始化参数及其默认值
@@ -405,10 +405,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
 
-        ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequestList);
     }
 
     template <class Archive>
@@ -440,10 +440,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
 
-        ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequestList);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -591,20 +591,20 @@ inline const TradeRecordList& System::getTradeRecordList() const {
     return m_trade_list;
 }
 
-inline const TradeRequest& System::getBuyTradeRequest() const {
-    return m_buyRequest;
+inline const std::vector<TradeRequest>& System::getBuyTradeRequestList() const {
+    return m_buyRequestList;
 }
 
-inline const TradeRequest& System::getSellTradeRequest() const {
-    return m_sellRequest;
+inline const std::vector<TradeRequest>& System::getSellTradeRequestList() const {
+    return m_sellRequestList;
 }
 
-inline const TradeRequest& System::getSellShortTradeRequest() const {
-    return m_sellShortRequest;
+inline const std::vector<TradeRequest>& System::getSellShortTradeRequestList() const {
+    return m_sellShortRequestList;
 }
 
-inline const TradeRequest& System::getBuyShortTradeRequest() const {
-    return m_buyShortRequest;
+inline const std::vector<TradeRequest>& System::getBuyShortTradeRequestList() const {
+    return m_buyShortRequestList;
 }
 
 inline bool System::_environmentIsValid(const Datetime& datetime) {
