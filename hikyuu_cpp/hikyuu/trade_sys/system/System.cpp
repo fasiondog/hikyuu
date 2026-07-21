@@ -459,31 +459,52 @@ void System::clearDelayBuyRequest() {
     m_buyRequest.clear();
 }
 
-TradeRecord System::runMoment(const Datetime& datetime) {
+TradeRecordList System::runMoment(const Datetime& datetime) {
+    TradeRecordList result;
     size_t pos = m_kdata.getPos(datetime);
-    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+    HKU_IF_RETURN(pos == Null<size_t>(), result);
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    return _runMoment(today, src_today);
+
+    TradeRecord tr_open = _runMomentOnOpen(today, src_today);
+    TradeRecord tr_close = _runMomentOnClose(today, src_today);
+
+    if (!tr_open.isNull()) {
+        result.push_back(tr_open);
+    }
+    if (!tr_close.isNull()) {
+        result.push_back(tr_close);
+    }
+    return result;
 }
 
-TradeRecord System::runMomentOnOpen(const Datetime& datetime) {
+TradeRecordList System::runMomentOnOpen(const Datetime& datetime) {
+    TradeRecordList result;
     size_t pos = m_kdata.getPos(datetime);
-    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+    HKU_IF_RETURN(pos == Null<size_t>(), result);
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    return _runMomentOnOpen(today, src_today);
+    TradeRecord tr = _runMomentOnOpen(today, src_today);
+    if (!tr.isNull()) {
+        result.push_back(tr);
+    }
+    return result;
 }
 
-TradeRecord System::runMomentOnClose(const Datetime& datetime) {
+TradeRecordList System::runMomentOnClose(const Datetime& datetime) {
+    TradeRecordList result;
     size_t pos = m_kdata.getPos(datetime);
-    HKU_IF_RETURN(pos == Null<size_t>(), TradeRecord());
+    HKU_IF_RETURN(pos == Null<size_t>(), result);
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
-    return _runMomentOnClose(today, src_today);
+    TradeRecord tr = _runMomentOnClose(today, src_today);
+    if (!tr.isNull()) {
+        result.push_back(tr);
+    }
+    return result;
 }
 
 TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {

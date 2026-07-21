@@ -23,7 +23,7 @@ public:
 
     virtual void readyForRun() override;
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
-    virtual TradeRecord runMoment(const Datetime& datetime) override;
+    virtual TradeRecordList runMoment(const Datetime& datetime) override;
 
     virtual void _checkParam(const string& name) const override;
     virtual void _reset() override;

@@ -71,12 +71,14 @@ void DelegateSystem::run(const KData& kdata, bool reset, bool resetAll) {
     m_buyShortRequest = m_sys->getBuyShortTradeRequest();
 }
 
-TradeRecord DelegateSystem::runMoment(const Datetime& datetime) {
-    TradeRecord ret;
+TradeRecordList DelegateSystem::runMoment(const Datetime& datetime) {
+    TradeRecordList ret;
     HKU_WARN_IF_RETURN(!m_sys, ret, "No delegated system is specified!");
-    ret = m_sys->runMoment(datetime);
-    m_trade_list.push_back(ret);
-    return ret;
+    auto tr_list = m_sys->runMoment(datetime);
+    for (auto& tr : tr_list) {
+        m_trade_list.push_back(tr);
+    }
+    return tr_list;
 }
 
 TradeRecord DelegateSystem::sellForceOnOpen(const Datetime& date, double num, Part from) {

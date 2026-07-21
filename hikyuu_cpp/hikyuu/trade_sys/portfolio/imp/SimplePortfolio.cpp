@@ -339,8 +339,8 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             }
         }
 
-        auto tr = sub_sys->runMoment(date);
-        if (!tr.isNull()) {
+        auto tr_list = sub_sys->runMoment(date);
+        for (auto& tr : tr_list) {
             HKU_INFO_IF(trace, "[PF] {}", tr);
             m_tm->addTradeRecord(tr);
         }

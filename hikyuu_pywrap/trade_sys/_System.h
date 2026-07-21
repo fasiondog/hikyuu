@@ -35,9 +35,9 @@ public:
     virtual ~PySystem() override;
 
     virtual void run(const KData& kdata, bool reset, bool resetAll) override;
-    virtual TradeRecord runMoment(const Datetime& datetime) override;
-    virtual TradeRecord runMomentOnOpen(const Datetime& datetime) override;
-    virtual TradeRecord runMomentOnClose(const Datetime& datetime) override;
+    virtual TradeRecordList runMoment(const Datetime& datetime) override;
+    virtual TradeRecordList runMomentOnOpen(const Datetime& datetime) override;
+    virtual TradeRecordList runMomentOnClose(const Datetime& datetime) override;
     virtual void readyForRun() override;
     virtual void _reset() override;
     virtual void _forceResetAll() override;

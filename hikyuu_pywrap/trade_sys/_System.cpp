@@ -24,16 +24,16 @@ void PySystem::run(const KData& kdata, bool reset, bool resetAll) {
     PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
 }
 
-TradeRecord PySystem::runMoment(const Datetime& datetime) {
-    PYBIND11_OVERLOAD(TradeRecord, System, runMoment, datetime);
+TradeRecordList PySystem::runMoment(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecordList, System, runMoment, datetime);
 }
 
-TradeRecord PySystem::runMomentOnOpen(const Datetime& datetime) {
-    PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnOpen, datetime);
+TradeRecordList PySystem::runMomentOnOpen(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecordList, System, runMomentOnOpen, datetime);
 }
 
-TradeRecord PySystem::runMomentOnClose(const Datetime& datetime) {
-    PYBIND11_OVERLOAD(TradeRecord, System, runMomentOnClose, datetime);
+TradeRecordList PySystem::runMomentOnClose(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(TradeRecordList, System, runMomentOnClose, datetime);
 }
 
 void PySystem::readyForRun() {

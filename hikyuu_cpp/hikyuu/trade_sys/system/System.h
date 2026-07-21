@@ -216,12 +216,12 @@ public:
     /**
      * @brief 在指定的日期执行一步，仅由 PF 调用
      * @param datetime 指定的日期
-     * @return TradeRecord
+     * @return TradeRecordList
      */
-    virtual TradeRecord runMoment(const Datetime& datetime);
+    virtual TradeRecordList runMoment(const Datetime& datetime);
 
-    virtual TradeRecord runMomentOnOpen(const Datetime& datetime);
-    virtual TradeRecord runMomentOnClose(const Datetime& datetime);
+    virtual TradeRecordList runMomentOnOpen(const Datetime& datetime);
+    virtual TradeRecordList runMomentOnClose(const Datetime& datetime);
 
     // 运行前准备工作, 失败将抛出异常
     virtual void readyForRun();
