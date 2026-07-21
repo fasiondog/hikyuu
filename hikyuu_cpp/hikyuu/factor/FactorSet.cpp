@@ -240,6 +240,11 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
                 return executor.executeValues(kdata);
             };
 
+            // 这里直接向全局线程池 submit 范围任务，且有外层调用者自身就在 work 线程里 submit
+            // 本函数时（嵌套调用）的可能。`wait_for_all_non_blocking` 必须支持在等待期间
+            // work-steal 已提交的子任务（否则当池被外层任务占满时会死锁：外层等待本任务、
+            // 本任务等待子任务、却没有空闲 worker 去执行子任务）。修改这一段前请确认
+            // `GlobalStealThreadPool` 的 non_blocking 等待确有 steal 语义。
             auto* task_group = get_global_task_group();
             HKU_ASSERT(task_group);
             auto ranges = parallelIndexRange(0, stk_total, task_group->worker_num());

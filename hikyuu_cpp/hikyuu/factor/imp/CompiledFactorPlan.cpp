@@ -1,6 +1,9 @@
 /*
  *  Copyright (c) 2026 hikyuu.org
  *
+ *  Created on: 2026-07-15
+ *      Author: woleigegg
+ *
  *  Internal compiled execution plan for stock-local factor formulas.
  */
 

@@ -16,6 +16,7 @@
 #include <hikyuu/indicator/crt/CORR.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/EMA.h>
+#include <hikyuu/indicator/crt/FACTOR.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/REF.h>
@@ -1340,6 +1341,36 @@ TEST_CASE("test_FactorSet_compiled_values_match_legacy") {
             check_indicator(aligned[si][fi], expected);
         }
     }
+}
+
+TEST_CASE("test_FactorSet_compiled_values_keep_nested_factors_distinct") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    REQUIRE_FALSE(stock.isNull());
+
+    Factor close_ma5("INNER_CLOSE_MA5", MA(CLOSE(), 5), KQuery::DAY);
+    Factor high_ma3("INNER_HIGH_MA3", MA(HIGH(), 3), KQuery::DAY);
+    FactorSet factorset("NESTED_FACTORS", KQuery::DAY);
+    factorset.add("OUTER_CLOSE_MA5", FACTOR(close_ma5));
+    factorset.add("OUTER_HIGH_MA3", FACTOR(high_ma3));
+
+    KQuery query(0, 30, KQuery::DAY);
+    KData kdata = stock.getKData(query);
+    REQUIRE_FALSE(kdata.empty());
+
+    auto compiled = factorset.getValues({stock}, query, false, false, true);
+    auto legacy = factorset.getValues({stock}, query, false, false, false);
+    REQUIRE_EQ(compiled.size(), 1);
+    REQUIRE_EQ(compiled[0].size(), 2);
+    REQUIRE_EQ(legacy.size(), 1);
+    REQUIRE_EQ(legacy[0].size(), 2);
+
+    Indicator expected_close_ma5 = FACTOR(close_ma5)(kdata).getResult(0);
+    Indicator expected_high_ma3 = FACTOR(high_ma3)(kdata).getResult(0);
+    check_indicator(compiled[0][0], expected_close_ma5);
+    check_indicator(compiled[0][1], expected_high_ma3);
+    check_indicator(legacy[0][0].getResult(0), expected_close_ma5);
+    check_indicator(legacy[0][1].getResult(0), expected_high_ma3);
+    CHECK_FALSE(compiled[0][0].equal(compiled[0][1]));
 }
 
 TEST_CASE("test_FactorSet_formula_results_keep_independent_graphs") {

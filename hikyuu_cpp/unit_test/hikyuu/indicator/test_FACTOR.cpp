@@ -92,6 +92,15 @@ TEST_CASE("test_FACTOR_different_factors") {
     check_indicator(result2, ma3_result);
 }
 
+TEST_CASE("test_FACTOR_alike_uses_factor_name") {
+    Factor close_ma5("CLOSE_MA5", MA(CLOSE(), 5), KQuery::DAY);
+    Factor high_ma3("HIGH_MA3", MA(HIGH(), 3), KQuery::DAY);
+    Factor same_name_different_formula("CLOSE_MA5", MA(HIGH(), 3), KQuery::DAY);
+
+    CHECK_FALSE(FACTOR(close_ma5).alike(FACTOR(high_ma3)));
+    CHECK_UNARY(FACTOR(close_ma5).alike(FACTOR(same_name_different_formula)));
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
