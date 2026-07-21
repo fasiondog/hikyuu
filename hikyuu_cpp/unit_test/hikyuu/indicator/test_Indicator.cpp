@@ -71,6 +71,15 @@ TEST_CASE("test_indicator_alike_dynamic_parameters") {
 
     CHECK_FALSE(corr_close.alike(corr_high));
     CHECK_UNARY(corr_close.alike(corr_close_copy));
+
+    Indicator corr_open_template = CORR(OPEN(), 10);
+    Indicator corr_high_template = CORR(HIGH(), 10);
+    Indicator corr_open_template_copy = CORR(OPEN(), 10);
+
+    CHECK_FALSE(corr_open_template.alike(corr_high_template));
+    CHECK_UNARY(corr_open_template.alike(corr_open_template_copy));
+
+    CHECK_FALSE(DROPNA(CLOSE()).alike(DROPNA(CLOSE())));
 }
 
 /** @par 检测点 */

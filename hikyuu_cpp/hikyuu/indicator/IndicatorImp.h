@@ -152,10 +152,16 @@ public:
     bool isPythonObject() const noexcept;
 
     /**
-     * Whether this implementation can be fully recalculated on a reusable batch executor.
-
-     * * Custom C++ indicators that retain state outside IndicatorImp buffers should opt out.
- */
+     * 该实现是否可在可复用的批处理执行器上被反复重算。
+     *
+     * 默认放行（非 Python 实现、且未显式置 `_support_batch_reuse=false` 都视为可复用）。
+     * 参与复用意味着同一节点的计算图会被 `CompiledFactorPlan` 跨股票反复重绑 context
+     * 并重算，因此自定义 C++ 指标必须满足：除 IndicatorImp 自身的 result buffer 与
+     * `m_params/m_ind_params` 外，不持有任何跨股票会残留的成员状态（如缓存统计量、可变
+     * 缓冲、上次输入依赖的中间结果等）。凡是会在 `_calculate`/`_dyn_calculate` 外部保留
+     * 上述状态、或无法通过 `scrubTemplateNode` 重置干净的实现，都应在构造时调用
+     * `supportBatchReuse(false)` 主动退出快速路径，回退到旧行为。
+     */
     bool supportBatchReuse() const;
 
     void supportBatchReuse(bool enable);

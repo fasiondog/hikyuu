@@ -927,6 +927,14 @@ Indicator IndicatorImp::calculate() {
                     _calculate(Indicator());
                 }
             } else {
+                // 动态周期叶子没有右子节点驱动 buffer 定长。当执行器跨股票重绑 context 时，
+                // 空输入会让 _dyn_calculate 在 total == 0 处提前返回而完全不触碰 buffer，
+                // 导致上一只股票的数据与长度残留在 buffer 中（脏缓冲区）。这里在调用前按
+                // 当前 context 长度预尺寸并 null 填充 buffer，使得即便 _dyn_calculate 什么都不写，
+                // size()/data() 也能返回正确（可能更短）的长度。
+                if (isNeedContext()) {
+                    _readyBuffer(getContext().size(), m_result_num);
+                }
                 _dyn_calculate(Indicator());
             }
             break;
@@ -1977,16 +1985,18 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
                     m_ind_params.size() != other.m_ind_params.size() || m_params != other.m_params,
                   false);
 
-    if (needSelfAlikeCompare()) {
-        HKU_IF_RETURN(!selfAlike(other), false);
-        HKU_IF_RETURN(isLeaf(), true);
-    }
-
     auto iter1 = m_ind_params.cbegin();
     auto iter2 = other.m_ind_params.cbegin();
     for (; iter1 != m_ind_params.cend() && iter2 != other.m_ind_params.cend(); ++iter1, ++iter2) {
         HKU_IF_RETURN(iter1->first != iter2->first, false);
         HKU_IF_RETURN(!iter1->second->alike(*(iter2->second)), false);
+    }
+
+    if (needSelfAlikeCompare()) {
+        HKU_IF_RETURN(!selfAlike(other), false);
+        // Special leaves use structural identity so an unevaluated operator template (such as
+        // CVAL(value)) can match a calculated input without comparing runtime buffers.
+        HKU_IF_RETURN(isLeaf(), true);
     }
 
     if (isLeaf() && other.isLeaf()) {
