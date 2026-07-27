@@ -221,16 +221,13 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
 
         // 如果不是所有任务都完成，尝试执行积累任务
         if (!all_ready) {
-            if (!pool.run_available_task_once()) {
-                return;
-            }
             if (pool.run_available_task_once()) {
                 delay = init_delay;
             } else if (pool.done()) {
-                // 非工作线程也要参与忙等，否则在内存不足时更容易发生内存交换
                 return;
             } else {
-                // 工作线程休眠忙等
+                // 当前没有可窃取任务时，未完成任务可能正在其他工作线程中运行。
+                // 继续等待所有 future 就绪，确保调用方后续 get 抛出异常时没有遗留任务。
                 std::this_thread::sleep_for(delay);
                 if (delay < max_delay) {
                     delay = std::min(delay * 2, max_delay);

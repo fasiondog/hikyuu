@@ -6,7 +6,6 @@
  */
 
 #include <cmath>
-#include <Eigen/Dense>
 #include "hikyuu/utilities/thread/algorithm.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/KDATA.h"
@@ -21,6 +20,7 @@
 #include "hikyuu/StockManager.h"
 #include "MultiFactorBase.h"
 #include "industry_neutralize.h"
+#include "style_regression.h"
 
 namespace hku {
 
@@ -142,7 +142,7 @@ void MultiFactorBase::baseCheckParam(const string& name) const {
 }
 
 void MultiFactorBase::paramChanged() {
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void MultiFactorBase::_checkData() {
@@ -165,17 +165,22 @@ void MultiFactorBase::_checkData() {
               m_stks.size());
 }
 
-void MultiFactorBase::reset() {
-    _reset();
-
-    std::lock_guard<std::mutex> lock(m_mutex);
+void MultiFactorBase::clearCalculatedData() {
     m_ref_dates = {};
     m_stk_map = {};
     m_all_factors = {};
     m_date_index = {};
     m_stk_factor_by_date = {};
     m_ic = {};
-    m_calculated = false;
+}
+
+void MultiFactorBase::reset() {
+    // 全程持锁：避免与正在进行的 calculate 写写交叉。
+    // 注意：_reset() 为虚函数，自定义实现不得在锁内重入同一实例需要 m_mutex 的方法。
+    std::lock_guard<std::mutex> lock(m_mutex);
+    _reset();
+    clearCalculatedData();
+    m_calculated.store(false, std::memory_order_release);
 }
 
 MultiFactorPtr MultiFactorBase::clone() {
@@ -212,7 +217,7 @@ MultiFactorPtr MultiFactorBase::clone() {
 
     p->m_special_category = m_special_category;
 
-    p->m_calculated = false;
+    p->m_calculated.store(false, std::memory_order_relaxed);
     // 强制重算，不克隆以下缓存，避免非线程安全
     // p->m_stk_map = m_stk_map;
     // p->m_date_index = m_date_index;
@@ -227,7 +232,7 @@ MultiFactorPtr MultiFactorBase::clone() {
 
 void MultiFactorBase::setQuery(const KQuery& query) {
     m_query = query;
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void MultiFactorBase::setRefStock(const Stock& stk) {
@@ -236,7 +241,7 @@ void MultiFactorBase::setRefStock(const Stock& stk) {
     HKU_CHECK(ref_dates.size() >= 2, "The dates len is insufficient! current len: {}",
               ref_dates.size());
     m_ref_stk = tmp_stk;
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void MultiFactorBase::setStockList(const StockList& stks) {
@@ -246,18 +251,18 @@ void MultiFactorBase::setStockList(const StockList& stks) {
     }
 
     m_stks = stks;
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void MultiFactorBase::setRefFactorSet(const FactorSet& factorset) {
     HKU_CHECK(!factorset.isNull() && !factorset.empty(), "Input factor set is null or empty!");
     m_factorset = factorset;
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void MultiFactorBase::setNormalize(NormPtr norm) {
     m_norm = norm;
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
@@ -295,29 +300,25 @@ void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
         m_special_style_inds[found_name] = style_inds;
     }
 
-    m_calculated = false;
+    m_calculated.store(false, std::memory_order_relaxed);
 }
 
 const DatetimeList& MultiFactorBase::getDatetimeList() {
-    if (!m_calculated) {
-        calculate();
-    }
+    calculate();
     return m_ref_dates;
 }
 
 const Indicator& MultiFactorBase::getFactor(const Stock& stk) {
     HKU_CHECK(getParam<bool>("save_all_factors"),
               "param \"save_all_factors\" is false, can't get all factors!");
-    if (!m_calculated) {
-        calculate();
-    }
+    calculate();
     const auto iter = m_stk_map.find(stk);
     HKU_CHECK(iter != m_stk_map.cend(), "Could not find this stock: {}", stk);
     return m_all_factors[iter->second];
 }
 
 const IndicatorList& MultiFactorBase::getAllFactors() {
-    if (getParam<bool>("save_all_factors") && !m_calculated) {
+    if (getParam<bool>("save_all_factors")) {
         calculate();
     } else {
         HKU_WARN("param \"save_all_factors\" is false, can't get all factors!");
@@ -326,9 +327,7 @@ const IndicatorList& MultiFactorBase::getAllFactors() {
 }
 
 ScoreRecordList MultiFactorBase::getScores(const Datetime& d) {
-    if (!m_calculated) {
-        calculate();
-    }
+    calculate();
     ScoreRecordList ret;
     const auto iter = m_date_index.find(d);
     HKU_IF_RETURN(iter == m_date_index.cend(), ret);
@@ -435,9 +434,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
 }
 
 const vector<ScoreRecordList>& MultiFactorBase::getAllScores() {
-    if (!m_calculated) {
-        calculate();
-    }
+    calculate();
     return m_stk_factor_by_date;
 }
 
@@ -446,9 +443,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
                        htr("mf param \"save_all_factors\" is false, can't get all factors!, please "
                            "set it to true if you want to get IC/ICIR!"));
 
-    if (!m_calculated) {
-        calculate();
-    }
+    calculate();
 
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -531,87 +526,8 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
 
 // 行业中性化（按行业分组去组内均值）的纯函数实现见 industry_neutralize.h，
 // 提取为内部 inline header 供白盒单元测试直接包含调用。
-
-// 计算多元回归中性化后的因子，y为因子，x为多个解释变量（包含常数项）- Eigen版本
-static PriceList calculate_residuals(const PriceList& y, const std::vector<PriceList>& x) {
-    HKU_ASSERT(!x.empty());
-    size_t n = y.size();
-    for (const auto& xi : x) {
-        HKU_ASSERT(xi.size() == n);
-    }
-
-    PriceList residuals(n, Null<price_t>());
-    size_t k = x.size();  // 解释变量个数
-
-    // 构建设计矩阵和因变量向量
-    Eigen::MatrixXd Xmat(n, k + 1);
-    Eigen::VectorXd Yvec(n);
-
-    // 填充数据 - 第一列为常数项（全1）
-    Xmat.col(0).setConstant(1.0);
-
-    // 标记有效数据点
-    std::vector<bool> valid(n, true);
-
-    for (size_t i = 0; i < n; ++i) {
-        Yvec(i) = y[i];
-
-        // 检查因变量是否有效
-        if (std::isnan(y[i]) || std::isinf(y[i])) {
-            valid[i] = false;
-            continue;
-        }
-
-        // 填充自变量并检查有效性
-        for (size_t j = 0; j < k; ++j) {
-            Xmat(i, j + 1) = x[j][i];
-            if (std::isnan(x[j][i]) || std::isinf(x[j][i])) {
-                valid[i] = false;
-                break;
-            }
-        }
-    }
-
-    // 计算有效数据点数量
-    size_t valid_count = std::count(valid.begin(), valid.end(), true);
-
-    // 数据点不足
-    if (valid_count <= k + 1) {
-        return residuals;
-    }
-
-    // 创建有效数据的子矩阵
-    Eigen::MatrixXd X_valid(valid_count, k + 1);
-    Eigen::VectorXd Y_valid(valid_count);
-
-    size_t valid_idx = 0;
-    for (size_t i = 0; i < n; ++i) {
-        if (valid[i]) {
-            X_valid.row(valid_idx) = Xmat.row(i);
-            Y_valid(valid_idx) = Yvec(i);
-            valid_idx++;
-        }
-    }
-
-    // 使用QR分解求解线性回归 β = (X'X)^(-1)X'Y
-    Eigen::VectorXd beta = X_valid.colPivHouseholderQr().solve(Y_valid);
-
-    // 检查解是否有效
-    if (beta.hasNaN()) {
-        return residuals;
-    }
-
-    // 计算拟合值和残差
-    Eigen::VectorXd fitted = Xmat * beta;
-
-    for (size_t i = 0; i < n; ++i) {
-        if (valid[i]) {
-            residuals[i] = y[i] - fitted(i);
-        }
-    }
-
-    return residuals;
-}
+// 风格因子中性化残差回归实现见 style_regression.cpp，从本类中提取为串行内核，
+// 不再在运行时修改进程级 Eigen 线程配置。
 
 vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     vector<IndicatorList> all_stk_inds;
@@ -675,9 +591,9 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     // 时间截面标准化/归一化
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
-        // 压制 Eigen 内部 OpenMP 并行，避免与外层按日线程池叠加导致线程超载；
-        // calculate_residuals 内的 Eigen 矩阵均为栈局部对象，外层按日并行天然可重入。
-        Eigen::setNbThreads(1);
+        // 风格因子中性化残差回归已提取为串行内核（style_regression.cpp），
+        // 不再在运行时修改进程级 Eigen::setNbThreads，避免并发 MF 互相污染全局配置；
+        // 外层按日并行天然可重入，回归内部均为栈局部对象。
         unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();
         global_parallel_for_index_void(
           0, days_total,
@@ -735,7 +651,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                               style_value[si] = per_factor[j][si][di];
                           }
                       }
-                      new_value = calculate_residuals(new_value, style_value_day);
+                      new_value = calculate_style_residuals(new_value, style_value_day);
                   }
 
                   for (size_t si = 0; si < stk_count; si++) {
@@ -744,9 +660,6 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
               }
           });
-
-        // 恢复 Eigen 线程数
-        Eigen::setNbThreads(std::thread::hardware_concurrency());
     }
 
     return all_stk_inds;
@@ -814,12 +727,24 @@ void MultiFactorBase::_buildIndex() {
 }
 
 void MultiFactorBase::calculate() {
-    HKU_IF_RETURN(m_calculated, void());
+    // Fast path: lock-free acquire 检查是否已 Ready
+    if (m_calculated.load(std::memory_order_acquire)) {
+        return;
+    }
 
     std::lock_guard<std::mutex> lock(m_mutex);
-    _checkData();
+
+    // 锁内二次检查：mutex 已提供慢路径同步，relaxed 即可
+    if (m_calculated.load(std::memory_order_relaxed)) {
+        return;
+    }
+
+    // 构建前清理旧结果，确保重试基于干净状态
+    clearCalculatedData();
 
     try {
+        _checkData();
+
         {  // 获取所有证券所有对齐后的原始因子
             vector<IndicatorList> all_stk_inds = getAllSrcFactors();
 
@@ -839,19 +764,21 @@ void MultiFactorBase::calculate() {
 
         // 计算完成后创建截面索引
         _buildIndex();
-    } catch (const std::exception& e) {
-        HKU_ERROR(e.what());
+
+        if (!getParam<bool>("save_all_factors")) {
+            m_all_factors = {};
+            m_stk_map = {};
+        }
     } catch (...) {
-        HKU_ERROR_UNKNOWN;
+        // 失败清理：所有异步子任务已在 wait_and_drain 语义下结束，
+        // 清除基类半成品，保持未计算状态，原异常向上传播，允许下一调用者重试。
+        clearCalculatedData();
+        m_calculated.store(false, std::memory_order_relaxed);
+        throw;
     }
 
-    if (!getParam<bool>("save_all_factors")) {
-        m_all_factors = {};
-        m_stk_map = {};
-    }
-
-    // 更新计算状态
-    m_calculated = true;
+    // Publish：release 保证此前所有写入对后续 acquire 读取可见
+    m_calculated.store(true, std::memory_order_release);
 }
 
 }  // namespace hku
