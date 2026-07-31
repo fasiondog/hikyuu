@@ -59,40 +59,40 @@ public:
     static std::atomic<size_t> s_count;
 
     TestCountingMF() : MultiFactorBase("TestCountingMF") {}
+};
 
-    IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        s_count.fetch_add(1, std::memory_order_relaxed);
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+IndicatorList TestCountingMF::_calculate(const vector<IndicatorList>& all_stk_inds) {
+    s_count.fetch_add(1, std::memory_order_relaxed);
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-        // 等权合成（与 EqualWeightMultiFactor 相同逻辑）
-        size_t days_total = m_ref_dates.size();
-        size_t stk_count = m_stks.size();
-        size_t ind_count = m_factorset.size();
-        return global_parallel_for_index(0, stk_count, [&](size_t si) {
-            vector<price_t> sumByDate(days_total);
-            vector<size_t> countByDate(days_total);
-            const auto& curStkInds = all_stk_inds[si];
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto* curInd = curStkInds[ii].data();
-                for (size_t di = 0; di < days_total; di++) {
-                    auto value = curInd[di];
-                    if (!std::isnan(value)) {
-                        sumByDate[di] += value;
-                        countByDate[di] += 1;
-                    }
+    // 等权合成（与 EqualWeightMultiFactor 相同逻辑）
+    size_t days_total = m_ref_dates.size();
+    size_t stk_count = m_stks.size();
+    size_t ind_count = m_factorset.size();
+    return global_parallel_for_index(0, stk_count, [&](size_t si) {
+        vector<price_t> sumByDate(days_total);
+        vector<size_t> countByDate(days_total);
+        const auto& curStkInds = all_stk_inds[si];
+        for (size_t ii = 0; ii < ind_count; ii++) {
+            const auto* curInd = curStkInds[ii].data();
+            for (size_t di = 0; di < days_total; di++) {
+                auto value = curInd[di];
+                if (!std::isnan(value)) {
+                    sumByDate[di] += value;
+                    countByDate[di] += 1;
                 }
             }
-            for (size_t di = 0; di < days_total; di++) {
-                sumByDate[di] =
-                  (countByDate[di] == 0) ? Null<price_t>() : sumByDate[di] / countByDate[di];
-            }
-            Indicator ret = PRICELIST(sumByDate);
-            ret.updateDiscard(true);
-            ret.name("IC");
-            return ret;
-        });
-    }
-};
+        }
+        for (size_t di = 0; di < days_total; di++) {
+            sumByDate[di] =
+              (countByDate[di] == 0) ? Null<price_t>() : sumByDate[di] / countByDate[di];
+        }
+        Indicator ret = PRICELIST(sumByDate);
+        ret.updateDiscard(true);
+        ret.name("IC");
+        return ret;
+    });
+}
 
 std::atomic<size_t> TestCountingMF::s_count{0};
 
@@ -162,51 +162,51 @@ public:
     static Datetime s_dirty_date;
 
     TestFailOnceMF() : MultiFactorBase("TestFailOnceMF") {}
+};
 
-    IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        size_t call = s_calls.fetch_add(1, std::memory_order_relaxed);
-        if (call == 0) {
-            // 恶意写坏基类 protected 派生状态，模拟自定义子类遗留半成品；
-            // 若 clearCalculatedData 未生效，第二次计算会看到这些脏数据
-            m_date_index[s_dirty_date] = 999;
-            m_ic = PRICELIST(PriceList{12345.0});
-            throw std::runtime_error("simulated first-call failure");
-        }
+IndicatorList TestFailOnceMF::_calculate(const vector<IndicatorList>& all_stk_inds) {
+    size_t call = s_calls.fetch_add(1, std::memory_order_relaxed);
+    if (call == 0) {
+        // 恶意写坏基类 protected 派生状态，模拟自定义子类遗留半成品；
+        // 若 clearCalculatedData 未生效，第二次计算会看到这些脏数据
+        m_date_index[s_dirty_date] = 999;
+        m_ic = PRICELIST(PriceList{12345.0});
+        throw std::runtime_error("simulated first-call failure");
+    }
 
-        // 第二次计算开始时检查：第一次遗留的脏状态必须已被清理
-        if (m_date_index.find(s_dirty_date) != m_date_index.end()) {
-            s_saw_dirty.store(true, std::memory_order_relaxed);
-        }
+    // 第二次计算开始时检查：第一次遗留的脏状态必须已被清理
+    if (m_date_index.find(s_dirty_date) != m_date_index.end()) {
+        s_saw_dirty.store(true, std::memory_order_relaxed);
+    }
 
-        // 等权合成
-        size_t days_total = m_ref_dates.size();
-        size_t stk_count = m_stks.size();
-        size_t ind_count = m_factorset.size();
-        return global_parallel_for_index(0, stk_count, [&](size_t si) {
-            vector<price_t> sumByDate(days_total);
-            vector<size_t> countByDate(days_total);
-            const auto& curStkInds = all_stk_inds[si];
-            for (size_t ii = 0; ii < ind_count; ii++) {
-                const auto* curInd = curStkInds[ii].data();
-                for (size_t di = 0; di < days_total; di++) {
-                    auto value = curInd[di];
-                    if (!std::isnan(value)) {
-                        sumByDate[di] += value;
-                        countByDate[di] += 1;
-                    }
+    // 等权合成
+    size_t days_total = m_ref_dates.size();
+    size_t stk_count = m_stks.size();
+    size_t ind_count = m_factorset.size();
+    return global_parallel_for_index(0, stk_count, [&](size_t si) {
+        vector<price_t> sumByDate(days_total);
+        vector<size_t> countByDate(days_total);
+        const auto& curStkInds = all_stk_inds[si];
+        for (size_t ii = 0; ii < ind_count; ii++) {
+            const auto* curInd = curStkInds[ii].data();
+            for (size_t di = 0; di < days_total; di++) {
+                auto value = curInd[di];
+                if (!std::isnan(value)) {
+                    sumByDate[di] += value;
+                    countByDate[di] += 1;
                 }
             }
-            for (size_t di = 0; di < days_total; di++) {
-                sumByDate[di] =
-                  (countByDate[di] == 0) ? Null<price_t>() : sumByDate[di] / countByDate[di];
-            }
-            Indicator ret = PRICELIST(sumByDate);
-            ret.updateDiscard(true);
-            ret.name("IC");
-            return ret;
-        });
-    }
-};
+        }
+        for (size_t di = 0; di < days_total; di++) {
+            sumByDate[di] =
+              (countByDate[di] == 0) ? Null<price_t>() : sumByDate[di] / countByDate[di];
+        }
+        Indicator ret = PRICELIST(sumByDate);
+        ret.updateDiscard(true);
+        ret.name("IC");
+        return ret;
+    });
+}
 
 std::atomic<size_t> TestFailOnceMF::s_calls{0};
 std::atomic<bool> TestFailOnceMF::s_saw_dirty{false};
@@ -281,23 +281,23 @@ class TestNestedMFB : public MultiFactorBase {
 
 public:
     TestNestedMFB() : MultiFactorBase("TestNestedMFB") {}
-
-    IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        size_t days_total = m_ref_dates.size();
-        size_t stk_count = m_stks.size();
-        return global_parallel_for_index(0, stk_count, [&](size_t si) {
-            vector<price_t> sumByDate(days_total);
-            const auto& curStkInds = all_stk_inds[si];
-            for (size_t di = 0; di < days_total; di++) {
-                sumByDate[di] += curStkInds[0][di];
-            }
-            Indicator ret = PRICELIST(sumByDate);
-            ret.updateDiscard(true);
-            ret.name("IC");
-            return ret;
-        });
-    }
 };
+
+IndicatorList TestNestedMFB::_calculate(const vector<IndicatorList>& all_stk_inds) {
+    size_t days_total = m_ref_dates.size();
+    size_t stk_count = m_stks.size();
+    return global_parallel_for_index(0, stk_count, [&](size_t si) {
+        vector<price_t> sumByDate(days_total);
+        const auto& curStkInds = all_stk_inds[si];
+        for (size_t di = 0; di < days_total; di++) {
+            sumByDate[di] += curStkInds[0][di];
+        }
+        Indicator ret = PRICELIST(sumByDate);
+        ret.updateDiscard(true);
+        ret.name("IC");
+        return ret;
+    });
+}
 
 class TestNestedMFA : public MultiFactorBase {
     MULTIFACTOR_IMP(TestNestedMFA)
@@ -309,29 +309,29 @@ public:
         m_b = b;
     }
 
-    IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        // 在 A 的计算过程中触发 B 的惰性计算：不同实例不同 mutex，无环
-        if (m_b && !m_ref_dates.empty()) {
-            (void)m_b->getScores(m_ref_dates[m_ref_dates.size() / 2]);
-        }
-        size_t days_total = m_ref_dates.size();
-        size_t stk_count = m_stks.size();
-        return global_parallel_for_index(0, stk_count, [&](size_t si) {
-            vector<price_t> sumByDate(days_total);
-            const auto& curStkInds = all_stk_inds[si];
-            for (size_t di = 0; di < days_total; di++) {
-                sumByDate[di] += curStkInds[0][di];
-            }
-            Indicator ret = PRICELIST(sumByDate);
-            ret.updateDiscard(true);
-            ret.name("IC");
-            return ret;
-        });
-    }
-
 private:
     std::shared_ptr<TestNestedMFB> m_b;
 };
+
+IndicatorList TestNestedMFA::_calculate(const vector<IndicatorList>& all_stk_inds) {
+    // 在 A 的计算过程中触发 B 的惰性计算：不同实例不同 mutex，无环
+    if (m_b && !m_ref_dates.empty()) {
+        (void)m_b->getScores(m_ref_dates[m_ref_dates.size() / 2]);
+    }
+    size_t days_total = m_ref_dates.size();
+    size_t stk_count = m_stks.size();
+    return global_parallel_for_index(0, stk_count, [&](size_t si) {
+        vector<price_t> sumByDate(days_total);
+        const auto& curStkInds = all_stk_inds[si];
+        for (size_t di = 0; di < days_total; di++) {
+            sumByDate[di] += curStkInds[0][di];
+        }
+        Indicator ret = PRICELIST(sumByDate);
+        ret.updateDiscard(true);
+        ret.name("IC");
+        return ret;
+    });
+}
 
 /** @par 嵌套计算：A 的 _calculate 内触发 B 的惰性计算，并发触发无死锁 */
 TEST_CASE("test_MF_nested_calculate_no_deadlock") {
