@@ -10,6 +10,6 @@
 
 namespace hku {
 
-PriceList calculate_style_residuals(const PriceList& y, const vector<PriceList>& x);
+HKU_API PriceList calculate_style_residuals(const PriceList& y, const vector<PriceList>& x);
 
 }  // namespace hku
