@@ -383,6 +383,59 @@ TEST_CASE("test_MF_nested_calculate_no_deadlock") {
     CHECK_UNARY_FALSE(a->getScores(a->getDatetimeList().back()).empty());
 }
 
+/** @par clone 独立状态：原对象 Ready 后 clone 不共享计算状态
+ *  两个线程同时访问原对象（已 Ready，不重算）与克隆对象（首次访问触发重算），
+ *  互不干扰且结果相等。
+ */
+TEST_CASE("test_MF_clone_independent_state") {
+    TestCountingMF::s_count = 0;
+    auto mfA = makeCountingMF();
+
+    // A 计算完成
+    (void)mfA->getDatetimeList();
+    CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 1u);
+
+    // clone 后强制重算：原对象不重算，仅克隆对象触发
+    auto mfB = mfA->clone();
+
+    std::atomic<bool> go{false};
+    std::vector<std::thread> threads;
+    threads.emplace_back([&]() {
+        while (!go.load(std::memory_order_acquire)) {
+            std::this_thread::yield();
+        }
+        (void)mfA->getDatetimeList();
+        (void)mfA->getScores(mfA->getDatetimeList().back());
+    });
+    threads.emplace_back([&]() {
+        while (!go.load(std::memory_order_acquire)) {
+            std::this_thread::yield();
+        }
+        (void)mfB->getDatetimeList();
+        (void)mfB->getScores(mfB->getDatetimeList().back());
+    });
+
+    go.store(true, std::memory_order_release);
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    // 只有克隆对象触发了一次新的完整计算
+    CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 2u);
+
+    // 两对象结果一致
+    const auto& dates_a = mfA->getDatetimeList();
+    const auto& dates_b = mfB->getDatetimeList();
+    CHECK_EQ(dates_a, dates_b);
+    auto cross_a = mfA->getScores(dates_a[dates_a.size() / 2]);
+    auto cross_b = mfB->getScores(dates_b[dates_b.size() / 2]);
+    CHECK_EQ(cross_a.size(), cross_b.size());
+    for (size_t i = 0; i < cross_a.size(); i++) {
+        CHECK_EQ(cross_a[i].stock, cross_b[i].stock);
+        CHECK_EQ(cross_a[i].value, doctest::Approx(cross_b[i].value).epsilon(1e-9));
+    }
+}
+
 /** @par 序列化 load 后状态未发布：重新计算得到完整结果 */
 #if HKU_SUPPORT_SERIALIZATION
 TEST_CASE("test_MF_serialization_load_recalculates") {
