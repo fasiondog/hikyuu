@@ -126,7 +126,10 @@ target("hikyuu")
     add_files("./trade_sys/environment/imp/*.cpp", {unity_group="environment_imp"})
     add_files("./trade_sys/system/**.cpp", {unity_group="system"})
     add_files("./trade_sys/moneymanager/**.cpp", {unity_group="moneymanager"})
-    add_files("./trade_sys/multifactor/*.cpp", "./trade_sys/multifactor/imp/*.cpp", {unity_group="multifactor"})
+    add_files("./trade_sys/multifactor/*.cpp|style_regression.cpp", "./trade_sys/multifactor/imp/*.cpp", {unity_group="multifactor"})
+    -- style_regression.cpp 单独编译：包含 Eigen 头，避免 unity build 拼接后
+    -- Eigen 内联实现泄漏给同组其他源码（编译变慢 + 潜在 ODR 风险）
+    add_files("./trade_sys/multifactor/style_regression.cpp", {unity_group = false})
     add_files("./trade_sys/multifactor/filter/*.cpp", {unity_group="multifactor_filter"})
     add_files("./trade_sys/multifactor/normalize/*.cpp", {unity_group="multifactor_norm"})
     add_files("./trade_sys/portfolio/**.cpp", {unity_group="portfolio"})

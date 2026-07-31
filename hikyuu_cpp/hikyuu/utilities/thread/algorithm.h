@@ -208,7 +208,8 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
     bool all_ready = false;
     auto init_delay = std::chrono::microseconds(1);
     auto delay = init_delay;
-    const auto max_delay = std::chrono::microseconds(50000);
+    const auto max_delay = std::chrono::microseconds(1000);
+    int spin_count = 0;
 
     while (!all_ready && !pool.done()) {
         all_ready = true;
@@ -223,14 +224,21 @@ void wait_for_all_non_blocking(GlobalStealThreadPool& pool, FutureContainer& fut
         if (!all_ready) {
             if (pool.run_available_task_once()) {
                 delay = init_delay;
+                spin_count = 0;
             } else if (pool.done()) {
                 return;
             } else {
                 // 当前没有可窃取任务时，未完成任务可能正在其他工作线程中运行。
-                // 继续等待所有 future 就绪，确保调用方后续 get 抛出异常时没有遗留任务。
-                std::this_thread::sleep_for(delay);
-                if (delay < max_delay) {
-                    delay = std::min(delay * 2, max_delay);
+                // 先让出时间片若干次，再进入微秒级指数退避（上限 1ms），
+                // 确保调用方后续 get 抛出异常时没有遗留任务，同时避免长时间忙等。
+                if (spin_count < 8) {
+                    ++spin_count;
+                    std::this_thread::yield();
+                } else {
+                    std::this_thread::sleep_for(delay);
+                    if (delay < max_delay) {
+                        delay = std::min(delay * 2, max_delay);
+                    }
                 }
             }
         }
