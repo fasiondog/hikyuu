@@ -5,15 +5,15 @@
  *      Author: fasiondog
  */
 
-#include "DelegateSystem.h"
+#include "MultiSystem.h"
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_EXPORT(hku::DelegateSystem)
+BOOST_CLASS_EXPORT(hku::MultiSystem)
 #endif
 
 namespace hku {
 
-void DelegateSystem::_reset() {
+void MultiSystem::_reset() {
     if (m_sys) {
         m_sys->reset();
     }
@@ -25,7 +25,7 @@ void DelegateSystem::_reset() {
     m_buyShortRequestList.clear();
 }
 
-void DelegateSystem::_forceResetAll() {
+void MultiSystem::_forceResetAll() {
     if (m_sys) {
         m_sys->forceResetAll();
     }
@@ -37,11 +37,11 @@ void DelegateSystem::_forceResetAll() {
     m_buyShortRequestList.clear();
 }
 
-SystemPtr DelegateSystem::_clone() {
-    return m_sys ? make_shared<DelegateSystem>(m_sys->clone()) : make_shared<DelegateSystem>();
+SystemPtr MultiSystem::_clone() {
+    return m_sys ? make_shared<MultiSystem>(m_sys->clone()) : make_shared<MultiSystem>();
 }
 
-void DelegateSystem::run(const KData& kdata, bool reset, bool resetAll) {
+void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
     HKU_WARN_IF_RETURN(!m_sys, void(), "No delegated system is specified!");
     m_kdata = kdata;
 
@@ -71,7 +71,7 @@ void DelegateSystem::run(const KData& kdata, bool reset, bool resetAll) {
     m_buyShortRequestList = m_sys->getBuyShortTradeRequestList();
 }
 
-TradeRecordList DelegateSystem::runMoment(const Datetime& datetime) {
+TradeRecordList MultiSystem::runMoment(const Datetime& datetime) {
     TradeRecordList ret;
     HKU_WARN_IF_RETURN(!m_sys, ret, "No delegated system is specified!");
     auto tr_list = m_sys->runMoment(datetime);
@@ -81,7 +81,7 @@ TradeRecordList DelegateSystem::runMoment(const Datetime& datetime) {
     return tr_list;
 }
 
-TradeRecord DelegateSystem::sellForceOnOpen(const Datetime& date, double num, Part from) {
+TradeRecord MultiSystem::sellForceOnOpen(const Datetime& date, double num, Part from) {
     TradeRecord ret;
     HKU_WARN_IF_RETURN(!m_sys, ret, "No delegated system is specified!");
     ret = m_sys->sellForceOnOpen(date, num, from);
@@ -89,7 +89,7 @@ TradeRecord DelegateSystem::sellForceOnOpen(const Datetime& date, double num, Pa
     return ret;
 }
 
-TradeRecord DelegateSystem::sellForceOnClose(const Datetime& date, double num, Part from) {
+TradeRecord MultiSystem::sellForceOnClose(const Datetime& date, double num, Part from) {
     TradeRecord ret;
     HKU_WARN_IF_RETURN(!m_sys, ret, "No delegated system is specified!");
     ret = m_sys->sellForceOnClose(date, num, from);
@@ -97,13 +97,13 @@ TradeRecord DelegateSystem::sellForceOnClose(const Datetime& date, double num, P
     return ret;
 }
 
-void DelegateSystem::clearDelayBuyRequest() {
+void MultiSystem::clearDelayBuyRequest() {
     HKU_WARN_IF_RETURN(!m_sys, void(), "No delegated system is specified!");
     m_sys->clearDelayBuyRequest();
     m_buyRequestList.clear();
 }
 
-TradeRecord DelegateSystem::pfProcessDelaySellRequest(const Datetime& date) {
+TradeRecord MultiSystem::pfProcessDelaySellRequest(const Datetime& date) {
     TradeRecord ret;
     HKU_WARN_IF_RETURN(!m_sys, ret, "No delegated system is specified!");
     ret = m_sys->pfProcessDelaySellRequest(date);

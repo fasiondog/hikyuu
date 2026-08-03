@@ -10,15 +10,17 @@
 
 namespace hku {
 
-class HKU_API DelegateSystem : public System {
+class HKU_API MultiSystem : public System {
 public:
-    DelegateSystem() = default;
-    explicit DelegateSystem(const string& name) : System(name) {}
-    explicit DelegateSystem(const SystemPtr& sys) : m_sys(sys) {}
-    virtual ~DelegateSystem() = default;
+    MultiSystem() = default;
+    explicit MultiSystem(const string& name) : System(name) {}
+    explicit MultiSystem(const SystemPtr& sys) : m_sys(sys) {}
+    virtual ~MultiSystem() = default;
 
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
     virtual TradeRecordList runMoment(const Datetime& datetime) override;
+    virtual TradeRecordList runMomentOnOpen(const Datetime& datetime);
+    virtual TradeRecordList runMomentOnClose(const Datetime& datetime);
 
     virtual void _reset() override;
     virtual void _forceResetAll() override;
