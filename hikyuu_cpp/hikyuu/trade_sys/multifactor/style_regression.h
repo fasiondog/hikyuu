@@ -1,6 +1,9 @@
 /*
  *  Copyright (c) 2026 hikyuu.org
  *
+ *  Created on: 2026-07-27
+ *      Author: woleigegg
+ *
  *  Style factor neutralization regression helpers.
  */
 

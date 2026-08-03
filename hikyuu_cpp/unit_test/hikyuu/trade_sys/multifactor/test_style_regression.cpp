@@ -1,7 +1,10 @@
 /*
- * test_style_regression.cpp
+ *  Copyright (c) 2026 hikyuu.org
  *
- * 风格因子中性化残差回归（calculate_style_residuals）的白盒测试。
+ *  Created on: 2026-07-31
+ *      Author: woleigegg
+ *
+ *  风格因子中性化残差回归（calculate_style_residuals）的白盒测试。
  *
  *   - golden 值：一元线性回归解析解核对；
  *   - 边界：样本不足全 NaN、自变量含 NaN 行置 NaN、秩亏共线不崩溃；

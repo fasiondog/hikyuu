@@ -1,7 +1,10 @@
 /*
- * test_MF_ThreadSafe.cpp
+ *  Copyright (c) 2026 hikyuu.org
  *
- * MultiFactorBase 线程安全惰性计算的白盒测试。
+ *  Created on: 2026-07-31
+ *      Author: woleigegg
+ *
+ *  MultiFactorBase 线程安全惰性计算的白盒测试。
  *
  *   - T2 并发首次访问：barrier 齐射 32 线程混合调用 getter，实际构建恰好一次；
  *   - T3 失败重试：首次 _calculate 抛异常且恶意写坏基类派生状态，

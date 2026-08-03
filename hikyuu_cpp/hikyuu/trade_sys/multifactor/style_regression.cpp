@@ -1,6 +1,9 @@
 /*
  *  Copyright (c) 2026 hikyuu.org
  *
+ *  Created on: 2026-07-27
+ *      Author: woleigegg
+ *
  *  风格因子中性化残差回归，从 MultiFactorBase 中提取的串行内核。
  *
  *  设计要点：
