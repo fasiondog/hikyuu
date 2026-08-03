@@ -20,7 +20,7 @@
 #include "hikyuu/StockManager.h"
 #include "MultiFactorBase.h"
 #include "industry_neutralize.h"
-#include "style_regression.h"
+#include "StyleRegression.h"
 
 namespace hku {
 
@@ -526,7 +526,7 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
 
 // 行业中性化（按行业分组去组内均值）的纯函数实现见 industry_neutralize.h，
 // 提取为内部 inline header 供白盒单元测试直接包含调用。
-// 风格因子中性化残差回归实现见 style_regression.cpp，从本类中提取为串行内核，
+// 风格因子中性化残差回归实现见 StyleRegression.cpp，从本类中提取为串行内核，
 // 不再在运行时修改进程级 Eigen 线程配置。
 
 vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
@@ -591,7 +591,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     // 时间截面标准化/归一化
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
-        // 风格因子中性化残差回归已提取为串行内核（style_regression.cpp），
+        // 风格因子中性化残差回归已提取为串行内核（StyleRegression.cpp），
         // 不再在运行时修改进程级 Eigen::setNbThreads，避免并发 MF 互相污染全局配置；
         // 外层按日并行天然可重入，回归内部均为栈局部对象。
         unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();

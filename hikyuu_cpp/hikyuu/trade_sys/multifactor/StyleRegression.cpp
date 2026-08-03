@@ -15,7 +15,7 @@
 
 #include <cmath>
 #include <Eigen/Dense>
-#include "style_regression.h"
+#include "StyleRegression.h"
 #include "hikyuu/utilities/Null.h"
 
 namespace hku {

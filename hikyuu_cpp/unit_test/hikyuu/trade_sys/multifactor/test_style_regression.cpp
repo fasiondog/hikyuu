@@ -15,7 +15,7 @@
 #include "../../test_config.h"
 #include <thread>
 #include <Eigen/Core>
-#include <hikyuu/trade_sys/multifactor/style_regression.h>
+#include <hikyuu/trade_sys/multifactor/StyleRegression.h>
 
 using namespace hku;
 
