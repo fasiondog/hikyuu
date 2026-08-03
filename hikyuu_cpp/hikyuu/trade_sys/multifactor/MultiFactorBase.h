@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <atomic>
 #include "hikyuu/KData.h"
 #include "ScoresFilterBase.h"
 #include "buildin_norm.h"
@@ -169,14 +170,26 @@ public:
     }
 
     /**
-     * 执行计算。默认取结果时，会自动计算。但并行使用mf时，应主动调用该接口
-     * @note 因获取scores非常频繁，所以为使用锁。
-     * 这样的话，在并行时并不完备。在需要并行计算时可主动调用该接口。
+     * 执行计算。默认取结果时，会自动计算。
+     *
+     * 并发语义（PR1）：
+     *   - 支持多个线程同时对同一未计算实例首次触发 calculate / getter；
+     *   - 计算成功后允许多线程并发只读；
+     *   - 不支持 getter 与 reset/setQuery/setStockList/setRefFactorSet/setParam 并发；
+     *   - 不支持调用方持有 getter 返回的内部引用期间另一线程修改实例。
+     *
+     * 失败语义：
+     *   - 计算抛出异常时，基类派生缓存被清理，m_calculated 保持 false；
+     *   - 异常向上传播，下一调用者可重新计算（DCLP，非 single-flight）。
      */
     void calculate();
 
 private:
     void initParam();
+
+    // 清除所有计算后生成的派生数据，保留配置成员。
+    // calculate() 构建前和异常后均调用，确保重试基于干净状态。
+    void clearCalculatedData();
 
     // 构造每个指标的行业归属标签（整数板块序号）与板块数，以便进行行业中性化处理。
     // 返回 {factor_name -> (labels, blk_count)}：
@@ -214,7 +227,7 @@ protected:
 
 private:
     std::mutex m_mutex;
-    bool m_calculated{false};
+    std::atomic<bool> m_calculated{false};
 
 //============================================
 // 序列化支持
@@ -263,7 +276,7 @@ private:
         // ar& BOOST_SERIALIZATION_NVP(m_ic);
         // ar& BOOST_SERIALIZATION_NVP(m_calculated);
         // ar& BOOST_SERIALIZATION_NVP(m_stk_factor_by_date);
-        m_calculated = false;
+        m_calculated.store(false, std::memory_order_relaxed);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
