@@ -19,8 +19,8 @@ public:
 
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
     virtual TradeRecordList runMoment(const Datetime& datetime) override;
-    virtual TradeRecordList runMomentOnOpen(const Datetime& datetime);
-    virtual TradeRecordList runMomentOnClose(const Datetime& datetime);
+    // virtual TradeRecordList runMomentOnOpen(const Datetime& datetime) override;
+    // virtual TradeRecordList runMomentOnClose(const Datetime& datetime) override;
 
     virtual void _reset() override;
     virtual void _forceResetAll() override;
