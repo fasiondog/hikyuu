@@ -15,14 +15,12 @@
  */
 
 #include "../../test_config.h"
-#include <fstream>
-#include <thread>
-#include <atomic>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/thread/algorithm.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/AMA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/trade_sys/multifactor/MultiFactorBase.h>
 #include <hikyuu/trade_sys/multifactor/crt/MF_EqualWeight.h>
 
