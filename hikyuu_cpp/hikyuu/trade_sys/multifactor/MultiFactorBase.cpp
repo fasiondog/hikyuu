@@ -687,40 +687,53 @@ void MultiFactorBase::_buildIndex() {
         }
     });
 
+    // 截面排序的确定性比较器：有效值按目标方向排序，值相等时以 market_code
+    // 字典序作为二级键打破 tie，使结果跨输入顺序、进程、平台、编译器稳定。
+    // NaN 置于末尾，NaN 之间同样按 market_code 字典序以保证 NaN 区段内部确定性。
+    // 使用 lambda 而非匿名命名空间函数，避免 unity_build 下的 ODR 风险，
+    // 同时使闭包类型在编译期唯一，让 std::sort 能够完全内联比较逻辑。
+    auto scoreDescLess = [](const ScoreRecord& a, const ScoreRecord& b) noexcept -> bool {
+        const bool a_nan = std::isnan(a.value);
+        const bool b_nan = std::isnan(b.value);
+        if (a_nan != b_nan) {
+            return !a_nan;  // 有效值永远在 NaN 前
+        }
+        if (!a_nan) {
+            if (a.value > b.value) return true;
+            if (a.value < b.value) return false;
+        }
+        return a.stock.market_code() < b.stock.market_code();
+    };
+
+    auto scoreAscLess = [](const ScoreRecord& a, const ScoreRecord& b) noexcept -> bool {
+        const bool a_nan = std::isnan(a.value);
+        const bool b_nan = std::isnan(b.value);
+        if (a_nan != b_nan) {
+            return !a_nan;  // 有效值永远在 NaN 前
+        }
+        if (!a_nan) {
+            if (a.value < b.value) return true;
+            if (a.value > b.value) return false;
+        }
+        return a.stock.market_code() < b.stock.market_code();
+    };
+
     int mode = getParam<int>("mode");
     if (0 == mode) {
         global_parallel_for_index_void(
           0, days_total,
-          [this](size_t i) {
+          [this, scoreDescLess](size_t i) {
               std::sort(m_stk_factor_by_date[i].begin(), m_stk_factor_by_date[i].end(),
-                        [](const ScoreRecord& a, const ScoreRecord& b) {
-                            if (std::isnan(a.value) && std::isnan(b.value)) {
-                                return false;
-                            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
-                                return true;
-                            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
-                                return false;
-                            }
-                            return a.value > b.value;
-                        });
+                        scoreDescLess);
           },
           100);
 
     } else if (1 == mode) {
         global_parallel_for_index_void(
           0, days_total,
-          [this](size_t i) {
+          [this, scoreAscLess](size_t i) {
               std::sort(m_stk_factor_by_date[i].begin(), m_stk_factor_by_date[i].end(),
-                        [](const ScoreRecord& a, const ScoreRecord& b) {
-                            if (std::isnan(a.value) && std::isnan(b.value)) {
-                                return false;
-                            } else if (!std::isnan(a.value) && std::isnan(b.value)) {
-                                return true;
-                            } else if (std::isnan(a.value) && !std::isnan(b.value)) {
-                                return false;
-                            }
-                            return a.value < b.value;
-                        });
+                        scoreAscLess);
           },
           100);
     }
