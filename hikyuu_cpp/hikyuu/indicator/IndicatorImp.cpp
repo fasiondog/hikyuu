@@ -156,6 +156,10 @@ uint64_t IndicatorImp::nextOriginId() noexcept {
     return seq.fetch_add(1, std::memory_order_relaxed);
 }
 
+uint64_t IndicatorImp::originId() const noexcept {
+    return m_origin_id;
+}
+
 IndicatorImp::IndicatorImp() : m_name("IndicatorImp") {
     memset(m_pBuffer, 0, sizeof(buffer_t *) * MAX_RESULT_NUM);
 }
