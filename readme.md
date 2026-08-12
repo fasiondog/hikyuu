@@ -118,61 +118,28 @@ sys.run(sm['sz000001'], Query(-150))
 
 ---
 
-## 🏗️ 交易系统化架构
+## 🏗️ 交易系统化架构核心组件
 
 > 遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合
 
-### 分层架构概览
-
-<p align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <strong>📊 投资组合层 Portfolio</strong><br>
-        <sub>多标的策略调度</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <strong>⚙️ 交易系统 SYS · 单对象</strong><br>
-        <sub>组件化单标的策略</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <strong>📝 交易管理 执行 & 记录</strong><br>
-        <sub>账户资金 · 持仓 · 订单</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <strong>💾 数据层 Stock & KData</strong><br>
-        <sub>证券管理 · K线序列 · 数据查询</sub>
-      </td>
-    </tr>
-  </table>
-</p>
-
-### 核心组件详解
-
-| 层级                   | 组件                                | 说明                             |
-| :--------------------- | :---------------------------------- | :------------------------------- |
-| **投资组合层**   | **PF** · Portfolio           | 投资组合 - 多标的策略调度        |
-|                        | **SE** · Selector            | 交易对象选择 - 选股策略筛选      |
-|                        | **AF** · AllocateFunds       | 资金分配 - 多标的资金调度        |
-|                        | **MF** · MultiFactor         | 多因子模型 - 因子评分与排序      |
-| **交易系统 SYS** | **EV** · Environment         | 市场环境判断 - 大盘环境有效性    |
-|                        | **CN** · Condition           | 系统有效条件 - 系统适用条件      |
-|                        | **SG** · Signal              | 信号指示器 - 产生买卖信号        |
-|                        | **ST** · Stoploss/Stopprofit | 止损 / 止盈 - 风险控制退出       |
-|                        | **MM** · MoneyManager        | 资金管理 - 买卖数量控制          |
-|                        | **PG** · ProfitGoal          | 盈利目标 - 目标达成退出          |
-|                        | **SP** · Slippage            | 移滑价差 - 回测价格模拟          |
-| **交易管理**     | **TM** · TradeManager        | 交易管理 - 账户资金与持仓记录    |
-|                        | **OB** · OrderBroker         | 订单执行 - 实盘下单 broker 对接  |
-| **数据层**       | **SM** · StockManager        | 证券管理 - StockManager 统一管理 |
-|                        | **KD** · KData               | K 线数据 - KData 量价序列        |
-|                        | **Q** · Query                | 数据查询 - Query 时间范围筛选    |
+| 层级                   | 组件                                                                                                                                | 说明                             |
+| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------- | :------------------------------- |
+| **投资组合层**   | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/portfolio.html"><b>PF</b> · Portfolio</a>           | 投资组合 - 多标的策略调度        |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/selector.html"><b>SE</b> · Selector</a>            | 交易对象选择 - 选股策略筛选      |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/allocate_funds.html"><b>AF</b> · AllocateFunds</a>  | 资金分配 - 多标的资金调度        |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/multifactor.html"><b>MF</b> · MultiFactor</a>       | 多因子模型 - 因子评分与排序      |
+| **交易系统 SYS** | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/environment.html"><b>EV</b> · Environment</a>             | 市场环境判断 - 大盘环境有效性    |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/condition.html"><b>CN</b> · Condition</a>                 | 系统有效条件 - 系统适用条件      |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/signal.html"><b>SG</b> · Signal</a>                       | 信号指示器 - 产生买卖信号        |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/stoploss.html"><b>ST</b> · Stoploss/Stopprofit</a>        | 止损 / 止盈 - 风险控制退出       |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/money_manager.html"><b>MM</b> · MoneyManager</a>          | 资金管理 - 买卖数量控制          |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/profitgoal.html"><b>PG</b> · ProfitGoal</a>               | 盈利目标 - 目标达成退出          |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/slippage.html"><b>SP</b> · Slippage</a>                   | 移滑价差 - 回测价格模拟          |
+| **交易管理**     | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_manage/TradeManager.html"><b>TM</b> · TradeManager</a>        | 交易管理 - 账户资金与持仓记录    |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_manage/OrderBroker.html"><b>OB</b> · OrderBroker</a>           | 订单执行 - 实盘下单 broker 对接  |
+| **数据层**       | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/stock_manager.html"><b>SM</b> · StockManager</a>                    | 证券管理 - StockManager 统一管理 |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/stock_manager.html#kdata"><b>KD</b> · KData</a>                     | K 线数据 - KData 量价序列        |
+|                        | <a target="_blank" href="https://hikyuu.readthedocs.io/zh-cn/latest/stock_manager.html#query"><b>Q</b> · Query</a>                      | 数据查询 - Query 时间范围筛选    |
 
 ---
 
