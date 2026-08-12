@@ -1,21 +1,8 @@
-<p align="center">
-  <img src="docs/source/_static/00000-title.png" alt="Hikyuu" width="500">
-</p>
-
-<p align="center">
-  <strong>开源超高速量化交易研究框架</strong>
-</p>
-
-<p align="center">
-  <img src="https://static.pepy.tech/badge/hikyuu" alt="Downloads">
-  <img src="https://static.pepy.tech/badge/hikyuu/month" alt="Monthly Downloads">
-  <img src="https://static.pepy.tech/badge/hikyuu/week" alt="Weekly Downloads">
-  <img src="https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg" alt="Windows Build">
-  <img src="https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg" alt="Ubuntu Build">
-  <img src="https://img.shields.io/github/license/fasiondog/hikyuu.svg" alt="License">
-</p>
+![title](docs/source/_static/00000-title.png)
 
 ---
+
+![img](https://static.pepy.tech/badge/hikyuu) ![img](https://static.pepy.tech/badge/hikyuu/month) ![img](https://static.pepy.tech/badge/hikyuu/week) ![img](https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg) ![img](https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg) ![License](https://img.shields.io/github/license/fasiondog/hikyuu.svg)
 
 ## ⚡ Hikyuu Ultra-Fast Quant Framework
 
