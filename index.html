@@ -82,10 +82,7 @@
     .nav-logo {
       font-size: 1.5rem;
       font-weight: 800;
-      background: var(--gradient-2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary-light);
       text-decoration: none;
     }
 
@@ -143,6 +140,7 @@
       bottom: 0;
       background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
       opacity: 1;
+      animation: gridShift 60s linear infinite;
     }
 
     .hero::after {
@@ -156,15 +154,29 @@
       background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
       filter: blur(60px);
       pointer-events: none;
+      animation: floatGlow 12s ease-in-out infinite;
+    }
+
+    .hero-glow {
+      position: absolute;
+      bottom: -20%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+      animation: floatGlow2 15s ease-in-out infinite;
     }
 
     .hero-content {
-      max-width: 1200px;
+      max-width: 800px;
       width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      text-align: center;
       position: relative;
       z-index: 1;
     }
@@ -184,6 +196,7 @@
       margin-bottom: 1.5rem;
       border: 1px solid rgba(129, 140, 248, 0.3);
       color: var(--primary-light);
+      animation: fadeInUp 0.8s ease-out 0.1s both, pulseBadge 2.5s ease-out 1.5s infinite;
     }
 
     .hero-title {
@@ -192,6 +205,16 @@
       line-height: 1.2;
       margin-bottom: 1.5rem;
       color: var(--white);
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    .hero-title-icon {
+      height: 3.8rem;
+      width: 3.8rem;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+      animation: breathe 4s ease-in-out 1.5s infinite;
     }
 
     .hero-description {
@@ -199,12 +222,15 @@
       line-height: 1.8;
       color: #cbd5e1;
       margin-bottom: 2rem;
+      animation: fadeInUp 0.8s ease-out 0.5s both;
     }
 
     .hero-buttons {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeInUp 0.8s ease-out 0.7s both;
     }
 
     .btn {
@@ -222,7 +248,7 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background: var(--primary);
       color: var(--white);
       box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
     }
@@ -243,32 +269,6 @@
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.35);
       transform: translateY(-2px);
-    }
-
-    .hero-image {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .hero-image-card {
-      background: var(--white);
-      padding: 2.5rem 3rem;
-      border-radius: 1.25rem;
-      box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.6),
-                  0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .hero-image-card img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
     }
 
     /* Stats Section - 深紫调（浅段） */
@@ -721,10 +721,12 @@
     }
 
     .community-card img {
-      max-width: 200px;
-      height: auto;
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
       border-radius: 0.5rem;
-      margin-top: 1rem;
+      margin: 1rem auto 0;
+      background: var(--white);
     }
 
     .community-card h4 {
@@ -737,6 +739,7 @@
     .community-card p {
       color: #94a3b8;
       font-size: 0.875rem;
+      margin-top: 1rem;
     }
 
     /* Footer */
@@ -792,19 +795,6 @@
 
     /* Responsive */
     @media (max-width: 1024px) {
-      .hero-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-
-      .hero-buttons {
-        justify-content: center;
-      }
-
-      .hero-image {
-        order: -1;
-      }
-
       .code-container {
         grid-template-columns: 1fr;
       }
@@ -813,6 +803,11 @@
     @media (max-width: 768px) {
       .hero-title {
         font-size: 2.5rem;
+      }
+
+      .hero-title-icon {
+        height: 2.8rem;
+        width: 2.8rem;
       }
 
       .section-title {
@@ -845,6 +840,57 @@
       }
     }
 
+    @keyframes floatGlow {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: translate(30px, 40px) scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes floatGlow2 {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translate(-40px, -30px) scale(1.15);
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes gridShift {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 100px 100px;
+      }
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 0 rgba(209, 213, 219, 0.3);
+      }
+      50% {
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px 3px rgba(209, 213, 219, 0.25);
+      }
+    }
+
+    @keyframes pulseBadge {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+      }
+    }
+
     .animate {
       animation: fadeInUp 0.8s ease-out;
     }
@@ -868,10 +914,11 @@
 
   <!-- Hero Section -->
   <section class="hero">
+    <div class="hero-glow"></div>
     <div class="hero-content">
       <div class="hero-text">
         <span class="hero-badge"><i class="fas fa-star"></i> 开源超高速量化交易框架</span>
-        <h1 class="hero-title">Hikyuu<br>Quant Framework</h1>
+        <h1 class="hero-title"><img src="images/hikyuu_48x48.png" class="hero-title-icon" alt="Hikyuu" />Hikyuu<br>Ultra-Fast Quant Framework</h1>
         <p class="hero-description">
           基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展（深度适配国内 A 股市场）。核心能力覆盖四大维度：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。
         </p>
@@ -885,11 +932,6 @@
           <a href="https://gitee.com/fasiondog/hikyuu_hub" class="btn btn-secondary">
             <i class="fas fa-puzzle-piece"></i> 策略部件库
           </a>
-        </div>
-      </div>
-      <div class="hero-image">
-        <div class="hero-image-card">
-          <img src="images/00000-title.png" alt="Hikyuu Overview" />
         </div>
       </div>
     </div>
@@ -1198,26 +1240,71 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
 
   <!-- Community Section -->
   <section class="community" id="community">
+    <!-- 支持项目 / 捐赠 -->
+    <div class="section-header">
+      <span class="section-badge"><i class="fas fa-heart"></i> 支持项目</span>
+      <h2 class="section-title">感谢捐赠，让 Hikyuu 走得更远</h2>
+      <p class="section-description">因作者精力有限，对捐赠用户的问题会优先解答、确保响应</p>
+    </div>
+    <div style="max-width: 1100px; margin: 0 auto 4rem;">
+      <div class="community-grid">
+        <a class="community-card" href="https://pay.ldxp.cn/item/gflv3v" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
+          <h4><i class="fas fa-mug-hot" style="color: var(--primary-light);"></i> 请作者喝杯咖啡</h4>
+          <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥30</div>
+          <p>支付宝扫码 · 一次性的小小支持</p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往捐赠 <i class="fas fa-arrow-right"></i></span>
+        </a>
+        <a class="community-card" href="https://pay.ldxp.cn/item/du4h8s" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
+          <h4><i class="fas fa-calendar-day" style="color: var(--primary-light);"></i> 订阅 180 天</h4>
+          <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥50</div>
+          <p>支付宝扫码 · 半年期订阅权益</p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往捐赠 <i class="fas fa-arrow-right"></i></span>
+        </a>
+        <a class="community-card" href="https://pay.ldxp.cn/item/ehbz9b" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
+          <h4><i class="fas fa-calendar-alt" style="color: var(--primary-light);"></i> 订阅 365 天</h4>
+          <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥100</div>
+          <p>支付宝扫码 · 全年期订阅权益</p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往捐赠 <i class="fas fa-arrow-right"></i></span>
+        </a>
+        <a class="community-card" href="https://t.zsxq.com/YSATD" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
+          <h4><i class="fas fa-star" style="color: var(--primary-light);"></i> 加入知识星球</h4>
+          <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥300/年</div>
+          <p>3 台设备登录 · 续费半价 · 专属微信群及策略部件库</p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往加入 <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+      <p style="max-width: 800px; margin: 2rem auto 0; text-align: center; color: #94a3b8; font-size: 0.875rem;">
+        <i class="fas fa-gift"></i> 捐赠计划与附赠详见
+        <a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html" target="_blank" rel="noopener" style="color: var(--primary-light); text-decoration: none; font-weight: 600;">捐赠计划说明</a>
+      </p>
+    </div>
+
+    <!-- 加入我们 -->
     <div class="section-header">
       <span class="section-badge">社区支持</span>
       <h2 class="section-title">加入我们</h2>
       <p class="section-description">交流以微信群为主、QQ 群为辅。加入任一社群请备注「加入 hikyuu」，未备注将无法通过验证～</p>
     </div>
     <div class="community-grid">
-      <div class="community-card" style="grid-column: span 2;">
-        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 微信群 &nbsp;·&nbsp; <i class="fas fa-comments" style="color: var(--primary);"></i> QQ 群</h4>
-        <p>加入任一社群请备注「加入 hikyuu」</p>
-        <img src="images/qun.png" alt="微信群和QQ群二维码" style="max-width: 100%; height: auto;" />
+      <div class="community-card">
+        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 微信群</h4>
+        <img src="images/weixin_group.jpg" alt="微信群二维码" />
+        <p>加入请备注「加入 hikyuu」</p>
       </div>
       <div class="community-card">
-        <h4><i class="fas fa-star" style="color: var(--accent);"></i> 知识星球</h4>
-        <p>首年 300 元 / 续费半价 · 3 台设备登录 · 含专属微信群及策略部件库</p>
-        <img src="images/xingqiu.png" alt="Hikyuu量化星球" />
+        <h4><i class="fas fa-comments" style="color: var(--primary);"></i> QQ 群</h4>
+        <img src="images/10003-qq.png" alt="QQ群二维码" />
+        <p>加入请备注「加入 hikyuu」</p>
       </div>
       <div class="community-card">
         <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 公众号</h4>
-        <p>关注获取最新资讯、性能测试与技术文章</p>
         <img src="images/weixin_gongzhonghao.jpg" alt="hikyuu量化" />
+        <p>关注获取最新资讯、性能测试与技术文章</p>
+      </div>
+      <div class="community-card">
+        <h4><i class="fas fa-star" style="color: var(--accent);"></i> 知识星球</h4>
+        <img src="images/xingqiu.png" alt="Hikyuu量化星球" />
+        <p>首年 300 元 / 续费半价 · 3 台设备登录 · 含专属微信群及策略部件库</p>
       </div>
     </div>
     <div style="max-width: 800px; margin: 3rem auto 0; text-align: center;">
