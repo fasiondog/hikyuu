@@ -130,6 +130,16 @@ public:
     /** 返回形如：Name(param1=val,param2=val,...) */
     string long_name() const;
 
+    /**
+     * @brief 构造出身标识（进程内唯一，clone/cloneNode 传承，不序列化）
+     *
+     * 供缓存类设施用作身份（如截面面板缓存）。同一次构造及其克隆链共享同一 id；
+     * 独立构造必然不同 id。不参与 alike()/operator==/formula() 等任何既有判等与展示。
+     */
+    uint64_t originId() const noexcept {
+        return m_origin_id;
+    }
+
     virtual string formula() const;
     virtual string str() const;
 
@@ -341,6 +351,12 @@ protected:
     ind_param_map_t m_ind_params;  // don't use unordered_map
 
     IndicatorImp* m_parent{nullptr};  // can't use shared_from_this in python, so not weak_ptr
+
+    /** 构造发号器：唯一定义在 IndicatorImp.cpp，保证跨 DLL 只有一份计数器 */
+    static uint64_t nextOriginId() noexcept;
+
+    /** 构造出身标识：构造发放，clone/cloneNode 传承，不进序列化 NVP 列表 */
+    uint64_t m_origin_id{nextOriginId()};
 
 public:
     static void initEngine();

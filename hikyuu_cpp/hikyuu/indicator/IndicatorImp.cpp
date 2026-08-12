@@ -6,6 +6,7 @@
  */
 #include <stdexcept>
 #include <algorithm>
+#include <atomic>
 #include <forward_list>
 #include <stack>
 #include "hikyuu/utilities/Log.h"
@@ -145,6 +146,14 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
         os << imp->str();
     }
     return os;
+}
+
+// 构造出身发号器。唯一定义于本文件（非 inline），保证跨 DLL 只有一份计数器：
+// 派生指标可能在插件 dll（如 extind）中构造，但其基类构造函数由核心 dll 导出并执行，
+// in-class 初始器随之在核心侧求值，id 空间统一。
+uint64_t IndicatorImp::nextOriginId() noexcept {
+    static std::atomic<uint64_t> seq{1};
+    return seq.fetch_add(1, std::memory_order_relaxed);
 }
 
 IndicatorImp::IndicatorImp() : m_name("IndicatorImp") {
@@ -398,6 +407,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     IndicatorImpPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
+    p->m_origin_id = m_origin_id;  // 出身证复印：克隆链共享构造身份
     p->m_is_python_object = m_is_python_object;
     p->m_need_self_alike_compare = m_need_self_alike_compare;
     p->m_is_serial = m_is_serial;
