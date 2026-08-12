@@ -1,155 +1,1297 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
-  <title>Hikyuu - Quant Framework</title>
+  <title>Hikyuu - 量化交易研究框架</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="keywords" content="hikyuu,quant,backtester,trade,量化交易,系统交易" />
   <meta name="description" content="Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架" />
-  <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-  <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-  <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  <script>
-    var _hmt = _hmt || [];
-    (function () {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?633d3909696d49eed8b658de9c8a0ae5";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #06b6d4;
+      --accent: #f59e0b;
+      --dark: #0f172a;
+      --dark-light: #1e293b;
+      --gray: #64748b;
+      --gray-light: #94a3b8;
+      --light: #f8fafc;
+      --white: #ffffff;
+      --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-2: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+      --gradient-3: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.7;
+      color: var(--dark);
+      background: var(--light);
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      background: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: var(--gradient-2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-2);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--white);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a0f1e 0%, #1a1745 50%, #0f172a 100%);
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+      opacity: 1;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-text {
+      color: var(--white);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.18);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      color: var(--primary-light);
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      color: var(--white);
+    }
+
+    .hero-description {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: #cbd5e1;
+      margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: var(--white);
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .hero-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-image-card {
+      background: var(--white);
+      padding: 2.5rem 3rem;
+      border-radius: 1.25rem;
+      box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.6),
+                  0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .hero-image-card img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Stats Section - 深紫调（浅段） */
+    .stats {
+      background: linear-gradient(180deg, #1e1b4b 0%, #1a1745 100%);
+      padding: 4rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a5b4fc 0%, #67e8f9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    /* Features Section - 深蓝黑（深段） */
+    .features {
+      padding: 6rem 2rem;
+      background: #0a0f1e;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 4rem;
+    }
+
+    .section-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(6, 182, 212, 0.18) 100%);
+      color: var(--primary-light);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(129, 140, 248, 0.2);
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .section-description {
+      color: #94a3b8;
+      font-size: 1.125rem;
+    }
+
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 1rem;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(129, 140, 248, 0.25);
+      box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15);
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-icon.purple {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(129, 140, 248, 0.12) 100%);
+      color: #a5b4fc;
+      border: 1px solid rgba(129, 140, 248, 0.2);
+    }
+
+    .feature-icon.blue {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(34, 211, 238, 0.12) 100%);
+      color: #67e8f9;
+      border: 1px solid rgba(34, 211, 238, 0.2);
+    }
+
+    .feature-icon.amber {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(251, 191, 36, 0.12) 100%);
+      color: #fcd34d;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-description {
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+
+    /* Code Example Section - 深紫调（浅段） */
+    .code-section {
+      padding: 6rem 2rem;
+      background: linear-gradient(180deg, #1a1745 0%, #1e1b4b 100%);
+      color: var(--white);
+    }
+
+    .code-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .code-text .section-title {
+      color: var(--white);
+    }
+
+    .code-text .section-description {
+      color: var(--gray-light);
+    }
+
+    .code-block {
+      background: var(--dark-light);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow-x: auto;
+    }
+
+    .code-header {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .code-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .code-dot.red { background: #ff5f56; }
+    .code-dot.yellow { background: #ffbd2e; }
+    .code-dot.green { background: #27c93f; }
+
+    .code-block pre {
+      margin: 0;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: #e2e8f0;
+    }
+
+    .code-block .comment { color: #64748b; }
+    .code-block .keyword { color: #c084fc; }
+    .code-block .function { color: #60a5fa; }
+    .code-block .string { color: #34d399; }
+    .code-block .number { color: #f59e0b; }
+
+    /* Architecture Section - 深蓝黑（深段） */
+    .architecture {
+      padding: 6rem 2rem;
+      background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .architecture .section-header .section-badge {
+      background: rgba(99, 102, 241, 0.18);
+      color: var(--primary-light);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+    }
+
+    .architecture .section-title {
+      color: var(--white);
+    }
+
+    .architecture .section-description {
+      color: #94a3b8;
+    }
+
+    .arch-diagram {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .arch-layer {
+      display: flex;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    .arch-layer-label {
+      flex-shrink: 0;
+      width: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .arch-layer-label .arch-layer-code {
+      font-size: 0.75rem;
+      font-weight: 500;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    .arch-layer-portfolio .arch-layer-label {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(129, 140, 248, 0.1));
+      border: 1px solid rgba(129, 140, 248, 0.2);
+      color: #a5b4fc;
+    }
+
+    .arch-layer-sys .arch-layer-label {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(34, 211, 238, 0.1));
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      color: #67e8f9;
+    }
+
+    .arch-layer-trade .arch-layer-label {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1));
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      color: #fcd34d;
+    }
+
+    .arch-layer-data .arch-layer-label {
+      background: linear-gradient(135deg, rgba(100, 116, 139, 0.15), rgba(148, 163, 184, 0.1));
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+    }
+
+    .arch-modules {
+      flex: 1;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    a.arch-module,
+    .arch-module {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: 0.625rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .arch-module:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .arch-module-code {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.875rem;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    .arch-layer-portfolio .arch-module-code {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(129, 140, 248, 0.15));
+      color: #c7d2fe;
+      border: 1px solid rgba(129, 140, 248, 0.2);
+    }
+
+    .arch-layer-sys .arch-module-code {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(34, 211, 238, 0.15));
+      color: #a5f3fc;
+      border: 1px solid rgba(34, 211, 238, 0.2);
+    }
+
+    .arch-layer-trade .arch-module-code {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.15));
+      color: #fde68a;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .arch-layer-data .arch-module-code {
+      background: linear-gradient(135deg, rgba(100, 116, 139, 0.25), rgba(148, 163, 184, 0.15));
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .arch-module-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .arch-module-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      line-height: 1.3;
+    }
+
+    .arch-module-desc {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin-top: 0.125rem;
+    }
+
+    @media (max-width: 768px) {
+      .arch-layer {
+        flex-direction: column;
+      }
+      .arch-layer-label {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .arch-layer-label .arch-layer-code {
+        margin-top: 0;
+      }
+      .arch-modules {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* Source Code Section - 深紫调（浅段） */
+    .source-code {
+      padding: 4rem 2rem;
+      background: linear-gradient(180deg, #1e1b4b 0%, #1a1745 100%);
+    }
+
+    .source-links {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .source-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0.75rem;
+      text-decoration: none;
+      color: var(--white);
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .source-link:hover {
+      transform: translateY(-4px);
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(129, 140, 248, 0.3);
+      box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.2);
+    }
+
+    .source-link i {
+      font-size: 1.5rem;
+      color: var(--primary-light);
+    }
+
+    /* Community Section - 深蓝黑（深段） */
+    .community {
+      padding: 6rem 2rem;
+      background: #0a0f1e;
+    }
+
+    .community-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .community-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .community-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(129, 140, 248, 0.25);
+      box-shadow: 0 15px 35px -10px rgba(99, 102, 241, 0.15);
+    }
+
+    .community-card img {
+      max-width: 200px;
+      height: auto;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .community-card h4 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .community-card p {
+      color: #94a3b8;
+      font-size: 0.875rem;
+    }
+
+    /* Footer */
+    .footer {
+      background: #070a14;
+      color: var(--gray-light);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: var(--gradient-2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--gray-light);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--white);
+    }
+
+    .footer-license {
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-license a {
+      color: var(--primary-light);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-buttons {
+        justify-content: center;
+      }
+
+      .hero-image {
+        order: -1;
+      }
+
+      .code-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .features-grid,
+      .community-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate {
+      animation: fadeInUp 0.8s ease-out;
+    }
+  </style>
 </head>
 
 <body>
-  <section class="page-header">
-    <h1 class="project-name">Hikyuu - Quant Framework</h1>
-    <h2 class="project-tagline"></h2>
-    <a href="https://hikyuu.readthedocs.io" class="btn">安装与帮助</a>
-    <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True"
-      class="btn">入门与示例</a>
-    <a href="https://v.youku.com/v_show/id_XMjg0MjYxMjE4NA==.html" class="btn">视频教程</a>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">Hikyuu</a>
+      <ul class="nav-links">
+        <li><a href="#features">核心优势</a></li>
+        <li><a href="#code">代码示例</a></li>
+        <li><a href="#architecture">架构设计</a></li>
+        <li><a href="#source">源码地址</a></li>
+        <li><a href="#community">社区支持</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="hero-badge"><i class="fas fa-star"></i> 开源超高速量化交易框架</span>
+        <h1 class="hero-title">Hikyuu<br>Quant Framework</h1>
+        <p class="hero-description">
+          基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展（深度适配国内 A 股市场）。核心能力覆盖四大维度：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。
+        </p>
+        <div class="hero-buttons">
+          <a href="https://hikyuu.readthedocs.io" class="btn btn-primary">
+            <i class="fas fa-book"></i> 安装与帮助
+          </a>
+          <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn btn-secondary">
+            <i class="fas fa-play-circle"></i> 入门与示例
+          </a>
+          <a href="https://gitee.com/fasiondog/hikyuu_hub" class="btn btn-secondary">
+            <i class="fas fa-puzzle-piece"></i> 策略部件库
+          </a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-image-card">
+          <img src="images/00000-title.png" alt="Hikyuu Overview" />
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="main-content">
-
-    <img alt="00000_title.png" src="images/00000-title3.png" width=250px />
-    <p>Hikyuu Quant
-      Framework是基于C++/Python的高性能开源量化交易研究框架，用于策略分析及回测（目前用于国内A股市场）。其核心思想基于当前成熟的系统化交易方法，将整个系统化交易抽象为由市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法七大组件，你可以分别构建这些组件的策略资产库，在实际研究中对它们自由组合来观察系统的有效性、稳定性以及单一种类策略的效果。
-    </p>
-
-    <p>示例：</p>
-
-    <pre><code>#创建模拟交易账户进行回测，初始资金30万
-my_tm = crtTM(init_cash = 300000)
-
-#创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA最为慢线，快线向上穿越慢线时买入，反之卖出）
-my_sg = SG_Flex(EMA(CLOSE, n=5), slow_n=10)
-
-#固定每次买入1000股
-my_mm = MM_FixedCount(1000)
-
-#创建交易系统并运行
-sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
-sys.run(sm['sz000001'], Query(-150))
-</code></pre>
-
-    <img alt="10000-overview.png" src="images/10000-overview.png" style="width: 600px" />
-
-    <p>更多示例参见：<a
-        href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True">https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True</a>
-    </p>
-
-    <h3>
-      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
-          class="octicon octicon-link"></span></a>为什么选择 Hikyuu
-    </h3>
-
-    <p><b>1、组合灵活，分类构建策略资产库</b>
-      Hikyuu对系统化交易方法进行了良好的抽象，包含了九大策略组件：市场环境判断策略、系统有效条件、信号指示器、止损/止盈策略、资金管理策略、盈利目标策略、移滑价差算法、交易对象选择策略、资金分配策略。可以在此基础上构建自己的策略库，并进行灵活的组合和测试。在进行策略探索时，可以更加专注于某一方面的策略性能与影响。其主要功能模块如下：
-    </p>
-    <img alt="主要功能模块示意图" src="images/10002-function-arc.png" style="width: 600px" />
-
-    <p><b>2、性能保障，打造自己的专属应用</b> 目前项目包含了3个主要组成部分：基于C++的核心库、对C++进行包装的Python库(hikyuu)、基于Python的交互式工具。
-    <ul>
-      <li>百万级别K线回测，2~3秒完成计算，助您快速完成基于全市场的策略验证。</li>
-      <li>C++核心库，提供了整体的策略框架，在保证性能的同时，已经考虑了对多线程和多核处理的支持，在未来追求更高运算速度提供便利。C++核心库，可以单独剥离使用，自行构建自己的客户端工具。</li>
-      <li>
-        Python库（hikyuu），提供了对C++库的包装，同时集成了talib库（如TA_SMA，对应talib.SMA），可以与numpy、pandas数据结构进行互相转换，为使用其他成熟的python数据分析工具提供了便利。
-      </li>
-      <li>hikyuu.interactive 交互式探索工具，提供了K线、指标、系统信号等的基本绘图功能，用于对量化策略的探索和回测。</li>
-    </ul>
-    </p>
-
-    <p><b>3、多范式支持，探索更便捷、自由 </b>同时支持面向对象和命令行编程范式。其中，命令行在进行策略探索时，更加简单、便捷、自由。</p>
-    <p><b>4、安全、自由、隐私，搭建自己的专属云量化平台</b> 结合 Python + Jupyter
-      的强大能力与云服务器，可以搭建自己专属的云量化平台。将Jupyter部署在云服务器上，随时随地的访问自己的云平台，即刻实现自己新的想法，如下图所示通过手机访问自己的云平台。结合Python强大成熟的数据分析、人工智能工具（如
-      numpy、scipy、pandas、TensorFlow)搭建更强大的人工智能平台。</p>
-    <p><b>5、数据存储方式可扩展</b>
-      目前支持本地HDF5格式、MySQL存储。默认使用HDF5，数据文件体积小、速度更快、备份更便利。截止至2017年4月21日，沪市日线数据文件149M、深市日线数据文件184M、5分钟线数据各不到2G。</p>
-
-    <h3>
-      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
-          class="octicon octicon-link"></span></a>浏览源码请访问
-    </h3>
-
-    <p>码云地址（推荐）：<a href="https://gitee.com/fasiondog/hikyuu">https://gitee.com/fasiondog/hikyuu</a></p>
-    <p>GitHub地址：<a href="https://github.com/fasiondog/hikyuu">https://github.com/fasiondog/hikyuu</a></p>
-
-    <h3>
-      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
-          class="octicon octicon-link"></span></a>想提供帮助？
-    </h3>
-
-    <p>Hikyuu非常需要社区提供帮助，具体包括：
-    <ul>
-      <li>测试：对Hikyuu项目中代码的测试和BUG反馈</li>
-      <li>文档：包括代码注释、开发教程、学习经验等</li>
-      <li>新功能：提供新的数据及财经数据接入、自动交易接口、上层应用开发等</li>
-      <li>网站：对hikyuu.org的官方网站的外观设计和功能添加</li>
-    </ul>
-    <a href="https://gitee.com/fasiondog/hikyuu/issues">建议通过在码云上开issue的方式来贡献以上内容</a>
-    </p>
-
-    <h3>
-      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
-          class="octicon octicon-link"></span></a>联系方式
-    </h3>
-
-    <p>加入星球，<b>更多示例与策略部件的及时分享</b></p>
-    <img alt="Hikyuu量化星球" src="images/zhishixingqiu.png">
-
-    <p>遇到了问题？想要更多了解Hikyuu？请使用以下方式联系：</p>
-    <p>后续社群建设和问题答复，将以知识星球为主”</p>
-    <p>关注公众号：</p>
-    <img alt="hikyuu量化" src="images/weixin_gongzhonghao.jpg" width=250 height=250>
-
-    <p>加入微信群（请注明“加入hikyuu”）：</p>
-    <img alt="微信群" src="images/weixin_group.jpg" width=250 height=250>
-
-    <p>QQ群扫码加入（逐渐废弃）：</p>
-    <img alt="QQ爱好者群扫码" src="images/10003-qq.png">
-
-    <h3>
-      <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true"
-          class="octicon octicon-link"></span></a>License
-    </h3>
-
-    <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License V2</a>
-
-
-    <footer class="site-footer">
-      <span class="site-footer-owner"><a href="https://git.oschina.net/fasiondog/hikyuu">Hikyuu - Quant Framework</a> is
-        maintained by <a href="https://git.oschina.net/fasiondog">fasiondog</a>.</span>
-
-      <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>
-        using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a
-          href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-    </footer>
-
+  <!-- Stats Section -->
+  <section class="stats">
+    <div class="stats-container">
+      <div class="stat-item">
+        <div class="stat-number">166ms</div>
+        <div class="stat-label">预热后 1913 万 K 线求和耗时（AMD 7950x）</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">10+</div>
+        <div class="stat-label">核心策略组件 · 自由组合构建资产库</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">4 种</div>
+        <div class="stat-label">存储方式（HDF5 / MySQL / ClickHouse / SQLite）</div>
+      </div>
+    </div>
   </section>
 
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-header">
+      <span class="section-badge">核心优势</span>
+      <h2 class="section-title">为什么选择 Hikyuu</h2>
+      <p class="section-description">强大的功能特性，助力您的量化交易研究</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon purple">
+          <i class="fas fa-puzzle-piece"></i>
+        </div>
+        <h3 class="feature-title">组合灵活，分类构建策略资产库</h3>
+        <p class="feature-description">
+          对系统化交易方法进行轻量化抽象，涵盖市场环境判断、系统有效条件、信号指示器、止损/止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配等核心组件。基于这些组件自由搭建专属策略库，灵活组合、高效回测，大幅提升研究效率。
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon blue">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3 class="feature-title">极致性能，轻松构建专属量化应用</h3>
+        <p class="feature-description">
+          C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x 实测：A 股全市场 1913 万日 K 线预热后，计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon amber">
+          <i class="fas fa-code"></i>
+        </div>
+        <h3 class="feature-title">语法简洁，策略探索更高效自由</h3>
+        <p class="feature-description">
+          同时支持面向对象与命令行两种编程范式。命令行风格语法极简、表达直观，搭配 hikyuu.interactive 内置的 K 线、指标、信号可视化能力，策略验证与回测分析更加得心应手。
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon purple">
+          <i class="fas fa-cloud"></i>
+        </div>
+        <h3 class="feature-title">自主可控，搭建专属云量化平台</h3>
+        <p class="feature-description">
+          结合 Python + Jupyter 与云服务器，搭建完全自主可控的云量化平台，手机、平板、电脑随时随地访问。无缝对接 numpy、scipy、pandas、TensorFlow 等 AI 与数据分析工具，按需自定义界面、实现服务化部署。
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon blue">
+          <i class="fas fa-database"></i>
+        </div>
+        <h3 class="feature-title">模块化可扩展数据存储</h3>
+        <p class="feature-description">
+          支持 HDF5、MySQL、ClickHouse、SQLite 四种存储方式。默认 HDF5 文件体积小、读写快、备份便捷。插件扩展的 ClickHouse 存储读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级高频数据。
+        </p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon amber">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3 class="feature-title">开源透明，数据安全可控</h3>
+        <p class="feature-description">
+          Apache 2.0 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。
+        </p>
+      </div>
+    </div>
+  </section>
 
+  <!-- Code Example Section -->
+  <section class="code-section" id="code">
+    <div class="code-container">
+      <div class="code-text">
+        <span class="section-badge" style="background: rgba(255,255,255,0.1); color: var(--white);">快速上手</span>
+        <h2 class="section-title">简洁的API设计</h2>
+        <p class="section-description">
+          几行代码即可创建一个完整的量化策略回测系统。Hikyuu提供直观的API，让策略开发更高效。
+        </p>
+        <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn btn-primary" style="margin-top: 2rem;">
+          <i class="fas fa-external-link-alt"></i> 查看更多示例
+        </a>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot red"></div>
+          <div class="code-dot yellow"></div>
+          <div class="code-dot green"></div>
+        </div>
+        <pre><code><span class="comment"># 创建模拟交易账户进行回测，初始资金30万</span>
+my_tm = <span class="function">crtTM</span>(init_cash = <span class="number">300000</span>)
+
+<span class="comment"># 创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线）</span>
+<span class="comment"># 快线向上穿越慢线时买入，反之卖出</span>
+my_sg = <span class="function">SG_Flex</span>(<span class="function">EMA</span>(<span class="function">CLOSE</span>(), n=<span class="number">5</span>), slow_n=<span class="number">10</span>)
+
+<span class="comment"># 固定每次买入1000股</span>
+my_mm = <span class="function">MM_FixedCount</span>(<span class="number">1000</span>)
+
+<span class="comment"># 创建交易系统并运行</span>
+sys = <span class="function">SYS_Simple</span>(tm = my_tm, sg = my_sg, mm = my_mm)
+sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>], <span class="function">Query</span>(<span class="number">-150</span>))</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Section -->
+  <section class="architecture" id="architecture">
+    <div class="section-header">
+      <span class="section-badge">系统架构</span>
+      <h2 class="section-title">交易系统化架构</h2>
+      <p class="section-description">遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合</p>
+    </div>
+    <div class="arch-diagram">
+      <!-- 投资组合层 -->
+      <div class="arch-layer arch-layer-portfolio">
+        <div class="arch-layer-label">
+          投资组合层
+          <span class="arch-layer-code">Portfolio</span>
+        </div>
+        <div class="arch-modules" style="grid-template-columns: repeat(4, 1fr);">
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/portfolio.html">
+            <div class="arch-module-code">PF</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">投资组合</span>
+              <span class="arch-module-desc">多标的策略调度</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/selector.html">
+            <div class="arch-module-code">SE</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">交易对象选择</span>
+              <span class="arch-module-desc">选股策略筛选</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/allocate_funds.html">
+            <div class="arch-module-code">AF</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">资金分配</span>
+              <span class="arch-module-desc">多标的资金调度</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/multifactor.html">
+            <div class="arch-module-code">MF</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">多因子模型</span>
+              <span class="arch-module-desc">因子评分与排序</span>
+            </div>
+          </a>
+        </div>
+      </div>
+      <!-- 交易系统层 -->
+      <div class="arch-layer arch-layer-sys">
+        <div class="arch-layer-label">
+          交易系统
+          <span class="arch-layer-code">SYS · 单对象</span>
+        </div>
+        <div class="arch-modules" style="grid-template-columns: repeat(4, 1fr);">
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/environment.html">
+            <div class="arch-module-code">EV</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">市场环境判断</span>
+              <span class="arch-module-desc">大盘环境有效性</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/condition.html">
+            <div class="arch-module-code">CN</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">系统有效条件</span>
+              <span class="arch-module-desc">系统适用条件</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/signal.html">
+            <div class="arch-module-code">SG</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">信号指示器</span>
+              <span class="arch-module-desc">产生买卖信号</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/stoploss.html">
+            <div class="arch-module-code">ST</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">止损 / 止盈</span>
+              <span class="arch-module-desc">风险控制退出</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/money_manager.html">
+            <div class="arch-module-code">MM</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">资金管理</span>
+              <span class="arch-module-desc">买卖数量控制</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/profitgoal.html">
+            <div class="arch-module-code">PG</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">盈利目标</span>
+              <span class="arch-module-desc">目标达成退出</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/slippage.html">
+            <div class="arch-module-code">SP</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">移滑价差</span>
+              <span class="arch-module-desc">回测价格模拟</span>
+            </div>
+          </a>
+        </div>
+      </div>
+      <!-- 交易管理层 -->
+      <div class="arch-layer arch-layer-trade">
+        <div class="arch-layer-label">
+          交易管理
+          <span class="arch-layer-code">执行 & 记录</span>
+        </div>
+        <div class="arch-modules" style="grid-template-columns: repeat(2, 1fr);">
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_manage/TradeManager.html">
+            <div class="arch-module-code">TM</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">交易管理</span>
+              <span class="arch-module-desc">账户资金与持仓记录</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_manage/OrderBroker.html">
+            <div class="arch-module-code">OB</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">订单执行</span>
+              <span class="arch-module-desc">实盘下单 broker 对接</span>
+            </div>
+          </a>
+        </div>
+      </div>
+      <!-- 数据层 -->
+      <div class="arch-layer arch-layer-data">
+        <div class="arch-layer-label">
+          数据层
+          <span class="arch-layer-code">Stock & KData</span>
+        </div>
+        <div class="arch-modules" style="grid-template-columns: repeat(3, 1fr);">
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/stock_manager.html">
+            <div class="arch-module-code">SM</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">证券管理</span>
+              <span class="arch-module-desc">StockManager 统一管理</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/base/datatype.html">
+            <div class="arch-module-code">KD</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">K 线数据</span>
+              <span class="arch-module-desc">KData 量价序列</span>
+            </div>
+          </a>
+          <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/base/datatype.html">
+            <div class="arch-module-code">Q</div>
+            <div class="arch-module-info">
+              <span class="arch-module-name">数据查询</span>
+              <span class="arch-module-desc">Query 时间范围筛选</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Source Code Section -->
+  <section class="source-code" id="source">
+    <div class="section-header">
+      <span class="section-badge">开源项目</span>
+      <h2 class="section-title">浏览源码</h2>
+      <p class="section-description">欢迎 Star、Fork，参与贡献</p>
+    </div>
+    <div class="source-links">
+      <a href="https://gitee.com/fasiondog/hikyuu" class="source-link">
+        <i class="fas fa-code-branch"></i>
+        <span>码云 Gitee（推荐）</span>
+      </a>
+      <a href="https://github.com/fasiondog/hikyuu" class="source-link">
+        <i class="fab fa-github"></i>
+        <span>GitHub</span>
+      </a>
+      <a href="https://gitcode.com/hikyuu/hikyuu" class="source-link">
+        <i class="fas fa-code"></i>
+        <span>GitCode</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Community Section -->
+  <section class="community" id="community">
+    <div class="section-header">
+      <span class="section-badge">社区支持</span>
+      <h2 class="section-title">加入我们</h2>
+      <p class="section-description">交流以微信群为主、QQ 群为辅。加入任一社群请备注「加入 hikyuu」，未备注将无法通过验证～</p>
+    </div>
+    <div class="community-grid">
+      <div class="community-card" style="grid-column: span 2;">
+        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 微信群 &nbsp;·&nbsp; <i class="fas fa-comments" style="color: var(--primary);"></i> QQ 群</h4>
+        <p>加入任一社群请备注「加入 hikyuu」</p>
+        <img src="images/qun.png" alt="微信群和QQ群二维码" style="max-width: 100%; height: auto;" />
+      </div>
+      <div class="community-card">
+        <h4><i class="fas fa-star" style="color: var(--accent);"></i> 知识星球</h4>
+        <p>首年 300 元 / 续费半价 · 3 台设备登录 · 含专属微信群及策略部件库</p>
+        <img src="images/xingqiu.png" alt="Hikyuu量化星球" />
+      </div>
+      <div class="community-card">
+        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 公众号</h4>
+        <p>关注获取最新资讯、性能测试与技术文章</p>
+        <img src="images/weixin_gongzhonghao.jpg" alt="hikyuu量化" />
+      </div>
+    </div>
+    <div style="max-width: 800px; margin: 3rem auto 0; text-align: center;">
+      <p style="color: #94a3b8;">
+        <b style="color: #cbd5e1;">需要的帮助：</b>测试反馈 BUG · 编写文档 · 开发新功能 · 网站优化
+        <br>
+        <a href="https://gitee.com/fasiondog/hikyuu/issues" style="color: var(--primary-light); text-decoration: none; font-weight: 600;">
+          建议通过在码云上开 issue 方式来贡献以上内容 <i class="fas fa-arrow-right"></i>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">Hikyuu</div>
+      <div class="footer-links">
+        <a href="https://hikyuu.readthedocs.io">文档</a>
+        <a href="https://gitee.com/fasiondog/hikyuu">Gitee</a>
+        <a href="https://github.com/fasiondog/hikyuu">GitHub</a>
+        <a href="#community">社区</a>
+      </div>
+      <div class="footer-license">
+        <p>基于 <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License V2</a> 开源协议发布</p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;">由 <a href="https://gitee.com/fasiondog" style="color: var(--primary-light); text-decoration: none;">fasiondog</a> 维护</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.feature-card, .community-card, .stat-item').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
 </body>
 
 </html>
