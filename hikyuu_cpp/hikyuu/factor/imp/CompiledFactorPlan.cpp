@@ -32,6 +32,7 @@ IndicatorImpPtr CompiledFactorPlan::cloneNode(const IndicatorImpPtr& src, CloneM
 
     dst->m_params = src->m_params;
     dst->m_name = src->m_name;
+    dst->m_origin_id = src->m_origin_id;  // 出身证复印：与 IndicatorImp::clone() 语义一致
     dst->m_is_python_object = src->m_is_python_object;
     dst->m_need_self_alike_compare = src->m_need_self_alike_compare;
     dst->m_is_serial = src->m_is_serial;
