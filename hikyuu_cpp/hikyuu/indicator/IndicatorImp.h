@@ -138,6 +138,10 @@ public:
      *
      * 注：定义在 IndicatorImp.cpp（非 inline）。dllexport 类的 inline 成员不保证导出，
      * 是否产生外部符号引用取决于调用方的内联决策，插件 dll 会链接失败。
+     *
+     * 注意（身份语义限制）：origin_id 只标识"出身"，不感知构造后的原地变异
+     * （setParam/setIndParam/add）。凡被缓存设施用作身份的指标对象，构造后必须
+     * 视为不可变；如需不同参数请构造新对象（新对象必持新 id）。
      */
     uint64_t originId() const noexcept;
 
