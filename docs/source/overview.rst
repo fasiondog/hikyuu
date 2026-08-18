@@ -83,15 +83,6 @@ Hikyuu 对系统化交易方法进行了轻量化抽象，涵盖市场环境判�
 目前支持本地 HDF5、MySQL、ClickHouse 和 SQLite 四种存储方式，默认采用 HDF5（文件体积小、读写速度快、备份便捷）。截至 2017 年 4 月 21 日，沪市日线数据文件仅 149MB，深市 184MB，5 分钟线数据整体小于 2GB。通过插件可扩展 ClickHouse 存储，其读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级及以下粒度的高频数据存储。
 
 
-🍺 想要更多了解Hikyuu？请使用以下方式联系：
----------------------------------------------------------------
-
-**因作者精力有限，对捐赠用户的问题会优先解答、确保响应；非捐赠用户的咨询会在时间允许的情况下尽力回复😁**
-
-交流渠道以微信群为主、QQ 群为辅。**加入任一社群请备注 "加入 hikyuu"，未备注将无法通过验证哦～**
-
-.. figure:: _static/qun.png
-
 
 🎉 感谢捐赠，让 Hikyuu 走得更远
 ---------------------------------------------------------------
@@ -110,22 +101,22 @@ Hikyuu 对系统化交易方法进行了轻量化抽象，涵盖市场环境判�
     </thead>
     <tbody>
     <tr>
-    <td>请作者喝杯☕️（30元）</td>
+    <td>请作者喝杯☕️（30元）（赠历史日线数据）</td>
     <td>支付宝</td>
     <td><a href="https://pay.ldxp.cn/item/gflv3v" rel="nofollow">https://pay.ldxp.cn/item/gflv3v</a></td>
     </tr>
     <tr>
-    <td>订阅180天（50元）</td>
+    <td>订阅180天（50元）（赠历史日线数据）</td>
     <td>支付宝</td>
     <td><a href="https://pay.ldxp.cn/item/du4h8s" rel="nofollow">https://pay.ldxp.cn/item/du4h8s</a></td>
     </tr>
     <tr>
-    <td>订阅365天（100元）</td>
+    <td>订阅365天（100元）（赠历史日/分/时/笔数据）</td>
     <td>支付宝</td>
     <td><a href="https://pay.ldxp.cn/item/ehbz9b" rel="nofollow">https://pay.ldxp.cn/item/ehbz9b</a></td>
     </tr>
     <tr>
-    <td>加入星球<br />(3台设备及其他，<br />首年300元，续费半价）<br />另有单独微信群及部件库</td>
+    <td>加入星球<br />(3台设备及其他，<br />首年300元，续费半价）<br />另有单独微信群及部件库（赠历史日/分/时/笔数据）</td>
     <td>微信或知识星球</td>
     <td><a href="https://t.zsxq.com/YSATD" rel="nofollow">https://t.zsxq.com/YSATD</a></td>
     </tr>
