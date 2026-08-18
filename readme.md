@@ -157,8 +157,6 @@ sys.run(sm['sz000001'], Query(-150))
 
 ## ❤️ 感谢捐赠，让 Hikyuu 走得更远
 
-> 因作者精力有限，对捐赠用户的问题会优先解答、确保响应；非捐赠用户的咨询会在时间允许的情况下尽力回复 😁
-
 <p align="center">
   <img src="docs/source/_static/dingyue.png" alt="订阅二维码" width="600">
 </p>
@@ -170,7 +168,13 @@ sys.run(sm['sz000001'], Query(-150))
 | 🗓️**订阅 365 天**  | ¥100 · 全年期订阅权益(赠历史日/分/时/笔数据)                                                | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/ehbz9b) |
 | 🌌**加入知识星球**   | ¥300/年 · 首年300元，续费半价3台设备登录 · 专属微信群及策略部件库，(赠历史日/分/时/笔数据) | 微信 / 知识星球APP | [前往加入](https://t.zsxq.com/YSATD)        |
 
-> 🎁 **捐赠计划与附赠参见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
+> 🎁 **捐赠计划与附赠详见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
+
+捐赠用户支持群（仅接受捐赠用户，入群请注明： Hikyuu 订阅）
+
+<p align="center">
+  <img src="docs/source/_static/support.jpg" alt="捐赠用户支持" width="150">
+</p>
 
 ## 🌟 需要的帮助
 

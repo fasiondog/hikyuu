@@ -125,6 +125,10 @@ Hikyuu 对系统化交易方法进行了轻量化抽象，涵盖市场环境判�
 
 .. figure:: _static/dingyue.png
 
+捐赠用户支持群（仅接受捐赠用户，入群请注明： Hikyuu 订阅）
+
+.. figure:: _static/support.jpg
+
 
 
 项目依赖说明
