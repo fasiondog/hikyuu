@@ -6,7 +6,7 @@ set_project("hikyuu")
 add_rules("mode.debug", "mode.release", "mode.coverage")
 
 -- version
-set_version("2.8.1", {build = "%Y%m%d%H%M"})
+set_version("2.8.2", {build = "%Y%m%d%H%M"})
 
 set_warnings("all")
 
@@ -190,7 +190,7 @@ add_requires("spdlog", {system = false, configs = {header_only = true, fmt_exter
 add_requireconfs("spdlog.fmt", {override = true, system = false, configs = {header_only = true}})
 add_requires("sqlite3", {system = false, configs = {shared = true, safe_mode="2", cxflags = "-fPIC"}})
 add_requires("flatbuffers v" .. flatbuffers_version, {system = false, configs = {runtimes = get_config("runtimes")}})
-add_requires("nng", {system = false, configs = {NNG_ENABLE_TLS = has_config("http_client_ssl"), cxflags = "-fPIC"}})
+add_requires("nng", {system = false, configs = {cxflags = "-fPIC"}})
 add_requires("nlohmann_json", {system = false})
 add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
