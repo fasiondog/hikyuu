@@ -2,6 +2,29 @@
 
 # 版本发布说明
 
+## 2.8.2 - 2026年8月20日
+
+**🚀 新增特性**
+
+* 新增指标：RSRS_BETA、RSRS_BULL、ADX、ADX2
+* feat(indicator): 添加origin-id用于缓存身份标识，提升指标计算缓存准确性
+* feat(draw): 更新热力图和柱状图标题以包含交易对象名称
+
+**⚡️ 优化改进**
+
+* perf(factor): MF因子服用以进一步提升多因子系统计算性能
+
+**🐞 缺陷修复**
+
+* fix(signal): 修复SignalBase::clone错误复制m_cycle_end导致周期边界损坏
+* fix(allocatefunds): 修复adjust_running_sys=false时running占用权重误用总账户资产
+* fix(indicator): 修复SPEARMAN(n=0)默认参数不产出有效结果
+* fix(multifactor): 使分数排序确定性，避免结果不一致
+* fix(multifactor): 导出calculate_style_residuals符号，修复链接问题
+* fix(multifactor): 使延迟计算线程安全，支持并发场景
+* fix(indicator): 在FACTOR身份标识中包含ktype，确保缓存准确性
+* fix(indicator): compiled plan审查跟进修复 (#493 review follow-ups)
+
 ## 2.8.1 - 2026年7月10日
 
 **🚀 新增特性**
