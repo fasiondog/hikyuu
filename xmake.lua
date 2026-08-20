@@ -112,7 +112,7 @@ set_configvar("HKU_ENABLE_TDX_KDATA", get_config("tdx") and 1 or 0)
 set_configvar("HKU_USE_LOW_PRECISION", get_config("low_precision") and 1 or 0)
 set_configvar("HKU_ENABLE_TA_LIB", get_config("ta_lib") and 1 or 0)
 
-set_configvar("HKU_ENABLE_MIMALLOC", is_plat("windows", "linux", "cross") and 1 or 0)
+set_configvar("HKU_ENABLE_MIMALLOC", (not get_config("leak_check")) and is_plat("windows", "linux", "cross") and 1 or 0)
 
 set_configvar("HKU_SUPPORT_DATETIME", 1)
 set_configvar("HKU_ENABLE_SQLCIPHER", 0)
@@ -196,7 +196,7 @@ add_requires("eigen", {system = false})
 add_requires("xxhash", {system = false})
 add_requires("utf8proc", {system = false})
 
-if is_plat("windows", "linux", "cross") then
+if (not has_config("leak_check")) and is_plat("windows", "linux", "cross") then
     add_requires("mimalloc", {system = false, configs ={shared = true}})
 end
 

@@ -35,7 +35,7 @@ target("hikyuu")
         add_packages("mysql")
     end    
 
-    if is_plat("windows", "linux", "cross") then 
+    if (not has_config("leak_check")) and is_plat("windows", "linux", "cross") then 
         add_packages("mimalloc")
     end
 
