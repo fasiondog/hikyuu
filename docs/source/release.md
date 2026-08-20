@@ -23,7 +23,6 @@
 * fix(multifactor): 导出calculate_style_residuals符号，修复链接问题
 * fix(multifactor): 使延迟计算线程安全，支持并发场景
 * fix(indicator): 在FACTOR身份标识中包含ktype，确保缓存准确性
-* fix(indicator): compiled plan审查跟进修复 (#493 review follow-ups)
 
 ## 2.8.1 - 2026年7月10日
 
