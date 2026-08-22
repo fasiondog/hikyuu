@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
+#include <hikyuu/trade_manage/OrderBrokerBase.h>
 #include <hikyuu/trade_manage/crt/TC_TestStub.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
@@ -16,6 +17,30 @@
 #include <boost/archive/xml_iarchive.hpp>
 
 using namespace hku;
+
+namespace {
+
+class CaptureOrderBroker final : public OrderBrokerBase {
+public:
+    void _buy(Datetime, const string&, const string&, price_t, double num, price_t, price_t,
+              SystemPart, const string&) override {
+        last_buy_num = num;
+        buy_count++;
+    }
+
+    void _sell(Datetime, const string&, const string&, price_t, double num, price_t, price_t,
+               SystemPart, const string&) override {
+        last_sell_num = num;
+        sell_count++;
+    }
+
+    double last_buy_num{0.0};
+    double last_sell_num{0.0};
+    size_t buy_count{0};
+    size_t sell_count{0};
+};
+
+}  // namespace
 
 /**
  * @defgroup test_TradeManager test_TradeManager
@@ -387,6 +412,28 @@ TEST_CASE("test_TradeManager_can_not_checkoutStock") {
 
     /** @arg 试图在最后交易日期前取出 */
     CHECK_EQ(tm->checkinStock(Datetime(199901010000), stock, 10.0, 200), false);
+}
+
+TEST_CASE("test_TradeManager_short_orders_use_executed_number") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero());
+    auto broker = std::make_shared<CaptureOrderBroker>();
+    tm->setBrokerLastDatetime(Datetime(199901010000));
+    tm->regBroker(broker);
+
+    Datetime sell_datetime(199911170000);
+    CHECK_EQ(tm->borrowStock(sell_datetime, stock, 10.0, 100), true);
+    TradeRecord sell_record = tm->sellShort(sell_datetime, stock, 10.0, 200);
+    CHECK_EQ(sell_record.number, 100);
+    CHECK_EQ(broker->sell_count, 1);
+    CHECK_EQ(broker->last_sell_num, sell_record.number);
+
+    Datetime buy_datetime(199911180000);
+    TradeRecord buy_record = tm->buyShort(buy_datetime, stock, 10.0, MAX_DOUBLE);
+    CHECK_EQ(buy_record.number, 100);
+    CHECK_EQ(broker->buy_count, 1);
+    CHECK_EQ(broker->last_buy_num, buy_record.number);
 }
 
 /** @par 检测点 */
