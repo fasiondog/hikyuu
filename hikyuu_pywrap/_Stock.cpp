@@ -137,11 +137,11 @@ void export_Stock(py::module& m) {
         :rtype: KRecord)")
 
       .def("get_krecord", getKRecord2, py::arg("date"), py::arg("ktype") = KQuery::DAY,
-           R"(get_krecord(self, datetime[, ktype=Query.DAY])
+           R"(get_krecord(self, date[, ktype=Query.DAY])
 
         根据数据类型（日线/周线等），获取指定时刻的KRecord
 
-        :param Datetime datetime: 指定日期时刻
+        :param Datetime date: 指定日期时刻
         :param Query.KType ktype: K线数据类别
         :return: K线记录
         :rtype: KRecord)")

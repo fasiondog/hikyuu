@@ -100,27 +100,33 @@ void export_Factor(py::module& m) {
     
     :param bool update_before: 是否在保存前，检查并更新已有因子，默认True)。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新)")
 
-      .def(
-        "save_special_values_to_db",
-        py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
-        py::arg("stock"), py::arg("values"), py::arg("replace") = false,
-        R"(save_special_values_to_db(self, stock, values[, replace=False])
-    
-    特殊因子保存值到数据库, 支持两种输入格式：
-    1. 直接保存Indicator对象的结果数据
-    2. 保存预计算的日期-值对数据
-    
-    重载版本1 - 保存Indicator对象, 通常为PRICELIST:
+      .def("save_special_values_to_db",
+           py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
+           py::arg("stock"), py::arg("values"), py::arg("replace") = false)
+
+      .def("save_special_values_to_db",
+           py::overload_cast<const Stock&, const DatetimeList&, const PriceList&, bool>(
+             &Factor::save_special_values_to_db),
+           py::arg("stock"), py::arg("dates"), py::arg("values"), py::arg("replace") = false,
+           R"(save_special_values_to_db(self, stock, values[, replace=False])
+save_special_values_to_db(self, stock, dates, values[, replace=False])
+
+    特殊因子保存值到数据库，支持两种输入格式：
+    1. 直接保存 Indicator 对象的结果数据（通常为 PRICELIST），自动从 Indicator 提取日期与值
+    2. 保存预计算的日期-值对数据，适用于已有独立的日期列表与价格列表
+       （如外部导入的财务数据、机器学习预测结果），无需先包装成 Indicator
+
+    重载1 - 保存 Indicator 对象:
     :param Stock stock: 证券对象
     :param Indicator values: 已计算好的指标对象（必须已绑定K线数据）
     :param bool replace: 是否替换已有数据，默认False
-    
-    重载版本2 - 保存预计算数据:
-    :param Stock stock: 证券对象  
+
+    重载2 - 保存预计算数据:
+    :param Stock stock: 证券对象
     :param DatetimeList dates: 特殊因子日期列表
     :param PriceList values: 特殊因子值列表
     :param bool replace: 是否替换已有数据，默认False
-    
+
     使用场景:
     - 保存复合指标计算结果
     - 保存外部导入的财务数据

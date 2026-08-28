@@ -185,8 +185,8 @@ void export_Signal(py::module& m) {
         or Buy When AMA - AMA[2] > filter
         or Buy When AMA - AMA[3] > filter 
     
-    :param Indicator ind:
-    :param int filer_n: N日周期
+    :param Indicator ind: 输入指标
+    :param int filter_n: N日周期
     :param float filter_p: 过滤器百分比
     :return: 信号指示器)");
 
@@ -201,8 +201,8 @@ void export_Signal(py::module& m) {
         Buy  When AMA - @lowest(AMA,n) > filter
         Sell When @highest(AMA, n) - AMA > filter
     
-    :param Indicator ind:
-    :param int filer_n: N日周期
+    :param Indicator ind: 输入指标
+    :param int filter_n: N日周期
     :param float filter_p: 过滤器百分比
     :return: 信号指示器)");
 
@@ -229,12 +229,12 @@ void export_Signal(py::module& m) {
     :param Indicator slow: 慢线
     :return: 信号指示器)");
 
-    m.def("SG_Flex", SG_Flex, py::arg("op"), py::arg("slow_n"),
+    m.def("SG_Flex", SG_Flex, py::arg("ind"), py::arg("slow_n"),
           R"(SG_Flex(ind, slow_n)
 
     使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
 
-    :param Indicator ind:
+    :param Indicator ind: 输入指标
     :param int slow_n: 慢线EMA周期
     :return: 信号指示器)");
 

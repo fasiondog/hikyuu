@@ -168,11 +168,11 @@ void export_Indicator(py::module& m) {
     :rtype: DatetimeList)")
 
       .def("exist_nan", &Indicator::existNan, py::arg("result_idx=0"),
-           R"(exist_nan(self, result_index)
+           R"(exist_nan(self, result_idx)
 
     判断是否存在NaN值
 
-    :param int result_index: 指定的结果集
+    :param int result_idx: 指定的结果集
     :rtype: bool)")
 
       .def("set_context", setContext_1)

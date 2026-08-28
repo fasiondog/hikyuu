@@ -943,7 +943,7 @@ void export_Indicator_build_in(py::module& m) {
 
     计算公式：（收盘价今－收盘价昨）＊成交量今
 
-    :param KData data: 输入数据
+    :param KData kdata: 输入数据
     :param int n: EMA平滑窗口
     :rtype: Indicator)");
 
@@ -1839,7 +1839,7 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("DMA", DMA, py::arg("x"), py::arg("a"), py::arg("fill_null") = true,
-          R"(DMA(ind, a[, fill_null=True])
+          R"(DMA(x, a[, fill_null=True])
 
     动态移动平均
 
@@ -1849,7 +1849,7 @@ void export_Indicator_build_in(py::module& m) {
 
     例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
 
-    :param Indicator ind: 输入数据
+    :param Indicator x: 输入数据
     :param Indicator a: 动态系数
     :param bool fill_null: 日期对齐时缺失数据填充 nan 值。
     :rtype: Indicator)");
@@ -2441,7 +2441,7 @@ void export_Indicator_build_in(py::module& m) {
     注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
     
     :param Indicator data: 待剔除异常值的数据
-    :param bool outExtreme: 指示剔除极值，默认 False
+    :param bool out_extreme: 指示剔除极值，默认 False
     :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma，默认 3.0
     :param bool recursive: 是否进行递归剔除极值，默认 False
     :rtype: Indicator)");
@@ -2733,11 +2733,11 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("DISCARD", py::overload_cast<int>(DISCARD), py::arg("discard"));
     m.def("DISCARD", py::overload_cast<const Indicator&, int>(DISCARD), py::arg("ind"),
-          py::arg("discard"), R"(DISCARD(data, discard)
+          py::arg("discard"), R"(DISCARD(ind, discard)
     
     以指标公式的方式设置指标结果的丢弃数据量。
 
-    :param Indicator data: 指标
+    :param Indicator ind: 指标
     :param int discard: 丢弃数据量
     :rtype: Indicator)");
 
@@ -2870,7 +2870,7 @@ void export_Indicator_build_in(py::module& m) {
 
     m.def("FACTOR", py::overload_cast<const string&>(FACTOR), py::arg("factor"));
     m.def("FACTOR", py::overload_cast<const Factor&>(&FACTOR), py::arg("factor"), R"(FACTOR(factor)
-    FACTOR(name)
+    FACTOR(factor)
 
     因子指标转换
 
