@@ -138,7 +138,7 @@ void export_Indicator(py::module& m) {
 
       .def("get_by_datetime", &Indicator::getByDate, py::arg("datetime"),
            py::arg("result_index") = 0,
-           R"(get_by_datetime(self, date[, result_index=0])
+           R"(get_by_datetime(self, datetime[, result_index=0])
 
     获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 

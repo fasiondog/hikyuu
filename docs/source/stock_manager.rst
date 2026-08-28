@@ -664,10 +664,10 @@ StockManager/Block/Stock
     .. py:method:: get(self, market_code)
 
         根据"市场简称证券代码"获取对应的证券实例
-        
-        :param str querystr: 格式：“市场简称证券代码”，如"sh000001"
+
+        :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
         :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
-        :rtype: Stock        
+        :rtype: Stock
 
     .. py:method:: add(self, stock)
     
@@ -713,7 +713,7 @@ StockManager/Block/Stock
     
         根据"市场简称证券代码"获取对应的证券实例
         
-        :param str querystr: 格式：“市场简称证券代码”，如"sh000001"
+        :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
         :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
         :rtype: Stock        
 

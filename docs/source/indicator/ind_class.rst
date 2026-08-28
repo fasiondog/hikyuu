@@ -84,12 +84,12 @@ Indicator
 
         :rtype: int
 
-    .. py:method:: get(self, result_index[, num=0])
+    .. py:method:: get(self, pos[, result_index=0])
 
         获取指定位置的值
 
         :param int pos: 指定的位置索引
-        :param int num: 指定的结果集
+        :param int result_index: 指定的结果集
 
     .. py::method:: get_pos(self, date):
 
@@ -109,7 +109,7 @@ Indicator
         获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 
         :param Datetime datetime: 指定日期
-        :param int num: 指定的结果集
+        :param int result_index: 指定的结果集
         :rtype: float
 
     .. py:method:: get_result(self, result_index)
