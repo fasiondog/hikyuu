@@ -27,6 +27,9 @@
 .clangd
 .vs
 .ipynb_checkpoints
+
+.workbuddy
+
 nohup.out
 temp
 tmp
