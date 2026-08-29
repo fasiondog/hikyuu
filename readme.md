@@ -53,8 +53,8 @@
 
 ### 环境要求
 
-- **Python 3.10 ~ 3.13**（3.9 及以下自 2.8.0 起不再支持）
-- 支持 Windows / Linux / macOS
+- **>= Python 3.10**（3.9 及以下自 2.8.0 起不再支持 pip 安装）
+- 支持 Windows / Linux / macOS （Linux为Ubuntu24.04+）
 - 主要依赖会自动安装：`numpy>=2.0`、`pandas>=2.3.0`、`matplotlib>=3.5.0`、`PySide6>=6.8.0`、`tables>=3.9.0` 等
 
 ### 第 1 步：安装
