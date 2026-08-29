@@ -49,7 +49,7 @@
 
 ---
 
-## ⚡ 快速开始（5 分钟跑通第一个回测）
+## ⚡ 快速开始（跑通第一个回测）
 
 ### 环境要求
 
@@ -71,7 +71,7 @@ pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ### 第 2 步：导入行情数据
 
-任选一种方式导入通达信数据：
+任选一种方式导入历史行情数据：
 
 ```bash
 # 图形界面（推荐首次使用，会自动生成配置文件）
@@ -80,8 +80,6 @@ HikyuuTDX
 # 命令行（需先运行过一次 HikyuuTDX 生成配置）
 importdata
 ```
-
-配置文件默认生成在用户目录的 `.hikyuu` 文件夹下。
 
 ### 第 3 步：跑通第一个回测
 
@@ -107,12 +105,12 @@ sys.run(sm['sz000001'], Query(-150))
 
 ### ❓ 上手常见问题
 
-| 现象                                          | 解决办法                                                                    |
-| :-------------------------------------------- | :-------------------------------------------------------------------------- |
-| Windows 下 `pip install` 卡在下载 PyQt / PySide6 | 换清华源：`pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple` |
-| `HikyuuTDX` 图形界面无法导入数据              | 改用命令行 `importdata`（需先运行过一次 GUI 以生成配置文件）               |
-| 提示缺少 hdf5 / dll 相关错误                  | 执行 `pip install tables` 重新安装 HDF5 支持                               |
-| **从源码构建**时的构建工具                    | 本项目使用 **xmake**，不是 cmake                                           |
+| 现象                                              | 解决办法                                                                     |
+| :------------------------------------------------ | :--------------------------------------------------------------------------- |
+| Windows 下`pip install` 卡在下载 PyQt / PySide6 | 换清华源：`pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple` |
+| `HikyuuTDX` 图形界面无法导入数据                | 改用命令行`importdata`（需先运行过一次 GUI 以生成配置文件）                |
+| 提示缺少 hdf5 / dll 相关错误                      | 执行`pip install tables` 重新安装 HDF5 支持                                |
+| **从源码构建**时的构建工具                  | 本项目使用**xmake**，不是 cmake                                        |
 
 > 💡 更多问题请查 [帮助文档](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)，或在 [Gitee 提交 issue](https://gitee.com/fasiondog/hikyuu/issues)。
 
