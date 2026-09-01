@@ -73,6 +73,8 @@ enum class Cmd : uint16_t {
     KDATA_GET_TRANS_LIST,
 
     BLOCK_LOAD,
+
+    STATUS_SHM_INFO,  // 查询 K 线共享内存缓存段信息（名称/代数）
 };
 
 /** 编码缓冲，按需增长 */

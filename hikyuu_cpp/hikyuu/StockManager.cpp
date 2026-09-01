@@ -369,6 +369,17 @@ void StockManager::loadAllKData() {
     bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
     HKU_INFO_IF(lazy_preload && canLazyLoad(KQuery::MIN), htr("Use lazy preload!"));
 
+#if HKU_ENABLE_NODE
+    // 主进程 K 线预加载完成后，将热数据发布为只读共享内存缓存快照，
+    // 供客户端进程零拷贝直接读取，避免全市场遍历时逐证券 IPC 往返；
+    // 在历史财务加载之前发布，使客户端尽早获得 K 线热数据。
+    auto publishShmCacheIfMaster = [this]() {
+        HKU_IF_RETURN(!m_ipc_server || !m_ipc_server->running(), void());
+        HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("kdata_server_shm_cache", true), void());
+        m_ipc_server->publishShmCache("hikyuu_ks");
+    };
+#endif
+
     // 先加载同类K线（预加载仅为缓存预热，一律后台异步执行，不阻塞初始化；
     // 预热期间的查询经由驱动实时获取，结果不受影响；
     // 需要等待预热完成的场景可显式调用 waitDataReady()）
@@ -382,7 +393,12 @@ void StockManager::loadAllKData() {
 #endif
 
     if (!driver->getPrototype()->canParallelLoad()) {
-        std::thread t = std::thread([this, ktypes, low_ktypes]() {
+        std::thread t = std::thread([this, ktypes, low_ktypes
+#if HKU_ENABLE_NODE
+                                     ,
+                                     publishShmCacheIfMaster
+#endif
+                                    ]() {
 #if HKU_ENABLE_NODE
             size_t preload_ktype_count = 0;
             for (const auto& low_ktype : low_ktypes) {
@@ -417,6 +433,13 @@ void StockManager::loadAllKData() {
                 }
             }
 
+#if HKU_ENABLE_NODE
+            // 取消预加载（进程退出）时不发布，避免白做全量序列化后立即被销毁
+            if (!m_cancel_load) {
+                publishShmCacheIfMaster();
+            }
+#endif
+
             if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
                 ThreadPool tg;
                 std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
@@ -438,7 +461,12 @@ void StockManager::loadAllKData() {
         t.detach();
     } else {
         // 异步并行加载
-        std::thread t = std::thread([this, ktypes, low_ktypes]() {
+        std::thread t = std::thread([this, ktypes, low_ktypes
+#if HKU_ENABLE_NODE
+                                     ,
+                                     publishShmCacheIfMaster
+#endif
+                                    ]() {
 #if HKU_ENABLE_NODE
             auto loaded_cnt = std::make_shared<std::atomic<uint64_t>>(0);
             uint64_t total_task = m_stockDict.size();
@@ -487,7 +515,20 @@ void StockManager::loadAllKData() {
                 }
             }
 
+            // 等待 K 线预加载任务全部完成后，再将热数据发布为共享内存快照；
+            // 注意发布必须在 join 之后，否则缓冲区可能尚未填充。
+            m_load_tg->join();
+            m_load_tg.reset();
+
+#if HKU_ENABLE_NODE
+            // 取消预加载（进程退出）时不发布，避免白做全量序列化后立即被销毁
+            if (!m_cancel_load) {
+                publishShmCacheIfMaster();
+            }
+#endif
+
             if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+                m_load_tg = std::make_unique<ThreadPool>();
                 std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
                 for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
                     if (m_cancel_load) {
@@ -501,10 +542,11 @@ void StockManager::loadAllKData() {
                         stk.getHistoryFinance();
                     });
                 }
+                lock.unlock();
+                m_load_tg->join();
+                m_load_tg.reset();
             }
 
-            m_load_tg->join();
-            m_load_tg.reset();
             m_data_ready.store(true, std::memory_order_release);
         });
         t.detach();

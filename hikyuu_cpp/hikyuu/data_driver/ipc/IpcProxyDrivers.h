@@ -11,11 +11,13 @@
 
 #if HKU_ENABLE_NODE
 
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
 #include "IpcTransport.h"
+#include "KDataShmCache.h"
 #include "hikyuu/data_driver/BaseInfoDriver.h"
 #include "hikyuu/data_driver/BlockInfoDriver.h"
 #include "hikyuu/data_driver/KDataDriver.h"
@@ -129,7 +131,10 @@ private:
 
 /**
  * K 线 IPC 代理驱动
- * @details 从数据服务进程获取 K 线/分时/分笔数据，通讯失败时降级至本地驱动
+ * @details 优先从服务端发布的只读共享内存缓存快照直接读取热数据（零拷贝），
+ * 快照未覆盖的查询回退 IPC 请求，通讯失败时降级至本地驱动。
+ * 服务端预加载完成时间可能晚于客户端接入，未命中时按最小间隔向服务端
+ * 拉取最新快照信息。
  */
 class HKU_API IpcKDataDriver : public KDataDriver {
 public:
@@ -150,8 +155,15 @@ public:
                            const KQuery& query) override;
 
 private:
+    /** 向服务端拉取共享内存快照信息并映射新段（带最小间隔限流） */
+    void _tryRefreshShm();
+
     IpcConnectorPtr m_conn;
     KDataDriverPtr m_local;  // 降级兜底
+    bool m_shm_enabled{true};
+    KDataShmReaderPtr m_shm_reader;
+    uint64_t m_shm_epoch{0};
+    std::chrono::steady_clock::time_point m_last_shm_check;
 };
 
 }  // namespace ipc

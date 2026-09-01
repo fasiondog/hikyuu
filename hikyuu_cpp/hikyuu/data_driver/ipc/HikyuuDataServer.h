@@ -21,6 +21,7 @@ namespace hku {
 namespace ipc {
 
 class FileLock;
+class KDataShmPublisher;
 
 /**
  * 单机 IPC 数据服务（Master 端）
@@ -73,6 +74,13 @@ public:
     /** 刷新板块缓存（数据加载/重加载完成后调用） */
     void refreshBlocks();
 
+    /**
+     * 将预加载的 K 线缓冲发布为只读共享内存缓存快照，供客户端零拷贝读取
+     * @param shm_name_prefix 共享内存段名前缀（受系统名称长度限制，建议不超过 11 字符）
+     * @return true 发布成功
+     */
+    bool publishShmCache(const std::string& shm_name_prefix);
+
 private:
     std::vector<uint8_t> _handle(Cmd cmd, std::vector<uint8_t>&& body, RetCode& ret);
 
@@ -87,6 +95,13 @@ private:
 
     std::shared_mutex m_block_mutex;
     BlockList m_blocks;
+
+    mutable std::shared_mutex m_shm_mutex;  // 保护 m_shm_name / m_shm_epoch
+    std::string m_shm_name;
+    uint64_t m_shm_epoch{0};
+    // 发布器生命周期与服务一致：持有当前段，重发布时自动删旧段，服务销毁时清理；
+    // 仅在后台预加载线程中访问，无需加锁保护
+    std::unique_ptr<KDataShmPublisher> m_shm_publisher;
 };
 
 typedef std::shared_ptr<HikyuuDataServer> HikyuuDataServerPtr;

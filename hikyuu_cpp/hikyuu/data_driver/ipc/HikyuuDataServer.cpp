@@ -19,6 +19,7 @@
 
 #include <unordered_map>
 #include "HikyuuDataServer.h"
+#include "KDataShmCache.h"
 #include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/Log.h"
 
@@ -157,6 +158,39 @@ void HikyuuDataServer::refreshBlocks() {
     auto blocks = StockManager::instance().getBlockList("");
     std::unique_lock<std::shared_mutex> lock(m_block_mutex);
     m_blocks = std::move(blocks);
+}
+
+bool HikyuuDataServer::publishShmCache(const std::string& shm_name_prefix) {
+    try {
+        // 以当前时间戳作为代数，保证段名唯一且单调（快速重发布时递增），
+        // 客户端以代数变化感知新快照；发布新段成功后由发布器删除旧段，
+        // 已映射旧段的客户端不受影响（POSIX 段删除不影响已有映射）
+        uint64_t epoch = static_cast<uint64_t>(
+          std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count());
+        {
+            std::shared_lock<std::shared_mutex> lock(m_shm_mutex);
+            if (epoch <= m_shm_epoch) {
+                epoch = m_shm_epoch + 1;
+            }
+        }
+        if (!m_shm_publisher) {
+            m_shm_publisher = std::make_unique<KDataShmPublisher>(shm_name_prefix);
+        }
+        std::string name = m_shm_publisher->publish(epoch);
+        HKU_IF_RETURN(name.empty(), false);
+
+        std::unique_lock<std::shared_mutex> lock(m_shm_mutex);
+        m_shm_name = name;
+        m_shm_epoch = epoch;
+        return true;
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed publish kdata shm cache: {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Failed publish kdata shm cache: unknown error!");
+    }
+    return false;
 }
 
 std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& body,
@@ -375,6 +409,13 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
         case Cmd::BLOCK_LOAD: {
             std::shared_lock<std::shared_mutex> lock(m_block_mutex);
             encodeBlockList(enc, m_blocks);
+            break;
+        }
+
+        case Cmd::STATUS_SHM_INFO: {
+            std::shared_lock<std::shared_mutex> lock(m_shm_mutex);
+            enc.putU64(m_shm_epoch);
+            enc.putString(m_shm_name);
             break;
         }
 

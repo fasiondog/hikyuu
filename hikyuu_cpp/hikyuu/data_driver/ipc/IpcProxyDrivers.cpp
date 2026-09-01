@@ -408,10 +408,59 @@ void IpcBlockDriver::remove(const std::string& category, const std::string& name
 // IpcKDataDriver
 ///////////////////////////////////////////////////////////////////////////////
 IpcKDataDriver::IpcKDataDriver(const IpcConnectorPtr& conn, const KDataDriverPtr& local)
-: KDataDriver("ipc"), m_conn(conn), m_local(local) {}
+: KDataDriver("ipc"), m_conn(conn), m_local(local) {
+    // 不在构造函数中协商共享内存快照：构造可能发生在连接池锁内，
+    // 阻塞 IPC 会拖垮整个驱动连接池；首次查询入口会限流协商。
+}
 
 KDataDriverPtr IpcKDataDriver::_clone() {
     return std::make_shared<IpcKDataDriver>(m_conn, m_local);
+}
+
+void IpcKDataDriver::_tryRefreshShm() {
+    if (!m_shm_enabled || !m_conn || !m_conn->connected()) {
+        return;
+    }
+    // 拉取限流：无论服务端是否已发布，最小间隔内最多协商一次，
+    // 避免高频未命中查询（如分时/分笔）退化为每查询一次额外 IPC；
+    // 服务端发布新段后客户端最多延迟该间隔感知。
+    constexpr int64_t MIN_CHECK_INTERVAL_MS = 5000;
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_shm_check).count() <
+        MIN_CHECK_INTERVAL_MS) {
+        return;
+    }
+    m_last_shm_check = now;
+
+    std::vector<uint8_t> res_body;
+    if (!m_conn->request(Cmd::STATUS_SHM_INFO, {}, res_body)) {
+        return;  // 通讯失败保持现状，查询自然回退 IPC/本地
+    }
+
+    Reader rd(res_body.data(), res_body.size());
+    uint64_t epoch = rd.getU64();
+    std::string name = rd.getString();
+    HKU_IF_RETURN(!rd.ok(), void());
+
+    if (epoch == 0 || name.empty()) {
+        // 服务端尚未发布（或已撤销）快照；若本地持有旧段则继续暂用，等待新段发布，
+        // 旧段数据在快照语义下仍为有效的历史子集；服务端重加载后数据变化由新 epoch 感知。
+        return;
+    }
+
+    if (epoch == m_shm_epoch && m_shm_reader && m_shm_reader->valid()) {
+        return;
+    }
+
+    auto reader = std::make_shared<KDataShmReader>();
+    if (reader->open(name)) {
+        m_shm_reader = reader;
+        m_shm_epoch = reader->epoch();
+        HKU_INFO("Mapped hikyuu kdata shm cache: {} (epoch: {}, covered stocks entries: {})",
+                 name, m_shm_epoch, reader->coveredCount());
+    } else {
+        HKU_WARN("Failed map hikyuu kdata shm cache: {}, fallback to ipc query!", name);
+    }
 }
 
 bool IpcKDataDriver::isIndexFirst() {
@@ -424,9 +473,21 @@ bool IpcKDataDriver::canParallelLoad() {
 
 size_t IpcKDataDriver::getCount(const std::string& market, const std::string& code,
                                 const KQuery::KType& kType) {
+    // 优先共享内存快照；限流协商保证服务端发布/重发布新段后客户端能延迟感知；
+    // 快照中的条数与服务端缓冲模式下的 getCount 语义一致（全量未截断）
+    _tryRefreshShm();
+    if (m_shm_reader && m_shm_reader->valid()) {
+        size_t count = 0;
+        if (m_shm_reader->tryGetCount(market + code, kType, count)) {
+            return count;
+        }
+    }
+
     Encoder enc;
     enc.putString(market + code);
-    encodeKQuery(enc, KQuery(0, Null<int64_t>(), kType));
+    // 显式 int64_t，避免 Null<int64_t> 隐式转换选中 KQuery 的日期重载；
+    // 服务端 getCount 仅使用 kType，查询区间不影响结果。
+    encodeKQuery(enc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), kType));
     std::vector<uint8_t> res_body;
     if (m_conn && m_conn->request(Cmd::KDATA_COUNT, enc.data(), res_body)) {
         Reader rd(res_body.data(), res_body.size());
@@ -440,6 +501,21 @@ size_t IpcKDataDriver::getCount(const std::string& market, const std::string& co
 
 bool IpcKDataDriver::getIndexRangeByDate(const std::string& market, const std::string& code,
                                          const KQuery& query, size_t& out_start, size_t& out_end) {
+    _tryRefreshShm();
+    if (m_shm_reader && m_shm_reader->valid()) {
+        if (m_shm_reader->tryGetIndexRangeByDate(market + code, query, out_start, out_end)) {
+            return true;
+        }
+        // 区分“快照覆盖但区间为空”（返回 false 且 out 保持 0/0）与“快照未覆盖”（回退）：
+        // 用 tryGetCount 判定覆盖性，与服务端缓冲模式行为对齐。
+        size_t count = 0;
+        if (m_shm_reader->tryGetCount(market + code, query.kType(), count)) {
+            out_start = 0;
+            out_end = 0;
+            return false;
+        }
+    }
+
     Encoder enc;
     enc.putString(market + code);
     encodeKQuery(enc, query);
@@ -463,6 +539,15 @@ bool IpcKDataDriver::getIndexRangeByDate(const std::string& market, const std::s
 
 KRecordList IpcKDataDriver::getKRecordList(const std::string& market, const std::string& code,
                                            const KQuery& query) {
+    // 优先共享内存快照（全市场遍历场景下避免逐证券 IPC 往返）
+    _tryRefreshShm();
+    if (m_shm_reader && m_shm_reader->valid()) {
+        KRecordList ks;
+        if (m_shm_reader->tryGetKRecordList(market + code, query, ks)) {
+            return ks;
+        }
+    }
+
     Encoder enc;
     enc.putString(market + code);
     encodeKQuery(enc, query);

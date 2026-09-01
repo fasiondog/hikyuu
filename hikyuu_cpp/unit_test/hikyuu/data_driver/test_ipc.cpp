@@ -25,6 +25,7 @@
 #include "hikyuu/data_driver/ipc/IpcTransport.h"
 #include "hikyuu/data_driver/ipc/HikyuuDataServer.h"
 #include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
+#include "hikyuu/data_driver/ipc/KDataShmCache.h"
 
 using namespace hku;
 using namespace hku::ipc;
@@ -340,6 +341,158 @@ TEST_CASE("test_IpcConnectorWaitReady") {
     t.join();
 
     server.stop();
+}
+
+TEST_CASE("test_KDataShmCache") {
+    // 测试配置预加载 day，以其缓冲为基准验证共享内存快照的发布与只读映射查询语义；
+    // 段名前缀需较短（系统共享内存名长度限制）；
+    // 预加载为后台异步，必须先等待完成，否则缓冲可能为空或不完整。
+    StockManager::instance().waitDataReady();
+    const std::string prefix = "hkushm";
+
+    SUBCASE("publish and read") {
+        KDataShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260901);
+        REQUIRE_FALSE(name.empty());
+
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+        CHECK_EQ(reader.epoch(), 20260901);
+        CHECK_GT(reader.coveredCount(), 0);
+
+        // 未覆盖的证券/类型应返回 false（由调用方回退）
+        size_t count = 0;
+        CHECK_FALSE(reader.tryGetCount("SH999999", KQuery::DAY, count));
+        CHECK_FALSE(reader.tryGetCount("SH600000", KQuery::MIN, count));
+
+        // 逐一比对已缓冲证券：条数与全量记录一致（发布前提为未截断）
+        auto& sm = StockManager::instance();
+        size_t checked = 0;
+        std::string sample_mc;
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            size_t buf_size = stk.getKDataBufferSize(KQuery::DAY);
+            if (buf_size == 0) {
+                continue;
+            }
+            const std::string mc = stk.market_code();
+            size_t shm_count = 0;
+            CHECK(reader.tryGetCount(mc, KQuery::DAY, shm_count));
+            CHECK_EQ(shm_count, buf_size);
+
+            KRecordList shm_ks;
+            // 注意：必须显式 int64_t，否则 Null<int64_t> 会隐式转换选中 KQuery 的日期重载
+            CHECK(reader.tryGetKRecordList(mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(),
+                                                      KQuery::DAY),
+                                           shm_ks));
+            auto buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+            REQUIRE_EQ(shm_ks.size(), buf_ks.size());
+            if (!shm_ks.empty()) {
+                CHECK_EQ(shm_ks.front().datetime, buf_ks.front().datetime);
+                CHECK_EQ(shm_ks.front().closePrice, buf_ks.front().closePrice);
+                CHECK_EQ(shm_ks.back().datetime, buf_ks.back().datetime);
+                CHECK_EQ(shm_ks.back().closePrice, buf_ks.back().closePrice);
+            }
+            if (sample_mc.empty() && buf_size > 3) {
+                sample_mc = mc;
+            }
+            checked++;
+        }
+        CHECK_EQ(checked, reader.coveredCount());
+        REQUIRE_FALSE(sample_mc.empty());
+
+        // 索引区间查询（含越界钳制）
+        KRecordList part;
+        CHECK(reader.tryGetKRecordList(sample_mc, KQuery(1, 3, KQuery::DAY), part));
+        CHECK_EQ(part.size(), 2);
+        CHECK(reader.tryGetKRecordList(sample_mc, KQuery(0, 100000000, KQuery::DAY), part));
+
+        // 日期区间查询与主进程缓冲模式一致（_getIndexRangeByDateFromBuffer 语义）
+        size_t start_ix = 0, end_ix = 0;
+        auto full = StockManager::instance().getStock(sample_mc).getKRecordListFromBuffer(
+          KQuery::DAY);
+        Datetime mid_date = full[full.size() / 2].datetime;
+        CHECK(reader.tryGetIndexRangeByDate(sample_mc,
+                                            KQueryByDate(mid_date, Null<Datetime>(), KQuery::DAY),
+                                            start_ix, end_ix));
+        CHECK_EQ(start_ix, full.size() / 2);
+        CHECK_EQ(end_ix, full.size());
+
+        KRecordList by_date;
+        CHECK(reader.tryGetKRecordList(sample_mc,
+                                       KQueryByDate(mid_date, Null<Datetime>(), KQuery::DAY),
+                                       by_date));
+        CHECK_EQ(by_date.size(), full.size() - full.size() / 2);
+
+        // 日期区间为空（覆盖但无数据）：返回 false 且不产生结果，由上层按覆盖处理；
+        // 未覆盖（不存在的证券）同样返回 false，二者由 IpcKDataDriver 以 tryGetCount 区分
+        Datetime before_all = full.front().datetime - TimeDelta(0, 1);
+        CHECK_FALSE(reader.tryGetIndexRangeByDate(
+          sample_mc, KQueryByDate(Datetime(190001010000LL), before_all, KQuery::DAY), start_ix,
+          end_ix));
+
+        reader.close();
+        CHECK_FALSE(reader.valid());
+    }
+
+    SUBCASE("invalid segment") {
+        KDataShmReader reader;
+        CHECK_FALSE(reader.open("hkushm_not_exist_0123456789"));
+        CHECK_FALSE(reader.valid());
+    }
+
+    SUBCASE("server shm info handshake") {
+        std::string addr = test_ipc_addr("hku_shm_test");
+        std::string lock_path = test_lock_path("hku_shm_test");
+        HikyuuDataServer server;
+        REQUIRE(server.start(addr, lock_path, "."));
+
+        IpcConnector conn;
+        REQUIRE(conn.init(addr));
+
+        // 发布前：epoch 为 0、段名为空，客户端应保持纯 IPC 查询
+        std::vector<uint8_t> res_body;
+        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
+        Reader rd(res_body.data(), res_body.size());
+        CHECK_EQ(rd.getU64(), 0);
+        CHECK(rd.getString().empty());
+        CHECK(rd.ok());
+
+        // 发布后：返回有效段名与代数，且客户端可映射读取
+        CHECK(server.publishShmCache(prefix));
+        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
+        Reader rd2(res_body.data(), res_body.size());
+        uint64_t epoch = rd2.getU64();
+        std::string name = rd2.getString();
+        CHECK(rd2.ok());
+        CHECK_GT(epoch, 0);
+        REQUIRE_FALSE(name.empty());
+
+        KDataShmReader reader;
+        CHECK(reader.open(name));
+        CHECK_EQ(reader.epoch(), epoch);
+        CHECK_GT(reader.coveredCount(), 0);
+
+        // 重发布应生成新代数，旧段被删除但已有映射不受影响；再次发布后读者可打开新段；
+        // 新段数据与缓冲一致（条数不变）
+        size_t old_covered = reader.coveredCount();
+        CHECK(server.publishShmCache(prefix));
+        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
+        Reader rd3(res_body.data(), res_body.size());
+        uint64_t epoch2 = rd3.getU64();
+        std::string name2 = rd3.getString();
+        CHECK(rd3.ok());
+        CHECK_GT(epoch2, epoch);
+        CHECK_NE(name2, name);
+
+        KDataShmReader reader2;
+        REQUIRE(reader2.open(name2));
+        CHECK_EQ(reader2.coveredCount(), old_covered);
+        // 旧映射在段删除后仍可读取（快照语义）
+        CHECK(reader.valid());
+        CHECK_EQ(reader.coveredCount(), old_covered);
+
+        server.stop();
+    }
 }
 
 TEST_CASE("test_IpcConnectorInterrupt") {
