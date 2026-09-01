@@ -11,7 +11,7 @@ target("core")
 
     add_deps("hikyuu")
     add_packages("boost", "fmt", "spdlog", "flatbuffers", "pybind11", "utf8proc", "nlohmann_json",
-                 "tl_expected")
+                 "tl_expected", "nng")
     if is_plat("windows") then
         set_filename("core.pyd")
         add_cxflags("/bigobj")

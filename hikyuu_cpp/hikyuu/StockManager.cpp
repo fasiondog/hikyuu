@@ -11,6 +11,10 @@
 
 #include "GlobalInitializer.h"
 #include <chrono>
+#include <cstdlib>
+#if HKU_ENABLE_NODE && defined(_WIN32)
+#include <windows.h>
+#endif
 #include <fmt/format.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -42,6 +46,11 @@ StockManager::StockManager() {
 }
 
 StockManager::~StockManager() {
+#if HKU_ENABLE_NODE
+    if (m_ipc_server) {
+        m_ipc_server->stop();
+    }
+#endif
     delete m_stockDict_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
 }
@@ -160,8 +169,22 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
 
+#if HKU_ENABLE_NODE
+    // 自动协商单机 IPC 数据服务（客户端模式将替换为代理驱动并关闭本地预加载）
+    _negotiateIpcDataServer();
+#endif
+
     // 加载数据
     loadData();
+
+#if HKU_ENABLE_NODE
+    // 基础数据（证券/市场/节假日/权息/板块等）加载完毕即可对外提供服务；
+    // K线预加载仅为缓存预热，服务端的K线请求均通过驱动实时查询，
+    // 后台预热期间不影响客户端查询，无需让客户端等待预加载完成。
+    if (m_ipc_server) {
+        m_ipc_server->setAllReady();
+    }
+#endif
 
     // 初始化内部定时任务（重加载）
     initInnerTask();
@@ -184,6 +207,12 @@ void StockManager::loadData() {
 
     HKU_INFO(htr("Loading block..."));
     m_blockDriver->load();
+#if HKU_ENABLE_NODE
+    if (m_ipc_server && m_ipc_server->running()) {
+        // 刷新 IPC 服务的板块缓存（驱动缓存加载完成后才能取到数据）
+        m_ipc_server->refreshBlocks();
+    }
+#endif
 
     // 获取K线数据驱动并预加载指定的数据
     HKU_INFO(htr("Loading KData..."));
@@ -198,6 +227,99 @@ void StockManager::loadData() {
     auto seconds = sec.count();
     HKU_INFO(htr("{:<.2f}s Loaded Data.", seconds));
 }
+
+KDataDriverConnectPoolPtr StockManager::_getKDataDriverPool() {
+    if (m_ipc_kdata_pool) {
+        return m_ipc_kdata_pool;
+    }
+    return DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+}
+
+#if HKU_ENABLE_NODE
+namespace {
+/* 获取系统临时目录，用于存放服务地址与文件锁 */
+string getIpcTempDir() {
+#if defined(_WIN32)
+    char buf[MAX_PATH];
+    if (GetTempPathA(MAX_PATH, buf)) {
+        string path(buf);
+        while (!path.empty() && (path.back() == '\\' || path.back() == '/')) {
+            path.pop_back();
+        }
+        HKU_IF_RETURN(!path.empty(), path);
+    }
+    return ".";
+#else
+    const char* tmp = std::getenv("TMPDIR");
+    return (tmp && *tmp) ? string(tmp) : "/tmp";
+#endif
+}
+}  // namespace
+
+void StockManager::_negotiateIpcDataServer() {
+    HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("kdata_server", true), void());
+
+    // 以数据目录区分服务地址与文件锁，避免不同项目/数据集间互扰
+    size_t h = std::hash<string>()(m_datadir);
+    string ipc_dir = getIpcTempDir();
+    string addr = fmt::format("ipc://{}/hikyuu_kdata_server_{:x}.ipc", ipc_dir, h);
+    string lock_path = fmt::format("{}/hikyuu_kdata_server_{:x}.lock", ipc_dir, h);
+
+    // 切换为客户端模式：替换为代理驱动并关闭本地预加载（仅内存覆盖，不改配置文件）
+    auto enterClientMode = [this](const ipc::IpcConnectorPtr& conn) {
+        m_ipc_client_mode = true;
+        m_ipc_conn = conn;
+        m_baseInfoDriver = std::make_shared<ipc::IpcBaseInfoDriver>(conn, m_baseInfoDriver);
+        m_blockDriver = std::make_shared<ipc::IpcBlockDriver>(conn, m_blockDriver);
+        auto local_pool = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+        auto ipc_kdriver = std::make_shared<ipc::IpcKDataDriver>(conn, local_pool->getPrototype());
+        m_ipc_kdata_pool = std::make_shared<KDataDriverConnectPool>(ipc_kdriver);
+        for (const auto& ktype : KQuery::getBaseKTypeList()) {
+            auto low_ktype = ktype;
+            to_lower(low_ktype);
+            m_preloadParam.set<bool>(low_ktype, false);
+        }
+        HKU_INFO("Connected to hikyuu data server: {}, running in client mode.", m_ipc_conn->addr());
+    };
+
+    // 连接服务并等待其数据就绪，成功返回 true 并切换为客户端模式
+    auto waitTimeout = [this]() -> uint64_t {
+        return m_hikyuuParam.tryGet<int64_t>("kdata_server_wait_timeout", 600);
+    };
+    auto tryConnect = [&](const ipc::IpcConnectorPtr& conn) -> bool {
+        HKU_IF_RETURN(!conn->connected(), false);
+        HKU_IF_RETURN(!conn->waitReady(waitTimeout()), false);
+        enterClientMode(conn);
+        return true;
+    };
+
+    // 1. 探测是否已有数据服务（客户端模式）
+    auto conn = std::make_shared<ipc::IpcConnector>();
+    if (conn->init(addr) && tryConnect(conn)) {
+        return;
+    }
+
+    // 2. 竞争文件锁成为数据服务主进程（服务先行，客户端可轮询等待加载进度）
+    m_ipc_server = std::make_shared<ipc::HikyuuDataServer>();
+    if (m_ipc_server->start(addr, lock_path, m_tmpdir)) {
+        return;
+    }
+    m_ipc_server.reset();
+
+    // 3. 锁已被其他进程持有但服务尚未监听（对方正在启动中），重试连接后降级独立模式
+    for (int i = 0; i < 20; i++) {
+        if (ipc::checkInterrupted()) {
+            HKU_WARN("Connect to hikyuu data server interrupted!");
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        if (conn->init(addr) && tryConnect(conn)) {
+            return;
+        }
+    }
+    HKU_WARN("Failed connect to hikyuu data server, fallback to standalone mode!");
+}
+#endif  // HKU_ENABLE_NODE
 
 void StockManager::loadAllKData() {
     // 按 K 线类型控制加载顺序
@@ -247,46 +369,83 @@ void StockManager::loadAllKData() {
     bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
     HKU_INFO_IF(lazy_preload && canLazyLoad(KQuery::MIN), htr("Use lazy preload!"));
 
-    // 先加载同类K线
-    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-    if (!driver->getPrototype()->canParallelLoad()) {
-        for (size_t i = 0, len = ktypes.size(); i < len; i++) {
-            if (m_cancel_load) {
-                break;
-            }
-            if (canLazyLoad(ktypes[i])) {
-                continue;
-            }
-            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                if (m_cancel_load) {
-                    break;
-                }
-                const auto& low_ktype = low_ktypes[i];
-                if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
-                    iter->second.loadKDataToBuffer(ktypes[i]);
-                }
-            }
-        }
-
-        if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-            ThreadPool tg;
-            for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                if (m_cancel_load) {
-                    break;
-                }
-                tg.submit([stk = iter->second, this]() {
-                    HKU_IF_RETURN(m_cancel_load, void());
-                    stk.getHistoryFinance();
-                });
-            }
-            tg.join();
-        }
-
+    // 先加载同类K线（预加载仅为缓存预热，一律后台异步执行，不阻塞初始化；
+    // 预热期间的查询经由驱动实时获取，结果不受影响；
+    // 需要等待预热完成的场景可显式调用 waitDataReady()）
+    auto driver = _getKDataDriverPool();
+#if HKU_ENABLE_NODE
+    if (m_ipc_client_mode) {
+        // 客户端模式下数据由服务端提供，本地无预加载任务，直接就绪
         m_data_ready.store(true, std::memory_order_release);
+        return;
+    }
+#endif
 
+    if (!driver->getPrototype()->canParallelLoad()) {
+        std::thread t = std::thread([this, ktypes, low_ktypes]() {
+#if HKU_ENABLE_NODE
+            size_t preload_ktype_count = 0;
+            for (const auto& low_ktype : low_ktypes) {
+                if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+                    preload_ktype_count++;
+                }
+            }
+            uint64_t total_task = m_stockDict.size() * preload_ktype_count;
+            uint64_t loaded_task = 0;
+#endif
+            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+                if (m_cancel_load) {
+                    break;
+                }
+                if (canLazyLoad(ktypes[i])) {
+                    continue;
+                }
+                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                    if (m_cancel_load) {
+                        break;
+                    }
+                    const auto& low_ktype = low_ktypes[i];
+                    if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+                        iter->second.loadKDataToBuffer(ktypes[i]);
+#if HKU_ENABLE_NODE
+                        if (m_ipc_server) {
+                            m_ipc_server->updateProgress(++loaded_task, total_task);
+                        }
+#endif
+                    }
+                }
+            }
+
+            if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+                ThreadPool tg;
+                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+                    if (m_cancel_load) {
+                        break;
+                    }
+                    tg.submit([stk = iter->second, this]() {
+                        HKU_IF_RETURN(m_cancel_load, void());
+                        stk.getHistoryFinance();
+                    });
+                }
+                lock.unlock();
+                tg.join();
+            }
+
+            m_data_ready.store(true, std::memory_order_release);
+        });
+        t.detach();
     } else {
         // 异步并行加载
         std::thread t = std::thread([this, ktypes, low_ktypes]() {
+#if HKU_ENABLE_NODE
+            auto loaded_cnt = std::make_shared<std::atomic<uint64_t>>(0);
+            uint64_t total_task = m_stockDict.size();
+            if (m_ipc_server) {
+                m_ipc_server->updateProgress(0, total_task);
+            }
+#endif
             auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
 
             // 加载其他证券K线(可能不同不同K线驱动的证券)
@@ -308,9 +467,21 @@ void StockManager::loadAllKData() {
                     }
                     if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
                         m_load_tg->submit(
-                          [this, stk = iter->second, ktype = std::move(ktypes[i])]() mutable {
+                          [this, stk = iter->second, ktype = std::move(ktypes[i])
+#if HKU_ENABLE_NODE
+                           ,
+                           loaded_cnt, total_task
+#endif
+                          ]() mutable {
                               HKU_IF_RETURN(m_cancel_load, void());
                               stk.loadKDataToBuffer(ktype);
+#if HKU_ENABLE_NODE
+                              if (m_ipc_server) {
+                                  uint64_t loaded = loaded_cnt->fetch_add(1) + 1;
+                                  m_ipc_server->updateProgress(std::min(loaded, total_task),
+                                                               total_task);
+                              }
+#endif
                           });
                     }
                 }
@@ -344,7 +515,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
   const vector<KQuery::KType>& ktypes) {
     std::unordered_set<string> loaded_codes;
     HKU_IF_RETURN(!m_context.isAll(), loaded_codes);
-    auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    auto driver = _getKDataDriverPool();
     HKU_IF_RETURN(!driver || !driver->getPrototype()->isColumnFirst(), loaded_codes);
 
     // 尝试优先加载 SH000001 K线
@@ -750,7 +921,7 @@ void StockManager::loadAllStocks() {
         }
     }
 
-    auto kdriver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    auto kdriver = _getKDataDriverPool();
 
     std::unique_lock<std::shared_mutex> lock(*m_stockDict_mutex);
     for (auto& info : stockInfos) {

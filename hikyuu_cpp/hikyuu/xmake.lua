@@ -147,6 +147,7 @@ target("hikyuu")
     add_files("./utilities/thread/*.cpp", "./utilities/db_connect/*.cpp", "./utilities/http_client/*.cpp", {unity_group="utilities"})
 
     add_files("./data_driver/*.cpp", {unity_group="data_driver"})
+    add_files("./data_driver/ipc/**.cpp", {unity_group="data_driver"})
     add_files("./data_driver/block_info/qianlong/**.cpp", {unity_group="data_driver"})
     add_files("./data_driver/kdata/cvs/**.cpp", {unity_group="data_driver"})
     if get_config("hdf5") or get_config("sqlite") then

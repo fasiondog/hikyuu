@@ -10,6 +10,10 @@
 #include <pybind11/stl.h>
 #include <hikyuu/hikyuu.h>
 #include <hikyuu/global/sysinfo.h>
+#include <hikyuu/utilities/config.h>
+#if HKU_ENABLE_NODE
+#include <hikyuu/data_driver/ipc/IpcTransport.h>
+#endif
 #include "pybind_utils.h"
 
 using namespace hku;
@@ -79,6 +83,19 @@ PYBIND11_MODULE(core, m) {
     // 设置系统运行状态
     setRunningInPython(true);
 
+#if HKU_ENABLE_NODE
+    // 注册 IPC 长阻塞等待（如等待数据服务就绪）的中断检查器，响应 Ctrl+C；
+    // 等待发生在已释放 GIL 的 C++ 代码中，此处需重新获取 GIL 后才能检查信号。
+    ipc::setInterruptChecker([]() {
+        py::gil_scoped_acquire gil;
+        if (PyErr_CheckSignals() != 0) {
+            // 抛出挂起的异常（如 KeyboardInterrupt），由 pybind11 转换为 Python 异常
+            throw py::error_already_set();
+        }
+        return false;
+    });
+#endif
+
 #if HKU_ENABLE_SEND_FEEDBACK
     sendPythonVersionFeedBack(PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
 #endif
@@ -133,9 +150,14 @@ PYBIND11_MODULE(core, m) {
     m.def("hikyuu_init",
           py::overload_cast<const string&, bool, const StrategyContext&>(&hikyuu_init),
           py::arg("filename"), py::arg("ignore_preload") = false,
-          py::arg("context") = StrategyContext({"all"}));
+          py::arg("context") = StrategyContext({"all"}),
+          // 初始化（含 IPC 协商、等待数据就绪与预加载）可能耗时较长，必须释放 GIL，
+          // 否则当前进程其他线程全部被冻结，且作为 IPC 客户端等待主进程加载时表现为卡死；
+          // 同时主进程的 C++ 后台线程（如日志线程）也需要 GIL 才能输出到 sys.stdout。
+          py::call_guard<py::gil_scoped_release>());
     m.def("hikyuu_init", py::overload_cast<const StrategyContext&, bool>(&hikyuu_init),
-          py::arg("context"), py::arg("ignore_preload") = false);
+          py::arg("context"), py::arg("ignore_preload") = false,
+          py::call_guard<py::gil_scoped_release>());
     m.def("get_version", getVersion, R"(getVersion()
 
         :return: hikyuu 当前版本

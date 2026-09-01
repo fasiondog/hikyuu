@@ -20,6 +20,10 @@ void export_StockManager(py::module& m) {
         "init", &StockManager::init, py::arg("base_info_param"), py::arg("block_param"),
         py::arg("kdata_param"), py::arg("preload_param"), py::arg("hikyuu_param"),
         py::arg("context") = StrategyContext({"all"}),
+        // 初始化（含 IPC 协商、等待数据服务就绪与预加载）可能耗时较长，必须释放 GIL，
+        // 否则本进程其他线程全部被冻结；作为 IPC 客户端等待主进程加载时表现为卡死；
+        // 作为主进程时，服务线程写日志也需要 GIL 才能输出到 sys.stdout。
+        py::call_guard<py::gil_scoped_release>(),
         R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param, context)
               
     初始化函数，必须在程序入口调用
@@ -39,9 +43,11 @@ void export_StockManager(py::module& m) {
 
       .def("cancel_load", &StockManager::cancelLoad, "取消所有数据加载")
 
-      .def("reload", &StockManager::reload, "重新加载所有证券数据")
+      .def("reload", &StockManager::reload, py::call_guard<py::gil_scoped_release>(),
+           "重新加载所有证券数据")
 
       .def("reload_with", &StockManager::reloadWith, py::arg("context"),
+           py::call_guard<py::gil_scoped_release>(),
            R"(reload_with(self, context)
 
     带策略上下文参数的重新加载, 如果context中证券列表为空，将沿用原有context

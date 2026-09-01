@@ -78,7 +78,7 @@ target("unit-test")
     end    
 
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "tl_expected", "eigen")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "tl_expected", "eigen", "nng")
     if has_config("ta_lib") then
         add_packages("ta-lib")
     end
@@ -153,7 +153,7 @@ target("small-test")
         add_packages("mysql")
     end    
 
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "tl_expected")
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "nlohmann_json", "tl_expected", "nng")
 
     add_includedirs("..")
 

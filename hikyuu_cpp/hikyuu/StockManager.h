@@ -15,6 +15,11 @@
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/utilities/plugin/PluginManager.h"
 #include "hikyuu/data_driver/DataDriverFactory.h"
+#include "hikyuu/utilities/config.h"
+#if HKU_ENABLE_NODE
+#include "hikyuu/data_driver/ipc/HikyuuDataServer.h"
+#include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
+#endif
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
@@ -315,6 +320,14 @@ private:
     /* 加载全部数据 */
     void loadData();
 
+    /* 获取 K 线驱动连接池，客户端模式下返回 IPC 代理驱动池 */
+    KDataDriverConnectPoolPtr _getKDataDriverPool();
+
+#if HKU_ENABLE_NODE
+    /* 自动协商单机 IPC 数据服务：探测已有服务(客户端)或竞争文件锁(主进程) */
+    void _negotiateIpcDataServer();
+#endif
+
     /* 加载 K线数据至缓存 */
     void loadAllKData();
     std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
@@ -388,6 +401,13 @@ private:
 
     PluginManager m_plugin_manager;
     std::string m_i18n_path;
+
+#if HKU_ENABLE_NODE
+    ipc::HikyuuDataServerPtr m_ipc_server;  // 非空时本进程为数据服务主进程
+    ipc::IpcConnectorPtr m_ipc_conn;        // 非空时本进程为数据服务客户端
+    bool m_ipc_client_mode{false};
+#endif
+    KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池
 };
 
 inline size_t StockManager::size() const noexcept {
