@@ -319,19 +319,19 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     :rtype: TimeDelta
 
 
-.. py:function:: Minutes(minutes)
+.. py:function:: Minutes(mins)
 
     以分钟数创建 TimeDelta
 
-    :param int minutes: 分钟数
+    :param int mins: 分钟数
     :rtype: TimeDelta
 
 
-.. py:function:: Seconds(seconds)
+.. py:function:: Seconds(secs)
 
     以秒数创建 TimeDelta
 
-    :param int seconds: 秒数
+    :param int secs: 秒数
     :rtype: TimeDelta
 
 
@@ -343,11 +343,11 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     :rtype: TimeDelta
 
 
-.. py:function:: Microseconds(microseconds)
+.. py:function:: Microseconds(microsecs)
 
     以微秒数创建 TimeDelta
 
-    :param int microseconds: 微秒数
+    :param int microsecs: 微秒数
     :rtype: TimeDelta
 
 

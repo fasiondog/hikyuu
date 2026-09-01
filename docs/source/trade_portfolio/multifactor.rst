@@ -173,11 +173,11 @@
 
         获取参考证券
 
-    .. py:method:: set_ref_stock(self, ref_stk)
+    .. py:method:: set_ref_stock(self, stk)
 
         重新设置参考证券
 
-        :param Stock ref_stk: 新指定的参考证券
+        :param Stock stk: 新指定的参考证券
 
     .. py:method:: get_stock_list(self)
 

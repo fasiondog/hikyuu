@@ -326,7 +326,7 @@ void export_MultiFactor(py::module& m) {
     :param Datetime date: 指定日期
     :param int start: 取当日排名开始
     :param int end: 取当日排名结束(不包含本身)
-    :param function func: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
+    :param function filter: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
     :rtype: ScoreRecordList)")
 
       .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,

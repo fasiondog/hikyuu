@@ -154,6 +154,12 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
           return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
       });
 
+    // 推荐用 MultiFactorSelector2 全部使用filter，这里仅兼容旧版接口
+    // 应用用户自定义的评分过滤器（支持 set_scores_filter / add_scores_filter）
+    if (m_sc_filter) {
+        scores = m_sc_filter->filter(scores, date, m_query);
+    }
+
     int param_topn = getParam<int>("topn");
     size_t topn = param_topn > 0 ? static_cast<size_t>(param_topn) : scores.size();
     if (topn > scores.size()) {

@@ -26,6 +26,7 @@ import Stoploss
 import ProfitGoal
 import Slippage
 import AllocateFunds
+import test_common_sql
 
 if __name__ == "__main__":
 
@@ -58,6 +59,7 @@ if __name__ == "__main__":
     suite.addTest(Slippage.suiteTestCrtSL())
 
     suite.addTest(AllocateFunds.suite())
+    suite.addTest(test_common_sql.suite())
 
     unittest.TextTestRunner(verbosity=2).run(suite)
     # unittest.main()

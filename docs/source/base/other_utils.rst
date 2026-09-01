@@ -68,21 +68,21 @@
     :param str filename: 待载入的序列化文件。
     :return: 之前被序列化保存的文件
     
-.. py:function:: roundUp(arg1[, arg2=0])
+.. py:function:: roundUp(number[, ndigits=0])
 
     向上截取，如10.1截取后为11
     
-    :param float arg1: 待处理数据
-    :param int arg2: 保留小数位数
+    :param float number: 待处理数据
+    :param int ndigits: 保留小数位数
     :return: 处理过的数据
 
 
-.. py:function:: roundDown(arg1[, arg2=0])
+.. py:function:: roundDown(number[, ndigits=0])
 
     向下截取，如10.1截取后为10
     
-    :param float arg1: 待处理数据
-    :param int arg2: 保留小数位数
+    :param float number: 待处理数据
+    :param int ndigits: 保留小数位数
     :return: 处理过的数据
     
     

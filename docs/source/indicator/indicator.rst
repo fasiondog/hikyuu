@@ -1877,15 +1877,13 @@
     :rtype: Indicator
 
 
-.. py:function:: RSI(kdata=None, N1=6, N2=12, N3=24)
+.. py:function:: RSI([data, n=14])
 
     相对强弱指标
 
-    :param KData kdata: 关联的K线数据
-    :param int N1: 参数N1
-    :param int N2: 参数N1
-    :param int N3: 参数N1
-    :return: rsi1, rsi2, rsi3
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
+    :rtype: Indicator
     
 
 .. py:function:: SAFTYLOSS([data, n1=10, n2=3, p=2.0])

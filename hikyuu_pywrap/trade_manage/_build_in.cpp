@@ -31,27 +31,27 @@ void export_build_in(py::module& m) {
       "TC_FixedA", TC_FixedA, py::arg("commission") = 0.0018, py::arg("lowest_commission") = 5.0,
       py::arg("stamptax") = 0.001, py::arg("transferfee") = 0.001,
       py::arg("lowest_transferfee") = 1.0,
-      R"(TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
+      R"(TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.001, lowest_transferfee=1.0])
 
     2015年8月1日之前的A股交易成本算法
 
     :param float commission: 佣金比例
-    :param float lowestCommission: 最低佣金值
+    :param float lowest_commission: 最低佣金值
     :param float stamptax: 印花税
     :param float transferfee: 过户费
-    :param float lowestTransferfee: 最低过户费
+    :param float lowest_transferfee: 最低过户费
     :return: :py:class:`TradeCostBase` 子类实例)");
 
     m.def(
       "TC_FixedA2015", TC_FixedA2015, py::arg("commission") = 0.0018,
       py::arg("lowest_commission") = 5.0, py::arg("stamptax") = 0.001,
       py::arg("transferfee") = 0.00002,
-      R"(TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+      R"(TC_FixedA2015([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.00002])
 
     2015年8月1日上证过户费改为成交金额的千分之0.02
 
     :param float commission: 佣金比例
-    :param float lowestCommission: 最低佣金值
+    :param float lowest_commission: 最低佣金值
     :param float stamptax: 印花税
     :param float transferfee: 过户费
     :return: :py:class:`TradeCostBase` 子类实例)");
@@ -60,24 +60,24 @@ void export_build_in(py::module& m) {
       "TC_FixedA2017", TC_FixedA2017, py::arg("commission") = 0.0018,
       py::arg("lowest_commission") = 5.0, py::arg("stamptax") = 0.001,
       py::arg("transferfee") = 0.00002,
-      R"(TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+      R"(TC_FixedA2017([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.00002])
 
     2017年1月1日起将对深市过户费项目单独列示，标准为成交金额0.02‰双向收取。
 
     :param float commission: 佣金比例
-    :param float lowestCommission: 最低佣金值
+    :param float lowest_commission: 最低佣金值
     :param float stamptax: 印花税
     :param float transferfee: 过户费
     :return: :py:class:`TradeCostBase` 子类实例)");
 
     m.def("TC_FixedETF", TC_FixedETF, py::arg("commission") = 0.0001,
           py::arg("lowest_commission") = 5.0,
-          R"(TC_FixedETF([commission=0.0001, lowestCommission=5.0])
+          R"(TC_FixedETF([commission=0.0001, lowest_commission=5.0])
 
     ETF交易成本算法，买卖双向收取佣金，无印花税和过户费。
 
     :param float commission: 佣金比例，默认万分之1
-    :param float lowestCommission: 最低佣金值，默认5元/笔
+    :param float lowest_commission: 最低佣金值，默认5元/笔
     :return: :py:class:`TradeCostBase` 子类实例)");
 
     m.def("TC_Zero", TC_Zero, "零交易成本算法");

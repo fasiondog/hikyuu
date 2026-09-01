@@ -394,11 +394,11 @@ def update_extern_data(connect, market, code, data_type):
 
             base_record_list = []
             start_ix = x
-            ix_date = current_date
-            while start_ix < length_base_all and \
-                    ix_date >= last_start_date and ix_date <= last_end_date:
+            while start_ix < length_base_all:
+                ix_date = Datetime.from_timestamp_utc(base_list[start_ix][0] * 1000000).ymdhm
+                if ix_date < last_start_date or ix_date > last_end_date:
+                    break
                 base_record_list.append(base_list[start_ix])
-                ix_date = Datetime.from_timestamp_utc(base_list[start_ix][0]*1000000).ymdhm
                 start_ix += 1
 
             if not base_record_list:

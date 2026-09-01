@@ -49,6 +49,73 @@
 
 ---
 
+## ⚡ 快速开始（跑通第一个回测）
+
+### 环境要求
+
+- **>= Python 3.10**（3.9 及以下自 2.8.0 起不再支持 pip 安装）
+- 支持 Windows / Linux / macOS （Linux为Ubuntu24.04+）
+- 主要依赖会自动安装：`numpy>=2.0`、`pandas>=2.3.0`、`matplotlib>=3.5.0`、`PySide6>=6.8.0`、`tables>=3.9.0` 等
+
+### 第 1 步：安装
+
+```bash
+pip install hikyuu
+```
+
+国内用户若下载缓慢，可换用镜像源：
+
+```bash
+pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+### 第 2 步：导入行情数据
+
+任选一种方式导入历史行情数据：
+
+```bash
+# 图形界面（推荐首次使用，会自动生成配置文件）
+HikyuuTDX
+
+# 命令行（需先运行过一次 HikyuuTDX 生成配置）
+importdata
+```
+
+### 第 3 步：跑通第一个回测
+
+```python
+from hikyuu.interactive import *
+
+# 创建模拟交易账户进行回测，初始资金 30 万
+my_tm = crtTM(init_cash=300000)
+
+# 创建信号指示器（以 5 日 EMA 为快线，其 10 日 EMA 为慢线）
+# 快线向上穿越慢线时买入，反之卖出
+my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
+
+# 固定每次买入 1000 股
+my_mm = MM_FixedCount(1000)
+
+# 创建交易系统并运行
+sys = SYS_Simple(tm=my_tm, sg=my_sg, mm=my_mm)
+sys.run(sm['sz000001'], Query(-150))
+```
+
+> 📖 完整示例参见 [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+
+### ❓ 上手常见问题
+
+| 现象                                              | 解决办法                                                                     |
+| :------------------------------------------------ | :--------------------------------------------------------------------------- |
+| Windows 下`pip install` 卡在下载 PyQt / PySide6 | 换清华源：`pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple` |
+| `HikyuuTDX` 图形界面无法导入数据                | 改用命令行`importdata`（需先运行过一次 GUI 以生成配置文件）                |
+| 提示缺少 hdf5 / dll 相关错误                      | 执行`pip install tables` 重新安装 HDF5 支持                                |
+| **从源码构建**时的构建工具                  | 本项目使用**xmake**，不是 cmake                                        |
+
+> 💡 更多问题请查 [帮助文档](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)，或在 [Gitee 提交 issue](https://gitee.com/fasiondog/hikyuu/issues)。
+
+---
+
 ## 🚀 为什么选择 Hikyuu？
 
 > 强大的功能特性，助力您的量化交易研究
@@ -95,6 +162,8 @@
 几行代码即可创建一个完整的量化策略回测系统。Hikyuu 提供直观的 API，让策略开发更高效。
 
 ```python
+from hikyuu.interactive import *
+
 # 创建模拟交易账户进行回测，初始资金30万
 my_tm = crtTM(init_cash=300000)
 
@@ -157,32 +226,26 @@ sys.run(sm['sz000001'], Query(-150))
 
 ## ❤️ 感谢捐赠，让 Hikyuu 走得更远
 
-> 因作者精力有限，对捐赠用户的问题会优先解答、确保响应；非捐赠用户的咨询会在时间允许的情况下尽力回复 😁
-
 <p align="center">
   <img src="docs/source/_static/dingyue.png" alt="订阅二维码" width="600">
 </p>
 
-| 方案                       | 说明                                                                 | 方式               | 链接                                       |
-| :------------------------- | :------------------------------------------------------------------- | :----------------- | :----------------------------------------- |
-| ☕**请作者喝杯咖啡** | ¥30 · 一次性的小小支持                                             | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/gflv3v) |
-| 📅**订阅 180 天**    | ¥50 · 半年期订阅权益                                               | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/du4h8s) |
-| 🗓️**订阅 365 天**  | ¥100 · 全年期订阅权益                                              | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/ehbz9b) |
-| 🌌**加入知识星球**   | ¥300/年 · 首年300元，续费半价3台设备登录 · 专属微信群及策略部件库 | 微信 / 知识星球APP | [前往加入](https://t.zsxq.com/YSATD)        |
+| 方案                       | 说明                                                                                            | 方式               | 链接                                       |
+| :------------------------- | :---------------------------------------------------------------------------------------------- | :----------------- | :----------------------------------------- |
+| ☕**请作者喝杯咖啡** | ¥30 · 一次性的小小支持(赠历史日线)                                                            | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/gflv3v) |
+| 📅**订阅 180 天**    | ¥50 · 半年期订阅权益(赠历史日线)                                                              | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/du4h8s) |
+| 🗓️**订阅 365 天**  | ¥100 · 全年期订阅权益(赠历史日/分/时/笔数据)                                                  | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/ehbz9b) |
+| 🌌**加入知识星球**   | ¥300/年 · 首年300元，续费半价。3台设备登录 · 专属微信群及策略部件库，(赠历史日/分/时/笔数据) | 微信 / 知识星球APP | [前往加入](https://t.zsxq.com/YSATD)        |
 
-> 🎁 **捐赠计划与附赠参见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
+> 🎁 **捐赠计划与附赠详见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
 
----
-
-## 💬 加入我们
-
-> 交流渠道以微信群为主、QQ 群为辅。**加入任一社群请备注「加入 hikyuu」，未备注将无法通过验证哦～**
+捐赠用户支持群（仅接受捐赠用户，入群请注明： Hikyuu 订阅）
 
 <p align="center">
-  <img src="docs/source/_static/qun.png" alt="交流群" width="500">
+  <img src="docs/source/_static/support.jpg" alt="捐赠用户支持" width="150">
 </p>
 
-### 🌟 需要的帮助
+## 🌟 需要的帮助
 
 欢迎社区成员一起参与贡献：
 
@@ -191,7 +254,7 @@ sys.run(sm['sz000001'], Query(-150))
 - 🔧 开发新功能
 - 🎨 网站优化
 
-> 💡 **建议通过在码云上开 issue 方式来贡献以上内容**
+> 💡 **建议通过在Github/Gitee/Gitcode开 issue 方式来贡献以上内容**
 
 ---
 

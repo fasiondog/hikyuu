@@ -118,7 +118,8 @@ void IndicatorImpBuffer::Buffer::reallocate(IndicatorImpBuffer::size_type new_ca
 
     value_type* new_data;
 #if HKU_ENABLE_MIMALLOC
-    new_data = static_cast<value_type*>(mi_realloc(data, new_capacity * sizeof(value_type)));
+    new_data = static_cast<value_type*>(
+      mi_realloc_aligned(data, new_capacity * sizeof(value_type), HKU_IND_ALIGN_SIZE));
 #else
     new_data = static_cast<value_type*>(std::realloc(data, new_capacity * sizeof(value_type)));
 #endif

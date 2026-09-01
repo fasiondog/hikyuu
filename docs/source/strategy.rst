@@ -266,18 +266,18 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     :rtype: TradeManagerPtr
 
 
-.. py:function:: run_in_strategy(sys, stock, query, broker, costfunc, other_brokers=[])
+.. py:function:: run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])
           
     方式1：在策略运行时执行系统交易 SYS
 
-    run_in_strategy(sys, stock, query, broker, costfunc, other_brokers=[])   
+    run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])   
     目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
      
     :param sys: 交易系统
     :param stock: 交易对象
     :param query: 查询条件
     :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param costfunc: 成本函数
+    :param cost_func: 成本函数
     :param list other_brokers: 其他的订单代理，默认为空列表
 
     方式2: 在策略运行时执行组合策略 PF
@@ -287,7 +287,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     :param Portfolio pf: 资产组合
     :param Query query: 查询条件
     :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param costfunc: 成本函数
+    :param cost_func: 成本函数
     :param list other_brokers: 其他的订单代理，默认为空列表
 
 

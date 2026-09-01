@@ -138,7 +138,7 @@ void export_Indicator(py::module& m) {
 
       .def("get_by_datetime", &Indicator::getByDate, py::arg("datetime"),
            py::arg("result_index") = 0,
-           R"(get_by_datetime(self, date[, result_index=0])
+           R"(get_by_datetime(self, datetime[, result_index=0])
 
     获取指定日期数值。如果对应日期无结果，返回 constant.null_price
 
@@ -168,11 +168,11 @@ void export_Indicator(py::module& m) {
     :rtype: DatetimeList)")
 
       .def("exist_nan", &Indicator::existNan, py::arg("result_idx=0"),
-           R"(exist_nan(self, result_index)
+           R"(exist_nan(self, result_idx)
 
     判断是否存在NaN值
 
-    :param int result_index: 指定的结果集
+    :param int result_idx: 指定的结果集
     :rtype: bool)")
 
       .def("set_context", setContext_1)

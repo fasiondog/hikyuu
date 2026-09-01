@@ -97,11 +97,11 @@ void export_TradeCost(py::module& m) {
 
       .def("get_buy_cost", &TradeCostBase::getBuyCost, py::arg("date"), py::arg("stock"),
            py::arg("price"), py::arg("num"),
-           R"(get_buy_cost(self, datetime, stock, price, num)
+           R"(get_buy_cost(self, date, stock, price, num)
     
         【重载接口】获取买入成本
         
-        :param Datetime datetime: 买入时刻
+        :param Datetime date: 买入时刻
         :param Stock stock: 买入对象
         :param float price: 买入价格
         :param int num: 买入数量
@@ -110,11 +110,11 @@ void export_TradeCost(py::module& m) {
 
       .def("get_sell_cost", &TradeCostBase::getSellCost, py::arg("date"), py::arg("stock"),
            py::arg("price"), py::arg("num"),
-           R"(get_sell_cost(self, datetime, stock, price, num)
+           R"(get_sell_cost(self, date, stock, price, num)
     
         【重载接口】获取卖出成本
         
-        :param Datetime datetime: 卖出时刻
+        :param Datetime date: 卖出时刻
         :param Stock stock: 卖出对象
         :param float price: 卖出价格
         :param int num: 卖出数量

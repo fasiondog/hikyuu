@@ -277,20 +277,20 @@ void export_Strategy(py::module& m) {
 
       .def("order", py::overload_cast<const Stock&, double, const string&>(&Strategy::order),
            py::arg("stock"), py::arg("num"), py::arg("remark") = "",
-           R"(order(self, stk, num, remark='')
+           R"(order(self, stock, num, remark='')
 
     按数量下单（正数为买入，负数为卖出）
-    :param Stock stk: 指定的证券
+    :param Stock stock: 指定的证券
     :param int num: 下单数量
     :param str remark: 下单备注)")
 
       .def("order_value",
            py::overload_cast<const Stock&, price_t, const string&>(&Strategy::orderValue),
            py::arg("stock"), py::arg("value"), py::arg("remark") = "",
-           R"(order_value(self, stk, value, remark='')
+           R"(order_value(self, stock, value, remark='')
 
     按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
-    :param Stock stk: 指定的证券
+    :param Stock stock: 指定的证券
     :param float value: 投入买入资金
     :param str remark: 下单备注)")
 
@@ -317,16 +317,16 @@ void export_Strategy(py::module& m) {
                             const TradeCostPtr&, const std::vector<OrderBrokerPtr>&>(runInStrategy),
           py::arg("sys"), py::arg("stock"), py::arg("query"), py::arg("broker"),
           py::arg("cost_func"), py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
-          R"(run_in_strategy(sys, stk, query, broker, costfunc, [other_brokers=[]])
+          R"(run_in_strategy(sys, stock, query, broker, cost_func, [other_brokers=[]])
           
     在策略运行时中执行系统交易 SYS
     目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
  
     :param sys: 交易系统
-    :param stk: 交易对象
+    :param stock: 交易对象
     :param query: 查询条件
     :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param costfunc: 成本函数
+    :param cost_func: 成本函数
     :param other_brokers: 其他的订单代理)");
 
     m.def("run_in_strategy",
@@ -334,7 +334,7 @@ void export_Strategy(py::module& m) {
                             const std::vector<OrderBrokerPtr>&>(runInStrategy),
           py::arg("pf"), py::arg("query"), py::arg("broker"), py::arg("cost_func"),
           py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
-          R"(run_in_strategy(pf, query, adjust_cycle, broker, costfunc, [other_brokers=[]])
+          R"(run_in_strategy(pf, query, broker, cost_func, [other_brokers=[]])
           
     在策略运行时中执行组合策略 PF
     目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
@@ -342,7 +342,7 @@ void export_Strategy(py::module& m) {
     :param Portfolio pf: 资产组合
     :param Query query: 查询条件
     :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param costfunc: 成本函数
+    :param cost_func: 成本函数
     :param other_brokers: 其他的订单代理)");
 
     m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),

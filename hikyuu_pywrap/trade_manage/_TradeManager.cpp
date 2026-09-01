@@ -451,7 +451,7 @@ void export_TradeManager(py::module& m) {
            py::arg("ktype") = KQuery::DAY, R"(get_funds_list(self, dates[, ktype = Query.DAY])
     
     获取指定日期列表的每日资产记录
-    :param Datetime datetime:  指定时刻
+    :param DatetimeList dates:  指定时刻
     :param Query.KType ktype: K线类型
     :rtype: FundsList)")
 
@@ -597,7 +597,7 @@ void export_TradeManager(py::module& m) {
       从Broker同步当前时刻的资产信息，必须按时间顺序被调用
 
       :param broker 订单代理实例
-      :param datetime 同步时，通常为当前时间（Null)，也可以强制为指定的时间点)")
+      :param date 同步时，通常为当前时间（Null)，也可以强制为指定的时间点)")
 
       .def("get_performance", &TradeManagerBase::getPerformance,
            py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
