@@ -31,6 +31,7 @@ enum SystemPart {
     PART_PORTFOLIO = 9,     /**< 资产组合 */
 
     PART_INVALID = 10, /**< 无效值 */
+    PART_SYSTEM = 11,  /**< 聚合子系统（递归组合重构新增） */
 };
 
 /**

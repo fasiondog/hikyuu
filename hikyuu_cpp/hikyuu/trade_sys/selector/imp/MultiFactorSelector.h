@@ -21,7 +21,7 @@ public:
     virtual void _reset() override;
     virtual SelectorPtr _clone() override;
     virtual SystemWeightList _getSelected(Datetime date) override;
-    virtual bool isMatchAF(const AFPtr& af) override;
+
     virtual void _calculate() override;
 
     void setFactorSet(const FactorSet& factorset) {

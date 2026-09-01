@@ -73,9 +73,7 @@ SelectorPtr MultiFactorSelector2::_clone() {
     return p;
 }
 
-bool MultiFactorSelector2::isMatchAF(const AFPtr& af) {
-    return true;
-}
+
 
 SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
     ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);

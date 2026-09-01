@@ -2,7 +2,7 @@
 
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
-    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase, AllocateFundsBase,
+    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase,
     MultiFactorBase, ScoresFilterBase, NormalizeBase
 )
 
@@ -162,7 +162,7 @@ def crtSG(func, params={}, name='crtSG'):
 # ------------------------------------------------------------------
 # Selector
 # ------------------------------------------------------------------
-def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE'):
+def crtSE(calculate, get_selected, params={}, name='crtSE'):
     """
     快速创建交易对象选择算法
 
@@ -176,29 +176,12 @@ def crtSE(calculate, get_selected, is_match_af=None, params={}, name='crtSE'):
     meta_x = type(name, (SelectorBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = calculate
     meta_x.get_selected = get_selected
-    meta_x.is_match_af = (lambda self, af: True) if is_match_af is None else is_match_af
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret
 
 
-# ------------------------------------------------------------------
-# allocatefunds
-# ------------------------------------------------------------------
-def crtAF(allocate_weight_func, params={}, name='crtAF'):
-    """
-    快速创建资产分配算法
 
-    :param allocate_weight_func: 资产分配算法
-    :param {} params: 参数字典
-    :param str name: 自定义名称
-    :return: 自定义资产分配算法实例
-    """
-    meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x._allocate_weight = allocate_weight_func
-    ret = meta_x(name, params)
-    globals().update(dict(_=ret))
-    return ret
 
 
 # ------------------------------------------------------------------

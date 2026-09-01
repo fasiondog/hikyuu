@@ -53,9 +53,7 @@ public:
         return c_ret;
     }
 
-    bool isMatchAF(const AFPtr& af) override {
-        PYBIND11_OVERLOAD_PURE_NAME(bool, SelectorBase, "is_match_af", isMatchAF, af);
-    }
+
 
     string str() const override {
         PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
@@ -293,11 +291,7 @@ void export_Selector(py::module& m) {
       .def("_reset", &SelectorBase::_reset, "子类复位操作实现")
       .def("_calculate", &SelectorBase::_calculate, "【重载接口】子类计算接口")
 
-      .def("is_match_af", &SelectorBase::isMatchAF, R"(is_match_af(self)
 
-    【重载接口】判断是否和 AF 匹配
-
-    :param AllocateFundsBase af: 资产分配算法)")
 
       .def("get_selected", &SelectorBase::getSelected,
            R"(get_selected(self, datetime)

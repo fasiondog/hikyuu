@@ -6,6 +6,10 @@
  */
 
 #include <hikyuu/trade_sys/system/build_in.h>
+#include <hikyuu/trade_sys/system/MomentResult.h>
+#include <hikyuu/trade_sys/system/TradeSuggestion.h>
+#include <hikyuu/trade_sys/system/SubSystemContext.h>
+#include <hikyuu/trade_sys/system/imp/MultiSystem.h>
 #include "../pybind_utils.h"
 #include "_System.h"
 
@@ -24,16 +28,16 @@ void PySystem::run(const KData& kdata, bool reset, bool resetAll) {
     PYBIND11_OVERLOAD(void, System, run, kdata, reset, resetAll);
 }
 
-TradeRecordList PySystem::runMoment(const Datetime& datetime) {
-    PYBIND11_OVERLOAD(TradeRecordList, System, runMoment, datetime);
+MomentResult PySystem::runMoment(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(MomentResult, System, runMoment, datetime);
 }
 
-TradeRecordList PySystem::runMomentOnOpen(const Datetime& datetime) {
-    PYBIND11_OVERLOAD(TradeRecordList, System, runMomentOnOpen, datetime);
+MomentResult PySystem::runMomentOnOpen(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(MomentResult, System, runMomentOnOpen, datetime);
 }
 
-TradeRecordList PySystem::runMomentOnClose(const Datetime& datetime) {
-    PYBIND11_OVERLOAD(TradeRecordList, System, runMomentOnClose, datetime);
+MomentResult PySystem::runMomentOnClose(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(MomentResult, System, runMomentOnClose, datetime);
 }
 
 void PySystem::readyForRun() {
@@ -115,6 +119,105 @@ void PySystem::set_tm(py::object tm) {
     tmp_tm.release();
 }
 
+PyMultiSystem::PyMultiSystem(const MultiSystem& base) : MultiSystem(base) {}
+
+PyMultiSystem::~PyMultiSystem() {}
+
+void PyMultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
+    PYBIND11_OVERLOAD(void, MultiSystem, run, kdata, reset, resetAll);
+}
+
+MomentResult PyMultiSystem::runMoment(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(MomentResult, MultiSystem, runMoment, datetime);
+}
+
+MomentResult PyMultiSystem::runMomentOnOpen(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(MomentResult, MultiSystem, runMomentOnOpen, datetime);
+}
+
+MomentResult PyMultiSystem::runMomentOnClose(const Datetime& datetime) {
+    PYBIND11_OVERLOAD(MomentResult, MultiSystem, runMomentOnClose, datetime);
+}
+
+void PyMultiSystem::readyForRun() {
+    PYBIND11_OVERLOAD(void, MultiSystem, readyForRun);
+}
+
+void PyMultiSystem::_reset() {
+    PYBIND11_OVERLOAD(void, MultiSystem, _reset);
+}
+
+void PyMultiSystem::_forceResetAll() {
+    PYBIND11_OVERLOAD(void, MultiSystem, _forceResetAll);
+}
+
+string PyMultiSystem::str() const {
+    PYBIND11_OVERLOAD(string, MultiSystem, str);
+}
+
+void PyMultiSystem::set_mm(py::object mm) {
+    py::gil_scoped_acquire gil;
+    auto tmp_mm = mm;
+    setMM(mm.cast<MMPtr>());
+    tmp_mm.release();
+}
+
+void PyMultiSystem::set_ev(py::object ev) {
+    py::gil_scoped_acquire gil;
+    auto tmp_ev = ev;
+    setEV(ev.cast<EnvironmentPtr>());
+    tmp_ev.release();
+}
+
+void PyMultiSystem::set_cn(py::object cn) {
+    py::gil_scoped_acquire gil;
+    auto tmp_cn = cn;
+    setCN(cn.cast<CNPtr>());
+    tmp_cn.release();
+}
+
+void PyMultiSystem::set_sg(py::object sg) {
+    py::gil_scoped_acquire gil;
+    auto tmp_sg = sg;
+    setSG(sg.cast<SGPtr>());
+    tmp_sg.release();
+}
+
+void PyMultiSystem::set_st(py::object st) {
+    py::gil_scoped_acquire gil;
+    auto tmp_st = st;
+    setST(st.cast<StoplossPtr>());
+    tmp_st.release();
+}
+
+void PyMultiSystem::set_tp(py::object tp) {
+    py::gil_scoped_acquire gil;
+    auto tmp_tp = tp;
+    setTP(tp.cast<StoplossPtr>());
+    tmp_tp.release();
+}
+
+void PyMultiSystem::set_pg(py::object pg) {
+    py::gil_scoped_acquire gil;
+    auto tmp_pg = pg;
+    setPG(pg.cast<PGPtr>());
+    tmp_pg.release();
+}
+
+void PyMultiSystem::set_sp(py::object sp) {
+    py::gil_scoped_acquire gil;
+    auto tmp_sp = sp;
+    setSP(sp.cast<SlippagePtr>());
+    tmp_sp.release();
+}
+
+void PyMultiSystem::set_tm(py::object tm) {
+    py::gil_scoped_acquire gil;
+    auto tmp_tm = tm;
+    setTM(tm.cast<TradeManagerPtr>());
+    tmp_tm.release();
+}
+
 void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
 
@@ -139,6 +242,56 @@ void export_System(py::module& m) {
 
     :param str part_name: 系统部件的字符串名称，参见：:py:func:`getSystemPartName`
     :rtype: System.Part)");
+
+    //--------------------------------------------------------------------------------------
+    // 递归组合重构：可扩展信息模型（MomentResult / TradeSuggestion / SubSystemContext）
+    py::enum_<SuggestionType>(m, "SuggestionType", "建议类型")
+      .value("HOLD", SuggestionType::HOLD)
+      .value("BUY", SuggestionType::BUY)
+      .value("SELL", SuggestionType::SELL)
+      .value("CLEAR", SuggestionType::CLEAR);
+
+    py::class_<TradeSuggestion>(m, "TradeSuggestion", "完整语义表达的建议指令（不做归一化）")
+      .def(py::init<>())
+      .def_readwrite("stock", &TradeSuggestion::stock)
+      .def_readwrite("sys", &TradeSuggestion::sys)
+      .def_readwrite("type", &TradeSuggestion::type)
+      .def_readwrite("number", &TradeSuggestion::number)
+      .def_readwrite("plan_price", &TradeSuggestion::plan_price)
+      .def_readwrite("plan_cash", &TradeSuggestion::plan_cash)
+      .def_readwrite("cash_ratio", &TradeSuggestion::cash_ratio)
+      .def_readwrite("assets_ratio", &TradeSuggestion::assets_ratio)
+      .def_readwrite("target_position_ratio", &TradeSuggestion::target_position_ratio)
+      .def_readwrite("stoploss", &TradeSuggestion::stoploss)
+      .def_readwrite("goalPrice", &TradeSuggestion::goalPrice)
+      .def_readwrite("from", &TradeSuggestion::from)
+      .def_readwrite("urgency", &TradeSuggestion::urgency)
+      .def_readwrite("score", &TradeSuggestion::score)
+      .def_readwrite("remark", &TradeSuggestion::remark);
+
+    py::class_<MomentResult>(m, "MomentResult", "某一时刻系统实例的完整运行结果（建议）")
+      .def(py::init<>())
+      .def_readwrite("datetime", &MomentResult::datetime)
+      .def_readwrite("funds_before_open", &MomentResult::funds_before_open)
+      .def_readwrite("funds_before_close", &MomentResult::funds_before_close)
+      .def_readwrite("funds", &MomentResult::funds)
+      .def_readwrite("positions", &MomentResult::positions)
+      .def_readwrite("tradesOnOpen", &MomentResult::tradesOnOpen)
+      .def_readwrite("tradesOnClose", &MomentResult::tradesOnClose)
+      .def_readwrite("delayOnNextOpen", &MomentResult::delayOnNextOpen)
+      .def_readwrite("suggestions", &MomentResult::suggestions)
+      .def("allTrades", &MomentResult::allTrades)
+      .def("empty", &MomentResult::empty);
+
+    py::class_<SubSystemContext>(m, "SubSystemContext", "MM L1 上下文（含模式 B 额度）")
+      .def(py::init<>())
+      .def_readwrite("sys", &SubSystemContext::sys)
+      .def_readwrite("funds", &SubSystemContext::funds)
+      .def_readwrite("profit_curve", &SubSystemContext::profit_curve)
+      .def_readwrite("total_return", &SubSystemContext::total_return)
+      .def_readwrite("current_weight", &SubSystemContext::current_weight)
+      .def_readwrite("quota", &SubSystemContext::quota)
+      .def_readwrite("suggestion_count", &SubSystemContext::suggestion_count);
 
     //--------------------------------------------------------------------------------------
     py::class_<TradeRequest>(
@@ -326,6 +479,60 @@ void export_System(py::module& m) {
         "回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求")
 
         DEF_PICKLE(System);
+
+    //--------------------------------------------------------------------------------------
+    // 递归组合重构：聚合交易系统（组合回测）
+    py::class_<MultiSystem, System, std::shared_ptr<MultiSystem>>(m, "MultiSystem", py::dynamic_attr(),
+      R"(聚合交易系统（组合回测）。持有多个子系统（单证券或嵌套聚合），在开盘/收盘阶段分别驱动并汇总下单。
+阶段 2（聚合最小）：所有子系统共享聚合系统的交易账户，组合回测跑通。)")
+      .def(py::init<>())
+      .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
+      .def(py::init<const SystemList&, const string&>(), py::arg("sys_list"),
+           py::arg("name") = "MultiSystem")
+      .def("add", &MultiSystem::add, py::arg("sys"), "添加子系统（含循环引用检测）")
+      .def("get_system_list", &MultiSystem::getSystemList, "获取子系统列表")
+      .def("run", py::overload_cast<const KData&, bool, bool>(&MultiSystem::run), py::arg("kdata"),
+           py::arg("reset") = true, py::arg("reset_all") = false,
+           R"(run(self, kdata, reset=True, reset_all=False)
+
+    组合回测入口。kdata 作为对齐时间轴，遍历每个交易日分别驱动所有子系统（开盘/收盘）并汇总下单。
+    所有子系统共享聚合系统的交易账户。
+
+    :param KData kdata: 对齐的时间轴（应覆盖各子系统的交易日）)")
+      .def("runMoment", &MultiSystem::runMoment, py::arg("datetime"),
+           R"(runMoment(self, datetime)
+
+    在指定时刻执行一步，分别驱动所有子系统（开盘/收盘），并汇总交易与建议。
+
+    :param Datetime datetime: 指定的日期
+    :rtype: MomentResult)")
+      .def("runMomentOnOpen", &MultiSystem::runMomentOnOpen, py::arg("datetime"))
+      .def("runMomentOnClose", &MultiSystem::runMomentOnClose, py::arg("datetime"))
+      .def("ready_for_run", &MultiSystem::readyForRun)
+      .def("set_mode", &MultiSystem::setMode, py::arg("mode"), "设置运行模式：A（信号汇总）/ B（资金划拨）")
+      .def_property_readonly("mode", &MultiSystem::getMode, "当前运行模式（A/B）")
+      .def("set_sub_init_cash", &MultiSystem::setSubInitCash, py::arg("cash"),
+           "设置子系统影子账户初始资金（模式 A 固定值 / 模式 B 初始额度）")
+      .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
+           "设置调仓周期（天），<=1 表示每个收盘日都再平衡")
+      .def("set_trade_on_close", &MultiSystem::setTradeOnClose, py::arg("on_close"),
+           "设置是否在收盘阶段执行调仓下单")
+      .def("set_se", &MultiSystem::setSE, py::arg("se"), "设置交易对象选择器（可选，仅调仓日选股过滤）")
+      .def_property_readonly("se", &MultiSystem::getSE, "交易对象选择器")
+      .def("set_sell_at_not_selected", &MultiSystem::setSellAtNotSelected, py::arg("on"),
+           "设置未选中子系统是否强制清仓（需设置 SE）")
+      .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
+           "获取各调仓日的换手率（(日期, 成交金额/总资产) 列表）")
+      .def_property("tm", &MultiSystem::getTM, &MultiSystem::setTM, "关联的交易管理实例")
+      .def_property("mm", &MultiSystem::getMM, &MultiSystem::setMM, "资金管理策略")
+      .def_property("ev", &MultiSystem::getEV, &MultiSystem::setEV, "市场环境判断策略")
+      .def_property("cn", &MultiSystem::getCN, &MultiSystem::setCN, "系统有效条件")
+      .def_property("sg", &MultiSystem::getSG, &MultiSystem::setSG, "信号指示器")
+      .def_property("st", &MultiSystem::getST, &MultiSystem::setST, "止损策略")
+      .def_property("tp", &MultiSystem::getTP, &MultiSystem::setTP, "止盈策略")
+      .def_property("pg", &MultiSystem::getPG, &MultiSystem::setPG, "盈利目标策略")
+      .def_property("sp", &MultiSystem::getSP, &MultiSystem::setSP, "移滑价差算法")
+      .def("clone", &MultiSystem::clone);
 
     //--------------------------------------------------------------------------------------
     m.def(

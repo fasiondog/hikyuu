@@ -12,7 +12,7 @@
 #include "../system/System.h"
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
-#include "hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h"
+
 #include "hikyuu/trade_sys/multifactor/MultiFactorBase.h"
 #include "SystemWeight.h"
 
@@ -126,7 +126,7 @@ public:
     /** 子类获取指定时刻收盘时选中的标的 */
     virtual SystemWeightList _getSelected(Datetime date) = 0;
 
-    virtual bool isMatchAF(const AFPtr& af) = 0;
+
 
     /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
     virtual void _addSystem(const SYSPtr& sys) {}
@@ -257,7 +257,6 @@ public:                                                            \
         return std::make_shared<classname>();                      \
     }                                                              \
     virtual SystemWeightList _getSelected(Datetime date) override; \
-    virtual bool isMatchAF(const AFPtr& af) override;              \
     virtual void _calculate() override;
 
 /**

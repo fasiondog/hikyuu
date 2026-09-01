@@ -20,7 +20,7 @@ public:
 
     virtual void _reset() override;
     virtual SelectorPtr _clone() override;
-    virtual bool isMatchAF(const AFPtr& af) override;
+
     virtual void _calculate() override;
     virtual SystemWeightList _getSelected(Datetime date) override {
         return SystemWeightList();

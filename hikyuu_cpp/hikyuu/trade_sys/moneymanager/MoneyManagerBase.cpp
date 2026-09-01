@@ -29,6 +29,7 @@ MoneyManagerBase::MoneyManagerBase() : m_name("MoneyManagerBase") {
     setParam<int>("max-stock", 20000);
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
+    setParam<double>("max-single-position", 1.0);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
@@ -36,6 +37,7 @@ MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
     setParam<int>("max-stock", 20000);
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
+    setParam<double>("max-single-position", 1.0);
 }
 
 MoneyManagerBase::~MoneyManagerBase() {}
@@ -223,6 +225,108 @@ void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
         iter->second.second++;
     }
     _sellNotify(tr);
+}
+
+//============================================================================
+// 组合级资金分配（MM L1/L2/L3），供聚合 System（MultiSystem）调用
+//============================================================================
+
+void MoneyManagerBase::allocate(const Datetime& date, const TradeManagerPtr& tm,
+                                TradeSuggestionList& suggestions, SubSystemContextList& contexts,
+                                const KQuery& query) {
+    auto weights = _allocateSystemWeight(date, tm, contexts, query);
+    _allocateSuggestions(date, tm, suggestions, weights, query);
+    _checkRisk(date, tm, suggestions, query);
+}
+
+std::unordered_map<SYSPtr, double> MoneyManagerBase::_allocateSystemWeight(
+    const Datetime& date, const TradeManagerPtr& tm, SubSystemContextList& contexts,
+    const KQuery& query) {
+    std::unordered_map<SYSPtr, double> weights;
+    if (contexts.empty()) {
+        return weights;
+    }
+    double eq = 1.0 / contexts.size();
+    for (auto& ctx : contexts) {
+        weights[ctx.sys] = eq;
+        if (m_mode == "B" && tm) {
+            // 模式 B：L1 产出「真实额度」= 等权 × 父总资产，写入 contexts[i].quota，
+            // 由父在调仓日回写给子系统（供下期运行，额度滞后一期）。
+            ctx.quota = eq * tm->getFunds(date, query.kType()).total_assets();
+        }
+    }
+    return weights;
+}
+
+void MoneyManagerBase::_allocateSuggestions(const Datetime& date, const TradeManagerPtr& tm,
+                                            TradeSuggestionList& suggestions,
+                                            const std::unordered_map<SYSPtr, double>& sys_weight,
+                                            const KQuery& query) {
+    KQuery::KType ktype = query.kType();
+    if (m_mode == "B") {
+        // 模式 B：透传子系统真实指令（number 即子管理人的下单量），父不换算。
+        // 只对 SELL 建议做「不超父当前持仓」的防御性裁剪。
+        for (auto& s : suggestions) {
+            if (s.type == SuggestionType::SELL) {
+                double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+                if (s.number > current) {
+                    s.number = current;
+                }
+            }
+        }
+        return;
+    }
+
+    FundsRecord funds = tm->getFunds(date, ktype);
+    double total_assets = funds.total_assets();
+    for (auto& s : suggestions) {
+        if (s.plan_price <= 0.0) {
+            s.number = 0.0;
+            continue;
+        }
+        double weight = 1.0;
+        auto it = sys_weight.find(s.sys);
+        if (it != sys_weight.end()) {
+            weight = it->second;
+        }
+        double current = tm->getPosition(date, s.stock).number;
+        if (s.type == SuggestionType::BUY) {
+            // 模式 A（默认）：目标持仓市值 = 权重 × 父总资产，换算为目标股数，number 改写为（目标 - 当前）的净调仓量
+            double target_value = weight * total_assets;
+            double target_shares = target_value / s.plan_price;
+            s.number = target_shares - current;
+        } else {
+            // SELL / CLEAR：退出该标的（卖出当前全部持仓）
+            s.number = -current;
+        }
+    }
+}
+
+void MoneyManagerBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
+                                  TradeSuggestionList& suggestions, const KQuery& query) {
+    // L3 组合风控（模式 A 默认启用；模式 B 尊重子管理人自主权，仅做总量校验 = 不裁剪）。
+    if (m_mode == "B") {
+        return;
+    }
+    // 集中度上限：单标的目标持仓市值 ≤ 总资产 × max-single-position（<=0 或 >=1 表示不限制）。
+    double max_ratio = getParam<double>("max-single-position");
+    if (max_ratio <= 0.0 || max_ratio >= 1.0) {
+        return;
+    }
+    KQuery::KType ktype = query.kType();
+    double total_assets = tm ? tm->getFunds(date, ktype).total_assets() : 0.0;
+    double cap = total_assets * max_ratio;
+    for (auto& s : suggestions) {
+        if (s.type != SuggestionType::BUY || s.number <= 0.0 || s.plan_price <= 0.0) {
+            continue;
+        }
+        double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+        double target_value = (current + s.number) * s.plan_price;
+        if (target_value > cap) {
+            double max_shares = cap / s.plan_price;
+            s.number = max_shares > current ? max_shares - current : 0.0;
+        }
+    }
 }
 
 } /* namespace hku */

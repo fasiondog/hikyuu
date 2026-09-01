@@ -280,39 +280,79 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     :param cost_func: 成本函数
     :param list other_brokers: 其他的订单代理，默认为空列表
 
-    方式2: 在策略运行时执行组合策略 PF
-    
-    目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
 
-    :param Portfolio pf: 资产组合
-    :param Query query: 查询条件
-    :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param list other_brokers: 其他的订单代理，默认为空列表
+.. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, name="SYSStrategy", other_brokers=[], config="")
 
-
-.. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")
-
-    创建系统策略
+    创建系统策略（单证券实盘入口）
     
     :param sys: 交易系统
     :param str stk_market_code: 证券市场代码
     :param query: 查询条件
     :param broker: 订单代理
     :param cost_func: 成本函数
-    :param list other_brokers: 其他订单代理，默认为空列表
     :param str name: 策略名称，默认为"SYSStrategy"
-    :param str config: 配置文件路径，默认为空
-
-
-.. py:function:: crt_pf_strategy(pf, query, broker, cost_func, other_brokers=[], name="PFStrategy", config="")
-
-    创建组合策略
-    
-    :param pf: 资产组合
-    :param query: 查询条件
-    :param broker: 订单代理
-    :param cost_func: 成本函数
     :param list other_brokers: 其他订单代理，默认为空列表
-    :param str name: 策略名称，默认为"PFStrategy"
     :param str config: 配置文件路径，默认为空
+
+
+.. py:function:: crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, name="MultiSYSStrategy", other_brokers=[], config="")
+
+    创建聚合系统策略（MultiSystem 实盘入口）
+    
+    父账户使用与券商同步的 ``BrokerTM``，子系统使用各自的影子/虚拟账户（模式 A/B 由 MultiSystem 内部决定）。
+    目前仅支持 buy_delay|sell_delay 均为 false 的子系统，即 close 时执行交易。
+    
+    :param MultiSystem ms: 聚合交易系统
+    :param str stk_market_code: 驱动标的（如 "SH000001"，作为对齐时间轴，应覆盖各子系统交易日）
+    :param query: 查询条件
+    :param broker: 订单代理（与父账户资产同步的订单代理）
+    :param cost_func: 成本函数
+    :param str name: 策略名称，默认为"MultiSYSStrategy"
+    :param list other_brokers: 其他订单代理，默认为空列表
+    :param str config: 配置文件路径，默认为空
+
+
+组合策略迁移指南（PF → MultiSystem）
+--------------------------------------
+
+自 2.8.x 起，原组合回测组件 ``Portfolio`` / ``AllocateFunds`` 已移除，统一由 :class:`MultiSystem` 承接组合回测与实盘。
+
+**回测迁移**
+
+.. code-block:: python
+
+    # 旧写法（PF + AF，已移除）
+    # pf = crtPF(tm, mm, se, af, adjust_cycle=10)
+    # pf.run(query)
+
+    # 新写法（MultiSystem）
+    sys1 = SYS_Simple(tm=tm1, sg=sg1, mm=mm1)   # 各自独立 SG/MM
+    sys2 = SYS_Simple(tm=tm2, sg=sg2, mm=mm2)
+    ms = MultiSystem()          # 或 MultiSystem(name="Combo")
+    ms.tm = crtTM(init_cash=1000000)
+    ms.set_mode("A")            # 默认即可：A=信号汇总；B=资金划拨（FOF-MOM）
+    ms.set_adjust_cycle(10)     # 调仓周期（天），默认 1=每个收盘日再平衡
+    ms.add(sys1)
+    ms.add(sys2)
+    ms.run(sh000001.get_kdata(Query(-200)))   # 以覆盖各子系统交易日的时间轴驱动
+
+    # 模式 B：父按等权分配额度给子系统，子系统在额度内自主交易（L2 透传）
+    ms.set_mode("B")
+
+**实盘迁移**
+
+.. code-block:: python
+
+    # 旧写法（已移除）
+    # stg = crt_pf_strategy(pf, query, broker, cost_func)
+
+    # 新写法
+    stg = crt_multi_sys_strategy(ms, "SH000001", query, broker, cost_func)
+    stg.start()
+
+**说明**
+
+- 子系统必须各自持有独立的 SG/MM 实例（不同证券需各自计算信号，共享同一 SG 会被互相覆盖）。
+- 模式 A：父按权重（默认等权）统一分配并下单，子系统为纯信号源；模式 B：父分配真实额度，子系统自主决策。
+- SE（交易对象选择）可选：``ms.set_se(se)`` 后仅在调仓日运行选中子系统，未选中可强制清仓（``ms.set_sell_at_not_selected(True)``）。
+- 组合风控（集中度上限）由父 MM 参数 ``max-single-position`` 控制（默认 1.0 不限制）。

@@ -33,9 +33,7 @@ void OperatorValueSelector::_reset() {
     }
 }
 
-bool OperatorValueSelector::isMatchAF(const AFPtr& af) {
-    return true;
-}
+
 
 SelectorPtr OperatorValueSelector::_clone() {
     auto p = make_shared<OperatorValueSelector>();

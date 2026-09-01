@@ -29,7 +29,7 @@
 # 1. 20171122, Added by fasiondog
 # ===============================================================================
 
-from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, Portfolio, TradeManager
+from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, TradeManager
 
 import matplotlib
 from matplotlib.pylab import gca as mpl_gca
@@ -134,11 +134,9 @@ def use_draw_with_matplotlib():
     TradeManager.performance = mpl_tm_performance
     System.plot = mpl_sysplot
     System.performance = mpl_sys_performance
-    Portfolio.performance = mpl_sys_performance
     TradeManager.heatmap = mpl_tm_heatmap
     TradeManager.year_profit_bar = mpl_tm_year_profit
     System.heatmap = mpl_sys_heatmap
-    Portfolio.heatmap = mpl_sys_heatmap
 
 
 def use_draw_with_echarts():
@@ -153,7 +151,6 @@ def use_draw_with_echarts():
 
     System.plot = ec_sysplot
     System.performance = ec_sys_performance
-    Portfolio.performance = ec_sys_performance
 
 
 def create_figure(n=1, figsize=None):

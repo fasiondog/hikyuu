@@ -428,7 +428,7 @@ Hikyuu是研究系统交易的Python量化框架，可以在其基础上构建�
     绘制系统绩效，即账户累积收益率曲线。通常不直接调用，而是在 sys, pf 计算完成后，查看绩效详情。
     如: sys.performance()
 
-    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param SystemBase sys: SYS实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     
 

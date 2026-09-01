@@ -17,7 +17,7 @@
 #include "slippage/build_in.h"
 #include "stoploss/build_in.h"
 #include "system/build_in.h"
-#include "allocatefunds/build_in.h"
+
 #include "selector/build_in.h"
 #include "multifactor/build_in.h"
 

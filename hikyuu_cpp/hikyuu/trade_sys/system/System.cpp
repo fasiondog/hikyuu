@@ -459,28 +459,46 @@ void System::clearDelayBuyRequest() {
     m_buyRequestList.clear();
 }
 
-TradeRecordList System::runMoment(const Datetime& datetime) {
-    TradeRecordList result;
+const std::vector<std::shared_ptr<System>>& System::getSubSystemList() const {
+    static SystemList empty;
+    return empty;
+}
+
+MomentResult System::runMoment(const Datetime& datetime) {
+    MomentResult result;
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), result);
 
     KRecord today = m_kdata.getKRecord(pos);
     KRecord src_today = m_src_kdata.getKRecord(pos);
+    KQuery::KType ktype = m_kdata.getQuery().kType();
+
+    result.datetime = datetime;
+    result.funds_before_open = m_tm->getFunds(datetime, ktype);
 
     TradeRecord tr_open = _runMomentOnOpen(today, src_today);
-    TradeRecord tr_close = _runMomentOnClose(today, src_today);
-
     if (!tr_open.isNull()) {
-        result.push_back(tr_open);
+        result.tradesOnOpen.push_back(tr_open);
     }
+
+    result.funds_before_close = m_tm->getFunds(datetime, ktype);
+
+    TradeRecord tr_close = _runMomentOnClose(today, src_today);
     if (!tr_close.isNull()) {
-        result.push_back(tr_close);
+        result.tradesOnClose.push_back(tr_close);
+    }
+
+    result.funds = m_tm->getFunds(datetime, ktype);
+
+    PositionRecord position = m_tm->getPosition(datetime, m_stock);
+    if (position.number > 0.0) {
+        result.positions.push_back(position);
     }
     return result;
 }
 
-TradeRecordList System::runMomentOnOpen(const Datetime& datetime) {
-    TradeRecordList result;
+MomentResult System::runMomentOnOpen(const Datetime& datetime) {
+    MomentResult result;
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), result);
 
@@ -488,13 +506,13 @@ TradeRecordList System::runMomentOnOpen(const Datetime& datetime) {
     KRecord src_today = m_src_kdata.getKRecord(pos);
     TradeRecord tr = _runMomentOnOpen(today, src_today);
     if (!tr.isNull()) {
-        result.push_back(tr);
+        result.tradesOnOpen.push_back(tr);
     }
     return result;
 }
 
-TradeRecordList System::runMomentOnClose(const Datetime& datetime) {
-    TradeRecordList result;
+MomentResult System::runMomentOnClose(const Datetime& datetime) {
+    MomentResult result;
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), result);
 
@@ -502,7 +520,7 @@ TradeRecordList System::runMomentOnClose(const Datetime& datetime) {
     KRecord src_today = m_src_kdata.getKRecord(pos);
     TradeRecord tr = _runMomentOnClose(today, src_today);
     if (!tr.isNull()) {
-        result.push_back(tr);
+        result.tradesOnClose.push_back(tr);
     }
     return result;
 }

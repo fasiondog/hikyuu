@@ -29,23 +29,7 @@ vector<FundsList> HKU_API parallel_run_sys(const SystemList& system_list, const 
     });
 }
 
-vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query,
-                                          bool force) {
-    return global_parallel_for_index_single(0, pf_list.size(), [&](size_t i) {
-        FundsList funds;
-        if (pf_list[i]) {
-            pf_list[i]->run(query, force);
-            auto tm = pf_list[i]->getTM();
-            if (tm) {
-                auto dates = StockManager::instance().getTradingCalendar(query, "SH");
-                if (!dates.empty()) {
-                    funds = tm->getFundsList(dates, query.kType());
-                }
-            }
-        }
-        return funds;
-    });
-}
+
 
 vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list,
                                        const DatetimeList& ref_dates) {

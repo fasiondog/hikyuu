@@ -80,9 +80,7 @@ SelectorPtr MultiFactorSelector::_clone() {
     return p;
 }
 
-bool MultiFactorSelector::isMatchAF(const AFPtr& af) {
-    return true;
-}
+
 
 ScoreRecordList MultiFactorSelector::filterOnlyShouldBuy(Datetime date,
                                                          const ScoreRecordList& scores,

@@ -22,6 +22,7 @@ void export_SystemPart(py::module& m) {
       .value("PROFITGOAL", PART_PROFITGOAL, "盈利目标策略")
       .value("SLIPPAGE", PART_SLIPPAGE, "移滑价差算法")
       .value("ALLOCATEFUNDS", PART_ALLOCATEFUNDS, "资产分配算法")
+      .value("SYS", PART_SYSTEM, "聚合子系统（递归组合重构新增）")
       .value("INVALID", PART_INVALID, "无效系统部件")
 
       // 支持简写

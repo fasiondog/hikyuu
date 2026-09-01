@@ -10,7 +10,7 @@
 #pragma once
 
 #include "trade_sys/system/System.h"
-#include "trade_sys/portfolio/Portfolio.h"
+
 #include "hikyuu/trade_manage/Performance.h"
 
 namespace hku {
@@ -26,15 +26,7 @@ namespace hku {
 vector<FundsList> HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query,
                                            bool reset = true, bool resetAll = false);
 
-/**
- * @brief 并行运行组合
- * @param pf_list 组合列表
- * @param query 组合运行查询条件
- * @param force 强制复位
- * @return vector<FundsList>
- */
-vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query,
-                                          bool force = false);
+
 
 /**
  * 从账户列表中一次性获取资金列表

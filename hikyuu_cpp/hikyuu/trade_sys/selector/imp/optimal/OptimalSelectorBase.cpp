@@ -67,9 +67,7 @@ SystemWeightList OptimalSelectorBase::_getSelected(Datetime date) {
     return ret;
 }
 
-bool OptimalSelectorBase::isMatchAF(const AFPtr& af) {
-    return true;
-}
+
 
 void OptimalSelectorBase::_reset() {
     m_sys_dict.clear();

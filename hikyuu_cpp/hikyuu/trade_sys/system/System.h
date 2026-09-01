@@ -22,14 +22,13 @@
 #include "../slippage/SlippageBase.h"
 #include "TradeRequest.h"
 #include "SystemPart.h"
+#include "MomentResult.h"
 #include "../../serialization/KData_serialization.h"
 
 namespace hku {
 
 using json = nlohmann::json;
 
-class HKU_API Portfolio;
-class HKU_API AllocateFundsBase;
 class HKU_API WalkForwardSystem;
 
 /**
@@ -38,8 +37,6 @@ class HKU_API WalkForwardSystem;
  */
 class HKU_API System : public enable_shared_from_this<System> {
     PARAMETER_SUPPORT_WITH_CHECK
-    friend class HKU_API Portfolio;
-    friend class HKU_API AllocateFundsBase;
     friend class HKU_API WalkForwardSystem;
 
 public:
@@ -218,10 +215,41 @@ public:
      * @param datetime 指定的日期
      * @return TradeRecordList
      */
-    virtual TradeRecordList runMoment(const Datetime& datetime);
+    virtual MomentResult runMoment(const Datetime& datetime);
 
-    virtual TradeRecordList runMomentOnOpen(const Datetime& datetime);
-    virtual TradeRecordList runMomentOnClose(const Datetime& datetime);
+    virtual MomentResult runMomentOnOpen(const Datetime& datetime);
+    virtual MomentResult runMomentOnClose(const Datetime& datetime);
+
+    //========================================
+    // 聚合形态（MultiSystem）接口，单证券形态返回默认值
+    //========================================
+
+    /** 是否为聚合形态（持有子系统）。单证券形态返回 false。 */
+    virtual bool isComposite() const {
+        return false;
+    }
+
+    /** 获取直接子系统列表，聚合形态重写。单证券形态返回空表。 */
+    virtual const std::vector<std::shared_ptr<System>>& getSubSystemList() const;
+
+    /** 层级路径（如 I/D/A），供 trace 与调试。聚合形态在 readyForRun 时维护。 */
+    virtual const string& getPath() const {
+        return m_path;
+    }
+
+    /** 设置层级路径（聚合形态在 readyForRun 时递归写入子系统） */
+    void setPath(const string& path) {
+        m_path = path;
+    }
+
+    /** 【模式 B】父向子系统回写分配额度（仅调仓日）。单证券形态为 no-op。 */
+    virtual void setSubSystemQuota(const std::shared_ptr<System>& sub_sys, const Datetime& date,
+                                   price_t quota) {}
+
+    /** 将自身本时刻成交转译为对上建议（聚合形态重写）。单证券形态返回空。 */
+    virtual TradeSuggestionList toSuggestions() const {
+        return TradeSuggestionList{};
+    }
 
     // 运行前准备工作, 失败将抛出异常
     virtual void readyForRun();
@@ -248,13 +276,13 @@ public:
 
     // 强制以开盘价卖出，仅供 PF/AF 内部调用
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
-        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        HKU_ASSERT(from == PART_PORTFOLIO || from == PART_SYSTEM);
         return _sellForce(date, num, from, true);
     }
 
     // 强制以收盘价卖出，仅供 PF/AF 内部调用
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
-        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        HKU_ASSERT(from == PART_PORTFOLIO || from == PART_SYSTEM);
         return _sellForce(date, num, from, false);
     }
 
@@ -338,6 +366,7 @@ private:
 protected:
     TradeManagerPtr m_tm;
     MoneyManagerPtr m_mm;
+    string m_path;  // 层级路径（聚合形态使用）
     EnvironmentPtr m_ev;
     ConditionPtr m_cn;
     SignalPtr m_sg;

@@ -9,7 +9,8 @@
 #include <hikyuu/strategy/Strategy.h>
 #include <hikyuu/strategy/BrokerTradeManager.h>
 #include <hikyuu/strategy/RunSystemInStrategy.h>
-#include <hikyuu/strategy/RunPortfolioInStrategy.h>
+#include <hikyuu/strategy/RunMultiSystemInStrategy.h>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/eval.h>
@@ -329,28 +330,33 @@ void export_Strategy(py::module& m) {
     :param cost_func: 成本函数
     :param other_brokers: 其他的订单代理)");
 
-    m.def("run_in_strategy",
-          py::overload_cast<const PFPtr&, const KQuery&, const OrderBrokerPtr&, const TradeCostPtr&,
-                            const std::vector<OrderBrokerPtr>&>(runInStrategy),
-          py::arg("pf"), py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
-          R"(run_in_strategy(pf, query, broker, cost_func, [other_brokers=[]])
-          
-    在策略运行时中执行组合策略 PF
-    目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
 
-    :param Portfolio pf: 资产组合
-    :param Query query: 查询条件
-    :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param other_brokers: 其他的订单代理)");
 
     m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),
           py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("name") = "SYSStrategy",
-          py::arg("config") = "");
-
-    m.def("crt_pf_strategy", crtPFStrategy, py::arg("pf"), py::arg("query"), py::arg("broker"),
-          py::arg("cost_func"), py::arg("name") = "PFStrategy",
+          py::arg("name") = "SYSStrategy",
           py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "");
+
+    m.def("crt_multi_sys_strategy", crtMultiSysStrategy, py::arg("ms"), py::arg("stk_market_code"),
+          py::arg("query"), py::arg("broker"), py::arg("cost_func"),
+          py::arg("name") = "MultiSYSStrategy",
+          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "",
+          R"(crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, [other_brokers=[]], [name='MultiSYSStrategy'], [config=''])
+
+    创建聚合系统策略（MultiSystem 实盘入口）。
+    父账户使用与券商同步的 BrokerTM，子系统使用各自的影子/虚拟账户（模式 A/B 由 MultiSystem 内部决定）。
+    目前仅支持 buy_delay | sell_delay 均为 false 的子系统，即 close 时执行交易。
+
+    :param ms: 聚合交易系统 MultiSystem
+    :param str stk_market_code: 驱动标的（如 'SH000001'，作为对齐时间轴）
+    :param query: 查询条件
+    :param broker: 订单代理（与父账户资产同步的订单代理）
+    :param cost_func: 成本函数
+    :param other_brokers: 其他的订单代理
+    :param str name: 策略名称
+    :param str config: 配置文件
+    :return: 策略运行时实例
+    :rtype: Strategy)");
+
+
 }

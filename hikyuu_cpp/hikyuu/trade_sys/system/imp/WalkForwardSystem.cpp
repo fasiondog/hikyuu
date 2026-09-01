@@ -296,8 +296,8 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     m_calculated = true;
 }
 
-TradeRecordList WalkForwardSystem::runMoment(const Datetime& datetime) {
-    TradeRecordList ret;
+MomentResult WalkForwardSystem::runMoment(const Datetime& datetime) {
+    MomentResult ret;
     auto sw_list = m_se->getSelected(datetime);
     HKU_IF_RETURN(sw_list.empty(), ret);
 
@@ -318,12 +318,11 @@ TradeRecordList WalkForwardSystem::runMoment(const Datetime& datetime) {
     }
 
     if (m_cur_sys) {
-        auto tr_list = m_cur_sys->runMoment(datetime);
-        for (auto& tr : tr_list) {
+        ret = m_cur_sys->runMoment(datetime);
+        for (auto& tr : ret.allTrades()) {
             m_trade_list.push_back(tr);
         }
         syncDataFromSystem(m_cur_sys, true);
-        return tr_list;
     }
     return ret;
 }

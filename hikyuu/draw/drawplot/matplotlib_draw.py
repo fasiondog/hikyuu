@@ -957,7 +957,7 @@ def sys_performance(sys, ref_stk=None, ext=True, log=False):
     """
     绘制系统绩效，即账户累积收益率曲线
 
-    :param SystemBase | PortfolioBase sys: SYS或PF实例
+    :param SystemBase sys: SYS实例
     :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
     :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为默认统计项）
     :param bool log: Y轴是否使用对数坐标

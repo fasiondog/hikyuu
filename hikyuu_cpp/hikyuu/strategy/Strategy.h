@@ -14,7 +14,10 @@
 #include "hikyuu/global/SpotRecord.h"
 #include "hikyuu/utilities/thread/FuncWrapper.h"
 #include "hikyuu/utilities/thread/ThreadSafeQueue.h"
-#include "hikyuu/trade_sys/portfolio/Portfolio.h"
+
+#include "hikyuu/trade_sys/system/System.h"
+#include "hikyuu/trade_sys/slippage/SlippageBase.h"
+
 #include "BrokerTradeManager.h"
 
 namespace hku {
@@ -269,18 +272,7 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                            const std::vector<OrderBrokerPtr>& other_brokers = {});
 
-/**
- * @brief 在策略运行时中执行组合策略 PF
- * @note 目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
- * @param pf 资产组合
- * @param query 查询条件
- * @param broker 订单代理（专用与和账户资产同步的订单代理）
- * @param costfunc 成本函数
- * @param other_brokers 其他的订单代理
- */
-void HKU_API runInStrategy(const PFPtr& pf, const KQuery& query, const OrderBrokerPtr& broker,
-                           const TradeCostPtr& costfunc,
-                           const std::vector<OrderBrokerPtr>& other_brokers = {});
+
 
 /** @} */
 }  // namespace hku
