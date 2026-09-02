@@ -43,7 +43,7 @@ struct HKU_API TradeSuggestion {
 
     price_t stoploss{0.0};
     price_t goalPrice{0.0};
-    SystemPart from{PART_SIGNAL};  // 来自子系统时为 PART_SYSTEM(=11)
+    SystemPart from{PART_SIGNAL};  // 来自子系统时为 PART_SYSTEM
     int urgency{0};                // 0-当前收盘执行；1-下一开盘立即执行
     double score{0.0};             // 信号强度，供 SE / MM 排序
     string remark;

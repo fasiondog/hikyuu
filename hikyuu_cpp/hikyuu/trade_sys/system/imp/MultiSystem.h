@@ -172,6 +172,7 @@ private:
     std::vector<std::pair<Datetime, double>> m_adjust_turnover;  // 调仓日换手率（成交额/调仓前总资产）
     TradeSuggestionList m_last_suggestions;  // 最近一次收盘产生的对上建议
     std::vector<TradeRecordList> m_open_trades;  // 当日各子系统开盘成交（延迟请求兑现），供收盘汇总
+    Datetime m_open_trades_date;  // m_open_trades 所属交易日；收盘阶段据此防越界与跨日残留（运行时态，不序列化）
 
     // 检查 candidate 子树（含自身）是否包含 target（用于循环引用检测）
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
@@ -211,6 +212,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_sub_init_cash);
         ar& BOOST_SERIALIZATION_NVP(m_adjust_cycle);
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);
+        ar& BOOST_SERIALIZATION_NVP(m_sell_at_not_selected);
+        ar& BOOST_SERIALIZATION_NVP(m_mode);
+        ar& BOOST_SERIALIZATION_NVP(m_se);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };

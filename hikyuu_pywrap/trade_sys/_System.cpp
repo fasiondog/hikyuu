@@ -484,7 +484,7 @@ void export_System(py::module& m) {
     // 递归组合重构：聚合交易系统（组合回测）
     py::class_<MultiSystem, System, std::shared_ptr<MultiSystem>>(m, "MultiSystem", py::dynamic_attr(),
       R"(聚合交易系统（组合回测）。持有多个子系统（单证券或嵌套聚合），在开盘/收盘阶段分别驱动并汇总下单。
-阶段 2（聚合最小）：所有子系统共享聚合系统的交易账户，组合回测跑通。)")
+每个子系统拥有各自独立的虚拟账户（模式 A 影子账户 / 模式 B 由父分配额度），父系统在自身账户上统一分配与下单。)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
       .def(py::init<const SystemList&, const string&>(), py::arg("sys_list"),
@@ -496,7 +496,7 @@ void export_System(py::module& m) {
            R"(run(self, kdata, reset=True, reset_all=False)
 
     组合回测入口。kdata 作为对齐时间轴，遍历每个交易日分别驱动所有子系统（开盘/收盘）并汇总下单。
-    所有子系统共享聚合系统的交易账户。
+    各子系统拥有独立虚拟账户，父系统在自身账户上统一分配与下单。
 
     :param KData kdata: 对齐的时间轴（应覆盖各子系统的交易日）)")
       .def("runMoment", &MultiSystem::runMoment, py::arg("datetime"),
@@ -523,15 +523,80 @@ void export_System(py::module& m) {
            "设置未选中子系统是否强制清仓（需设置 SE）")
       .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
            "获取各调仓日的换手率（(日期, 成交金额/总资产) 列表）")
-      .def_property("tm", &MultiSystem::getTM, &MultiSystem::setTM, "关联的交易管理实例")
-      .def_property("mm", &MultiSystem::getMM, &MultiSystem::setMM, "资金管理策略")
-      .def_property("ev", &MultiSystem::getEV, &MultiSystem::setEV, "市场环境判断策略")
-      .def_property("cn", &MultiSystem::getCN, &MultiSystem::setCN, "系统有效条件")
-      .def_property("sg", &MultiSystem::getSG, &MultiSystem::setSG, "信号指示器")
-      .def_property("st", &MultiSystem::getST, &MultiSystem::setST, "止损策略")
-      .def_property("tp", &MultiSystem::getTP, &MultiSystem::setTP, "止盈策略")
-      .def_property("pg", &MultiSystem::getPG, &MultiSystem::setPG, "盈利目标策略")
-      .def_property("sp", &MultiSystem::getSP, &MultiSystem::setSP, "移滑价差算法")
+      // 与 PySystem 的 set_* 一致：设置 Python 自定义部件时持 GIL 并 release() 保活，
+      // 防止 Python 侧部件（如自定义 MM/SG）被提前 GC 导致 C++ 侧持悬垂指针（use-after-free）。
+      .def_property("tm", &MultiSystem::getTM,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setTM(o.cast<TradeManagerPtr>());
+                        tmp.release();
+                    },
+                    "关联的交易管理实例")
+      .def_property("mm", &MultiSystem::getMM,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setMM(o.cast<MMPtr>());
+                        tmp.release();
+                    },
+                    "资金管理策略")
+      .def_property("ev", &MultiSystem::getEV,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setEV(o.cast<EnvironmentPtr>());
+                        tmp.release();
+                    },
+                    "市场环境判断策略")
+      .def_property("cn", &MultiSystem::getCN,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setCN(o.cast<CNPtr>());
+                        tmp.release();
+                    },
+                    "系统有效条件")
+      .def_property("sg", &MultiSystem::getSG,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setSG(o.cast<SGPtr>());
+                        tmp.release();
+                    },
+                    "信号指示器")
+      .def_property("st", &MultiSystem::getST,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setST(o.cast<StoplossPtr>());
+                        tmp.release();
+                    },
+                    "止损策略")
+      .def_property("tp", &MultiSystem::getTP,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setTP(o.cast<StoplossPtr>());
+                        tmp.release();
+                    },
+                    "止盈策略")
+      .def_property("pg", &MultiSystem::getPG,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setPG(o.cast<PGPtr>());
+                        tmp.release();
+                    },
+                    "盈利目标策略")
+      .def_property("sp", &MultiSystem::getSP,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setSP(o.cast<SlippagePtr>());
+                        tmp.release();
+                    },
+                    "移滑价差算法")
       .def("clone", &MultiSystem::clone);
 
     //--------------------------------------------------------------------------------------

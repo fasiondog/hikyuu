@@ -77,6 +77,7 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     p->m_tm = m_tm;
     p->m_query = m_query;
     p->m_buy_sell_counts = m_buy_sell_counts;
+    p->m_mode = m_mode;
     return p;
 }
 
@@ -291,10 +292,18 @@ void MoneyManagerBase::_allocateSuggestions(const Datetime& date, const TradeMan
         }
         double current = tm->getPosition(date, s.stock).number;
         if (s.type == SuggestionType::BUY) {
-            // 模式 A（默认）：目标持仓市值 = 权重 × 父总资产，换算为目标股数，number 改写为（目标 - 当前）的净调仓量
+            // 模式 A（默认）：目标持仓市值 = 权重 × 父总资产，换算为目标股数，净调仓量 =（目标 - 当前）。
+            // 若净调仓量为负（当前已超配目标），转为 SELL 减仓至目标，避免“负 BUY”在执行阶段被丢弃
+            // 而导致超配仓位无法再平衡（与 PF 周期性再平衡语义对齐）。
             double target_value = weight * total_assets;
             double target_shares = target_value / s.plan_price;
-            s.number = target_shares - current;
+            double delta = target_shares - current;
+            if (delta < 0.0) {
+                s.type = SuggestionType::SELL;
+                s.number = -delta;  // 减仓数量（正数），执行阶段按 SELL 卖出
+            } else {
+                s.number = delta;
+            }
         } else {
             // SELL / CLEAR：退出该标的（卖出当前全部持仓）
             s.number = -current;

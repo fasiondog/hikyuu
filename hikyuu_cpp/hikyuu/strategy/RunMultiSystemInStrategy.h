@@ -17,7 +17,10 @@ namespace hku {
 
 /**
  * @brief 在策略运行时中执行聚合系统 MultiSystem
- * @note 目前仅支持 buy_delay | sell_delay 均为 false 的子系统，即 close 时执行交易
+ * @note 父账户调仓统一在收盘阶段执行。子系统的延迟成交（buy_delay/sell_delay=true 时于下一 bar 开盘兑现）
+ *       由 MultiSystem 在开盘阶段缓存、同交易日收盘阶段汇总为对上建议后在父账户下单，故延迟/非延迟子系统均支持。
+ *       盘中模式应成对注册 runMomentOnOpen/runMomentOnClose；若仅注册收盘驱动，当日开盘兑现的延迟成交不会被采集
+ *       （MultiSystem 内部已做防越界与防跨日残留处理，不会误并前一交易日缓冲）。
  */
 class HKU_API RunMultiSystemInStrategy {
 public:

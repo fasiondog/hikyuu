@@ -30,8 +30,8 @@ enum SystemPart {
     PART_ALLOCATEFUNDS = 8, /**< 资产分配算法 */
     PART_PORTFOLIO = 9,     /**< 资产组合 */
 
-    PART_INVALID = 10, /**< 无效值 */
-    PART_SYSTEM = 11,  /**< 聚合子系统（递归组合重构新增） */
+    PART_SYSTEM = 10,  /**< 聚合子系统（递归组合重构新增） */
+    PART_INVALID = 11, /**< 无效值（哨兵，须为枚举末项） */
 };
 
 /**

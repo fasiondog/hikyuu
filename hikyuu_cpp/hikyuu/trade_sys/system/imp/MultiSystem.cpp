@@ -113,9 +113,15 @@ SystemPtr MultiSystem::_clone() {
     ret->m_sub_init_cash = m_sub_init_cash;
     ret->m_adjust_cycle = m_adjust_cycle;
     ret->m_trade_on_close = m_trade_on_close;
+    ret->m_sell_at_not_selected = m_sell_at_not_selected;
     if (getMM()) {
         ret->setMM(getMM()->clone());
     }
+    if (m_se) {
+        ret->m_se = m_se->clone();
+    }
+    // setMode 会同步设置 MM 的模式，须在 setMM 之后调用，确保克隆体保留 A/B 模式
+    ret->setMode(m_mode);
     return ret;
 }
 
@@ -136,11 +142,24 @@ void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
         m_se->calculate(m_sys_list, m_kdata.getQuery());
     }
 
+    // 与单证券 System::run 一致的账户日期过滤：仅驱动 [账户初始化日, 账户最后成交日] 之后的 bar。
+    // 目的：实盘每日以 BrokerTM 全量重放对齐时间轴时，跳过已在真实账户执行过的历史 bar，
+    //       避免重复下单污染真实账户。对全新回测账户（lastDatetime == initDatetime == 时间轴起点）
+    //       该过滤为空操作，不影响组合回测遍历全轴。
+    Datetime tm_init_datetime = m_tm->initDatetime();
+    Datetime tm_last_datetime = m_tm->lastDatetime();
+    if (KQuery::getKTypeInSeconds(m_kdata.getQuery().kType()) >= 86400) {
+        tm_init_datetime = tm_init_datetime.startOfDay();
+        tm_last_datetime = tm_last_datetime.startOfDay();
+    }
+
     // 聚合系统在完整对齐时间轴上驱动所有子系统
     size_t total = m_kdata.size();
     auto const* ks = m_kdata.data();
     for (size_t i = 0; i < total; ++i) {
-        runMoment(ks[i].datetime);
+        if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= tm_last_datetime) {
+            runMoment(ks[i].datetime);
+        }
     }
     m_calculated = true;
 }
@@ -283,12 +302,16 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         m_trade_list.push_back(tr);
     }
 
-    // 新的一天：清空并重建各子系统开盘成交缓冲（供收盘阶段汇总使用）
+    // 新的一天：清空并重建各子系统开盘成交缓冲（供本层收盘阶段汇总使用）。
+    // 注意：子系统开盘成交发生在各自（虚拟）账户上，仅缓存进 m_open_trades 供本层收盘合并；
+    // 【不计入】父自身的 tradesOnOpen —— 否则当本 MultiSystem 作为上层聚合的子系统时，上层会把这些
+    // 孙系统原始开盘成交与本层收盘已净额化执行的成交重复计入（嵌套双计），导致对上建议方向/数量错误。
+    // 父自身账户的开盘成交（如退市强平）已在上面并入 result.tradesOnOpen，符合 MomentResult 契约。
     m_open_trades.assign(m_sys_list.size(), TradeRecordList{});
+    m_open_trades_date = datetime;
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         MomentResult sub = m_sys_list[i]->runMomentOnOpen(datetime);
         for (auto& tr : sub.tradesOnOpen) {
-            result.tradesOnOpen.push_back(tr);
             m_open_trades[i].push_back(tr);
         }
     }
@@ -315,6 +338,16 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     KQuery::KType ktype = m_kdata.getQuery().kType();
     TradeSuggestionList suggestions;
     SubSystemContextList contexts;
+
+    // 防越界 + 防跨日残留：确保开盘缓冲与子系统数量对齐，且仅当缓冲属于当前交易日时才沿用。
+    // 场景：实盘盘中若仅注册收盘驱动（当日未先调用 runMomentOnOpen）或刚经历 reset，
+    //       m_open_trades 可能为空（下面按 [i] 索引会越界崩溃）或残留前一交易日开盘成交
+    //       （与今日收盘建议重复合并 → 重复下单）。isNull() 前置短路，避免对 Null 调用 startOfDay()。
+    if (m_open_trades.size() != m_sys_list.size() || m_open_trades_date.isNull() ||
+        m_open_trades_date.startOfDay() != datetime.startOfDay()) {
+        m_open_trades.assign(m_sys_list.size(), TradeRecordList{});
+        m_open_trades_date = datetime;
+    }
 
     bool is_adjust = _isAdjustDate();
 

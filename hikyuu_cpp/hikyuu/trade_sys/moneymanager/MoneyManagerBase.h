@@ -224,6 +224,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_mode);
         // m_query、m_tm都是系统运行时临时设置，不需要序列化
         // ar & BOOST_SERIALIZATION_NVP(m_query);
         // ar & BOOST_SERIALIZATION_NVP(m_tm);
@@ -234,6 +235,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_mode);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
