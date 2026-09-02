@@ -70,8 +70,10 @@ xmake -b core
 
 # 编译并运行 C++ 单元测试（doctest，small-test 不依赖真实数据）
 xmake r small-test
-# 完整单测（含 indicator/trade_sys 等大部分模块）
+
+# 执行完整单测（含 indicator/trade_sys 等大部分模块）
 xmake r unit-test
+
 # 真实数据测试（需 HKU_USE_REAL_DATA_TEST 与真实行情数据，通常只在 CI/本地有数据时跑）
 xmake r real-test
 
@@ -96,9 +98,41 @@ python3 hikyuu/test/test.py     # CI 使用的入口
 
 ### C++ 测试（hikyuu_cpp/unit_test/）
 
-- 基于 **doctest**，目录结构与核心库模块一一对应（`hikyuu/indicator/`、`hikyuu/trade_sys/`、`hikyuu/trade_manage/`、`hikyuu/analysis/`、`hikyuu/factor/`、`hikyuu/serialization/` 等）。
-- 新增 C++ 功能应在对应模块目录下添加 `test_*.cpp`。
-- `unit-test` 覆盖大部分模块；`small-test` 为最小回归集（CI 用）；`real-test` 需真实数据。
+基于 **doctest**，目录结构与核心库模块一一对应。测试工程组织须遵循以下原则：
+
+#### 组织原则
+
+1. **物理隔离，结构并行**：测试工程与源代码工程物理隔离，使用完全独立的并行目录（`hikyuu_cpp/unit_test/hikyuu/…` 对 `hikyuu_cpp/hikyuu/…`），内部目录结构保持一致。
+2. **一模块一套件**：针对一个模块（通常为一个类），建立一个测试套件（test_suite），命名规则为 `test_模块名_suite`，例如 `test_iniparser_suite`，全部使用小写字母。测试套件在文件顶部用 `@defgroup` / `@ingroup` 声明，见 `test_iniparser.cpp`、`test_Stock.cpp` 等现有文件。
+3. **一套件一文件**：每个测试套件使用一个独立测试文件，文件命名规则为 `test_模块名.cpp`，例如 `test_iniparser.cpp`、`test_Stock.cpp`。
+4. **一函数/方法一用例**：针对每一个函数或类成员方法，建立一个独立的测试用例（`TEST_CASE`），命名规则为 `test_函数名` 或 `test_类名_方法名`。重名时可在其后加 `_case` 或其他标识进行区分。
+5. **公开接口尽可能覆盖**：公开接口应尽可能添加测试；对于必须 mock 才能模拟的场景可不考虑。
+6. **@arg 标注测试点**：在每个测试用例内，用 `/** @arg … */` 注释明确标注每一个测试点，便于代码审查与快速定位。示例：
+
+```cpp
+TEST_CASE("test_IniParser_hasSection") {
+    IniParser ini_parser;
+    // …准备数据…
+    /** @arg 存在指定的 section */
+    CHECK_UNARY(ini_parser.hasSection("test1"));
+    /** @arg 不存在指定 section */
+    CHECK_UNARY(!ini_parser.hasSection("test2"));
+}
+```
+
+7. **边界条件必须覆盖**：每个函数/方法的测试中，边界条件必须覆盖，尤其注意：
+
+   - **循环边界**：0 次、1 次、恰好 N 次、N-1、N+1 次迭代的情况（例如空容器、单元素、多元素）。
+   - **极值边界**：最小值/最大值、空字符串、空范围、`Null<T>()`、越界索引、零值、负值（若允许）。
+   - **分支边界**：`if/else`、`switch` 的每个分支，三元表达式两侧，提前 `return` / `break` / `continue` 的路径。
+   - **错误/异常路径**：非法输入、文件不存在、格式错误等应触发异常的情况。
+8. **覆盖率要求**：整体应尽可能达到分支覆盖，最低要求为行覆盖。**必须 mock 才能模拟的代码路径可豁免**（如需要网络、数据库、实盘连接等外部依赖才能触发的分支）。`xmake f -m coverage -y` 可生成 lcov 覆盖率报告进行自查。
+
+#### 运行目标
+
+- `unit-test`：覆盖大部分模块的完整单测集。
+- `small-test`：最小回归集，CI 默认使用。
+- `real-test`：需真实行情数据，配合 `HKU_USE_REAL_DATA_TEST` 使用。
 
 ## 5. 代码规范
 
