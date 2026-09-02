@@ -130,12 +130,11 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_desc") {
 
     auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
     mf->setParam<int>("mode", 0);
-    mf->getDatetimeList();  // 触发计算
+    mf->getDatetimeList();
     const auto& all_scores = mf->getAllScores();
     CHECK_UNARY(!all_scores.empty());
 
     size_t mixed_nan_count = 0;
-    size_t valid_tie_count = 0;
 
     for (size_t d = 0; d < all_scores.size(); d++) {
         const auto& cross = all_scores[d];
@@ -150,7 +149,6 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_desc") {
                 CHECK_UNARY(prev.value >= curr.value);
                 if (prev.value == curr.value) {
                     CHECK_UNARY(prev.stock.market_code() < curr.stock.market_code());
-                    valid_tie_count++;
                 }
             }
             if (prev_nan && curr_nan) {
@@ -169,8 +167,7 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_desc") {
         }
     }
 
-    CHECK_MESSAGE(mixed_nan_count > 0,
-                  "mixed_nan scenario not triggered by test data");
+    CHECK_MESSAGE(mixed_nan_count > 0, "mixed_nan scenario not triggered by test data");
 }
 
 /**
@@ -192,7 +189,6 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_asc") {
     CHECK_UNARY(!all_scores.empty());
 
     size_t mixed_nan_count = 0;
-    size_t valid_tie_count = 0;
 
     for (size_t d = 0; d < all_scores.size(); d++) {
         const auto& cross = all_scores[d];
@@ -207,7 +203,6 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_asc") {
                 CHECK_UNARY(prev.value <= curr.value);
                 if (prev.value == curr.value) {
                     CHECK_UNARY(prev.stock.market_code() < curr.stock.market_code());
-                    valid_tie_count++;
                 }
             }
             if (prev_nan && curr_nan) {
@@ -226,8 +221,7 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_asc") {
         }
     }
 
-    CHECK_MESSAGE(mixed_nan_count > 0,
-                  "mixed_nan scenario not triggered by test data");
+    CHECK_MESSAGE(mixed_nan_count > 0, "mixed_nan scenario not triggered by test data");
 }
 
 /**
