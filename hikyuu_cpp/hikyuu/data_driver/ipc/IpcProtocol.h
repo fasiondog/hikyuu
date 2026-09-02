@@ -129,6 +129,18 @@ public:
     std::string getString();
     Datetime getDatetime();
 
+    /**
+     * 读取集合元素个数（u64），并校验其不超过剩余字节所能容纳的上限
+     * @details 线上 count 来自对端，坏帧或版本错配可能给出天文数字，
+     * 调用方直接 resize/reserve 会触发 length_error/bad_alloc。超界时置失败，
+     * 由调用方按既有的 rd.ok() 判定回退。
+     * @param elem_min_size 单个元素编码后的最小字节数
+     */
+    uint64_t getCount(size_t elem_min_size);
+
+    /** 同 getCount，但元素个数字段为 u32 */
+    uint32_t getCount32(size_t elem_min_size);
+
 private:
     bool check(size_t n) noexcept;
 

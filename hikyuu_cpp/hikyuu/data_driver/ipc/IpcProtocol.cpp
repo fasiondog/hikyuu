@@ -156,6 +156,27 @@ Datetime Reader::getDatetime() {
     return Datetime(n);
 }
 
+uint64_t Reader::getCount(size_t elem_min_size) {
+    uint64_t count = getU64();
+    HKU_IF_RETURN(!m_ok, 0);
+    // 超界时必须置失败，否则调用方会把“坏帧”误读为“成功但集合为空”
+    if (elem_min_size > 0 && count > remain() / elem_min_size) {
+        m_ok = false;
+        return 0;
+    }
+    return count;
+}
+
+uint32_t Reader::getCount32(size_t elem_min_size) {
+    uint32_t count = getU32();
+    HKU_IF_RETURN(!m_ok, 0);
+    if (elem_min_size > 0 && count > remain() / elem_min_size) {
+        m_ok = false;
+        return 0;
+    }
+    return count;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // 帧编解码
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,7 +282,8 @@ void encodeKRecordList(Encoder& enc, const KRecordList& ks) {
 
 KRecordList decodeKRecordList(Reader& rd) {
     KRecordList ks;
-    uint64_t count = rd.getU64();
+    // 单条 KRecord 线上最小 56 字节：datetime(8) + 6 个 double(48)
+    uint64_t count = rd.getCount(56);
     HKU_IF_RETURN(!rd.ok(), ks);
     ks.resize(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -296,7 +318,8 @@ void encodeTimeLineList(Encoder& enc, const TimeLineList& ts) {
 
 TimeLineList decodeTimeLineList(Reader& rd) {
     TimeLineList ts;
-    uint64_t count = rd.getU64();
+    // 单条分时记录线上最小 24 字节：datetime(8) + price(8) + vol(8)
+    uint64_t count = rd.getCount(24);
     HKU_IF_RETURN(!rd.ok(), ts);
     ts.resize(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -333,7 +356,8 @@ void encodeTransList(Encoder& enc, const TransList& ts) {
 
 TransList decodeTransList(Reader& rd) {
     TransList ts;
-    uint64_t count = rd.getU64();
+    // 单条分笔记录线上最小 28 字节：datetime(8) + price(8) + vol(8) + direct(4)
+    uint64_t count = rd.getCount(28);
     HKU_IF_RETURN(!rd.ok(), ts);
     ts.resize(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -381,7 +405,8 @@ void encodeStockWeightList(Encoder& enc, const StockWeightList& ws) {
 
 StockWeightList decodeStockWeightList(Reader& rd) {
     StockWeightList ws;
-    uint64_t count = rd.getU64();
+    // 单条权息线上最小 72 字节：datetime(8) + 8 个 double(64)
+    uint64_t count = rd.getCount(72);
     HKU_IF_RETURN(!rd.ok(), ws);
     ws.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -434,7 +459,8 @@ void encodeStockInfoList(Encoder& enc, const std::vector<StockInfo>& infos) {
 
 std::vector<StockInfo> decodeStockInfoList(Reader& rd) {
     std::vector<StockInfo> infos;
-    uint64_t count = rd.getU64();
+    // 单条证券信息线上最小 66 字节：3 个字符串前缀(6) + 定长字段(60)
+    uint64_t count = rd.getCount(66);
     HKU_IF_RETURN(!rd.ok(), infos);
     infos.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -537,7 +563,8 @@ void encodeZhBond10List(Encoder& enc, const ZhBond10List& bonds) {
 
 ZhBond10List decodeZhBond10List(Reader& rd) {
     ZhBond10List bonds;
-    uint64_t count = rd.getU64();
+    // 单条国债线上最小 16 字节：date(8) + value(8)
+    uint64_t count = rd.getCount(16);
     HKU_IF_RETURN(!rd.ok(), bonds);
     bonds.resize(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -562,7 +589,8 @@ HistoryFinanceInfo decodeHistoryFinanceInfo(Reader& rd) {
     HistoryFinanceInfo info;
     info.fileDate = rd.getDatetime();
     info.reportDate = rd.getDatetime();
-    uint32_t count = rd.getU32();
+    // 单个财务字段为 float，线上 4 字节
+    uint32_t count = rd.getCount32(4);
     HKU_IF_RETURN(!rd.ok(), info);
     info.values.resize(count);
     for (uint32_t i = 0; i < count && rd.ok(); i++) {
@@ -580,7 +608,8 @@ void encodeHistoryFinanceList(Encoder& enc, const std::vector<HistoryFinanceInfo
 
 std::vector<HistoryFinanceInfo> decodeHistoryFinanceList(Reader& rd) {
     std::vector<HistoryFinanceInfo> infos;
-    uint64_t count = rd.getU64();
+    // 单条财务信息线上最小 20 字节：fileDate(8) + reportDate(8) + values 个数(4)
+    uint64_t count = rd.getCount(20);
     HKU_IF_RETURN(!rd.ok(), infos);
     infos.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -601,7 +630,8 @@ void encodeHolidaySet(Encoder& enc, const std::unordered_set<Datetime>& holidays
 
 std::unordered_set<Datetime> decodeHolidaySet(Reader& rd) {
     std::unordered_set<Datetime> holidays;
-    uint64_t count = rd.getU64();
+    // 单个节假日线上 8 字节
+    uint64_t count = rd.getCount(8);
     HKU_IF_RETURN(!rd.ok(), holidays);
     holidays.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -610,8 +640,7 @@ std::unordered_set<Datetime> decodeHolidaySet(Reader& rd) {
     return holidays;
 }
 
-void encodeFinanceField(Encoder& enc,
-                        const std::vector<std::pair<size_t, std::string>>& fields) {
+void encodeFinanceField(Encoder& enc, const std::vector<std::pair<size_t, std::string>>& fields) {
     enc.putU64(fields.size());
     for (const auto& field : fields) {
         enc.putU64(field.first);
@@ -621,7 +650,8 @@ void encodeFinanceField(Encoder& enc,
 
 std::vector<std::pair<size_t, std::string>> decodeFinanceField(Reader& rd) {
     std::vector<std::pair<size_t, std::string>> fields;
-    uint64_t count = rd.getU64();
+    // 单个字段线上最小 10 字节：序号(8) + 名称字符串前缀(2)
+    uint64_t count = rd.getCount(10);
     HKU_IF_RETURN(!rd.ok(), fields);
     fields.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -652,7 +682,8 @@ Block decodeBlock(Reader& rd) {
     string name = rd.getString();
     string index_code = rd.getString();
     Block block(category, name);
-    uint64_t count = rd.getU64();
+    // 单个成分股代码线上最小 2 字节（字符串长度前缀）
+    uint64_t count = rd.getCount(2);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
         block.add(rd.getString());
     }
@@ -674,7 +705,8 @@ void encodeBlockList(Encoder& enc, const BlockList& blocks) {
 
 BlockList decodeBlockList(Reader& rd) {
     BlockList blocks;
-    uint64_t count = rd.getU64();
+    // 单个板块线上最小 14 字节：3 个字符串前缀(6) + 成分股个数(8)
+    uint64_t count = rd.getCount(14);
     HKU_IF_RETURN(!rd.ok(), blocks);
     blocks.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {
@@ -727,7 +759,8 @@ void encodeParamMap(Encoder& enc, const std::unordered_map<std::string, double>&
 
 std::unordered_map<std::string, double> decodeParamMap(Reader& rd) {
     std::unordered_map<std::string, double> params;
-    uint64_t count = rd.getU64();
+    // 单个参数线上最小 10 字节：键字符串前缀(2) + 值(8)
+    uint64_t count = rd.getCount(10);
     HKU_IF_RETURN(!rd.ok(), params);
     params.reserve(count);
     for (uint64_t i = 0; i < count && rd.ok(); i++) {

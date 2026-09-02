@@ -13,10 +13,64 @@
 #include <chrono>
 #include <thread>
 #include "IpcProxyDrivers.h"
+#include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/Log.h"
 
 namespace hku {
 namespace ipc {
+
+namespace {
+/// 探测类请求的短超时（毫秒）：服务端不可用时单次探测最多阻塞该时长
+constexpr uint32_t PROBE_TIMEOUT_MS = 1000;
+
+/// 探测连续失败后的基础退避间隔（毫秒），随失败次数指数增长
+constexpr int64_t PROBE_BACKOFF_BASE_MS = 5000;
+
+/// 退避间隔的最大左移位数，即 5s → 10s → 20s 封顶；
+/// 封顶值同时决定了服务端重启完成后客户端感知新快照段的最大延迟
+constexpr int PROBE_BACKOFF_MAX_SHIFT = 2;
+
+/**
+ * 判断指定证券的分时/分笔价格是否需从服务端加工态还原为驱动原始值
+ * @details 服务端经 Stock 层应答，而 Stock 层对 ETF/FUND/B 的分时·分笔价格统一施加 ×0.1
+ * （缓冲与非缓冲分支均如此，见 Stock::getKRecordList / getTimeLineList / getTransList），
+ * 快照亦取自已加工的预加载缓冲。客户端 Stock 层拿到驱动结果后会再加工一次，
+ * 故代理驱动必须在此还原，否则价格被缩放两次（0.01×）。
+ * @note 还原为 ÷0.1，与客户端后续的 ×0.1 数学上互逆；浮点上存在 1 ULP 级差异，
+ *       对价格无实际影响。仅分时/分笔需要，故先判类型再查证券，避开无用开销。
+ */
+bool needUnscalePrice(const KQuery::KType& ktype, const std::string& market,
+                      const std::string& code) {
+    if (ktype != KQuery::TIMELINE && ktype != KQuery::TRANS) {
+        return false;
+    }
+    Stock stk = StockManager::instance().getStock(market + code);
+    HKU_IF_RETURN(stk.isNull(), false);
+    uint32_t t = stk.type();
+    return t == STOCKTYPE_ETF || t == STOCKTYPE_FUND || t == STOCKTYPE_B;
+}
+
+/// 还原 KRecordList 中服务端已施加的价格缩放
+void unscalePrice(KRecordList& ks) {
+    for (auto& k : ks) {
+        k.closePrice /= 0.1;
+    }
+}
+
+/// 还原 TimeLineList 中服务端已施加的价格缩放
+void unscalePrice(TimeLineList& tls) {
+    for (auto& t : tls) {
+        t.price /= 0.1;
+    }
+}
+
+/// 还原 TransList 中服务端已施加的价格缩放
+void unscalePrice(TransList& ts) {
+    for (auto& t : ts) {
+        t.price /= 0.1;
+    }
+}
+}  // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
 // IpcConnector
@@ -52,6 +106,53 @@ bool IpcConnector::request(Cmd cmd, const std::vector<uint8_t>& body,
         return false;
     }
     return true;
+}
+
+bool IpcConnector::probeRequest(Cmd cmd, std::vector<uint8_t>& res_body) {
+    auto now = std::chrono::steady_clock::now();
+    {
+        std::lock_guard<std::mutex> lock(m_probe_mutex);
+        if (m_probe_fails > 0) {
+            int64_t backoff = PROBE_BACKOFF_BASE_MS
+                              << std::min(m_probe_fails - 1, PROBE_BACKOFF_MAX_SHIFT);
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_probe).count() <
+                backoff) {
+                return false;  // 退避期内跳过探测，调用方沿用已有数据或回退本地驱动
+            }
+        }
+        // 在发起请求前记录时间点：即使请求阻塞至超时，也不会因耗时而立即绕过退避判定
+        m_last_probe = now;
+    }
+
+    const std::vector<uint8_t> empty_body;
+    std::vector<uint8_t> req_frame = encodeRequest(cmd, empty_body);
+    std::vector<uint8_t> res_frame;
+    bool ok = m_client.request(req_frame, res_frame, PROBE_TIMEOUT_MS);
+    if (ok) {
+        RetCode ret = RetCode::ERROR;
+        if (!decodeResponse(res_frame, ret, res_body)) {
+            HKU_ERROR("Invalid ipc response frame!");
+            ok = false;
+        } else if (ret != RetCode::SUCCESS) {
+            ok = false;
+        }
+    }
+
+    std::lock_guard<std::mutex> lock(m_probe_mutex);
+    if (ok) {
+        if (m_probe_fails > 0) {
+            HKU_INFO("Ipc data server probe recovered after {} failure(s)!", m_probe_fails);
+        }
+        m_probe_fails = 0;
+    } else {
+        m_probe_fails++;
+        if (m_probe_fails == 1) {
+            HKU_WARN(
+              "Ipc data server probe failed (server may be restarting), "
+              "will retry with exponential backoff!");
+        }
+    }
+    return ok;
 }
 
 bool IpcConnector::waitReady(uint64_t timeout_seconds,
@@ -407,14 +508,31 @@ void IpcBlockDriver::remove(const std::string& category, const std::string& name
 ///////////////////////////////////////////////////////////////////////////////
 // IpcKDataDriver
 ///////////////////////////////////////////////////////////////////////////////
-IpcKDataDriver::IpcKDataDriver(const IpcConnectorPtr& conn, const KDataDriverPtr& local)
-: KDataDriver("ipc"), m_conn(conn), m_local(local) {
+IpcKDataDriver::IpcKDataDriver(const IpcConnectorPtr& conn,
+                               const KDataDriverConnectPoolPtr& local_pool)
+: KDataDriver("ipc"), m_conn(conn), m_local_pool(local_pool) {
     // 不在构造函数中协商共享内存快照：构造可能发生在连接池锁内，
     // 阻塞 IPC 会拖垮整个驱动连接池；首次查询入口会限流协商。
+    m_shm_state = std::make_shared<ShmState>();
 }
 
 KDataDriverPtr IpcKDataDriver::_clone() {
-    return std::make_shared<IpcKDataDriver>(m_conn, m_local);
+    auto driver = std::make_shared<IpcKDataDriver>(m_conn, m_local_pool);
+    // 共享快照状态：同一进程内所有克隆必须看到同一代快照，避免跨代索引漂移
+    driver->m_shm_state = m_shm_state;
+    driver->m_shm_enabled = m_shm_enabled;
+    return driver;
+}
+
+KDataShmReaderPtr IpcKDataDriver::_shmReader() const {
+    std::shared_lock<std::shared_mutex> lock(m_shm_state->mutex);
+    auto reader = m_shm_state->reader;
+    return (reader && reader->valid()) ? reader : nullptr;
+}
+
+bool IpcKDataDriver::_preferLocalDriver(const KQuery::KType& ktype) const {
+    auto reader = _shmReader();
+    return m_local_pool && reader && !reader->coversKType(ktype);
 }
 
 void IpcKDataDriver::_tryRefreshShm() {
@@ -422,19 +540,23 @@ void IpcKDataDriver::_tryRefreshShm() {
         return;
     }
     // 拉取限流：无论服务端是否已发布，最小间隔内最多协商一次，
-    // 避免高频未命中查询（如分时/分笔）退化为每查询一次额外 IPC；
-    // 服务端发布新段后客户端最多延迟该间隔感知。
+    // 避免高频未命中查询（如快照未覆盖的证券、越界区间）退化为每查询一次额外 IPC；
+    // 服务端发布新段后客户端最多延迟该间隔感知；分时/分笔本地优先，不参与协商。
+    // 服务端不可用时的额外抑制（短超时 + 指数退避）由 probeRequest 在各克隆实例间统一处理。
     constexpr int64_t MIN_CHECK_INTERVAL_MS = 5000;
     auto now = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_shm_check).count() <
-        MIN_CHECK_INTERVAL_MS) {
-        return;
+    {
+        std::unique_lock<std::shared_mutex> lock(m_shm_state->mutex);
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_shm_state->last_check)
+              .count() < MIN_CHECK_INTERVAL_MS) {
+            return;
+        }
+        m_shm_state->last_check = now;
     }
-    m_last_shm_check = now;
 
     std::vector<uint8_t> res_body;
-    if (!m_conn->request(Cmd::STATUS_SHM_INFO, {}, res_body)) {
-        return;  // 通讯失败保持现状，查询自然回退 IPC/本地
+    if (!m_conn->probeRequest(Cmd::STATUS_SHM_INFO, res_body)) {
+        return;  // 退避抑制或通讯失败，保持现状，查询自然回退 IPC/本地
     }
 
     Reader rd(res_body.data(), res_body.size());
@@ -448,23 +570,37 @@ void IpcKDataDriver::_tryRefreshShm() {
         return;
     }
 
-    if (epoch == m_shm_epoch && m_shm_reader && m_shm_reader->valid()) {
+    {
+        std::shared_lock<std::shared_mutex> lock(m_shm_state->mutex);
+        if (epoch == m_shm_state->epoch && m_shm_state->reader && m_shm_state->reader->valid()) {
+            return;
+        }
+    }
+
+    // 映射在锁外执行（含文件 IO 与 O(entries) 升序校验），避免阻塞其他克隆的查询
+    auto reader = std::make_shared<KDataShmReader>();
+    if (!reader->open(name)) {
+        HKU_WARN("Failed map hikyuu kdata shm cache: {}, fallback to ipc query!", name);
         return;
     }
 
-    auto reader = std::make_shared<KDataShmReader>();
-    if (reader->open(name)) {
-        m_shm_reader = reader;
-        m_shm_epoch = reader->epoch();
-        HKU_INFO("Mapped hikyuu kdata shm cache: {} (epoch: {}, covered stocks entries: {})",
-                 name, m_shm_epoch, reader->coveredCount());
-    } else {
-        HKU_WARN("Failed map hikyuu kdata shm cache: {}, fallback to ipc query!", name);
+    std::unique_lock<std::shared_mutex> lock(m_shm_state->mutex);
+    // 并发下其他克隆可能已完成同代映射，无需重复替换
+    if (m_shm_state->epoch == reader->epoch() && m_shm_state->reader &&
+        m_shm_state->reader->valid()) {
+        return;
     }
+    m_shm_state->reader = reader;
+    m_shm_state->epoch = reader->epoch();
+    HKU_INFO("Mapped hikyuu kdata shm cache: {} (epoch: {}, covered stocks entries: {})", name,
+             m_shm_state->epoch, reader->coveredCount());
 }
 
 bool IpcKDataDriver::isIndexFirst() {
-    return false;
+    // 快照缓冲序、服务端 KQuery(start_ix, end_ix) 与本地驱动的索引空间均为 0 = 最早记录，
+    // 按位置检索恒快于按日期检索；返回 false 会让 Stock::getKRecord(Datetime)/getMarketValue
+    // 退化为整包日期查询，放大传输量与服务端代价。
+    return true;
 }
 
 bool IpcKDataDriver::canParallelLoad() {
@@ -474,13 +610,20 @@ bool IpcKDataDriver::canParallelLoad() {
 size_t IpcKDataDriver::getCount(const std::string& market, const std::string& code,
                                 const KQuery::KType& kType) {
     // 优先共享内存快照；限流协商保证服务端发布/重发布新段后客户端能延迟感知；
-    // 快照中的条数与服务端缓冲模式下的 getCount 语义一致（全量未截断）
+    // 快照取自服务端缓冲，故条数与服务端缓冲模式下的 getCount 语义一致
     _tryRefreshShm();
-    if (m_shm_reader && m_shm_reader->valid()) {
+    if (auto reader = _shmReader()) {
         size_t count = 0;
-        if (m_shm_reader->tryGetCount(market + code, kType, count)) {
+        if (reader->tryGetCount(market + code, kType, count)) {
             return count;
         }
+    }
+
+    // 主进程未预加载的类型不存在实时更新，服务端只能现场懒加载后序列化返回，
+    // 直接走本地驱动更快，且主进程不可用（如定时重启窗口）时无需等待超时
+    if (_preferLocalDriver(kType)) {
+        auto local = m_local_pool->getConnect();
+        return local ? local->getCount(market, code, kType) : 0;
     }
 
     Encoder enc;
@@ -496,24 +639,31 @@ size_t IpcKDataDriver::getCount(const std::string& market, const std::string& co
         HKU_ERROR("Failed decode kdata count from ipc server!");
     }
     HKU_WARN("Fallback to local driver: getCount");
-    return m_local ? m_local->getCount(market, code, kType) : 0;
+    auto local = m_local_pool ? m_local_pool->getConnect() : nullptr;
+    return local ? local->getCount(market, code, kType) : 0;
 }
 
 bool IpcKDataDriver::getIndexRangeByDate(const std::string& market, const std::string& code,
                                          const KQuery& query, size_t& out_start, size_t& out_end) {
     _tryRefreshShm();
-    if (m_shm_reader && m_shm_reader->valid()) {
-        if (m_shm_reader->tryGetIndexRangeByDate(market + code, query, out_start, out_end)) {
+    if (auto reader = _shmReader()) {
+        if (reader->tryGetIndexRangeByDate(market + code, query, out_start, out_end)) {
             return true;
         }
         // 区分“快照覆盖但区间为空”（返回 false 且 out 保持 0/0）与“快照未覆盖”（回退）：
         // 用 tryGetCount 判定覆盖性，与服务端缓冲模式行为对齐。
         size_t count = 0;
-        if (m_shm_reader->tryGetCount(market + code, query.kType(), count)) {
+        if (reader->tryGetCount(market + code, query.kType(), count)) {
             out_start = 0;
             out_end = 0;
             return false;
         }
+    }
+
+    // 未预加载的类型直接走本地，理由同 getCount
+    if (_preferLocalDriver(query.kType())) {
+        auto local = m_local_pool->getConnect();
+        return local ? local->getIndexRangeByDate(market, code, query, out_start, out_end) : false;
     }
 
     Encoder enc;
@@ -533,19 +683,31 @@ bool IpcKDataDriver::getIndexRangeByDate(const std::string& market, const std::s
         HKU_ERROR("Failed decode kdata index range from ipc server!");
     }
     HKU_WARN("Fallback to local driver: getIndexRangeByDate");
-    return m_local ? m_local->getIndexRangeByDate(market, code, query, out_start, out_end)
-                   : false;
+    auto local = m_local_pool ? m_local_pool->getConnect() : nullptr;
+    return local ? local->getIndexRangeByDate(market, code, query, out_start, out_end) : false;
 }
 
 KRecordList IpcKDataDriver::getKRecordList(const std::string& market, const std::string& code,
                                            const KQuery& query) {
     // 优先共享内存快照（全市场遍历场景下避免逐证券 IPC 往返）
     _tryRefreshShm();
-    if (m_shm_reader && m_shm_reader->valid()) {
+    // 单次调用内固定 reader 引用，避开刷新与读取之间的换代窗口
+    bool unscale = needUnscalePrice(query.kType(), market, code);
+    if (auto reader = _shmReader()) {
         KRecordList ks;
-        if (m_shm_reader->tryGetKRecordList(market + code, query, ks)) {
+        if (reader->tryGetKRecordList(market + code, query, ks)) {
+            // 快照取自服务端已加工的预加载缓冲，需还原为驱动原始值
+            if (unscale) {
+                unscalePrice(ks);
+            }
             return ks;
         }
+    }
+
+    // 未预加载的类型直接走本地，理由同 getCount
+    if (_preferLocalDriver(query.kType())) {
+        auto local = m_local_pool->getConnect();
+        return local ? local->getKRecordList(market, code, query) : KRecordList();
     }
 
     Encoder enc;
@@ -555,15 +717,33 @@ KRecordList IpcKDataDriver::getKRecordList(const std::string& market, const std:
     if (m_conn && m_conn->request(Cmd::KDATA_GET_KRECORD_LIST, enc.data(), res_body)) {
         Reader rd(res_body.data(), res_body.size());
         auto ks = decodeKRecordList(rd);
-        HKU_IF_RETURN(rd.ok(), ks);
+        if (rd.ok()) {
+            // 服务端经 Stock 层应答，分时/分笔的 ETF/FUND/B 价格已缩放，需还原
+            if (unscale) {
+                unscalePrice(ks);
+            }
+            return ks;
+        }
         HKU_ERROR("Failed decode krecord list from ipc server!");
     }
     HKU_WARN("Fallback to local driver: getKRecordList");
-    return m_local ? m_local->getKRecordList(market, code, query) : KRecordList();
+    auto local = m_local_pool ? m_local_pool->getConnect() : nullptr;
+    return local ? local->getKRecordList(market, code, query) : KRecordList();
 }
 
 TimeLineList IpcKDataDriver::getTimeLineList(const std::string& market, const std::string& code,
                                              const KQuery& query) {
+    // 分时在主进程侧同样直接走驱动现场读取（Stock::getTimeLineList 不读预加载缓冲），
+    // 行情代理也不为其注册处理函数，不存在实时更新；快照亦无分时读取接口。
+    // 客户端与主进程共享同一数据目录（服务地址由 datadir 哈希派生），本地读取结果一致，
+    // 故一律本地优先，省去序列化传输与服务端工作线程占用。
+    if (m_local_pool) {
+        auto local = m_local_pool->getConnect();
+        if (local) {
+            return local->getTimeLineList(market, code, query);
+        }
+    }
+
     Encoder enc;
     enc.putString(market + code);
     encodeKQuery(enc, query);
@@ -571,15 +751,29 @@ TimeLineList IpcKDataDriver::getTimeLineList(const std::string& market, const st
     if (m_conn && m_conn->request(Cmd::KDATA_GET_TIMELINE_LIST, enc.data(), res_body)) {
         Reader rd(res_body.data(), res_body.size());
         auto tls = decodeTimeLineList(rd);
-        HKU_IF_RETURN(rd.ok(), tls);
+        if (rd.ok()) {
+            // 本地优先路径返回驱动原始值，而服务端经 Stock 层应答已缩放，此处还原以保持两者一致
+            if (needUnscalePrice(KQuery::TIMELINE, market, code)) {
+                unscalePrice(tls);
+            }
+            return tls;
+        }
         HKU_ERROR("Failed decode timeline list from ipc server!");
     }
-    HKU_WARN("Fallback to local driver: getTimeLineList");
-    return m_local ? m_local->getTimeLineList(market, code, query) : TimeLineList();
+    HKU_WARN("Failed get timeline list from local driver and ipc server!");
+    return TimeLineList();
 }
 
 TransList IpcKDataDriver::getTransList(const std::string& market, const std::string& code,
                                        const KQuery& query) {
+    // 分笔同分时：主进程侧不读预加载缓冲且无实时更新，一律本地优先
+    if (m_local_pool) {
+        auto local = m_local_pool->getConnect();
+        if (local) {
+            return local->getTransList(market, code, query);
+        }
+    }
+
     Encoder enc;
     enc.putString(market + code);
     encodeKQuery(enc, query);
@@ -587,11 +781,17 @@ TransList IpcKDataDriver::getTransList(const std::string& market, const std::str
     if (m_conn && m_conn->request(Cmd::KDATA_GET_TRANS_LIST, enc.data(), res_body)) {
         Reader rd(res_body.data(), res_body.size());
         auto ts = decodeTransList(rd);
-        HKU_IF_RETURN(rd.ok(), ts);
+        if (rd.ok()) {
+            // 同分时：还原服务端 Stock 层已施加的缩放
+            if (needUnscalePrice(KQuery::TRANS, market, code)) {
+                unscalePrice(ts);
+            }
+            return ts;
+        }
         HKU_ERROR("Failed decode trans list from ipc server!");
     }
-    HKU_WARN("Fallback to local driver: getTransList");
-    return m_local ? m_local->getTransList(market, code, query) : TransList();
+    HKU_WARN("Failed get trans list from local driver and ipc server!");
+    return TransList();
 }
 
 }  // namespace ipc

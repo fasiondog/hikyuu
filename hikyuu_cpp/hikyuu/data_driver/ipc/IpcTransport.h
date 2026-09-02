@@ -12,6 +12,7 @@
 #if HKU_ENABLE_NODE
 
 #include <atomic>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -68,6 +69,15 @@ public:
     bool request(const std::vector<uint8_t>& request_frame,
                  std::vector<uint8_t>& response_frame) noexcept;
 
+    /**
+     * 同上，但为本次请求临时指定收发超时，用于轻量探测类请求（如快照协商），
+     * 避免服务端不可用（如定时重启窗口）时长时间阻塞调用方。
+     * 超时值在持锁期间设置并于返回前恢复，不影响其他请求。
+     * @param timeout_ms 本次请求的发送/接收超时（毫秒）
+     */
+    bool request(const std::vector<uint8_t>& request_frame, std::vector<uint8_t>& response_frame,
+                 uint32_t timeout_ms) noexcept;
+
     void showLog(bool show) {
         m_show_log = show;
     }
@@ -78,6 +88,7 @@ private:
     nng_socket m_socket;
     std::atomic_bool m_connected{false};
     std::atomic_bool m_show_log{true};
+    uint32_t m_timeout_ms{10000};  ///< 默认收发超时，构造后不变
 };
 
 typedef std::shared_ptr<IpcClient> IpcClientPtr;
@@ -123,6 +134,13 @@ private:
     struct Work;
     static void _serverCallback(void* arg);
     static void _processRequest(Work* work);
+
+    /**
+     * 复用该并发槽：释放 aio 残留消息后重新装载接收
+     * @details 传输层错误（客户端在响应期间断开）不应让 worker 永久退役，
+     * 否则并发槽单调耗尽；仅在服务已停止时置 FINISH。
+     */
+    static void _rearm(Work* work);
 
     std::string m_addr;
     nng_socket m_socket;

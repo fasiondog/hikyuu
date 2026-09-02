@@ -20,6 +20,39 @@ namespace ipc {
 namespace {
 std::mutex g_interrupt_checker_mutex;
 std::function<bool()> g_interrupt_checker;
+
+/**
+ * 临时收发超时守卫：构造时按需覆盖 socket 超时，析构时恢复默认值。
+ * 必须在持有 IpcClient::m_mutex 的临界区内使用，保证 socket 独占。
+ */
+class TimeoutGuard {
+public:
+    TimeoutGuard(nng_socket sock, uint32_t timeout_ms, uint32_t default_ms)
+    : m_sock(sock), m_default_ms(default_ms), m_changed(false) {
+        if (timeout_ms == default_ms) {
+            return;
+        }
+        if (nng_socket_set_ms(sock, NNG_OPT_SENDTIMEO, timeout_ms) == 0 &&
+            nng_socket_set_ms(sock, NNG_OPT_RECVTIMEO, timeout_ms) == 0) {
+            m_changed = true;
+        }
+    }
+
+    ~TimeoutGuard() {
+        if (m_changed) {
+            nng_socket_set_ms(m_sock, NNG_OPT_SENDTIMEO, m_default_ms);
+            nng_socket_set_ms(m_sock, NNG_OPT_RECVTIMEO, m_default_ms);
+        }
+    }
+
+    TimeoutGuard(const TimeoutGuard&) = delete;
+    TimeoutGuard& operator=(const TimeoutGuard&) = delete;
+
+private:
+    nng_socket m_sock;
+    uint32_t m_default_ms;
+    bool m_changed;
+};
 }  // namespace
 
 void setInterruptChecker(std::function<bool()> checker) {
@@ -65,10 +98,10 @@ bool IpcClient::dial() noexcept {
         rv = nng_socket_set_ms(m_socket, NNG_OPT_RECONNMAXT, 15000);
         HKU_CHECK(rv == 0, "Failed nng_socket_set_ms! {}", nng_strerror(rv));
 
-        rv = nng_socket_set_ms(m_socket, NNG_OPT_SENDTIMEO, 10000);
+        rv = nng_socket_set_ms(m_socket, NNG_OPT_SENDTIMEO, m_timeout_ms);
         HKU_CHECK(rv == 0, "Failed nng_socket_set_ms! {}", nng_strerror(rv));
 
-        rv = nng_socket_set_ms(m_socket, NNG_OPT_RECVTIMEO, 10000);
+        rv = nng_socket_set_ms(m_socket, NNG_OPT_RECVTIMEO, m_timeout_ms);
         HKU_CHECK(rv == 0, "Failed nng_socket_set_ms! {}", nng_strerror(rv));
 
         rv = nng_dial(m_socket, m_addr.c_str(), NULL, 0);
@@ -76,9 +109,11 @@ bool IpcClient::dial() noexcept {
         return true;
 
     } catch (const std::exception& e) {
-        HKU_ERROR_IF(m_show_log, "Failed dial ipc server: {}! {}", m_addr, e.what());
+        // 拨号失败是主从协商的正常分支（首个进程探测不到已有服务时才转为主进程），
+        // 协商失败已由 StockManager 统一告警，此处仅留调试级线索，避免单进程启动即报 ERROR
+        HKU_DEBUG_IF(m_show_log, "Failed dial ipc server: {}! {}", m_addr, e.what());
     } catch (...) {
-        HKU_ERROR_IF(m_show_log, "Failed dial ipc server: {}! Unknown error!", m_addr);
+        HKU_DEBUG_IF(m_show_log, "Failed dial ipc server: {}! Unknown error!", m_addr);
     }
 
     m_connected = false;
@@ -96,6 +131,11 @@ void IpcClient::close() noexcept {
 
 bool IpcClient::request(const std::vector<uint8_t>& request_frame,
                         std::vector<uint8_t>& response_frame) noexcept {
+    return request(request_frame, response_frame, m_timeout_ms);
+}
+
+bool IpcClient::request(const std::vector<uint8_t>& request_frame,
+                        std::vector<uint8_t>& response_frame, uint32_t timeout_ms) noexcept {
     std::lock_guard<std::mutex> lock(m_mutex);
     HKU_IF_RETURN(!m_connected, false);
 
@@ -105,27 +145,44 @@ bool IpcClient::request(const std::vector<uint8_t>& request_frame,
 
     bool sent = false;
     bool success = false;
-    rv = nng_msg_append(msg, request_frame.data(), request_frame.size());
-    if (rv == 0) {
-        rv = nng_sendmsg(m_socket, msg, 0);
+    nng_msg* res_msg = nullptr;
+    bool res_owned = false;  // 已收到响应但尚未释放
+    // response_frame.assign 可能因内存不足抛异常，而本函数承诺 noexcept，
+    // 不在此兜住会直接 terminate；异常一律视为通讯失败，由调用方回退本地驱动
+    try {
+        rv = nng_msg_append(msg, request_frame.data(), request_frame.size());
         if (rv == 0) {
-            // nng_sendmsg 成功后消息所有权即转移给 nng，不得再释放
-            sent = true;
-            nng_msg* res_msg = nullptr;
-            rv = nng_recvmsg(m_socket, &res_msg, 0);
+            // 持锁期间独占 socket，可安全地临时调整超时，离开临界区前自动恢复
+            TimeoutGuard guard(m_socket, timeout_ms, m_timeout_ms);
+            rv = nng_sendmsg(m_socket, msg, 0);
             if (rv == 0) {
-                const uint8_t* body = (const uint8_t*)nng_msg_body(res_msg);
-                response_frame.assign(body, body + nng_msg_len(res_msg));
-                nng_msg_free(res_msg);
-                success = true;
+                // nng_sendmsg 成功后消息所有权即转移给 nng，不得再释放
+                sent = true;
+                rv = nng_recvmsg(m_socket, &res_msg, 0);
+                if (rv == 0) {
+                    res_owned = true;
+                    const uint8_t* body = (const uint8_t*)nng_msg_body(res_msg);
+                    response_frame.assign(body, body + nng_msg_len(res_msg));
+                    success = true;
+                } else {
+                    HKU_ERROR_IF(m_show_log, "Failed recv ipc response! {}", nng_strerror(rv));
+                }
             } else {
-                HKU_ERROR_IF(m_show_log, "Failed recv ipc response! {}", nng_strerror(rv));
+                HKU_ERROR_IF(m_show_log, "Failed send ipc request! {}", nng_strerror(rv));
             }
-        } else {
-            HKU_ERROR_IF(m_show_log, "Failed send ipc request! {}", nng_strerror(rv));
         }
+    } catch (const std::exception& e) {
+        HKU_ERROR_IF(m_show_log, "Failed ipc request! {}", e.what());
+        success = false;
+    } catch (...) {
+        HKU_ERROR_IF(m_show_log, "Failed ipc request! Unknown error!");
+        success = false;
     }
 
+    // assign 抛异常时响应消息仍由本函数持有，须在此释放，避免泄漏
+    if (res_owned) {
+        nng_msg_free(res_msg);
+    }
     if (!sent) {
         nng_msg_free(msg);
     }
@@ -182,21 +239,27 @@ void IpcServer::start(size_t max_parallel) {
         }
         HKU_INFO("Ipc data server started, listen: {}", m_addr);
     } catch (...) {
-        // 启动失败时清理已创建的资源，避免泄漏（此时回调尚未启动，无需 stop aio）
-        for (auto* w : m_works) {
-            if (w->ctx_valid) {
-                nng_ctx_close(w->ctx);
+        if (m_running) {
+            // 回调可能已在飞，必须走 stop() 的安全路径（nng_aio_stop 等待回调结束后再释放），
+            // 否则会与正在执行的 _serverCallback 并发读写 Work 成员
+            stop();
+        } else {
+            // 启动失败时清理已创建的资源，避免泄漏（此时回调尚未启动，无需 stop aio）
+            for (auto* w : m_works) {
+                if (w->ctx_valid) {
+                    nng_ctx_close(w->ctx);
+                }
+                if (w->aio) {
+                    nng_aio_free(w->aio);
+                }
+                delete w;
             }
-            if (w->aio) {
-                nng_aio_free(w->aio);
+            m_works.clear();
+            if (listened) {
+                nng_listener_close(m_listener);
             }
-            delete w;
+            nng_close(m_socket);
         }
-        m_works.clear();
-        if (listened) {
-            nng_listener_close(m_listener);
-        }
-        nng_close(m_socket);
         throw;
     }
 }
@@ -243,11 +306,8 @@ void IpcServer::_serverCallback(void* arg) {
             if ((rv = nng_aio_result(work->aio)) != 0) {
                 HKU_ERROR_IF(rv != NNG_ECANCELED && rv != NNG_ECLOSED,
                              "Failed ipc server ctx send! {}", nng_strerror(rv));
-                work->state = Work::FINISH;
-                return;
             }
-            work->state = Work::RECV;
-            nng_ctx_recv(work->ctx, work->aio);
+            _rearm(work);
             break;
 
         case Work::FINISH:
@@ -257,6 +317,25 @@ void IpcServer::_serverCallback(void* arg) {
             HKU_ERROR("Ipc server bad state!");
             break;
     }
+}
+
+void IpcServer::_rearm(Work* work) {
+    // aio 可能仍持有未完成发送的消息，nng_ctx_recv 完成时会直接覆盖它，
+    // 故先摘出再释放；不可就地 free（aio 仍持有该指针，stop() 时会被二次处理）
+    if (nng_msg* pending = nng_aio_get_msg(work->aio)) {
+        nng_aio_set_msg(work->aio, nullptr);
+        nng_msg_free(pending);
+    }
+
+    // 客户端在响应传输期间断开（强杀、超时放弃）属常态，若就此置 FINISH，
+    // 该 ctx 将永久退役且从不重建，长期运行后并发槽单调耗尽、服务实质不可用。
+    // 仅在服务停止（stop 已先置 m_running=false 再 nng_aio_stop）时结束 worker。
+    if (!work->server || !work->server->running() || !work->ctx_valid) {
+        work->state = Work::FINISH;
+        return;
+    }
+    work->state = Work::RECV;
+    nng_ctx_recv(work->ctx, work->aio);
 }
 
 void IpcServer::_processRequest(Work* work) {
@@ -270,7 +349,7 @@ void IpcServer::_processRequest(Work* work) {
         if (rv != 0) {
             HKU_ERROR_IF(rv != NNG_ECANCELED && rv != NNG_ECLOSED, "Failed nng_aio_result! {}",
                          nng_strerror(rv));
-            work->state = Work::FINISH;
+            _rearm(work);
             return;
         }
 
@@ -313,17 +392,13 @@ void IpcServer::_processRequest(Work* work) {
 
     } catch (const std::exception& e) {
         HKU_ERROR("Ipc server process request failed! {}", e.what());
-        if (msg) {
-            nng_msg_free(msg);
-        }
-        work->state = Work::FINISH;
+        // 不在此处 nng_msg_free：msg 取自 nng_aio_get_msg，aio 仍持有该指针，
+        // 就地释放会让后续 nng_aio_free 面对已释放内存；由 _rearm 摘出后统一释放
+        _rearm(work);
 
     } catch (...) {
         HKU_ERROR("Ipc server process request failed! Unknown error!");
-        if (msg) {
-            nng_msg_free(msg);
-        }
-        work->state = Work::FINISH;
+        _rearm(work);
     }
 }
 

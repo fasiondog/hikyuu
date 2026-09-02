@@ -165,10 +165,10 @@ bool HikyuuDataServer::publishShmCache(const std::string& shm_name_prefix) {
         // 以当前时间戳作为代数，保证段名唯一且单调（快速重发布时递增），
         // 客户端以代数变化感知新快照；发布新段成功后由发布器删除旧段，
         // 已映射旧段的客户端不受影响（POSIX 段删除不影响已有映射）
-        uint64_t epoch = static_cast<uint64_t>(
-          std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now().time_since_epoch())
-            .count());
+        uint64_t epoch =
+          static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                                  std::chrono::system_clock::now().time_since_epoch())
+                                  .count());
         {
             std::shared_lock<std::shared_mutex> lock(m_shm_mutex);
             if (epoch <= m_shm_epoch) {
@@ -193,8 +193,7 @@ bool HikyuuDataServer::publishShmCache(const std::string& shm_name_prefix) {
     return false;
 }
 
-std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& body,
-                                               RetCode& ret) {
+std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& body, RetCode& ret) {
     Encoder enc;
     Reader rd(body.data(), body.size());
     auto& sm = StockManager::instance();
@@ -226,9 +225,10 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
                 // StockInfo 约定为 8 位 YYYYMMDD，客户端 loadAllStocks 会乘以 10000 还原；
                 // 而 Datetime::number() 为 12 位，直接写入会导致客户端日期溢出为 Null，必须换算；
                 // endDate 为无穷（Null）时，按 8 位上限编码，保证客户端 Datetime 构造不抛异常。
-                info.startDate = stk.startDatetime().isNull() ? 0 : stk.startDatetime().number() / 10000;
-                info.endDate = stk.lastDatetime().isNull() ? 99999999
-                                                             : stk.lastDatetime().number() / 10000;
+                info.startDate =
+                  stk.startDatetime().isNull() ? 0 : stk.startDatetime().number() / 10000;
+                info.endDate =
+                  stk.lastDatetime().isNull() ? 99999999 : stk.lastDatetime().number() / 10000;
                 info.precision = stk.precision();
                 info.tick = stk.tick();
                 info.tickValue = stk.tickValue();
@@ -251,10 +251,12 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
                 info.name = stk.name();
                 info.type = stk.type();
                 info.valid = stk.valid() ? 1 : 0;
-                // 同 BASE_ALL_STOCK_INFO：8 位 YYYYMMDD 约定，12 位写入会导致客户端日期溢出为 Null。
-                info.startDate = stk.startDatetime().isNull() ? 0 : stk.startDatetime().number() / 10000;
-                info.endDate = stk.lastDatetime().isNull() ? 99999999
-                                                             : stk.lastDatetime().number() / 10000;
+                // 同 BASE_ALL_STOCK_INFO：8 位 YYYYMMDD 约定，12 位写入会导致客户端日期溢出为
+                // Null。
+                info.startDate =
+                  stk.startDatetime().isNull() ? 0 : stk.startDatetime().number() / 10000;
+                info.endDate =
+                  stk.lastDatetime().isNull() ? 99999999 : stk.lastDatetime().number() / 10000;
                 info.precision = stk.precision();
                 info.tick = stk.tick();
                 info.tickValue = stk.tickValue();

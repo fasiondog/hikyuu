@@ -12,7 +12,9 @@
 #if HKU_ENABLE_NODE
 
 #include <thread>
+#include <atomic>
 #include <chrono>
+#include <limits>
 #if defined(_WIN32)
 #include <process.h>
 #define HKU_TEST_GETPID _getpid
@@ -74,6 +76,75 @@ TEST_CASE("test_IpcEncoderReader") {
     CHECK_FALSE(rd.ok());
 }
 
+TEST_CASE("test_IpcReaderCountBound") {
+    // getCount / getCount32 须校验元素个数不超过剩余字节所能容纳的上限：
+    // 坏帧或版本错配给出的天文数字若被直接用于 resize/reserve，会触发
+    // length_error/bad_alloc；且超界必须置失败，否则调用方会把“坏帧”误读为“成功但集合为空”
+    SUBCASE("count within bound") {
+        Encoder enc;
+        enc.putU64(2);
+        // 每条记录最小 8 字节，补足 24 字节足以容纳 2 条
+        for (int i = 0; i < 24; i++) {
+            enc.putU8(0);
+        }
+        Reader rd(enc.data().data(), enc.data().size());
+        CHECK_EQ(rd.getCount(8), 2);
+        CHECK(rd.ok());
+    }
+
+    SUBCASE("count exceeds bound") {
+        Encoder enc;
+        enc.putU64(1000);
+        enc.putU8(0);  // 剩余 1 字节，容纳不下 1000 条
+        Reader rd(enc.data().data(), enc.data().size());
+        CHECK_EQ(rd.getCount(8), 0);
+        CHECK_FALSE(rd.ok());
+    }
+
+    SUBCASE("astronomic count") {
+        Encoder enc;
+        enc.putU64(std::numeric_limits<uint64_t>::max());
+        Reader rd(enc.data().data(), enc.data().size());
+        CHECK_EQ(rd.getCount(8), 0);
+        CHECK_FALSE(rd.ok());
+    }
+
+    SUBCASE("u32 variant") {
+        Encoder enc;
+        enc.putU32(std::numeric_limits<uint32_t>::max());
+        Reader rd(enc.data().data(), enc.data().size());
+        CHECK_EQ(rd.getCount32(8), 0);
+        CHECK_FALSE(rd.ok());
+
+        Encoder enc2;
+        enc2.putU32(3);
+        for (int i = 0; i < 24; i++) {
+            enc2.putU8(0);
+        }
+        Reader rd2(enc2.data().data(), enc2.data().size());
+        CHECK_EQ(rd2.getCount32(8), 3);
+        CHECK(rd2.ok());
+    }
+
+    SUBCASE("elem_min_size zero skips check") {
+        // 变长元素（如字符串列表）给不出最小字节数，传 0 表示不做上界校验
+        Encoder enc;
+        enc.putU64(1000);
+        Reader rd(enc.data().data(), enc.data().size());
+        CHECK_EQ(rd.getCount(0), 1000);
+        CHECK(rd.ok());
+    }
+
+    SUBCASE("truncated count field") {
+        // count 字段自身被截断：getU64 越界置失败，getCount 返回 0
+        Encoder enc;
+        enc.putU32(1);  // 仅 4 字节，不足 u64
+        Reader rd(enc.data().data(), enc.data().size());
+        CHECK_EQ(rd.getCount(8), 0);
+        CHECK_FALSE(rd.ok());
+    }
+}
+
 TEST_CASE("test_IpcFrameCodec") {
     std::vector<uint8_t> body = {1, 2, 3, 4, 5};
     auto req = encodeRequest(Cmd::KDATA_COUNT, body);
@@ -124,8 +195,8 @@ TEST_CASE("test_IpcRecordCodec") {
 
     SUBCASE("StockWeightList") {
         StockWeightList ws;
-        ws.emplace_back(StockWeight(Datetime(202006010000LL), 0.1, 0.2, 0.3, 0.4, 0.5, 1000, 900,
-                                    0.6));
+        ws.emplace_back(
+          StockWeight(Datetime(202006010000LL), 0.1, 0.2, 0.3, 0.4, 0.5, 1000, 900, 0.6));
         Encoder enc;
         encodeStockWeightList(enc, ws);
         Reader rd(enc.data().data(), enc.data().size());
@@ -381,9 +452,8 @@ TEST_CASE("test_KDataShmCache") {
 
             KRecordList shm_ks;
             // 注意：必须显式 int64_t，否则 Null<int64_t> 会隐式转换选中 KQuery 的日期重载
-            CHECK(reader.tryGetKRecordList(mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(),
-                                                      KQuery::DAY),
-                                           shm_ks));
+            CHECK(reader.tryGetKRecordList(
+              mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), shm_ks));
             auto buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
             REQUIRE_EQ(shm_ks.size(), buf_ks.size());
             if (!shm_ks.empty()) {
@@ -408,19 +478,17 @@ TEST_CASE("test_KDataShmCache") {
 
         // 日期区间查询与主进程缓冲模式一致（_getIndexRangeByDateFromBuffer 语义）
         size_t start_ix = 0, end_ix = 0;
-        auto full = StockManager::instance().getStock(sample_mc).getKRecordListFromBuffer(
-          KQuery::DAY);
+        auto full =
+          StockManager::instance().getStock(sample_mc).getKRecordListFromBuffer(KQuery::DAY);
         Datetime mid_date = full[full.size() / 2].datetime;
-        CHECK(reader.tryGetIndexRangeByDate(sample_mc,
-                                            KQueryByDate(mid_date, Null<Datetime>(), KQuery::DAY),
-                                            start_ix, end_ix));
+        CHECK(reader.tryGetIndexRangeByDate(
+          sample_mc, KQueryByDate(mid_date, Null<Datetime>(), KQuery::DAY), start_ix, end_ix));
         CHECK_EQ(start_ix, full.size() / 2);
         CHECK_EQ(end_ix, full.size());
 
         KRecordList by_date;
-        CHECK(reader.tryGetKRecordList(sample_mc,
-                                       KQueryByDate(mid_date, Null<Datetime>(), KQuery::DAY),
-                                       by_date));
+        CHECK(reader.tryGetKRecordList(
+          sample_mc, KQueryByDate(mid_date, Null<Datetime>(), KQuery::DAY), by_date));
         CHECK_EQ(by_date.size(), full.size() - full.size() / 2);
 
         // 日期区间为空（覆盖但无数据）：返回 false 且不产生结果，由上层按覆盖处理；
@@ -434,10 +502,181 @@ TEST_CASE("test_KDataShmCache") {
         CHECK_FALSE(reader.valid());
     }
 
+    SUBCASE("realtime mirror") {
+        // 验证实时镜像写入：末根更新/追加/过期忽略/预留区写满冻结，
+        // 以及并发读写下 seqlock 的无撕裂一致性
+        KDataShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260902);
+        REQUIRE_FALSE(name.empty());
+
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+
+        auto& sm = StockManager::instance();
+        Stock sample;
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            if (stk.getKDataBufferSize(KQuery::DAY) > 3) {
+                sample = stk;
+                break;
+            }
+        }
+        REQUIRE_FALSE(sample.isNull());
+        auto buf_ks = sample.getKRecordListFromBuffer(KQuery::DAY);
+        REQUIRE_FALSE(buf_ks.empty());
+        const std::string mc = sample.market_code();
+        size_t base_count = buf_ks.size();
+        Datetime last_dt = buf_ks.back().datetime;
+
+        size_t count = 0;
+        REQUIRE(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count);
+
+        // 未覆盖证券/类型的镜像更新：静默跳过
+        shmMirrorRealtimeUpdate("SH999999", KQuery::DAY, KRecord(last_dt, 1, 1, 1, 1, 1, 1));
+        shmMirrorRealtimeUpdate(mc, KQuery::MIN, KRecord(last_dt, 1, 1, 1, 1, 1, 1));
+        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count);
+
+        // 末根同日更新：收/量/额覆盖，高取大、低取小（与 realtimeUpdate 规则一致）
+        shmMirrorRealtimeUpdate(
+          mc, KQuery::DAY,
+          KRecord(last_dt, buf_ks.back().openPrice, buf_ks.back().highPrice + 1.0,
+                  buf_ks.back().lowPrice - 1.0, 12.34, 555.0, 666.0));
+        KRecordList ks;
+        REQUIRE(reader.tryGetKRecordList(
+          mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), ks));
+        REQUIRE_EQ(ks.size(), base_count);
+        CHECK_EQ(ks.back().closePrice, 12.34);
+        CHECK_EQ(ks.back().highPrice, buf_ks.back().highPrice + 1.0);
+        CHECK_EQ(ks.back().lowPrice, buf_ks.back().lowPrice - 1.0);
+        CHECK_EQ(ks.back().transAmount, 555.0);
+        CHECK_EQ(ks.back().transCount, 666.0);
+
+        // 追加：DAY 预留容量为 2，前两笔成功，第三笔被阻挡（冻结语义，
+        // 现有部署每日定时重启重新发布即恢复）
+        Datetime dt1 = last_dt + TimeDelta(1);
+        Datetime dt2 = last_dt + TimeDelta(2);
+        Datetime dt3 = last_dt + TimeDelta(3);
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt1, 10.0, 10.5, 9.5, 10.2, 100.0, 200.0));
+        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count + 1);
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt2, 10.1, 10.6, 9.6, 10.3, 101.0, 201.0));
+        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count + 2);
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt3, 10.2, 10.7, 9.7, 10.4, 103.0, 203.0));
+        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count + 2);  // 预留区满，追加被阻挡
+
+        // 预留区满后末根更新仍生效
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt2, 10.1, 11.0, 9.0, 10.9, 102.0, 202.0));
+        REQUIRE(reader.tryGetKRecordList(
+          mc, KQuery((int64_t)(base_count + 1), (int64_t)(base_count + 2), KQuery::DAY), ks));
+        REQUIRE_EQ(ks.size(), 1);
+        CHECK_EQ(ks[0].closePrice, 10.9);
+        CHECK_EQ(ks[0].highPrice, 11.0);
+
+        // 过期记录被忽略
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0));
+        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count + 2);
+
+        // 日期查询覆盖镜像追加区
+        size_t start_ix = 0, end_ix = 0;
+        CHECK(reader.tryGetIndexRangeByDate(mc, KQueryByDate(dt1, Null<Datetime>(), KQuery::DAY),
+                                            start_ix, end_ix));
+        CHECK_EQ(start_ix, base_count);
+        CHECK_EQ(end_ix, base_count + 2);
+
+        // 并发读写：写者持续更新末根（close 与 transCount 同值写入），
+        // 读者验证两字段恒相等，检验 seqlock 无撕裂读
+        // 前置：先将末根 close 与 transCount 置为同值，否则读者会以初始不等状态误判撕裂
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY,
+                                KRecord(dt2, 10.1, 11.0, 9.0, 102.0, 102.0, 102.0));
+        std::atomic<bool> stop{false};
+        std::atomic<bool> torn{false};
+        std::atomic<size_t> reads{0};
+        std::thread writer([&]() {
+            for (int i = 0; i < 2000; i++) {
+                double v = (double)(i % 97) + 1.0;
+                shmMirrorRealtimeUpdate(mc, KQuery::DAY,
+                                        KRecord(dt2, 10.1, 11.0, 9.0, v, 102.0, v));
+            }
+            stop.store(true);
+        });
+        while (!stop.load()) {
+            KRecordList tail;
+            if (reader.tryGetKRecordList(
+                  mc, KQuery((int64_t)(base_count + 1), (int64_t)(base_count + 2), KQuery::DAY),
+                  tail) &&
+                tail.size() == 1) {
+                reads++;
+                if (tail[0].closePrice != tail[0].transCount) {
+                    torn.store(true);
+                    break;
+                }
+            }
+        }
+        writer.join();
+        CHECK_FALSE(torn);
+        CHECK_GT(reads.load(), 0);  // 确保读者确实取到快照，避免重试全失败导致假通过
+    }
+
     SUBCASE("invalid segment") {
         KDataShmReader reader;
         CHECK_FALSE(reader.open("hkushm_not_exist_0123456789"));
         CHECK_FALSE(reader.valid());
+    }
+
+    SUBCASE("oversized market_code") {
+        // 索引项的 market_code 为定长字段，超长 key 必须在二分查找前被拒绝：
+        // 截断后可能与其他证券重名而返回错误数据（发布端同理跳过超长证券）
+        KDataShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260904);
+        REQUIRE_FALSE(name.empty());
+
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+
+        size_t count = 12345;
+        const std::string too_long(sizeof(ShmStockEntry::market_code) + 8, 'X');
+        CHECK_FALSE(reader.tryGetCount(too_long, KQuery::DAY, count));
+        CHECK_EQ(count, 12345);  // 失败时不得写出参
+
+        size_t start_ix = 1, end_ix = 1;
+        CHECK_FALSE(reader.tryGetIndexRangeByDate(
+          too_long, KQueryByDate(Datetime(199001010000LL), Null<Datetime>(), KQuery::DAY), start_ix,
+          end_ix));
+
+        KRecordList ks;
+        CHECK_FALSE(reader.tryGetKRecordList(
+          too_long, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), ks));
+
+        // 恰好等于字段长度的 key 亦不可容纳（需留 NUL 结束符），同样应被拒绝而非误匹配
+        const std::string exact_len(sizeof(ShmStockEntry::market_code), 'Y');
+        CHECK_FALSE(reader.tryGetCount(exact_len, KQuery::DAY, count));
+    }
+
+    SUBCASE("ktype coverage") {
+        // ktype 表须反映主进程的预加载配置（测试配置仅 day=True），
+        // 客户端据此判定某类型在主进程侧是否存在实时更新链路，从而决定是否直接走本地驱动
+        KDataShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260903);
+        REQUIRE_FALSE(name.empty());
+
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+        CHECK(reader.coversKType(KQuery::DAY));
+        // 大小写不敏感（表内统一存储大写）
+        CHECK(reader.coversKType("day"));
+        CHECK_FALSE(reader.coversKType(KQuery::MIN));
+        CHECK_FALSE(reader.coversKType(KQuery::WEEK));
+        // 标准配置不预加载分时/分笔，故不进表；客户端将直接走本地驱动
+        CHECK_FALSE(reader.coversKType(KQuery::TIMELINE));
+        CHECK_FALSE(reader.coversKType(KQuery::TRANS));
+
+        // 段未映射时一律返回 false，调用方不得据此判定“主进程未预加载”
+        reader.close();
+        CHECK_FALSE(reader.coversKType(KQuery::DAY));
     }
 
     SUBCASE("server shm info handshake") {
@@ -509,9 +748,9 @@ TEST_CASE("test_IpcConnectorInterrupt") {
     setInterruptChecker([]() { return true; });
     auto start_tp = std::chrono::steady_clock::now();
     CHECK_FALSE(conn.waitReady(60));
-    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-                     std::chrono::steady_clock::now() - start_tp)
-                     .count();
+    auto elapsed =
+      std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - start_tp)
+        .count();
     CHECK_LT(elapsed, 5);
     setInterruptChecker(nullptr);
 

@@ -9,6 +9,9 @@
 #include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
+#if HKU_ENABLE_NODE
+#include "data_driver/ipc/KDataShmCache.h"
+#endif
 #include "plugin/hkuextra.h"
 #include "KData.h"
 
@@ -1188,6 +1191,11 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 
     if (m_data->pKData[ktype]->empty()) {
         m_data->pKData[ktype]->push_back(record);
+#if HKU_ENABLE_NODE
+        // 镜像到共享内存段（未发布该证券/类型时静默跳过）；
+        // 在证券×ktype 写锁内调用，保证段内单写者串行
+        ipc::shmMirrorRealtimeUpdate(market_code(), inktype, record);
+#endif
         return;
     }
 
@@ -1214,6 +1222,12 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
         HKU_DEBUG("Ignore record, datetime({}) < last record.datetime({})! {} {}", record.datetime,
                   tmp.datetime, market_code(), inktype);
     }
+
+#if HKU_ENABLE_NODE
+    // 镜像到共享内存段（未发布时静默跳过；过期记录由镜像规则同样忽略），
+    // 客户端进程由此读到准实时数据，无需 IPC 往返
+    ipc::shmMirrorRealtimeUpdate(market_code(), inktype, record);
+#endif
 }
 
 Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {

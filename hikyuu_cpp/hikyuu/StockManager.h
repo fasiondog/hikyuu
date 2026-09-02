@@ -66,6 +66,17 @@ public:
     /** 主动退出并释放资源 */
     static void quit();
 
+#if HKU_ENABLE_NODE
+    /**
+     * 停止单机数据服务并释放共享内存快照
+     * @details 必须在 nng_fini() 之前调用：服务端的 nng worker 持有在飞的接收操作，
+     * 若留待 nng 全局状态被拆除后再由取消回调触发，会在已销毁的内部结构上重新装载
+     * 接收而崩溃。非泄漏检测构建下 StockManager 不析构，故不能依赖其析构函数停机。
+     * 重复调用安全。
+     */
+    void stopIpcDataServer();
+#endif
+
     /** 获取基础信息驱动参数 */
     const Parameter& getBaseInfoDriverParameter() const;
 
@@ -331,6 +342,29 @@ private:
     /* 加载 K线数据至缓存 */
     void loadAllKData();
     std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
+
+    /* 串行加载全部 K 线及历史财务（驱动不支持并行加载时），在独立线程中执行 */
+    void _loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
+
+    /* 并行加载全部 K 线及历史财务，在独立线程中执行 */
+    void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
+
+    /*
+     * 以下接口无条件声明，未启用 HKU_ENABLE_NODE 时为空实现：它们被 _loadAllKDataSerial /
+     * _loadAllKDataParallel 调用，若改为条件声明就会把 #if 重新带回两个加载函数的内部。
+     */
+
+    /* 是否处于 IPC 客户端模式：数据由服务端提供，本地无预加载任务 */
+    bool _isIpcClientMode() const;
+
+    /* 主进程 K 线预加载完成后，将热数据发布为只读共享内存快照 */
+    void _publishShmCacheIfMaster();
+
+    /* 上报预加载进度，供客户端感知服务端就绪程度 */
+    void _reportLoadProgress(uint64_t loaded, uint64_t total);
+
+    /* 通知客户端基础数据已加载完毕，可对外提供服务 */
+    void _notifyIpcBaseDataReady();
 
     /* 加载节假日信息 */
     void loadAllHolidays();

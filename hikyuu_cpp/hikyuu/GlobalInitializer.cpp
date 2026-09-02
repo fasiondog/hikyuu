@@ -150,6 +150,13 @@ void GlobalInitializer::clean() {
     }
 #endif
 
+#if HKU_ENABLE_NODE
+    // 显式停止单机数据服务：其 nng worker 持有在飞的接收操作，若留待下方 nng_fini
+    // 拆除全局状态后再由取消回调触发，会在已销毁的内部结构上重新装载接收而崩溃；
+    // 非泄漏检测构建下 StockManager 不析构，也无法依赖其析构函数停机
+    sm.stopIpcDataServer();
+#endif
+
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
     // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢
     StockManager::quit();

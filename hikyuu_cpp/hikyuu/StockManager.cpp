@@ -47,9 +47,7 @@ StockManager::StockManager() {
 
 StockManager::~StockManager() {
 #if HKU_ENABLE_NODE
-    if (m_ipc_server) {
-        m_ipc_server->stop();
-    }
+    stopIpcDataServer();
 #endif
     delete m_stockDict_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
@@ -177,14 +175,10 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // 加载数据
     loadData();
 
-#if HKU_ENABLE_NODE
     // 基础数据（证券/市场/节假日/权息/板块等）加载完毕即可对外提供服务；
     // K线预加载仅为缓存预热，服务端的K线请求均通过驱动实时查询，
     // 后台预热期间不影响客户端查询，无需让客户端等待预加载完成。
-    if (m_ipc_server) {
-        m_ipc_server->setAllReady();
-    }
-#endif
+    _notifyIpcBaseDataReady();
 
     // 初始化内部定时任务（重加载）
     initInnerTask();
@@ -271,15 +265,18 @@ void StockManager::_negotiateIpcDataServer() {
         m_ipc_conn = conn;
         m_baseInfoDriver = std::make_shared<ipc::IpcBaseInfoDriver>(conn, m_baseInfoDriver);
         m_blockDriver = std::make_shared<ipc::IpcBlockDriver>(conn, m_blockDriver);
+        // 传入整个本地驱动连接池（而非其 prototype）：主进程未预加载的类型与分时/分笔
+        // 由客户端本地驱动直接服务，需经池取连接以避免多个克隆并发复用同一连接/文件句柄
         auto local_pool = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-        auto ipc_kdriver = std::make_shared<ipc::IpcKDataDriver>(conn, local_pool->getPrototype());
+        auto ipc_kdriver = std::make_shared<ipc::IpcKDataDriver>(conn, local_pool);
         m_ipc_kdata_pool = std::make_shared<KDataDriverConnectPool>(ipc_kdriver);
         for (const auto& ktype : KQuery::getBaseKTypeList()) {
             auto low_ktype = ktype;
             to_lower(low_ktype);
             m_preloadParam.set<bool>(low_ktype, false);
         }
-        HKU_INFO("Connected to hikyuu data server: {}, running in client mode.", m_ipc_conn->addr());
+        HKU_INFO("Connected to hikyuu data server: {}, running in client mode.",
+                 m_ipc_conn->addr());
     };
 
     // 连接服务并等待其数据就绪，成功返回 true 并切换为客户端模式
@@ -319,6 +316,49 @@ void StockManager::_negotiateIpcDataServer() {
     }
     HKU_WARN("Failed connect to hikyuu data server, fallback to standalone mode!");
 }
+
+void StockManager::stopIpcDataServer() {
+    if (!m_ipc_server) {
+        return;
+    }
+    // 先停机（等回调结束、关闭 ctx/aio、释放文件锁），再销毁服务；
+    // 销毁会连带析构发布器，解除共享内存映射并删除当前段
+    m_ipc_server->stop();
+    m_ipc_server.reset();
+}
+
+bool StockManager::_isIpcClientMode() const {
+    return m_ipc_client_mode;
+}
+
+// 主进程 K 线预加载完成后，将热数据发布为只读共享内存缓存快照，
+// 供客户端进程零拷贝直接读取，避免全市场遍历时逐证券 IPC 往返
+void StockManager::_publishShmCacheIfMaster() {
+    HKU_IF_RETURN(!m_ipc_server || !m_ipc_server->running(), void());
+    HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("kdata_server_shm_cache", true), void());
+    m_ipc_server->publishShmCache("hikyuu_ks");
+}
+
+void StockManager::_reportLoadProgress(uint64_t loaded, uint64_t total) {
+    HKU_IF_RETURN(!m_ipc_server, void());
+    m_ipc_server->updateProgress(std::min(loaded, total), total);
+}
+
+void StockManager::_notifyIpcBaseDataReady() {
+    HKU_IF_RETURN(!m_ipc_server, void());
+    m_ipc_server->setAllReady();
+}
+
+#else
+
+/* 未启用单机数据服务时均为空操作，使调用方（两个加载函数与 init）无需条件编译 */
+bool StockManager::_isIpcClientMode() const {
+    return false;
+}
+void StockManager::_publishShmCacheIfMaster() {}
+void StockManager::_reportLoadProgress(uint64_t, uint64_t) {}
+void StockManager::_notifyIpcBaseDataReady() {}
+
 #endif  // HKU_ENABLE_NODE
 
 void StockManager::loadAllKData() {
@@ -369,188 +409,151 @@ void StockManager::loadAllKData() {
     bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
     HKU_INFO_IF(lazy_preload && canLazyLoad(KQuery::MIN), htr("Use lazy preload!"));
 
-#if HKU_ENABLE_NODE
-    // 主进程 K 线预加载完成后，将热数据发布为只读共享内存缓存快照，
-    // 供客户端进程零拷贝直接读取，避免全市场遍历时逐证券 IPC 往返；
-    // 在历史财务加载之前发布，使客户端尽早获得 K 线热数据。
-    auto publishShmCacheIfMaster = [this]() {
-        HKU_IF_RETURN(!m_ipc_server || !m_ipc_server->running(), void());
-        HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("kdata_server_shm_cache", true), void());
-        m_ipc_server->publishShmCache("hikyuu_ks");
-    };
-#endif
-
     // 先加载同类K线（预加载仅为缓存预热，一律后台异步执行，不阻塞初始化；
     // 预热期间的查询经由驱动实时获取，结果不受影响；
     // 需要等待预热完成的场景可显式调用 waitDataReady()）
     auto driver = _getKDataDriverPool();
-#if HKU_ENABLE_NODE
-    if (m_ipc_client_mode) {
+    if (_isIpcClientMode()) {
         // 客户端模式下数据由服务端提供，本地无预加载任务，直接就绪
         m_data_ready.store(true, std::memory_order_release);
         return;
     }
-#endif
 
     if (!driver->getPrototype()->canParallelLoad()) {
-        std::thread t = std::thread([this, ktypes, low_ktypes
-#if HKU_ENABLE_NODE
-                                     ,
-                                     publishShmCacheIfMaster
-#endif
-                                    ]() {
-#if HKU_ENABLE_NODE
-            size_t preload_ktype_count = 0;
-            for (const auto& low_ktype : low_ktypes) {
-                if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
-                    preload_ktype_count++;
-                }
-            }
-            uint64_t total_task = m_stockDict.size() * preload_ktype_count;
-            uint64_t loaded_task = 0;
-#endif
-            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
-                if (m_cancel_load) {
-                    break;
-                }
-                if (canLazyLoad(ktypes[i])) {
-                    continue;
-                }
-                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
-                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                    if (m_cancel_load) {
-                        break;
-                    }
-                    const auto& low_ktype = low_ktypes[i];
-                    if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
-                        iter->second.loadKDataToBuffer(ktypes[i]);
-#if HKU_ENABLE_NODE
-                        if (m_ipc_server) {
-                            m_ipc_server->updateProgress(++loaded_task, total_task);
-                        }
-#endif
-                    }
-                }
-            }
-
-#if HKU_ENABLE_NODE
-            // 取消预加载（进程退出）时不发布，避免白做全量序列化后立即被销毁
-            if (!m_cancel_load) {
-                publishShmCacheIfMaster();
-            }
-#endif
-
-            if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-                ThreadPool tg;
-                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
-                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                    if (m_cancel_load) {
-                        break;
-                    }
-                    tg.submit([stk = iter->second, this]() {
-                        HKU_IF_RETURN(m_cancel_load, void());
-                        stk.getHistoryFinance();
-                    });
-                }
-                lock.unlock();
-                tg.join();
-            }
-
-            m_data_ready.store(true, std::memory_order_release);
+        std::thread t = std::thread([this, ktypes, low_ktypes]() mutable {
+            _loadAllKDataSerial(std::move(ktypes), std::move(low_ktypes));
         });
         t.detach();
     } else {
         // 异步并行加载
-        std::thread t = std::thread([this, ktypes, low_ktypes
-#if HKU_ENABLE_NODE
-                                     ,
-                                     publishShmCacheIfMaster
-#endif
-                                    ]() {
-#if HKU_ENABLE_NODE
-            auto loaded_cnt = std::make_shared<std::atomic<uint64_t>>(0);
-            uint64_t total_task = m_stockDict.size();
-            if (m_ipc_server) {
-                m_ipc_server->updateProgress(0, total_task);
-            }
-#endif
-            auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
-
-            // 加载其他证券K线(可能不同不同K线驱动的证券)
-            this->m_load_tg = std::make_unique<ThreadPool>();
-            for (size_t i = 0, len = ktypes.size(); i < len; i++) {
-                if (m_cancel_load) {
-                    break;
-                }
-                if (canLazyLoad(ktypes[i])) {
-                    continue;
-                }
-                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
-                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                    if (m_cancel_load) {
-                        break;
-                    }
-                    if (loaded_codes.find(iter->first) != loaded_codes.end()) {
-                        continue;
-                    }
-                    if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
-                        m_load_tg->submit(
-                          [this, stk = iter->second, ktype = std::move(ktypes[i])
-#if HKU_ENABLE_NODE
-                           ,
-                           loaded_cnt, total_task
-#endif
-                          ]() mutable {
-                              HKU_IF_RETURN(m_cancel_load, void());
-                              stk.loadKDataToBuffer(ktype);
-#if HKU_ENABLE_NODE
-                              if (m_ipc_server) {
-                                  uint64_t loaded = loaded_cnt->fetch_add(1) + 1;
-                                  m_ipc_server->updateProgress(std::min(loaded, total_task),
-                                                               total_task);
-                              }
-#endif
-                          });
-                    }
-                }
-            }
-
-            // 等待 K 线预加载任务全部完成后，再将热数据发布为共享内存快照；
-            // 注意发布必须在 join 之后，否则缓冲区可能尚未填充。
-            m_load_tg->join();
-            m_load_tg.reset();
-
-#if HKU_ENABLE_NODE
-            // 取消预加载（进程退出）时不发布，避免白做全量序列化后立即被销毁
-            if (!m_cancel_load) {
-                publishShmCacheIfMaster();
-            }
-#endif
-
-            if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
-                m_load_tg = std::make_unique<ThreadPool>();
-                std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
-                for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
-                    if (m_cancel_load) {
-                        break;
-                    }
-                    if (loaded_codes.find(iter->first) != loaded_codes.end()) {
-                        continue;
-                    }
-                    m_load_tg->submit([this, stk = iter->second]() {
-                        HKU_IF_RETURN(m_cancel_load, void());
-                        stk.getHistoryFinance();
-                    });
-                }
-                lock.unlock();
-                m_load_tg->join();
-                m_load_tg.reset();
-            }
-
-            m_data_ready.store(true, std::memory_order_release);
+        std::thread t = std::thread([this, ktypes, low_ktypes]() mutable {
+            _loadAllKDataParallel(std::move(ktypes), std::move(low_ktypes));
         });
         t.detach();
     }
+}
+
+void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
+    size_t preload_ktype_count = 0;
+    for (const auto& low_ktype : low_ktypes) {
+        if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+            preload_ktype_count++;
+        }
+    }
+    uint64_t total_task = m_stockDict.size() * preload_ktype_count;
+    uint64_t loaded_task = 0;
+
+    for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        if (m_cancel_load) {
+            break;
+        }
+        if (canLazyLoad(ktypes[i])) {
+            continue;
+        }
+        std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (m_cancel_load) {
+                break;
+            }
+            const auto& low_ktype = low_ktypes[i];
+            if (m_preloadParam.tryGet<bool>(low_ktype, false)) {
+                iter->second.loadKDataToBuffer(ktypes[i]);
+                _reportLoadProgress(++loaded_task, total_task);
+            }
+        }
+    }
+
+    // 在历史财务加载之前发布，使客户端尽早获得 K 线热数据；
+    // 取消预加载（进程退出）时不发布，避免白做全量序列化后立即被销毁
+    if (!m_cancel_load) {
+        _publishShmCacheIfMaster();
+    }
+
+    if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+        ThreadPool tg;
+        std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (m_cancel_load) {
+                break;
+            }
+            tg.submit([stk = iter->second, this]() {
+                HKU_IF_RETURN(m_cancel_load, void());
+                stk.getHistoryFinance();
+            });
+        }
+        lock.unlock();
+        tg.join();
+    }
+
+    m_data_ready.store(true, std::memory_order_release);
+}
+
+void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
+    auto loaded_cnt = std::make_shared<std::atomic<uint64_t>>(0);
+    uint64_t total_task = m_stockDict.size();
+    _reportLoadProgress(0, total_task);
+
+    auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
+
+    // 加载其他证券K线(可能不同不同K线驱动的证券)
+    this->m_load_tg = std::make_unique<ThreadPool>();
+    for (size_t i = 0, len = ktypes.size(); i < len; i++) {
+        if (m_cancel_load) {
+            break;
+        }
+        if (canLazyLoad(ktypes[i])) {
+            continue;
+        }
+        std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (m_cancel_load) {
+                break;
+            }
+            if (loaded_codes.find(iter->first) != loaded_codes.end()) {
+                continue;
+            }
+            if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
+                m_load_tg->submit([this, stk = iter->second, ktype = std::move(ktypes[i]),
+                                   loaded_cnt, total_task]() mutable {
+                    HKU_IF_RETURN(m_cancel_load, void());
+                    stk.loadKDataToBuffer(ktype);
+                    _reportLoadProgress(loaded_cnt->fetch_add(1) + 1, total_task);
+                });
+            }
+        }
+    }
+
+    // 等待 K 线预加载任务全部完成后，再将热数据发布为共享内存快照；
+    // 注意发布必须在 join 之后，否则缓冲区可能尚未填充；
+    // 取消预加载（进程退出）时不发布，避免白做全量序列化后立即被销毁
+    m_load_tg->join();
+    m_load_tg.reset();
+
+    if (!m_cancel_load) {
+        _publishShmCacheIfMaster();
+    }
+
+    if (!m_cancel_load && m_hikyuuParam.tryGet<bool>("load_history_finance", true)) {
+        m_load_tg = std::make_unique<ThreadPool>();
+        std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            if (m_cancel_load) {
+                break;
+            }
+            if (loaded_codes.find(iter->first) != loaded_codes.end()) {
+                continue;
+            }
+            m_load_tg->submit([this, stk = iter->second]() {
+                HKU_IF_RETURN(m_cancel_load, void());
+                stk.getHistoryFinance();
+            });
+        }
+        lock.unlock();
+        m_load_tg->join();
+        m_load_tg.reset();
+    }
+
+    m_data_ready.store(true, std::memory_order_release);
 }
 
 std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(

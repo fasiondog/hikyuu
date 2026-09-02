@@ -29,6 +29,10 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
+; 单机数据服务: 同一台机器上多个进程共用同一数据目录时自动协商, 缺省即启用
+;kdata_server = True
+;kdata_server_shm_cache = True
+;kdata_server_wait_timeout = 600
 
 [block]
 type = sqlite3
@@ -103,6 +107,10 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
+; 单机数据服务: 同一台机器上多个进程共用同一数据目录时自动协商, 缺省即启用
+;kdata_server = True
+;kdata_server_shm_cache = True
+;kdata_server_wait_timeout = 600
 
 [block]
 type = mysql
@@ -164,6 +172,10 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
+; 单机数据服务: 同一台机器上多个进程共用同一数据目录时自动协商, 缺省即启用
+;kdata_server = True
+;kdata_server_shm_cache = True
+;kdata_server_wait_timeout = 600
 
 [block]
 type = clickhouse
