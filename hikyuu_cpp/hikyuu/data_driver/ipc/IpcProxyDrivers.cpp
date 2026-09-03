@@ -50,7 +50,10 @@ bool needUnscalePrice(const KQuery::KType& ktype, const std::string& market,
     return t == STOCKTYPE_ETF || t == STOCKTYPE_FUND || t == STOCKTYPE_B;
 }
 
-/// 还原 KRecordList 中服务端已施加的价格缩放
+/// 还原 KRecordList 中服务端已施加的价格缩放。
+/// @note 仅还原 closePrice：服务端 Stock.cpp 只对 TIMELINE/TRANS 的 ETF/FUND/B 缩放 closePrice
+///       （×0.1），不涉及 open/high/low。二者隐式配对——若服务端改为缩放全部 OHLC，本函数须同步
+///       更新，否则 open/high/low 将静默产生 10 倍误差。调用点由 needUnscalePrice 按同一条件守卫。
 void unscalePrice(KRecordList& ks) {
     for (auto& k : ks) {
         k.closePrice /= 0.1;
@@ -209,17 +212,150 @@ bool IpcConnector::waitReady(uint64_t timeout_seconds,
     }
 }
 
+bool IpcConnector::refreshShmInfo() {
+    if (!connected()) {
+        return false;
+    }
+    // 拉取限流：最小间隔内最多协商一次，避免高频未命中查询每查一次额外 IPC；
+    // 服务端发布新段后客户端最多延迟该间隔感知。服务端不可用时的退避抑制由
+    // probeRequest 在连接内统一处理（连续失败指数退避）。
+    constexpr int64_t MIN_CHECK_INTERVAL_MS = 5000;
+    auto now = std::chrono::steady_clock::now();
+    {
+        std::lock_guard<std::mutex> lock(m_shm_info_mutex);
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_shm_last_check).count() <
+            MIN_CHECK_INTERVAL_MS) {
+            return false;
+        }
+        m_shm_last_check = now;
+    }
+
+    std::vector<uint8_t> res_body;
+    if (!probeRequest(Cmd::STATUS_SHM_INFO, res_body)) {
+        return false;  // 退避抑制或通讯失败，保持现状，查询自然回退 IPC/本地
+    }
+
+    Reader rd(res_body.data(), res_body.size());
+    ShmInfo info;
+    info.kdata_epoch = rd.getU64();
+    info.kdata_name = rd.getString();
+    // 向后兼容：基础信息快照字段为后续新增，旧版服务端仅回 kdata 两项；
+    // 读到末尾后 rd.ok() 为假，仅丢弃 bi 字段，kdata 部分仍有效。
+    if (rd.ok()) {
+        info.bi_epoch = rd.getU64();
+        info.bi_name = rd.getString();
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(m_shm_info_mutex);
+        m_shm_info = info;
+    }
+    return true;
+}
+
+IpcConnector::ShmInfo IpcConnector::getShmInfo() const {
+    std::lock_guard<std::mutex> lock(m_shm_info_mutex);
+    return m_shm_info;
+}
+
+uint64_t IpcConnector::kdataShmEpoch() const {
+    std::lock_guard<std::mutex> lock(m_shm_info_mutex);
+    return m_shm_info.kdata_epoch;
+}
+
+uint64_t IpcConnector::biShmEpoch() const {
+    std::lock_guard<std::mutex> lock(m_shm_info_mutex);
+    return m_shm_info.bi_epoch;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // IpcBaseInfoDriver
 ///////////////////////////////////////////////////////////////////////////////
 IpcBaseInfoDriver::IpcBaseInfoDriver(const IpcConnectorPtr& conn, const BaseInfoDriverPtr& local)
-: BaseInfoDriver("ipc"), m_conn(conn), m_local(local) {}
+: BaseInfoDriver("ipc"), m_conn(conn), m_local(local) {
+    // 不在构造函数中协商共享内存快照：构造可能发生在连接池锁内，
+    // 阻塞 IPC 会拖垮整个驱动连接池；首次查询入口会限流协商。
+    m_shm_state = std::make_shared<BiShmState>();
+}
 
 bool IpcBaseInfoDriver::_init() {
     if (!m_conn || !m_conn->connected()) {
         HKU_WARN("Ipc connection is unavailable, IpcBaseInfoDriver will fallback to local!");
     }
     return true;
+}
+
+BaseInfoShmReaderPtr IpcBaseInfoDriver::_shmReader() const {
+    std::shared_lock<std::shared_mutex> lock(m_shm_state->mutex);
+    auto reader = m_shm_state->reader;
+    return (reader && reader->valid()) ? reader : nullptr;
+}
+
+bool IpcBaseInfoDriver::_preferLocalDriver(const std::string& table,
+                                           const BaseInfoShmReaderPtr& reader) const {
+    // 快照已映射且其 coversTable 返回 false ⇒ 主进程未加载该项（受 load_stock_weight /
+    // load_history_finance 门控），走 IPC 只会让主进程现场取数；本地驱动共享同一数据目录，
+    // 结果一致且更快。快照尚未映射（reader 为空）时不偏好本地，保持原 IPC 优先行为。
+    return m_local && reader && !reader->coversTable(table);
+}
+
+void IpcBaseInfoDriver::_tryRefreshShm() {
+    if (!m_shm_enabled || !m_conn) {
+        return;
+    }
+    // 探测由连接内统一限流（与 K 线代理驱动共用同一次协商）。返回值不可作为是否继续的依据：
+    // 一个限流窗口内只有首个调用者拿到 true，若据此直接返回，则 K 线驱动与基础信息驱动
+    // 会互相饿死（K 线查询频度高时，基础信息快照可能永远映射不上/换代不上）。
+    // 故此处忽略返回值，一律读缓存代数并自行判断是否需要重映射。
+    m_conn->refreshShmInfo();
+
+    uint64_t epoch = m_conn->biShmEpoch();
+    if (epoch == 0) {
+        // 服务端尚未发布基础信息快照；若本地持有旧段则继续暂用，等待新段发布
+        return;
+    }
+
+    {
+        // 热路径：仅比对代数（不复制段名），已映射同代则直接返回
+        std::shared_lock<std::shared_mutex> lock(m_shm_state->mutex);
+        if (epoch == m_shm_state->epoch && m_shm_state->reader && m_shm_state->reader->valid()) {
+            return;
+        }
+    }
+
+    auto info = m_conn->getShmInfo();
+    const std::string& name = info.bi_name;
+    if (name.empty()) {
+        return;
+    }
+
+    auto reader = std::make_shared<BaseInfoShmReader>();
+    if (!reader->open(name)) {
+        HKU_WARN("Failed map hikyuu base info shm cache: {}, fallback to ipc query!", name);
+        return;
+    }
+
+    std::unique_lock<std::shared_mutex> lock(m_shm_state->mutex);
+    if (m_shm_state->epoch == reader->epoch() && m_shm_state->reader &&
+        m_shm_state->reader->valid()) {
+        return;
+    }
+    // 换代时比对财务字段数：字段表变更（主进程数据集升级）会使客户端按旧下标读取
+    // 新布局的 values（IFinance 以 values.at(field_ix) 取值，将抛 out_of_range），
+    // 故显式告警提示重加载，避免故障时无从定位
+    size_t new_value_count = reader->financeValueCount();
+    if (m_shm_state->reader && m_shm_state->finance_value_count != 0 && new_value_count != 0 &&
+        m_shm_state->finance_value_count != new_value_count) {
+        HKU_WARN(
+          "History finance field count changed in base info shm cache ({} -> {}), the local field "
+          "index map may be stale, please reload hikyuu!",
+          m_shm_state->finance_value_count, new_value_count);
+    }
+    m_shm_state->reader = reader;
+    m_shm_state->epoch = reader->epoch();
+    m_shm_state->finance_value_count = new_value_count;
+    HKU_INFO("Mapped hikyuu base info shm cache: {} (epoch: {}, covered stock entries: {})", name,
+             m_shm_state->epoch, reader->coveredCount());
 }
 
 std::vector<StockInfo> IpcBaseInfoDriver::getAllStockInfo() {
@@ -251,6 +387,19 @@ StockInfo IpcBaseInfoDriver::getStockInfo(std::string market, const std::string&
 StockWeightList IpcBaseInfoDriver::getStockWeightList(const std::string& market,
                                                       const std::string& code, Datetime start,
                                                       Datetime end) {
+    _tryRefreshShm();
+    auto reader = _shmReader();
+    if (reader) {
+        if (_preferLocalDriver(SHM_BI_TABLE_WEIGHT, reader)) {
+            // 主进程未加载权息数据（load_stock_weight=false），本地驱动共享同一数据源，直读
+            return m_local->getStockWeightList(market, code, start, end);
+        }
+        StockWeightList ws;
+        if (reader->tryGetWeightList(market + code, start, end, ws)) {
+            return ws;  // 快照命中（可能为空，表示该证券本无权息）
+        }
+        // 表已覆盖但本证券不在快照中：回退 IPC 让主进程从其本地驱动应答
+    }
     Encoder enc;
     enc.putString(market);
     enc.putString(code);
@@ -268,6 +417,17 @@ StockWeightList IpcBaseInfoDriver::getStockWeightList(const std::string& market,
 }
 
 std::unordered_map<std::string, StockWeightList> IpcBaseInfoDriver::getAllStockWeightList() {
+    _tryRefreshShm();
+    auto reader = _shmReader();
+    if (reader) {
+        if (_preferLocalDriver(SHM_BI_TABLE_WEIGHT, reader)) {
+            return m_local->getAllStockWeightList();
+        }
+        std::unordered_map<std::string, StockWeightList> result;
+        if (reader->tryGetAllWeightList(result)) {
+            return result;
+        }
+    }
     std::unordered_map<std::string, StockWeightList> result;
     std::vector<uint8_t> res_body;
     if (m_conn && m_conn->request(Cmd::BASE_ALL_STOCK_WEIGHT_LIST, {}, res_body)) {
@@ -287,6 +447,19 @@ std::unordered_map<std::string, StockWeightList> IpcBaseInfoDriver::getAllStockW
 std::vector<HistoryFinanceInfo> IpcBaseInfoDriver::getHistoryFinance(const std::string& market,
                                                                      const std::string& code,
                                                                      Datetime start, Datetime end) {
+    _tryRefreshShm();
+    auto reader = _shmReader();
+    if (reader) {
+        if (_preferLocalDriver(SHM_BI_TABLE_FINANCE, reader)) {
+            // 主进程未加载历史财务数据（load_history_finance=false），本地驱动直读
+            return m_local->getHistoryFinance(market, code, start, end);
+        }
+        std::vector<HistoryFinanceInfo> fins;
+        if (reader->tryGetHistoryFinance(market + code, start, end, fins)) {
+            return fins;  // 快照命中（可能为空，表示该证券无财务记录）
+        }
+        // 表已覆盖但本证券不在快照中：回退 IPC 让主进程从其本地驱动应答
+    }
     Encoder enc;
     enc.putString(market);
     enc.putString(code);
@@ -302,6 +475,33 @@ std::vector<HistoryFinanceInfo> IpcBaseInfoDriver::getHistoryFinance(const std::
     HKU_WARN("Fallback to local driver: getHistoryFinance");
     return m_local ? m_local->getHistoryFinance(market, code, start, end)
                    : std::vector<HistoryFinanceInfo>();
+}
+
+std::unordered_map<std::string, std::vector<HistoryFinanceInfo>>
+IpcBaseInfoDriver::getAllHistoryFinance(const std::atomic_bool& cancel_flag) {
+    std::unordered_map<std::string, std::vector<HistoryFinanceInfo>> result;
+    _tryRefreshShm();
+    auto reader = _shmReader();
+    if (reader) {
+        if (_preferLocalDriver(SHM_BI_TABLE_FINANCE, reader)) {
+            // 主进程未加载历史财务数据（load_history_finance=false），本地驱动直读
+            return m_local->getAllHistoryFinance(cancel_flag);
+        }
+        if (reader->tryGetAllHistoryFinance(result)) {
+            return result;
+        }
+    }
+    // 协议未设全量历史财务的命令字：该入口供列式驱动的批量初始化使用，数据量大，
+    // 且客户端不会走到（客户端无预加载任务、IpcKDataDriver::isColumnFirst 为 false），
+    // 故不为其扩充协议，快照未命中时直接回退本地驱动。
+    // 必须 override：否则会落入基类实现（仅打 ERROR 并返回空、不回退），与其他方法
+    // “失败即降级”的行为不一致，调用方无从感知
+    HKU_WARN("Fallback to local driver: getAllHistoryFinance");
+    if (m_local) {
+        return m_local->getAllHistoryFinance(cancel_flag);
+    }
+    HKU_ERROR("Failed getAllHistoryFinance: neither shm cache nor local driver is available!");
+    return result;
 }
 
 std::vector<std::pair<size_t, std::string>> IpcBaseInfoDriver::getHistoryFinanceField() {
@@ -365,7 +565,10 @@ std::vector<MarketInfo> IpcBaseInfoDriver::getAllMarketInfo() {
     if (m_conn && m_conn->request(Cmd::BASE_ALL_MARKET_INFO, {}, res_body)) {
         Reader rd(res_body.data(), res_body.size());
         std::vector<MarketInfo> result;
-        uint64_t count = rd.getU64();
+        // MarketInfo 最小编码尺寸 48B：4×putString(各 2B 长度前缀) + putDatetime(8B) + 4×putI64(各 8B)。
+        // 用 getCount 而非裸 getU64：损坏帧的超大 count 会被校验拦截（置 rd 失败并返回 0），避免
+        // reserve 天文数字抛 length_error/bad_alloc，转而经下方 !rd.ok() 优雅回退本地驱动
+        uint64_t count = rd.getCount(48);
         result.reserve(count);
         for (uint64_t i = 0; i < count && rd.ok(); i++) {
             result.emplace_back(decodeMarketInfo(rd));
@@ -382,7 +585,9 @@ std::vector<StockTypeInfo> IpcBaseInfoDriver::getAllStockTypeInfo() {
     if (m_conn && m_conn->request(Cmd::BASE_ALL_STOCK_TYPE_INFO, {}, res_body)) {
         Reader rd(res_body.data(), res_body.size());
         std::vector<StockTypeInfo> result;
-        uint64_t count = rd.getU64();
+        // StockTypeInfo 最小编码尺寸 50B：putU32(4B) + putString(2B) + 3×putDouble(各 8B) +
+        // putI32(4B) + 2×putDouble(各 8B)。同 getAllMarketInfo，用 getCount 拦截损坏帧超大 count
+        uint64_t count = rd.getCount(50);
         result.reserve(count);
         for (uint64_t i = 0; i < count && rd.ok(); i++) {
             result.emplace_back(decodeStockTypeInfo(rd));
@@ -443,28 +648,38 @@ bool IpcBlockDriver::_init() {
 }
 
 void IpcBlockDriver::load() {
+    // 先在锁外完成 IPC/本地取数（可能阻塞一个往返），仅对最终的 m_blocks 赋值持写锁，
+    // 避免长时间持锁阻塞读方；每日定时重载与用户遍历并发时不会撕裂 vector。
+    BlockList new_blocks;
+    bool ok = false;
     std::vector<uint8_t> res_body;
     if (m_conn && m_conn->request(Cmd::BLOCK_LOAD, {}, res_body)) {
         Reader rd(res_body.data(), res_body.size());
         auto blocks = decodeBlockList(rd);
         if (rd.ok()) {
-            m_blocks = std::move(blocks);
-            return;
+            new_blocks = std::move(blocks);
+            ok = true;
+        } else {
+            HKU_ERROR("Failed decode block list from ipc server!");
         }
-        HKU_ERROR("Failed decode block list from ipc server!");
     }
 
-    HKU_WARN("Fallback to local driver: load blocks");
-    if (m_local) {
-        m_local->load();
-        m_blocks = m_local->getBlockList();
-    } else {
-        m_blocks.clear();
+    if (!ok) {
+        HKU_WARN("Fallback to local driver: load blocks");
+        if (m_local) {
+            m_local->load();
+            new_blocks = m_local->getBlockList();
+        }
+        // 无本地驱动时 new_blocks 保持为空，等价于原先的 clear()
     }
+
+    std::unique_lock<std::shared_mutex> lock(m_blocks_mutex);
+    m_blocks = std::move(new_blocks);
 }
 
 StringList IpcBlockDriver::getAllCategory() {
     StringList result;
+    std::shared_lock<std::shared_mutex> lock(m_blocks_mutex);
     for (const auto& blk : m_blocks) {
         if (std::find(result.begin(), result.end(), blk.category()) == result.end()) {
             result.push_back(blk.category());
@@ -474,6 +689,7 @@ StringList IpcBlockDriver::getAllCategory() {
 }
 
 Block IpcBlockDriver::getBlock(const std::string& category, const std::string& name) {
+    std::shared_lock<std::shared_mutex> lock(m_blocks_mutex);
     for (const auto& blk : m_blocks) {
         if (blk.category() == category && blk.name() == name) {
             return blk;
@@ -484,6 +700,7 @@ Block IpcBlockDriver::getBlock(const std::string& category, const std::string& n
 
 BlockList IpcBlockDriver::getBlockList(const std::string& category) {
     BlockList result;
+    std::shared_lock<std::shared_mutex> lock(m_blocks_mutex);
     for (const auto& blk : m_blocks) {
         if (category.empty() || blk.category() == category) {
             result.push_back(blk);
@@ -493,16 +710,17 @@ BlockList IpcBlockDriver::getBlockList(const std::string& category) {
 }
 
 BlockList IpcBlockDriver::getBlockList() {
+    std::shared_lock<std::shared_mutex> lock(m_blocks_mutex);
     return m_blocks;
 }
 
 void IpcBlockDriver::save(const Block& block) {
-    HKU_WARN("The client mode is read-only, can not save block: {}:{}!", block.category(),
-             block.name());
+    HKU_THROW("The client mode is read-only, can not save block: {}:{}!", block.category(),
+              block.name());
 }
 
 void IpcBlockDriver::remove(const std::string& category, const std::string& name) {
-    HKU_WARN("The client mode is read-only, can not remove block: {}:{}!", category, name);
+    HKU_THROW("The client mode is read-only, can not remove block: {}:{}!", category, name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -536,45 +754,34 @@ bool IpcKDataDriver::_preferLocalDriver(const KQuery::KType& ktype) const {
 }
 
 void IpcKDataDriver::_tryRefreshShm() {
-    if (!m_shm_enabled || !m_conn || !m_conn->connected()) {
+    if (!m_shm_enabled || !m_conn) {
         return;
     }
-    // 拉取限流：无论服务端是否已发布，最小间隔内最多协商一次，
-    // 避免高频未命中查询（如快照未覆盖的证券、越界区间）退化为每查询一次额外 IPC；
-    // 服务端发布新段后客户端最多延迟该间隔感知；分时/分笔本地优先，不参与协商。
-    // 服务端不可用时的额外抑制（短超时 + 指数退避）由 probeRequest 在各克隆实例间统一处理。
-    constexpr int64_t MIN_CHECK_INTERVAL_MS = 5000;
-    auto now = std::chrono::steady_clock::now();
-    {
-        std::unique_lock<std::shared_mutex> lock(m_shm_state->mutex);
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_shm_state->last_check)
-              .count() < MIN_CHECK_INTERVAL_MS) {
-            return;
-        }
-        m_shm_state->last_check = now;
-    }
+    // 探测由连接内统一限流（与基础信息代理驱动共用同一次协商）。返回值不可作为是否继续的
+    // 依据：一个限流窗口内只有首个调用者拿到 true，若据此直接返回，则两类驱动会互相
+    // 饿死（K 线查询频度高时，基础信息快照可能永远映射不上；反之亦然）。
+    // 故此处忽略返回值，一律读缓存代数并自行判断是否需要重映射。
+    m_conn->refreshShmInfo();
 
-    std::vector<uint8_t> res_body;
-    if (!m_conn->probeRequest(Cmd::STATUS_SHM_INFO, res_body)) {
-        return;  // 退避抑制或通讯失败，保持现状，查询自然回退 IPC/本地
-    }
-
-    Reader rd(res_body.data(), res_body.size());
-    uint64_t epoch = rd.getU64();
-    std::string name = rd.getString();
-    HKU_IF_RETURN(!rd.ok(), void());
-
-    if (epoch == 0 || name.empty()) {
+    uint64_t epoch = m_conn->kdataShmEpoch();
+    if (epoch == 0) {
         // 服务端尚未发布（或已撤销）快照；若本地持有旧段则继续暂用，等待新段发布，
         // 旧段数据在快照语义下仍为有效的历史子集；服务端重加载后数据变化由新 epoch 感知。
         return;
     }
 
     {
+        // 热路径：仅比对代数（不复制段名），已映射同代则直接返回
         std::shared_lock<std::shared_mutex> lock(m_shm_state->mutex);
         if (epoch == m_shm_state->epoch && m_shm_state->reader && m_shm_state->reader->valid()) {
             return;
         }
+    }
+
+    auto info = m_conn->getShmInfo();
+    const std::string& name = info.kdata_name;
+    if (name.empty()) {
+        return;
     }
 
     // 映射在锁外执行（含文件 IO 与 O(entries) 升序校验），避免阻塞其他克隆的查询

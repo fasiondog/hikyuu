@@ -35,6 +35,20 @@ HKU_API void setInterruptChecker(std::function<bool()> checker);
 HKU_API bool checkInterrupted();
 
 /**
+ * 构造单机 IPC 数据服务的通讯地址与主进程竞选文件锁路径
+ * @details 以 datadir 哈希隔离不同数据集/项目，避免互扰。平台差异：
+ * - POSIX：ipc:// 是真实文件系统路径（Unix domain socket），落在系统临时目录下；
+ * - Windows：nng 将 ipc:// 映射为命名管道 \\.\pipe\<name>，管道名不能含盘符或反斜杠
+ *   （否则 CreateNamedPipeA 必然失败），故仅用不含目录的固定名 + datadir 哈希。
+ * 生产代码与单元测试共用本函数，避免两侧地址构造方式不一致而漏测平台问题。
+ * @param datadir 数据目录，用于派生隔离哈希
+ * @param addr [out] nng ipc:// 通讯地址（master 监听与 client 拨号共用）
+ * @param lock_path [out] 主进程竞选文件锁路径
+ */
+HKU_API void makeIpcServerPaths(const std::string& datadir, std::string& addr,
+                                std::string& lock_path);
+
+/**
  * IPC 数据服务客户端（nng REQ，二进制帧）
  * @ingroup DataDriver
  */
@@ -128,6 +142,13 @@ public:
 
     bool running() const noexcept {
         return m_running;
+    }
+
+    /// 仅置停止标志而不触碰 nng：用于 Windows 进程退出路径，跳过对在飞异步 recv 的
+    /// 阻塞式取消（命名管道 teardown 在静态析构期会陷入内核态不可中断等待）；
+    /// 在飞回调随后经 _rearm 检测 running()==false 自然收敛为 FINISH，不再重投递。
+    void markStopped() noexcept {
+        m_running = false;
     }
 
 private:

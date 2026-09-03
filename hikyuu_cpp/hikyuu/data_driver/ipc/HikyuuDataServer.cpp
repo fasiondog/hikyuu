@@ -19,6 +19,7 @@
 
 #include <unordered_map>
 #include "HikyuuDataServer.h"
+#include "BaseInfoShmCache.h"
 #include "KDataShmCache.h"
 #include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/Log.h"
@@ -138,9 +139,24 @@ bool HikyuuDataServer::start(const std::string& addr, const std::string& lock_pa
     return true;
 }
 
-void HikyuuDataServer::stop() {
+void HikyuuDataServer::stop(bool at_process_exit) {
     HKU_IF_RETURN(!m_running, void());
     m_running = false;
+#if defined(_WIN32)
+    // Windows 进程退出路径：IpcServer::stop() 需取消全部在飞异步 nng_ctx_recv 并关闭 REP
+    // 监听器，而命名管道传输在静态析构期取消在飞异步操作会陷入内核态不可中断等待
+    // （连 TerminateProcess 都需等该等待结束才能回收进程，表现为退出卡死数分钟）。
+    // 参照实时行情 SpotAgent 的安全退出（关闭 socket 前已 join 接收线程、无在飞异步操作）
+    // 及 GlobalInitializer::clean() 中 nng_fini 在 Windows 被跳过的既有决策：此处不做 nng
+    // 优雅拆除，仅置停止标志（令在飞回调经 _rearm 收敛为 FINISH）并释放文件锁（非阻塞，
+    // 使等待的客户端可尽快接管为 Master）；命名管道句柄、共享内存段与内存均由 OS 在进程
+    // 退出时回收。
+    if (at_process_exit) {
+        m_server.markStopped();
+        m_lock.reset();
+        return;
+    }
+#endif
     m_server.stop();
     m_lock.reset();
 }
@@ -189,6 +205,43 @@ bool HikyuuDataServer::publishShmCache(const std::string& shm_name_prefix) {
         HKU_ERROR("Failed publish kdata shm cache: {}", e.what());
     } catch (...) {
         HKU_ERROR("Failed publish kdata shm cache: unknown error!");
+    }
+    return false;
+}
+
+bool HikyuuDataServer::publishBaseInfoShm(const std::string& shm_name_prefix,
+                                          bool include_finance) {
+    try {
+        uint64_t epoch = static_cast<uint64_t>(
+          std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+          .count());
+        std::string name;
+        {
+            // 权息在主线程发布、历史财务在预加载线程发布，二者并发，串行化发布过程
+            std::lock_guard<std::mutex> lock(m_bi_pub_mutex);
+            {
+                std::shared_lock<std::shared_mutex> rd(m_bi_mutex);
+                if (epoch <= m_bi_epoch) {
+                    epoch = m_bi_epoch + 1;
+                }
+            }
+            if (!m_bi_publisher) {
+                m_bi_publisher = std::make_unique<BaseInfoShmPublisher>(shm_name_prefix);
+            }
+            name = m_bi_publisher->publish(epoch, include_finance);
+            if (name.empty()) {
+                return false;
+            }
+            std::unique_lock<std::shared_mutex> lock2(m_bi_mutex);
+            m_bi_name = name;
+            m_bi_epoch = epoch;
+        }
+        return true;
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed publish base info shm cache: {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Failed publish base info shm cache: unknown error!");
     }
     return false;
 }
@@ -332,9 +385,27 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
             Datetime start = rd.getDatetime();
             Datetime end = rd.getDatetime();
             HKU_CHECK(rd.ok(), "Invalid request body!");
-            auto driver = sm.getBaseInfoDriver();
-            HKU_CHECK(driver, "BaseInfo driver is null!");
-            auto infos = driver->getHistoryFinance(market, code, start, end);
+            // 与权息 handler（stk.getWeight）保持一致：走 Stock 缓存而非直查驱动。
+            // 财务 SHM 快照同样发布于该缓存，二者同源可消除列式驱动下批量缓存
+            // (getAllHistoryFinance) 与逐证券直查 (getHistoryFinance) 的记录数差异，
+            // 避免 SHM 命中与 IPC 回退返回不一致结果；缓存未预加载时 getHistoryFinance()
+            // 内部懒加载兜底，不会丢数据。
+            Stock stk = sm.getStock(market + code);
+            HKU_CHECK(!stk.isNull(), "Not found stock: {}{}!", market, code);
+            const auto& cache = stk.getHistoryFinance();
+            std::vector<HistoryFinanceInfo> infos;
+            if (start < end) {
+                // 按 reportDate 的 ymd 过滤 [start, end)，与 SHM 读端 tryGetHistoryFinance 一致
+                uint64_t start_ymd = start.isNull() ? Datetime::min().ymd() : start.ymd();
+                uint64_t end_ymd = end.isNull() ? Datetime::max().ymd() : end.ymd();
+                infos.reserve(cache.size());
+                for (const auto& info : cache) {
+                    uint64_t ymd = info.reportDate.ymd();
+                    if (ymd >= start_ymd && ymd < end_ymd) {
+                        infos.emplace_back(info);
+                    }
+                }
+            }
             encodeHistoryFinanceList(enc, infos);
             break;
         }
@@ -415,9 +486,15 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
         }
 
         case Cmd::STATUS_SHM_INFO: {
-            std::shared_lock<std::shared_mutex> lock(m_shm_mutex);
+            // 响应体：[kdata_epoch u64][kdata_name string][bi_epoch u64][bi_name string]
+            // 后两个字段为后续新增：旧版客户端读到 kdata 部分后即停止解析，
+            // 不会因缺字段而把整帧判为坏帧（见 IpcConnector::refreshShmInfo）
+            std::shared_lock<std::shared_mutex> lock1(m_shm_mutex);
+            std::shared_lock<std::shared_mutex> lock2(m_bi_mutex);
             enc.putU64(m_shm_epoch);
             enc.putString(m_shm_name);
+            enc.putU64(m_bi_epoch);
+            enc.putString(m_bi_name);
             break;
         }
 

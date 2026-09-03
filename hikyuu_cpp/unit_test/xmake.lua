@@ -195,7 +195,9 @@ target("real-test")
         add_packages("mysql")
     end
     
-    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json", "tl_expected")
+    -- nng：StockManager.h 在 HKU_ENABLE_NODE 下传递引入 ipc/IpcTransport.h（依赖 nng/nng.h），
+    -- 与 unit-test/small-test 保持一致，否则任何 include StockManager.h 的 real_data 用例均无法编译
+    add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json", "tl_expected", "nng")
     
     add_includedirs("..")
 

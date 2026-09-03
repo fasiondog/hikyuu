@@ -13,6 +13,14 @@
 #include <nng/protocol/reqrep0/req.h>
 #include "IpcTransport.h"
 #include "hikyuu/utilities/Log.h"
+#include <cstdlib>
+#include <fmt/format.h>
+#if defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 namespace hku {
 namespace ipc {
@@ -53,6 +61,24 @@ private:
     uint32_t m_default_ms;
     bool m_changed;
 };
+
+/* 获取系统临时目录，用于存放服务地址与文件锁 */
+std::string getIpcTempDir() {
+#if defined(_WIN32)
+    char buf[MAX_PATH];
+    if (GetTempPathA(MAX_PATH, buf)) {
+        std::string path(buf);
+        while (!path.empty() && (path.back() == '\\' || path.back() == '/')) {
+            path.pop_back();
+        }
+        HKU_IF_RETURN(!path.empty(), path);
+    }
+    return ".";
+#else
+    const char* tmp = std::getenv("TMPDIR");
+    return (tmp && *tmp) ? std::string(tmp) : "/tmp";
+#endif
+}
 }  // namespace
 
 void setInterruptChecker(std::function<bool()> checker) {
@@ -68,6 +94,20 @@ bool checkInterrupted() {
     }
     // 检查器在锁外执行（Python 环境下需获取 GIL，锁内执行可能死锁）
     return checker ? checker() : false;
+}
+
+void makeIpcServerPaths(const std::string& datadir, std::string& addr, std::string& lock_path) {
+    size_t h = std::hash<std::string>()(datadir);
+    std::string ipc_dir = getIpcTempDir();
+#if defined(_WIN32)
+    // Windows: nng 将 ipc:// 映射为命名管道 \\.\pipe\<name>，管道名不能含盘符或反斜杠，
+    // 否则 CreateNamedPipeA 必然失败。隔离性已由 datadir 哈希保证，故仅用不含目录的固定名。
+    addr = fmt::format("ipc://hikyuu_kdata_server_{:x}", h);
+#else
+    // POSIX: ipc:// 为真实文件系统路径（Unix domain socket），须落在可写的临时目录下
+    addr = fmt::format("ipc://{}/hikyuu_kdata_server_{:x}.ipc", ipc_dir, h);
+#endif
+    lock_path = fmt::format("{}/hikyuu_kdata_server_{:x}.lock", ipc_dir, h);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

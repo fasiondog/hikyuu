@@ -788,8 +788,16 @@ bool KDataShmReader::tryGetKRecordList(const std::string& market_code, const KQu
         }
 
         out.resize(end_ix - start_ix);
-        for (size_t i = start_ix; i < end_ix; i++) {
-            out[i - start_ix] = readShmKRecord(recs[i]);
+        // 段内容损坏（非法日期值）会使 Datetime 构造抛异常；读端接口非 noexcept，须就地
+        // 兜底为“未命中”返回 false 回退 IPC/本地（同 BaseInfoShmCache）。datetime 为 8 字节
+        // 对齐字段，x86-64/ARM64 上原子读写不会撕裂成非法值，故此处异常即段持久损坏，
+        // 无需经 seqlock 重试区分并发撕裂。
+        try {
+            for (size_t i = start_ix; i < end_ix; i++) {
+                out[i - start_ix] = readShmKRecord(recs[i]);
+            }
+        } catch (...) {
+            return false;
         }
         std::atomic_thread_fence(std::memory_order_acquire);
         if (entry->seq.load(std::memory_order_relaxed) == s1) {

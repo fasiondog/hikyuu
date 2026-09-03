@@ -314,6 +314,15 @@ public:
         return m_cancel_load;
     }
 
+    /*
+     * 等待后台预加载线程退出（幂等：线程未启动或已结束时立即返回）。仅由程序退出路径调用，
+     * 须在 cancelLoad() 之后、停止 m_load_tg 与销毁 IPC 服务之前调用，以根除预加载线程与退出
+     * 时序对 m_load_tg / m_ipc_server 的并发访问（TOCTOU/UAF，见 review C3）。该线程仅加载数据、
+     * 写共享内存快照与更新原子进度，不涉及任何 nng 操作，且全程检查 m_cancel_load，cancel 后能
+     * 快速退出，故 join 不会成为 Windows 静态析构期的新阻塞点。
+     */
+    void joinPreloadThread();
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -356,6 +365,15 @@ private:
 
     /* 是否处于 IPC 客户端模式：数据由服务端提供，本地无预加载任务 */
     bool _isIpcClientMode() const;
+
+    /*
+     * 主进程端：将权息与历史财务发布为共享内存快照。
+     * 权息在 loadData 中发布（加载后立即就绪），历史财务在预加载线程中
+     * 于其加载完成后再次发布（以新代数重建整段，两项一并收录）。
+     * @param include_finance 是否收录历史财务；权息就绪但财务尚未预加载时须传 false，
+     *        否则会逐证券触发历史财务懒加载（见 BaseInfoShmPublisher::publish）
+     */
+    void _publishBaseInfoShmIfMaster(bool include_finance = true);
 
     /* 主进程 K 线预加载完成后，将热数据发布为只读共享内存快照 */
     void _publishShmCacheIfMaster();
@@ -432,6 +450,7 @@ private:
     StrategyContext m_context;
 
     std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
+    std::thread m_preload_thread;           // 后台预加载线程（joinable，退出时由 joinPreloadThread 回收）
 
     PluginManager m_plugin_manager;
     std::string m_i18n_path;

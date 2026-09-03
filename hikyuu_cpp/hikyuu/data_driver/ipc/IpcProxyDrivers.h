@@ -11,12 +11,14 @@
 
 #if HKU_ENABLE_NODE
 
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include "BaseInfoShmCache.h"
 #include "IpcTransport.h"
 #include "KDataShmCache.h"
 #include "hikyuu/data_driver/BaseInfoDriver.h"
@@ -33,6 +35,14 @@ namespace ipc {
  */
 class HKU_API IpcConnector {
 public:
+    /** 服务端发布的两类共享内存快照信息 */
+    struct ShmInfo {
+        uint64_t kdata_epoch{0};     ///< K 线快照代数
+        std::string kdata_name;      ///< K 线快照段名，空表示尚未发布
+        uint64_t bi_epoch{0};        ///< 基础信息（权息/历史财务）快照代数
+        std::string bi_name;         ///< 基础信息段名，空表示尚未发布
+    };
+
     IpcConnector() = default;
     explicit IpcConnector(const std::string& addr);
     ~IpcConnector() = default;
@@ -80,12 +90,39 @@ public:
     bool waitReady(uint64_t timeout_seconds,
                    std::function<void(uint64_t, uint64_t)>&& progress_cb = nullptr);
 
+    /**
+     * 拉取服务端共享内存快照信息（带最小间隔限流，探测退避由 probeRequest 统一处理）
+     * @details 结果在本连接内缓存，K 线代理驱动与基础信息代理驱动共用同一次探测，
+     * 避免两个驱动各自发起一轮 IPC。限流未到期时不发起探测，**调用方仍须读取缓存**
+     * （见 getShmInfo / kdataShmEpoch / biShmEpoch）并自行判断是否需要重映射：
+     * 一个限流窗口内只有首个调用者能拿到 true，若其余调用者据此直接返回，
+     * 两类驱动会互相饿死，导致某一类快照长期映射不上、换代不上。
+     * @return true 本次确实发起了探测并收到响应 | false 限流未到期或通讯失败（仅作诊断用）
+     */
+    bool refreshShmInfo();
+
+    /** 取缓存的快照信息（可能为零值，表示服务端尚未发布） */
+    ShmInfo getShmInfo() const;
+
+    /**
+     * 取缓存的 K 线快照代数（轻量，不复制段名）
+     * @note 供查询热路径先比对代数，仅在代数变化时才取完整 ShmInfo 并重映射
+     */
+    uint64_t kdataShmEpoch() const;
+
+    /** 取缓存的基础信息快照代数（轻量，不复制段名），语义同 kdataShmEpoch */
+    uint64_t biShmEpoch() const;
+
 private:
     std::string m_addr;
     IpcClient m_client;
     std::mutex m_probe_mutex;
     std::chrono::steady_clock::time_point m_last_probe;
     int m_probe_fails{0};  ///< 连续探测失败次数，成功后归零
+
+    mutable std::mutex m_shm_info_mutex;
+    ShmInfo m_shm_info;
+    std::chrono::steady_clock::time_point m_shm_last_check;
 };
 
 typedef std::shared_ptr<IpcConnector> IpcConnectorPtr;
@@ -108,6 +145,8 @@ public:
     std::vector<HistoryFinanceInfo> getHistoryFinance(const std::string& market,
                                                       const std::string& code, Datetime start,
                                                       Datetime end) override;
+    std::unordered_map<std::string, std::vector<HistoryFinanceInfo>> getAllHistoryFinance(
+      const std::atomic_bool& cancel_flag) override;
     std::vector<std::pair<size_t, std::string>> getHistoryFinanceField() override;
     Parameter getFinanceInfo(const std::string& market, const std::string& code) override;
     MarketInfo getMarketInfo(const std::string& market) override;
@@ -118,8 +157,40 @@ public:
     ZhBond10List getAllZhBond10() override;
 
 private:
+    /**
+     * 快照状态
+     * @details 权息与历史财务经共享内存快照零拷贝读取，缺失时回退 IPC，
+     * 主进程未加载的表直接由本地驱动服务（见 _preferLocalDriver）。
+     */
+    struct BiShmState {
+        std::shared_mutex mutex;
+        BaseInfoShmReaderPtr reader;
+        uint64_t epoch{0};
+        size_t finance_value_count{0};  ///< 已映射段的财务字段数，用于换代时侦测字段表变更
+    };
+    typedef std::shared_ptr<BiShmState> BiShmStatePtr;
+
+    /** 取当前快照读取器的引用副本，保证单次调用内不跨代 */
+    BaseInfoShmReaderPtr _shmReader() const;
+
+    /** 映射服务端最新发布的基础信息快照（探测由 IpcConnector 统一限流/退避） */
+    void _tryRefreshShm();
+
+    /**
+     * 判断指定表是否应直接由本地驱动服务（跳过 IPC）
+     * @details 快照中缺失的表意味着主进程未加载该项（分别受 load_stock_weight /
+     * load_history_finance 门控），走 IPC 只会让主进程现场取数并序列化；
+     * 客户端与主进程共享同一数据目录，本地读取结果一致且更快。
+     * @note 快照尚未映射时返回 false，保持原有 IPC 优先行为
+     * @param table 表名（SHM_BI_TABLE_WEIGHT / SHM_BI_TABLE_FINANCE）
+     * @param reader 调用方已取出的快照读取器，复用之以免单次查询内重复加锁取到不同代
+     */
+    bool _preferLocalDriver(const std::string& table, const BaseInfoShmReaderPtr& reader) const;
+
     IpcConnectorPtr m_conn;
     BaseInfoDriverPtr m_local;  // 降级兜底
+    bool m_shm_enabled{true};
+    BiShmStatePtr m_shm_state;
 };
 
 /**
@@ -142,6 +213,9 @@ public:
 private:
     IpcConnectorPtr m_conn;
     BlockInfoDriverPtr m_local;  // 降级兜底
+    // 每日定时重载（reloadHikyuuTask）在调度线程对 m_blocks 做 move-assign，
+    // 与用户线程的遍历并发，故需读写锁保护（与被替换的 SQLite/MySQL 板块驱动对齐）
+    std::shared_mutex m_blocks_mutex;
     BlockList m_blocks;
 };
 
@@ -205,7 +279,6 @@ private:
         std::shared_mutex mutex;
         KDataShmReaderPtr reader;
         uint64_t epoch{0};
-        std::chrono::steady_clock::time_point last_check;
     };
     typedef std::shared_ptr<ShmState> ShmStatePtr;
 

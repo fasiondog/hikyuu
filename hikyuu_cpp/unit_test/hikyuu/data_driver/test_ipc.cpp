@@ -15,6 +15,7 @@
 #include <atomic>
 #include <chrono>
 #include <limits>
+#include <filesystem>
 #if defined(_WIN32)
 #include <process.h>
 #define HKU_TEST_GETPID _getpid
@@ -32,16 +33,20 @@
 using namespace hku;
 using namespace hku::ipc;
 
+// 地址与文件锁构造统一走生产函数 ipc::makeIpcServerPaths（含 Windows 命名管道平台适配），
+// 使单测覆盖真实的生产地址构造路径——回归防护：Windows 下 ipc:// 若含盘符/反斜杠，
+// CreateNamedPipeA 必然失败（见评审 C2），而单测曾自行拼地址绕过该路径而漏测。
+// 以 name + PID 作为派生哈希的输入，保证各用例、各测试进程间地址互不冲突。
 static std::string test_ipc_addr(const std::string& name) {
-    const char* tmp = getenv("TMPDIR");
-    std::string dir = (tmp && *tmp) ? std::string(tmp) : "/tmp";
-    return "ipc://" + dir + "/" + name + "_" + std::to_string(HKU_TEST_GETPID()) + ".ipc";
+    std::string addr, lock_path;
+    makeIpcServerPaths(name + "_" + std::to_string(HKU_TEST_GETPID()), addr, lock_path);
+    return addr;
 }
 
 static std::string test_lock_path(const std::string& name) {
-    const char* tmp = getenv("TMPDIR");
-    std::string dir = (tmp && *tmp) ? std::string(tmp) : "/tmp";
-    return dir + "/" + name + "_" + std::to_string(HKU_TEST_GETPID()) + ".lock";
+    std::string addr, lock_path;
+    makeIpcServerPaths(name + "_" + std::to_string(HKU_TEST_GETPID()), addr, lock_path);
+    return lock_path;
 }
 
 TEST_CASE("test_IpcEncoderReader") {
@@ -730,7 +735,165 @@ TEST_CASE("test_KDataShmCache") {
         CHECK(reader.valid());
         CHECK_EQ(reader.coveredCount(), old_covered);
 
+        // 扩展：基础信息快照字段（向后兼容，旧客户端解析到 kdata 部分即止）；
+        // 发布基础信息快照后握手应返回非空 bi_epoch / bi_name，且可被映射读取。
+        CHECK(server.publishBaseInfoShm(prefix));
+        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
+        Reader rd_bi(res_body.data(), res_body.size());
+        rd_bi.getU64();  // kdata_epoch
+        rd_bi.getString();  // kdata_name
+        uint64_t bi_epoch = rd_bi.getU64();
+        std::string bi_name = rd_bi.getString();
+        CHECK(rd_bi.ok());
+        CHECK_GT(bi_epoch, 0);
+        REQUIRE_FALSE(bi_name.empty());
+
+        BaseInfoShmReader bi_reader;
+        CHECK(bi_reader.open(bi_name));
+        CHECK_EQ(bi_reader.epoch(), bi_epoch);
+
         server.stop();
+    }
+}
+
+TEST_CASE("test_BaseInfoShmCache") {
+    // 与 test_KDataShmCache 同构：以 StockManager 已加载的权息/历史财务为基准，
+    // 验证基础信息（权息 + 历史财务）共享内存快照的发布与只读映射查询语义；
+    // 段名前缀需较短（系统共享内存名长度限制）。预加载为后台异步，必须先等待完成。
+    StockManager::instance().waitDataReady();
+    const std::string prefix = "hkubshm";
+
+    SUBCASE("publish and read weight") {
+        BaseInfoShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260901);
+        REQUIRE_FALSE(name.empty());
+
+        BaseInfoShmReader reader;
+        REQUIRE(reader.open(name));
+        CHECK_EQ(reader.epoch(), 20260901);
+
+        auto& sm = StockManager::instance();
+
+        // 测试数据集 stkWeight 含 3 万余行，权息表应被建表
+        CHECK(reader.coversTable(SHM_BI_TABLE_WEIGHT));
+
+        size_t checked = 0, weight_mismatch = 0, expect_weight_stocks = 0;
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            const StockWeightList& expect = stk.getWeight();
+            StockWeightList actual;
+            if (expect.empty()) {
+                // 无权息的证券不在快照中（发布端跳过空表项），查询应返回 false
+                CHECK_FALSE(reader.tryGetWeightList(stk.market_code(), Datetime::min(),
+                                                    Null<Datetime>(), actual));
+                continue;
+            }
+            expect_weight_stocks++;
+            CHECK(reader.tryGetWeightList(stk.market_code(), Datetime::min(), Null<Datetime>(),
+                                          actual));
+            if (expect.size() != actual.size()) {
+                weight_mismatch++;
+                continue;
+            }
+            for (size_t i = 0; i < expect.size(); i++) {
+                if (expect[i].datetime() != actual[i].datetime() ||
+                    expect[i].countAsGift() != actual[i].countAsGift() ||
+                    expect[i].countForSell() != actual[i].countForSell() ||
+                    expect[i].priceForSell() != actual[i].priceForSell() ||
+                    expect[i].bonus() != actual[i].bonus() ||
+                    expect[i].increasement() != actual[i].increasement() ||
+                    expect[i].totalCount() != actual[i].totalCount() ||
+                    expect[i].freeCount() != actual[i].freeCount() ||
+                    expect[i].suogu() != actual[i].suogu()) {
+                    weight_mismatch++;
+                    break;
+                }
+            }
+            checked++;
+        }
+        CHECK_EQ(weight_mismatch, 0);
+        HKU_INFO("BaseInfoShmCache weight check: {} stocks with weight checked", checked);
+
+        // 全量比对：快照内证券条目数应大于 0（且等于有权息的证券数）
+        std::unordered_map<std::string, StockWeightList> all;
+        CHECK(reader.tryGetAllWeightList(all));
+        CHECK_GT(all.size(), 0);
+        CHECK_EQ(all.size(), expect_weight_stocks);
+
+        // 未覆盖的证券应返回 false（由上层回退 IPC/本地）
+        StockWeightList dummy;
+        CHECK_FALSE(reader.tryGetWeightList("SH999999", Datetime::min(), Null<Datetime>(), dummy));
+
+        // 区间过滤语义须与主进程 Stock::getWeight(start, end) 一致（[start, end)、按完整日期比较），
+        // 否则快照命中会比服务端 IPC 应答多/少返回记录
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            auto full = stk.getWeight();
+            if (full.size() < 3) {
+                continue;
+            }
+            Datetime sub_start = full[1].datetime();
+            Datetime sub_end = full[full.size() - 1].datetime();
+            auto expect = stk.getWeight(sub_start, sub_end);
+            StockWeightList actual;
+            REQUIRE(reader.tryGetWeightList(stk.market_code(), sub_start, sub_end, actual));
+            REQUIRE_GT(expect.size(), 0);
+            REQUIRE_EQ(actual.size(), expect.size());
+            CHECK_EQ(actual.front().datetime(), expect.front().datetime());
+            CHECK_EQ(actual.back().datetime(), expect.back().datetime());
+
+            // 空区间（start >= end）：与 Stock::getWeight 一致，命中但结果为空
+            StockWeightList empty_range;
+            CHECK(reader.tryGetWeightList(stk.market_code(), sub_end, sub_start, empty_range));
+            CHECK(empty_range.empty());
+            CHECK(stk.getWeight(sub_end, sub_start).empty());
+            break;
+        }
+
+        reader.close();
+        CHECK_FALSE(reader.valid());
+    }
+
+    SUBCASE("finance gated by data availability") {
+        // 测试数据集 HistoryFinance 表为空，故历史财务表不应被建表（与 load_history_finance
+        // 门控语义一致）；同时验证 coversTable 在表缺失时返回 false 且段映射仍有效。
+        BaseInfoShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260902);
+        REQUIRE_FALSE(name.empty());
+
+        BaseInfoShmReader reader;
+        REQUIRE(reader.open(name));
+
+        bool any_finance = false;
+        for (const auto& stk : StockManager::instance().getStockList(nullptr)) {
+            if (!stk.getHistoryFinance().empty()) {
+                any_finance = true;
+                break;
+            }
+        }
+        CHECK_EQ(reader.coversTable(SHM_BI_TABLE_FINANCE), any_finance);
+        std::vector<HistoryFinanceInfo> dummy;
+        CHECK_FALSE(
+          reader.tryGetHistoryFinance("SH600000", Datetime::min(), Null<Datetime>(), dummy));
+        CHECK_FALSE(reader.tryGetHistoryFinance(
+          "SH600000", Datetime(202001010000LL), Datetime(202101010000LL), dummy));
+
+        reader.close();
+    }
+
+    SUBCASE("republish with new epoch") {
+        // 历史财务就绪后重发布（以新代数重建整段），客户端经 epoch 变化感知；
+        // 退化场景下旧映射在重发布（旧段被删）后仍可读取。
+        BaseInfoShmPublisher publisher(prefix);
+        std::string n1 = publisher.publish(20260901);
+        BaseInfoShmReader r1;
+        REQUIRE(r1.open(n1));  // 必须在重发布前映射，否则 Windows 下旧段名已被删无法再打开
+        std::string n2 = publisher.publish(20260902);
+        BaseInfoShmReader r2;
+        REQUIRE(r2.open(n2));
+        CHECK_NE(n1, n2);
+        CHECK_EQ(r1.epoch(), 20260901);
+        CHECK_EQ(r2.epoch(), 20260902);
+        CHECK(r1.valid());  // 旧映射在段删除后仍可读（快照语义）
+        CHECK(r2.valid());
     }
 }
 

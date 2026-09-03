@@ -166,8 +166,8 @@ private:
  * 全局镜像入口：Stock::realtimeUpdate 调用，将实时更新镜像到共享内存段
  * @note 未注册发布器（客户端进程/未启用缓存）时仅一次原子判断，开销可忽略
  */
-void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
-                             const KRecord& record);
+HKU_API void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
+                                      const KRecord& record);
 
 class KDataShmReader;
 typedef std::shared_ptr<KDataShmReader> KDataShmReaderPtr;

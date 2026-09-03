@@ -129,6 +129,10 @@ void GlobalInitializer::clean() {
 
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
+    // 等待后台预加载线程退出：须在任何 tg->stop() 与 stopIpcDataServer() 之前，根除预加载线程
+    // 对 m_load_tg / m_ipc_server 的并发访问（C3：TOCTOU/UAF）。该线程不涉及 nng，cancel 后快速
+    // 退出，join 安全（Windows 亦然，与其进程退出路径跳过 nng 拆除的既有决策互不冲突）。
+    sm.joinPreloadThread();
 
 #if HKU_OS_OSX
     // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常

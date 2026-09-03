@@ -13,6 +13,7 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <shared_mutex>
 #include <string>
 #include "IpcTransport.h"
@@ -22,6 +23,7 @@ namespace ipc {
 
 class FileLock;
 class KDataShmPublisher;
+class BaseInfoShmPublisher;
 
 /**
  * 单机 IPC 数据服务（Master 端）
@@ -46,8 +48,12 @@ public:
      */
     bool start(const std::string& addr, const std::string& lock_path, const std::string& tmpdir);
 
-    /** 停止服务并释放文件锁 */
-    void stop();
+    /**
+     * 停止服务并释放文件锁
+     * @param at_process_exit 是否处于进程退出（静态析构）路径；Windows 下该路径跳过 nng
+     *        异步拆除，仅释放文件锁，其余资源交由 OS 在进程退出时回收（详见实现说明）
+     */
+    void stop(bool at_process_exit = false);
 
     bool running() const noexcept {
         return m_running;
@@ -73,6 +79,18 @@ public:
 
     /** 刷新板块缓存（数据加载/重加载完成后调用） */
     void refreshBlocks();
+
+    /**
+     * 将权息与历史财务发布为只读共享内存快照，供客户端零拷贝读取
+     * @details 两项分别受 load_stock_weight / load_history_finance 配置门控，
+     * 主进程未加载的项不建表；历史财务的加载晚于权息，故本方法会被调用两次，
+     * 每次以新代数重建整段（新段就绪后才删旧段，已映射的读者不受影响）。
+     * @param shm_name_prefix 共享内存段名前缀（受系统名称长度限制，建议不超过 11 字符）
+     * @param include_finance 是否收录历史财务表；权息就绪但财务尚未预加载时须传 false，
+     *        否则会逐证券触发历史财务懒加载（见 BaseInfoShmPublisher::publish）
+     * @return true 发布成功（无数据可发布时返回 false，客户端回退 IPC）
+     */
+    bool publishBaseInfoShm(const std::string& shm_name_prefix, bool include_finance = true);
 
     /**
      * 将预加载的 K 线缓冲发布为只读共享内存缓存快照，供客户端零拷贝读取
@@ -102,6 +120,13 @@ private:
     // 发布器生命周期与服务一致：持有当前段，重发布时自动删旧段，服务销毁时清理；
     // 仅在后台预加载线程中访问，无需加锁保护
     std::unique_ptr<KDataShmPublisher> m_shm_publisher;
+
+    mutable std::shared_mutex m_bi_mutex;  // 保护 m_bi_name / m_bi_epoch
+    std::string m_bi_name;
+    uint64_t m_bi_epoch{0};
+    // 权息于 loadData 中在主线程发布，历史财务于预加载线程发布，两者并发，需加锁保护
+    std::mutex m_bi_pub_mutex;
+    std::unique_ptr<BaseInfoShmPublisher> m_bi_publisher;
 };
 
 typedef std::shared_ptr<HikyuuDataServer> HikyuuDataServerPtr;

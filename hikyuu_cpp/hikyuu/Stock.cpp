@@ -5,7 +5,9 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include <cstring>
+#include <set>
 #include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
@@ -1329,6 +1331,17 @@ const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
 
 void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     HKU_IF_RETURN(!m_data, void());
+    // 按 (reportDate, fileDate) 去重：列式驱动批量 getAllHistoryFinance 可能对同一键返回重复行
+    // （real-test 实测 ClickHouse 某证券批量 124 vs 逐证券直查 123，且缓存独有键为空，即纯多重性
+    // 重复）。去重使缓存与逐证券直查、SHM 快照、IPC 回退四路径记录集合一致；财务语义上每个
+    // (reportDate, fileDate) 应唯一，保留首次出现（remove_if 稳定，维持原相对顺序，排序由发布端负责）
+    std::set<std::pair<uint64_t, uint64_t>> seen;
+    history_finance.erase(
+      std::remove_if(history_finance.begin(), history_finance.end(),
+                     [&seen](const HistoryFinanceInfo& r) {
+                         return !seen.emplace(r.reportDate.number(), r.fileDate.number()).second;
+                     }),
+      history_finance.end());
     history_finance.shrink_to_fit();
     if (!m_data->m_history_finance_ready) {
         std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
