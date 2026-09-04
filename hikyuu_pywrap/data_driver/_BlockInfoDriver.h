@@ -24,6 +24,10 @@ public:
         m_is_python_object = true;
     }
 
+    py::function get_py_override(const char* name) const {
+        return py::get_override(static_cast<const BlockInfoDriver*>(this), name);
+    }
+
     bool _init() override {
         PYBIND11_OVERLOAD_PURE(bool, BlockInfoDriver, _init, );
     }
@@ -36,15 +40,29 @@ public:
         PYBIND11_OVERLOAD_PURE(Block, BlockInfoDriver, getBlock, category, name);
     }
 
+    // 必须实现的子类接口
     BlockList getBlockList(const string& category) override {
-        auto self = py::cast(this);
-        auto py_list = self.attr("_getBlockList")(category);
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("_getBlockList");
+        if (!py_func) {
+            pybind11::pybind11_fail(
+              "Tried to call pure virtual function \"BlockInfoDriver::_getBlockList\"");
+        }
+
+        auto py_list = py_func(category);
         return python_list_to_vector<Block>(py_list);
     }
 
+    // 必须实现的子类接口
     BlockList getBlockList() override {
-        auto self = py::cast(this);
-        auto py_list = self.attr("_getBlockList")(py::none());
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("_getBlockList");
+        if (!py_func) {
+            pybind11::pybind11_fail(
+              "Tried to call pure virtual function \"BlockInfoDriver::_getBlockList\"");
+        }
+
+        auto py_list = py_func(py::none());
         return python_list_to_vector<Block>(py_list);
     }
 
