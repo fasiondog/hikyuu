@@ -553,6 +553,13 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     HKU_IF_RETURN(!m_data || start >= end, result);
+    // 客户端模式：本地不物化权息（见 StockManager::loadAllStockWeights），按需经驱动读取
+    // 主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），避免与
+    // 快照重复占用客户端内存。getWeight 非逐 K 线热路径（每次指标/复权计算调用一次），
+    // 按需读 shm 开销可忽略；主进程仍读本地已物化的 m_weightList。
+    if (StockManager::instance().isIpcClientMode()) {
+        return StockManager::instance().getStockWeightList(*this, start, end);
+    }
     std::shared_lock<std::shared_mutex> lock(m_data->m_weight_mutex);
     StockWeightList::const_iterator start_iter, end_iter;
     start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(),

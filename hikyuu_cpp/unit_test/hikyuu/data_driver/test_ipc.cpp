@@ -1115,6 +1115,63 @@ TEST_CASE("test_KDataClientModeGating") {
     server.stop();
 }
 
+TEST_CASE("test_StockWeightClientModeDelegatesToDriver") {
+    // 客户端模式下 loadAllStockWeights 跳过本地物化，Stock::getWeight 改为按需经驱动读取
+    //（客户端即 shm 优先）。用一只“全新构造、m_weightList 为空”的 Stock 证明委托：主进程
+    // 模式下它读自身空缓存返回空；客户端模式下同一对象经驱动取回该证券真实权息，且与
+    // 主进程已物化证券的结果逐字段一致（证明客户端不再需要本地物化即可正确读取权息）。
+    StockManager::instance().waitDataReady();
+    auto& sm = StockManager::instance();
+
+    // 选取一只本地已物化权息（m_weightList 非空）的真实证券作为基准
+    Stock dict_stk;
+    StockWeightList expect;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        auto ws = stk.getWeight();  // 主进程路径：读本地 m_weightList
+        if (!ws.empty()) {
+            dict_stk = stk;
+            expect = std::move(ws);
+            break;
+        }
+    }
+    REQUIRE_FALSE(dict_stk.isNull());
+    REQUIRE_FALSE(expect.empty());
+
+    // 全新构造的同 market_code Stock：独立 m_data、m_weightList 为空（未被 loadAllStockWeights 物化）
+    Stock fresh(dict_stk.market(), dict_stk.code(), "fresh");
+    /** @arg 主进程模式：读自身空 m_weightList，返回空（基线，证明 fresh 本地无权息缓存）*/
+    CHECK(fresh.getWeight().empty());
+
+    // RAII：无论用例中途 REQUIRE 失败与否，退出时复位客户端模式，避免污染其他用例
+    struct ClientModeGuard {
+        ~ClientModeGuard() { StockManager::instance()._testingSetIpcClientMode(false); }
+    } guard;
+    sm._testingSetIpcClientMode(true);
+
+    /** @arg 客户端模式：fresh 本地缓存为空，getWeight 仍经驱动取回真实权息，与物化基准逐字段一致 */
+    StockWeightList actual = fresh.getWeight();
+    REQUIRE_EQ(actual.size(), expect.size());
+    size_t mismatch = 0;
+    for (size_t i = 0; i < expect.size(); i++) {
+        if (expect[i].datetime() != actual[i].datetime() ||
+            expect[i].countAsGift() != actual[i].countAsGift() ||
+            expect[i].countForSell() != actual[i].countForSell() ||
+            expect[i].priceForSell() != actual[i].priceForSell() ||
+            expect[i].bonus() != actual[i].bonus() ||
+            expect[i].increasement() != actual[i].increasement() ||
+            expect[i].totalCount() != actual[i].totalCount() ||
+            expect[i].freeCount() != actual[i].freeCount() ||
+            expect[i].suogu() != actual[i].suogu()) {
+            mismatch++;
+        }
+    }
+    CHECK_EQ(mismatch, 0);
+
+    /** @arg 与直接调用委托入口结果一致（同一驱动路径、同一区间语义）*/
+    StockWeightList direct = sm.getStockWeightList(fresh, Datetime::min(), Null<Datetime>());
+    CHECK_EQ(direct.size(), actual.size());
+}
+
 TEST_CASE("test_BaseInfoShmCache") {
     // 与 test_KDataShmCache 同构：以 StockManager 已加载的权息/历史财务为基准，
     // 验证基础信息（权息 + 历史财务）共享内存快照的发布与只读映射查询语义；

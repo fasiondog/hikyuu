@@ -250,6 +250,13 @@ public:
     vector<HistoryFinanceInfo> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
 
     /**
+     * 获取指定证券的权息列表（经基础信息驱动；客户端模式下即 shm 优先、未覆盖回退 IPC/本地）
+     * @note 供 Stock::getWeight 在客户端模式下按需读取主进程发布的权息快照，避免客户端启动时
+     *       再物化一份全量权息（与 getHistoryFinance 的按需委托范式一致）
+     */
+    StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
+
+    /**
      * 添加Stock，仅供临时增加的特殊Stock使用
      * @param stock
      * @return true 成功 | false 失败
@@ -534,6 +541,11 @@ inline size_t StockManager::getHistoryFinanceFieldIndex(const string& name) cons
 inline vector<HistoryFinanceInfo> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
                                                                   Datetime end) {
     return m_baseInfoDriver->getHistoryFinance(stk.market(), stk.code(), start, end);
+}
+
+inline StockWeightList StockManager::getStockWeightList(const Stock& stk, Datetime start,
+                                                        Datetime end) {
+    return m_baseInfoDriver->getStockWeightList(stk.market(), stk.code(), start, end);
 }
 
 inline void StockManager::setPluginPath(const std::string& path) {

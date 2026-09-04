@@ -1199,6 +1199,10 @@ void StockManager::loadInnerBlocks() {
 
 void StockManager::loadAllStockWeights() {
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("load_stock_weight", true), void());
+    // 客户端模式下权息由主进程发布的共享内存快照提供：Stock::getWeight 按需经驱动
+    // （IpcBaseInfoDriver，shm 优先）读取，无需在本地再物化一份全量权息，避免与快照
+    // 重复占用客户端内存（历史财务同理——客户端 loadAllKData 提前返回，本就不预加载财务）。
+    HKU_IF_RETURN(isIpcClientMode(), void());
     HKU_INFO(htr("Loading stock weight..."));
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
