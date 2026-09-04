@@ -1017,8 +1017,8 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
     size_t total = m_data->pKData[ktype]->size();
     HKU_IF_RETURN(total == 0, result);
     HKU_WARN_IF_RETURN(start_ix >= end_ix || start_ix >= total, result,
-                       "Invalid param (start_ix: {}, end_ix: {})! current total: {}", start_ix,
-                       end_ix, total);
+                       "Invalid param (start_ix: {}, end_ix: {})! current total: {} | {} | {}",
+                       start_ix, end_ix, total, name(), ktype);
     size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
     result.resize(length);
     memcpy((void*)&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
@@ -1334,7 +1334,8 @@ void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     // 按 (reportDate, fileDate) 去重：列式驱动批量 getAllHistoryFinance 可能对同一键返回重复行
     // （real-test 实测 ClickHouse 某证券批量 124 vs 逐证券直查 123，且缓存独有键为空，即纯多重性
     // 重复）。去重使缓存与逐证券直查、SHM 快照、IPC 回退四路径记录集合一致；财务语义上每个
-    // (reportDate, fileDate) 应唯一，保留首次出现（remove_if 稳定，维持原相对顺序，排序由发布端负责）
+    // (reportDate, fileDate) 应唯一，保留首次出现（remove_if
+    // 稳定，维持原相对顺序，排序由发布端负责）
     std::set<std::pair<uint64_t, uint64_t>> seen;
     history_finance.erase(
       std::remove_if(history_finance.begin(), history_finance.end(),
