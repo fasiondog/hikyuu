@@ -479,14 +479,19 @@ void KDataShmPublisher::mirrorUpdate(const std::string& market_code, const KQuer
 
     // 写者串行由 Stock::realtimeUpdate 的证券×ktype 写锁保证，
     // 段尾与缓冲尾同步演进，镜像规则与 realtimeUpdate 一致：
-    // 末根同日则更新高/低/收/量额，更新（晚于末根）则追加，过期则忽略
+    // 与末根 datetime 相等则更新高/低/收/量额，晚于末根则追加，过期则忽略
     uint64_t count = me.entry->record_count.load(std::memory_order_relaxed);
     if (count == 0) {
         return;  // 防御：发布条目必含记录
     }
     KRecord* recs = me.records;
-    uint64_t dt = record.datetime.number();
-    uint64_t last_dt = recs[count - 1].datetime.number();
+    // 按完整 Datetime 比较，与 Stock::realtimeUpdate 的 tmp.datetime ==/< record.datetime 同源一致。
+    // 本函数仅由 realtimeUpdate 驱动，后者只合成分钟及以上 K 线（record.datetime 无亚分钟部分），故与
+    // number() 等价；但记录区已改存原始 KRecord(Datetime)，直接比较是自然形式，省一次无谓截断。
+    // 注：分笔（TRANS，秒级）仅由历史数据经 publish 全量 memcpy 入段（秒精度保留），不参与实时合成、
+    // 不经此路径；其按日期读取的秒级正确性由 dateRange 的完整 Datetime 二分比较保证。
+    const Datetime& dt = record.datetime;
+    const Datetime& last_dt = recs[count - 1].datetime;
     if (dt < last_dt) {
         return;
     }
