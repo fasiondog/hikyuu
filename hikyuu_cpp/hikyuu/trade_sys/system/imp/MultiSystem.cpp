@@ -88,6 +88,7 @@ void MultiSystem::_reset() {
     m_buyShortRequestList.clear();
     m_last_suggestions.clear();
     m_open_trades.clear();
+    m_sub_funds_before.clear();
     m_adjust_turnover.clear();
 }
 
@@ -102,6 +103,7 @@ void MultiSystem::_forceResetAll() {
     m_buyShortRequestList.clear();
     m_last_suggestions.clear();
     m_open_trades.clear();
+    m_sub_funds_before.clear();
     m_adjust_turnover.clear();
 }
 
@@ -164,9 +166,12 @@ void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
     m_calculated = true;
 }
 
-TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys,
-                                                const TradeRecordList& trades) const {
+TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const TradeRecordList& trades,
+                                                const FundsRecord& funds_before) const {
     TradeSuggestionList result;
+    // 子系统「交易前」资金基准（防除零）：用于计算建议三比重（设计 8.2/8.3 完整语义透传）
+    double base_assets = funds_before.total_assets();
+    double base_cash = funds_before.cash;
     std::map<Stock, double> net;       // 净数量（正=买，负=卖）
     std::map<Stock, bool> is_clear;    // 是否整体清仓
     std::map<Stock, price_t> price;    // 计划价（取成交价）
@@ -205,6 +210,14 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys,
             s.type = SuggestionType::BUY;
         } else {
             s.type = is_clear[stock] ? SuggestionType::CLEAR : SuggestionType::SELL;
+        }
+        // 三比重：以子系统交易前资金为分母。父层 MM 据此按比重映射到父真实资产（模式 A）。
+        if (base_assets > 0.0) {
+            s.assets_ratio = s.plan_cash / base_assets;
+            s.target_position_ratio = s.assets_ratio;  // 近似：单笔自 0 建仓时即目标仓位占比
+        }
+        if (base_cash > 0.0) {
+            s.cash_ratio = s.plan_cash / base_cash;
         }
         result.push_back(s);
     }
@@ -308,8 +321,14 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     // 孙系统原始开盘成交与本层收盘已净额化执行的成交重复计入（嵌套双计），导致对上建议方向/数量错误。
     // 父自身账户的开盘成交（如退市强平）已在上面并入 result.tradesOnOpen，符合 MomentResult 契约。
     m_open_trades.assign(m_sys_list.size(), TradeRecordList{});
+    m_sub_funds_before.assign(m_sys_list.size(), FundsRecord{});
     m_open_trades_date = datetime;
+    KQuery::KType ktype = m_kdata.getQuery().kType();
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
+        // 子系统当日「交易前」资金快照（开盘驱动前），供收盘阶段 _toSuggestions 计算三比重
+        if (m_sys_list[i]->getTM()) {
+            m_sub_funds_before[i] = m_sys_list[i]->getTM()->getFunds(datetime, ktype);
+        }
         MomentResult sub = m_sys_list[i]->runMomentOnOpen(datetime);
         for (auto& tr : sub.tradesOnOpen) {
             m_open_trades[i].push_back(tr);
@@ -343,10 +362,18 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     // 场景：实盘盘中若仅注册收盘驱动（当日未先调用 runMomentOnOpen）或刚经历 reset，
     //       m_open_trades 可能为空（下面按 [i] 索引会越界崩溃）或残留前一交易日开盘成交
     //       （与今日收盘建议重复合并 → 重复下单）。isNull() 前置短路，避免对 Null 调用 startOfDay()。
-    if (m_open_trades.size() != m_sys_list.size() || m_open_trades_date.isNull() ||
-        m_open_trades_date.startOfDay() != datetime.startOfDay()) {
+    if (m_open_trades.size() != m_sys_list.size() || m_sub_funds_before.size() != m_sys_list.size() ||
+        m_open_trades_date.isNull() || m_open_trades_date.startOfDay() != datetime.startOfDay()) {
         m_open_trades.assign(m_sys_list.size(), TradeRecordList{});
+        m_sub_funds_before.assign(m_sys_list.size(), FundsRecord{});
         m_open_trades_date = datetime;
+        // 交易前快照缺失（如盘中仅注册收盘驱动、未先调 runMomentOnOpen）：以子系统当前资金兜底，保证比重分母非空
+        KQuery::KType kt = m_kdata.getQuery().kType();
+        for (size_t i = 0; i < m_sys_list.size(); ++i) {
+            if (m_sys_list[i]->getTM()) {
+                m_sub_funds_before[i] = m_sys_list[i]->getTM()->getFunds(datetime, kt);
+            }
+        }
     }
 
     bool is_adjust = _isAdjustDate();
@@ -384,7 +411,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         // 合并后转译为对父建议（模式 A/B 共用此粘合剂）。
         TradeRecordList sub_trades = m_open_trades[i];
         sub_trades.insert(sub_trades.end(), sub.tradesOnClose.begin(), sub.tradesOnClose.end());
-        TradeSuggestionList subsug = _toSuggestions(sys, sub_trades);
+        TradeSuggestionList subsug = _toSuggestions(sys, sub_trades, m_sub_funds_before[i]);
         for (auto& s : subsug) {
             suggestions.push_back(s);
         }

@@ -172,14 +172,16 @@ private:
     std::vector<std::pair<Datetime, double>> m_adjust_turnover;  // 调仓日换手率（成交额/调仓前总资产）
     TradeSuggestionList m_last_suggestions;  // 最近一次收盘产生的对上建议
     std::vector<TradeRecordList> m_open_trades;  // 当日各子系统开盘成交（延迟请求兑现），供收盘汇总
-    Datetime m_open_trades_date;  // m_open_trades 所属交易日；收盘阶段据此防越界与跨日残留（运行时态，不序列化）
+    std::vector<FundsRecord> m_sub_funds_before;  // 当日各子系统「交易前」资金快照，供 _toSuggestions 计算三比重（运行时态，不序列化）
+    Datetime m_open_trades_date;  // m_open_trades/m_sub_funds_before 所属交易日；收盘阶段据此防越界与跨日残留（运行时态，不序列化）
 
     // 检查 candidate 子树（含自身）是否包含 target（用于循环引用检测）
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
 
-    /** 将一组成交按标的聚合为净建议（标注来源子系统 sys） */
-    TradeSuggestionList _toSuggestions(const SystemPtr& sys,
-                                       const TradeRecordList& trades) const;
+    /** 将一组成交按标的聚合为净建议（标注来源子系统 sys）。
+     *  funds_before 为子系统当日「交易前」资金快照，用于计算建议的三比重（cash/assets/target_position）。 */
+    TradeSuggestionList _toSuggestions(const SystemPtr& sys, const TradeRecordList& trades,
+                                       const FundsRecord& funds_before) const;
 
     /** 判定给定日期是否为调仓日（仅调仓日执行再平衡） */
     bool _isAdjustDate() const;

@@ -164,11 +164,16 @@ public:
                   SubSystemContextList& contexts, const KQuery& query);
 
     /** L1 系统级分配：模式 A 返回名义权重（suggested weight），模式 B 返回真实额度（写入 contexts[i].quota）。
-     *  @note 默认返回等权（1/N），保证任意 MM 在聚合形态下零改动即可工作。 */
+     *  @note 默认返回等权（1/N）；参数 weight-list 非空时改用固定权重（迁移 AF_FixedWeight/FixedWeightList）。
+     *        保证任意 MM 在聚合形态下零改动即可工作。 */
     virtual std::unordered_map<SYSPtr, double> _allocateSystemWeight(const Datetime& date,
                                                                       const TradeManagerPtr& tm,
                                                                       SubSystemContextList& contexts,
                                                                       const KQuery& query);
+
+    /** 解析参数 weight-list（逗号分隔的固定权重）为归一化权重向量；为空、数量与子系统不符或总和<=0 时
+     *  返回空向量（调用方回退等权）。迁移自 AF_FixedWeight / AF_FixedWeightList。 */
+    std::vector<double> _parseWeightList(size_t expect_n) const;
 
     /** L2 行为级换算：模式 A 按 assets_ratio / 权重换算为父账户数量；模式 B 透传子系统 number。
      *  @note 默认实现为模式 A（等权到仓）：将每条建议的 number 改写为「权重 × 父总资产 / 计划价」的目标股数，

@@ -27,8 +27,8 @@ enum SystemPart {
     PART_PROFITGOAL = 6,   /**< 盈利目标策略 */
     PART_SLIPPAGE = 7,     /**< 移滑价差算法 */
 
-    PART_ALLOCATEFUNDS = 8, /**< 资产分配算法 */
-    PART_PORTFOLIO = 9,     /**< 资产组合 */
+    PART_ALLOCATEFUNDS = 8, /**< 【已废弃】资产分配算法（AF 已随重构删除；保留枚举值以兼容旧序列化数据，勿用于新代码） */
+    PART_PORTFOLIO = 9,     /**< 【已废弃】资产组合（PF 已随重构删除；保留枚举值以兼容旧序列化数据，勿用于新代码） */
 
     PART_SYSTEM = 10,  /**< 聚合子系统（递归组合重构新增） */
     PART_INVALID = 11, /**< 无效值（哨兵，须为枚举末项） */

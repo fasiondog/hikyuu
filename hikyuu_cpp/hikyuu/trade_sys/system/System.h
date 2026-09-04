@@ -211,9 +211,9 @@ public:
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false);
 
     /**
-     * @brief 在指定的日期执行一步，仅由 PF 调用
+     * @brief 在指定的日期执行一步，由聚合系统（MultiSystem）或实盘驱动调用
      * @param datetime 指定的日期
-     * @return TradeRecordList
+     * @return MomentResult
      */
     virtual MomentResult runMoment(const Datetime& datetime);
 
@@ -271,25 +271,26 @@ public:
 
 public:
     //-------------------------
-    // 仅供 PF/AF 内部调用
+    // 仅供聚合系统（MultiSystem）内部调用
     //-------------------------
 
-    // 强制以开盘价卖出，仅供 PF/AF 内部调用
+    // 强制以开盘价卖出，仅供聚合系统内部调用
+    // @note from 允许 PART_SYSTEM；PART_PORTFOLIO 为已废弃 PF 的历史兼容值（保留以兼容旧序列化数据）
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_PORTFOLIO || from == PART_SYSTEM);
         return _sellForce(date, num, from, true);
     }
 
-    // 强制以收盘价卖出，仅供 PF/AF 内部调用
+    // 强制以收盘价卖出，仅供聚合系统内部调用
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_PORTFOLIO || from == PART_SYSTEM);
         return _sellForce(date, num, from, false);
     }
 
-    // 清除已有的交易请求，供Portfolio使用
+    // 清除已有的交易请求，供聚合系统使用
     virtual void clearDelayBuyRequest();
 
-    // 当前是否存在延迟的操作请求，供Portfolio
+    // 当前是否存在延迟的操作请求，供聚合系统使用
     bool haveDelaySellRequest() const {
         return !m_sellRequestList.empty();
     }
@@ -298,10 +299,10 @@ public:
         return !m_buyRequestList.empty();
     }
 
-    // 处理延迟买入请求，仅供 PF 调用
+    // 处理延迟卖出请求，仅供聚合系统调用
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date);
 
-    // 处理延迟买入请求，仅供 PF 调用
+    // 处理延迟买入请求，仅供聚合系统调用
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
 
     bool isPythonObject() const noexcept {
@@ -360,7 +361,7 @@ private:
     TradeRecord _runMomentOnOpen(const KRecord& today, const KRecord& src_today);
     TradeRecord _runMomentOnClose(const KRecord& today, const KRecord& src_today);
 
-    // Portfolio | AllocateFunds 指示立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
+    // 聚合系统（MultiSystem）指示立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
     TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);
 
 protected:

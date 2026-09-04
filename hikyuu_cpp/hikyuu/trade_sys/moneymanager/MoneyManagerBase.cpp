@@ -7,6 +7,8 @@
 
 #include "MoneyManagerBase.h"
 
+#include <sstream>
+
 namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const MoneyManagerBase& mm) {
@@ -30,6 +32,9 @@ MoneyManagerBase::MoneyManagerBase() : m_name("MoneyManagerBase") {
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
     setParam<double>("max-single-position", 1.0);
+    // [AF 迁移] 组合级分配参数（设计 12 章）：weight-list 固定权重、fixed-amount 固定金额
+    setParam<string>("weight-list", "");
+    setParam<double>("fixed-amount", 0.0);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
@@ -38,6 +43,9 @@ MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
     setParam<double>("max-single-position", 1.0);
+    // [AF 迁移] 组合级分配参数（设计 12 章）：weight-list 固定权重、fixed-amount 固定金额
+    setParam<string>("weight-list", "");
+    setParam<double>("fixed-amount", 0.0);
 }
 
 MoneyManagerBase::~MoneyManagerBase() {}
@@ -45,6 +53,9 @@ MoneyManagerBase::~MoneyManagerBase() {}
 void MoneyManagerBase::baseCheckParam(const string& name) const {
     if ("max-stock" == name) {
         HKU_ASSERT(getParam<int>("max-stock") >= 1);
+    }
+    if ("fixed-amount" == name) {
+        HKU_ASSERT(getParam<double>("fixed-amount") >= 0.0);
     }
 }
 
@@ -247,16 +258,67 @@ std::unordered_map<SYSPtr, double> MoneyManagerBase::_allocateSystemWeight(
     if (contexts.empty()) {
         return weights;
     }
+    // L1 权重来源（设计 12 章 AF 分配迁移）：
+    //   1) 参数 weight-list 非空：按序解析为各子系统固定权重并归一化（迁移 AF_FixedWeight / AF_FixedWeightList）；
+    //   2) 否则等权 1/N（迁移 AF_EqualWeight，默认）。
+    std::vector<double> fixed_weights = _parseWeightList(contexts.size());
     double eq = 1.0 / contexts.size();
-    for (auto& ctx : contexts) {
-        weights[ctx.sys] = eq;
+    // 模式 B 额度：fixed-amount>0 时每子系统固定额度（迁移 AF_FixedAmount），否则权重 × 父总资产。
+    double fixed_amount = getParam<double>("fixed-amount");
+    double total_assets = tm ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
+    for (size_t i = 0; i < contexts.size(); ++i) {
+        auto& ctx = contexts[i];
+        double w = fixed_weights.empty() ? eq : fixed_weights[i];
+        weights[ctx.sys] = w;
         if (m_mode == "B" && tm) {
-            // 模式 B：L1 产出「真实额度」= 等权 × 父总资产，写入 contexts[i].quota，
-            // 由父在调仓日回写给子系统（供下期运行，额度滞后一期）。
-            ctx.quota = eq * tm->getFunds(date, query.kType()).total_assets();
+            // 模式 B：L1 产出「真实额度」写入 contexts[i].quota，由父在调仓日回写给子系统（供下期运行，额度滞后一期）。
+            ctx.quota = (fixed_amount > 0.0) ? fixed_amount : (w * total_assets);
         }
     }
     return weights;
+}
+
+std::vector<double> MoneyManagerBase::_parseWeightList(size_t expect_n) const {
+    std::vector<double> result;
+    string wl = getParam<string>("weight-list");
+    if (wl.empty()) {
+        return result;  // 空 → 调用方回退等权
+    }
+    std::stringstream ss(wl);
+    string item;
+    double sum = 0.0;
+    while (std::getline(ss, item, ',')) {
+        size_t b = item.find_first_not_of(" \t\r\n");
+        if (b == string::npos) {
+            continue;  // 纯空白项跳过
+        }
+        size_t e = item.find_last_not_of(" \t\r\n");
+        item = item.substr(b, e - b + 1);
+        double v = 0.0;
+        try {
+            v = std::stod(item);
+        } catch (...) {
+            HKU_WARN("weight-list contains invalid item '{}', treated as 0!", item);
+            v = 0.0;
+        }
+        if (v < 0.0) {
+            v = 0.0;  // 负权重按 0 处理（不支持做空额度分配）
+        }
+        result.push_back(v);
+        sum += v;
+    }
+    // 数量须与子系统一致且总和 >0，否则视为无效，回退等权
+    if (result.size() != expect_n || sum <= 0.0) {
+        HKU_WARN_IF(result.size() != expect_n,
+                    "weight-list size({}) != subsystems({}), fallback to equal weight!",
+                    result.size(), expect_n);
+        result.clear();
+        return result;
+    }
+    for (auto& v : result) {
+        v /= sum;  // 归一化，使权重和为 1
+    }
+    return result;
 }
 
 void MoneyManagerBase::_allocateSuggestions(const Datetime& date, const TradeManagerPtr& tm,
@@ -280,6 +342,8 @@ void MoneyManagerBase::_allocateSuggestions(const Datetime& date, const TradeMan
 
     FundsRecord funds = tm->getFunds(date, ktype);
     double total_assets = funds.total_assets();
+    // 模式 A + fixed-amount>0：每标的目标市值取固定金额（迁移 AF_FixedAmount 的行为级语义），优先于按比重换算。
+    double fixed_amount = getParam<double>("fixed-amount");
     for (auto& s : suggestions) {
         if (s.plan_price <= 0.0) {
             s.number = 0.0;
@@ -292,10 +356,19 @@ void MoneyManagerBase::_allocateSuggestions(const Datetime& date, const TradeMan
         }
         double current = tm->getPosition(date, s.stock).number;
         if (s.type == SuggestionType::BUY) {
-            // 模式 A（默认）：目标持仓市值 = 权重 × 父总资产，换算为目标股数，净调仓量 =（目标 - 当前）。
-            // 若净调仓量为负（当前已超配目标），转为 SELL 减仓至目标，避免“负 BUY”在执行阶段被丢弃
-            // 而导致超配仓位无法再平衡（与 PF 周期性再平衡语义对齐）。
-            double target_value = weight * total_assets;
+            // 模式 A（默认）：目标持仓市值 = 子系统权重 × 子建议仓位比重 × 父总资产（设计 8.3 完整语义透传）。
+            //   - fixed-amount>0：每标的固定金额（迁移 AF_FixedAmount），优先于按比重换算；
+            //   - assets_ratio>0：尊重子系统上送的内部仓位比重（如子半仓则父也按半仓映射），避免信号强度被抹平；
+            //   - assets_ratio<=0（无比重信息，如子系统交易前总资产为 0）：回退按满仓（ratio=1）等权到仓。
+            // 换算为目标股数，净调仓量 =（目标 - 当前）；若为负（当前已超配），转 SELL 减仓至目标，
+            // 避免“负 BUY”在执行阶段被丢弃导致超配仓位无法再平衡（与 PF 周期性再平衡语义对齐）。
+            double target_value;
+            if (fixed_amount > 0.0) {
+                target_value = fixed_amount;
+            } else {
+                double ratio = (s.assets_ratio > 0.0) ? s.assets_ratio : 1.0;
+                target_value = weight * ratio * total_assets;
+            }
             double target_shares = target_value / s.plan_price;
             double delta = target_shares - current;
             if (delta < 0.0) {

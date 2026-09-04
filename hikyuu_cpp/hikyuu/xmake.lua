@@ -118,8 +118,7 @@ target("hikyuu")
     add_files("./strategy/**.cpp", {unity_group="strategy"})
     add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
     
-    add_files("./trade_sys/**.cpp|allocatefunds/**.cpp|condition/**.cpp|system/**.cpp")
-    -- [refactor] 阶段0：已删除 trade_sys/allocatefunds/ 整目录
+    add_files("./trade_sys/**.cpp|allocatefunds/**.cpp|portfolio/**.cpp|condition/**.cpp|system/**.cpp")
     add_files("./trade_sys/condition/*.cpp", "./trade_sys/condition/imp/logic/*.cpp", {unity_group="condition"})
     add_files("./trade_sys/condition/imp/*.cpp", {unity_group="condition_imp"})
     add_files("./trade_sys/environment/*.cpp", "./trade_sys/environment/imp/logic/*.cpp", {unity_group="environment"})
@@ -132,7 +131,6 @@ target("hikyuu")
     add_files("./trade_sys/multifactor/StyleRegression.cpp", {unity_group = false})
     add_files("./trade_sys/multifactor/filter/*.cpp", {unity_group="multifactor_filter"})
     add_files("./trade_sys/multifactor/normalize/*.cpp", {unity_group="multifactor_norm"})
-    -- [refactor] 阶段0：已删除 trade_sys/portfolio/ 整目录
     add_files("./trade_sys/profitgoal/**.cpp", {unity_group="profitgoal"})
     add_files("./trade_sys/selector/*.cpp", "./trade_sys/selector/imp/logic/*.cpp", {unity_group="selector"})
     add_files("./trade_sys/selector/imp/optimal/*.cpp", {unity_group="selector"})
