@@ -30,6 +30,8 @@
 #include "hikyuu/data_driver/ipc/HikyuuDataServer.h"
 #include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
 #include "hikyuu/data_driver/ipc/KDataShmCache.h"
+#include "hikyuu/plugin/dataserver.h"
+#include "hikyuu/utilities/node/NodeServer.h"
 
 using namespace hku;
 using namespace hku::ipc;
@@ -1302,6 +1304,113 @@ TEST_CASE("test_KDataClientModeGating") {
     }
 
     server.stop();
+}
+
+TEST_CASE("test_IpcPullFromBufferServer") {
+    // 客户端委托主进程从行情缓存服务拉取：验证 getDataFromBufferServer 在客户端模式不再因本地
+    // 无预加载缓冲而 early-return，而是把 (addr, codes, ktype) 一次性委托主进程；主进程经
+    // pullFromBufferServerLocal 从桩缓存服务拉取 → realtimeUpdate → 更新自身缓冲并镜像共享内存，
+    // 全体客户端随后经 shm 读到。模型参照 test_KDataClientModeGating（同进程兼任 master+client）
+    // 与 demo3.cpp 的 NodeServer "market" handler。
+    StockManager::instance().waitDataReady();
+    auto& sm = StockManager::instance();
+
+    // 选取一只已预加载 DAY 缓冲的真实证券作为主进程侧标的（测试进程即主进程）
+    Stock sample;
+    KRecordList buf_ks;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+        if (buf_ks.size() > 3) {
+            sample = stk;
+            break;
+        }
+    }
+    REQUIRE_FALSE(sample.isNull());
+    const std::string mc = sample.market_code();
+    const KRecord last = buf_ks.back();
+    // 桩返回的“同日更新”记录：开/高/低保持原值（高取大/低取小为不可逆合并），仅改收/量/额，
+    // 使更新可逆——用例末以原末根 realtimeUpdate 还原，避免污染其他以真实数据为基准的用例。
+    const double NEW_CLOSE = last.closePrice + 1.23;
+    const double NEW_AMOUNT = last.transAmount + 100.0;
+    const double NEW_COUNT = last.transCount + 10.0;
+
+    // 桩 buffer server：与 master handler 的 NodeClient 同进程，用 inproc 传输免端口占用。
+    // 仅对请求 codes 中等于 mc 的证券返回上述 canned 记录；空 codes → 空响应（no-op）。
+    const std::string stub_addr = "inproc://hku_pull_stub_" + std::to_string(HKU_TEST_GETPID());
+    NodeServer stub(stub_addr);
+    stub.regHandle("market", [mc, last, NEW_CLOSE, NEW_AMOUNT, NEW_COUNT](json&& req) {
+        json jstklist;
+        if (req.contains("codes") && req["codes"].is_array()) {
+            for (const auto& jc : req["codes"]) {
+                if (jc.get<string>() != mc) {
+                    continue;
+                }
+                json jr;
+                jr.emplace_back(last.datetime.str());
+                jr.emplace_back(last.openPrice);
+                jr.emplace_back(last.highPrice);
+                jr.emplace_back(last.lowPrice);
+                jr.emplace_back(NEW_CLOSE);
+                jr.emplace_back(NEW_AMOUNT);
+                jr.emplace_back(NEW_COUNT);
+                json jstk;
+                jstk["code"] = mc;
+                jstk["data"] = json::array();
+                jstk["data"].emplace_back(std::move(jr));
+                jstklist.emplace_back(std::move(jstk));
+            }
+        }
+        json res;
+        res["data"] = std::move(jstklist);
+        return res;
+    });
+    stub.start(4);
+
+    std::string addr = test_ipc_addr("hku_pull_test");
+    std::string lock_path = test_lock_path("hku_pull_test");
+    HikyuuDataServer server;
+    REQUIRE(server.start(addr, lock_path, "."));
+    auto conn = std::make_shared<IpcConnector>();
+    REQUIRE(conn->init(addr));
+
+    registerRealtimeForwarder(conn);
+    // RAII：无论用例中途 REQUIRE 失败与否，退出时复位客户端模式与转发注册，避免污染其他用例
+    struct ClientModeGuard {
+        ~ClientModeGuard() {
+            StockManager::instance()._testingSetIpcClientMode(false);
+            registerRealtimeForwarder(nullptr);
+        }
+    } guard;
+    sm._testingSetIpcClientMode(true);
+
+    /** @arg 客户端委托：一次 getDataFromBufferServer 调用经一次 IPC 往返委托主进程拉取，主进程
+     *         缓冲反映桩返回的新收盘价（而非客户端 early-return）。主进程缓冲即委托链路的权威
+     *         终点（client→IPC→master handler→pullFromBufferServerLocal→NodeClient→桩→realtimeUpdate）；
+     *         realtimeUpdate 的 shm 镜像为其无条件副产物，已由 test_KDataShmCache 充分覆盖。此处不
+     *         另建本地 KDataShmPublisher：其 publish/removeAll 会改动进程级全局镜像注册表
+     *         (g_mirror_pub/pid/staging)——与本文件其他 shm 用例共享，doctest 执行顺序下会破坏
+     *         test_KDataShmCache staging 子用例的暂存重放前提（与 test_KDataClientModeGating 同：
+     *         仅驱动 master 侧 realtimeUpdate、不建本地发布器）。*/
+    getDataFromBufferServer(stub_addr, StockList{sample}, KQuery::DAY);
+    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, NEW_CLOSE);
+
+    // 还原主进程缓冲末根（同日更新可逆），避免污染其他用例
+    sample.realtimeUpdate(last, KQuery::DAY);
+    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
+
+    /** @arg 边界：未注册转发连接时，客户端委托静默返回（ipcForwardPullFromBufferServer 返回
+     *         false），不崩溃、不改动主进程缓冲 */
+    registerRealtimeForwarder(nullptr);
+    getDataFromBufferServer(stub_addr, StockList{sample}, KQuery::DAY);
+    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
+
+    /** @arg 边界：空证券列表委托为 no-op（主进程拉取空 codes，桩返回空 data，缓冲不变）*/
+    registerRealtimeForwarder(conn);
+    getDataFromBufferServer(stub_addr, StockList{}, KQuery::DAY);
+    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
+
+    server.stop();
+    stub.stop();
 }
 
 TEST_CASE("test_StockWeightClientModeDelegatesToDriver") {

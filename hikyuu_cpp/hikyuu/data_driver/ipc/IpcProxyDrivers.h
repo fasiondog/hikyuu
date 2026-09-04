@@ -153,6 +153,17 @@ HKU_API Datetime ipcForwardGetLastUpdateTime(const std::string& market_code,
                                              const KQuery::KType& ktype);
 
 /**
+ * 客户端委托主进程从行情缓存服务（buffer server）拉取指定证券的最新 K 线并更新
+ * @details 客户端无预加载缓冲，若自行拉取需对每条记录逐次转发 realtimeUpdate（N 次 IPC 往返）；
+ * 改为把 (addr, codes, ktype) 一次性转给主进程，由主进程拉取→应用到缓冲→镜像共享内存，
+ * 全体客户端随后经 shm 读到更新。主进程按自身缓冲重建各证券的起始日期（shm 真源）。
+ * @return true 主进程已受理并执行拉取 | false 未注册转发连接或通讯失败（调用方仅记日志，不中断）
+ */
+HKU_API bool ipcForwardPullFromBufferServer(const std::string& addr,
+                                            const std::vector<std::string>& codes,
+                                            const KQuery::KType& ktype);
+
+/**
  * 基础信息 IPC 代理驱动
  * @details 从数据服务进程获取证券基础信息，通讯失败时降级至本地驱动
  */

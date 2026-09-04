@@ -73,6 +73,7 @@ enum class Cmd : uint16_t {
     KDATA_GET_TRANS_LIST,
     KDATA_REALTIME_UPDATE,  // 客户端转发实时 K 线更新，由主进程应用到缓冲并镜像至共享内存
     KDATA_GET_LAST_UPDATE_TIME,  // 客户端查询主进程缓冲的最后更新时刻（客户端无本地缓冲）
+    KDATA_PULL_FROM_BUFFER_SERVER,  // 客户端委托主进程从行情缓存服务拉取最新 K 线并更新（拉取→缓冲→镜像 shm）
 
     BLOCK_LOAD,
 

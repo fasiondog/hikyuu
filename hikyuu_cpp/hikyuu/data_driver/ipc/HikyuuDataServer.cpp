@@ -22,6 +22,7 @@
 #include "BaseInfoShmCache.h"
 #include "KDataShmCache.h"
 #include "hikyuu/StockManager.h"
+#include "hikyuu/plugin/dataserver.h"
 #include "hikyuu/utilities/Log.h"
 
 namespace hku {
@@ -510,6 +511,31 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
             Datetime last = stk.isNull() ? Datetime::min()
                                          : stk.getLastUpdateTime(KQuery::getKTypeEnum(ktype));
             encodeDatetimeFull(enc, last);
+            break;
+        }
+
+        case Cmd::KDATA_PULL_FROM_BUFFER_SERVER: {
+            // 客户端委托：主进程从行情缓存服务拉取指定证券最新 K 线并更新（本地缓冲 + 镜像 shm），
+            // 全体客户端随后经共享内存读到。直接调本地拉取实现 pullFromBufferServerLocal（而非
+            // getDataFromBufferServer），避免重入客户端委托分支——主进程永不应把自己路由成客户端
+            //（同进程测试下 isIpcClientMode() 可能为真），并按主进程自身缓冲重建各证券起始日期
+            //（即 shm 真源）。
+            std::string addr = rd.getString();
+            std::string ktype = rd.getString();
+            uint32_t n = rd.getU32();
+            HKU_CHECK(rd.ok(), "Invalid request body!");
+            HKU_CHECK(KQuery::isValidKType(ktype), "Invalid ktype: {}!", ktype);
+            StockList stklist;
+            stklist.reserve(n);
+            for (uint32_t i = 0; i < n && rd.ok(); i++) {
+                Stock stk = sm.getStock(rd.getString());
+                if (!stk.isNull()) {
+                    stklist.push_back(stk);
+                }
+            }
+            HKU_CHECK(rd.ok(), "Invalid request body!");
+            pullFromBufferServerLocal(addr, stklist, KQuery::getKTypeEnum(ktype));
+            enc.putU8(1);  // 已受理并执行；pullFromBufferServerLocal 为 best-effort void，内部自记日志
             break;
         }
 

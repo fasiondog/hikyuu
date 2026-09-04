@@ -77,9 +77,9 @@ void Encoder::putDatetime(const Datetime& d) {
     putU64(d.number());
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // Reader
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 bool Reader::check(size_t n) noexcept {
     if (m_ok && m_pos + n <= m_len) {
         return true;
@@ -177,9 +177,9 @@ uint32_t Reader::getCount32(size_t elem_min_size) {
     return count;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // 帧编解码
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 std::vector<uint8_t> encodeRequest(Cmd cmd, const std::vector<uint8_t>& body) {
     std::vector<uint8_t> frame(REQUEST_HEADER_SIZE + body.size());
     uint32_t magic = MAGIC;
@@ -248,9 +248,9 @@ bool decodeResponse(const std::vector<uint8_t>& frame, RetCode& out_ret,
     return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // KRecord
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeDatetimeFull(Encoder& enc, const Datetime& d) {
     bool is_null = d.isNull();
     enc.putU8(is_null ? 1 : 0);
@@ -305,9 +305,9 @@ KRecordList decodeKRecordList(Reader& rd) {
     return ks;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // TimeLineRecord
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeTimeLineRecord(Encoder& enc, const TimeLineRecord& t) {
     enc.putDatetime(t.datetime);
     enc.putDouble(t.price);
@@ -341,9 +341,9 @@ TimeLineList decodeTimeLineList(Reader& rd) {
     return ts;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // TransRecord
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeTransRecord(Encoder& enc, const TransRecord& t) {
     enc.putDatetime(t.datetime);
     enc.putDouble(t.price);
@@ -379,9 +379,9 @@ TransList decodeTransList(Reader& rd) {
     return ts;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // StockWeight
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeStockWeight(Encoder& enc, const StockWeight& w) {
     enc.putDatetime(w.datetime());
     enc.putDouble(w.countAsGift());
@@ -428,9 +428,9 @@ StockWeightList decodeStockWeightList(Reader& rd) {
     return ws;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // StockInfo
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeStockInfo(Encoder& enc, const StockInfo& info) {
     enc.putString(info.market);
     enc.putString(info.code);
@@ -482,9 +482,9 @@ std::vector<StockInfo> decodeStockInfoList(Reader& rd) {
     return infos;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // MarketInfo
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeMarketInfo(Encoder& enc, const MarketInfo& info) {
     enc.putString(info.market());
     enc.putString(info.name());
@@ -524,9 +524,9 @@ MarketInfo decodeMarketInfo(Reader& rd) {
                       closeTime2);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // StockTypeInfo
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeStockTypeInfo(Encoder& enc, const StockTypeInfo& info) {
     enc.putU32(info.type());
     enc.putString(info.description());
@@ -552,9 +552,9 @@ StockTypeInfo decodeStockTypeInfo(Reader& rd) {
                          maxTradeNumber);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // ZhBond10
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeZhBond10(Encoder& enc, const ZhBond10& bond) {
     enc.putDatetime(bond.date);
     enc.putDouble(bond.value);
@@ -586,9 +586,9 @@ ZhBond10List decodeZhBond10List(Reader& rd) {
     return bonds;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // HistoryFinanceInfo
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeHistoryFinanceInfo(Encoder& enc, const HistoryFinanceInfo& info) {
     enc.putDatetime(info.fileDate);
     enc.putDatetime(info.reportDate);
@@ -631,9 +631,9 @@ std::vector<HistoryFinanceInfo> decodeHistoryFinanceList(Reader& rd) {
     return infos;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // 节假日与财务字段
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeHolidaySet(Encoder& enc, const std::unordered_set<Datetime>& holidays) {
     enc.putU64(holidays.size());
     for (const auto& d : holidays) {
@@ -675,9 +675,9 @@ std::vector<std::pair<size_t, std::string>> decodeFinanceField(Reader& rd) {
     return fields;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // Block
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeBlock(Encoder& enc, const Block& block) {
     enc.putString(block.category());
     enc.putString(block.name());
@@ -728,9 +728,9 @@ BlockList decodeBlockList(Reader& rd) {
     return blocks;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // KQuery
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeKQuery(Encoder& enc, const KQuery& query) {
     enc.putU8(static_cast<uint8_t>(query.queryType()));
     enc.putString(query.kType());
@@ -759,9 +759,9 @@ KQuery decodeKQuery(Reader& rd) {
     return KQueryByDate(start, end, ktype);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 // Parameter(string -> double)
-///////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------
 void encodeParamMap(Encoder& enc, const std::unordered_map<std::string, double>& params) {
     enc.putU64(params.size());
     for (const auto& item : params) {

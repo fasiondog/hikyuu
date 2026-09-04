@@ -8,6 +8,9 @@
 #include "hikyuu/utilities/node/NodeClient.h"
 #include "interface/plugins.h"
 #include "dataserver.h"
+#if HKU_ENABLE_NODE
+#include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
+#endif
 
 namespace hku {
 
@@ -28,6 +31,28 @@ void HKU_API stopDataServer() {
 
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
                                      const KQuery::KType& ktype) {
+#if HKU_ENABLE_NODE
+    // 客户端模式：本地无预加载缓冲（pullFromBufferServerLocal 的 preload 检查会直接返回），且自行
+    // 拉取需对每条记录逐次转发 realtimeUpdate（N 次 IPC 往返）。改为把 (addr, codes, ktype) 一次性
+    // 委托主进程：主进程拉取→应用缓冲→镜像共享内存，全体客户端随后经 shm 读到更新。主进程不可达
+    // 时该转发内部告警并返回 false，此处静默返回，不中断调用方流程。
+    if (StockManager::instance().isIpcClientMode()) {
+        std::vector<std::string> codes;
+        codes.reserve(stklist.size());
+        for (const auto& stk : stklist) {
+            if (!stk.isNull()) {
+                codes.emplace_back(stk.market_code());
+            }
+        }
+        ipc::ipcForwardPullFromBufferServer(addr, codes, ktype);
+        return;
+    }
+#endif
+    pullFromBufferServerLocal(addr, stklist, ktype);
+}
+
+void HKU_API pullFromBufferServerLocal(const std::string& addr, const StockList& stklist,
+                                       const KQuery::KType& ktype) {
     // SPEND_TIME(getDataFromBufferServer);
     const auto& preload = StockManager::instance().getPreloadParameter();
     string low_ktype = ktype;

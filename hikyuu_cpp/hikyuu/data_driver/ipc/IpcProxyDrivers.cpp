@@ -224,6 +224,36 @@ Datetime ipcForwardGetLastUpdateTime(const std::string& market_code, const KQuer
     return last;
 }
 
+bool ipcForwardPullFromBufferServer(const std::string& addr, const std::vector<std::string>& codes,
+                                    const KQuery::KType& ktype) {
+    IpcConnectorPtr conn;
+    {
+        std::shared_lock<std::shared_mutex> lock(g_fwd_mutex);
+        conn = g_fwd_conn;
+    }
+    HKU_IF_RETURN(!conn, false);
+
+    // 请求体：[addr string][ktype string][count u32][code string × count]，响应体：[ok u8]
+    Encoder enc;
+    enc.putString(addr);
+    enc.putString(ktype);
+    enc.putU32(static_cast<uint32_t>(codes.size()));
+    for (const auto& code : codes) {
+        enc.putString(code);
+    }
+    std::vector<uint8_t> res_body;
+    if (!conn->request(Cmd::KDATA_PULL_FROM_BUFFER_SERVER, enc.data(), res_body)) {
+        // 主进程不可用（如每日定时重启窗口）期间无法委托，告警后返回，不中断调用方流程
+        HKU_WARN("Failed forward pull-from-buffer-server to data server (ktype {}, {} codes)!",
+                 ktype, codes.size());
+        return false;
+    }
+    Reader rd(res_body.data(), res_body.size());
+    uint8_t ok = rd.getU8();
+    HKU_IF_RETURN(!rd.ok(), false);
+    return ok != 0;
+}
+
 bool IpcConnector::waitReady(uint64_t timeout_seconds,
                              std::function<void(uint64_t, uint64_t)>&& progress_cb) {
     auto start_tp = std::chrono::steady_clock::now();
