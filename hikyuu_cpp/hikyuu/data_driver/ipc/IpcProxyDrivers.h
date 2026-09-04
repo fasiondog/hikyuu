@@ -272,6 +272,9 @@ public:
                              const KQuery& query, size_t& out_start, size_t& out_end) override;
     KRecordList getKRecordList(const std::string& market, const std::string& code,
                                const KQuery& query) override;
+    bool tryGetKRecordView(const std::string& market, const std::string& code,
+                           const KQuery::KType& kType, size_t start_ix, size_t end_ix,
+                           KRecordView& out) override;
     TimeLineList getTimeLineList(const std::string& market, const std::string& code,
                                  const KQuery& query) override;
     TransList getTransList(const std::string& market, const std::string& code,

@@ -1004,6 +1004,31 @@ KRecordList IpcKDataDriver::getKRecordList(const std::string& market, const std:
     return local ? local->getKRecordList(market, code, query) : KRecordList();
 }
 
+bool IpcKDataDriver::tryGetKRecordView(const std::string& market, const std::string& code,
+                                       const KQuery::KType& kType, size_t start_ix, size_t end_ix,
+                                       KRecordView& out) {
+    // 分时/分笔的 ETF/FUND/B 价格在服务端已缩放，需反缩放还原，无法裸指针视图；
+    // 返回 false 由调用方回退 getKRecordList 拷贝路径（其内含 unscalePrice）
+    if (needUnscalePrice(kType, market, code)) {
+        return false;
+    }
+    _tryRefreshShm();
+    // 单次调用内固定 reader 引用；out.pin 持有该 reader，使视图指针在 epoch 换代后仍有效
+    auto reader = _shmReader();
+    if (!reader) {
+        return false;
+    }
+    const KRecord* data = nullptr;
+    size_t count = 0;
+    if (!reader->tryGetKRecordView(market + code, kType, start_ix, end_ix, data, count)) {
+        return false;
+    }
+    out.data = data;
+    out.count = count;
+    out.pin = reader;  // 类型擦除持有映射存活
+    return true;
+}
+
 TimeLineList IpcKDataDriver::getTimeLineList(const std::string& market, const std::string& code,
                                              const KQuery& query) {
     // 分时在主进程侧同样直接走驱动现场读取（Stock::getTimeLineList 不读预加载缓冲），

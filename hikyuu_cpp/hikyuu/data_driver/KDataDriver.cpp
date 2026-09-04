@@ -86,6 +86,14 @@ KRecordList KDataDriver::getKRecordList(const string& market, const string& code
     return KRecordList();
 }
 
+bool KDataDriver::tryGetKRecordView(const string& market, const string& code,
+                                    const KQuery::KType& kType, size_t start_ix, size_t end_ix,
+                                    KRecordView& out) {
+    // 默认不支持零拷贝视图（仅客户端 IPC 代理驱动覆写）；静默返回 false，调用方回退
+    // getKRecordList 拷贝路径。此为可选优化而非未实现错误，故不记日志。
+    return false;
+}
+
 TimeLineList KDataDriver::getTimeLineList(const string& market, const string& code,
                                           const KQuery& query) {
     HKU_INFO("The getTimeLineList method has not been implemented! (KDataDriver: {})", m_name);

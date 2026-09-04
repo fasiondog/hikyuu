@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 #include <boost/interprocess/mapped_region.hpp>
@@ -41,28 +42,26 @@ namespace hku {
 namespace ipc {
 
 constexpr uint32_t SHM_CACHE_MAGIC = 0x53434B48;  // "HKCS" 小端
-constexpr uint32_t SHM_CACHE_VERSION = 2;
+constexpr uint32_t SHM_CACHE_VERSION = 3;
 
 /*
  * K 线共享内存缓存段布局（全定长、无指针）：
  * [ShmCacheHeader][ShmKTypeInfo × ktype_count]
  * 每个 ktype：[ShmStockEntry × entry_count，按 market_code 升序，供二分查找]
- * 记录区：每证券 [已发布数据][1 个交易日预留区]，主进程实时数据镜像写入尾部
+ * 记录区：每证券 [已发布数据][1 个交易日预留区]，主进程实时数据镜像写入尾部；
+ *         记录直接以 KRecord 二进制存放（datetime 为原始 Datetime 字节），客户端可
+ *         reinterpret_cast 为 KRecord* 零拷贝视图读取（见 tryGetKRecordView）。
  * 并发模型：单写者（主进程 realtimeUpdate 持证券×ktype 写锁）多读者（客户端进程），
  * entry 级 seqlock + 原子 record_count 保证读端无撕裂；历史区发布后不可变。
  * 段名含代数（epoch），重发布创建新段并删除旧段，读端已映射的旧段不受影响。
  */
 
-/** K线记录（与网络协议编码一致，datetime 为 12 位 YYYYMMDDHHMM） */
-struct ShmKRecord {
-    uint64_t datetime;
-    double openPrice;
-    double highPrice;
-    double lowPrice;
-    double closePrice;
-    double transAmount;
-    double transCount;
-};
+// 记录区以 KRecord 原始字节存放，要求其为标准布局且对齐不超过 8 字节（记录区按 8 字节对齐）。
+// Datetime 内部为 bt::ptime（纯整数字段，无指针/虚表）；主进程与客户端为同机同一 core 构建
+// 产物，字节布局一致，可跨进程按字节共享（代码库既有 Stock::_getKRecordListFromBuffer 已按
+// sizeof(KRecord) memcpy KRecord 数组，此处将该实践扩展到跨进程）。
+static_assert(std::is_standard_layout<KRecord>::value && alignof(KRecord) <= 8,
+              "KRecord must be standard-layout and <=8-byte aligned for shm byte sharing!");
 
 /** 证券索引项（record_count/seq 为跨进程原子量，需 lock-free） */
 struct ShmStockEntry {
@@ -148,7 +147,7 @@ private:
     /** 镜像写入索引项（指向已发布段内位置，随 publish/removeAll 整体替换） */
     struct MirrorEntry {
         ShmStockEntry* entry{nullptr};
-        ShmKRecord* records{nullptr};
+        KRecord* records{nullptr};
         bool overflow_warned{false};
     };
 
@@ -227,6 +226,17 @@ public:
 
     bool tryGetKRecordList(const std::string& market_code, const KQuery& query,
                            KRecordList& out) const;
+
+    /**
+     * 返回指向段内 [start_ix, end_ix) 记录的裸指针视图（零拷贝）
+     * @details 调用方须持有本 reader 的 shared_ptr 以 pin 住映射（epoch 换代后旧映射仍存活）；
+     * 区间须由调用方预先解析为正索引（负索引/日期经 Stock::getIndexRange 解析）。
+     * 不做 seqlock 拷贝：末根进行中 bar 存在与主进程 KDataSharedBufferImp 同类的良性瞬时竞争。
+     * @return 命中且区间有效返回 true；未覆盖/越界/空区间返回 false
+     */
+    bool tryGetKRecordView(const std::string& market_code, const KQuery::KType& ktype,
+                           size_t start_ix, size_t end_ix, const KRecord*& out_data,
+                           size_t& out_count) const;
 
 private:
     struct Impl;

@@ -556,6 +556,83 @@ TEST_CASE("test_KDataShmCache") {
         CHECK_FALSE(reader.valid());
     }
 
+    SUBCASE("krecord view (zero-copy)") {
+        // 裸指针视图：内容与同区间 tryGetKRecordList 逐字段一致；越界/未覆盖/空区间返回
+        // false；mirrorUpdate 追加后视图 count 随 readCount 增长、末根反映镜像（视图读的是实时段）
+        KDataShmPublisher publisher(prefix);
+        std::string name = publisher.publish(20260908);
+        REQUIRE_FALSE(name.empty());
+
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+
+        auto& sm = StockManager::instance();
+        Stock sample;
+        KRecordList buf_ks;
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+            if (buf_ks.size() > 3) {
+                sample = stk;
+                break;
+            }
+        }
+        REQUIRE_FALSE(sample.isNull());
+        const std::string mc = sample.market_code();
+        size_t total = 0;
+        REQUIRE(reader.tryGetCount(mc, KQuery::DAY, total));
+        REQUIRE_GT(total, 3);
+
+        // 全区间视图与同区间拷贝列表逐字段一致（datetime/OHLC/额/量）
+        const KRecord* data = nullptr;
+        size_t count = 0;
+        REQUIRE(reader.tryGetKRecordView(mc, KQuery::DAY, 0, total, data, count));
+        REQUIRE_NE(data, nullptr);
+        CHECK_EQ(count, total);
+        KRecordList list;
+        REQUIRE(reader.tryGetKRecordList(
+          mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), list));
+        REQUIRE_EQ(list.size(), count);
+        for (size_t i = 0; i < count; i++) {
+            CHECK_EQ(data[i].datetime, list[i].datetime);
+            CHECK_EQ(data[i].openPrice, list[i].openPrice);
+            CHECK_EQ(data[i].highPrice, list[i].highPrice);
+            CHECK_EQ(data[i].lowPrice, list[i].lowPrice);
+            CHECK_EQ(data[i].closePrice, list[i].closePrice);
+            CHECK_EQ(data[i].transAmount, list[i].transAmount);
+            CHECK_EQ(data[i].transCount, list[i].transCount);
+        }
+
+        // 子区间 [1,3)：视图为同一映射内偏移（part == data+1，验证记录连续、步长 sizeof(KRecord)）
+        const KRecord* part = nullptr;
+        size_t part_count = 0;
+        REQUIRE(reader.tryGetKRecordView(mc, KQuery::DAY, 1, 3, part, part_count));
+        CHECK_EQ(part_count, 2);
+        CHECK_EQ(part, data + 1);
+        CHECK_EQ(part[0].datetime, list[1].datetime);
+        CHECK_EQ(part[1].closePrice, list[2].closePrice);
+
+        // end 越界被钳制到 total
+        const KRecord* clamp = nullptr;
+        size_t clamp_count = 0;
+        REQUIRE(
+          reader.tryGetKRecordView(mc, KQuery::DAY, total - 1, total + 1000, clamp, clamp_count));
+        CHECK_EQ(clamp_count, 1);
+
+        // 失败路径：未覆盖证券/类型、空区间(start==end / start>end)、起始越界
+        const KRecord* bad = nullptr;
+        size_t bad_count = 12345;
+        CHECK_FALSE(reader.tryGetKRecordView("SH999999", KQuery::DAY, 0, 1, bad, bad_count));
+        CHECK_FALSE(reader.tryGetKRecordView(mc, KQuery::MIN, 0, 1, bad, bad_count));
+        CHECK_FALSE(reader.tryGetKRecordView(mc, KQuery::DAY, 2, 2, bad, bad_count));
+        CHECK_FALSE(reader.tryGetKRecordView(mc, KQuery::DAY, 3, 1, bad, bad_count));
+        CHECK_FALSE(reader.tryGetKRecordView(mc, KQuery::DAY, total, total + 1, bad, bad_count));
+        CHECK_EQ(bad, nullptr);  // 失败时不写出 data
+        CHECK_EQ(bad_count, 0);  // 失败时 count 归零
+        // 注：本子用例不驱动 mirrorUpdate 追加，保持只读零副作用；“视图读实时段”
+        // 的验证放在下方 realtime mirror 子用例（复用其自身追加，避免跨子用例污染：
+        // 本处追加会被暂存至全局 g_mirror_pending，并被下一个 publish 重放到其新段）。
+    }
+
     SUBCASE("realtime mirror") {
         // 验证实时镜像写入：末根更新/追加/过期忽略/预留区写满冻结，
         // 以及并发读写下 seqlock 的无撕裂一致性
@@ -641,6 +718,30 @@ TEST_CASE("test_KDataShmCache") {
                                             start_ix, end_ix));
         CHECK_EQ(start_ix, base_count);
         CHECK_EQ(end_ix, base_count + 2);
+
+        // 视图读实时段：追加/末根更新后，裸指针视图与拷贝路径一致——
+        // 视图 count 随 readCount 增长、追加区与末根更新（close=10.9）反映到视图、历史区不变。
+        // 复用本子用例自身的追加，不产生跨子用例污染（对比上方 krecord view 子用例保持只读）。
+        const KRecord* view_data = nullptr;
+        size_t view_count = 0;
+        REQUIRE(
+          reader.tryGetKRecordView(mc, KQuery::DAY, 0, base_count + 2, view_data, view_count));
+        REQUIRE_NE(view_data, nullptr);
+        CHECK_EQ(view_count, base_count + 2);
+        CHECK_EQ(view_data[0].datetime, buf_ks.front().datetime);  // 历史区不变
+        CHECK_EQ(view_data[base_count].datetime, dt1);             // 追加区首根
+        CHECK_EQ(view_data[base_count + 1].datetime, dt2);         // 追加区末根
+        CHECK_EQ(view_data[base_count + 1].closePrice, 10.9);      // 末根更新反映到视图
+        CHECK_EQ(view_data[base_count + 1].highPrice, 11.0);
+        // 视图与同区间拷贝列表逐字段一致（视图读的是同一实时段）
+        KRecordList view_list;
+        REQUIRE(reader.tryGetKRecordList(
+          mc, KQuery((int64_t)0, (int64_t)(base_count + 2), KQuery::DAY), view_list));
+        REQUIRE_EQ(view_list.size(), view_count);
+        for (size_t i = 0; i < view_count; i++) {
+            CHECK_EQ(view_data[i].datetime, view_list[i].datetime);
+            CHECK_EQ(view_data[i].closePrice, view_list[i].closePrice);
+        }
 
         // 并发读写：写者持续更新末根（close 与 transCount 同值写入），
         // 读者验证两字段恒相等，检验 seqlock 无撕裂读
@@ -934,6 +1035,94 @@ TEST_CASE("test_KDataShmCache") {
         CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice,
                  last_rec.closePrice);
     }
+}
+
+TEST_CASE("test_IpcKDataDriverView") {
+    // 驱动层零拷贝视图：IpcKDataDriver::tryGetKRecordView 经 _tryRefreshShm 映射服务端发布的
+    // 快照后返回裸指针视图（pin 住映射），内容与源缓冲/拷贝路径一致；未覆盖证券/类型、
+    // 空区间、起始越界返回 false（由调用方回退 getKRecordList 拷贝路径）。
+    StockManager::instance().waitDataReady();
+    const std::string prefix = "hkuview";
+    std::string addr = test_ipc_addr("hku_view_test");
+    std::string lock_path = test_lock_path("hku_view_test");
+
+    HikyuuDataServer server;
+    REQUIRE(server.start(addr, lock_path, "."));
+    REQUIRE(server.publishShmCache(prefix));
+
+    auto conn = std::make_shared<IpcConnector>();
+    REQUIRE(conn->init(addr));
+
+    // 本地兜底池：视图命中时不使用；DoNothing 驱动仅用于满足构造（未覆盖类型不走本地）
+    Parameter param;
+    param.set<std::string>("type", "DoNothing");
+    auto local_pool = DataDriverFactory::getKDataDriverPool(param);
+    REQUIRE(local_pool);
+
+    IpcKDataDriver driver(conn, local_pool);
+
+    auto& sm = StockManager::instance();
+    Stock sample;
+    KRecordList buf_ks;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+        if (buf_ks.size() > 3) {
+            sample = stk;
+            break;
+        }
+    }
+    REQUIRE_FALSE(sample.isNull());
+    const size_t total = buf_ks.size();
+    const std::string mkt = sample.market(), code = sample.code();
+
+    SUBCASE("view hits shm, matches source buffer and copy path") {
+        KRecordView view;
+        REQUIRE(driver.tryGetKRecordView(mkt, code, KQuery::DAY, 0, total, view));
+        REQUIRE_NE(view.data, nullptr);
+        CHECK_EQ(view.count, total);
+        CHECK(view.pin != nullptr);  // 映射被 pin 住（跨代存活由 reader shared_ptr 语义保证）
+
+        // 与源缓冲逐字段一致（验证 publish → shm → view 全链路，datetime 二进制共享正确）
+        for (size_t i = 0; i < total; i++) {
+            CHECK_EQ(view.data[i].datetime, buf_ks[i].datetime);
+            CHECK_EQ(view.data[i].openPrice, buf_ks[i].openPrice);
+            CHECK_EQ(view.data[i].highPrice, buf_ks[i].highPrice);
+            CHECK_EQ(view.data[i].lowPrice, buf_ks[i].lowPrice);
+            CHECK_EQ(view.data[i].closePrice, buf_ks[i].closePrice);
+            CHECK_EQ(view.data[i].transAmount, buf_ks[i].transAmount);
+            CHECK_EQ(view.data[i].transCount, buf_ks[i].transCount);
+        }
+
+        // 与拷贝路径（getKRecordList，shm 优先）一致：视图与 memcpy 副本同源
+        KRecordList cp =
+          driver.getKRecordList(mkt, code, KQuery((int64_t)0, (int64_t)total, KQuery::DAY));
+        REQUIRE_EQ(cp.size(), total);
+        CHECK_EQ(cp.front().datetime, view.data[0].datetime);
+        CHECK_EQ(cp.back().closePrice, view.data[total - 1].closePrice);
+    }
+
+    SUBCASE("end_ix clamped, sub-range shares mapping") {
+        KRecordView full;
+        REQUIRE(driver.tryGetKRecordView(mkt, code, KQuery::DAY, 0, total, full));
+        KRecordView tail;
+        REQUIRE(driver.tryGetKRecordView(mkt, code, KQuery::DAY, total - 2, total + 1000, tail));
+        CHECK_EQ(tail.count, 2);                       // end 越界被钳制到 total
+        CHECK_EQ(tail.data, full.data + (total - 2));  // 同一映射内偏移（记录连续）
+        CHECK_EQ(tail.data[1].datetime, buf_ks.back().datetime);
+    }
+
+    SUBCASE("uncovered / invalid range returns false") {
+        KRecordView view;
+        CHECK_FALSE(driver.tryGetKRecordView("SH", "999999", KQuery::DAY, 0, 1, view));
+        CHECK_FALSE(driver.tryGetKRecordView(mkt, code, KQuery::MIN, 0, 1, view));  // 未覆盖类型
+        CHECK_FALSE(driver.tryGetKRecordView(mkt, code, KQuery::DAY, 2, 2, view));  // start==end
+        CHECK_FALSE(
+          driver.tryGetKRecordView(mkt, code, KQuery::DAY, total, total + 1, view));  // 起始越界
+        CHECK_EQ(view.data, nullptr);
+        CHECK_EQ(view.count, 0);
+    }
+
+    server.stop();
 }
 
 TEST_CASE("test_KDataRealtimeForward") {

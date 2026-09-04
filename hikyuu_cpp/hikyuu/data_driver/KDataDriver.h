@@ -17,6 +17,18 @@
 namespace hku {
 
 /**
+ * K 线记录裸指针视图（零拷贝）
+ * @details 由支持共享内存视图的驱动（客户端 IPC 代理驱动）填充，data 指向只读共享内存中
+ * 连续的 count 条 KRecord；pin 以类型擦除方式持有底层映射存活（如 KDataShmReader 的
+ * shared_ptr），视图有效期内不得释放。不支持视图的驱动返回 false，调用方回退拷贝路径。
+ */
+struct KRecordView {
+    const KRecord* data{nullptr};  ///< 区间首记录指针（连续 count 条）
+    size_t count{0};               ///< 区间记录数
+    shared_ptr<void> pin;          ///< 持有映射存活（类型擦除）
+};
+
+/**
  * K线数据驱动基类
  * @ingroup DataDriver
  */
@@ -99,6 +111,22 @@ public:
      */
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query);
+
+    /**
+     * 获取指定区间的 K 线记录裸指针视图（零拷贝，可选实现）
+     * @details 仅客户端共享内存路径支持；[start_ix, end_ix) 须为已解析的正索引。
+     * 默认返回 false，调用方回退 getKRecordList 拷贝路径。
+     * @param market 市场简称
+     * @param code   证券代码
+     * @param kType  K线类型
+     * @param start_ix 起始索引（含）
+     * @param end_ix   结束索引（不含）
+     * @param out    [out] 视图句柄
+     * @return 支持且命中返回 true
+     */
+    virtual bool tryGetKRecordView(const string& market, const string& code,
+                                   const KQuery::KType& kType, size_t start_ix, size_t end_ix,
+                                   KRecordView& out);
 
     /**
      * 获取分时线
@@ -193,6 +221,11 @@ public:
 
     KRecordList getKRecordList(const string& market, const string& code, const KQuery& query) {
         return m_driver->getKRecordList(market, code, query);
+    }
+
+    bool tryGetKRecordView(const string& market, const string& code, const KQuery::KType& kType,
+                           size_t start_ix, size_t end_ix, KRecordView& out) {
+        return m_driver->tryGetKRecordView(market, code, kType, start_ix, end_ix, out);
     }
 
     TimeLineList getTimeLineList(const string& market, const string& code, const KQuery& query) {

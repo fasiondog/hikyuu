@@ -142,6 +142,28 @@ TEST_CASE("test_KDataShm_real") {
         CHECK_EQ(shm_end, ipc_end);
         std::cout << "KData 日期区间 SHM==IPC 源: probe=" << sample_mc << " 索引区间=[" << shm_start
                   << "," << shm_end << ") 记录数=" << shm_by_date.size() << std::endl;
+
+        // 三方一致性：裸指针视图(tryGetKRecordView) == 段内拷贝(tryGetKRecordList)
+        // == Stock::getKRecordList（IPC 回退源）。视图读的是同一段内存，datetime 以
+        // 原始字节共享，逐字段应与两条拷贝路径完全一致（实证跨进程 KRecord 二进制共享）。
+        const KRecord* view_data = nullptr;
+        size_t view_count = 0;
+        CHECK(
+          reader.tryGetKRecordView(sample_mc, KQuery::DAY, 0, full.size(), view_data, view_count));
+        REQUIRE_NE(view_data, nullptr);
+        CHECK_EQ(view_count, full.size());
+        KRecordList shm_copy;
+        CHECK(reader.tryGetKRecordList(sample_mc, query, shm_copy));
+        REQUIRE_EQ(shm_copy.size(), full.size());
+        size_t view_mismatch = 0;
+        for (size_t i = 0; i < view_count; i++) {
+            if (!krecordMatch(view_data[i], full[i]) || !krecordMatch(view_data[i], shm_copy[i])) {
+                view_mismatch++;
+            }
+        }
+        CHECK_EQ(view_mismatch, 0);
+        std::cout << "KData 视图==拷贝==Stock 三方一致: probe=" << sample_mc
+                  << " 记录数=" << view_count << std::endl;
     } else {
         std::cout << "无记录数 >3 的抽样证券，跳过日期/索引区间比对" << std::endl;
     }
