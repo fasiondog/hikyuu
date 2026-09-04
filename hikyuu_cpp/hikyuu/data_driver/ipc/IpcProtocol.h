@@ -71,6 +71,7 @@ enum class Cmd : uint16_t {
     KDATA_GET_KRECORD_LIST,
     KDATA_GET_TIMELINE_LIST,
     KDATA_GET_TRANS_LIST,
+    KDATA_REALTIME_UPDATE,  // 客户端转发实时 K 线更新，由主进程应用到缓冲并镜像至共享内存
 
     BLOCK_LOAD,
 

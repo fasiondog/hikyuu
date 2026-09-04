@@ -145,12 +145,36 @@ std::atomic<bool> g_mirror_active{false};
  */
 std::atomic<int64_t> g_mirror_pid{0};
 
+/**
+ * 发布窗口暂存（staging）：publish 构建新段期间（快照拷贝 → 镜像注册）到达的实时更新
+ * @details 行情接收（SpotAgent）与 shm 发布相互独立，若不暂存，落在该窗口内的更新
+ * 既进不了快照（拷贝已完成）也进不了镜像（尚未注册），将永久丢失，破坏
+ * “段尾与缓冲尾同步演进”的不变量（客户端缺中间分钟记录、增量量额错乱）。
+ * 暂存于新段注册后按到达序重放，镜像合并规则幂等，与快照已收录的重叠记录收敛一致。
+ * 暂存期间若存在活跃旧段（重发布场景），更新同步双写旧段，旧段读者不受发布过程影响。
+ * 受 g_mirror_mutex 保护；g_mirror_staging 仅由声称（CAS）成功的发布器在成功路径关闭，
+ * 失败路径保持开启并保留暂存，由下一次发布一并重放，避免失败窗口内的更新丢失。
+ */
+std::atomic<bool> g_mirror_staging{false};
+struct StagedUpdate {
+    std::string market_code;
+    KQuery::KType ktype;
+    KRecord record;
+};
+std::vector<StagedUpdate> g_mirror_pending;
+
+/** 暂存条数上限：防御发布长期失败/反复失败时无界增长，超限后丢弃并告警一次 */
+constexpr size_t SHM_STAGING_MAX_RECORDS = 2000000;
+bool g_staging_overflow_warned{false};  // 受 g_mirror_mutex 保护
+
 }  // namespace
 
 void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
                              const KRecord& record) {
-    // 快速路径：未注册发布器（客户端进程/未启用缓存/尚未发布）时直接返回
-    if (!g_mirror_active.load(std::memory_order_acquire)) {
+    // 快速路径：非发布窗口（未暂存）且未注册发布器（客户端进程/未启用缓存/尚未发布）
+    // 时直接返回
+    bool staging = g_mirror_staging.load(std::memory_order_acquire);
+    if (!staging && !g_mirror_active.load(std::memory_order_acquire)) {
         return;
     }
     // fork 出的子进程不是发布段的那个进程，写入会成为双写者；
@@ -158,10 +182,47 @@ void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType
     if (g_mirror_pid.load(std::memory_order_relaxed) != (int64_t)HKU_SHM_GETPID()) {
         return;
     }
+    if (staging) {
+        // 发布窗口：暂存待新段注册后重放；若存在活跃旧段则同步双写，
+        // 使已映射旧段的读者在发布期间仍能读到准实时数据
+        std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
+        if (!g_mirror_staging.load(std::memory_order_relaxed)) {
+            // 极端竞态：加锁期间发布已完成并转入重放，此后按常态镜像路径处理
+        } else if (g_mirror_pending.size() < SHM_STAGING_MAX_RECORDS) {
+            g_mirror_pending.push_back(StagedUpdate{market_code, ktype, record});
+        } else if (!g_staging_overflow_warned) {
+            g_staging_overflow_warned = true;
+            HKU_WARN("Shm cache staging overflow (publish window too long?), drop updates!");
+        }
+        if (g_mirror_pub) {
+            g_mirror_pub->mirrorUpdate(market_code, ktype, record);
+        }
+        return;
+    }
     std::shared_lock<std::shared_mutex> lock(g_mirror_mutex);
     if (g_mirror_pub) {
         g_mirror_pub->mirrorUpdate(market_code, ktype, record);
     }
+}
+
+void shmTestingBeginStaging() {
+    bool expected = false;
+    if (g_mirror_staging.compare_exchange_strong(expected, true)) {
+        std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
+        g_mirror_pid.store((int64_t)HKU_SHM_GETPID(), std::memory_order_relaxed);
+    }
+}
+
+void shmTestingEndStagingAndReplay() {
+    std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
+    if (g_mirror_pub) {
+        for (const auto& upd : g_mirror_pending) {
+            g_mirror_pub->mirrorUpdate(upd.market_code, upd.ktype, upd.record);
+        }
+    }
+    g_mirror_pending.clear();
+    g_staging_overflow_warned = false;
+    g_mirror_staging.store(false, std::memory_order_release);
 }
 
 //----------------------------------------------------------------------------
@@ -177,6 +238,17 @@ KDataShmPublisher::~KDataShmPublisher() {
 std::string KDataShmPublisher::publish(uint64_t epoch) {
     // 新段名（创建成功后赋值），异常时仅清理新段，保留旧段继续服务
     std::string created_name;
+    // 声称发布窗口暂存：从快照拷贝前开启，至新段注册并重放完毕后关闭（见成功路径）；
+    // CAS 失败仅发生在另一发布器正在构建时（并发重发布），此时不重复声称，
+    // 由声称方统一暂存/重放，本发布器按无暂存路径执行
+    bool own_staging = false;
+    g_mirror_staging.compare_exchange_strong(own_staging, true);
+    if (own_staging) {
+        std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
+        // 与镜像写入同一 pid 门控：首次发布前 g_mirror_pid 尚未设置，此处提前记录，
+        // 使发布窗口内的镜像调用能通过 pid 校验进入暂存分支
+        g_mirror_pid.store((int64_t)HKU_SHM_GETPID(), std::memory_order_relaxed);
+    }
     try {
         auto& sm = StockManager::instance();
         const auto& preload_param = sm.getPreloadParameter();
@@ -343,7 +415,7 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
 
         std::string old_name = m_current_name;
         {
-            // 持注册表写锁原子替换镜像状态：进行中的镜像写入（读锁）完成后
+            // 持注册表写锁原子替换镜像状态：进行中的镜像写入（读锁/暂存写锁）完成后
             // 才会切换，旧段映射在替换后才解除，镜像写入不会触及已解除的映射
             std::unique_lock<std::shared_mutex> reg_lock(g_mirror_mutex);
             m_shm.swap(shm);
@@ -353,6 +425,22 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
             g_mirror_pub = this;
             g_mirror_pid.store((int64_t)HKU_SHM_GETPID(), std::memory_order_relaxed);
             g_mirror_active.store(true, std::memory_order_release);
+            if (own_staging) {
+                // 新段就绪后按到达序重放发布窗口内暂存的实时更新：
+                // 镜像合并规则幂等，快照已收录的重叠记录重放后收敛一致；
+                // 重放与关闭暂存在同一写锁内完成，期间新到的更新阻塞在
+                // shmMirrorRealtimeUpdate 的锁上，释放后直接镜像至新段，无缝衔接
+                for (const auto& upd : g_mirror_pending) {
+                    mirrorUpdate(upd.market_code, upd.ktype, upd.record);
+                }
+                HKU_INFO_IF(!g_mirror_pending.empty(),
+                            "Replayed {} staged realtime updates into shm cache {}",
+                            g_mirror_pending.size(), name);
+                g_mirror_pending.clear();
+                g_mirror_pending.shrink_to_fit();
+                g_staging_overflow_warned = false;
+                g_mirror_staging.store(false, std::memory_order_release);
+            }
         }
         writeSegmentRecord(m_prefix, name);
         if (!old_name.empty() && old_name != name) {
@@ -369,6 +457,8 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
         if (!created_name.empty() && created_name != m_current_name) {
             removeSegment(created_name);
         }
+        // 发布失败：保持暂存开启并保留已暂存更新（本次快照已作废，这些更新只能
+        // 由下一次成功发布重放），避免失败窗口内的实时更新丢失
         return "";
     } catch (...) {
         HKU_ERROR("Failed publish kdata shm cache: unknown error!");

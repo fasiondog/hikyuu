@@ -169,6 +169,12 @@ private:
 HKU_API void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
                                       const KRecord& record);
 
+///@{ 仅供单元测试：模拟发布窗口（publish 构建新段期间）的暂存开启/关闭重放，
+/// 使窗口内实时更新的暂存与重放路径可被确定性验证；生产代码不得调用
+HKU_API void shmTestingBeginStaging();
+HKU_API void shmTestingEndStagingAndReplay();
+///@}
+
 class KDataShmReader;
 typedef std::shared_ptr<KDataShmReader> KDataShmReaderPtr;
 

@@ -15,6 +15,7 @@
 #include <atomic>
 #include <chrono>
 #include <limits>
+#include <memory>
 #include <filesystem>
 #if defined(_WIN32)
 #include <process.h>
@@ -754,6 +755,218 @@ TEST_CASE("test_KDataShmCache") {
 
         server.stop();
     }
+
+    // 注：以下两个子用例直接驱动镜像入口（不修改 Stock 预加载缓冲，避免污染
+    // 其他以真实数据为基准的用例），验证发布窗口内到达的实时更新不丢失
+
+    SUBCASE("staging during publish window") {
+        // 发布窗口暂存：行情接收与 shm 发布相互独立，窗口内（快照拷贝→镜像注册）
+        // 到达的实时更新不得丢失，重放后段尾与暂存更新收敛一致
+        auto& sm = StockManager::instance();
+        Stock sample;
+        KRecordList buf_ks;
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+            if (buf_ks.size() > 3) {
+                sample = stk;
+                break;
+            }
+        }
+        REQUIRE_FALSE(sample.isNull());
+        const std::string mc = sample.market_code();
+        size_t base_count = buf_ks.size();
+        Datetime last_dt = buf_ks.back().datetime;
+
+        // 场景1：首次发布前（尚无活跃段）窗口内到达的更新：
+        // 暂存后由重放补录进段（快照未含这些更新），不丢失
+        shmTestingBeginStaging();
+        KRecord upd1(last_dt, 10.0, 10.5, 9.5, 999.0, 100.0, 200.0);  // 末根更新
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, upd1);
+        KRecord upd2(last_dt + TimeDelta(1), 10.0, 10.5, 9.5, 10.2, 100.0, 200.0);  // 追加
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, upd2);
+
+        {
+            // 模拟预加载完成后的发布：缓冲未变，快照仍为 base_count 条；
+            // 窗口内暂存的更新由重放补入段尾
+            KDataShmPublisher publisher(prefix);
+            std::string name = publisher.publish(20260905);
+            REQUIRE_FALSE(name.empty());
+            shmTestingEndStagingAndReplay();
+
+            KDataShmReader reader;
+            REQUIRE(reader.open(name));
+            size_t count = 0;
+            REQUIRE(reader.tryGetCount(mc, KQuery::DAY, count));
+            CHECK_EQ(count, base_count + 1);  // 窗口内追加的记录已经重放进入段
+            KRecordList ks;
+            REQUIRE(reader.tryGetKRecordList(
+              mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), ks));
+            REQUIRE_EQ(ks.size(), base_count + 1);
+            CHECK_EQ(ks.back().datetime, upd2.datetime);
+            CHECK_EQ(ks.back().closePrice, 10.2);
+            CHECK_EQ(ks[ks.size() - 2].closePrice, 999.0);
+        }
+
+        // 场景2：重发布窗口（存在活跃旧段）：更新双写旧段，旧段读者不受发布过程影响
+        KDataShmPublisher publisher2(prefix);
+        std::string name2 = publisher2.publish(20260906);
+        REQUIRE_FALSE(name2.empty());
+        KDataShmReader reader2;
+        REQUIRE(reader2.open(name2));
+        shmTestingBeginStaging();
+        KRecord upd3(last_dt, 10.0, 10.5, 9.5, 10.9, 102.0, 202.0);  // 末根更新
+        shmMirrorRealtimeUpdate(mc, KQuery::DAY, upd3);
+        // 双写：活跃段（reader2 所映射）立即可见，无需等重放
+        KRecordList ks2;
+        REQUIRE(reader2.tryGetKRecordList(
+          mc, KQuery((int64_t)(base_count - 1), (int64_t)base_count, KQuery::DAY), ks2));
+        REQUIRE_EQ(ks2.size(), 1);
+        CHECK_EQ(ks2[0].closePrice, 10.9);
+        shmTestingEndStagingAndReplay();  // 重放幂等，状态不变
+        size_t count2 = 0;
+        REQUIRE(reader2.tryGetCount(mc, KQuery::DAY, count2));
+        CHECK_EQ(count2, base_count);
+    }
+
+    SUBCASE("concurrent publish and realtime update") {
+        // 发布与实时更新（Stock::realtimeUpdate 全链路）并发：任意交错下，
+        // 段尾都不得落后于缓冲尾（更新或进快照、或经暂存重放、或注册后直接镜像）；
+        // 仅更新末根且保持高/低不变，结束后以原记录覆盖回收/量/额，缓冲可精确还原
+        auto& sm = StockManager::instance();
+        Stock sample;
+        KRecordList buf_ks;
+        for (const auto& stk : sm.getStockList(nullptr)) {
+            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+            if (buf_ks.size() > 3) {
+                sample = stk;
+                break;
+            }
+        }
+        REQUIRE_FALSE(sample.isNull());
+        const std::string mc = sample.market_code();
+        Datetime last_dt = buf_ks.back().datetime;
+        KRecord last_rec = buf_ks.back();
+        size_t base_count = buf_ks.size();
+
+        KDataShmPublisher publisher(prefix);
+        std::atomic<bool> stop{false};
+        std::thread updater([&]() {
+            // 仅更新末根（不追加）：避开预留容量边界，终态完全确定
+            for (int i = 0; !stop.load(std::memory_order_relaxed); i++) {
+                double v = (double)(i % 89) + 1.0;
+                sample.realtimeUpdate(
+                  KRecord(last_dt, last_rec.openPrice, last_rec.highPrice, last_rec.lowPrice, v,
+                          last_rec.transAmount, last_rec.transCount),
+                  KQuery::DAY);
+                std::this_thread::yield();
+            }
+        });
+        std::string name = publisher.publish(20260907);
+        stop.store(true);
+        updater.join();
+        REQUIRE_FALSE(name.empty());
+
+        // 以缓冲为基准取末根（写线程已停止，缓冲稳定），段尾必须一致
+        double buf_close = sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice;
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+        size_t count = 0;
+        REQUIRE(reader.tryGetCount(mc, KQuery::DAY, count));
+        CHECK_EQ(count, base_count);
+        KRecordList ks;
+        REQUIRE(reader.tryGetKRecordList(
+          mc, KQuery((int64_t)(base_count - 1), (int64_t)base_count, KQuery::DAY), ks));
+        REQUIRE_EQ(ks.size(), 1);
+        CHECK_EQ(ks[0].datetime, last_dt);
+        CHECK_EQ(ks[0].closePrice, buf_close);
+
+        // 还原末根收/量/额（高/低未动），同步镜像段，缓冲与测试前完全一致
+        sample.realtimeUpdate(last_rec, KQuery::DAY);
+        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice,
+                 last_rec.closePrice);
+    }
+}
+
+TEST_CASE("test_KDataRealtimeForward") {
+    // 客户端实时更新转发：客户端无预加载缓冲，Stock::realtimeUpdate 经 IPC 转发至
+    // 主进程应用（缓冲 + 共享内存镜像），保留客户端主动更新行情数据的能力
+    StockManager::instance().waitDataReady();
+    std::string addr = test_ipc_addr("hku_fwd_test");
+    std::string lock_path = test_lock_path("hku_fwd_test");
+
+    HikyuuDataServer server;
+    REQUIRE(server.start(addr, lock_path, "."));
+    auto conn = std::make_shared<IpcConnector>();
+    REQUIRE(conn->init(addr));
+
+    auto& sm = StockManager::instance();
+    Stock sample;
+    KRecordList buf_ks;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+        if (buf_ks.size() > 3) {
+            sample = stk;
+            break;
+        }
+    }
+    REQUIRE_FALSE(sample.isNull());
+    const std::string mc = sample.market_code();
+    KRecord last = buf_ks.back();
+
+    registerRealtimeForwarder(conn);
+
+    SUBCASE("forward applies on server side") {
+        // 末根同日更新：主进程应用合并规则。仅覆盖收/量/额（可精确还原），
+        // 不改高/低（高取大/低取小为不可逆合并，会污染其他以真实数据为基准的用例）
+        KRecord upd(last.datetime, last.openPrice, last.highPrice, last.lowPrice, 88.88, 111.0,
+                    222.0);
+        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, upd));
+        auto ks = sample.getKRecordListFromBuffer(KQuery::DAY);
+        REQUIRE_EQ(ks.size(), buf_ks.size());  // 同日不追加
+        CHECK_EQ(ks.back().closePrice, 88.88);
+        CHECK_EQ(ks.back().transAmount, 111.0);
+        CHECK_EQ(ks.back().transCount, 222.0);
+
+        // 发布快照后转发：更新同时进入共享内存段（镜像链路）
+        const std::string prefix = "hkufwd";
+        CHECK(server.publishShmCache(prefix));
+        KRecord upd2(last.datetime, last.openPrice, last.highPrice, last.lowPrice, 66.66, 333.0,
+                     444.0);
+        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, upd2));
+        std::vector<uint8_t> res_body;
+        REQUIRE(conn->request(Cmd::STATUS_SHM_INFO, {}, res_body));
+        Reader rd(res_body.data(), res_body.size());
+        rd.getU64();
+        std::string name = rd.getString();
+        REQUIRE_FALSE(name.empty());
+        KDataShmReader reader;
+        REQUIRE(reader.open(name));
+        KRecordList shm_ks;
+        REQUIRE(reader.tryGetKRecordList(
+          mc, KQuery((int64_t)(buf_ks.size() - 1), (int64_t)buf_ks.size(), KQuery::DAY), shm_ks));
+        REQUIRE_EQ(shm_ks.size(), 1);
+        CHECK_EQ(shm_ks[0].closePrice, 66.66);
+        CHECK_EQ(shm_ks[0].transCount, 444.0);
+
+        // 还原缓冲与镜像段末根的收/量/额，与测试前完全一致
+        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
+        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
+    }
+
+    SUBCASE("forward edge cases") {
+        // 未知证券：服务端以 applied=0 应答（非协议错误）
+        CHECK_FALSE(ipcForwardRealtimeUpdate(
+          "SH999999", KQuery::DAY, KRecord(last.datetime, 1, 1, 1, 1, 1, 1)));
+        // 主进程未预加载的类型（无缓冲）：applied=0
+        CHECK_FALSE(ipcForwardRealtimeUpdate(
+          mc, KQuery::MIN, KRecord(last.datetime, 1, 1, 1, 1, 1, 1)));
+    }
+
+    // 注销后转发直接失败（退回原行为）
+    registerRealtimeForwarder(nullptr);
+    CHECK_FALSE(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
+
+    server.stop();
 }
 
 TEST_CASE("test_BaseInfoShmCache") {

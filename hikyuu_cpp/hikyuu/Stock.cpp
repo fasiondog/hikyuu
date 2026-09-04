@@ -1161,6 +1161,18 @@ bool Stock::isTransactionTime(Datetime time) {
 }
 
 void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
+#if HKU_ENABLE_NODE
+    // 客户端模式：本地无预加载缓冲，转发至主进程应用（更新其缓冲并镜像至
+    // 共享内存段，全体客户端由此读到），保留客户端主动更新行情数据的能力；
+    // 未注册转发连接或转发失败时退回原行为（静默忽略）
+    if (StockManager::instance().isIpcClientMode()) {
+        HKU_IF_RETURN(record.datetime.isNull() ||
+                        StockManager::instance().isHoliday(record.datetime),
+                      void());
+        ipc::ipcForwardRealtimeUpdate(market_code(), inktype, record);
+        return;
+    }
+#endif
     HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull() ||
                     StockManager::instance().isHoliday(record.datetime),
                   void());

@@ -479,6 +479,26 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
             break;
         }
 
+        case Cmd::KDATA_REALTIME_UPDATE: {
+            // 客户端转发的实时 K 线更新：应用到主进程缓冲并镜像至共享内存段，
+            // 全体客户端由此读到该更新；与主进程自身行情接收的重复更新
+            // 由 realtimeUpdate/镜像合并规则幂等收敛（高取大/低取小，收量额覆盖）。
+            // 证券不存在/无缓冲不算协议错误，以 applied=0 应答，避免客户端误报通讯异常
+            std::string market_code = rd.getString();
+            std::string ktype = rd.getString();
+            KRecord record = decodeKRecord(rd);
+            HKU_CHECK(rd.ok(), "Invalid request body!");
+            HKU_CHECK(KQuery::isValidKType(ktype), "Invalid ktype: {}!", ktype);
+            uint8_t applied = 0;
+            Stock stk = sm.getStock(market_code);
+            if (!stk.isNull()) {
+                stk.realtimeUpdate(record, KQuery::getKTypeEnum(ktype));
+                applied = stk.isBuffer(KQuery::getKTypeEnum(ktype)) ? 1 : 0;
+            }
+            enc.putU8(applied);
+            break;
+        }
+
         case Cmd::BLOCK_LOAD: {
             std::shared_lock<std::shared_mutex> lock(m_block_mutex);
             encodeBlockList(enc, m_blocks);

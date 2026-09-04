@@ -48,6 +48,9 @@ StockManager::~StockManager() {
     // 幂等：clean() 通常已 join 过，此处再调用为无操作（兼顾未经 clean() 的析构路径）。
     joinPreloadThread();
 #if HKU_ENABLE_NODE
+    // 注销客户端实时更新转发连接：此后 Stock::realtimeUpdate 的转发调用直接返回，
+    // 避免退出期在已失效的连接上阻塞
+    ipc::registerRealtimeForwarder(nullptr);
     stopIpcDataServer();
 #endif
     delete m_stockDict_mutex;
@@ -260,6 +263,9 @@ void StockManager::_negotiateIpcDataServer() {
             to_lower(low_ktype);
             m_preloadParam.set<bool>(low_ktype, false);
         }
+        // 注册实时更新转发：客户端无预加载缓冲，Stock::realtimeUpdate 经此连接
+        // 转发至主进程应用（缓冲 + 共享内存镜像），保留客户端主动更新行情的能力
+        ipc::registerRealtimeForwarder(conn);
         HKU_INFO("Connected to hikyuu data server: {}, running in client mode.",
                  m_ipc_conn->addr());
     };
@@ -323,6 +329,10 @@ bool StockManager::_isIpcClientMode() const {
     return m_ipc_client_mode;
 }
 
+bool StockManager::isIpcClientMode() const {
+    return m_ipc_client_mode;
+}
+
 // 主进程 K 线预加载完成后，将热数据发布为只读共享内存缓存快照，
 // 供客户端进程零拷贝直接读取，避免全市场遍历时逐证券 IPC 往返
 void StockManager::_publishShmCacheIfMaster() {
@@ -355,6 +365,9 @@ void StockManager::_notifyIpcBaseDataReady() {
 
 /* 未启用单机数据服务时均为空操作，使调用方（两个加载函数与 init）无需条件编译 */
 bool StockManager::_isIpcClientMode() const {
+    return false;
+}
+bool StockManager::isIpcClientMode() const {
     return false;
 }
 void StockManager::_publishBaseInfoShmIfMaster(bool) {}

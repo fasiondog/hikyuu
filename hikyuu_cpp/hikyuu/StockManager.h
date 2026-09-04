@@ -77,6 +77,13 @@ public:
     void stopIpcDataServer();
 #endif
 
+    /**
+     * 是否处于 IPC 客户端模式（数据由服务端提供，本地无预加载缓冲）
+     * @note 供 Stock::realtimeUpdate 等核心路径判断是否需将更新转发至主进程；
+     * 无条件声明，未启用 HKU_ENABLE_NODE 时为空实现（恒返回 false）
+     */
+    bool isIpcClientMode() const;
+
     /** 获取基础信息驱动参数 */
     const Parameter& getBaseInfoDriverParameter() const;
 

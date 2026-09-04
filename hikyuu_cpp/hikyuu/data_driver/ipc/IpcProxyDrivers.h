@@ -128,6 +128,22 @@ private:
 typedef std::shared_ptr<IpcConnector> IpcConnectorPtr;
 
 /**
+ * 注册客户端实时更新转发连接（进入客户端模式时调用，传 nullptr 注销）
+ * @details 客户端无预加载缓冲，Stock::realtimeUpdate 无法本地应用；注册后
+ * 经 ipcForwardRealtimeUpdate 转发至主进程，由主进程应用到缓冲并镜像至
+ * 共享内存段，全体客户端由此读到该更新（与主进程自身行情接收幂等收敛）。
+ */
+HKU_API void registerRealtimeForwarder(const IpcConnectorPtr& conn);
+
+/**
+ * 客户端进程将实时 K 线更新转发至主进程（Stock::realtimeUpdate 调用）
+ * @return true 主进程已应用 | false 未注册转发连接、通讯失败或主进程未应用
+ *         （如证券不存在、无对应缓冲），调用方仅记录日志不中断流程
+ */
+HKU_API bool ipcForwardRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
+                                      const KRecord& record);
+
+/**
  * 基础信息 IPC 代理驱动
  * @details 从数据服务进程获取证券基础信息，通讯失败时降级至本地驱动
  */
