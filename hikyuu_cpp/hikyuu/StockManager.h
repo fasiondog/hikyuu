@@ -84,6 +84,15 @@ public:
      */
     bool isIpcClientMode() const;
 
+#if HKU_ENABLE_NODE
+    /// 仅供单元测试：强制置位客户端模式标志，以验证 Stock::realtimeUpdate /
+    /// getLastUpdateTime 的“转发 vs 本地缓冲”门控分支；生产代码不得调用。
+    /// 调用方须在用例结束时复位，避免污染同进程内其他用例。
+    void _testingSetIpcClientMode(bool mode) {
+        m_ipc_client_mode = mode;
+    }
+#endif
+
     /** 获取基础信息驱动参数 */
     const Parameter& getBaseInfoDriverParameter() const;
 

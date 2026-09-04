@@ -1031,6 +1031,90 @@ TEST_CASE("test_KDataRealtimeForward") {
     server.stop();
 }
 
+TEST_CASE("test_KDataClientModeGating") {
+    // 客户端模式下的门控：Stock::realtimeUpdate / getLastUpdateTime 仅对“本地无缓冲”的
+    // 普通代理证券转发主进程；对“本地有缓冲”的临时证券（setKRecordList 指定外部数据）
+    // 应就地生效、不外发（主进程并无此证券）。用测试钩子强制客户端模式以覆盖该分支。
+    StockManager::instance().waitDataReady();
+    std::string addr = test_ipc_addr("hku_gate_test");
+    std::string lock_path = test_lock_path("hku_gate_test");
+
+    HikyuuDataServer server;
+    REQUIRE(server.start(addr, lock_path, "."));
+    auto conn = std::make_shared<IpcConnector>();
+    REQUIRE(conn->init(addr));
+
+    auto& sm = StockManager::instance();
+    // 选取一只已预加载 DAY 缓冲的真实证券作为“主进程侧”标的（测试进程即主进程）
+    Stock sample;
+    KRecordList buf_ks;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+        if (buf_ks.size() > 3) {
+            sample = stk;
+            break;
+        }
+    }
+    REQUIRE_FALSE(sample.isNull());
+    const std::string mc = sample.market_code();
+    KRecord last = buf_ks.back();
+
+    registerRealtimeForwarder(conn);
+    // RAII：无论用例中途 REQUIRE 失败与否，退出时复位客户端模式与转发注册，避免污染其他用例
+    struct ClientModeGuard {
+        ~ClientModeGuard() {
+            StockManager::instance()._testingSetIpcClientMode(false);
+            registerRealtimeForwarder(nullptr);
+        }
+    } guard;
+    sm._testingSetIpcClientMode(true);
+
+    SUBCASE("buffered temp stock applies locally, not forwarded") {
+        // 临时证券：setKRecordList 建本地缓冲（isBuffer=true），就地更新、不转发
+        Stock temp("SH", "999901", "temp");
+        KRecordList tks;
+        tks.emplace_back(KRecord(last.datetime, 10.0, 10.5, 9.8, 10.2, 100.0, 10.0));
+        temp.setKRecordList(tks, KQuery::DAY);
+        REQUIRE(temp.isBuffer(KQuery::DAY));
+
+        // 同日更新末根：仅覆盖收/量/额（可精确比对），就地写入本地缓冲
+        KRecord tupd(last.datetime, 10.0, 10.5, 9.8, 11.11, 200.0, 20.0);
+        temp.realtimeUpdate(tupd, KQuery::DAY);
+        auto tbuf = temp.getKRecordListFromBuffer(KQuery::DAY);
+        REQUIRE_EQ(tbuf.size(), 1);  // 同日不追加
+        CHECK_EQ(tbuf.back().closePrice, 11.11);
+        CHECK_EQ(tbuf.back().transAmount, 200.0);
+
+        // getLastUpdateTime 返回本地写入时刻（非 min），证明未走转发
+        //（若转发，主进程无 SH999901 会降级返回 min）
+        CHECK(temp.getLastUpdateTime(KQuery::DAY) != Datetime::min());
+    }
+
+    SUBCASE("non-buffered proxy stock forwards to server") {
+        // 普通代理证券：与主进程同一 market_code 的全新 Stock 对象，本地无缓冲（isBuffer=false）
+        Stock proxy(sample.market(), sample.code(), "proxy");
+        CHECK_FALSE(proxy.isBuffer(KQuery::DAY));
+
+        // realtimeUpdate 转发至主进程，应用到其预加载缓冲（sample 即主进程侧同一证券）；
+        // 仅覆盖收/量/额，高/低保持原值（高取大/低取小为不可逆合并，避免污染）
+        KRecord pupd(last.datetime, last.openPrice, last.highPrice, last.lowPrice, 55.55, 666.0,
+                     777.0);
+        proxy.realtimeUpdate(pupd, KQuery::DAY);
+        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, 55.55);
+
+        // getLastUpdateTime 转发至主进程，取回其缓冲刷新时刻（与主进程本地一致、非 min）
+        Datetime fwd = proxy.getLastUpdateTime(KQuery::DAY);
+        CHECK(fwd != Datetime::min());
+        CHECK_EQ(fwd, sample.getLastUpdateTime(KQuery::DAY));
+
+        // 还原主进程缓冲末根，避免污染其他以真实数据为基准的用例
+        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
+        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
+    }
+
+    server.stop();
+}
+
 TEST_CASE("test_BaseInfoShmCache") {
     // 与 test_KDataShmCache 同构：以 StockManager 已加载的权息/历史财务为基准，
     // 验证基础信息（权息 + 历史财务）共享内存快照的发布与只读映射查询语义；

@@ -1162,10 +1162,13 @@ bool Stock::isTransactionTime(Datetime time) {
 
 void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 #if HKU_ENABLE_NODE
-    // 客户端模式：本地无预加载缓冲，转发至主进程应用（更新其缓冲并镜像至
+    // 客户端模式且本地无缓冲（普通代理证券）：转发至主进程应用（更新其缓冲并镜像至
     // 共享内存段，全体客户端由此读到），保留客户端主动更新行情数据的能力；
-    // 未注册转发连接或转发失败时退回原行为（静默忽略）
-    if (StockManager::instance().isIpcClientMode()) {
+    // 未注册转发连接或转发失败时退回原行为（静默忽略）。
+    // 反之，若本地已有缓冲（如经 setKRecordList 指定外部数据的临时证券，isBuffer 为真），
+    // 该数据仅本客户端可见、主进程并无此证券，必须就地更新本地缓冲而不外发，故以
+    // !isBuffer 门控（落到下方本地逻辑；客户端无发布器，shmMirror 为安全空操作）。
+    if (StockManager::instance().isIpcClientMode() && !isBuffer(inktype)) {
         HKU_IF_RETURN(record.datetime.isNull() ||
                         StockManager::instance().isHoliday(record.datetime),
                       void());
@@ -1233,9 +1236,11 @@ Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     auto ktype = inktype;
     to_upper(ktype);
 #if HKU_ENABLE_NODE
-    // 客户端无本地缓冲，m_lastUpdate 恒为 Datetime::min()；转发至主进程取其缓冲刷新
-    // 时刻，与客户端经共享内存读到的数据保持一致（未注册转发连接/失败时降级返回 min()）
-    if (StockManager::instance().isIpcClientMode()) {
+    // 客户端模式且本地无缓冲（普通代理证券）：m_lastUpdate 恒为 Datetime::min()，转发至
+    // 主进程取其缓冲刷新时刻，与客户端经共享内存读到的数据保持一致（未注册转发连接/
+    // 失败时降级返回 min()）。若本地已有缓冲（如 setKRecordList 指定的临时证券），
+    // m_lastUpdate 由本地写入，应直接返回本地值而非转发，故以 !isBuffer 门控。
+    if (StockManager::instance().isIpcClientMode() && !isBuffer(ktype)) {
         return ipc::ipcForwardGetLastUpdateTime(market_code(), ktype);
     }
 #endif
