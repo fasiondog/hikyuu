@@ -82,6 +82,55 @@ TEST_CASE("test_IpcEncoderReader") {
     CHECK_FALSE(rd.ok());
 }
 
+TEST_CASE("test_IpcDatetimeFullPrecision") {
+    // putDatetime/getDatetime 经 number() 仅精确到分钟；encodeDatetimeFull/decodeDatetimeFull
+    // 须保留秒/毫秒/微秒（getLastUpdateTime 返回的墙钟时刻依赖此精度）
+    SUBCASE("minute-precision codec drops sub-minute") {
+        Datetime d(2026, 9, 4, 17, 55, 9, 781, 172);
+        Encoder enc;
+        enc.putDatetime(d);
+        Reader rd(enc.data().data(), enc.data().size());
+        Datetime got = rd.getDatetime();
+        // 分钟及以上一致，秒/毫秒/微秒被截断为 0
+        CHECK_EQ(got.ymdhm(), d.ymdhm());
+        CHECK_EQ(got.second(), 0);
+    }
+
+    SUBCASE("full-precision codec round-trips exactly") {
+        Datetime d(2026, 9, 4, 17, 55, 9, 781, 172);
+        Encoder enc;
+        encodeDatetimeFull(enc, d);
+        Reader rd(enc.data().data(), enc.data().size());
+        Datetime got = decodeDatetimeFull(rd);
+        CHECK(rd.ok());
+        CHECK_EQ(got, d);
+        CHECK_EQ(got.second(), 9);
+        CHECK_EQ(got.millisecond(), 781);
+        CHECK_EQ(got.microsecond(), 172);
+    }
+
+    SUBCASE("now / min / null round-trip") {
+        // now() 含微秒，往返须精确相等
+        Datetime n = Datetime::now();
+        Encoder e1;
+        encodeDatetimeFull(e1, n);
+        Reader r1(e1.data().data(), e1.data().size());
+        CHECK_EQ(decodeDatetimeFull(r1), n);
+
+        // min() 为 getLastUpdateTime 的降级哨兵值
+        Encoder e2;
+        encodeDatetimeFull(e2, Datetime::min());
+        Reader r2(e2.data().data(), e2.data().size());
+        CHECK_EQ(decodeDatetimeFull(r2), Datetime::min());
+
+        // Null<Datetime> 往返仍为 null
+        Encoder e3;
+        encodeDatetimeFull(e3, Datetime());
+        Reader r3(e3.data().data(), e3.data().size());
+        CHECK(decodeDatetimeFull(r3).isNull());
+    }
+}
+
 TEST_CASE("test_IpcReaderCountBound") {
     // getCount / getCount32 须校验元素个数不超过剩余字节所能容纳的上限：
     // 坏帧或版本错配给出的天文数字若被直接用于 resize/reserve，会触发
@@ -953,6 +1002,18 @@ TEST_CASE("test_KDataRealtimeForward") {
         CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
     }
 
+    SUBCASE("forward get last update time") {
+        // 主进程已预加载 DAY 缓冲，其 m_lastUpdate[DAY] 为加载时刻（非 min）；
+        // 测试进程即主进程（非客户端模式），本地直接取值与经 IPC 转发取值应一致
+        Datetime direct = sample.getLastUpdateTime(KQuery::DAY);
+        CHECK(direct != Datetime::min());
+        CHECK_EQ(ipcForwardGetLastUpdateTime(mc, KQuery::DAY), direct);
+        // 主进程未预加载的类型（无缓冲）：min
+        CHECK_EQ(ipcForwardGetLastUpdateTime(mc, KQuery::MIN), Datetime::min());
+        // 未知证券：min
+        CHECK_EQ(ipcForwardGetLastUpdateTime("SH999999", KQuery::DAY), Datetime::min());
+    }
+
     SUBCASE("forward edge cases") {
         // 未知证券：服务端以 applied=0 应答（非协议错误）
         CHECK_FALSE(ipcForwardRealtimeUpdate(
@@ -965,6 +1026,7 @@ TEST_CASE("test_KDataRealtimeForward") {
     // 注销后转发直接失败（退回原行为）
     registerRealtimeForwarder(nullptr);
     CHECK_FALSE(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
+    CHECK_EQ(ipcForwardGetLastUpdateTime(mc, KQuery::DAY), Datetime::min());
 
     server.stop();
 }

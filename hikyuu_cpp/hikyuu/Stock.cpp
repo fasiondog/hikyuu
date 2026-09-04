@@ -1232,6 +1232,13 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     auto ktype = inktype;
     to_upper(ktype);
+#if HKU_ENABLE_NODE
+    // 客户端无本地缓冲，m_lastUpdate 恒为 Datetime::min()；转发至主进程取其缓冲刷新
+    // 时刻，与客户端经共享内存读到的数据保持一致（未注册转发连接/失败时降级返回 min()）
+    if (StockManager::instance().isIpcClientMode()) {
+        return ipc::ipcForwardGetLastUpdateTime(market_code(), ktype);
+    }
+#endif
     if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {
         auto iter = m_data->m_lastUpdate.find(ktype);
         if (iter == m_data->m_lastUpdate.end()) {

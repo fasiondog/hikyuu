@@ -251,6 +251,19 @@ bool decodeResponse(const std::vector<uint8_t>& frame, RetCode& out_ret,
 ///////////////////////////////////////////////////////////////////////////////
 // KRecord
 ///////////////////////////////////////////////////////////////////////////////
+void encodeDatetimeFull(Encoder& enc, const Datetime& d) {
+    bool is_null = d.isNull();
+    enc.putU8(is_null ? 1 : 0);
+    enc.putU64(is_null ? 0 : d.ticks());
+}
+
+Datetime decodeDatetimeFull(Reader& rd) {
+    uint8_t is_null = rd.getU8();
+    uint64_t ticks = rd.getU64();
+    HKU_IF_RETURN(!rd.ok() || is_null, Datetime());
+    return Datetime::min() + TimeDelta::fromTicks((int64_t)ticks);
+}
+
 void encodeKRecord(Encoder& enc, const KRecord& k) {
     enc.putDatetime(k.datetime);
     enc.putDouble(k.openPrice);

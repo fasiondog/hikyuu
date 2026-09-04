@@ -203,6 +203,27 @@ bool ipcForwardRealtimeUpdate(const std::string& market_code, const KQuery::KTyp
     return applied != 0;
 }
 
+Datetime ipcForwardGetLastUpdateTime(const std::string& market_code, const KQuery::KType& ktype) {
+    IpcConnectorPtr conn;
+    {
+        std::shared_lock<std::shared_mutex> lock(g_fwd_mutex);
+        conn = g_fwd_conn;
+    }
+    HKU_IF_RETURN(!conn, Datetime::min());
+
+    // 请求体：[market_code string][ktype string]，响应体：[last_update 全精度 Datetime]
+    Encoder enc;
+    enc.putString(market_code);
+    enc.putString(ktype);
+    std::vector<uint8_t> res_body;
+    HKU_IF_RETURN(!conn->request(Cmd::KDATA_GET_LAST_UPDATE_TIME, enc.data(), res_body),
+                  Datetime::min());
+    Reader rd(res_body.data(), res_body.size());
+    Datetime last = decodeDatetimeFull(rd);
+    HKU_IF_RETURN(!rd.ok(), Datetime::min());
+    return last;
+}
+
 bool IpcConnector::waitReady(uint64_t timeout_seconds,
                              std::function<void(uint64_t, uint64_t)>&& progress_cb) {
     auto start_tp = std::chrono::steady_clock::now();

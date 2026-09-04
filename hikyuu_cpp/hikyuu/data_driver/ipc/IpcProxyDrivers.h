@@ -144,6 +144,15 @@ HKU_API bool ipcForwardRealtimeUpdate(const std::string& market_code, const KQue
                                       const KRecord& record);
 
 /**
+ * 客户端进程向主进程查询指定证券×类型的缓冲最后更新时刻（Stock::getLastUpdateTime 调用）
+ * @details 客户端无预加载缓冲，本地 m_lastUpdate 恒为 Datetime::min()；转发取主进程
+ * 缓冲的刷新时刻，与客户端经共享内存读到的数据保持一致。
+ * @return 主进程缓冲的最后更新时刻；未注册转发连接、通讯失败或证券不存在时返回 Datetime::min()
+ */
+HKU_API Datetime ipcForwardGetLastUpdateTime(const std::string& market_code,
+                                             const KQuery::KType& ktype);
+
+/**
  * 基础信息 IPC 代理驱动
  * @details 从数据服务进程获取证券基础信息，通讯失败时降级至本地驱动
  */

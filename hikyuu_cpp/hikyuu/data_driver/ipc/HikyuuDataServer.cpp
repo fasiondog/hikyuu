@@ -499,6 +499,20 @@ std::vector<uint8_t> HikyuuDataServer::_handle(Cmd cmd, std::vector<uint8_t>&& b
             break;
         }
 
+        case Cmd::KDATA_GET_LAST_UPDATE_TIME: {
+            // 客户端无本地缓冲，m_lastUpdate 恒为 min()；转发取主进程缓冲的刷新时刻，
+            // 与客户端经共享内存读到的数据一致。证券不存在时返回 min()，不算协议错误
+            std::string market_code = rd.getString();
+            std::string ktype = rd.getString();
+            HKU_CHECK(rd.ok(), "Invalid request body!");
+            HKU_CHECK(KQuery::isValidKType(ktype), "Invalid ktype: {}!", ktype);
+            Stock stk = sm.getStock(market_code);
+            Datetime last = stk.isNull() ? Datetime::min()
+                                         : stk.getLastUpdateTime(KQuery::getKTypeEnum(ktype));
+            encodeDatetimeFull(enc, last);
+            break;
+        }
+
         case Cmd::BLOCK_LOAD: {
             std::shared_lock<std::shared_mutex> lock(m_block_mutex);
             encodeBlockList(enc, m_blocks);

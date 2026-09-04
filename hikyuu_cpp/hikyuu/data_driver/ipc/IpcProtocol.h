@@ -72,6 +72,7 @@ enum class Cmd : uint16_t {
     KDATA_GET_TIMELINE_LIST,
     KDATA_GET_TRANS_LIST,
     KDATA_REALTIME_UPDATE,  // 客户端转发实时 K 线更新，由主进程应用到缓冲并镜像至共享内存
+    KDATA_GET_LAST_UPDATE_TIME,  // 客户端查询主进程缓冲的最后更新时刻（客户端无本地缓冲）
 
     BLOCK_LOAD,
 
@@ -168,6 +169,16 @@ HKU_API bool decodeResponse(const std::vector<uint8_t>& frame, RetCode& out_ret,
 ///@}
 
 ///@{ 记录编解码
+/**
+ * 全精度 Datetime 编解码（微秒级）
+ * @details putDatetime/getDatetime 经 number() 仅精确到分钟（YYYYMMDDHHMM），
+ * 会丢失秒/毫秒/微秒；对 K 线、权息等最细到分钟的记录无损，但墙钟时刻
+ * （如 getLastUpdateTime 返回的 Datetime::now()）需全精度，故用本对函数（以
+ * isNull 标志 + 距最小日期的微秒数 ticks 表示，与 TimeDelta::fromTicks 精确互逆）。
+ */
+HKU_API void encodeDatetimeFull(Encoder& enc, const Datetime& d);
+HKU_API Datetime decodeDatetimeFull(Reader& rd);
+
 HKU_API void encodeKRecord(Encoder& enc, const KRecord& k);
 HKU_API KRecord decodeKRecord(Reader& rd);
 HKU_API void encodeKRecordList(Encoder& enc, const KRecordList& ks);
