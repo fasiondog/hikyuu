@@ -57,7 +57,7 @@ public:
         long start_ix = 0, end_ix = 0;
         if (py::isinstance<py::int_>(t[0]) && py::isinstance<py::int_>(t[1])) {
             start_ix = t[0].cast<py::int_>();
-            end_ix = t[0].cast<py::int_>();
+            end_ix = t[1].cast<py::int_>();
         } else {
             throw std::logic_error("expected 2-int tuple in call to _getIndexRangeByDate");
         }
