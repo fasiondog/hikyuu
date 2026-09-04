@@ -368,8 +368,11 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
                 entry_offset += sizeof(ShmStockEntry);
 
                 KRecord* rec = reinterpret_cast<KRecord*>(base + record_offset);
-                // KRecord 为标准布局、可 memcpy（见头文件 static_assert），整段一次性拷入
-                std::memcpy(rec, entry.second.data(), entry.second.size() * sizeof(KRecord));
+                // KRecord 为标准布局、无虚表与资源所有权（见头文件 static_assert），可安全按字节 memcpy；
+                // 因含 Datetime（用户声明拷贝构造/赋值致其非平凡可拷贝），显式转 void* 消除
+                // -Wnontrivial-memcall——原始字节拷贝为共享内存刻意设计
+                std::memcpy(static_cast<void*>(rec), entry.second.data(),
+                            entry.second.size() * sizeof(KRecord));
                 // 预留区已由整段 memset 清零，镜像追加时写入
 
                 MirrorEntry me;
@@ -855,8 +858,10 @@ bool KDataShmReader::tryGetKRecordList(const std::string& market_code, const KQu
 
         out.resize(end_ix - start_ix);
         // 记录区以 KRecord 二进制存放，整段 memcpy 拷出（较逐条 Datetime 构造更快）；
-        // 段完整性由 magic/version 校验与 entry 级 seqlock 保证，无需逐条异常兜底
-        std::memcpy(out.data(), recs + start_ix, (end_ix - start_ix) * sizeof(KRecord));
+        // 段完整性由 magic/version 校验与 entry 级 seqlock 保证，无需逐条异常兜底。
+        // out.data() 为 KRecord*（含 Datetime 致非平凡可拷贝），显式转 void* 消除 -Wnontrivial-memcall
+        std::memcpy(static_cast<void*>(out.data()), recs + start_ix,
+                    (end_ix - start_ix) * sizeof(KRecord));
         std::atomic_thread_fence(std::memory_order_acquire);
         if (entry->seq.load(std::memory_order_relaxed) == s1) {
             return true;
