@@ -164,9 +164,9 @@ void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // KDataShmPublisher
-///////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 KDataShmPublisher::KDataShmPublisher(const std::string& shm_name_prefix)
 : m_prefix(shm_name_prefix) {}
 
@@ -219,9 +219,7 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
         size_t total_capacity = 0;
         bool warned_long_code = false;
         for (const auto& ktype : ktypes) {
-            // 预加载数量上限；缓冲条数达到上限时可能发生了截断，
-            // 此类证券不发布，由客户端回退 IPC 查询；服务端同样从缓冲应答，
-            // 两条路径的结果均与主进程保持一致
+            // 预加载数量上限（缓冲条数达到上限时可能发生了截断）
             std::string preload_key = ktype;
             to_lower(preload_key);
             preload_key += "_max";
@@ -232,10 +230,6 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
             KTypeData kd;
             kd.ktype = ktype;
             for (const Stock& stk : stocks) {
-                size_t buf_count = stk.getKDataBufferSize(ktype);
-                if (buf_count == 0 || (int64_t)buf_count >= max_num) {
-                    continue;
-                }
                 // 超长 market_code 无法存入定长字段，截断后可能与其他证券重名，
                 // 进而使读端的升序校验失败、整段被拒映射（所有客户端退化为 IPC），故跳过
                 const std::string& mc = stk.market_code();
@@ -247,8 +241,12 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
                     }
                     continue;
                 }
+                // 空缓冲表示该证券未预加载此类型；条数达到上限则可能发生了截断。
+                // 此类证券不发布，由客户端回退 IPC 查询；服务端同样从缓冲应答，
+                // 两条路径的结果均与主进程保持一致。
+                // 副本在 Stock 缓冲锁内一次性拷出，是自洽快照，无需再与缓冲条数比对
                 KRecordList ks = stk.getKRecordListFromBuffer(ktype);
-                if (ks.size() != buf_count) {
+                if (ks.empty() || (int64_t)ks.size() >= max_num) {
                     continue;
                 }
                 total_records += ks.size();
@@ -468,9 +466,9 @@ void KDataShmPublisher::removeSegment(const std::string& name) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // KDataShmReader
-///////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 struct KDataShmReader::Impl {
     std::string name;
     uint64_t epoch{0};

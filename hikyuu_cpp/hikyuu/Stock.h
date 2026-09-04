@@ -231,9 +231,6 @@ public:
      */
     void loadKDataToBuffer(KQuery::KType) const;
 
-    /** 获取指定类型已缓存K线的记录数，未缓存返回 0 */
-    size_t getKDataBufferSize(KQuery::KType) const noexcept;
-
     /** 获取指定类型已缓存K线的全量副本，未缓存返回空 */
     KRecordList getKRecordListFromBuffer(KQuery::KType) const;
 

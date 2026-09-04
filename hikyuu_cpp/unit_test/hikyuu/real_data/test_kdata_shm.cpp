@@ -73,7 +73,7 @@ TEST_CASE("test_KDataShm_real") {
     size_t checked = 0, count_mismatch = 0, content_mismatch = 0;
     std::string sample_mc;
     for (const auto& stk : sm.getStockList(nullptr)) {
-        if (stk.getKDataBufferSize(KQuery::DAY) == 0) {
+        if (stk.getKRecordListFromBuffer(KQuery::DAY).empty()) {
             continue;  // 未预加载 day 缓冲的证券不在快照中
         }
         const std::string mc = stk.market_code();

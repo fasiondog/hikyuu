@@ -515,21 +515,6 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     }
 }
 
-size_t Stock::getKDataBufferSize(KQuery::KType inkType) const noexcept {
-    HKU_IF_RETURN(!m_data, 0);
-    string kType(inkType);
-    to_upper(kType);
-    try {
-        auto mutex_iter = m_data->pMutex.find(kType);
-        HKU_IF_RETURN(mutex_iter == m_data->pMutex.end(), 0);
-        std::shared_lock<std::shared_mutex> lock(*(mutex_iter->second));
-        auto iter = m_data->pKData.find(kType);
-        return (iter != m_data->pKData.end() && iter->second) ? iter->second->size() : 0;
-    } catch (...) {
-        return 0;
-    }
-}
-
 KRecordList Stock::getKRecordListFromBuffer(KQuery::KType inkType) const {
     KRecordList result;
     HKU_IF_RETURN(!m_data, result);

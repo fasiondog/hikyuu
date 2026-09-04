@@ -441,25 +441,24 @@ TEST_CASE("test_KDataShmCache") {
         CHECK_FALSE(reader.tryGetCount("SH999999", KQuery::DAY, count));
         CHECK_FALSE(reader.tryGetCount("SH600000", KQuery::MIN, count));
 
-        // 逐一比对已缓冲证券：条数与全量记录一致（发布前提为未截断）
+        // 逐一比对已缓冲证券：条数与全量记录一致（快照即预加载缓冲的镜像）
         auto& sm = StockManager::instance();
         size_t checked = 0;
         std::string sample_mc;
         for (const auto& stk : sm.getStockList(nullptr)) {
-            size_t buf_size = stk.getKDataBufferSize(KQuery::DAY);
-            if (buf_size == 0) {
+            auto buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+            if (buf_ks.empty()) {
                 continue;
             }
             const std::string mc = stk.market_code();
             size_t shm_count = 0;
             CHECK(reader.tryGetCount(mc, KQuery::DAY, shm_count));
-            CHECK_EQ(shm_count, buf_size);
+            CHECK_EQ(shm_count, buf_ks.size());
 
             KRecordList shm_ks;
             // 注意：必须显式 int64_t，否则 Null<int64_t> 会隐式转换选中 KQuery 的日期重载
             CHECK(reader.tryGetKRecordList(
               mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), shm_ks));
-            auto buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
             REQUIRE_EQ(shm_ks.size(), buf_ks.size());
             if (!shm_ks.empty()) {
                 CHECK_EQ(shm_ks.front().datetime, buf_ks.front().datetime);
@@ -467,7 +466,7 @@ TEST_CASE("test_KDataShmCache") {
                 CHECK_EQ(shm_ks.back().datetime, buf_ks.back().datetime);
                 CHECK_EQ(shm_ks.back().closePrice, buf_ks.back().closePrice);
             }
-            if (sample_mc.empty() && buf_size > 3) {
+            if (sample_mc.empty() && buf_ks.size() > 3) {
                 sample_mc = mc;
             }
             checked++;
@@ -519,14 +518,15 @@ TEST_CASE("test_KDataShmCache") {
 
         auto& sm = StockManager::instance();
         Stock sample;
+        KRecordList buf_ks;
         for (const auto& stk : sm.getStockList(nullptr)) {
-            if (stk.getKDataBufferSize(KQuery::DAY) > 3) {
+            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
+            if (buf_ks.size() > 3) {
                 sample = stk;
                 break;
             }
         }
         REQUIRE_FALSE(sample.isNull());
-        auto buf_ks = sample.getKRecordListFromBuffer(KQuery::DAY);
         REQUIRE_FALSE(buf_ks.empty());
         const std::string mc = sample.market_code();
         size_t base_count = buf_ks.size();
