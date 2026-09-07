@@ -120,46 +120,63 @@ static_assert(sizeof(ShmBiHeader) == 32 && sizeof(std::atomic<uint32_t>) == size
               "ShmBiHeader layout must stay compatible with plain uint32_t magic!");
 static_assert(sizeof(ShmBiTableInfo) == 32, "ShmBiTableInfo must be 32 bytes!");
 
-class BaseInfoShmPublisher;
-typedef std::shared_ptr<BaseInfoShmPublisher> BaseInfoShmPublisherPtr;
+/** BaseInfoShmBuilder 输入：一条权息 entry（原始，不做长度/排序校验） */
+struct BaseInfoShmBuildWeightEntry {
+    std::string market_code;
+    StockWeightList weights;
+};
+
+/** BaseInfoShmBuilder 输入：一条历史财务 entry（原始，不做长度/排序校验） */
+struct BaseInfoShmBuildFinanceEntry {
+    std::string market_code;
+    std::vector<HistoryFinanceInfo> finances;
+};
+
+/** BaseInfoShmBuilder 输入：一张表（WEIGHT 用 weight_entries，FINANCE 用 finance_entries） */
+struct BaseInfoShmBuildTable {
+    std::string name;  ///< SHM_BI_TABLE_WEIGHT / SHM_BI_TABLE_FINANCE
+    uint32_t value_count{0};
+    std::vector<BaseInfoShmBuildWeightEntry> weight_entries;   ///< 顺序即写入顺序，本类不排序
+    std::vector<BaseInfoShmBuildFinanceEntry> finance_entries;  ///< 同上
+};
+
+class BaseInfoShmBuilder;
+typedef std::shared_ptr<BaseInfoShmBuilder> BaseInfoShmBuilderPtr;
 
 /**
- * 主进程端：将权息与历史财务发布为只读共享内存快照
- * @details 两项均受 [hikyuu] 配置门控，仅当主进程确实加载了该数据才会建表：
- * - 权息：load_stock_weight 为真且至少一只证券有权息数据；
- * - 历史财务：load_history_finance 为真且至少一只证券有财务记录。
- * 未建表时客户端经 coversTable() 判定后回退 IPC/本地驱动，语义与快照的 ktype 表一致。
- * 历史财务的加载晚于权息（在 K 线预加载之后），故发布分两次：先发权息，
- * 财务就绪后以新代数重建整段（两项一并收录），客户端经 epoch 变化自动换代。
+ * 段写入原语：把「表定义 + entry 列表 + 权息/财务记录」写成一个已创建并填充的共享内存段
+ * @details 纯数据 → 字节：不依赖 StockManager、不做 epoch 编排、不加 market_code 长度与
+ * entry 排序门控（以便单测构造边界 / 坏段）；段随本对象存活，析构或 reset 时删除。
+ * 基础信息发布后不可变，无实时镜像，故不需 KDataShmBuilder 那样的镜像定位接口。
  * @ingroup DataDriver
  */
-class HKU_API BaseInfoShmPublisher {
+class HKU_API BaseInfoShmBuilder {
 public:
-    explicit BaseInfoShmPublisher(const std::string& shm_name_prefix);
-    ~BaseInfoShmPublisher();
+    explicit BaseInfoShmBuilder(const std::string& shm_name_prefix);
+    ~BaseInfoShmBuilder();
 
-    BaseInfoShmPublisher(const BaseInfoShmPublisher&) = delete;
-    BaseInfoShmPublisher& operator=(const BaseInfoShmPublisher&) = delete;
+    BaseInfoShmBuilder(const BaseInfoShmBuilder&) = delete;
+    BaseInfoShmBuilder& operator=(const BaseInfoShmBuilder&) = delete;
 
     /**
-     * 构建并发布快照（同步执行，耗时与数据量成正比）
-     * @param epoch 代数
-     * @param include_finance 是否收录历史财务表；财务加载晚于权息，
-     *        权息就绪但财务尚未预加载时应传 false，避免逐证券触发历史财务懒加载
-     * @return 成功返回段名；无数据可发布时返回空（不建段）
+     * 创建并填充段；成功返回段名，失败返回空
+     * @note 段名 = {prefix}_{epoch:016x}；不校验 market_code 长度 / entry 升序，按给定原样写入
      */
-    std::string publish(uint64_t epoch, bool include_finance = true);
+    std::string build(uint64_t epoch, const std::vector<BaseInfoShmBuildTable>& tables);
 
-    /** 删除当前持有的段 */
-    void removeAll();
+    /** 解除映射并删除当前段（容忍失败） */
+    void reset();
 
-    /** 删除指定名称的段（容忍失败） */
+    /** 删除指定名称的段（静态，容忍失败） */
     static void removeSegment(const std::string& name);
+
+    const std::string& name() const noexcept {
+        return m_current_name;
+    }
 
 private:
     std::string m_prefix;
     std::string m_current_name;
-
     boost::interprocess::shared_memory_object m_shm;
     boost::interprocess::mapped_region m_region;
 };

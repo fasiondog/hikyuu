@@ -16,6 +16,7 @@
 #include <chrono>
 #include <limits>
 #include <memory>
+#include <algorithm>
 #include <filesystem>
 #if defined(_WIN32)
 #include <process.h>
@@ -27,7 +28,6 @@
 #include "hikyuu/StockManager.h"
 #include "hikyuu/data_driver/ipc/IpcProtocol.h"
 #include "hikyuu/data_driver/ipc/IpcTransport.h"
-#include "hikyuu/data_driver/ipc/HikyuuDataServer.h"
 #include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
 #include "hikyuu/data_driver/ipc/KDataShmCache.h"
 #include "hikyuu/plugin/dataserver.h"
@@ -44,12 +44,6 @@ static std::string test_ipc_addr(const std::string& name) {
     std::string addr, lock_path;
     makeIpcServerPaths(name + "_" + std::to_string(HKU_TEST_GETPID()), addr, lock_path);
     return addr;
-}
-
-static std::string test_lock_path(const std::string& name) {
-    std::string addr, lock_path;
-    makeIpcServerPaths(name + "_" + std::to_string(HKU_TEST_GETPID()), addr, lock_path);
-    return lock_path;
 }
 
 TEST_CASE("test_IpcEncoderReader") {
@@ -371,88 +365,27 @@ TEST_CASE("test_IpcClientServer") {
     CHECK_FALSE(server.running());
 }
 
-TEST_CASE("test_HikyuuDataServer") {
-    std::string addr = test_ipc_addr("hku_ds_test");
-    std::string lock_path = test_lock_path("hku_ds_test");
-
-    HikyuuDataServer server1;
-    CHECK(server1.start(addr, lock_path, "."));
-    CHECK(server1.running());
-
-    // 文件锁已被占用，第二个实例启动应失败
-    HikyuuDataServer server2;
-    CHECK_FALSE(server2.start(test_ipc_addr("hku_ds_test2"), lock_path, "."));
-
-    SUBCASE("STATUS_READY handshake") {
-        IpcConnector conn;
-        CHECK(conn.init(addr));
-
-        // 未就绪，request 返回 LOADING（非 SUCCESS）
-        std::vector<uint8_t> res_body;
-        CHECK_FALSE(conn.request(Cmd::STATUS_READY, {}, res_body));
-
-        // 就绪后返回 SUCCESS，并携带进度信息
-        server1.setAllReady();
-        CHECK(conn.request(Cmd::STATUS_READY, {}, res_body));
-        Reader rd(res_body.data(), res_body.size());
-        CHECK_EQ(rd.getU8(), 1);
-        CHECK(rd.ok());
-
-        // 全量证券信息应正常返回（与 StockManager 中证券数一致）
-        CHECK(conn.request(Cmd::BASE_ALL_STOCK_INFO, {}, res_body));
-        Reader rd2(res_body.data(), res_body.size());
-        uint64_t stock_count = rd2.getU64();
-        CHECK_EQ(stock_count, StockManager::instance().size());
-        CHECK(rd2.ok());
-
-        // 日期回环回归：服务端按 8 位 YYYYMMDD 编码，客户端以 *10000 还原后必须与原始起止时间一致；
-        // 防止直接写入 12 位 Datetime::number() 导致客户端日期溢出为 Null 的问题复发。
-        if (stock_count > 0) {
-            StockInfo info = decodeStockInfo(rd2);
-            CHECK(rd2.ok());
-            Stock expect = StockManager::instance().getStock(info.market + info.code);
-            CHECK_FALSE(expect.isNull());
-            Datetime start(info.startDate * 10000LL);
-            CHECK_EQ(start, expect.startDatetime());
-            if (expect.lastDatetime().isNull()) {
-                CHECK_EQ(info.endDate, 99999999);
-            } else {
-                CHECK_EQ(Datetime(info.endDate * 10000LL), expect.lastDatetime());
-            }
-
-            // BASE_STOCK_INFO 单证券分支同样适用 8 位编码约定
-            Encoder enc2;
-            enc2.putString(expect.market_code());
-            CHECK(conn.request(Cmd::BASE_STOCK_INFO, enc2.data(), res_body));
-            Reader rd3(res_body.data(), res_body.size());
-            StockInfo info2 = decodeStockInfo(rd3);
-            CHECK(rd3.ok());
-            CHECK_EQ(info2.startDate, info.startDate);
-            CHECK_EQ(info2.endDate, info.endDate);
-        }
-
-        // 未知证券的 K 线查询应返回 ERROR（由服务端抛异常）
-        Encoder enc;
-        enc.putString("SH999999");
-        encodeKQuery(enc, KQuery(0, 10, KQuery::DAY));
-        CHECK_FALSE(conn.request(Cmd::KDATA_COUNT, enc.data(), res_body));
-    }
-
-    server1.stop();
-    CHECK_FALSE(server1.running());
-
-    // 锁释放后可再次启动
-    HikyuuDataServer server3;
-    CHECK(server3.start(addr, lock_path, "."));
-    server3.stop();
-}
-
 TEST_CASE("test_IpcConnectorWaitReady") {
     std::string addr = test_ipc_addr("hku_wait_test");
-    std::string lock_path = test_lock_path("hku_wait_test");
-
-    HikyuuDataServer server;
-    CHECK(server.start(addr, lock_path, "."));
+    // 以裸 IpcServer 复现服务端 STATUS_READY 应答（原依赖的 HikyuuDataServer 已迁至 shmserver
+    // 插件）
+    std::atomic<bool> ready{false};
+    IpcServer server(addr);
+    server.setHandler(
+      [&ready](Cmd cmd, std::vector<uint8_t>&&, RetCode& ret) -> std::vector<uint8_t> {
+          Encoder enc;
+          if (cmd == Cmd::STATUS_READY) {
+              bool r = ready.load();
+              enc.putU8(r ? 1 : 0);
+              enc.putU64(r ? 100 : 0);
+              enc.putU64(100);
+          } else {
+              ret = RetCode::ERROR;
+              enc.putString("unexpected cmd");
+          }
+          return enc.data();
+      });
+    server.start();
 
     IpcConnector conn;
     CHECK(conn.init(addr));
@@ -461,14 +394,38 @@ TEST_CASE("test_IpcConnectorWaitReady") {
     CHECK_FALSE(conn.waitReady(2));
 
     // 后台置为就绪后，等待成功
-    std::thread t([&server]() {
+    std::thread t([&ready]() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        server.setAllReady();
+        ready.store(true);
     });
     CHECK(conn.waitReady(10));
     t.join();
 
     server.stop();
+}
+
+// 从 StockManager 已预加载的 DAY 缓冲收集 Builder 输入（替代旧 Publisher.publish 的自动收集）。
+// Builder 不做排序，而 Reader 依赖 market_code 升序二分，故此处显式按 market_code 升序排列。
+static std::vector<KDataShmBuildKType> collectDayKtypesForBuild() {
+    KDataShmBuildKType day;
+    day.ktype = KQuery::DAY;
+    auto& sm = StockManager::instance();
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        auto records = stk.getKRecordListFromBuffer(KQuery::DAY);
+        if (records.empty()) {
+            continue;
+        }
+        KDataShmBuildEntry entry;
+        entry.market_code = stk.market_code();
+        entry.records = std::move(records);
+        entry.reserved = 1;  // 与生产发布一致，预留 1 个交易日镜像区
+        day.entries.push_back(std::move(entry));
+    }
+    std::sort(day.entries.begin(), day.entries.end(),
+              [](const KDataShmBuildEntry& a, const KDataShmBuildEntry& b) {
+                  return a.market_code < b.market_code;
+              });
+    return {day};
 }
 
 TEST_CASE("test_KDataShmCache") {
@@ -479,8 +436,9 @@ TEST_CASE("test_KDataShmCache") {
     const std::string prefix = "hkushm";
 
     SUBCASE("publish and read") {
-        KDataShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260901);
+        KDataShmBuilder builder(prefix);
+        auto day_ktypes = collectDayKtypesForBuild();
+        std::string name = builder.build(20260901, day_ktypes);
         REQUIRE_FALSE(name.empty());
 
         KDataShmReader reader;
@@ -561,8 +519,9 @@ TEST_CASE("test_KDataShmCache") {
     SUBCASE("krecord view (zero-copy)") {
         // 裸指针视图：内容与同区间 tryGetKRecordList 逐字段一致；越界/未覆盖/空区间返回
         // false；mirrorUpdate 追加后视图 count 随 readCount 增长、末根反映镜像（视图读的是实时段）
-        KDataShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260908);
+        KDataShmBuilder builder(prefix);
+        auto day_ktypes = collectDayKtypesForBuild();
+        std::string name = builder.build(20260908, day_ktypes);
         REQUIRE_FALSE(name.empty());
 
         KDataShmReader reader;
@@ -630,153 +589,8 @@ TEST_CASE("test_KDataShmCache") {
         CHECK_FALSE(reader.tryGetKRecordView(mc, KQuery::DAY, total, total + 1, bad, bad_count));
         CHECK_EQ(bad, nullptr);  // 失败时不写出 data
         CHECK_EQ(bad_count, 0);  // 失败时 count 归零
-        // 注：本子用例不驱动 mirrorUpdate 追加，保持只读零副作用；“视图读实时段”
-        // 的验证放在下方 realtime mirror 子用例（复用其自身追加，避免跨子用例污染：
-        // 本处追加会被暂存至全局 g_mirror_pending，并被下一个 publish 重放到其新段）。
-    }
-
-    SUBCASE("realtime mirror") {
-        // 验证实时镜像写入：末根更新/追加/过期忽略/预留区写满冻结，
-        // 以及并发读写下 seqlock 的无撕裂一致性
-        KDataShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260902);
-        REQUIRE_FALSE(name.empty());
-
-        KDataShmReader reader;
-        REQUIRE(reader.open(name));
-
-        auto& sm = StockManager::instance();
-        Stock sample;
-        KRecordList buf_ks;
-        for (const auto& stk : sm.getStockList(nullptr)) {
-            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
-            if (buf_ks.size() > 3) {
-                sample = stk;
-                break;
-            }
-        }
-        REQUIRE_FALSE(sample.isNull());
-        REQUIRE_FALSE(buf_ks.empty());
-        const std::string mc = sample.market_code();
-        size_t base_count = buf_ks.size();
-        Datetime last_dt = buf_ks.back().datetime;
-
-        size_t count = 0;
-        REQUIRE(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count);
-
-        // 未覆盖证券/类型的镜像更新：静默跳过
-        shmMirrorRealtimeUpdate("SH999999", KQuery::DAY, KRecord(last_dt, 1, 1, 1, 1, 1, 1));
-        shmMirrorRealtimeUpdate(mc, KQuery::MIN, KRecord(last_dt, 1, 1, 1, 1, 1, 1));
-        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count);
-
-        // 末根同日更新：收/量/额覆盖，高取大、低取小（与 realtimeUpdate 规则一致）
-        shmMirrorRealtimeUpdate(
-          mc, KQuery::DAY,
-          KRecord(last_dt, buf_ks.back().openPrice, buf_ks.back().highPrice + 1.0,
-                  buf_ks.back().lowPrice - 1.0, 12.34, 555.0, 666.0));
-        KRecordList ks;
-        REQUIRE(reader.tryGetKRecordList(
-          mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), ks));
-        REQUIRE_EQ(ks.size(), base_count);
-        CHECK_EQ(ks.back().closePrice, 12.34);
-        CHECK_EQ(ks.back().highPrice, buf_ks.back().highPrice + 1.0);
-        CHECK_EQ(ks.back().lowPrice, buf_ks.back().lowPrice - 1.0);
-        CHECK_EQ(ks.back().transAmount, 555.0);
-        CHECK_EQ(ks.back().transCount, 666.0);
-
-        // 追加：DAY 预留容量为 2，前两笔成功，第三笔被阻挡（冻结语义，
-        // 现有部署每日定时重启重新发布即恢复）
-        Datetime dt1 = last_dt + TimeDelta(1);
-        Datetime dt2 = last_dt + TimeDelta(2);
-        Datetime dt3 = last_dt + TimeDelta(3);
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt1, 10.0, 10.5, 9.5, 10.2, 100.0, 200.0));
-        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count + 1);
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt2, 10.1, 10.6, 9.6, 10.3, 101.0, 201.0));
-        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count + 2);
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt3, 10.2, 10.7, 9.7, 10.4, 103.0, 203.0));
-        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count + 2);  // 预留区满，追加被阻挡
-
-        // 预留区满后末根更新仍生效
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt2, 10.1, 11.0, 9.0, 10.9, 102.0, 202.0));
-        REQUIRE(reader.tryGetKRecordList(
-          mc, KQuery((int64_t)(base_count + 1), (int64_t)(base_count + 2), KQuery::DAY), ks));
-        REQUIRE_EQ(ks.size(), 1);
-        CHECK_EQ(ks[0].closePrice, 10.9);
-        CHECK_EQ(ks[0].highPrice, 11.0);
-
-        // 过期记录被忽略
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, KRecord(dt1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0));
-        CHECK(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count + 2);
-
-        // 日期查询覆盖镜像追加区
-        size_t start_ix = 0, end_ix = 0;
-        CHECK(reader.tryGetIndexRangeByDate(mc, KQueryByDate(dt1, Null<Datetime>(), KQuery::DAY),
-                                            start_ix, end_ix));
-        CHECK_EQ(start_ix, base_count);
-        CHECK_EQ(end_ix, base_count + 2);
-
-        // 视图读实时段：追加/末根更新后，裸指针视图与拷贝路径一致——
-        // 视图 count 随 readCount 增长、追加区与末根更新（close=10.9）反映到视图、历史区不变。
-        // 复用本子用例自身的追加，不产生跨子用例污染（对比上方 krecord view 子用例保持只读）。
-        const KRecord* view_data = nullptr;
-        size_t view_count = 0;
-        REQUIRE(
-          reader.tryGetKRecordView(mc, KQuery::DAY, 0, base_count + 2, view_data, view_count));
-        REQUIRE_NE(view_data, nullptr);
-        CHECK_EQ(view_count, base_count + 2);
-        CHECK_EQ(view_data[0].datetime, buf_ks.front().datetime);  // 历史区不变
-        CHECK_EQ(view_data[base_count].datetime, dt1);             // 追加区首根
-        CHECK_EQ(view_data[base_count + 1].datetime, dt2);         // 追加区末根
-        CHECK_EQ(view_data[base_count + 1].closePrice, 10.9);      // 末根更新反映到视图
-        CHECK_EQ(view_data[base_count + 1].highPrice, 11.0);
-        // 视图与同区间拷贝列表逐字段一致（视图读的是同一实时段）
-        KRecordList view_list;
-        REQUIRE(reader.tryGetKRecordList(
-          mc, KQuery((int64_t)0, (int64_t)(base_count + 2), KQuery::DAY), view_list));
-        REQUIRE_EQ(view_list.size(), view_count);
-        for (size_t i = 0; i < view_count; i++) {
-            CHECK_EQ(view_data[i].datetime, view_list[i].datetime);
-            CHECK_EQ(view_data[i].closePrice, view_list[i].closePrice);
-        }
-
-        // 并发读写：写者持续更新末根（close 与 transCount 同值写入），
-        // 读者验证两字段恒相等，检验 seqlock 无撕裂读
-        // 前置：先将末根 close 与 transCount 置为同值，否则读者会以初始不等状态误判撕裂
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY,
-                                KRecord(dt2, 10.1, 11.0, 9.0, 102.0, 102.0, 102.0));
-        std::atomic<bool> stop{false};
-        std::atomic<bool> torn{false};
-        std::atomic<size_t> reads{0};
-        std::thread writer([&]() {
-            for (int i = 0; i < 2000; i++) {
-                double v = (double)(i % 97) + 1.0;
-                shmMirrorRealtimeUpdate(mc, KQuery::DAY,
-                                        KRecord(dt2, 10.1, 11.0, 9.0, v, 102.0, v));
-            }
-            stop.store(true);
-        });
-        while (!stop.load()) {
-            KRecordList tail;
-            if (reader.tryGetKRecordList(
-                  mc, KQuery((int64_t)(base_count + 1), (int64_t)(base_count + 2), KQuery::DAY),
-                  tail) &&
-                tail.size() == 1) {
-                reads++;
-                if (tail[0].closePrice != tail[0].transCount) {
-                    torn.store(true);
-                    break;
-                }
-            }
-        }
-        writer.join();
-        CHECK_FALSE(torn);
-        CHECK_GT(reads.load(), 0);  // 确保读者确实取到快照，避免重试全失败导致假通过
+        // 注：本子用例保持只读零副作用；实时镜像追加/末根更新的“视图读实时段”验证
+        // 依赖服务端镜像编排，已随 shmserver 插件迁移，核心库侧不再覆盖。
     }
 
     SUBCASE("invalid segment") {
@@ -788,8 +602,9 @@ TEST_CASE("test_KDataShmCache") {
     SUBCASE("oversized market_code") {
         // 索引项的 market_code 为定长字段，超长 key 必须在二分查找前被拒绝：
         // 截断后可能与其他证券重名而返回错误数据（发布端同理跳过超长证券）
-        KDataShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260904);
+        KDataShmBuilder builder(prefix);
+        auto day_ktypes = collectDayKtypesForBuild();
+        std::string name = builder.build(20260904, day_ktypes);
         REQUIRE_FALSE(name.empty());
 
         KDataShmReader reader;
@@ -817,8 +632,9 @@ TEST_CASE("test_KDataShmCache") {
     SUBCASE("ktype coverage") {
         // ktype 表须反映主进程的预加载配置（测试配置仅 day=True），
         // 客户端据此判定某类型在主进程侧是否存在实时更新链路，从而决定是否直接走本地驱动
-        KDataShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260903);
+        KDataShmBuilder builder(prefix);
+        auto day_ktypes = collectDayKtypesForBuild();
+        std::string name = builder.build(20260903, day_ktypes);
         REQUIRE_FALSE(name.empty());
 
         KDataShmReader reader;
@@ -836,207 +652,6 @@ TEST_CASE("test_KDataShmCache") {
         reader.close();
         CHECK_FALSE(reader.coversKType(KQuery::DAY));
     }
-
-    SUBCASE("server shm info handshake") {
-        std::string addr = test_ipc_addr("hku_shm_test");
-        std::string lock_path = test_lock_path("hku_shm_test");
-        HikyuuDataServer server;
-        REQUIRE(server.start(addr, lock_path, "."));
-
-        IpcConnector conn;
-        REQUIRE(conn.init(addr));
-
-        // 发布前：epoch 为 0、段名为空，客户端应保持纯 IPC 查询
-        std::vector<uint8_t> res_body;
-        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
-        Reader rd(res_body.data(), res_body.size());
-        CHECK_EQ(rd.getU64(), 0);
-        CHECK(rd.getString().empty());
-        CHECK(rd.ok());
-
-        // 发布后：返回有效段名与代数，且客户端可映射读取
-        CHECK(server.publishShmCache(prefix));
-        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
-        Reader rd2(res_body.data(), res_body.size());
-        uint64_t epoch = rd2.getU64();
-        std::string name = rd2.getString();
-        CHECK(rd2.ok());
-        CHECK_GT(epoch, 0);
-        REQUIRE_FALSE(name.empty());
-
-        KDataShmReader reader;
-        CHECK(reader.open(name));
-        CHECK_EQ(reader.epoch(), epoch);
-        CHECK_GT(reader.coveredCount(), 0);
-
-        // 重发布应生成新代数，旧段被删除但已有映射不受影响；再次发布后读者可打开新段；
-        // 新段数据与缓冲一致（条数不变）
-        size_t old_covered = reader.coveredCount();
-        CHECK(server.publishShmCache(prefix));
-        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
-        Reader rd3(res_body.data(), res_body.size());
-        uint64_t epoch2 = rd3.getU64();
-        std::string name2 = rd3.getString();
-        CHECK(rd3.ok());
-        CHECK_GT(epoch2, epoch);
-        CHECK_NE(name2, name);
-
-        KDataShmReader reader2;
-        REQUIRE(reader2.open(name2));
-        CHECK_EQ(reader2.coveredCount(), old_covered);
-        // 旧映射在段删除后仍可读取（快照语义）
-        CHECK(reader.valid());
-        CHECK_EQ(reader.coveredCount(), old_covered);
-
-        // 扩展：基础信息快照字段（向后兼容，旧客户端解析到 kdata 部分即止）；
-        // 发布基础信息快照后握手应返回非空 bi_epoch / bi_name，且可被映射读取。
-        CHECK(server.publishBaseInfoShm(prefix));
-        REQUIRE(conn.request(Cmd::STATUS_SHM_INFO, {}, res_body));
-        Reader rd_bi(res_body.data(), res_body.size());
-        rd_bi.getU64();  // kdata_epoch
-        rd_bi.getString();  // kdata_name
-        uint64_t bi_epoch = rd_bi.getU64();
-        std::string bi_name = rd_bi.getString();
-        CHECK(rd_bi.ok());
-        CHECK_GT(bi_epoch, 0);
-        REQUIRE_FALSE(bi_name.empty());
-
-        BaseInfoShmReader bi_reader;
-        CHECK(bi_reader.open(bi_name));
-        CHECK_EQ(bi_reader.epoch(), bi_epoch);
-
-        server.stop();
-    }
-
-    // 注：以下两个子用例直接驱动镜像入口（不修改 Stock 预加载缓冲，避免污染
-    // 其他以真实数据为基准的用例），验证发布窗口内到达的实时更新不丢失
-
-    SUBCASE("staging during publish window") {
-        // 发布窗口暂存：行情接收与 shm 发布相互独立，窗口内（快照拷贝→镜像注册）
-        // 到达的实时更新不得丢失，重放后段尾与暂存更新收敛一致
-        auto& sm = StockManager::instance();
-        Stock sample;
-        KRecordList buf_ks;
-        for (const auto& stk : sm.getStockList(nullptr)) {
-            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
-            if (buf_ks.size() > 3) {
-                sample = stk;
-                break;
-            }
-        }
-        REQUIRE_FALSE(sample.isNull());
-        const std::string mc = sample.market_code();
-        size_t base_count = buf_ks.size();
-        Datetime last_dt = buf_ks.back().datetime;
-
-        // 场景1：首次发布前（尚无活跃段）窗口内到达的更新：
-        // 暂存后由重放补录进段（快照未含这些更新），不丢失
-        shmTestingBeginStaging();
-        KRecord upd1(last_dt, 10.0, 10.5, 9.5, 999.0, 100.0, 200.0);  // 末根更新
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, upd1);
-        KRecord upd2(last_dt + TimeDelta(1), 10.0, 10.5, 9.5, 10.2, 100.0, 200.0);  // 追加
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, upd2);
-
-        {
-            // 模拟预加载完成后的发布：缓冲未变，快照仍为 base_count 条；
-            // 窗口内暂存的更新由重放补入段尾
-            KDataShmPublisher publisher(prefix);
-            std::string name = publisher.publish(20260905);
-            REQUIRE_FALSE(name.empty());
-            shmTestingEndStagingAndReplay();
-
-            KDataShmReader reader;
-            REQUIRE(reader.open(name));
-            size_t count = 0;
-            REQUIRE(reader.tryGetCount(mc, KQuery::DAY, count));
-            CHECK_EQ(count, base_count + 1);  // 窗口内追加的记录已经重放进入段
-            KRecordList ks;
-            REQUIRE(reader.tryGetKRecordList(
-              mc, KQuery((int64_t)0, (int64_t)Null<int64_t>(), KQuery::DAY), ks));
-            REQUIRE_EQ(ks.size(), base_count + 1);
-            CHECK_EQ(ks.back().datetime, upd2.datetime);
-            CHECK_EQ(ks.back().closePrice, 10.2);
-            CHECK_EQ(ks[ks.size() - 2].closePrice, 999.0);
-        }
-
-        // 场景2：重发布窗口（存在活跃旧段）：更新双写旧段，旧段读者不受发布过程影响
-        KDataShmPublisher publisher2(prefix);
-        std::string name2 = publisher2.publish(20260906);
-        REQUIRE_FALSE(name2.empty());
-        KDataShmReader reader2;
-        REQUIRE(reader2.open(name2));
-        shmTestingBeginStaging();
-        KRecord upd3(last_dt, 10.0, 10.5, 9.5, 10.9, 102.0, 202.0);  // 末根更新
-        shmMirrorRealtimeUpdate(mc, KQuery::DAY, upd3);
-        // 双写：活跃段（reader2 所映射）立即可见，无需等重放
-        KRecordList ks2;
-        REQUIRE(reader2.tryGetKRecordList(
-          mc, KQuery((int64_t)(base_count - 1), (int64_t)base_count, KQuery::DAY), ks2));
-        REQUIRE_EQ(ks2.size(), 1);
-        CHECK_EQ(ks2[0].closePrice, 10.9);
-        shmTestingEndStagingAndReplay();  // 重放幂等，状态不变
-        size_t count2 = 0;
-        REQUIRE(reader2.tryGetCount(mc, KQuery::DAY, count2));
-        CHECK_EQ(count2, base_count);
-    }
-
-    SUBCASE("concurrent publish and realtime update") {
-        // 发布与实时更新（Stock::realtimeUpdate 全链路）并发：任意交错下，
-        // 段尾都不得落后于缓冲尾（更新或进快照、或经暂存重放、或注册后直接镜像）；
-        // 仅更新末根且保持高/低不变，结束后以原记录覆盖回收/量/额，缓冲可精确还原
-        auto& sm = StockManager::instance();
-        Stock sample;
-        KRecordList buf_ks;
-        for (const auto& stk : sm.getStockList(nullptr)) {
-            buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
-            if (buf_ks.size() > 3) {
-                sample = stk;
-                break;
-            }
-        }
-        REQUIRE_FALSE(sample.isNull());
-        const std::string mc = sample.market_code();
-        Datetime last_dt = buf_ks.back().datetime;
-        KRecord last_rec = buf_ks.back();
-        size_t base_count = buf_ks.size();
-
-        KDataShmPublisher publisher(prefix);
-        std::atomic<bool> stop{false};
-        std::thread updater([&]() {
-            // 仅更新末根（不追加）：避开预留容量边界，终态完全确定
-            for (int i = 0; !stop.load(std::memory_order_relaxed); i++) {
-                double v = (double)(i % 89) + 1.0;
-                sample.realtimeUpdate(
-                  KRecord(last_dt, last_rec.openPrice, last_rec.highPrice, last_rec.lowPrice, v,
-                          last_rec.transAmount, last_rec.transCount),
-                  KQuery::DAY);
-                std::this_thread::yield();
-            }
-        });
-        std::string name = publisher.publish(20260907);
-        stop.store(true);
-        updater.join();
-        REQUIRE_FALSE(name.empty());
-
-        // 以缓冲为基准取末根（写线程已停止，缓冲稳定），段尾必须一致
-        double buf_close = sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice;
-        KDataShmReader reader;
-        REQUIRE(reader.open(name));
-        size_t count = 0;
-        REQUIRE(reader.tryGetCount(mc, KQuery::DAY, count));
-        CHECK_EQ(count, base_count);
-        KRecordList ks;
-        REQUIRE(reader.tryGetKRecordList(
-          mc, KQuery((int64_t)(base_count - 1), (int64_t)base_count, KQuery::DAY), ks));
-        REQUIRE_EQ(ks.size(), 1);
-        CHECK_EQ(ks[0].datetime, last_dt);
-        CHECK_EQ(ks[0].closePrice, buf_close);
-
-        // 还原末根收/量/额（高/低未动），同步镜像段，缓冲与测试前完全一致
-        sample.realtimeUpdate(last_rec, KQuery::DAY);
-        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice,
-                 last_rec.closePrice);
-    }
 }
 
 TEST_CASE("test_IpcKDataDriverView") {
@@ -1045,12 +660,31 @@ TEST_CASE("test_IpcKDataDriverView") {
     // 空区间、起始越界返回 false（由调用方回退 getKRecordList 拷贝路径）。
     StockManager::instance().waitDataReady();
     const std::string prefix = "hkuview";
+    const uint64_t epoch = 20260910;
     std::string addr = test_ipc_addr("hku_view_test");
-    std::string lock_path = test_lock_path("hku_view_test");
 
-    HikyuuDataServer server;
-    REQUIRE(server.start(addr, lock_path, "."));
-    REQUIRE(server.publishShmCache(prefix));
+    // 原用例经 HikyuuDataServer.publishShmCache 产段并应答 STATUS_SHM_INFO；服务端已迁至
+    // shmserver 插件。此处以核心库 KDataShmBuilder 产段 + 裸 IpcServer 应答 STATUS_SHM_INFO
+    // 复现握手，保留对核心客户端代理 IpcKDataDriver「shm 优先 + 零拷贝视图」路径的覆盖。
+    KDataShmBuilder builder(prefix);
+    auto day_ktypes = collectDayKtypesForBuild();
+    std::string seg_name = builder.build(epoch, day_ktypes);
+    REQUIRE_FALSE(seg_name.empty());
+
+    IpcServer server(addr);
+    server.setHandler([&](Cmd cmd, std::vector<uint8_t>&&, RetCode& ret) -> std::vector<uint8_t> {
+        if (cmd != Cmd::STATUS_SHM_INFO) {
+            ret = RetCode::ERROR;
+            return {};
+        }
+        Encoder enc;
+        enc.putU64(epoch);        // kdata_epoch
+        enc.putString(seg_name);  // kdata_name
+        enc.putU64(0);            // bi_epoch（本用例不涉及基础信息快照）
+        enc.putString("");        // bi_name
+        return enc.data();
+    });
+    server.start();
 
     auto conn = std::make_shared<IpcConnector>();
     REQUIRE(conn->init(addr));
@@ -1127,295 +761,9 @@ TEST_CASE("test_IpcKDataDriverView") {
     server.stop();
 }
 
-TEST_CASE("test_KDataRealtimeForward") {
-    // 客户端实时更新转发：客户端无预加载缓冲，Stock::realtimeUpdate 经 IPC 转发至
-    // 主进程应用（缓冲 + 共享内存镜像），保留客户端主动更新行情数据的能力
-    StockManager::instance().waitDataReady();
-    std::string addr = test_ipc_addr("hku_fwd_test");
-    std::string lock_path = test_lock_path("hku_fwd_test");
-
-    HikyuuDataServer server;
-    REQUIRE(server.start(addr, lock_path, "."));
-    auto conn = std::make_shared<IpcConnector>();
-    REQUIRE(conn->init(addr));
-
-    auto& sm = StockManager::instance();
-    Stock sample;
-    KRecordList buf_ks;
-    for (const auto& stk : sm.getStockList(nullptr)) {
-        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
-        if (buf_ks.size() > 3) {
-            sample = stk;
-            break;
-        }
-    }
-    REQUIRE_FALSE(sample.isNull());
-    const std::string mc = sample.market_code();
-    KRecord last = buf_ks.back();
-
-    registerRealtimeForwarder(conn);
-
-    SUBCASE("forward applies on server side") {
-        // 末根同日更新：主进程应用合并规则。仅覆盖收/量/额（可精确还原），
-        // 不改高/低（高取大/低取小为不可逆合并，会污染其他以真实数据为基准的用例）
-        KRecord upd(last.datetime, last.openPrice, last.highPrice, last.lowPrice, 88.88, 111.0,
-                    222.0);
-        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, upd));
-        auto ks = sample.getKRecordListFromBuffer(KQuery::DAY);
-        REQUIRE_EQ(ks.size(), buf_ks.size());  // 同日不追加
-        CHECK_EQ(ks.back().closePrice, 88.88);
-        CHECK_EQ(ks.back().transAmount, 111.0);
-        CHECK_EQ(ks.back().transCount, 222.0);
-
-        // 发布快照后转发：更新同时进入共享内存段（镜像链路）
-        const std::string prefix = "hkufwd";
-        CHECK(server.publishShmCache(prefix));
-        KRecord upd2(last.datetime, last.openPrice, last.highPrice, last.lowPrice, 66.66, 333.0,
-                     444.0);
-        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, upd2));
-        std::vector<uint8_t> res_body;
-        REQUIRE(conn->request(Cmd::STATUS_SHM_INFO, {}, res_body));
-        Reader rd(res_body.data(), res_body.size());
-        rd.getU64();
-        std::string name = rd.getString();
-        REQUIRE_FALSE(name.empty());
-        KDataShmReader reader;
-        REQUIRE(reader.open(name));
-        KRecordList shm_ks;
-        REQUIRE(reader.tryGetKRecordList(
-          mc, KQuery((int64_t)(buf_ks.size() - 1), (int64_t)buf_ks.size(), KQuery::DAY), shm_ks));
-        REQUIRE_EQ(shm_ks.size(), 1);
-        CHECK_EQ(shm_ks[0].closePrice, 66.66);
-        CHECK_EQ(shm_ks[0].transCount, 444.0);
-
-        // 还原缓冲与镜像段末根的收/量/额，与测试前完全一致
-        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
-        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
-    }
-
-    SUBCASE("forward get last update time") {
-        // 主进程已预加载 DAY 缓冲，其 m_lastUpdate[DAY] 为加载时刻（非 min）；
-        // 测试进程即主进程（非客户端模式），本地直接取值与经 IPC 转发取值应一致
-        Datetime direct = sample.getLastUpdateTime(KQuery::DAY);
-        CHECK(direct != Datetime::min());
-        CHECK_EQ(ipcForwardGetLastUpdateTime(mc, KQuery::DAY), direct);
-        // 主进程未预加载的类型（无缓冲）：min
-        CHECK_EQ(ipcForwardGetLastUpdateTime(mc, KQuery::MIN), Datetime::min());
-        // 未知证券：min
-        CHECK_EQ(ipcForwardGetLastUpdateTime("SH999999", KQuery::DAY), Datetime::min());
-    }
-
-    SUBCASE("forward edge cases") {
-        // 未知证券：服务端以 applied=0 应答（非协议错误）
-        CHECK_FALSE(ipcForwardRealtimeUpdate(
-          "SH999999", KQuery::DAY, KRecord(last.datetime, 1, 1, 1, 1, 1, 1)));
-        // 主进程未预加载的类型（无缓冲）：applied=0
-        CHECK_FALSE(ipcForwardRealtimeUpdate(
-          mc, KQuery::MIN, KRecord(last.datetime, 1, 1, 1, 1, 1, 1)));
-    }
-
-    // 注销后转发直接失败（退回原行为）
-    registerRealtimeForwarder(nullptr);
-    CHECK_FALSE(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
-    CHECK_EQ(ipcForwardGetLastUpdateTime(mc, KQuery::DAY), Datetime::min());
-
-    server.stop();
-}
-
-TEST_CASE("test_KDataClientModeGating") {
-    // 客户端模式下的门控：Stock::realtimeUpdate / getLastUpdateTime 仅对“本地无缓冲”的
-    // 普通代理证券转发主进程；对“本地有缓冲”的临时证券（setKRecordList 指定外部数据）
-    // 应就地生效、不外发（主进程并无此证券）。用测试钩子强制客户端模式以覆盖该分支。
-    StockManager::instance().waitDataReady();
-    std::string addr = test_ipc_addr("hku_gate_test");
-    std::string lock_path = test_lock_path("hku_gate_test");
-
-    HikyuuDataServer server;
-    REQUIRE(server.start(addr, lock_path, "."));
-    auto conn = std::make_shared<IpcConnector>();
-    REQUIRE(conn->init(addr));
-
-    auto& sm = StockManager::instance();
-    // 选取一只已预加载 DAY 缓冲的真实证券作为“主进程侧”标的（测试进程即主进程）
-    Stock sample;
-    KRecordList buf_ks;
-    for (const auto& stk : sm.getStockList(nullptr)) {
-        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
-        if (buf_ks.size() > 3) {
-            sample = stk;
-            break;
-        }
-    }
-    REQUIRE_FALSE(sample.isNull());
-    const std::string mc = sample.market_code();
-    KRecord last = buf_ks.back();
-
-    registerRealtimeForwarder(conn);
-    // RAII：无论用例中途 REQUIRE 失败与否，退出时复位客户端模式与转发注册，避免污染其他用例
-    struct ClientModeGuard {
-        ~ClientModeGuard() {
-            StockManager::instance()._testingSetIpcClientMode(false);
-            registerRealtimeForwarder(nullptr);
-        }
-    } guard;
-    sm._testingSetIpcClientMode(true);
-
-    SUBCASE("buffered temp stock applies locally, not forwarded") {
-        // 临时证券：setKRecordList 建本地缓冲（isBuffer=true），就地更新、不转发
-        Stock temp("SH", "999901", "temp");
-        KRecordList tks;
-        tks.emplace_back(KRecord(last.datetime, 10.0, 10.5, 9.8, 10.2, 100.0, 10.0));
-        temp.setKRecordList(tks, KQuery::DAY);
-        REQUIRE(temp.isBuffer(KQuery::DAY));
-
-        // 同日更新末根：仅覆盖收/量/额（可精确比对），就地写入本地缓冲
-        KRecord tupd(last.datetime, 10.0, 10.5, 9.8, 11.11, 200.0, 20.0);
-        temp.realtimeUpdate(tupd, KQuery::DAY);
-        auto tbuf = temp.getKRecordListFromBuffer(KQuery::DAY);
-        REQUIRE_EQ(tbuf.size(), 1);  // 同日不追加
-        CHECK_EQ(tbuf.back().closePrice, 11.11);
-        CHECK_EQ(tbuf.back().transAmount, 200.0);
-
-        // getLastUpdateTime 返回本地写入时刻（非 min），证明未走转发
-        //（若转发，主进程无 SH999901 会降级返回 min）
-        CHECK(temp.getLastUpdateTime(KQuery::DAY) != Datetime::min());
-    }
-
-    SUBCASE("non-buffered proxy stock forwards to server") {
-        // 普通代理证券：与主进程同一 market_code 的全新 Stock 对象，本地无缓冲（isBuffer=false）
-        Stock proxy(sample.market(), sample.code(), "proxy");
-        CHECK_FALSE(proxy.isBuffer(KQuery::DAY));
-
-        // realtimeUpdate 转发至主进程，应用到其预加载缓冲（sample 即主进程侧同一证券）；
-        // 仅覆盖收/量/额，高/低保持原值（高取大/低取小为不可逆合并，避免污染）
-        KRecord pupd(last.datetime, last.openPrice, last.highPrice, last.lowPrice, 55.55, 666.0,
-                     777.0);
-        proxy.realtimeUpdate(pupd, KQuery::DAY);
-        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, 55.55);
-
-        // getLastUpdateTime 转发至主进程，取回其缓冲刷新时刻（与主进程本地一致、非 min）
-        Datetime fwd = proxy.getLastUpdateTime(KQuery::DAY);
-        CHECK(fwd != Datetime::min());
-        CHECK_EQ(fwd, sample.getLastUpdateTime(KQuery::DAY));
-
-        // 还原主进程缓冲末根，避免污染其他以真实数据为基准的用例
-        CHECK(ipcForwardRealtimeUpdate(mc, KQuery::DAY, last));
-        CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
-    }
-
-    server.stop();
-}
-
-TEST_CASE("test_IpcPullFromBufferServer") {
-    // 客户端委托主进程从行情缓存服务拉取：验证 getDataFromBufferServer 在客户端模式不再因本地
-    // 无预加载缓冲而 early-return，而是把 (addr, codes, ktype) 一次性委托主进程；主进程经
-    // pullFromBufferServerLocal 从桩缓存服务拉取 → realtimeUpdate → 更新自身缓冲并镜像共享内存，
-    // 全体客户端随后经 shm 读到。模型参照 test_KDataClientModeGating（同进程兼任 master+client）
-    // 与 demo3.cpp 的 NodeServer "market" handler。
-    StockManager::instance().waitDataReady();
-    auto& sm = StockManager::instance();
-
-    // 选取一只已预加载 DAY 缓冲的真实证券作为主进程侧标的（测试进程即主进程）
-    Stock sample;
-    KRecordList buf_ks;
-    for (const auto& stk : sm.getStockList(nullptr)) {
-        buf_ks = stk.getKRecordListFromBuffer(KQuery::DAY);
-        if (buf_ks.size() > 3) {
-            sample = stk;
-            break;
-        }
-    }
-    REQUIRE_FALSE(sample.isNull());
-    const std::string mc = sample.market_code();
-    const KRecord last = buf_ks.back();
-    // 桩返回的“同日更新”记录：开/高/低保持原值（高取大/低取小为不可逆合并），仅改收/量/额，
-    // 使更新可逆——用例末以原末根 realtimeUpdate 还原，避免污染其他以真实数据为基准的用例。
-    const double NEW_CLOSE = last.closePrice + 1.23;
-    const double NEW_AMOUNT = last.transAmount + 100.0;
-    const double NEW_COUNT = last.transCount + 10.0;
-
-    // 桩 buffer server：与 master handler 的 NodeClient 同进程，用 inproc 传输免端口占用。
-    // 仅对请求 codes 中等于 mc 的证券返回上述 canned 记录；空 codes → 空响应（no-op）。
-    const std::string stub_addr = "inproc://hku_pull_stub_" + std::to_string(HKU_TEST_GETPID());
-    NodeServer stub(stub_addr);
-    stub.regHandle("market", [mc, last, NEW_CLOSE, NEW_AMOUNT, NEW_COUNT](json&& req) {
-        json jstklist;
-        if (req.contains("codes") && req["codes"].is_array()) {
-            for (const auto& jc : req["codes"]) {
-                if (jc.get<string>() != mc) {
-                    continue;
-                }
-                json jr;
-                jr.emplace_back(last.datetime.str());
-                jr.emplace_back(last.openPrice);
-                jr.emplace_back(last.highPrice);
-                jr.emplace_back(last.lowPrice);
-                jr.emplace_back(NEW_CLOSE);
-                jr.emplace_back(NEW_AMOUNT);
-                jr.emplace_back(NEW_COUNT);
-                json jstk;
-                jstk["code"] = mc;
-                jstk["data"] = json::array();
-                jstk["data"].emplace_back(std::move(jr));
-                jstklist.emplace_back(std::move(jstk));
-            }
-        }
-        json res;
-        res["data"] = std::move(jstklist);
-        return res;
-    });
-    stub.start(4);
-
-    std::string addr = test_ipc_addr("hku_pull_test");
-    std::string lock_path = test_lock_path("hku_pull_test");
-    HikyuuDataServer server;
-    REQUIRE(server.start(addr, lock_path, "."));
-    auto conn = std::make_shared<IpcConnector>();
-    REQUIRE(conn->init(addr));
-
-    registerRealtimeForwarder(conn);
-    // RAII：无论用例中途 REQUIRE 失败与否，退出时复位客户端模式与转发注册，避免污染其他用例
-    struct ClientModeGuard {
-        ~ClientModeGuard() {
-            StockManager::instance()._testingSetIpcClientMode(false);
-            registerRealtimeForwarder(nullptr);
-        }
-    } guard;
-    sm._testingSetIpcClientMode(true);
-
-    /** @arg 客户端委托：一次 getDataFromBufferServer 调用经一次 IPC 往返委托主进程拉取，主进程
-     *         缓冲反映桩返回的新收盘价（而非客户端 early-return）。主进程缓冲即委托链路的权威
-     *         终点（client→IPC→master handler→pullFromBufferServerLocal→NodeClient→桩→realtimeUpdate）；
-     *         realtimeUpdate 的 shm 镜像为其无条件副产物，已由 test_KDataShmCache 充分覆盖。此处不
-     *         另建本地 KDataShmPublisher：其 publish/removeAll 会改动进程级全局镜像注册表
-     *         (g_mirror_pub/pid/staging)——与本文件其他 shm 用例共享，doctest 执行顺序下会破坏
-     *         test_KDataShmCache staging 子用例的暂存重放前提（与 test_KDataClientModeGating 同：
-     *         仅驱动 master 侧 realtimeUpdate、不建本地发布器）。*/
-    getDataFromBufferServer(stub_addr, StockList{sample}, KQuery::DAY);
-    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, NEW_CLOSE);
-
-    // 还原主进程缓冲末根（同日更新可逆），避免污染其他用例
-    sample.realtimeUpdate(last, KQuery::DAY);
-    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
-
-    /** @arg 边界：未注册转发连接时，客户端委托静默返回（ipcForwardPullFromBufferServer 返回
-     *         false），不崩溃、不改动主进程缓冲 */
-    registerRealtimeForwarder(nullptr);
-    getDataFromBufferServer(stub_addr, StockList{sample}, KQuery::DAY);
-    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
-
-    /** @arg 边界：空证券列表委托为 no-op（主进程拉取空 codes，桩返回空 data，缓冲不变）*/
-    registerRealtimeForwarder(conn);
-    getDataFromBufferServer(stub_addr, StockList{}, KQuery::DAY);
-    CHECK_EQ(sample.getKRecordListFromBuffer(KQuery::DAY).back().closePrice, last.closePrice);
-
-    server.stop();
-    stub.stop();
-}
-
 TEST_CASE("test_StockWeightClientModeDelegatesToDriver") {
     // 客户端模式下 loadAllStockWeights 跳过本地物化，Stock::getWeight 改为按需经驱动读取
-    //（客户端即 shm 优先）。用一只“全新构造、m_weightList 为空”的 Stock 证明委托：主进程
+    // （客户端即 shm 优先）。用一只“全新构造、m_weightList 为空”的 Stock 证明委托：主进程
     // 模式下它读自身空缓存返回空；客户端模式下同一对象经驱动取回该证券真实权息，且与
     // 主进程已物化证券的结果逐字段一致（证明客户端不再需要本地物化即可正确读取权息）。
     StockManager::instance().waitDataReady();
@@ -1435,14 +783,17 @@ TEST_CASE("test_StockWeightClientModeDelegatesToDriver") {
     REQUIRE_FALSE(dict_stk.isNull());
     REQUIRE_FALSE(expect.empty());
 
-    // 全新构造的同 market_code Stock：独立 m_data、m_weightList 为空（未被 loadAllStockWeights 物化）
+    // 全新构造的同 market_code Stock：独立 m_data、m_weightList 为空（未被 loadAllStockWeights
+    // 物化）
     Stock fresh(dict_stk.market(), dict_stk.code(), "fresh");
     /** @arg 主进程模式：读自身空 m_weightList，返回空（基线，证明 fresh 本地无权息缓存）*/
     CHECK(fresh.getWeight().empty());
 
     // RAII：无论用例中途 REQUIRE 失败与否，退出时复位客户端模式，避免污染其他用例
     struct ClientModeGuard {
-        ~ClientModeGuard() { StockManager::instance()._testingSetIpcClientMode(false); }
+        ~ClientModeGuard() {
+            StockManager::instance()._testingSetIpcClientMode(false);
+        }
     } guard;
     sm._testingSetIpcClientMode(true);
 
@@ -1470,6 +821,52 @@ TEST_CASE("test_StockWeightClientModeDelegatesToDriver") {
     CHECK_EQ(direct.size(), actual.size());
 }
 
+// 以 StockManager 已加载的权息 / 历史财务为基准收集 Builder 输入（替代旧 Publisher.publish
+// 的自动收集与建表门控）。Builder 不排序，Reader 按 market_code 升序二分，故显式排序；
+// 历史财务表仅在存在数据时才建表（与旧发布门控一致，测试数据集 HistoryFinance 为空）。
+static std::vector<BaseInfoShmBuildTable> collectBaseInfoTablesForBuild() {
+    auto& sm = StockManager::instance();
+    BaseInfoShmBuildTable weight;
+    weight.name = SHM_BI_TABLE_WEIGHT;
+    weight.value_count = 0;
+    BaseInfoShmBuildTable finance;
+    finance.name = SHM_BI_TABLE_FINANCE;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        auto w = stk.getWeight();
+        if (!w.empty()) {
+            BaseInfoShmBuildWeightEntry e;
+            e.market_code = stk.market_code();
+            e.weights = std::move(w);
+            weight.weight_entries.push_back(std::move(e));
+        }
+        auto fin = stk.getHistoryFinance();
+        if (!fin.empty()) {
+            BaseInfoShmBuildFinanceEntry e;
+            e.market_code = stk.market_code();
+            e.finances = std::move(fin);
+            finance.finance_entries.push_back(std::move(e));
+        }
+    }
+    std::sort(weight.weight_entries.begin(), weight.weight_entries.end(),
+              [](const BaseInfoShmBuildWeightEntry& a, const BaseInfoShmBuildWeightEntry& b) {
+                  return a.market_code < b.market_code;
+              });
+    std::sort(finance.finance_entries.begin(), finance.finance_entries.end(),
+              [](const BaseInfoShmBuildFinanceEntry& a, const BaseInfoShmBuildFinanceEntry& b) {
+                  return a.market_code < b.market_code;
+              });
+    std::vector<BaseInfoShmBuildTable> tables;
+    if (!weight.weight_entries.empty()) {
+        tables.push_back(std::move(weight));
+    }
+    if (!finance.finance_entries.empty()) {
+        finance.value_count =
+          static_cast<uint32_t>(finance.finance_entries[0].finances[0].values.size());
+        tables.push_back(std::move(finance));
+    }
+    return tables;
+}
+
 TEST_CASE("test_BaseInfoShmCache") {
     // 与 test_KDataShmCache 同构：以 StockManager 已加载的权息/历史财务为基准，
     // 验证基础信息（权息 + 历史财务）共享内存快照的发布与只读映射查询语义；
@@ -1478,8 +875,9 @@ TEST_CASE("test_BaseInfoShmCache") {
     const std::string prefix = "hkubshm";
 
     SUBCASE("publish and read weight") {
-        BaseInfoShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260901);
+        BaseInfoShmBuilder builder(prefix);
+        auto bi_tables = collectBaseInfoTablesForBuild();
+        std::string name = builder.build(20260901, bi_tables);
         REQUIRE_FALSE(name.empty());
 
         BaseInfoShmReader reader;
@@ -1537,8 +935,8 @@ TEST_CASE("test_BaseInfoShmCache") {
         StockWeightList dummy;
         CHECK_FALSE(reader.tryGetWeightList("SH999999", Datetime::min(), Null<Datetime>(), dummy));
 
-        // 区间过滤语义须与主进程 Stock::getWeight(start, end) 一致（[start, end)、按完整日期比较），
-        // 否则快照命中会比服务端 IPC 应答多/少返回记录
+        // 区间过滤语义须与主进程 Stock::getWeight(start, end) 一致（[start,
+        // end)、按完整日期比较）， 否则快照命中会比服务端 IPC 应答多/少返回记录
         for (const auto& stk : sm.getStockList(nullptr)) {
             auto full = stk.getWeight();
             if (full.size() < 3) {
@@ -1569,8 +967,9 @@ TEST_CASE("test_BaseInfoShmCache") {
     SUBCASE("finance gated by data availability") {
         // 测试数据集 HistoryFinance 表为空，故历史财务表不应被建表（与 load_history_finance
         // 门控语义一致）；同时验证 coversTable 在表缺失时返回 false 且段映射仍有效。
-        BaseInfoShmPublisher publisher(prefix);
-        std::string name = publisher.publish(20260902);
+        BaseInfoShmBuilder builder(prefix);
+        auto bi_tables = collectBaseInfoTablesForBuild();
+        std::string name = builder.build(20260902, bi_tables);
         REQUIRE_FALSE(name.empty());
 
         BaseInfoShmReader reader;
@@ -1587,8 +986,8 @@ TEST_CASE("test_BaseInfoShmCache") {
         std::vector<HistoryFinanceInfo> dummy;
         CHECK_FALSE(
           reader.tryGetHistoryFinance("SH600000", Datetime::min(), Null<Datetime>(), dummy));
-        CHECK_FALSE(reader.tryGetHistoryFinance(
-          "SH600000", Datetime(202001010000LL), Datetime(202101010000LL), dummy));
+        CHECK_FALSE(reader.tryGetHistoryFinance("SH600000", Datetime(202001010000LL),
+                                                Datetime(202101010000LL), dummy));
 
         reader.close();
     }
@@ -1596,11 +995,12 @@ TEST_CASE("test_BaseInfoShmCache") {
     SUBCASE("republish with new epoch") {
         // 历史财务就绪后重发布（以新代数重建整段），客户端经 epoch 变化感知；
         // 退化场景下旧映射在重发布（旧段被删）后仍可读取。
-        BaseInfoShmPublisher publisher(prefix);
-        std::string n1 = publisher.publish(20260901);
+        BaseInfoShmBuilder builder(prefix);
+        auto bi_tables = collectBaseInfoTablesForBuild();
+        std::string n1 = builder.build(20260901, bi_tables);
         BaseInfoShmReader r1;
         REQUIRE(r1.open(n1));  // 必须在重发布前映射，否则 Windows 下旧段名已被删无法再打开
-        std::string n2 = publisher.publish(20260902);
+        std::string n2 = builder.build(20260902, bi_tables);
         BaseInfoShmReader r2;
         REQUIRE(r2.open(n2));
         CHECK_NE(n1, n2);
@@ -1613,10 +1013,16 @@ TEST_CASE("test_BaseInfoShmCache") {
 
 TEST_CASE("test_IpcConnectorInterrupt") {
     std::string addr = test_ipc_addr("hku_intr_test");
-    std::string lock_path = test_lock_path("hku_intr_test");
-
-    HikyuuDataServer server;
-    CHECK(server.start(addr, lock_path, "."));
+    // 以裸 IpcServer 恒返回未就绪复现"服务在但数据未就绪"场景（HikyuuDataServer 已迁插件）
+    IpcServer server(addr);
+    server.setHandler([](Cmd, std::vector<uint8_t>&&, RetCode&) -> std::vector<uint8_t> {
+        Encoder enc;  // 永不就绪
+        enc.putU8(0);
+        enc.putU64(0);
+        enc.putU64(100);
+        return enc.data();
+    });
+    server.start();
 
     IpcConnector conn;
     CHECK(conn.init(addr));

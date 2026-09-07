@@ -19,6 +19,7 @@
 #if HKU_ENABLE_NODE
 
 #include <iostream>
+#include <algorithm>
 #include <unordered_map>
 #include "hikyuu/StockManager.h"
 #include "hikyuu/data_driver/ipc/BaseInfoShmCache.h"
@@ -66,9 +67,24 @@ TEST_CASE("test_WeightShm_real") {
     std::cout << "含权息的证券数: " << weight_stocks.size() << std::endl;
 
     const std::string prefix = "hkuwshm";
-    BaseInfoShmPublisher publisher(prefix);
-    // include_finance=false：本用例只验证权息表，不触发历史财务就绪等待
-    std::string name = publisher.publish(20260904, false);
+    // 服务端 Publisher 已迁至 shmserver 插件；real-test 改用核心库 BaseInfoShmBuilder。
+    // 本用例只验证权息表（旧 publish(…, false) 不含历史财务），故仅构建 WEIGHT 表；
+    // Builder 不排序，Reader 依赖 market_code 升序二分，故显式排序。
+    BaseInfoShmBuildTable weight;
+    weight.name = SHM_BI_TABLE_WEIGHT;
+    weight.value_count = 0;
+    for (const auto& stk : weight_stocks) {
+        BaseInfoShmBuildWeightEntry e;
+        e.market_code = stk.market_code();
+        e.weights = stk.getWeight();
+        weight.weight_entries.push_back(std::move(e));
+    }
+    std::sort(weight.weight_entries.begin(), weight.weight_entries.end(),
+              [](const BaseInfoShmBuildWeightEntry& a, const BaseInfoShmBuildWeightEntry& b) {
+                  return a.market_code < b.market_code;
+              });
+    BaseInfoShmBuilder builder(prefix);
+    std::string name = builder.build(20260904, {weight});
     REQUIRE_FALSE(name.empty());
 
     BaseInfoShmReader reader;
@@ -85,7 +101,8 @@ TEST_CASE("test_WeightShm_real") {
     for (const auto& stk : weight_stocks) {
         const StockWeightList expect = stk.getWeight();
         StockWeightList actual;
-        CHECK(reader.tryGetWeightList(stk.market_code(), Datetime::min(), Null<Datetime>(), actual));
+        CHECK(
+          reader.tryGetWeightList(stk.market_code(), Datetime::min(), Null<Datetime>(), actual));
         if (expect.size() != actual.size()) {
             size_mismatch++;
             continue;

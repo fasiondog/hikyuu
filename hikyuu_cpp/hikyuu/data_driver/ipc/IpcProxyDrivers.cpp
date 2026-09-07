@@ -163,7 +163,7 @@ bool IpcConnector::probeRequest(Cmd cmd, std::vector<uint8_t>& res_body) {
 // 客户端实时更新转发
 ///////////////////////////////////////////////////////////////////////////////
 namespace {
-/// 转发连接注册表：进入客户端模式时注册（StockManager::_negotiateIpcDataServer），
+/// 转发连接注册表：进入客户端模式时注册（StockManager::_negotiateShmServer），
 /// 退出时注销；读写锁保护，转发频度低（行情推送级），锁开销可忽略
 std::shared_mutex g_fwd_mutex;
 IpcConnectorPtr g_fwd_conn;

@@ -268,6 +268,11 @@ def load_hikyuu(**kwargs):
         spot_worker_num (int): 行情接收数据处理线程数，默认为 1
         reload_time (str): 指定数据重新加载时间(时:分)，格式为 HH:MM, 默认为 00:00
         lazy_preload (boolean): 日线以下使用懒加载方式进行预加载，默认为 False
+
+        use_shm_server (boolean): 本进程是否作为客户端接入既有 shm 数据服务，默认为 True。
+            服务端进程应置 False（只作发布者，不探测/不当客户端），可避免启动时的探测等待与降级告警。
+        shm_server_wait_timeout (int): 作为客户端时等待服务端数据就绪的秒数，默认为 600。
+        shm_server_shm_cache (boolean): 客户端是否零拷贝映射服务端共享内存快照，默认为 True。
     """
     if 'config_file' in kwargs:
         config_file = kwargs['config_file']
@@ -298,6 +303,10 @@ def load_hikyuu(**kwargs):
         hku_param["plugindir"] = os.path.join(os.path.dirname(__file__), "plugin")
     hku_param["reload_time"] = ini.get('hikyuu', 'reload_time', fallback="00:00")
     hku_param["lazy_preload"] = ini.getboolean("hikyuu", "lazy_preload", fallback=False)
+    # shm 数据服务配置（[hikyuu] 段，未显式配置时取默认值）；由服务端进程显式关闭 use_shm_server 即不探测、不当客户端
+    hku_param["use_shm_server"] = ini.getboolean("hikyuu", "use_shm_server", fallback=True)
+    hku_param["shm_server_wait_timeout"] = ini.getint("hikyuu", "shm_server_wait_timeout", fallback=600)
+    hku_param["shm_server_shm_cache"] = ini.getboolean("hikyuu", "shm_server_shm_cache", fallback=True)
 
     base_param = Parameter()
     base_info_config = ini.options('baseinfo')
@@ -351,6 +360,12 @@ def load_hikyuu(**kwargs):
         hku_param.set("load_history_finance", kwargs['load_history_finance'])
     if 'load_weight' in kwargs:
         hku_param.set("load_stock_weight", kwargs['load_weight'])
+    if 'use_shm_server' in kwargs:
+        hku_param.set("use_shm_server", kwargs['use_shm_server'])
+    if 'shm_server_wait_timeout' in kwargs:
+        hku_param.set("shm_server_wait_timeout", kwargs['shm_server_wait_timeout'])
+    if 'shm_server_shm_cache' in kwargs:
+        hku_param.set("shm_server_shm_cache", kwargs['shm_server_shm_cache'])
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 

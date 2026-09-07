@@ -29,10 +29,11 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
-; 单机数据服务: 同一台机器上多个进程共用同一数据目录时自动协商, 缺省即启用
-;kdata_server = True
-;kdata_server_shm_cache = True
-;kdata_server_wait_timeout = 600
+; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
+; 以下开关仅作用于客户端; 未启动服务端时, 进程自动以独立模式加载全部数据
+;use_shm_server = True
+;shm_server_shm_cache = True
+;shm_server_wait_timeout = 600
 
 [block]
 type = sqlite3
@@ -107,10 +108,11 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
-; 单机数据服务: 同一台机器上多个进程共用同一数据目录时自动协商, 缺省即启用
-;kdata_server = True
-;kdata_server_shm_cache = True
-;kdata_server_wait_timeout = 600
+; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
+; 以下开关仅作用于客户端; 未启动服务端时, 进程自动以独立模式加载全部数据
+;use_shm_server = True
+;shm_server_shm_cache = True
+;shm_server_wait_timeout = 600
 
 [block]
 type = mysql
@@ -172,10 +174,11 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
-; 单机数据服务: 同一台机器上多个进程共用同一数据目录时自动协商, 缺省即启用
-;kdata_server = True
-;kdata_server_shm_cache = True
-;kdata_server_wait_timeout = 600
+; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
+; 以下开关仅作用于客户端; 未启动服务端时, 进程自动以独立模式加载全部数据
+;use_shm_server = True
+;shm_server_shm_cache = True
+;shm_server_wait_timeout = 600
 
 [block]
 type = clickhouse

@@ -12,7 +12,7 @@
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
 #if HKU_ENABLE_NODE
-#include "data_driver/ipc/KDataShmCache.h"
+#include "data_driver/ipc/ShmMirrorSink.h"
 #endif
 #include "plugin/hkuextra.h"
 #include "KData.h"

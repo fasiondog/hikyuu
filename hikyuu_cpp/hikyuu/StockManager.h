@@ -16,8 +16,8 @@
 #include "hikyuu/utilities/plugin/PluginManager.h"
 #include "hikyuu/data_driver/DataDriverFactory.h"
 #include "hikyuu/utilities/config.h"
+#include "hikyuu/plugin/interface/ShmServerPluginInterface.h"
 #if HKU_ENABLE_NODE
-#include "hikyuu/data_driver/ipc/HikyuuDataServer.h"
 #include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
 #endif
 #include "Block.h"
@@ -65,17 +65,6 @@ public:
 
     /** 主动退出并释放资源 */
     static void quit();
-
-#if HKU_ENABLE_NODE
-    /**
-     * 停止单机数据服务并释放共享内存快照
-     * @details 必须在 nng_fini() 之前调用：服务端的 nng worker 持有在飞的接收操作，
-     * 若留待 nng 全局状态被拆除后再由取消回调触发，会在已销毁的内部结构上重新装载
-     * 接收而崩溃。非泄漏检测构建下 StockManager 不析构，故不能依赖其析构函数停机。
-     * 重复调用安全。
-     */
-    void stopIpcDataServer();
-#endif
 
     /**
      * 是否处于 IPC 客户端模式（数据由服务端提供，本地无预加载缓冲）
@@ -339,10 +328,10 @@ public:
 
     /*
      * 等待后台预加载线程退出（幂等：线程未启动或已结束时立即返回）。仅由程序退出路径调用，
-     * 须在 cancelLoad() 之后、停止 m_load_tg 与销毁 IPC 服务之前调用，以根除预加载线程与退出
-     * 时序对 m_load_tg / m_ipc_server 的并发访问（TOCTOU/UAF，见 review C3）。该线程仅加载数据、
-     * 写共享内存快照与更新原子进度，不涉及任何 nng 操作，且全程检查 m_cancel_load，cancel 后能
-     * 快速退出，故 join 不会成为 Windows 静态析构期的新阻塞点。
+     * 须在 cancelLoad() 之后、停止 m_load_tg 之前调用，以根除预加载线程与退出时序对 m_load_tg
+     * 的并发访问（TOCTOU/UAF，见 review C3）。该线程仅加载数据、派发加载事件，不涉及任何 nng
+     * 操作，且全程检查 m_cancel_load，cancel 后能快速退出，故 join 不会成为 Windows 静态析构期
+     * 的新阻塞点。
      */
     void joinPreloadThread();
 
@@ -367,8 +356,8 @@ private:
     KDataDriverConnectPoolPtr _getKDataDriverPool();
 
 #if HKU_ENABLE_NODE
-    /* 自动协商单机 IPC 数据服务：探测已有服务(客户端)或竞争文件锁(主进程) */
-    void _negotiateIpcDataServer();
+    /* 纯客户端协商 shm 数据服务：仅探测并连接既有服务，失败降级独立模式，绝不自行拉起服务 */
+    void _negotiateShmServer();
 #endif
 
     /* 加载 K线数据至缓存 */
@@ -381,31 +370,15 @@ private:
     /* 并行加载全部 K 线及历史财务，在独立线程中执行 */
     void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
-    /*
-     * 以下接口无条件声明，未启用 HKU_ENABLE_NODE 时为空实现：它们被 _loadAllKDataSerial /
-     * _loadAllKDataParallel 调用，若改为条件声明就会把 #if 重新带回两个加载函数的内部。
-     */
-
-    /* 是否处于 IPC 客户端模式：数据由服务端提供，本地无预加载任务 */
+    /* 是否处于 IPC 客户端模式：数据由服务端提供，本地无预加载任务（无条件声明，非 node 构建恒 false） */
     bool _isIpcClientMode() const;
 
     /*
-     * 主进程端：将权息与历史财务发布为共享内存快照。
-     * 权息在 loadData 中发布（加载后立即就绪），历史财务在预加载线程中
-     * 于其加载完成后再次发布（以新代数重建整段，两项一并收录）。
-     * @param include_finance 是否收录历史财务；权息就绪但财务尚未预加载时须传 false，
-     *        否则会逐证券触发历史财务懒加载（见 BaseInfoShmPublisher::publish）
+     * 派发数据加载事件给已注册的插件回调（无条件声明，由 loadData 与两个加载函数调用）。
+     * 核心库不再感知服务端存在，仅按序通知；无注册回调时零开销。事件到发布动作的映射见设计 §5.2。
+     * @note 回调内禁止调用 register/unregisterLoadEventCallback（会死锁）
      */
-    void _publishBaseInfoShmIfMaster(bool include_finance = true);
-
-    /* 主进程 K 线预加载完成后，将热数据发布为只读共享内存快照 */
-    void _publishShmCacheIfMaster();
-
-    /* 上报预加载进度，供客户端感知服务端就绪程度 */
-    void _reportLoadProgress(uint64_t loaded, uint64_t total);
-
-    /* 通知客户端基础数据已加载完毕，可对外提供服务 */
-    void _notifyIpcBaseDataReady();
+    void _fireLoadEvent(LoadEvent event);
 
     /* 加载节假日信息 */
     void loadAllHolidays();
@@ -479,12 +452,30 @@ private:
     std::string m_i18n_path;
 
 #if HKU_ENABLE_NODE
-    ipc::HikyuuDataServerPtr m_ipc_server;  // 非空时本进程为数据服务主进程
-    ipc::IpcConnectorPtr m_ipc_conn;        // 非空时本进程为数据服务客户端
+    ipc::IpcConnectorPtr m_ipc_conn;  // 非空时本进程为 shm 数据服务客户端
     bool m_ipc_client_mode{false};
 #endif
     KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池
 };
+
+/** 数据加载事件回调类型（插件订阅，见设计 §5.2） */
+using LoadEventCallback = std::function<void(LoadEvent)>;
+
+/**
+ * 注册数据加载事件回调，返回回调 id（插件 start() 时订阅，用于在正确时点发布快照）
+ * @note 回调容器锁堆分配且永不释放，故本函数及其逆过程在静态析构期调用亦安全
+ */
+HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
+
+/** 注销数据加载事件回调（插件 stop() 时调用）；id 不存在时为无操作 */
+HKU_API void unregisterLoadEventCallback(size_t id);
+
+/**
+ * 标记本进程为 shm server 角色：_negotiateShmServer() 据此跳过客户端协商（防自连接，见设计 §5.5）
+ * @details 由门面 startShmServer() 在加载插件之前调用；即便 StockManager 尚未 init 亦可安全置位
+ */
+HKU_API void setShmServerRole(bool role) noexcept;
+HKU_API bool isShmServerRole() noexcept;
 
 inline size_t StockManager::size() const noexcept {
     return m_stockDict.size();

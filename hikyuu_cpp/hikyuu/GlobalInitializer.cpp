@@ -28,6 +28,7 @@
 #include "StockManager.h"
 #include "global/GlobalSpotAgent.h"
 #include "global/schedule/scheduler.h"
+#include "plugin/shmserver.h"
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
 #include "plugin/interface/plugins.h"
@@ -129,9 +130,9 @@ void GlobalInitializer::clean() {
 
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
-    // 等待后台预加载线程退出：须在任何 tg->stop() 与 stopIpcDataServer() 之前，根除预加载线程
-    // 对 m_load_tg / m_ipc_server 的并发访问（C3：TOCTOU/UAF）。该线程不涉及 nng，cancel 后快速
-    // 退出，join 安全（Windows 亦然，与其进程退出路径跳过 nng 拆除的既有决策互不冲突）。
+    // 等待后台预加载线程退出：须在任何 tg->stop() 之前，根除预加载线程对 m_load_tg
+    // 的并发访问（C3：TOCTOU/UAF）。该线程不涉及 nng，cancel 后快速退出，join 安全
+    // （Windows 亦然，与其进程退出路径跳过 nng 拆除的既有决策互不冲突）。
     sm.joinPreloadThread();
 
 #if HKU_OS_OSX
@@ -155,10 +156,10 @@ void GlobalInitializer::clean() {
 #endif
 
 #if HKU_ENABLE_NODE
-    // 显式停止单机数据服务：其 nng worker 持有在飞的接收操作，若留待下方 nng_fini
-    // 拆除全局状态后再由取消回调触发，会在已销毁的内部结构上重新装载接收而崩溃；
-    // 非泄漏检测构建下 StockManager 不析构，也无法依赖其析构函数停机
-    sm.stopIpcDataServer();
+    // 显式停止本进程内拉起的 shm 数据服务（若已 startShmServer）：须早于下方 nng_fini，
+    // 服务端 nng worker 持有在飞接收操作，晚于 nng 全局状态拆除会崩溃。未启动时为
+    // 空操作（门面仅查本进程插件指针，不触发插件加载）。
+    stopShmServer();
 #endif
 
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)

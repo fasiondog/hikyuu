@@ -19,8 +19,6 @@
 #include <vector>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
-#include "hikyuu/Stock.h"
-#include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/Log.h"
 
 namespace bi = boost::interprocess;
@@ -90,126 +88,56 @@ void biWriteSegmentRecord(const std::string& prefix, const std::string& name) {
     }
 }
 
-/** 待发布的一张表 */
-struct BiTableData {
-    std::string name;
-    uint32_t value_count{0};  ///< FINANCE 使用；WEIGHT 为 0
-    size_t record_size{0};    ///< 单条记录的段内步幅
-    std::vector<std::pair<std::string, size_t>> entries;  // (market_code, 记录条数)，按 code 升序
-    std::vector<StockWeightList> weights;                 // WEIGHT 表的记录内容
-    std::vector<std::vector<HistoryFinanceInfo>> finances;  // FINANCE 表的记录内容
-};
-
 }  // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
-// BaseInfoShmPublisher
+// BaseInfoShmBuilder
 ///////////////////////////////////////////////////////////////////////////////
-BaseInfoShmPublisher::BaseInfoShmPublisher(const std::string& shm_name_prefix)
+BaseInfoShmBuilder::BaseInfoShmBuilder(const std::string& shm_name_prefix)
 : m_prefix(shm_name_prefix) {}
 
-BaseInfoShmPublisher::~BaseInfoShmPublisher() {
-    removeAll();
+BaseInfoShmBuilder::~BaseInfoShmBuilder() {
+    reset();
 }
 
-std::string BaseInfoShmPublisher::publish(uint64_t epoch, bool include_finance) {
+std::string BaseInfoShmBuilder::build(uint64_t epoch, const std::vector<BaseInfoShmBuildTable>& tables) {
     // 新段名（创建成功后赋值），异常时仅清理新段，保留旧段继续服务
     std::string created_name;
     try {
-        auto& sm = StockManager::instance();
-        const auto& hikyuu_param = sm.getHikyuuParameter();
-
-        // 首次发布前清理上一个异常退出的 Master 残留段（本进程已持文件锁，是唯一 Master）
+        // 首次构建前清理上一个异常退出残留的段（本对象已持旧段时不清理）
         if (m_current_name.empty()) {
             std::string orphan = biReadSegmentRecord(m_prefix);
             if (!orphan.empty()) {
                 removeSegment(orphan);
             }
         }
-
-        auto stocks = sm.getStockList(nullptr);
-        HKU_IF_RETURN(stocks.empty(), "");
-
-        // 发布端须按 market_code 升序排列 entry，读端据此二分查找；
-        // getStockList 的返回顺序不保证按 market_code 有序，故显式排序。
-        // 权息与历史财务两张表共用同一证券顺序，排序一次即两者皆有序。
-        std::sort(stocks.begin(), stocks.end(),
-                  [](const Stock& a, const Stock& b) { return a.market_code() < b.market_code(); });
-
-        std::vector<BiTableData> tables;
-
-        // 权息：load_stock_weight 为假时主进程根本不加载，客户端也拿不到，故不建表，
-        // 由客户端经 coversTable 判定后走本地驱动（本地若同样关闭则结果一致为空）
-        if (hikyuu_param.tryGet<bool>("load_stock_weight", true)) {
-            BiTableData td;
-            td.name = SHM_BI_TABLE_WEIGHT;
-            td.record_size = sizeof(ShmWeightRecord);
-            for (const Stock& stk : stocks) {
-                const std::string& mc = stk.market_code();
-                if (mc.size() >= sizeof(ShmBiEntry::market_code)) {
-                    continue;  // 定长字段放不下，截断后可能与其它证券重名，跳过
-                }
-                StockWeightList ws = stk.getWeight();
-                if (ws.empty()) {
-                    continue;  // 无权息的证券不占条目，由客户端回退（结果同样为空）
-                }
-                td.entries.emplace_back(mc, ws.size());
-                td.weights.emplace_back(std::move(ws));
-            }
-            if (!td.entries.empty()) {
-                tables.emplace_back(std::move(td));
-            }
-        }
-
-        // 历史财务：load_history_finance 仅控制预加载，懒加载路径无配置门控；
-        // 未预加载时逐证券触发驱动查询代价过高，故同样以配置为门控，未加载则不建表。
-        // 发布点位于预加载线程的历史财务加载之后，此时各证券缓存已就绪；
-        // 但在权息就绪、历史财务尚未预加载的提前发布点（StockManager::init 内），
-        // 必须传 include_finance=false，否则会逐证券触发历史财务懒加载（见 Stock::getHistoryFinance）。
-        if (include_finance && hikyuu_param.tryGet<bool>("load_history_finance", true)) {
-            auto fields = sm.getHistoryFinanceAllFields();
-            if (!fields.empty()) {
-                BiTableData td;
-                td.name = SHM_BI_TABLE_FINANCE;
-                td.value_count = (uint32_t)fields.size();
-                td.record_size = financeRecordStride(td.value_count);
-                for (const Stock& stk : stocks) {
-                    const std::string& mc = stk.market_code();
-                    if (mc.size() >= sizeof(ShmBiEntry::market_code)) {
-                        continue;
-                    }
-                    const auto& fins = stk.getHistoryFinance();
-                    if (fins.empty()) {
-                        continue;
-                    }
-                    td.entries.emplace_back(mc, fins.size());
-                    td.finances.emplace_back(fins);
-                    // 对齐本地驱动 ASC("report_date") 契约：列式驱动的批量导入路径
-                    // (getAllHistoryFinance) 不保证顺序，发布前按 reportDate 升序稳定排序，使快照
-                    // 命中的输出顺序与 SQL 驱动回退一致；同一 reportDate 可能有多条(季报/年报同日)，
-                    // stable_sort 保留其相对次序，与 ASC 仅按 report_date 排序的语义相符
-                    std::stable_sort(td.finances.back().begin(), td.finances.back().end(),
-                                     [](const HistoryFinanceInfo& a, const HistoryFinanceInfo& b) {
-                                         return a.reportDate < b.reportDate;
-                                     });
-                }
-                if (!td.entries.empty()) {
-                    tables.emplace_back(std::move(td));
-                }
-            }
-        }
-
         HKU_IF_RETURN(tables.empty(), "");
+
+        // 逐表确定单条记录步幅与 entry 数（不做长度/排序门控，按入参原样写入）
+        auto record_size_of = [](const BaseInfoShmBuildTable& t) -> size_t {
+            return t.name == SHM_BI_TABLE_FINANCE ? financeRecordStride(t.value_count)
+                                                  : sizeof(ShmWeightRecord);
+        };
+        auto entry_count_of = [](const BaseInfoShmBuildTable& t) -> size_t {
+            return t.name == SHM_BI_TABLE_FINANCE ? t.finance_entries.size()
+                                                  : t.weight_entries.size();
+        };
+        auto record_count_of = [&](const BaseInfoShmBuildTable& t, size_t i) -> size_t {
+            return t.name == SHM_BI_TABLE_FINANCE ? t.finance_entries[i].finances.size()
+                                                  : t.weight_entries[i].weights.size();
+        };
 
         // 计算布局：[header][tables][entries][对齐填充][records]
         size_t header_size = sizeof(ShmBiHeader);
         size_t table_area = tables.size() * sizeof(ShmBiTableInfo);
         size_t entry_count_total = 0;
         size_t records_size = 0;
-        for (const auto& td : tables) {
-            entry_count_total += td.entries.size();
-            for (size_t i = 0; i < td.entries.size(); i++) {
-                records_size += td.entries[i].second * td.record_size;
+        for (const auto& t : tables) {
+            size_t rs = record_size_of(t);
+            size_t ec = entry_count_of(t);
+            entry_count_total += ec;
+            for (size_t i = 0; i < ec; i++) {
+                records_size += record_count_of(t, i) * rs;
             }
         }
         size_t record_base = header_size + table_area + entry_count_total * sizeof(ShmBiEntry);
@@ -217,8 +145,8 @@ std::string BaseInfoShmPublisher::publish(uint64_t epoch, bool include_finance) 
         size_t total_size = record_base + records_size;
 
         std::string name = fmt::format("{}_{:016x}", m_prefix, epoch);
-        // 段名受系统限制（POSIX 一般不超过 31 字符），超长时放弃发布
-        HKU_WARN_IF_RETURN(name.size() > 30, "", "Shm segment name too long ({}), skip publish!",
+        // 段名受系统限制（POSIX 一般不超过 31 字符），超长时放弃构建
+        HKU_WARN_IF_RETURN(name.size() > 30, "", "Shm segment name too long ({}), skip build!",
                            name);
         removeSegment(name);
 
@@ -238,40 +166,44 @@ std::string BaseInfoShmPublisher::publish(uint64_t epoch, bool include_finance) 
         size_t entry_offset = header_size + table_area;
         size_t record_offset = record_base;
         for (size_t t = 0; t < tables.size(); t++) {
-            const BiTableData& td = tables[t];
+            const BaseInfoShmBuildTable& td = tables[t];
+            size_t record_size = record_size_of(td);
+            size_t ec = entry_count_of(td);
             ShmBiTableInfo* info =
               reinterpret_cast<ShmBiTableInfo*>(base + header_size + t * sizeof(ShmBiTableInfo));
             biPutFixedString(info->name, sizeof(info->name), td.name);
             info->entry_offset = entry_offset;
-            info->entry_count = (uint32_t)td.entries.size();
+            info->entry_count = (uint32_t)ec;
             info->value_count = td.value_count;
 
-            for (size_t i = 0; i < td.entries.size(); i++) {
+            for (size_t i = 0; i < ec; i++) {
+                const std::string& mc = (td.name == SHM_BI_TABLE_FINANCE)
+                                          ? td.finance_entries[i].market_code
+                                          : td.weight_entries[i].market_code;
+                size_t nrec = record_count_of(td, i);
                 ShmBiEntry* se = reinterpret_cast<ShmBiEntry*>(base + entry_offset);
-                biPutFixedString(se->market_code, sizeof(se->market_code), td.entries[i].first);
+                biPutFixedString(se->market_code, sizeof(se->market_code), mc);
                 se->record_offset = record_offset;
-                se->record_count = td.entries[i].second;
+                se->record_count = nrec;
                 se->value_count = td.value_count;
                 entry_offset += sizeof(ShmBiEntry);
 
                 uint8_t* rec_base = base + record_offset;
                 if (td.name == SHM_BI_TABLE_WEIGHT) {
-                    const StockWeightList& ws = td.weights[i];
+                    const StockWeightList& ws = td.weight_entries[i].weights;
                     for (size_t r = 0; r < ws.size(); r++) {
-                        writeShmWeightRecord(reinterpret_cast<ShmWeightRecord*>(rec_base) + r,
-                                             ws[r]);
+                        writeShmWeightRecord(reinterpret_cast<ShmWeightRecord*>(rec_base) + r, ws[r]);
                     }
                 } else {
-                    const auto& fins = td.finances[i];
+                    const auto& fins = td.finance_entries[i].finances;
                     for (size_t r = 0; r < fins.size(); r++) {
-                        ShmFinanceRecord* fr = reinterpret_cast<ShmFinanceRecord*>(
-                          rec_base + r * td.record_size);
+                        ShmFinanceRecord* fr =
+                          reinterpret_cast<ShmFinanceRecord*>(rec_base + r * record_size);
                         fr->reportDate = fins[r].reportDate.number();
                         fr->fileDate = fins[r].fileDate.number();
-                        float* vals = reinterpret_cast<float*>(
-                          rec_base + r * td.record_size + sizeof(ShmFinanceRecord));
-                        // 字段数不一致（主进程数据集变更）时按表级字段数截断/补零，
-                        // 避免越界写入；客户端以表级 value_count 读取，二者始终一致
+                        float* vals = reinterpret_cast<float*>(rec_base + r * record_size +
+                                                               sizeof(ShmFinanceRecord));
+                        // 字段数不一致时按表级字段数截断/补零，避免越界写入
                         size_t n = std::min((size_t)td.value_count, fins[r].values.size());
                         for (size_t v = 0; v < n; v++) {
                             vals[v] = fins[r].values[v];
@@ -281,7 +213,7 @@ std::string BaseInfoShmPublisher::publish(uint64_t epoch, bool include_finance) 
                         }
                     }
                 }
-                record_offset += td.entries[i].second * td.record_size;
+                record_offset += nrec * record_size;
             }
         }
 
@@ -293,31 +225,22 @@ std::string BaseInfoShmPublisher::publish(uint64_t epoch, bool include_finance) 
         m_shm.swap(shm);
         m_region.swap(region);
         m_current_name = name;
-
         biWriteSegmentRecord(m_prefix, name);
         if (!old_name.empty() && old_name != name) {
             removeSegment(old_name);
         }
 
-        size_t total_records = 0;
-        for (const auto& td : tables) {
-            for (const auto& e : td.entries) {
-                total_records += e.second;
-            }
-        }
-        HKU_INFO(
-          "Published base info shm cache: {} ({} tables, {} stock entries, {} records, {:.2f} MB)",
-          name, tables.size(), entry_count_total, total_records, total_size / 1048576.0);
+        HKU_INFO("Built base info shm segment: {} ({} tables, {} stock entries)", name,
+                 tables.size(), entry_count_total);
         return name;
-
     } catch (const std::exception& e) {
-        HKU_ERROR("Failed publish base info shm cache: {}", e.what());
+        HKU_ERROR("Failed build base info shm segment: {}", e.what());
         if (!created_name.empty() && created_name != m_current_name) {
             removeSegment(created_name);
         }
         return "";
     } catch (...) {
-        HKU_ERROR("Failed publish base info shm cache: unknown error!");
+        HKU_ERROR("Failed build base info shm segment: unknown error!");
         if (!created_name.empty() && created_name != m_current_name) {
             removeSegment(created_name);
         }
@@ -325,7 +248,7 @@ std::string BaseInfoShmPublisher::publish(uint64_t epoch, bool include_finance) 
     }
 }
 
-void BaseInfoShmPublisher::removeAll() {
+void BaseInfoShmBuilder::reset() {
     bi::mapped_region().swap(m_region);
     bi::shared_memory_object().swap(m_shm);
     if (!m_current_name.empty()) {
@@ -334,7 +257,7 @@ void BaseInfoShmPublisher::removeAll() {
     }
 }
 
-void BaseInfoShmPublisher::removeSegment(const std::string& name) {
+void BaseInfoShmBuilder::removeSegment(const std::string& name) {
     try {
         bi::shared_memory_object::remove(name.c_str());
     } catch (...) {

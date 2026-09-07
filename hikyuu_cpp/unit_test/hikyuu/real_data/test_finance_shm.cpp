@@ -115,8 +115,26 @@ TEST_CASE("test_HistoryFinanceShm_real") {
     std::cout << "含历史财务的证券数: " << finance_stocks.size() << std::endl;
 
     const std::string prefix = "hkufin";
-    BaseInfoShmPublisher publisher(prefix);
-    std::string name = publisher.publish(20260904, true);  // include_finance = true
+    // 服务端 Publisher 已迁至 shmserver 插件；real-test 改用核心库 BaseInfoShmBuilder。
+    // 旧 publish(…, true) 从字段表推导表级 value_count，此处显式以 fields.size() 设置，
+    // 保证段内变长字段步幅与旧发布一致（下方断言 financeValueCount()==fields.size()）。
+    // Builder 不排序，Reader 依赖 market_code 升序二分，故显式排序；只建 FINANCE 表
+    // （本用例不校验 WEIGHT 表）。
+    BaseInfoShmBuildTable finance;
+    finance.name = SHM_BI_TABLE_FINANCE;
+    for (const auto& stk : finance_stocks) {
+        BaseInfoShmBuildFinanceEntry e;
+        e.market_code = stk.market_code();
+        e.finances = stk.getHistoryFinance();
+        finance.finance_entries.push_back(std::move(e));
+    }
+    std::sort(finance.finance_entries.begin(), finance.finance_entries.end(),
+              [](const BaseInfoShmBuildFinanceEntry& a, const BaseInfoShmBuildFinanceEntry& b) {
+                  return a.market_code < b.market_code;
+              });
+    finance.value_count = static_cast<uint32_t>(fields.size());
+    BaseInfoShmBuilder builder(prefix);
+    std::string name = builder.build(20260904, {finance});
     REQUIRE_FALSE(name.empty());
 
     BaseInfoShmReader reader;

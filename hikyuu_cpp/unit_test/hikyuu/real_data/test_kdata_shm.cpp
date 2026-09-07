@@ -19,6 +19,7 @@
 #if HKU_ENABLE_NODE
 
 #include <iostream>
+#include <algorithm>
 #include "hikyuu/StockManager.h"
 #include "hikyuu/data_driver/ipc/KDataShmCache.h"
 
@@ -40,6 +41,30 @@ bool krecordMatch(const KRecord& a, const KRecord& b) {
            a.transAmount == b.transAmount && a.transCount == b.transCount;
 }
 
+// 从 StockManager 已预加载的 DAY 缓冲收集 Builder 输入（替代旧 Publisher.publish 的自动收集）。
+// Builder 不排序，而 Reader 依赖 market_code 升序二分，故显式按 market_code 升序排列。
+std::vector<KDataShmBuildKType> collectDayKtypesForBuild() {
+    KDataShmBuildKType day;
+    day.ktype = KQuery::DAY;
+    auto& sm = StockManager::instance();
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        auto records = stk.getKRecordListFromBuffer(KQuery::DAY);
+        if (records.empty()) {
+            continue;
+        }
+        KDataShmBuildEntry entry;
+        entry.market_code = stk.market_code();
+        entry.records = std::move(records);
+        entry.reserved = 1;  // 与生产发布一致，预留 1 个交易日镜像区
+        day.entries.push_back(std::move(entry));
+    }
+    std::sort(day.entries.begin(), day.entries.end(),
+              [](const KDataShmBuildEntry& a, const KDataShmBuildEntry& b) {
+                  return a.market_code < b.market_code;
+              });
+    return {day};
+}
+
 }  // namespace
 
 /**
@@ -50,10 +75,12 @@ TEST_CASE("test_KDataShm_real") {
     sm.waitDataReady();
 
     const std::string prefix = "hkukshm";
-    KDataShmPublisher publisher(prefix);
-    std::string name = publisher.publish(20260904);
+    // 服务端 Publisher 已迁至 shmserver 插件；real-test 改用核心库 KDataShmBuilder，
+    // 从已预加载的 DAY 缓冲自行收集段输入。
+    KDataShmBuilder builder(prefix);
+    std::string name = builder.build(20260904, collectDayKtypesForBuild());
     if (name.empty()) {
-        MESSAGE("KData 共享内存快照发布失败（可能内存不足），跳过 KData 快照测试");
+        MESSAGE("KData 共享内存快照发布失败（未预加载 day 或内存不足），跳过 KData 快照测试");
         return;
     }
 
@@ -134,7 +161,8 @@ TEST_CASE("test_KDataShm_real") {
             CHECK(krecordMatch(shm_by_date.back(), ipc_by_date.back()));
         }
 
-        // 索引区间：SHM tryGetIndexRangeByDate == Stock::getIndexRange（IPC KDATA_INDEX_RANGE_BY_DATE 源）
+        // 索引区间：SHM tryGetIndexRangeByDate == Stock::getIndexRange（IPC
+        // KDATA_INDEX_RANGE_BY_DATE 源）
         size_t shm_start = 0, shm_end = 0, ipc_start = 0, ipc_end = 0;
         CHECK(reader.tryGetIndexRangeByDate(sample_mc, qbd, shm_start, shm_end));
         CHECK(sample_stk.getIndexRange(qbd, ipc_start, ipc_end));

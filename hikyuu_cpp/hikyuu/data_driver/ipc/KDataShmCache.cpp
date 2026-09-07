@@ -19,8 +19,6 @@
 #include <unordered_map>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
-#include "hikyuu/Stock.h"
-#include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/Log.h"
 
 // 取当前进程 id，用于识别 fork 出的子进程（Windows 无 fork，仅为统一代码路径）
@@ -83,243 +81,48 @@ void writeSegmentRecord(const std::string& prefix, const std::string& name) {
     }
 }
 
-/** 每证券预留容量（1 个交易日）：分钟级按 A 股 240 分钟折算，日线及以上预留 2 条；
- *  预留区写满后停止镜像追加（现有部署每日定时重启，重新发布即恢复） */
-size_t reservedForKType(const KQuery::KType& ktype) {
-    // 分笔不在 g_ktype2min 中（由 g_ktype2sec 承载），getKTypeInMin 会打 WARN 并返回 0；
-    // 行情代理也未为分笔注册处理函数（见 GlobalSpotAgent），不存在实时镜像写入，
-    // 且单日分笔可达数千条，预留整日容量代价过高，故按最小值预留
-    if (ktype == KQuery::TRANS) {
-        return 2;
-    }
-    int32_t kmin = KQuery::getKTypeInMin(ktype);
-    if (kmin > 0 && kmin <= 240) {
-        return (size_t)(240 / kmin) + 1;
-    }
-    return 2;
-}
-
 /** seqlock 读重试上限，超限回退 IPC（仅在镜像写入极频繁时发生） */
 constexpr int SHM_READ_MAX_RETRY = 8;
 
-/**
- * 全局镜像注册表：读锁保护镜像写入，写锁保护发布/注销时的状态替换
- * @note 刻意堆分配且永不释放：注销可能发生在静态析构期（GlobalInitializer::clean 由最后
- * 一个 s_global_initializer 析构经 __cxa_finalize 触发），彼时本翻译单元的静态对象已被销毁，
- * 对已销毁的锁加锁会得到 EINVAL 并抛出 system_error；而调用方位于析构函数（隐式 noexcept）
- * 中，异常将直接 terminate。此处一把锁的泄露相对进程退出无实质影响。
- */
-std::shared_mutex& g_mirror_mutex = *(new std::shared_mutex);
-KDataShmPublisher* g_mirror_pub{nullptr};
-std::atomic<bool> g_mirror_active{false};
-
-/**
- * 发布快照的进程 id
- * @details Linux 默认 fork 的子进程会继承段映射与 g_mirror_active，若子进程也触发
- * Stock::realtimeUpdate，同一 entry 将出现第二个写者，破坏 seqlock 的单写者前提
- * 并导致读端撕裂。子进程 pid 与发布时不同，据此停用其镜像写入。
- */
-std::atomic<int64_t> g_mirror_pid{0};
-
-/**
- * 发布窗口暂存（staging）：publish 构建新段期间（快照拷贝 → 镜像注册）到达的实时更新
- * @details 行情接收（SpotAgent）与 shm 发布相互独立，若不暂存，落在该窗口内的更新
- * 既进不了快照（拷贝已完成）也进不了镜像（尚未注册），将永久丢失，破坏
- * “段尾与缓冲尾同步演进”的不变量（客户端缺中间分钟记录、增量量额错乱）。
- * 暂存于新段注册后按到达序重放，镜像合并规则幂等，与快照已收录的重叠记录收敛一致。
- * 暂存期间若存在活跃旧段（重发布场景），更新同步双写旧段，旧段读者不受发布过程影响。
- * 受 g_mirror_mutex 保护；g_mirror_staging 仅由声称（CAS）成功的发布器在成功路径关闭，
- * 失败路径保持开启并保留暂存，由下一次发布一并重放，避免失败窗口内的更新丢失。
- */
-std::atomic<bool> g_mirror_staging{false};
-struct StagedUpdate {
-    std::string market_code;
-    KQuery::KType ktype;
-    KRecord record;
-};
-std::vector<StagedUpdate> g_mirror_pending;
-
-/** 暂存条数上限：防御发布长期失败/反复失败时无界增长，超限后丢弃并告警一次 */
-constexpr size_t SHM_STAGING_MAX_RECORDS = 2000000;
-bool g_staging_overflow_warned{false};  // 受 g_mirror_mutex 保护
-
 }  // namespace
 
-void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
-                             const KRecord& record) {
-    // 快速路径：非发布窗口（未暂存）且未注册发布器（客户端进程/未启用缓存/尚未发布）
-    // 时直接返回
-    bool staging = g_mirror_staging.load(std::memory_order_acquire);
-    if (!staging && !g_mirror_active.load(std::memory_order_acquire)) {
-        return;
-    }
-    // fork 出的子进程不是发布段的那个进程，写入会成为双写者；
-    // 此处仅发布进程会执行到，getpid 的 syscall 开销相对行情更新频率可忽略
-    if (g_mirror_pid.load(std::memory_order_relaxed) != (int64_t)HKU_SHM_GETPID()) {
-        return;
-    }
-    if (staging) {
-        // 发布窗口：暂存待新段注册后重放；若存在活跃旧段则同步双写，
-        // 使已映射旧段的读者在发布期间仍能读到准实时数据
-        std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
-        if (!g_mirror_staging.load(std::memory_order_relaxed)) {
-            // 极端竞态：加锁期间发布已完成并转入重放，此后按常态镜像路径处理
-        } else if (g_mirror_pending.size() < SHM_STAGING_MAX_RECORDS) {
-            g_mirror_pending.push_back(StagedUpdate{market_code, ktype, record});
-        } else if (!g_staging_overflow_warned) {
-            g_staging_overflow_warned = true;
-            HKU_WARN("Shm cache staging overflow (publish window too long?), drop updates!");
-        }
-        if (g_mirror_pub) {
-            g_mirror_pub->mirrorUpdate(market_code, ktype, record);
-        }
-        return;
-    }
-    std::shared_lock<std::shared_mutex> lock(g_mirror_mutex);
-    if (g_mirror_pub) {
-        g_mirror_pub->mirrorUpdate(market_code, ktype, record);
-    }
-}
-
-void shmTestingBeginStaging() {
-    bool expected = false;
-    if (g_mirror_staging.compare_exchange_strong(expected, true)) {
-        std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
-        g_mirror_pid.store((int64_t)HKU_SHM_GETPID(), std::memory_order_relaxed);
-    }
-}
-
-void shmTestingEndStagingAndReplay() {
-    std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
-    if (g_mirror_pub) {
-        for (const auto& upd : g_mirror_pending) {
-            g_mirror_pub->mirrorUpdate(upd.market_code, upd.ktype, upd.record);
-        }
-    }
-    g_mirror_pending.clear();
-    g_staging_overflow_warned = false;
-    g_mirror_staging.store(false, std::memory_order_release);
-}
-
 //----------------------------------------------------------------------------
-// KDataShmPublisher
+// KDataShmBuilder
 //----------------------------------------------------------------------------
-KDataShmPublisher::KDataShmPublisher(const std::string& shm_name_prefix)
-: m_prefix(shm_name_prefix) {}
+KDataShmBuilder::KDataShmBuilder(const std::string& shm_name_prefix) : m_prefix(shm_name_prefix) {}
 
-KDataShmPublisher::~KDataShmPublisher() {
-    removeAll();
+KDataShmBuilder::~KDataShmBuilder() {
+    reset();
 }
 
-std::string KDataShmPublisher::publish(uint64_t epoch) {
+std::string KDataShmBuilder::build(uint64_t epoch, const std::vector<KDataShmBuildKType>& ktypes) {
     // 新段名（创建成功后赋值），异常时仅清理新段，保留旧段继续服务
     std::string created_name;
-    // 声称发布窗口暂存：从快照拷贝前开启，至新段注册并重放完毕后关闭（见成功路径）；
-    // CAS 失败仅发生在另一发布器正在构建时（并发重发布），此时不重复声称，
-    // 由声称方统一暂存/重放，本发布器按无暂存路径执行
-    bool own_staging = false;
-    g_mirror_staging.compare_exchange_strong(own_staging, true);
-    if (own_staging) {
-        std::unique_lock<std::shared_mutex> lock(g_mirror_mutex);
-        // 与镜像写入同一 pid 门控：首次发布前 g_mirror_pid 尚未设置，此处提前记录，
-        // 使发布窗口内的镜像调用能通过 pid 校验进入暂存分支
-        g_mirror_pid.store((int64_t)HKU_SHM_GETPID(), std::memory_order_relaxed);
-    }
     try {
-        auto& sm = StockManager::instance();
-        const auto& preload_param = sm.getPreloadParameter();
-
-        // 首次发布前清理上一个异常退出的 Master 残留段（仅此时执行：
-        // 本进程已持文件锁，是唯一 Master；已映射旧段的读者不受 remove 影响）
+        // 首次构建前清理上一个异常退出残留的段（本对象已持旧段时不清理）
         if (m_current_name.empty()) {
             std::string orphan = readSegmentRecord(m_prefix);
             if (!orphan.empty()) {
                 removeSegment(orphan);
             }
         }
-
-        // 收集已预加载的 K 线类型（超长名无法存入定长字段，防御性跳过）
-        std::vector<KQuery::KType> ktypes;
-        for (const auto& ktype : KQuery::getBaseKTypeList()) {
-            if (ktype.size() >= sizeof(ShmKTypeInfo::ktype)) {
-                HKU_WARN("Ktype {} too long for shm cache, skip publish it!", ktype);
-                continue;
-            }
-            std::string low_ktype = ktype;
-            to_lower(low_ktype);
-            if (preload_param.tryGet<bool>(low_ktype, false)) {
-                ktypes.push_back(ktype);
-            }
-        }
         HKU_IF_RETURN(ktypes.empty(), "");
 
-        auto stocks = sm.getStockList(nullptr);
-        HKU_IF_RETURN(stocks.empty(), "");
-
-        struct KTypeData {
-            KQuery::KType ktype;
-            std::vector<std::pair<std::string, KRecordList>> entries;  // 按 market_code 升序
-        };
-        std::vector<KTypeData> ktype_datas;
-        ktype_datas.reserve(ktypes.size());
-
-        size_t total_records = 0;
-        size_t total_capacity = 0;
-        bool warned_long_code = false;
-        for (const auto& ktype : ktypes) {
-            // 预加载数量上限（缓冲条数达到上限时可能发生了截断）
-            std::string preload_key = ktype;
-            to_lower(preload_key);
-            preload_key += "_max";
-            int64_t max_num =
-              preload_param.tryGet<int64_t>(preload_key, std::numeric_limits<int64_t>::max());
-            size_t reserved = reservedForKType(ktype);
-
-            KTypeData kd;
-            kd.ktype = ktype;
-            for (const Stock& stk : stocks) {
-                // 超长 market_code 无法存入定长字段，截断后可能与其他证券重名，
-                // 进而使读端的升序校验失败、整段被拒映射（所有客户端退化为 IPC），故跳过
-                const std::string& mc = stk.market_code();
-                if (mc.size() >= sizeof(ShmStockEntry::market_code)) {
-                    if (!warned_long_code) {
-                        warned_long_code = true;
-                        HKU_WARN("Stock {} market_code too long for shm cache, skip publish it!",
-                                 mc);
-                    }
-                    continue;
-                }
-                // 空缓冲表示该证券未预加载此类型；条数达到上限则可能发生了截断。
-                // 此类证券不发布，由客户端回退 IPC 查询；服务端同样从缓冲应答，
-                // 两条路径的结果均与主进程保持一致。
-                // 副本在 Stock 缓冲锁内一次性拷出，是自洽快照，无需再与缓冲条数比对
-                KRecordList ks = stk.getKRecordListFromBuffer(ktype);
-                if (ks.empty() || (int64_t)ks.size() >= max_num) {
-                    continue;
-                }
-                total_records += ks.size();
-                total_capacity += ks.size() + reserved;
-                kd.entries.emplace_back(mc, std::move(ks));
+        // 统计记录与容量（预留区由入参逐 entry 给定，Builder 不推导）
+        size_t total_records = 0, total_capacity = 0, entries_total = 0;
+        for (const auto& kt : ktypes) {
+            entries_total += kt.entries.size();
+            for (const auto& e : kt.entries) {
+                total_records += e.records.size();
+                total_capacity += e.records.size() + e.reserved;
             }
-            if (!kd.entries.empty()) {
-                std::sort(kd.entries.begin(), kd.entries.end(),
-                          [](const auto& a, const auto& b) { return a.first < b.first; });
-            }
-            // entry 为空的类型同样记入 ktype 表：表中列出的是主进程“已预加载”的全部类型。
-            // 主进程仅为已预加载的类型注册行情处理函数（见 GlobalSpotAgent），客户端据此
-            // 判定某类型在主进程侧是否存在实时更新链路，从而决定是否直接走本地驱动。
-            ktype_datas.emplace_back(std::move(kd));
         }
         HKU_IF_RETURN(total_records == 0, "");
 
-        // 计算布局：[header][ktypes][entries][对齐填充][records]，全部相对段首字节偏移；
-        // 记录区按 8 字节对齐（KRecord 含 double），每证券含 1 交易日预留区
+        // 计算布局：[header][ktypes][entries][对齐填充][records]，与 KDataShmReader 校验规则一致；
+        // 记录区按 8 字节对齐（KRecord 含 double），每证券含尾部预留区
         size_t header_size = sizeof(ShmCacheHeader);
-        size_t ktype_table_size = ktype_datas.size() * sizeof(ShmKTypeInfo);
-        size_t entries_total = 0;
-        for (const auto& kd : ktype_datas) {
-            entries_total += kd.entries.size();
-        }
+        size_t ktype_table_size = ktypes.size() * sizeof(ShmKTypeInfo);
         size_t entries_size = entries_total * sizeof(ShmStockEntry);
         size_t record_base = header_size + ktype_table_size + entries_size;
         record_base = (record_base + 7) & ~(size_t)7;
@@ -327,8 +130,8 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
         size_t total_size = record_base + records_size;
 
         std::string name = fmt::format("{}_{:016x}", m_prefix, epoch);
-        // 段名受系统限制（POSIX 一般不超过 31 字符），超长时放弃发布
-        HKU_WARN_IF_RETURN(name.size() > 30, "", "Shm segment name too long ({}), skip publish!",
+        // 段名受系统限制（POSIX 一般不超过 31 字符），超长时放弃构建
+        HKU_WARN_IF_RETURN(name.size() > 30, "", "Shm segment name too long ({}), skip build!",
                            name);
         removeSegment(name);
 
@@ -344,102 +147,68 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
         header->version = SHM_CACHE_VERSION;
         header->epoch = epoch;
         header->data_size = total_size;
-        header->ktype_count = (uint32_t)ktype_datas.size();
+        header->ktype_count = (uint32_t)ktypes.size();
 
+        // 不做 market_code 长度 / entry 升序门控：按入参原样写入，供单测构造边界 / 坏段；
+        // entry 为空的 ktype 同样记入表（保持 ktype 覆盖语义，与 Reader coversKType 对应）
         size_t entry_offset = header_size + ktype_table_size;
         size_t record_offset = record_base;
-        std::unordered_map<std::string, MirrorEntry> new_index;
-        new_index.reserve(entries_total);
-        for (size_t i = 0; i < ktype_datas.size(); i++) {
+        std::unordered_map<std::string, MirrorTarget> new_targets;
+        new_targets.reserve(entries_total);
+        for (size_t i = 0; i < ktypes.size(); i++) {
             ShmKTypeInfo* info =
               reinterpret_cast<ShmKTypeInfo*>(base + header_size + i * sizeof(ShmKTypeInfo));
-            putFixedString(info->ktype, sizeof(info->ktype), ktype_datas[i].ktype);
+            putFixedString(info->ktype, sizeof(info->ktype), ktypes[i].ktype);
             info->entry_offset = entry_offset;
-            info->entry_count = (uint32_t)ktype_datas[i].entries.size();
-            size_t reserved = reservedForKType(ktype_datas[i].ktype);
+            info->entry_count = (uint32_t)ktypes[i].entries.size();
 
-            for (const auto& entry : ktype_datas[i].entries) {
+            std::string up_ktype(ktypes[i].ktype);
+            to_upper(up_ktype);
+            for (const auto& e : ktypes[i].entries) {
                 ShmStockEntry* se = reinterpret_cast<ShmStockEntry*>(base + entry_offset);
-                putFixedString(se->market_code, sizeof(se->market_code), entry.first);
+                putFixedString(se->market_code, sizeof(se->market_code), e.market_code);
                 se->record_offset = record_offset;
-                se->record_capacity = entry.second.size() + reserved;
-                se->record_count.store(entry.second.size(), std::memory_order_relaxed);
+                se->record_capacity = e.records.size() + e.reserved;
+                se->record_count.store(e.records.size(), std::memory_order_relaxed);
                 se->seq.store(0, std::memory_order_relaxed);
                 entry_offset += sizeof(ShmStockEntry);
 
                 KRecord* rec = reinterpret_cast<KRecord*>(base + record_offset);
                 // KRecord 为标准布局、无虚表与资源所有权（见头文件 static_assert），可安全按字节 memcpy；
-                // 因含 Datetime（用户声明拷贝构造/赋值致其非平凡可拷贝），显式转 void* 消除
-                // -Wnontrivial-memcall——原始字节拷贝为共享内存刻意设计
-                std::memcpy(static_cast<void*>(rec), entry.second.data(),
-                            entry.second.size() * sizeof(KRecord));
-                // 预留区已由整段 memset 清零，镜像追加时写入
+                // 因含 Datetime（非平凡可拷贝），显式转 void* 消除 -Wnontrivial-memcall
+                std::memcpy(static_cast<void*>(rec), e.records.data(),
+                            e.records.size() * sizeof(KRecord));
 
-                MirrorEntry me;
-                me.entry = se;
-                me.records = rec;
-                new_index.emplace(entry.first + "|" + ktype_datas[i].ktype, me);
-
+                new_targets.emplace(e.market_code + "|" + up_ktype, MirrorTarget{se, rec});
                 record_offset += se->record_capacity * sizeof(KRecord);
             }
         }
 
-        // 数据全部写入后再落 magic，读端以 magic 校验段完整性；
-        // release store 与读端 acquire load 配对才能跨进程建立 happens-before
-        // （普通写 + atomic_thread_fence 无法保证），故 magic 为原子量；
-        // 新段就绪后才替换镜像状态并删除旧段，保证已映射旧段的读者不受影响
+        // 数据全部写入后再落 magic，读端以 magic 校验段完整性（release store 与读端 acquire 配对）
         header->magic.store(SHM_CACHE_MAGIC, std::memory_order_release);
         region.flush();
 
+        // 接管：解除旧段映射并删除旧段（旧段读者不受影响）
         std::string old_name = m_current_name;
-        {
-            // 持注册表写锁原子替换镜像状态：进行中的镜像写入（读锁/暂存写锁）完成后
-            // 才会切换，旧段映射在替换后才解除，镜像写入不会触及已解除的映射
-            std::unique_lock<std::shared_mutex> reg_lock(g_mirror_mutex);
-            m_shm.swap(shm);
-            m_region.swap(region);
-            m_mirror_index.swap(new_index);
-            m_current_name = name;
-            g_mirror_pub = this;
-            g_mirror_pid.store((int64_t)HKU_SHM_GETPID(), std::memory_order_relaxed);
-            g_mirror_active.store(true, std::memory_order_release);
-            if (own_staging) {
-                // 新段就绪后按到达序重放发布窗口内暂存的实时更新：
-                // 镜像合并规则幂等，快照已收录的重叠记录重放后收敛一致；
-                // 重放与关闭暂存在同一写锁内完成，期间新到的更新阻塞在
-                // shmMirrorRealtimeUpdate 的锁上，释放后直接镜像至新段，无缝衔接
-                for (const auto& upd : g_mirror_pending) {
-                    mirrorUpdate(upd.market_code, upd.ktype, upd.record);
-                }
-                HKU_INFO_IF(!g_mirror_pending.empty(),
-                            "Replayed {} staged realtime updates into shm cache {}",
-                            g_mirror_pending.size(), name);
-                g_mirror_pending.clear();
-                g_mirror_pending.shrink_to_fit();
-                g_staging_overflow_warned = false;
-                g_mirror_staging.store(false, std::memory_order_release);
-            }
-        }
+        m_shm.swap(shm);
+        m_region.swap(region);
+        m_targets.swap(new_targets);
+        m_current_name = name;
         writeSegmentRecord(m_prefix, name);
         if (!old_name.empty() && old_name != name) {
             removeSegment(old_name);
         }
-        HKU_INFO(
-          "Published kdata shm cache: {} ({} preloaded ktypes, {} stocks entries, {} records, "
-          "capacity {} records, {:.2f} MB)",
-          name, ktype_datas.size(), entries_total, total_records, total_capacity,
-          total_size / 1048576.0);
+        HKU_INFO("Built kdata shm segment: {} ({} ktypes, {} entries, {} records, capacity {})",
+                 name, ktypes.size(), entries_total, total_records, total_capacity);
         return name;
     } catch (const std::exception& e) {
-        HKU_ERROR("Failed publish kdata shm cache: {}", e.what());
+        HKU_ERROR("Failed build kdata shm segment: {}", e.what());
         if (!created_name.empty() && created_name != m_current_name) {
             removeSegment(created_name);
         }
-        // 发布失败：保持暂存开启并保留已暂存更新（本次快照已作废，这些更新只能
-        // 由下一次成功发布重放），避免失败窗口内的实时更新丢失
         return "";
     } catch (...) {
-        HKU_ERROR("Failed publish kdata shm cache: unknown error!");
+        HKU_ERROR("Failed build kdata shm segment: unknown error!");
         if (!created_name.empty() && created_name != m_current_name) {
             removeSegment(created_name);
         }
@@ -447,92 +216,33 @@ std::string KDataShmPublisher::publish(uint64_t epoch) {
     }
 }
 
-void KDataShmPublisher::removeAll() {
-    {
-        // 持注册表写锁注销：等待进行中的镜像写入（读锁）完成后才解除映射，
-        // 后续镜像调用经快速路径/空指针判断直接返回
-        std::unique_lock<std::shared_mutex> reg_lock(g_mirror_mutex);
-        if (g_mirror_pub == this) {
-            g_mirror_pub = nullptr;
-            g_mirror_pid.store(0, std::memory_order_relaxed);
-            g_mirror_active.store(false, std::memory_order_release);
-        }
-        m_mirror_index.clear();
-        bi::mapped_region().swap(m_region);
-        bi::shared_memory_object().swap(m_shm);
+bool KDataShmBuilder::getMirrorTarget(const std::string& market_code, const KQuery::KType& ktype,
+                                      ShmStockEntry*& entry, KRecord*& records) {
+    if (m_targets.empty()) {
+        return false;
     }
+    std::string up_ktype(ktype);
+    to_upper(up_ktype);
+    auto it = m_targets.find(market_code + "|" + up_ktype);
+    if (it == m_targets.end()) {
+        return false;
+    }
+    entry = it->second.entry;
+    records = it->second.records;
+    return true;
+}
+
+void KDataShmBuilder::reset() {
+    bi::mapped_region().swap(m_region);
+    bi::shared_memory_object().swap(m_shm);
+    m_targets.clear();
     if (!m_current_name.empty()) {
         removeSegment(m_current_name);
         m_current_name.clear();
     }
 }
 
-void KDataShmPublisher::mirrorUpdate(const std::string& market_code, const KQuery::KType& ktype,
-                                     const KRecord& record) {
-    if (m_mirror_index.empty() || record.datetime.isNull()) {
-        return;
-    }
-    std::string up_ktype(ktype);
-    to_upper(up_ktype);
-    auto it = m_mirror_index.find(market_code + "|" + up_ktype);
-    if (it == m_mirror_index.end()) {
-        return;
-    }
-    MirrorEntry& me = it->second;
-
-    // 写者串行由 Stock::realtimeUpdate 的证券×ktype 写锁保证，
-    // 段尾与缓冲尾同步演进，镜像规则与 realtimeUpdate 一致：
-    // 与末根 datetime 相等则更新高/低/收/量额，晚于末根则追加，过期则忽略
-    uint64_t count = me.entry->record_count.load(std::memory_order_relaxed);
-    if (count == 0) {
-        return;  // 防御：发布条目必含记录
-    }
-    KRecord* recs = me.records;
-    // 按完整 Datetime 比较，与 Stock::realtimeUpdate 的 tmp.datetime ==/< record.datetime 同源一致。
-    // 本函数仅由 realtimeUpdate 驱动，后者只合成分钟及以上 K 线（record.datetime 无亚分钟部分），故与
-    // number() 等价；但记录区已改存原始 KRecord(Datetime)，直接比较是自然形式，省一次无谓截断。
-    // 注：分笔（TRANS，秒级）仅由历史数据经 publish 全量 memcpy 入段（秒精度保留），不参与实时合成、
-    // 不经此路径；其按日期读取的秒级正确性由 dateRange 的完整 Datetime 二分比较保证。
-    const Datetime& dt = record.datetime;
-    const Datetime& last_dt = recs[count - 1].datetime;
-    if (dt < last_dt) {
-        return;
-    }
-    bool append = dt > last_dt;
-    if (append && count >= me.entry->record_capacity) {
-        // 1 交易日预留区写满：停止镜像追加（末根更新仍生效），
-        // 客户端数据冻结在写满时刻，每日定时重启重新发布后恢复
-        if (!me.overflow_warned) {
-            me.overflow_warned = true;
-            HKU_WARN("Shm cache reserved area is full for {} {}, stop mirror append!", market_code,
-                     up_ktype);
-        }
-        return;
-    }
-
-    // seqlock 写入段：奇数 seq 标记写入中，完成后 release 落偶数 seq
-    uint32_t seq = me.entry->seq.load(std::memory_order_relaxed);
-    me.entry->seq.store(seq + 1, std::memory_order_relaxed);
-    std::atomic_thread_fence(std::memory_order_release);
-    if (append) {
-        recs[count] = record;
-        me.entry->record_count.store(count + 1, std::memory_order_relaxed);
-    } else {
-        KRecord& tmp = recs[count - 1];
-        if (tmp.highPrice < record.highPrice) {
-            tmp.highPrice = record.highPrice;
-        }
-        if (tmp.lowPrice > record.lowPrice) {
-            tmp.lowPrice = record.lowPrice;
-        }
-        tmp.closePrice = record.closePrice;
-        tmp.transAmount = record.transAmount;
-        tmp.transCount = record.transCount;
-    }
-    me.entry->seq.store(seq + 2, std::memory_order_release);
-}
-
-void KDataShmPublisher::removeSegment(const std::string& name) {
+void KDataShmBuilder::removeSegment(const std::string& name) {
     try {
         bi::shared_memory_object::remove(name.c_str());
     } catch (...) {

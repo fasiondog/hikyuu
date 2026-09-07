@@ -100,79 +100,77 @@ static_assert(sizeof(ShmCacheHeader) == 32 && sizeof(std::atomic<uint32_t>) == s
                 alignof(std::atomic<uint32_t>) == alignof(uint32_t),
               "ShmCacheHeader layout must stay compatible with plain uint32_t magic!");
 
-class KDataShmPublisher;
-typedef std::shared_ptr<KDataShmPublisher> KDataShmPublisherPtr;
+/** KDataShmBuilder 输入：单证券在某 ktype 下的待写入记录段（原始，不做长度/排序校验） */
+struct KDataShmBuildEntry {
+    std::string market_code;
+    KRecordList records;  ///< 已发布历史区（不含预留区）
+    size_t reserved{0};   ///< 尾部预留区条数（镜像追加容量）
+};
+
+/** KDataShmBuilder 输入：一个 ktype 及其 entry 列表（entry 顺序即写入顺序，本类不排序） */
+struct KDataShmBuildKType {
+    KQuery::KType ktype;
+    std::vector<KDataShmBuildEntry> entries;
+};
+
+class KDataShmBuilder;
+typedef std::shared_ptr<KDataShmBuilder> KDataShmBuilderPtr;
 
 /**
- * 主进程端：将预加载的 K 线缓冲发布为共享内存缓存，并镜像后续实时更新
- * @details 快照包含 [preload] 中开启且已缓冲的基础 K 线类型（分时/分笔亦在基础类型之列，
- * 配置开启时同样发布，但 Stock::getTimeLineList / getTransList 不读该缓冲）。
- * 每证券按 ktype 预留 1 个交易日容量，Stock::realtimeUpdate 时同步镜像写入，
- * 客户端读到准实时数据；预留区写满后停止镜像（每日定时重启恢复）。
+ * 段写入原语：把「ktype 表 + entry 列表 + 记录」写成一个已创建并填充的共享内存段
+ * @details 纯数据 → 字节：不依赖 StockManager、不做 epoch 编排、不加 market_code 长度与
+ * entry 排序门控（以便单测构造边界 / 坏段）；段随本对象存活，析构或 reset 时删除。
+ * 服务端编排（收集数据 / 镜像索引 / staging / 生命周期）在插件侧 Publisher，其调用本类落字节。
+ * 段布局与 KDataShmReader 校验规则严格对应，是段布局的单一实现（见设计 §5.3）。
  * @ingroup DataDriver
  */
-class HKU_API KDataShmPublisher {
+class HKU_API KDataShmBuilder {
 public:
     /**
      * @param shm_name_prefix 段名前缀（受系统共享内存名长度限制，建议不超过 11 字符）
      */
-    explicit KDataShmPublisher(const std::string& shm_name_prefix);
-    ~KDataShmPublisher();
+    explicit KDataShmBuilder(const std::string& shm_name_prefix);
+    ~KDataShmBuilder();
 
-    KDataShmPublisher(const KDataShmPublisher&) = delete;
-    KDataShmPublisher& operator=(const KDataShmPublisher&) = delete;
+    KDataShmBuilder(const KDataShmBuilder&) = delete;
+    KDataShmBuilder& operator=(const KDataShmBuilder&) = delete;
 
     /**
-     * 构建并发布快照（同步执行，耗时约与数据量成正比），并注册为镜像写入目标
-     * @param epoch 代数
-     * @return 成功返回段名，失败返回空
+     * 创建并填充段；成功返回段名，失败返回空
+     * @note 段名 = {prefix}_{epoch:016x}；不校验 market_code 长度 / entry 升序，按给定原样写入
      */
-    std::string publish(uint64_t epoch);
+    std::string build(uint64_t epoch, const std::vector<KDataShmBuildKType>& ktypes);
 
-    /** 注销镜像并删除当前持有的段 */
-    void removeAll();
+    /**
+     * build 成功后：定位段内镜像写入目标（entry 与记录基址），供插件 Publisher 复用
+     * @return 命中返回 true；未 build / 未收录该 market_code×ktype 返回 false
+     */
+    bool getMirrorTarget(const std::string& market_code, const KQuery::KType& ktype,
+                         ShmStockEntry*& entry, KRecord*& records);
 
-    /** 删除指定名称的段（容忍失败） */
+    /** 解除映射并删除当前段（容忍失败） */
+    void reset();
+
+    /** 删除指定名称的段（静态，容忍失败） */
     static void removeSegment(const std::string& name);
 
-    /**
-     * 镜像实时 K 线更新到共享内存段（未覆盖的证券/类型静默跳过）
-     * @note 必须由全局镜像注册表持读锁时调用；写者需保证同一
-     * 证券×ktype 串行（Stock::realtimeUpdate 写锁已保证）
-     */
-    void mirrorUpdate(const std::string& market_code, const KQuery::KType& ktype,
-                      const KRecord& record);
+    const std::string& name() const noexcept {
+        return m_current_name;
+    }
 
 private:
-    /** 镜像写入索引项（指向已发布段内位置，随 publish/removeAll 整体替换） */
-    struct MirrorEntry {
-        ShmStockEntry* entry{nullptr};
-        KRecord* records{nullptr};
-        bool overflow_warned{false};
+    struct MirrorTarget {
+        ShmStockEntry* entry;
+        KRecord* records;
     };
 
     std::string m_prefix;
     std::string m_current_name;
-
-    // 以下镜像状态由全局注册表读写锁保护（publish 成功/removeAll 时持写锁替换）；
-    // 注意：头文件中必须用全限定名，unity build 下 bi 别名可能与其它翻译单元冲突
+    // 头文件中必须用全限定名，unity build 下 bi 别名可能与其它翻译单元冲突
     boost::interprocess::shared_memory_object m_shm;
     boost::interprocess::mapped_region m_region;
-    std::unordered_map<std::string, MirrorEntry> m_mirror_index;  // key: market_code|KTYPE
+    std::unordered_map<std::string, MirrorTarget> m_targets;  // key: market_code|KTYPE(大写)
 };
-
-/**
- * 全局镜像入口：Stock::realtimeUpdate 调用，将实时更新镜像到共享内存段
- * @note 未注册发布器（客户端进程/未启用缓存）时仅一次原子判断，开销可忽略
- */
-HKU_API void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
-                                      const KRecord& record);
-
-///@{ 仅供单元测试：模拟发布窗口（publish 构建新段期间）的暂存开启/关闭重放，
-/// 使窗口内实时更新的暂存与重放路径可被确定性验证；生产代码不得调用
-HKU_API void shmTestingBeginStaging();
-HKU_API void shmTestingEndStagingAndReplay();
-///@}
 
 class KDataShmReader;
 typedef std::shared_ptr<KDataShmReader> KDataShmReaderPtr;

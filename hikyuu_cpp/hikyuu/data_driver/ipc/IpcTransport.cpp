@@ -102,12 +102,12 @@ void makeIpcServerPaths(const std::string& datadir, std::string& addr, std::stri
 #if defined(_WIN32)
     // Windows: nng 将 ipc:// 映射为命名管道 \\.\pipe\<name>，管道名不能含盘符或反斜杠，
     // 否则 CreateNamedPipeA 必然失败。隔离性已由 datadir 哈希保证，故仅用不含目录的固定名。
-    addr = fmt::format("ipc://hikyuu_kdata_server_{:x}", h);
+    addr = fmt::format("ipc://hikyuu_shm_server_{:x}", h);
 #else
     // POSIX: ipc:// 为真实文件系统路径（Unix domain socket），须落在可写的临时目录下
-    addr = fmt::format("ipc://{}/hikyuu_kdata_server_{:x}.ipc", ipc_dir, h);
+    addr = fmt::format("ipc://{}/hikyuu_shm_server_{:x}.ipc", ipc_dir, h);
 #endif
-    lock_path = fmt::format("{}/hikyuu_kdata_server_{:x}.lock", ipc_dir, h);
+    lock_path = fmt::format("{}/hikyuu_shm_server_{:x}.lock", ipc_dir, h);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
