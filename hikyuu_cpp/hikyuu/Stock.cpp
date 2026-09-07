@@ -12,6 +12,7 @@
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
 #if HKU_ENABLE_NODE
+#include "data_driver/ipc/ShmClientHook.h"
 #include "data_driver/ipc/ShmMirrorSink.h"
 #endif
 #include "plugin/hkuextra.h"
@@ -1179,7 +1180,7 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
         HKU_IF_RETURN(record.datetime.isNull() ||
                         StockManager::instance().isHoliday(record.datetime),
                       void());
-        ipc::ipcForwardRealtimeUpdate(market_code(), inktype, record);
+        ipc::forwardRealtimeUpdate(market_code(), inktype, record);
         return;
     }
 #endif
@@ -1248,7 +1249,7 @@ Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     // 失败时降级返回 min()）。若本地已有缓冲（如 setKRecordList 指定的临时证券），
     // m_lastUpdate 由本地写入，应直接返回本地值而非转发，故以 !isBuffer 门控。
     if (StockManager::instance().isIpcClientMode() && !isBuffer(ktype)) {
-        return ipc::ipcForwardGetLastUpdateTime(market_code(), ktype);
+        return ipc::forwardGetLastUpdateTime(market_code(), ktype);
     }
 #endif
     if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {

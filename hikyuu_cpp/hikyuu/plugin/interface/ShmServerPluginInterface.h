@@ -9,6 +9,11 @@
 
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
+#if HKU_ENABLE_NODE
+// 客户端能力面接口与本接口同属 shmserver 插件接口族、同居本目录（单一来源）
+#include "ShmClientInterface.h"
+#endif
+
 // HKU_API 由构建以 -D 提供（核心库导出、插件导入时各不相同）；当消费方（如插件仅引用本头
 // 而未先行包含 lang.h/DataType.h）未定义该宏时，回退为空，避免 class HKU_API 被当作类名解析。
 // 与 lang.h / DataType.h 的同名守卫一致；Windows 插件经 -D HKU_API=__declspec(dllimport) 覆盖。
@@ -62,6 +67,17 @@ public:
 
     /** 服务监听地址（供日志 / 排障；未启动时为空串） */
     virtual const std::string& addr() const noexcept = 0;
+
+#if HKU_ENABLE_NODE
+    /**
+     * 客户端能力面（同一插件实例多继承实现 ipc::ShmClientInterface）
+     * @details 插件在宿主进程协商时扮演客户端角色（连接既有服务、装配代理驱动、转发三条实时
+     * 链路）。服务端与客户端能力同属一个插件实例并共享同一份 VIP 授权，宿主统一经本访问器取得
+     * 客户端接口而不再对插件对象做裸 dynamic_cast；不支持客户端角色的插件返回 nullptr（宿主
+     * 据此降级独立模式）。
+     */
+    virtual ipc::ShmClientInterface* client() noexcept = 0;
+#endif
 };
 
 }  // namespace hku

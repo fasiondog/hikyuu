@@ -12,7 +12,7 @@
 #include <hikyuu/global/sysinfo.h>
 #include <hikyuu/utilities/config.h>
 #if HKU_ENABLE_NODE
-#include <hikyuu/data_driver/ipc/IpcTransport.h>
+#include <hikyuu/data_driver/ipc/ShmClientHook.h>
 #endif
 #include "pybind_utils.h"
 

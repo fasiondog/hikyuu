@@ -18,7 +18,7 @@
 #include "hikyuu/utilities/config.h"
 #include "hikyuu/plugin/interface/ShmServerPluginInterface.h"
 #if HKU_ENABLE_NODE
-#include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
+#include "hikyuu/plugin/interface/ShmClientInterface.h"
 #endif
 #include "Block.h"
 #include "MarketInfo.h"
@@ -452,7 +452,9 @@ private:
     std::string m_i18n_path;
 
 #if HKU_ENABLE_NODE
-    ipc::IpcConnectorPtr m_ipc_conn;  // 非空时本进程为 shm 数据服务客户端
+    // 非空时本进程为 shm 数据服务客户端。仅借用的裸指针：实现对象随插件实例存活，
+    // 核心库不持有所有权（退出期经 registerShmClient(nullptr) 断开引用即可）
+    ipc::ShmClientInterface* m_shm_client{nullptr};
     bool m_ipc_client_mode{false};
 #endif
     KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池

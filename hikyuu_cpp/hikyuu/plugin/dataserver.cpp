@@ -9,7 +9,7 @@
 #include "interface/plugins.h"
 #include "dataserver.h"
 #if HKU_ENABLE_NODE
-#include "hikyuu/data_driver/ipc/IpcProxyDrivers.h"
+#include "hikyuu/data_driver/ipc/ShmClientHook.h"
 #endif
 
 namespace hku {
@@ -44,7 +44,7 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
                 codes.emplace_back(stk.market_code());
             }
         }
-        ipc::ipcForwardPullFromBufferServer(addr, codes, ktype);
+        ipc::forwardPullFromBufferServer(addr, codes, ktype);
         return;
     }
 #endif

@@ -28,6 +28,9 @@
 #include "plugin/hkuextra.h"
 #include "plugin/extind.h"
 #include "global/sysinfo.h"
+#if HKU_ENABLE_NODE
+#include "data_driver/ipc/ShmClientHook.h"
+#endif
 
 namespace hku {
 StockManager* StockManager::m_sm = nullptr;
@@ -49,9 +52,9 @@ StockManager::~StockManager() {
     // 幂等：clean() 通常已 join 过，此处再调用为无操作（兼顾未经 clean() 的析构路径）。
     joinPreloadThread();
 #if HKU_ENABLE_NODE
-    // 注销客户端实时更新转发连接：此后 Stock::realtimeUpdate 的转发调用直接返回，
-    // 避免退出期在已失效的连接上阻塞。服务端停机已迁至插件（stopShmServer 门面，见步骤 3）
-    ipc::registerRealtimeForwarder(nullptr);
+    // 注销 shm 客户端（断开与插件实现对象的引用）：此后 Stock::realtimeUpdate 的转发调用
+    // 直接返回，避免退出期在已失效的连接上阻塞。服务端停机已迁至插件（stopShmServer 门面）
+    ipc::registerShmClient(nullptr);
 #endif
     delete m_stockDict_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
@@ -245,63 +248,39 @@ void StockManager::_negotiateShmServer() {
     // 本进程为 server 角色：绝不进入客户端模式（防 realtimeUpdate 自转发环，见设计 §5.5）
     HKU_IF_RETURN(isShmServerRole(), void());
 
-    // 以数据目录区分服务地址（避免不同项目/数据集间互扰）；客户端不再竞争文件锁，
-    // lock_path 仅为与地址构造函数共用而保留（含 Windows 命名管道平台适配）
-    string addr, lock_path;
-    ipc::makeIpcServerPaths(m_datadir, addr, lock_path);
+    // 客户端能力（探测/连接/等待就绪/代理驱动/三条转发）全部由 shmserver 插件提供：
+    // 核心库不链接任何实现符号，未安装或未授权插件时直接降级独立模式（自行加载全部数据）。
+    // print=false：社区版用户未安装插件时不应在启动日志中产生报错噪音
+    // 客户端能力面经 ShmServerPluginInterface::client() 取得，不做裸 dynamic_cast
+    auto* plugin = getPlugin<ShmServerPluginInterface>(HKU_PLUGIN_SHM_SERVER, false);
+    auto* client = plugin ? plugin->client() : nullptr;
+    HKU_IF_RETURN(!client, void());
 
-    // 切换为客户端模式：替换为代理驱动并关闭本地预加载（仅内存覆盖，不改配置文件）
-    auto enterClientMode = [this](const ipc::IpcConnectorPtr& conn) {
-        m_ipc_client_mode = true;
-        m_ipc_conn = conn;
-        m_baseInfoDriver = std::make_shared<ipc::IpcBaseInfoDriver>(conn, m_baseInfoDriver);
-        m_blockDriver = std::make_shared<ipc::IpcBlockDriver>(conn, m_blockDriver);
-        // 传入整个本地驱动连接池（而非其 prototype）：主进程未预加载的类型与分时/分笔
-        // 由客户端本地驱动直接服务，需经池取连接以避免多个克隆并发复用同一连接/文件句柄
-        auto local_pool = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
-        auto ipc_kdriver = std::make_shared<ipc::IpcKDataDriver>(conn, local_pool);
-        m_ipc_kdata_pool = std::make_shared<KDataDriverConnectPool>(ipc_kdriver);
-        for (const auto& ktype : KQuery::getBaseKTypeList()) {
-            auto low_ktype = ktype;
-            to_lower(low_ktype);
-            m_preloadParam.set<bool>(low_ktype, false);
-        }
-        // 注册实时更新转发：客户端无预加载缓冲，Stock::realtimeUpdate 经此连接
-        // 转发至主进程应用（缓冲 + 共享内存镜像），保留客户端主动更新行情的能力
-        ipc::registerRealtimeForwarder(conn);
-        HKU_INFO("Connected to hikyuu shm server: {}, running in client mode.",
-                 m_ipc_conn->addr());
-    };
+    // 连接既有服务并等待其数据就绪（重试与中断检查由插件内部完成；客户端绝不自行拉起服务）
+    auto wait_timeout = m_hikyuuParam.tryGet<int64_t>("shm_server_wait_timeout", 600);
+    HKU_WARN_IF_RETURN(!client->connect(m_datadir, wait_timeout < 0 ? 0 : (uint64_t)wait_timeout),
+                       void(), "Failed connect to hikyuu shm server, fallback to standalone mode!");
 
-    // 连接服务并等待其数据就绪，成功返回 true 并切换为客户端模式
-    auto waitTimeout = [this]() -> uint64_t {
-        return m_hikyuuParam.tryGet<int64_t>("shm_server_wait_timeout", 600);
-    };
-    auto tryConnect = [&](const ipc::IpcConnectorPtr& conn) -> bool {
-        HKU_IF_RETURN(!conn->connected(), false);
-        HKU_IF_RETURN(!conn->waitReady(waitTimeout()), false);
-        enterClientMode(conn);
-        return true;
-    };
-
-    // 1. 探测是否已有 shm 服务（纯客户端：仅连接既有服务，绝不自行拉起）
-    auto conn = std::make_shared<ipc::IpcConnector>();
-    if (conn->init(addr) && tryConnect(conn)) {
-        return;
+    // 切换为客户端模式：装配插件提供的代理驱动并关闭本地预加载（仅内存覆盖，不改配置文件）
+    m_ipc_client_mode = true;
+    m_shm_client = client;
+    m_baseInfoDriver = client->createBaseInfoDriver(m_baseInfoDriver);
+    m_blockDriver = client->createBlockDriver(m_blockDriver);
+    // 传入整个本地驱动连接池（而非其 prototype）：服务进程未预加载的类型与分时/分笔
+    // 由客户端本地驱动直接服务，需经池取连接以避免多个克隆并发复用同一连接/文件句柄
+    auto local_pool = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
+    m_ipc_kdata_pool =
+      std::make_shared<KDataDriverConnectPool>(client->createKDataDriver(local_pool));
+    for (const auto& ktype : KQuery::getBaseKTypeList()) {
+        auto low_ktype = ktype;
+        to_lower(low_ktype);
+        m_preloadParam.set<bool>(low_ktype, false);
     }
-
-    // 2. 服务尚未监听（对方可能正在启动中），重试连接；全部失败则降级独立模式（自行加载全部数据）
-    for (int i = 0; i < 20; i++) {
-        if (ipc::checkInterrupted()) {
-            HKU_WARN("Connect to hikyuu shm server interrupted!");
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        if (conn->init(addr) && tryConnect(conn)) {
-            return;
-        }
-    }
-    HKU_WARN("Failed connect to hikyuu shm server, fallback to standalone mode!");
+    // 注册客户端实现：此后 Stock::realtimeUpdate / getLastUpdateTime 经薄转发层转至服务进程
+    // （客户端无预加载缓冲，更新由服务进程应用到缓冲并镜像共享内存，全体客户端可见）
+    ipc::registerShmClient(client);
+    HKU_INFO("Connected to hikyuu shm server: {}, running in client mode.",
+             client->serverAddr());
 }
 
 bool StockManager::_isIpcClientMode() const {
