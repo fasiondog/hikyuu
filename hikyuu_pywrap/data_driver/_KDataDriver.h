@@ -26,6 +26,10 @@ public:
         m_is_python_object = true;
     }
 
+    py::function get_py_override(const char* name) const {
+        return py::get_override(static_cast<const KDataDriver*>(this), name);
+    }
+
     bool _init() override {
         PYBIND11_OVERLOAD(bool, KDataDriver, _init, );
     }
@@ -44,8 +48,13 @@ public:
 
     bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                              size_t& out_start, size_t& out_end) override {
-        auto self = py::cast(this);
-        py::tuple t = self.attr("_getIndexRangeByDate")(market, code, query);
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("_getIndexRangeByDate");
+        if (!py_func) {
+            return KDataDriver::getIndexRangeByDate(market, code, query, out_start, out_end);
+        }
+
+        py::tuple t = py_func(market, code, query);
         if (len(t) != 2) {
             PyErr_SetObject(PyExc_ValueError,
                             py::str("expected 2-item tuple in call to _getIndexRangeByDate; got {}")
@@ -62,7 +71,7 @@ public:
             throw std::logic_error("expected 2-int tuple in call to _getIndexRangeByDate");
         }
 
-        if (start_ix < 0 && end_ix < 0) {
+        if (start_ix < 0 || end_ix < 0) {
             throw std::logic_error("startix or endix must be >= zero!");
         }
 
@@ -73,21 +82,36 @@ public:
 
     KRecordList getKRecordList(const string& market, const string& code,
                                const KQuery& query) override {
-        auto self = py::cast(this);
-        py::list py_list = self.attr("_getKRecordList")(market, code, query);
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("_getKRecordList");
+        if (!py_func) {
+            return KDataDriver::getKRecordList(market, code, query);
+        }
+
+        py::list py_list = py_func(market, code, query);
         return python_list_to_vector<KRecord>(py_list);
     }
 
     TimeLineList getTimeLineList(const string& market, const string& code,
                                  const KQuery& query) override {
-        auto self = py::cast(this);
-        py::list py_list = self.attr("_getTimeLineList")(market, code, query);
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("_getTimeLineList");
+        if (!py_func) {
+            return KDataDriver::getTimeLineList(market, code, query);
+        }
+
+        py::list py_list = py_func(market, code, query);
         return python_list_to_vector<TimeLineRecord>(py_list);
     }
 
     TransList getTransList(const string& market, const string& code, const KQuery& query) override {
-        auto self = py::cast(this);
-        py::list py_list = self.attr("_getTransList")(market, code, query);
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("_getTransList");
+        if (!py_func) {
+            return KDataDriver::getTransList(market, code, query);
+        }
+
+        py::list py_list = py_func(market, code, query);
         return python_list_to_vector<TransRecord>(py_list);
     }
 };

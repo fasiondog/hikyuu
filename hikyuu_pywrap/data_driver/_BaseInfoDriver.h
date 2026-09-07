@@ -22,6 +22,10 @@ public:
 
     PyBaseInfoDriver(const string& name) : BaseInfoDriver(name) {}
 
+    py::function get_py_override(const char* name) const {
+        return py::get_override(static_cast<const BaseInfoDriver*>(this), name);
+    }
+
     bool _init() override {
         PYBIND11_OVERLOAD_PURE(bool, BaseInfoDriver, _init, );
     }
@@ -41,8 +45,13 @@ public:
     }
 
     unordered_map<string, StockWeightList> getAllStockWeightList() override {
-        auto self = py::cast(this);
-        py::dict py_dict = self.attr("getAllStockWeightList")();
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("getAllStockWeightList");
+        if (!py_func) {
+            return BaseInfoDriver::getAllStockWeightList();
+        }
+
+        py::dict py_dict = py_func();
         std::unordered_map<std::string, StockWeightList> result;
         for (auto item : py_dict) {
             std::string key = py::cast<std::string>(item.first);
@@ -60,8 +69,13 @@ public:
     }
 
     vector<std::pair<size_t, string>> getHistoryFinanceField() override {
-        auto self = py::cast(this);
-        py::list py_list = self.attr("getHistoryFinanceField")();
+        py::gil_scoped_acquire gil;
+        py::function py_func = get_py_override("getHistoryFinanceField");
+        if (!py_func) {
+            return BaseInfoDriver::getHistoryFinanceField();
+        }
+
+        py::list py_list = py_func();
         return python_list_to_vector<std::pair<size_t, string>>(py_list);
     }
 
