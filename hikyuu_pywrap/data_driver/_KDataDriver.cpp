@@ -55,7 +55,7 @@ void export_KDataDriver(py::module& m) {
       .def(
         "_getIndexRangeByDate",
         [](KDataDriver& self, const string& market, const string& code, const KQuery& query) {
-            size_t start, end;
+            size_t start = 0, end = 0;
             self.getIndexRangeByDate(market, code, query, start, end);
             return py::make_tuple(start, end);
         },

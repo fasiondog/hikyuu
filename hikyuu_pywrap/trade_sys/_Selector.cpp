@@ -44,11 +44,17 @@ public:
         PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
     }
 
+    // 必须实现的子类接口
     SystemWeightList _getSelected(Datetime date) override {
-        // PYBIND11_OVERLOAD_PURE_NAME(SystemWeightList, SelectorBase, "get_selected", getSelected,
-        //                             date);
-        auto self = py::cast(this);
-        py::sequence py_ret = self.attr("get_selected")(date);
+        py::gil_scoped_acquire gil;
+        py::function py_func =
+          py::get_override(static_cast<const SelectorBase*>(this), "get_selected");
+        if (!py_func) {
+            pybind11::pybind11_fail(
+              "Tried to call pure virtual function \"SelectorBase::get_selected\"");
+        }
+
+        py::sequence py_ret = py_func(date);
         auto c_ret = python_list_to_vector<SystemWeight>(py_ret);
         return c_ret;
     }
