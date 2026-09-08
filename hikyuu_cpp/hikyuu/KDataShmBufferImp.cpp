@@ -82,8 +82,9 @@ KDataImpPtr KDataShmBufferImp::create(const Stock& stock, const KQuery& query) {
     }
 
     KRecordView view;
-    // 复用同一连接：tryGetKRecordView 内部的 _tryRefreshShm 在 5s 限流窗口内为快速路径
-    // （仅时间戳比较），不会触发额外 IPC；驱动不支持视图时返回 false 回退私有副本拷贝路径
+    // 复用同一连接：tryGetKRecordView 仅按会话期固定快照（协商映射见连接 mapSessionShm）检查覆盖
+    // 并返回零拷贝视图，命中时不触发额外 IPC；快照未覆盖或驱动不支持视图时返回 false，由调用方
+    // 回退 KDataPrivatedBufferImp 私有副本拷贝路径（经 getKRecordList 走 IPC / 本地取数）
     HKU_IF_RETURN(!conn->tryGetKRecordView(market, code, query.kType(), start, end, view),
                   nullptr);
     return KDataImpPtr(new KDataShmBufferImp(stock, query, view, start));

@@ -464,9 +464,9 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
         tg.join();
     }
 
-    // 历史财务已就绪，派发 HISTORY_FINANCE_LOADED：插件整段重建快照，权息与财务一并收录，
-    // 客户端经 epoch 变化自动换代；
-    // 取消预加载（进程退出）时不派发：既避免白做一次全量发布，也避免退出时序中做无谓序列化
+    // 历史财务已就绪，派发 HISTORY_FINANCE_LOADED：插件据此整段重建基础快照（权息与财务一并收录）；
+    // 已接入会话的共享内存快照在连接期协商后固定，运行期不随重发布自动换代，新快照仅对之后新协商的
+    // 会话可见；取消预加载（进程退出）时不派发：既避免白做一次全量发布，也避免退出时序中做无谓序列化
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::HISTORY_FINANCE_LOADED);
     }
@@ -537,8 +537,9 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
         m_load_tg.reset();
     }
 
-    // 历史财务已就绪，派发 HISTORY_FINANCE_LOADED：插件整段重建快照，权息与财务一并收录，
-    // 客户端经 epoch 变化自动换代；取消预加载（进程退出）时不派发，理由同串行分支
+    // 历史财务已就绪，派发 HISTORY_FINANCE_LOADED：插件据此整段重建基础快照（权息与财务一并收录）；
+    // 已接入会话的快照会话期固定，运行期不随重发布自动换代（新会话协商时按最新 epoch 映射）；
+    // 取消预加载（进程退出）时不派发，理由同串行分支
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::HISTORY_FINANCE_LOADED);
     }
