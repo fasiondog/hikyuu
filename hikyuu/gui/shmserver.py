@@ -19,11 +19,12 @@ import hikyuu as hku
 def main(datadir, publish_shm, recv_spot, config_file):
     """在当前进程内启动 shm(共享内存)数据服务（独立 VIP 插件，需有效授权），常驻供其他 hikyuu 进程零拷贝读取。
 
-    服务不会自动产生：需在本进程显式启动；其他进程 import hikyuu 时若同一 datadir 已有服务且 use_shm_server=True，
-    将自动作为客户端接入。按 Ctrl-C 停止服务。
+    服务不会自动产生：需在本进程显式启动；其他进程显式开启 use_shm_server=True 且同一
+    datadir 已有服务时，将自动作为客户端接入。按 Ctrl-C 停止服务。
     """
-    # 服务端进程只作发布者、不接入其他 shm 服务：显式关闭客户端探测（use_shm_server=False），
-    # 否则 init 阶段会先当客户端探测既有服务、白等约 10s 后打印 "fallback to standalone mode" 告警。
+    # 服务端进程只作发布者、不接入其他 shm 服务：显式关闭客户端探测（use_shm_server=False）。
+    # 该开关默认即关闭，此处仍显式声明以防用户配置文件中已开启；否则 init 阶段会先当客户端
+    # 探测既有服务、白等约 10s 后打印 "fallback to standalone mode" 告警。
     # 同时确保按 --config（或默认）配置完成数据初始化（import hikyuu 本身不加载数据）。
     load_kwargs = {"use_shm_server": False}
     if config_file:

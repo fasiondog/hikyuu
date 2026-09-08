@@ -235,8 +235,9 @@ KDataDriverConnectPoolPtr StockManager::_getKDataDriverPool() {
 
 #if HKU_ENABLE_NODE
 void StockManager::_negotiateShmServer() {
-    // 总门控：关闭时完全不参与（不探测、不映射、不转发），行为等同未启用该特性
-    HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("use_shm_server", true), void());
+    // 总门控：关闭时完全不参与（不探测、不映射、不转发），行为等同未启用该特性。
+    // 默认关闭（进程默认独立模式运行）；作为客户端接入既有服务需在配置中显式开启
+    HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("use_shm_server", false), void());
     // 本进程为 server 角色：绝不进入客户端模式（防 realtimeUpdate 自转发环，见设计 §5.5）
     HKU_IF_RETURN(isShmServerRole(), void());
 

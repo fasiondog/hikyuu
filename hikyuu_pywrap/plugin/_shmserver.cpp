@@ -19,6 +19,7 @@ void export_plugin_shmserver(py::module& m) {
 
     在当前进程内启动 shm(共享内存)数据服务，供其他 hikyuu 进程作为客户端零拷贝读取，避免多进程重复加载数据。
     服务由独立插件 shmserver 提供（VIP 插件，需有效授权）。
+    客户端进程需显式开启 use_shm_server（配置文件或 load_hikyuu(use_shm_server=True)）才会接入本服务。
 
     须在 hikyuu 初始化之后调用（import hikyuu 默认完成初始化）；早于初始化调用会因数据未就绪而返回 False。
 

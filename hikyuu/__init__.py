@@ -269,9 +269,10 @@ def load_hikyuu(**kwargs):
         reload_time (str): 指定数据重新加载时间(时:分)，格式为 HH:MM, 默认为 00:00
         lazy_preload (boolean): 日线以下使用懒加载方式进行预加载，默认为 False
 
-        use_shm_server (boolean): 本进程是否作为客户端接入既有 shm 数据服务，默认为 True。
-            服务端进程应置 False（只作发布者，不探测/不当客户端），可避免启动时的探测等待与降级告警。
-        shm_server_wait_timeout (int): 作为客户端时等待服务端数据就绪的秒数，默认为 600。
+        use_shm_server (boolean): 本进程是否作为客户端接入既有 shm 数据服务，默认为 False。
+            默认以独立模式运行；同一 datadir 已有服务且需共享数据快照时置 True，本进程将自动接入。
+        shm_server_wait_timeout (int): 客户端接入协商的总时长预算（秒），含连接探测与就绪
+            等待；0 表示无限等待，默认 600，超时后降级独立模式。
     """
     if 'config_file' in kwargs:
         config_file = kwargs['config_file']
@@ -302,8 +303,9 @@ def load_hikyuu(**kwargs):
         hku_param["plugindir"] = os.path.join(os.path.dirname(__file__), "plugin")
     hku_param["reload_time"] = ini.get('hikyuu', 'reload_time', fallback="00:00")
     hku_param["lazy_preload"] = ini.getboolean("hikyuu", "lazy_preload", fallback=False)
-    # shm 数据服务配置（[hikyuu] 段，未显式配置时取默认值）；由服务端进程显式关闭 use_shm_server 即不探测、不当客户端
-    hku_param["use_shm_server"] = ini.getboolean("hikyuu", "use_shm_server", fallback=True)
+    # shm 数据服务配置（[hikyuu] 段，未显式配置时取默认值）：默认关闭，进程以独立模式运行；
+    # 作为客户端接入既有服务，需在配置或 load_hikyuu 参数中显式开启 use_shm_server=True
+    hku_param["use_shm_server"] = ini.getboolean("hikyuu", "use_shm_server", fallback=False)
     hku_param["shm_server_wait_timeout"] = ini.getint("hikyuu", "shm_server_wait_timeout", fallback=600)
 
     base_param = Parameter()
