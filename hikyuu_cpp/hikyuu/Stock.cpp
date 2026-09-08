@@ -554,26 +554,49 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     HKU_IF_RETURN(!m_data || start >= end, result);
-    // 客户端模式：启动期已按 load_stock_weight 配置物化全量权息（见
-    // StockManager::loadAllStockWeights），此处仅对未物化的证券按需兜底——覆盖配置关闭
-    // （load_stock_weight=false，启动期不做预载）、addStock 新增或全新构造等不在物化范围的
-    // 证券，经驱动（IpcBaseInfoDriver，shm 优先，未覆盖回退 IPC/本地）读取整只权息并缓存，
-    // 置位 m_weight_ready 后不再重复读取，空结果同样置位避免反复空查；主进程模式直接读本地
-    // m_weightList，无此兜底。
-    if (StockManager::instance().isIpcClientMode() &&
+    // 权息缓存就绪（物化/懒加载兜底/已释放后重读）策略，按进程角色区分：
+    // - 客户端模式：启动期已按 load_stock_weight 配置物化全量权息（见
+    //   StockManager::loadAllStockWeights），此处仅对未物化的证券按需兜底——覆盖配置关闭
+    //   （load_stock_weight=false，启动期不做预载）、addStock 新增或全新构造等不在物化范围的
+    //   证券，经驱动（IpcBaseInfoDriver，shm 优先，未覆盖回退 IPC/本地）读取整只权息并缓存；
+    // - shm server 角色：含财务基础快照发布后 StockManager::releaseShmServerBaseInfoCache()
+    //   已释放各证券本地权息缓存（见该方法说明，客户端均经共享内存读取），此处对已释放证券按需
+    //   经驱动懒加载重读自愈（IPC 兜底应答、同进程 API 访问），保证结果正确；
+    // - 普通主进程独立模式：直接读本地 m_weightList，无懒加载兜底（启动期已全量物化）。
+    // 未就绪证券并发懒加载可能重复，结果一致，可以容忍（与 getHistoryFinance 懒加载同理）。
+    // 空结果同样置位 m_weight_ready，避免无权息证券每次查询反复访问驱动。
+    StockManager& sm = StockManager::instance();
+    auto lazy_load_weight = [this, &sm]() {
+        // 调用方需已持有 m_weight_mutex 唯一锁
+        StockWeightList full_list = sm.getStockWeightList(*this, Datetime::min(), Null<Datetime>());
+        full_list.shrink_to_fit();
+        m_data->m_weightList.swap(full_list);
+        m_data->m_weight_ready.store(true, std::memory_order_release);
+    };
+    if ((sm.isIpcClientMode() || isShmServerRole()) &&
         !m_data->m_weight_ready.load(std::memory_order_acquire)) {
-        // 并发下可能多个线程同时发现未物化并重复加载，结果一致，可以容忍
-        // （与 getHistoryFinance 懒加载同理）
         std::unique_lock<std::shared_mutex> unique_lock(m_data->m_weight_mutex);
         if (!m_data->m_weight_ready.load(std::memory_order_relaxed)) {
-            StockWeightList full_list = StockManager::instance().getStockWeightList(
-              *this, Datetime::min(), Null<Datetime>());
-            full_list.shrink_to_fit();
-            m_data->m_weightList.swap(full_list);
-            m_data->m_weight_ready.store(true, std::memory_order_release);
+            lazy_load_weight();
         }
     }
     std::shared_lock<std::shared_mutex> lock(m_data->m_weight_mutex);
+    // 与 releaseShmServerBaseInfoCache() 并发的释放窗口：抢先通过上面 ready 检查的读线程可能在
+    // 读锁内发现缓存刚被清空且 ready 置 false（真正无权息证券表现为 ready=true 空表，不会进入
+    // 此分支），放弃读锁补一次懒加载后重查，避免 IPC 兜底应答返回空权息。
+    // 补查仅限具备懒加载兜底的角色（client / server），普通独立模式下即使缓存被清空也保持
+    // “只读物化缓存”的既有语义（该模式正常不会发生释放）
+    if (m_data->m_weightList.empty() &&
+        !m_data->m_weight_ready.load(std::memory_order_acquire) &&
+        (sm.isIpcClientMode() || isShmServerRole())) {
+        lock.unlock();
+        std::unique_lock<std::shared_mutex> unique_lock(m_data->m_weight_mutex);
+        if (!m_data->m_weight_ready.load(std::memory_order_relaxed)) {
+            lazy_load_weight();
+        }
+        unique_lock.unlock();
+        lock.lock();
+    }
     StockWeightList::const_iterator start_iter, end_iter;
     start_iter = lower_bound(m_data->m_weightList.begin(), m_data->m_weightList.end(),
                              StockWeight(start), std::less<StockWeight>());
@@ -1343,25 +1366,45 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
 
 vector<HistoryFinanceInfo> Stock::getHistoryFinance() const {
     HKU_ASSERT(m_data);
-    // 客户端模式：本地不物化历史财务（见 StockManager::loadAllKData 客户端模式早退），按需
-    // 经驱动读取主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），
-    // 避免与快照重复占用客户端内存，且每次调用都反映主进程当前缓存；主进程（非客户端模式）
-    // 仍物化缓存并返回其副本。getHistoryFinance 非逐 K 线热路径（每次指标/查询调用一次），
-    // 按需读 shm 解码开销可忽略。返回值类型须为按值：客户端模式无本地缓存，无法返回引用。
-    if (StockManager::instance().isIpcClientMode()) {
-        return StockManager::instance().getHistoryFinance(*this, Datetime::min(),
-                                                           Null<Datetime>());
+    // 历史财务读取策略：
+    // - 客户端模式：本地不物化历史财务（见 StockManager::loadAllKData 客户端模式早退），按需
+    //   经驱动读取主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），
+    //   避免与快照重复占用客户端内存，且每次调用都反映主进程当前缓存；
+    // - shm server 角色：含财务基础快照发布后 StockManager::releaseShmServerBaseInfoCache()
+    //   已释放本地历史财务缓存（客户端均经共享内存读取，服务端无需保留副本），已释放证券在
+    //   下次访问时按需懒加载重读自愈（IPC 兜底应答、同进程 API 访问）；
+    // - 普通主进程模式：启动期预载物化缓存，返回其副本。
+    // getHistoryFinance 非逐 K 线热路径（每次指标/查询调用一次），按需读 shm 解码开销可忽略。
+    // 返回值类型须为按值：客户端模式无本地缓存，无法返回引用。
+    StockManager& sm = StockManager::instance();
+    if (sm.isIpcClientMode()) {
+        return sm.getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
     }
-    if (!m_data->m_history_finance_ready) {
-        // 目前 m_history_finance_ready 和 m_history_finance_mutex
-        // 分离，并行时短时间可能造成多次获取，可以容忍
-        std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
-        m_data->m_history_finance =
-          StockManager::instance().getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
+    auto lazy_load_finance = [this, &sm]() {
+        // 调用方需已持有 m_history_finance_mutex 唯一锁
+        m_data->m_history_finance = sm.getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
         m_data->m_history_finance.shrink_to_fit();
         m_data->m_history_finance_ready = true;
+    };
+    if (!m_data->m_history_finance_ready) {
+        // 目前 m_history_finance_ready 和 m_history_finance_mutex 分离，并行时短时间可能造成
+        // 多次获取，可以容忍
+        std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
+        if (!m_data->m_history_finance_ready) {
+            lazy_load_finance();
+        }
     }
     std::shared_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
+    // 与 releaseShmServerBaseInfoCache() 并发的释放窗口：说明同 Stock::getWeight
+    if (m_data->m_history_finance.empty() && !m_data->m_history_finance_ready) {
+        lock.unlock();
+        std::unique_lock<std::shared_mutex> unique_lock(m_data->m_history_finance_mutex);
+        if (!m_data->m_history_finance_ready) {
+            lazy_load_finance();
+        }
+        unique_lock.unlock();
+        lock.lock();
+    }
     return m_data->m_history_finance;
 }
 

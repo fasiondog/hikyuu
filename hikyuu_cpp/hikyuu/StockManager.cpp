@@ -1177,6 +1177,30 @@ void StockManager::loadAllStockWeights() {
     }
 }
 
+void StockManager::releaseShmServerBaseInfoCache() {
+    // 仅 shm server 角色（且非客户端模式）放行；客户端/普通独立模式不得释放——客户端本地本就不
+    // 物化历史财务，且启动期权息物化（load_stock_weight）在非 server 角色下无共享快照可依赖，
+    // 释放后 getWeight 无懒加载兜底将静默返回空
+    HKU_IF_RETURN(!isShmServerRole() || isIpcClientMode(), void());
+    HKU_DEBUG(htr("Release stock weight/finance cache after shm base info published"));
+    std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
+    for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+        Stock& stock = iter->second;
+        {
+            std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
+            StockWeightList().swap(stock.m_data->m_weightList);
+            // 置 false：下次 Stock::getWeight 经驱动懒加载重读（server 角色含懒加载兜底）
+            stock.m_data->m_weight_ready.store(false, std::memory_order_release);
+        }
+        {
+            std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_history_finance_mutex);
+            vector<HistoryFinanceInfo>().swap(stock.m_data->m_history_finance);
+            // 置 false：下次 Stock::getHistoryFinance 经驱动懒加载重读（各模式均有兜底）
+            stock.m_data->m_history_finance_ready = false;
+        }
+    }
+}
+
 void StockManager::loadAllZhBond10() {
     m_zh_bond10 = m_baseInfoDriver->getAllZhBond10();
     m_zh_bond10.shrink_to_fit();

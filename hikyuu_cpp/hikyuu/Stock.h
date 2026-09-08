@@ -145,11 +145,16 @@ public:
      * @param start 起始日期
      * @param end 结束日期
      * @return 满足要求的权息信息列表指针
-     * @note 客户端模式（IPC）下：启动期按 load_stock_weight 配置物化全量权息（源为主进程发布
-     *       的共享内存快照，IpcBaseInfoDriver shm 优先、未覆盖回退 IPC/本地），getWeight 直接
-     *       命中本地缓存；仅当配置关闭（load_stock_weight=false）或对 addStock 新增、全新构造
-     *       等未物化证券，首次访问才按需经驱动读取整只权息并缓存（空结果同样缓存，避免反复
-     *       空查）。主进程（非客户端模式）只读取启动期物化的本地缓存，无懒加载兜底。
+     * @note 按进程角色区分权息缓存策略：
+     *       - 客户端模式（IPC）：启动期按 load_stock_weight 配置物化全量权息（源为主进程发布
+     *         的共享内存快照，IpcBaseInfoDriver shm 优先、未覆盖回退 IPC/本地），getWeight 直接
+     *         命中本地缓存；仅当配置关闭（load_stock_weight=false）或对 addStock 新增、全新构造
+     *         等未物化证券，首次访问才按需经驱动读取整只权息并缓存（空结果同样缓存，避免反复空查）。
+     *       - shm server 角色：含财务的基础信息快照发布后，StockManager::
+     *         releaseShmServerBaseInfoCache() 会释放各证券本地权息缓存以回收内存（客户端均经共享
+     *         内存读取，服务端无需保留副本）；此后对已释放证券的访问（IPC 兜底应答、同进程 API）
+     *         同样按需懒加载重读并缓存自愈，结果正确。
+     *       - 普通主进程独立模式：仅读取启动期物化的本地缓存，无懒加载兜底。
      */
     StockWeightList getWeight(const Datetime& start = Datetime::min(),
                               const Datetime& end = Null<Datetime>()) const;
@@ -208,10 +213,11 @@ public:
 
     /**
      * 获取历史财务信息
-     * @note 返回历史财务记录副本。主进程（非客户端模式）返回其内部已物化缓存的副本；
-     *       客户端模式（IPC）下本地不物化，按需经基础信息驱动读取主进程发布的共享内存
-     *       快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），避免与快照重复占用
-     *       客户端内存。
+     * @note 返回历史财务记录副本。主进程（非客户端模式）返回其内部已物化缓存的副本，缓存被
+     *       StockManager::releaseShmServerBaseInfoCache()（shm server 角色发布含财务快照后）
+     *       释放后按需懒加载重读自愈；客户端模式（IPC）下本地不物化，按需经基础信息驱动读取
+     *       主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），避免
+     *       与快照重复占用客户端内存。
      */
     vector<HistoryFinanceInfo> getHistoryFinance() const;
 
@@ -309,13 +315,18 @@ struct HKU_API Stock::Data {
 
     StockWeightList m_weightList;  // 权息信息列表
     std::shared_mutex m_weight_mutex;
-    // 权息是否已完成初始化（预载物化或懒加载兜底，可能为空）。客户端模式下 load_stock_weight
-    // 开启时启动期物化置位；关闭或 addStock 新增、全新构造等未物化证券首查时懒加载兜底置位，
+    // 权息是否已完成初始化（预载物化或懒加载兜底，可能为空）。置位时机：
+    // - 客户端模式：load_stock_weight 开启时启动期物化置位；配置关闭或 addStock 新增、全新构造
+    //   等未物化证券首查懒加载置位；
+    // - shm server 角色：含财务快照发布后 releaseShmServerBaseInfoCache() 置 false（缓存已释放，
+    //   内存归还），下次访问经驱动懒加载重读后重新置位；
     // 空结果同样置位，避免无权息证券每次查询反复访问驱动
     mutable std::atomic_bool m_weight_ready{false};
 
     mutable vector<HistoryFinanceInfo>
       m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
+    // 历史财务是否已完成初始化（主进程启动期预载置位；被 releaseShmServerBaseInfoCache() 释放后
+    // 置 false，下次访问懒加载重读置位；客户端模式本地不物化，恒 false）
     mutable std::atomic_bool m_history_finance_ready{false};
     mutable std::shared_mutex m_history_finance_mutex;
 

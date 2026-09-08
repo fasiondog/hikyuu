@@ -336,6 +336,23 @@ public:
      */
     void joinPreloadThread();
 
+    /**
+     * 释放 shm server 角色下各证券本地缓存的权息与历史财务数据，回收与共享内存快照重复的内存
+     * @details 由 shmserver 插件在“含历史财务的基础信息快照”发布成功后调用（_onLoadEvent 的
+     *          HISTORY_FINANCE_LOADED 分支及 start() 启动兜底发布）。发布后客户端均经共享内存
+     *          读取，服务端无需再保留两份副本。仅当本进程为 shm server 角色且非客户端模式时
+     *          真正执行，否则为空操作：
+     *          - 调用后各证券 m_weight_ready / m_history_finance_ready 置 false、缓存容器清空
+     *            并归还内存；后续 Stock::getWeight / Stock::getHistoryFinance（IPC 兜底应答、
+     *            同进程 API 访问）按需经基础信息驱动懒加载重读自愈，保证结果正确，代价仅为被
+     *            访问证券的首次库查询；
+     *          - 下一次数据 reload 时 loadAllStockWeights / 历史财务预加载会先行重新物化，
+     *            不影响下一轮快照重建；
+     *          - 切勿在仅发布权息（include_finance=false，即 BASE_DATA_READY 之后的首次发布）
+     *            后调用，否则随后含财务的发布将读到空的权息表。
+     */
+    void releaseShmServerBaseInfoCache();
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
