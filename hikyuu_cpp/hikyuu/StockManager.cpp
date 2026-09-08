@@ -276,10 +276,6 @@ void StockManager::_negotiateShmServer() {
              client->serverAddr());
 }
 
-bool StockManager::_isIpcClientMode() const {
-    return m_ipc_client_mode;
-}
-
 bool StockManager::isIpcClientMode() const {
     return m_ipc_client_mode;
 }
@@ -287,9 +283,6 @@ bool StockManager::isIpcClientMode() const {
 #else
 
 /* 未启用单机数据服务时为空操作，使调用方无需条件编译 */
-bool StockManager::_isIpcClientMode() const {
-    return false;
-}
 bool StockManager::isIpcClientMode() const {
     return false;
 }
@@ -399,7 +392,7 @@ void StockManager::loadAllKData() {
     // 预热期间的查询经由驱动实时获取，结果不受影响；
     // 需要等待预热完成的场景可显式调用 waitDataReady()）
     auto driver = _getKDataDriverPool();
-    if (_isIpcClientMode()) {
+    if (isIpcClientMode()) {
         // 客户端模式下数据由服务端提供，本地无预加载任务，直接就绪
         m_data_ready.store(true, std::memory_order_release);
         return;

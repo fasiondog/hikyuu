@@ -388,9 +388,6 @@ private:
     /* 并行加载全部 K 线及历史财务，在独立线程中执行 */
     void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
-    /* 是否处于 IPC 客户端模式：数据由服务端提供，本地无预加载任务（无条件声明，非 node 构建恒 false） */
-    bool _isIpcClientMode() const;
-
     /*
      * 派发数据加载事件给已注册的插件回调（无条件声明，由 loadData 与两个加载函数调用）。
      * 核心库不再感知服务端存在，仅按序通知；无注册回调时零开销。事件到发布动作的映射见设计 §5.2。
