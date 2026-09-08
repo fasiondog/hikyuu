@@ -240,8 +240,9 @@ public:
 
     /**
      * 获取指定证券的权息列表（经基础信息驱动；客户端模式下即 shm 优先、未覆盖回退 IPC/本地）
-     * @note 供 Stock::getWeight 在客户端模式下首次查询时懒加载主进程发布的权息快照至本地缓存，
-     *       避免客户端启动时物化一份全量权息
+     * @note 供 StockManager::loadAllStockWeights 启动期物化全量权息（isAll 分支用
+     *       getAllStockWeightList）；客户端模式下亦供 Stock::getWeight 对未物化证券（配置关闭、
+     *       addStock 新增、全新构造等）按需懒加载兜底
      */
     StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
 

@@ -1136,11 +1136,11 @@ void StockManager::loadInnerBlocks() {
 
 void StockManager::loadAllStockWeights() {
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("load_stock_weight", true), void());
-    // 客户端模式下不做启动期全量权息物化：权息由主进程发布的共享内存快照提供，
-    // Stock::getWeight 首次查询时按懒加载方式经驱动（IpcBaseInfoDriver，shm 优先）读取
-    // 并缓存被实际查询证券的权息到本地，避免与快照重复占用客户端内存（历史财务同理——
-    // 客户端 loadAllKData 提前返回，本就不预加载财务）。
-    HKU_IF_RETURN(isIpcClientMode(), void());
+    // 客户端模式同样按上述配置在启动期物化全量权息：共享内存快照已由连接在 waitReady 后就绪
+    // 后一次性协商映射（IpcConnector::mapSessionShm），IpcBaseInfoDriver 自快照读出全量权息
+    // （快照未覆盖则直读本地驱动，与主进程共享同一数据源），此后 Stock::getWeight 直接命中本地
+    // 缓存，满足权息高频读取场景；配置关闭或 addStock 新增、全新构造等未物化证券仍由
+    // Stock::getWeight 按需懒加载兜底。
     HKU_INFO(htr("Loading stock weight..."));
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
@@ -1150,10 +1150,15 @@ void StockManager::loadAllStockWeights() {
         std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             auto weight_iter = all_stkweight_dict.find(iter->first);
-            if (weight_iter != all_stkweight_dict.end()) {
-                Stock& stock = iter->second;
+            Stock& stock = iter->second;
+            {
                 std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
-                stock.m_data->m_weightList.swap(weight_iter->second);
+                if (weight_iter != all_stkweight_dict.end()) {
+                    stock.m_data->m_weightList.swap(weight_iter->second);
+                }
+                // 无论该证券是否有权息均置已物化：未收录即本证券无权息（如多数 ETF），
+                // 避免客户端模式下 getWeight 对无权息证券反复触发懒加载空查
+                stock.m_data->m_weight_ready.store(true, std::memory_order_release);
             }
         }
     } else {
@@ -1166,6 +1171,7 @@ void StockManager::loadAllStockWeights() {
             {
                 std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
                 stock.m_data->m_weightList = std::move(sw_list);
+                stock.m_data->m_weight_ready.store(true, std::memory_order_release);
             }
         }
     }

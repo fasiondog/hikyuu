@@ -145,10 +145,11 @@ public:
      * @param start 起始日期
      * @param end 结束日期
      * @return 满足要求的权息信息列表指针
-     * @note 主进程（非客户端模式）直接读取本地已物化的权息缓存；客户端模式（IPC）下本地不
-     *       预加载全量权息，首次访问时按懒加载方式经基础信息驱动读取主进程发布的共享内存
-     *       快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地）并缓存至本地，后续查询
-     *       直接命中本地缓存。
+     * @note 客户端模式（IPC）下：启动期按 load_stock_weight 配置物化全量权息（源为主进程发布
+     *       的共享内存快照，IpcBaseInfoDriver shm 优先、未覆盖回退 IPC/本地），getWeight 直接
+     *       命中本地缓存；仅当配置关闭（load_stock_weight=false）或对 addStock 新增、全新构造
+     *       等未物化证券，首次访问才按需经驱动读取整只权息并缓存（空结果同样缓存，避免反复
+     *       空查）。主进程（非客户端模式）只读取启动期物化的本地缓存，无懒加载兜底。
      */
     StockWeightList getWeight(const Datetime& start = Datetime::min(),
                               const Datetime& end = Null<Datetime>()) const;
@@ -308,6 +309,10 @@ struct HKU_API Stock::Data {
 
     StockWeightList m_weightList;  // 权息信息列表
     std::shared_mutex m_weight_mutex;
+    // 权息是否已完成初始化（预载物化或懒加载兜底，可能为空）。客户端模式下 load_stock_weight
+    // 开启时启动期物化置位；关闭或 addStock 新增、全新构造等未物化证券首查时懒加载兜底置位，
+    // 空结果同样置位，避免无权息证券每次查询反复访问驱动
+    mutable std::atomic_bool m_weight_ready{false};
 
     mutable vector<HistoryFinanceInfo>
       m_history_finance;  // 历史财务信息 [财务报告日期, 字段1, 字段2, ...]
