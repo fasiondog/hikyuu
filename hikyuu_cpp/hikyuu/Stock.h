@@ -145,6 +145,10 @@ public:
      * @param start 起始日期
      * @param end 结束日期
      * @return 满足要求的权息信息列表指针
+     * @note 主进程（非客户端模式）直接读取本地已物化的权息缓存；客户端模式（IPC）下本地不
+     *       预加载全量权息，首次访问时按懒加载方式经基础信息驱动读取主进程发布的共享内存
+     *       快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地）并缓存至本地，后续查询
+     *       直接命中本地缓存。
      */
     StockWeightList getWeight(const Datetime& start = Datetime::min(),
                               const Datetime& end = Null<Datetime>()) const;
@@ -206,7 +210,7 @@ public:
      * @note 返回历史财务记录副本。主进程（非客户端模式）返回其内部已物化缓存的副本；
      *       客户端模式（IPC）下本地不物化，按需经基础信息驱动读取主进程发布的共享内存
      *       快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），避免与快照重复占用
-     *       客户端内存（与 Stock::getWeight 客户端模式范式一致）。
+     *       客户端内存。
      */
     vector<HistoryFinanceInfo> getHistoryFinance() const;
 

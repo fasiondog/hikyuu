@@ -554,12 +554,29 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     HKU_IF_RETURN(!m_data || start >= end, result);
-    // 客户端模式：本地不物化权息（见 StockManager::loadAllStockWeights），按需经驱动读取
-    // 主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），避免与
-    // 快照重复占用客户端内存。getWeight 非逐 K 线热路径（每次指标/复权计算调用一次），
-    // 按需读 shm 开销可忽略；主进程仍读本地已物化的 m_weightList。
+    // 客户端模式：本地不物化全量权息（见 StockManager::loadAllStockWeights 客户端模式早退），
+    // 首次查询时按懒加载方式经 StockManager 从主进程发布的共享内存快照（IpcBaseInfoDriver
+    // shm 优先，未覆盖回退 IPC/本地）读取整只证券权息并缓存至本地 m_weightList，后续查询直接
+    // 命中本地缓存，避免反复读 shm/IPC 及重复解码；缓存仅覆盖实际查询过的证券，避免启动时
+    // 全量复制占用客户端内存。getWeight 非逐 K 线热路径（每次指标/复权计算调用一次），首次
+    // 一次性读取开销可忽略；主进程仍直接读本地已物化的 m_weightList。
     if (StockManager::instance().isIpcClientMode()) {
-        return StockManager::instance().getStockWeightList(*this, start, end);
+        bool cache_empty = false;
+        {
+            std::shared_lock<std::shared_mutex> shared_lock(m_data->m_weight_mutex);
+            cache_empty = m_data->m_weightList.empty();
+        }
+        if (cache_empty) {
+            // 并发下可能多个线程同时发现缓存为空并重复加载，结果一致，可以容忍
+            // （与 getHistoryFinance 懒加载同理）
+            std::unique_lock<std::shared_mutex> unique_lock(m_data->m_weight_mutex);
+            if (m_data->m_weightList.empty()) {
+                StockWeightList full_list = StockManager::instance().getStockWeightList(
+                  *this, Datetime::min(), Null<Datetime>());
+                full_list.shrink_to_fit();
+                m_data->m_weightList.swap(full_list);
+            }
+        }
     }
     std::shared_lock<std::shared_mutex> lock(m_data->m_weight_mutex);
     StockWeightList::const_iterator start_iter, end_iter;

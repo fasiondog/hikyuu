@@ -240,8 +240,8 @@ public:
 
     /**
      * 获取指定证券的权息列表（经基础信息驱动；客户端模式下即 shm 优先、未覆盖回退 IPC/本地）
-     * @note 供 Stock::getWeight 在客户端模式下按需读取主进程发布的权息快照，避免客户端启动时
-     *       再物化一份全量权息（与 getHistoryFinance 的按需委托范式一致）
+     * @note 供 Stock::getWeight 在客户端模式下首次查询时懒加载主进程发布的权息快照至本地缓存，
+     *       避免客户端启动时物化一份全量权息
      */
     StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
 
