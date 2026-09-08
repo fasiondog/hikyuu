@@ -1329,8 +1329,17 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     m_data->m_lastDate = (*m_data->pKData[nktype]).back().datetime;
 }
 
-const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
+vector<HistoryFinanceInfo> Stock::getHistoryFinance() const {
     HKU_ASSERT(m_data);
+    // 客户端模式：本地不物化历史财务（见 StockManager::loadAllKData 客户端模式早退），按需
+    // 经驱动读取主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），
+    // 避免与快照重复占用客户端内存，且每次调用都反映主进程当前缓存；主进程（非客户端模式）
+    // 仍物化缓存并返回其副本。getHistoryFinance 非逐 K 线热路径（每次指标/查询调用一次），
+    // 按需读 shm 解码开销可忽略。返回值类型须为按值：客户端模式无本地缓存，无法返回引用。
+    if (StockManager::instance().isIpcClientMode()) {
+        return StockManager::instance().getHistoryFinance(*this, Datetime::min(),
+                                                           Null<Datetime>());
+    }
     if (!m_data->m_history_finance_ready) {
         // 目前 m_history_finance_ready 和 m_history_finance_mutex
         // 分离，并行时短时间可能造成多次获取，可以容忍
@@ -1339,15 +1348,21 @@ const vector<HistoryFinanceInfo>& Stock::getHistoryFinance() const {
           StockManager::instance().getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
         m_data->m_history_finance.shrink_to_fit();
         m_data->m_history_finance_ready = true;
-        return m_data->m_history_finance;
-    } else {
-        std::shared_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
-        return m_data->m_history_finance;
     }
+    std::shared_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
+    return m_data->m_history_finance;
 }
 
 void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     HKU_IF_RETURN(!m_data, void());
+    // 客户端模式：本地不物化历史财务（与 getHistoryFinance() 客户端分支对称，本地缓存恒空，
+    // 读侧统一经 baseInfo 驱动现查 shm/IPC），批量导入结果直接丢弃，避免与快照重复占用客户端
+    // 内存。正常流程客户端预加载（loadAllKData）提前返回，本就到不了此处，此为 Stock 层
+    // 不变量防呆——本函数是财务缓存唯一批量写入入口（列式 getAllHistoryFinance，见设计
+    // §11.23①），任何未来调用路径（如 reload、插件）都不得在客户端模式重新制造本地副本。
+    if (StockManager::instance().isIpcClientMode()) {
+        return;
+    }
     // 按 (reportDate, fileDate) 去重：列式驱动批量 getAllHistoryFinance 可能对同一键返回重复行
     // （real-test 实测 ClickHouse 某证券批量 124 vs 逐证券直查 123，且缓存独有键为空，即纯多重性
     // 重复）。去重使缓存与逐证券直查、SHM 快照、IPC 回退四路径记录集合一致；财务语义上每个

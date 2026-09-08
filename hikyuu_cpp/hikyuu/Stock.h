@@ -203,8 +203,12 @@ public:
 
     /**
      * 获取历史财务信息
+     * @note 返回历史财务记录副本。主进程（非客户端模式）返回其内部已物化缓存的副本；
+     *       客户端模式（IPC）下本地不物化，按需经基础信息驱动读取主进程发布的共享内存
+     *       快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），避免与快照重复占用
+     *       客户端内存（与 Stock::getWeight 客户端模式范式一致）。
      */
-    const vector<HistoryFinanceInfo>& getHistoryFinance() const;
+    vector<HistoryFinanceInfo> getHistoryFinance() const;
 
     /**
      * 获取自身市场的交易日日历（不是本身的交易日期）
