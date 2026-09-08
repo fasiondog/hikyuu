@@ -116,14 +116,6 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
-    // 检测旧配置键：kdata_server* 已统一更名为 shm_server*（不保留别名），残留仅提示一次
-    for (const char* legacy : {"kdata_server", "kdata_server_wait_timeout", "kdata_server_shm_cache"}) {
-        if (hikyuuParam.have(legacy)) {
-            HKU_WARN("Deprecated config key '{}' is ignored; renamed to the shm_server family "
-                     "(use_shm_server / shm_server_wait_timeout / shm_server_shm_cache).", legacy);
-        }
-    }
-
     // 设置插件路径
     auto plugin_path = getPluginPath();
     if (plugin_path.empty() || plugin_path == ".") {

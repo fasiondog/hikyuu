@@ -272,7 +272,6 @@ def load_hikyuu(**kwargs):
         use_shm_server (boolean): 本进程是否作为客户端接入既有 shm 数据服务，默认为 True。
             服务端进程应置 False（只作发布者，不探测/不当客户端），可避免启动时的探测等待与降级告警。
         shm_server_wait_timeout (int): 作为客户端时等待服务端数据就绪的秒数，默认为 600。
-        shm_server_shm_cache (boolean): 客户端是否零拷贝映射服务端共享内存快照，默认为 True。
     """
     if 'config_file' in kwargs:
         config_file = kwargs['config_file']
@@ -306,7 +305,6 @@ def load_hikyuu(**kwargs):
     # shm 数据服务配置（[hikyuu] 段，未显式配置时取默认值）；由服务端进程显式关闭 use_shm_server 即不探测、不当客户端
     hku_param["use_shm_server"] = ini.getboolean("hikyuu", "use_shm_server", fallback=True)
     hku_param["shm_server_wait_timeout"] = ini.getint("hikyuu", "shm_server_wait_timeout", fallback=600)
-    hku_param["shm_server_shm_cache"] = ini.getboolean("hikyuu", "shm_server_shm_cache", fallback=True)
 
     base_param = Parameter()
     base_info_config = ini.options('baseinfo')
@@ -364,8 +362,6 @@ def load_hikyuu(**kwargs):
         hku_param.set("use_shm_server", kwargs['use_shm_server'])
     if 'shm_server_wait_timeout' in kwargs:
         hku_param.set("shm_server_wait_timeout", kwargs['shm_server_wait_timeout'])
-    if 'shm_server_shm_cache' in kwargs:
-        hku_param.set("shm_server_shm_cache", kwargs['shm_server_shm_cache'])
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 

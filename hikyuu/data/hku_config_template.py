@@ -32,7 +32,6 @@ lazy_preload = {lazy_preload}
 ; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
 ; 以下开关仅作用于客户端; 未启动服务端时, 进程自动以独立模式加载全部数据
 ;use_shm_server = True
-;shm_server_shm_cache = True
 ;shm_server_wait_timeout = 600
 
 [block]
@@ -111,7 +110,6 @@ lazy_preload = {lazy_preload}
 ; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
 ; 以下开关仅作用于客户端; 未启动服务端时, 进程自动以独立模式加载全部数据
 ;use_shm_server = True
-;shm_server_shm_cache = True
 ;shm_server_wait_timeout = 600
 
 [block]
@@ -177,7 +175,6 @@ lazy_preload = {lazy_preload}
 ; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
 ; 以下开关仅作用于客户端; 未启动服务端时, 进程自动以独立模式加载全部数据
 ;use_shm_server = True
-;shm_server_shm_cache = True
 ;shm_server_wait_timeout = 600
 
 [block]

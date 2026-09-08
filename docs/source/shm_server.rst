@@ -141,8 +141,6 @@ shm 数据服务（单机共享内存）
     datadir = /home/user/stock
     ; 本进程是否作为客户端连接既有 shm 服务，置 False 则始终以独立模式运行
     use_shm_server = True
-    ; 服务端是否发布共享内存快照，置 False 则客户端全部改走 IPC 请求
-    shm_server_shm_cache = True
     ; 客户端等待服务端数据就绪的最长秒数，0 表示无限等待，超时后降级为独立模式
     shm_server_wait_timeout = 600
 
@@ -157,20 +155,10 @@ shm 数据服务（单机共享内存）
      - ``True``
      - 本进程是否作为客户端连接既有服务。置 ``False`` 时本进程既不探测、也不映射、也不转发，
        始终以独立模式运行，行为与未启用本特性时一致。
-   * - ``shm_server_shm_cache``
-     - ``True``
-     - 服务端是否发布共享内存快照。置 ``False`` 时客户端全部查询改走 IPC，延迟升高，但不再占用
-       共享内存。该开关作用于服务端，对所有客户端生效。
    * - ``shm_server_wait_timeout``
      - ``600``
      - 客户端等待服务端数据就绪的最长时间（秒），``0`` 表示无限等待；超时后客户端降级为独立模式
        启动，避免永久挂起。
-
-.. note::
-
-    旧配置键 ``kdata_server`` / ``kdata_server_shm_cache`` / ``kdata_server_wait_timeout`` 已
-    统一更名为上表的 ``shm_server`` 家族（**不保留别名**）。配置中若仍残留旧键，初始化时会被
-    忽略并打印一次告警，请改用新键名。
 
 数据获取路径
 ------------
