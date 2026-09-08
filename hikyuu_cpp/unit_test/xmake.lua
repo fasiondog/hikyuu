@@ -195,9 +195,6 @@ target("real-test")
         add_packages("mysql")
     end
     
-    -- nng：shm 客户端实现已迁至 shmserver 插件，核心库薄层（ShmClientInterface/ShmClientHook）
-    -- 不再传递引入 nng 头；此处与 unit-test/small-test 保持一致，避免其它用例（如 node 相关）
-    -- 因包集合不一致而编译失败
     add_packages("boost", "fmt", "spdlog", "doctest", "sqlite3", "mysql", "nlohmann_json", "tl_expected", "nng")
     
     add_includedirs("..")

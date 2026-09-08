@@ -10,8 +10,10 @@
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
 #if HKU_ENABLE_NODE
-// 客户端能力面接口与本接口同属 shmserver 插件接口族、同居本目录（单一来源）
-#include "ShmClientInterface.h"
+// 客户端协商能力所需的驱动类型（装配进 StockManager 的数据驱动），全部为核心库自有类型
+#include "hikyuu/data_driver/BaseInfoDriver.h"
+#include "hikyuu/data_driver/BlockInfoDriver.h"
+#include "hikyuu/data_driver/KDataDriver.h"
 #endif
 
 // HKU_API 由构建以 -D 提供（核心库导出、插件导入时各不相同）；当消费方（如插件仅引用本头
@@ -38,9 +40,17 @@ enum class LoadEvent {
 };
 
 /**
- * shm 数据服务插件控制接口（继承 PluginBase，与其余 *PluginInterface 同构）
+ * shm 数据服务插件接口（继承 PluginBase，与其余 *PluginInterface 同构）
  * @details 服务端整体迁入 hku_plugin/plugin_shmserver，由 Python 侧 start_shm_server() 显式拉起。
- * 核心库仅暴露本接口作为控制入口；VIP 授权门控在插件实现侧完成（复刻 dataserver 范式，见设计 §4.2）。
+ * 核心库仅依赖本接口这一份契约与插件交互，其上承载两个角色互斥的能力面：
+ *   - 服务端能力（start / stop / running / addr）：由门面 startShmServer() 显式拉起服务；
+ *   - 客户端协商能力（connect / serverAddr / createXxxDriver）：use_shm_server 开启且本进程非
+ *     server 角色时，由 StockManager::_negotiateShmServer 接入既有服务并装配三类代理驱动。
+ *
+ * 客户端协商能力原独立暴露为 ipc::ShmClientInterface（插件对象多继承实现、宿主经 client() 访问器
+ * 取得），现并入本接口：本接口是核心库对 shmserver 插件的**唯一**类型契约，插件的实现细节（协议
+ * 编解码、共享内存布局、转发链路）一律不进入核心库——三条实时转发由插件 connect 成功后自行向
+ * ipc::registerShmClient() 注册回调，核心库不再持有任何客户端接口类型。
  * @note 本头文件仅核心库一份，插件经 add_includedirs 引用同一份、不放本地拷贝；
  * 类须 HKU_API 导出，跨 DLL dynamic_cast 才能成功（见设计 §5.4 单一来源约定）。
  * @ingroup DataDriver
@@ -69,14 +79,34 @@ public:
     virtual const std::string& addr() const noexcept = 0;
 
 #if HKU_ENABLE_NODE
+    // ── 客户端协商能力（原 ShmClientInterface 契约并入本接口）─────────────────────────
+    // 仅供 StockManager 客户端协商路径调用（use_shm_server 开启且本进程非 server 角色）。
+    // 签名仅涉及核心库数据类型，接口中不出现任何插件私有类型。
+
     /**
-     * 客户端能力面（同一插件实例多继承实现 ipc::ShmClientInterface）
-     * @details 插件在宿主进程协商时扮演客户端角色（连接既有服务、装配代理驱动、转发三条实时
-     * 链路）。服务端与客户端能力同属一个插件实例并共享同一份 VIP 授权，宿主统一经本访问器取得
-     * 客户端接口而不再对插件对象做裸 dynamic_cast；不支持客户端角色的插件返回 nullptr（宿主
-     * 据此降级独立模式）。
+     * 探测并连接既有 shm 服务，阻塞等待其数据就绪
+     * @param datadir 数据目录（服务地址由其哈希派生，保证只有同数据集的进程互连）
+     * @param wait_timeout_sec 等待就绪的总预算（秒），0 表示无限等待
+     * @return true 已连接且服务就绪（本进程应进入客户端模式）| false 无服务/超时/被中断
+     * @note 实现内部负责连接重试与中断检查（经核心库 ipc::checkInterrupted()），且**不得**在本
+     * 进程拉起服务——服务只能由 start_shm_server() 显式启动；连接成功后须自行向核心库
+     * ipc::registerShmClient() 注册三条转发回调（此后 Stock::realtimeUpdate 等经核心库薄转发层
+     * 转至服务进程），并在断开 / 销毁时注销。
      */
-    virtual ipc::ShmClientInterface* client() noexcept = 0;
+    virtual bool connect(const std::string& datadir, uint64_t wait_timeout_sec) noexcept = 0;
+
+    /** 已连接的服务地址（日志用） */
+    virtual std::string serverAddr() const noexcept = 0;
+
+    /** 创建 K 线代理驱动（内部含本地驱动连接池，用于本地优先与降级兜底） */
+    virtual KDataDriverPtr createKDataDriver(
+      const KDataDriverConnectPoolPtr& local_pool) noexcept = 0;
+
+    /** 创建基础信息代理驱动（local 为降级兜底的本地驱动） */
+    virtual BaseInfoDriverPtr createBaseInfoDriver(const BaseInfoDriverPtr& local) noexcept = 0;
+
+    /** 创建板块代理驱动（local 为降级兜底的本地驱动） */
+    virtual BlockInfoDriverPtr createBlockDriver(const BlockInfoDriverPtr& local) noexcept = 0;
 #endif
 };
 

@@ -16,21 +16,47 @@
 #include <vector>
 #include "hikyuu/KQuery.h"
 #include "hikyuu/KRecord.h"
-#include "hikyuu/plugin/interface/ShmClientInterface.h"
 
 namespace hku {
 namespace ipc {
 
 /**
- * 注册 / 注销 shm 客户端实现（插件进入客户端模式时注册，传 nullptr 注销）
- * @details 核心库只保存裸指针（所有权归插件），未注册时全部转发为安全空操作，
- * 进程按独立模式运行。插件侧在 disconnect() 中自行清理内部状态，此处仅切断引用。
- * @note 原子量保证行情线程（转发调用方）与协商线程（注册方）之间的可见性
+ * 三条实时转发回调（shmserver 插件 connect 成功后注册、断开时注册空集注销）
+ * @details 转发目标的实现（协议编解码、传输、共享内存读写）全部在 shmserver 插件内；核心库
+ * 不持有任何插件接口类型，仅以本结构保存行情路径（Stock / dataserver）所需的转发函数，
+ * 未注册（独立模式 / 未安装插件）时全部转发为安全空操作。
  */
-HKU_API void registerShmClient(ShmClientInterface* client) noexcept;
+struct ShmClientForwarders {
+    /** Stock::realtimeUpdate 转发：服务端已应用返回 true */
+    std::function<bool(const std::string& market_code, const KQuery::KType& ktype,
+                       const KRecord& record)>
+      realtimeUpdate;
 
-/** 当前注册的客户端实现；未注册（独立模式 / 未安装插件）返回 nullptr */
-HKU_API ShmClientInterface* shmClient() noexcept;
+    /** Stock::getLastUpdateTime 转发：返回服务端缓冲最后更新时刻，未注册 / 失败返回 Datetime::min() */
+    std::function<Datetime(const std::string& market_code, const KQuery::KType& ktype)>
+      getLastUpdateTime;
+
+    /** 客户端委托服务进程从行情缓存服务（buffer server）拉取 K 线：服务端已受理返回 true */
+    std::function<bool(const std::string& addr, const std::vector<std::string>& codes,
+                       const KQuery::KType& ktype)>
+      pullFromBufferServer;
+
+    /** 是否为空（全部回调为空即视为注销状态） */
+    inline explicit operator bool() const noexcept {
+        return static_cast<bool>(realtimeUpdate) || static_cast<bool>(getLastUpdateTime) ||
+               static_cast<bool>(pullFromBufferServer);
+    }
+};
+
+/**
+ * 注册 / 注销 shm 客户端转发回调（插件 connect 成功 / 断开时调用；传入空集合即注销）
+ * @note 注册仅发生在 StockManager 初始化协商期，转发调用发生在行情线程；实现采用无锁发布-订阅
+ * （发布-获取），转发侧只读注册期创建的稳定对象。回调对象生命周期随插件实例，插件销毁前须先注销
+ */
+HKU_API void registerShmClient(ShmClientForwarders fwd) noexcept;
+
+/** 当前是否已注册客户端转发；未注册（独立模式 / 未安装插件）返回 false */
+HKU_API bool shmClient() noexcept;
 
 /**
  * 客户端实时更新转发（Stock::realtimeUpdate 调用）
