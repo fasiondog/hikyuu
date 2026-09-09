@@ -31,6 +31,18 @@ void initInnerTask() {
     }
 
     if (reload_enable) {
+        // shm客户端延迟5分钟重启，以便shm server先重启完毕
+        if (StockManager::instance().isIpcClientMode()) {
+            constexpr int64_t shm_client_reload_delay_minutes = 5;
+            mm += shm_client_reload_delay_minutes;
+            hh += mm / 60;
+            mm %= 60;
+            hh %= 24;  // 24 小时回卷（如 23:59 延后即为次日 00:04，避免超出 TimeDelta 上限）
+            HKU_INFO(
+              "Running in shm client mode, daily auto reload delayed {} minutes to {:02d}:{:02d}",
+              shm_client_reload_delay_minutes, hh, mm);
+        }
+
         auto* tm = getScheduler();
         tm->addFuncAtTimeEveryDay(Datetime::min(), Datetime::max(), TimeDelta(0, hh, mm),
                                   reloadHikyuuTask);
