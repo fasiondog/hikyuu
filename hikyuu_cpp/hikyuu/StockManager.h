@@ -323,7 +323,7 @@ public:
     /*
      * 等待后台预加载线程退出（幂等：线程未启动或已结束时立即返回）。仅由程序退出路径调用，
      * 须在 cancelLoad() 之后、停止 m_load_tg 之前调用，以根除预加载线程与退出时序对 m_load_tg
-     * 的并发访问（TOCTOU/UAF，见 review C3）。该线程仅加载数据、派发加载事件，不涉及任何 nng
+     * 的并发访问（TOCTOU/UAF）。该线程仅加载数据、派发加载事件，不涉及任何 nng
      * 操作，且全程检查 m_cancel_load，cancel 后能快速退出，故 join 不会成为 Windows 静态析构期
      * 的新阻塞点。
      */
@@ -381,7 +381,7 @@ private:
 
     /*
      * 派发数据加载事件给已注册的插件回调（无条件声明，由 loadData 与两个加载函数调用）。
-     * 核心库不再感知服务端存在，仅按序通知；无注册回调时零开销。事件到发布动作的映射见设计 §5.2。
+     * 核心库不再感知服务端存在，仅按序通知；无注册回调时零开销。
      * @note 回调内禁止调用 register/unregisterLoadEventCallback（会死锁）
      */
     void _fireLoadEvent(LoadEvent event);
@@ -463,7 +463,7 @@ private:
     KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池
 };
 
-/** 数据加载事件回调类型（插件订阅，见设计 §5.2） */
+/** 数据加载事件回调类型 */
 using LoadEventCallback = std::function<void(LoadEvent)>;
 
 /**
@@ -476,7 +476,7 @@ HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
 HKU_API void unregisterLoadEventCallback(size_t id);
 
 /**
- * 标记本进程为 shm server 角色：_negotiateShmServer() 据此跳过客户端协商（防自连接，见设计 §5.5）
+ * 标记本进程为 shm server 角色：_negotiateShmServer() 据此跳过客户端协商（防自连接）
  * @details 由门面 startShmServer() 在加载插件之前调用；即便 StockManager 尚未 init 亦可安全置位
  */
 HKU_API void setShmServerRole(bool role) noexcept;
