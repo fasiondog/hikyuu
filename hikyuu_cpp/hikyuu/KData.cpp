@@ -9,6 +9,7 @@
 #include "StockManager.h"
 #include "KDataSharedBufferImp.h"
 #include "KDataPrivatedBufferImp.h"
+#include "KDataShmBufferImp.h"
 #include "indicator/crt/KDATA.h"
 #include "plugin/hkuextra.h"
 #include <fstream>
@@ -62,6 +63,15 @@ KData::KData(const Stock& stock, const KQuery& query) {
         // 当Stock已缓存了该类型的K线数据，且不进行复权
         m_imp = make_shared<KDataSharedBufferImp>(stock, query);
         return;
+    }
+
+    // 客户端共享内存零拷贝视图：NO_RECOVER 且主进程快照覆盖该证券/类型时直接裸指针视图，
+    // 不满足（非客户端/未覆盖/需反缩放/区间无效）时 create 返回 nullptr，回退下方私有副本路径
+    if (query.recoverType() == KQuery::NO_RECOVER) {
+        if (auto view_imp = KDataShmBufferImp::create(stock, query)) {
+            m_imp = std::move(view_imp);
+            return;
+        }
     }
 
     m_imp = getKDataImp(stock, query);

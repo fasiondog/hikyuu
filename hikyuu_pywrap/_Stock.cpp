@@ -179,6 +179,15 @@ void export_Stock(py::module& m) {
         :param KRecord krecord: 新增的实时K线记录
         :param KQuery.KType ktype: K 线类型)")
 
+      .def("get_last_update_time", &Stock::getLastUpdateTime, py::arg("ktype") = KQuery::DAY,
+           R"(get_last_update_time(self, [ktype=Query.DAY])
+
+        获取指定类型K线数据的最后更新时刻。客户端模式下，普通证券转发至主进程
+        取其缓冲刷新时刻，临时证券（setKRecordList）则返回本地写入时刻。
+
+        :param KQuery.KType ktype: K 线类型
+        :rtype: Datetime)")
+
       .def("get_weight", &Stock::getWeight, py::arg("start") = Datetime::min(),
            py::arg("end") = Datetime(),
            R"(get_weight(self, [start, end])

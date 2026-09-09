@@ -29,6 +29,11 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
+; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
+; 以下开关默认关闭; 未启动服务端时, 进程自动以独立模式加载全部数据; 作为客户端接入既有服务时取消注释并置 True
+;use_shm_server = True
+; 客户端接入协商总预算(秒), 含连接探测与就绪等待; 0=无限等待, 超时后降级独立模式
+;shm_server_wait_timeout = 600
 
 [block]
 type = sqlite3
@@ -103,6 +108,11 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
+; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
+; 以下开关默认关闭; 未启动服务端时, 进程自动以独立模式加载全部数据; 作为客户端接入既有服务时取消注释并置 True
+;use_shm_server = True
+; 客户端接入协商总预算(秒), 含连接探测与就绪等待; 0=无限等待, 超时后降级独立模式
+;shm_server_wait_timeout = 600
 
 [block]
 type = mysql
@@ -164,6 +174,11 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
+; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
+; 以下开关默认关闭; 未启动服务端时, 进程自动以独立模式加载全部数据; 作为客户端接入既有服务时取消注释并置 True
+;use_shm_server = True
+; 客户端接入协商总预算(秒), 含连接探测与就绪等待; 0=无限等待, 超时后降级独立模式
+;shm_server_wait_timeout = 600
 
 [block]
 type = clickhouse
