@@ -9,12 +9,10 @@
 
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
-#if HKU_ENABLE_NODE
 // 客户端协商能力所需的驱动类型（装配进 StockManager 的数据驱动），全部为核心库自有类型
 #include "hikyuu/data_driver/BaseInfoDriver.h"
 #include "hikyuu/data_driver/BlockInfoDriver.h"
 #include "hikyuu/data_driver/KDataDriver.h"
-#endif
 
 // HKU_API 由构建以 -D 提供（核心库导出、插件导入时各不相同）；当消费方（如插件仅引用本头
 // 而未先行包含 lang.h/DataType.h）未定义该宏时，回退为空，避免 class HKU_API 被当作类名解析。
@@ -78,7 +76,6 @@ public:
     /** 服务监听地址（供日志 / 排障；未启动时为空串） */
     virtual const std::string& addr() const noexcept = 0;
 
-#if HKU_ENABLE_NODE
     // ── 客户端协商能力（原 ShmClientInterface 契约并入本接口）─────────────────────────
     // 仅供 StockManager 客户端协商路径调用（use_shm_server 开启且本进程非 server 角色）。
     // 签名仅涉及核心库数据类型，接口中不出现任何插件私有类型。
@@ -107,7 +104,6 @@ public:
 
     /** 创建板块代理驱动（local 为降级兜底的本地驱动） */
     virtual BlockInfoDriverPtr createBlockDriver(const BlockInfoDriverPtr& local) noexcept = 0;
-#endif
 };
 
 }  // namespace hku

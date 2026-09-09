@@ -11,10 +11,8 @@
 #include "GlobalInitializer.h"
 #include "StockManager.h"
 #include "data_driver/KDataDriver.h"
-#if HKU_ENABLE_NODE
 #include "data_driver/ipc/ShmClientHook.h"
 #include "data_driver/ipc/ShmMirrorSink.h"
-#endif
 #include "plugin/hkuextra.h"
 #include "KData.h"
 
@@ -1204,7 +1202,6 @@ bool Stock::isTransactionTime(Datetime time) {
 }
 
 void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
-#if HKU_ENABLE_NODE
     // 客户端模式且本地无缓冲（普通代理证券）：转发至主进程应用（更新其缓冲并镜像至
     // 共享内存段，全体客户端由此读到），保留客户端主动更新行情数据的能力；
     // 未注册转发连接或转发失败时退回原行为（静默忽略）。
@@ -1218,7 +1215,6 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
         ipc::forwardRealtimeUpdate(market_code(), inktype, record);
         return;
     }
-#endif
     HKU_IF_RETURN(!isBuffer(inktype) || record.datetime.isNull() ||
                     StockManager::instance().isHoliday(record.datetime),
                   void());
@@ -1236,11 +1232,9 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 
     if (m_data->pKData[ktype]->empty()) {
         m_data->pKData[ktype]->push_back(record);
-#if HKU_ENABLE_NODE
         // 镜像到共享内存段（未发布该证券/类型时静默跳过）；
         // 在证券×ktype 写锁内调用，保证段内单写者串行
         ipc::shmMirrorRealtimeUpdate(market_code(), inktype, record);
-#endif
         return;
     }
 
@@ -1268,17 +1262,14 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
                   tmp.datetime, market_code(), inktype);
     }
 
-#if HKU_ENABLE_NODE
     // 镜像到共享内存段（未发布时静默跳过；过期记录由镜像规则同样忽略），
     // 客户端进程由此读到准实时数据，无需 IPC 往返
     ipc::shmMirrorRealtimeUpdate(market_code(), inktype, record);
-#endif
 }
 
 Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     auto ktype = inktype;
     to_upper(ktype);
-#if HKU_ENABLE_NODE
     // 客户端模式且本地无缓冲（普通代理证券）：m_lastUpdate 恒为 Datetime::min()，转发至
     // 主进程取其缓冲刷新时刻，与客户端经共享内存读到的数据保持一致（未注册转发连接/
     // 失败时降级返回 min()）。若本地已有缓冲（如 setKRecordList 指定的临时证券），
@@ -1286,7 +1277,6 @@ Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     if (StockManager::instance().isIpcClientMode() && !isBuffer(ktype)) {
         return ipc::forwardGetLastUpdateTime(market_code(), ktype);
     }
-#endif
     if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {
         auto iter = m_data->m_lastUpdate.find(ktype);
         if (iter == m_data->m_lastUpdate.end()) {

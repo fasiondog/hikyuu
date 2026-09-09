@@ -15,7 +15,6 @@
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/utilities/plugin/PluginManager.h"
 #include "hikyuu/data_driver/DataDriverFactory.h"
-#include "hikyuu/utilities/config.h"
 #include "hikyuu/plugin/interface/ShmServerPluginInterface.h"
 #include "Block.h"
 #include "MarketInfo.h"
@@ -65,19 +64,16 @@ public:
 
     /**
      * 是否处于 IPC 客户端模式（数据由服务端提供，本地无预加载缓冲）
-     * @note 供 Stock::realtimeUpdate 等核心路径判断是否需将更新转发至主进程；
-     * 无条件声明，未启用 HKU_ENABLE_NODE 时为空实现（恒返回 false）
+     * @note 供 Stock::realtimeUpdate 等核心路径判断是否需将更新转发至主进程
      */
     bool isIpcClientMode() const;
 
-#if HKU_ENABLE_NODE
     /// 仅供单元测试：强制置位客户端模式标志，以验证 Stock::realtimeUpdate /
     /// getLastUpdateTime 的“转发 vs 本地缓冲”门控分支；生产代码不得调用。
     /// 调用方须在用例结束时复位，避免污染同进程内其他用例。
     void _testingSetIpcClientMode(bool mode) {
         m_ipc_client_mode = mode;
     }
-#endif
 
     /** 获取基础信息驱动参数 */
     const Parameter& getBaseInfoDriverParameter() const;
@@ -370,10 +366,8 @@ private:
     /* 获取 K 线驱动连接池，客户端模式下返回 IPC 代理驱动池 */
     KDataDriverConnectPoolPtr _getKDataDriverPool();
 
-#if HKU_ENABLE_NODE
     /* 纯客户端协商 shm 数据服务：仅探测并连接既有服务，失败降级独立模式，绝不自行拉起服务 */
     void _negotiateShmServer();
-#endif
 
     /* 加载 K线数据至缓存 */
     void loadAllKData();
@@ -463,11 +457,9 @@ private:
     PluginManager m_plugin_manager;
     std::string m_i18n_path;
 
-#if HKU_ENABLE_NODE
     // 本进程是否作为 shm 数据服务客户端（连接成功、装配代理驱动后置位）。转发回调由插件
     // connect 成功后自行注册、断开时注销，核心库不持有任何插件类型指针
     bool m_ipc_client_mode{false};
-#endif
     KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池
 };
 

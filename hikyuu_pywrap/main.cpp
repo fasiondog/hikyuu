@@ -10,10 +10,7 @@
 #include <pybind11/stl.h>
 #include <hikyuu/hikyuu.h>
 #include <hikyuu/global/sysinfo.h>
-#include <hikyuu/utilities/config.h>
-#if HKU_ENABLE_NODE
 #include <hikyuu/data_driver/ipc/ShmClientHook.h>
-#endif
 #include "pybind_utils.h"
 
 using namespace hku;
@@ -83,7 +80,6 @@ PYBIND11_MODULE(core, m) {
     // 设置系统运行状态
     setRunningInPython(true);
 
-#if HKU_ENABLE_NODE
     // 注册 IPC 长阻塞等待（如等待数据服务就绪）的中断检查器，响应 Ctrl+C；
     // 等待发生在已释放 GIL 的 C++ 代码中，此处需重新获取 GIL 后才能检查信号。
     ipc::setInterruptChecker([]() {
@@ -94,7 +90,6 @@ PYBIND11_MODULE(core, m) {
         }
         return false;
     });
-#endif
 
 #if HKU_ENABLE_SEND_FEEDBACK
     sendPythonVersionFeedBack(PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);

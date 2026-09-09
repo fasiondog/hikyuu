@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include "hikyuu/utilities/config.h"
-
-#if HKU_ENABLE_NODE
-
 #include <functional>
 #include <string>
 #include <vector>
@@ -92,5 +88,3 @@ HKU_API bool checkInterrupted();
 
 }  // namespace ipc
 }  // namespace hku
-
-#endif  // HKU_ENABLE_NODE

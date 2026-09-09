@@ -5,10 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/utilities/config.h"
-
-#if HKU_ENABLE_NODE
-
 #include "ShmMirrorSink.h"
 #include <atomic>
 #include <cstdint>
@@ -63,5 +59,3 @@ void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuery::KType
 
 }  // namespace ipc
 }  // namespace hku
-
-#endif  // HKU_ENABLE_NODE

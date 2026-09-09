@@ -6,9 +6,6 @@
  */
 
 #include "doctest/doctest.h"
-#include "hikyuu/utilities/config.h"
-
-#if HKU_ENABLE_NODE
 
 #include <string>
 #include <vector>
@@ -143,5 +140,3 @@ TEST_CASE("test_ShmClientHook_interrupt") {
 }
 
 /** @} */
-
-#endif  // HKU_ENABLE_NODE

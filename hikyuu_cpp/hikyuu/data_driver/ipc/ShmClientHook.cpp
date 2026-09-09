@@ -5,10 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "hikyuu/utilities/config.h"
-
-#if HKU_ENABLE_NODE
-
 #include <atomic>
 #include <functional>
 #include <mutex>
@@ -81,5 +77,3 @@ bool checkInterrupted() {
 
 }  // namespace ipc
 }  // namespace hku
-
-#endif  // HKU_ENABLE_NODE

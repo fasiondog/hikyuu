@@ -29,9 +29,7 @@
 #include "global/GlobalSpotAgent.h"
 #include "global/schedule/scheduler.h"
 #include "plugin/shmserver.h"
-#if HKU_ENABLE_NODE
 #include "data_driver/ipc/ShmClientHook.h"
-#endif
 #include "indicator/IndicatorImp.h"
 #include "global/sysinfo.h"
 #include "plugin/interface/plugins.h"
@@ -158,7 +156,6 @@ void GlobalInitializer::clean() {
     }
 #endif
 
-#if HKU_ENABLE_NODE
     // 注销 shm 客户端转发回调（若本进程为客户端）：此后 Stock::realtimeUpdate / getLastUpdateTime 的
     // 转发调用直接返回，避免退出期在已失效的连接上阻塞。默认构建下 ~StockManager 从不执行，
     // 故与服务端停机一样须在 clean() 中显式调用。
@@ -168,7 +165,6 @@ void GlobalInitializer::clean() {
     // 服务端 nng worker 持有在飞接收操作，晚于 nng 全局状态拆除会崩溃。未启动时为
     // 空操作（门面仅查本进程插件指针，不触发插件加载）。
     stopShmServer();
-#endif
 
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
     // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢

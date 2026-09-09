@@ -7,10 +7,6 @@
 
 #pragma once
 
-#include "hikyuu/utilities/config.h"
-
-#if HKU_ENABLE_NODE
-
 #include <string>
 #include "hikyuu/KQuery.h"
 #include "hikyuu/KRecord.h"
@@ -49,5 +45,3 @@ HKU_API void shmMirrorRealtimeUpdate(const std::string& market_code, const KQuer
 
 }  // namespace ipc
 }  // namespace hku
-
-#endif  // HKU_ENABLE_NODE

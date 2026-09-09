@@ -28,9 +28,7 @@
 #include "plugin/hkuextra.h"
 #include "plugin/extind.h"
 #include "global/sysinfo.h"
-#if HKU_ENABLE_NODE
 #include "data_driver/ipc/ShmClientHook.h"
-#endif
 
 namespace hku {
 StockManager* StockManager::m_sm = nullptr;
@@ -51,11 +49,9 @@ StockManager::~StockManager() {
     // 同时保证 m_preload_thread 析构时非 joinable（否则 std::thread 析构会触发 std::terminate）。
     // 幂等：clean() 通常已 join 过，此处再调用为无操作（兼顾未经 clean() 的析构路径）。
     joinPreloadThread();
-#if HKU_ENABLE_NODE
     // 注销 shm 客户端转发回调（断开与插件实现的引用）：此后 Stock::realtimeUpdate 的转发调用
     // 直接返回，避免退出期在已失效的连接上阻塞。服务端停机已迁至插件（stopShmServer 门面）
     ipc::registerShmClient(ipc::ShmClientForwarders());
-#endif
     delete m_stockDict_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
 }
@@ -174,10 +170,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
 
-#if HKU_ENABLE_NODE
     // 纯客户端协商 shm 数据服务（连接成功将替换为代理驱动并关闭本地预加载；失败降级独立模式）
     _negotiateShmServer();
-#endif
 
     // 加载数据
     loadData();
@@ -233,7 +227,6 @@ KDataDriverConnectPoolPtr StockManager::_getKDataDriverPool() {
     return DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
 }
 
-#if HKU_ENABLE_NODE
 void StockManager::_negotiateShmServer() {
     // 总门控：关闭时完全不参与（不探测、不映射、不转发），行为等同未启用该特性。
     // 默认关闭（进程默认独立模式运行）；作为客户端接入既有服务需在配置中显式开启
@@ -276,16 +269,7 @@ bool StockManager::isIpcClientMode() const {
     return m_ipc_client_mode;
 }
 
-#else
-
-/* 未启用单机数据服务时为空操作，使调用方无需条件编译 */
-bool StockManager::isIpcClientMode() const {
-    return false;
-}
-
-#endif  // HKU_ENABLE_NODE
-
-// ── LoadEvent 事件总线（无条件编译：核心库仅派发，插件订阅；见设计 §5.2）───────────────
+// ── LoadEvent 事件总线（核心库仅派发，插件订阅；见设计 §5.2）─────────────────────────────
 namespace {
 // 回调容器整体以 new 持有且永不 delete：其成员锁若在静态析构期被销毁，stopShmServer()
 // 于 clean()（静态析构期）注销回调时加锁将 EINVAL 抛异常并经 noexcept 析构链 std::terminate
