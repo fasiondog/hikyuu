@@ -9,6 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/utilities/Log.h>
+#include "../plugin_valid.h"
 
 using namespace hku;
 
@@ -279,6 +280,8 @@ TEST_CASE("test_StockManager_getZhBond10") {
 
 /** @par 检测点 */
 TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
     auto& sm = StockManager::instance();
     const bool org_role = isShmServerRole();
     Stock stk = sm.getStock("sz000001");
