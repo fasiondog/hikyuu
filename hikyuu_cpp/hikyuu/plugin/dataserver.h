@@ -29,8 +29,8 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
                                      const KQuery::KType& ktype);
 
 /**
- * @brief 从行情缓存服务拉取最新 K 线并就地更新（本地缓冲 + 镜像共享内存），不含客户端路由判定。
- * @details 供主进程 IPC handler 直接调用：getDataFromBufferServer 在客户端模式会委托主进程，
+ * 从行情缓存服务拉取最新 K 线并就地更新（本地缓冲 + 镜像共享内存），不含客户端路由判定。
+ * @details 仅供主进程 IPC handler 直接调用：getDataFromBufferServer 在客户端模式会委托主进程，
  *          主进程侧必须走本函数以避免重入客户端分支（同进程测试下 isIpcClientMode() 可能为真）。
  * @param addr 缓存服务地址，如: tcp://192.168.1.1:9201
  * @param stklist 待更新的股票列表
