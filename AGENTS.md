@@ -8,7 +8,7 @@
 - **Hikyuu** 是一个基于 **C++/Python** 的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展（深度适配国内 A 股市场）。
 - 核心能力：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。
 - 项目组成：**高性能 C++ 核心库**（`hikyuu_cpp`）+ **pybind11 绑定层**（`hikyuu_pywrap`）+ **Python 接口层**（`hikyuu` 包）+ **交互式探索工具**（`hikyuu.interactive`）。
-- 开源协议：Apache License 2.0；当前版本 2.8.x；默认分支 `master`，另有 `release`、`bugfix`、`feature/*` 分支。
+- 开源协议：Apache License 2.0；默认分支 `master`，另有 `release`、`bugfix`、`feature/*` 分支。
 - 项目文档：[https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)（Sphinx，中文为主）。
 
 ## 2. 仓库结构
@@ -145,6 +145,54 @@ TEST_CASE("test_IniParser_hasSection") {
 - 提交前用 `clang-format` / `yapf` 格式化改动文件，避免与现有风格偏离。
 - 新增公开 API 需要同步维护 `.pyi` 存根（`hikyuu/__init__.pyi`、`core.pyi`、`extend.pyi` 及 `hikyuu/cpp/core3xx.pyi`）以及文档（`docs/source/`）。
 
+### 命名规范（C++）
+
+以下规范自 `hikyuu_cpp/hikyuu/` 现有代码提炼，新增/修改代码须遵循：
+
+| 标识符类别                        | 规范                                                                                                                  | 示例                                                                                                                                                               |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 命名空间                          | 全小写                                                                                                                | `namespace hku;`                                                                                                                                                 |
+| 类 / 结构体                       | `PascalCase`，业务域 + 核心概念；导出类加 `HKU_API` 宏                                                            | `class HKU_API StockManager`、`class SignalBase`、`struct ParamItemRecord`                                                                                   |
+| 公开成员函数                      | `camelCase`，动词起首（`should/get/set/is/has/reload…`）                                                         | `shouldBuy()`、`getBuyValue()`、`reloadWith()`、`isIpcClientMode()`、`setTO()`、`nextTimeShouldBuy()`                                                  |
+| 受保护 / 私有成员函数             | `_` 前缀 + `camelCase`（子类需 override 的钩子以 `_` 开头）                                                     | `_calculate()`、`_reset()`、`_clone()`、`_addBuySignal()`、`_testingSetIpcClientMode()`                                                                  |
+| 成员变量                          | `m_` 前缀 + `camelCase`                                                                                           | `m_name`、`m_kdata`、`m_is_python_object`、`m_buySig`、`m_cycle_start`、`m_ipc_client_mode`                                                            |
+| 类静态成员变量                    | `ms_` 前缀 + `camelCase`（区别于非静态成员的 `m_`）                                                             | `ms_sm`、`ms_init_mutex`、`ms_stockDict`（注：`StockManager` 旧代码沿用 `m_sm`/`m_init_mutex`/`m_stockDict` 为历史遗留，新增静态成员一律用 `ms_`） |
+| 全局变量 / 文件作用域 static 全局 | `g_` 前缀 + `camelCase`                                                                                           | `g_load_event`、`g_shm_server_role`、`g_all_base_ktype`、`g_ktype2min`、`g_log_level`                                                                    |
+| 函数内 static 局部变量            | `g_` 前缀 + `camelCase`（与全局变量一致，便于识别长生命周期存储）                                                 | `static std::once_flag g_tz_set;`、`static long int g_timezone;`                                                                                               |
+| 类型别名 / 智能指针别名           | 业务对象名 +`Ptr`（`typedef shared_ptr<T> XPtr;`）                                                                | `typedef shared_ptr<SignalBase> SignalPtr;`                                                                                                                      |
+| 枚举类型 / 枚举值                 | 枚举类型`PascalCase`；枚举值全大写 + 下划线                                                                         | `KQuery::QueryType { INDEX, DATE, INVALID }`                                                                                                                     |
+| 宏 / 编译开关 / 常量              | 全大写 + 下划线                                                                                                       | `HKU_API`、`HKU_SUPPORT_SERIALIZATION`、`HKU_ENABLE_NODE`、`IND_EQ_THRESHOLD`                                                                              |
+| 函数参数                          | `camelCase`                                                                                                         | `baseInfoParam`、`kdataParam`、`datetime`、`context`                                                                                                       |
+| 局部变量                          | `camelCase`                                                                                                         | `initParam()` 内部局部变量风格                                                                                                                                   |
+| 头/源文件名                       | `PascalCase`；**一 `class` 一文件**（类名与文件名一致）；扁平 `struct`/POD/小工具类型可多个共存于同一文件 | `StockManager.h`、`SignalBase.h`；`SG_Cross.h`、`MM_FixedPercent.h`、`ST_FixedPercent.h`、`SP_Normal.h`                                                |
+| 实现派生类文件                    | `PascalCase`，置于对应模块的 `imp/` 子目录                                                                        | `imp/CrossSignal.h`、`imp/FixedPercentMoneyManager.h`                                                                                                          |
+
+> 注：`hku` 是整个 C++ 核心库唯一的顶层命名空间；新增公开类须带 `HKU_API` 导出宏；工厂构造函数集中在各模块 `crt/` 子目录，派生实现集中在 `imp/` 子目录。
+>
+> **文件组织约束**：每个 `class` 必须独占一个头/源文件（文件名与类名一致）；仅扁平 `struct`、POD、小工具结构、枚举、typedef 别名等轻量定义可与其他类型共存于同一文件。例如 `Parameter.h` 中的 `struct ParamItemRecord` 与 `class Parameter` 共存属于合规例外，但 `class StockManager`、`class SignalBase` 等核心业务类各自独立成文件。
+
+### 命名规范（Python）
+
+以下规范自 `hikyuu/` 包现有代码（不含 `cpp/` 编译产物与 `test/`）提炼：
+
+| 标识符类别          | 规范                                                                                                   | 示例                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| 包 / 模块文件名     | `snake_case`                                                                                         | `indicator/`、`trade_manage/`、`trade_sys/`、`util/singleton.py`、`draw/drawplot/matplotlib_draw.py` |
+| 类                  | `PascalCase`                                                                                         | `class Spot`、`class OrderBrokerWrap`、`class SingletonType`、`class System`                           |
+| 公开函数 / 方法     | `snake_case`，动词起首                                                                               | `concat_to_df()`、`df_to_ind()`、`run_in_strategy()`、`get_part()`                                     |
+| 私有 / 内部方法     | 单下划线前缀 +`snake_case`（约定为内部使用，不强约束）                                               | `_buy()`、`_sell()`、`_get_asset_info()`、`_clone()`                                                   |
+| 魔术方法            | 双下划线包裹，Python 标准                                                                              | `__init__`、`__iter__`、`__str__`、`__repr__`                                                          |
+| 模块级常量          | `SCREAMING_SNAKE_CASE`                                                                               | `BASE_DIR`、`DRAWNULL`、`HDF5_COMPRESS_LEVEL`、`KDATA`、`CLOSE`、`OPEN`、`HIGH`、`LOW`         |
+| 全局上下文短变量    | 单字母大写（K 线字段/对象缩写）                                                                        | `O`、`C`、`H`、`L`、`A`、`V`、`D`、`K`、`Q`（在 `hikyuu/__init__.py` 中作为全局便捷别名）  |
+| 类变量 / 枚举式常量 | 全大写                                                                                                 | `System.ENVIRONMENT`、`System.SIGNAL`、`System.STOPLOSS`                                                 |
+| 实例变量            | `snake_case`；私有以单下划线开头                                                                     | `self._name`、`self._params`、`self._broker`、`self._instance_lock`、`self._stop_event`              |
+| 局部变量            | `snake_case`                                                                                         | `df`、`ind_list`、`head_stock_code`、`params`、`cloned`                                              |
+| 函数参数            | `snake_case`，类型注解变量名同样 `snake_case`                                                      | `head_stock_code`、`col_name`、`col_date`、`allocate_weight_func`、`get_real_buy_price`              |
+| 自定义装饰器        | `hku_` 前缀 + `snake_case`                                                                         | `@hku_catch`、`@hku_check_ignore`                                                                          |
+| property / 访问器   | `snake_case`（`flat/Spot.py` 中 `PascalCase` 访问器为 flatbuffers 生成代码，**非**本规范） | `hikyuu/` 自身代码访问器方法以 `snake_case` 为主                                                           |
+
+> 注：`hikyuu/cpp/core3xx.pyi` 等由 pybind11-stubgen 生成的存根中可能出现与上述不一致的命名，属于绑定层生成产物，不视为 Python 侧手写规范。
+
 ### 生成 .pyi 存根（pybind11-stubgen）
 
 C++ 绑定层（`core.so` / `core.pyd`）的 `.pyi` 存根使用 **pybind11-stubgen** 生成：
@@ -158,7 +206,7 @@ pip install pybind11-stubgen
 pybind11-stubgen -o . hikyuu
 ```
 
-- 生成的存根需人工复核后合并/替换到 `hikyuu/__init__.pyi`、`hikyuu/core.pyi` 等对应位置（生成内容可能包含与手写存根不一致的差异，注意保留手写部分的注释与说明）。
+- 不要手工生成存根，仅需要发布或人工请求时生成
 - 修改了 `hikyuu_pywrap/` 下的绑定（新增/变更类、函数、参数）后，应重新生成并同步对应存根。
 
 ## 6. 架构与关键组件
@@ -177,7 +225,7 @@ pybind11-stubgen -o . hikyuu
 
 ## 7. 文档
 
-- Sphinx + myst_parser，源文件在 `docs/source/`（`.rst` 与 `.md` 混用），默认中文。
+- Sphinx + myst_parser，源文件在 `docs/source/`（`.rst` 与 `.md` 混用， 新增文件时优先使用md），默认中文。
 - 本地构建：`cd docs && ./make.sh`（即 `sphinx-build -M html source build`）。
 - 修改公开接口/新增组件时同步更新 `docs/source/` 下对应章节（`indicator/`、`trade_sys/`、`trade_manage/`、`stock_manager.rst`、`factor.md` 等）。
 
@@ -195,7 +243,7 @@ pybind11-stubgen -o . hikyuu
 3. **只改 Python 层时无需重编 C++**，但要注意 `.pyi` 存根与实现保持同步，且 `hikyuu/core.py`/`extend.py` 承担核心对象导出。
 4. **编译产物不要提交**：`*.so`、`*.pyd`、`*.dll`、`build/` 均在 `.gitignore` 中；`hikyuu/cpp/` 下的 `core3xx.so` 等为本机构建产物。
 5. **新增依赖**：C++ 依赖在 `xmake.lua` 中 `add_requires`（注意平台差异与版本，如 hdf5 在 Windows 为 1.13.3、mysql 按平台不同版本）；Python 依赖加到 `requirements.txt`。
-6. **测试优先**：改动涉及 C++ 核心时，至少跑 `xmake r small-test` + `python3 hikyuu/test/test.py`；涉及具体模块时跑对应单测文件。
+6. **测试优先**：改动涉及 C++ 核心时，至少跑 `xmake r unit-test` + `python3 hikyuu/test/test.py`；涉及具体模块时跑对应单测文件。
 7. **CI 会验证**：`.github/workflows/` 下 ubuntu（aarch64/x86_64）、windows、macosx 三套流水线，PR 合入 `master` 前需通过构建与测试。
 8. **提交信息**：仓库使用中文或英文均可，历史中常见 `fix(xxx): 描述` 的 conventional commits 风格（如 `fix(data): 修复 SQL 后端派生周期 K 线跨界聚合`）。
 9. **谨慎处理**：`hikyuu_pywrap` 使用 unity build（`c++.unity_build`），新增 .cpp 时注意 unity_group 分组；修改 `xmake.lua` 后需重新 `xmake f` 配置。
@@ -205,5 +253,4 @@ pybind11-stubgen -o . hikyuu
 - [ ] `clang-format` / `yapf` 已格式化改动文件
 - [ ] C++ 改动已编译通过且 Python 侧可正常 `import hikyuu`
 - [ ] 相关单测已运行（C++：`xmake r small-test`；Python：`python3 hikyuu/test/test.py`）
-- [ ] 公开接口的 `.pyi` 存根与文档已同步
 - [ ] 未提交任何编译产物/本地数据文件

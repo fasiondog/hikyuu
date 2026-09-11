@@ -609,9 +609,21 @@ StockManager/Block/Stock
     .. py:method:: realtime_update(self, krecord)
     
         （临时函数）只用于更新内存缓存中的日线数据
+
+        单机数据服务客户端模式下：普通证券（本地无缓冲）的更新经 IPC 转发至主进程应用并
+        镜像至共享内存（全体客户端可读）；临时证券（经 set_krecord_list 建有本地缓冲）则
+        就地更新本地缓存、不外发。
         
         :param KRecord krecord: 新增的实时K线记录
         
+    .. py:method:: get_last_update_time(self[, ktype=Query.DAY])
+
+        获取指定类型 K 线数据的最后更新时刻。单机数据服务客户端模式下，普通证券转发至
+        主进程取其缓冲刷新时刻，临时证券（经 set_krecord_list 指定外部数据）则返回本地写入时刻。
+
+        :param Query.KType ktype: K线类型
+        :rtype: Datetime
+
     .. py:method:: load_kdata_to_buffer(self, ktype)
     
         将指定类别的K线数据加载至内存缓存

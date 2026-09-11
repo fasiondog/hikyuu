@@ -129,6 +129,7 @@ setup(
             'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
             'importdata=hikyuu.gui.importdata:main',
             'dataserver=hikyuu.gui.dataserver:main',
+            'shmserver=hikyuu.gui.shmserver:main',
         ]
     },
     install_requires=requirements,

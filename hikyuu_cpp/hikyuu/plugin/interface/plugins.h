@@ -20,6 +20,7 @@
 #include "DataDriverPluginInterface.h"
 #include "HkuExtraPluginInterface.h"
 #include "CheckDataPluginInterface.h"
+#include "ShmServerPluginInterface.h"
 
 namespace hku {
 
@@ -34,5 +35,6 @@ namespace hku {
 #define HKU_PLUGIN_CLICKHOUSE_DRIVER "clickhousedriver"
 #define HKU_PLUGIN_HKU_EXTRA "hkuextra"
 #define HKU_PLUGIN_CHECK_DATA "checkdata"
+#define HKU_PLUGIN_SHM_SERVER "shmserver"
 
 }  // namespace hku

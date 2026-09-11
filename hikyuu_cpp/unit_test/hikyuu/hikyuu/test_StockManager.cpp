@@ -9,6 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/utilities/Log.h>
+#include "../plugin_valid.h"
 
 using namespace hku;
 
@@ -275,6 +276,42 @@ TEST_CASE("test_StockManager_getZhBond10") {
     CHECK_EQ(result[10].value, doctest::Approx(3.2968));
     CHECK_EQ(result[5535].date, Datetime(20240229));
     CHECK_EQ(result[5535].value, doctest::Approx(2.3375));
+}
+
+/** @par 检测点 */
+TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
+    auto& sm = StockManager::instance();
+    const bool org_role = isShmServerRole();
+    Stock stk = sm.getStock("sz000001");
+    const size_t weight_cnt = stk.getWeight().size();
+    const size_t finance_cnt = stk.getHistoryFinance().size();
+
+    /** @arg 非 server 角色（普通独立/客户端进程）调用为空操作：缓存不受影响 */
+    setShmServerRole(false);
+    sm.releaseShmServerBaseInfoCache();
+    CHECK_EQ(stk.getWeight().size(), weight_cnt);
+    CHECK_EQ(stk.getHistoryFinance().size(), finance_cnt);
+
+    /** @arg server 角色释放权息缓存：改回独立模式（getWeight 无懒加载兜底）再查询返回空，
+     *          证明缓存确已清空并归还 */
+    setShmServerRole(true);
+    sm.releaseShmServerBaseInfoCache();
+    setShmServerRole(false);
+    CHECK_EQ(stk.getWeight().size(), 0);
+
+    /** @arg server 角色下再次访问已释放证券：按需懒加载重读自愈，结果与释放前一致 */
+    setShmServerRole(true);
+    CHECK_EQ(stk.getWeight().size(), weight_cnt);
+    CHECK_EQ(stk.getHistoryFinance().size(), finance_cnt);
+
+    // 恢复现场：独立/客户端模式的 Stock::getWeight 无懒加载兜底，须在恢复角色前回填全部证券
+    // 权息缓存，避免清空状态影响同进程后续用例（历史财务各模式均有懒加载兜底，无需回填）
+    for (const auto& stock : sm.getStockList(nullptr)) {
+        stock.getWeight();
+    }
+    setShmServerRole(org_role);
 }
 
 /** @} */

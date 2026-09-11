@@ -15,6 +15,7 @@
 #include "hikyuu/utilities/thread/thread.h"
 #include "hikyuu/utilities/plugin/PluginManager.h"
 #include "hikyuu/data_driver/DataDriverFactory.h"
+#include "hikyuu/plugin/interface/ShmServerPluginInterface.h"
 #include "Block.h"
 #include "MarketInfo.h"
 #include "StockTypeInfo.h"
@@ -60,6 +61,19 @@ public:
 
     /** 主动退出并释放资源 */
     static void quit();
+
+    /**
+     * 是否处于 IPC 客户端模式（数据由服务端提供，本地无预加载缓冲）
+     * @note 供 Stock::realtimeUpdate 等核心路径判断是否需将更新转发至主进程
+     */
+    bool isIpcClientMode() const;
+
+    /// 仅供单元测试：强制置位客户端模式标志，以验证 Stock::realtimeUpdate /
+    /// getLastUpdateTime 的“转发 vs 本地缓冲”门控分支；生产代码不得调用。
+    /// 调用方须在用例结束时复位，避免污染同进程内其他用例。
+    void _testingSetIpcClientMode(bool mode) {
+        m_ipc_client_mode = mode;
+    }
 
     /** 获取基础信息驱动参数 */
     const Parameter& getBaseInfoDriverParameter() const;
@@ -218,6 +232,14 @@ public:
     vector<HistoryFinanceInfo> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
 
     /**
+     * 获取指定证券的权息列表（经基础信息驱动；客户端模式下即 shm 优先、未覆盖回退 IPC/本地）
+     * @note 供 StockManager::loadAllStockWeights 启动期物化全量权息（isAll 分支用
+     *       getAllStockWeightList）；客户端模式下亦供 Stock::getWeight 对未物化证券（配置关闭、
+     *       addStock 新增、全新构造等）按需懒加载兜底
+     */
+    StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
+
+    /**
      * 添加Stock，仅供临时增加的特殊Stock使用
      * @param stock
      * @return true 成功 | false 失败
@@ -298,6 +320,32 @@ public:
         return m_cancel_load;
     }
 
+    /*
+     * 等待后台预加载线程退出（幂等：线程未启动或已结束时立即返回）。仅由程序退出路径调用，
+     * 须在 cancelLoad() 之后、停止 m_load_tg 之前调用，以根除预加载线程与退出时序对 m_load_tg
+     * 的并发访问（TOCTOU/UAF）。该线程仅加载数据、派发加载事件，不涉及任何 nng
+     * 操作，且全程检查 m_cancel_load，cancel 后能快速退出，故 join 不会成为 Windows 静态析构期
+     * 的新阻塞点。
+     */
+    void joinPreloadThread();
+
+    /**
+     * 释放 shm server 角色下各证券本地缓存的权息与历史财务数据，回收与共享内存快照重复的内存
+     * @details 由 shmserver 插件在“含历史财务的基础信息快照”发布成功后调用（_onLoadEvent 的
+     *          HISTORY_FINANCE_LOADED 分支及 start() 启动兜底发布）。发布后客户端均经共享内存
+     *          读取，服务端无需再保留两份副本。仅当本进程为 shm server 角色且非客户端模式时
+     *          真正执行，否则为空操作：
+     *          - 调用后各证券 m_weight_ready / m_history_finance_ready 置 false、缓存容器清空
+     *            并归还内存；后续 Stock::getWeight / Stock::getHistoryFinance（IPC 兜底应答、
+     *            同进程 API 访问）按需经基础信息驱动懒加载重读自愈，保证结果正确，代价仅为被
+     *            访问证券的首次库查询；
+     *          - 下一次数据 reload 时 loadAllStockWeights / 历史财务预加载会先行重新物化，
+     *            不影响下一轮快照重建；
+     *          - 切勿在仅发布权息（include_finance=false，即 BASE_DATA_READY 之后的首次发布）
+     *            后调用，否则随后含财务的发布将读到空的权息表。
+     */
+    void releaseShmServerBaseInfoCache();
+
 public:
     typedef StockMapIterator const_iterator;
     const_iterator begin() const {
@@ -315,9 +363,28 @@ private:
     /* 加载全部数据 */
     void loadData();
 
+    /* 获取 K 线驱动连接池，客户端模式下返回 IPC 代理驱动池 */
+    KDataDriverConnectPoolPtr _getKDataDriverPool();
+
+    /* 纯客户端协商 shm 数据服务：仅探测并连接既有服务，失败降级独立模式，绝不自行拉起服务 */
+    void _negotiateShmServer();
+
     /* 加载 K线数据至缓存 */
     void loadAllKData();
     std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
+
+    /* 串行加载全部 K 线及历史财务（驱动不支持并行加载时），在独立线程中执行 */
+    void _loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
+
+    /* 并行加载全部 K 线及历史财务，在独立线程中执行 */
+    void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
+
+    /*
+     * 派发数据加载事件给已注册的插件回调（无条件声明，由 loadData 与两个加载函数调用）。
+     * 核心库不再感知服务端存在，仅按序通知；无注册回调时零开销。
+     * @note 回调内禁止调用 register/unregisterLoadEventCallback（会死锁）
+     */
+    void _fireLoadEvent(LoadEvent event);
 
     /* 加载节假日信息 */
     void loadAllHolidays();
@@ -385,10 +452,35 @@ private:
     StrategyContext m_context;
 
     std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
+    std::thread m_preload_thread;           // 后台预加载线程（joinable，退出时由 joinPreloadThread 回收）
 
     PluginManager m_plugin_manager;
     std::string m_i18n_path;
+
+    // 本进程是否作为 shm 数据服务客户端（连接成功、装配代理驱动后置位）。转发回调由插件
+    // connect 成功后自行注册、断开时注销，核心库不持有任何插件类型指针
+    bool m_ipc_client_mode{false};
+    KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池
 };
+
+/** 数据加载事件回调类型 */
+using LoadEventCallback = std::function<void(LoadEvent)>;
+
+/**
+ * 注册数据加载事件回调，返回回调 id（插件 start() 时订阅，用于在正确时点发布快照）
+ * @note 回调容器锁堆分配且永不释放，故本函数及其逆过程在静态析构期调用亦安全
+ */
+HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
+
+/** 注销数据加载事件回调（插件 stop() 时调用）；id 不存在时为无操作 */
+HKU_API void unregisterLoadEventCallback(size_t id);
+
+/**
+ * 标记本进程为 shm server 角色：_negotiateShmServer() 据此跳过客户端协商（防自连接）
+ * @details 由门面 startShmServer() 在加载插件之前调用；即便 StockManager 尚未 init 亦可安全置位
+ */
+HKU_API void setShmServerRole(bool role) noexcept;
+HKU_API bool isShmServerRole() noexcept;
 
 inline size_t StockManager::size() const noexcept {
     return m_stockDict.size();
@@ -445,6 +537,11 @@ inline size_t StockManager::getHistoryFinanceFieldIndex(const string& name) cons
 inline vector<HistoryFinanceInfo> StockManager::getHistoryFinance(const Stock& stk, Datetime start,
                                                                   Datetime end) {
     return m_baseInfoDriver->getHistoryFinance(stk.market(), stk.code(), start, end);
+}
+
+inline StockWeightList StockManager::getStockWeightList(const Stock& stk, Datetime start,
+                                                        Datetime end) {
+    return m_baseInfoDriver->getStockWeightList(stk.market(), stk.code(), start, end);
 }
 
 inline void StockManager::setPluginPath(const std::string& path) {

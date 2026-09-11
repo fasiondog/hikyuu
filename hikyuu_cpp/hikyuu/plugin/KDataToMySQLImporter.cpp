@@ -21,8 +21,8 @@ KDataToMySQLImporter::KDataToMySQLImporter() {
 KDataToMySQLImporter::~KDataToMySQLImporter() {}
 
 bool KDataToMySQLImporter::setConfig(const string& host, int port, const string& user,
-                                     const string& pwd) {
-    return m_plugin ? m_plugin->setConfig(host, port, user, pwd) : false;
+                                     const string& pwd, const string& baseinfo_db) {
+    return m_plugin ? m_plugin->setConfig(host, port, user, pwd, baseinfo_db) : false;
 }
 
 Datetime KDataToMySQLImporter::getLastDatetime(const string& market, const string& code,
@@ -64,6 +64,23 @@ void KDataToMySQLImporter::addTransList(const string& market, const string& code
     if (m_plugin) {
         m_plugin->addTransList(market, code, translist);
     }
+}
+
+bool KDataToMySQLImporter::addMarket(const string& market, const string& name,
+                                     const string& description, const string& index_code,
+                                     uint64_t open1, uint64_t close1, uint64_t open2,
+                                     uint64_t close2) {
+    return m_plugin ? m_plugin->addMarket(market, name, description, index_code, open1, close1,
+                                          open2, close2)
+                    : false;
+}
+
+bool KDataToMySQLImporter::addStockType(uint32_t type_id, const string& description,
+                                        uint32_t precision, double tick, double tick_value,
+                                        double min_trade, double max_trade) {
+    return m_plugin ? m_plugin->addStockType(type_id, description, precision, tick, tick_value,
+                                             min_trade, max_trade)
+                    : false;
 }
 
 }  // namespace hku
