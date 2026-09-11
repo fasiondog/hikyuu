@@ -68,10 +68,10 @@ void KDataToHdf5Importer::addTransList(const string& market, const string& code,
 
 bool KDataToHdf5Importer::addMarket(const string& market, const string& name,
                                     const string& description, const string& index_code,
-                                    uint64_t last_date, uint64_t open1, uint64_t close1,
-                                    uint64_t open2, uint64_t close2) {
-    return m_plugin ? m_plugin->addMarket(market, name, description, index_code, last_date, open1,
-                                          close1, open2, close2)
+                                    uint64_t open1, uint64_t close1, uint64_t open2,
+                                    uint64_t close2) {
+    return m_plugin ? m_plugin->addMarket(market, name, description, index_code, open1, close1,
+                                          open2, close2)
                     : false;
 }
 

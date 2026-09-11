@@ -55,7 +55,6 @@ public:
      * @param name 市场名称
      * @param description 描述（建议注明时区，如 "NASDAQ/UTC-5"）
      * @param index_code 市场代表指数代码（getMarketStock/交易日历依赖 {market}{index_code}）
-     * @param last_date 起始日期 yyyymmdd
      * @param open1 上午开盘时间 HHMM
      * @param close1 上午收盘时间 HHMM
      * @param open2 下午开盘时间 HHMM
@@ -64,8 +63,8 @@ public:
      * @note 注册后须重启 hikyuu_init() 方生效；须另行导入代表指数 K 线
      */
     virtual bool addMarket(const string& market, const string& name, const string& description,
-                           const string& index_code, uint64_t last_date, uint64_t open1,
-                           uint64_t close1, uint64_t open2, uint64_t close2) = 0;
+                           const string& index_code, uint64_t open1, uint64_t close1,
+                           uint64_t open2, uint64_t close2) = 0;
 
     /**
      * @brief 向 baseinfo 库注册证券类型（幂等：已存在则跳过并返回 true）
