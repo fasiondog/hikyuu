@@ -8,6 +8,7 @@
  *  覆盖范围：
  *    1. MultiSystem 结构：运行模式、clone 保真、组合判定、循环引用检测（直接/嵌套）、
  *       任意深度嵌套、模式 B 额度回写（checkin/checkout）、驱动轴模式与固定轴注入、
+ *       run(query) 兼容重载（master Portfolio::run(query) 语义）、
  *       外部调仓日表注入（归一化去重 / 覆盖式写入 / 清空）；
  *    2. 组合级资金分配引擎 AllocateFundsBase（AF L1/L2/L3）：
  *       - L1 系统级分配：等权 / weight-list 固定权重（迁移 AF_FixedWeight/FixedWeightList）
@@ -102,6 +103,38 @@ TEST_CASE("test_MultiSystem_axis_mode") {
     CHECK_EQ(ms.getDateAxis()[1], Datetime(20250103));
     ms.clearDateAxis();
     CHECK_EQ(ms.getDateAxis().size(), 0);
+}
+
+/** @par 检测点：run(query) 兼容重载（等价 master Portfolio::run(query)，见 design.md §4.5） */
+TEST_CASE("test_MultiSystem_run_query") {
+    /** @arg 未注入固定时间轴且无子系统时，run(query) 告警返回、不抛出异常 */
+    auto ms = std::make_shared<MultiSystem>("ms");
+    ms->setTM(crtTM(Datetime(201111010000LL), 100000.0));
+    CHECK_NOTHROW(ms->run(KQuery(Datetime(20111101), Datetime(20111230))));
+    CHECK_EQ(ms->getSystemList().size(), 0);
+
+    /** @arg 注入固定时间轴时，run(query) 以其为驱动轴，且不改写入参 query 与注入轴 */
+    auto ms2 = std::make_shared<MultiSystem>("ms2");
+    ms2->setTM(crtTM(Datetime(201111010000LL), 100000.0));
+    auto sys = create_test_sys(3, 5);
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(20111101), Datetime(20111230));
+    sys->setTO(stk.getKData(query));
+    ms2->add(sys);
+    ms2->setAxisMode("calendar");
+    ms2->setDateAxis({Datetime(20111122), Datetime(20111123), Datetime(20111124)});
+
+    ms2->run(query);
+    /** @arg 上下文 KData 承载入参 query（子系统计算与价格查询均以此为上下文） */
+    CHECK_EQ(ms2->getQuery(), query);
+    /** @arg 注入的固定时间轴未被改写 */
+    REQUIRE_EQ(ms2->getDateAxis().size(), 3);
+    CHECK_EQ(ms2->getDateAxis()[0], Datetime(20111122));
+    CHECK_EQ(ms2->getDateAxis()[2], Datetime(20111124));
+    /** @arg 子系统运行后其上下文 KData 与入参 query 一致（run(kdata) 语义未破坏） */
+    REQUIRE_EQ(ms2->getSystemList().size(), 1);
+    CHECK_EQ(ms2->getSystemList()[0]->getQuery(), query);
 }
 
 /** @par 检测点：外部调仓日表注入（归一化去重、忽略 Null）/ 覆盖式写入 / clone 保真 / 清空回退 */

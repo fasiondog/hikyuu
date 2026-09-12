@@ -17,6 +17,7 @@
 
 #include "../../selector/SelectorBase.h"
 #include "../../../utilities/arithmetic.h"
+#include "../../../StockManager.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::MultiSystem)
@@ -256,6 +257,62 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
 }
 
 void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
+    // 驱动轴选择（参数 axis-mode，见 MultiSystem.h）：
+    //   "kdata"    —— 以入参 KData 自带日期序列为轴（默认，保持既有行为）
+    //   "calendar" —— 以 setDateAxis() 注入的固定日期表（如全市场交易日历）为轴；
+    //                 入参 KData 退化为 query/ktype 与价格查询上下文（runMoment/_closePhase 仅取其 query）
+    string axis_mode = tryGetParam<string>("axis-mode", "kdata");
+    bool use_calendar_axis = (axis_mode == "calendar");
+    if (use_calendar_axis && m_date_axis.empty()) {
+        HKU_WARN("axis-mode=calendar but date axis is empty, fallback to kdata axis! [{}]", name());
+        use_calendar_axis = false;
+    }
+    _runAxis(kdata, use_calendar_axis ? &m_date_axis : nullptr, reset, resetAll);
+}
+
+Stock MultiSystem::_findStock(const SystemPtr& sys) {
+    HKU_IF_RETURN(!sys, Stock());
+    Stock stk = sys->getStock();
+    HKU_IF_RETURN(!stk.isNull(), stk);
+    for (const auto& sub : sys->getSubSystemList()) {
+        stk = _findStock(sub);
+        HKU_IF_RETURN(!stk.isNull(), stk);
+    }
+    return Stock();
+}
+
+void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
+    // master 兼容重载：等价 Portfolio::run(query)，以市场交易日历为驱动轴（见 design.md §4.5）
+    auto& sm = StockManager::instance();
+
+    // 与 master 一致：ktype 非日线时，仅当 adjust-mode 为 query/day 才允许（日历轴为日线序列）
+    string mode = getAdjustMode();
+    to_lower(mode);
+    HKU_CHECK(mode == "query" || mode == "day" || query.kType() == KQuery::DAY,
+              "The kType of query must be DAY when adjust-mode is not \"query\"! [{}]", name());
+
+    // 驱动轴：显式注入的固定时间轴优先（尊重 axis-mode=calendar 使用者的注入），否则取市场交易日历
+    DatetimeList dates = (getAxisMode() == "calendar" && !m_date_axis.empty())
+                           ? m_date_axis
+                           : sm.getTradingCalendar(query);
+    HKU_WARN_IF_RETURN(dates.empty(), void(), "No trading date in the query range! [{}]", name());
+
+    // 上下文 KData（仅承载 query/ktype 与价格查询上下文）：
+    //   自身标的（显式设置）→ 首个（递归）子系统标的 → 日历基准指数
+    Stock ref_stk = getStock();
+    for (size_t i = 0; i < m_sys_list.size() && ref_stk.isNull(); ++i) {
+        ref_stk = _findStock(m_sys_list[i]);
+    }
+    if (ref_stk.isNull()) {
+        MarketInfo market_info = sm.getMarketInfo("SH");
+        ref_stk = sm.getStock(market_info.market() + market_info.code());
+    }
+    HKU_WARN_IF_RETURN(ref_stk.isNull(), void(), "No stock as price context! [{}]", name());
+
+    _runAxis(ref_stk.getKData(query), &dates, reset, resetAll);
+}
+
+void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool reset, bool resetAll) {
     HKU_WARN_IF_RETURN(m_sys_list.empty(), void(), "No subsystem specified!");
     m_kdata = kdata;
 
@@ -283,24 +340,13 @@ void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
         tm_last_datetime = tm_last_datetime.startOfDay();
     }
 
-    // 驱动轴选择（参数 axis-mode，见 MultiSystem.h）：
-    //   "kdata"    —— 以入参 KData 自带日期序列为轴（默认，保持既有行为）
-    //   "calendar" —— 以 setDateAxis() 注入的固定日期表（如全市场交易日历）为轴；
-    //                 入参 KData 退化为 query/ktype 与价格查询上下文（runMoment/_closePhase 仅取其 query）
-    string axis_mode = tryGetParam<string>("axis-mode", "kdata");
-    bool use_calendar_axis = (axis_mode == "calendar");
-    if (use_calendar_axis && m_date_axis.empty()) {
-        HKU_WARN("axis-mode=calendar but date axis is empty, fallback to kdata axis! [{}]", name());
-        use_calendar_axis = false;
-    }
-
     // v5：adjust-mode 内化 —— 非 query/day 时在「驱动轴」上展开调仓日表（design.md §4.3）。
     // 展开只依赖驱动轴本身，与驱动循环解耦；外部 setAdjustDates() 注入优先。
-    _expandAdjustDates(use_calendar_axis ? m_date_axis : m_kdata.getDatetimeList());
+    _expandAdjustDates(axis ? *axis : m_kdata.getDatetimeList());
 
-    if (use_calendar_axis) {
+    if (axis) {
         // 固定时间轴驱动：轴上日期未必存在于入参 KData（停牌/非交易日不构成缺口）
-        for (const auto& dt : m_date_axis) {
+        for (const auto& dt : *axis) {
             if (dt >= tm_init_datetime && dt >= tm_last_datetime) {
                 runMoment(dt);
             }

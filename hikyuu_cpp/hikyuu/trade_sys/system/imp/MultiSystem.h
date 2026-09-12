@@ -67,6 +67,19 @@ public:
     }
 
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
+
+    /** master 兼容重载：等价 master `Portfolio::run(query)`，以市场交易日历为驱动轴运行。
+     *  - 驱动轴：已显式注入的固定时间轴（axis-mode == "calendar" 且非空）优先，
+     *            否则取 StockManager 市场交易日历 `get_trading_calendar(query)`（默认 SH 市场）；
+     *  - 上下文 KData：仅提供 query/ktype 与价格查询上下文，优先取自身标的 `getStock()`，
+     *            其次取首个（递归）子系统标的，最后退化为日历基准指数（如 sh000001）的 KData；
+     *  - 不修改 axis-mode / 固定时间轴参数，仅本次运行使用日历轴驱动。
+     *  @param query 查询条件（同时作为子系统与价格的查询上下文）
+     *  @param reset 运行前是否复位（转发给各子系统）
+     *  @param resetAll 运行前是否强制全量复位
+     *  @note ktype 非日线时，与 master 一致，要求 adjust-mode 为 query/day（日历轴为日线序列）。 */
+    void run(const KQuery& query, bool reset = true, bool resetAll = false);
+
     virtual MomentResult runMoment(const Datetime& datetime) override;
     virtual MomentResult runMomentOnOpen(const Datetime& datetime) override;
     virtual MomentResult runMomentOnClose(const Datetime& datetime) override;
@@ -266,6 +279,13 @@ private:
     DatetimeList m_date_axis;     // 固定时间轴：axis-mode="calendar" 时的驱动日期表（运行时态，不序列化）
     std::set<Datetime> m_adjust_dates;  // 外部调仓日表（归一化至当日零点；非空时优先于 m_adjust_cycle，运行时态，不序列化）
     std::set<Datetime> m_auto_adjust_dates;  // adjust-mode 自动展开的调仓日表（运行时态，不序列化，不覆盖外部注入）
+
+    /** 按指定驱动轴运行：axis 为空时以入参 KData 自带日期序列为轴，否则以 axis 为驱动轴
+     *  （固定时间轴驱动时，轴上日期未必存在于入参 KData，停牌/非交易日不构成缺口） */
+    void _runAxis(const KData& kdata, const DatetimeList* axis, bool reset, bool resetAll);
+
+    /** 递归查找系统自身或其（嵌套聚合）子系统的标的，未找到返回空 Stock */
+    static Stock _findStock(const SystemPtr& sys);
 
     /** 注册聚合系统自身参数（axis-mode / adjust-mode / delay-to-trading-day） */
     void _initAxisParam() {

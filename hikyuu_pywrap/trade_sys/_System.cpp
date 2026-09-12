@@ -525,6 +525,19 @@ void export_System(py::module& m) {
     各子系统拥有独立虚拟账户，父系统在自身账户上统一分配与下单。
 
     :param KData kdata: 对齐的时间轴（应覆盖各子系统的交易日）)")
+      .def("run", py::overload_cast<const KQuery&, bool, bool>(&MultiSystem::run), py::arg("query"),
+           py::arg("reset") = true, py::arg("reset_all") = false,
+           R"(run(self, query, reset=True, reset_all=False)
+
+    [master 兼容] 以市场交易日历为驱动轴运行，等价 master 的 Portfolio.run(query)。
+
+    与 run(kdata) 的区别：驱动轴不再取入参 KData 自带日期，而是取交易日历
+    （已注入的固定时间轴优先，否则为 StockManager.get_trading_calendar(query)）。
+    价格与 ktype 上下文取自参考标的 KData（自身标的 → 首个子系统标的 → 日历基准指数）。
+
+    :param Query query: 查询条件
+    :param bool reset: 运行前是否复位
+    :param bool reset_all: 运行前是否强制全量复位)")
       .def("runMoment", &MultiSystem::runMoment, py::arg("datetime"),
            R"(runMoment(self, datetime)
 

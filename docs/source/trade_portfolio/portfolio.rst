@@ -100,7 +100,8 @@ PF 部件说明:
       - ``MultiSystemPtr``（兼容别名 ``PortfolioPtr`` 指向 ``MultiSystemPtr``，存量 ``PortfolioPtr pf = PF_Simple(...)`` 可继续编译）
     * - 类 / 方法
       - ``Portfolio`` / ``SimplePortfolio`` / ``WithoutAFPortfolio`` 及其方法（``run`` / ``getRunningDates`` / ``getCycleEndDates`` / ``lastSuggestion`` …）
-      - 不再存在；改用 :class:`MultiSystem` 的 ``run`` / ``getAdjustDates`` / ``getAdjustTurnover`` / ``toSuggestions``
+      - 不再存在；改用 :class:`MultiSystem` 的 ``run`` / ``getAdjustDates`` / ``getAdjustTurnover`` / ``toSuggestions``。
+        其中 ``run(query)`` 另提供兼容重载（等价 master ``Portfolio.run(query)``，以市场交易日历为驱动轴），存量 ``pf.run(query)`` 无需改写
     * - 账户层级
       - 真实 TM + 影子 TM + 子系统账户
       - 父真实 TM + 子系统影子账户 ``TM_SUB``（:meth:`MultiSystem.set_sub_init_cash`）
@@ -114,7 +115,9 @@ PF 部件说明:
 迁移建议：
 
 - 位置传参调用 ``PF_Simple(...)`` / ``PF_WithoutAF(...)`` **无需修改**（返回类型别名可承接）。
-- 调用 ``Portfolio`` 类方法处，改为 :class:`MultiSystem` 写法：
+- ``pf.run(query)`` **无需修改**：:meth:`MultiSystem.run` 提供 ``query`` 兼容重载，
+  以市场交易日历（``StockManager.get_trading_calendar``，默认 SH）为驱动轴，语义等价 master ``Portfolio.run(query)``。
+- 需要自定义驱动轴时，改用显式写法：
   ``ms.set_axis_mode("calendar")`` + ``ms.set_date_axis(...)`` + ``ms.run(kdata)``。
 - 依赖 ``lastSuggestion()`` 的代码改用 ``System.to_suggestions()``（字段结构不同）。
 - 新项目直接使用 :class:`MultiSystem` + :class:`AllocateFundsBase`。
