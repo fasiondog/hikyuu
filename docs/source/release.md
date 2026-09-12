@@ -2,6 +2,46 @@
 
 # 版本发布说明
 
+## Unreleased
+
+**⚠️ 破坏性变更：MM / AF 职责分离（Portfolio / AllocateFunds 体系重构）**
+
+原独立组合引擎 `Portfolio`（`SimplePortfolio` / `WithoutAFPortfolio`）由 `MultiSystem` 承接；
+组合级资金分配从 `MoneyManagerBase` 剥离，改由独立基类 `AllocateFundsBase`（AF）承载：
+
+* `PF_Simple` / `PF_WithoutAF` 工厂保留（函数名、参数名、参数顺序、默认值不变），但**返回 `MultiSystem`**，
+  其中 `af` 参数类型由 `MMPtr` 改为 `AFPtr`；
+* `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor`
+  工厂保留，但**返回 `AllocateFundsBase` 实例**（`AFPtr`）；
+* `MoneyManagerBase` **限定为单系统 / 单证券**形态：移除组合级接口
+  （`allocate` / `set_mode` / `_allocate_system_weight` / `_allocate_suggestions` / `_check_risk`
+  及 `max-single-position` / `weight-list` / `fixed-amount` 参数与 `mode` 属性）；
+* `Portfolio` 类及其方法**不再提供**；Python `crtAF` **保留**，回调契约由 `_allocateWeight(date, se_list)`
+  更新为 `_allocate(date, tm, contexts, query)`，并可选注入 `_to_targets` / `_check_risk`。
+
+迁移要点：
+
+* 位置传参调用 `PF_*` / `AF_*` 无需修改（提供 `PortfolioPtr` → `MultiSystemPtr`、
+  `AFPtr` → `AllocateFundsPtr` 兼容别名）；
+* `Portfolio` 类方法改用 `MultiSystem` 等价接口：驱动时间轴用 `set_axis_mode("calendar")` +
+  `set_date_axis(...)`；`lastSuggestion()` → `System.to_suggestions()`；
+  `getRunningDates/getCycleEndDates/getRealSystemList` 等查询接口不再提供；
+* 自定义资产分配：`crtAF(allocate_func[, to_targets_func, check_risk_func])` 快速构建，或继承
+  `AllocateFundsBase` 并重载 `_allocate`（L1）/ `_to_targets`（L2）/ `_check_risk`（L3）；
+* 组合级分配模式（A/B）唯一来源在 AF：`MultiSystem.set_mode` 转发至 `set_af`；序列化向后兼容
+  （旧档案中的 `m_mode` 自动迁移至 AF）；
+* `sys_use_self_tm` 等在新体系无对应语义的参数将被忽略并告警；AF 的 `auto_adjust_weight` 语义由
+  `AF_FixedWeight` / `AF_FixedWeightList` 的「不归一化」直接承载。
+
+详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
+
+**🚀 新增特性**
+
+* feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 A）
+* feat(allocatefunds): 独立 `AllocateFundsBase` 基类与 `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` 工厂（承载组合级 L1/L2/L3）
+* feat(allocatefunds): 恢复 Python `crtAF` 便捷构造（L1 `_allocate`，可选注入 L2 `_to_targets` / L3 `_check_risk`）
+* feat(MultiSystem): 新增 `adjust-mode` / `delay-to-trading-day` 参数，支持将调仓模式内化为调仓日表
+
 ## 2.8.2 - 2026年8月20日
 
 **🚀 新增特性**
