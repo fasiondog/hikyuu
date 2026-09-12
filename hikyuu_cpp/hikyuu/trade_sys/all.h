@@ -21,4 +21,8 @@
 #include "selector/build_in.h"
 #include "multifactor/build_in.h"
 
+// v5：PF/AF 兼容层（工厂直通，见 docs/design/pf_af_compat/design.md）
+#include "allocatefunds/build_in.h"
+#include "portfolio/build_in.h"
+
 #endif /* ALL_TRADE_SYS_H_ */

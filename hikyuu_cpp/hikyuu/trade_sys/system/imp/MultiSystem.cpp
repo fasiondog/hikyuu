@@ -13,14 +13,22 @@
 #include <map>
 #include <cmath>
 #include <set>
+#include <unordered_map>
 
 #include "../../selector/SelectorBase.h"
+#include "../../../utilities/arithmetic.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::MultiSystem)
 #endif
 
 namespace hku {
+
+static const string s_default_af_mode = "A";
+
+const string& MultiSystem::getMode() const {
+    return m_af ? m_af->getMode() : s_default_af_mode;
+}
 
 bool MultiSystem::_subtreeContains(const SystemPtr& candidate, System* target) {
     if (!candidate || !target) {
@@ -116,15 +124,135 @@ SystemPtr MultiSystem::_clone() {
     ret->m_adjust_cycle = m_adjust_cycle;
     ret->m_trade_on_close = m_trade_on_close;
     ret->m_sell_at_not_selected = m_sell_at_not_selected;
+    ret->m_date_axis = m_date_axis;  // 固定时间轴随配置复制（axis-mode 参数由 System::clone 复制）
+    ret->m_adjust_dates = m_adjust_dates;  // 外部调仓日表随配置复制
     if (getMM()) {
         ret->setMM(getMM()->clone());
+    }
+    // AF 的 clone 已复制 m_mode，不再需要额外的模式同步
+    if (m_af) {
+        ret->setAF(m_af->clone());
     }
     if (m_se) {
         ret->m_se = m_se->clone();
     }
-    // setMode 会同步设置 MM 的模式，须在 setMM 之后调用，确保克隆体保留 A/B 模式
-    ret->setMode(m_mode);
     return ret;
+}
+
+void MultiSystem::setAxisMode(const string& mode) {
+    if (mode != "kdata" && mode != "calendar") {
+        HKU_WARN("Invalid axis-mode: {}, only \"kdata\" / \"calendar\" supported, fallback to \"kdata\"! [{}]",
+                 mode, name());
+        setParam<string>("axis-mode", "kdata");
+        return;
+    }
+    setParam<string>("axis-mode", mode);
+}
+
+void MultiSystem::setAdjustDates(const DatetimeList& dates) {
+    m_adjust_dates.clear();
+    for (const auto& date : dates) {
+        if (!date.isNull()) {
+            m_adjust_dates.insert(date.startOfDay());
+        }
+    }
+}
+
+void MultiSystem::setAdjustMode(const string& mode) {
+    string m = mode;
+    to_lower(m);
+    if (m != "query" && m != "day" && m != "week" && m != "month" && m != "quarter" &&
+        m != "year") {
+        HKU_WARN("Invalid adjust-mode: {}, only query/day/week/month/quarter/year supported, "
+                 "fallback to \"query\"! [{}]",
+                 mode, name());
+        setParam<string>("adjust-mode", "query");
+        return;
+    }
+    setParam<string>("adjust-mode", m);
+}
+
+void MultiSystem::_expandAdjustDates(const DatetimeList& axis) {
+    m_auto_adjust_dates.clear();
+    // 外部显式注入优先，不再自动展开（保持 setAdjustDates 的高优先级）
+    if (!m_adjust_dates.empty() || axis.empty()) {
+        return;
+    }
+    string mode = getAdjustMode();
+    to_lower(mode);
+    if (mode == "query" || mode == "day") {
+        return;  // 沿用 m_adjust_cycle 的收盘日计数判定
+    }
+    DatetimeList expanded = calcAdjustDates(axis, mode, m_adjust_cycle, getDelayToTradingDay());
+    for (const auto& d : expanded) {
+        m_auto_adjust_dates.insert(d.startOfDay());
+    }
+    if (getParam<bool>("trace")) {
+        HKU_INFO("[{}] adjust-mode={} expand adjust dates: {} (axis={})", name(), mode,
+                 m_auto_adjust_dates.size(), axis.size());
+    }
+}
+
+DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const string& mode,
+                                          int adjust_cycle, bool delay_to_trading_day) {
+    std::set<Datetime> result;
+    if (dates.empty()) {
+        return DatetimeList();
+    }
+    // 严格限定 mode：仅 week/month/quarter/year 有效，其余（query/day/非法值）返回空
+    string m = mode;
+    to_lower(m);
+    if (m != "week" && m != "month" && m != "quarter" && m != "year") {
+        return DatetimeList();
+    }
+    const size_t total = dates.size();
+    const int cycle = adjust_cycle > 0 ? adjust_cycle : 1;
+
+    if (delay_to_trading_day) {
+        // 顺延语义：目标日非交易日时，顺延至当周期内的首个交易日（与 master Portfolio 一致）。
+        // emitted 记录已命中的「理论调仓日」，同一周期只命中一次。
+        std::set<Datetime> emitted;
+        for (size_t i = 0; i < total; ++i) {
+            const Datetime& date = dates[i];
+            Datetime adjust_date;
+            if (m == "week") {
+                adjust_date = date.startOfWeek() + Days(cycle - 1);
+            } else if (m == "month") {
+                adjust_date = date.startOfMonth() + Days(cycle - 1);
+            } else if (m == "quarter") {
+                adjust_date = date.startOfQuarter() + Days(cycle - 1);
+            } else {  // year
+                adjust_date = date.startOfYear() + Days(cycle - 1);
+            }
+            bool adjust = false;
+            if (date == adjust_date) {
+                adjust = true;
+                emitted.emplace(adjust_date);
+            } else if (emitted.find(adjust_date) == emitted.end() && date > adjust_date) {
+                adjust = true;
+                emitted.emplace(adjust_date);
+            }
+            if (adjust) {
+                result.insert(date);
+            }
+        }
+    } else {
+        for (size_t i = 0; i < total; ++i) {
+            const Datetime& date = dates[i];
+            bool adjust = false;
+            if (m == "week") {
+                adjust = (date.dayOfWeek() == cycle);  // 每周第 cycle 日（0=周日, 1=周一 ... 6=周六）
+            } else if (m == "month" || m == "quarter") {
+                adjust = (date.day() == cycle);  // 每月/每季第 cycle 日
+            } else {                             // year
+                adjust = (date.dayOfYear() == cycle);  // 每年第 cycle 日
+            }
+            if (adjust) {
+                result.insert(date);
+            }
+        }
+    }
+    return DatetimeList(result.begin(), result.end());
 }
 
 void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
@@ -155,12 +283,36 @@ void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
         tm_last_datetime = tm_last_datetime.startOfDay();
     }
 
-    // 聚合系统在完整对齐时间轴上驱动所有子系统
-    size_t total = m_kdata.size();
-    auto const* ks = m_kdata.data();
-    for (size_t i = 0; i < total; ++i) {
-        if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= tm_last_datetime) {
-            runMoment(ks[i].datetime);
+    // 驱动轴选择（参数 axis-mode，见 MultiSystem.h）：
+    //   "kdata"    —— 以入参 KData 自带日期序列为轴（默认，保持既有行为）
+    //   "calendar" —— 以 setDateAxis() 注入的固定日期表（如全市场交易日历）为轴；
+    //                 入参 KData 退化为 query/ktype 与价格查询上下文（runMoment/_closePhase 仅取其 query）
+    string axis_mode = tryGetParam<string>("axis-mode", "kdata");
+    bool use_calendar_axis = (axis_mode == "calendar");
+    if (use_calendar_axis && m_date_axis.empty()) {
+        HKU_WARN("axis-mode=calendar but date axis is empty, fallback to kdata axis! [{}]", name());
+        use_calendar_axis = false;
+    }
+
+    // v5：adjust-mode 内化 —— 非 query/day 时在「驱动轴」上展开调仓日表（design.md §4.3）。
+    // 展开只依赖驱动轴本身，与驱动循环解耦；外部 setAdjustDates() 注入优先。
+    _expandAdjustDates(use_calendar_axis ? m_date_axis : m_kdata.getDatetimeList());
+
+    if (use_calendar_axis) {
+        // 固定时间轴驱动：轴上日期未必存在于入参 KData（停牌/非交易日不构成缺口）
+        for (const auto& dt : m_date_axis) {
+            if (dt >= tm_init_datetime && dt >= tm_last_datetime) {
+                runMoment(dt);
+            }
+        }
+    } else {
+        // 聚合系统在完整对齐时间轴上驱动所有子系统
+        size_t total = m_kdata.size();
+        auto const* ks = m_kdata.data();
+        for (size_t i = 0; i < total; ++i) {
+            if (ks[i].datetime >= tm_init_datetime && ks[i].datetime >= tm_last_datetime) {
+                runMoment(ks[i].datetime);
+            }
         }
     }
     m_calculated = true;
@@ -224,7 +376,18 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
     return result;
 }
 
-bool MultiSystem::_isAdjustDate() const {
+bool MultiSystem::_isAdjustDate(const Datetime& date) const {
+    // 外部调仓日表优先：仅命中表内日期才调仓（PF 映射 master adjust_mode / delay_to_trading_day 时使用）
+    if (!date.isNull()) {
+        if (!m_adjust_dates.empty()) {
+            return m_adjust_dates.find(date.startOfDay()) != m_adjust_dates.end();
+        }
+        // adjust-mode ∈ {week,month,quarter,year} 自动展开的调仓日表
+        if (!m_auto_adjust_dates.empty()) {
+            return m_auto_adjust_dates.find(date.startOfDay()) != m_auto_adjust_dates.end();
+        }
+    }
+    // 回退：每 m_adjust_cycle 个收盘日再平衡
     if (m_adjust_cycle <= 1) {
         return true;
     }
@@ -376,16 +539,18 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         }
     }
 
-    bool is_adjust = _isAdjustDate();
+    bool is_adjust = _isAdjustDate(datetime);
 
     // 调仓日 SE 选股：只对选中子系统收集建议；未选中按 sell_at_not_selected 清仓。
     // 非调仓日不启用 SE 过滤（各子系统照常运行）。
     std::set<System*> selected;
+    std::unordered_map<System*, double> se_scores;  // v5：SE 得分，供 AF_MultiFactor 等以得分为权重
     if (m_se && is_adjust) {
         SystemWeightList sws = m_se->getSelected(datetime);
         for (auto& sw : sws) {
             if (sw.sys) {
                 selected.insert(sw.sys.get());
+                se_scores[sw.sys.get()] = sw.weight;
             }
         }
     }
@@ -418,6 +583,11 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         SubSystemContext ctx;
         ctx.sys = sys;
         ctx.funds = sys->getTM()->getFunds(datetime, ktype);
+        // v5：回填 SE 得分（非调仓日/未选中为 0），供 AF_MultiFactor 等以得分为权重
+        auto score_it = se_scores.find(sys.get());
+        if (score_it != se_scores.end()) {
+            ctx.score = score_it->second;
+        }
         contexts.push_back(ctx);
     }
 
@@ -425,10 +595,10 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
 
     TradeRecordList executed;
     if (m_trade_on_close && is_adjust) {
-        if (m_mode == "B") {
+        if (getMode() == "B") {
             // 模式 B：即使无交易建议也要运行 L1 产出下期额度（额度分配独立于建议），
             // L2 透传子系统真实指令；调仓日回写下期额度（滞后一期，额度穿透）。
-            getMM()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
+            getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
             if (!suggestions.empty()) {
                 _executeSuggestions(datetime, suggestions, ktype, executed);
             }
@@ -438,8 +608,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 }
             }
         } else if (!suggestions.empty()) {
-            // 模式 A：等权换算后父统一下单
-            getMM()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
+            // 模式 A：AF 的 L2 换算后父统一下单
+            getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
             _executeSuggestions(datetime, suggestions, ktype, executed);
         }
     }

@@ -119,6 +119,9 @@ target("hikyuu")
     add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
     
     add_files("./trade_sys/**.cpp|allocatefunds/**.cpp|portfolio/**.cpp|condition/**.cpp|system/**.cpp")
+    -- v5：PF/AF 兼容层工厂（工厂直通，见 docs/design/pf_af_compat/design.md §4 / §5）
+    add_files("./trade_sys/allocatefunds/**.cpp", {unity_group="allocatefunds"})
+    add_files("./trade_sys/portfolio/**.cpp", {unity_group="portfolio"})
     add_files("./trade_sys/condition/*.cpp", "./trade_sys/condition/imp/logic/*.cpp", {unity_group="condition"})
     add_files("./trade_sys/condition/imp/*.cpp", {unity_group="condition_imp"})
     add_files("./trade_sys/environment/*.cpp", "./trade_sys/environment/imp/logic/*.cpp", {unity_group="environment"})

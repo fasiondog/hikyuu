@@ -2,7 +2,7 @@
 
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
-    ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase,
+    AllocateFundsBase, ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase,
     MultiFactorBase, ScoresFilterBase, NormalizeBase
 )
 
@@ -181,7 +181,30 @@ def crtSE(calculate, get_selected, params={}, name='crtSE'):
     return ret
 
 
+# ------------------------------------------------------------------
+# allocate_funds
+# ------------------------------------------------------------------
+def crtAF(allocate_func, params={}, name='crtAF', to_targets_func=None, check_risk_func=None):
+    """
+    快速创建资产分配算法（AF）
 
+    :param allocate_func: L1 系统级分配接口，原型 ``func(self, date, tm, contexts, query)``，
+        返回 ``{System: weight}``；模式 B 下就地回写 ``contexts[i].quota`` 并返回空表
+    :param {} params: 参数字典
+    :param str name: 自定义名称
+    :param to_targets_func: L2 行为级换算接口，原型 ``func(self, date, tm, suggestions, sys_weight, query)``，可选
+    :param check_risk_func: L3 组合风控接口，原型 ``func(self, date, tm, suggestions, query)``，可选
+    :return: 自定义资产分配算法实例
+    """
+    meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init, '_clone': part_clone})
+    meta_x._allocate = allocate_func
+    if to_targets_func is not None:
+        meta_x._to_targets = to_targets_func
+    if check_risk_func is not None:
+        meta_x._check_risk = check_risk_func
+    ret = meta_x(name, params)
+    globals().update(dict(_=ret))
+    return ret
 
 
 # ------------------------------------------------------------------

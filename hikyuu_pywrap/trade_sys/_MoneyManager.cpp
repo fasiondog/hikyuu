@@ -270,4 +270,6 @@ void export_MoneyManager(py::module& m) {
     :param list buy_counts: 买入数量列表
     :param list sell_counts: 卖出数量列表
     :return: 资金管理策略实例)");
+
+    // 注：组合级资金分配（AF_*）已迁出至 _AllocateFunds.cpp（AllocateFundsBase）。
 }

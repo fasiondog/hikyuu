@@ -10,11 +10,36 @@
 #include <hikyuu/trade_sys/system/TradeSuggestion.h>
 #include <hikyuu/trade_sys/system/SubSystemContext.h>
 #include <hikyuu/trade_sys/system/imp/MultiSystem.h>
+// v5：PF 兼容层（工厂直通，见 docs/design/pf_af_compat/design.md §4）
+#include <hikyuu/trade_sys/portfolio/build_in.h>
+#include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include "../pybind_utils.h"
 #include "_System.h"
 
 namespace py = pybind11;
 using namespace hku;
+
+namespace {
+
+// DatetimeList（std::vector<Datetime>）已由 py::bind_vector 注册为独立 Python 类型
+// （hikyuu_pywrap/bind_stl.cpp），注册类型优先于 pybind11/stl.h 的转换器，导致仅接受
+// DatetimeList 实例而拒绝 Python list/tuple。此处在绑定层统一接受任意可迭代的 Datetime
+// 序列并手动转换，既兼容既有的 DatetimeList 传参，也支持 list/tuple 写法。
+DatetimeList toDatetimeList(const py::object& dates) {
+    DatetimeList result;
+    if (dates.is_none()) {
+        return result;
+    }
+    if (!py::hasattr(dates, "__iter__")) {
+        throw py::type_error("dates 需为 Datetime 的可迭代序列（list/tuple/DatetimeList）");
+    }
+    for (auto item : py::iter(dates)) {
+        result.push_back(py::cast<Datetime>(item));
+    }
+    return result;
+}
+
+}  // namespace
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4267)
@@ -290,6 +315,7 @@ void export_System(py::module& m) {
       .def_readwrite("profit_curve", &SubSystemContext::profit_curve)
       .def_readwrite("total_return", &SubSystemContext::total_return)
       .def_readwrite("current_weight", &SubSystemContext::current_weight)
+      .def_readwrite("score", &SubSystemContext::score)
       .def_readwrite("quota", &SubSystemContext::quota)
       .def_readwrite("suggestion_count", &SubSystemContext::suggestion_count);
 
@@ -515,8 +541,77 @@ void export_System(py::module& m) {
            "设置子系统影子账户初始资金（模式 A 固定值 / 模式 B 初始额度）")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
            "设置调仓周期（天），<=1 表示每个收盘日都再平衡")
+      .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
+           R"(set_axis_mode(self, mode)
+
+    设置驱动时间轴模式："kdata"（默认，以 run(kdata) 入参 KData 自带日期为驱动轴）
+    或 "calendar"（以 set_date_axis 注入的固定日期表为驱动轴）。非法取值告警并回退 "kdata"。
+
+    :param str mode: "kdata" / "calendar")")
+      .def("get_axis_mode", &MultiSystem::getAxisMode, "获取驱动时间轴模式")
+      .def(
+        "set_date_axis",
+        [](MultiSystem& ms, const py::object& dates) { ms.setDateAxis(toDatetimeList(dates)); },
+        py::arg("dates"),
+        "设置固定日期表（接受 list/tuple/DatetimeList；仅 axis_mode == \"calendar\" 时作为驱动轴；"
+        "空表回退 kdata 轴并告警）")
+      .def("get_date_axis", &MultiSystem::getDateAxis, "获取固定日期表")
+      .def("clear_date_axis", &MultiSystem::clearDateAxis, "清空固定日期表")
+      .def(
+        "set_adjust_dates",
+        [](MultiSystem& ms, const py::object& dates) { ms.setAdjustDates(toDatetimeList(dates)); },
+        py::arg("dates"),
+        R"(set_adjust_dates(self, dates)
+
+    设置外部调仓日表（非空时优先作为调仓日判据，否则回退 set_adjust_cycle 的计数判定）。
+    传入日期统一归一化为当日零点后存入，仅命中表内日期才执行再平衡。
+
+    :param dates: Datetime 序列（list/tuple/DatetimeList 均可）)")
+      .def(
+        "get_adjust_dates",
+        [](const MultiSystem& ms) {
+            // 返回 list（DatetimeList）而非 C++ std::set：与 get_date_axis 一致，
+            // 且规避 Python 侧对 Datetime 无 __hash__ 时 set 转换失败的问题
+            const auto& dates = ms.getAdjustDates();
+            return DatetimeList(dates.begin(), dates.end());
+        },
+        "获取外部调仓日表（已归一化为当日零点）")
+      .def("clear_adjust_dates", &MultiSystem::clearAdjustDates,
+           "清空外部调仓日表（回退调仓周期计数判定）")
+      .def_static(
+        "calc_adjust_dates",
+        [](const py::object& dates, const string& mode, int adjust_cycle,
+           bool delay_to_trading_day) {
+            return MultiSystem::calcAdjustDates(toDatetimeList(dates), mode, adjust_cycle,
+                                                delay_to_trading_day);
+        },
+        py::arg("dates"), py::arg("mode"), py::arg("adjust_cycle") = 1,
+        py::arg("delay_to_trading_day") = true,
+        R"(calc_adjust_dates(dates, mode, adjust_cycle=1, delay_to_trading_day=True)
+
+    [静态] 在给定交易日轴上计算调仓日集合（纯函数，可用于预览调仓节奏）。
+
+    :param dates: 已排序的交易日序列（list/tuple/DatetimeList）
+    :param str mode: "week" / "month" / "quarter" / "year"（其余取值返回空）
+    :param int adjust_cycle: 周期内第 N 日（<=0 视为 1）
+    :param bool delay_to_trading_day: 目标日非交易日时是否顺延至当周期内首个交易日
+    :rtype: DatetimeList)")
       .def("set_trade_on_close", &MultiSystem::setTradeOnClose, py::arg("on_close"),
            "设置是否在收盘阶段执行调仓下单")
+      .def("set_adjust_mode", &MultiSystem::setAdjustMode, py::arg("mode"),
+           R"(set_adjust_mode(self, mode)
+
+    设置调仓模式（承接 master PF 的 adjust_mode）：
+      - "query" / "day"（默认）：沿用 set_adjust_cycle 的「每 N 个收盘日」计数判定；
+      - "week" / "month" / "quarter" / "year"：在驱动轴上按「周期内第 adjust_cycle 日」展开调仓日表。
+    非法取值告警并回退 "query"。
+
+    :param str mode: "query" / "day" / "week" / "month" / "quarter" / "year")")
+      .def("get_adjust_mode", &MultiSystem::getAdjustMode, "获取调仓模式")
+      .def("set_delay_to_trading_day", &MultiSystem::setDelayToTradingDay, py::arg("delay"),
+           "设置调仓日非交易日时是否顺延至当周期内首个交易日（仅 week/month/quarter/year 展开时生效）")
+      .def("get_delay_to_trading_day", &MultiSystem::getDelayToTradingDay,
+           "获取调仓日是否顺延至交易日")
       .def("set_se", &MultiSystem::setSE, py::arg("se"), "设置交易对象选择器（可选，仅调仓日选股过滤）")
       .def_property_readonly("se", &MultiSystem::getSE, "交易对象选择器")
       .def("set_sell_at_not_selected", &MultiSystem::setSellAtNotSelected, py::arg("on"),
@@ -597,7 +692,75 @@ void export_System(py::module& m) {
                         tmp.release();
                     },
                     "移滑价差算法")
+      .def_property("af", &MultiSystem::getAF,
+                    [](MultiSystem& self, py::object o) {
+                        py::gil_scoped_acquire gil;
+                        auto tmp = o;
+                        self.setAF(o.cast<AllocateFundsPtr>());
+                        tmp.release();
+                    },
+                    "组合级资金分配算法（AF，承载 L1/L2/L3；仅聚合系统使用）")
       .def("clone", &MultiSystem::clone);
+
+    //--------------------------------------------------------------------------------------
+    // v5：PF 兼容层（工厂直通到 MultiSystem），保持 master 调用方式不变
+    // （见 docs/design/pf_af_compat/design.md §4；返回类型由 PortfolioPtr 变为 MultiSystem）
+    m.def(
+      "PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+
+    创建一个多标的、单系统策略的投资组合（v5：返回 MultiSystem，语义为模式 B 额度划拨）
+
+    调仓模式 adjust_mode 说明：
+    - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
+      决定周期间隔；
+    - "day" 模式，adjust_cycle 为调仓间隔天数
+    - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
+      为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
+      如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
+      将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
+      的第一个交易日。
+
+    :param TradeManager tm: 交易管理
+    :param SelectorBase se: 交易对象选择算法
+    :param AllocateFundsBase af: 组合级资金分配算法（AF，承载 L1/L2/L3）
+    :param int adjust_cycle: 调仓周期
+    :param str adjust_mode: 调仓模式
+    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
+    :rtype: MultiSystem)");
+
+    m.def(
+      "PF_WithoutAF", &PF_WithoutAF, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
+      py::arg("delay_to_trading_day") = true, py::arg("trade_on_close") = true,
+      py::arg("sys_use_self_tm") = false, py::arg("sell_at_not_selected") = false,
+      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
+      R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
+
+    创建无资金分配算法的投资组合（v5：返回 MultiSystem，语义为模式 A 信号汇总）
+
+    调仓模式 adjust_mode 说明：
+    - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
+      决定周期间隔；
+    - "day" 模式，adjust_cycle 为调仓间隔天数
+    - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
+      为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
+      如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
+      将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
+      的第一个交易日。
+
+    :param TradeManager tm: 交易管理
+    :param SelectorBase se: 交易对象选择算法
+    :param int adjust_cycle: 调仓周期
+    :param str adjust_mode: 调仓模式
+    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
+    :param bool trade_on_close: 交易是否在收盘时进行
+    :param bool sys_use_self_tm: 原型系统使用自身附带的tm进行计算（v5 忽略并告警）
+    :param bool sell_at_not_selected: 调仓日未选中的股票是否强制卖出
+    :rtype: MultiSystem)");
 
     //--------------------------------------------------------------------------------------
     m.def(
