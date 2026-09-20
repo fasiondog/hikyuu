@@ -84,6 +84,20 @@ xmake f -m coverage -y       # coverage（生成 lcov/genhtml 报告）
 
 > 注意：运行 `xmake r` 系列测试时，构建系统会自动把 `test_data`、`hikyuu/plugin`、`i18n` 拷贝到可执行文件所在目录（见 `hikyuu_cpp/unit_test/xmake.lua` 的 `prepare_run`）。
 
+### IDE / LSP 索引（clangd）
+
+`hikyuu_cpp/hikyuu/` 源码普遍以 `#include "hikyuu/xxx.h"`（依赖各 target 的 `add_includedirs("..")`，即以 `hikyuu_cpp` 为包含根目录），`hikyuu_pywrap/` 则用 `#include <hikyuu/xxx.h>`（依赖 `add_includedirs("../hikyuu_cpp")`）。因此 **clangd 必须拿到编译数据库**，否则会退化为 fallback 参数（编译目录 = 文件自身所在目录），对新建文件报成片的 `Unknown type name 'XXX'`、`'hikyuu/xxx.h' file not found` —— 这类报错是**索引问题而非代码问题**，不要靠改代码去「修」。
+
+```bash
+# 生成到工程根目录 compile_commands.json（clangd 原生自动发现的 locations）
+xmake project -k compile_commands --lsp=clangd
+```
+
+- 新增/删除源文件、变更 `xmake f` 选项（依赖/开关）后需重跑一次；生成物已 gitignore（`.vscode`、`.clangd` 均在忽略列表内），勿提交。
+- 不要用 `.clangd` 的 `-I.` 代替编译数据库：相对路径按编译目录解析，对 fallback 命令会指向源文件所在目录而非包含根，**实测无效**。
+- 若仍想把数据库放在 `.vscode/` 等子目录下，可用 `clangd.arguments: --compile-commands-dir=<dir>` 指定目录。
+- 手改 `hikyuu_cpp/hikyuu/config.h`、`version.h` 无效（均由 `add_configfiles` 依据 `config.h.in`/`version.h.in` 在构建时生成，且已 gitignore）；clangd 识别 `HKU_*` 条件编译宏同样依赖编译数据库里携带的 `-D` 定义，因此变更后须重新生成 `compile_commands.json`。
+
 ## 4. 测试
 
 ### Python 测试（hikyuu/test/）
