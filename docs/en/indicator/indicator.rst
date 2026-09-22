@@ -1812,9 +1812,9 @@ Built-in Technical Indicators
         
         # The indicator is valid only when R² > 0.8
         if r2 > 0.8:
-            print(f"有效 RSRS_BULL 值: {bull_value}")
+            print(f"Valid RSRS_BULL value: {bull_value}")
         else:
-            print("R² 过低，指标不可信")
+            print("The R² is too low, the indicator is not reliable")
 
 
 .. py:function:: RSRS_BETA([kdata, n=20])
