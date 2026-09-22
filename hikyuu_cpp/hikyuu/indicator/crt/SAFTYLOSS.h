@@ -14,19 +14,23 @@
 namespace hku {
 
 /**
- * 亚历山大 艾尔德安全地带止损
+ * Alexander Elder's safe zone stop-loss
  * @details
  * <pre>
- * 参见《走进我的交易室》（2007年 地震出版社） 亚历山大.艾尔德(Alexander Elder) P202
- * 计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，
- *         得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日
- *         最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的
- *         上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+ * See "Come Into My Trading Room" (2007, Earthquake Press) by Alexander Elder, P202
+ * Calculation description: within the lookback period (generally 10 to 20 days), add up the lengths
+ *         of all the downward crossings and divide by the number of the downward crossings to get
+ *         the average noise (i.e. within the lookback period, the length by which every low price
+ * is lower than the previous day's low price divided by the number of times), and subtract (the
+ * previous day's average noise multiplied by a multiple) from today's low price to get the
+ * stop-loss line. To offset the fluctuation and guarantee that the stop-loss line moves upward, the
+ * highest value within N days (generally 3 days) is taken based on the above result
  * </pre>
- * @note：返回结果中前（回溯周期宽度＋去最高值的宽度）个点是无效的
- * @param n1 计算平均噪音的回溯时间窗口，默认为10天
- * @param n2 对初步止损线去n2日内的最高值，默认为3
- * @param p 噪音系数，默认为2
+ * @note: the first (lookback period width + the width for taking the highest value) points in the
+ *        returned result are invalid
+ * @param n1 the lookback time window for calculating the average noise, 10 days by default
+ * @param n2 take the highest value within n2 days for the preliminary stop-loss line, 3 by default
+ * @param p the noise coefficient, 2 by default
  * @ingroup Indicator
  */
 Indicator HKU_API SAFTYLOSS(int n1 = 10, int n2 = 3, double p = 2.0);
@@ -34,20 +38,24 @@ Indicator HKU_API SAFTYLOSS(const IndParam& n1, const IndParam& n2, double p = 2
 Indicator HKU_API SAFTYLOSS(const IndParam& n1, const IndParam& n2, const IndParam& p);
 
 /**
- * 亚历山大 艾尔德安全地带止损
+ * Alexander Elder's safe zone stop-loss
  * @details
  * <pre>
- * 参见《走进我的交易室》（2007年 地震出版社） 亚历山大.艾尔德(Alexander Elder) P202
- * 计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，
- *         得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日
- *         最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的
- *         上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+ * See "Come Into My Trading Room" (2007, Earthquake Press) by Alexander Elder, P202
+ * Calculation description: within the lookback period (generally 10 to 20 days), add up the lengths
+ *         of all the downward crossings and divide by the number of the downward crossings to get
+ *         the average noise (i.e. within the lookback period, the length by which every low price
+ * is lower than the previous day's low price divided by the number of times), and subtract (the
+ * previous day's average noise multiplied by a multiple) from today's low price to get the
+ * stop-loss line. To offset the fluctuation and guarantee that the stop-loss line moves upward, the
+ * highest value within N days (generally 3 days) is taken based on the above result
  * </pre>
- * @note：返回结果中前（回溯周期宽度＋去最高值的宽度）个点是无效的
- * @param data 输入数据，单一输入
- * @param n1 计算平均噪音的回溯时间窗口，默认为10天
- * @param n2 对初步止损线去n2日内的最高值，默认为3
- * @param p 噪音系数，默认为2
+ * @note: the first (lookback period width + the width for taking the highest value) points in the
+ *        returned result are invalid
+ * @param data the input data, a single input
+ * @param n1 the lookback time window for calculating the average noise, 10 days by default
+ * @param n2 take the highest value within n2 days for the preliminary stop-loss line, 3 by default
+ * @param p the noise coefficient, 2 by default
  * @ingroup Indicator
  */
 inline Indicator SAFTYLOSS(const Indicator& data, int n1 = 10, int n2 = 3, double p = 2.0) {

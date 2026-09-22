@@ -10,43 +10,46 @@
 namespace hku {
 
 /**
- * @brief 判断股票是否涨停指标
+ * @brief Indicator for judging whether a stock is limit up
  * @ingroup Indicator
- * @details 根据不同股票类型判断当日收盘价是否达到涨停板价格：
- * - A股普通股票：涨停幅度为10%
- * - 北交所股票：涨停幅度为30%
- * - 创业板/科创板股票：涨停幅度为20%
- * - ST股票涨停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
+ * @details Judge whether the close price of the day reaches the limit-up price according to the
+ * different stock types:
+ * - Ordinary A-share stock: the limit-up range is 10%
+ * - Beijing Stock Exchange stock: the limit-up range is 30%
+ * - ChiNext / STAR Market stock: the limit-up range is 20%
+ * - ST stock: the limit-up range is 5%, but it is not handled yet because the historical date
+ * information of the ST identifier is missing
  *
- * 涨停判断逻辑：当日收盘价 >= 前一日收盘价 × (1 + 涨停幅度)
+ * Limit-up judgment logic: close price of the day >= close price of the previous day × (1 +
+ * limit-up range)
  *
- * 注意事项：
- * - 第一个K线数据由于缺少前一日数据，会被标记为discard（舍弃）
- * - 不支持的股票类型默认返回非涨停状态
- * - 计算结果为布尔值：1表示涨停，0表示非涨停
+ * Notes:
+ * - The first K-line data is marked as discard because the previous day data is missing
+ * - An unsupported stock type returns the non-limit-up state by default
+ * - The calculation result is a boolean value: 1 means limit up, 0 means not limit up
  *
  * <pre>
- * 示例：
+ * Example:
  * @code
- * // 创建涨停判断指标
+ * // Create the limit-up judgment indicator
  * Indicator limit_up = ISLIMITUP();
  *
- * // 对指定K线数据进行判断
+ * // Judge the given K-line data
  * KData kdata = sm["sh000001"].getKData(KQuery(-100));
  * Indicator result = ISLIMITUP(kdata);
  *
  * @endcode
  * </pre>
  *
- * @return Indicator 涨停判断指标实例
+ * @return Indicator the limit-up judgment indicator instance
  */
 Indicator HKU_API ISLIMITUP();
 
 /**
- * @brief 判断指定K线数据中的股票是否涨停
+ * @brief Judge whether the stock in the given K-line data is limit up
  * @ingroup Indicator
- * @param k K线数据
- * @return Indicator 涨停判断指标实例
+ * @param k K-line data
+ * @return Indicator the limit-up judgment indicator instance
  * @see ISLIMITUP()
  */
 Indicator HKU_API ISLIMITUP(const KData& k);
