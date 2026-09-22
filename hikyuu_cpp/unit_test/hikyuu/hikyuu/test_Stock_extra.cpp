@@ -33,10 +33,10 @@ static bool _pluginValid() {
 TEST_CASE("test_Stock_extra_ktype") {
     HKU_IF_RETURN(!_pluginValid(), void());
 
-    /** @arg 检查扩展K线类型对应的分钟数 */
+    /** @arg Check the number of the minutes of the extended K-line type */
     CHECK_EQ(KQuery::getKTypeInMin(KQuery::DAY) * 3, KQuery::getKTypeInMin(KQuery::DAY3));
 
-    /** @arg 检测 nbar 类别的扩展K线数据 */
+    /** @arg Check the extended K-line data of the nbar category */
     auto stk = getStock("sh000001");
     auto kday1 = stk.getKData(KQuery(0));
     auto kday3 = stk.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY3));
@@ -95,7 +95,7 @@ TEST_CASE("test_Stock_extra_ktype") {
         CHECK_EQ(kday3[i], kday3_2[i]);
     }
 
-    /** @arg 检测周期转换类别的扩展K线数据 */
+    /** @arg Check the extended K-line data of the period conversion category */
     auto kmin1 = stk.getKData(KQuery(0, Null<int64_t>(), KQuery::MIN));
     auto kmin3 = stk.getKData(KQuery(0, Null<int64_t>(), KQuery::MIN3));
     CHECK_EQ(kmin3.size(), stk.getCount(KQuery::MIN3));

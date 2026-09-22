@@ -22,7 +22,7 @@ using namespace hku;
 /** @par Test points */
 TEST_CASE("test_StockManager_size") {
     StockManager& sm = StockManager::instance();
-    /** @arg 检测是否和测试数据中证券数相符 */
+    /** @arg Check that it matches the security count of the test data */
     CHECK_EQ(sm.size(), 4729);
 }
 
@@ -32,13 +32,13 @@ TEST_CASE("test_StockManager_getStock") {
     Stock stock;
     Stock null_stock = Null<Stock>();
 
-    /** @arg 根据“市场简称证券代码”查询，对应的市场不存在 */
+    /** @arg Query by "market code" while the market does not exist */
     CHECK_EQ(sm.getStock("z000001"), null_stock);
 
-    /** @arg 根据“市场简称证券代码”查询，对应的市场存在，但证券代码不存在 */
+    /** @arg Query by "market code" while the market exists but the security code does not */
     CHECK_EQ(sm.getStock("sh1000001"), null_stock);
 
-    /** @arg 根据“市场简称证券代码”查询正常存在的stock */
+    /** @arg Query an existing stock by "market code" */
     stock = sm.getStock("sh000001");
     CHECK_EQ(stock.market(), "SH");
     CHECK_EQ(stock.code(), "000001");
@@ -61,11 +61,11 @@ TEST_CASE("test_StockManager_getStock") {
 TEST_CASE("test_StockManager_getMarketInfo") {
     StockManager& sm = StockManager::instance();
 
-    /** @arg 查询不存在的市场 */
+    /** @arg Query a market that does not exist */
     CHECK_EQ(Null<MarketInfo>(), sm.getMarketInfo("XXX"));
     CHECK_EQ(Null<MarketInfo>(), sm.getMarketInfo(""));
 
-    /** @arg 查询已存在的市场，市场简称全部大写 */
+    /** @arg Query an existing market with an all-uppercase market name */
     MarketInfo marketInfo = sm.getMarketInfo("SH");
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
@@ -78,12 +78,12 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_EQ(marketInfo.openTime2(), TimeDelta(0, 13, 00));
     CHECK_EQ(marketInfo.closeTime2(), TimeDelta(0, 15, 00));
 
-    /** @arg 查询已存在的市场，市场简称全部小写 */
+    /** @arg Query an existing market with an all-lowercase market name */
     marketInfo = sm.getMarketInfo("sh");
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
 
-    /** @arg 查询已存在的市场，市场简称大小写混写 */
+    /** @arg Query an existing market with a mixed-case market name */
     marketInfo = sm.getMarketInfo("Sh");
     CHECK_NE(marketInfo, Null<MarketInfo>());
     CHECK_EQ(marketInfo.market(), "SH");
@@ -94,10 +94,10 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     StockManager& sm = StockManager::instance();
     StockTypeInfo stockTypeInfo;
 
-    /** @arg 查询不存在的type */
+    /** @arg Query a type that does not exist */
     CHECK_EQ(sm.getStockTypeInfo(999), Null<StockTypeInfo>());
 
-    /** @arg 查询第一条记录，即type=0 */
+    /** @arg Query the first record, i.e. type=0 */
     stockTypeInfo = sm.getStockTypeInfo(0);
     CHECK_NE(stockTypeInfo, Null<StockTypeInfo>());
     CHECK_EQ(stockTypeInfo.type(), 0);
@@ -107,7 +107,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     CHECK_EQ(stockTypeInfo.minTradeNumber(), 100);
     CHECK_EQ(stockTypeInfo.maxTradeNumber(), 1000000);
 
-    /** @arg 查询最后一条记录，即type=8 */
+    /** @arg Query the last record, i.e. type=8 */
     stockTypeInfo = sm.getStockTypeInfo(8);
     CHECK_NE(stockTypeInfo, Null<StockTypeInfo>());
     CHECK_EQ(stockTypeInfo.type(), 8);
@@ -117,7 +117,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     CHECK_EQ(stockTypeInfo.minTradeNumber(), 100);
     CHECK_EQ(stockTypeInfo.maxTradeNumber(), 1000000);
 
-    /** @arg 查询正常存在信息 */
+    /** @arg Query information that exists normally */
     stockTypeInfo = sm.getStockTypeInfo(2);
     CHECK_NE(stockTypeInfo, Null<StockTypeInfo>());
     CHECK_EQ(stockTypeInfo.type(), 2);
@@ -132,7 +132,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
 TEST_CASE("test_StockManager_getAllMarket") {
     StockManager& sm = StockManager::instance();
 
-    /** @arg 检测测试数据中的Market */
+    /** @arg Check the Market in the test data */
     StringList result(sm.getAllMarket());
     std::vector<string> want_list{"TMP", "SH", "SZ"};
     for (auto want : want_list) {
@@ -167,7 +167,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     string day_filename(fmt::format("{}/test_day_data.csv", sm.datadir()));
     string min_filename(fmt::format("{}/test_min_data.csv", sm.datadir()));
 
-    /** @arg 增加临时增加返还的Stock的基本属性 */
+    /** @arg Check the basic attributes of the temporarily added Stock */
     Stock stk = sm.addTempCsvStock("test", day_filename, min_filename);
     CHECK_EQ(stk.isNull(), false);
     CHECK_EQ(stk.market(), "TMP");
@@ -176,7 +176,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_EQ(stk.getCount(KQuery::DAY), 100);
     CHECK_EQ(stk.getCount(KQuery::MIN), 24000);
 
-    /** @arg 增加临时增加返还的Stock的KRecord[0]（第一个数据）读取*/
+    /** @arg Read KRecord[0] (the first record) of the temporarily added Stock */
     KRecord record;
     record = stk.getKRecord(0);
     CHECK_EQ(record.datetime, Datetime(201703070000));
@@ -187,7 +187,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_LT((record.transAmount - 20993120.6), 0.00001);
     CHECK_LT((record.transCount - 164064235.0), 0.00001);
 
-    /** @arg 增加临时增加返还的Stock的KRecord[10]（中间的数据）读取*/
+    /** @arg Read KRecord[10] (a record in the middle) of the temporarily added Stock */
     record = stk.getKRecord(10);
     CHECK_EQ(record.datetime, Datetime(201703210000));
     CHECK_LT((record.openPrice - 3250.25), 0.00001);
@@ -197,7 +197,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_LT((record.transAmount - 21912127.0), 0.00001);
     CHECK_LT((record.transCount - 162719306.0), 0.00001);
 
-    /** @arg 增加临时增加返还的Stock的KRecord[99]（最后一个数据）读取*/
+    /** @arg Read KRecord[99] (the last record) of the temporarily added Stock */
     record = stk.getKRecord(99);
     CHECK_EQ(record.datetime, Datetime(201707310000));
     CHECK_LT((record.openPrice - 3252.75), 0.00001);
@@ -207,7 +207,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_LT((record.transAmount - 25352591.70), 0.00001);
     CHECK_LT((record.transCount - 246039440.0), 0.00001);
 
-    /** @arg 使用getStock获取临时加入的Stock */
+    /** @arg Get the temporarily added Stock with getStock */
     stk = sm.getStock("tmptest");
     CHECK_EQ(stk.isNull(), false);
     CHECK_EQ(stk.market(), "TMP");
@@ -216,7 +216,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_EQ(stk.getCount(KQuery::DAY), 100);
     CHECK_EQ(stk.getCount(KQuery::MIN), 24000);
 
-    /** @arg 使用getStock获取临时加入的Stock的KRecord[10]读取*/
+    /** @arg Read KRecord[10] of the temporarily added Stock obtained with getStock */
     record = stk.getKRecord(10);
     CHECK_EQ(record.datetime, Datetime(201703210000));
     CHECK_LT((record.openPrice - 3250.25), 0.00001);
@@ -226,7 +226,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_LT((record.transAmount - 21912127.0), 0.00001);
     CHECK_LT((record.transCount - 162719306.0), 0.00001);
 
-    /** @arg 删除临时加入的Stock */
+    /** @arg Remove the temporarily added Stock */
     sm.removeTempCsvStock("test");
     stk = sm.getStock("tmptest");
     CHECK_EQ(stk.isNull(), true);
@@ -237,8 +237,8 @@ TEST_CASE("test_StockManager_isHoliday") {
     auto& sm = StockManager::instance();
     CHECK_THROWS(sm.isHoliday(Datetime()));
     CHECK_EQ(sm.isHoliday(Datetime(202101010000LL)), true);
-    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL)), true);  // 周六
-    CHECK_EQ(sm.isHoliday(Datetime(202101030000LL)), true);  // 周日
+    CHECK_EQ(sm.isHoliday(Datetime(202101020000LL)), true);  // Saturday
+    CHECK_EQ(sm.isHoliday(Datetime(202101030000LL)), true);  // Sunday
     CHECK_EQ(sm.isHoliday(Datetime(202110010000LL)), true);
     CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
 }
@@ -248,8 +248,8 @@ TEST_CASE("test_StockManager_isTradingHours") {
     auto& sm = StockManager::instance();
     CHECK_THROWS(sm.isTradingHours(Datetime()));
     CHECK_EQ(sm.isTradingHours(Datetime(202101010000LL)), false);
-    CHECK_EQ(sm.isTradingHours(Datetime(202101020000LL)), false);  // 周六
-    CHECK_EQ(sm.isTradingHours(Datetime(202101030000LL)), false);  // 周日
+    CHECK_EQ(sm.isTradingHours(Datetime(202101020000LL)), false);  // Saturday
+    CHECK_EQ(sm.isTradingHours(Datetime(202101030000LL)), false);  // Sunday
     CHECK_EQ(sm.isTradingHours(Datetime(202110010000LL)), false);
     CHECK_EQ(sm.isTradingHours(Datetime(202109300000LL)), false);
     CHECK_EQ(sm.isTradingHours(Datetime(202109300929LL)), false);
@@ -288,26 +288,30 @@ TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
     const size_t weight_cnt = stk.getWeight().size();
     const size_t finance_cnt = stk.getHistoryFinance().size();
 
-    /** @arg 非 server 角色（普通独立/客户端进程）调用为空操作：缓存不受影响 */
+    /** @arg The call is a no-op in a non-server role (an ordinary standalone / client process): the
+     * cache is unaffected */
     setShmServerRole(false);
     sm.releaseShmServerBaseInfoCache();
     CHECK_EQ(stk.getWeight().size(), weight_cnt);
     CHECK_EQ(stk.getHistoryFinance().size(), finance_cnt);
 
-    /** @arg server 角色释放权息缓存：改回独立模式（getWeight 无懒加载兜底）再查询返回空，
-     *          证明缓存确已清空并归还 */
+    /** @arg The server role releases the ex-rights/ex-dividend cache: switching back to the
+     * standalone mode (where getWeight has no lazy loading fallback) and querying again returns
+     * empty, proving that the cache has really been cleared and returned */
     setShmServerRole(true);
     sm.releaseShmServerBaseInfoCache();
     setShmServerRole(false);
     CHECK_EQ(stk.getWeight().size(), 0);
 
-    /** @arg server 角色下再次访问已释放证券：按需懒加载重读自愈，结果与释放前一致 */
+    /** @arg Accessing a released security again in the server role: the on-demand lazy reload heals
+     * it and the result matches the one before the release */
     setShmServerRole(true);
     CHECK_EQ(stk.getWeight().size(), weight_cnt);
     CHECK_EQ(stk.getHistoryFinance().size(), finance_cnt);
 
-    // 恢复现场：独立/客户端模式的 Stock::getWeight 无懒加载兜底，须在恢复角色前回填全部证券
-    // 权息缓存，避免清空状态影响同进程后续用例（历史财务各模式均有懒加载兜底，无需回填）
+    // Restore the state: Stock::getWeight has no lazy loading fallback in the standalone / client
+    // mode, so the ex-rights/ex-dividend cache must be refilled before the role is restored,
+    // avoiding an emptied state affecting the later cases (the historical finance has a fallback)
     for (const auto& stock : sm.getStockList(nullptr)) {
         stock.getWeight();
     }

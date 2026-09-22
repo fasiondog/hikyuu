@@ -1,7 +1,7 @@
 /*
  * test_Block.cpp
  *
- *  Created on: 2015年2月8日
+ *  Created on: 2015-2-8
  *      Author: fasiondog
  */
 
@@ -22,23 +22,23 @@ using namespace hku;
 /** @par Test points */
 TEST_CASE("test_Block_1") {
     Block blk;
-    /** @arg 默认构造函数,category、name为"" */
+    /** @arg The default constructor with category and name being "" */
     CHECK(blk.category() == "");
     CHECK(blk.name() == "");
 
-    /** @arg 使用category、name构造 */
+    /** @arg Constructed with category and name */
     Block blk2("test", "1");
     CHECK(blk2.category() == "test");
     CHECK(blk2.name() == "1");
 
-    /** @arg 不等判断 */
+    /** @arg The inequality judgement */
     CHECK((blk != blk2));
 
-    /** @arg 空Block比较 */
+    /** @arg The comparison with an empty Block */
     CHECK_UNARY(blk == Null<Block>());
     CHECK_UNARY(blk == Block());
 
-    /** @arg 赋值后比较是否相等 */
+    /** @arg Compare the equality after the assignment */
     Block blk3 = blk2;
     CHECK((blk2 == blk3));
 }
@@ -48,11 +48,11 @@ TEST_CASE("test_Block_2") {
     StockManager& sm = StockManager::instance();
     Block blk;
 
-    /** @arg block为空，empty=true / size=0 */
+    /** @arg The block is empty: empty=true / size=0 */
     CHECK(blk.empty());
     CHECK(blk.size() == 0);
 
-    /** @arg 直接加入Stock实例 */
+    /** @arg Add a Stock instance directly */
     blk.add(sm["sh000001"]);
     CHECK(!blk.empty());
     CHECK(blk.size() == 1);
@@ -70,14 +70,14 @@ TEST_CASE("test_Block_2") {
         std::cout << *iter << std::endl;
     }*/
 
-    /** @arg 已Stock标识加入 */
+    /** @arg Add by the Stock identifier */
     blk.add("sh000002");
     CHECK(!blk.empty());
     CHECK(blk.size() == 3);
     CHECK(blk.have("sh000002"));
     CHECK(blk.get("sh000002") == sm["sh000002"]);
 
-    /** @arg 直接删除Stock实例 */
+    /** @arg Remove a Stock instance directly */
     blk.remove(sm["sh000001"]);
     CHECK(!blk.empty());
     CHECK(blk.size() == 2);
@@ -86,7 +86,7 @@ TEST_CASE("test_Block_2") {
     CHECK(!blk.have("sh000001"));
     // CHECK((blk.get("sh000001") == Null<Stock>()));
 
-    /** @arg 使用Stock标识进行删除 */
+    /** @arg Remove by the Stock identifier */
     blk.remove("sz000002");
     CHECK(!blk.empty());
     CHECK(blk.size() == 1);
@@ -95,7 +95,7 @@ TEST_CASE("test_Block_2") {
     CHECK(!blk.have("sh000001"));
     // CHECK((blk.get("sz000002") == Null<Stock>()));
 
-    /** @arg 仅剩一条记录时执行删除操作 */
+    /** @arg Remove when only one record is left */
     blk.remove("sh000002");
     CHECK(blk.empty());
     CHECK(blk.size() == 0);
@@ -104,12 +104,12 @@ TEST_CASE("test_Block_2") {
     CHECK(!blk.have("sh000001"));
     // CHECK((blk.get("sh000002") == Null<Stock>()));
 
-    /** @arg 为空时，执行删除操作 */
+    /** @arg Remove when it is empty */
     blk.remove("sh000002");
     CHECK(blk.empty());
     CHECK(blk.size() == 0);
 
-    /** @arg 删除不存在的Stock */
+    /** @arg Remove a Stock that does not exist */
     blk.add("sh000002");
     CHECK(!blk.have("sz000001"));
     blk.remove("sz000001");
@@ -117,7 +117,7 @@ TEST_CASE("test_Block_2") {
     CHECK(!blk.empty());
     CHECK(blk.size() == 1);
 
-    /** @arg 测试clear */
+    /** @arg Test clear */
     CHECK(!blk.empty());
     blk.clear();
     CHECK(blk.empty());
