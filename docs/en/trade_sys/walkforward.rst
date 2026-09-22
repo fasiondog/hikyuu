@@ -32,7 +32,7 @@ Create a Walk-forward Trading System
 
 
 Built-in Trading System Optimization Selectors
----------------------------------------------
+----------------------------------------------
 
 Although the system optimization selector also uses the SE prefix in Hikyuu, it is not the same as the SE in the PF (portfolio), and the two cannot be interchanged. The system optimization selector must be used together with SYS_WalkForward.
 
