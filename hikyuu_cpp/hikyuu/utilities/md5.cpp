@@ -3,7 +3,8 @@
  *  Created on: 2021/12/06
  *      Author: fasiondog
  *
- *  注: boost的md5计算在windows和linux平台上结果不一致，所以改从 dlib 移植
+ *  Note: the md5 calculation of boost gives different results on the windows and the linux
+ * platforms, so it was ported from dlib instead
  */
 
 #include "arithmetic.h"

@@ -172,7 +172,7 @@ string Parameter::getNameValueList() const {
 }
 
 HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
-    // 注意：参数大小写敏感
+    // Note: the parameter is case sensitive
     HKU_IF_RETURN(p1.size() != p2.size(), false);
 
     auto iter1 = p1.begin();
@@ -260,7 +260,7 @@ HKU_API bool operator==(const Parameter& p1, const Parameter& p2) {
 }
 
 HKU_API bool operator!=(const Parameter& p1, const Parameter& p2) {
-    // 注意：参数大小写敏感
+    // Note: the parameter is case sensitive
     return !(p1 == p2);
 }
 
