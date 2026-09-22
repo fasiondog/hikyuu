@@ -19,9 +19,9 @@ template <class TableT, size_t page_size>
 class SQLResultSetIterator;
 
 /**
- * SQL查询结果集
- * @tparam TableT 数据结构
- * @tparam page_size 每页包含的数据数量
+ * SQL query result set
+ * @tparam TableT data structure
+ * @tparam page_size the number of the data contained in every page
  * @ingroup DBConnect
  */
 template <class TableT, size_t page_size = 100>
@@ -38,7 +38,7 @@ public:
     SQLResultSet() = default;
 
     /**
-     * 构建新的分页查询结果实例
+     * Build a new paged query result instance
      * @param connect
      * @param sql
      */
@@ -65,7 +65,7 @@ public:
         }
     }
 
-    /** 获取其数据库连接 */
+    /** Get its database connection */
     const DBConnectPtr& getConnect() const {
         return m_connect;
     }
@@ -90,8 +90,8 @@ public:
     }
 
     /**
-     * @brief 获取当前时刻数据集大小
-     * @note 数据集大小会根据当前的数据库内容发生变化，并非一直不变
+     * @brief Get the data set size at the current moment
+     * @note The data set size changes with the current database content, it is not always constant
      * @return size_t
      */
     size_t size() const {
@@ -102,17 +102,18 @@ public:
     }
 
     /**
-     * @brief 当前数据集是否为空
-     * @return true 空
-     * @return false 非空
+     * @brief Whether the current data set is empty
+     * @return true empty
+     * @return false not empty
      */
     bool empty() const {
         return size() == 0;
     }
 
     /**
-     * @brief 获取当前数据集分页数量
-     * @note 仅为调用时刻获取的相应数据集分页数量
+     * @brief Get the number of the pages of the current data set
+     * @note It is the number of the pages of the corresponding data set obtained at the calling
+     * moment only
      * @return size_t
      */
     size_t getPageCount() {
@@ -122,9 +123,9 @@ public:
     }
 
     /**
-     * @brief 获取指定页中的全部数据
-     * @param page 指定页
-     * @return std::vector<TableT> 该页包含的所有有效数据集
+     * @brief Get all the data in the given page
+     * @param page the given page
+     * @return std::vector<TableT> all the valid data sets contained in this page
      */
     std::vector<TableT> getPage(size_t page) {
         std::vector<TableT> result;

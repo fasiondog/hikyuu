@@ -17,12 +17,12 @@
 
 namespace hku {
 
-// 前向声明，避免循环依赖
+// Forward declaration, to avoid the circular dependency
 class AsyncMySQLConnect;
 
 class HKU_UTILS_API AsyncMySQLStatement : public AsyncSQLStatementBase {
 public:
-    AsyncMySQLStatement(AsyncMySQLConnect* connect, const std::string &sql);
+    AsyncMySQLStatement(AsyncMySQLConnect *connect, const std::string &sql);
     virtual ~AsyncMySQLStatement() override;
 
     AsyncMySQLStatement(const AsyncMySQLStatement &) = delete;
@@ -31,7 +31,7 @@ public:
     virtual net::awaitable<void> sub_exec() override;
     virtual net::awaitable<bool> sub_moveNext() override;
     virtual uint64_t sub_getLastRowid() override;
-    
+
     virtual void sub_bindNull(int idx) override;
     virtual void sub_bindInt(int idx, int64_t value) override;
     virtual void sub_bindDouble(int idx, double item) override;

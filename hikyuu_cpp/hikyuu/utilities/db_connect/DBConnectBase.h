@@ -22,58 +22,58 @@ template <class TableT, size_t page_size>
 class SQLResultSet;
 
 /**
- * 数据库连接基类
+ * Base class of the database connection
  * @ingroup DBConnect
  */
 class HKU_UTILS_API DBConnectBase : public std::enable_shared_from_this<DBConnectBase> {
-    PARAMETER_SUPPORT  // NOSONAR
+PARAMETER_SUPPORT  // NOSONAR
 
-      public :
-      /**
-       * 构造函数
-       * @param param 数据库连接参数
-       */
-      explicit DBConnectBase(const Parameter &param);
+  public :
+  /**
+   * Constructor
+   * @param param database connection parameters
+   */
+  explicit DBConnectBase(const Parameter &param);
     virtual ~DBConnectBase() = default;
 
     //-------------------------------------------------------------------------
-    // 子类接口
+    // Subclass interface
     //-------------------------------------------------------------------------
 
-    /** ping 操作，用于判断是否连接 */
+    /** The ping operation, used to judge whether it is connected */
     virtual bool ping() = 0;
 
-    /** 开始事务，失败时抛出异常 */
+    /** Start a transaction; an exception is thrown on failure */
     virtual void transaction() = 0;
 
-    /** 提交事务，失败时抛出异常 */
+    /** Commit the transaction; an exception is thrown on failure */
     virtual void commit() = 0;
 
-    /** 回滚事务 */
+    /** Roll back the transaction */
     virtual void rollback() noexcept = 0;
 
-    /** 执行无返回结果的 SQL */
+    /** Execute the SQL without a result */
     virtual int64_t exec(const std::string &sql_string) = 0;
 
-    /** 获取 SQLStatement */
+    /** Get the SQLStatement */
     virtual SQLStatementPtr getStatement(const std::string &sql_statement) = 0;
 
-    /** 判断表是否存在 */
+    /** Judge whether the table exists */
     virtual bool tableExist(const std::string &tablename) = 0;
 
     /**
-     * 重置含自增 id 的表中的 id 从 1开始
-     * @param tablename 待重置id的表名
-     * @exception 表中仍旧含有数据时，抛出异常
+     * Reset the id in the table with an auto-increment id to start from 1
+     * @param tablename the table name whose id is to be reset
+     * @exception An exception is thrown when the table still contains data
      */
     virtual void resetAutoIncrement(const std::string &tablename) = 0;
 
     //-------------------------------------------------------------------------
-    // 模板方法
+    // Template methods
     //-------------------------------------------------------------------------
     /**
-     * 保存或更新 通过 TABLE_BIND 绑定的表结构
-     * 可由 driver 直接保存，示例如下：
+     * Save or update the table structure bound through TABLE_BIND
+     * It can be saved directly by the driver, the example is as follows:
      * @code
      * struct TTT {
      *   TABLE_BIND(TTT, ttt_table, age, name)
@@ -98,195 +98,207 @@ class HKU_UTILS_API DBConnectBase : public std::enable_shared_from_this<DBConnec
      *       driver->save(a);
      *   }
      * @endcode
-     * @param item 待保持的记录
-     * @param autotrans 启动事务
+     * @param item the record to be saved
+     * @param autotrans start a transaction
      */
     template <typename T>
     void save(T &item, bool autotrans = true);
 
     /**
-     * 批量保存
-     * @param container 拥有迭代器的容器
-     * @param autotrans 启动事务
+     * Batch saving
+     * @param container a container with an iterator
+     * @param autotrans start a transaction
      */
     template <class Container>
     void batchSave(Container &container, bool autotrans = true);
 
     /**
-     * 批量保存，迭代器中的数据必须是通过 TABLE_BIND 绑定的表模型
-     * @param first 迭代器起始点
-     * @param last 迭代器终止点
-     * @param autotrans 启动事务
+     * Batch saving; the data in the iterators must be the table model bound through TABLE_BIND
+     * @param first the iterator start point
+     * @param last the iterator end point
+     * @param autotrans start a transaction
      */
     template <class InputIterator>
     void batchSave(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
-     * 加载模型数据至指定的模型实例
-     * @note 查询条件应只返回一条记录，如果有多条查询结果，将只取一条
-     * @param item 指定的模型实例
-     * @param where 查询条件，如：“id=1"
+     * Load the model data into the given model instance
+     * @note The query condition should return one record only; if there are multiple query results,
+     *       only one is taken
+     * @param item the given model instance
+     * @param where the query condition, e.g. "id=1"
      */
     template <typename T>
     void load(T &item, const std::string &where = "");
 
     /**
-     * 加载模型数据至指定的模型实例
-     * @note 查询条件应只返回一条记录，如果有多条查询结果，将只取一条
-     * @param item 指定的模型实例
-     * @param cond 查询条件，如：“id=1"
+     * Load the model data into the given model instance
+     * @note The query condition should return one record only; if there are multiple query results,
+     *       only one is taken
+     * @param item the given model instance
+     * @param cond the query condition, e.g. "id=1"
      */
     template <typename T>
     void load(T &item, const DBCondition &cond);
 
     /**
-     * 加载模型数据至指定的模型实例, 仅供查询
-     * @param item 指定的模型实例
-     * @param sql 查询条件 select 的 sql 语句
+     * Load the model data into the given model instance, for the query only
+     * @param item the given model instance
+     * @param sql the select sql statement of the query condition
      */
     template <typename T>
     void loadView(T &item, const std::string &sql);
 
     /**
-     * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
-     * @param container 指定容器
-     * @param where 查询条件
+     * Batch load the model data into a container (a container supporting push_back, such as vector
+     * and list)
+     * @param container the given container
+     * @param where query condition
      */
     template <typename Container>
     void batchLoad(Container &container, const std::string &where = "");
 
     /**
-     * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
-     * @param container 指定容器
-     * @param cond 查询条件
+     * Batch load the model data into a container (a container supporting push_back, such as vector
+     * and list)
+     * @param container the given container
+     * @param cond query condition
      */
     template <typename Container>
     void batchLoad(Container &container, const DBCondition &cond);
 
     /**
-     * 批量加载模型数据至容器（vector，list 等支持 push_back 的容器）
-     * @param container 指定容器
-     * @param sql select 的查询语句
+     * Batch load the model data into a container (a container supporting push_back, such as vector
+     * and list)
+     * @param container the given container
+     * @param sql the select query statement
      */
     template <typename Container>
     void batchLoadView(Container &container, const std::string &sql);
 
     /**
-     * 批量更新
-     * @param container 拥有迭代器的容器
-     * @param autotrans 启动事务
+     * Batch updating
+     * @param container a container with an iterator
+     * @param autotrans start a transaction
      */
     template <class Container>
     void batchUpdate(Container &container, bool autotrans = true);
 
     /**
-     * 批量更新
-     * @param first 迭代器起始点
-     * @param last 迭代器终止点
-     * @param autotrans 启动事务
+     * Batch updating
+     * @param first the iterator start point
+     * @param last the iterator end point
+     * @param autotrans start a transaction
      */
     template <class InputIterator>
     void batchUpdate(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
-     * 批量保存或更新
-     * @param container 拥有迭代器的容器
-     * @param autotrans 启动事务
+     * Batch saving or updating
+     * @param container a container with an iterator
+     * @param autotrans start a transaction
      */
     template <class Container>
     void batchSaveOrUpdate(Container &container, bool autotrans = true);
 
     /**
-     * 批量保存或更新
-     * @param first 迭代器起始点
-     * @param last 迭代器终止点
-     * @param autotrans 启动事务
+     * Batch saving or updating
+     * @param first the iterator start point
+     * @param last the iterator end point
+     * @param autotrans start a transaction
      */
     template <class InputIterator>
     void batchSaveOrUpdate(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
-     * 从指定表中删除符合条件的数据指定条件删除
-     * @param tablename 待删除数据的表名
-     * @param where 删除条件
-     * @param autotrans 启动事务
+     * Delete the data satisfying the condition from the given table, i.e. delete by the given
+     * condition
+     * @param tablename the table name of the data to be deleted
+     * @param where the deletion condition
+     * @param autotrans start a transaction
      */
     void remove(const std::string &tablename, const std::string &where, bool autotrans = true);
 
     /**
-     * 从指定表中删除符合条件的数据指定条件删除
-     * @param tablename 待删除数据的表名
-     * @param cond 删除条件
-     * @param autotrans 启动事务
+     * Delete the data satisfying the condition from the given table, i.e. delete by the given
+     * condition
+     * @param tablename the table name of the data to be deleted
+     * @param cond the deletion condition
+     * @param autotrans start a transaction
      */
     void remove(const std::string &tablename, const DBCondition &cond, bool autotrans = true);
 
     /**
-     * 删除
-     * @param item 待删除的数据, 通过 item.rowid() 删除，删除后，rowid, 将被置为无效
-     * @param autotrans 启动事务
+     * Delete
+     * @param item the data to be deleted; it is deleted through item.rowid(), and afterwards the
+     * rowid is set to invalid
+     * @param autotrans start a transaction
      */
     template <typename T>
     void remove(T &item, bool autotrans = true);
 
     /**
-     * 批量删除
-     * @param container 拥有迭代器的容器
-     * @param autotrans 启动事务
+     * Batch deleting
+     * @param container a container with an iterator
+     * @param autotrans start a transaction
      */
     template <class Container>
     void batchRemove(Container &container, bool autotrans = true);
 
     /**
-     * 批量删除，迭代器中的数据必须是通过 TABLE_BIND 绑定的表模型
-     * @param first 迭代器起始点
-     * @param last 迭代器终止点
-     * @param autotrans 启动事务
+     * Batch deleting; the data in the iterators must be the table model bound through TABLE_BIND
+     * @param first the iterator start point
+     * @param last the iterator end point
+     * @param autotrans start a transaction
      */
     template <class InputIterator>
     void batchRemove(InputIterator first, InputIterator last, bool autotrans = true);
 
     /**
-     * 查询单个整数，如：select count(*) from table
-     * @note sql 语句应只返回单个元素，否则将抛出异常，如多条记录、多个列
-     * @param query 查询语句
-     * @param default_val 当查询失败时，返回该默认值。如果该值为 Null<int>(), 则抛出异常。
+     * Query a single integer, e.g. select count(*) from table
+     * @note The sql statement should return a single element only, otherwise an exception is
+     * thrown, such as for multiple records or multiple columns
+     * @param query query statement
+     * @param default_val the default value returned when the query fails. An exception is thrown if
+     * it is Null<int>().
      */
     int queryInt(const std::string &query, int default_val);
 
     /**
-     * 查询统计数据，如：select count(*) from table
-     * @note sql 语句应只返回单个元素，否则将抛出异常，如多条记录、多个列
-     * @param query 查询语句
-     * @param default_val 当查询失败时，返回该默认值。如果该值为 Null<NumberType>(), 则抛出异常。
+     * Query the statistical data, e.g. select count(*) from table
+     * @note The sql statement should return a single element only, otherwise an exception is
+     * thrown, such as for multiple records or multiple columns
+     * @param query query statement
+     * @param default_val the default value returned when the query fails. An exception is thrown if
+     * it is Null<NumberType>().
      */
     template <typename NumberType>
     NumberType queryNumber(const std::string &query, NumberType default_val = Null<NumberType>());
 
     /**
-     * 分页查询
-     * @tparam TableT 查询数据结构
-     * @tparam page_size 每页数据记录数
+     * Paged query
+     * @tparam TableT the query data structure
+     * @tparam page_size the number of the data records per page
      * @return SQLResultSet<TableT, page_size>
      */
     template <typename TableT, size_t page_size = 50>
     SQLResultSet<TableT, page_size> query();
 
     /**
-     * 分页查询
-     * @tparam TableT 查询数据结构
-     * @tparam page_size 每页数据记录数
-     * @param query 查询条件
+     * Paged query
+     * @tparam TableT the query data structure
+     * @tparam page_size the number of the data records per page
+     * @param query query condition
      * @return SQLResultSet<TableT, page_size>
      */
     template <typename TableT, size_t page_size = 50>
     SQLResultSet<TableT, page_size> query(const std::string &query);
 
     /**
-     * 分页查询
-     * @tparam TableT 查询数据结构
-     * @tparam page_size 每页数据记录数
-     * @param cond 查询条件
+     * Paged query
+     * @tparam TableT the query data structure
+     * @tparam page_size the number of the data records per page
+     * @param cond query condition
      * @return SQLResultSet<TableT, page_size>
      */
     template <typename TableT, size_t page_size = 50>
@@ -300,7 +312,7 @@ private:
 typedef std::shared_ptr<DBConnectBase> DBConnectPtr;
 
 //-------------------------------------------------------------------------
-// inline方法实现
+// Implementation of the inline methods
 //-------------------------------------------------------------------------
 
 inline DBConnectBase::DBConnectBase(const Parameter &param) : m_params(param) {}
@@ -327,7 +339,7 @@ NumberType DBConnectBase::queryNumber(const std::string &query, NumberType defau
 }
 
 //-------------------------------------------------------------------------
-// 模板方法实现
+// Implementation of the template methods
 //-------------------------------------------------------------------------
 
 template <typename TableT, size_t page_size>
