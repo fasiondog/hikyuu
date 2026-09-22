@@ -4,7 +4,7 @@
  *  Created on: 2025-10-17
  *      Author: fasiondog
  *
- *  部分杂类函数
+ *  Some miscellaneous functions
  */
 
 #pragma once
@@ -16,28 +16,29 @@
 namespace hku {
 
 /**
- * @brief 并行运行系统
- * @param system_list 系统列表
- * @param query 系统运行查询条件
- * @param reset 执行前是否依据系统部件共享属性复位
- * @param resetAll 强制复位所有部件
- * @return 各系统Query周期内各时间点的资金列表
+ * @brief Run the systems in parallel
+ * @param system_list system list
+ * @param query query condition for running the systems
+ * @param reset whether to reset according to the shared attribute of the system parts before
+ *              execution
+ * @param resetAll force resetting all the parts
+ * @return the funds list of every time point within the Query period of each system
  */
 vector<FundsList> HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query,
                                            bool reset = true, bool resetAll = false);
 
 /**
- * @brief 并行运行组合
- * @param pf_list 组合列表
- * @param query 组合运行查询条件
- * @param force 强制复位
+ * @brief Run the portfolios in parallel
+ * @param pf_list portfolio list
+ * @param query query condition for running the portfolios
+ * @param force force reset
  * @return vector<FundsList>
  */
 vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query,
                                           bool force = false);
 
 /**
- * 从账户列表中一次性获取资金列表
+ * Get the funds list of the account list at once
  * @param tm_list
  * @param ref_dates
  * @return vector<FundsList>
@@ -46,11 +47,12 @@ vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQ
 vector<FundsList> HKU_API getFundsList(const vector<TMPtr>& tm_list, const DatetimeList& ref_dates);
 
 /**
- * 从账户列表中一次性获取资金列表
+ * Get the funds list of the account list at once
  * @param tm_list
- * @param datetime 截止日期
- * @param ktype 数据类型
- * @param ext 是否获取扩展统计信息（捐赠用户，否则仍为基础统计）
+ * @param datetime deadline date
+ * @param ktype K-line type
+ * @param ext whether to get the extended statistics (donation users, otherwise the basic
+ *            statistics are still returned)
  * @return vector<FundsList>
  * @ingroup TradeManagerClass
  */
