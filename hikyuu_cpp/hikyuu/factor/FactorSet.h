@@ -19,28 +19,30 @@ public:
                        const Block& block = Block());
 
     /**
-     * 构造函数，使用指定的因子列表创建因子集合
-     * @param factors 因子列表
-     * @param ktype K线类型，默认为日线
-     * @param block 板块，默认为空
-     * @param name 因子集合名称，默认为空
+     * Constructor, create a factor set with the given factor list
+     * @param factors factor list
+     * @param ktype K-line type, the daily line by default
+     * @param block block, empty by default
+     * @param name factor set name, empty by default
      */
     explicit FactorSet(const FactorList& factors, const KQuery::KType& ktype = KQuery::DAY,
                        const Block& block = Block(), const string& name = "");
 
     /**
-     * 构造函数，使用指定的指标列表创建因子集合，因子名称默认为指标名称, 主要用于创建临时的因子集合
-     * @note 同名的指标会被覆盖，最终保留最后一个同名指标
-     * @param inds 指标列表
-     * @param ktype 因子集合的 K 线类型，默认为日线
+     * Constructor, create a factor set with the given indicator list, the factor name is the
+     * indicator name by default; it is mainly used to create a temporary factor set
+     * @note An indicator with the same name is overwritten, the last one with the same name is kept
+     * @param inds indicator list
+     * @param ktype K-line type of the factor set, the daily line by default
      */
     explicit FactorSet(const IndicatorList& inds, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
-     * 构造函数，使用指定的指标映射表创建因子集合
-     * @note 同名的指标会被覆盖，最终保留最后一个同名指标
-     * @param inds 指标映射表，key 为因子名称，value 为对应的指标
-     * @param ktype 因子集合的 K 线类型，默认为日线
+     * Constructor, create a factor set with the given indicator map
+     * @note An indicator with the same name is overwritten, the last one with the same name is kept
+     * @param inds indicator map, the key is the factor name and the value is the corresponding
+     *             indicator
+     * @param ktype K-line type of the factor set, the daily line by default
      */
     explicit FactorSet(const std::unordered_map<string, Indicator>& inds,
                        const KQuery::KType& ktype = KQuery::DAY);
@@ -53,15 +55,17 @@ public:
     FactorSet& operator=(FactorSet&& other);
 
     /**
-     * 获取指定证券列表的指定查询参数的计算结果
-     * @param stocks 证券列表
-     * @param query 查询参数
-     * @param align 是否对齐日期（按指定align_dates或默认交易日历)，默认 false
-     * @param fill_null 是否填充空值，默认 false
-     * @param tovalue 是否转换为数值，默认 false
-     * @param check 是否检查股票列表属于自身指定的 block，默认 false
-     * @param align_dates 对齐日期列表，默认为空
-     * @return stocks * inds 的列表, 按证券顺序
+     * Get the calculation results of the given query condition on the given stock list
+     * @param stocks security list
+     * @param query query condition
+     * @param align whether to align the dates (according to the given align_dates or the default
+     *              trading calendar), false by default
+     * @param fill_null whether to fill the null values, false by default
+     * @param tovalue whether to convert to values, false by default
+     * @param check whether to check that the stock list belongs to the block specified by itself,
+     *              false by default
+     * @param align_dates the align date list, empty by default
+     * @return the list of stocks * inds, in the security order
      */
     vector<IndicatorList> getValues(const StockList& stocks, const KQuery& query,
                                     bool align = false, bool fill_null = false,
@@ -69,13 +73,14 @@ public:
                                     const DatetimeList& align_dates = {}) const;
 
     /**
-     * 获取所有因子的指定查询参数的计算结果
-     * @param query 查询参数
-     * @param align 是否对齐日期（按指定align_dates或默认交易日历)，默认 false
-     * @param fill_null 是否填充空值，默认 false
-     * @param tovalue 是否转换为数值，默认 false
-     * @param align_dates 对齐日期列表，默认为空
-     * @return 所有因子的计算结果
+     * Get the calculation results of the given query condition on all the factors
+     * @param query query condition
+     * @param align whether to align the dates (according to the given align_dates or the default
+     *              trading calendar), false by default
+     * @param fill_null whether to fill the null values, false by default
+     * @param tovalue whether to convert to values, false by default
+     * @param align_dates the align date list, empty by default
+     * @return the calculation results of all the factors
      */
     vector<IndicatorList> getAllValues(const KQuery& query, bool align = false,
                                        bool fill_null = false, bool tovalue = false,
@@ -94,7 +99,7 @@ public:
     void block(const Block& blk);
 
     //------------------------
-    // 容器操作接口
+    // Container operation interface
     //------------------------
 
     size_t size() const noexcept;
@@ -108,16 +113,17 @@ public:
     string str() const;
 
     //------------------------
-    // 因子管理接口
+    // Factor management interface
     //------------------------
 
     void add(const Factor& factor);
     void add(const FactorList& factors);
 
-    /** 便捷方法：添加一个指标，并以指定的名称作为因子名称 */
+    /** Convenience method: add an indicator and use the given name as the factor name */
     void add(const string& name, const Indicator& ind);
 
-    /** 便捷方法：添加一个指标, 以指标名作为因子名称。注意：同名指标后者会覆盖先加入的指标 */
+    /** Convenience method: add an indicator and use the indicator name as the factor name. Note:
+     *  the later indicator with the same name overwrites the one added before */
     void add(const Indicator& ind);
 
     void add(const IndicatorList& inds);
@@ -140,10 +146,10 @@ public:
     void load_from_db();
 
     //------------------------
-    // 迭代器支持
+    // Iterator support
     //------------------------
 
-    // 迭代器类定义
+    // Iterator class definition
     class const_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;
@@ -201,8 +207,8 @@ private:
         string name;
         string ktype{KQuery::DAY};
         Block block;
-        vector<Factor> factors;                      // 保持插入顺序
-        unordered_map<string, size_t> nameIndexMap;  // 名称到索引的映射，用于快速查找
+        vector<Factor> factors;                      // Keep the insertion order
+        unordered_map<string, size_t> nameIndexMap;  // Name to index mapping, used for fast lookup
     };
     shared_ptr<Data> m_data;
 
