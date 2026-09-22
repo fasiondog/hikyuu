@@ -99,8 +99,9 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
     Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
-    // 与 _calculate 一致：n=0 表示全窗口。_calculate 只把归一化后的 n 用于
-    // m_discard，再委托本函数；本函数重新 getParam 会读到原始 0，必须再次转换。
+    // Consistent with _calculate: n=0 means the whole window. _calculate passes only the
+    // normalized n to m_discard and then delegates to this function; this function calls getParam
+    // again and would read the original 0, so it must be converted once more.
     if (n == 0) {
         n = total;
     }
@@ -134,9 +135,10 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
 
           spearmanLevel(tmpa.data(), ptra, act_count);
           spearmanLevel(tmpb.data(), ptrb, act_count);
-          // 对 rank 直接计算 Pearson 相关系数（tie-safe）。
-          // 关键性质: average-rank 不改变秩的总和, 故 rank 均值恒为先验常数
-          // (act_count+1)/2, 无需遍历估计, 消除大数相减的 catastrophic cancellation。
+          // Calculate the Pearson correlation coefficient on the ranks directly (tie-safe).
+          // Key property: the average rank does not change the sum of the ranks, so the mean of the
+          // ranks is always the prior constant (act_count+1)/2, which needs no traversal estimation
+          // and eliminates the catastrophic cancellation of subtracting large numbers.
           double mean_rank = (act_count + 1) / 2.0;
           double var_r = 0.0, var_s = 0.0, cov = 0.0;
           for (int j = 0; j < act_count; j++) {
@@ -146,15 +148,17 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
               var_s += dev_s * dev_s;
               cov += dev_r * dev_s;
           }
-          // 零方差(因子或收益率在截面上全等)时返回 0.0:
-          // 语义为"无区分度即无预测力"。不返回 NaN, 因下游 MA 指标对 NaN
-          // 为"一 NaN 全 NaN"传染(且首窗口含 NaN 会静默输出偏低错误值),
-          // 加权合成无 NaN 守卫, NaN 会扩散污染约 ic_rolling_n 天的权重。
+          // On a zero variance (the factors or the returns are all equal in the cross section) it
+          // returns 0.0: the semantics is "no discrimination means no predictive power". NaN is not
+          // returned, because a downstream MA indicator spreads NaN like "one NaN makes all NaN"
+          // (and a NaN in the first window silently outputs a low wrong value), the weighted
+          // combination has no NaN guard, and NaN would spread and pollute the weights of about
+          // ic_rolling_n days.
           if (var_r == 0.0 || var_s == 0.0) {
               dst[i] = 0.0;
           } else {
               double rho = cov / std::sqrt(var_r * var_s);
-              // 钳位处理浮点误差引发的越界
+              // Clamp the out of range caused by the floating point error
               dst[i] = std::max(-1.0, std::min(1.0, rho));
           }
       },

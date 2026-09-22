@@ -29,7 +29,7 @@ void IIsLimitUp::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
-    m_discard = 1;  // 第一根K线没有前一根K线, 无法判断是否涨停, 直接舍弃
+    m_discard = 1;  // No previous K-line, so the limit up cannot be judged; discard it
     _increment_calculate(ind, 0);
 }
 
@@ -41,11 +41,11 @@ void IIsLimitUp::_increment_calculate(const Indicator& data, size_t start_pos) {
     value_t limit_up = 0.0;
     const Stock& stock = kdata.getStock();
     if (stock.type() == STOCKTYPE_A) {
-        limit_up = 1.1;  // A股涨停幅度为10%, 但ST股票涨停幅度为5%, 由于没有ST历史日期暂不处理
+        limit_up = 1.1;  // 10% for the A-shares, but 5% for the ST stocks (not handled: no ST date)
     } else if (stock.type() == STOCKTYPE_A_BJ) {
-        limit_up = 1.3;  // 北交所涨停幅度为30%
+        limit_up = 1.3;  // 30% for the Beijing Stock Exchange
     } else if (stock.type() == STOCKTYPE_GEM || stock.type() == STOCKTYPE_START) {
-        limit_up = 1.2;  // 创业板和科创板涨停幅度为20%
+        limit_up = 1.2;  // 20% for the ChiNext and the STAR Market
     }
 
     auto const* ks = kdata.data();
@@ -57,7 +57,7 @@ void IIsLimitUp::_increment_calculate(const Indicator& data, size_t start_pos) {
         }
     } else {
         for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = 0.0;  // 不支持的股票类型, 默认为非涨停
+            dst[i] = 0.0;  // An unsupported security type, regarded as not limit up
         }
     }
 }

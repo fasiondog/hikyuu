@@ -16,18 +16,18 @@ BOOST_CLASS_EXPORT(hku::IAlign)
 namespace hku {
 
 IAlign::IAlign() : IndicatorImp("ALIGN") {
-    setParam<DatetimeList>("align_date_list", DatetimeList());  // 要对齐的日期序列（须已升序排列）
-    setParam<bool>("fill_null", true);                          // 缺失的数据是否使用 nan 填充
+    setParam<DatetimeList>("align_date_list", DatetimeList());  // The date sequence to align to
+    setParam<bool>("fill_null", true);  // Whether to fill the missing data with nan
 }
 
 IAlign::~IAlign() {}
 
 void IAlign::_calculate(const Indicator& ind) {
-    // ref_date_list 参数会影响 IndicatorImp 全局，勿随意修改
+    // The ref_date_list parameter affects the IndicatorImp globally, do not modify it at will
     DatetimeList dates = getParam<DatetimeList>("align_date_list");
     size_t total = dates.size();
 
-    // 如果 align_date_list 无效，则尝试取自身上下文中的日期作为参考日期
+    // If align_date_list is invalid, try to use the dates in its own context as the reference dates
     if (0 == total) {
         dates = getContext().getDatetimeList();
         total = dates.size();
@@ -44,10 +44,14 @@ void IAlign::_calculate(const Indicator& ind) {
 
     bool fill_null = getParam<bool>("fill_null");
 
-    // 处理传入的数据本身没有上下文日期的指标，无法对标的情况:
-    // 1.忽略 fill_null 参数
-    // 2.数据长度小于等于日期序列长度，则按右对齐，即最后的数据对应最后的日期，前面缺失的数据做抛弃处理
-    // 3.数据长度大于日期序列长度，按右对其，前面超出日期序列的数据丢弃
+    // Handle the case where the passed indicator itself has no context dates and cannot be
+    // aligned:
+    // 1. ignore the fill_null parameter;
+    // 2. if the data length is not greater than the date sequence length, align at the right end,
+    //    i.e. the last data corresponds to the last date and the missing data in front is
+    //    discarded;
+    // 3. if the data length is greater than the date sequence length, align at the right end and
+    //    discard the data in front that exceeds the date sequence.
     DatetimeList ind_dates = ind.getDatetimeList();
     if (ind_dates.size() == 0) {
         if (ind_total <= total) {
@@ -80,9 +84,10 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
-    // 其它有上下文日期对应的指标数据
-    // 1. 如果没有刚好相等的日期，则取小于对应日期且最靠近对应日期的数据
-    // 2. 如果有对应的日期，取对应日期的数据
+    // The other indicator data that has the corresponding context dates
+    // 1. If there is no exactly equal date, take the data of the closest date earlier than the
+    //    corresponding date;
+    // 2. if there is a corresponding date, take the data of that date.
     if (fill_null) {
         size_t ind_idx = ind.discard();
         for (size_t i = 0; i < total; i++) {
@@ -119,12 +124,13 @@ void IAlign::_calculate(const Indicator& ind) {
 
     } else {
         if (ind_dates[0] > dates[total - 1]) {
-            // 如果第一个数据日期 > 最后一个参考日期，则全部忽略
+            // If the first data date > the last reference date, ignore everything
             m_discard = total;
             return;
 
         } else if (dates[0] > ind_dates[ind_total - 1]) {
-            // 如果参考日期都大于 ind_dates 的最后一个日期，则直接使用 ind_dates 的最后一个数据
+            // If all the reference dates are later than the last date of ind_dates, use the last
+            // data of ind_dates directly
             for (size_t r = 0; r < m_result_num; r++) {
                 value_t val = ind.get(ind_total - 1, r);
                 auto* dst = this->data(r);
@@ -180,7 +186,7 @@ void IAlign::_calculate(const Indicator& ind) {
         }
     }
 
-    // 强制重新更新 m_discard
+    // Force updating m_discard again
     m_discard = 0;
     updateDiscard();
 }

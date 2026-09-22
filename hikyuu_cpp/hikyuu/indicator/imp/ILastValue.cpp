@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::ILastValue)
 namespace hku {
 
 ILastValue::ILastValue() : IndicatorImp("LASTVALUE", 1) {
-    setParam<bool>("ignore_discard", false);  // 忽略输入指标的 discard
+    setParam<bool>("ignore_discard", false);  // Ignore the discard of the input indicator
 }
 
 ILastValue::~ILastValue() {}

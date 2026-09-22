@@ -97,7 +97,7 @@ void IRecover::_calculate(const Indicator& ind) {
 }
 
 #if 0
-// 需要后复权为全量方式才有意义，但全量后复权太慢
+// It is meaningful only when the back adjustment is in the full mode, but the full back adjustment is too slow
 bool IRecover::supportIncrementCalculate() const {
     KQuery::RecoverType recover_type =
       static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
@@ -111,7 +111,7 @@ void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
     KQuery::RecoverType recover_type =
       static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
 
-    // 保证从旧的上下文起点到新的上下文终点的数据都被计算到
+    // Guarantee that the data from the old context start to the new context end are all calculated
     query = KQueryByDate(m_old_context.front().datetime,
                          kdata.back().datetime + Seconds(KQuery::getKTypeInSeconds(query.kType())),
                          query.kType(), recover_type);

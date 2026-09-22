@@ -140,7 +140,8 @@ static void insum_min(const IndicatorList& inds, Indicator::value_t* dst, size_t
             continue;
         }
         const auto* data = value.data();
-        // 遍历所有数据data,dst为空则等于data[i],data[i]小于原来值则为data[i]
+        // Traverse all the data; dst is set to data[i] when it is empty, and to data[i] when
+        // data[i] is smaller than the original value
         for (size_t i = 0; i < len; i++) {
             if (!std::isnan(data[i])) {
                 if (std::isnan(dst[i])) {
@@ -153,16 +154,16 @@ static void insum_min(const IndicatorList& inds, Indicator::value_t* dst, size_t
     }
 }
 
-// 排名按降序，指标值最高的排名为1
+// The ranking is in the descending order, the highest indicator value has the rank 1
 static void insum_rank_desc(const IndicatorList& inds, Indicator::value_t* dst,
                             const Indicator& ind, size_t len) {
     size_t discard = ind.discard();
     for (size_t i = discard; i < len; i++) {
         if (std::isnan(dst[i])) {
-            dst[i] = 1;  // 相当于初始化
+            dst[i] = 1;  // It is equivalent to the initialization
         }
     }
-    for (const auto& value : inds) {  // 单个ind
+    for (const auto& value : inds) {  // A single ind
         if (value.empty()) {
             continue;
         }
@@ -171,8 +172,8 @@ static void insum_rank_desc(const IndicatorList& inds, Indicator::value_t* dst,
                      value.getContext().getStock().market_code(), value.size(), len);
             continue;
         }
-        const auto* data = value.data();    // 对比股的数据
-        const auto* data_ind = ind.data();  // 本股数据
+        const auto* data = value.data();    // The data of the compared stock
+        const auto* data_ind = ind.data();  // The data of this stock
 
         for (size_t i = discard; i < len; i++) {
             if (!std::isnan(data[i])) {
@@ -184,16 +185,17 @@ static void insum_rank_desc(const IndicatorList& inds, Indicator::value_t* dst,
     }
 }
 
-// 排名按升序，指标值最低的排名为1，指标值越高排名值越高
+// The ranking is in the ascending order, the lowest indicator value has the rank 1 and a higher
+// indicator value means a higher rank
 static void insum_rank_asc(const IndicatorList& inds, Indicator::value_t* dst, const Indicator& ind,
                            size_t len) {
     size_t discard = ind.discard();
     for (size_t i = discard; i < len; i++) {
         if (std::isnan(dst[i])) {
-            dst[i] = 1;  // 相当于初始化
+            dst[i] = 1;  // It is equivalent to the initialization
         }
     }
-    for (const auto& value : inds) {  // 单个ind
+    for (const auto& value : inds) {  // A single ind
         if (value.empty()) {
             continue;
         }
@@ -202,12 +204,13 @@ static void insum_rank_asc(const IndicatorList& inds, Indicator::value_t* dst, c
                      value.getContext().getStock().market_code(), value.size(), len);
             continue;
         }
-        const auto* data = value.data();    // 对比股的数据
-        const auto* data_ind = ind.data();  // 本股数据
+        const auto* data = value.data();    // The data of the compared stock
+        const auto* data_ind = ind.data();  // The data of this stock
 
         for (size_t i = discard; i < len; i++) {
             if (!std::isnan(data[i])) {
-                if (data[i] < data_ind[i]) {  // 如果比dst_tmp值小,则排名+1,如果比dst_tmp值大,则不变
+                if (data[i] <
+                    data_ind[i]) {  // Rank + 1 when it is smaller than dst_tmp, unchanged otherwise
                     dst[i]++;
                 }
             }
@@ -237,7 +240,7 @@ void IInSum::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     int mode = getParam<int>("mode");
-    // 模式4/5依赖上下文
+    // Modes 4/5 depend on the context
     if (mode == 4 || mode == 5) {
         if (ind.size() == 0) {
             m_discard = total;
@@ -257,7 +260,8 @@ void IInSum::_calculate(const Indicator& ind) {
     } else if (3 == mode) {
         insum_min(inds, dst, total);
     } else if (4 == mode) {
-        // 指标值越大排名值越低，即指标最大的值对应排名值为1
+        // A larger indicator value means a lower rank, i.e. the largest indicator value has the
+        // rank 1
         auto nind = ind;
         if (ind.size() != total) {
             nind = ALIGN(ind, std::move(dates), getParam<bool>("fill_null"));
@@ -265,7 +269,8 @@ void IInSum::_calculate(const Indicator& ind) {
         }
         insum_rank_desc(inds, dst, nind, total);
     } else if (5 == mode) {
-        // 指标值越高排名值越高，即指标值最低的排名值为1
+        // A higher indicator value means a higher rank, i.e. the lowest indicator value has the
+        // rank 1
         auto nind = ind;
         if (ind.size() != total) {
             nind = ALIGN(ind, std::move(dates), getParam<bool>("fill_null"));

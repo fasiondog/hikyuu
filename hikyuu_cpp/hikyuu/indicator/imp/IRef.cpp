@@ -1,7 +1,7 @@
 /*
  * IRef.cpp
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2015-3-21
  *      Author: fasiondog
  */
 

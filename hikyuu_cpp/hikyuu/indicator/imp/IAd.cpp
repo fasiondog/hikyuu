@@ -39,7 +39,7 @@ void IAd::_calculate(const Indicator& data) {
         const KRecord& r = k[i];
         value_t tmp = r.highPrice - r.lowPrice;
         if (tmp != 0.0) {
-            // 多空对比 = [（收盘价- 最低价） - （最高价 - 收盘价）] / （最高价 - 最低价）
+            // Bull/bear comparison = [(close - low) - (high - close)] / (high - low)
             ad += ((r.closePrice + r.closePrice - r.highPrice - r.lowPrice) / tmp) * r.transAmount;
         }
         dst[i] = ad;

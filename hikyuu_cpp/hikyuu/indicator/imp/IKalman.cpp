@@ -14,8 +14,8 @@ BOOST_CLASS_EXPORT(hku::IKalman)
 namespace hku {
 
 IKalman::IKalman() : IndicatorImp("KALMAN", 1) {
-    setParam<double>("q", 0.01);  // 过程噪声协方差
-    setParam<double>("r", 0.1);   // 测量噪声协方差
+    setParam<double>("q", 0.01);  // Process noise covariance
+    setParam<double>("r", 0.1);   // Measurement noise covariance
 }
 
 IKalman::~IKalman() {}
@@ -34,8 +34,8 @@ void IKalman::_calculate(const Indicator &data) {
     auto const *src = data.data();
     auto *dst = this->data();
 
-    value_t x = src[m_discard];  // 状态估计值
-    value_t p = 1.0;             // 估计误差协方差
+    value_t x = src[m_discard];  // State estimate
+    value_t p = 1.0;             // Estimation error covariance
 
     dst[m_discard] = x;
     for (size_t i = m_discard + 1; i < total; ++i) {

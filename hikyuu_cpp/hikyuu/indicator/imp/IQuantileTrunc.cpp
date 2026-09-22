@@ -41,7 +41,7 @@ void IQuantileTrunc::_checkParam(const string &name) const {
     }
 }
 
-// 替换掉分位数范围外数值
+// Replace the values outside the quantile range
 static Indicator::value_t quantile_trunc(Indicator::value_t const *src, size_t total,
                                          double quantile_min, double quantile_max) {
     Indicator::value_t result = src[total - 1];

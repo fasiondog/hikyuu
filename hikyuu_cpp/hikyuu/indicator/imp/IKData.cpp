@@ -29,7 +29,7 @@ void IKData::_checkParam(const string& name) const {
     }
 }
 
-// 支持KDATA Indicator作为参数
+// Support a KDATA Indicator as the parameter
 void IKData::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
                 "The input is ignored because {} depends on the context!",

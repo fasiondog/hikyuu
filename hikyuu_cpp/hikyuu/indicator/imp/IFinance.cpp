@@ -19,10 +19,11 @@ IFinance::IFinance() : IndicatorImp("FINANCE", 1) {
     setParam<int>("field_ix", 0);
     setParam<string>("field_name", "");
 
-    // 某些信息如每股收益，只使用年报计算
+    // Some information such as the earnings per share is calculated with the annual report only
     setParam<bool>("only_year_report", false);
 
-    // 某些信息如每股收益，需要动态计算，如全年收益在只有一季报时，使用一季报*4进行预估
+    // Some information such as the earnings per share needs a dynamic calculation; for example,
+    // when only the Q1 report exists, the annual earnings is estimated with the Q1 report * 4
     setParam<bool>("dynamic", false);
 }
 
@@ -73,8 +74,9 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     size_t finances_total = finances.size();
 
-    // Fixed #25(gitee) 季报和年报在同一天发布可能冲突
-    // 公式FINANCE(kdata, 231) 和FINANCE(kdata,95)中没有年报（231为第四季度）的数据的问题
+    // Fixed #25 (gitee): the quarterly report and the annual report may conflict when published on
+    // the same day the problem that FINANCE(kdata, 231) and FINANCE(kdata, 95) have no annual
+    // report data (231 is the fourth quarter)
     for (size_t i = finances_total - 1; i > 0; --i) {
         if (finances[i - 1].reportDate >= finances[i].reportDate) {
             finances[i - 1].reportDate = finances[i].reportDate - TimeDelta(1);
@@ -90,16 +92,16 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 if (dynamic) {
                     long month = finances[pos].fileDate.month();
                     if (3L == month) {
-                        // 一季报
+                        // Q1 report
                         dst[cur_kix] = value * 4;
                     } else if (6L == month) {
-                        // 半年报
+                        // Half-year report
                         dst[cur_kix] = value * 2;
                     } else if (9L == month) {
-                        // 三季报
+                        // Q3 report
                         dst[cur_kix] = value / 3.0 * 4.0;
                     } else {
-                        // 年报
+                        // Annual report
                         dst[cur_kix] = value;
                     }
                 } else {
@@ -113,16 +115,16 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 if (dynamic) {
                     long month = finances[pos].fileDate.month();
                     if (3L == month) {
-                        // 一季报
+                        // Q1 report
                         dst[cur_kix] = value * 4;
                     } else if (6L == month) {
-                        // 半年报
+                        // Half-year report
                         dst[cur_kix] = value * 2;
                     } else if (9L == month) {
-                        // 三季报
+                        // Q3 report
                         dst[cur_kix] = value / 3.0 * 4.0;
                     } else {
-                        // 年报
+                        // Annual report
                         dst[cur_kix] = value;
                     }
                 } else {

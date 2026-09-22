@@ -23,7 +23,7 @@ IDropna::IDropna() : IndicatorImp("DROPNA", 1) {
 IDropna::~IDropna() {}
 
 void IDropna::_calculate(const Indicator& ind) {
-    // ref_date_list 参数会影响 IndicatorImp 全局，勿随意修改
+    // The ref_date_list parameter affects the IndicatorImp globally, do not modify it at will
     size_t total = ind.size();
     if (ind.discard() >= total) {
         m_discard = 0;

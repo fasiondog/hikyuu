@@ -15,8 +15,8 @@ namespace hku {
 
 IRSRSBull::IRSRSBull() : IndicatorImp("RSRS_BULL", 4) {
     m_need_context = true;
-    setParam<int>("n", 20);  // 回归窗口
-    setParam<int>("m", 60);  // Z-score窗口
+    setParam<int>("n", 20);  // Regression window
+    setParam<int>("m", 60);  // Z-score window
 }
 
 IRSRSBull::~IRSRSBull() {}
@@ -47,12 +47,12 @@ void IRSRSBull::_calculate(const Indicator&) {
         return;
     }
 
-    auto* bull = this->data(0);  // 层级4修正值（右偏修正）
-    auto* beta = this->data(1);  // β 值
-    auto* r2 = this->data(2);    // R² 值
-    auto* z = this->data(3);     // Z-score 值
+    auto* bull = this->data(0);  // The level 4 correction value (the right skew correction)
+    auto* beta = this->data(1);  // The beta value
+    auto* r2 = this->data(2);    // The R2 value
+    auto* z = this->data(3);     // The Z-score value
 
-    // 第一步：计算每个点的 β 和 R²（从 start_idx 开始）
+    // Step 1: calculate the beta and the R2 of every point (starting from start_idx)
     value_t sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x2 = 0.0, sum_y2 = 0.0;
     for (size_t i = 0; i < static_cast<size_t>(n); i++) {
         value_t x = k[i].lowPrice;
@@ -64,7 +64,7 @@ void IRSRSBull::_calculate(const Indicator&) {
         sum_y2 += y * y;
     }
 
-    // 计算第 n-1 个点的 β 和 R²
+    // Calculate the beta and the R2 of the (n-1)-th point
     value_t denom_beta = n * sum_x2 - sum_x * sum_x;
     value_t denom_r2 = n * sum_y2 - sum_y * sum_y;
 
@@ -75,7 +75,7 @@ void IRSRSBull::_calculate(const Indicator&) {
         r2[start_idx] = ssr / sst;
     }
 
-    // 滚动计算后续点的 β 和 R²
+    // Calculate the beta and the R2 of the following points in a rolling way
     for (size_t i = n; i < total; i++) {
         value_t old_x = k[i - n].lowPrice;
         value_t old_y = k[i - n].highPrice;
@@ -99,8 +99,9 @@ void IRSRSBull::_calculate(const Indicator&) {
         }
     }
 
-    // 第二步：计算滚动 M 日的 Z-score
-    // 计算前 M 个 β 的均值和标准差（从 start_idx 到 z_start）
+    // Step 2: calculate the Z-score of the rolling M days
+    // Calculate the mean and the standard deviation of the first M betas (from start_idx to
+    // z_start)
     value_t sum_beta = 0.0, sum_beta2 = 0.0;
     int valid_count = 0;
     for (size_t i = start_idx; i <= z_start; i++) {
@@ -121,9 +122,9 @@ void IRSRSBull::_calculate(const Indicator&) {
             bull[z_start] = z[z_start] * r2[z_start] * beta[z_start];
         }
 
-        // 滚动计算后续的 Z-score 和层级4修正值
+        // Calculate the following Z-scores and the level 4 correction values in a rolling way
         for (size_t i = z_start + 1; i < total; i++) {
-            // 移除最旧的 β
+            // Remove the oldest beta
             size_t oldest_idx = i - m;
             if (oldest_idx >= start_idx && !std::isnan(beta[oldest_idx])) {
                 sum_beta -= beta[oldest_idx];
@@ -131,7 +132,7 @@ void IRSRSBull::_calculate(const Indicator&) {
                 valid_count--;
             }
 
-            // 添加新的 β
+            // Add the new beta
             if (!std::isnan(beta[i])) {
                 sum_beta += beta[i];
                 sum_beta2 += beta[i] * beta[i];
@@ -151,7 +152,7 @@ void IRSRSBull::_calculate(const Indicator&) {
         }
     }
 
-    // 设置 discard，并将 beta 和 r2 前面的位置置为 Null（参考 ADX 处理方式）
+    // Set the discard and set the positions before beta and r2 to Null (refer to the ADX way)
     m_discard = z_start;
     for (size_t i = 0; i < z_start; i++) {
         beta[i] = Null<value_t>();

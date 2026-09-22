@@ -1,7 +1,7 @@
 /*
  * IReplace.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -17,7 +17,7 @@ IReplace::IReplace() : IndicatorImp("REPLACE", 1) {
     setParam<double>("old_value", Null<double>());
     setParam<double>("new_value", 0.0);
     setParam<bool>("ignore_discard",
-                   false);  // 忽略传入指标的 discard, 即对所有数据进行替换处理
+                   false);  // Ignore the discard of the passed indicator, i.e. replace all the data
 }
 
 IReplace::~IReplace() {}
@@ -54,7 +54,7 @@ void IReplace::_calculate(const Indicator &data) {
         }
     }
 
-    // 重新更新 m_discard
+    // Update m_discard again
     updateDiscard();
 }
 

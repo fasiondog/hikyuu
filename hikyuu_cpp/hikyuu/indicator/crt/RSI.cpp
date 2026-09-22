@@ -1,7 +1,7 @@
 /*
  * RSI.h
  *
- *   Created on: 2023年09月23日
+ *   Created on: 2023-09-23
  *       Author: yangrq1018
  */
 
@@ -11,7 +11,7 @@
 namespace hku {
 
 /**
- * 相对强弱指数
+ * Relative Strength Index
  * @ingroup Indicator
  */
 Indicator HKU_API RSI(int n) {
