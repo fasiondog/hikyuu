@@ -336,12 +336,13 @@ public:
 
     /*
      * Wait for the background preload thread to exit (idempotent: it returns immediately when the
-     * thread was never started or has already finished). It is only called on the program exit path,
-     * after cancelLoad() and before stopping m_load_tg, so that concurrent access (TOCTOU/UAF) to
-     * m_load_tg from the preload thread and the exit sequence is eliminated. That thread only loads
-     * data and dispatches load events, it performs no nng operation at all, and it checks
-     * m_cancel_load all the way, so it exits quickly after being cancelled; therefore this join will
-     * not become a new blocking point during the static destruction phase on Windows.
+     * thread was never started or has already finished). It is only called on the program exit
+     * path, after cancelLoad() and before stopping m_load_tg, so that concurrent access
+     * (TOCTOU/UAF) to m_load_tg from the preload thread and the exit sequence is eliminated. That
+     * thread only loads data and dispatches load events, it performs no nng operation at all, and
+     * it checks m_cancel_load all the way, so it exits quickly after being cancelled; therefore
+     * this join will not become a new blocking point during the static destruction phase on
+     * Windows.
      */
     void joinPreloadThread();
 
@@ -352,17 +353,17 @@ public:
      *          finance data" is published successfully (the HISTORY_FINANCE_LOADED branch of
      *          _onLoadEvent and the fallback publish at start()). After that, clients read through
      *          shared memory, so the server does not need to keep two copies. It really runs only
-     *          when this process acts as the shm server and is not in client mode, otherwise it is a
-     *          no-op:
-     *          - After the call, m_weight_ready / m_history_finance_ready of each security are set to
-     *            false, the cache containers are cleared and the memory is returned; later
-     *            Stock::getWeight / Stock::getHistoryFinance (IPC fallback reply, in-process API
-     *            access) lazily reload them through the base info driver on demand, so the result
-     *            stays correct at the cost of the first query of the accessed security;
+     *          when this process acts as the shm server and is not in client mode, otherwise it is
+     * a no-op:
+     *          - After the call, m_weight_ready / m_history_finance_ready of each security are set
+     * to false, the cache containers are cleared and the memory is returned; later Stock::getWeight
+     * / Stock::getHistoryFinance (IPC fallback reply, in-process API access) lazily reload them
+     * through the base info driver on demand, so the result stays correct at the cost of the first
+     * query of the accessed security;
      *          - On the next data reload, loadAllStockWeights / the historical finance preload
      *            materialize them again first, so the next snapshot rebuild is not affected;
-     *          - Never call it after publishing only the weight data (include_finance=false, i.e. the
-     *            first publish after BASE_DATA_READY), otherwise the following publish that includes
+     *          - Never call it after publishing only the weight data (include_finance=false, i.e.
+     * the first publish after BASE_DATA_READY), otherwise the following publish that includes
      *            finance data would read an empty weight table.
      */
     void releaseShmServerBaseInfoCache();
@@ -384,7 +385,8 @@ private:
     /* Load all the data */
     void loadData();
 
-    /* Get the K-line driver connection pool; the IPC proxy driver pool is returned in client mode */
+    /* Get the K-line driver connection pool; the IPC proxy driver pool is returned in client mode
+     */
     KDataDriverConnectPoolPtr _getKDataDriverPool();
 
     /* Pure client negotiation of the shm data service: it only probes and connects to an existing
@@ -395,11 +397,12 @@ private:
     void loadAllKData();
     std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
 
-    /* Load all the K-line data and historical finance data serially (when the driver does not support
-     * parallel loading), executed in a separate thread */
+    /* Load all the K-line data and historical finance data serially (when the driver does not
+     * support parallel loading), executed in a separate thread */
     void _loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
-    /* Load all the K-line data and historical finance data in parallel, executed in a separate thread
+    /* Load all the K-line data and historical finance data in parallel, executed in a separate
+     * thread
      */
     void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
@@ -408,7 +411,8 @@ private:
      * called by loadData and the two loading functions). The core library no longer perceives the
      * existence of the server, it only notifies in order; there is no overhead when no callback is
      * registered.
-     * @note Calling register/unregisterLoadEventCallback inside a callback is forbidden (it deadlocks)
+     * @note Calling register/unregisterLoadEventCallback inside a callback is forbidden (it
+     * deadlocks)
      */
     void _fireLoadEvent(LoadEvent event);
 
@@ -446,8 +450,8 @@ private:
     std::atomic_bool m_cancel_load{false};  // Cancel the loading, used as the exit indicator
     std::atomic_bool m_data_ready{true};    // Indicates whether all the data is ready; true when it
                                             // has not been initialized
-    std::thread::id m_thread_id;  // Records the thread id, used to tell whether a Strategy runs as a
-                                  // separate process or as a thread
+    std::thread::id m_thread_id;  // Records the thread id, used to tell whether a Strategy runs as
+                                  // a separate process or as a thread
     string m_tmpdir;
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;
@@ -487,9 +491,9 @@ private:
     std::string m_i18n_path;
 
     // Whether this process acts as a client of the shm data service (set after a successful
-    // connection and the assembly of the proxy driver). The forwarding callback is registered by the
-    // plugin itself after a successful connect and unregistered on disconnect; the core library does
-    // not hold any plugin type pointer
+    // connection and the assembly of the proxy driver). The forwarding callback is registered by
+    // the plugin itself after a successful connect and unregistered on disconnect; the core library
+    // does not hold any plugin type pointer
     bool m_ipc_client_mode{false};
     KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // IPC K-line driver pool in client mode
 };
@@ -500,20 +504,20 @@ using LoadEventCallback = std::function<void(LoadEvent)>;
 /**
  * Register a data loading event callback, returning the callback id (subscribed when a plugin
  * start()s, used to publish the snapshot at the right moment)
- * @note The lock of the callback container is heap allocated and never released, so this function and
- *       its inverse are safe to call during the static destruction phase as well
+ * @note The lock of the callback container is heap allocated and never released, so this function
+ * and its inverse are safe to call during the static destruction phase as well
  */
 HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
 
-/** Unregister a data loading event callback (called when a plugin stop()s); a no-op when the id does
- *  not exist */
+/** Unregister a data loading event callback (called when a plugin stop()s); a no-op when the id
+ * does not exist */
 HKU_API void unregisterLoadEventCallback(size_t id);
 
 /**
  * Mark this process as the shm server role: _negotiateShmServer() skips the client negotiation
  * accordingly (to prevent self-connection)
- * @details Called by the facade startShmServer() before the plugin is loaded; it is safe to set even
- *          if StockManager has not been initialized yet
+ * @details Called by the facade startShmServer() before the plugin is loaded; it is safe to set
+ * even if StockManager has not been initialized yet
  */
 HKU_API void setShmServerRole(bool role) noexcept;
 HKU_API bool isShmServerRole() noexcept;

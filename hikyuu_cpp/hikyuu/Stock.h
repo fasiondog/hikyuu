@@ -157,8 +157,8 @@ public:
      *         well, to avoid repeated empty queries).
      *       - shm server role: after the base info snapshot containing finance data is published,
      *         StockManager::releaseShmServerBaseInfoCache() releases the local weight cache of each
-     *         security to reclaim memory (clients read through shared memory, so the server does not
-     *         need to keep a copy). Later access to a released security (IPC fallback reply, or the
+     *         security to reclaim memory (clients read through shared memory, so the server does
+     * not need to keep a copy). Later access to a released security (IPC fallback reply, or the
      *         in-process API) lazily reloads and caches it again, so the result stays correct.
      *       - Plain standalone main process: only the local cache materialized at startup is read,
      *         with no lazy-loading fallback.
@@ -223,8 +223,8 @@ public:
     /**
      * Get the historical financial information
      * @note Returns a copy of the historical financial records. The main process (not in client
-     *       mode) returns a copy of its materialized internal cache; after that cache is released by
-     *       StockManager::releaseShmServerBaseInfoCache() (invoked by the shm server role once the
+     *       mode) returns a copy of its materialized internal cache; after that cache is released
+     * by StockManager::releaseShmServerBaseInfoCache() (invoked by the shm server role once the
      *       snapshot containing finance data has been published), it is lazily reloaded on demand.
      *       In client mode (IPC) it is not materialized locally; instead it is read on demand
      *       through the base info driver from the shared-memory snapshot published by the main
@@ -330,22 +330,23 @@ struct HKU_API Stock::Data {
     std::shared_mutex m_weight_mutex;
     // Whether the weight data has been initialized (materialized at startup or lazily loaded as a
     // fallback; it may be empty). When it is set:
-    // - Client mode: set when materialized at startup while load_stock_weight is enabled; set on the
+    // - Client mode: set when materialized at startup while load_stock_weight is enabled; set on
+    // the
     //   first lazy load for securities that were not materialized, e.g. added by addStock or newly
     //   constructed, when the config is disabled;
     // - shm server role: set to false by releaseShmServerBaseInfoCache() after the snapshot
     //   containing finance data is published (the cache has been released and the memory returned),
     //   then set again after the next access lazily reloads it through the driver;
-    // An empty result sets it as well, so securities without weight data do not hit the driver again
-    // on every query.
+    // An empty result sets it as well, so securities without weight data do not hit the driver
+    // again on every query.
     mutable std::atomic_bool m_weight_ready{false};
 
     mutable vector<HistoryFinanceInfo>
       m_history_finance;  // Historical financial info [report date, field 1, field 2, ...]
-    // Whether the historical finance data has been initialized (set when the main process preloads it
-    // at startup; set to false after it is released by releaseShmServerBaseInfoCache(), and set again
-    // after the next access lazily reloads it; in client mode it is never materialized locally, so it
-    // stays false)
+    // Whether the historical finance data has been initialized (set when the main process preloads
+    // it at startup; set to false after it is released by releaseShmServerBaseInfoCache(), and set
+    // again after the next access lazily reloads it; in client mode it is never materialized
+    // locally, so it stays false)
     mutable std::atomic_bool m_history_finance_ready{false};
     mutable std::shared_mutex m_history_finance_mutex;
 
@@ -390,8 +391,9 @@ typedef vector<Stock> StockList;
  */
 Stock HKU_API getStock(const string& querystr);
 
-/* Used to take a Stock instance as a map key; it is generally recommended to use stock.id as the key,
- * otherwise the map has to build a new object through the copy constructor, which is inefficient */
+/* Used to take a Stock instance as a map key; it is generally recommended to use stock.id as the
+ * key, otherwise the map has to build a new object through the copy constructor, which is
+ * inefficient */
 bool operator<(const Stock& s1, const Stock& s2);
 inline bool operator<(const Stock& s1, const Stock& s2) {
     return s1.id() < s2.id();

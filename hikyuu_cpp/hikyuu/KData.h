@@ -88,8 +88,8 @@ public:
      */
     KData getSubKData(int64_t start, int64_t end = Null<int64_t>()) const;
 
-    /** Get the index position of the given date. Note: it is the position inside this KData, not the
-     *  position of the original K-line record in the Stock */
+    /** Get the index position of the given date. Note: it is the position inside this KData, not
+     * the position of the original K-line record in the Stock */
     size_t getPos(const Datetime& datetime) const noexcept;
 
     /** Get the position in the original K-line record by date */
@@ -108,8 +108,8 @@ public:
      *  otherwise endPos - 1 */
     size_t lastPos() const;
 
-    /** Get the position of the next record after the range in the original K-line record; 0 if it is
-     *  empty, otherwise lastPos + 1 */
+    /** Get the position of the next record after the range in the original K-line record; 0 if it
+     * is empty, otherwise lastPos + 1 */
     size_t endPos() const;
 
     /** Write the data to the given file */

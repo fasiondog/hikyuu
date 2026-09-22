@@ -84,9 +84,9 @@ public:
     CostRecord cost;    ///< Trade cost
     price_t stoploss;   ///< Stop-loss price
     price_t cash;       ///< Cash balance
-    SystemPart from;    ///< Auxiliary record of the trading system part that issued the instruction;
-                        ///< Null<int>() means invalid
-    string remark;      ///< Remark (at most 100 encoded characters)
+    SystemPart from;  ///< Auxiliary record of the trading system part that issued the instruction;
+                      ///< Null<int>() means invalid
+    string remark;    ///< Remark (at most 100 encoded characters)
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
