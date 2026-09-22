@@ -1,22 +1,21 @@
-<!-- TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_portfolio/scfilter.md -->
+# Cross-section Scores Filter|SCFilter
 
-# 截面评分过滤|SCFilter
-
-MF获取时间截面因子数据（评分记录)后，通常需要根据评分情况，进行过滤选择标的，供 PF 进行组合调仓等。实现这个功能主要靠 SE_MultitFactor2。但过滤的方式有很多中，hikyuu 提供了内置的 SCFilter（也可自定义新的Filter)，供 SE_MultiFactor 实现过滤，如：
+After the MF gets the cross-section factor data (score records), it is usually necessary to filter and select the targets according to the scores, for the PF to adjust the portfolio positions. Implementing this function mainly relies on SE_MultiFactor2. But there are many filtering ways; hikyuu provides the built-in SCFilter (a new Filter can also be customized), which SE_MultiFactor uses to implement the filtering, e.g.:
 
 ```python
-# 如为 SE_MultiFactor2 实例，设置过滤：分值不为Nan|分成10组取第0组|价格大于等于10元|成交金额不在当日排名末尾20%之内|取前10
+# For an SE_MultiFactor2 instance, set the filter: the score is not Nan | split into 10 groups and take group 0 |
+# the price is greater than or equal to 10 yuan | the amount is not in the last 20% of the daily ranking | take the top 10
 se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
             10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
 ```
 
-SCFilter 通过 | 操作符生成新的 Filter，且对评分记录的过滤是按顺序进行的。
+SCFilter generates a new Filter with the | operator, and the filtering of the score records is performed in order.
 
-| 名称                      | 说明                                                                                     | 参数                                                                                           |
-| ------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| SCFilter_IgnoreNan        | 忽略截面中的 Nan 值                                                                      |                                                                                                |
-| SCFilter_LessOrEqualValue | 过滤掉评分小于等于指定值的截面                                                           | value(double)：默认值0.0                                                                       |
-| SCFilter_TopN             | 仅获取评分列表中排在前TopN位的标的<br />注意：和 MF 本身指定的排序方式相关，默认为降序   | topn(int): 默认值10                                                                            |
-| SCFilter_Group            | 对截面评分进行分组，并选定指定分组                                                       | group(int): 分组数量，默认10组<br />group_index(int): 指定分组序号（从0开始)，默认为0          |
-| SCFilter_AmountLimit      | 过滤掉成交金额在评分列表末尾百分比范围内的标的，<br />即保证成交金额在指定排名百分比之前 | min_amount_percent_limit(double)：默认0.1，即仅保留前90%                                       |
-| SCFilter_Price            | 按标的价格过滤，仅保留价格符合条件的标的<br /> [min_price, max_price]之间                | min_price(double): 最低价格限制（默认10.0)<br />max_price(double): 最高价格限制（默认100000.0) |
+| Name                      | Description                                                                                     | Parameters                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| SCFilter_IgnoreNan        | Ignore the Nan values in the cross-section                                                                      |                                                                                                |
+| SCFilter_LessOrEqualValue | Filter out the cross-sections whose score is less than or equal to the specified value                                                           | value(double): defaults to 0.0                                                                       |
+| SCFilter_TopN             | Only get the targets ranked in the top TopN of the score list<br />Note: it is related to the sorting mode specified by the MF itself, which is descending by default   | topn(int): defaults to 10                                                                            |
+| SCFilter_Group            | Group the cross-section scores and select the specified group                                                       | group(int): the number of the groups, defaults to 10<br />group_index(int): the specified group index (starting from 0), defaults to 0          |
+| SCFilter_AmountLimit      | Filter out the targets whose amount is within the percentage range at the end of the score list,<br />i.e. guarantee that the amount is before the specified ranking percentage | min_amount_percent_limit(double): defaults to 0.1, i.e. only keep the top 90%                                       |
+| SCFilter_Price            | Filter by the target price, keeping only the targets whose price meets the condition<br /> between [min_price, max_price]                | min_price(double): the minimum price limit (defaults to 10.0)<br />max_price(double): the maximum price limit (defaults to 100000.0) |

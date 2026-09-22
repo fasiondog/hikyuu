@@ -1,25 +1,23 @@
-<!-- TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_portfolio/normalize.md -->
+# Factor Standardization and Neutralization|NORM
 
-# 因子标准化与中性化|NORM
-
-因子计算时，往往需要在时间截面上进行标准化或归一化，或者进行行业中性化、市值中性化等。可以通过为 MF 指定全局的标准化算法，或针对特定因子指定标准化和中性化策略，来达到此目的。示例：
+When calculating the factors, it is often necessary to standardize or normalize them on the cross-section, or to neutralize them by industry, market value, etc. This can be achieved by specifying a global standardization algorithm for the MF, or by specifying standardization and neutralization strategies for specific factors. Example:
 
 ```python
-# 创建两个因子 ma20, ma60
+# Create the two factors ma20, ma60
 ma20 = MA(CLOSE(), 20)
 ma20.name = 'MA20'
 
 ma60 = MA(CLOSE(), 60)
 ma60.name = 'MA60'
 
-# 指定证券列表
+# Specify the security list
 stks = [s for s in blocka]
 
-# 指定查询范围，并创建一个等权组合的 MF
+# Specify the query range, and create an equal-weight composed MF
 query = Query(Datetime(20150101), Datetime(20251017))
 mf = MF_EqualWeight([ma20, ma60], stks, query, ref_stk=sm["sh000001"])
 
-# 没有标准化时，获取合成后某日的评分列表
+# Without standardization, get the score list of a certain day after composing
 scores = mf.get_scores(Datetime(20251016))
 print(scores.to_df())
 ```
@@ -43,7 +41,7 @@ print(scores.to_df())
 ```
 
 ```python
-# 添加全局标准化
+# Add the global standardization
 mf.set_normalize(NORM_Zscore())
 scores = mf.get_scores(Datetime(20251016))
 print(scores.to_df())
@@ -65,7 +63,7 @@ print(scores.to_df())
 ```
 
 ```python
-# 为 ma20 添加行业中性化以及市场中性化(即按市值风格因子中性化)
+# Add the industry neutralization and the market neutralization (i.e. neutralizing by the market value style factor) for ma20
 mf.add_special_normalize("MA20", NORM_Zscore(), category="行业板块", style_inds=[LOG(CLOSE()*LIUTONGPAN())])
 scores = mf.get_scores(Datetime(20251016))
 print(scores.to_df())
@@ -86,11 +84,11 @@ print(scores.to_df())
 [3979 rows x 3 columns]
 ```
 
-## 内建的因子标准化算法
+## Built-in Factor Standardization Algorithms
 
-| 名称                  | 说明                 | 参数                                                                                                                                                |
-| --------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NORM_MinMax           | 归一化               |                                                                                                                                                     |
-| NORM_Zscore           | 正态分布标准化       | **out_extreme**(false): 去除去除异常值<br />**nsigma**(3.0): 异常值判断界限(西格玛)<br />**recursive**(false): 是否递归去除异常值 |
-| NORM_Quantile         | 分位数标准化         | **quantile_min**(0.01): 最小分位数<br />**quantile_max**(0.99): 最大分位数                                                            |
-| NORM_Quantile_Uniform | 分位数均匀分布标准化 | **quantile_min**(0.01): 最小分位数<br />**quantile_max**(0.99): 最大分位数                                                            |
+| Name                  | Description                                     | Parameters                                                                                                                                          |
+| --------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NORM_MinMax           | Normalization                                  |                                                                                                                                                     |
+| NORM_Zscore           | Normal distribution standardization            | **out_extreme**(false): remove the outliers<br />**nsigma**(3.0): the outlier judgement threshold (sigma)<br />**recursive**(false): whether to remove the outliers recursively |
+| NORM_Quantile         | Quantile standardization                        | **quantile_min**(0.01): the minimum quantile<br />**quantile_max**(0.99): the maximum quantile                                                            |
+| NORM_Quantile_Uniform | Quantile uniform distribution standardization   | **quantile_min**(0.01): the minimum quantile<br />**quantile_max**(0.99): the maximum quantile                                                            |

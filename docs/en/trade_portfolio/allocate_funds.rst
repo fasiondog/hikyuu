@@ -1,75 +1,73 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_portfolio/allocate_funds.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-资产分配算法组件|AF
-====================
+Asset Allocation Algorithm Component|AF
+=======================================
 
-资产分配算法组件，用于对选中的系统进行资产分配。
+The asset allocation algorithm component, used to allocate the assets to the selected systems.
 
-公共参数:
+Common parameters:
 
-    * **adjust_running_sys** *(bool|True)* : 是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配。
+    * **adjust_running_sys** *(bool|True)* : Whether to adjust the positions of the strategies already holding positions. When not adjusting, only the current remaining funds of the total account are used for the allocation; otherwise the total market value is used.
     
-        - True: 主动根据资产分配对已持仓策略进行增减仓, 
-        - False: 不会根据当前分配权重对已持仓策略进行强制加减仓
+        - True: actively increase or decrease the positions of the holding strategies according to the asset allocation, 
+        - False: the holding strategies will not be forcibly increased or decreased according to the current allocated weights
 
-    * **auto_adjust_weight** *(bool|True)* : 自动调整权重，此时认为传入的权重为各证券的相互比例（详见ignore_zero_weight说明）。否则，以传入的权重为指定权重不做调整（此时传入的各个权重需要小于1）。
+    * **auto_adjust_weight** *(bool|True)* : Adjust the weights automatically; in this case the passed weights are considered to be the mutual ratios of the securities (see the ignore_zero_weight description). Otherwise, the passed weights are used as the specified weights without adjustment (in this case each passed weight needs to be less than 1).
 
-    * **ignore_zero_weight** *(bool|False)* : 该参数在 auto_adjust_weight 为 True 时生效。是否过滤子类返回的比例权重列表中的 0 值（包含小于0）和 nan 值。
+    * **ignore_zero_weight** *(bool|False)* : This parameter takes effect when auto_adjust_weight is True. Whether to filter the 0 values (including those less than 0) and the nan values in the ratio weight list returned by the subclass.
    
         :: 
         
-            如: 子类返回权重比例列表 [6, 2, 0, 0, 0], 则
-               - 过滤 0 值, 则实际调整后的权重为 Xi / sum(Xi): [6/8, 2/8]
-               - 不过滤, m 设为非零元素个数, n为总元素个数, (Xi / Sum(Xi)) * (m / n):
-                  [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0] 即保留分为5份后, 仅在2份中保持相对比例
+            E.g.: if the subclass returns the weight ratio list [6, 2, 0, 0, 0], then
+               - filtering the 0 values, the actually adjusted weight is Xi / sum(Xi): [6/8, 2/8]
+               - not filtering, let m be the number of the non-zero elements and n the total number of elements, (Xi / Sum(Xi)) * (m / n):
+                  [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0], i.e. after keeping it divided into 5 shares, the relative ratio is kept only in 2 shares
 
-    * **ignore_se_score_is_null** *(bool|False)* : 忽略选中系统列表中的系统得分为 null 的系统。 **注意: 某些SE(如SE_MultiFactor)本身可能也存在类似控制**
-    * **ignore_se_score_lt_zero** *(bool|False)* : 忽略选中系统列表中的系统得分小于等于 0 的系统
-    * **reserve_percent** *(float|0.0)* : 资产占比保留比例，小于该比例的资产将被忽略。
-    * **trace** *(bool|False)* : 打印跟踪信息
+    * **ignore_se_score_is_null** *(bool|False)* : Ignore the systems whose score is null in the selected system list. **Note: some SEs (e.g. SE_MultiFactor) may also have a similar control themselves**
+    * **ignore_se_score_lt_zero** *(bool|False)* : Ignore the systems whose score is less than or equal to 0 in the selected system list
+    * **reserve_percent** *(float|0.0)* : The reserved ratio of the asset proportion; the assets with a proportion smaller than this ratio will be ignored.
+    * **trace** *(bool|False)* : Print the tracking information
 
 
-内建资产分配算法
-------------------
+Built-in Asset Allocation Algorithms
+------------------------------------
 
 .. raw:: html
 
     <table border="1">
         <thead>
             <tr>
-                <th>代码</th>
-                <th>名称</th>
-                <th>描述</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><a href="#target-section">AF_FixedWeight</a></td>
-                <td>固定比例资产分配</td>
-                <td>每个选中的资产都只占总资产固定的比例</td>
+                <td>Fixed-ratio asset allocation</td>
+                <td>Every selected asset only takes a fixed proportion of the total assets</td>
             </tr>
             <tr>
                 <td><a href="#target-section">AF_FixedAmount</a></td>
-                <td>固定金额资产分配</td>
-                <td>每个选中的资产都只占总资产固定的金额</td>
+                <td>Fixed-amount asset allocation</td>
+                <td>Every selected asset only takes a fixed amount of the total assets</td>
             </tr>            
             <tr>
-                <td><a href="#target-section">AF_FixedWeightList</td>
-                <td>固定比例资产分配列表</td>
-                <td>按指定的权重列表对选中系统进行资产分配</td>
+                <td><a href="#target-section">AF_FixedWeightList</a></td>
+                <td>Fixed-ratio asset allocation list</td>
+                <td>Allocate the assets to the selected systems by the specified weight list</td>
             </tr>
             <tr>
-                <td><a href="#target-section">AF_EqualWeight</td>
-                <td>固定比例资产分配</td>
-                <td>对选中的资产进行等比例分配</td>
+                <td><a href="#target-section">AF_EqualWeight</a></td>
+                <td>Fixed-ratio asset allocation</td>
+                <td>Allocate the selected assets with an equal ratio</td>
             </tr>
             <tr>
-                <td><a href="#target-section">AF_MultiFactor</td>
-                <td>多因子评分权重资产分配</td>
-                <td>根据系统得分进行资产分配，对选中的系统进行得分排序，按得分从高到低进行资产分配，得分为0的系统将被忽略。</td>
+                <td><a href="#target-section">AF_MultiFactor</a></td>
+                <td>Multi-factor scoring weight asset allocation</td>
+                <td>Allocate the assets by the system score; sort the selected systems by the score and allocate the assets from the highest score to the lowest; the systems with a score of 0 will be ignored.</td>
             </tr>    
         </tbody>
     </table>
@@ -77,124 +75,124 @@
 
 .. py:function:: AF_FixedWeight(weight)
 
-    固定比例资产分配，每个选中的资产都只占总资产固定的比例
+    The fixed-ratio asset allocation; every selected asset only takes a fixed proportion of the total assets
 
-    :param float weight:  指定的资产比例 [0, 1]
+    :param float weight:  the specified asset proportion [0, 1]
 
 .. py:function:: AF_FixedAmount(amount)
 
-    固定金额资产分配，每个选中的资产都只占总资产固定的金额
+    The fixed-amount asset allocation; every selected asset only takes a fixed amount of the total assets
 
-    :param float amount:  指定的资产金额
+    :param float amount:  the specified asset amount
 
 .. py:function:: AF_FixedWeightList(weights)
 
-    固定比例资产分配列表.
+    The fixed-ratio asset allocation list.
 
-    :param float weights:  指定的资产比例列表
+    :param float weights:  the specified asset proportion list
 
 
 .. py:function:: AF_EqualWeight()
 
-    固定比例资产分配，对选中的资产进行等比例分配
+    The fixed-ratio asset allocation; allocate the selected assets with an equal ratio
 
 
 .. py:function:: AF_MultiFactor()
 
-    根据系统得分进行资产分配，对选中的系统进行得分排序，按得分从高到低进行资产分配，得分为0的系统将被忽略。
+    Allocate the assets by the system score; sort the selected systems by the score and allocate the assets from the highest score to the lowest; the systems with a score of 0 will be ignored.
 
 
 
 
 
-系统权重系数结构
------------------
+System Weight Structure
+-----------------------
 
 .. py:class:: SystemWeight
 
-    系统权重系数结构，在资产分配时，指定对应系统的资产占比系数
+    The system weight structure; during the asset allocation, it specifies the asset proportion coefficient of the corresponding system
 
-    .. py:attribute:: sys 对应的 System 实例
-    .. py:attribute:: weight 对应的权重系数，有效范围为 [0, 1] 
+    .. py:attribute:: sys The corresponding System instance
+    .. py:attribute:: weight The corresponding weight coefficient, with the valid range [0, 1] 
 
 
 .. py:class:: SystemWeightList
 
-    由系统权重系数结构组成的列表
+    The list composed of the system weight structures
 
     .. py:attribute:: sys  
     
-        对应的 System 实例
+        The corresponding System instance
 
     .. py::attribute weight
 
-        对应的权重系数，有效范围为 [0, 1]
+        The corresponding weight coefficient, with the valid range [0, 1]
 
 
-资产分配算法基类
-------------------
+Asset Allocation Algorithm Base Class
+-------------------------------------
 
 .. py:class:: AllocateFundsBase
 
-    资产分配算法基类, 子类接口：
+    The asset allocation algorithm base class; the subclass interfaces:
 
-    - _allocateWeight : 【必须】子类资产分配调整实现
-    - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量
+    - _allocateWeight : [Required] The subclass asset allocation adjustment implementation
+    - _clone : [Required] The clone interface
+    - _reset : [Optional] Reload the private variables
 
-    .. py:attribute:: name 名称
+    .. py:attribute:: name Name
     
     .. py:method:: __init__(self[, name="AllocateFundsBase])
     
-        初始化构造函数
+        The initialization constructor
         
-        :param str name: 名称
+        :param str name: the name
 
     .. py:method:: have_param(self, name)
 
-        指定的参数是否存在
+        Whether the specified parameter exists
         
-        :param str name: 参数名称
-        :return: True 存在 | False 不存在
+        :param str name: the parameter name
+        :return: True exists | False does not exist
 
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
         
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
 
     .. py:method:: reset(self)
     
-        复位操作
+        The reset operation
     
     .. py:method:: clone(self)
     
-        克隆操作        
+        The clone operation        
         
     .. py:method:: _calculate(self)
     
-        【重载接口】子类计算接口
+        [Overload interface] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        【重载接口】子类复位接口，复位内部私有变量
+        [Overload interface] The subclass reset interface, resetting the internal private variables
 
     .. py::method:: _allocate_weight(self, date, se_list)
 
-        【重载接口】子类分配权重接口，获取实际分配资产的系统实例及其权重
+        [Overload interface] The subclass weight allocation interface, getting the actually allocated system instances and their weights
 
-        :param Datetime date: 当前时间
-        :param SystemList se_list: 当前选中的系统列表
-        :return: 系统权重分配信息列表
+        :param Datetime date: the current time
+        :param SystemList se_list: the list of the currently selected systems
+        :return: the list of the system weight allocation information
         :rtype: SystemWeightList

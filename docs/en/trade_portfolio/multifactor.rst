@@ -1,291 +1,289 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_portfolio/multifactor.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-多因子合成|MF
-==============
+Multi-factor Composition|MF
+===========================
 
-多因子本质是在时间截面上对候选标的进行评分，所以实际需要配合 Selector (策略选择算法) 使用。
+The multi-factor is essentially scoring the candidate targets on the cross-section, so it actually needs to be used together with the Selector (strategy selection algorithm).
 
-因子计算时的标准化与中性化，参见: :doc:`normalize`
+For the standardization and neutralization when calculating the factors, see: :doc:`normalize`
 
-公共参数:
+Common parameters:
 
-    * **fill_null** *(bool|True)*: 数据缺失时是否填充 nan 值, 否则以最近值填充
-    * **ic_n** *(int|5)*: 用于计算合成后因子 IC 时的 ic_n 日收益率
-    * **spearman** *(bool|True)*: 使用 spearman 获取相关系数，否则为 pearson
-    * **mode** *(int|2)*: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    * **save_all_factors** *(bool|False)*: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
+    * **fill_null** *(bool|True)*: whether to fill the nan value when the data is missing, otherwise fill with the most recent value
+    * **ic_n** *(int|5)*: the ic_n day return used when calculating the IC of the composed factor
+    * **spearman** *(bool|True)*: use spearman to get the correlation coefficient, otherwise pearson
+    * **mode** *(int|2)*: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    * **save_all_factors** *(bool|False)*: whether to save all the factor values, affecting the get_actor/get_all_factors methods
 
 
-内建对因子合成算法
---------------------------------
+Built-in Factor Composition Algorithms
+--------------------------------------
 
 .. py:function:: MF_Weight(input, stks, weights, query, ref_stk[, ic_n=5, spearman=True, mode=0, save_all_factors=False])
 
-    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn，支持多种输入类型
+    Compose the factor by the specified weights = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param sequense(float) weights: 权重列表(需和因子数量等长)
-    :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequense(float) weights: the weight list (must be the same length as the number of the factors)
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         weights = [0.6, 0.4]
         mf1 = MF_Weight(indicators, stocks, weights, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_Weight(factor_set, stocks, weights, query)
 
 
 .. py:function:: MF_EqualWeight(input, stks, query, ref_stk[, ic_n=5])
 
-    等权重合成因子，支持多种输入类型
+    Compose the factor with the equal weights, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequense(stock) stks: the list of the securities to calculate
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods    
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         mf1 = MF_EqualWeight(indicators, stocks, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_EqualWeight(factor_set, stocks, query)
 
 
 .. py:function:: MF_ICWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    滚动IC权重合成因子，支持多种输入类型
+    Compose the factor with the rolling IC weights, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param Query query: 日期范围
-    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param int ic_rolling_n: IC 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequense(stock) stks: the list of the securities to calculate
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param int ic_rolling_n: the IC rolling period
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods    
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         mf1 = MF_ICWeight(indicators, stocks, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_ICWeight(factor_set, stocks, query)
 
 
 .. py:function:: MF_ICIRWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    滚动ICIR权重合成因子，支持多种输入类型
+    Compose the factor with the rolling ICIR weights, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param Query query: 日期范围
-    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param int ic_rolling_n: IC 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法    
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequense(stock) stks: the list of the securities to calculate
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param int ic_rolling_n: the IC rolling period
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods    
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         mf1 = MF_ICIRWeight(indicators, stocks, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_ICIRWeight(factor_set, stocks, query)
 
 
-自定义多因子合成算法基类
---------------------------------------
+Custom Multi-factor Composition Algorithm Base Class
+----------------------------------------------------
 
-自定义多因子合成算法接口：
+The custom multi-factor composition algorithm interface:
 
-* :py:meth:`MultiFactorBase._calculate` - 【必须】计算合成因子
+* :py:meth:`MultiFactorBase._calculate` - [Required] Calculate the composed factor
 
 
-多因子合成算法基类
----------------------------------------
+Multi-factor Composition Algorithm Base Class
+---------------------------------------------
 
 .. py:class:: MultiFactorBase
 
-    多因子合成基类
+    The multi-factor composition base class
     
-    .. py:attribute:: name 名称
-    .. py:attribute:: query 查询条件
+    .. py:attribute:: name Name
+    .. py:attribute:: query Query condition
 
     .. py:method:: __init__(self)
     
-        初始化构造函数
+        The initialization constructor
         
-        :param str name: 名称
+        :param str name: the name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型        
+        :raises logic_error: Unsupported type! The parameter type is not supported        
 
     .. py:method:: clone(self)
     
-        克隆操作 
+        The clone operation 
 
     .. py:method:: get_ref_stock(self)
 
-        获取参考证券
+        Get the reference security
 
     .. py:method:: set_ref_stock(self, stk)
 
-        重新设置参考证券
+        Reset the reference security
 
-        :param Stock stk: 新指定的参考证券
+        :param Stock stk: the newly specified reference security
 
     .. py:method:: get_stock_list(self)
 
-        获取创建时指定的证券列表
+        Get the security list specified at the creation
 
     .. py:method:: set_stock_list(self, stks)
 
-        重新指定证券列表
+        Re-specify the security list
 
-        :param list stks: 指定的证券列表
+        :param list stks: the specified security list
 
     .. py:method:: get_stock_list_num(self)
 
-        获取创建时指定的证券列表中证券数量
+        Get the number of the securities in the security list specified at the creation
 
     .. py:method:: get_datetime_list(self)
 
-        获取参考日期列表（由参考证券通过查询条件获得）
+        Get the reference date list (obtained from the reference security through the query condition)
 
     .. py:method:: get_ref_indicators(self)
 
-        获取创建时输入的原始因子列表
+        Get the original factor list input at the creation
 
     .. py:method:: set_ref_indicators(self, inds)
 
-        重新设置原始因子列表
+        Reset the original factor list
 
-        :param list inds: 新的原始因子列表
+        :param list inds: the new original factor list
 
     .. py:method:: get_factor(self, stock)
 
-        获取指定证券合成后的新因子
+        Get the new composed factor of the specified security
 
-        :param Stock stock: 指定证券
+        :param Stock stock: the specified security
 
     .. py:method:: get_all_factors(self)
 
-        获取所有证券合成后的因子列表
+        Get the list of the composed factors of all the securities
 
-        :return: [factor1, factor2, ...] 顺序与参考证券顺序相同
+        :return: [factor1, factor2, ...] in the same order as the reference securities
 
     .. py:method:: get_ic(self[, ndays=0])
 
-        获取合成因子的IC, 长度与参考日期同
+        Get the IC of the composed factor, with the same length as the reference dates.
 
-        ndays 对于使用 IC/ICIR 加权的新因子，最好保持好 ic_n 一致，
-        但对于等权计算的新因子，不一定非要使用 ic_n 计算。
-        所以，ndays 增加了一个特殊值 0, 表示直接使用 ic_n 参数计算 IC
+        For the new factors weighted with IC/ICIR, it is best to keep ndays consistent with ic_n;
+        but for the new factors calculated with the equal weights, it is not necessarily required to calculate with ic_n.
+        Therefore, ndays has a special value 0, which means calculating the IC directly with the ic_n parameter
      
-        :param int ndays: ic 的 ndays 日收益率
+        :param int ndays: the ndays-day return of the ic
         :rtype: Indicator
 
     .. py:method:: get_icir(self, ir_n[, ic_n=0])
 
-        获取合成因子的 ICIR
+        Get the ICIR of the composed factor
 
-        :param int ir_n: 计算 IR 的 n 窗口
-        :param int ic_n: 计算 IC 的 n 窗口 (同 get_ic 中的 ndays)
+        :param int ir_n: the n window for calculating the IR
+        :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic)
 
     .. py:method:: get_score(self, date[, start=0, end=Null])
 
-        获取指定日期截面的所有因子值，已经降序排列，相当于各证券日期截面评分。
+        Get all the factor values of the cross-section on the specified date, already sorted descending, equivalent to the cross-section scores of the securities on that date.
 
-        :param Datetime date: 指定日期
-        :param int start: 取当日排名开始
-        :param int end: 取当日排名结束(不包含本身)
-        :param function func: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
+        :param Datetime date: the specified date
+        :param int start: the start of the daily ranking to take
+        :param int end: the end of the daily ranking to take (exclusive)
+        :param function func: a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
         :rtype: ScoreRecordList
 
     .. py:method:: get_all_scores(self)
 
-        获取所有日期的所有评分，长度与参考日期相同
+        Get all the scores of all the dates, with the same length as the reference dates
 
         :return: ScoreRecordList
 
     .. py:method:: get_all_src_factors(self)
 
-        获取所有原始因子列表(如果指定了标准化、行业中性化, 返回为已处理的因子列表)
+        Get the list of all the original factors (if the standardization or the industry neutralization is specified, the returned list is the processed factor list)
 
         :rtype: list
         :return: list IndicatorList stks x inds
 
     .. py:method:: set_normalize(self, norm)
 
-        设置标准化或归一化方法（影响全部因子）
+        Set the standardization or normalization method (affecting all the factors)
     
-        :param NormalizeBase norm: 标准化或归一化方法实例
+        :param NormalizeBase norm: the standardization or normalization method instance
 
     
     .. py:method:: add_special_normalize(self, name[, norm=None, category="", style_inds=[]])
         
-        对指定名称的指标应用特定的标准化/归一化、行业中性化、风格因子中性化操作。标准化操作、行业中性化、风格因子中性化彼此无关，可同时指定也可分开指定。
+        Apply a specific standardization/normalization, industry neutralization or style factor neutralization operation to the indicator with the specified name. The standardization operation, the industry neutralization and the style factor neutralization are independent of each other; they can be specified together or separately.
 
-        :param str name: 特殊归一化方法名称
-        :param Normalize norm: 特殊归一化方法
-        :param str category: 行业中性化时，指定板块类别
-        :param list[Indicator] style_inds: 用于中性化的风格指标列表
+        :param str name: the special normalization method name
+        :param Normalize norm: the special normalization method
+        :param str category: for the industry neutralization, specify the block category
+        :param list[Indicator] style_inds: the list of the style indicators used for the neutralization
 
 
     .. py:method:: _calculate(self, stks_inds)
 
-        计算每日证券合成因子，输入参数由上层函数计算后传入，如：
+        Calculate the composed factor of the securities for each day; the input parameter is calculated and passed in by the upper layer function, e.g.:
 
-        待计算的证券列表 - stk1, stk2
-        原始因子列表 - ind1, ind2
-        则传入的 stks_inds 为：[IndicatorList(stk1)[ind1, ind2], IndicatorList(stk2)[ind1, ind2]]
+        The security list to calculate - stk1, stk2
+        The original factor list - ind1, ind2
+        Then the passed stks_inds is: [IndicatorList(stk1)[ind1, ind2], IndicatorList(stk2)[ind1, ind2]]
 
-        :param list stks_inds: 与证券列表顺序相同已经计算好的所有证券的原始因子列表
-        :return: 按证券列表顺序存放的所有新的因子
+        :param list stks_inds: the calculated original factor lists of all the securities, in the same order as the security list
+        :return: all the new factors, stored in the order of the security list
