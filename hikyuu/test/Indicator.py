@@ -326,13 +326,13 @@ class IndicatorTest(unittest.TestCase):
         stock = sm['sh000001']
 
         if stock.is_null():
-            print("⚠ 无法获取股票数据，跳过此测试")
+            print("⚠ Unable to get stock data, skipping this test")
             return
 
         kdata = stock.get_kdata(Query(-100))
 
         if len(kdata) == 0:
-            print("⚠ K线数据为空，跳过此测试")
+            print("⚠ K-line data is empty, skipping this test")
             return
 
         # 测试收盘价上涨

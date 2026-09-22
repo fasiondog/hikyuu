@@ -212,7 +212,7 @@ class TestTdxImport(unittest.TestCase):
             time.sleep(0.01)
         
         # 断言: 确认导入过程已正常结束
-        self.assertTrue(runner.finished, "导入过程未能按预期在10秒内发出完成信号, 可能发生死锁或意外错误。")
+        self.assertTrue(runner.finished, "The import process did not signal completion within 10 seconds as expected; a deadlock or unexpected error may have occurred.")
 
     @patch('hikyuu.gui.data.UseTdxImportToH5Thread.TdxHq_API')
     @patch('hikyuu.gui.data.UseTdxImportToH5Thread.sqlite_import_new_holidays')
@@ -229,7 +229,7 @@ class TestTdxImport(unittest.TestCase):
             import h5py
             import numpy as np
         except ImportError:
-            self.skipTest("h5py 或 numpy 未安装, 跳过此核心功能测试")
+            self.skipTest("h5py or numpy is not installed, skipping this core functionality test")
 
         # 同样地, 定义一个用于测试的同步导入线程
         class TestImporterThread(UseTdxImportToH5Thread):
@@ -257,20 +257,20 @@ class TestTdxImport(unittest.TestCase):
         start_time = time.time()
         while not runner.finished and time.time() - start_time < 10:
             time.sleep(0.01)
-        self.assertTrue(runner.finished, "导入过程未能按预期在10秒内完成, 数据校验无法进行。")
+        self.assertTrue(runner.finished, "The import process did not complete within 10 seconds as expected; data verification cannot be performed.")
 
         # --- 数据校验阶段 ---
         h5_file_path = os.path.join(self.hdf5_dest_dir, 'sh_day.h5')
-        self.assertTrue(os.path.exists(h5_file_path), f"目标HDF5文件未被创建于路径: {h5_file_path}")
+        self.assertTrue(os.path.exists(h5_file_path), f"Target HDF5 file was not created at path: {h5_file_path}")
 
         with h5py.File(h5_file_path, 'r') as f:
             # 1. 检查HDF5文件内部结构是否符合预期
-            self.assertIn('data', f, "HDF5文件中必须存在顶层组 '/data'")
+            self.assertIn('data', f, "The top-level group '/data' must exist in the HDF5 file")
             data_group = f['/data']
             
             # 2. 检查对应股票的数据集是否存在 (注意: 导入时会自动转为大写)
             stock_code = 'SH600000'
-            self.assertIn(stock_code, data_group, f"数据集中应存在股票代码为 '{stock_code}' 的表")
+            self.assertIn(stock_code, data_group, f"There should be a table for the stock code '{stock_code}'")
             
             dset = data_group[stock_code]
             
@@ -279,36 +279,36 @@ class TestTdxImport(unittest.TestCase):
                 record = dset[0]
                 # 3. 逐字段验证数据是否经过了正确的转换和存储
                 expected_datetime = 202301030000
-                self.assertEqual(record['datetime'], expected_datetime, f"日期时间戳不匹配. 预期: {expected_datetime}, 实际: {record['datetime']}")
+                self.assertEqual(record['datetime'], expected_datetime, f"Datetime mismatch. Expected: {expected_datetime}, actual: {record['datetime']}")
                 
                 # 注意: HDF5中价格为放大1000倍的整数, 成交额单位为千元, 成交量单位为百股
                 expected_open = 10.0
                 actual_open = record['openPrice'] / 1000.0
-                self.assertTrue(np.isclose(actual_open, expected_open), f"开盘价不匹配. 预期: {expected_open}, 实际: {actual_open}")
+                self.assertTrue(np.isclose(actual_open, expected_open), f"Open price mismatch. Expected: {expected_open}, actual: {actual_open}")
 
                 expected_high = 11.5
                 actual_high = record['highPrice'] / 1000.0
-                self.assertTrue(np.isclose(actual_high, expected_high), f"最高价不匹配. 预期: {expected_high}, 实际: {actual_high}")
+                self.assertTrue(np.isclose(actual_high, expected_high), f"High price mismatch. Expected: {expected_high}, actual: {actual_high}")
 
                 expected_low = 9.8
                 actual_low = record['lowPrice'] / 1000.0
-                self.assertTrue(np.isclose(actual_low, expected_low), f"最低价不匹配. 预期: {expected_low}, 实际: {actual_low}")
+                self.assertTrue(np.isclose(actual_low, expected_low), f"Low price mismatch. Expected: {expected_low}, actual: {actual_low}")
 
                 expected_close = 11.2
                 actual_close = record['closePrice'] / 1000.0
-                self.assertTrue(np.isclose(actual_close, expected_close), f"收盘价不匹配. 预期: {expected_close}, 实际: {actual_close}")
+                self.assertTrue(np.isclose(actual_close, expected_close), f"Close price mismatch. Expected: {expected_close}, actual: {actual_close}")
 
                 expected_amount = 550  # 550000.0 / 1000
                 actual_amount = record['transAmount']
-                self.assertTrue(np.isclose(actual_amount, expected_amount), f"成交金额不匹配. 预期: {expected_amount} (千元), 实际: {actual_amount}")
+                self.assertTrue(np.isclose(actual_amount, expected_amount), f"Amount mismatch. Expected: {expected_amount} (thousand yuan), actual: {actual_amount}")
 
                 expected_volume = 500 # 50000 / 100
                 actual_volume = record['transCount']
-                self.assertTrue(np.isclose(actual_volume, expected_volume), f"成交量不匹配. 预期: {expected_volume} (百股), 实际: {actual_volume}")
+                self.assertTrue(np.isclose(actual_volume, expected_volume), f"Volume mismatch. Expected: {expected_volume} (hundred shares), actual: {actual_volume}")
             
             # 如果记录数大于1, 则认为是真实的通达信数据, 只做基本的存在性检查
             else:
-                self.assertTrue(dset.shape[0] > 1, f"数据记录数量不正确. 预期: > 1, 实际: {dset.shape[0]}")
+                self.assertTrue(dset.shape[0] > 1, f"Incorrect number of data records. Expected: > 1, actual: {dset.shape[0]}")
 
 if __name__ == '__main__':
     # 允许此文件作为独立的脚本直接运行, 方便单独调试

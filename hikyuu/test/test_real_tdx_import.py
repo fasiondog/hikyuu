@@ -159,35 +159,35 @@ def test_import_and_verify_output(imported_data, real_tdx_file_path):
     预期结果:
       - 测试通过, 并在控制台输出清晰的首末记录, 方便人工核对。
     """
-    print(f"\n成功从 {os.path.basename(real_tdx_file_path)} 导入了 {imported_data['imported_count']} 条记录。")
+    print(f"\nSuccessfully imported {imported_data['imported_count']} records from {os.path.basename(real_tdx_file_path)}.")
     assert imported_data['imported_count'] > 0
 
     table = get_h5table(imported_data['h5file'], imported_data['market'], imported_data['stock_code'])
-    print("\n请核对以下数据是否正确：")
+    print("\nPlease check whether the following data is correct:")
     print("=" * 30)
     
     first_record = table[0]
-    print(f"第一条记录: ")
-    print(f"  日期 (datetime): {first_record['datetime']}")
-    print(f"  开盘价 (open):   {first_record['openPrice'] / 1000.0}")
-    print(f"  最高价 (high):   {first_record['highPrice'] / 1000.0}")
-    print(f"  最低价 (low):    {first_record['lowPrice'] / 1000.0}")
-    print(f"  收盘价 (close):  {first_record['closePrice'] / 1000.0}")
-    print(f"  成交额 (amount): {first_record['transAmount'] / 1000.0}")
-    print(f"  成交量 (volume): {first_record['transCount']}")
+    print(f"First record: ")
+    print(f"  datetime: {first_record['datetime']}")
+    print(f"  open:   {first_record['openPrice'] / 1000.0}")
+    print(f"  high:   {first_record['highPrice'] / 1000.0}")
+    print(f"  low:    {first_record['lowPrice'] / 1000.0}")
+    print(f"  close:  {first_record['closePrice'] / 1000.0}")
+    print(f"  amount: {first_record['transAmount'] / 1000.0}")
+    print(f"  volume: {first_record['transCount']}")
 
     last_record = table[-1]
-    print(f"最后一条记录: ")
-    print(f"  日期 (datetime): {last_record['datetime']}")
-    print(f"  开盘价 (open):   {last_record['openPrice'] / 1000.0}")
-    print(f"  最高价 (high):   {last_record['highPrice'] / 1000.0}")
-    print(f"  最低价 (low):    {last_record['lowPrice'] / 1000.0}")
-    print(f"  收盘价 (close):  {last_record['closePrice'] / 1000.0}")
-    print(f"  成交额 (amount): {last_record['transAmount'] / 1000.0}")
-    print(f"  成交量 (volume): {last_record['transCount']}")
+    print(f"Last record: ")
+    print(f"  datetime: {last_record['datetime']}")
+    print(f"  open:   {last_record['openPrice'] / 1000.0}")
+    print(f"  high:   {last_record['highPrice'] / 1000.0}")
+    print(f"  low:    {last_record['lowPrice'] / 1000.0}")
+    print(f"  close:  {last_record['closePrice'] / 1000.0}")
+    print(f"  amount: {last_record['transAmount'] / 1000.0}")
+    print(f"  volume: {last_record['transCount']}")
 
     print("-" * 30)
-    print(f"共有 {len(table)} 条记录。")
+    print(f"{len(table)} records in total.")
 
 
 def test_compare_imported_data_with_source(imported_data, real_tdx_file_path):
@@ -210,20 +210,20 @@ def test_compare_imported_data_with_source(imported_data, real_tdx_file_path):
     raw_records = _read_raw_tdx_day_file(real_tdx_file_path)
     
     # 3. 断言记录数量一致
-    assert len(h5_table) == len(raw_records), "导入后的记录数与源文件不一致！"
+    assert len(h5_table) == len(raw_records), "The number of records after import is inconsistent with the source file!"
     
     # 4. 逐条比较记录
     for i, h5_record in enumerate(h5_table):
         raw_record = raw_records[i]
-        assert h5_record['datetime'] == raw_record['datetime'], f"第 {i+1} 条记录的日期不匹配"
-        assert h5_record['openPrice'] == raw_record['openPrice'], f"第 {i+1} 条记录的开盘价不匹配"
-        assert h5_record['highPrice'] == raw_record['highPrice'], f"第 {i+1} 条记录的最高价不匹配"
-        assert h5_record['lowPrice'] == raw_record['lowPrice'], f"第 {i+1} 条记录的最低价不匹配"
-        assert h5_record['closePrice'] == raw_record['closePrice'], f"第 {i+1} 条记录的收盘价不匹配"
-        assert h5_record['transAmount'] == raw_record['transAmount'], f"第 {i+1} 条记录的成交额不匹配"
-        assert h5_record['transCount'] == raw_record['transCount'], f"第 {i+1} 条记录的成交量不匹配"
+        assert h5_record['datetime'] == raw_record['datetime'], f"Record {i+1}: datetime mismatch"
+        assert h5_record['openPrice'] == raw_record['openPrice'], f"Record {i+1}: open price mismatch"
+        assert h5_record['highPrice'] == raw_record['highPrice'], f"Record {i+1}: high price mismatch"
+        assert h5_record['lowPrice'] == raw_record['lowPrice'], f"Record {i+1}: low price mismatch"
+        assert h5_record['closePrice'] == raw_record['closePrice'], f"Record {i+1}: close price mismatch"
+        assert h5_record['transAmount'] == raw_record['transAmount'], f"Record {i+1}: amount mismatch"
+        assert h5_record['transCount'] == raw_record['transCount'], f"Record {i+1}: volume mismatch"
 
-    print(f"\n成功校验 {len(h5_table)} 条记录，HDF5数据与源文件完全一致。")
+    print(f"\nSuccessfully verified {len(h5_table)} records; the HDF5 data is identical to the source file.")
 
 
 def test_compare_common_data_with_source(imported_data, real_tdx_file_path):
@@ -249,42 +249,42 @@ def test_compare_common_data_with_source(imported_data, real_tdx_file_path):
     raw_records_map = {row['datetime']: row for row in raw_records_list}
 
     # 3. 打印数据源信息, 方便调试
-    print("\n--- 数据源信息 ---")
+    print("\n--- Data source info ---")
     if h5_records_map:
         h5_dates_list = sorted(h5_records_map.keys())
-        print(f"HDF5      : 共 {len(h5_records_map)} 条记录, 时间范围: {h5_dates_list[0]} -> {h5_dates_list[-1]}")
+        print(f"HDF5      : {len(h5_records_map)} records, date range: {h5_dates_list[0]} -> {h5_dates_list[-1]}")
     else:
-        print("HDF5      : 0 条记录")
+        print("HDF5      : 0 records")
     
     if raw_records_map:
         raw_dates_list = sorted(raw_records_map.keys())
-        print(f"原始.day文件: 共 {len(raw_records_map)} 条记录, 时间范围: {raw_dates_list[0]} -> {raw_dates_list[-1]}")
+        print(f"Raw .day  : {len(raw_records_map)} records, date range: {raw_dates_list[0]} -> {raw_dates_list[-1]}")
     else:
-        print("原始.day文件: 0 条记录")
+        print("Raw .day  : 0 records")
 
     # 4. 寻找两个日期集合的交集, 并进行比较
     h5_dates = set(h5_records_map.keys())
     raw_dates = set(raw_records_map.keys())
     common_dates = sorted(list(h5_dates.intersection(raw_dates)))
     
-    print(f"共同部分  : 共 {len(common_dates)} 条记录用于比较。")
+    print(f"Common    : {len(common_dates)} records for comparison.")
     print("--------------------")
 
-    assert len(common_dates) > 0, "HDF5文件与原始文件没有共同的数据可供比较！"
+    assert len(common_dates) > 0, "The HDF5 file and the raw file have no common data to compare!"
 
     # 5. 逐条比较共同的记录
     for date in common_dates:
         h5_record = h5_records_map[date]
         raw_record = raw_records_map[date]
         
-        assert h5_record['openPrice'] == raw_record['openPrice'], f"日期 {date} 的开盘价不匹配"
-        assert h5_record['highPrice'] == raw_record['highPrice'], f"日期 {date} 的最高价不匹配"
-        assert h5_record['lowPrice'] == raw_record['lowPrice'], f"日期 {date} 的最低价不匹配"
-        assert h5_record['closePrice'] == raw_record['closePrice'], f"日期 {date} 的收盘价不匹配"
-        assert h5_record['transAmount'] == raw_record['transAmount'], f"日期 {date} 的成交额不匹配"
-        assert h5_record['transCount'] == raw_record['transCount'], f"日期 {date} 的成交量不匹配"
+        assert h5_record['openPrice'] == raw_record['openPrice'], f"Open price mismatch at {date}"
+        assert h5_record['highPrice'] == raw_record['highPrice'], f"High price mismatch at {date}"
+        assert h5_record['lowPrice'] == raw_record['lowPrice'], f"Low price mismatch at {date}"
+        assert h5_record['closePrice'] == raw_record['closePrice'], f"Close price mismatch at {date}"
+        assert h5_record['transAmount'] == raw_record['transAmount'], f"Amount mismatch at {date}"
+        assert h5_record['transCount'] == raw_record['transCount'], f"Volume mismatch at {date}"
 
-    print(f"\n成功校验 {len(common_dates)} 条共同记录，数据完全一致。")
+    print(f"\nSuccessfully verified {len(common_dates)} common records; the data is identical.")
 
 
 def test_mismatched_data_is_detected(imported_data, real_tdx_file_path):
@@ -309,7 +309,7 @@ def test_mismatched_data_is_detected(imported_data, real_tdx_file_path):
     raw_records_map = {row['datetime']: row for row in raw_records_list}
     common_dates = sorted(list(set(h5_records_map.keys()).intersection(set(raw_records_map.keys()))))
     
-    assert len(common_dates) > 100, "数据量太少，无法执行本测试"
+    assert len(common_dates) > 100, "Too little data to run this test"
 
     # 2. 故意修改一条数据以注入故障
     target_date = common_dates[100]  # 选择一条记录进行修改
@@ -317,7 +317,7 @@ def test_mismatched_data_is_detected(imported_data, real_tdx_file_path):
     modified_price = 99999999
     raw_records_map[target_date]['openPrice'] = modified_price
     
-    print(f"\n[故障注入] 将日期 {target_date} 的原始开盘价 ({original_price}) 修改为 {modified_price} 以测试断言。\n")
+    print(f"\n[Fault injection] Change the raw open price of {target_date} ({original_price}) to {modified_price} to test the assertion.\n")
 
     # 3. 使用 pytest.raises 验证断言是否会按预期失败
     with pytest.raises(AssertionError) as excinfo:
@@ -325,12 +325,12 @@ def test_mismatched_data_is_detected(imported_data, real_tdx_file_path):
         for date in common_dates:
             h5_record = h5_records_map[date]
             raw_record = raw_records_map[date]
-            assert h5_record['openPrice'] == raw_record['openPrice'], f"日期 {date} 的开盘价不匹配"
+            assert h5_record['openPrice'] == raw_record['openPrice'], f"Open price mismatch at {date}"
             # ... (其他字段的断言在此处可以省略, 因为我们预期在 openPrice 就会失败)
 
     # 4. 验证失败信息是否包含了我们期望的内容, 确保断言是在正确的位置失败的
     error_message = str(excinfo.value)
-    print(f"[断言验证] 捕获到错误: {error_message}")
+    print(f"[Assertion check] Caught error: {error_message}")
     assert str(target_date) in error_message
-    assert "开盘价不匹配" in error_message
-    print("[验证成功] 断言已在正确的位置因正确的原因失败。")
+    assert "Open price mismatch" in error_message
+    print("[Verification passed] The assertion failed at the correct place for the correct reason.")
