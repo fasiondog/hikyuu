@@ -67,9 +67,10 @@ except Exception as e:
     # hku_fatal(traceback.format_exc())
     print("{}: {}".format(info[0].__name__, info[1]))
     print(traceback.format_exc())
-    print("""请使用 pipdeptree -p hikyuu 检查是否存在缺失的依赖包。
-如果没有问题可以在 https://gitee.com/fasiondog/hikyuu 或 https://github.com/fasiondog/hikyuu
-上提交 issue，同时附上 "用户目录/.hikyuu" 下的 hikyuu_py.log 和 hikyuu.log 日志文件 """)
+    print("""Please use pipdeptree -p hikyuu to check whether any dependency package is missing.
+If everything is fine, you can submit an issue at https://gitee.com/fasiondog/hikyuu or
+https://github.com/fasiondog/hikyuu, attaching the hikyuu_py.log and hikyuu.log files under
+"~/.hikyuu" """)
     raise e
 
 
@@ -109,7 +110,7 @@ try:
     plugin_major_version = get_major_version(plugin_version)
 
     if hikyuu_major_version != plugin_major_version:
-        hku_warn("hikyuu版本 ({}) 与 hikyuu_plugin版本 ({}) 不匹配，请确保使用兼容版本！".format(__version__, plugin_version))
+        hku_warn("The hikyuu version ({}) does not match the hikyuu_plugin version ({}), please make sure to use compatible versions!".format(__version__, plugin_version))
 
 except ImportError:
     plugin_path = Path.home() / '.hikyuu' / 'plugin'
@@ -277,14 +278,14 @@ def load_hikyuu(**kwargs):
     if 'config_file' in kwargs:
         config_file = kwargs['config_file']
         if not os.path.exists(config_file):
-            hku_fatal("配置文件不存在: {}".format(config_file))
+            hku_fatal("The configuration file does not exist: {}".format(config_file))
             return
     else:
         from .data.hku_config_template import generate_default_config
         config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
         if not os.path.exists(config_file):
             # 创建默认配置
-            hku_info("创建默认配置文件")
+            hku_info("Creating the default configuration file")
             generate_default_config()
 
     import configparser
@@ -600,10 +601,10 @@ def realtime_update_wrap():
         if (source == 'qmt') or (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
             realtime_update_inner(source, stk_list)
             pre_update_time = datetime.now()
-            print(f"更新完毕！更新时间: {pre_update_time}")
+            print(f"Update completed! Update time: {pre_update_time}")
         else:
-            print(f"更新间隔小于 {str(delta)} 秒，未更新")
-            print(f"上次更新时间: {pre_update_time}")
+            print(f"The update interval is less than {str(delta)} seconds, not updated")
+            print(f"Last update time: {pre_update_time}")
 
     return realtime_update_closure
 

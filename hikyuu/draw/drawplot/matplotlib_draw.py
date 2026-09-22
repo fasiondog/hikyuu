@@ -274,7 +274,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     axes.set_title(title)
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
+    text = u'%s Open:%.2f High:%.2f Low:%.2f Close:%.2f Change:%.2f%%' % (
         last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close,
         100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
@@ -326,7 +326,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     axes.set_title(title)
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (
+    text = u'%s Open:%.2f High:%.2f Low:%.2f Close:%.2f' % (
         last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close
     )
     axes.text(
@@ -529,12 +529,12 @@ def iheatmap(ind, axes=None):
         axes = create_figure()
 
     if len(ind) == 0:
-        hku_error("指标长度为0, 指标应已计算（即有值")
+        hku_error("The indicator length is 0, the indicator should have been calculated (i.e. has values)")
         return
 
     dates = ind.get_datetime_list()
     if len(dates) == 0:
-        hku_error("获取日期列表失败！指标应为时间序列")
+        hku_error("Failed to get the date list! The indicator should be a time series")
         return
 
     data = pd.DataFrame({'date': dates, 'value': ind.value_to_np()})
@@ -547,7 +547,7 @@ def iheatmap(ind, axes=None):
     # 获取每个月的收益
     monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
     if len(monthly) < 2:
-        hku_warn("月数据不足！")
+        hku_warn("Insufficient monthly data!")
         return
 
     monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
@@ -556,9 +556,9 @@ def iheatmap(ind, axes=None):
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
     # 设置标题和坐标轴标签
-    axes.set_title('年-月度收益率(%)热力图')
-    axes.set_xlabel('月度')
-    axes.set_ylabel('年份')
+    axes.set_title('Year-Month Return (%) Heatmap')
+    axes.set_xlabel('Month')
+    axes.set_ylabel('Year')
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
@@ -902,11 +902,11 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
 
     invest_total = per['Total Invested Principal'] + per['Total Invested Assets']
     cur_fund = per['Current Total Assets']
-    t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
+    t1 = 'Total Invested: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
-    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%    当前距历史最高点回撤: {:<.2f}%'.format(
+    t2 = 'Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%    Current Drawdown from Historical High: {:<.2f}%'.format(
         funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback, mdd_current)
-    t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
+    t3 = 'Win Rate: {:<.2f}%    Win/Loss Ratio: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}'.format(
         per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
 
     import matplotlib.pyplot as plt
@@ -918,9 +918,9 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     if log:
         ax1.set_yscale('log')
 
-    ref_return.plot(axes=ax1, legend_on=True, label=f'{ref_stk.name}({ref_stk.market_code}) 收益曲线')
-    funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} 累积收益率 {funds_return[-1]*100.:<.2f}%')
-    ax1.set_title(f"账户({tm.name}) 累积收益率")
+    ref_return.plot(axes=ax1, legend_on=True, label=f'{ref_stk.name}({ref_stk.market_code}) Return Curve')
+    funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} Cumulative Return {funds_return[-1]*100.:<.2f}%')
+    ax1.set_title(f"Account({tm.name}) Cumulative Return")
     label = t1 + '\n\n' + t2 + '\n\n' + t3
     ax2.text(0,
              1,
@@ -989,12 +989,12 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
 
     dates = get_date_range(start_date, end_date)
     if len(dates) == 0:
-        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        hku_error("No data, please check the date range! start_date={}, end_date={}", start_date, end_date)
         return
 
     funds = tm.get_funds_curve(dates)
     if len(funds) == 0:
-        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
+        hku_error("Failed to get the tm return curve, please check the tm initial date! tm.init_datetime={} start_date={}, end_date={}",
                   tm.init_datetime, start_date, end_date)
         return
 
@@ -1012,7 +1012,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
         min_value=('value', 'min')
     ).reset_index()
     if len(monthly) < 2:
-        hku_warn("月数据不足！")
+        hku_warn("Insufficient monthly data!")
         return
 
     monthly['return'] = ((monthly['last_value'] - monthly['last_value'].shift(1)) /
@@ -1033,7 +1033,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
 
     year_return_df = yearly_value.set_index('year')['year_return']
     pivot_data[''] = np.nan
-    pivot_data['年度收益'] = year_return_df
+    pivot_data['Annual Return'] = year_return_df
 
     annot_matrix = []
     for year in pivot_data.index:
@@ -1052,7 +1052,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
                     row.append("")
             elif col == '':
                 row.append("")
-            elif col == '年度收益':
+            elif col == 'Annual Return':
                 row.append(f"{year_return_df.loc[year]:.2f}" if year in year_return_df.index else "")
         annot_matrix.append(row)
 
@@ -1061,9 +1061,9 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, vmin=-v_limit, vmax=v_limit, annot=annot_matrix, fmt='', ax=axes)
     # 设置标题和坐标轴标签
-    axes.set_title(f'{tm.name} 年-月度收益率(%)热力图')
-    axes.set_xlabel('月度')
-    axes.set_ylabel('年份')
+    axes.set_title(f'{tm.name} Year-Month Return (%) Heatmap')
+    axes.set_xlabel('Month')
+    axes.set_ylabel('Year')
 
 
 def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True):
@@ -1085,12 +1085,12 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
 
     dates = get_date_range(start_date, end_date)
     if len(dates) == 0:
-        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        hku_error("No data, please check the date range! start_date={}, end_date={}", start_date, end_date)
         return
 
     funds = tm.get_funds_curve(dates)
     if len(funds) == 0:
-        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
+        hku_error("Failed to get the tm return curve, please check the tm initial date! tm.init_datetime={} start_date={}, end_date={}",
                   tm.init_datetime, start_date, end_date)
         return
 
@@ -1107,7 +1107,7 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
     yearly_first = data.groupby('year').first()['value'].reset_index()
 
     if len(yearly) < 1:
-        hku_warn("年度数据不足！")
+        hku_warn("Insufficient annual data!")
         return
 
     yearly['return'] = ((yearly['last_value'] - yearly['last_value'].shift(1)) /
@@ -1139,10 +1139,10 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
         if show_high_low:
             if max_ret > ret:
                 axes.bar(x_pos[i], max_ret - ret, bottom=ret, width=bar_width,
-                         color=max_color, alpha=0.4, label='最高收益范围' if i == 0 else "")
+                         color=max_color, alpha=0.4, label='Max Return Range' if i == 0 else "")
             if min_ret < ret:
                 axes.bar(x_pos[i], ret - min_ret, bottom=min_ret, width=bar_width,
-                         color=min_color, alpha=0.7, label='最低收益范围' if i == 0 else "")
+                         color=min_color, alpha=0.7, label='Min Return Range' if i == 0 else "")
 
         axes.bar(x_pos[i], ret, width=bar_width, color=base_color, alpha=0.9)
 
@@ -1160,9 +1160,9 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
     if show_high_low:
         axes.legend()
 
-    axes.set_title(f'{tm.name} 年度收益率(%)柱状图')
-    axes.set_xlabel('年份')
-    axes.set_ylabel('收益率(%)')
+    axes.set_title(f'{tm.name} Annual Return (%) Bar Chart')
+    axes.set_xlabel('Year')
+    axes.set_ylabel('Return (%)')
     axes.grid(axis='y', linestyle='--', alpha=0.7)
 
 
@@ -1170,7 +1170,7 @@ def sys_heatmap(sys, axes=None):
     """
     绘制系统收益年-月收益热力图
     """
-    hku_check(sys.tm is not None, "系统未初始化交易账户")
+    hku_check(sys.tm is not None, "The system has not initialized the trading account")
     query = sys.query
     k = get_kdata('sh000001', query)
     tm_heatmap(sys.tm, k[0].datetime, k[-1].datetime, axes)

@@ -52,8 +52,8 @@ def _find_ema_coefficient(closes, emas, number=66, percent=0.95):
           number: 以最近多少天的数据来计算，即取最后N天的数据作为计算标准
           percent：通道包含多少的价格，如0.95表示通道将包含95%的价格
     """
-    assert len(closes) == len(emas), "数据长度不等"
-    assert number >= 1, "Number必须大于0"
+    assert len(closes) == len(emas), "The data lengths are not equal"
+    assert number >= 1, "Number must be greater than 0"
 
     tmp_closes = closes[-number:]
     tmp_emas = emas[-number:]

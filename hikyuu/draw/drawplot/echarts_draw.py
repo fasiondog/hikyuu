@@ -173,7 +173,7 @@ def kplot_line(kdata: KData):
     kdata_points = [(round(r.open, 2), round(r.close, 2), round(r.low, 2), round(r.high, 2)) for r in kdata]
     title = get_draw_title(kdata)
     last_record = kdata[-1]
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
+    text = u'%s Open:%.2f High:%.2f Low:%.2f Close:%.2f Change:%.2f%%' % (
         last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
         last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
     )
@@ -539,7 +539,7 @@ def sys_performance(sys, ref_stk=None):
     funds = VALUE(funds)
     funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else constant.null_price for f in funds_list]
     funds_return = VALUE(funds_return, align_dates=ref_dates)
-    funds_return.name = "系统累积收益率"
+    funds_return.name = "System Cumulative Return"
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
@@ -557,11 +557,11 @@ def sys_performance(sys, ref_stk=None):
 
     invest_total = per['Total Invested Principal'] + per['Total Invested Assets']
     cur_fund = per['Current Total Assets']
-    t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
+    t1 = 'Total Invested: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
-    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
+    t2 = 'Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%'.format(
         funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback)
-    t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
+    t3 = 'Win Rate: {:<.2f}%    Win/Loss Ratio: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}'.format(
         per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
 
     line = iplot(ref_return, ref_k)

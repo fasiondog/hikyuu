@@ -47,37 +47,37 @@ def get_draw_title(kdata):
 
     s1 = ''
     if query.ktype == Query.DAY:
-        s1 = u' （日线）'
+        s1 = u' (Daily)'
     elif query.ktype == Query.WEEK:
-        s1 = u' （周线）'
+        s1 = u' (Weekly)'
     elif query.ktype == Query.MONTH:
-        s1 = u' （月线）'
+        s1 = u' (Monthly)'
     elif query.ktype == Query.QUARTER:
-        s1 = u' （季线）'
+        s1 = u' (Quarterly)'
     elif query.ktype == Query.HALFYEAR:
-        s1 = u' （半年线）'
+        s1 = u' (Half-Yearly)'
     elif query.ktype == Query.YEAR:
-        s1 = u' （年线）'
+        s1 = u' (Yearly)'
     elif query.ktype == Query.MIN:
-        s1 = u' （1分钟线）'
+        s1 = u' (1-Minute)'
     elif query.ktype == Query.MIN3:
-        s1 = u' （3分钟线）'
+        s1 = u' (3-Minute)'
     elif query.ktype == Query.MIN5:
-        s1 = u' （5分钟线）'
+        s1 = u' (5-Minute)'
     elif query.ktype == Query.MIN15:
-        s1 = u' （15分钟线）'
+        s1 = u' (15-Minute)'
     elif query.ktype == Query.MIN30:
-        s1 = u' （30分钟线）'
+        s1 = u' (30-Minute)'
     elif query.ktype == Query.MIN60:
-        s1 = u' （60分钟线）'
+        s1 = u' (60-Minute)'
     elif query.ktype == Query.HOUR2:
-        s1 = u' （2小时线）'
+        s1 = u' (2-Hour)'
     elif query.ktype == Query.HOUR4:
-        s1 = u' （4小时线）'
+        s1 = u' (4-Hour)'
     elif query.ktype == Query.HOUR6:
-        s1 = u' （6小时线）'
+        s1 = u' (6-Hour)'
     elif query.ktype == Query.HOUR12:
-        s1 = u' （12小时线）'
+        s1 = u' (12-Hour)'
 
     name = stock.name
 
