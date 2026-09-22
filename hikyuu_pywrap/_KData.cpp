@@ -19,49 +19,49 @@ void export_KData(py::module& m) {
     int64_t null_int64 = Null<int64_t>();
     py::class_<KData>(
       m, "KData",
-      "通过 Stock.getKData 获取的K线数据，由 KRecord 组成的数组，可象 list 一样进行遍历")
+      "The K-line data obtained through Stock.getKData; it is an array composed of KRecords and can be traversed like a list")
       .def(py::init<>())
       .def("__str__", &KData::toString)
       .def("__repr__", &KData::toString)
 
       .def_property_readonly("start_pos", &KData::startPos,
-                             "获取在原始K线记录中对应的起始位置，如果KData为空返回0")
+                             "Get the corresponding start position in the original K-line records; if the KData is empty, return 0")
       .def_property_readonly(
         "end_pos", &KData::endPos,
-        "获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1")
+        "Get the position of the next record after the range in the original K-line records; if it is empty, return 0, otherwise it equals lastPos + 1")
       .def_property_readonly(
         "last_pos", &KData::lastPos,
-        "获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1")
+        "Get the position of the last record in the original K-line records; if it is empty, return 0, otherwise it equals endPos - 1")
 
       .def_property_readonly("open", &KData::open,
-                             "返回包含开盘价的 Indicator 实例，相当于 OPEN(k)")
+                             "Return the Indicator instance containing the open prices, equivalent to OPEN(k)")
       .def_property_readonly("close", &KData::close,
-                             "返回包含收盘价的 Indicator 实例，相当于 CLOSE(k)")
+                             "Return the Indicator instance containing the close prices, equivalent to CLOSE(k)")
       .def_property_readonly("high", &KData::high,
-                             "返回包含最高价的 Indicator 实例，相当于 HIGH(k)")
-      .def_property_readonly("low", &KData::low, "返回包含最低价的 Indicator 实例，相当于 LOW(k)")
-      .def_property_readonly("amo", &KData::amo, "返回包含成交金额的 Indicator 实例，相当于 AMO(k)")
-      .def_property_readonly("vol", &KData::vol, "返回包含成交量的 Indicator 实例，相当于 VOL(k)")
+                             "Return the Indicator instance containing the high prices, equivalent to HIGH(k)")
+      .def_property_readonly("low", &KData::low, "Return the Indicator instance containing the low prices, equivalent to LOW(k)")
+      .def_property_readonly("amo", &KData::amo, "Return the Indicator instance containing the amounts, equivalent to AMO(k)")
+      .def_property_readonly("vol", &KData::vol, "Return the Indicator instance containing the volumes, equivalent to VOL(k)")
 
       .def("get_datetime_list", &KData::getDatetimeList, R"(get_datetime_list(self)
 
-        返回交易日期列表
+        Return the trading date list
 
         :rtype: DatetimeList)")
 
       .def("get", KData_getKRecord1, py::return_value_policy::copy, R"(get(self, pos)
 
-        获取指定索引位置的K线记录
+        Get the K-line record at the specified index position
 
-        :param int pos: 位置索引
+        :param int pos: the position index
         :rtype: KRecord)")
 
       .def("get_by_datetime", KData_getKRecord2, py::return_value_policy::copy,
            R"(get_by_datetime(self, datetime)
 
-        获取指定时间的K线记录。
+        Get the K-line record at the specified time.
 
-        :param Datetime datetime: 指定的日期
+        :param Datetime datetime: the specified date
         :rtype: KRecord)")
 
       .def(
@@ -76,9 +76,9 @@ void export_KData(py::module& m) {
         },
         R"(get_pos(self, datetime)
 
-        获取指定时间的K线记录的索引位置, 如果不在数据范围内，则返回 None
+        Get the index position of the K-line record at the specified time; if it is out of the data range, return None
         
-        :param Datetime datetime: 指定的日期
+        :param Datetime datetime: the specified date
         :rtype: int)")
 
       .def(
@@ -93,67 +93,67 @@ void export_KData(py::module& m) {
         },
         R"(get_pos_in_stock(self, datetime) 
         
-        获取指定时间对应的原始K线中的索引位置
+        Get the index position in the original K-line corresponding to the specified time
 
-        :param Datetime datetime: 指定的时间
-        :return: 对应的索引位置，如果不在数据范围内，则返回 None)")
+        :param Datetime datetime: the specified time
+        :return: the corresponding index position; if it is out of the data range, return None)")
 
       .def("empty", &KData::empty, R"(empty(self)
 
-        判断是否为空
+        Judge whether it is empty
 
         :rtype: bool)")
 
       .def("get_query", &KData::getQuery, py::return_value_policy::copy, R"(get_query(self)
 
-        获取关联的查询条件
+        Get the associated query condition
 
         :rtype: KQuery)")
 
       .def("get_stock", &KData::getStock, py::return_value_policy::copy, R"(get_stock(self)
 
-        获取关联的Stock
+        Get the associated Stock
 
         :rtype: Stock)")
 
       .def("get_kdata", py::overload_cast<const KQuery::KType&>(&KData::getKData, py::const_),
            py::arg("ktype"), R"(get_kdata(self, ktype
            
-        获取相同时间范围内的其他类型K线数据，如日线下对应的分钟线数据
+        Get the K-line data of the other type within the same time range, e.g. the minute-line data corresponding under the daily line
 
-        :param KQuery::KType ktype: 指定需要的K线类型)")
+        :param KQuery::KType ktype: the specified needed K-line type)")
 
       .def("get_kdata",
            py::overload_cast<const Datetime&, const Datetime&>(&KData::getKData, py::const_),
            R"(get_kdata(self, start_date, end_date)
       
-        通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData（注意，不是原 KData 的子集）
+        Get a new KData that keeps the data type and the recovery type unchanged through the current KData (note that it is not a subset of the original KData)
 
-        :param Datetime start: 新的起始日期
-        :param Datetime end: 新的结束日期
+        :param Datetime start: the new start date
+        :param Datetime end: the new end date
         :rtype: KData)")
 
       .def("get_kdata", py::overload_cast<const KQuery&>(&KData::getKData, py::const_),
            R"(get_kdata(query)
 
-        通过当前 KData 获取获取另一个 KData，不一定是其子集
+        Get another KData through the current KData, which is not necessarily a subset of it
 
         :rtype: KData)")
 
       .def("get_sub_kdata", &KData::getSubKData, py::arg("start"), py::arg("end") = null_int64,
            R"(get_sub_kdata(start, end = Null<int64_t>)
 
-        通过索引获取自身子集
+        Get a subset of itself by the index
 
-        :param int start: 起始索引
-        :param int end: 结束索引
+        :param int start: the start index
+        :param int end: the end index
         :rtype: KData)")
 
       .def("tocsv", &KData::tocsv, R"(tocsv(self, filename)
 
-        将数据保存至CSV文件
+        Save the data to a CSV file
 
-        :param str filename: 指定保存的文件名称)")
+        :param str filename: the specified file name to save)")
 
       .def("__len__", &KData::size)
 
@@ -192,7 +192,7 @@ void export_KData(py::module& m) {
                    size_t start, stop, step, length;
 
                    if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
-                       throw std::invalid_argument("无效的切片参数");
+                       throw std::invalid_argument("Invalid slice parameters");
                    }
 
                    KRecordList result;
@@ -224,7 +224,7 @@ void export_KData(py::module& m) {
             HKU_IF_RETURN(total == 0, py::array());
 
             struct RawData {
-                int64_t datetime;  // 转换后的毫秒时间戳
+                int64_t datetime;  // The converted millisecond timestamp
                 double open;
                 double high;
                 double low;
@@ -245,7 +245,7 @@ void export_KData(py::module& m) {
                 data[i].volume = k.transCount;
             }
 
-            // 定义NumPy结构化数据类型
+            // Define the NumPy structured data type
             auto dtype = py::dtype(
               vector_to_python_list<string>(
                 {"datetime", "open", "high", "low", "close", "amount", "volume"}),
@@ -255,7 +255,7 @@ void export_KData(py::module& m) {
             return py::array(dtype, total, static_cast<RawData*>(data),
                              py::capsule(data, [](void* p) { std::free(p); }));
         },
-        "将 KData 转换为 NumPy 数组")
+        "Convert the KData to a NumPy array")
 
       .def(
         "to_df",
@@ -265,7 +265,7 @@ void export_KData(py::module& m) {
                 return py::module_::import("pandas").attr("DataFrame")();
             }
 
-            // 创建数组
+            // Create the array
             py::array_t<int64_t> datetime_arr(total);
             py::array_t<double> open_arr(total);
             py::array_t<double> high_arr(total);
@@ -274,7 +274,7 @@ void export_KData(py::module& m) {
             py::array_t<double> amount_arr(total);
             py::array_t<double> vol_arr(total);
 
-            // 获取缓冲区并填充数据
+            // Get the buffer and fill the data
             auto datetime_buf = datetime_arr.request();
             auto open_buf = open_arr.request();
             auto high_buf = high_arr.request();
@@ -302,7 +302,7 @@ void export_KData(py::module& m) {
                 vol_ptr[i] = ks[i].transCount;
             }
 
-            // 构建 DataFrame
+            // Build the DataFrame
             auto pandas = py::module_::import("pandas");
             py::dict columns;
             if (with_stock) {
@@ -332,9 +332,9 @@ void export_KData(py::module& m) {
         },
         py::arg("with_stock") = false, R"(to_df(self, with_stock=False) -> pandas.DataFrame
 
-    转化为pandas的DataFrame
+    Convert to a pandas DataFrame
         
-    :param bool with_stock: 包含Stock的代码与名称
+    :param bool with_stock: include the code and the name of the Stock
     :rtype: pandas.DataFrame)")
 
         DEF_PICKLE(KData);

@@ -1,7 +1,7 @@
 /*
  * _BlockInfoDriver.cpp
  *
- *  Created on: 2017年10月7日
+ *  Created on: 2017-10-07
  *      Author: fasiondog
  */
 
@@ -22,55 +22,55 @@ BlockList (BlockInfoDriver::*get_block_list_2)() = &BlockInfoDriver::getBlockLis
 
 void export_BlockInfoDriver(py::module& m) {
     py::class_<BlockInfoDriver, BlockInfoDriverPtr, PyBlockInfoDriver>(m, "BlockInfoDriver",
-                                                                       R"(板块数据驱动基类
+                                                                       R"(The block data driver base class
 
-    子类接口：
-        - _init(self) (必须)
-        - getAllCategory(self) (必须)
-        - getBlock(self, category, name) (必须)
-        - getBlockList(self, category=None) (必须)
-        - save(self, block) (必须)
-        - remove(self, category, name) (必须)
+    The subclass interfaces:
+        - _init(self) (Required)
+        - getAllCategory(self) (Required)
+        - getBlock(self, category, name) (Required)
+        - getBlockList(self, category=None) (Required)
+        - save(self, block) (Required)
+        - remove(self, category, name) (Required)
     )")
-      .def(py::init<const string&>(), R"(初始化
+      .def(py::init<const string&>(), R"(Initialize
 
-    :param str name: 驱动名称)")
+    :param str name: the driver name)")
       .def_property_readonly("name", &BlockInfoDriver::name, py::return_value_policy::copy,
-                             "驱动名称")
+                             "The driver name")
       .def("__str__", BlockInfoDriver_to_str)
       .def("__repr__", BlockInfoDriver_to_str)
 
-      .def("get_param", &BlockInfoDriver::getParam<boost::any>, "获取指定参数")
+      .def("get_param", &BlockInfoDriver::getParam<boost::any>, "Get the specified parameter")
       .def("set_param",
            static_cast<void (BlockInfoDriver::*)(const std::string&, const boost::any&)>(
              &BlockInfoDriver::setParam),
-           "设置指定参数")
-      .def("have_param", &BlockInfoDriver::haveParam, "指定参数是否存在")
+           "Set the specified parameter")
+      .def("have_param", &BlockInfoDriver::haveParam, "Whether the specified parameter exists")
 
-      .def("_init", &BlockInfoDriver::_init, "【子类接口（必须）】驱动初始化")
+      .def("_init", &BlockInfoDriver::_init, "[Subclass interface (Required)] Initialize the driver")
       .def("getAllCategory", &BlockInfoDriver::getAllCategory,
-           "【子类接口（必须）】获取所有板块分类")
+           "[Subclass interface (Required)] Get all the block categories")
       .def("getBlock", &BlockInfoDriver::getBlock, py::arg("category"), py::arg("name"),
-           R"(【子类接口（必须）】获取指定板块
+           R"([Subclass interface (Required)] Get the specified block
 
-    :param str category: 指定的板块分类
-    :param str name: 板块名称)")
+    :param str category: the specified block category
+    :param str name: the block name)")
       .def("_getBlockList",
            (BlockList (BlockInfoDriver::*)(const string&))&BlockInfoDriver::getBlockList,
            py::arg("category"),
-           R"(【子类接口（必须）】获取指定分类的板块列表
+           R"([Subclass interface (Required)] Get the block list of the specified category
 
-    :param str category: 板块分类)")
-      .def("getBlockList", get_block_list_1, py::arg("category"), "获取指定分类的板块列表")
-      .def("getBlockList", get_block_list_2, "获取所有板块列表")
+    :param str category: the block category)")
+      .def("getBlockList", get_block_list_1, py::arg("category"), "Get the block list of the specified category")
+      .def("getBlockList", get_block_list_2, "Get all the block lists")
       .def("save", &BlockInfoDriver::save, py::arg("block"),
-           R"(【子类接口（必须）】保存指定的板块
+           R"([Subclass interface (Required)] Save the specified block
 
-    :param Block block: 板块对象
-    :note: 如果已存在同名板块，则覆盖；如果板块分类或名称存在修改，需要手工在修改前删除原板块)")
+    :param Block block: the block object
+    :note: if a block with the same name already exists, it will be overwritten; if the block category or the name has been modified, you need to delete the original block manually before the modification)")
       .def("remove", &BlockInfoDriver::remove, py::arg("category"), py::arg("name"),
-           R"(【子类接口（必须）】删除指定的板块
+           R"([Subclass interface (Required)] Delete the specified block
 
-    :param str category: 板块分类
-    :param str name: 板块名称)");
+    :param str category: the block category
+    :param str name: the block name)");
 }

@@ -1,7 +1,7 @@
 /*
  * _KDataDriver.cpp
  *
- *  Created on: 2017年10月7日
+ *  Created on: 2017-10-07
  *      Author: fasiondog
  */
 
@@ -12,12 +12,12 @@ namespace py = pybind11;
 
 void export_KDataDriver(py::module& m) {
     py::class_<KDataDriver, KDataDriverPtr, PyKDataDriver>(m, "KDataDriver",
-                                                           R"(K线数据驱动基类
+                                                           R"(The K-line data driver base class
 
-  子类接口:
+  The subclass interfaces:
     - _init(self)
-    - isIndexFirst(self) (必须)
-    - canParallelLoad(self) (必须)
+    - isIndexFirst(self) (Required)
+    - canParallelLoad(self) (Required)
     - getCount(self, market, code, ktype)
     - _getIndexRangeByDate(self, market, code, query)
     - _getKRecordList(self, market, code, query)
@@ -26,31 +26,31 @@ void export_KDataDriver(py::module& m) {
   )")
       .def(py::init<>())
       .def(py::init<const string&>())
-      .def_property_readonly("name", &KDataDriver::name, py::return_value_policy::copy, "驱动名称")
+      .def_property_readonly("name", &KDataDriver::name, py::return_value_policy::copy, "The driver name")
 
       .def("__str__", to_py_str<KDataDriver>)
       .def("__repr__", to_py_str<KDataDriver>)
 
-      .def("get_param", &KDataDriver::getParam<boost::any>, "获取指定参数的值")
+      .def("get_param", &KDataDriver::getParam<boost::any>, "Get the value of the specified parameter")
       .def("set_param",
            static_cast<void (KDataDriver::*)(const std::string&, const boost::any&)>(
              &KDataDriver::setParam),
-           "设置参数")
-      .def("have_param", &KDataDriver::haveParam, "指定参数是否存在")
+           "Set the parameter")
+      .def("have_param", &KDataDriver::haveParam, "Whether the specified parameter exists")
 
-      .def("clone", &KDataDriver::clone, "克隆驱动")
+      .def("clone", &KDataDriver::clone, "Clone the driver")
 
-      .def("_init", &KDataDriver::_init, "【子类接口】初始化驱动")
+      .def("_init", &KDataDriver::_init, "[Subclass interface] Initialize the driver")
       .def("isIndexFirst", &KDataDriver::isIndexFirst,
-           "【子类接口（必须）】判断该引擎是否是位置索引方式查询速度更快，还是按日期方式查询更快")
+           "[Subclass interface (Required)] Judge whether this engine is faster when querying by the position index way, or faster when querying by the date way")
       .def("canParallelLoad", &KDataDriver::canParallelLoad,
-           "【子类接口（必须）】是否支持并行数据加载")
+           "[Subclass interface (Required)] Whether the parallel data loading is supported")
       .def("getCount", &KDataDriver::getCount, py::arg("market"), py::arg("code"), py::arg("ktype"),
-           R"(获取指定类型的K线数据量
+           R"(Get the amount of the K-line data of the specified type
 
-    :param str market: 市场简称
-    :param str code: 证券代码
-    :param Query.KType ktype: K线类型
+    :param str market: the market abbreviation
+    :param str code: the security code
+    :param Query.KType ktype: the K-line type
     :rtype int)")
       .def(
         "_getIndexRangeByDate",
@@ -60,17 +60,17 @@ void export_KDataDriver(py::module& m) {
             return py::make_tuple(start, end);
         },
         py::arg("market"), py::arg("code"), py::arg("query"),
-        R"(【子类接口】获取指定日期范围对应的K线记录索引
+        R"([Subclass interface] Get the K-line record indexes corresponding to the specified date range
 
-    :param str market: 市场简称
-    :param str code: 证券代码
-    :param KQuery query: 查询条件
-    :return: (start, end) 对应的K线记录位置)")
+    :param str market: the market abbreviation
+    :param str code: the security code
+    :param KQuery query: the query condition
+    :return: the (start, end) corresponding K-line record positions)")
       .def("_getKRecordList", &KDataDriver::getKRecordList, py::arg("market"), py::arg("code"),
-           py::arg("query"), "【子类接口】获取K线数据")
+           py::arg("query"), "[Subclass interface] Get the K-line data")
       .def("_getTimeLineList", &KDataDriver::getTimeLineList, py::arg("market"), py::arg("code"),
-           py::arg("query"), "【子类接口】获取分时线数据")
+           py::arg("query"), "[Subclass interface] Get the time-line data")
       .def("_getTransList", &KDataDriver::getTransList, py::arg("market"), py::arg("code"),
-           py::arg("query"), "【子类接口】获取历史分笔数据")
-      .def("isColumnFirst", &KDataDriver::isColumnFirst, "是否列优先(列数据库存储K线数据)");
+           py::arg("query"), "[Subclass interface] Get the historical tick data")
+      .def("isColumnFirst", &KDataDriver::isColumnFirst, "Whether it is column-first (the column database stores the K-line data)");
 }

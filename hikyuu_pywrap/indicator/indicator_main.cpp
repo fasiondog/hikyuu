@@ -38,11 +38,11 @@ void export_indicator_main(py::module& m) {
       },
       R"(batch_calculate_inds(inds, kdata) -> list)
     
-    并行计算多个指标
+    Calculate multiple indicators in parallel
     
-    :param list inds: 指标列表
-    :param KData kdata: K线数据
-    :return: 指标计算结果列表
+    :param list inds: the indicator list
+    :param KData kdata: the K-line data
+    :return: the list of the indicator calculation results
     :rtype: list)");
 
     m.def(
@@ -56,12 +56,12 @@ void export_indicator_main(py::module& m) {
       },
       R"(multi_regression(stk, query, *inds) -> list)
     
-    对股票进行多元线性回归分析，使用股票收盘价的收益率作为因变量
+    Perform a multiple linear regression analysis on the stock, using the return of the stock close price as the dependent variable
     
-    :param Stock stk: 股票对象
-    :param KQuery query: K线查询条件
-    :param Indicator *inds: 一个或多个指标作为自变量
-    :return: 回归系数列表，第一个元素是alpha(截距)，后续是各个beta系数
+    :param Stock stk: the stock object
+    :param KQuery query: the K-line query condition
+    :param Indicator *inds: one or more indicators as the independent variables
+    :return: the list of the regression coefficients; the first element is alpha (the intercept), followed by each beta coefficient
     :rtype: list
     :example:
     
@@ -84,18 +84,18 @@ void export_indicator_main(py::module& m) {
       },
       R"(multi_regression_full(stk, query, *inds) -> list)
     
-    对股票进行多元线性回归分析（完整版本），返回完整的回归结果
+    Perform a multiple linear regression analysis on the stock (the full version), returning the complete regression result
     
-    :param Stock stk: 股票对象
-    :param KQuery query: K线查询条件
-    :param Indicator *inds: 一个或多个指标作为自变量
-    :return: 回归结果列表，格式为：
+    :param Stock stk: the stock object
+    :param KQuery query: the K-line query condition
+    :param Indicator *inds: one or more indicators as the independent variables
+    :return: the list of the regression results, in the format:
              [alpha, beta1, beta2, ..., betan, e1, e2, ..., en, RSS, R²]
-             - alpha: 截距项
-             - beta1~betan: 各因子系数
-             - e1~en: 各数据点的残差（实际值-预测值）
-             - RSS: 残差平方和
-             - R²: 决定系数
+             - alpha: the intercept
+             - beta1~betan: the coefficient of each factor
+             - e1~en: the residual of each data point (the actual value - the predicted value)
+             - RSS: the residual sum of squares
+             - R²: the coefficient of determination
     :rtype: list
     :example:
     
@@ -104,7 +104,7 @@ void export_indicator_main(py::module& m) {
         >>> alpha = result[0]
         >>> beta1 = result[1]
         >>> beta2 = result[2]
-        >>> residuals = result[3:-2]  # 残差序列
+        >>> residuals = result[3:-2]  # the residual sequence
         >>> RSS = result[-2]
         >>> R_squared = result[-1]
     )");

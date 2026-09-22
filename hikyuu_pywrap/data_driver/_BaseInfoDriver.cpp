@@ -1,7 +1,7 @@
 /*
  * _BaseInfoDriver.cpp
  *
- *  Created on: 2017年10月7日
+ *  Created on: 2017-10-07
  *      Author: fasiondog
  */
 
@@ -18,88 +18,88 @@ static string BaseInfoDriver_to_str(const BaseInfoDriver& v) {
 
 void export_BaseInfoDriver(py::module& m) {
     py::class_<BaseInfoDriver, BaseInfoDriverPtr, PyBaseInfoDriver>(m, "BaseInfoDriver",
-                                                                    R"(基本信息数据获取驱动基类
+                                                                    R"(The basic information data driver base class
 
-    子类接口：
-        - _init(self) (必须)
-        - getAllStockInfo(self) (必须)
-        - getStockInfo(self, market, code) (必须)
-        - getMarketInfo(self, market) (必须)
-        - getAllMarketInfo(self) (必须)
-        - getAllStockTypeInfo(self) (必须)
-        - getStockTypeInfo(self, type) (必须)
-        - getAllHolidays(self) (必须)
-        - getAllZhBond10(self) (必须)
+    The subclass interfaces:
+        - _init(self) (Required)
+        - getAllStockInfo(self) (Required)
+        - getStockInfo(self, market, code) (Required)
+        - getMarketInfo(self, market) (Required)
+        - getAllMarketInfo(self) (Required)
+        - getAllStockTypeInfo(self) (Required)
+        - getStockTypeInfo(self, type) (Required)
+        - getAllHolidays(self) (Required)
+        - getAllZhBond10(self) (Required)
         - getStockWeightList(self, market, code, start, end)
         - getAllStockWeightList(self)
         - getHistoryFinance(self, market, code, start, end)
         - getHistoryFinanceField(self)
         - getFinanceInfo(self, market, code)
     )")
-      .def(py::init<const string&>(), R"(初始化
+      .def(py::init<const string&>(), R"(Initialize
 
-    :param str name: 驱动名称)")
+    :param str name: the driver name)")
       .def_property_readonly("name", &BaseInfoDriver::name, py::return_value_policy::copy,
-                             "驱动名称")
+                             "The driver name")
       .def("__str__", BaseInfoDriver_to_str)
       .def("__repr__", BaseInfoDriver_to_str)
 
-      .def("get_param", &BaseInfoDriver::getParam<boost::any>, "获取指定参数")
+      .def("get_param", &BaseInfoDriver::getParam<boost::any>, "Get the specified parameter")
       .def("set_param",
            static_cast<void (BaseInfoDriver::*)(const std::string&, const boost::any&)>(
              &BaseInfoDriver::setParam),
-           "设置指定参数")
-      .def("have_param", &BaseInfoDriver::haveParam, "指定参数是否存在")
+           "Set the specified parameter")
+      .def("have_param", &BaseInfoDriver::haveParam, "Whether the specified parameter exists")
 
-      .def("_init", &BaseInfoDriver::_init, "【子类接口（必须）】驱动初始化")
+      .def("_init", &BaseInfoDriver::_init, "[Subclass interface (Required)] Initialize the driver")
       .def("getAllStockInfo", &BaseInfoDriver::getAllStockInfo,
-           "【子类接口（必须）】获取所有股票详情信息")
+           "[Subclass interface (Required)] Get the detailed information of all the stocks")
       .def("getStockInfo", &BaseInfoDriver::getStockInfo, py::arg("market"), py::arg("code"),
-           R"(【子类接口（必须）】获取指定的证券信息
+           R"([Subclass interface (Required)] Get the specified security information
 
-    :param str market: 市场简称
-    :param str code: 证券代码)")
+    :param str market: the market abbreviation
+    :param str code: the security code)")
       .def("getStockWeightList", &BaseInfoDriver::getStockWeightList, py::arg("market"),
            py::arg("code"), py::arg("start"), py::arg("end"),
-           R"(获取指定日期范围内 [start, end) 的权息列表
+           R"(Get the dividend list within the specified date range [start, end)
 
-    :param str market: 市场简称
-    :param str code: 证券代码
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期)")
+    :param str market: the market abbreviation
+    :param str code: the security code
+    :param Datetime start: the start date
+    :param Datetime end: the end date)")
       .def("getAllStockWeightList", &BaseInfoDriver::getAllStockWeightList,
-           "获取所有股票的权息列表")
+           "Get the dividend lists of all the stocks")
       .def("getHistoryFinance", &BaseInfoDriver::getHistoryFinance, py::arg("market"),
            py::arg("code"), py::arg("start"), py::arg("end"),
-           R"(获取历史财务信息
+           R"(Get the historical finance information
 
-    :param str market: 市场简称
-    :param str code: 证券代码
-    :param Datetime start: 财务报告发布起始日期
-    :param Datetime end: 查询结束日期)")
+    :param str market: the market abbreviation
+    :param str code: the security code
+    :param Datetime start: the start date of the finance report publishing
+    :param Datetime end: the end date of the query)")
       .def("getHistoryFinanceField", &BaseInfoDriver::getHistoryFinanceField,
-           "获取历史财务信息字段序号与名称")
+           "Get the indexes and the names of the historical finance information fields")
       .def("getFinanceInfo", &BaseInfoDriver::getFinanceInfo, py::arg("market"), py::arg("code"),
-           R"(获取当前财务信息
+           R"(Get the current finance information
 
-    :param str market: 市场标识
-    :param str code: 证券代码)")
+    :param str market: the market identifier
+    :param str code: the security code)")
       .def("getMarketInfo", &BaseInfoDriver::getMarketInfo, py::arg("market"),
-           R"(【子类接口（必须）】获取指定的MarketInfo
+           R"([Subclass interface (Required)] Get the specified MarketInfo
 
-    :param str market: 市场简称
-    :return: 如未找到，则返回 Null<MarketInfo>())")
+    :param str market: the market abbreviation
+    :return: if it is not found, return Null<MarketInfo>())")
       .def("getAllMarketInfo", &BaseInfoDriver::getAllMarketInfo,
-           "【子类接口（必须）】获取全部市场信息")
+           "[Subclass interface (Required)] Get all the market information")
       .def("getAllStockTypeInfo", &BaseInfoDriver::getAllStockTypeInfo,
-           "【子类接口（必须）】获取全部证券类型信息")
+           "[Subclass interface (Required)] Get all the security type information")
       .def("getStockTypeInfo", &BaseInfoDriver::getStockTypeInfo, py::arg("type"),
-           R"(【子类接口（必须）】获取相应的证券类型详细信息
+           R"([Subclass interface (Required)] Get the detailed information of the corresponding security type
 
-    :param int type: 证券类型
-    :return: 对应的证券类型信息，如果不存在，则返回Null<StockTypeInfo>())")
+    :param int type: the security type
+    :return: the corresponding security type information; if it does not exist, return Null<StockTypeInfo>())")
       .def("getAllHolidays", &BaseInfoDriver::getAllHolidays,
-           "【子类接口（必须）】获取所有节假日日期")
+           "[Subclass interface (Required)] Get all the holiday dates")
       .def("getAllZhBond10", &BaseInfoDriver::getAllZhBond10,
-           "【子类接口（必须）】获取所有中国10年期国债信息");
+           "[Subclass interface (Required)] Get all the Chinese 10-year treasury bond information");
 }

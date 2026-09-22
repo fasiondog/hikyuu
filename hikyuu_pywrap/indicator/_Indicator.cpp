@@ -25,7 +25,7 @@ void (Indicator::*setIndParam1)(const string&, const Indicator&) = &Indicator::s
 void (Indicator::*setIndParam2)(const string&, const IndParam&) = &Indicator::setIndParam;
 
 void export_Indicator(py::module& m) {
-    py::class_<Indicator>(m, "Indicator", "技术指标")
+    py::class_<Indicator>(m, "Indicator", "The technical indicator")
       .def(py::init<>())
       .def(py::init<IndicatorImpPtr>(), py::keep_alive<1, 2>())
       .def("__str__", &Indicator::str)
@@ -35,81 +35,81 @@ void export_Indicator(py::module& m) {
         "enable_increment_calculate",
         [](py::object) { return Indicator::enableIncrementCalculate(); },
         [](py::object cls, bool flag) { Indicator::enableIncrementCalculate(flag); },
-        "启用/禁用指标增量计算")
+        "Enable/disable the indicator incremental calculation")
 
-      .def_property("name", ind_read_name, ind_write_name, "指标名称")
+      .def_property("name", ind_read_name, ind_write_name, "The indicator name")
       .def_property_readonly("long_name", &Indicator::long_name,
-                             "返回形如：Name(param1_val,param2_val,...)")
-      .def_property_readonly("discard", &Indicator::discard, "结果中需抛弃的个数")
+                             "Return in the form: Name(param1_val,param2_val,...)")
+      .def_property_readonly("discard", &Indicator::discard, "The number of the points to discard in the result")
       .def_property_readonly("optype",
                              [](const Indicator& ind) { return getOPTypeName(ind.getOPType()); })
 
       .def("set_discard", &Indicator::setDiscard, R"(set_discard(self, discard)
     
-    设置抛弃的个数，如果小于原有的discard则无效
-    :param int discard: 需抛弃的点数，大于0)")
+    Set the number to discard; if it is smaller than the original discard, it is invalid
+    :param int discard: the number of the points to discard, greater than 0)")
 
       .def("get_param", &Indicator::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (Indicator::*)(const std::string&, const boost::any&)>(
              &Indicator::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
+    :param str name: the parameter name
+    :param value: the parameter value
     :type value: int | bool | float | string | Query | KData | Stock | DatetimeList
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &Indicator::haveParam, "是否存在指定参数")
+      .def("have_param", &Indicator::haveParam, "Whether the specified parameter exists")
 
-      .def("have_ind_param", &Indicator::haveIndParam, "是否存在指定的动态周期指标参数")
+      .def("have_ind_param", &Indicator::haveIndParam, "Whether the specified dynamic period indicator parameter exists")
       .def("get_ind_param", &Indicator::getIndParam, R"(get_ind_param(self, name)
     
-    获取指定的动态指标参数
+    Get the specified dynamic indicator parameter
     
-    :param str name: 参数名称
-    :return: 动态指标参数
+    :param str name: the parameter name
+    :return: the dynamic indicator parameter
     :rtype: IndParam
-    :raises out_of_range: 无此参数)")
+    :raises out_of_range: no such parameter)")
 
       .def("set_ind_param", setIndParam1)
       .def("set_ind_param", setIndParam2, R"(set_param(self, name, ind)
 
-    设置动态指标参数
+    Set the dynamic indicator parameter
 
-    :param str name: 参数名称
-    :param Indicator|IndParam: 参数值（可为 Indicator 或 IndParam 实例）)")
+    :param str name: the parameter name
+    :param Indicator|IndParam: the parameter value (can be an Indicator or an IndParam instance))")
 
-      .def("empty", &Indicator::empty, "是否为空")
-      .def("clone", &Indicator::clone, "克隆操作")
+      .def("empty", &Indicator::empty, "Whether it is empty")
+      .def("clone", &Indicator::clone, "The clone operation")
       .def("formula", &Indicator::formula, R"(formula(self)
 
-    打印指标公式
+    Print the indicator formula
 
     :rtype: str)")
 
       .def("get_result_num", &Indicator::getResultNumber, R"(get_result_num(self)
 
-    获取结果集数量
+    Get the number of the result sets
 
     :rtype: int)")
 
       .def("get", &Indicator::get, py::arg("pos"), py::arg("result_index") = 0,
            R"(get(self, pos[, result_index=0])
 
-    获取指定位置的值
+    Get the value at the specified position
 
-    :param int pos: 指定的位置索引
-    :param int result_index: 指定的结果集
+    :param int pos: the specified index position
+    :param int result_index: the specified result set
     :rtype: float)")
 
       .def(
@@ -124,86 +124,86 @@ void export_Indicator(py::module& m) {
         },
         R"(get_pos(self, date):
 
-    获取指定日期相应的索引位置, 如果没有对应位置返回 None
+    Get the index position corresponding to the specified date; if there is no corresponding position, return None
 
-    :param Datetime date: 指定日期
+    :param Datetime date: the specified date
     :rtype: int)")
 
       .def("get_datetime", &Indicator::getDatetime, R"(get_datetime(self, pos)
 
-    获取指定位置的日期
+    Get the date at the specified position
 
-    :param int pos: 指定的位置索引
+    :param int pos: the specified index position
     :rtype: float)")
 
       .def("get_by_datetime", &Indicator::getByDate, py::arg("datetime"),
            py::arg("result_index") = 0,
            R"(get_by_datetime(self, datetime[, result_index=0])
 
-    获取指定日期数值。如果对应日期无结果，返回 constant.null_price
+    Get the value of the specified date. If there is no result for the corresponding date, return constant.null_price
 
-    :param Datetime datetime: 指定日期
-    :param int result_index: 指定的结果集
+    :param Datetime datetime: the specified date
+    :param int result_index: the specified result set
     :rtype: float)")
 
       .def("get_result", &Indicator::getResult, R"(get_result(self, result_index)
 
-    获取指定结果集
+    Get the specified result set
 
-    :param int result_index: 指定的结果集
+    :param int result_index: the specified result set
     :rtype: Indicator)")
 
       .def("get_result_as_price_list", &Indicator::getResultAsPriceList,
            R"(get_result_as_price_list(self, result_index)
 
-    获取指定结果集
+    Get the specified result set
 
-    :param int result_index: 指定的结果集
+    :param int result_index: the specified result set
     :rtype: PriceList)")
 
       .def("get_datetime_list", &Indicator::getDatetimeList, R"(get_datetime_list(self)
 
-    返回对应的日期列表
+    Return the corresponding date list
 
     :rtype: DatetimeList)")
 
       .def("exist_nan", &Indicator::existNan, py::arg("result_idx=0"),
            R"(exist_nan(self, result_idx)
 
-    判断是否存在NaN值
+    Judge whether a NaN value exists
 
-    :param int result_idx: 指定的结果集
+    :param int result_idx: the specified result set
     :rtype: bool)")
 
       .def("set_context", setContext_1)
       .def("set_context", setContext_2, R"(set_context(self, kdata)
 
-    设置上下文
+    Set the context
 
-    :param KData kdata: 关联的上下文K线)
+    :param KData kdata: the associated context K-line)
       
 set_context(self, stock, query)
 
-    设置上下文
+    Set the context
 
-    :param Stock stock: 指定的 Stock
-    :param Query query: 指定的查询条件)")
+    :param Stock stock: the specified Stock
+    :param Query query: the specified query condition)")
 
       .def("get_context", &Indicator::getContext, R"(get_context(self)
 
-    获取上下文
+    Get the context
 
     :rtype: KData)")
 
       .def("extend", &Indicator::extend, R"(extend(self)
 
-    在有上下文时，自动将上下文扩展至当前最新数据并计算)")
+    When there is a context, automatically extend the context to the current latest data and calculate)")
 
       .def("contains", &Indicator::contains, R"(contains(self, name)
         
-    获取指标公式中是否包含指定名称的指标
+    Get whether the indicator formula contains the indicator with the specified name
     
-    :param str name: 指定的指标名称
+    :param str name: the specified indicator name
     :rtype: bool)")
 
       .def("equal", &Indicator::equal)
@@ -249,7 +249,7 @@ set_context(self, stock, query)
                    size_t start, stop, step, length;
 
                    if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
-                       throw std::invalid_argument("无效的切片参数");
+                       throw std::invalid_argument("Invalid slice parameters");
                    }
 
                    std::vector<Indicator::value_t> result;
@@ -342,18 +342,18 @@ set_context(self, stock, query)
             ret = py::array(dtype, self.size(), data, capsule);
             return ret;
         },
-        "转化为np.array, 如果为时间序列, 则包含 datetime 日期列")
+        "Convert to np.array; if it is a time series, the datetime date column will be included")
 
       .def(
         "value_to_np",
         [](const Indicator& self) {
             size_t ret_num = self.getResultNumber();
 
-            // 初始化array_t并获取其内部缓冲区
+            // Initialize the array_t and get its internal buffer
             py::array_t<double> ret;
-            ret.resize({self.size(), ret_num});  // 二维形状: [size, ret_num]
+            ret.resize({self.size(), ret_num});  // The 2D shape: [size, ret_num]
             auto buf = ret.request();
-            double* buffer = static_cast<double*>(buf.ptr);  // 从array_t获取指针
+            double* buffer = static_cast<double*>(buf.ptr);  // Get the pointer from the array_t
 
             std::vector<std::string> names;
             std::vector<std::string> fields;
@@ -361,7 +361,7 @@ set_context(self, stock, query)
             for (size_t i = 0; i < ret_num; i++) {
                 names.push_back(fmt::format("value{}", i));
                 fields.push_back("d");
-                offsets.push_back(i * sizeof(Indicator::value_t));  // 简化偏移计算
+                offsets.push_back(i * sizeof(Indicator::value_t));  // Simplify the offset calculation
             }
 
             auto dtype = py::dtype(
@@ -373,7 +373,7 @@ set_context(self, stock, query)
                 src[i] = self.data(i);
             }
 
-            // 填充数据到array_t的缓冲区
+            // Fill the data into the buffer of the array_t
             for (size_t i = 0, total = self.size(); i < total; i++) {
                 for (size_t j = 0; j < ret_num; j++) {
                     buffer[i * ret_num + j] = src[j][i];
@@ -382,7 +382,7 @@ set_context(self, stock, query)
 
             return py::array(dtype, {self.size()}, {ret_num * sizeof(double)}, buf.ptr, ret);
         },
-        "仅转化值为np.array, 不包含日期列")
+        "Convert only the values to np.array, without the date column")
 
       .def(
         "to_array",
@@ -397,7 +397,7 @@ set_context(self, stock, query)
             }
             return ret;
         },
-        py::arg("result_index") = 0, "将指定结果集转化为numpy.array")
+        py::arg("result_index") = 0, "Convert the specified result set to numpy.array")
 
       .def(
         "to_df",
@@ -433,7 +433,7 @@ set_context(self, stock, query)
             return py::module_::import("pandas").attr("DataFrame")(columns,
                                                                    py::arg("copy") = false);
         },
-        "转换为 DataFrame")
+        "Convert to a DataFrame")
 
       .def(
         "value_to_df",
@@ -459,7 +459,7 @@ set_context(self, stock, query)
             return py::module_::import("pandas").attr("DataFrame")(columns,
                                                                    py::arg("copy") = false);
         },
-        "转换为 DataFrame, 仅包含值")
+        "Convert to a DataFrame, containing only the values")
 
       .def(+py::self)
       .def(py::self + py::self)
