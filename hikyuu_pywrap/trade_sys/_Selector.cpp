@@ -1,7 +1,7 @@
 /*
  * _Selector.cpp
  *
- *  Created on: 2016年3月28日
+ *  Created on: 2016-03-28
  *      Author: fasiondog
  */
 
@@ -44,7 +44,7 @@ public:
         PYBIND11_OVERLOAD(void, SelectorBase, _removeAll, );
     }
 
-    // 必须实现的子类接口
+    // The subclass interfaces that must be implemented
     SystemWeightList _getSelected(Datetime date) override {
         py::gil_scoped_acquire gil;
         py::function py_func =
@@ -104,7 +104,7 @@ public:
     }
 
 private:
-    // 目前无法序列化
+    // Cannot be serialized currently
     py::function m_evaluate;
 };
 #ifdef __GNUC__
@@ -117,12 +117,12 @@ SEPtr crtSEOptimal(const py::function& evalfunc) {
 
 void export_Selector(py::module& m) {
     py::class_<SystemWeight>(m, "SystemWeight", py::dynamic_attr(),
-                             "系统权重系数结构，在资产分配时，指定对应系统的资产占比系数")
+                             "The system weight structure; during the asset allocation, it specifies the asset proportion coefficient of the corresponding system")
       .def(py::init<>())
       .def(py::init<const SystemPtr&, price_t>())
       .def("__str__", to_py_str<SystemWeight>)
       .def("__repr__", to_py_str<SystemWeight>)
-      .def_readwrite("sys", &SystemWeight::sys, "对应的 System 实例")
+      .def_readwrite("sys", &SystemWeight::sys, "The corresponding System instance")
       .def_readwrite("weight", &SystemWeight::weight)
 
         DEF_PICKLE(SystemWeight);
@@ -152,7 +152,7 @@ void export_Selector(py::module& m) {
             }
             data[i].weight = sw.weight;
         }
-        // 定义NumPy结构化数据类型
+        // Define the NumPy structured data type
         py::dtype dtype =
           py::dtype(vector_to_python_list<string>(
                       {htr("sys_name"), htr("market_code"), htr("stock_name"), htr("weight")}),
@@ -169,17 +169,17 @@ void export_Selector(py::module& m) {
             return py::module_::import("pandas").attr("DataFrame")();
         }
 
-        // 创建 Python 字符串对象数组
+        // Create the python string object array
         py::list sysname_list(total);
         py::list code_list(total);
         py::list name_list(total);
         py::array_t<double> value_arr(total);
 
-        // 获取 value 数组缓冲区
+        // Get the buffer of the value array
         auto value_buf = value_arr.request();
         double* value_ptr = static_cast<double*>(value_buf.ptr);
 
-        // 填充数据
+        // Fill the data
         for (size_t i = 0; i < total; i++) {
             const SystemWeight& sw = sws[i];
             if (sw.sys) {
@@ -195,7 +195,7 @@ void export_Selector(py::module& m) {
             }
         }
 
-        // 构建 DataFrame
+        // Build the DataFrame
         auto pandas = py::module_::import("pandas");
         py::dict columns;
         columns[htr("sys_name").c_str()] =
@@ -211,30 +211,30 @@ void export_Selector(py::module& m) {
 
     py::class_<SelectorBase, SEPtr, PySelectorBase>(
       m, "SelectorBase",
-      R"(选择器策略基类，实现标的、系统策略的评估和选取算法，自定义选择器策略子类接口：
+      R"(The selector strategy base class, implementing the algorithm for evaluating and selecting the targets and the system strategies; the custom selector strategy subclass interfaces:
 
-    - get_selected - 【必须】获取指定时刻选择的系统实例列表
-    - _calculate - 【必须】计算接口
-    - _reset - 【可选】重置私有属性
-    - _clone - 【必须】克隆接口)")
+    - get_selected - [Required] Get the list of the system instances selected at the specified moment
+    - _calculate - [Required] The calculation interface
+    - _reset - [Optional] Reset the private attributes
+    - _clone - [Required] The clone interface)")
 
       .def(py::init<>())
       .def(py::init<const SelectorBase&>())
-      .def(py::init<const string&>(), R"(初始化构造函数
+      .def(py::init<const string&>(), R"(The initialization constructor
         
-    :param str name: 名称)")
+    :param str name: the name)")
 
       .def("__str__", to_py_str<SelectorBase>)
       .def("__repr__", to_py_str<SelectorBase>)
 
       .def_property("name", py::overload_cast<>(&SelectorBase::name, py::const_),
                     py::overload_cast<const string&>(&SelectorBase::name),
-                    py::return_value_policy::copy, "算法名称")
+                    py::return_value_policy::copy, "The algorithm name")
       .def_property_readonly("proto_sys_list", &SelectorBase::getProtoSystemList,
-                             py::return_value_policy::copy, "原型系统列表")
+                             py::return_value_policy::copy, "The prototype system list")
       .def_property_readonly("real_sys_list", &SelectorBase::getRealSystemList,
-                             py::return_value_policy::copy, "由 PF 运行时设定的实际运行系统列表")
-      .def_property_readonly("scfilter", &SelectorBase::getScoresFilter, "获取 ScoresFilter")
+                             py::return_value_policy::copy, "The actual running system list set by the PF at runtime")
+      .def_property_readonly("scfilter", &SelectorBase::getScoresFilter, "Get the ScoresFilter")
 
       .def_property(
         "mf", &SelectorBase::getMF,
@@ -244,40 +244,40 @@ void export_Selector(py::module& m) {
             self.setMF(mf.cast<MFPtr>());
             tmp.release();
         },
-        "获取关联的 MF")
+        "Get the associated MF")
 
       .def("get_param", &SelectorBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (SelectorBase::*)(const std::string&, const boost::any&)>(
              &SelectorBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &SelectorBase::haveParam, "是否存在指定参数")
+      .def("have_param", &SelectorBase::haveParam, "Whether the specified parameter exists")
 
-      .def("reset", &SelectorBase::reset, "复位操作")
-      .def("clone", &SelectorBase::clone, "克隆操作")
-      .def("remove_all", &SelectorBase::removeAll, "清除所有已加入的原型系统")
+      .def("reset", &SelectorBase::reset, "The reset operation")
+      .def("clone", &SelectorBase::clone, "The clone operation")
+      .def("remove_all", &SelectorBase::removeAll, "Remove all the added prototype systems")
 
       .def("add_stock", &SelectorBase::addStock, py::arg("stock"), py::arg("sys"),
            R"(add_stock(self, stock, sys)
 
-    加入初始标的及其对应的系统策略原型
+    Add the initial target and its corresponding system strategy prototype
 
-    :param Stock stock: 加入的初始标的
-    :param System sys: 系统策略原型)")
+    :param Stock stock: the initial target to add
+    :param System sys: the system strategy prototype)")
 
       .def(
         "add_stock_list",
@@ -287,31 +287,31 @@ void export_Selector(py::module& m) {
         py::arg("stk_list"), py::arg("sys"),
         R"(add_stock_list(self, stk_list, sys)
 
-    加入初始标的列表及其系统策略原型
+    Add the initial target list and its system strategy prototype
 
-    :param StockList stk_list: 加入的初始标的列表
-    :param System sys: 系统策略原型)")
+    :param StockList stk_list: the initial target list to add
+    :param System sys: the system strategy prototype)")
 
       .def("get_proto_sys_list", &SelectorBase::getProtoSystemList, py::return_value_policy::copy)
       .def("get_real_sys_list", &SelectorBase::getRealSystemList, py::return_value_policy::copy)
       .def("calculate", &SelectorBase::calculate)
 
-      .def("_reset", &SelectorBase::_reset, "子类复位操作实现")
-      .def("_calculate", &SelectorBase::_calculate, "【重载接口】子类计算接口")
+      .def("_reset", &SelectorBase::_reset, "The subclass reset operation implementation")
+      .def("_calculate", &SelectorBase::_calculate, "[Overload interface] The subclass calculation interface")
 
       .def("is_match_af", &SelectorBase::isMatchAF, R"(is_match_af(self)
 
-    【重载接口】判断是否和 AF 匹配
+    [Overload interface] Judge whether it matches the AF
 
-    :param AllocateFundsBase af: 资产分配算法)")
+    :param AllocateFundsBase af: the asset allocation algorithm)")
 
       .def("get_selected", &SelectorBase::getSelected,
            R"(get_selected(self, datetime)
 
-    【重载接口】获取指定时刻选取的系统实例
+    [Overload interface] Get the selected system instances at the specified moment
 
-    :param Datetime datetime: 指定时刻
-    :return: 选取的系统实例列表
+    :param Datetime datetime: the specified moment
+    :return: the list of the selected system instances
     :rtype: SystemList)")
 
       .def("add_sys", &SelectorBase::addSystem)
@@ -327,7 +327,7 @@ void export_Selector(py::module& m) {
         },
         R"(set_scores_filter(self, filter)
            
-    设置 ScoresFilter, 将替换现有的过滤器. 仅适用于 SE_MultiFactor
+    Set the ScoresFilter, which will replace the existing filter. It is only applicable to SE_MultiFactor
     
     :param ScoresFilter filter: ScoresFilter)")
 
@@ -341,9 +341,9 @@ void export_Selector(py::module& m) {
         },
         R"(add_scores_filter(self, filter)
         
-    在已有过滤基础上新增过滤, 仅适用于 SE_MultiFactor    
+    Add a new filter on top of the existing one. It is only applicable to SE_MultiFactor    
 
-    :param ScoresFilter filter: 新的过滤器)")
+    :param ScoresFilter filter: the new filter)")
 
       .def("__add__",
            [](const SelectorPtr& self, const SelectorPtr& other) { return self + other; })
@@ -381,39 +381,39 @@ void export_Selector(py::module& m) {
       py::arg("stk_list"), py::arg("sys"), py::arg("weight") = 1.0,
       R"(SE_Fixed([stk_list, sys])
 
-    固定选择器，即始终选择初始划定的标的及其系统策略原型
+    The fixed selector, i.e. always selecting the initially defined targets and their system strategy prototypes
 
-    :param list stk_list: 初始划定的标的
-    :param System sys: 系统策略原型
-    :param float weight: 默认权重
-    :return: SE选择器实例)");
+    :param list stk_list: the initially defined targets
+    :param System sys: the system strategy prototype
+    :param float weight: the default weight
+    :return: the SE selector instance)");
 
     m.def("SE_Signal", py::overload_cast<>(SE_Signal));
     m.def("SE_Signal", py::overload_cast<const StockList&, const SystemPtr&>(SE_Signal),
           R"(SE_Signal([stk_list, sys])
 
-    信号选择器，仅依靠系统买入信号进行选中
+    The signal selector, selecting only by the system buy signals
 
-    :param list stk_list: 初始划定的标的
-    :param System sys: 系统策略原型
-    :return: SE选择器实例)");
+    :param list stk_list: the initially defined targets
+    :param System sys: the system strategy prototype
+    :return: the SE selector instance)");
 
     m.def("SE_MultiFactor", py::overload_cast<const MFPtr&, int>(SE_MultiFactor), py::arg("mf"),
           py::arg("topn") = 10);
-    // 添加支持FactorSet和Indicator序列的重载函数
+    // Add the overloads supporting the FactorSet and the Indicator sequence
     m.def(
       "SE_MultiFactor",
       [](const py::object& input, int topn, int ic_n, int ic_rolling_n, const py::object& ref_stk,
          bool spearman, const string& mode) {
           Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
 
-          // 判断输入类型
+          // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
-              // 输入是FactorSet
+              // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return SE_MultiFactor(factset, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
           } else if (py::isinstance<py::sequence>(input)) {
-              // 输入是序列（假设为Indicator列表）
+              // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
               return SE_MultiFactor(c_inds, topn, ic_n, ic_rolling_n, c_ref_stk, spearman, mode);
           } else {
@@ -426,61 +426,61 @@ void export_Selector(py::module& m) {
       py::arg("mode") = "MF_ICIRWeight",
       R"(SE_MultiFactor
 
-    创建基于多因子评分的选择器，支持多种创建方式
+    Create a multi-factor scoring based selector, supporting several creation ways
 
-    - 直接指定 MF:
-      :param MultiFactorBase mf: 直接指定的多因子合成算法
-      :param int topn: 只选取时间截面中前 topn 个系统
+    - Specify the MF directly:
+      :param MultiFactorBase mf: the directly specified multi-factor composition algorithm
+      :param int topn: only select the first topn systems in the cross-section
 
-    - 使用FactorSet:
-      :param FactorSet input: 因子集合
-      :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
-      :param int ic_n: 默认 IC 对应的 N 日收益率
-      :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
-      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+    - Use a FactorSet:
+      :param FactorSet input: the factor set
+      :param int topn: only select the first topn systems in the cross-section; when it is less than or equal to 0, there is no limit
+      :param int ic_n: the N-day return corresponding to the default IC
+      :param int ic_rolling_n: the IC rolling period
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
 
-    - 使用Indicator序列:
-      :param sequense(Indicator) input: 原始因子列表
-      :param int topn: 只选取时间截面中前 topn 个系统，小于等于0时代表不限制
-      :param int ic_n: 默认 IC 对应的 N 日收益率
-      :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
-      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
+    - Use an Indicator sequence:
+      :param sequense(Indicator) input: the original factor list
+      :param int topn: only select the first topn systems in the cross-section; when it is less than or equal to 0, there is no limit
+      :param int ic_n: the N-day return corresponding to the default IC
+      :param int ic_rolling_n: the IC rolling period
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
 
     .. code-block:: python
     
-        # 使用Indicator列表（原有方式）
+        # Use an Indicator list (the original way)
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         selector1 = SE_MultiFactor(indicators, topn=10)
         
-        # 使用FactorSet（新增方式）
+        # Use a FactorSet (the new way)
         factor_set = FactorSet(indicators)
         selector2 = SE_MultiFactor(factor_set, topn=10)
         
-        # 直接使用MultiFactor对象
+        # Use the MultiFactor object directly
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor(mf, topn=10))");
 
     m.def("SE_MultiFactor2", py::overload_cast<const MFPtr&, const SCFilterPtr&>(SE_MultiFactor2),
           py::arg("mf"), py::arg("filter") = SCFilter_IgnoreNan());
-    // 添加支持FactorSet和Indicator序列的重载函数
+    // Add the overloads supporting the FactorSet and the Indicator sequence
     m.def(
       "SE_MultiFactor2",
       [](const py::object& input, int ic_n, int ic_rolling_n, const py::object& ref_stk,
          bool spearman, const string& mode, const SCFilterPtr& filter) {
           Stock c_ref_stk = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
 
-          // 判断输入类型
+          // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
-              // 输入是FactorSet
+              // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return SE_MultiFactor2(factset, ic_n, ic_rolling_n, c_ref_stk, spearman, mode,
                                      filter);
           } else if (py::isinstance<py::sequence>(input)) {
-              // 输入是序列（假设为Indicator列表）
+              // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
               return SE_MultiFactor2(c_inds, ic_n, ic_rolling_n, c_ref_stk, spearman, mode, filter);
           } else {
@@ -493,59 +493,59 @@ void export_Selector(py::module& m) {
       py::arg("mode") = "MF_ICIRWeight", py::arg("filter") = SCFilter_IgnoreNan(),
       R"(SE_MultiFactor2
 
-    创建基于多因子评分的选择器，支持多种创建方式
+    Create a multi-factor scoring based selector, supporting several creation ways
 
-    - 直接指定 MF:
-      :param MultiFactorBase mf: 直接指定的多因子合成算法
-      :param ScoresFilterBase filter: 评分过滤器
+    - Specify the MF directly:
+      :param MultiFactorBase mf: the directly specified multi-factor composition algorithm
+      :param ScoresFilterBase filter: the scores filter
 
-    - 使用FactorSet:
-      :param FactorSet input: 因子集合
-      :param int ic_n: 默认 IC 对应的 N 日收益率
-      :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
-      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
-      :param ScoresFilterBase filter: 评分过滤器
+    - Use a FactorSet:
+      :param FactorSet input: the factor set
+      :param int ic_n: the N-day return corresponding to the default IC
+      :param int ic_rolling_n: the IC rolling period
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
+      :param ScoresFilterBase filter: the scores filter
 
-    - 使用Indicator序列:
-      :param sequense(Indicator) input: 原始因子列表
-      :param int ic_n: 默认 IC 对应的 N 日收益率
-      :param int ic_rolling_n: IC 滚动周期
-      :param Stock ref_stk: 参考证券,用于日期对齐，未指定时为 sh000001
-      :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" 因子合成算法名称
-      :param ScoresFilterBase filter: 评分过滤器
+    - Use an Indicator sequence:
+      :param sequense(Indicator) input: the original factor list
+      :param int ic_n: the N-day return corresponding to the default IC
+      :param int ic_rolling_n: the IC rolling period
+      :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001
+      :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+      :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
+      :param ScoresFilterBase filter: the scores filter
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         selector1 = SE_MultiFactor2(indicators)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         selector2 = SE_MultiFactor2(factor_set)
         
-        # 直接使用MultiFactor对象
+        # Use the MultiFactor object directly
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor2(mf))");
 
     m.def("crtSEOptimal", crtSEOptimal, R"(crtSEOptimal(func)
     
-    快速创建自定义绩效评估函数的寻优选择器
+    Quickly create the optimization selector with a custom performance evaluation function
 
-    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值)");
+    :param func: a callable object, receiving the parameters (sys, lastdate) and returning a float value)");
 
-    m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "账户资产最大寻优选择器");
+    m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "The optimization selector maximizing the account assets");
 
     m.def("SE_PerformanceOptimal", SE_PerformanceOptimal, py::arg("key") = "Account Avg Annual Return %",
           py::arg("mode") = 0, R"(SE_PerformanceOptimal(key="Account Avg Annual Return %", mode=0)
 
-    使用 Performance 统计结果进行寻优的选择器
+    The selector optimizing by the Performance statistics results
 
-    :param string key: Performance 统计项
-    :param int mode:  0 取统计结果最大的值系统 | 1 取统计结果为最小值的系统)");
+    :param string key: the Performance statistics item
+    :param int mode:  0 take the system with the maximum statistics result | 1 take the system with the minimum statistics result)");
 
     m.def(
       "SE_EvaluateOptimal",
@@ -559,7 +559,7 @@ void export_Selector(py::module& m) {
       },
       R"(SE_EvaluateOptimal(evalulate_func)
 
-    使用自定义函数进行寻优的选择器
+    The selector optimizing with a custom function
 
-    :param func: 一个可调用对象，接收参数为 (sys, lastdate)，返回一个 float 数值)");
+    :param func: a callable object, receiving the parameters (sys, lastdate) and returning a float value)");
 }
