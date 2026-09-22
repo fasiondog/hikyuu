@@ -21,7 +21,7 @@ SEPtr HKU_API SE_MaxFundsOptimal();
  * Selector that performs the optimization with the Performance statistics results
  * @return SEPtr
  */
-SEPtr HKU_API SE_PerformanceOptimal(const string& key = "Account average annual return %",
+SEPtr HKU_API SE_PerformanceOptimal(const string& key = "Account Avg Annual Return %",
                                     int mode = 0);
 
 /**
