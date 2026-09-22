@@ -33,7 +33,7 @@ class HKU_API AllocateFundsBase;
 class HKU_API WalkForwardSystem;
 
 /**
- * 交易系统基类
+ * Base class of the trading system
  * @ingroup System
  */
 class HKU_API System : public enable_shared_from_this<System> {
@@ -43,25 +43,25 @@ class HKU_API System : public enable_shared_from_this<System> {
     friend class HKU_API WalkForwardSystem;
 
 public:
-    /** 默认构造函数 */
+    /** Default constructor */
     System();
 
-    /** 指定系统名称的构造函数 */
+    /** Constructor with the system name specified */
     explicit System(const string& name);
 
     /**
-     * @brief 构造函数
+     * @brief Constructor
      *
-     * @param tm 指定账户
-     * @param mm 指定资金管理策略
-     * @param ev 指定市场环境判断策略
-     * @param cn 指定系统条件判断策略
-     * @param sg 指定信号指示器
-     * @param st 指定止损策略
-     * @param tp 指定止盈策略
-     * @param pg 指定目标盈利策略
-     * @param sp 指定移滑价差算法
-     * @param name 系统名称
+     * @param tm the given account
+     * @param mm the given money management strategy
+     * @param ev the given market environment judgment strategy
+     * @param cn the given system condition judgment strategy
+     * @param sg the given signal generator
+     * @param st the given stop-loss strategy
+     * @param tp the given take-profit strategy
+     * @param pg the given profit goal strategy
+     * @param sp the given slippage algorithm
+     * @param name system name
      */
     System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const EnvironmentPtr& ev,
            const ConditionPtr& cn, const SignalPtr& sg, const StoplossPtr& st,
@@ -70,152 +70,160 @@ public:
 
     System(const System&) = default;
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~System();
 
     typedef SystemPart Part;
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const;
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name);
 
-    /** 获取交易对象 */
+    /** Get the trading object */
     KData getTO() const;
 
-    /** 获取管理账户 */
+    /** Get the managed account */
     TradeManagerPtr getTM() const;
 
-    /** 获取资金管理策略 */
+    /** Get the money management strategy */
     MoneyManagerPtr getMM() const;
 
-    /** 获取市场环境判定策略 */
+    /** Get the market environment judgment strategy */
     EnvironmentPtr getEV() const;
 
-    /** 获取系统条件判定策略 */
+    /** Get the system condition judgment strategy */
     ConditionPtr getCN() const;
 
-    /** 获取信号指示器 */
+    /** Get the signal generator */
     SignalPtr getSG() const;
 
-    /** 获取止损策略 */
+    /** Get the stop-loss strategy */
     StoplossPtr getST() const;
 
-    /** 获取止盈策略 */
+    /** Get the take-profit strategy */
     StoplossPtr getTP() const;
 
-    /** 获取盈利目标策略 */
+    /** Get the profit goal strategy */
     ProfitGoalPtr getPG() const;
 
-    /** 获取移滑价差策略 */
+    /** Get the slippage strategy */
     SlippagePtr getSP() const;
 
-    /** 设定管理账户 */
+    /** Set the managed account */
     void setTM(const TradeManagerPtr& tm);
 
-    /** 设定资金管理策略 */
+    /** Set the money management strategy */
     void setMM(const MoneyManagerPtr& mm);
 
-    /** 设定市场环境判定策略 */
+    /** Set the market environment judgment strategy */
     void setEV(const EnvironmentPtr& ev);
 
-    /** 设定系统条件判定策略 */
+    /** Set the system condition judgment strategy */
     void setCN(const ConditionPtr& cn);
 
-    /** 设定信号指示器 */
+    /** Set the signal generator */
     void setSG(const SignalPtr& sg);
 
-    /** 设定止损策略 */
+    /** Set the stop-loss strategy */
     void setST(const StoplossPtr& st);
 
-    /** 设定止盈策略 */
+    /** Set the take-profit strategy */
     void setTP(const StoplossPtr& tp);
 
-    /** 设定盈利目标策略 */
+    /** Set the profit goal strategy */
     void setPG(const ProfitGoalPtr& pg);
 
-    /** 设定移滑价差算法 */
+    /** Set the slippage algorithm */
     void setSP(const SlippagePtr& sp);
 
-    /** 获取交易的证券 */
+    /** Get the traded security */
     Stock getStock() const;
 
-    /** 设定交易的证券 */
+    /** Set the traded security */
     void setStock(const Stock& stk);
 
     const KQuery& getQuery() const;
 
-    /** 获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录 */
+    /** Get the actually executed trade records; unlike TM, the trade records caused by the
+     *  equity/dividend adjustment are not included */
     const TradeRecordList& getTradeRecordList() const;
 
-    /** 获取买入请求，“delay”模式下查看下一时刻是否存在买入操作 */
+    /** Get the buy request; in "delay" mode it shows whether a buy operation exists at the next
+     *  moment */
     const TradeRequest& getBuyTradeRequest() const;
 
-    /** 获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作 */
+    /** Get the sell request; in "delay" mode it shows whether a sell operation exists at the next
+     *  moment */
     const TradeRequest& getSellTradeRequest() const;
 
     const TradeRequest& getSellShortTradeRequest() const;
     const TradeRequest& getBuyShortTradeRequest() const;
 
-    /** 将所有组件全部置为非共享 */
+    /** Mark all the components as not shared */
     void setNotSharedAll();
 
     /**
-     * 复位，但不包括已有的交易对象，以及共享的部件
-     * @note 实际复位操作依赖于系统中各个部件的共享参数
+     * Reset, excluding the existing trading object and the shared parts
+     * @note The actual reset operation depends on the shared parameters of the parts in the system
      */
     void reset();
 
-    /** 强制复位所有组件以及清空已有的交易对象，忽略组件的共享属性 */
+    /** Force resetting all the components and clearing the existing trading object, ignoring the
+     *  shared attribute of the components */
     void forceResetAll();
 
     typedef shared_ptr<System> SystemPtr;
 
     /**
-     * 克隆操作，会依次调用所有部件的clone操作
+     * Clone operation, the clone operation of every part is called in turn
      */
     SystemPtr clone();
 
     /**
-     * 设置交易对象
-     * @note 其中tm, ev没有setTO接口
+     * Set the trading object
+     * @note tm and ev have no setTO interface
      */
     void setTO(const KData& kdata);
 
     /**
-     * 回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求
+     * After the backtest is finished, return the trade record of the last day together with the
+     * delayed buy and sell requests that need to be delayed
      */
     json lastSuggestion() const;
 
     /**
-     * @brief 不指定stock的方式下run，需要事先通过setStock设定stock
-     * @param query 查询条件
-     * @param reset 执行前是否依据系统部件共享属性复位
-     * @param resetAll 强制复位所有部件
+     * @brief Run without a specified stock; the stock must be set beforehand through setStock
+     * @param query query condition
+     * @param reset whether to reset according to the shared attribute of the system parts before
+     *              execution
+     * @param resetAll force resetting all the parts
      */
     void run(const KQuery& query, bool reset = true, bool resetAll = false);
 
     /**
-     * @brief 运行系统策略
-     * @param stock 指定的证券
-     * @param query 指定查询条件
-     * @param reset 执行前是否依据系统部件共享属性复位
-     * @param resetAll 强制复位所有部件
+     * @brief Run the system strategy
+     * @param stock the given security
+     * @param query the given query condition
+     * @param reset whether to reset according to the shared attribute of the system parts before
+     *              execution
+     * @param resetAll force resetting all the parts
      */
     void run(const Stock& stock, const KQuery& query, bool reset = true, bool resetAll = false);
 
     /**
-     * @brief 运行系统
-     * @param kdata 指定的交易对象
-     * @param reset 执行前是否依据系统部件共享属性复位
-     * @param resetAll 强制复位所有部件
+     * @brief Run the system
+     * @param kdata the given trading object
+     * @param reset whether to reset according to the shared attribute of the system parts before
+     *              execution
+     * @param resetAll force resetting all the parts
      */
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false);
 
     /**
-     * @brief 在指定的日期执行一步，仅由 PF 调用
-     * @param datetime 指定的日期
+     * @brief Execute one step on the given date, called by PF only
+     * @param datetime the given date
      * @return TradeRecord
      */
     virtual TradeRecord runMoment(const Datetime& datetime);
@@ -223,10 +231,11 @@ public:
     virtual TradeRecord runMomentOnOpen(const Datetime& datetime);
     virtual TradeRecord runMomentOnClose(const Datetime& datetime);
 
-    // 运行前准备工作, 失败将抛出异常
+    // Preparation before running; an exception is thrown on failure
     virtual void readyForRun();
 
-    // 由各个相关组件调用，用于组件参数变化时通知 sys，以便重算
+    // Called by the related components to notify sys when the component parameters change, so that
+    // it is recalculated
     void partChangedNotify() {
         m_calculated = false;
     }
@@ -234,7 +243,7 @@ public:
     virtual void _reset() {}
     virtual void _forceResetAll() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual SystemPtr _clone() {
         return make_shared<System>();
     }
@@ -243,25 +252,25 @@ public:
 
 public:
     //-------------------------
-    // 仅供 PF/AF 内部调用
+    // For internal use by PF/AF only
     //-------------------------
 
-    // 强制以开盘价卖出，仅供 PF/AF 内部调用
+    // Force selling at the open price, for internal use by PF/AF only
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
         return _sellForce(date, num, from, true);
     }
 
-    // 强制以收盘价卖出，仅供 PF/AF 内部调用
+    // Force selling at the close price, for internal use by PF/AF only
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
         HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
         return _sellForce(date, num, from, false);
     }
 
-    // 清除已有的交易请求，供Portfolio使用
+    // Clear the existing trade requests, used by Portfolio
     virtual void clearDelayBuyRequest();
 
-    // 当前是否存在延迟的操作请求，供Portfolio
+    // Whether a delayed operation request currently exists, used by Portfolio
     bool haveDelaySellRequest() const {
         return m_sellRequest.valid;
     }
@@ -270,10 +279,10 @@ public:
         return m_buyRequest.valid;
     }
 
-    // 处理延迟买入请求，仅供 PF 调用
+    // Process the delayed sell request, called by PF only
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date);
 
-    // 处理延迟买入请求，仅供 PF 调用
+    // Process the delayed buy request, called by PF only
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
 
     bool isPythonObject() const noexcept {
@@ -284,10 +293,10 @@ private:
     bool _environmentIsValid(const Datetime& datetime);
     bool _conditionIsValid(const Datetime& datetime);
 
-    // 通知所有需要接收实际买入交易记录的部件
+    // Notify all the parts that need to receive the actual buy trade record
     void _buyNotifyAll(const TradeRecord&);
 
-    // 通知所有需要接收实际卖出交易记录的部件
+    // Notify all the parts that need to receive the actual sell trade record
     void _sellNotifyAll(const TradeRecord&);
 
     double _getBuyNumber(const Datetime&, price_t price, price_t risk, Part from);
@@ -332,7 +341,8 @@ private:
     TradeRecord _runMomentOnOpen(const KRecord& today, const KRecord& src_today);
     TradeRecord _runMomentOnClose(const KRecord& today, const KRecord& src_today);
 
-    // Portfolio | AllocateFunds 指示立即进行强制卖出，以便对 buy_delay 的系统进行资金调整
+    // Portfolio | AllocateFunds instructs an immediate forced sell, so that the funds of the
+    // buy_delay system can be adjusted
     TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);
 
 protected:
@@ -349,18 +359,20 @@ protected:
     string m_name;
     Stock m_stock;
     KData m_kdata;
-    KData m_src_kdata;  // 未复权的原始 K 线数据
+    KData m_src_kdata;  // The original K-line data without adjustment
 
     bool m_is_python_object{false};
-    bool m_calculated;  // 控制是否需要重新计算
+    bool m_calculated;  // Controls whether a recalculation is needed
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_buy_days;                 // 每一次买入清零，计算一次加1，即买入后的天数
-    int m_sell_short_days;          // 每一次卖空清零
-    TradeRecordList m_trade_list;   // 保存实际执行的交易记录
-    price_t m_lastTakeProfit;       // 上一次多头止损价，用于保证止赢价单调递增
-    price_t m_lastShortTakeProfit;  // 上一次空头止赢价
+    int m_buy_days;                 // Cleared on every buy and increased by one on every
+                                    // calculation, i.e. the number of days after the buy
+    int m_sell_short_days;          // Cleared on every short sell
+    TradeRecordList m_trade_list;   // Saves the actually executed trade records
+    price_t m_lastTakeProfit;       // The last long take-profit price, used to guarantee that the
+                                    // take-profit price increases monotonically
+    price_t m_lastShortTakeProfit;  // The last short take-profit price
 
     TradeRequest m_buyRequest;
     TradeRequest m_sellRequest;
@@ -368,10 +380,10 @@ protected:
     TradeRequest m_buyShortRequest;
 
 private:
-    void initParam();  // 初始化参数及其默认值
+    void initParam();  // Initialize the parameters and their default values
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -451,7 +463,7 @@ private:
 };
 
 /**
- * 客户程序应使用该指针进行操作
+ * Client programs should operate through this pointer
  * @ingroup System
  */
 typedef shared_ptr<System> SystemPtr;
