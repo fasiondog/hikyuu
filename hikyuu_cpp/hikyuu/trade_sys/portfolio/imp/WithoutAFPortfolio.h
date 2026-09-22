@@ -14,7 +14,7 @@
 namespace hku {
 
 /*
- * 无资金分配算法的资产组合
+ * Portfolio without a fund allocation algorithm
  * @ingroup WithoutAFPortfolio
  */
 class HKU_API WithoutAFPortfolio : public Portfolio {
@@ -34,15 +34,16 @@ private:
     void _runMomentWithoutAFForceSell(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
 private:
-    SystemList m_force_sell_sys_list;  // 强制卖出的系统列表
-    list<SYSPtr> m_running_sys_list;   // 当前运行中的系统列表，需要依次执行
-    SystemList m_selected_list;        // 本轮周期内选中的系统列表
+    SystemList m_force_sell_sys_list;  // System list of the forced sells
+    list<SYSPtr> m_running_sys_list;   // List of the currently running systems, they need to be
+                                       // executed in turn
+    SystemList m_selected_list;        // System list selected in the current cycle
 
-    // 记录指派给SE的系统到内部实际系统映射
+    // Records the mapping from the systems assigned to SE to the internal actual systems
     unordered_map<SYSPtr, SYSPtr> m_se_sys_to_pf_sys_dict;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

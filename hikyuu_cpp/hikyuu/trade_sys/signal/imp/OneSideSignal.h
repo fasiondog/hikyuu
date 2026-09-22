@@ -14,7 +14,8 @@
 
 namespace hku {
 
-// 根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号
+// Build a one-sided signal (containing the buy or the sell signals only) from the input indicator;
+// a signal is added if the indicator value is greater than 0
 class OneSideSignal : public SignalBase {
 public:
     OneSideSignal();
@@ -29,7 +30,7 @@ private:
     Indicator m_ind;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

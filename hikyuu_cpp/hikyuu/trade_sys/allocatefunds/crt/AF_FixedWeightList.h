@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  */
 
@@ -12,8 +12,8 @@
 namespace hku {
 
 /**
- * @brief 固定比例资产分配
- * @param weights 指定的资产比例列表
+ * @brief Fixed proportion asset allocation
+ * @param weights the given asset proportion list
  * @return AFPtr
  * @ingroup AllocateFunds
  */

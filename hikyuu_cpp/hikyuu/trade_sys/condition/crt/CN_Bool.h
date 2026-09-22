@@ -13,8 +13,9 @@
 namespace hku {
 
 /**
- * 布尔信号指标系统有效条件
- * @param ind bool类型的指标，指标中相应位置>0则代表系统有效，否则无效
+ * System valid condition of the boolean signal indicator
+ * @param ind the boolean type indicator; a value > 0 at the corresponding position means the system
+ *            is valid, otherwise it is invalid
  * @return
  */
 CNPtr HKU_API CN_Bool(const Indicator& ind);

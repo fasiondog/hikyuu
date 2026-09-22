@@ -12,7 +12,8 @@
 namespace hku {
 
 /**
- * 仅能手工添加系统环境有效性的EV，用于测试或其他用途
+ * An EV whose system environment validity can only be added manually, used for the testing or other
+ * purposes
  * @return EVPtr
  */
 EVPtr HKU_API EV_Manual();

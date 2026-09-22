@@ -25,10 +25,10 @@ public:
 protected:
     double m_value{0.0};
     SignalPtr m_sg;
-    int m_mode{0};  // 仅对-、/有效，0：(sg, value), 1: (value, sg)
+    int m_mode{0};  // It is valid for - and / only: 0: (sg, value), 1: (value, sg)
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

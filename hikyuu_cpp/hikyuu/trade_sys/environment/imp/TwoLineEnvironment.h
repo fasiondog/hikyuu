@@ -1,7 +1,7 @@
 /*
  * TwoLineEnviroment.h
  *
- *  Created on: 2016年5月17日
+ *  Created on: 2016-5-17
  *      Author: Administrator
  */
 
@@ -29,7 +29,7 @@ private:
     Indicator m_slow;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

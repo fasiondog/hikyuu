@@ -1,7 +1,7 @@
 /*
  * MM_FixedCapital.h
  *
- *  Created on: 2016年5月3日
+ *  Created on: 2016-5-3
  *      Author: Administrator
  */
 
@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 固定资金管理策略
- * 公式: 买入数量 = 当前现金 / capital
+ * Fixed capital money management strategy
+ * Formula: buy quantity = current cash / capital
  * @param capital
  * @return MoneyManagerPtr
  */

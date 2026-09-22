@@ -1,7 +1,7 @@
 /*
  * OPCondition.h
  *
- *  Created on: 2016年5月9日
+ *  Created on: 2016-5-9
  *      Author: Administrator
  */
 
@@ -27,7 +27,7 @@ private:
     Indicator m_op;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

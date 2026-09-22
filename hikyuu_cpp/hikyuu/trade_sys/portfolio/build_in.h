@@ -1,7 +1,7 @@
 /*
  * build_in.h
  *
- *  Created on: 2016年3月28日
+ *  Created on: 2016-3-28
  *      Author: fasiondog
  */
 

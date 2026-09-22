@@ -1,7 +1,7 @@
 /*
  * MM_FixedCapital.h
  *
- *  Created on: 2016年5月3日
+ *  Created on: 2016-5-3
  *      Author: Administrator
  */
 
@@ -14,9 +14,9 @@
 namespace hku {
 
 /**
- * @brief 连续买入/卖出固定数量资金管理策略。
- * @param buy_counts 依次买入数量
- * @param sell_counts 依次卖出数量
+ * @brief Money management strategy of buying / selling a fixed quantity consecutively.
+ * @param buy_counts the buy quantities in turn
+ * @param sell_counts the sell quantities in turn
  * @return MoneyManagerPtr
  */
 MoneyManagerPtr HKU_API MM_FixedCountTps(const vector<double>& buy_counts,

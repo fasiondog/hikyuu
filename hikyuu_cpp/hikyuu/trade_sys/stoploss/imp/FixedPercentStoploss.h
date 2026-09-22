@@ -14,7 +14,8 @@
 namespace hku {
 
 /**
- * 固定百分比止损策略，即当价格低于买入价格的某一百分比时止损
+ * Fixed percentage stop-loss strategy, i.e. the stop-loss is triggered when the price is lower than
+ * the buy price by a certain percentage
  */
 class FixedPercentStoploss : public StoplossBase {
     STOPLOSS_IMP(FixedPercentStoploss, "FixedPercentSL")

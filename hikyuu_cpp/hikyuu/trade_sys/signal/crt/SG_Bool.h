@@ -1,7 +1,7 @@
 /*
  * SG_Bool.h
  *
- *  Created on: 2017年7月2日
+ *  Created on: 2017-7-2
  *      Author: fasiondog
  */
 
@@ -15,11 +15,13 @@
 namespace hku {
 
 /**
- * 布尔信号指示器
- * @param buy 买入指示（结果Indicator中相应位置>0则代表买入）
- * @param sell 卖出指示（结果Indicator中相应位置>0则代表卖出）
- * @param alternate 买入与卖出信号是否交替出现，默认为true
- * @return 信号指示器
+ * Boolean signal generator
+ * @param buy the buy indication (a value > 0 at the corresponding position of the result Indicator
+ *            means a buy)
+ * @param sell the sell indication (a value > 0 at the corresponding position of the result
+ * Indicator means a sell)
+ * @param alternate whether the buy and sell signals appear alternately, true by default
+ * @return signal generator
  * @ingroup Signal
  */
 SignalPtr HKU_API SG_Bool(const Indicator& buy, const Indicator& sell, bool alternate = true);

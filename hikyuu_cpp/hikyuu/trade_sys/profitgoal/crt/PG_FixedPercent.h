@@ -1,7 +1,7 @@
 /*
  * PG_FixedPercent.h
  *
- *  Created on: 2016年5月6日
+ *  Created on: 2016-5-6
  *      Author: Administrator
  */
 
@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
- * @param p 百分比
+ * Fixed percentage profit goal, target price = buy price * (1 + p)
+ * @param p percentage
  * @return PGPtr
  */
 ProfitGoalPtr HKU_API PG_FixedPercent(double p = 0.2);

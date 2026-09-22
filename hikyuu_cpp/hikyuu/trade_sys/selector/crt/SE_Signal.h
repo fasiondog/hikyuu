@@ -12,16 +12,16 @@
 namespace hku {
 
 /**
- * @brief 信号选择器，仅依靠系统买入信号进行选中
+ * @brief Signal selector, it selects with the system buy signals only
  * @return SEPtr
  * @ingroup Selector
  */
 SEPtr HKU_API SE_Signal();
 
 /**
- * @brief 信号选择器，仅依靠系统买入信号进行选中
- * @param stock_list 股票列表
- * @param sys 原型系统
+ * @brief Signal selector, it selects with the system buy signals only
+ * @param stock_list stock list
+ * @param sys prototype system
  * @return SEPtr
  * @ingroup Selector
  */

@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 固定资本管理策略
- * 公式: 买入数量 = 当前总资产 / capital
+ * Fixed capital funds management strategy
+ * Formula: buy quantity = current total assets / capital
  * @param capital
  * @return MoneyManagerPtr
  */

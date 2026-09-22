@@ -49,8 +49,8 @@ protected:
 protected:
     SelectorPtr m_se1;
     SelectorPtr m_se2;
-    std::unordered_set<SYSPtr> m_se1_set;  // se1 的原型系统实例集合
-    std::unordered_set<SYSPtr> m_se2_set;  // se2 的原型系统实例集合
+    std::unordered_set<SYSPtr> m_se1_set;  // The prototype system instance set of se1
+    std::unordered_set<SYSPtr> m_se2_set;  // The prototype system instance set of se2
     std::unordered_map<SYSPtr, SYSPtr> m_real_to_proto;
 
 private:
@@ -59,7 +59,7 @@ private:
 
 private:
     //============================================
-    // 序列化支持
+    // Serialization support
     //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

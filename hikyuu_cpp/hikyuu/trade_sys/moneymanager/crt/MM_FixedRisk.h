@@ -1,7 +1,7 @@
 /*
  * MM_FixedRisk.h
  *
- *  Created on: 2016年5月1日
+ *  Created on: 2016-5-1
  *      Author: Administrator
  */
 
@@ -14,8 +14,9 @@
 namespace hku {
 
 /**
- * 固定风险资金管理策略对每笔交易限定一个预先确定的或者固定的资金风险，如每笔交易固定风险1000元。
- * 公式：交易数量 = 固定风险 / 交易风险。
+ * The fixed risk money management strategy limits a predetermined or fixed fund risk for every
+ * trade, such as a fixed risk of 1000 yuan for every trade.
+ * Formula: trade quantity = fixed risk / trade risk.
  * @param risk
  * @return MoneyManagerPtr
  */

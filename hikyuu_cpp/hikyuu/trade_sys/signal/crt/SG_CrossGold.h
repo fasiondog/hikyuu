@@ -1,7 +1,7 @@
 /*
  * CROSS_SG.h
  *
- *  Created on: 2015年2月20日
+ *  Created on: 2015-2-20
  *      Author: fasiondog
  */
 
@@ -15,11 +15,13 @@
 namespace hku {
 
 /**
- * 金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
- * 当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。
- * @param fast 快线
- * @param slow 慢线
- * @return 信号指示器
+ * Golden cross indicator: it is a golden cross and a buy when the fast line crosses the slow line
+ * upward from below and both the fast line and the slow line are directed upward;
+ * it is a death cross and a sell when the fast line crosses the slow line downward from above and
+ * both the fast line and the slow line are directed downward.
+ * @param fast fast line
+ * @param slow slow line
+ * @return signal generator
  * @ingroup Signal
  */
 SignalPtr HKU_API SG_CrossGold(const Indicator& fast, const Indicator& slow);

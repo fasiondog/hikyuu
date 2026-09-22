@@ -11,7 +11,8 @@
 namespace hku {
 
 /**
- * 一个总是发出买入信号的系统，主要用于 PF 中 MultiFactor 选股匹配
+ * A system that always issues a buy signal, it is mainly used for the MultiFactor stock selection
+ * matching in PF
  * @return SignalPtr
  * @ingroup Signal
  */

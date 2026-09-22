@@ -14,8 +14,9 @@
 namespace hku {
 
 /**
- * 固定百分比止损策略，即当价格低于买入价格的某一百分比时止损
- * @param p 百分比(0,1]
+ * Fixed percentage stop-loss strategy, i.e. the stop-loss is triggered when the price is lower than
+ * the buy price by a certain percentage
+ * @param p percentage (0,1]
  * @ingroup Stoploss
  */
 StoplossPtr HKU_API ST_FixedPercent(double p = 0.03);

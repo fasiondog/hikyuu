@@ -1,7 +1,7 @@
 /*
  * SL_FixedPercent.h
  *
- *  Created on: 2016年5月7日
+ *  Created on: 2016-5-7
  *      Author: Administrator
  */
 
@@ -14,9 +14,10 @@
 namespace hku {
 
 /**
- * 固定百分比移滑价差算法
- * @details 买入实际价格 = 计划买入价格 * (1 + p)，卖出实际价格 = 计划卖出价格 * (1 - p)
- * @param p 偏移的固定百分比
+ * Fixed percentage slippage algorithm
+ * @details Actual buy price = planned buy price * (1 + p), actual sell price = planned sell price *
+ *          (1 - p)
+ * @param p the fixed offset percentage
  * @return SPPtr
  */
 SlippagePtr HKU_API SP_FixedPercent(double p = 0.001);

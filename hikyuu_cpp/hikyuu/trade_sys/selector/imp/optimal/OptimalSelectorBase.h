@@ -40,10 +40,10 @@ public:
 
     virtual string str() const override;
 
-    // 以便继承子类只需要实现 _clone 和 该接口即可
-    // 该接口实现系统绩效评估，getSelected 时将取评估结果最大的系统
-    // 使用 std::function 的话，在 C++ 中无法序列化，所以使用继承
-    // 返回 Null<double> 时，将不被评估选中
+    // So that an inheriting subclass only needs to implement _clone and this interface
+    // This interface implements the system performance evaluation; getSelected takes the system
+    // with the largest evaluation result std::function cannot be serialized in C++, so inheritance
+    // is used When Null<double> is returned it will not be selected by the evaluation
     virtual double evaluate(const SYSPtr& sys, const Datetime& endDate) noexcept {
         return Null<double>();
     }
