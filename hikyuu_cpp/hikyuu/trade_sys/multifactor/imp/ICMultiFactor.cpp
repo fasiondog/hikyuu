@@ -18,7 +18,7 @@ BOOST_CLASS_EXPORT(hku::ICMultiFactor)
 namespace hku {
 
 ICMultiFactor::ICMultiFactor() : MultiFactorBase("MF_ICWeight") {
-    setParam<int>("ic_rolling_n", 120);  // 计算滚动ic的滚动周期, 通常取 120 或 250
+    setParam<int>("ic_rolling_n", 120);  // The rolling period of the rolling IC, usually 120 or 250
 }
 
 ICMultiFactor::ICMultiFactor(const StockList& stks, const KQuery& query, const Stock& ref_stk,
@@ -44,7 +44,7 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     int ic_rolling_n = getParam<int>("ic_rolling_n");
     bool spearman = getParam<bool>("use_spearman");
 
-    // 计算每个经过标准化/风格化的原始因子的滚动IC值
+    // Calculate the rolling IC value of every standardized / styled original factor
     IndicatorList all_returns = _getAllReturns(ic_n);
     IndicatorList ic =
       global_parallel_for_index(0, ind_count, [&, ic_n, spearman, ic_rolling_n](size_t ii) {

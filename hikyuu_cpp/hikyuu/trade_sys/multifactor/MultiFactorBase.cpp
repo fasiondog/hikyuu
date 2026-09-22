@@ -124,10 +124,10 @@ MultiFactorBase::MultiFactorBase(const StockList& stks, const KQuery& query, con
 void MultiFactorBase::initParam() {
     setParam<bool>("fill_null", true);
     setParam<int>("ic_n", 1);
-    setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
-    setParam<int>("mode", 0);              // 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    setParam<bool>("save_all_factors", false);  // 计算完后保留所有因子数据，否则将被清除，影响
-                                                // getAllFactors/getFactor 方法
+    setParam<bool>("use_spearman", true);  // SPEARMAN is used by default, otherwise the pearson one
+    setParam<int>("mode", 0);              // Sorting mode: 0-descending, 1-ascending, 2-no sorting
+    setParam<bool>("save_all_factors", false);  // Keep all the factor data after the calculation
+                                                // the getAllFactors/getFactor methods
 }
 
 void MultiFactorBase::baseCheckParam(const string& name) const {
@@ -148,12 +148,13 @@ void MultiFactorBase::paramChanged() {
 void MultiFactorBase::_checkData() {
     HKU_CHECK(!m_factorset.empty(), "Input factor set is empty!");
 
-    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
+    // The subsequent calculation needs to stay aligned and handling a mixed Null stock is
+    // troublesome, so an exception is thrown to block it
     for (const auto& stk : m_stks) {
         HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
     }
 
-    // 获取用于对齐的参考日期
+    // Get the reference dates used for the alignment
     if (m_ref_stk.isNull()) {
         m_ref_stk = StockManager::instance().getMarketStock("SH");
     }
@@ -175,8 +176,9 @@ void MultiFactorBase::clearCalculatedData() {
 }
 
 void MultiFactorBase::reset() {
-    // 全程持锁：避免与正在进行的 calculate 写写交叉。
-    // 注意：_reset() 为虚函数，自定义实现不得在锁内重入同一实例需要 m_mutex 的方法。
+    // The lock is held throughout: to avoid a write-write interleaving with an ongoing calculate.
+    // Note: _reset() is a virtual function and a custom implementation must not re-enter, inside
+    // the lock, a method of the same instance that needs m_mutex.
     std::lock_guard<std::mutex> lock(m_mutex);
     _reset();
     clearCalculatedData();
@@ -218,7 +220,7 @@ MultiFactorPtr MultiFactorBase::clone() {
     p->m_special_category = m_special_category;
 
     p->m_calculated.store(false, std::memory_order_relaxed);
-    // 强制重算，不克隆以下缓存，避免非线程安全
+    // Force a recalculation without cloning the following caches, to avoid the thread unsafety
     // p->m_stk_map = m_stk_map;
     // p->m_date_index = m_date_index;
     // p->m_stk_factor_by_date = m_stk_factor_by_date;
@@ -245,7 +247,8 @@ void MultiFactorBase::setRefStock(const Stock& stk) {
 }
 
 void MultiFactorBase::setStockList(const StockList& stks) {
-    // 后续计算需要保持对齐，夹杂 Null stock 处理麻烦，直接抛出异常屏蔽
+    // The subsequent calculation needs to stay aligned and handling a mixed Null stock is
+    // troublesome, so an exception is thrown to block it
     for (const auto& stk : stks) {
         HKU_CHECK(!stk.isNull(), "Exist null stock in stks!");
     }
@@ -267,14 +270,14 @@ void MultiFactorBase::setNormalize(NormPtr norm) {
 
 void MultiFactorBase::addSpecialNormalize(const string& name, NormalizePtr norm,
                                           const string& category, const IndicatorList& style_inds) {
-    // 未指定任何特殊处理
+    // No special handling is given
     HKU_WARN_IF(!norm && category.empty() && style_inds.empty(),
                 "No special handling is specified!");
 
     bool found = false;
     string found_name;
     for (const auto& ind : m_factorset) {
-        // 指标可以是中文名，但Factor不可以
+        // An indicator may use a Chinese name, but a Factor may not
         if (utf8_fold_equal(ind.name(), name)) {
             found = true;
             found_name = ind.name();
@@ -447,11 +450,13 @@ Indicator MultiFactorBase::getIC(int ndays) {
 
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    // 如果 ndays 和 ic_n 参数相同，优先取缓存的 ic 结果
-    // 新的因子计算 IC，本质上不需要缓存（如等权重），但通过 IC 或 ICIR 计算权重的新因子
-    // 虽然可以用不同的 N 日收益率来计算新因子IC，但最好还是使用相同值
-    // 通过IC/ICIR计算权重的情况较多，所以这里直接缓存一份，减少重复计算
-    // 实际使用时，最好保证 getIC(ndays) 中的 ndays 和 ic_n 一致
+    // When ndays equals the ic_n parameter, the cached IC result is taken first
+    // The IC of a new factor essentially needs no cache (such as the equal weight), but for a new
+    // factor whose weight is calculated through IC or ICIR, although the IC of the new factor can
+    // be calculated with a different N-day return, it is better to use the same value The weight is
+    // often calculated through IC/ICIR, so a copy is cached here directly to reduce the repeated
+    // calculation In the actual usage it is better to keep ndays in getIC(ndays) consistent with
+    // ic_n
     int ic_n = getParam<int>("ic_n");
     if (ndays <= 0) {
         ndays = ic_n;
@@ -463,7 +468,7 @@ Indicator MultiFactorBase::getIC(int ndays) {
     result.setParam<DatetimeList>("align_date_list", m_ref_dates);
     result.name("IC");
 
-    // 如果 ndays 和 ic_n 参数相同，缓存计算结果
+    // When ndays equals the ic_n parameter, cache the calculation result
     if (ic_n == ndays) {
         m_ic = result;
     }
@@ -480,7 +485,8 @@ Indicator MultiFactorBase::getICIR(int ir_n, int ic_n) {
 }
 
 unordered_map<string, std::pair<PriceList, size_t>> MultiFactorBase::_buildDummyIndex() {
-    // 如果指定了特殊的指标的行业中性化处理，则构建其行业归属标签
+    // When the industry neutralization of a special indicator is given, build its industry
+    // membership labels
     unordered_map<string, std::pair<PriceList, size_t>> stock_dummy_index;
     for (const auto& [ind_name, catefory] : m_special_category) {
         stock_dummy_index[ind_name] = {PriceList(m_stks.size(), Null<price_t>()), 0};
@@ -507,8 +513,9 @@ unordered_map<string, std::pair<PriceList, size_t>> MultiFactorBase::_buildDummy
                 j++;
             }
             if (!found) {
-                // 无归属股票赋 blk_count，下游组内去均值时跳过（残差置 NaN），
-                // 避免将其隐式聚成伪行业簇造成伪回归。
+                // A stock without a membership is assigned blk_count and skipped when the group
+                // mean is removed downstream (the residual is set to NaN), avoiding an implicit
+                // clustering into a pseudo industry group that would cause a pseudo regression.
                 dummy[i] = blk_count;
             }
         }
@@ -524,10 +531,11 @@ IndicatorList MultiFactorBase::_getAllReturns(int ndays) const {
     });
 }
 
-// 行业中性化（按行业分组去组内均值）的纯函数实现见 industry_neutralize.h，
-// 提取为内部 inline header 供白盒单元测试直接包含调用。
-// 风格因子中性化残差回归实现见 StyleRegression.cpp，从本类中提取为串行内核，
-// 不再在运行时修改进程级 Eigen 线程配置。
+// The pure function implementation of the industry neutralization (removing the group mean by
+// industry group) is in industry_neutralize.h; it is extracted as an internal inline header so that
+// the white box unit tests can include and call it directly. The residual regression implementation
+// of the style factor neutralization is in StyleRegression.cpp; it is extracted from this class as
+// a serial kernel and no longer modifies the process level Eigen thread configuration at runtime.
 
 vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     vector<IndicatorList> all_stk_inds;
@@ -545,22 +553,30 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
     all_stk_inds = m_factorset.getValues(m_stks, m_query, true, fill_null, true, true, m_ref_dates);
 
-    // 风格因子按 [风格因子名][风格因子][股票] 三维存储（vector<IndicatorList>）。
+    // The style factors are stored in three dimensions [style factor name][style factor][stock]
+    // (vector<IndicatorList>).
     //
-    // 原实现为 [风格因子名][风格因子] 二维，每条风格因子全市场共享同一条时序，
-    // 导致两个独立缺陷：
-    //   1) 并发提取时多线程写同一个 Indicator（对 shared_ptr 对象本身的非原子
-    //      赋值是 C++ UB），是启用风格中性化后 get_ic / get_all_src_factors
-    //      进程直接崩溃（segfault，无 Python 异常）的根因；
-    //   2) 截面回归的自变量对所有股票取同一值，退化为常数列，与截距共线，
-    //      市值/风格中性化在数学上彻底失效（残差≈原值）。
+    // The original implementation was two-dimensional [style factor name][style factor] and every
+    // style factor shared the same time series across the whole market, which caused two
+    // independent defects:
+    //   1) during a concurrent extraction multiple threads wrote the same Indicator (the non-atomic
+    //   assignment to the shared_ptr object itself is
+    //      a C++ UB), which is the root cause of the segfault (no Python exception) of get_ic /
+    //      get_all_src_factors after the style neutralization is enabled;
+    //   2) the independent variable of the cross-sectional regression took the same value for all
+    //   the stocks, degenerating into a constant column collinear with the intercept,
+    //      so the market value / style neutralization failed completely in mathematics (the
+    //      residual is about the original value).
     //
-    // 补上股票维度后：
-    //   - 写隔离：每个 si 线程只写 per_factor[j][si]，不同 si 写不同槽；
-    //   - 读隔离：每线程对模板 styles[j] 先 clone() 出独立副本再 ALIGN 计算，
-    //     calculate() 只写本线程副本的 buffer，不触碰共享的 styles[j]。
-    //     （IndicatorImp::clone() 对根源对象严格只读，经代码核实，故并发
-    //      styles[j].clone() 安全；此处 styles[j] 为用户传入的根 Indicator。）
+    // After the stock dimension is added:
+    //   - Write isolation: every si thread writes per_factor[j][si] only and different si write
+    //   different slots;
+    //   - Read isolation: every thread first clone()s an independent copy of the template styles[j]
+    //   and then calculates ALIGN on it,
+    //     so calculate() writes the buffer of the thread copy only and does not touch the shared
+    //     styles[j]. (IndicatorImp::clone() is strictly read-only on the root object, which was
+    //     verified in the code, so concurrent
+    //      styles[j].clone() is safe; here styles[j] is the root Indicator passed in by the user.)
     unordered_map<string, vector<IndicatorList>> use_style_inds;
     for (const auto& [style_ind_name, style_inds] : m_special_style_inds) {
         auto& per_factor = use_style_inds[style_ind_name];
@@ -579,7 +595,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                     if (kdata.size() == 0) {
                         per_factor[j][si] = null_ind;
                     } else {
-                        // 每线程独立 clone：calculate 只写本线程副本的 buffer
+                        // An independent clone per thread: calculate writes the buffer of the
+                        // thread copy only
                         per_factor[j][si] =
                           ALIGN(styles[j].clone(), m_ref_dates, fill_null)(kdata).getResult(0);
                     }
@@ -589,11 +606,13 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         });
     }
 
-    // 时间截面标准化/归一化
+    // The time cross-sectional standardization / normalization
     if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
-        // 风格因子中性化残差回归已提取为串行内核（StyleRegression.cpp），
-        // 不再在运行时修改进程级 Eigen::setNbThreads，避免并发 MF 互相污染全局配置；
-        // 外层按日并行天然可重入，回归内部均为栈局部对象。
+        // The residual regression of the style factor neutralization has been extracted as a serial
+        // kernel (StyleRegression.cpp), it no longer modifies the process level Eigen::setNbThreads
+        // at runtime, avoiding the concurrent MFs polluting the global config mutually; the outer
+        // day-by-day parallelism is naturally reentrant and the regression internals are all stack
+        // local objects.
         unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();
         global_parallel_for_index_void(
           0, days_total,
@@ -608,13 +627,16 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                       one_day_data[si] = all_stk_inds[si][ii][di];
                   }
 
-                  // 注：经 m_factorset.getValues(align=true) 产出的 all_stk_inds[*][ii]
-                  // 会被 ALIGN 套层改名为 "ALIGN"（运行时实证）。而 addSpecialNormalize
-                  // 存入 m_special_norms/m_special_category 的 key 是 FactorSet 里的因子
-                  // 原名（如 "MA"）。若取 all_stk_inds[0][ii].name() 做 find 的 key，永远
-                  // 不命中，行业/风格/特殊标准化全部静默失效。改用 m_factorset[ii].name()
-                  // 按下标溯源原名：getValues 产出 result[j][i] 严格对应 factors[i]，
-                  // 下标 ii 与 m_factorset[ii] 一一对应，无乱序风险。
+                  // Note: the all_stk_inds[*][ii] produced by m_factorset.getValues(align=true)
+                  // is renamed to "ALIGN" by the ALIGN wrapper (verified at runtime). But the key
+                  // stored into m_special_norms/m_special_category by addSpecialNormalize is the
+                  // original factor name in the FactorSet (such as "MA"). If
+                  // all_stk_inds[0][ii].name() were taken as the find key it would never hit and
+                  // the industry / style / special standardization would all fail silently.
+                  // Instead, m_factorset[ii].name() is used to trace back the original name by
+                  // index: getValues produces result[j][i] strictly corresponding to factors[i],
+                  // and the index ii corresponds one to one with m_factorset[ii], with no risk of
+                  // an out of order access.
                   auto ind_name = m_factorset[ii].name();
                   auto special_norm_iter = m_special_norms.find(ind_name);
                   if (special_norm_iter != m_special_norms.end()) {
@@ -633,21 +655,25 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
 
                   auto category_iter = ind_dummy_dict.find(ind_name);
                   if (category_iter != ind_dummy_dict.end()) {
-                      // 行业中性化：组内去均值（O(n)，数学等价于去截距 one-hot 多元回归）。
-                      // 原实现误用单变量 calculate_residuals 对整数板块序号做一元回归，
-                      // 隐含"行业 j 的效应 = β0 + β1·j"的错误假设，结果依赖板块列表排列顺序。
+                      // The industry neutralization: removing the group mean (O(n), mathematically
+                      // equivalent to a multiple regression without the intercept on the one-hot
+                      // encoding). The original implementation wrongly used the univariate
+                      // calculate_residuals to do a unary regression on the integer block index,
+                      // implying the wrong assumption "the effect of industry j = b0 + b1*j", so
+                      // the result depended on the order of the block list.
                       const auto& [labels, blk_count] = category_iter->second;
                       new_value = calculate_industry_residuals(new_value, labels, blk_count);
                   }
                   auto style_iter = use_style_inds.find(ind_name);
                   if (style_iter != use_style_inds.end()) {
-                      auto& per_factor = style_iter->second;  // [风格因子][股票]
+                      auto& per_factor = style_iter->second;  // [style factor][stock]
                       vector<PriceList> style_value_day(per_factor.size());
                       for (size_t j = 0; j < per_factor.size(); j++) {
                           auto& style_value = style_value_day[j];
                           style_value.resize(stk_count);
                           for (size_t si = 0; si < stk_count; si++) {
-                              // 取第 si 只股票自己的风格因子值（原实现误取共享值）
+                              // Take the style factor value of the si-th stock itself (the original
+                              // implementation wrongly took the shared value)
                               style_value[si] = per_factor[j][si][di];
                           }
                       }
@@ -675,10 +701,11 @@ void MultiFactorBase::_buildIndex() {
     m_stk_factor_by_date.resize(days_total);
     for (size_t i = 0; i < days_total; i++) {
         m_date_index[m_ref_dates[i]] = i;
-        m_stk_factor_by_date[i].resize(stk_count);  // 每个日期预分配股票数量的空间
+        m_stk_factor_by_date[i].resize(
+          stk_count);  // Pre-allocate one slot per stock for every date
     }
 
-    // 先遍历股票j，再遍历日期i，默认不排序
+    // Traverse the stock j first and then the date i, no sorting by default
     global_parallel_for_index_void(0, stk_count, [this, days_total](size_t j) {
         const auto& stk = m_stks[j];
         const auto* data = m_all_factors[j].data();
@@ -687,20 +714,25 @@ void MultiFactorBase::_buildIndex() {
         }
     });
 
-    // 截面排序的确定性比较器：有效值按目标方向排序，值相等时以 market_code
-    // 字典序作为二级键打破 tie，使结果跨输入顺序、进程、平台、编译器稳定。
-    // NaN 置于末尾，NaN 之间同样按 market_code 字典序以保证 NaN 区段内部确定性。
-    // 使用 lambda 而非匿名命名空间函数，避免 unity_build 下的 ODR 风险，
-    // 同时使闭包类型在编译期唯一，让 std::sort 能够完全内联比较逻辑。
+    // The deterministic comparator of the cross-sectional sorting: the valid values are sorted in
+    // the target direction and, when the values are equal, the market_code lexicographic order is
+    // used as the secondary key to break the tie, making the result stable across the input order,
+    // the process, the platform and the compiler. NaN is placed at the end and the NaNs are also
+    // ordered by the market_code lexicographic order to guarantee the determinism within the NaN
+    // section. A lambda is used instead of an anonymous namespace function to avoid the ODR risk
+    // under unity_build, and at the same time the closure type is unique at compile time, letting
+    // std::sort fully inline the comparison logic.
     auto scoreDescLess = [](const ScoreRecord& a, const ScoreRecord& b) noexcept -> bool {
         const bool a_nan = std::isnan(a.value);
         const bool b_nan = std::isnan(b.value);
         if (a_nan != b_nan) {
-            return !a_nan;  // 有效值永远在 NaN 前
+            return !a_nan;  // A valid value always comes before NaN
         }
         if (!a_nan) {
-            if (a.value > b.value) return true;
-            if (a.value < b.value) return false;
+            if (a.value > b.value)
+                return true;
+            if (a.value < b.value)
+                return false;
         }
         return a.stock.market_code() < b.stock.market_code();
     };
@@ -709,11 +741,13 @@ void MultiFactorBase::_buildIndex() {
         const bool a_nan = std::isnan(a.value);
         const bool b_nan = std::isnan(b.value);
         if (a_nan != b_nan) {
-            return !a_nan;  // 有效值永远在 NaN 前
+            return !a_nan;  // A valid value always comes before NaN
         }
         if (!a_nan) {
-            if (a.value < b.value) return true;
-            if (a.value > b.value) return false;
+            if (a.value < b.value)
+                return true;
+            if (a.value > b.value)
+                return false;
         }
         return a.stock.market_code() < b.stock.market_code();
     };
@@ -740,42 +774,43 @@ void MultiFactorBase::_buildIndex() {
 }
 
 void MultiFactorBase::calculate() {
-    // Fast path: lock-free acquire 检查是否已 Ready
+    // Fast path: check whether it is already Ready with a lock-free acquire
     if (m_calculated.load(std::memory_order_acquire)) {
         return;
     }
 
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    // 锁内二次检查：mutex 已提供慢路径同步，relaxed 即可
+    // A second check inside the lock: the mutex already provides the slow path synchronization, so
+    // relaxed is enough
     if (m_calculated.load(std::memory_order_relaxed)) {
         return;
     }
 
-    // 构建前清理旧结果，确保重试基于干净状态
+    // Clean up the old result before the building, ensuring the retry is based on a clean state
     clearCalculatedData();
 
     try {
         _checkData();
 
-        {  // 获取所有证券所有对齐后的原始因子
+        {  // Get all the aligned original factors of all the securities
             vector<IndicatorList> all_stk_inds = getAllSrcFactors();
 
             size_t factor_count = m_factorset.size();
             if (factor_count == 1) {
-                // 直接使用原始因子
+                // Use the original factors directly
                 size_t stk_count = m_stks.size();
                 m_all_factors.resize(stk_count);
                 for (size_t i = 0; i < stk_count; i++) {
                     m_all_factors[i] = std::move(all_stk_inds[i][0]);
                 }
             } else {
-                // 计算每支证券调整后的合成因子
+                // Calculate the adjusted composite factor of every security
                 m_all_factors = _calculate(all_stk_inds);
             }
         }
 
-        // 计算完成后创建截面索引
+        // Create the cross-sectional index after the calculation
         _buildIndex();
 
         if (!getParam<bool>("save_all_factors")) {
@@ -783,14 +818,16 @@ void MultiFactorBase::calculate() {
             m_stk_map = {};
         }
     } catch (...) {
-        // 失败清理：所有异步子任务已在 wait_and_drain 语义下结束，
-        // 清除基类半成品，保持未计算状态，原异常向上传播，允许下一调用者重试。
+        // The failure cleanup: all the asynchronous subtasks have ended under the wait_and_drain
+        // semantics, so the half-finished product of the base class is cleared, the not calculated
+        // state is kept, the original exception propagates up and the next caller may retry.
         clearCalculatedData();
         m_calculated.store(false, std::memory_order_relaxed);
         throw;
     }
 
-    // Publish：release 保证此前所有写入对后续 acquire 读取可见
+    // Publish: release guarantees that all the previous writes are visible to the subsequent
+    // acquire reads
     m_calculated.store(true, std::memory_order_release);
 }
 

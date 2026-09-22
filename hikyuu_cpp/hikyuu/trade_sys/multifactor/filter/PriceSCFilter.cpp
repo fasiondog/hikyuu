@@ -14,8 +14,8 @@ BOOST_CLASS_EXPORT(hku::PriceSCFilter)
 namespace hku {
 
 PriceSCFilter::PriceSCFilter() : ScoresFilterBase("SCFilter_Price") {
-    setParam<double>("min_price", 5.0);       // 最低价格
-    setParam<double>("max_price", 100000.0);  // 最高价格
+    setParam<double>("min_price", 5.0);       // Minimum price
+    setParam<double>("max_price", 100000.0);  // Maximum price
 }
 
 void PriceSCFilter::_checkParam(const string& name) const {
