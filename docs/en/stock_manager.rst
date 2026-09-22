@@ -1,581 +1,579 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/stock_manager.rst
-
 .. py:currentmodule:: hikyuu
 .. highlight:: python
 
-证券管理
-========
+Security Management
+===================
 
-构建K线查询条件
------------------
+Building the K-line Query Condition
+-----------------------------------
     
 .. py:class:: Query
 
-    K线数据查询条件，一般在Python中使用 Query 即可，不用指明 Query。
+    The K-line data query condition; generally in Python, using Query directly is enough, without specifying Query.
 
-    简化 :py:data:`Query.KType` 枚举值
+    The simplified :py:data:`Query.KType` enumeration values
     
-    - Query.DAY - 日线类型
-    - Query.WEEK - 周线类型
-    - Query.MONTH - 月线类型
-    - Query.QUARTER - 季线类型
-    - Query.HALFYEAR - 半年线类型
-    - Query.YEAR - 年线类型
-    - Query.MIN - 1分钟线类型
-    - Query.MIN5 - 5分钟线类型
-    - Query.MIN15 - 15分钟线类型
-    - Query.MIN30 - 30分钟线类型
-    - Query.MIN60 - 60分钟线类型
+    - Query.DAY - the daily line type
+    - Query.WEEK - the weekly line type
+    - Query.MONTH - the monthly line type
+    - Query.QUARTER - the quarterly line type
+    - Query.HALFYEAR - the half-year line type
+    - Query.YEAR - the yearly line type
+    - Query.MIN - the 1-minute line type
+    - Query.MIN5 - the 5-minute line type
+    - Query.MIN15 - the 15-minute line type
+    - Query.MIN30 - the 30-minute line type
+    - Query.MIN60 - the 60-minute line type
     
-    简化 :py:data:`Query.RecoverType` 枚举值
+    The simplified :py:data:`Query.RecoverType` enumeration values
     
-    - Query.NO_RECOVER      - 不复权
-    - Query.FORWARD         - 前向复权
-    - Query.BACKWARD        - 后向复权
-    - Query.EQUAL_FORWARD   - 等比前向复权
-    - Query.EQUAL_BACKWARD  - 等比后向复权
+    - Query.NO_RECOVER      - no recovery
+    - Query.FORWARD         - the forward recovery
+    - Query.BACKWARD        - the backward recovery
+    - Query.EQUAL_FORWARD   - the equal-ratio forward recovery
+    - Query.EQUAL_BACKWARD  - the equal-ratio backward recovery
 
     .. py:attribute:: start 
     
-        起始索引，当按日期查询方式创建时无效，为 constant.null_int64
+        The start index; it is invalid when created with the date query way, being constant.null_int64
         
     .. py:attribute:: end
 
-        结束索引，当按日期查询方式创建时无效，为 constant.null_int64
+        The end index; it is invalid when created with the date query way, being constant.null_int64
         
     .. py:attribute:: start_datetime
     
-        起始日期，当按索引查询方式创建时无效，为 constant.null_datetime
+        The start date; it is invalid when created with the index query way, being constant.null_datetime
         
     .. py:attribute:: end_datetime
     
-        结束日期，当按索引查询方式创建时无效，为 constant.null_datetime
+        The end date; it is invalid when created with the index query way, being constant.null_datetime
         
     .. py:attribute:: query_type
     
-        查询方式
+        The query way
         
     .. py:attribute:: ktype
     
-        查询的K线类型
+        The K-line type queried
         
     .. py:attribute:: recover_type
     
-        查询的复权类型
+        The recovery type queried
         
     .. py:attribute:: ktype_in_sec
     
-        获取ktype对应的秒数，返回 TimeDelta 对象
+        Get the number of the seconds corresponding to the ktype, returning a TimeDelta object
         
         :rtype: TimeDelta
     
     .. py:data:: QueryType
     
-        查询方式定义
+        The definition of the query ways
         
-        - DATE  - 按日期方式查询
-        - INDEX - 按索引方式查询
+        - DATE  - query by the date way
+        - INDEX - query by the index way
     
     .. py:data:: KType
     
-        K线类型枚举定义
+        The definition of the K-line type enumerations
         
-        - DAY      - 日线类型
-        - WEEK     - 周线类型
-        - MONTH    - 月线类型
-        - QUARTER  - 季线类型 
-        - HALFYEAR - 半年线类型 
-        - YEAR     - 年线类型 
-        - MIN      - 1分钟线类型
-        - MIN5     - 5分钟线类型
-        - MIN15    - 15分钟线类型
-        - MIN30    - 30分钟线类型
-        - MIN60    - 60分钟线类型    
+        - DAY      - the daily line type
+        - WEEK     - the weekly line type
+        - MONTH    - the monthly line type
+        - QUARTER  - the quarterly line type 
+        - HALFYEAR - the half-year line type 
+        - YEAR     - the yearly line type 
+        - MIN      - the 1-minute line type
+        - MIN5     - the 5-minute line type
+        - MIN15    - the 15-minute line type
+        - MIN30    - the 30-minute line type
+        - MIN60    - the 60-minute line type    
         
     .. py:data:: RecoverType
     
-        K线复权类别枚举定义
+        The definition of the K-line recovery type enumerations
     
-        - NO_RECOVER      - 不复权
-        - FORWARD         - 前向复权
-        - BACKWARD        - 后向复权
-        - EQUAL_FORWARD   - 等比前向复权
-        - EQUAL_BACKWARD  - 等比后向复权
+        - NO_RECOVER      - no recovery
+        - FORWARD         - the forward recovery
+        - BACKWARD        - the backward recovery
+        - EQUAL_FORWARD   - the equal-ratio forward recovery
+        - EQUAL_BACKWARD  - the equal-ratio backward recovery
 
     .. py:method:: is_right_opening(self)
 
-        判断是否为右开区间，即未指定结束时间
+        Judge whether it is a right-open interval, i.e. the end time is not specified
 
     .. py:method:: is_valid_ktype(self, ktype)
 
-        判断指定的K线类型是否有效
+        Judge whether the specified K-line type is valid
 
-        :param KType ktype: K线类型
-        :return: 是否有效
+        :param KType ktype: the K-line type
+        :return: whether it is valid
         :rtype: bool
 
     .. py:staticmethod:: is_base_ktype(ktype)
 
-        判断指定的K线类型是否为基础K线类型
+        Judge whether the specified K-line type is a basic K-line type
 
-        :param KType ktype: K线类型
-        :return: 是否为基础K线类型
+        :param KType ktype: the K-line type
+        :return: whether it is a basic K-line type
         :rtype: bool
 
     .. py:staticmethod:: is_extra_ktype(ktype)
 
-        判断指定的K线类型是否为扩展K线类型
+        Judge whether the specified K-line type is an extended K-line type
 
-        :param KType ktype: K线类型
-        :return: 是否为扩展K线类型
+        :param KType ktype: the K-line type
+        :return: whether it is an extended K-line type
         :rtype: bool
 
     .. py:staticmethod:: get_base_ktype_list()
 
-        获取所有基础K线类型
+        Get all the basic K-line types
 
-        :return: 基础K线类型列表
+        :return: the list of the basic K-line types
         :rtype: list[Query.KType]
 
     .. py:staticmethod:: get_extra_ktype_list()
 
-        获取所有扩展K线类型
+        Get all the extended K-line types
 
-        :return: 扩展K线类型列表
+        :return: the list of the extended K-line types
         :rtype: list[Query.KType]
 
     .. py:staticmethod:: get_ktype_in_min(ktype)
 
-        获取指定K线类型对应的分钟数
+        Get the number of the minutes corresponding to the specified K-line type
 
         :rtype: int
 
 
 StockManager/Block/Stock
------------------------------
+-------------------------
 
 .. py:class:: StockManager
 
-    证券信息管理类
+    The security information management class
     
     .. py:attribute:: data_ready
     
-        是否所有数据已准备就绪（加载完毕）
+        Whether all the data is ready (loaded)
         
     .. py:staticmethod:: instance()
     
-        获取StockManager单例实例
+        Get the StockManager singleton instance
         
     .. py:method:: init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param[, context])
     
-        初始化函数，必须在程序入口调用
+        The initialization function, which must be called at the program entry
         
-        :param Parameter base_info_param: 基础信息数据驱动参数
-        :param Parameter block_param: 板块信息数据驱动参数
-        :param Parameter kdata_param: K线数据驱动参数
-        :param Parameter preload_param: 预加载参数
-        :param Parameter hikyuu_param: 其他hikyuu参数
-        :param StrategyContext context: 策略上下文, 默认加载全部证券
+        :param Parameter base_info_param: the basic information data driver parameters
+        :param Parameter block_param: the block information data driver parameters
+        :param Parameter kdata_param: the K-line data driver parameters
+        :param Parameter preload_param: the preloading parameters
+        :param Parameter hikyuu_param: the other hikyuu parameters
+        :param StrategyContext context: the strategy context, loading all the securities by default
         
     .. py:method:: wait_data_ready(self)
     
-        简单阻塞，等待所有数据准备就绪（加载完毕）
+        A simple block, waiting for all the data to be ready (loaded)
         
     .. py:method:: cancel_load(self)
     
-        取消所有数据加载
+        Cancel all the data loading
        
     .. py:method:: get_base_info_parameter(self)
     
-        :return: 基础信息数据驱动参数
+        :return: the basic information data driver parameters
         :rtype: Parameter
         
     .. py:method:: get_block_parameter(self)
 
-        :return: 板块信息数据驱动参数
+        :return: the block information data driver parameters
         :rtype: Parameter
         
     .. py:method:: get_kdata_parameter(self)
     
-        :return: K线数据驱动参数
+        :return: the K-line data driver parameters
         :rtype: Parameter
         
     .. py:method:: get_preload_parameter(self)
     
-        :return: 预加载参数
+        :return: the preloading parameters
         :rtype: Parameter
         
     .. py:method:: get_hikyuu_parameter(self)
     
-        :return: 其他hikyuu参数
+        :return: the other hikyuu parameters
         :rtype: Parameter
 
     .. py:method:: get_context(self)
 
-        :return: 获取当前上下文
+        :return: get the current context
         :rtype: StrategyContext
 
     .. py:method:: set_plugin_path(self, path)
     
-        设置插件路径，仅在初始化之前设置有效
+        Set the plugin path, which is valid only when set before the initialization
         
     .. py:method:: get_plugin_path(self)
     
-        :return: 获取插件路径
+        :return: get the plugin path
         :rtype: str
         
     .. py:method:: set_language_path(self, path)
     
-        设置多语言支持的翻译文件所在路径，仅在初始化之前设置有效
+        Set the path of the translation files for the multi-language support, which is valid only when set before the initialization
     
     .. py:method:: reload(self)
     
-        重新加载所有证券数据
+        Reload all the security data
         
     .. py:method:: reload_with(self, context)
     
-        带策略上下文参数的重新加载，如果 context 中证券列表为空，将沿用原有 context
+        Reload with the strategy context parameter; if the security list in the context is empty, the original context will be used
         
-        :param StrategyContext context: 策略上下文
+        :param StrategyContext context: the strategy context
     
     .. py:method:: tmpdir(self)
     
-        获取用于保存零时变量等的临时目录，如未配置则为当前目录 由 m_config 中的"tmpdir"指定
+        Get the temporary directory used to save the temporary variables, etc.; if not configured, it is the current directory, specified by "tmpdir" in m_config
 
     .. py:method:: datadir(self)
 
-        获取财务数据目录
+        Get the finance data directory
     
     .. py:method:: get_market_list(self)
     
-        获取市场简称列表
+        Get the list of the market abbreviations
         
         :rtype: StringList
     
     .. py:method:: get_market_info(self, market)
     
-        获取相应的市场信息
+        Get the corresponding market information
         
-        :param string market: 指定的市场标识（市场简称）
-        :return: 相应的市场信息，如果相应的市场信息不存在，则返回Null<MarketInfo>()
+        :param string market: the specified market identifier (the market abbreviation)
+        :return: the corresponding market information; if the corresponding market information does not exist, return Null<MarketInfo>()
         :rtype: MarketInfo
     
     .. py:method:: get_market_stock(self, market)
     
-        获取指定市场的代表指数（可能为空）
+        Get the representative index of the specified market (may be empty)
         
-        :param string market: 指定的市场标识（市场简称）
-        :return: 相应的市场代表指数，如果相应的市场信息不存在，则返回Null<Stock>()
+        :param string market: the specified market identifier (the market abbreviation)
+        :return: the corresponding market representative index; if the corresponding market information does not exist, return Null<Stock>()
         :rtype: Stock
     
     .. py:method:: get_stock_type_info(self, stk_type)
     
-        获取相应的证券类型详细信息
+        Get the detailed information of the corresponding security type
         
-        :param int stk_type: 证券类型，参见： :py:data:`constant`
-        :return: 对应的证券类型信息，如果不存在，则返回Null<StockTypeInfo>()
+        :param int stk_type: the security type, see: :py:data:`constant`
+        :return: the corresponding security type information; if it does not exist, return Null<StockTypeInfo>()
         :rtype: StockTypeInfo
 
     .. py:method:: get_stock_type_list(self)
 
-        获取所有证券类型详细信息
+        Get the detailed information of all the security types
 
-        :return: 所有证券类型详细信息
+        :return: the detailed information of all the security types
         :rtype: DataFrame
         
     .. py:method:: get_stock(self, querystr)
     
-        根据"市场简称证券代码"获取对应的证券实例
+        Get the corresponding security instance by "market abbreviation + security code"
         
-        :param str querystr: 格式：“市场简称证券代码”，如"sh000001"
-        :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
+        :param str querystr: the format: "market abbreviation + security code", e.g. "sh000001"
+        :return: the corresponding security instance; if the instance does not exist, return Null<Stock>() without raising an exception
         :rtype: Stock
     
     .. py:method:: get_stock_list(self[, filter=None])
     
-        获取证券列表
+        Get the security list
         
-        :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数
+        :param func filter: a filter function whose input parameter is the stock and which returns True | False
         
     .. py:method:: __getitem__
 
-        同 get_stock
+        The same as get_stock
         
     .. py:method:: __len__
     
-        返回证券数量
+        Return the number of the securities
         
     .. py:method:: __iter__
     
-        遍历所有证券
+        Traverse all the securities
         
     .. py:method:: get_category_list(self)
     
-        获取所有板块分类
+        Get all the block categories
         
-        :return: 所有板块分类
+        :return: all the block categories
         :rtype: StringList
     
     .. py:method:: get_block(self, category, name)
     
-        获取预定义的板块
+        Get the predefined block
         
-        :param str category: 板块分类
-        :param str name: 板块名称
-        :return: 板块，如找不到返回空Block
+        :param str category: the block category
+        :param str name: the block name
+        :return: the block; if it cannot be found, return an empty Block
         :rtype: Block
 
     .. py:method:: add_block(self, block)
 
-        将独立的板块加入到数据库中，板块通过 category+name 区分，数据库中相同板块将被覆盖。注意，如果板块发生变化，需要调用 save_block 重新保存。
+        Add the independent block to the database; the blocks are distinguished by category+name, and the same block in the database will be overwritten. Note, if the block has changed, you need to call save_block to save it again.
 
-        :param Block block: 新增的板块
+        :param Block block: the newly added block
         
     .. py:method:: save_block(self, block)
     
-        保存发生变化后的板块至数据库
+        Save the changed block to the database
         
-        :param Block block: 板块实例
+        :param Block block: the block instance
 
     .. py:method:: remove_block(self, block)
 
-        从数据库系统中删除板块
+        Delete the block from the database system
 
-        :param Block block: 要删除的板块
+        :param Block block: the block to delete
         
     .. py:method:: get_block_list(self[, category])
     
-        获取指定分类的板块列表
+        Get the block list of the specified category
         
-        :param str category: 板块分类
-        :return: 板块列表
+        :param str category: the block category
+        :return: the block list
         :rtype: BlockList
 
     .. py:method:: get_block_list_by_index_stock(self, index_stk)
 
-        获取指定指数的板块列表
+        Get the block list of the specified index
 
-        :param Stock index_stk: 指数
-        :return: 板块列表
+        :param Stock index_stk: the index
+        :return: the block list
         :rtype: BlockList        
     
     .. py:method:: get_trading_calendar(self, query[, market='SH'])
                   get_trading_calendar(self, stk_list, query)
     
-        获取交易日历
+        Get the trading calendar
         
-        **方式一：** 获取指定市场的交易日历
+        **Way 1:** get the trading calendar of the specified market
         
-        :param Query query: Query查询条件
-        :param str market: 市场简称，默认为'SH'
-        :return: 日期列表
+        :param Query query: the Query condition
+        :param str market: the market abbreviation, defaulting to 'SH'
+        :return: the date list
         :rtype: DatetimeList
         
-        **方式二：** 根据指定的证券列表获取叠加后的交易日历（主要用于包含不同市场证券时）
+        **Way 2:** get the superimposed trading calendar according to the specified security list (mainly used when the securities of the different markets are included)
         
-        :param StockList stk_list: 股票列表
-        :param Query query: Query查询条件
-        :return: 日期列表
+        :param StockList stk_list: the stock list
+        :param Query query: the Query condition
+        :return: the date list
         :rtype: DatetimeList
         
     .. py:method:: is_holiday(self, d)
 
-        判断时间对应日期是否为节假日(仅使用A股市场)
+        Judge whether the date corresponding to the time is a holiday (only using the A-share market)
 
-        :param Datetime d: 指定的时间
+        :param Datetime d: the specified time
         :rtype: bool
 
     .. py:method:: is_trading_hours(self, d: Datetime, market: str)
 
-        判断指定时间对应的日期是否为交易时间
+        Judge whether the date corresponding to the specified time is the trading time
 
-        :param Datetime d: 待判断的时间
-        :param str market: 市场简称
-        :return: 是否为交易时间
+        :param Datetime d: the time to judge
+        :param str market: the market abbreviation
+        :return: whether it is the trading time
         :rtype: bool
     
 
     .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
 
-        从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。
+        Add a temporary Stock from the CSV files (the K-line data), which can be used for the temporary testing when there are only the K-line data in the CSV format.
 
-        添加的 stock 对应的 market 为 "TMP", 如需通过 sm 获取，需加入 tmp，如：sm['tmp0001']
+        The market of the added stock is "TMP"; if it needs to be obtained through sm, you need to add tmp, e.g.: sm['tmp0001']
         
-        CSV文件第一行为标题，需含有 Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
+        The first line of the CSV file is the header, which needs to contain Datetime (or Date, 日期), OPEN (or 开盘价), HIGH (or 最高价), LOW (or 最低价), CLOSE (or 收盘价), AMOUNT (or 成交金额), VOLUME (or VOL, COUNT, 成交量).
         
-        :param str code: 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>。
-        :param str day_filename: 日线CSV文件名
-        :param str min_filename: 分钟线CSV文件名
-        :param float tick: 最小跳动量，默认0.01
-        :param float tick_value: 最小跳动量价值，默认0.01
-        :param int precision: 价格精度，默认2
-        :param int min_trade_num: 单笔最小交易量，默认1
-        :param int min_trade_num: 单笔最大交易量，默认1000000
-        :return: 加入的Stock
+        :param str code: the security code numbered by yourself; it cannot be the same as the existing Stock, otherwise it will return Null<Stock>.
+        :param str day_filename: the daily-line CSV file name
+        :param str min_filename: the minute-line CSV file name
+        :param float tick: the minimum tick, defaulting to 0.01
+        :param float tick_value: the minimum tick value, defaulting to 0.01
+        :param int precision: the price precision, defaulting to 2
+        :param int min_trade_num: the minimum trading quantity per order, defaulting to 1
+        :param int min_trade_num: the maximum trading quantity per order, defaulting to 1000000
+        :return: the added Stock
         :rtype: Stock
 
     .. py:method:: remove_temp_csv_stock(self, code)
     
-        移除增加的临时Stock
+        Remove the added temporary Stock
         
-        :param str code: 创建时自定义的编码
+        :param str code: the custom code at the creation
 
     .. py:method:: add_stock(self, stock)
 
-        谨慎调用！！！仅供增加某些临时的外部 Stock, 通常配合 Stock.set_krecord_list 方法直接使用外部来源的数据
+        Call with caution!!! It is only used to add some temporary external Stocks, usually used together with the Stock.set_krecord_list method to directly use the data from the external sources
 
-        :param Stock stock: sm 外部自行创建的 Stock
+        :param Stock stock: the Stock created by yourself outside sm
 
     .. py:method:: remove_stock(self, market_code)
 
-        从 sm 中移除 market_code 代表的证券，谨慎使用！！！通常用于移除临时增加的外部 Stock
+        Remove the security represented by the market_code from sm; use with caution!!! It is usually used to remove the temporary external Stocks added
 
-        :param str market_code: 证券市场标识
+        :param str market_code: the security market identifier
 
     .. py:method:: get_history_finance_all_fields(self)
 
-        获取所有历史财务信息字段及其索引
+        Get all the historical finance information fields and their indexes
 
     .. py:method:: get_history_finance_field_index(self, name)
 
-        根据字段名称，获取历史财务信息相应字段索引
+        Get the index of the corresponding field of the historical finance information by the field name
 
     .. py:method:: get_history_finance_field_name(self, index)
 
-        根据字段索引，获取历史财务信息相应字段名
+        Get the corresponding field name of the historical finance information by the field index
 
 
 .. py:class:: Stock
 
-    证券对象
+    The security object
 
-    .. py:attribute:: id : 内部id，一般用于作为map的键值使用
-    .. py:attribute:: market : 获取所属市场简称，市场简称是市场的唯一标识
-    .. py:attribute:: code : 获取证券代码
-    .. py:attribute:: market_code : 市场简称+证券代码，如: sh000001
-    .. py:attribute:: name : 获取证券名称
+    .. py:attribute:: id : the internal id, generally used as the key of a map
+    .. py:attribute:: market : get the market abbreviation it belongs to; the market abbreviation is the unique identifier of the market
+    .. py:attribute:: code : get the security code
+    .. py:attribute:: market_code : the market abbreviation + the security code, e.g.: sh000001
+    .. py:attribute:: name : get the security name
     .. py:attribute:: type 
     
-        获取证券类型，参见：:py:data:`constant`
+        Get the security type, see: :py:data:`constant`
         
-    .. py:attribute:: valid : 该证券当前是否有效
-    .. py:attribute:: start_datetime : 证券起始日期
-    .. py:attribute:: last_datetime : 证券最后日期
-    .. py:attribute:: tick : 最小跳动量
-    .. py:attribute:: tick_value : 最小跳动量价值
-    .. py:attribute:: unit : 每单位价值 = tickValue / tick
-    .. py:attribute:: precision : 价格精度
-    .. py:attribute:: atom : 最小交易数量，同minTradeNumber
-    .. py:attribute:: min_trade_number : 最小交易数量
-    .. py:attribute:: max_trade_number : 最大交易数量
+    .. py:attribute:: valid : whether the security is currently valid
+    .. py:attribute:: start_datetime : the start date of the security
+    .. py:attribute:: last_datetime : the last date of the security
+    .. py:attribute:: tick : the minimum tick
+    .. py:attribute:: tick_value : the minimum tick value
+    .. py:attribute:: unit : the per-unit value = tickValue / tick
+    .. py:attribute:: precision : the price precision
+    .. py:attribute:: atom : the minimum trading quantity, the same as minTradeNumber
+    .. py:attribute:: min_trade_number : the minimum trading quantity
+    .. py:attribute:: max_trade_number : the maximum trading quantity
 
     .. py:method:: is_null(self)
     
-        是否为Null
+        Whether it is Null
     
         :rtype: bool
     
     .. py:method:: get_kdata(self, query)
     
-        获取K线数据
+        Get the K-line data
         
-        :param Query query: 查询条件
-        :return: 满足查询条件的K线数据
+        :param Query query: the query condition
+        :return: the K-line data satisfying the query condition
         :rtype: KData
     
     .. py:method:: get_count(self[, ktype=Query.DAY])
     
-        获取不同类型K线数据量
+        Get the amount of the K-line data of the different types
         
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录数
+        :param Query.KType ktype: the K-line data category
+        :return: the number of the K-line records
         :rtype: int
     
     .. py:method:: get_market_value(self, date, ktype)
     
-        获取指定时刻的市值，即小于等于指定时刻的最后一条记录的收盘价
+        Get the market value at the specified moment, i.e. the close price of the last record less than or equal to the specified moment
         
-        :param Datetime date: 指定时刻
-        :param Query.KType ktype: K线数据类别
-        :return: 指定时刻的市值
+        :param Datetime date: the specified moment
+        :param Query.KType ktype: the K-line data category
+        :return: the market value at the specified moment
         :rtype: float
     
     .. py:method:: get_krecord(self, pos[, ktype=Query.DAY])
     
-        获取指定索引的K线数据记录，未作越界检查
+        Get the K-line data record at the specified index, without the out-of-bounds check
         
-        :param int pos | Datetime datetime: 指定的索引位置，或日期
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录
+        :param int pos | Datetime datetime: the specified index position, or the date
+        :param Query.KType ktype: the K-line data category
+        :return: the K-line record
         :rtype: KRecord
     
     
     .. py:method:: get_krecord_list(self, start, end, ktype)
     
-        获取K线记录 [start, end)，一般不直接使用，用getKData替代
+        Get the K-line records [start, end); it is generally not used directly, replaced with getKData
         
-        :param int start: 起始位置
-        :param int end: 结束位置
-        :param Query.KType ktype: K线类别
-        :return: K线记录列表
+        :param int start: the start position
+        :param int end: the end position
+        :param Query.KType ktype: the K-line category
+        :return: the K-line record list
         :rtype: KRecordList
     
     .. py:method:: get_datetime_list(self, query)
     
-        获取日期列表
+        Get the date list
         
-        :param Query query: 查询条件
+        :param Query query: the query condition
         :rtype: DatetimeList
 
     .. py:method:: get_timeline_list(self, query)
     
-        获取分时线数据
+        Get the time-line data
         
-        :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
+        :param Query query: the query condition (the K-line type and the recovery type parameters in the query condition are useless at this time)
         :rtype: TimeLineList
     
     .. py:method:: get_trans_list(self, query)
     
-        获取历史分笔数据
+        Get the historical tick data
         
-        :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
+        :param Query query: the query condition (the K-line type and the recovery type parameters in the query condition are useless at this time)
         :rtype: TransList
 
     .. py:method:: get_weight(self[, start, end])
     
-        获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
+        Get the dividend information within the specified time range [start, end). When the start and the end moments are not specified, get all the dividend records.
         
-        :param Datetime start: 起始时刻
-        :param Datetime end: 结束时刻
+        :param Datetime start: the start moment
+        :param Datetime end: the end moment
         :rtype: StockWeightList
         
     .. py:method:: get_finance_info(self)
     
-        获取当前财务信息
+        Get the current finance information
         
         :rtype: Parameter
         
     .. py:method:: get_history_finance(self)
     
-        获取所有历史财务信息列表，字段信息可参考 StockManager 中的相关方法: get_history_finance_all_fields/get_history_finance_field_index/get_history_finance_field_name 方法
+        Get the list of all the historical finance information; for the field information, refer to the related methods in StockManager: the get_history_finance_all_fields/get_history_finance_field_index/get_history_finance_field_name methods
         
-        日常建议直接使用指标 FINANCE 获取财务数据
+        For the daily use, it is recommended to use the FINANCE indicator directly to get the finance data
         
-        :param Datetime date: 指定日期必须是0331、0630、0930、1231，如 Datetime(201109300000)
+        :param Datetime date: the specified date must be 0331, 0630, 0930, 1231, e.g. Datetime(201109300000)
         :rtype: list
     
     .. py:method:: set_krecord_list(self, krecord_list[, ktype=Query.DAY])
 
-        谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据
-        如果数据格式为 pandas.DataFrame, 可以使用 set_kdata_from_df 方法。
+        Call with caution!!! Set the current memory KRecordList directly; it is only used to set the K-line data for the external Stocks that need to be added temporarily.
+        If the data format is a pandas.DataFrame, you can use the set_kdata_from_df method.
 
-        :param sequence krecord_list: 一个可迭代变量获取 KRecord 实例的对象，如: list (仅包含 KRecord 实例)
-        :param Query.KType ktype: K线类别
+        :param sequence krecord_list: an object of an iterable variable to get the KRecord instances, e.g.: a list (containing only the KRecord instances)
+        :param Query.KType ktype: the K-line category
 
     .. py:method:: set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
 
-        谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
-        从 DataFrame 中获取 KRecordList, 并设置给当前Stock。df, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
+        Call with caution!!! Set the current memory data directly, which means the basic data of the Stock is changed.
+        Get the KRecordList from the DataFrame and set it to the current Stock. df must specify the column names in order, defaulting to: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
 
         .. code-block:: python
 
@@ -589,10 +587,10 @@ StockManager/Block/Stock
             print('query_history_k_data_plus respond error_code:'+rs.error_code)
             print('query_history_k_data_plus respond  error_msg:'+rs.error_msg)
 
-            #### 打印结果集 ####
+            #### Print the result set ####
             data_list = []
             while (rs.error_code == '0') & rs.next():
-                # 获取一条记录，将记录合并在一起
+                # Get a record and merge the records together
                 data_list.append(rs.get_row_data())
             result = pd.DataFrame(data_list, columns=rs.fields)
             print(result)
@@ -603,190 +601,189 @@ StockManager/Block/Stock
             stock.set_kdata_from_df(result)
             print(stock)        
 
-        :param DataFrame df: 输入数据
-        :param list cols: 列名
-        :param Query.KType ktype: K线类别
+        :param DataFrame df: the input data
+        :param list cols: the column names
+        :param Query.KType ktype: the K-line category
 
 
     .. py:method:: realtime_update(self, krecord)
     
-        （临时函数）只用于更新内存缓存中的日线数据
+        (A temporary function) only used to update the daily-line data in the memory cache
 
-        单机数据服务客户端模式下：普通证券（本地无缓冲）的更新经 IPC 转发至主进程应用并
-        镜像至共享内存（全体客户端可读）；临时证券（经 set_krecord_list 建有本地缓冲）则
-        就地更新本地缓存、不外发。
+        In the client mode of the single-machine data server: the update of the ordinary securities (no local buffer) is forwarded through IPC to the master process to apply and
+        mirrored into the shared memory (readable by all the clients); the temporary securities (with a local buffer created by set_krecord_list) are
+        updated in place in the local cache, without being sent out.
         
-        :param KRecord krecord: 新增的实时K线记录
+        :param KRecord krecord: the newly added real-time K-line record
         
     .. py:method:: get_last_update_time(self[, ktype=Query.DAY])
 
-        获取指定类型 K 线数据的最后更新时刻。单机数据服务客户端模式下，普通证券转发至
-        主进程取其缓冲刷新时刻，临时证券（经 set_krecord_list 指定外部数据）则返回本地写入时刻。
+        Get the last update moment of the specified type of the K-line data. In the client mode of the single-machine data server, the ordinary securities are forwarded to
+        the master process to take its buffer refresh moment; the temporary securities (with the external data specified by set_krecord_list) return the local writing moment.
 
-        :param Query.KType ktype: K线类型
+        :param Query.KType ktype: the K-line type
         :rtype: Datetime
 
     .. py:method:: load_kdata_to_buffer(self, ktype)
     
-        将指定类别的K线数据加载至内存缓存
+        Load the K-line data of the specified category into the memory cache
         
-        :param Query.KType ktype: K线类型
+        :param Query.KType ktype: the K-line type
 
     .. py:method:: release_kdata_buffer(self, ktype)
     
-        释放指定类别的内存K线数据
+        Release the memory K-line data of the specified category
         
-        :param Query.KType ktype: K线类型
+        :param Query.KType ktype: the K-line type
 
     .. py:method:: get_belong_to_block_list(self[, category=None])
     
-        获取所属板块列表
+        Get the list of the belonging blocks
 
-        :param str category: 指定的板块分类，为 None 时，返回所有板块分类下的所属板块
+        :param str category: the specified block category; when it is None, return the belonging blocks under all the block categories
         :rtype: list    
     
     
 .. py:class:: Block
 
-    板块类，可视为证券的容器
+    The block class, which can be regarded as a container of the securities
     
-    .. py:attribute:: category : 板块分类
-    .. py:attribute:: name : 板块名称
-    .. py:attribute:: index_stock: 对应指数（可能为空 Stock）
+    .. py:attribute:: category : the block category
+    .. py:attribute:: name : the block name
+    .. py:attribute:: index_stock: the corresponding index (may be an empty Stock)
     
     .. py:method:: __init__(self, category, name):
     
-        构建一个新的板块实例，并指定其板块分类及板块名称
+        Build a new block instance and specify its block category and block name
     
-        :param str category: 板块分类
-        :param srt name: 板块名称
+        :param str category: the block category
+        :param srt name: the block name
 
     .. py:method:: __init__(self, block):
     
-        通过其他板块实例构建新的板块实例
+        Build a new block instance from another block instance
     
-        :param Block block: 板块实例
+        :param Block block: the block instance
     
     .. py:method:: size(self)
     
-        包含的证券数量
+        The number of the contained securities
         
     .. py:method:: empty(self)
     
-        是否为空
+        Whether it is empty
         
     .. py:method:: get(self, market_code)
 
-        根据"市场简称证券代码"获取对应的证券实例
+        Get the corresponding security instance by "market abbreviation + security code"
 
-        :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
-        :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
+        :param str market_code: the format: "market abbreviation + security code", e.g. "sh000001"
+        :return: the corresponding security instance; if the instance does not exist, return Null<Stock>() without raising an exception
         :rtype: Stock
 
     .. py:method:: add(self, stock)
     
-        加入指定的证券
+        Add the specified security
         
-        :param Stock stock: 待加入的证券
-        :return: 是否成功加入
+        :param Stock stock: the security to add
+        :return: whether it was added successfully
         :rtype: bool
         
         add(self, market_code)
     
-        根据"市场简称证券代码"加入指定的证券
+        Add the specified security by "market abbreviation + security code"
         
-        :param str market_code: 市场简称证券代码
-        :return: 是否成功加入
+        :param str market_code: the market abbreviation + the security code
+        :return: whether it was added successfully
         :rtype: bool
 
     .. py:method:: remove(self, stock)
     
-        移除指定证券
+        Remove the specified security
         
-        :param Stock stock: 指定的证券
-        :return: 是否成功
+        :param Stock stock: the specified security
+        :return: whether it was successful
         :rtype: bool
         
         remove(self, market_code)
     
-        移除指定证券
+        Remove the specified security
         
-        :param str market_code: 市场简称证券代码
-        :return: 是否成功
+        :param str market_code: the market abbreviation + the security code
+        :return: whether it was successful
         :rtype: bool
         
     .. py:method:: clear(self)
 
-        移除包含的所有证券
+        Remove all the contained securities
         
     .. py:method:: __len__(self)  
 
-        包含的证券数量
+        The number of the contained securities
         
     .. py:method:: __getitem__(self, market_code)
     
-        根据"市场简称证券代码"获取对应的证券实例
+        Get the corresponding security instance by "market abbreviation + security code"
         
-        :param str market_code: 格式：“市场简称证券代码”，如"sh000001"
-        :return: 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
+        :param str market_code: the format: "market abbreviation + security code", e.g. "sh000001"
+        :return: the corresponding security instance; if the instance does not exist, return Null<Stock>() without raising an exception
         :rtype: Stock        
-
      
 
-其它证券信息定义
-------------------
+Other Security Information Definitions
+--------------------------------------
 
 .. py:class:: StockTypeInfo
 
-    股票类型详情记录
+    The stock type detail record
     
-    .. py:attribute:: type : 证券类型
-    .. py:attribute:: description : 描述信息
-    .. py:attribute:: tick : 最小跳动量
-    .. py:attribute:: tick_value : 每一个tick价格
-    .. py:attribute:: unit : 每最小变动量价格，即单位价格 = tickValue/tick
-    .. py:attribute:: precision : 价格精度
-    .. py:attribute:: min_trade_num : 每笔最小交易量
-    .. py:attribute:: max_trade_num : 每笔最大交易量
+    .. py:attribute:: type : the security type
+    .. py:attribute:: description : the description information
+    .. py:attribute:: tick : the minimum tick
+    .. py:attribute:: tick_value : the price of each tick
+    .. py:attribute:: unit : the price of each minimum change, i.e. the unit price = tickValue/tick
+    .. py:attribute:: precision : the price precision
+    .. py:attribute:: min_trade_num : the minimum trading quantity per order
+    .. py:attribute:: max_trade_num : the maximum trading quantity per order
 
 
 .. py:class:: StockWeight
 
-    权息记录
+    The dividend record
     
-    .. py:attribute:: datetime : 权息日期
-    .. py:attribute:: count_as_gift : 每10股送X股
-    .. py:attribute:: count_for_sell : 每10股配X股
-    .. py:attribute:: price_for_sell : 配股价
-    .. py:attribute:: bonus : 每10股红利
-    .. py:attribute:: increasement : 每10股转增X股
-    .. py:attribute:: total_count : 总股本（万股）
-    .. py:attribute:: free_count : 流通股（万股）
+    .. py:attribute:: datetime : the dividend date
+    .. py:attribute:: count_as_gift : X shares sent per 10 shares
+    .. py:attribute:: count_for_sell : X shares allotted per 10 shares
+    .. py:attribute:: price_for_sell : the allotment price
+    .. py:attribute:: bonus : the dividend per 10 shares
+    .. py:attribute:: increasement : X shares converted per 10 shares
+    .. py:attribute:: total_count : the total share capital (10,000 shares)
+    .. py:attribute:: free_count : the circulating shares (10,000 shares)
     
 
 .. py:class:: StockWeightList
 
-    std::vector<StockWeight> 包装，见 :py:class:`StockWeight`
+    A wrapper of std::vector<StockWeight>, see :py:class:`StockWeight`
 
     .. py:method:: to_numpy(self)
 
-        转为 numpy 数组
+        Convert to a numpy array
 
     .. py:method:: to_pandas(self)
 
-        转为 pandas DataFrame
+        Convert to a pandas DataFrame
 
     .. py:method:: to_pyarrow(self)
 
-        转为 pyarrow Table
+        Convert to a pyarrow Table
 
 
 .. py:class:: MarketInfo
 
-    市场信息记录
+    The market information record
     
-    .. py:attribute:: market : 市场简称（如：沪市“SH”, 深市“SZ”）
-    .. py:attribute:: name : 市场全称
-    .. py:attribute:: description :描述说明
-    .. py:attribute:: code : 该市场对应的主要指数，用于获取交易日历
-    .. py:attribute:: last_datetime : 该市场K线数据最后交易日期
+    .. py:attribute:: market : the market abbreviation (e.g.: the Shanghai market "SH", the Shenzhen market "SZ")
+    .. py:attribute:: name : the full name of the market
+    .. py:attribute:: description : the description
+    .. py:attribute:: code : the main index corresponding to this market, used to get the trading calendar
+    .. py:attribute:: last_datetime : the last trading date of the K-line data of this market

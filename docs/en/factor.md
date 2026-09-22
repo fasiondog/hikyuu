@@ -1,611 +1,609 @@
-<!-- TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/factor.md -->
+# Factor Management
 
-# 因子管理
+hikyuu provides a complete factor management system, including the management of the single factor Factor and the factor set FactorSet. A factor is the basic building block of the quantitative analysis, usually composed of the technical indicators or the other calculation formulas.
 
-hikyuu提供了完善的因子管理体系，包括单个因子 Factor 和因子集合 FactorSet 的管理。因子是量化分析的基础构建块，通常由技术指标或其他计算公式构成。
+## Best Practices
 
-## 最佳实践
+1. **Naming convention**: the factor names should be descriptive and are not case-sensitive
+2. **Factor set organization**: organize the related factors into the same FactorSet for easy management
+3. **Data validation**: use the `check=True` parameter to verify whether the stock list belongs to the specified block
+4. **Factor update**: after the daily market data download is completed, `update_all_factors_values()` should be called in time to update all the stored factor values, ensuring that the factor data is synchronized with the market data. This method is not integrated into HikyuuTdx and importdata, and needs to be called manually by yourself, because sometimes a data check is needed, and the factor values are saved only after confirming that the data is correct.
+5. **Saving the factor values**: for the high-frequency aggregated factor values or the high-frequency factor values, it is recommended to set `need_save_value=True` and save them to the database. Because of Hikyuu's ultra-high calculation speed, the ordinary daily-frequency factor values (such as MA5) are usually not recommended to be saved to the database, because reading the factor values from the storage is slower, **which is different from the habit of the other quantitative frameworks relying on the factor storage to improve the speed**. It is recommended to test and decide by yourself according to your needs. Usually the original factor values are saved directly, without the cross-section, the standardization, etc.; these can be done by the MF. For the factors needing the cross-section values, the corresponding security set usually needs to be specified, which can be specified directly by Factor and FactorSet.
 
-1. **命名规范**: 因子名称应具有描述性且不区分大小写
-2. **因子集组织**: 将相关的因子组织到同一个FactorSet中便于管理
-3. **数据验证**: 使用 `check=True` 参数验证股票列表是否属于指定板块
-4. **因子更新**: 每日行情数据下载完成后，应及时调用 `update_all_factors_values()` 更新所有存储的因子值，确保因子数据与行情数据同步。该方法未集成到 HikyuuTdx 和 importdata 中，需要自行手工调用，原因是有时需要进行数据检查，确认数据无误后再进行因子值保存。
-5. **因子值保存**: 对于高频聚合的因子值或高频因子值，建议设置 `need_save_value=True` 并保存到数据库。由于 Hikyuu的超高计算速度，普通的日频因子值(如MA5)，通常不建议保存到数据库，因为从存储中读取因子值速度更更慢，**这和其他的量化框架依赖因子存储来提升速度的习惯有所不同**。建议自行根据需要测试决定。通常直接保存原始因子值，不需要进行截面、标准化等处理，可以由 MF 完成。对需要截面值的因子，通常需要指定对应的证券集，Factor和FactorSet直接指定。
+6. **Saving the special factor values**: for the special factor values not calculated through the indicators (such as PRICELIST or Indicator()), you can use the `save_special_values_to_db()` method to save the pre-calculated factor values directly
+7. **Using the donating user features**: ⚠️ the database storage and reading operations related to the factors are all the donating user features, and the database engine only supports ClickHouse. Before using them, please confirm that you have obtained the corresponding permissions. Including but not limited to: `save_to_db()`, `remove_from_db()`, `save_values()`, `get_all_values()`, `get_values()` and the other database-related operation methods.
 
-6. **特殊因子值保存**: 对于不通过指标计算的特殊因子值（如PRICELIST或Indicator()），可以使用 `save_special_values_to_db()` 方法直接保存预计算的因子值
-7. **捐赠用户功能使用**: ⚠️ 因子相关的数据库存储和读取操作均为捐赠用户功能，数据库引擎仅支持ClickHouse。使用前请确认已获得相应权限。包括但不限于：`save_to_db()`、`remove_from_db()`、`save_values()`、`get_all_values()`、`get_values()` 等涉及数据库的操作方法。
+## Notes
 
-## 注意事项
+- The combination of the factor name and the K-line type is the unique identifier
+- When adding a factor with the same name to the FactorSet, the original factor will be overwritten
+- The factors in the factor set keep the adding order
+- The date alignment of the factor calculation results needs the reference security to synchronize
+- ⚠️ All the database-related operation methods are the donating user features, supporting only the ClickHouse database engine
+- **Block change handling**: when the block (the security set) of a Factor or a FactorSet changes, the system will not automatically update the saved factor values. If the stock set changes, you need to delete the original factor/factor set and recreate it yourself, or directly create a new factor/factor set. It is recommended to explicitly specify a fixed security set at the creation, avoiding the later changes.
 
-- 因子名称和K线类型的组合是唯一的标识符
-- FactorSet 添加同名因子时会覆盖原有的因子
-- 因子集中的因子保持添加顺序
-- 因子计算结果的日期对齐需要参考证券进行同步
-- ⚠️ 所有涉及数据库的操作方法均为捐赠用户功能，仅支持ClickHouse数据库引擎
-- **Block变更处理**：当Factor或FactorSet的block（证券集合）发生变化时，系统不会自动更新已保存的因子值。如果股票集发生变化，需要自行删除原有因子/因子集后重新创建，或直接创建新的因子/因子集。建议在创建时就明确指定固定的证券集合，避免后续变更。
+## The Factor Class
 
-## Factor类
+The Factor class is used to represent a single factor, containing the basic information of the factor, the calculation formula and the related attributes.
 
-Factor 类用于表示单个因子，包含了因子的基本信息、计算公式和相关属性。
-
-### Factor构造函数
+### The Factor Constructor
 
 ```
-# 默认构造函数
+# The default constructor
 Factor()
 
-# 只指定名称和K线类型（用于从数据库加载已有因子）
+# Only specify the name and the K-line type (used to load the existing factor from the database)
 Factor(name, ktype=KQuery.DAY)
 
-# 创建新的因子对象
+# Create a new factor object
 Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=False, start_date=Datetime.min(), block=Block(), recover_type=KQuery.NO_RECOVER)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子名称
-- `formula` (Indicator): 计算公式指标，一旦创建不可更改
-- `ktype` (KQuery.KType): K线类型，默认为日线
-- `brief` (str): 简要描述，默认为空
-- `details` (str): 详细描述，默认为空
-- `need_save_value` (bool): 是否需要持久化保存因子值数据，默认为False。设置为True时，将因子指定股票集合从start_date开始的计算值保存到数据库中。由于Hikyuu的计算速度远快于数据库存储，通常日频因子计算的各证券值不建议保存到数据库，需要保存到数据库的通常为高频聚合到日频的因子值或高频因子值
+- `name` (str): the factor name
+- `formula` (Indicator): the calculation formula indicator, which cannot be changed once created
+- `ktype` (KQuery.KType): the K-line type, defaulting to the daily line
+- `brief` (str): the brief description, defaulting to empty
+- `details` (str): the detailed description, defaulting to empty
+- `need_save_value` (bool): whether the factor value data needs to be persisted, defaulting to False. When it is set to True, the calculated values of the specified stock set of the factor starting from start_date are saved to the database. Since Hikyuu's calculation speed is much faster than the database storage, the values of each security calculated by the ordinary daily-frequency factors are usually not recommended to be saved to the database; what usually needs to be saved to the database is the factor values aggregated from the high frequency to the daily frequency or the high-frequency factor values
 
-- `start_date` (Datetime): 开始日期，数据存储时的起始日期，默认为最小日期
-- `block` (Block): 板块信息，证券集合，如果为空则为全部，默认为空
-- `recover_type` (KQuery.RecoverType): 恢复类型，默认为 NO_RECOVER
+- `start_date` (Datetime): the start date, the starting date when storing the data, defaulting to the minimum date
+- `block` (Block): the block information, the security set; if it is empty, it is all, defaulting to empty
+- `recover_type` (KQuery.RecoverType): the recovery type, defaulting to NO_RECOVER
 
-**注意:** 因子名称不区分大小写，以 `name + ktype` 作为唯一标识
+**Note:** the factor name is not case-sensitive, with `name + ktype` as the unique identifier
 
-### Factor属性
+### The Factor Attributes
 
-| 属性                | 类型         | 描述                     |
+| Attribute                | Type         | Description                     |
 | ------------------- | ------------ | ------------------------ |
-| `name`            | str          | 因子名称                 |
-| `ktype`           | KQuery.KType | 因子频率类型             |
-| `create_at`       | Datetime     | 创建日期                 |
-| `update_at`       | Datetime     | 更改日期                 |
-| `formula`         | Indicator    | 因子计算公式             |
-| `start_date`      | Datetime     | 数据存储起始日期         |
-| `block`           | Block        | 证券集合                 |
-| `brief`           | str          | 基础说明                 |
-| `details`         | str          | 详细说明                 |
-| `need_save_value` | bool         | 是否持久化保存因子值数据 |
+| `name`            | str          | the factor name                 |
+| `ktype`           | KQuery.KType | the factor frequency type             |
+| `create_at`       | Datetime     | the creation date                 |
+| `update_at`       | Datetime     | the modification date                 |
+| `formula`         | Indicator    | the factor calculation formula             |
+| `start_date`      | Datetime     | the start date of the data storage         |
+| `block`           | Block        | the security set                 |
+| `brief`           | str          | the basic description                 |
+| `details`         | str          | the detailed description                 |
+| `need_save_value` | bool         | whether to persist the factor value data |
 
-### 方法
+### The Methods
 
-#### 通用方法
+#### The Common Methods
 
 ```
-# 检查因子是否为空
+# Check whether the factor is empty
 is_null = factor.is_null()
 ```
 
-**返回值:**
+**Return value:**
 
-- `bool`: 如果因子为空返回 True，否则返回 False
+- `bool`: if the factor is empty, return True; otherwise, return False
 
-#### 数据库操作 ⚠️ 捐赠用户功能
+#### The Database Operations ⚠️ Donating user features
 
 <div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>以下数据库操作方法均为捐赠用户功能，仅支持ClickHouse数据库引擎。</p>
+<p class="admonition-title">Note</p>
+<p>The following database operation methods are all the donating user features, supporting only the ClickHouse database engine.</p>
 </div>
 
 ```
-# 保存因子元数据到数据库 ⚠️ 捐赠用户功能
+# Save the factor metadata to the database ⚠️ Donating user feature
 factor.save_to_db()
 
-# 从数据库中删除因子及其数据 ⚠️ 捐赠用户功能
+# Delete the factor and its data from the database ⚠️ Donating user feature
 factor.remove_from_db()
 
-# 特殊因子保存值到数据库 ⚠️ 捐赠用户功能
+# Save the special factor values to the database ⚠️ Donating user feature
 factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 
-#### 数据获取 ⚠️ 捐赠用户功能
+#### Getting the Data ⚠️ Donating user features
 
 <div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>以下数据获取方法，如因子值本身存储在数据库中，则需 捐赠用户 权限，仅支持 ClickHouse 数据库引擎。</p>
+<p class="admonition-title">Note</p>
+<p>For the following data getting methods, if the factor values themselves are stored in the database, the donating user permission is required, supporting only the ClickHouse database engine.</p>
 </div>
 
 ```
-# 获取单个证券的计算结果 ⚠️ 捐赠用户功能
+# Get the calculation result of a single security ⚠️ Donating user feature
 result = factor.get_value(stock, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 
-# 获取所有计算结果 ⚠️ 捐赠用户功能
+# Get all the calculation results ⚠️ Donating user feature
 results = factor.get_all_values(query, align=False, fill_null=False, tovalue=False, align_dates=DatetimeList())
 
-# 获取指定证券列表的计算结果 ⚠️ 捐赠用户功能
+# Get the calculation results of the specified security list ⚠️ Donating user feature
 results = factor.get_values(stocks, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 
-# 保存计算结果到数据库 ⚠️ 捐赠用户功能
+# Save the calculation results to the database ⚠️ Donating user feature
 factor.save_values(stocks, query, replace=False)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `stock` (Stock): 证券对象（仅 get_value 方法）
-- `query` (Query): 查询参数
-- `align` (bool): 是否对齐日期，默认 False
-- `fill_null` (bool): 是否填充空值，默认 False
-- `tovalue` (bool): 是否转换为数值，默认 False
-- `check` (bool): 是否检查股票属于自身指定的 block，默认 False（仅 get_value 和 get_values 方法）
-- `align_dates` (DatetimeList): 对齐日期列表，默认为空
-- `stocks` (sequence): 证券列表
-- `replace` (bool): 是否替换已有数据，默认 False
+- `stock` (Stock): the security object (only the get_value method)
+- `query` (Query): the query parameters
+- `align` (bool): whether to align the dates, defaulting to False
+- `fill_null` (bool): whether to fill the empty values, defaulting to False
+- `tovalue` (bool): whether to convert to the values, defaulting to False
+- `check` (bool): whether to check that the stocks belong to the block specified by itself, defaulting to False (only the get_value and the get_values methods)
+- `align_dates` (DatetimeList): the aligned date list, defaulting to empty
+- `stocks` (sequence): the security list
+- `replace` (bool): whether to replace the existing data, defaulting to False
 
-**返回值:**
+**Return values:**
 
-- `get_value`: 返回单个 Indicator 对象，表示指定证券的计算结果
-- `get_all_values`: 返回 Indicator 列表，包含所有证券的计算结果
-- `get_values`: 返回 Indicator 列表，按股票顺序排列的计算结果
+- `get_value`: return a single Indicator object, representing the calculation result of the specified security
+- `get_all_values`: return a list of the Indicators, containing the calculation results of all the securities
+- `get_values`: return a list of the Indicators, the calculation results arranged by the stock order
 
-#### 特殊因子值保存方法 ⚠️ 捐赠用户功能
+#### The Special Factor Value Saving Method ⚠️ Donating user features
 
-对于某些特殊因子，其值不是通过指标公式计算得出，而是预先准备好的数据，可以使用特殊因子值保存方法。该方法支持两种输入格式：
+For some special factors, whose values are not calculated through the indicator formulas but are pre-prepared data, the special factor value saving method can be used. This method supports two input formats:
 
-##### 重载版本1：保存Indicator对象
+##### Overloaded version 1: save the Indicator object
 
 ```
-# 保存Indicator对象的结果数据 ⚠️ 捐赠用户功能
+# Save the result data of the Indicator object ⚠️ Donating user feature
 factor.save_special_values_to_db(stock, indicator, replace=False)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `stock` (Stock): 证券对象
-- `indicator` (Indicator): 已计算好的指标对象（必须已绑定K线数据）
-- `replace` (bool): 是否替换已有数据，默认False
+- `stock` (Stock): the security object
+- `indicator` (Indicator): the already calculated indicator object (it must have been bound to the K-line data)
+- `replace` (bool): whether to replace the existing data, defaulting to False
 
-##### 重载版本2：保存预计算数据
+##### Overloaded version 2: save the pre-calculated data
 
 ```
-# 保存预计算的日期-值对数据 ⚠️ 捐赠用户功能
+# Save the pre-calculated date-value pair data ⚠️ Donating user feature
 factor.save_special_values_to_db(stock, dates, values, replace=False)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `stock` (Stock): 证券对象
-- `dates` (DatetimeList): 因子值对应的日期列表
-- `values` (PriceList): 因子值列表
-- `replace` (bool): 是否替换已有数据，默认False
+- `stock` (Stock): the security object
+- `dates` (DatetimeList): the date list corresponding to the factor values
+- `values` (PriceList): the factor value list
+- `replace` (bool): whether to replace the existing data, defaulting to False
 
-**使用场景:**
+**Usage scenarios:**
 
-- 保存复合指标计算结果
-- 保存外部导入的财务数据
-- 保存机器学习模型预测结果
-- 保存人工标注的特殊因子值
-- 保存从其他数据源获取的因子数据
+- Save the composite indicator calculation results
+- Save the externally imported finance data
+- Save the machine learning model prediction results
+- Save the manually annotated special factor values
+- Save the factor data obtained from the other data sources
 
-**注意事项:**
+**Notes:**
 
-- 当使用Indicator对象时，该对象必须已经绑定了具体的K线数据（即有有效的context）
-- 当使用日期-值对时，日期列表和值列表长度必须相等
-- Indicator对象可以通过 `.getDateList()`和 `.getResult(0)`方法提取所需数据
+- When using the Indicator object, the object must have been bound to the specific K-line data (i.e. having a valid context)
+- When using the date-value pairs, the date list and the value list must have the equal length
+- The Indicator object can extract the needed data through the `.getDateList()` and the `.getResult(0)` methods
 
-### Factor使用示例
+### The Factor Usage Example
 
 ```
 from hikyuu import *
 
-# 创建因子对象
+# Create the factor object
 special_factor = Factor("SPECIAL_FACTOR", PRICELIST(), KQuery.DAY, "特殊因子", "预计算因子值")
 special_factor.save_to_db()
 
 stock = sm['sh600000']
 
-# 方式1：保存Indicator对象
+# Way 1: save the Indicator object
 k_data = stock.getKData(Query(Datetime(20240101), Datetime(20240110)))
 complex_indicator = MA(CLOSE(), 10)(k_data) + RSI(CLOSE(), 14)(k_data) * 0.1
 special_factor.save_special_values_to_db(stock, complex_indicator)
 
-# 方式2：保存预计算的日期-值对
+# Way 2: save the pre-calculated date-value pairs
 dates = DatetimeList([Datetime(20240101), Datetime(20240102), Datetime(20240103)])
 values = PriceList([1.2, 1.5, 1.3])
 special_factor.save_special_values_to_db(stock, dates, values)
 
-# 从Indicator提取数据保存示例
+# An example of extracting the data from the Indicator to save
 extracted_dates = complex_indicator.getDateList()
 extracted_values = complex_indicator.getResult(0)
 special_factor.save_special_values_to_db(stock, extracted_dates, extracted_values)
 
-# 验证保存结果
+# Verify the saving result
 query_test = Query(Datetime(20240101), Datetime(20240110))
 saved_values = special_factor.get_values([stock], query_test)
 print(f"保存的因子值: {saved_values[0].getResult(0)}")
 ```
 
-## FactorSet类
+## The FactorSet Class
 
-`FactorSet` 类用于管理一组相关的因子，提供批量操作和集合管理功能。
+The `FactorSet` class is used to manage a group of the related factors, providing the batch operations and the set management functions.
 
-### FactorSet构造函数
+### The FactorSet Constructor
 
 ```
-# 默认构造函数
+# The default constructor
 FactorSet()
 
-# 创建指定名称和类型的因子集
+# Create the factor set with the specified name and type
 FactorSet(name, ktype=KQuery.DAY, block=Block())
 
-# 使用指标列表创建因子集合
+# Create the factor set with an indicator list
 FactorSet(inds, ktype=KQuery.DAY)
 
-# 使用因子列表创建因子集合
+# Create the factor set with a factor list
 FactorSet(factors[, ktype=KQuery.DAY[, block=Block(), name='']])
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子集名称
-- `ktype` (KQuery.KType): K线类型，默认为日线
-- `block` (Block): 板块信息，证券集合，默认为空
-- `inds` (list): 指标列表
-- `factors` (list): 因子列表
+- `name` (str): the factor set name
+- `ktype` (KQuery.KType): the K-line type, defaulting to the daily line
+- `block` (Block): the block information, the security set, defaulting to empty
+- `inds` (list): the indicator list
+- `factors` (list): the factor list
 
-**注意:** 使用指标列表或因子列表创建时，同名的指标/因子会被覆盖，最终保留最后一个同名指标/因子
+**Note:** when creating with an indicator list or a factor list, the indicators/factors with the same name will be overwritten, and finally the last indicator/factor with the same name is kept
 
-### FactorSet属性
+### The FactorSet Attributes
 
-| 属性      | 类型         | 描述             |
+| Attribute      | Type         | Description             |
 | --------- | ------------ | ---------------- |
-| `name`  | str          | 因子集名称       |
-| `ktype` | KQuery.KType | 因子集频率类型   |
-| `block` | Block        | 因子集对应的板块 |
+| `name`  | str          | the factor set name       |
+| `ktype` | KQuery.KType | the factor set frequency type   |
+| `block` | Block        | the block corresponding to the factor set |
 
-### 基本方法
+### The Basic Methods
 
 ```
-# 检查是否为空
+# Check whether it is empty
 is_empty = factor_set.empty()
 
-# 清空因子集
+# Clear the factor set
 factor_set.clear()
 
-# 检查是否为null值
+# Check whether it is a null value
 is_null = factor_set.is_null()
 
-# 获取因子数量
+# Get the number of the factors
 count = len(factor_set)
 ```
 
-### 因子管理方法
+### The Factor Management Methods
 
 ```
-# 添加因子
-factor_set.add(factor)           # 添加单个Factor对象
-factor_set.add(indicator)        # 添加Indicator对象
-factor_set.add(indicator_list)   # 添加Indicator列表
-factor_set.add(factor_list)      # 添加Factor列表
+# Add the factors
+factor_set.add(factor)           # add a single Factor object
+factor_set.add(indicator)        # add an Indicator object
+factor_set.add(indicator_list)   # add an Indicator list
+factor_set.add(factor_list)      # add a Factor list
 
-# 检查是否存在指定因子
+# Check whether the specified factor exists
 exists = factor_set.has_factor("MA5")
 
-# 获取指定因子
+# Get the specified factor
 factor = factor_set.get_factor("MA5")
 
-# 移除因子
+# Remove the factor
 factor_set.remove_factor("MA5")
 
-# 获取所有因子
+# Get all the factors
 factors = factor_set.get_factors()
 ```
 
-### 数据获取方法
+### The Data Getting Methods
 
 ```
-# 获取所有因子的计算结果
+# Get the calculation results of all the factors
 all_results = factor_set.get_all_values(query, align=False, fill_null=False, tovalue=False, align_dates=DatetimeList())
 
-# 获取指定证券列表的计算结果
+# Get the calculation results of the specified security list
 results = factor_set.get_values(stocks, query, align=False, fill_null=False, tovalue=False, check=False, align_dates=DatetimeList())
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `query` (Query): 查询参数
-- `align` (bool): 是否对齐日期，默认False
-- `fill_null` (bool): 是否填充空值，默认False
-- `tovalue` (bool): 是否转换为数值，默认False
-- `check` (bool): 是否检查股票列表属于自身指定的block，默认False
-- `align_dates` (DatetimeList): 对齐日期列表，默认为空
-- `stocks` (sequence): 证券列表
+- `query` (Query): the query parameters
+- `align` (bool): whether to align the dates, defaulting to False
+- `fill_null` (bool): whether to fill the empty values, defaulting to False
+- `tovalue` (bool): whether to convert to the values, defaulting to False
+- `check` (bool): whether to check that the stock list belongs to the block specified by itself, defaulting to False
+- `align_dates` (DatetimeList): the aligned date list, defaulting to empty
+- `stocks` (sequence): the security list
 
-### 迭代器支持
+### The Iterator Support
 
 ```
-# 遍历所有因子
+# Traverse all the factors
 for factor in factor_set:
     print(f"因子名称: {factor.name}")
 
-# 通过索引访问
+# Access by the index
 first_factor = factor_set[0]
 named_factor = factor_set["MA5"]
 ```
 
-### FactorSet使用示例
+### The FactorSet Usage Example
 
 ```
 from hikyuu import *
 
-# 创建多个技术指标因子
+# Create the technical indicator factors
 ma5 = MA(CLOSE(), 5)
 ma10 = MA(CLOSE(), 10)
 rsi = RSI(CLOSE(), 14)
 
-# 设置因子名称
+# Set the factor names
 ma5.name = "MA5"
 ma10.name = "MA10" 
 rsi.name = "RSI"
 
-# 创建因子集
+# Create the factor set
 factor_set = FactorSet("技术指标因子集", KQuery.DAY)
 
-# 添加因子
+# Add the factors
 factor_set.add(ma5)
 factor_set.add(ma10)
 factor_set.add(rsi)
 
-# 或者直接从指标列表创建
+# Or create it directly from the indicator list
 indicators = [ma5, ma10, rsi]
 factor_set2 = FactorSet(indicators, KQuery.DAY)
 
 print(f"因子集包含 {len(factor_set)} 个因子")
 
-# 遍历因子
+# Traverse the factors
 for factor in factor_set:
     print(f"- {factor.name}: {factor.brief}")
 
-# 获取计算结果
-stocks = blocka.get_stock_list()[:10]  # 获取前10只A股
+# Get the calculation results
+stocks = blocka.get_stock_list()[:10]  # get the first 10 A-shares
 query = Query(Datetime(20240101), Datetime(20241231))
 results = factor_set.get_values(stocks, query)
 
-# 检查特定因子
+# Check the specific factor
 if factor_set.has_factor("MA5"):
     ma5_factor = factor_set.get_factor("MA5")
     print(f"找到MA5因子: {ma5_factor.details}")
 ```
 
-## 与多因子合成的结合使用
+## Combining with the Multi-factor Composition
 
-因子和因子集可以与多因子合成算法配合使用：
+The factors and the factor sets can be used together with the multi-factor composition algorithms:
 
 ```
 from hikyuu import *
 
-# 方法1: 使用Indicator列表
+# Way 1: use an Indicator list
 indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
 weights = [0.6, 0.4]
 mf1 = MF_Weight(indicators, stocks, weights, query)
 
-# 方法2: 使用FactorSet
+# Way 2: use a FactorSet
 factor_set = FactorSet(indicators)
 mf2 = MF_Weight(factor_set, stocks, weights, query)
 
-# 等权重合成
+# Compose with the equal weights
 mf_equal = MF_EqualWeight(factor_set, stocks, query)
 ```
 
-## 全局因子管理函数 ⚠️ 捐赠用户功能
+## The Global Factor Management Functions ⚠️ Donating user features
 
 <div class="admonition warning">
-<p class="admonition-title">⚠️ 重要提醒</p>
-<p>以下所有全局因子管理函数均为捐赠用户功能，数据库引擎仅支持ClickHouse。</p>
+<p class="admonition-title">⚠️ Important reminder</p>
+<p>All the following global factor management functions are the donating user features, and the database engine only supports ClickHouse.</p>
 </div>
 
-除了Factor和FactorSet类的方法外，hikyuu还提供了一系列全局函数用于因子的数据库管理和批量操作。
+Besides the methods of the Factor and the FactorSet classes, hikyuu also provides a series of the global functions for the database management and the batch operations of the factors.
 
-### 因子数据库操作 ⚠️ 捐赠用户功能
+### The Factor Database Operations ⚠️ Donating user features
 
-#### has_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
+#### has_factor(name[, ktype=KQuery.DAY]) ⚠️ Donating user feature
 
-检查指定名称和类型的因子是否存在于数据库中
+Check whether the factor with the specified name and type exists in the database
 
 ```python
 from hikyuu import *
 
-# 检查日线因子是否存在 ⚠️ 捐赠用户功能
+# Check whether the daily-line factor exists ⚠️ Donating user feature
 exists = has_factor("MA5")
-# 检查周线因子是否存在 ⚠️ 捐赠用户功能
+# Check whether the weekly-line factor exists ⚠️ Donating user feature
 weekly_exists = has_factor("MA5", KQuery.WEEK)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子名称
-- `ktype` (KQuery.KType): K线类型，默认为日线
+- `name` (str): the factor name
+- `ktype` (KQuery.KType): the K-line type, defaulting to the daily line
 
-**返回值:** `bool` - 如果因子存在返回 True，否则返回 False
+**Return value:** `bool` - if the factor exists, return True; otherwise, return False
 
-#### get_factor(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
+#### get_factor(name[, ktype=KQuery.DAY]) ⚠️ Donating user feature
 
-获取指定名称和类型的因子元数据
+Get the factor metadata with the specified name and type
 
 ```python
 from hikyuu import *
 
-# 获取日线因子 ⚠️ 捐赠用户功能
+# Get the daily-line factor ⚠️ Donating user feature
 factor = get_factor("MA5")
-# 获取周线因子 ⚠️ 捐赠用户功能
+# Get the weekly-line factor ⚠️ Donating user feature
 weekly_factor = get_factor("MA5", KQuery.WEEK)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子名称
-- `ktype` (KQuery.KType): K线类型，默认为日线
+- `name` (str): the factor name
+- `ktype` (KQuery.KType): the K-line type, defaulting to the daily line
 
-**返回值:** 因子对象，如果不存在则返回空因子
+**Return value:** the factor object; if it does not exist, return an empty factor
 
-#### save_factor(factor[, update_before=True]) ⚠️ 捐赠用户功能
+#### save_factor(factor[, update_before=True]) ⚠️ Donating user feature
 
-保存因子到数据库
+Save the factor to the database
 
 ```python
-# 创建并保存因子（默认会检查并更新已有因子）⚠️ 捐赠用户功能
+# Create and save the factor (by default it will check and update the existing factor) ⚠️ Donating user feature
 ma5 = MA(CLOSE(), 5)
 ma5.name = "MA5"
 ma5_factor = Factor("MA5", ma5)
 save_factor(ma5_factor)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `factor` (Factor): 要保存的因子对象
-- `update_before` (bool): 是否在保存前检查并更新已有因子，默认为True。注意：通常必须为true，否则会导致数据错误，除非确定所有因子值都已更新
+- `factor` (Factor): the factor object to save
+- `update_before` (bool): whether to check and update the existing factor before saving, defaulting to True. Note: it usually must be true, otherwise it will cause the data errors, unless it is certain that all the factor values have been updated
 
-**注意:** 以 `name + ktype` 作为唯一标识
+**Note:** with `name + ktype` as the unique identifier
 
-#### remove_factor(name, ktype) ⚠️ 捐赠用户功能
+#### remove_factor(name, ktype) ⚠️ Donating user feature
 
-从数据库中删除因子
+Delete the factor from the database
 
 ```python
-# 删除指定因子 ⚠️ 捐赠用户功能
+# Delete the specified factor ⚠️ Donating user feature
 remove_factor("MA5", KQuery.DAY)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子名称
-- `ktype` (KQuery.KType): K线类型
+- `name` (str): the factor name
+- `ktype` (KQuery.KType): the K-line type
 
-**注意:** 以 `name + ktype` 作为唯一标识
+**Note:** with `name + ktype` as the unique identifier
 
-#### get_all_factors() ⚠️ 捐赠用户功能
+#### get_all_factors() ⚠️ Donating user feature
 
-获取所有因子元数据
+Get all the factor metadata
 
 ```python
-# 获取所有因子 ⚠️ 捐赠用户功能
+# Get all the factors ⚠️ Donating user feature
 all_factors = get_all_factors()
 print(f"共有 {len(all_factors)} 个因子")
 
-# 遍历所有因子
+# Traverse all the factors
 for factor in all_factors:
     print(f"- {factor.name} ({factor.ktype})")
 ```
 
-**返回值:** 所有因子对象列表
+**Return value:** the list of all the factor objects
 
-#### update_all_factors_values([ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
+#### update_all_factors_values([ktype=KQuery.DAY]) ⚠️ Donating user feature
 
-更新所有因子值（增量更新）
+Update all the factor values (an incremental update)
 
 ```python
-# 更新所有日线因子值 ⚠️ 捐赠用户功能
+# Update all the daily-line factor values ⚠️ Donating user feature
 update_all_factors_values()
 
-# 更新所有周线因子值 ⚠️ 捐赠用户功能
+# Update all the weekly-line factor values ⚠️ Donating user feature
 update_all_factors_values(KQuery.WEEK)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `ktype` (KQuery.KType): K线类型，默认为日线
+- `ktype` (KQuery.KType): the K-line type, defaulting to the daily line
 
-**使用场景:** 每日行情数据下载完成后，可以调用此函数更新所有存储的因子值。该操作为增量更新，只计算新增数据部分，提高更新效率。
+**Usage scenario:** after the daily market data download is completed, this function can be called to update all the stored factor values. This operation is an incremental update, calculating only the newly added data part, improving the update efficiency.
 
 #### is_valid_factor_name(name)
 
-验证因子名称是否合法
+Validate whether the factor name is legal
 
 ```python
 from hikyuu import *
 
-# 验证因子名称是否合法
+# Validate whether the factor name is legal
 is_valid = is_valid_factor_name("MA5")
 print(f"MA5 是否为合法因子名称: {is_valid}")
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子名称
+- `name` (str): the factor name
 
-**返回值:** `bool` - 如果名称合法返回 True，否则返回 False
+**Return value:** `bool` - if the name is legal, return True; otherwise, return False
 
-**注意:** 该函数主要用于 ClickHouse 数据库驱动，非 ClickHouse 驱动下始终返回 True
+**Note:** this function is mainly used for the ClickHouse database driver, and it always returns True under the non-ClickHouse drivers
 
-### 因子集数据库操作 ⚠️ 捐赠用户功能
+### The Factor Set Database Operations ⚠️ Donating user features
 
-#### save_factorset(set) ⚠️ 捐赠用户功能
+#### save_factorset(set) ⚠️ Donating user feature
 
-保存因子集到数据库
+Save the factor set to the database
 
 ```python
-# 创建并保存因子集 ⚠️ 捐赠用户功能
+# Create and save the factor set ⚠️ Donating user feature
 indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
 factor_set = FactorSet(indicators)
 factor_set.name = "均线因子集"
 save_factorset(factor_set)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `set` (FactorSet): 要保存的因子集对象
+- `set` (FactorSet): the factor set object to save
 
-**注意:** 以 `name + ktype` 作为唯一标识
+**Note:** with `name + ktype` as the unique identifier
 
-#### get_factorset(name[, ktype=KQuery.DAY]) ⚠️ 捐赠用户功能
+#### get_factorset(name[, ktype=KQuery.DAY]) ⚠️ Donating user feature
 
-获取因子集
+Get the factor set
 
 ```python
-# 获取因子集 ⚠️ 捐赠用户功能
+# Get the factor set ⚠️ Donating user feature
 factor_set = get_factorset("均线因子集")
-# 获取周线因子集 ⚠️ 捐赠用户功能
+# Get the weekly-line factor set ⚠️ Donating user feature
 weekly_set = get_factorset("均线因子集", KQuery.WEEK)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子集名称
-- `ktype` (KQuery.KType): K线类型，默认为日线
+- `name` (str): the factor set name
+- `ktype` (KQuery.KType): the K-line type, defaulting to the daily line
 
-**返回值:** 因子集对象，如果不存在则返回空因子集
+**Return value:** the factor set object; if it does not exist, return an empty factor set
 
-#### remove_factorset(name, ktype) ⚠️ 捐赠用户功能
+#### remove_factorset(name, ktype) ⚠️ Donating user feature
 
-从数据库中删除因子集
+Delete the factor set from the database
 
 ```python
-# 删除指定因子集 ⚠️ 捐赠用户功能
+# Delete the specified factor set ⚠️ Donating user feature
 remove_factorset("均线因子集", KQuery.DAY)
 ```
 
-**参数说明:**
+**Parameter descriptions:**
 
-- `name` (str): 因子集名称
-- `ktype` (KQuery.KType): K线类型
+- `name` (str): the factor set name
+- `ktype` (KQuery.KType): the K-line type
 
-**注意:** 以 `name + ktype` 作为唯一标识
+**Note:** with `name + ktype` as the unique identifier
 
-#### get_all_factorsets() ⚠️ 捐赠用户功能
+#### get_all_factorsets() ⚠️ Donating user feature
 
-获取所有因子集
+Get all the factor sets
 
 ```python
-# 获取所有因子集 ⚠️ 捐赠用户功能
+# Get all the factor sets ⚠️ Donating user feature
 all_sets = get_all_factorsets()
 print(f"共有 {len(all_sets)} 个因子集")
 
-# 遍历所有因子集
+# Traverse all the factor sets
 for factor_set in all_sets:
     print(f"- {factor_set.name} ({factor_set.ktype}): {len(factor_set)}个因子")
 ```
 
-**返回值:** 所有因子集对象列表
+**Return value:** the list of all the factor set objects
 
-### 全局因子管理使用示例
+### The Global Factor Management Usage Example
 
 ```
 from hikyuu import *
 
-# 1. 创建并管理因子
+# 1. Create and manage the factors
 ma5 = MA(CLOSE(), 5)
 ma5.name = "MA5"
 ma5_factor = Factor("MA5", ma5, brief="5日均线")
@@ -614,70 +612,70 @@ rsi = RSI(CLOSE(), 14)
 rsi.name = "RSI"
 rsi_factor = Factor("RSI", rsi, brief="14日相对强弱指数")
 
-# 保存到数据库
-# 也可以不保存，保存到数据库的优势：后续可以直接: ma5 = Factor('MA5) , 会自动从数据库加载获取因子定义
-# 默认创建的因子 need_save_value=False，如需同时保存因子值，需将 need_save_value=True，保存时将自动计算所有因子值并存储
+# Save to the database
+# It can also be not saved; the advantage of saving to the database: later you can directly: ma5 = Factor('MA5), which will automatically load and get the factor definition from the database
+# The factor created by default has need_save_value=False; if you also need to save the factor values, you need to set need_save_value=True; when saving, all the factor values will be calculated and stored automatically
 save_factor(ma5_factor)
 save_factor(rsi_factor)
 
-# 2. 创建因子集
+# 2. Create the factor set
 tech_indicators = [ma5, rsi]
 factor_set = FactorSet(tech_indicators)
 factor_set.name = "技术指标集"
 save_factorset(factor_set)
 
-# 3. 查询和使用
-# 获取所有因子
+# 3. Query and use
+# Get all the factors
 all_factors = get_all_factors()
 print(f"数据库中共有 {len(all_factors)} 个因子")
 
-# 获取特定因子集
+# Get the specific factor set
 loaded_set = get_factorset("技术指标集")
 if not loaded_set.is_null():
     print(f"加载因子集: {loaded_set.name}, 包含 {len(loaded_set)} 个因子")
   
-    # 使用因子集进行计算
+    # Use the factor set to calculate
     stocks = blocka.get_stock_list()[:5]
     query = Query(Datetime(20240101), Datetime(20241231))
     results = loaded_set.get_values(stocks, query)
     print("计算完成")
 
-# 4. 清理不需要的因子
+# 4. Clean up the unneeded factors
 # remove_factor("MA5", KQuery.DAY)
 # remove_factorset("技术指标集", KQuery.DAY)
 ```
 
-## 常见问题 FAQ
+## FAQ
 
-### Q: 因子值的精度是如何保证的？
+### Q: How is the precision of the factor values guaranteed?
 
-**A:** 系统使用float64存储，支持双精度浮点数，能够精确表示大部分金融计算所需的数值范围。
+**A:** The system uses float64 to store, supporting the double-precision floating-point numbers, which can precisely represent the numerical range needed by most of the financial calculations.
 
-### Q: 对于高频因子值有什么特殊考虑吗？
+### Q: Are there any special considerations for the high-frequency factor values?
 
-**A:** 高频因子值的处理建议：
-- 考虑是否真的需要保存到数据库（Hikyuu计算速度很快）
-- 根据实际需求测试决定存储策略
+**A:** The suggestions for handling the high-frequency factor values:
+- Consider whether it is really necessary to save them to the database (Hikyuu's calculation speed is very fast)
+- Test and decide the storage strategy according to the actual needs
 
-### Q: 当我修改了因子的证券集合（block）后，之前保存的因子值如何更新？
+### Q: When I have modified the security set (block) of the factor, how are the previously saved factor values updated?
 
-**A:** 当Factor或FactorSet的block（证券集合）发生变化时，系统不会自动更新已保存的因子值。如果您修改了股票集合，您有两种处理方式：
+**A:** When the block (the security set) of a Factor or a FactorSet changes, the system will not automatically update the saved factor values. If you have modified the stock set, you have two ways to handle it:
 
-1. **删除重建**：删除原有因子/因子集，然后重新创建并保存
+1. **Delete and recreate**: delete the original factor/factor set, and then recreate and save it
    ```python
-   # 删除旧的因子
+   # Delete the old factor
    remove_factor("MY_FACTOR", KQuery.DAY)
    
-   # 创建并保存新的因子
+   # Create and save the new factor
    new_factor = Factor("MY_FACTOR", formula, block=new_block)
    save_factor(new_factor)
    ```
 
-2. **新建因子**：使用不同的名称创建新因子/因子集
+2. **Create a new factor**: create a new factor/factor set with a different name
    ```python
-   # 创建带版本标识的新因子
+   # Create the new factor with a version identifier
    updated_factor = Factor("MY_FACTOR_V2", formula, block=new_block)
    save_factor(updated_factor)
    ```
 
-我们建议在创建因子时就明确指定固定的证券集合，尽量避免后续变更，这样可以减少不必要的维护工作。
+We recommend explicitly specifying a fixed security set when creating the factor, avoiding the later changes as much as possible, which can reduce the unnecessary maintenance work.
