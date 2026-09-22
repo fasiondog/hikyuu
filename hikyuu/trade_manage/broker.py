@@ -35,29 +35,29 @@ from hikyuu.util import hku_error
 
 
 class OrderBrokerWrap(OrderBrokerBase):
-    """订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
-       包装只有买卖操作参数只有(code, price, num)的交易接口类
+    """Order broker wrapper class, users can refer to it to customize their own order broker and add extra processing
+       Wraps the trading interface classes whose buy/sell operation parameters are only (code, price, num)
     """
 
     def __init__(self, broker, name):
         """
-        订单代理包装类，用户可以参考自定义自己的订单代理，加入额外的处理
+        Order broker wrapper class, users can refer to it to customize their own order broker and add extra processing
         """
         super(OrderBrokerWrap, self).__init__(name)
         self._broker = broker
 
     def _buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         """
-        实现 OrderBrokerBase 的 _buy 接口
-        :param str market: 证券市场    
-        :param str code: 证券代码
-        :param float price: 买入价格
-        :param int num: 买入数量        
+        Implement the _buy interface of OrderBrokerBase
+        :param str market: the stock market
+        :param str code: the stock code
+        :param float price: the buy price
+        :param int num: the buy number
         """
         self._broker.buy(market, code, price, num, stoploss, goal_price, part_from, remark)
 
     def _sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from, remark=""):
-        """实现 OrderBrokerBase 的 _sell 接口"""
+        """Implement the _sell interface of OrderBrokerBase"""
         self._broker.sell(market, code, price, num, stoploss, goal_price, part_from, remark)
 
     def _get_asset_info(self):
@@ -72,24 +72,24 @@ class OrderBrokerWrap(OrderBrokerBase):
 
 
 class TestOrderBroker:
-    """用于测试的订单代理，仅在执行买入/卖出时打印信息"""
+    """An order broker for testing, only prints the information when executing the buy/sell"""
 
     def __init__(self):
         pass
 
     def buy(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
-        print(f"买入：{market}{code}, 价格: {price}, 数量: {num} 预期止损价: {stoploss}, 预期目标价: {goal_price}, 信号来源: {part_from}, 备注: {remark}")
+        print(f"Buy: {market}{code}, price: {price}, number: {num}, expected stop-loss price: {stoploss}, expected goal price: {goal_price}, signal source: {part_from}, remark: {remark}")
 
     def sell(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
-        print(f"卖出：{market}{code}, 价格: {price}, 数量: {num}, 信号来源: {part_from}, 备注: {remark}")
+        print(f"Sell: {market}{code}, price: {price}, number: {num}, signal source: {part_from}, remark: {remark}")
 
 
 def crtOB(broker, name="NO_NAME"):
     """
-    快速生成订单代理包装对象
+    Quickly create an order broker wrapper object
 
-    :param broker: 订单代理示例，必须拥有buy和sell方法，并且参数为 code, price, num
-    :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，
-                        否则忽略; 对卖出操作无效，立即以当前价卖出
+    :param broker: the order broker instance, must have the buy and sell methods, and the parameters are code, price, num
+    :param float slip: place the order if the absolute difference between the current sell-1 price and the indicated buy price does not exceed slip,
+                        otherwise ignore; it has no effect on the sell operation, which sells immediately at the current price
     """
     return OrderBrokerWrap(broker, name)

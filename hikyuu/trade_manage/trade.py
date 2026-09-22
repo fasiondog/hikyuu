@@ -47,7 +47,7 @@ PositionRecordList.to_pandas = PositionRecordList.to_df
 
 
 def Performance_to_df(per):
-    """将 Performance 统计结果转换为 DataFrame 格式"""
+    """Convert the Performance statistics result to a DataFrame"""
     return pd.DataFrame(dict(name=per.names(), value=per.values()))
 
 
