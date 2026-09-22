@@ -12,9 +12,10 @@
 namespace hku {
 
 /**
- * 10年期中国国债收益率
- * @note 优先使用上下文中日期作为参考日期
- * @param default_val 如果指定日期早于已有的最早国债数据，此时使用该指定默认值
+ * Yield of the 10-year Chinese treasury bond
+ * @note The date in the context is used as the reference date with priority
+ * @param default_val if the given date is earlier than the existing earliest treasury bond data,
+ *                    this given default value is used
  * @return Indicator
  */
 Indicator HKU_API ZHBOND10(double default_val = 4.0);

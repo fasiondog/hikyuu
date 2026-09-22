@@ -16,9 +16,12 @@
 namespace hku {
 
 /*
- * N周期内首个条件成立位置, N为0时，为整个序列
- * 用法：BARSSINCEN(X,N):N周期内第一次X不为0到现在的周期数,N为常量BARSSINCEN(X,N):
- * 例如：BARSSINCEN(HIGH>10,10)表示10个周期内股价超过10元时到当前的周期数
+ * The position where the condition first holds within N periods; when N is 0 it is the whole
+ * sequence
+ * Usage: BARSSINCEN(X,N): the number of periods from the first time X is not 0 within N periods
+ * until now, N is a constant BARSSINCEN(X,N):
+ * For example: BARSSINCEN(HIGH>10,10) gives the number of periods from the time the stock price
+ * exceeds 10 yuan within 10 periods until now
  */
 class IBarsSince : public IndicatorImp {
     INDICATOR_IMP(IBarsSince)

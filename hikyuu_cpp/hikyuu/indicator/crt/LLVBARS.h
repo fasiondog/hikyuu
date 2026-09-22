@@ -16,11 +16,12 @@
 namespace hku {
 
 /**
- * 上一低点位置 求上一低点到当前的周期数。
+ * Position of the previous low; the number of periods from the previous low to the current one.
  * @details
  * <pre>
- * 用法：LLVBARS(X,N):求N周期内X最低值到当前周期数N=0表示从第一个有效值开始统计
- * 例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
+ * Usage: LLVBARS(X,N): the number of periods from the lowest value of X within N periods until now;
+ * N=0 means counting starts from the first valid value
+ * For example: LLVBARS(HIGH,20) gives the number of periods from the 20-day lowest point until now
  * </pre>
  * @ingroup Indicator
  */

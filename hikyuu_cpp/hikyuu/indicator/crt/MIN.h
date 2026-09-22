@@ -1,7 +1,7 @@
 /*
  * MIN.h
  *
- *  Created on: 2019年4月8日
+ *  Created on: 2019-4-8
  *      Author: fasiondog
  */
 
@@ -18,11 +18,11 @@ namespace hku {
 #endif
 
 /**
- * 求最小值
+ * Calculate the minimum
  * @details
  * <pre>
- * 用法: MIN(A,B)返回A和B中的较小值
- * 例如: MIN(CLOSE,OPEN)返回开盘价和收盘价中的较小值
+ * Usage: MIN(A,B) returns the smaller one of A and B
+ * For example: MIN(CLOSE,OPEN) returns the smaller one of the open price and the close price
  * </pre>
  * @ingroup Indicator
  */

@@ -12,10 +12,10 @@
 namespace hku {
 
 /**
- * 替换指定数值，通常用于替换 Nan 值
- * @param old_val 要替换的数值
- * @param new_val 替换后的数值
- * @param ignore_discard 忽略 discard，如果替换 nan 值，新discard将被设置为 0
+ * Replace the given value, it is usually used to replace the Nan values
+ * @param old_val the value to be replaced
+ * @param new_val the replaced value
+ * @param ignore_discard ignore discard; if the nan values are replaced, the new discard is set to 0
  * @ingroup Indicator
  */
 Indicator HKU_API REPLACE(double old_val = Null<double>(), double new_val = 0.0,

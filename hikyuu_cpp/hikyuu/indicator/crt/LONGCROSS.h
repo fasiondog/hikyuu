@@ -18,11 +18,11 @@
 namespace hku {
 
 /**
- * 两条线维持一定周期后交叉
+ * Two lines cross after maintaining for a certain number of periods
  * @details
  * <pre>
- * LONGCROSS(A,B,N) 表示 A 在 N 周期内都小于 B，
- * 本周期从下方向上穿过 B 时返回 1，否则返回 0。
+ * LONGCROSS(A,B,N) means A is less than B within N periods,
+ * and it returns 1 when A crosses B upward from below in the current period, otherwise 0.
  * </pre>
  * @ingroup Indicator
  */

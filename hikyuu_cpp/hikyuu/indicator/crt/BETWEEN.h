@@ -1,7 +1,7 @@
 /*
  * BETWEEN.h
  *
- *  Created on: 2019年4月8日
+ *  Created on: 2019-4-8
  *      Author: fasiondog
  */
 
@@ -14,11 +14,12 @@
 namespace hku {
 
 /**
- * 介于(介于两个数之间)
+ * Between (between two numbers)
  * @details
  * <pre>
- * 用法：BETWEEN(A,B,C)表示A处于B和C之间时返回1，否则返回0
- * 例如：BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5))表示收盘价介于5日均线和10日均线之间
+ * Usage: BETWEEN(A,B,C) returns 1 when A is between B and C, otherwise it returns 0
+ * For example: BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5)) means the close price is between the 5-day
+ * moving average and the 10-day moving average
  * @ingroup Indicator
  * </pre>
  */
