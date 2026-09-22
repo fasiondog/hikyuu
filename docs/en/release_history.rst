@@ -1,4 +1,5 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/release_history.rst
+.. Note: The historical release notes are intentionally kept in Chinese only; they are not translated
+.. into English. For the future English release notes, see docs/en/release.md.
 
 历史版本发布说明
 =======================
