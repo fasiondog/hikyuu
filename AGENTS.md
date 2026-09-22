@@ -45,7 +45,7 @@ hikyuu/
 │   ├── cpp/                  # 编译产物目录：core310~core313.so、lib*.dylib 等（gitignore）
 │   ├── test/                 # Python 测试（test.py 为入口）
 │   └── examples/             # 示例与 notebook 教程
-├── docs/                     # Sphinx 文档（docs/source，中文；docs/make.sh 构建）
+├── docs/                     # Sphinx 文档（双源：docs/zh 中文 + docs/en 英文；docs/make.sh 构建）
 ├── test_data/                # C++ 测试数据（运行测试时自动拷贝）
 ├── i18n/                     # 国际化/语言文件
 ├── docker/                   # 容器化配置
@@ -157,7 +157,7 @@ TEST_CASE("test_IniParser_hasSection") {
 | Lua    | `.lua-format`                             | 构建脚本格式化                                                                    |
 
 - 提交前用 `clang-format` / `yapf` 格式化改动文件，避免与现有风格偏离。
-- 新增公开 API 需要同步维护 `.pyi` 存根（`hikyuu/__init__.pyi`、`core.pyi`、`extend.pyi` 及 `hikyuu/cpp/core3xx.pyi`）以及文档（`docs/source/`）。
+- 新增公开 API 需要同步维护 `.pyi` 存根（`hikyuu/__init__.pyi`、`core.pyi`、`extend.pyi` 及 `hikyuu/cpp/core3xx.pyi`）以及文档（`docs/zh/` 与 `docs/en/`，两棵树需成对更新、结构保持一致）。
 
 ### 命名规范（C++）
 
@@ -239,9 +239,12 @@ pybind11-stubgen -o . hikyuu
 
 ## 7. 文档
 
-- Sphinx + myst_parser，源文件在 `docs/source/`（`.rst` 与 `.md` 混用， 新增文件时优先使用md），默认中文。
-- 本地构建：`cd docs && ./make.sh`（即 `sphinx-build -M html source build`）。
-- 修改公开接口/新增组件时同步更新 `docs/source/` 下对应章节（`indicator/`、`trade_sys/`、`trade_manage/`、`stock_manager.rst`、`factor.md` 等）。
+- Sphinx + myst_parser，**双源双语**：`docs/zh/`（中文）与 `docs/en/`（英文）是两棵**独立 Sphinx 树**，各自 `conf.py`，不使用 gettext。
+- 文件仍以 `.rst` 与 `.md` 混用（新增文件优先 `.md`）。
+- 本地构建：`cd docs && ./make.sh`（构建两棵树 → `build/html/{en,zh}`）；`./make.sh en` / `./make.sh zh` 只构建单树。
+- **必须成对维护**：改动任一语言文档时，同 PR 内同步另一棵树，保持文件集合 / toctree / 标题层级 / label / 图片 / 代码块一致。
+- 修改公开接口/新增组件时同步更新 **两棵树**下对应章节（`indicator/`、`trade_sys/`、`trade_manage/`、`stock_manager.rst`、`factor.md` 等）。
+- RTD 托管配置：`docs/en/.readthedocs.yaml`、`docs/zh/.readthedocs.yaml`（仓库根**不放**配置文件）；跨语言跳转由 RTD Flyout 提供，源内禁止硬编码 `/en/`、`/zh-cn/` 链接。
 
 ## 8. AI 开发工作流与注意事项
 

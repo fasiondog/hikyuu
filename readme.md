@@ -1,4 +1,4 @@
-![title](docs/source/_static/00000-title.png)
+![title](docs/zh/_static/00000-title.png)
 
 ---
 
@@ -125,7 +125,7 @@ sys.run(sm['sz000001'], Query(-150))
 对系统化交易方法进行轻量化抽象，涵盖 **市场环境判断、系统有效条件、信号指示器、止损 / 止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配** 等核心组件。你可以基于这些组件自由搭建专属策略库，灵活组合、高效回测，并在策略探索时专注于单一模块的效果与影响，大幅提升研究效率。
 
 <p align="center">
-  <img src="docs/source/_static/10002-function-arc.png" alt="功能架构" width="800">
+  <img src="docs/zh/_static/10002-function-arc.png" alt="功能架构" width="800">
 </p>
 
 ### 🚀 极致性能，轻松构建专属量化应用
@@ -180,7 +180,7 @@ sys.run(sm['sz000001'], Query(-150))
 ```
 
 <p align="center">
-  <img src="docs/source/_static/10000-overview.png" alt="回测结果示意" width="900">
+  <img src="docs/zh/_static/10000-overview.png" alt="回测结果示意" width="900">
 </p>
 
 > 📖 **完整示例参见**：[Jupyter Notebook 系列教程](https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
@@ -227,7 +227,7 @@ sys.run(sm['sz000001'], Query(-150))
 ## ❤️ 感谢捐赠，让 Hikyuu 走得更远
 
 <p align="center">
-  <img src="docs/source/_static/dingyue.png" alt="订阅二维码" width="600">
+  <img src="docs/zh/_static/dingyue.png" alt="订阅二维码" width="600">
 </p>
 
 | 方案                       | 说明                                                                                            | 方式               | 链接                                       |
@@ -242,7 +242,7 @@ sys.run(sm['sz000001'], Query(-150))
 捐赠用户支持群（仅接受捐赠用户，入群请注明： Hikyuu 订阅）
 
 <p align="center">
-  <img src="docs/source/_static/support.jpg" alt="捐赠用户支持" width="150">
+  <img src="docs/zh/_static/support.jpg" alt="捐赠用户支持" width="150">
 </p>
 
 ## 🌟 需要的帮助
