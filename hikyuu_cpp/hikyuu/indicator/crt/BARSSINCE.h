@@ -16,11 +16,15 @@
 namespace hku {
 
 /**
- * 第一个条件成立位置到当前的周期数。
+ * The number of periods from the position where the condition first holds to the current one.
+
  * @details
  * <pre>
- * 用法：BARSSINCE(X):第一次X不为0到现在的天数。
- * 例如：BARSSINCE(HIGH>10)表示股价超过10元时到当前的周期数
+ * Usage: BARSSINCE(X): the number of days from the first time X is not 0 until now.
+
+ * For example: BARSSINCE(HIGH>10) gives the number of periods from the time the stock price exceeds
+ * 10 yuan until now
+
  * </pre>
  * @ingroup Indicator
  */
@@ -35,11 +39,17 @@ inline Indicator BARSSINCE(Indicator::value_t val) {
 }
 
 /**
- * N周期内首个条件成立位置
- * @details N周期内第一个条件成立到当前的周期数
+ * The position where the condition first holds within N periods
+
+ * @details The number of periods from the first time the condition holds within N periods until now
+
  * <pre>
- * 用法：BARSSINCEN(X,N):N周期内第一次X不为0到现在的周期数,N为常量BARSSINCEN(X,N):
- * 例如：BARSSINCEN(HIGH>10,10)表示10个周期内股价超过10元时到当前的周期数
+ * Usage: BARSSINCEN(X,N): the number of periods from the first time X is not 0 within N periods
+ * until now, N is a constant BARSSINCEN(X,N):
+
+ * For example: BARSSINCEN(HIGH>10,10) gives the number of periods from the time the stock price
+ * exceeds 10 yuan within 10 periods until now
+
  * </pre>
  * @ingroup Indicator
  */

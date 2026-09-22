@@ -1,7 +1,8 @@
 /*
  * TRG.h
  *
- *  Created on: 2019年3月6日
+ *  Created on: 2019-3-6
+
  *      Author: fasiondog
  */
 
@@ -14,13 +15,20 @@
 namespace hku {
 
 /**
- * @brief 真实波动幅度（TR）
+ * @brief True range (TR)
+
  * @details
  * <pre>
- * 真实波动幅度（TR）是以下三个值中的最大值：
- *  1. 当前周期最高价（H）与最低价（L）之差
- *  2. 当前周期最高价与前一周期收盘价（PC）之差的绝对值
- *  3. 当前周期最低价与前一周期收盘价之差的绝对值
+ * The true range (TR) is the maximum of the following three values:
+
+ *  1. the difference between the high price (H) and the low price (L) of the current period
+
+ *  2. the absolute value of the difference between the high price of the current period and the
+ *     close price (PC) of the previous period
+
+ *  3. the absolute value of the difference between the low price of the current period and the close
+ *     price of the previous period
+
  * </pre>
  * @ingroup Indicator
  */

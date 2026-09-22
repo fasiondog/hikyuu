@@ -1,7 +1,7 @@
 /*
  * ATR.h
  *
- *  Created on: 2016年5月4日
+ *  Created on: 2016-5-4
  *      Author: Administrator
  */
 
@@ -14,16 +14,16 @@
 namespace hku {
 
 /**
- * 平均真实波幅(Average True Range), TR 的简单平均值
- * @param n 计算均值的周期窗口，必须为大于1的整数
+ * Average True Range (ATR), the simple average of TR
+ * @param n the period window for calculating the average, it must be an integer greater than 1
  * @ingroup Indicator
  */
 Indicator HKU_API ATR(int n = 14);
 
 /**
- * 平均真实波幅(Average True Range)
- * @param kdata 待计算的源数据
- * @param n 计算均值的周期窗口，必须为大于1的整数
+ * Average True Range (ATR)
+ * @param kdata the source data to be calculated
+ * @param n the period window for calculating the average, it must be an integer greater than 1
  * @ingroup Indicator
  */
 Indicator HKU_API ATR(const KData& kdata, int n = 14);

@@ -13,19 +13,26 @@
 namespace hku {
 
 /**
- * 信息比率（Information Ratio，IR）
+ * Information Ratio (IR)
+
  * @details
  * <pre>
- * 公式: (P-B) / TE
- * P: 组合收益率
- * B: 比较基准收益率
- * TE: 投资周期中每天的 p 和 b 之间的标准差
- * 实际使用时，P 一般为 TM 的资产曲线，B 为沪深 3000 收盘价，如:
+ * Formula: (P-B) / TE
+
+ * P: portfolio return
+
+ * B: benchmark return
+
+ * TE: the standard deviation between the daily p and b in the investment period
+
+ * In practice, P is generally the asset curve of TM and B is the close price of the CSI 300, e.g.:
+
  * ref_k = sm["sh000300"].get_kdata(query)
  * funds = my_tm.get_funds_curve(ref_k.get_datetime.list())
  * ir = IR(PRICELIST(funds), ref_k.close, 0)
  * </pre>
- * @note 如果希望通过IC值计算IR，请使用 ICIR 指标
+ * @note If the IR is expected to be calculated from the IC values, please use the ICIR indicator
+
  * @param p
  * @param b
  * @param n

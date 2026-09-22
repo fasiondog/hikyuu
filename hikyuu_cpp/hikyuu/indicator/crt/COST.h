@@ -16,15 +16,17 @@
 namespace hku {
 
 /**
- * 成本分布
+ * Cost distribution
  * @details
  * <pre>
- * 用法：COST(k, X) 表示X%获利盘的价格是多少
- * 例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，
- *       其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
+ * Usage: COST(k, X) means what the price is when X% of the positions are profitable
+ * For example: COST(k, 10) means what the price is when 10% of the positions are profitable, i.e.
+ * 10% of the positions are below that price,
+ *       and the remaining 90% are above that price and are trapped. This function is valid for the
+ *       daily analysis period only
  * </pre>
- * @param k 关联的K线数据
- * @param x X%获利盘
+ * @param k the associated K-line data
+ * @param x the X% profitable positions
  * @ingroup Indicator
  */
 Indicator HKU_API COST(const KData& k, double x = 10.0);

@@ -16,20 +16,27 @@
 namespace hku {
 
 /**
- * 获取股票类型指标
+ * Get the stock type indicator
+
  * 
- * 返回当前股票的类型值（StockType枚举值）
+ * Return the type value of the current stock (the StockType enumeration value)
+
  * 
- * @param k K线数据上下文（可选）
- * @return 指标对象，所有位置的值均为该股票的type值
+ * @param k K-line data context (optional)
+
+ * @return the indicator object, the value at every position is the type value of the stock
+
  * @ingroup Indicator
  * 
- * @par 示例:
+ * @par Example:
+
  * @code
- * // 使用默认上下文
+ * // Use the default context
+
  * auto stktype = STKTYPE();
  * 
- * // 指定K线数据
+ * // The given K-line data
+
  * Stock stock = sm.getStock("sh000001");
  * KData kdata = stock.getKData(KQuery(0, 100));
  * auto stktype = STKTYPE(kdata);

@@ -17,12 +17,15 @@
 namespace hku {
 
 /**
- * 下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
- * @param query 查询条件
- * @param market 所属市场，等于 "" 时，获取所有市场
- * @param stk_type 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
- * @param ignore_context 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
- * @param fill_null 日期对齐时，缺失数据填充 nan 值
+ * Number of the falling stocks. When there is a given context and ignore_context is false, the
+ * query, market and stk_type parameters are ignored.
+ * @param query query condition
+ * @param market the market it belongs to; when it is "" all the markets are got
+ * @param stk_type security type; when it is greater than constant.STOCKTYPE_TMP all the security
+ *                 types are got
+ * @param ignore_context whether to ignore the context. When it is ignored, the query, market and
+ *                       stk_type parameters are used forcibly.
+ * @param fill_null fill the missing data with nan when the dates are aligned
  * @ingroup Indicator
  */
 Indicator HKU_API DECLINE(const KQuery& query = KQueryByIndex(-100), const string& market = "SH",

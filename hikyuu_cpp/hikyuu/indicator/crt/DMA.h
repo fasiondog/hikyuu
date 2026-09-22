@@ -16,16 +16,24 @@
 namespace hku {
 
 /**
- * 动态移动平均
+ * Dynamic moving average
+
  * @details
  * <pre>
- * 用法：DMA(X,A),求X的动态移动平均。
- * 算法：若Y=DMA(X,A) 则 Y=A*X+(1-A)*Y',其中Y'表示上一周期Y值。
- * 例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
+ * Usage: DMA(X,A) gives the dynamic moving average of X.
+
+ * Algorithm: if Y=DMA(X,A) then Y=A*X+(1-A)*Y', where Y' is the Y value of the previous period.
+
+ * For example: DMA(CLOSE,VOL/CAPITAL) gives the average price with the turnover rate as the
+ * smoothing factor
+
  * </pre>
- * @param x 待计算的数据
- * @param a 动态系数
- * @param fill_null 日期对齐时缺失数据填充nan值
+ * @param x the data to be calculated
+
+ * @param a dynamic coefficient
+
+ * @param fill_null fill the missing data with nan when the dates are aligned
+
  * @ingroup Indicator
  */
 Indicator HKU_API DMA(const Indicator& x, const Indicator& a, bool fill_null = true);

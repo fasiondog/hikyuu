@@ -14,19 +14,26 @@
 namespace hku {
 
 /**
- * 加权移动平均
- * 算法:Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
- * @param n 计算均值的周期窗口，n >= 1
+ * Weighted moving average
+
+ * Algorithm: Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
+
+ * @param n the period window for calculating the average, n >= 1
+
  * @ingroup Indicator
  */
 Indicator HKU_API WMA(int n = 22);
 Indicator HKU_API WMA(const IndParam& n);
 
 /**
- * 加权移动平均
- * 算法:Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
- * @param ind 待计算的数据
- * @param n 计算均值的周期窗口
+ * Weighted moving average
+
+ * Algorithm: Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
+
+ * @param ind the data to be calculated
+
+ * @param n the period window for calculating the average
+
  * @ingroup Indicator
  */
 inline Indicator WMA(const Indicator& ind, int n = 22) {

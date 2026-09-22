@@ -1,7 +1,8 @@
 /*
  * SUM.h
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019-4-1
+
  *      Author: fasiondog
  */
 
@@ -14,17 +15,24 @@
 namespace hku {
 
 /**
- * 求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
- * @param n N日时间窗口
+ * Calculate the sum. SUM(X,N) sums up X within N periods; when N=0 it starts from the first valid
+ * value.
+
+ * @param n N-day time window
+
  * @ingroup Indicator
  */
 Indicator HKU_API SUM(int n = 20);
 Indicator HKU_API SUM(const IndParam& n);
 
 /**
- * 求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
- * @param ind 待计算的数据
- * @param n N日时间窗口
+ * Calculate the sum. SUM(X,N) sums up X within N periods; when N=0 it starts from the first valid
+ * value.
+
+ * @param ind the data to be calculated
+
+ * @param n N-day time window
+
  * @ingroup Indicator
  */
 inline Indicator SUM(const Indicator& ind, int n = 20) {
