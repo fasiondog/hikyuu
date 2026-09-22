@@ -31,14 +31,18 @@ public:
     Performance& operator=(const Performance& other) noexcept;
     Performance& operator=(Performance&& other) noexcept;
 
-    /** Whether it is a valid statistics item */
+    /** Whether it is a valid statistics item
+     *  @note The legacy Chinese keys (used before the i18n refactoring) are still accepted for
+     *        backward compatibility, but they are deprecated */
     bool exist(const string& key);
 
     /** Reset, clearing the calculated results */
     void reset();
 
     /** Get the statistics value by the item name; it takes effect only after statistics or report
-     *  has been run */
+     *  has been run
+     *  @note The legacy Chinese keys (used before the i18n refactoring) are still accepted for
+     *        backward compatibility, but they are deprecated */
     double get(const string& name) const;
 
     /** The same as get */

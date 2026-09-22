@@ -16,7 +16,7 @@ namespace hku {
 
 PerformanceOptimalSelector::PerformanceOptimalSelector()
 : OptimalSelectorBase("SE_PerformanceOptimal") {
-    setParam<string>("key", "帐户平均年收益率%");
+    setParam<string>("key", "Account Avg Annual Return %");
     setParam<int>("mode", 0);  // 0 takes the highest value, 1 takes the lowest value
 }
 

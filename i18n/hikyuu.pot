@@ -22,3 +22,215 @@ msgstr ""
 #: hikyuu_pywrap/plugin/_backtest.cpp:22
 msgid "on_bar is not callable!"
 msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:85
+msgid "Account Initial Capital"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:86
+msgid "Total Invested Principal"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:87
+msgid "Total Invested Assets"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:88
+msgid "Total Borrowed Cash"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:89
+msgid "Total Borrowed Assets"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:90
+msgid "Total Dividends"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:91
+msgid "Cash Balance"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:92
+msgid "Open Position Net Value"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:93
+msgid "Current Total Assets"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:94
+msgid "Total Cost of Closed Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:95
+msgid "Total Net Profit of Closed Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:96
+msgid "Max Cash Usage per Trade %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:97
+msgid "Avg Cash Usage per Trade %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:98
+msgid "Open Position Account Return %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:99
+msgid "Closed Trade Account Return %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:100
+msgid "Account CAGR %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:101
+msgid "Account Avg Annual Return %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:102
+msgid "Total Profit of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:103
+msgid "Total Loss of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:104
+msgid "Total Closed Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:105
+msgid "Number of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:106
+msgid "Number of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:107
+msgid "Winning Trade Ratio %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:108
+msgid "Profit Expectancy"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:109
+msgid "Avg Profit per Winning Trade"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:110
+msgid "Avg Loss per Losing Trade"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:111
+msgid "Avg Win / Avg Loss Ratio"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:112
+msgid "Profit Factor"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:113
+msgid "Largest Single Win"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:114
+msgid "Largest Single Win %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:115
+msgid "Largest Single Loss"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:116
+msgid "Largest Single Loss %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:117
+msgid "Avg Holding Period of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:118
+msgid "Max Holding Period of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:119
+msgid "Avg Holding Period of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:120
+msgid "Max Holding Period of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:121
+msgid "Total Time Flat"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:122
+msgid "Time Flat / Total Time %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:123
+msgid "Avg Time Flat"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:124
+msgid "Max Time Flat"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:125
+msgid "Max Consecutive Wins"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:126
+msgid "Max Consecutive Losses"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:127
+msgid "Max Consecutive Win Amount"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:128
+msgid "Max Consecutive Loss Amount"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:129
+msgid "R-Multiple Expectancy"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:130
+msgid "Trade Opportunities per Year"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:131
+msgid "Annual Expected R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:132
+msgid "Avg R-Multiple of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:133
+msgid "Avg R-Multiple of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:134
+msgid "Max Single Win R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:135
+msgid "Max Single Loss R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:136
+msgid "Max Consecutive Win R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:137
+msgid "Max Consecutive Loss R-Multiple"
+msgstr ""
