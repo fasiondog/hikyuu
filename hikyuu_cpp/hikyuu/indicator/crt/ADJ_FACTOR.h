@@ -13,57 +13,67 @@
 namespace hku {
 
 /**
- * @brief 计算复权因子指标
+ * @brief Calculate the adjustment factor indicator
  *
- * 基于股票的权息数据（送股、配股、转增、现金分红等）计算后复权因子序列。
- * 复权因子表示如果上市时持有1股，经过所有送股、配股、转增后，现在持有多少股。
- * 采用累乘方式计算，确保价格、成交量和成交金额的复权处理一致性。
+ * Calculate the backward adjustment factor sequence based on the ex-rights/ex-dividend data of the
+ * stock (bonus shares, rights shares, capitalized shares, cash dividend, etc.).
+ * The adjustment factor means: if 1 share was held at the listing, how many shares are held now
+ * after all the bonus shares, rights shares and capitalized shares. It is calculated in a
+ * cumulative multiplication way to ensure the consistency of the adjustment of the price, the
+ * volume and the turnover amount.
  *
- * 该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+ * This indicator needs a KData context to work, it is set through the setContext() method.
  *
- * @return Indicator 复权因子指标对象
+ * @return Indicator the adjustment factor indicator object
  *
- * @par 使用示例:
+ * @par Usage example:
  * @code{.cpp}
- * // 获取某只股票的复权因子
+ * // Get the adjustment factor of a stock
  * Stock stock = sm.getStock("sh000001");
  * KData kdata = stock.getKData(Query(-100));
  * Indicator adj_factor = ADJ_FACTOR();
  * adj_factor.setContext(kdata);
  * @endcode
  *
- * @see ADJ_OPEN 复权开盘价
- * @see ADJ_HIGH 复权最高价
- * @see ADJ_LOW 复权最低价
- * @see ADJ_CLOSE 复权收盘价
- * @see ADJ_VOL 复权成交量
+ * @see ADJ_OPEN adjusted open price
+ * @see ADJ_HIGH adjusted high price
+ * @see ADJ_LOW adjusted low price
+ * @see ADJ_CLOSE adjusted close price
+ * @see ADJ_VOL adjusted volume
  */
 Indicator HKU_API ADJ_FACTOR();
 
 Indicator HKU_API ADJ_FACTOR(const KData& kdata);
 
 /**
- * @brief 计算复权开盘价指标
+ * @brief Calculate the adjusted open price indicator
  *
- * 将开盘价按复权因子进行后复权处理，得到复权后的开盘价序列。
- * 计算公式：ADJ_OPEN = ADJ_FACTOR * OPEN
+ * The open price is adjusted backward with the adjustment factor, so that the adjusted open price
+ * sequence is obtained.
+ * Calculation formula: ADJ_OPEN = ADJ_FACTOR * OPEN
  *
- * @return Indicator 复权开盘价指标对象
+ * @return Indicator the adjusted open price indicator object
  *
- * @details 设计目的：
- * - 本系列指标（ADJ_*）主要是为了配合因子管理系统快速计算后向等比复权因子而设计
- * - 在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算
+ * @details Design purpose:
+ * - This series of indicators (ADJ_*) is mainly designed to cooperate with the factor management
+ * system to calculate the backward proportional adjustment factor quickly
+ * - In the factor management scenario, the adjustment calculation can be done efficiently by
+ * updating the factor values incrementally and storing them every day
  *
- * @warning 重要限制：
- * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
- * 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
- * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
- * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+ * @warning Important limitations:
+ * - **Period limitation**: it applies to the daily period only. Non-daily periods such as the
+ * weekly and monthly periods have alignment problems and the result may be inaccurate
+ * - **Depends on factor management**: it needs to be used together with the factor value storage of
+ * the factor management system, update_all_factors_values() should be called every day to update
+ * and save the factor values to guarantee the accuracy
+ * - **Relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as
+ * RECOVER_EQUAL_FORWARD; if it is not the factor management scenario, it is recommended to use
+ * RECOVER_EQUAL_FORWARD directly
+ * - **Calculation start point**: neither of them starts the calculation from the listing date, but
+ * from the start point of the currently queried K-line data
  *
- * @see ADJ_FACTOR 复权因子
- * @see RECOVER_EQUAL_FORWARD 等比前复权
+ * @see ADJ_FACTOR adjustment factor
+ * @see RECOVER_EQUAL_FORWARD equal backward adjustment
  */
 inline Indicator ADJ_OPEN() {
     return ADJ_FACTOR() * OPEN();
@@ -74,27 +84,34 @@ inline Indicator ADJ_OPEN(const KData& kdata) {
 }
 
 /**
- * @brief 计算复权最高价指标
+ * @brief Calculate the adjusted high price indicator
  *
- * 将最高价按复权因子进行后复权处理，得到复权后的最高价序列。
- * 计算公式：ADJ_HIGH = ADJ_FACTOR * HIGH
+ * The high price is adjusted backward with the adjustment factor, so that the adjusted high price
+ * sequence is obtained.
+ * Calculation formula: ADJ_HIGH = ADJ_FACTOR * HIGH
  *
- * @return Indicator 复权最高价指标对象
+ * @return Indicator the adjusted high price indicator object
  *
- * @details 设计目的：
- * - 本系列指标（ADJ_*）主要是为了配合因子管理系统快速计算后向等比复权因子而设计
- * - 在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算
+ * @details Design purpose:
+ * - This series of indicators (ADJ_*) is mainly designed to cooperate with the factor management
+ * system to calculate the backward proportional adjustment factor quickly
+ * - In the factor management scenario, the adjustment calculation can be done efficiently by
+ * updating the factor values incrementally and storing them every day
  *
- * @warning 重要限制：
- * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
- * 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
- * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
- * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+ * @warning Important limitations:
+ * - **Period limitation**: it applies to the daily period only. Non-daily periods such as the
+ * weekly and monthly periods have alignment problems and the result may be inaccurate
+ * - **Depends on factor management**: it needs to be used together with the factor value storage of
+ * the factor management system, update_all_factors_values() should be called every day to update
+ * and save the factor values to guarantee the accuracy
+ * - **Relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as
+ * RECOVER_EQUAL_FORWARD; if it is not the factor management scenario, it is recommended to use
+ * RECOVER_EQUAL_FORWARD directly
+ * - **Calculation start point**: neither of them starts the calculation from the listing date, but
+ * from the start point of the currently queried K-line data
  *
- * @see ADJ_FACTOR 复权因子
- * @see RECOVER_EQUAL_FORWARD 等比前复权
+ * @see ADJ_FACTOR adjustment factor
+ * @see RECOVER_EQUAL_FORWARD equal backward adjustment
  */
 inline Indicator ADJ_HIGH() {
     return ADJ_FACTOR() * HIGH();
@@ -105,27 +122,34 @@ inline Indicator ADJ_HIGH(const KData& kdata) {
 }
 
 /**
- * @brief 计算复权最低价指标
+ * @brief Calculate the adjusted low price indicator
  *
- * 将最低价按复权因子进行后复权处理，得到复权后的最低价序列。
- * 计算公式：ADJ_LOW = ADJ_FACTOR * LOW
+ * The low price is adjusted backward with the adjustment factor, so that the adjusted low price
+ * sequence is obtained.
+ * Calculation formula: ADJ_LOW = ADJ_FACTOR * LOW
  *
- * @return Indicator 复权最低价指标对象
+ * @return Indicator the adjusted low price indicator object
  *
- * @details 设计目的：
- * - 本系列指标（ADJ_*）主要是为了配合因子管理系统快速计算后向等比复权因子而设计
- * - 在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算
+ * @details Design purpose:
+ * - This series of indicators (ADJ_*) is mainly designed to cooperate with the factor management
+ * system to calculate the backward proportional adjustment factor quickly
+ * - In the factor management scenario, the adjustment calculation can be done efficiently by
+ * updating the factor values incrementally and storing them every day
  *
- * @warning 重要限制：
- * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
- * 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
- * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
- * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+ * @warning Important limitations:
+ * - **Period limitation**: it applies to the daily period only. Non-daily periods such as the
+ * weekly and monthly periods have alignment problems and the result may be inaccurate
+ * - **Depends on factor management**: it needs to be used together with the factor value storage of
+ * the factor management system, update_all_factors_values() should be called every day to update
+ * and save the factor values to guarantee the accuracy
+ * - **Relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as
+ * RECOVER_EQUAL_FORWARD; if it is not the factor management scenario, it is recommended to use
+ * RECOVER_EQUAL_FORWARD directly
+ * - **Calculation start point**: neither of them starts the calculation from the listing date, but
+ * from the start point of the currently queried K-line data
  *
- * @see ADJ_FACTOR 复权因子
- * @see RECOVER_EQUAL_FORWARD 等比前复权
+ * @see ADJ_FACTOR adjustment factor
+ * @see RECOVER_EQUAL_FORWARD equal backward adjustment
  */
 inline Indicator ADJ_LOW() {
     return ADJ_FACTOR() * LOW();
@@ -136,27 +160,34 @@ inline Indicator ADJ_LOW(const KData& kdata) {
 }
 
 /**
- * @brief 计算复权收盘价指标
+ * @brief Calculate the adjusted close price indicator
  *
- * 将收盘价按复权因子进行后复权处理，得到复权后的收盘价序列。
- * 计算公式：ADJ_CLOSE = ADJ_FACTOR * CLOSE
+ * The close price is adjusted backward with the adjustment factor, so that the adjusted close price
+ * sequence is obtained.
+ * Calculation formula: ADJ_CLOSE = ADJ_FACTOR * CLOSE
  *
- * @return Indicator 复权收盘价指标对象
+ * @return Indicator the adjusted close price indicator object
  *
- * @details 设计目的：
- * - 本系列指标（ADJ_*）主要是为了配合因子管理系统快速计算后向等比复权因子而设计
- * - 在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算
+ * @details Design purpose:
+ * - This series of indicators (ADJ_*) is mainly designed to cooperate with the factor management
+ * system to calculate the backward proportional adjustment factor quickly
+ * - In the factor management scenario, the adjustment calculation can be done efficiently by
+ * updating the factor values incrementally and storing them every day
  *
- * @warning 重要限制：
- * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
- * 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
- * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
- * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+ * @warning Important limitations:
+ * - **Period limitation**: it applies to the daily period only. Non-daily periods such as the
+ * weekly and monthly periods have alignment problems and the result may be inaccurate
+ * - **Depends on factor management**: it needs to be used together with the factor value storage of
+ * the factor management system, update_all_factors_values() should be called every day to update
+ * and save the factor values to guarantee the accuracy
+ * - **Relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as
+ * RECOVER_EQUAL_FORWARD; if it is not the factor management scenario, it is recommended to use
+ * RECOVER_EQUAL_FORWARD directly
+ * - **Calculation start point**: neither of them starts the calculation from the listing date, but
+ * from the start point of the currently queried K-line data
  *
- * @see ADJ_FACTOR 复权因子
- * @see RECOVER_EQUAL_FORWARD 等比前复权
+ * @see ADJ_FACTOR adjustment factor
+ * @see RECOVER_EQUAL_FORWARD equal backward adjustment
  */
 inline Indicator ADJ_CLOSE() {
     return ADJ_FACTOR() * CLOSE();
@@ -167,29 +198,38 @@ inline Indicator ADJ_CLOSE(const KData& kdata) {
 }
 
 /**
- * @brief 计算复权成交量指标
+ * @brief Calculate the adjusted volume indicator
  *
- * 将成交量按复权因子进行后复权处理，得到复权后的成交量序列。
- * 计算公式：ADJ_VOL = VOL / ADJ_FACTOR
+ * The volume is adjusted backward with the adjustment factor, so that the adjusted volume sequence
+ * is obtained.
+ * Calculation formula: ADJ_VOL = VOL / ADJ_FACTOR
  *
- * @return Indicator 复权成交量指标对象
+ * @return Indicator the adjusted volume indicator object
  *
- * @details 设计目的：
- * - 本系列指标（ADJ_*）主要是为了配合因子管理系统快速计算后向等比复权因子而设计
- * - 在因子管理场景中，通过每日增量更新并存储因子值，可以高效地进行复权计算
+ * @details Design purpose:
+ * - This series of indicators (ADJ_*) is mainly designed to cooperate with the factor management
+ * system to calculate the backward proportional adjustment factor quickly
+ * - In the factor management scenario, the adjustment calculation can be done efficiently by
+ * updating the factor values incrementally and storing them every day
  * -
- * 注意：成交量复权使用除法，与价格复权使用乘法相反。这是因为当股本增加时，每股对应的成交量应该相应减少
+ * Note: the volume adjustment uses division, which is opposite to the multiplication used by the
+ * price adjustment. The reason is that when the share capital increases, the volume corresponding
+ * to each share should decrease accordingly
  *
- * @warning 重要限制：
- * - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
- * - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values()
- * 更新保存因子值以保证准确性
- * - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD
- * 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
- * - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+ * @warning Important limitations:
+ * - **Period limitation**: it applies to the daily period only. Non-daily periods such as the
+ * weekly and monthly periods have alignment problems and the result may be inaccurate
+ * - **Depends on factor management**: it needs to be used together with the factor value storage of
+ * the factor management system, update_all_factors_values() should be called every day to update
+ * and save the factor values to guarantee the accuracy
+ * - **Relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as
+ * RECOVER_EQUAL_FORWARD; if it is not the factor management scenario, it is recommended to use
+ * RECOVER_EQUAL_FORWARD directly
+ * - **Calculation start point**: neither of them starts the calculation from the listing date, but
+ * from the start point of the currently queried K-line data
  *
- * @see ADJ_FACTOR 复权因子
- * @see RECOVER_EQUAL_FORWARD 等比前复权
+ * @see ADJ_FACTOR adjustment factor
+ * @see RECOVER_EQUAL_FORWARD equal backward adjustment
  */
 inline Indicator ADJ_VOL() {
     return VOL() / ADJ_FACTOR();
