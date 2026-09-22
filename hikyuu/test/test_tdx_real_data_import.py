@@ -180,12 +180,12 @@ class TestTdxRealDataImport(unittest.TestCase):
             import h5py
             import numpy as np
         except ImportError:
-            self.skipTest("h5py or numpy is not installed, skipping this core functionality test")
+            self.skipTest("h5py 或 numpy 未安装, 跳过此核心功能测试")
 
         # --- 1. 准备测试数据 ---
         source_day_file = get_real_tdx_filepath('000001', 'sh')
         if not os.path.exists(source_day_file):
-            self.skipTest(f"TDX data file not found: {source_day_file}, please copy the file to that directory before testing.")
+            self.skipTest(f"未找到通达信数据文件: {source_day_file}, 请将文件复制到该目录后再进行测试。")
 
         dest_day_file = os.path.join(self.sh_dir, 'sh000001.day')
         shutil.copy(source_day_file, dest_day_file)
@@ -219,7 +219,7 @@ class TestTdxRealDataImport(unittest.TestCase):
         start_time = time.time()
         while not runner.finished and time.time() - start_time < 10:
             time.sleep(0.05)
-        self.assertTrue(runner.finished, "The import process did not complete within 10 seconds as expected.")
+        self.assertTrue(runner.finished, "导入过程未能按预期在10秒内完成。")
 
         # --- 3. 数据校验 ---
         records = []
@@ -232,12 +232,12 @@ class TestTdxRealDataImport(unittest.TestCase):
                 records.append(record_data)
 
         h5_file_path = os.path.join(self.hdf5_dest_dir, 'sh_day.h5')
-        print(f"Check the target HDF5 file: {h5_file_path}")
-        self.assertTrue(os.path.exists(h5_file_path), f"Target HDF5 file was not created at: {h5_file_path}")
+        print(f"检查目标HDF5文件: {h5_file_path}")
+        self.assertTrue(os.path.exists(h5_file_path), f"目标HDF5文件未被创建于: {h5_file_path}")
 
         with h5py.File(h5_file_path, 'r') as f:
             stock_code = 'SH000001'
-            self.assertIn(stock_code, f['/data'], f"There should be a table '{stock_code}'")
+            self.assertIn(stock_code, f['/data'], f"数据集中应存在 '{stock_code}' 的表")
 
             dset = f['/data'][stock_code]
 
@@ -247,33 +247,33 @@ class TestTdxRealDataImport(unittest.TestCase):
             # 校验第一条记录
             first_h5_record = dset[0]
             expected_first_record = records[0]
-            self.assertEqual(first_h5_record['datetime'], expected_first_record[0] * 10000, "The datetime of the first record does not match")
-            self.assertEqual(first_h5_record['openPrice'], expected_first_record[1] * 10, "The open price of the first record does not match")
-            self.assertEqual(first_h5_record['highPrice'], expected_first_record[2] * 10, "The high price of the first record does not match")
-            self.assertEqual(first_h5_record['lowPrice'], expected_first_record[3] * 10, "The low price of the first record does not match")
-            self.assertEqual(first_h5_record['closePrice'], expected_first_record[4] * 10, "The close price of the first record does not match")
+            self.assertEqual(first_h5_record['datetime'], expected_first_record[0] * 10000, "第一条记录的日期不匹配")
+            self.assertEqual(first_h5_record['openPrice'], expected_first_record[1] * 10, "第一条记录的开盘价不匹配")
+            self.assertEqual(first_h5_record['highPrice'], expected_first_record[2] * 10, "第一条记录的最高价不匹配")
+            self.assertEqual(first_h5_record['lowPrice'], expected_first_record[3] * 10, "第一条记录的最低价不匹配")
+            self.assertEqual(first_h5_record['closePrice'], expected_first_record[4] * 10, "第一条记录的收盘价不匹配")
             self.assertTrue(
                 np.isclose(first_h5_record['transAmount'], expected_first_record[5] / 1000.0),
-                "The amount of the first record does not match",
+                "第一条记录的成交金额不匹配",
             )
             self.assertEqual(
-                int(first_h5_record['transCount']), round(expected_first_record[6] / 100), "The volume of the first record does not match"
+                int(first_h5_record['transCount']), round(expected_first_record[6] / 100), "第一条记录的成交量不匹配"
             )
 
             # 校验最后一条记录
             last_h5_record = dset[-1]
             expected_last_record = records[-1]
-            self.assertEqual(last_h5_record['datetime'], expected_last_record[0] * 10000, "The datetime of the last record does not match")
-            self.assertEqual(last_h5_record['openPrice'], expected_last_record[1] * 10, "The open price of the last record does not match")
-            self.assertEqual(last_h5_record['highPrice'], expected_last_record[2] * 10, "The high price of the last record does not match")
-            self.assertEqual(last_h5_record['lowPrice'], expected_last_record[3] * 10, "The low price of the last record does not match")
-            self.assertEqual(last_h5_record['closePrice'], expected_last_record[4] * 10, "The close price of the last record does not match")
+            self.assertEqual(last_h5_record['datetime'], expected_last_record[0] * 10000, "最后一条记录的日期不匹配")
+            self.assertEqual(last_h5_record['openPrice'], expected_last_record[1] * 10, "最后一条记录的开盘价不匹配")
+            self.assertEqual(last_h5_record['highPrice'], expected_last_record[2] * 10, "最后一条记录的最高价不匹配")
+            self.assertEqual(last_h5_record['lowPrice'], expected_last_record[3] * 10, "最后一条记录的最低价不匹配")
+            self.assertEqual(last_h5_record['closePrice'], expected_last_record[4] * 10, "最后一条记录的收盘价不匹配")
             self.assertTrue(
                 np.isclose(last_h5_record['transAmount'], expected_last_record[5] / 1000.0),
-                "The amount of the last record does not match",
+                "最后一条记录的成交金额不匹配",
             )
             self.assertEqual(
-                int(last_h5_record['transCount']), round(expected_last_record[6] / 100), "The volume of the last record does not match"
+                int(last_h5_record['transCount']), round(expected_last_record[6] / 100), "最后一条记录的成交量不匹配"
             )
 
 
