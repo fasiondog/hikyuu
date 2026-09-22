@@ -149,7 +149,7 @@ string Performance::report() {
 }
 
 void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime) {
-    // 清除上次统计结果
+    // Clear the last statistics result
     reset();
 
     HKU_INFO_IF_RETURN(!tm, void(), "TradeManagerPtr is Null!");
@@ -187,13 +187,13 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
           total_r(0.0),
           max_continues_r(0.0) {}
 
-        int total_duration;           // 总持仓时间
-        int continues;                // 当前连续持仓时间
-        int max_continues;            // 最大连续持仓数
-        price_t continues_money;      // 当前连续持仓利润或损失
-        price_t max_continues_money;  // 最大连续持仓利润或损失
-        price_t total_r;              // 累计r乘数
-        price_t max_continues_r;      // 最大连续盈利或损失的r乘数和
+        int total_duration;           // Total holding duration
+        int continues;                // Current consecutive holding duration
+        int max_continues;            // Maximum number of the consecutive holdings
+        price_t continues_money;      // Current consecutive holding profit or loss
+        price_t max_continues_money;  // Maximum consecutive holding profit or loss
+        price_t total_r;              // Accumulated R multiple
+        price_t max_continues_r;  // Sum of the R multiples of the max consecutive profits/losses
     };
 
     CalData earn, loss;
@@ -238,7 +238,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
                 m_result["最大单笔赢利R乘数"] = r;
             }
 
-            // 上一笔交易是盈利交易
+            // The last trade was a profitable trade
             if (pre_earn) {
                 earn.continues++;
                 earn.continues_money = roundEx(profit + earn.continues_money, precision);
@@ -262,7 +262,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
             pre_earn = true;
 
         } else {
-            // 没赚钱的，记为亏损交易
+            // The one that made no money is recorded as a losing trade
             m_result["亏损交易数"]++;
             m_result["亏损交易亏损总额"] =
               roundEx(profit + m_result["亏损交易亏损总额"], precision);
@@ -285,7 +285,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
                 m_result["最大单笔亏损R乘数"] = r;
             }
 
-            // 上一次是亏损交易
+            // The last one was a losing trade
             if (!pre_earn) {
                 loss.continues++;
                 loss.continues_money = roundEx(profit + loss.continues_money, precision);
@@ -447,7 +447,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
                 continue;
             }
 
-            // 当前是空仓
+            // It is currently an empty position
             total_short_days++;
             if (pre_short) {
                 short_days++;

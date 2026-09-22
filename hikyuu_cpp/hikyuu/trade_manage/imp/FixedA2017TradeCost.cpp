@@ -1,7 +1,7 @@
 ﻿/*
  * AShareTradeCost.cpp
  *
- *  Created on: 2016年5月4日
+ *  Created on: 2016-5-4
  *      Author: Administrator
  */
 
@@ -69,7 +69,7 @@ CostRecord FixedA2017TradeCost::getSellCost(const Datetime& datetime, const Stoc
         result.commission = lowestCommission;
     }
 
-    // A股和创业板有印花税，其他无
+    // The A-shares and the ChiNext have the stamp duty, the others do not
     if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM) {
         result.stamptax = roundEx(value * getParam<price_t>("stamptax"), precision);
     } else {
