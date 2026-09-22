@@ -7,6 +7,8 @@
 
 #include "Performance.h"
 
+#include "hikyuu/utilities/os.h"
+
 namespace hku {
 
 namespace {
@@ -72,11 +74,52 @@ const std::map<string, string>& legacyKeyMap() {
     return keys;
 }
 
+/** The unified mapping from the English key to the corresponding Chinese name. It is initialized
+ *  from the inversion of legacyKeyMap, and the Chinese names registered via addKey are also
+ *  stored in it, so that all the methods of Performance share the same key name mapping. */
+std::map<string, string>& chineseNameMap() {
+    static std::map<string, string> names = [] {
+        std::map<string, string> ret;
+        for (const auto& [chinese, english] : legacyKeyMap()) {
+            ret[english] = chinese;
+        }
+        return ret;
+    }();
+    return names;
+}
+
+/** Get the corresponding Chinese name of the given English key; returns an empty string if it has
+ *  not been registered */
+const string& lookupChineseName(const string& key) {
+    static const string empty;
+    const auto& names = chineseNameMap();
+    auto iter = names.find(key);
+    return iter == names.end() ? empty : iter->second;
+}
+
+/** Get the current English key of the given legacy Chinese key; it is kept for backward
+ *  compatibility only, do not use it in the new code. Returns an empty string if not found. */
 const string& lookupLegacyKey(const string& key) {
     static const string empty;
-    const auto& keys = legacyKeyMap();
-    auto iter = keys.find(key);
-    return iter == keys.end() ? empty : iter->second;
+    for (const auto& [english, chinese] : chineseNameMap()) {
+        if (chinese == key) {
+            return english;
+        }
+    }
+    return empty;
+}
+
+/** Check whether the given key is an English key, i.e. it consists of the printable ASCII
+ *  characters only. Since the i18n refactoring, the non-English keys, such as the legacy Chinese
+ *  ones, are not supported any more.
+ */
+bool isEnglishKey(const string& key) {
+    for (unsigned char ch : key) {
+        if (ch < 0x20 || ch > 0x7E) {
+            return false;
+        }
+    }
+    return true;
 }
 
 }  // namespace
@@ -200,12 +243,21 @@ PriceList Performance::values() const {
     return result;
 }
 
-void Performance::addKey(const string& key) {
+void Performance::addKey(const string& key, const string& chinese) {
+    HKU_ERROR_IF_RETURN(!isEnglishKey(key), void(),
+                        "Performance - addKey: only the English key is supported, but got \"{}\"!",
+                        key);
+    if (!chinese.empty()) {
+        chineseNameMap()[key] = chinese;
+    }
     m_keys.push_back(key);
     m_result[key] = 0.0;
 }
 
 void Performance::setValue(const string& key, double value) {
+    HKU_ERROR_IF_RETURN(!isEnglishKey(key), void(),
+                        "Performance - setValue: only the English key is supported, but got \"{}\"!",
+                        key);
     m_result[key] = value;
 }
 
@@ -217,8 +269,14 @@ string Performance::report() {
 
     buf.setf(std::ios_base::fixed);
     buf.precision(2);
+    bool zh_lang = (getSystemLanguage() == "zh_cn");
     for (const auto& key : m_keys) {
-        buf << htr(key.c_str()) << ": " << m_result.at(key) << std::endl;
+        const string& chinese = lookupChineseName(key);
+        if (zh_lang && !chinese.empty()) {
+            buf << chinese << ": " << m_result.at(key) << std::endl;
+        } else {
+            buf << htr(key.c_str()) << ": " << m_result.at(key) << std::endl;
+        }
     }
 
     buf.unsetf(std::ostream::floatfield);

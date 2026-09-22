@@ -83,7 +83,19 @@ public:
         return m_result;
     }
 
-    void addKey(const string& key);
+    /** Add a new statistics item
+     *  @note Since the i18n refactoring, only the English key is supported; a non-English key, such
+     *        as a legacy Chinese one, is rejected with an error log
+     *  @param chinese the optional corresponding Chinese name of the key, which is registered into
+     *         the unified key name mapping: it is displayed by report in the Chinese environment,
+     *         and the Chinese key is also accepted by get/exist like the built-in legacy keys
+     */
+    void addKey(const string& key, const string& chinese = string());
+
+    /** Set the value of the given statistics item
+     *  @note Since the i18n refactoring, only the English key is supported; a non-English key, such
+     *        as a legacy Chinese one, is rejected with an error log
+     */
     void setValue(const string& key, double value);
 
 private:
