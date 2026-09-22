@@ -16,8 +16,9 @@
 namespace hku {
 
 /**
- * 盈利目标策略基类
- * @details 交易前确定盈利目标，用于系统在价格达到盈利目标时执行卖出
+ * Base class of the profit goal strategy
+ * @details The profit goal is determined before the trade, it is used by the system to execute a
+ * sell when the price reaches the profit goal
  * @ingroup ProfitGoal
  */
 class HKU_API ProfitGoalBase : public enable_shared_from_this<ProfitGoalBase> {
@@ -29,57 +30,57 @@ public:
     ProfitGoalBase(const ProfitGoalBase&) = default;
     virtual ~ProfitGoalBase();
 
-    /** 设置账户 */
+    /** Set the account */
     void setTM(const TradeManagerPtr& tm);
 
-    /** 获取账户 */
+    /** Get the account */
     TradeManagerPtr getTM() const;
 
-    /** 设置交易对象 */
+    /** Set the trading object */
     void setTO(const KData& kdata);
 
-    /** 获取交易对象 */
+    /** Get the trading object */
     KData getTO() const;
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const;
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name);
 
-    /** 接收实际交易变化情况 */
+    /** Receive the actual trade change situation */
     virtual void buyNotify(const TradeRecord&) {}
 
-    /** 接收实际交易变化情况 */
+    /** Receive the actual trade change situation */
     virtual void sellNotify(const TradeRecord&) {}
 
-    /** 复位操作 */
+    /** Reset operation */
     void reset();
 
     typedef shared_ptr<ProfitGoalBase> ProfitGoalPtr;
-    /** 克隆接口 */
+    /** Clone interface */
     ProfitGoalPtr clone();
 
     /**
-     * 买入时计算目标价格
-     * @param datetime 当前时间
-     * @param price 当前价格
-     * @return 返回Null<price_t>时，表示未限定目标; 返回0，意味着需要卖出
+     * Calculate the target price when buying
+     * @param datetime the current time
+     * @param price the current price
+     * @return Null<price_t> means no target is set; 0 means a sell is needed
      */
     virtual price_t getGoal(const Datetime& datetime, price_t price) = 0;
 
-    /** 返回0,表示未设目标 */
+    /** 0 is returned, meaning no target is set */
     virtual price_t getShortGoal(const Datetime&, price_t) {
         return 0.0;
     }
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual ProfitGoalPtr _clone() = 0;
 
-    /** 子类计算接口，由setTO调用 */
+    /** Subclass calculation interface, it is called by setTO */
     virtual void _calculate() {}
 
     bool isPythonObject() const noexcept {
@@ -94,7 +95,7 @@ protected:
     TradeManagerPtr m_tm;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -121,7 +122,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ProfitGoalBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public ProfitGoalBase {
  *     PROFIT_GOAL_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -152,7 +154,7 @@ public:                                       \
     virtual price_t getGoal(const Datetime&, price_t) override;
 
 /**
- * 客户程序都应使用该指针类型
+ * Client programs should all use this pointer type
  * @ingroup ProfitGoal
  */
 typedef shared_ptr<ProfitGoalBase> ProfitGoalPtr;

@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 资金管理基类
+ * Base class of the money management
  * @ingroup MoneyManager
  */
 class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase> {
@@ -28,110 +28,117 @@ public:
     MoneyManagerBase(const MoneyManagerBase&) = default;
     virtual ~MoneyManagerBase();
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const {
         return m_name;
     }
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name) {
         m_name = name;
     }
 
-    /** 复位 */
+    /** Reset */
     void reset();
 
     /**
-     * 设定交易账户
-     * @param tm 指定的交易账户
+     * Set the trade account
+     * @param tm the given trade account
      */
     void setTM(const TradeManagerPtr& tm) {
         m_tm = tm;
     }
 
     /**
-     * 获取交易账户
+     * Get the trade account
      * @return
      */
     TradeManagerPtr getTM() const {
         return m_tm;
     }
 
-    /** 设置查询条件 */
+    /** Set the query condition */
     void setQuery(const KQuery& query) {
         m_query = query;
     }
 
-    /** 获取交易的K线类型 */
+    /** Get the K-line type of the trade */
     const KQuery& getQuery() const {
         return m_query;
     }
 
     typedef shared_ptr<MoneyManagerBase> MoneyManagerPtr;
-    /** 克隆操作 */
+    /** Clone operation */
     MoneyManagerPtr clone();
 
-    /** 接收实际交易变化情况 */
+    /** Receive the actual trade change situation */
     void buyNotify(const TradeRecord& tr);
 
-    /** 子类接收实际交易变化情况接口，一般存在多次增减仓的情况才需要重载 */
+    /** Interface for the subclass to receive the actual trade change situation; it generally needs
+     *  to be overloaded only when there are multiple position increases and decreases */
     virtual void _buyNotify(const TradeRecord&) {}
 
-    /** 接收实际交易变化情况 */
+    /** Receive the actual trade change situation */
     void sellNotify(const TradeRecord& tr);
 
-    /** 子类接收实际交易变化情况接口，一般存在多次增减仓的情况才需要重载 */
+    /** Interface for the subclass to receive the actual trade change situation; it generally needs
+     *  to be overloaded only when there are multiple position increases and decreases */
     virtual void _sellNotify(const TradeRecord&) {}
 
     /**
-     * 获取指定交易对象可卖出的数量
-     * @param datetime 交易日期
-     * @param stock 交易对象
-     * @param price 交易价格
-     * @param risk 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-     * @param from 信号来源
-     * @note 默认实现返回 MAX_DOUBLE 卖出全部; 多次减仓才需要实现该接口
+     * Get the quantity of the given trading object that can be sold
+     * @param datetime trade date
+     * @param stock the trading object
+     * @param price trade price
+     * @param risk the risk taken by the new trade; if it is 0, it means the whole loss, i.e. the
+     *             market value drops to 0 yuan
+     * @param from signal source
+     * @note The default implementation returns MAX_DOUBLE, i.e. selling everything; this interface
+     * is needed only for the multiple position reductions
      */
     double getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                          SystemPart from);
 
     /**
-     * 获取指定交易对象可卖空的数量
-     * @param datetime 交易日期
-     * @param stock 交易对象
-     * @param price 交易价格
-     * @param from 信号来源
-     * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
+     * Get the quantity of the given trading object that can be short sold
+     * @param datetime trade date
+     * @param stock the trading object
+     * @param price trade price
+     * @param from signal source
+     * @param risk the trade risk taken; Null<price_t> means there is no loss upper limit
      */
     double getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                               price_t risk, SystemPart from);
 
     /**
-     * 获取指定交易对象空头回补的买入数量
-     * @param datetime 交易日期
-     * @param stock 交易对象
-     * @param price 交易价格
-     * @param from 信号来源
-     * @param risk 承担的交易风险，如果为Null<price_t>，表示不设损失上限
+     * Get the buy quantity to cover the short position of the given trading object
+     * @param datetime trade date
+     * @param stock the trading object
+     * @param price trade price
+     * @param from signal source
+     * @param risk the trade risk taken; Null<price_t> means there is no loss upper limit
      */
     double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                              price_t risk, SystemPart from);
 
     /**
-     * 获取指定交易对象可买入的数量
-     * @param datetime 交易日期
-     * @param stock 交易对象
-     * @param price 交易价格
-     * @param from 信号来源
-     * @param risk 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+     * Get the quantity of the given trading object that can be bought
+     * @param datetime trade date
+     * @param stock the trading object
+     * @param price trade price
+     * @param from signal source
+     * @param risk the risk taken by the trade; if it is 0, it means the whole loss, i.e. the market
+     *             value drops to 0 yuan
      */
     double getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                         SystemPart from);
 
-    /** 当前买入交易次数, 连续买入计数，一旦接收卖出将恢复置0 */
+    /** Current number of the buy trades; it counts the consecutive buys and is reset to 0 once a
+     *  sell is received */
     size_t currentBuyCount(const Stock&) const;
 
-    /** 当前卖出交易次数，连续卖出计数，一旦接收买入将恢复置0 */
+    /** Current number of the sell trades; it counts the consecutive sells and is reset to 0 once a
+     *  buy is received */
     size_t currentSellCount(const Stock&) const;
 
     virtual double _getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
@@ -146,10 +153,10 @@ public:
     virtual double _getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                       price_t risk, SystemPart from);
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆私有变量接口 */
+    /** Interface for the subclass to clone its private variables */
     virtual MoneyManagerPtr _clone() = 0;
 
     bool isPythonObject() const noexcept {
@@ -164,7 +171,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -174,7 +181,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_query、m_tm都是系统运行时临时设置，不需要序列化
+        // m_query and m_tm are set temporarily when the system runs, they do not need to be
+        // serialized
         // ar & BOOST_SERIALIZATION_NVP(m_query);
         // ar & BOOST_SERIALIZATION_NVP(m_tm);
     }
@@ -196,7 +204,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MoneyManagerBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public MoneyManagerBase {
  *     MONEY_MANAGER_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -220,7 +229,7 @@ private:                                                           \
 #endif
 
 /**
- * 客户程序都应使用该指针类型
+ * Client programs should all use this pointer type
  * @ingroup MoneyManager
  */
 typedef shared_ptr<MoneyManagerBase> MoneyManagerPtr;
