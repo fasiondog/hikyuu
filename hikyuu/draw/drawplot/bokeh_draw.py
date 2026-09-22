@@ -186,9 +186,9 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     axes.add_tools(
         HoverTool(
             tooltips=[
-                ("index", "$index"), ('Date', get_date_format(k)), ("Open", "@open{0.0000}"), ("High", "@high{0.0000}"),
-                ("Low", "@low{0.0000}"), ("Close", "@close{0.0000}"), ("Amount", "@amount{0.0000}"),
-                ("Volume", "@volume{0.0000}")
+                ("index", "$index"), ('日期', get_date_format(k)), ("开盘价", "@open{0.0000}"), ("最高价", "@high{0.0000}"),
+                ("最低价", "@low{0.0000}"), ("收盘价", "@close{0.0000}"), ("成交金额", "@amount{0.0000}"),
+                ("成交量", "@volume{0.0000}")
             ],
             formatters={"@datetime": "datetime"}
         )
@@ -201,7 +201,7 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
 
     last_record = kdata[-1]
     color = colorup if last_record.close > kdata[-2].close else colordown
-    text = u'%s Open:%.2f High:%.2f Low:%.2f Close:%.2f Change:%.2f%%' % (
+    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
         last_record.datetime, last_record.open, last_record.high, last_record.low, last_record.close, 100 *
         (last_record.close - kdata[-2].close) / kdata[-2].close
     )
@@ -233,7 +233,7 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     :param colordown:   the color of the lines where close < open
     :param ticksize:    open/close tick marker in points
     """
-    print("Bokeh does not support drawing American-style candlestick charts yet, please use matplotlib")
+    print("Bokeh 暂不支持绘制美式K线图, 请使用 matplotlib")
     return None
 
 
@@ -299,7 +299,7 @@ def iplot(
         axes.add_tools(
             HoverTool(
                 tooltips=[
-                    ("index", "$index"), ('Indicator', indicator.name), ('Date', get_date_format(kref)), ("Value", "@value{0.0000}")
+                    ("index", "$index"), ('指标', indicator.name), ('日期', get_date_format(kref)), ("值", "@value{0.0000}")
                 ],
                 formatters={"@datetime": "datetime"}
             )
@@ -315,7 +315,7 @@ def iplot(
             axes.legend.location = "top_left"
         else:
             axes.line(x='datetime', y='value', line_width=width, line_color=line_color, source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('Indicator', indicator.name), ("Value", "@value{0.0000}")]))
+        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name), ("值", "@value{0.0000}")]))
 
     if zero_on:
         axes.line(x=x_value, y=[0 for i in range(len(indicator))], line_color='black')
@@ -397,7 +397,7 @@ def ibar(
         axes.add_tools(
             HoverTool(
                 tooltips=[
-                    ("index", "$index"), ('Indicator', indicator.name), ('Date', get_date_format(kref)), ("Value", "@value{0.0000}")
+                    ("index", "$index"), ('指标', indicator.name), ('日期', get_date_format(kref)), ("值", "@value{0.0000}")
                 ],
                 formatters={"@datetime": "datetime"}
             )
@@ -412,7 +412,7 @@ def ibar(
             axes.legend.location = "top_left"
         else:
             axes.vbar(x='datetime', top='value', width=width, color=line_color, source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('Indicator', indicator.name), ("Value", "@value{0.0000}")]))
+        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name), ("值", "@value{0.0000}")]))
 
     if text_on:
         label = Label(

@@ -97,7 +97,7 @@ def use_draw_engine(engine='matplotlib'):
     elif engine == 'echarts':
         use_draw_with_echarts()
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def use_draw_with_bokeh():
@@ -169,7 +169,7 @@ def create_figure(n=1, figsize=None):
     elif engine == 'bokeh':
         return bk_create_figure(n, figsize if figsize else (800, 800))
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def gcf():
@@ -179,7 +179,7 @@ def gcf():
     elif engine == 'bokeh':
         return bk_gcf()
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def gca():
@@ -189,7 +189,7 @@ def gca():
     elif engine == 'bokeh':
         return bk_gca()
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def show_gcf():
@@ -199,7 +199,7 @@ def show_gcf():
     elif engine == 'bokeh':
         bk_show_gcf()
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
@@ -217,7 +217,7 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     elif engine == 'bokeh':
         pass
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
@@ -235,7 +235,7 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     elif engine == 'bokeh':
         return bk_ax_draw_macd(axes, kdata, n1, n2, n3)
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
@@ -257,7 +257,7 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     elif engine == 'bokeh':
         bk_ax_draw_macd2(axes, ref, kdata, n1, n2, n3)
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def adjust_axes_show(axeslist):
@@ -272,7 +272,7 @@ def adjust_axes_show(axeslist):
     elif engine == 'bokeh':
         pass
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 def ax_set_locator_formatter(axes, dates, typ):
@@ -288,7 +288,7 @@ def ax_set_locator_formatter(axes, dates, typ):
     elif engine == 'bokeh':
         pass
     else:
-        print("Unknown engine: {}".format(engine))
+        print("未知的引擎: {}".format(engine))
 
 
 # 设置默认引擎
