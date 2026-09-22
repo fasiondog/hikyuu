@@ -78,7 +78,7 @@ public:
  * @{
  */
 
-/** @par 检测点：测试FactorSet基本功能 */
+/** @par Test point: test the basic functionality of FactorSet */
 TEST_CASE("test_FactorSet_basic") {
     // Create the Factor object used by the test
     Indicator ma5 = MA(CLOSE(), 5);
@@ -87,27 +87,27 @@ TEST_CASE("test_FactorSet_basic") {
     Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
     Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
 
-    // 测试构造函数和基本属性
+    // Test the constructor and the basic attributes
     FactorSet fs("TestFactorSet");
     CHECK_EQ(fs.name(), "TESTFACTORSET");
 
-    // 测试空状态
+    // Test the empty state
     CHECK_EQ(fs.size(), 0);
     CHECK_UNARY(fs.empty());
 
-    // 添加因子
+    // Add the factor
     fs.add(factor1);
     fs.add(factor2);
 
     CHECK_EQ(fs.size(), 2);
     CHECK_FALSE(fs.empty());
 
-    // 测试因子查询
+    // Test the factor query
     CHECK_UNARY(fs.have("MA5"));
     CHECK_UNARY(fs.have("MA10"));
     CHECK_FALSE(fs.have("NONEXIST"));
 
-    // 测试获取因子
+    // Test getting the factor
     Factor retrieved1 = fs.get("MA5");
     CHECK_EQ(retrieved1.name(), "MA5");
     CHECK_EQ(retrieved1.brief(), "5日均线因子");
@@ -116,25 +116,25 @@ TEST_CASE("test_FactorSet_basic") {
     CHECK_EQ(retrieved2.name(), "MA10");
     CHECK_EQ(retrieved2.brief(), "10日均线因子");
 
-    // 测试不存在的因子
+    // Test a factor that does not exist
     CHECK_THROWS(fs.get("NONEXIST"));
 
-    // 测试移除因子
+    // Test removing the factor
     fs.remove("MA5");
     CHECK_EQ(fs.size(), 1);
     CHECK_FALSE(fs.have("MA5"));
     CHECK_UNARY(fs.have("MA10"));
 
-    // 测试清空
+    // Test clear
     fs.clear();
     CHECK_EQ(fs.size(), 0);
     CHECK_UNARY(fs.empty());
     CHECK_FALSE(fs.have("MA10"));
 }
 
-/** @par 检测点：测试FactorSet ktype 匹配检查 */
+/** @par Test point: test the ktype match check of FactorSet */
 TEST_CASE("test_FactorSet_ktype_check") {
-    // 创建不同周期的因子
+    // Create the factors of the different periods
     Indicator day_ma = MA(CLOSE(), 5);
     Indicator week_ma = MA(CLOSE(), 10);
     Indicator month_ma = MA(CLOSE(), 20);
@@ -143,61 +143,61 @@ TEST_CASE("test_FactorSet_ktype_check") {
     Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
     Factor month_factor("MONTH_MA", month_ma, KQuery::MONTH, "月线因子");
 
-    // 测试日线 FactorSet
+    // Test the daily line FactorSet
     SUBCASE("DAY FactorSet") {
         FactorSet day_fs("DayFactors", KQuery::DAY);
 
-        // 应该能正常添加日线因子
+        // A daily line factor should be added normally
         CHECK_NOTHROW(day_fs.add(day_factor));
         CHECK_EQ(day_fs.size(), 1);
 
-        // 添加周线因子应该抛出异常
+        // Adding a weekly line factor should throw an exception
         CHECK_THROWS(day_fs.add(week_factor));
-        CHECK_EQ(day_fs.size(), 1);  // 大小应该不变
+        CHECK_EQ(day_fs.size(), 1);  // The size should stay unchanged
 
-        // 添加月线因子也应该抛出异常
+        // Adding a monthly line factor should also throw
         CHECK_THROWS(day_fs.add(month_factor));
-        CHECK_EQ(day_fs.size(), 1);  // 大小应该不变
+        CHECK_EQ(day_fs.size(), 1);  // The size should stay unchanged
     }
 
-    // 测试周线 FactorSet
+    // Test the weekly line FactorSet
     SUBCASE("WEEK FactorSet") {
         FactorSet week_fs("WeekFactors", KQuery::WEEK);
 
-        // 应该能正常添加周线因子
+        // A weekly line factor should be added normally
         CHECK_NOTHROW(week_fs.add(week_factor));
         CHECK_EQ(week_fs.size(), 1);
 
-        // 添加日线因子应该抛出异常
+        // Adding a daily line factor should throw an exception
         CHECK_THROWS(week_fs.add(day_factor));
-        CHECK_EQ(week_fs.size(), 1);  // 大小应该不变
+        CHECK_EQ(week_fs.size(), 1);  // The size should stay unchanged
 
-        // 添加月线因子也应该抛出异常
+        // Adding a monthly line factor should also throw
         CHECK_THROWS(week_fs.add(month_factor));
-        CHECK_EQ(week_fs.size(), 1);  // 大小应该不变
+        CHECK_EQ(week_fs.size(), 1);  // The size should stay unchanged
     }
 
-    // 测试月线 FactorSet
+    // Test the monthly line FactorSet
     SUBCASE("MONTH FactorSet") {
         FactorSet month_fs("MonthFactors", KQuery::MONTH);
 
-        // 应该能正常添加月线因子
+        // A monthly line factor should be added normally
         CHECK_NOTHROW(month_fs.add(month_factor));
         CHECK_EQ(month_fs.size(), 1);
 
-        // 添加日线因子应该抛出异常
+        // Adding a daily line factor should throw an exception
         CHECK_THROWS(month_fs.add(day_factor));
-        CHECK_EQ(month_fs.size(), 1);  // 大小应该不变
+        CHECK_EQ(month_fs.size(), 1);  // The size should stay unchanged
 
-        // 添加周线因子也应该抛出异常
+        // Adding a weekly line factor should also throw
         CHECK_THROWS(month_fs.add(week_factor));
-        CHECK_EQ(month_fs.size(), 1);  // 大小应该不变
+        CHECK_EQ(month_fs.size(), 1);  // The size should stay unchanged
     }
 
-    // 测试默认构造的 FactorSet (DAY)
+    // Test the default constructed FactorSet (DAY)
     SUBCASE("Default FactorSet") {
         FactorSet default_fs("DefaultFactors");
-        // 默认应该是 DAY 类型
+        // The default should be the DAY type
         CHECK_NOTHROW(default_fs.add(day_factor));
         CHECK_EQ(default_fs.size(), 1);
 
@@ -206,35 +206,35 @@ TEST_CASE("test_FactorSet_ktype_check") {
     }
 }
 
-/** @par 检测点：测试FactorSet同名因子覆盖 */
+/** @par Test point: test the overwrite of a FactorSet factor with the same name */
 TEST_CASE("test_FactorSet_duplicate_name") {
     Indicator ma5 = MA(CLOSE(), 5);
-    Indicator ma5_new = MA(CLOSE(), 5);  // 同名但不同的指标
+    Indicator ma5_new = MA(CLOSE(), 5);  // The same name but a different indicator
 
     Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "原始版本");
     Factor factor2("MA5", ma5_new, KQuery::DAY, "5日均线因子", "更新版本");
 
     FactorSet fs("TestFactorSet");
 
-    // 添加第一个因子
+    // Add the first factor
     fs.add(factor1);
     CHECK_EQ(fs.size(), 1);
 
-    // 获取并验证第一个因子
+    // Get and verify the first factor
     Factor retrieved1 = fs.get("MA5");
     CHECK_EQ(retrieved1.brief(), "5日均线因子");
     CHECK_EQ(retrieved1.details(), "原始版本");
 
-    // 添加同名因子，应该覆盖原有的
+    // Adding a factor with the same name should overwrite the existing one
     fs.add(factor2);
-    CHECK_EQ(fs.size(), 1);  // 大小不变，因为是覆盖而不是新增
+    CHECK_EQ(fs.size(), 1);  // The size stays because it is an overwrite, not a new entry
 
-    // 验证被覆盖后的因子
+    // Verify the overwritten factor
     Factor retrieved2 = fs.get("MA5");
     CHECK_EQ(retrieved2.brief(), "5日均线因子");
     CHECK_EQ(retrieved2.details(), "更新版本");  // 应该是新的值
 
-    // 验证迭代顺序（应该只有一个元素）
+    // Verify the iteration order (there should be one element only)
     size_t count = 0;
     for (const auto& factor : fs) {
         CHECK_EQ(factor.name(), "MA5");
@@ -244,7 +244,7 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     CHECK_EQ(count, 1);
 }
 
-/** @par 检测点：测试FactorSet浅拷贝语义 */
+/** @par Test point: test the shallow copy semantics of FactorSet */
 TEST_CASE("test_FactorSet_shallow_copy") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
@@ -252,35 +252,35 @@ TEST_CASE("test_FactorSet_shallow_copy") {
     Factor factor1("MA5", ma5, KQuery::DAY);
     Factor factor2("MA10", ma10, KQuery::DAY);
 
-    // 创建原始 FactorSet
+    // Create the original FactorSet
     FactorSet fs1("Original");
     fs1.add(factor1);
     fs1.add(factor2);
     CHECK_EQ(fs1.size(), 2);
 
-    // 测试拷贝构造（浅拷贝）
+    // Test the copy constructor (a shallow copy)
     FactorSet fs2(fs1);
     CHECK_EQ(fs2.name(), "ORIGINAL");
     CHECK_EQ(fs2.size(), 2);
     CHECK_UNARY(fs2.have("MA5"));
     CHECK_UNARY(fs2.have("MA10"));
 
-    // 由于是浅拷贝，修改拷贝会影响原对象
+    // Since it is a shallow copy, modifying the copy affects the original object
     fs2.remove("MA5");
 
-    // 验证原对象也被修改了（浅拷贝特性）
-    CHECK_EQ(fs1.size(), 1);       // 原对象大小也被修改
-    CHECK_FALSE(fs1.have("MA5"));  // 原对象因子被移除
+    // Verify that the original object was modified too (the shallow copy property)
+    CHECK_EQ(fs1.size(), 1);       // The size of the original object was modified too
+    CHECK_FALSE(fs1.have("MA5"));  // The factor of the original object was removed
 
-    // 测试拷贝赋值（浅拷贝）
+    // Test the copy assignment (a shallow copy)
     FactorSet fs3("Target");
     fs3 = fs1;
     CHECK_EQ(fs3.name(), "ORIGINAL");
     CHECK_EQ(fs3.size(), 1);
 
-    // 测试移动语义 - 在浅拷贝情况下，移动构造实际上是拷贝构造
+    // Test the move semantics - with a shallow copy the move constructor is a copy constructor
     FactorSet fs4(std::move(fs2));
-    // fs4 应该反映最新的状态，因为所有对象共享同一份数据
+    // fs4 should reflect the latest state, because all the objects share the same data
     CHECK_EQ(fs4.name(), "ORIGINAL");
     CHECK_EQ(fs4.size(), 1);
 
@@ -291,10 +291,10 @@ TEST_CASE("test_FactorSet_shallow_copy") {
 
 #if defined(_MSC_VER) && defined(__clang__)
 #pragma warning(push)
-#pragma warning(disable : 4552)  // MSVC 自身赋值编号
+#pragma warning(disable : 4552)  // The MSVC self assignment number
 #pragma clang diagnostic ignored "-Wself-assign-overloaded"
 #endif
-    // 测试自赋值（浅拷贝情况下自赋值应该是安全的）
+    // Test the self assignment (it should be safe with a shallow copy)
     fs1 = fs1;
     CHECK_EQ(fs1.size(), 1);
 #if defined(_MSC_VER) && defined(__clang__)
@@ -302,7 +302,7 @@ TEST_CASE("test_FactorSet_shallow_copy") {
 #endif
 }
 
-/** @par 检测点：测试FactorSet迭代器功能 */
+/** @par Test point: test the iterator functionality of FactorSet */
 TEST_CASE("test_FactorSet_iterator") {
     // Create the Factor object used by the test
     Indicator ma5 = MA(CLOSE(), 5);
@@ -311,7 +311,7 @@ TEST_CASE("test_FactorSet_iterator") {
     Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
     Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
 
-    // 创建 FactorSet 并添加因子
+    // Create a FactorSet and add the factor
     FactorSet fs("TestFactorSet");
     fs.add(factor1);
     fs.add(factor2);
@@ -319,7 +319,7 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_EQ(fs.size(), 2);
     CHECK_FALSE(fs.empty());
 
-    // 测试基于范围的for循环 - 迭代器应直接返回Factor引用
+    // Test the range based for loop - the iterator returns a Factor reference directly
     size_t count = 0;
     for (const Factor& factor : fs) {
         CHECK_UNARY_FALSE(factor.isNull());
@@ -329,12 +329,12 @@ TEST_CASE("test_FactorSet_iterator") {
     }
     CHECK_EQ(count, 2);
 
-    // 测试显式迭代器 - 解引用应直接返回Factor引用
+    // Test the explicit iterator - the dereference returns a Factor reference directly
     auto it = fs.begin();
     auto end = fs.end();
     count = 0;
     while (it != end) {
-        const Factor& factor = *it;  // 直接解引用得到Factor引用
+        const Factor& factor = *it;  // A direct dereference gives the Factor reference
         CHECK_UNARY_FALSE(factor.isNull());
         CHECK_UNARY(factor.name() == "MA5" || factor.name() == "MA10");
         count++;
@@ -342,14 +342,14 @@ TEST_CASE("test_FactorSet_iterator") {
     }
     CHECK_EQ(count, 2);
 
-    // 测试迭代器箭头操作符
+    // Test the iterator arrow operator
     for (auto it = fs.begin(); it != fs.end(); ++it) {
-        const Factor* factor_ptr = it.operator->();  // 箭头操作符应返回Factor指针
+        const Factor* factor_ptr = it.operator->();  // The arrow operator returns a Factor pointer
         CHECK_UNARY_FALSE(factor_ptr->isNull());
         CHECK_UNARY_FALSE(factor_ptr->name().empty());
     }
 
-    // 测试 const_iterator 和 iterator 的等价性
+    // Test the equivalence of const_iterator and iterator
     const FactorSet& const_fs = fs;
     count = 0;
     for (auto it = const_fs.begin(); it != const_fs.end(); ++it) {
@@ -359,7 +359,7 @@ TEST_CASE("test_FactorSet_iterator") {
     }
     CHECK_EQ(count, 2);
 
-    // 测试 cbegin/cend
+    // Test cbegin/cend
     count = 0;
     for (auto it = fs.cbegin(); it != fs.cend(); ++it) {
         const Factor& factor = *it;
@@ -368,25 +368,25 @@ TEST_CASE("test_FactorSet_iterator") {
     }
     CHECK_EQ(count, 2);
 
-    // 测试迭代器比较操作
+    // Test the iterator comparison operations
     auto it1 = fs.begin();
     auto it2 = fs.begin();
     CHECK_UNARY(it1 == it2);
     ++it1;
     CHECK_UNARY(it1 != it2);
 
-    // 测试空集合的迭代器
+    // Test the iterator of an empty set
     FactorSet empty_fs;
     CHECK_UNARY(empty_fs.begin() == empty_fs.end());
     CHECK_UNARY(empty_fs.cbegin() == empty_fs.cend());
 
-    // 测试基于迭代器的因子收集
+    // Test the iterator based factor collection
     vector<Factor> factors;
     for (const Factor& factor : fs) {
         factors.push_back(factor);
     }
     CHECK_EQ(factors.size(), 2);
-    // 验证收集到的因子
+    // Verify the collected factors
     bool has_ma5 = false, has_ma10 = false;
     for (const auto& factor : factors) {
         if (factor.name() == "MA5")
@@ -398,45 +398,45 @@ TEST_CASE("test_FactorSet_iterator") {
     CHECK_UNARY(has_ma10);
 }
 
-/** @par 检测点：测试FactorSet Block属性功能 */
+/** @par Test point: test the Block attribute functionality of FactorSet */
 TEST_CASE("test_FactorSet_block") {
-    // 测试默认构造函数的 Block
+    // Test the Block of the default constructor
     FactorSet fs1;
     CHECK_UNARY(fs1.block().isNull());
     CHECK_EQ(fs1.block().size(), 0);
 
-    // 测试带参数的构造函数（使用默认 Block）
+    // Test the constructor with parameters (using the default Block)
     FactorSet fs2("TestSet", KQuery::DAY);
     CHECK_EQ(fs2.name(), "TESTSET");
     CHECK_EQ(fs2.ktype(), KQuery::DAY);
     CHECK_UNARY(fs2.block().isNull());
     CHECK_EQ(fs2.block().size(), 0);
 
-    // 创建测试用的 Block
+    // Create the Block for the test
     Block test_block("行业", "测试板块");
 
-    // 测试带显式 Block 参数的构造函数
+    // Test the constructor with an explicit Block parameter
     FactorSet fs3("TestWithBlock", KQuery::WEEK, test_block);
     CHECK_EQ(fs3.name(), "TESTWITHBLOCK");
     CHECK_EQ(fs3.ktype(), KQuery::WEEK);
     CHECK_FALSE(fs3.block().isNull());
     CHECK_EQ(fs3.block().category(), "行业");
     CHECK_EQ(fs3.block().name(), "测试板块");
-    CHECK_EQ(fs3.block().size(), 0);  // 新创建的 Block 应该是空的
+    CHECK_EQ(fs3.block().size(), 0);  // A newly created Block should be empty
 
-    // 测试 Block setter/getter
+    // Test the Block setter / getter
     Block new_block("概念", "新概念板块");
     fs1.block(new_block);
     CHECK_FALSE(fs1.block().isNull());
     CHECK_EQ(fs1.block().category(), "概念");
     CHECK_EQ(fs1.block().name(), "新概念板块");
 
-    // 测试拷贝语义下的 Block 共享
+    // Test the Block sharing under the copy semantics
     FactorSet fs4(fs3);
     CHECK_EQ(fs4.block().category(), "行业");
     CHECK_EQ(fs4.block().name(), "测试板块");
 
-    // 修改拷贝的 Block 应该影响原对象（浅拷贝）
+    // Modifying the Block of the copy should affect the original object (a shallow copy)
     Block modified_block = fs4.block();
     modified_block.category("地域");
     modified_block.name("修改后的板块");
@@ -446,14 +446,14 @@ TEST_CASE("test_FactorSet_block") {
     CHECK_EQ(fs3.block().name(), "修改后的板块");
 }
 
-/** @par 检测点：测试FactorSet block匹配检查 */
+/** @par Test point: test the block match check of FactorSet */
 TEST_CASE("test_FactorSet_block_check") {
-    // 创建测试用的 Blocks
+    // Create the Blocks for the test
     Block block1("行业", "科技板块");
     Block block2("行业", "金融板块");
     Block block3("概念", "新能源概念");
 
-    // 创建测试因子（注意Block参数在最后）
+    // Create the test factor (note that the Block parameter is the last one)
     Indicator ma5 = MA(CLOSE(), 5);
     Factor factor1("MA5_B1", ma5, KQuery::DAY, "MA5因子", "block1测试", false, Datetime::min(),
                    block1);
@@ -462,15 +462,15 @@ TEST_CASE("test_FactorSet_block_check") {
     Factor factor3("MA5_B3", ma5, KQuery::DAY, "MA5因子", "block3测试", false, Datetime::min(),
                    block3);
 
-    // 测试使用 block1 构造的 FactorSet
+    // Test the FactorSet constructed with block1
     SUBCASE("FactorSet with block1") {
         FactorSet fs("TestFS", KQuery::DAY, block1);
 
-        // 应该能正常添加匹配 block1 的因子
+        // A factor matching block1 should be added normally
         CHECK_NOTHROW(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
-        // 添加不匹配 block1 的因子应该抛出异常
+        // Adding a factor not matching block1 should throw an exception
         CHECK_THROWS(fs.add(factor2));
         CHECK_EQ(fs.size(), 1);  // The size should stay unchanged
 
@@ -478,15 +478,15 @@ TEST_CASE("test_FactorSet_block_check") {
         CHECK_EQ(fs.size(), 1);  // The size should stay unchanged
     }
 
-    // 测试使用 block2 构造的 FactorSet
+    // Test the FactorSet constructed with block2
     SUBCASE("FactorSet with block2") {
         FactorSet fs("TestFS", KQuery::DAY, block2);
 
-        // 应该能正常添加匹配 block2 的因子
+        // A factor matching block2 should be added normally
         CHECK_NOTHROW(fs.add(factor2));
         CHECK_EQ(fs.size(), 1);
 
-        // 添加不匹配 block2 的因子应该抛出异常
+        // Adding a factor not matching block2 should throw an exception
         CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);  // The size should stay unchanged
 
@@ -494,15 +494,15 @@ TEST_CASE("test_FactorSet_block_check") {
         CHECK_EQ(fs.size(), 1);  // The size should stay unchanged
     }
 
-    // 测试使用 block3 构造的 FactorSet
+    // Test the FactorSet constructed with block3
     SUBCASE("FactorSet with block3") {
         FactorSet fs("TestFS", KQuery::DAY, block3);
 
-        // 应该能正常添加匹配 block3 的因子
+        // A factor matching block3 should be added normally
         CHECK_NOTHROW(fs.add(factor3));
         CHECK_EQ(fs.size(), 1);
 
-        // 添加不匹配 block3 的因子应该抛出异常
+        // Adding a factor not matching block3 should throw an exception
         CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);  // The size should stay unchanged
 
@@ -510,20 +510,20 @@ TEST_CASE("test_FactorSet_block_check") {
         CHECK_EQ(fs.size(), 1);  // The size should stay unchanged
     }
 
-    // 测试默认构造的 FactorSet（空 Block）
+    // Test the default constructed FactorSet (an empty Block)
     SUBCASE("FactorSet with default empty block") {
         FactorSet fs("TestFS");
 
-        // 创建一个空 Block 的因子
+        // Create a factor with an empty Block
         Block empty_block;
         Factor factor_empty("EMPTY", ma5, KQuery::DAY, "空Block因子", "", false, Datetime::min(),
                             empty_block);
 
-        // 应该能正常添加空 Block 的因子
+        // A factor with an empty Block should be added normally
         CHECK_NOTHROW(fs.add(factor_empty));
         CHECK_EQ(fs.size(), 1);
 
-        // 添加非空 Block 的因子应该抛出异常
+        // Adding a factor with a non-empty Block should throw an exception
         CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
@@ -534,48 +534,48 @@ TEST_CASE("test_FactorSet_block_check") {
         CHECK_EQ(fs.size(), 1);
     }
 
-    // 测试运行时修改 Block 的情况
+    // Test the case of modifying the Block at runtime
     SUBCASE("FactorSet with runtime block modification") {
         FactorSet fs("TestFS", KQuery::DAY, block1);
 
-        // 先添加一个匹配的因子
+        // Add a matching factor first
         CHECK_NOTHROW(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
-        // 修改 FactorSet 的 Block
+        // Modify the Block of the FactorSet
         fs.block(block2);
 
-        // 现在添加原来匹配但现在不匹配的因子应该失败
+        // Adding the factor that matched before but not now should fail
         CHECK_THROWS(fs.add(factor1));
         CHECK_EQ(fs.size(), 1);
 
-        // 添加新的匹配因子应该成功
+        // Adding a new matching factor should succeed
         CHECK_NOTHROW(fs.add(factor2));
         CHECK_EQ(fs.size(), 2);
     }
 }
 
-/** @par 检测点：测试FactorSet因子顺序保持功能 */
+/** @par Test point: test the factor order preservation of FactorSet */
 TEST_CASE("test_FactorSet_order_preservation") {
     // Create the Indicator used by the test
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
     Indicator ma20 = MA(CLOSE(), 20);
 
-    // 创建 Factor 对象
+    // Create the Factor objects
     Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子");
     Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子");
     Factor factor3("MA20", ma20, KQuery::DAY, "20日均线因子");
 
-    // 创建 FactorSet 并按特定顺序添加因子
+    // Create a FactorSet and add the factors in a specific order
     FactorSet fs("ORDER_TEST", KQuery::DAY);
-    fs.add(factor1);  // 第1个添加
-    fs.add(factor2);  // 第2个添加
-    fs.add(factor3);  // 第3个添加
+    fs.add(factor1);  // Added 1st
+    fs.add(factor2);  // Added 2nd
+    fs.add(factor3);  // Added 3rd
 
     CHECK_EQ(fs.size(), 3);
 
-    // 验证迭代顺序与添加顺序一致
+    // Verify that the iteration order matches the addition order
     vector<string> expected_order{"MA5", "MA10", "MA20"};
     size_t index = 0;
     for (const auto& factor : fs) {
@@ -584,13 +584,13 @@ TEST_CASE("test_FactorSet_order_preservation") {
     }
     CHECK_EQ(index, 3);
 
-    // 测试重复添加相同名称的因子
+    // Test adding a factor with the same name repeatedly
     SUBCASE("Duplicate factor name handling") {
         Factor duplicate_factor("MA5", ma5, KQuery::DAY, "重复的5日均线");
         fs.add(duplicate_factor);
-        // 大小应该保持不变
+        // The size should stay unchanged
         CHECK_EQ(fs.size(), 3);
-        // 顺序应该保持不变
+        // The order should stay unchanged
         index = 0;
         for (const auto& factor : fs) {
             CHECK_EQ(factor.name(), expected_order[index]);
@@ -599,9 +599,9 @@ TEST_CASE("test_FactorSet_order_preservation") {
         CHECK_EQ(index, 3);
     }
 
-    // 测试删除最后一个因子
+    // Test removing the last factor
     SUBCASE("Remove last factor") {
-        fs.remove("MA20");  // 删除最后一个因子
+        fs.remove("MA20");  // Remove the last factor
         CHECK_EQ(fs.size(), 2);
 
         vector<string> expected_after_removal{"MA5", "MA10"};
@@ -612,18 +612,18 @@ TEST_CASE("test_FactorSet_order_preservation") {
         }
         CHECK_EQ(index, 2);
 
-        // 验证剩余因子仍可正常访问
+        // Verify that the remaining factors can still be accessed
         CHECK_UNARY(fs.have("MA5"));
         CHECK_UNARY(fs.have("MA10"));
         CHECK_FALSE(fs.have("MA20"));
     }
 
-    // 测试删除中间因子（关键测试点）
+    // Test removing a factor in the middle (the key test point)
     SUBCASE("Remove middle factor") {
-        fs.remove("MA10");  // 删除中间的因子
+        fs.remove("MA10");  // Remove the factor in the middle
         CHECK_EQ(fs.size(), 2);
 
-        // 验证顺序：第一个和第三个因子应该保持，第二个被移除
+        // Verify the order: the 1st and the 3rd factors stay and the 2nd was removed
         vector<string> expected_after_removal{"MA5", "MA20"};
         index = 0;
         for (const auto& factor : fs) {
@@ -632,17 +632,17 @@ TEST_CASE("test_FactorSet_order_preservation") {
         }
         CHECK_EQ(index, 2);
 
-        // 验证剩余因子仍可正常访问
+        // Verify that the remaining factors can still be accessed
         CHECK_UNARY(fs.have("MA5"));
         CHECK_UNARY(fs.have("MA20"));
         CHECK_FALSE(fs.have("MA10"));
 
-        // 验证可以通过名称获取因子
+        // Verify that the factor can be obtained by name
         Factor retrieved_factor = fs.get("MA20");
         CHECK_EQ(retrieved_factor.name(), "MA20");
     }
 
-    // 测试删除所有因子
+    // Test removing all the factors
     SUBCASE("Remove all factors") {
         fs.remove("MA5");
         fs.remove("MA10");
@@ -655,67 +655,67 @@ TEST_CASE("test_FactorSet_order_preservation") {
     }
 }
 
-/** @par 检测点：测试FactorSet getValues功能 */
+/** @par Test point: test the getValues functionality of FactorSet */
 TEST_CASE("test_FactorSet_getValues") {
     HKU_IF_RETURN(!pluginValid(), void());
     // Create the Indicator used by the test
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    // 创建 Factor 对象
+    // Create the Factor objects
     Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子");
     Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子");
 
-    // 创建 FactorSet
+    // Create the FactorSet
     FactorSet fs("TEST_SET", KQuery::DAY);
     fs.add(factor1);
     fs.add(factor2);
 
     CHECK_EQ(fs.size(), 2);
 
-    // 创建测试股票列表
+    // Create the test stock list
     StockList stocks;
-    // 由于没有初始化 StockManager，这里使用空列表进行测试
-    // 实际使用时应该包含有效的股票对象
+    // Since StockManager is not initialized, an empty list is used here for the test
+    // In the real usage it should contain valid stock objects
 
     KQuery query(0, Null<int64_t>(), KQuery::DAY);
 
-    // 测试 getValues 基本功能
+    // Test the basic functionality of getValues
     SUBCASE("Basic getValues functionality") {
         vector<IndicatorList> results = fs.getValues(stocks, query, false);
-        // 结果数量应该等于股票数量
+        // The result count should equal the stock count
         CHECK_EQ(results.size(), stocks.size());
-        // 每个股票的结果应该包含所有因子的计算结果
+        // The result of every stock should contain the calculation result of every factor
         for (const auto& stock_results : results) {
             CHECK_EQ(stock_results.size(), fs.size());
         }
     }
 
-    // 测试 check 参数功能
+    // Test the check parameter functionality
     SUBCASE("Check parameter functionality") {
-        // 不进行 block 检查时应该正常工作
+        // It should work without the block check
         CHECK_NOTHROW(fs.getValues(stocks, query, false));
 
-        // 当前 FactorSet 没有设置 block，所以 check=true 也应该正常工作
+        // The current FactorSet has no block, so check=true should also work
         CHECK_NOTHROW(fs.getValues(stocks, query, true));
     }
 
-    // 测试空 FactorSet 情况
+    // Test the case of an empty FactorSet
     SUBCASE("Empty FactorSet") {
         FactorSet empty_fs("EMPTY", KQuery::DAY);
         vector<IndicatorList> results = empty_fs.getValues(stocks, query, false);
         CHECK_EQ(results.size(), stocks.size());
-        // 空 FactorSet 的结果应该是空的 IndicatorList
+        // The result of an empty FactorSet should be an empty IndicatorList
         for (const auto& stock_results : results) {
             CHECK_EQ(stock_results.size(), 0);
         }
     }
 }
 
-/** @par 检测点：测试FactorSet getValues方法的完整参数组合 */
+/** @par Test point: test the full parameter combination of the FactorSet getValues method */
 TEST_CASE("test_FactorSet_getValues_complete_params") {
     HKU_IF_RETURN(!pluginValid(), void());
-    // 准备测试数据
+    // Prepare the test data
     StockManager& sm = StockManager::instance();
     Stock stock1 = sm.getStock("sh000001");  // The Shanghai Composite Index
     Stock stock2 = sm.getStock("sz000001");  // The Shenzhen Component Index
@@ -723,9 +723,9 @@ TEST_CASE("test_FactorSet_getValues_complete_params") {
     CHECK_FALSE(stock2.isNull());
 
     StockList stocks = {stock1, stock2};
-    KQuery query(0, 10, KQuery::DAY);  // 获取前10天数据
+    KQuery query(0, 10, KQuery::DAY);  // Get the data of the first 10 days
 
-    // 创建测试 FactorSet
+    // Create the test FactorSet
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
@@ -738,14 +738,14 @@ TEST_CASE("test_FactorSet_getValues_complete_params") {
 
     CHECK_EQ(factorset.size(), 2);
 
-    // 测试不同的参数组合
+    // Test the different parameter combinations
     SUBCASE("Default parameters") {
         vector<IndicatorList> result = factorset.getValues(stocks, query);
-        // 验证返回结果不为空
+        // Verify that the returned result is not empty
         CHECK_FALSE(result.empty());
-        // 验证每个股票都有对应的指标结果
+        // Verify that every stock has a corresponding indicator result
         CHECK_EQ(result.size(), stocks.size());
-        // 验证每个股票的结果包含所有因子
+        // Verify that the result of every stock contains all the factors
         for (const auto& stock_result : result) {
             CHECK_EQ(stock_result.size(), factorset.size());
         }
@@ -798,7 +798,7 @@ TEST_CASE("test_FactorSet_getValues_complete_params") {
     }
 
     SUBCASE("Mixed parameter combinations") {
-        // 测试各种参数组合
+        // Test the various parameter combinations
         vector<IndicatorList> result1 =
           factorset.getValues(stocks, query, true, false, false, false);
         vector<IndicatorList> result2 =
@@ -822,7 +822,7 @@ TEST_CASE("test_FactorSet_getValues_complete_params") {
     }
 }
 
-/** @par 检测点：测试FactorSet getValues方法的check参数功能 */
+/** @par Test point: test the check parameter of the FactorSet getValues method */
 TEST_CASE("test_FactorSet_getValues_check") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
@@ -832,9 +832,9 @@ TEST_CASE("test_FactorSet_getValues_check") {
     CHECK_FALSE(stock2.isNull());
 
     StockList test_stocks{stock1, stock2};
-    KQuery query(0, Null<int64_t>(), KQuery::DAY);  // 使用默认查询范围
+    KQuery query(0, Null<int64_t>(), KQuery::DAY);  // Use the default query range
 
-    // 创建不带 Block 的 FactorSet
+    // Create a FactorSet without a Block
     SUBCASE("FactorSet without block") {
         // Create the Indicator used by the test
         Indicator ma5 = MA(CLOSE(), 5);
@@ -846,18 +846,18 @@ TEST_CASE("test_FactorSet_getValues_check") {
         // It should work normally with check=false
         CHECK_NOTHROW(factorset.getValues(test_stocks, query, false, false, false, false));
 
-        // check=true 时也应该正常工作（因为没有 Block 限制）
+        // It should also work with check=true (there is no Block restriction)
         CHECK_NOTHROW(factorset.getValues(test_stocks, query, false, false, false, true));
     }
 
-    // 创建带 Block 的 FactorSet
+    // Create a FactorSet with a Block
     SUBCASE("FactorSet with block") {
         Block test_block("行业", "测试板块");
-        test_block.add(stock1);  // 只添加第一个股票
+        test_block.add(stock1);  // Add the first stock only
 
         FactorSet factorset("BLOCK_SET", KQuery::DAY, test_block);
 
-        // 创建使用相同 Block 的 Factor
+        // Create a Factor using the same Block
         Indicator ma5 = MA(CLOSE(), 5);
         Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "测试因子", "", false, Datetime::min(),
                       test_block);
@@ -872,16 +872,16 @@ TEST_CASE("test_FactorSet_getValues_check") {
         // It should work normally with check=false
         CHECK_NOTHROW(factorset.getValues(test_stocks, query, false, false, false, false));
 
-        // check=true 时，只包含 Block 内股票应该正常工作
+        // With check=true, containing the stocks inside the Block only should work
         StockList block_stocks{stock1};
         CHECK_NOTHROW(factorset.getValues(block_stocks, query, false, false, false, true));
 
-        // check=true 时，包含 Block 外股票应该抛出异常
+        // With check=true, containing a stock outside the Block should throw
         CHECK_THROWS(factorset.getValues(test_stocks, query, false, false, false, true));
     }
 }
 
-/** @par 检测点：测试FactorSet getValues方法的边界条件 */
+/** @par Test point: test the boundary conditions of the FactorSet getValues method */
 TEST_CASE("test_FactorSet_getValues_edge_cases") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
@@ -893,71 +893,71 @@ TEST_CASE("test_FactorSet_getValues_edge_cases") {
     StockList stocks = {stock1, stock2};
     KQuery query(0, 10, KQuery::DAY);
 
-    // 创建测试 FactorSet
+    // Create the test FactorSet
     Indicator ma5 = MA(CLOSE(), 5);
     Factor factor("EDGE_TEST", ma5, KQuery::DAY);
 
     FactorSet factorset("EDGE_TEST_SET", KQuery::DAY);
     factorset.add(factor);
 
-    // 测试空股票列表
+    // Test an empty stock list
     SUBCASE("Empty stock list") {
         StockList empty_stocks;
         vector<IndicatorList> result = factorset.getValues(empty_stocks, query);
-        // 空股票列表应该返回空结果
+        // An empty stock list should return an empty result
         CHECK_UNARY(result.empty());
     }
 
     // Test an invalid query range
     SUBCASE("Invalid query range") {
-        KQuery invalid_query(1000000, 1000010, KQuery::DAY);  // 超出实际数据范围
+        KQuery invalid_query(1000000, 1000010, KQuery::DAY);  // Beyond the actual data range
         vector<IndicatorList> result = factorset.getValues(stocks, invalid_query);
-        // 应该返回空的指标结果容器
-        CHECK_FALSE(result.empty());             // 容器不为空
-        CHECK_EQ(result.size(), stocks.size());  // 但每个股票的结果为空
+        // An empty indicator result container should be returned
+        CHECK_FALSE(result.empty());             // The container is not empty
+        CHECK_EQ(result.size(), stocks.size());  // But the result of every stock is empty
         for (const auto& stock_result : result) {
             CHECK_EQ(stock_result.size(), factorset.size());
             for (const auto& ind : stock_result) {
-                CHECK_UNARY(ind.empty());  // 指标数据为空
+                CHECK_UNARY(ind.empty());  // The indicator data is empty
             }
         }
     }
 
     // Test the different K-line types
     SUBCASE("Different KType") {
-        // 日线查询
+        // The daily line query
         KQuery day_query(0, 5, KQuery::DAY);
         vector<IndicatorList> day_result = factorset.getValues(stocks, day_query);
         CHECK_FALSE(day_result.empty());
         CHECK_EQ(day_result.size(), stocks.size());
 
-        // 周线查询
+        // The weekly line query
         KQuery week_query(0, 5, KQuery::WEEK);
         vector<IndicatorList> week_result = factorset.getValues(stocks, week_query);
         CHECK_FALSE(week_result.empty());
         CHECK_EQ(week_result.size(), stocks.size());
 
-        // 月线查询
+        // The monthly line query
         KQuery month_query(0, 5, KQuery::MONTH);
         vector<IndicatorList> month_result = factorset.getValues(stocks, month_query);
         CHECK_FALSE(month_result.empty());
         CHECK_EQ(month_result.size(), stocks.size());
     }
 
-    // 测试空FactorSet
+    // Test an empty FactorSet
     SUBCASE("Empty FactorSet") {
         FactorSet empty_set("EMPTY", KQuery::DAY);
         vector<IndicatorList> result = empty_set.getValues(stocks, query);
         CHECK_FALSE(result.empty());
         CHECK_EQ(result.size(), stocks.size());
-        // 空 FactorSet 的结果应该是空的 IndicatorList
+        // The result of an empty FactorSet should be an empty IndicatorList
         for (const auto& stock_result : result) {
             CHECK_EQ(stock_result.size(), 0);
         }
     }
 }
 
-/** @par 检测点：测试FactorSet getValues方法的结果正确性 */
+/** @par Test point: test the result correctness of the FactorSet getValues method */
 TEST_CASE("test_FactorSet_getValues_result_correctness") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
@@ -967,9 +967,9 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
     CHECK_FALSE(stock2.isNull());
 
     StockList stocks = {stock1, stock2};
-    KQuery query(0, 20, KQuery::DAY);  // 获取20天数据进行验证
+    KQuery query(0, 20, KQuery::DAY);  // Get 20 days of data for the verification
 
-    // 创建测试因子集
+    // Create the test factor set
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
@@ -983,7 +983,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
     CHECK_EQ(factorset.size(), 2);
 
     SUBCASE("Basic functionality and result validation") {
-        // 测试基本功能并验证计算结果
+        // Test the basic functionality and verify the calculation result
         vector<IndicatorList> result = factorset.getValues(stocks, query);
         CHECK_FALSE(result.empty());
         CHECK_EQ(result.size(), 2);  // The results of the two stocks
@@ -991,9 +991,9 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
         // Verify the result of every stock
         for (size_t stock_idx = 0; stock_idx < result.size(); ++stock_idx) {
             const IndicatorList& stock_result = result[stock_idx];
-            CHECK_EQ(stock_result.size(), 2);  // 每个股票有两个因子的结果
+            CHECK_EQ(stock_result.size(), 2);  // Every stock has the results of the two factors
 
-            // 验证每个因子的结果
+            // Verify the result of every factor
             for (size_t factor_idx = 0; factor_idx < stock_result.size(); ++factor_idx) {
                 const Indicator& ind = stock_result[factor_idx];
                 CHECK_FALSE(ind.empty());
@@ -1001,14 +1001,14 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
                 CHECK_GE(ind.discard(), 0);
                 CHECK_EQ(ind.getResultNumber(), 1);
 
-                // 验证数值合理性（跳过discard部分）
+                // Verify the sanity of the values (skipping the discard part)
                 for (size_t i = ind.discard(); i < ind.size(); ++i) {
                     if (!std::isnan(ind[i]) && !std::isinf(ind[i])) {
                         CHECK_GT(ind[i], 0.0);
                     }
                 }
 
-                // 验证discard部分确实是NaN
+                // Verify that the discard part is really NaN
                 for (size_t i = 0; i < ind.discard(); ++i) {
                     CHECK_UNARY(std::isnan(ind[i]));
                 }
@@ -1017,7 +1017,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
     }
 
     SUBCASE("Parameter combinations validation") {
-        // 测试不同参数组合的功能性验证
+        // The functional verification of the different parameter combinations
         vector<IndicatorList> result1 =
           factorset.getValues(stocks, query, false, false, false, false);
         vector<IndicatorList> result2 =
@@ -1027,26 +1027,26 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
         vector<IndicatorList> result4 =
           factorset.getValues(stocks, query, false, false, true, false);
 
-        // 所有结果都应该有效
+        // All the results should be valid
         CHECK_FALSE(result1.empty());
         CHECK_FALSE(result2.empty());
         CHECK_FALSE(result3.empty());
         CHECK_FALSE(result4.empty());
 
-        // 验证基本属性
+        // Verify the basic attributes
         CHECK_EQ(result1.size(), 2);
         CHECK_EQ(result2.size(), 2);
         CHECK_EQ(result3.size(), 2);
         CHECK_EQ(result4.size(), 2);
 
-        // 验证每个结果都有正确的因子数量
+        // Verify that every result has the correct factor count
         for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
             CHECK_EQ(result1[stock_idx].size(), 2);
             CHECK_EQ(result2[stock_idx].size(), 2);
             CHECK_EQ(result3[stock_idx].size(), 2);
             CHECK_EQ(result4[stock_idx].size(), 2);
 
-            // 验证每个因子结果的基本属性
+            // Verify the basic attributes of every factor result
             for (size_t factor_idx = 0; factor_idx < 2; ++factor_idx) {
                 const Indicator& ind1 = result1[stock_idx][factor_idx];
                 const Indicator& ind2 = result2[stock_idx][factor_idx];
@@ -1067,7 +1067,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
     }
 
     SUBCASE("Edge case handling validation") {
-        // 测试边界情况
+        // Test the boundary cases
         StockList empty_stocks;
         vector<IndicatorList> empty_result = factorset.getValues(empty_stocks, query);
         CHECK_UNARY(empty_result.empty());
@@ -1104,7 +1104,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
         CHECK_EQ(week_result.size(), 2);
         CHECK_EQ(month_result.size(), 2);
 
-        // 验证都有合理的数据
+        // Verify that all of them have reasonable data
         for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
             CHECK_GT(day_result[stock_idx].size(), 0);
             CHECK_GT(week_result[stock_idx].size(), 0);
@@ -1123,7 +1123,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
     }
 
     SUBCASE("Result consistency validation") {
-        // 测试多次调用结果的一致性
+        // Test the consistency of the results of multiple calls
         vector<IndicatorList> result1 = factorset.getValues(stocks, query);
         vector<IndicatorList> result2 = factorset.getValues(stocks, query);
 
@@ -1132,7 +1132,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
         CHECK_EQ(result1.size(), result2.size());
         CHECK_EQ(result1.size(), 2);
 
-        // 验证每只股票的结果一致性
+        // Verify the consistency of the result of every stock
         for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
             const IndicatorList& stock_result1 = result1[stock_idx];
             const IndicatorList& stock_result2 = result2[stock_idx];
@@ -1140,7 +1140,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
             CHECK_EQ(stock_result1.size(), stock_result2.size());
             CHECK_EQ(stock_result1.size(), 2);
 
-            // 验证每个因子结果的一致性
+            // Verify the consistency of every factor result
             for (size_t factor_idx = 0; factor_idx < 2; ++factor_idx) {
                 const Indicator& ind1 = stock_result1[factor_idx];
                 const Indicator& ind2 = stock_result2[factor_idx];
@@ -1148,7 +1148,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
                 CHECK_EQ(ind1.size(), ind2.size());
                 CHECK_EQ(ind1.discard(), ind2.discard());
 
-                // 验证有效数据一致
+                // Verify that the valid data is consistent
                 for (size_t i = std::max(ind1.discard(), ind2.discard());
                      i < std::min(ind1.size(), ind2.size()); ++i) {
                     if (!std::isnan(ind1[i]) && !std::isnan(ind2[i])) {
@@ -1160,7 +1160,7 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
     }
 
     SUBCASE("Align parameter validation") {
-        // 测试align参数的效果
+        // Test the effect of the align parameter
         vector<IndicatorList> result_false = factorset.getValues(stocks, query, false);
         vector<IndicatorList> result_true = factorset.getValues(stocks, query, true);
 
@@ -1169,11 +1169,11 @@ TEST_CASE("test_FactorSet_getValues_result_correctness") {
         CHECK_EQ(result_false.size(), result_true.size());
         CHECK_EQ(result_false.size(), 2);
 
-        // 获取交易日历验证align=true的效果
+        // Get the trading calendar to verify the effect of align=true
         DatetimeList trading_dates = sm.getTradingCalendar(query);
         CHECK_FALSE(trading_dates.empty());
 
-        // 验证align=true时结果大小与交易日历匹配
+        // Verify that with align=true the result size matches the trading calendar
         for (size_t stock_idx = 0; stock_idx < result_true.size(); ++stock_idx) {
             for (size_t factor_idx = 0; factor_idx < result_true[stock_idx].size(); ++factor_idx) {
                 const Indicator& ind_aligned = result_true[stock_idx][factor_idx];
@@ -1421,9 +1421,9 @@ TEST_CASE("test_FactorSet_compiled_path_nested_invocation") {
     }
 }
 
-/** @par 检测点：测试FactorSet边界条件和异常处理 */
+/** @par Test point: test the boundary conditions and the exception handling of FactorSet */
 TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
-    // 测试空名称构造
+    // Test the construction with an empty name
     SUBCASE("Empty name construction") {
         FactorSet fs("", KQuery::DAY);
         CHECK_EQ(fs.name(), "");
@@ -1432,7 +1432,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         CHECK_UNARY(fs.empty());
     }
 
-    // 测试极端长名称
+    // Test an extremely long name
     SUBCASE("Very long name") {
         string long_name(1000, 'A');
         FactorSet fs(long_name, KQuery::DAY);
@@ -1440,12 +1440,12 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         CHECK_EQ(fs.ktype(), KQuery::DAY);
     }
 
-    // 测试大量因子的情况
+    // Test the case of many factors
     SUBCASE("Large number of factors") {
         FactorSet fs("LARGE_SET", KQuery::DAY);
         Indicator base_indicator = CLOSE();
 
-        // 添加大量因子（测试性能和稳定性）
+        // Add many factors (testing the performance and the stability)
         const size_t factor_count = 100;
         for (size_t i = 0; i < factor_count; ++i) {
             string name = "FACTOR_" + std::to_string(i);
@@ -1456,7 +1456,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
 
         CHECK_EQ(fs.size(), factor_count);
 
-        // 测试随机访问
+        // Test the random access
         for (size_t i = 0; i < factor_count; i += 10) {
             string name = "FACTOR_" + std::to_string(i);
             CHECK_UNARY(fs.have(name));
@@ -1464,7 +1464,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
             CHECK_EQ(factor.name(), name);
         }
 
-        // 测试迭代器遍历
+        // Test the iterator traversal
         size_t count = 0;
         for (const auto& factor : fs) {
             CHECK_FALSE(factor.name().empty());
@@ -1473,7 +1473,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         CHECK_EQ(count, factor_count);
     }
 
-    // 测试重复添加大量同名因子
+    // Test adding many factors with the same name repeatedly
     SUBCASE("Massive duplicate additions") {
         FactorSet fs("DUPLICATE_TEST", KQuery::DAY);
         Indicator ma5 = MA(CLOSE(), 5);
@@ -1482,7 +1482,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         const size_t iterations = 3;
         for (size_t i = 0; i < iterations; ++i) {
             CHECK_NOTHROW(fs.add(base_factor));
-            // 大小应该始终保持为1
+            // The size should always stay 1
             CHECK_EQ(fs.size(), 1);
         }
 
@@ -1490,7 +1490,7 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         CHECK_UNARY(fs.have("SAME_NAME"));
     }
 
-    // 测试并发访问（模拟多线程环境）
+    // Test the concurrent access (simulating a multi-threaded environment)
     SUBCASE("Concurrent-like access simulation") {
         FactorSet fs("CONCURRENT_TEST", KQuery::DAY);
         Indicator ma5 = MA(CLOSE(), 5);
@@ -1499,11 +1499,11 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         Factor factor1("MA5", ma5, KQuery::DAY);
         Factor factor2("MA10", ma10, KQuery::DAY);
 
-        // 模拟并发添加
+        // Simulate a concurrent add
         fs.add(factor1);
         fs.add(factor2);
 
-        // 模拟并发读取
+        // Simulate a concurrent read
         CHECK_UNARY(fs.have("MA5"));
         CHECK_UNARY(fs.have("MA10"));
 
@@ -1513,62 +1513,62 @@ TEST_CASE("test_FactorSet_edge_cases_and_exceptions") {
         CHECK_EQ(f1.name(), "MA5");
         CHECK_EQ(f2.name(), "MA10");
 
-        // 模拟并发删除
+        // Simulate a concurrent remove
         fs.remove("MA5");
         CHECK_FALSE(fs.have("MA5"));
         CHECK_EQ(fs.size(), 1);
     }
 }
 
-/** @par 检测点：测试FactorSet性能相关功能 */
+/** @par Test point: test the performance related functionality of FactorSet */
 TEST_CASE("test_FactorSet_performance_features") {
-    // 测试不同K线类型的FactorSet性能
+    // Test the performance of the FactorSet with the different K-line types
     SUBCASE("Different KType performance") {
         Indicator ma5 = MA(CLOSE(), 5);
 
-        // 日线FactorSet
+        // The daily line FactorSet
         FactorSet day_fs("DAY_PERF", KQuery::DAY);
         Factor day_factor("DAY_MA5", ma5, KQuery::DAY);
         CHECK_NOTHROW(day_fs.add(day_factor));
         CHECK_EQ(day_fs.size(), 1);
 
-        // 周线FactorSet
+        // The weekly line FactorSet
         FactorSet week_fs("WEEK_PERF", KQuery::WEEK);
         Factor week_factor("WEEK_MA5", ma5, KQuery::WEEK);
         CHECK_NOTHROW(week_fs.add(week_factor));
         CHECK_EQ(week_fs.size(), 1);
 
-        // 月线FactorSet
+        // The monthly line FactorSet
         FactorSet month_fs("MONTH_PERF", KQuery::MONTH);
         Factor month_factor("MONTH_MA5", ma5, KQuery::MONTH);
         CHECK_NOTHROW(month_fs.add(month_factor));
         CHECK_EQ(month_fs.size(), 1);
 
-        // 季线FactorSet
+        // The quarterly line FactorSet
         FactorSet quarter_fs("QUARTER_PERF", KQuery::QUARTER);
         Factor quarter_factor("QUARTER_MA5", ma5, KQuery::QUARTER);
         CHECK_NOTHROW(quarter_fs.add(quarter_factor));
         CHECK_EQ(quarter_fs.size(), 1);
 
-        // 年线FactorSet
+        // The yearly line FactorSet
         FactorSet year_fs("YEAR_PERF", KQuery::YEAR);
         Factor year_factor("YEAR_MA5", ma5, KQuery::YEAR);
         CHECK_NOTHROW(year_fs.add(year_factor));
         CHECK_EQ(year_fs.size(), 1);
     }
 
-    // 测试复杂指标组合的性能
+    // Test the performance of a complex indicator combination
     SUBCASE("Complex indicator combination performance") {
         FactorSet fs("COMPLEX_PERF", KQuery::DAY);
 
-        // 创建复杂的指标组合
+        // Create a complex indicator combination
         Indicator close = CLOSE();
         Indicator open = OPEN();
         Indicator high = HIGH();
         Indicator low = LOW();
         Indicator vol = VOL();
 
-        // 添加各种复杂因子
+        // Add the various complex factors
         vector<std::pair<string, Indicator>> indicators = {
           {"PRICE_RANGE", high - low},
           {"PRICE_CHANGE", close - open},
@@ -1583,7 +1583,7 @@ TEST_CASE("test_FactorSet_performance_features") {
 
         CHECK_EQ(fs.size(), indicators.size());
 
-        // 验证所有因子都能正确访问
+        // Verify that all the factors can be accessed correctly
         for (const auto& item : indicators) {
             CHECK_UNARY(fs.have(item.first));
             const Factor& factor = fs.get(item.first);
@@ -1592,19 +1592,19 @@ TEST_CASE("test_FactorSet_performance_features") {
     }
 }
 
-/** @par 检测点：测试FactorSet内存管理和资源释放 */
+/** @par Test point: test the memory management and the resource release of FactorSet */
 TEST_CASE("test_FactorSet_memory_management") {
-    // 测试大量临时对象的内存管理
+    // Test the memory management of many temporary objects
     SUBCASE("Temporary object memory management") {
         vector<FactorSet> factor_sets;
 
-        // 创建多个FactorSet实例
+        // Create multiple FactorSet instances
         const size_t set_count = 50;
         for (size_t i = 0; i < set_count; ++i) {
             string name = "TEMP_SET_" + std::to_string(i);
             FactorSet fs(name, KQuery::DAY);
 
-            // 为每个FactorSet添加几个因子
+            // Add a few factors to every FactorSet
             for (size_t j = 0; j < 3; ++j) {
                 string factor_name = "FACTOR_" + std::to_string(j);
                 Indicator ind = MA(CLOSE(), static_cast<int>(j + 5));
@@ -1615,23 +1615,23 @@ TEST_CASE("test_FactorSet_memory_management") {
             factor_sets.push_back(std::move(fs));
         }
 
-        // 验证所有FactorSet都正确创建
+        // Verify that all the FactorSets were created correctly
         CHECK_EQ(factor_sets.size(), set_count);
         for (size_t i = 0; i < set_count; ++i) {
             CHECK_EQ(factor_sets[i].size(), 3);
             CHECK_EQ(factor_sets[i].name(), "TEMP_SET_" + std::to_string(i));
         }
 
-        // 清理
+        // Clean up
         factor_sets.clear();
     }
 
-    // 测试循环引用检测
+    // Test the circular reference detection
     SUBCASE("Circular reference detection") {
         FactorSet fs1("SET1", KQuery::DAY);
         FactorSet fs2("SET2", KQuery::DAY);
 
-        // 正常的操作不应该导致循环引用
+        // A normal operation should not cause a circular reference
         Indicator ma5 = MA(CLOSE(), 5);
         Factor factor1("MA5_1", ma5, KQuery::DAY);
         Factor factor2("MA5_2", ma5, KQuery::DAY);
@@ -1639,16 +1639,16 @@ TEST_CASE("test_FactorSet_memory_management") {
         CHECK_NOTHROW(fs1.add(factor1));
         CHECK_NOTHROW(fs2.add(factor2));
 
-        // 验证两个FactorSet互相独立
+        // Verify that the two FactorSets are independent of each other
         CHECK_EQ(fs1.size(), 1);
         CHECK_EQ(fs2.size(), 1);
         CHECK_NE(&fs1, &fs2);
     }
 }
 
-/** @par 检测点：测试FactorSet与其他系统的集成 */
+/** @par Test point: test the integration of FactorSet with the other systems */
 TEST_CASE("test_FactorSet_integration") {
-    // 测试与StockManager的集成
+    // Test the integration with StockManager
     SUBCASE("StockManager integration") {
         FactorSet fs("STOCK_INTEGRATION", KQuery::DAY);
         Indicator ma5 = MA(CLOSE(), 5);
@@ -1657,22 +1657,23 @@ TEST_CASE("test_FactorSet_integration") {
         CHECK_NOTHROW(fs.add(factor));
         CHECK_EQ(fs.size(), 1);
 
-        // 测试getAllValues（会调用StockManager）
+        // Test getAllValues (it calls StockManager)
         KQuery query(0, 10, KQuery::DAY);
         CHECK_NOTHROW(fs.getAllValues(query));
-        // 注意：实际结果取决于StockManager的状态，这里只测试不抛异常
+        // Note: the real result depends on the state of StockManager; only no exception is tested
+        // here
     }
 
-    // 测试与Block系统的集成
+    // Test the integration with the Block system
     SUBCASE("Block system integration") {
-        // 创建一个真实的Block（如果可能的话）
+        // Create a real Block (if possible)
         Block real_block("行业", "真实测试板块");
 
         FactorSet fs("BLOCK_INTEGRATION", KQuery::DAY, real_block);
         CHECK_EQ(fs.block().category(), "行业");
         CHECK_EQ(fs.block().name(), "真实测试板块");
 
-        // 测试Block相关操作
+        // Test the Block related operations
         Block new_block("概念", "新概念");
         fs.block(new_block);
         CHECK_EQ(fs.block().category(), "概念");
@@ -1682,7 +1683,7 @@ TEST_CASE("test_FactorSet_integration") {
 
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点：测试FactorSet序列化功能 */
+/** @par Test point: test the serialization of FactorSet */
 TEST_CASE("test_FactorSet_serialization") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -1692,7 +1693,7 @@ TEST_CASE("test_FactorSet_serialization") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    // 创建测试用的 Block
+    // Create the Block for the test
     Block test_block("行业", "测试板块");
 
     Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线", false, Datetime::min(),
@@ -1700,7 +1701,7 @@ TEST_CASE("test_FactorSet_serialization") {
     Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线", false,
                    Datetime::min(), test_block);
 
-    // 测试基本序列化 - 空FactorSet
+    // Test the basic serialization - an empty FactorSet
     SUBCASE("Empty FactorSet serialization") {
         FactorSet fs1("EMPTY_TEST", KQuery::DAY, test_block);
 
@@ -1724,7 +1725,7 @@ TEST_CASE("test_FactorSet_serialization") {
         CHECK_EQ(fs1.block().name(), fs2.block().name());
     }
 
-    // 测试带因子的序列化
+    // Test the serialization with the factors
     SUBCASE("FactorSet with factors serialization") {
         FactorSet fs1("FACTORS_TEST", KQuery::DAY, test_block);
         fs1.add(factor1);
@@ -1749,7 +1750,7 @@ TEST_CASE("test_FactorSet_serialization") {
         CHECK_EQ(fs1.block().category(), fs2.block().category());
         CHECK_EQ(fs1.block().name(), fs2.block().name());
 
-        // 验证因子也被正确序列化
+        // Verify that the factors were serialized correctly too
         CHECK_UNARY(fs2.have("MA5"));
         CHECK_UNARY(fs2.have("MA10"));
 
@@ -1762,7 +1763,7 @@ TEST_CASE("test_FactorSet_serialization") {
         CHECK_EQ(retrieved_ma10.brief(), "10日均线因子");
     }
 
-    // 测试不同K线类型的序列化
+    // Test the serialization of the different K-line types
     SUBCASE("Different KType serialization") {
         Indicator week_ma = MA(CLOSE(), 5);
         Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
@@ -1789,7 +1790,7 @@ TEST_CASE("test_FactorSet_serialization") {
         CHECK_UNARY(fs2.have("WEEK_MA"));
     }
 
-    // 测试空名称的序列化
+    // Test the serialization of an empty name
     SUBCASE("Empty name serialization") {
         FactorSet fs1("", KQuery::DAY, test_block);
         fs1.add(factor1);
@@ -1813,7 +1814,7 @@ TEST_CASE("test_FactorSet_serialization") {
         CHECK_UNARY(fs2.have("MA5"));
     }
 
-    // 测试修改后的序列化
+    // Test the serialization after the modification
     SUBCASE("Modified FactorSet serialization") {
         FactorSet fs1("MODIFY_TEST", KQuery::DAY, test_block);
         fs1.add(factor1);
@@ -1824,7 +1825,7 @@ TEST_CASE("test_FactorSet_serialization") {
             oa << BOOST_SERIALIZATION_NVP(fs1);
         }
 
-        // 修改原始对象
+        // Modify the original object
         fs1.add(factor2);
         fs1.remove("MA5");
 
@@ -1835,14 +1836,15 @@ TEST_CASE("test_FactorSet_serialization") {
             ia >> BOOST_SERIALIZATION_NVP(fs2);
         }
 
-        // 验证反序列化的对象是保存时的状态，不受后续修改影响
+        // Verify that the deserialized object has the state at the save time, unaffected by the
+        // later modification
         CHECK_EQ(fs2.name(), "MODIFY_TEST");
         CHECK_EQ(fs2.size(), 1);
         CHECK_UNARY(fs2.have("MA5"));
         CHECK_FALSE(fs2.have("MA10"));
     }
 
-    // 测试Block为空的序列化
+    // Test the serialization with an empty Block
     SUBCASE("Empty Block serialization") {
         FactorSet fs1("NO_BLOCK_TEST", KQuery::DAY);
 
