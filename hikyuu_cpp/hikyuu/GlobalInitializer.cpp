@@ -45,7 +45,7 @@ int GlobalInitializer::m_count = 0;
 
 void GlobalInitializer::init() {
 #ifdef MSVC_LEAKER_DETECT
-    // MSVC内存泄露检测
+    // MSVC memory leak detection
     int flag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
     flag |= _CRTDBG_LEAK_CHECK_DF;
     flag |= _CRTDBG_ALLOC_MEM_DF;
@@ -53,21 +53,22 @@ void GlobalInitializer::init() {
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
     _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
 
-    // 存在内存泄露时，可在填写 VS 输出的泄露点，VS 调试时可自动跳转
-    // 记得重新设回 -1 或注释掉，否则会运行失败
+    // When a memory leak exists, the leak point can be filled in the VS output and VS can jump to
+    // it automatically during the debugging Remember to set it back to -1 or comment it out,
+    // otherwise the run would fail
     _CrtSetBreakAlloc(-1);
 #endif
 
     IndicatorImp::initEngine();
 
 #if HKU_OS_WINDOWS
-    // 获取进程默认堆
+    // Get the default heap of the process
     HANDLE hHeap = GetProcessHeap();
     if (hHeap == NULL) {
         fmt::print("GetProcessHeap failed: {}\n", GetLastError());
     }
 
-    // 启用LFH（关键：lfhFlag固定为2）
+    // Enable the LFH (key: lfhFlag is fixed to 2)
     ULONG lfhFlag = 2;
     if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &lfhFlag, sizeof(lfhFlag))) {
         fmt::print("Enable LFH failed: {}\n", GetLastError());
@@ -131,13 +132,16 @@ void GlobalInitializer::clean() {
 
     StockManager &sm = StockManager::instance();
     sm.cancelLoad();
-    // 等待后台预加载线程退出：须在任何 tg->stop() 之前，根除预加载线程对 m_load_tg
-    // 的并发访问（C3：TOCTOU/UAF）。该线程不涉及 nng，cancel 后快速退出，join 安全
-    // （Windows 亦然，与其进程退出路径跳过 nng 拆除的既有决策互不冲突）。
+    // Wait for the background preload thread to exit: it must happen before any tg->stop(),
+    // eradicating the concurrent access of the preload thread to m_load_tg (C3: TOCTOU/UAF). That
+    // thread does not involve nng and exits quickly after the cancel, so the join is safe (the same
+    // on Windows, which does not conflict with the existing decision of skipping the nng teardown
+    // in its process exit path).
     sm.joinPreloadThread();
 
 #if HKU_OS_OSX
-    // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
+    // Actively stop the asynchronous data loading task group, otherwise hdf5 reports a close
+    // exception on linux
     auto *tg = sm.getLoadTaskGroup();
     if (tg) {
         tg->stop();
@@ -149,25 +153,30 @@ void GlobalInitializer::clean() {
     releaseGlobalSpotAgent();
 
 #if !HKU_OS_OSX
-    // 主动停止异步数据加载任务组，否则 hdf5 在 linux 下会报关闭异常
+    // Actively stop the asynchronous data loading task group, otherwise hdf5 reports a close
+    // exception on linux
     auto *tg = sm.getLoadTaskGroup();
     if (tg) {
         tg->stop();
     }
 #endif
 
-    // 注销 shm 客户端转发回调（若本进程为客户端）：此后 Stock::realtimeUpdate / getLastUpdateTime 的
-    // 转发调用直接返回，避免退出期在已失效的连接上阻塞。默认构建下 ~StockManager 从不执行，
-    // 故与服务端停机一样须在 clean() 中显式调用。
+    // Unregister the shm client forwarding callbacks (if this process is a client): after that the
+    // forwarding calls of Stock::realtimeUpdate / getLastUpdateTime return directly, avoiding
+    // blocking on an already invalid connection during the exit. In the default build ~StockManager
+    // is never executed, so like the server shutdown it must be called explicitly in clean().
     ipc::registerShmClient(ipc::ShmClientForwarders());
 
-    // 显式停止本进程内拉起的 shm 数据服务（若已 startShmServer）：须早于下方 nng_fini，
-    // 服务端 nng worker 持有在飞接收操作，晚于 nng 全局状态拆除会崩溃。未启动时为
-    // 空操作（门面仅查本进程插件指针，不触发插件加载）。
+    // Explicitly stop the shm data service started in this process (if startShmServer was called):
+    // it must happen before the nng_fini below, because the server nng worker holds in-flight
+    // receive operations and would crash if the global nng state is torn down first. When it was
+    // not started it is a no-op (the facade only checks the plugin pointer of this process and does
+    // not trigger a plugin load).
     stopShmServer();
 
 #if HKU_ENABLE_LEAK_DETECT || defined(MSVC_LEAKER_DETECT)
-    // 非内存泄漏检测时，内存让系统自动释放，避免某些场景下 windows 下退出速度过慢
+    // Without the memory leak detection the memory is left to the system to release automatically,
+    // avoiding a too slow exit on Windows in some scenarios
     StockManager::quit();
 #else
     fmt::print("Quit Hikyuu system!\n\n");
@@ -181,7 +190,7 @@ void GlobalInitializer::clean() {
 #endif
 
 #if !HKU_OS_WINDOWS
-    // windows 反而会卡死
+    // on Windows it would hang instead
     nng_fini();
 #endif
 
@@ -192,7 +201,7 @@ void GlobalInitializer::clean() {
     spdlog::drop_all();
 
 #ifdef MSVC_LEAKER_DETECT
-    // MSVC 内存泄露检测，输出至 VS 的输出窗口
+    // The MSVC memory leak detection, it outputs to the output window of VS
     _CrtDumpMemoryLeaks();
 #endif
 }

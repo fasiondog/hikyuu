@@ -447,7 +447,8 @@ void Stock::releaseKDataBuffer(KQuery::KType ktype) const {
         }
     }
 
-    // 同时释放掉历史财务信息，以便重加载时获取最新数据
+    // Release the historical financial information at the same time, so that the latest data is
+    // fetched on a reload
     {
         std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
         m_data->m_history_finance_ready = false;
@@ -455,7 +456,7 @@ void Stock::releaseKDataBuffer(KQuery::KType ktype) const {
     }
 }
 
-// 仅在初始化时调用
+// Called during the initialization only
 void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     HKU_IF_RETURN(!m_data || !m_kdataDriver, void());
 
@@ -465,7 +466,8 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
-    // CSV 直接全部加载至内存，其他类型依据配置的预加载参数进行加载
+    // CSV is loaded into the memory entirely, the other types are loaded according to the
+    // configured preload parameters
     KQuery query = KQuery(0, Null<int64_t>(), kType);
 
     if (driver->name() != "TMPCSV") {
@@ -494,7 +496,8 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
 
     {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[kType]));
-        // 需要对是否已缓存进行二次判定，防止加锁之前已被缓存
+        // A second check of the caching is needed, to prevent it from having been cached before the
+        // lock
         if (m_data->pKData.find(kType) != m_data->pKData.end() && m_data->pKData[kType]) {
             return;
         }
@@ -552,20 +555,30 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
 StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) const {
     StockWeightList result;
     HKU_IF_RETURN(!m_data || start >= end, result);
-    // 权息缓存就绪（物化/懒加载兜底/已释放后重读）策略，按进程角色区分：
-    // - 客户端模式：启动期已按 load_stock_weight 配置物化全量权息（见
-    //   StockManager::loadAllStockWeights），此处仅对未物化的证券按需兜底——覆盖配置关闭
-    //   （load_stock_weight=false，启动期不做预载）、addStock 新增或全新构造等不在物化范围的
-    //   证券，经驱动（IpcBaseInfoDriver，shm 优先，未覆盖回退 IPC/本地）读取整只权息并缓存；
-    // - shm server 角色：含财务基础快照发布后 StockManager::releaseShmServerBaseInfoCache()
-    //   已释放各证券本地权息缓存（见该方法说明，客户端均经共享内存读取），此处对已释放证券按需
-    //   经驱动懒加载重读自愈（IPC 兜底应答、同进程 API 访问），保证结果正确；
-    // - 普通主进程独立模式：直接读本地 m_weightList，无懒加载兜底（启动期已全量物化）。
-    // 未就绪证券并发懒加载可能重复，结果一致，可以容忍（与 getHistoryFinance 懒加载同理）。
-    // 空结果同样置位 m_weight_ready，避免无权息证券每次查询反复访问驱动。
+    // The readiness policy of the ex-rights/ex-dividend cache (materialization / lazy loading
+    // fallback / re-reading after a release) differs by the process role:
+    // - The client mode: all the ex-rights/ex-dividend data has been materialized at the startup
+    // according to the load_stock_weight config (see
+    //   StockManager::loadAllStockWeights); here only the not materialized securities are handled
+    //   on demand, covering the config being off (load_stock_weight=false, no preload at the
+    //   startup) and the securities added by addStock or newly constructed that are out of the
+    //   materialization scope, which are read as a whole through the driver (IpcBaseInfoDriver, shm
+    //   first, falling back to IPC / local when not covered) and cached;
+    // - The shm server role: after the basic snapshot with the finance is published,
+    // StockManager::releaseShmServerBaseInfoCache()
+    //   has released the local ex-rights/ex-dividend cache of every security (see the description
+    //   of that method; the clients all read through the shared memory), and here the released
+    //   securities are re-read lazily through the driver for self healing on demand (the IPC
+    //   fallback reply and the API access in the same process), guaranteeing a correct result;
+    // - The ordinary standalone mode of the main process: it reads the local m_weightList directly
+    // with no lazy loading fallback (everything is materialized at the startup). The concurrent
+    // lazy loading of a not ready security may be duplicated, the results are the same and it is
+    // tolerable (the same as the getHistoryFinance lazy loading). An empty result also sets
+    // m_weight_ready, avoiding the repeated driver access of the securities without the
+    // ex-rights/ex-dividend data on every query.
     StockManager& sm = StockManager::instance();
     auto lazy_load_weight = [this, &sm]() {
-        // 调用方需已持有 m_weight_mutex 唯一锁
+        // The caller must already hold the unique lock of m_weight_mutex
         StockWeightList full_list = sm.getStockWeightList(*this, Datetime::min(), Null<Datetime>());
         full_list.shrink_to_fit();
         m_data->m_weightList.swap(full_list);
@@ -579,13 +592,16 @@ StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) con
         }
     }
     std::shared_lock<std::shared_mutex> lock(m_data->m_weight_mutex);
-    // 与 releaseShmServerBaseInfoCache() 并发的释放窗口：抢先通过上面 ready 检查的读线程可能在
-    // 读锁内发现缓存刚被清空且 ready 置 false（真正无权息证券表现为 ready=true 空表，不会进入
-    // 此分支），放弃读锁补一次懒加载后重查，避免 IPC 兜底应答返回空权息。
-    // 补查仅限具备懒加载兜底的角色（client / server），普通独立模式下即使缓存被清空也保持
-    // “只读物化缓存”的既有语义（该模式正常不会发生释放）
-    if (m_data->m_weightList.empty() &&
-        !m_data->m_weight_ready.load(std::memory_order_acquire) &&
+    // The release window concurrent with releaseShmServerBaseInfoCache(): a read thread that passed
+    // the ready check above may find inside the read lock that the cache has just been cleared and
+    // ready is set to false (a security really without the data appears as a ready=true empty table
+    // and does not enter this branch); it gives up the read lock, performs one more lazy loading
+    // and queries again, avoiding an IPC fallback reply returning empty ex-rights/ex-dividend data.
+    // The supplementary query is limited to the roles with the lazy loading fallback (client /
+    // server); in the ordinary standalone mode the existing semantics of "reading the materialized
+    // cache only" are kept even if the cache is cleared (a release normally does not happen in that
+    // mode)
+    if (m_data->m_weightList.empty() && !m_data->m_weight_ready.load(std::memory_order_acquire) &&
         (sm.isIpcClientMode() || isShmServerRole())) {
         lock.unlock();
         std::unique_lock<std::shared_mutex> unique_lock(m_data->m_weight_mutex);
@@ -651,13 +667,13 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             loadKDataToBuffer(ktype);
         }
 
-        // 如果为内存缓存或者数据驱动为索引优先，则按索引方式获取
+        // If it is an in-memory cache or the data driver prefers the index, acquire it by index
         if (isBuffer(ktype)) {
             KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
             size_t out_start, out_end;
 
             if (_getIndexRangeFromBuffer(query, out_start, out_end)) {
-                // 找到的是>=datetime的记录
+                // The record found is >= datetime
                 KRecord k = _getKRecordFromBuffer(out_start, ktype);
                 if (k.datetime == datetime) {
                     return k.closePrice;
@@ -672,7 +688,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
             size_t out_start, out_end;
             if (getIndexRange(query, out_start, out_end)) {
-                // 找到的是>=datetime的记录
+                // The record found is >= datetime
                 KRecord k = getKRecord(out_start, ktype);
                 if (k.datetime == datetime) {
                     return k.closePrice;
@@ -684,9 +700,9 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             }
 
         } else {
-            // 未在缓存中，且日期优先的情况下
-            // 先尝试获取等于该日期的K线数据
-            // 如未找到，则获取小于该日期的最后一条记录
+            // It is not in the cache and the date is preferred
+            // Try to get the K-line data equal to that date first
+            // If it is not found, get the last record earlier than that date
             KQuery query = KQueryByDate(datetime, datetime + Minutes(1), ktype);
             auto k_list = getKRecordList(query);
             if (k_list.size() > 0 && k_list[0].datetime == datetime) {
@@ -700,7 +716,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             }
         }
 
-        // 没有找到，则取最后一条记录
+        // If it is not found, take the last record
         price_t price = 0.0;
         size_t total = getCount(ktype);
         if (total > 0) {
@@ -714,7 +730,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
         KQuery query = KQueryByDate(datetime, Null<Datetime>(), ktype);
         size_t out_start, out_end;
         if (getIndexRange(query, out_start, out_end)) {
-            // 找到的是>=datetime的记录
+            // The record found is >= datetime
             KRecord k = getKRecord(out_start, ktype);
             if (k.datetime == datetime) {
                 return k.closePrice;
@@ -725,7 +741,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             }
         }
 
-        // 没有找到，则取最后一条记录
+        // If it is not found, take the last record
         price_t price = 0.0;
         size_t total = getCount(ktype);
         if (total > 0) {
@@ -1072,7 +1088,7 @@ KRecordList Stock::_getKRecordList(const KQuery& query) const {
         loadKDataToBuffer(query.kType());
     }
 
-    // 如果是在内存缓存中
+    // If it is in the in-memory cache
     if (isBuffer(query.kType())) {
         size_t start_ix = 0, end_ix = 0;
         if (query.queryType() == KQuery::DATE) {
@@ -1081,7 +1097,7 @@ KRecordList Stock::_getKRecordList(const KQuery& query) const {
             }
         } else {
             if (query.start() < 0 || query.end() < 0) {
-                // 处理负数索引
+                // Handle a negative index
                 if (!getIndexRange(query, start_ix, end_ix)) {
                     return result;
                 }
@@ -1100,7 +1116,7 @@ KRecordList Stock::_getKRecordList(const KQuery& query) const {
             size_t start_ix = 0, end_ix = 0;
             if (query.queryType() == KQuery::INDEX) {
                 if (query.start() < 0 || query.end() < 0) {
-                    // 处理负数索引
+                    // Handle a negative index
                     if (!getIndexRange(query, start_ix, end_ix)) {
                         return result;
                     }
@@ -1176,7 +1192,7 @@ vector<Block> Stock::getBelongToBlockList(const string& category) const {
     return StockManager::instance().getStockBelongs(*this, category);
 }
 
-// 判断是否在交易时间段内（不判断日期）
+// Judge whether it is within the trading time range (the date is not judged)
 bool Stock::isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());
     HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
@@ -1185,7 +1201,8 @@ bool Stock::isTransactionTime(Datetime time) {
                           market_info.openTime2() > market_info.closeTime2(),
                         false, "Error transaction time in market({})!", market_info.market());
 
-    // 如果交易时间段的起始和终止时间都相等则认未做限定，全天都为可交易时间
+    // When the start and the end time of the trading time range are equal it is regarded as
+    // unlimited and the whole day is tradable
     HKU_IF_RETURN(market_info.openTime1() == market_info.closeTime1() &&
                     market_info.openTime2() == market_info.closeTime2(),
                   true);
@@ -1193,7 +1210,8 @@ bool Stock::isTransactionTime(Datetime time) {
     Datetime today = Datetime::today();
     Datetime openTime1 = today + market_info.openTime1();
     Datetime closeTime1 = today + market_info.closeTime1();
-    // 某些行情闭市最后一天tick时间可能延迟数秒，补充余量
+    // The tick time of the last day of some market data may be delayed by a few seconds, so a
+    // margin is added
     HKU_IF_RETURN(time >= openTime1 && time <= closeTime1 + Seconds(30), true);
 
     Datetime openTime2 = today + market_info.openTime2();
@@ -1202,16 +1220,19 @@ bool Stock::isTransactionTime(Datetime time) {
 }
 
 void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
-    // 客户端模式且本地无缓冲（普通代理证券）：转发至主进程应用（更新其缓冲并镜像至
-    // 共享内存段，全体客户端由此读到），保留客户端主动更新行情数据的能力；
-    // 未注册转发连接或转发失败时退回原行为（静默忽略）。
-    // 反之，若本地已有缓冲（如经 setKRecordList 指定外部数据的临时证券，isBuffer 为真），
-    // 该数据仅本客户端可见、主进程并无此证券，必须就地更新本地缓冲而不外发，故以
-    // !isBuffer 门控（落到下方本地逻辑；客户端无发布器，shmMirror 为安全空操作）。
+    // The client mode without a local buffer (an ordinary proxy security): it is forwarded to the
+    // main process to apply (updating its buffer and mirroring to the shared memory segment, from
+    // which all the clients read), keeping the ability of the client to update the market data
+    // actively; it falls back to the original behavior (silently ignored) when no forwarding
+    // connection is registered or the forwarding fails. Conversely, if there is already a local
+    // buffer (such as a temporary security with external data given by setKRecordList, isBuffer is
+    // true), that data is visible to this client only and the main process does not have this
+    // security, so the local buffer must be updated in place without sending it out; therefore the
+    // !isBuffer gate is used (it falls to the local logic below; the client has no publisher and
+    // shmMirror is a safe no-op).
     if (StockManager::instance().isIpcClientMode() && !isBuffer(inktype)) {
-        HKU_IF_RETURN(record.datetime.isNull() ||
-                        StockManager::instance().isHoliday(record.datetime),
-                      void());
+        HKU_IF_RETURN(
+          record.datetime.isNull() || StockManager::instance().isHoliday(record.datetime), void());
         ipc::forwardRealtimeUpdate(market_code(), inktype, record);
         return;
     }
@@ -1222,25 +1243,28 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
     string ktype(inktype);
     to_upper(ktype);
 
-    // 加写锁
+    // Acquire the write lock
     std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
 
-    // 需要对是否已缓存进行二次判定，防止加锁之前缓存被释放
+    // A second check of the caching is needed, to prevent the cache from being released before the
+    // lock
     if (m_data->pKData.find(ktype) == m_data->pKData.end() || !m_data->pKData[ktype]) {
         return;
     }
 
     if (m_data->pKData[ktype]->empty()) {
         m_data->pKData[ktype]->push_back(record);
-        // 镜像到共享内存段（未发布该证券/类型时静默跳过）；
-        // 在证券×ktype 写锁内调用，保证段内单写者串行
+        // Mirrored to the shared memory segment (silently skipped when this security / type is not
+        // published); called inside the write lock of the security x ktype, guaranteeing the single
+        // writer serialization within the segment
         ipc::shmMirrorRealtimeUpdate(market_code(), inktype, record);
         return;
     }
 
     KRecord& tmp = m_data->pKData[ktype]->back();
 
-    // 如果传入的记录日期等于最后一条记录日期，则更新最后一条记录；否则，追加入缓存
+    // When the date of the passed record equals the date of the last record, update the last
+    // record; otherwise append it to the cache
     if (tmp.datetime == record.datetime) {
         if (tmp.highPrice < record.highPrice) {
             tmp.highPrice = record.highPrice;
@@ -1262,25 +1286,29 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
                   tmp.datetime, market_code(), inktype);
     }
 
-    // 镜像到共享内存段（未发布时静默跳过；过期记录由镜像规则同样忽略），
-    // 客户端进程由此读到准实时数据，无需 IPC 往返
+    // Mirrored to the shared memory segment (silently skipped when it is not published; an expired
+    // record is ignored by the mirror rule as well), so the client processes read the near realtime
+    // data without an IPC round trip
     ipc::shmMirrorRealtimeUpdate(market_code(), inktype, record);
 }
 
 Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     auto ktype = inktype;
     to_upper(ktype);
-    // 客户端模式且本地无缓冲（普通代理证券）：m_lastUpdate 恒为 Datetime::min()，转发至
-    // 主进程取其缓冲刷新时刻，与客户端经共享内存读到的数据保持一致（未注册转发连接/
-    // 失败时降级返回 min()）。若本地已有缓冲（如 setKRecordList 指定的临时证券），
-    // m_lastUpdate 由本地写入，应直接返回本地值而非转发，故以 !isBuffer 门控。
+    // The client mode without a local buffer (an ordinary proxy security): m_lastUpdate is always
+    // Datetime::min(), so it is forwarded to the main process to get its buffer refresh moment,
+    // staying consistent with the data the client reads through the shared memory (when no
+    // forwarding connection is registered / it fails it degrades to returning min()). If there is
+    // already a local buffer (such as a temporary security given by setKRecordList), m_lastUpdate
+    // is written locally and the local value should be returned directly instead of forwarding, so
+    // the !isBuffer gate is used.
     if (StockManager::instance().isIpcClientMode() && !isBuffer(ktype)) {
         return ipc::forwardGetLastUpdateTime(market_code(), ktype);
     }
     if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {
         auto iter = m_data->m_lastUpdate.find(ktype);
         if (iter == m_data->m_lastUpdate.end()) {
-            // 可能新增的扩展K线类型
+            // The possibly newly added extended K-line type
             if (KQuery::isExtraKType(ktype)) {
                 m_data->m_lastUpdate[ktype] = Datetime::min();
             }
@@ -1304,7 +1332,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);
 
-    // 写锁
+    // Write lock
     std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
@@ -1334,7 +1362,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     string nktype(ktype);
     to_upper(nktype);
 
-    // 写锁
+    // Write lock
     std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
@@ -1356,36 +1384,44 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
 
 vector<HistoryFinanceInfo> Stock::getHistoryFinance() const {
     HKU_ASSERT(m_data);
-    // 历史财务读取策略：
-    // - 客户端模式：本地不物化历史财务（见 StockManager::loadAllKData 客户端模式早退），按需
-    //   经驱动读取主进程发布的共享内存快照（IpcBaseInfoDriver shm 优先，未覆盖回退 IPC/本地），
-    //   避免与快照重复占用客户端内存，且每次调用都反映主进程当前缓存；
-    // - shm server 角色：含财务基础快照发布后 StockManager::releaseShmServerBaseInfoCache()
-    //   已释放本地历史财务缓存（客户端均经共享内存读取，服务端无需保留副本），已释放证券在
-    //   下次访问时按需懒加载重读自愈（IPC 兜底应答、同进程 API 访问）；
-    // - 普通主进程模式：启动期预载物化缓存，返回其副本。
-    // getHistoryFinance 非逐 K 线热路径（每次指标/查询调用一次），按需读 shm 解码开销可忽略。
-    // 返回值类型须为按值：客户端模式无本地缓存，无法返回引用。
+    // The historical finance reading policy:
+    // - The client mode: the historical finance is not materialized locally (see the early return
+    // of the client mode in StockManager::loadAllKData) and it is read on demand
+    //   through the driver from the shared memory snapshot published by the main process
+    //   (IpcBaseInfoDriver prefers shm and falls back to IPC / local when not covered), avoiding a
+    //   duplicated occupation of the client memory with the snapshot, and every call reflects the
+    //   current cache of the main process;
+    // - The shm server role: after the basic snapshot with the finance is published,
+    // StockManager::releaseShmServerBaseInfoCache()
+    //   has released the local historical finance cache (the clients all read through the shared
+    //   memory and the server does not need to keep a copy); a released security is re-read lazily
+    //   for self healing on the next access (the IPC fallback reply and the API access in the same
+    //   process);
+    // - The ordinary main process mode: the materialized cache is preloaded at the startup and its
+    // copy is returned. getHistoryFinance is not a per-K-line hot path (it is called once per
+    // indicator / query), so the on-demand shm read and decoding cost is negligible. The return
+    // type must be by value: the client mode has no local cache and cannot return a reference.
     StockManager& sm = StockManager::instance();
     if (sm.isIpcClientMode()) {
         return sm.getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
     }
     auto lazy_load_finance = [this, &sm]() {
-        // 调用方需已持有 m_history_finance_mutex 唯一锁
+        // The caller must already hold the unique lock of m_history_finance_mutex
         m_data->m_history_finance = sm.getHistoryFinance(*this, Datetime::min(), Null<Datetime>());
         m_data->m_history_finance.shrink_to_fit();
         m_data->m_history_finance_ready = true;
     };
     if (!m_data->m_history_finance_ready) {
-        // 目前 m_history_finance_ready 和 m_history_finance_mutex 分离，并行时短时间可能造成
-        // 多次获取，可以容忍
+        // At present m_history_finance_ready and m_history_finance_mutex are separate, so in
+        // parallel a short period may cause multiple acquisitions, which is tolerable
         std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
         if (!m_data->m_history_finance_ready) {
             lazy_load_finance();
         }
     }
     std::shared_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
-    // 与 releaseShmServerBaseInfoCache() 并发的释放窗口：说明同 Stock::getWeight
+    // The release window concurrent with releaseShmServerBaseInfoCache(): the description is the
+    // same as Stock::getWeight
     if (m_data->m_history_finance.empty() && !m_data->m_history_finance_ready) {
         lock.unlock();
         std::unique_lock<std::shared_mutex> unique_lock(m_data->m_history_finance_mutex);
@@ -1400,19 +1436,26 @@ vector<HistoryFinanceInfo> Stock::getHistoryFinance() const {
 
 void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     HKU_IF_RETURN(!m_data, void());
-    // 客户端模式：本地不物化历史财务（与 getHistoryFinance() 客户端分支对称，本地缓存恒空，
-    // 读侧统一经 baseInfo 驱动现查 shm/IPC），批量导入结果直接丢弃，避免与快照重复占用客户端
-    // 内存。正常流程客户端预加载（loadAllKData）提前返回，本就到不了此处，此为 Stock 层
-    // 不变量防呆——本函数是财务缓存唯一批量写入入口（列式 getAllHistoryFinance，见设计
-    // §11.23①），任何未来调用路径（如 reload、插件）都不得在客户端模式重新制造本地副本。
+    // The client mode: the historical finance is not materialized locally (symmetric with the
+    // client branch of getHistoryFinance(); the local cache is always empty and the reading side
+    // queries shm/IPC through the baseInfo driver uniformly); the batch import result is discarded
+    // directly, avoiding a duplicated occupation of the client memory with the snapshot. In the
+    // normal flow the client preload (loadAllKData) returns early and would not reach here at all;
+    // this is the foolproof invariant at the Stock layer: this function is the only batch writing
+    // entry of the finance cache (the column-oriented getAllHistoryFinance, see design §11.23①) and
+    // no future call path (such as reload or a plugin) may recreate a local copy in the client
+    // mode.
     if (StockManager::instance().isIpcClientMode()) {
         return;
     }
-    // 按 (reportDate, fileDate) 去重：列式驱动批量 getAllHistoryFinance 可能对同一键返回重复行
-    // （real-test 实测 ClickHouse 某证券批量 124 vs 逐证券直查 123，且缓存独有键为空，即纯多重性
-    // 重复）。去重使缓存与逐证券直查、SHM 快照、IPC 回退四路径记录集合一致；财务语义上每个
-    // (reportDate, fileDate) 应唯一，保留首次出现（remove_if
-    // 稳定，维持原相对顺序，排序由发布端负责）
+    // Deduplicate by (reportDate, fileDate): the batch getAllHistoryFinance of the column-oriented
+    // driver may return duplicate rows for the same key (in the real test ClickHouse returned 124
+    // rows in a batch for a security versus 123 rows by a direct per-security query, and the keys
+    // unique to the cache were empty, i.e. a pure multiplicity duplication). The deduplication
+    // makes the cache consistent with the other three paths (the direct per-security query, the SHM
+    // snapshot and the IPC fallback); semantically every (reportDate, fileDate) should be unique,
+    // so the first occurrence is kept (remove_if is stable and keeps the original relative order;
+    // the sorting is the responsibility of the publishing side)
     std::set<std::pair<uint64_t, uint64_t>> seen;
     history_finance.erase(
       std::remove_if(history_finance.begin(), history_finance.end(),

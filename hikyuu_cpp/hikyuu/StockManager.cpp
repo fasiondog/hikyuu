@@ -45,12 +45,16 @@ StockManager::StockManager() {
 }
 
 StockManager::~StockManager() {
-    // 先等后台预加载线程退出：避免其在成员（m_load_tg）析构后仍访问 → UAF；
-    // 同时保证 m_preload_thread 析构时非 joinable（否则 std::thread 析构会触发 std::terminate）。
-    // 幂等：clean() 通常已 join 过，此处再调用为无操作（兼顾未经 clean() 的析构路径）。
+    // Wait for the background preload thread to exit first: otherwise it would still access the
+    // members (m_load_tg) after their destruction, causing a UAF; at the same time it guarantees
+    // that m_preload_thread is not joinable at its destruction (otherwise the std::thread
+    // destructor would trigger std::terminate). Idempotent: clean() has usually joined already, so
+    // calling it again here is a no-op (it also covers the destruction path without clean()).
     joinPreloadThread();
-    // 注销 shm 客户端转发回调（断开与插件实现的引用）：此后 Stock::realtimeUpdate 的转发调用
-    // 直接返回，避免退出期在已失效的连接上阻塞。服务端停机已迁至插件（stopShmServer 门面）
+    // Unregister the shm client forwarding callbacks (breaking the reference to the plugin
+    // implementation): after that the forwarding call of Stock::realtimeUpdate returns directly,
+    // avoiding blocking on an already invalid connection during the exit. The server shutdown has
+    // been moved to the plugin (the stopShmServer facade)
     ipc::registerShmClient(ipc::ShmClientForwarders());
     delete m_stockDict_mutex;
     fmt::print("Quit Hikyuu system!\n\n");
@@ -87,7 +91,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     HKU_WARN_IF_RETURN(m_initializing, void(),
                        "The last initialization has not finished. Please try again later!");
 
-    // 防止重复 init
+    // Prevent a duplicated init
     if (m_thread_id != std::thread::id()) {
         return;
     }
@@ -108,18 +112,18 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_hikyuuParam = hikyuuParam;
     m_context = context;
 
-    // 获取路径信息
+    // Get the path information
     m_tmpdir = hikyuuParam.tryGet<string>("tmpdir", ".");
     m_datadir = hikyuuParam.tryGet<string>("datadir", ".");
 
-    // 设置插件路径
+    // Set the plugin path
     auto plugin_path = getPluginPath();
     if (plugin_path.empty() || plugin_path == ".") {
         m_plugin_manager.pluginPath("./plugin");
     }
     HKU_INFO(htr("Plugin path: {}", getPluginPath()));
 
-    // 注册扩展K线处理
+    // Register the extended K-line handling
     registerPredefinedExtraKType();
 
     global_submit_task([this]() {
@@ -157,11 +161,11 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         DataDriverFactory::regBlockDriver(driver);
     }
 
-    // 加载证券基本信息
+    // Load the basic security information
     m_baseInfoDriver = DataDriverFactory::getBaseInfoDriver(baseInfoParam);
     HKU_CHECK(m_baseInfoDriver, "Failed get base info driver!");
 
-    // 获取板块驱动
+    // Get the block driver
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
 
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
@@ -170,15 +174,18 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
         m_kdataDriverParam = driver->getPrototype()->getParameter();
     }
 
-    // 纯客户端协商 shm 数据服务（连接成功将替换为代理驱动并关闭本地预加载；失败降级独立模式）
+    // The pure client negotiates the shm data service (on a successful connection it is replaced by
+    // the proxy driver and the local preload is turned off; on failure it degrades to the
+    // standalone mode)
     _negotiateShmServer();
 
-    // 加载数据
+    // Load the data
     loadData();
 
-    // 基础数据与快照发布改由插件订阅 LoadEvent 完成（见设计 §5.2），核心库不再主动通知就绪。
+    // The basic data and the snapshot publishing are now done by the plugin subscribing to
+    // LoadEvent (see design §5.2), the core library no longer notifies the readiness actively.
 
-    // 初始化内部定时任务（重加载）
+    // Initialize the internal scheduled task (reload)
     initInnerTask();
 
     m_initializing = false;
@@ -194,25 +201,29 @@ void StockManager::loadData() {
     loadAllStocks();
     loadInnerBlocks();
     loadAllStockWeights();
-    // 权息已就绪，派发 BASE_DATA_READY 事件：插件据此发布一次基础信息快照（历史财务要等预加载线程跑完再重建）。
-    // 两次发布分处主线程与预加载线程；此时历史财务尚未预加载，插件侧须以 include_finance=false
-    // 发布，否则逐个证券触发历史财务懒加载（见 Stock::getHistoryFinance）。
+    // The ex-rights/ex-dividend data is ready, dispatch the BASE_DATA_READY event: the plugin
+    // publishes a basic information snapshot accordingly (the historical finance is rebuilt after
+    // the preload thread finishes). The two publishes happen in the main thread and the preload
+    // thread respectively; at this moment the historical finance has not been preloaded yet, so the
+    // plugin side must publish with include_finance=false, otherwise the historical finance of
+    // every security would be lazily loaded one by one (see Stock::getHistoryFinance).
     _fireLoadEvent(LoadEvent::BASE_DATA_READY);
     loadAllZhBond10();
     loadHistoryFinanceField();
 
     HKU_INFO(htr("Loading block..."));
     m_blockDriver->load();
-    // 板块加载完成，派发 BLOCKS_LOADED 事件：插件据此刷新 IPC 服务的板块缓存（原 refreshBlocks）
+    // The blocks are loaded, dispatch the BLOCKS_LOADED event: the plugin refreshes the block cache
+    // of the IPC service accordingly (the former refreshBlocks)
     _fireLoadEvent(LoadEvent::BLOCKS_LOADED);
 
-    // 获取K线数据驱动并预加载指定的数据
+    // Get the K-line data driver and preload the given data
     HKU_INFO(htr("Loading KData..."));
 
-    // 加载K线及历史财务信息
+    // Load the K-lines and the historical financial information
     loadAllKData();
 
-    // 更新 license expire time
+    // Update the license expire time
     updateSysInfoExpiredTime(getExpireDate());
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
@@ -228,30 +239,42 @@ KDataDriverConnectPoolPtr StockManager::_getKDataDriverPool() {
 }
 
 void StockManager::_negotiateShmServer() {
-    // 总门控：关闭时完全不参与（不探测、不映射、不转发），行为等同未启用该特性。
-    // 默认关闭（进程默认独立模式运行）；作为客户端接入既有服务需在配置中显式开启
+    // The master gate: when it is off nothing participates at all (no detection, no mapping, no
+    // forwarding) and the behavior equals to the feature being disabled. It is off by default (the
+    // process runs in the standalone mode by default); connecting to an existing service as a
+    // client requires enabling it explicitly in the config
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("use_shm_server", false), void());
-    // 本进程为 server 角色：绝不进入客户端模式（防 realtimeUpdate 自转发环，见设计 §5.5）
+    // This process is in the server role: it never enters the client mode (to prevent the
+    // realtimeUpdate self-forwarding loop, see design §5.5)
     HKU_IF_RETURN(isShmServerRole(), void());
 
-    // 客户端能力（探测/连接/等待就绪/代理驱动/三条转发）全部由 shmserver 插件提供，核心库仅
-    // 依赖 ShmServerPluginInterface 这一份契约：不链接任何实现符号，未安装或未授权插件时直接
-    // 降级独立模式（自行加载全部数据）。print=false：社区版用户未安装插件时启动日志不应产生噪音。
-    // 三条实时转发由插件 connect 成功后自行注册（ipc::registerShmClient），核心库不再持有客户端指针
+    // All the client capabilities (detection / connection / waiting for readiness / the proxy
+    // driver / the three forwardings) are provided by the shmserver plugin; the core library only
+    // depends on the single contract ShmServerPluginInterface: it does not link any implementation
+    // symbol and degrades directly to the standalone mode (loading all the data by itself) when the
+    // plugin is not installed or not authorized. print=false: the startup log should not produce
+    // noise for the community users without the plugin. The three realtime forwardings are
+    // registered by the plugin itself after a successful connect (ipc::registerShmClient); the core
+    // library no longer holds the client pointer
     auto* plugin = getPlugin<ShmServerPluginInterface>(HKU_PLUGIN_SHM_SERVER, false);
     HKU_IF_RETURN(!plugin, void());
 
-    // 连接既有服务并等待其数据就绪（重试、中断检查与转发注册由插件内部完成；客户端绝不自行拉起服务）
+    // Connect to the existing service and wait for its data to be ready (the retries, the
+    // interruption check and the forwarding registration are done inside the plugin; the client
+    // never starts the service itself)
     auto wait_timeout = m_hikyuuParam.tryGet<int64_t>("shm_server_wait_timeout", 600);
     HKU_WARN_IF_RETURN(!plugin->connect(m_datadir, wait_timeout < 0 ? 0 : (uint64_t)wait_timeout),
                        void(), "Failed connect to hikyuu shm server, fallback to standalone mode!");
 
-    // 切换为客户端模式：装配插件提供的代理驱动并关闭本地预加载（仅内存覆盖，不改配置文件）
+    // Switch to the client mode: install the proxy driver provided by the plugin and turn off the
+    // local preload (an in-memory override only, the config file is not modified)
     m_ipc_client_mode = true;
     m_baseInfoDriver = plugin->createBaseInfoDriver(m_baseInfoDriver);
     m_blockDriver = plugin->createBlockDriver(m_blockDriver);
-    // 传入整个本地驱动连接池（而非其 prototype）：服务进程未预加载的类型与分时/分笔
-    // 由客户端本地驱动直接服务，需经池取连接以避免多个克隆并发复用同一连接/文件句柄
+    // The whole local driver connection pool is passed in (instead of its prototype): the types not
+    // preloaded by the service process and the time-sharing / tick data are served by the local
+    // driver of the client directly, and a connection must be taken from the pool to avoid multiple
+    // clones reusing the same connection / file handle concurrently
     auto local_pool = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     m_ipc_kdata_pool =
       std::make_shared<KDataDriverConnectPool>(plugin->createKDataDriver(local_pool));
@@ -260,20 +283,23 @@ void StockManager::_negotiateShmServer() {
         to_lower(low_ktype);
         m_preloadParam.set<bool>(low_ktype, false);
     }
-    // 客户端无预加载缓冲，更新由服务进程应用到缓冲并镜像共享内存，全体客户端可见
-    HKU_INFO("Connected to hikyuu shm server: {}, running in client mode.",
-             plugin->serverAddr());
+    // The client has no preload buffer; the update is applied to the buffer by the service process
+    // and mirrored to the shared memory, visible to all the clients
+    HKU_INFO("Connected to hikyuu shm server: {}, running in client mode.", plugin->serverAddr());
 }
 
 bool StockManager::isIpcClientMode() const {
     return m_ipc_client_mode;
 }
 
-// ── LoadEvent 事件总线（核心库仅派发，插件订阅；见设计 §5.2）─────────────────────────────
+// ── LoadEvent event bus (the core library only dispatches and the plugin subscribes; see design
+// §5.2) ─────────────────────────────────────
 namespace {
-// 回调容器整体以 new 持有且永不 delete：其成员锁若在静态析构期被销毁，stopShmServer()
-// 于 clean()（静态析构期）注销回调时加锁将 EINVAL 抛异常并经 noexcept 析构链 std::terminate
-// （同旧 §4.7 约束 2）。故连容器本身也置于堆上永不释放。
+// The callback container is held with new entirely and never deleted: if its member lock were
+// destroyed during the static destruction, stopShmServer() would throw EINVAL while locking when
+// unregistering the callbacks in clean() (the static destruction period) and the noexcept
+// destruction chain would call std::terminate (the same as constraint 2 of the old §4.7). Therefore
+// the container itself is also placed on the heap and never released.
 struct LoadEventState {
     std::shared_mutex mutex;
     std::vector<std::pair<size_t, LoadEventCallback>> callbacks;
@@ -293,9 +319,10 @@ size_t registerLoadEventCallback(LoadEventCallback&& cb) {
 void unregisterLoadEventCallback(size_t id) {
     std::unique_lock<std::shared_mutex> lock(g_load_event->mutex);
     auto& v = g_load_event->callbacks;
-    v.erase(std::remove_if(v.begin(), v.end(),
-                           [id](const std::pair<size_t, LoadEventCallback>& p) { return p.first == id; }),
-            v.end());
+    v.erase(
+      std::remove_if(v.begin(), v.end(),
+                     [id](const std::pair<size_t, LoadEventCallback>& p) { return p.first == id; }),
+      v.end());
 }
 
 void setShmServerRole(bool role) noexcept {
@@ -307,7 +334,9 @@ bool isShmServerRole() noexcept {
 }
 
 void StockManager::_fireLoadEvent(LoadEvent event) {
-    // 回调极少（插件 start/stop 各注册一次），仅在加载时序同步触发；无注册者时遍历即空，开销可忽略
+    // There are very few callbacks (the plugin registers them once each at start / stop) and they
+    // are triggered synchronously only in the loading sequence; with no registration the traversal
+    // is empty and the cost is negligible
     std::shared_lock<std::shared_mutex> lock(g_load_event->mutex);
     for (const auto& [id, cb] : g_load_event->callbacks) {
         cb(event);
@@ -321,17 +350,18 @@ void StockManager::joinPreloadThread() {
 }
 
 void StockManager::loadAllKData() {
-    // 按 K 线类型控制加载顺序
+    // Control the loading order by the K-line type
     vector<KQuery::KType> ktypes;
     vector<string> low_ktypes;
 
-    // 如果上下文指定了 ktype list，则按上下文指定的 ktype 顺序加载，否则按默认顺序加载
+    // If the context gives a ktype list, load in the order of the ktypes given by the context,
+    // otherwise load in the default order
     const auto& context_ktypes = m_context.getKTypeList();
     if (context_ktypes.empty()) {
         ktypes = KQuery::getBaseKTypeList();
 
     } else {
-        // 使用上下文预加载参数覆盖全局预加载参数
+        // Override the global preload parameters with the context preload parameters
         ktypes = context_ktypes;
         for (const auto& ktype : ktypes) {
             auto low_ktype = ktype;
@@ -346,7 +376,8 @@ void StockManager::loadAllKData() {
         auto& back = low_ktypes.emplace_back(ktype);
         to_lower(back);
 
-        // 判断上下文是否指定了预加载数量，如果指定了，则覆盖默认值
+        // Judge whether the context gives the preload numbers; when it does, they override the
+        // default values
         string preload_key = fmt::format("{}_max", back);
         auto context_iter = context_preload_num.find(preload_key);
         if (context_iter != context_preload_num.end()) {
@@ -368,26 +399,30 @@ void StockManager::loadAllKData() {
     bool lazy_preload = m_hikyuuParam.tryGet<bool>("lazy_preload", false);
     HKU_INFO_IF(lazy_preload && canLazyLoad(KQuery::MIN), htr("Use lazy preload!"));
 
-    // 先加载同类K线（预加载仅为缓存预热，一律后台异步执行，不阻塞初始化；
-    // 预热期间的查询经由驱动实时获取，结果不受影响；
-    // 需要等待预热完成的场景可显式调用 waitDataReady()）
+    // Load the K-lines of the same kind first (the preload is only a cache warm-up, it always runs
+    // asynchronously in the background and does not block the initialization; the queries during
+    // the warm-up are fetched from the driver in real time and their results are not affected; the
+    // scenarios needing to wait for the warm-up to finish can call waitDataReady() explicitly)
     auto driver = _getKDataDriverPool();
     if (isIpcClientMode()) {
-        // 客户端模式下数据由服务端提供，本地无预加载任务，直接就绪
+        // In the client mode the data is provided by the server, there is no local preload task and
+        // it is ready directly
         m_data_ready.store(true, std::memory_order_release);
         return;
     }
 
-    // 预加载线程改为 joinable 成员 m_preload_thread（不再 detach）：退出时由 joinPreloadThread()
-    // 等其退出后再停 m_load_tg / 销毁 IPC 服务，根除并发访问竞态（C3）。
-    // 若上一次预加载线程仍存在（重复初始化），先 join 再重新赋值，避免对 joinable 线程赋值触发 terminate。
+    // The preload thread is now the joinable member m_preload_thread (no longer detached): at the
+    // exit joinPreloadThread() waits for its exit before stopping m_load_tg / destroying the IPC
+    // service, eradicating the concurrent access race (C3). If the previous preload thread still
+    // exists (a duplicated initialization), join it before the new assignment, avoiding terminate
+    // on assigning a joinable thread.
     joinPreloadThread();
     if (!driver->getPrototype()->canParallelLoad()) {
         m_preload_thread = std::thread([this, ktypes, low_ktypes]() mutable {
             _loadAllKDataSerial(std::move(ktypes), std::move(low_ktypes));
         });
     } else {
-        // 异步并行加载
+        // Asynchronous parallel loading
         m_preload_thread = std::thread([this, ktypes, low_ktypes]() mutable {
             _loadAllKDataParallel(std::move(ktypes), std::move(low_ktypes));
         });
@@ -395,7 +430,8 @@ void StockManager::loadAllKData() {
 }
 
 void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
-    // 进度上报已迁至插件侧（经 LoadEvent + 轮询自持，见设计 §5.2），此处不再统计 loaded/total
+    // The progress reporting has moved to the plugin side (through LoadEvent + its own polling, see
+    // design §5.2); loaded/total is no longer counted here
 
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         if (m_cancel_load) {
@@ -416,8 +452,9 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
         }
     }
 
-    // 在历史财务加载之前派发 KDATA_PRELOAD_FINISHED，使客户端尽早获得 K 线热数据；
-    // 取消预加载（进程退出）时不派发，避免白做全量序列化后立即被销毁
+    // Dispatch KDATA_PRELOAD_FINISHED before the historical finance is loaded, so that the clients
+    // get the hot K-line data as early as possible; it is not dispatched when the preload is
+    // cancelled (the process exit), avoiding a full serialization that is destroyed immediately
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::KDATA_PRELOAD_FINISHED);
     }
@@ -438,9 +475,13 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
         tg.join();
     }
 
-    // 历史财务已就绪，派发 HISTORY_FINANCE_LOADED：插件据此整段重建基础快照（权息与财务一并收录）；
-    // 已接入会话的共享内存快照在连接期协商后固定，运行期不随重发布自动换代，新快照仅对之后新协商的
-    // 会话可见；取消预加载（进程退出）时不派发：既避免白做一次全量发布，也避免退出时序中做无谓序列化
+    // The historical finance is ready, dispatch HISTORY_FINANCE_LOADED: the plugin rebuilds the
+    // basic snapshot as a whole accordingly (the ex-rights/ex-dividend data and the finance are
+    // collected together); The shared memory snapshot of an already connected session is fixed
+    // after the negotiation during the connection and does not switch generation automatically with
+    // a republish at runtime; the new snapshot is visible only to the sessions negotiated
+    // afterwards; it is not dispatched when the preload is cancelled (the process exit): this
+    // avoids both a useless full publish and a pointless serialization in the exit sequence
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::HISTORY_FINANCE_LOADED);
     }
@@ -449,10 +490,11 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
 }
 
 void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
-    // 进度上报已迁至插件侧（见设计 §5.2），此处不再统计 loaded/total
+    // The progress reporting has moved to the plugin side (see design §5.2); loaded/total is no
+    // longer counted here
     auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
 
-    // 加载其他证券K线(可能不同不同K线驱动的证券)
+    // Load the K-lines of the other securities (they may use different K-line drivers)
     this->m_load_tg = std::make_unique<ThreadPool>();
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         if (m_cancel_load) {
@@ -470,9 +512,11 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
                 continue;
             }
             if (m_preloadParam.tryGet<bool>(low_ktypes[i], false)) {
-                // ktypes[i] 在外层 ktype 循环内被内层证券循环复用，此处若 std::move 会使首个
-                // 证券 submit 后 ktypes[i] 变为 moved-from 空串，后续证券 loadKDataToBuffer("")
-                // 全部失效（预加载缓冲仅首证券填充）。故用拷贝，ktype 为短字符串开销可忽略。
+                // ktypes[i] is reused by the inner stock loop within the outer ktype loop; a
+                // std::move here would make the first stock submit an empty moved-from ktypes[i],
+                // and the following stocks would call loadKDataToBuffer("") and all fail (only the
+                // first stock fills the preload buffer). Therefore a copy is used; ktype is a short
+                // string and the cost is negligible.
                 m_load_tg->submit([this, stk = iter->second, ktype = ktypes[i]]() mutable {
                     HKU_IF_RETURN(m_cancel_load, void());
                     stk.loadKDataToBuffer(ktype);
@@ -481,9 +525,10 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
         }
     }
 
-    // 等待 K 线预加载任务全部完成后，再派发 KDATA_PRELOAD_FINISHED 供插件发布共享内存快照；
-    // 注意派发必须在 join 之后，否则缓冲区可能尚未填充；
-    // 取消预加载（进程退出）时不派发，避免白做全量序列化后立即被销毁
+    // Wait for all the K-line preload tasks to finish and then dispatch KDATA_PRELOAD_FINISHED for
+    // the plugin to publish the shared memory snapshot; note that the dispatch must happen after
+    // the join, otherwise the buffer may not be filled yet; it is not dispatched when the preload
+    // is cancelled (the process exit), avoiding a full serialization that is destroyed immediately
     m_load_tg->join();
     m_load_tg.reset();
 
@@ -511,9 +556,12 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
         m_load_tg.reset();
     }
 
-    // 历史财务已就绪，派发 HISTORY_FINANCE_LOADED：插件据此整段重建基础快照（权息与财务一并收录）；
-    // 已接入会话的快照会话期固定，运行期不随重发布自动换代（新会话协商时按最新 epoch 映射）；
-    // 取消预加载（进程退出）时不派发，理由同串行分支
+    // The historical finance is ready, dispatch HISTORY_FINANCE_LOADED: the plugin rebuilds the
+    // basic snapshot as a whole accordingly (the ex-rights/ex-dividend data and the finance are
+    // collected together); The snapshot of an already connected session is fixed for the session
+    // lifetime and does not switch generation automatically with a republish at runtime (a new
+    // session maps the latest epoch at the negotiation); it is not dispatched when the preload is
+    // cancelled (the process exit), for the same reason as the serial branch
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::HISTORY_FINANCE_LOADED);
     }
@@ -528,7 +576,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
     auto driver = _getKDataDriverPool();
     HKU_IF_RETURN(!driver || !driver->getPrototype()->isColumnFirst(), loaded_codes);
 
-    // 尝试优先加载 SH000001 K线
+    // Try to load the SH000001 K-lines with priority
     Stock sh000001;
     {
         std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
@@ -553,7 +601,7 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 
     HKU_IF_RETURN(m_cancel_load, loaded_codes);
 
-    // 主要受带宽限制，无需多线程
+    // It is mainly bandwidth limited, no multi-threading is needed
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         if (m_cancel_load) {
             break;
@@ -647,7 +695,7 @@ Stock StockManager::getStock(const string& querystr) const {
     to_upper(query_str);
     size_t pos = query_str.find('.');
     if (pos != string::npos) {
-        // 后缀表示法
+        // The suffix notation
         std::string suffix = query_str.substr(pos + 1);
         std::string prefix = query_str.substr(0, pos);
         query_str = suffix + prefix;
@@ -979,7 +1027,7 @@ void StockManager::loadAllStocks() {
                 stock.m_data->m_minTradeNumber = info.minTradeNumber;
                 stock.m_data->m_maxTradeNumber = info.maxTradeNumber;
                 stock.m_data->m_history_finance_ready = false;
-                // 强制释放所有已缓存K线数据
+                // Force releasing all the cached K-line data
                 stock.m_data->m_lastUpdate.clear();
                 for (const auto& ktype : base_ktypes) {
                     stock.releaseKDataBuffer(ktype);
@@ -1110,11 +1158,15 @@ void StockManager::loadInnerBlocks() {
 
 void StockManager::loadAllStockWeights() {
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("load_stock_weight", true), void());
-    // 客户端模式同样按上述配置在启动期物化全量权息：共享内存快照已由连接在 waitReady 后就绪
-    // 后一次性协商映射（IpcConnector::mapSessionShm），IpcBaseInfoDriver 自快照读出全量权息
-    // （快照未覆盖则直读本地驱动，与主进程共享同一数据源），此后 Stock::getWeight 直接命中本地
-    // 缓存，满足权息高频读取场景；配置关闭或 addStock 新增、全新构造等未物化证券仍由
-    // Stock::getWeight 按需懒加载兜底。
+    // The client mode also materializes all the ex-rights/ex-dividend data at the startup according
+    // to the config above: the shared memory snapshot has been mapped at once by the connection
+    // after waitReady (IpcConnector::mapSessionShm) and IpcBaseInfoDriver reads all the
+    // ex-rights/ex-dividend data from the snapshot (when the snapshot does not cover it, the local
+    // driver is read directly, sharing the same data source with the main process); after that
+    // Stock::getWeight hits the local cache directly, satisfying the high frequency reading of the
+    // ex-rights/ex-dividend data; the securities not materialized (the config off, added by
+    // addStock or newly constructed) are still handled by the on-demand lazy loading fallback of
+    // Stock::getWeight.
     HKU_INFO(htr("Loading stock weight..."));
     if (m_context.isAll()) {
         auto all_stkweight_dict = m_baseInfoDriver->getAllStockWeightList();
@@ -1130,8 +1182,10 @@ void StockManager::loadAllStockWeights() {
                 if (weight_iter != all_stkweight_dict.end()) {
                     stock.m_data->m_weightList.swap(weight_iter->second);
                 }
-                // 无论该证券是否有权息均置已物化：未收录即本证券无权息（如多数 ETF），
-                // 避免客户端模式下 getWeight 对无权息证券反复触发懒加载空查
+                // It is marked materialized whether the security has the ex-rights/ex-dividend data
+                // or not: not being collected means this security has none (such as most ETFs),
+                // avoiding the client mode getWeight repeatedly triggering an empty lazy loading
+                // query for the securities without the ex-rights/ex-dividend data
                 stock.m_data->m_weight_ready.store(true, std::memory_order_release);
             }
         }
@@ -1152,9 +1206,11 @@ void StockManager::loadAllStockWeights() {
 }
 
 void StockManager::releaseShmServerBaseInfoCache() {
-    // 仅 shm server 角色（且非客户端模式）放行；客户端/普通独立模式不得释放——客户端本地本就不
-    // 物化历史财务，且启动期权息物化（load_stock_weight）在非 server 角色下无共享快照可依赖，
-    // 释放后 getWeight 无懒加载兜底将静默返回空
+    // Only the shm server role (and not the client mode) is allowed; the client / ordinary
+    // standalone mode must not release it: the client does not materialize the historical finance
+    // locally, and the ex-rights/ex-dividend materialization at the startup (load_stock_weight)
+    // cannot rely on a shared snapshot in a non-server role, so after a release getWeight would
+    // silently return empty without a lazy loading fallback
     HKU_IF_RETURN(!isShmServerRole() || isIpcClientMode(), void());
     HKU_DEBUG(htr("Release stock weight/finance cache after shm base info published"));
     std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
@@ -1163,13 +1219,15 @@ void StockManager::releaseShmServerBaseInfoCache() {
         {
             std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
             StockWeightList().swap(stock.m_data->m_weightList);
-            // 置 false：下次 Stock::getWeight 经驱动懒加载重读（server 角色含懒加载兜底）
+            // Set it to false: the next Stock::getWeight re-reads it through the driver lazy
+            // loading (the server role has the lazy loading fallback)
             stock.m_data->m_weight_ready.store(false, std::memory_order_release);
         }
         {
             std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_history_finance_mutex);
             vector<HistoryFinanceInfo>().swap(stock.m_data->m_history_finance);
-            // 置 false：下次 Stock::getHistoryFinance 经驱动懒加载重读（各模式均有兜底）
+            // Set it to false: the next Stock::getHistoryFinance re-reads it through the driver
+            // lazy loading (every mode has the fallback)
             stock.m_data->m_history_finance_ready = false;
         }
     }

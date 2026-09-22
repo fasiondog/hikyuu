@@ -32,10 +32,10 @@ const string KQuery::HOUR2("HOUR2");
 const string KQuery::HOUR4("HOUR4");
 const string KQuery::HOUR6("HOUR6");
 const string KQuery::HOUR12("HOUR12");
-const string KQuery::TIMELINE("TIMELINE");  // 分时
-const string KQuery::TRANS("TRANS");        // 分笔
+const string KQuery::TIMELINE("TIMELINE");  // Time-sharing
+const string KQuery::TRANS("TRANS");        // Tick
 
-// 所有基础K线类型（即有实际物理存储的K线类型）
+// All the base K-line types (i.e. the K-line types with an actual physical storage)
 static std::unordered_set<string> g_all_base_ktype{
   KQuery::MIN,  KQuery::MIN5,  KQuery::MIN15,    KQuery::MIN30,   KQuery::MIN60,
   KQuery::DAY,  KQuery::WEEK,  KQuery::MONTH,    KQuery::QUARTER, KQuery::HALFYEAR,
@@ -66,7 +66,7 @@ static unordered_map<string, int64_t> g_ktype2sec{
   {KQuery::TRANS, 3},
 };
 
-// 获取所有的 KType
+// Get all the KTypes
 vector<KQuery::KType> KQuery::getBaseKTypeList() noexcept {
     vector<KQuery::KType> ret;
     for (const auto& v : g_all_base_ktype) {
@@ -162,7 +162,7 @@ uint64_t KQuery::hash() const {
     XXH64_update(state, &m_recoverType, sizeof(m_recoverType));
     XXH64_update(state, m_dataType.data(), m_dataType.size());
 
-    // 获取最终哈希值
+    // Get the final hash value
     uint64_t result = XXH64_digest(state);
     XXH64_freeState(state);
     return result;
