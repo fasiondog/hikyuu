@@ -1,320 +1,318 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/strategy.rst
-
 .. currentmodule:: hikyuu
 .. highlight:: python
 
-实盘交易
-=======================
+Live Trading
+============
 
-程序化交易也就是自动化交易，也就是大家常见的各种量化框架，本质就是任务的定时调度 + 通知回调。
+Programmatic trading, i.e. automated trading, is the various quantitative frameworks commonly seen; its essence is the scheduled task scheduling + the notification callbacks.
 
-Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strategy 运行时仅供大家学习参考如何和实盘进行对接，造成盈亏请自行负责。
+Hikyuu mainly focuses on the fast strategy analysis; it does not provide live trading itself. The Strategy runtime is only for everyone to learn how to connect with the live trading; you are responsible for the profits and losses caused by yourself.
 
-具体可参见安装目录下的 strategy 子目录下的相关 demo。
+For the details, see the related demos in the strategy subdirectory of the installation directory.
 
 
-公共参数：
+Common parameters:
 
-    * **spot_worker_num=1** *(int)* : 接收行情数据时内部的线程数
-    * **quotation_server=""** *(string)* : 指定行情服务地址，为空表示使用本机默认配置（hikyuu.ini）
+    * **spot_worker_num=1** *(int)* : the number of the internal threads when receiving the market data
+    * **quotation_server=""** *(string)* : specify the market data service address; when empty, the local default configuration (hikyuu.ini) is used
 
 
 .. py:class:: Strategy
 
-    策略运行时
+    The strategy runtime
     
-    创建策略运行时有以下几种方式：
+    There are the following ways to create a strategy runtime:
     
     .. code-block:: python
     
-        # 方式 1：使用默认参数创建
+        # Way 1: create with the default parameters
         stg = Strategy()
         
-        # 方式 2：指定证券代码列表和 K 线类型
+        # Way 2: specify the security code list and the K-line types
         stg = Strategy(
             code_list=["sz000001", "sz000002"],
             ktype_list=["day", "min"],
             preload_num={"day_max": 1000, "min_max": 2000},
             name="MyStrategy",
-            config=""  # 配置文件路径，为空时使用默认的 hikyuu 配置文件
+            config=""  # the configuration file path; when empty, the default hikyuu configuration file is used
         )
         
-        # 方式 3：使用上下文创建
+        # Way 3: create with a context
         context = StrategyContext(stock_list=["sz000001"], ktype_list=["day"])
         stg = Strategy(context, name="MyStrategy", config="")
 
     .. py:attribute:: name
         
-        策略名称，可读可写
+        The strategy name, readable and writable
         
     .. py:attribute:: context
         
-        策略上下文，只读属性，包含证券代码列表、K 线类型等信息
+        The strategy context, a read-only attribute, containing the security code list, the K-line types, etc.
         
     .. py:attribute:: tm
         
-        关联的交易管理实例，可读可写，用于管理账户资产和订单
+        The associated trade manager instance, readable and writable, used to manage the account assets and the orders
         
     .. py:attribute:: sp
         
-        移滑价差算法，可读可写，仅在回测状态下使用
+        The slippage algorithm, readable and writable, used only in the backtest state
         
     .. py:attribute:: running
         
-        获取当前运行状态，只读属性，返回 True 或 False
+        Get the current running state, a read-only attribute, returning True or False
         
     .. py:attribute:: is_backtesting
         
-        获取回测状态，只读属性
+        Get the backtest state, a read-only attribute
 
     .. py:method:: start(self, auto_recieve_spot=True)
 
-        启动策略执行，请在完成相关回调设置后执行。
+        Start the strategy execution; please execute it after completing the related callback settings.
         
-        注意：在 Python 交互模式下无法启动策略。
+        Note: the strategy cannot be started in the Python interactive mode.
 
-        :param bool auto_recieve_spot: 是否自动接收行情数据，默认为 True
+        :param bool auto_recieve_spot: whether to receive the market data automatically, defaulting to True
 
     .. py:method:: on_change(self, func)
 
-        设置证券数据更新回调通知
+        Set the callback notification of the security data update
         
-        当行情数据发生变化时触发该回调，通常用于调试。只要收到行情采集消息就会触发，不受开、闭市时间限制。
+        This callback is triggered when the market data changes, usually used for debugging. It is triggered whenever a market data collection message is received, without being restricted by the market open/close times.
 
-        :param func: 可调用对象，需接收三个参数：func(stg: Strategy, stock: Stock, spot: SpotRecord)
+        :param func: a callable object, which needs to receive three parameters: func(stg: Strategy, stock: Stock, spot: SpotRecord)
 
     .. py:method:: on_received_spot(self, func)
 
-        设置证券数据更新通知回调
+        Set the callback notification of the security data update
         
-        在一批行情数据接受完毕后通知，通常仅用于调试打印。该批行情数据中不一定含有上下文中包含的 stock，
-        且只要收到行情采集消息就会触发，不受开、闭市时间限制。
+        Notified after a batch of the market data has been received, usually used only for the debugging printing. This batch of the market data does not necessarily contain the stocks in the context,
+        and it is triggered whenever a market data collection message is received, without being restricted by the market open/close times.
 
-        :param func: 可调用对象，需接收两个参数：func(stg: Strategy, revTime: Datetime)
+        :param func: a callable object, which needs to receive two parameters: func(stg: Strategy, revTime: Datetime)
 
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
         
-        设置日内循环执行回调。如果忽略市场开闭市，则自启动时刻开始按间隔时间循环，
-        否则第一次执行时将开盘时间对齐时间间隔，且在非开市时间停止执行。
+        Set the callback executed in a loop within the day. If the market open/close is ignored, it loops from the start moment by the interval time;
+        otherwise, at the first execution, the time interval is aligned with the market open time, and the execution stops in the non-trading time.
 
-        :param func: 可调用对象，需接收一个参数：func(stg: Strategy)
-        :param TimeDelta time: 间隔时间，如间隔 3 秒：TimeDelta(0, 0, 0, 3) 或 Seconds(3)
-        :param str market: 使用哪个市场的开闭市时间，默认为"SH"
-        :param ignore_market: 忽略市场开闭市时间，默认为 False
+        :param func: a callable object, which needs to receive one parameter: func(stg: Strategy)
+        :param TimeDelta time: the interval time, e.g. an interval of 3 seconds: TimeDelta(0, 0, 0, 3) or Seconds(3)
+        :param str market: which market's open/close times to use, defaulting to "SH"
+        :param ignore_market: ignore the market open/close times, defaulting to False
 
     .. py:method:: run_daily_at(self, func, time, ignore_holiday=True)
 
-        设置每日定点执行回调
+        Set the callback executed at a fixed time every day
 
-        :param func: 可调用对象，需接收一个参数：func(stg: Strategy)
-        :param TimeDelta time: 执行时刻，如每日 15 点：TimeDelta(0, 15)，必须小于 1 天
-        :param ignore_holiday: 节假日不执行，默认为 True
+        :param func: a callable object, which needs to receive one parameter: func(stg: Strategy)
+        :param TimeDelta time: the execution moment, e.g. at 15 o'clock every day: TimeDelta(0, 15), which must be less than 1 day
+        :param ignore_holiday: do not execute on the holidays, defaulting to True
        
-        .. note:: 同一时刻只能注册一个任务，重复注册将抛出异常
+        .. note:: only one task can be registered at the same moment; registering repeatedly will raise an exception
 
     .. py:method:: today(self)
 
-        获取当前交易日日期（使用该方法而不是 Datetime.today(), 以便回测和实盘一致）
+        Get the current trading day date (use this method instead of Datetime.today(), so that the backtest and the live trading are consistent)
 
-        :return: 当前交易日日期
+        :return: the current trading day date
         :rtype: Datetime
 
     .. py:method:: now(self)   
 
-        获取当前时间（使用该方法而不是 Datetime.now(), 以便回测和实盘一致）
+        Get the current time (use this method instead of Datetime.now(), so that the backtest and the live trading are consistent)
 
-        :return: 当前时间
+        :return: the current time
         :rtype: Datetime
 
     .. py:method:: next_datetime(self)
 
-        下一交易时间点（回测使用）
+        The next trading time point (used for the backtest)
         
-        :return: 下一交易时间点，实盘时返回 Null<Datetime>()
+        :return: the next trading time point; in live trading, return Null<Datetime>()
         :rtype: Datetime
 
     .. py:method:: get_current_price(self, stk, ktype)
     
-        获取当前价格
+        Get the current price
         
-        :param Stock stk: 指定的证券
-        :param KQuery.KType ktype: K 线类型
-        :return: 当前价格，无效时返回 constant.null_price
+        :param Stock stk: the specified security
+        :param KQuery.KType ktype: the K-line type
+        :return: the current price; when invalid, return constant.null_price
         :rtype: price_t
 
     .. py:method:: get_last_kdata(self, stk, start_date, ktype, recover_type)
 
-        方法1：获取指定证券从指定日期开始到当前时间的对应 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
+        Way 1: get the K-line data of the specified security from the specified date to the current time (to keep the live trading and the backtest consistent, please use this method to get the K-line data)
         get_last_kdata(self, stk, start_date, ktype, recover_type)
 
-        方法2：获取指定证券当前能获取到的最后 last_num 条 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
+        Way 2: get the last last_num K-line records of the specified security that can currently be obtained (to keep the live trading and the backtest consistent, please use this method to get the K-line data)
         get_last_kdata(self, stk, lastnum, ktype, recover_type)
 
-        :param Stock stk: 指定的证券
-        :param int lastnum: 最后 N 条数据
-        :param Datetime start_date: 开始日期
-        :param KQuery.KType ktype: K 线类型
-        :param KQuery.RecoverType recover_type: 恢复方式，默认为 KQuery.NO_RECOVER
-        :return: K 线数据
+        :param Stock stk: the specified security
+        :param int lastnum: the last N records
+        :param Datetime start_date: the start date
+        :param KQuery.KType ktype: the K-line type
+        :param KQuery.RecoverType recover_type: the recovery type, defaulting to KQuery.NO_RECOVER
+        :return: the K-line data
         :rtype: KData
 
 
     .. py:method:: get_kdata(self, stk, start_date, end_date, ktype, recover_type)
 
-        获取指定证券指定日期范围内的 K 线数据 (为保证实盘和回测一致，请使用本方法获取 K 线数据)
+        Get the K-line data of the specified security within the specified date range (to keep the live trading and the backtest consistent, please use this method to get the K-line data)
 
-        :param Stock stk: 指定的证券
-        :param Datetime start_date: 开始日期
-        :param Datetime end_date: 结束日期，如为 Null 或大于当前时间，则自动使用 nextDatetime()
-        :param KQuery.KType ktype: K 线类型
-        :param KQuery.RecoverType recover_type: 恢复方式，默认为 KQuery.NO_RECOVER
-        :return: K 线数据
+        :param Stock stk: the specified security
+        :param Datetime start_date: the start date
+        :param Datetime end_date: the end date; if it is Null or greater than the current time, nextDatetime() is used automatically
+        :param KQuery.KType ktype: the K-line type
+        :param KQuery.RecoverType recover_type: the recovery type, defaulting to KQuery.NO_RECOVER
+        :return: the K-line data
         :rtype: KData
 
     .. py:method:: order(self, stock, num, remark='')
 
-        按数量下单（正数为买入，负数为卖出）
+        Place an order by the quantity (a positive number is a buy, a negative number is a sell)
         
-        实际交易数量会受到证券的最小/最大交易数量限制：
+        The actual trading quantity is restricted by the minimum/maximum trading quantity of the security:
         
-        - 买入时，如果下单数量超过最大交易数量，则按最大交易数量成交
-        - 卖出时，如果下单数量超过最大交易数量且不等于 MAX_DOUBLE，则按最大交易数量成交
-        - 卖出时，如果下单数量小于最小交易数量，则全部卖出
+        - When buying, if the order quantity exceeds the maximum trading quantity, it is traded by the maximum trading quantity
+        - When selling, if the order quantity exceeds the maximum trading quantity and is not equal to MAX_DOUBLE, it is traded by the maximum trading quantity
+        - When selling, if the order quantity is less than the minimum trading quantity, all are sold
 
-        :param Stock stock: 指定的证券
-        :param float num: 下单数量
-        :param str remark: 下单备注
-        :return: 交易记录
+        :param Stock stock: the specified security
+        :param float num: the order quantity
+        :param str remark: the order remark
+        :return: the trade record
         :rtype: TradeRecord
 
     .. py:method:: order_value(self, stock, value, remark='')
 
-        按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
+        Place an order by the expected security market value, i.e. how much money of the security you want to buy (a positive number is a buy, a negative number is a sell)
         
-        该方法会根据当前价格计算需要买入的数量，并考虑手续费等因素，确保不会超出可用资金。
-        如果资金不足，会自动减少买入数量，如果连最小交易数量都无法买入，则不会下单。
+        This method calculates the quantity to buy by the current price, and takes the fees and other factors into account, ensuring that it will not exceed the available funds.
+        If the funds are insufficient, the buy quantity will be reduced automatically; if even the minimum trading quantity cannot be bought, no order is placed.
 
-        :param Stock stock: 指定的证券
-        :param float value: 投入买入资金
-        :param str remark: 下单备注
-        :return: 交易记录
+        :param Stock stock: the specified security
+        :param float value: the funds invested to buy
+        :param str remark: the order remark
+        :return: the trade record
         :rtype: TradeRecord
         
     .. py:method:: buy(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
     
-        买入操作
+        The buy operation
         
-        :param Stock stock: 指定的证券
-        :param price_t price: 买入价格，0 表示使用当前市场价格
-        :param float num: 买入数量
-        :param float stoploss: 止损价，默认为 0
-        :param float goal_price: 目标价，默认为 0
-        :param SystemPart part: 系统部分，默认为 PART_SIGNAL
-        :param str remark: 备注信息
-        :return: 交易记录
+        :param Stock stock: the specified security
+        :param price_t price: the buy price; 0 means using the current market price
+        :param float num: the buy quantity
+        :param float stoploss: the stop-loss price, defaulting to 0
+        :param float goal_price: the target price, defaulting to 0
+        :param SystemPart part: the system part, defaulting to PART_SIGNAL
+        :param str remark: the remark information
+        :return: the trade record
         :rtype: TradeRecord
         
     .. py:method:: sell(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
     
-        卖出操作
+        The sell operation
         
-        :param Stock stock: 指定的证券
-        :param price_t price: 卖出价格，0 表示使用当前市场价格
-        :param float num: 卖出数量
-        :param price_t stoploss: 止损价，默认为 0
-        :param price_t goal_price: 目标价，默认为 0
-        :param SystemPart part: 系统部分，默认为 PART_SIGNAL
-        :param str remark: 备注信息
-        :return: 交易记录
+        :param Stock stock: the specified security
+        :param price_t price: the sell price; 0 means using the current market price
+        :param float num: the sell quantity
+        :param price_t stoploss: the stop-loss price, defaulting to 0
+        :param price_t goal_price: the target price, defaulting to 0
+        :param SystemPart part: the system part, defaulting to PART_SIGNAL
+        :param str remark: the remark information
+        :return: the trade record
         :rtype: TradeRecord
 
 
 .. py:function:: start_spot_agent(print=False, worker_num=1, addr="")
     
-    启动行情数据接收代理
+    Start the market data receiving agent
     
-    如果之前已经处于运行状态，将抛出异常。
+    If it is already in the running state, an exception will be raised.
 
-    :param bool print: 是否打印日志，默认为 False
-    :param int worker_num: 工作线程数，默认为 1
-    :param str addr: 行情采集服务地址，为空表示使用 hikyuu 配置文件中的行情服务器地址
+    :param bool print: whether to print the logs, defaulting to False
+    :param int worker_num: the number of the working threads, defaulting to 1
+    :param str addr: the market data collection service address; when empty, the market server address in the hikyuu configuration file is used
 
 .. py:function:: stop_spot_agent()
 
-    停止行情数据接收代理
+    Stop the market data receiving agent
 
 .. py:function:: spot_agent_is_running()
 
-    判断行情数据接收代理是否在运行
+    Judge whether the market data receiving agent is running
 
-    :return: True 或 False
+    :return: True or False
 
 .. py:function:: spot_agent_is_connected()
 
-    判断行情数据接收代理是否已连接
+    Judge whether the market data receiving agent is connected
 
-    :return: True 或 False
+    :return: True or False
 
 
 .. py:function:: crtBrokerTM(broker, cost_func=TC_Zero(), name="SYS", other_brokers=[])
 
-    创建券商交易管理器
+    Create the broker trade manager
     
-    :param broker: 券商实例
-    :param TradeCost cost_func: 交易成本函数，默认为 TC_Zero()
-    :param str name: 名称，默认为"SYS"
-    :param list other_brokers: 其他订单代理列表，默认为空
-    :return: 交易管理器实例
+    :param broker: the broker instance
+    :param TradeCost cost_func: the trade cost function, defaulting to TC_Zero()
+    :param str name: the name, defaulting to "SYS"
+    :param list other_brokers: the list of the other order brokers, defaulting to empty
+    :return: the trade manager instance
     :rtype: TradeManagerPtr
 
 
 .. py:function:: run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])
           
-    方式1：在策略运行时执行系统交易 SYS
+    Way 1: execute the system trading SYS in the strategy runtime
 
     run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])   
-    目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
+    Currently only the systems with both buy_delay|sell_delay being false are supported, i.e. trading at the close
      
-    :param sys: 交易系统
-    :param stock: 交易对象
-    :param query: 查询条件
-    :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param list other_brokers: 其他的订单代理，默认为空列表
+    :param sys: the trading system
+    :param stock: the trading object
+    :param query: the query condition
+    :param broker: the order broker (dedicated to the order broker synchronizing with the account assets)
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers, defaulting to an empty list
 
-    方式2: 在策略运行时执行组合策略 PF
+    Way 2: execute the portfolio strategy PF in the strategy runtime
     
-    目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
+    Currently only the systems with both buy_delay|sell_delay being false are supported, i.e. trading at the close
 
-    :param Portfolio pf: 资产组合
-    :param Query query: 查询条件
-    :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param list other_brokers: 其他的订单代理，默认为空列表
+    :param Portfolio pf: the portfolio
+    :param Query query: the query condition
+    :param broker: the order broker (dedicated to the order broker synchronizing with the account assets)
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers, defaulting to an empty list
 
 
 .. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")
 
-    创建系统策略
+    Create the system strategy
     
-    :param sys: 交易系统
-    :param str stk_market_code: 证券市场代码
-    :param query: 查询条件
-    :param broker: 订单代理
-    :param cost_func: 成本函数
-    :param list other_brokers: 其他订单代理，默认为空列表
-    :param str name: 策略名称，默认为"SYSStrategy"
-    :param str config: 配置文件路径，默认为空
+    :param sys: the trading system
+    :param str stk_market_code: the security market code
+    :param query: the query condition
+    :param broker: the order broker
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers, defaulting to an empty list
+    :param str name: the strategy name, defaulting to "SYSStrategy"
+    :param str config: the configuration file path, defaulting to empty
 
 
 .. py:function:: crt_pf_strategy(pf, query, broker, cost_func, other_brokers=[], name="PFStrategy", config="")
 
-    创建组合策略
+    Create the portfolio strategy
     
-    :param pf: 资产组合
-    :param query: 查询条件
-    :param broker: 订单代理
-    :param cost_func: 成本函数
-    :param list other_brokers: 其他订单代理，默认为空列表
-    :param str name: 策略名称，默认为"PFStrategy"
-    :param str config: 配置文件路径，默认为空
+    :param pf: the portfolio
+    :param query: the query condition
+    :param broker: the order broker
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers, defaulting to an empty list
+    :param str name: the strategy name, defaulting to "PFStrategy"
+    :param str config: the configuration file path, defaulting to empty
