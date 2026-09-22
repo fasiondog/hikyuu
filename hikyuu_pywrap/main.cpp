@@ -9,6 +9,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <hikyuu/hikyuu.h>
+#include <hikyuu/lang.h>
 #include <hikyuu/global/sysinfo.h>
 #include <hikyuu/data_driver/ipc/ShmClientHook.h>
 #include "pybind_utils.h"
@@ -169,6 +170,24 @@ PYBIND11_MODULE(core, m) {
         return ret;
     });
     m.def("can_upgrade", CanUpgrade);
+
+    m.def("htr", [](const std::string& key) { return lang_htr(key.c_str()); }, py::arg("key"),
+          R"(htr(key)
+
+    Translate the given text into the current runtime language.
+
+    It shares the same gettext domain with the C++ part (the msgid must be in English), so that the
+    python-side text, such as the drawing labels, always appears in the same language as the C++
+    output, such as Performance.report().
+
+    The placeholders in the msgid use the python style ``{}``, and the caller formats the returned
+    text itself::
+
+        htr("Account({}) cumulative return").format(tm.name)
+
+    :param str key: the text in English (the msgid)
+    :return: the translated text; the original text is returned when no translation exists
+    :rtype: str)");
 
     m.def("get_stock", getStock,
           R"(get_stock(market_code)

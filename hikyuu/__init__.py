@@ -55,6 +55,9 @@ else:
 try:
     from .util import *
     from .extend import *
+    # The i18n translation helper, which shares the same gettext domain with the C++ part;
+    # the msgid must be in English, and the caller formats the returned text itself
+    from .core import htr
     from .indicator import *
     from .trade_manage import *
     from .trade_sys import *

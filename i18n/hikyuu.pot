@@ -17,6 +17,7 @@ msgstr ""
 "X-Poedit-KeywordsList: htr;hctr:1c,2\n"
 "X-Poedit-SearchPath-0: hikyuu_cpp/hikyuu\n"
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
+"X-Poedit-SearchPath-2: hikyuu/draw\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
 #: hikyuu_pywrap/plugin/_backtest.cpp:22
@@ -233,4 +234,250 @@ msgstr ""
 
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:137
 msgid "Max Consecutive Loss R-Multiple"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:905
+#, python-format
+msgid "Total Invested Assets: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:907
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%    Current Drawdown from Peak: {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:911
+#, python-format
+msgid "Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:925
+#, python-format
+msgid "{} Return Curve"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:928
+#, python-format
+msgid "{} Cumulative Return {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:929
+#, python-format
+msgid "Account({}) Cumulative Return"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:277
+#, python-format
+msgid "{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f} Change:{:.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:328
+#, python-format
+msgid "{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:530
+#, python-format
+msgid "The indicator length is 0; the indicator should have been calculated (i.e. it has values)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:535
+#, python-format
+msgid "Failed to get the date list! The indicator should be a time series"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:548
+#, python-format
+msgid "Insufficient monthly data!"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:557
+#, python-format
+msgid "Year-Month Return (%) Heatmap"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:558
+#, python-format
+msgid "Month"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:559
+#, python-format
+msgid "Year"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:996
+#, python-format
+msgid "No data, please check the date range! start_date={}, end_date={}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1002
+#, python-format
+msgid "Failed to get the tm return curve, please check the tm initial date! tm.init_datetime={} start_date={}, end_date={}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1040
+#, python-format
+msgid "Annual Return"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1070
+#, python-format
+msgid "{} Year-Month Return (%) Heatmap"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1117
+#, python-format
+msgid "Insufficient yearly data!"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1149
+#, python-format
+msgid "Highest Return Range"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1152
+#, python-format
+msgid "Lowest Return Range"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1170
+#, python-format
+msgid "{} Annual Return (%) Bar Chart"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1172
+#, python-format
+msgid "Return (%)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1180
+#, python-format
+msgid "The system has no trade manager initialized"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:50
+msgid " (Daily)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:52
+msgid " (Weekly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:54
+msgid " (Monthly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:56
+msgid " (Quarterly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:58
+msgid " (Half-Yearly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:60
+msgid " (Yearly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:62
+msgid " (1-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:64
+msgid " (3-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:66
+msgid " (5-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:68
+msgid " (15-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:70
+msgid " (30-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:72
+msgid " (60-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:74
+msgid " (2-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:76
+msgid " (4-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:78
+msgid " (6-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:80
+msgid " (12-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:190
+msgid "Date"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:190
+msgid "Open"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "High"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "Low"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "Close"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:192
+msgid "Amount"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:192
+msgid "Volume"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:236
+msgid "Bokeh does not support the American K-line chart yet, please use matplotlib"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:302
+msgid "Indicator"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:303
+msgid "Value"
+msgstr ""
+
+#: hikyuu/draw/drawplot/echarts_draw.py:542
+msgid "System Cumulative Return"
+msgstr ""
+
+#: hikyuu/draw/drawplot/echarts_draw.py:562
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/elder.py:55
+msgid "The lengths of the two sequences are not equal"
+msgstr ""
+
+#: hikyuu/draw/elder.py:56
+msgid "Number must be greater than 0"
+msgstr ""
+
+#: hikyuu/draw/drawplot/__init__.py:100
+#, python-format
+msgid "Unknown engine: {}"
 msgstr ""

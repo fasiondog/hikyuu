@@ -29,7 +29,7 @@
 # 1. 20171122, Added by fasiondog
 # ===============================================================================
 
-from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, Portfolio, TradeManager
+from hikyuu.core import KData, Indicator, SignalBase, ConditionBase, EnvironmentBase, System, Portfolio, TradeManager, htr
 
 import matplotlib
 from matplotlib.pylab import gca as mpl_gca
@@ -97,7 +97,7 @@ def use_draw_engine(engine='matplotlib'):
     elif engine == 'echarts':
         use_draw_with_echarts()
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def use_draw_with_bokeh():
@@ -157,11 +157,12 @@ def use_draw_with_echarts():
 
 
 def create_figure(n=1, figsize=None):
-    """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
+    """Generate a window containing the specified number of axes; at most 4 axes are supported.
 
-    :param int n: 坐标轴数量
-    :param figsize: (宽, 高)
-    :return: (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
+    :param int n: the number of the axes
+    :param figsize: (width, height)
+    :return: (ax1, ax2, ...) depending on the specified number of the axes; None is returned
+        when the number is out of [1, 4]
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
@@ -169,7 +170,7 @@ def create_figure(n=1, figsize=None):
     elif engine == 'bokeh':
         return bk_create_figure(n, figsize if figsize else (800, 800))
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def gcf():
@@ -179,7 +180,7 @@ def gcf():
     elif engine == 'bokeh':
         return bk_gcf()
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def gca():
@@ -189,7 +190,7 @@ def gca():
     elif engine == 'bokeh':
         return bk_gca()
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def show_gcf():
@@ -199,17 +200,17 @@ def show_gcf():
     elif engine == 'bokeh':
         bk_show_gcf()
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD
+    """Draw MACD
 
-    :param axes: 指定的坐标轴
+    :param axes: the specified axes
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
@@ -217,17 +218,17 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     elif engine == 'bokeh':
         pass
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD
+    """Draw MACD
 
-    :param axes: 指定的坐标轴
+    :param axes: the specified axes
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
@@ -235,21 +236,21 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     elif engine == 'bokeh':
         return bk_ax_draw_macd(axes, kdata, n1, n2, n3)
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD。
-    当BAR值变化与参考序列ref变化不一致时，显示为灰色，
-    当BAR和参考序列ref同时上涨，显示红色
-    当BAR和参考序列ref同时下跌，显示绿色
+    """Draw MACD.
+    It is drawn in gray when the change of the BAR value is inconsistent with that of the
+    reference sequence ref, in red when both BAR and the reference sequence ref rise, and in
+    green when both of them fall.
 
-    :param axes: 指定的坐标轴
-    :param ref: 参考序列，EMA
+    :param axes: the specified axes
+    :param ref: the reference sequence, EMA
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
@@ -257,14 +258,14 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     elif engine == 'bokeh':
         bk_ax_draw_macd2(axes, ref, kdata, n1, n2, n3)
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def adjust_axes_show(axeslist):
-    """用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度
-    显示重叠的问题。
+    """Adjust the display of the axes that are closely connected up and down, so that the
+    minimum tick of the upper axis does not overlap the maximum tick of the lower one.
 
-    :param axeslist: 上下相连的坐标轴列表 (ax1,ax2,...)
+    :param axeslist: the list of the axes connected up and down (ax1, ax2, ...)
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
@@ -272,15 +273,16 @@ def adjust_axes_show(axeslist):
     elif engine == 'bokeh':
         pass
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
 def ax_set_locator_formatter(axes, dates, typ):
-    """ 设置指定坐标轴的日期显示，根据指定的K线类型优化X轴坐标显示
+    """Set the date display of the specified axes, and optimize the X-axis display
+    according to the specified K-line type
 
-    :param axes: 指定的坐标轴
-    :param dates: Datetime构成可迭代序列
-    :param Query.KType typ: K线类型
+    :param axes: the specified axes
+    :param dates: an iterable sequence of Datetime
+    :param Query.KType typ: the K-line type
     """
     engine = get_current_draw_engine()
     if engine == 'matplotlib':
@@ -288,10 +290,10 @@ def ax_set_locator_formatter(axes, dates, typ):
     elif engine == 'bokeh':
         pass
     else:
-        print("未知的引擎: {}".format(engine))
+        print(htr("Unknown engine: {}").format(engine))
 
 
-# 设置默认引擎
+# Set the default engine
 use_draw_engine('matplotlib')
 
 __all__ = [

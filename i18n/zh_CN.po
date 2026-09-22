@@ -17,6 +17,7 @@ msgstr ""
 "X-Poedit-KeywordsList: htr;hctr:1c,2\n"
 "X-Poedit-SearchPath-0: hikyuu_cpp/hikyuu\n"
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
+"X-Poedit-SearchPath-2: hikyuu/draw\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
 #: hikyuu_cpp/hikyuu/StockManager.cpp:110
@@ -1080,3 +1081,249 @@ msgstr "最大连续赢利R乘数"
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:137
 msgid "Max Consecutive Loss R-Multiple"
 msgstr "最大连续亏损R乘数"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:905
+#, python-format
+msgid "Total Invested Assets: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}"
+msgstr "投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:907
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%    Current Drawdown from Peak: {:<.2f}%"
+msgstr "当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%    当前距历史最高点回撤: {:<.2f}%"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:911
+#, python-format
+msgid "Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgstr "系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:925
+#, python-format
+msgid "{} Return Curve"
+msgstr "{} 收益曲线"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:928
+#, python-format
+msgid "{} Cumulative Return {:<.2f}%"
+msgstr "{} 累积收益率 {:<.2f}%"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:929
+#, python-format
+msgid "Account({}) Cumulative Return"
+msgstr "账户({}) 累积收益率"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:277
+#, python-format
+msgid "{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f} Change:{:.2f}%"
+msgstr "{} 开:{:.2f} 高:{:.2f} 低:{:.2f} 收:{:.2f} 涨幅:{:.2f}%"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:328
+#, python-format
+msgid "{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f}"
+msgstr "{} 开:{:.2f} 高:{:.2f} 低:{:.2f} 收:{:.2f}"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:530
+#, python-format
+msgid "The indicator length is 0; the indicator should have been calculated (i.e. it has values)"
+msgstr "指标长度为0, 指标应已计算（即有值"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:535
+#, python-format
+msgid "Failed to get the date list! The indicator should be a time series"
+msgstr "获取日期列表失败！指标应为时间序列"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:548
+#, python-format
+msgid "Insufficient monthly data!"
+msgstr "月数据不足！"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:557
+#, python-format
+msgid "Year-Month Return (%) Heatmap"
+msgstr "年-月度收益率(%)热力图"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:558
+#, python-format
+msgid "Month"
+msgstr "月度"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:559
+#, python-format
+msgid "Year"
+msgstr "年份"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:996
+#, python-format
+msgid "No data, please check the date range! start_date={}, end_date={}"
+msgstr "没有数据，请检查日期范围！start_date={}, end_date={}"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1002
+#, python-format
+msgid "Failed to get the tm return curve, please check the tm initial date! tm.init_datetime={} start_date={}, end_date={}"
+msgstr "获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1040
+#, python-format
+msgid "Annual Return"
+msgstr "年度收益"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1070
+#, python-format
+msgid "{} Year-Month Return (%) Heatmap"
+msgstr "{} 年-月度收益率(%)热力图"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1117
+#, python-format
+msgid "Insufficient yearly data!"
+msgstr "年度数据不足！"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1149
+#, python-format
+msgid "Highest Return Range"
+msgstr "最高收益范围"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1152
+#, python-format
+msgid "Lowest Return Range"
+msgstr "最低收益范围"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1170
+#, python-format
+msgid "{} Annual Return (%) Bar Chart"
+msgstr "{} 年度收益率(%)柱状图"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1172
+#, python-format
+msgid "Return (%)"
+msgstr "收益率(%)"
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1180
+#, python-format
+msgid "The system has no trade manager initialized"
+msgstr "系统未初始化交易账户"
+
+#: hikyuu/draw/drawplot/common.py:50
+msgid " (Daily)"
+msgstr " （日线）"
+
+#: hikyuu/draw/drawplot/common.py:52
+msgid " (Weekly)"
+msgstr " （周线）"
+
+#: hikyuu/draw/drawplot/common.py:54
+msgid " (Monthly)"
+msgstr " （月线）"
+
+#: hikyuu/draw/drawplot/common.py:56
+msgid " (Quarterly)"
+msgstr " （季线）"
+
+#: hikyuu/draw/drawplot/common.py:58
+msgid " (Half-Yearly)"
+msgstr " （半年线）"
+
+#: hikyuu/draw/drawplot/common.py:60
+msgid " (Yearly)"
+msgstr " （年线）"
+
+#: hikyuu/draw/drawplot/common.py:62
+msgid " (1-min)"
+msgstr " （1分钟线）"
+
+#: hikyuu/draw/drawplot/common.py:64
+msgid " (3-min)"
+msgstr " （3分钟线）"
+
+#: hikyuu/draw/drawplot/common.py:66
+msgid " (5-min)"
+msgstr " （5分钟线）"
+
+#: hikyuu/draw/drawplot/common.py:68
+msgid " (15-min)"
+msgstr " （15分钟线）"
+
+#: hikyuu/draw/drawplot/common.py:70
+msgid " (30-min)"
+msgstr " （30分钟线）"
+
+#: hikyuu/draw/drawplot/common.py:72
+msgid " (60-min)"
+msgstr " （60分钟线）"
+
+#: hikyuu/draw/drawplot/common.py:74
+msgid " (2-hour)"
+msgstr " （2小时线）"
+
+#: hikyuu/draw/drawplot/common.py:76
+msgid " (4-hour)"
+msgstr " （4小时线）"
+
+#: hikyuu/draw/drawplot/common.py:78
+msgid " (6-hour)"
+msgstr " （6小时线）"
+
+#: hikyuu/draw/drawplot/common.py:80
+msgid " (12-hour)"
+msgstr " （12小时线）"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:190
+msgid "Date"
+msgstr "日期"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:190
+msgid "Open"
+msgstr "开盘价"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "High"
+msgstr "最高价"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "Low"
+msgstr "最低价"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "Close"
+msgstr "收盘价"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:192
+msgid "Amount"
+msgstr "成交金额"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:192
+msgid "Volume"
+msgstr "成交量"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:236
+msgid "Bokeh does not support the American K-line chart yet, please use matplotlib"
+msgstr "Bokeh 暂不支持绘制美式K线图, 请使用 matplotlib"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:302
+msgid "Indicator"
+msgstr "指标"
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:303
+msgid "Value"
+msgstr "值"
+
+#: hikyuu/draw/drawplot/echarts_draw.py:542
+msgid "System Cumulative Return"
+msgstr "系统累积收益率"
+
+#: hikyuu/draw/drawplot/echarts_draw.py:562
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%"
+msgstr "当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%"
+
+#: hikyuu/draw/elder.py:55
+msgid "The lengths of the two sequences are not equal"
+msgstr "数据长度不等"
+
+#: hikyuu/draw/elder.py:56
+msgid "Number must be greater than 0"
+msgstr "Number必须大于0"
+
+#: hikyuu/draw/drawplot/__init__.py:100
+#, python-format
+msgid "Unknown engine: {}"
+msgstr "未知的引擎: {}"
