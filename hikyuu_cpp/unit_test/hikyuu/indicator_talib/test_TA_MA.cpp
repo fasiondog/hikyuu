@@ -25,7 +25,7 @@ TEST_CASE("test_TA_MA") {
     KData kdata = getKData("sh000001", KQuery(-10));
     Indicator c = CLOSE(kdata);
 
-    // /** @arg 非法 n < 1 || n > 100000 */
+    // /** @arg An invalid n < 1 || n > 100000 */
     CHECK_THROWS(TA_MA(c, 0));
     CHECK_THROWS(TA_MA(c, 2, -1));
     CHECK_THROWS(TA_MA(c, 2, 9));

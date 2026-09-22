@@ -7,9 +7,9 @@
 
 /*************************************************************
  *
- * 该示例使用 C++ 方式执行 Strategy 运行时
- * 也就是最常见的量化框架：定时调度 + 数据推送通知回调
- * 更多信息可参考 python 版 strategy 子目录中的示例
+ * This example runs the Strategy runtime in C++
+ * i.e. the most common quant framework: a scheduled dispatch + a data push callback
+ * More information can be found in the python strategy examples subdirectory
  *
  *************************************************************/
 
@@ -49,28 +49,30 @@ int main(int argc, char* argv[]) {
 #endif
 
     // The plugin path setting:
-    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken automatically from the plugindir
-    // of the hikyuu.ini config: StockManager::instance().setPluginPath(".");
-    // Method 2: before the initialization, set the plugin path yourself (if needed)
-    // otherwise it defaults to the .hikyuu/plugin directory under the user home, where the plugins can be copied
+    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken
+    // automatically from the plugindir of the hikyuu.ini config:
+    // StockManager::instance().setPluginPath("."); Method 2: before the initialization, set the
+    // plugin path yourself (if needed) otherwise it defaults to the .hikyuu/plugin directory under
+    // the user home, where the plugins can be copied
     // StockManager::instance().setPluginPath("./plugin");
 
-    // 以多线程的方式执行多个策略
-    // 注意：同一进程内的所有 strategy 共享的是同一个上下文！！！
+    // Run multiple strategies in a multi-threaded way
+    // Note: all the strategies in the same process share the same context!!!
     StrategyContext context({"sh000001", "sz000001"}, {KQuery::DAY});
 
-    // macosx 下如果多线程执行多策略，需要主动初始化，防止异步线程中加载插件导致失败
+    // On macosx an explicit init is needed for multi-threaded strategies, avoiding a plugin load
+    // failure in an async thread
     hikyuu_init(context, true);
 
     Strategy stg(context, "test");
 
-    // stock 数据变化接收，通常用于调测，直接一般不需要
+    // The stock data change receiving, usually for debugging and not needed normally
     stg.onChange(changed);
 
-    // 每日开盘期间，按间隔时间循环执行
+    // Execute in a loop at an interval during the daily open
     stg.runDaily(my_process1, Minutes(1));
 
-    // 每日定点执行
+    // Execute at a fixed time every day
     stg.runDailyAt(my_process2, Datetime::now() - Datetime::today() + Seconds(20));
 
     auto t = std::thread([context]() {
@@ -79,7 +81,7 @@ int main(int argc, char* argv[]) {
         stg2.start();
     });
 
-    // 启动策略
+    // Start the strategy
     stg.start();
 
 #if defined(_WIN32)

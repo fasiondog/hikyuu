@@ -49,7 +49,7 @@ public:
  */
 
 TEST_CASE("test_MAX_DOUBLE") {
-    // 测试 负MAX_DOUBLE 取绝对值后是否等于 MAX_DOUBLE
+    // Test whether the absolute value of a negative MAX_DOUBLE equals MAX_DOUBLE
     double x = -MAX_DOUBLE;
     CHECK_EQ(std::abs(x), MAX_DOUBLE);
 }
@@ -91,7 +91,7 @@ TEST_CASE("test_TradeManager_getBuyCost") {
     TradeManagerPtr tm =
       crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
-    /** @arg 调用CostFunc是否正常 */
+    /** @arg Whether calling CostFunc works */
     result = tm->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
     expect.commission = 18.0;
     expect.stamptax = 0.0;
@@ -108,7 +108,7 @@ TEST_CASE("test_TradeManager_getSellCost") {
     TradeManagerPtr tm =
       crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0));
 
-    /** @arg 调用CostFunc是否正常 */
+    /** @arg Whether calling CostFunc works */
     result = tm->getSellCost(Datetime(200101010000), stock, 10.0, 100);
     expect.commission = 5.0;
     expect.stamptax = 1.0;
@@ -128,35 +128,36 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     TradeRecord trade;
     TradeRecordList trade_list;
 
-    /** @arg 账户初始余额为0，未进行过交易，忽略权息信息 */
+    /** @arg The initial balance is 0, no trade yet and the ex-rights/ex-dividend data is ignored */
     tm = crtTM(Datetime(199901010000), 0, costfunc, "SYS");
     result = tm->buy(Datetime(199911180000), stock, 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 账户初始余额为100000，试图对Null<Stock>进行操作 */
+    /** @arg The initial balance is 100000 and a Null<Stock> is operated on */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911180000), Null<Stock>(), 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
     CHECK_EQ(tm->cash(Datetime(199911180000)), 100000);
 
-    /** @arg 试图在初始建仓日之前买入 */
+    /** @arg Try to buy before the initial position building day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199001010000), stock, 26.36, 100, 0, 26.36, 26.36);
     CHECK_EQ(result, Null<TradeRecord>());
 
-#if 0  // 取消了该限制
-    /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但指定日期该证券不能进行交易，如非交易日 */
+#if 0  // This restriction was removed
+    /** @arg The initial balance is 100000 with no trade and the data ignored, but the security cannot be traded on that date, e.g. a non-trading day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911130000), stock, 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格超出当日最高价 */
+    /** @arg The initial balance is 100000 with no trade and the data ignored, but the buy price exceeds the high price of the day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.2, 100, 0, 27.2, 27.2);
     CHECK_EQ(result, Null<TradeRecord>());
 #endif
 
-    /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格等于当日最高价 */
+    /** @arg The initial balance is 100000 with no trade and the data ignored, but the buy price
+     * equals the high price of the day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0, 27.18, 27.18);
     cost = tm->getBuyCost(Datetime(199911170000), stock, 27.18, 100);
@@ -169,38 +170,39 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     CHECK_EQ(trade_list[1], trade);
 
 #if 0
-    /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格低于当日最低价 */
+    /** @arg The initial balance is 100000 with no trade and the data ignored, but the buy price is lower than the low price of the day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 26.36, 100, 0, 26.36, 26.36);
     CHECK_EQ(result, Null<TradeRecord>());
 #endif
 
-    /** @arg 账户初始余额为100000，未进行过交易，忽略权息信息，但买入价格等于当日最低价 */
+    /** @arg The initial balance is 100000 with no trade and the data ignored, but the buy price
+     * equals the low price of the day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911160000), stock, 26.48, 100, 0, 26.48, 26.48);
     cost = tm->getBuyCost(Datetime(199911160000), stock, 26.48, 100);
     CHECK_EQ(result, TradeRecord(stock, Datetime(199911160000), BUSINESS_BUY, 26.48, 26.48, 26.48,
                                  100, cost, 0.0, 100000 - cost.total - 26.48 * 100, PART_INVALID));
 
-    /** @arg 试图在最后一笔交易时间之前进行交易 */
+    /** @arg Try to trade before the last trade time */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 26.48, 100, 0, 26.48, 26.48);
     CHECK_UNARY(!(result == Null<TradeRecord>()));
     result = tm->buy(Datetime(199911160000), stock, 26.48, 100, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 试图买入数量为0的股票 */
+    /** @arg Try to buy a quantity of 0 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 26.48, 0, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 买入数量小于该股票的最小交易量 */
+    /** @arg The buy quantity is less than the minimum trade quantity */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result =
       tm->buy(Datetime(199911170000), stock, 26.48, stock.minTradeNumber() - 1, 0, 26.48, 26.48);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 买入数量大于该股票的最大交易量 */
+    /** @arg The buy quantity is greater than the maximum trade quantity */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result =
       tm->buy(Datetime(199911170000), stock, 26.48, stock.maxTradeNumber() - 1, 0, 26.48, 26.48);
@@ -218,58 +220,58 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     TradeRecord trade;
     TradeRecordList trade_list;
 
-    /** @arg 账户初始余额为0，未进行过交易，忽略权息信息 */
+    /** @arg The initial balance is 0, no trade yet and the ex-rights/ex-dividend data is ignored */
     tm = crtTM(Datetime(199901010000), 0, costfunc, "SYS");
     result = tm->sell(Datetime(199911180000), stock, 27.2, 100);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 账户初始余额为100000，试图对Null<Stock>进行操作 */
+    /** @arg The initial balance is 100000 and a Null<Stock> is operated on */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->sell(Datetime(199911180000), Null<Stock>(), 27.2, 100);
     CHECK_EQ(result, Null<TradeRecord>());
     CHECK_EQ(tm->cash(Datetime(199911180000)), 100000);
 
-    /** @arg 试图在最后一个交易日之前卖出 */
+    /** @arg Try to sell before the last trading day */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199801010000), stock, 26.36, 100);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 卖出的数量等于0 */
+    /** @arg The sell quantity is 0 */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, 0);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 卖出的数量小于最小交易数量 */
+    /** @arg The sell quantity is less than the minimum trade quantity */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, stock.minTradeNumber() - 1);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 卖出的数量大于最大交易数量 */
+    /** @arg The sell quantity is greater than the maximum trade quantity */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, stock.maxTradeNumber() + 1);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 卖出未持仓的股票 */
+    /** @arg Sell a stock that is not held */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->sell(Datetime(199901020000), stock, 26.36, 100);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 卖出的数量大于当前持仓数量 */
+    /** @arg The sell quantity is greater than the current position quantity */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0);
     CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
     result = tm->sell(Datetime(199911180000), stock, 26.36, 101);
     CHECK_EQ(result, Null<TradeRecord>());
 
-    /** @arg 忽略权息信息，将买入股票全部卖出 */
+    /** @arg Ignoring the ex-rights/ex-dividend data, sell all the bought stocks */
     tm = crtTM(Datetime(199901010000), 100000, costfunc, "SYS");
     result = tm->buy(Datetime(199911170000), stock, 27.18, 100, 0, 27.18, 27.18);
     cost = tm->getBuyCost(Datetime(199911170000), stock, 27.18, 100);
@@ -287,7 +289,8 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     CHECK_EQ(tm->getStockNumber(), 0);
     CHECK_EQ(tm->cash(Datetime(199911180000)), 99903.36);
 
-    /** @arg 不忽略权息信息，对股票进行买卖操作，忽略买卖成本 */
+    /** @arg With the ex-rights/ex-dividend data, buy and sell the stock and ignore the trade cost
+     */
     tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "SYS");
     tm->buy(Datetime(199911170000), stock, 27.18, 1000, 0);
     CHECK_EQ(tm->cash(Datetime(199911170000)), 972820);
@@ -302,7 +305,7 @@ TEST_CASE("test_TradeManager_can_not_sell") {
 TEST_CASE("test_TradeManager_can_not_checkin") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图存入的金额 <= 0 */
+    /** @arg Try to deposit an amount <= 0 */
     CHECK_EQ(tm->checkin(Datetime(199901020000), 0), false);
     CHECK_EQ(tm->checkin(Datetime(199901020000), -0.01), false);
     CHECK_EQ(tm->checkin(Datetime(199901020000), 0.01), true);
@@ -316,16 +319,16 @@ TEST_CASE("test_TradeManager_can_not_checkin") {
 TEST_CASE("test_TradeManager_can_not_checkout") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图取出的金额 <= 0 */
+    /** @arg Try to withdraw an amount <= 0 */
     CHECK_EQ(tm->checkout(Datetime(199901020000), 0), false);
     CHECK_EQ(tm->checkout(Datetime(199901020000), -0.01), false);
     CHECK_EQ(tm->checkout(Datetime(199901020000), 0.01), true);
 
-    /** @arg 试图在最后交易日期前取出 */
+    /** @arg Try to withdraw before the last trading date */
     tm->checkin(Datetime(200001020000), 0.01);
     CHECK_EQ(tm->checkout(Datetime(200001010000), 200), false);
 
-    /** @arg 试图取出的金额，大于当前账户余额 */
+    /** @arg The amount to withdraw is greater than the current balance */
     CHECK_EQ(tm->currentCash(), 100000);
     CHECK_EQ(tm->checkout(Datetime(200001030000), 100000.01), false);
     CHECK_EQ(tm->checkout(Datetime(200001030000), 100000), true);
@@ -335,7 +338,7 @@ TEST_CASE("test_TradeManager_can_not_checkout") {
 TEST_CASE("test_TradeManager_can_not_borrowCash") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图存入的金额 <= 0 */
+    /** @arg Try to deposit an amount <= 0 */
     CHECK_EQ(tm->borrowCash(Datetime(199901020000), 0), false);
     CHECK_EQ(tm->borrowCash(Datetime(199901020000), -0.01), false);
     CHECK_EQ(tm->borrowCash(Datetime(199901020000), 0.01), true);
@@ -349,22 +352,22 @@ TEST_CASE("test_TradeManager_can_not_borrowCash") {
 TEST_CASE("test_TradeManager_can_not_returnCash") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图在最后交易日期前操作 */
+    /** @arg Try to operate before the last trading date */
     tm->borrowCash(Datetime(200001020000), 50000);
     CHECK_EQ(tm->returnCash(Datetime(200001010000), 200), false);
 
-    /** @arg 试图归还的金额 <= 0 */
+    /** @arg Try to return an amount <= 0 */
     CHECK_EQ(tm->returnCash(Datetime(200001020000), 0), false);
     CHECK_EQ(tm->returnCash(Datetime(200001020000), -0.01), false);
     CHECK_EQ(tm->returnCash(Datetime(200001020000), 0.01), true);
     CHECK_EQ(tm->borrowCash(Datetime(200001020000), 0.01), true);
 
-    /** @arg 试图归还的金额，大于当前的欠款额 */
+    /** @arg The amount to return is greater than the current debt */
     CHECK_EQ(tm->getDebtCash(Datetime(200001030000)), 50000);
     CHECK_EQ(tm->returnCash(Datetime(200001030000), 50000.01), false);
     CHECK_EQ(tm->returnCash(Datetime(200001030000), 50000), true);
 
-    /** @arg 试图归还的金额，大于当前的账户余额 */
+    /** @arg The amount to return is greater than the current balance */
     tm->borrowCash(Datetime(200001040000), 50000);
     tm->checkout(Datetime(200001040000), 120000);
     CHECK_EQ(tm->currentCash(), 30000);
@@ -378,13 +381,13 @@ TEST_CASE("test_TradeManager_can_not_checkinStock") {
     Stock stock = sm.getStock("sh600000");
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图存入的stock is null */
+    /** @arg The stock to deposit is null */
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), Stock(), 10, 100), false);
 
-    /** @arg 试图存入的数量为0 */
+    /** @arg The quantity to deposit is 0 */
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, 10, 0), false);
 
-    /** @arg 试图存入的金额小于等于0 */
+    /** @arg The amount to deposit is <= 0 */
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, 0, 100), false);
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, -0.01, 100), false);
 
@@ -399,18 +402,18 @@ TEST_CASE("test_TradeManager_can_not_checkoutStock") {
     Stock stock = sm.getStock("sh600000");
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图取出的stock is null */
+    /** @arg The stock to withdraw is null */
     CHECK_EQ(tm->checkoutStock(Datetime(199901020000), Stock(), 10, 100), false);
 
-    /** @arg 试图取出的数量为0 */
+    /** @arg The quantity to withdraw is 0 */
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, 10, 100), true);
     CHECK_EQ(tm->checkoutStock(Datetime(199901020000), stock, 10, 0), false);
 
-    /** @arg 试图取出的金额小于等于0 */
+    /** @arg The amount to withdraw is <= 0 */
     CHECK_EQ(tm->checkoutStock(Datetime(199901020000), stock, 0, 100), false);
     CHECK_EQ(tm->checkoutStock(Datetime(199901020000), stock, -0.01, 100), false);
 
-    /** @arg 试图在最后交易日期前取出 */
+    /** @arg Try to withdraw before the last trading date */
     CHECK_EQ(tm->checkinStock(Datetime(199901010000), stock, 10.0, 200), false);
 }
 
@@ -442,17 +445,17 @@ TEST_CASE("test_TradeManager_can_not_borrowStock") {
     Stock stock = sm.getStock("sh600000");
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
-    /** @arg 试图借入的stock is null */
+    /** @arg The stock to borrow is null */
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), Stock(), 10, 100), false);
 
-    /** @arg 试图借入的数量为0 */
+    /** @arg The quantity to borrow is 0 */
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10, 0), false);
 
-    /** @arg 试图借入的金额小于等于0 */
+    /** @arg The amount to borrow is <= 0 */
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 0, 100), false);
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, -0.01, 100), false);
 
-    /** @arg 试图在最后交易日期前借入 */
+    /** @arg Try to borrow before the last trading date */
     tm->checkin(Datetime(200001020000), 10000);
     CHECK_EQ(tm->borrowStock(Datetime(200001010000), stock, 10.0, 200), false);
 }
@@ -465,25 +468,25 @@ TEST_CASE("test_TradeManager_can_not_returnStock") {
 
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10, 100), true);
 
-    /** @arg 试图归还的stock is null */
+    /** @arg The stock to return is null */
     CHECK_EQ(tm->returnStock(Datetime(199901020000), Stock(), 10, 100), false);
 
-    /** @arg 试图归还的数量为0 */
+    /** @arg The quantity to return is 0 */
     CHECK_EQ(tm->returnStock(Datetime(199901020000), stock, 10, 0), false);
 
-    /** @arg 试图归还的金额小于等于0 */
+    /** @arg The amount to return is <= 0 */
     CHECK_EQ(tm->returnStock(Datetime(199901020000), stock, 0, 100), false);
     CHECK_EQ(tm->returnStock(Datetime(199901020000), stock, -0.01, 100), false);
 
-    /** @arg 试图在最后交易日期前归还 */
+    /** @arg Try to return before the last trading date */
     CHECK_EQ(tm->returnStock(Datetime(199901010000), stock, 10.0, 100), false);
 
-    /** @arg 试图归还的数量大于借入的数量 */
+    /** @arg The quantity to return is greater than the borrowed one */
     CHECK_EQ(tm->returnStock(Datetime(199901030000), stock, 10.0, 101), false);
     CHECK_EQ(tm->returnStock(Datetime(199901030000), stock, 10.0, 100), true);
 }
 
-/** @par 检测点, 多次借入、归还现金 */
+/** @par Test point: multiple borrows and returns of cash */
 TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     FundsRecord funds;
     TradeCostPtr tc = TC_TestStub();
@@ -491,7 +494,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
 
     Datetime cur_date, pre_date, next_date;
 
-    /** @arg 19991117 借入5000, 分2次归还 */
+    /** @arg 19991117: borrow 5000 and return it in 2 times */
     cur_date = Datetime(199911170000);
     pre_date = Datetime(199911160000);
     next_date = Datetime(199911180000);
@@ -523,7 +526,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     funds = tm->getFunds(next_date);
     CHECK_EQ(funds, FundsRecord(99890, 0, 0, 100000, 0, 0, 0));
 
-    /** @arg 分两次借入5000元，一次归还 */
+    /** @arg Borrow 5000 in two times and return it once */
     cur_date = Datetime(199911190000);
     pre_date = Datetime(199911180000);
     next_date = Datetime(199911200000);
@@ -545,7 +548,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     funds = tm->getFunds(next_date);
     CHECK_EQ(funds, FundsRecord(99750, 0, 0, 100000, 0, 0, 0));
 
-    /** @arg 分两次借入5000元，跨记录两次归还 */
+    /** @arg Borrow 5000 in two times and return it in two times across records */
     tm->reset();
     cur_date = Datetime(199911200000);
     pre_date = Datetime(199911190000);
@@ -577,7 +580,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_cash_by_day") {
     CHECK_EQ(funds, FundsRecord(99820, 0, 0, 100000, 0, 0, 0));
 }
 
-/** @par 检测点, 多次借入、归还股票 */
+/** @par Test point: multiple borrows and returns of stocks */
 TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -593,7 +596,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
 
     Datetime cur_date, pre_date, next_date;
 
-    /** @arg 19991117 一次性买入1000股, 分两笔归还 */
+    /** @arg 19991117: buy 1000 shares once and return them in two records */
     cur_date = Datetime(199911170000);
     pre_date = Datetime(199911160000);
     next_date = Datetime(199911180000);
@@ -624,7 +627,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     funds = tm->getFunds(next_date);
     CHECK_EQ(funds, FundsRecord(99830, 0, 0, 100000, 0, 0, 0));
 
-    /** @arg 19991123 分两次买入共1000股，一次性归还 */
+    /** @arg 19991123: buy 1000 shares in two times and return them once */
     cur_date = Datetime(199911230000);
     pre_date = Datetime(199911220000);
     next_date = Datetime(199911240000);
@@ -648,7 +651,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     funds = tm->getFunds(next_date);
     CHECK_EQ(funds, FundsRecord(99610, 0, 0, 100000, 0, 0, 0));
 
-    /** @arg 19991123 分两次买入1000股，跨记录两次归还 */
+    /** @arg 19991123: buy 1000 shares in two times, return them in two times across records */
     cur_date = Datetime(199911300000);
     pre_date = Datetime(199911290000);
     next_date = Datetime(199912010000);
@@ -680,7 +683,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     funds = tm->getFunds(next_date);
     CHECK_EQ(funds, FundsRecord(99330, 0, 0, 100000, 0, 0, 0));
 
-    /** @arg 19991207 分两次买入1000股，不跨记录，三次归还 */
+    /** @arg 19991207: buy 1000 shares in two times and return them in three times in one record */
     cur_date = Datetime(199912070000);
     pre_date = Datetime(199912060000);
     next_date = Datetime(199912080000);
@@ -721,7 +724,7 @@ TEST_CASE("test_TradeManager_trade_multi_borrow_stock_by_day") {
     CHECK_EQ(funds, FundsRecord(99050, 0, 0, 100000, 0, 0, 0));
 }
 
-/** @par 检测点，测试 getTradeList */
+/** @par Test point: test getTradeList */
 TEST_CASE("test_getTradeList") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sz000001");
@@ -734,7 +737,7 @@ TEST_CASE("test_getTradeList") {
     tm->buy(Datetime(199305250000L), stk, 27.5, 100);
     tm->buy(Datetime(199407110000L), stk, 8.55, 200);
 
-    /** @arg 获取全部交易记录 */
+    /** @arg Get all the trade records */
     TradeRecordList tr_list = tm->getTradeList();
     CHECK_EQ(tr_list.size(), 8);
     CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000,
@@ -742,7 +745,8 @@ TEST_CASE("test_getTradeList") {
     CHECK_EQ(tr_list[7], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
-    /** @arg 指定日期范围获取交易记录 start 等于账户建立日期，end 为  Null<Datetime>() */
+    /** @arg Get the records in a range where start is the account creation date and end is
+     * Null<Datetime>() */
     tr_list = tm->getTradeList(Datetime(199305010000), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 8);
@@ -751,7 +755,7 @@ TEST_CASE("test_getTradeList") {
     CHECK_EQ(tr_list[7], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
-    /** @arg 指定日期范围获取交易记录 start 等于第一条买入记录日期，end为Null */
+    /** @arg Get the records in a range where start is the first buy record date and end is Null */
     tr_list = tm->getTradeList(Datetime(199305200000L), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 7);
@@ -760,7 +764,7 @@ TEST_CASE("test_getTradeList") {
     CHECK_EQ(tr_list[6], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
-    /** @arg 指定日期范围获取交易记录 start 介于两个交易记录日期之间，end为Null */
+    /** @arg Get the records in a range where start lies between two record dates, end is Null */
     tr_list = tm->getTradeList(Datetime(199305210000L), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 6);
@@ -769,15 +773,15 @@ TEST_CASE("test_getTradeList") {
     CHECK_EQ(tr_list[5], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
-    /** @arg 指定日期范围获取交易记录 start 大于 end */
+    /** @arg Get the records in a range where start is greater than end */
     tr_list = tm->getTradeList(Null<Datetime>(), Datetime(199305210000L));
     CHECK_EQ(tr_list.size(), 0);
 
-    /** @arg 指定日期范围获取交易记录 start 等于 end */
+    /** @arg Get the records in a range where start equals end */
     tr_list = tm->getTradeList(Datetime(199305210000L), Datetime(199305210000L));
     CHECK_EQ(tr_list.size(), 0);
 
-    /** @arg 指定日期范围获取交易记录 start等于某交易记录日期，end大于最后一条交易记录日期 */
+    /** @arg Get the records where start is a record date and end is later than the last record */
     tr_list = tm->getTradeList(Datetime(199305200000L), Datetime(199407120000L));
 
     CHECK_EQ(tr_list.size(), 7);
@@ -786,7 +790,7 @@ TEST_CASE("test_getTradeList") {
     CHECK_EQ(tr_list[6], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
-    /** @arg 指定日期范围获取交易记录 start等于某交易记录日期，end等于最后一条交易记录日期 */
+    /** @arg Get the records where start is a record date and end is the last record date */
     tr_list = tm->getTradeList(Datetime(199305200000L), Datetime(199407110000L));
 
     CHECK_EQ(tr_list.size(), 4);
@@ -796,7 +800,7 @@ TEST_CASE("test_getTradeList") {
                                      cost, 0, 91710, PART_INVALID));
 }
 
-/** @par 检测点, 测试addTradeRecord */
+/** @par Test point: test addTradeRecord */
 TEST_CASE("test_TradeManager_addTradeRecord") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sz000001");
@@ -809,7 +813,7 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
     tm->buy(Datetime(199305250000L), stk, 27.5, 100);
     tm->buy(Datetime(199407110000L), stk, 8.55, 200);
 
-    /** @arg 加入账户初始化交易记录 */
+    /** @arg Add the account initialization trade record */
     TradeRecordList tr_list = tm->getTradeList();
     CHECK_EQ(tr_list.size(), 8);
     CHECK_EQ(tr_list[0], TradeRecord(Stock(), Datetime(199305010000L), BUSINESS_INIT, 100000,
@@ -823,7 +827,7 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
     CHECK_EQ(tr_list.size(), 1);
     CHECK_EQ(tr_list[0], tr);
 
-    /** @arg 复制一个tm的交易记录至另一个tm */
+    /** @arg Copy the trade records of one tm into another */
     tm = crtTM(Datetime(199305010000), 100000);
     tm->buy(Datetime(199305200000L), stk, 55.7, 100);
     tm->buy(Datetime(199305250000L), stk, 27.5, 100);

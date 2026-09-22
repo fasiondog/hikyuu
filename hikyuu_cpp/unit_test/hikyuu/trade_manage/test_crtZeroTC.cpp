@@ -31,18 +31,18 @@ TEST_CASE("test_TC_Zero") {
     TradeCostPtr cost_func = TC_Zero();
     CostRecord result;
 
-    /** @arg 检查name */
+    /** @arg Check the name */
     CHECK_EQ(cost_func->name(), "TC_Zero");
 
-    /** @arg 计算买入成本 */
+    /** @arg Calculate the buy cost */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);
     CHECK_EQ(result, Null<CostRecord>());
 
-    /** @arg 计算卖出成本 */
+    /** @arg Calculate the sell cost */
     result = cost_func->getSellCost(Datetime(200101010000), stock, 9.01, 1000);
     CHECK_EQ(result, Null<CostRecord>());
 
-    /** @arg 测试clone */
+    /** @arg Test clone */
     TradeCostPtr cost_clone_func = cost_func->clone();
     CHECK_EQ(cost_clone_func->name(), "TC_Zero");
     result = cost_clone_func->getBuyCost(Datetime(200101010000), stock, 9.01, 1000);

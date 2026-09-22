@@ -7,10 +7,10 @@
 
 /*************************************************************
  *
- * 该示例，为使用 C++ 方式使用 hikyuu
- * 1. 初始化 hikyuu
- * 2. 打印 K 线数据
- * 更多使用可以参考 python，基本一致，仅函数命名风格不一样
+ * This example uses hikyuu in C++
+ * 1. Initialize hikyuu
+ * 2. Print the K-line data
+ * For more usage see python: they are basically the same, only the naming style differs
  *
  *************************************************************/
 
@@ -34,13 +34,14 @@ int main(int argc, char* argv[]) {
 #endif
 
     // The plugin path setting:
-    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken automatically from the plugindir
-    // of the hikyuu.ini config: StockManager::instance().setPluginPath(".");
-    // Method 2: before the initialization, set the plugin path yourself (if needed)
-    // otherwise it defaults to the .hikyuu/plugin directory under the user home, where the plugins can be copied
+    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken
+    // automatically from the plugindir of the hikyuu.ini config:
+    // StockManager::instance().setPluginPath("."); Method 2: before the initialization, set the
+    // plugin path yourself (if needed) otherwise it defaults to the .hikyuu/plugin directory under
+    // the user home, where the plugins can be copied
     // StockManager::instance().setPluginPath("./plugin");
 
-    // 配置文件的位置自行修改
+    // Modify the config file location yourself
     hikyuu_init(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()));
 
     StockManager& sm = StockManager::instance();
@@ -55,7 +56,7 @@ int main(int argc, char* argv[]) {
         std::cout << k[i] << std::endl;
     }
 
-    // 启动行情接收（只是计算回测可以不需要）
+    // Start the market data receiving (not needed for a backtest only)
     // startSpotAgent(true);
     // while (true) {
     //     std::this_thread::sleep_for(std::chrono::seconds(1));

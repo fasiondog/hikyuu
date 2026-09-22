@@ -24,7 +24,7 @@ using namespace hku;
 TEST_CASE("test_TA_CDLDARKCLOUDCOVER") {
     KData kdata = getKData("sh000001", KQuery(-30));
 
-    /** @arg 非法 n < 0 */
+    /** @arg An invalid n < 0 */
     CHECK_THROWS(TA_CDLDARKCLOUDCOVER(kdata, -0.1));
 
     /** @arg The normal case */

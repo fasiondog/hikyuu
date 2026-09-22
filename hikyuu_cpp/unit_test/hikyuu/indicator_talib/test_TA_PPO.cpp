@@ -42,7 +42,7 @@ TEST_CASE("test_TA_PPO") {
     CHECK_EQ(result[25], doctest::Approx(-1.571039).epsilon(0.0001));
     CHECK_EQ(result[29], doctest::Approx(-2.557277).epsilon(0.0001));
 
-    // /** @arg 计算数据的 discard 不为0 */
+    // /** @arg The discard of the calculated data is not 0 */
     auto data = TA_MA(c, 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_PPO(data);

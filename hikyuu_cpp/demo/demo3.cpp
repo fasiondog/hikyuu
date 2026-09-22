@@ -7,15 +7,17 @@
 
 /*************************************************************
  *
- * 这是利用 hikyuu 本身来实现一个数据缓存服务
- * 其接收 HikyuuTDX 行情采集发来的行情数据，并提供服务接口供其他程序来获取最新数据
+ * This implements a data cache service with hikyuu itself
+ * It receives the market data sent by the HikyuuTDX collector and offers an interface for the other
+ * programs to get the latest data
  *
- * 用途：
- * 在程序化交易里，经常在实际下单时，希望获取最新数据，
- * 或者是日频交易时，不开启 hikyuu 本身的行情自动接收，而是在收盘前定时执行时，手工获取下最新数据
+ * Purpose:
+ * In the programmatic trading the latest data is often wanted when placing a real order,
+ * or in daily trading the automatic receiving of hikyuu is off and the latest data is fetched
+ * manually during a scheduled run before the close
  *
- * hikyuu 中提供了对应的函数 get_data_from_buffer_server(python), getDataFromBufferServer(C++)
- * 用来从该服务获取最新数据（补齐当天数据）, 如：
+ * hikyuu provides get_data_from_buffer_server (python) and getDataFromBufferServer (C++)
+ * to get the latest data from this service (filling the data of the day), e.g.:
  * get_data_from_buffer_server("tcp://192.168.1.1:9201", Query.DAY)
  *
  *************************************************************/
@@ -59,19 +61,20 @@ int main(int argc, char* argv[]) {
 #endif
 
     // The plugin path setting:
-    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken automatically from the plugindir
-    // of the hikyuu.ini config: StockManager::instance().setPluginPath(".");
-    // Method 2: before the initialization, set the plugin path yourself (if needed)
-    // otherwise it defaults to the .hikyuu/plugin directory under the user home, where the plugins can be copied
+    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken
+    // automatically from the plugindir of the hikyuu.ini config:
+    // StockManager::instance().setPluginPath("."); Method 2: before the initialization, set the
+    // plugin path yourself (if needed) otherwise it defaults to the .hikyuu/plugin directory under
+    // the user home, where the plugins can be copied
     // StockManager::instance().setPluginPath("./plugin");
 
     try {
-        // 获取基础配置参数
+        // Get the basic configuration parameters
         Parameter baseParam, blockParam, kdataParam, preloadParam, hkuParam;
         getConfigFromIni(fmt::format("{}/.hikyuu/hikyuu.ini", getUserDir()), baseParam, blockParam,
                          kdataParam, preloadParam, hkuParam);
 
-        // 调整所有类型K线为预加载且预加载数量为1天的量
+        // Preload every K-line type with a preload amount of one day
         Parameter new_preloadParam;
         auto ktypes = KQuery::getBaseKTypeList();
         for (auto& ktype : ktypes) {
@@ -85,13 +88,13 @@ int main(int argc, char* argv[]) {
                 HKU_INFO("{}: {}", fmt::format("{}_max", ktype), 240 / minutes);
             }
         }
-        // 不加载历史财务信息，不加载权息数据
+        // Do not load the historical financial information nor the ex-rights/ex-dividend data
         hkuParam.set<bool>("load_history_finance", false);
         hkuParam.set<bool>("load_stock_weight", false);
         StockManager::instance().init(baseParam, blockParam, kdataParam, new_preloadParam,
                                       hkuParam);
 
-        // 启动行情接收
+        // Start the market data receiving
         startSpotAgent(true, 2);
 
         server.setAddr("tcp://0.0.0.0:9201");
