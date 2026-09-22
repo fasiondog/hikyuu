@@ -129,7 +129,7 @@ class ImportQmtToH5Task:
                     time.sleep(0.1)
                     end_time = time.time()
                     if (end_time - start_time) > 30 and process.total == 0:
-                        self.logger.error(f'QMT 超时没反应 {market} {ktype}')
+                        self.logger.error(f'QMT timed out with no response {market} {ktype}')
                         break
 
                 total += process.total
@@ -164,7 +164,7 @@ class ImportQmtToH5Task:
             if not last_date.is_null():
                 if last_date >= Datetime.today():
                     cnt += 1
-                    print(f"已导入 {cnt}, 总数: {total}, {market}{code}")
+                    print(f"Imported {cnt}, total: {total}, {market}{code}")
                     continue
                 df = xtdata.get_local_data(field_list=['open', 'high', 'low', 'close', 'amount', 'volume'],
                                            stock_list=[f"{code}.{market}",], period=ktype_to_qmt_period(ktype),
@@ -189,7 +189,7 @@ class ImportQmtToH5Task:
                     im.update_index(market, code, nktype)
 
             cnt += 1
-            print(f"导入hikyuu 已完成: {cnt}, 总数: {total}, {market}{code}")
+            print(f"Import into hikyuu completed: {cnt}, total: {total}, {market}{code}")
 
 
 if __name__ == '__main__':

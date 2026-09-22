@@ -12,10 +12,10 @@ import hikyuu as hku
 
 
 @click.command()
-@click.option('--datadir', default="", help='数据目录，为空时使用 hikyuu.ini 中 [hikyuu] datadir')
-@click.option('--publish_shm', default=True, type=bool, help='是否发布共享内存快照（K线热数据 + 基础信息）')
-@click.option('--recv_spot', default=True, type=bool, help='本进程是否接收实时行情并镜像写入快照尾部')
-@click.option('--config', 'config_file', default="", help='指定 hikyuu 配置文件路径，为空则使用默认 ~/.hikyuu/hikyuu.ini')
+@click.option('--datadir', default="", help='Data directory; when empty, the [hikyuu] datadir in hikyuu.ini is used')
+@click.option('--publish_shm', default=True, type=bool, help='Whether to publish the shared memory snapshot (K-line hot data + basic info)')
+@click.option('--recv_spot', default=True, type=bool, help='Whether this process receives realtime quotes and mirrors them to the tail of the snapshot')
+@click.option('--config', 'config_file', default="", help='The hikyuu configuration file path; when empty, the default ~/.hikyuu/hikyuu.ini is used')
 def main(datadir, publish_shm, recv_spot, config_file):
     """在当前进程内启动 shm(共享内存)数据服务（独立 VIP 插件，需有效授权），常驻供其他 hikyuu 进程零拷贝读取。
 
@@ -33,10 +33,10 @@ def main(datadir, publish_shm, recv_spot, config_file):
 
     try:
         if not hku.start_shm_server(datadir, publish_shm=publish_shm, recv_spot=recv_spot):
-            click.echo("start_shm_server 返回 False：插件缺失 / 授权无效或数据未就绪，本进程未成为服务端。", err=True)
+            click.echo("start_shm_server returned False: missing plug-in / invalid license or data not ready; this process did not become the server.", err=True)
             return
 
-        click.echo("shm 数据服务已启动，按 Ctrl-C 停止。")
+        click.echo("The shm data service has started, press Ctrl-C to stop.")
         while True:
             try:
                 time.sleep(1)

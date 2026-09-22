@@ -50,12 +50,12 @@ class SchedImportThread(QThread):
     def run(self):
         self.mutex.tryLock()
         next_datetime, delta = self.next_time_delta()
-        self.logger.info("下次导入时间：{}".format(next_datetime))
+        self.logger.info("Next import time: {}".format(next_datetime))
         delta = int(delta.total_milliseconds())
         while self.working and not self.cond.wait(self.mutex, int(delta)):
             self.message.emit()
             next_datetime, delta = self.next_time_delta()
-            self.logger.info("下次导入时间：{}".format(next_datetime))
+            self.logger.info("Next import time: {}".format(next_datetime))
             delta = int(delta.total_milliseconds())
 
 

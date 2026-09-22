@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>数据导入工具</string>
+   <string>Data Import Tool</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -31,7 +31,7 @@
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
-        <string>导入设置</string>
+        <string>Import Settings</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
@@ -43,7 +43,7 @@
            </sizepolicy>
           </property>
           <property name="title">
-           <string>数据源设置</string>
+           <string>Data Source Settings</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12">
            <item>
@@ -60,14 +60,14 @@
                 <bool>true</bool>
                </property>
                <property name="text">
-                <string>使用Pytdx下载数据</string>
+                <string>Download data with Pytdx</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_16">
                <property name="text">
-                <string>同时使用</string>
+                <string>Use</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -90,7 +90,7 @@
              <item>
               <widget class="QLabel" name="label_17">
                <property name="text">
-                <string>个通达信服务器进行下载</string>
+                <string>TDX servers for download simultaneously</string>
                </property>
               </widget>
              </item>
@@ -120,7 +120,7 @@
              <item>
               <widget class="QRadioButton" name="tdx_radioButton">
                <property name="text">
-                <string>使用通达信盘后数据（不支持分笔、分时数据，需要配置安装路径）</string>
+                <string>Use TDX after-hours data (tick and time-series data are not supported; the installation path must be configured)</string>
                </property>
               </widget>
              </item>
@@ -143,14 +143,14 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>选择</string>
+                <string>Browse...</string>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>通达信安装目录：</string>
+                <string>TDX Installation Directory:</string>
                </property>
               </widget>
              </item>
@@ -177,7 +177,7 @@
              <item>
               <widget class="QRadioButton" name="qmt_radioButton">
                <property name="text">
-                <string>使用 qmt 数据下载（需要 miniqmt）（屏蔽，qmt下载数据太慢，且不稳定）</string>
+                <string>Download data with QMT (requires miniqmt) (disabled: QMT data download is too slow and unstable)</string>
                </property>
               </widget>
              </item>
@@ -189,7 +189,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox_7">
           <property name="title">
-           <string>导入设置</string>
+           <string>Import Settings</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
            <item>
@@ -203,21 +203,21 @@
              <item>
               <widget class="QCheckBox" name="import_weight_checkBox">
                <property name="text">
-                <string>下载权息数据</string>
+                <string>Download Weight Data</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="import_history_finance_checkBox">
                <property name="text">
-                <string>下载历史财务数据</string>
+                <string>Download Historical Finance Data</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="import_block_checkBox">
                <property name="text">
-                <string>下载指数板块</string>
+                <string>Download Index Blocks</string>
                </property>
               </widget>
              </item>
@@ -231,14 +231,14 @@
              <item>
               <widget class="QCheckBox" name="import_stock_checkBox">
                <property name="text">
-                <string>股票</string>
+                <string>Stock</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="import_fund_checkBox">
                <property name="text">
-                <string>基金</string>
+                <string>Fund</string>
                </property>
               </widget>
              </item>
@@ -248,7 +248,7 @@
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>期货</string>
+                <string>Futures</string>
                </property>
               </widget>
              </item>
@@ -275,21 +275,21 @@
              <item>
               <widget class="QCheckBox" name="import_day_checkBox">
                <property name="text">
-                <string>日线</string>
+                <string>Daily</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="import_min5_checkBox">
                <property name="text">
-                <string>5分钟线</string>
+                <string>5-Minute</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="import_min_checkBox">
                <property name="text">
-                <string>1分钟线</string>
+                <string>1-Minute</string>
                </property>
               </widget>
              </item>
@@ -299,7 +299,7 @@
                 <bool>true</bool>
                </property>
                <property name="text">
-                <string>分笔</string>
+                <string>Tick</string>
                </property>
               </widget>
              </item>
@@ -309,7 +309,7 @@
                 <bool>true</bool>
                </property>
                <property name="text">
-                <string>分时</string>
+                <string>Time-Series</string>
                </property>
               </widget>
              </item>
@@ -346,14 +346,14 @@
              <item row="4" column="0">
               <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>初次导入分时起始日期：</string>
+                <string>Initial time-series import start date:</string>
                </property>
               </widget>
              </item>
              <item row="3" column="0">
               <widget class="QLabel" name="label_6">
                <property name="text">
-                <string>初次导入分笔起始日期：</string>
+                <string>Initial tick import start date:</string>
                </property>
               </widget>
              </item>
@@ -384,21 +384,21 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_3">
                <property name="text">
-                <string>初次导入日线起始日期：</string>
+                <string>Initial daily import start date:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_10">
                <property name="text">
-                <string>初次导入5分钟线起始日期：</string>
+                <string>Initial 5-minute import start date:</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_15">
                <property name="text">
-                <string>初次导入1分钟线起始日期：</string>
+                <string>Initial 1-minute import start date:</string>
                </property>
               </widget>
              </item>
@@ -468,7 +468,7 @@
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>存储设置</string>
+        <string>Storage Settings</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
@@ -486,7 +486,7 @@
            </size>
           </property>
           <property name="title">
-           <string>存储引擎设置</string>
+           <string>Storage Engine Settings</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
            <item>
@@ -497,21 +497,21 @@
              <item>
               <widget class="QRadioButton" name="enable_hdf55_radioButton">
                <property name="text">
-                <string>HDF5(推荐)</string>
+                <string>HDF5 (recommended)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="enable_mysql_radioButton">
                <property name="text">
-                <string>MYSQL(不适合大数据)</string>
+                <string>MySQL (not suitable for big data)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="enable_clickhouse_radioButton">
                <property name="text">
-                <string>Clickhouse(捐赠权益)</string>
+                <string>ClickHouse (donation benefit)</string>
                </property>
               </widget>
              </item>
@@ -548,7 +548,7 @@
            </size>
           </property>
           <property name="title">
-           <string>HDF5存储设置</string>
+           <string>HDF5 Storage Settings</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
@@ -562,14 +562,14 @@
              <item row="0" column="2">
               <widget class="QPushButton" name="hdf5_dir_pushButton">
                <property name="text">
-                <string>选择</string>
+                <string>Browse...</string>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label">
                <property name="text">
-                <string>目标数据（HDF5）存放目录：</string>
+                <string>Target data (HDF5) directory:</string>
                </property>
               </widget>
              </item>
@@ -581,7 +581,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>MYSQL存储设置</string>
+           <string>MySQL Storage Settings</string>
           </property>
           <property name="flat">
            <bool>false</bool>
@@ -607,7 +607,7 @@
              <item row="3" column="0">
               <widget class="QLabel" name="label_11">
                <property name="text">
-                <string>用户名：</string>
+                <string>User name:</string>
                </property>
               </widget>
              </item>
@@ -617,7 +617,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="label_19">
                <property name="text">
-                <string>端口号：</string>
+                <string>Port:</string>
                </property>
               </widget>
              </item>
@@ -627,7 +627,7 @@
              <item row="4" column="0">
               <widget class="QLabel" name="label_13">
                <property name="text">
-                <string>密码</string>
+                <string>Password</string>
                </property>
               </widget>
              </item>
@@ -637,28 +637,28 @@
              <item row="0" column="2">
               <widget class="QPushButton" name="mysql_tmpdir_pushButton">
                <property name="text">
-                <string>选择</string>
+                <string>Browse...</string>
                </property>
               </widget>
              </item>
              <item row="2" column="2">
               <widget class="QPushButton" name="mysql_test_pushButton">
                <property name="text">
-                <string>测试连接</string>
+                <string>Test Connection</string>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_20">
                <property name="text">
-                <string>临本机时文件目录：</string>
+                <string>Local temporary file directory:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_18">
                <property name="text">
-                <string>主机名/IP：</string>
+                <string>Host/IP:</string>
                </property>
               </widget>
              </item>
@@ -673,7 +673,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox_8">
           <property name="title">
-           <string>Clickhouse设置(捐赠权益)</string>
+           <string>ClickHouse Settings (donation benefit)</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_19">
            <item>
@@ -693,14 +693,14 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_53">
                <property name="text">
-                <string>本机临时文件目录：</string>
+                <string>Local temporary file directory:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_54">
                <property name="text">
-                <string>主机名/IP：</string>
+                <string>Host/IP:</string>
                </property>
               </widget>
              </item>
@@ -713,14 +713,14 @@
              <item row="2" column="0">
               <widget class="QLabel" name="label_51">
                <property name="text">
-                <string>HTTP端口号：</string>
+                <string>HTTP port:</string>
                </property>
               </widget>
              </item>
              <item row="4" column="0">
               <widget class="QLabel" name="label_50">
                <property name="text">
-                <string>用户名：</string>
+                <string>User name:</string>
                </property>
               </widget>
              </item>
@@ -730,7 +730,7 @@
              <item row="3" column="0">
               <widget class="QLabel" name="label_55">
                <property name="text">
-                <string>TCP端口号</string>
+                <string>TCP port</string>
                </property>
               </widget>
              </item>
@@ -740,21 +740,21 @@
              <item row="5" column="0">
               <widget class="QLabel" name="label_52">
                <property name="text">
-                <string>密码</string>
+                <string>Password</string>
                </property>
               </widget>
              </item>
              <item row="2" column="2">
               <widget class="QPushButton" name="clickhouse_test_pushButton">
                <property name="text">
-                <string>测试连接</string>
+                <string>Test Connection</string>
                </property>
               </widget>
              </item>
              <item row="0" column="2">
               <widget class="QPushButton" name="clickhouse_tmpdir_pushButton">
                <property name="text">
-                <string>选择</string>
+                <string>Browse...</string>
                </property>
               </widget>
              </item>
@@ -783,7 +783,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>执行导入</string>
+        <string>Run Import</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
@@ -805,7 +805,7 @@
         <item>
          <widget class="QLabel" name="label_43">
           <property name="text">
-           <string>    注：HDF5存储导入时，请关闭其他 hikyuu 进程，HDF5不支持同时读写！</string>
+           <string>    Note: when importing with HDF5 storage, please close other hikyuu processes; HDF5 does not support simultaneous read and write!</string>
           </property>
          </widget>
         </item>
@@ -823,7 +823,7 @@
           <item>
            <widget class="QPushButton" name="sched_import_pushButton">
             <property name="text">
-             <string>启动定时导入</string>
+             <string>Start Scheduled Import</string>
             </property>
            </widget>
           </item>
@@ -832,7 +832,7 @@
             <item>
              <widget class="QLabel" name="label_40">
               <property name="text">
-               <string>导入执行时间：</string>
+               <string>Import execution time:</string>
               </property>
              </widget>
             </item>
@@ -883,14 +883,14 @@
           <item>
            <widget class="QPushButton" name="start_import_pushButton">
             <property name="text">
-             <string>手工执行导入</string>
+             <string>Run Import Manually</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="import_status_label">
             <property name="text">
-             <string>请勿盘中导入！</string>
+             <string>Do not import during trading hours!</string>
             </property>
            </widget>
           </item>
@@ -928,7 +928,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox_5">
           <property name="title">
-           <string>导入进展</string>
+           <string>Import Progress</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
@@ -950,7 +950,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="label_14">
                <property name="text">
-                <string>导入1分钟线：</string>
+                <string>Import 1-minute data:</string>
                </property>
               </widget>
              </item>
@@ -964,21 +964,21 @@
              <item row="3" column="0">
               <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>导入分笔数据：</string>
+                <string>Import tick data:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string>导入日线：</string>
+                <string>Import daily data:</string>
                </property>
               </widget>
              </item>
              <item row="4" column="0">
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>导入分时数据：</string>
+                <string>Import time-series data:</string>
                </property>
               </widget>
              </item>
@@ -999,7 +999,7 @@
              <item row="1" column="0">
               <widget class="QLabel" name="label_12">
                <property name="text">
-                <string>导入5分钟线：</string>
+                <string>Import 5-minute data:</string>
                </property>
               </widget>
              </item>
@@ -1013,7 +1013,7 @@
              <item row="5" column="0">
               <widget class="QLabel" name="label_9">
                <property name="text">
-                <string>导入权息数据：</string>
+                <string>Import weight data:</string>
                </property>
               </widget>
              </item>
@@ -1067,18 +1067,18 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入上证日线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入深证日线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入上证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入深证5分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入上证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入深证1分钟线记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入上证分笔记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入深证分笔记录：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入上证分时数据：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入深证分时数据：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入权息数据数：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;导入完毕！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SH daily records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SZ daily records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SH 5-minute records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SZ 5-minute records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SH 1-minute records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SZ 1-minute records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SH tick records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SZ tick records:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SH time-series data:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import SZ time-series data:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import weight data count:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Import completed!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -1089,13 +1089,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </widget>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
-        <string>预加载设置</string>
+        <string>Preload Settings</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QGroupBox" name="groupBox_6">
           <property name="title">
-           <string>预加载设置</string>
+           <string>Preload Settings</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
@@ -1109,35 +1109,35 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item>
               <widget class="QLabel" name="label_35">
                <property name="text">
-                <string>此处为 Hikyuu 运行时的数据预加载设置，请根据机器内存大小选择</string>
+                <string>These are the Hikyuu runtime data preload settings; choose according to your machine memory</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_36">
                <property name="text">
-                <string>（目前加载全部日线数据目前需要约需900M内存）</string>
+                <string>(currently loading all daily data requires about 900M of memory)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QCheckBox" name="lazy_checkBox">
                <property name="text">
-                <string>(捐赠权益)使用懒加载模式(仅对日线以下级别生效)</string>
+                <string>(donation benefit) Use the lazy loading mode (effective only for levels below daily)</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_57">
                <property name="text">
-                <string>谨慎!!! 此处为全局设置，使用懒加载容易不小心遍历过多证券导致爆内存！！</string>
+                <string>Caution!!! This is a global setting; with lazy loading you may accidentally iterate over too many securities and run out of memory!!</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="label_58">
                <property name="text">
-                <string>建议通过指定 load_hikyuu 参数的方式使用懒加载</string>
+                <string>It is recommended to use lazy loading by specifying the load_hikyuu parameter</string>
                </property>
               </widget>
              </item>
@@ -1181,28 +1181,28 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="8" column="0">
               <widget class="QCheckBox" name="preload_min5_checkBox">
                <property name="text">
-                <string>预加载5分钟线</string>
+                <string>Preload 5-minute data</string>
                </property>
               </widget>
              </item>
              <item row="7" column="0">
               <widget class="QCheckBox" name="preload_min1_checkBox">
                <property name="text">
-                <string>预加载1分钟线</string>
+                <string>Preload 1-minute data</string>
                </property>
               </widget>
              </item>
              <item row="12" column="1">
               <widget class="QLabel" name="label_42">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="9" column="0">
               <widget class="QCheckBox" name="preload_min15_checkBox">
                <property name="text">
-                <string>预加载15分钟线</string>
+                <string>Preload 15-minute data</string>
                </property>
               </widget>
              </item>
@@ -1223,7 +1223,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="2" column="1">
               <widget class="QLabel" name="label_25">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
@@ -1237,14 +1237,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="1" column="0">
               <widget class="QCheckBox" name="preload_day_checkBox">
                <property name="text">
-                <string>预加载日线</string>
+                <string>Preload daily data</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
               <widget class="QCheckBox" name="preload_week_checkBox">
                <property name="text">
-                <string>预加载周线</string>
+                <string>Preload weekly data</string>
                </property>
               </widget>
              </item>
@@ -1265,42 +1265,42 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="5" column="4">
               <widget class="QPushButton" name="save_pushButton">
                <property name="text">
-                <string>保存设置</string>
+                <string>Save Settings</string>
                </property>
               </widget>
              </item>
              <item row="10" column="0">
               <widget class="QCheckBox" name="preload_min30_checkBox">
                <property name="text">
-                <string>预加载30分钟线</string>
+                <string>Preload 30-minute data</string>
                </property>
               </widget>
              </item>
              <item row="4" column="0">
               <widget class="QCheckBox" name="preload_quarter_checkBox">
                <property name="text">
-                <string>预加载季线</string>
+                <string>Preload quarterly data</string>
                </property>
               </widget>
              </item>
              <item row="6" column="1">
               <widget class="QLabel" name="label_29">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="7" column="1">
               <widget class="QLabel" name="label_30">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="3" column="1">
               <widget class="QLabel" name="label_26">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
@@ -1314,7 +1314,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="1" column="1">
               <widget class="QLabel" name="label_24">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
@@ -1344,7 +1344,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="0" column="0">
               <widget class="QLabel" name="label_59">
                <property name="text">
-                <string>0 - 表示不限制</string>
+                <string>0 - means no limit</string>
                </property>
               </widget>
              </item>
@@ -1358,21 +1358,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="8" column="1">
               <widget class="QLabel" name="label_31">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="13" column="0">
               <widget class="QCheckBox" name="preload_timeline_checkBox">
                <property name="text">
-                <string>预加载分时线</string>
+                <string>Preload time-series data</string>
                </property>
               </widget>
              </item>
              <item row="11" column="0">
               <widget class="QCheckBox" name="preload_min60_checkBox">
                <property name="text">
-                <string>预加载60分钟线</string>
+                <string>Preload 60-minute data</string>
                </property>
               </widget>
              </item>
@@ -1386,56 +1386,56 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="5" column="1">
               <widget class="QLabel" name="label_28">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="12" column="0">
               <widget class="QCheckBox" name="preload_hour2_checkBox">
                <property name="text">
-                <string>预加载120分钟线</string>
+                <string>Preload 120-minute data</string>
                </property>
               </widget>
              </item>
              <item row="3" column="0">
               <widget class="QCheckBox" name="preload_month_checkBox">
                <property name="text">
-                <string>预加载月线</string>
+                <string>Preload monthly data</string>
                </property>
               </widget>
              </item>
              <item row="9" column="1">
               <widget class="QLabel" name="label_32">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="6" column="0">
               <widget class="QCheckBox" name="preload_year_checkBox">
                <property name="text">
-                <string>预加载年线</string>
+                <string>Preload yearly data</string>
                </property>
               </widget>
              </item>
              <item row="11" column="1">
               <widget class="QLabel" name="label_34">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="13" column="1">
               <widget class="QLabel" name="label_60">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
               <widget class="QLabel" name="label_27">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
@@ -1449,7 +1449,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="5" column="0">
               <widget class="QCheckBox" name="preload_halfyear_checkBox">
                <property name="text">
-                <string>预加载半年线</string>
+                <string>Preload half-yearly data</string>
                </property>
               </widget>
              </item>
@@ -1463,21 +1463,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <item row="10" column="1">
               <widget class="QLabel" name="label_33">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
              <item row="14" column="0">
               <widget class="QCheckBox" name="preload_trans_checkBox">
                <property name="text">
-                <string>预加载分笔</string>
+                <string>Preload tick data</string>
                </property>
               </widget>
              </item>
              <item row="14" column="1">
               <widget class="QLabel" name="label_61">
                <property name="text">
-                <string>最大缓存数量：</string>
+                <string>Max cache size:</string>
                </property>
               </widget>
              </item>
@@ -1510,7 +1510,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>行情采集服务</string>
+        <string>Quote Collection Service</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -1537,7 +1537,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QPushButton" name="collect_start_pushButton">
             <property name="text">
-             <string>启动采集</string>
+             <string>Start Collection</string>
             </property>
            </widget>
           </item>
@@ -1587,7 +1587,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QLabel" name="label_39">
             <property name="text">
-             <string>行情数据源：</string>
+             <string>Quote data source:</string>
             </property>
            </widget>
           </item>
@@ -1644,7 +1644,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QLabel" name="label_23">
             <property name="text">
-             <string>采集间隔（秒）：</string>
+             <string>Collection interval (seconds):</string>
             </property>
            </widget>
           </item>
@@ -1694,7 +1694,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QLabel" name="label_21">
             <property name="text">
-             <string>执行时间段1：</string>
+             <string>Execution time range 1:</string>
             </property>
            </widget>
           </item>
@@ -1742,7 +1742,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QLabel" name="label_37">
             <property name="text">
-             <string>执行时间段2：</string>
+             <string>Execution time range 2:</string>
             </property>
            </widget>
           </item>
@@ -1815,7 +1815,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              </sizepolicy>
             </property>
             <property name="text">
-             <string>使用芝麻代理</string>
+             <string>Use Zhima proxy</string>
             </property>
            </widget>
           </item>
@@ -1855,12 +1855,12 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;注：&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;1、行情采集服务仅对预加载数据有效&lt;/span&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;，在行情采集服务运行期间，hikyuu.interactive启动后，自行主动调用 start_spot_agent 函数后方自动连接采集服务获取行情数据，并更新预加载的内容数据。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Note:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;1. The quote collection service is only effective for preloaded data&lt;/span&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;; while the quote collection service is running, after hikyuu.interactive starts, you must call the start_spot_agent function yourself to automatically connect to the collection service, obtain quote data and update the preloaded data.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;2、芝麻代理，实际已不维护，请自行实现参考代码处理。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;2. The Zhima proxy is actually no longer maintained; please implement your own handling by referring to the sample code.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt; font-weight:696; color:#0000ff;&quot;&gt;3、此处采集为网络采集（请勿过于频繁）。可参考安装目录下gui子目录下的 start_qmt.py（miniqmt已不可用）自行实现自有数据源的接入。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt; font-weight:696; color:#0000ff;&quot;&gt;3. The collection here is network-based (do not query too frequently). You can refer to start_qmt.py under the gui subdirectory of the installation directory (miniqmt is no longer available) to implement access to your own data source.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -1873,7 +1873,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <bool>true</bool>
        </property>
        <attribute name="title">
-        <string>项目捐赠</string>
+        <string>Project Donation</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_18">
         <item>
@@ -1907,9 +1907,9 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Arial'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Hikyuu &lt;/span&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;专注于量化交易领域的核心技术构建，涵盖交易模型开发、极速计算引擎、高效回测框架及实盘拓展能力&lt;/span&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;，定位为量化交易的基础设施级计算引擎，为量化交易爱好者提供高性能底层架构支持。随着社区规模扩大，分散了作者在策略研究上的精力。为保障项目的可持续性，现对捐赠用户提供部分额外功能作为回馈，感谢社区伙伴的支持！&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;捐赠功能以插件的方式提供，采用独立授权许可，完全在 hikyuu 之外，对喜欢自行编译扩展的朋友没有影响。自 2.8.3 版本起，插件许可授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;详情参见：&lt;/span&gt;&lt;a href=&quot;https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#3586ff;&quot;&gt;捐赠权益&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt; ，感谢大家的支持！&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Hikyuu &lt;/span&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;focuses on building the core technologies of quantitative trading, covering trading model development, an ultra-fast computing engine, an efficient backtesting framework and live-trading extension capabilities&lt;/span&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;, positioned as an infrastructure-level computing engine for quantitative trading, providing high-performance underlying architecture support for quantitative trading enthusiasts. As the community grows, the author has less time for strategy research. To keep the project sustainable, some extra features are now offered to donors as a give-back. Thank you for your support!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;The donation features are provided as plug-ins with an independent license, completely outside hikyuu, and do not affect those who like to compile and extend it themselves. Starting from version 2.8.3, the plug-in license no longer requires collecting hardware information; the license verification is done online instead, with an offline grace period of up to 30 days, and no online verification is performed during A-share trading hours, so intraday operation is not affected.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt;For details, see: &lt;/span&gt;&lt;a href=&quot;https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#3586ff;&quot;&gt;Donation Benefits&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt; font-weight:700;&quot;&gt; Thank you all for your support!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -1933,7 +1933,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              </font>
             </property>
             <property name="text">
-             <string>申请捐赠功能试用（30天试用）</string>
+             <string>Apply for a donation feature trial (30-day trial)</string>
             </property>
            </widget>
           </item>
@@ -1942,7 +1942,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <item>
              <widget class="QLabel" name="label_45">
               <property name="text">
-               <string>电子邮件地址:</string>
+               <string>Email address:</string>
               </property>
              </widget>
             </item>
@@ -1952,7 +1952,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <item>
              <widget class="QPushButton" name="fetch_trial_pushButton">
               <property name="text">
-               <string>申请试用许可</string>
+               <string>Apply for Trial License</string>
               </property>
              </widget>
             </item>
@@ -1977,7 +1977,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              </font>
             </property>
             <property name="text">
-             <string>加入知识星球进行捐赠（可同时在3台设备上使用捐赠功能）,或者请作者喝杯☕️，谢谢</string>
+             <string>Join the Knowledge Planet to donate (the donation features can be used on 3 devices at the same time), or buy the author a cup of coffee ☕️, thank you</string>
             </property>
            </widget>
           </item>
@@ -2070,7 +2070,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
              </font>
             </property>
             <property name="text">
-             <string>当前捐赠授权信息</string>
+             <string>Current Donation License Info</string>
             </property>
            </widget>
           </item>
@@ -2105,7 +2105,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <item>
        <widget class="QLabel" name="label_41">
         <property name="text">
-         <string>执行日志</string>
+         <string>Execution Log</string>
         </property>
        </widget>
       </item>

@@ -11,11 +11,11 @@ import click
 
 
 @click.command()
-@click.option('--addr', '-addr', default="tcp://0.0.0.0:9201", help='自身对外提供的服务地址, 如需外部机器访问，请使用 tcp://0.0.0.0:port')
-@click.option('--work_num', '-n', default=2, type=int, help='行情接收处理线程数')
-@click.option('--save', '-save', default=False, type=bool, help='保存行情数据(仅支持clickhouse)')
-@click.option('--buf', '-buf', default=False, type=bool, help='缓存行情数据')
-@click.option('--parquet_path', '-parquet_path', default="", help='Parquet 文件存储路径, 空字符串表示不保存')
+@click.option('--addr', '-addr', default="tcp://0.0.0.0:9201", help='The service address provided to the outside, use tcp://0.0.0.0:port for external access')
+@click.option('--work_num', '-n', default=2, type=int, help='The number of quote receiving and processing threads')
+@click.option('--save', '-save', default=False, type=bool, help='Save the quote data (ClickHouse only)')
+@click.option('--buf', '-buf', default=False, type=bool, help='Cache the quote data')
+@click.option('--parquet_path', '-parquet_path', default="", help='Parquet file storage path; an empty string means do not save')
 def main(addr, work_num, save, buf, parquet_path):
     # 如需其他机器访问，addr 参数需为 tcp://0.0.0.0:port
     try:

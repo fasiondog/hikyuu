@@ -55,5 +55,5 @@ class ImportZhBond10Task:
 
         connect.close()
 
-        self.queue.put([self.task_name, "ZH_BOND10", "10年期中国国债收益率下载完毕", None, None])
+        self.queue.put([self.task_name, "ZH_BOND10", "10-year China government bond yield downloaded", None, None])
         self.status = "finished"
