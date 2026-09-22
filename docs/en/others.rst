@@ -1,27 +1,25 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/others.rst
-
-杂项函数
-=============
+Miscellaneous Functions
+=======================
 
 .. note::
 
-    get_inds_views, get_market_view 以及 KData.to_pyarrow 等和 arrow 相关功能，需要额外安装 hikyuu_plugin 包支持。
+    The arrow related functions such as get_inds_views, get_market_view and KData.to_pyarrow require the additional installation of the hikyuu_plugin package.
 
     python -m pip install hikyuu-plugin
 
-    使用前，需 from hikyuu_plugin.extra import * 进行插件导入.
+    Before using them, the plugin needs to be imported with from hikyuu_plugin.extra import *.
 
 .. py:function:: get_market_view(stks[, date=Datetime(), market='SH']) -> pandas.DataFrame
 
-    获取指定股票集合在指定交易日的行情数据，不包含当日停牌无数据的股票。如未指定日期，则返回最后交易日行情数据，
-    如同时接收了行情数据，则为实时行情。
+    Get the market data of the specified stock collection on the specified trading day, excluding the stocks that are suspended that day and have no data. If the date is not specified, the market data of the last trading day is returned;
+    if the market data is also being received, it is the real-time market data.
 
-    注: 此函数依赖于日线数据
+    Note: this function depends on the daily data
     
-    :param list[Stock] stks: 股票列表
-    :param Datetime date: 获取指定日期的行情数据
-    :param str market: 市场代码
-    :return: 指定股票列表最后行情数据
+    :param list[Stock] stks: the stock list
+    :param Datetime date: get the market data of the specified date
+    :param str market: the market code
+    :return: the last market data of the specified stock list
     :rtype: pandas.DataFrame
 
     ::
@@ -64,13 +62,13 @@
 
 .. py:function:: concat_to_df(dates, ind_list[, head_stock_code=True, head_ind_name=False])
     
-    将列表中的指标至合并在一张 pandas DataFrame 中
+    Merge the indicators in the list into one pandas DataFrame
 
-    :param DatetimeList dates: 指定的日期列表
-    :param sequence ind_list: 已计算的指标列表
-    :param bool head_ind_name: 表标题是否使用指标名称
-    :param bool head_stock_code: 表标题是否使用证券代码
-    :return: 合并后的 DataFrame, 以 dates 为 index（注: dates列 为 Datetime 类型）
+    :param DatetimeList dates: the specified date list
+    :param sequence ind_list: the list of the calculated indicators
+    :param bool head_ind_name: whether the table header uses the indicator names
+    :param bool head_stock_code: whether the table header uses the security codes
+    :return: the merged DataFrame, with dates as the index (note: the dates column is of the Datetime type)
 
     ::
 
@@ -96,14 +94,14 @@
 
 .. py:function:: get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame
 
-    方式1: 获取指定日期的各证券的各指标结果
+    Way 1: get the indicator results of each security on the specified date
 
-      :param stks: 证券列表
-      :param list[Indicator] inds: 指标列表
-      :param Datetime date: 指定日期
-      :param int cal_len: 计算需要的数据长度
-      :param str ktype: k线类型
-      :param str market: 指定行情市场（用于日期对齐）
+      :param stks: the security list
+      :param list[Indicator] inds: the indicator list
+      :param Datetime date: the specified date
+      :param int cal_len: the data length needed to calculate
+      :param str ktype: the k-line type
+      :param str market: the specified market (used for the date alignment)
 
     ::
 
@@ -124,14 +122,14 @@
 
         [8484 rows x 8 columns]
 
-    方式2: 获取按指定Query查询计算的各证券的各指标结果, 结果中将包含指定 Query 包含的所有指定市场交易日日期
+    Way 2: get the indicator results of each security calculated with the specified Query; the result will contain all the trading dates of the specified market included in the specified Query
 
     get_inds_view(stks, inds, query[, market='SH']) -> pandas.DataFrame
 
-      :param stks: 指定证券列表
-      :param list[Indicator] inds: 指定指标列表
-      :param Query query: 查询条件
-      :param str market: 指定行情市场（用于日期对齐）
+      :param stks: the specified security list
+      :param list[Indicator] inds: the specified indicator list
+      :param Query query: the query condition
+      :param str market: the specified market (used for the date alignment)
 
     ::
 
@@ -155,16 +153,16 @@
 
 .. py:function:: df_to_ind(df, col_name, col_date=None)
     
-    将 pandas.DataFrame 指定列转化为 Indicator
+    Convert the specified column of a pandas.DataFrame to an Indicator
 
     :param df: pandas.DataFrame
-    :param col_name: 指定列名
-    :param col_date: 指定日期列名 (为None时忽略, 否则该列为对应参考日期)
+    :param col_name: the specified column name
+    :param col_date: the specified date column name (ignored when it is None; otherwise this column is the corresponding reference date)
     :return: Indicator
 
     ::
 
-        # 示例, 从 akshare 获取美国国债10年期收益率:
+        # Example: get the 10-year US treasury yield from akshare:
         import akshare as ak
         df = ak.bond_zh_us_rate("19901219")
         x = df_to_ind(df, '美国国债收益率10年', '日期')
@@ -172,62 +170,62 @@
 
 .. py:function:: parallel_run_sys(sys_list, query[, reset=False, reset_all=False]) -> List[FundsList]
 
-    并行运行多个系系统, 并返回 list FundsList, 各账户对应资产（按query时间段）
+    Run multiple systems in parallel, and return a list of FundsList, the assets of each account (within the query time range)
 
-    :param sys_list: 系统列表
-    :param query: 查询条件
-    :param bool reset: 执行前是否依据系统部件共享属性复位
-    :param bool reset_all: 强制复位所有部件
+    :param sys_list: the system list
+    :param query: the query condition
+    :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+    :param bool reset_all: forcibly reset all the parts
 
 .. py:function:: parallel_run_pf(pf_list, query[, force=False]) -> List[FundsList]
 
-    并行执行多个投资组合策略, 并返回 list FundsList, 各账户对应资产（按query时间段）
+    Execute multiple portfolio strategies in parallel, and return a list of FundsList, the assets of each account (within the query time range)
 
-    :param list pf_list: 投资组合列表
-    :param Query query: 查询条件
-    :param bool force: 强制重新计算
+    :param list pf_list: the portfolio list
+    :param Query query: the query condition
+    :param bool force: force recalculating
 
 
 .. py:function:: multi_regression(stk, query, *inds) -> list
 
-    对股票进行多元线性回归分析，使用股票收盘价的收益率作为因变量，输入的指标作为自变量进行多元线性回归。
+    Perform a multiple linear regression analysis on the stock, using the return of the stock close price as the dependent variable and the input indicators as the independent variables for the multiple linear regression.
 
-    回归模型为：Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
+    The regression model is: Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
 
     .. note::
 
-        NaN值处理策略：如果某个时间点的任何因子或收益率为NaN，则该时间点的数据被舍弃，但不会影响其他时间点的数据和其他因子。
+        NaN handling strategy: if any factor or the return at a time point is NaN, the data at that time point is discarded, but it does not affect the data at the other time points and the other factors.
 
-    :param Stock stk: 股票对象
-    :param KQuery query: K线查询条件，用于获取回归分析所需的时间范围和数据类型
-    :param Indicator \*inds: 一个或多个指标作为自变量（因子）
-    :return: 回归系数列表，第一个元素是alpha(截距)，后续是各个beta系数
+    :param Stock stk: the stock object
+    :param KQuery query: the K-line query condition, used to get the time range and the data type needed for the regression analysis
+    :param Indicator \*inds: one or more indicators as the independent variables (the factors)
+    :return: the list of the regression coefficients; the first element is alpha (the intercept), followed by each beta coefficient
     :rtype: list
 
     ::
 
         >>> stk = getStock('sh000001')
         >>> result = multi_regression(stk, KQuery(-252), MA(CLOSE(), 5), MACD(CLOSE())[0], RSI(CLOSE(), 14))
-        >>> alpha = result[0]  # 截距项
-        >>> beta1 = result[1]  # 第一个因子的系数
-        >>> beta2 = result[2]  # 第二个因子的系数
-        >>> beta3 = result[3]  # 第三个因子的系数
+        >>> alpha = result[0]  # the intercept
+        >>> beta1 = result[1]  # the coefficient of the first factor
+        >>> beta2 = result[2]  # the coefficient of the second factor
+        >>> beta3 = result[3]  # the coefficient of the third factor
 
 
 .. py:function:: multi_regression_full(stk, query, \*inds) -> list
 
-    对股票进行多元线性回归分析（完整版本），返回完整的回归结果，包括系数、残差序列、残差平方和和R²值
+    Perform a multiple linear regression analysis on the stock (the full version), returning the complete regression result, including the coefficients, the residual sequence, the residual sum of squares and the R² value
 
-    :param Stock stk: 股票对象
-    :param KQuery query: K线查询条件
-    :param Indicator \*inds: 一个或多个指标作为自变量（因子）
-    :return: 回归结果列表，格式为：
+    :param Stock stk: the stock object
+    :param KQuery query: the K-line query condition
+    :param Indicator \*inds: one or more indicators as the independent variables (the factors)
+    :return: the list of the regression results, in the format:
              [alpha, beta1, beta2, ..., betan, e1, e2, ..., en, RSS, R²]
-             - alpha: 截距项
-             - beta1~betan: 各因子系数
-             - e1~en: 各数据点的残差（实际值-预测值）
-             - RSS: 残差平方和
-             - R²: 决定系数
+             - alpha: the intercept
+             - beta1~betan: the coefficient of each factor
+             - e1~en: the residual of each data point (the actual value - the predicted value)
+             - RSS: the residual sum of squares
+             - R²: the coefficient of determination
     :rtype: list
 
     ::
@@ -237,6 +235,6 @@
         >>> alpha = result[0]
         >>> beta1 = result[1]
         >>> beta2 = result[2]
-        >>> residuals = result[3:-2]  # 残差序列
+        >>> residuals = result[3:-2]  # the residual sequence
         >>> RSS = result[-2]
         >>> R_squared = result[-1]
