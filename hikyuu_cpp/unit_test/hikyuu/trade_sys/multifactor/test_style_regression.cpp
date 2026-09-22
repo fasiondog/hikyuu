@@ -104,8 +104,9 @@ TEST_CASE("test_style_regression_rank_deficient") {
 /** @par The global state: the Eigen thread configuration is unchanged around the concurrent calls
  *  Eigen::nbThreads() exists unconditionally in <Eigen/Core> (it returns 1 without OpenMP),
  *  so it is asserted unconditionally: whether it starts as 1 or N, it must stay afterwards.
- *  Anti-regression: if a runtime global Eigen::setNbThreads switch is reintroduced, this fails. */
-*/ TEST_CASE("test_style_regression_eigen_threads_unchanged") {
+ *  Anti-regression: if a runtime global Eigen::setNbThreads switch is reintroduced, this fails. 
+ */
+TEST_CASE("test_style_regression_eigen_threads_unchanged") {
     PriceList y{2.0, 1.0, 4.0, 3.0, 6.0, 5.0, 8.0, 7.0};
     vector<PriceList> x{{0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0}};
 

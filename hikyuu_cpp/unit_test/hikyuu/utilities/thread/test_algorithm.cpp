@@ -215,8 +215,9 @@ TEST_CASE("test_parallel_for_index_single") {
 /** @par The global thread pool drains on an exception: when a task throws, the other unfinished
  *  tasks must finish first. It verifies that wait_for_all_non_blocking does not return early:
  *  when the caller starts get, all the tasks of the same batch have finished, leaving no background
- * task that keeps accessing the caller stack / container. */
-*/ TEST_CASE("test_global_wait_drains_all_futures_on_exception") {
+ * task that keeps accessing the caller stack / container. 
+ */
+TEST_CASE("test_global_wait_drains_all_futures_on_exception") {
     auto* tg = get_global_task_group();
     REQUIRE_UNARY(tg);
 

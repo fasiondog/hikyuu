@@ -343,7 +343,8 @@ IndicatorList TestNestedMFA::_calculate(const vector<IndicatorList>& all_stk_ind
 }
 
 /** @par The nested calculation: the lazy calculation of B is triggered inside the _calculate of A
- * and the concurrent triggering has no deadlock */
+ * and the concurrent triggering has no deadlock 
+ */
 TEST_CASE("test_MF_nested_calculate_no_deadlock") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -396,8 +397,9 @@ TEST_CASE("test_MF_nested_calculate_no_deadlock") {
 /** @par The clone independent state: after the original object is Ready the clone does not share
  * the calculation state Two threads access the original object (already Ready, no recalculation)
  * and the clone (the first access triggers a recalculation) at the same time, without interfering
- * with each other and the results are equal. */
-*/ TEST_CASE("test_MF_clone_independent_state") {
+ * with each other and the results are equal. 
+ */ 
+TEST_CASE("test_MF_clone_independent_state") {
     TestCountingMF::s_count = 0;
     auto mfA = makeCountingMF();
 

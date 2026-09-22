@@ -116,8 +116,9 @@ TEST_CASE("test_industry_residuals_all_invalid") {
 /** @par Boundary: a negative / oversized label - guard the UB of static_cast<size_t>, no crash
  *  static_cast<size_t>(negative) is a C++ UB: it may overflow to SIZE_MAX and cause an out of range
  * segfault of sums[g]. The implementation must intercept label<0 or label>=blk_count with a double
- * compare before the  cast. */
-*/ TEST_CASE("test_industry_residuals_negative_and_oversized_label") {
+ * compare before the  cast. 
+*/
+TEST_CASE("test_industry_residuals_negative_and_oversized_label") {
     PriceList y{10.0, 20.0, 30.0, 40.0};
     size_t blk_count = 2;
     // label[0]=-1 (a negative UB risk), [1]=999 (oversized), [2]=0 (valid), [3]=1 (valid)
