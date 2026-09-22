@@ -19,42 +19,42 @@
 namespace hku {
 
 /**
- * 业务类型
+ * Business type
  * @ingroup TradeManagerClass
  */
 enum BUSINESS {
-    BUSINESS_INIT = 0,           /**< 建立初始账户 */
-    BUSINESS_BUY = 1,            /**< 买入 */
-    BUSINESS_SELL = 2,           /**< 卖出 */
-    BUSINESS_GIFT = 3,           /**< 送股 */
-    BUSINESS_BONUS = 4,          /**< 分红 */
-    BUSINESS_CHECKIN = 5,        /**< 存入现金 */
-    BUSINESS_CHECKOUT = 6,       /**< 取出现金 */
-    BUSINESS_CHECKIN_STOCK = 7,  /**< 存入股票资产 */
-    BUSINESS_CHECKOUT_STOCK = 8, /**< 取出股票资产 */
-    BUSINESS_BORROW_CASH = 9,    /**< 借入资金 */
-    BUSINESS_RETURN_CASH = 10,   /**< 归还资金 */
-    BUSINESS_BORROW_STOCK = 11,  /**< 借入股票资产 */
-    BUSINESS_RETURN_STOCK = 12,  /**< 归还股票资产 */
-    BUSINESS_SELL_SHORT = 13,    /**< 卖空 */
-    BUSINESS_BUY_SHORT = 14,     /**< 卖空后回补 */
-    BUSINESS_SUOGU = 15,         /**< 缩扩股 */
-    BUSINESS_INVALID = 16        /**< 无效类型 */
+    BUSINESS_INIT = 0,           /**< Create the initial account */
+    BUSINESS_BUY = 1,            /**< Buy */
+    BUSINESS_SELL = 2,           /**< Sell */
+    BUSINESS_GIFT = 3,           /**< Bonus share */
+    BUSINESS_BONUS = 4,          /**< Cash dividend */
+    BUSINESS_CHECKIN = 5,        /**< Deposit cash */
+    BUSINESS_CHECKOUT = 6,       /**< Withdraw cash */
+    BUSINESS_CHECKIN_STOCK = 7,  /**< Deposit stock assets */
+    BUSINESS_CHECKOUT_STOCK = 8, /**< Withdraw stock assets */
+    BUSINESS_BORROW_CASH = 9,    /**< Borrow cash */
+    BUSINESS_RETURN_CASH = 10,   /**< Repay borrowed cash */
+    BUSINESS_BORROW_STOCK = 11,  /**< Borrow stock assets */
+    BUSINESS_RETURN_STOCK = 12,  /**< Return borrowed stock assets */
+    BUSINESS_SELL_SHORT = 13,    /**< Short sell */
+    BUSINESS_BUY_SHORT = 14,     /**< Cover a short position */
+    BUSINESS_SUOGU = 15,         /**< Share consolidation / expansion */
+    BUSINESS_INVALID = 16        /**< Invalid type */
 };
 
 /**
- * 获取业务名称，用于打印输出
+ * Get the business name, used for print output
  * @ingroup TradeManagerClass
  */
 string HKU_API getBusinessName(BUSINESS);
 
 /**
- * 根据字符串获取相应的BUSINESS枚举值
+ * Get the BUSINESS enum value matching the given string
  */
 BUSINESS HKU_API getBusinessEnum(const string&);
 
 /**
- * 交易记录
+ * Trade record
  * @ingroup TradeManagerClass
  */
 class HKU_API TradeRecord {
@@ -69,23 +69,24 @@ public:
     TradeRecord(TradeRecord&&);
     TradeRecord& operator=(TradeRecord&&);
 
-    /** 仅用于python的__str__ */
+    /** Only used by __str__ in python */
     string toString() const;
 
     bool isNull() const;
 
-    Stock stock;        ///< 交易对象
-    Datetime datetime;  ///< 交易日期
-    BUSINESS business;  ///< 业务类型
-    price_t planPrice;  ///< 计划交易价格
-    price_t realPrice;  ///< 实际交易价格
-    price_t goalPrice;  ///< 目标价位，如果为0或Null表示未限定目标
-    double number;      ///< 成交数量
-    CostRecord cost;    ///< 交易成本
-    price_t stoploss;   ///< 止损价
-    price_t cash;       ///< 现金余额
-    SystemPart from;    ///< 辅助记录交易系统部件，区别是哪个部件发出的指示，Null<int>()表示无效
-    string remark;      ///< 备注(最大100编码字符)
+    Stock stock;        ///< Traded security
+    Datetime datetime;  ///< Trade date
+    BUSINESS business;  ///< Business type
+    price_t planPrice;  ///< Planned trade price
+    price_t realPrice;  ///< Actual trade price
+    price_t goalPrice;  ///< Target price; 0 or Null means no target is set
+    double number;      ///< Traded quantity
+    CostRecord cost;    ///< Trade cost
+    price_t stoploss;   ///< Stop-loss price
+    price_t cash;       ///< Cash balance
+    SystemPart from;    ///< Auxiliary record of the trading system part that issued the instruction;
+                        ///< Null<int>() means invalid
+    string remark;      ///< Remark (at most 100 encoded characters)
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -143,7 +144,7 @@ private:
 typedef vector<TradeRecord> TradeRecordList;
 
 /**
- * 输出TradeRecord信息
+ * Print the TradeRecord information
  * @ingroup TradeManagerClass
  */
 HKU_API std::ostream& operator<<(std::ostream&, const TradeRecord&);
