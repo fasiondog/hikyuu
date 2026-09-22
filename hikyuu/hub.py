@@ -24,7 +24,7 @@ import inspect
 import sqlalchemy
 from functools import lru_cache
 
-# 引入 git 前需设置环境变量，否则某些情况下会报错失败
+# The environment variables must be set before importing git, otherwise it may fail with an error in some cases
 os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
 try:
     import git
@@ -39,8 +39,8 @@ Base = declarative_base()
 class ConfigModel(Base):
     __tablename__ = 'hub_config'
     id = Column(Integer, Sequence('config_id_seq'), primary_key=True)
-    key = Column(String, index=True)  # 参数名
-    value = Column(String)  # 参数值
+    key = Column(String, index=True)  # the parameter name
+    value = Column(String)  # the parameter value
 
     __table_args__ = (UniqueConstraint('key'), )
 
@@ -54,12 +54,12 @@ class ConfigModel(Base):
 class HubModel(Base):
     __tablename__ = 'hub_repo'
     id = Column(Integer, Sequence('remote_id_seq'), primary_key=True)
-    name = Column(String, index=True)  # 本地仓库名
-    hub_type = Column(String)  # 'remote' (远程仓库) | 'local' （本地仓库）
-    local_base = Column(String)  # 本地路径的基础名称
-    local = Column(String)  # 本地路径
-    url = Column(String)  # git 仓库地址
-    branch = Column(String)  # 远程仓库分支
+    name = Column(String, index=True)  # the local repository name
+    hub_type = Column(String)  # 'remote' (remote repository) | 'local' (local repository)
+    local_base = Column(String)  # the base name of the local path
+    local = Column(String)  # the local path
+    url = Column(String)  # the git repository url
+    branch = Column(String)  # the branch of the remote repository
 
     __table_args__ = (UniqueConstraint('name'), )
 
@@ -75,14 +75,14 @@ class HubModel(Base):
 class PartModel(Base):
     __tablename__ = 'hub_part'
     id = Column(Integer, Sequence('part_id_seq'), primary_key=True)
-    hub_name = Column(String)  # 所属仓库标识
-    part = Column(String)  # 部件类型
-    name = Column(String)  # 策略名称
-    author = Column(String)  # 策略作者
-    version = Column(String)  # 版本
-    doc = Column(String)  # 帮助说明
-    module_name = Column(String)  # 实际策略导入模块名
-    label = Column(String)  # 标签
+    hub_name = Column(String)  # the identifier of the repository it belongs to
+    part = Column(String)  # the part type
+    name = Column(String)  # the strategy name
+    author = Column(String)  # the strategy author
+    version = Column(String)  # the version
+    doc = Column(String)  # the help description
+    module_name = Column(String)  # the actual module name imported by the strategy
+    label = Column(String)  # the label
     __table_args__ = (
         UniqueConstraint('name', name='uq_part_model_name'),
     )
@@ -101,7 +101,7 @@ class HubNameRepeatError(Exception):
         self.name = name
 
     def __str__(self):
-        return "已存在相同名称的仓库（{}），请更换仓库名！".format(self.name)
+        return "A repository with the same name ({}) already exists, please use another repository name!".format(self.name)
 
 
 class HubNotFoundError(Exception):
@@ -109,7 +109,7 @@ class HubNotFoundError(Exception):
         self.name = name
 
     def __str__(self):
-        return '找不到指定的仓库（"{}"）'.format(self.name)
+        return 'The specified repository ("{}") cannot be found'.format(self.name)
 
 
 class ModuleConflictError(Exception):
@@ -119,7 +119,7 @@ class ModuleConflictError(Exception):
         self.hub_path = hub_path
 
     def __str__(self):
-        return '该仓库（{}）路径名与其他 python 模块（"{}"）冲突，请更改目录名称！（"{}"）'.format(
+        return 'The path name of this repository ({}) conflicts with another python module ("{}"), please change the directory name! ("{}")'.format(
             self.hub_name, self.conflict_module, self.hub_path
         )
 
@@ -130,7 +130,7 @@ class PartNotFoundError(Exception):
         self.cause = cause
 
     def __str__(self):
-        return '未找到指定的策略部件: "{}", {}!'.format(self.name, self.cause)
+        return 'The specified strategy part cannot be found: "{}", {}!'.format(self.name, self.cause)
 
 
 class PartNameError(Exception):
@@ -138,18 +138,18 @@ class PartNameError(Exception):
         self.name = name
 
     def __str__(self):
-        return '无效的策略部件名称: "{}"!'.format(self.name)
+        return 'Invalid strategy part name: "{}"!'.format(self.name)
 
 
-# Windows下 shutil.rmtree 删除的目录中如有存在只读文件或目录会导致失败，需要此函数辅助处理
-# 可参见：https://blog.csdn.net/Tri_C/article/details/99862201
+# On Windows, shutil.rmtree fails if the directory to be deleted contains read-only files or directories; this function is used to handle it
+# See also: https://blog.csdn.net/Tri_C/article/details/99862201
 def handle_remove_read_only(func, path, exc):
     excvalue = exc[1]
     if func in (os.rmdir, os.remove, os.unlink) and excvalue.errno == errno.EACCES:
         os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
         func(path)
     else:
-        raise RuntimeError('无法移除目录 "{}"，请手工删除'.format(path))
+        raise RuntimeError('Unable to remove the directory "{}", please delete it manually'.format(path))
 
 
 def dbsession(func):
@@ -169,7 +169,7 @@ def dbsession(func):
 
 
 class HubManager(metaclass=SingletonType):
-    """策略库管理"""
+    """Strategy repository management"""
 
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -178,7 +178,7 @@ class HubManager(metaclass=SingletonType):
         if not os.path.lexists(hku_dir):
             os.mkdir(hku_dir)
 
-        # 创建仓库数据库
+        # Create the repository database
         engine = create_engine("sqlite:///{}/.hikyuu/hub.db".format(usr_dir))
 
         inspector = sqlalchemy.inspect(engine)
@@ -205,10 +205,10 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def setup_hub(self):
-        """初始化 hikyuu 默认策略仓库"""
+        """Initialize the default hikyuu strategy repository"""
         usr_dir = os.path.expanduser('~')
 
-        # 检查并建立远端仓库的本地缓存目录
+        # Check and create the local cache directory of the remote repository
         self.remote_cache_dir = self._session.query(ConfigModel.value).filter(ConfigModel.key == 'remote_cache_dir'
                                                                               ).first()
         if self.remote_cache_dir is None:
@@ -221,75 +221,75 @@ class HubManager(metaclass=SingletonType):
         if not os.path.lexists(self.remote_cache_dir):
             os.makedirs(self.remote_cache_dir)
 
-        # 将远程仓库本地缓存地址加入系统路径
+        # Add the local cache address of the remote repository to the system path
         sys.path.append(self.remote_cache_dir)
 
-        # 将所有本地仓库的上层路径加入系统路径
+        # Add the parent paths of all the local repositories to the system path
         hub_models = self._session.query(HubModel).filter_by(hub_type='local').all()
         for model in hub_models:
             sys.path.append(os.path.dirname(model.local))
 
-        # 检查并下载 hikyuu 默认策略仓库, hikyuu_hub 避免导入时模块和 hikyuu 重名
+        # Check and download the default hikyuu strategy repository; hikyuu_hub avoids the module name conflicting with hikyuu when importing
         hikyuu_hub_path = self._session.query(HubModel.local).filter(HubModel.name == 'default').first()
         if hikyuu_hub_path is None:
             self.add_remote_hub('default', 'https://gitee.com/fasiondog/hikyuu_hub.git', 'main')
 
     def download_remote_hub(self, local_dir, url, branch):
-        print('正在下载 hikyuu 策略仓库至："{}"'.format(local_dir))
+        print('Downloading the hikyuu strategy repository to: "{}"'.format(local_dir))
 
-        # 如果存在同名缓存目录，则强制删除
+        # If a cache directory with the same name exists, delete it forcibly
         if os.path.lexists(local_dir):
             shutil.rmtree(local_dir, onerror=handle_remove_read_only)
 
         try:
             git.Repo.clone_from(url, local_dir, branch=branch)
         except:
-            raise RuntimeError("需要安装git（https://git-scm.com/），或检查网络是否正常或链接地址({})是否正确!".format(url))
-        print('下载完毕')
+            raise RuntimeError("git (https://git-scm.com/) must be installed, or please check whether the network works and the url ({}) is correct!".format(url))
+        print('Download completed')
 
     @dbsession
     def add_remote_hub(self, name, url, branch='main'):
-        """增加远程策略仓库
+        """Add a remote strategy repository
 
-        :param str name: 本地仓库名称（自行起名）
-        :param str url: git 仓库地址
-        :param str branch: git 仓库分支
+        :param str name: the local repository name (named by yourself)
+        :param str url: the git repository url
+        :param str branch: the git repository branch
         """
         record = self._session.query(HubModel).filter(HubModel.name == name).first()
         checkif(record is not None, name, HubNameRepeatError)
 
         record = self._session.query(HubModel).filter(and_(HubModel.url == url, HubModel.branch == branch)).first()
 
-        # 下载远程仓库
+        # Download the remote repository
         local_dir = "{}/{}".format(self.remote_cache_dir, name)
         self.download_remote_hub(local_dir, url, branch)
 
-        # 导入仓库各部件策略信息
+        # Import the strategy part information of the repository
         record = HubModel(name=name, hub_type='remote', url=url, branch=branch, local_base=name, local=local_dir)
         self.import_part_to_db(record)
 
-        # 更新仓库记录
+        # Update the repository record
         self._session.add(record)
 
     @dbsession
     def add_local_hub(self, name, path):
-        """增加本地数据仓库
+        """Add a local data repository
 
-        :param str name: 仓库名称
-        :param str path: 本地全路径
+        :param str name: the repository name
+        :param str path: the local full path
         """
-        checkif(not os.path.lexists(path), '找不到指定的路径（"{}"）'.format(path))
+        checkif(not os.path.lexists(path), 'The specified path ("{}") cannot be found'.format(path))
 
-        # 获取绝对路径
+        # Get the absolute path
         local_path = os.path.abspath(path)
 
         record = self._session.query(HubModel).filter(HubModel.name == name).first()
         checkif(record is not None, name, HubNameRepeatError)
 
-        # 将本地路径的上一层路径加入系统路径
+        # Add the parent path of the local path to the system path
         sys.path.append(os.path.dirname(path))
 
-        # 检查仓库目录名称是否与其他 python 模块存在冲突
+        # Check whether the repository directory name conflicts with other python modules
         tmp = importlib.import_module(os.path.basename(local_path))
         checkif(
             tmp.__path__[0] != local_path if sys.platform == 'win32' else tmp.__path__[0].lower() != local_path.lower(),
@@ -299,22 +299,22 @@ class HubManager(metaclass=SingletonType):
             hub_path=local_path
         )
 
-        # 导入部件信息
+        # Import the part information
         local_base = os.path.basename(local_path)
         hub_model = HubModel(name=name, hub_type='local', local_base=local_base, local=local_path)
         self.import_part_to_db(hub_model)
 
-        # 更新仓库记录
+        # Update the repository record
         self._session.add(hub_model)
 
     @dbsession
     def update_hub(self, name):
-        """更新指定仓库
+        """Update the specified repository
 
-        :param str name: 仓库名称
+        :param str name: the repository name
         """
         hub_model = self._session.query(HubModel).filter_by(name=name).first()
-        checkif(hub_model is None, '指定的仓库（{}）不存在！'.format(name))
+        checkif(hub_model is None, 'The specified repository ({}) does not exist!'.format(name))
 
         self._session.query(PartModel).filter_by(hub_name=name).delete()
         if hub_model.hub_type == 'remote':
@@ -323,13 +323,13 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def build_hub(self, name, cmd='buildall'):
-        """构建 cpp 部分 part
+        """Build the cpp part
 
-        :param str name: 仓库名称
-        :param str cmd: 同仓库下 python setup.py 后的命令参数，如: build -t ind -n cpp_example
+        :param str name: the repository name
+        :param str cmd: the command arguments after python setup.py in the repository, e.g. build -t ind -n cpp_example
         """
         hub_model = self._session.query(HubModel).filter_by(name=name).first()
-        checkif(hub_model is None, '指定的仓库（{}）不存在！'.format(name))
+        checkif(hub_model is None, 'The specified repository ({}) does not exist!'.format(name))
         if sys.platform == 'win32':
             os.system(f"python {hub_model.local}/setup.py {cmd}")
         else:
@@ -337,9 +337,9 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def remove_hub(self, name):
-        """删除指定的仓库
+        """Remove the specified repository
 
-        :param str name: 仓库名称
+        :param str name: the repository name
         """
         self._session.query(PartModel).filter_by(hub_name=name).delete()
         self._session.query(HubModel).filter_by(name=name).delete()
@@ -367,7 +367,7 @@ class HubManager(metaclass=SingletonType):
             'other': 'other',
         }
 
-        # 检查仓库本地目录是否存在，不存在则给出告警信息并直接返回
+        # Check whether the local directory of the repository exists; if not, give a warning and return directly
         local_dir = hub_model.local
         if not os.path.lexists(local_dir):
             self.logger.warning(
@@ -377,32 +377,32 @@ class HubManager(metaclass=SingletonType):
 
         base_local = os.path.basename(local_dir)
 
-        # 遍历仓库导入部件信息
+        # Traverse the repository and import the part information
         for part, part_dir in part_dict.items():
             path = "{}/{}".format(hub_model.local, part_dir)
             try:
                 with os.scandir(path) as it:
                     for entry in it:
                         if (not entry.name.startswith('.')) and entry.is_dir() and (entry.name != "__pycache__"):
-                            # 计算实际的导入模块名
+                            # Calculate the actual module name to import
                             module_name = '{}.part.{}.{}.part'.format(base_local, part, entry.name) if part not in (
                                 'pf', 'sys', 'ind', 'other'
                             ) else '{}.{}.{}.part'.format(base_local, part, entry.name)
 
-                            # 导入模块
+                            # Import the module
                             try:
                                 # part_module = importlib.import_module(module_name)
                                 part_module = self._get_module(module_name)
                             except ModuleNotFoundError:
-                                self.logger.error('{} 缺失 part.py 文件, 位置："{}"！'.format(module_name, entry.path))
+                                self.logger.error('{}: the part.py file is missing, location: "{}"!'.format(module_name, entry.path))
                                 continue
                             except Exception as e:
-                                self.logger.error('{} 无法导入该文件: {}! {}'.format(module_name, entry.path, str(e)))
+                                self.logger.error('{}: unable to import the file: {}! {}'.format(module_name, entry.path, str(e)))
                                 continue
 
                             module_vars = vars(part_module)
                             if 'part' not in module_vars:
-                                self.logger.error('缺失 part 函数！("{}")'.format(entry.path))
+                                self.logger.error('The part function is missing! ("{}")'.format(entry.path))
                                 continue
 
                             name = '{}.{}.{}'.format(hub_model.name, part, entry.name) if part not in (
@@ -422,7 +422,7 @@ class HubManager(metaclass=SingletonType):
                                 )
                                 self._session.add(part_model)
                             except Exception as e:
-                                self.logger.error('存在语法错误 ("{}/part.py")! {}'.format(entry.path, e))
+                                self.logger.error('There is a syntax error ("{}/part.py")! {}'.format(entry.path, e))
                                 continue
 
             except FileNotFoundError:
@@ -430,10 +430,10 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_part(self, name, **kwargs):
-        """获取指定策略部件
+        """Get the specified strategy part
 
-        :param str name: 策略部件名称
-        :param kwargs: 其他部件相关参数
+        :param str name: the strategy part name
+        :param kwargs: other part-related arguments
         """
         name_parts = name.split('.')
         checkif(
@@ -442,14 +442,14 @@ class HubManager(metaclass=SingletonType):
             name, PartNameError
         )
 
-        # 未指定仓库名，则默认使用 'default' 仓库
+        # If no repository name is specified, the 'default' repository is used by default
         part_name = 'default.{}'.format(name) if len(name_parts) == 2 else name
         part_model = self._session.query(PartModel).filter_by(name=part_name).first()
-        checkif(part_model is None, part_name, PartNotFoundError, cause='仓库中不存在')
+        checkif(part_model is None, part_name, PartNotFoundError, cause='does not exist in the repository')
         try:
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
-            raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
+            raise PartNotFoundError(part_name, 'Please check whether the path of the part exists')
         part = part_module.part(**kwargs)
         try:
             part.name = part_model.name
@@ -460,10 +460,10 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_part_module(self, name):
-        """获取指定策略部件
+        """Get the specified strategy part
 
-        :param str name: 策略部件名称
-        :param kwargs: 其他部件相关参数
+        :param str name: the strategy part name
+        :param kwargs: other part-related arguments
         """
         name_parts = name.split('.')
         checkif(
@@ -472,28 +472,28 @@ class HubManager(metaclass=SingletonType):
             name, PartNameError
         )
 
-        # 未指定仓库名，则默认使用 'default' 仓库
+        # If no repository name is specified, the 'default' repository is used by default
         part_name = 'default.{}'.format(name) if len(name_parts) == 2 else name
         part_model = self._session.query(PartModel).filter_by(name=part_name).first()
-        checkif(part_model is None, part_name, PartNotFoundError, cause='仓库中不存在')
+        checkif(part_model is None, part_name, PartNotFoundError, cause='does not exist in the repository')
         try:
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
-            raise PartNotFoundError(part_name, '请检查部件对应路径是否存在')
+            raise PartNotFoundError(part_name, 'Please check whether the path of the part exists')
         return part_module
 
     @dbsession
     def get_part_info(self, name):
-        """获取策略部件信息
+        """Get the strategy part information
 
-        :param str name: 部件名称
+        :param str name: the part name
         """
         part_model = self._session.query(PartModel).filter_by(name=name).first()
-        checkif(part_model is None, name, PartNotFoundError, cause='仓库中不存在')
+        checkif(part_model is None, name, PartNotFoundError, cause='does not exist in the repository')
         try:
             part_module = importlib.import_module(part_model.module_name)
         except ModuleNotFoundError:
-            raise PartNotFoundError(name, '请检查部件对应路径是否存在')
+            raise PartNotFoundError(name, 'Please check whether the path of the part exists')
         signature = inspect.signature(part_module.part)
         func_name = f'\npart("{name}",'
         for param_name, param in signature.parameters.items():
@@ -524,9 +524,9 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_hub_path(self, name):
-        """获取仓库所在的本地路径
+        """Get the local path of the repository
 
-        :param str name: 仓库名
+        :param str name: the repository name
         """
         path = self._session.query(HubModel.local).filter_by(name=name).first()
         checkif(path is None, name, HubNotFoundError)
@@ -534,15 +534,15 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_hub_name_list(self):
-        """返回仓库名称列表"""
+        """Return the list of the repository names"""
         return [record[0] for record in self._session.query(HubModel.name).all()]
 
     @dbsession
     def get_part_name_list(self, hub=None, part_type=None):
-        """获取部件名称列表
+        """Get the list of the part names
 
-        :param str hub: 仓库名
-        :param str part_type: 部件类型
+        :param str hub: the repository name
+        :param str part_type: the part type
         """
         if hub is None and part_type is None:
             results = self._session.query(PartModel.name).all()
@@ -557,10 +557,10 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def get_current_hub(self, filename):
-        """用于在仓库part.py中获取当前所在的仓库名。
-        示例： get_current_hub(__file__)
+        """Used to get the name of the repository the current part.py belongs to.
+        Example: get_current_hub(__file__)
         """
-        abs_path = os.path.abspath(filename)  # 当前文件的绝对路径
+        abs_path = os.path.abspath(filename)  # the absolute path of the current file
         path_parts = pathlib.Path(abs_path).parts
         local_base = path_parts[-4] if path_parts[-3] in ('pf', 'sys', 'ind', 'other') else path_parts[-5]
         hub_model = self._session.query(HubModel.name).filter_by(local_base=local_base).first()
@@ -569,12 +569,12 @@ class HubManager(metaclass=SingletonType):
 
     @dbsession
     def search_part(self, name: str = None, hub: str = None, part_type: str = None, label=None):
-        """搜索部件
-        :param str name: 部件名称
-        :param str hub: 仓库名
-        :param str part_type: 部件类型
-        :param str label: 标签
-        :return: 部件名称列表
+        """Search parts
+        :param str name: the part name
+        :param str hub: the repository name
+        :param str part_type: the part type
+        :param str label: the label
+        :return: the list of the part names
         :rtype: list
         """
         parts = None
@@ -600,82 +600,82 @@ class HubManager(metaclass=SingletonType):
 
 
 def add_remote_hub(name, url, branch='main'):
-    """增加远程策略仓库
+    """Add a remote strategy repository
 
-    :param str name: 本地仓库名称（自行起名）
-    :param str url: git 仓库地址
-    :param str branch: git 仓库分支
+    :param str name: the local repository name (named by yourself)
+    :param str url: the git repository url
+    :param str branch: the git repository branch
     """
     HubManager().add_remote_hub(name, url, branch)
 
 
 def add_local_hub(name, path):
-    """增加本地数据仓库
+    """Add a local data repository
 
-    :param str name: 仓库名称
-    :param str path: 本地全路径
+    :param str name: the repository name
+    :param str path: the local full path
     """
     HubManager().add_local_hub(name, path)
 
 
 def update_hub(name):
-    """更新指定仓库
+    """Update the specified repository
 
-    :param str name: 仓库名称
+    :param str name: the repository name
     """
     HubManager().update_hub(name)
 
 
 def build_hub(name, cmd='buildall'):
-    """构建 cpp 部分 part
+    """Build the cpp part
 
-    :param str name: 仓库名称
-    :param str cmd: 同仓库下 python setup.py 后的命令参数，如: build -t ind -n cpp_example
+    :param str name: the repository name
+    :param str cmd: the command arguments after python setup.py in the repository, e.g. build -t ind -n cpp_example
     """
     HubManager().build_hub(name, cmd)
 
 
 def remove_hub(name):
-    """删除指定的仓库
+    """Remove the specified repository
 
-    :param str name: 仓库名称
+    :param str name: the repository name
     """
     HubManager().remove_hub(name)
 
 
 def get_part(name, *args, **kwargs):
-    """获取指定策略部件
+    """Get the specified strategy part
 
-    :param str name: 策略部件名称
-    :param args: 其他部件相关参数
-    :param kwargs: 其他部件相关参数
+    :param str name: the strategy part name
+    :param args: other part-related arguments
+    :param kwargs: other part-related arguments
     """
     return HubManager().get_part(name, *args, **kwargs)
 
 
 def get_part_list(name_list):
     """
-    获取指定策略部件列表
+    Get the list of the specified strategy parts
 
-    :param list name_list: 部件名称列表
-    :return: 部件列表
+    :param list name_list: the list of the part names
+    :return: the list of parts
     :rtype: list
     """
     return [get_part(name) for name in name_list]
 
 
 def get_hub_path(name):
-    """获取仓库所在的本地路径
+    """Get the local path of the repository
 
-    :param str name: 仓库名
+    :param str name: the repository name
     """
     return HubManager().get_hub_path(name)
 
 
 def get_part_info(name):
-    """获取策略部件信息
+    """Get the strategy part information
 
-    :param str name: 部件名称
+    :param str name: the part name
     """
     return HubManager().get_part_info(name)
 
@@ -688,22 +688,22 @@ help_part = print_part_info
 
 
 def get_hub_name_list():
-    """返回仓库名称列表"""
+    """Return the list of the repository names"""
     return HubManager().get_hub_name_list()
 
 
 def get_part_name_list(hub=None, part_type=None):
-    """获取部件名称列表
-    :param str hub: 仓库名
-    :param str part_type: 部件类型
+    """Get the list of the part names
+    :param str hub: the repository name
+    :param str part_type: the part type
     """
     return HubManager().get_part_name_list(hub, part_type)
 
 
 def get_part_module(part_name: str):
-    """获取部件模块
-    :param str part_name: 部件名称
-    :return: 部件模块
+    """Get the part module
+    :param str part_name: the part name
+    :return: the part module
     :rtype: module
     """
     return HubManager().get_part_module(part_name)
@@ -711,30 +711,30 @@ def get_part_module(part_name: str):
 
 @lru_cache
 def get_current_hub(filename):
-    """用于在仓库part.py中获取当前所在的仓库名。
-    示例： get_current_hub(__file__)
+    """Used to get the name of the repository the current part.py belongs to.
+    Example: get_current_hub(__file__)
     """
     return HubManager().get_current_hub(filename)
 
 
 def search_part(name: str = None, hub: str = None, part_type: str = None, label: str = None):
-    """搜索部件
+    """Search parts
 
-    :param str name: 部件名称
-    :param str hub: 仓库名
-    :param str part_type: 部件类型
-    :param str label: 标签
-    :return: 部件名称列表
+    :param str name: the part name
+    :param str hub: the repository name
+    :param str part_type: the part type
+    :param str label: the label
+    :return: the list of the part names
     :rtype: list
     """
     return HubManager().search_part(name, hub, part_type, label)
 
 
-# 初始化仓库
+# Initialize the repository
 try:
     HubManager().setup_hub()
 except Exception as e:
-    HubManager().logger.warning("无法初始化 hikyuu 策略仓库！ {}".format(e))
+    HubManager().logger.warning("Unable to initialize the hikyuu strategy repository! {}".format(e))
 
 __all__ = [
     'add_remote_hub',
