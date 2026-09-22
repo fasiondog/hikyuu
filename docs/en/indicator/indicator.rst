@@ -1,373 +1,371 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/indicator/indicator.rst
-
 .. py:currentmodule:: hikyuu.indicator
 .. highlight:: python
 
-内建技术指标
-============
+Built-in Technical Indicators
+=============================
 
 
 .. py:function:: ABS([data])
 
-    求绝对值
+    Get the absolute value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: ACOS([data])
 
-    反余弦值
+    The arccosine value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: AD(kdata)
 
-   累积/派发线
+   The accumulation/distribution line
    
-   :param KData kdata: k线数据
+   :param KData kdata: the K-line data
    :rtype: Indicator
 
 
 .. py:function:: ADJ_FACTOR([kdata])
 
-    计算复权因子指标
+    Calculate the recovery factor indicator
     
-    基于股票的权息数据（送股、配股、转增、现金分红等）计算后复权因子序列。
-    复权因子表示如果上市时持有1股，经过所有送股、配股、转增后，现在持有多少股。
-    采用累乘方式计算，确保价格、成交量和成交金额的复权处理一致性。
+    Calculate the backward recovery factor sequence based on the stock's dividend data (the stock sends, the allotments, the conversions, the cash dividends, etc.).
+    The recovery factor indicates how many shares are held now if 1 share was held at the listing, after all the stock sends, the allotments and the conversions.
+    It is calculated in a cumulative multiplication way, ensuring the consistency of the recovery processing of the price, the volume and the amount.
     
-    该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
+    This indicator needs to set the KData context to work properly, set through the setContext() method.
     
-    :param KData kdata: 可选，直接传入K线数据作为上下文
+    :param KData kdata: optional, pass in the K-line data directly as the context
     :rtype: Indicator
     
     .. warning:: 
-       **重要限制**：
+       **Important restrictions**:
        
-       - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
-       - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+       - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
+       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
     
-    **使用示例**::
+    **Usage example**::
     
-        # 获取某只股票的复权因子
+        # Get the recovery factor of a stock
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(-100))
         adj_factor = ADJ_FACTOR()
         adj_factor.setContext(kdata)
         
-        # 或者直接传入K线数据
+        # Or pass in the K-line data directly
         adj_factor = ADJ_FACTOR(kdata)
     
-    **相关指标**：
+    **Related indicators**:
     
-    * :py:func:`ADJ_OPEN` - 复权开盘价
-    * :py:func:`ADJ_HIGH` - 复权最高价
-    * :py:func:`ADJ_LOW` - 复权最低价
-    * :py:func:`ADJ_CLOSE` - 复权收盘价
-    * :py:func:`ADJ_VOL` - 复权成交量
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`ADJ_OPEN` - the recovered open price
+    * :py:func:`ADJ_HIGH` - the recovered high price
+    * :py:func:`ADJ_LOW` - the recovered low price
+    * :py:func:`ADJ_CLOSE` - the recovered close price
+    * :py:func:`ADJ_VOL` - the recovered volume
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
 
 
 .. py:function:: ADJ_OPEN()
 
-    计算复权开盘价指标
+    Calculate the recovered open price indicator
     
-    将开盘价按复权因子进行后复权处理，得到复权后的开盘价序列。
-    计算公式：ADJ_OPEN = ADJ_FACTOR * OPEN
+    Recover the open price backward by the recovery factor, obtaining the recovered open price sequence.
+    The calculation formula: ADJ_OPEN = ADJ_FACTOR * OPEN
     
     :rtype: Indicator
     
     .. warning:: 
-       **重要限制**：
+       **Important restrictions**:
        
-       - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
-       - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+       - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
+       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
     
-    **相关指标**：
+    **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`ADJ_FACTOR` - the recovery factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
 
 
 .. py:function:: ADJ_HIGH()
 
-    计算复权最高价指标
+    Calculate the recovered high price indicator
     
-    将最高价按复权因子进行后复权处理，得到复权后的最高价序列。
-    计算公式：ADJ_HIGH = ADJ_FACTOR * HIGH
+    Recover the high price backward by the recovery factor, obtaining the recovered high price sequence.
+    The calculation formula: ADJ_HIGH = ADJ_FACTOR * HIGH
     
     :rtype: Indicator
     
     .. warning:: 
-       **重要限制**：
+       **Important restrictions**:
        
-       - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
-       - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+       - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
+       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
     
-    **相关指标**：
+    **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`ADJ_FACTOR` - the recovery factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
 
 
 .. py:function:: ADJ_LOW()
 
-    计算复权最低价指标
+    Calculate the recovered low price indicator
     
-    将最低价按复权因子进行后复权处理，得到复权后的最低价序列。
-    计算公式：ADJ_LOW = ADJ_FACTOR * LOW
+    Recover the low price backward by the recovery factor, obtaining the recovered low price sequence.
+    The calculation formula: ADJ_LOW = ADJ_FACTOR * LOW
     
     :rtype: Indicator
     
     .. warning:: 
-       **重要限制**：
+       **Important restrictions**:
        
-       - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
-       - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+       - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
+       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
     
-    **相关指标**：
+    **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`ADJ_FACTOR` - the recovery factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
 
 
 .. py:function:: ADJ_CLOSE()
 
-    计算复权收盘价指标
+    Calculate the recovered close price indicator
     
-    将收盘价按复权因子进行后复权处理，得到复权后的收盘价序列。
-    计算公式：ADJ_CLOSE = ADJ_FACTOR * CLOSE
+    Recover the close price backward by the recovery factor, obtaining the recovered close price sequence.
+    The calculation formula: ADJ_CLOSE = ADJ_FACTOR * CLOSE
     
     :rtype: Indicator
     
     .. warning:: 
-       **重要限制**：
+       **Important restrictions**:
        
-       - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
-       - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+       - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
+       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
     
-    **相关指标**：
+    **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`ADJ_FACTOR` - the recovery factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
 
 
 .. py:function:: ADJ_VOL()
 
-    计算复权成交量指标
+    Calculate the recovered volume indicator
     
-    将成交量按复权因子进行后复权处理，得到复权后的成交量序列。
-    计算公式：ADJ_VOL = VOL / ADJ_FACTOR
+    Recover the volume backward by the recovery factor, obtaining the recovered volume sequence.
+    The calculation formula: ADJ_VOL = VOL / ADJ_FACTOR
     
-    注意：成交量复权使用除法，与价格复权使用乘法相反。这是因为当股本增加时，每股对应的成交量应该相应减少。
+    Note: the volume recovery uses division, which is opposite to the price recovery using multiplication. This is because when the share capital increases, the volume corresponding to each share should be reduced accordingly.
     
     :rtype: Indicator
     
     .. warning:: 
-       **重要限制**：
+       **Important restrictions**:
        
-       - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
-       - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+       - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
+       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
     
-    **相关指标**：
+    **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`ADJ_FACTOR` - the recovery factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
 
 
 .. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
-    上涨家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
+    The number of the rising stocks. When a specified context exists and ignore_context is false, the query, market, stk_type parameters will be ignored.
 
-    :param Query query: 查询条件
-    :param str market: 所属市场，等于 "" 时，获取所有市场
-    :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
-    :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :param Query query: the query condition
+    :param str market: the market it belongs to; when it equals "", get all the markets
+    :param int stk_type: the security type; when it is greater than constant.STOCKTYPE_TMP, get all the types of the securities
+    :param bool ignore_context: whether to ignore the context. When ignoring, the query, market, stk_type parameters are used forcibly.
     :rtype: Indicator
 
 .. py:function:: AGG_COUNT
 
-    聚合函数: 非空值计数, 可参考 :func:`AGG_STD`   
+    The aggregation function: the non-empty value counting, refer to :func:`AGG_STD`   
 
 .. py:function:: AGG_MAD
 
-    聚合函数: 平均绝对偏差, 可参考 :func:`AGG_STD`
+    The aggregation function: the average absolute deviation, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_MAX
 
-    聚合函数: 最大值, 可参考 :func:`AGG_STD`
+    The aggregation function: the maximum value, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_MEAN
 
-    聚合函数: 平均值, 可参考 :func:`AGG_STD`
+    The aggregation function: the average value, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_MEDIAN
 
-    聚合函数: 中位数, 可参考 :func:`AGG_STD`    
+    The aggregation function: the median, refer to :func:`AGG_STD`    
 
 .. py:function:: AGG_MIN
 
-    聚合函数: 最小值, 可参考 :func:`AGG_STD`
+    The aggregation function: the minimum value, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_PROD
 
-    聚合函数: 乘积, 可参考 :func:`AGG_STD` 
+    The aggregation function: the product, refer to :func:`AGG_STD` 
 
 .. py:function:: AGG_SAMPLE(ind[, time="9:35", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间采样聚合指标，在指定时间点对指标数据进行采样。
+    The time sampling aggregation indicator, sampling the indicator data at the specified time points.
 
-    如果找不到精确匹配的时间，会选择最接近目标时间之前的有效数据。
+    If the exactly matching time cannot be found, the valid data closest before the target time is selected.
 
-    :param Indicator ind: 输入指标
-    :param str time: 指定采样时间，格式为 HH:MM，默认为 "9:35"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str time: the specified sampling time, in the format HH:MM, defaulting to "9:35"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator
 
 .. py:function:: AGG_SAMPLE_MAX(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间段最大值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最大值。
+    The maximum in the time period aggregation indicator, counting the maximum of the indicator data within the specified time period [start_time, last_time].
 
-    包含 start_time 和 last_time 本身。
+    It includes the start_time and the last_time themselves.
 
-    :param Indicator ind: 输入指标
-    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
-    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str start_time: the start time of the time period, in the format HH:MM, defaulting to "9:30"
+    :param str last_time: the end time of the time period, in the format HH:MM, defaulting to "10:00"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator
 
 .. py:function:: AGG_SAMPLE_MIN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间段最小值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最小值。
+    The minimum in the time period aggregation indicator, counting the minimum of the indicator data within the specified time period [start_time, last_time].
 
-    包含 start_time 和 last_time 本身。
+    It includes the start_time and the last_time themselves.
 
-    :param Indicator ind: 输入指标
-    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
-    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str start_time: the start time of the time period, in the format HH:MM, defaulting to "9:30"
+    :param str last_time: the end time of the time period, in the format HH:MM, defaulting to "10:00"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator
 
 .. py:function:: AGG_SAMPLE_MEAN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间段平均值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的平均值。
+    The average in the time period aggregation indicator, counting the average of the indicator data within the specified time period [start_time, last_time].
 
-    包含 start_time 和 last_time 本身。
+    It includes the start_time and the last_time themselves.
 
-    :param Indicator ind: 输入指标
-    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
-    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str start_time: the start time of the time period, in the format HH:MM, defaulting to "9:30"
+    :param str last_time: the end time of the time period, in the format HH:MM, defaulting to "10:00"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator
 
 .. py:function:: AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.75])
 
-    聚合其他K线周期分位数, 可参考 AGG_STD 帮助
+    Aggregate the quantile of the other K-line periods, refer to the AGG_STD help
 
-    :param Indicator ind: 指标数据
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :param float quantile: 分位数 (0, 1) 之间
-    :return: 指标数据
+    :param Indicator ind: the indicator data
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :param float quantile: the quantile, between (0, 1)
+    :return: the indicator data
     :rtype: Indicator     
 
 .. py:function:: AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
-    聚合其他K线周期的标准差, 如计算日线时聚合分钟线收盘价的标准差
+    Aggregate the standard deviation of the other K-line periods, e.g. calculating the standard deviation of the minute-line close prices aggregated when calculating the daily line
 
         >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
         >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
         >>> ind(k)
 
-    :param Indicator ind: 指标数据
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (滚动聚合单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
-    :return: 指标数据
+    :param Indicator ind: the indicator data
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the rolling aggregation unit; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :param int ddof: the degree of freedom (1: the sample standard deviation, 0: the population standard deviation)
+    :return: the indicator data
     :rtype: Indicator
 
 .. py:function:: AGG_VAR
 
-    聚合函数: 方差, 可参考 :func:`AGG_STD`
+    The aggregation function: the variance, refer to :func:`AGG_STD`
 
 
 .. py:function:: AGG_VWAP([ktype=Query.MIN, fill_null=False, unit=1])
 
-    聚合其他K线成交量加权平均价格(Volume Weighted Average Price)
-    VWAP 是成交量加权的平均价格，计算方式是将每一分钟（或单位时间）的成交量乘以该分钟的成交价格，然后对所有乘积求和，最后除以总成交量。
+    Aggregate the volume weighted average price of the other K-line periods (Volume Weighted Average Price).
+    VWAP is the volume-weighted average price, calculated by multiplying the volume of each minute (or unit time) by the trading price of that minute, then summing all the products, and finally dividing by the total volume.
 
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :return: 指标数据
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :return: the indicator data
     :rtype: Indicator
 
 
 .. py:function:: AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
       
-    使用自定函数聚合其他K线周期的指标。
+    Aggregate the indicators of the other K-line periods with a custom function.
     
-    示例, 计算日线时聚合分钟线收盘价的和:
+    Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
       >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: np.sum(x))
       >>> ind(k)
 
-    :param Indicator ind: 待计算指标
-    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回针对list的聚合结果, 注意是单个值
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :return: 聚合结果
+    :param Indicator ind: the indicator to calculate
+    :param callable agg_func: the custom aggregation function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the aggregation result for the list; note that it is a single value
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :return: the aggregation result
     :rtype: Indicator
 
 
 .. py:function:: ALIGN(data, ref[, fill_null=True])
 
-    按指定的参考日期对齐
+    Align by the specified reference dates
 
-    :param Indicator data: 输入数据
-    :param DatetimeList|Indicator|KData ref: 指定做为日期参考的 DatetimeList、Indicator 或 KData
-    :param bool fill_null: 缺失数据使用 nan 填充; 否则使用小于对应日期且最接近对应日期的数据
+    :param Indicator data: the input data
+    :param DatetimeList|Indicator|KData ref: the specified DatetimeList, Indicator or KData used as the date reference
+    :param bool fill_null: the missing data is filled with nan; otherwise, use the data less than and closest to the corresponding date
     :retype: Indicator
 
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])
 
-    佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
+    The Perry J. Kaufman adaptive moving average [BOOK1]_
     
-    :param Indicator data: 输入数据
-    :param int n: 计算均值的周期窗口，必须为大于2的整数
-    :param int fast_n: 对应快速周期N
-    :param int slow_n: 对应慢速EMA线的N值
+    :param Indicator data: the input data
+    :param int n: the period window for calculating the average, which must be an integer greater than 2
+    :param int fast_n: the corresponding fast period N
+    :param int slow_n: the N value corresponding to the slow EMA line
     :rtype: Indicator
     
     * result(0): AMA
@@ -376,75 +374,75 @@
     
 .. py:function:: AMO([data])
 
-    获取成交金额，包装KData的成交金额成Indicator
+    Get the amount; wrap the amount of the KData as an Indicator
     
-    :param data: 输入数据（KData 或 Indicator）
+    :param data: the input data (KData or Indicator)
     :rtype: Indicator
 
 
 .. py:function:: ASIN([data])
 
-    反正弦值
+    The arcsine value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: ATAN([data])
 
-    反正切值
+    The arctangent value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: ATR([kdata, n=14])
 
-    平均真实波幅(Average True Range), 真实波动幅度 TR 的简单移动均值
+    The Average True Range, the simple moving average of the true range TR
 
-    :param KData kdata: 待计算的源数据
-    :param int n: 计算均值的周期窗口，必须为大于1的整数
+    :param KData kdata: the source data to calculate
+    :param int n: the period window for calculating the average, which must be an integer greater than 1
     :rtype: Indicator
 
 
 .. py:function:: ADX([kdata, n=14])
 
-    平均趋向指数(Average Directional Index)
+    The Average Directional Index
 
-    ADX属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。采用威尔德（Wilder）原始公式。
+    ADX belongs to the trend strength indicators; it does not distinguish the up/down direction, but only judges whether there is a trend. It uses the Wilder original formula.
 
-    :param KData kdata: 待计算的源数据
-    :param int n: 计算周期，默认14，必须为大于1的整数
+    :param KData kdata: the source data to calculate
+    :param int n: the calculation period, defaulting to 14, which must be an integer greater than 1
     :rtype: Indicator
 
-    * result(0): ADX本身（趋势强度，值域0~100）
-    * result(1): +DI（上升动向线，多头力量）
-    * result(2): -DI（下降动向线，空头力量）
+    * result(0): the ADX itself (the trend strength, with the value range 0~100)
+    * result(1): +DI (the rising direction line, the bull force)
+    * result(2): -DI (the falling direction line, the bear force)
 
-    判断标准：
+    The judgement criteria:
 
-    - ADX >= 25：存在清晰单边趋势（上涨/下跌都行）
-    - ADX < 25：无趋势，箱体震荡
-    - ADX数值越大，趋势越猛
+    - ADX >= 25: there is a clear one-sided trend (both rising/falling are fine)
+    - ADX < 25: no trend, a range oscillation
+    - The greater the ADX value, the stronger the trend
 
-    **计算原理**：
+    **The calculation principle**:
 
-    1. **真实波幅（TR）**：TR = max(HIGH-LOW, abs(HIGH-REF(CLOSE,1)), abs(LOW-REF(CLOSE,1)))
-    2. **动向波动（+DM/-DM）**：+DM = HIGH - REF(HIGH,1)（若>0且大于-DM）；-DM = REF(LOW,1) - LOW（若>0且大于+DM）
-    3. **Wilder平滑**：初始为N周期简单平均，后续使用递归公式 S_t = S_{t-1} * (N-1)/N + X_t/N
-    4. **动向指数（±DI）**：+DI = 100 * (+DM平滑值) / TR平滑值；-DI = 100 * (-DM平滑值) / TR平滑值
-    5. **动向指数（DX）**：DX = 100 * abs(+DI - (-DI)) / (+DI + (-DI))
-    6. **平均动向指数（ADX）**：对DX进行Wilder平滑
+    1. **The true range (TR)**: TR = max(HIGH-LOW, abs(HIGH-REF(CLOSE,1)), abs(LOW-REF(CLOSE,1)))
+    2. **The directional movement (+DM/-DM)**: +DM = HIGH - REF(HIGH,1) (if >0 and greater than -DM); -DM = REF(LOW,1) - LOW (if >0 and greater than +DM)
+    3. **The Wilder smoothing**: the initial is the simple average of the N periods; afterwards, the recursive formula S_t = S_{t-1} * (N-1)/N + X_t/N is used
+    4. **The directional index (±DI)**: +DI = 100 * (the smoothed +DM) / (the smoothed TR); -DI = 100 * (the smoothed -DM) / (the smoothed TR)
+    5. **The directional index (DX)**: DX = 100 * abs(+DI - (-DI)) / (+DI + (-DI))
+    6. **The Average Directional Index (ADX)**: smooth the DX with Wilder
 
-    **使用示例**::
+    **Usage example**::
 
-        # 获取K线数据
+        # Get the K-line data
         kdata = get_kdata('sh000001', Query(-200))
         
-        # 计算ADX指标
+        # Calculate the ADX indicator
         adx = ADX(kdata, 14)
         
-        # 获取ADX值（索引0）、+DI值（索引1）、-DI值（索引2）
+        # Get the ADX value (index 0), the +DI value (index 1), the -DI value (index 2)
         adx_value = adx.get(-1, 0)
         pdi_value = adx.get(-1, 1)
         mdi_value = adx.get(-1, 2)
@@ -452,39 +450,39 @@
 
 .. py:function:: ADX2([kdata, n=14])
 
-    平均趋向指数(ADX2) - 使用EMA平滑方式
+    The Average Directional Index (ADX2) - using the EMA smoothing way
 
-    ADX2属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。
-    与ADX的区别在于使用EMA（指数移动平均）而非Wilder平滑，对趋势变化更敏感。
+    ADX2 belongs to the trend strength indicators; it does not distinguish the up/down direction, but only judges whether there is a trend.
+    The difference from the ADX is that it uses the EMA (the Exponential Moving Average) instead of the Wilder smoothing, being more sensitive to the trend changes.
 
-    :param KData kdata: 待计算的源数据
-    :param int n: 计算周期，默认14，必须为大于1的整数
+    :param KData kdata: the source data to calculate
+    :param int n: the calculation period, defaulting to 14, which must be an integer greater than 1
     :rtype: Indicator
 
-    * result(0): ADX2本身（趋势强度，值域0~100）
-    * result(1): +DI（上升动向线，多头力量）
-    * result(2): -DI（下降动向线，空头力量）
+    * result(0): the ADX2 itself (the trend strength, with the value range 0~100)
+    * result(1): +DI (the rising direction line, the bull force)
+    * result(2): -DI (the falling direction line, the bear force)
 
-    判断标准：
+    The judgement criteria:
 
-    - ADX2 >= 25：存在清晰单边趋势（上涨/下跌都行）
-    - ADX2 < 25：无趋势，箱体震荡
-    - ADX2数值越大，趋势越猛
+    - ADX2 >= 25: there is a clear one-sided trend (both rising/falling are fine)
+    - ADX2 < 25: no trend, a range oscillation
+    - The greater the ADX2 value, the stronger the trend
 
-    **与ADX的区别**：
+    **The difference from the ADX**:
 
-    - **ADX**：使用Wilder平滑（平滑系数=1/N），响应较慢但更稳定
-    - **ADX2**：使用EMA平滑（平滑系数=2/(N+1)），对趋势变化更敏感
+    - **ADX**: uses the Wilder smoothing (the smoothing coefficient = 1/N), responding slower but more stable
+    - **ADX2**: uses the EMA smoothing (the smoothing coefficient = 2/(N+1)), being more sensitive to the trend changes
 
-    **使用示例**::
+    **Usage example**::
 
-        # 获取K线数据
+        # Get the K-line data
         kdata = get_kdata('sh000001', Query(-200))
         
-        # 计算ADX2指标
+        # Calculate the ADX2 indicator
         adx2 = ADX2(kdata, 14)
         
-        # 获取ADX2值（索引0）、+DI值（索引1）、-DI值（索引2）
+        # Get the ADX2 value (index 0), the +DI value (index 1), the -DI value (index 2)
         adx2_value = adx2.get(-1, 0)
         pdi_value = adx2.get(-1, 1)
         mdi_value = adx2.get(-1, 2)
@@ -492,124 +490,124 @@
 
 .. py:function:: AVEDEV(data[, n=22])
 
-    平均绝对偏差，求X的N日平均绝对偏差
+    The average absolute deviation, getting the N-day average absolute deviation of X
 
-    :param Indicator data: 输入数据
-    :param int|Indicator n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator n: the time window
     :rtype: Indicator
 
 
 .. py:function:: BACKSET([data, n=2])
 
-    向前赋值将当前位置到若干周期前的数据设为1。
+    The forward assignment, setting the data from the current position to several periods ago to 1.
 
-    用法：BACKSET(X,N),X非0,则将当前位置到N周期前的数值设为1。
+    Usage: BACKSET(X,N); if X is not 0, set the values from the current position to N periods ago to 1.
 
-    例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
+    For example: BACKSET(CLOSE>OPEN,2); if it closes bullish, set the values of this period and the previous period to 1, otherwise 0
 
-    :param Indicator data: 输入数据
-    :param int n|Indicator|IndParam: N周期
+    :param Indicator data: the input data
+    :param int n|Indicator|IndParam: N periods
     :rtype: Indicator
 
 
 .. py:function:: BARSCOUNT([data])
 
-    有效值周期数, 求总的周期数。
+    The number of the valid periods, getting the total number of the periods.
 
-    用法：BARSCOUNT(X)第一个有效数据到当前的天数。
+    Usage: BARSCOUNT(X), the number of the days from the first valid data to the current.
 
-    例如：BARSCOUNT(CLOSE)对于日线数据取得上市以来总交易日数，对于1分钟线取得当日交易分钟数。
+    For example: BARSCOUNT(CLOSE) gets the total number of the trading days since the listing for the daily data, and the number of the trading minutes of the day for the 1-minute line.
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: BARSLAST([data])
 
-    上一次条件成立位置 上一次条件成立到当前的周期数。
+    The position of the last time the condition was satisfied, the number of the periods from the last time the condition was satisfied to the current.
 
-    用法：BARSLAST(X): 上一次 X 不为 0 到现在的天数。
+    Usage: BARSLAST(X): the number of the days from the last time X is not 0 to now.
 
-    例如：BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) 表示上一个涨停板到当前的周期数
+    For example: BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) means the number of the periods from the last limit-up board to the current
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: BARSLASTS([data|val,] n)
 
-    第N次条件成立位置到当前的周期数。
+    The number of the periods from the Nth time the condition was satisfied to the current.
 
-    用法：BARSLASTS(X, N): 第N次 X 不为 0 到现在的天数。
+    Usage: BARSLASTS(X, N): the number of the days from the Nth time X is not 0 to now.
 
-    例如：BARSLASTS(CLOSE/REF(CLOSE,1)>=1.1, 2) 表示第2个涨停板到当前的周期数。
+    For example: BARSLASTS(CLOSE/REF(CLOSE,1)>=1.1, 2) means the number of the periods from the 2nd limit-up board to the current.
 
-    注意：当N=1时，BARSLASTS(X, 1) 等价于 BARSLAST(X)。
+    Note: when N=1, BARSLASTS(X, 1) is equivalent to BARSLAST(X).
 
-    支持动态参数，n 可以是整数、Indicator 或 IndParam。
+    It supports the dynamic parameters; n can be an integer, an Indicator or an IndParam.
 
-    使用示例::
+    Usage example::
 
-        # 静态参数
+        # The static parameter
         result = BARSLASTS(cond, 2)
         
-        # 动态参数 - 使用 CVAL
+        # The dynamic parameter - using CVAL
         result = BARSLASTS(cond, CVAL(cond, 2))
         
-        # 动态参数 - 使用 IndParam
+        # The dynamic parameter - using IndParam
         result = BARSLASTS(cond, IndParam(n_indicator))
         
-        # 动态参数 - 直接使用 Indicator
+        # The dynamic parameter - using an Indicator directly
         result = BARSLASTS(cond, n_indicator)
 
-    :param Indicator data: 输入数据（可选）
-    :param float val: 输入值（可选，与data二选一）
-    :param int|Indicator|IndParam n: 第N次条件成立，支持动态参数
+    :param Indicator data: the input data (optional)
+    :param float val: the input value (optional, choose one of data and it)
+    :param int|Indicator|IndParam n: the Nth time the condition is satisfied, supporting the dynamic parameters
     :rtype: Indicator
 
 
 .. py:function:: BARSLASTCOUNT([data])
 
-    统计连续满足条件的周期数
+    Count the number of the periods continuously satisfying the condition
 
-    用法：ARSLASTCOUNT(X)，其中X为条件表达式。
+    Usage: BARSLASTCOUNT(X), where X is a condition expression.
 
-    例如：BARSLASTCOUNT(CLOSE>OPEN)表示统计连续收阳的周期数
+    For example: BARSLASTCOUNT(CLOSE>OPEN) means counting the number of the periods continuously closing bullish
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: BARSSINCE([data])
 
-    第一个条件成立位置到当前的周期数。
+    The number of the periods from the first time the condition was satisfied to the current.
 
-    用法：BARSSINCE(X):第一次X不为0到现在的天数。
+    Usage: BARSSINCE(X): the number of the days from the first time X is not 0 to now.
 
-    例如：BARSSINCE(HIGH>10)表示股价超过10元时到当前的周期数
+    For example: BARSSINCE(HIGH>10) means the number of the periods from when the stock price exceeds 10 yuan to the current
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: BETA(ind, ref_ind[, n=10, fill_null=True])
 
-    计算 Beta 系数，如衡量资产收益与市场收益之间的敏感性。
+    Calculate the Beta coefficient, e.g. measuring the sensitivity between the asset return and the market return.
 
-    计算公式：Beta = Cov(stock_return, market_return) / Var(market_return)
+    The calculation formula: Beta = Cov(stock_return, market_return) / Var(market_return)
 
-    .. note:: BETA本身不会对输入数据进行收益率转换(pct_change)处理，
-              输入的指标应为已经计算好的收益率数据。
+    .. note:: BETA itself does not convert the input data to the return rate (pct_change);
+              the input indicator should be the already calculated return rate data.
 
-    :param Indicator ind: 输入指标，如股票收益率指标
-    :param Indicator ref_ind: 对照指标，如市场收益率指标
-    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度
-    :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
+    :param Indicator ind: the input indicator, such as the stock return indicator
+    :param Indicator ref_ind: the reference indicator, such as the market return indicator
+    :param int n: the rolling window size (greater than 2 or equal to 0), defaulting to 10. If it is 0, use the length of the input ind
+    :param bool fill_null: during the date alignment, whether to fill the missing dates with the nan values, defaulting to true
     :rtype: Indicator
 
-    **使用示例**::
+    **Usage example**::
 
-        # 计算股票相对于市场的Beta系数
+        # Calculate the Beta coefficient of the stock relative to the market
         stock_return = ROC(CLOSE(), 1)
         market_return = ROC(INDEXC(), 1)
         beta = BETA(stock_return, market_return, 60)
@@ -617,11 +615,11 @@
 
 .. py:function:: BETWEEN(a, b, c)
 
-    介于(介于两个数之间)
+    Between (between two numbers)
 
-    用法：BETWEEN(A,B,C)表示A处于B和C之间时返回1，否则返回0
+    Usage: BETWEEN(A,B,C) means that it returns 1 when A is between B and C, otherwise 0
 
-    例如：BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5))表示收盘价介于5日均线和10日均线之间
+    For example: BETWEEN(CLOSE,MA(CLOSE,10),MA(CLOSE,5)) means that the close price is between the 5-day MA and the 10-day MA
 
     :param Indicator a: A
     :param Indicator b: B
@@ -631,730 +629,729 @@
     
 .. py:function:: BLOCKSETNUM(block, query)
 
-    横向统计（返回板块股个数）, 两种调用方式:
+    The cross-sectional statistics (returning the number of the stocks in the block), with two calling ways:
 
         BLOCKSET(block, query)
         
         BLOCKSET(stks, query)
 
-    :param Block block | sequence stks: 待统计的板块 或 stock list
-    :param Query query: 统计范围
+    :param Block block | sequence stks: the block to count or a stock list
+    :param Query query: the statistics range
 
 
 .. py:function:: CLOSE([data])
    
-    获取收盘价，包装KData的收盘价成Indicator
+    Get the close price; wrap the close price of the KData as an Indicator
     
-    :param data: 输入数据（KData 或 Indicator）
+    :param data: the input data (KData or Indicator)
     :rtype: Indicator
     
     
 .. py:function:: CAPITAL(kdata)
 
-   获取流通盘（单位：万股），同 LIUTONGPAN
+   Get the circulating share capital (unit: 10,000 shares), the same as LIUTONGPAN
    
-   :param KData kdata: k线数据
+   :param KData kdata: the K-line data
    :rtype: Indicator
    
 
 .. py:function:: CEIL([data])
 
-    同  :py:func:`CEILING`
+    The same as :py:func:`CEILING`
 
    
 .. py:function:: CEILING([data])
 
-    向上舍入(向数值增大方向舍入)取整
+    Round up (rounding in the direction of increasing the value) to an integer
    
-    用法：CEILING(A)返回沿A数值增大方向最接近的整数
+    Usage: CEILING(A) returns the closest integer in the direction of increasing the value of A
    
-    例如：CEILING(12.3)求得13；CEILING(-3.5)求得-3
+    For example: CEILING(12.3) gets 13; CEILING(-3.5) gets -3
    
-    :param data: 输入数据
+    :param data: the input data
     :rtype: Indicator
    
 
 .. py:function:: CYCLE(kdata, [adjust_cycle=1], [adjust_mode='query'], [delay_to_trading_day=True])
           
-    PF调仓周期指标，主要用于PF调仓日验证，及作为SG
+    The PF position adjustment period indicator, mainly used for the PF position adjustment day verification, and as an SG
 
-    :param KData kdata: K线数据
-    :param int adjust_cycle: 调整周期
-    :param string adjust_mode: 调整方式
-    :param bool delay_to_trading_day: 调整周期是否延至交易日
+    :param KData kdata: the K-line data
+    :param int adjust_cycle: the adjustment period
+    :param string adjust_mode: the adjustment way
+    :param bool delay_to_trading_day: whether the adjustment period is postponed to the trading day
     :rtype: Indicator
 
 
 .. py:function:: CONTEXT([ind, fill_null=False, use_self_ktype=False, use_self_recover_type=False])
     
-    独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
-    例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
-    则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
+    The independent context. It uses the context that the ind comes with. When a new context is specified, it will not change the existing context.
+    For example: ind = CLOSE(k1); when a new context ind = ind(k2) is specified, the close price of k2 is used. If you still want to use the close price of k1,
+    you need to use ind = CONTEXT(CLOSE(k1)); at this time ind(k2) will still use the close price of k1.
     
-    :param Indicator ind: 指标对象
-    :param bool fill_null: 日期对齐时，缺失日期对应填充空值，否则使用前值填充。
-    :param bool use_self_ktype: 公式计算时使用自身独立上下文中的KTYPE
-    :param bool use_self_recover_type: 公式计算时使用自身独立上下文中的RECOVER_TYPE
+    :param Indicator ind: the indicator object
+    :param bool fill_null: during the date alignment, the missing dates are filled with the empty values; otherwise, they are filled with the previous values.
+    :param bool use_self_ktype: use the KTYPE in its own independent context when calculating the formula
+    :param bool use_self_recover_type: use the RECOVER_TYPE in its own independent context when calculating the formula
     :rtype: Indicator
 
 .. py:function:: CONTEXT_K(ind)
 
-    获取指标上下文。Indicator::getContext()方法获取的是当前的上下文，但对于 CONTEXT 独立上下文指标无法获取其指定的独立上下文，需用此方法获取
+    Get the indicator context. The Indicator::getContext() method gets the current context, but it cannot get the specified independent context for the CONTEXT independent context indicator; you need to use this method to get it
 
-    :param Indicator ind: 指标对象
+    :param Indicator ind: the indicator object
     :rtype: KData
 
 .. py:function:: CORR(ind1, ind2, n)
 
-    计算 ind1 和 ind2 的样本相关系数与协方差。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+    Calculate the sample correlation coefficient and the covariance of ind1 and ind2. There are two results in the return; the first is the correlation coefficient, and the second is the covariance.
 
-    :param Indicator ind1: 指标1
-    :param Indicator ind2: 指标2
-    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
+    :param Indicator ind1: the indicator 1
+    :param Indicator ind2: the indicator 2
+    :param int n: calculate the correlation coefficient of the data between the two inds by the specified length n. If it is 0, use the length of the input ind.
     :rtype: Indicator    
 
 .. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
 
-    计算 ind1 和 ind2 的样本协方差。
+    Calculate the sample covariance of ind1 and ind2.
 
-    :param Indicator ind1: 指标1
-    :param Indicator ind2: 指标2
-    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度。
-    :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
+    :param Indicator ind1: the indicator 1
+    :param Indicator ind2: the indicator 2
+    :param int n: the rolling window size (greater than 2 or equal to 0), defaulting to 10. If it is 0, use the length of the input ind.
+    :param bool fill_null: during the date alignment, whether to fill the missing dates with the nan values, defaulting to true
     :rtype: Indicator
 
 
 .. py:function:: COS([data])
 
-    余弦值
+    The cosine value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: COST(k[, x=10.0])
 
-    成本分布
+    The cost distribution
 
-    用法：COST(k, X) 表示X%获利盘的价格是多少
+    Usage: COST(k, X) means what the price of the X% profitable positions is
 
-    例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
+    For example: COST(k, 10) means what the price of the 10% profitable positions is, i.e. 10% of the positions are below this price, and the other 90% are above this price, being the trapped positions. This function is only valid for the daily analysis period.
 
-    :param KData k: 关联的K线数据
-    :param float x: x%获利价格, 0~100
+    :param KData k: the associated K-line data
+    :param float x: the x% profitable price, 0~100
     :rtype: Indicator
 
 
 .. py:function:: CODELIKE([data,] pattern)
 
-    证券代码模式匹配
+    The security code pattern matching
     
-    返回当前上下文中的证券代码是否匹配指定的模式。支持通配符匹配：
+    Return whether the security code in the current context matches the specified pattern. It supports the wildcard matching:
     
-    - ``*`` ：匹配任意长度的任意字符序列（包括空序列）
-    - ``?`` ：匹配单个任意字符
+    - ``*``: matches any sequence of any characters of any length (including the empty sequence)
+    - ``?``: matches a single arbitrary character
     
-    返回值：匹配成功返回 1.0，否则返回 0.0。所有周期的返回值相同。
+    The return value: it returns 1.0 when the match succeeds, otherwise 0.0. The return values of all the periods are the same.
     
-    使用示例::
+    Usage example::
     
-        # 匹配以"600"开头的股票代码
+        # Match the stock codes starting with "600"
         kdata = get_kdata('sh600000', Query(-10))
         result = CODELIKE(kdata, "600*")
         
-        # 匹配6位数字的股票代码
+        # Match the stock codes of 6 digits
         result = CODELIKE(kdata, "??????")
         
-        # 匹配以"000"开头且以"1"结尾的代码
+        # Match the codes starting with "000" and ending with "1"
         result = CODELIKE(kdata, "000*1")
         
-        # 精确匹配特定代码
+        # Match a specific code exactly
         result = CODELIKE(kdata, "600000")
 
-    :param KData data: K线数据（可选，当存在上下文时可省略）
-    :param str pattern: 匹配模式，支持通配符 * 和 ?
-    :return: 匹配结果指标，所有周期值相同（1.0 或 0.0）
+    :param KData data: the K-line data (optional; it can be omitted when a context exists)
+    :param str pattern: the matching pattern, supporting the wildcards * and ?
+    :return: the matching result indicator, with the same values for all the periods (1.0 or 0.0)
     :rtype: Indicator
 
 
 .. py:function:: COUNT([data, n=20])
 
-    统计满足条件的周期数。
+    Count the number of the periods satisfying the condition.
     
-    用法：COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
+    Usage: COUNT(X,N), counting the number of the periods satisfying the condition X within the N periods; if N=0, start from the first valid value.
     
-    例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
+    For example: COUNT(CLOSE>OPEN,20) means counting the number of the periods closing bullish within the 20 periods
     
-    :param Indicator data: 条件
-    :param int|Indicator|IndParam n: 周期
+    :param Indicator data: the condition
+    :param int|Indicator|IndParam n: the periods
     :rtype: Indicator
 
 
 .. py:function:: CROSS(x, y)
 
-    交叉函数
+    The cross function
 
-    :param x: 变量或常量，判断交叉的第一条线
-    :param y: 变量或常量，判断交叉的第二条线
+    :param x: the variable or the constant, the first line to judge the cross
+    :param y: the variable or the constant, the second line to judge the cross
     :rtype: Indicator
 
 
 .. py:function:: CVAL([data, value=0.0, discard=0])
 
-    data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样
+    data is an Indicator instance; create a constant indicator with the same length as data, whose value is value, and the discard length is the same as data
     
-    :param Indicator data: Indicator实例
-    :param float value: 常数值
-    :param int discard: 抛弃数量
+    :param Indicator data: the Indicator instance
+    :param float value: the constant value
+    :param int discard: the discard quantity
     :rtype: Indicator
-    
+
 
 .. py:function:: DATE([data])
 
-    取得该周期从1900以来的年月日。用法: DATE 例如函数返回1000101，表示2000年1月1日。
+    Get the year-month-day of this period since 1900. Usage: DATE, e.g. the function returns 1000101, which means January 1, 2000.
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: DAY([data])
 
-    取得该周期的日期。用法: DAY 函数返回有效值范围为(1-31)。
+    Get the date of this period. Usage: DAY, the valid value range returned by the function is (1-31).
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: DECLINE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
-    下跌家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
+    The number of the falling stocks. When a specified context exists and ignore_context is false, the query, market, stk_type parameters will be ignored.
 
-    :param Query query: 查询条件
-    :param str market: 所属市场，等于 "" 时，获取所有市场
-    :param int stk_type: 证券类型, 大于 constant.STOCKTYPE_TMP 时，获取所有类型证券
-    :param bool ignore_context: 是否忽略上下文。忽略时，强制使用 query, market, stk_type 参数。
+    :param Query query: the query condition
+    :param str market: the market it belongs to; when it equals "", get all the markets
+    :param int stk_type: the security type; when it is greater than constant.STOCKTYPE_TMP, get all the types of the securities
+    :param bool ignore_context: whether to ignore the context. When ignoring, the query, market, stk_type parameters are used forcibly.
     :rtype: Indicator
 
 
 .. py:function:: DEVSQ([data, n=10])
 
-    数据偏差平方和，求X的N日数据偏差平方和
+    The sum of the squared deviations of the data, getting the N-day sum of the squared deviations of X
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: DIFF([data, n=1])
 
-    差分指标，即data[i] - data[i-n]
+    The difference indicator, i.e. data[i] - data[i-n]
     
-    :param Indicator data: 输入数据
-    :param int n: 差分周期，默认1
+    :param Indicator data: the input data
+    :param int n: the difference period, defaulting to 1
     :rtype: Indicator
 
 
 .. py:function:: DISCARD(data, discard)
     
-    以指标公式的方式设置指标结果的丢弃数据量。
+    Set the amount of the discarded data of the indicator result in the way of the indicator formula.
 
-    :param Indicator data: 指标
-    :param int discard: 丢弃数据量
+    :param Indicator data: the indicator
+    :param int discard: the amount of the discarded data
     :rtype: Indicator
 
 
 .. py:function:: DMA(ind, a)
 
-    动态移动平均
+    The dynamic moving average
 
-    用法：DMA(X,A),求X的动态移动平均。
+    Usage: DMA(X,A), getting the dynamic moving average of X.
 
-    算法：若Y=DMA(X,A) 则 Y=A*X+(1-A)*Y',其中Y'表示上一周期Y值。
+    The algorithm: if Y=DMA(X,A), then Y=A*X+(1-A)*Y', where Y' represents the Y value of the previous period.
 
-    例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
+    For example: DMA(CLOSE,VOL/CAPITAL) means getting the average price with the turnover rate as the smoothing factor
 
-    :param Indicator ind: 输入数据
-    :param Indicator a: 动态系数
+    :param Indicator ind: the input data
+    :param Indicator a: the dynamic coefficient
     :rtype: Indicator
 
 
 .. py:function:: DROPNA([data])
 
-    删除 nan 值
+    Remove the nan values
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: DOWNNDAY(data[, n=3])
 
-    连跌周期数, DOWNNDAY(CLOSE,M)表示连涨M个周期
+    The number of the consecutive falling periods; DOWNNDAY(CLOSE,M) means M consecutive falling periods
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
     
 .. py:function:: EMA([data, n=22])
 
-    指数移动平均线(Exponential Moving Average)
+    The Exponential Moving Average
 
-    :param data: 输入数据
-    :param int|Indciator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
+    :param data: the input data
+    :param int|Indciator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
     :rtype: Indicator
     
 
 .. py:function:: EVERY([data, n=20])
 
-    一直存在
+    Always exists
 
-    用法：EVERY (X,N) 表示条件X在N周期一直存在
+    Usage: EVERY (X,N) means that the condition X always exists within the N periods
 
-    例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
+    For example: EVERY(CLOSE>OPEN,10) means that all the previous 10 days are the bullish candles
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
+    :param data: the input data
+    :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
     :rtype: Indicator
 
 
 .. py:function:: EXIST([data, n=20])
 
-    存在, EXIST(X,N) 表示条件X在N周期有存在
+    Exists; EXIST(X,N) means that the condition X exists within the N periods
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
+    :param data: the input data
+    :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
     :rtype: Indicator
 
 
 .. py:function:: EXP([data])
 
-    EXP(X)为e的X次幂
+    EXP(X) is e to the power of X
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: FACTOR(factor)
 
-    因子指标转换
+    The factor indicator conversion
 
-    将Factor对象转换为Indicator，使其可以在指标系统中使用。
-    该指标需要设置K线上下文才能进行计算。
+    Convert a Factor object to an Indicator, so that it can be used in the indicator system.
+    This indicator needs to set the K-line context to calculate.
 
-    :param Factor factor: 因子对象（与name二选一）
-    :param str name: 因子名称（便捷版本，与factor二选一）
+    :param Factor factor: the factor object (choose one of name and it)
+    :param str name: the factor name (the convenient version, choose one of factor and it)
     :rtype: Indicator
 
 
 .. py:function:: FIXED_START_INDEX([ind, start_index=0])
 
-    固定指标计算时使用的查询范围的起始索引
+    Fix the start index of the query range used when calculating the indicator
 
-    对某些随时间起点变化的指标（如 AD），固定起始索引确保从股票第一条数据开始计算。
+    For some indicators that change with the time start point (such as AD), fixing the start index ensures the calculation from the first data of the stock.
 
-    :param Indicator ind: 输入指标
-    :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
+    :param Indicator ind: the input indicator
+    :param int start_index: the start index position, defaulting to 0; when it is negative, it means starting the calculation from the time point moved forward by index from the current latest
     :rtype: Indicator
 
 
 .. py:function:: FIXED_START_DATE([ind, start_date=Datetime.min()])
 
-    固定指标计算时使用的查询范围的起始日期
+    Fix the start date of the query range used when calculating the indicator
 
-    对某些随时间起点变化的指标（如 AD），固定起始日期确保从指定日期开始计算。
+    For some indicators that change with the time start point (such as AD), fixing the start date ensures the calculation from the specified date.
 
-    :param Indicator ind: 输入指标
-    :param Datetime start_date: 起始日期，默认为 Datetime.min()
+    :param Indicator ind: the input indicator
+    :param Datetime start_date: the start date, defaulting to Datetime.min()
     :rtype: Indicator
 
 
 .. py:function:: FILTER([data, n=5])
 
-    信号过滤, 过滤连续出现的信号。
+    The signal filter, filtering the signals that appear consecutively.
 
-    用法：FILTER(X,N): X 满足条件后，删除其后 N 周期内的数据置为 0。
+    Usage: FILTER(X,N): after X satisfies the condition, delete the data within the following N periods, setting them to 0.
 
-    例如：FILTER(CLOSE>OPEN,5) 查找阳线，5 天内再次出现的阳线不被记录在内。
+    For example: FILTER(CLOSE>OPEN,5) searches for the bullish candles, and the bullish candles appearing again within 5 days are not recorded.
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 过滤周期
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the filter period
     :rtype: Indicator
 
 
 .. py:function:: FINANCE([kdata, ix, name])
 
-    获取历史财务信息。（可通过 StockManager.get_history_finance_all_fields 查询相应的历史财务字段信息）
+    Get the historical finance information. (The corresponding historical finance field information can be queried through StockManager.get_history_finance_all_fields)
 
-    ix, name 使用时，为二选一。即要不使用 ix，要不就使用 name 进行获取。
+    When ix and name are used, choose one of them. That is, either use ix or use name to get.
 
-    :param KData kdata: K线数据
-    :param int ix: 历史财务信息字段索引
-    :param int name: 历史财务信息字段名称
+    :param KData kdata: the K-line data
+    :param int ix: the historical finance information field index
+    :param int name: the historical finance information field name
     :rtype: Indicator
 
 
 .. py:function:: FLOOR([data])
 
-    向下舍入(向数值减小方向舍入)取整
+    Round down (rounding in the direction of decreasing the value) to an integer
     
-    用法：FLOOR(A)返回沿A数值减小方向最接近的整数
+    Usage: FLOOR(A) returns the closest integer in the direction of decreasing the value of A
     
-    例如：FLOOR(12.3)求得12
+    For example: FLOOR(12.3) gets 12
 
-    :param data: 输入数据
+    :param data: the input data
     :rtype: Indicator
 
 .. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积计数
+    The custom group cumulative counting
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator        
 
 .. py:function:: GROUP_MAX(ind[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积最大值
+    The custom group cumulative maximum
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator        
 
 .. py:function:: GROUP_MIN(ind[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积计录最小值
+    The custom group cumulative minimum
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator        
 
 .. py:function:: GROUP_PROD(ind[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积乘积
+    The custom group cumulative product
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator
 
 .. py:function:: GROUP_SUM(ind[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积和
+    The custom group cumulative sum
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator    
 
 .. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
       
-    自定义分组累积计算指标。
+    The custom group cumulative calculation indicator.
     
-    示例, 计算日线时聚合分钟线收盘价的和:
+    Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
       >>> ind = GROUP_FUNC(CLOSE(), lambda dates, data: data/2.0)
       >>> ind(k)
 
-    :param Indicator ind: 待计算指标
-    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param callable group_func: the custom group cumulative function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the cumulative calculation result with the same length as the input; the type must also be np.array
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator    
 
 
 .. py:function:: HHV([data, n=20])
 
-    N日内最高价，N=0则从第一个有效值开始。
+    The highest price within the N days; when N=0, start from the first valid value.
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: N日时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
     
 
 .. py:function:: HHVBARS([data, n=20])
 
-    上一高点位置 求上一高点到当前的周期数。
+    The position of the previous high point, getting the number of the periods from the previous high point to the current.
 
-    用法：HHVBARS(X,N):求N周期内X最高值到当前周期数N=0表示从第一个有效值开始统计
+    Usage: HHVBARS(X,N): getting the number of the periods from the highest value of X within the N periods to the current; N=0 means counting from the first valid value
 
-    例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
+    For example: HHVBARS(HIGH,0) gets the number of the periods from the historical new high to the current
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: N日时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
     
 .. py:function:: HIGH([data])
 
-    获取最高价，包装KData的最高价成Indicator
+    Get the high price; wrap the high price of the KData as an Indicator
 
-    :param data: 输入数据（KData 或 Indicator） 
+    :param data: the input data (KData or Indicator) 
     :rtype: Indicator
     
     
 .. py:function:: HOUR([data])
 
-    取得该周期的小时数。用法：HOUR 函数返回有效值范围为(0-23)，对于日线及更长的分析周期值为0。
+    Get the number of the hours of this period. Usage: HOUR, the valid value range returned by the function is (0-23), and the value is 0 for the daily and the longer analysis periods.
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: HSL(kdata)
 
-    获取换手率(百分比 x%)，等于 VOL(k) / CAPITAL(k)
+    Get the turnover rate (the percentage x%), equal to VOL(k) / CAPITAL(k)
     
-    :param KData kdata: k线数据
+    :param KData kdata: the K-line data
     :rtype: Indicator
     
 .. py:function:: IC(ind, stks[, n=1, spearman=True, strict=True])
 
-    计算指定的因子相对于参考证券的 IC （默认为 RankIC）
+    Calculate the IC of the specified factor relative to the reference securities (the RankIC by default)
 
-    IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-    天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-    如需严格“t 时刻因子值→t+1 时刻收益“计算，请设置 strict=True (注意此模式下, 后n位为 NA)
+    The IC originally needs "the factor value at time t → the return at time t+1"; it is changed to calculate "the factor value at time t → the return of the previous N days at time t" (e.g. the return of the past 5 days), and it is called the "current IC". (Otherwise the current values would all be missing NA)
+    If the strict "the factor value at time t → the return at time t+1" calculation is needed, please set strict=True (note that in this mode, the last n positions are NA)
     
-    :param sequence or Block stks: 证券组合
-    :param int n: 时间窗口(对应的 n 日收益率)
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param bool strict: 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”
+    :param sequence or Block stks: the securities portfolio
+    :param int n: the time window (the corresponding n-day return)
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param bool strict: the strict mode, following the IC definition "the factor value at time t → the return at time t+1"
     :rtype: Indicator
 
 
 .. py:function:: ICIR(ind, stks[, n=1, rolling_n=120, spearman=True])
 
-    计算 IC 因子 IR = IC的多周期均值/IC的标准方差
+    Calculate the IC factor IR = the multi-period average of the IC / the standard deviation of the IC
 
-    :param sequence or Block stks: 证券组合
-    :param int n: 时间窗口(对应的 n 日收益率)
-    :param int rolling_n: 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson  
-    :param bool strict: 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”  
+    :param sequence or Block stks: the securities portfolio
+    :param int n: the time window (the corresponding n-day return)
+    :param int rolling_n: the rolling period
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson  
+    :param bool strict: the strict mode, following the IC definition "the factor value at time t → the return at time t+1"  
     :rtype: Indicator
 
 
 .. py:function:: IR(p, b[, n=100])
 
-    信息比率（Information Ratio，IR）
+    The Information Ratio (IR)
 
-    公式: (P-B) / TE
-    P: 组合收益率
-    B: 比较基准收益率
-    TE: 投资周期中每天的 p 和 b 之间的标准差
-    实际使用时，P 一般为 TM 的资产曲线，B 为沪深 3000 收盘价，如:
+    The formula: (P-B) / TE
+    P: the portfolio return
+    B: the benchmark return
+    TE: the standard deviation between p and b of each day within the investment period
+    In actual use, P is generally the asset curve of the TM, and B is the close price of the CSI 300, e.g.:
     ref_k = sm["sh000300"].get_kdata(query)
     funds = my_tm.get_funds_curve(ref_k.get_datetime.list())
     ir = IR(PRICELIST(funds), ref_k.close, 0)
 
-    如果希望计算因子 IC 的 IR 值，请使用 ICIR 指标
+    If you want to calculate the IR value of the factor IC, please use the ICIR indicator
 
     :param Indicator p:
     :param Indicator b:
-    :param int n: 时间窗口（默认100），如果只想使用最后的值，可以使用 0, 或 len(p),len(b) 指定
+    :param int n: the time window (defaulting to 100); if you only want to use the last value, you can use 0, or specify len(p), len(b)
     :rtype: Indicator
 
     
 .. py:function:: IF(x, a, b)
 
-    条件函数, 根据条件求不同的值。
+    The condition function, getting the different values according to the condition.
     
-    用法：IF(X,A,B)若X不为0则返回A,否则返回B
+    Usage: IF(X,A,B); if X is not 0, return A, otherwise return B
     
-    例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
+    For example: IF(CLOSE>OPEN,HIGH,LOW) means that if this period closes bullish, return the highest value, otherwise return the lowest value
     
-    :param Indicator x: 条件指标
-    :param Indicator a: 待选指标 a
-    :param Indicator b: 待选指标 b
+    :param Indicator x: the condition indicator
+    :param Indicator a: the candidate indicator a
+    :param Indicator b: the candidate indicator b
     :rtype: Indicator
     
 
 .. py:function:: INBLOCK(data, category, name)        
 
-    当前上下文证券是否在指定的板块中。
+    Whether the security of the current context is in the specified block.
 
-    :param KData data: 指定的K线数据(上下文)
-    :param string category: 板块类别
-    :param string name: 板块名称
+    :param KData data: the specified K-line data (the context)
+    :param string category: the block category
+    :param string name: the block name
     :rtype: Indicator
 
 
 .. py:function:: INDEXC([kdata])
     
-    返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指
+    Return the corresponding market close prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXH([kdata])
     
-    返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指
+    Return the corresponding market high prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXL([kdata])
 
-    返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指
+    Return the corresponding market low prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXO([kdata])
     
-    返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指
+    Return the corresponding market open prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXA([kdata])
     
-    返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指
+    Return the corresponding market amounts, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXV([kdata])
 
-    返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指
+    Return the corresponding market volumes, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXADV([query])
     
-    通达信 880005 大盘上涨家数, 可能无法盘中更新!
+    The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
 
 
 .. py:function:: INDEXDEC([query])
     
-    通达信 880005 大盘下跌家数, 可能无法盘中更新!
+    The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
 
 
 .. py:function:: INSUM(block, query, ind, mode)
 
-    返回板块各成分该指标相应输出按计算类型得到的计算值.
+    Return the calculated values of the corresponding outputs of this indicator of each component in the block by the calculation type.
 
-    注意: INSUM使用模式4/5时相当于RANK功能, 但不适合在MF中使用, 在 MF 中使用时计算量为 N x N 级别, 计算缓慢。如果希望在 MF 中使用，建议直接使用 RANK[捐赠用户] 指标。
+    Note: when the INSUM uses the modes 4/5, it is equivalent to the RANK function, but it is not suitable for use in the MF; when used in the MF, the calculation amount is at the N x N level, calculating slowly. If you want to use it in the MF, it is recommended to use the RANK [Donating user] indicator directly.
 
-    用法:
+    Usage:
     
         INSUM(block, query, ind, mode)
 
         INSUM(stks, query, ind, mode)
 
-    :param Block block | sequence stks: 指定板块 或 证券列表
-    :param Query query: 指定范围
-    :param Indicator ind: 指定指标
-    :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名(指标值最高的排名为1), 5-升序排名(指标值越高排名值越高)
+    :param Block block | sequence stks: the specified block or the security list
+    :param Query query: the specified range
+    :param Indicator ind: the specified indicator
+    :param int mode: the calculation type: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-descending ranking (the highest indicator value is ranked 1), 5-ascending ranking (the greater the indicator value, the greater the ranking value)
     :rtype: Indicator    
 
 
 .. py:function:: INTPART([data])
 
-    取整(绝对值减小取整，即取得数据的整数部分)
+    Take the integer part (rounding by decreasing the absolute value, i.e. getting the integer part of the data)
     
-    :param data: 输入数据
+    :param data: the input data
     :rtype: Indicator
 
 
 .. py:function:: ISNA(ind[, ignore_discard=False])
 
-    判断指标是否为 nan 值，若为 nan 值, 则返回1, 否则返回0.
+    Judge whether the indicator is a nan value; if it is a nan value, return 1, otherwise return 0.
 
-    :param Indicator ind: 指定指标
-    :param bool ignore_discard: 忽略指标丢弃数据
+    :param Indicator ind: the specified indicator
+    :param bool ignore_discard: ignore the discarded data of the indicator
 
 
 .. py:function:: ISLIMITDOWN([kdata])
 
-    判断股票是否跌停指标
+    The indicator judging whether the stock is the limit down
 
-    根据不同股票类型判断当日收盘价是否达到跌停板价格：
+    Judge whether the close price of the day reaches the limit-down price according to the different stock types:
     
-    - A股普通股票：跌停幅度为10%
-    - 北交所股票：跌停幅度为30%  
-    - 创业板/科创板股票：跌停幅度为20%
-    - ST股票跌停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
+    - The ordinary A-share stocks: the limit-down range is 10%
+    - The Beijing Stock Exchange stocks: the limit-down range is 30%  
+    - The ChiNext/STAR Market stocks: the limit-down range is 20%
+    - The ST stocks have a limit-down range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
-    跌停判断逻辑：当日收盘价 <= 前一日收盘价 × (1 - 跌停幅度)
+    The limit-down judgement logic: the close price of the day <= the close price of the previous day × (1 - the limit-down range)
 
-    :param KData kdata: K线数据
+    :param KData kdata: the K-line data
     :rtype: Indicator
 
 
 .. py:function:: ISLIMITUP([kdata])
 
-    判断股票是否涨停指标
+    The indicator judging whether the stock is the limit up
 
-    根据不同股票类型判断当日收盘价是否达到涨停板价格：
+    Judge whether the close price of the day reaches the limit-up price according to the different stock types:
     
-    - A股普通股票：涨停幅度为10%
-    - 北交所股票：涨停幅度为30%
-    - 创业板/科创板股票：涨停幅度为20%
-    - ST股票涨停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
+    - The ordinary A-share stocks: the limit-up range is 10%
+    - The Beijing Stock Exchange stocks: the limit-up range is 30%
+    - The ChiNext/STAR Market stocks: the limit-up range is 20%
+    - The ST stocks have a limit-up range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
-    涨停判断逻辑：当日收盘价 >= 前一日收盘价 × (1 + 涨停幅度)
+    The limit-up judgement logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
 
-    :param KData kdata: K线数据
+    :param KData kdata: the K-line data
     :rtype: Indicator
 
 
 .. py:function:: ISINF(ind)
 
-    判断指标是否为正无穷大 (+inf) 值，若为 +inf 值, 则返回1, 否则返回0。如判断负无穷大, 使用 ISINFA。
+    Judge whether the indicator is a positive infinity (+inf) value; if it is a +inf value, return 1, otherwise return 0. To judge the negative infinity, use ISINFA.
 
-    :param Indicator ind: 指定指标
+    :param Indicator ind: the specified indicator
     :rtype: Indicator
 
 
 .. py:function:: ISINFA(ind)
 
-    判断指标是否为负无穷大 (-inf) 值，若为 -inf 值, 则返回1, 否则返回0。如判断正无穷大, 使用 ISINF。
+    Judge whether the indicator is a negative infinity (-inf) value; if it is a -inf value, return 1, otherwise return 0. To judge the positive infinity, use ISINF.
 
-    :param Indicator ind: 指定指标
+    :param Indicator ind: the specified indicator
     :rtype: Indicator
 
 
 .. py:function:: JUMPDOWN([ind])
 
-    边缘跳变，从小于等于0.0，跳变到 > 0.0
+    The edge jump, jumping from <= 0.0 to > 0.0
     
-    :param Indicator ind: 指标
+    :param Indicator ind: the indicator
     :rtype: Indicator
 
 
 .. py:function:: JUMPUP([ind])
     
-    边缘跳变，从大于0.0，跳变到 <= 0.0
+    The edge jump, jumping from > 0.0 to <= 0.0
     
-    :param Indicator ind: 指标
+    :param Indicator ind: the indicator
     :rtype: Indicator
 
 
 .. py:function:: KALMAN(ind, [q=0.01], [r=0.1])
 
-    Kalman滤波器, 用于平滑指标, 可设置平滑系数q和r, 默认q=0.01, r=0.1
+    The Kalman filter, used to smooth the indicator; the smoothing coefficients q and r can be set, defaulting to q=0.01, r=0.1
 
-    :param Indicator ind: 指标
-    :param float q: 平滑系数
-    :param float r: 噪声系数
+    :param Indicator ind: the indicator
+    :param float q: the smoothing coefficient
+    :param float r: the noise coefficient
     :rtype: Indicator
 
     
 .. py:function:: KDATA([data])
 
-    包装KData成Indicator，用于其他指标计算
+    Wrap the KData as an Indicator, used for the calculation of the other indicators
 
-    :param data: KData 或 具有6个返回结果的Indicator（如KDATA生成的Indicator）
+    :param data: the KData or an Indicator with 6 returned results (such as the Indicator generated by KDATA)
     :rtype: Indicator
 
     
 .. py:function:: KDATA_PART([data, kpart])
 
-    根据字符串选择返回指标KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL，如:KDATA_PART("CLOSE")等同于CLOSE()
+    Select and return the indicator KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL by the string, e.g.: KDATA_PART("CLOSE") is equivalent to CLOSE()
 
-    :param data: 输入数据（KData 或 Indicator） 
+    :param data: the input data (KData or Indicator) 
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :rtype: Indicator
 
 
 .. py:function:: KDJ(kdata[, n=9, m12=3, m2=3])
 
-    经典 KDJ 随机指标
+    The classic KDJ stochastic indicator
 
-    :param KData kdata: 关联的K线数据
+    :param KData kdata: the associated K-line data
     :param int n:
     :param int m1:
     :param int m2:
@@ -1362,80 +1359,80 @@
 
 .. py:function:: LIUTONGPAN(kdata)
 
-   获取流通盘（单位：万股），同 CAPITAL
+   Get the circulating share capital (unit: 10,000 shares), the same as CAPITAL
    
-   :param KData kdata: k线数据
+   :param KData kdata: the K-line data
    :rtype: Indicator
 
 
 .. py:function:: LAST([data, m=10, n=5])
 
-    区间存在。
+    Exists in the interval.
 
-    用法：LAST (X,M,N) 表示条件 X 在前 M 周期到前 N 周期存在。
+    Usage: LAST (X,M,N) means that the condition X exists from the previous M periods to the previous N periods.
 
-    例如：LAST(CLOSE>OPEN,10,5) 表示从前10日到前5日内一直阳线。
+    For example: LAST(CLOSE>OPEN,10,5) means the bullish candles from the previous 10 days to the previous 5 days.
 
-    :param data: 输入数据
-    :param int m: m周期
-    :param int n: n周期
+    :param data: the input data
+    :param int m: m periods
+    :param int n: n periods
     :rtype: Indicator
 
 
 .. py:function:: LASTVALUE(ind, [ignore_discard=False])
 
-    等同于通达信CONST指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
+    Equivalent to the TDX CONST indicator. Take the last value of the input indicator as a constant, i.e. all the values in the result are the last value of the input indicator; use with caution. It contains a look-ahead function; use with caution.
 
-    :param Indicator ind: 指标
-    :param bool ignore_discard: 忽略指标丢弃数据
+    :param Indicator ind: the indicator
+    :param bool ignore_discard: ignore the discarded data of the indicator
     :rtype: Indicator
 
 
 .. py:function:: LLV([data, n=20])
 
-    N日内最低价，N=0则从第一个有效值开始。
+    The lowest price within the N days; when N=0, start from the first valid value.
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: N日时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
 
 
 .. py:function:: LLVBARS([data, n=20])
 
-    上一低点位置 求上一低点到当前的周期数。
+    The position of the previous low point, getting the number of the periods from the previous low point to the current.
     
-    用法：LLVBARS(X,N):求N周期内X最低值到当前周期数N=0表示从第一个有效值开始统计
+    Usage: LLVBARS(X,N): getting the number of the periods from the lowest value of X within the N periods to the current; N=0 means counting from the first valid value
     
-    例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
+    For example: LLVBARS(HIGH,20) gets the number of the periods from the 20-day lowest point to the current
     
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: N日时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
 
 
 .. py:function:: LN([data])
 
-    求自然对数, LN(X)以e为底的对数
+    Get the natural logarithm; LN(X) is the logarithm with the base e
 
-    :param data: 输入数据
+    :param data: the input data
     :rtype: Indicator
 
 
 .. py:function:: LOG([data])
 
-    以10为底的对数
+    The logarithm with the base 10
 
-    :param data: 输入数据
+    :param data: the input data
     :rtype: Indicator
 
 
 .. py:function:: LONGCROSS(a, b[, n=3])
 
-    两条线维持一定周期后交叉
+    The two lines cross after maintaining for a certain period
 
-    用法：LONGCROSS(A,B,N)表示A在N周期内都小于B，本周期从下方向上穿过B时返 回1，否则返回0
+    Usage: LONGCROSS(A,B,N) means that A is less than B within the N periods, and it returns 1 when A crosses B upward from below in this period, otherwise 0
 
-    例如：LONGCROSS(MA(CLOSE,5),MA(CLOSE,10),5)表示5日均线维持5周期后与10日均线交金叉
+    For example: LONGCROSS(MA(CLOSE,5),MA(CLOSE,10),5) means that the 5-day MA is maintained for 5 periods and then crosses the 10-day MA in a golden cross
 
     :param Indicator a:
     :param Indicator b:
@@ -1445,39 +1442,39 @@
     
 .. py:function:: LOW([data])
 
-    获取最低价，包装KData的最低价成Indicator
+    Get the low price; wrap the low price of the KData as an Indicator
     
-    :param data: 输入数据（KData 或 Indicator） 
+    :param data: the input data (KData or Indicator) 
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: MA([data, n=22])
 
-    简单移动平均
+    The simple moving average
     
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
-
     
+
 .. py:function:: MACD([data, n1=12, n2=26, n3=9])
 
-    平滑异同移动平均线
+    The Moving Average Convergence Divergence
     
-    :param Indicator data: 输入数据
-    :param int n1: 短期EMA时间窗
-    :param int n2: 长期EMA时间窗
-    :param int n3: （短期EMA-长期EMA）EMA平滑时间窗
-    :rtype: 具有三个结果集的 Indicator
+    :param Indicator data: the input data
+    :param int n1: the short-term EMA time window
+    :param int n2: the long-term EMA time window
+    :param int n3: the EMA smoothing time window of (the short-term EMA - the long-term EMA)
+    :rtype: an Indicator with three result sets
 
-    * result(0): MACD_BAR：MACD直柱，即MACD快线－MACD慢线
-    * result(1): DIFF: 快线,即（短期EMA-长期EMA）
-    * result(2): DEA: 慢线，即快线的n3周期EMA平滑
+    * result(0): MACD_BAR: the MACD bar, i.e. the MACD fast line - the MACD slow line
+    * result(1): DIFF: the fast line, i.e. (the short-term EMA - the long-term EMA)
+    * result(2): DEA: the slow line, i.e. the n3-period EMA smoothing of the fast line
 
 
 .. py:function:: MAX(ind1, ind2)
 
-    求最大值, MAX(A,B)返回A和B中的较大值。
+    Get the maximum value; MAX(A,B) returns the greater value of A and B.
     
     :param Indicator ind1: A
     :param Indicator ind2: B
@@ -1486,24 +1483,24 @@
 
 .. py:function:: MDD([ind, n=0])
 
-    最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
+    The maximum drawdown percentage (when n=0, there is no time window limit), which is a positive value by the industry convention
 
 
 .. py:function:: MDD_CURRENT([data])
 
-    当前点到历史最高点的回撤百分比，按行业惯例为正值
+    The drawdown percentage from the current point to the historical highest point, which is a positive value by the industry convention
     
-    计算公式：(历史最高点 - 当前值) / 历史最高点 * 100%
+    The calculation formula: (the historical highest point - the current value) / the historical highest point * 100%
     
-    与 MDD 的区别：MDD 计算的是到指定窗口内最高点的回撤，而 MDD_CURRENT 计算的是到从序列起始点到当前点的历史最高点的回撤，不设时间窗口限制。
+    The difference from MDD: what the MDD calculates is the drawdown to the highest point within the specified window, while what the MDD_CURRENT calculates is the drawdown to the historical highest point from the start point of the sequence to the current point, without a time window limit.
     
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: MIN(ind1, ind2)
 
-    求最小值, MIN(A,B)返回A和B中的较小值。
+    Get the minimum value; MIN(A,B) returns the smaller value of A and B.
     
     :param Indicator ind1: A
     :param Indicator ind2: B
@@ -1512,19 +1509,19 @@
 
 .. py:function:: MINUTE([data])
 
-    取得该周期的分钟数。用法：MINUTE 函数返回有效值范围为(0-59)，对于日线及更长的分析周期值为0。
+    Get the number of the minutes of this period. Usage: MINUTE, the valid value range returned by the function is (0-59), and the value is 0 for the daily and the longer analysis periods.
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: MOD(ind1, ind2)
 
-    取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符
+    Get the modulus after taking the integer. This function is only for the TDX compatibility. In fact, the modulus of the indicators can be obtained directly with the % operator
 
-    用法：MOD(A,B)返回A对B求模
+    Usage: MOD(A,B) returns the modulus of A by B
 
-    例如：MOD(26,10) 返回 6
+    For example: MOD(26,10) returns 6
 
     :param Indicator ind1:
     :param Indicator ind2:
@@ -1533,287 +1530,287 @@
 
 .. py:function:: MONTH([data])
 
-    取得该周期的月份。用法: MONTH 函数返回有效值范围为(1-12)。
+    Get the month of this period. Usage: MONTH, the valid value range returned by the function is (1-12).
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: MRR([ind, n=0])
 
-    最大盈利百分比(和MDD向对应的相反方向计算)
+    The maximum profit percentage (calculated in the opposite direction corresponding to MDD)
 
 
 .. py:function:: NAMELIKE([data,] pattern)
 
-    证券名称模式匹配
+    The security name pattern matching
     
-    返回当前上下文中的证券名称是否匹配指定的模式。支持通配符匹配：
+    Return whether the security name in the current context matches the specified pattern. It supports the wildcard matching:
     
-    - ``*`` ：匹配任意长度的任意字符序列（包括空序列）
-    - ``?`` ：匹配单个任意字符
+    - ``*``: matches any sequence of any characters of any length (including the empty sequence)
+    - ``?``: matches a single arbitrary character
     
-    返回值：匹配成功返回 1.0，否则返回 0.0。所有周期的返回值相同。
+    The return value: it returns 1.0 when the match succeeds, otherwise 0.0. The return values of all the periods are the same.
     
-    使用示例::
+    Usage example::
     
-        # 匹配以"上证"开头的指数名称
+        # Match the index names starting with "上证"
         kdata = get_kdata('sh000001', Query(-10))
         result = NAMELIKE(kdata, "上证*")
         
-        # 匹配包含"指数"的名称
+        # Match the names containing "指数"
         result = NAMELIKE(kdata, "*指数*")
         
-        # 匹配4个字符的名称
+        # Match the names of 4 characters
         result = NAMELIKE(kdata, "????")
         
-        # 精确匹配特定名称
+        # Match a specific name exactly
         result = NAMELIKE(kdata, "上证指数")
 
-    :param KData data: K线数据（可选，当存在上下文时可省略）
-    :param str pattern: 匹配模式，支持通配符 * 和 ?
-    :return: 匹配结果指标，所有周期值相同（1.0 或 0.0）
+    :param KData data: the K-line data (optional; it can be omitted when a context exists)
+    :param str pattern: the matching pattern, supporting the wildcards * and ?
+    :return: the matching result indicator, with the same values for all the periods (1.0 or 0.0)
     :rtype: Indicator
 
 
 .. py:function:: NDAY(x, y[, n=3])
 
-    连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
+    Consecutively greater; NDAY(X,Y,N) means that the condition X>Y persists for N periods
 
     :param Indicator x:
     :param Indicator y:
-    :param int n: 时间窗口
+    :param int n: the time window
     :rtype: Indicator
 
 
 .. py:function:: NOT([data])
 
-    求逻辑非。NOT(X)返回非X,即当X<=0时返回1，否则返回0。
+    Get the logical negation. NOT(X) returns the negation of X, i.e. it returns 1 when X<=0, otherwise 0.
     
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
     
     
 .. py:function:: OPEN([data])
 
-    获取开盘价，包装KData的开盘价成Indicator
+    Get the open price; wrap the open price of the KData as an Indicator
     
-    :param data: 输入数据（KData 或 Indicator） 
+    :param data: the input data (KData or Indicator) 
     :rtype: Indicator
 
 
 .. py:function:: POW(data, n)
 
-    乘幂
+    The power
     
-    用法：POW(A,B)返回A的B次幂
+    Usage: POW(A,B) returns A to the power of B
     
-    例如：POW(CLOSE,3)求得收盘价的3次方
+    For example: POW(CLOSE,3) gets the 3rd power of the close price
     
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 幂
+    :param data: the input data
+    :param int|Indicator|IndParam n: the power
     :rtype: Indicator
 
 
 .. py:function:: SIGNED_POWER(data, n)
 
-    带符号乘幂
+    The signed power
     
-    用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
+    Usage: SIGNED_POWER(A,B) returns A to the power of B, but keeping the original sign
     
-    例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
+    For example: SIGNED_POWER(CLOSE,3) gets the 3rd power of the close price, keeping the original sign
     
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 幂
+    :param data: the input data
+    :param int|Indicator|IndParam n: the power
     :rtype: Indicator
 
 
 .. py:function:: PRICELIST([data=None, discard=0, align_dates=None])
     
-    将 list、tuple、Indicator 转化为普通的 Indicator
+    Convert a list, a tuple or an Indicator to an ordinary Indicator
     
-    :param sequence data: 输入数据
-    :param int discard: 丢弃前多少个数据
-    :param sequence align_dates: 对齐日期列表，如果为空则不进行对齐
+    :param sequence data: the input data
+    :param int discard: how many data to discard at the front
+    :param sequence align_dates: the aligned date list; if it is empty, no alignment is performed
     :rtype: Indicator
 
 
 .. py:function:: RANK(stks, ref_ind[, mode = 0, fill_null = true, market = 'SH'])
 
-    计算指标值在指定板块中的排名
+    Calculate the ranking of the indicator value in the specified block
 
-    :param stks: 指定证券列表 或 Block
-    :param ref_ind: 参考指标
-    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比, 4-降序排名百分比(0~1), 5-升序排名百分比(0~1)
-    :param fill_null: 是否填充缺失值
-    :param market: 板块所属市场
-    :return: 指标值在指定板块中的排名
+    :param stks: the specified security list or Block
+    :param ref_ind: the reference indicator
+    :param mode: the sorting way: 0-descending ranking (the highest indicator value is ranked 1), 1-ascending ranking (the greater the indicator value, the greater the ranking value), 2-the descending ranking percentage, 3-the ascending ranking percentage, 4-the descending ranking percentage (0~1), 5-the ascending ranking percentage (0~1)
+    :param fill_null: whether to fill the missing values
+    :param market: the market the block belongs to
+    :return: the ranking of the indicator value in the specified block
     :rtype: Indicator
-
  
+
 .. py:function:: REF([data, n])
 
-    向前引用 （即右移），引用若干周期前的数据。
+    The forward reference (i.e. shifting right), referencing the data several periods ago.
     
-    用法：REF(X，A)　引用A周期前的X值。
+    Usage: REF(X,A) references the value of X A periods ago.
     
-    :param Indicator data: 输入数据
-    :param int n: 引用n周期前的值，即右移n位
+    :param Indicator data: the input data
+    :param int n: reference the value n periods ago, i.e. shifting right by n positions
     :rtype: Indicator
 
 
 .. py:function:: REFX(n: int)
 
-    REF增强(勿用于回测), 用于获取指标中第n个周期的值, n为正数时从当前周期向前数, 为负数时从当前周期向后数。
+    The enhancement of REF (do not use it for backtesting), used to get the value of the nth period in the indicator; when n is positive, count forward from the current period; when it is negative, count backward from the current period.
 
-    注意：此函数属于未来函数, 不应被用于回测, 主要用于AI等需要获取未来数据的场景。
+    Note: this function belongs to the look-ahead function and should not be used for backtesting; it is mainly used for the scenarios that need to get the future data, such as AI.
 
-    :param Indicator ind: 指标
-    :param int n: 周期数    
+    :param Indicator ind: the indicator
+    :param int n: the number of the periods    
 
 
 .. py:function:: RECOVER_BACKWARD([data])
 
-    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行后向复权
+    Perform the backward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
-    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
 
 
 .. py:function:: RECOVER_FORWARD([data])
 
-    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行前向复权
+    Perform the forward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
-    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
 
 
 .. py:function:: RECOVER_EQUAL_BACKWARD([data])
 
-    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比后向复权
+    Perform the equal-ratio backward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
-    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
 
 
 .. py:function:: RECOVER_EQUAL_FORWARD([data])
 
-    对输入的指标数据 (CLOSE|OPEN|HIGH|LOW) 进行等比前向复权
+    Perform the equal-ratio forward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
-    :param Indicator|KData data: 只接受 CLOSE|OPEN|HIGH|LOW 指标，或 KData（此时默认使用 KData 的收盘价）
+    :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
 
 
 .. py:function:: REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False])
           
-    替换指标中指定值，默认为替换 nan 值为 0.0。
+    Replace the specified values in the indicator, defaulting to replacing the nan values with 0.0.
 
-    :param Indicator ind: 指定指标
-    :param double old_value: 指定值
-    :param double new_value: 替换值
-    :param bool ignore_discard: 忽略指标丢弃数据
+    :param Indicator ind: the specified indicator
+    :param double old_value: the specified value
+    :param double new_value: the replacement value
+    :param bool ignore_discard: ignore the discarded data of the indicator
     :rtype: Indicator
 
 
 .. py:function:: RESULT(data, result_ix)
 
-    以公式指标的方式返回指定指标中的指定结果集
+    Return the specified result set in the specified indicator in the way of the formula indicator
 
-    :param Indicator data: 指定的指标
-    :param int result_ix: 指定的结果集
+    :param Indicator data: the specified indicator
+    :param int result_ix: the specified result set
     :rtype: Indicator
 
 
 .. py:function:: REVERSE([data])
 
-    求相反数，REVERSE(X)返回-X
+    Get the opposite number; REVERSE(X) returns -X
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: ROC([data, n=10])
 
-    变动率指标: ((price / prevPrice)-1)*100
+    The rate of change indicator: ((price / prevPrice)-1)*100
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: ROCP([data, n=10])
 
-    变动率指标: (price - prevPrice) / prevPrice
+    The rate of change indicator: (price - prevPrice) / prevPrice
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: ROCR([data, n=10])
 
-    变动率指标: (price / prevPrice)
+    The rate of change indicator: (price / prevPrice)
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: ROCR100([data, n=10])
 
-    变动率指标: (price / prevPrice) * 100
+    The rate of change indicator: (price / prevPrice) * 100
 
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: RSRS_BULL([kdata, n=20, m=60])
 
-    RSRS 右偏标准分指标（层级4），基于光大研报进阶版修正 RSRS。
+    The RSRS right-skewed standard score indicator (level 4), based on the advanced version of the RSRS corrected by the Everbright research report.
 
-    在修正标准分（Z × R²）基础上再乘一次原始 β，放大多头强势区间的分值、压缩空头弱势分值，专门做多择时用。
+    On the basis of the corrected standard score (Z × R²), it is multiplied by the original β once again, amplifying the scores in the strong bull zone and compressing the scores in the weak bear zone, specifically for the long timing.
 
-    **计算层次**：
+    **The calculation layers**:
     
-    1. **层次1（β）**：滚动 N 日 OLS 回归计算 β 值，公式：High = α + β · Low
-    2. **层次2（Z）**：滚动 M 日 Z-score 标准化，解决不同阶段 β 中枢漂移问题
-    3. **层次3（修正标准分）**：Z × R²，R² 为回归拟合优度，过滤拟合差的噪音
-    4. **层次4（右偏修正）**：Z × R² × β，放大多头强势区间
+    1. **Level 1 (β)**: calculate the β value with the rolling N-day OLS regression, with the formula: High = α + β · Low
+    2. **Level 2 (Z)**: the rolling M-day Z-score standardization, solving the problem of the β center drifting in the different stages
+    3. **Level 3 (the corrected standard score)**: Z × R², where R² is the regression goodness of fit, filtering the noise with the poor fitting
+    4. **Level 4 (the right-skewed correction)**: Z × R² × β, amplifying the strong bull zone
 
-    :param KData kdata: K线数据
-    :param int n: 回归窗口，默认为20
-    :param int m: Z-score窗口，默认为60
+    :param KData kdata: the K-line data
+    :param int n: the regression window, defaulting to 20
+    :param int m: the Z-score window, defaulting to 60
     :rtype: Indicator
 
-    **返回结果**：
+    **The returned results**:
 
-    * result(0): 层级4修正值（右偏修正 = Z × R² × β）
-    * result(1): β 值（回归斜率）
-    * result(2): R² 值（回归拟合优度）
-    * result(3): Z 值（Z-score 标准化值）
+    * result(0): the level 4 corrected value (the right-skewed correction = Z × R² × β)
+    * result(1): the β value (the regression slope)
+    * result(2): the R² value (the regression goodness of fit)
+    * result(3): the Z value (the Z-score standardized value)
 
-    **使用示例**::
+    **Usage example**::
 
-        # 获取K线数据
+        # Get the K-line data
         kdata = get_kdata('sh000001', Query(-1000))
         
-        # 计算RSRS_BULL指标（默认n=20, m=60）
+        # Calculate the RSRS_BULL indicator (defaulting to n=20, m=60)
         bull = RSRS_BULL(kdata)
         
-        # 获取层级4修正值（结果集0）
+        # Get the level 4 corrected value (the result set 0)
         bull_value = bull.get(-1, 0)
         
-        # 获取 β 值（结果集1）
+        # Get the β value (the result set 1)
         beta = bull.get(-1, 1)
         
-        # 获取 R² 值（结果集2）
+        # Get the R² value (the result set 2)
         r2 = bull.get(-1, 2)
         
-        # 获取 Z 值（结果集3）
+        # Get the Z value (the result set 3)
         z_score = bull.get(-1, 3)
         
-        # 只有当 R² > 0.8 时，指标才有效
+        # The indicator is valid only when R² > 0.8
         if r2 > 0.8:
             print(f"有效 RSRS_BULL 值: {bull_value}")
         else:
@@ -1822,440 +1819,440 @@
 
 .. py:function:: RSRS_BETA([kdata, n=20])
 
-    原始 RSRS（底层 β）指标，基于滚动N日OLS回归。
+    The original RSRS (the underlying β) indicator, based on the rolling N-day OLS regression.
 
-    每根K线贡献一个坐标点 (Low[i], High[i])，使用滚动窗口内的N个点进行OLS回归。
-    公式：High = α + β · Low
+    Each K-line contributes a coordinate point (Low[i], High[i]), and the N points within the rolling window are used for the OLS regression.
+    The formula: High = α + β · Low
 
-    β 为最原始的 RSRS 斜率，代表支撑阻力强弱。
-    缺陷：不同行情区间 β 中枢波动大，不能跨时段直接对比。
+    β is the most original RSRS slope, representing the strength of the support and the resistance.
+    The defect: the β center fluctuates greatly in the different market ranges, and it cannot be compared directly across the time periods.
 
-    :param KData kdata: K线数据
-    :param int n: 滚动窗口，默认为20
+    :param KData kdata: the K-line data
+    :param int n: the rolling window, defaulting to 20
     :rtype: Indicator
 
-    **计算原理**：
+    **The calculation principle**:
     
-    1. 每根K线取自身的最低价 Low[i] 和最高价 High[i]，形成坐标点 (Low[i], High[i])
-    2. 使用滚动窗口内的N个点进行OLS线性回归，拟合直线 High = α + β · Low
-    3. β 值即为回归斜率，反映支撑阻力的强弱程度
+    1. Take the lowest price Low[i] and the highest price High[i] of each K-line itself, forming the coordinate point (Low[i], High[i])
+    2. Use the N points within the rolling window to perform the OLS linear regression, fitting the line High = α + β · Low
+    3. The β value is the regression slope, reflecting the strength of the support and the resistance
 
-    **使用示例**::
+    **Usage example**::
 
-        # 获取K线数据
+        # Get the K-line data
         kdata = get_kdata('sh000001', Query(-200))
         
-        # 计算RSRS_BETA指标（默认n=20）
+        # Calculate the RSRS_BETA indicator (defaulting to n=20)
         rsrs_beta = RSRS_BETA(kdata)
         
-        # 计算RSRS_BETA指标（自定义窗口大小）
+        # Calculate the RSRS_BETA indicator (a custom window size)
         rsrs_beta = RSRS_BETA(kdata, 10)
 
 
 .. py:function:: ROUND([data, ndigits=2])
 
-    四舍五入
+    Round half up
 
-    :param data: 输入数据
-    :param int ndigits: 保留的小数点后位数
+    :param data: the input data
+    :param int ndigits: the number of the decimal places to keep
     :rtype: Indicator
 
 
 .. py:function:: ROUNDDOWN([data, ndigits=2])
 
-    向下截取，如10.1截取后为10
+    Round down, e.g. 10.1 becomes 10 after rounding
 
-    :param data: 输入数据
-    :param int ndigits: 保留的小数点后位数
+    :param data: the input data
+    :param int ndigits: the number of the decimal places to keep
     :rtype: Indicator
 
 
 .. py:function:: ROUNDUP([data, ndigits=2])
 
-    向上截取，如10.1截取后为11
+    Round up, e.g. 10.1 becomes 11 after rounding
 
-    :param data: 输入数据
-    :param int ndigits: 保留的小数点后位数
+    :param data: the input data
+    :param int ndigits: the number of the decimal places to keep
     :rtype: Indicator
 
 
 .. py:function:: RSI([data, n=14])
 
-    相对强弱指标
+    The Relative Strength Index
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
     
 
 .. py:function:: SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
-    亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_
+    The Alexander Elder safety zone stop line, see [BOOK2]_
     
-    计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+    The calculation description: within the lookback period (generally 10 to 20 days), sum all the lengths of the downward penetrations and divide by the number of the downward penetrations to get the average noise (i.e. the total length of all the lowest prices below the lowest price of the previous day within the lookback period divided by the number of the times), and subtract (the average noise of the previous day multiplied by a multiple) from the lowest price of today to get the stop line. To offset the fluctuation and ensure the upward movement of the stop line, take the highest value within the N days (generally 3 days) on the basis of the above result
 
-    :param Indicator data: 输入数据
-    :param int n1: 计算平均噪音的回溯时间窗口
-    :param int n2: 对初步止损线去n2日内的最高值
-    :param float p: 噪音系数
+    :param Indicator data: the input data
+    :param int n1: the lookback time window for calculating the average noise
+    :param int n2: take the highest value within the n2 days for the preliminary stop line
+    :param float p: the noise coefficient
     :rtype: Indicator
     
 
 .. py:function:: SIN([data])
 
-    正弦值
+    The sine value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: SGN([data])
 
-    求符号值, SGN(X)，当 X>0, X=0, X<0分别返回 1, 0, -1。
+    Get the sign value; SGN(X) returns 1, 0, -1 when X>0, X=0, X<0 respectively.
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: SLICE(data, start, end, result_index=-1)
 
-    获取某指标中指定范围 [start, end) 的数据，生成新的指标
+    Get the data of the specified range [start, end) in an indicator, generating a new indicator
 
-    :param Indicator|sequence data: 输入数据
-    :param int start: 起始位置
-    :param int end: 终止位置（不包含本身）
-    :param int result_index: 原输入数据中的结果集, 默认小于0时表示全部结果集
+    :param Indicator|sequence data: the input data
+    :param int start: the start position
+    :param int end: the end position (exclusive)
+    :param int result_index: the result set in the original input data; when it is less than 0 by default, it means all the result sets
 
 
 .. py:function:: SLOPE(data, n=22)
 
-    计算线性回归斜率、拟合优度R²和相对最大残差，N支持变量
+    Calculate the linear regression slope, the goodness of fit R² and the relative maximum residual; N supports the variables
 
-    :param Indicator|sequence data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator|sequence data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
-    **结果集**：
+    **The result sets**:
 
-    * result(0): 斜率
-    * result(1): 拟合优度 R²
-    * result(2): 相对最大残差 RelMaxRes = max|yi - ŷi| / ȳ
+    * result(0): the slope
+    * result(1): the goodness of fit R²
+    * result(2): the relative maximum residual RelMaxRes = max|yi - ŷi| / ȳ
 
-    **相对最大残差说明**：
+    **The explanation of the relative maximum residual**:
 
-    * 分子：窗口内最大绝对残差（保证没有点严重远离回归线）
-    * 分母：窗口 y 均值（消除股价量纲，百分比含义）
-    * 指标越小 = 整段所有 K 线都紧贴回归线
+    * The numerator: the maximum absolute residual within the window (guaranteeing that no point is far away from the regression line)
+    * The denominator: the average of y within the window (eliminating the price dimension, with the percentage meaning)
+    * The smaller the indicator = all the K-lines of the whole segment are close to the regression line
 
-    **判定阈值举例**：
+    **The examples of the judgement thresholds**:
 
-    * RelMaxRes < 0.03：最远 K 线偏离均价不足 3%，全部点位贴合回归线
+    * RelMaxRes < 0.03: the farthest K-line deviates from the average price by less than 3%, and all the points are close to the regression line
 
 
 .. py:function:: SMA([data, n=22, m=2])
 
-    求移动平均
+    Get the moving average
 
-    用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
+    Usage: if Y=SMA(X,N,M), then Y=[M*X+(N-M)*Y')/N, where Y' represents the Y value of the previous period
     
-    :param Indicator data: 输入数据
-    :param int n: 时间窗口
-    :param float m: 系数
+    :param Indicator data: the input data
+    :param int n: the time window
+    :param float m: the coefficient
     :rtype: Indicator
 
 
 .. py:function:: SPEARMAN(ind1, ind2, n)
 
-    Spearman 相关系数
+    The Spearman correlation coefficient
 
-    :param Indicator ind1: 输入参数1
-    :param Indicator ind2: 输入参数2
-    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
+    :param Indicator ind1: the input parameter 1
+    :param Indicator ind2: the input parameter 2
+    :param int n: the rolling window (greater than 2 or equal to 0); when it is equal to 0, it means that n actually uses the length of the ind
 
 
 .. py:function:: SKEW([data, n=10])
 
-    计算N周期内未调整的总体偏度
+    Calculate the unadjusted population skewness within the N periods
 
-    :param Indicator data: 输入数据
-    :param int n: N日时间窗口（大于等于3或等于0），等于0时使用输入的data实际长度
+    :param Indicator data: the input data
+    :param int n: the N-day time window (greater than or equal to 3 or equal to 0); when it is equal to 0, use the actual length of the input data
     :rtype: Indicator
 
 
 .. py:function:: KURT([data, n=10])
 
-    计算N周期内的超额峰度（未调整的总体峰度 - 3）
+    Calculate the excess kurtosis within the N periods (the unadjusted population kurtosis - 3)
 
-    超额峰度（Excess Kurtosis）是衡量数据分布峰态的指标，用于描述数据分布的尾部厚度。
-    正态分布的超额峰度为0。正的超额峰度表示分布比正态分布有更厚的尾部（尖峰厚尾），
-    负的超额峰度表示分布比正态分布有更薄的尾部（平峰薄尾）。
+    The Excess Kurtosis is an indicator measuring the kurtosis of the data distribution, used to describe the tail thickness of the data distribution.
+    The excess kurtosis of the normal distribution is 0. A positive excess kurtosis means that the distribution has a thicker tail than the normal distribution (leptokurtic),
+    and a negative excess kurtosis means that the distribution has a thinner tail than the normal distribution (platykurtic).
 
-    :param Indicator data: 输入数据
-    :param int n: N日时间窗口（大于等于4或等于0），等于0时使用输入的data实际长度
+    :param Indicator data: the input data
+    :param int n: the N-day time window (greater than or equal to 4 or equal to 0); when it is equal to 0, use the actual length of the input data
     :rtype: Indicator
 
 
 .. py:function:: SQRT([data])
 
-    开平方
+    Take the square root
 
-    用法：SQRT(X)为X的平方根
+    Usage: SQRT(X) is the square root of X
 
-    例如：SQRT(CLOSE)收盘价的平方根
+    For example: SQRT(CLOSE) is the square root of the close price
 
-    :param data: 输入数据
+    :param data: the input data
     :rtype: Indicator
 
 
 .. py:function:: STD([data, n=10])
 
-    计算N周期内样本标准差
+    Calculate the sample standard deviation within the N periods
     
-    :param Indicator data: 输入数据
-    :param int n|Indicator|IndParam: 时间窗口
+    :param Indicator data: the input data
+    :param int n|Indicator|IndParam: the time window
     :rtype: Indicator
 
 
 .. py:function:: STDEV([data, n=10])
 
-    计算N周期内样本标准差
+    Calculate the sample standard deviation within the N periods
     
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
     
 
 .. py:function:: STDP([data, n=10])
 
-    总体标准差，STDP(X,N)为X的N日总体标准差
+    The population standard deviation; STDP(X,N) is the N-day population standard deviation of X
     
-    :param data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: STKTYPE([k])
 
-    获取股票类型指标
+    Get the stock type indicator
 
-    返回当前股票的类型值（StockType枚举值）
+    Return the type value (the StockType enumeration value) of the current stock
 
-    示例::
+    Example::
 
-        # 使用默认上下文
+        # Use the default context
         stktype = STKTYPE()
         
-        # 指定K线数据
+        # Specify the K-line data
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(0, 100))
         stktype = STKTYPE(kdata)
 
-    :param KData k: K线数据上下文
+    :param KData k: the K-line data context
     :rtype: Indicator
 
 
 .. py:function:: SUM([data, n=20])
 
-    求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
+    Get the total sum. SUM(X,N), counting the total sum of X within the N periods; when N=0, start from the first valid value.
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: SUMBARS([data,] a)
 
-    累加到指定周期数, 向前累加到指定值到现在的周期数
+    Accumulate to the specified number of the periods, the number of the periods from accumulating forward to the specified value until now
 
-    用法：SUMBARS(X,A):将X向前累加直到大于等于A,返回这个区间的周期数
+    Usage: SUMBARS(X,A): accumulate X forward until it is greater than or equal to A, returning the number of the periods of this interval
 
-    例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
+    For example: SUMBARS(VOL,CAPITAL) gets the number of the periods from a complete turnover to now
 
-    :param Indicator data: 输入数据
-    :param float|Indicator|IndParam a: 指定累加和
+    :param Indicator data: the input data
+    :param float|Indicator|IndParam a: the specified accumulated sum
     :rtype: Indicator
 
 
 .. py:function:: TAN([data])
 
-    正切值
+    The tangent value
 
-    :param Indicator data: 输入数据
+    :param Indicator data: the input data
     :rtype: Indicator
 
 
 .. py:function:: TIME([data])
 
-    取得该周期的时分秒。用法: TIME 函数返回有效值范围为(000000-235959)。
+    Get the hour-minute-second of this period. Usage: TIME, the valid value range returned by the function is (000000-235959).
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: TIMELINE([k])
 
-    分时价格数据
+    The time-line price data
 
-    :param KData k: 上下文
+    :param KData k: the context
     :rtype: Indicator
     
 
 .. py:function:: TIMELINEVOL([k])
 
-    分时成交量数据
+    The time-line volume data
 
-    :param KData k: 上下文
+    :param KData k: the context
     :rtype: Indicator
 
 
 .. py:function:: TR([kdata])
 
-    真实波动幅度(TR)是以下三个值中的最大值:
-    1. 当前周期最高价与最低价之差
-    2. 当前周期最高价与前一周期收盘价之差的绝对值
-    3. 当前周期最低价与前一周期收盘价之差的绝对值
+    The true range (TR) is the maximum of the following three values:
+    1. The difference between the high price and the low price of the current period
+    2. The absolute value of the difference between the high price of the current period and the close price of the previous period
+    3. The absolute value of the difference between the low price of the current period and the close price of the previous period
 
-    :param KData kdata: K线数据
+    :param KData kdata: the K-line data
     :rtype: Indicator
 
 
 .. py:function:: TS_RANK([data, n=20])
 
-    时间序列排名，计算当前值在过去N个周期内的排名比例（Alpha101）
+    The time series ranking, calculating the ranking ratio of the current value within the past N periods (Alpha101)
 
-    用法：TS_RANK(X,N)，表示X在过去N个周期内的排名（从1到N）除以N。
-    例如：TS_RANK(CLOSE,20)表示收盘价在过去20个周期内的排名比例。
+    Usage: TS_RANK(X,N) means the ranking of X within the past N periods (from 1 to N) divided by N.
+    For example: TS_RANK(CLOSE,20) means the ranking ratio of the close price within the past 20 periods.
 
-    Alpha101中的定义：
+    The definition in Alpha101:
     TS_RANK(x, n) = (rank of x in the last n observations) / n
-    其中rank为升序排名，即较小的值排名靠前，输出为0～1的百分位值。
+    where the rank is the ascending ranking, i.e. the smaller values are ranked higher, and the output is the percentile value of 0~1.
 
-    该指标是单只股票在时间轴上的滚动排名，用于衡量当前值在历史序列中的相对位置。
+    This indicator is the rolling ranking of a single stock on the time axis, used to measure the relative position of the current value in the historical sequence.
 
-    :param Indicator data: 待计算的数据
-    :param int n: 周期数，默认20
+    :param Indicator data: the data to calculate
+    :param int n: the number of the periods, defaulting to 20
     :rtype: Indicator
 
 
 .. py:function:: UPNDAY(data[, n=3])
 
-    连涨周期数, UPNDAY(CLOSE,M)表示连涨M个周期
+    The number of the consecutive rising periods; UPNDAY(CLOSE,M) means M consecutive rising periods
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: VAR([data, n=10])
 
-    估算样本方差, VAR(X,N)为X的N日估算样本方差
+    The estimated sample variance; VAR(X,N) is the N-day estimated sample variance of X
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: VARP([data, n=10])
 
-    总体样本方差, VARP(X,N)为X的N日总体样本方差
+    The population sample variance; VARP(X,N) is the N-day population sample variance of X
 
-    :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 
 .. py:function:: VIGOR([kdata, n=2])
 
-    亚历山大.艾尔德力度指数 [BOOK2]_
+    The Alexander Elder force index [BOOK2]_
     
-    计算公式：（收盘价今－收盘价昨）＊成交量今
+    The calculation formula: (the close price today - the close price yesterday) * the volume today
     
-    :param KData data: 输入数据
-    :param int n: EMA平滑窗口
+    :param KData data: the input data
+    :param int n: the EMA smoothing window
     :rtype: Indicator
-   
+    
     
 .. py:function:: VOL([data])
 
-    获取成交量，包装KData的成交量成Indicator
+    Get the volume; wrap the volume of the KData as an Indicator
 
-    :param data: 输入数据（KData 或 Indicator）
+    :param data: the input data (KData or Indicator)
     :rtype: Indicator
 
 
 .. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
-    将最多6个Indicator的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    Combine the results of at most 6 Indicators together in one Indicator. E.g. ind = WEAVE(ind1, ind2), then ind contains the multiple results at this time, stored in the order of ind1 and ind2.
     
-    :param Indicator ind1: 指标1
-    :param Indicator ind2: 指标2
-    :param Indicator ind3: 指标3, 可省略
-    :param Indicator ind4: 指标4, 可省略
-    :param Indicator ind5: 指标5, 可省略
-    :param Indicator ind6: 指标6, 可省略
+    :param Indicator ind1: the indicator 1
+    :param Indicator ind2: the indicator 2
+    :param Indicator ind3: the indicator 3, which can be omitted
+    :param Indicator ind4: the indicator 4, which can be omitted
+    :param Indicator ind5: the indicator 5, which can be omitted
+    :param Indicator ind6: the indicator 6, which can be omitted
     :rtype: Indicator
 
 
 .. py:function:: WEEK([data])
 
-    取得该周期的星期数。用法：WEEK 函数返回有效值范围为(0-6)，0表示星期天。
+    Get the day of the week of this period. Usage: WEEK, the valid value range returned by the function is (0-6), and 0 means Sunday.
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: WINNER([ind])
     
-    获利盘比例
+    The profitable position ratio
 
-    用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
+    Usage: WINNER(CLOSE) means the ratio of the profitable positions sold at the current closing price.
 
-    例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
+    For example: returning 0.1 means 10% of the profitable positions; WINNER(10.5) means the ratio of the profitable positions at the price of 10.5 yuan
 
-    该函数仅对日线分析周期有效，且仅对存在流通盘权息数据的证券有效，对指数、基金等无效。
+    This function is only valid for the daily analysis period, and only for the securities with the circulating share capital dividend data; it is invalid for the indexes, the funds, etc.
 
 
 .. py:function:: WITHKTYPE([ind, ktype, fill_null=False])
 
-    将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+    Convert the indicator data to the specified K-line type. The related convenience functions: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator
 
 
 .. py:function:: YEAR([data])
 
-    取得该周期的年份。
+    Get the year of this period.
 
-    :param data: 输入数据 KData
+    :param data: the input data KData
     :rtype: Indicator
 
 
 .. py:function:: ZHBOND10([data, default_val])
 
-    获取10年期中国国债收益率
+    Get the 10-year Chinese treasury bond yield
 
-    :param DatetimeList|KDate|Indicator data: 输入的日期参考，优先使用上下文中的日期
-    :param float default_val: 如果输入的日期早于已有国债数据的最早记录，则使用此默认值
+    :param DatetimeList|KDate|Indicator data: the input date reference, preferring the dates in the context
+    :param float default_val: if the input date is earlier than the earliest record of the existing treasury bond data, this default value is used
 
 
 .. py:function:: ZONGGUBEN([data])
 
-   获取总股本（单位：万股）
+   Get the total share capital (unit: 10,000 shares)
 
-   :param KData kdata: k线数据
+   :param KData kdata: the K-line data
    :rtype: Indicator    
 
 
 .. py:function:: ZSCORE([data, out_extreme, nsigma, recursive])
 
-    对数据进行标准化（归一），可选进行极值排除
+    Standardize (normalize) the data, with the optional outlier exclusion
 
-    注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
+    Note: it is not a window rolling; if the standardization with the window rolling is needed, just use (x - MA(x, n)) / STDEV(x, n).
     
-    :param Indicator data: 待剔除异常值的数据
-    :param bool outExtreme: 指示剔除极值，默认 False
-    :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma ,默认 3.0
-    :param bool recursive: 是否进行递归剔除极值, 默认 False
+    :param Indicator data: the data from which the outliers are to be removed
+    :param bool outExtreme: indicate removing the extreme values, defaulting to False
+    :param float nsigma: the multiple of sigma used when removing the extreme values, defaulting to 3.0
+    :param bool recursive: whether to remove the extreme values recursively, defaulting to False
     :rtype: Indicator
