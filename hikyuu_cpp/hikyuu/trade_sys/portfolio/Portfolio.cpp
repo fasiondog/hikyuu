@@ -1,7 +1,7 @@
 /*
  * Portfolio.cpp
  *
- *  Created on: 2016年2月21日
+ *  Created on: 2016-2-21
  *      Author: fasiondog
  */
 
@@ -60,20 +60,22 @@ Portfolio::Portfolio(const string& name, const TradeManagerPtr& tm, const Select
 Portfolio::~Portfolio() {}
 
 void Portfolio::initParam() {
-    setParam<int>("adjust_cycle", 1);          // 调仓周期
-    setParam<string>("adjust_mode", "query");  // 调仓模式
+    setParam<int>("adjust_cycle", 1);          // Position adjustment cycle
+    setParam<string>("adjust_mode", "query");  // Position adjustment mode
 
-    // 延迟至交易日，当调仓日为非交易日时，自动延迟至下一个交易日作为调仓日
+    // Delay to a trading day: when the adjustment day is not a trading day it is delayed
+    // automatically to the next trading day
     setParam<bool>("delay_to_trading_day", true);
 
-    setParam<bool>("trace", false);      // 打印跟踪
-    setParam<int>("trace_max_num", 10);  // 打印跟踪时，显示当前持仓证券最大数量
+    setParam<bool>("trace", false);      // Print the trace
+    setParam<int>("trace_max_num", 10);  // Max held securities shown when printing the trace
 }
 
 void Portfolio::baseCheckParam(const string& name) const {
     if ("adjust_mode" == name || "adjust_cycle" == name) {
         if (!haveParam("adjust_mode") || !haveParam("adjust_cycle")) {
-            // 同时判断两个参数时，可能一个参数还未设定
+            // When the two parameters are judged at the same time, one of them may not have been
+            // set yet
             return;
         }
         string adjust_mode = getParam<string>("adjust_mode");
@@ -371,7 +373,7 @@ void Portfolio::_calculateAdjustDateOnModeDelayToTradingDay(int adjust_cycle, co
 }
 
 void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust) {
-    // 当前日期小于账户建立日期，直接忽略
+    // The current date is earlier than the account creation date, ignore it directly
     HKU_IF_RETURN(date < m_tm->initDatetime(), void());
 
     bool trace = getParam<bool>("trace");
@@ -387,7 +389,7 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
         HKU_INFO("{}: {}", htr("[PF] current running system size"), m_running_sys_set.size());
     }
 
-    // 开盘前，调整账户权息
+    // Adjust the ex-rights/ex-dividend data of the account before the open
     m_tm->updateWithWeight(date);
 
     _runMomentOnOpen(date, nextCycle, adjust);
@@ -396,7 +398,7 @@ void Portfolio::runMoment(const Datetime& date, const Datetime& nextCycle, bool 
     _runMomentOnClose(date, nextCycle, adjust);
     traceMomentTMAfterRunAtClose(date);
 
-    // 跟踪打印当前账户资产
+    // Print the current account assets for the trace
     if (trace) {
         FundsRecord funds = m_tm->getFunds(date, m_query.kType());
         HKU_INFO("[PF] {}: {:.2f}, {}: {:<.2f}, {}: {:<.2f}", htr("total asset"),
@@ -441,7 +443,7 @@ void Portfolio::traceMomentTMAfterRunAtOpen(const Datetime& date) {
     HKU_IF_RETURN(!getParam<bool>("trace") || m_running_sys_set.empty(), void());
 
     //----------------------------------------------------------------------
-    // 跟踪打印持仓情况
+    // Print the position for the trace
     //----------------------------------------------------------------------
     // clang-format off
     HKU_INFO("+------------+------------+------------+--------------+--------------+");
@@ -476,7 +478,7 @@ void Portfolio::traceMomentTMAfterRunAtClose(const Datetime& date) {
     HKU_IF_RETURN(!getParam<bool>("trace") || m_running_sys_set.empty(), void());
 
     //----------------------------------------------------------------------
-    // 跟踪打印持仓情况
+    // Print the position for the trace
     //----------------------------------------------------------------------
     // clang-format off
     HKU_INFO("+------------+------------+------------+--------------+--------------+-------------+-------------+");

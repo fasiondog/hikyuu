@@ -11,7 +11,7 @@ namespace hku {
 FixedAmountFunds::FixedAmountFunds() : AllocateFundsBase("AF_FixedAmount") {
     setParam<double>("amount", 20000);
 
-    // 公共参数必须设置为 false，禁止自动调整权重
+    // The common parameter must be set to false, the automatic weight adjustment is forbidden
     setParam<bool>("auto_adjust_weight", false);
 }
 
@@ -28,11 +28,12 @@ void FixedAmountFunds::_checkParam(const string& name) const {
 }
 
 SystemWeightList FixedAmountFunds ::_allocateWeight(const Datetime& date,
-                                                            const SystemWeightList& se_list) {
-    
+                                                    const SystemWeightList& se_list) {
     const auto& q = getQuery();
-    FundsRecord funds = getTM()->getFunds(date, q.kType());  // 总资产从总账户获取
-    price_t total_funds = funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+    FundsRecord funds =
+      getTM()->getFunds(date, q.kType());  // The total assets come from the total account
+    price_t total_funds =
+      funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
 
     price_t t_cash = funds.cash;
     SystemWeightList result;
@@ -42,7 +43,7 @@ SystemWeightList FixedAmountFunds ::_allocateWeight(const Datetime& date,
             break;
         }
 
-        double w = amount/total_funds;
+        double w = amount / total_funds;
         result.emplace_back(iter->sys, w);
         t_cash -= amount;
     }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  */
 
@@ -16,7 +16,7 @@ namespace hku {
 FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_FixedWeight") {
     setParam<double>("weight", 0.1);
 
-    // 公共参数必须设置为 false，禁止自动调整权重
+    // The common parameter must be set to false, the automatic weight adjustment is forbidden
     setParam<bool>("auto_adjust_weight", false);
 }
 

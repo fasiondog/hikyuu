@@ -16,14 +16,14 @@ namespace hku {
 FixedWeightListAllocateFunds::FixedWeightListAllocateFunds()
 : AllocateFundsBase("AF_FixedWeightList") {
     setParam<PriceList>("weights", PriceList());
-    // 公共参数必须设置为 false，禁止自动调整权重
+    // The common parameter must be set to false, the automatic weight adjustment is forbidden
     setParam<bool>("auto_adjust_weight", false);
 }
 
 FixedWeightListAllocateFunds::FixedWeightListAllocateFunds(const PriceList& weights)
 : AllocateFundsBase("AF_FixedWeightList") {
     setParam<PriceList>("weights", weights);
-    // 公共参数必须设置为 false，禁止自动调整权重
+    // The common parameter must be set to false, the automatic weight adjustment is forbidden
     setParam<bool>("auto_adjust_weight", false);
 }
 
