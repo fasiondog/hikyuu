@@ -234,7 +234,7 @@ private:
  * <pre>
  * KData{
  *   size : 738501
- *   stock: Stock(SH, 000001, 上证指数, 指数, 1, 1990-Dec-19 00:00:00, +infinity),
+ *   stock: Stock(SH, 000001, Shanghai Composite Index, Index, 1, 1990-Dec-19 00:00:00, +infinity),
  *   query: KQuery(0, 99999999999, INDEX, MIN, NO_RECOVER)
  *  }
  * </pre>
