@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Hikyuu documentation build configuration file (Chinese source tree).
+# Hikyuu documentation build configuration file (English source tree).
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -40,7 +40,7 @@ source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
-language = 'zh_CN'
+language = 'en'
 exclude_patterns = []
 pygments_style = 'sphinx'
 todo_include_todos = False
@@ -54,7 +54,7 @@ html_css_files = [
 ]
 
 html_use_index = True
-html_search_language = 'zh'
+html_search_language = 'en'
 htmlhelp_basename = 'Hikyuudoc'
 
 needs_sphinx = '4.2.0'
