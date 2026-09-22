@@ -45,19 +45,20 @@ public:
 }  // namespace rap
 
 /**
- * 通用共享资源池 - 适用于协程环境
- * 使用 boost 无锁队列，在协程中异步获取资源
+ * General shared resource pool - it is suitable for the coroutine environment
+ * It uses the boost lock free queue and acquires the resources asynchronously in a coroutine
  * @ingroup Utilities
  *
- * @tparam ResourceType 资源类型，必须支持构造函数 ResourceType(const Parameter&)
- * @tparam MutexType 互斥锁类型，默认为 std::mutex（线程安全）
+ * @tparam ResourceType the resource type, it must support the constructor
+ * ResourceType(const Parameter&)
+ * @tparam MutexType the mutex type, std::mutex by default (thread safe)
  */
 template <typename ResourceType, typename MutexType = std::mutex>
 class ResourceAsioPool {
 private:
     struct WaiterNode {
         std::shared_ptr<net::steady_timer> timer;
-        ResourceType *reserved_resource = nullptr;  // 预留的资源指针
+        ResourceType *reserved_resource = nullptr;  // The reserved resource pointer
         WaiterNode() = default;
     };
 
@@ -67,9 +68,9 @@ public:
     ResourceAsioPool &operator=(const ResourceAsioPool &) = delete;
 
     /**
-     * 构造函数
-     * @param param 连接参数
-     * @param max_count 最大资源上限，0 表示无限制
+     * Constructor
+     * @param param connection parameters
+     * @param max_count the maximum resource upper limit, 0 means unlimited
      */
     explicit ResourceAsioPool(const Parameter &param, size_t max_count = 128,
                               size_t max_waiters = 1000)
@@ -90,24 +91,24 @@ public:
     }
 
     /**
-     * 析构函数，释放所有缓存的资源
+     * Destructor, it releases all the cached resources
      */
     virtual ~ResourceAsioPool() {
-        // 标记正在析构，阻止新的资源获取和归还
+        // Mark that it is being destructed, preventing new resource acquisitions and returns
         m_is_destroying.store(true, std::memory_order_release);
 
-        // 取消并清理所有等待者
+        // Cancel and clean up all the waiters
         WaiterNode *waiter = nullptr;
         while (m_waiterQueue.pop(waiter)) {
             if (waiter) {
-                // 尝试取消定时器，判断协程是否还在等待
+                // Try to cancel the timer to judge whether the coroutine is still waiting
                 std::size_t cancelled_ops = 0;
                 if (waiter->timer) {
                     cancelled_ops = waiter->timer->cancel();
                 }
 
-                // 只有成功取消时，才安全删除预留资源
-                // 如果 cancel 返回 0，说明协程可能已经醒来并使用该资源
+                // Only on a successful cancel is it safe to delete the reserved resource
+                // If cancel returns 0, the coroutine may have woken up and used the resource
                 if (cancelled_ops > 0 && waiter->reserved_resource) {
                     delete waiter->reserved_resource;
                     m_count.fetch_sub(1);
@@ -117,15 +118,15 @@ public:
             }
         }
 
-        // 等待所有活跃资源归还
-        // 当 m_count == m_idleCount 时，说明所有资源都已归还到空闲队列
+        // Wait for all the active resources to be returned
+        // When m_count == m_idleCount all the resources have been returned to the idle queue
         std::unique_lock<MutexType> lock(m_destroy_mutex);
         m_destroy_cv.wait(lock, [this]() {
             return m_count.load(std::memory_order_relaxed) ==
                    m_idleCount.load(std::memory_order_relaxed);
         });
 
-        // 此时所有资源都在空闲队列中，释放它们
+        // At this time all the resources are in the idle queue, release them
         ResourceType *p = nullptr;
         while (m_resourceList.pop(p)) {
             if (p) {
@@ -134,28 +135,31 @@ public:
         }
     }
 
-    /** 资源实例指针类型 */
+    /** Resource instance pointer type */
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 同步获取可用资源（不等待，无空闲资源直接返回失败）
+     * Acquire an available resource synchronously (without waiting; it returns a failure directly
+     * when there is no idle resource)
      *
-     * @return std::expected<ResourcePtr, std::string>
-     *         成功时包含资源指针，失败时包含错误信息
+     * @return stdx::expected<ResourcePtr, std::string>
+     *         it contains the resource pointer on success and the error information on failure
      *
-     * @note 获取策略：
-     *       1. 优先从空闲队列获取资源并检查版本
-     *       2. 如果资源版本过旧，销毁该资源并尝试创建新资源
-     *       3. 如果无空闲但未达上限，创建新版本资源
-     *       4. 如果已达上限且无空闲，立即返回失败（不等待）
-     *       5. 如需异步等待，请使用 asyncGet()
+     * @note The acquisition strategy:
+     *       1. Acquire the resource from the idle queue preferentially and check its version
+     *       2. If the resource version is too old, destroy the resource and try to create a new one
+     *       3. If there is no idle resource but the upper limit has not been reached, create a new
+     *          version resource
+     *       4. If the upper limit has been reached and there is no idle resource, return a failure
+     *          immediately (without waiting)
+     *       5. Use asyncGet() if an asynchronous waiting is needed
      *
      * @example
      * @code
      * auto result = pool.get();
      * if (result) {
      *     auto resource = result.value();
-     *     // 资源保证是当前最新版本
+     *     // The resource is guaranteed to be of the current latest version
      *     resource->doWork();
      * } else {
      *     HKU_ERROR("Failed to get resource: {}", result.error());
@@ -163,14 +167,15 @@ public:
      * @endcode
      */
     stdx::expected<ResourcePtr, std::string> get() {
-        // 1. 尝试从空闲队列获取资源
+        // 1. Try to acquire a resource from the idle queue
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
             return stdx::expected<ResourcePtr, std::string>(ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 2. 无空闲但未达上限 → 创建新资源
+        // 2. There is no idle resource but the upper limit has not been reached -> create a new
+        //    resource
         if (m_maxCount == 0 || m_count.load(std::memory_order_relaxed) < m_maxCount) {
             try {
                 p = new ResourceType(m_param);
@@ -185,20 +190,22 @@ public:
             return stdx::expected<ResourcePtr, std::string>(ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 3. 已达上限且无空闲资源 → 直接返回失败
+        // 3. The upper limit has been reached and there is no idle resource -> return a failure
+        //    directly
         return stdx::unexpected(fmt::format("No available resource, max_count={}, current_count={}",
                                             m_maxCount, m_count.load(std::memory_order_relaxed)));
     }
 
     /**
-     * 协程方式获取可用资源（带超时）
-     * @param timeout 超时时间
-     * @return awaitable<std::expected<ResourcePtr, std::string>>
-     * 可等待的结果，成功时包含资源指针，失败时包含错误信息
+     * Acquire an available resource in a coroutine way (with a timeout)
+     * @param timeout timeout
+     * @return awaitable<stdx::expected<ResourcePtr, std::string>>
+     * an awaitable result, it contains the resource pointer on success and the error information on
+     * failure
      */
     awaitable<stdx::expected<ResourcePtr, std::string>> asyncGet(
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(5)) {
-        // 尝试从空闲队列获取资源
+        // Try to acquire a resource from the idle queue
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
@@ -206,7 +213,8 @@ public:
               ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 无空闲但未达上限 → 创建新资源
+        // There is no idle resource but the upper limit has not been reached -> create a new
+        // resource
         if (m_maxCount == 0 || m_count.load(std::memory_order_relaxed) < m_maxCount) {
             try {
                 p = new ResourceType(m_param);
@@ -222,19 +230,19 @@ public:
               ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 已达上限 → 进入等待队列
+        // The upper limit has been reached -> enter the waiting queue
         auto executor = co_await this_coro::executor;
         auto waiter = new WaiterNode();
         waiter->timer = std::make_shared<net::steady_timer>(executor);
         waiter->timer->expires_after(timeout);
 
-        // 无锁加入等待队列
+        // Join the waiting queue in a lock free way
         if (!m_waiterQueue.push(waiter)) {
             delete waiter;
             co_return stdx::unexpected(fmt::format("Waiter queue is full (max={})", m_maxWaiters));
         }
 
-        // 等待被唤醒或超时
+        // Wait to be woken up or to time out
         net::error_code ec;
         try {
             co_await waiter->timer->async_wait(net::redirect_error(net::use_awaitable, ec));
@@ -243,43 +251,46 @@ public:
         }
 
         if (ec == net::error::operation_aborted && waiter->reserved_resource) {
-            // 被唤醒且有预留资源，直接使用（保证成功）
+            // It has been woken up and there is a reserved resource, use it directly (success is
+            // guaranteed)
             ResourceType *res = waiter->reserved_resource;
-            delete waiter;  // 清理节点
+            delete waiter;  // Clean up the node
 
             co_return stdx::expected<ResourcePtr, std::string>(
               ResourcePtr(res, ResourceCloser(this)));
         } else {
-            // 超时, 注意：waiter 仍在队列中，将由归还线程或析构函数清理
+            // Timeout; note: the waiter is still in the queue and is cleaned up by the returning
+            // thread or the destructor
             co_return stdx::unexpected(
               fmt::format("ResourceAsioPool get timeout, max_count={}, current_count={}",
                           m_maxCount, m_count.load()));
         }
     }
 
-    /** 当前活动的资源数, 即全部资源数（含空闲及被使用的资源） */
+    /** The number of the currently active resources, i.e. all the resources (including the idle and
+     *  the used ones) */
     size_t count() const {
         return m_count.load();
     }
 
     /**
-     * 当前空闲的资源数（精确值）
-     * 使用原子计数器跟踪，避免操作队列本身
+     * The current number of the idle resources (the exact value)
+     * It is tracked with an atomic counter to avoid operating the queue itself
      */
     size_t idleCount() const {
         return m_idleCount.load();
     }
 
-    /** 释放当前所有的空闲资源 */
+    /** Release all the currently idle resources */
     void releaseIdleResource() {
         ResourceType *p = nullptr;
         while (m_resourceList.pop(p)) {
             if (p) {
-                m_idleCount.fetch_sub(1);  // 减少空闲计数
+                m_idleCount.fetch_sub(1);  // Decrease the idle count
                 delete p;
-                m_count.fetch_sub(1);  // 减少计数
+                m_count.fetch_sub(1);  // Decrease the count
 
-                // 通知析构函数：资源计数已变化
+                // Notify the destructor: the resource count has changed
                 m_destroy_cv.notify_one();
             }
         }
@@ -292,7 +303,7 @@ private:
 
         void operator()(ResourceType *conn) {
             if (conn) {
-                // 如果绑定了 pool，则归还资源；否则删除
+                // If the pool is bound, the resource is returned; otherwise it is deleted
                 if (m_pool) {
                     m_pool->returnResource(conn, this);
                 } else {
@@ -305,14 +316,14 @@ private:
         ResourceAsioPool *m_pool;
     };
 
-    /** 归还至资源池 */
+    /** Return it to the resource pool */
     void returnResource(ResourceType *p, ResourceCloser *closer) {
         if (!p) [[unlikely]] {
             HKU_WARN("ResourceAsioPool::returnResource: nullptr");
             return;
         }
 
-        // 如果正在析构，直接删除资源
+        // If it is being destructed, delete the resource directly
         if (m_is_destroying.load(std::memory_order_acquire)) {
             delete p;
             m_count.fetch_sub(1);
@@ -320,32 +331,34 @@ private:
             return;
         }
 
-        // 尝试唤醒一个未超时的等待者（资源预留机制）
+        // Try to wake up a waiter that has not timed out (the resource reservation mechanism)
         WaiterNode *waiter = nullptr;
 
-        // 循环 pop 直到找到未超时的等待者或队列为空
+        // Pop in a loop until a waiter that has not timed out is found or the queue is empty
         while (m_waiterQueue.pop(waiter)) {
-            // 先预留资源，再取消定时器（关键：确保唤醒前资源已就绪）
+            // Reserve the resource first and then cancel the timer (key: ensure the resource is
+            // ready before the wake-up)
             waiter->reserved_resource = p;
 
-            // 尝试取消定时器，通过返回值判断是否成功
+            // Try to cancel the timer and judge the success through the return value
             std::size_t cancelled_ops = waiter->timer->cancel();
 
             if (cancelled_ops > 0) {
-                // 成功取消，协程会被唤醒并直接使用预留的资源
+                // The cancel succeeded; the coroutine is woken up and uses the reserved resource
+                // directly
                 m_destroy_cv.notify_one();
                 return;
             } else {
-                // cancel 返回 0，说明定时器已自然到期（超时）
-                // 撤销预留，清理该节点，继续找下一个等待者
+                // cancel returns 0, meaning the timer has expired naturally (a timeout)
+                // Cancel the reservation, clean up the node and continue to find the next waiter
                 waiter->reserved_resource = nullptr;
                 delete waiter;
             }
         }
 
-        // 没有有效等待者，放回空闲队列
+        // There is no valid waiter, put it back into the idle queue
         if (!m_resourceList.push(p)) {
-            // 队列已满，直接删除
+            // The queue is full, delete it directly
             delete p;
             m_count.fetch_sub(1);
             m_destroy_cv.notify_one();
@@ -356,28 +369,35 @@ private:
         m_destroy_cv.notify_one();
     }
 
-    std::atomic<size_t> m_count{0};      // 当前活动的资源数
-    std::atomic<size_t> m_idleCount{0};  // 当前空闲的资源数
-    size_t m_maxCount;                   // 最大资源上限
+    std::atomic<size_t> m_count{0};      // The number of the currently active resources
+    std::atomic<size_t> m_idleCount{0};  // The current number of the idle resources
+    size_t m_maxCount;                   // The maximum resource upper limit
     Parameter m_param;
     boost::lockfree::queue<ResourceType *> m_resourceList;
 
-    size_t m_maxWaiters;                                 // 运行时逻辑上限：最大等待者数量
-    boost::lockfree::queue<WaiterNode *> m_waiterQueue;  // 无锁等待队列
-    MutexType m_destroy_mutex;                           // 保护析构等待的条件变量
-    std::condition_variable_any m_destroy_cv;            // 用于通知析构函数资源已归还
-    std::atomic<bool> m_is_destroying{false};            // 标记是否正在析构
+    size_t m_maxWaiters;                                 // The runtime logical upper limit: the
+                                                         // maximum number of the waiters
+    boost::lockfree::queue<WaiterNode *> m_waiterQueue;  // The lock free waiting queue
+    MutexType m_destroy_mutex;                 // The mutex protecting the destructor waiting
+                                               // condition variable
+    std::condition_variable_any m_destroy_cv;  // Used to notify the destructor that a
+                                               // resource has been returned
+    std::atomic<bool> m_is_destroying{false};  // Marks whether it is being destructed
 };
 
 /**
- * @brief 带版本的资源池（强制要求资源类型支持版本接口）
- * @details 使用 boost::lockfree::queue 实现无锁空闲队列，支持协程异步获取资源。
- *          当参数发生变化时，自动递增版本号并释放所有空闲的旧版本资源。
+ * @brief Versioned resource pool (the resource type is required to support the version interfaces)
+ * @details It uses boost::lockfree::queue to implement the lock free idle queue and supports the
+ *          asynchronous resource acquisition in a coroutine.
+ *          When the parameters change, the version number is increased automatically and all the
+ * idle old version resources are released.
  *
- *          **重要约束**：ResourceType 必须实现 getVersion() 和 setVersion(int) 方法。
+ *          **Important constraint**: ResourceType must implement the getVersion() and
+ *          setVersion(int) methods.
  *
- * @tparam ResourceType 资源类型，必须实现 getVersion() 和 setVersion(int) 方法
- * @tparam MutexType 互斥锁类型，默认为 std::mutex（线程安全）
+ * @tparam ResourceType the resource type, it must implement the getVersion() and setVersion(int)
+ *                      methods
+ * @tparam MutexType the mutex type, std::mutex by default (thread safe)
  * @ingroup Utilities
  */
 template <typename ResourceType, typename MutexType = std::mutex>
@@ -385,12 +405,12 @@ class ResourceAsioVersionPool {
 private:
     struct WaiterNode {
         std::shared_ptr<net::steady_timer> timer;
-        ResourceType *reserved_resource = nullptr;  // 预留的资源指针
+        ResourceType *reserved_resource = nullptr;  // The reserved resource pointer
         WaiterNode() = default;
     };
 
 public:
-    // 编译期检查：ResourceType 必须支持 getVersion 和 setVersion
+    // Compile-time check: ResourceType must support getVersion and setVersion
     static_assert(hku::detail::has_resource_getVersion_v<ResourceType>,
                   "ResourceType must implement getVersion() method.");
     static_assert(hku::detail::has_resource_setVersion_v<ResourceType>,
@@ -401,10 +421,10 @@ public:
     ResourceAsioVersionPool &operator=(const ResourceAsioVersionPool &) = delete;
 
     /**
-     * 构造函数
-     * @param param 连接参数
-     * @param max_count 最大资源上限，0 表示无限制
-     * @param max_waiters 最大等待者数量
+     * Constructor
+     * @param param connection parameters
+     * @param max_count the maximum resource upper limit, 0 means unlimited
+     * @param max_waiters the maximum number of the waiters
      */
     explicit ResourceAsioVersionPool(const Parameter &param, size_t max_count = 0,
                                      size_t max_waiters = 1000)
@@ -425,24 +445,24 @@ public:
     }
 
     /**
-     * 析构函数，释放所有缓存的资源
+     * Destructor, it releases all the cached resources
      */
     virtual ~ResourceAsioVersionPool() {
-        // 标记正在析构，阻止新的资源获取和归还
+        // Mark that it is being destructed, preventing new resource acquisitions and returns
         m_is_destroying.store(true, std::memory_order_release);
 
-        // 取消并清理所有等待者
+        // Cancel and clean up all the waiters
         WaiterNode *waiter = nullptr;
         while (m_waiterQueue.pop(waiter)) {
             if (waiter) {
-                // 尝试取消定时器，判断协程是否还在等待
+                // Try to cancel the timer to judge whether the coroutine is still waiting
                 std::size_t cancelled_ops = 0;
                 if (waiter->timer) {
                     cancelled_ops = waiter->timer->cancel();
                 }
 
-                // 只有成功取消时，才安全删除预留资源
-                // 如果 cancel 返回 0，说明协程可能已经醒来并使用该资源
+                // Only on a successful cancel is it safe to delete the reserved resource
+                // If cancel returns 0, the coroutine may have woken up and used the resource
                 if (cancelled_ops > 0 && waiter->reserved_resource) {
                     delete waiter->reserved_resource;
                     m_count.fetch_sub(1);
@@ -452,12 +472,12 @@ public:
             }
         }
 
-        // 等待所有活跃资源归还
+        // Wait for all the active resources to be returned
         std::unique_lock<MutexType> lock(m_destroy_mutex);
         m_destroy_cv.wait(
           lock, [this]() { return m_count.load(std::memory_order_relaxed) == m_idleCount.load(); });
 
-        // 此时所有资源都在空闲队列中，释放它们
+        // At this time all the resources are in the idle queue, release them
         ResourceType *p = nullptr;
         while (m_resourceList.pop(p)) {
             if (p) {
@@ -466,13 +486,14 @@ public:
         }
     }
 
-    /** 指定参数是否存在 */
+    /** Whether the given parameter exists */
     bool haveParam(const std::string &name) {
         std::lock_guard<MutexType> lock(m_mutex);
         return m_param.have(name);
     }
 
-    /** 获取指定参数的值，如参数不存在或类型不匹配抛出异常 */
+    /** Get the value of the given parameter; an exception is thrown when the parameter does not
+     * exist or the type does not match */
     template <typename ValueType>
     ValueType getParam(const std::string &name) {
         std::lock_guard<MutexType> lock(m_mutex);
@@ -480,71 +501,78 @@ public:
     }
 
     /**
-     * @brief 设定指定参数的值，参数仅在生成新的资源时生效
-     * @details 在原本存在该参数的情况下，新设定的值类型须和原有参数类型相同，否则将抛出异常
-     * @param name 参数名
-     * @param value 参数值
+     * @brief Set the value of the given parameter; the parameter takes effect only when a new
+     * resource is created
+     * @details When the parameter already exists, the type of the newly set value must be the same
+     * as that of the original parameter, otherwise an exception is thrown
+     * @param name parameter name
+     * @param value parameter value
      * @exception std::logic_error
      */
     template <typename ValueType>
     void setParam(const std::string &name, const ValueType &value) {
         std::lock_guard<MutexType> lock(m_mutex);
-        // 如果参数未实际发送变化，则直接返回
+        // If the parameter has not actually changed, return directly
         if (m_param.have(name) && value == m_param.get<ValueType>(name)) {
             return;
         }
         m_param.set<ValueType>(name, value);
         m_version.fetch_add(1);
-        releaseIdleResource();  // 释放当前空闲资源，以便新参数值生效
+        releaseIdleResource();  // Release the current idle resources so that the new parameter
+                                // values take effect
     }
 
     /**
-     * @brief 设置资源参数，参数仅在生成新的资源时生效
-     * @param param 参数对象
+     * @brief Set the resource parameters; they take effect only when a new resource is created
+     * @param param the parameter object
      */
     void setParameter(const Parameter &param) {
         std::lock_guard<MutexType> lock(m_mutex);
         m_param = param;
         m_version.fetch_add(1);
-        releaseIdleResource();  // 释放当前空闲资源，以便新参数值生效
+        releaseIdleResource();  // Release the current idle resources so that the new parameter
+                                // values take effect
     }
 
     /**
-     * @brief 设置资源参数，参数仅在生成新的资源时生效
-     * @param param 参数对象
+     * @brief Set the resource parameters; they take effect only when a new resource is created
+     * @param param the parameter object
      */
     void setParameter(Parameter &&param) {
         std::lock_guard<MutexType> lock(m_mutex);
         m_param = std::move(param);
         m_version.fetch_add(1);
-        releaseIdleResource();  // 释放当前空闲资源，以便新参数值生效
+        releaseIdleResource();  // Release the current idle resources so that the new parameter
+                                // values take effect
     }
 
-    /** 获取当前资源池版本 */
+    /** Get the current version of the resource pool */
     int getVersion() {
         return m_version.load();
     }
 
-    /** 递增当前资源池版本，相当于通知资源池资源版本发生变化 */
+    /** Increase the current version of the resource pool, equivalent to notifying the resource pool
+     *  that the resource version has changed */
     void incVersion(int version) {
         m_version.fetch_add(1);
     }
 
-    /** 资源实例指针类型 */
+    /** Resource instance pointer type */
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 同步获取可用资源（不等待，无空闲资源直接返回失败）
-     * @return std::expected<ResourcePtr, std::string>
-     * 成功时包含资源指针，失败时包含错误信息
+     * Acquire an available resource synchronously (without waiting; it returns a failure directly
+     * when there is no idle resource)
+     * @return stdx::expected<ResourcePtr, std::string>
+     * It contains the resource pointer on success and the error information on failure
      */
     stdx::expected<ResourcePtr, std::string> get() {
-        // 1. 尝试从空闲队列获取资源
+        // 1. Try to acquire a resource from the idle queue
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
 
-            // 检查资源版本，如果版本过旧则销毁
+            // Check the resource version and destroy it if it is too old
             if (p->getVersion() != m_version.load()) {
                 delete p;
                 m_count.fetch_sub(1);
@@ -555,7 +583,7 @@ public:
             }
         }
 
-        // 2. 未达上限，创建新资源
+        // 2. The upper limit has not been reached, create a new resource
         if (m_maxCount == 0 || m_count.load(std::memory_order_relaxed) < m_maxCount) {
             try {
                 Parameter current_param;
@@ -578,27 +606,30 @@ public:
             return stdx::expected<ResourcePtr, std::string>(ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 3. 已达上限且无空闲资源 → 直接返回失败
+        // 3. The upper limit has been reached and there is no idle resource -> return a failure
+        //    directly
         return stdx::unexpected(fmt::format("No available resource, max_count={}, current_count={}",
                                             m_maxCount, m_count.load(std::memory_order_relaxed)));
     }
 
     /**
-     * 协程方式获取可用资源（带超时）
-     * @param timeout 超时时间，默认 5 秒
-     * @return awaitable<std::expected<ResourcePtr, std::string>>
-     * 可等待的结果，成功时包含资源指针，失败时包含错误信息
+     * Acquire an available resource in a coroutine way (with a timeout)
+     * @param timeout timeout, 5 seconds by default
+     * @return awaitable<stdx::expected<ResourcePtr, std::string>>
+     * an awaitable result, it contains the resource pointer on success and the error information on
+     * failure
      */
     awaitable<stdx::expected<ResourcePtr, std::string>> asyncGet(
       std::chrono::steady_clock::duration timeout = std::chrono::seconds(5)) {
         auto executor = co_await this_coro::executor;
 
-        // 尝试从空闲队列获取资源
+        // Try to acquire a resource from the idle queue
         ResourceType *p = nullptr;
         if (m_resourceList.pop(p)) {
             m_idleCount.fetch_sub(1);
 
-            // 检查资源版本，如果版本过旧则销毁，下面会创建新资源
+            // Check the resource version and destroy it if it is too old; a new resource is created
+            // below
             if (p->getVersion() != m_version.load()) {
                 delete p;
                 m_count.fetch_sub(1);
@@ -609,7 +640,7 @@ public:
             }
         }
 
-        // 未达上限，创建新资源
+        // The upper limit has not been reached, create a new resource
         if (m_maxCount == 0 || m_count.load(std::memory_order_relaxed) < m_maxCount) {
             try {
                 Parameter current_param;
@@ -635,18 +666,18 @@ public:
               ResourcePtr(p, ResourceCloser(this)));
         }
 
-        // 已达上限，进入等待队列
+        // The upper limit has been reached, enter the waiting queue
         auto waiter = new WaiterNode();
         waiter->timer = std::make_shared<net::steady_timer>(executor);
         waiter->timer->expires_after(timeout);
 
-        // 无锁加入等待队列
+        // Join the waiting queue in a lock free way
         if (!m_waiterQueue.push(waiter)) {
             delete waiter;
             co_return stdx::unexpected(fmt::format("Waiter queue is full (max={})", m_maxWaiters));
         }
 
-        // 等待被唤醒或超时
+        // Wait to be woken up or to time out
         net::error_code ec;
         try {
             co_await waiter->timer->async_wait(net::redirect_error(net::use_awaitable, ec));
@@ -655,44 +686,48 @@ public:
         }
 
         if (ec == net::error::operation_aborted && waiter->reserved_resource) {
-            // 被唤醒且有预留资源，直接使用（保证成功）
+            // It has been woken up and there is a reserved resource, use it directly (success is
+            // guaranteed)
             ResourceType *res = waiter->reserved_resource;
-            delete waiter;  // 清理节点
+            delete waiter;  // Clean up the node
 
             co_return stdx::expected<ResourcePtr, std::string>(
               ResourcePtr(res, ResourceCloser(this)));
         } else {
-            // 超时
-            // 注意：waiter 仍在队列中，将由归还线程或析构函数清理
+            // Timeout
+            // Note: the waiter is still in the queue and is cleaned up by the returning thread or
+            // the
+            // destructor
             co_return stdx::unexpected(
               fmt::format("ResourceAsioVersionPool get timeout, max_count={}, current_count={}",
                           m_maxCount, m_count.load(std::memory_order_relaxed)));
         }
     }
 
-    /** 当前活动的资源数，即全部资源数（含空闲及被使用的资源） */
+    /** The number of the currently active resources, i.e. all the resources (including the idle and
+     *  the used ones) */
     size_t count() const {
         return m_count.load();
     }
 
     /**
-     * 当前空闲的资源数（精确值）
-     * 使用原子计数器跟踪，避免操作队列本身
+     * The current number of the idle resources (the exact value)
+     * It is tracked with an atomic counter to avoid operating the queue itself
      */
     size_t idleCount() const {
         return m_idleCount.load();
     }
 
-    /** 释放当前所有的空闲资源 */
+    /** Release all the currently idle resources */
     void releaseIdleResource() {
         ResourceType *p = nullptr;
         while (m_resourceList.pop(p)) {
             if (p) {
-                m_idleCount.fetch_sub(1);  // 减少空闲计数
+                m_idleCount.fetch_sub(1);  // Decrease the idle count
                 delete p;
-                m_count.fetch_sub(1);  // 减少计数
+                m_count.fetch_sub(1);  // Decrease the count
 
-                // 通知析构函数：资源计数已变化
+                // Notify the destructor: the resource count has changed
                 m_destroy_cv.notify_one();
             }
         }
@@ -705,7 +740,7 @@ private:
 
         void operator()(ResourceType *conn) {
             if (conn) {
-                // 如果绑定了 pool，则归还资源；否则删除
+                // If the pool is bound, the resource is returned; otherwise it is deleted
                 if (m_pool) {
                     m_pool->returnResource(conn, this);
                 } else {
@@ -718,14 +753,14 @@ private:
         ResourceAsioVersionPool *m_pool;
     };
 
-    /** 归还至资源池 */
+    /** Return it to the resource pool */
     void returnResource(ResourceType *p, ResourceCloser *closer) {
         if (!p) [[unlikely]] {
             HKU_WARN("ResourceAsioVersionPool::returnResource: nullptr");
             return;
         }
 
-        // 如果正在析构，直接删除资源
+        // If it is being destructed, delete the resource directly
         if (m_is_destroying.load(std::memory_order_acquire)) {
             delete p;
             m_count.fetch_sub(1);
@@ -733,36 +768,40 @@ private:
             return;
         }
 
-        // 当前归还资源的版本和资源池版本相等，才接受归还
+        // The returned resource is accepted only when its version equals the resource pool version
         if (p->getVersion() == m_version.load()) {
-            // 尝试唤醒一个未超时的等待者（资源预留机制）
+            // Try to wake up a waiter that has not timed out (the resource reservation mechanism)
             WaiterNode *waiter = nullptr;
 
-            // 循环 pop 直到找到未超时的等待者或队列为空
+            // Pop in a loop until a waiter that has not timed out is found or the queue is empty
             while (m_waiterQueue.pop(waiter)) {
-                // 先预留资源，再取消定时器（关键：确保唤醒前资源已就绪）
+                // Reserve the resource first and then cancel the timer (key: ensure the resource is
+                // ready before the wake-up)
                 waiter->reserved_resource = p;
 
-                // 尝试取消定时器，通过返回值判断是否成功
+                // Try to cancel the timer and judge the success through the return value
                 std::size_t cancelled_ops = waiter->timer->cancel();
 
                 if (cancelled_ops > 0) {
-                    // 成功取消，协程会被唤醒并直接使用预留的资源
+                    // The cancel succeeded; the coroutine is woken up and uses the reserved
+                    // resource
+                    // directly
 
-                    // waiter 将由协程在获取资源后删除
+                    // The waiter is deleted by the coroutine after the resource is acquired
                     m_destroy_cv.notify_one();
                     return;
                 } else {
-                    // cancel 返回 0，说明定时器已自然到期（超时）
-                    // 撤销预留，清理该节点，继续找下一个等待者
+                    // cancel returns 0, meaning the timer has expired naturally (a timeout)
+                    // Cancel the reservation, clean up the node and continue to find the next
+                    // waiter
                     waiter->reserved_resource = nullptr;
                     delete waiter;
                 }
             }
 
-            // 没有有效等待者，放回空闲队列
+            // There is no valid waiter, put it back into the idle queue
             if (!m_resourceList.push(p)) {
-                // 队列已满，直接删除
+                // The queue is full, delete it directly
                 delete p;
                 m_count.fetch_sub(1);
                 m_destroy_cv.notify_one();
@@ -778,19 +817,21 @@ private:
         }
     }
 
-    std::atomic<size_t> m_count{0};      // 当前活动的资源数
-    std::atomic<size_t> m_idleCount{0};  // 当前空闲的资源数
-    size_t m_maxCount;                   // 最大资源上限
+    std::atomic<size_t> m_count{0};      // The number of the currently active resources
+    std::atomic<size_t> m_idleCount{0};  // The current number of the idle resources
+    size_t m_maxCount;                   // The maximum resource upper limit
     Parameter m_param;
     boost::lockfree::queue<ResourceType *> m_resourceList;
-    std::atomic<int> m_version{0};  // 当前资源池版本
+    std::atomic<int> m_version{0};  // The current resource pool version
 
-    mutable MutexType m_mutex;                           // 保护参数访问的互斥锁
-    size_t m_maxWaiters;                                 // 最大等待者数量
-    boost::lockfree::queue<WaiterNode *> m_waiterQueue;  // 无锁等待队列
-    MutexType m_destroy_mutex;                           // 保护析构等待的条件变量
-    std::condition_variable_any m_destroy_cv;            // 用于通知析构函数资源已归还
-    std::atomic<bool> m_is_destroying{false};            // 标记是否正在析构
+    mutable MutexType m_mutex;  // The mutex protecting the parameter access
+    size_t m_maxWaiters;        // The maximum number of the waiters
+    boost::lockfree::queue<WaiterNode *> m_waiterQueue;  // The lock free waiting queue
+    MutexType m_destroy_mutex;                 // The mutex protecting the destructor waiting
+                                               // condition variable
+    std::condition_variable_any m_destroy_cv;  // Used to notify the destructor that a
+                                               // resource has been returned
+    std::atomic<bool> m_is_destroying{false};  // Marks whether it is being destructed
 };
 
 }  // namespace hku
