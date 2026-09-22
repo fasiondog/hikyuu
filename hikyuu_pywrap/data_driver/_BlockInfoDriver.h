@@ -40,7 +40,7 @@ public:
         PYBIND11_OVERLOAD_PURE(Block, BlockInfoDriver, getBlock, category, name);
     }
 
-    // 必须实现的子类接口
+    // The subclass interface that must be implemented
     BlockList getBlockList(const string& category) override {
         py::gil_scoped_acquire gil;
         py::function py_func = get_py_override("_getBlockList");
@@ -53,7 +53,7 @@ public:
         return python_list_to_vector<Block>(py_list);
     }
 
-    // 必须实现的子类接口
+    // The subclass interface that must be implemented
     BlockList getBlockList() override {
         py::gil_scoped_acquire gil;
         py::function py_func = get_py_override("_getBlockList");
