@@ -1,141 +1,139 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_sys/signal.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-信号指示器|SG
-=============
+Signal Generator|SG
+===================
 
-信号指示器负责产生买入、卖出信号。
+The signal generator is responsible for generating the buy and sell signals.
 
-公共参数：
+Common parameters:
 
-    * **alternate** *(bool|True)* ：买入和卖出信号是否交替出现。单线型的信号通常通过拐点、斜率等判断信号的产生，此种情况下可能出现连续出现买入信号或连续出现卖出信号的情况，此时可通过该参数控制买入、卖出信号是否交替出现。而双线交叉型的信号通常本身买入和卖出已经是交替出现，此时该参数无效。
-    * **cycle** *(bool|False)* : 配合 PF, 仅在PF调仓周期内计算
-    * **support_borrow_stock** *(bool|False)* : 支持发出空头信号
+    * **alternate** *(bool|True)* : Whether the buy and sell signals appear alternately. The single-line signals usually judge the generation of the signals by the inflection points, the slope, etc.; in this case, consecutive buy signals or consecutive sell signals may appear, and this parameter can be used to control whether the buy and sell signals appear alternately. The two-line crossover signals usually have the buy and sell already appearing alternately, so this parameter is invalid in that case.
+    * **cycle** *(bool|False)* : Used with PF, calculated only within the PF position adjustment period
+    * **support_borrow_stock** *(bool|False)* : Support issuing short signals
 
 
-通用信号指示器
---------------
+General Signal Generators
+-------------------------
 
-通常使用技术指标判断买入、卖出时，依据的是快线和慢线的交叉、或是单曲线的拐点。下面的通用信号指示器足够应付大部分的情况。
+When technical indicators are usually used to judge buying and selling, it is based on the crossover of the fast line and the slow line, or the inflection point of a single curve. The general signal generators below are enough for most cases.
 
 .. raw:: html
 
     <table border="1">
         <thead>
             <tr>
-                <th>代码</th>
-                <th>名称</th>
-                <th>描述</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><a href="#target-section">SG_Cross</a></td>
-                <td>双线交叉指示器</td>
-                <td>当快线从下向上穿越慢线时，买入；<br>当快线从上向下穿越慢线时，卖出。</td>
+                <td>Two-line crossover indicator</td>
+                <td>When the fast line crosses the slow line from below upward, buy;<br>when the fast line crosses the slow line from above downward, sell.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_CrossGold</td>
-                <td>金叉指示器</td>
-                <td>当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；<br>当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。</td>
+                <td>Golden cross indicator</td>
+                <td>A golden cross is when the fast line crosses the slow line from below upward and both the fast line and the slow line point upward, buy;<br>when the fast line crosses the slow line from above downward and both the fast line and the slow line point downward, it is a death cross, sell.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Single</a></td>
-                <td>单线拐点信号指示器</td>
-                <td>生成单线拐点信号指示器。使用《精明交易者》中给出的曲线拐点算法判断曲线趋势</td>
+                <td>Single-line inflection point signal indicator</td>
+                <td>Generate a single-line inflection point signal indicator. Use the curve inflection point algorithm given in the book "精明交易者" to judge the curve trend</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Single2</a></td>
-                <td>单线拐点信号指示器2</td>
-                <td>生成单线拐点信号指示器。使用《精明交易者》中给出的曲线拐点算法判断曲线趋势</td>
+                <td>Single-line inflection point signal indicator 2</td>
+                <td>Generate a single-line inflection point signal indicator. Use the curve inflection point algorithm given in the book "精明交易者" to judge the curve trend</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Flex</a></td>
-                <td>自交叉单线拐点指示器</td>
-                <td>使用自身的EMA(slow_n)作为慢线，自身作为快线。<br>快线向上穿越慢线买入，<br>快线向下穿越慢线卖出。</td>
+                <td>Self-crossover single-line inflection point indicator</td>
+                <td>Use its own EMA(slow_n) as the slow line, and itself as the fast line.<br>Buy when the fast line crosses the slow line upward,<br>sell when the fast line crosses the slow line downward.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Bool</a></td>
-                <td>布尔信号指示器</td>
-                <td>使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。</td>
+                <td>Boolean signal indicator</td>
+                <td>Use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_OneSide</a></td>
-                <td>单边信号指示器</td>
-                <td>根据输入指标构建单边信号（单纯的只包含买入或卖出信号），<br>如果指标值大于0，则加入信号</td>
+                <td>One-side signal indicator</td>
+                <td>Build a one-side signal (containing only the buy signal or only the sell signal) from the input indicator,<br>if the indicator value is greater than 0, add the signal</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Buy</a></td>
-                <td>单边买入信号指示器</td>
-                <td>SG_OneSide 简化模式</td>
+                <td>One-side buy signal indicator</td>
+                <td>The simplified mode of SG_OneSide</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_OneSell</a></td>
-                <td>单边卖出信号指示器</td>
-                <td>SG_OneSide简化模式</td>
+                <td>One-side sell signal indicator</td>
+                <td>The simplified mode of SG_OneSide</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Band</a></td>
-                <td>区间突破信号指示器</td>
-                <td>指标区间指示器, 当指标超过上轨时，买入；<br>当指标低于下轨时，卖出。</td>
+                <td>Range breakout signal indicator</td>
+                <td>The indicator range indicator; when the indicator exceeds the upper band, buy;<br>when the indicator falls below the lower band, sell.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
-                <td>持续买入信号指示器</td>
-                <td>一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用</td>
+                <td>Always-buy signal indicator</td>
+                <td>A special SG that issues a buy signal every day continuously, usually used with PF</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF调仓周期买入信号指示器</td>
-                <td>一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号</td>
+                <td>PF position adjustment period buy signal indicator</td>
+                <td>A special SG, used with PF, taking the PF position adjustment period as the buy signal</td>
             </tr>
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
-                <td>SG运算辅助</td>
-                <td>由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性<br>建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题</td>
+                <td>SG operation helpers</td>
+                <td>Since the alternate of SG defaults to True, when using a form like "sg1 + sg2 + sg3", it is easy to ignore the alternate attribute of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem</td>
             </tr>        
         </tbody>
     </table>
     <p></p>
 
 
-双线交叉信号指示器
-^^^^^^^^^^^^^^^^^^
+Two-line Crossover Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cross(fast, slow)
     
-    双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
+    The two-line crossover indicator; when the fast line crosses the slow line from below upward, buy; when the fast line crosses the slow line from above downward, sell. E.g.: buy when the 5-day MA crosses the 10-day MA upward, sell when the 5-day MA crosses the 10-day MA downward:: 
 
         SG_Cross(MA(CLOSE(), n=10), MA(CLOSE(), n=30))
 
-    :param Indicator fast: 快线
-    :param Indicator slow: 慢线
-    :return: 信号指示器
+    :param Indicator fast: the fast line
+    :param Indicator slow: the slow line
+    :return: the signal generator
         
         
-金叉信号指示器
-^^^^^^^^^^^^^^^
+Golden Cross Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_CrossGold(fast, slow)
 
-    金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
-    当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。::
+    The golden cross indicator; a golden cross is when the fast line crosses the slow line from below upward and both the fast line and the slow line point upward, buy;
+    when the fast line crosses the slow line from above downward and both the fast line and the slow line point downward, it is a death cross, sell.::
     
         SG_CrossGold(MA(CLOSE(), n=10), MA(CLOSE(), n=30))
     
-    :param Indicator fast: 快线
-    :param Indicator slow: 慢线
-    :return: 信号指示器    
-        
+    :param Indicator fast: the fast line
+    :param Indicator slow: the slow line
+    :return: the signal generator    
 
-单线拐点信号指示器
-^^^^^^^^^^^^^^^^^^
+
+Single-line Inflection Point Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
-    生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
+    Generate a single-line inflection point signal indicator. Use the curve inflection point algorithm given in the book "精明交易者" [BOOK1]_ to judge the curve trend; the formula is as follows::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -144,13 +142,13 @@
         or Buy When AMA - AMA[3] > filter 
     
     :param Indicator ind:
-    :param int filer_n: N日周期
-    :param float filter_p: 过滤器百分比
-    :return: 信号指示器
+    :param int filer_n: the N-day period
+    :param float filter_p: the filter percentage
+    :return: the signal generator
     
 .. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
-    生成单线拐点信号指示器2 [BOOK1]_::
+    Generate the single-line inflection point signal indicator 2 [BOOK1]_::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -158,69 +156,69 @@
         Sell When @highest(AMA, n) - AMA > filter
     
     :param Indicator ind:
-    :param int filer_n: N日周期
-    :param float filter_p: 过滤器百分比
-    :return: 信号指示器
+    :param int filer_n: the N-day period
+    :param float filter_p: the filter percentage
+    :return: the signal generator
    
-自交叉单线拐点指示器
-^^^^^^^^^^^^^^^^^^^^
+Self-crossover Single-line Inflection Point Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Flex(ind, slow_n)
 
-    使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
+    Use its own EMA(slow_n) as the slow line and itself as the fast line; buy when the fast line crosses the slow line upward, and sell when the fast line crosses the slow line downward.
 
     :param Indicator ind:
-    :param int slow_n: 慢线EMA周期
-    :return: 信号指示器
+    :param int slow_n: the period of the slow line EMA
+    :return: the signal generator
 
 
-布尔信号指示器
-^^^^^^^^^^^^^^^^
+Boolean Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Bool(buy, sell[, alternate=True])
 
-    布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
+    The boolean signal indicator; use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.
     
-    :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
-    :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
-    :param bool alternate: 是否交替买入卖出，默认为True
-    :return: 信号指示器
+    :param Indicator buy: the buy indicator (a position > 0 in the result Indicator means buy)
+    :param Indicator sell: the sell indicator (a position > 0 in the result Indicator means sell)
+    :param bool alternate: whether to buy and sell alternately, defaults to True
+    :return: the signal generator
 
 
-单边信号指示器
-^^^^^^^^^^^^^^^^
+One-side Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_OneSide(ind, is_buy)
           
-    根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号
+    Build a one-side signal (containing only the buy signal or only the sell signal) from the input indicator; if the indicator value is greater than 0, add the signal
     
-    :param Indicator ind: 输入指标
-    :param bool is_buy: 构建的是买入信号，否则为卖出信号
+    :param Indicator ind: the input indicator
+    :param bool is_buy: build a buy signal, otherwise a sell signal
 
 
 .. py:function:: SG_Buy(ind)
 
-    单边买入信号, SG_OneSide 简化
+    The one-side buy signal, a simplification of SG_OneSide
 
-    :param Indicator ind: 输入指标
-    :return: 信号指示器
+    :param Indicator ind: the input indicator
+    :return: the signal generator
 
 
 .. py:function:: SG_Sell(ind)
 
-    单边卖出信号, SG_OneSide 简化
+    The one-side sell signal, a simplification of SG_OneSide
 
-    :param Indicator ind: 输入指标
-    :return: 信号指示器
+    :param Indicator ind: the input indicator
+    :return: the signal generator
 
 
-区间突破信号指示器
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Range Breakout Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Band(ind, lower, upper)
           
-    指标区间指示器, 当指标超过上轨时，买入；
-    当指标低于下轨时，卖出。
+    The indicator range indicator; when the indicator exceeds the upper band, buy;
+    when the indicator falls below the lower band, sell.
     
     ::
 
@@ -228,58 +226,58 @@
         SG_Band(CLOSE, MA(LOW), MA(HIGH))
 
 
-持续买入信号指示器
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Always-buy Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_AllwaysBuy()
     
-    一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用
+    A special SG that issues a buy signal every day continuously, usually used with PF
 
 
-PF调仓周期买入信号指示器
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PF Position Adjustment Period Buy Signal Indicator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()
     
-    一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号
+    A special SG, used with PF, taking the PF position adjustment period as the buy signal
 
 
-自定义信号指示器
-----------------
+Custom Signal Generator
+-----------------------
 
-快速创建不带私有属性的自定义信号指示器
+Quickly create a custom signal generator without private attributes.
 
 .. py:function:: crtSG(func, params={}, name='crtSG')
 
-    快速创建自定义不带私有属性的信号指示器
+    Quickly create a custom signal generator without private attributes
     
-    :param func: 信号策略函数
-    :param {} params: 参数字典
-    :param str name: 自定义名称
-    :return: 自定义信号指示器实例
+    :param func: the signal strategy function
+    :param {} params: the parameter dictionary
+    :param str name: the custom name
+    :return: the custom signal generator instance
     
-示例：
+Example:
 
 .. literalinclude:: ../../examples/quick_crtsg.py      
 
-自定义的信号指示器接口：
+The custom signal generator interface:
 
-* :py:meth:`SignalBase._calculate` - 【必须】子类计算接口
-* :py:meth:`SignalBase._clone` - 【必须】克隆接口
-* :py:meth:`SignalBase._reset` - 【可选】重载私有变量
+* :py:meth:`SignalBase._calculate` - [Required] The subclass calculation interface
+* :py:meth:`SignalBase._clone` - [Required] The clone interface
+* :py:meth:`SignalBase._reset` - [Optional] Reload the private variables
 
-示例1（不含私有变量，海龟交易策略）:
+Example 1 (without private variables, the turtle trading strategy):
 
 .. literalinclude:: ../../examples/Turtle_SG.py                
                 
-示例2（含私有属性）:
+Example 2 (with private attributes):
 
 ::
 
     class SignalPython(SignalBase):
         def __init__(self):
             super(SignalPython, self).__init__("SignalPython")
-            self._x = 0 #私有属性
+            self._x = 0 # private attribute
             self.setParam("test", 30)
         
         def _reset(self):
@@ -295,98 +293,98 @@ PF调仓周期买入信号指示器
             self._addSellSignal(Datetime(201201300000))
 
 
-信号指示器基类
---------------
+Signal Generator Base Class
+---------------------------
 
 .. py:class:: SignalBase
 
-    信号指示器基类
+    The signal generator base class
     
-    .. py:attribute:: name 名称
+    .. py:attribute:: name Name
     
     .. py:method:: __init__(self[, name="SignalBase"])
     
-        :param str name: 名称
+        :param str name: the name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
                 
     .. py:method:: should_buy(self, datetime)
     
-        指定时刻是否可以买入
+        Whether it can be bought at the specified moment
     
-        :param Datetime datetime: 指定时刻
+        :param Datetime datetime: the specified moment
         :rtype: bool
     
     .. py:method:: should_sell(self, datetime)
     
-        指定时刻是否可以卖出
+        Whether it can be sold at the specified moment
         
-        :param Datetime datetime: 指定时刻
+        :param Datetime datetime: the specified moment
         :rtype: bool
 
     .. py:method:: next_time_should_buy(self)
 
-        下一时刻是否可以买入，相当于最后时刻是否指示买入
+        Whether it can be bought at the next moment, equivalent to whether the last moment indicated a buy
 
     .. py:method:: next_time_should_sell(self)
 
-        下一时刻是否可以卖出，相当于最后时刻是否指示卖出
+        Whether it can be sold at the next moment, equivalent to whether the last moment indicated a sell
     
     .. py:method:: get_buy_signal(self)
     
-        获取所有买入指示日期列表
+        Get the list of all the buy indication dates
         
         :rtype: DatetimeList
     
     .. py:method:: get_sell_signal(self)
     
-        获取所有卖出指示日期列表
+        Get the list of all the sell indication dates
         
         :rtype: DatetimeList
     
     .. py:method:: _add_buy_signal(self, datetime)
     
-        加入买入信号，在_calculate中调用
+        Add a buy signal, called in _calculate
         
-        :param Datetime datetime: 指示买入的日期
+        :param Datetime datetime: the date indicating the buy
     
     .. py:method:: _add_sell_signal(self, datetime)
     
-        加入卖出信号，在_calculate中调用
+        Add a sell signal, called in _calculate
 
-        :param Datetime datetime: 指示卖出的日期
+        :param Datetime datetime: the date indicating the sell
         
     .. py:method:: reset(self)
     
-        复位操作
+        The reset operation
     
     .. py:method:: clone(self)
     
-        克隆操作
+        The clone operation
     
     .. py:method:: _calculate(self, kdata)
     
-        【重载接口】子类计算接口
+        [Overload interface] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        【重载接口】子类复位接口，复位内部私有变量
+        [Overload interface] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口
+        [Overload interface] The subclass clone interface

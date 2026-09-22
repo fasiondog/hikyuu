@@ -1,120 +1,117 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_sys/profitgoal.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-盈利目标策略|PG
-================
+Profit Goal Strategy|PG
+=======================
 
-内建盈利目标策略
-----------------
+Built-in Profit Goal Strategies
+-------------------------------
 
 .. py:function:: PG_FixedPercent([p = 0.2])
 
-    固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
+    The fixed percentage profit goal; the goal price = the buy price * (1 + p)
     
-    :param float p: 百分比
-    :return: 盈利目标策略实例
+    :param float p: the percentage
+    :return: the profit goal strategy instance
     
 .. py:function:: PG_FixedHoldDays([days=5])
 
-    固定持仓天数盈利目标策略
+    The fixed holding days profit goal strategy
     
-    :param int days: 允许持仓天数（按交易日算）,默认5天
-    :return: 盈利目标策略实例
+    :param int days: the allowed holding days (counted by trading days), defaults to 5 days
+    :return: the profit goal strategy instance
     
 .. py:function:: PG_NoGoal()
 
-    无盈利目标策略，通常为了进行测试或对比。
+    No profit goal strategy, usually for testing or comparison.
     
-    :return: 盈利目标策略实例
+    :return: the profit goal strategy instance
 
     
-自定义盈利目标策略
-------------------    
+Custom Profit Goal Strategy
+---------------------------    
 
-自定义盈利目标策略接口：
+The custom profit goal strategy interface:
 
-* :py:meth:`ProfitGoalBase.getGoal` - 【必须】获取目标价格
-* :py:meth:`ProfitGoalBase._calculate` - 【必须】子类计算接口
-* :py:meth:`ProfitGoalBase._clone` - 【必须】克隆接口
-* :py:meth:`ProfitGoalBase._reset` - 【可选】重载私有变量
-* :py:meth:`ProfitGoalBase.buyNotify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
-* :py:meth:`ProfitGoalBase.sellNotify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
+* :py:meth:`ProfitGoalBase.getGoal` - [Required] Get the goal price
+* :py:meth:`ProfitGoalBase._calculate` - [Required] The subclass calculation interface
+* :py:meth:`ProfitGoalBase._clone` - [Required] The clone interface
+* :py:meth:`ProfitGoalBase._reset` - [Optional] Reload the private variables
+* :py:meth:`ProfitGoalBase.buyNotify` - [Optional] Receive the notification of the actual buy; reserved for handling multiple position increases/decreases
+* :py:meth:`ProfitGoalBase.sellNotify` - [Optional] Receive the notification of the actual sell; reserved for handling multiple position increases/decreases
     
 
-盈利目标策略基类
-----------------
+Profit Goal Strategy Base Class
+-------------------------------
 
 .. py:class:: ProfitGoalBase
 
-    盈利目标策略基类
+    The profit goal strategy base class
     
-    .. py:attribute:: name 名称
-    .. py:attribute:: to 设置或获取交易对象
-    .. py:attribute:: tm 设置或获取交易管理账户
+    .. py:attribute:: name Name
+    .. py:attribute:: to Set or get the trading object
+    .. py:attribute:: tm Set or get the trade management account
     
     .. py:method:: __init__(self[, name="ProfitGoalBase"])
     
-        初始化构造函数
+        The initialization constructor
         
-        :param str name: 名称
+        :param str name: the name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
         
     .. py:method:: reset(self)
     
-        复位操作
+        The reset operation
     
     .. py:method:: clone(self)
     
-        克隆操作        
+        The clone operation        
         
     .. py:method:: get_goal(self, datetime, price)
     
-        【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
+        [Overload interface] Get the profit goal price; returning constant.null_price means no goal is set, and returning 0 means it needs to be sold
         
-        :param Datetime datetime: 当前时间
-        :param float price: 当前价格
-        :return: 目标价格
+        :param Datetime datetime: the current time
+        :param float price: the current price
+        :return: the goal price
         :rtype: float
         
     .. py:method:: buy_notify(self, trade_record)
     
-        【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
+        [Overload interface] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
-        :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
+        :param TradeRecord trade_record: the actual buy trade record when the actual buy occurs
         
     .. py:method:: sell_notify(self, trade_record)
     
-        【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
+        [Overload interface] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
-        :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录
+        :param TradeRecord trade_record: the actual sell trade record when the actual sell occurs
          
     .. py:method:: _calculate(self)
     
-        【重载接口】子类计算接口
+        [Overload interface] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        【重载接口】子类复位接口，复位内部私有变量
+        [Overload interface] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口        
-     
+        [Overload interface] The subclass clone interface        

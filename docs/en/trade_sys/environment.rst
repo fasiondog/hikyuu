@@ -1,101 +1,99 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_sys/environment.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-市场环境判定策略|EV
-===========================
+Environment Judgement Strategy|EV
+=================================
 
-内建市场环境判定策略
----------------------------
+Built-in Environment Judgement Strategies
+-----------------------------------------
 
 .. py:function:: EV_TwoLine(fast, slow[, market = 'SH'])
 
-    快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
+    The fast/slow line judgement strategy; when the fast line of the market index is above the slow line, the market is valid, otherwise invalid.
 
-    :param Indicator fast: 快线指标
-    :param Indicator slow: 慢线指标
-    :param string market: 市场名称
+    :param Indicator fast: the fast line indicator
+    :param Indicator slow: the slow line indicator
+    :param string market: the market name
 
 .. py:function:: EV_Bool(ind[, market = 'SH'])
 
-    布尔信号指标市场环境
+    The boolean signal indicator market environment
 
-    :param Indicator ind: bool类型的指标, 指标中相应位置大于0则代表市场有效, 否则无效
-    :param str market: 指定的市场，用于获取相应的交易日历
+    :param Indicator ind: a bool-type indicator; a position greater than 0 in the indicator means the market is valid, otherwise invalid
+    :param str market: the specified market, used to get the corresponding trading calendar
 
 
-自定义市场环境判定策略
-----------------------
+Custom Environment Judgement Strategy
+-------------------------------------
 
-自定义市场环境判定策略接口：
+The custom environment judgement strategy interface:
 
-* :py:meth:`EnvironmentBase._calculate` - 【必须】子类计算接口
-* :py:meth:`EnvironmentBase._clone` - 【必须】克隆接口
-* :py:meth:`EnvironmentBase._reset` - 【可选】重载私有变量
+* :py:meth:`EnvironmentBase._calculate` - [Required] The subclass calculation interface
+* :py:meth:`EnvironmentBase._clone` - [Required] The clone interface
+* :py:meth:`EnvironmentBase._reset` - [Optional] Reload the private variables
 
-市场环境判定策略基类
---------------------
+Environment Judgement Strategy Base Class
+-----------------------------------------
 
 .. py:class:: EnvironmentBase
 
-    市场环境判定策略基类
+    The environment judgement strategy base class
     
-    .. py:attribute:: name 名称
-    .. py:attribute:: query 设置或获取查询条件
+    .. py:attribute:: name Name
+    .. py:attribute:: query Set or get the query condition
     
     .. py:method:: __init__(self[, name='EnvironmentBase'])
     
-        初始化构造函数
+        The initialization constructor
         
-        :param str name: 名称
+        :param str name: the name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
         
     .. py:method:: is_valid(self, datetime)
     
-        指定时间系统是否有效
+        Whether the system is valid at the specified time
         
-        :param Datetime datetime: 指定时间
-        :return: True 有效 | False 无效
+        :param Datetime datetime: the specified time
+        :return: True valid | False invalid
     
     .. py:method:: _add_valid(self, datetime)
     
-        加入有效时间，在_calculate中调用
+        Add a valid time, called in _calculate
         
-        :param Datetime datetime: 有效时间
+        :param Datetime datetime: the valid time
       
     .. py:method:: reset(self)
     
-        复位操作
+        The reset operation
     
     .. py:method:: clone(self)
     
-        克隆操作        
+        The clone operation        
         
     .. py:method:: _calculate(self)
     
-        【重载接口】子类计算接口
+        [Overload interface] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        【重载接口】子类复位接口，用于复位内部私有变量
+        [Overload interface] The subclass reset interface, used to reset the internal private variables
     
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口
+        [Overload interface] The subclass clone interface

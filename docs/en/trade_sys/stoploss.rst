@@ -1,131 +1,129 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_sys/stoploss.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-止损/止赢策略|ST
-=================
+Stop-loss/Take-profit Strategy|ST
+=================================
 
 .. Note::
 
-    Hikyuu中将止损和止盈分别作为交易系统的两个策略组件。两者之间在概念和执行上有所区别。比如，一般系统通常在使用跟随性的指标曲线作为止盈退出时，经常会发生滞后的情况，原本希望收盘价低于指标时卖出止盈，但实际上指标和收盘价同时都在下跌，这样实际的退出发生在收盘价向下穿越指标线时，这样造成滞后反映，另外，如果在盘中实时跟踪，由于收盘价不停的变动，止损的指标线也会发生变动，这样会出现噪音误判，导致一般系统里实盘和回测的结果出现偏差。Hikyuu里，当前Bar里止损/止盈都是不变的固定是上一时刻的值，同时，Hikyuu里系统是保证止盈始终单调递增的！比如某个指标值，前天值为11，昨天的值为9，今天的收盘价10，那么这个指标作为止损部件（今日收盘价10大于止损价9），不会触发退出，而作为止盈部件，系统则会发出卖出指示，因为当前的收盘价已经低于11。
+    In Hikyuu, the stop-loss and the take-profit are two separate strategy components of the trade system. They differ in concept and execution. For example, in a general system, when a following indicator curve is used as the take-profit exit, a lag often occurs: originally it is expected to sell and take the profit when the close price falls below the indicator, but in fact the indicator and the close price both keep falling, so the actual exit happens when the close price crosses the indicator line downward, causing a lagged reaction. In addition, if tracked in real time during the trading session, since the close price keeps changing, the stop-loss indicator line also changes, which causes noise misjudgements, and the results of live trading and backtesting in a general system deviate. In Hikyuu, the stop-loss/take-profit in the current bar is always a fixed value, namely the value of the previous moment; meanwhile, in Hikyuu the system guarantees that the take profit always increases monotonically! For example, for a certain indicator value, the value was 11 the day before yesterday, 9 yesterday, and today's close price is 10; then, as a stop-loss part (today's close price 10 is greater than the stop-loss price 9), it will not trigger an exit, but as a take-profit part, the system will issue a sell instruction, because the current close price is already below 11.
     
 
-常用止损/止赢策略
------------------
+Common Stop-loss/Take-profit Strategies
+---------------------------------------
 
-止损是指买入后，价格的走势和预期相反，当价格低于某一水平时卖出，防止进一步的损失。
-止赢是在买入后，价格符合预期走势，当价格回落至某一水平时卖出，获得足够的收益。
-进行交易时，即可使用相同的止损和止赢策略，也可使用不同的止损和止赢策略，如使用固定百分比3%作为止损，使用吊灯安全线作为止赢。
+The stop-loss means that after buying, the price moves against the expectation, and when the price falls below a certain level, sell to prevent further losses.
+The take-profit means that after buying, the price moves as expected, and when the price falls back to a certain level, sell to secure enough profit.
+When trading, you can use the same stop-loss and take-profit strategies, or different ones, e.g. a fixed percentage of 3% as the stop-loss and the chandelier safety line as the take-profit.
 
-固定百分比止损
-^^^^^^^^^^^^^^
+Fixed Percentage Stop-loss
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: ST_FixedPercent([p=0.03])
 
-    固定百分比止损策略，即当价格低于买入价格的某一百分比时止损
+    The fixed percentage stop-loss strategy, i.e. stopping the loss when the price falls below a certain percentage of the buy price
     
-    :param float p: 百分比(0,1]
-    :return: 止损/止赢策略实例
+    :param float p: the percentage (0,1]
+    :return: the stop-loss/take-profit strategy instance
 
-技术指标止损
-^^^^^^^^^^^^
+Technical Indicator Stop-loss
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: ST_Indicator(op[, kpart="CLOSE"])
 
-    使用技术指标作为止损价。如使用10日EMA作为止损：::
+    Use a technical indicator as the stop-loss price. E.g. use the 10-day EMA as the stop-loss: ::
     
         ST_Indicator(EMA(CLOSE(), n=10))
 
-    :param Indicator ind: 指标公式
-    :return: 止损/止赢策略实例
+    :param Indicator ind: the indicator formula
+    :return: the stop-loss/take-profit strategy instance
 
-亚历山大.艾尔德安全地带止损
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^    
+Alexander Elder Safety Zone Stop-loss
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    
 
 .. py:function:: ST_Saftyloss([n1=10, n2=3, p=2.0])
 
-    参见《走进我的交易室》（2007年 地震出版社） 亚历山大.艾尔德(Alexander Elder) P202
-    计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，
-    得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日
-    最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的
-    上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
+    See "走进我的交易室" (2007, 地震出版社) by Alexander Elder, P202.
+    Calculation description: within the lookback period (generally 10 to 20 days), add up the lengths of all the downward crossings and divide by the number of the downward crossings,
+    to get the mean noise (i.e. the length of all the lowest prices below the previous day's lowest price within the lookback period divided by the number), and subtract the previous day's
+    mean noise multiplied by a factor from today's lowest price to get the stop-loss line. To offset the fluctuation and guarantee the upward movement of the stop-loss line,
+    take the highest value within N days (generally 3 days) based on the above result.
 
-    :param int n1: 计算平均噪音的回溯时间窗口，默认为10天
-    :param int n2: 对初步止损线去n2日内的最高值，默认为3
-    :param double p: 噪音系数，默认为2
-    :return: 止损/止赢策略实例
+    :param int n1: the lookback time window for calculating the average noise, defaults to 10 days
+    :param int n2: take the highest value within n2 days of the preliminary stop-loss line, defaults to 3
+    :param double p: the noise coefficient, defaults to 2
+    :return: the stop-loss/take-profit strategy instance
     
 
-自定义止损/止赢策略
--------------------
+Custom Stop-loss/Take-profit Strategy
+-------------------------------------
 
-自定义止损/止赢策略接口：
+The custom stop-loss/take-profit strategy interface:
 
-* :py:meth:`SignalBase._calculate` - 【必须】子类计算接口
-* :py:meth:`SignalBase._clone` - 【必须】克隆接口
-* :py:meth:`SignalBase._reset` - 【可选】重载私有变量
+* :py:meth:`SignalBase._calculate` - [Required] The subclass calculation interface
+* :py:meth:`SignalBase._clone` - [Required] The clone interface
+* :py:meth:`SignalBase._reset` - [Optional] Reload the private variables
 
-止损/止赢策略基类
------------------
+Stop-loss/Take-profit Strategy Base Class
+-----------------------------------------
 
 .. py:class:: StoplossBase
 
-    止损/止赢算法基类
+    The stop-loss/take-profit algorithm base class
     
-    .. py:attribute:: name 名称
-    .. py:attribute:: tm 设置或获取交易管理实例
-    .. py:attribute:: to 设置或获取交易对象
+    .. py:attribute:: name Name
+    .. py:attribute:: tm Set or get the trade manager instance
+    .. py:attribute:: to Set or get the trading object
     
     .. py:method:: __init__(self[, name="StoplossBase"])
     
-        :param str name: 名称
+        :param str name: the name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
    
     .. py:method:: reset(self)
     
-        复位操作
+        The reset operation
     
     .. py:method:: clone(self)
     
-        克隆操作
+        The clone operation
 
     .. py:method:: get_price(self, datetime, price)
     
-        【重载接口】获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
+        [Overload interface] Get the planned stop-loss price of this expected trade (buy); if there is no stop-loss price, return 0. It is used by the system to query the planned stop-loss price of this trade from the stop-loss strategy module before the trade is executed.
         
         .. note::
-            一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价的30%作为止损，则不需要考虑price参数。
+            Generally, the stop-loss and take-profit algorithms can be interchanged, but the getPrice of the stop-loss can take the planned trade price, e.g. 30% of the buy price as the stop-loss. The take-profit ignores the passed price parameter, i.e. it assumes price is 0.0. In fact, even for the stop-loss it is not recommended to use the price parameter; e.g. if 30% of the previous day's lowest price can be used as the stop-loss, the price parameter does not need to be considered.
         
-        :param Datetime datetime: 交易时间
-        :param float price: 计划买入的价格
-        :return: 止损价格
+        :param Datetime datetime: the trade time
+        :param float price: the planned buy price
+        :return: the stop-loss price
         :rtype: float
         
     .. py:method:: _calculate(self)
     
-        【重载接口】子类计算接口
+        [Overload interface] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        【重载接口】子类复位接口，复位内部私有变量
+        [Overload interface] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口
+        [Overload interface] The subclass clone interface
