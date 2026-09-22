@@ -12,7 +12,7 @@
 #endif
 
 /*
- * CPU 架构宏定义
+ * Macro definitions of the CPU architecture
  */
 #if defined(__arm__) || defined(_M_ARM)
 #define HKU_ARCH_ARM 1
@@ -42,7 +42,7 @@
 #endif
 
 /*
- * 操作系统宏定义
+ * Macro definitions of the operating system
  */
 #if defined(_WIN32) || defined(_WIN64)
 #define HKU_OS_WINDOWS 1
@@ -82,7 +82,7 @@
 #define HKU_OS_IOS 0
 #endif
 
-// IOS 模拟器
+// IOS simulator
 #if HKU_OS_IOS && TARGET_OS_SIMULATOR
 #define HKU_OS_IOS_SIMULATOR 1
 #else

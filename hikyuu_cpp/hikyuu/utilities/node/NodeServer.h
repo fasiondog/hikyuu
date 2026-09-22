@@ -58,7 +58,7 @@ public:
     void start(size_t max_parrel = 128) {
         CLS_CHECK(!m_addr.empty(), "You must set NodeServer's addr first!");
 
-        // 启动 node server
+        // Start the node server
         int rv = nng_rep0_open(&m_socket);
         CLS_CHECK(0 == rv, "Failed open server socket! {}", nng_strerror(rv));
         rv = nng_listen(m_socket, m_addr.c_str(), &m_listener, 0);
@@ -101,7 +101,7 @@ public:
             }
         }
 
-        // 关闭 socket 服务节点
+        // Close the socket service node
         nng_listener_close(m_listener);
         nng_close(m_socket);
         m_works.clear();
@@ -162,14 +162,14 @@ private:
             json req = decodeMsg(msg);
             NODE_CHECK(req.contains("cmd"), NodeErrorCode::MISSING_CMD, "Missing command!");
 
-            // 兼容老版本数字cmd
+            // Compatible with the old version numeric cmd
             std::string cmd = req["cmd"].is_number() ? fmt::format("{}", req["cmd"].get<int>())
                                                      : req["cmd"].get<std::string>();
             auto iter = server->m_handles.find(cmd);
             NODE_CHECK(iter != server->m_handles.end(), NodeErrorCode::INVALID_CMD,
                        "The server does not know how to process the message: {}", cmd);
 
-            // tcp 连接尝试获取客户端地址和端口加入 req 中
+            // For a tcp connection it tries to get the client address and port into req
             req["remote_host"] = "";
             req["remote_port"] = 0;
             nng_pipe p = nng_msg_get_pipe(msg);

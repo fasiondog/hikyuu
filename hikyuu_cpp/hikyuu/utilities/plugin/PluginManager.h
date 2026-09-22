@@ -65,10 +65,10 @@ public:
                 std::unique_lock<std::shared_mutex> write_lock(m_mutex);
                 auto it = m_plugins.find(pluginname);
                 if (it != m_plugins.end()) {
-                    // 复用已插入的插件实例
+                    // Reuse the plugin instance already inserted
                     ret = it->second->instance<PluginInterfaceT>();
                 } else {
-                    // 插入新加载的插件
+                    // Insert the newly loaded plugin
                     auto [it, success] =
                       m_plugins.insert(std::make_pair(pluginname, std::move(loader)));
                     if (success) {
