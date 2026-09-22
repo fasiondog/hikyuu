@@ -1,7 +1,7 @@
 /*
  * SP_Normal.h
  *
- *  Created on: 2025年10月25日
+ *  Created on: 2025-10-25
  *      Author: fasiondog
  */
 
@@ -12,10 +12,11 @@
 namespace hku {
 
 /**
- * 正态分布随机价格移滑价差算法, 买入和卖出操作是基于正态分布的随机价格偏移
- * @param mean 正态分布均值
- * @param stddev 正态分布标准差
- * @return 滑点对象指针
+ * Normal distribution random price slippage algorithm: the buy and sell operations are a random
+ * price offset based on the normal distribution
+ * @param mean mean of the normal distribution
+ * @param stddev standard deviation of the normal distribution
+ * @return the slippage object pointer
  */
 SlippagePtr HKU_API SP_Normal(double mean = 0.0, double stddev = 0.05);
 

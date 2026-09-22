@@ -1,7 +1,7 @@
 /*
  * FLEX._SG.h
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2015-3-21
  *      Author: fasiondog
  */
 
@@ -15,11 +15,12 @@
 namespace hku {
 
 /**
- * 自交叉单线拐点指示器。
- * 使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
+ * Self-crossing single line inflection point indicator.
+ * It uses its own EMA(slow_n) as the slow line and itself as the fast line: it buys when the fast
+ * line crosses the slow line upward and sells when the fast line crosses the slow line downward.
  * @param op
- * @param slow_n 慢线EMA周期
- * @return 信号指示器
+ * @param slow_n the EMA period of the slow line
+ * @return signal generator
  * @ingroup Signal
  */
 SignalPtr HKU_API SG_Flex(const Indicator& op, int slow_n);

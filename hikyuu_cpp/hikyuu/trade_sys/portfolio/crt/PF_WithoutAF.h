@@ -16,29 +16,35 @@
 namespace hku {
 
 /**
- * @brief 无资金分配算法的投资组合
+ * @brief Portfolio without a fund allocation algorithm
  * @details
  * <pre>
- * 调仓模式 adjust_mode 说明：
- *  - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
- *    决定周期间隔；
- *  - "day" 模式，adjust_cycle 为调仓间隔天数
- *  - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
- *    为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
- *    如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
- *    将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
- *    的第一个交易日
+ * Description of the rebalancing mode adjust_mode:
+ *  - In the "query" mode it follows the ktype in the input parameter query; at this time
+ * adjust_cycle determines the cycle interval with the ktype in query;
+ *  - In the "day" mode adjust_cycle is the number of the days between the rebalancing;
+ *  - In the "week" | "month" | "quarter" | "year" mode, adjust_cycle is the corresponding N-th day
+ * of every week, the n-th day of every month, the n-th day of every quarter and the n-th day of
+ * every year; when delay_to_trading_day is false, the rebalancing is skipped if that day is not a
+ * trading day; when delay_to_trading_day is true, it is postponed to the first trading day within
+ * the current cycle if that day is not a trading day; for example, if the rebalancing is specified
+ * on the 1st day of every month but the 1st is not a trading day, it is postponed to the first
+ * trading day of that month
  * </pre>
- * @note 无资金分配算法模式下，仅支持全部在开盘时买卖或全部在收盘时买卖！
- * @param tm 交易账户
- * @param se 系统选择器
- * @param adjust_cycle 调仓周期（受 adjust_mode 影响）, 默认为1
- * @param adjust_mode 调仓模式 "query" | "day" | "week" | "month" | "year"
- * @param delay_to_trading_day true 时，如果当日不是交易日将会被顺延至当前周期内的第一个交易日
- * @param trade_on_close 在收盘时执行交易
- * @param sys_use_self_tm 使用原型系统自身交易账户进行计算（仅在无资金分配模式下有效），默认 false
- * @param sell_at_not_selected 调仓日未选中的股票是否强制卖出，默认 false
- * @return 组合实例
+ * @note In the mode without a fund allocation algorithm, only all buying and selling at the open or
+ *       all buying and selling at the close is supported!
+ * @param tm trade account
+ * @param se system selector
+ * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default
+ * @param adjust_mode the rebalancing mode "query" | "day" | "week" | "month" | "year"
+ * @param delay_to_trading_day when it is true, it is postponed to the first trading day within the
+ *                             current cycle if that day is not a trading day
+ * @param trade_on_close execute the trade at the close
+ * @param sys_use_self_tm use the trade account of the prototype system itself for the calculation
+ *                        (valid in the mode without a fund allocation only), false by default
+ * @param sell_at_not_selected whether to force selling the stocks not selected on the rebalancing
+ *                             day, false by default
+ * @return the portfolio instance
  */
 PortfolioPtr HKU_API PF_WithoutAF(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),
                                   int adjust_cycle = 1, const string& adjust_mode = "query",

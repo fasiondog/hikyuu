@@ -14,12 +14,16 @@
 namespace hku {
 
 /**
- * 固定交易数量资金管理策略
- * @details 每次买入固定的数量，如果帐户余额不足，则向帐户中存入足够的资金，保证能够执行买入。
- *          即，假设资金总是充足的。
- * @param n 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
- * @note 1) 该策略主要用于测试和其他策略进行比较结果，本身不符合现实。\n
- *       2) 该策略并不判断已有的持仓情况，如果在已有持仓情况下不能交易，则该判断应为System本身的责任
+ * Fixed trade quantity money management strategy
+ * @details A fixed quantity is bought every time; if the account balance is insufficient, enough
+ * funds are deposited into the account to guarantee that the buy can be executed. That is, the
+ * funds are always assumed to be sufficient.
+ * @param n the quantity bought every time (it should be an integer multiple of the minimum trade
+ *          quantity of the trading object, the program does not check this here)
+ * @note 1) This strategy is mainly used to test and compare the results with the other strategies,
+ * it does not conform to the reality itself. \n 2) This strategy does not judge the existing
+ * positions; if a trade cannot be made with the existing positions, that judgment should be the
+ * responsibility of the System itself
  */
 class FixedCountMoneyManager : public MoneyManagerBase {
     MONEY_MANAGER_IMP(FixedCountMoneyManager)

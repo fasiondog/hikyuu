@@ -1,7 +1,7 @@
 /*
  * SimplePortfolio.h
  *
- *  Created on: 2016年2月21日
+ *  Created on: 2016-2-21
  *      Author: fasiondog
  */
 
@@ -17,7 +17,7 @@
 namespace hku {
 
 /*
- * 资产组合
+ * Portfolio
  * @ingroup SimplePortfolio
  */
 class HKU_API SimplePortfolio : public Portfolio {
@@ -31,13 +31,14 @@ public:
     virtual json lastSuggestion() const override;
 
 private:
-    SystemList m_dlist_sys_list;               // 因证券退市，无法执行卖出的系统（资产全部损失）
-    SystemWeightList m_delay_adjust_sys_list;  // 延迟调仓卖出的系统列表
+    SystemList m_dlist_sys_list;               // The systems that cannot execute a sell because the
+                                               // security is delisted (the whole assets are lost)
+    SystemWeightList m_delay_adjust_sys_list;  // System list of the delayed rebalancing sells
     SystemWeightList m_tmp_selected_list;
     SystemWeightList m_tmp_will_remove_sys;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

@@ -1,7 +1,7 @@
 /*
  * MM_WilliamsFixedRisk.h
  *
- *  Created on: 2016年5月3日
+ *  Created on: 2016-5-3
  *      Author: Administrator
  */
 
@@ -14,10 +14,10 @@
 namespace hku {
 
 /**
- * @brief 威廉斯固定风险资金管理策略
- * 买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
- * @param p 风险百分比
- * @param max_loss 最大损失
+ * @brief Williams fixed risk money management strategy
+ * Buy quantity = (account balance × risk percentage p) ÷ maximum loss (max_loss)
+ * @param p risk percentage
+ * @param max_loss maximum loss
  * @return MoneyManagerPtr
  */
 MoneyManagerPtr HKU_API MM_WilliamsFixedRisk(double p = 0.1, price_t max_loss = 1000.0);

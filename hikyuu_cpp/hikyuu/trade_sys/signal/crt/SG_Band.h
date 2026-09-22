@@ -1,7 +1,7 @@
 /*
  * SG_Band.h
  *
- *   Created on: 2023年09月23日
+ *   Created on: 2023-09-23
  *       Author: yangrq1018
  */
 #pragma once
@@ -14,20 +14,22 @@
 namespace hku {
 
 /**
- * 指标区间指示器, 当指标超过上轨时，买入；当指标低于下轨时，卖出。
- * @note 适用于 RSI 类，有绝对值区间的指标
- * @param ind 指标
- * @param lower 下轨
- * @param upper 上轨
+ * Indicator band indicator: buy when the indicator exceeds the upper band, and sell when the
+ * indicator is lower than the lower band.
+ * @note It is suitable for the RSI-like indicators with an absolute value range
+ * @param ind indicator
+ * @param lower lower band
+ * @param upper upper band
  * @return SignalPtr
  */
 SignalPtr HKU_API SG_Band(const Indicator& ind, price_t lower, price_t upper);
 
 /**
- * 指标区间指示器, 当指标超过上轨指标时，买入；当指标低于下轨指标时，卖出。
- * @param ind 指标
- * @param lower 下轨指标
- * @param upper 上轨指标
+ * Indicator band indicator: buy when the indicator exceeds the upper band indicator, and sell when
+ * the indicator is lower than the lower band indicator.
+ * @param ind indicator
+ * @param lower lower band indicator
+ * @param upper upper band indicator
  * @return SignalPtr
  */
 SignalPtr HKU_API SG_Band(const Indicator& ind, const Indicator& lower, const Indicator& upper);
