@@ -14,10 +14,12 @@
 namespace hku {
 
 /*
- * 佩里.J.考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社）
- * 参数： n: 计算均值的周期窗口，必须为大于2的整数
- *       fast_n: 快速趋势的周期，一般为2，不用改变
- *       slow_n: 对应慢速EMA线的N值，考夫曼一般设为30，不过当超过60左右该指标会收敛不会有太大的影响
+ * Perry J. Kaufman adaptive moving average, see "Smarter Trading" (2006, Guangdong Economy
+ * Publishing House)
+ * Parameters: n: the period window for calculating the average, it must be an integer greater than
+ * 2 fast_n: the period of the fast trend, generally 2, it does not need to be changed slow_n: the N
+ * value of the corresponding slow EMA line, Kaufman generally sets it to 30; the indicator
+ * converges when it exceeds about 60 and there is not much influence
  */
 class IAma : public IndicatorImp {
     INDICATOR_IMP(IAma)

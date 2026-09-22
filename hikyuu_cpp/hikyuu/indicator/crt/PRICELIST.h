@@ -16,9 +16,10 @@
 namespace hku {
 
 /**
- * 包装PriceList成Indicator
- * @param data 源数据
- * @param discard 前端抛弃的数据点数，抛弃的值使用Null<price_t>()填充
+ * Wrap a PriceList into an Indicator
+ * @param data source data
+ * @param discard the number of the data points discarded at the front; the discarded values are
+ *                 filled with Null<price_t>()
  * @ingroup Indicator
  */
 Indicator HKU_API PRICELIST(const PriceList& data, int discard = 0);
@@ -31,9 +32,9 @@ Indicator HKU_API PRICELIST(DatetimeList&& dates, double value, int discard = 0)
 Indicator HKU_API PRICELIST();
 
 /**
- * 包装数组成Indicator，用于计算其他指标
+ * Wrap an array into an Indicator, used to calculate the other indicators
  * @param data price_t[]
- * @param total 数组大小
+ * @param total array size
  * @ingroup Indicator
  */
 // Indicator HKU_API PRICELIST(double* data, size_t total);

@@ -1,7 +1,7 @@
 /*
  * IRef.h
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2015-3-21
  *      Author: fasiondog
  */
 
@@ -14,10 +14,11 @@
 namespace hku {
 
 /*
- * REF 向前引用 （即右移）
- * 引用若干周期前的数据。
- * 用法：　REF(X，A)　引用A周期前的X值。
- * 例如：　REF(CLOSE，1)　表示上一周期的收盘价，在日线上就是昨收。
+ * REF forward reference (i.e. shift right)
+ * Reference the data of several periods before.
+ * Usage: REF(X,A) references the X value A periods before.
+ * For example: REF(CLOSE,1) means the close price of the previous period, which is the previous
+ * close on the daily line.
  */
 class IRef : public IndicatorImp {
     INDICATOR_IMP(IRef)
