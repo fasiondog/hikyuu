@@ -28,7 +28,7 @@ using namespace hku;
 TEST_CASE("test_Parameter") {
     Parameter param;
 
-    /** @arg 正常添加、读取、修改参数 */
+    /** @arg The normal adding, reading and modifying of the parameters */
     param.set<int>("n", 1);
     param.set<int64_t>("n64", 21474836480ll);
     param.set<bool>("bool", true);
@@ -52,16 +52,16 @@ TEST_CASE("test_Parameter") {
     CHECK(param.get<double>("double") == 10.01);
     CHECK(param.get<string>("string") == "test2");
 
-    /** @arg 添加不支持的参数类型 */
+    /** @arg Add an unsupported parameter type */
     CHECK_THROWS_AS(param.set<size_t>("n", 10), std::logic_error);
     CHECK_THROWS_AS(param.set<float>("n", 10.0), std::logic_error);
 
-    /** @arg 修改参数时，指定的类型和原有类型不符 */
+    /** @arg When modifying a parameter, the given type does not match the existing one */
     CHECK_THROWS_AS(param.set<float>("n", 10.0), std::logic_error);
     CHECK_THROWS_AS(param.set<float>("bool", 10.0), std::logic_error);
     CHECK_THROWS_AS(param.set<float>("double", 10.0), std::logic_error);
 
-    /** @arg 测试相等比较 */
+    /** @arg Test the equality comparison */
     Parameter p1, p2;
     p1.set<string>("string", "test");
     p1.set<bool>("bool", true);
@@ -100,21 +100,21 @@ TEST_CASE("test_Parameter") {
     p2.set<PriceList>("ps", {1.0, 2.0});
     CHECK_EQ(p1, p2);
 
-    /** @arg 测试使用 Stock 做为参数 */
+    /** @arg Test using Stock as a parameter */
     Stock stk = getStock("sh600000");
     Parameter p;
     p.set<Stock>("stk", stk);
     Stock stk2 = p.get<Stock>("stk");
     CHECK(stk == stk2);
 
-    /** @arg 测试使用 Block 做为参数 */
+    /** @arg Test using Block as a parameter */
     Block blk;
     p = Parameter();
     p.set<Block>("blk", blk);
     Block blk2 = p.get<Block>("blk");
     CHECK(blk == blk2);
 
-    /** @arg 测试使用 KQuery 做为参数 */
+    /** @arg Test using KQuery as a parameter */
     KQuery query(10, 20);
     p = Parameter();
     p.set<KQuery>("query", query);
@@ -122,7 +122,7 @@ TEST_CASE("test_Parameter") {
     q2 = p.get<KQuery>("query");
     CHECK(query == q2);
 
-    /** @arg 测试使用 KData 做为参数 */
+    /** @arg Test using KData as a parameter */
     KData k = stk.getKData(query);
     p = Parameter();
     p.set<KData>("k", k);
@@ -139,7 +139,7 @@ TEST_CASE("test_Parameter") {
     CHECK(k.getStock() == k2.getStock());
     CHECK(k.getQuery() == k2.getQuery());
 
-    /** @arg 测试使用 PriceList 做为参数 */
+    /** @arg Test using PriceList as a parameter */
     PriceList x;
     for (int i = 0; i < 10; i++) {
         x.push_back(i);
@@ -153,7 +153,7 @@ TEST_CASE("test_Parameter") {
     }
 }
 
-/** @par 验证对 KData 的获取 */
+/** @par Verify the getting of KData */
 TEST_CASE("test_Parameter_KData") {
     KData k = getKData("sh000001", KQuery(-10));
     CHECK_EQ(k.size(), 10);
@@ -161,7 +161,7 @@ TEST_CASE("test_Parameter_KData") {
     Parameter param;
     param.set<KData>("k", k);
 
-    /** @arg 验证是否可以多次读取 KData，防止移动语义影响 */
+    /** @arg Verify that KData can be read several times, avoiding the move semantics */
     auto ek = param.get<KData>("k");
     CHECK_EQ(ek, k);
 

@@ -22,11 +22,12 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点: 基本功能测试 */
+/** @par Test point: the basic functionality test */
 TEST_CASE("test_LruCache_basic") {
-    LruCache<int, std::string> cache(3, 0);  // 容量为3的缓存，溢出容量为0以保持原有行为
+    LruCache<int, std::string> cache(3,
+                                     0);  // Capacity 3, overflow 0, keeping the original behavior
 
-    /** @arg 测试插入和获取 */
+    /** @arg Test the insertion and the getting */
     cache.insert(1, "one");
     cache.insert(2, "two");
     cache.insert(3, "three");
@@ -35,54 +36,54 @@ TEST_CASE("test_LruCache_basic") {
     CHECK_EQ(cache.get(2), "two");
     CHECK_EQ(cache.get(3), "three");
 
-    /** @arg 测试LRU淘汰机制 */
-    cache.insert(4, "four");  // 此时链表状态 4,1,3
+    /** @arg Test the LRU elimination */
+    cache.insert(4, "four");  // The list is now 4,1,3
 
-    CHECK_EQ(cache.get(1), "one");    // 非严格LRU模式，仍旧存在
-    CHECK_EQ(cache.get(2), "");       // 非严格LRU模式，已淘汰
-    CHECK_EQ(cache.get(3), "three");  // 仍存在
-    CHECK_EQ(cache.get(4), "four");   // 最新插入
+    CHECK_EQ(cache.get(1), "one");    // The non-strict LRU mode, it still exists
+    CHECK_EQ(cache.get(2), "");       // The non-strict LRU mode, it was eliminated
+    CHECK_EQ(cache.get(3), "three");  // It still exists
+    CHECK_EQ(cache.get(4), "four");   // The latest inserted
 
-    /** @arg 测试访问更新LRU顺序 */
-    cache.get(4);             // 访问4,标记为已读取
-    cache.insert(5, "five");  // 此时链表状态 3,5,4
+    /** @arg Test that an access updates the LRU order */
+    cache.get(4);             // Access 4 and mark it as read
+    cache.insert(5, "five");  // The list is now 3,5,4
 
-    CHECK_EQ(cache.get(1), "");       // 被淘汰
-    CHECK_EQ(cache.get(3), "three");  // 仍存在
-    CHECK_EQ(cache.get(4), "four");   // 仍存在
-    CHECK_EQ(cache.get(5), "five");   // 新插入
+    CHECK_EQ(cache.get(1), "");       // It was eliminated
+    CHECK_EQ(cache.get(3), "three");  // It still exists
+    CHECK_EQ(cache.get(4), "four");   // It still exists
+    CHECK_EQ(cache.get(5), "five");   // The new insertion
 
-    /** @arg 测试容量和大小 */
+    /** @arg Test the capacity and the size */
     CHECK_EQ(cache.capacity(), 3);
     CHECK_EQ(cache.size(), 3);
     CHECK_UNARY(!cache.empty());
 
-    /** @arg 测试更新已存在的键 */
+    /** @arg Test updating an existing key */
     cache.insert(1, "two_updated");
     CHECK_EQ(cache.get(1), "two_updated");
 }
 
-/** @par 检测点: 移动语义功能测试 */
+/** @par Test point: the move semantics test */
 TEST_CASE("test_LruCache_move_semantics") {
-    LruCache<int, std::string> cache(3, 0);  // 溢出容量为0以保持原有行为
+    LruCache<int, std::string> cache(3, 0);  // Overflow 0, keeping the original behavior
 
-    /** @arg 测试移动语义insert */
+    /** @arg Test insert with the move semantics */
     std::string value = "test_value";
-    std::string original_value = value;  // 保存原始值
+    std::string original_value = value;  // Save the original value
 
-    cache.insert(1, std::move(value));  // 使用移动语义插入
+    cache.insert(1, std::move(value));  // Insert with the move semantics
 
-    CHECK_EQ(cache.get(1), original_value);  // 确保值正确存储
-    // value变量现在可能为空，因为我们移动了它
+    CHECK_EQ(cache.get(1), original_value);  // Make sure the value is stored correctly
+    // The value variable may be empty now, because it was moved
 
-    /** @arg 测试移动语义更新现有键 */
+    /** @arg Test updating an existing key with the move semantics */
     std::string new_value = "new_test_value";
-    std::string original_new_value = new_value;  // 保存原始值
+    std::string original_new_value = new_value;  // Save the original value
 
-    cache.insert(1, std::move(new_value));       // 使用移动语义更新已存在的键
-    CHECK_EQ(cache.get(1), original_new_value);  // 确保值被正确更新
+    cache.insert(1, std::move(new_value));       // Update the existing key with the move semantics
+    CHECK_EQ(cache.get(1), original_new_value);  // Make sure the value was updated correctly
 
-    /** @arg 测试移动语义与LRU淘汰机制 */
+    /** @arg Test the move semantics with the LRU elimination */
     std::string value2 = "value2";
     std::string original_value2 = value2;
     std::string value3 = "value3";
@@ -90,64 +91,64 @@ TEST_CASE("test_LruCache_move_semantics") {
     std::string value4 = "value4";
     std::string original_value4 = value4;
 
-    cache.insert(2, std::move(value2));  // 插入第二个值
-    cache.insert(3, std::move(value3));  // 插入第三个值
+    cache.insert(2, std::move(value2));  // Insert the second value
+    cache.insert(3, std::move(value3));  // Insert the third value
     CHECK_EQ(cache.get(2), original_value2);
     CHECK_EQ(cache.get(3), original_value3);
 
-    cache.insert(4, std::move(value4));  // 此时应该触发LRU淘汰，键1可能被移除
+    cache.insert(4, std::move(value4));  // This should trigger the LRU elimination, key 1 removed
     CHECK_EQ(cache.get(4), original_value4);
 
-    // 验证哪些键还存在
-    // 由于LRU机制，最久未访问的键(可能是2或3之前的1)会被移除
-    CHECK_EQ(cache.size(), 3);  // 确保缓存大小正确
+    // Verify which keys still exist
+    // Due to the LRU mechanism the least recently accessed key (probably 1) is removed
+    CHECK_EQ(cache.size(), 3);  // Make sure the cache size is correct
 }
 
-/** @par 检测点: tryGet功能测试 */
+/** @par Test point: the tryGet functionality test */
 TEST_CASE("test_LruCache_tryGet") {
-    LruCache<int, std::string> cache(3, 0);  // 溢出容量为0以保持原有行为
+    LruCache<int, std::string> cache(3, 0);  // Overflow 0, keeping the original behavior
 
-    /** @arg 测试tryGet在键不存在时的行为 */
+    /** @arg Test the behavior of tryGet when the key does not exist */
     std::string value;
     bool found = cache.tryGet(1, value);
-    CHECK_UNARY(!found);             // 键不存在，应返回false
-    CHECK_EQ(value, std::string{});  // 值应为默认构造值
+    CHECK_UNARY(!found);             // The key does not exist, false should be returned
+    CHECK_EQ(value, std::string{});  // The value should be the default constructed one
 
-    /** @arg 测试tryGet在键存在时的行为 */
+    /** @arg Test the behavior of tryGet when the key exists */
     cache.insert(1, "one");
     bool found2 = cache.tryGet(1, value);
-    CHECK_UNARY(found2);     // 键存在，应返回true
-    CHECK_EQ(value, "one");  // 值应正确返回
+    CHECK_UNARY(found2);     // The key exists, true should be returned
+    CHECK_EQ(value, "one");  // The value should be returned correctly
 
-    /** @arg 测试tryGet更新LRU顺序 */
+    /** @arg Test that tryGet updates the LRU order */
     cache.insert(2, "two");
     cache.insert(3, "three");
-    CHECK_EQ(cache.size(), 3);  // 确保三个元素都在
+    CHECK_EQ(cache.size(), 3);  // Make sure the three elements are all there
 
     std::string value3;
-    bool found3 = cache.tryGet(2, value3);  // 访问2，使其变为最新
+    bool found3 = cache.tryGet(2, value3);  // Access 2 to make it the latest
     CHECK_UNARY(found3);
     CHECK_EQ(value3, "two");
 
-    cache.insert(4, "four");  // 此时应该淘汰最早访问的元素，由于2被访问了，所以1应该被淘汰
+    cache.insert(4, "four");  // The earliest accessed element should be eliminated; 2 was accessed
     std::string value4;
     bool found4 = cache.tryGet(1, value4);
-    CHECK_UNARY(!found4);             // 1应该已被淘汰
-    CHECK_EQ(cache.get(2), "two");    // 2应该还在，因为刚访问过
-    CHECK_EQ(cache.get(3), "three");  // 3应该还在
-    CHECK_EQ(cache.get(4), "four");   // 4是最新插入的
+    CHECK_UNARY(!found4);             // 1 should have been eliminated
+    CHECK_EQ(cache.get(2), "two");    // 2 should still be there, it was accessed just now
+    CHECK_EQ(cache.get(3), "three");  // 3 should still be there
+    CHECK_EQ(cache.get(4), "four");   // 4 is the latest inserted
 }
 
-/** @par 检测点: 边界情况测试 */
+/** @par Test point: the boundary case test */
 TEST_CASE("test_LruCache_edge_cases") {
-    LruCache<int, int> cache(0, 0);  // 容量为0的缓存，溢出容量也为0
+    LruCache<int, int> cache(0, 0);  // A cache with the capacity 0 and the overflow capacity 0
 
-    /** @arg 测试容量为0的情况（无限制容量）*/
+    /** @arg Test the case of the capacity 0 (an unlimited capacity) */
     cache.insert(1, 100);
-    CHECK_EQ(cache.get(1), 100);  // 应该返回存储的值，因为容量为0表示无限制
-    CHECK_UNARY(!cache.empty());  // 缓存不应该为空，因为有元素
+    CHECK_EQ(cache.get(1), 100);  // The stored value is returned, the capacity 0 means unlimited
+    CHECK_UNARY(!cache.empty());  // The cache should not be empty, because it has elements
 
-    /** @arg 测试容量调整 */
+    /** @arg Test the capacity adjustment */
     cache.resize(2);
     cache.insert(1, 100);
     cache.insert(2, 200);
@@ -155,66 +156,68 @@ TEST_CASE("test_LruCache_edge_cases") {
     CHECK_EQ(cache.get(1), 100);
     CHECK_EQ(cache.get(2), 200);
 
-    /** @arg 测试清空 */
+    /** @arg Test clear */
     cache.clear();
     CHECK_UNARY(cache.empty());
     CHECK_EQ(cache.size(), 0);
 }
 
-/** @par 检测点: contains和remove功能 */
+/** @par Test point: the contains and remove functionality */
 TEST_CASE("test_LruCache_contains_remove") {
-    LruCache<std::string, int> cache(3, 0);  // 溢出容量为0以保持原有行为
+    LruCache<std::string, int> cache(3, 0);  // Overflow 0, keeping the original behavior
 
-    /** @arg 测试contains功能 */
+    /** @arg Test the contains functionality */
     cache.insert("key1", 100);
     cache.insert("key2", 200);
     CHECK_UNARY(cache.contains("key1"));
     CHECK_UNARY(cache.contains("key2"));
     CHECK_UNARY(!cache.contains("key3"));
 
-    /** @arg 测试remove功能 */
+    /** @arg Test the remove functionality */
     bool removed = cache.remove("key1");
     CHECK_UNARY(removed);
     CHECK_UNARY(!cache.contains("key1"));
     CHECK_EQ(cache.get("key1"), 0);
 
-    /** @arg 测试删除不存在的键 */
+    /** @arg Test removing a key that does not exist */
     removed = cache.remove("nonexistent");
     CHECK_UNARY(!removed);
 
-    /** @arg 测试remove后的新插入 */
+    /** @arg Test a new insertion after remove */
     cache.insert("key3", 300);
     cache.insert("key4", 400);
     CHECK_UNARY(cache.contains("key3"));
     CHECK_UNARY(cache.contains("key4"));
-    CHECK_UNARY(cache.contains("key2"));  // key2应该还在，因为key1已经被删除了
+    CHECK_UNARY(cache.contains("key2"));  // key2 should still be there, key1 was removed
 }
 
-/** @par 检测点: 线程安全测试 */
+/** @par Test point: the thread safety test */
 TEST_CASE("test_LruCache_thread_safety") {
     const int num_threads = 10;
     const int ops_per_thread = 100;
     std::vector<std::thread> threads;
 
-    // 使用智能指针管理cache
+    // The cache is managed with a smart pointer
     auto cache = std::make_shared<LruCache<int, int, std::shared_mutex>>(
-      1000, 0);  // 增加容量以避免并发测试时的LRU淘汰，溢出容量为0
+      1000,
+      0);  // A larger capacity to avoid the LRU elimination in the concurrent test, overflow 0
 
-    // 并发写入测试
+    // The concurrent write test
     for (int t = 0; t < num_threads; ++t) {
-        threads.emplace_back([=, cache_ptr = cache]() {  // 每个线程持有cache的shared_ptr
-            for (int i = 0; i < ops_per_thread; ++i) {
-                int key = t * ops_per_thread + i;
-                cache_ptr->insert(key, key * 2);
-            }
-        });
+        threads.emplace_back(
+          [=, cache_ptr = cache]() {  // Every thread holds a shared_ptr of the cache
+              for (int i = 0; i < ops_per_thread; ++i) {
+                  int key = t * ops_per_thread + i;
+                  cache_ptr->insert(key, key * 2);
+              }
+          });
     }
 
     for (auto& th : threads) {
         th.join();
     }
 
-    // 验证写入的结果
+    // Verify the results of the writes
     for (int t = 0; t < num_threads; ++t) {
         for (int i = 0; i < ops_per_thread; ++i) {
             int key = t * ops_per_thread + i;
@@ -223,23 +226,25 @@ TEST_CASE("test_LruCache_thread_safety") {
         }
     }
 
-    // 并发读写测试 - 使用独立的作用域确保这些线程完全结束
+    // The concurrent read / write test - a separate scope makes sure these threads finish
     {
         std::atomic<bool> stop_flag(false);
         std::vector<std::thread> rw_threads;
 
-        // 为了并发读写测试，使用更大的容量避免LRU影响
-        cache->setOverflow(0);  // 设置溢出容量为0
-        cache->resize(2000);    // 调整容量以避免LRU影响
+        // For the concurrent read / write test a larger capacity avoids the LRU influence
+        cache->setOverflow(0);  // Set the overflow capacity to 0
+        cache->resize(2000);    // Adjust the capacity to avoid the LRU influence
 
-        // 写线程
+        // The write thread
         for (int w = 0; w < 3; ++w) {
             rw_threads.emplace_back(
-              [w, cache_ptr = cache, &stop_flag]() {  // 每个线程持有cache的shared_ptr
+              [w, cache_ptr = cache,
+               &stop_flag]() {  // Every thread holds a shared_ptr of the cache
                   int key_offset = w * 1000;
                   int key = key_offset;
                   while (!stop_flag.load()) {
-                      cache_ptr->insert(key % 500, key * 3);  // 在小范围内循环使用键
+                      cache_ptr->insert(key % 500,
+                                        key * 3);  // The keys are reused within a small range
                       key++;
                       std::this_thread::sleep_for(std::chrono::microseconds(100));
                   }
@@ -251,15 +256,17 @@ TEST_CASE("test_LruCache_thread_safety") {
 #pragma warning(disable : 4101)
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-        // 读线程
+        // The read thread
         for (int r = 0; r < 3; ++r) {
             rw_threads.emplace_back(
-              [r, cache_ptr = cache, &stop_flag]() {  // 每个线程持有cache的shared_ptr
+              [r, cache_ptr = cache,
+               &stop_flag]() {  // Every thread holds a shared_ptr of the cache
                   int key_offset = r * 1000;
                   int key = key_offset;
                   while (!stop_flag.load()) {
                       int val = cache_ptr->get(key % 500);
-                      // 不再验证特定值，因为并发写入可能导致值的变化
+                      // A specific value is not verified any more, because the concurrent writes
+                      // may change it
                       key++;
                       std::this_thread::sleep_for(std::chrono::microseconds(100));
                   }
@@ -270,7 +277,7 @@ TEST_CASE("test_LruCache_thread_safety") {
 #pragma warning(pop)
 #endif
 
-        // 运行一段时间后停止
+        // Stop after running for a while
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         stop_flag.store(true);
 
@@ -278,22 +285,22 @@ TEST_CASE("test_LruCache_thread_safety") {
             th.join();
         }
 
-        // rw_threads在这里离开作用域并被销毁
+        // rw_threads leaves the scope and is destroyed here
     }
 
-    // cache会在所有线程都结束后才离开作用域，确保安全
+    // The cache leaves the scope only after all the threads have finished, ensuring the safety
 }
 
-/** @par 检测点: 综合功能测试 */
+/** @par Test point: the comprehensive functionality test */
 TEST_CASE("test_LruCache_comprehensive") {
-    LruCache<int, std::string> cache(3, 0);  // 容量为3的缓存，溢出容量为0
+    LruCache<int, std::string> cache(3, 0);  // Capacity 3, overflow 0
 
-    /** @arg 测试初始状态 */
+    /** @arg Test the initial state */
     CHECK_EQ(cache.size(), 0);
     CHECK_UNARY(cache.empty());
     CHECK_EQ(cache.capacity(), 3);
 
-    /** @arg 测试基本操作序列 */
+    /** @arg Test the basic operation sequence */
     cache.insert(1, "one");
     cache.insert(2, "two");
     cache.insert(3, "three");
@@ -301,136 +308,136 @@ TEST_CASE("test_LruCache_comprehensive") {
     CHECK_EQ(cache.size(), 3);
     CHECK_UNARY(!cache.empty());
 
-    /** @arg 测试混合操作 */
-    // 先删除一个元素
+    /** @arg Test the mixed operations */
+    // Delete one element first
     CHECK_UNARY(cache.remove(2));
     CHECK_EQ(cache.size(), 2);
 
-    // 再添加一个元素，此时未达到容量上限
+    // Add one more element, the capacity limit has not been reached
     cache.insert(4, "four");
     CHECK_EQ(cache.size(), 3);
 
-    // 验证元素的存在性
+    // Verify the existence of the elements
     CHECK_UNARY(cache.contains(1));
-    CHECK_UNARY(!cache.contains(2));  // 已删除
+    CHECK_UNARY(!cache.contains(2));  // It was deleted
     CHECK_UNARY(cache.contains(3));
     CHECK_UNARY(cache.contains(4));
 
-    /** @arg 测试clear操作 */
+    /** @arg Test the clear operation */
     cache.clear();
     CHECK_EQ(cache.size(), 0);
     CHECK_UNARY(cache.empty());
-    CHECK_EQ(cache.capacity(), 3);  // 容量不应该改变
+    CHECK_EQ(cache.capacity(), 3);  // The capacity should not change
 
-    // 验证所有元素都被清除了
+    // Verify that all the elements were cleared
     CHECK_UNARY(!cache.contains(1));
     CHECK_UNARY(!cache.contains(3));
     CHECK_UNARY(!cache.contains(4));
 
-    /** @arg 测试重新填充 */
+    /** @arg Test the refilling */
     cache.insert(5, "five");
     CHECK_EQ(cache.get(5), "five");
     CHECK_EQ(cache.size(), 1);
 
-    /** @arg 测试tryGet与其它操作的交互 */
+    /** @arg Test the interaction of tryGet with the other operations */
     std::string value;
     bool found = cache.tryGet(5, value);
     CHECK_UNARY(found);
     CHECK_EQ(value, "five");
 
-    // 尝试获取不存在的键
+    // Try to get a key that does not exist
     found = cache.tryGet(99, value);
     CHECK_UNARY(!found);
 
-    /** @arg 测试resize操作 */
+    /** @arg Test the resize operation */
     cache.resize(1);
     CHECK_EQ(cache.capacity(), 1);
 
     cache.insert(6, "six");
-    cache.insert(7, "seven");  // 这个应该导致LRU淘汰
+    cache.insert(7, "seven");  // This should cause an LRU elimination
 
-    // 验证只有最新的元素存在
-    CHECK_UNARY(!cache.contains(5));  // 早期的元素应该被移除
-    CHECK_UNARY(!cache.contains(6));  // 上一个元素应该被移除
-    CHECK_UNARY(cache.contains(7));   // 最新的元素应该存在
+    // Verify that only the latest element exists
+    CHECK_UNARY(!cache.contains(5));  // The early element should have been removed
+    CHECK_UNARY(!cache.contains(6));  // The previous element should have been removed
+    CHECK_UNARY(cache.contains(7));   // The latest element should exist
 }
 
-/** @par 检测点: 冗余容量功能测试 */
+/** @par Test point: the overflow capacity test */
 TEST_CASE("test_LruCache_overflow") {
-    LruCache<int, std::string> cache(3, 2);  // 容量为3，溢出容量为2
+    LruCache<int, std::string> cache(3, 2);  // The capacity is 3 and the overflow capacity is 2
 
-    /** @arg 测试在容量+溢出容量范围内不发生淘汰 */
+    /** @arg Test that no elimination happens within capacity + overflow */
     cache.insert(1, "one");
     cache.insert(2, "two");
     cache.insert(3, "three");
-    cache.insert(4, "four");  // 超过容量但未超过容量+溢出容量
-    cache.insert(5, "five");  // 达到容量+溢出容量
+    cache.insert(4, "four");  // Above the capacity but not above capacity + overflow
+    cache.insert(5, "five");  // Reaching capacity + overflow
 
     CHECK_EQ(cache.size(), 5);
     CHECK_EQ(cache.capacity(), 3);
     CHECK_EQ(cache.overflow(), 2);
 
-    // 验证所有元素都存在
+    // Verify that all the elements exist
     CHECK_UNARY(cache.contains(1));
     CHECK_UNARY(cache.contains(2));
     CHECK_UNARY(cache.contains(3));
     CHECK_UNARY(cache.contains(4));
     CHECK_UNARY(cache.contains(5));
 
-    /** @arg 测试超过容量+溢出容量时发生淘汰 */
-    cache.insert(6, "six");  // 超过容量+溢出容量，应该开始淘汰
+    /** @arg Test that an elimination happens beyond capacity + overflow */
+    cache.insert(6, "six");  // Beyond capacity + overflow, the elimination should start
 
-    CHECK_EQ(cache.size(), 3);  // 仍应等于容量
+    CHECK_EQ(cache.size(), 3);  // It should still equal the capacity
 
-    // 由于LRU机制，最久未访问的元素(1)应该被移除
+    // Due to the LRU mechanism the least recently accessed element (1) should be removed
     CHECK_UNARY(!cache.contains(1));
     CHECK_UNARY(!cache.contains(2));
     CHECK_UNARY(!cache.contains(3));
     CHECK_UNARY(cache.contains(4));
     CHECK_UNARY(cache.contains(5));
-    CHECK_UNARY(cache.contains(6));  // 最新插入的应该存在
+    CHECK_UNARY(cache.contains(6));  // The latest inserted should exist
 
-    /** @arg 测试溢出容量调整 */
-    cache.setOverflow(1);  // 将溢出容量调整为1
+    /** @arg Test the overflow capacity adjustment */
+    cache.setOverflow(1);  // Adjust the overflow capacity to 1
 
-    // 此时缓存大小为3，但容量+溢出容量变为4，应该触发清理
-    CHECK_EQ(cache.size(), 3);  // 应该减少到容量
+    // The size is 3 while capacity + overflow becomes 4, which should trigger a cleanup
+    CHECK_EQ(cache.size(), 3);  // It should shrink to the capacity
 
-    /** @arg 测试resize对溢出容量的影响 */
-    LruCache<int, std::string> cache2(2, 1);  // 容量为2，溢出容量为1
+    /** @arg Test the effect of resize on the overflow capacity */
+    LruCache<int, std::string> cache2(2, 1);  // The capacity is 2 and the overflow capacity is 1
 
     cache2.insert(1, "one");
     cache2.insert(2, "two");
-    cache2.insert(3, "three");  // 达到容量+溢出容量
+    cache2.insert(3, "three");  // Reaching capacity + overflow
 
     CHECK_EQ(cache2.size(), 3);
 
-    cache2.resize(1);  // 调整容量为1
+    cache2.resize(1);  // Adjust the capacity to 1
 
     cache2.insert(4, "four");
-    cache2.insert(5, "five");  // 超过新容量+溢出容量，应该触发清理
+    cache2.insert(5, "five");  // Beyond the new capacity + overflow, a cleanup should be triggered
 
-    CHECK_EQ(cache2.size(), 1);  // 应该等于新容量
+    CHECK_EQ(cache2.size(), 1);  // It should equal the new capacity
 }
 
-/** @par 检测点: overflow和setOverflow功能测试 */
+/** @par Test point: the overflow and setOverflow functionality test */
 TEST_CASE("test_LruCache_overflow_functions") {
-    LruCache<int, std::string> cache(2, 1);  // 容量为2，溢出容量为1
+    LruCache<int, std::string> cache(2, 1);  // The capacity is 2 and the overflow capacity is 1
 
-    /** @arg 测试构造函数中设置溢出容量 */
+    /** @arg Test setting the overflow capacity in the constructor */
     CHECK_EQ(cache.capacity(), 2);
     CHECK_EQ(cache.overflow(), 1);
 
-    /** @arg 测试setOverflow函数 */
+    /** @arg Test the setOverflow function */
     cache.setOverflow(3);
     CHECK_EQ(cache.overflow(), 3);
 
-    /** @arg 测试在新溢出容量下操作 */
+    /** @arg Test the operations under the new overflow capacity */
     cache.insert(1, "one");
     cache.insert(2, "two");
     cache.insert(3, "three");
     cache.insert(4, "four");
-    cache.insert(5, "five");  // 2+3=5，应该刚好达到容量+溢出容量
+    cache.insert(5, "five");  // 2+3=5, exactly reaching capacity + overflow
 
     CHECK_EQ(cache.size(), 5);
     CHECK_UNARY(cache.contains(1));
@@ -439,28 +446,28 @@ TEST_CASE("test_LruCache_overflow_functions") {
     CHECK_UNARY(cache.contains(4));
     CHECK_UNARY(cache.contains(5));
 
-    /** @arg 测试超过新容量+溢出容量时的行为 */
-    cache.insert(6, "six");  // 超过容量+溢出容量，应该开始淘汰
+    /** @arg Test the behavior beyond the new capacity + overflow */
+    cache.insert(6, "six");  // Beyond capacity + overflow, the elimination should start
 
-    CHECK_EQ(cache.size(), 2);  // 仍应等于容量
+    CHECK_EQ(cache.size(), 2);  // It should still equal the capacity
 
-    /** @arg 测试将溢出容量设置为0（严格容量控制） */
-    LruCache<int, std::string> cache2(2, 5);  // 容量2，溢出容量5
+    /** @arg Test setting the overflow capacity to 0 (a strict capacity control) */
+    LruCache<int, std::string> cache2(2, 5);  // Capacity 2, overflow 5
     cache2.insert(1, "one");
     cache2.insert(2, "two");
     cache2.insert(3, "three");
     cache2.insert(4, "four");
     cache2.insert(5, "five");
-    cache2.insert(6, "six");  // 未超过2+5，不应淘汰
+    cache2.insert(6, "six");  // Not beyond 2+5, no elimination should happen
 
     CHECK_EQ(cache2.size(), 6);
     CHECK_UNARY(cache2.contains(1));
 
-    cache2.setOverflow(0);             // 设置溢出容量为0
-    CHECK_EQ(cache2.size(), 2);        // 应该减少到容量，因为超过了容量+溢出容量(2+0)
-    CHECK_UNARY(!cache2.contains(1));  // 最早的应该被淘汰
-    CHECK_UNARY(cache2.contains(5));   // 5应该还存在（更近访问）
-    CHECK_UNARY(cache2.contains(6));   // 6应该还存在
+    cache2.setOverflow(0);       // Set the overflow capacity to 0
+    CHECK_EQ(cache2.size(), 2);  // It shrinks to the capacity, capacity + overflow (2+0) exceeded
+    CHECK_UNARY(!cache2.contains(1));  // The earliest should have been eliminated
+    CHECK_UNARY(cache2.contains(5));   // 5 should still exist (a more recent access)
+    CHECK_UNARY(cache2.contains(6));   // 6 should still exist
 }
 
 /** @} */

@@ -28,36 +28,36 @@ namespace bd = boost::gregorian;
 
 /** @par Test points */
 TEST_CASE("test_TimeDelta") {
-    /** @arg days  超出限定值 */
+    /** @arg days exceeds the limit */
     CHECK_THROWS(TimeDelta(99999999LL + 1));
     CHECK_THROWS(TimeDelta(-99999999LL - 1));
 
 #if !HKU_DISABLE_ASSERT
-    /** @arg hours 超出限定值 */
+    /** @arg hours exceeds the limit */
     CHECK_THROWS(TimeDelta(0, 100001));
     CHECK_THROWS(TimeDelta(0, -100001));
 
-    /** @arg minutes 超出限定值 */
+    /** @arg minutes exceeds the limit */
     CHECK_THROWS(TimeDelta(0, 0, 100001));
     CHECK_THROWS(TimeDelta(0, 0, -100001));
 
-    /** @arg seconds 超出限定值 */
+    /** @arg seconds exceeds the limit */
     CHECK_THROWS(TimeDelta(0, 0, 0, 8640000));
     CHECK_THROWS(TimeDelta(0, 0, 0, -8640000));
 
-    /** @arg milliseconds 超出限定值 */
+    /** @arg milliseconds exceeds the limit */
     CHECK_THROWS(TimeDelta(0, 0, 0, 0, 8640000000000));
     CHECK_THROWS(TimeDelta(0, 0, 0, 0, -8640000000000));
 
-    /** @arg microseconds 超出限定值 */
+    /** @arg microseconds exceeds the limit */
     CHECK_THROWS(TimeDelta(0, 0, 0, 0, 0, 8640000000000));
     CHECK_THROWS(TimeDelta(0, 0, 0, 0, 0, -8640000000000));
 #endif
 
-    /** @arg microseconds总值超出限定值 */
+    /** @arg The total microseconds exceed the limit */
     CHECK_THROWS(TimeDelta(99999999LL, 23, 59, 60, 999, 999));
 
-    /** @arg 正常初始化，时分秒毫秒微秒都在各自的进制范围内 */
+    /** @arg A normal initialization where every field is within its own range */
     TimeDelta td(7, 10, 20, 3, 5, 7);
     CHECK(td.days() == 7);
     CHECK(td.hours() == 10);
@@ -67,7 +67,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 7);
     CHECK(td.isNegative() == false);
 
-    /** @arg 正常初始化，时大于23 */
+    /** @arg A normal initialization with hours greater than 23 */
     td = TimeDelta(0, 24);
     CHECK(td.days() == 1);
     CHECK(td.hours() == 0);
@@ -78,7 +78,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.ticks() == 86400000000LL);
     CHECK(td.isNegative() == false);
 
-    /** @arg 正常初始化，分大于59 */
+    /** @arg A normal initialization with minutes greater than 59 */
     td = TimeDelta(0, 0, 60);
     CHECK(td.days() == 0);
     CHECK(td.hours() == 1);
@@ -89,7 +89,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.ticks() == 3600000000LL);
     CHECK(td.isNegative() == false);
 
-    /** @arg 正常初始化，秒大于59 */
+    /** @arg A normal initialization with seconds greater than 59 */
     td = TimeDelta(0, 0, 0, 60);
     CHECK(td.days() == 0);
     CHECK(td.hours() == 0);
@@ -100,7 +100,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.ticks() == 60000000LL);
     CHECK(td.isNegative() == false);
 
-    /** @arg 负时长初始化, 天数为 -1 */
+    /** @arg A negative duration initialization with days = -1 */
     td = TimeDelta(-1);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -111,7 +111,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -86400000000LL);
 
-    /** @arg 负时长初始化, hours = -1 */
+    /** @arg A negative duration initialization with hours = -1 */
     td = TimeDelta(0, -1);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -122,7 +122,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -60 * 60 * 1000000LL);
 
-    /** @arg 负时长初始化, minutes = -1 */
+    /** @arg A negative duration initialization with minutes = -1 */
     td = TimeDelta(0, 0, -1);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -133,7 +133,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -60000000LL);
 
-    /** @arg 负时长初始化, seconds = -1 */
+    /** @arg A negative duration initialization with seconds = -1 */
     td = TimeDelta(0, 0, 0, -1);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -144,7 +144,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -1000000LL);
 
-    /** @arg 负时长初始化, milliseconds = -1 */
+    /** @arg A negative duration initialization with milliseconds = -1 */
     td = TimeDelta(0, 0, 0, 0, -1);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -155,7 +155,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -1000LL);
 
-    /** @arg 负时长初始化, microseconds = -1 */
+    /** @arg A negative duration initialization with microseconds = -1 */
     td = TimeDelta(0, 0, 0, 0, 0, -1);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -166,7 +166,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 999);
     CHECK(td.ticks() == -1LL);
 
-    /** @arg 负时长初始化, microseconds = -999 */
+    /** @arg A negative duration initialization with microseconds = -999 */
     td = TimeDelta(0, 0, 0, 0, 0, -999);
     CHECK(td.isNegative());
     CHECK(td.days() == -1);
@@ -177,7 +177,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 1);
     CHECK(td.ticks() == -999LL);
 
-    /** @arg 负时长初始化，所有参数均为负数 */
+    /** @arg A negative duration initialization where all the parameters are negative */
     td = TimeDelta(-1, -2, -13, -11, -12, -15);
     CHECK(td.isNegative());
     CHECK(td.days() == -2);
@@ -188,7 +188,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.microseconds() == 985);
     CHECK(td.ticks() == -94391012015LL);
 
-    /** @arg 正时长初始化，参数正负混合 */
+    /** @arg A positive duration initialization with the parameters of mixed signs */
     td = TimeDelta(2, -23, -10, 4, 80, -917);
     CHECK(td.days() == 1);
     CHECK(td.hours() == 0);
@@ -201,7 +201,7 @@ TEST_CASE("test_TimeDelta") {
 
 /** @par Test points */
 TEST_CASE("test_TimeDelta_operator") {
-    /** @arg 相加, 正正相加*/
+    /** @arg Add, a positive plus a positive */
     TimeDelta td = TimeDelta(1, 20, 100, 1, 3, 5) + TimeDelta(30, 3, 2, 4, 5, 6);
     CHECK(td.isNegative() == false);
     CHECK(td.days() == 32);
@@ -212,7 +212,7 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(td.microseconds() == 11);
     CHECK(td.ticks() == 2767325008011LL);
 
-    /** @arg 相加，和为 0 时长 */
+    /** @arg Add, the sum is the 0 duration */
     td = TimeDelta(1) + TimeDelta(-1);
     CHECK(td.isNegative() == false);
     CHECK(td.days() == 0);
@@ -223,7 +223,7 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == 0);
 
-    /** @arg 相加，和为负 */
+    /** @arg Add, the sum is negative */
     td = TimeDelta(-1) + TimeDelta(0, -1);
     CHECK(td.isNegative() == true);
     CHECK(td.days() == -2);
@@ -234,15 +234,15 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -90000000000LL);
 
-    /** @arg + 号 */
+    /** @arg The + operator */
     CHECK(+TimeDelta(1) == TimeDelta(1));
     CHECK(+TimeDelta(-1) == TimeDelta(-1));
 
-    /** @arg -号 */
+    /** @arg The - operator */
     CHECK(-TimeDelta(1) == TimeDelta(-1));
     CHECK(-TimeDelta(-1) == TimeDelta(1));
 
-    /** @arg 相减，结果为0 */
+    /** @arg Subtract, the result is 0 */
     td = TimeDelta(1, 0, 1) - TimeDelta(0, 24, 0, 60);
     CHECK(td.isNegative() == false);
     CHECK(td.days() == 0);
@@ -253,7 +253,7 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == 0);
 
-    /** @arg 相减，结果为负 */
+    /** @arg Subtract, the result is negative */
     td = TimeDelta(0, 0, 1) - TimeDelta(0, 1);
     CHECK(td.isNegative() == true);
     CHECK(td.days() == -1);
@@ -264,69 +264,69 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(td.microseconds() == 0);
     CHECK(td.ticks() == -3540000000LL);
 
-    /** @arg 求绝对值 */
+    /** @arg The absolute value */
     td = TimeDelta() - Microseconds(1);
     CHECK(td == Microseconds(-1));
     CHECK(td.abs() == Microseconds(1));
 
-    /** @arg 乘以0 */
+    /** @arg Multiply by 0 */
     td = TimeDelta(1, 1, 3) * 0;
     CHECK(td == TimeDelta());
 
-    /** @arg 乘以大于0的整数 */
+    /** @arg Multiply by an integer greater than 0 */
     td = TimeDelta(1, 1, 3) * 2;
     CHECK(td == TimeDelta(2, 2, 6));
 
-    /** @arg 乘以大于0的小数 */
+    /** @arg Multiply by a decimal greater than 0 */
     td = TimeDelta(2, 2, 6) * 0.5;
     CHECK(td == TimeDelta(1, 1, 3));
 
-    /** @arg 乘以小于0的整数 */
+    /** @arg Multiply by an integer less than 0 */
     td = TimeDelta(1, 1, 3) * -2;
     CHECK(td == TimeDelta(-2, -2, -6));
 
-    /** @arg 乘以小于0的小数 */
+    /** @arg Multiply by a decimal less than 0 */
     td = TimeDelta(-2, -2, -6) * 0.5;
     CHECK(td == TimeDelta(-1, -1, -3));
 
-    /** @arg 正 TimeDelat 乘以负数 */
+    /** @arg A positive TimeDelta multiplied by a negative number */
     td = TimeDelta(1) * -2;
     CHECK(td == TimeDelta(-2));
 
-    /** @arg 负 TimeDelat 乘以负数 */
+    /** @arg A negative TimeDelta multiplied by a negative number */
     td = TimeDelta(-1) * -2;
     CHECK(td == TimeDelta(2));
 
-    /** @arg 除以 0 */
+    /** @arg Divide by 0 */
     CHECK_THROWS(TimeDelta(1) / 0);
 
-    /** @arg 正常除法 */
+    /** @arg The normal division */
     CHECK(TimeDelta(2) / 2 == TimeDelta(1));
     CHECK(TimeDelta(2) / TimeDelta(1) == 2);
     CHECK(Microseconds(1) / 3 == TimeDelta(0));
     CHECK(Microseconds(2) / 3 == Microseconds(1));
 
-    /** @arg 地板除 */
+    /** @arg The floor division */
     CHECK_THROWS(TimeDelta(1).floorDiv(0));
     CHECK(TimeDelta(2).floorDiv(2) == TimeDelta(1));
     CHECK(Microseconds(1).floorDiv(3) == TimeDelta(0));
     CHECK(Microseconds(2).floorDiv(3) == TimeDelta(0));
 
-    /** @arg 除以 zero TimeDelta */
+    /** @arg Divide by a zero TimeDelta */
     CHECK_THROWS(TimeDelta(1) / TimeDelta());
 
-    /** @arg 对零时长取余 */
+    /** @arg The remainder against the zero duration */
     CHECK_THROWS(TimeDelta(1) % TimeDelta());
 
-    /** @arg 取余 */
+    /** @arg The remainder */
     CHECK(TimeDelta(3) % TimeDelta(2) == TimeDelta(1));
 
-    /** @arg 相等 */
+    /** @arg The equality */
     CHECK(TimeDelta(1, 2, 1, 1, 1, 1) == TimeDelta(1, 2, 1, 1, 1, 1));
     CHECK(TimeDelta(1) == TimeDelta(0, 24));
     CHECK(TimeDelta(-1) == TimeDelta(0, -24));
 
-    /** @arg 不等 */
+    /** @arg The inequality */
     CHECK(TimeDelta(1, 2) != TimeDelta(1));
 
     /** @arg >, <, >=, <= */

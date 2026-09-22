@@ -212,18 +212,19 @@ TEST_CASE("test_parallel_for_index_single") {
     }
 }
 
-/** @par 全局线程池异常排干：一个任务抛异常时，其他未完成的任务必须先执行完毕
- *  验证 wait_for_all_non_blocking 不再早退：调用方开始 get 时，同批任务已全部结束，
- *  不会留下后台任务继续访问调用方栈/容器。
- */
-TEST_CASE("test_global_wait_drains_all_futures_on_exception") {
+/** @par The global thread pool drains on an exception: when a task throws, the other unfinished
+ *  tasks must finish first. It verifies that wait_for_all_non_blocking does not return early:
+ *  when the caller starts get, all the tasks of the same batch have finished, leaving no background
+ * task that keeps accessing the caller stack / container. */
+*/ TEST_CASE("test_global_wait_drains_all_futures_on_exception") {
     auto* tg = get_global_task_group();
     REQUIRE_UNARY(tg);
 
     std::atomic<bool> go{false};
     std::atomic<bool> slow_task_finished{false};
 
-    // 两个任务：fast 立即抛异常；slow 等发令后延迟完成并写标志
+    // Two tasks: fast throws immediately, slow waits for the signal, finishes delayed, sets the
+    // flag
     auto fast = tg->submit([&go]() {
         while (!go.load(std::memory_order_acquire)) {
             std::this_thread::yield();
@@ -239,14 +240,15 @@ TEST_CASE("test_global_wait_drains_all_futures_on_exception") {
         slow_task_finished.store(true, std::memory_order_release);
     });
 
-    // 同时起跑，避免 fast 在 slow 入队前就完成导致测试假绿
+    // Start together, avoiding that fast finishes before slow is enqueued and the test passes
+    // falsely
     go.store(true, std::memory_order_release);
 
     std::vector<std::future<void>> futures;
     futures.push_back(std::move(fast));
     futures.push_back(std::move(slow));
 
-    // 模拟 global_parallel_for_index 的 wait + sequential get 模式
+    // Simulate the wait + sequential get pattern of global_parallel_for_index
     wait_for_all_non_blocking(*tg, futures);
 
     bool caught = false;
@@ -259,7 +261,7 @@ TEST_CASE("test_global_wait_drains_all_futures_on_exception") {
     }
 
     CHECK_UNARY(caught);
-    // 异常返回时 slow 任务必须已结束：排干语义成立
+    // When the exception returns the slow task must have finished: the drain semantics hold
     CHECK_UNARY(slow_task_finished.load(std::memory_order_acquire));
 }
 
