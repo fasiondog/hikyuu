@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 创建零成本算法实例
+ * Create a zero cost algorithm instance
  * @see ZeroTradeCost
  * @ingroup TradeCost
  */

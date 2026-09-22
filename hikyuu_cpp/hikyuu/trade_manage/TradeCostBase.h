@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 交易成本算法接口基类
+ * Base class of the trade cost algorithm interface
  * @ingroup TradeCost
  */
 class HKU_API TradeCostBase {
@@ -27,50 +27,50 @@ public:
     virtual ~TradeCostBase();
 
     typedef shared_ptr<TradeCostBase> TradeCostPtr;
-    /** 克隆操作   */
+    /** Clone operation   */
     TradeCostPtr clone();
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const {
         return m_name;
     }
 
     /**
-     * 计算买入成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 买入价格
-     * @param num 买入数量
-     * @return CostRecord 交易成本记录
+     * Calculate the buy cost
+     * @param datetime trade date
+     * @param stock the traded security object
+     * @param price buy price
+     * @param num buy quantity
+     * @return CostRecord the trade cost record
      */
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num) const = 0;
 
     /**
-     * 计算卖出成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 卖出价格
-     * @param num 卖出数量
-     * @return CostRecord 交易成本记录
+     * Calculate the sell cost
+     * @param datetime trade date
+     * @param stock the traded security object
+     * @param price sell price
+     * @param num sell quantity
+     * @return CostRecord the trade cost record
      */
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
                                    double num) const = 0;
 
     /**
-     * 计算借入现金花费的成本
-     * @param datetime 借入日期
-     * @param cash 借入的资金
+     * Calculate the cost of borrowing cash
+     * @param datetime borrow date
+     * @param cash borrowed funds
      */
     virtual CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) const {
         return CostRecord();
     }
 
     /**
-     * 计算归还融资成本
-     * @param borrow_datetime 资金借入日期
-     * @param return_datetime 归还日期
-     * @param cash 归还金额
+     * Calculate the cost of returning the margin financing
+     * @param borrow_datetime the date the funds were borrowed
+     * @param return_datetime return date
+     * @param cash returned amount
      */
     virtual CostRecord getReturnCashCost(const Datetime& borrow_datetime,
                                          const Datetime& return_datetime, price_t cash) const {
@@ -78,11 +78,11 @@ public:
     }
 
     /**
-     * 计算融劵借入成本
-     * @param datetime 融劵日期
-     * @param stock 借入的对象
-     * @param price 每股价格
-     * @param num 借入的数量
+     * Calculate the cost of borrowing securities
+     * @param datetime the date of the securities lending
+     * @param stock the borrowed object
+     * @param price price per share
+     * @param num borrowed quantity
      */
     virtual CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock,
                                           price_t price, double num) const {
@@ -90,12 +90,12 @@ public:
     }
 
     /**
-     * 计算融劵归还成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param stock 归还的对象
-     * @param price 归还时每股价格
-     * @param num 归还的数量
+     * Calculate the cost of returning the borrowed securities
+     * @param borrow_datetime borrow date
+     * @param return_datetime return date
+     * @param stock the returned object
+     * @param price price per share at returning
+     * @param num returned quantity
      */
     virtual CostRecord getReturnStockCost(const Datetime& borrow_datetime,
                                           const Datetime& return_datetime, const Stock& stock,
@@ -103,7 +103,7 @@ public:
         return CostRecord();
     }
 
-    /** 继承子类必须实现私有变量的克隆接口 */
+    /** The inheriting subclass must implement the clone interface of its private variables */
     virtual TradeCostPtr _clone() = 0;
 
 protected:
@@ -116,7 +116,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -136,7 +136,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(TradeCostBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class DrivedCost: public TradeCostBase {
  *     TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -160,7 +161,7 @@ private:                                                        \
 #endif
 
 /**
- * 交易成本算法指针
+ * Trade cost algorithm pointer
  * @ingroup TradeCost
  */
 typedef shared_ptr<TradeCostBase> TradeCostPtr;

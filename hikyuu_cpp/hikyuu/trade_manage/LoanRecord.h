@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * 借款记录（融资记录）
+ * Loan record (margin financing record)
  * @ingroup TradeManagerClass
  */
 class HKU_API LoanRecord {

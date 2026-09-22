@@ -16,7 +16,7 @@ namespace hku {
 #endif
 
 /**
- * 简单绩效统计
+ * Simple performance statistics
  * @ingroup Performance
  */
 class HKU_API Performance {
@@ -31,41 +31,44 @@ public:
     Performance& operator=(const Performance& other) noexcept;
     Performance& operator=(Performance&& other) noexcept;
 
-    /** 是否为合法的统计项 */
+    /** Whether it is a valid statistics item */
     bool exist(const string& key);
 
-    /** 复位，清除已计算的结果 */
+    /** Reset, clearing the calculated results */
     void reset();
 
-    /** 按指标名称获取指标值，必须在运行 statistics 或 report 之后生效  */
+    /** Get the statistics value by the item name; it takes effect only after statistics or report
+     *  has been run */
     double get(const string& name) const;
 
-    /** 同 get */
+    /** The same as get */
     double operator[](const string& name) const {
         return get(name);
     }
 
     /**
-     * 简单的文本统计报告，用于直接输出打印。
-     * @note 只有运行 statistics 后或 Performance 本身为从 TM 获取的结果时才生效
+     * A simple text statistics report, used for the direct printing output.
+     * @note It takes effect only after statistics has been run, or when Performance itself is the
+     *       result got from TM
      * @return
      */
     string report();
 
     /**
-     * 根据交易记录，统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
-     * 以便用于计算当前市值
-     * @param tm 指定的交易管理实例
-     * @param datetime 统计截止时刻
+     * Count the system performance up to a certain moment according to the trade records; datetime
+     * must be greater than or equal to lastDatetime so that it can be used to calculate the current
+     * market value
+     * @param tm the given trade management instance
+     * @param datetime the statistics end moment
      */
     void statistics(const TradeManagerPtr& tm, const Datetime& datetime = Datetime::now());
 
-    /** 获取所有统计项名称，顺序与 values 相同 */
+    /** Get the names of all the statistics items, in the same order as values */
     const StringList& names() const {
         return m_keys;
     }
 
-    /** 获取所有统计项值，顺序与 names 相同*/
+    /** Get the values of all the statistics items, in the same order as names */
     PriceList values() const;
 
     typedef std::map<string, double> map_type;
@@ -81,7 +84,8 @@ public:
 
 private:
     map_type m_result;
-    StringList m_keys;  // 保存统计项顺序, map/unordered_map都不能保持按插入顺序遍历
+    StringList m_keys;  // Saves the order of the statistics items; neither map nor unordered_map
+                        // can keep the insertion order when iterating
 };
 
 } /* namespace hku */
