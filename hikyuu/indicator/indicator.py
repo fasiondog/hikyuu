@@ -37,21 +37,21 @@ Indicator.value_to_pandas = Indicator.value_to_df
 
 
 def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
-    """将列表中的指标至合并在一张 pandas DataFrame 中
+    """Merge the indicators in the list into one pandas DataFrame
 
-    :param DatetimeList dates: 指定的日期列表
-    :param sequence ind_list: 已计算的指标列表
-    :param bool head_ind_name: 表标题是否使用指标名称
-    :param bool head_stock_code: 表标题是否使用证券代码
-    :return: 合并后的 DataFrame, 以 dates 为 index（注: dates列 为 Datetime 类型）
+    :param DatetimeList dates: the specified date list
+    :param sequence ind_list: the list of the calculated indicators
+    :param bool head_ind_name: whether the table header uses the indicator name
+    :param bool head_stock_code: whether the table header uses the stock code
+    :return: the merged DataFrame, with dates as the index (note: the dates column is of the Datetime type)
 
-    示例:
+    Example:
         query = Query(-200)
         k_list = [stk.get_kdata(query) for stk in [sm['sz000001'], sm['sz000002']]]
         ma_list = [MA(CLOSE(k)) for k in k_list]
         concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
 
-    输出：
+    Output:
                 date	SZ000001	SZ000002
         0	2023-05-12 00:00:00	12.620000	15.060000
         1	2023-05-15 00:00:00	12.725000	15.060000
@@ -83,17 +83,17 @@ def concat_to_df(dates, ind_list, head_stock_code=True, head_ind_name=False):
 
 def df_to_ind(df, col_name, col_date=None):
     """
-    将 pandas.DataFrame 指定列转化为 Indicator
+    Convert the specified columns of a pandas.DataFrame to an Indicator
 
-    示例，从 akshare 获取美国国债10年期收益率:
+    Example, get the 10-year US Treasury bond yield from akshare:
 
         import akshare as ak
         df = ak.bond_zh_us_rate("19901219")
         x = df_to_ind(df, '美国国债收益率10年', '日期')
 
     :param df: pandas.DataFrame
-    :param col_name: 指定列名
-    :param col_date: 指定日期列名 (为None时忽略, 否则该列为对应参考日期)
+    :param col_name: the specified column name
+    :param col_date: the specified date column name (ignored when None, otherwise this column is the corresponding reference date)
     :return: Indicator
     """
     if col_date is not None:
@@ -103,7 +103,7 @@ def df_to_ind(df, col_name, col_date=None):
     return PRICELIST(df[col_name])
 
 
-# 避免 python 中公式原型必须加括号
+# Avoid that the formula prototype must be bracketed in python
 KDATA = C_KDATA()
 CLOSE = C_CLOSE()
 OPEN = C_OPEN()
@@ -112,7 +112,7 @@ LOW = C_LOW()
 AMO = C_AMO()
 VOL = C_VOL()
 
-# 同名指标
+# Indicators with the same name
 VALUE = PRICELIST
 CAPITAL = LIUTONGPAN
 CONST = LASTVALUE

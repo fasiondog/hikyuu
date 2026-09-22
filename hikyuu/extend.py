@@ -1,11 +1,11 @@
 #
-# 对 C++ 引出类和函数进行扩展, pybind11 对小函数到导出效率不如 python 直接执行
+# Extend the classes and functions exported from C++; the pybind11 export efficiency for small functions is not as good as executing them directly in python
 #
 
-# 优先加载 hikyuu 库，防止 windows 公共依赖库不同导致DLL初始化失败
+# Load the hikyuu library first, to prevent the DLL initialization failure caused by different common dependency libraries on windows
 from .core import *
 
-# 过滤掉 numpy 告警
+# Filter out the numpy warnings
 import os
 os.environ["NUMEXPR_MAX_THREADS"] = str(os.cpu_count())
 
@@ -13,12 +13,12 @@ from datetime import datetime, timedelta, date  # NOQA: E402
 import numpy as np  # NOQA: E402
 import pandas as pd  # NOQA: E402
 
-# 解决中文对齐问题
+# Solve the Chinese alignment problem
 pd.set_option('display.unicode.ambiguous_as_wide', True)
 pd.set_option('display.unicode.east_asian_width', True)
 
 # ------------------------------------------------------------------
-# 增加Datetime、Stock的hash支持，以便可做为dict的key
+# Add hash support for Datetime and Stock, so that they can be used as the keys of a dict
 # ------------------------------------------------------------------
 
 Datetime.__hash__ = lambda self: self.ticks
@@ -26,7 +26,7 @@ TimeDelta.__hash__ = lambda self: self.ticks
 Stock.__hash__ = lambda self: self.id
 
 # ------------------------------------------------------------------
-# 增强 Datetime
+# Enhance Datetime
 # ------------------------------------------------------------------
 
 __old_Datetime_init__ = Datetime.__init__
@@ -35,9 +35,9 @@ __old_Datetime_sub__ = Datetime.__sub__
 
 
 def __new_Datetime_add__(self, td):
-    """加上指定时长，时长对象可为 TimeDelta 或 datetime.timedelta 类型
+    """Add the specified time duration; the duration object can be a TimeDelta or a datetime.timedelta type
 
-    :param TimeDelta td: 时长
+    :param TimeDelta td: the time duration
     :rtype: Datetime
     """
     if isinstance(td, TimeDelta):
@@ -49,9 +49,9 @@ def __new_Datetime_add__(self, td):
 
 
 def __new_Datetime_sub__(self, td):
-    """减去指定的时长, 时长对象可为 TimeDelta 或 datetime.timedelta 类型
+    """Subtract the specified time duration; the duration object can be a TimeDelta or a datetime.timedelta type
 
-    :param TimeDelta td: 指定时长
+    :param TimeDelta td: the specified time duration
     :rtype: Datetime
     """
     if isinstance(td, TimeDelta):
@@ -65,12 +65,12 @@ def __new_Datetime_sub__(self, td):
 
 
 def Datetime_date(self):
-    """转化生成 python 的 date"""
+    """Convert to a python date"""
     return date(self.year, self.month, self.day)
 
 
 def Datetime_datetime(self):
-    """转化生成 python 的 datetime"""
+    """Convert to a python datetime"""
     return datetime(self.year, self.month, self.day, self.hour, self.minute, self.second, self.microsecond)
 
 
@@ -81,7 +81,7 @@ Datetime.date = Datetime_date
 Datetime.datetime = Datetime_datetime
 
 # ------------------------------------------------------------------
-# 增强 TimeDelta
+# Enhance TimeDelta
 # ------------------------------------------------------------------
 
 __old_TimeDelta_init__ = TimeDelta.__init__
@@ -91,9 +91,9 @@ __old_TimeDelta_sub__ = TimeDelta.__sub__
 
 def __new_TimeDelta_init__(self, *args, **kwargs):
     """
-    可通过以下方式构建：
+    It can be built in the following ways:
 
-    - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
+    - Built from a datetime.timedelta. TimeDelta(timedelta instance)
     - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
 
         - -99999999 <= days <= 99999999
@@ -120,7 +120,7 @@ def __new_TimeDelta_init__(self, *args, **kwargs):
 
 
 def __new_TimeDelta_add__(self, td):
-    """可和 TimeDelta, datetime.timedelta, Datetime执行相加操作"""
+    """Can be added with TimeDelta, datetime.timedelta and Datetime"""
     if isinstance(td, TimeDelta):
         return __old_TimeDelta_add__(self, td)
     elif isinstance(td, timedelta):
@@ -134,12 +134,12 @@ def __new_TimeDelta_add__(self, td):
 
 
 def __new_TimeDelta_sub__(self, td):
-    """可减去TimeDelta, datetime.timedelta"""
+    """Can subtract TimeDelta and datetime.timedelta"""
     return __old_TimeDelta_sub__(self, td) if isinstance(td, TimeDelta) else __old_TimeDelta_sub__(self, TimeDelta(td))
 
 
 def TimeDelta_timedelta(self):
-    """ 转化为 datetime.timedelta """
+    """ Convert to a datetime.timedelta """
     return timedelta(
         days=self.days,
         hours=self.hours,
@@ -157,7 +157,7 @@ TimeDelta.timedelta = TimeDelta_timedelta
 
 
 # ------------------------------------------------------------------
-# 重定义Query
+# Redefine Query
 # ------------------------------------------------------------------
 
 Query.INDEX = Query.QueryType.INDEX
@@ -189,13 +189,13 @@ old_Query_init = Query.__init__
 
 def new_Query_init(self, start=0, end=None, ktype=Query.DAY, recover_type=Query.NO_RECOVER):
     """
-        构建按索引 [start, end) 方式获取K线数据条件。start，end应同为 int 或 同为 Datetime 类型。
+        Build the condition to get the K-line data by index in the [start, end) way. start and end should both be int or both be Datetime.
 
-        :param int|Datetime start: 起始索引位置或起始日期
-        :param int|Datetime end: 结束索引位置或结束日期
-        :param Query.KType ktype: K线数据类型（如日线、分钟线等）
-        :param Query.RecoverType recover_type: 复权类型
-        :return: 查询条件
+        :param int|Datetime start: the start index position or the start date
+        :param int|Datetime end: the end index position or the end date
+        :param Query.KType ktype: the K-line data type (such as daily, minute, etc.)
+        :param Query.RecoverType recover_type: the recovery type
+        :return: the query condition
         :rtype: KQuery
         """
     if isinstance(start, int):
@@ -211,7 +211,7 @@ Query.__init__ = new_Query_init
 
 
 # ------------------------------------------------------------------
-# 增加转化为 np.array、pandas.DataFrame 的功能
+# Add the conversion to np.array and pandas.DataFrame
 # ------------------------------------------------------------------
 def DatetimeList_to_np(data: DatetimeList):
     return dates_to_np(data)
@@ -253,7 +253,7 @@ KData.to_pandas = KData.to_df
 
 
 # ------------------------------------------------------------------
-# 增强 Parameter
+# Enhance Parameter
 # ------------------------------------------------------------------
 
 
@@ -272,7 +272,7 @@ def Parameter_items(self):
 
 
 def Parameter_to_dict(self):
-    """转化为 Python dict 对象"""
+    """Convert to a Python dict object"""
     return dict(self.items())
 
 
