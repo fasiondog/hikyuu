@@ -22,7 +22,8 @@
 namespace hku {
 
 /**
- * 函数及函数对象等包装器实现移动语义，以便线程池支持不同类型的任务
+ * The wrapper of the functions and function objects implements the move semantics, so that the
+ * thread pool can support different types of the tasks
  */
 class FuncWrapper {
 public:
@@ -31,28 +32,31 @@ public:
     FuncWrapper(FuncWrapper&) = delete;
     FuncWrapper& operator=(const FuncWrapper&) = delete;
 
-    /** 移动构造函数，实现对函数及函数对象等任务包装 */
+    /** Move constructor, it implements the wrapping of the tasks such as the functions and the
+     *  function objects */
     template <typename F>
-    // cppcheck-suppress noExplicitConstructor ; 此处不能添加 explicit 修饰，需要使用转换复制
+    // cppcheck-suppress noExplicitConstructor ; the explicit modifier cannot be added here, the
+    // conversion copy is needed
     FuncWrapper(F&& f) : impl(new impl_type<F>(std::move(f))) {}
 
-    /** 执行被包装的任务 */
+    /** Execute the wrapped task */
     void operator()() {
         if (impl) {
             impl->call();
         }
     }
 
-    /** 移动构造函数 */
+    /** Move constructor */
     FuncWrapper(FuncWrapper&& other) : impl(std::move(other.impl)) {}
 
-    /** 移动复制函数 */
+    /** Move copy function */
     FuncWrapper& operator=(FuncWrapper&& other) {
         impl = std::move(other.impl);
         return *this;
     }
 
-    /** 是否是空任务，用于线程池判断是否在所有任务完成后终止运行 */
+    /** Whether it is an empty task, used by the thread pool to judge whether to terminate the run
+     *  after all the tasks are finished */
     bool isNullTask() const {
         return impl ? false : true;
     }
@@ -68,7 +72,8 @@ private:
     template <typename F>
     struct impl_type : impl_base {
         F f;
-        // cppcheck-suppress noExplicitConstructor ; 此处不能添加 explicit 修饰，需要使用转换复制
+        // cppcheck-suppress noExplicitConstructor ; the explicit modifier cannot be added here, the
+        // conversion copy is needed
         impl_type(F&& f_) : f(std::move(f_)) {}
         void call() override {
             f();
