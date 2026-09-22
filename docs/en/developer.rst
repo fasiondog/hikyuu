@@ -34,7 +34,7 @@ See: `<https://xmake.io/#/zh-cn/guide/installation>`_
 
 
 3. Clone the Hikyuu source code
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Execute the following command to clone the hikyuu source code: (do not clone the code in a directory with Chinese characters in the path)
 
@@ -50,7 +50,7 @@ Execute the following command to clone the hikyuu source code: (do not clone the
 
 
 4. Install the dependency packages on Linux
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On Linux, the dependent development packages need to be installed. For example on Ubuntu, execute the following command:
 
@@ -69,7 +69,7 @@ Compiling and Installing
 ------------------------
 
 1. Install the python dependency packages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
@@ -100,7 +100,7 @@ For the parameters of each command, you can execute python setup.py commond --he
 
 
 3. Set the PYTHONPATH environment variable
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On Linux, e.g. modify the ~/.bashrc file and add the following at the end (pointing to the source code directory):
 
