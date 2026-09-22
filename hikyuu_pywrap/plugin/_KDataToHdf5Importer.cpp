@@ -15,27 +15,27 @@ void export_plugin_KDataToHdf5Importer(py::module& m) {
     py::class_<KDataToHdf5Importer>(m, "KDataToHdf5Importer",
                                     R"(KDataToHdf5Importer()
 
-    K线数据导入器（HDF5 存储），用于将外部数据源取得的 K线 / 分时 / 分笔数据写入 HDF5 数据目录，
-    并支持向 baseinfo（sqlite3）库注册新的市场与证券类型。
+    The K-line data importer (the HDF5 storage), used to write the K-line / time-line / tick data obtained from the external data sources to the HDF5 data directory,
+    and supports registering the new markets and the security types to the baseinfo (sqlite3) database.
 
-    实际写入由 import2hdf5 插件完成（VIP 插件，需有效的设备授权）。插件缺失或授权无效时，构造阶段
-    仅输出错误日志，后续调用表现为：set_config / add_market / add_stock_type 返回 False，
-    get_last_datetime 返回空 Datetime，各数据写入接口被直接忽略。
+    The actual writing is done by the import2hdf5 plugin (a VIP plugin, requiring a valid device license). When the plugin is missing or the license is invalid, at the construction stage
+    only the error logs are output; the subsequent calls behave as: set_config / add_market / add_stock_type return False,
+    get_last_datetime returns an empty Datetime, and the data writing interfaces are ignored directly.
 
-    仅需写入基础周期：周线、月线、季线、半年线、年线由日线派生，15/30/60分钟线、2小时线由5分钟线
-    派生，故 add_krecord_list 通常只配合 Query.DAY、Query.MIN、Query.MIN5 使用。
+    Only the basic periods need to be written: the weekly, the monthly, the quarterly, the half-year and the yearly lines are derived from the daily line, and the 15/30/60-minute lines and the 2-hour line are derived from the 5-minute line,
+    therefore, add_krecord_list is usually only used together with Query.DAY, Query.MIN, Query.MIN5.
 
-    典型用法::
+    Typical usage::
 
         >>> im = KDataToHdf5Importer()
-        >>> if not im.set_config('/home/user/hikyuu_data', ['SH']):  # 返回 False 通常表示无有效授权
+        >>> if not im.set_config('/home/user/hikyuu_data', ['SH']):  # returning False usually means there is no valid license
         ...     raise RuntimeError('KDataToHdf5Importer set config error! Maybe no license!')
         >>> last = im.get_last_datetime('SH', '600000', Query.DAY)
         >>> ks = [KRecord(Datetime(20250102), 10.0, 10.5, 9.8, 10.2, 1200.0, 100000.0)]
         >>> im.add_krecord_list('SH', '600000', ks, Query.DAY)
         >>> im.update_index('SH', '600000', Query.DAY)
 
-    注意：HDF5 数据不支持同时读写，导入目标目录不应是 hikyuu 当前正在加载使用的数据目录。
+    Note: the HDF5 data does not support reading and writing at the same time; the import target directory should not be the data directory that hikyuu is currently loading and using.
 )")
       .def(py::init<>())
       .def(
@@ -45,70 +45,70 @@ void export_plugin_KDataToHdf5Importer(py::module& m) {
         py::arg("baseinfo_path") = "",
         R"(set_config(datapath: str, markets: list = ['SH', 'SZ', 'BJ'], ktypes: list = ['DAY', 'MIN', 'MIN5', 'TIMELINE', 'TRANSDATA'], baseinfo_path: str = '') -> bool
 
-    设置 HDF5 数据保存路径以及需要初始化的市场、数据类型列表，须在其余接口之前调用。
+    Set the HDF5 data saving path and the lists of the markets and the data types that need to be initialized; it must be called before the other interfaces.
 
-    :param str datapath: K线等数据的 HDF5 保存目录
-    :param list markets: 需初始化数据文件的市场简称列表，如 ['SH', 'SZ', 'BJ']
-    :param list ktypes: 需初始化的数据类型列表，可选 'DAY' | 'MIN' | 'MIN5' | 'TIMELINE' | 'TRANSDATA'
-    :param str baseinfo_path: baseinfo（sqlite3）库文件路径（如 ~/.hikyuu/stock.db），供 add_market、add_stock_type 使用；为空时这两个接口不可用
-    :return: 配置成功返回 True；插件缺失或授权无效返回 False
+    :param str datapath: the HDF5 saving directory of the K-line and the other data
+    :param list markets: the list of the market abbreviations whose data files need to be initialized, e.g. ['SH', 'SZ', 'BJ']
+    :param list ktypes: the list of the data types to initialize, optionally 'DAY' | 'MIN' | 'MIN5' | 'TIMELINE' | 'TRANSDATA'
+    :param str baseinfo_path: the baseinfo (sqlite3) database file path (e.g. ~/.hikyuu/stock.db), used by add_market and add_stock_type; when it is empty, these two interfaces are unavailable
+    :return: return True when the configuration succeeds; return False when the plugin is missing or the license is invalid
     :rtype: bool)")
       .def("get_last_datetime", &KDataToHdf5Importer::getLastDatetime,
            R"(get_last_datetime(market: str, code: str, ktype: Query.KType) -> Datetime
 
-    获取指定市场、指定证券在指定周期下已导入数据的最后时间，常用于增量导入时确定起始位置。
+    Get the last time of the imported data of the specified market and the specified security under the specified period, usually used to determine the start position during the incremental import.
 
-    :param str market: 市场简称，如 'SH'
-    :param str code: 证券代码（不含市场简称），如 '600000'
-    :param Query.KType ktype: K线周期，如 Query.DAY、Query.MIN、Query.MIN5
-    :return: 最后一条数据的时间；无数据、插件缺失或授权无效时返回空 Datetime（is_null 为 True）
+    :param str market: the market abbreviation, e.g. 'SH'
+    :param str code: the security code (excluding the market abbreviation), e.g. '600000'
+    :param Query.KType ktype: the K-line period, e.g. Query.DAY, Query.MIN, Query.MIN5
+    :return: the time of the last record; when there is no data, the plugin is missing or the license is invalid, return an empty Datetime (is_null is True)
     :rtype: Datetime)")
       .def("add_krecord_list", &KDataToHdf5Importer::addKRecordList,
            R"(add_krecord_list(market: str, code: str, krecords: list, ktype: Query.KType) -> None
 
-    为指定市场、指定证券追加写入 K 线数据，写入后需调用 update_index 更新索引。
+    Append and write the K-line data for the specified market and the specified security; after writing, you need to call update_index to update the index.
 
-    :param str market: 市场简称，如 'SH'
-    :param str code: 证券代码（不含市场简称），如 '600000'
-    :param list krecords: KRecord 列表，字段含义参见 KRecord（datetime、open、high、low、close、amount、volume）
-    :param Query.KType ktype: K线周期，如 Query.DAY、Query.MIN、Query.MIN5
+    :param str market: the market abbreviation, e.g. 'SH'
+    :param str code: the security code (excluding the market abbreviation), e.g. '600000'
+    :param list krecords: a list of the KRecords; for the field meanings, see KRecord (datetime, open, high, low, close, amount, volume)
+    :param Query.KType ktype: the K-line period, e.g. Query.DAY, Query.MIN, Query.MIN5
     :return: None)")
       .def("add_timeline_list", &KDataToHdf5Importer::addTimeLineList,
            R"(add_timeline_list(market: str, code: str, timeline: list) -> None
 
-    为指定市场、指定证券追加写入分时数据（对应 ktypes 中的 'TIMELINE'）。
+    Append and write the time-line data for the specified market and the specified security (corresponding to 'TIMELINE' in the ktypes).
 
-    :param str market: 市场简称，如 'SH'
-    :param str code: 证券代码（不含市场简称），如 '600000'
-    :param list timeline: TimeLineRecord 列表，字段含义参见 TimeLineRecord（date、price、vol）
+    :param str market: the market abbreviation, e.g. 'SH'
+    :param str code: the security code (excluding the market abbreviation), e.g. '600000'
+    :param list timeline: a list of the TimeLineRecords; for the field meanings, see TimeLineRecord (date, price, vol)
     :return: None)")
       .def("add_trans_list", &KDataToHdf5Importer::addTransList,
            R"(add_trans_list(market: str, code: str, translist: list) -> None
 
-    为指定市场、指定证券追加写入分笔数据（对应 ktypes 中的 'TRANSDATA'）。
+    Append and write the tick data for the specified market and the specified security (corresponding to 'TRANSDATA' in the ktypes).
 
-    :param str market: 市场简称，如 'SH'
-    :param str code: 证券代码（不含市场简称），如 '600000'
-    :param list translist: TransRecord 列表，字段含义参见 TransRecord（date、price、vol、direct）
+    :param str market: the market abbreviation, e.g. 'SH'
+    :param str code: the security code (excluding the market abbreviation), e.g. '600000'
+    :param list translist: a list of the TransRecords; for the field meanings, see TransRecord (date, price, vol, direct)
     :return: None)")
       .def("update_index", &KDataToHdf5Importer::updateIndex,
            R"(update_index(market: str, code: str, ktype: Query.KType) -> None
 
-    更新指定市场、指定证券、指定周期的数据索引（日期与数据位置的对应关系），通常在批量写入数据后调用。
+    Update the data index of the specified market, the specified security and the specified period (the correspondence between the dates and the data positions), usually called after writing the data in batches.
 
-    :param str market: 市场简称，如 'SH'
-    :param str code: 证券代码（不含市场简称），如 '600000'
-    :param Query.KType ktype: K线周期，如 Query.DAY、Query.MIN、Query.MIN5
+    :param str market: the market abbreviation, e.g. 'SH'
+    :param str code: the security code (excluding the market abbreviation), e.g. '600000'
+    :param Query.KType ktype: the K-line period, e.g. Query.DAY, Query.MIN, Query.MIN5
     :return: None)")
       .def("remove", &KDataToHdf5Importer::remove,
            R"(remove(market: str, code: str, ktype: Query.KType, start: Datetime) -> None
 
-    删除指定市场、指定证券、指定周期中 start 及其之后的全部数据，常用于清除错误数据后重新导入。
+    Delete all the data of the specified market, the specified security and the specified period from start onwards, usually used to re-import after clearing the erroneous data.
 
-    :param str market: 市场简称，如 'SH'
-    :param str code: 证券代码（不含市场简称），如 '600000'
-    :param Query.KType ktype: K线周期，如 Query.DAY、Query.MIN、Query.MIN5
-    :param Datetime start: 起始时间（含），该时间及其之后的数据一并删除
+    :param str market: the market abbreviation, e.g. 'SH'
+    :param str code: the security code (excluding the market abbreviation), e.g. '600000'
+    :param Query.KType ktype: the K-line period, e.g. Query.DAY, Query.MIN, Query.MIN5
+    :param Datetime start: the start time (inclusive); the data at and after this time is deleted together
     :return: None)")
       .def(
         "add_market", &KDataToHdf5Importer::addMarket, py::arg("market"), py::arg("name"),
@@ -116,38 +116,38 @@ void export_plugin_KDataToHdf5Importer(py::module& m) {
         py::arg("close1") = 1130, py::arg("open2") = 1300, py::arg("close2") = 1500,
         R"(add_market(market: str, name: str, description: str, index_code: str, open1: int = 930, close1: int = 1130, open2: int = 1300, close2: int = 1500) -> bool
 
-    向 baseinfo（sqlite3）库注册新市场，幂等操作：市场已存在时跳过写入并返回 True。
+    Register a new market to the baseinfo (sqlite3) database, an idempotent operation: when the market already exists, skip the writing and return True.
 
-    :param str market: 市场简称（自动转为大写），如 'US'
-    :param str name: 市场名称
-    :param str description: 市场描述，建议注明时区，如 'NASDAQ/UTC-5'
-    :param str index_code: 市场代表指数代码，get_market_stock 与交易日历依赖 {market}{index_code}
-    :param int open1: 上午开盘时间，HHMM 格式，如 930
-    :param int close1: 上午收盘时间，HHMM 格式，如 1130
-    :param int open2: 下午开盘时间，HHMM 格式，如 1300
-    :param int close2: 下午收盘时间，HHMM 格式，如 1500
-    :return: 注册成功或市场已存在返回 True；授权无效、baseinfo_path 未配置或写入失败返回 False
+    :param str market: the market abbreviation (automatically converted to uppercase), e.g. 'US'
+    :param str name: the market name
+    :param str description: the market description; it is recommended to note the time zone, e.g. 'NASDAQ/UTC-5'
+    :param str index_code: the market representative index code; get_market_stock and the trading calendar depend on {market}{index_code}
+    :param int open1: the morning open time, in the HHMM format, e.g. 930
+    :param int close1: the morning close time, in the HHMM format, e.g. 1130
+    :param int open2: the afternoon open time, in the HHMM format, e.g. 1300
+    :param int close2: the afternoon close time, in the HHMM format, e.g. 1500
+    :return: return True when the registration succeeds or the market already exists; return False when the license is invalid, the baseinfo_path is not configured or the writing fails
     :rtype: bool
 
-    注意：注册后须重启（重新执行 hikyuu_init）方生效；市场代表指数的 K 线须另行导入。)")
+    Note: a restart (re-executing hikyuu_init) is required after the registration for it to take effect; the K-lines of the market representative index need to be imported separately.)")
       .def(
         "add_stock_type", &KDataToHdf5Importer::addStockType, py::arg("type_id"),
         py::arg("description"), py::arg("precision") = 2, py::arg("tick") = 0.01,
         py::arg("tick_value") = 0.01, py::arg("min_trade") = 1.0, py::arg("max_trade") = 1000000.0,
         R"(add_stock_type(type_id: int, description: str, precision: int = 2, tick: float = 0.01, tick_value: float = 0.01, min_trade: float = 1.0, max_trade: float = 1000000.0) -> bool
 
-    向 baseinfo（sqlite3）库注册证券类型，幂等操作：type_id 已存在时跳过写入并返回 True。
+    Register the security type to the baseinfo (sqlite3) database, an idempotent operation: when the type_id already exists, skip the writing and return True.
 
-    :param int type_id: 类型编号，约定 id 与 type 一致，仅允许 10（复用 CRYPTO）或大于等于 12 的自定义编号
-    :param str description: 类型描述
-    :param int precision: 价格精度（小数位数）
-    :param float tick: 最小跳动量
-    :param float tick_value: 每个 tick 的价值
-    :param float min_trade: 每笔最小交易量
-    :param float max_trade: 每笔最大交易量
-    :return: 注册成功或类型已存在返回 True；授权无效、baseinfo_path 未配置、type_id 非法或写入失败返回 False
+    :param int type_id: the type number; by convention, the id is consistent with the type; only 10 (reusing CRYPTO) or a custom number greater than or equal to 12 is allowed
+    :param str description: the type description
+    :param int precision: the price precision (the number of the decimal places)
+    :param float tick: the minimum tick
+    :param float tick_value: the value of each tick
+    :param float min_trade: the minimum trading quantity per order
+    :param float max_trade: the maximum trading quantity per order
+    :return: return True when the registration succeeds or the type already exists; return False when the license is invalid, the baseinfo_path is not configured, the type_id is illegal or the writing fails
     :rtype: bool
 
-    注意：注册后须重启（重新执行 hikyuu_init）方生效。
+    Note: a restart (re-executing hikyuu_init) is required after the registration for it to take effect.
 )");
 }
