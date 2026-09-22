@@ -29,14 +29,14 @@ TEST_CASE("test_AGG_SAMPLE") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试默认参数（9:35采样） */
+    /** @arg Test the default parameter (sampled at 9:35) */
     auto ind = AGG_SAMPLE(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE");
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 验证采样值 - 找到9:35对应的分钟线数据 */
+    /** @arg Verify the sampled value - find the minute line data of 9:35 */
     double expected_value = 0.0;
     bool found = false;
     for (auto& kr : mink) {
@@ -49,13 +49,13 @@ TEST_CASE("test_AGG_SAMPLE") {
     CHECK_UNARY(found);
     CHECK_EQ(result[0], doctest::Approx(expected_value));
 
-    /** @arg 测试指定时间参数（10:30采样） */
+    /** @arg Test the given time parameter (sampled at 10:30) */
     ind = AGG_SAMPLE(CLOSE(), "10:30");
     result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE");
 
-    /** @arg 验证采样值 - 找到10:30对应的分钟线数据 */
+    /** @arg Verify the sampled value - find the minute line data of 10:30 */
     found = false;
     for (auto& kr : mink) {
         if (kr.datetime.hour() == 10 && kr.datetime.minute() == 30) {
@@ -76,7 +76,7 @@ TEST_CASE("test_AGG_SAMPLE_time_parameter") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试不同时间点采样 */
+    /** @arg Test the sampling at different time points */
     auto ind935 = AGG_SAMPLE(CLOSE(), "9:35");
     auto ind1000 = AGG_SAMPLE(CLOSE(), "10:00");
     auto ind1130 = AGG_SAMPLE(CLOSE(), "11:30");
@@ -89,7 +89,7 @@ TEST_CASE("test_AGG_SAMPLE_time_parameter") {
     CHECK_EQ(result1000.size(), k.size());
     CHECK_EQ(result1130.size(), k.size());
 
-    /** @arg 验证不同时间点采样值不同 */
+    /** @arg Verify that the sampled values differ at different time points */
     double value935 = 0.0, value1000 = 0.0, value1130 = 0.0;
     bool found935 = false, found1000 = false, found1130 = false;
 

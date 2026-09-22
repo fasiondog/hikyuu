@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-// 低精度模式下, float 会溢出
+// In the low precision mode the float overflows
 #if !HKU_USE_LOW_PRECISION
 
 /** @par Test points */

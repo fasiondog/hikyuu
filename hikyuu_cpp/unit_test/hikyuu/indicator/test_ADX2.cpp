@@ -28,7 +28,7 @@ TEST_CASE("test_ADX2") {
     CHECK_EQ(adx2.getResultNumber(), 3);
 }
 
-/** @par 检测点：验证具体计算结果 */
+/** @par Test point: verify the concrete calculation result */
 TEST_CASE("test_ADX2_calculation") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -68,7 +68,7 @@ TEST_CASE("test_ADX2_calculation") {
     }
 }
 
-/** @par 检测点：验证结果集顺序 */
+/** @par Test point: verify the order of the result sets */
 TEST_CASE("test_ADX2_result_order") {
     auto k = getKData("sh000001", KQuery(-100));
 
@@ -84,7 +84,7 @@ TEST_CASE("test_ADX2_result_order") {
     CHECK_FALSE(std::isnan(mdi_val));
 }
 
-/** @par 检测点：ADX与ADX2对比 */
+/** @par Test point: the comparison of ADX and ADX2 */
 TEST_CASE("test_ADX_vs_ADX2") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");

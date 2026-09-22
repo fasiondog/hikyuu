@@ -32,7 +32,7 @@ TEST_CASE("test_RSRS_BETA_kdata") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-100));
 
-    // 正常情况，n = 20
+    // The normal case, n = 20
     Indicator result = RSRS_BETA(kdata, 20);
     CHECK_EQ(result.name(), "RSRS_BETA");
     CHECK_EQ(result.size(), kdata.size());
@@ -43,7 +43,7 @@ TEST_CASE("test_RSRS_BETA_kdata") {
         CHECK_UNARY(std::isnan(result[i]));
     }
 
-    // 验证具体计算结果（固定值检查）
+    // Verify the concrete calculation result (a fixed value check)
     CHECK_EQ(result[19], doctest::Approx(0.791453).epsilon(0.001));
     CHECK_EQ(result[39], doctest::Approx(0.711802).epsilon(0.001));
     CHECK_EQ(result[59], doctest::Approx(0.882348).epsilon(0.001));
@@ -70,7 +70,7 @@ TEST_CASE("test_RSRS_BETA_different_n") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-100));
 
-    // 不同窗口大小的测试
+    // The test with different window sizes
     Indicator result10 = RSRS_BETA(kdata, 10);
     Indicator result20 = RSRS_BETA(kdata, 20);
     Indicator result30 = RSRS_BETA(kdata, 30);

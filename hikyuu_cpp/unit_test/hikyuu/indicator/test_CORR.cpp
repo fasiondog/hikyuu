@@ -45,7 +45,7 @@ TEST_CASE("test_CORR") {
     CHECK_THROWS_AS(CORR(x, y, -1), std::exception);
     CHECK_THROWS_AS(CORR(x, y, 1), std::exception);
 
-    // 正常情况，n = 0
+    // The normal case, n = 0
     result = CORR(x, y, 0);
     CHECK_EQ(result.name(), "CORR");
     CHECK_EQ(result.discard(), 9);
@@ -70,7 +70,7 @@ TEST_CASE("test_CORR") {
         CHECK_EQ(cov[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
     }
 
-    // 正常情况，n = 8
+    // The normal case, n = 8
     result = CORR(x, y, 8);
     CHECK_EQ(result.name(), "CORR");
     CHECK_EQ(result.discard(), 7);

@@ -29,14 +29,14 @@ TEST_CASE("test_AGG_SAMPLE_MAX") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试默认参数（9:30-10:00时间段最大值） */
+    /** @arg Test the default parameter (the maximum in the 9:30-10:00 range) */
     auto ind = AGG_SAMPLE_MAX(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MAX");
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 验证时间段最大值 - 找到9:30到10:00之间的最大收盘价 */
+    /** @arg Verify the maximum - find the highest close between 9:30 and 10:00 */
     double expected_value = 0.0;
     for (auto& kr : mink) {
         int hour = kr.datetime.hour();
@@ -64,7 +64,7 @@ TEST_CASE("test_AGG_SAMPLE_MAX_time_range") {
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MAX");
 
-    /** @arg 验证时间段最大值 */
+    /** @arg Verify the maximum of the time range */
     double expected_value = 0.0;
     for (auto& kr : mink) {
         int hour = kr.datetime.hour();

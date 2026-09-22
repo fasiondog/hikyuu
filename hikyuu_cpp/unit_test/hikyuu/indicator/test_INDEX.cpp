@@ -27,7 +27,7 @@ TEST_CASE("test_INDEXO") {
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.name(), "INDEXO");
 
-    /** @arg 上证日线 */
+    /** @arg The Shanghai Composite daily line */
     KQuery query = KQueryByDate(Datetime(20111130), Datetime(20111206));
     auto k = getKData("sh600004", query);
     REQUIRE(k.size() > 0);
@@ -41,7 +41,7 @@ TEST_CASE("test_INDEXO") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 上证5分钟线 */
+    /** @arg The Shanghai Composite 5-minute line */
     query = KQueryByDate(Datetime(201111300930), Datetime(201111301400), KQuery::MIN5);
     k = getKData("sh600004", query);
     REQUIRE(k.size() > 0);
@@ -55,7 +55,7 @@ TEST_CASE("test_INDEXO") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 上证周线 */
+    /** @arg The Shanghai Composite weekly line */
     query = KQueryByDate(Datetime(20111101), Datetime(20111201), KQuery::WEEK);
     k = getKData("sh600004", query);
     REQUIRE(k.size() > 0);

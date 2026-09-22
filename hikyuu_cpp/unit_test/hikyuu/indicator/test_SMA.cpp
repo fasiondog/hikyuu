@@ -29,13 +29,13 @@ TEST_CASE("test_SMA") {
     PriceList a;
     Indicator data = PRICELIST(a);
 
-    /** @arg 输入指标长度为0 */
+    /** @arg The input indicator length is 0 */
     result = SMA(data);
     CHECK_EQ(result.name(), "SMA");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 输入指标长度为1，n = 2, m=2 */
+    /** @arg The input indicator length is 1, n = 2 and m=2 */
     a.push_back(10);
     data = PRICELIST(a);
     result = SMA(data, 2, 2);
@@ -44,7 +44,7 @@ TEST_CASE("test_SMA") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result[0], 10);
 
-    /** @arg 输入指标长度为1，n = 1, m=2 */
+    /** @arg The input indicator length is 1, n = 1 and m=2 */
     a.clear();
     a.push_back(10);
     data = PRICELIST(a);
@@ -54,7 +54,7 @@ TEST_CASE("test_SMA") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result[0], 10);
 
-    /** @arg 输入指标长度为10，n = 1, m=1 */
+    /** @arg The input indicator length is 10, n = 1 and m=1 */
     a.clear();
     for (int i = 0; i < 10; ++i) {
         a.push_back(i / 10.0);
@@ -68,7 +68,7 @@ TEST_CASE("test_SMA") {
         CHECK_EQ(result[i], data[i]);
     }
 
-    /** @arg 输入指标长度为1，n = 4, m=2 */
+    /** @arg The input indicator length is 1, n = 4 and m=2 */
     result = SMA(data, 4, 2);
     CHECK_EQ(result.name(), "SMA");
     CHECK_EQ(result.discard(), 0);

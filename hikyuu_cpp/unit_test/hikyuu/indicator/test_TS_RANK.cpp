@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点：TS_RANK基础功能测试 */
+/** @par Test point: the basic functionality test of TS_RANK */
 TEST_CASE("test_TS_RANK_base") {
     Indicator ind = PRICELIST({5.0, 3.0, 8.0, 3.0, 2.0, 9.0, 1.0, 7.0, 4.0, 6.0}, 0);
 
@@ -40,7 +40,7 @@ TEST_CASE("test_TS_RANK_base") {
     check_indicator(ret, expect);
 }
 
-/** @par 检测点：TS_RANK参数为1时的行为 */
+/** @par Test point: the behavior of TS_RANK with the parameter 1 */
 TEST_CASE("test_TS_RANK_n1") {
     Indicator ind = PRICELIST({1.0, 2.0, 3.0, 4.0, 5.0});
 
@@ -53,7 +53,7 @@ TEST_CASE("test_TS_RANK_n1") {
     check_indicator(ret, expect);
 }
 
-/** @par 检测点：TS_RANK处理NaN值 */
+/** @par Test point: TS_RANK handling the NaN values */
 TEST_CASE("test_TS_RANK_with_nan") {
     price_t nan = Null<price_t>();
     Indicator ind = PRICELIST({nan, 3.0, 5.0, 4.0, 6.0, 2.0}, 1);
@@ -64,7 +64,7 @@ TEST_CASE("test_TS_RANK_with_nan") {
     CHECK_EQ(ret.discard(), 3);
 }
 
-/** @par 检测点：TS_RANK空数据处理 */
+/** @par Test point: TS_RANK handling the empty data */
 TEST_CASE("test_TS_RANK_empty") {
     Indicator ind;
 
@@ -74,7 +74,7 @@ TEST_CASE("test_TS_RANK_empty") {
     CHECK_EQ(ret.discard(), 0);
 }
 
-/** @par 检测点：TS_RANK增量计算基本功能 */
+/** @par Test point: the basic functionality of the TS_RANK incremental calculation */
 TEST_CASE("test_TS_RANK_increment_base") {
     Stock stk = getStock("sh600000");
     KData k1 = stk.getKData(KQuery(100, 200));
@@ -94,7 +94,7 @@ TEST_CASE("test_TS_RANK_increment_base") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点：TS_RANK序列化 */
+/** @par Test point: the TS_RANK serialization */
 TEST_CASE("test_TS_RANK_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

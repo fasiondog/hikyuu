@@ -50,7 +50,7 @@ TEST_CASE("test_VAR") {
         CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.001));
     }
 
-    /** @arg 非法参数 n = 1时 */
+    /** @arg The invalid parameter n = 1 */
     CHECK_THROWS_AS(VAR(ind, 1), std::exception);
 
     /** @arg operator() */
@@ -63,7 +63,7 @@ TEST_CASE("test_VAR") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg n =0 时 */
+    /** @arg When n =0 */
     dev = VAR(ind, 0);
     CHECK_EQ(dev.size(), 15);
     CHECK_EQ(dev.discard(), 14);

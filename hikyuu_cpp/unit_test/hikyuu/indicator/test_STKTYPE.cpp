@@ -22,7 +22,7 @@ TEST_CASE("test_STKTYPE") {
     KData k;
     Indicator stktype;
 
-    /** @arg 查询A股股票的类型 */
+    /** @arg Query the type of an A-share stock */
     Stock stk = getStock("SZ000001");
     REQUIRE(!stk.isNull());
     k = stk.getKData(KQuery(-10));
@@ -33,12 +33,12 @@ TEST_CASE("test_STKTYPE") {
     CHECK_EQ(stktype.size(), k.size());
     CHECK_EQ(stktype.discard(), 0);
 
-    // A股的类型为 STOCKTYPE_A (1)
+    // The type of an A-share is STOCKTYPE_A (1)
     for (size_t i = 0; i < k.size(); ++i) {
         CHECK_EQ(stktype[i], doctest::Approx(STOCKTYPE_A));
     }
 
-    /** @arg 查询指数的类型 */
+    /** @arg Query the type of an index */
     stk = getStock("sh000001");
     REQUIRE(!stk.isNull());
     k = stk.getKData(KQuery(-10));
@@ -48,12 +48,12 @@ TEST_CASE("test_STKTYPE") {
     CHECK_EQ(stktype.size(), k.size());
     CHECK_EQ(stktype.discard(), 0);
 
-    // 指数的类型为 STOCKTYPE_INDEX (2)
+    // The type of an index is STOCKTYPE_INDEX (2)
     for (size_t i = 0; i < k.size(); ++i) {
         CHECK_EQ(stktype[i], doctest::Approx(STOCKTYPE_INDEX));
     }
 
-    /** @arg 使用默认上下文（无参数版本） */
+    /** @arg Use the default context (the no-argument version) */
     stk = getStock("SZ000001");
     REQUIRE(!stk.isNull());
     k = stk.getKData(KQuery(-10));
@@ -64,7 +64,7 @@ TEST_CASE("test_STKTYPE") {
     CHECK_EQ(stktype.size(), k.size());
     CHECK_EQ(stktype.discard(), 0);
 
-    // A股的类型为 STOCKTYPE_A (1)
+    // The type of an A-share is STOCKTYPE_A (1)
     for (size_t i = 0; i < k.size(); ++i) {
         CHECK_EQ(stktype[i], doctest::Approx(STOCKTYPE_A));
     }

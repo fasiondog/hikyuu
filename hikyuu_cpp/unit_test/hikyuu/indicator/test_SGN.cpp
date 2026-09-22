@@ -1,7 +1,7 @@
 /*
  * test_SGN.cpp
  *
- *  Created on: 2019年4月3日
+ *  Created on: 2019-4-3
  *      Author: fasiondog
  */
 

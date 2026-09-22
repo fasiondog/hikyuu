@@ -1,9 +1,9 @@
 /*
  * test_ICIR_nan_consistency.cpp
  *
- * 验证 MA(ic,n) / STDEV(ic,n) 组合在含散布 NaN 时的语义一致性。
- * ICIR = MA / STDEV，分子分母必须基于完全相同的有效样本集，
- * 且任一为 NaN 时 ICIR 必须静默输出 NaN（不抛浮点除零异常）。
+ * Verify the semantic consistency of the MA(ic,n) / STDEV(ic,n) combination with scattered NaN.
+ * ICIR = MA / STDEV: the numerator and the denominator must be based on exactly the same valid
+ * sample set, and when either of them is NaN, ICIR must silently output NaN.
  */
 
 #include "../test_config.h"
@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点：MA/STDEV 组合 ICIR 在含 NaN 时的一致性 */
+/** @par Test point: the consistency of the MA/STDEV ICIR combination with NaN */
 TEST_CASE("test_ICIR_nan_consistency") {
     PriceList d;
     d.push_back(1.0);
@@ -35,7 +35,7 @@ TEST_CASE("test_ICIR_nan_consistency") {
     int n = 4;
     Indicator ma = MA(ic, n);
     Indicator std = STDEV(ic, n);
-    // ICIR = MA / STDEV（ICIR.h 内部即此组合）
+    // ICIR = MA / STDEV (this is the combination inside ICIR.h)
     Indicator ir = ma / std;
 
     CHECK_EQ(ir.size(), ma.size());
@@ -43,16 +43,16 @@ TEST_CASE("test_ICIR_nan_consistency") {
 
     for (size_t i = 0; i < ir.size(); ++i) {
         if (std::isnan(ma[i]) || std::isnan(std[i]) || std[i] == 0.0) {
-            // 任一为 NaN 或 std=0 时，ICIR 必须为 NaN（不抛异常，不产生 Inf）
+            // When either is NaN or std=0, ICIR must be NaN (no exception, no Inf)
             CHECK_UNARY(std::isnan(ir[i]));
         } else {
-            // 两者均有效时，ICIR = ma/std
+            // When both are valid, ICIR = ma/std
             CHECK_EQ(ir[i], doctest::Approx(ma[i] / std[i]).epsilon(0.0001));
         }
     }
 }
 
-/** @par 检测点：count=1 时 std=NaN，ICIR 静默 NaN（不除零崩溃） */
+/** @par Test point: with count=1 std=NaN and ICIR is silently NaN (no division by 0 crash) */
 TEST_CASE("test_ICIR_count1_silent_nan") {
     PriceList d;
     for (int i = 0; i < 7; ++i) {
@@ -65,10 +65,10 @@ TEST_CASE("test_ICIR_count1_silent_nan") {
     Indicator std = STDEV(ic, 4);
     Indicator ir = ma / std;
 
-    // MA 有值（5.0），但 std=NaN（count=1），ICIR 必须静默 NaN
+    // MA has a value (5.0) but std=NaN (count=1), so ICIR must be silently NaN
     for (size_t i = ir.discard(); i < ir.size(); ++i) {
         CHECK_UNARY(std::isnan(std[i]));
-        // 不允许 Inf 或异常
+        // Inf or an exception is not allowed
         CHECK_UNARY(std::isnan(ir[i]));
     }
 }

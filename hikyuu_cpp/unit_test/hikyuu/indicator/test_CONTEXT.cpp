@@ -36,7 +36,7 @@ TEST_CASE("test_CONTEXT") {
     auto k3 = stk3.getKData(q3);
     price_t nan = Null<price_t>();
 
-    /** @arg 空对象 */
+    /** @arg An empty object */
     auto ctx = hku::CONTEXT();
     CHECK_UNARY(ctx.empty());
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
@@ -46,14 +46,14 @@ TEST_CASE("test_CONTEXT") {
     CHECK_UNARY(ctx.empty());
     CHECK_EQ(ctx.name(), "CONTEXT");
 
-    /** @arg 公式原型（无数据序列） */
+    /** @arg A formula prototype (without a data sequence) */
     ctx = hku::CONTEXT(MA(CLOSE()));
     CHECK_UNARY(ctx.empty());
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
     CHECK_EQ(ctx.getContext(), Null<KData>());
     CHECK_EQ(ctx.name(), "CONTEXT");
 
-    /** @arg 时间无关序列 */
+    /** @arg A time independent sequence */
     Indicator a = PRICELIST(PriceList{nan, nan, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 2);
     ctx = hku::CONTEXT(a);
     CHECK_EQ(CONTEXT_K(ctx), Null<KData>());
@@ -89,7 +89,7 @@ TEST_CASE("test_CONTEXT") {
     CHECK_EQ(result.getContext(), k3);
     check_indicator(result, PRICELIST(PriceList{3, 4, 5, 6, 7, 8, 9, 10}));
 
-    /** @arg 无上下文的，时间序列 */
+    /** @arg A time series without a context */
     auto dates = getStock("sz000001").getDatetimeList(KQuery(-12));
     a = PRICELIST(PriceList{nan, nan, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, dates, 2);
     ctx = hku::CONTEXT(a);
@@ -115,7 +115,7 @@ TEST_CASE("test_CONTEXT") {
     CHECK_EQ(result.getContext(), k1);
     check_indicator(result, CVAL(0.)(k1) + a);
 
-    /** @arg 带上下文的时间序列 */
+    /** @arg A time series with a context */
     a = k2.close();
     ctx = hku::CONTEXT(a);
     CHECK_EQ(CONTEXT_K(ctx), k2);
@@ -140,13 +140,13 @@ TEST_CASE("test_CONTEXT") {
     CHECK_EQ(result.size(), k3.size());
     check_indicator(result, ALIGN(stk1.getKData(q3).close(), k3, false));
 
-    /** @arg 复杂公式 */
+    /** @arg A complex formula */
     result = (CLOSE(k1) + hku::CONTEXT(MA(k3.close(), 2)))(k2);
     CHECK_EQ(result.size(), k2.size());
     auto expect = k2.close() + MA(stk3.getKData(q2).close(), 2);
     check_indicator(result, expect);
 
-    /** @arg 多 CONTEXT 组合公式 */
+    /** @arg A combination formula of multiple CONTEXT */
     auto ind1 = hku::CONTEXT(CLOSE(k1)) + hku::CONTEXT(CLOSE(k1));
     auto ind2 = CLOSE() + CLOSE();
     result = ind1(k1);
@@ -162,7 +162,7 @@ TEST_CASE("test_CONTEXT") {
     expect = ind2(k1);
     check_indicator(result, expect);
 
-    /** @arg 直接指定 stock 创建 */
+    /** @arg Created with a given stock directly */
     ind1 = hku::CONTEXT(CLOSE(), stk1);
     ind2 = CLOSE(k1);
     result = ind1(k1);

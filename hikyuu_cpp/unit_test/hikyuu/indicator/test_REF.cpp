@@ -1,7 +1,7 @@
 /*
  * test_REF.cpp
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2015-3-21
  *      Author: fasiondog
  */
 
@@ -80,7 +80,7 @@ TEST_CASE("test_REF_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
-    
+
     auto temp = IF(CVAL(1), 9, 10);
     result = REF(CLOSE(), temp + 1);
     result.setContext(kdata);
@@ -100,8 +100,6 @@ TEST_CASE("test_REF_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
-
-
 }
 
 //-----------------------------------------------------------------------------

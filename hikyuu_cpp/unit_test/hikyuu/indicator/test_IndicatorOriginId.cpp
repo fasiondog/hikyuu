@@ -68,7 +68,7 @@ TEST_CASE("test_IndicatorOriginId_clone_inherit") {
     CHECK_EQ(fp->getLeftNode()->originId(), gp->getLeftNode()->originId());    // The MA subtree
     CHECK_EQ(fp->getRightNode()->originId(), gp->getRightNode()->originId());  // The CVAL subtree
     auto ma_l = fp->getLeftNode(), ma_g = gp->getLeftNode();
-    CHECK_EQ(ma_l->getRightNode()->originId(), ma_g->getRightNode()->originId());  // CLOSE 叶
+    CHECK_EQ(ma_l->getRightNode()->originId(), ma_g->getRightNode()->originId());  // The CLOSE leaf
 
     // The clone of a clone has the same id (the clone chain)
     Indicator e = g.clone();

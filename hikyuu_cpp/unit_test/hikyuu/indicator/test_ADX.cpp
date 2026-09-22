@@ -28,7 +28,7 @@ TEST_CASE("test_ADX") {
     CHECK_EQ(adx.getResultNumber(), 3);
 }
 
-/** @par 检测点：验证具体计算结果 */
+/** @par Test point: verify the concrete calculation result */
 TEST_CASE("test_ADX_calculation") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -65,7 +65,7 @@ TEST_CASE("test_ADX_calculation") {
     }
 }
 
-/** @par 检测点：验证结果集顺序 */
+/** @par Test point: verify the order of the result sets */
 TEST_CASE("test_ADX_result_order") {
     auto k = getKData("sh000001", KQuery(-100));
 

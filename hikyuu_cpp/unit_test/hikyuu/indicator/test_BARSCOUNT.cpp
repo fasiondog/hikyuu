@@ -27,7 +27,7 @@ using namespace hku;
 TEST_CASE("test_BARSCOUNT") {
     Indicator result;
 
-    /** @arg 输入指标，未关联上下文 */
+    /** @arg The input indicator has no associated context */
     PriceList a;
     a.push_back(1);
     a.push_back(0);
@@ -45,7 +45,7 @@ TEST_CASE("test_BARSCOUNT") {
     CHECK_EQ(result[2], 1);
     CHECK_EQ(result[3], 2);
 
-    /** @arg 输入指标为日线 CLOSE */
+    /** @arg The input indicator is a daily line CLOSE */
     Stock stk = getStock("sz000001");
     KData k = stk.getKData(KQuery(-100));
     result = BARSCOUNT(CLOSE(k));
@@ -55,7 +55,7 @@ TEST_CASE("test_BARSCOUNT") {
     CHECK_EQ(result[0], 4838);
     CHECK_EQ(result[99], 4937);
 
-    /** @arg 输入指标为分钟线 CLOSE */
+    /** @arg The input indicator is a minute line CLOSE */
     k = stk.getKData(KQueryByDate(Datetime(200209020000), Datetime(200209050000), KQuery::MIN));
     result = BARSCOUNT(CLOSE(k));
     CHECK_EQ(result.name(), "BARSCOUNT");

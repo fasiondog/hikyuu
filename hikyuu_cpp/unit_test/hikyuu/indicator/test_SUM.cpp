@@ -66,7 +66,7 @@ TEST_CASE("test_SUM") {
     CHECK_EQ(result.discard(), 9);
     CHECK_EQ(result[9], 45);
 
-    /** @arg 增量计算 n=0 */
+    /** @arg The incremental calculation with n=0 */
     auto stk = getStock("sz000001");
     auto k1 = stk.getKData(KQuery(-10, -8));
     auto k2 = stk.getKData(KQuery(-9, -6));
@@ -74,17 +74,17 @@ TEST_CASE("test_SUM") {
     result = SUM(CLOSE(), 0)(k1)(k2);
     check_indicator(result, SUM(CLOSE(), 0)(k2));
 
-    /** @arg 增量计算 n=1 */
+    /** @arg The incremental calculation with n=1 */
     result = SUM(CLOSE(), 1)(k1)(k2);
     check_indicator(result, SUM(CLOSE(), 1)(k2));
     result = SUM(CLOSE(), 1)(k1)(k3);
     check_indicator(result, SUM(CLOSE(), 1)(k3));
 
-    /** @arg 增量计算 n=3 */
+    /** @arg The incremental calculation with n=3 */
     result = SUM(CLOSE(), 3)(k1)(k2);
     check_indicator(result, SUM(CLOSE(), 3)(k2));
 
-    // 重叠长度小于 discard
+    // The overlap length is less than the discard
     k1 = stk.getKData(KQuery(-10, -4));
     k3 = stk.getKData(KQuery(-5));
     result = SUM(CLOSE(), 3)(k1)(k3);
@@ -94,7 +94,7 @@ TEST_CASE("test_SUM") {
     result = SUM(CLOSE(), 3)(k1)(k3);
     check_indicator(result, SUM(CLOSE(), 3)(k3));
 
-    // 重叠长度等于 discard
+    // The overlap length equals the discard
     k1 = stk.getKData(KQuery(-10, -4));
     k3 = stk.getKData(KQuery(-7));
     result = SUM(CLOSE(), 3)(k1);
@@ -108,7 +108,7 @@ TEST_CASE("test_SUM") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.0001));
     }
 
-    // 重叠长度大于 discard
+    // The overlap length is greater than the discard
     k1 = stk.getKData(KQuery(-10, -4));
     k3 = stk.getKData(KQuery(-8));
     result = SUM(CLOSE(), 3)(k1);

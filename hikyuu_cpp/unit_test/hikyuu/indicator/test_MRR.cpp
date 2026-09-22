@@ -117,13 +117,15 @@ TEST_CASE("test_MRR") {
         CHECK_EQ(mrr[i], doctest::Approx(m[i]));
     }
 
-    /** @arg 反例: 先冲高再挖坑, 锁定 look-ahead bias bug (与 IMdd 对称)
-     * 原增量算法用窗口全局 min 作盈利基准, 当窗口最低点出现在最高点之后时
-     * 高估盈利比率。数据 [1.0, 2.0, 1.5, 0.5, 1.2] n=4:
-     *   i=4 窗口 [2.0, 1.5, 0.5, 1.2] 最低 0.5 在最高 2.0 之后,
-     *     标准 MRR=140(1.2 相对其前累计 min 0.5), bug 版=300(2.0 相对全局 min 0.5)
-     * 全量 n=4<total=5 走分支B(首段变长)+委托 _increment_calculate,
-     * 修复后两段均用标准 run_min 基准, 与标准 MRR 一致。
+    /** @arg A counter example: a high is made first and then a pit is dug, pinning the look-ahead
+     * bias bug (symmetric to IMdd) The original incremental algorithm used the global min of the
+     * window as the rise base; when the lowest point of the window appears after the highest point,
+     * it overestimated the rise rate. The data [1.0, 2.0, 1.5, 0.5, 1.2], n=4:
+     *   i=4, the window [2.0, 1.5, 0.5, 1.2] has its lowest 0.5 after the highest 2.0,
+     *     the standard MRR=140 (1.2 against its preceding accumulated min 0.5) while the buggy
+     * version=300 (2.0 against the global min 0.5) The full calculation with n=4<total=5 goes
+     * through the branch B (a longer first segment) + the delegated _increment_calculate, after the
+     * fix both segments use the standard run_min base and match the standard MRR.
      */
     PriceList mrr_lookahead_data{1.0, 2.0, 1.5, 0.5, 1.2};
     Indicator mrr_lookahead = MRR(PRICELIST(mrr_lookahead_data), 4);
@@ -167,7 +169,8 @@ TEST_CASE("test_MRR_with_nan") {
     // i=3, the incremental current point is NaN; the scheme 4 continues without writing, keeping
     // the buffer NaN
     CHECK(std::isnan(mrr[3]));
-    // i=6 窗口[4,6]=[-5,0.5,1.2], 跳过-5后有效[0.5,1.2], run_min=0.5, rr=1.2/0.5-1=140
+    // i=6, the window [4,6]=[-5,0.5,1.2]; skipping -5 the valid part is [0.5,1.2], run_min=0.5,
+    // rr=1.2/0.5-1=140
     CHECK_GE(mrr[6], 0.0);
 }
 

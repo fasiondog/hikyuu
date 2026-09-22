@@ -27,7 +27,7 @@ using namespace hku;
 TEST_CASE("test_BACKSET") {
     Indicator result;
 
-    /** @arg 未指定输入ind */
+    /** @arg No input ind is given */
     result = BACKSET();
     CHECK_EQ(result.name(), "BACKSET");
     CHECK_EQ(result.size(), 0);

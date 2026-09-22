@@ -22,13 +22,13 @@ using namespace hku;
 TEST_CASE("test_TR") {
     KData k;
 
-    /** @arg k 为空 */
+    /** @arg k is empty */
     auto ret = TR(k);
     CHECK_EQ(ret.size(), 0);
     CHECK_EQ(ret.discard(), 0);
     CHECK_EQ(ret.name(), "TR");
 
-    /** @arg 正常k */
+    /** @arg A normal k */
     k = getKData("sh000001", KQueryByIndex(-10));
     REQUIRE(k.size() > 0);
     ret = ret(k);

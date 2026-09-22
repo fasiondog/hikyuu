@@ -21,11 +21,11 @@ using namespace hku;
 
 /** @par Test points */
 TEST_CASE("test_RESULT") {
-    /** @arg 无效参数 */
+    /** @arg An invalid parameter */
     CHECK_THROWS_AS(RESULT(-1), std::exception);
     CHECK_THROWS_AS(RESULT(6), std::exception);
 
-    /** @arg 输入空指标 */
+    /** @arg An empty indicator is passed */
     auto ret = RESULT(Indicator(), 0);
     CHECK_EQ(ret.empty(), true);
 

@@ -23,7 +23,7 @@ TEST_CASE("test_LIUTONGPAN") {
     KData k;
     Indicator liutong;
 
-    /** @arg 查询指数的流通盘, 没有流通盘数据 */
+    /** @arg Query the outstanding shares of an index, there is no such data */
     k = getKData("sh000001", KQueryByIndex(-100));
     REQUIRE(k.size() > 0);
     liutong = LIUTONGPAN(k);
@@ -31,7 +31,7 @@ TEST_CASE("test_LIUTONGPAN") {
     CHECK_EQ(liutong.size(), k.size());
     CHECK_EQ(liutong.discard(), k.size());
 
-    /** @arg 查询股票流通盘，日线 */
+    /** @arg Query the outstanding shares of a stock, the daily line */
     Stock stk = getStock("SH600004");
     KQuery query = KQueryByDate(Datetime(200301010000), Datetime(200708250000));
     k = stk.getKData(query);
@@ -50,7 +50,7 @@ TEST_CASE("test_LIUTONGPAN") {
         }
     }
 
-    /** @arg 查询股票流通盘，5分钟线 */
+    /** @arg Query the outstanding shares of a stock, the 5-minute line */
     query = KQueryByDate(Datetime(200301010000), Datetime(200708250000), KQuery::MIN5);
     k = stk.getKData(query);
     liutong = LIUTONGPAN(k);

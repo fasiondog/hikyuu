@@ -45,7 +45,7 @@ TEST_CASE("test_COV") {
     CHECK_THROWS_AS(COV(x, y, -1), std::exception);
     CHECK_THROWS_AS(COV(x, y, 1), std::exception);
 
-    // 正常情况，n = 0
+    // The normal case, n = 0
     result = COV(x, y, 0);
     CHECK_EQ(result.name(), "COV");
     CHECK_EQ(result.discard(), 9);
@@ -61,7 +61,7 @@ TEST_CASE("test_COV") {
         CHECK_EQ(result[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
     }
 
-    // 正常情况，n = 8
+    // The normal case, n = 8
     result = COV(x, y, 8);
     CHECK_EQ(result.name(), "COV");
     CHECK_EQ(result.discard(), 7);
@@ -76,7 +76,7 @@ TEST_CASE("test_COV") {
         CHECK_EQ(result[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
     }
 
-    // 测试函数式调用方式 COV(ref_ind, n)(ind)
+    // Test the functional call style COV(ref_ind, n)(ind)
     result = COV(y, 8)(x);
     CHECK_EQ(result.name(), "COV");
     CHECK_EQ(result.discard(), 7);

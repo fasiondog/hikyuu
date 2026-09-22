@@ -29,14 +29,14 @@ TEST_CASE("test_AGG_SAMPLE_MIN") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试默认参数（9:30-10:00时间段最小值） */
+    /** @arg Test the default parameter (the minimum in the 9:30-10:00 range) */
     auto ind = AGG_SAMPLE_MIN(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MIN");
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 验证时间段最小值 - 找到9:30到10:00之间的最小收盘价 */
+    /** @arg Verify the minimum - find the lowest close between 9:30 and 10:00 */
     double expected_value = std::numeric_limits<double>::max();
     for (auto& kr : mink) {
         int hour = kr.datetime.hour();
@@ -64,7 +64,7 @@ TEST_CASE("test_AGG_SAMPLE_MIN_time_range") {
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MIN");
 
-    /** @arg 验证时间段最小值 */
+    /** @arg Verify the minimum of the time range */
     double expected_value = std::numeric_limits<double>::max();
     for (auto& kr : mink) {
         int hour = kr.datetime.hour();

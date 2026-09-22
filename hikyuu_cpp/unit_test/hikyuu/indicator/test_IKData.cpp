@@ -24,12 +24,12 @@ TEST_CASE("test_IKData") {
     Stock stock = sm.getStock("sh000001");
     KData kdata;
 
-    /** @arg Indicator为空 */
+    /** @arg The Indicator is empty */
     Indicator ki, open, high, low, close, amount, count;
     CHECK_EQ(open.size(), 0);
     CHECK_EQ(open.empty(), true);
 
-    /** @arg 对应的KData为空 */
+    /** @arg The corresponding KData is empty */
     ki = KDATA(kdata);
     CHECK_EQ(ki.size(), 0);
     CHECK_EQ(ki.empty(), true);
@@ -110,14 +110,14 @@ TEST_CASE("test_IKData") {
         CHECK_EQ(count[i], doctest::Approx(kdata[i].transCount));
     }
 
-    /** @arg 新旧上下文相等 */
+    /** @arg The new and the old context are equal */
     auto k1 = stock.getKData(KQuery(0, 10));
     auto k2 = stock.getKData(KQuery(0, 10));
     close = CLOSE(k1);
     close.setContext(k2);
     check_indicator(close, CLOSE(k1));
 
-    /** @arg 新上下文在旧上下文内部 */
+    /** @arg The new context is inside the old one */
     k1 = stock.getKData(KQuery(0, 10));
     k2 = stock.getKData(KQuery(0, 9));
     close = CLOSE(k1);
@@ -139,7 +139,7 @@ TEST_CASE("test_IKData") {
     close.setContext(k2);
     check_indicator(close, CLOSE(k2));
 
-    /** @arg 新上下文起点在旧上下文中，部分在新上下文中 */
+    /** @arg The new context starts inside the old one and lies partly in the new one */
     k1 = stock.getKData(KQuery(1, 5));
     k2 = stock.getKData(KQuery(1, 6));
     close = CLOSE(k1);
@@ -156,7 +156,7 @@ TEST_CASE("test_IKData") {
     close.setContext(k2);
     check_indicator(close, CLOSE(k2));
 
-    /** @arg 新上下文起点在旧上下文之前 */
+    /** @arg The new context starts before the old one */
     k1 = stock.getKData(KQuery(5, 9));
     k2 = stock.getKData(KQuery(1, 4));
     close = CLOSE(k1);

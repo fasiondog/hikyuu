@@ -35,18 +35,18 @@ TEST_CASE("test_RSRS_BULL_kdata") {
 
     // Verify that all the result sets are nan in the first discard positions
     for (size_t i = 0; i < result.discard(); ++i) {
-        CHECK_UNARY(std::isnan(result.get(i, 0)));  // 层级4修正值
-        CHECK_UNARY(std::isnan(result.get(i, 1)));  // β 值
-        CHECK_UNARY(std::isnan(result.get(i, 2)));  // R² 值
-        CHECK_UNARY(std::isnan(result.get(i, 3)));  // Z 值
+        CHECK_UNARY(std::isnan(result.get(i, 0)));  // The level 4 correction value
+        CHECK_UNARY(std::isnan(result.get(i, 1)));  // The beta value
+        CHECK_UNARY(std::isnan(result.get(i, 2)));  // The R2 value
+        CHECK_UNARY(std::isnan(result.get(i, 3)));  // The Z value
     }
 
     // Verify that the following values are not nan
     for (size_t i = result.discard(); i < result.size(); ++i) {
-        CHECK_UNARY(!std::isnan(result.get(i, 0)));  // 层级4修正值
-        CHECK_UNARY(!std::isnan(result.get(i, 1)));  // β 值
-        CHECK_UNARY(!std::isnan(result.get(i, 2)));  // R² 值
-        CHECK_UNARY(!std::isnan(result.get(i, 3)));  // Z 值
+        CHECK_UNARY(!std::isnan(result.get(i, 0)));  // The level 4 correction value
+        CHECK_UNARY(!std::isnan(result.get(i, 1)));  // The beta value
+        CHECK_UNARY(!std::isnan(result.get(i, 2)));  // The R2 value
+        CHECK_UNARY(!std::isnan(result.get(i, 3)));  // The Z value
     }
 
     // Verify that the R2 value is within 0~1

@@ -25,7 +25,7 @@ TEST_CASE("test_VIGOR") {
     KData kdata;
     Indicator vigor;
 
-    /** @arg kdata为空时 */
+    /** @arg When kdata is empty */
     vigor = VIGOR(kdata, 1);
     CHECK_EQ(vigor.size(), 0);
     CHECK_EQ(vigor.empty(), true);

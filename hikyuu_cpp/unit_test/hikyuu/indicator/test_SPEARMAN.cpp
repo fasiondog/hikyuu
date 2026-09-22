@@ -190,7 +190,8 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result.name(), "SPEARMAN");
     CHECK_EQ(result.size(), a.size());
     CHECK_EQ(result.discard(), 4);
-    // 硬编码期望钉死修复前“全 NaN”退路；并与显式 n=total 对照
+    // The hard coded expectation pins down the pre-fix "all NaN" fallback and compares it with an
+    // explicit n=total
     CHECK_EQ(result[4], doctest::Approx(0.872082));
     Indicator full = SPEARMAN(x, y, static_cast<int>(a.size()));
     CHECK_EQ(result.discard(), full.discard());

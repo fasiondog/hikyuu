@@ -63,7 +63,7 @@ TEST_CASE("test_VARP") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg n =0 时 */
+    /** @arg When n =0 */
     dev = VARP(ind, 0);
     CHECK_EQ(dev.size(), 15);
     CHECK_EQ(dev.discard(), 14);

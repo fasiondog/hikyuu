@@ -24,7 +24,7 @@ using namespace hku;
 TEST_CASE("test_ISNA") {
     price_t nan = Null<price_t>();
 
-    /** @arg ignore_discard 为 false */
+    /** @arg ignore_discard is false */
     Indicator data = PRICELIST(PriceList{nan, nan, 1, nan, 3}, 2);
     Indicator result = ISNA(data, false);
     CHECK_EQ(result.name(), "ISNA");
@@ -39,7 +39,7 @@ TEST_CASE("test_ISNA") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg ignore_discard 为 true */
+    /** @arg ignore_discard is true */
     result = ISNA(data, true);
     CHECK_EQ(result.name(), "ISNA");
     CHECK_EQ(result.discard(), 0);

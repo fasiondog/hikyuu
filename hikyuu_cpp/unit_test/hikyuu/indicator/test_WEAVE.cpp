@@ -45,7 +45,7 @@ TEST_CASE("test_WAEVE_export") {
         CHECK_EQ(ret.get(i, 5), a[i]);
     }
 
-    /** @arg 超出参数个数 */
+    /** @arg More than the allowed number of parameters */
     CHECK_THROWS(WEAVE(c, c, c, c, c, c, c));
 }
 

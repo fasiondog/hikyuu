@@ -83,7 +83,7 @@ TEST_CASE("test_AMA") {
         CHECK_EQ(result.get(i, 1), expect.get(i, 1));
     }
 
-    /** 增量计算 */
+    /** The incremental calculation */
     Stock stk = getStock("sh000001");
     auto k1 = stk.getKData(KQuery(0, 20));
     auto k2 = stk.getKData(KQuery(0, 21));

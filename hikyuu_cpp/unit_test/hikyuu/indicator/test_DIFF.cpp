@@ -22,7 +22,7 @@ using namespace hku;
 
 /** @par Test points */
 TEST_CASE("test_DIFF") {
-    /** @arg 正常测试 */
+    /** @arg The normal test */
     PriceList d;
     for (size_t i = 0; i < 10; ++i) {
         d.push_back(i);

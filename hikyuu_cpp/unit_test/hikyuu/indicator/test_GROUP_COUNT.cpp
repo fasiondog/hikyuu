@@ -39,7 +39,7 @@ TEST_CASE("test_GROUP_COUNT") {
       result.back(),
       stk.getKData(KQueryByDate(Datetime(20111118), Datetime(20111119), KQuery::MIN)).size());
 
-    /** @arg 日线按日分组 */
+    /** @arg The daily lines grouped by day */
     result = ind(k);
     CHECK_EQ(result.name(), "GROUP_COUNT");
     CHECK_EQ(result.size(), k.size());
@@ -48,7 +48,7 @@ TEST_CASE("test_GROUP_COUNT") {
         CHECK_EQ(result[i], 1);
     }
 
-    /** @arg 日线按周分组 */
+    /** @arg The daily lines grouped by week */
     auto wk = stk.getKData(KQueryByDate(Datetime(20111115), Null<Datetime>(), KQuery::WEEK));
     result = ind(wk);
     CHECK_EQ(result.name(), "GROUP_COUNT");

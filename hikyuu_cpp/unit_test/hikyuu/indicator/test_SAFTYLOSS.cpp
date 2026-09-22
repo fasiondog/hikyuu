@@ -34,7 +34,7 @@ TEST_CASE("test_SAFTYLOSS") {
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 参数n1、n2非法 */
+    /** @arg The parameters n1 and n2 are invalid */
     query = KQuery(0, 20);
     kdata = stock.getKData(query);
     close = CLOSE(kdata);
@@ -42,7 +42,7 @@ TEST_CASE("test_SAFTYLOSS") {
     CHECK_THROWS_AS(SAFTYLOSS(close, 0, 0), std::exception);
     CHECK_THROWS_AS(SAFTYLOSS(close, 2, 0), std::exception);
 
-    /** @arg 正常参数 */
+    /** @arg The normal parameters */
     result = SAFTYLOSS(close, 2, 1, 1.0);
     CHECK_EQ(result.empty(), false);
     CHECK_EQ(result.size(), close.size());

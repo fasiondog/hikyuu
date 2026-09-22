@@ -24,7 +24,7 @@ TEST_CASE("test_TIME") {
     Stock stock = sm.getStock("sh000001");
     KData kdata;
 
-    /** @arg 无输入参数 */
+    /** @arg No input parameter */
     Indicator date = hku::DATE(), time = TIME(), year = YEAR(), month = MONTH(), week = WEEK(),
               day = DAY(), hour = HOUR(), minute = MINUTE();
     CHECK_EQ(date.size(), 0);
@@ -59,7 +59,7 @@ TEST_CASE("test_TIME") {
     CHECK_EQ(minute.empty(), true);
     CHECK_EQ(minute.name(), "MINUTE");
 
-    /** @arg 对应的KData为空 */
+    /** @arg The corresponding KData is empty */
     CHECK_EQ(kdata.empty(), true);
 
     date = hku::DATE(kdata);
