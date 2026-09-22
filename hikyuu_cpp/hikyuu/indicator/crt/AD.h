@@ -16,8 +16,8 @@
 namespace hku {
 
 /**
- * 累积/派发线
- * @param k 关联的 KData 数据
+ * Accumulation / distribution line
+ * @param k the associated KData
  * @ingroup Indicator
  */
 Indicator HKU_API AD(const KData& k);

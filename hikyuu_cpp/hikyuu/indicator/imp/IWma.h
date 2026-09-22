@@ -14,7 +14,8 @@
 namespace hku {
 
 /*
- * WMA(X,N):X的N日加权移动平均.算法:Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)。
+ * WMA(X,N): the N-day weighted moving average of X. Algorithm:
+ * Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n).
  */
 class IWma : public IndicatorImp {
     INDICATOR_IMP(IWma)

@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 向下舍入(向数值减小方向舍入)取整
+ * Round down (round in the direction of decreasing value) to an integer
  */
 class IFloor : public IndicatorImp {
     INDICATOR_IMP(IFloor)

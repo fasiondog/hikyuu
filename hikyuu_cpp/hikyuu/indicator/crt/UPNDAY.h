@@ -17,7 +17,7 @@
 namespace hku {
 
 /**
- * 连涨周期, UPNDAY(CLOSE,M)表示连涨M个周期
+ * Consecutive rising periods; UPNDAY(CLOSE,M) means rising for M consecutive periods
  * @ingroup Indicator
  */
 inline Indicator UPNDAY(const Indicator& ind, int n = 3) {

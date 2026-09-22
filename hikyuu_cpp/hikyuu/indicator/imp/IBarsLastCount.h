@@ -13,7 +13,7 @@
 
 namespace hku {
 
-/* 统计连续满足条件的周期数 */
+/* Count the number of the consecutive periods satisfying the condition */
 class IBarsLastCount : public IndicatorImp {
     INDICATOR_IMP(IBarsLastCount)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 是否为负无穷大 （正无穷大使用 ISINF)
+ * Whether it is negative infinity (use ISINF for positive infinity)
  * @ingroup Indicator
  */
 Indicator HKU_API ISINFA();

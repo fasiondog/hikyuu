@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 向上舍入 (向数值增大方向舍入)取整
+ * Round up (round in the direction of increasing value) to an integer
  */
 class ICeil : public IndicatorImp {
     INDICATOR_IMP(ICeil)

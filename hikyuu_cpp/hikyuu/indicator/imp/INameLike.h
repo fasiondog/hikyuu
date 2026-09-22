@@ -13,7 +13,7 @@
 
 namespace hku {
 
-/* 以指标形式返回品种名称是否匹配指定模式 */
+/* Return whether the security name matches the given pattern, in the form of an indicator */
 class INameLike : public IndicatorImp {
     INDICATOR_IMP(INameLike)
     INDICATOR_IMP_SUPPORT_INCREMENT

@@ -16,7 +16,8 @@
 namespace hku {
 
 /**
- * 变动率指标 (price - prePrice) / prevPrice   N 日收益率 （本金之外的盈利）
+ * Rate of change indicator (price - prePrice) / prevPrice, the N-day return (the profit beyond the
+ * principal)
  * @ingroup Indicator
  */
 Indicator HKU_API ROCP(int n = 10);

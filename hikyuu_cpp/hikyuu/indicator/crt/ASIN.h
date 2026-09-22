@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 反正弦值
+ * Arcsine value
  * @ingroup Indicator
  */
 Indicator HKU_API ASIN();

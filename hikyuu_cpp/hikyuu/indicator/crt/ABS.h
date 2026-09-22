@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 求绝对值
+ * Calculate the absolute value
  * @ingroup Indicator
  */
 Indicator HKU_API ABS();

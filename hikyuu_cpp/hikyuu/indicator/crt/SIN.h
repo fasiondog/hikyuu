@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 正弦值
+ * Sine value
  * @ingroup Indicator
  */
 Indicator HKU_API SIN();

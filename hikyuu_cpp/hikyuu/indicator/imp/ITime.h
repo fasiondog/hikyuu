@@ -14,7 +14,7 @@
 namespace hku {
 
 /*
- * 通达信时间函数实现
+ * Implementation of the TDX time functions
  */
 class ITime : public IndicatorImp {
     INDICATOR_IMP(ITime)

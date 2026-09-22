@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 四舍五入
+ * Rounding
  * @ingroup Indicator
  */
 Indicator HKU_API ROUND(int ndigits = 2);

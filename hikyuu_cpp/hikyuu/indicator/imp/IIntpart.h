@@ -16,7 +16,7 @@
 namespace hku {
 
 /*
- * 取整(绝对值减小取整，即取得数据的整数部分)
+ * Round to an integer (rounded toward a smaller absolute value, i.e. the integer part of the data)
  */
 class IIntpart : public IndicatorImp {
     INDICATOR_IMP(IIntpart)

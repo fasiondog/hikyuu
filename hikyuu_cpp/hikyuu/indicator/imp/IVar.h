@@ -16,7 +16,7 @@
 namespace hku {
 
 /*
- * 估算样本方差
+ * Estimate the sample variance
  */
 class IVar : public hku::IndicatorImp {
     INDICATOR_IMP(IVar)

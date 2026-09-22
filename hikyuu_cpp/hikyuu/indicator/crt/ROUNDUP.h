@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 向上截取，如10.1截取后为11
+ * Truncate upward, e.g. 10.1 is truncated to 11
  * @ingroup Indicator
  */
 Indicator HKU_API ROUNDUP(int ndigits = 2);
