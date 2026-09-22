@@ -13,4 +13,4 @@ void initInnerTask();
 
 void reloadHikyuuTask();
 
-}
+}  // namespace hku

@@ -22,23 +22,23 @@ struct Spot;
 namespace hku {
 
 /**
- * 接收外部实时数据代理
+ * Agent that receives the external realtime data
  * @ingroup Agent
  */
 class HKU_API SpotAgent {
 public:
     SpotAgent() = default;
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~SpotAgent();
 
-    /** 启动代理 */
+    /** Start the agent */
     void start();
 
-    /** 停止代理 */
+    /** Stop the agent */
     void stop();
 
-    /** 是否处于运行状态 */
+    /** Whether it is running */
     bool isRunning() {
         return !m_stop;
     }
@@ -51,7 +51,8 @@ public:
         return m_work_num;
     }
 
-    /** 设置是否打印数据接收进展情况，主要用于在交互环境下关闭打印 */
+    /** Set whether to print the data receiving progress; it is mainly used to turn off the
+     *  printing in an interactive environment */
     void setPrintFlag(bool print) {
         m_print = print;
     }
@@ -73,29 +74,34 @@ public:
     }
 
     /**
-     * 增加收到 Spot 数据时的处理函数
-     * @note 仅能在停止状态时执行此操作，否则将抛出异常
-     * @param process 处理函数，仅处理单条 spot 数据
+     * Add the handler called when Spot data is received
+     * @note This operation can only be performed in the stopped state, otherwise an exception is
+     *       thrown
+     * @param process the handler, it processes a single spot record only
      */
     void addProcess(std::function<void(const SpotRecord&)> process);
 
     /**
-     * 在接受某时刻全部批次的数据后，进行相应的后处理函数,
-     * 传入的日期时间为接收到数据的时刻（非数据处理完毕的时间）
-     * @note 仅能在停止状态时执行此操作，否则将抛出异常
-     * @param func 后处理函数
+     * Add the post-processing function to be called after all the batches of data at a certain
+     * moment have been received; the given datetime is the moment when the data is received (not
+     * the time when the data has been fully processed)
+     * @note This operation can only be performed in the stopped state, otherwise an exception is
+     *       thrown
+     * @param func the post-processing function
      */
     void addPostProcess(std::function<void(Datetime)> func);
 
     /**
-     * 清除之前增加的所有处理函数
-     * @note 仅能在停止状态时执行此操作，否则将抛出异常
+     * Clear all the handlers added before
+     * @note This operation can only be performed in the stopped state, otherwise an exception is
+     *       thrown
      */
     void clearProcessList();
 
     /**
-     * 清除之前增加的所有后处理函数
-     * @note 仅能在停止状态时执行此操作，否则将抛出异常
+     * Clear all the post-processing functions added before
+     * @note This operation can only be performed in the stopped state, otherwise an exception is
+     *       thrown
      */
     void clearPostProcessList();
 
@@ -103,15 +109,18 @@ public:
     static void setQuotationServer(const string& server);
 
 private:
-    static string ms_pubUrl;                 // 数据发送服务地址
-    static const char* ms_startTag;          // 批次数据接收起始标记，用于判断启动了新的批次数据接收
-    static const char* ms_endTag;            // 批次数据接收接收标记，用于判断该批次数据更新结束
-    static const char* ms_spotTopic;         // 向数据发送服务订阅的主题
-    static const size_t ms_startTagLength;   // 批次数据接收起始标记长度
-    static const size_t ms_endTagLength;     // 批次数据接收结束标记长度
-    static const size_t ms_spotTopicLength;  // 订阅主题标记长度
+    static string ms_pubUrl;          // Address of the data sending service
+    static const char* ms_startTag;   // Start marker of the batch data receiving, used to
+                                      // determine that a new batch of data receiving started
+    static const char* ms_endTag;     // End marker of the batch data receiving, used to
+                                      // determine that the update of the batch data ended
+    static const char* ms_spotTopic;  // Topic subscribed from the data sending service
+    static const size_t
+      ms_startTagLength;                  // Length of the start marker of the batch data receiving
+    static const size_t ms_endTagLength;  // Length of the end marker of the batch data receiving
+    static const size_t ms_spotTopicLength;  // Length of the subscribed topic marker
 
-    static Datetime ms_start_rev_time;  // 批次数据接收开始时间
+    static Datetime ms_start_rev_time;  // Start time of the batch data receiving
 
 private:
     SpotAgent(const SpotAgent&) = delete;
@@ -125,25 +134,33 @@ private:
     void work_thread();
 
 private:
-    enum STATUS { WAITING, RECEIVING };    // 等待新的批次数据，正在接收批次数据中
-    enum STATUS m_status = WAITING;        // 当前内部状态
-    std::mutex m_run_mutex;                // 防止多线程启停
-    std::atomic_bool m_stop = true;        // 结束代理工作标识
-    std::atomic_bool m_connected = false;  // 是否已连接数据服务
+    enum STATUS {
+        WAITING,
+        RECEIVING
+    };  // Waiting for a new batch of data, or receiving a batch
+        // of data
+    enum STATUS m_status = WAITING;        // Current internal state
+    std::mutex m_run_mutex;                // Prevents multi-threaded start / stop
+    std::atomic_bool m_stop = true;        // Flag for ending the agent work
+    std::atomic_bool m_connected = false;  // Whether the data service has been connected
 
-    int m_revTimeout = 100;                         // 连接数据服务超时时长（毫秒）
-    std::thread m_receiveThread;                    // 数据接收线程
-    std::unique_ptr<ThreadPool> m_tg;               // 数据处理任务线程池
-    size_t m_work_num = 1;                          // 数据处理任务线程池线程数
-    std::unique_ptr<ThreadPool> m_receive_data_tg;  // 数据接收任务组
+    int m_revTimeout = 100;                         // Timeout for connecting the data service (ms)
+    std::thread m_receiveThread;                    // Data receiving thread
+    std::unique_ptr<ThreadPool> m_tg;               // Thread pool for the data processing tasks
+    size_t m_work_num = 1;                          // Number of the threads in the data processing
+                                                    // task thread pool
+    std::unique_ptr<ThreadPool> m_receive_data_tg;  // Data receiving task group
 
-    bool m_print = true;   // 是否打印连接信息
-    string m_server_addr;  // 服务器地址
+    bool m_print = true;   // Whether to print the connection information
+    string m_server_addr;  // Server address
 
-    // 下面属性被修改时需要加锁，以便可以使用多线程方式运行 strategy
+    // The following attributes need to be locked when they are modified, so that strategy can be
+    // run in a multi-threaded way
     std::mutex m_mutex;
-    list<std::function<void(const SpotRecord&)>> m_processList;  // 已注册的 spot 处理函数列表
-    list<std::function<void(Datetime)>> m_postProcessList;       // 已注册的批次后处理函数列表
+    list<std::function<void(const SpotRecord&)>> m_processList;  // List of the registered spot
+                                                                 // handlers
+    list<std::function<void(Datetime)>> m_postProcessList;       // List of the registered batch
+                                                                 // post-processing functions
 };
 
 }  // namespace hku
