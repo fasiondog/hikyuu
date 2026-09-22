@@ -5,9 +5,9 @@ Miscellaneous Functions
 
     The arrow related functions such as get_inds_views, get_market_view and KData.to_pyarrow require the additional installation of the hikyuu_plugin package.
 
-    python -m pip install hikyuu-plugin
+    ``python -m pip install hikyuu-plugin``
 
-    Before using them, the plugin needs to be imported with from hikyuu_plugin.extra import *.
+    Before using them, the plugin needs to be imported with ``from hikyuu_plugin.extra import *``.
 
 .. py:function:: get_market_view(stks[, date=Datetime(), market='SH']) -> pandas.DataFrame
 
