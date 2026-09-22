@@ -55,34 +55,35 @@ namespace hku {
  * Use SPDLOG for logging
  *********************************************/
 
-/** 日志级别 */
+/** Log level */
 enum LOG_LEVEL {
-    LOG_TRACE = SPDLOG_LEVEL_TRACE,     ///< 跟踪
-    LOG_DEBUG = SPDLOG_LEVEL_DEBUG,     ///< 调试
-    LOG_INFO = SPDLOG_LEVEL_INFO,       ///< 一般信息
-    LOG_WARN = SPDLOG_LEVEL_WARN,       ///< 告警
-    LOG_ERROR = SPDLOG_LEVEL_ERROR,     ///< 错误
-    LOG_FATAL = SPDLOG_LEVEL_CRITICAL,  ///< 致命
-    LOG_OFF = SPDLOG_LEVEL_OFF,         ///< 关闭日志打印
+    LOG_TRACE = SPDLOG_LEVEL_TRACE,     ///< Trace
+    LOG_DEBUG = SPDLOG_LEVEL_DEBUG,     ///< Debug
+    LOG_INFO = SPDLOG_LEVEL_INFO,       ///< General information
+    LOG_WARN = SPDLOG_LEVEL_WARN,       ///< Warning
+    LOG_ERROR = SPDLOG_LEVEL_ERROR,     ///< Error
+    LOG_FATAL = SPDLOG_LEVEL_CRITICAL,  ///< Fatal
+    LOG_OFF = SPDLOG_LEVEL_OFF,         ///< Turn off the log printing
 };
 
 /**
- * 初始化 logger
- * @param not_use_color 不使用彩色输出
- * @param filename 日志文件名，为空时默认为当前目录下 "./hikyuu.log"，需自行保存存放目录存在且可写入
+ * Initialize the logger
+ * @param not_use_color do not use the colored output
+ * @param filename the log file name; it is "./hikyuu.log" in the current directory by default when
+ *                 it is empty; you need to guarantee that the directory exists and is writable
  */
 void HKU_UTILS_API initLogger(bool not_use_color = false,
                               const std::string& filename = std::string());
 
 /**
- * 获取当前日志级别
+ * Get the current log level
  * @return
  */
 LOG_LEVEL HKU_UTILS_API get_log_level();
 
 /**
- * 设置日志级别
- * @param level 指定的日志级别
+ * Set the log level
+ * @param level the given log level
  */
 void HKU_UTILS_API set_log_level(LOG_LEVEL level);
 
@@ -97,7 +98,8 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// clang/gcc 下使用 __PRETTY_FUNCTION__ 会包含函数参数，可以在编译时指定
+// Under clang/gcc __PRETTY_FUNCTION__ contains the function parameters, it can be specified at
+// compile time
 // #define HKU_FUNCTION __PRETTY_FUNCTION__
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,8 +110,8 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 #if !HKU_ENABLE_STACK_TRACE
 #if CPP_STANDARD >= CPP_STANDARD_20
 /**
- * 若表达式为 false，将抛出 hku::exception 异常, 并附带传入信息
- * @note 用于外部入参及结果检查
+ * If the expression is false an hku::exception is thrown with the passed information
+ * @note Used for checking the external input parameters and the results
  */
 #define HKU_CHECK(expr, ...)                                                                     \
     do {                                                                                         \
@@ -121,8 +123,8 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     } while (0)
 
 /**
- * 若表达式为 false，将抛出指定的异常, 并附带传入信息
- * @note 用于外部入参及结果检查
+ * If the expression is false the given exception is thrown with the passed information
+ * @note Used for checking the external input parameters and the results
  */
 #define HKU_CHECK_THROW(expr, except, ...)                                                         \
     do {                                                                                           \
@@ -173,8 +175,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 
 #if HKU_ENABLE_STACK_TRACE
 /**
- * 若表达式为 false，将抛出 hku::exception 异常
- * @note 仅用于内部入参检查，编译时可通过 HKU_DISABLE_ASSERT 宏关闭
+ * If the expression is false an hku::exception is thrown
+ * @note Used for checking the internal input parameters only; it can be disabled at compile time
+ *       with the HKU_DISABLE_ASSERT macro
  */
 #define HKU_ASSERT(expr)                                                                  \
     do {                                                                                  \
@@ -209,14 +212,14 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 #endif  // #if HKU_ENABLE_STACK_TRACE
 
 #if !HKU_ENABLE_STACK_TRACE
-/** 抛出 hku::exception 及传入信息 */
+/** Throw an hku::exception with the passed information */
 #define HKU_THROW(...)                                                                             \
     do {                                                                                           \
         throw ::hku::exception(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
                                            HKU_FUNCTION, __FILE__, __LINE__));                     \
     } while (0)
 
-/** 抛出指定异常及传入信息 */
+/** Throw the given exception with the passed information */
 #define HKU_THROW_EXCEPTION(except, ...)                                                 \
     do {                                                                                 \
         throw except(fmt::format("EXCEPTION: {} [{}] ({}:{})", fmt::format(__VA_ARGS__), \
@@ -242,8 +245,8 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
 #endif  // #if !HKU_ENABLE_STACK_TRACE
 
 /**
- * 满足指定条件时，打印 TRACE 信息
- * @param expr 指定条件
+ * Print the TRACE information when the given condition is satisfied
+ * @param expr the given condition
  */
 #define HKU_TRACE_IF(expr, ...) \
     if (expr) {                 \
@@ -251,8 +254,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 DEBUG 信息, 并返回指定值
- * @param expr 指定条件
+ * Print the DEBUG information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
  */
 #define HKU_DEBUG_IF(expr, ...) \
     if (expr) {                 \
@@ -260,8 +264,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 INFO 信息, 并返回指定值
- * @param expr 指定条件
+ * Print the INFO information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
  */
 #define HKU_INFO_IF(expr, ...) \
     if (expr) {                \
@@ -269,8 +274,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 WARN 信息, 并返回指定值
- * @param expr 指定条件
+ * Print the WARN information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
  */
 #define HKU_WARN_IF(expr, ...) \
     if (expr) {                \
@@ -278,8 +284,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 ERROR 信息, 并返回指定值
- * @param expr 指定条件
+ * Print the ERROR information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
  */
 #define HKU_ERROR_IF(expr, ...) \
     if (expr) {                 \
@@ -287,8 +294,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 FATAL 信息, 并返回指定值
- * @param expr 指定条件
+ * Print the FATAL information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
  */
 #define HKU_FATAL_IF(expr, ...) \
     if (expr) {                 \
@@ -296,9 +304,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Return the given value when the given condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_IF_RETURN(expr, ret) \
     if (expr) {                  \
@@ -306,9 +314,9 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 TRACE 信息, 并返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Print the TRACE information and return the given value when the given condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_TRACE_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
@@ -317,9 +325,10 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 DEBUG 信息, 并返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Print the DEBUG information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_DEBUG_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
@@ -328,9 +337,10 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 INFO 信息, 并返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Print the INFO information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_INFO_IF_RETURN(expr, ret, ...) \
     if (expr) {                            \
@@ -339,9 +349,10 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 WARN 信息, 并返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Print the WARN information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_WARN_IF_RETURN(expr, ret, ...) \
     if (expr) {                            \
@@ -350,9 +361,10 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 ERROR 信息, 并返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Print the ERROR information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_ERROR_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
@@ -361,9 +373,10 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
     }
 
 /**
- * 满足指定条件时，打印 FATAL 信息, 并返回指定值
- * @param expr 指定条件
- * @param ret 返回值
+ * Print the FATAL information and return the given value when the given
+ * condition is satisfied
+ * @param expr the given condition
+ * @param ret return value
  */
 #define HKU_FATAL_IF_RETURN(expr, ret, ...) \
     if (expr) {                             \
@@ -371,7 +384,7 @@ std::shared_ptr<spdlog::logger> HKU_UTILS_API getHikyuuLogger();
         return ret;                         \
     }
 
-/** 用于 catch (...) 中打印，减少编译后代码大小 */
+/** Used for the printing in catch (...), it reduces the size of the compiled code */
 #define HKU_THROW_UNKNOWN HKU_THROW("Unknown error!")
 #define HKU_TRACE_UNKNOWN HKU_TRACE("Unknown error!")
 #define HKU_DEBUG_UNKNOWN HKU_DEBUG("Unknown error!")

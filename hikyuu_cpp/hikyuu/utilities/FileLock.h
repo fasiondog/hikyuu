@@ -22,42 +22,56 @@
 namespace hku {
 
 /**
- * 跨进程文件锁
+ * Cross-process file lock
  *
- * 底层实现：POSIX 使用 fcntl(F_SETLK) 记录锁，Windows 使用 LockFileEx，
- * 均为内核维护的跨进程互斥锁，进程退出（含异常崩溃）时由内核自动释放，
- * 因此不会出现早期 "O_CREAT|O_EXCL" 实现那种锁文件残留导致的永久死锁。
+ * Underlying implementation: POSIX uses the fcntl(F_SETLK) record lock and Windows uses LockFileEx;
+ * both are cross-process mutual exclusion locks maintained by the kernel and are released
+ * automatically by the kernel when the process exits (including an abnormal crash),
+ * so the permanent deadlock caused by the residual lock file in the early "O_CREAT|O_EXCL"
+ * implementation does not happen.
  *
  * @note
- *  - POSIX 记录锁为建议锁，且以 "进程" 为持有单位：同一进程内重复加锁不会失败，
- *    且关闭该文件的任一 fd 会释放该进程在此文件上的全部锁。故本类额外维护进程内
- *    互斥量，保证同一进程内相同路径的加锁串行，并避免误释放其他持有的锁。
- *    进程内互斥依赖 "同一份实现镜像"：若同进程内同时存在多份本实现拷贝（如插件与
- *    主程序各自静态链接），进程内互斥会失效，跨进程锁也会因同进程 fcntl 语义而失效。
- *  - 锁文件（filename）不存在时会被自动创建，且不会被删除。请勿对锁文件执行
- *    unlink/rename，否则锁所依附的 inode 不再唯一，跨进程互斥会被破坏。
- *  - 参与互斥的所有进程必须使用完全相同的 filename（本类会对注册表键做路径规范化，
- *    但仍建议统一使用绝对路径）。
- *  - 本类仅可作为函数局部对象或受控生命周期对象使用，禁止作为静态/全局对象：
- *    进程内互斥量注册表在进程退出时销毁，静态 FileLock 可能在注册表析构后被析构。
- *  - 对象被移动后（filename() 为空）仅可再被析构或赋值，不可继续调用 tryLock()。
+ *  - The POSIX record lock is an advisory lock and is held per "process": locking repeatedly within
+ *    the same process does not fail,
+ *    and closing any fd of this file releases all the locks of this process on this file. Therefore
+ *    this class additionally maintains an in-process
+ *    mutex to guarantee that the locking of the same path within the same process is serialized,
+ * and to avoid mistakenly releasing the other held locks. The in-process mutual exclusion relies on
+ * "a single copy of the implementation image": if multiple copies of this implementation exist in
+ * the same process at the same time (such as the plugin and the main program statically linking it
+ * separately), the in-process mutual exclusion becomes invalid and the cross-process lock also
+ * becomes invalid because of the fcntl semantics of the same process.
+ *  - The lock file (filename) is created automatically when it does not exist and is never deleted.
+ *    Do not perform
+ *    unlink/rename on the lock file, otherwise the inode the lock depends on is no longer unique
+ * and the cross-process mutual exclusion is broken.
+ *  - All the processes participating in the mutual exclusion must use exactly the same filename
+ * (this class normalizes the path for the registry key, but it is still recommended to use the
+ * absolute path uniformly).
+ *  - This class can be used as a local function object or a controlled lifetime object only; it
+ * must not be used as a static/global object: the in-process mutex registry is destroyed when the
+ * process exits, and a static FileLock may be destructed after the registry has been destructed.
+ *  - After the object has been moved (filename() is empty) it can only be destructed or assigned
+ *    again, tryLock() must not be called further.
  *
  * @code
  *     hku::FileLock lock(fmt::format("{}.lock", filename));
  *     if (lock.tryLock()) {
- *         // ... 受保护的操作
- *     }   // lock 析构时自动解锁
+ *         // ... the protected operations
+ *     }   // It is unlocked automatically when lock is destructed
  * @endcode
  */
 class HKU_UTILS_API FileLock {
 public:
     /**
-     * 构造函数，仅记录锁文件名并登记进程内互斥量，不进行加锁
-     * @param filename 锁文件名（建议使用独立于数据文件的旁路文件）
+     * Constructor, it only records the lock file name and registers the in-process mutex, without
+     * locking
+     * @param filename the lock file name (it is recommended to use a bypass file independent of the
+     *                 data files)
      */
     explicit FileLock(std::string filename);
 
-    /** 析构函数，若仍持有锁则自动释放 */
+    /** Destructor, it releases the lock automatically if it is still held */
     ~FileLock();
 
     FileLock(const FileLock&) = delete;
@@ -66,29 +80,32 @@ public:
     FileLock& operator=(FileLock&& other) noexcept;
 
     /**
-     * 尝试加锁（非阻塞）
-     * @return true 加锁成功，false 已被其他进程或本进程其他线程持有
+     * Try to lock (non-blocking)
+     * @return true the lock is acquired successfully, false it is already held by another process
+     * or another thread of this process
      */
     bool tryLock() noexcept;
 
     /**
-     * 等待加锁，最多尝试 maxAttempts 次，每次间隔 waitTimeMs 毫秒
-     * @param maxAttempts 最大尝试次数
-     * @param waitTimeMs 每次尝试的间隔毫秒数
-     * @return true 加锁成功，false 超出尝试次数仍未获得锁
-     * @note 最后一次尝试结束后不再空等
+     * Wait for the lock; it tries at most maxAttempts times with an interval of waitTimeMs
+     * milliseconds every time
+     * @param maxAttempts the maximum number of the attempts
+     * @param waitTimeMs the interval in milliseconds between the attempts
+     * @return true the lock is acquired successfully, false the lock is still not acquired after
+     * the number of the attempts is exceeded
+     * @note It does not keep waiting after the last attempt
      */
     bool waitLock(int maxAttempts = 10, int waitTimeMs = 100) noexcept;
 
-    /** 解锁（未持锁时为无操作） */
+    /** Unlock (it is a no-op when the lock is not held) */
     void unlock() noexcept;
 
-    /** 当前是否已持有锁 */
+    /** Whether the lock is currently held */
     bool isLocked() const noexcept {
         return m_locked;
     }
 
-    /** 获取锁文件名 */
+    /** Get the lock file name */
     const std::string& filename() const noexcept {
         return m_filename;
     }
@@ -100,10 +117,10 @@ private:
 private:
     std::string m_filename;
     bool m_locked{false};
-    std::unique_lock<std::mutex> m_localLock; // 保证进程内互斥
+    std::unique_lock<std::mutex> m_localLock;  // Guarantees the in-process mutual exclusion
 
 #if HKU_OS_WINDOWS
-    void* m_handle{nullptr};  // 仅存放有效句柄，不记录 INVALID_HANDLE_VALUE
+    void* m_handle{nullptr};  // Only a valid handle is stored, INVALID_HANDLE_VALUE is not recorded
 #else
     int m_handle{-1};
 #endif

@@ -6,8 +6,8 @@
  *  Created on: 2019-12-19
  *      Author: fasiondog
  *
- *  用途：跨系统函数封装
- *  注意：如无特殊说明，输入和输出的字符串均为 UTF8 编码
+ *  Purpose: the cross-system function encapsulation
+ *  Note: unless otherwise specified, the input and output strings are UTF8 encoded
  */
 
 #pragma once
@@ -24,88 +24,92 @@
 namespace hku {
 
 /**
- * 判断文件或目录是否存在
- * @param filename 文件名或目录名
+ * Judge whether a file or a directory exists
+ * @param filename file name or directory name
  */
 bool HKU_UTILS_API existFile(const std::string &filename) noexcept;
 
 /**
- * 创建目录
- * @param pathname 路径名
- * @return 如果目录已存在或者创建成功返回 true，否则返回 false
+ * Create a directory
+ * @param pathname path name
+ * @return true is returned if the directory already exists or is created successfully, otherwise
+ *         false
  */
 bool HKU_UTILS_API createDir(const std::string &pathname) noexcept;
 
 /**
- * 删除文件
- * @param filename 文件名
- * @return 删除失败或文件不存在时返回false
+ * Delete a file
+ * @param filename file name
+ * @return false is returned when the deletion fails or the file does not exist
  */
 bool HKU_UTILS_API removeFile(const std::string &filename) noexcept;
 
 /**
- * 删除目录及其包含的文件和子目录
- * @param path 待删除目录
+ * Delete a directory and the files and subdirectories it contains
+ * @param path the directory to be deleted
  */
 bool HKU_UTILS_API removeDir(const std::string &path) noexcept;
 
 /**
- * 拷贝文件
- * @param src 原文件
- * @param dst 目标文件
- * @param flush 是否立即落盘
+ * Copy a file
+ * @param src the source file
+ * @param dst the target file
+ * @param flush whether to write to the disk immediately
  */
 bool HKU_UTILS_API copyFile(const std::string &src, const std::string &dst,
                             bool flush = false) noexcept;
 
 /**
- * 文件、目录改名或移动
- * @param oldname 旧名
- * @param newname 新名
- * @param overlay 新名文件已存在时，强制覆盖
- * @return true 成功
- * @return false 失败 旧名文件不存在，或文件被占用等其他原因导致的失败
+ * Rename or move a file or a directory
+ * @param oldname the old name
+ * @param newname the new name
+ * @param overlay forcefully overwrite when the file with the new name already exists
+ * @return true success
+ * @return false failure, caused by the non-existing file with the old name, the file being occupied
+ *         or other reasons
  */
 bool HKU_UTILS_API renameFile(const std::string &oldname, const std::string &newname,
                               bool overlay = false) noexcept;
 
 /**
- * 获取用户路径
+ * Get the user path
  */
 std::string HKU_UTILS_API getUserDir();
 
 /**
- * 获取程序当前所在路径
+ * Get the current path of the program
  */
 std::string HKU_UTILS_API getCurrentDir();
 
 /**
- * 获取dll自身所在目录
- * @note 仅支持linux/macos。windows下获取的是exe所在路径！
+ * Get the directory of the dll itself
+ * @note It is supported under linux/macos only. Under Windows the path of the exe is got!
  */
 std::string HKU_UTILS_API getDllSelfDir();
 
 /**
- * 输出终端是否支持彩色控制字符
+ * Whether the output terminal supports the color control characters
  */
 bool HKU_UTILS_API isColorTerminal() noexcept;
 
 /**
- * @brief 获取硬盘剩余存储空间大小
- * @note windows下如果指定路径无效时，返回的是当前磁盘剩余空间。
- *       某些 64 位linux下 size_t 位 32位无符号整数，这里返回值需使用 uint64_t
- * @param path 指定路径名
- * @return uint64_t 获取失败时，返回 Null<uint64_t>()
+ * @brief Get the size of the remaining storage space of the disk
+ * @note Under Windows the remaining space of the current disk is returned when the given path is
+ * invalid.
+ *       Under some 64-bit linux size_t is a 32-bit unsigned integer, so uint64_t must be used for
+ * the return value here
+ * @param path the given path name
+ * @return uint64_t Null<uint64_t>() is returned when it fails
  */
 uint64_t HKU_UTILS_API getDiskFreeSpace(const char *path);
 
-/** 获取当前系统名称 */
+/** Get the current system name */
 std::string HKU_UTILS_API getPlatform();
 
-/** 获取当前CPU架构名称 */
+/** Get the current CPU architecture name */
 std::string HKU_UTILS_API getCpuArch();
 
-/** 获取当前系统语言名称(全部小写返回) */
+/** Get the current system language name (returned in lowercase) */
 std::string HKU_UTILS_API getSystemLanguage();
 
 uint64_t HKU_UTILS_API getMemoryMaxSize();
