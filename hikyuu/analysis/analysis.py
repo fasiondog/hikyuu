@@ -16,7 +16,11 @@ def combinate_ind_analysis(
     buy_inds,
     sell_inds,
     n=7,
-    keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]
+    keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]
 ):
     '''
     对单只股票进行指标组合测试
@@ -66,7 +70,11 @@ def combinate_ind_analysis_multi(
     buy_inds,
     sell_inds,
     n=7,
-    keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]
+    keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]
 ):
     '''
     对指定的股票集进行指标组合测试
@@ -104,7 +112,11 @@ def combinate_ind_analysis_multi(
     return pd.DataFrame(ret)
 
 
-def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+def analysis_sys_list(stks, query, sys_proto, keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]):
     if not keys:
         for key in keys:
             if not Performance.exist(key):
@@ -133,7 +145,11 @@ def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当�
     return pd.DataFrame(ret)
 
 
-def analysis_sys_list_multi(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+def analysis_sys_list_multi(stks, query, sys_proto, keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]):
     if not keys:
         for key in keys:
             if not Performance.exist(key):

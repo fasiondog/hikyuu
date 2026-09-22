@@ -898,16 +898,16 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     bond = ZHBOND10(ref_dates)
     sigma = STDEV(ROCP(funds), 0)  # n=0: 全期样本标准差（expand-all）
     sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
-    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
+    sharp = (per['Account Avg Annual Return %'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
 
-    invest_total = per['累计投入本金'] + per['累计投入资产']
-    cur_fund = per['当前总资产']
+    invest_total = per['Total Invested Principal'] + per['Total Invested Assets']
+    cur_fund = per['Current Total Assets']
     t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
         invest_total, cur_fund, cur_fund - invest_total)
     t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%    当前距历史最高点回撤: {:<.2f}%'.format(
-        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback, mdd_current)
+        funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback, mdd_current)
     t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
-        per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
+        per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
 
     import matplotlib.pyplot as plt
     fg = plt.figure(figsize=(15, 10))

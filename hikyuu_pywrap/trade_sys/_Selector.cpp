@@ -539,8 +539,8 @@ void export_Selector(py::module& m) {
 
     m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "账户资产最大寻优选择器");
 
-    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal, py::arg("key") = "帐户平均年收益率%",
-          py::arg("mode") = 0, R"(SE_PerformanceOptimal(key="帐户平均年收益率%", mode=0)
+    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal, py::arg("key") = "Account Avg Annual Return %",
+          py::arg("mode") = 0, R"(SE_PerformanceOptimal(key="Account Avg Annual Return %", mode=0)
 
     使用 Performance 统计结果进行寻优的选择器
 

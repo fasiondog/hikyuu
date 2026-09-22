@@ -29,7 +29,7 @@
     :param TradeManager tm: 交易账户
     :param int train_len: 滚动评估系统绩效时使用的数据长度
     :param int test_len: 使用在 train_len 中选出的最优系统执行的数据长度
-    :param SelectorBase se: 寻优选择器, 默认为按“帐户平均年收益率%”最大选择
+    :param SelectorBase se: 寻优选择器, 默认为按“Account Avg Annual Return %”最大选择
     :param TradeManager train_tm: 滚动评估时使用的交易账户, 为None时, 使用 tm 的拷贝进行评估
 
 
@@ -48,7 +48,7 @@ PF（投资组合）中的 SE，则是在调仓日对所有候选系统进行排
     账户资产最大寻优选择器
 
 
-.. py:function:: SE_PerformanceOptimal(key="帐户平均年收益率%", mode=0)
+.. py:function:: SE_PerformanceOptimal(key="Account Avg Annual Return %", mode=0)
 
     使用 Performance 统计结果进行寻优的选择器
 
