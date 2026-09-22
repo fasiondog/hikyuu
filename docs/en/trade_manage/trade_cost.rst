@@ -1,143 +1,141 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_manage/trade_cost.rst
-
 .. currentmodule:: hikyuu.trade_manage
 .. highlight:: python
 
-交易成本算法
-============
+Trade Cost Algorithms
+=====================
 
-内建交易成本算法
-----------------
+Built-in Trade Cost Algorithms
+------------------------------
 
-零交易成本算法
-^^^^^^^^^^^^^^
+Zero Trade Cost Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: TC_Zero()
 
-    :return: :py:class:`TradeCostBase` 子类实例
+    :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
-沪深A股交易成本算法
-^^^^^^^^^^^^^^^^^^^
+Shanghai-Shenzhen A-share Trade Cost Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* 2015年8月1日之前，上证过户费为交易数量的千分之一，不足1元，按1元计。
-* 2015年8月1日之后，上证过户费为成交金额的千分之0.02
+* Before August 1, 2015, the Shanghai transfer fee was one thousandth of the trade number; if it was less than 1 yuan, it was counted as 1 yuan.
+* After August 1, 2015, the Shanghai transfer fee is 0.02 thousandths of the transaction amount.
 
-计算规则如下:: python
+The calculation rules are as follows:: python
 
-    1）上证交易所
-        买入：佣金＋过户费
-        卖出：佣金＋过户费＋印花税
-    2）深证交易所：
-        买入：佣金
-        卖出：佣金＋印花税
+    1) Shanghai Stock Exchange
+        Buy: commission + transfer fee
+        Sell: commission + transfer fee + stamp tax
+    2) Shenzhen Stock Exchange:
+        Buy: commission
+        Sell: commission + stamp tax
 
-    其中，佣金最低5元
+    Among them, the minimum commission is 5 yuan.
 
 .. py:function:: TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
 
-    2015年8月1日及之后的A股交易成本算法，上证过户费改为成交金额的千分之0.02
+    The A-share trade cost algorithm for August 1, 2015 and later; the Shanghai transfer fee was changed to 0.02 thousandths of the transaction amount
 
-    :param float commission: 佣金比例
-    :param float lowestCommission: 最低佣金值
-    :param float stamptax: 印花税
-    :param float transferfee: 过户费
-    :return: :py:class:`TradeCostBase` 子类实例
+    :param float commission: the commission ratio
+    :param float lowestCommission: the minimum commission value
+    :param float stamptax: the stamp tax
+    :param float transferfee: the transfer fee
+    :return: an instance of a :py:class:`TradeCostBase` subclass
     
 .. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
 
-    2015年8月1日之前的A股交易成本算法
+    The A-share trade cost algorithm before August 1, 2015
 
-    :param float commission: 佣金比例
-    :param float lowestCommission: 最低佣金值
-    :param float stamptax: 印花税
-    :param float transferfee: 过户费
-    :param float lowestTransferfee: 最低过户费
-    :return: :py:class:`TradeCostBase` 子类实例
+    :param float commission: the commission ratio
+    :param float lowestCommission: the minimum commission value
+    :param float stamptax: the stamp tax
+    :param float transferfee: the transfer fee
+    :param float lowestTransferfee: the minimum transfer fee
+    :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
-ETF交易成本算法
-^^^^^^^^^^^^^^^
+ETF Trade Cost Algorithm
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-计算规则如下:: python
+The calculation rules are as follows:: python
 
-    买入：佣金（最低5元）
-    卖出：佣金（最低5元）
+    Buy: commission (minimum 5 yuan)
+    Sell: commission (minimum 5 yuan)
     
-    无印花税和过户费
+    No stamp tax and transfer fee.
 
 .. py:function:: TC_FixedETF([commission=0.0001, lowestCommission=5.0])
 
-    ETF交易成本算法，买卖双向收取佣金，无印花税和过户费
+    The ETF trade cost algorithm; the commission is charged in both directions of buying and selling, with no stamp tax and transfer fee
 
-    :param float commission: 佣金比例，默认万分之1
-    :param float lowestCommission: 最低佣金值，默认5元/笔
-    :return: :py:class:`TradeCostBase` 子类实例
-
-
-自定义交易成本算法
-------------------
-
-自定义交易成本算法接口：
-
-* :py:meth:`TradeCostBase.getBuyCost` - 【必须】获取买入成本
-* :py:meth:`TradeCostBase.getSellCost` - 【必须】获取卖出成本
-* :py:meth:`TradeCostBase._clone` - 【必须】子类克隆接口
+    :param float commission: the commission ratio, defaults to one ten-thousandth
+    :param float lowestCommission: the minimum commission value, defaults to 5 yuan per trade
+    :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
+Custom Trade Cost Algorithm
+---------------------------
 
-交易算法成本基类
-----------------
+The custom trade cost algorithm interface:
+
+* :py:meth:`TradeCostBase.getBuyCost` - [Required] Get the buy cost
+* :py:meth:`TradeCostBase.getSellCost` - [Required] Get the sell cost
+* :py:meth:`TradeCostBase._clone` - [Required] The subclass clone interface
+
+
+
+Trade Cost Algorithm Base Class
+-------------------------------
 
 .. py:class:: TradeCostBase(name)
 
-    交易成本算法基类
+    The trade cost algorithm base class
     
-    .. py:attribute:: name 名称
+    .. py:attribute:: name Name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
 
     .. py:method:: clone(self)
     
-        克隆操作
+        The clone operation
 
     .. py:method:: get_buy_cost(self, datetime, stock, price, num)
     
-        【重载接口】获取买入成本
+        [Overload interface] Get the buy cost
         
-        :param Datetime datetime: 买入时刻
-        :param Stock stock: 买入对象
-        :param float price: 买入价格
-        :param int num: 买入数量
-        :return: 交易成本记录
+        :param Datetime datetime: the buy moment
+        :param Stock stock: the buy object
+        :param float price: the buy price
+        :param int num: the buy number
+        :return: the trade cost record
         :rtype: CostRecord
     
     .. py:method:: get_sell_cost(self, datetime, stock, price, num)
     
-        【重载接口】获取卖出成本
+        [Overload interface] Get the sell cost
         
-        :param Datetime datetime: 卖出时刻
-        :param Stock stock: 卖出对象
-        :param float price: 卖出价格
-        :param int num: 卖出数量
-        :return: 交易成本记录
+        :param Datetime datetime: the sell moment
+        :param Stock stock: the sell object
+        :param float price: the sell price
+        :param int num: the sell number
+        :return: the trade cost record
         :rtype: CostRecord
         
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口
+        [Overload interface] The subclass clone interface

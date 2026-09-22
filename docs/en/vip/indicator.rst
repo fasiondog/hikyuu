@@ -1,25 +1,23 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/vip/indicator.rst
-
 .. py:currentmodule:: hikyuu.indicator
 .. highlight:: python
 
-扩展指标列表
-====================
+Extended Indicator List
+=======================
 
-* :py:func:`WITHKTYPE` - 将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
-* :py:func:`RANK` - 计算指标值在指定板块中的排名
-* :py:func:`AGG_COUNT` - [捐赠用户]聚合函数: 非空值计数
-* :py:func:`AGG_MAD` - [捐赠用户]聚合函数: 平均绝对偏差
-* :py:func:`AGG_MAX` - [捐赠用户]聚合函数: 最大值
-* :py:func:`AGG_MIN` - [捐赠用户]聚合函数: 最大值
-* :py:func:`AGG_MEAN` - [捐赠用户]聚合函数: 平均值
-* :py:func:`AGG_MEDIAN` - [捐赠用户]聚合函数: 中位数
-* :py:func:`AGG_PROD` - [捐赠用户]聚合函数: 乘积
-* :py:func:`AGG_SAMPLE` - [捐赠用户]聚合函数: 时间采样（在指定时间点对指标数据进行采样）
-* :py:func:`AGG_SAMPLE_MAX` - [捐赠用户]聚合函数: 时间段最大值（在指定时间段内统计指标数据的最大值）
-* :py:func:`AGG_SAMPLE_MIN` - [捐赠用户]聚合函数: 时间段最小值（在指定时间段内统计指标数据的最小值）
-* :py:func:`AGG_SAMPLE_MEAN` - [捐赠用户]聚合函数: 时间段平均值（在指定时间段内统计指标数据的平均值）
-* :py:func:`AGG_SUM` - [捐赠用户]聚合函数: 总和
-* :py:func:`AGG_STD` - [捐赠用户]聚合函数: 标准差
-* :py:func:`AGG_VAR` - [捐赠用户]聚合函数: 方差
-* :py:func:`AGG_QUANTILE` - [捐赠用户]聚合函数: 分位数
+* :py:func:`WITHKTYPE` - Convert the indicator data to the specified K-line type. Related convenience functions: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+* :py:func:`RANK` - Calculate the ranking of the indicator values in the specified block
+* :py:func:`AGG_COUNT` - [Donors] Aggregation function: the count of the non-null values
+* :py:func:`AGG_MAD` - [Donors] Aggregation function: the mean absolute deviation
+* :py:func:`AGG_MAX` - [Donors] Aggregation function: the maximum
+* :py:func:`AGG_MIN` - [Donors] Aggregation function: the minimum
+* :py:func:`AGG_MEAN` - [Donors] Aggregation function: the mean
+* :py:func:`AGG_MEDIAN` - [Donors] Aggregation function: the median
+* :py:func:`AGG_PROD` - [Donors] Aggregation function: the product
+* :py:func:`AGG_SAMPLE` - [Donors] Aggregation function: time sampling (sample the indicator data at the specified time points)
+* :py:func:`AGG_SAMPLE_MAX` - [Donors] Aggregation function: the maximum of the time range (the maximum of the indicator data within the specified time range)
+* :py:func:`AGG_SAMPLE_MIN` - [Donors] Aggregation function: the minimum of the time range (the minimum of the indicator data within the specified time range)
+* :py:func:`AGG_SAMPLE_MEAN` - [Donors] Aggregation function: the mean of the time range (the mean of the indicator data within the specified time range)
+* :py:func:`AGG_SUM` - [Donors] Aggregation function: the sum
+* :py:func:`AGG_STD` - [Donors] Aggregation function: the standard deviation
+* :py:func:`AGG_VAR` - [Donors] Aggregation function: the variance
+* :py:func:`AGG_QUANTILE` - [Donors] Aggregation function: the quantile

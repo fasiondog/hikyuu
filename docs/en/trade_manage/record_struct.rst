@@ -1,151 +1,148 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_manage/record_struct.rst
-
 .. currentmodule:: hikyuu.trade_manage
 .. highlight:: python
 
-基础数据结构
-============
+Basic Data Structures
+=====================
 
-交易业务类型
-------------
+Trade Business Types
+--------------------
 
 .. py:function:: get_business_name(business)
 
-    :param BUSINESS business: 交易业务类型
-    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
+    :param BUSINESS business: the trade business type
+    :return: the trade business type name ("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
     :rtype: string
 
 .. py:class:: BUSINESS    
     
-    - BUSINESS.INIT     - 建立初始账户
-    - BUSINESS.BUY      - 买入
-    - BUSINESS.SELL     - 卖出
-    - BUSINESS.GIFT     - 送股
-    - BUSINESS.BONUS    - 分红
-    - BUSINESS.CHECKIN  - 存入现金
-    - BUSINESS.CHECKOUT - 取出现金
-    - BUSINESS.INVALID  - 无效类型
+    - BUSINESS.INIT     - Create the initial account
+    - BUSINESS.BUY      - Buy
+    - BUSINESS.SELL     - Sell
+    - BUSINESS.GIFT     - Bonus shares
+    - BUSINESS.BONUS    - Dividend
+    - BUSINESS.CHECKIN  - Deposit cash
+    - BUSINESS.CHECKOUT - Withdraw cash
+    - BUSINESS.INVALID  - Invalid type
 
 
 
 
-交易成本记录
-------------
+Trade Cost Record
+-----------------
 
-交易成本计算的返回结果
+The return result of the trade cost calculation.
 
 .. py:class:: CostRecord
 
-    交易成本记录
+    The trade cost record
 
-    .. py:attribute:: commission  佣金(float)
-    .. py:attribute:: stamptax    印花税(float)
-    .. py:attribute:: transferfee 过户费(float)
-    .. py:attribute:: others      其它费用(float)
-    .. py:attribute:: total       总成本(float)，= 佣金 + 印花税 + 过户费 + 其它费用
+    .. py:attribute:: commission  Commission (float)
+    .. py:attribute:: stamptax    Stamp tax (float)
+    .. py:attribute:: transferfee Transfer fee (float)
+    .. py:attribute:: others      Other fees (float)
+    .. py:attribute:: total       Total cost (float), = commission + stamp tax + transfer fee + other fees
         
         
-交易记录
---------
+Trade Records
+-------------
 
 .. py:class:: TradeRecordList
 
-    交易记录列表，C++ std::vector<TradeRecord>包装
+    The trade record list, a wrapper of the C++ std::vector<TradeRecord>
     
     .. py:method:: to_numpy()
     
-        仅在安装了numpy模块时生效，转换为numpy.array
+        Takes effect only when the numpy module is installed; converts to numpy.array
     
     .. py:method:: to_pandas()
     
-        仅在安装了pandas模块时生效，转换为pandas.DataFrame
+        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
 
     .. py:method:: to_pyarrow()
 
-        转换为 pyarrow.Table
+        Converts to pyarrow.Table
 
 .. py:class:: TradeRecord([stock, datetime, business, planPrice, realPrice, goalPrice, number, cost, stoploss, cash, part])
 
-    交易记录
+    The trade record
     
-    .. py:attribute:: stock     股票（Stock）
-    .. py:attribute:: datetime  交易时间（Datetime）
-    .. py:attribute:: business  交易类型
-    .. py:attribute:: plan_price 计划交易价格（float）
-    .. py:attribute:: real_price 实际交易价格（float）
-    .. py:attribute:: goal_price 目标价格（float），如果为0表示未限定目标
-    .. py:attribute:: number    成交数量（float）
-    .. py:attribute:: cost      交易成本
+    .. py:attribute:: stock     Stock (Stock)
+    .. py:attribute:: datetime  Trade time (Datetime)
+    .. py:attribute:: business  Trade type
+    .. py:attribute:: plan_price Planned trade price (float)
+    .. py:attribute:: real_price Actual trade price (float)
+    .. py:attribute:: goal_price Goal price (float); 0 means no goal is set
+    .. py:attribute:: number    Traded number (float)
+    .. py:attribute:: cost      Trade cost
 
-        类型：:py:class:`CostRecord`
+        Type: :py:class:`CostRecord`
         
-    .. py:attribute:: stoploss 止损价（float）
-    .. py:attribute:: cash     现金余额（float）
+    .. py:attribute:: stoploss Stop-loss price (float)
+    .. py:attribute:: cash     Cash balance (float)
     .. py:attribute:: part     
     
-        交易指示来源，区别是交易系统哪个部件发出的指示，参见： :py:class:`System.Part`
+        The source of the trade instruction, distinguishing which part of the trade system issued the instruction; see: :py:class:`System.Part`
 
-    
 
-持仓记录
---------
+
+Position Records
+----------------
 
 .. py:class:: PositionRecordList
 
-    持仓记录列表，C++ std::vector<PositionRecord>包装
+    The position record list, a wrapper of the C++ std::vector<PositionRecord>
     
     .. py:method:: to_numpy()
     
-        仅在安装了numpy模块时生效，转换为numpy.array
+        Takes effect only when the numpy module is installed; converts to numpy.array
     
     .. py:method:: to_pandas()
     
-        仅在安装了pandas模块时生效，转换为pandas.DataFrame
+        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
 
     .. py:method:: to_pyarrow()
 
-        转换为 pyarrow.Table
+        Converts to pyarrow.Table
         
 
 .. py:class:: PositionRecord([stock, take_datetime, clean_datetime, number, stoploss, goal_price, total_number, buy_money, total_cost, total_risk, sell_money])
 
-    持仓记录
+    The position record
     
-    .. py:attribute:: stock          交易对象（Stock）
-    .. py:attribute:: take_datetime  初次建仓时刻（Datetime）
-    .. py:attribute:: clean_datetime 平仓日期，当前持仓记录中为 constant.null_datetime
-    .. py:attribute:: number       当前持仓数量（float）
-    .. py:attribute:: stoploss     当前止损价（float）
-    .. py:attribute:: goal_price   当前的目标价格（float）
-    .. py:attribute:: total_number 累计持仓数量（float）
-    .. py:attribute:: buy_money    累计买入资金（float）
-    .. py:attribute:: total_cost   累计交易总成本（float）
-    .. py:attribute:: total_risk   累计交易风险（float） = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-    .. py:attribute:: sell_money   累计卖出资金（float）
+    .. py:attribute:: stock          Trading object (Stock)
+    .. py:attribute:: take_datetime  The moment of the initial position opening (Datetime)
+    .. py:attribute:: clean_datetime The position closing date; it is constant.null_datetime in the current position record
+    .. py:attribute:: number       The current position number (float)
+    .. py:attribute:: stoploss     The current stop-loss price (float)
+    .. py:attribute:: goal_price   The current goal price (float)
+    .. py:attribute:: total_number The accumulated position number (float)
+    .. py:attribute:: buy_money    The accumulated buy money (float)
+    .. py:attribute:: total_cost   The accumulated total trade cost (float)
+    .. py:attribute:: total_risk   The accumulated trade risk (float) = the sum of (buy price - stop loss) * buy number, excluding the trade cost
+    .. py:attribute:: sell_money   The accumulated sell money (float)
 
     
-资产情况记录
-------------
+Funds Records
+-------------
 
-由TradeManager::getFunds返回
+Returned by TradeManager::getFunds.
 
 .. py:class:: FundsRecord([cash, market_value, short_market_value, base_cash, base_asset, borrow_cash, borrow_asset])
 
-    当前资产情况记录，由 :py:meth:`TradeManager.getFunds` 返回
+    The current funds record, returned by :py:meth:`TradeManager.getFunds`
     
-    .. py:attribute:: cash               当前现金（float）
-    .. py:attribute:: market_value       当前多头市值（float）
-    .. py:attribute:: short_market_value 当前空头仓位市值（float）
-    .. py:attribute:: base_cash          当前投入本金（float）
-    .. py:attribute:: base_asset         当前投入的资产价值（float）
-    .. py:attribute:: borrow_cash        当前借入的资金（float），即负债
-    .. py:attribute:: borrow_asset       当前借入证券资产价值（float）
+    .. py:attribute:: cash               The current cash (float)
+    .. py:attribute:: market_value       The current long market value (float)
+    .. py:attribute:: short_market_value The current short position market value (float)
+    .. py:attribute:: base_cash          The current invested principal (float)
+    .. py:attribute:: base_asset         The current invested asset value (float)
+    .. py:attribute:: borrow_cash        The currently borrowed money (float), i.e. the debt
+    .. py:attribute:: borrow_asset       The current borrowed securities asset value (float)
 
-    只读属性，自动根据上面的属性计算得到的结果:
+    Read-only attributes, the results calculated automatically from the attributes above:
 
-    .. py:attribute:: total_assets  总资产
-    .. py:attribute:: net_assets  净资产
-    .. py:attribute:: total_borrow  总负债
-    .. py:attribute:: total_base  投入本值资产（本钱）
-    .. py:attribute:: profit  收益
-
+    .. py:attribute:: total_assets  Total assets
+    .. py:attribute:: net_assets  Net assets
+    .. py:attribute:: total_borrow  Total debt
+    .. py:attribute:: total_base  The invested principal (capital)
+    .. py:attribute:: profit  The profit

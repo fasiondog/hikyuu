@@ -1,47 +1,45 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/vip/backtest.rst
+Event-driven Backtest
+=====================
 
-事件驱动式回测
-================
-
-事件驱动式策略回测
+Event-driven strategy backtest.
 
 .. note:: 
 
-    backtest 为 SYS 和 PF 回测的补充，但 SYS 和 PF 回测与事件回测原理不同，不要在事件回测中进行对 SYS 和 PF 的测试。
+    backtest is a supplement to the SYS and PF backtests, but the SYS and PF backtests differ in principle from the event backtest; do not test SYS and PF in the event backtest.
 
 
-**重要注意事项**
+**Important notes**
 
 .. note::
 
-    on_bar(stg) 函数中，为了回测和实盘一体，**不能直接使用以下函数， 否则回测中使用的将是未来数据**：
+    In the on_bar(stg) function, to unify the backtest and live trading, **the following functions must not be used directly, otherwise the backtest will use future data**:
     
-        - Datetime.now() 和 Datetime.today()，而需要使用 stg.now() 和 today()。
-        - stock.get_kdata, 使用 stg.get_kdata, stg.get_last_kdata
+        - Datetime.now() and Datetime.today(); use stg.now() and stg.today() instead.
+        - stock.get_kdata; use stg.get_kdata and stg.get_last_kdata instead.
 
 
 
 
 .. py:function:: backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode, support_short, sp)
 
-    事件驱动式回测, 通常直接测试 Strategy 中的主体函数
+    Event-driven backtest; usually the body function in the Strategy is tested directly.
 
-    如果 hikyuu 已经加载数据，可以忽略 context 参数。否则通 Strategy 类似，需要主动传入 context 参数，
-    context 中包含需要加载的股票代码、K线类型、K线数量、K线起始日期等信息。
+    If hikyuu has already loaded the data, the context parameter can be omitted. Otherwise, similar to Strategy, the context parameter needs to be passed in actively;
+    the context contains the stock codes to load, the K-line types, the number of K-lines, the K-line start date and other information.
       
-    :param StrategyContext context: 策略上下文 (在已经使用 load_hikyuu 的环境下，context可省略)
-    :param func on_bar: 策略主体执行函数, 如: on_bar(stg: Strategy)
-    :param TradeManager tm: 策略测试账户
-    :param Datetime start_date: 起始日期
-    :param Datetime end_date: 结束日期（不包含其本身）
-    :param Query.KType ktype: K线类型(按该类型逐 Bar 执行测试)
-    :param str ref_market: 所属市场
-    :param int mode: 0 - 当前bar收盘价执行买卖操作; 1 - 下一bar开盘价执行买卖操作
-    :param support_short: 是否支持卖空
-    :param Slippage sp: 滑点算法
+    :param StrategyContext context: the strategy context (in an environment where load_hikyuu has already been used, context can be omitted)
+    :param func on_bar: the strategy body execution function, e.g.: on_bar(stg: Strategy)
+    :param TradeManager tm: the strategy test account
+    :param Datetime start_date: the start date
+    :param Datetime end_date: the end date (exclusive)
+    :param Query.KType ktype: the K-line type (the test is executed bar by bar with this type)
+    :param str ref_market: the market it belongs to
+    :param int mode: 0 - execute the buy/sell operations with the close price of the current bar; 1 - execute the buy/sell operations with the open price of the next bar
+    :param support_short: whether short selling is supported
+    :param Slippage sp: the slippage algorithm
 
 
-示例1 (在已使用 load_hikyuu 加载数据的环境下，可省略 context 参数)
+Example 1 (in an environment where the data has been loaded with load_hikyuu, the context parameter can be omitted)
 
 ::
 
@@ -87,11 +85,11 @@
     plt.show()
 
 
-示例2 (使用 StrategyContext)
+Example 2 (using StrategyContext)
 
 .. note::
 
-    该方式下, 无法在 stg 外获取像 sm['sz000001'] 这样获取股票对象，仅能在 stg 内部获取。如需在 stg 外部获取，参考示例3。
+    In this way, a stock object such as sm['sz000001'] cannot be obtained outside stg, but only inside stg. To obtain it outside stg, see example 3.
 
 ::
 
@@ -100,7 +98,7 @@
 
     class Config:
         ktype = Query.DAY
-        stock = 'sz000001'  # 注意此时不能使用 sm['sz000001']
+        stock = 'sz000001'  # Note that sm['sz000001'] cannot be used here
         ma1 = MA(CLOSE(), 10)
         ma2 = MA(CLOSE(), 30)
 
@@ -121,15 +119,15 @@
 
         s = Strategy(['sz000001'],  [Query.DAY])
 
-        # 实盘
+        # Live trading
         # s.run_daily(my_func2, Minutes(1))  # , ignore_market=True)
         # s.start()
 
-        # 回测
+        # Backtest
         start_date = Datetime(2024, 1, 1)
         end_date = Datetime(2025, 1, 1)
         
-        # 该方式下，此处获取不大实际的 stk !!!
+        # In this way, the actual stk cannot be obtained here!!!
         # stk = sm['sz000001']
         # k = stk.get_kdata(Query(start_date, end_date, ktype=Config.ktype))
 
@@ -141,9 +139,9 @@
         plt.show()
 
 
-示例3  (使用 load_hikyuu 加载函数)
+Example 3 (using the load_hikyuu loading function)
 
-该方式一般用于回测或调试
+This way is generally used for backtesting or debugging.
 
 ::
 
@@ -152,7 +150,7 @@
 
     class Config:
         ktype = Query.DAY
-        stock = 'sz000001'  # 注意此时不能使用 sm['sz000001']
+        stock = 'sz000001'  # Note that sm['sz000001'] cannot be used here
         ma1 = MA(CLOSE(), 10)
         ma2 = MA(CLOSE(), 30)
 
@@ -165,7 +163,7 @@
             return
         ind = CROSS(Config.ma1, Config.ma2)(k)
         if ind[-1] >= 1 and not stg.tm.have(stk):
-            hku_info("{} 触发买入", stg.today())
+            hku_info("{} triggers a buy", stg.today())
             stg.buy(stk, k[-1].close, 100)
             hku_info("{}", stg.tm.get_position(stg.today(), stk))
         elif ind[-1] < 1 and stg.tm.have(stk):
@@ -189,11 +187,11 @@
 
         s = Strategy()
 
-        # 实盘
+        # Live trading
         # s.run_daily(my_func2, Minutes(1))  # , ignore_market=True)
         # s.start()
 
-        # 回测
+        # Backtest
         start_date = Datetime(2023, 1, 1)
         end_date = Datetime(2025, 1, 1)
         print(sm['sz000001'])
@@ -203,4 +201,4 @@
 
         tm.performance(Query(start_date, end_date, Config.ktype))
         from matplotlib import pyplot as plt
-        plt.show()    
+        plt.show()

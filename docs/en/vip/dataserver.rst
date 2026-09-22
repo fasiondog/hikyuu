@@ -1,66 +1,64 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/vip/dataserver.rst
-
 dataserver
-============
+==========
 
-pip 安装的，可在 shell 下直接执行 dataserver 命令。或使用 Python 执行安装目录下 gui/dataserver.py 文件。
+If installed with pip, the dataserver command can be executed directly in the shell. Or execute the gui/dataserver.py file under the installation directory with Python.
 
 ::
     
-    dataserver 参数如下：
+    The dataserver parameters are as follows:
 
     Options:
-    -addr, --addr TEXT              自身对外提供的服务地址, 如需外部机器访问，请使用 tcp://0.0.0.0:port
-    -n, --work_num INTEGER          行情接收处理线程数
-    -save, --save BOOLEAN           保存行情数据(仅支持clickhouse)
-    -buf, --buf BOOLEAN             缓存行情数据
-    -parquet_path, --parquet_path TEXT  Parquet 文件存储路径
+    -addr, --addr TEXT              The service address provided to the outside; for access from other machines, use tcp://0.0.0.0:port
+    -n, --work_num INTEGER          The number of the quote receiving and processing threads
+    -save, --save BOOLEAN           Save the quote data (ClickHouse only)
+    -buf, --buf BOOLEAN             Cache the quote data
+    -parquet_path, --parquet_path TEXT  Parquet file storage path
 
 
-dataserver 需要配合行情采集服务使用，可以和行情采集服务所在机器在同一台机器上运行，也可以在两台机器上分别运行，但需要配置好网络。
+dataserver needs to work with the quote collection service; it can run on the same machine as the quote collection service, or the two can run on separate machines, but the network needs to be configured properly.
 
-启动行情采集数据服务如下，如下命令行等其他方式，请查看安装目录下 gui 子目录下相关 python 文件
+Start the quote collection data service as follows; for other ways such as the command line below, please refer to the related python files in the gui subdirectory under the installation directory.
 
 .. figure:: ../_static/dataserver_01.png
 
-和行情采集在同一台服务器上运行时，通常不用修改配置。如果不在同一机器上，需要调整 dataserver 所在机器相关配置：
+When running on the same server as the quote collection service, the configuration usually does not need to be modified. If they are not on the same machine, the related configuration on the machine where dataserver runs needs to be adjusted:
 
 ::
 
-    如，行情采集运行在 A 机器（IP地址为： 192.168.1.2），dataserver 运行在 B 机器（IP地址：192.168.1.3），则修改 B 机器用户目录下的 hikyuu.ini 文件：
+    For example, if the quote collection runs on machine A (IP address: 192.168.1.2) and dataserver runs on machine B (IP address: 192.168.1.3), then modify the hikyuu.ini file in the user directory of machine B:
 
-    修改 [hikyuu] 节下的 quotation_server 参数为：
+    Modify the quotation_server parameter under the [hikyuu] section to:
 
     [hikyuu]
     tmpdir = /Users/fasiondog/stock/tmp
     datadir = /Users/fasiondog/stock
     quotation_server = tcp://192.168.1.2:9200
 
-如正常连接至行情采集服务，则会显示如下字样：
+If it connects to the quote collection service normally, the following will be displayed:
 
 ::
 
     Ready to receive quotation from ....
 
 
-如连接行情采集服务失败，将持续打印连接失败信息，如：
+If connecting to the quote collection service fails, the connection failure message will be printed continuously, e.g.:
 
 .. figure:: ../_static/dataserver_02.png
 
-在 hikyuu 其他程序中使用，调用 get_data_from_buffer_server 从 B 机器获取缓存的实时数据：
+To use it in other hikyuu programs, call get_data_from_buffer_server to get the cached realtime data from machine B:
 
 .. py:function:: get_data_from_buffer_server(addr: str, stklist: list, ktype: Query.KType)
           
-    :param str addr: 数据服务器地址
-    :param list stklist: 需要获取数据的股票列表
-    :param Query.KType ktype: 数据类型
+    :param str addr: the data server address
+    :param list stklist: the list of the stocks whose data needs to be obtained
+    :param Query.KType ktype: the data type
 
 
-如:
+E.g.:
 
 ::
 
     get_data_from_buffer_server("tcp://192.168.1.3:9201", [sm["sh000001"], sm["sh000002"]], KQuery.DAY)
 
 
-使用此方法的其他 hikyuu 进程，可以通过 load_hikyuu 中的参数 “start_spot” 或 Strategy.start 方法参数，禁用自己的行情接收，节省机器资源占用。
+Other hikyuu processes using this method can disable their own quote receiving through the "start_spot" parameter in load_hikyuu or the Strategy.start method parameter, to save the machine resource usage.
