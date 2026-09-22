@@ -1,248 +1,246 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_sys/money_manager.rst
-
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-资金管理策略|MM
-===============
+Money Management Strategy|MM
+============================
 
-公共参数：
+Common parameters:
 
-    * **auto-checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
-    * **max-stock=20000** *(int)* : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
-    * **disable_ev_force_clean_position=False** *(bool)* : 禁用市场环境失效时强制清仓
-    * **disable_cn_force_clean_position=False** *(bool)* : 禁用系统有效条件失效时强制清仓
+    * **auto-checkin=False** *(bool)* : When the account cash is not enough to buy the number indicated by the money management strategy, automatically deposit (checkin) enough cash into the account.
+    * **max-stock=20000** *(int)* : The maximum number of the security types held (i.e. how many stocks are held, not the position number of each stock)
+    * **disable_ev_force_clean_position=False** *(bool)* : Disable the forced position clearing when the environment is invalid
+    * **disable_cn_force_clean_position=False** *(bool)* : Disable the forced position clearing when the system validity condition is invalid
 
 
-内建资金管理策略
-----------------
+Built-in Money Management Strategies
+------------------------------------
 
-不做资金管理策略
-^^^^^^^^^^^^^^^^^^
+No Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_Nothing()
 
-    特殊的资金管理策略，相当于不做资金管理，有多少钱买多少。
+    A special money management strategy, equivalent to no money management: buy as much as the money allows.
 
 
-固定交易数量资金管理策略
-^^^^^^^^^^^^^^^^^^^^^^^^
+Fixed Trade Number Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedCount([n = 100])
 
-    固定交易数量资金管理策略。每次买入固定的数量。
+    The fixed trade number money management strategy. Buy a fixed number each time.
     
-    :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
-    :return: 资金管理策略实例
+    :param float n: the number bought each time (it should be an integral multiple of the minimum trade number of the trading object; the program does not check this here)
+    :return: the money management strategy instance
 
 .. py:function:: MM_FixedCountTps([buy_counts, sell_counts])
           
-    连续买入/卖出固定数量资金管理策略。
+    The money management strategy of buying/selling a fixed number consecutively.
     
-    :param list buy_counts: 买入数量列表
-    :param list sell_counts: 卖出数量列表
-    :return: 资金管理策略实例
+    :param list buy_counts: the list of the buy numbers
+    :param list sell_counts: the list of the sell numbers
+    :return: the money management strategy instance
 
 
-固定风险资金管理策略
-^^^^^^^^^^^^^^^^^^^^
+Fixed Risk Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedRisk([risk = 1000.00])
 
-    固定风险资金管理策略对每笔交易限定一个预先确定的或者固定的资金风险，如每笔交易固定风险1000元。公式：交易数量 = 固定风险 / 交易风险。
+    The fixed risk money management strategy limits a predetermined or fixed money risk for each trade, such as a fixed risk of 1000 yuan per trade. Formula: trade number = fixed risk / trade risk.
 
-    :param float risk: 固定风险
-    :return: 资金管理策略实例
+    :param float risk: the fixed risk
+    :return: the money management strategy instance
     
 
-固定资本资金管理策略
-^^^^^^^^^^^^^^^^^^^^
+Fixed Capital Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    固定资金管理策略, 即控制每次买入投入的总资金。买入数量 = 当前现金 / capital
+    The fixed money management strategy, i.e. controlling the total money invested in each buy. Buy number = current cash / capital.
 
-    :param float capital: 固定资本单位
-    :return: 资金管理策略实例
+    :param float capital: the fixed capital unit
+    :return: the money management strategy instance
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    固定资本管理策略。买入数量 = 当前总资产 / capital
+    The fixed capital money management strategy. Buy number = current total assets / capital.
 
-    :param float capital: 固定资本单位
-    :return: 资金管理策略实例    
+    :param float capital: the fixed capital unit
+    :return: the money management strategy instance    
 
 
-固定单位资金风险管理策略
-^^^^^^^^^^^^^^^^^^^^^^^^
+Fixed Units Risk Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedUnits([n = 33])
 
-    固定单位资金管理策略。公式: 买入数量 = 当前现金 / n / 当前风险risk
+    The fixed units money management strategy. Formula: buy number = current cash / n / current risk.
 
-    :param int n: n个资金单位
-    :return: 资金管理策略实例
+    :param int n: n money units
+    :return: the money management strategy instance
     
 
-威廉斯固定风险资金管理策略
-^^^^^^^^^^^^^^^^^^^^^^^^^^  
+Williams Fixed Risk Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    威廉斯固定风险资金管理策略，买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
+    The Williams fixed risk money management strategy; buy number = (account balance × risk percentage p) ÷ maximum loss (max_loss)
     
-    :param float p: 风险百分比
-    :param float max_loss: 最大损失
-    :return: 资金管理策略实例
+    :param float p: the risk percentage
+    :param float max_loss: the maximum loss
+    :return: the money management strategy instance
 
     
-固定百分比资金管理策略
-^^^^^^^^^^^^^^^^^^^^^^
+Fixed Percentage Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedPercent([p = 0.03])
 
-    固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
+    The fixed percentage risk model. Formula: P (position size) = account balance * percentage / R (the trade risk per share). [BOOK3]_, [BOOK4]_ .
     
-    :param float p: 百分比
-    :return: 资金管理策略实例
-    
-
-固定波幅资金管理策略
-^^^^^^^^^^^^^^^^^^^^
-
-
+    :param float p: the percentage
+    :return: the money management strategy instance
     
 
-自定义资金管理策略
---------------------
+Fixed Volatility Money Management Strategy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-自定义资金管理策略接口：
 
-* :py:meth:`MoneyManagerBase.buyNotify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
-* :py:meth:`MoneyManagerBase.sellNotify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
-* :py:meth:`MoneyManagerBase._getBuyNumber` - 【必须】获取指定交易对象可买入的数量
-* :py:meth:`MoneyManagerBase._getSellNumber` - 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
-* :py:meth:`MoneyManagerBase._reset` - 【可选】重置私有属性
-* :py:meth:`MoneyManagerBase._clone` - 【必须】克隆接口
+    
 
-资金管理策略基类
-----------------
+Custom Money Management Strategy
+--------------------------------
+
+The custom money management strategy interface:
+
+* :py:meth:`MoneyManagerBase.buyNotify` - [Optional] Receive the notification of the actual buy; reserved for handling multiple position increases/decreases
+* :py:meth:`MoneyManagerBase.sellNotify` - [Optional] Receive the notification of the actual sell; reserved for handling multiple position increases/decreases
+* :py:meth:`MoneyManagerBase._getBuyNumber` - [Required] Get the number that can be bought for the specified trading object
+* :py:meth:`MoneyManagerBase._getSellNumber` - [Optional] Get the number that can be sold for the specified trading object; if not overloaded, it defaults to selling all the held number
+* :py:meth:`MoneyManagerBase._reset` - [Optional] Reset the private attributes
+* :py:meth:`MoneyManagerBase._clone` - [Required] The clone interface
+
+Money Management Strategy Base Class
+------------------------------------
 
 .. py:class:: MoneyManagerBase
 
-    资金管理策略基类
+    The money management strategy base class
     
-    .. py:attribute:: name  名称
-    .. py:attribute:: tm    设置或获取交易管理对象
-    .. py:attribute:: query 设置或获取查询条件
+    .. py:attribute:: name  Name
+    .. py:attribute:: tm    Set or get the trade manager object
+    .. py:attribute:: query Set or get the query condition
     
     .. py:method:: __init__(self[, name="MoneyManagerBase])
     
-        初始化构造函数
+        The initialization constructor
         
-        :param str name: 名称
+        :param str name: the name
         
     .. py:method:: get_param(self, name)
 
-        获取指定的参数
+        Get the specified parameter
         
         .. note::
 
-            所有的资金管理策略具有参数“auto-checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
+            All the money management strategies have the parameter "auto-checkin" (bool type, defaults to False), which means "when the account cash is not enough to buy the number indicated by the money management strategy, automatically deposit (checkin) enough cash into the account."
     
-        :param str name: 参数名称
-        :return: 参数值
-        :raises out_of_range: 无此参数
+        :param str name: the parameter name
+        :return: the parameter value
+        :raises out_of_range: no such parameter
         
     .. py:method:: set_param(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值
+        :param str name: the parameter name
+        :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! 不支持的参数类型
+        :raises logic_error: Unsupported type! The parameter type is not supported
         
     .. py:method:: reset(self)
     
-        复位操作
+        The reset operation
     
     .. py:method:: clone(self)
     
-        克隆操作
+        The clone operation
         
     .. py:method:: get_buy_num(self, datetime, stock, price, risk, part_from)
     
-        获取指定交易对象可买入的数量
+        Get the number that can be bought for the specified trading object
         
-        :param Datetime datetime: 交易时间
-        :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-        :param System.Part part_from: 来源系统组件
-        :return: 可买入数量
+        :param Datetime datetime: the trade time
+        :param Stock stock: the trading object
+        :param float price: the trade price
+        :param float risk: the risk taken by the trade; if it is 0, it means a total loss, i.e. the market value falls to 0
+        :param System.Part part_from: the source system component
+        :return: the number that can be bought
         :rtype: float
         
     .. py:method:: get_sell_num(self, datetime, stock, price, risk, part_from)
     
-        获取指定交易对象可卖出的数量
+        Get the number that can be sold for the specified trading object
         
-        :param Datetime datetime: 交易时间
-        :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-        :param System.Part part_from: 来源系统组件
-        :return: 可卖出数量
+        :param Datetime datetime: the trade time
+        :param Stock stock: the trading object
+        :param float price: the trade price
+        :param float risk: the risk taken by the new trade; if it is 0, it means a total loss, i.e. the market value falls to 0
+        :param System.Part part_from: the source system component
+        :return: the number that can be sold
         :rtype: float
 
     .. py:method:: current_buy_count(self, stock)
 
-        当前连续买入计数
+        The current consecutive buy count
 
     .. py:method:: current_sell_count(self, stock)
 
-        当前连续卖出计数
+        The current consecutive sell count
         
     .. py:method:: _buy_notify(self, trade_record)
     
-        【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
+        [Overload interface] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
-        :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
+        :param TradeRecord trade_record: the actual buy trade record when the actual buy occurs
         
     .. py:method:: _sell_notify(self, trade_record)
     
-        【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
+        [Overload interface] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
-        :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录
+        :param TradeRecord trade_record: the actual sell trade record when the actual sell occurs
     
     .. py:method:: _get_buy_num(self, datetime, stock, price, risk, part_from)
 
-        【重载接口】获取指定交易对象可买入的数量
+        [Overload interface] Get the number that can be bought for the specified trading object
         
-        :param Datetime datetime: 交易时间
-        :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-        :param System.Part part_from: 来源系统组件
-        :return: 可买入数量
+        :param Datetime datetime: the trade time
+        :param Stock stock: the trading object
+        :param float price: the trade price
+        :param float risk: the risk taken by the trade; if it is 0, it means a total loss, i.e. the market value falls to 0
+        :param System.Part part_from: the source system component
+        :return: the number that can be bought
         :rtype: float
 
     .. py:method:: _get_sell_num(self, datetime, stock, price, risk, part_from)
     
-        【重载接口】获取指定交易对象可卖出的数量。如未重载，默认为卖出全部已持仓数量。
+        [Overload interface] Get the number that can be sold for the specified trading object. If not overloaded, it defaults to selling all the held number.
         
-        :param Datetime datetime: 交易时间
-        :param Stock stock: 交易对象
-        :param float price: 交易价格
-        :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-        :param System.Part part_from: 来源系统组件
-        :return: 可卖出数量
+        :param Datetime datetime: the trade time
+        :param Stock stock: the trading object
+        :param float price: the trade price
+        :param float risk: the risk taken by the new trade; if it is 0, it means a total loss, i.e. the market value falls to 0
+        :param System.Part part_from: the source system component
+        :return: the number that can be sold
         :rtype: float
         
     .. py:method:: _reset(self)
     
-        【重载接口】子类复位接口，复位内部私有变量
+        [Overload interface] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        【重载接口】子类克隆接口
+        [Overload interface] The subclass clone interface
