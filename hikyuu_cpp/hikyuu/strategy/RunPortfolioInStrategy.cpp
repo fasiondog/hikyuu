@@ -42,7 +42,7 @@ RunPortfolioInStrategy::RunPortfolioInStrategy(const PFPtr& pf, const KQuery& qu
 }
 
 void RunPortfolioInStrategy::run() {
-    // 如果已经有交易记录，不允许同步前移
+    // Synchronizing forward is not allowed when there are already trade records
     if (!m_pf->getTM()->firstDatetime().isNull()) {
         m_pf->getTM()->fetchAssetInfoFromBroker(m_broker);
         m_pf->run(m_query, true);
@@ -89,7 +89,7 @@ void RunPortfolioInStrategy::run() {
         return;
     }
 
-    // 获取最近调仓日
+    // Get the latest position adjustment day
     auto k = getKData("sh000001", m_query);
     auto cycle =
       CYCLE(k, m_pf->getParam<int>("adjust_cycle"), m_pf->getParam<string>("adjust_mode"),

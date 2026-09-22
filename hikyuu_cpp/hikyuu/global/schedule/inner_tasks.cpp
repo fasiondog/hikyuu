@@ -31,13 +31,13 @@ void initInnerTask() {
     }
 
     if (reload_enable) {
-        // shm客户端延迟5分钟重启，以便shm server先重启完毕
+        // The shm client restarts 5 minutes later, so that the shm server finishes restarting first
         if (StockManager::instance().isIpcClientMode()) {
             constexpr int64_t shm_client_reload_delay_minutes = 5;
             mm += shm_client_reload_delay_minutes;
             hh += mm / 60;
             mm %= 60;
-            hh %= 24;  // 24 小时回卷（如 23:59 延后即为次日 00:04，避免超出 TimeDelta 上限）
+            hh %= 24;  // Wrap around 24 hours (23:59 delayed becomes 00:04 of the next day)
             HKU_INFO(
               "Running in shm client mode, daily auto reload delayed {} minutes to {:02d}:{:02d}",
               shm_client_reload_delay_minutes, hh, mm);
@@ -50,17 +50,17 @@ void initInnerTask() {
 }
 
 void reloadHikyuuTask() {
-    // 先停止行情接收
+    // Stop the market data receiving first
     auto* agent = getGlobalSpotAgent();
     bool agent_running = agent->isRunning();
     if (agent_running) {
         agent->stop();
     }
 
-    // 重新加载数据
+    // Reload the data
     StockManager::instance().reload();
 
-    // 重新启动行情接收
+    // Restart the market data receiving
     if (agent_running) {
         bool print = agent->getPrintFlag();
         size_t work_num = agent->getWorkerNum();

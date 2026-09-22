@@ -15,12 +15,16 @@ namespace ipc {
 
 namespace {
 
-// 转发回调对象：注册时在堆上创建并以 release 发布，转发侧 acquire 读取后只读访问；对象进程
-// 生命周期内常驻、不释放，以避免与行情线程（转发读方）产生释放-使用竞争（注册仅发生一两次）
+// The forwarding callback object: it is created on the heap at the registration and published with
+// release, the forwarding side reads it with acquire and then accesses it read-only; the object
+// stays resident for the process lifetime and is never released, avoiding a release-use race with
+// the market data thread (the forwarding reader); the registration happens only once or twice.
 std::atomic<ShmClientForwarders*> g_client{nullptr};
 
-// 中断检查器由插件侧等待逻辑（运行期）与 Python 绑定（注册）共同使用；堆分配且永不释放，
-// 避免静态析构期（如插件 stop 路径再触发一次检查）触碰已销毁的 TU 级静态量
+// The interruption checker is used by both the plugin side waiting logic (runtime) and the Python
+// binding (registration); it is heap allocated and never released, avoiding a static destruction
+// period (such as a check triggered again in the plugin stop path) touching a destroyed TU level
+// static variable
 std::mutex* g_interrupt_checker_mutex = new std::mutex;
 std::function<bool()>* g_interrupt_checker = new std::function<bool()>;
 
@@ -28,11 +32,11 @@ std::function<bool()>* g_interrupt_checker = new std::function<bool()>;
 
 void registerShmClient(ShmClientForwarders fwd) noexcept {
     if (!fwd) {
-        // 注销：切断引用，转发侧随即按安全空操作处理
+        // Unregister: cut the reference, the forwarding side then treats it as a safe no-op
         g_client.store(nullptr, std::memory_order_release);
         return;
     }
-    // 发布新回调组（不再释放，见上）
+    // Publish the new callback group (no release any more, see above)
     g_client.store(new ShmClientForwarders(std::move(fwd)), std::memory_order_release);
 }
 
@@ -71,7 +75,8 @@ bool checkInterrupted() {
         std::lock_guard<std::mutex> lock(*g_interrupt_checker_mutex);
         checker = *g_interrupt_checker;
     }
-    // 检查器在锁外执行（Python 环境下需获取 GIL，锁内执行可能死锁）
+    // The checker is executed outside the lock (in the Python environment it needs the GIL and
+    // executing it inside the lock may deadlock)
     return checker ? checker() : false;
 }
 

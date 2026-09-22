@@ -50,7 +50,8 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
                const Datetime& start_date, const Block& block, KQuery::RecoverType recover_type)
 : m_data(make_shared<Data>(name, formula, ktype, brief, details, need_save_value, start_date, block,
                            recover_type)) {
-    // 使用保存因子值时,因子名称必须是英文字母、数字、_ 组成，且首字母不能为数字
+    // When the saved factor values are used the factor name must consist of English letters, digits
+    // and _ and must not start with a digit
     if (need_save_value && !name.empty()) {
         HKU_CHECK(isValidFactorName(name), "{}",
                   htr("When saving factor values, factor names must consist of English letters, "
@@ -70,7 +71,8 @@ void Factor::name(const string& name) {
 
 void Factor::needSaveValue(bool flag) {
     if (flag && !m_data->name.empty()) {
-        // 保存因子值时,因子名称必须是英文字母、数字、_ 组成，且首字母不能为数字
+        // When the factor values are saved the factor name must consist of English letters, digits
+        // and _ and must not start with a digit
         HKU_CHECK(isValidFactorName(m_data->name), "{}",
                   htr("When saving factor values, factor names must consist of English letters, "
                       "numbers and underscores, and cannot start with a number!"));
