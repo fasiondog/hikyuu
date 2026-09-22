@@ -262,8 +262,9 @@ pybind11-stubgen -o . hikyuu
 5. **新增依赖**：C++ 依赖在 `xmake.lua` 中 `add_requires`（注意平台差异与版本，如 hdf5 在 Windows 为 1.13.3、mysql 按平台不同版本）；Python 依赖加到 `requirements.txt`。
 6. **测试优先**：改动涉及 C++ 核心时，至少跑 `xmake r unit-test` + `python3 hikyuu/test/test.py`；涉及具体模块时跑对应单测文件。
 7. **CI 会验证**：`.github/workflows/` 下 ubuntu（aarch64/x86_64）、windows、macosx 三套流水线，PR 合入 `master` 前需通过构建与测试。
-8. **提交信息**：仓库使用中文或英文均可，历史中常见 `fix(xxx): 描述` 的 conventional commits 风格（如 `fix(data): 修复 SQL 后端派生周期 K 线跨界聚合`）。
-9. **谨慎处理**：`hikyuu_pywrap` 使用 unity build（`c++.unity_build`），新增 .cpp 时注意 unity_group 分组；修改 `xmake.lua` 后需重新 `xmake f` 配置。
+8. **提交信息统一使用英文**：conventional commits 风格，如 `fix(data): fix cross-period aggregation of derived K-lines in the SQL backend`；历史早期存在中文提交信息，新提交一律用英文，正文说明也用英文。
+9. **AI 不得主动提交**：AI 编码代理禁止执行 `git commit`，也应避免 `git add`；每完成一个步骤后，列出「待提交文件清单 + 建议的英文 commit message（可直接复制的 `git commit -m "..."`）」告知用户，由用户自行决定提交时机与粒度。
+10. **谨慎处理**：`hikyuu_pywrap` 使用 unity build（`c++.unity_build`），新增 .cpp 时注意 unity_group 分组；修改 `xmake.lua` 后需重新 `xmake f` 配置。
 
 ## 9. 快速自查清单（提交前）
 
