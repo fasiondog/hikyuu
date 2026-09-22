@@ -117,16 +117,16 @@ class UsePytdxImportToH5Thread(QThread):
         if self.config.getboolean('weight', 'enable', fallback=False):
             task_count += (market_count*2)
 
-        self.logger.info('Searching for TDX servers')
-        self.send_message(['INFO', 'Searching for TDX servers'])
+        self.logger.info('搜索通达信服务器')
+        self.send_message(['INFO', '搜索通达信服务器'])
         self.hosts = search_best_tdx()
         if not self.hosts:
-            self.logger.warn('Unable to connect to the TDX quote server! Please check your network settings!')
-            self.send_message(['INFO', 'Unable to connect to the TDX quote server! Please check your network settings!'])
+            self.logger.warn('无法连接通达信行情服务器！请检查网络设置！')
+            self.send_message(['INFO', '无法连接通达信行情服务器！请检查网络设置！'])
             return
 
         if task_count == 0:
-            self.send_message(['INFO', 'No market data selected for import!'])
+            self.send_message(['INFO', '未选择需要导入的行情数据！'])
             return
 
         use_tdx_number = min(
@@ -235,7 +235,7 @@ class UsePytdxImportToH5Thread(QThread):
             self.logger.error(str(e))
             self.send_message(['THREAD', 'FAILURE', str(e)])
         else:
-            self.logger.info('Import completed')
+            self.logger.info('导入完毕')
             self.send_message(['THREAD', 'FINISHED'])
 
     @hku_catch(trace=True, re_raise=True)
@@ -249,8 +249,8 @@ class UsePytdxImportToH5Thread(QThread):
             time_progress[market] = 0
 
         # 正在导入代码表
-        self.logger.info('Importing the stock code table')
-        self.send_message(['INFO', 'Importing the stock code table'])
+        self.logger.info('导入股票代码表')
+        self.send_message(['INFO', '导入股票代码表'])
 
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             connect = sqlite3.connect("{}/stock.db".format(
@@ -292,19 +292,19 @@ class UsePytdxImportToH5Thread(QThread):
                   "failed connect pytdx {}:{}", self.hosts[0][2],
                   self.hosts[0][3])
 
-        self.logger.info("Importing the exchange holiday calendar")
+        self.logger.info("导入交易所休假日历")
         import_new_holidays(connect)
 
         count = import_index_name(connect)
-        self.logger.info("Number of indices: {}".format(count))
+        self.logger.info("指数数量: {}".format(count))
 
         for market in g_market_list:
             count = import_stock_name(connect, pytdx_api, market,
                                       self.quotations)
             if count > 0:
-                self.logger.info("{} new stocks added: {}".format(market, count))
+                self.logger.info("{} 新增股票数: {}".format(market, count))
                 self.send_message(
-                    ['INFO', '{} new stocks added: {}'.format(market, count)])
+                    ['INFO', '{} 新增股票数：{}'.format(market, count)])
         pytdx_api.disconnect()
         connect.close()
 

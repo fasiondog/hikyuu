@@ -94,12 +94,12 @@ class ImportPytdxToH5:
         try:
             progress = ProgressBar(self)
             api = TdxHq_API()
-            hku_info("Importing {} {} data from {}", self.market, self.ktype, self.ip)
+            hku_info("导入 {} {} 数据 from {}", self.market, self.ktype, self.ip)
             hku_check(api.connect(self.ip, self.port), "failed connect pytdx: {}:{}", self.ip, self.port)
             count = import_data(
                 connect, self.market, self.ktype, self.quotations, api, self.dest_dir, self.startDatetime, progress
             )
-            self.logger.info("Imported {} {} records: {}".format(self.market, self.ktype, count))
+            self.logger.info("导入 {} {} 记录数: {}".format(self.market, self.ktype, count))
             api.disconnect()
         except Exception as e:
             self.logger.error("ImportPytdxToH5Task failed! {}".format(e))

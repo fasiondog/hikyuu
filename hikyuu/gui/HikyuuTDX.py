@@ -66,7 +66,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event):
         if self.import_running:
-            QMessageBox.about(self, 'Tip', 'An import task is running, please wait patiently!')
+            QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
             event.ignore()
             return
 
@@ -277,9 +277,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_save_pushButton_clicked(self):
         try:
             self.saveConfig()
-            QMessageBox.about(self, '', 'Saved successfully')
+            QMessageBox.about(self, '', '保存成功')
         except Exception as e:
-            QMessageBox.about(self, "Error", str(e))
+            QMessageBox.about(self, "错误", str(e))
 
     def normalOutputWritten(self, text):
         """普通打印信息重定向"""
@@ -370,9 +370,9 @@ hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 </style></head><body style="font-weight:400; font-style:normal;">
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu is a</span><span style="font-weight:700;">high-performance quantitative trading computing engine that is free and open source under the Apache-2.0 license. The core framework, backtesting, indicators, trading models and other basic features are completely free and unrestricted for all users.</span><span>To support the long-term stable maintenance, continuous updates and bug fixes of the project, a voluntary donation plan is now offered, providing donors with independent plug-in value-added features. None of the value-added features affects the use of the core framework or free compilation.</span></p>
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>The donation value-added features are provided as independent plug-ins, completely separated from the Hikyuu core framework. They do not modify, intrude into or restrict the core code, and do not affect users' own compilation or secondary development. Starting from version 2.8.3, the donation plug-in license no longer requires collecting hardware information; the license verification is done online instead, with an offline grace period of up to 30 days, and no online verification is performed during A-share trading hours, so intraday operation is not affected.</span></p>
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>For details, see: </span><a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">Donation Benefits</span></a><span style="font-weight:700;"> Thank you all for your support!</span></p></body></html>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu 是一款</span><span style="font-weight:700;">遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。</span><span>为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。自 2.8.3 版本起，捐赠插件授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>详情参见：</span><a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">捐赠权益</span></a><span style="font-weight:700;"> ，感谢大家的支持！</span></p></body></html>
 """
         self.label_46.setText(label_46_txt)
         self.label_46.setOpenExternalLinks(True)
@@ -395,7 +395,7 @@ li.checked::marker { content: "\2612"; }
         self.time_start_dateEdit.setDate(today - datetime.timedelta(7))
         self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
-        self.collect_status_label.setText("Stopped")
+        self.collect_status_label.setText("已停止")
 
         # 初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
@@ -679,7 +679,7 @@ li.checked::marker { content: "\2612"; }
     def on_fetch_trial_pushButton_clicked(self):
         email = self.email_lineEdit.text()
         info = fetch_trial_license(email)
-        QMessageBox.about(self, "Get Trial License", info)
+        QMessageBox.about(self, "获取试用许可", info)
         self.label_license.setText(view_license())
         self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
@@ -803,7 +803,7 @@ li.checked::marker { content: "\2612"; }
     @Slot()
     def on_clickhouse_tmpdir_pushButton_clicked(self):
         if not is_valid_license():
-            QMessageBox.critical(self, "ClickHouse Engine", "A donation license is required to use the ClickHouse engine")
+            QMessageBox.critical(self, "clickhouse引擎", "需要捐赠授权才能使用clickhouse引擎")
             return
 
         dlg = QFileDialog()
@@ -816,7 +816,7 @@ li.checked::marker { content: "\2612"; }
 
     @Slot()
     def on_mysql_test_pushButton_clicked(self):
-        """Test Database Connection"""
+        """测试数据库连接"""
         db_config = {
             'user': self.mysql_usr_lineEdit.text(),
             'password': self.mysql_pwd_lineEdit.text(),
@@ -829,18 +829,18 @@ li.checked::marker { content: "\2612"; }
             cnx.close()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                QMessageBox.critical(self, "Test Database Connection", "Incorrect MySQL password or user name!")
+                QMessageBox.critical(self, "测试数据库连接", "MYSQL密码或用户名错误！")
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                QMessageBox.critical(self, "Test Database Connection", "The MySQL database does not exist!")
+                QMessageBox.critical(self, "测试数据库连接", "MySQL数据库不存在！")
             else:
-                QMessageBox.critical(self, "Test Database Connection", err.msg)
+                QMessageBox.critical(self, "测试数据库连接", err.msg)
             return
 
-        QMessageBox.about(self, "Test Database Connection", " Connected successfully!")
+        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
 
     @Slot()
     def on_clickhouse_test_pushButton_clicked(self):
-        """Test Database Connection"""
+        """测试数据库连接"""
         db_config = {
             'username': self.clickhouse_usr_lineEdit.text(),
             'password': self.clickhouse_pwd_lineEdit.text(),
@@ -852,10 +852,10 @@ li.checked::marker { content: "\2612"; }
             cnx = clickhouse_connect.get_client(**db_config)
             cnx.close()
         except Exception as err:
-            QMessageBox.critical(self, "Test database connection failed", str(err))
+            QMessageBox.critical(self, "测试数据库连接失败", str(err))
             return
 
-        QMessageBox.about(self, "Test Database Connection", " Connected successfully!")
+        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
 
     def reset_progress_bar(self):
         self.hdf5_weight_label.setText('')
@@ -868,7 +868,7 @@ li.checked::marker { content: "\2612"; }
         self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
-        self.import_status_label.setText("Elapsed: {:>.2f} s".format(escape))
+        self.import_status_label.setText("耗时：{:>.2f} 秒".format(escape))
 
     def on_message_from_thread(self, msg):
         if not msg or len(msg) < 2:
@@ -879,7 +879,7 @@ li.checked::marker { content: "\2612"; }
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name
             self.import_status_label.setText(
-                "Elapsed: {:>.2f} s ({:>.2f} minutes) {}".format(
+                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(
                     self.escape_time, self.escape_time / 60, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
 
@@ -890,21 +890,21 @@ li.checked::marker { content: "\2612"; }
             elif msg_task_name == 'THREAD':
                 status = msg[2]
                 if status == 'FAILURE':
-                    self.import_status_label.setText("Elapsed: {:>.2f} s, import exception!".format(self.escape_time))
+                    self.import_status_label.setText("耗时：{:>.2f} 秒 导入异常！".format(self.escape_time))
                     self.import_detail_textEdit.append(msg[3])
                 self.hdf5_import_thread.terminate()
                 self.hdf5_import_thread = None
                 self.escape_time_thread.stop()
                 self.escape_time_thread = None
                 self.start_import_pushButton.setEnabled(True)
-                self.import_detail_textEdit.append("Import completed!")
-                self.hdf5_weight_label.setText("Import completed!")
+                self.import_detail_textEdit.append("导入完毕！")
+                self.hdf5_weight_label.setText("导入完毕!")
                 if can_upgrade():
                     release_info = get_latest_version_info()
                     self.import_detail_textEdit.append("========================================================")
                     self.import_detail_textEdit.append(
-                        "A new Hikyuu version ({}) has been released, updating is recommended".format(release_info['version']))
-                    self.import_detail_textEdit.append("Update command: pip instal hikyuu --upgrade")
+                        "Hikyuu 新版本 ({}) 已发布，建议更新".format(release_info['version']))
+                    self.import_detail_textEdit.append("更新命令: pip instal hikyuu --upgrade")
                     self.import_detail_textEdit.append(f'{release_info["remark"]}')
                     self.import_detail_textEdit.append("========================================================")
                 if is_valid_license():
@@ -915,7 +915,7 @@ li.checked::marker { content: "\2612"; }
                             self.import_detail_textEdit.append(
                                 "========================================================")
                             self.import_detail_textEdit.append(
-                                "Your license is about to expire, deadline: {}!".format(expire_date))
+                                "您的授权即将到期，截止日期：{}!".format(expire_date))
                             self.import_detail_textEdit.append(
                                 "========================================================")
                 self.import_running = False
@@ -926,33 +926,33 @@ li.checked::marker { content: "\2612"; }
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
                 else:
                     if self.use_download == 'qmt':
-                        self.import_detail_textEdit.append('Imported {} records: {}'.format(msg[4], msg[5]))
+                        self.import_detail_textEdit.append('导入 {} 记录数：{}'.format(msg[4], msg[5]))
                     else:
-                        self.import_detail_textEdit.append('Imported {} {} records: {}'.format(msg[3], msg[4], msg[5]))
+                        self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_TRANS':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.hdf5_trans_progressBar.setValue(progress)
                 else:
-                    self.import_detail_textEdit.append('Imported {} tick records: {}'.format(msg[3], msg[5]))
+                    self.import_detail_textEdit.append('导入 {} 分笔记录数：{}'.format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_TIME':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.hdf5_time_progressBar.setValue(progress)
                 else:
-                    self.import_detail_textEdit.append('Imported {} time-series records: {}'.format(msg[3], msg[5]))
+                    self.import_detail_textEdit.append('导入 {} 分时记录数：{}'.format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_WEIGHT':
-                if msg[2] == 'Import weight data completed!':
-                    self.import_detail_textEdit.append('Imported weight records: {}'.format(msg[3]))
-                elif msg[2] == 'Import TDX finance data completed!':
-                    self.import_detail_textEdit.append('Imported TDX finance records: {}'.format(msg[3]))
+                if msg[2] == '导入权息数据完毕!':
+                    self.import_detail_textEdit.append('导入权息记录数：{}'.format(msg[3]))
+                elif msg[2] == '导入通达信财务信息完毕!':
+                    self.import_detail_textEdit.append('导入通达信财务记录数：{}'.format(msg[3]))
 
             elif msg_task_name == 'IMPORT_FINANCE':
                 # self.finance_progressBar.setValue(msg[2])
-                self.logger.info(f"Finance data download: {msg[2]}%")
+                self.logger.info(f"财务数据下载: {msg[2]}%")
 
             elif msg_task_name == 'IMPORT_BLOCKINFO':
                 if msg[2] != 'FINISHED':
@@ -967,7 +967,7 @@ li.checked::marker { content: "\2612"; }
         try:
             self.saveConfig()
         except Exception as e:
-            QMessageBox.about(self, "Failed to save the configuration", str(e))
+            QMessageBox.about(self, "保存配置信息失败", str(e))
             return
 
         config = self.getCurrentConfig()
@@ -976,30 +976,30 @@ li.checked::marker { content: "\2612"; }
                 if not os.path.lexists(config['hdf5']['dir']):
                     os.makedirs(f"{config['hdf5']['dir']}/tmp")
                 elif not os.path.isdir(config['hdf5']['dir']):
-                    QMessageBox.about(self, "Error", 'The specified target data directory does not exist!')
+                    QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
                     return
 
             if config.getboolean('tdx', 'enable'):
                 if not os.path.lexists(config['tdx']['dir']):
                     os.makedirs(f"{config['tdx']['dir']}/tmp")
                 elif not os.path.isdir(config['tdx']['dir']):
-                    QMessageBox.about(self, "Error", "Please check whether the TDX installation directory is correct!")
+                    QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
                     return
 
             if config.getboolean('mysql', 'enable'):
                 if not os.path.lexists(config['mysql']['tmpdir']):
                     os.makedirs(config['mysql']['tmpdir'])
                 elif not os.path.isdir(config['mysql']['tmpdir']):
-                    QMessageBox.about(self, "Error", "Please check whether the temporary directory is correct!")
+                    QMessageBox.about(self, "错误", "请确认临时目录是否正确！")
                     return
         except Exception as e:
-            QMessageBox.about(self, "Error", str(e))
+            QMessageBox.about(self, "错误", str(e))
             return
 
         now = hikyuu.Datetime.now()
         today = hikyuu.Datetime.today()
         if now.day_of_week() not in (0, 6) and hikyuu.TimeDelta(0, 8, 30) < now - today < hikyuu.TimeDelta(0, 15, 45):
-            reply = QMessageBox.question(self, 'Warning', 'Importing data between 8:30 and 15:45 on a trading day will cause incorrect after-hours data. Do you still want to continue the import?',
+            reply = QMessageBox.question(self, '警告', '交易日8:30-15:45分之间导入数据将导致盘后数据错误，是否仍要继续执行导入?',
                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if reply == QMessageBox.No:
                 return
@@ -1009,9 +1009,9 @@ li.checked::marker { content: "\2612"; }
         self.reset_progress_bar()
 
         if config.getboolean('weight', 'enable', fallback=False):
-            self.hdf5_weight_label.setText("Importing")
+            self.hdf5_weight_label.setText("正在导入")
 
-        self.import_status_label.setText("Starting the task....")
+        self.import_status_label.setText("正在启动任务....")
         QApplication.processEvents()
 
         if self.use_download == 'tdx':
@@ -1020,12 +1020,12 @@ li.checked::marker { content: "\2612"; }
             self.hdf5_import_thread = UsePytdxImportToH5Thread(self, config)
         elif self.use_download == 'qmt':
             if sys.platform != 'win32':
-                QMessageBox.about(self, "Error", "The QMT import function is only supported on Windows!")
+                QMessageBox.about(self, "错误", "qmt导入功能仅支持Windows系统！")
                 return
             try:
                 import xtquant
             except ImportError:
-                QMessageBox.about(self, "Error", "Please install xtquant and try again!")
+                QMessageBox.about(self, "错误", "请安装xtquant后再次尝试！")
                 return
             self.hdf5_import_thread = UseQmtImportToH5Thread(self, config)
 
@@ -1042,10 +1042,10 @@ li.checked::marker { content: "\2612"; }
         self.sched_import_pushButton.setEnabled(False)
         if self._is_sched_import_running:
             self._is_sched_import_running = False
-            self.sched_import_pushButton.setText("Start Scheduled Import")
+            self.sched_import_pushButton.setText("启动定时导入")
             self.sched_import_thread.terminate()
             self.sched_import_thread.wait()
-            self.logger.info("Scheduled import stopped")
+            self.logger.info("已停止定时导入")
             self.sched_import_thread = None
             self.sched_import_pushButton.setEnabled(True)
             self.start_import_pushButton.setEnabled(True)
@@ -1054,7 +1054,7 @@ li.checked::marker { content: "\2612"; }
         try:
             self.saveConfig()
         except Exception as e:
-            QMessageBox.about(self, "Error saving the configuration", str(e))
+            QMessageBox.about(self, "保存配置信息错误", str(e))
             return
 
         self.start_import_pushButton.setEnabled(False)
@@ -1062,7 +1062,7 @@ li.checked::marker { content: "\2612"; }
         self.sched_import_thread = SchedImportThread(self.getCurrentConfig())
         self.sched_import_thread.message.connect(self.on_start_import_pushButton_clicked)
         self.sched_import_thread.start()
-        self.sched_import_pushButton.setText("Stop Scheduled Import")
+        self.sched_import_pushButton.setText("停止定时导入")
         self.sched_import_pushButton.setEnabled(True)
 
     @Slot()
@@ -1074,10 +1074,10 @@ li.checked::marker { content: "\2612"; }
                 self.collect_spot_thread.wait()
                 self.collect_spot_thread = None
             self._is_collect_running = False
-            self.logger.info("Stop Collection")
-            self.collect_status_label.setText("Stopped")
-            self.collect_start_pushButton.setText("Start Collection")
-            QMessageBox.about(self, '', 'Stopped')
+            self.logger.info("停止采集")
+            self.collect_status_label.setText("已停止")
+            self.collect_start_pushButton.setText("启动采集")
+            QMessageBox.about(self, '', '已停止')
         else:
             if self.collect_spot_thread is None or self.collect_spot_thread.isFinished():
                 self.collect_spot_thread = CollectSpotThread(
@@ -1086,9 +1086,9 @@ li.checked::marker { content: "\2612"; }
                 )
                 self.collect_spot_thread.start()
             self._is_collect_running = True
-            self.collect_status_label.setText("Running")
-            self.collect_start_pushButton.setText("Stop Collection")
-            QMessageBox.about(self, '', 'Started, please check the console log to confirm it is running normally')
+            self.collect_status_label.setText("运行中")
+            self.collect_start_pushButton.setText("停止采集")
+            QMessageBox.about(self, '', '已启动，请在控制台日志查看是否正常运行')
 
 
 class_logger(MyMainWindow)

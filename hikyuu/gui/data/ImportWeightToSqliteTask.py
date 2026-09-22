@@ -106,13 +106,13 @@ class ImportWeightToSqliteTask:
 
             if self.cmd == 'weight':
                 total_count = pytdx_import_weight(api, connect, self.market)
-                self.logger.info("Imported {} weight records: {}".format(self.market, total_count))
-                self.queue.put([self.msg_name, 'Import weight data completed!', 0, 0, f'{self.market} {total_count}'])
+                self.logger.info("导入 {} 权息记录数: {}".format(self.market, total_count))
+                self.queue.put([self.msg_name, '导入权息数据完毕!', 0, 0, f'{self.market} {total_count}'])
             elif self.cmd == 'finance':
-                self.queue.put([self.msg_name, f'Downloading the current TDX finance data ({self.market})...', 0, 0, 0])
+                self.queue.put([self.msg_name, f'下载通达信当前财务信息({self.market})...', 0, 0, 0])
                 x = pytdx_import_finance(connect, api, self.market)
-                self.logger.info(f'Imported {x} TDX finance records for {self.market}')
-                self.queue.put([self.msg_name, 'Import TDX finance data completed!', 0, 0, f'{self.market} {x}'])
+                self.logger.info(f'导入 {self.market} 通达信当前财务信息数: {x}')
+                self.queue.put([self.msg_name, '导入通达信财务信息完毕!', 0, 0, f'{self.market} {x}'])
 
             api.disconnect()
 

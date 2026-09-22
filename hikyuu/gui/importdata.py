@@ -44,7 +44,7 @@ class HKUImportDataCMD:
         self.mysql_import_thread = None
         self.import_running = False
         self.progress = {'DAY': 0, '1MIN': 0, '5MIN': 0, 'TRANS': 0, 'TIME': 0}
-        self.info_type = {'DAY': 'Daily data', '1MIN': '1-minute data', '5MIN': '5-minute data', 'TRANS': 'Historical ticks', 'TIME': 'Time-series data'}
+        self.info_type = {'DAY': '日线数据', '1MIN': '一分钟线', '5MIN': '五分钟线', 'TRANS': '历史分笔', 'TIME': '分时数据'}
         self.start_import_time = time.time()
         self.details = []
 
@@ -58,7 +58,7 @@ class HKUImportDataCMD:
     def print_progress(self, ktype, progress):
         if progress != self.progress[ktype]:
             print(
-                'import progress: {}%  - {} - elapsed {:>.2f} minutes'.format(progress,
+                'import progress: {}%  - {} - 已耗时 {:>.2f} 分钟'.format(progress,
                                                                      self.info_type[ktype], self.time_escaped())
             )
             self.progress[ktype] = progress
@@ -77,10 +77,10 @@ class HKUImportDataCMD:
                 status = msg[2]
                 if status == 'FAILURE':
                     self.details.append(msg[3])
-                print("\nImport completed, elapsed {:>.2f} minutes".format(self.time_escaped()))
+                print("\n导入完毕, 共耗时 {:>.2f} 分钟".format(self.time_escaped()))
                 if not self.ignore_kdata:
                     print('\n=========================================================')
-                    print("Import details:")
+                    print("导入详情:")
                     for info in self.details:
                         print(info)
                     print('=========================================================')
@@ -91,36 +91,36 @@ class HKUImportDataCMD:
                 if ktype != 'FINISHED':
                     self.print_progress(ktype, progress)
                 else:
-                    self.details.append('Imported {} {} records: {}'.format(msg[3], msg[4], msg[5]))
+                    self.details.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_TRANS':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.print_progress('TRANS', progress)
                 else:
-                    self.details.append('Imported {} tick records: {}'.format(msg[3], msg[5]))
+                    self.details.append('导入 {} 分笔记录数：{}'.format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_TIME':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.print_progress('TIME', progress)
                 else:
-                    self.details.append('Imported {} time-series records: {}'.format(msg[3], msg[5]))
+                    self.details.append('导入 {} 分时记录数：{}'.format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_WEIGHT':
                 if msg[2] == 'INFO':
                     pass
                 elif msg[2] == 'FINISHED':
-                    print('Import weight data completed!')
-                elif msg[2] == 'Import completed!':
-                    self.details.append('Imported weight records: {}'.format(msg[3]))
-                elif msg[2] == 'No change in the weight data':
+                    print('导入权息数据完毕！')
+                elif msg[2] == '导入完成!':
+                    self.details.append('导入权息记录数：{}'.format(msg[3]))
+                elif msg[2] == '权息数据无变化':
                     self.details.append(msg[3])
                 else:
-                    print('Weight {}'.format(msg[2]))
+                    print('权息{}'.format(msg[2]))
 
             elif msg_task_name == 'IMPORT_FINANCE':
-                print("Finance data download: {}%".format(msg[2]))
+                print("财务数据下载: {}%".format(msg[2]))
 
     def start_import_data(self):
         config = self.getCurrentConfig()
@@ -128,26 +128,26 @@ class HKUImportDataCMD:
             if not os.path.lexists(config['hdf5']['dir']):
                 os.makedirs(f"{config['hdf5']['dir']}/tmp")
             elif not os.path.isdir(config['hdf5']['dir']):
-                print("Error", 'The specified target data directory does not exist!')
+                print("错误", '指定的目标数据存放目录不存在！')
                 sys.exit(-1)
 
         if config.getboolean('tdx', 'enable'):
             if not os.path.lexists(config['tdx']['dir']):
                 os.makedirs(f"{config['tdx']['dir']}/tmp")
             elif not os.path.isdir(config['tdx']['dir']):
-                print("Error", "Please check whether the TDX installation directory is correct!")
+                print("错误", "请确认通达信安装目录是否正确！")
                 sys.exit(-1)
 
         if config.getboolean('mysql', 'enable'):
             if not os.path.lexists(config['mysql']['tmpdir']):
                 os.makedirs(config['mysql']['tmpdir'])
             elif not os.path.isdir(config['mysql']['tmpdir']):
-                print("Error", "Please check whether the temporary directory is correct!")
+                print("错误", "请确认临时目录是否正确！")
                 sys.exit(-1)
 
         self.import_running = True
 
-        print("Starting the task....")
+        print("正在启动任务....")
 
         if config.getboolean('tdx', 'enable'):
             self.hdf5_import_thread = UseTdxImportToH5Thread(None, config)

@@ -11,7 +11,7 @@ def callback(datas):
     records = []
     for stock_code, data in datas.items():
         records.append(parse_one_result_qmt(stock_code, data))
-    hku_info(f"Received: {len(records)}")
+    hku_info(f"接收: {len(records)}")
 
     if records:
         start_send_spot()
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
     if not os.path.exists(config_file):
         # 创建默认配置
-        hku_info("Creating the default configuration file")
+        hku_info("创建默认配置文件")
         generate_default_config()
 
     ini = configparser.ConfigParser()
@@ -96,12 +96,12 @@ if __name__ == "__main__":
     for i in range(n):
         codes = code_list[i * batch_size: (i + 1) * batch_size]
         v = xtdata.subscribe_whole_quote(codes, callback)
-        hku_info_if(v < 0, "Subscription failed")
+        hku_info_if(v < 0, "订阅失败")
         time.sleep(0.5)
     codes = code_list[n * batch_size:]
     if codes:
         v = xtdata.subscribe_whole_quote(codes, callback)
-        hku_info_if(v < 0, "Subscription failed")
+        hku_info_if(v < 0, "订阅失败")
 
     # 每日 9:30 时，主动读取行情一次，以便 hikyuu 生成当日首个分钟线
     while True:
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             hku_info(f"start timer: {delta}s")
             time.sleep(delta.total_seconds())
         except KeyboardInterrupt:
-            print("Press Ctrl-C to stop")
+            print("Ctrl-C 终止")
             break
         except Exception as e:
             hku_error(str(e))

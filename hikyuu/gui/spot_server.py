@@ -232,29 +232,29 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
     phase1_delta = parse_phase(phase1)
     if phase1_delta is None or len(phase1_delta) != 2:
-        hku_error("Invalid parameter phase1: {}".format(phase1))
+        hku_error("无效参数 phase1: {}".format(phase1))
         exit(1)
     if phase1_delta[0] > phase1_delta[1]:
-        hku_error("Invalid parameter phase1: {}, the end time must be greater than or equal to the start time".format(phase1))
+        hku_error("无效参数 phase1: {}, 结束时间应大于等于起始时间".format(phase1))
         exit(1)
 
     phase2_delta = parse_phase(phase2)
     if phase2_delta is None or len(phase2_delta) != 2:
-        hku_error("Invalid parameter phase2: {}".format(phase2))
+        hku_error("无效参数 phase2: {}".format(phase2))
         exit(1)
     if phase2_delta[0] > phase2_delta[1]:
-        hku_error("Invalid parameter phase2: {}, the end time must be greater than or equal to the start time".format(phase2))
+        hku_error("无效参数 phase2: {}, 结束时间应大于等于起始时间".format(phase2))
         exit(1)
     if phase1_delta[1] > phase2_delta[0]:
-        hku_error("Invalid parameter phase1: {}, phase2: {}, the phase2 start time must be greater than or equal to the phase1 end time".format(phase1, phase2))
+        hku_error("无效参数 phase1: {}, phase2: {}, phase2 起始时间应大于等于 phase1 结束时间".format(phase1, phase2))
         exit(1)
 
-    hku_logger.info("Collection time range 1: {}".format(phase1))
-    hku_logger.info("Collection time range 2: {}".format(phase2))
+    hku_logger.info("采集时间段1：{}".format(phase1))
+    hku_logger.info("采集时间段2：{}".format(phase2))
 
     config_file = os.path.expanduser('~') + '/.hikyuu/hikyuu.ini'
     if not os.path.exists(config_file):
-        print("Configuration file not found, please run HikyuuTDX first to configure and import data")
+        print("未找到配置文件，请先运行 HikyuuTDX 进行配置与数据导入")
         exit(1)
 
     hikyuu_init(config_file, ignore_preload=True)
@@ -281,14 +281,14 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
     start_time = Datetime.now()
     delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
     next_time = start_time + delta
-    hku_info("Collection start time: {}".format(next_time))
+    hku_info("启动采集时间：{}".format(next_time))
     time.sleep(delta.total_seconds())
     while True:
         try:
             start_time = Datetime.now()
             start_send_spot()
             records = get_spot(stk_list, source, use_proxy, send_spot)
-            hku_info("{}:{}:{} collected count: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
+            hku_info("{}:{}:{} 采集数量: {}".format(start_time.hour, start_time.minute, start_time.second, len(records)))
             # pub_sock.send('{}{}'.format(spot_topic, '[end spot]').encode('utf-8'))
             end_send_spot()
             delta = next_delta(start_time, seconds, phase1_delta, phase2_delta, ignore_weekend)
@@ -298,7 +298,7 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
             else:
                 pass
         except KeyboardInterrupt:
-            print("Press Ctrl-C to stop")
+            print("Ctrl-C 终止")
             break
         except Exception as e:
             hku_error(str(e))
@@ -308,8 +308,8 @@ def collect(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
 @click.command()
 @click.option('-server', '--server', default='tcp://*:9200')
-@click.option('-use_proxy', '--use_proxy', is_flag=True, help='Whether to use a proxy; you must apply for a Zhima HTTP proxy yourself and add your IP to the whitelist')
-@click.option('-source', '--source', default='qq', type=click.Choice(['qmt', 'qq']), help='Data source')
+@click.option('-use_proxy', '--use_proxy', is_flag=True, help='是否使用代理，须自行申请芝麻http代理并加入ip白名单')
+@click.option('-source', '--source', default='qq', type=click.Choice(['qmt', 'qq']), help='数据来源')
 @click.option('-seconds', '--seconds', default=10)
 @click.option('-phase1', '--phase1', default='9:00-12:00')
 @click.option('-phase2', '--phase2', default='13:00-15:00')
@@ -320,7 +320,7 @@ def run(server, use_proxy, source, seconds, phase1, phase2, ignore_weekend):
 
 if __name__ == '__main__':
     try:
-        print("The collection program is running, press Ctrl-C to stop it!")
+        print("采集程序运行中，可使用 Ctrl-C 终止！")
         run()
     except KeyboardInterrupt:
         exit(1)

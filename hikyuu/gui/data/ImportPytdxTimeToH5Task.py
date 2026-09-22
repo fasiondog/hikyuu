@@ -89,12 +89,12 @@ class ImportPytdxTimeToH5:
         try:
             progress = ProgressBar(self)
             api = TdxHq_API()
-            hku_info("Importing {} time-series data from {}", self.market, self.ip)
+            hku_info("导入 {} 分时数据 from {}", self.market, self.ip)
             hku_check(api.connect(self.ip, self.port), "failed connect pytdx {}:{}", self.ip, self.port)
             count = import_time(
                 connect, self.market, self.quotations, api, self.dest_dir, max_days=self.max_days, progress=progress
             )
-            self.logger.info("Imported {} time-series records: {}".format(self.market, count))
+            self.logger.info("导入 {} 分时记录数: {}".format(self.market, count))
             api.disconnect()
         except Exception as e:
             self.logger.error(e)

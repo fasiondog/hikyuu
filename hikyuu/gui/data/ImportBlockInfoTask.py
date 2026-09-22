@@ -56,5 +56,5 @@ class ImportBlockInfoTask:
 
         connect.close()
 
-        self.queue.put([self.task_name, "BLOCKINFO", f"Block info update completed: {count}", None, None])
+        self.queue.put([self.task_name, "BLOCKINFO", f"板块信息更新完毕: {count}", None, None])
         self.status = "finished"
