@@ -109,15 +109,12 @@ public:
     static void setQuotationServer(const string& server);
 
 private:
-    static string ms_pubUrl;          // Address of the data sending service
-    static const char* ms_startTag;   // Start marker of the batch data receiving, used to
-                                      // determine that a new batch of data receiving started
-    static const char* ms_endTag;     // End marker of the batch data receiving, used to
-                                      // determine that the update of the batch data ended
-    static const char* ms_spotTopic;  // Topic subscribed from the data sending service
-    static const size_t
-      ms_startTagLength;                  // Length of the start marker of the batch data receiving
-    static const size_t ms_endTagLength;  // Length of the end marker of the batch data receiving
+    static string ms_pubUrl;                 // Address of the data sending service
+    static const char* ms_startTag;          // Start marker of a batch data receiving
+    static const char* ms_endTag;            // End marker of a batch data receiving
+    static const char* ms_spotTopic;         // Topic subscribed from the data sending service
+    static const size_t ms_startTagLength;   // Length of the batch receiving start marker
+    static const size_t ms_endTagLength;     // Length of the batch receiving end marker
     static const size_t ms_spotTopicLength;  // Length of the subscribed topic marker
 
     static Datetime ms_start_rev_time;  // Start time of the batch data receiving
