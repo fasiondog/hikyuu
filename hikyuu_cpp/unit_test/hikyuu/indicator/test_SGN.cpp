@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SGN") {
     Indicator result;
 
@@ -60,7 +60,7 @@ TEST_CASE("test_SGN") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SGN_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -201,7 +201,7 @@ TEST_CASE("test_AF_without_running_uses_sub_tm_funds") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AF_EqualWeight_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RESULT") {
     /** @arg 无效参数 */
     CHECK_THROWS_AS(RESULT(-1), std::exception);
@@ -46,7 +46,7 @@ TEST_CASE("test_RESULT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RESULT_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

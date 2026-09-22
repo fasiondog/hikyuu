@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RECOVER") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sz000001");
@@ -171,7 +171,7 @@ TEST_CASE("test_RECOVER") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RECOVER_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

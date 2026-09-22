@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CDL3INSIDE") {
     KData kdata = getKData("sh000001", KQuery(-30));
     Indicator result = TA_CDL3INSIDE(kdata);
@@ -39,7 +39,7 @@ TEST_CASE("test_TA_CDL3INSIDE") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CDL3INSIDE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

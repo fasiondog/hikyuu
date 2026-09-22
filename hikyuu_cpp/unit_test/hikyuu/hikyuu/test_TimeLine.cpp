@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeLine_query_by_index") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm["sz000001"];
@@ -135,7 +135,7 @@ TEST_CASE("test_TimeLine_query_by_index") {
     CHECK_EQ(result[1], TimeLineRecord(Datetime(201902011458), 11.20, 0));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeLine_query_by_date") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm["sz000001"];

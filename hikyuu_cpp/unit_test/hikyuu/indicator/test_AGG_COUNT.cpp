@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_COUNT") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -93,7 +93,7 @@ TEST_CASE("test_AGG_COUNT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_COUNT_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

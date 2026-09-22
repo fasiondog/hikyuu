@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CODELIKE") {
     StockManager& sm = StockManager::instance();
 
@@ -81,7 +81,7 @@ TEST_CASE("test_CODELIKE") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_NAMELIKE") {
     StockManager& sm = StockManager::instance();
 
@@ -125,7 +125,7 @@ TEST_CASE("test_NAMELIKE") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CODELIKE_NAMELIKE_wildcard") {
     StockManager& sm = StockManager::instance();
 

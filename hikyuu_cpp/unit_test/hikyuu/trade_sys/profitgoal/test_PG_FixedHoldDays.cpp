@@ -18,13 +18,13 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_PG_FixedHoldDays") {
     StockManager& sm = StockManager::instance();
     TMPtr tm = crtTM(Datetime(199001010000LL), 100000);
 
-    Datetime start_date(199911100000LL);  // 测试起始日期
-    Datetime end_date(200002250000LL);    // 测试结束日期
+    Datetime start_date(199911100000LL);  // Test start date
+    Datetime end_date(200002250000LL);    // Test end date
     KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
 
     Stock stk = sm.getStock("sh600000");

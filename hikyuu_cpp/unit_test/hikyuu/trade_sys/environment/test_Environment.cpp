@@ -34,9 +34,9 @@ public:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment") {
-    /** @arg 基本操作 */
+    /** @arg The basic operation */
     EnvironmentPtr p = make_shared<EnvironmentTest>();
     CHECK_EQ(p->name(), "TEST");
     CHECK_EQ(p->isValid(Datetime(200001010000)), false);
@@ -47,7 +47,7 @@ TEST_CASE("test_Environment") {
     CHECK_EQ(p->isValid(Datetime(200001020000)), false);
     CHECK_EQ(p->getParam<int>("n"), 10);
 
-    /** @arg 克隆操作 */
+    /** @arg The clone operation */
     p->setParam<int>("n", 20);
     EnvironmentPtr p_clone = p->clone();
     CHECK_NE(p, p_clone);

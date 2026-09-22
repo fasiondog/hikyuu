@@ -53,16 +53,16 @@ int main(int argc, char* argv[]) {
     initLogger(false, "./demo.log");
 
 #if defined(_WIN32)
-    // Windows 下设置控制台程序输出代码页为 UTF8
+    // Set the console output code page to UTF8 on Windows
     auto old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    // 插件路径设置：
-    // 方法1：初始化前，设置插件路径为 "." 或 "", 将自动从 hikyuu.ini 中的 plugindir
-    // 配置获取插件路径 StockManager::instance().setPluginPath(".");
-    // 方法2：初始化前，自己设定插件路径（如果需要的话）
-    // 否则，默认为用户目录下 .hikyuu/plugin 目录，可自行copy插件到该目录
+    // The plugin path setting:
+    // Method 1: before the initialization, set the plugin path to "." or "" and it is taken automatically from the plugindir
+    // of the hikyuu.ini config: StockManager::instance().setPluginPath(".");
+    // Method 2: before the initialization, set the plugin path yourself (if needed)
+    // otherwise it defaults to the .hikyuu/plugin directory under the user home, where the plugins can be copied
     // StockManager::instance().setPluginPath("./plugin");
 
     try {

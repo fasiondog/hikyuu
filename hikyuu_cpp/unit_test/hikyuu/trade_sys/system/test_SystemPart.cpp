@@ -16,7 +16,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getSystemPartName") {
     SystemPart part = PART_ENVIRONMENT;
     CHECK_EQ(getSystemPartName(part), "EV");
@@ -44,7 +44,7 @@ TEST_CASE("test_getSystemPartName") {
     CHECK_EQ(getSystemPartName(part + 1), "--");
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getSystemPartEnum") {
     string part;
     part = "EV";

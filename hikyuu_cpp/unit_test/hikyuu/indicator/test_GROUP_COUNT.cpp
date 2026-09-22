@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GROUP_COUNT") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -29,7 +29,7 @@ TEST_CASE("test_GROUP_COUNT") {
     auto k = stk.getKData(KQueryByDate(Datetime(20111115)));
     auto mink = stk.getKData(KQueryByDate(Datetime(20111115), Datetime(20111120), KQuery::MIN));
 
-    /** @arg 分钟线按日分组 */
+    /** @arg The minute lines grouped by day */
     auto ind = GROUP_COUNT(CLOSE(), KQuery::DAY);
     auto result = ind(mink);
     CHECK_EQ(result.name(), "GROUP_COUNT");
@@ -64,7 +64,7 @@ TEST_CASE("test_GROUP_COUNT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GROUP_COUNT_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

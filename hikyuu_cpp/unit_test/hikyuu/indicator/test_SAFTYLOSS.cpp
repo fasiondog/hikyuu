@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SAFTYLOSS") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -28,7 +28,7 @@ TEST_CASE("test_SAFTYLOSS") {
     KData kdata;
     Indicator close, result;
 
-    /** @arg 源数据为空 */
+    /** @arg The source data is empty */
     result = SAFTYLOSS(CLOSE(kdata), 2, 1);
     CHECK_EQ(result.empty(), true);
     CHECK_EQ(result.size(), 0);
@@ -115,7 +115,7 @@ TEST_CASE("test_SAFTYLOSS") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SAFTYLOSS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-50));
@@ -146,7 +146,7 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SAFTYLOSS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

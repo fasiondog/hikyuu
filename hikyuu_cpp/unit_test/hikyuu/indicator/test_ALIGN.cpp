@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ALIGN_fill_null") {
     Indicator result;
     Stock stk = getStock("sh000001");
@@ -177,7 +177,7 @@ TEST_CASE("test_ALIGN_fill_null") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ALIGN_not_fill_null") {
     Indicator result;
     Stock stk = getStock("sh000001");
@@ -354,7 +354,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ALIGN_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -20,28 +20,28 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_ADOSC") {
     KData kdata = getKData("sh000001", KQuery(-20));
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_ADOSC(kdata, -1));
     CHECK_THROWS(TA_ADOSC(kdata, 2, -1));
     CHECK_THROWS(TA_ADOSC(kdata, 100001));
     CHECK_THROWS(TA_ADOSC(kdata, 2, 100001));
 
-    /** @arg KData 为空 */
+    /** @arg KData is empty */
     Indicator result = TA_ADOSC(KData());
     CHECK_EQ(result.name(), "TA_ADOSC");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg KData 长度小于默认参数抛弃数量 */
+    /** @arg The KData length is less than the discard count of the default parameters */
     result = TA_ADOSC(getKData("sh000001", KQuery(-8)));
     CHECK_EQ(result.discard(), 8);
     CHECK_EQ(result.size(), 8);
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     result = TA_ADOSC(kdata);
     CHECK_EQ(result.name(), "TA_ADOSC");
     CHECK_EQ(result.discard(), 9);
@@ -57,7 +57,7 @@ TEST_CASE("test_TA_ADOSC") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_ADOSC_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

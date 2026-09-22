@@ -20,14 +20,14 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MDD") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KData kdata;
     Indicator open, close, mdd;
 
-    /** @arg n = 10 且数据大小刚好为10 时, 正常关联数据 */
+    /** @arg The normal associated data with n = 10 and a data size of exactly 10 */
     kdata = stock.getKData(KQuery(-10));
     auto c = kdata.close();
     auto m = MDD(c);
@@ -39,7 +39,7 @@ TEST_CASE("test_MDD") {
                                  3.27389, 3.27389, 3.27389, 3.28155, 3.58515};
     check_indicator(m, PRICELIST(expects));
 
-    /** @arg n = 0 时，正常关联数据 */
+    /** @arg The normal associated data with n = 0 */
     kdata = stock.getKData(KQuery(-10));
     close = CLOSE(kdata);
     mdd = MDD(close, 0);
@@ -70,7 +70,7 @@ TEST_CASE("test_MDD") {
     Indicator zero_ind = PRICELIST(PriceList(kdata.size(), 0.0));
     check_indicator(mdd, zero_ind);
 
-    /** @arg 空数据测试 */
+    /** @arg The empty data test */
     kdata = KData();
     close = CLOSE(kdata);
     mdd = MDD(close, 0);
@@ -86,7 +86,7 @@ TEST_CASE("test_MDD") {
     expects = {0.0, 0.0, 2.85714, 2.85714, 12.03704, 16.66667, 16.66667, 28.70370};
     check_indicator(mdd1, PRICELIST(expects));
 
-    /** @arg 极端上涨序列 */
+    /** @arg An extreme rising sequence */
     PriceList rising_data{100.0, 110.0, 120.0, 130.0, 140.0};
     Indicator rising = PRICELIST(rising_data);
     Indicator mdd_rising = MDD(rising, 0);
@@ -94,7 +94,7 @@ TEST_CASE("test_MDD") {
     zero_ind = PRICELIST(PriceList(rising_data.size(), 0.0));
     check_indicator(mdd_rising, zero_ind);
 
-    /** @arg 极端下跌序列 */
+    /** @arg An extreme falling sequence */
     PriceList falling_data{100.0, 90.0, 80.0, 70.0, 60.0};
     Indicator falling = PRICELIST(falling_data);
     Indicator mdd_falling = MDD(falling, 0);
@@ -105,7 +105,7 @@ TEST_CASE("test_MDD") {
     expects = {0.0, 10.0, 20., 22.22222, 25.0};
     check_indicator(mdd_falling, PRICELIST(expects));
 
-    /** @arg 包含相等价格的情况 */
+    /** @arg The case containing equal prices */
     PriceList equal_data{100.0, 100.0, 100.0, 100.0, 100.0};
     Indicator equal = PRICELIST(equal_data);
     Indicator mdd_equal = MDD(equal, 0);
@@ -113,21 +113,21 @@ TEST_CASE("test_MDD") {
     Indicator zero_equal = PRICELIST(PriceList(equal_data.size(), 0.0));
     check_indicator(mdd_equal, zero_equal);
 
-    /** @arg 单一数据点 */
+    /** @arg A single data point */
     PriceList single_data{100.0};
     Indicator single = PRICELIST(single_data);
     Indicator mdd_single = MDD(single, 0);
     CHECK_EQ(mdd_single.size(), 1);
     CHECK_EQ(mdd_single[0], 0.0);
 
-    /** @arg 空数据 */
+    /** @arg Empty data */
     PriceList empty_data{};
     Indicator empty = PRICELIST(empty_data);
     Indicator mdd_empty = MDD(empty, 0);
     CHECK_EQ(mdd_empty.size(), 0);
     CHECK_EQ(mdd_empty.empty(), true);
 
-    /** @arg 增量计算 */
+    /** @arg The incremental calculation */
     kdata = stock.getKData(KQuery(-20, -10));
     m = MDD(CLOSE(), 3)(kdata);
     mdd1 = m(stock.getKData(-15));
@@ -154,7 +154,7 @@ TEST_CASE("test_MDD") {
     CHECK_EQ(mdd_lookahead[7], doctest::Approx(50.0).epsilon(0.0001));
 }
 
-/** @par 检测点: 全量==增量等价 (复用同一实例连续 setContext 触发 _increment_calculate) */
+/** @par Test point: the full calculation equals the incremental one (setContext is called repeatedly on the same instance to trigger _increment_calculate) */
 TEST_CASE("test_MDD_increment_equivalence") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("SH600000");
@@ -200,7 +200,7 @@ TEST_CASE("test_MDD_with_nan") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MDD_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

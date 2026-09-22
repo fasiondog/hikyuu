@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_parallelIndexRange") {
     /** @arg start=0, end=0 */
     std::vector<range_t> ranges = parallelIndexRange(0, 0);

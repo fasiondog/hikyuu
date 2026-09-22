@@ -49,7 +49,7 @@ TEST_CASE("test_multi_regression_single_factor_fixed") {
 
         CHECK_EQ(result.size(), 2);
 
-        // 固定值验证 - 根据实际运行结果设置
+        // The fixed value verification - set according to the actual run result
         CHECK(result[0] == doctest::Approx(0.035479989606263).epsilon(1e-6));
         CHECK(result[1] == doctest::Approx(-0.000014864499944).epsilon(1e-6));
     }
@@ -72,7 +72,7 @@ TEST_CASE("test_multi_regression_multi_factor") {
         // 应该返回 alpha 和三个 beta
         CHECK_EQ(result.size(), 4);
 
-        // 固定值验证 - 根据实际运行结果设置
+        // The fixed value verification - set according to the actual run result
         CHECK(result[0] == doctest::Approx(-0.007766162437654).epsilon(1e-6));
         CHECK(result[1] == doctest::Approx(0.000002228680454).epsilon(1e-6));
         CHECK(result[2] == doctest::Approx(0.000262073918492).epsilon(1e-6));
@@ -92,7 +92,7 @@ TEST_CASE("test_multi_regression_indicator_list") {
         // 应该返回 alpha 和三个 beta
         CHECK_EQ(result.size(), 4);
 
-        // 固定值验证 - 根据实际运行结果设置
+        // The fixed value verification - set according to the actual run result
         CHECK(result[0] == doctest::Approx(0.006943948947997).epsilon(1e-6));
         CHECK(result[1] == doctest::Approx(-0.000033354626070).epsilon(1e-6));
         CHECK(result[2] == doctest::Approx(0.000061308868555).epsilon(1e-6));
@@ -153,7 +153,7 @@ TEST_CASE("test_multi_regression_full") {
         // 假设有 n 个有效数据点，则结果大小为 2 + n + 2 = n + 4
         CHECK_GT(result.size(), 4);
 
-        // 固定值验证 - 根据实际运行结果设置
+        // The fixed value verification - set according to the actual run result
         CHECK(result[0] == doctest::Approx(0.035479989606263).epsilon(1e-6));   // alpha
         CHECK(result[1] == doctest::Approx(-0.000014864499944).epsilon(1e-6));  // beta
 

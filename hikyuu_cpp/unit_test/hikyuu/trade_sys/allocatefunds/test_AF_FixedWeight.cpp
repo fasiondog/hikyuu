@@ -16,9 +16,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AF_FixedWeight") {
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS_AS(AF_FixedWeight(0.0), std::exception);
     CHECK_THROWS_AS(AF_FixedWeight(-0.1), std::exception);
     CHECK_THROWS_AS(AF_FixedWeight(1.001), std::exception);

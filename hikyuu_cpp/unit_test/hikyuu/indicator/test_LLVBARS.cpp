@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLVBARS") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sh000001");
@@ -132,7 +132,7 @@ TEST_CASE("test_LLVBARS") {
     CHECK_EQ(result[9], 0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHVBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -176,7 +176,7 @@ TEST_CASE("test_HHVBARS_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLVBARS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

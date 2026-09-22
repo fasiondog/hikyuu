@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MA") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -34,7 +34,7 @@ TEST_CASE("test_MA") {
     CHECK_EQ(ma.size(), 0);
     CHECK_EQ(ma.empty(), true);
 
-    /** @arg n = 0 时，正常关联数据 */
+    /** @arg The normal associated data with n = 0 */
     kdata = stock.getKData(KQuery(-10));
     open = OPEN(kdata);
     ma = MA(open, 0);
@@ -74,7 +74,7 @@ TEST_CASE("test_MA") {
         CHECK_EQ(ma_nan[5], doctest::Approx(3.25).epsilon(0.0001));
     }
 
-    /** @arg n = 10 且数据大小刚好为10 时, 正常关联数据 */
+    /** @arg The normal associated data with n = 10 and a data size of exactly 10 */
     kdata = stock.getKData(KQuery(-10));
     open = OPEN(kdata);
     ma = MA(open, 10);
@@ -152,7 +152,7 @@ TEST_CASE("test_MA") {
         CHECK_EQ(ma1[i], ma2[i]);
     }
 
-    /** @arg 增量计算 */
+    /** @arg The incremental calculation */
     auto k = stock.getKData(KQuery(-30, -20));
     auto k2 = stock.getKData(KQuery(-30, -10));
     ma = MA(MA(CLOSE(), 2))(k);
@@ -167,7 +167,7 @@ TEST_CASE("test_MA") {
     check_indicator(ma3, ma2);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MA_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -214,7 +214,7 @@ TEST_CASE("test_MA_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_MA_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -232,7 +232,7 @@ TEST_CASE("test_MA_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

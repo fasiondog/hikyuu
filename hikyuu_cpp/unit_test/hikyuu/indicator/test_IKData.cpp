@@ -18,7 +18,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IKData") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -58,7 +58,7 @@ TEST_CASE("test_IKData") {
     CHECK_EQ(count.size(), 0);
     CHECK_EQ(count.empty(), true);
 
-    /** @arg 非空的KData */
+    /** @arg A non-empty KData */
     KQuery query(10);
     kdata = stock.getKData(query);
     size_t total = kdata.size();
@@ -179,7 +179,7 @@ TEST_CASE("test_IKData") {
     check_indicator(close, CLOSE(k2));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IKData_setContext") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -250,7 +250,7 @@ TEST_CASE("test_IKData_setContext") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KDATA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

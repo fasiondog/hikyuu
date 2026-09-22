@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_COS") {
     Indicator result;
 
@@ -43,7 +43,7 @@ TEST_CASE("test_TA_COS") {
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], doctest::Approx(std::cos(-0.1)));
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     data = TA_MA(getKData("sz000001", KQuery(-50)).close());
     CHECK_EQ(data.discard(), 29);
     result = TA_COS(data);
@@ -62,7 +62,7 @@ TEST_CASE("test_TA_COS_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_TA_COS_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -80,7 +80,7 @@ TEST_CASE("test_TA_COS_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_COS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

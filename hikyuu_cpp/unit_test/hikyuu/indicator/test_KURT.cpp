@@ -21,11 +21,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KURT") {
     Indicator result;
 
-    // 空指标
+    // An empty indicator
     result = KURT(Indicator(), 10);
     CHECK_UNARY(result.empty());
 
@@ -33,7 +33,7 @@ TEST_CASE("test_KURT") {
     PriceList uniform{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
     Indicator x = PRICELIST(uniform);
 
-    // 非法参数 n
+    // The invalid parameter n
     CHECK_THROWS_AS(KURT(x, -1), std::exception);
     CHECK_THROWS_AS(KURT(x, 1), std::exception);
     CHECK_THROWS_AS(KURT(x, 2), std::exception);
@@ -103,7 +103,7 @@ TEST_CASE("test_KURT_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_KURT_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -120,7 +120,7 @@ TEST_CASE("test_KURT_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KURT_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

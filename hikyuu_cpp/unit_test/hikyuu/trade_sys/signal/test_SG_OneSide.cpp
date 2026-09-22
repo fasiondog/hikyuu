@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SG_OneSide") {
     auto k = getKData("sh000001", KQuery(-30));
     Indicator ind;

@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Parameter") {
     Parameter param;
 
@@ -170,7 +170,7 @@ TEST_CASE("test_Parameter_KData") {
 }
 
 #if HKU_SUPPORT_SERIALIZATION
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Parameter_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/Parameter.xml";

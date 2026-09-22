@@ -19,14 +19,14 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_size") {
     StockManager& sm = StockManager::instance();
     /** @arg 检测是否和测试数据中证券数相符 */
     CHECK_EQ(sm.size(), 4729);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_getStock") {
     StockManager& sm = StockManager::instance();
     Stock stock;
@@ -57,7 +57,7 @@ TEST_CASE("test_StockManager_getStock") {
     CHECK_EQ(stock.maxTradeNumber(), 1000000);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_getMarketInfo") {
     StockManager& sm = StockManager::instance();
 
@@ -89,7 +89,7 @@ TEST_CASE("test_StockManager_getMarketInfo") {
     CHECK_EQ(marketInfo.market(), "SH");
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_getStockTypeInfo") {
     StockManager& sm = StockManager::instance();
     StockTypeInfo stockTypeInfo;
@@ -128,7 +128,7 @@ TEST_CASE("test_StockManager_getStockTypeInfo") {
     CHECK_EQ(stockTypeInfo.maxTradeNumber(), 1000000);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_getAllMarket") {
     StockManager& sm = StockManager::instance();
 
@@ -147,7 +147,7 @@ TEST_CASE("test_StockManager_getAllMarket") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_getBlock") {
     if (supportChineseSimple()) {
         StockManager& sm = StockManager::instance();
@@ -160,7 +160,7 @@ TEST_CASE("test_StockManager_getBlock") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_TempCsvStock") {
     StockManager& sm = StockManager::instance();
 
@@ -232,7 +232,7 @@ TEST_CASE("test_StockManager_TempCsvStock") {
     CHECK_EQ(stk.isNull(), true);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_isHoliday") {
     auto& sm = StockManager::instance();
     CHECK_THROWS(sm.isHoliday(Datetime()));
@@ -243,7 +243,7 @@ TEST_CASE("test_StockManager_isHoliday") {
     CHECK_EQ(sm.isHoliday(Datetime(202109300000LL)), false);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_isTradingHours") {
     auto& sm = StockManager::instance();
     CHECK_THROWS(sm.isTradingHours(Datetime()));
@@ -265,7 +265,7 @@ TEST_CASE("test_StockManager_isTradingHours") {
     CHECK_THROWS(sm.isTradingHours(Datetime(202109301500LL), "invalid"));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_getZhBond10") {
     auto& sm = StockManager::instance();
     const auto& result = sm.getZhBond10();
@@ -278,7 +278,7 @@ TEST_CASE("test_StockManager_getZhBond10") {
     CHECK_EQ(result[5535].value, doctest::Approx(2.3375));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
     HKU_IF_RETURN(!pluginValid(), void());
 

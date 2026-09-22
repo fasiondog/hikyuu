@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_FACTOR") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));  // 获取最近20条数据
@@ -108,7 +108,7 @@ TEST_CASE("test_FACTOR_alike_uses_factor_identity") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_FACTOR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -47,7 +47,7 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Signal") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -56,7 +56,7 @@ TEST_CASE("test_Signal") {
     SignalTest *p_src = (SignalTest *)p.get();
 
     SUBCASE("Basic operation") {
-        /** @arg 基本操作 */
+        /** @arg The basic operation */
         CHECK_EQ(p_src->getX(), 0);
         CHECK_EQ(p->name(), "SignalBase");
         p->name("SignalTest");
@@ -70,7 +70,7 @@ TEST_CASE("test_Signal") {
         p->_addSellSignal(Datetime(200101030000));
         CHECK_EQ(p->shouldSell(Datetime(200101030000)), true);
 
-        /** @arg 克隆操作 */
+        /** @arg The clone operation */
         p_src->setX(10);
         SignalPtr p_clone = p->clone();
         CHECK_NE(p, p_clone);
@@ -165,7 +165,7 @@ TEST_CASE("test_Signal") {
 }
 
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Signal_clone_cycle_bounds") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -191,7 +191,7 @@ TEST_CASE("test_Signal_clone_cycle_bounds") {
     CHECK_EQ(c->getCycleEnd(), t1);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Signal_clone_operator_behavior") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");

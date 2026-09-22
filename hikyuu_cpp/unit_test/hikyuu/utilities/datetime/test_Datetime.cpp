@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Datetime") {
     Datetime null_datetime = Null<Datetime>();
 
@@ -90,7 +90,7 @@ TEST_CASE("test_Datetime") {
     CHECK_THROWS_AS(Datetime(201001010060L), std::out_of_range);
     CHECK_THROWS_AS(Datetime(201001010061L), std::out_of_range);
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS_AS(Datetime(2001010203041LL), std::out_of_range);
 
     /** @arg 属性读取 */
@@ -449,7 +449,7 @@ TEST_CASE("test_Datetime") {
     CHECK_EQ(Datetime::max().ticks(), (Datetime::max() - Datetime::min()).ticks());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Datetime_related_operator") {
     /** @arg 小于比较 */
     CHECK(Datetime(200101010000) < Null<Datetime>());

@@ -1,7 +1,7 @@
 /*
  * test_ABS.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -52,7 +52,7 @@ TEST_CASE("test_nan_sort_in_MF") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MF_EqualWeight") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -159,7 +159,7 @@ TEST_CASE("test_MF_EqualWeight_benchmark") {
     auto ref_k = ref_stk.getKData(query);
     auto ref_dates = ref_k.getDatetimeList();
 
-    int cycle = 10;  // 测试循环次数
+    int cycle = 10;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_MF_EqualWeight_benchmark, cycle,
@@ -179,7 +179,7 @@ TEST_CASE("test_MF_EqualWeight_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MF_EqualWeight_export") {
     StockManager& sm = StockManager::instance();
     int ndays = 3;

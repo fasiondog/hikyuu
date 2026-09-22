@@ -72,7 +72,7 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_spearmanLevel") {
     /** @arg 无重复值排序 */
     std::vector<IndicatorImp::value_t> a{3., 8., 4., 7., 2.};
@@ -122,11 +122,11 @@ TEST_CASE("test_spearmanLevel") {
     CHECK_UNARY(std::isnan(ptrc[10]));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SPEARMAN") {
     Indicator result;
 
-    /** @arg 空指标 */
+    /** @arg An empty indicator */
     result = SPEARMAN(Indicator(), Indicator(), 10);
     CHECK_UNARY(result.empty());
 
@@ -175,7 +175,7 @@ TEST_CASE("test_SPEARMAN") {
     CHECK_UNARY(std::isnan(result[7]));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SPEARMAN_n0_full_window") {
     // 回归 n=0 默认参数：_calculate 将 n 归一化为 total 后委托
     // _increment_calculate，后者必须再次归一化，否则窗口长度为 0、全 NaN。
@@ -225,7 +225,7 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result.discard(), 5);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SPEARMAN_with_ties") {
     // 回归 tie-handling: 当输入存在相同值(average-rank)时, 简化公式
     // 1 - 6*sum_d2/(n^3-n) 不再精确, 必须用 Pearson-on-ranks 计算。
@@ -273,7 +273,7 @@ TEST_CASE("test_SPEARMAN_benchmark") {
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
     Indicator h = kdata.close();
-    int cycle = 10;  // 测试循环次数
+    int cycle = 10;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_SPEARMAN_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -290,7 +290,7 @@ TEST_CASE("test_SPEARMAN_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SPEARMAN_export") {
     StockManager &sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -27,9 +27,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KData_equal") {
-    /** @arg kdata为空 */
+    /** @arg kdata is empty */
     KData null_k = Null<KData>();
     KData k1, k2;
     CHECK_EQ(k1, null_k);
@@ -69,7 +69,7 @@ TEST_CASE("test_KData_equal") {
     CHECK_NE(k1, k2);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getDatetimeList") {
     StockManager& sm = StockManager::instance();
     Stock stock;
@@ -77,7 +77,7 @@ TEST_CASE("test_getDatetimeList") {
     KQuery query;
     DatetimeList result;
 
-    /** @arg kdata为空 */
+    /** @arg kdata is empty */
     result = kdata.getDatetimeList();
     CHECK_UNARY(result.empty());
 
@@ -178,7 +178,7 @@ TEST_CASE("test_getDatetimeList") {
     CHECK_EQ(result[8], Datetime(200001061130));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getKData_by_index") {
     StockManager& sm = StockManager::instance();
     Stock stock;
@@ -197,7 +197,7 @@ TEST_CASE("test_getKData_by_index") {
     CHECK_EQ(kdata.lastPos(), 0);
 
     ///==============================
-    /// 测试日线
+    /// Test the daily line
     ///==============================
     /** @arg SH000001全部K线日线数据, KQuery(0) */
     stock = sm.getStock("sh000001");
@@ -488,7 +488,7 @@ TEST_CASE("test_getKData_by_index") {
     CHECK_EQ(record, expect);
 
     ///==============================
-    /// 测试分钟线
+    /// Test the minute line
     ///==============================
     /** @arg SH000001全部1分钟K线数据,KQuery(0) */
     query = KQuery(0, Null<int64_t>(), KQuery::MIN);
@@ -734,7 +734,7 @@ TEST_CASE("test_getKData_by_index") {
                                279102.7000, 451981.0000));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getKData_by_date") {
     StockManager& sm = StockManager::instance();
     Stock stock;
@@ -744,7 +744,7 @@ TEST_CASE("test_getKData_by_date") {
     size_t total;
 
     ///===================================
-    /// 测试日线
+    /// Test the daily line
     ///===================================
 
     /** @arg SH000001全部日线数据, KQueryByDate() */
@@ -960,7 +960,7 @@ TEST_CASE("test_getKData_by_date") {
                              4262559.5000, 45917078.0000));
 
     ///===================================
-    /// 测试周线
+    /// Test the weekly line
     ///===================================
     /** @arg 起始时间为第一条记录日期的前一天 */
     total = stock.getCount(KQuery::WEEK);
@@ -1131,7 +1131,7 @@ TEST_CASE("test_getKData_by_date") {
                                9126681.1000, 98132048.0000));
 
     ///===================================
-    /// 测试分钟线
+    /// Test the minute line
     ///===================================
     /** @arg SH000001全部分钟线数据 */
     stock = sm.getStock("sh000001");
@@ -1271,7 +1271,7 @@ TEST_CASE("test_getKData_by_date") {
     CHECK_EQ(record.datetime, Datetime(201112061500));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getKData_recover") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -1341,7 +1341,7 @@ TEST_CASE("test_getKRecord_By_Date") {
     KData kdata;
     KRecord result;
 
-    /** @arg kdata为空 */
+    /** @arg kdata is empty */
     result = kdata.getKRecord(Datetime(200101010000));
     CHECK_EQ(result, KRecord::NullKRecord);
 
@@ -1667,7 +1667,7 @@ TEST_CASE("test_getKRecord_By_Date") {
     CHECK_EQ(result, KRecord::NullKRecord);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KData_getOtherFromSelf") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -1851,7 +1851,7 @@ TEST_CASE("test_KData_getOtherFromSelf_subfunctions") {
     CHECK_EQ(kdata_idx_from_date.getQuery().kType(), KQuery::DAY);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KData_getKData") {
     KData k1, k2;
 

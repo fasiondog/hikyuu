@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MM_FixedCountTpsTps") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");

@@ -53,7 +53,7 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Condition") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -61,7 +61,7 @@ TEST_CASE("test_Condition") {
     KData kdata = stock.getKData(query);
     ConditionTest *p_src;
 
-    /** @arg 基本操作 */
+    /** @arg The basic operation */
     ConditionPtr p(new ConditionTest);
     p_src = (ConditionTest *)p.get();
     CHECK_EQ(p->name(), "TEST");
@@ -80,7 +80,7 @@ TEST_CASE("test_Condition") {
     CHECK_EQ(ds[0], Datetime(19901221));
     CHECK_EQ(ds[1], Datetime(19901224));
 
-    /** @arg 克隆操作 */
+    /** @arg The clone operation */
     p->setParam<int>("n", 20);
     ConditionPtr p_clone = p->clone();
     CHECK_NE(p, p_clone);

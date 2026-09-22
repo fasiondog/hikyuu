@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KQuery_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/KQuery.xml";
@@ -48,7 +48,7 @@ TEST_CASE("test_KQuery_serialize") {
     CHECK_EQ(q1.end(), q1.end());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KQueryByDate_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/KQueryByDate.xml";

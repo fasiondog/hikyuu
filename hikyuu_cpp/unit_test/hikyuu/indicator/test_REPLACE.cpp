@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REPLACE") {
     double nan = Null<double>();
 
@@ -83,7 +83,7 @@ TEST_CASE("test_REPLACE") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REPLACE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

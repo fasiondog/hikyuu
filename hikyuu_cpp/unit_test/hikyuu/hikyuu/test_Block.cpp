@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Block_1") {
     Block blk;
     /** @arg 默认构造函数,category、name为"" */
@@ -43,7 +43,7 @@ TEST_CASE("test_Block_1") {
     CHECK((blk2 == blk3));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Block_2") {
     StockManager& sm = StockManager::instance();
     Block blk;

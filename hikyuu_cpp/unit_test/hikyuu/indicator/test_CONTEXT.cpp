@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CONTEXT") {
     auto stk1 = getStock("sz000001");
     auto stk2 = getStock("sz000002");
@@ -174,7 +174,7 @@ TEST_CASE("test_CONTEXT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CONTEXT_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -24,7 +24,7 @@ using namespace std;
 
 /**
  * 测试IniParser读取文件操作 \n
- * @par 检测点
+ * @par Test points
  */
 TEST_CASE("test_IniParser_read") {
     IniParser ini_parser;
@@ -86,7 +86,7 @@ TEST_CASE("test_IniParser_read") {
 }
 
 /**
- * @par 检测点
+ * @par Test points
  */
 TEST_CASE("test_IniParser_hasSection") {
     IniParser ini_parser;
@@ -108,7 +108,7 @@ TEST_CASE("test_IniParser_hasSection") {
 }
 
 /**
- * @par 检测点
+ * @par Test points
  */
 TEST_CASE("test_IniParser_hasOption") {
     std::string test_filename("test_iniparser.ini");
@@ -135,7 +135,7 @@ TEST_CASE("test_IniParser_hasOption") {
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_getSectionList") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -167,7 +167,7 @@ TEST_CASE("test_IniParser_getSectionList") {
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_getOptionList") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -202,7 +202,7 @@ TEST_CASE("test_IniParser_getOptionList") {
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_get") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -216,7 +216,7 @@ TEST_CASE("test_IniParser_get") {
     IniParser ini_parser;
     ini_parser.read(test_filename);
 
-    /** @arg 存在指定section和option, 并且无缺省值*/
+    /** @arg The given section and option exist and there is no default value */
     CHECK_EQ(ini_parser.get("section1", "key1"), "value1");
     CHECK_EQ(ini_parser.get("section2", "key1"), "value1");
 
@@ -224,13 +224,13 @@ TEST_CASE("test_IniParser_get") {
     CHECK_EQ(ini_parser.get("section1", "key1", "value"), "value1");
     CHECK_NE(ini_parser.get("section2", "key1", "value"), "value");
 
-    /** @arg 存在指定section，但不存在相应的option，并且无缺省值 */
+    /** @arg The given section exists but the option does not, and there is no default value */
     CHECK_THROWS_AS(ini_parser.get("section1", "key2"), std::invalid_argument);
 
     /** @arg 存在指定section，但不存在相应的option，但指定了缺省值 */
     CHECK_EQ(ini_parser.get("section1", "key2", "value2"), "value2");
 
-    /** @arg 不存在指定的section，并且无缺省值 */
+    /** @arg The given section does not exist and there is no default value */
     CHECK_THROWS_AS(ini_parser.get("section3", "key1"), std::invalid_argument);
 
     /** @arg 不存在指定的section，但指定了缺省值 */
@@ -239,7 +239,7 @@ TEST_CASE("test_IniParser_get") {
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_getInt") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -254,41 +254,41 @@ TEST_CASE("test_IniParser_getInt") {
     IniParser ini_parser;
     ini_parser.read(test_filename);
 
-    /** @arg 存在指定section和option, 并且无缺省值*/
+    /** @arg The given section and option exist and there is no default value */
     CHECK_EQ(ini_parser.getInt("section1", "key1"), 1);
     CHECK_EQ(ini_parser.getInt("section1", "key3"), -3);
     CHECK_EQ(ini_parser.getInt("section2", "key1"), 10);
 
-    /** @arg 存在指定section和option, 并且指定了有效缺省值*/
+    /** @arg The given section and option exist and a valid default value is given */
     CHECK_EQ(ini_parser.getInt("section1", "key1", "2"), 1);
     CHECK_NE(ini_parser.getInt("section2", "key1", "20"), 20);
 
-    /** @arg 存在指定section和option，但对应的值无法转换为int类型*/
+    /** @arg The given section and option exist but the value cannot be converted into int */
     CHECK_THROWS_AS(ini_parser.getInt("section2", "key2"), std::invalid_argument);
 
-    /** @arg 存在指定section和option, 但指定了无效缺省值（无法转换到int类型），应抛出异常*/
+    /** @arg The section and option exist but an invalid default value is given (it cannot be converted into int), an exception should be thrown */
     CHECK_THROWS_AS(ini_parser.getInt("section1", "key1", "tow"), std::invalid_argument);
     CHECK_THROWS_AS(ini_parser.getInt("section2", "key1", "twenty"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，并且无缺省值 */
+    /** @arg The given section exists but the option does not, and there is no default value */
     CHECK_THROWS_AS(ini_parser.getInt("section1", "key2"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了有效缺省值 */
+    /** @arg The section exists but the option does not, and a valid default value is given */
     CHECK_EQ(ini_parser.getInt("section1", "key2", "10"), 10);
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了无效缺省值（无法转换到int类型） */
+    /** @arg The section exists but the option does not, and an invalid default value is given (it cannot be converted into int) */
     CHECK_THROWS_AS(ini_parser.getInt("section1", "key2", "10.0"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，并且无缺省值 */
+    /** @arg The given section does not exist and there is no default value */
     CHECK_THROWS_AS(ini_parser.getInt("section3", "key1"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，但指定了有效缺省值 */
+    /** @arg The given section does not exist but a valid default value is given */
     CHECK_THROWS_AS(ini_parser.getInt("section3", "key1", "1"), std::invalid_argument);
 
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_getFloat") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -303,37 +303,37 @@ TEST_CASE("test_IniParser_getFloat") {
     IniParser ini_parser;
     ini_parser.read(test_filename);
 
-    /** @arg 存在指定section和option, 并且无缺省值*/
+    /** @arg The given section and option exist and there is no default value */
     CHECK_EQ(ini_parser.getFloat("section1", "key1"), doctest::Approx(1.123456).epsilon(0.00001));
     CHECK_EQ(ini_parser.getFloat("section1", "key3"), doctest::Approx(-3.145789).epsilon(0.00001));
     CHECK_EQ(ini_parser.getFloat("section2", "key1"), doctest::Approx(10).epsilon(0.00001));
 
-    /** @arg 存在指定section和option, 并且指定了有效缺省值*/
+    /** @arg The given section and option exist and a valid default value is given */
     CHECK_EQ(ini_parser.getFloat("section1", "key1", "2.01"),
              doctest::Approx(1.123456).epsilon(0.00001));
     CHECK_EQ(ini_parser.getFloat("section2", "key1", "20.20"),
              doctest::Approx(10).epsilon(0.00001));
 
-    /** @arg 存在指定section和option，但对应的值无法转换为int类型*/
+    /** @arg The given section and option exist but the value cannot be converted into int */
     CHECK_THROWS_AS(ini_parser.getFloat("section2", "key2"), std::invalid_argument);
 
-    /** @arg 存在指定section和option, 但指定了无效缺省值（无法转换到int类型），应抛出异常*/
+    /** @arg The section and option exist but an invalid default value is given (it cannot be converted into int), an exception should be thrown */
     CHECK_THROWS_AS(ini_parser.getFloat("section1", "key1", "tow"), std::invalid_argument);
     CHECK_THROWS_AS(ini_parser.getFloat("section2", "key1", "twenty"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，并且无缺省值 */
+    /** @arg The given section exists but the option does not, and there is no default value */
     CHECK_THROWS_AS(ini_parser.getFloat("section1", "key2"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了有效缺省值 */
+    /** @arg The section exists but the option does not, and a valid default value is given */
     CHECK_EQ(ini_parser.getFloat("section1", "key2", "10"), doctest::Approx(10.0));
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了无效缺省值（无法转换到int类型） */
+    /** @arg The section exists but the option does not, and an invalid default value is given (it cannot be converted into int) */
     CHECK_THROWS_AS(ini_parser.getFloat("section1", "key2", "1A0"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，并且无缺省值 */
+    /** @arg The given section does not exist and there is no default value */
     CHECK_THROWS_AS(ini_parser.getFloat("section3", "key1"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，但指定了有效缺省值 */
+    /** @arg The given section does not exist but a valid default value is given */
     CHECK_THROWS_AS(ini_parser.getFloat("section3", "key1", "1"), std::invalid_argument);
 
     /** @arg 测试值为-3.4e-38和3.4e+38的情况 */
@@ -352,7 +352,7 @@ TEST_CASE("test_IniParser_getFloat") {
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_getDouble") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -367,42 +367,42 @@ TEST_CASE("test_IniParser_getDouble") {
     IniParser ini_parser;
     ini_parser.read(test_filename);
 
-    /** @arg 存在指定section和option, 并且无缺省值*/
+    /** @arg The given section and option exist and there is no default value */
     CHECK_EQ(ini_parser.getDouble("section1", "key1"), doctest::Approx(1.123456).epsilon(0.00001));
     CHECK_EQ(ini_parser.getDouble("section1", "key3"), doctest::Approx(-3.145789).epsilon(0.00001));
     CHECK_EQ(ini_parser.getDouble("section2", "key1"), doctest::Approx(10).epsilon(0.00001));
 
-    /** @arg 存在指定section和option, 并且指定了有效缺省值*/
+    /** @arg The given section and option exist and a valid default value is given */
     CHECK_EQ(ini_parser.getDouble("section1", "key1", "2.01"), doctest::Approx(1.123456));
     CHECK_EQ(ini_parser.getDouble("section2", "key1", "20.20"), doctest::Approx(10));
 
-    /** @arg 存在指定section和option，但对应的值无法转换为int类型*/
+    /** @arg The given section and option exist but the value cannot be converted into int */
     CHECK_THROWS_AS(ini_parser.getDouble("section2", "key2"), std::invalid_argument);
 
-    /** @arg 存在指定section和option, 但指定了无效缺省值（无法转换到int类型），应抛出异常*/
+    /** @arg The section and option exist but an invalid default value is given (it cannot be converted into int), an exception should be thrown */
     CHECK_THROWS_AS(ini_parser.getDouble("section1", "key1", "tow"), std::invalid_argument);
     CHECK_THROWS_AS(ini_parser.getDouble("section2", "key1", "twenty"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，并且无缺省值 */
+    /** @arg The given section exists but the option does not, and there is no default value */
     CHECK_THROWS_AS(ini_parser.getDouble("section1", "key2"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了有效缺省值 */
+    /** @arg The section exists but the option does not, and a valid default value is given */
     CHECK_EQ(ini_parser.getDouble("section1", "key2", "10"),
              doctest::Approx(10.0).epsilon(0.00001));
 
-    /** @arg 存在指定section，但不存在相应的option，但指定了无效缺省值（无法转换到int类型） */
+    /** @arg The section exists but the option does not, and an invalid default value is given (it cannot be converted into int) */
     CHECK_THROWS_AS(ini_parser.getDouble("section1", "key2", "1A0"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，并且无缺省值 */
+    /** @arg The given section does not exist and there is no default value */
     CHECK_THROWS_AS(ini_parser.getDouble("section3", "key1"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，但指定了有效缺省值 */
+    /** @arg The given section does not exist but a valid default value is given */
     CHECK_THROWS_AS(ini_parser.getDouble("section3", "key1", "1"), std::invalid_argument);
 
     removeFile(test_filename);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IniParser_getBool") {
     std::string test_filename("test_iniparser.ini");
     ofstream testini(test_filename, ofstream::trunc);
@@ -459,7 +459,7 @@ TEST_CASE("test_IniParser_getBool") {
     CHECK_UNARY(!ini_parser.getBool("section1", "key19"));
     CHECK_UNARY(!ini_parser.getBool("section1", "key20"));
 
-    /** @arg 存在指定section和option, 并且指定了有效缺省值*/
+    /** @arg The given section and option exist and a valid default value is given */
     CHECK_UNARY(ini_parser.getBool("section1", "key1", "0"));
     CHECK_UNARY(!ini_parser.getBool("section1", "key2", "1"));
 
@@ -470,7 +470,7 @@ TEST_CASE("test_IniParser_getBool") {
     CHECK_THROWS_AS(ini_parser.getBool("section1", "key1", "tow"), std::invalid_argument);
     CHECK_THROWS_AS(ini_parser.getBool("section1", "key1", "twenty"), std::invalid_argument);
 
-    /** @arg 存在指定section，但不存在相应的option，并且无缺省值 */
+    /** @arg The given section exists but the option does not, and there is no default value */
     CHECK_THROWS_AS(ini_parser.getBool("section1", "key22"), std::invalid_argument);
 
     /** @arg
@@ -500,10 +500,10 @@ TEST_CASE("test_IniParser_getBool") {
     /** @arg 存在指定section，但不存在相应的option，但指定了无效缺省值（无法转换到bool类型） */
     CHECK_THROWS_AS(ini_parser.getBool("section1", "key22", "10"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，并且无缺省值 */
+    /** @arg The given section does not exist and there is no default value */
     CHECK_THROWS_AS(ini_parser.getBool("section3", "key1"), std::invalid_argument);
 
-    /** @arg 不存在指定的section，但指定了有效缺省值 */
+    /** @arg The given section does not exist but a valid default value is given */
     CHECK_THROWS_AS(ini_parser.getBool("section3", "key1", "1"), std::invalid_argument);
 
     removeFile(test_filename);

@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ISLASTBAR") {
     /** @arg 正常执行 */
     Indicator data = PRICELIST({1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
@@ -105,7 +105,7 @@ TEST_CASE("test_ISLASTBAR_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ISLASTBAR_export") {
     // StockManager& sm = StockManager::instance();
     // string filename(sm.tmpdir());

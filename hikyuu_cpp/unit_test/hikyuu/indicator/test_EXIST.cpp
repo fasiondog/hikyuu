@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_EXIST") {
     Indicator result;
 
@@ -111,7 +111,7 @@ TEST_CASE("test_EXIST") {
     CHECK_EQ(result[9], 0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_EXIST_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -146,7 +146,7 @@ TEST_CASE("test_EXIST_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_EXIST_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

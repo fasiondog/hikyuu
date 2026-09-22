@@ -26,7 +26,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CostRecord_export") {
     string filename(StockManager::instance().tmpdir());
     filename += "/CostRecord.xml";
@@ -53,7 +53,7 @@ TEST_CASE("test_CostRecord_export") {
     CHECK_EQ(cost.total, doctest::Approx(cost2.total).epsilon(0.00001));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeRecord_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -88,7 +88,7 @@ TEST_CASE("test_TradeRecord_export") {
     CHECK_EQ(record1, record2);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_PositionRecord_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -124,7 +124,7 @@ TEST_CASE("test_PositionRecord_export") {
     CHECK_EQ(record1, record2);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -180,7 +180,7 @@ TEST_CASE("test_TradeManager_export") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_FundsRecord_export") {
     string filename(StockManager::instance().tmpdir());
     filename += "/FundsRecord.xml";
@@ -209,7 +209,7 @@ TEST_CASE("test_FundsRecord_export") {
     CHECK_EQ(funds1, funds2);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BorrowRecord_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TC_FixedA") {
     StockManager& sm = StockManager::instance();
     Stock stock;
@@ -137,7 +137,7 @@ TEST_CASE("test_TC_FixedA") {
 }
 
 #if HKU_SUPPORT_SERIALIZATION
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_FixedATC_export") {
     StockManager& sm = StockManager::instance();
 

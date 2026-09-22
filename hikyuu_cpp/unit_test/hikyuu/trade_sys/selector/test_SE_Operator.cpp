@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_AddValue") {
     StockManager& sm = StockManager::instance();
 
@@ -35,10 +35,10 @@ TEST_CASE("test_SE_AddValue") {
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -103,7 +103,7 @@ TEST_CASE("test_SE_AddValue") {
     CHECK_EQ(result[2].weight, 4.0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_SubValue") {
     StockManager& sm = StockManager::instance();
 
@@ -115,10 +115,10 @@ TEST_CASE("test_SE_SubValue") {
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -183,7 +183,7 @@ TEST_CASE("test_SE_SubValue") {
     CHECK_EQ(result[2].weight, 2.0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_MultiValue") {
     StockManager& sm = StockManager::instance();
 
@@ -195,10 +195,10 @@ TEST_CASE("test_SE_MultiValue") {
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -263,7 +263,7 @@ TEST_CASE("test_SE_MultiValue") {
     CHECK_EQ(result[2].weight, 3.0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_DivValue") {
     StockManager& sm = StockManager::instance();
 
@@ -275,10 +275,10 @@ TEST_CASE("test_SE_DivValue") {
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -343,7 +343,7 @@ TEST_CASE("test_SE_DivValue") {
     CHECK_EQ(result[2].weight, 3.0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_Add") {
     StockManager& sm = StockManager::instance();
 
@@ -355,10 +355,10 @@ TEST_CASE("test_SE_Add") {
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -477,11 +477,11 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[1].weight, 0.3);
     CHECK_EQ(result[2].weight, 0.2);
 
-    /** @arg 尝试 clone 操作 */
+    /** @arg Try the clone operation */
     CHECK_THROWS(se->clone());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_Sub") {
     StockManager& sm = StockManager::instance();
 
@@ -493,10 +493,10 @@ TEST_CASE("test_SE_Sub") {
     SEPtr se2 = SE_Fixed();
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -580,11 +580,11 @@ TEST_CASE("test_SE_Sub") {
     CHECK_EQ(result[1].weight, 0.0);
     CHECK_EQ(result[2].weight, 0.0);
 
-    /** @arg 尝试 clone 操作 */
+    /** @arg Try the clone operation */
     CHECK_THROWS(se->clone());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_Multi") {
     StockManager& sm = StockManager::instance();
 
@@ -596,10 +596,10 @@ TEST_CASE("test_SE_Multi") {
     SEPtr se2 = SE_Fixed(0.5);
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -672,11 +672,11 @@ TEST_CASE("test_SE_Multi") {
     CHECK_EQ(result[1].weight, 0.5);
     CHECK_EQ(result[2].weight, 0.5);
 
-    /** @arg 尝试 clone 操作 */
+    /** @arg Try the clone operation */
     CHECK_THROWS(se->clone());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_Div") {
     StockManager& sm = StockManager::instance();
 
@@ -688,10 +688,10 @@ TEST_CASE("test_SE_Div") {
     SEPtr se2 = SE_Fixed(0.5);
     SEPtr se = se1 + se2;
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     sys->setSG(sg);
@@ -764,7 +764,7 @@ TEST_CASE("test_SE_Div") {
     CHECK_EQ(result[1].weight, 2.0);
     CHECK_EQ(result[2].weight, 2.0);
 
-    /** @arg 尝试 clone 操作 */
+    /** @arg Try the clone operation */
     CHECK_THROWS(se->clone());
 }
 

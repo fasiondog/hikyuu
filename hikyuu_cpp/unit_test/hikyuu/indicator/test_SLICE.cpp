@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SLICE") {
     PriceList tmp_list;
     Indicator result;
@@ -134,7 +134,7 @@ TEST_CASE("test_SLICE") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 // TEST_CASE("test_SLICE_export") {
 //     StockManager& sm = StockManager::instance();
 //     string filename(sm.tmpdir());

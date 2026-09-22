@@ -20,18 +20,18 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_T3") {
     KData kdata = getKData("sh000001", KQuery(-15));
     Indicator c = CLOSE(kdata);
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_T3(c, 1));
     CHECK_THROWS(TA_T3(c, 100001));
     CHECK_THROWS(TA_T3(c, 5, -0.1));
     CHECK_THROWS(TA_T3(c, 5, 1.1));
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     Indicator result = TA_T3(c, 2);
     CHECK_EQ(result.name(), "TA_T3");
     CHECK_EQ(result.discard(), 6);
@@ -40,7 +40,7 @@ TEST_CASE("test_TA_T3") {
     CHECK_EQ(result[6], doctest::Approx(2396.84113).epsilon(0.0001));
     CHECK_EQ(result[14], doctest::Approx(2331.71384).epsilon(0.0001));
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     auto data = TA_MA(c, 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_T3(data, 2);
@@ -56,7 +56,7 @@ TEST_CASE("test_TA_T3") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_T3_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

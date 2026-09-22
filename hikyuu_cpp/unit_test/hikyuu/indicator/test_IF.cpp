@@ -25,7 +25,7 @@ using namespace hku;
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IF") {
     KData kdata = getStock("SH600000").getKData(KQuery(-10));
 
@@ -95,7 +95,7 @@ TEST_CASE("test_IF") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IF_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

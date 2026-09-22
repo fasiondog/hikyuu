@@ -21,11 +21,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SKEW") {
     Indicator result;
 
-    // 空指标
+    // An empty indicator
     result = SKEW(Indicator(), 10);
     CHECK_UNARY(result.empty());
 
@@ -33,7 +33,7 @@ TEST_CASE("test_SKEW") {
     PriceList symmetric{1.0, 2.0, 3.0, 4.0, 4.0, 3.0, 2.0, 1.0};
     Indicator x = PRICELIST(symmetric);
 
-    // 非法参数 n
+    // The invalid parameter n
     CHECK_THROWS_AS(SKEW(x, -1), std::exception);
     CHECK_THROWS_AS(SKEW(x, 1), std::exception);
     CHECK_THROWS_AS(SKEW(x, 2), std::exception);
@@ -102,7 +102,7 @@ TEST_CASE("test_SKEW_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_SKEW_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -119,7 +119,7 @@ TEST_CASE("test_SKEW_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SKEW_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

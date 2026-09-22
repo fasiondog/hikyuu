@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_combinateIndex") {
     std::vector<float> nums;
     std::vector<std::vector<size_t>> result;

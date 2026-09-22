@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_MIN") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -50,7 +50,7 @@ TEST_CASE("test_AGG_SAMPLE_MIN") {
     CHECK_EQ(result[0], doctest::Approx(expected_value));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_MIN_time_range") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -58,7 +58,7 @@ TEST_CASE("test_AGG_SAMPLE_MIN_time_range") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试指定时间段参数（10:00-11:00） */
+    /** @arg Test the given time range parameter (10:00-11:00) */
     auto ind = AGG_SAMPLE_MIN(CLOSE(), "10:00", "11:00");
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
@@ -83,7 +83,7 @@ TEST_CASE("test_AGG_SAMPLE_MIN_time_range") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_MIN_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

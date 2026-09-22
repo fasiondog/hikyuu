@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TC_Zero") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600004");
@@ -52,7 +52,7 @@ TEST_CASE("test_TC_Zero") {
 }
 
 #if HKU_SUPPORT_SERIALIZATION
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ZeroCost_export") {
     StockManager& sm = StockManager::instance();
 

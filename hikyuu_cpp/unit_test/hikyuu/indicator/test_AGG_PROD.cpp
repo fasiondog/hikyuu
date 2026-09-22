@@ -24,7 +24,7 @@ using namespace hku;
 // 低精度模式下, float 会溢出
 #if !HKU_USE_LOW_PRECISION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_PROD") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -32,7 +32,7 @@ TEST_CASE("test_AGG_PROD") {
     auto mink =
       getKData("sz000001", KQueryByDate(Datetime(20111115), Null<Datetime>(), KQuery::MIN));
 
-    /** @arg 单日分钟线聚合 */
+    /** @arg The single day minute line aggregation */
     auto ind = AGG_PROD(CLOSE(), KQuery::MIN);
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());

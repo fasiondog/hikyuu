@@ -97,7 +97,7 @@ TEST_CASE("test_MF_ICIRWeight_benchmark") {
     auto ref_k = ref_stk.getKData(query);
     auto ref_dates = ref_k.getDatetimeList();
 
-    int cycle = 10;  // 测试循环次数
+    int cycle = 10;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_MF_ICIRWeight_benchmark, cycle,

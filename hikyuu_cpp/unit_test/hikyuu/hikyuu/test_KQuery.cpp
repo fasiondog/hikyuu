@@ -16,7 +16,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KQuery") {
     KQuery q1 = KQueryByIndex(-1);
     CHECK_EQ(q1.start(), -1);
@@ -47,7 +47,7 @@ TEST_CASE("test_KQuery") {
     CHECK_UNARY(q1.isRightOpening());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KQuery_equal") {
     KQuery q1 = KQueryByIndex(-1);
     KQuery q2 = KQueryByIndex(-1);

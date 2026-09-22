@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ST_FixedPercent_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -47,7 +47,7 @@ TEST_CASE("test_ST_FixedPercent_export") {
     CHECK_EQ(sg1->name(), sg2->name());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ST_Saftyloss_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

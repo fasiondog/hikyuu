@@ -26,7 +26,7 @@ namespace bd = boost::gregorian;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeDelta") {
     /** @arg days  超出限定值 */
     CHECK_THROWS(TimeDelta(99999999LL + 1));
@@ -199,7 +199,7 @@ TEST_CASE("test_TimeDelta") {
     CHECK(td.ticks() == 89404079083LL);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeDelta_operator") {
     /** @arg 相加, 正正相加*/
     TimeDelta td = TimeDelta(1, 20, 100, 1, 3, 5) + TimeDelta(30, 3, 2, 4, 5, 6);
@@ -353,7 +353,7 @@ TEST_CASE("test_TimeDelta_operator") {
     CHECK(TimeDelta(0, 0, 0, 0, 1, 500).total_milliseconds() == 1.5);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeDelta_subclass") {
     /** @arg Days */
     CHECK(Days(1) == TimeDelta(1));
@@ -380,7 +380,7 @@ TEST_CASE("test_TimeDelta_subclass") {
     CHECK(TimeDelta(0, 0, 0, 0, 0, 1) == Microseconds(1));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeDelta_Datetime_operator") {
     /** @arg Datetime + TimeDelta */
     Datetime d = Datetime(2019, 12, 18) + TimeDelta(1);
@@ -406,7 +406,7 @@ TEST_CASE("test_TimeDelta_Datetime_operator") {
 
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeDelat_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/TimeDelta.xml";

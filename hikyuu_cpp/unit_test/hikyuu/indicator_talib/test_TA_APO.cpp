@@ -20,30 +20,30 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_APO") {
     KData kdata = getKData("sh000001", KQuery(-10));
     Indicator c = CLOSE(kdata);
 
-    /** @arg 非法 n < 2 || n > 100000 */
+    /** @arg Invalid n < 2 || n > 100000 */
     CHECK_THROWS(TA_APO(c, 1));
     CHECK_THROWS(TA_APO(c, 2, 1));
     CHECK_THROWS(TA_APO(c, 100001));
     CHECK_THROWS(TA_APO(c, 2, 100001));
 
-    /** @arg KData 为空 */
+    /** @arg KData is empty */
     Indicator result = TA_APO(KData().close());
     CHECK_EQ(result.name(), "TA_APO");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg KData 长度小于默认参数抛弃数量 */
+    /** @arg The KData length is less than the discard count of the default parameters */
     result = TA_APO(c);
     CHECK_EQ(result.name(), "TA_APO");
     CHECK_EQ(result.discard(), 10);
     CHECK_EQ(result.size(), 10);
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     kdata = getKData("sh000001", KQuery(-30));
     result = TA_APO(CLOSE(kdata));
     CHECK_EQ(result.name(), "TA_APO");
@@ -58,7 +58,7 @@ TEST_CASE("test_TA_APO") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_APO_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

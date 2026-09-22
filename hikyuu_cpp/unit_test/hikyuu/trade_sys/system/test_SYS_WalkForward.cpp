@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     Stock stk = getStock("sz000001");
     KQuery query = KQueryByIndex(-50);
@@ -83,7 +83,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     Stock stk = getStock("sz000001");
     KQuery query = KQueryByIndex(-50);
@@ -146,7 +146,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SYS_WalkForword_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

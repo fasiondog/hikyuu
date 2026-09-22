@@ -49,9 +49,9 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ProfitGoal") {
-    /** @arg 基本操作 */
+    /** @arg The basic operation */
     ProfitGoalPtr p(new ProfitGoalTest);
     CHECK_EQ(p->name(), "ProfitGoalTest");
     CHECK_EQ(p->getGoal(Datetime(200101010000), 1.0), 0.0);
@@ -64,7 +64,7 @@ TEST_CASE("test_ProfitGoal") {
     p->reset();
     CHECK_EQ(p_src->getX(), 0);
 
-    /** @arg 测试克隆操作 */
+    /** @arg Test the clone operation */
     p_src->setX(10);
     ProfitGoalPtr p_clone = p->clone();
     CHECK_EQ(p_clone->name(), "ProfitGoalTest");

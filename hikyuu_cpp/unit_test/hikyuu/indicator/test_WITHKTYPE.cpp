@@ -26,7 +26,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_equal_ktype") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -64,7 +64,7 @@ TEST_CASE("test_WITHKTYPE_equal_ktype") {
     check_indicator(ret, wk.close());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_extent") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -105,7 +105,7 @@ TEST_CASE("test_WITHKTYPE_extent") {
 #endif
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_sample") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -125,7 +125,7 @@ TEST_CASE("test_WITHKTYPE_sample") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_export") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();

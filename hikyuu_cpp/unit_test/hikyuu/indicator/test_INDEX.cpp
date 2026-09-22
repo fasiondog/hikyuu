@@ -20,9 +20,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_INDEXO") {
-    /** @arg 空指标 */
+    /** @arg An empty indicator */
     Indicator result = INDEXO();
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.name(), "INDEXO");
@@ -75,7 +75,7 @@ TEST_CASE("test_INDEXO") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_INDEX_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

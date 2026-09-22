@@ -1,7 +1,7 @@
 /*
  * test_EXP.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_EXP") {
     Indicator result;
 
@@ -49,7 +49,7 @@ TEST_CASE("test_EXP") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_EXP_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

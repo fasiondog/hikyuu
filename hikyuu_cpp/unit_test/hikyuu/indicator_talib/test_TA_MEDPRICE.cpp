@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MEDPRICE") {
     KData kdata = getKData("sz000001", KQuery(-30));
     Indicator result = TA_MEDPRICE(kdata);
@@ -39,7 +39,7 @@ TEST_CASE("test_TA_MEDPRICE") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MEDPRICE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -27,7 +27,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BARSLASTS") {
     /** @arg n=1时，结果应与BARSLAST一致 */
     PriceList a;
@@ -90,7 +90,7 @@ TEST_CASE("test_BARSLASTS") {
         CHECK_UNARY(std::isnan(result[i]));
     }
 
-    /** @arg 空数据测试 */
+    /** @arg The empty data test */
     PriceList empty;
     data = PRICELIST(empty);
     result = BARSLASTS(data, 1);
@@ -201,7 +201,7 @@ TEST_CASE("test_BARSLASTS_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BARSLASTS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

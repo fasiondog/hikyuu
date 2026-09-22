@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SMA") {
     Indicator result;
     PriceList a;
@@ -79,7 +79,7 @@ TEST_CASE("test_SMA") {
     CHECK_EQ(result[9], doctest::Approx(0.8002).epsilon(0.01));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SMA_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-33));
@@ -112,7 +112,7 @@ TEST_CASE("test_SMA_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_SMA_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -130,7 +130,7 @@ TEST_CASE("test_SMA_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SMA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

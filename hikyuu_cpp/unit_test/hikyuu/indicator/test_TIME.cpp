@@ -18,7 +18,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TIME") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -102,7 +102,7 @@ TEST_CASE("test_TIME") {
     CHECK_EQ(minute.empty(), true);
     CHECK_EQ(minute.name(), "MINUTE");
 
-    /** @arg 非空的KData */
+    /** @arg A non-empty KData */
     KQuery query(-10);
     kdata = stock.getKData(query);
     size_t total = kdata.size();
@@ -151,7 +151,7 @@ TEST_CASE("test_TIME") {
         CHECK_EQ(minute[i], d.minute());
     }
 
-    /** @arg 非空的KData */
+    /** @arg A non-empty KData */
     date = hku::DATE();
     time = TIME();
     year = YEAR();
@@ -212,7 +212,7 @@ TEST_CASE("test_TIME") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TIME_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -54,7 +54,7 @@ TEST_CASE("test_MAX_DOUBLE") {
     CHECK_EQ(std::abs(x), MAX_DOUBLE);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_init") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -83,7 +83,7 @@ TEST_CASE("test_TradeManager_init") {
     CHECK_EQ(tm->getShortPosition(stock), Null<PositionRecord>());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_getBuyCost") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -100,7 +100,7 @@ TEST_CASE("test_TradeManager_getBuyCost") {
     CHECK_EQ(result, expect);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_getSellCost") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600004");
@@ -117,7 +117,7 @@ TEST_CASE("test_TradeManager_getSellCost") {
     CHECK_EQ(result, expect);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_buy") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -207,7 +207,7 @@ TEST_CASE("test_TradeManager_can_not_buy") {
     CHECK_EQ(result, Null<TradeRecord>());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_sell") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -298,7 +298,7 @@ TEST_CASE("test_TradeManager_can_not_sell") {
     CHECK_EQ(tm->cash(Datetime(200612010000)), 1006135.0);  // 1005049.5);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_checkin") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
@@ -307,12 +307,12 @@ TEST_CASE("test_TradeManager_can_not_checkin") {
     CHECK_EQ(tm->checkin(Datetime(199901020000), -0.01), false);
     CHECK_EQ(tm->checkin(Datetime(199901020000), 0.01), true);
 
-    /** @arg 试图在最后交易日期前存入 */
+    /** @arg Try to withdraw before the last trading date */
     tm->checkin(Datetime(200001020000), 10000);
     CHECK_EQ(tm->checkin(Datetime(200001010000), 200), false);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_checkout") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
@@ -331,7 +331,7 @@ TEST_CASE("test_TradeManager_can_not_checkout") {
     CHECK_EQ(tm->checkout(Datetime(200001030000), 100000), true);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_borrowCash") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
@@ -340,12 +340,12 @@ TEST_CASE("test_TradeManager_can_not_borrowCash") {
     CHECK_EQ(tm->borrowCash(Datetime(199901020000), -0.01), false);
     CHECK_EQ(tm->borrowCash(Datetime(199901020000), 0.01), true);
 
-    /** @arg 试图在最后交易日期前存入 */
+    /** @arg Try to withdraw before the last trading date */
     tm->checkin(Datetime(200001020000), 10000);
     CHECK_EQ(tm->borrowCash(Datetime(200001010000), 200), false);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_returnCash") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
@@ -372,7 +372,7 @@ TEST_CASE("test_TradeManager_can_not_returnCash") {
     CHECK_EQ(tm->returnCash(Datetime(200001040000), 50000), false);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_checkinStock") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -388,12 +388,12 @@ TEST_CASE("test_TradeManager_can_not_checkinStock") {
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, 0, 100), false);
     CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, -0.01, 100), false);
 
-    /** @arg 试图在最后交易日期前存入 */
+    /** @arg Try to withdraw before the last trading date */
     tm->checkin(Datetime(200001020000), 10000);
     CHECK_EQ(tm->checkinStock(Datetime(200001010000), stock, 10.0, 200), false);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_checkoutStock") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -436,7 +436,7 @@ TEST_CASE("test_TradeManager_short_orders_use_executed_number") {
     CHECK_EQ(broker->last_buy_num, buy_record.number);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_borrowStock") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -457,7 +457,7 @@ TEST_CASE("test_TradeManager_can_not_borrowStock") {
     CHECK_EQ(tm->borrowStock(Datetime(200001010000), stock, 10.0, 200), false);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TradeManager_can_not_returnStock") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");

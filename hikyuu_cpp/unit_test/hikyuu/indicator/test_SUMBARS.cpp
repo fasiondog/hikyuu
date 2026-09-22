@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS") {
     Indicator result;
 
@@ -159,7 +159,7 @@ TEST_CASE("test_SUMBARS") {
     CHECK_UNARY(std::isnan(result[1]));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -198,7 +198,7 @@ TEST_CASE("test_SUMBARS_dyn") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_with_cval_dyn_param") {
     // 原始触发场景: CVAL 嵌套作 SUMBARS 动态参数.
     // 修复前: CVAL(one, 10) 中 one=CVAL(10) → 走 Indicator::operator() → alike true
@@ -230,7 +230,7 @@ TEST_CASE("test_SUMBARS_with_cval_dyn_param") {
 //-----------------------------------------------------------------------------
 // 动态/静态路径符号回归（修复 _dyn_calculate 返回负号的 bug）
 //-----------------------------------------------------------------------------
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_sign_regression") {
     // 反例：末位需向左回溯 2 根才累加到 a，距离 > 0（非退化解）
     //   修复前动态版返回 -2（符号错误），修复后返回 2（与静态版一致）
@@ -266,7 +266,7 @@ TEST_CASE("test_SUMBARS_dyn_sign_regression") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_static_equivalence") {
     // 多个位置的距离 > 0，覆盖非退化解等价类
     PriceList a;
@@ -299,7 +299,7 @@ TEST_CASE("test_SUMBARS_dyn_static_equivalence") {
     check_eq(s, SUMBARS(data, IndParam(CVAL(data, 90))));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_unreachable_discard") {
     // 全段累加不可达：动态版仅逐位写 NaN 且不推进 discard，静态版整体丢弃
     PriceList a;
@@ -321,7 +321,7 @@ TEST_CASE("test_SUMBARS_dyn_unreachable_discard") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_edge") {
     // 1. a <= 0：首根即 sum>=a 成立，距离恒为 0（验证 i==j 退化解，不死循环）
     {
@@ -389,7 +389,7 @@ TEST_CASE("test_SUMBARS_dyn_edge") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_varying_param") {
     // 动态参数 a 序列逐位变化，手工核算
     PriceList a;
@@ -421,7 +421,7 @@ TEST_CASE("test_SUMBARS_dyn_varying_param") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -22,7 +22,7 @@ using namespace hku;
  */
 
 /**
- * @par 检测点
+ * @par Test points
  * 核心回归: 全量计算 == 增量计算 (复用同一实例连续 setContext 触发 _increment_calculate)。
  *
  * 背景: IDDecline::_increment_calculate 曾因比较运算符从 '<' 误写为 '>' (从 ADVANCE
@@ -77,7 +77,7 @@ TEST_CASE("test_Decline_increment_equivalence") {
 }
 
 /**
- * @par 检测点
+ * @par Test points
  * DECLINE 与 ADVANCE 互为镜像, 锁定方向语义: DECLINE 统计下跌, ADVANCE 统计上涨。
  * 验证: 在有足够多股票数据的交易日 (D+A >= 10, 排除极少数据对齐的异质日),
  *   存在某日 D != A (非全平盘, < / > 运算符实际区分下跌/上涨)。
@@ -118,7 +118,7 @@ TEST_CASE("test_Decline_vs_Advance_mirror") {
 }
 
 /**
- * @par 检测点
+ * @par Test points
  * ignore_context 模式: 不依赖上下文, 直接按 query/market/stk_type 全市场统计。
  * 验证可正常计算且存在有效 (非 NaN) 输出点。
  */

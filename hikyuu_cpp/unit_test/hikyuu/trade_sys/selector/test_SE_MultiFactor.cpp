@@ -26,7 +26,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_MultiFactor") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -87,7 +87,7 @@ TEST_CASE("test_SE_MultiFactor") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_MultiFactor_export") {
     StockManager& sm = StockManager::instance();
     string filename(fmt::format("{}/SE_MultiFactor.xml", sm.tmpdir()));

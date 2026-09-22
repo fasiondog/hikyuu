@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ADJ_FACTOR") {
     KData k;
     Indicator adj_factor;
@@ -109,7 +109,7 @@ TEST_CASE("test_ADJ_FACTOR") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ADJ_FACTOR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

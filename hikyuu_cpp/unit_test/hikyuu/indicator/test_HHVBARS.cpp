@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019-4-1
  *      Author: fasiondog
  */
 
@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHVBARS") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sh000001");
@@ -131,7 +131,7 @@ TEST_CASE("test_HHVBARS") {
     CHECK_EQ(result[9], 5);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHVBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -170,7 +170,7 @@ TEST_CASE("test_HHVBARS_dyn") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHVBARS_dyn2") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -190,7 +190,7 @@ TEST_CASE("test_HHVBARS_dyn2") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHVBARS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

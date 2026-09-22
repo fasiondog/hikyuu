@@ -15,7 +15,7 @@
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_indicator_other") {
     double dx = Null<double>();
     size_t ix = size_t(dx);
@@ -28,7 +28,7 @@ TEST_CASE("test_indicator_other") {
     HKU_INFO("float nan to size_t: {}", ix);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_indicator_alike") {
     /** @arg 空 indicator 比较 */
     CHECK_UNARY(Indicator().alike(Indicator()));
@@ -82,7 +82,7 @@ TEST_CASE("test_indicator_alike_dynamic_parameters") {
     CHECK_FALSE(DROPNA(CLOSE()).alike(DROPNA(CLOSE())));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_add") {
     /** @arg 正常相加*/
     PriceList d1, d2;
@@ -153,7 +153,7 @@ TEST_CASE("test_operator_add_benchmark") {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
 
-    int cycle = 10000;  // 测试循环次数
+    int cycle = 10000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(Indicator_add, cycle, HKU_CSTR(""));
@@ -166,7 +166,7 @@ TEST_CASE("test_operator_add_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_sub") {
     /** @arg 正常相减*/
     PriceList d1, d2;
@@ -216,7 +216,7 @@ TEST_CASE("test_operator_sub_benchmark") {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
 
-    int cycle = 10000;  // 测试循环次数
+    int cycle = 10000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(Indicator_sub, cycle, HKU_CSTR(""));
@@ -228,7 +228,7 @@ TEST_CASE("test_operator_sub_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_multi") {
     /** @arg 正常相乘*/
     PriceList d1, d2;
@@ -278,7 +278,7 @@ TEST_CASE("test_operator_multi_benchmark") {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
 
-    int cycle = 10000;  // 测试循环次数
+    int cycle = 10000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(Indicator_multi, cycle, HKU_CSTR(""));
@@ -290,7 +290,7 @@ TEST_CASE("test_operator_multi_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_division") {
     /** @arg 正常相除*/
     PriceList d1, d2;
@@ -348,7 +348,7 @@ TEST_CASE("test_operator_division_benchmark") {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
 
-    int cycle = 10000;  // 测试循环次数
+    int cycle = 10000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(Indicator_div, cycle, HKU_CSTR(""));
@@ -360,7 +360,7 @@ TEST_CASE("test_operator_division_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_mod") {
     /** @arg 正常取模*/
     PriceList d1, d2;
@@ -424,7 +424,7 @@ TEST_CASE("test_operator_mod_benchmark") {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
 
-    int cycle = 10000;  // 测试循环次数
+    int cycle = 10000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(Indicator_mod, cycle, HKU_CSTR(""));
@@ -436,7 +436,7 @@ TEST_CASE("test_operator_mod_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_eq") {
     /** @arg 正常相等*/
     PriceList d1, d2;
@@ -455,13 +455,13 @@ TEST_CASE("test_operator_eq") {
         CHECK_EQ(result[i], true);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data3;
     result = (data1 == data3);
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 两个ind的size相同，但result_number不同 */
+    /** @arg The two ind have the same size but a different result_number */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query(0, 10);
@@ -486,7 +486,7 @@ TEST_CASE("test_operator_eq_benchmark") {
     Indicator data1 = PRICELIST(d1);
     Indicator data2 = PRICELIST(d2);
 
-    int cycle = 10000;  // 测试循环次数
+    int cycle = 10000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(Indicator_eq, cycle, HKU_CSTR(""));
@@ -498,7 +498,7 @@ TEST_CASE("test_operator_eq_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_ne") {
     /** @arg 正常不相等 */
     PriceList d1, d2;
@@ -523,7 +523,7 @@ TEST_CASE("test_operator_ne") {
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 两个ind的size相同，但result_number不同 */
+    /** @arg The two ind have the same size but a different result_number */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query(0, 10);
@@ -537,7 +537,7 @@ TEST_CASE("test_operator_ne") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_gt") {
     PriceList d1, d2, d3;
     for (size_t i = 0; i < 10; ++i) {
@@ -571,13 +571,13 @@ TEST_CASE("test_operator_gt") {
         CHECK_EQ(result[i], 0.0);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data4;
     result = data1 > data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 两个ind的size相同，但result_number不同 */
+    /** @arg The two ind have the same size but a different result_number */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query(0, 10);
@@ -591,7 +591,7 @@ TEST_CASE("test_operator_gt") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_ge") {
     PriceList d1, d2, d3;
     for (size_t i = 0; i < 10; ++i) {
@@ -625,13 +625,13 @@ TEST_CASE("test_operator_ge") {
         CHECK_EQ(result[i], 1.0);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data4;
     result = data1 >= data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 两个ind的size相同，但result_number不同 */
+    /** @arg The two ind have the same size but a different result_number */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query(0, 10);
@@ -645,7 +645,7 @@ TEST_CASE("test_operator_ge") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_lt") {
     PriceList d1, d2, d3;
     for (size_t i = 0; i < 10; ++i) {
@@ -679,13 +679,13 @@ TEST_CASE("test_operator_lt") {
         CHECK_EQ(result[i], 0.0);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data4;
     result = data1 < data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 两个ind的size相同，但result_number不同 */
+    /** @arg The two ind have the same size but a different result_number */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query(0, 10);
@@ -699,7 +699,7 @@ TEST_CASE("test_operator_lt") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_operator_le") {
     PriceList d1, d2, d3;
     for (size_t i = 0; i < 10; ++i) {
@@ -733,13 +733,13 @@ TEST_CASE("test_operator_le") {
         CHECK_EQ(result[i], 1.0);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data4;
     result = data1 <= data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 两个ind的size相同，但result_number不同 */
+    /** @arg The two ind have the same size but a different result_number */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KQuery query(0, 10);
@@ -753,7 +753,7 @@ TEST_CASE("test_operator_le") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_getResult_getResultAsPriceList") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -762,7 +762,7 @@ TEST_CASE("test_getResult_getResultAsPriceList") {
     Indicator ikdata, result1;
     PriceList result2;
 
-    /** @arg 源数据为空 */
+    /** @arg The source data is empty */
     ikdata = KDATA(kdata);
     result1 = ikdata.getResult(0);
     result2 = ikdata.getResultAsPriceList(0);
@@ -793,7 +793,7 @@ TEST_CASE("test_getResult_getResultAsPriceList") {
     CHECK_EQ(result2[9], doctest::Approx(26.55));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LOGIC_AND") {
     PriceList d1, d2, d3;
     for (size_t i = 0; i < 10; ++i) {
@@ -843,14 +843,14 @@ TEST_CASE("test_LOGIC_AND") {
         CHECK_EQ(result[i], 1.0);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data4;
     result = data1 & data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LOGIC_OR") {
     PriceList d1, d2, d3;
     for (size_t i = 0; i < 10; ++i) {
@@ -891,14 +891,14 @@ TEST_CASE("test_LOGIC_OR") {
         CHECK_EQ(result[i], 1.0);
     }
 
-    /** @arg 两个ind的size不同 */
+    /** @arg The two ind have different sizes */
     Indicator data4;
     result = data1 | data4;
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.size(), 0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_indicator_increment_calculate") {
     auto VAR1 = LLV(LOW(), 13);
     auto VAR2 = HHV(HIGH(), 13);
@@ -925,7 +925,7 @@ TEST_CASE("test_indicator_increment_calculate") {
     CHECK_EQ(x[159], y[159]);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_combineCalculateIndicators") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -993,7 +993,7 @@ TEST_CASE("test_combineCalculateIndicators") {
     check_indicator(result[1], CLOSE(kdata));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Indicator_operator_alike_non_cval") {
     // 验证 Indicator::operator() 中 alike 短路修复对非 CVAL 算子同样生效.
     // PRICELIST 同型同参 leaf, 基类 alike 走 leaf size/data 比较(非 ICval 的 selfAlike)

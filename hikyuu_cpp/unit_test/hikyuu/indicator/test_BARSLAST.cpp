@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BARSLAST") {
     Indicator result;
 
@@ -94,7 +94,7 @@ TEST_CASE("test_BARSLAST") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BARSLAST_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

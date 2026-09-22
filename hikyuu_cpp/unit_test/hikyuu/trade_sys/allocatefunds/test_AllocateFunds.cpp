@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AllocateFunds") {
     SEPtr se = SE_Fixed();
     AFPtr af = AF_EqualWeight();

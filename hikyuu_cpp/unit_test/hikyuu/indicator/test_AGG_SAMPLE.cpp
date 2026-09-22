@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -68,7 +68,7 @@ TEST_CASE("test_AGG_SAMPLE") {
     CHECK_EQ(result[0], doctest::Approx(expected_value));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_time_parameter") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -120,7 +120,7 @@ TEST_CASE("test_AGG_SAMPLE_time_parameter") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

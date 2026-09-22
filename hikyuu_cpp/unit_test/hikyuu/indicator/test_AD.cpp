@@ -18,7 +18,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AD") {
     Stock stk = getStock("SH600004");
     KQuery query = KQueryByIndex(-10);
@@ -41,7 +41,7 @@ TEST_CASE("test_AD") {
 TEST_CASE("test_AD_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_AD_benchmark, cycle, fmt::format("data len: {}", kdata.size()));
@@ -59,7 +59,7 @@ TEST_CASE("test_AD_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AD_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

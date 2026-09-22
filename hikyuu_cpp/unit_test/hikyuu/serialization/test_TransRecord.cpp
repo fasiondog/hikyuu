@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TransRecord_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/TransRecord.xml";
@@ -44,7 +44,7 @@ TEST_CASE("test_TransRecord_serialize") {
     CHECK_EQ(t1, t2);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TransList_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/TransList.xml";

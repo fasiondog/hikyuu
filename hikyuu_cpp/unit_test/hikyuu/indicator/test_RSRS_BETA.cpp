@@ -21,9 +21,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RSRS_BETA") {
-    // 非法参数 n
+    // The invalid parameter n
     CHECK_THROWS_AS(RSRS_BETA(1), std::exception);
     CHECK_THROWS_AS(RSRS_BETA(0), std::exception);
 }
@@ -105,7 +105,7 @@ TEST_CASE("test_RSRS_BETA_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RSRS_BETA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

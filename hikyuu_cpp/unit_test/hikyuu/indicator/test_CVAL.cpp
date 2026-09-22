@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL") {
     Indicator result;
 
@@ -93,7 +93,7 @@ TEST_CASE("test_CVAL") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL_nested_size_propagation") {
     // 修复前: CVAL(one, 10) 中 one=CVAL(10) → 走 Indicator::operator()
     //   alike(新空壳 ICval, 已计算 CVAL10) 为 true → 短路返回 m_imp 的克隆空壳
@@ -122,7 +122,7 @@ TEST_CASE("test_CVAL_nested_size_propagation") {
     CHECK_NE(three.getImp().get(), two.getImp().get());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL_nested_state_sharing") {
     // 修复使 alike==true 时返回 ind(共享底层节点), 而非 m_imp 的独立克隆.
     // 这是修复引入的语义变更: 返回值与 ind 共享同一 IndicatorImp.
@@ -151,7 +151,7 @@ TEST_CASE("test_CVAL_nested_state_sharing") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

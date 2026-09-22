@@ -29,7 +29,7 @@ static bool _pluginValid() {
     return plugin && isValidLicense();
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Stock_extra_ktype") {
     HKU_IF_RETURN(!_pluginValid(), void());
 

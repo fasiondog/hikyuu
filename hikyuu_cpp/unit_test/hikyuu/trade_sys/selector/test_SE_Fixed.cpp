@@ -23,17 +23,17 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_Fixed") {
     StockManager& sm = StockManager::instance();
 
     SYSPtr sys = SYS_Simple();
     SEPtr se = SE_Fixed();
 
-    /** @arg 试图加入一个不存在的stock */
+    /** @arg Try to add a stock that does not exist */
     CHECK_THROWS_AS(se->addStock(Stock(), sys), std::exception);
 
-    /** @arg 试图加入一个空的系统策略原型 */
+    /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
     // /** @arg 试图加入一个缺少MM | SG的系统策略原型 */
@@ -68,7 +68,7 @@ TEST_CASE("test_SE_Fixed") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 克隆操作 */
+    /** @arg The clone operation */
     proto_sys_list = se->getProtoSystemList();
     se->calculate(proto_sys_list, KQuery(-20));
     SEPtr se2;
@@ -86,7 +86,7 @@ TEST_CASE("test_SE_Fixed") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_Fixed_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

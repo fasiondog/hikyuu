@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ThreadPool") {
     {
         SPEND_TIME(test_ThreadPool);
@@ -42,7 +42,7 @@ TEST_CASE("test_ThreadPool") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MQThreadPool") {
     {
         SPEND_TIME(test_MQThreadPool);
@@ -65,7 +65,7 @@ TEST_CASE("test_MQThreadPool") {
 }
 
 #if 0
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GlobalStealThreadPool") {
     {
         SPEND_TIME(test_GlobalStealThreadPool);
@@ -87,7 +87,7 @@ TEST_CASE("test_GlobalStealThreadPool") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GlobalMQStealThreadPool") {
     {
         SPEND_TIME(test_GlobalMQStealThreadPool);

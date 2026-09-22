@@ -22,11 +22,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_COV") {
     Indicator result;
 
-    // 空指标
+    // An empty indicator
     result = COV(Indicator(), Indicator(), 10);
     CHECK_UNARY(result.empty());
 
@@ -41,7 +41,7 @@ TEST_CASE("test_COV") {
     Indicator x = PRICELIST(a);
     Indicator y = PRICELIST(b);
 
-    // 非法参数 n
+    // The invalid parameter n
     CHECK_THROWS_AS(COV(x, y, -1), std::exception);
     CHECK_THROWS_AS(COV(x, y, 1), std::exception);
 
@@ -95,7 +95,7 @@ TEST_CASE("test_COV_benchmark") {
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
     Indicator h = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_COV_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -112,7 +112,7 @@ TEST_CASE("test_COV_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_COV_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

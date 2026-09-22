@@ -20,14 +20,14 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SLOPE") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KData kdata;
     Indicator slope;
 
-    /** @arg 空指标 */
+    /** @arg An empty indicator */
     slope = SLOPE();
     CHECK_EQ(slope.size(), 0);
     CHECK_EQ(slope.name(), "SLOPE");
@@ -72,7 +72,7 @@ TEST_CASE("test_SLOPE") {
     CHECK_EQ(slope[3], doctest::Approx(12.347).epsilon(0.0001));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SLOPE_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -115,7 +115,7 @@ TEST_CASE("test_SLOPE_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SLOPE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
