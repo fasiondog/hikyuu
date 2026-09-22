@@ -11,38 +11,38 @@
 
 namespace hku {
 
-/** 保存因子 */
+/** Save the factor */
 void HKU_API saveFactor(const Factor& factor, bool update_before = true);
 
-/** 保存特殊因子值 */
+/** Save the special factor values */
 void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
                                      const DatetimeList& dates, const PriceList& values,
                                      bool replace);
 
 bool HKU_API hasFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
-/** 获取因子 */
+/** Get the factor */
 Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
-/** 删除因子 */
+/** Delete the factor */
 void HKU_API removeFactor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
-/** 获取所有因子 */
+/** Get all the factors */
 FactorList HKU_API getAllFactors();
 
-/** 获取所有因子集合 */
+/** Get all the factor sets */
 FactorSetList HKU_API getAllFactorSets();
 
-/** 更新保存的所有因子数据至当前 */
+/** Update all the saved factor data to the current */
 void HKU_API updateAllFactorsValues(const KQuery::KType& ktype = KQuery::DAY);
 
-/** 保存因子集合 */
+/** Save the factor set */
 void HKU_API saveFactorSet(const FactorSet& set);
 
-/** 删除因子集合 */
+/** Delete the factor set */
 void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype);
 
-/** 获取因子集合 */
+/** Get the factor set */
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
 bool isValidFactorName(const string& name);

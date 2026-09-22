@@ -11,18 +11,19 @@
 namespace hku {
 
 /**
- * @brief 策略回测（事件驱动方式）
+ * @brief Strategy backtest (event driven way)
  *
- * @param context 策略上下文
- * @param on_bar 策略主体执行函数
- * @param tm 策略测试账户
- * @param start_date 起始日期
- * @param end_date 结束日期（不包含本身）
- * @param ktype K线类型
- * @param ref_market 所属市场
- * @param mode 模式  0: 当前bar收盘价执行买卖操作；1: 下一bar开盘价执行买卖操作;
- * @param support_short 是否支持做空
- * @param slip 滑点算法
+ * @param context strategy context
+ * @param on_bar the main execution function of the strategy
+ * @param tm the strategy test account
+ * @param start_date start date
+ * @param end_date end date (exclusive)
+ * @param ktype K-line type
+ * @param ref_market the market it belongs to
+ * @param mode mode: 0: the buy and sell operations are executed at the current bar close price;
+ *             1: they are executed at the next bar open price;
+ * @param support_short whether short selling is supported
+ * @param slip slippage algorithm
  * @ingroup Strategy
  */
 void HKU_API backtest(const StrategyContext& context, const std::function<void(Strategy*)>& on_bar,
@@ -31,7 +32,7 @@ void HKU_API backtest(const StrategyContext& context, const std::function<void(S
                       const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
                       int mode = 0, bool support_short = false, SlippagePtr slip = SlippagePtr());
 
-// 仅在 sm.init 之后使用
+// It is used after sm.init only
 void HKU_API backtest(const std::function<void(Strategy*)>& on_bar, const TradeManagerPtr& tm,
                       const Datetime& start_date, const Datetime& end_date = Null<Datetime>(),
                       const KQuery::KType& ktype = KQuery::DAY, const string& ref_market = "SH",
