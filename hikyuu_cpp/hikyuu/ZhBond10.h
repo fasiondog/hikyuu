@@ -12,18 +12,18 @@
 namespace hku {
 
 /**
- * 10年期中国国债数据结构
+ * Data structure of the 10-year Chinese treasury bond
  * @ingroup StockManage
  */
 struct HKU_API ZhBond10 {
-    Datetime date;  ///< 日期
-    price_t value;  ///< 收益率
+    Datetime date;  ///< Date
+    price_t value;  ///< Yield
 };
 
 typedef vector<ZhBond10> ZhBond10List;
 
 /**
- * 输出 ZhBond10 ZhBond10(date, value)
+ * Output ZhBond10: ZhBond10(date, value)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream&, const ZhBond10&);

@@ -14,12 +14,12 @@
 namespace hku {
 
 /**
- * 权息数据结构
+ * Ex-rights/ex-dividend data structure
  * @ingroup StockManage
  */
 class HKU_API StockWeight {
 public:
-    /** 默认构造函数，返回Null<StockWeight>() */
+    /** Default constructor, returns Null<StockWeight>() */
     StockWeight() = default;
 
     explicit StockWeight(const Datetime& datetime);
@@ -28,68 +28,68 @@ public:
                 price_t priceForSell, price_t bonus, price_t increasement, price_t totalCount,
                 price_t freeCount, price_t suogu);
 
-    /** 权息日期 */
+    /** Ex-rights/ex-dividend date */
     Datetime datetime() const noexcept {
         return m_datetime;
     }
 
-    /** 每10股送X股 */
+    /** Bonus shares per 10 shares (X shares given per 10 shares) */
     price_t countAsGift() const noexcept {
         return m_countAsGift;
     }
 
-    /** 每10股配X股 */
+    /** Rights shares per 10 shares (X shares allotted per 10 shares) */
     price_t countForSell() const noexcept {
         return m_countForSell;
     }
 
-    /** 配股价 */
+    /** Rights issue price */
     price_t priceForSell() const noexcept {
         return m_priceForSell;
     }
 
-    /** 每10股红利 */
+    /** Dividend per 10 shares */
     price_t bonus() const noexcept {
         return m_bonus;
     }
 
-    /** 每10股转增X股 */
+    /** Capitalized shares per 10 shares (X shares converted per 10 shares) */
     price_t increasement() const noexcept {
         return m_increasement;
     }
 
-    /** 总股本（万股） */
+    /** Total share capital (in units of 10 thousand shares) */
     price_t totalCount() const noexcept {
         return m_totalCount;
     }
 
-    /** 流通股（万股） */
+    /** Outstanding shares (in units of 10 thousand shares) */
     price_t freeCount() const noexcept {
         return m_freeCount;
     }
 
-    /** 扩缩股比例 */
+    /** Share expansion/contraction ratio (suogu) */
     price_t suogu() const noexcept {
         return m_suogu;
     }
 
 private:
-    Datetime m_datetime;         // 权息日期
-    price_t m_countAsGift{0.};   // 每10股送X股
-    price_t m_countForSell{0.};  // 每10股配X股
-    price_t m_priceForSell{0.};  // 配股价
-    price_t m_bonus{0.};         // 每10股红利
-    price_t m_increasement{0.};  // 每10股转增X股
-    price_t m_totalCount{0.};    // 总股本（万股）
-    price_t m_freeCount{0.};     // 流通股（万股）
-    price_t m_suogu{0.};         // 扩缩股比例
+    Datetime m_datetime;         // Ex-rights/ex-dividend date
+    price_t m_countAsGift{0.};   // Bonus shares per 10 shares
+    price_t m_countForSell{0.};  // Rights shares per 10 shares
+    price_t m_priceForSell{0.};  // Rights issue price
+    price_t m_bonus{0.};         // Dividend per 10 shares
+    price_t m_increasement{0.};  // Capitalized shares per 10 shares
+    price_t m_totalCount{0.};    // Total share capital (10 thousand shares)
+    price_t m_freeCount{0.};     // Outstanding shares (10 thousand shares)
+    price_t m_suogu{0.};         // Share expansion/contraction ratio
 };
 
 /** @ingroup StockManage */
 typedef vector<StockWeight> StockWeightList;
 
 /**
- * 输出权息信息，如：Weight(datetime, countAsGift, countForSell,
+ * Output the ex-rights/ex-dividend information, e.g.: Weight(datetime, countAsGift, countForSell,
  * priceForSell, bonus, increasement, totalCount, freeCount)
  * @ingroup StockManage
  */
@@ -97,7 +97,7 @@ HKU_API std::ostream& operator<<(std::ostream&, const StockWeight&);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// 关系比较函数
+// Relational comparison functions
 //
 ///////////////////////////////////////////////////////////////////////////////
 bool operator==(const StockWeight&, const StockWeight&);
@@ -107,32 +107,32 @@ bool operator<(const StockWeight&, const StockWeight&);
 bool operator>=(const StockWeight&, const StockWeight&);
 bool operator<=(const StockWeight&, const StockWeight&);
 
-/* 相等比较, 仅根据日期判断 */
+/* Equal comparison, judged by the date only */
 inline bool operator==(const StockWeight& m1, const StockWeight& m2) {
     return m1.datetime() == m2.datetime();
 }
 
-/* 不等比较， 仅根据日期判断 */
+/* Unequal comparison, judged by the date only */
 inline bool operator!=(const StockWeight& m1, const StockWeight& m2) {
     return m1.datetime() != m2.datetime();
 }
 
-/* 大于比较, 仅根据日期判断 */
+/* Greater-than comparison, judged by the date only */
 inline bool operator>(const StockWeight& m1, const StockWeight& m2) {
     return m1.datetime() > m2.datetime();
 }
 
-/* 小于比较， 仅根据日期判断 */
+/* Less-than comparison, judged by the date only */
 inline bool operator<(const StockWeight& m1, const StockWeight& m2) {
     return m1.datetime() < m2.datetime();
 }
 
-/* 大于等于比较, 仅根据日期判断 */
+/* Greater-than-or-equal comparison, judged by the date only */
 inline bool operator>=(const StockWeight& m1, const StockWeight& m2) {
     return m1.datetime() >= m2.datetime();
 }
 
-/* 小于等于比较， 仅根据日期判断 */
+/* Less-than-or-equal comparison, judged by the date only */
 inline bool operator<=(const StockWeight& m1, const StockWeight& m2) {
     return m1.datetime() <= m2.datetime();
 }
