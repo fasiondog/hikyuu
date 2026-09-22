@@ -1,7 +1,7 @@
 /*
  * SMA.h
  *
- *  Created on: 2015年2月16日
+ *  Created on: 2015-2-16
  *      Author: fasiondog
  */
 
@@ -14,13 +14,13 @@
 namespace hku {
 
 /**
- * 求移动平均
+ * Calculate the moving average
  * @details
  * <pre>
- * 用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
+ * Usage: if Y=SMA(X,N,M) then Y=[M*X+(N-M)*Y')/N, where Y' is the Y value of the previous period
  * </pre>
- * @param n 计算均值的周期窗口，必须为大于0的整数
- * @param m 系数
+ * @param n the period window for calculating the average, it must be an integer greater than 0
+ * @param m coefficient
  * @ingroup Indicator
  */
 Indicator HKU_API SMA(int n = 22, double m = 2.0);
@@ -29,14 +29,14 @@ Indicator HKU_API SMA(const IndParam& n, double m = 2.0);
 Indicator HKU_API SMA(const IndParam& n, const IndParam& m);
 
 /**
- * 求移动平均
+ * Calculate the moving average
  * @details
  * <pre>
- * 用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
+ * Usage: if Y=SMA(X,N,M) then Y=[M*X+(N-M)*Y')/N, where Y' is the Y value of the previous period
  * </pre>
- * @param ind 待计算的数据
- * @param n 计算均值的周期窗口，必须为大于0的整数
- * @param m 系数
+ * @param ind the data to be calculated
+ * @param n the period window for calculating the average, it must be an integer greater than 0
+ * @param m coefficient
  * @ingroup Indicator
  */
 inline Indicator SMA(const Indicator& ind, int n = 22, double m = 2.0) {

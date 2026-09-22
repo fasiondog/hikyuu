@@ -1,7 +1,7 @@
 /*
  * REF.h
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2015-3-21
  *      Author: fasiondog
  */
 
@@ -14,21 +14,21 @@
 namespace hku {
 
 /**
- * REF 向前引用 （即右移）
- * 引用若干周期前的数据。
- * 用法：　REF(X，A)　引用A周期前的X值。
- * @param n 引用n周期前的值，即右移n位
+ * REF forward reference (i.e. shift right)
+ * Reference the data of several periods before.
+ * Usage: REF(X,A) references the X value A periods before.
+ * @param n references the value n periods before, i.e. shifting right by n
  * @ingroup Indicator
  */
 Indicator HKU_API REF(int n);
 Indicator HKU_API REF(const IndParam& n);
 
 /**
- * REF 向前引用 （即右移）
- * 引用若干周期前的数据。
- * 用法：　REF(X，A)　引用A周期前的X值。
- * @param ind 待计算的数据
- * @param n 引用n周期前的值，即右移n位
+ * REF forward reference (i.e. shift right)
+ * Reference the data of several periods before.
+ * Usage: REF(X,A) references the X value A periods before.
+ * @param ind the data to be calculated
+ * @param n references the value n periods before, i.e. shifting right by n
  * @ingroup Indicator
  */
 inline Indicator REF(const Indicator& ind, int n) {
