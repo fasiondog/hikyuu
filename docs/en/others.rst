@@ -1,0 +1,242 @@
+.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/others.rst
+
+杂项函数
+=============
+
+.. note::
+
+    get_inds_views, get_market_view 以及 KData.to_pyarrow 等和 arrow 相关功能，需要额外安装 hikyuu_plugin 包支持。
+
+    python -m pip install hikyuu-plugin
+
+    使用前，需 from hikyuu_plugin.extra import * 进行插件导入.
+
+.. py:function:: get_market_view(stks[, date=Datetime(), market='SH']) -> pandas.DataFrame
+
+    获取指定股票集合在指定交易日的行情数据，不包含当日停牌无数据的股票。如未指定日期，则返回最后交易日行情数据，
+    如同时接收了行情数据，则为实时行情。
+
+    注: 此函数依赖于日线数据
+    
+    :param list[Stock] stks: 股票列表
+    :param Datetime date: 获取指定日期的行情数据
+    :param str market: 市场代码
+    :return: 指定股票列表最后行情数据
+    :rtype: pandas.DataFrame
+
+    ::
+
+        In [2]: get_market_view([s for s in sm])
+        Out[2]: 
+            证券代码        证券名称       日期     开盘价     最高价     最低价     收盘价  ...  涨跌幅（%）    振幅(%)  换手率(%)        总市值      流通市值    市净率  动态市盈率
+        0     SZ301632       C广东建科 2025-08-13     32.840     46.580     32.040     43.600  ...    28.197589  44.275274  78.480086  1.824922e+06  3.002447e+05  6.827756 -272.500006
+        1     SZ159271     恒生指数ETF 2025-08-13      1.002      1.016      1.002      1.016  ...     1.905717   1.397206        NaN           NaN           NaN       NaN         NaN
+        2     SH589850   科创50ETF东财 2025-08-13      1.018      1.029      1.017      1.026  ...     0.489716   1.178782        NaN           NaN           NaN       NaN         NaN
+        3     SZ180901        润泽REIT 2025-08-13      6.120      6.139      6.040      6.090  ...    -0.620104   1.617647        NaN           NaN           NaN       NaN         NaN
+        4     SH589200  科创200ETF工银 2025-08-13      1.037      1.065      1.037      1.063  ...     2.507232   2.700096        NaN           NaN           NaN       NaN         NaN
+        ...        ...             ...        ...        ...        ...        ...        ...  ...          ...        ...        ...           ...           ...       ...         ...
+        8060  SH600159        大龙地产 2025-08-13      3.000      3.000      2.920      2.930  ...    -1.677852   2.666667   1.624909  2.431909e+05  2.431909e+05  1.408722 -732.499965
+        8061  SZ000548        湖南投资 2025-08-13      5.670      5.700      5.630      5.640  ...    -0.529101   1.234568   1.362903  2.815577e+05  2.815399e+05  1.369198   35.250001
+        8062  SH603180        金牌家居 2025-08-13     21.260     21.410     20.930     20.970  ...    -1.317647   2.257761   0.946926  3.234771e+05  3.234771e+05  1.153155   22.793478
+        8063  SH601003        柳钢股份 2025-08-13      6.060      6.090      6.010      6.040  ...    -0.330033   1.320132   1.529113  1.547927e+06  1.547927e+06  1.792604   15.100000
+        8064  SH000129         180波动 2025-08-13  15259.241  15280.421  15175.761  15190.970  ...    -0.368136   0.685879        NaN           NaN           NaN       NaN         NaN
+
+        [8065 rows x 17 columns]
+
+        In [3]: get_market_view([s for s in sm], Datetime(20250812))
+        Out[3]: 
+            证券代码        证券名称       日期     开盘价     最高价     最低价     收盘价  ...  涨跌幅（%）    振幅(%)  换手率(%)        总市值      流通市值    市净率  动态市盈率
+        0     SZ301632       C广东建科 2025-08-12     32.660     40.000     30.020     34.010  ...     4.133497  30.557257  84.592471  1.423523e+06  2.342046e+05  5.325963 -212.562505
+        1     SZ159271     恒生指数ETF 2025-08-12      0.993      0.997      0.991      0.997  ...     0.402820   0.604230        NaN           NaN           NaN       NaN         NaN
+        2     SH589850   科创50ETF东财 2025-08-12      1.001      1.027      0.996      1.021  ...     1.998002   3.096903        NaN           NaN           NaN       NaN         NaN
+        3     SZ180901        润泽REIT 2025-08-12      6.006      6.145      6.003      6.128  ...     1.038747   2.364302        NaN           NaN           NaN       NaN         NaN
+        4     SH589200  科创200ETF工银 2025-08-12      1.035      1.039      1.020      1.037  ...    -0.096339   1.835749        NaN           NaN           NaN       NaN         NaN
+        ...        ...             ...        ...        ...        ...        ...        ...  ...          ...        ...        ...           ...           ...       ...         ...
+        8059  SH600159        大龙地产 2025-08-12      2.990      3.020      2.940      2.980  ...    -0.334448   2.675585   2.259280  2.473410e+05  2.473410e+05  1.432761 -744.999965
+        8060  SZ000548        湖南投资 2025-08-12      5.670      5.700      5.640      5.670  ...     0.176678   1.058201   1.138197  2.830554e+05  2.830375e+05  1.376481   35.437501
+        8061  SH603180        金牌家居 2025-08-12     21.430     21.520     21.210     21.250  ...    -0.793651   1.446570   0.703566  3.277963e+05  3.277963e+05  1.168552   23.097826
+        8062  SH601003        柳钢股份 2025-08-12      6.110      6.180      6.040      6.060  ...    -0.818331   2.291326   1.396695  1.553053e+06  1.553053e+06  1.798540   15.150000
+        8063  SH000129         180波动 2025-08-12  15230.810  15321.111  15229.380  15247.100  ...     0.206570   0.602273        NaN           NaN           NaN       NaN         NaN
+
+        [8064 rows x 17 columns]
+        
+
+
+.. py:function:: concat_to_df(dates, ind_list[, head_stock_code=True, head_ind_name=False])
+    
+    将列表中的指标至合并在一张 pandas DataFrame 中
+
+    :param DatetimeList dates: 指定的日期列表
+    :param sequence ind_list: 已计算的指标列表
+    :param bool head_ind_name: 表标题是否使用指标名称
+    :param bool head_stock_code: 表标题是否使用证券代码
+    :return: 合并后的 DataFrame, 以 dates 为 index（注: dates列 为 Datetime 类型）
+
+    ::
+
+        query = Query(-200)
+        k_list = [stk.get_kdata(query) for stk in [sm['sz000001'], sm['sz000002']]]
+        ma_list = [MA(CLOSE(k)) for k in k_list]
+        df = concat_to_df(sm.get_trading_calendar(query), ma_list, head_stock_code=True, head_ind_name=False)
+        df
+
+                date	SZ000001	SZ000002
+        0	2023-05-12 00:00:00	12.620000	15.060000
+        1	2023-05-15 00:00:00	12.725000	15.060000
+        2	2023-05-16 00:00:00	12.690000	15.010000
+        3	2023-05-17 00:00:00	12.640000	14.952500
+        4	2023-05-18 00:00:00	12.610000	14.886000
+        ...	...	...	...
+        195	2024-03-01 00:00:00	9.950455	9.837273
+        196	2024-03-04 00:00:00	9.995909	9.838182
+        197	2024-03-05 00:00:00	10.038182	9.816364
+        198	2024-03-06 00:00:00	10.070455	9.776818
+        199	2024-03-07 00:00:00	10.101364	9.738182
+
+
+.. py:function:: get_inds_view(stks, inds, date[, cal_len=100, ktype=Query.DAY, market='SH']) -> pandas.DataFrame
+
+    方式1: 获取指定日期的各证券的各指标结果
+
+      :param stks: 证券列表
+      :param list[Indicator] inds: 指标列表
+      :param Datetime date: 指定日期
+      :param int cal_len: 计算需要的数据长度
+      :param str ktype: k线类型
+      :param str market: 指定行情市场（用于日期对齐）
+
+    ::
+
+        In [4]: get_inds_view(sm, [OPEN(),CLOSE(),MA(CLOSE()), AMA(CLOSE()), MA(CLOSE(), 20)], Datetime(20250822))
+        Out[4]:
+            证券代码               证券名称   交易时间      OPEN     CLOSE           MA          AMA           MA
+        0     SZ399295                 创价值 2025-08-22  4928.540  5041.720  4710.365909  4909.715525  4718.344500
+        1     SH688630               芯碁微装 2025-08-22   124.110   129.000   124.648182   129.966137   127.810500
+        2     SH600605               汇通能源 2025-08-22    35.250    34.910    37.600000    37.489924    37.400000
+        3     SH000852               中证1000 2025-08-22  7250.190  7362.940  6932.661364  7184.920216  6955.541000
+        4     SH000001               上证指数 2025-08-22  3772.280  3825.760  3656.552273  3753.987779  3662.238000
+        ...        ...                    ...        ...       ...       ...          ...          ...          ...
+        8479  BJ920101               志高机械 2025-08-22    52.630    52.300    54.744286    54.284372    54.744286
+        8480  SZ159280  港股通互联网ETF汇添富 2025-08-22     1.019     1.031     1.032600     1.031993     1.032600
+        8481  SH563620      自由现金流全指ETF 2025-08-22     1.012     1.013     1.011667     1.011238     1.011667
+        8482  SZ159369      创业板50ETF易方达 2025-08-22     1.002     1.039     1.024000     1.022333     1.024000
+        8483  SZ159283        通用航空ETF南方 2025-08-22     1.006     1.026     1.016500     1.015444     1.016500
+
+        [8484 rows x 8 columns]
+
+    方式2: 获取按指定Query查询计算的各证券的各指标结果, 结果中将包含指定 Query 包含的所有指定市场交易日日期
+
+    get_inds_view(stks, inds, query[, market='SH']) -> pandas.DataFrame
+
+      :param stks: 指定证券列表
+      :param list[Indicator] inds: 指定指标列表
+      :param Query query: 查询条件
+      :param str market: 指定行情市场（用于日期对齐）
+
+    ::
+
+        In [5]: get_inds_view(sm, [OPEN(),CLOSE(),MA(CLOSE()), AMA(CLOSE()), MA(CLOSE(), 20)], Query(-2000))
+        Out[5]:
+                证券代码         证券名称   交易时间      OPEN     CLOSE           MA          AMA           MA
+        0         SZ399295           创价值 2017-06-05  3000.070  3003.850  3003.850000  3003.850000  3003.850000
+        1         SZ399295           创价值 2017-06-06  2998.360  3011.500  3007.675000  3007.250000  3007.675000
+        2         SZ399295           创价值 2017-06-07  3004.490  3065.660  3027.003333  3033.210000  3027.003333
+        3         SZ399295           创价值 2017-06-08  3058.980  3058.970  3034.995000  3040.975491  3034.995000
+        4         SZ399295           创价值 2017-06-09  3055.200  3060.110  3040.018000  3046.784218  3040.018000
+        ...            ...              ...        ...       ...       ...          ...          ...          ...
+        16367995  SZ159283  通用航空ETF南方 2025-08-18       NaN       NaN          NaN          NaN          NaN
+        16367996  SZ159283  通用航空ETF南方 2025-08-19       NaN       NaN          NaN          NaN          NaN
+        16367997  SZ159283  通用航空ETF南方 2025-08-20       NaN       NaN          NaN          NaN          NaN
+        16367998  SZ159283  通用航空ETF南方 2025-08-21     1.012     1.007     1.007000     1.007000     1.007000
+        16367999  SZ159283  通用航空ETF南方 2025-08-22     1.006     1.026     1.016500     1.015444     1.016500
+
+        [16368000 rows x 8 columns]
+
+
+.. py:function:: df_to_ind(df, col_name, col_date=None)
+    
+    将 pandas.DataFrame 指定列转化为 Indicator
+
+    :param df: pandas.DataFrame
+    :param col_name: 指定列名
+    :param col_date: 指定日期列名 (为None时忽略, 否则该列为对应参考日期)
+    :return: Indicator
+
+    ::
+
+        # 示例, 从 akshare 获取美国国债10年期收益率:
+        import akshare as ak
+        df = ak.bond_zh_us_rate("19901219")
+        x = df_to_ind(df, '美国国债收益率10年', '日期')
+
+
+.. py:function:: parallel_run_sys(sys_list, query[, reset=False, reset_all=False]) -> List[FundsList]
+
+    并行运行多个系系统, 并返回 list FundsList, 各账户对应资产（按query时间段）
+
+    :param sys_list: 系统列表
+    :param query: 查询条件
+    :param bool reset: 执行前是否依据系统部件共享属性复位
+    :param bool reset_all: 强制复位所有部件
+
+.. py:function:: parallel_run_pf(pf_list, query[, force=False]) -> List[FundsList]
+
+    并行执行多个投资组合策略, 并返回 list FundsList, 各账户对应资产（按query时间段）
+
+    :param list pf_list: 投资组合列表
+    :param Query query: 查询条件
+    :param bool force: 强制重新计算
+
+
+.. py:function:: multi_regression(stk, query, *inds) -> list
+
+    对股票进行多元线性回归分析，使用股票收盘价的收益率作为因变量，输入的指标作为自变量进行多元线性回归。
+
+    回归模型为：Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
+
+    .. note::
+
+        NaN值处理策略：如果某个时间点的任何因子或收益率为NaN，则该时间点的数据被舍弃，但不会影响其他时间点的数据和其他因子。
+
+    :param Stock stk: 股票对象
+    :param KQuery query: K线查询条件，用于获取回归分析所需的时间范围和数据类型
+    :param Indicator \*inds: 一个或多个指标作为自变量（因子）
+    :return: 回归系数列表，第一个元素是alpha(截距)，后续是各个beta系数
+    :rtype: list
+
+    ::
+
+        >>> stk = getStock('sh000001')
+        >>> result = multi_regression(stk, KQuery(-252), MA(CLOSE(), 5), MACD(CLOSE())[0], RSI(CLOSE(), 14))
+        >>> alpha = result[0]  # 截距项
+        >>> beta1 = result[1]  # 第一个因子的系数
+        >>> beta2 = result[2]  # 第二个因子的系数
+        >>> beta3 = result[3]  # 第三个因子的系数
+
+
+.. py:function:: multi_regression_full(stk, query, \*inds) -> list
+
+    对股票进行多元线性回归分析（完整版本），返回完整的回归结果，包括系数、残差序列、残差平方和和R²值
+
+    :param Stock stk: 股票对象
+    :param KQuery query: K线查询条件
+    :param Indicator \*inds: 一个或多个指标作为自变量（因子）
+    :return: 回归结果列表，格式为：
+             [alpha, beta1, beta2, ..., betan, e1, e2, ..., en, RSS, R²]
+             - alpha: 截距项
+             - beta1~betan: 各因子系数
+             - e1~en: 各数据点的残差（实际值-预测值）
+             - RSS: 残差平方和
+             - R²: 决定系数
+    :rtype: list
+
+    ::
+
+        >>> stk = getStock('sh000001')
+        >>> result = multi_regression_full(stk, KQuery(-252), MA(CLOSE(), 5), MA(CLOSE(), 10))
+        >>> alpha = result[0]
+        >>> beta1 = result[1]
+        >>> beta2 = result[2]
+        >>> residuals = result[3:-2]  # 残差序列
+        >>> RSS = result[-2]
+        >>> R_squared = result[-1]
