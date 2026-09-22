@@ -15,14 +15,15 @@
 
 namespace hku {
 
-// Pimpl 实现结构体
+// The Pimpl implementation struct
 struct AsyncSQLiteStatement::Impl {
     sqlite3 *m_db = nullptr;
     sqlite3_stmt *m_stmt = nullptr;
     bool m_needs_reset = false;
     int m_step_status = SQLITE_DONE;
     bool m_at_first_step = true;
-    AsyncSQLiteConnect *m_connect = nullptr;  // 持有连接指针以获取线程池执行器
+    AsyncSQLiteConnect *m_connect =
+      nullptr;  // Hold the connection pointer to get the thread pool executor
 
     Impl(AsyncSQLiteConnect *connect, sqlite3 *db, sqlite3_stmt *stmt)
     : m_db(db), m_stmt(stmt), m_connect(connect) {}
@@ -46,7 +47,7 @@ struct AsyncSQLiteStatement::Impl {
         }
     }
 
-    // 从连接获取线程池执行器
+    // Get the thread pool executor from the connection
     ThreadPool::ExecutorWrapper getExecutor() const {
         return m_connect->getThreadPoolExecutor();
     }
@@ -56,10 +57,11 @@ AsyncSQLiteStatement::AsyncSQLiteStatement(AsyncSQLiteConnect *connect, const st
 : AsyncSQLStatementBase(connect, sql), m_impl(nullptr) {
     HKU_CHECK(connect != nullptr, "Invalid AsyncSQLiteConnect");
 
-    // 确保连接已初始化（同步操作）
+    // Make sure the connection is initialized (a synchronous operation)
     connect->_connect();
 
-    // 在构造函数中准备 statement（同步操作，因为只是本地内存操作）
+    // Prepare the statement in the constructor (a synchronous operation, because it is a local
+    // memory operation only)
     auto *raw_conn = connect->getRawConnection();
     sqlite3 *db = static_cast<sqlite3 *>(raw_conn);
 
@@ -80,7 +82,7 @@ AsyncSQLiteStatement::AsyncSQLiteStatement(AsyncSQLiteConnect *connect, const st
 }
 
 AsyncSQLiteStatement::~AsyncSQLiteStatement() {
-    // m_impl 会自动清理 sqlite3_stmt
+    // m_impl cleans up the sqlite3_stmt automatically
 }
 
 void AsyncSQLiteStatement::_reset() {
@@ -94,9 +96,9 @@ net::awaitable<void> AsyncSQLiteStatement::sub_exec() {
         throw exception("AsyncSQLiteStatement is not initialized");
     }
 
-    // 将 reset 和 step 合并到一个 co_run 中
+    // Merge reset and step into a single co_run
     auto exec_func = [this]() -> int {
-        // 1. 重置语句
+        // 1. Reset the statement
         if (m_impl->m_needs_reset) {
             int status = sqlite3_reset(m_impl->m_stmt);
             if (status != SQLITE_OK) {
@@ -107,7 +109,7 @@ net::awaitable<void> AsyncSQLiteStatement::sub_exec() {
             m_impl->m_at_first_step = true;
         }
 
-        // 2. 执行第一步
+        // 2. Execute the first step
         m_impl->m_step_status = sqlite3_step(m_impl->m_stmt);
         m_impl->m_needs_reset = true;
 
@@ -130,13 +132,13 @@ net::awaitable<bool> AsyncSQLiteStatement::sub_moveNext() {
         throw exception("AsyncSQLiteStatement is not initialized");
     }
 
-    // moveNext 是本地状态检查，可以直接同步返回
+    // moveNext is a local state check and can return synchronously directly
     if (m_impl->m_step_status == SQLITE_ROW) {
         if (m_impl->m_at_first_step) {
             m_impl->m_at_first_step = false;
             co_return true;
         } else {
-            // 需要执行 sqlite3_step，这是 I/O 操作
+            // sqlite3_step needs to be executed, this is an I/O operation
             auto step_func = [this]() -> int {
                 m_impl->m_step_status = sqlite3_step(m_impl->m_stmt);
                 return m_impl->m_step_status;

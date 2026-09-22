@@ -32,7 +32,8 @@ SQLiteStatement::SQLiteStatement(DBConnectBase *driver, const std::string &sql_s
 
 SQLiteStatement::~SQLiteStatement() {
     sqlite3_finalize(m_stmt);
-    // m_db 来自 Connect，其生命周期有 Connect 管理，不能在这里释放
+    // m_db comes from Connect and its lifetime is managed by Connect, so it must not be released
+    // here
 }
 
 void SQLiteStatement::_reset() {

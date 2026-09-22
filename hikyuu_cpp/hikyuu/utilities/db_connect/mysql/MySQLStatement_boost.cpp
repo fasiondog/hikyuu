@@ -35,7 +35,7 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_sta
 }
 
 MySQLStatement::~MySQLStatement() {
-    // boost.mysql 的 statement 会自动清理
+    // The statement of boost.mysql is cleaned up automatically
 }
 
 void MySQLStatement::_prepare() {
@@ -44,28 +44,28 @@ void MySQLStatement::_prepare() {
         boost::mysql::diagnostics diag;
         _reset();
 
-        // 使用 MySQLConnect 的 impl 里的 get_statement 方法
+        // Use the get_statement method in the impl of MySQLConnect
         m_impl->stmt = m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
         m_impl->needs_reset = true;
 
         if (ec) [[unlikely]] {
             _reset();
 
-            // 判断是否为连接层错误（需要重连），而非 SQL 应用层错误
-            // MySQL 客户端连接错误码:
-            // - 2013 (CR_SERVER_LOST): 查询过程中丢失连接
-            // - 2006 (CR_SERVER_GONE_ERROR): 服务器已断开
-            // - 2003 (CR_CONN_HOST_ERROR): 无法连接到服务器
-            // - 2002 (CR_CONNECTION_ERROR): 本地连接失败
-            // - 2005 (CR_UNKNOWN_HOST): 未知主机
+            // Judge whether it is a connection layer error (a reconnection is needed) rather than
+            // an SQL application layer error The MySQL client connection error codes:
+            // - 2013 (CR_SERVER_LOST): the connection is lost during the query
+            // - 2006 (CR_SERVER_GONE_ERROR): the server has gone away
+            // - 2003 (CR_CONN_HOST_ERROR): unable to connect to the server
+            // - 2002 (CR_CONNECTION_ERROR): the local connection failed
+            // - 2005 (CR_UNKNOWN_HOST): an unknown host
             bool is_connection_error = false;
 
-            // 通过错误码判断（Boost.MySQL 使用 boost::system::error_code）
+            // Judge it by the error code (Boost.MySQL uses boost::system::error_code)
             int error_value = ec.value();
 
-            // MySQL 客户端错误范围是 2000-2999
+            // The range of the MySQL client errors is 2000-2999
             if (error_value >= 2000 && error_value <= 2999) {
-                // 常见的连接相关错误码
+                // The common connection related error codes
                 switch (error_value) {
                     case 2002:  // CR_CONNECTION_ERROR
                     case 2003:  // CR_CONN_HOST_ERROR
@@ -75,7 +75,8 @@ void MySQLStatement::_prepare() {
                         is_connection_error = true;
                         break;
                     default:
-                        // 其他客户端错误，检查消息中是否包含连接相关关键词
+                        // For the other client errors, check whether the message contains a
+                        // connection related keyword
                         if (!diag.server_message().empty()) {
                             const auto& msg = diag.server_message();
                             is_connection_error =
@@ -90,16 +91,16 @@ void MySQLStatement::_prepare() {
                 }
             }
 
-            // 只在连接层错误时尝试重连
+            // Try to reconnect only on a connection layer error
             if (is_connection_error) {
                 _reset();
                 if (m_impl->connect->ping()) {
-                    // ping 成功（已自动重连），再次获取 statement
+                    // The ping succeeded (it reconnected automatically), get the statement again
                     m_impl->stmt = m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
                     m_impl->needs_reset = true;
 
                     if (ec) [[unlikely]] {
-                        // 重连后仍然失败，打印错误日志
+                        // It still fails after the reconnection, print the error log
                         HKU_ERROR("Failed prepare statement after reconnect! Error code {}: {}",
                                   ec.value(), ec.message());
                         SQL_THROW(ec.value(), "Failed prepare statement after reconnect!");
@@ -108,7 +109,7 @@ void MySQLStatement::_prepare() {
                 }
             }
 
-            // 非连接错误或重连失败，直接抛出原始错误
+            // Not a connection error or the reconnection failed, throw the original error directly
             SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
         }
 
@@ -139,14 +140,14 @@ void MySQLStatement::sub_exec() {
     boost::mysql::error_code ec;
     boost::mysql::diagnostics diag;
 
-    // 获取底层连接用于执行
+    // Get the underlying connection for the execution
     auto* conn = static_cast<boost::mysql::tcp_connection*>(m_impl->connect->getRawConnection());
 
     if (m_impl->params.empty()) {
-        // 没有参数，直接执行
+        // Without parameters, execute directly
         conn->execute(m_sql_string, m_impl->results, ec, diag);
     } else {
-        // 有参数，使用预处理语句（统一使用 field_view 迭代器）
+        // With parameters, use the prepared statement (a field_view iterator is used uniformly)
         std::vector<boost::mysql::field_view> param_views;
         param_views.reserve(m_impl->params.size());
         for (const auto& f : m_impl->params) {
@@ -184,7 +185,7 @@ void MySQLStatement::sub_bindNull(int idx) {
     SQL_CHECK(idx == static_cast<int>(m_impl->params.size()), -1,
               "Parameter index must be sequential! Expected index: {}, but got: {}",
               m_impl->params.size(), idx);
-    m_impl->params.push_back(boost::mysql::field());  // 默认构造为 NULL
+    m_impl->params.push_back(boost::mysql::field());  // Constructed as NULL by default
 }
 
 void MySQLStatement::sub_bindInt(int idx, int64_t value) {
@@ -211,7 +212,7 @@ void MySQLStatement::sub_bindDatetime(int idx, const Datetime& item) {
               "Parameter index must be sequential! Expected index: {}, but got: {}",
               m_impl->params.size(), idx);
 
-    // 使用 boost.mysql 原生 datetime 类型
+    // Use the native datetime type of boost.mysql
     boost::mysql::datetime dt(
       static_cast<std::uint16_t>(item.year()), static_cast<std::uint8_t>(item.month()),
       static_cast<std::uint8_t>(item.day()), static_cast<std::uint8_t>(item.hour()),
@@ -275,16 +276,16 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     }
 
     try {
-        // 尝试直接转换为 int64
+        // Try to convert it into int64 directly
         item = value.as_int64();
     } catch (...) {
         try {
-            // 尝试作为 uint64 转换（YEAR 可能以 uint64 返回）
+            // Try to convert it as uint64 (YEAR may be returned as uint64)
             uint64_t u = value.as_uint64();
             item = static_cast<int64_t>(u);
         } catch (...) {
             try {
-                // 最后尝试作为字符串解析
+                // Finally try to parse it as a string
                 std::string str = value.as_string();
                 item = std::stoll(str);
             } catch (const std::exception& e) {
@@ -311,16 +312,17 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     }
 
     try {
-        // 尝试直接转换为 double
+        // Try to convert it into double directly
         item = value.as_double();
     } catch (...) {
         try {
-            // 如果失败，尝试作为 float 转换
+            // If it fails, try to convert it as float
             float f = value.as_float();
             item = static_cast<double>(f);
         } catch (...) {
             try {
-                // 最后尝试作为字符串解析（DECIMAL 类型可能以字符串返回）
+                // Finally try to parse it as a string (the DECIMAL type may be returned as a
+                // string)
                 std::string str = value.as_string();
                 item = std::stod(str);
             } catch (const std::exception& e) {
@@ -347,21 +349,22 @@ void MySQLStatement::sub_getColumnAsDatetime(int idx, Datetime& item) {
     }
 
     try {
-        // 优先尝试直接作为 datetime 读取
+        // Try to read it as datetime first
         auto dt = value.as_datetime();
-        item = Datetime(static_cast<long>(dt.year()), static_cast<long>(dt.month()),
-                        static_cast<long>(dt.day()), static_cast<long>(dt.hour()),
-                        static_cast<long>(dt.minute()), static_cast<long>(dt.second()),
-                        static_cast<long>(dt.microsecond() / 1000),   // 微秒转毫秒
-                        static_cast<long>(dt.microsecond() % 1000));  // 剩余微秒
+        item = Datetime(
+          static_cast<long>(dt.year()), static_cast<long>(dt.month()), static_cast<long>(dt.day()),
+          static_cast<long>(dt.hour()), static_cast<long>(dt.minute()),
+          static_cast<long>(dt.second()),
+          static_cast<long>(dt.microsecond() / 1000),   // Convert the microseconds to milliseconds
+          static_cast<long>(dt.microsecond() % 1000));  // The remaining microseconds
     } catch (...) {
         try {
-            // 尝试作为 date 读取（没有时间部分）
+            // Try to read it as date (there is no time part)
             auto d = value.as_date();
             item = Datetime(static_cast<long>(d.year()), static_cast<long>(d.month()),
                             static_cast<long>(d.day()));
         } catch (...) {
-            // 最后尝试作为字符串解析
+            // Finally try to parse it as a string
             std::string datetime_str = value.as_string();
             item = Datetime(datetime_str);
         }
@@ -385,37 +388,37 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
     }
 
     try {
-        // 尝试直接作为字符串读取
+        // Try to read it as a string directly
         item = value.as_string();
     } catch (...) {
-        // 如果失败，可能是日期时间类型，需要特殊处理
+        // If it fails it may be a date time type and needs a special handling
         try {
-            // 尝试作为 datetime 读取
+            // Try to read it as datetime
             auto dt = value.as_datetime();
-            // 格式化为字符串：YYYY-MM-DD HH:MM:SS
+            // Format it as a string: YYYY-MM-DD HH:MM:SS
             char buffer[64];
             snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d %02d:%02d:%02d", dt.year(), dt.month(),
                      dt.day(), dt.hour(), dt.minute(), dt.second());
             item = buffer;
         } catch (...) {
             try {
-                // 尝试作为 date 读取
+                // Try to read it as date
                 auto d = value.as_date();
-                // 格式化为字符串：YYYY-MM-DD
+                // Format it as a string: YYYY-MM-DD
                 char buffer[32];
                 snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", d.year(), d.month(), d.day());
                 item = buffer;
             } catch (...) {
                 try {
-                    // 最后尝试作为 time 读取（boost::mysql::time 是 duration 类型）
+                    // Finally try to read it as time (boost::mysql::time is a duration type)
                     auto t = value.as_time();
-                    // 将 duration 转换为小时、分钟、秒
+                    // Convert the duration into hours, minutes and seconds
                     auto total_seconds =
                       std::chrono::duration_cast<std::chrono::seconds>(t).count();
                     int hours = total_seconds / 3600;
                     int minutes = (total_seconds % 3600) / 60;
                     int seconds = total_seconds % 60;
-                    // 格式化为字符串：HH:MM:SS
+                    // Format it as a string: HH:MM:SS
                     char buffer[32];
                     snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d", hours, minutes, seconds);
                     item = buffer;
@@ -447,7 +450,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::string& item) {
         auto blob = value.as_blob();
         item.assign(blob.begin(), blob.end());
     } catch (...) {
-        // 如果不是 blob 类型，尝试作为字符串读取
+        // If it is not a blob type, try to read it as a string
         item = value.as_string();
     }
 }
@@ -472,7 +475,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::vector<char>& item) {
         const auto& blob = value.as_blob();
         item.assign(blob.begin(), blob.end());
     } catch (...) {
-        // 如果不是 blob 类型，尝试作为字符串读取
+        // If it is not a blob type, try to read it as a string
         std::string str = value.as_string();
         item.assign(str.begin(), str.end());
     }

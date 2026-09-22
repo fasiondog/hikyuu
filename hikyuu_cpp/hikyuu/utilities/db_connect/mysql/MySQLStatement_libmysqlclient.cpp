@@ -30,7 +30,7 @@
 
 namespace hku {
 
-// Pimpl 实现结构体
+// The Pimpl implementation struct
 struct MySQLStatement::Impl {
     MYSQL* db{nullptr};
     MYSQL_STMT* stmt{nullptr};
@@ -92,8 +92,9 @@ void MySQLStatement::_prepare() {
     mysql_stmt_close(m_impl->stmt);
     m_impl->stmt = nullptr;
 
-    // 如果是服务器异常，尝试重连服务器
-    // 1 是 Lost connection to MySQL server during query，但 MYSQL 没有错误码定义
+    // On a server exception, try to reconnect to the server
+    // 1 is "Lost connection to MySQL server during query", but MYSQL has no error code definition
+    // for it
     if (1 == ret || CR_SERVER_LOST == ret || CR_SERVER_GONE_ERROR == ret) {
         MySQLConnect* connect = dynamic_cast<MySQLConnect*>(m_driver);
         if (connect && connect->ping()) {

@@ -23,7 +23,7 @@
 
 namespace hku {
 
-// Pimpl 实现结构体
+// The Pimpl implementation struct
 struct MySQLConnect::Impl {
     MYSQL* mysql{nullptr};
 };
@@ -65,7 +65,7 @@ void MySQLConnect::connect() {
         unsigned int port = tryGetParam<int>("port", 3306);
 
 #if MYSQL_VERSION_ID < 80034
-        // mysql 后续不再支持自动重连选项
+        // The auto reconnect option is no longer supported by mysql
         // see: https://dev.mysql.com/doc/c-api/8.2/en/c-api-auto-reconnect.html
 #if MYSQL_VERSION_ID >= 80000
         bool reconnect = 1;
@@ -139,7 +139,7 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
 
     int ret = mysql_real_query(m_impl->mysql, sql_string.c_str(), sql_string.size());
     if (ret) {
-        // 尝试重新连接
+        // Try to reconnect
         if (ping()) {
             ret = mysql_real_query(m_impl->mysql, sql_string.c_str(), sql_string.size());
         } else {
@@ -168,7 +168,7 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
                 HKU_TRACE("num_rows: {}", num_rows);
 #endif
             } else {
-                SQL_THROW(ret, "mysql_field_count error：{}! error msg: {}", sql_string,
+                SQL_THROW(ret, "mysql_field_count error: {}! error msg: {}", sql_string,
                           mysql_error(m_impl->mysql));
             }
         }

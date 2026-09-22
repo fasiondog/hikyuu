@@ -45,7 +45,8 @@ SQLiteUtil::RecoverResult SQLiteUtil::recoverFromBackup(const std::string& backu
 
     std::string journal = fmt::format("{}-journal", dst);
     if (save_bad) {
-        // 如果目标数据库文件或日志文件存在，但另存为损坏文件备份时，失败返回
+        // When the target database file or the journal file exists but saving it as a corrupted
+        // file backup fails, return a failure
         HKU_IF_RETURN(
           existFile(journal) && !renameFile(journal, fmt::format("{}.bad", journal), true),
           RECOVER_FAILED_INVALID_DST);
@@ -53,10 +54,10 @@ SQLiteUtil::RecoverResult SQLiteUtil::recoverFromBackup(const std::string& backu
                       RECOVER_FAILED_INVALID_DST);
     }
 
-    // 尝试先删除目标数据库及其日志文件
+    // Try to delete the target database and its journal file first
     HKU_IF_RETURN(!removeDBFile(dst), RECOVER_FAILED_INVALID_DST);
 
-    // 将备份数据库反向备份至目标数据库
+    // Back up the backup database into the target database in the reverse direction
     try {
         Parameter param;
         param.set<std::string>("db", backup);

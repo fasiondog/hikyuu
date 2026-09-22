@@ -17,7 +17,7 @@
 
 namespace hku {
 
-// 辅助函数：打印 diagnostics 诊断信息
+// Helper function: print the diagnostics information
 static void printDiagHelper(const boost::mysql::error_code& ec,
                             const boost::mysql::diagnostics& diag, const std::string& context) {
     if (!diag.server_message().empty()) {
@@ -29,7 +29,7 @@ static void printDiagHelper(const boost::mysql::error_code& ec,
     }
 }
 
-// Pimpl 实现结构体
+// The Pimpl implementation struct
 struct MySQLConnect::Impl {
     boost::asio::io_context io_context;
     std::unique_ptr<boost::mysql::tcp_connection> conn;
@@ -44,12 +44,13 @@ struct MySQLConnect::Impl {
             return ret;
         }
 
-        // 创建 statement 并准备关闭的 lambda
+        // Create the statement and prepare the lambda for the closing
         auto* connection_ptr = conn.get();
         auto deleter = [connection_ptr](boost::mysql::statement* stmt) {
             if (stmt && connection_ptr) {
                 connection_ptr->close_statement(*stmt);
-                // 忽略关闭时的错误，因为连接可能已经断开
+                // Ignore the error at the closing, because the connection may have been lost
+                // already
             }
             delete stmt;
         };
@@ -69,7 +70,7 @@ struct MySQLConnect::Impl {
 
 MySQLConnect::MySQLConnect(const Parameter& param)
 : DBConnectBase(param), m_impl(std::make_unique<Impl>()) {
-    // 获取预处理语句缓存大小，并创建缓存
+    // Get the prepared statement cache size and create the cache
     int64_t cache_size = tryGetParam<int64_t>("statement_cache_size", 3);
     m_params.set("statement_cache_size", cache_size);
     m_impl->statement_cache =
@@ -155,14 +156,14 @@ bool MySQLConnect::ping() {
         boost::mysql::results results;
         m_impl->conn->execute("SELECT 1", results, ec, diag);
 
-        // 如果 ping 失败，尝试重连
+        // Try to reconnect when the ping fails
         if (ec && !tryConnect()) [[unlikely]] {
             printDiagHelper(ec, diag, "MySQL ping failed!");
             return false;
         }
         return true;
     } catch (const std::exception& e) {
-        // 异常时也尝试重连
+        // Try to reconnect on an exception as well
         HKU_ERROR_IF_RETURN(!tryConnect(), false, "MySQL ping exception! {}", e.what());
         return true;
     }
@@ -183,7 +184,7 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
     m_impl->conn->execute(sql_string, results, ec, diag);
 
     if (ec) [[unlikely]] {
-        // 执行失败,尝试重连后再次执行
+        // The execution failed, try to reconnect and execute again
         if (ping()) {
             m_impl->conn->execute(sql_string, results, ec, diag);
         }
@@ -194,7 +195,7 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
         }
     }
 
-    // 获取受影响的行数
+    // Get the number of the affected rows
     return results.affected_rows();
 }
 
