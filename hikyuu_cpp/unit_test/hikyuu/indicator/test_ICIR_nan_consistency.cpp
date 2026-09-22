@@ -58,7 +58,7 @@ TEST_CASE("test_ICIR_count1_silent_nan") {
     for (int i = 0; i < 7; ++i) {
         d.push_back(Null<price_t>());
     }
-    d[3] = 5.0;  // 唯一有效值
+    d[3] = 5.0;  // The only valid value
 
     Indicator ic = PRICELIST(d);
     Indicator ma = MA(ic, 4);

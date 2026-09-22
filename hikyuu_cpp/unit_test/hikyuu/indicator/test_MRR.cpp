@@ -50,7 +50,7 @@ TEST_CASE("test_MRR") {
     CHECK_EQ(mrr.discard(), 0);
     check_indicator(mrr, PRICELIST(expects));
 
-    /** @arg n = 1 时, 正常关联数据 */
+    /** @arg n = 1, the normal associated data */
     kdata = stock.getKData(KQuery(-5));
     close = CLOSE(kdata);
     mrr = MRR(close, 1);
@@ -130,7 +130,8 @@ TEST_CASE("test_MRR") {
     CHECK_EQ(mrr_lookahead[4], doctest::Approx(140.0).epsilon(0.0001));
 }
 
-/** @par Test point: the full calculation equals the incremental one (setContext is called repeatedly on the same instance to trigger _increment_calculate) */
+/** @par Test point: the full calculation equals the incremental one (setContext is called
+ * repeatedly on the same instance to trigger _increment_calculate) */
 TEST_CASE("test_MRR_increment_equivalence") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("SH600000");
@@ -153,15 +154,18 @@ TEST_CASE("test_MRR_increment_equivalence") {
     }
 }
 
-/** @par 检测点: 含 NaN/非正数数据防崩溃 (验证方案4 不段错误/除零) */
+/** @par Test point: the NaN / non-positive data does not crash (no segfault or division by 0) */
 TEST_CASE("test_MRR_with_nan") {
-    // 数据覆盖方案4 内外层防御: i=3(NaN)命中增量外层isnan, i=4(-5)命中外层<=0,
-    // i=5 窗口含 j=3(NaN)命中内层isnan, i=6 窗口含 j=4(-5)命中内层<=0
-    // n=3<total=7: [0,3)走分支B全量首段, [3,7)委托方案4增量
+    // The data covers the inner and outer defenses of the scheme 4: i=3 (NaN) hits the outer isnan
+    // of the incremental path and i=4 (-5) hits the outer <=0, i=5 has a window containing j=3
+    // (NaN) hitting the inner isnan and i=6 has a window containing j=4 (-5) hitting the inner <=0
+    // n=3<total=7: [0,3) goes through the branch B full first segment and [3,7) delegates to the
+    // scheme 4 incremental
     PriceList data{1.0, 2.0, 1.5, std::numeric_limits<double>::quiet_NaN(), -5.0, 0.5, 1.2};
     Indicator mrr = MRR(PRICELIST(data), 3);
     CHECK_EQ(mrr.size(), 7);
-    // i=3 增量当前点 NaN, 方案4 continue 不写, 保持缓冲初值 NaN
+    // i=3, the incremental current point is NaN; the scheme 4 continues without writing, keeping
+    // the buffer NaN
     CHECK(std::isnan(mrr[3]));
     // i=6 窗口[4,6]=[-5,0.5,1.2], 跳过-5后有效[0.5,1.2], run_min=0.5, rr=1.2/0.5-1=140
     CHECK_GE(mrr[6], 0.0);
@@ -198,7 +202,7 @@ TEST_CASE("test_MRR_export") {
     CHECK_EQ(m1.size(), m2.size());
     CHECK_EQ(m1.discard(), m2.discard());
     CHECK_EQ(m1.getResultNumber(), m2.getResultNumber());
-    // 使用check_indicator验证序列化前后的一致性
+    // Use check_indicator to verify the consistency before and after the serialization
     check_indicator(m1, m2);
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */

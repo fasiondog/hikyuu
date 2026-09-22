@@ -29,7 +29,7 @@ using namespace hku;
 
 /** @par Test points */
 TEST_CASE("test_BARSLASTS") {
-    /** @arg n=1时，结果应与BARSLAST一致 */
+    /** @arg With n=1 the result should match BARSLAST */
     PriceList a;
     for (int i = 0; i < 8; ++i) {
         a.push_back(i % 4 == 0 ? 1.0 : 0.0);
@@ -41,34 +41,35 @@ TEST_CASE("test_BARSLASTS") {
     CHECK_EQ(result.discard(), expected.discard());
     check_indicator(result, expected);
 
-    /** @arg n=2时的基本测试 */
+    /** @arg The basic test with n=2 */
     result = BARSLASTS(data, 2);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), 4);
 
-    // 第0个位置：条件第1次成立，不足2次，应为NaN
+    // Position 0: the condition holds for the 1st time, fewer than 2, so NaN
     CHECK_UNARY(std::isnan(result[0]));
-    // 第1-3个位置：条件只成立1次，不足2次，应为NaN
+    // Positions 1-3: the condition holds only once, fewer than 2, so NaN
     CHECK_UNARY(std::isnan(result[1]));
     CHECK_UNARY(std::isnan(result[2]));
     CHECK_UNARY(std::isnan(result[3]));
-    // 第4个位置：条件第2次成立，距离第1次成立(位置0)为4
+    // Position 4: the condition holds for the 2nd time, the distance from the 1st (position 0) is 4
     CHECK_EQ(result[4], 4);
-    // 第5-6个位置：条件已成立2次，距离第1次成立(位置0)分别为5,6
+    // Positions 5-6: the condition has held twice, the distances from the 1st (position 0) are 5
+    // and 6
     CHECK_EQ(result[5], 5);
     CHECK_EQ(result[6], 6);
-    // 第7个位置：条件已成立2次，距离第1次成立(位置0)为7
+    // Position 7: the condition has held twice, the distance from the 1st (position 0) is 7
     CHECK_EQ(result[7], 7);
 
-    /** @arg n=3时的测试 */
+    /** @arg The test with n=3 */
     result = BARSLASTS(data, 3);
     CHECK_EQ(result.size(), data.size());
-    // 前7个位置：条件只成立2次，不足3次，应为NaN
+    // The first 7 positions: the condition holds only twice, fewer than 3, so NaN
     for (size_t i = 0; i < 7; ++i) {
         CHECK_UNARY(std::isnan(result[i]));
     }
 
-    /** @arg n <= 0时，应返回全NaN序列 */
+    /** @arg With n <= 0 an all-NaN sequence should be returned */
     result = BARSLASTS(data, 0);
     CHECK_EQ(result.size(), data.size());
     CHECK_EQ(result.discard(), data.size());
@@ -96,7 +97,7 @@ TEST_CASE("test_BARSLASTS") {
     result = BARSLASTS(data, 1);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 全0数据测试 */
+    /** @arg The all-zero data test */
     PriceList zeros;
     for (int i = 0; i < 5; ++i) {
         zeros.push_back(0.0);
@@ -107,19 +108,19 @@ TEST_CASE("test_BARSLASTS") {
     CHECK_EQ(result.discard(), data.size());
 }
 
-/** @par 检测点 - 动态参数测试 */
+/** @par Test point - the dynamic parameter test */
 TEST_CASE("test_BARSLASTS_dyn") {
-    /** @arg 动态参数n与静态参数n=2的结果对比 */
+    /** @arg The comparison between the dynamic parameter n and the static parameter n=2 */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
         a.push_back(i % 3 == 0 ? 1.0 : 0.0);
     }
     Indicator data = PRICELIST(a);
 
-    // 静态参数版本
+    // The static parameter version
     Indicator expect_static = BARSLASTS(data, 2);
 
-    // 动态参数版本（使用CVAL创建常量指标）
+    // The dynamic parameter version (a constant indicator is created with CVAL)
     Indicator result_dyn = BARSLASTS(data, CVAL(data, 2));
 
     CHECK_EQ(expect_static.size(), result_dyn.size());
@@ -132,7 +133,7 @@ TEST_CASE("test_BARSLASTS_dyn") {
         }
     }
 
-    /** @arg 动态参数n与IndParam版本对比 */
+    /** @arg The comparison between the dynamic parameter n and the IndParam version */
     Indicator result_indparam = BARSLASTS(data, IndParam(CVAL(data, 2)));
     CHECK_EQ(expect_static.size(), result_indparam.size());
     CHECK_EQ(expect_static.discard(), result_indparam.discard());
@@ -144,8 +145,8 @@ TEST_CASE("test_BARSLASTS_dyn") {
         }
     }
 
-    /** @arg 动态参数变化的情况 */
-    // 构造一个变化的n值指标：前半部分n=1，后半部分n=2
+    /** @arg The case where the dynamic parameter changes */
+    // Build a varying n indicator: n=1 in the first half and n=2 in the second half
     PriceList n_values;
     for (int i = 0; i < 10; ++i) {
         n_values.push_back(i < 5 ? 1.0 : 2.0);
@@ -155,7 +156,7 @@ TEST_CASE("test_BARSLASTS_dyn") {
     result_dyn = BARSLASTS(data, n_param);
     CHECK_EQ(result_dyn.size(), data.size());
 
-    // 验证前5个位置使用n=1的逻辑（应该与BARSLAST一致）
+    // Verify that the first 5 positions use the n=1 logic (they should match BARSLAST)
     Indicator expect_first_half = BARSLAST(SLICE(data, 0, 5));
     for (size_t i = 0; i < 5; ++i) {
         if (std::isnan(expect_first_half[i])) {
@@ -165,7 +166,7 @@ TEST_CASE("test_BARSLASTS_dyn") {
         }
     }
 
-    /** @arg 动态参数n<=0的情况 */
+    /** @arg The case of the dynamic parameter n<=0 */
     PriceList zero_n;
     for (int i = 0; i < 10; ++i) {
         zero_n.push_back(0.0);
@@ -175,16 +176,16 @@ TEST_CASE("test_BARSLASTS_dyn") {
     CHECK_EQ(result_dyn.size(), data.size());
     CHECK_EQ(result_dyn.discard(), data.size());
 
-    /** @arg 真实股票数据测试 */
+    /** @arg The real stock data test */
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
     Indicator c = CLOSE(kdata);
-    Indicator cond = c > REF(c, 1);  // 上涨条件
+    Indicator cond = c > REF(c, 1);  // The rising condition
 
-    // 静态参数
+    // The static parameter
     expect_static = BARSLASTS(cond, 2);
 
-    // 动态参数（常量）
+    // The dynamic parameter (a constant)
     result_dyn = BARSLASTS(cond, CVAL(cond, 2));
     CHECK_EQ(expect_static.size(), result_dyn.size());
     for (size_t i = 0; i < result_dyn.size(); ++i) {

@@ -38,7 +38,7 @@ TEST_CASE("test_RSRS_BETA_kdata") {
     CHECK_EQ(result.size(), kdata.size());
     CHECK_EQ(result.discard(), 19);
 
-    // 验证前几个值为 nan（需要足够数据才能计算）
+    // Verify that the first few values are nan (enough data is needed to calculate)
     for (size_t i = 0; i < result.discard(); ++i) {
         CHECK_UNARY(std::isnan(result[i]));
     }
@@ -55,7 +55,7 @@ TEST_CASE("test_RSRS_BETA_consistency") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-50));
 
-    // 多次计算相同输入应得到相同结果
+    // Calculating the same input several times should give the same result
     Indicator result1 = RSRS_BETA(kdata, 20);
     Indicator result2 = RSRS_BETA(kdata, 20);
 

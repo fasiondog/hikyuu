@@ -24,7 +24,7 @@ TEST_CASE("test_PRICELIST") {
     PriceList tmp_list;
     Indicator result;
 
-    /** @arg PriceList 为空 */
+    /** @arg The PriceList is empty */
     result = PRICELIST(tmp_list);
     CHECK_EQ(result.size(), tmp_list.size());
     CHECK_EQ(result.empty(), true);

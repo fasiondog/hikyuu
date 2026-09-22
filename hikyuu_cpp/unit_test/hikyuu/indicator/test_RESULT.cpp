@@ -29,7 +29,7 @@ TEST_CASE("test_RESULT") {
     auto ret = RESULT(Indicator(), 0);
     CHECK_EQ(ret.empty(), true);
 
-    /** @arg 正常获取 */
+    /** @arg The normal getting */
     auto k = getStock("SH000001").getKData(KQuery(-100));
     auto macd = MACD(CLOSE(), 0);
     auto bar = RESULT(macd, 0);

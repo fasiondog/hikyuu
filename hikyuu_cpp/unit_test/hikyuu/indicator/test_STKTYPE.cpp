@@ -69,7 +69,7 @@ TEST_CASE("test_STKTYPE") {
         CHECK_EQ(stktype[i], doctest::Approx(STOCKTYPE_A));
     }
 
-    /** @arg 空K线数据 */
+    /** @arg Empty K-line data */
     KData empty_k;
     stktype = STKTYPE(empty_k);
     CHECK_EQ(stktype.size(), 0);

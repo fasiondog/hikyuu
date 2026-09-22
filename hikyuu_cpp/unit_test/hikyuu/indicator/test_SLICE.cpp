@@ -25,12 +25,12 @@ TEST_CASE("test_SLICE") {
     PriceList tmp_list;
     Indicator result;
 
-    /** @arg PriceList 为空 */
+    /** @arg The PriceList is empty */
     result = SLICE(tmp_list, 0, tmp_list.size());
     CHECK_EQ(result.size(), tmp_list.size());
     CHECK_EQ(result.empty(), true);
 
-    /** @arg PriceList 非空, 获取全部数据 */
+    /** @arg The PriceList is not empty, get all the data */
     for (size_t i = 0; i < 10; ++i) {
         tmp_list.push_back(i);
     }
@@ -41,7 +41,7 @@ TEST_CASE("test_SLICE") {
         CHECK_EQ(result[i], tmp_list[i]);
     }
 
-    /** @arg PriceList 非空, 正索引获取部分数据 */
+    /** @arg The PriceList is not empty, get part of the data with a positive index */
     result = SLICE(tmp_list, 2, tmp_list.size());
     CHECK_EQ(result.size(), tmp_list.size() - 2);
     CHECK_EQ(result.empty(), false);
@@ -54,29 +54,29 @@ TEST_CASE("test_SLICE") {
     CHECK_EQ(result.empty(), false);
     CHECK_EQ(result[0], tmp_list[3]);
 
-    /** @arg PriceList 非空, 负索引获取部分数据 */
+    /** @arg The PriceList is not empty, get part of the data with a negative index */
     result = SLICE(tmp_list, -2, -1);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.empty(), false);
     CHECK_EQ(result[0], tmp_list[8]);
 
-    /** @arg PriceList 非空, 正负索引获取部分数据 */
+    /** @arg The PriceList is not empty, get part of the data with positive and negative indexes */
     result = SLICE(tmp_list, 1, -7);
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.empty(), false);
     CHECK_EQ(result[0], tmp_list[1]);
     CHECK_EQ(result[1], tmp_list[2]);
 
-    /** @arg PriceList 非空, 索引不在范围内 */
+    /** @arg The PriceList is not empty and the index is out of range */
     result = SLICE(tmp_list, 10, 11);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.empty(), true);
 
-    /** @arg 待转化数据为Indicator，Indicator为空 */
+    /** @arg The data to convert is an Indicator and the Indicator is empty */
     result = SLICE(Indicator(), 0, 1);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 待转化数据为Indicator, result_num=0 */
+    /** @arg The data to convert is an Indicator and result_num=0 */
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KQuery query(0, 30);
@@ -96,7 +96,7 @@ TEST_CASE("test_SLICE") {
     CHECK_EQ(result[1], ikdata[3]);
     CHECK_EQ(result[2], ikdata[4]);
 
-    /** @arg 待转化数据为Indicator, result_num=1 */
+    /** @arg The data to convert is an Indicator and result_num=1 */
     result = SLICE(ikdata, 0, 30, 1);
     CHECK_EQ(result.size(), ikdata.size());
     CHECK_EQ(result.discard(), ikdata.discard());
@@ -104,7 +104,7 @@ TEST_CASE("test_SLICE") {
         CHECK_EQ(result[i], ikdata.get(i, 1));
     }
 
-    /** @arg 待转化数据为Indicator, result_num=-1 */
+    /** @arg The data to convert is an Indicator and result_num=-1 */
     result = SLICE(ikdata, 0, 30, -1);
     CHECK_EQ(result.getResultNumber(), ikdata.getResultNumber());
     CHECK_EQ(result.size(), ikdata.size());

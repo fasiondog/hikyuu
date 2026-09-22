@@ -34,13 +34,15 @@ TEST_CASE("test_STDEV") {
 
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 10);
-    // BREAKING CHANGE: discard 从 1 改为 data.discard()+n-1=9（窗口未满输出 NaN）
+    // BREAKING CHANGE: discard changed from 1 to data.discard()+n-1=9 (NaN while the window is not
+    // full)
     CHECK_EQ(dev.discard(), 9);
     CHECK_EQ(dev.size(), 15);
 
-    // 窗口未满（i<9）输出 NaN；i>=9 稳态值与旧实现一致（Welford 精度内）
-    vector<price_t> expected{0, 0, 0, 0, 0, 0, 0, 0, 0, 2.92309, 3.14289, 2.83039,
-                             3.26769, 3.653, 4.00139};
+    // While the window is not full (i<9) NaN is output; from i>=9 the steady value matches the old
+    // implementation (within the Welford precision)
+    vector<price_t> expected{0, 0,       0,       0,       0,       0,     0,      0,
+                             0, 2.92309, 3.14289, 2.83039, 3.26769, 3.653, 4.00139};
     for (size_t i = 0; i < dev.discard(); ++i) {
         CHECK_UNARY(std::isnan(dev[i]));
     }
@@ -126,10 +128,11 @@ TEST_CASE("test_STDEV_export") {
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 //----------------------------------------------------------------------------
-// NaN 语义测试（Welford 滚动方差 + 离群值离开条件重算）
+// The NaN semantics test (the Welford rolling variance + the conditional recalculation when an
+// outlier leaves)
 //----------------------------------------------------------------------------
 
-/** @par 检测点：散布 NaN 的滚动标准差 */
+/** @par Test point: the rolling standard deviation with scattered NaN */
 TEST_CASE("test_STDEV_nan_scattered") {
     PriceList d;
     d.push_back(1.0);
@@ -149,21 +152,21 @@ TEST_CASE("test_STDEV_nan_scattered") {
     for (size_t i = 0; i < dev.discard(); ++i) {
         CHECK_UNARY(std::isnan(dev[i]));
     }
-    // i=3 窗口 [1,2,3,NaN] → vc=3, std=std(1,2,3)=1.0
+    // i=3, the window [1,2,3,NaN] -> vc=3, std=std(1,2,3)=1.0
     CHECK_EQ(dev[3], doctest::Approx(1.0).epsilon(0.0001));
-    // i=4 窗口 [2,3,NaN,5] → vc=3, std=std(2,3,5)=1.527525
+    // i=4, the window [2,3,NaN,5] -> vc=3, std=std(2,3,5)=1.527525
     CHECK_EQ(dev[4], doctest::Approx(1.527525).epsilon(0.0001));
-    // i=5 窗口 [3,NaN,5,6] → vc=3, std=std(3,5,6)=1.527525
+    // i=5, the window [3,NaN,5,6] -> vc=3, std=std(3,5,6)=1.527525
     CHECK_EQ(dev[5], doctest::Approx(1.527525).epsilon(0.0001));
-    // i=6 窗口 [NaN,5,6,7] → vc=3, std=std(5,6,7)=1.0（恢复）
+    // i=6, the window [NaN,5,6,7] -> vc=3, std=std(5,6,7)=1.0 (recovered)
     CHECK_EQ(dev[6], doctest::Approx(1.0).epsilon(0.0001));
-    // i=7 窗口 [5,6,7,8] → vc=4, std=std(5,6,7,8)=1.290994
+    // i=7, the window [5,6,7,8] -> vc=4, std=std(5,6,7,8)=1.290994
     CHECK_EQ(dev[7], doctest::Approx(1.290994).epsilon(0.0001));
     CHECK_EQ(dev[8], doctest::Approx(1.290994).epsilon(0.0001));
     CHECK_EQ(dev[9], doctest::Approx(1.290994).epsilon(0.0001));
 }
 
-/** @par 检测点：连续 NaN 穿越后状态恢复 */
+/** @par Test point: the state recovery after passing through consecutive NaN */
 TEST_CASE("test_STDEV_nan_consecutive") {
     PriceList d;
     d.push_back(1.0);
@@ -177,19 +180,19 @@ TEST_CASE("test_STDEV_nan_consecutive") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 3);
     CHECK_EQ(dev.discard(), 2);
-    // i=2 窗口 [1,2,NaN] → vc=2, std=std(1,2)=0.707107
+    // i=2, the window [1,2,NaN] -> vc=2, std=std(1,2)=0.707107
     CHECK_EQ(dev[2], doctest::Approx(0.707107).epsilon(0.0001));
-    // i=3 窗口 [2,NaN,NaN] → vc=1, std=NaN
+    // i=3, the window [2,NaN,NaN] -> vc=1, std=NaN
     CHECK_UNARY(std::isnan(dev[3]));
-    // i=4 窗口 [NaN,NaN,NaN] → vc=0, std=NaN
+    // i=4, the window [NaN,NaN,NaN] -> vc=0, std=NaN
     CHECK_UNARY(std::isnan(dev[4]));
-    // i=5 窗口 [NaN,NaN,3] → vc=1, std=NaN（从 0 重建）
+    // i=5, the window [NaN,NaN,3] -> vc=1, std=NaN (rebuilt from 0)
     CHECK_UNARY(std::isnan(dev[5]));
-    // i=6 窗口 [NaN,3,4] → vc=2, std=std(3,4)=0.707107（恢复）
+    // i=6, the window [NaN,3,4] -> vc=2, std=std(3,4)=0.707107 (recovered)
     CHECK_EQ(dev[6], doctest::Approx(0.707107).epsilon(0.0001));
 }
 
-/** @par 检测点：窗口仅 1 个有效值（count=1，std=NaN 而非 Inf/异常） */
+/** @par Test point: the window has a single valid value (count=1, std=NaN instead of Inf) */
 TEST_CASE("test_STDEV_nan_single_valid") {
     PriceList d;
     for (int i = 0; i < 7; ++i) {
@@ -200,13 +203,13 @@ TEST_CASE("test_STDEV_nan_single_valid") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 4);
     CHECK_EQ(dev.discard(), 3);
-    // vc 恒=1，std 恒 NaN（样本方差除以 0，安全返回 NaN）
+    // vc is always 1 and std always NaN (the sample variance divides by 0, NaN is returned safely)
     for (size_t i = dev.discard(); i < dev.size(); ++i) {
         CHECK_UNARY(std::isnan(dev[i]));
     }
 }
 
-/** @par 检测点：大基数小方差（Welford 精度验证） */
+/** @par Test point: a large base with a small variance (the Welford precision check) */
 TEST_CASE("test_STDEV_large_base") {
     PriceList d;
     double base = 1e8;
@@ -217,19 +220,19 @@ TEST_CASE("test_STDEV_large_base") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 3);
     CHECK_EQ(dev.discard(), 2);
-    // 窗口 [1e8+1,1e8+2,1e8+3] → std=1.0（精确，Welford 消除大基数）
+    // The window [1e8+1,1e8+2,1e8+3] -> std=1.0 (exact, Welford removes the large base)
     CHECK_EQ(dev[2], doctest::Approx(1.0).epsilon(0.0001));
     CHECK_EQ(dev[3], doctest::Approx(1.0).epsilon(0.0001));
     CHECK_EQ(dev[4], doctest::Approx(1.0).epsilon(0.0001));
 }
 
-/** @par 检测点：离群值离开窗口触发重算（精度恢复） */
+/** @par Test point: an outlier leaving the window triggers a recalculation */
 TEST_CASE("test_STDEV_outlier_leaving_rescan") {
     PriceList d;
     d.push_back(10.0);
     d.push_back(10.0);
     d.push_back(10.0);
-    d.push_back(1e6);  // 离群值
+    d.push_back(1e6);  // The outlier
     d.push_back(2.0);
     d.push_back(4.0);
     d.push_back(4.0);
@@ -240,14 +243,14 @@ TEST_CASE("test_STDEV_outlier_leaving_rescan") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 5);
     CHECK_EQ(dev.discard(), 4);
-    // i=8 离群值 1e6 离开窗口，窗口 [2,4,4,4,5]
-    // 真实 std = sqrt(1.2) ≈ 1.095445，重算必须精确恢复
+    // i=8, the outlier 1e6 leaves the window, the window is [2,4,4,4,5]
+    // The true std = sqrt(1.2) ~ 1.095445, the recalculation must restore it exactly
     CHECK_EQ(dev[8], doctest::Approx(1.095445).epsilon(0.00001));
-    // i=9 窗口 [4,4,4,5,5] → std=0.547723
+    // i=9, the window [4,4,4,5,5] -> std=0.547723
     CHECK_EQ(dev[9], doctest::Approx(0.547723).epsilon(0.0001));
 }
 
-/** @par 检测点：极小窗口 n=2 */
+/** @par Test point: the minimum window n=2 */
 TEST_CASE("test_STDEV_n2") {
     PriceList d;
     d.push_back(3.0);
@@ -258,15 +261,15 @@ TEST_CASE("test_STDEV_n2") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 2);
     CHECK_EQ(dev.discard(), 1);
-    // i=1 窗口 [3,NaN] → vc=1, std=NaN
+    // i=1, the window [3,NaN] -> vc=1, std=NaN
     CHECK_UNARY(std::isnan(dev[1]));
-    // i=2 窗口 [NaN,5] → vc=1, std=NaN
+    // i=2, the window [NaN,5] -> vc=1, std=NaN
     CHECK_UNARY(std::isnan(dev[2]));
-    // i=3 窗口 [5,7] → vc=2, std=std(5,7)=1.414214
+    // i=3, the window [5,7] -> vc=2, std=std(5,7)=1.414214
     CHECK_EQ(dev[3], doctest::Approx(1.414214).epsilon(0.0001));
 }
 
-/** @par 检测点：全 NaN 序列不死循环不抛异常 */
+/** @par Test point: an all-NaN sequence neither loops forever nor throws */
 TEST_CASE("test_STDEV_all_nan") {
     PriceList d;
     for (int i = 0; i < 4; ++i) {
@@ -280,7 +283,7 @@ TEST_CASE("test_STDEV_all_nan") {
     }
 }
 
-/** @par 检测点：上游 discard 传递 */
+/** @par Test point: the upstream discard propagation */
 TEST_CASE("test_STDEV_upstream_discard") {
     PriceList d;
     for (int i = 0; i < 10; ++i) {
@@ -298,11 +301,11 @@ TEST_CASE("test_STDEV_upstream_discard") {
     for (size_t i = 0; i < dev.discard(); ++i) {
         CHECK_UNARY(std::isnan(dev[i]));
     }
-    // i=6 窗口 [5,6,7] → std=1.0
+    // i=6, the window [5,6,7] -> std=1.0
     CHECK_EQ(dev[6], doctest::Approx(1.0).epsilon(0.0001));
 }
 
-/** @par 检测点：_dyn 动态路径与静态 n 等价（含 NaN） */
+/** @par Test point: the _dyn dynamic path is equivalent to the static n (with NaN) */
 TEST_CASE("test_STDEV_dyn_nan_equivalence") {
     PriceList d;
     d.push_back(1.0);
@@ -318,7 +321,7 @@ TEST_CASE("test_STDEV_dyn_nan_equivalence") {
     Indicator expect = STDEV(ind, 4);
     Indicator result = STDEV(ind, CVAL(ind, 4));
     CHECK_EQ(expect.size(), result.size());
-    // _dyn 路径加了窗口未满 guard，discard 与静态一致
+    // The _dyn path has the window-not-full guard, so its discard matches the static one
     CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.size(); ++i) {
         if (std::isnan(expect[i])) {
@@ -329,18 +332,20 @@ TEST_CASE("test_STDEV_dyn_nan_equivalence") {
     }
 }
 
-/** @par 检测点：n=1 参数被拦截（样本标准差无定义，抛异常而非 Inf/崩溃） */
+/** @par Test point: the n=1 parameter is intercepted (the sample standard deviation is undefined,
+ * an exception is thrown instead of Inf/a crash) */
 TEST_CASE("test_STDEV_n1_rejected") {
     PriceList d;
     for (int i = 0; i < 5; ++i) {
         d.push_back(i + 1);
     }
     Indicator ind = PRICELIST(d);
-    // n=1: 样本方差除以 N-1=0，_checkParam 拦截（HKU_ASSERT(n==0 || n>=2)）
+    // n=1: the sample variance divides by N-1=0 and _checkParam intercepts it (HKU_ASSERT(n==0 ||
+    // n>=2))
     CHECK_THROWS_AS(STDEV(ind, 1), std::exception);
 }
 
-/** @par 检测点：常数序列 Zero Variance（浮点噪声防御） */
+/** @par Test point: the zero variance of a constant sequence (the floating point noise defense) */
 TEST_CASE("test_STDEV_zero_variance") {
     PriceList d;
     for (int i = 0; i < 5; ++i) {
@@ -349,7 +354,8 @@ TEST_CASE("test_STDEV_zero_variance") {
     Indicator ind = PRICELIST(d);
     Indicator dev = STDEV(ind, 3);
     CHECK_EQ(dev.discard(), 2);
-    // 常数序列方差=0，浮点噪声可能让 M2 微负，max(0,...) 防御确保输出 0.0 而非 NaN
+    // The variance of a constant sequence is 0; the floating point noise may make M2 slightly
+    // negative, the max(0,...) defense ensures 0.0 instead of NaN
     for (size_t i = dev.discard(); i < dev.size(); ++i) {
         CHECK_EQ(dev[i], doctest::Approx(0.0).epsilon(0.0001));
     }

@@ -74,7 +74,7 @@ static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value
 
 /** @par Test points */
 TEST_CASE("test_spearmanLevel") {
-    /** @arg 无重复值排序 */
+    /** @arg The sorting without duplicate values */
     std::vector<IndicatorImp::value_t> a{3., 8., 4., 7., 2.};
     size_t totala = a.size();
     auto levela = std::make_unique<IndicatorImp::value_t[]>(totala);
@@ -86,7 +86,7 @@ TEST_CASE("test_spearmanLevel") {
         CHECK_EQ(ptra[i], doctest::Approx(expecta[i]));
     }
 
-    /** @arg 存在重复值 */
+    /** @arg There are duplicate values */
     std::vector<IndicatorImp::value_t> b{5., 10., 8., 10., 6.};
     size_t totalb = b.size();
     auto levelb = std::make_unique<IndicatorImp::value_t[]>(totalb);
@@ -98,7 +98,7 @@ TEST_CASE("test_spearmanLevel") {
         CHECK_EQ(ptrb[i], doctest::Approx(expectb[i]));
     }
 
-    /** @arg 存在nan值*/
+    /** @arg There are nan values */
     IndicatorImp::value_t null_value = Null<IndicatorImp::value_t>();
     std::vector<IndicatorImp::value_t> c{
       null_value, null_value, 5., 10., null_value, null_value, 8., 10., 6., null_value, null_value};
@@ -136,11 +136,11 @@ TEST_CASE("test_SPEARMAN") {
     Indicator x = PRICELIST(a);
     Indicator y = PRICELIST(b);
 
-    /** @arg 非法参数 n */
+    /** @arg The invalid parameter n */
     CHECK_THROWS_AS(SPEARMAN(x, y, -1), std::exception);
     CHECK_THROWS_AS(SPEARMAN(x, y, 1), std::exception);
 
-    /** @arg 正常情况 n */
+    /** @arg The normal case n */
     PriceList expect{Null<price_t>(), 1., 1., 0.95, 0.872082};
     result = SPEARMAN(x, y, a.size());
     CHECK_EQ(result.name(), "SPEARMAN");
@@ -159,7 +159,7 @@ TEST_CASE("test_SPEARMAN") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-    /** @arg 包含 nan 值 */
+    /** @arg It contains nan values */
     price_t null_value = Null<price_t>();
     a = PriceList{3., 8., null_value, 4., 7., 2., null_value, null_value};
     b = PriceList{null_value, 5., 10., 8., null_value, 10., 6., null_value};
@@ -177,10 +177,11 @@ TEST_CASE("test_SPEARMAN") {
 
 /** @par Test points */
 TEST_CASE("test_SPEARMAN_n0_full_window") {
-    // 回归 n=0 默认参数：_calculate 将 n 归一化为 total 后委托
-    // _increment_calculate，后者必须再次归一化，否则窗口长度为 0、全 NaN。
+    // The regression of the n=0 default parameter: _calculate normalizes n to total and delegates
+    // to _increment_calculate, which must normalize it again, otherwise the window length is 0 and
+    // everything is NaN.
 
-    /** @arg n=0 等价于 n=total 全窗口 */
+    /** @arg n=0 is equivalent to n=total, the whole window */
     PriceList a{3., 8., 4., 7., 2.};
     PriceList b{5., 10., 8., 10., 6.};
     Indicator x = PRICELIST(a);
@@ -195,12 +196,12 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result.discard(), full.discard());
     CHECK_EQ(result[4], doctest::Approx(full[4]));
 
-    /** @arg 空序列 n=0：应安全返回空指标，不越界 */
+    /** @arg An empty sequence with n=0: an empty indicator should be returned safely */
     result = SPEARMAN(Indicator(), Indicator(), 0);
     CHECK_UNARY(result.empty());
 
-    /** @arg 极短序列 total=1, n=0：归一化 n=1，m_discard=0+1-1=0；
-     *  act_count=1<2 不写值，result[0] 为 NaN（discard 仍为 0，非全量） */
+    /** @arg A very short sequence total=1 with n=0: n is normalized to 1 and m_discard=0+1-1=0;
+     *  act_count=1<2 so no value is written and result[0] is NaN (the discard is still 0) */
     PriceList short_a{1.};
     PriceList short_b{2.};
     result = SPEARMAN(PRICELIST(short_a), PRICELIST(short_b), 0);
@@ -208,7 +209,7 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result.discard(), 0);
     CHECK_UNARY(std::isnan(result[0]));
 
-    /** @arg 下界触发 total=2, n=0：归一化 n=2，恰好 act_count==2，完全负相关 */
+    /** @arg The lower bound trigger total=2 with n=0: n becomes 2 and act_count==2 exactly */
     PriceList edge_a{1., 2.};
     PriceList edge_b{2., 1.};
     result = SPEARMAN(PRICELIST(edge_a), PRICELIST(edge_b), 0);
@@ -216,7 +217,8 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result[1], doctest::Approx(-1.0));
 
-    /** @arg 输入带 discard：有效数据不足以填满全窗口时 discard=total */
+    /** @arg The input has a discard: it is total when the valid data cannot fill the whole window
+     */
     // total=5, ind.discard=2 → m_discard = 2 + 5 - 1 = 6 > 5 → discard=5
     PriceList da{1., 2., 3., 4., 5.};
     PriceList db{5., 4., 3., 2., 1.};
@@ -227,16 +229,17 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
 
 /** @par Test points */
 TEST_CASE("test_SPEARMAN_with_ties") {
-    // 回归 tie-handling: 当输入存在相同值(average-rank)时, 简化公式
-    // 1 - 6*sum_d2/(n^3-n) 不再精确, 必须用 Pearson-on-ranks 计算。
-    // 下列期望值由 tie 修正公式独立推导, 不依赖本实现:
+    // The tie-handling regression: when the input has equal values (the average rank) the
+    // simplified formula 1 - 6*sum_d2/(n^3-n) is no longer exact, the Pearson-on-ranks calculation
+    // must be used. The following expected values are derived independently with the tie corrected
+    // formula:
     //   rho = [n(n^2-1)/6 - T_x - T_y - sum_d2]
     //         / [2*sqrt((n(n^2-1)/12 - T_x)(n(n^2-1)/12 - T_y))]
 
-    /** @arg 双向 tie: a 与 b 均含重复值 (T_x = T_y = 1.0)
+    /** @arg A two-way tie: both a and b contain duplicate values (T_x = T_y = 1.0)
      *  a={3,3,5,7,7} -> ranks {1.5,1.5,3,4.5,4.5}
      *  b={10,8,8,6,10} -> ranks {4.5,2.5,2.5,1,4.5}
-     *  buggy 简化公式给出 -0.125, 正确值 -0.25 */
+     *  the buggy simplified formula gives -0.125 while the correct value is -0.25 */
     PriceList a{3., 3., 5., 7., 7.};
     PriceList b{10., 8., 8., 6., 10.};
     Indicator x = PRICELIST(a);
@@ -245,18 +248,19 @@ TEST_CASE("test_SPEARMAN_with_ties") {
     CHECK_EQ(result.discard(), 4);
     CHECK_EQ(result[4], doctest::Approx(-0.25));
 
-    /** @arg 零方差退化: a 全相同 (rank 全为 3), 因子无区分度, 应返回 0.0
-     *  buggy 简化公式给出 0.5 (把"无区分度"误判为正相关) */
+    /** @arg The zero variance degeneration: a is all equal (all the ranks are 3), so 0.0 is
+     * returned the buggy simplified formula gives 0.5 (mistaking "no discrimination" for a
+     * correlation) */
     PriceList za{5., 5., 5., 5., 5.};
     PriceList zb{1., 2., 3., 4., 5.};
     result = SPEARMAN(PRICELIST(za), PRICELIST(zb), za.size());
     CHECK_EQ(result.discard(), 4);
     CHECK_EQ(result[4], doctest::Approx(0.0));
 
-    /** @arg 双向 tie + NaN 过滤 (act_count < n): 验证去除 act_count==n 分支后
-     *  仅对有效对计算仍正确。窗口 n=7, 有效对 4 个:
-     *  (3,10),(5,8),(7,6),(7,10) -> ranks a{1,2,3.5,3.5} b{3.5,2,1,3.5}
-     *  正确值 -0.388889 */
+    /** @arg A two-way tie + the NaN filter (act_count < n): verify that, after the act_count==n
+     * branch is removed, the calculation on the valid pairs only is still correct. The window n=7,
+     * 4 valid pairs: (3,10),(5,8),(7,6),(7,10) -> ranks a{1,2,3.5,3.5} b{3.5,2,1,3.5} the correct
+     * value is -0.388889 */
     price_t null_value = Null<price_t>();
     PriceList na{3., 3., null_value, 5., 7., 7., null_value};
     PriceList nb{10., null_value, 8., 8., 6., 10., null_value};

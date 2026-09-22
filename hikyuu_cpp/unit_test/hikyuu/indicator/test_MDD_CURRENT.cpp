@@ -22,7 +22,7 @@ using namespace hku;
 
 /** @par Test points */
 TEST_CASE("test_MDD_CURRENT") {
-    /** @arg 基本功能测试 */
+    /** @arg The basic functionality test */
     PriceList data{100.0, 95.0, 90.0, 98.0, 105.0, 102.0};
     Indicator d = PRICELIST(data);
     Indicator mdd_current = MDD_CURRENT(d);
@@ -31,13 +31,13 @@ TEST_CASE("test_MDD_CURRENT") {
     CHECK_EQ(mdd_current.size(), 6);
     CHECK_EQ(mdd_current.discard(), 0);
 
-    // 计算验证：
-    // 100 → 历史最高点=100 → 回撤=0%
-    // 95 → 历史最高点=100 → 回撤=5%
-    // 90 → 历史最高点=100 → 回撤=10%
-    // 98 → 历史最高点=100 → 回撤=2%
-    // 105 → 历史最高点=105 → 回撤=0%
-    // 102 → 历史最高点=105 → 回撤≈2.86%
+    // The calculation verification:
+    // 100 -> the historical high=100 -> the drawdown=0%
+    // 95 -> the historical high=100 -> the drawdown=5%
+    // 90 -> the historical high=100 -> the drawdown=10%
+    // 98 -> the historical high=100 -> the drawdown=2%
+    // 105 -> the historical high=105 -> the drawdown=0%
+    // 102 -> the historical high=105 -> the drawdown~2.86%
     std::vector<price_t> expects{0.0, 5.0, 10.0, 2.0, 0.0, 2.857142857142857};
     check_indicator(mdd_current, PRICELIST(expects));
 
@@ -76,11 +76,11 @@ TEST_CASE("test_MDD_CURRENT") {
     CHECK_EQ(mdd_empty.size(), 0);
     CHECK_EQ(mdd_empty.empty(), true);
 
-    /** @arg 波动序列测试 */
+    /** @arg The fluctuating sequence test */
     PriceList volatile_data{50.0, 60.0, 55.0, 70.0, 65.0, 80.0, 75.0, 85.0, 80.0, 90.0};
     Indicator volatile_ind = PRICELIST(volatile_data);
     Indicator mdd_volatile = MDD_CURRENT(volatile_ind);
-    // 计算验证：
+    // The calculation verification:
     // 50 → 50 → 0%
     // 60 → 60 → 0%
     // 55 → 60 → 8.33%
@@ -96,34 +96,34 @@ TEST_CASE("test_MDD_CURRENT") {
     check_indicator(mdd_volatile, PRICELIST(expects));
 }
 
-/** @par 检测点: 含 NaN/负数数据处理 */
+/** @par Test point: the handling of the NaN / negative data */
 TEST_CASE("test_MDD_CURRENT_with_nan") {
     PriceList data{100.0, 105.0, 90.0, std::numeric_limits<double>::quiet_NaN(), -5.0, 90.0, 110.0};
     Indicator mdd = MDD_CURRENT(PRICELIST(data));
     CHECK_EQ(mdd.size(), 7);
-    CHECK_EQ(mdd[3], 0.0);                                        // NaN 填0
-    CHECK_EQ(mdd[4], doctest::Approx(104.7619).epsilon(0.0001));  // -5，历史最高105 → 104.7619%
-    CHECK_EQ(mdd[5], doctest::Approx(14.2857).epsilon(0.0001));   // 90，历史最高105 → 14.2857%
-    CHECK_EQ(mdd[6], 0.0);                                        // 110，创历史新高
+    CHECK_EQ(mdd[3], 0.0);                                        // NaN is filled with 0
+    CHECK_EQ(mdd[4], doctest::Approx(104.7619).epsilon(0.0001));  // -5, high 105 -> 104.7619%
+    CHECK_EQ(mdd[5], doctest::Approx(14.2857).epsilon(0.0001));   // 90, high 105 -> 14.2857%
+    CHECK_EQ(mdd[6], 0.0);                                        // 110, a new historical high
 }
 
-/** @par 检测点: 增量计算 */
+/** @par Test point: the incremental calculation */
 TEST_CASE("test_MDD_CURRENT_increment") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-20));
 
-    // 使用指标链式调用验证增量计算
+    // Verify the incremental calculation with the indicator chaining
     Indicator m = MDD_CURRENT(CLOSE())(kdata);
     CHECK_EQ(m.name(), "MDD_CURRENT");
     CHECK_EQ(m.size(), kdata.size());
 
-    // 验证连续调用的增量计算
+    // Verify the incremental calculation with consecutive calls
     KData kdata_more = stock.getKData(KQuery(-25));
     Indicator m_more = m(kdata_more);
     CHECK_EQ(m_more.size(), kdata_more.size());
 
-    // 直接计算对比
+    // Compare with the direct calculation
     Indicator m_direct = MDD_CURRENT(CLOSE())(kdata_more);
     CHECK_EQ(m_more.size(), m_direct.size());
     for (size_t i = 0; i < m_more.size(); ++i) {
@@ -134,18 +134,19 @@ TEST_CASE("test_MDD_CURRENT_increment") {
     }
 }
 
-/** @par Test point: the full calculation equals the incremental one (setContext is called repeatedly on the same instance to trigger _increment_calculate) */
+/** @par Test point: the full calculation equals the incremental one (setContext is called
+ * repeatedly on the same instance to trigger _increment_calculate) */
 TEST_CASE("test_MDD_CURRENT_increment_equivalence") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("SH600000");
     KData k_full = stk.getKData(KQuery(-30));
     KData k_partial = stk.getKData(KQuery(-30, -15));
 
-    // 全量基准
+    // The full baseline
     Indicator ind_full = MDD_CURRENT(CLOSE());
     ind_full.setContext(k_full);
 
-    // 增量: 复用同一实例连续 setContext
+    // Incremental: reuse the same instance with consecutive setContext
     Indicator ind_inc = MDD_CURRENT(CLOSE());
     ind_inc.setContext(k_partial);
     ind_inc.setContext(k_full);

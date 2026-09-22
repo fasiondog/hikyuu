@@ -27,7 +27,7 @@ TEST_CASE("test_MA") {
     KData kdata;
     Indicator open, ma;
 
-    /** @arg n = 3, 但关联数据为空 */
+    /** @arg n = 3 but the associated data is empty */
     open = OPEN(kdata);
     ma = MA(open, 3);
     CHECK_EQ(ma.name(), "MA");
@@ -49,7 +49,7 @@ TEST_CASE("test_MA") {
         CHECK_EQ(ma[i], doctest::Approx(expects[i]).epsilon(0.0001));
     }
 
-    /** @arg n = 0 且数据含 interior NaN（valid_count 分母正确性） */
+    /** @arg n = 0 and the data contains an interior NaN (the valid_count denominator) */
     {
         PriceList d_nan;
         d_nan.push_back(1.0);
@@ -64,13 +64,13 @@ TEST_CASE("test_MA") {
         CHECK_EQ(ma_nan[0], doctest::Approx(1.0).epsilon(0.0001));
         // i=1: sum=3, vc=2, mean=1.5
         CHECK_EQ(ma_nan[1], doctest::Approx(1.5).epsilon(0.0001));
-        // i=2: NaN skip, 不输出（vc 不变）
+        // i=2: the NaN is skipped, nothing is output (vc unchanged)
         CHECK_UNARY(std::isnan(ma_nan[2]));
-        // i=3: sum=7, vc=3, mean=7/3≈2.333（旧 bug 会算 7/4=1.75）
+        // i=3: sum=7, vc=3, mean=7/3~2.333 (the old bug computed 7/4=1.75)
         CHECK_EQ(ma_nan[3], doctest::Approx(2.333333).epsilon(0.0001));
         // i=4: NaN skip
         CHECK_UNARY(std::isnan(ma_nan[4]));
-        // i=5: sum=13, vc=4, mean=13/4=3.25（旧 bug 会算 13/6≈2.167）
+        // i=5: sum=13, vc=4, mean=13/4=3.25 (the old bug computed 13/6~2.167)
         CHECK_EQ(ma_nan[5], doctest::Approx(3.25).epsilon(0.0001));
     }
 
@@ -86,7 +86,7 @@ TEST_CASE("test_MA") {
     }
     CHECK_EQ(ma[9], doctest::Approx(2383.4041));
 
-    /** @arg n = 10 且数据大小刚好为9 时, 正常关联数据 */
+    /** @arg n = 10 and the data size is exactly 9, the normal associated data */
     kdata = stock.getKData(KQuery(-9));
     open = OPEN(kdata);
     ma = MA(open, 10);
@@ -97,7 +97,7 @@ TEST_CASE("test_MA") {
         CHECK_UNARY(std::isnan(ma[i]));
     }
 
-    /** @arg n = 10 且数据大小为11 时, 正常关联数据 */
+    /** @arg n = 10 and the data size is 11, the normal associated data */
     kdata = stock.getKData(KQuery(-11));
     open = OPEN(kdata);
     ma = MA(open, 10);
@@ -121,7 +121,7 @@ TEST_CASE("test_MA") {
         CHECK_EQ(ma[i], doctest::Approx(open[i]).epsilon(0.001));
     }
 
-    /** @arg 源数据本身带有discard不等于0 */
+    /** @arg The source data itself has a discard that is not 0 */
     PriceList data;
     for (int i = 0; i < 10; ++i) {
         data.push_back(i);
@@ -265,10 +265,10 @@ TEST_CASE("test_MA_export") {
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
 //----------------------------------------------------------------------------
-// NaN 语义测试（Welford 滚动均值，与 IStdev 共用 valid_count 逻辑）
+// The NaN semantics test (the Welford rolling mean, sharing the valid_count logic with IStdev)
 //----------------------------------------------------------------------------
 
-/** @par 检测点：散布 NaN 的滚动均值 */
+/** @par Test point: the rolling mean with scattered NaN */
 TEST_CASE("test_MA_nan_scattered") {
     PriceList d;
     d.push_back(1.0);
@@ -289,21 +289,21 @@ TEST_CASE("test_MA_nan_scattered") {
     for (size_t i = 0; i < ma.discard(); ++i) {
         CHECK_UNARY(std::isnan(ma[i]));
     }
-    // 窗口 [1,2,3,NaN] → vc=3, mean=2.0
+    // The window [1,2,3,NaN] -> vc=3, mean=2.0
     CHECK_EQ(ma[3], doctest::Approx(2.0).epsilon(0.0001));
-    // 窗口 [2,3,NaN,5] → vc=3, mean=10/3
+    // The window [2,3,NaN,5] -> vc=3, mean=10/3
     CHECK_EQ(ma[4], doctest::Approx(3.333333).epsilon(0.0001));
-    // 窗口 [3,NaN,5,6] → vc=3, mean=14/3
+    // The window [3,NaN,5,6] -> vc=3, mean=14/3
     CHECK_EQ(ma[5], doctest::Approx(4.666667).epsilon(0.0001));
-    // 窗口 [NaN,5,6,7] → vc=3, mean=6.0（NaN 离开后恢复）
+    // The window [NaN,5,6,7] -> vc=3, mean=6.0 (recovered after the NaN left)
     CHECK_EQ(ma[6], doctest::Approx(6.0).epsilon(0.0001));
-    // 窗口 [5,6,7,8] → vc=4, mean=6.5（全有效）
+    // The window [5,6,7,8] -> vc=4, mean=6.5 (all valid)
     CHECK_EQ(ma[7], doctest::Approx(6.5).epsilon(0.0001));
     CHECK_EQ(ma[8], doctest::Approx(7.5).epsilon(0.0001));
     CHECK_EQ(ma[9], doctest::Approx(8.5).epsilon(0.0001));
 }
 
-/** @par 检测点：连续 NaN 穿越后状态恢复 */
+/** @par Test point: the state recovery after passing through consecutive NaN */
 TEST_CASE("test_MA_nan_consecutive") {
     PriceList d;
     d.push_back(1.0);
@@ -317,37 +317,37 @@ TEST_CASE("test_MA_nan_consecutive") {
     Indicator ind = PRICELIST(d);
     Indicator ma = MA(ind, 3);
     CHECK_EQ(ma.discard(), 2);
-    // i=2 窗口 [1,2,NaN] → vc=2, mean=1.5
+    // i=2, the window [1,2,NaN] -> vc=2, mean=1.5
     CHECK_EQ(ma[2], doctest::Approx(1.5).epsilon(0.0001));
-    // i=3 窗口 [2,NaN,NaN] → vc=1, mean=2.0
+    // i=3, the window [2,NaN,NaN] -> vc=1, mean=2.0
     CHECK_EQ(ma[3], doctest::Approx(2.0).epsilon(0.0001));
-    // i=4 窗口 [NaN,NaN,NaN] → vc=0, mean=NaN
+    // i=4, the window [NaN,NaN,NaN] -> vc=0, mean=NaN
     CHECK_UNARY(std::isnan(ma[4]));
-    // i=5 窗口 [NaN,NaN,3] → vc=1, mean=3.0（从 0 重建）
+    // i=5, the window [NaN,NaN,3] -> vc=1, mean=3.0 (rebuilt from 0)
     CHECK_EQ(ma[5], doctest::Approx(3.0).epsilon(0.0001));
-    // i=6 窗口 [NaN,3,4] → vc=2, mean=3.5（恢复）
+    // i=6, the window [NaN,3,4] -> vc=2, mean=3.5 (recovered)
     CHECK_EQ(ma[6], doctest::Approx(3.5).epsilon(0.0001));
 }
 
-/** @par 检测点：窗口仅 1 个有效值（count=1 边界） */
+/** @par Test point: the window has a single valid value (the count=1 boundary) */
 TEST_CASE("test_MA_nan_single_valid") {
     PriceList d;
     for (int i = 0; i < 7; ++i) {
         d.push_back(Null<price_t>());  // NaN
     }
-    d[3] = 5.0;  // 唯一有效值
+    d[3] = 5.0;  // The only valid value
 
     Indicator ind = PRICELIST(d);
     Indicator ma = MA(ind, 4);
     CHECK_EQ(ma.discard(), 3);
-    // vc 恒=1，输出该有效值本身
+    // vc is always 1 and the valid value itself is output
     CHECK_EQ(ma[3], doctest::Approx(5.0).epsilon(0.0001));
     CHECK_EQ(ma[4], doctest::Approx(5.0).epsilon(0.0001));
     CHECK_EQ(ma[5], doctest::Approx(5.0).epsilon(0.0001));
     CHECK_EQ(ma[6], doctest::Approx(5.0).epsilon(0.0001));
 }
 
-/** @par 检测点：大基数小方差（Welford 精度验证） */
+/** @par Test point: a large base with a small variance (the Welford precision check) */
 TEST_CASE("test_MA_large_base") {
     PriceList d;
     double base = 1e8;
@@ -358,13 +358,13 @@ TEST_CASE("test_MA_large_base") {
     Indicator ind = PRICELIST(d);
     Indicator ma = MA(ind, 3);
     CHECK_EQ(ma.discard(), 2);
-    // 窗口 [1e8+1,1e8+2,1e8+3] → mean=1e8+2
+    // The window [1e8+1,1e8+2,1e8+3] -> mean=1e8+2
     CHECK_EQ(ma[2], doctest::Approx(100000002.0).epsilon(0.0001));
     CHECK_EQ(ma[3], doctest::Approx(100000003.0).epsilon(0.0001));
     CHECK_EQ(ma[4], doctest::Approx(100000004.0).epsilon(0.0001));
 }
 
-/** @par 检测点：极小窗口 n=2 */
+/** @par Test point: the minimum window n=2 */
 TEST_CASE("test_MA_n2") {
     PriceList d;
     d.push_back(3.0);
@@ -375,15 +375,15 @@ TEST_CASE("test_MA_n2") {
     Indicator ind = PRICELIST(d);
     Indicator ma = MA(ind, 2);
     CHECK_EQ(ma.discard(), 1);
-    // i=1 窗口 [3,NaN] → vc=1, mean=3.0
+    // i=1, the window [3,NaN] -> vc=1, mean=3.0
     CHECK_EQ(ma[1], doctest::Approx(3.0).epsilon(0.0001));
-    // i=2 窗口 [NaN,5] → vc=1, mean=5.0
+    // i=2, the window [NaN,5] -> vc=1, mean=5.0
     CHECK_EQ(ma[2], doctest::Approx(5.0).epsilon(0.0001));
-    // i=3 窗口 [5,7] → vc=2, mean=6.0
+    // i=3, the window [5,7] -> vc=2, mean=6.0
     CHECK_EQ(ma[3], doctest::Approx(6.0).epsilon(0.0001));
 }
 
-/** @par 检测点：全 NaN 序列不死循环不抛异常 */
+/** @par Test point: an all-NaN sequence neither loops forever nor throws */
 TEST_CASE("test_MA_all_nan") {
     PriceList d;
     for (int i = 0; i < 4; ++i) {
@@ -397,18 +397,18 @@ TEST_CASE("test_MA_all_nan") {
     }
 }
 
-/** @par 检测点：上游 discard 传递 */
+/** @par Test point: the upstream discard propagation */
 TEST_CASE("test_MA_upstream_discard") {
     PriceList d;
     for (int i = 0; i < 10; ++i) {
         d.push_back(i + 1);
     }
-    // 构造上游 discard=4：前4个置 NaN
+    // Build the upstream discard=4: the first 4 are set to NaN
     for (int i = 0; i < 4; ++i) {
         d[i] = Null<price_t>();
     }
     Indicator ind = PRICELIST(d);
-    ind.setDiscard(4);  // 显式声明 discard
+    ind.setDiscard(4);  // Declare the discard explicitly
 
     Indicator ma = MA(ind, 3);
     // m_discard = 4 + 3 - 1 = 6
@@ -416,12 +416,12 @@ TEST_CASE("test_MA_upstream_discard") {
     for (size_t i = 0; i < ma.discard(); ++i) {
         CHECK_UNARY(std::isnan(ma[i]));
     }
-    // i=6 窗口 [5,6,7] → mean=6.0
+    // i=6, the window [5,6,7] -> mean=6.0
     CHECK_EQ(ma[6], doctest::Approx(6.0).epsilon(0.0001));
     CHECK_EQ(ma[7], doctest::Approx(7.0).epsilon(0.0001));
 }
 
-/** @par 检测点：_dyn 动态路径与静态 n 等价（含 NaN） */
+/** @par Test point: the _dyn dynamic path is equivalent to the static n (with NaN) */
 TEST_CASE("test_MA_dyn_nan_equivalence") {
     PriceList d;
     d.push_back(1.0);
@@ -437,7 +437,7 @@ TEST_CASE("test_MA_dyn_nan_equivalence") {
     Indicator expect = MA(ind, 4);
     Indicator result = MA(ind, CVAL(ind, 4));
     CHECK_EQ(expect.size(), result.size());
-    // _dyn 路径 discard 与静态一致（均有窗口未满 guard）
+    // The _dyn path discard matches the static one (both have the window-not-full guard)
     CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.size(); ++i) {
         if (std::isnan(expect[i])) {

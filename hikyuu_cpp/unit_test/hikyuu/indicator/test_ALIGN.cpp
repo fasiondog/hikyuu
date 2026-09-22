@@ -32,7 +32,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         a.push_back(i);
     }
 
-    /** @arg 输入指标本身和上下文无关，参考日期长度为0 */
+    /** @arg The input indicator is context independent and the reference date length is 0 */
     DatetimeList ref;
     Indicator data = PRICELIST(a);
     result = ALIGN(data, ref);
@@ -42,7 +42,7 @@ TEST_CASE("test_ALIGN_fill_null") {
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 输入指标本身和上下文无关，和参考日期列表等长 */
+    /** @arg The input indicator is context independent and as long as the reference date list */
     ref = stk.getDatetimeList(KQuery(-10));
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -56,7 +56,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg 输入指标本身和上下文无关，且长度长于参考日期列表 */
+    /** @arg The input indicator is context independent and longer than the reference date list */
     a.push_back(11);
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -70,7 +70,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg 输入指标本身和上下文无关，且长度小于参考日期列表 */
+    /** @arg The input indicator is context independent and shorter than the reference date list */
     a.clear();
     a.push_back(1);
     data = PRICELIST(a);
@@ -87,7 +87,7 @@ TEST_CASE("test_ALIGN_fill_null") {
     CHECK_EQ(result[9], 1);
     CHECK_EQ(result_dates[9], ref[9]);
 
-    /** @arg 输入指标本身和上下文无关，且长度为0 */
+    /** @arg The input indicator is context independent and its length is 0 */
     a.clear();
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -101,7 +101,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应日期全部小于参考日期 */
+    /** @arg All the dates of ind are earlier than the reference dates */
     KData k = stk.getKData(KQuery(-10));
     ref.clear();
     ref.push_back(Datetime(201901010000));
@@ -119,7 +119,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应日期全部大于参考日期 */
+    /** @arg All the dates of ind are later than the reference dates */
     ref.clear();
     ref.push_back(Datetime(191901010000));
     ref.push_back(Datetime(191901020000));
@@ -136,7 +136,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应日期等于参考日期 */
+    /** @arg The dates of ind equal the reference dates */
     ref = k.getDatetimeList();
     data = CLOSE(k);
     result = ALIGN(data, ref);
@@ -150,7 +150,7 @@ TEST_CASE("test_ALIGN_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应部分日期 */
+    /** @arg Only part of the dates of ind */
     ref.clear();
     ref.push_back(Datetime(201111220000));
     ref.push_back(Datetime(201111230000));
@@ -187,7 +187,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         a.push_back(i);
     }
 
-    /** @arg 输入指标本身和上下文无关，参考日期长度为0 */
+    /** @arg The input indicator is context independent and the reference date length is 0 */
     DatetimeList ref;
     Indicator data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -197,7 +197,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 输入指标本身和上下文无关，和参考日期列表等长 */
+    /** @arg The input indicator is context independent and as long as the reference date list */
     ref = stk.getDatetimeList(KQuery(-10));
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -211,7 +211,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg 输入指标本身和上下文无关，且长度长于参考日期列表 */
+    /** @arg The input indicator is context independent and longer than the reference date list */
     a.push_back(11);
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -225,7 +225,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg 输入指标本身和上下文无关，且长度小于参考日期列表 */
+    /** @arg The input indicator is context independent and shorter than the reference date list */
     a.clear();
     a.push_back(1);
     data = PRICELIST(a);
@@ -242,7 +242,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
     CHECK_EQ(result[9], 1);
     CHECK_EQ(result_dates[9], ref[9]);
 
-    /** @arg 输入指标本身和上下文无关，且长度为0 */
+    /** @arg The input indicator is context independent and its length is 0 */
     a.clear();
     data = PRICELIST(a);
     result = ALIGN(data, ref, false);
@@ -256,7 +256,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应日期全部小于参考日期 */
+    /** @arg All the dates of ind are earlier than the reference dates */
     KData k = stk.getKData(KQuery(-10));
     ref.clear();
     ref.push_back(Datetime(201901010000));
@@ -275,7 +275,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应日期全部大于参考日期 */
+    /** @arg All the dates of ind are later than the reference dates */
     ref.clear();
     ref.push_back(Datetime(191901010000));
     ref.push_back(Datetime(191901020000));
@@ -292,7 +292,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    /** @arg ind对应日期等于参考日期 */
+    /** @arg The dates of ind equal the reference dates */
     ref = k.getDatetimeList();
     data = CLOSE(k);
     result = ALIGN(data, ref, false);
@@ -306,7 +306,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result_dates[i], ref[i]);
     }
 
-    // /** @arg ind对应部分日期 */
+    // /** @arg Only part of the dates of ind */
     ref.clear();
     ref.push_back(Datetime(201111220000));
     ref.push_back(Datetime(201111230000));
@@ -337,7 +337,7 @@ TEST_CASE("test_ALIGN_not_fill_null") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-    /** @arg 分钟线对齐日线 */
+    /** @arg Align the minute lines to the daily line */
     auto mink = stk.getKData(KQuery(-2400));
     auto dates = k.getDatetimeList();
     DatetimeList ref_ds;

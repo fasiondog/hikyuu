@@ -23,12 +23,12 @@ using namespace hku;
 TEST_CASE("test_ZHBOND10") {
     Indicator result;
 
-    /** @arg 输入日期列表, 未指定日期的空指标 */
+    /** @arg The input date list, an empty indicator without a given date */
     result = ZHBOND10();
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.name(), "ZHBOND10");
 
-    /** @arg 输入日期列表, 指定日期都小于最小国债数据日期 */
+    /** @arg The input date list, all the given dates are earlier than the earliest bond date */
     DatetimeList dates = {Datetime(19900101), Datetime(19900201)};
     result = ZHBOND10(dates);
     CHECK_EQ(result.name(), "ZHBOND10");
@@ -38,7 +38,7 @@ TEST_CASE("test_ZHBOND10") {
         CHECK_EQ(result[i], 4.0);
     }
 
-    /** @arg 输入日期列表, 指定日期都大于最大国债数据日期 */
+    /** @arg The input date list, all the given dates are later than the latest bond date */
     dates = {Datetime(20250101), Datetime(20250201)};
     result = ZHBOND10(dates, 3.1);
     CHECK_EQ(result.name(), "ZHBOND10");
@@ -48,7 +48,7 @@ TEST_CASE("test_ZHBOND10") {
         CHECK_EQ(result[i], doctest::Approx(2.3375));
     }
 
-    /** @arg 输入日期列表, 指定日期列表中对应日期断续不在收益率列表中 */
+    /** @arg The input date list; some of the given dates are not in the yield list */
     dates = {Datetime(19900101), Datetime(19900201)};
     dates.emplace_back(20020104);
     dates.emplace_back(20020105);
@@ -67,13 +67,13 @@ TEST_CASE("test_ZHBOND10") {
     CHECK_EQ(result[5], doctest::Approx(3.2003));
     CHECK_EQ(result[6], doctest::Approx(3.4532));
 
-    /** @arg 输入kdata, kdata 为空 */
+    /** @arg The input kdata is empty */
     KData k;
     result = ZHBOND10(k);
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.name(), "ZHBOND10");
 
-    /** @arg 输入kdata, kdata 为日线不为空 */
+    /** @arg The input kdata is a non-empty daily line */
     k = getKData("sh000001", KQueryByDate(Datetime(20011226), Datetime(20020111)));
     result = ZHBOND10(k, 3.0);
     CHECK_EQ(result.name(), "ZHBOND10");
@@ -89,13 +89,13 @@ TEST_CASE("test_ZHBOND10") {
     CHECK_EQ(result[7], doctest::Approx(3.5896));
     CHECK_EQ(result[8], doctest::Approx(3.5784));
 
-    /** @arg 输入 Indicator, Indicator 为空 */
+    /** @arg The input Indicator is empty */
     Indicator ind;
     result = ZHBOND10(ind);
     CHECK_UNARY(result.empty());
     CHECK_EQ(result.name(), "ZHBOND10");
 
-    /** @arg 输入 Indicator 不为空 */
+    /** @arg The input Indicator is not empty */
     k = getKData("sh000001", KQueryByDate(Datetime(20011226), Datetime(20020111)));
     result = ZHBOND10(k.close(), 3.0);
     CHECK_EQ(result.name(), "ZHBOND10");
