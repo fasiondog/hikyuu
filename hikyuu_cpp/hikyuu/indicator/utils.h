@@ -12,30 +12,34 @@
 namespace hku {
 
 /**
- * 对股票进行多元线性回归分析
+ * Perform a multiple linear regression analysis on a stock
  *
- * @details 使用股票收盘价的收益率作为因变量，输入的指标作为自变量进行多元线性回归。
- * 回归模型为：Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
+ * @details The return of the stock close price is used as the dependent variable, and the input
+ * indicators are used as the independent variables for the multiple linear regression.
+ * The regression model is: Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
  *
- * @note NaN值处理策略：如果某个时间点的任何因子或收益率为NaN，则该时间点的数据被舍弃，
- *       但不会影响其他时间点的数据和其他因子。
+ * @note NaN handling strategy: if any factor or the return at a time point is NaN, the data at that
+ *       time point is discarded, but it does not affect the data at the other time points or the
+ *       other factors.
  *
- * @param stk 股票对象
- * @param query K线查询条件，用于获取回归分析所需的时间范围和数据类型
- * @param inds 指标列表，作为回归的自变量（因子）
- * @return 回归系数向量，第一个元素是alpha(截距)，后续是各个beta系数
- *         如果数据不足或回归失败，返回空向量
+ * @param stk the stock object
+ * @param query K-line query condition, used to get the time range and data type needed by the
+ *              regression analysis
+ * @param inds indicator list, used as the independent variables (factors) of the regression
+ * @return the regression coefficient vector, the first element is alpha (the intercept), followed
+ * by the beta coefficients; an empty vector is returned if the data is insufficient or the
+ *         regression fails
  *
  * @example
  * @code
- * // C++示例
+ * // C++ example
  * Stock stk = getStock("sh000001");
  * Indicator ind1 = MA(CLOSE(), 5);
  * Indicator ind2 = MA(CLOSE(), 10);
  * auto result = multi_regression(stk, KQuery(-252), ind1, ind2);
- * double alpha = result[0];  // 截距项
- * double beta1 = result[1];  // 第一个因子的系数
- * double beta2 = result[2];  // 第二个因子的系数
+ * double alpha = result[0];  // Intercept
+ * double beta1 = result[1];  // Coefficient of the first factor
+ * double beta2 = result[2];  // Coefficient of the second factor
  * @endcode
  *
  * @ingroup Indicator
@@ -44,15 +48,16 @@ HKU_API std::vector<double> multi_regression(const Stock& stk, const KQuery& que
                                              const IndicatorList& inds);
 
 /**
- * 对股票进行多元线性回归分析（可变参数版本）
+ * Perform a multiple linear regression analysis on a stock (variadic version)
  *
- * @details 与上述函数功能相同，提供可变参数接口以便更便捷地传入多个指标
+ * @details It has the same function as the above function, providing a variadic interface to pass
+ * multiple indicators more conveniently
  *
- * @param stk 股票对象
- * @param query K线查询条件
- * @param ind1 第一个指标（必需）
- * @param inds 更多指标（可选）
- * @return 回归系数向量
+ * @param stk the stock object
+ * @param query K-line query condition
+ * @param ind1 the first indicator (required)
+ * @param inds more indicators (optional)
+ * @return the regression coefficient vector
  *
  * @ingroup Indicator
  */
@@ -63,21 +68,22 @@ std::vector<double> multi_regression(const Stock& stk, const KQuery& query, cons
 }
 
 /**
- * 对股票进行多元线性回归分析（完整版本）
+ * Perform a multiple linear regression analysis on a stock (full version)
  *
- * @details 返回完整的回归结果，包括系数、残差序列、残差平方和和R²值
+ * @details It returns the complete regression result, including the coefficients, the residual
+ * sequence, the residual sum of squares and the R² value
  *
- * @param stk 股票对象
- * @param query K线查询条件
- * @param inds 指标列表，作为回归的自变量（因子）
- * @return 回归结果向量，格式如下：
+ * @param stk the stock object
+ * @param query K-line query condition
+ * @param inds indicator list, used as the independent variables (factors) of the regression
+ * @return the regression result vector in the following format:
  *         [alpha, beta1, beta2, ..., betan, e1, e2, ..., en, RSS, R²]
- *         - alpha: 截距项
- *         - beta1~betan: 各因子系数
- *         - e1~en: 各数据点的残差（实际值-预测值）
- *         - RSS: 残差平方和
- *         - R²: 决定系数
- *         如果数据不足或回归失败，返回空向量
+ *         - alpha: the intercept
+ *         - beta1~betan: the coefficient of every factor
+ *         - e1~en: the residual of every data point (actual value - predicted value)
+ *         - RSS: the residual sum of squares
+ *         - R²: the coefficient of determination
+ *         An empty vector is returned if the data is insufficient or the regression fails
  *
  * @ingroup Indicator
  */
@@ -85,15 +91,15 @@ HKU_API std::vector<double> multi_regression_full(const Stock& stk, const KQuery
                                                   const IndicatorList& inds);
 
 /**
- * 对股票进行多元线性回归分析（完整版本，可变参数）
+ * Perform a multiple linear regression analysis on a stock (full version, variadic)
  *
- * @details 与上述函数功能相同，提供可变参数接口
+ * @details It has the same function as the above function, providing a variadic interface
  *
- * @param stk 股票对象
- * @param query K线查询条件
- * @param ind1 第一个指标（必需）
- * @param inds 更多指标（可选）
- * @return 回归结果向量
+ * @param stk the stock object
+ * @param query K-line query condition
+ * @param ind1 the first indicator (required)
+ * @param inds more indicators (optional)
+ * @return the regression result vector
  *
  * @ingroup Indicator
  */

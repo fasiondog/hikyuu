@@ -30,7 +30,7 @@ vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& in
                                                      const KData& kdata, bool tovalue);
 
 /**
- * 指标实现类，定义新指标时，应从此类继承
+ * Indicator implementation class; when defining a new indicator, this class should be inherited
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
@@ -44,23 +44,23 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
 
 public:
     enum OPType : uint8_t {
-        LEAF,   ///< 叶子节点
+        LEAF,   ///< Leaf node
         OP,     /// OP(OP1,OP2) OP1->calcalue(OP2->calculate(ind))
-        ADD,    ///< 加
-        SUB,    ///< 减
-        MUL,    ///< 乘
-        DIV,    ///< 除
-        MOD,    ///< 取模
-        EQ,     ///< 等于
-        GT,     ///< 大于
-        LT,     ///< 小于
-        NE,     ///< 不等于
-        GE,     ///< 大于等于
-        LE,     ///< 小于等于
-        AND,    ///< 与
-        OR,     ///< 或
-        WEAVE,  ///< 特殊的，需要两个指标作为参数的指标
-        OP_IF,  /// if操作
+        ADD,    ///< Addition
+        SUB,    ///< Subtraction
+        MUL,    ///< Multiplication
+        DIV,    ///< Division
+        MOD,    ///< Modulo
+        EQ,     ///< Equal
+        GT,     ///< Greater than
+        LT,     ///< Less than
+        NE,     ///< Not equal
+        GE,     ///< Greater than or equal
+        LE,     ///< Less than or equal
+        AND,    ///< And
+        OR,     ///< Or
+        WEAVE,  ///< Special, an indicator that requires two indicators as the parameters
+        OP_IF,  /// if operation
         INVALID
     };
 
@@ -68,7 +68,7 @@ public:
     typedef IndicatorImpBuffer buffer_t;
 
 public:
-    /** 默认构造函数   */
+    /** Default constructor   */
     IndicatorImp();
     explicit IndicatorImp(const string& name);
     IndicatorImp(const string& name, size_t result_num);
@@ -101,47 +101,54 @@ public:
 
     size_t getPos(Datetime) const;
 
-    /** 以PriceList方式获取指定的输出集 */
+    /** Get the given output set in the form of a PriceList */
     PriceList getResultAsPriceList(size_t result_num);
 
-    /** 以Indicator的方式获取指定的输出集，该方式包含了discard的信息 */
+    /** Get the given output set in the form of an Indicator, it contains the discard information */
     IndicatorImpPtr getResult(size_t result_num);
 
     /**
-     * 使用IndicatorImp(const Indicator&...)构造函数后，计算结果使用该函数,
-     * 未做越界保护
+     * After using the IndicatorImp(const Indicator&...) constructor, this function is used for the
+     * calculation result; no out-of-range protection is done
      */
     void _set(value_t val, size_t pos, size_t num = 0);
 
     /**
-     * 准备内存
-     * @param len 长度，如果长度大于MAX_RESULT_NUM将抛出异常std::invalid_argument
-     * @param result_num 结果集数量
-     * @return true 成功 | false 失败
+     * Prepare the memory
+     * @param len the length; std::invalid_argument is thrown if the length is greater than
+     *            MAX_RESULT_NUM
+     * @param result_num number of the result sets
+     * @return true success | false failure
      */
     void _readyBuffer(size_t len, size_t result_num);
 
-    /** 数据中是否包含 nan 值 */
+    /** Whether the data contains nan values */
     bool existNan(size_t result_idx = 0) const;
 
     const string& name() const noexcept;
     void name(const string& name) noexcept;
 
-    /** 返回形如：Name(param1=val,param2=val,...) */
+    /** It is returned in the form: Name(param1=val,param2=val,...) */
     string long_name() const;
 
     /**
-     * @brief 构造出身标识（进程内唯一，clone/cloneNode 传承，不序列化）
+     * @brief Construction origin identifier (unique within the process, inherited by
+     * clone/cloneNode, not serialized)
      *
-     * 供缓存类设施用作身份（如截面面板缓存）。同一次构造及其克隆链共享同一 id；
-     * 独立构造必然不同 id。不参与 alike()/operator==/formula() 等任何既有判等与展示。
+     * It is used as the identity by the caching facilities (such as the cross-section panel cache).
+     * One construction and its clone chain share the same id; independent constructions necessarily
+     * have different ids. It does not participate in any existing equality judgment or display such
+     * as alike()/operator==/formula().
      *
-     * 注：定义在 IndicatorImp.cpp（非 inline）。dllexport 类的 inline 成员不保证导出，
-     * 是否产生外部符号引用取决于调用方的内联决策，插件 dll 会链接失败。
+     * Note: it is defined in IndicatorImp.cpp (not inline). The inline member of a dllexport class
+     * is not guaranteed to be exported, whether an external symbol reference is generated depends
+     * on the inline decision of the caller, and a plugin dll will fail to link.
      *
-     * 注意（身份语义限制）：origin_id 只标识"出身"，不感知构造后的原地变异
-     * （setParam/setIndParam/add）。凡被缓存设施用作身份的指标对象，构造后必须
-     * 视为不可变；如需不同参数请构造新对象（新对象必持新 id）。
+     * Note (identity semantic limitation): origin_id only identifies the "origin", it is not aware
+     * of the in-place mutation after the construction (setParam/setIndParam/add). Any indicator
+     * object used as an identity by a caching facility must be regarded as immutable after the
+     * construction; construct a new object if different parameters are needed (a new object always
+     * holds a new id).
      */
     uint64_t originId() const noexcept;
 
@@ -167,21 +174,25 @@ public:
     bool isPythonObject() const noexcept;
 
     /**
-     * 该实现是否可在可复用的批处理执行器上被反复重算。
+     * Whether this implementation can be recalculated repeatedly on a reusable batch executor.
      *
-     * 默认放行（非 Python 实现、且未显式置 `_support_batch_reuse=false` 都视为可复用）。
-     * 参与复用意味着同一节点的计算图会被 `CompiledFactorPlan` 跨股票反复重绑 context
-     * 并重算，因此自定义 C++ 指标必须满足：除 IndicatorImp 自身的 result buffer 与
-     * `m_params/m_ind_params` 外，不持有任何跨股票会残留的成员状态（如缓存统计量、可变
-     * 缓冲、上次输入依赖的中间结果等）。凡是会在 `_calculate`/`_dyn_calculate` 外部保留
-     * 上述状态、或无法通过 `scrubTemplateNode` 重置干净的实现，都应在构造时调用
-     * `supportBatchReuse(false)` 主动退出快速路径，回退到旧行为。
+     * It is allowed by default (a non-Python implementation without an explicit
+     * `_support_batch_reuse=false` is regarded as reusable). Participating in the reuse means that
+     * the calculation graph of the same node is repeatedly rebounded to the context across the
+     * stocks and recalculated by `CompiledFactorPlan`, so a custom C++ indicator must satisfy:
+     * apart from the result buffer of IndicatorImp itself and `m_params/m_ind_params`, it holds no
+     * member state that would remain across the stocks (such as cached statistics, mutable buffers,
+     * intermediate results that depend on the last input, and so on). Any implementation that keeps
+     * the above state outside `_calculate`/`_dyn_calculate`, or cannot be reset cleanly through
+     * `scrubTemplateNode`, should call `supportBatchReuse(false)` at construction to exit the fast
+     * path actively and fall back to the old behavior.
      */
     bool supportBatchReuse() const;
 
     void supportBatchReuse(bool enable);
 
-    /** 仅用于两个结果集数量相同、长度相同的指标交换数据，不交换其他参数。失败抛出异常 */
+    /** Only used to swap the data of two indicators with the same number of result sets and the
+     *  same length, no other parameters are swapped. An exception is thrown on failure */
     void swap(IndicatorImp* other);
     void swap(IndicatorImp* other, size_t other_result_idx, size_t self_result_idx);
 
@@ -195,32 +206,33 @@ public:
     const ind_param_map_t& getIndParams() const;
 
     // ===================
-    //  子类接口
+    //  Subclass interface
     // ===================
     virtual void _calculate(const Indicator&);
 
-    // ====== start 动态参数计算相关接口 ======
+    // ====== start dynamic parameter calculation related interface ======
     /**
-     * 动态参数计算接口
-     * @note 如果只有一个动态参数，且该参数代表计算窗口周期，可以直接重载_dyn_run_one_step
-     * 配合isSerial
+     * Dynamic parameter calculation interface
+     * @note If there is only one dynamic parameter and it represents the calculation window period,
+     *       _dyn_run_one_step can be overloaded directly together with isSerial
      */
     virtual void _dyn_calculate(const Indicator&);
 
     /**
-     * 如果只有一个动态参数，且该参数代表计算窗口周期，则可使用该宏定义动态周期计算接口，否则需要自己重载
-     * _dyn_calculate 函数实现动态参数计算
+     * If there is only one dynamic parameter and it represents the calculation window period, this
+     * macro can be used to define the dynamic cycle calculation interface; otherwise you need to
+     * overload the _dyn_calculate function yourself to implement the dynamic parameter calculation
      */
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {}
 
-    /** 是否必须串行计算 */
+    /** Whether the calculation must be serial */
     bool isSerial() const noexcept {
         return m_is_serial;
     }
-    // ====== end 动态参数计算相关接口 ======
+    // ====== end dynamic parameter calculation related interface ======
 
-    // ====== start 增量计算相关接口 =======
-    /** 是否支持增量计算 */
+    // ====== start incremental calculation related interface =======
+    /** Whether the incremental calculation is supported */
     virtual bool supportIncrementCalculate() const;
 
     virtual size_t min_increment_start() const {
@@ -228,7 +240,7 @@ public:
     }
 
     virtual void _increment_calculate(const Indicator& ind, size_t start_pos) {}
-    // ====== end 增量计算相关接口 =======
+    // ====== end incremental calculation related interface ======
 
     virtual IndicatorImpPtr _clone() {
         return make_shared<IndicatorImp>();
@@ -249,17 +261,19 @@ public:
 
 public:
     // ===================
-    //  内部特殊用途公共接口
+    //  Internal public interface for special purposes
     // ===================
 
     void onlySetContext(const KData&);
 
     void setCalculateFlag(bool flag) noexcept;
 
-    /** 判断是否和另一个指标等效，即计算效果相同 */
+    /** Judge whether it is equivalent to another indicator, i.e. the calculation effect is the
+     *  same */
     bool alike(const IndicatorImp& other) const;
 
-    /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
+    /** Judge whether the indicator formula contains the indicator with the given name (for special
+     *  use) */
     bool contains(const string& name) const;
 
     value_t* data(size_t result_idx = 0) noexcept;
@@ -274,20 +288,23 @@ public:
     void printAllSubTrees(bool show_long_name = false) const;
     void printLeaves(bool show_long_name = false) const;
 
-    /* 特殊指标需自己实现 selfAlike 函数的, needSelfAlikeCompare 应返回 true */
+    /* For a special indicator that needs to implement the selfAlike function itself,
+     *  needSelfAlikeCompare should return true */
     bool needSelfAlikeCompare() const noexcept {
         return m_need_self_alike_compare;
     }
 
-    // 特殊指标需自己实现 selfAlike 函数，返回true表示两个指标等效
+    // A special indicator needs to implement the selfAlike function itself; returning true means
+    // the two indicators are equivalent
     virtual bool selfAlike(const IndicatorImp& other) const noexcept {
         return false;
     }
 
-    // 使用输入上下文的特殊指标获取内部节点，以便合入指标树优化
+    // Get the inner nodes of the special indicator that uses the input context, so that it can be
+    // merged into the indicator tree optimization
     virtual void getSelfInnerNodesWithInputConext(vector<IndicatorImpPtr>& nodes) const {}
 
-    // 指定独立 ktype 的叶子节点重载获取内部子节点
+    // Overload of a leaf node with a separate ktype to get its inner child nodes
     virtual void getSeparateKTypeLeafSubNodes(vector<IndicatorImpPtr>& nodes) const {}
 
 private:
@@ -323,10 +340,10 @@ private:
 
     void _printTree(int depth = 0, bool isLast = true, bool show_long_name = false) const;
 
-    // 获取所有子树
+    // Get all the subtrees
     vector<IndicatorImp*> getAllSubTrees() const;
 
-    // 获取子树中节点的数量
+    // Get the number of the nodes in the subtree
     static size_t treeSize(IndicatorImp* tree);
 
     static bool nodeInTree(IndicatorImp* node, IndicatorImp* tree);
@@ -357,10 +374,12 @@ protected:
 
     IndicatorImp* m_parent{nullptr};  // can't use shared_from_this in python, so not weak_ptr
 
-    /** 构造发号器：唯一定义在 IndicatorImp.cpp，保证跨 DLL 只有一份计数器 */
+    /** Construction id issuer: defined only in IndicatorImp.cpp, guaranteeing that there is only
+     *  one counter across the DLLs */
     static uint64_t nextOriginId() noexcept;
 
-    /** 构造出身标识：构造发放，clone/cloneNode 传承，不进序列化 NVP 列表 */
+    /** Construction origin identifier: issued at construction and inherited by clone/cloneNode,
+     *  it does not enter the serialization NVP list */
     uint64_t m_origin_id{nextOriginId()};
 
 public:
@@ -490,8 +509,9 @@ public:                                                      \
         return make_shared<classname>();                     \
     }
 
-// 如果只有一个动态参数，且该参数代表计算窗口周期，则可使用该宏定义动态周期计算接口，否则需要自己重载
-// _dyn_calculate 函数实现动态参数计算
+// If there is only one dynamic parameter and it represents the calculation window period, this
+// macro can be used to define the dynamic cycle calculation interface; otherwise you need to
+// overload the _dyn_calculate function yourself to implement the dynamic parameter calculation
 #define INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE \
 public:                                     \
     virtual void _dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) override;
@@ -503,7 +523,7 @@ public:                                                                         
         return true;                                                                    \
     }
 
-/** 获取 OPType 名称字符串 */
+/** Get the name string of OPType */
 string HKU_API getOPTypeName(IndicatorImp::OPType);
 
 typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
