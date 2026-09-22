@@ -14,21 +14,21 @@
 namespace hku {
 
 /**
- * 按索引方式查询K线数据条件
+ * Query condition for K-line (candlestick) data by index
  * @ingroup StockManage
  */
 class HKU_API KQuery {
 public:
-    /// 查询方式：索引或日期
+    /// Query mode: by index or by date
     enum QueryType : uint8_t {
-        INDEX = 0,  ///< 按索引方式查询
-        DATE = 1,   ///< 按日期方式查询
+        INDEX = 0,  ///< Query by index
+        DATE = 1,   ///< Query by date
         INVALID = 2
     };
 
     typedef string KType;
 
-    // 基础K线类型
+    // Basic K-line types
     static const string MIN;
     static const string MIN5;
     static const string MIN15;
@@ -42,31 +42,31 @@ public:
     static const string HALFYEAR;
     static const string YEAR;
 
-    // 扩展K线类型
+    // Extended K-line types
     static const string DAY3;
     static const string DAY5;
     static const string DAY7;
     static const string MIN3;
-    static const string HOUR4;   // 默认不支持
-    static const string HOUR6;   // 默认不支持
-    static const string HOUR12;  // 默认不支持
+    static const string HOUR4;   // Not supported by default
+    static const string HOUR6;   // Not supported by default
+    static const string HOUR12;  // Not supported by default
 
-    static const string TIMELINE;  // 分时
-    static const string TRANS;     // 分笔
+    static const string TIMELINE;  // Intraday time-line
+    static const string TRANS;     // Tick
 
-    /** 判断指定的K线类型是否有效 */
+    /** Whether the given K-line type is valid */
     static bool isValidKType(const string& ktype);
 
-    /** 判断是否为有效 ktype */
+    /** Whether it is a base ktype */
     static bool isBaseKType(const string& ktype) noexcept;
 
-    /** 判断是否为扩展 ktype */
+    /** Whether it is an extended ktype */
     static bool isExtraKType(const string& ktype);
 
-    /** 获取所有的 KType */
+    /** Get all base KTypes */
     static vector<KType> getBaseKTypeList() noexcept;
 
-    /** 获取所有扩展 KType */
+    /** Get all extended KTypes */
     static vector<KType> getExtraKTypeList();
 
     static int32_t getKTypeInMin(const KType& ktype);
@@ -76,19 +76,19 @@ public:
     static int64_t getKTypeInSeconds(const KType& ktype);
 
     /**
-     * 复权类型
-     * @note 日线以上，如周线/月线不支持复权
+     * Price adjustment type
+     * @note Periods above daily, e.g. weekly / monthly, do not support price adjustment
      */
     enum RecoverType : uint8_t {
-        NO_RECOVER = 0,      ///< 不复权
-        FORWARD = 1,         ///< 前向复权
-        BACKWARD = 2,        ///< 后向复权
-        EQUAL_FORWARD = 3,   ///< 等比前向复权
-        EQUAL_BACKWARD = 4,  ///< 等比后向复权
+        NO_RECOVER = 0,      ///< No adjustment
+        FORWARD = 1,         ///< Forward adjustment
+        BACKWARD = 2,        ///< Backward adjustment
+        EQUAL_FORWARD = 3,   ///< Equal-ratio forward adjustment
+        EQUAL_BACKWARD = 4,  ///< Equal-ratio backward adjustment
         INVALID_RECOVER_TYPE = 5
     };
 
-    /** 默认构造，按索引方式查询全部日线数据，不复权 */
+    /** Default constructor: query all daily data by index, without price adjustment */
     KQuery()
     : m_start(0),
       m_end(Null<int64_t>()),
@@ -97,12 +97,12 @@ public:
       m_recoverType(NO_RECOVER) {};
 
     /**
-     * K线查询，范围[start, end)
-     * @param start 起始索引，支持负数
-     * @param end  结束索引（不包含本身），支持负数
-     * @param dataType K线类型
-     * @param recoverType 复权类型
-     * @param queryType 默认按索引方式查询
+     * Query K-line data over the range [start, end)
+     * @param start start index, negative values are supported
+     * @param end  end index (exclusive), negative values are supported
+     * @param dataType K-line type
+     * @param recoverType price adjustment type
+     * @param queryType query by index by default
      */
     KQuery(int64_t start,  // cppcheck-suppress [noExplicitConstructor]
            int64_t end = Null<int64_t>(), const KType& dataType = DAY,
@@ -116,75 +116,75 @@ public:
     }
 
     /**
-     * 按指定日期查询 K 线，范围[start, end)
-     * @param start 起始日期
-     * @param end  结束日期
-     * @param ktype K线类型
-     * @param recoverType 复权类型
+     * Query K-line data by date, over the range [start, end)
+     * @param start start date
+     * @param end  end date
+     * @param ktype K-line type
+     * @param recoverType price adjustment type
      */
     KQuery(Datetime start,  // cppcheck-suppress [noExplicitConstructor]
            Datetime end = Null<Datetime>(), const KType& ktype = DAY,
            RecoverType recoverType = NO_RECOVER);
 
     /**
-     * 按索引方式查询时，返回指定的起始索引，否则返回Null<int64_t>()
+     * Return the specified start index when querying by index, otherwise Null<int64_t>()
      */
     int64_t start() const noexcept {
         return m_queryType != INDEX ? Null<int64_t>() : m_start;
     }
 
     /**
-     * 按索引方式查询时，返回指定的结束索引，否则返回Null<int64_t>()
+     * Return the specified end index when querying by index, otherwise Null<int64_t>()
      */
     int64_t end() const noexcept {
         return m_queryType != INDEX ? Null<int64_t>() : m_end;
     }
 
     /**
-     * 按日期方式查询时，返回指定的起始日期，否则返回Null<Datetime>()
+     * Return the specified start date when querying by date, otherwise Null<Datetime>()
      */
     Datetime startDatetime() const;
 
     /**
-     * 按日期方式查询时，返回指定的结束日期，否则返回Null<Datetime>()
+     * Return the specified end date when querying by date, otherwise Null<Datetime>()
      */
     Datetime endDatetime() const;
 
-    /** 获取查询条件类型 */
+    /** Get the query condition type */
     QueryType queryType() const noexcept {
         return m_queryType;
     }
 
-    /** 获取K线数据类型 */
+    /** Get the K-line data type */
     // KType kType() const { return m_dataType; }
     const string& kType() const noexcept {
         return m_dataType;
     }
 
-    /** 获取K线数据类型所对应的秒数 */
+    /** Get the number of seconds corresponding to the K-line data type */
     TimeDelta kTypeInSeconds() const {
         return Seconds(getKTypeInSeconds(m_dataType));
     }
 
-    /** 获取复权类型 */
+    /** Get the price adjustment type */
     RecoverType recoverType() const noexcept {
         return m_recoverType;
     }
 
-    /** 设置复权类型 */
+    /** Set the price adjustment type */
     void recoverType(RecoverType recoverType) noexcept {
         m_recoverType = recoverType;
     }
 
     /**
-     * @brief 哈希值（谨慎）
-     * @note 由于 end 为 null 时，获取
-     * K线数据行为不一致，所以除非知道自己的使用场景，否则勿使用此方法
+     * @brief Hash value (use with care)
+     * @note When end is null, the behavior of fetching K-line data is inconsistent, so do not use
+     *       this method unless you know your use case
      * @return size_t
      */
     uint64_t hash() const;
 
-    /** 判断是否为右开区间，即未指定结束时间 */
+    /** Whether it is a right-open interval, i.e. no end time was specified */
     bool isRightOpening() const {
         if (m_queryType == DATE) {
             return endDatetime().isNull();
@@ -192,22 +192,22 @@ public:
         return m_end == Null<int64_t>();
     }
 
-    /** 获取queryType名称，用于显示输出 */
+    /** Get the name of the queryType, used for display output */
     static string getQueryTypeName(QueryType);
 
-    /** 获取KType名称，用于显示输出 */
+    /** Get the name of the KType, used for display output */
     static string getKTypeName(const KType&);
 
-    /** 获取recoverType名称，用于显示输出 */
+    /** Get the name of the recoverType, used for display output */
     static string getRecoverTypeName(RecoverType);
 
-    /** 根据字符串名称获取相应的queryType枚举值 */
+    /** Get the queryType enum value matching the given string name */
     static QueryType getQueryTypeEnum(const string&);
 
-    /** 根据字符串名称，获取相应的枚举值 */
+    /** Get the KType enum value matching the given string name */
     static KType getKTypeEnum(const string&);
 
-    /** 根据字符串名称，获取相应的枚举值 */
+    /** Get the recoverType enum value matching the given string name */
     static RecoverType getRecoverTypeEnum(const string&);
 
 private:
@@ -219,11 +219,11 @@ private:
 };
 
 /**
- * 构造按索引方式K线查询，范围[start, end)
- * @param start 起始索引，支持负数
- * @param end  结束索引（不包含本身），支持负数
- * @param dataType K线类型
- * @param recoverType 复权类型
+ * Create a K-line query by index, over the range [start, end)
+ * @param start start index, negative values are supported
+ * @param end  end index (exclusive), negative values are supported
+ * @param dataType K-line type
+ * @param recoverType price adjustment type
  * @see KQuery
  * @ingroup StockManage*
  */
@@ -237,11 +237,11 @@ inline KQuery KQueryByIndex(int64_t start, int64_t end, const KQuery::KType& dat
 }
 
 /**
- * 构造按日期方式K线查询，范围[startDatetime, endDatetime)
- * @param start 起始日期
- * @param end  结束日期（不包含本身）
- * @param dataType K线类型
- * @param recoverType 复权类型
+ * Create a K-line query by date, over the range [startDatetime, endDatetime)
+ * @param start start date
+ * @param end  end date (exclusive)
+ * @param dataType K-line type
+ * @param recoverType price adjustment type
  * @see KQuery
  * @ingroup StockManage
  */
@@ -256,21 +256,22 @@ inline KQuery KQueryByDate(const Datetime& start, const Datetime& end,
 }
 
 /**
- * 输出KQuery信息，如：KQuery(start, end, queryType, kType, recoverType)
+ * Print the KQuery information, e.g. KQuery(start, end, queryType, kType, recoverType)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream& os, const KQuery& query);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
+// Relational comparison functions. They are not defined inside the class so that
+// Null<>() == d is supported, i.e. Null can be placed on the left side
 //
 ///////////////////////////////////////////////////////////////////////////////
 bool HKU_API operator==(const KQuery&, const KQuery&) noexcept;
 bool HKU_API operator!=(const KQuery&, const KQuery&) noexcept;
 
 /**
- * 提供KQuery的Null值
+ * Provide the Null value of KQuery
  * @ingroup StockManage
  */
 template <>
