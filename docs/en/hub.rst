@@ -1,113 +1,112 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/hub.rst
+.. py:currentmodule:: hikyuu
+.. highlight:: python
 
-使用HUB
-==========
+Using the HUB
+=============
 
-HUB 指的是量化交易策略部件的平台，用于：
+The HUB refers to the platform of the quantitative trading strategy parts, used to:
 
-1. 存储策略：策略仓库为用户提供了一个集中的地方来存储和管理的量化交易策略。这些策略可能包括各种投资逻辑、交易规则、风险控制措施等。
-2. 共享与学习：大家可以在策略仓库中分享策略，供他人用户学习和借鉴，共同进步。
-3. 个人策略积累和管理：处理公共的 hikyuu_hub 外，可以自行搭建自己的策略仓库。通过加入本地目录做仓库，个人可以更加灵活地管理和控制自己的策略库。比如，通过不同的仓库来管理 alpha_101, alpha_36 等不同的因子库。
-4. 仓库版本管理：本地策略库仅仅为本地的目录，可以选择使用 git 进行版本管理。比如，公共的 hikyuu_hub 库就是使用 git 进行管理。
-5. 仓库中的策略部件同时支持 python 和 C++ 编写，可以避免直接修改 hikyuu 源码来添加新功能。
+1. Store the strategies: the strategy repository provides users with a centralized place to store and manage the quantitative trading strategies. These strategies may include various investment logics, trading rules, risk control measures, etc.
+2. Share and learn: everyone can share the strategies in the strategy repository for other users to learn and draw on, and make progress together.
+3. Accumulate and manage the personal strategies: besides the public hikyuu_hub, you can also build your own strategy repository. By adding a local directory as a repository, individuals can manage and control their own strategy library more flexibly. For example, manage different factor libraries such as alpha_101, alpha_36 through different repositories.
+4. Repository version management: the local strategy library is only a local directory; you can choose to use git for the version management. For example, the public hikyuu_hub repository is managed with git.
+5. The strategy parts in the repository support both python and C++, which can avoid directly modifying the hikyuu source code to add new features.
 
-有关 HUB 的详细使用, 参见: `Hikyuu | 量化交易策略部件仓库使用说明 <https://mp.weixin.qq.com/s/4oh9DEEUkv1gk4KoCcGhtQ>`_
+For the detailed usage of the HUB, see: `Hikyuu | 量化交易策略部件仓库使用说明 <https://mp.weixin.qq.com/s/4oh9DEEUkv1gk4KoCcGhtQ>`_
 
 
 .. py:function:: add_remote_hub(name, url, branch='main')
     
-    增加远程策略仓库
+    Add a remote strategy repository
 
-    :param str name: 本地仓库名称（自行起名）
-    :param str url: git 仓库地址
-    :param str branch: git 仓库分支
+    :param str name: the local repository name (name it yourself)
+    :param str url: the git repository address
+    :param str branch: the git repository branch
 
 
 .. py:function:: add_local_hub(name, path)
 
-    增加本地策略仓库
+    Add a local strategy repository
 
-    :param str name: 本地仓库名称（自行起名）
-    :param str path: 本地仓库路径
+    :param str name: the local repository name (name it yourself)
+    :param str path: the local repository path
 
 
 .. py:function:: update_hub(name)
 
-    更新策略仓库
+    Update the strategy repository
 
-    :param str name: 仓库名称
+    :param str name: the repository name
 
 
 .. py:function:: remove_hub(name)
 
-    删除策略仓库
+    Remove the strategy repository
 
-    :param str name: 仓库名称
+    :param str name: the repository name
 
 
 .. py:function:: get_hub_name_list()
 
-    获取策略仓库名称列表
+    Get the list of the strategy repository names
 
-    :return: 仓库列表
+    :return: the repository list
     :rtype: list
 
 
 .. py:function:: get_hub_path(name)
 
-    获取策略仓库路径
+    Get the strategy repository path
 
-    :param str name: 仓库名称
+    :param str name: the repository name
 
 
 .. py:function:: get_current_hub(filename)
 
-    用于在仓库part.py中获取当前所在的仓库名。
+    Used to get the name of the current repository in the part.py of the repository.
     
-    示例： get_current_hub(__file__)
+    Example: get_current_hub(__file__)
 
-    :return: 仓库名称
+    :return: the repository name
     :rtype: str
 
 
 .. py:function:: get_part(name, *args, **kwargs)
 
-    获取策略部件
+    Get the strategy part
 
-    :param str name: 策略部件名称
-    :param args: 策略部件参数
-    :param kwargs: 策略部件参数
-    :return: 策略部件实例
+    :param str name: the strategy part name
+    :param args: the strategy part parameters
+    :param kwargs: the strategy part parameters
+    :return: the strategy part instance
     :rtype: object
 
 
 .. py:function:: get_part_name_list(self, hub=None, part_type=None)
 
-    获取策略部件名称列表
+    Get the list of the strategy part names
 
-    :param str name: 仓库名称
-    :param str part_type: 部件类型
-    :return: 策略部件名称列表
+    :param str name: the repository name
+    :param str part_type: the part type
+    :return: the list of the strategy part names
     :rtype: list
 
 
 .. py:function:: help_part(name)
 
-    获取策略部件帮助信息
+    Get the help information of the strategy part
 
-    :param str name: 部件名称
+    :param str name: the part name
 
 
 .. py:function:: search_part(name: str=None, hub: str = None, part_type: str = None, label=None)
 
-    搜索策略部件
+    Search the strategy parts
 
-    示例: search_part('趋势')
+    Example: search_part('趋势')
 
-    :param str name: 部件名称
-    :param str hub: 仓库名称
-    :param str part_type: 部件类型
-    :param str label: 标签
-    :return: 策略部件名称列表
-
-
+    :param str name: the part name
+    :param str hub: the repository name
+    :param str part_type: the part type
+    :param str label: the label
+    :return: the list of the strategy part names
