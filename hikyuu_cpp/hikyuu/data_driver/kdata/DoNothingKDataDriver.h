@@ -10,7 +10,8 @@
 namespace hku {
 
 /**
- * 一个特殊的 KDatadriver，不实际读取数据，用于增加外部临时Stock时使用
+ * A special KDataDriver that does not actually read the data, used when adding an external
+ * temporary Stock
  */
 class DoNothingKDataDriver : public KDataDriver {
 public:

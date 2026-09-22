@@ -20,18 +20,19 @@ typedef DriverConnectPool<KDataDriverConnect> KDataDriverConnectPool;
 typedef shared_ptr<KDataDriverConnectPool> KDataDriverConnectPoolPtr;
 
 /**
- * 数据驱动工厂类
+ * Data driver factory class
  * @ingroup DataDriver
  */
 class HKU_API DataDriverFactory {
 public:
     /**
-     * 初始化支持的默认驱动
+     * Initialize the supported default drivers
      */
     static void init();
 
     /**
-     * 主动释放资源，主要用于内存泄漏检测，退出时主动清理，避免误报
+     * Release the resources proactively, mainly used for memory leak detection, cleaning up
+     * proactively on exit to avoid false positives
      */
     static void release();
 
@@ -50,8 +51,8 @@ public:
 private:
     static map<string, BaseInfoDriverPtr> *m_baseInfoDrivers;
     static map<string, BlockInfoDriverPtr> *m_blockDrivers;
-    static map<string, KDataDriverPtr> *m_kdataPrototypeDrivers;        // K线驱动原型
-    static map<string, KDataDriverConnectPoolPtr> *m_kdataDriverPools;  // K线驱动池
+    static map<string, KDataDriverPtr> *m_kdataPrototypeDrivers;        // K-line driver prototype
+    static map<string, KDataDriverConnectPoolPtr> *m_kdataDriverPools;  // K-line driver pool
 };
 
 } /* namespace hku */

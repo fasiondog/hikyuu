@@ -1,7 +1,7 @@
 /*
  * MySQLBaseInfoDriver.h
  *
- *  Created on: 2014年8月27日
+ *  Created on: 2014-8-27
  *      Author: fasiondog
  */
 

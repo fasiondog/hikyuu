@@ -1,7 +1,7 @@
 /*
  * KDataTempCsvDriver.h
  *
- *  Created on: 2017年7月30日
+ *  Created on: 2017-7-30
  *      Author: fasiondog
  */
 
@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 获取临时载入的CSV文件
+ * Get the temporarily loaded CSV file
  * @ingroup DataDriver
  */
 class KDataTempCsvDriver : public KDataDriver {
@@ -44,32 +44,32 @@ public:
     }
 
     /**
-     * 获取指定类型的K线数据量
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param kType  K线类型
+     * Get the amount of the K-line data of the given type
+     * @param market market abbreviation
+     * @param code   security code
+     * @param kType  K-line type
      * @return
      */
     virtual size_t getCount(const string& market, const string& code,
                             const KQuery::KType& kType) override;
 
     /**
-     * 获取指定日期范围对应的K线记录索引
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param query  查询条件
-     * @param out_start [out] 对应K线记录位置
-     * @param out_end [out] 对应的K线记录位置
+     * Get the K-line record index corresponding to the given date range
+     * @param market market abbreviation
+     * @param code   security code
+     * @param query  query condition
+     * @param out_start [out] the position of the corresponding K-line record
+     * @param out_end [out] the position of the corresponding K-line record
      * @return
      */
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end) override;
 
     /**
-     * 获取 K 线数据
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param query  查询条件
+     * Get the K-line data
+     * @param market market abbreviation
+     * @param code   security code
+     * @param query  query condition
      */
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query) override;

@@ -1,7 +1,7 @@
 /*
  * SQLiteKDataDriver.h
  *
- *   Created on: 2023年09月14日
+ *   Created on: 2023-09-14
  *       Author: yangrq1018
  */
 #pragma once

@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 读取历史财务信息
+ * Read the historical financial information
  * @ingroup DataDriver
  */
 class HKU_API HistoryFinanceReader {
@@ -28,7 +28,7 @@ public:
     PriceList getHistoryFinanceInfo(Datetime date, const string& market, const string& code);
 
 private:
-    string m_dir;  //历史财务信息文件存放目录
+    string m_dir;  // The directory where the historical financial information files are stored
 };
 
 }  // namespace hku
