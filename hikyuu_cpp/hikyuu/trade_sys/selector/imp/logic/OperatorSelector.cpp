@@ -144,7 +144,8 @@ SelectorPtr OperatorSelector::_clone() {
 #if 0    
     // OperatorSelector does not support the clone operation
     // Implementing clone would require a whole mechanism similar to the indicator one
-    // it would need to find the most underlying system strategy instance and, after creating the clone object, the original system instance would also have to use that clone
+    // it would need to find the most underlying system strategy instance and, after creating the
+    // clone object, the original system instance would also have to use that clone
     auto p = make_shared<OperatorSelector>();
     p->cloneRebuild(m_se1, m_se2);
     return p;
