@@ -1,5 +1,5 @@
 # .readthedocs.yaml
-# Read the Docs configuration file
+# Read the Docs configuration file (English site: project hikyuu)
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
 # Required
@@ -11,15 +11,12 @@ build:
   tools:
     python: "3.11"
 
-# Build the Chinese source tree (docs/zh) — paths are relative to the repository root
+# Build the English source tree (docs/en) — paths are relative to the repository root
 sphinx:
-  configuration: docs/zh/conf.py
+  configuration: docs/en/conf.py
 
 # We recommend specifying your dependencies to enable reproducible builds:
 # https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-# python:
-#   install:
-#   - requirements: docs/requirements.txt
 python:
   install:
     - requirements: docs/requirements.txt
