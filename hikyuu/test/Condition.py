@@ -3,8 +3,8 @@
 # gb18030
 
 # ===============================================================================
-# 作者：fasiondog
-# 历史：1）20130311, Added by fasiondog
+# Author: fasiondog
+# History: 1)20130311, Added by fasiondog
 # ===============================================================================
 
 import unittest
@@ -70,8 +70,8 @@ class TestCrtCN(unittest.TestCase):
 
         k = sm['sh000001'].get_kdata(Query(-100))
         self.assertEqual(k.empty(), False)
-        p.sg = SignalBase()  # cn设置交易对象时，必须已经指定了信号指示器
-        p.to = k  # cn在设置交易对象时才会调用_caculate函数
+        p.sg = SignalBase()  # The signal indicator must already be specified when setting the trading object of cn
+        p.to = k  # The _calculate function is called only when cn sets the trading object
         self.assertEqual(p.is_valid(Datetime(201108120000)), True)
         self.assertEqual(p.is_valid(Datetime(201108250000)), True)
         self.assertEqual(p.is_valid(Datetime(200101030000)), False)

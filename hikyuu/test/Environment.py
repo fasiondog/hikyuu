@@ -3,8 +3,8 @@
 # gb18030
 
 #===============================================================================
-# 作者：fasiondog
-# 历史：1）20130311, Added by fasiondog
+# Author: fasiondog
+# History: 1)20130311, Added by fasiondog
 #===============================================================================
 
 import unittest
@@ -66,7 +66,7 @@ class TestCrtEV(unittest.TestCase):
         self.assertEqual(p.get_param("n"), 10)
         p.set_param("n", 20)
         self.assertEqual(p.get_param("n"), 20)
-        p.query = Query(-100)  #ev在设置查询对象时才会调用_caculate函数
+        p.query = Query(-100)  # The _calculate function is called only when ev sets the query object
         self.assertEqual(p.is_valid(Datetime(200101010000)), True)
 
         p_clone = p.clone()

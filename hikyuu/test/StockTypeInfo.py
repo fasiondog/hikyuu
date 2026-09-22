@@ -3,8 +3,8 @@
 # gb18030
 
 #===============================================================================
-# 作者：fasiondog
-# 历史：1）20120927, Added by fasiondog
+# Author: fasiondog
+# History: 1)20120927, Added by fasiondog
 #===============================================================================
 
 import unittest
@@ -28,7 +28,7 @@ class StockTypeInfoTest(unittest.TestCase):
         if not constant.pickle_support:
             return
 
-        #TODO: Python3 出错，暂未解决
+        # TODO: fails on Python3, not resolved yet
         """import pickle as pl
         filename = sm.tmpdir() + '/StockTypeInfo.plk'
         a = sm.getStockTypeInfo(1)

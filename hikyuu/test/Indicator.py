@@ -3,8 +3,8 @@
 # gb18030
 
 # ===============================================================================
-# 作者：fasiondog
-# 历史：1）20130220, Added by fasiondog
+# Author: fasiondog
+# History: 1)20130220, Added by fasiondog
 # ===============================================================================
 
 import unittest
@@ -208,7 +208,7 @@ class IndicatorTest(unittest.TestCase):
         if not constant.pickle_support:
             return
 
-        # TODO Python3出错，暂未解决
+        # TODO: fails on Python3, not resolved yet
         """
         import pickle as pl
         filename = sm.tmpdir() + '/Indicator.plk'
@@ -231,97 +231,97 @@ class IndicatorTest(unittest.TestCase):
         data = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]
         ind = PRICELIST(data)
 
-        # 测试N=1，应该与BARSLAST一致
+        # Test N=1, should be consistent with BARSLAST
         result1 = BARSLASTS(ind, 1)
         expected1 = BARSLAST(ind)
 
-        # print(f"数据: {data}")
+        # print(f"data: {data}")
         # print(f"BARSLASTS(ind, 1): {[result1[i] for i in range(len(result1))]}")
         # print(f"BARSLAST(ind):     {[expected1[i] for i in range(len(expected1))]}")
 
-        # 验证N=1时与BARSLAST一致
+        # Verify that N=1 is consistent with BARSLAST
         for i in range(len(result1)):
             if np.isnan(expected1[i]):
                 self.assertTrue(np.isnan(result1[i]))
             else:
                 self.assertTrue(result1[i] == expected1[i])
 
-        # print("✓ N=1时与BARSLAST一致")
+        # print("✓ N=1 is consistent with BARSLAST")
 
-        # 测试N=2
+        # Test N=2
         result2 = BARSLASTS(ind, 2)
         # print(f"BARSLASTS(ind, 2): {[result2[i] for i in range(len(result2))]}")
         # print(f"BARSLASTS(ind, 2) discard: {result2.discard}")
 
-        # 验证N=2的结果
-        # 位置0-3：条件只成立1次，不足2次，应为NaN
+        # Verify the N=2 result
+        # Positions 0-3: the condition holds only once, less than 2 times, should be NaN
         for i in range(4):
             self.assertTrue(np.isnan(result2[i]))
 
-        # 位置4：条件第2次成立，距离第1次成立(位置0)为4
+        # Position 4: the condition holds for the 2nd time, 4 bars from the 1st hold (position 0)
         self.assertTrue(result2[4] == 4)
 
-        # 位置5-7：条件已成立2次，距离第1次成立(位置0)分别为5,6,7
+        # Positions 5-7: the condition holds twice, 5, 6, 7 bars from the 1st hold (position 0)
         for i in range(5, 8):
             self.assertTrue(result2[i] == i)
 
-        # 位置8：条件第3次成立，距离第2次成立(位置4)为4
+        # Position 8: the condition holds for the 3rd time, 4 bars from the 2nd hold (position 4)
         self.assertTrue(result2[8] == 4)
 
-        # print("✓ N=2测试通过")
+        # print("✓ N=2 test passed")
 
-        # 测试N=3
+        # Test N=3
         result3 = BARSLASTS(ind, 3)
         # print(f"BARSLASTS(ind, 3): {[result3[i] for i in range(len(result3))]}")
 
-        # 验证N=3的结果
-        # 位置0-7：条件只成立2次，不足3次，应为NaN
+        # Verify the N=3 result
+        # Positions 0-7: the condition holds only twice, less than 3 times, should be NaN
         for i in range(8):
             self.assertTrue(np.isnan(result3[i]))
 
-        # 位置8：条件第3次成立，距离第1次成立(位置0)为8
+        # Position 8: the condition holds for the 3rd time, 8 bars from the 1st hold (position 0)
         self.assertTrue(result3[8] == 8)
 
-        # 位置9-11：条件已成立3次，距离第1次成立(位置0)分别为9,10,11
+        # Positions 9-11: the condition holds 3 times, 9, 10, 11 bars from the 1st hold (position 0)
         for i in range(9, 12):
             self.assertTrue(result3[i] == i)
 
-        """测试边界情况"""
-        # print("\n测试边界情况...")
+        """Test the edge cases"""
+        # print("\nTesting the edge cases...")
 
-        # 测试N <= 0
+        # Test N <= 0
         data = [1, 0, 1, 0, 1]
         ind = PRICELIST(data)
 
         result0 = BARSLASTS(ind, 0)
         # print(f"BARSLASTS(ind, 0): {[result0[i] for i in range(len(result0))]}")
         self.assertTrue(result0.discard == len(data))
-        # print("✓ N=0测试通过")
+        # print("✓ N=0 test passed")
 
         result_neg = BARSLASTS(ind, -1)
         # print(f"BARSLASTS(ind, -1): {[result_neg[i] for i in range(len(result_neg))]}")
         self.assertTrue(result_neg.discard == len(data))
-        # print("✓ N=-1测试通过")
+        # print("✓ N=-1 test passed")
 
-        # 测试空数据
+        # Test empty data
         empty_ind = PRICELIST([])
         result_empty = BARSLASTS(empty_ind, 1)
-        # print(f"BARSLASTS(空数据, 1): 长度={len(result_empty)}")
+        # print(f"BARSLASTS(empty data, 1): length={len(result_empty)}")
         self.assertTrue(len(result_empty) == 0)
-        # print("✓ 空数据测试通过")
+        # print("✓ empty data test passed")
 
-        # 测试全0数据
+        # Test all-zero data
         zeros = [0, 0, 0, 0, 0]
         ind_zeros = PRICELIST(zeros)
         result_zeros = BARSLASTS(ind_zeros, 1)
-        # print(f"BARSLASTS(全0数据, 1): discard={result_zeros.discard}")
+        # print(f"BARSLASTS(all-zero data, 1): discard={result_zeros.discard}")
         self.assertTrue(result_zeros.discard == len(zeros))
-        # print("✓ 全0数据测试通过")
+        # print("✓ all-zero data test passed")
 
-        """测试与K线数据结合使用"""
-        # print("\n测试与K线数据结合使用...")
+        """Test the combination with K-line data"""
+        # print("\nTesting the combination with K-line data...")
 
-        # 获取股票数据
+        # Get the stock data
         sm = StockManager.instance()
         stock = sm['sh000001']
 
@@ -335,19 +335,19 @@ class IndicatorTest(unittest.TestCase):
             print("⚠ K-line data is empty, skipping this test")
             return
 
-        # 测试收盘价上涨
+        # Test the rising close price
         close = CLOSE(kdata)
         up = close > REF(close, 1)
 
-        # 计算第1次上涨到现在的天数
+        # Calculate the days from the 1st rise to now
         result1 = BARSLASTS(up, 1)
-        # print(f"BARSLASTS(上涨, 1)前5个值: {[result1[i] for i in range(min(5, len(result1)))]}")
+        # print(f"BARSLASTS(rise, 1) first 5 values: {[result1[i] for i in range(min(5, len(result1)))]}")
 
-        # 计算第2次上涨到现在的天数
+        # Calculate the days from the 2nd rise to now
         result2 = BARSLASTS(up, 2)
-        # print(f"BARSLASTS(上涨, 2)前5个值: {[result2[i] for i in range(min(5, len(result2)))]}")
+        # print(f"BARSLASTS(rise, 2) first 5 values: {[result2[i] for i in range(min(5, len(result2)))]}")
 
-        # 验证N=1时与BARSLAST一致
+        # Verify that N=1 is consistent with BARSLAST
         expected = BARSLAST(up)
         for i in range(min(10, len(result1))):
             if np.isnan(expected[i]):
@@ -355,58 +355,58 @@ class IndicatorTest(unittest.TestCase):
             else:
                 self.assertTrue(result1[i] == expected[i])
 
-        # print("✓ K线数据测试通过")
+        # print("✓ K-line data test passed")
 
     def test_CODELIKE_NAMELIKE(self):
-        """测试CODELIKE和NAMELIKE指标"""
-        # 获取测试股票
+        """Test the CODELIKE and NAMELIKE indicators"""
+        # Get the test stock
         stock = sm['sh000001']
         k = stock.get_kdata(Query(-10))
         
-        # 测试CODELIKE - 精确匹配
+        # Test CODELIKE - exact match
         result = CODELIKE(k, "000001")
         self.assertEqual(len(result), len(k))
-        # sh000001的代码是000001，应该匹配成功，返回全1
+        # The code of sh000001 is 000001, it should match and return all 1
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
         
-        # 测试CODELIKE - 包含匹配（无通配符时自动包含匹配）
+        # Test CODELIKE - contains match (auto contains match when there is no wildcard)
         result = CODELIKE(k, "000")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
         
-        # 测试CODELIKE - 通配符?匹配
+        # Test CODELIKE - wildcard ? match
         result = CODELIKE(k, "??????")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
         
-        # 测试CODELIKE - 不匹配的情况
+        # Test CODELIKE - no match case
         result = CODELIKE(k, "01")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 0.0)
         
-        # 测试NAMELIKE - 包含匹配（无通配符时自动包含匹配）
+        # Test NAMELIKE - contains match (auto contains match when there is no wildcard)
         result = NAMELIKE(k, "上证")
         self.assertEqual(len(result), len(k))
-        # sh000001的名称包含"上证"，应该匹配成功
+        # The Chinese name of sh000001 contains the pattern above, it should match
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
         
-        # 测试NAMELIKE - 不匹配的情况
-        result = NAMELIKE(k, "*不存在的名称*")
+        # Test NAMELIKE - no match case
+        result = NAMELIKE(k, "*non-existent name*")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 0.0)
         
-        # 测试深圳股票
+        # Test a Shenzhen stock
         stock2 = sm['sz00001']
         if not stock2.is_null():
             k2 = stock2.get_kdata(Query(-10))
             
-            # 测试CODELIKE
+            # Test CODELIKE
             result = CODELIKE(k2, "000")
             self.assertEqual(len(result), len(k2))
             for i in range(len(result)):
@@ -417,7 +417,7 @@ class IndicatorTest(unittest.TestCase):
             for i in range(len(result)):
                 self.assertEqual(result[i], 0.0)
         
-        # 测试深圳股票NAMELIKE
+        # Test NAMELIKE for a Shenzhen stock
         stock3 = sm['sz000955']
         if not stock3.is_null():
             k3 = stock3.get_kdata(Query(-10))
@@ -428,11 +428,11 @@ class IndicatorTest(unittest.TestCase):
                 self.assertEqual(result[i], 1.0)
     
     def test_CODELIKE_NAMELIKE_wildcard(self):
-        """测试CODELIKE和NAMELIKE的通配符功能"""
+        """Test the wildcard function of CODELIKE and NAMELIKE"""
         stock = sm['sh000001']
         k = stock.get_kdata(Query(-10))
         
-        # 测试通配符*匹配任意序列
+        # Test the wildcard * matching any sequence
         result = CODELIKE(k, "*")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
@@ -443,7 +443,7 @@ class IndicatorTest(unittest.TestCase):
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
         
-        # 测试通配符组合
+        # Test wildcard combinations
         result = CODELIKE(k, "0*1")
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
