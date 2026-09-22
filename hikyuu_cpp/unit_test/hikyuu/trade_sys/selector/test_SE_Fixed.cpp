@@ -36,7 +36,7 @@ TEST_CASE("test_SE_Fixed") {
     /** @arg Try to add an empty system strategy prototype */
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], SYSPtr()), std::exception);
 
-    // /** @arg 试图加入一个缺少MM | SG的系统策略原型 */
+    // /** @arg Try to add a system strategy prototype missing MM | SG */
     SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
     MMPtr mm = MM_FixedCount(100);
     sys->setSG(sg);
@@ -46,7 +46,7 @@ TEST_CASE("test_SE_Fixed") {
     sys->setMM(mm);
     CHECK_THROWS_AS(se->addStock(sm["sh600000"], sys), std::exception);
 
-    // 目前必须有PF指定实际执行的子系统，下面代码无法执行
+    // Currently a PF must specify the actually executed subsystem, so the code below cannot run
     // /** @arg getSelectedSystemList */
     sys->setSG(sg);
     se->addStock(sm["sh600000"], sys);

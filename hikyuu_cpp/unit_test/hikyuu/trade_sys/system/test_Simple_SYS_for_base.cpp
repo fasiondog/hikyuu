@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（基本操作）  */
+/** @par Test point (the basic operations) */
 TEST_CASE("test_SYS_Simple_for_base") {
     TradeRecordList tr_list;
     price_t current_cash;
@@ -48,22 +48,22 @@ TEST_CASE("test_SYS_Simple_for_base") {
     MMPtr mm = MM_FixedCount(100);
     SYSPtr sys;
 
-    /** @arg 未指定账户运行    */
+    /** @arg Run without a given account */
     sys = SYS_Simple();
     CHECK_THROWS_AS(sys->readyForRun(), std::exception);
 
-    /** @arg 指定了账户，但未指定其他策略组件 */
+    /** @arg The account is given but the other strategy components are not */
     sys = SYS_Simple();
     sys->setTM(tm->clone());
     CHECK_THROWS_AS(sys->readyForRun(), std::exception);
 
-    /** @arg 指定了TM和SG，但未指定其他策略组件 */
+    /** @arg TM and SG are given but the other components are not */
     sys = SYS_Simple();
     sys->setTM(tm->clone());
     sys->setSG(sg->clone());
     CHECK_THROWS_AS(sys->readyForRun(), std::exception);
 
-    /** @arg 指定了TM、SG、MM，但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG and MM are given but the others are not, a non-delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", false);
     sys->setParam("sell_delay", false);
@@ -115,7 +115,7 @@ TEST_CASE("test_SYS_Simple_for_base") {
     CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[3].from, PART_SIGNAL);
 
-    /** @arg 指定了TM、SG、MM，但未指定其他策略组件，延迟操作 */
+    /** @arg TM, SG and MM are given but the others are not, a delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", true);
     sys->setParam("sell_delay", true);

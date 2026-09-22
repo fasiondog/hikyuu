@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（止损策略）  */
+/** @par Test point (the stop-loss strategy) */
 TEST_CASE("test_SYS_Simple_for_st") {
     TradeRecordList tr_list;
     price_t current_cash;
@@ -49,7 +49,7 @@ TEST_CASE("test_SYS_Simple_for_st") {
     STPtr st = ST_FixedPercent(0.01);
     SYSPtr sys;
 
-    /** @arg 指定了TM、SG、MM、ST，但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG, MM and ST are given but the others are not, a non-delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", false);
     sys->setParam("sell_delay", false);
@@ -102,7 +102,7 @@ TEST_CASE("test_SYS_Simple_for_st") {
     // CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     // CHECK_EQ(tr_list[3].from, PART_SIGNAL);
 
-    /** @arg 指定了TM、SG、MM、ST，但未指定其他策略组件，延迟操作 */
+    /** @arg TM, SG, MM and ST are given but the others are not, a delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", true);
     sys->setParam("sell_delay", true);

@@ -28,7 +28,7 @@ TEST_CASE("test_MM_FixedCount") {
     /** @arg n < 1 */
     CHECK_THROWS_AS(MM_FixedCount(0), std::exception);
 
-    /** @arg n = 100, 一个初始资金为0的交易账户，能够执行买入操作 */
+    /** @arg n = 100; a trade account with the initial capital 0 can execute a buy */
     tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
     CHECK_EQ(tm->initCash(), 0.0);
     auto mm = MM_FixedCount(100);

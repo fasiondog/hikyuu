@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（系统有效性策略）  */
+/** @par Test point (the system valid condition strategy) */
 TEST_CASE("test_SYS_Simple_for_cn") {
     TradeRecordList tr_list;
     price_t current_cash;
@@ -63,7 +63,7 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     CNPtr cn2 = make_shared<TestCN2>();
     CNPtr cn3 = make_shared<TestCN3>();
 
-    /** @arg 指定了TM、SG、MM、ST、TP、EV、CN，CN有效日期和EV重合 */
+    /** @arg TM, SG, MM, ST, TP, EV and CN are given; the CN valid dates overlap those of EV */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);
@@ -121,7 +121,8 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[3].from, PART_ENVIRONMENT);
 
-    /** @arg 指定了TM、SG、MM、ST、TP、EV、CN，CN的有效日期范围完全覆盖并大于EV的范围 */
+    /** @arg TM, SG, MM, ST, TP, EV and CN are given; the CN valid range fully covers and exceeds EV
+     */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);
@@ -179,7 +180,7 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[3].from, PART_ENVIRONMENT);
 
-    /** @arg 指定了TM、SG、MM、EV、CN（不触发建仓），CN的有效日期范围在EV的范围之内 */
+    /** @arg TM, SG, MM, EV and CN are given (no position building); the CN range is inside EV */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);
@@ -236,7 +237,7 @@ TEST_CASE("test_SYS_Simple_for_cn") {
     CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[3].from, PART_CONDITION);
 
-    /** @arg 指定了TM、SG、MM、EV、CN（触发建仓），CN的有效日期范围在EV的范围之内 */
+    /** @arg TM, SG, MM, EV and CN are given (position building); the CN range is inside EV */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);

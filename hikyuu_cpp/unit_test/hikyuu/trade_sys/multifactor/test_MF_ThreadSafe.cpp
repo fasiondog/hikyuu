@@ -4,14 +4,17 @@
  *  Created on: 2026-07-31
  *      Author: woleigegg
  *
- *  MultiFactorBase 线程安全惰性计算的白盒测试。
+ *  The white box test of the thread safe lazy calculation of MultiFactorBase.
  *
- *   - T2 并发首次访问：barrier 齐射 32 线程混合调用 getter，实际构建恰好一次；
- *   - T3 失败重试：首次 _calculate 抛异常且恶意写坏基类派生状态，
- *     验证原异常传播、基类半成品被清理、第二次调用成功且无脏数据；
- *   - T4 reset：重置后重新计算，无旧结果残留；
- *   - T6 嵌套：一个 MF 的 _calculate 触发另一个 MF 的惰性计算，无死锁；
- *   - T7 序列化：load 后状态未发布，重新计算得到完整结果。
+ *   - T2 a concurrent first access: 32 threads released by a barrier call the getters in a mixed
+ * way and the build happens exactly once;
+ *   - T3 a failure retry: the first _calculate throws and maliciously corrupts the base derived
+ * state; it verifies that the original exception propagates, the base half-finished product is
+ * cleaned and the second call succeeds without dirty data;
+ *   - T4 reset: the recalculation after the reset leaves no old result;
+ *   - T6 nesting: the _calculate of one MF triggers the lazy calculation of another MF without a
+ * deadlock;
+ *   - T7 serialization: after load the state is not published and the recalculation is complete.
  */
 
 #include "../../test_config.h"
@@ -32,7 +35,8 @@ using namespace hku;
  * @{
  */
 
-/** 简易 spin barrier：不依赖 C++20 latch/barrier，保证各线程同时起跑 */
+/** A simple spin barrier: it does not depend on the C++20 latch/barrier and all the threads start
+ * together */
 class SpinBarrier {
 public:
     explicit SpinBarrier(size_t n) : m_target(n) {}
@@ -50,7 +54,7 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-// 计数 MF：进入 _calculate 即计数并延迟，放大并发窗口
+// A counting MF: it counts and delays on entering _calculate, enlarging the concurrency window
 //-----------------------------------------------------------------------------
 
 class TestCountingMF : public MultiFactorBase {
@@ -66,7 +70,7 @@ IndicatorList TestCountingMF::_calculate(const vector<IndicatorList>& all_stk_in
     s_count.fetch_add(1, std::memory_order_relaxed);
     std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-    // 等权合成（与 EqualWeightMultiFactor 相同逻辑）
+    // The equal weight combination (the same logic as EqualWeightMultiFactor)
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_factorset.size();
@@ -97,7 +101,8 @@ IndicatorList TestCountingMF::_calculate(const vector<IndicatorList>& all_stk_in
 
 std::atomic<size_t> TestCountingMF::s_count{0};
 
-/** 构造并配置一个计数 MF（两个因子确保走 _calculate 分支，而非单因子直通） */
+/** Build and configure a counting MF (two factors take the _calculate branch, not the single-factor
+ * pass-through) */
 static std::shared_ptr<TestCountingMF> makeCountingMF() {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -114,7 +119,8 @@ static std::shared_ptr<TestCountingMF> makeCountingMF() {
     return mf;
 }
 
-/** @par 并发首次访问：32 线程 barrier 齐射混合调用 getter，实际构建恰好一次 */
+/** @par A concurrent first access: 32 threads released by a barrier call the getters in a mixed way
+ * and the build happens exactly once */
 TEST_CASE("test_MF_thread_safe_concurrent_first_access") {
     TestCountingMF::s_count = 0;
     auto mf = makeCountingMF();
@@ -144,14 +150,14 @@ TEST_CASE("test_MF_thread_safe_concurrent_first_access") {
         t.join();
     }
 
-    // 完整计算只执行一次
+    // The complete calculation runs once only
     CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 1u);
-    // 所有线程都拿到一致完整结果
+    // All the threads get a consistent complete result
     CHECK_EQ(ok_count.load(std::memory_order_relaxed), N);
 }
 
 //-----------------------------------------------------------------------------
-// FailOnce MF：首次调用写坏基类派生状态后抛异常，第二次正常
+// A FailOnce MF: the first call corrupts the base derived state and throws; the second is normal
 //-----------------------------------------------------------------------------
 
 class TestFailOnceMF : public MultiFactorBase {
@@ -168,19 +174,20 @@ public:
 IndicatorList TestFailOnceMF::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t call = s_calls.fetch_add(1, std::memory_order_relaxed);
     if (call == 0) {
-        // 恶意写坏基类 protected 派生状态，模拟自定义子类遗留半成品；
-        // 若 clearCalculatedData 未生效，第二次计算会看到这些脏数据
+        // Maliciously corrupt the base protected derived state, simulating a half-finished product
+        // left by a custom subclass; if clearCalculatedData does not work, the second run sees the
+        // dirty data
         m_date_index[s_dirty_date] = 999;
         m_ic = PRICELIST(PriceList{12345.0});
         throw std::runtime_error("simulated first-call failure");
     }
 
-    // 第二次计算开始时检查：第一次遗留的脏状态必须已被清理
+    // Check at the start of the second calculation: the dirty state left by the first is cleaned
     if (m_date_index.find(s_dirty_date) != m_date_index.end()) {
         s_saw_dirty.store(true, std::memory_order_relaxed);
     }
 
-    // 等权合成
+    // The equal weight combination
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();
     size_t ind_count = m_factorset.size();
@@ -213,7 +220,8 @@ std::atomic<size_t> TestFailOnceMF::s_calls{0};
 std::atomic<bool> TestFailOnceMF::s_saw_dirty{false};
 Datetime TestFailOnceMF::s_dirty_date = Datetime(20111204);
 
-/** @par 失败重试：首次异常向上传播，半成品被清理，第二次调用成功 */
+/** @par The failure retry: the first exception propagates up, the half-finished product is cleaned
+ * and the second call succeeds */
 TEST_CASE("test_MF_failed_first_call_clean_retry") {
     TestFailOnceMF::s_calls = 0;
     TestFailOnceMF::s_saw_dirty = false;
@@ -231,23 +239,23 @@ TEST_CASE("test_MF_failed_first_call_clean_retry") {
     mf->setRefFactorSet(FactorSet(inds, KQuery::DAY));
     mf->setParam<bool>("save_all_factors", true);
 
-    // 第一次调用：原异常向上传播，不发布 Ready
+    // The first call: the original exception propagates up and Ready is not published
     REQUIRE_THROWS_AS(mf->getDatetimeList(), std::runtime_error);
     CHECK_EQ(TestFailOnceMF::s_calls.load(std::memory_order_relaxed), 1u);
 
-    // 第二次调用：基于干净状态重新计算成功
+    // The second call: the recalculation based on the clean state succeeds
     const auto& dates = mf->getDatetimeList();
     CHECK_UNARY_FALSE(dates.empty());
     CHECK_EQ(TestFailOnceMF::s_calls.load(std::memory_order_relaxed), 2u);
-    // 第一次遗留的脏派生状态必须已被 clearCalculatedData 清除
+    // The dirty derived state left by the first call must have been cleared by clearCalculatedData
     CHECK_UNARY_FALSE(TestFailOnceMF::s_saw_dirty.load(std::memory_order_relaxed));
 
-    // 结果完整可用
+    // The result is complete and usable
     auto cross = mf->getScores(dates[dates.size() / 2]);
     CHECK_UNARY_FALSE(cross.empty());
 }
 
-/** @par reset 后重新计算：无旧结果残留，结果与首次一致 */
+/** @par The recalculation after reset: no old result is left and it matches the first one */
 TEST_CASE("test_MF_reset_recalculates_clean") {
     TestCountingMF::s_count = 0;
     auto mf = makeCountingMF();
@@ -257,10 +265,10 @@ TEST_CASE("test_MF_reset_recalculates_clean") {
     CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 1u);
 
     mf->reset();
-    // reset 本身不触发计算
+    // reset itself does not trigger the calculation
     CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 1u);
 
-    // 再次访问触发重算，结果一致
+    // Accessing again triggers the recalculation and the result is consistent
     const auto& dates2 = mf->getDatetimeList();
     CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 2u);
     CHECK_EQ(dates1, dates2);
@@ -274,7 +282,7 @@ TEST_CASE("test_MF_reset_recalculates_clean") {
 }
 
 //-----------------------------------------------------------------------------
-// 嵌套：一个 MF 的 _calculate 触发另一个 MF 的惰性计算
+// Nesting: the _calculate of one MF triggers the lazy calculation of another MF
 //-----------------------------------------------------------------------------
 
 class TestNestedMFB : public MultiFactorBase {
@@ -315,7 +323,7 @@ private:
 };
 
 IndicatorList TestNestedMFA::_calculate(const vector<IndicatorList>& all_stk_inds) {
-    // 在 A 的计算过程中触发 B 的惰性计算：不同实例不同 mutex，无环
+    // Trigger the lazy calculation of B during the calculation of A: different mutexes, no cycle
     if (m_b && !m_ref_dates.empty()) {
         (void)m_b->getScores(m_ref_dates[m_ref_dates.size() / 2]);
     }
@@ -334,7 +342,8 @@ IndicatorList TestNestedMFA::_calculate(const vector<IndicatorList>& all_stk_ind
     });
 }
 
-/** @par 嵌套计算：A 的 _calculate 内触发 B 的惰性计算，并发触发无死锁 */
+/** @par The nested calculation: the lazy calculation of B is triggered inside the _calculate of A
+ * and the concurrent triggering has no deadlock */
 TEST_CASE("test_MF_nested_calculate_no_deadlock") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -355,7 +364,7 @@ TEST_CASE("test_MF_nested_calculate_no_deadlock") {
     a->setRefFactorSet(FactorSet(inds, KQuery::DAY));
     a->setB(b);
 
-    // 两个线程同时触发 A 和 B 的惰性计算
+    // Two threads trigger the lazy calculations of A and B at the same time
     std::atomic<bool> go{false};
     std::vector<std::thread> threads;
     threads.emplace_back([&]() {
@@ -378,25 +387,25 @@ TEST_CASE("test_MF_nested_calculate_no_deadlock") {
         t.join();
     }
 
-    // 无死锁即通过；结果完整可用
+    // No deadlock means it passes; the result is complete and usable
     CHECK_UNARY_FALSE(a->getDatetimeList().empty());
     CHECK_UNARY_FALSE(b->getDatetimeList().empty());
     CHECK_UNARY_FALSE(a->getScores(a->getDatetimeList().back()).empty());
 }
 
-/** @par clone 独立状态：原对象 Ready 后 clone 不共享计算状态
- *  两个线程同时访问原对象（已 Ready，不重算）与克隆对象（首次访问触发重算），
- *  互不干扰且结果相等。
- */
-TEST_CASE("test_MF_clone_independent_state") {
+/** @par The clone independent state: after the original object is Ready the clone does not share
+ * the calculation state Two threads access the original object (already Ready, no recalculation)
+ * and the clone (the first access triggers a recalculation) at the same time, without interfering
+ * with each other and the results are equal. */
+*/ TEST_CASE("test_MF_clone_independent_state") {
     TestCountingMF::s_count = 0;
     auto mfA = makeCountingMF();
 
-    // A 计算完成
+    // The calculation of A is finished
     (void)mfA->getDatetimeList();
     CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 1u);
 
-    // clone 后强制重算：原对象不重算，仅克隆对象触发
+    // A forced recalculation after clone: the original is not recalculated, only the clone triggers
     auto mfB = mfA->clone();
 
     std::atomic<bool> go{false};
@@ -421,10 +430,10 @@ TEST_CASE("test_MF_clone_independent_state") {
         t.join();
     }
 
-    // 只有克隆对象触发了一次新的完整计算
+    // Only the clone triggered one new complete calculation
     CHECK_EQ(TestCountingMF::s_count.load(std::memory_order_relaxed), 2u);
 
-    // 两对象结果一致
+    // The results of the two objects are consistent
     const auto& dates_a = mfA->getDatetimeList();
     const auto& dates_b = mfB->getDatetimeList();
     CHECK_EQ(dates_a, dates_b);
@@ -437,7 +446,7 @@ TEST_CASE("test_MF_clone_independent_state") {
     }
 }
 
-/** @par 序列化 load 后状态未发布：重新计算得到完整结果 */
+/** @par After the serialization load the state is not published: the recalculation is complete */
 #if HKU_SUPPORT_SERIALIZATION
 TEST_CASE("test_MF_serialization_load_recalculates") {
     StockManager& sm = StockManager::instance();
@@ -448,7 +457,7 @@ TEST_CASE("test_MF_serialization_load_recalculates") {
 
     auto mf1 = MF_EqualWeight(inds, stks, query, ref_stk);
     mf1->setParam<bool>("save_all_factors", true);
-    (void)mf1->getDatetimeList();  // 触发计算
+    (void)mf1->getDatetimeList();  // Trigger the calculation
 
     string filename(sm.tmpdir());
     filename += "/MF_thread_safe_export.xml";
@@ -465,7 +474,8 @@ TEST_CASE("test_MF_serialization_load_recalculates") {
         ia >> BOOST_SERIALIZATION_NVP(mf2);
     }
 
-    // load 后 m_calculated 必须为 false：访问触发重新计算而非复用旧状态
+    // After load m_calculated must be false: an access recalculates instead of reusing the old
+    // state
     const auto& dates = mf2->getDatetimeList();
     CHECK_UNARY_FALSE(dates.empty());
     auto cross = mf2->getScores(dates[dates.size() / 2]);

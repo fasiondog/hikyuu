@@ -30,7 +30,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
     KQuery query = KQueryByIndex(-50);
     TMPtr tm = crtTM();
 
-    /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
+    /** @arg A single candidate system with SE_MaxFundsOptimal */
     auto se = SE_MaxFundsOptimal();
     se->setParam<bool>("trace", true);
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
@@ -54,7 +54,7 @@ TEST_CASE("test_SYS_WalkForword_SE_MaxFundsOptimal_parallel") {
         CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
     }
 
-    /** @arg 多个候选系统， 使用 SE_MaxFundsOptimal */
+    /** @arg Multiple candidate systems with SE_MaxFundsOptimal */
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     SystemList sys_list;
     for (const auto& param : params) {
@@ -89,7 +89,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     KQuery query = KQueryByIndex(-50);
     TMPtr tm = crtTM();
 
-    /** @arg 只有一个候选系统, 使用 SE_MaxFundsOptimal */
+    /** @arg A single candidate system with SE_MaxFundsOptimal */
     auto se = SE_PerformanceOptimal("当前总资产");
     auto sys = SYS_WalkForward(SystemList{create_test_sys(3, 5)}, tm, 30, 20, se);
     CHECK_EQ(sys->name(), "SYS_WalkForward");
@@ -112,7 +112,7 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
         CHECK_EQ(tr_list1[i + 1], tr_list2[i]);
     }
 
-    /** @arg 多个候选系统， 使用 SE_MaxFundsOptimal */
+    /** @arg Multiple candidate systems with SE_MaxFundsOptimal */
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     SystemList sys_list;
     for (const auto& param : params) {

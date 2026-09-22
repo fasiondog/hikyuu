@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（市场环境策略）  */
+/** @par Test point (the market environment strategy) */
 TEST_CASE("test_SYS_Simple_for_ev") {
     TradeRecordList tr_list;
     price_t current_cash;
@@ -59,7 +59,7 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     EVPtr ev3 = make_shared<TestEV3>();
     ev3->setQuery(query);
 
-    /** @arg 指定了TM、SG、MM、ST、TP、EV（不触发建仓），但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG, MM, ST, TP and EV are given (no position building) but the others are not */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);
@@ -103,7 +103,7 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_LT(std::fabs(tr_list[2].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[2].from, PART_ENVIRONMENT);
 
-    /** @arg 指定了TM、SG、MM、ST、TP、EV（触发建仓），但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG, MM, ST, TP and EV are given (position building) but the others are not */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);
@@ -160,7 +160,7 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_LT(std::fabs(tr_list[3].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[3].from, PART_ENVIRONMENT);
 
-    /** @arg 指定了TM、SG、MM、ST、TP、EV（不触发建仓），但未指定其他策略组件，延迟操作 */
+    /** @arg TM, SG, MM, ST, TP, EV given (no position building), the others are not, delayed */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", true);
     sys->setParam<bool>("sell_delay", true);
@@ -203,7 +203,7 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_LT(std::fabs(tr_list[2].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[2].from, PART_ENVIRONMENT);
 
-    /** @arg 指定了TM、SG、MM、ST、TP、EV（触发建仓），但未指定其他策略组件，延迟操作 */
+    /** @arg TM, SG, MM, ST, TP and EV are given (position building), the others are not, delayed */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", true);
     sys->setParam<bool>("sell_delay", true);
@@ -260,7 +260,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_EQ(tr_list[3].from, PART_ENVIRONMENT);
 
     /** @arg
-     * 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、不触发建仓），但未指定其他策略组件，非延迟操作
+     * TM, SG, MM and EV are given (covering one buy / sell pair exactly, no position building) but
+     * the others are not, a non-delayed operation
      */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
@@ -303,7 +304,8 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_EQ(tr_list[2].from, PART_SIGNAL);
 
     /** @arg
-     * 指定了TM、SG、MM、EV（刚好覆盖一对买入/卖出信号、触发建仓），但未指定其他策略组件，非延迟操作
+     * TM, SG, MM and EV are given (covering one buy / sell pair exactly, position building) but the
+     * others are not, a non-delayed operation
      */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
@@ -345,7 +347,7 @@ TEST_CASE("test_SYS_Simple_for_ev") {
     CHECK_LT(std::fabs(tr_list[2].cash - current_cash), 0.00001);
     CHECK_EQ(tr_list[2].from, PART_SIGNAL);
 
-    /** @arg 指定了TM、SG、MM、EV（触发建仓），EV的有效起始日期刚好是买入信号日期 */
+    /** @arg TM, SG, MM and EV are given (position building); the EV start date is the buy date */
     sys = SYS_Simple();
     sys->setParam<bool>("buy_delay", false);
     sys->setParam<bool>("sell_delay", false);

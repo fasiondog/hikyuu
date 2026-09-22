@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（止盈策略）  */
+/** @par Test point (the take-profit strategy) */
 TEST_CASE("test_SYS_Simple_for_tp") {
     TradeRecordList tr_list;
     price_t current_cash;
@@ -50,7 +50,7 @@ TEST_CASE("test_SYS_Simple_for_tp") {
     TPPtr tp = ST_Indicator(MA(CLOSE(), 5));
     SYSPtr sys;
 
-    /** @arg 指定了TM、SG、MM、ST、TP，但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG, MM, ST and TP are given but the others are not, a non-delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", false);
     sys->setParam("sell_delay", false);
@@ -117,7 +117,7 @@ TEST_CASE("test_SYS_Simple_for_tp") {
     // CHECK_LT(std::fabs(tr_list[4].cash - current_cash), 0.00001);
     // CHECK_EQ(tr_list[4].from, PART_TAKEPROFIT);
 
-    /** @arg 指定了TM、SG、MM、ST、TP，但未指定其他策略组件，延迟操作 */
+    /** @arg TM, SG, MM, ST and TP are given but the others are not, a delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", true);
     sys->setParam("sell_delay", true);

@@ -38,16 +38,16 @@ TEST_CASE("test_SE_MultiFactor") {
     sys->setSG(SG_Cycle());
     sys->setParam<bool>("buy_delay", false);
 
-    /** @arg 测试试图修改参数值为非法值 */
+    /** @arg Test trying to change a parameter into an illegal value */
     auto ret = SE_MultiFactor(src_inds);
     CHECK_THROWS(ret->setParam<int>("ic_n", 0));
     CHECK_THROWS(ret->setParam<int>("ic_rolling_n", 0));
     CHECK_THROWS(ret->setParam<string>("mode", "MF"));
 
-    /** @arg src_inds 为空，其余为默认参数 */
+    /** @arg src_inds is empty and the others are the default parameters */
     CHECK_THROWS(SE_MultiFactor(IndicatorList{}));
 
-    /** @arg 默认参数 */
+    /** @arg The default parameters */
     ret = SE_MultiFactor(src_inds, 10, 5, 120, ref_stk, "MF_ICIRWeight");
     ret->addStockList(stks, sys);
     auto proto_list = ret->getProtoSystemList();

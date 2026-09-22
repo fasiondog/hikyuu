@@ -44,7 +44,7 @@ TEST_CASE("test_SE_AddValue") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 数字 + 空指针 */
+    /** @arg A number + a null pointer */
     se = 3.0 + SEPtr();
     CHECK_EQ(se->name(), "SE_AddValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -57,7 +57,7 @@ TEST_CASE("test_SE_AddValue") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 空指针 + 数字 */
+    /** @arg A null pointer + a number */
     se = SEPtr() + 3.0;
     CHECK_EQ(se->name(), "SE_AddValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -70,7 +70,7 @@ TEST_CASE("test_SE_AddValue") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 + 数字 */
+    /** @arg A selector + a number */
     se = se1 + 2.0;
     CHECK_EQ(se->name(), "SE_AddValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -86,7 +86,7 @@ TEST_CASE("test_SE_AddValue") {
     CHECK_EQ(result[1].weight, 3.0);
     CHECK_EQ(result[2].weight, 3.0);
 
-    /** @arg 数字 + 选择器 */
+    /** @arg A number + a selector */
     se = 3.0 + se1;
     CHECK_EQ(se->name(), "SE_AddValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -124,7 +124,7 @@ TEST_CASE("test_SE_SubValue") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 数字 - 空指针 */
+    /** @arg A number - a null pointer */
     se = 3.0 - SEPtr();
     CHECK_EQ(se->name(), "SE_SubValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -137,7 +137,7 @@ TEST_CASE("test_SE_SubValue") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 空指针 - 数字 */
+    /** @arg A null pointer - a number */
     se = SEPtr() - 3.0;
     CHECK_EQ(se->name(), "SE_SubValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -150,7 +150,7 @@ TEST_CASE("test_SE_SubValue") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 - 数字 */
+    /** @arg A selector - a number */
     se = se1 - 2.0;
     CHECK_EQ(se->name(), "SE_SubValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -166,7 +166,7 @@ TEST_CASE("test_SE_SubValue") {
     CHECK_EQ(result[1].weight, -1.0);
     CHECK_EQ(result[2].weight, -1.0);
 
-    /** @arg 数字 - 选择器 */
+    /** @arg A number - a selector */
     se = 3.0 - se1;
     CHECK_EQ(se->name(), "SE_SubValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -204,7 +204,7 @@ TEST_CASE("test_SE_MultiValue") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 数字 * 空指针 */
+    /** @arg A number * a null pointer */
     se = 3.0 * SEPtr();
     CHECK_EQ(se->name(), "SE_MultiValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -217,7 +217,7 @@ TEST_CASE("test_SE_MultiValue") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 空指针 * 数字 */
+    /** @arg A null pointer * a number */
     se = SEPtr() * 3.0;
     CHECK_EQ(se->name(), "SE_MultiValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -230,7 +230,7 @@ TEST_CASE("test_SE_MultiValue") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 * 数字 */
+    /** @arg A selector * a number */
     se = se1 * 2.0;
     CHECK_EQ(se->name(), "SE_MultiValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -246,7 +246,7 @@ TEST_CASE("test_SE_MultiValue") {
     CHECK_EQ(result[1].weight, 2.0);
     CHECK_EQ(result[2].weight, 2.0);
 
-    /** @arg 数字 * 选择器 */
+    /** @arg A number * a selector */
     se = 3.0 * se1;
     CHECK_EQ(se->name(), "SE_MultiValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -284,7 +284,7 @@ TEST_CASE("test_SE_DivValue") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 数字 / 空指针 */
+    /** @arg A number / a null pointer */
     se = 3.0 / SEPtr();
     CHECK_EQ(se->name(), "SE_DivValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -297,7 +297,7 @@ TEST_CASE("test_SE_DivValue") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 空指针 / 数字 */
+    /** @arg A null pointer / a number */
     se = SEPtr() / 3.0;
     CHECK_EQ(se->name(), "SE_DivValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -310,7 +310,7 @@ TEST_CASE("test_SE_DivValue") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 * 数字 */
+    /** @arg A selector * a number */
     se = se1 / 2.0;
     CHECK_EQ(se->name(), "SE_DivValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -326,7 +326,7 @@ TEST_CASE("test_SE_DivValue") {
     CHECK_EQ(result[1].weight, 0.5);
     CHECK_EQ(result[2].weight, 0.5);
 
-    /** @arg 数字 / 选择器 */
+    /** @arg A number / a selector */
     se = 3.0 / se1;
     CHECK_EQ(se->name(), "SE_DivValue");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -364,7 +364,7 @@ TEST_CASE("test_SE_Add") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 空指针 + 空指针 */
+    /** @arg A null pointer + a null pointer */
     se = SEPtr() + SEPtr();
     CHECK_EQ(se->name(), "SE_Add");
     se->addStock(sm["sh600000"], sys);
@@ -377,7 +377,7 @@ TEST_CASE("test_SE_Add") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 + 空指针 */
+    /** @arg A selector + a null pointer */
     se = se1 + SEPtr();
     CHECK_EQ(se->name(), "SE_Add");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -396,7 +396,7 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[1].weight, 1.0);
     CHECK_EQ(result[2].weight, 1.0);
 
-    /** @arg 空指针 + 选择器 */
+    /** @arg A null pointer + a selector */
     se1->removeAll();
     se = SEPtr() + se1;
     CHECK_EQ(se->name(), "SE_Add");
@@ -416,7 +416,7 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[1].weight, 1.0);
     CHECK_EQ(result[2].weight, 1.0);
 
-    /** @arg 正常两个选择器相加 */
+    /** @arg The normal addition of two selectors */
     se1->removeAll();
     se2->removeAll();
     se = se1 + se2;
@@ -442,7 +442,7 @@ TEST_CASE("test_SE_Add") {
     CHECK_EQ(result[1].weight, 2.0);
     CHECK_EQ(result[2].weight, 2.0);
 
-    /** 异构并集, 必须使用 addSystem 加入实际的系统实例 */
+    /** A heterogeneous union: the real system instance must be added with addSystem */
     sys->reset();
     auto sys1 = sys->clone();
     sys1->setStock(sm["sh600000"]);
@@ -502,7 +502,7 @@ TEST_CASE("test_SE_Sub") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 空指针 - 空指针 */
+    /** @arg A null pointer - a null pointer */
     se = SEPtr() - SEPtr();
     CHECK_EQ(se->name(), "SE_Sub");
     se->addStock(sm["sh600000"], sys);
@@ -515,7 +515,7 @@ TEST_CASE("test_SE_Sub") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 - 空指针 */
+    /** @arg A selector - a null pointer */
     se = se1 - SEPtr();
     CHECK_EQ(se->name(), "SE_Sub");
     se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
@@ -534,7 +534,7 @@ TEST_CASE("test_SE_Sub") {
     CHECK_EQ(result[1].weight, 1.0);
     CHECK_EQ(result[2].weight, 1.0);
 
-    /** @arg 空指针 - 选择器 */
+    /** @arg A null pointer - a selector */
     se1->removeAll();
     se = SEPtr() - se1;
     CHECK_EQ(se->name(), "SE_Sub");
@@ -554,7 +554,7 @@ TEST_CASE("test_SE_Sub") {
     CHECK_EQ(result[1].weight, -1.0);
     CHECK_EQ(result[2].weight, -1.0);
 
-    /** @arg 正常两个选择器相- */
+    /** @arg The normal subtraction of two selectors */
     se1->removeAll();
     se2->removeAll();
     se = se1 - se2;
@@ -605,7 +605,7 @@ TEST_CASE("test_SE_Multi") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 空指针 * 空指针 */
+    /** @arg A null pointer * a null pointer */
     se = SEPtr() * SEPtr();
     CHECK_EQ(se->name(), "SE_Multi");
     se->addStock(sm["sh600000"], sys);
@@ -618,7 +618,7 @@ TEST_CASE("test_SE_Multi") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 * 空指针 */
+    /** @arg A selector * a null pointer */
     se1->removeAll();
     se = se1 * SEPtr();
     CHECK_EQ(se->name(), "SE_Multi");
@@ -632,7 +632,7 @@ TEST_CASE("test_SE_Multi") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 空指针 * 选择器 */
+    /** @arg A null pointer * a selector */
     se1->removeAll();
     se = SEPtr() * se1;
     CHECK_EQ(se->name(), "SE_Multi");
@@ -646,7 +646,7 @@ TEST_CASE("test_SE_Multi") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 正常两个选择器相* */
+    /** @arg The normal multiplication of two selectors */
     se1->removeAll();
     se2->removeAll();
     se = se1 * se2;
@@ -697,7 +697,7 @@ TEST_CASE("test_SE_Div") {
     sys->setSG(sg);
     sys->setMM(mm);
 
-    /** @arg 空指针 / 空指针 */
+    /** @arg A null pointer / a null pointer */
     se = SEPtr() / SEPtr();
     CHECK_EQ(se->name(), "SE_Div");
     se->addStock(sm["sh600000"], sys);
@@ -710,7 +710,7 @@ TEST_CASE("test_SE_Div") {
     auto result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 选择器 / 空指针 */
+    /** @arg A selector / a null pointer */
     se1->removeAll();
     se = se1 / SEPtr();
     CHECK_EQ(se->name(), "SE_Div");
@@ -724,7 +724,7 @@ TEST_CASE("test_SE_Div") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 空指针 / 选择器 */
+    /** @arg A null pointer / a selector */
     se1->removeAll();
     se = SEPtr() / se1;
     CHECK_EQ(se->name(), "SE_Div");
@@ -738,7 +738,7 @@ TEST_CASE("test_SE_Div") {
     result = se->getSelected(Datetime(200001010000L));
     CHECK_UNARY(result.empty());
 
-    /** @arg 正常两个选择器相除 */
+    /** @arg The normal division of two selectors */
     se1->removeAll();
     se2->removeAll();
     se = se1 / se2;

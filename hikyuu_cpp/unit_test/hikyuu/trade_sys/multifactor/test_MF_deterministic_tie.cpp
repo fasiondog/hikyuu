@@ -1,9 +1,10 @@
 /*
  *  Copyright (c) 2026 hikyuu.org
  *
- *  测试 MultiFactorBase::_buildIndex 截面排序的确定性：
- *  有效值相等（tie）时按 market_code 字典序打破并列，
- *  使排名跨输入顺序、进程、平台、编译器稳定。
+ *  Test the determinism of the cross-sectional sorting of MultiFactorBase::_buildIndex:
+ *  when the valid values are equal (a tie) the tie is broken by the market_code lexicographic
+ * order, so the ranking is stable across the input order, the process, the platform and the
+ * compiler.
  */
 
 #include "../../test_config.h"
@@ -21,29 +22,30 @@ using namespace hku;
  */
 
 /**
- * @par 检测点：全部有效值相等（tie）时按 market_code 字典序稳定排序（mode 0 降序）
+ * @par Test point: all the valid values equal (a tie) and sorted by the market_code lexicographic
+ * order (mode 0, descending)
  *
- * 用 CLOSE() - CLOSE() 构造全 tie 截面：每只股票的值都是自身收盘价减自身
- * 收盘价 = 0.0，跨股票也全为 0.0。该表达式是非叶子 OP 节点，继承 CLOSE()
- * 的长度和 context，在 MF compiled plan 路径下能正确按每只股票的 KData
- * 计算出与 dates 等长的全 0.0 序列。
+ * An all-tie cross section is built with CLOSE() - CLOSE(): the value of every stock is its own
+ * close minus itself = 0.0 and it is 0.0 across the stocks too. This expression is a non-leaf OP
+ * node and inherits the length and the context of CLOSE(), so under the MF compiled plan path it
+ * correctly computes an all 0.0 sequence as long as dates from the KData of every stock.
  *
- * 验证排序后严格按 market_code 字典序排列，且值保持 0.0。
+ * Verify that after the sorting the order is strictly the market_code one and the values stay 0.0.
  */
 TEST_CASE("test_MF_deterministic_tie_all_equal_desc") {
     StockManager& sm = StockManager::instance();
-    // market_code 字典序: SH600004 < SH600005 < SZ000001 < SZ000002
+    // The market_code lexicographic order: SH600004 < SH600005 < SZ000001 < SZ000002
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
     Stock ref_stk = sm["sh000001"];
     KQuery query = KQuery(-30);
     IndicatorList src_inds{CLOSE() - CLOSE()};
 
     auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
-    mf->setParam<int>("mode", 0);  // 降序
+    mf->setParam<int>("mode", 0);  // Descending
     auto dates = mf->getDatetimeList();
     CHECK_UNARY(!dates.empty());
 
-    // 取中间日期截面（避免边界日部分股票停牌缺失数据导致 NaN）
+    // Take a cross section in the middle (avoiding the NaN from the suspended stocks on the edges)
     auto cross = mf->getScores(dates[dates.size() / 2]);
     CHECK_EQ(cross.size(), 4);
     CHECK_EQ(cross[0].stock, sm["sh600004"]);
@@ -56,9 +58,11 @@ TEST_CASE("test_MF_deterministic_tie_all_equal_desc") {
 }
 
 /**
- * @par 检测点：全部有效值相等（tie）时按 market_code 字典序稳定排序（mode 1 升序）
+ * @par Test point: all the valid values equal (a tie) and sorted by the market_code lexicographic
+ * order (mode 1, ascending)
  *
- * 升序模式下 tie-break 二级键不随主方向翻转，仍按 market_code 字典序。
+ * In the ascending mode the tie-break secondary key does not flip with the main direction and is
+ * still the market_code lexicographic order.
  */
 TEST_CASE("test_MF_deterministic_tie_all_equal_asc") {
     StockManager& sm = StockManager::instance();
@@ -68,7 +72,7 @@ TEST_CASE("test_MF_deterministic_tie_all_equal_asc") {
     IndicatorList src_inds{CLOSE() - CLOSE()};
 
     auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
-    mf->setParam<int>("mode", 1);  // 升序
+    mf->setParam<int>("mode", 1);  // Ascending
     auto dates = mf->getDatetimeList();
     CHECK_UNARY(!dates.empty());
 
@@ -81,10 +85,11 @@ TEST_CASE("test_MF_deterministic_tie_all_equal_asc") {
 }
 
 /**
- * @par 检测点：输入 StockList 正反顺序不影响 tie 排序结果
+ * @par Test point: the forward / reverse order of the input StockList does not affect the result
  *
- * 两个 MF 实例使用相同股票集合但不同的 StockList 输入顺序，断言输出截面
- * 顺序完全一致，代数上证明比较器构成严格全序（不依赖输入排列）。
+ * Two MF instances use the same stock set but a different StockList input order; it asserts the
+ * output cross section order is exactly the same, algebraically proving a strict total order
+ * (independent of the input permutation).
  */
 TEST_CASE("test_MF_deterministic_tie_input_order_invariant") {
     StockManager& sm = StockManager::instance();
@@ -110,16 +115,17 @@ TEST_CASE("test_MF_deterministic_tie_input_order_invariant") {
 }
 
 /**
- * @par 检测点：getAllScores 多日期截面的全序属性验证（mode 0 降序）
+ * @par Test point: the total order property of the multiple date cross sections of getAllScores
+ * (mode 0, descending)
  *
- * 用真实指标 MA(CLOSE()) 遍历 getAllScores 的所有日期截面，断言：
- *   1. 有效值不在 NaN 之后
- *   2. 有效值段 prev.value >= curr.value（降序）
- *   3. 有效值相等时 market_code 字典序严格递增
- *   4. NaN 段 market_code 字典序严格递增
+ * The real indicator MA(CLOSE()) traverses all the date cross sections of getAllScores; it asserts:
+ *   1. a valid value never comes after a NaN;
+ *   2. in the valid section prev.value >= curr.value (descending);
+ *   3. with equal valid values the market_code lexicographic order strictly increases;
+ *   4. in the NaN section the market_code lexicographic order strictly increases.
  *
- * 使用覆盖率计数器：统计"有效值与 NaN 混合"和"有效值 tie"的截面数，
- * 若为 0 则显式 FAIL，避免属性断言假绿。
+ * A coverage counter counts the "valid value mixed with NaN" and "valid value tie" sections;
+ * if it is 0 an explicit FAIL avoids a falsely green property assertion.
  */
 TEST_CASE("test_MF_deterministic_tie_mixed_property_desc") {
     StockManager& sm = StockManager::instance();
@@ -171,9 +177,10 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_desc") {
 }
 
 /**
- * @par 检测点：getAllScores 多日期截面的全序属性验证（mode 1 升序）
+ * @par Test point: the total order property of the multiple date cross sections of getAllScores
+ * (mode 1, ascending)
  *
- * 与降序用例对称，仅有效值比较方向改为 <=，其余全序属性相同。
+ * Symmetric to the descending case: only the comparison becomes <= and the other properties hold.
  */
 TEST_CASE("test_MF_deterministic_tie_mixed_property_asc") {
     StockManager& sm = StockManager::instance();
@@ -183,7 +190,7 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_asc") {
     IndicatorList src_inds{MA(CLOSE(), 3)};
 
     auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
-    mf->setParam<int>("mode", 1);  // 升序
+    mf->setParam<int>("mode", 1);  // Ascending
     mf->getDatetimeList();
     const auto& all_scores = mf->getAllScores();
     CHECK_UNARY(!all_scores.empty());
@@ -225,10 +232,10 @@ TEST_CASE("test_MF_deterministic_tie_mixed_property_asc") {
 }
 
 /**
- * @par 检测点：空 StockList 应在计算时被 _checkData 拒绝
+ * @par Test point: an empty StockList should be rejected by _checkData at the calculation
  *
- * MF_EqualWeight 构造时不校验，首次触发 calculate() 时 _checkData 要求
- * m_stks.size() >= 2，空列表应抛异常。
+ * MF_EqualWeight does not validate at the construction; when calculate() is triggered _checkData
+ * requires m_stks.size() >= 2, so an empty list should throw.
  */
 TEST_CASE("test_MF_deterministic_tie_empty_stks") {
     StockManager& sm = StockManager::instance();
@@ -241,9 +248,9 @@ TEST_CASE("test_MF_deterministic_tie_empty_stks") {
 }
 
 /**
- * @par 检测点：单只股票应在计算时被 _checkData 拒绝
+ * @par Test point: a single stock should be rejected by _checkData at the calculation
  *
- * _checkData 要求 m_stks.size() >= 2，单只股票无截面排名意义，应抛异常。
+ * _checkData requires m_stks.size() >= 2; a single stock has no ranking meaning and should throw.
  */
 TEST_CASE("test_MF_deterministic_tie_single_stk") {
     StockManager& sm = StockManager::instance();
@@ -256,11 +263,11 @@ TEST_CASE("test_MF_deterministic_tie_single_stk") {
 }
 
 /**
- * @par 检测点：重复 Stock 不破坏严格弱序，正常排序且不崩溃
+ * @par Test point: a duplicated Stock does not break the strict weak ordering, no crash
  *
- * StockList 中包含同一股票两次，两元素 value 和 market_code 完全相同，
- * 比较器对它们返回 a<b=false, b<a=false（等价类），std::sort 正确处理。
- * 验证不崩溃且两重复元素相邻排列在 market_code 对应位置。
+ * The StockList contains the same stock twice: the two elements have identical value and code,
+ * so the comparator returns a<b=false and b<a=false (an equivalence class) and std::sort is right.
+ * Verify that there is no crash and the two duplicate elements are adjacent at the code position.
  */
 TEST_CASE("test_MF_deterministic_tie_duplicate_stk") {
     StockManager& sm = StockManager::instance();

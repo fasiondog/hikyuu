@@ -26,7 +26,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（盈利目标策略）  */
+/** @par Test point (the profit goal strategy) */
 TEST_CASE("test_SYS_Simple_for_pg") {
     TradeRecordList tr_list;
     price_t current_cash;
@@ -52,7 +52,7 @@ TEST_CASE("test_SYS_Simple_for_pg") {
     PGPtr pg = PG_FixedPercent(0.01);
     SYSPtr sys;
 
-    /** @arg 指定了TM、SG、MM、ST、TP、PG，但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG, MM, ST, TP and PG are given but the others are not, a non-delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", false);
     sys->setParam("sell_delay", false);
@@ -121,7 +121,7 @@ TEST_CASE("test_SYS_Simple_for_pg") {
     // CHECK_LT(std::fabs(tr_list[4].cash - current_cash), 0.00001);
     // CHECK_EQ(tr_list[4].from, PART_PROFITGOAL);
 
-    // /** @arg 指定了TM、SG、MM、ST、TP、PG，但未指定其他策略组件，延迟操作 */
+    // /** @arg TM, SG, MM, ST, TP and PG are given but the others are not, a delayed operation */
     // sys = SYS_Simple();
     // sys->setParam("delay", true);
     // sys->setTM(tm->clone());

@@ -36,7 +36,7 @@ TEST_CASE("test_PG_FixedHoldDays") {
 
     tm->buy(Datetime(199911110000LL), stk, 29.51, 100, 0.0, 0.0, 0.0, PART_SIGNAL);
 
-    /** @arg 检查默认参数 */
+    /** @arg Check the default parameters */
     CHECK_EQ(pg->getParam<int>("days"), 5);
 
     /** @arg days = 0 */

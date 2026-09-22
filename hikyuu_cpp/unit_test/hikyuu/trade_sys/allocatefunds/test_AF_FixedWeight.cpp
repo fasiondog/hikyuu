@@ -23,7 +23,7 @@ TEST_CASE("test_AF_FixedWeight") {
     CHECK_THROWS_AS(AF_FixedWeight(-0.1), std::exception);
     CHECK_THROWS_AS(AF_FixedWeight(1.001), std::exception);
 
-    /** @arg 尝试变更非法的公共参数 */
+    /** @arg Try to change an illegal common parameter */
     auto af = AF_FixedWeight(0.1);
     CHECK_THROWS_AS(af->setParam<bool>("auto_adjust_weight", true), std::exception);
 }

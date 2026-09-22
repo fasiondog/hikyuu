@@ -39,11 +39,11 @@ TEST_CASE("test_MF_ICIRWeight") {
     KData ref_k = ref_stk.getKData(query);
     DatetimeList ref_dates = ref_k.getDatetimeList();
 
-    /** @arg 输入非法 ic_n, ic_rolling_n */
+    /** @arg An invalid ic_n or ic_rolling_n is passed */
     CHECK_THROWS_AS(MF_ICIRWeight(src_inds, stks, query, ref_stk, 0), std::exception);
     CHECK_THROWS_AS(MF_ICIRWeight(src_inds, stks, query, ref_stk, 1, -1), std::exception);
 
-    /** @arg 正常计算 */
+    /** @arg The normal calculation */
     // query = KQuery(-50);
     auto mf = MF_ICIRWeight(src_inds, stks, query, ref_stk, ndays, ic_rolling_n);
     mf->setParam<bool>("save_all_factors", true);
