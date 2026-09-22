@@ -1,5 +1,3 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/index.rst
-
 .. Hikyuu documentation master file, created by
    sphinx-quickstart on Thu Nov 10 22:23:15 2011.
    You can adapt this file completely to your liking, but it should at least
@@ -17,7 +15,7 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: Python指南
+   :caption: Python Guide
 
    hub.rst
    interactive/index
@@ -37,7 +35,7 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: 用户捐赠
+   :caption: Donors
    :name: 捐赠用户 features
 
    vip/index.rst
@@ -45,7 +43,7 @@ Welcome to Hikyuu's documentation!
 
 .. toctree::
    :maxdepth: 1
-   :caption: C++开发指南
+   :caption: C++ Developer Guide
    :name: C++ Develop Guide
 
    developer.rst

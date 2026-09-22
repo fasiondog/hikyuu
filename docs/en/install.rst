@@ -1,47 +1,49 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/install.rst
+Installation
+============
 
-安装步骤
-=========
+Prerequisites
+-------------
 
-安装前准备
-----------
-
-支持的操作系统：64位 Windows7(x86 cpu)及以上版本、Ubuntu、MacOSX(arm)，其他建议使用源码编译安装
+Supported operating systems: 64-bit Windows 7 (x86 CPU) and above, Ubuntu, and macOS (arm). For
+anything else, building from source is recommended.
 
 
-1. Python环境：>= Python3.10)。 推荐使用安装时 python 的主流版本或低一个版本，比如截止 2025年4月1日, python主流版本为 3.12, 建议使用3.12或3.11, 避免因 python 版本低可能导致的其他依赖包互不兼容导致的错误。
+1. Python: >= Python 3.10. Use the mainstream Python version at install time, or one version lower.
+   For example, as of April 1, 2025 the mainstream version is 3.12, so 3.12 or 3.11 is recommended;
+   this avoids errors caused by other packages being incompatible with an older Python version.
 
 .. note:: 
 
-    - 推荐安装集成了常用数据科学软件包的Python发布版本： `Anaconda <https://www.anaconda.com/>`_ 。国内用户建议从 `清华镜像网站 <https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/>`_ 下载，速度快。
+    - A Python distribution that bundles common data-science packages is recommended: `Anaconda <https://www.anaconda.com/>`_ . Users in China are advised to download it from the `Tsinghua mirror <https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/>`_ , which is much faster.
 
-    - linux 下, conda 通常使用自己的 libstdc++.so, 而不是系统默认 libstdc++.so, 可能出现兼容性问题, 如： ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: cannot allocate memory in static TLS block。 通常的解决办法是保证统一使用系统或者统一使用conda的libstdc++.so，比如手动将conda的lib路径添加到LD_LIBRARY_PATH最前面（优先查找）export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"，然后再启动程序。
+    - On Linux, conda usually ships its own libstdc++.so instead of the system one, which can cause compatibility problems such as: ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: cannot allocate memory in static TLS block. The usual fix is to use either the system or the conda libstdc++.so consistently; for example, put the conda lib path first in LD_LIBRARY_PATH (so it is searched first) with export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH" before starting the program.
 
-2. 安装 git （如使用 hub，必须安装）
+2. Install git (required if you use hub)
 
-    git工具官方链接: `https://git-scm.com/downloads <https://git-scm.com/downloads>`_
+    Official git downloads: `https://git-scm.com/downloads <https://git-scm.com/downloads>`_
 
 
-pip 安装
-----------
+Install with pip
+----------------
 
-安装：python -m pip install hikyuu
+Install: python -m pip install hikyuu
 
-版本升级：python -m pip install hikyuu -U
+Upgrade: python -m pip install hikyuu -U
 
 .. note::
 
-    **2.6.8/2.6.9 版本，部分 x86 cpu 不支持 avx 指令集的老旧机器, 会崩溃。建议升级到 2.7.0 以上版本。**
+    **In versions 2.6.8/2.6.9, some older x86 CPUs that do not support the AVX instruction set may crash. Upgrade to 2.7.0 or later.**
 
 
 .. figure:: _static/20000-install.png
 
 .. note::
 
-    第一次使用，请详细阅读 :ref:`quickstart` 。
+    If this is your first time using Hikyuu, please read :ref:`quickstart` carefully.
    
 
-源码编译安装
-----------------
+Build from source
+-----------------
 
-Windows(x86 cpu),Ubuntu24.04及以上、mac(arm cpu)支持 pip 安装，其他建议使用源码方式安装，参见 :ref:`developer` 。
+Windows (x86 CPU), Ubuntu 24.04 and above, and macOS (arm CPU) support pip installation. For other
+platforms, build from source; see :ref:`developer` .
