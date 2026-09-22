@@ -1,7 +1,7 @@
 /*
  * SGN.h
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019-4-1
  *      Author: fasiondog
  */
 
@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 求符号值, SGN(X)，当 X>0, X=0, X<0分别返回 1, 0, -1。
+ * Calculate the sign value, SGN(X) returns 1, 0 and -1 respectively when X>0, X=0 and X<0.
  * @ingroup Indicator
  */
 Indicator HKU_API SGN();

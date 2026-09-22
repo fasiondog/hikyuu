@@ -16,11 +16,13 @@
 namespace hku {
 
 /**
- * 上一次条件成立位置, 上一次条件成立到当前的周期数。
+ * Position where the condition held last time; the number of periods from the last time the
+ * condition held to the current one.
  * @details
  * <pre>
- * 用法：BARSLAST(X): 上一次 X 不为 0 到现在的天数。
- * 例如：BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) 表示上一个涨停板到当前的周期数。
+ * Usage: BARSLAST(X): the number of days from the last time X was not 0 until now.
+ * For example: BARSLAST(CLOSE/REF(CLOSE,1)>=1.1) gives the number of periods from the last limit-up
+ * until now.
  * </pre>
  * @ingroup Indicator
  */

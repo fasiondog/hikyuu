@@ -14,8 +14,8 @@
 namespace hku {
 
 /*
- * 差分指标，即 a[i] - a[i-n]
- * 参数：n: 差分周期，默认1
+ * Difference indicator, i.e. a[i] - a[i-n]
+ * Parameters: n: difference period, 1 by default
  */
 class IDiff : public hku::IndicatorImp {
     INDICATOR_IMP(IDiff)

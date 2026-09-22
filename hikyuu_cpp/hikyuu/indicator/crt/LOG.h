@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 以10为底的对数
- * 用法：LOG(X)取得X的对数
+ * Logarithm with the base 10
+ * Usage: LOG(X) gets the logarithm of X
  * @ingroup Indicator
  */
 Indicator HKU_API LOG();

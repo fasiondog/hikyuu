@@ -12,9 +12,9 @@
 namespace hku {
 
 /**
- * 横向统计（返回板块股个数）
- * @param blk 待统计的板块
- * @param query 统计范围
+ * Cross-sectional statistics (it returns the number of the stocks in the block)
+ * @param blk the block to be counted
+ * @param query the statistics range
  * @return Indicator
  */
 Indicator HKU_API BLOCKSETNUM(const Block& blk, const KQuery& query);

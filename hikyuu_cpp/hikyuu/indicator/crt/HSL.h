@@ -1,7 +1,7 @@
 /*
  * HSL.h
  *
- *  Created on: 2019年3月6日
+ *  Created on: 2019-3-6
  *      Author: fasiondog
  */
 
@@ -16,8 +16,9 @@
 namespace hku {
 
 /**
- * 获取换手率, 乘以 100 才是百分比，等于 VOL(k) / CAPITAL(k) * 0.01
- * @param k 关联的K线数据
+ * Get the turnover rate; multiply it by 100 to get the percentage, it equals
+ * VOL(k) / CAPITAL(k) * 0.01
+ * @param k the associated K-line data
  * @ingroup Indicator
  */
 Indicator HKU_API HSL(const KData& k);

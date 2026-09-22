@@ -14,9 +14,9 @@
 namespace hku {
 
 /**
- * 卡尔曼滤波
- * @param q 噪声方差
- * @param r 测量噪声方差
+ * Kalman filter
+ * @param q noise variance
+ * @param r measurement noise variance
  * @ingroup Indicator
  */
 Indicator HKU_API KALMAN(double q = 0.01, double r = 0.1);
