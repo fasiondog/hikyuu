@@ -4,7 +4,7 @@
 # Create on: 2024-03-11
 #    Author: fasiondog
 
-# 来源于 pandas 中对 ipython，notebook 环境的检测代码
+# From the ipython/notebook environment detection code in pandas
 
 def in_interactive_session() -> bool:
     """
@@ -31,7 +31,7 @@ def in_interactive_session() -> bool:
 
 def in_ipython_frontend() -> bool:
     """
-    Check if we're inside an IPython zmq frontend. 检测是否在 jupyter 环境中
+    Check if we're inside an IPython zmq frontend, i.e. whether it is in a jupyter environment
 
     Returns
     -------

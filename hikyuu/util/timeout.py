@@ -21,12 +21,12 @@ class ThreadKiller(threading.Thread):
         self._stop_event = threading.Event()
 
     def stop(self):
-        """停止killer线程"""
+        """Stop the killer thread"""
         self._stop_event.set()
 
     def run(self):
         """loop raising exception incase it's caught hopefully this breaks us far out"""
-        max_attempts = 5  # 限制最大尝试次数
+        max_attempts = 5  # limit the maximum number of attempts
         attempts = 0
 
         while attempts < max_attempts and not self._stop_event.is_set():
@@ -35,7 +35,7 @@ class ThreadKiller(threading.Thread):
                 break
 
             try:
-                # 使用弱引用避免循环引用
+                # Use a weak reference to avoid a circular reference
                 thread_ident = target_thread.ident
                 if thread_ident is not None:
                     ctypes.pythonapi.PyThreadState_SetAsyncExc(
@@ -43,20 +43,20 @@ class ThreadKiller(threading.Thread):
                         ctypes.py_object(self.exception_cls)
                     )
             except Exception:
-                # 忽略注入异常时的错误
+                # Ignore the error when injecting the exception
                 pass
 
-            # 检查目标线程是否还活着
+            # Check whether the target thread is still alive
             target_thread = self.target_thread_ref()
             if target_thread is None or not target_thread.is_alive():
                 break
 
             attempts += 1
             if attempts < max_attempts:
-                # 等待一段时间再重试
+                # Wait for a while and retry
                 self._stop_event.wait(min(self.repeat_sec, 0.1))
 
-        # 清理资源
+        # Clean up the resources
         self._stop_event.clear()
 
 
@@ -71,11 +71,11 @@ class TerminableThread(threading.Thread):
         if not self.is_alive():
             return True
 
-        # 如果已经有killer线程在运行，先停止它
+        # If a killer thread is already running, stop it first
         if self._killer is not None and self._killer.is_alive():
             self._killer.stop()
 
-        # 使用弱引用避免循环引用
+        # Use a weak reference to avoid a circular reference
         self._killer = ThreadKiller(weakref.ref(self), exception_cls, repeat_sec=repeat_sec)
         self._killer.start()
         return True
@@ -107,13 +107,13 @@ def timeout(sec: float, raise_sec: float = 1.0):
             def run_func():
                 try:
                     res = func(*args, **kwargs)
-                    if not completed.is_set():  # 只有在未超时的情况下才保存结果
+                    if not completed.is_set():  # save the result only when it has not timed out
                         result.append(res)
                 except FuncTimeoutError:
-                    # 超时异常，正常情况下的预期行为
+                    # Timeout exception, the expected behavior in the normal case
                     pass
                 except Exception as e:
-                    if not completed.is_set():  # 只有在未超时的情况下才保存异常
+                    if not completed.is_set():  # save the exception only when it has not timed out
                         exception.append(e)
                 finally:
                     completed.set()
@@ -122,28 +122,28 @@ def timeout(sec: float, raise_sec: float = 1.0):
             thread = TerminableThread(target=run_func, daemon=True)
             thread.start()
 
-            # 等待线程完成或超时
+            # Wait for the thread to finish or time out
             thread.join(timeout=sec)
 
             if not completed.is_set():
-                # 超时情况：线程仍在运行
-                completed.set()  # 标记为已完成以防止后续结果处理
+                # Timeout: the thread is still running
+                completed.set()  # mark as completed to prevent the subsequent result processing
 
-                # 创建新的异常类实例用于终止线程
+                # Create a new exception class instance to terminate the thread
                 exc = type('TimeoutError', FuncTimeoutError.__bases__, dict(FuncTimeoutError.__dict__))
 
-                # 终止线程
+                # Terminate the thread
                 thread.terminate(exception_cls=exc, repeat_sec=raise_sec)
 
-                # 等待一小段时间让线程有机会清理
+                # Wait for a short time to give the thread a chance to clean up
                 thread.join(timeout=min(raise_sec, 1.0))
 
                 raise TimeoutError(err_msg)
             elif exception:
-                # 如果在线程运行期间发生异常，重新抛出
+                # If an exception occurred while the thread was running, raise it again
                 raise exception[0]
             else:
-                # 线程成功完成，返回结果
+                # The thread finished successfully, return the result
                 return result[0] if result else None
 
         return wrapped_func

@@ -3,8 +3,8 @@
 # cp936
 
 # ===============================================================================
-# 作者：fasiondog
-# 历史：1）20090527, Added by fasiondog
+# Author: fasiondog
+# History: 1) 20090527, Added by fasiondog
 # ===============================================================================
 
 # from singleton import Singleton

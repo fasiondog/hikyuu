@@ -26,8 +26,8 @@
 
 
 def list_getitem(data, i):
-    """对C++引出的vector，实现python的切片，
-       将引入的vector类的__getitem__函数覆盖即可。
+    """Implement the python slicing for the vector exported from C++,
+       just override the __getitem__ function of the imported vector class.
     """
     if isinstance(i, int):
         length = len(data)
