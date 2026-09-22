@@ -1,10 +1,8 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/base/index.rst
-
-基础设施
-========
+Infrastructure
+==============
 
 .. py:module:: hikyuu
-    
+
 
 .. toctree::
 

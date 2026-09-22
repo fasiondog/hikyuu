@@ -1,10 +1,8 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/indicator/index.rst
-
-技术指标
-========
+Technical Indicators
+====================
 
 .. py:module:: hikyuu.indicator
-    
+
 
 .. toctree::
 

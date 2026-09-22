@@ -1,12 +1,10 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/indicator/talib.rst
-
 .. py:currentmodule:: hikyuu.indicator
 .. highlight:: python
 
-TA-Lib 指标
-============
+TA-Lib Indicators
+=================
 
-Hikyuu已经内置了所有 ta-lib 指标，可以直接使用，其命名方式统一为 TA_FUNC名称。具体可以参考 Ta-lib 的官方文档。
+Hikyuu has built in all the ta-lib indicators, which can be used directly; the naming convention is uniformly the TA_FUNC name. For details, please refer to the official Ta-lib documentation.
 
 ::
 
@@ -14,5 +12,3 @@ Hikyuu已经内置了所有 ta-lib 指标，可以直接使用，其命名方式
     print(x)
     x.plot()
     print(x.discard)
-
-    

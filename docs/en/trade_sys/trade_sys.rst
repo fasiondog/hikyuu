@@ -1,10 +1,8 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/trade_sys/trade_sys.rst
-
-交易系统
-========
+Trade System
+============
 
 .. py:module:: hikyuu.trade_sys
-    
+
 
 .. toctree::
 
