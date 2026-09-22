@@ -1,7 +1,7 @@
 /*
  * BandSignal2.cpp
  *
- *   Created on: 2023年09月23日
+ *   Created on: 2023-09-23
  *       Author: yangrq1018
  */
 #include "../../../indicator/crt/KDATA.h"

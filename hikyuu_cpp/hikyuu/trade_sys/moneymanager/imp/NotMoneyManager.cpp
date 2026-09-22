@@ -1,7 +1,7 @@
 /*
  * NotMoneyManager.cpp
  *
- *  Created on: 2017年5月22日
+ *  Created on: 2017-5-22
  *      Author: Administrator
  */
 
@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::NotMoneyManager)
 namespace hku {
 
 NotMoneyManager::NotMoneyManager() : MoneyManagerBase("MM_Nothing") {
-    // 如果已有持仓，则不再买入
+    // Do not buy any more when there is already a position
     setParam<bool>("if_have_a_position_will_not_buy", false);
 }
 

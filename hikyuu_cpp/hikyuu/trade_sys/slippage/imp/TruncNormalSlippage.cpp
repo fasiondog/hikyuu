@@ -1,7 +1,7 @@
 /*
  * TruncNormalSlippage.cpp
  *
- *  Created on: 2025年10月25日
+ *  Created on: 2025-10-25
  *      Author: fasiondog
  */
 
@@ -53,12 +53,12 @@ price_t TruncNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t p
     std::normal_distribution<double> dis(mean, stddev);
 
     double value;
-    // 生成符合截断范围的值
+    // Generate a value within the truncated range
     do {
         value = dis(ms_gen);
     } while (value < min_v || value > max_v);
 
-    // 买入时价格总是变高（不利方向）
+    // On a buy the price always goes higher (the unfavorable direction)
     return price + std::abs(value);
 }
 
@@ -71,12 +71,12 @@ price_t TruncNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t 
     std::normal_distribution<double> dis(mean, stddev);
 
     double value;
-    // 生成符合截断范围的值
+    // Generate a value within the truncated range
     do {
         value = dis(ms_gen);
     } while (value < min_v || value > max_v);
 
-    // 卖出时价格总是变低（不利方向）
+    // On a sell the price always goes lower (the unfavorable direction)
     return price - std::abs(value);
 }
 

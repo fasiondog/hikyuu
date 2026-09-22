@@ -17,7 +17,7 @@ namespace hku {
 PerformanceOptimalSelector::PerformanceOptimalSelector()
 : OptimalSelectorBase("SE_PerformanceOptimal") {
     setParam<string>("key", "帐户平均年收益率%");
-    setParam<int>("mode", 0);  // 0 取最高值，1 取最低值
+    setParam<int>("mode", 0);  // 0 takes the highest value, 1 takes the lowest value
 }
 
 void PerformanceOptimalSelector::_checkParam(const string& name) const {
@@ -57,7 +57,8 @@ void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, con
     CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
     CLS_WARN_IF_RETURN(m_pro_sys_list.empty(), void(), "candidate sys list is empty!");
 
-    // 运行时检查，而不是 addSystem 时检查，以便 WalkForwordSystem 可以直接加入未指定标的的系统列表
+    // The check is done at runtime rather than in addSystem, so that WalkForwardSystem can add the
+    // system list without a given security directly
     for (const auto& sys : m_pro_sys_list) {
         CLS_ERROR_IF_RETURN(sys->getStock().isNull(), void(),
                             "The candidate sys ({}) was specified stock!", sys->name());
@@ -111,7 +112,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
               for (const auto& sys : m_pro_sys_list) {
-                  // 切断所有共享组件，避免并行冲突
+                  // Cut off all the shared components to avoid a parallel conflict
                   auto new_sys = sys->clone();
                   new_sys->run(q, true);
                   per.statistics(new_sys->getTM(), end_date);

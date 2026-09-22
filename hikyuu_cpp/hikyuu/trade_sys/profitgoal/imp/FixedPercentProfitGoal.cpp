@@ -1,7 +1,7 @@
 /*
  * FixedPercentProfitGoal.cpp
  *
- *  Created on: 2016年5月6日
+ *  Created on: 2016-5-6
  *      Author: Administrator
  */
 
@@ -18,11 +18,11 @@ FixedPercentProfitGoal::FixedPercentProfitGoal() : ProfitGoalBase("PG_FixedPerce
 }
 
 /**
- * @brief 析构函数，释放 FixedPercentProfitGoal 对象资源
+ * @brief Destructor, it releases the resources of the FixedPercentProfitGoal object
  *
- * 该析构函数是 FixedPercentProfitGoal 类的默认析构函数实现，
- * 负责清理对象占用的资源。由于该类没有动态分配的资源，
- * 因此使用默认的空实现。
+ * This destructor is the default destructor implementation of the FixedPercentProfitGoal class,
+ * responsible for cleaning up the resources occupied by the object. Because this class has no
+ * dynamically allocated resources, the default empty implementation is used.
  */
 FixedPercentProfitGoal::~FixedPercentProfitGoal() {}
 

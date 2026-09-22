@@ -63,7 +63,7 @@ ConditionPtr ConditionBase::clone() {
     p->m_date_index = m_date_index;
     p->m_values = m_values;
 
-    // tm、sg由系统运行时进行设定，不作clone
+    // tm and sg are set by the system at runtime, they are not cloned
     // p->m_tm = m_tm->clone();
     // p->m_sg = m_sg->clone();
     return p;

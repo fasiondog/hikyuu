@@ -31,7 +31,7 @@ OptimalSelectorBase::OptimalSelectorBase(const string& name) : SelectorBase(name
 void OptimalSelectorBase::_initParams() {
     setParam<bool>("depend_on_proto_sys", true);
     setParam<string>("market", "SH");
-    setParam<int>("index", 0);  // 取排序后的第 index 个结果
+    setParam<int>("index", 0);  // Take the index-th result after the sorting
     setParam<int>("train_len", 100);
     setParam<int>("test_len", 20);
     setParam<bool>("trace", false);
@@ -89,7 +89,8 @@ void OptimalSelectorBase::calculate(const SystemList& pf_realSysList, const KQue
     CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
     CLS_WARN_IF_RETURN(m_pro_sys_list.empty(), void(), "candidate sys list is empty!");
 
-    // 运行时检查，而不是 addSystem 时检查，以便 WalkForwordSystem 可以直接加入未指定标的的系统列表
+    // The check is done at runtime rather than in addSystem, so that WalkForwardSystem can add the
+    // system list without a given security directly
     for (const auto& sys : m_pro_sys_list) {
         CLS_ERROR_IF_RETURN(sys->getStock().isNull(), void(),
                             "The candidate sys ({}) was specified stock!", sys->name());
@@ -148,7 +149,8 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
           }
 
           if (!selected_sys_list->empty()) {
-              // 降序排列，相等时取排在候选前面的
+              // Sort in the descending order; on equality the one earlier in the candidates is
+              // taken
               std::stable_sort(
                 selected_sys_list->begin(), selected_sys_list->end(),
                 [](const SystemWeight& a, const SystemWeight& b) { return a.weight > b.weight; });
