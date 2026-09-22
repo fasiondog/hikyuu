@@ -24,12 +24,12 @@
 namespace hku {
 
 /**
- * 证券信息统一管理类
+ * Unified management class for security information
  * @ingroup StockManage
  */
 class HKU_API StockManager {
 public:
-    /** 获取StockManager单例实例 */
+    /** Get the singleton instance of StockManager */
     static StockManager& instance();
     virtual ~StockManager();
 
@@ -37,124 +37,130 @@ public:
     StockManager& operator=(const StockManager&) = delete;
 
     /**
-     * 初始化函数，必须在程序入口调用
-     * @param baseInfoParam 基础信息驱动参数
-     * @param blockParam 板块驱动参数
-     * @param kdataParam K线驱动参数
-     * @param preloadParam 预加载参数
-     * @param hikyuuParam 其他参数
-     * @param context 策略上下文
+     * Initialization function, it must be called at the program entry
+     * @param baseInfoParam base info driver parameter
+     * @param blockParam sector driver parameter
+     * @param kdataParam K-line driver parameter
+     * @param preloadParam preload parameter
+     * @param hikyuuParam other parameters
+     * @param context strategy context
      */
     void init(const Parameter& baseInfoParam, const Parameter& blockParam,
               const Parameter& kdataParam, const Parameter& preloadParam,
               const Parameter& hikyuuParam,
               const StrategyContext& context = StrategyContext({"all"}));
 
-    /** 重新加载 */
+    /** Reload */
     void reload();
 
     /**
-     * 带策略上下文参数的重新加载, 如果context中证券列表为空，将沿用原有context
-     * @param context 策略上下文
+     * Reload with a strategy context parameter; if the security list in the context is empty, the
+     * original context is kept
+     * @param context strategy context
      */
     void reloadWith(const StrategyContext& context);
 
-    /** 主动退出并释放资源 */
+    /** Quit proactively and release the resources */
     static void quit();
 
     /**
-     * 是否处于 IPC 客户端模式（数据由服务端提供，本地无预加载缓冲）
-     * @note 供 Stock::realtimeUpdate 等核心路径判断是否需将更新转发至主进程
+     * Whether it is in IPC client mode (the data is provided by the server, with no local preload
+     * buffer)
+     * @note Used by core paths such as Stock::realtimeUpdate to decide whether an update has to be
+     *       forwarded to the main process
      */
     bool isIpcClientMode() const;
 
-    /// 仅供单元测试：强制置位客户端模式标志，以验证 Stock::realtimeUpdate /
-    /// getLastUpdateTime 的“转发 vs 本地缓冲”门控分支；生产代码不得调用。
-    /// 调用方须在用例结束时复位，避免污染同进程内其他用例。
+    /// For unit tests only: force the client mode flag, in order to verify the "forward vs local
+    /// buffer" gating branch of Stock::realtimeUpdate / getLastUpdateTime. Production code must not
+    /// call it. The caller has to reset it when the test case ends, so that other cases in the same
+    /// process are not polluted.
     void _testingSetIpcClientMode(bool mode) {
         m_ipc_client_mode = mode;
     }
 
-    /** 获取基础信息驱动参数 */
+    /** Get the base info driver parameter */
     const Parameter& getBaseInfoDriverParameter() const;
 
-    /** 获取板块驱动参数 */
+    /** Get the sector driver parameter */
     const Parameter& getBlockDriverParameter() const;
 
-    /** 获取 K 线数据驱动参数 */
+    /** Get the K-line data driver parameter */
     const Parameter& getKDataDriverParameter() const;
 
-    /** 获取预加载参数 */
+    /** Get the preload parameter */
     const Parameter& getPreloadParameter() const;
 
-    /** 获取其他参数 */
+    /** Get the other parameters */
     const Parameter& getHikyuuParameter() const;
 
-    /** 获取策略上下文 */
+    /** Get the strategy context */
     const StrategyContext& getStrategyContext() const;
 
-    /** 获取基础信息驱动 */
+    /** Get the base info driver */
     BaseInfoDriverPtr getBaseInfoDriver() const;
 
     /**
-     * 获取用于保存零时变量等的临时目录，如为配置则为当前目录
-     * 由m_config中的“tmpdir”指定
+     * Get the temporary directory used for temporary variables and the like; the current directory
+     * is used when it is not configured
+     * It is specified by "tmpdir" in m_config
      */
     const string& tmpdir() const;
 
-    /** 获取数据目录 */
+    /** Get the data directory */
     const string& datadir() const;
 
-    /** 获取证券数量 */
+    /** Get the number of securities */
     size_t size() const noexcept;
 
     /**
-     * 根据"市场简称证券代码"获取对应的证券实例
-     * @param querystr 格式：“市场简称证券代码”，如"sh000001"
-     * @return 对应的证券实例，如果实例不存在，则Null<Stock>()，不抛出异常
+     * Get the security instance matching "market abbreviation + security code"
+     * @param querystr in the form of "market abbreviation + security code", e.g. "sh000001"
+     * @return the matching security instance; Null<Stock>() if it does not exist, no exception is
+     *         thrown
      */
     Stock getStock(const string& querystr) const;
 
-    /** 同 getStock @see getStock */
+    /** Same as getStock @see getStock */
     Stock operator[](const string&) const;
 
     StockList getStockList(
       std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
 
     /**
-     * 获取相应的市场信息
-     * @param market 指定的市场标识
-     * @return 相应的市场信息，如果相应的市场信息不存在，则返回Null<MarketInfo>()
+     * Get the market information
+     * @param market the given market identifier
+     * @return the matching market information; Null<MarketInfo>() if it does not exist
      */
     MarketInfo getMarketInfo(const string& market) const noexcept;
 
     /**
-     * 获取指定市场代表指数证券
-     * @param market 指定的市场标识
+     * Get the representative index security of the given market
+     * @param market the given market identifier
      */
     Stock getMarketStock(const string& market) const;
 
     /**
-     * 获取相应的证券类型详细信息
-     * @param type 证券类型
-     * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
+     * Get the detailed information of the given security type
+     * @param type security type
+     * @return the matching security type information; Null<StockTypeInf>() if it does not exist
      */
     StockTypeInfo getStockTypeInfo(uint32_t type) const;
 
-    /** 获取所有证券类型信息 */
+    /** Get the information of all security types */
     vector<StockTypeInfo> getStockTypeInfoList() const;
 
-    /** 获取市场简称列表 */
+    /** Get the list of market abbreviations */
     StringList getAllMarket() const;
 
-    /** 获取所有板块分类 */
+    /** Get all sector categories */
     StringList getAllCategory();
 
     /**
-     * 获取预定义的板块
-     * @param category 板块分类
-     * @param name 板块名称
-     * @return 板块，如找不到返回空
+     * Get a predefined sector
+     * @param category sector category
+     * @param name sector name
+     * @return the sector; empty if it cannot be found
      */
     Block getBlock(const string& category, const string& name);
 
@@ -169,29 +175,30 @@ public:
     }
 
     /**
-     * 获取指定分类的板块列表
-     * @param category 板块分类, 如为空字符串，所有板块列表
-     * @return 板块列表
+     * Get the sector list of the given category
+     * @param category sector category; if it is an empty string, the list of all sectors
+     * @return sector list
      */
     BlockList getBlockList(const string& category = "");
 
     /**
-     * 获取指定指数的板块列表, 如果不存在返回空列表
-     * @param index_stk 指数
-     * @return 板块列表
+     * Get the sector list of the given index; an empty list is returned if it does not exist
+     * @param index_stk index
+     * @return sector list
      */
     BlockList getBlockListByIndexStock(const Stock& stk);
 
     /**
-     * 获取指定证券所属的板块列表
-     * @param stk 指定证券
-     * @param category 板块分类，如果为空字符串，返回所有板块分类下的所属板块
+     * Get the sector list that the given security belongs to
+     * @param stk the given security
+     * @param category sector category; if it is an empty string, the sectors of all categories are
+     *        returned
      * @return BlockList
      */
     BlockList getStockBelongs(const Stock& stk, const string& category);
 
     /**
-     * 获取交易日历，目前支持"SH"
+     * Get the trading calendar; currently only "SH" is supported
      * @param query
      * @param market
      * @return DatetimeList
@@ -199,7 +206,8 @@ public:
     DatetimeList getTradingCalendar(const KQuery& query, const string& market = "SH");
 
     /**
-     * 根据指定的证券列表获取叠加后的交易日历（主要用于包含不同市场证券时）
+     * Get the merged trading calendar of the given security list (mainly used when securities of
+     * different markets are included)
      * @param stk_list
      * @param query
      * @return DatetimeList
@@ -207,21 +215,21 @@ public:
     DatetimeList getTradingCalendar(const StockList& stk_list, const KQuery& query);
 
     /**
-     * 获取10年期中国国债收益率
+     * Get the 10-year Chinese government bond yield
      */
     const ZhBond10List& getZhBond10() const;
 
     /**
-     * 判断指定时间对应的日期是否为节假日(包含周六、周日)
-     * @note 仅支持中国大陆市场, Null<Datetime>() 将抛出异常
-     * @param d 指定时间
+     * Whether the date of the given time is a holiday (including Saturday and Sunday)
+     * @note Only the mainland China market is supported; Null<Datetime>() throws an exception
+     * @param d the given time
      */
     bool isHoliday(const Datetime& d) const;
 
     /**
-     * 粗略判断指定时间是否为交易时间
-     * @param d 指定时间，Null<Datetime>() 将抛出异常
-     * @param market 指定市场
+     * Roughly judge whether the given time is inside the trading hours
+     * @param d the given time; Null<Datetime>() throws an exception
+     * @param market the given market
      */
     bool isTradingHours(const Datetime& d, const string& market = "SH") const;
 
@@ -232,37 +240,42 @@ public:
     vector<HistoryFinanceInfo> getHistoryFinance(const Stock& stk, Datetime start, Datetime end);
 
     /**
-     * 获取指定证券的权息列表（经基础信息驱动；客户端模式下即 shm 优先、未覆盖回退 IPC/本地）
-     * @note 供 StockManager::loadAllStockWeights 启动期物化全量权息（isAll 分支用
-     *       getAllStockWeightList）；客户端模式下亦供 Stock::getWeight 对未物化证券（配置关闭、
-     *       addStock 新增、全新构造等）按需懒加载兜底
+     * Get the equity/dividend adjustment (weight) list of the given security (through the base info
+     * driver; in client mode it reads shm first and falls back to IPC/local when not covered)
+     * @note Used by StockManager::loadAllStockWeights to materialize the full weight set at startup
+     *       (the isAll branch calls getAllStockWeightList); in client mode it is also used by
+     *       Stock::getWeight as the lazy-loading fallback for securities that were not materialized
+     *       (config disabled, added by addStock, newly constructed, ...)
      */
     StockWeightList getStockWeightList(const Stock& stk, Datetime start, Datetime end);
 
     /**
-     * 添加Stock，仅供临时增加的特殊Stock使用
+     * Add a Stock; only for special Stocks that are added temporarily
      * @param stock
-     * @return true 成功 | false 失败
+     * @return true on success | false on failure
      */
     bool addStock(const Stock& stock);
 
     /**
-     * 从 StockManager 中移除相应的 Stock，一般用于将临时增加的 Stock 从 sm 中移除
+     * Remove the matching Stock from StockManager; generally used to remove a temporarily added
+     * Stock from sm
      * @param market_code
      */
     void removeStock(const string& market_code);
 
     /**
-     * 从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试
-     * @details 增加的临时Stock，其market为“TMP”
-     * @param code 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>
-     * @param day_filename 日线CSV文件名
-     * @param min_filename 分钟线CSV文件名
-     * @param tick 最小跳动量，默认0.01
-     * @param tickValue 最小跳动量价值，默认0.01
-     * @param precision 价格精度，默认2
-     * @param minTradeNumber 单笔最小交易量，默认1
-     * @param maxTradeNumber 单笔最大交易量，默认1000000
+     * Add a temporary Stock from a CSV file (K-line data); it can be used for a temporary test when
+     * the K-line data is only available in CSV format
+     * @details The market of the added temporary Stock is "TMP"
+     * @param code a self-assigned security code, which must not duplicate an existing Stock,
+     *        otherwise Null<Stock> is returned
+     * @param day_filename daily CSV file name
+     * @param min_filename minute CSV file name
+     * @param tick minimum tick size, 0.01 by default
+     * @param tickValue value of the minimum tick, 0.01 by default
+     * @param precision price precision, 2 by default
+     * @param minTradeNumber minimum quantity per trade, 1 by default
+     * @param maxTradeNumber maximum quantity per trade, 1000000 by default
      * @return
      */
     Stock addTempCsvStock(const string& code, const string& day_filename,
@@ -271,36 +284,37 @@ public:
                           size_t maxTradeNumber = 1000000);
 
     /**
-     * 移除增加的临时Stock
+     * Remove an added temporary Stock
      * @param code
      */
     void removeTempCsvStock(const string& code);
 
-    /** 是否所有数据准备完毕 */
+    /** Whether all the data is ready */
     bool dataReady() const;
 
-    /** 简单阻塞，等待所有数据准备完毕 */
+    /** Simply block until all the data is ready */
     void waitDataReady() const;
 
-    /** 是否正在初始化 */
+    /** Whether it is being initialized */
     bool initializing() const;
 
     /**
-     * 获取当前执行线程id，主要用于判断 Strategy 是以独立进程还是线程方式运行
+     * Get the id of the current executing thread; mainly used to tell whether a Strategy runs as a
+     * separate process or as a thread
      */
     std::thread::id thread_id() const noexcept {
         return m_thread_id;
     }
 
-    /** 仅由程序退出使使用！！！ */
+    /** Only used when the program exits!!! */
     ThreadPool* getLoadTaskGroup() {
         return m_load_tg.get();
     }
 
-    /** 设置插件路径（仅在初始化之前有效） */
+    /** Set the plugin path (only effective before initialization) */
     void setPluginPath(const std::string& path);
 
-    /** 获取当前插件路径 */
+    /** Get the current plugin path */
     const string& getPluginPath() const noexcept {
         return m_plugin_manager.pluginPath();
     }
@@ -308,10 +322,10 @@ public:
     template <typename PluginInterfaceT>
     PluginInterfaceT* getPlugin(const std::string& pluginname, bool print = true) noexcept;
 
-    /** 设置多语言支持路径（仅在初始化之前有效） */
+    /** Set the multi-language support path (only effective before initialization) */
     void setLanguagePath(const std::string& path) noexcept;
 
-    /** 取消加载，退出时使用 */
+    /** Cancel the loading, used when exiting */
     void cancelLoad() {
         m_cancel_load = true;
     }
@@ -321,28 +335,35 @@ public:
     }
 
     /*
-     * 等待后台预加载线程退出（幂等：线程未启动或已结束时立即返回）。仅由程序退出路径调用，
-     * 须在 cancelLoad() 之后、停止 m_load_tg 之前调用，以根除预加载线程与退出时序对 m_load_tg
-     * 的并发访问（TOCTOU/UAF）。该线程仅加载数据、派发加载事件，不涉及任何 nng
-     * 操作，且全程检查 m_cancel_load，cancel 后能快速退出，故 join 不会成为 Windows 静态析构期
-     * 的新阻塞点。
+     * Wait for the background preload thread to exit (idempotent: it returns immediately when the
+     * thread was never started or has already finished). It is only called on the program exit path,
+     * after cancelLoad() and before stopping m_load_tg, so that concurrent access (TOCTOU/UAF) to
+     * m_load_tg from the preload thread and the exit sequence is eliminated. That thread only loads
+     * data and dispatches load events, it performs no nng operation at all, and it checks
+     * m_cancel_load all the way, so it exits quickly after being cancelled; therefore this join will
+     * not become a new blocking point during the static destruction phase on Windows.
      */
     void joinPreloadThread();
 
     /**
-     * 释放 shm server 角色下各证券本地缓存的权息与历史财务数据，回收与共享内存快照重复的内存
-     * @details 由 shmserver 插件在“含历史财务的基础信息快照”发布成功后调用（_onLoadEvent 的
-     *          HISTORY_FINANCE_LOADED 分支及 start() 启动兜底发布）。发布后客户端均经共享内存
-     *          读取，服务端无需再保留两份副本。仅当本进程为 shm server 角色且非客户端模式时
-     *          真正执行，否则为空操作：
-     *          - 调用后各证券 m_weight_ready / m_history_finance_ready 置 false、缓存容器清空
-     *            并归还内存；后续 Stock::getWeight / Stock::getHistoryFinance（IPC 兜底应答、
-     *            同进程 API 访问）按需经基础信息驱动懒加载重读自愈，保证结果正确，代价仅为被
-     *            访问证券的首次库查询；
-     *          - 下一次数据 reload 时 loadAllStockWeights / 历史财务预加载会先行重新物化，
-     *            不影响下一轮快照重建；
-     *          - 切勿在仅发布权息（include_finance=false，即 BASE_DATA_READY 之后的首次发布）
-     *            后调用，否则随后含财务的发布将读到空的权息表。
+     * Release the locally cached weight and historical finance data of each security under the shm
+     * server role, reclaiming the memory duplicated with the shared-memory snapshot
+     * @details Called by the shmserver plugin after the "base info snapshot containing historical
+     *          finance data" is published successfully (the HISTORY_FINANCE_LOADED branch of
+     *          _onLoadEvent and the fallback publish at start()). After that, clients read through
+     *          shared memory, so the server does not need to keep two copies. It really runs only
+     *          when this process acts as the shm server and is not in client mode, otherwise it is a
+     *          no-op:
+     *          - After the call, m_weight_ready / m_history_finance_ready of each security are set to
+     *            false, the cache containers are cleared and the memory is returned; later
+     *            Stock::getWeight / Stock::getHistoryFinance (IPC fallback reply, in-process API
+     *            access) lazily reload them through the base info driver on demand, so the result
+     *            stays correct at the cost of the first query of the accessed security;
+     *          - On the next data reload, loadAllStockWeights / the historical finance preload
+     *            materialize them again first, so the next snapshot rebuild is not affected;
+     *          - Never call it after publishing only the weight data (include_finance=false, i.e. the
+     *            first publish after BASE_DATA_READY), otherwise the following publish that includes
+     *            finance data would read an empty weight table.
      */
     void releaseShmServerBaseInfoCache();
 
@@ -360,54 +381,59 @@ public:
     }
 
 private:
-    /* 加载全部数据 */
+    /* Load all the data */
     void loadData();
 
-    /* 获取 K 线驱动连接池，客户端模式下返回 IPC 代理驱动池 */
+    /* Get the K-line driver connection pool; the IPC proxy driver pool is returned in client mode */
     KDataDriverConnectPoolPtr _getKDataDriverPool();
 
-    /* 纯客户端协商 shm 数据服务：仅探测并连接既有服务，失败降级独立模式，绝不自行拉起服务 */
+    /* Pure client negotiation of the shm data service: it only probes and connects to an existing
+     * service, degrades to standalone mode on failure, and never starts a service by itself */
     void _negotiateShmServer();
 
-    /* 加载 K线数据至缓存 */
+    /* Load the K-line data into the cache */
     void loadAllKData();
     std::unordered_set<string> tryLoadAllKDataFromColumnFirst(const vector<KQuery::KType>& ktypes);
 
-    /* 串行加载全部 K 线及历史财务（驱动不支持并行加载时），在独立线程中执行 */
+    /* Load all the K-line data and historical finance data serially (when the driver does not support
+     * parallel loading), executed in a separate thread */
     void _loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
-    /* 并行加载全部 K 线及历史财务，在独立线程中执行 */
+    /* Load all the K-line data and historical finance data in parallel, executed in a separate thread
+     */
     void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
     /*
-     * 派发数据加载事件给已注册的插件回调（无条件声明，由 loadData 与两个加载函数调用）。
-     * 核心库不再感知服务端存在，仅按序通知；无注册回调时零开销。
-     * @note 回调内禁止调用 register/unregisterLoadEventCallback（会死锁）
+     * Dispatch the data loading event to the registered plugin callbacks (declared unconditionally;
+     * called by loadData and the two loading functions). The core library no longer perceives the
+     * existence of the server, it only notifies in order; there is no overhead when no callback is
+     * registered.
+     * @note Calling register/unregisterLoadEventCallback inside a callback is forbidden (it deadlocks)
      */
     void _fireLoadEvent(LoadEvent event);
 
-    /* 加载节假日信息 */
+    /* Load the holiday information */
     void loadAllHolidays();
 
-    /* 初始化时，添加市场信息 */
+    /* Add the market information during initialization */
     void loadAllMarketInfos();
 
-    /* 初始化时，添加证券类型信息 */
+    /* Add the security type information during initialization */
     void loadAllStockTypeInfo();
 
-    /* 加载所有证券 */
+    /* Load all the securities */
     void loadAllStocks();
 
-    /* 加载内部自生成的板块 */
+    /* Load the internally generated sectors */
     void loadInnerBlocks();
 
-    /* 加载所有权息数据 */
+    /* Load all the weight data */
     void loadAllStockWeights();
 
-    /** 加载10年期中国国债收益率数据 */
+    /** Load the 10-year Chinese government bond yield data */
     void loadAllZhBond10();
 
-    /** 加载历史财经字段索引 */
+    /** Load the historical financial field index */
     void loadHistoryFinanceField();
 
 private:
@@ -417,15 +443,17 @@ private:
     static StockManager* m_sm;
     std::mutex m_init_mutex;
     bool m_initializing{false};
-    std::atomic_bool m_cancel_load{false};  // 取消加载, 用于退出指示
-    std::atomic_bool m_data_ready{true};    // 用于指示是否所有数据准备完毕, 如果未初始化则为 true
-    std::thread::id m_thread_id;  // 记录线程id，用于判断Stratege是以独立进程方式还是线程方式运行
+    std::atomic_bool m_cancel_load{false};  // Cancel the loading, used as the exit indicator
+    std::atomic_bool m_data_ready{true};    // Indicates whether all the data is ready; true when it
+                                            // has not been initialized
+    std::thread::id m_thread_id;  // Records the thread id, used to tell whether a Strategy runs as a
+                                  // separate process or as a thread
     string m_tmpdir;
     string m_datadir;
     BaseInfoDriverPtr m_baseInfoDriver;
     BlockInfoDriverPtr m_blockDriver;
 
-    // 内部自生成的板块，初始化时生成，不从数据库取
+    // Internally generated sectors, created during initialization and not read from the database
     std::unordered_map<string, Block> m_innerBlocks;
 
     StockMapIterator::stock_map_t m_stockDict;  // SH000001 -> stock
@@ -437,12 +465,12 @@ private:
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
     mutable StockTypeInfoMap m_stockTypeInfo;
 
-    std::unordered_set<Datetime> m_holidays;  // 节假日
+    std::unordered_set<Datetime> m_holidays;  // Holidays
 
-    ZhBond10List m_zh_bond10;  // 10年期中国国债收益率数据
+    ZhBond10List m_zh_bond10;  // 10-year Chinese government bond yield data
 
-    unordered_map<string, size_t> m_field_name_to_ix;  // 财经字段名称到字段索引映射
-    unordered_map<size_t, string> m_field_ix_to_name;  // 财经字段索引到字段名称映射
+    unordered_map<string, size_t> m_field_name_to_ix;  // Financial field name -> field index
+    unordered_map<size_t, string> m_field_ix_to_name;  // Financial field index -> field name
 
     Parameter m_baseInfoDriverParam;
     Parameter m_blockDriverParam;
@@ -451,33 +479,41 @@ private:
     Parameter m_hikyuuParam;
     StrategyContext m_context;
 
-    std::unique_ptr<ThreadPool> m_load_tg;  // 异步数据加载辅助线程组
-    std::thread m_preload_thread;           // 后台预加载线程（joinable，退出时由 joinPreloadThread 回收）
+    std::unique_ptr<ThreadPool> m_load_tg;  // Auxiliary thread group for asynchronous data loading
+    std::thread m_preload_thread;           // Background preload thread (joinable, reclaimed by
+                                            // joinPreloadThread when exiting)
 
     PluginManager m_plugin_manager;
     std::string m_i18n_path;
 
-    // 本进程是否作为 shm 数据服务客户端（连接成功、装配代理驱动后置位）。转发回调由插件
-    // connect 成功后自行注册、断开时注销，核心库不持有任何插件类型指针
+    // Whether this process acts as a client of the shm data service (set after a successful
+    // connection and the assembly of the proxy driver). The forwarding callback is registered by the
+    // plugin itself after a successful connect and unregistered on disconnect; the core library does
+    // not hold any plugin type pointer
     bool m_ipc_client_mode{false};
-    KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // 客户端模式下的 IPC K线驱动池
+    KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // IPC K-line driver pool in client mode
 };
 
-/** 数据加载事件回调类型 */
+/** Data loading event callback type */
 using LoadEventCallback = std::function<void(LoadEvent)>;
 
 /**
- * 注册数据加载事件回调，返回回调 id（插件 start() 时订阅，用于在正确时点发布快照）
- * @note 回调容器锁堆分配且永不释放，故本函数及其逆过程在静态析构期调用亦安全
+ * Register a data loading event callback, returning the callback id (subscribed when a plugin
+ * start()s, used to publish the snapshot at the right moment)
+ * @note The lock of the callback container is heap allocated and never released, so this function and
+ *       its inverse are safe to call during the static destruction phase as well
  */
 HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
 
-/** 注销数据加载事件回调（插件 stop() 时调用）；id 不存在时为无操作 */
+/** Unregister a data loading event callback (called when a plugin stop()s); a no-op when the id does
+ *  not exist */
 HKU_API void unregisterLoadEventCallback(size_t id);
 
 /**
- * 标记本进程为 shm server 角色：_negotiateShmServer() 据此跳过客户端协商（防自连接）
- * @details 由门面 startShmServer() 在加载插件之前调用；即便 StockManager 尚未 init 亦可安全置位
+ * Mark this process as the shm server role: _negotiateShmServer() skips the client negotiation
+ * accordingly (to prevent self-connection)
+ * @details Called by the facade startShmServer() before the plugin is loaded; it is safe to set even
+ *          if StockManager has not been initialized yet
  */
 HKU_API void setShmServerRole(bool role) noexcept;
 HKU_API bool isShmServerRole() noexcept;
