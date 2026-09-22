@@ -1,236 +1,234 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/base/other_utils.rst
-
 .. py:currentmodule:: hikyuu
 .. highlight:: python
 
-杂项或辅助
-=============
+Miscellaneous and Auxiliary
+===========================
 
-函数
-------
+Functions
+---------
 
 .. py:function:: select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=True)
 
-    示例::
+    Example::
     
-        #选出涨停股
+        # Select the limit-up stocks
         C = CLOSE()
         x = select(C / REF(C, 1) - 1 >= 0.0995)
 
-    :param Indicator cond: 条件指标
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期
-    :param bool print_out: 打印选中的股票
-    :rtype: 选中的股票列表
+    :param Indicator cond: the condition indicator
+    :param Datetime start: the start date
+    :param Datetime end: the end date
+    :param bool print_out: print the selected stocks
+    :rtype: the list of the selected stocks
 
 
 .. py:function:: select2(inds, start=Datetime(201801010000), end=Datetime.now(), stks=None)
 
-    导出最后时刻指定证券的所有指定指标值
+    Export all the specified indicator values of the specified securities at the last moment.
 
-    如：
+    E.g.:
         select2([CLOSE(), VOLUME()], stks=blocka)
-    返回一个DataFrame, 列名是指标名称, 行是证券代码和证券名称:
+    Return a DataFrame, the column names are the indicator names, the rows are the code and the name of the securities:
         证券代码  证券名称  CLOSE  VOLUME
         SH600000 浦发银行  14.09   1000
         SH600001 中国平安  13.09   2000
         SZ000001 平安银行  13.09   3000
         ...
 
-    :param Indicator inds: 指标列表
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期（不包括该日期）
-    :param list stks: 指定的证券列表
+    :param Indicator inds: the indicator list
+    :param Datetime start: the start date
+    :param Datetime end: the end date (excluding this date)
+    :param list stks: the specified securities list
     :rtype: pandas.DataFrame
 
 
 .. py:function:: get_log_level()
 
-    获取当前日志打印级别
+    Get the current log printing level
     
     :rtype: LOG_LEVEL
     
 .. py:function:: set_log_level(level)
 
-    设置日志打印级别
+    Set the log printing level
     
-    :param LOG_LEVEL level: 指定的日志打印级别
+    :param LOG_LEVEL level: the specified log printing level
 
 .. py:function:: hku_save(var, filename)
 
-    序列化，将hikyuu内建类型的变量（如Stock、TradeManager等）保存在指定的文件中，格式为XML。
+    Serialization: save a variable of a hikyuu built-in type (such as Stock, TradeManager, etc.) to the specified file, in XML format.
     
-    :param var: hikyuu内建类型的变量
-    :param str filename: 指定的文件名
+    :param var: a variable of a hikyuu built-in type
+    :param str filename: the specified file name
 
 .. py:function:: hku_load(filename)
 
-    将通过 hku_save 保存的变量，读取到var中。
+    Read the variable saved by hku_save into var.
     
-    :param str filename: 待载入的序列化文件。
-    :return: 之前被序列化保存的文件
+    :param str filename: the serialization file to be loaded.
+    :return: the variable previously saved by serialization
     
 .. py:function:: roundUp(number[, ndigits=0])
 
-    向上截取，如10.1截取后为11
+    Round up, e.g. 10.1 becomes 11 after rounding
     
-    :param float number: 待处理数据
-    :param int ndigits: 保留小数位数
-    :return: 处理过的数据
+    :param float number: the data to process
+    :param int ndigits: the number of the decimal digits to keep
+    :return: the processed data
 
 
 .. py:function:: roundDown(number[, ndigits=0])
 
-    向下截取，如10.1截取后为10
+    Round down, e.g. 10.1 becomes 10 after rounding
     
-    :param float number: 待处理数据
-    :param int ndigits: 保留小数位数
-    :return: 处理过的数据
+    :param float number: the data to process
+    :param int ndigits: the number of the decimal digits to keep
+    :return: the processed data
     
     
 .. py:function:: get_date_range(start, end)
 
-    获取指定 [start, end) 日期时间范围的自然日日历日期列表，仅支持到日
+    Get the list of the natural calendar dates in the specified [start, end) date-time range, supported only up to the day
     
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期
+    :param Datetime start: the start date
+    :param Datetime end: the end date
     :rtype: DatetimeList
 
     
 .. py:function:: toPriceList(arg)
 
-    将Python的可迭代对象如 list、tuple 转化为 PriceList（该函数实际已废弃，可以不再使用）
+    Convert a Python iterable object such as a list or a tuple to a PriceList (this function is actually deprecated and no longer needed)
     
-    :param arg: 待转化的Python序列
+    :param arg: the Python sequence to convert
     :rtype: list
     
 
 .. py:function:: set_global_context(stk, query)
 
-    设置全局的 context
+    Set the global context
 
-    :param Stock stk: 指定的全局Stock
-    :param Query query: 指定的查询条件
+    :param Stock stk: the specified global Stock
+    :param Query query: the specified query condition
     
     
 .. py:function:: get_global_context()
 
-    获取当前全局默认上下文
+    Get the current global default context
     
     :rtype: KData
 
     
-类
------------
+Classes
+-------
 
 .. py:class:: Parameter
 
-    参数类
+    The parameter class
     
     .. py:method:: get(self, name)
         
-        获取指定参数
+        Get the specified parameter
         
-        :param str name: 参数名称
-        :return: 参数值
+        :param str name: the parameter name
+        :return: the parameter value
         
     .. py:method:: set(self, name, value)
     
-        设置参数
+        Set the parameter
         
-        :param str name: 参数名称
-        :param value: 参数值（仅支持 int | float | str | bool 类型）
+        :param str name: the parameter name
+        :param value: the parameter value (only the int | float | str | bool types are supported)
     
     
 .. py:class:: PriceList
 
-    价格序列，其中价格使用double表示，对应C++中的std::vector<double>。
+    The price sequence, in which the price is represented with a double, corresponding to std::vector<double> in C++.
 
     .. py:method:: to_np(self)
 
-        仅在安装了numpy模块时生效，转换为numpy.array
+        Takes effect only when the numpy module is installed; converts to numpy.array
 
     .. py:method:: to_df(self)
 
-        仅在安装了pandas模块时生效，转换为pandas.DataFrame
+        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
         
         
 .. py:class:: DatetimeList
 
-    日期序列，对应C++中的std::vector<Datetime>
+    The date sequence, corresponding to std::vector<Datetime> in C++
     
     .. py:method:: append(self, datetime)
     
-        向列表末端加入元素
+        Add an element to the end of the list
         
-        :param Datetime datetime: 待加入的元素
+        :param Datetime datetime: the element to add
     
     .. py:method:: to_np(self)
 
-        仅在安装了numpy模块时生效，转换为numpy.array
+        Takes effect only when the numpy module is installed; converts to numpy.array
 
     .. py:method:: to_df(self)
 
-        仅在安装了pandas模块时生效，转换为pandas.DataFrame
+        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
 
 
 .. py:class:: StringList
 
-    字符串列表，对应C++中的std::vector<String>
+    The string list, corresponding to std::vector<String> in C++
     
     
 .. py:class:: KRecordList
 
-    C++ std::vector<KRecord>包装
+    A wrapper of the C++ std::vector<KRecord>
     
     .. py:method:: append(self, krecord)
     
-        向列表末端加入元素
+        Add an element to the end of the list
         
-        :param KRecord krecord: 待加入的元素
+        :param KRecord krecord: the element to add
     
     .. py:method:: to_np(self)
 
-        仅在安装了numpy模块时生效，转换为numpy.array
+        Takes effect only when the numpy module is installed; converts to numpy.array
 
     .. py:method:: to_df(self)
 
-        仅在安装了pandas模块时生效，转换为pandas.DataFrame
+        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
     
 
 .. py:class:: BlockList
 
-    C++ std::vector<Block>包装
+    A wrapper of the C++ std::vector<Block>
     
     
 .. py:class:: OstreamRedirect
 
-    重定向C++ std::cout、std::cerr至python。在非命令行方式下，某些App无法显示C++ iostream的输出信息，如Jupyter notebook。默认构造时，只是指定是否需要重定向std::cout或std::cerr，必须使用open方法或with语法才会启用重定向。
+    Redirect the C++ std::cout and std::cerr to python. In a non-command-line mode, some Apps cannot display the C++ iostream output, such as the Jupyter notebook. By default, the construction only specifies whether std::cout or std::cerr needs to be redirected; the redirection must be enabled with the open method or the with syntax.
     
-    使用with示例：
+    An example of using with:
     
     .. code-block:: python
     
         with OstreamRedirect():
-            your_function() #被封装的C++函数，其中使用了std::iostream输出
+            your_function() # the wrapped C++ function, which outputs with std::iostream
     
 
     .. py:method:: init(self[, stdout=True, stderr=True])
         
-        :param bool stdout: 是否重定向C++ std::cout
-        :param bool stderr: 是否重定向C++ std::cerr
+        :param bool stdout: whether to redirect the C++ std::cout
+        :param bool stderr: whether to redirect the C++ std::cerr
 
     .. py:method:: open(self)
     
-        启用重定向
+        Enable the redirection
         
     .. py:method:: close(self)
     
-        关闭重定向
+        Disable the redirection
     
     
-枚举
------------    
+Enumerations
+------------    
 
 .. py:class:: LOG_LEVEL
 
@@ -241,4 +239,3 @@
     - ERROR
     - FATAL
     - NO_PRINT
-

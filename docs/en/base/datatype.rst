@@ -1,215 +1,213 @@
-.. TODO(en): Placeholder - English translation pending; structure mirrors docs/zh/base/datatype.rst
-
 .. py:currentmodule:: hikyuu
 .. highlight:: python
 
-基础数据类型
-============
+Basic Data Types
+================
 
-日期时间
------------
+Date and Time
+-------------
 
-日期时间及其运算主要涉及 :py:class:`Datetime`，:py:class:`TimeDelta`。
+The date-time and its operations mainly involve :py:class:`Datetime` and :py:class:`TimeDelta`.
 
-两者及其相关运算规则可参考 python datetime 模块中的 datetime 和 timedelta 帮助，
-并且两者可和 datetime、timedelta 相互转换，并直接进行运算操作。
+For the two classes and their related operation rules, refer to the datetime and timedelta help in the python datetime module;
+the two can be converted to and from datetime and timedelta, and can be operated on directly.
 
-TimeDelta 的运算规则基本与 datetime.timedelta 相同。
+The operation rules of TimeDelta are basically the same as datetime.timedelta.
 
 .. py:class:: Datetime
 
-    日期时间类（精确到微秒），通过以下方式构建：
+    The date-time class (accurate to the microsecond), built in the following ways:
     
-    - 通过字符串：Datetime("2010-1-1 10:00:00")、Datetime("2001-1-1")、Datetime("20010101")、Datetime("20010101T232359)
-    - 通过 Python 的date：Datetime(date(2010,1,1))
-    - 通过 Python 的datetime：Datetime(datetime(2010,1,1,10)
-    - 通过 YYYYMMDDHHMMSS 或 YYYYMMDDHHMM 或 YYYYMMDD 形式的整数：Datetime(201001011000)、Datetime(20010101)
+    - From a string: Datetime("2010-1-1 10:00:00"), Datetime("2001-1-1"), Datetime("20010101"), Datetime("20010101T232359)
+    - From a Python date: Datetime(date(2010,1,1))
+    - From a Python datetime: Datetime(datetime(2010,1,1,10)
+    - From an integer in the YYYYMMDDHHMMSS, YYYYMMDDHHMM or YYYYMMDD form: Datetime(201001011000), Datetime(20010101)
     - Datetime(year, month, day, hour=0, minute=0, second=0, millisecond=0, microsecond=0)
     
-    获取日期列表参见： :py:func:`getDateRange`
+    To get the date list, see: :py:func:`getDateRange`
     
-    获取交易日日期参见： :py:meth:`StockManager.getTradingCalendar` 
+    To get the trading dates, see: :py:meth:`StockManager.getTradingCalendar` 
 
-    .. py:attribute:: year 年，如果是 Null 将抛出异常
-    .. py:attribute:: month 月，如果是 Null 将抛出异常
-    .. py:attribute:: day 日，如果是 Null 将抛出异常
-    .. py:attribute:: hour 时，如果是 Null 将抛出异常
-    .. py:attribute:: minute 分，如果是 Null 将抛出异常
-    .. py:attribute:: second 秒，如果是 Null 将抛出异常
-    .. py:attribute:: millisecond 毫秒，如果是 Null 将抛出异常
-    .. py:attribute:: microsecond 微秒，如果是 Null 将抛出异常
-    .. py:attribute:: number YYYYMMDDHHMM 形式的整数，精度只到分钟
-    .. py:attribute:: ym YYYYMM 形式的整数
-    .. py:attribute:: ymd YYYYMMDD 形式的整数
-    .. py:attribute:: ymdh YYYYMMDDhh 形式的整数
-    .. py:attribute:: ymdhm YYYYMMDDhhmm 形式的整数
-    .. py:attribute:: ymdhms YYYYMMDDhhmmss 形式的整数
-    .. py:attribute:: ticks 距离最小日期过去的微秒数
-    .. py:attribute:: hex 兼容oracle datetime 表示, 返回用后7个字节表示世纪、世纪年、月、日、时、分、秒的64位整数
+    .. py:attribute:: year Year; an exception is raised if it is Null
+    .. py:attribute:: month Month; an exception is raised if it is Null
+    .. py:attribute:: day Day; an exception is raised if it is Null
+    .. py:attribute:: hour Hour; an exception is raised if it is Null
+    .. py:attribute:: minute Minute; an exception is raised if it is Null
+    .. py:attribute:: second Second; an exception is raised if it is Null
+    .. py:attribute:: millisecond Millisecond; an exception is raised if it is Null
+    .. py:attribute:: microsecond Microsecond; an exception is raised if it is Null
+    .. py:attribute:: number The integer in the YYYYMMDDHHMM form, with the accuracy only to the minute
+    .. py:attribute:: ym The integer in the YYYYMM form
+    .. py:attribute:: ymd The integer in the YYYYMMDD form
+    .. py:attribute:: ymdh The integer in the YYYYMMDDhh form
+    .. py:attribute:: ymdhm The integer in the YYYYMMDDhhmm form
+    .. py:attribute:: ymdhms The integer in the YYYYMMDDhhmmss form
+    .. py:attribute:: ticks The microseconds elapsed since the minimum date
+    .. py:attribute:: hex Compatible with the oracle datetime representation; returns a 64-bit integer in which the last 7 bytes represent the century, the century year, the month, the day, the hour, the minute and the second
 
     .. py:method:: date(self)
     
-        转化生成 python 的 date
+        Convert to a python date
         
     .. py:method:: datetime(self)
     
-        转化生成 python 的datetime
+        Convert to a python datetime
     
     .. py:method:: is_null(self)
     
-        是否是Null值, 即是否等于 constant.null_datetime
+        Whether it is a Null value, i.e. whether it equals constant.null_datetime
 
     .. py:method:: __add__(self, td)
 
-        加上指定时长，时长对象可为 TimeDelta 或 datetime.timedelta 类型
+        Add the specified time duration; the duration object can be a TimeDelta or a datetime.timedelta type
 
-        :param TimeDelta td: 时长
+        :param TimeDelta td: the time duration
         :rtype: Datetime
 
     .. py:method:: __sub__(self, td)
 
-        减去指定的时长, 时长对象可为 TimeDelta 或 datetime.timedelta 类型
+        Subtract the specified time duration; the duration object can be a TimeDelta or a datetime.timedelta type
 
-        :param TimeDelta td: 指定时长
+        :param TimeDelta td: the specified time duration
         :rtype: Datetime
 
     .. py:method:: day_of_week(self)
     
-        返回是一周中的第几天，周日为0，周一为1
+        Return the day of the week; Sunday is 0 and Monday is 1
         
         :rtype: int
         
     .. py:method:: date_of_week(self, day)
     
-        返回指定的本周中第几天的日期，周日为0天，周六为第6天
+        Return the date of the specified day of this week; Sunday is day 0 and Saturday is day 6
         
-        :param int day: 指明本周的第几天，如小于则认为为第0天，如大于6则认为为第6天
+        :param int day: indicate the day of this week; if it is less than 0, it is considered day 0, and if it is greater than 6, it is considered day 6
         :rtype: Datetime
         
     .. py:method:: day_of_year(self)
     
-        返回一年中的第几天，1月1日为一年中的第1天
+        Return the day of the year; January 1st is the 1st day of the year
         
         :rtype: int
 
     .. py:method:: start_of_day(self)
 
-        返回当天 0点0分0秒
+        Return 00:00:00 of the current day
 
     .. py:method:: end_of_day(self)
 
-        返回当日 23点59分59秒
+        Return 23:59:59 of the current day
         
     .. py:method:: start_of_week(self)
     
-        返回周起始日期（周一）
+        Return the start date of the week (Monday)
         
     .. py:method:: end_of_week(self)
     
-        返回周结束日期（周日）
+        Return the end date of the week (Sunday)
         
     .. py:method:: start_of_month(self)
     
-        返回月度起始日期
+        Return the start date of the month
         
     .. py:method:: end_of_month(self)
     
-        返回月末最后一天日期
+        Return the last day of the month
         
     .. py:method:: start_of_quarter(self)
     
-        返回季度起始日期
+        Return the start date of the quarter
         
     .. py:method:: end_of_quarter(self)
     
-        返回季度结束日期
+        Return the end date of the quarter
         
     .. py:method:: start_of_halfyear(self)
     
-        返回半年度起始日期
+        Return the start date of the half-year
         
     .. py:method:: end_of_halfyear(self)
     
-        返回半年度结束日期
+        Return the end date of the half-year
         
     .. py:method:: start_of_year(self)
     
-        返回年度起始日期
+        Return the start date of the year
         
     .. py:method:: end_of_year(self)
     
-        返回年度结束日期
+        Return the end date of the year
         
     .. py:method:: next_day(self)
     
-        返回下一自然日
+        Return the next natural day
         
     .. py:method:: next_week(self)
     
-        返回下周周一日期
+        Return the Monday date of the next week
         
     .. py:method:: next_month(self)
     
-        返回下月首日日期
+        Return the first day of the next month
         
     .. py:method:: next_quarter(self)
     
-        返回下一季度首日日期
+        Return the first day of the next quarter
         
     .. py:method:: next_halfyear(self)
     
-        返回下一半年度首日日期
+        Return the first day of the next half-year
         
     .. py:method:: next_year(self)
     
-        返回下一年度首日日期
+        Return the first day of the next year
         
     .. py:method:: pre_day(self)
 
-        返回前一自然日日期
+        Return the previous natural day
         
     .. py:method:: pre_week(self)
     
-        返回上周周一日期
+        Return the Monday date of the previous week
         
     .. py:method:: pre_month(self)
     
-        返回上月首日日期
+        Return the first day of the previous month
         
     .. py:method:: pre_quarter(self)
     
-        返回上一季度首日日期
+        Return the first day of the previous quarter
         
     .. py:method:: pre_halfyear(self)
     
-        返回上一半年度首日日期
+        Return the first day of the previous half-year
 
     .. py:method:: pre_year(self)
     
-        返回上一年度首日日期
+        Return the first day of the previous year
         
     .. py:staticmethod:: max()
     
-        获取支持的最大日期时间
+        Get the maximum supported date-time
         
     .. py:staticmethod:: min()
     
-        获取支持的最小日期时间
+        Get the minimum supported date-time
         
     .. py:staticmethod:: now()
     
-        获取当前的日期时间
+        Get the current date-time
         
     .. py:staticmethod:: today()
     
-        获取当前的日期
+        Get the current date
 
 
 .. py:class:: TimeDelta
 
-    时间时长，用于时间计算。可通过以下方式构建：
+    The time duration, used for the time calculation. It can be built in the following ways:
 
-    - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
+    - Build from a datetime.timedelta. TimeDelta(timedelta instance)
     - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
 
         - -99999999 <= days <= 99999999
@@ -219,319 +217,318 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
         - -86399000000 <= milliseconds <= 86399000000
         - -86399000000 <= microseconds <= 86399000000
 
-    以上参数限制，主要为防止求总微秒数时可能出现溢出的情况。如只使用一个参数不希望存在上述限制时，可使用快捷函数：
+    The parameter limits above are mainly to prevent a possible overflow when summing the total microseconds. When only one parameter is used and the limits above are not desired, the shortcut functions can be used:
     :py:func:`Days`, :py:func:`Hours`, :py:func:`Minutes`, :py:func:`Seconds`, :py:func:`Milliseconds`, 
     :py:func:`Microseconds`
 
-    .. py:attribute:: days 天数 [-99999999, 99999999]
-    .. py:attribute:: hours 小时数 [0, 23]
-    .. py:attribute:: minutes 分钟数 [0, 59]
-    .. py:attribute:: seconds 秒数 [0, 59]
-    .. py:attribute:: milliseconds 毫秒数 [0, 999]
-    .. py:attribute:: microseconds 微秒数 [0, 999]
-    .. py:attribute:: ticks 同总微秒数
+    .. py:attribute:: days The number of days [-99999999, 99999999]
+    .. py:attribute:: hours The number of hours [0, 23]
+    .. py:attribute:: minutes The number of minutes [0, 59]
+    .. py:attribute:: seconds The number of seconds [0, 59]
+    .. py:attribute:: milliseconds The number of milliseconds [0, 999]
+    .. py:attribute:: microseconds The number of microseconds [0, 999]
+    .. py:attribute:: ticks The same as the total microseconds
 
     .. py:method:: isNegative(self)
 
-        是否为负时长
+        Whether it is a negative duration
 
         :rtype: bool
 
     .. py:method:: total_days(self)
 
-        获取带小数的总天数
+        Get the total number of days with decimals
 
         :rtype: float
 
     .. py:method:: total_hours(self)
 
-        获取带小数的总小时数
+        Get the total number of hours with decimals
 
         :rtype: float
 
     .. py:method:: total_minutes(self)
 
-        获取带小数的总分钟数
+        Get the total number of minutes with decimals
 
         :rtype: float
 
     .. py:method:: total_seconds(self)
 
-        获取带小数的总秒数
+        Get the total number of seconds with decimals
 
         :rtype: float
 
     .. py:method:: total_milliseconds(self)
 
-        获取带小数的总毫秒数
+        Get the total number of milliseconds with decimals
 
         :rtype: float
 
     .. py:staticmethod:: max()
 
-        支持的最大时长
+        The maximum supported duration
 
         :return: TimeDelta(99999999, 23, 59, 59, 999, 999)
 
     .. py:staticmethod:: min()
 
-        支持的最小时长
+        The minimum supported duration
 
         :return: TimeDelta(-99999999, 0, 0, 0, 0, 0)
 
     .. py:staticmethod:: resolution()
 
-        支持的最小精度
+        The minimum supported precision
         
         :return: TimeDelta(0, 0, 0, 0, 0, 1)
 
     .. py:staticmethod:: max_ticks()
 
-        支持的最大 ticks （即微秒数）
+        The maximum supported ticks (i.e. the number of microseconds)
 
         :rtype: int
 
     .. py:staticmethod:: min_ticks()
 
-        支持的最小 ticks （即微秒数）
+        The minimum supported ticks (i.e. the number of microseconds)
 
         :rtype: int
 
     .. py:staticmethod:: from_ticks(ticks)
 
-        使用 ticks（即微秒数） 值创建
+        Create with the ticks (i.e. the number of microseconds) value
 
-        :param int ticks: 微秒数
+        :param int ticks: the number of microseconds
         :rtype: TimeDelta
 
 
 .. py:function:: Days(days)
 
-    以天数创建 TimeDelta
+    Create a TimeDelta with the number of days
 
-    :param int days: 天数
+    :param int days: the number of days
     :rtype: TimeDelta
 
 
 .. py:function:: Hours(hours)
 
-    以小时数创建 TimeDelta
+    Create a TimeDelta with the number of hours
 
-    :param int hours: 小时数
+    :param int hours: the number of hours
     :rtype: TimeDelta
 
 
 .. py:function:: Minutes(mins)
 
-    以分钟数创建 TimeDelta
+    Create a TimeDelta with the number of minutes
 
-    :param int mins: 分钟数
+    :param int mins: the number of minutes
     :rtype: TimeDelta
 
 
 .. py:function:: Seconds(secs)
 
-    以秒数创建 TimeDelta
+    Create a TimeDelta with the number of seconds
 
-    :param int secs: 秒数
+    :param int secs: the number of seconds
     :rtype: TimeDelta
 
 
 .. py:function:: Milliseconds(milliseconds)
 
-    以毫秒数创建 TimeDelta
+    Create a TimeDelta with the number of milliseconds
 
-    :param int milliseconds: 毫秒数
+    :param int milliseconds: the number of milliseconds
     :rtype: TimeDelta
 
 
 .. py:function:: Microseconds(microsecs)
 
-    以微秒数创建 TimeDelta
+    Create a TimeDelta with the number of microseconds
 
-    :param int microsecs: 微秒数
+    :param int microsecs: the number of microseconds
     :rtype: TimeDelta
 
 
 
-K线数据
-----------       
-       
+K-line Data
+-----------       
+    
 .. py:class:: KRecord
 
-    K线记录，组成K线数据，属性可读写。
+    The K-line record, composing the K-line data; the attributes are readable and writable.
     
-    .. py:attribute:: datetime : 日期时间
-    .. py:attribute:: open     : 开盘价
-    .. py:attribute:: high     : 最高价
-    .. py:attribute:: low      : 最低价
-    .. py:attribute:: close    : 收盘价
-    .. py:attribute:: amount   : 成交金额
-    .. py:attribute:: volume   : 成交量
+    .. py:attribute:: datetime : The date-time
+    .. py:attribute:: open     : The open price
+    .. py:attribute:: high     : The high price
+    .. py:attribute:: low      : The low price
+    .. py:attribute:: close    : The close price
+    .. py:attribute:: amount   : The amount
+    .. py:attribute:: volume   : The volume
 
     .. py:method:: is_valid(self)
 
-        判断该K线记录是否有效
+        Judge whether the K-line record is valid
 
     
 .. py:class:: KData
 
-    通过 Stock.get_kdata 获取的K线数据，由 KRecord 组成的数组，可象 list 一样进行遍历
+    The K-line data obtained through Stock.get_kdata; it is an array composed of KRecords and can be traversed like a list
     
     .. py:attribute:: start_pos
     
-        获取在原始K线记录中对应的起始位置，如果KData为空返回0
+        Get the corresponding start position in the original K-line records; if the KData is empty, return 0
         
     .. py:attribute:: last_pos
     
-        获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1
+        Get the position of the last record in the original K-line records; if it is empty, return 0, otherwise it equals endPos - 1
         
     .. py:attribute:: end_pos
     
-        获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1
+        Get the position of the next record after the range in the original K-line records; if it is empty, return 0, otherwise it equals lastPos + 1
         
     .. py:method:: get_datetime_list()
     
-        返回交易日期列表
+        Return the trading date list
 
         :rtype: DatetimeList
         
     .. py:method:: get(pos)
 
-        获取指定索引位置的K线记录
+        Get the K-line record at the specified index position
         
-        :param int pos: 位置索引
+        :param int pos: the position index
         :rtype: KRecord        
     
     .. py:method:: get_by_datetime(datetime)    
 
-        获取指定时间的K线记录。
-    
-        :param Datetime datetime: 指定的日期
+        Get the K-line record at the specified time.
+
+        :param Datetime datetime: the specified date
         :rtype: KRecord
     
     .. py:method:: get_pos(datetime)
 
-        获取指定时间对应的索引位置
+        Get the index position corresponding to the specified time
         
-        :param Datetime datetime: 指定的时间
-        :return: 对应的索引位置，如果不在数据范围内，则返回 None    
+        :param Datetime datetime: the specified time
+        :return: the corresponding index position; if it is out of the data range, return None    
 
     .. py:method:: get_pos_in_stock(datetime)
 
-        获取指定时间对应原始 K 线中的索引位置
+        Get the index position in the original K-line corresponding to the specified time
         
-        :param Datetime datetime: 指定的时间
-        :return: 对应的索引位置，如果不在数据范围内，则返回 None    
+        :param Datetime datetime: the specified time
+        :return: the corresponding index position; if it is out of the data range, return None    
 
     .. py:method:: empty()
     
-        判断是否为空
+        Judge whether it is empty
     
         :rtype: bool
     
     .. py:method:: get_query()
     
-        获取关联的查询条件
+        Get the associated query condition
     
         :rtype: Query
     
     .. py:method:: get_stock()
     
-        获取关联的Stock
+        Get the associated Stock
     
         :rtype: Stock
 
     .. py:method:: get_kdata()
 
-        通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData（注意，不是原 KData 的子集）
+        Get a new KData that keeps the data type and the recovery type unchanged through the current KData (note that it is not a subset of the original KData)
 
-        :param Datetime start: 新的起始日期
-        :param Datetime end: 新的结束日期
+        :param Datetime start: the new start date
+        :param Datetime end: the new end date
         :rtype: KData
     
     .. py:method:: tocsv(filename)
     
-        将数据保存至CSV文件
+        Save the data to a CSV file
     
-        :param str filename: 指定保存的文件名称
+        :param str filename: the specified file name to save
 
     .. py:method:: to_np()
     
-        转化为numpy结构数组
+        Convert to a numpy structured array
     
         :rtype: numpy.array
         
     .. py:method:: to_df(with_stock=False)
     
-        转化为pandas的DataFrame
+        Convert to a pandas DataFrame
         
-        :param bool with_stock: 包含Stock的代码与名称
+        :param bool with_stock: include the code and the name of the Stock
         :rtype: pandas.DataFrame
 
 
-分时线数据
+Time-line Data
 --------------
 
 .. py:class:: TimeLineRecord
 
-    分时线记录，属性可读写。
+    The time-line record; the attributes are readable and writable.
     
-    .. py:attribute:: date : 日期时间
-    .. py:attribute:: price : 价格
-    .. py:attribute:: vol : 成交量
+    .. py:attribute:: date : The date-time
+    .. py:attribute:: price : The price
+    .. py:attribute:: vol : The volume
 
 
 .. py:class:: TimeLineList
 
-    通过 Stock.get_timeline_list 获取的分时线数据，由 TimeLineRecord 组成的数组，可象 list 一样进行遍历
+    The time-line data obtained through Stock.get_timeline_list; it is an array composed of TimeLineRecords and can be traversed like a list
     
     .. py:method:: to_numpy()
     
-        转化为numpy结构数组
+        Convert to a numpy structured array
     
         :rtype: numpy.array
         
     .. py:method:: to_pandas()
     
-        转化为pandas的DataFrame
+        Convert to a pandas DataFrame
         
         :rtype: pandas.DataFrame
 
     .. py:method:: to_pyarrow()
 
-        转换为 pyarrow.Table
+        Convert to pyarrow.Table
         
 
-分笔历史数据
-----------------
+Tick History Data
+-----------------
 
 .. py:class:: TransRecord
 
-    历史分笔数据记录
+    The historical tick data record
     
-    .. py:attribute:: date : 时间
-    .. py:attribute:: price : 价格
-    .. py:attribute:: vol : 成交量
-    .. py:attribute:: direct : 买卖盘性质: 1--sell 0--buy 2--集合竞价 其他未知
+    .. py:attribute:: date : The time
+    .. py:attribute:: price : The price
+    .. py:attribute:: vol : The volume
+    .. py:attribute:: direct : The nature of the buy/sell order: 1--sell 0--buy 2--call auction, others unknown
     
 .. py:class:: TransList
 
-    分时线数据列表
+    The time-line data list
     
     .. py:method:: to_numpy()
     
-        转化为numpy结构数组
+        Convert to a numpy structured array
     
         :rtype: numpy.array
         
     .. py:method:: to_pandas()
     
-        转化为pandas的DataFrame
+        Convert to a pandas DataFrame
         
         :rtype: pandas.DataFrame
 
     .. py:method:: to_pyarrow()
 
-        转换为 pyarrow.Table
-    
+        Convert to pyarrow.Table
