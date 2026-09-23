@@ -9,109 +9,109 @@ Built-in Profit Goal Strategies
 
 .. py:function:: PG_FixedPercent([p = 0.2])
 
-    The fixed percentage profit goal; the goal price = the buy price * (1 + p)
-    
+    Fixed-percentage profit goal: the goal price equals the buy price multiplied by (1 + p).
+
     :param float p: the percentage
     :return: the profit goal strategy instance
-    
+
 .. py:function:: PG_FixedHoldDays([days=5])
 
-    The fixed holding days profit goal strategy
-    
-    :param int days: the allowed holding days (counted by trading days), defaults to 5 days
+    Profit goal based on a fixed number of holding days.
+
+    :param int days: the maximum allowed holding period, counted in trading days; defaults to 5
     :return: the profit goal strategy instance
-    
+
 .. py:function:: PG_NoGoal()
 
-    No profit goal strategy, usually for testing or comparison.
-    
+    No profit goal; typically used for testing or comparison.
+
     :return: the profit goal strategy instance
 
-    
+
 Custom Profit Goal Strategy
----------------------------    
+---------------------------
 
-The custom profit goal strategy interface:
+A custom profit goal strategy implements the following interface:
 
-* :py:meth:`ProfitGoalBase.getGoal` - [Required] Get the goal price
-* :py:meth:`ProfitGoalBase._calculate` - [Required] The subclass calculation interface
-* :py:meth:`ProfitGoalBase._clone` - [Required] The clone interface
-* :py:meth:`ProfitGoalBase._reset` - [Optional] Reset the internal member variables
-* :py:meth:`ProfitGoalBase.buyNotify` - [Optional] Receive the notification of the actual buy; reserved for handling multiple position increases/decreases
-* :py:meth:`ProfitGoalBase.sellNotify` - [Optional] Receive the notification of the actual sell; reserved for handling multiple position increases/decreases
-    
+* :py:meth:`ProfitGoalBase.getGoal` - [Required] Return the goal price
+* :py:meth:`ProfitGoalBase._calculate` - [Required] Subclass calculation hook
+* :py:meth:`ProfitGoalBase._clone` - [Required] Subclass clone hook
+* :py:meth:`ProfitGoalBase._reset` - [Optional] Reset internal member variables
+* :py:meth:`ProfitGoalBase.buyNotify` - [Optional] Receive notification of an actual buy; reserved for handling multiple additions to or reductions of a position
+* :py:meth:`ProfitGoalBase.sellNotify` - [Optional] Receive notification of an actual sell; reserved for handling multiple additions to or reductions of a position
+
 
 Profit Goal Strategy Base Class
 -------------------------------
 
 .. py:class:: ProfitGoalBase
 
-    The profit goal strategy base class
-    
+    Base class for profit goal strategies.
+
     .. py:attribute:: name Name
-    .. py:attribute:: to Set or get the traded K-line data (TO)
-    .. py:attribute:: tm Set or get the trade management account
-    
+    .. py:attribute:: to Set or get the traded K-line (bar) data (TO)
+    .. py:attribute:: tm Set or get the trade manager account
+
     .. py:method:: __init__(self[, name="ProfitGoalBase"])
-    
-        The initialization constructor
-        
+
+        Constructor.
+
         :param str name: the name
-        
+
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
-    
+        Get the value of the specified parameter.
+
         :param str name: the parameter name
         :return: the parameter value
-        :raises out_of_range: no such parameter
-        
+        :raises out_of_range: raised if no such parameter exists
+
     .. py:method:: set_param(self, name, value)
-    
-        Set the parameter
-        
+
+        Set the value of a parameter.
+
         :param str name: the parameter name
         :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! The parameter type is not supported
-        
+        :raises logic_error: Unsupported type! Raised when the parameter type is not supported
+
     .. py:method:: reset(self)
-    
-        The reset operation
-    
+
+        Reset the part to its initial state.
+
     .. py:method:: clone(self)
-    
-        The clone operation        
-        
+
+        Create and return a copy of this instance.
+
     .. py:method:: get_goal(self, datetime, price)
-    
-        [Override hook] Get the profit goal price; returning constant.null_price means no goal is set, and returning 0 means it needs to be sold
-        
+
+        [Override hook] Return the profit goal price. Returning constant.null_price means no goal is set; returning 0 means the position should be sold.
+
         :param Datetime datetime: the current time
         :param float price: the current price
         :return: the goal price
         :rtype: float
-        
+
     .. py:method:: buy_notify(self, trade_record)
-    
-        [Override hook] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
-        
-        :param TradeRecord trade_record: the actual buy trade record when the actual buy occurs
-        
+
+        [Override hook] Called when the trading system executes an actual buy, notifying the part of the trade. This usually only needs to be overridden when a position is added to or reduced multiple times.
+
+        :param TradeRecord trade_record: the trade record of the actual buy when the fill occurs
+
     .. py:method:: sell_notify(self, trade_record)
-    
-        [Override hook] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
-        
-        :param TradeRecord trade_record: the actual sell trade record when the actual sell occurs
-         
+
+        [Override hook] Called when the trading system executes an actual sell, notifying the part of the trade. This usually only needs to be overridden when a position is added to or reduced multiple times.
+
+        :param TradeRecord trade_record: the trade record of the actual sell when the fill occurs
+
     .. py:method:: _calculate(self)
-    
-        [Override hook] The subclass calculation interface
-    
+
+        [Override hook] Subclass calculation hook.
+
     .. py:method:: _reset(self)
-    
-        [Override hook] The subclass reset interface, resetting the internal private variables
-    
+
+        [Override hook] Subclass reset hook, used to reset internal private state.
+
     .. py:method:: _clone(self)
-    
-        [Override hook] The subclass clone interface        
+
+        [Override hook] Subclass clone hook.

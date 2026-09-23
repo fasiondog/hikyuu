@@ -6,22 +6,22 @@ Stop-loss/Take-profit Strategy|ST
 
 .. Note::
 
-    In Hikyuu, the stop-loss and the take-profit are two separate strategy parts of the trading system. They differ in concept and execution. For example, in a general system, when a following indicator curve is used as the take-profit exit, a lag often occurs: originally it is expected to sell and take the profit when the close price falls below the indicator, but in fact the indicator and the close price both keep falling, so the actual exit happens when the close price crosses the indicator line downward, causing a lagged reaction. In addition, if tracked in real time during the trading session, since the close price keeps changing, the stop-loss indicator line also changes, which causes noise misjudgments, and the results of live trading and backtesting in a general system deviate. In Hikyuu, the stop-loss/take-profit in the current bar is always a fixed value, namely the value of the previous moment; meanwhile, in Hikyuu the system guarantees that the take profit always increases monotonically! For example, for a certain indicator value, the value was 11 the day before yesterday, 9 yesterday, and today's close price is 10; then, as a stop-loss part (today's close price 10 is greater than the stop-loss price 9), it will not trigger an exit, but as a take-profit part, the system will issue a sell instruction, because the current close price is already below 11.
+    In Hikyuu, stop-loss and take-profit are implemented as two separate strategy parts of the trading system, differing in both concept and execution. A typical system uses a trailing indicator curve as its take-profit exit, which introduces lag: you intend to sell and lock in profit as soon as the close falls below the indicator, but in a downturn the indicator and the close fall together, so the exit is only signaled when the close crosses below the indicator line. Tracking the curve in real time during the trading session makes the problem worse, because the close keeps moving and drags the stop-loss line with it, producing noise and false signals; as a result, live and backtested results diverge in typical systems. Hikyuu avoids this by keeping the stop-loss and take-profit levels fixed within the current bar—the level is always the value from the previous moment—and by guaranteeing that the take-profit level increases monotonically. For example, suppose an indicator reads 11 two days ago and 9 yesterday, while today's close is 10. Used as a stop-loss, it does not trigger an exit because today's close 10 is above the stop price 9; used as a take-profit, the system issues a sell instruction because the current close 10 is already below 11.
     
 
 Common Stop-loss/Take-profit Strategies
 ---------------------------------------
 
-The stop-loss means that after buying, the price moves against the expectation, and when the price falls below a certain level, sell to prevent further losses.
-The take-profit means that after buying, the price moves as expected, and when the price falls back to a certain level, sell to secure enough profit.
-When trading, you can use the same stop-loss and take-profit strategies, or different ones, e.g. a fixed percentage of 3% as the stop-loss and the chandelier safety line as the take-profit.
+A stop-loss protects a position after entry: if the price moves against expectations and falls below a predefined level, the position is sold to prevent further losses.
+A take-profit works the other way around: after the price moves in the expected direction, if it pulls back to a predefined level, the position is sold to lock in a sufficient gain.
+You may assign the same strategy to both roles or use different ones—for example, a fixed 3% stop-loss together with the chandelier safety line as the take-profit.
 
 Fixed Percentage Stop-loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: ST_FixedPercent([p=0.03])
 
-    The fixed percentage stop-loss strategy, i.e. stopping the loss when the price falls below a certain percentage of the buy price
+    Fixed-percentage stop-loss: exit once the price falls more than a given percentage below the buy price
     
     :param float p: the percentage (0,1]
     :return: the stop-loss/take-profit strategy instance
@@ -31,7 +31,7 @@ Technical Indicator Stop-loss
 
 .. py:function:: ST_Indicator(op[, kpart="CLOSE"])
 
-    Use a technical indicator as the stop-loss price. E.g. use the 10-day EMA as the stop-loss: ::
+    Use a technical indicator as the stop-loss level. For example, use the 10-day EMA::
     
         ST_Indicator(EMA(CLOSE(), n=10))
 
@@ -43,14 +43,12 @@ Alexander Elder Safety Zone Stop-loss
 
 .. py:function:: ST_Saftyloss([n1=10, n2=3, p=2.0])
 
-    See *Come Into My Trading Room* (2002) by Alexander Elder, p. 202 (Chinese translation published by Seismological Press).
-    Calculation description: within the lookback period (generally 10 to 20 days), add up the lengths of all the downward crossings and divide by the number of the downward crossings,
-    to get the mean noise (i.e. the length of all the lowest prices below the previous day's lowest price within the lookback period divided by the number), and subtract the previous day's
-    mean noise multiplied by a factor from today's lowest price to get the stop-loss line. To offset the fluctuation and guarantee the upward movement of the stop-loss line,
-    take the highest value within N days (generally 3 days) based on the above result.
+    See Alexander Elder, *Come Into My Trading Room* (2002), p. 202 (Chinese translation published by Seismological Press).
+    Calculation: over the lookback window (typically 10 to 20 days), sum the sizes of all downward penetrations and divide by their count to obtain the average noise. A downward penetration is the amount by which a day's low falls below the previous day's low. The preliminary stop-loss line is today's low minus the previous day's
+    average noise multiplied by a coefficient. To dampen fluctuations and ensure that the line only moves upward, take the highest preliminary value over the past n2 days (typically 3 days).
 
-    :param int n1: the lookback time window for calculating the average noise, defaults to 10 days
-    :param int n2: take the highest value within n2 days of the preliminary stop-loss line, defaults to 3
+    :param int n1: the lookback window used to calculate the average noise, defaults to 10 days
+    :param int n2: number of days over which the highest preliminary stop-loss value is taken, defaults to 3
     :param double p: the noise coefficient, defaults to 2
     :return: the stop-loss/take-profit strategy instance
     
@@ -69,11 +67,11 @@ Stop-loss/Take-profit Strategy Base Class
 
 .. py:class:: StoplossBase
 
-    The stop-loss/take-profit algorithm base class
+    Base class for stop-loss/take-profit strategies
     
-    .. py:attribute:: name Name
+    .. py:attribute:: name The strategy name
     .. py:attribute:: tm Set or get the trade manager instance
-    .. py:attribute:: to Set or get the traded K-line data (TO)
+    .. py:attribute:: to Set or get the traded KData (trade object, TO)
     
     .. py:method:: __init__(self[, name="StoplossBase"])
     
@@ -106,10 +104,10 @@ Stop-loss/Take-profit Strategy Base Class
 
     .. py:method:: get_price(self, datetime, price)
     
-        [Override hook] Get the planned stop-loss price of this expected trade (buy); if there is no stop-loss price, return 0. It is used by the system to query the planned stop-loss price of this trade from the stop-loss strategy module before the trade is executed.
+        [Override hook] Return the planned stop-loss price for an anticipated trade (a buy); return 0 if no stop-loss price applies. The system calls this method before execution to query the strategy for this trade's planned stop-loss level.
         
         .. note::
-            Generally, the stop-loss and take-profit algorithms can be interchanged, but the getPrice of the stop-loss can take the planned trade price, e.g. 30% of the buy price as the stop-loss. The take-profit ignores the passed price parameter, i.e. it assumes price is 0.0. In fact, even for the stop-loss it is not recommended to use the price parameter; e.g. if 30% of the previous day's lowest price can be used as the stop-loss, the price parameter does not need to be considered.
+            In general, stop-loss and take-profit algorithms are interchangeable. The difference is that a stop-loss implementation may use the planned trade price—for example, setting the stop 30% below the buy price—whereas a take-profit ignores the price argument and treats it as 0.0. In practice, even stop-loss implementations are better off ignoring price: a stop based on, say, a level relative to the previous day's low does not need it.
         
         :param Datetime datetime: the trade time
         :param float price: the planned buy price
@@ -122,7 +120,7 @@ Stop-loss/Take-profit Strategy Base Class
     
     .. py:method:: _reset(self)
     
-        [Override hook] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface; resets the internal private variables
     
     .. py:method:: _clone(self)
     

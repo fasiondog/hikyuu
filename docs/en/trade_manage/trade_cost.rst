@@ -18,38 +18,38 @@ Zero Trade Cost Algorithm
 Shanghai-Shenzhen A-share Trade Cost Algorithm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Before August 1, 2015, the Shanghai transfer fee was one thousandth of the trade number; if it was less than 1 yuan, it was counted as 1 yuan.
-* After August 1, 2015, the Shanghai transfer fee is 0.02 thousandths of the transaction amount.
+* Before August 1, 2015, the Shanghai transfer fee was 0.1% of the traded share quantity, with a minimum of 1 yuan.
+* Since August 1, 2015, the Shanghai transfer fee has been 0.002% (0.02‰) of turnover.
 
 The calculation rules are as follows:: python
 
     1) Shanghai Stock Exchange
         Buy: commission + transfer fee
-        Sell: commission + transfer fee + stamp tax
+        Sell: commission + transfer fee + stamp duty
     2) Shenzhen Stock Exchange:
         Buy: commission
-        Sell: commission + stamp tax
+        Sell: commission + stamp duty
 
     Among them, the minimum commission is 5 yuan.
 
 .. py:function:: TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
 
-    The A-share trade cost algorithm for August 1, 2015 and later; the Shanghai transfer fee was changed to 0.02 thousandths of the transaction amount
+    The A-share trade cost algorithm for August 1, 2015 and later; the Shanghai transfer fee was changed to 0.002% (0.02‰) of turnover
 
-    :param float commission: the commission ratio
-    :param float lowestCommission: the minimum commission value
-    :param float stamptax: the stamp tax
-    :param float transferfee: the transfer fee
+    :param float commission: the commission rate
+    :param float lowestCommission: the minimum commission
+    :param float stamptax: the stamp duty rate
+    :param float transferfee: the transfer fee rate
     :return: an instance of a :py:class:`TradeCostBase` subclass
     
 .. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
 
     The A-share trade cost algorithm before August 1, 2015
 
-    :param float commission: the commission ratio
-    :param float lowestCommission: the minimum commission value
-    :param float stamptax: the stamp tax
-    :param float transferfee: the transfer fee
+    :param float commission: the commission rate
+    :param float lowestCommission: the minimum commission
+    :param float stamptax: the stamp duty rate
+    :param float transferfee: the transfer fee rate
     :param float lowestTransferfee: the minimum transfer fee
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
@@ -62,14 +62,14 @@ The calculation rules are as follows:: python
     Buy: commission (minimum 5 yuan)
     Sell: commission (minimum 5 yuan)
     
-    No stamp tax and transfer fee.
+    No stamp duty or transfer fee.
 
 .. py:function:: TC_FixedETF([commission=0.0001, lowestCommission=5.0])
 
-    The ETF trade cost algorithm; the commission is charged in both directions of buying and selling, with no stamp tax and transfer fee
+    The ETF trade cost algorithm; commission is charged on both the buy and sell sides, with no stamp duty or transfer fee
 
-    :param float commission: the commission ratio, defaults to one ten-thousandth
-    :param float lowestCommission: the minimum commission value, defaults to 5 yuan per trade
+    :param float commission: the commission rate, defaulting to one ten-thousandth (0.01%)
+    :param float lowestCommission: the minimum commission, defaulting to 5 yuan per trade
     :return: an instance of a :py:class:`TradeCostBase` subclass
 
 
@@ -89,7 +89,7 @@ Trade Cost Algorithm Base Class
 
 .. py:class:: TradeCostBase(name)
 
-    The trade cost algorithm base class
+    Base class for trade cost algorithms
     
     .. py:attribute:: name Name
         
@@ -112,30 +112,30 @@ Trade Cost Algorithm Base Class
 
     .. py:method:: clone(self)
     
-        The clone operation
+        Clone the instance
 
     .. py:method:: get_buy_cost(self, datetime, stock, price, num)
     
-        [Override hook] Get the buy cost
+        [Override hook] Compute the buy cost
         
         :param Datetime datetime: the buy moment
-        :param Stock stock: the buy object
+        :param Stock stock: the security bought
         :param float price: the buy price
-        :param int num: the buy number
+        :param int num: the number of shares bought
         :return: the trade cost record
         :rtype: CostRecord
     
     .. py:method:: get_sell_cost(self, datetime, stock, price, num)
     
-        [Override hook] Get the sell cost
+        [Override hook] Compute the sell cost
         
         :param Datetime datetime: the sell moment
-        :param Stock stock: the sell object
+        :param Stock stock: the security sold
         :param float price: the sell price
-        :param int num: the sell number
+        :param int num: the number of shares sold
         :return: the trade cost record
         :rtype: CostRecord
         
     .. py:method:: _clone(self)
     
-        [Override hook] The subclass clone interface
+        [Override hook] Subclass clone interface

@@ -4,19 +4,19 @@
 Trade Management
 ================
 
-The trade management can be understood as a simulated account performing the simulated trades. Generally, use crtTM to create the trade manager instance.
+Trade management can be understood as a simulated brokerage account that executes simulated trades. In general, use crtTM to create a trade manager instance.
 
 Common parameters:
 
-    * **precision=2** *(int)* : the price calculation accuracy
-    * **support_borrow_cash=False** *(bool)* : whether to finance automatically
-    * **support_borrow_stock=False** *(bool)* : whether to short the securities automatically
+    * **precision=2** *(int)* : price calculation precision
+    * **support_borrow_cash=False** *(bool)* : whether to automatically borrow cash (financing / margin)
+    * **support_borrow_stock=False** *(bool)* : whether to automatically borrow securities for short selling
     * **save_action=True** *(bool)* : whether to save the Python command sequences
 
 
 .. py:function:: crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])
 
-    Create the trade manager module, managing the trade records and the fund usage of the account
+    Create the trade manager module, which manages the account's trade records and fund usage
     
     :param Datetime date:  the account establishment date
     :param float init_cash:    the initial capital
@@ -27,11 +27,11 @@ Common parameters:
     
 .. py:class:: TradeManager
 
-    The trade manager class, which can be understood as a simulated account performing the simulated trades. Generally, use crtTM to create the trade manager instance.
+    The trade manager class, which can be understood as a simulated brokerage account that executes simulated trades. In general, use crtTM to create a trade manager instance.
 
     .. py:attribute:: name
         
-        The name
+        The account name
         
     .. py:attribute:: cost_func 
         
@@ -43,7 +43,7 @@ Common parameters:
         
     .. py:attribute:: current_cash
     
-        (Read-only) the current cash
+        (Read-only) the current cash balance
         
     .. py:attribute:: init_datetime
         
@@ -51,21 +51,21 @@ Common parameters:
         
     .. py:attribute:: first_datetime 
         
-        (Read-only) the date when the first buy trade occurred; if no trade has occurred, return Datetime()
+        (Read-only) the date of the first buy trade; returns Datetime() if no trade has occurred
         
     .. py:attribute:: last_datetime
         
-        (Read-only) the date of the last trade; note that it is unrelated to the trade type; if no trade has occurred, return the account establishment date
+        (Read-only) the date of the last trade (regardless of trade type); returns the account establishment date if no trade has occurred
         
     .. py:attribute:: precision 
         
-        (Read-only) the price precision, the same as the common parameter "precision"
+        (Read-only) the price precision, same as the common parameter "precision"
         
     .. py:attribute:: broker_last_datetime
     
-        The moment when the order broker operations actually start.
+        The moment from which the order broker actually starts operating.
         
-        By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal generator, the TradeManager will execute the buy/sell operations at the historical moments; at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions. At this time, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be specified. The attribute brokeLastDatetime is used to specify that moment.
+        By default, when the TradeManager executes buy/sell operations, it invokes the order broker to perform the broker's buy/sell actions. This causes a problem in live trading. To obtain the latest signal, the signal generator must backtrack through historical data, so the TradeManager ends up executing buy/sell operations at historical moments. If the order broker itself does not control when buy/sell instructions are issued, it will send out erroneous instructions. To prevent this, you must specify a moment after which the order broker's buy/sell operations are allowed. The broker_last_datetime attribute is used to specify that moment.
         
 
     .. py:method:: __init__()
@@ -99,7 +99,7 @@ Common parameters:
         
     .. py:method:: reset(self)
     
-        Reset, clearing the trade and the position records
+        Reset, clearing all trade and position records
         
     .. py:method:: clone(self)
 
@@ -109,79 +109,79 @@ Common parameters:
         
     .. py:method:: checkin(self, datetime, cash)
     
-    Deposit the cash into the account
+        Deposit cash into the account
     
         :param Datetime datetime: the trading time
-        :param float cash: the amount of the cash deposited
+        :param float cash: the amount of cash deposited
         :rtype: TradeRecord
         
     .. py:method:: checkout(self, datetime, cash)
     
-    Withdraw the cash from the account
+        Withdraw cash from the account
         
         :param Datetime datetime: the trading time
-        :param float cash: the amount of the funds withdrawn
+        :param float cash: the amount of funds withdrawn
         :rtype: TradeRecord
         
     .. py:method:: checkin_stock(self, datetime, stock, price, number)
     
-    Deposit the stock assets
+        Deposit securities into the account
     
         :param Datetime datetime: the trading time
-        :param Stock stock: the stock to deposit
-        :param float price: the per-share price of the deposited stock
-        :param float number: the quantity of the deposited stock
+        :param Stock stock: the security to deposit
+        :param float price: the per-share price of the deposited security
+        :param float number: the quantity of the deposited security
         :rtype: TradeRecord
         
     .. py:method:: checkout_stock(self, datetime, stock, price, number)
     
-    Withdraw the stock assets
+        Withdraw securities from the account
         
         :param Datetime datetime: the trading time
-        :param Stock stock: the stock to withdraw
-        :param float price: the per-share price of the withdrawn stock
-        :param float number: the withdrawn quantity
+        :param Stock stock: the security to withdraw
+        :param float price: the per-share price of the withdrawn security
+        :param float number: the quantity withdrawn
         :rtype: TradeRecord
         
     .. py:method:: borrow_cash(self, datetime, cash)
     
-    Borrow the funds (financing)
+        Borrow cash (financing / margin)
     
         :param Datetime datetime: the trading time
-        :param float cash: the amount of the cash borrowed
+        :param float cash: the amount of cash borrowed
         :rtype: TradeRecord
         
     .. py:method:: return_cash(self, datetime, cash)
     
-    Return the borrowed funds
+        Repay borrowed cash
         
         :param Datetime datetime: the trading time
-        :param float cash: the amount of the cash returned
+        :param float cash: the amount of cash repaid
         :rtype: TradeRecord
         
     .. py:method:: borrow_stock(self, datetime, stock, price, number)
     
-    Borrow the stocks (short selling the securities)
+        Borrow securities (for short selling)
     
         :param Datetime datetime: the trading time
-        :param Stock stock: the stock borrowed
-        :param float price: the per-share price at the borrowing
-        :param float number: the borrowed quantity
+        :param Stock stock: the security borrowed
+        :param float price: the per-share price at the time of borrowing
+        :param float number: the quantity borrowed
         :rtype: TradeRecord
         
     .. py:method:: return_stock(self, datetime, stock, price, number)
     
-    Return the borrowed stocks
+        Return borrowed securities
         
         :param Datetime datetime: the trading time
-        :param Stock stock: the stock returned
-        :param float price: the per-share price at the return
-        :param float number: the returned quantity
+        :param Stock stock: the security returned
+        :param float price: the per-share price at the time of return
+        :param float number: the quantity returned
         :rtype: TradeRecord
         
     .. py:method:: buy(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
     
-    The buy operation
+        The buy operation
         
         :param Datetime datetime: the buy time
         :param Stock stock:       the security to buy
@@ -191,27 +191,27 @@ Common parameters:
         :param float goal_price:  the target price
         :param float plan_price:  the planned buy price
         :param SystemPart part:   the source of the trading instruction
-        :param str remark:        the remark information
+        :param str remark:        the remark
         :rtype: TradeRecord
         
     .. py:method:: sell(self, datetime, stock, real_price[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
     
-    The sell operation
+        The sell operation
         
         :param Datetime datetime: the sell time
         :param Stock stock:       the security to sell
         :param float real_price:  the actual sell price
-        :param float number:      the sell quantity; if it equals constant.max_double, it means selling all
+        :param float number:      the sell quantity; if it equals constant.max_double, sell all
         :param float stoploss:    the new stop-loss price
         :param float goal_price:  the new target price
         :param float plan_price:  the originally planned sell price
         :param SystemPart part:   the source of the trading instruction
-        :param str remark:        the remark information
+        :param str remark:        the remark
         :rtype: TradeRecord
         
     .. py:method:: buy_short(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
     
-    The short selling operation (sell first, buy later)
+        The short selling operation (sell first, buy back later)
         
         :param Datetime datetime: the short selling time
         :param Stock stock:       the security to short sell
@@ -221,41 +221,41 @@ Common parameters:
         :param float goal_price:  the target price
         :param float plan_price:  the planned short selling price
         :param SystemPart part:   the source of the trading instruction
-        :param str remark:        the remark information
+        :param str remark:        the remark
         :rtype: TradeRecord
         
     .. py:method:: sell_short(self, datetime, stock, real_price[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
     
-    The short covering operation (buy back to close the position)
+        The short covering operation (buy back to close the position)
         
         :param Datetime datetime: the covering time
         :param Stock stock:       the security to cover
         :param float real_price:  the actual covering price
-        :param float number:      the covering quantity; if it equals constant.max_double, it means covering all
+        :param float number:      the covering quantity; if it equals constant.max_double, cover all
         :param float stoploss:    the stop-loss price
         :param float goal_price:  the target price
         :param float plan_price:  the planned covering price
         :param SystemPart part:   the source of the trading instruction
-        :param str remark:        the remark information
+        :param str remark:        the remark
         :rtype: TradeRecord
         
     .. py:method:: have(self, stock)
     
-        Whether the specified security is currently held (the long position)
+        Whether the specified security is currently held (long position)
         
         :param Stock stock: the specified security
         :rtype: bool
         
     .. py:method:: have_short(self, stock)
     
-        Whether the current short position holds the specified security
+        Whether the specified security is currently held in the short position
         
         :param Stock stock: the specified security
         :rtype: bool
         
     .. py:method:: cash(self, datetime[, ktype=Query.KType.DAY])
     
-        Get the cash on the specified date. (Note: without the date parameter, the positions cannot be adjusted according to the dividend information.)
+        Get the cash balance on the specified date. (Note: without the date parameter, positions cannot be adjusted according to dividend information.)
         
         :param Datetime datetime: the specified moment
         :param ktype: the K-line type
@@ -263,13 +263,13 @@ Common parameters:
         
     .. py:method:: get_stock_num(self)
     
-        The number of the kinds of the securities currently held, i.e. how many stocks are currently held (not the position size of each stock)
+        The number of distinct securities currently held, i.e. how many different securities are currently held (not the position size of each security)
         
         :rtype: int
         
     .. py:method:: get_short_stock_num(self)
     
-        The number of the kinds of the securities currently held in the short position
+        The number of distinct securities currently held in the short position
         
         :rtype: int
         
@@ -291,7 +291,7 @@ Common parameters:
         
     .. py:method:: get_debt_number(self, datetime, stock)
     
-        Get the number of the borrowed stocks at the specified moment
+        Get the number of borrowed shares of the specified security at the specified moment
         
         :param Datetime datetime: the specified moment
         :param Stock stock: the specified security
@@ -299,14 +299,14 @@ Common parameters:
         
     .. py:method:: get_debt_cash(self, datetime)
     
-        Get the amount of the borrowed cash at the specified moment
+        Get the amount of borrowed cash at the specified moment
         
         :param Datetime datetime: the specified moment
         :rtype: float
         
     .. py:method:: get_position(self, date, stock)
 
-        Get the position record of the security at the specified time; if the stock is not currently held, return PositionRecord()
+        Get the position record of the security at the specified time; returns PositionRecord() if the security is not currently held
         
         :param Datetime date: the specified time
         :param Stock stock: the specified security
@@ -314,50 +314,50 @@ Common parameters:
         
     .. py:method:: get_short_position(self, stock)
     
-        Get the current short position record of the specified security; if the stock is not currently held, return PositionRecord()
+        Get the current short position record of the specified security; returns PositionRecord() if the security is not currently held
         
         :param Stock stock: the specified security
         :rtype: PositionRecord
         
     .. py:method:: get_position_list(self)
     
-        Get all the current position records (long)
+        Get all current position records (long)
         
         :rtype: PositionRecordList
         
     .. py:method:: get_positions(self)
     
-    Get all the current position records as a dictionary, with the stock as the key and the PositionRecord as the value
+        Get all current position records as a dictionary, with the stock as the key and the PositionRecord as the value
         
         :rtype: dict
         
     .. py:method:: get_history_position_list(self)
     
-        Get all the historical position records, i.e. the closed records (long)
+        Get all historical position records, i.e. the closed records (long)
         
         :rtype: PositionRecordList
 
     .. py:method:: get_short_position_list(self)
     
-        Get all the current short position records
+        Get all current short position records
         
         :rtype: PositionRecordList
         
     .. py:method:: get_short_history_position_list(self)
     
-        Get all the historical short position records
+        Get all historical short position records
         
         :rtype: PositionRecordList
         
     .. py:method:: get_borrow_stock_list(self)
     
-        Get the list of the currently borrowed stocks
+        Get the list of currently borrowed securities
         
         :rtype: BorrowRecordList
         
     .. py:method:: get_trade_list(self[, start, end])
     
-        Get the trade records; when the parameters are not specified, get all the trade records
+        Get the trade records; when no parameters are specified, get all trade records
         
         :param Datetime start: the start date
         :param Datetime end: the end date
@@ -385,47 +385,47 @@ Common parameters:
         
     .. py:method:: get_borrow_cash_cost(self, datetime, cash)
     
-        Calculate the cost of borrowing the funds
+        Calculate the cost of borrowing cash
         
         :param Datetime datetime: the trading time
-        :param float cash: the amount of the cash borrowed
+        :param float cash: the amount of cash borrowed
         :rtype: CostRecord
         
     .. py:method:: get_return_cash_cost(self, datetime, cash)
     
-        Calculate the cost of returning the borrowed funds
+        Calculate the cost of repaying borrowed cash
         
         :param Datetime datetime: the trading time
-        :param float cash: the amount of the cash returned
+        :param float cash: the amount of cash repaid
         :rtype: CostRecord
         
     .. py:method:: get_borrow_stock_cost(self, datetime, stock, price, num)
     
-        Calculate the cost of borrowing the stocks
+        Calculate the cost of borrowing securities
         
         :param Datetime datetime: the trading time
-        :param Stock stock: the stock borrowed
-        :param float price: the per-share price at the borrowing
-        :param float num: the borrowed quantity
+        :param Stock stock: the security borrowed
+        :param float price: the per-share price at the time of borrowing
+        :param float num: the quantity borrowed
         :rtype: CostRecord
         
     .. py:method:: get_return_stock_cost(self, datetime, stock, price, num)
     
-        Calculate the cost of returning the borrowed stocks
+        Calculate the cost of returning borrowed securities
         
         :param Datetime datetime: the trading time
-        :param Stock stock: the stock returned
-        :param float price: the per-share price at the return
-        :param float num: the returned quantity
+        :param Stock stock: the security returned
+        :param float price: the per-share price at the time of return
+        :param float num: the quantity returned
         :rtype: CostRecord
      
     .. py:method:: get_funds(self[, ktype = Query.DAY])
 
         Get the asset market value details at the specified moment
     
-        Way 1: get_funds(self[, ktype = Query.DAY])
+        Form 1: get_funds(self[, ktype = Query.DAY])
 
-        Way 2: get_funds(self, datetime[, ktype = Query.DAY])
+        Form 2: get_funds(self, datetime[, ktype = Query.DAY])
     
         get_funds(self, datetime[, ktype = Query.DAY])
         Get the asset market value details at the specified moment
@@ -435,7 +435,7 @@ Common parameters:
 
     .. py:method:: get_funds_list(self, dates[, ktype = Query.DAY])
     
-        Get the daily asset records of the specified date list
+        Get the daily asset records for the specified date list
         
         :param DatetimeList dates: the date list
         :param Query.KType ktype: the K-line type
@@ -443,18 +443,18 @@ Common parameters:
 
     .. py:method:: get_funds_curve(self, dates[, ktype = Query.DAY])
     
-        Get the net asset value curve
+        Get the net asset value (NAV) curve
         
-        :param DatetimeList dates: the date list; get the corresponding net asset value curve according to this date list
+        :param DatetimeList dates: the date list; the corresponding NAV curve is obtained according to this date list
         :param Query.KType ktype: the K-line type, which must match the date list
-        :return: the net asset value list
+        :return: the NAV list
         :rtype: PriceList
         
     .. py:method:: get_profit_curve(self, dates[, ktype = Query.DAY])
     
-        Get the profit curve, i.e. the net asset value curve after deducting the previous deposits
+        Get the profit curve, i.e. the NAV curve after deducting all previous cash deposits
         
-        :param DatetimeList dates: the date list; get the corresponding profit curve according to this date list, which should be in the increasing order
+        :param DatetimeList dates: the date list; the corresponding profit curve is obtained according to this date list, which must be in ascending order
         :param Query.KType ktype: the K-line type, which must match the date list
         :return: the profit curve
         :rtype: PriceList
@@ -477,7 +477,7 @@ Common parameters:
         
     .. py:method:: add_trade_record(self, tr)
 
-        Add the trade record directly; if the initialization account record is added, all the existing trade and position records will be cleared.
+        Add a trade record directly. If an account initialization record is added, all existing trade and position records are cleared.
 
         :param TradeRecord tr: the trade record
         :return: True (success) | False (failure)
@@ -485,7 +485,7 @@ Common parameters:
         
     .. py:method:: add_position(self, position)
     
-        After establishing the initial account, add the position record directly; it is only used to build an account with the initial positions
+        After the initial account is established, add a position record directly. It is only used to build an account that already has initial positions.
         
         :param PositionRecord position: the position record
         :return: True | False
@@ -493,23 +493,23 @@ Common parameters:
         
     .. py:method:: tocsv(self, path)
     
-    Output the trade records, the open position records, the closed position records and the net asset value curve in the csv format
+        Output the trade records, open position records, closed position records, and NAV curve in CSV format
         
         :param str path: the directory of the output files
         
     .. py:method:: reg_broker(self, broker)
     
-    Register the order broker. This command can be executed multiple times to register multiple order brokers.
+        Register an order broker. This command can be called multiple times to register multiple order brokers.
         
         :param OrderBrokerBase broker: the order broker instance
         
     .. py:method:: clear_broker(self)
 
-        Clear all the registered order brokers
+        Clear all registered order brokers
 
     .. py:method:: get_margin_rate(self, datetime, stock)
     
-        Get the margin ratio of the specified object
+        Get the margin rate of the specified object
         
         :param Datetime datetime: the date
         :param Stock stock: the specified object
@@ -517,24 +517,24 @@ Common parameters:
         
     .. py:method:: update_with_weight(self, date)
     
-        Update the current positions and the trade records according to the dividend information; it must be called in the chronological order
+        Update the current positions and trade records according to dividend/equity adjustment information; must be called in chronological order
         
         :param Datetime date: the current moment
         
     .. py:method:: fetch_asset_info_from_broker(self, broker[, date=Datetime.now()])
     
-        Synchronize the asset information at the current moment from the Broker; it must be called in the chronological order
+        Synchronize asset information at the current moment from the broker; must be called in chronological order
         
         :param OrderBrokerBase broker: the order broker instance
-        :param Datetime date: when synchronizing, it is usually the current time (Null); it can also be forced to a specified time point
+        :param Datetime date: when synchronizing, usually the current time (Null); can also be forced to a specified time point
         
     .. py:method:: get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY, ext=False]) -> Performance
         
-        Get the account performance at the specified moment of the account
+        Get the account performance at the specified moment
 
         :param Datetime datetime: the specified moment
         :param Query.KType ktype: the K-line type
-        :param bool ext: whether to get the extended statistics items (requiring the donating user permission); otherwise, only the basic statistics items
+        :param bool ext: whether to return the extended statistics items (requires donor user permission); otherwise only the basic statistics items are returned
         :return: the account performance
         :rtype: Performance
 
@@ -542,27 +542,27 @@ Common parameters:
     
         Get the maximum drawdown percentage of the account at the specified moment (a negative number)
 
-        :param Datetime date: the specified date (including this moment)
+        :param Datetime date: the specified date (this moment included)
         :param Query.KType ktype: the K-line type
         :return: the maximum drawdown percentage
 
     .. py:method:: get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo]
           
-        Get the position details (the open position records) of the specified time after the last trading moment of the account
+        Get the position details (open position records) at the specified time after the account's last trading moment
     
-        :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)
+        :param Datetime current_time: the current moment (must be greater than or equal to the last trading moment)
         :param Query.KType ktype: the K-line type
-        :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-        :return: the list of the extended position details
+        :param int trade_mode: the trading mode, affecting some statistics items: 0-trade at the close, 1-trade at the next open
+        :return: the list of extended position details
 
     .. py:method:: get_position_ext_info(self, stock, current_time, ktype=Query.DAY, trade_mode=0) -> PositionExtInfo
     
-        Get the extended position details at the specified moment of the account (only for the specified stock)
+        Get the extended position details at the specified moment (for the specified security only)
 
-        :param Stock stock: the specified stock
-        :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)
+        :param Stock stock: the specified security
+        :param Datetime current_time: the current moment (must be greater than or equal to the last trading moment)
         :param Query.KType ktype: the K-line type, defaulting to the daily line
-        :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open, defaulting to 0
+        :param int trade_mode: the trading mode, affecting some statistics items: 0-trade at the close, 1-trade at the next open, defaulting to 0
         :return: the extended position details, containing the following fields:
         
             - position (PositionRecord): the basic position record
@@ -571,39 +571,39 @@ Common parameters:
             - max_close_price (float): the highest close price in the period
             - min_close_price (float): the lowest close price in the period
             - current_close_price (float): the current close price
-            - max_pull_back1 (float): the maximum drawdown percentage 1 (calculated only with the maximum close price and the lowest close price) (a negative number)
-            - max_pull_back2 (float): the maximum drawdown percentage 2 (calculated with the maximum of the highest prices and the minimum of the lowest prices in the period) (a negative number)
+            - max_pull_back1 (float): maximum drawdown percentage 1 (computed using only the maximum close price and the lowest close price) (a negative number)
+            - max_pull_back2 (float): maximum drawdown percentage 2 (computed using the maximum of the highest prices and the minimum of the lowest prices in the period) (a negative number)
             - current_profit (float): the current floating profit and loss (excluding the estimated sell cost)
             
             And the following calculation methods:
             
-            - current_pull_back1(): the current drawdown percentage 1 (calculated only with the maximum close price and the current close price)
-            - current_pull_back2(): the current drawdown percentage 2 (calculated with the maximum of the highest prices in the period and the current close price)
-            - max_floating_profit1(): the maximum floating profit percentage 1 in the period (calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
-            - max_floating_profit2(): the maximum floating profit percentage 2 in the period (calculated with the maximum of the highest prices, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
-            - min_loss_profit1(): the maximum floating loss percentage 1 in the period (calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
-            - min_loss_profit2(): the maximum floating loss percentage 2 in the period (calculated only with the lowest price in the period, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
+            - current_pull_back1(): current drawdown percentage 1 (computed using only the maximum close price and the current close price)
+            - current_pull_back2(): current drawdown percentage 2 (computed using the maximum of the highest prices in the period and the current close price)
+            - max_floating_profit1(): maximum floating profit percentage 1 in the period (computed using only the close price, excluding the estimated sell cost; statistics may be inaccurate with multiple buys and sells)
+            - max_floating_profit2(): maximum floating profit percentage 2 in the period (computed using the maximum of the highest prices, excluding the estimated sell cost; statistics may be inaccurate with multiple buys and sells)
+            - min_loss_profit1(): maximum floating loss percentage 1 in the period (computed using only the close price, excluding the estimated sell cost; statistics may be inaccurate with multiple buys and sells)
+            - min_loss_profit2(): maximum floating loss percentage 2 in the period (computed using the lowest price in the period, excluding the estimated sell cost; statistics may be inaccurate with multiple buys and sells)
             
-        :note: this function is only suitable for the case of one buy and one sell; for the case of one buy and multiple sells, some statistics may be inaccurate, for reference only
+        :note: this function is only suitable for the case of one buy and one sell; for the case of one buy and multiple sells, some statistics may be inaccurate — for reference only
 
     .. py:method:: get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo]
           
-        Get the historical position extended details of the account (the closed records)
+        Get the historical extended position details of the account (closed records)
     
         :param Query.KType ktype: the K-line type
-        :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-        :return: the list of the extended position details
+        :param int trade_mode: the trading mode, affecting some statistics items: 0-trade at the close, 1-trade at the next open
+        :return: the list of extended position details
 
     .. py:method:: get_profit_percent_monthly(self[, datetime=Datetime.now()]) -> list[tuple[Datetime, double]]
 
-        Get the account profit percentage (monthly) of the account at the specified deadline
+        Get the account's monthly profit percentage as of the specified deadline
 
         :param Datetime datetime: the specified deadline
-        :return: the account profit percentage (monthly), a list of the tuples of (date, return rate)
+        :return: the account's monthly profit percentage, a list of (date, return rate) tuples
 
     .. py:method:: get_profit_percent_yearly(self[, datetime=Datetime.now()]) -> list[tuple[Datetime, double]]
 
-        Get the account profit percentage (yearly) of the account at the specified deadline
+        Get the account's yearly profit percentage as of the specified deadline
 
         :param Datetime datetime: the specified deadline
-        :return: the account profit percentage (yearly), a list of the tuples of (date, return rate)
+        :return: the account's yearly profit percentage, a list of (date, return rate) tuples
