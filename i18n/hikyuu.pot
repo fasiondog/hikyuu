@@ -248,7 +248,7 @@ msgstr ""
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:911
 #, python-format
-msgid "Win Rate: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgid "Win Rate: {:<.2f}%    Avg Win/Avg Loss: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
 msgstr ""
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:925

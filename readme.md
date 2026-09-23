@@ -148,7 +148,7 @@ sys.run(sm['sz000001'], Query(-150))
 ### 💹 Flexible composition: build a categorized strategy asset library
 
 Hikyuu provides a lightweight abstraction of systematic trading methods, covering **market environment
-assessment, system validity conditions, signal indicators, stop-loss / take-profit strategies, money
+assessment, system validity conditions, signal generators, stop-loss / take-profit strategies, money
 management, profit goals, slippage algorithms, trading object selection and fund allocation**. You can
 build your own strategy library from these components, combine and backtest them efficiently, and focus
 on the effect and impact of a single module while exploring strategies, which greatly improves research

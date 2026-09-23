@@ -256,7 +256,7 @@
 | 最大回撤 | `Max Drawdown` | 同 §8 |
 | 当前距历史最高点回撤 | `Current Drawdown from Peak` | |
 | 系统胜率 | `Win Rate %`（图上标签 `Win Rate`） | 同 §8 |
-| 盈/亏比 | `Profit Factor` | 同 §8 |
+| 盈/亏比（图上 `1 : x`） | `Avg Win/Avg Loss`，取 Performance key `Avg Win / Avg Loss Ratio`（均盈/均亏） | **不是** `Profit Factor`（总盈/总亏，见 §8-28） |
 | 夏普比率 | `Sharpe Ratio` | |
 | 投入总资产 / 当前总资产 / 当前盈利 | `Total Invested Assets` / `Current Total Assets` / `Current Profit` | 同 §8 |
 | 月度 / 年份 | `Month` / `Year` | 热力图轴 |

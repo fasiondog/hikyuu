@@ -1094,7 +1094,7 @@ msgstr "当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回�
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:911
 #, python-format
-msgid "Win Rate: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgid "Win Rate: {:<.2f}%    Avg Win/Avg Loss: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
 msgstr "系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}"
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:925
