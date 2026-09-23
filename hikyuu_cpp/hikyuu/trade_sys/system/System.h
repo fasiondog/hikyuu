@@ -54,8 +54,8 @@ public:
      *
      * @param tm the given account
      * @param mm the given money management strategy
-     * @param ev the given market environment judgment strategy
-     * @param cn the given system condition judgment strategy
+     * @param ev the given market environment strategy
+     * @param cn the given system valid condition strategy
      * @param sg the given signal generator
      * @param st the given stop-loss strategy
      * @param tp the given take-profit strategy
@@ -90,10 +90,10 @@ public:
     /** Get the money management strategy */
     MoneyManagerPtr getMM() const;
 
-    /** Get the market environment judgment strategy */
+    /** Get the market environment strategy */
     EnvironmentPtr getEV() const;
 
-    /** Get the system condition judgment strategy */
+    /** Get the system valid condition strategy */
     ConditionPtr getCN() const;
 
     /** Get the signal generator */
@@ -117,10 +117,10 @@ public:
     /** Set the money management strategy */
     void setMM(const MoneyManagerPtr& mm);
 
-    /** Set the market environment judgment strategy */
+    /** Set the market environment strategy */
     void setEV(const EnvironmentPtr& ev);
 
-    /** Set the system condition judgment strategy */
+    /** Set the system valid condition strategy */
     void setCN(const ConditionPtr& cn);
 
     /** Set the signal generator */

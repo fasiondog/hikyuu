@@ -153,14 +153,18 @@ itself, it has no effect on the operation.)")
       .def("__str__", to_py_str<TradeRequest>)
       .def("__repr__", to_py_str<TradeRequest>)
 
-      .def_readwrite("valid", &TradeRequest::valid, "Whether this trade request record is valid (True | False)")
+      .def_readwrite("valid", &TradeRequest::valid,
+                     "Whether this trade request record is valid (True | False)")
       .def_readwrite("business", &TradeRequest::business,
                      "The trade business type, see: :py:class:`hikyuu.trade_manage.BUSINESS`")
-      .def_readwrite("datetime", &TradeRequest::datetime, "The moment when the trade request was issued")
-      .def_readwrite("stoploss", &TradeRequest::stoploss, "The stop-loss price at the moment when the trade request was issued")
+      .def_readwrite("datetime", &TradeRequest::datetime,
+                     "The moment when the trade request was issued")
+      .def_readwrite("stoploss", &TradeRequest::stoploss,
+                     "The stop-loss price at the moment when the trade request was issued")
       .def_readwrite("part", &TradeRequest::from,
                      "The source of the trade request, see: :py:class:`System.Part`")
-      .def_readwrite("count", &TradeRequest::count, "The number of the consecutive delays due to the operation failures")
+      .def_readwrite("count", &TradeRequest::count,
+                     "The number of the consecutive delays due to the operation failures")
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
@@ -168,7 +172,7 @@ itself, it has no effect on the operation.)")
       m, "System", py::dynamic_attr(),
       R"(The system base class. To extend or implement the more complex system trading behaviors, you can inherit from this class.
 
-A system refers to the complete strategy for a single trading object, including the environment judgement, the system valid condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used for the simulated backtesting.
+A system refers to the complete strategy for a single trading object, including the market environment, the system valid condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used for the simulated backtesting.
 
 Common parameters:
 
@@ -176,9 +180,9 @@ Common parameters:
   - delay_use_current_price=True (bool): in the case of the delayed operation, whether to calculate the new stop-loss/take-profit/target price with the price of the bar at the current trade, or use the result calculated last time
   - max_delay_count=3 (int): the limit on the number of the consecutive delayed trade requests; it should be greater than or equal to 0, and 0 means only one delay is allowed
   - tp_monotonic=True (bool): the take-profit increases monotonically
-  - tp_delay_n=3 (int): the number of the days when the take-profit delay starts, i.e. the take-profit strategy judgement takes effect only after several days of the actual trading
+  - tp_delay_n=3 (int): the number of the days when the take-profit delay starts, i.e. the take-profit strategy judgment takes effect only after several days of the actual trading
   - ignore_sell_sg=False (bool): ignore the sell signal, and sell only by the stop-loss/take-profit and the other ways
-  - ev_open_position=False (bool): whether to use the market environment judgement for the initial position building
+  - ev_open_position=False (bool): whether to use the market environment for the initial position building
   - cn_open_position=False (bool): whether to use the system valid condition for the initial position building)")
 
       .def(py::init<const string&>())
@@ -192,27 +196,29 @@ Common parameters:
       .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
                     "The system name")
-      .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy, "The query condition")
+      .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy,
+                             "The query condition")
 
       .def_property("to", &System::getTO, &System::setTO, "The trading object KData")
 
-      //   .def_property("tm", &System::getTM, &System::setTM, "The associated trade manager instance")
+      //   .def_property("tm", &System::getTM, &System::setTM, "The associated trade manager
+      //   instance")
 
       .def_property(
         "tm", &System::getTM, [](PySystem& self, py::object py_tm) { self.set_tm(py_tm); },
         "The associated trade manager instance")
       .def_property(
         "mm", &System::getMM, [](PySystem& self, py::object py_mm) { self.set_mm(py_mm); },
-        "The money manager strategy")
+        "The money management strategy")
       .def_property(
         "ev", &System::getEV, [](PySystem& self, py::object py_ev) { self.set_ev(py_ev); },
-        "The market environment judgement strategy")
+        "The market environment strategy")
       .def_property(
         "cn", &System::getCN, [](PySystem& self, py::object py_tm) { self.set_cn(py_tm); },
         "The system valid condition")
       .def_property(
         "sg", &System::getSG, [](PySystem& self, py::object py_sig) { self.set_sg(py_sig); },
-        "The signal indicator")
+        "The signal generator")
       .def_property(
         "st", &System::getST, [](PySystem& self, py::object py_st) { self.set_st(py_st); },
         "The stop-loss strategy")
@@ -321,7 +327,8 @@ Common parameters:
             py::module json_module = py::module::import("json");
             return json_module.attr("loads")(json_str);
         },
-        "After the backtest is completed, return the trade records of the last day, and the delayed buy and sell requests that need to be delayed")
+        "After the backtest is completed, return the trade records of the last day, and the "
+        "delayed buy and sell requests that need to be delayed")
 
         DEF_PICKLE(System);
 
@@ -349,14 +356,14 @@ Common parameters:
       py::arg("tp") = py::none(), py::arg("pg") = py::none(), py::arg("sp") = py::none(),
       R"(SYS_Simple([tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg=None, sp=None])
 
-  Create a simple system instance (no multiple position increases or decreases per trade, i.e. after each buy, sell all when selling); when the system instance runs (calling the run method), it needs at least a matching trade manager instance, a money manager strategy
-  and a signal indicator), which can be specified after creating the system instance. If there is no output when calling run,
+  Create a simple system instance (no multiple position increases or decreases per trade, i.e. after each buy, sell all when selling); when the system instance runs (calling the run method), it needs at least a matching trade manager instance, a money management strategy
+  and a signal generator), which can be specified after creating the system instance. If there is no output when calling run,
   and no correct results, it may be that tm, sg, mm are not set. For the backtest, use the run method, e.g.::
     
         # Create a simulated trading account for the backtest, with an initial capital of 300,000
         my_tm = crtTM(init_cash = 300000)
 
-        # Create the signal indicator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
+        # Create the signal generator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
         my_sg = SG_Flex(EMA(C, n=5), slow_n=10)
 
         # Fixedly buy 1000 shares each time
@@ -367,10 +374,10 @@ Common parameters:
         sys.run(sm['sz000001'], Query(-150))
     
     :param TradeManager tm: the trade manager instance 
-    :param MoneyManager mm: the money manager strategy
-    :param EnvironmentBase ev: the market environment judgement strategy
+    :param MoneyManager mm: the money management strategy
+    :param EnvironmentBase ev: the market environment strategy
     :param ConditionBase cn: the system valid condition
-    :param SignalBase sg: the signal indicator
+    :param SignalBase sg: the signal generator
     :param StoplossBase st: the stop-loss strategy
     :param StoplossBase tp: the take-profit strategy
     :param ProfitGoalBase pg: the profit goal strategy

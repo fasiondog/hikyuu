@@ -282,18 +282,23 @@ Common parameters:
                     py::overload_cast<const string&>(&TradeManagerBase::name),
                     py::return_value_policy::copy, "Name")
 
-      .def_property_readonly("init_cash", &TradeManagerBase::initCash, "(Read-only) the initial capital")
-      .def_property_readonly("current_cash", &TradeManagerBase::currentCash, "(Read-only) the current cash")
+      .def_property_readonly("init_cash", &TradeManagerBase::initCash,
+                             "(Read-only) the initial capital")
+      .def_property_readonly("current_cash", &TradeManagerBase::currentCash,
+                             "(Read-only) the current cash")
       .def_property_readonly("init_datetime", &TradeManagerBase::initDatetime,
                              "(Read-only) the account establishment date")
 
       .def_property_readonly("first_datetime", &TradeManagerBase::firstDatetime,
-                             "(Read-only) the date when the first buy trade occurred; if no trade has occurred, return Datetime>()")
+                             "(Read-only) the date when the first buy trade occurred; if no trade "
+                             "has occurred, return Datetime>()")
       .def_property_readonly(
         "last_datetime", &TradeManagerBase::lastDatetime,
-        "(Read-only) the date of the last trade; note that it is unrelated to the trade type; if no trade has occurred, return the account establishment date")
-      .def_property_readonly("precision", &TradeManagerBase::precision,
-                             "(Read-only) the price precision, the same as the common parameter 'precision'")
+        "(Read-only) the date of the last trade; note that it is unrelated to the trade type; if "
+        "no trade has occurred, return the account establishment date")
+      .def_property_readonly(
+        "precision", &TradeManagerBase::precision,
+        "(Read-only) the price precision, the same as the common parameter 'precision'")
 
       .def_property("cost_func", get_costFunc, set_costFunc, "The trade cost algorithm")
 
@@ -301,7 +306,7 @@ Common parameters:
                     &TradeManagerBase::setBrokerLastDatetime,
                     R"(The moment when the order broker operations actually start.
         
-    By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal indicator, the TradeManager will execute the buy/sell operations at the historical moments; at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions. At this time, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be specified. The attribute brokeLastDatetime is used to specify that moment.))")
+    By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal generator, the TradeManager will execute the buy/sell operations at the historical moments; at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions. At this time, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be specified. The attribute brokeLastDatetime is used to specify that moment.))")
 
       .def("get_param", &TradeManagerBase::getParam<boost::any>, R"(get_param(self, name)
 

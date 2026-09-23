@@ -38,14 +38,14 @@ public:
 
 void export_Signal(py::module& m) {
     py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", py::dynamic_attr(),
-                                                R"(The signal indicator base class
-    The signal indicator is responsible for generating the buy and the sell signals.
+                                                R"(The signal generator base class
+    The signal generator is responsible for generating the buy and the sell signals.
 
 Common parameters:
 
     - alternate (bool|True): whether the buy and the sell signals appear alternately. The single-line signals usually judge the generation of the signals through the inflection points, the slopes, etc.; in this case, the consecutive buy signals or the consecutive sell signals may appear, and this parameter can control whether the buy and the sell signals appear alternately. The double-line cross signals usually have the buys and the sells already alternating, in which case this parameter is invalid.
 
-The custom signal indicator interfaces:
+The custom signal generator interfaces:
 
     - _calculate : [Required] the subclass calculation interface
     - _clone : [Required] the clone interface
@@ -143,7 +143,9 @@ The custom signal indicator interfaces:
       
     [Overload interface] The subclass calculation interface)")
 
-      .def("_reset", &SignalBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
+      .def("_reset", &SignalBase::_reset,
+           "[Overload interface] The subclass reset interface, resetting the internal private "
+           "variables")
 
       .def("__add__", [](const SignalPtr& self, const SignalPtr& other) { return self + other; })
       .def("__add__", [](const SignalPtr& self, double other) { return self + other; })
@@ -166,18 +168,18 @@ The custom signal indicator interfaces:
     m.def("SG_Bool", SG_Bool, py::arg("buy"), py::arg("sell"), py::arg("alternate") = true,
           R"(SG_Bool(buy, sell)
 
-    The boolean signal indicator, using the Indicators whose operation results are like bool arrays as the buy and the sell indications respectively.
+    The boolean signal generator, using the Indicators whose operation results are like bool arrays as the buy and the sell indications respectively.
 
     :param Indicator buy: the buy indication (if the corresponding position in the result Indicator is >0, it means buying)
     :param Indicator sell: the sell indication (if the corresponding position in the result Indicator is >0, it means selling)
     :param bool alternate: whether to buy and sell alternately, defaulting to True
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Single", SG_Single, py::arg("ind"), py::arg("filter_n") = 10,
           py::arg("filter_p") = 0.1,
           R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
-    Generate the single-line inflection point signal indicator. It uses the curve inflection point algorithm given in Trade Your Way to Financial Freedom [BOOK1]_ to judge the curve trend; the formula is as follows::
+    Generate the single-line inflection point signal generator. It uses the curve inflection point algorithm given in Trade Your Way to Financial Freedom [BOOK1]_ to judge the curve trend; the formula is as follows::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -188,13 +190,13 @@ The custom signal indicator interfaces:
     :param Indicator ind: the input indicator
     :param int filter_n: the N-day period
     :param float filter_p: the filter percentage
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Single2", SG_Single2, py::arg("ind"), py::arg("filter_n") = 10,
           py::arg("filter_p") = 0.1,
           R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
-    Generate the single-line inflection point signal indicator 2 [BOOK1]_::
+    Generate the single-line inflection point signal generator 2 [BOOK1]_::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -204,7 +206,7 @@ The custom signal indicator interfaces:
     :param Indicator ind: the input indicator
     :param int filter_n: the N-day period
     :param float filter_p: the filter percentage
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Cross", SG_Cross, py::arg("fast"), py::arg("slow"),
           R"(SG_Cross(fast, slow)
@@ -215,7 +217,7 @@ The custom signal indicator interfaces:
 
     :param Indicator fast: the fast line
     :param Indicator slow: the slow line
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_CrossGold", SG_CrossGold, py::arg("fast"), py::arg("slow"),
           R"(SG_CrossGold(fast, slow)
@@ -227,7 +229,7 @@ The custom signal indicator interfaces:
 
     :param Indicator fast: the fast line
     :param Indicator slow: the slow line
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Flex", SG_Flex, py::arg("ind"), py::arg("slow_n"),
           R"(SG_Flex(ind, slow_n)
@@ -236,7 +238,7 @@ The custom signal indicator interfaces:
 
     :param Indicator ind: the input indicator
     :param int slow_n: the EMA period of the slow line
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Band",
           py::overload_cast<const Indicator&, const Indicator&, const Indicator&>(SG_Band),
@@ -266,21 +268,21 @@ The custom signal indicator interfaces:
     
     :param Indicator ind: the input indicator
     :param bool is_buy: what is built is the buy signal; otherwise, it is the sell signal
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Buy", SG_Buy, py::arg("ind"), R"(SG_Buy(ind)
     
     Generate the one-sided buy signal
 
     :param Indicator ind: the input indicator
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def("SG_Sell", SG_Sell, py::arg("ind"), R"(SG_Sell(ind)
     
     Generate the one-sided sell signal
 
     :param Indicator ind: the input indicator
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def(
       "SG_Add",
@@ -301,7 +303,7 @@ The custom signal indicator interfaces:
     :param SignalBase sg1: the input signal 1
     :param SignalBase sg2: the input signal 2
     :param bool alternate: whether to buy and sell alternately, defaulting to True
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def(
       "SG_Sub",
@@ -322,7 +324,7 @@ The custom signal indicator interfaces:
     :param SignalBase sg1: the input signal 1
     :param SignalBase sg2: the input signal 2
     :param bool alternate: whether to buy and sell alternately, defaulting to True
-    :return: the signal indicator)");
+    :return: the signal generator)");
 
     m.def(
       "SG_Mul",

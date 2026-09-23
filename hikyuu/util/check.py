@@ -33,9 +33,9 @@ class HKUIngoreError(Exception):
 
 
 def checkif(expression, message, excepion=None, **kwargs):
-    """Raise an exception if the expression is True. Note: the judgement of this function is the opposite of assert.
+    """Raise an exception if the expression is True. Note: the judgment of this function is the opposite of assert.
 
-    :param boolean expression: the judgement condition
+    :param boolean expression: the judgment condition
     :param str message: the exception annotation message
     :param Exception exception: the specified exception class; when None, the default HKUCheckError exception is used
     """
@@ -57,7 +57,7 @@ def hku_check(exp, msg, *args, **kwargs):
 def hku_check_throw(expression, message, excepion=None, **kwargs):
     """Raise an exception if the expression is False.
 
-    :param boolean expression: the judgement condition
+    :param boolean expression: the judgment condition
     :param str message: the exception annotation message
     :param Exception exception: the specified exception class; when None, the default HKUCheckError exception is used
     """

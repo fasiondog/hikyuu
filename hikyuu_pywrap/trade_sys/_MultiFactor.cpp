@@ -138,11 +138,11 @@ void export_MultiFactor(py::module& m) {
         return pandas.attr("DataFrame")(columns, py::arg("copy") = false);
     });
 
-    py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
-                                                               py::dynamic_attr(),
-                                                               R"(The market environment judgement strategy base class
+    py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(
+      m, "MultiFactorBase", py::dynamic_attr(),
+      R"(The market environment strategy base class
 
-The custom market environment judgement strategy interfaces:
+The custom market environment strategy interfaces:
 
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
@@ -189,7 +189,8 @@ The custom market environment judgement strategy interfaces:
     :param Stock stk: the reference security)")
 
       .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy,
-           "Get the reference date list (obtained from the reference security through the query condition)")
+           "Get the reference date list (obtained from the reference security through the query "
+           "condition)")
 
       .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy,
            "Get the security list specified at the creation")

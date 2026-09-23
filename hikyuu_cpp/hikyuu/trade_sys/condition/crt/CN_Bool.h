@@ -13,7 +13,7 @@
 namespace hku {
 
 /**
- * System valid condition of the boolean signal indicator
+ * System valid condition of the boolean signal
  * @param ind the boolean type indicator; a value > 0 at the corresponding position means the system
  *            is valid, otherwise it is invalid
  * @return

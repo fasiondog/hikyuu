@@ -31,7 +31,7 @@ TEST_CASE("test_Block_1") {
     CHECK(blk2.category() == "test");
     CHECK(blk2.name() == "1");
 
-    /** @arg The inequality judgement */
+    /** @arg The inequality judgment */
     CHECK((blk != blk2));
 
     /** @arg The comparison with an empty Block */

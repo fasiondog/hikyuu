@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * Fast and slow line judgment strategy: the market is valid when the fast line of the market index
+ * Fast and slow line strategy: the market is valid when the fast line of the market index
  * is greater than the slow line, otherwise it is invalid.
  * @param fast fast line indicator
  * @param slow slow line indicator

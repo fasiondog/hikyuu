@@ -17,7 +17,7 @@
  * Hikyuu Quant Framework is an open-source C++/Python quantitative trading research framework for
  * strategy analysis and backtesting (currently aimed at the domestic securities market). Its core
  * idea is based on the current mature systematic trading method: the whole systematic trading is
- * abstracted into seven components, namely the market environment judgment strategy, the system
+ * abstracted into seven components, namely the market environment strategy, the system
  * valid condition, the signal generator, the stop-loss / take-profit strategy, the money management
  * strategy, the profit goal strategy and the slippage algorithm. You can build the strategy asset
  * library of these components separately and combine them freely in practical research to observe
@@ -107,14 +107,14 @@
  * @details Allocate the funds
  * @ingroup Portfolio
  *
- * @defgroup Environment Environment external environment judgment
- * @details The external environment judgment module, used to judge whether the current market
+ * @defgroup Environment Environment market environment
+ * @details The market environment module, used to judge whether the current market
  *          environment is valid; a buy operation happens only when the market is in a valid state.
  *          When the market enters an invalid state, the general strategy of the system is to
  *          immediately force a liquidation.
  * @ingroup TradeSystem
  *
- * @defgroup Condition Condition system valid condition judgment
+ * @defgroup Condition Condition system valid condition
  * @details It judges the precondition for the current system to be valid; when the system is in an
  *          invalid state no buy is suggested, and the held stocks are generally forced to be
  *          liquidated (the concrete behavior is decided by the concrete system strategy)

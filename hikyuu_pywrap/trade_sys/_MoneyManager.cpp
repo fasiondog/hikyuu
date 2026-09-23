@@ -65,18 +65,18 @@ public:
 };
 
 void export_MoneyManager(py::module& m) {
-    py::class_<MoneyManagerBase, MMPtr, PyMoneyManagerBase>(m, "MoneyManagerBase",
-                                                            py::dynamic_attr(),
-                                                            R"(The money manager strategy base class
+    py::class_<MoneyManagerBase, MMPtr, PyMoneyManagerBase>(
+      m, "MoneyManagerBase", py::dynamic_attr(),
+      R"(The money management strategy base class
 
 Common parameters:
 
-    - auto-checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money manager strategy, automatically deposit (checkin) enough cash into the account.
+    - auto-checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money management strategy, automatically deposit (checkin) enough cash into the account.
     - max-stock=20000 (int): the maximum number of the kinds of the held securities (i.e. how many stocks are held, not the position size of each stock)
     - disable_ev_force_clean_position=False (bool): disable forcibly clearing the positions when the market environment becomes invalid
     - disable_cn_force_clean_position=False (bool): disable forcibly clearing the positions when the system valid condition becomes invalid
 
-The custom money manager strategy interfaces:
+The custom money management strategy interfaces:
 
     - _buyNotify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
     - _sellNotify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing
@@ -101,8 +101,10 @@ The custom money manager strategy interfaces:
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
                     py::return_value_policy::copy, "Set or get the query condition")
 
-      .def("current_buy_count", &MoneyManagerBase::currentBuyCount, "The current consecutive buy count")
-      .def("current_sell_count", &MoneyManagerBase::currentSellCount, "The current consecutive sell count")
+      .def("current_buy_count", &MoneyManagerBase::currentBuyCount,
+           "The current consecutive buy count")
+      .def("current_sell_count", &MoneyManagerBase::currentSellCount,
+           "The current consecutive sell count")
 
       .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -199,75 +201,77 @@ The custom money manager strategy interfaces:
       .def("_get_sell_short_num", &MoneyManagerBase::_getSellShortNumber)
       .def("_get_buy_short_num", &MoneyManagerBase::_getBuyShortNumber)
 
-      .def("_reset", &MoneyManagerBase::_reset, R"([Overload interface] The subclass reset interface, resetting the internal private variables)")
+      .def(
+        "_reset", &MoneyManagerBase::_reset,
+        R"([Overload interface] The subclass reset interface, resetting the internal private variables)")
 
         DEF_PICKLE(MMPtr);
 
     m.def("MM_Nothing", MM_Nothing, R"(MM_Nothing()
 
-    A special money manager strategy, equivalent to no money management; buy as much as the money available.)");
+    A special money management strategy, equivalent to no money management; buy as much as the money available.)");
 
     m.def("MM_FixedRisk", MM_FixedRisk, py::arg("risk") = 1000.00,
           R"(MM_FixedRisk([risk = 1000.00])
 
-    The fixed risk money manager strategy limits each trade to a pre-determined or fixed capital risk, e.g. a fixed risk of 1000 yuan per trade. The formula: the trading quantity = the fixed risk / the trading risk.
+    The fixed risk money management strategy limits each trade to a pre-determined or fixed capital risk, e.g. a fixed risk of 1000 yuan per trade. The formula: the trading quantity = the fixed risk / the trading risk.
 
     :param float risk: the fixed risk
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
           R"(MM_FixedCapital([capital = 10000.0])
 
-    The fixed capital money manager strategy. The buy quantity = the current cash / capital
+    The fixed capital money management strategy. The buy quantity = the current cash / capital
 
     :param float capital: the fixed capital unit
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
           R"(MM_FixedCapitalFunds([capital = 10000.0]) 
 
-    The fixed total capital money manager strategy. The buy quantity = the current total assets / capital
+    The fixed total capital money management strategy. The buy quantity = the current total assets / capital
   
     :param float capital: the fixed capital unit
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_FixedCount", MM_FixedCount, py::arg("n") = 100, R"(MM_FixedCount([n = 100])
 
-    The fixed trading quantity money manager strategy. Buy a fixed quantity each time.
+    The fixed trading quantity money management strategy. Buy a fixed quantity each time.
     
     :param float n: the quantity to buy each time (it should be an integer multiple of the minimum trading quantity of the trading object; the program does not check this here)
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_FixedPercent", MM_FixedPercent, py::arg("p") = 0.03, R"(MM_FixedPercent([p = 0.03])
 
     The fixed percentage risk model. The formula: P (the position size) = the account balance * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
     
     :param float p: the percentage
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_FixedUnits", MM_FixedUnits, py::arg("n") = 33, R"(MM_FixedUnits([n = 33])
 
-    The fixed unit money manager strategy. The formula: the buy quantity = the current cash / n / the current risk
+    The fixed unit money management strategy. The formula: the buy quantity = the current cash / n / the current risk
 
     :param int n: n capital units
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_WilliamsFixedRisk", MM_WilliamsFixedRisk, py::arg("p") = 0.1,
           py::arg("max_loss") = 1000.0,
           R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    The Williams fixed risk money manager strategy. The buy quantity = (the account balance × the risk percentage p) ÷ the maximum loss (max_loss)
+    The Williams fixed risk money management strategy. The buy quantity = (the account balance × the risk percentage p) ÷ the maximum loss (max_loss)
 
     :param float p: the risk percentage
     :param float max_loss: the maximum loss
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 
     m.def("MM_FixedCountTps", MM_FixedCountTps, py::arg("buy_counts"), py::arg("sell_counts"),
           R"(MM_FixedCountTps([buy_counts, sell_counts])
           
-    The consecutive buy/sell fixed quantity money manager strategy.
+    The consecutive buy/sell fixed quantity money management strategy.
     
     :param list buy_counts: the buy quantity list
     :param list sell_counts: the sell quantity list
-    :return: the money manager strategy instance)");
+    :return: the money management strategy instance)");
 }

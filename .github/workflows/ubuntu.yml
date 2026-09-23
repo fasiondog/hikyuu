@@ -61,4 +61,28 @@ jobs:
       - name: test
         run: |
           xmake r small-test
+
+  docs:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip3 install nbformat
+
+      - name: Check docs parity
+        run: |
+          python3 docs/tools/check_docs_parity.py --skip-cjk
+
+      - name: Check notebook parity
+        run: |
+          python3 docs/tools/check_notebook_parity.py
   

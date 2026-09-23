@@ -18,7 +18,7 @@
 namespace hku {
 
 /**
- * Base class of the environment judgment strategy
+ * Base class of the market environment strategy
  * @note The external environment should have nothing to do with the concrete trading object
  * @ingroup Environment
  */

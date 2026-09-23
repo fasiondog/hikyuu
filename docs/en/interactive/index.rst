@@ -7,7 +7,7 @@ To draw the figures with matplotlib, you must understand the two basic objects i
 
 For the detailed examples of the drawing:
 
-`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
+`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True>`_
 
 
 Drawing the Combined Window
@@ -380,7 +380,7 @@ The following functions have been set as the plot functions of the corresponding
 
     Draw the buy/sell signals
 
-    :param SignalBase sg: the signal indicator
+    :param SignalBase sg: the signal generator
     :param new:   only taking effect when the axes is not specified; when True, create a new window object and draw in it
     :param axes:  specify in which axes object to draw
     :param style: 1 | 2 the signal arrow drawing style
@@ -402,7 +402,7 @@ The following functions have been set as the plot functions of the corresponding
 
 .. py:function:: evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2)
 
-    Draw the market valid judgement
+    Draw the market valid judgment
 
     :param EnvironmentBase cn: the system valid condition
     :param KData ref_kdata: used as the date reference

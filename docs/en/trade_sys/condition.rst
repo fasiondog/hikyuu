@@ -17,7 +17,7 @@ Built-in System Validity Conditions
 
 .. py:function:: CN_Bool(ind)
 
-    The boolean signal indicator system validity condition; a position > 0 in the indicator means the system is valid, otherwise invalid.
+    The boolean signal generator system validity condition; a position > 0 in the indicator means the system is valid, otherwise invalid.
 
     :param Indicator ind: a bool-type indicator with KData as the input
     :return: the system validity condition instance

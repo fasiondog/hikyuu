@@ -98,7 +98,7 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
     // The original implementation wrongly used the global maximum of the window as the drawdown
     // base of all the points; when the highest point of the window appears after the lowest point
     // it introduces the look-ahead bias and overestimates the drawdown.
-    // Here the original O(1) fast path state machine is abandoned (its judgement of
+    // Here the original O(1) fast path state machine is abandoned (its judgment of
     // current_dd > window_max_dd does not hold in principle under the standard MDD semantics,
     // because the dd of different j uses a different run_max_j base), and it degenerates to an
     // O(n) brute force scan per point, using the run_max base to guarantee the correctness.

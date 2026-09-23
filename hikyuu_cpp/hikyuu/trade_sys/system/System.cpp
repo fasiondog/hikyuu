@@ -113,7 +113,7 @@ void System::initParam() {
     // Whether a trade can be done when the high price equals the low price
     setParam<bool>("can_trade_when_high_eq_low", false);
 
-    // Whether to use the market environment judgment for the initial position building
+    // Whether to use the market environment for the initial position building
     setParam<bool>("ev_open_position", false);
 
     // Whether to use the system valid condition for the initial position building
@@ -373,9 +373,9 @@ void System::readyForRun() {
     HKU_CHECK(m_mm, "Not setMoneyManager! {}", name());
     HKU_CHECK(m_sg, "Not setSignal! {}", name());
 
-    // When a market environment judgment strategy exists, the default previous-day market valid
+    // When a market environment strategy exists, the default previous-day market valid
     // flag must be set to false, because whether the market is valid must be judged entirely by the
-    // market environment judgment strategy
+    // market environment strategy
     if (m_ev)
         m_pre_ev_valid = false;
 
@@ -551,7 +551,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     if (!m_pre_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] EV status from invalid to valid", name()));
 
-        // If the environment judgment strategy is used for the initial position building
+        // If the environment strategy is used for the initial position building
         if (getParam<bool>("ev_open_position")) {
             HKU_INFO_IF(trace, htr("[{}] EV to buy", name()));
             TradeRecord tr = _buy(today, src_today, PART_ENVIRONMENT);
@@ -563,7 +563,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     m_pre_ev_valid = current_ev_valid;
 
     //----------------------------------------------------------
-    // Process the system valid condition judgment strategy
+    // Process the system valid condition strategy
     //----------------------------------------------------------
 
     bool current_cn_valid = _conditionIsValid(today.datetime);
@@ -586,7 +586,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     if (!m_pre_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] CN status from invalid to valid", name()));
 
-        // If the environment judgment strategy is used for the initial position building
+        // If the environment strategy is used for the initial position building
         if (getParam<bool>("cn_open_position")) {
             HKU_INFO_IF(trace, htr("[{}] CN to buy", name()));
             TradeRecord tr = _buy(today, src_today, PART_CONDITION);

@@ -6,7 +6,7 @@ Order Broker
 
 Multiple order broker instances can be registered to the TradeManager through :py:meth:`TradeManager.regBroker`. These order brokers can perform the additional buy/sell actions; e.g. the mail order broker can send an email when the TradeManager issues the buy/sell instructions.
 
-By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal indicator, the TradeManager will execute the buy/sell operations at the historical moments; **at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions**. Therefore, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be executed. The TradeManager attribute :py:attr:`TradeManager.brokeLastDatetime` is used to specify that moment.
+By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal generator, the TradeManager will execute the buy/sell operations at the historical moments; **at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions**. Therefore, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be executed. The TradeManager attribute :py:attr:`TradeManager.brokeLastDatetime` is used to specify that moment.
 
 
 The Order Broker Wrapper in Python
@@ -25,7 +25,7 @@ Since implementing a custom order broker by inheriting from :py:class:`OrderBrok
     # Modify the last timestamp of the order broker as needed; only when it is greater than this timestamp will the order broker actually issue the order instructions
     my_tm.broke_last_datetime=Datetime(201706010000)
 
-    # Create the signal indicator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
+    # Create the signal generator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
     my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 
     # Fixedly buy 1000 shares each time

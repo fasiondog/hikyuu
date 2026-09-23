@@ -28,7 +28,7 @@ Project home page: `https://hikyuu.org/ <https://hikyuu.org/>`_
 
 Documentation: `https://hikyuu.readthedocs.io/en/latest/index.html <https://hikyuu.readthedocs.io/en/latest/index.html>`_
 
-Getting started: `https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True <https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
+Getting started: `https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True <https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True>`_
 
 Strategy component library: `https://gitee.com/fasiondog/hikyuu_hub <https://gitee.com/fasiondog/hikyuu_hub>`_
 
@@ -56,7 +56,7 @@ Example code:
 .. figure:: _static/10000-overview.png
         :width: 600px
 
-The complete example is available in the `Getting Started Notebook <https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
+The complete example is available in the `Getting Started Notebook <https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True>`_
 
 
 Why Hikyuu?

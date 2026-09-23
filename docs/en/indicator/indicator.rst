@@ -419,7 +419,7 @@ Built-in Technical Indicators
     * result(1): +DI (the rising direction line, the bull force)
     * result(2): -DI (the falling direction line, the bear force)
 
-    The judgement criteria:
+    The judgment criteria:
 
     - ADX >= 25: there is a clear one-sided trend (both rising/falling are fine)
     - ADX < 25: no trend, a range oscillation
@@ -463,7 +463,7 @@ Built-in Technical Indicators
     * result(1): +DI (the rising direction line, the bull force)
     * result(2): -DI (the falling direction line, the bear force)
 
-    The judgement criteria:
+    The judgment criteria:
 
     - ADX2 >= 25: there is a clear one-sided trend (both rising/falling are fine)
     - ADX2 < 25: no trend, a range oscillation
@@ -1265,7 +1265,7 @@ Built-in Technical Indicators
     - The ChiNext/STAR Market stocks: the limit-down range is 20%
     - The ST stocks have a limit-down range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
-    The limit-down judgement logic: the close price of the day <= the close price of the previous day × (1 - the limit-down range)
+    The limit-down judgment logic: the close price of the day <= the close price of the previous day × (1 - the limit-down range)
 
     :param KData kdata: the K-line data
     :rtype: Indicator
@@ -1282,7 +1282,7 @@ Built-in Technical Indicators
     - The ChiNext/STAR Market stocks: the limit-up range is 20%
     - The ST stocks have a limit-up range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
-    The limit-up judgement logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
+    The limit-up judgment logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
 
     :param KData kdata: the K-line data
     :rtype: Indicator
@@ -1944,7 +1944,7 @@ Built-in Technical Indicators
     * The denominator: the average of y within the window (eliminating the price dimension, with the percentage meaning)
     * The smaller the indicator = all the K-lines of the whole segment are close to the regression line
 
-    **The examples of the judgement thresholds**:
+    **The examples of the judgment thresholds**:
 
     * RelMaxRes < 0.03: the farthest K-line deviates from the average price by less than 3%, and all the points are close to the regression line
 

@@ -28,7 +28,7 @@
 | 买卖信号 | buy/sell signal | — | `shouldBuy()` / `shouldSell()` | |
 | 止损 | stop-loss | ST | `trade_sys/stoploss`（`crtST`、`ST_FixedPercent` 等） | 保留连字符 |
 | 止盈 | take-profit | TP | — | **不用** "stopprofit" 作为正文 |
-| 资金管理 | money management | MM | `trade_sys/moneymanager`（`crtMM`、`MM_FixedPercent` 等） | **不用** "money manage" |
+| 资金管理 | money management | MM | `trade_sys/moneymanager`（`crtMM`、`MM_FixedPercent` 等） | **不用** "money manage"；类名 `MoneyManager`（组件）可用 "money manager" |
 | 头寸规模 / 下单数量 | position sizing | — | — | |
 | 盈利目标 | profit goal | PG | `trade_sys/profitgoal`（`crtPG`、`PG_FixedPercent` 等） | |
 | 滑点 / 移滑价差 | slippage | SP | `trade_sys/slippage`（`crtSP`、`SP_Normal` 等） | |
@@ -74,7 +74,7 @@
 | 融资 / 借入资金 | margin / borrowed funds |
 | 红利 | dividend |
 | 权息（复权）数据 | equity/dividend adjustment data |
-| 复权 | adjustment (forward / backward)；前复权 qfq (forward adjustment)、后复权 hfq (backward adjustment)；常量 `RECOVER_*` |
+| 复权 | adjustment (forward / backward)；前复权 qfq (forward adjustment)、后复权 hfq (backward adjustment)；常量 `RECOVER_*`。注：代码枚举 `KQuery::RecoverType`（`NO_RECOVER`/`FORWARD`/`BACKWARD`/`EQUAL_*`）为历史 API 名，正文用 adjustment |
 | 除权除息 | ex-rights / ex-dividend |
 | 复权因子 | adjustment factor（`IAdjFactor`） |
 | 交割 / 结算 | settlement |
@@ -136,7 +136,7 @@
 | --- | --- | --- |
 | 行情 / 行情数据 | market data / quotes | — |
 | 实时行情 | real-time quotes | — |
-| K 线 | candlestick / bar | `KData` / `KRecord` |
+| K 线 | candlestick / bar；代码中统一用 "K-line"，首次出现带 `(candlestick)` 注记 | `KData` / `KRecord` |
 | 日线 | daily bar | `KData`（日线 K 类型） |
 | 分钟线 | minute bar | `KData`（1/5/15/30/60 分钟 K 类型） |
 | 逐笔成交 | tick / transaction | `TransRecord` |
@@ -273,13 +273,13 @@
 
 | 缩写 | 全称 | 中文 |
 | --- | --- | --- |
-| SG | signal | 信号指示器 |
-| MM | money manager | 资金管理 |
+| SG | signal generator | 信号指示器 |
+| MM | money management | 资金管理 |
 | ST | stop-loss | 止损 |
 | TP | take-profit | 止盈 |
 | PG | profit goal | 盈利目标 |
 | SP | slippage | 滑点 |
-| EV | environment | 市场环境 |
+| EV | market environment | 市场环境 |
 | CN | condition | 系统有效条件 |
 | SE | selector | 选择器 |
 | AF | allocate funds | 资金分配 |

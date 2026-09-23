@@ -33,8 +33,9 @@ public:
 };
 
 void export_Normlize(py::module& m) {
-    py::class_<NormalizeBase, NormalizePtr, PyNormalizeBase>(m, "NormalizeBase", py::dynamic_attr(),
-                                                             R"(The cross-section standardization operation used for the MF)")
+    py::class_<NormalizeBase, NormalizePtr, PyNormalizeBase>(
+      m, "NormalizeBase", py::dynamic_attr(),
+      R"(The cross-section standardization operation used for the MF)")
       .def(py::init<>())
       .def(py::init<const NormalizeBase&>())
       .def(py::init<const string&>(), R"(The initialization constructor
@@ -71,7 +72,8 @@ void export_Normlize(py::module& m) {
 
       .def("clone", &NormalizeBase::clone, "The clone operation")
 
-      .def("normalize", &NormalizeBase::normalize, "[Overload interface] The subclass calculation interface")
+      .def("normalize", &NormalizeBase::normalize,
+           "[Overload interface] The subclass calculation interface")
 
         DEF_PICKLE(NormalizePtr);
 
@@ -81,7 +83,7 @@ void export_Normlize(py::module& m) {
           py::arg("recursive") = false, R"(The Z-score standardization operation
           
     :param out_extreme: whether to remove the outliers
-    :param nsigma: the outlier judgement multiple ±3.0
+    :param nsigma: the outlier judgment multiple ±3.0
     :param recursive: whether to process the outliers recursively)");
 
     m.def("NORM_Quantile", &NORM_Quantile, py::arg("quantile_min") = 0.01,
@@ -91,7 +93,8 @@ void export_Normlize(py::module& m) {
     :param quantile_max: the maximum quantile)");
 
     m.def("NORM_Quantile_Uniform", &NORM_Quantile_Uniform, py::arg("quantile_min") = 0.01,
-          py::arg("quantile_max") = 0.99, R"(The quantile cross-section uniform distribution standardization operation
+          py::arg("quantile_max") = 0.99,
+          R"(The quantile cross-section uniform distribution standardization operation
           
     :param quantile_min: the minimum quantile
     :param quantile_max: the maximum quantile)");

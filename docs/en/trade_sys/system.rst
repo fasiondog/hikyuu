@@ -4,7 +4,7 @@
 System Strategy|SYS
 ===================
 
-A system is the complete strategy for a single trading object, including the environment judgement, the system validity condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used to simulate the backtest.
+A system is the complete strategy for a single trading object, including the market environment, the system validity condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used to simulate the backtest.
 
 For multiple objects, a portfolio needs to be used in Hikyuu; see: :ref:`portfolio`.
 
@@ -15,11 +15,11 @@ Common parameters:
     * **delay_use_current_price=True** *(bool)* : In the case of a delayed operation, whether to use the price of the bar at the current trade time to calculate the new stop-loss price/take-profit price/goal price, or to use the result calculated last time
     * **max_delay_count=3** *(int)* : The limit of the number of the consecutive delayed trade requests; it should be greater than or equal to 0, and 0 means only 1 delay is allowed
     * **tp_monotonic=True** *(bool)* : The take profit increases monotonically
-    * **tp_delay_n=3** *(int)* : The number of days when the take profit starts to be delayed, i.e. the take profit strategy judgement takes effect from several days after the actual trade
+    * **tp_delay_n=3** *(int)* : The number of days when the take profit starts to be delayed, i.e. the take profit strategy judgment takes effect from several days after the actual trade
     * **ignore_sell_sg=False** *(bool)* : Ignore the sell signal, and sell only by the stop-loss/take-profit and other ways
     * **can_trade_when_high_eq_low=False** *(bool)* : Whether trading is allowed when the highest price equals the lowest price (a limit-up with a single price cannot be bought, and a limit-down with a single price cannot be sold)
 
-    * **ev_open_position=False** *(bool)*: Whether to use the environment judgement for the initial position opening
+    * **ev_open_position=False** *(bool)*: Whether to use the market environment for the initial position opening
     * **cn_open_position=False** *(bool)*: Whether to use the system validity condition for the initial position opening
     
     * **shared_tm=False** *(bool)*: Whether the tm part is a shared part
@@ -46,7 +46,7 @@ Common parameters:
         <tbody>
             <tr>
                 <td>EV_Xxx</td>
-                <td>Environment judgement strategy</td>
+                <td>Market environment strategy</td>
                 <td>Used to judge the market environment; an actual trade happens only when the market is valid. This strategy can usually be shared among different system strategy instances to reduce the amount of calculation.</td>
             </tr>
             <tr>
@@ -107,7 +107,7 @@ Create a System and Run the Backtest
     
     :param TradeManager tm: the trade manager instance 
     :param MoneyManager mm: the money management strategy
-    :param EnvironmentBase ev: the environment judgement strategy
+    :param EnvironmentBase ev: the market environment strategy
     :param ConditionBase cn: the system validity condition
     :param SignalBase sg: the signal generator
     :param StoplossBase st: the stop-loss strategy
@@ -126,7 +126,7 @@ System Part Enum Definitions
     
     In actual use, the simplified way of System.ENVIRONMENT can be used instead of System.Part.ENVIRONMENT, and the others are similar.
 
-    - System.Part.ENVIRONMENT  - Environment judgement strategy
+    - System.Part.ENVIRONMENT  - Market environment strategy
     - System.Part.CONDITION    - System validity condition
     - System.Part.SIGNAL       - Signal generator
     - System.Part.STOPLOSS     - Stop-loss strategy
@@ -185,7 +185,7 @@ System Base Class Definition
         
     .. py:attribute:: ev  
     
-        The environment judgement strategy
+        The market environment strategy
         
     .. py:attribute:: cn  
     

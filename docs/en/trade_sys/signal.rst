@@ -41,13 +41,13 @@ When technical indicators are usually used to judge buying and selling, it is ba
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Single</a></td>
-                <td>Single-line inflection point signal indicator</td>
-                <td>Generate a single-line inflection point signal indicator. Use the curve inflection point algorithm given in the book "精明交易者" to judge the curve trend</td>
+                <td>Single-line inflection point signal generator</td>
+                <td>Generate a single-line inflection point signal generator. Use the curve inflection point algorithm given in the book "Smarter Trading" to judge the curve trend</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Single2</a></td>
-                <td>Single-line inflection point signal indicator 2</td>
-                <td>Generate a single-line inflection point signal indicator. Use the curve inflection point algorithm given in the book "精明交易者" to judge the curve trend</td>
+                <td>Single-line inflection point signal generator 2</td>
+                <td>Generate a single-line inflection point signal generator. Use the curve inflection point algorithm given in the book "Smarter Trading" to judge the curve trend</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Flex</a></td>
@@ -56,37 +56,37 @@ When technical indicators are usually used to judge buying and selling, it is ba
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Bool</a></td>
-                <td>Boolean signal indicator</td>
+                <td>Boolean signal generator</td>
                 <td>Use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_OneSide</a></td>
-                <td>One-side signal indicator</td>
+                <td>One-side signal generator</td>
                 <td>Build a one-side signal (containing only the buy signal or only the sell signal) from the input indicator,<br>if the indicator value is greater than 0, add the signal</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Buy</a></td>
-                <td>One-side buy signal indicator</td>
+                <td>One-side buy signal generator</td>
                 <td>The simplified mode of SG_OneSide</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_OneSell</a></td>
-                <td>One-side sell signal indicator</td>
+                <td>One-side sell signal generator</td>
                 <td>The simplified mode of SG_OneSide</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Band</a></td>
-                <td>Range breakout signal indicator</td>
+                <td>Range breakout signal generator</td>
                 <td>The indicator range indicator; when the indicator exceeds the upper band, buy;<br>when the indicator falls below the lower band, sell.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
-                <td>Always-buy signal indicator</td>
+                <td>Always-buy signal generator</td>
                 <td>A special SG that issues a buy signal every day continuously, usually used with PF</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF position adjustment period buy signal indicator</td>
+                <td>PF position adjustment period buy signal generator</td>
                 <td>A special SG, used with PF, taking the PF position adjustment period as the buy signal</td>
             </tr>
             <tr>
@@ -99,7 +99,7 @@ When technical indicators are usually used to judge buying and selling, it is ba
     <p></p>
 
 
-Two-line Crossover Signal Indicator
+Two-line Crossover Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cross(fast, slow)
@@ -113,7 +113,7 @@ Two-line Crossover Signal Indicator
     :return: the signal generator
         
         
-Golden Cross Signal Indicator
+Golden Cross Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_CrossGold(fast, slow)
@@ -128,12 +128,12 @@ Golden Cross Signal Indicator
     :return: the signal generator    
 
 
-Single-line Inflection Point Signal Indicator
+Single-line Inflection Point Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
-    Generate a single-line inflection point signal indicator. Use the curve inflection point algorithm given in the book "精明交易者" [BOOK1]_ to judge the curve trend; the formula is as follows::
+    Generate a single-line inflection point signal generator. Use the curve inflection point algorithm given in the book "Smarter Trading" [BOOK1]_ to judge the curve trend; the formula is as follows::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -148,7 +148,7 @@ Single-line Inflection Point Signal Indicator
     
 .. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
-    Generate the single-line inflection point signal indicator 2 [BOOK1]_::
+    Generate the single-line inflection point signal generator 2 [BOOK1]_::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -172,12 +172,12 @@ Self-crossover Single-line Inflection Point Indicator
     :return: the signal generator
 
 
-Boolean Signal Indicator
+Boolean Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Bool(buy, sell[, alternate=True])
 
-    The boolean signal indicator; use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.
+    The boolean signal generator; use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.
     
     :param Indicator buy: the buy indicator (a position > 0 in the result Indicator means buy)
     :param Indicator sell: the sell indicator (a position > 0 in the result Indicator means sell)
@@ -185,7 +185,7 @@ Boolean Signal Indicator
     :return: the signal generator
 
 
-One-side Signal Indicator
+One-side Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_OneSide(ind, is_buy)
@@ -212,7 +212,7 @@ One-side Signal Indicator
     :return: the signal generator
 
 
-Range Breakout Signal Indicator
+Range Breakout Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Band(ind, lower, upper)
@@ -226,7 +226,7 @@ Range Breakout Signal Indicator
         SG_Band(CLOSE, MA(LOW), MA(HIGH))
 
 
-Always-buy Signal Indicator
+Always-buy Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_AllwaysBuy()
@@ -234,7 +234,7 @@ Always-buy Signal Indicator
     A special SG that issues a buy signal every day continuously, usually used with PF
 
 
-PF Position Adjustment Period Buy Signal Indicator
+PF Position Adjustment Period Buy Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()
