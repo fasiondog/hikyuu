@@ -6,7 +6,15 @@
 Portfolio|PF
 ============
 
-In Hikyuu, a Portfolio (PF) is organized with system trading strategies as the units; Hikyuu can use a portfolio of the same trading strategy with different targets, and in the future it can also use a portfolio of system strategies with different targets and different trading logic (requiring tm and the components to support it), which is not exactly the same as the portfolios with multiple targets but the same strategy logic in common programmatic trading.
+In Hikyuu, a portfolio is organized with system trading strategies as the units; it can use a portfolio of the same trading strategy with different targets.
+
+.. note::
+
+   Since ``feature/next``, the original independent ``Portfolio`` (``SimplePortfolio`` / ``WithoutAFPortfolio``) has been taken over by
+   :class:`MultiSystem`: **PF is essentially a preset configuration of MultiSystem**.
+   The ``PF_Simple`` / ``PF_WithoutAF`` described on this page are the **compatibility layer factories**, used to take over the existing master calling style,
+   their **return value is** :class:`MultiSystem`, no longer a ``Portfolio`` object.
+   New projects are recommended to use :class:`MultiSystem` directly (see :doc:`../trade_sys/system`).
 
 PF part descriptions:
 
@@ -24,117 +32,92 @@ PF part descriptions:
             <tr>
                 <td>MF_Xxx</td>
                 <td>Multi-factor composition (cross-sectional scoring board)</td>
-                <td>The multi-factor is essentially scoring the candidates on the cross-section, so it actually needs to be used together with the Selector (strategy selection algorithm).</td>
+                <td>The multi-factor is essentially scoring the candidates on the cross-section, so it actually needs to be used together with the Selector (the strategy selection algorithm).</td>
             </tr>
             <tr>
                 <td>SE_Xxx</td>
-                <td>Strategy selection algorithm</td>
-                <td>Implements the algorithm for evaluating and selecting the targets and the system strategies.<br>Note: the optimization selector in the walk-forward optimization system is also named with the SE prefix, but it is not this one.</td>
+                <td>System selection algorithm</td>
+                <td>Implements the algorithm for evaluating and selecting the targets and the system strategies.</td>
             </tr>
             <tr>
                 <td>AF_Xxx</td>
                 <td>Asset allocation algorithm</td>
-                <td>Used to allocate the assets to the systems selected on the cross-section.</td>
-            </tr>            
+                <td>Used to allocate the assets to the systems selected on the cross-section.<br>Since ``feature/next``, AF is an independent base class :class:`AllocateFundsBase`, carrying the portfolio-level L1/L2/L3, see :doc:`allocate_funds`.</td>
+            </tr>
         </tbody>
     </table>
     <p></p>
 
 
+Built-in Portfolios
+-------------------
+
 .. py:function:: PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
-    Create a portfolio of multiple targets with a single system strategy
+    Create a portfolio of multiple targets with a single system strategy (**returns MultiSystem, the semantics is mode B: quota allocation + the next-period quota write-back**).
 
-    Description of the position adjustment mode adjust_mode:
-    - "query" mode, follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
-    - "day" mode, adjust_cycle is the position adjustment interval in days;
-    - for the "week" | "month" | "quarter" | "year" modes, adjust_cycle
-
-      is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
-      if the day is not a trading day the position adjustment will be skipped; when delay_to_trading_day is true, if the day is not a trading day
-      it will be postponed to the first trading day in the current period; e.g. if the position adjustment is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+    Description of the rebalancing mode adjust_mode:
+    - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval by the ktype in query;
+    - In the "day" mode, adjust_cycle is the rebalancing interval days;
+    - In the "week" | "month" | "quarter" | "year" mode, adjust_cycle is the corresponding N-th day of every week, the n-th day of every month, the n-th day of every quarter and the n-th day of every year; when delay_to_trading_day is false and that day is not a trading day, the rebalancing is skipped; when delay_to_trading_day is true and that day is not a trading day, it is postponed to the first trading day within the current cycle, e.g. if the rebalancing is specified on the 1st day of every month but the 1st of that month is not a trading day, it is postponed to the first trading day of that month.
 
     :param TradeManager tm: the trade management
     :param SelectorBase se: the trading object selection algorithm
-    :param AllocateFundsBase af: the asset allocation algorithm
-    :param int adjust_cycle: the position adjustment period
-    :param str adjust_mode: the position adjustment mode
-    :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
+    :param AllocateFundsBase af: the fund allocation algorithm (AF, carrying L1/L2/L3, see :doc:`allocate_funds`)
+    :param int adjust_cycle: the rebalancing cycle
+    :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
+    :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
+    :rtype: MultiSystem
 
+.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
 
-.. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
-    
-    Create a portfolio without an asset allocation algorithm; all the single-system strategies use the common tm to manage the account
+    Create a portfolio without a fund allocation algorithm (**returns MultiSystem, the semantics is mode A: signal aggregation + the parent uniform ordering**).
 
-    Description of the position adjustment mode adjust_mode:
-    - "query" mode, follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
-    - "day" mode, adjust_cycle is the position adjustment interval in days;
-    - for the "week" | "month" | "quarter" | "year" modes, adjust_cycle
-    
-      is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
-      if the day is not a trading day the position adjustment will be skipped; when delay_to_trading_day is true, if the day is not a trading day
-      it will be postponed to the first trading day in the current period; e.g. if the position adjustment is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+    The description of the rebalancing mode adjust_mode is the same as above.
 
     :param TradeManager tm: the trade management
     :param SelectorBase se: the trading object selection algorithm
-    :param int adjust_cycle: the position adjustment period
-    :param str adjust_mode: the position adjustment mode
-    :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
+    :param int adjust_cycle: the rebalancing cycle
+    :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
+    :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close
-    :param bool sys_use_self_tm: the prototype systems use their own tm to calculate
-    :param bool sell_at_not_selected: whether the stocks not selected on the position adjustment day are forcibly sold
-    
-    
-Portfolio Class Definition
---------------------------
+    :param bool sys_use_self_tm: the prototype system uses its own tm for the calculation (**no corresponding semantics in v5, ignored with a warning**)
+    :param bool sell_at_not_selected: whether the targets not selected on the rebalancing day are force sold
+    :rtype: MultiSystem
 
-.. py:class:: Portfolio
 
-    Implements a portfolio of multiple targets and multiple strategies
-    
-    .. py:attribute:: name  Name
-    
-    .. py:attribute:: query Running condition
+Differences from master and the migration
+-----------------------------------------
 
-    .. py:attribute:: tm The associated trade manager instance
-        
-    .. py:attribute:: se The selector strategy
-        
-    .. py:attribute:: af The asset allocation algorithm
+.. list-table::
+    :header-rows: 1
 
-    .. py:attribute:: proto_sys_list The prototype system list
+    * - Dimension
+      - master
+      - v5 (factory pass-through)
+    * - Return type
+      - ``PortfolioPtr``
+      - ``MultiSystemPtr`` (the compatibility alias ``PortfolioPtr`` points to ``MultiSystemPtr``, the existing ``PortfolioPtr pf = PF_Simple(...)`` keeps compiling)
+    * - Class / methods
+      - ``Portfolio`` / ``SimplePortfolio`` / ``WithoutAFPortfolio`` and their methods (``run`` / ``getRunningDates`` / ``getCycleEndDates`` / ``lastSuggestion`` ...)
+      - No longer exist; use the ``run`` / ``getAdjustDates`` / ``getAdjustTurnover`` / ``toSuggestions`` of :class:`MultiSystem`.
+        Among them ``run(query)`` also provides a compatibility overload (equivalent to the master ``Portfolio.run(query)``, with the market trading calendar as the driving axis), the existing ``pf.run(query)`` needs no rewrite
+    * - Account hierarchy
+      - Real TM + shadow TM + sub-system accounts
+      - The parent real TM + the sub-system shadow accounts ``TM_SUB`` (:meth:`MultiSystem.set_sub_init_cash`)
+    * - Fund allocation
+      - checkout / checkin on the rebalancing day
+      - Mode B: the next-period quota write-back (lagging one period behind); mode A: no allocation
+    * - Unmapped parameters
+      - ``sys_use_self_tm`` takes effect
+      - Ignored with ``HKU_WARN``
 
-    .. py:attribute:: real_sys_list The actual system list at runtime
+Migration suggestions:
 
-    .. py:method:: get_param(self, name)
-
-        Get the specified parameter
-        
-        :param str name: the parameter name
-        :return: the parameter value
-        :raises out_of_range: no such parameter
-        
-    .. py:method:: set_param(self, name, value)
-    
-        Set the parameter
-        
-        :param str name: the parameter name
-        :param value: the parameter value
-        :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! The parameter type is not supported  
-
-    .. py:method:: reset(self)
-    
-        The reset operation
-    
-    .. py:method:: clone(self)
-    
-        The clone operation
-
-    .. py:method:: run(self, query[, force=false])
-    
-        Run the portfolio strategy. When the query condition and the components have not changed, the PF will not actually calculate by default when it is executed the second time.
-        However, since the parameters of the components may change, whether a recalculation is needed cannot be judged automatically; you can specify a forced calculation manually.
-
-        :param Query query: the query condition
-        :param bool force: force recalculating        
+- The positional argument calls of ``PF_Simple(...)`` / ``PF_WithoutAF(...)`` **need no modification** (the return type alias can take over).
+- ``pf.run(query)`` **needs no modification**: :meth:`MultiSystem.run` provides the ``query`` compatibility overload,
+  with the market trading calendar (``StockManager.get_trading_calendar``, SH by default) as the driving axis, semantically equivalent to the master ``Portfolio.run(query)``.
+- When a custom driving axis is needed, use the explicit writing:
+  ``ms.set_axis_mode("calendar")`` + ``ms.set_date_axis(...)`` + ``ms.run(kdata)``.
+- The code depending on ``lastSuggestion()`` changes to ``System.to_suggestions()`` (the field structure is different).
+- New projects directly use :class:`MultiSystem` + :class:`AllocateFundsBase`.

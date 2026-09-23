@@ -6,7 +6,20 @@ System Strategy|SYS
 
 A system is the complete strategy for a single trading object, including the environment judgement, the system validity condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used to simulate the backtest.
 
-For multiple objects, a portfolio needs to be used in Hikyuu; see: :ref:`portfolio`.
+For multiple targets (multiple securities), :class:`MultiSystem` can be used to aggregate multiple System instances (single-security or nested :class:`MultiSystem`) into a portfolio, backtested uniformly under the same trade account (TM). :class:`MultiSystem` adds the sub-systems through ``add(subsystem)``, and supports **arbitrary nesting** and circular reference detection; every sub-system keeps its own SG/MM/EV/CN/ST/TP/PG/SP strategy, only the parent system keeps the books and orders uniformly.
+
+:class:`MultiSystem` supports two running modes (``set_mode``):
+
+- **Mode A (signal aggregation, the default)**: the parent gives every sub-system a fixed "shadow account" (the virtual funds are decoupled from the parent), the sub-systems act as pure signal sources; the parent converts the quantities by the weights (the equal weight by default) through MM L1/L2 and orders uniformly.
+- **Mode B (fund allocation / FOF-MOM)**: the parent gives every sub-system a "real account with the quota allocated by the upper layer" (the initial quota ``set_sub_init_cash``), the sub-systems decide autonomously within their own quota, the parent **passes through** their real instructions through MM L2; on the rebalancing day the parent writes back the next-period quota (lagging one period behind, supporting the nested penetration).
+
+The aggregate backtest also supports:
+
+- **MM L1/L2/L3 layering**: L1 system-level allocation (the nominal weight in mode A / the real quota in mode B), L2 behavior-level conversion (conversion by proportion in A / pass-through in B), L3 portfolio risk control (the concentration upper limit ``max-single-position``, 1.0 by default meaning no limit).
+- **Rebalancing cycle** (``set_adjust_cycle``): rebalance on every close day by default; after setting the days greater than 1, the rebalancing happens only on the cycle day.
+- **Trading object selection (SE)** (``set_se``): optional, on the rebalancing day only the selected sub-systems run, the unselected ones can be force liquidated (``set_sell_at_not_selected``).
+- **Turnover rate** (``get_adjust_turnover``): records the ratio of the turnover amount to the total assets before rebalancing on every rebalancing day.
+- **Delisting/suspension**: the parent uniformly force sells the holdings of the delisted instruments at the open stage; the sub-systems automatically skip the suspended days.
 
 Common parameters:
 
@@ -240,17 +253,17 @@ System Base Class Definition
         
         :rtype: TradeRecordList
         
-    .. py:method:: get_buy_trade_request(self)
+    .. py:method:: get_buy_trade_request_list(self)
     
-        Get the buy request; in the "delay" mode, check whether there is a buy operation at the next moment
+        Get the buy request list; in the "delay" mode, check whether there is a buy operation at the next moment
         
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
 
-    .. py:method:: get_sell_trade_request(self)
+    .. py:method:: get_sell_trade_request_list(self)
     
-        Get the sell request; in the "delay" mode, check whether there is a sell operation at the next moment
+        Get the sell request list; in the "delay" mode, check whether there is a sell operation at the next moment
         
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
                 
     .. py:function:: run(self, stock, query[, reset=True])
     
@@ -280,7 +293,7 @@ Trade Request Records
 
 .. py:class:: TradeRequest
 
-    The trade request record. The trade request information registered inside the system when implementing the delayed operations. The main purpose of exposing this structure is to be used in the "delay" mode (the trade is delayed to the open of the next bar); in this case the system actually knows that a trade will happen in the next bar, and :py:meth:`System.getBuyTradeRequest` and :py:meth:`System.getSellTradeRequest` can be used to know whether the next BAR needs to be bought/sold. It is mainly used for reminding or printing the operations needed in the next bar. It has no effect on the running of the system itself.
+    The trade request record. The trade request information registered inside the system when implementing the delayed operations. The main purpose of exposing this structure is to be used in the "delay" mode (the trade is delayed to the open of the next bar); in this case the system actually knows that a trade will happen in the next bar, and :py:meth:`System.getBuyTradeRequestList` and :py:meth:`System.getSellTradeRequestList` can be used to know whether the next BAR needs to be bought/sold. It is mainly used for reminding or printing the operations needed in the next bar. It has no effect on the running of the system itself.
     
     .. py:attribute:: valid 
         

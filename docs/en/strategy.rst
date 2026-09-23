@@ -280,15 +280,6 @@ Common parameters:
     :param cost_func: the cost function
     :param list other_brokers: the other order brokers, defaulting to an empty list
 
-    Way 2: execute the portfolio strategy PF in the strategy runtime
-    
-    Currently only the systems with both buy_delay|sell_delay being false are supported, i.e. trading at the close
-
-    :param Portfolio pf: the portfolio
-    :param Query query: the query condition
-    :param broker: the order broker (dedicated to the order broker synchronizing with the account assets)
-    :param cost_func: the cost function
-    :param list other_brokers: the other order brokers, defaulting to an empty list
 
 
 .. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")
@@ -305,14 +296,64 @@ Common parameters:
     :param str config: the configuration file path, defaulting to empty
 
 
-.. py:function:: crt_pf_strategy(pf, query, broker, cost_func, other_brokers=[], name="PFStrategy", config="")
+.. py:function:: crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, name="MultiSYSStrategy", other_brokers=[], config="")
 
-    Create the portfolio strategy
+    Create the aggregate system strategy (the MultiSystem live trading entry)
     
-    :param pf: the portfolio
+    The parent account uses the ``BrokerTM`` synchronized with the broker, the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally by MultiSystem).
+    Currently only the sub-systems with both buy_delay|sell_delay being false are supported, i.e. the trade is executed at the close.
+    
+    :param MultiSystem ms: the aggregate trading system
+    :param str stk_market_code: the driving instrument (e.g. "SH000001", used to align the time axis, it should cover the trading days of every sub-system)
     :param query: the query condition
-    :param broker: the order broker
+    :param broker: the order broker (the order broker synchronized with the parent account assets)
     :param cost_func: the cost function
+    :param str name: the strategy name, defaulting to "MultiSYSStrategy"
     :param list other_brokers: the other order brokers, defaulting to an empty list
-    :param str name: the strategy name, defaulting to "PFStrategy"
     :param str config: the configuration file path, defaulting to empty
+
+
+Portfolio Strategy Migration Guide (PF -> MultiSystem)
+------------------------------------------------------
+
+Since 2.8.x, the original portfolio backtest components ``Portfolio`` / ``AllocateFunds`` have been removed, :class:`MultiSystem` uniformly takes over the portfolio backtest and the live trading.
+
+**Backtest migration**
+
+.. code-block:: python
+
+    # Old writing (PF + AF, removed)
+    # pf = crtPF(tm, mm, se, af, adjust_cycle=10)
+    # pf.run(query)
+
+    # New writing (MultiSystem)
+    sys1 = SYS_Simple(tm=tm1, sg=sg1, mm=mm1)   # each has its own SG/MM
+    sys2 = SYS_Simple(tm=tm2, sg=sg2, mm=mm2)
+    ms = MultiSystem()          # or MultiSystem(name="Combo")
+    ms.tm = crtTM(init_cash=1000000)
+    ms.set_mode("A")            # the default is fine: A=signal aggregation; B=fund allocation (FOF-MOM)
+    ms.set_adjust_cycle(10)     # the rebalancing cycle (days), 1 by default = rebalance on every close day
+    ms.add(sys1)
+    ms.add(sys2)
+    ms.run(sh000001.get_kdata(Query(-200)))   # drive with the time axis covering the trading days of every sub-system
+
+    # Mode B: the parent allocates the quota to the sub-systems by equal weight, the sub-systems trade autonomously within the quota (L2 pass-through)
+    ms.set_mode("B")
+
+**Live trading migration**
+
+.. code-block:: python
+
+    # Old writing (removed)
+    # stg = crt_pf_strategy(pf, query, broker, cost_func)
+
+    # New writing
+    stg = crt_multi_sys_strategy(ms, "SH000001", query, broker, cost_func)
+    stg.start()
+
+**Notes**
+
+- The sub-systems must each hold independent SG/MM instances (different securities need to calculate their signals respectively, sharing the same SG will overwrite each other).
+- Mode A: the parent allocates and orders uniformly by the weight (the equal weight by default), the sub-systems are pure signal sources; mode B: the parent allocates the real quota, the sub-systems decide autonomously.
+- SE (trading object selection) is optional: after ``ms.set_se(se)`` only the selected sub-systems run on the rebalancing day, the unselected ones can be force liquidated (``ms.set_sell_at_not_selected(True)``).
+- The portfolio risk control (the concentration upper limit) is controlled by the parent MM parameter ``max-single-position`` (1.0 by default meaning no limit).

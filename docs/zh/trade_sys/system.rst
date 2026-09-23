@@ -255,17 +255,17 @@
         
         :rtype: TradeRecordList
         
-    .. py:method:: get_buy_trade_request(self)
+    .. py:method:: get_buy_trade_request_list(self)
     
-        获取买入请求，“delay”模式下查看下一时刻是否存在买入操作
+        获取买入请求列表，“delay”模式下查看下一时刻是否存在买入操作
         
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
 
-    .. py:method:: get_sell_trade_request(self)
+    .. py:method:: get_sell_trade_request_list(self)
     
-        获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作
+        获取卖出请求列表，“delay”模式下查看下一时刻是否存在卖出操作
         
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
                 
     .. py:function:: run(self, stock, query[, reset=True])
     

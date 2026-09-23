@@ -201,12 +201,6 @@
 
         :param ScoresFilter filter: 新的过滤器    
 
-    .. py:method:: is_match_af(self)
-
-        【重载接口】判断是否和 AF 匹配
-
-        :param AllocateFundsBase af: 资产分配算法
-
 
     .. py:method:: get_selected(self, datetime)
     

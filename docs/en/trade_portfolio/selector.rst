@@ -204,12 +204,6 @@ Selector Strategy Base Class
 
         :param ScoresFilter filter: the new filter    
 
-    .. py:method:: is_match_af(self)
-
-        [Overload interface] Judge whether it matches the AF
-
-        :param AllocateFundsBase af: the asset allocation algorithm
-
 
     .. py:method:: get_selected(self, datetime)
     

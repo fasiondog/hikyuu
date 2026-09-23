@@ -428,7 +428,7 @@ The following functions have been set as the plot functions of the corresponding
     Draw the system performance, i.e. the account cumulative return curve. It is usually not called directly, but to view the performance details after the sys, pf calculation is completed.
     E.g.: sys.performance()
 
-    :param SystemBase | PortfolioBase sys: the SYS or PF instance
+    :param SystemBase sys: the SYS instance
     :param Stock ref_stk: the reference stock, defaulting to the CSI 300: sh000300, drawing the return curve of the reference target
     
 
