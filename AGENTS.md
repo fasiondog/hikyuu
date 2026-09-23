@@ -22,7 +22,7 @@ hikyuu/
 ├── hikyuu_cpp/               # The C++ core engine library
 │   ├── hikyuu/               #   ├─ The core code: Stock/KData/Indicator/StockManager...
 │   │   ├── data_driver/      #   ├─ The data driver engine (HDF5/MySQL/SQLite/TDX)
-│   │   ├── trade_sys/        #   ├─ The trading system components (SG/MM/ST/CN/EV/PG/SP/PF/SE/AF/MF)
+│   │   ├── trade_sys/        #   ├─ The trading system parts (SG/MM/ST/CN/EV/PG/SP/PF/SE/AF/MF)
 │   │   ├── trade_manage/     #   ├─ The trade management (TradeManager/OrderBroker)
 │   │   ├── indicator/        #   ├─ The indicator library (including indicator_talib)
 │   │   ├── strategy/         #   ├─ The strategy context
@@ -245,6 +245,7 @@ The core components of the systematic trading framework (independently replaceab
 - **They must be maintained in pairs**: when changing the documentation of either language, synchronize the other tree within the same PR, keeping the file sets / the toctree / the heading levels / the labels / the images / the code blocks consistent.
 - When modifying the public interfaces/adding the components, synchronize the corresponding sections under **both trees** (`indicator/`, `trade_sys/`, `trade_manage/`, `stock_manager.rst`, `factor.md`, etc.).
 - The RTD hosting configuration: `docs/en/.readthedocs.yaml`, `docs/zh/.readthedocs.yaml` (the configuration files are **not** placed at the repository root); the cross-language jumps are provided by the RTD Flyout, and hardcoding the `/en/`, `/zh-cn/` links in the sources is forbidden.
+- **When doing Chinese-English translation (covering the C++/Python comment anglicization, the docstrings, the bilingual docs, the README, etc.), the wording must refer to the glossary `docs/tools/glossary.zh-en.md`**; new terms must be registered in the glossary first (via PR review), and then be used — do not invent synonymous translations.
 
 ## 8. The AI Development Workflow and Caveats
 

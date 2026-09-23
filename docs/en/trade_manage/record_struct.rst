@@ -9,17 +9,17 @@ Trade Business Types
 
 .. py:function:: get_business_name(business)
 
-    :param BUSINESS business: the trade business type
-    :return: the trade business type name ("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
+    :param BUSINESS business: trade business type
+    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "UNKNOWN")
     :rtype: string
 
-.. py:class:: BUSINESS    
-    
-    - BUSINESS.INIT     - Create the initial account
+.. py:class:: BUSINESS
+
+    - BUSINESS.INIT     - Initialize the account
     - BUSINESS.BUY      - Buy
     - BUSINESS.SELL     - Sell
-    - BUSINESS.GIFT     - Bonus shares
-    - BUSINESS.BONUS    - Dividend
+    - BUSINESS.GIFT     - Bonus shares (stock dividend)
+    - BUSINESS.BONUS    - Cash dividend
     - BUSINESS.CHECKIN  - Deposit cash
     - BUSINESS.CHECKOUT - Withdraw cash
     - BUSINESS.INVALID  - Invalid type
@@ -30,58 +30,58 @@ Trade Business Types
 Trade Cost Record
 -----------------
 
-The return result of the trade cost calculation.
+Result returned by a transaction-cost calculation.
 
 .. py:class:: CostRecord
 
-    The trade cost record
+    Transaction cost record.
 
     .. py:attribute:: commission  Commission (float)
-    .. py:attribute:: stamptax    Stamp tax (float)
+    .. py:attribute:: stamptax    Stamp duty (float)
     .. py:attribute:: transferfee Transfer fee (float)
     .. py:attribute:: others      Other fees (float)
-    .. py:attribute:: total       Total cost (float), = commission + stamp tax + transfer fee + other fees
-        
-        
+    .. py:attribute:: total       Total cost (float) = commission + stamp duty + transfer fee + other fees
+
+
 Trade Records
 -------------
 
 .. py:class:: TradeRecordList
 
-    The trade record list, a wrapper of the C++ std::vector<TradeRecord>
-    
+    A list of trade records; a thin wrapper around the C++ std::vector<TradeRecord>.
+
     .. py:method:: to_numpy()
-    
-        Takes effect only when the numpy module is installed; converts to numpy.array
-    
+
+        Available only when NumPy is installed; converts the list to a numpy.array.
+
     .. py:method:: to_pandas()
-    
-        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
+
+        Available only when pandas is installed; converts the list to a pandas.DataFrame.
 
     .. py:method:: to_pyarrow()
 
-        Converts to pyarrow.Table
+        Converts the list to a pyarrow.Table.
 
 .. py:class:: TradeRecord([stock, datetime, business, planPrice, realPrice, goalPrice, number, cost, stoploss, cash, part])
 
-    The trade record
-    
-    .. py:attribute:: stock     Stock (Stock)
-    .. py:attribute:: datetime  Trade time (Datetime)
-    .. py:attribute:: business  Trade type
-    .. py:attribute:: plan_price Planned trade price (float)
-    .. py:attribute:: real_price Actual trade price (float)
-    .. py:attribute:: goal_price Goal price (float); 0 means no goal is set
-    .. py:attribute:: number    Traded number (float)
-    .. py:attribute:: cost      Trade cost
+    A single trade record representing one executed fill.
+
+    .. py:attribute:: stock     Traded instrument (Stock)
+    .. py:attribute:: datetime  Fill timestamp (Datetime)
+    .. py:attribute:: business  Trade business type (see BUSINESS)
+    .. py:attribute:: plan_price Planned price for the order (float)
+    .. py:attribute:: real_price Actual fill price (float)
+    .. py:attribute:: goal_price Target price (float); 0 means no target price is set
+    .. py:attribute:: number    Filled share quantity (float)
+    .. py:attribute:: cost      Transaction costs of the fill
 
         Type: :py:class:`CostRecord`
-        
+
     .. py:attribute:: stoploss Stop-loss price (float)
-    .. py:attribute:: cash     Cash balance (float)
-    .. py:attribute:: part     
-    
-        The source of the trade instruction, distinguishing which part of the trade system issued the instruction; see: :py:class:`System.Part`
+    .. py:attribute:: cash     Cash balance after the fill (float)
+    .. py:attribute:: part
+
+        Identifies the trading-system part that issued the instruction (see the SystemPart enumeration, also exposed as System.Part).
 
 
 
@@ -90,59 +90,59 @@ Position Records
 
 .. py:class:: PositionRecordList
 
-    The position record list, a wrapper of the C++ std::vector<PositionRecord>
-    
+    A list of position records; a thin wrapper around the C++ std::vector<PositionRecord>.
+
     .. py:method:: to_numpy()
-    
-        Takes effect only when the numpy module is installed; converts to numpy.array
-    
+
+        Available only when NumPy is installed; converts the list to a numpy.array.
+
     .. py:method:: to_pandas()
-    
-        Takes effect only when the pandas module is installed; converts to pandas.DataFrame
+
+        Available only when pandas is installed; converts the list to a pandas.DataFrame.
 
     .. py:method:: to_pyarrow()
 
-        Converts to pyarrow.Table
-        
+        Converts the list to a pyarrow.Table.
+
 
 .. py:class:: PositionRecord([stock, take_datetime, clean_datetime, number, stoploss, goal_price, total_number, buy_money, total_cost, total_risk, sell_money])
 
-    The position record
-    
-    .. py:attribute:: stock          Trading object (Stock)
-    .. py:attribute:: take_datetime  The moment of the initial position opening (Datetime)
-    .. py:attribute:: clean_datetime The position closing date; it is constant.null_datetime in the current position record
-    .. py:attribute:: number       The current position number (float)
-    .. py:attribute:: stoploss     The current stop-loss price (float)
-    .. py:attribute:: goal_price   The current goal price (float)
-    .. py:attribute:: total_number The accumulated position number (float)
-    .. py:attribute:: buy_money    The accumulated buy money (float)
-    .. py:attribute:: total_cost   The accumulated total trade cost (float)
-    .. py:attribute:: total_risk   The accumulated trade risk (float) = the sum of (buy price - stop loss) * buy number, excluding the trade cost
-    .. py:attribute:: sell_money   The accumulated sell money (float)
+    Position record.
 
-    
+    .. py:attribute:: stock          Instrument held (Stock)
+    .. py:attribute:: take_datetime  Initial entry time (Datetime)
+    .. py:attribute:: clean_datetime Exit time; equal to constant.null_datetime while the position is still open
+    .. py:attribute:: number         Current position size, in shares/units (float)
+    .. py:attribute:: stoploss       Current stop-loss price (float)
+    .. py:attribute:: goal_price     Current target price (float)
+    .. py:attribute:: total_number   Cumulative acquired share quantity (float)
+    .. py:attribute:: buy_money      Cumulative total buy amount (float)
+    .. py:attribute:: total_cost     Cumulative total transaction cost (float)
+    .. py:attribute:: total_risk     Cumulative risk (float): the sum over all entries of (entry price - stop-loss price) x entry quantity, excluding transaction costs
+    .. py:attribute:: sell_money     Cumulative sale proceeds (float)
+
+
 Funds Records
 -------------
 
-Returned by TradeManager::getFunds.
+Snapshot of the account's current cash, holdings, and borrowings. Returned by :py:meth:`TradeManager.getFunds`.
 
 .. py:class:: FundsRecord([cash, market_value, short_market_value, base_cash, base_asset, borrow_cash, borrow_asset])
 
-    The current funds record, returned by :py:meth:`TradeManager.getFunds`
-    
-    .. py:attribute:: cash               The current cash (float)
-    .. py:attribute:: market_value       The current long market value (float)
-    .. py:attribute:: short_market_value The current short position market value (float)
-    .. py:attribute:: base_cash          The current invested principal (float)
-    .. py:attribute:: base_asset         The current invested asset value (float)
-    .. py:attribute:: borrow_cash        The currently borrowed money (float), i.e. the debt
-    .. py:attribute:: borrow_asset       The current borrowed securities asset value (float)
+    Current funds record, returned by :py:meth:`TradeManager.getFunds`.
 
-    Read-only attributes, the results calculated automatically from the attributes above:
+    .. py:attribute:: cash               Current cash balance (float)
+    .. py:attribute:: market_value       Current market value of long positions (float)
+    .. py:attribute:: short_market_value Current market value of short positions (float)
+    .. py:attribute:: base_cash          Cumulative cash principal invested (float)
+    .. py:attribute:: base_asset         Current value of assets contributed in kind (float)
+    .. py:attribute:: borrow_cash        Cash borrowed (margin loan), i.e. outstanding debt (float)
+    .. py:attribute:: borrow_asset       Market value of borrowed securities (float)
 
-    .. py:attribute:: total_assets  Total assets
-    .. py:attribute:: net_assets  Net assets
-    .. py:attribute:: total_borrow  Total debt
-    .. py:attribute:: total_base  The invested principal (capital)
-    .. py:attribute:: profit  The profit
+    Read-only attributes, computed automatically from the attributes above:
+
+    .. py:attribute:: total_assets  Total assets (float)
+    .. py:attribute:: net_assets  Net assets (float)
+    .. py:attribute:: total_borrow  Total borrowings (total debt) (float)
+    .. py:attribute:: total_base  Total invested capital (float)
+    .. py:attribute:: profit  Cumulative profit (float)

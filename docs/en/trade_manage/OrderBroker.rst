@@ -6,7 +6,7 @@ Order Broker
 
 Multiple order broker instances can be registered to the TradeManager through :py:meth:`TradeManager.regBroker`. These order brokers can perform the additional buy/sell actions; e.g. the mail order broker can send an email when the TradeManager issues the buy/sell instructions.
 
-By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal indicator, the TradeManager will execute the buy/sell operations at the historical moments; **at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions**. Therefore, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be executed. The TradeManager attribute :py:attr:`TradeManager.brokeLastDatetime` is used to specify that moment.
+By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal generator, the TradeManager will execute the buy/sell operations at the historical moments; **at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions**. Therefore, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be executed. The TradeManager attribute :py:attr:`TradeManager.brokeLastDatetime` is used to specify that moment.
 
 
 The Order Broker Wrapper in Python
@@ -25,7 +25,7 @@ Since implementing a custom order broker by inheriting from :py:class:`OrderBrok
     # Modify the last timestamp of the order broker as needed; only when it is greater than this timestamp will the order broker actually issue the order instructions
     my_tm.broke_last_datetime=Datetime(201706010000)
 
-    # Create the signal indicator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
+    # Create the signal generator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
     my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 
     # Fixedly buy 1000 shares each time
@@ -84,7 +84,7 @@ Built-in Order Broker Classes
     
 .. py:class:: TestOrderBroker
 
-    Used for testing; prints when executing the buy/sell operations, e.g.: "买入：000001 10.0 1000"
+    Used for testing; prints when executing the buy/sell operations, e.g.: "Buy: SH000001, price: 10.0, number: 1000, ..."
 
 .. py:class:: MailOrderBroker
 
@@ -106,8 +106,8 @@ Built-in Order Broker Classes
     
         Execute the buy operation and send an email to the specified mailbox, in the following format:
         
-            The email title: 【Hkyuu提醒】买入 证券代码
-            The email content: 买入：证券代码，价格：买入的价格，数量：买入数量
+            The email title: [Hkyuu Notice] Buy <stock code>
+            The email content: Buy: <stock code>, price: <buy price>, number: <buy quantity>
         
         :param str market: the security market
         :param str code: the security code
@@ -122,8 +122,8 @@ Built-in Order Broker Classes
     
         Execute the sell operation and send an email to the specified mailbox, in the following format:
         
-            The email title: 【Hkyuu提醒】卖出 证券代码
-            The email content: 卖出：证券代码，价格：卖出的价格，数量：卖出数量
+            The email title: [Hkyuu Notice] Sell <stock code>
+            The email content: Sell: <stock code>, price: <sell price>, number: <sell quantity>
     
         :param str market: the security market
         :param str code: the security code
@@ -188,7 +188,7 @@ The custom order broker interfaces:
 
     .. py:method:: _buy(self, market, code, price, num, stoploss, goal_price, part_from)
 
-        [Overload interface] Execute the actual buy operation
+        [Override hook] Execute the actual buy operation
     
         :param str code: the security code
         :param float price: the buy price
@@ -199,7 +199,7 @@ The custom order broker interfaces:
         
     .. py:method:: _sell(self, market, code, price, num, stoploss, goal_price, part_from)
     
-        [Overload interface] Execute the actual sell operation
+        [Override hook] Execute the actual sell operation
     
         :param str market: the security market    
         :param str code: the security code

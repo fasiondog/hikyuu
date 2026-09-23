@@ -19,8 +19,8 @@
 * :py:func:`ISNA` - 判断是否为 nan 值
 * :py:func:`ISINF` - 判断是否为 +inf 值
 * :py:func:`ISINFA` - 判断是否为 -inf 值
-* :py:func:`JUMPDOWN` - 边缘跳变，从小于等于0.0，跳变到 > 0.0
-* :py:func:`JUMPUP` - 边缘跳变，从大于0.0，跳变到 <= 0.0
+* :py:func:`JUMPDOWN` - 边缘跳变，从大于 0.0，跳变到 <= 0.0（下降沿）
+* :py:func:`JUMPUP` - 边缘跳变，从小于等于 0.0，跳变到 > 0.0（上升沿）
 * :py:func:`LASTVALUE` - 等同于通达信 CONST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
 * :py:func:`NAMELIKE` - 证券名称模式匹配
 * :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE

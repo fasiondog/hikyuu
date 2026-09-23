@@ -7,80 +7,80 @@ Indicator
 
 .. py:class:: Indicator(name)
 
-    The Indicator definition
+    Definition of the Indicator base class.
 
     .. py:attribute:: name Name
 
     .. py:attribute:: long_name Name
 
-    .. py:attribute:: discard The number of the points to discard
+    .. py:attribute:: discard Number of points to discard (warm-up length)
 
     .. py:method:: have_param(self, name)
 
-        Whether the specified parameter exists
+        Check whether the specified parameter exists
 
-        :param str name: the parameter name
+        :param str name: parameter name
 
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
+        Get the value of the specified parameter
     
-        :param str name: the parameter name
-        :return: the parameter value
-        :raises out_of_range: no such parameter
+        :param str name: parameter name
+        :return: parameter value
+        :raises out_of_range: raised if no such parameter exists
         
     .. py:method:: set_param(self, name, value)
     
-        Set the parameter
+        Set the value of a parameter
         
-        :param str name: the parameter name
-        :param value: the parameter value
+        :param str name: parameter name
+        :param value: parameter value
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! The parameter type is not supported
 
     .. py:method:: support_ind_param(self)
 
-        Whether the dynamic indicator parameters are supported
+        Check whether dynamic indicator parameters are supported
 
     .. py:method:: have_ind_param(self, name)
 
-        Whether the specified parameter exists
+        Check whether the specified dynamic indicator parameter exists
 
-        :param str name: the parameter name
+        :param str name: parameter name
 
     .. py:method:: get_ind_param(self, name)
 
         Get the specified dynamic indicator parameter
 
-        :param str name: the parameter name
+        :param str name: parameter name
         :rtype: IndParam
 
-    .. py::method:: set_ind_param(self, name, val)
+    .. py:method:: set_ind_param(self, name, val)
 
-        Set the dynamic indicator parameter
+        Set a dynamic indicator parameter
 
-        :param str name: the parameter name
-        :param Indicator|IndParam: the parameter value (can be an Indicator or an IndParam instance)    
+        :param str name: parameter name
+        :param Indicator|IndParam: parameter value (an Indicator or IndParam instance)    
 
     .. py:method:: clone(self)
     
-        The clone operation
+        Return a clone of this indicator
 
     .. py:method:: empty(self)
 
-        Whether it is empty
+        Check whether the indicator is empty
 
         :rtype: bool
 
     .. py:method:: formula(self)
 
-        Print the indicator formula
+        Return the formula expression of the indicator
 
         :rtype: str
 
     .. py:method:: get_result_num(self)
 
-        Get the number of the result sets
+        Get the number of result sets
 
         :rtype: int
 
@@ -88,53 +88,53 @@ Indicator
 
         Get the value at the specified position
 
-        :param int pos: the specified position index
-        :param int result_index: the specified result set
+        :param int pos: position index
+        :param int result_index: index of the result set
 
-    .. py::method:: get_pos(self, date):
+    .. py:method:: get_pos(self, date)
 
         Get the index position corresponding to the specified date
 
-        :param Datetime date: the specified date
+        :param Datetime date: specified date
         :rtype: int
 
     .. py:method:: get_datetime(self, pos)
 
         Get the date at the specified position
 
-        :param int pos: the specified position index
+        :param int pos: position index
 
     .. py:method:: get_by_datetime(self, datetime[, result_index=0])
 
-        Get the value of the specified date. If there is no result for the corresponding date, return constant.null_price
+        Get the value at the specified date. If there is no result for that date, return constant.null_price
 
-        :param Datetime datetime: the specified date
-        :param int result_index: the specified result set
+        :param Datetime datetime: specified date
+        :param int result_index: index of the result set
         :rtype: float
 
     .. py:method:: get_result(self, result_index)
 
         Get the specified result set
 
-        :param int result_index: the specified result set
+        :param int result_index: index of the result set
         :rtype: Indicator
 
     .. py:method:: get_result_as_price_list(self, result_index)
 
-        Get the specified result set
+        Get the specified result set as a list
 
-        :param int result_index: the specified result set
+        :param int result_index: index of the result set
         :rtype: list
 
     .. py:method:: get_datetime_list(self)
 
-        Return the corresponding date list
+        Return the list of corresponding dates
 
         :rtype: DatetimeList
 
     .. py:method:: get_context(self)
 
-        Get the context
+        Get the bound context
 
         :rtype: KData
 
@@ -142,53 +142,53 @@ Indicator
 
         Set the context
 
-        :param KData kdata: the associated context K-line
+        :param KData kdata: context K-line (candlestick) to bind
 
         set_context(self, stock, query)
 
         Set the context
 
-        :param Stock stock: the specified Stock
-        :param Query query: the specified query condition
+        :param Stock stock: specified Stock
+        :param Query query: query criteria
 
     .. py:method:: extend(self)
 
-        When there is a context, automatically extend the context to the current latest data and perform the incremental calculation.
+        When a context is bound, automatically extend the context to the latest available data and perform an incremental calculation.
 
-        In the incremental calculation, it is equivalent to keeping the start of the current query unchanged and extending backward to the new end point. This feature is sensitive to the initial values for some recursive indicators, such as AMA, so there may be some differences.
+        During the incremental calculation, the start of the current query is kept fixed and the query is extended backward to the new end point. Some recursive indicators are sensitive to their initial values (such as AMA), so the result may differ slightly.
 
-        Main usage: quickly get the latest data to calculate in live trading
+        Main use case: quickly pulling the latest data for calculation in live trading.
 
     .. py:method:: to_array(self, result_index=0)
 
-        Convert the specified result set to numpy.array
+        Convert the specified result set to a numpy.array
 
     .. py:method:: to_numpy(self)
 
-        Convert to a numpy array; if it is a time series, the datetime column will be included
+        Convert to a numpy array; for a time series, the datetime column is included
 
         :rtype: numpy.ndarray
 
     .. py:method:: value_to_numpy(self)
 
-        Convert to a numpy array, containing only the value
+        Convert to a numpy array containing only the values
 
     .. py:method:: to_pandas(self)
 
-        Convert to a pandas DataFrame; if it is a time series, the datetime column will be included
+        Convert to a pandas DataFrame; for a time series, the datetime column is included
 
     .. py:method:: value_to_pandas(self)
 
-        Convert to a pandas DataFrame, containing only the value
+        Convert to a pandas DataFrame containing only the values
 
     .. py:method:: to_pyarrow(self)
 
-        Convert to a pyarrow Table; if it is a time series, the datetime column will be included
+        Convert to a pyarrow Table; for a time series, the datetime column is included
 
         :rtype: pyarrow.Table
 
     .. py:method:: value_to_pyarrow(self)
 
-        Convert to a pyarrow Table, containing only the value
+        Convert to a pyarrow Table containing only the values
 
         :rtype: pyarrow.Table

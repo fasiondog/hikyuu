@@ -60,9 +60,9 @@
 
 自定义止损/止赢策略接口：
 
-* :py:meth:`SignalBase._calculate` - 【必须】子类计算接口
-* :py:meth:`SignalBase._clone` - 【必须】克隆接口
-* :py:meth:`SignalBase._reset` - 【可选】重载私有变量
+* :py:meth:`StoplossBase._calculate` - 【必须】子类计算接口
+* :py:meth:`StoplossBase._clone` - 【必须】克隆接口
+* :py:meth:`StoplossBase._reset` - 【可选】重载私有变量
 
 止损/止赢策略基类
 -----------------

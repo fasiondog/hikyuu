@@ -19,7 +19,7 @@ Hikyuu Quant Framework 是一款基于 C++/Python 开发的开源超高速量化
 
 👉 **帮助文档：** `https://hikyuu.readthedocs.io/zh-cn/latest/index.html <https://hikyuu.readthedocs.io/zh-cn/latest/index.html>`_
 
-👉 **入门示例:** `https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True <https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
+👉 **入门示例:** `https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True <https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True>`_
 
 👉 **策略部件库：** `https://gitee.com/fasiondog/hikyuu_hub <https://gitee.com/fasiondog/hikyuu_hub>`_
 
@@ -45,7 +45,7 @@ Hikyuu Quant Framework 是一款基于 C++/Python 开发的开源超高速量化
 .. figure:: _static/10000-overview.png
         :width: 600px
 
-完整示例参见：`入门示例 Notebook <https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
+完整示例参见：`入门示例 Notebook <https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True>`_
 
 
 🔥 为什么选择 Hikyuu？

@@ -2,9 +2,9 @@
 
 .. note::
 
-    To compile the code smoothly, do not compile with the source package downloaded directly from GitHub. The reason is that some files' line endings are replaced with Linux-style line endings when uploading to git, which will cause some of the directly downloaded code to fail to compile smoothly on Windows.
+    For a successful build, do not compile from a source package downloaded directly from GitHub: when files are uploaded to git, some line endings are converted to Linux-style line endings, so parts of a directly downloaded source package may fail to compile on Windows.
 
-For the C++ API reference, generate the Doxygen documentation with the following command:
+To build the C++ API reference, generate the Doxygen documentation with the following command:
 
 .. code-block:: shell
 
@@ -13,22 +13,22 @@ For the C++ API reference, generate the Doxygen documentation with the following
 .. _developer:
 
 
-Preparation Before Compiling
-----------------------------
+Build Prerequisites
+-------------------
 
 1. Install a C++ compiler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The code is gradually migrating to c++20; compiling requires support for the c++20 language features.
+The codebase is gradually migrating to C++20, so a compiler that supports the C++20 language features is required.
 
-- Windows platform: Visual C++ 2022
-- Linux platform: g++ >= 13, clang >= 15
+- Windows: Visual C++ 2022
+- Linux: g++ >= 13, clang >= 15
 
 
-2. Install the build tool xmake
+2. Install the xmake build tool
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-xmake >= 2.8.2, website: `<https://github.com/xmake-io/xmake>`_
+xmake >= 2.8.2. Website: `<https://github.com/xmake-io/xmake>`_
 
 See: `<https://xmake.io/#/zh-cn/guide/installation>`_
 
@@ -36,7 +36,7 @@ See: `<https://xmake.io/#/zh-cn/guide/installation>`_
 3. Clone the Hikyuu source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Execute the following command to clone the hikyuu source code: (do not clone the code in a directory with Chinese characters in the path)
+Run the following command to clone the Hikyuu source code (do not clone into a directory whose path contains Chinese characters):
 
 .. code-block:: shell
 
@@ -44,100 +44,100 @@ Execute the following command to clone the hikyuu source code: (do not clone the
 
 .. note::
 
-    **Donating users who need to use the plugin, please install the hikyuu_plugin package: pip install hikyuu_plugin**
+    **Donor users who need the plugin should install the hikyuu_plugin package: pip install hikyuu_plugin**
 
-    If the latest code crashes when using the plugin, it is recommended to checkout the release branch or the corresponding version branch to compile.
+    If the plugin crashes when used with the latest code, check out the release branch or the corresponding version branch and build from that.
 
 
 4. Install the dependency packages on Linux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On Linux, the dependent development packages need to be installed. For example on Ubuntu, execute the following command:
+On Linux, the required development packages must be installed. On Ubuntu, for example, run:
 
 .. code-block:: shell
     
     sudo apt-get install -y libsqlite3-dev   
 
 
-6. Install the xcode command line tools on Macosx
+5. Install the Xcode command-line tools on macOS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Please install xcode and its command line tools before compiling.
+Install Xcode and its command-line tools before building.
     
 
-Compiling and Installing
-------------------------
+Building and Installing
+-----------------------
 
-1. Install the python dependency packages
+1. Install the Python dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
-    pip install -r requirements.txt  or pip install -r requirements.txt -U  (upgrade the dependency packages periodically)
+    pip install -r requirements.txt  or pip install -r requirements.txt -U  (upgrade the dependencies periodically)
 
 
-2. Compile
+2. Build
 ^^^^^^^^^^
 
 .. note::
 
-    **Note**: if it has not been compiled for a long time, before recompiling after updating the code, please execute python setup.py clear first to completely clear the previous compilation cache. And update the python dependencies, pip install -r requirements.txt
+    **Note**: if you have not built for a while, run python setup.py clear before rebuilding after updating the code, so that the previous build cache is fully cleared. Also update the Python dependencies: pip install -r requirements.txt
 
 
-Enter the source code directory and execute python setup.py build -j 10; the other supported commands:
+From the source directory, run python setup.py build -j 10. Other supported commands:
 
-- python setup.py help        -- view the help
-- python setup.py build       -- perform the compilation
-- python setup.py install     -- compile and install (install to the site-packages directory of python)
+- python setup.py help        -- show the help
+- python setup.py build       -- run the build
+- python setup.py install     -- build and install (into Python's site-packages directory)
 - python setup.py uninstall   -- remove the installed Hikyuu
-- python setup.py test        -- run the unit tests (with the optional argument --compile=1, compile first)
-- python setup.py clear       -- clear the local compilation results
-- python setup.py wheel       -- generate the wheel package
+- python setup.py test        -- run the unit tests (optionally pass --compile=1 to build first)
+- python setup.py clear       -- clear the local build artifacts
+- python setup.py wheel       -- generate a wheel package
 
 
-For the parameters of each command, you can execute python setup.py commond --help, e.g.: python setup.py build --help
+For the options of each command, run python setup.py <command> --help, for example: python setup.py build --help
 
 
 
 3. Set the PYTHONPATH environment variable
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On Linux, e.g. modify the ~/.bashrc file and add the following at the end (pointing to the source code directory):
+On Linux, for example, add the following line to the end of ~/.bashrc (pointing to the source directory):
 
 .. code-block:: shell
 
     export PYTHONPATH=/path/to/hikyuu:$PYTHONPATH
 
 
-4. Convert to a Visual Studio project on Windows
+4. Generate a Visual Studio project on Windows
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Please compile once directly with python setup.py build first, then convert.
+Run a complete build with python setup.py build first, and generate the project only afterwards.
 
-On Windows, for those used to debugging with msvc, you can use the xmake project -k vsxmake -m "debug,release" command to generate the VS project. After executing the command, a subdirectory such as vsxmake2022 will be generated in the current directory, and the VS project is inside it.
+On Windows, if you prefer to debug with MSVC, run xmake project -k vsxmake -m "debug,release" to generate a Visual Studio project. After the command finishes, a subdirectory such as vsxmake2022 is created in the current directory, and the Visual Studio project is inside it.
 
-In VS, you can set the demo as the startup project for debugging.
+In Visual Studio, you can set the demo as the startup project for debugging.
 
 
-5. The IDE cannot provide hints properly
+5. IDE code hints do not work
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Install pybind11-stubgen with the command pip install pybind11-stubgen
-2. Run the pybind11-stubgen hikyuu -o . command, and then the hints and the help information will work properly.
+1. Install pybind11-stubgen with pip install pybind11-stubgen
+2. Run pybind11-stubgen hikyuu -o .; code hints and help information will then work correctly.
 
 
 6. Using the plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For those who compile by themselves and want to use the hikyuu plugin, please install the standalone plugin package pip install hikyuu-plugin
+If you build from source and want to use the Hikyuu plugin, install the standalone plugin package: pip install hikyuu-plugin
 
-But note that the plugin version needs to match; it is best to compile with the release branch (or tag) to avoid the version mismatch making it unusable.
+Note that the plugin version must match your build: it is best to build from the release branch (or a release tag), so that a version mismatch does not render the plugin unusable.
 
 
 Docker Build
 ------------
 
-In the docker directory of the source code, the Dockerfile_dev files based on Ubuntu/Debain/Fedora are provided, which can be used to quickly build the Hikyuu compilation environment.
+The docker directory in the source tree contains Dockerfile_dev files based on Ubuntu, Debian and Fedora, which can be used to quickly set up a Hikyuu build environment.
 
 .. code-block:: shell
 
@@ -146,10 +146,10 @@ In the docker directory of the source code, the Dockerfile_dev files based on Ub
 
     docker run -it hikyuu_dev /bin/bash
 
-Enter the hikyuu directory; the rest is the same as the source code compilation steps.
+Enter the hikyuu directory; the remaining steps are the same as the source build instructions above.
 
-You can also use the dockerfile that installs Hikyuu based on pip, see /docker/Dockerfile_miniconda .
+There is also a Dockerfile that installs Hikyuu via pip; see /docker/Dockerfile_miniconda .
 
-Hikyuu needs to import the data before using it; the Docker image does not include the GUI, and you can directly execute the python hikyuu/gui/importdata.py command to import the data.
+Hikyuu requires data to be imported before use. The Docker image does not include the GUI; run python hikyuu/gui/importdata.py directly to import the data.
 
-The hikyuu configuration file is in the /root/.hikyuu directory, and the data files (HDF5) are stored in the /root/stocks directory; you can specify the mounted directories yourself when creating the docker container.
+The Hikyuu configuration file is located in /root/.hikyuu, and the data files (HDF5) are stored in /root/stocks; you can specify your own mount directories when creating the Docker container.

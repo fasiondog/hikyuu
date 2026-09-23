@@ -172,7 +172,7 @@ Every K-line query of the client chooses the path according to the following pri
 
     The ``[preload]`` configuration of the client process itself is automatically ignored (all set to ``False``).
 
-    The recovery processing is always done locally on the client; what the server transmits is the original data without recovery.
+    The adjustment processing is always done locally on the client; what the server transmits is the original data without adjustment.
 
 Block Reading and Writing in the Client Mode
 --------------------------------------------
@@ -205,7 +205,7 @@ local driver fallback write (the write does not apply the "three-layer fallback"
     block library, without the above propagation boundary.
 
 FAQ
----
+----
 
 **Will the data be inconsistent among the multiple processes?**
 

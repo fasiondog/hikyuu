@@ -408,7 +408,7 @@ StockManager/Block/Stock
         :param float tick_value: 最小跳动量价值，默认0.01
         :param int precision: 价格精度，默认2
         :param int min_trade_num: 单笔最小交易量，默认1
-        :param int min_trade_num: 单笔最大交易量，默认1000000
+        :param int max_trade_num: 单笔最大交易量，默认1000000
         :return: 加入的Stock
         :rtype: Stock
 
@@ -657,7 +657,7 @@ StockManager/Block/Stock
         构建一个新的板块实例，并指定其板块分类及板块名称
     
         :param str category: 板块分类
-        :param srt name: 板块名称
+        :param str name: 板块名称
 
     .. py:method:: __init__(self, block):
     

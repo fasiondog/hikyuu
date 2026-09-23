@@ -42,14 +42,14 @@ The latest code examples are available at the address below. They walk you throu
 Hikyuu and the ideas behind systematic trading step by step. While working with Hikyuu you can look
 up the built-in indicators, strategies and functions in this documentation for more detail.
 
-`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_ 
+`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True>`_ 
 
 All the examples above are written and run with Jupyter Notebook. You can download each example from
 the top-right corner of its page and open it directly in Jupyter Notebook.
 
 .. figure:: _static/quickstart_download.png
 
-Or find all examples under ``examples/notebook`` in the installation directory.
+Or find all examples under ``examples/notebook/en`` in the installation directory.
 
 
 .. figure:: _static/quickstart_examples.png

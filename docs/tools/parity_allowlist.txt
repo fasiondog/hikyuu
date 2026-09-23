@@ -1,0 +1,11 @@
+# 结构一致性校验白名单（语言专属页 / 单边文件 / 单边 notebook）
+#
+# 用途：check_docs_parity.py 与 check_notebook_parity.py 据此排除"允许单边存在"的路径。
+# 格式：每行一个相对路径（相对于 docs/en 与 docs/zh 两棵树，或相对于 notebook/en 与 notebook/zh）。
+# 规则：只增不减需评审（维护规范 §3.3 / §4.2），防止把"漏改"伪装成"语言专属页"。
+#
+# 目前：无语言专属页，两棵树严格对等。
+
+# --- 有意差异（非语言专属页，历史 release notes 仅中文） ---
+release.md             # en 侧为占位（英文 release notes 从下一版本开始），zh 侧为完整历史；见 git commit 88ea46b07
+release_history.rst    # 历史版本发布说明仅保留中文，不翻译；见 git commit 99e2e8681

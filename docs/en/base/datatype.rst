@@ -442,7 +442,7 @@ K-line Data
 
     .. py:method:: get_kdata()
 
-        Get a new KData that keeps the data type and the recovery type unchanged through the current KData (note that it is not a subset of the original KData)
+        Get a new KData that keeps the data type and the adjustment type unchanged through the current KData (note that it is not a subset of the original KData)
 
         :param Datetime start: the new start date
         :param Datetime end: the new end date

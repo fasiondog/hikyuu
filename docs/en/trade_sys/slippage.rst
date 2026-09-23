@@ -9,64 +9,64 @@ Built-in Slippage Algorithms
 
 .. py:function:: SP_FixedPercent([p=0.001])
 
-    The fixed percentage slippage algorithm; the actual buy price = the planned buy price * (1 + p), the actual sell price = the planned sell price * (1 - p)
-    
-    :param float p: the fixed percentage of the offset
+    Fixed-percentage slippage: the actual buy price equals the planned buy price multiplied by (1 + p), and the actual sell price equals the planned sell price multiplied by (1 - p).
+
+    :param float p: the fixed percentage offset
     :return: the slippage algorithm instance
 
 
 .. py:function:: SP_FixedValuet([p=0.001])
 
-    The fixed price slippage algorithm; the actual buy price = the planned buy price + the offset price, the actual sell price = the planned sell price - the offset price
-    
-    :param float p: the offset price
+    Fixed absolute-price slippage: the actual buy price equals the planned buy price plus the offset, and the actual sell price equals the planned sell price minus the offset.
+
+    :param float p: the absolute price offset
     :return: the slippage algorithm instance
 
 .. py:function:: SP_Uniform([min_value=-0.05, max_value=0.05])
 
-    The uniformly distributed random price slippage algorithm; for the buy and sell operations the price is a uniformly distributed random offset in the range [min_value, max_value]
-    
-    :param float min_value: the minimum offset price
-    :param float max_value: the maximum offset price
+    Random slippage with a uniform distribution: for both buys and sells, the price offset is drawn uniformly from the interval [min_value, max_value].
+
+    :param float min_value: the minimum price offset
+    :param float max_value: the maximum price offset
     :return: the slippage algorithm instance
 
 .. py:function:: SP_Normal([mean=0.0, stddev=0.05])
 
-    The normally distributed random price slippage algorithm; for the buy and sell operations the price is a random offset in the normal distribution range [mean, stddev]
-    
+    Random slippage with a normal distribution: for both buys and sells, the price offset is drawn from N(mean, stddev^2), i.e. a normal distribution with the given mean and standard deviation.
+
     :param float mean: the mean of the normal distribution
     :param float stddev: the standard deviation of the normal distribution
     :return: the slippage algorithm instance
 
 .. py:function:: SP_LogNormal([mean=0.0, stddev=0.05])
 
-    The log-normal distributed random price slippage algorithm; for the buy and sell operations the price is a random offset in the log-normal distribution range [mean, stddev]
+    Random slippage with a log-normal distribution: for both buys and sells, the price offset is drawn from a log-normal distribution parameterized by the given mean and standard deviation.
 
     :param float mean: the mean of the log-normal distribution
     :param float stddev: the standard deviation of the log-normal distribution
     :return: the slippage algorithm instance
 
 .. py:function:: SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
-         
-    The truncated normal distributed random price slippage algorithm; for the buy and sell operations the price is a random offset in the truncated normal distribution range [mean, stddev, min_value, max_value]
-    
-    :param float mean: the mean of the truncated normal distribution
-    :param float stddev: the standard deviation of the truncated normal distribution
-    :param float min_value: the minimum truncation value
-    :param float max_value: the maximum truncation value
+
+    Random slippage with a truncated normal distribution: for both buys and sells, the price offset is drawn from N(mean, stddev^2) truncated to the interval [min_value, max_value].
+
+    :param float mean: the mean of the underlying normal distribution
+    :param float stddev: the standard deviation of the underlying normal distribution
+    :param float min_value: the lower truncation bound
+    :param float max_value: the upper truncation bound
     :return: the slippage algorithm instance
-    
+
 
 Custom Slippage Algorithm
 -------------------------
 
-The custom slippage interface:
+A custom slippage algorithm implements the following interface:
 
-* :py:meth:`SlippageBase.get_real_buy_price` - [Required] Calculate the actual buy price
-* :py:meth:`SlippageBase.get_real_sell_price` - [Required] Calculate the actual sell price
-* :py:meth:`SlippageBase._calculate` - [Required] The subclass calculation interface
-* :py:meth:`SlippageBase._clone` - [Required] The clone interface
-* :py:meth:`SlippageBase._reset` - [Optional] Reload the private variables
+* :py:meth:`SlippageBase.get_real_buy_price` - [Required] Compute the actual buy price
+* :py:meth:`SlippageBase.get_real_sell_price` - [Required] Compute the actual sell price
+* :py:meth:`SlippageBase._calculate` - [Required] Subclass calculation hook
+* :py:meth:`SlippageBase._clone` - [Required] Subclass clone hook
+* :py:meth:`SlippageBase._reset` - [Optional] Reset internal member variables
 
 
 Slippage Algorithm Base Class
@@ -74,67 +74,67 @@ Slippage Algorithm Base Class
 
 .. py:class:: SlippageBase
 
-    The slippage algorithm base class
-    
+    Base class for slippage algorithms.
+
     .. py:attribute:: name Name
-    
+
     .. py:method:: __init__(self[, name="SlippageBase"])
-    
-        The initialization constructor
-        
+
+        Constructor.
+
         :param str name: the name
-        
+
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
-    
+        Get the value of the specified parameter.
+
         :param str name: the parameter name
         :return: the parameter value
-        :raises out_of_range: no such parameter
-        
+        :raises out_of_range: raised if no such parameter exists
+
     .. py:method:: set_param(self, name, value)
-    
-        Set the parameter
-        
+
+        Set the value of a parameter.
+
         :param str name: the parameter name
         :param value: the parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! The parameter type is not supported
-        
+        :raises logic_error: Unsupported type! Raised when the parameter type is not supported
+
     .. py:method:: get_real_buy_price(self, datetime, price)
 
-        [Overload interface] Calculate the actual buy price
-        
-        :param Datetime datetime: the buy time
+        [Override hook] Compute the actual buy price.
+
+        :param Datetime datetime: the buy timestamp
         :param float price: the planned buy price
         :return: the actual buy price
         :rtype: float
-        
+
     .. py:method:: get_real_sell_price(self, datetime, price)
 
-        [Overload interface] Calculate the actual sell price
-        
-        :param Datetime datetime: the sell time
+        [Override hook] Compute the actual sell price.
+
+        :param Datetime datetime: the sell timestamp
         :param float price: the planned sell price
         :return: the actual sell price
-        :rtype: float        
+        :rtype: float
 
     .. py:method:: reset(self)
-    
-        The reset operation
-    
+
+        Reset the part to its initial state.
+
     .. py:method:: clone(self)
-    
-        The clone operation        
-        
+
+        Create and return a copy of this instance.
+
     .. py:method:: _calculate(self)
-    
-        [Overload interface] The subclass calculation interface
-    
+
+        [Override hook] Subclass calculation hook.
+
     .. py:method:: _reset(self)
-    
-        [Overload interface] The subclass reset interface, resetting the internal private variables
-    
+
+        [Override hook] Subclass reset hook, used to reset internal private state.
+
     .. py:method:: _clone(self)
-    
-        [Overload interface] The subclass clone interface
+
+        [Override hook] Subclass clone hook.

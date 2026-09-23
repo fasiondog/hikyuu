@@ -1,50 +1,50 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-Environment Judgement Strategy|EV
+Market Environment Strategy|EV
 =================================
 
-Built-in Environment Judgement Strategies
+Built-in Market Environment Strategies
 -----------------------------------------
 
 .. py:function:: EV_TwoLine(fast, slow[, market = 'SH'])
 
-    The fast/slow line judgement strategy; when the fast line of the market index is above the slow line, the market is valid, otherwise invalid.
+    Fast/slow-line strategy: the market is valid when the market index's fast line is above its slow line, and invalid otherwise.
 
-    :param Indicator fast: the fast line indicator
-    :param Indicator slow: the slow line indicator
+    :param Indicator fast: the fast-line indicator
+    :param Indicator slow: the slow-line indicator
     :param string market: the market name
 
 .. py:function:: EV_Bool(ind[, market = 'SH'])
 
-    The boolean signal indicator market environment
+    A market environment condition driven by a boolean indicator: the market is valid where the indicator's value is greater than 0, and invalid elsewhere.
 
-    :param Indicator ind: a bool-type indicator; a position greater than 0 in the indicator means the market is valid, otherwise invalid
-    :param str market: the specified market, used to get the corresponding trading calendar
+    :param Indicator ind: a boolean indicator; values greater than 0 mark the market as valid, all other values mark it as invalid
+    :param str market: the market whose trading calendar is used
 
 
-Custom Environment Judgement Strategy
+Custom Market Environment Strategy
 -------------------------------------
 
-The custom environment judgement strategy interface:
+The custom market environment strategy interface:
 
 * :py:meth:`EnvironmentBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`EnvironmentBase._clone` - [Required] The clone interface
-* :py:meth:`EnvironmentBase._reset` - [Optional] Reload the private variables
+* :py:meth:`EnvironmentBase._reset` - [Optional] Reset the internal member variables
 
-Environment Judgement Strategy Base Class
+Market Environment Strategy Base Class
 -----------------------------------------
 
 .. py:class:: EnvironmentBase
 
-    The environment judgement strategy base class
+    Base class for market environment strategies
     
-    .. py:attribute:: name Name
-    .. py:attribute:: query Set or get the query condition
+    .. py:attribute:: name The strategy name
+    .. py:attribute:: query Set or get the query conditions
     
     .. py:method:: __init__(self[, name='EnvironmentBase'])
     
-        The initialization constructor
+        Constructor
         
         :param str name: the name
         
@@ -67,14 +67,14 @@ Environment Judgement Strategy Base Class
         
     .. py:method:: is_valid(self, datetime)
     
-        Whether the system is valid at the specified time
+        Whether the market is valid at the given time
         
         :param Datetime datetime: the specified time
-        :return: True valid | False invalid
+        :return: True means valid | False means invalid
     
     .. py:method:: _add_valid(self, datetime)
     
-        Add a valid time, called in _calculate
+        Register a time as valid; called from _calculate
         
         :param Datetime datetime: the valid time
       
@@ -88,12 +88,12 @@ Environment Judgement Strategy Base Class
         
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, used to reset the internal private variables
+        [Override hook] The subclass reset interface; resets the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface
