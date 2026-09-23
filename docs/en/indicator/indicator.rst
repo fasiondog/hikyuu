@@ -31,11 +31,11 @@ Built-in Technical Indicators
 
 .. py:function:: ADJ_FACTOR([kdata])
 
-    Calculate the recovery factor indicator
+    Calculate the adjustment factor indicator
     
-    Calculate the backward recovery factor sequence based on the stock's dividend data (the stock sends, the allotments, the conversions, the cash dividends, etc.).
-    The recovery factor indicates how many shares are held now if 1 share was held at the listing, after all the stock sends, the allotments and the conversions.
-    It is calculated in a cumulative multiplication way, ensuring the consistency of the recovery processing of the price, the volume and the amount.
+    Calculate the backward adjustment factor sequence based on the stock's dividend data (the stock sends, the allotments, the conversions, the cash dividends, etc.).
+    The adjustment factor indicates how many shares are held now if 1 share was held at the listing, after all the stock sends, the allotments and the conversions.
+    It is calculated in a cumulative multiplication way, ensuring the consistency of the adjustment processing of the price, the volume and the amount.
     
     This indicator needs to set the KData context to work properly, set through the setContext() method.
     
@@ -52,7 +52,7 @@ Built-in Technical Indicators
     
     **Usage example**::
     
-        # Get the recovery factor of a stock
+        # Get the adjustment factor of a stock
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(-100))
         adj_factor = ADJ_FACTOR()
@@ -63,19 +63,19 @@ Built-in Technical Indicators
     
     **Related indicators**:
     
-    * :py:func:`ADJ_OPEN` - the recovered open price
-    * :py:func:`ADJ_HIGH` - the recovered high price
-    * :py:func:`ADJ_LOW` - the recovered low price
-    * :py:func:`ADJ_CLOSE` - the recovered close price
-    * :py:func:`ADJ_VOL` - the recovered volume
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
+    * :py:func:`ADJ_OPEN` - the adjusted open price
+    * :py:func:`ADJ_HIGH` - the adjusted high price
+    * :py:func:`ADJ_LOW` - the adjusted low price
+    * :py:func:`ADJ_CLOSE` - the adjusted close price
+    * :py:func:`ADJ_VOL` - the adjusted volume
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
 
 
 .. py:function:: ADJ_OPEN()
 
-    Calculate the recovered open price indicator
+    Calculate the adjusted open price indicator
     
-    Recover the open price backward by the recovery factor, obtaining the recovered open price sequence.
+    Recover the open price backward by the adjustment factor, obtaining the adjusted open price sequence.
     The calculation formula: ADJ_OPEN = ADJ_FACTOR * OPEN
     
     :rtype: Indicator
@@ -90,15 +90,15 @@ Built-in Technical Indicators
     
     **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - the recovery factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
+    * :py:func:`ADJ_FACTOR` - the adjustment factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
 
 
 .. py:function:: ADJ_HIGH()
 
-    Calculate the recovered high price indicator
+    Calculate the adjusted high price indicator
     
-    Recover the high price backward by the recovery factor, obtaining the recovered high price sequence.
+    Recover the high price backward by the adjustment factor, obtaining the adjusted high price sequence.
     The calculation formula: ADJ_HIGH = ADJ_FACTOR * HIGH
     
     :rtype: Indicator
@@ -113,15 +113,15 @@ Built-in Technical Indicators
     
     **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - the recovery factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
+    * :py:func:`ADJ_FACTOR` - the adjustment factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
 
 
 .. py:function:: ADJ_LOW()
 
-    Calculate the recovered low price indicator
+    Calculate the adjusted low price indicator
     
-    Recover the low price backward by the recovery factor, obtaining the recovered low price sequence.
+    Recover the low price backward by the adjustment factor, obtaining the adjusted low price sequence.
     The calculation formula: ADJ_LOW = ADJ_FACTOR * LOW
     
     :rtype: Indicator
@@ -136,15 +136,15 @@ Built-in Technical Indicators
     
     **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - the recovery factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
+    * :py:func:`ADJ_FACTOR` - the adjustment factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
 
 
 .. py:function:: ADJ_CLOSE()
 
-    Calculate the recovered close price indicator
+    Calculate the adjusted close price indicator
     
-    Recover the close price backward by the recovery factor, obtaining the recovered close price sequence.
+    Recover the close price backward by the adjustment factor, obtaining the adjusted close price sequence.
     The calculation formula: ADJ_CLOSE = ADJ_FACTOR * CLOSE
     
     :rtype: Indicator
@@ -159,18 +159,18 @@ Built-in Technical Indicators
     
     **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - the recovery factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
+    * :py:func:`ADJ_FACTOR` - the adjustment factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
 
 
 .. py:function:: ADJ_VOL()
 
-    Calculate the recovered volume indicator
+    Calculate the adjusted volume indicator
     
-    Recover the volume backward by the recovery factor, obtaining the recovered volume sequence.
+    Recover the volume backward by the adjustment factor, obtaining the adjusted volume sequence.
     The calculation formula: ADJ_VOL = VOL / ADJ_FACTOR
     
-    Note: the volume recovery uses division, which is opposite to the price recovery using multiplication. This is because when the share capital increases, the volume corresponding to each share should be reduced accordingly.
+    Note: the volume adjustment uses division, which is opposite to the price adjustment using multiplication. This is because when the share capital increases, the volume corresponding to each share should be reduced accordingly.
     
     :rtype: Indicator
     
@@ -184,8 +184,8 @@ Built-in Technical Indicators
     
     **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - the recovery factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
+    * :py:func:`ADJ_FACTOR` - the adjustment factor
+    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
 
 
 .. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
@@ -674,7 +674,7 @@ Built-in Technical Indicators
 
 .. py:function:: CYCLE(kdata, [adjust_cycle=1], [adjust_mode='query'], [delay_to_trading_day=True])
           
-    The PF position adjustment period indicator, mainly used for the PF position adjustment day verification, and as an SG
+    The PF rebalance cycle indicator, mainly used for the PF rebalance day verification, and as an SG
 
     :param KData kdata: the K-line data
     :param int adjust_cycle: the adjustment period
@@ -1671,7 +1671,7 @@ Built-in Technical Indicators
 
 .. py:function:: RECOVER_BACKWARD([data])
 
-    Perform the backward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
+    Perform the backward adjustment on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
     :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
@@ -1679,7 +1679,7 @@ Built-in Technical Indicators
 
 .. py:function:: RECOVER_FORWARD([data])
 
-    Perform the forward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
+    Perform the forward adjustment on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
     :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
@@ -1687,7 +1687,7 @@ Built-in Technical Indicators
 
 .. py:function:: RECOVER_EQUAL_BACKWARD([data])
 
-    Perform the equal-ratio backward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
+    Perform the equal-ratio backward adjustment on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
     :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator
@@ -1695,7 +1695,7 @@ Built-in Technical Indicators
 
 .. py:function:: RECOVER_EQUAL_FORWARD([data])
 
-    Perform the equal-ratio forward recovery on the input indicator data (CLOSE|OPEN|HIGH|LOW)
+    Perform the equal-ratio forward adjustment on the input indicator data (CLOSE|OPEN|HIGH|LOW)
 
     :param Indicator|KData data: only the CLOSE|OPEN|HIGH|LOW indicators are accepted, or a KData (in this case, the close price of the KData is used by default)
     :rtype: Indicator

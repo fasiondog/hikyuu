@@ -45,20 +45,20 @@ PF part descriptions:
 
     Create a portfolio of multiple targets with a single system strategy
 
-    Description of the position adjustment mode adjust_mode:
+    Description of the rebalance mode adjust_mode:
     - "query" mode, follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
-    - "day" mode, adjust_cycle is the position adjustment interval in days;
+    - "day" mode, adjust_cycle is the rebalance interval in days;
     - for the "week" | "month" | "quarter" | "year" modes, adjust_cycle
 
       is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
-      if the day is not a trading day the position adjustment will be skipped; when delay_to_trading_day is true, if the day is not a trading day
-      it will be postponed to the first trading day in the current period; e.g. if the position adjustment is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+      if the day is not a trading day the rebalance will be skipped; when delay_to_trading_day is true, if the day is not a trading day
+      it will be postponed to the first trading day in the current period; e.g. if the rebalance is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
 
     :param TradeManager tm: the trade management
-    :param SelectorBase se: the trading object selection algorithm
+    :param SelectorBase se: the instrument selection algorithm
     :param AllocateFundsBase af: the asset allocation algorithm
-    :param int adjust_cycle: the position adjustment period
-    :param str adjust_mode: the position adjustment mode
+    :param int adjust_cycle: the rebalance cycle
+    :param str adjust_mode: the rebalance mode
     :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
 
 
@@ -66,23 +66,23 @@ PF part descriptions:
     
     Create a portfolio without an asset allocation algorithm; all the single-system strategies use the common tm to manage the account
 
-    Description of the position adjustment mode adjust_mode:
+    Description of the rebalance mode adjust_mode:
     - "query" mode, follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
-    - "day" mode, adjust_cycle is the position adjustment interval in days;
+    - "day" mode, adjust_cycle is the rebalance interval in days;
     - for the "week" | "month" | "quarter" | "year" modes, adjust_cycle
     
       is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
-      if the day is not a trading day the position adjustment will be skipped; when delay_to_trading_day is true, if the day is not a trading day
-      it will be postponed to the first trading day in the current period; e.g. if the position adjustment is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+      if the day is not a trading day the rebalance will be skipped; when delay_to_trading_day is true, if the day is not a trading day
+      it will be postponed to the first trading day in the current period; e.g. if the rebalance is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
 
     :param TradeManager tm: the trade management
-    :param SelectorBase se: the trading object selection algorithm
-    :param int adjust_cycle: the position adjustment period
-    :param str adjust_mode: the position adjustment mode
+    :param SelectorBase se: the instrument selection algorithm
+    :param int adjust_cycle: the rebalance cycle
+    :param str adjust_mode: the rebalance mode
     :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
     :param bool trade_on_close: whether the trade is executed at the close
     :param bool sys_use_self_tm: the prototype systems use their own tm to calculate
-    :param bool sell_at_not_selected: whether the stocks not selected on the position adjustment day are forcibly sold
+    :param bool sell_at_not_selected: whether the stocks not selected on the rebalance day are forcibly sold
     
     
 Portfolio Class Definition

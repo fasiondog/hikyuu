@@ -55,7 +55,7 @@ Indicator
         :param str name: 参数名称
         :rtype: IndParam
 
-    .. py::method:: set_ind_param(self, name, val)
+    .. py:method:: set_ind_param(self, name, val)
 
         设置动态指标参数
 
@@ -91,7 +91,7 @@ Indicator
         :param int pos: 指定的位置索引
         :param int result_index: 指定的结果集
 
-    .. py::method:: get_pos(self, date):
+    .. py:method:: get_pos(self, date)
 
         获取指定日期相应的索引位置
 

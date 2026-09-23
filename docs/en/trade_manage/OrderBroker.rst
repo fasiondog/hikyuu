@@ -84,7 +84,7 @@ Built-in Order Broker Classes
     
 .. py:class:: TestOrderBroker
 
-    Used for testing; prints when executing the buy/sell operations, e.g.: "买入：000001 10.0 1000"
+    Used for testing; prints when executing the buy/sell operations, e.g.: "Buy: SH000001, price: 10.0, number: 1000, ..."
 
 .. py:class:: MailOrderBroker
 
@@ -106,8 +106,8 @@ Built-in Order Broker Classes
     
         Execute the buy operation and send an email to the specified mailbox, in the following format:
         
-            The email title: 【Hkyuu提醒】买入 证券代码
-            The email content: 买入：证券代码，价格：买入的价格，数量：买入数量
+            The email title: [Hkyuu Notice] Buy <stock code>
+            The email content: Buy: <stock code>, price: <buy price>, number: <buy quantity>
         
         :param str market: the security market
         :param str code: the security code
@@ -122,8 +122,8 @@ Built-in Order Broker Classes
     
         Execute the sell operation and send an email to the specified mailbox, in the following format:
         
-            The email title: 【Hkyuu提醒】卖出 证券代码
-            The email content: 卖出：证券代码，价格：卖出的价格，数量：卖出数量
+            The email title: [Hkyuu Notice] Sell <stock code>
+            The email content: Sell: <stock code>, price: <sell price>, number: <sell quantity>
     
         :param str market: the security market
         :param str code: the security code
@@ -188,7 +188,7 @@ The custom order broker interfaces:
 
     .. py:method:: _buy(self, market, code, price, num, stoploss, goal_price, part_from)
 
-        [Overload interface] Execute the actual buy operation
+        [Override hook] Execute the actual buy operation
     
         :param str code: the security code
         :param float price: the buy price
@@ -199,7 +199,7 @@ The custom order broker interfaces:
         
     .. py:method:: _sell(self, market, code, price, num, stoploss, goal_price, part_from)
     
-        [Overload interface] Execute the actual sell operation
+        [Override hook] Execute the actual sell operation
     
         :param str market: the security market    
         :param str code: the security code

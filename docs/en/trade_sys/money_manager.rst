@@ -30,7 +30,7 @@ Fixed Trade Number Money Management Strategy
 
     The fixed trade number money management strategy. Buy a fixed number each time.
     
-    :param float n: the number bought each time (it should be an integral multiple of the minimum trade number of the trading object; the program does not check this here)
+    :param float n: the number bought each time (it should be an integral multiple of the minimum trade number of the instrument; the program does not check this here)
     :return: the money management strategy instance
 
 .. py:function:: MM_FixedCountTps([buy_counts, sell_counts])
@@ -118,8 +118,8 @@ The custom money management strategy interface:
 
 * :py:meth:`MoneyManagerBase.buyNotify` - [Optional] Receive the notification of the actual buy; reserved for handling multiple position increases/decreases
 * :py:meth:`MoneyManagerBase.sellNotify` - [Optional] Receive the notification of the actual sell; reserved for handling multiple position increases/decreases
-* :py:meth:`MoneyManagerBase._getBuyNumber` - [Required] Get the number that can be bought for the specified trading object
-* :py:meth:`MoneyManagerBase._getSellNumber` - [Optional] Get the number that can be sold for the specified trading object; if not overloaded, it defaults to selling all the held number
+* :py:meth:`MoneyManagerBase._getBuyNumber` - [Required] Get the number that can be bought for the specified instrument
+* :py:meth:`MoneyManagerBase._getSellNumber` - [Optional] Get the number that can be sold for the specified instrument; if not overloaded, it defaults to selling all the held number
 * :py:meth:`MoneyManagerBase._reset` - [Optional] Reset the private attributes
 * :py:meth:`MoneyManagerBase._clone` - [Required] The clone interface
 
@@ -171,10 +171,10 @@ Money Management Strategy Base Class
         
     .. py:method:: get_buy_num(self, datetime, stock, price, risk, part_from)
     
-        Get the number that can be bought for the specified trading object
+        Get the number that can be bought for the specified instrument
         
         :param Datetime datetime: the trade time
-        :param Stock stock: the trading object
+        :param Stock stock: the instrument
         :param float price: the trade price
         :param float risk: the risk taken by the trade; if it is 0, it means a total loss, i.e. the market value falls to 0
         :param System.Part part_from: the source system component
@@ -183,10 +183,10 @@ Money Management Strategy Base Class
         
     .. py:method:: get_sell_num(self, datetime, stock, price, risk, part_from)
     
-        Get the number that can be sold for the specified trading object
+        Get the number that can be sold for the specified instrument
         
         :param Datetime datetime: the trade time
-        :param Stock stock: the trading object
+        :param Stock stock: the instrument
         :param float price: the trade price
         :param float risk: the risk taken by the new trade; if it is 0, it means a total loss, i.e. the market value falls to 0
         :param System.Part part_from: the source system component
@@ -203,22 +203,22 @@ Money Management Strategy Base Class
         
     .. py:method:: _buy_notify(self, trade_record)
     
-        [Overload interface] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
+        [Override hook] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
         :param TradeRecord trade_record: the actual buy trade record when the actual buy occurs
         
     .. py:method:: _sell_notify(self, trade_record)
     
-        [Overload interface] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
+        [Override hook] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
         :param TradeRecord trade_record: the actual sell trade record when the actual sell occurs
     
     .. py:method:: _get_buy_num(self, datetime, stock, price, risk, part_from)
 
-        [Overload interface] Get the number that can be bought for the specified trading object
+        [Override hook] Get the number that can be bought for the specified instrument
         
         :param Datetime datetime: the trade time
-        :param Stock stock: the trading object
+        :param Stock stock: the instrument
         :param float price: the trade price
         :param float risk: the risk taken by the trade; if it is 0, it means a total loss, i.e. the market value falls to 0
         :param System.Part part_from: the source system component
@@ -227,10 +227,10 @@ Money Management Strategy Base Class
 
     .. py:method:: _get_sell_num(self, datetime, stock, price, risk, part_from)
     
-        [Overload interface] Get the number that can be sold for the specified trading object. If not overloaded, it defaults to selling all the held number.
+        [Override hook] Get the number that can be sold for the specified instrument. If not overloaded, it defaults to selling all the held number.
         
         :param Datetime datetime: the trade time
-        :param Stock stock: the trading object
+        :param Stock stock: the instrument
         :param float price: the trade price
         :param float risk: the risk taken by the new trade; if it is 0, it means a total loss, i.e. the market value falls to 0
         :param System.Part part_from: the source system component
@@ -239,8 +239,8 @@ Money Management Strategy Base Class
         
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

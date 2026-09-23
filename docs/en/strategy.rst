@@ -152,7 +152,7 @@ Common parameters:
         :param int lastnum: the last N records
         :param Datetime start_date: the start date
         :param KQuery.KType ktype: the K-line type
-        :param KQuery.RecoverType recover_type: the recovery type, defaulting to KQuery.NO_RECOVER
+        :param KQuery.RecoverType recover_type: the adjustment type, defaulting to KQuery.NO_RECOVER
         :return: the K-line data
         :rtype: KData
 
@@ -165,7 +165,7 @@ Common parameters:
         :param Datetime start_date: the start date
         :param Datetime end_date: the end date; if it is Null or greater than the current time, nextDatetime() is used automatically
         :param KQuery.KType ktype: the K-line type
-        :param KQuery.RecoverType recover_type: the recovery type, defaulting to KQuery.NO_RECOVER
+        :param KQuery.RecoverType recover_type: the adjustment type, defaulting to KQuery.NO_RECOVER
         :return: the K-line data
         :rtype: KData
 
@@ -274,7 +274,7 @@ Common parameters:
     Currently only the systems with both buy_delay|sell_delay being false are supported, i.e. trading at the close
      
     :param sys: the trading system
-    :param stock: the trading object
+    :param stock: the instrument
     :param query: the query condition
     :param broker: the order broker (dedicated to the order broker synchronizing with the account assets)
     :param cost_func: the cost function

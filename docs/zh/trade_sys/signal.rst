@@ -35,7 +35,7 @@
                 <td>当快线从下向上穿越慢线时，买入；<br>当快线从上向下穿越慢线时，卖出。</td>
             </tr>
             <tr>
-                <td><a href="#target-section">SG_CrossGold</td>
+                <td><a href="#target-section">SG_CrossGold</a></td>
                 <td>金叉指示器</td>
                 <td>当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；<br>当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。</td>
             </tr>
@@ -70,7 +70,7 @@
                 <td>SG_OneSide 简化模式</td>
             </tr>
             <tr>
-                <td><a href="#target-section">SG_OneSell</a></td>
+                <td><a href="#target-section">SG_Sell</a></td>
                 <td>单边卖出信号指示器</td>
                 <td>SG_OneSide简化模式</td>
             </tr>
@@ -142,7 +142,7 @@
         or Buy When AMA - AMA[3] > filter 
     
     :param Indicator ind:
-    :param int filer_n: N日周期
+    :param int filter_n: N日周期
     :param float filter_p: 过滤器百分比
     :return: 信号指示器
     
@@ -156,7 +156,7 @@
         Sell When @highest(AMA, n) - AMA > filter
     
     :param Indicator ind:
-    :param int filer_n: N日周期
+    :param int filter_n: N日周期
     :param float filter_p: 过滤器百分比
     :return: 信号指示器
    

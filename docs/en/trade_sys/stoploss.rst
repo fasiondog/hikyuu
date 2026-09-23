@@ -43,7 +43,7 @@ Alexander Elder Safety Zone Stop-loss
 
 .. py:function:: ST_Saftyloss([n1=10, n2=3, p=2.0])
 
-    See "走进我的交易室" (2007, 地震出版社) by Alexander Elder, P202.
+    See *Come Into My Trading Room* (2002) by Alexander Elder, p. 202 (Chinese translation published by Seismological Press).
     Calculation description: within the lookback period (generally 10 to 20 days), add up the lengths of all the downward crossings and divide by the number of the downward crossings,
     to get the mean noise (i.e. the length of all the lowest prices below the previous day's lowest price within the lookback period divided by the number), and subtract the previous day's
     mean noise multiplied by a factor from today's lowest price to get the stop-loss line. To offset the fluctuation and guarantee the upward movement of the stop-loss line,
@@ -60,9 +60,9 @@ Custom Stop-loss/Take-profit Strategy
 
 The custom stop-loss/take-profit strategy interface:
 
-* :py:meth:`SignalBase._calculate` - [Required] The subclass calculation interface
-* :py:meth:`SignalBase._clone` - [Required] The clone interface
-* :py:meth:`SignalBase._reset` - [Optional] Reload the private variables
+* :py:meth:`StoplossBase._calculate` - [Required] The subclass calculation interface
+* :py:meth:`StoplossBase._clone` - [Required] The clone interface
+* :py:meth:`StoplossBase._reset` - [Optional] Reset the internal member variables
 
 Stop-loss/Take-profit Strategy Base Class
 -----------------------------------------
@@ -73,7 +73,7 @@ Stop-loss/Take-profit Strategy Base Class
     
     .. py:attribute:: name Name
     .. py:attribute:: tm Set or get the trade manager instance
-    .. py:attribute:: to Set or get the trading object
+    .. py:attribute:: to Set or get the traded K-line data (TO)
     
     .. py:method:: __init__(self[, name="StoplossBase"])
     
@@ -106,7 +106,7 @@ Stop-loss/Take-profit Strategy Base Class
 
     .. py:method:: get_price(self, datetime, price)
     
-        [Overload interface] Get the planned stop-loss price of this expected trade (buy); if there is no stop-loss price, return 0. It is used by the system to query the planned stop-loss price of this trade from the stop-loss strategy module before the trade is executed.
+        [Override hook] Get the planned stop-loss price of this expected trade (buy); if there is no stop-loss price, return 0. It is used by the system to query the planned stop-loss price of this trade from the stop-loss strategy module before the trade is executed.
         
         .. note::
             Generally, the stop-loss and take-profit algorithms can be interchanged, but the getPrice of the stop-loss can take the planned trade price, e.g. 30% of the buy price as the stop-loss. The take-profit ignores the passed price parameter, i.e. it assumes price is 0.0. In fact, even for the stop-loss it is not recommended to use the price parameter; e.g. if 30% of the previous day's lowest price can be used as the stop-loss, the price parameter does not need to be considered.
@@ -118,12 +118,12 @@ Stop-loss/Take-profit Strategy Base Class
         
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

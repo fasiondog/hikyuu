@@ -384,7 +384,7 @@ The following functions have been set as the plot functions of the corresponding
     :param new:   only taking effect when the axes is not specified; when True, create a new window object and draw in it
     :param axes:  specify in which axes object to draw
     :param style: 1 | 2 the signal arrow drawing style
-    :param KData kdata: the specified KData (i.e. the trading object of the signal generator); if this value is None, it is considered that the signal generator has already specified the trading object; otherwise, use this parameter as the trading object
+    :param KData kdata: the specified KData (i.e. the traded K-line data (TO) of the signal generator); if this value is None, it is considered that the signal generator has already specified the traded K-line data (TO); otherwise, use this parameter as the traded K-line data (TO)
 
 
 .. py:function:: cnplot(cn[, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2])
@@ -394,7 +394,7 @@ The following functions have been set as the plot functions of the corresponding
     :param ConditionBase cn: the system valid condition
     :param new:  only taking effect when the axes is not specified; when True, create a new window object and draw in it
     :param axes: specify in which axes object to draw
-    :param KData kdata: the specified KData; if this value is None, it is considered that the system valid condition has already specified the trading object; otherwise, use this parameter as the trading object
+    :param KData kdata: the specified KData; if this value is None, it is considered that the system valid condition has already specified the traded K-line data (TO); otherwise, use this parameter as the traded K-line data (TO)
     :param upcolor: the color when valid
     :param downcolor: the color when invalid
     :param alpha: the transparency    

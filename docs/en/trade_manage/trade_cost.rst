@@ -116,7 +116,7 @@ Trade Cost Algorithm Base Class
 
     .. py:method:: get_buy_cost(self, datetime, stock, price, num)
     
-        [Overload interface] Get the buy cost
+        [Override hook] Get the buy cost
         
         :param Datetime datetime: the buy moment
         :param Stock stock: the buy object
@@ -127,7 +127,7 @@ Trade Cost Algorithm Base Class
     
     .. py:method:: get_sell_cost(self, datetime, stock, price, num)
     
-        [Overload interface] Get the sell cost
+        [Override hook] Get the sell cost
         
         :param Datetime datetime: the sell moment
         :param Stock stock: the sell object
@@ -138,4 +138,4 @@ Trade Cost Algorithm Base Class
         
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

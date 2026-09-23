@@ -9,7 +9,7 @@ The signal generator is responsible for generating the buy and sell signals.
 Common parameters:
 
     * **alternate** *(bool|True)* : Whether the buy and sell signals appear alternately. The single-line signals usually judge the generation of the signals by the inflection points, the slope, etc.; in this case, consecutive buy signals or consecutive sell signals may appear, and this parameter can be used to control whether the buy and sell signals appear alternately. The two-line crossover signals usually have the buy and sell already appearing alternately, so this parameter is invalid in that case.
-    * **cycle** *(bool|False)* : Used with PF, calculated only within the PF position adjustment period
+    * **cycle** *(bool|False)* : Used with PF, calculated only within the PF rebalance cycle
     * **support_borrow_stock** *(bool|False)* : Support issuing short signals
 
 
@@ -35,7 +35,7 @@ When technical indicators are usually used to judge buying and selling, it is ba
                 <td>When the fast line crosses the slow line from below upward, buy;<br>when the fast line crosses the slow line from above downward, sell.</td>
             </tr>
             <tr>
-                <td><a href="#target-section">SG_CrossGold</td>
+                <td><a href="#target-section">SG_CrossGold</a></td>
                 <td>Golden cross indicator</td>
                 <td>A golden cross is when the fast line crosses the slow line from below upward and both the fast line and the slow line point upward, buy;<br>when the fast line crosses the slow line from above downward and both the fast line and the slow line point downward, it is a death cross, sell.</td>
             </tr>
@@ -70,7 +70,7 @@ When technical indicators are usually used to judge buying and selling, it is ba
                 <td>The simplified mode of SG_OneSide</td>
             </tr>
             <tr>
-                <td><a href="#target-section">SG_OneSell</a></td>
+                <td><a href="#target-section">SG_Sell</a></td>
                 <td>One-side sell signal generator</td>
                 <td>The simplified mode of SG_OneSide</td>
             </tr>
@@ -86,8 +86,8 @@ When technical indicators are usually used to judge buying and selling, it is ba
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
-                <td>PF position adjustment period buy signal generator</td>
-                <td>A special SG, used with PF, taking the PF position adjustment period as the buy signal</td>
+                <td>PF rebalance cycle buy signal generator</td>
+                <td>A special SG, used with PF, taking the PF rebalance cycle as the buy signal</td>
             </tr>
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
@@ -142,7 +142,7 @@ Single-line Inflection Point Signal Generator
         or Buy When AMA - AMA[3] > filter 
     
     :param Indicator ind:
-    :param int filer_n: the N-day period
+    :param int filter_n: the N-day period
     :param float filter_p: the filter percentage
     :return: the signal generator
     
@@ -156,7 +156,7 @@ Single-line Inflection Point Signal Generator
         Sell When @highest(AMA, n) - AMA > filter
     
     :param Indicator ind:
-    :param int filer_n: the N-day period
+    :param int filter_n: the N-day period
     :param float filter_p: the filter percentage
     :return: the signal generator
    
@@ -239,7 +239,7 @@ PF Position Adjustment Period Buy Signal Generator
 
 .. py:function:: SG_Cycle()
     
-    A special SG, used with PF, taking the PF position adjustment period as the buy signal
+    A special SG, used with PF, taking the PF rebalance cycle as the buy signal
 
 
 Custom Signal Generator
@@ -264,7 +264,7 @@ The custom signal generator interface:
 
 * :py:meth:`SignalBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`SignalBase._clone` - [Required] The clone interface
-* :py:meth:`SignalBase._reset` - [Optional] Reload the private variables
+* :py:meth:`SignalBase._reset` - [Optional] Reset the internal member variables
 
 Example 1 (without private variables, the turtle trading strategy):
 
@@ -379,12 +379,12 @@ Signal Generator Base Class
     
     .. py:method:: _calculate(self, kdata)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

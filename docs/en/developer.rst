@@ -59,7 +59,7 @@ On Linux, the dependent development packages need to be installed. For example o
     sudo apt-get install -y libsqlite3-dev   
 
 
-6. Install the xcode command line tools on Macosx
+5. Install the Xcode command line tools on macOS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Please install xcode and its command line tools before compiling.

@@ -55,7 +55,7 @@ Indicator
         :param str name: the parameter name
         :rtype: IndParam
 
-    .. py::method:: set_ind_param(self, name, val)
+    .. py:method:: set_ind_param(self, name, val)
 
         Set the dynamic indicator parameter
 
@@ -91,7 +91,7 @@ Indicator
         :param int pos: the specified position index
         :param int result_index: the specified result set
 
-    .. py::method:: get_pos(self, date):
+    .. py:method:: get_pos(self, date)
 
         Get the index position corresponding to the specified date
 

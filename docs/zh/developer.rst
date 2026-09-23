@@ -58,10 +58,10 @@ Linux下需安装依赖的开发软件包。如 Ubuntu 下，执行以下命令�
     sudo apt-get install -y libsqlite3-dev   
 
 
-6、Macosx 下安装 xcode 命令行工具
+5、macOS 下安装 Xcode 命令行工具
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-编译前请安装 xcode 及其命令行工具。
+编译前请安装 Xcode 及其命令行工具。
     
 
 编译与安装

@@ -66,7 +66,7 @@ The custom slippage interface:
 * :py:meth:`SlippageBase.get_real_sell_price` - [Required] Calculate the actual sell price
 * :py:meth:`SlippageBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`SlippageBase._clone` - [Required] The clone interface
-* :py:meth:`SlippageBase._reset` - [Optional] Reload the private variables
+* :py:meth:`SlippageBase._reset` - [Optional] Reset the internal member variables
 
 
 Slippage Algorithm Base Class
@@ -103,7 +103,7 @@ Slippage Algorithm Base Class
         
     .. py:method:: get_real_buy_price(self, datetime, price)
 
-        [Overload interface] Calculate the actual buy price
+        [Override hook] Calculate the actual buy price
         
         :param Datetime datetime: the buy time
         :param float price: the planned buy price
@@ -112,7 +112,7 @@ Slippage Algorithm Base Class
         
     .. py:method:: get_real_sell_price(self, datetime, price)
 
-        [Overload interface] Calculate the actual sell price
+        [Override hook] Calculate the actual sell price
         
         :param Datetime datetime: the sell time
         :param float price: the planned sell price
@@ -129,12 +129,12 @@ Slippage Algorithm Base Class
         
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

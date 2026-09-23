@@ -27,11 +27,11 @@ Building the K-line Query Condition
     
     The simplified :py:data:`Query.RecoverType` enumeration values
     
-    - Query.NO_RECOVER      - no recovery
-    - Query.FORWARD         - the forward recovery
-    - Query.BACKWARD        - the backward recovery
-    - Query.EQUAL_FORWARD   - the equal-ratio forward recovery
-    - Query.EQUAL_BACKWARD  - the equal-ratio backward recovery
+    - Query.NO_RECOVER      - no adjustment
+    - Query.FORWARD         - the forward adjustment
+    - Query.BACKWARD        - the backward adjustment
+    - Query.EQUAL_FORWARD   - the equal-ratio forward adjustment
+    - Query.EQUAL_BACKWARD  - the equal-ratio backward adjustment
 
     .. py:attribute:: start 
     
@@ -59,7 +59,7 @@ Building the K-line Query Condition
         
     .. py:attribute:: recover_type
     
-        The recovery type queried
+        The adjustment type queried
         
     .. py:attribute:: ktype_in_sec
     
@@ -92,13 +92,13 @@ Building the K-line Query Condition
         
     .. py:data:: RecoverType
     
-        The definition of the K-line recovery type enumerations
+        The definition of the K-line adjustment type enumerations
     
-        - NO_RECOVER      - no recovery
-        - FORWARD         - the forward recovery
-        - BACKWARD        - the backward recovery
-        - EQUAL_FORWARD   - the equal-ratio forward recovery
-        - EQUAL_BACKWARD  - the equal-ratio backward recovery
+        - NO_RECOVER      - no adjustment
+        - FORWARD         - the forward adjustment
+        - BACKWARD        - the backward adjustment
+        - EQUAL_FORWARD   - the equal-ratio forward adjustment
+        - EQUAL_BACKWARD  - the equal-ratio backward adjustment
 
     .. py:method:: is_right_opening(self)
 
@@ -529,14 +529,14 @@ StockManager/Block/Stock
     
         Get the time-line data
         
-        :param Query query: the query condition (the K-line type and the recovery type parameters in the query condition are useless at this time)
+        :param Query query: the query condition (the K-line type and the adjustment type parameters in the query condition are useless at this time)
         :rtype: TimeLineList
     
     .. py:method:: get_trans_list(self, query)
     
         Get the historical tick data
         
-        :param Query query: the query condition (the K-line type and the recovery type parameters in the query condition are useless at this time)
+        :param Query query: the query condition (the K-line type and the adjustment type parameters in the query condition are useless at this time)
         :rtype: TransList
 
     .. py:method:: get_weight(self[, start, end])

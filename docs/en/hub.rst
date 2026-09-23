@@ -12,7 +12,7 @@ The HUB refers to the platform of the quantitative trading strategy parts, used 
 4. Repository version management: the local strategy library is only a local directory; you can choose to use git for the version management. For example, the public hikyuu_hub repository is managed with git.
 5. The strategy parts in the repository support both python and C++, which can avoid directly modifying the hikyuu source code to add new features.
 
-For the detailed usage of the HUB, see: `Hikyuu | 量化交易策略部件仓库使用说明 <https://mp.weixin.qq.com/s/4oh9DEEUkv1gk4KoCcGhtQ>`_
+For the detailed usage of the HUB, see the article `Hikyuu Hub: user guide for the quantitative trading strategy parts repository <https://mp.weixin.qq.com/s/4oh9DEEUkv1gk4KoCcGhtQ>`_ (in Chinese).
 
 
 .. py:function:: add_remote_hub(name, url, branch='main')
@@ -103,7 +103,7 @@ For the detailed usage of the HUB, see: `Hikyuu | 量化交易策略部件仓库
 
     Search the strategy parts
 
-    Example: search_part('趋势')
+    Example: search_part('MA')  # part names in the public hikyuu_hub repository are in Chinese, so Chinese keywords such as '趋势' (trend) can also be used
 
     :param str name: the part name
     :param str hub: the repository name

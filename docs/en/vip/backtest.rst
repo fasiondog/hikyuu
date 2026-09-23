@@ -158,7 +158,7 @@ This way is generally used for backtesting or debugging.
     def on_bar(stg: Strategy):
         stk = sm[Config.stock]
         k = stg.get_last_kdata(stk, 100, Config.ktype)
-        # hku_info("{}, 当前价: {:<.2f}", stg.today(), k[-1].close)
+        # hku_info("{}, current price: {:<.2f}", stg.today(), k[-1].close)
         if len(k) < 30 or k[-1].datetime != stg.today():
             return
         ind = CROSS(Config.ma1, Config.ma2)(k)

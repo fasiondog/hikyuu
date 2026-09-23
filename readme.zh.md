@@ -47,7 +47,7 @@
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🏠**项目首页**          | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                      |
 | 📚**帮助文档**          | [https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)                                  |
-| 🚀**入门示例**          | [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True) |
+| 🚀**入门示例**          | [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True) |
 | 🧰**策略部件库**        | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                                |
 | 🐧**Ubuntu 虚拟机环境** | [百度网盘下载（提取码: ht8j）](https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j)                                                        |
 
@@ -105,7 +105,7 @@ sys = SYS_Simple(tm=my_tm, sg=my_sg, mm=my_mm)
 sys.run(sm['sz000001'], Query(-150))
 ```
 
-> 📖 完整示例参见 [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+> 📖 完整示例参见 [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True)
 
 ### ❓ 上手常见问题
 
@@ -187,7 +187,7 @@ sys.run(sm['sz000001'], Query(-150))
   <img src="docs/zh/_static/10000-overview.png" alt="回测结果示意" width="900">
 </p>
 
-> 📖 **完整示例参见**：[Jupyter Notebook 系列教程](https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+> 📖 **完整示例参见**：[Jupyter Notebook 系列教程](https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True)
 
 ---
 

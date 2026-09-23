@@ -36,7 +36,7 @@ The custom profit goal strategy interface:
 * :py:meth:`ProfitGoalBase.getGoal` - [Required] Get the goal price
 * :py:meth:`ProfitGoalBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`ProfitGoalBase._clone` - [Required] The clone interface
-* :py:meth:`ProfitGoalBase._reset` - [Optional] Reload the private variables
+* :py:meth:`ProfitGoalBase._reset` - [Optional] Reset the internal member variables
 * :py:meth:`ProfitGoalBase.buyNotify` - [Optional] Receive the notification of the actual buy; reserved for handling multiple position increases/decreases
 * :py:meth:`ProfitGoalBase.sellNotify` - [Optional] Receive the notification of the actual sell; reserved for handling multiple position increases/decreases
     
@@ -49,7 +49,7 @@ Profit Goal Strategy Base Class
     The profit goal strategy base class
     
     .. py:attribute:: name Name
-    .. py:attribute:: to Set or get the trading object
+    .. py:attribute:: to Set or get the traded K-line data (TO)
     .. py:attribute:: tm Set or get the trade management account
     
     .. py:method:: __init__(self[, name="ProfitGoalBase"])
@@ -85,7 +85,7 @@ Profit Goal Strategy Base Class
         
     .. py:method:: get_goal(self, datetime, price)
     
-        [Overload interface] Get the profit goal price; returning constant.null_price means no goal is set, and returning 0 means it needs to be sold
+        [Override hook] Get the profit goal price; returning constant.null_price means no goal is set, and returning 0 means it needs to be sold
         
         :param Datetime datetime: the current time
         :param float price: the current price
@@ -94,24 +94,24 @@ Profit Goal Strategy Base Class
         
     .. py:method:: buy_notify(self, trade_record)
     
-        [Overload interface] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
+        [Override hook] When the trade system performs an actual buy operation, notify the trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
         :param TradeRecord trade_record: the actual buy trade record when the actual buy occurs
         
     .. py:method:: sell_notify(self, trade_record)
     
-        [Overload interface] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
+        [Override hook] When the trade system performs an actual sell operation, notify the actual trade change; it generally needs to be overloaded only when there are multiple position increases/decreases
         
         :param TradeRecord trade_record: the actual sell trade record when the actual sell occurs
          
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface        
+        [Override hook] The subclass clone interface        

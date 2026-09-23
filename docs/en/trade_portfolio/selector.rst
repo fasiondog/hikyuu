@@ -206,14 +206,14 @@ Selector Strategy Base Class
 
     .. py:method:: is_match_af(self)
 
-        [Overload interface] Judge whether it matches the AF
+        [Override hook] Judge whether it matches the AF
 
         :param AllocateFundsBase af: the asset allocation algorithm
 
 
     .. py:method:: get_selected(self, datetime)
     
-        [Overload interface] Get the selected system instances at the specified moment
+        [Override hook] Get the selected system instances at the specified moment
         
         :param Datetime datetime: the specified moment
         :return: the list of the selected system instances
@@ -222,15 +222,15 @@ Selector Strategy Base Class
 
      .. py:method:: _calculate(self)
 
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
 
      .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface    
+        [Override hook] The subclass clone interface    
     
     
     

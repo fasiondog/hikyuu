@@ -8,7 +8,7 @@ Technical Indicator Overview
 
 * :py:func:`ALIGN` - align by the specified reference dates
 * :py:func:`CODELIKE` - the security code pattern matching
-* :py:func:`CYCLE` - the PF position adjustment period indicator, mainly used for the PF position adjustment day verification, and as an SG
+* :py:func:`CYCLE` - the PF rebalance cycle indicator, mainly used for the PF rebalance day verification, and as an SG
 * :py:func:`CVAL` - create a fixed-value indicator of the specified length
 * :py:func:`CONTEXT` - an independent context
 * :py:func:`DISCARD` - set the amount of the discarded data of the indicator result in the way of the indicator formula.
@@ -44,16 +44,16 @@ Technical Indicator Overview
 * :py:func:`CLOSE` - wrap the close price of the KData as an Indicator
 * :py:func:`AMO`   - wrap the amount of the KData as an Indicator
 * :py:func:`VOL`   - wrap the volume of the KData as an Indicator
-* :py:func:`ADJ_FACTOR` - the recovery factor (used together with the factor management system)
-* :py:func:`ADJ_OPEN` - the recovered open price
-* :py:func:`ADJ_HIGH` - the recovered high price
-* :py:func:`ADJ_LOW` - the recovered low price
-* :py:func:`ADJ_CLOSE` - the recovered close price
-* :py:func:`ADJ_VOL` - the recovered volume
-* :py:func:`RECOVER_FORWARD` - the forward recovery
-* :py:func:`RECOVER_BACKWARD` - the backward recovery
-* :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery
-* :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
+* :py:func:`ADJ_FACTOR` - the adjustment factor (used together with the factor management system)
+* :py:func:`ADJ_OPEN` - the adjusted open price
+* :py:func:`ADJ_HIGH` - the adjusted high price
+* :py:func:`ADJ_LOW` - the adjusted low price
+* :py:func:`ADJ_CLOSE` - the adjusted close price
+* :py:func:`ADJ_VOL` - the adjusted volume
+* :py:func:`RECOVER_FORWARD` - the forward adjustment
+* :py:func:`RECOVER_BACKWARD` - the backward adjustment
+* :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+* :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 * :py:func:`FINANCE` - the historical finance information
 * :py:func:`HSL` - the turnover rate
 * :py:func:`CAPITAL` - the circulating share capital, the same name: LIUTONGPAN

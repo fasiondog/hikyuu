@@ -38,7 +38,7 @@ Although the system optimization selector also uses the SE prefix in Hikyuu, it 
 
 The system optimization selector selects the "optimal" system among the candidate trading systems, and uses this "optimal" system for trading in the following time.
 
-The SE in the PF (portfolio), on the other hand, sorts and scores all the candidate systems on the position adjustment date, and the PF allocates the funds according to the scoring result; every candidate system is an actual trading system.
+The SE in the PF (portfolio), on the other hand, sorts and scores all the candidate systems on the rebalance date, and the PF allocates the funds according to the scoring result; every candidate system is an actual trading system.
 
 
 .. py:function:: SE_MaxFundsOptimal()

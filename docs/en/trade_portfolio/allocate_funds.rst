@@ -138,7 +138,7 @@ Asset Allocation Algorithm Base Class
 
     - _allocateWeight : [Required] The subclass asset allocation adjustment implementation
     - _clone : [Required] The clone interface
-    - _reset : [Optional] Reload the private variables
+    - _reset : [Optional] Reset the internal member variables
 
     .. py:attribute:: name Name
     
@@ -182,15 +182,15 @@ Asset Allocation Algorithm Base Class
         
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
 
     .. py::method:: _allocate_weight(self, date, se_list)
 
-        [Overload interface] The subclass weight allocation interface, getting the actually allocated system instances and their weights
+        [Override hook] The subclass weight allocation interface, getting the actually allocated system instances and their weights
 
         :param Datetime date: the current time
         :param SystemList se_list: the list of the currently selected systems

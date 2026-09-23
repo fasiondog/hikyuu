@@ -30,7 +30,7 @@ The custom market environment strategy interface:
 
 * :py:meth:`EnvironmentBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`EnvironmentBase._clone` - [Required] The clone interface
-* :py:meth:`EnvironmentBase._reset` - [Optional] Reload the private variables
+* :py:meth:`EnvironmentBase._reset` - [Optional] Reset the internal member variables
 
 Market Environment Strategy Base Class
 -----------------------------------------
@@ -88,12 +88,12 @@ Market Environment Strategy Base Class
         
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, used to reset the internal private variables
+        [Override hook] The subclass reset interface, used to reset the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

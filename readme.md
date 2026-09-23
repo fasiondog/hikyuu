@@ -65,7 +65,7 @@ system to individual requirements.
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🏠 **Project home page**    | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                     |
 | 📚 **Documentation**        | [https://hikyuu.readthedocs.io/en/latest/index.html](https://hikyuu.readthedocs.io/en/latest/index.html)                                       |
-| 🚀 **Getting started**      | [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True) |
+| 🚀 **Getting started**      | [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True) |
 | 🧰 **Strategy component library** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                        |
 | 🐧 **Ubuntu VM image**      | [Baidu Netdisk (extraction code: ht8j)](https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j)                                             |
 
@@ -124,7 +124,7 @@ sys = SYS_Simple(tm=my_tm, sg=my_sg, mm=my_mm)
 sys.run(sm['sz000001'], Query(-150))
 ```
 
-> 📖 See the [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+> 📖 See the [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True)
 > for the complete example.
 
 ### ❓ FAQ
@@ -234,7 +234,7 @@ sys.run(sm['sz000001'], Query(-150))
   <img src="docs/en/_static/10000-overview.png" alt="Backtest result" width="900">
 </p>
 
-> 📖 **Complete example**: [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True)
+> 📖 **Complete example**: [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True)
 
 ---
 

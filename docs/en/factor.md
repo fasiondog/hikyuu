@@ -50,7 +50,7 @@ Factor(name, formula, ktype=KQuery.DAY, brief="", details="", need_save_value=Fa
 
 - `start_date` (Datetime): the start date, the starting date when storing the data, defaulting to the minimum date
 - `block` (Block): the block information, the security set; if it is empty, it is all, defaulting to empty
-- `recover_type` (KQuery.RecoverType): the recovery type, defaulting to NO_RECOVER
+- `recover_type` (KQuery.RecoverType): the adjustment type, defaulting to NO_RECOVER
 
 **Note:** the factor name is not case-sensitive, with `name + ktype` as the unique identifier
 

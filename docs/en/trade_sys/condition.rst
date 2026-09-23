@@ -42,7 +42,7 @@ The custom system validity condition interface:
 
 * :py:meth:`ConditionBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`ConditionBase._clone` - [Required] The clone interface
-* :py:meth:`ConditionBase._reset` - [Optional] Reload the private variables
+* :py:meth:`ConditionBase._reset` - [Optional] Reset the internal member variables
 
 
 System Validity Condition Base Class
@@ -53,7 +53,7 @@ System Validity Condition Base Class
     The system validity condition base class
     
     .. py:attribute:: name Name
-    .. py:attribute:: to Set or get the trading object
+    .. py:attribute:: to Set or get the traded K-line data (TO)
     .. py:attribute:: tm Set or get the trade management account
     .. py:attribute:: sg Set or get the trade signal generator
     
@@ -89,11 +89,11 @@ System Validity Condition Base Class
 
     .. py:method:: get_datetime_list(self)
 
-        Get the dates when the system is valid. Note that it only returns the list of the dates when the system is valid, which is not the same length as the trading object.
+        Get the dates when the system is valid. Note that it only returns the list of the dates when the system is valid, which is not the same length as the traded K-line data (TO).
 
     .. py:method:: get_values(self)
 
-        Get the actual values in the form of an indicator, with the same length as the trading object; 0 means invalid, and 1 means the system is valid
+        Get the actual values in the form of an indicator, with the same length as the traded K-line data (TO); 0 means invalid, and 1 means the system is valid
 
     .. py:method:: _add_valid(self, datetime)
     
@@ -111,12 +111,12 @@ System Validity Condition Base Class
         
     .. py:method:: _calculate(self)
     
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation interface
     
     .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset interface, resetting the internal private variables
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface
+        [Override hook] The subclass clone interface

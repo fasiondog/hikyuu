@@ -4,7 +4,7 @@
 System Strategy|SYS
 ===================
 
-A system is the complete strategy for a single trading object, including the market environment, the system validity condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used to simulate the backtest.
+A system is the complete strategy for a single instrument, including the market environment, the system validity condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used to simulate the backtest.
 
 For multiple objects, a portfolio needs to be used in Hikyuu; see: :ref:`portfolio`.
 
@@ -14,8 +14,8 @@ Common parameters:
     * **sell_delay=True** *(bool)* : Whether the sell operation is delayed to be traded at the open of the next bar
     * **delay_use_current_price=True** *(bool)* : In the case of a delayed operation, whether to use the price of the bar at the current trade time to calculate the new stop-loss price/take-profit price/goal price, or to use the result calculated last time
     * **max_delay_count=3** *(int)* : The limit of the number of the consecutive delayed trade requests; it should be greater than or equal to 0, and 0 means only 1 delay is allowed
-    * **tp_monotonic=True** *(bool)* : The take profit increases monotonically
-    * **tp_delay_n=3** *(int)* : The number of days when the take profit starts to be delayed, i.e. the take profit strategy judgment takes effect from several days after the actual trade
+    * **tp_monotonic=True** *(bool)* : The take-profit increases monotonically
+    * **tp_delay_n=3** *(int)* : The number of days when the take-profit starts to be delayed, i.e. the take-profit strategy judgment takes effect from several days after the actual trade
     * **ignore_sell_sg=False** *(bool)* : Ignore the sell signal, and sell only by the stop-loss/take-profit and other ways
     * **can_trade_when_high_eq_low=False** *(bool)* : Whether trading is allowed when the highest price equals the lowest price (a limit-up with a single price cannot be bought, and a limit-down with a single price cannot be sold)
 
@@ -263,11 +263,11 @@ System Base Class Definition
 
     .. py:method:: reset(self)
     
-        Reset, but excluding the existing trading objects and the shared parts
+        Reset, but excluding the existing trading object (TO) and the shared parts
         
     .. py:method:: force_reset_all(self)
 
-        Force resetting all the components and clearing the existing trading objects, ignoring the sharing attributes of the components
+        Force resetting all the components and clearing the existing trading object (TO), ignoring the sharing attributes of the components
 
     .. py:method:: clone(self)
     

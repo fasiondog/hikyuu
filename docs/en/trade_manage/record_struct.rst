@@ -118,7 +118,7 @@ Position Records
     .. py:attribute:: total_number The accumulated position number (float)
     .. py:attribute:: buy_money    The accumulated buy money (float)
     .. py:attribute:: total_cost   The accumulated total trade cost (float)
-    .. py:attribute:: total_risk   The accumulated trade risk (float) = the sum of (buy price - stop loss) * buy number, excluding the trade cost
+    .. py:attribute:: total_risk   The accumulated trade risk (float) = the sum of (buy price - stop-loss) * buy number, excluding the trade cost
     .. py:attribute:: sell_money   The accumulated sell money (float)
 
     
