@@ -1221,7 +1221,7 @@ Built-in Technical Indicators
 
 .. py:function:: INSUM(block, query, ind, mode)
 
-    Return the calculated values of the corresponding outputs of this indicator of each component in the block by the calculation type.
+    Return the calculated values of the corresponding outputs of this indicator of each constituent in the block by the calculation type.
 
     Note: when the INSUM uses the modes 4/5, it is equivalent to the RANK function, but it is not suitable for use in the MF; when used in the MF, the calculation amount is at the N x N level, calculating slowly. If you want to use it in the MF, it is recommended to use the RANK [Donating user] indicator directly.
 

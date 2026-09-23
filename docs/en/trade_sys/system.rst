@@ -267,7 +267,7 @@ System Base Class Definition
         
     .. py:method:: force_reset_all(self)
 
-        Force resetting all the components and clearing the existing trading object (TO), ignoring the sharing attributes of the components
+        Force resetting all the parts and clearing the existing trading object (TO), ignoring the sharing attributes of the parts
 
     .. py:method:: clone(self)
     

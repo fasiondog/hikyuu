@@ -2577,7 +2577,7 @@ void export_Indicator_build_in(py::module& m) {
       py::arg("fill_null") = true,
       R"(INSUM(stks, query, ind, mode[, fill_null=True])
 
-    Return the calculated values of the corresponding outputs of this indicator of each component in the block by the calculation type. The calculation types: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-descending ranking, 5-ascending ranking.
+    Return the calculated values of the corresponding outputs of this indicator for each constituent in the block, aggregated by the calculation type. The calculation types: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-descending ranking, 5-ascending ranking.
 
     Note: when the INSUM uses the modes 4/5, it is equivalent to the RANK function, but it is not suitable for use in the MF; when used in the MF, the calculation amount is at the N x N level, calculating slowly. If you want to use it in the MF, it is recommended to use the RANK indicator directly.
 

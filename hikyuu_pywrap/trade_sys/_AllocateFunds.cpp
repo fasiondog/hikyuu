@@ -82,7 +82,7 @@ The subclass interfaces:
       .def("__repr__", to_py_str<AllocateFundsBase>)
       .def_property("name", py::overload_cast<>(&AllocateFundsBase::name, py::const_),
                     py::overload_cast<const string&>(&AllocateFundsBase::name),
-                    py::return_value_policy::copy, "The algorithm component name")
+                    py::return_value_policy::copy, "The algorithm part name")
       .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "Set or get the query condition")

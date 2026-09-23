@@ -252,7 +252,7 @@ Common parameters:
 
       .def("have_param", &System::haveParam, "Whether the specified parameter exists")
 
-      .def("set_not_shared_all", &System::setNotSharedAll, "Set all the components to non-shared")
+      .def("set_not_shared_all", &System::setNotSharedAll, "Set all the parts to non-shared")
 
       .def("get_stock", &System::getStock, R"(get_stock(self)
 
@@ -294,7 +294,7 @@ Common parameters:
       .def("force_reset_all", &System::forceResetAll,
            R"(force_reset_all(self)
 
-    Forcibly reset all the components and clear the existing trading object, ignoring the sharing attributes of the components.)")
+    Forcibly reset all the parts and clear the existing trading object, ignoring the sharing attributes of the parts.)")
 
       .def("clone", &System::clone,
            R"(clone(self)

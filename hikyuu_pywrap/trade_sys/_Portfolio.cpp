@@ -135,8 +135,8 @@ void export_Portfolio(py::module& m) {
       .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false,
            R"(run(self, query[, force=false])
     
-    Run the portfolio strategy. When the query condition and the components have not changed, the PF will not actually calculate by default when it is executed the second time.
-    However, since the parameters of the components may change, whether a recalculation is needed cannot be judged automatically; you can specify a forced calculation manually.
+    Run the portfolio strategy. When the query condition and the parts have not changed, the PF will not actually calculate by default when it is executed the second time.
+    However, since the parameters of the parts may change, whether a recalculation is needed cannot be judged automatically; you can specify a forced calculation manually.
         
     :param Query query: the query condition
     :param bool force: force recalculating)")

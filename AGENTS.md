@@ -22,7 +22,7 @@ hikyuu/
 ├── hikyuu_cpp/               # The C++ core engine library
 │   ├── hikyuu/               #   ├─ The core code: Stock/KData/Indicator/StockManager...
 │   │   ├── data_driver/      #   ├─ The data driver engine (HDF5/MySQL/SQLite/TDX)
-│   │   ├── trade_sys/        #   ├─ The trading system components (SG/MM/ST/CN/EV/PG/SP/PF/SE/AF/MF)
+│   │   ├── trade_sys/        #   ├─ The trading system parts (SG/MM/ST/CN/EV/PG/SP/PF/SE/AF/MF)
 │   │   ├── trade_manage/     #   ├─ The trade management (TradeManager/OrderBroker)
 │   │   ├── indicator/        #   ├─ The indicator library (including indicator_talib)
 │   │   ├── strategy/         #   ├─ The strategy context

@@ -16,7 +16,7 @@
 - 术语变更走 PR review，改名视为全仓变更（代码注释、docstring、两棵文档树、README 一次性替换）。
 - 缩写（§10）在代码与文档中**保持大写**，首次出现给全称。
 
-## 2. 交易系统组件（Trade System Components）
+## 2. 交易系统部件（Trade System Parts）
 
 | 中文 | 英文（标准） | 缩写 | 代码对应 | 备注 |
 | --- | --- | --- | --- | --- |
@@ -271,9 +271,14 @@
 
 ## 10. 缩写约定（代码与文档保持一致）
 
+> **用词规则**：交易体系中的各单元（EV/CN/SG/ST/TP/MM/PG/SP/SE/AF/MF/PF/TM）统一称
+> **part**（对应代码 `SystemPart` / `System.Part`，中文"部件"），**不要**用 component；
+> component 仅用于内部软件组合语境（如 GUI 组件、软件架构组件）。板块成分股用 constituent。
+
 | 缩写 | 全称 | 中文 |
 | --- | --- | --- |
-| SG | signal generator | 信号指示器 |
+| — | **part**（交易体系部件，禁用 component） | 部件 |
+| SG | signal | 信号指示器 |
 | MM | money management | 资金管理 |
 | ST | stop-loss | 止损 |
 | TP | take-profit | 止盈 |

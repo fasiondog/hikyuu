@@ -16,10 +16,10 @@
 > engine · an efficient backtesting system · live-trading extension**.
 
 Built on mature systematic trading concepts, the framework decomposes quantitative analysis into
-independent modular components: **market environment assessment, system validity conditions, signal
+independent modular parts: **market environment assessment, system validity conditions, signal
 generators, stop-loss / take-profit models, money management models, profit goal estimation,
 slippage simulation algorithms, multi-factor modeling, portfolio analysis and fund allocation**. You can
-combine these components freely to build your own strategy library, verify the stability and effectiveness
+combine these parts freely to build your own strategy library, verify the stability and effectiveness
 of your strategies through simulated backtesting, and complete quantitative research and data analysis.
 The framework also provides extension interfaces, so developers can build and connect their own
 compliant third-party trading interfaces (such as official compliant terminals like QMT), and adapt the
@@ -47,7 +47,7 @@ system to individual requirements.
       </td>
       <td align="center" width="33%">
         <strong><code>🧩 10+</code></strong><br>
-        <sub>Core strategy components · freely composable asset library</sub>
+        <sub>Core strategy parts · freely composable asset library</sub>
       </td>
       <td align="center" width="33%">
         <strong><code>💾 4 types</code></strong><br>
@@ -66,7 +66,7 @@ system to individual requirements.
 | 🏠 **Project home page**    | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                     |
 | 📚 **Documentation**        | [https://hikyuu.readthedocs.io/en/latest/index.html](https://hikyuu.readthedocs.io/en/latest/index.html)                                       |
 | 🚀 **Getting started**      | [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True) |
-| 🧰 **Strategy component library** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                        |
+| 🧰 **Strategy part library** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                        |
 | 🐧 **Ubuntu VM image**      | [Baidu Netdisk (extraction code: ht8j)](https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j)                                             |
 
 ---
@@ -150,7 +150,7 @@ sys.run(sm['sz000001'], Query(-150))
 Hikyuu provides a lightweight abstraction of systematic trading methods, covering **market environment
 assessment, system validity conditions, signal generators, stop-loss / take-profit strategies, money
 management, profit goals, slippage algorithms, trading object selection and fund allocation**. You can
-build your own strategy library from these components, combine and backtest them efficiently, and focus
+build your own strategy library from these parts, combine and backtest them efficiently, and focus
 on the effect and impact of a single module while exploring strategies, which greatly improves research
 productivity.
 
@@ -238,11 +238,11 @@ sys.run(sm['sz000001'], Query(-150))
 
 ---
 
-## 🏗️ Core components of the systematic trading architecture
+## 🏗️ Core parts of the systematic trading architecture
 
-> Rigorously architected around systematic trading concepts; every component can be replaced and combined freely
+> Rigorously architected around systematic trading concepts; every part can be replaced and combined freely
 
-| Layer                        | Component                        | Description                                  |
+| Layer                        | Part                             | Description                                  |
 | :--------------------------- | :------------------------------- | :------------------------------------------- |
 | **Portfolio layer**    | <b> · PortfolioPF</a>           | Portfolio - scheduling of multiple systems   |
 |                              | <b> · SelectorSE</a>            | System selector - system strategy filtering  |
@@ -289,7 +289,7 @@ Zsxq; see the donation page for the plans and the benefits attached to each one.
 | ☕ **Buy me a coffee** | ¥30 · one-time support (includes historical daily data)                              | Alipay                | [Donate](https://pay.ldxp.cn/item/gflv3v)   |
 | 📅 **180-day subscription** | ¥50 · half-year subscription (includes historical daily data)                        | Alipay                | [Donate](https://pay.ldxp.cn/item/du4h8s)   |
 | 🗓️ **365-day subscription** | ¥100 · one-year subscription (includes historical daily/minute/hour/tick data)       | Alipay                | [Donate](https://pay.ldxp.cn/item/ehbz9b)   |
-| 🌌 **Join Zsxq**      | ¥300/year · half price to renew · 3 devices · private WeChat group and component library (includes historical daily/minute/hour/tick data) | WeChat / Zsxq app | [Join](https://t.zsxq.com/YSATD)            |
+| 🌌 **Join Zsxq**      | ¥300/year · half price to renew · 3 devices · private WeChat group and part library (includes historical daily/minute/hour/tick data) | WeChat / Zsxq app | [Join](https://t.zsxq.com/YSATD)            |
 
 > 🎁 **Donation plans and benefits**: [https://hikyuu.readthedocs.io/en/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/en/latest/vip/donate-plan.html)
 

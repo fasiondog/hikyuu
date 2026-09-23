@@ -6,36 +6,36 @@
 Portfolio|PF
 ============
 
-In Hikyuu, a Portfolio (PF) is organized with system trading strategies as the units; Hikyuu can use a portfolio of the same trading strategy with different targets, and in the future it can also use a portfolio of system strategies with different targets and different trading logic (requiring tm and the components to support it), which is not exactly the same as the portfolios with multiple targets but the same strategy logic in common programmatic trading.
+In Hikyuu, a Portfolio (PF) is organized around trading systems around trading systems as its core units. Hikyuu supports portfolios that run a single trading strategy across multiple instruments, and it will in the future also support portfolios that combine trading systems differing in both their instruments and their trading logic (provided that the trade manager and the other parts add the required support). This is not exactly the same notion as the portfolio in conventional programmatic trading, where multiple instruments share identical strategy logic.
 
-PF part descriptions:
+PF parts:
 
 .. raw:: html
 
     <table border="1">
         <thead>
             <tr>
-                <th>Part naming convention</th>
-                <th>Part description</th>
-                <th>Part usage</th>
+                <th>Naming convention</th>
+                <th>Component</th>
+                <th>Purpose</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>MF_Xxx</td>
-                <td>Multi-factor composition (cross-sectional scoring board)</td>
-                <td>The multi-factor is essentially scoring the candidates on the cross-section, so it actually needs to be used together with the Selector (strategy selection algorithm).</td>
+                <td>Multi-factor composition (cross-sectional scoring engine)</td>
+                <td>A multi-factor model essentially scores the candidate instruments at each cross-section, so in practice it must be used together with a Selector (strategy selection algorithm).</td>
             </tr>
             <tr>
                 <td>SE_Xxx</td>
-                <td>Strategy selection algorithm</td>
-                <td>Implements the algorithm for evaluating and selecting the targets and the system strategies.<br>Note: the optimization selector in the walk-forward optimization system is also named with the SE prefix, but it is not this one.</td>
+                <td>System selection algorithm</td>
+                <td>Implements the evaluation and selection logic for instruments and trading systems.<br>Note: the optimization selector in the walk-forward optimization system also carries the SE prefix, but it is a different part, not the one described here.</td>
             </tr>
             <tr>
                 <td>AF_Xxx</td>
-                <td>Asset allocation algorithm</td>
-                <td>Used to allocate the assets to the systems selected on the cross-section.</td>
-            </tr>            
+                <td>Fund allocation algorithm</td>
+                <td>Allocates funds to the trading systems selected at each cross-section.</td>
+            </tr>
         </tbody>
     </table>
     <p></p>
@@ -43,98 +43,91 @@ PF part descriptions:
 
 .. py:function:: PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
-    Create a portfolio of multiple targets with a single system strategy
+    Create a portfolio that runs a single trading-system strategy across multiple instruments.
 
-    Description of the rebalance mode adjust_mode:
-    - "query" mode, follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
-    - "day" mode, adjust_cycle is the rebalance interval in days;
-    - for the "week" | "month" | "quarter" | "year" modes, adjust_cycle
+    Rebalance mode (``adjust_mode``):
 
-      is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
-      if the day is not a trading day the rebalance will be skipped; when delay_to_trading_day is true, if the day is not a trading day
-      it will be postponed to the first trading day in the current period; e.g. if the rebalance is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+    - ``"query"``: follow the ``ktype`` of the input ``query``; in this mode ``adjust_cycle`` is the interval expressed in that bar period.
+    - ``"day"``: ``adjust_cycle`` is the rebalance interval in days.
+    - ``"week"`` | ``"month"`` | ``"quarter"`` | ``"year"``: ``adjust_cycle`` specifies the Nth day of the week, month, quarter, or year, respectively. When ``delay_to_trading_day`` is false, a scheduled rebalance date that is not a trading day is skipped. When ``delay_to_trading_day`` is true, the rebalance is postponed to the first trading day within the current period. For example, if the rebalance is scheduled for the 1st of every month and that day is not a trading day, it is moved to the first trading day of that month.
 
-    :param TradeManager tm: the trade management
-    :param SelectorBase se: the instrument selection algorithm
-    :param AllocateFundsBase af: the asset allocation algorithm
-    :param int adjust_cycle: the rebalance cycle
-    :param str adjust_mode: the rebalance mode
-    :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
+    :param TradeManager tm: trade manager
+    :param SelectorBase se: selector that chooses the instruments
+    :param AllocateFundsBase af: fund allocation algorithm
+    :param int adjust_cycle: rebalance cycle
+    :param str adjust_mode: rebalance mode
+    :param bool delay_to_trading_day: when the scheduled date is not a trading day, postpone the rebalance to the first trading day within the current period
 
 
 .. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
-    
-    Create a portfolio without an asset allocation algorithm; all the single-system strategies use the common tm to manage the account
 
-    Description of the rebalance mode adjust_mode:
-    - "query" mode, follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
-    - "day" mode, adjust_cycle is the rebalance interval in days;
-    - for the "week" | "month" | "quarter" | "year" modes, adjust_cycle
-    
-      is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
-      if the day is not a trading day the rebalance will be skipped; when delay_to_trading_day is true, if the day is not a trading day
-      it will be postponed to the first trading day in the current period; e.g. if the rebalance is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+    Create a portfolio without a fund allocation algorithm; all constituent single-system strategies share one common ``tm`` that manages the account.
 
-    :param TradeManager tm: the trade management
-    :param SelectorBase se: the instrument selection algorithm
-    :param int adjust_cycle: the rebalance cycle
-    :param str adjust_mode: the rebalance mode
-    :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
-    :param bool trade_on_close: whether the trade is executed at the close
-    :param bool sys_use_self_tm: the prototype systems use their own tm to calculate
-    :param bool sell_at_not_selected: whether the stocks not selected on the rebalance day are forcibly sold
-    
-    
+    Rebalance mode (``adjust_mode``):
+
+    - ``"query"``: follow the ``ktype`` of the input ``query``; in this mode ``adjust_cycle`` is the interval expressed in that bar period.
+    - ``"day"``: ``adjust_cycle`` is the rebalance interval in days.
+    - ``"week"`` | ``"month"`` | ``"quarter"`` | ``"year"``: ``adjust_cycle`` specifies the Nth day of the week, month, quarter, or year, respectively. When ``delay_to_trading_day`` is false, a scheduled rebalance date that is not a trading day is skipped. When ``delay_to_trading_day`` is true, the rebalance is postponed to the first trading day within the current period. For example, if the rebalance is scheduled for the 1st of every month and that day is not a trading day, it is moved to the first trading day of that month.
+
+    :param TradeManager tm: trade manager
+    :param SelectorBase se: selector that chooses the instruments
+    :param int adjust_cycle: rebalance cycle
+    :param str adjust_mode: rebalance mode
+    :param bool delay_to_trading_day: when the scheduled date is not a trading day, postpone the rebalance to the first trading day within the current period
+    :param bool trade_on_close: whether trades are executed at the close
+    :param bool sys_use_self_tm: whether each prototype system performs its calculations with its own attached trade manager
+    :param bool sell_at_not_selected: whether to force-sell positions in instruments that are not selected on the rebalance day
+
+
 Portfolio Class Definition
---------------------------
+---------------------------
 
 .. py:class:: Portfolio
 
-    Implements a portfolio of multiple targets and multiple strategies
-    
-    .. py:attribute:: name  Name
-    
-    .. py:attribute:: query Running condition
+    Implements a portfolio spanning multiple instruments and multiple strategies.
 
-    .. py:attribute:: tm The associated trade manager instance
-        
-    .. py:attribute:: se The selector strategy
-        
-    .. py:attribute:: af The asset allocation algorithm
+    .. py:attribute:: name  Portfolio name
 
-    .. py:attribute:: proto_sys_list The prototype system list
+    .. py:attribute:: query  Query that defines the run conditions
 
-    .. py:attribute:: real_sys_list The actual system list at runtime
+    .. py:attribute:: tm  Associated trade manager instance
+
+    .. py:attribute:: se  Selector strategy
+
+    .. py:attribute:: af  Fund allocation algorithm
+
+    .. py:attribute:: proto_sys_list  List of prototype systems
+
+    .. py:attribute:: real_sys_list  List of the actual systems instantiated at run time
 
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
-        
-        :param str name: the parameter name
-        :return: the parameter value
-        :raises out_of_range: no such parameter
-        
+        Return the value of the specified parameter.
+
+        :param str name: parameter name
+        :return: parameter value
+        :raises out_of_range: raised if no such parameter exists
+
     .. py:method:: set_param(self, name, value)
-    
-        Set the parameter
-        
-        :param str name: the parameter name
-        :param value: the parameter value
+
+        Set the value of a parameter.
+
+        :param str name: parameter name
+        :param value: parameter value
         :type value: int | bool | float | string
-        :raises logic_error: Unsupported type! The parameter type is not supported  
+        :raises logic_error: Unsupported type! Raised when the parameter value type is not supported.
 
     .. py:method:: reset(self)
-    
-        The reset operation
-    
+
+        Reset the portfolio to its initial state.
+
     .. py:method:: clone(self)
-    
-        The clone operation
+
+        Return a clone (deep copy) of the portfolio.
 
     .. py:method:: run(self, query[, force=false])
-    
-        Run the portfolio strategy. When the query condition and the components have not changed, the PF will not actually calculate by default when it is executed the second time.
-        However, since the parameters of the components may change, whether a recalculation is needed cannot be judged automatically; you can specify a forced calculation manually.
 
-        :param Query query: the query condition
-        :param bool force: force recalculating        
+        Run the portfolio strategy. If the query conditions and all parts are unchanged, a second invocation of the PF does not perform any actual calculation by default. However, the parameters of individual parts may have changed in a way that cannot be detected automatically, so you can pass ``force=True`` to trigger a forced recalculation manually.
+
+        :param Query query: query conditions
+        :param bool force: force a full recalculation

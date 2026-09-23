@@ -12,7 +12,7 @@ dimensions: **trading model development, an extremely fast computation engine, a
 backtesting system, and live-trading extension**.
 
 Built around mature systematic trading concepts, the framework decomposes a complete trading system
-into independent components: **market environment, condition, signal generator, stop-loss /
+into independent parts: **market environment, condition, signal generator, stop-loss /
 take-profit, money management, profit goal, slippage, multi-factor model, portfolio and fund
 allocation**. You can build your own strategy library for each module, combine them freely in
 research and backtest flexibly, and analyze the effectiveness and robustness of a single strategy as
@@ -30,7 +30,7 @@ Documentation: `https://hikyuu.readthedocs.io/en/latest/index.html <https://hiky
 
 Getting started: `https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True <https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True>`_
 
-Strategy component library: `https://gitee.com/fasiondog/hikyuu_hub <https://gitee.com/fasiondog/hikyuu_hub>`_
+Strategy part library: `https://gitee.com/fasiondog/hikyuu_hub <https://gitee.com/fasiondog/hikyuu_hub>`_
 
 Thanks to a community member who provided an Ubuntu virtual machine image with Hikyuu preinstalled;
 download it from Baidu Netdisk (extraction code: ht8j): `download <https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j>`_
@@ -66,7 +66,7 @@ Why Hikyuu?
 
 Hikyuu provides a lightweight abstraction of systematic trading methods, covering market environment,
 condition, signal generator, stop-loss / take-profit, money management, profit goal, slippage,
-selector and fund allocation. You can assemble your own strategy library from these components,
+selector and fund allocation. You can assemble your own strategy library from these parts,
 combine and backtest them efficiently, and focus on the effect and impact of a single module while
 exploring strategies, which greatly improves research productivity. The main functional architecture
 is shown below:
@@ -150,7 +150,7 @@ Thanks to our donors
     <td><a href="https://pay.ldxp.cn/item/ehbz9b" rel="nofollow">https://pay.ldxp.cn/item/ehbz9b</a></td>
     </tr>
     <tr>
-    <td>Join the Zsxq community<br />(3 devices and more,<br />CNY 300 for the first year, half price to renew)<br />Includes a separate WeChat group and the component library (includes historical daily/minute/hour/tick data)</td>
+    <td>Join the Zsxq community<br />(3 devices and more,<br />CNY 300 for the first year, half price to renew)<br />Includes a separate WeChat group and the part library (includes historical daily/minute/hour/tick data)</td>
     <td>WeChat or Zsxq</td>
     <td><a href="https://t.zsxq.com/YSATD" rel="nofollow">https://t.zsxq.com/YSATD</a></td>
     </tr>

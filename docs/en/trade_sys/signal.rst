@@ -1,22 +1,22 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-Signal Generator|SG
-===================
+Signal Generator (SG)
+=====================
 
-The signal generator is responsible for generating the buy and sell signals.
+A signal generator (SG) produces the buy and sell signals used by a trading system.
 
 Common parameters:
 
-    * **alternate** *(bool|True)* : Whether the buy and sell signals appear alternately. The single-line signals usually judge the generation of the signals by the inflection points, the slope, etc.; in this case, consecutive buy signals or consecutive sell signals may appear, and this parameter can be used to control whether the buy and sell signals appear alternately. The two-line crossover signals usually have the buy and sell already appearing alternately, so this parameter is invalid in that case.
-    * **cycle** *(bool|False)* : Used with PF, calculated only within the PF rebalance cycle
-    * **support_borrow_stock** *(bool|False)* : Support issuing short signals
+    * **alternate** *(bool|True)* : Whether buy and sell signals must alternate. Single-line generators typically derive their signals from curve inflection points, slope changes, and similar rules, so they can emit several consecutive buy signals or several consecutive sell signals; this parameter forces the two to alternate. Two-line crossover generators already alternate buys and sells by construction, in which case this parameter has no effect.
+    * **cycle** *(bool|False)* : Use together with a PF: signals are evaluated only on the PF rebalance cycle
+    * **support_borrow_stock** *(bool|False)* : Allow short-sale signals to be emitted
 
 
-General Signal Generators
--------------------------
+Built-in Signal Generators
+--------------------------
 
-When technical indicators are usually used to judge buying and selling, it is based on the crossover of the fast line and the slow line, or the inflection point of a single curve. The general signal generators below are enough for most cases.
+When technical indicators are used to decide entries and exits, the rule almost always comes down to a crossover between a fast line and a slow line, or to an inflection point on a single curve. The built-in signal generators below cover the majority of these cases.
 
 .. raw:: html
 
@@ -31,69 +31,69 @@ When technical indicators are usually used to judge buying and selling, it is ba
         <tbody>
             <tr>
                 <td><a href="#target-section">SG_Cross</a></td>
-                <td>Two-line crossover indicator</td>
-                <td>When the fast line crosses the slow line from below upward, buy;<br>when the fast line crosses the slow line from above downward, sell.</td>
+                <td>Two-line crossover signal generator</td>
+                <td>Buy when the fast line crosses above the slow line from below;<br>sell when the fast line crosses below the slow line from above.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_CrossGold</a></td>
-                <td>Golden cross indicator</td>
-                <td>A golden cross is when the fast line crosses the slow line from below upward and both the fast line and the slow line point upward, buy;<br>when the fast line crosses the slow line from above downward and both the fast line and the slow line point downward, it is a death cross, sell.</td>
+                <td>Golden cross signal generator</td>
+                <td>Golden cross: buy when the fast line crosses above the slow line from below while both lines point upward;<br>death cross: sell when the fast line crosses below the slow line from above while both lines point downward.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Single</a></td>
-                <td>Single-line inflection point signal generator</td>
-                <td>Generate a single-line inflection point signal generator. Use the curve inflection point algorithm given in the book "Smarter Trading" to judge the curve trend</td>
+                <td>Single-line inflection-point signal generator</td>
+                <td>Determines the trend of a single curve with the inflection-point algorithm given in the book "Smarter Trading"</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Single2</a></td>
-                <td>Single-line inflection point signal generator 2</td>
-                <td>Generate a single-line inflection point signal generator. Use the curve inflection point algorithm given in the book "Smarter Trading" to judge the curve trend</td>
+                <td>Single-line inflection-point signal generator 2</td>
+                <td>Determines the trend of a single curve with the inflection-point algorithm given in the book "Smarter Trading"</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Flex</a></td>
-                <td>Self-crossover single-line inflection point indicator</td>
-                <td>Use its own EMA(slow_n) as the slow line, and itself as the fast line.<br>Buy when the fast line crosses the slow line upward,<br>sell when the fast line crosses the slow line downward.</td>
+                <td>Self-crossing single-line signal generator</td>
+                <td>Uses EMA(slow_n) of the indicator itself as the slow line, and the indicator itself as the fast line.<br>Buy when the fast line crosses above the slow line,<br>sell when the fast line crosses below the slow line.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Bool</a></td>
                 <td>Boolean signal generator</td>
-                <td>Use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.</td>
+                <td>Takes two indicators whose results behave like boolean arrays, used as the buy condition and the sell condition respectively.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_OneSide</a></td>
-                <td>One-side signal generator</td>
-                <td>Build a one-side signal (containing only the buy signal or only the sell signal) from the input indicator,<br>if the indicator value is greater than 0, add the signal</td>
+                <td>One-sided signal generator</td>
+                <td>Builds a one-sided signal from the input indicator (buys only or sells only);<br>a positive indicator value adds the corresponding signal.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Buy</a></td>
-                <td>One-side buy signal generator</td>
-                <td>The simplified mode of SG_OneSide</td>
+                <td>One-sided buy signal generator</td>
+                <td>A shorthand for SG_OneSide</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Sell</a></td>
-                <td>One-side sell signal generator</td>
-                <td>The simplified mode of SG_OneSide</td>
+                <td>One-sided sell signal generator</td>
+                <td>A shorthand for SG_OneSide</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Band</a></td>
                 <td>Range breakout signal generator</td>
-                <td>The indicator range indicator; when the indicator exceeds the upper band, buy;<br>when the indicator falls below the lower band, sell.</td>
+                <td>Band breakout generator; buy when the indicator breaks above the upper band;<br>sell when it falls below the lower band.</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_AllwaysBuy</a></td>
                 <td>Always-buy signal generator</td>
-                <td>A special SG that issues a buy signal every day continuously, usually used with PF</td>
+                <td>A special SG that keeps emitting a buy signal on every bar, usually used together with a PF</td>
             </tr>
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
                 <td>PF rebalance cycle buy signal generator</td>
-                <td>A special SG, used with PF, taking the PF rebalance cycle as the buy signal</td>
+                <td>A special SG for use with a PF, treating the PF rebalance cycle as its buy signals</td>
             </tr>
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
                 <td>SG operation helpers</td>
-                <td>Since the alternate of SG defaults to True, when using a form like "sg1 + sg2 + sg3", it is easy to ignore the alternate attribute of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem</td>
-            </tr>        
+                <td>Because alternate defaults to True for an SG, chaining a form such as "sg1 + sg2 + sg3" can silently carry over the alternate setting of sg1 + sg2<br>It is recommended to use SG_Add(sg1, sg2, False) + sg3 to avoid the alternation problem</td>
+            </tr>
         </tbody>
     </table>
     <p></p>
@@ -103,72 +103,72 @@ Two-line Crossover Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cross(fast, slow)
-    
-    The two-line crossover indicator; when the fast line crosses the slow line from below upward, buy; when the fast line crosses the slow line from above downward, sell. E.g.: buy when the 5-day MA crosses the 10-day MA upward, sell when the 5-day MA crosses the 10-day MA downward:: 
+
+    The two-line crossover signal generator: buy when the fast line crosses above the slow line from below, and sell when the fast line crosses below the slow line from above. For example, buy when a shorter-period MA crosses above a longer-period MA and sell on the opposite cross::
 
         SG_Cross(MA(CLOSE(), n=10), MA(CLOSE(), n=30))
 
     :param Indicator fast: the fast line
     :param Indicator slow: the slow line
     :return: the signal generator
-        
-        
+
+
 Golden Cross Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_CrossGold(fast, slow)
 
-    The golden cross indicator; a golden cross is when the fast line crosses the slow line from below upward and both the fast line and the slow line point upward, buy;
-    when the fast line crosses the slow line from above downward and both the fast line and the slow line point downward, it is a death cross, sell.::
-    
+    The golden cross signal generator. A golden cross occurs when the fast line crosses above the slow line from below while both the fast line and the slow line point upward — buy.
+    A death cross occurs when the fast line crosses below the slow line from above while both lines point downward — sell.::
+
         SG_CrossGold(MA(CLOSE(), n=10), MA(CLOSE(), n=30))
-    
+
     :param Indicator fast: the fast line
     :param Indicator slow: the slow line
-    :return: the signal generator    
+    :return: the signal generator
 
 
 Single-line Inflection Point Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1])
-    
-    Generate a single-line inflection point signal generator. Use the curve inflection point algorithm given in the book "Smarter Trading" [BOOK1]_ to judge the curve trend; the formula is as follows::
+
+    Creates a single-line inflection-point signal generator. It judges the trend of the curve with the inflection-point algorithm given in the book "Smarter Trading" [BOOK1]_. The rules are as follows::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
         Buy  When AMA - AMA[1] > filter
         or Buy When AMA - AMA[2] > filter
-        or Buy When AMA - AMA[3] > filter 
-    
-    :param Indicator ind:
-    :param int filter_n: the N-day period
+        or Buy When AMA - AMA[3] > filter
+
+    :param Indicator ind: the input indicator curve
+    :param int filter_n: the lookback period N, in bars
     :param float filter_p: the filter percentage
     :return: the signal generator
-    
+
 .. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
-    
-    Generate the single-line inflection point signal generator 2 [BOOK1]_::
+
+    Creates the second variant of the single-line inflection-point signal generator [BOOK1]_::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
         Buy  When AMA - @lowest(AMA,n) > filter
         Sell When @highest(AMA, n) - AMA > filter
-    
-    :param Indicator ind:
-    :param int filter_n: the N-day period
+
+    :param Indicator ind: the input indicator curve
+    :param int filter_n: the lookback period N, in bars
     :param float filter_p: the filter percentage
     :return: the signal generator
-   
-Self-crossover Single-line Inflection Point Indicator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Self-crossing Single-line Signal Generator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Flex(ind, slow_n)
 
-    Use its own EMA(slow_n) as the slow line and itself as the fast line; buy when the fast line crosses the slow line upward, and sell when the fast line crosses the slow line downward.
+    Uses EMA(slow_n) of the indicator itself as the slow line and the indicator itself as the fast line. Buy when the fast line crosses above the slow line, and sell when the fast line crosses below the slow line.
 
-    :param Indicator ind:
-    :param int slow_n: the period of the slow line EMA
+    :param Indicator ind: the input indicator
+    :param int slow_n: the EMA period of the slow line
     :return: the signal generator
 
 
@@ -177,28 +177,28 @@ Boolean Signal Generator
 
 .. py:function:: SG_Bool(buy, sell[, alternate=True])
 
-    The boolean signal generator; use Indicators whose operation results are bool-array-like as the buy and sell indicators respectively.
-    
-    :param Indicator buy: the buy indicator (a position > 0 in the result Indicator means buy)
-    :param Indicator sell: the sell indicator (a position > 0 in the result Indicator means sell)
-    :param bool alternate: whether to buy and sell alternately, defaults to True
+    The boolean signal generator: takes two indicators whose results behave like boolean arrays, used as the buy condition and the sell condition respectively.
+
+    :param Indicator buy: the buy indicator (a positive value at a given position in the result means buy)
+    :param Indicator sell: the sell indicator (a positive value at a given position in the result means sell)
+    :param bool alternate: whether buys and sells must alternate; defaults to True
     :return: the signal generator
 
 
-One-side Signal Generator
-^^^^^^^^^^^^^^^^^^^^^^^^^
+One-sided Signal Generator
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_OneSide(ind, is_buy)
-          
-    Build a one-side signal (containing only the buy signal or only the sell signal) from the input indicator; if the indicator value is greater than 0, add the signal
-    
+
+    Builds a one-sided signal from the input indicator (containing only buy signals or only sell signals); if the indicator value is positive, the corresponding signal is added.
+
     :param Indicator ind: the input indicator
-    :param bool is_buy: build a buy signal, otherwise a sell signal
+    :param bool is_buy: True to build a buy-only signal, otherwise a sell-only signal
 
 
 .. py:function:: SG_Buy(ind)
 
-    The one-side buy signal, a simplification of SG_OneSide
+    The one-sided buy-only signal; a shorthand for SG_OneSide.
 
     :param Indicator ind: the input indicator
     :return: the signal generator
@@ -206,7 +206,7 @@ One-side Signal Generator
 
 .. py:function:: SG_Sell(ind)
 
-    The one-side sell signal, a simplification of SG_OneSide
+    The one-sided sell-only signal; a shorthand for SG_OneSide.
 
     :param Indicator ind: the input indicator
     :return: the signal generator
@@ -216,10 +216,10 @@ Range Breakout Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Band(ind, lower, upper)
-          
-    The indicator range indicator; when the indicator exceeds the upper band, buy;
-    when the indicator falls below the lower band, sell.
-    
+
+    The band breakout signal generator: buy when the indicator breaks above the upper band,
+    and sell when the indicator falls below the lower band.
+
     ::
 
         SG_Band(MA(C, n=10), 100, 200)
@@ -230,46 +230,46 @@ Always-buy Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_AllwaysBuy()
-    
-    A special SG that issues a buy signal every day continuously, usually used with PF
+
+    A special SG that keeps emitting a buy signal on every bar, usually used together with a PF.
 
 
-PF Position Adjustment Period Buy Signal Generator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PF Rebalance Cycle Buy Signal Generator
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: SG_Cycle()
-    
-    A special SG, used with PF, taking the PF rebalance cycle as the buy signal
+
+    A special SG for use with a PF, treating the PF rebalance cycle as its buy signals.
 
 
 Custom Signal Generator
 -----------------------
 
-Quickly create a custom signal generator without private attributes.
+Quickly create a custom signal generator that holds no private attributes.
 
 .. py:function:: crtSG(func, params={}, name='crtSG')
 
-    Quickly create a custom signal generator without private attributes
-    
+    Quickly create a custom signal generator without private attributes.
+
     :param func: the signal strategy function
     :param {} params: the parameter dictionary
     :param str name: the custom name
     :return: the custom signal generator instance
-    
+
 Example:
 
-.. literalinclude:: ../../examples/quick_crtsg.py      
+.. literalinclude:: ../../examples/quick_crtsg.py
 
 The custom signal generator interface:
 
-* :py:meth:`SignalBase._calculate` - [Required] The subclass calculation interface
-* :py:meth:`SignalBase._clone` - [Required] The clone interface
+* :py:meth:`SignalBase._calculate` - [Required] The computation hook implemented by the subclass
+* :py:meth:`SignalBase._clone` - [Required] The clone hook
 * :py:meth:`SignalBase._reset` - [Optional] Reset the internal member variables
 
-Example 1 (without private variables, the turtle trading strategy):
+Example 1 (without private state, the turtle trading strategy):
 
-.. literalinclude:: ../../examples/Turtle_SG.py                
-                
+.. literalinclude:: ../../examples/Turtle_SG.py
+
 Example 2 (with private attributes):
 
 ::
@@ -277,17 +277,17 @@ Example 2 (with private attributes):
     class SignalPython(SignalBase):
         def __init__(self):
             super(SignalPython, self).__init__("SignalPython")
-            self._x = 0 # private attribute
+            self._x = 0  # private attribute
             self.setParam("test", 30)
-        
+
         def _reset(self):
             self._x = 0
-                
+
         def _clone(self):
             p = SignalPython()
             p._x = self._x
             return p
-        
+
         def _calculate(self, k):
             self._addBuySignal(Datetime(201201210000))
             self._addSellSignal(Datetime(201201300000))
@@ -298,93 +298,95 @@ Signal Generator Base Class
 
 .. py:class:: SignalBase
 
-    The signal generator base class
-    
-    .. py:attribute:: name Name
-    
+    The base class for all signal generators.
+
+    .. py:attribute:: name
+
+        The signal generator name
+
     .. py:method:: __init__(self[, name="SignalBase"])
-    
-        :param str name: the name
-        
+
+        :param str name: the signal generator name
+
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
-    
+        Get the value of the specified parameter.
+
         :param str name: the parameter name
         :return: the parameter value
         :raises out_of_range: no such parameter
-        
+
     .. py:method:: set_param(self, name, value)
-    
-        Set the parameter
-        
+
+        Set the value of a parameter.
+
         :param str name: the parameter name
         :param value: the parameter value
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! The parameter type is not supported
-                
+
     .. py:method:: should_buy(self, datetime)
-    
-        Whether it can be bought at the specified moment
-    
-        :param Datetime datetime: the specified moment
+
+        Whether a buy signal exists at the specified datetime.
+
+        :param Datetime datetime: the specified datetime
         :rtype: bool
-    
+
     .. py:method:: should_sell(self, datetime)
-    
-        Whether it can be sold at the specified moment
-        
-        :param Datetime datetime: the specified moment
+
+        Whether a sell signal exists at the specified datetime.
+
+        :param Datetime datetime: the specified datetime
         :rtype: bool
 
     .. py:method:: next_time_should_buy(self)
 
-        Whether it can be bought at the next moment, equivalent to whether the last moment indicated a buy
+        Whether buying is allowed at the next bar; equivalent to asking whether the last bar indicated a buy.
 
     .. py:method:: next_time_should_sell(self)
 
-        Whether it can be sold at the next moment, equivalent to whether the last moment indicated a sell
-    
-    .. py:method:: get_buy_signal(self)
-    
-        Get the list of all the buy indication dates
-        
-        :rtype: DatetimeList
-    
-    .. py:method:: get_sell_signal(self)
-    
-        Get the list of all the sell indication dates
-        
-        :rtype: DatetimeList
-    
-    .. py:method:: _add_buy_signal(self, datetime)
-    
-        Add a buy signal, called in _calculate
-        
-        :param Datetime datetime: the date indicating the buy
-    
-    .. py:method:: _add_sell_signal(self, datetime)
-    
-        Add a sell signal, called in _calculate
+        Whether selling is allowed at the next bar; equivalent to asking whether the last bar indicated a sell.
 
-        :param Datetime datetime: the date indicating the sell
-        
+    .. py:method:: get_buy_signal(self)
+
+        Get the list of all dates flagged as buy signals.
+
+        :rtype: DatetimeList
+
+    .. py:method:: get_sell_signal(self)
+
+        Get the list of all dates flagged as sell signals.
+
+        :rtype: DatetimeList
+
+    .. py:method:: _add_buy_signal(self, datetime)
+
+        Add a buy signal; called from within _calculate.
+
+        :param Datetime datetime: the datetime of the buy signal
+
+    .. py:method:: _add_sell_signal(self, datetime)
+
+        Add a sell signal; called from within _calculate.
+
+        :param Datetime datetime: the datetime of the sell signal
+
     .. py:method:: reset(self)
-    
-        The reset operation
-    
+
+        Reset the generator to its initial state.
+
     .. py:method:: clone(self)
-    
-        The clone operation
-    
+
+        Return a clone (copy) of the generator.
+
     .. py:method:: _calculate(self, kdata)
-    
-        [Override hook] The subclass calculation interface
-    
+
+        [Override hook] The computation hook implemented by the subclass.
+
     .. py:method:: _reset(self)
-    
-        [Override hook] The subclass reset interface, resetting the internal private variables
-    
+
+        [Override hook] The subclass reset hook, which resets the internal private variables.
+
     .. py:method:: _clone(self)
-    
-        [Override hook] The subclass clone interface
+
+        [Override hook] The subclass clone hook.

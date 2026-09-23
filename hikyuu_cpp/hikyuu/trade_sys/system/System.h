@@ -161,7 +161,7 @@ public:
     const TradeRequest& getSellShortTradeRequest() const;
     const TradeRequest& getBuyShortTradeRequest() const;
 
-    /** Mark all the components as not shared */
+    /** Mark all the parts as not shared */
     void setNotSharedAll();
 
     /**
@@ -170,8 +170,8 @@ public:
      */
     void reset();
 
-    /** Force resetting all the components and clearing the existing trading object, ignoring the
-     *  shared attribute of the components */
+    /** Force resetting all the parts and clearing the existing trading object, ignoring the
+     *  shared attribute of the parts */
     void forceResetAll();
 
     typedef shared_ptr<System> SystemPtr;
@@ -234,7 +234,7 @@ public:
     // Preparation before running; an exception is thrown on failure
     virtual void readyForRun();
 
-    // Called by the related components to notify sys when the component parameters change, so that
+    // Called by the related parts to notify sys when the part parameters change, so that
     // it is recalculated
     void partChangedNotify() {
         m_calculated = false;

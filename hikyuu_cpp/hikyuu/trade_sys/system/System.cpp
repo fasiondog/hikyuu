@@ -126,7 +126,7 @@ void System::initParam() {
     setParam<bool>("support_borrow_stock", false);
 
     // The following parameters control the sharing strategy of the parts and affect the clone and
-    // reset operations A shared component is neither cloned nor reset
+    // reset operations: a shared part is neither cloned nor reset
     setParam<bool>("shared_tm", false);
     setParam<bool>("shared_ev", true);
     setParam<bool>("shared_cn", false);

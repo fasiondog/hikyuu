@@ -17,10 +17,10 @@
  * Hikyuu Quant Framework is an open-source C++/Python quantitative trading research framework for
  * strategy analysis and backtesting (currently aimed at the domestic securities market). Its core
  * idea is based on the current mature systematic trading method: the whole systematic trading is
- * abstracted into seven components, namely the market environment strategy, the system
+ * abstracted into seven parts, namely the market environment strategy, the system
  * valid condition, the signal generator, the stop-loss / take-profit strategy, the money management
  * strategy, the profit goal strategy and the slippage algorithm. You can build the strategy asset
- * library of these components separately and combine them freely in practical research to observe
+ * library of these parts separately and combine them freely in practical research to observe
  * the effectiveness and stability of the system as well as the effect of a single kind of strategy.
  *
  * For more information, please visit: <a href="http://hikyuu.org">http://hikyuu.org</a>

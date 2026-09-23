@@ -112,7 +112,7 @@ void PerformanceOptimalSelector::_calculate_parallel(
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
               for (const auto& sys : m_pro_sys_list) {
-                  // Cut off all the shared components to avoid a parallel conflict
+                  // Cut off all the shared parts to avoid a parallel conflict
                   auto new_sys = sys->clone();
                   new_sys->run(q, true);
                   per.statistics(new_sys->getTM(), end_date);

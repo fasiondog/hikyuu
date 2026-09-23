@@ -1,10 +1,10 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-Asset Allocation Algorithm Component|AF
-=======================================
+Fund Allocation (AF)
+====================
 
-The asset allocation algorithm component, used to allocate the assets to the selected systems.
+The fund allocation (AF) part, used to allocate capital among the selected systems.
 
 Common parameters:
 

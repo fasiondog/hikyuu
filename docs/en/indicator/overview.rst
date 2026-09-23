@@ -144,7 +144,7 @@ The indicators themselves directly support the "+", "-", "*", "/", "&" (and), "|
 **Cross-sectional Statistics**
 
 * :py:func:`BLOCKSETNUM` - return the number of the stocks in the block
-* :py:func:`INSUM` - return the calculated values of the corresponding outputs of this indicator of each component in the block by the calculation type. The calculation types: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-ranking (1 corresponds to the lowest indicator value), 5-ranking (starting from 1, corresponding to the highest indicator value).
+* :py:func:`INSUM` - return the calculated values of the corresponding outputs of this indicator of each constituent in the block by the calculation type. The calculation types: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-ranking (1 corresponds to the lowest indicator value), 5-ranking (starting from 1, corresponding to the highest indicator value).
 * :py:func:`RANK` - [Donating user] calculate the ranking of the indicator value in the specified block
 
 **Technical Indicators**
