@@ -58,3 +58,27 @@ html_search_language = 'zh'
 htmlhelp_basename = 'Hikyuudoc'
 
 needs_sphinx = '4.2.0'
+
+
+def setup(app):
+    """Allow CJK characters and full-width punctuation to follow an inline-
+    markup *closing* delimiter.
+
+    By default docutils only accepts ASCII whitespace/punctuation after an
+    inline-markup closing delimiter, so Chinese text like ``**中文**（`` or
+    double-backtick literals followed by full-width punctuation is wrongly
+    reported as "Inline X start-string without end-string".
+
+    We only relax the *trailing* constraint: ``closing_delimiters`` feeds
+    docutils' ``end_string_suffix`` (used after a close) but is *not* used by
+    the leading constraint, so ``|substitution|`` references, hyperlink
+    targets, etc. stay at docutils' default and are unaffected. Appending the
+    CJK ranges below makes a close valid when followed by any CJK character or
+    full-width punctuation. This patch is zh-only: the English tree is pure
+    ASCII and keeps docutils' default behaviour.
+    """
+    import docutils.utils.punctuation_chars as punctuation_chars
+    # CJK symbols/punctuation, CJK unified ideographs, fullwidth forms
+    cjk = '\u3000-\u303f\u4e00-\u9fff\uFF01-\uFF60'
+    if cjk not in punctuation_chars.closing_delimiters:
+        punctuation_chars.closing_delimiters += cjk
