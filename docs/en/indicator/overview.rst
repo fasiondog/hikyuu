@@ -4,45 +4,45 @@
 Technical Indicator Overview
 ============================
 
-**Auxiliary indicators**
+**Auxiliary Indicators**
 
-* :py:func:`ALIGN` - align by the specified reference dates
-* :py:func:`CODELIKE` - the security code pattern matching
-* :py:func:`CYCLE` - the PF rebalance cycle indicator, mainly used for the PF rebalance day verification, and as an SG
-* :py:func:`CVAL` - create a fixed-value indicator of the specified length
-* :py:func:`CONTEXT` - an independent context
-* :py:func:`DISCARD` - set the amount of the discarded data of the indicator result in the way of the indicator formula.
-* :py:func:`DROPNA` - remove the nan values
-* :py:func:`FIXED_START_INDEX` - [Donating user] fix the start index of the query range used when calculating the indicator
-* :py:func:`FIXED_START_DATE` - [Donating user] fix the start date of the query range used when calculating the indicator
-* :py:func:`INBLOCK` - whether the security of the current context is in the specified block.
-* :py:func:`ISNA` - judge whether it is a nan value
-* :py:func:`ISINF` - judge whether it is a +inf value
-* :py:func:`ISINFA` - judge whether it is a -inf value
-* :py:func:`JUMPDOWN` - the edge jump, jumping from <= 0.0 to > 0.0
-* :py:func:`JUMPUP` - the edge jump, jumping from > 0.0 to <= 0.0
-* :py:func:`LASTVALUE` - equivalent to the TDX CONST indicator. Take the last value of the input indicator as a constant, i.e. all the values in the result are the last value of the input indicator; use with caution. It contains a look-ahead function; use with caution.
-* :py:func:`NAMELIKE` - the security name pattern matching
-* :py:func:`PRICELIST` - wrap a PriceList or the result set of an Indicator as an Indicator; the same name: VALUE
-* :py:func:`REF` - the forward reference (i.e. shifting right), referencing the data several periods ago
-* :py:func:`REFX` - the enhancement of REF, which can shift left or right. When shifting left, it is a look-ahead function; do not use it for backtesting.
-* :py:func:`REPLACE` - replace the specified values in the indicator, defaulting to replacing the nan values with 0.0
-* :py:func:`RESULT` - return the corresponding result set in the specified indicator in the way of the indicator formula
-* :py:func:`SLICE` - get the data of the specified range [start, end) in an indicator, generating a new indicator
-* :py:func:`WEAVE` - merge the results of the two inds into one ind
-* :py:func:`WITHKTYPE` - [Donating user] convert the indicator data to the specified K-line type. The related convenience functions: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
-* :py:func:`ZSCORE` - the ZScore standardization
+* :py:func:`ALIGN` - align the data to the specified reference dates
+* :py:func:`CODELIKE` - pattern matching against the security code
+* :py:func:`CYCLE` - the portfolio (PF) rebalance-cycle indicator, used mainly for rebalancing-day validation in a portfolio and as a signal generator (SG)
+* :py:func:`CVAL` - create a constant-value indicator of the specified length
+* :py:func:`CONTEXT` - a standalone context
+* :py:func:`DISCARD` - set the discarded (warm-up) length of an indicator's result using indicator formula syntax
+* :py:func:`DROPNA` - remove NaN values
+* :py:func:`FIXED_START_INDEX` - [supporter-only] pin the start index of the query range used when the indicator is calculated
+* :py:func:`FIXED_START_DATE` - [supporter-only] pin the start date of the query range used when the indicator is calculated
+* :py:func:`INBLOCK` - whether the security in the current context belongs to the specified sector
+* :py:func:`ISNA` - test whether a value is NaN
+* :py:func:`ISINF` - test whether a value is positive infinity (+inf)
+* :py:func:`ISINFA` - test whether a value is negative infinity (-inf)
+* :py:func:`JUMPDOWN` - falling-edge detector: outputs 1.0 when the series crosses from > 0.0 to <= 0.0
+* :py:func:`JUMPUP` - rising-edge detector: outputs 1.0 when the series crosses from <= 0.0 to > 0.0
+* :py:func:`LASTVALUE` - equivalent to the TDX CONST indicator: broadcasts the final value of the input indicator across the entire result, so every output value equals that final value. It contains a look-ahead bias; do not use it in backtests.
+* :py:func:`NAMELIKE` - pattern matching against the security name
+* :py:func:`PRICELIST` - wrap a PriceList or the result set of an Indicator as an Indicator; alias: VALUE
+* :py:func:`REF` - backward reference (a right shift): the data from N periods earlier
+* :py:func:`REFX` - an enhanced REF that can shift left or right. Shifting left introduces look-ahead data; do not use it for backtesting.
+* :py:func:`REPLACE` - replace specified values in an indicator; by default replaces NaN with 0.0
+* :py:func:`RESULT` - return the corresponding result set of the specified indicator using indicator formula syntax
+* :py:func:`SLICE` - extract the data over the half-open range [start, end) of an indicator into a new indicator
+* :py:func:`WEAVE` - merge the result sets of two indicators into one
+* :py:func:`WITHKTYPE` - [supporter-only] convert the indicator data to the specified bar (K-line/candlestick) type. Convenience wrappers: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+* :py:func:`ZSCORE` - Z-score normalization
 
 
-**Market indicators**
+**Market Data Indicators**
 
-* :py:func:`KDATA` - wrap the KData as an Indicator, used for the calculation of the other indicators
-* :py:func:`KDATA_PART` - select and return the indicator KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL by the string
+* :py:func:`KDATA` - wrap KData (bar data) as an Indicator for use in other indicator calculations
+* :py:func:`KDATA_PART` - select and return one of KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL by its name string
 * :py:func:`OPEN`  - wrap the open price of the KData as an Indicator
 * :py:func:`HIGH`  - wrap the high price of the KData as an Indicator
 * :py:func:`LOW`   - wrap the low price of the KData as an Indicator
 * :py:func:`CLOSE` - wrap the close price of the KData as an Indicator
-* :py:func:`AMO`   - wrap the amount of the KData as an Indicator
+* :py:func:`AMO`   - wrap the trading value (amount) of the KData as an Indicator
 * :py:func:`VOL`   - wrap the volume of the KData as an Indicator
 * :py:func:`ADJ_FACTOR` - the adjustment factor (used together with the factor management system)
 * :py:func:`ADJ_OPEN` - the adjusted open price
@@ -50,199 +50,199 @@ Technical Indicator Overview
 * :py:func:`ADJ_LOW` - the adjusted low price
 * :py:func:`ADJ_CLOSE` - the adjusted close price
 * :py:func:`ADJ_VOL` - the adjusted volume
-* :py:func:`RECOVER_FORWARD` - the forward adjustment
-* :py:func:`RECOVER_BACKWARD` - the backward adjustment
-* :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
-* :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
-* :py:func:`FINANCE` - the historical finance information
-* :py:func:`HSL` - the turnover rate
-* :py:func:`CAPITAL` - the circulating share capital, the same name: LIUTONGPAN
-* :py:func:`TIMELINE`   - the time-line price
-* :py:func:`TIMELINEVOL`   - the time-line volume
-* :py:func:`ZHBOND10` - the 10-year Chinese treasury bond yield
+* :py:func:`RECOVER_FORWARD` - forward adjustment
+* :py:func:`RECOVER_BACKWARD` - backward adjustment
+* :py:func:`RECOVER_EQUAL_FORWARD` - equal-weight forward adjustment
+* :py:func:`RECOVER_EQUAL_BACKWARD` - equal-weight backward adjustment
+* :py:func:`FINANCE` - historical financial data
+* :py:func:`HSL` - turnover rate
+* :py:func:`CAPITAL` - the floating (tradable) share capital; alias: LIUTONGPAN
+* :py:func:`TIMELINE`   - intraday timeline price
+* :py:func:`TIMELINEVOL`   - intraday timeline volume
+* :py:func:`ZHBOND10` - the China 10-year government bond yield
 * :py:func:`ZONGGUBEN` - the total share capital
-* :py:func:`STKTYPE` - the stock type indicator
-* :py:func:`ISLIMITUP` - judge whether it is the limit up
-* :py:func:`ISLIMITDOWN` - judge whether it is the limit down
-    
-
-**Market-wide indicators**
-
-* :py:func:`ADVANCE` - the number of the rising stocks
-* :py:func:`DECLINE` - the number of the falling stocks
-* :py:func:`INDEXO` - return the corresponding market open prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
-* :py:func:`INDEXH` - return the corresponding market high prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
-* :py:func:`INDEXL` - return the corresponding market low prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
-* :py:func:`INDEXC` - return the corresponding market close prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
-* :py:func:`INDEXA` - return the corresponding market amounts, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
-* :py:func:`INDEXV` - return the corresponding market volumes, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
-* :py:func:`INDEXADV` - the TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
-* :py:func:`INDEXDEC` - the TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
+* :py:func:`STKTYPE` - the security type indicator
+* :py:func:`ISLIMITUP` - test whether the security is at its limit-up price
+* :py:func:`ISLIMITDOWN` - test whether the security is at its limit-down price
 
 
-**Logical Arithmetic Functions**
+**Market-Wide and Index Indicators**
 
-The indicators themselves directly support the "+", "-", "*", "/", "&" (and), "|" (or), "<", ">", "<=", ">=", "==", "!=" operations.
+* :py:func:`ADVANCE` - the number of advancing (rising) securities
+* :py:func:`DECLINE` - the number of declining (falling) securities
+* :py:func:`INDEXO` - return the open prices of the corresponding market indices: the SSE Composite Index, SZSE Component Index, STAR 50 Index, and ChiNext Index
+* :py:func:`INDEXH` - return the high prices of the corresponding market indices: the SSE Composite Index, SZSE Component Index, STAR 50 Index, and ChiNext Index
+* :py:func:`INDEXL` - return the low prices of the corresponding market indices: the SSE Composite Index, SZSE Component Index, STAR 50 Index, and ChiNext Index
+* :py:func:`INDEXC` - return the close prices of the corresponding market indices: the SSE Composite Index, SZSE Component Index, STAR 50 Index, and ChiNext Index
+* :py:func:`INDEXA` - return the trading values of the corresponding market indices: the SSE Composite Index, SZSE Component Index, STAR 50 Index, and ChiNext Index
+* :py:func:`INDEXV` - return the volumes of the corresponding market indices: the SSE Composite Index, SZSE Component Index, STAR 50 Index, and ChiNext Index
+* :py:func:`INDEXADV` - the TDX 880005 market-wide advancing-security count, which may not be updated intraday
+* :py:func:`INDEXDEC` - the TDX 880005 market-wide declining-security count, which may not be updated intraday
 
-* :py:func:`BETWEEN` - between (between two numbers)
-* :py:func:`CEILING` - round up (rounding in the direction of increasing the value) to an integer
-* :py:func:`CROSS` - the cross function
-* :py:func:`DOWNNDAY` - the number of the consecutive falling periods
-* :py:func:`EVERY` - always exists
-* :py:func:`EXIST` - exists; EXIST(X,N) means that the condition X exists within the N periods
-* :py:func:`FLOOR` - round down (rounding in the direction of decreasing the value) to an integer
-* :py:func:`IF` - get the different values according to the condition
-* :py:func:`INTPART` - take the integer part (rounding by decreasing the absolute value, i.e. getting the integer part of the data)
-* :py:func:`LAST` - exists in the interval
-* :py:func:`LONGCROSS` - the two lines cross after maintaining for a certain period
-* :py:func:`NOT` - get the logical negation
-* :py:func:`UPNDAY` - the number of the consecutive rising periods
-* :py:func:`NDAY` - consecutively greater
+
+**Logical and Comparison Functions**
+
+Indicators natively support the operators "+", "-", "*", "/", "&" (logical and), "|" (logical or), "<", ">", "<=", ">=", "==" and "!=".
+
+* :py:func:`BETWEEN` - test whether a value lies between two given numbers
+* :py:func:`CEILING` - round toward positive infinity to the nearest integer
+* :py:func:`CROSS` - crossing detector: whether one series crosses above the other
+* :py:func:`DOWNNDAY` - consecutive-down indicator: 1 when the input has fallen over each of the last N periods
+* :py:func:`EVERY` - all-periods test: EVERY(X, N) outputs 1 when X is true (nonzero) in every one of the most recent N periods; N = 0 means every period from the first valid bar up to the current bar
+* :py:func:`EXIST` - within-window existence: EXIST(X, N) outputs 1 when condition X has been true at least once during the last N periods
+* :py:func:`FLOOR` - round toward negative infinity to the nearest integer
+* :py:func:`IF` - select different values according to a condition
+* :py:func:`INTPART` - take the integer part (truncate toward zero)
+* :py:func:`LAST` - interval-persistence test: LAST(X, M, N) outputs 1 when condition X holds on every bar from M periods ago through N periods ago (M >= N); M = 0 starts from the first bar and N = 0 ends at the current bar
+* :py:func:`LONGCROSS` - sustained-then-cross detector: two lines cross only after one has stayed on one side of the other for a given number of periods
+* :py:func:`NOT` - logical negation
+* :py:func:`UPNDAY` - consecutive-up indicator: 1 when the input has risen over each of the last N periods
+* :py:func:`NDAY` - consecutive comparison: NDAY(X, Y, N) outputs 1 when X has been greater than Y for N consecutive periods
 
 
 **Mathematical Indicators**
 
-* :py:func:`ABS` - get the absolute value
-* :py:func:`ACOS` - the arccosine value
-* :py:func:`ASIN` - the arcsine value
-* :py:func:`ATAN` - the arctangent value
-* :py:func:`COS` - the cosine value
-* :py:func:`EXP` - e to the power of X
-* :py:func:`LN` - get the natural logarithm; LN(X) is the logarithm with the base e
-* :py:func:`LOG` - the logarithm with the base 10
-* :py:func:`MAX` - the maximum value
-* :py:func:`MIN` - the minimum value
-* :py:func:`MOD` - get the modulus after taking the integer. This function is only for the TDX compatibility. In fact, the modulus of the indicators can be obtained directly with the % operator.
-* :py:func:`POW` - the power
-* :py:func:`SIGNED_POWER` - the signed power
-* :py:func:`REVERSE` - get the opposite number
+* :py:func:`ABS` - absolute value
+* :py:func:`ACOS` - arccosine
+* :py:func:`ASIN` - arcsine
+* :py:func:`ATAN` - arctangent
+* :py:func:`COS` - cosine
+* :py:func:`EXP` - e raised to the power X
+* :py:func:`LN` - natural logarithm; LN(X) is the logarithm with base e
+* :py:func:`LOG` - base-10 logarithm
+* :py:func:`MAX` - maximum value
+* :py:func:`MIN` - minimum value
+* :py:func:`MOD` - modulo after truncating to an integer. Provided only for TDX compatibility; in practice the % operator can be applied directly to indicators.
+* :py:func:`POW` - power
+* :py:func:`SIGNED_POWER` - signed power (preserves the sign of the base)
+* :py:func:`REVERSE` - arithmetic negation (the opposite number)
 * :py:func:`ROUND` - round half up
-* :py:func:`ROUNDUP` -  round up, e.g. 10.1 becomes 11 after rounding
-* :py:func:`ROUNDDOWN` - round down, e.g. 10.1 becomes 10 after rounding
-* :py:func:`SIN` - the sine value
-* :py:func:`SGN` - get the sign value
-* :py:func:`SLOPE` - calculate the linear regression slope, the goodness of fit R² and the relative maximum residual
-* :py:func:`SQRT` - take the square root
-* :py:func:`TAN` - the tangent value
+* :py:func:`ROUNDUP` - round up toward positive infinity, e.g. 10.1 becomes 11
+* :py:func:`ROUNDDOWN` - round down toward zero, e.g. 10.1 becomes 10
+* :py:func:`SIN` - sine
+* :py:func:`SGN` - sign function
+* :py:func:`SLOPE` - linear-regression slope, goodness of fit R², and relative maximum residual
+* :py:func:`SQRT` - square root
+* :py:func:`TAN` - tangent
 
 **Statistical Indicators**
 
-* :py:func:`AVEDEV` - the average absolute deviation
-* :py:func:`BETA` - the Beta coefficient, measuring the sensitivity between the asset return and the market return
-* :py:func:`DEVSQ` - the sum of the squared deviations of the data
-* :py:func:`STD` - the estimated standard deviation, the same as STDEV
-* :py:func:`STDEV` - calculate the sample standard deviation within the N periods
-* :py:func:`STDP` - the population standard deviation
-* :py:func:`VAR` - the estimated sample variance
-* :py:func:`VARP` - the population sample variance
-* :py:func:`CORR` - the sample correlation coefficient and the covariance
-* :py:func:`COV` - the sample covariance
-* :py:func:`SPEARMAN` - the Spearman correlation coefficient
-* :py:func:`SKEW` - the population skewness
-* :py:func:`KURT` - the excess kurtosis
+* :py:func:`AVEDEV` - average absolute deviation
+* :py:func:`BETA` - beta coefficient, measuring the sensitivity of the asset's returns to the market returns
+* :py:func:`DEVSQ` - sum of squared deviations
+* :py:func:`STD` - estimated standard deviation; identical to STDEV
+* :py:func:`STDEV` - sample standard deviation over N periods
+* :py:func:`STDP` - population standard deviation
+* :py:func:`VAR` - estimated sample variance
+* :py:func:`VARP` - population variance
+* :py:func:`CORR` - sample correlation coefficient and covariance
+* :py:func:`COV` - sample covariance
+* :py:func:`SPEARMAN` - Spearman rank correlation coefficient
+* :py:func:`SKEW` - population skewness
+* :py:func:`KURT` - excess kurtosis
 
-**Cross-sectional Statistics**
+**Cross-Sectional Statistics**
 
-* :py:func:`BLOCKSETNUM` - return the number of the stocks in the block
-* :py:func:`INSUM` - return the calculated values of the corresponding outputs of this indicator of each constituent in the block by the calculation type. The calculation types: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-ranking (1 corresponds to the lowest indicator value), 5-ranking (starting from 1, corresponding to the highest indicator value).
-* :py:func:`RANK` - [Donating user] calculate the ranking of the indicator value in the specified block
+* :py:func:`BLOCKSETNUM` - return the number of securities in the sector
+* :py:func:`INSUM` - aggregate the corresponding output of this indicator across every constituent of the sector according to a calculation type. Types: 0-sum, 1-mean, 2-maximum, 3-minimum, 4-rank (1 = lowest indicator value), 5-rank (starting from 1 for the highest indicator value).
+* :py:func:`RANK` - [supporter-only] calculate the rank of the indicator value within the specified sector
 
 **Technical Indicators**
 
-* :py:func:`AD` - the accumulation/distribution line
-* :py:func:`ADX` - the Average Directional Index, the trend strength indicator (Wilder smoothing)
-* :py:func:`ADX2` - the Average Directional Index (ADX2), the trend strength indicator (EMA smoothing)
-* :py:func:`AMA` - the Perry J. Kaufman adaptive moving average [BOOK1]_
-* :py:func:`ATR` - the average true range; the simple moving average of the true range TR
-* :py:func:`BACKSET` - the forward assignment, setting the data from the current position to several periods ago to 1
-* :py:func:`BARSCOUNT` - the number of the valid periods, getting the total number of the periods.
-* :py:func:`BARSLAST` - the position of the last time the condition was satisfied, the number of the periods from the last time the condition was satisfied to the current
-* :py:func:`BARSLASTS` - the number of the periods from the Nth time the condition was satisfied to the current (supporting the dynamic parameters)
-* :py:func:`BARSLASTCOUNT` - count the number of the periods continuously satisfying the condition
-* :py:func:`BARSSINCE` - the number of the periods from the first time the condition was satisfied to the current
-* :py:func:`COUNT` - count the number of the periods satisfying the condition
-* :py:func:`COST` - the cost distribution
-* :py:func:`DIFF` - the difference indicator, i.e. data[i] - data[i-n]
-* :py:func:`DMA` - the dynamic moving average
-* :py:func:`EMA` - the Exponential Moving Average
-* :py:func:`FILTER` - the signal filter, filtering the signals that appear consecutively
-* :py:func:`HHV` - the highest price within the N days
-* :py:func:`HHVBARS` - the position of the previous high point, getting the number of the periods from the previous high point to the current
-* :py:func:`KALMAN` - the Kalman filter
-* :py:func:`KDJ` - the classic stochastic indicator
-* :py:func:`LLV` - the lowest price within the N days
-* :py:func:`LLVBARS` - the position of the previous low point, getting the number of the periods from the previous low point to the current
-* :py:func:`MA`  - the simple moving average
-* :py:func:`MACD` - the Moving Average Convergence Divergence
-* :py:func:`MDD` - the maximum drawdown percentage
-* :py:func:`MDD_CURRENT` - the drawdown percentage from the current point to the historical highest point
-* :py:func:`ROC` - the rate of change indicator: ((price / prevPrice)-1)*100
-* :py:func:`ROCP` - the rate of change indicator: (price - prevPrice) / prevPrice
-* :py:func:`ROCR` - the rate of change indicator: (price / prevPrice)
-* :py:func:`ROCR100` - the rate of change indicator: (price / prevPrice) * 100
-* :py:func:`RSRS_BULL` - the RSRS right-skewed standard score indicator (level 4), based on the advanced version of the RSRS corrected by the Everbright research report
-* :py:func:`RSRS_BETA` - the original RSRS (the underlying β) indicator, based on the rolling N-day OLS regression
-* :py:func:`RSI` - the Relative Strength Index
-* :py:func:`SMA` - the moving average
-* :py:func:`SAFTYLOSS` - the Alexander Elder safety zone stop line
-* :py:func:`SUM` - get the total sum
-* :py:func:`SUMBARS` - accumulate to the specified number of the periods, the number of the periods from accumulating forward to the specified value until now
-* :py:func:`TR` - the true range
-* :py:func:`TS_RANK` - the time series ranking (Alpha101), calculating the ranking ratio of the current value within the past N periods
-* :py:func:`VIGOR` - the Alexander Elder force index
+* :py:func:`AD` - accumulation/distribution line
+* :py:func:`ADX` - Average Directional Index, a trend-strength indicator (Wilder smoothing)
+* :py:func:`ADX2` - Average Directional Index (ADX2), a trend-strength indicator (EMA smoothing)
+* :py:func:`AMA` - Perry J. Kaufman's adaptive moving average [BOOK1]_
+* :py:func:`ATR` - average true range: the simple moving average of the true range TR
+* :py:func:`BACKSET` - backward assignment: when the condition holds, set the current bar and the preceding N-1 bars to 1
+* :py:func:`BARSCOUNT` - the number of valid bars, i.e. the total number of periods with data
+* :py:func:`BARSLAST` - bars since the most recent occurrence: the number of periods from the last bar on which the condition was true to the current bar
+* :py:func:`BARSLASTS` - the number of periods from the Nth most recent occurrence of the condition to the current bar (supports dynamic parameters)
+* :py:func:`BARSLASTCOUNT` - count how many consecutive bars satisfy the condition
+* :py:func:`BARSSINCE` - the number of periods from the first bar on which the condition was true to the current bar
+* :py:func:`COUNT` - count the number of periods that satisfy the condition
+* :py:func:`COST` - cost distribution
+* :py:func:`DIFF` - period difference, i.e. data[i] - data[i-n]
+* :py:func:`DMA` - dynamic moving average
+* :py:func:`EMA` - Exponential Moving Average
+* :py:func:`FILTER` - signal filter: suppress signals that appear consecutively
+* :py:func:`HHV` - highest value over the past N periods
+* :py:func:`HHVBARS` - bars since the most recent highest value: the number of periods from the previous peak to the current bar
+* :py:func:`KALMAN` - Kalman filter
+* :py:func:`KDJ` - the classic stochastic oscillator
+* :py:func:`LLV` - lowest value over the past N periods
+* :py:func:`LLVBARS` - bars since the most recent lowest value: the number of periods from the previous trough to the current bar
+* :py:func:`MA`  - simple moving average
+* :py:func:`MACD` - Moving Average Convergence Divergence
+* :py:func:`MDD` - maximum drawdown percentage
+* :py:func:`MDD_CURRENT` - drawdown percentage from the current bar back to the historical peak
+* :py:func:`ROC` - rate of change: ((price / prevPrice) - 1) * 100
+* :py:func:`ROCP` - rate of change: (price - prevPrice) / prevPrice
+* :py:func:`ROCR` - rate of change: price / prevPrice
+* :py:func:`ROCR100` - rate of change: (price / prevPrice) * 100
+* :py:func:`RSRS_BULL` - the RSRS right-skew standard-score indicator (level 4), based on the enhanced RSRS corrected in the Everbright Securities research report
+* :py:func:`RSRS_BETA` - the original RSRS (underlying beta) indicator, based on rolling N-day OLS regression
+* :py:func:`RSI` - Relative Strength Index
+* :py:func:`SMA` - moving average
+* :py:func:`SAFTYLOSS` - Alexander Elder's SafeZone stop line
+* :py:func:`SUM` - cumulative sum
+* :py:func:`SUMBARS` - bars-to-target: the number of periods needed for the cumulative sum counted backward from the current bar to reach a specified value
+* :py:func:`TR` - true range
+* :py:func:`TS_RANK` - time-series rank (Alpha101): the percentile rank of the current value within the past N periods
+* :py:func:`VIGOR` - Alexander Elder's Force Index
 
 
-**Time Indicators**
+**Date and Time Indicators**
 
-* :py:func:`DATE` - get the year-month-day of this period since 1900
-* :py:func:`TIME` - get the hour-minute-second of this period
-* :py:func:`YEAR` - get the year of this period
-* :py:func:`MONTH` - get the month of this period
-* :py:func:`WEEK` - get the day of the week of this period; the valid value range returned by the function is (0-6), and 0 means Sunday
-* :py:func:`DAY` - get the date of this period
-* :py:func:`HOUR` - get the number of the hours of this period
-* :py:func:`MINUTE` - get the number of the minutes of this period
+* :py:func:`DATE` - the year-month-day of the bar, encoded as the number of years elapsed since 1900
+* :py:func:`TIME` - the hour-minute-second of the bar
+* :py:func:`YEAR` - the year of the bar
+* :py:func:`MONTH` - the month of the bar
+* :py:func:`WEEK` - the weekday of the bar; valid return values are 0-6, with 0 meaning Sunday
+* :py:func:`DAY` - the day of the month of the bar
+* :py:func:`HOUR` - the hour of the bar
+* :py:func:`MINUTE` - the minute of the bar
 
 **Factor Indicators**
 
-* :py:func:`FACTOR` - the factor indicator conversion, converting a Factor object to an Indicator
-* :py:func:`IC` - calculate the factor IC value
-* :py:func:`IR` - used to calculate the IR of the account return and the reference return
-* :py:func:`ICIR` - calculate the IR value of the factor IC
+* :py:func:`FACTOR` - factor conversion: turn a Factor object into an Indicator
+* :py:func:`IC` - calculate the factor IC (information coefficient)
+* :py:func:`IR` - calculate the information ratio of the account returns against a reference return
+* :py:func:`ICIR` - calculate the IR of the factor IC series
 
 
-**Aggregation Indicators [Donating user]**
+**Aggregation Indicators [supporter-only]**
 
-* :py:func:`AGG_COUNT` - the aggregation function: the non-empty value counting
-* :py:func:`AGG_MAD` - the aggregation function: the average absolute deviation
-* :py:func:`AGG_MAX` - the aggregation function: the maximum value
-* :py:func:`AGG_MIN` - the aggregation function: the maximum value
-* :py:func:`AGG_MEAN` - the aggregation function: the average value
-* :py:func:`AGG_MEDIAN` - the aggregation function: the median
-* :py:func:`AGG_PROD` - the aggregation function: the product
-* :py:func:`AGG_SAMPLE` - the aggregation function: the time sampling (sampling the indicator data at the specified time points)
-* :py:func:`AGG_SAMPLE_MAX` - the aggregation function: the maximum in the time period (counting the maximum of the indicator data within the specified time period)
-* :py:func:`AGG_SAMPLE_MIN` - the aggregation function: the minimum in the time period (counting the minimum of the indicator data within the specified time period)
-* :py:func:`AGG_SAMPLE_MEAN` - the aggregation function: the average in the time period (counting the average of the indicator data within the specified time period)
-* :py:func:`AGG_SUM` - the aggregation function: the total sum
-* :py:func:`AGG_STD` - the aggregation function: the standard deviation
-* :py:func:`AGG_VAR` - the aggregation function: the variance
-* :py:func:`AGG_QUANTILE` - the aggregation function: the quantile
-* :py:func:`AGG_VWAP` - the aggregation function: the volume-weighted average price
-* :py:func:`AGG_FUNC` - the aggregation function: the custom aggregation function
+* :py:func:`AGG_COUNT` - aggregation: count of non-null values
+* :py:func:`AGG_MAD` - aggregation: mean absolute deviation
+* :py:func:`AGG_MAX` - aggregation: maximum value
+* :py:func:`AGG_MIN` - aggregation: minimum value
+* :py:func:`AGG_MEAN` - aggregation: mean
+* :py:func:`AGG_MEDIAN` - aggregation: median
+* :py:func:`AGG_PROD` - aggregation: product
+* :py:func:`AGG_SAMPLE` - aggregation: time sampling (sample the indicator data at the specified time points)
+* :py:func:`AGG_SAMPLE_MAX` - aggregation: interval maximum (the maximum of the indicator data within the specified time interval)
+* :py:func:`AGG_SAMPLE_MIN` - aggregation: interval minimum (the minimum of the indicator data within the specified time interval)
+* :py:func:`AGG_SAMPLE_MEAN` - aggregation: interval mean (the mean of the indicator data within the specified time interval)
+* :py:func:`AGG_SUM` - aggregation: total sum
+* :py:func:`AGG_STD` - aggregation: standard deviation
+* :py:func:`AGG_VAR` - aggregation: variance
+* :py:func:`AGG_QUANTILE` - aggregation: quantile
+* :py:func:`AGG_VWAP` - aggregation: volume-weighted average price
+* :py:func:`AGG_FUNC` - aggregation: custom aggregation function
 
-**Grouping Indicators [Donating user]**
+**Grouping Indicators [supporter-only]**
 
-* :py:func:`GROUP_COUNT` - the grouping function: the non-empty value counting
-* :py:func:`GROUP_MAX` - the grouping function: the group cumulative maximum
-* :py:func:`GROUP_MIN` - the grouping function: the group cumulative minimum
-* :py:func:`GROUP_MEAN` - the grouping function: the group cumulative average
-* :py:func:`GROUP_PROD` - the grouping function: the group cumulative product
-* :py:func:`GROUP_SUM` - the grouping function: the group cumulative total sum
-* :py:func:`GROUP_FUNC` - the grouping function: the custom grouping calculation function
+* :py:func:`GROUP_COUNT` - grouping: count of non-null values
+* :py:func:`GROUP_MAX` - grouping: group-wise cumulative maximum
+* :py:func:`GROUP_MIN` - grouping: group-wise cumulative minimum
+* :py:func:`GROUP_MEAN` - grouping: group-wise cumulative mean
+* :py:func:`GROUP_PROD` - grouping: group-wise cumulative product
+* :py:func:`GROUP_SUM` - grouping: group-wise cumulative sum
+* :py:func:`GROUP_FUNC` - grouping: custom group calculation function
 
 
-**Other Conversion Aids**
+**Other Conversion Helpers**
 
-* :py:func:`concat_to_df` - merge the indicator list into a DataFrame
-* :py:func:`df_to_ind` - convert the specified column of a DataFrame to an indicator
+* :py:func:`concat_to_df` - concatenate a list of indicators into a DataFrame
+* :py:func:`df_to_ind` - convert a specified column of a DataFrame into an indicator
