@@ -572,7 +572,7 @@ public:
      * @param stoploss stop-loss price
      * @param goalPrice target price
      * @param planPrice planned short sell price
-     * @param from records which system part issued the buy instruction
+     * @param from records which system part issued the sell instruction
      * @param remark remark
      * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
      *         failed
@@ -590,11 +590,11 @@ public:
      * @param datetime buy time
      * @param stock the security to buy
      * @param realPrice actual buy price
-     * @param number sell quantity; MAX_DOUBLE means selling everything
+     * @param number buy quantity; MAX_DOUBLE means covering the entire short position
      * @param stoploss stop-loss price
      * @param goalPrice target price
      * @param planPrice planned buy price
-     * @param from records which system part issued the sell instruction
+     * @param from records which system part issued the buy instruction
      * @param remark remark
      * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
      *         failed
@@ -817,8 +817,8 @@ protected:
     string m_name;            // Account name
     TradeCostPtr m_costfunc;  // Cost algorithm
 
-    Datetime m_broker_last_datetime;  // The last moment an order broker performed an operation,
-                                      // i.e. the current startup time
+    Datetime m_broker_last_datetime;     // The last moment an order broker performed an operation,
+                                         // i.e. the current startup time
     list<OrderBrokerPtr> m_broker_list;  // Order broker list
 
     bool m_is_python_object{false};

@@ -113,7 +113,7 @@ void System::initParam() {
     // Whether a trade can be done when the high price equals the low price
     setParam<bool>("can_trade_when_high_eq_low", false);
 
-    // Whether to use the market environment judgment for the initial position building
+    // Whether to use the market environment (EV) for the initial position building
     setParam<bool>("ev_open_position", false);
 
     // Whether to use the system valid condition for the initial position building
@@ -126,7 +126,7 @@ void System::initParam() {
     setParam<bool>("support_borrow_stock", false);
 
     // The following parameters control the sharing strategy of the parts and affect the clone and
-    // reset operations A shared component is neither cloned nor reset
+    // reset operations: a shared part is neither cloned nor reset
     setParam<bool>("shared_tm", false);
     setParam<bool>("shared_ev", true);
     setParam<bool>("shared_cn", false);
@@ -373,9 +373,9 @@ void System::readyForRun() {
     HKU_CHECK(m_mm, "Not setMoneyManager! {}", name());
     HKU_CHECK(m_sg, "Not setSignal! {}", name());
 
-    // When a market environment judgment strategy exists, the default previous-day market valid
+    // When a market environment (EV) strategy exists, the default previous-day market valid
     // flag must be set to false, because whether the market is valid must be judged entirely by the
-    // market environment judgment strategy
+    // market environment strategy
     if (m_ev)
         m_pre_ev_valid = false;
 
@@ -590,7 +590,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     if (!m_pre_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] EV status from invalid to valid", name()));
 
-        // If the environment judgment strategy is used for the initial position building
+        // If the EV is used for the initial position building
         if (getParam<bool>("ev_open_position")) {
             HKU_INFO_IF(trace, htr("[{}] EV to buy", name()));
             TradeRecord tr = _buy(today, src_today, PART_ENVIRONMENT);
@@ -625,7 +625,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     if (!m_pre_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] CN status from invalid to valid", name()));
 
-        // If the environment judgment strategy is used for the initial position building
+        // If the EV is used for the initial position building
         if (getParam<bool>("cn_open_position")) {
             HKU_INFO_IF(trace, htr("[{}] CN to buy", name()));
             TradeRecord tr = _buy(today, src_today, PART_CONDITION);

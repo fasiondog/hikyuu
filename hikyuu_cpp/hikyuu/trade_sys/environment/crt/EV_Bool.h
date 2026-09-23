@@ -13,7 +13,7 @@
 namespace hku {
 
 /**
- * Market environment of the boolean signal indicator
+ * Market environment of the boolean signal
  * @param ind the boolean type indicator; a value > 0 at the corresponding position means the market
  *            is valid, otherwise it is invalid
  * @param market the given market, used to get the corresponding trading calendar

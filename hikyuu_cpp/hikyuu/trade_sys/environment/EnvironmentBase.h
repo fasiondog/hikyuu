@@ -18,7 +18,7 @@
 namespace hku {
 
 /**
- * Base class of the environment judgment strategy
+ * Base class of the market environment strategy
  * @note The external environment should have nothing to do with the concrete trading object
  * @ingroup Environment
  */
@@ -57,8 +57,8 @@ public:
     typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
     /**
      * Clone operation
-     * @note Unlike the other system strategy components, the Environment is not bound to a specific
-     *       trading object and can be shared, so essentially the clone operation is not needed
+     * @note Unlike the other trading-system parts, the Environment is not bound to a specific
+     *       instrument and can be shared, so essentially the clone operation is not needed
      * here; it exists only for the consistency and the possibly existing special scenarios.
      */
     EnvironmentPtr clone();

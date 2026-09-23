@@ -58,13 +58,13 @@ std::vector<std::vector<size_t>> combinateIndex(const std::vector<T>& inputs) {
 std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs, int n);
 
 /**
- * @brief Combination test of the given security and the buy / sell signal indicators
+ * @brief Combination test of the given security and the buy / sell signals
  * @param stk the given security
  * @param query the given range condition
  * @param tm the given trade management instance
  * @param sys the given trading strategy instance
- * @param buy_inds buy signal indicator list
- * @param sell_inds sell signal indicator list
+ * @param buy_inds buy indicator list
+ * @param sell_inds sell indicator list
  * @param n combination time range parameter
  * @return std::map<std::string, Performance>
  */
@@ -101,7 +101,7 @@ struct HKU_API CombinateAnalysisOutput {
 };
 
 /**
- * @brief Combination test of the buy / sell signal indicators on the given security list
+ * @brief Combination test of the buy / sell signals on the given security list
  * @param blk the given block
  * @param query the given range condition
  * @param tm the given trade instance

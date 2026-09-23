@@ -51,8 +51,8 @@ public:
      *
      * @param tm the given account
      * @param mm the given money management strategy
-     * @param ev the given market environment judgment strategy
-     * @param cn the given system condition judgment strategy
+     * @param ev the given market environment strategy
+     * @param cn the given system valid condition strategy
      * @param sg the given signal generator
      * @param st the given stop-loss strategy
      * @param tp the given take-profit strategy
@@ -78,7 +78,7 @@ public:
     /** Set the name */
     void name(const string& name);
 
-    /** Get the trading object */
+    /** Get the traded K-line data (TO) */
     KData getTO() const;
 
     /** Get the managed account */
@@ -87,10 +87,10 @@ public:
     /** Get the money management strategy */
     MoneyManagerPtr getMM() const;
 
-    /** Get the market environment judgment strategy */
+    /** Get the market environment strategy */
     EnvironmentPtr getEV() const;
 
-    /** Get the system condition judgment strategy */
+    /** Get the system valid condition strategy */
     ConditionPtr getCN() const;
 
     /** Get the signal generator */
@@ -114,10 +114,10 @@ public:
     /** Set the money management strategy */
     void setMM(const MoneyManagerPtr& mm);
 
-    /** Set the market environment judgment strategy */
+    /** Set the market environment strategy */
     void setEV(const EnvironmentPtr& ev);
 
-    /** Set the system condition judgment strategy */
+    /** Set the system valid condition strategy */
     void setCN(const ConditionPtr& cn);
 
     /** Set the signal generator */
@@ -158,7 +158,7 @@ public:
     const std::vector<TradeRequest>& getSellShortTradeRequestList() const;
     const std::vector<TradeRequest>& getBuyShortTradeRequestList() const;
 
-    /** Mark all the components as not shared */
+    /** Mark all the parts as not shared */
     void setNotSharedAll();
 
     /**
@@ -167,8 +167,8 @@ public:
      */
     void reset();
 
-    /** Force resetting all the components and clearing the existing trading object, ignoring the
-     *  shared attribute of the components */
+    /** Force resetting all the parts and clearing the existing trading object, ignoring the
+     *  shared attribute of the parts */
     void forceResetAll();
 
     typedef shared_ptr<System> SystemPtr;
@@ -179,7 +179,7 @@ public:
     SystemPtr clone();
 
     /**
-     * Set the trading object
+     * Set the traded K-line data (TO)
      * @note tm and ev have no setTO interface
      */
     void setTO(const KData& kdata);
@@ -211,7 +211,7 @@ public:
 
     /**
      * @brief Run the system
-     * @param kdata the given trading object
+     * @param kdata the given traded K-line data (TO)
      * @param reset whether to reset according to the shared attribute of the system parts before
      *              execution
      * @param resetAll force resetting all the parts
@@ -230,32 +230,39 @@ public:
     virtual MomentResult runMomentOnClose(const Datetime& datetime);
 
     //========================================
-    // The aggregate form (MultiSystem) interface, the single-security form returns the default value
+    // The aggregate form (MultiSystem) interface, the single-security form returns the default
+    // value
     //========================================
 
-    /** Whether it is the aggregate form (holding sub-systems). The single-security form returns false. */
+    /** Whether it is the aggregate form (holding sub-systems). The single-security form returns
+     * false. */
     virtual bool isComposite() const {
         return false;
     }
 
-    /** Get the direct sub-system list, overridden by the aggregate form. The single-security form returns an empty list. */
+    /** Get the direct sub-system list, overridden by the aggregate form. The single-security form
+     * returns an empty list. */
     virtual const std::vector<std::shared_ptr<System>>& getSubSystemList() const;
 
-    /** The hierarchy path (e.g. I/D/A), used by trace and debugging. Maintained by the aggregate form at readyForRun. */
+    /** The hierarchy path (e.g. I/D/A), used by trace and debugging. Maintained by the aggregate
+     * form at readyForRun. */
     virtual const string& getPath() const {
         return m_path;
     }
 
-    /** Set the hierarchy path (the aggregate form writes it into the sub-systems recursively at readyForRun) */
+    /** Set the hierarchy path (the aggregate form writes it into the sub-systems recursively at
+     * readyForRun) */
     void setPath(const string& path) {
         m_path = path;
     }
 
-    /** [Mode B] The parent writes the allocation quota back to the sub-system (on the rebalancing day only). It is a no-op for the single-security form. */
+    /** [Mode B] The parent writes the allocation quota back to the sub-system (on the rebalancing
+     * day only). It is a no-op for the single-security form. */
     virtual void setSubSystemQuota(const std::shared_ptr<System>& sub_sys, const Datetime& date,
                                    price_t quota) {}
 
-    /** Translate the trade of this moment into the parent suggestion (overridden by the aggregate form). The single-security form returns empty. */
+    /** Translate the trade of this moment into the parent suggestion (overridden by the aggregate
+     * form). The single-security form returns empty. */
     virtual TradeSuggestionList toSuggestions() const {
         return TradeSuggestionList{};
     }
@@ -263,7 +270,7 @@ public:
     // Preparation before running; an exception is thrown on failure
     virtual void readyForRun();
 
-    // Called by the related components to notify sys when the component parameters change, so that
+    // Called by the related parts to notify sys when the part parameters change, so that
     // it is recalculated
     void partChangedNotify() {
         m_calculated = false;

@@ -98,7 +98,7 @@ void IMrr::_increment_calculate(const Indicator& ind, size_t start_pos) {
     // The original implementation wrongly used the global minimum of the window as the rise base
     // of all the points; when the lowest point of the window appears after the highest point it
     // introduces the look-ahead bias and overestimates the rise rate.
-    // Here the original O(1) fast path state machine is abandoned (its judgement of
+    // Here the original O(1) fast path state machine is abandoned (its judgment of
     // current_rr > window_max_rr does not hold in principle under the standard MRR semantics)
     // and it degenerates to an O(n) brute force scan per point, using the run_min base to
     // guarantee the correctness. It is symmetric to the IMdd fix.

@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * Single line inflection point signal indicator
+ * Single line inflection point signal
  * @details
  * <pre>
  * The curve inflection point algorithm given in "Smarter Trading" is used to judge the curve trend,
@@ -35,7 +35,7 @@ namespace hku {
 SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filter_p = 0.1);
 
 /**
- * Single line inflection point signal indicator 2
+ * Single line inflection point signal 2
  * @details
  * <pre>
  * The curve inflection point algorithm given in "Smarter Trading" is used to judge the curve trend,
