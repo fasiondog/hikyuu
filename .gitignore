@@ -88,6 +88,7 @@ hikyuu.code-workspace
 /install
 /build
 /docs/build
+/docs/_build
 /docs/notepad-workspace
 /docs/design
 /cppcheck-cppcheck-build-dir

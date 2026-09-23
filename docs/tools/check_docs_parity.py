@@ -27,6 +27,7 @@ DOCS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EN_DIR = os.path.join(DOCS_DIR, "en")
 ZH_DIR = os.path.join(DOCS_DIR, "zh")
 DEFAULT_ALLOWLIST = os.path.join(DOCS_DIR, "tools", "parity_allowlist.txt")
+DEFAULT_CJK_ALLOWLIST = os.path.join(DOCS_DIR, "tools", "cjk_allowlist.txt")
 
 # File extensions that carry documentation content.
 CONTENT_EXTS = (".rst", ".md", ".ipynb")
@@ -193,13 +194,16 @@ def static_hashes(root):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true", help="additionally compare _static and conf.py")
-    parser.add_argument("--skip-cjk", action="store_true", help="skip the Chinese-text check in docs/en (progressive rollout, design doc 05 §4.3)")
     parser.add_argument("--allowlist", default=DEFAULT_ALLOWLIST, help="parity allowlist file")
+    parser.add_argument("--cjk-allowlist", default=DEFAULT_CJK_ALLOWLIST,
+                        help="files in docs/en allowed to contain CJK text (domain data, real output samples)")
+    parser.add_argument("--skip-cjk", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
 
     en_files = collect_files(EN_DIR)
     zh_files = collect_files(ZH_DIR)
     allowlist = load_allowlist(args.allowlist)
+    cjk_allowlist = load_allowlist(args.cjk_allowlist) if os.path.exists(args.cjk_allowlist) else set()
 
     errors = []
 
@@ -229,31 +233,56 @@ def main():
                 % (rel, [t[0] for t in en_titles], [t[0] for t in zh_titles])
             )
 
-        en_labels, en_images, en_code, en_lit = parse_rst_items(en_path) if rel.endswith(".rst") else parse_md_items(en_path)
-        zh_labels, zh_images, zh_code, zh_lit = parse_rst_items(zh_path) if rel.endswith(".rst") else parse_md_items(zh_path)
+        en_labels, en_images, en_code, en_lit = parse_rst_items(
+            en_path) if rel.endswith(".rst") else parse_md_items(en_path)
+        zh_labels, zh_images, zh_code, zh_lit = parse_rst_items(
+            zh_path) if rel.endswith(".rst") else parse_md_items(zh_path)
 
         if en_labels != zh_labels:
-            errors.append("%s: explicit label mismatch: en-only=%s zh-only=%s" % (rel, sorted(en_labels - zh_labels), sorted(zh_labels - en_labels)))
+            errors.append("%s: explicit label mismatch: en-only=%s zh-only=%s" %
+                          (rel, sorted(en_labels - zh_labels), sorted(zh_labels - en_labels)))
         if en_images != zh_images:
-            errors.append("%s: image reference mismatch: en-only=%s zh-only=%s" % (rel, sorted(en_images - zh_images), sorted(zh_images - en_images)))
+            errors.append("%s: image reference mismatch: en-only=%s zh-only=%s" %
+                          (rel, sorted(en_images - zh_images), sorted(zh_images - en_images)))
         if en_code != zh_code:
             errors.append("%s: code-block language sequence mismatch: en=%s zh=%s" % (rel, en_code, zh_code))
         if en_lit != zh_lit:
-            errors.append("%s: literalinclude path mismatch: en-only=%s zh-only=%s" % (rel, sorted(set(en_lit) - set(zh_lit)), sorted(set(zh_lit) - set(en_lit))))
+            errors.append("%s: literalinclude path mismatch: en-only=%s zh-only=%s" %
+                          (rel, sorted(set(en_lit) - set(zh_lit)), sorted(set(zh_lit) - set(en_lit))))
 
-    # Check 13: docs/en must not contain Chinese body text (allowlist-aware).
-    # Progressive rollout: this check only takes effect after the full anglicization of a module;
-    # use --skip-cjk until then (design doc 05 §4.3).
+    # Check 13: docs/en must not contain Chinese body text. Files listed in cjk_allowlist.txt
+    # are allowed to contain CJK because they are domain data / real tool output (stock names,
+    # A-share API fields, DataFrame samples, Chinese bibliography, etc., design doc 01 §4).
+    # --skip-cjk is kept as a hidden emergency escape hatch (design doc 05 §4.3).
     if not args.skip_cjk:
         cjk = re.compile("[\u4e00-\u9fff]")
         for rel in sorted(en_files):
-            if rel in allowlist:
+            if rel in allowlist or rel in cjk_allowlist:
                 continue
             path = os.path.join(EN_DIR, rel)
             with open(path, "r", encoding="utf-8") as f:
                 for lineno, line in enumerate(f, 1):
                     if cjk.search(line):
                         errors.append("%s:%d: Chinese text found in docs/en" % (rel, lineno))
+
+    # Check 11: no hardcoded cross-language links. The English tree must not link to /zh-cn/,
+    # and the Chinese tree must not link to /en/ (design doc 02 §5.3). Same-language absolute
+    # links (e.g. /en/latest inside docs/en) are tolerated for now.
+    def _cross_language_links(root, forbidden_segment):
+        hits = []
+        pattern = re.compile(r"readthedocs\.io/%s/" % re.escape(forbidden_segment))
+        for rel in sorted(collect_files(root)):
+            if rel in allowlist:
+                continue
+            with open(os.path.join(root, rel), "r", encoding="utf-8") as f:
+                for lineno, line in enumerate(f, 1):
+                    if pattern.search(line):
+                        hits.append("%s:%d: cross-language link /%s/ found"
+                                    % (rel, lineno, forbidden_segment))
+        return hits
+
+    errors.extend(_cross_language_links(EN_DIR, "zh-cn"))
+    errors.extend(_cross_language_links(ZH_DIR, "en"))
 
     if args.full:
         # Check 8: _static same-name file hashes.

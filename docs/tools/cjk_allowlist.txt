@@ -1,0 +1,23 @@
+# docs/en 中文保留白名单（C 类领域数据 / 真实输出样例 / 真实出版物与专有名）
+#
+# 与 parity_allowlist.txt 的区别：本名单中的文件仍参与全部结构一致性检查，
+# 仅豁免 check 13（docs/en 中文正文检查）。新增需评审（设计文档 01 §4）。
+# 格式：每行一个相对 docs/en 的路径。
+#
+# --- 真实运行输出样例（DataFrame 列名与 A 股证券名为实际输出，翻译即失真） ---
+others.rst                        # get_market_view 等真实输出：证券代码/证券名称/开盘价 等列名 + 证券名
+factor.md                         # 多因子打分输出样例：证券代码/证券名称列 + 证券名
+trade_portfolio/normalize.md      # 标准化后打分输出样例（同上）
+trade_portfolio/mf_example.ipynb  # category="行业板块" 公开契约键 + 输出样例
+base/other_utils.rst              # select2 输出样例：证券代码/证券名称列 + 证券名
+#
+# --- 代码真实接受的中文字面量（接口契约） ---
+stock_manager.rst                 # add_temp_stock CSV 表头中文别名（KDataTempCsvDriver 真实接受：日期/开盘价/成交量）
+indicator/indicator.rst           # NAMELIKE 示例以中文名/通配模式匹配（"上证*"、"上证指数"）
+interactive/index.rst             # DRAWTEXT/DRAWTEXT_FIX 示例字面文本 '大阳线'（用户自绘文本）
+hub.rst                           # search_part('趋势') 示例（hikyuu_hub 部件名为中文）
+#
+# --- 专有名 / 出版物 ---
+trade_manage/OrderBroker.rst      # 第三方项目名 "扯线木偶 (puppet)" 与作者名 "睿瞳深邃"
+vip/vip-plan.md                   # 知识星球社群专有名 "Hikyuu 量化"
+reference.rst                     # 中文译著书目（BOOK1~BOOK7 真实出版物名）
