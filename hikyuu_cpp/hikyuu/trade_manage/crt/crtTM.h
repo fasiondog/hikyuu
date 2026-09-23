@@ -15,13 +15,15 @@
 namespace hku {
 
 /**
- * 创建交易管理模块，管理帐户的交易记录及资金使用情况
- * @details 考虑的移滑价差需要使用当日的最高或最低价，所以不在该模块内进行处理
+ * Create the trade management module, it manages the trade records and the fund usage of the
+ * account
+ * @details The slippage considered needs the high or low price of the day, so it is not handled
+ *          inside this module
  * @ingroup TradeManagerClass
- * @param datetime 账户建立日期, 默认1990-1-1
- * @param initcash 初始现金，默认100000
- * @param costfunc 交易成本算法,默认零成本算法
- * @param name 账户名称，默认“SYS”
+ * @param datetime account creation date, 1990-1-1 by default
+ * @param initcash initial cash, 100000 by default
+ * @param costfunc trade cost algorithm, the zero cost algorithm by default
+ * @param name account name, "SYS" by default
  * @see TradeManager
  */
 TradeManagerPtr HKU_API crtTM(const Datetime& datetime = Datetime(199001010000LL),

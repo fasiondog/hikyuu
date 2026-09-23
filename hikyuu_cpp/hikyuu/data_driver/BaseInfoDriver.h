@@ -93,7 +93,7 @@ struct StockInfo {
 };
 
 /**
- * 基本信息数据获取驱动基类
+ * Base class of the basic information data driver
  * @ingroup DataDriver
  */
 class HKU_API BaseInfoDriver {
@@ -104,46 +104,47 @@ public:
     typedef unordered_map<uint32_t, StockTypeInfo> StockTypeInfoMap;
 
     /**
-     * 构造函数
-     * @param name 驱动名称
+     * Constructor
+     * @param name driver name
      */
     BaseInfoDriver(const string& name);
     virtual ~BaseInfoDriver() {}
 
-    /** 获取驱动名称 */
+    /** Get the driver name */
     const string& name() const;
 
     /**
-     * 驱动初始化
+     * Driver initialization
      * @param params
      * @return
      */
     bool init(const Parameter& params);
 
     /**
-     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
+     * Driver initialization; when it is implemented concretely, attention should be paid to closing
+     * the related resources opened before.
      * @return
      */
     virtual bool _init() = 0;
 
     /**
-     * 获取所有股票详情信息
+     * Get the detailed information of all the stocks
      */
     virtual vector<StockInfo> getAllStockInfo() = 0;
 
     /**
-     * 获取指定的证券信息
-     * @param market 市场简称
-     * @param code 证券代码
+     * Get the information of the given security
+     * @param market market abbreviation
+     * @param code security code
      */
     virtual StockInfo getStockInfo(string market, const string& code) = 0;
 
     /**
-     * 获取指定日期范围内 [start, end) 的权息列表
-     * @param market 市场简称
-     * @param code 证券代码
-     * @param start 起始日期
-     * @param end 结束日期
+     * Get the ex-rights/ex-dividend list within the given date range [start, end)
+     * @param market market abbreviation
+     * @param code security code
+     * @param start start date
+     * @param end end date
      */
     virtual StockWeightList getStockWeightList(const string& market, const string& code,
                                                Datetime start, Datetime end);
@@ -154,12 +155,12 @@ public:
     }
 
     /**
-     * 获取历史财务信息
-     * @param market 市场简称
-     * @param code 证券代码
-     * @param start 财务报告发布起始日期
-     * @param end 查询结束日期
-     * @return vector<float> [[财务报告发布日期(ymd), 字段1, 字段2, ...], ...]
+     * Get the historical financial information
+     * @param market market abbreviation
+     * @param code security code
+     * @param start start date of the financial report release
+     * @param end end date of the query
+     * @return vector<float> [[financial report release date (ymd), field1, field2, ...], ...]
      */
     virtual vector<HistoryFinanceInfo> getHistoryFinance(const string& market, const string& code,
                                                          Datetime start, Datetime end) {
@@ -167,7 +168,7 @@ public:
     }
 
     /**
-     * 获取历史财务信息字段序号与名称
+     * Get the field indexes and names of the historical financial information
      * @return vector<std::pair<size_t, string>>
      */
     virtual vector<std::pair<size_t, string>> getHistoryFinanceField() {
@@ -175,38 +176,39 @@ public:
     }
 
     /**
-     * 获取当前财务信息
-     * @param market 市场标识
-     * @param code 证券代码
+     * Get the current financial information
+     * @param market market identifier
+     * @param code security code
      */
     virtual Parameter getFinanceInfo(const string& market, const string& code);
 
     /**
-     * 获取指定的MarketInfo
-     * @param market 市场简称
-     * @return 如未找到，则返回 Null<MarketInfo>()
+     * Get the given MarketInfo
+     * @param market market abbreviation
+     * @return Null<MarketInfo>() is returned if it is not found
      */
     virtual MarketInfo getMarketInfo(const string& market) = 0;
 
     /**
-     * 获取全部市场信息
+     * Get all the market information
      */
     virtual vector<MarketInfo> getAllMarketInfo() = 0;
 
     /**
-     * 获取全部证券类型信息
+     * Get all the security type information
      */
     virtual vector<StockTypeInfo> getAllStockTypeInfo() = 0;
 
     /**
-     * 获取相应的证券类型详细信息
-     * @param type 证券类型
-     * @return 对应的证券类型信息，如果不存在，则返回Null<StockTypeInf>()
+     * Get the detailed information of the corresponding security type
+     * @param type security type
+     * @return the corresponding security type information; Null<StockTypeInf>() is returned if it
+     *         does not exist
      */
     virtual StockTypeInfo getStockTypeInfo(uint32_t type) = 0;
 
     /**
-     * 获取所有节假日日期
+     * Get all the holiday dates
      */
     virtual std::unordered_set<Datetime> getAllHolidays() = 0;
 
@@ -217,7 +219,8 @@ public:
     virtual ZhBond10List getAllZhBond10() = 0;
 
     /**
-     * 获取所有历史财务信息, 用于列式存储时数据初始化使用
+     * Get all the historical financial information, used for the data initialization in column
+     * storage
      */
     virtual unordered_map<string, vector<HistoryFinanceInfo>> getAllHistoryFinance(
       const std::atomic_bool& cancel_flag) {

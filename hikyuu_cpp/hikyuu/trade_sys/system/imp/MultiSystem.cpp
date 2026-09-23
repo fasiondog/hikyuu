@@ -4,8 +4,8 @@
  *  Created on: 2024-09-13
  *      Author: fasiondog
  *
- *  递归组合重构：聚合交易系统（组合回测）
- *  阶段 3：双模式（A/B）+ 任意嵌套 + MM L1/L2/L3 + 调仓周期 + 层级路径。
+ *  Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
+ *  Stage 3: dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
  */
 
 #include "MultiSystem.h"
@@ -64,20 +64,20 @@ void MultiSystem::readyForRun() {
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
     HKU_CHECK(!m_sys_list.empty(), "No subsystem specified! {}", name());
 
-    // 聚合形态不校验自身 SG/MM/ST 等单证券组件（它们属于各子系统）；
-    // 仅准备好运行环境，子系统的组件在校验循环中各子 readyForRun 完成。
+    // The aggregate form does not validate its own single-security parts such as SG/MM/ST (they belong to every sub-system);
+    // it only prepares the running environment, the sub-system parts are completed by the readyForRun of every sub-system in the validation loop.
     m_close_day_index = 0;
     if (m_path.empty()) {
         m_path = name();
     }
 
-    // 为每个子系统创建独立虚拟账户（模式 A：固定影子账户；模式 B：由父分配额度）
-    // 子系统保留各自 SG/MM/EV/CN/ST/TP/PG/SP（各自独立证券的策略），仅账户隔离。
+    // Create an independent virtual account for every sub-system (mode A: a fixed shadow account; mode B: the quota allocated by the parent)
+    // The sub-systems keep their own SG/MM/EV/CN/ST/TP/PG/SP (the strategies of their own independent securities), only the accounts are isolated.
     for (auto& sys : m_sys_list) {
         TMPtr sub_tm = crtTM(m_tm->initDatetime(), m_sub_init_cash, TC_Zero(), "TM_SUB");
         sys->setTM(sub_tm);
         sys->setParam<bool>("shared_tm", false);
-        // 层级路径递归写入
+        // The hierarchy path is written recursively
         sys->setPath(m_path + "/" + sys->name());
         if (!sys->getTO().empty()) {
             sys->setTO(sys->getTO());
@@ -125,12 +125,12 @@ SystemPtr MultiSystem::_clone() {
     ret->m_adjust_cycle = m_adjust_cycle;
     ret->m_trade_on_close = m_trade_on_close;
     ret->m_sell_at_not_selected = m_sell_at_not_selected;
-    ret->m_date_axis = m_date_axis;  // 固定时间轴随配置复制（axis-mode 参数由 System::clone 复制）
-    ret->m_adjust_dates = m_adjust_dates;  // 外部调仓日表随配置复制
+    ret->m_date_axis = m_date_axis;  // The fixed time axis is copied with the configuration (the axis-mode parameter is copied by System::clone)
+    ret->m_adjust_dates = m_adjust_dates;  // The external rebalancing day table is copied with the configuration
     if (getMM()) {
         ret->setMM(getMM()->clone());
     }
-    // AF 的 clone 已复制 m_mode，不再需要额外的模式同步
+    // The AF clone has already copied m_mode, no additional mode synchronization is needed
     if (m_af) {
         ret->setAF(m_af->clone());
     }
@@ -175,14 +175,14 @@ void MultiSystem::setAdjustMode(const string& mode) {
 
 void MultiSystem::_expandAdjustDates(const DatetimeList& axis) {
     m_auto_adjust_dates.clear();
-    // 外部显式注入优先，不再自动展开（保持 setAdjustDates 的高优先级）
+    // The external explicit injection takes precedence, no auto expansion (to keep the high priority of setAdjustDates)
     if (!m_adjust_dates.empty() || axis.empty()) {
         return;
     }
     string mode = getAdjustMode();
     to_lower(mode);
     if (mode == "query" || mode == "day") {
-        return;  // 沿用 m_adjust_cycle 的收盘日计数判定
+        return;  // Continue the close-day counting judgment of m_adjust_cycle
     }
     DatetimeList expanded = calcAdjustDates(axis, mode, m_adjust_cycle, getDelayToTradingDay());
     for (const auto& d : expanded) {
@@ -200,7 +200,7 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
     if (dates.empty()) {
         return DatetimeList();
     }
-    // 严格限定 mode：仅 week/month/quarter/year 有效，其余（query/day/非法值）返回空
+    // Strictly restrict mode: only week/month/quarter/year are valid, the others (query/day/invalid values) return empty
     string m = mode;
     to_lower(m);
     if (m != "week" && m != "month" && m != "quarter" && m != "year") {
@@ -210,8 +210,8 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
     const int cycle = adjust_cycle > 0 ? adjust_cycle : 1;
 
     if (delay_to_trading_day) {
-        // 顺延语义：目标日非交易日时，顺延至当周期内的首个交易日（与 master Portfolio 一致）。
-        // emitted 记录已命中的「理论调仓日」，同一周期只命中一次。
+        // The postponement semantics: when the target day is not a trading day, it is postponed to the first trading day within the current cycle (consistent with master Portfolio).
+        // emitted records the "theoretical rebalancing day" already hit, only one hit per cycle.
         std::set<Datetime> emitted;
         for (size_t i = 0; i < total; ++i) {
             const Datetime& date = dates[i];
@@ -242,11 +242,11 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
             const Datetime& date = dates[i];
             bool adjust = false;
             if (m == "week") {
-                adjust = (date.dayOfWeek() == cycle);  // 每周第 cycle 日（0=周日, 1=周一 ... 6=周六）
+                adjust = (date.dayOfWeek() == cycle);  // The cycle-th day of every week (0=Sunday, 1=Monday ... 6=Saturday)
             } else if (m == "month" || m == "quarter") {
-                adjust = (date.day() == cycle);  // 每月/每季第 cycle 日
+                adjust = (date.day() == cycle);  // The cycle-th day of every month/quarter
             } else {                             // year
-                adjust = (date.dayOfYear() == cycle);  // 每年第 cycle 日
+                adjust = (date.dayOfYear() == cycle);  // The cycle-th day of every year
             }
             if (adjust) {
                 result.insert(date);
@@ -257,10 +257,10 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
 }
 
 void MultiSystem::run(const KData& kdata, bool reset, bool resetAll) {
-    // 驱动轴选择（参数 axis-mode，见 MultiSystem.h）：
-    //   "kdata"    —— 以入参 KData 自带日期序列为轴（默认，保持既有行为）
-    //   "calendar" —— 以 setDateAxis() 注入的固定日期表（如全市场交易日历）为轴；
-    //                 入参 KData 退化为 query/ktype 与价格查询上下文（runMoment/_closePhase 仅取其 query）
+    // The driving axis selection (the axis-mode parameter, see MultiSystem.h):
+    //   "kdata"    -- the date sequence of the input KData is used as the axis (the default, keeping the existing behavior)
+    //   "calendar" -- the fixed date table (e.g. the market-wide trading calendar) injected by setDateAxis() is used as the axis;
+    //                 the input KData degenerates into the query/ktype and the price query context (runMoment/_closePhase only take its query)
     string axis_mode = tryGetParam<string>("axis-mode", "kdata");
     bool use_calendar_axis = (axis_mode == "calendar");
     if (use_calendar_axis && m_date_axis.empty()) {
@@ -282,23 +282,23 @@ Stock MultiSystem::_findStock(const SystemPtr& sys) {
 }
 
 void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
-    // master 兼容重载：等价 Portfolio::run(query)，以市场交易日历为驱动轴（见 design.md §4.5）
+    // master compatibility overload: equivalent to Portfolio::run(query), it uses the market trading calendar as the driving axis (see design.md §4.5)
     auto& sm = StockManager::instance();
 
-    // 与 master 一致：ktype 非日线时，仅当 adjust-mode 为 query/day 才允许（日历轴为日线序列）
+    // Consistent with master: when ktype is not the daily line, it is only allowed when adjust-mode is query/day (the calendar axis is a daily line sequence)
     string mode = getAdjustMode();
     to_lower(mode);
     HKU_CHECK(mode == "query" || mode == "day" || query.kType() == KQuery::DAY,
               "The kType of query must be DAY when adjust-mode is not \"query\"! [{}]", name());
 
-    // 驱动轴：显式注入的固定时间轴优先（尊重 axis-mode=calendar 使用者的注入），否则取市场交易日历
+    // The driving axis: the explicitly injected fixed time axis takes precedence (respecting the injection of the axis-mode=calendar users), otherwise the market trading calendar is used
     DatetimeList dates = (getAxisMode() == "calendar" && !m_date_axis.empty())
                            ? m_date_axis
                            : sm.getTradingCalendar(query);
     HKU_WARN_IF_RETURN(dates.empty(), void(), "No trading date in the query range! [{}]", name());
 
-    // 上下文 KData（仅承载 query/ktype 与价格查询上下文）：
-    //   自身标的（显式设置）→ 首个（递归）子系统标的 → 日历基准指数
+    // The context KData (only carrying the query/ktype and the price query context):
+    //   its own instrument (explicitly set) -> the first (recursive) sub-system instrument -> the calendar benchmark index
     Stock ref_stk = getStock();
     for (size_t i = 0; i < m_sys_list.size() && ref_stk.isNull(); ++i) {
         ref_stk = _findStock(m_sys_list[i]);
@@ -324,15 +324,15 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
 
     readyForRun();
 
-    // 通知 SE 实际运行的系统列表（与原型映射），并启动其计算
+    // Notify SE of the actually running system list (mapped with the prototypes), and start its calculation
     if (m_se) {
         m_se->calculate(m_sys_list, m_kdata.getQuery());
     }
 
-    // 与单证券 System::run 一致的账户日期过滤：仅驱动 [账户初始化日, 账户最后成交日] 之后的 bar。
-    // 目的：实盘每日以 BrokerTM 全量重放对齐时间轴时，跳过已在真实账户执行过的历史 bar，
-    //       避免重复下单污染真实账户。对全新回测账户（lastDatetime == initDatetime == 时间轴起点）
-    //       该过滤为空操作，不影响组合回测遍历全轴。
+    // The account date filtering consistent with the single-security System::run: only the bars after [the account initialization day, the account last trade day] are driven.
+    // Purpose: when the live trading replays with the BrokerTM full alignment of the time axis daily, skip the historical bars already executed on the real account,
+    //       to avoid the duplicate orders polluting the real account. For a brand-new backtesting account (lastDatetime == initDatetime == the start of the time axis)
+    //       this filtering is a no-op, it does not affect the portfolio backtesting traversing the whole axis.
     Datetime tm_init_datetime = m_tm->initDatetime();
     Datetime tm_last_datetime = m_tm->lastDatetime();
     if (KQuery::getKTypeInSeconds(m_kdata.getQuery().kType()) >= 86400) {
@@ -340,19 +340,19 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
         tm_last_datetime = tm_last_datetime.startOfDay();
     }
 
-    // v5：adjust-mode 内化 —— 非 query/day 时在「驱动轴」上展开调仓日表（design.md §4.3）。
-    // 展开只依赖驱动轴本身，与驱动循环解耦；外部 setAdjustDates() 注入优先。
+    // v5: adjust-mode internalization -- when it is not query/day, expand the rebalancing day table on the "driving axis" (design.md §4.3).
+    // The expansion only depends on the driving axis itself, decoupled from the driving loop; the external setAdjustDates() injection takes precedence.
     _expandAdjustDates(axis ? *axis : m_kdata.getDatetimeList());
 
     if (axis) {
-        // 固定时间轴驱动：轴上日期未必存在于入参 KData（停牌/非交易日不构成缺口）
+        // Driven by the fixed time axis: the dates on the axis may not exist in the input KData (the suspended/non-trading days do not constitute a gap)
         for (const auto& dt : *axis) {
             if (dt >= tm_init_datetime && dt >= tm_last_datetime) {
                 runMoment(dt);
             }
         }
     } else {
-        // 聚合系统在完整对齐时间轴上驱动所有子系统
+        // The aggregate system drives all the sub-systems on the fully aligned time axis
         size_t total = m_kdata.size();
         auto const* ks = m_kdata.data();
         for (size_t i = 0; i < total; ++i) {
@@ -367,12 +367,12 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
 TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const TradeRecordList& trades,
                                                 const FundsRecord& funds_before) const {
     TradeSuggestionList result;
-    // 子系统「交易前」资金基准（防除零）：用于计算建议三比重（设计 8.2/8.3 完整语义透传）
+    // The "before-trade" fund benchmark of the sub-system (to prevent division by zero): used to calculate the three ratios of the suggestion (the complete semantic pass-through of the design 8.2/8.3)
     double base_assets = funds_before.total_assets();
     double base_cash = funds_before.cash;
-    std::map<Stock, double> net;       // 净数量（正=买，负=卖）
-    std::map<Stock, bool> is_clear;    // 是否整体清仓
-    std::map<Stock, price_t> price;    // 计划价（取成交价）
+    std::map<Stock, double> net;       // The net quantity (positive=buy, negative=sell)
+    std::map<Stock, bool> is_clear;    // Whether to liquidate the whole position
+    std::map<Stock, price_t> price;    // The planned price (the traded price)
 
     for (const auto& tr : trades) {
         if (tr.business == BUSINESS_INVALID) {
@@ -409,10 +409,10 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
         } else {
             s.type = is_clear[stock] ? SuggestionType::CLEAR : SuggestionType::SELL;
         }
-        // 三比重：以子系统交易前资金为分母。父层 MM 据此按比重映射到父真实资产（模式 A）。
+        // The three ratios: the sub-system before-trade funds are used as the denominator. The parent MM maps them into the parent real assets by the ratios (mode A).
         if (base_assets > 0.0) {
             s.assets_ratio = s.plan_cash / base_assets;
-            s.target_position_ratio = s.assets_ratio;  // 近似：单笔自 0 建仓时即目标仓位占比
+            s.target_position_ratio = s.assets_ratio;  // Approximation: the target position ratio when a single trade builds the position from 0
         }
         if (base_cash > 0.0) {
             s.cash_ratio = s.plan_cash / base_cash;
@@ -423,17 +423,17 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
 }
 
 bool MultiSystem::_isAdjustDate(const Datetime& date) const {
-    // 外部调仓日表优先：仅命中表内日期才调仓（PF 映射 master adjust_mode / delay_to_trading_day 时使用）
+    // The external rebalancing day table takes precedence: the rebalancing is only performed on the dates hitting the table (used when PF maps the master adjust_mode / delay_to_trading_day)
     if (!date.isNull()) {
         if (!m_adjust_dates.empty()) {
             return m_adjust_dates.find(date.startOfDay()) != m_adjust_dates.end();
         }
-        // adjust-mode ∈ {week,month,quarter,year} 自动展开的调仓日表
+        // The rebalancing day table auto-expanded by adjust-mode ∈ {week,month,quarter,year}
         if (!m_auto_adjust_dates.empty()) {
             return m_auto_adjust_dates.find(date.startOfDay()) != m_auto_adjust_dates.end();
         }
     }
-    // 回退：每 m_adjust_cycle 个收盘日再平衡
+    // Fallback: rebalance every m_adjust_cycle close days
     if (m_adjust_cycle <= 1) {
         return true;
     }
@@ -442,7 +442,7 @@ bool MultiSystem::_isAdjustDate(const Datetime& date) const {
 
 void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                                       KQuery::KType ktype, TradeRecordList& out_trades) {
-    // 先卖后买，释放现金
+    // Sell first then buy, to release the cash
     for (const auto& s : suggestions) {
         if (s.stock.isNull()) {
             continue;
@@ -450,8 +450,8 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.type == SuggestionType::BUY) {
             continue;
         }
-        // SELL：卖出建议数量（模式 A 已改写为「-父当前持仓」= 全平；模式 B 透传子指令）
-        // CLEAR：全额退出
+        // SELL: sell the suggested quantity (in mode A it is rewritten to "-the parent current position" = full close; in mode B the sub-instruction is passed through)
+        // CLEAR: exit the whole position
         double num = s.number;
         if (s.type == SuggestionType::CLEAR || num >= MAX_DOUBLE) {
             num = MAX_DOUBLE;
@@ -497,13 +497,13 @@ MomentResult MultiSystem::runMoment(const Datetime& datetime) {
 
     result.funds_before_open = m_tm->getFunds(datetime, ktype);
 
-    // 开盘阶段：驱动子系统兑现延迟请求，并收集开盘成交（供收盘阶段汇总为对上建议）
+    // The open stage: drive the sub-systems to fulfill the delayed requests, and collect the open trades (used by the close stage to aggregate into the parent suggestions)
     MomentResult open_result = runMomentOnOpen(datetime);
     result.tradesOnOpen = open_result.tradesOnOpen;
 
     result.funds_before_close = m_tm->getFunds(datetime, ktype);
 
-    // 收盘阶段：驱动子系统生成信号，合并「开盘+收盘」成交汇总为建议，由父统一下单
+    // The close stage: drive the sub-systems to generate signals, merge the "open+close" trades and aggregate them into the suggestions, the parent orders uniformly
     TradeRecordList executed = _closePhase(datetime);
     for (auto& tr : executed) {
         result.tradesOnClose.push_back(tr);
@@ -517,24 +517,24 @@ MomentResult MultiSystem::runMoment(const Datetime& datetime) {
 MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     MomentResult result;
     result.datetime = datetime;
-    // 父在开盘阶段统一处理退市标的：强制卖出父持仓
+    // The parent handles the delisted instruments uniformly at the open stage: force selling the parent holdings
     TradeRecordList delist_trades = _forceSellDelisted(datetime);
     for (auto& tr : delist_trades) {
         result.tradesOnOpen.push_back(tr);
         m_trade_list.push_back(tr);
     }
 
-    // 新的一天：清空并重建各子系统开盘成交缓冲（供本层收盘阶段汇总使用）。
-    // 注意：子系统开盘成交发生在各自（虚拟）账户上，仅缓存进 m_open_trades 供本层收盘合并；
-    // 【不计入】父自身的 tradesOnOpen —— 否则当本 MultiSystem 作为上层聚合的子系统时，上层会把这些
-    // 孙系统原始开盘成交与本层收盘已净额化执行的成交重复计入（嵌套双计），导致对上建议方向/数量错误。
-    // 父自身账户的开盘成交（如退市强平）已在上面并入 result.tradesOnOpen，符合 MomentResult 契约。
+    // A new day: clear and rebuild the open trade buffer of every sub-system (used by the close stage of this layer for the aggregation).
+    // Note: the open trades of the sub-systems happen on their own (virtual) accounts, they are only cached into m_open_trades for the close merge of this layer;
+    // they are [not counted] into the tradesOnOpen of the parent itself -- otherwise when this MultiSystem is a sub-system of an upper aggregate, the upper layer would count
+    // these grand-system raw open trades and the net trades already executed by this layer's close together (nested double counting), causing the wrong direction/quantity of the parent suggestion.
+    // The open trades of the parent's own account (e.g. the delisting forced liquidation) have been merged into result.tradesOnOpen above, conforming to the MomentResult contract.
     m_open_trades.assign(m_sys_list.size(), TradeRecordList{});
     m_sub_funds_before.assign(m_sys_list.size(), FundsRecord{});
     m_open_trades_date = datetime;
     KQuery::KType ktype = m_kdata.getQuery().kType();
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
-        // 子系统当日「交易前」资金快照（开盘驱动前），供收盘阶段 _toSuggestions 计算三比重
+        // The "before-trade" fund snapshot of the sub-system on that day (before the open drive), used by the close stage _toSuggestions to calculate the three ratios
         if (m_sys_list[i]->getTM()) {
             m_sub_funds_before[i] = m_sys_list[i]->getTM()->getFunds(datetime, ktype);
         }
@@ -567,16 +567,16 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     TradeSuggestionList suggestions;
     SubSystemContextList contexts;
 
-    // 防越界 + 防跨日残留：确保开盘缓冲与子系统数量对齐，且仅当缓冲属于当前交易日时才沿用。
-    // 场景：实盘盘中若仅注册收盘驱动（当日未先调用 runMomentOnOpen）或刚经历 reset，
-    //       m_open_trades 可能为空（下面按 [i] 索引会越界崩溃）或残留前一交易日开盘成交
-    //       （与今日收盘建议重复合并 → 重复下单）。isNull() 前置短路，避免对 Null 调用 startOfDay()。
+    // Prevent out-of-bounds + prevent cross-day residue: ensure the open buffer is aligned with the sub-system quantity, and it is only reused when the buffer belongs to the current trading day.
+    // Scenario: if only the close drive is registered during the live trading (runMomentOnOpen is not called first on that day) or it has just gone through reset,
+    //       m_open_trades may be empty (the [i] indexing below would crash out-of-bounds) or hold the open trades of the previous trading day
+    //       (duplicate merging with the today close suggestions -> duplicate orders). The isNull() pre-short-circuit avoids calling startOfDay() on Null.
     if (m_open_trades.size() != m_sys_list.size() || m_sub_funds_before.size() != m_sys_list.size() ||
         m_open_trades_date.isNull() || m_open_trades_date.startOfDay() != datetime.startOfDay()) {
         m_open_trades.assign(m_sys_list.size(), TradeRecordList{});
         m_sub_funds_before.assign(m_sys_list.size(), FundsRecord{});
         m_open_trades_date = datetime;
-        // 交易前快照缺失（如盘中仅注册收盘驱动、未先调 runMomentOnOpen）：以子系统当前资金兜底，保证比重分母非空
+        // The before-trade snapshot is missing (e.g. only the close drive is registered during the session, runMomentOnOpen is not called first): use the current funds of the sub-system as the fallback, to ensure the ratio denominator is not empty
         KQuery::KType kt = m_kdata.getQuery().kType();
         for (size_t i = 0; i < m_sys_list.size(); ++i) {
             if (m_sys_list[i]->getTM()) {
@@ -587,10 +587,10 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
 
     bool is_adjust = _isAdjustDate(datetime);
 
-    // 调仓日 SE 选股：只对选中子系统收集建议；未选中按 sell_at_not_selected 清仓。
-    // 非调仓日不启用 SE 过滤（各子系统照常运行）。
+    // The SE stock selection on the rebalancing day: only collect the suggestions of the selected sub-systems; the unselected ones are liquidated by sell_at_not_selected.
+    // The SE filtering is not enabled on the non-rebalancing days (every sub-system runs normally).
     std::set<System*> selected;
-    std::unordered_map<System*, double> se_scores;  // v5：SE 得分，供 AF_MultiFactor 等以得分为权重
+    std::unordered_map<System*, double> se_scores;  // v5: the SE scores, used by AF_MultiFactor etc. to take the scores as the weights
     if (m_se && is_adjust) {
         SystemWeightList sws = m_se->getSelected(datetime);
         for (auto& sw : sws) {
@@ -604,7 +604,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         SystemPtr sys = m_sys_list[i];
         if (m_se && is_adjust && selected.count(sys.get()) == 0) {
-            // 未选中子系统：若父在其标的上持有仓位，则生成清仓建议
+            // The unselected sub-system: if the parent holds a position on its instrument, generate a liquidation suggestion
             if (m_sell_at_not_selected && !sys->getStock().isNull() && m_tm->have(sys->getStock())) {
                 TradeSuggestion s;
                 s.stock = sys->getStock();
@@ -618,8 +618,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         }
 
         MomentResult sub = sys->runMomentOnClose(datetime);
-        // 子系统决策可能体现在开盘成交（延迟买入）或收盘成交（立即买卖），
-        // 合并后转译为对父建议（模式 A/B 共用此粘合剂）。
+        // The sub-system decision may be reflected in the open trade (the delayed buy) or the close trade (the immediate buy/sell),
+        // it is merged and translated into the parent suggestion (mode A/B share this glue).
         TradeRecordList sub_trades = m_open_trades[i];
         sub_trades.insert(sub_trades.end(), sub.tradesOnClose.begin(), sub.tradesOnClose.end());
         TradeSuggestionList subsug = _toSuggestions(sys, sub_trades, m_sub_funds_before[i]);
@@ -629,7 +629,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         SubSystemContext ctx;
         ctx.sys = sys;
         ctx.funds = sys->getTM()->getFunds(datetime, ktype);
-        // v5：回填 SE 得分（非调仓日/未选中为 0），供 AF_MultiFactor 等以得分为权重
+        // v5: backfill the SE score (0 on the non-rebalancing days / for the unselected ones), used by AF_MultiFactor etc. to take the scores as the weights
         auto score_it = se_scores.find(sys.get());
         if (score_it != se_scores.end()) {
             ctx.score = score_it->second;
@@ -642,8 +642,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     TradeRecordList executed;
     if (m_trade_on_close && is_adjust) {
         if (getMode() == "B") {
-            // 模式 B：即使无交易建议也要运行 L1 产出下期额度（额度分配独立于建议），
-            // L2 透传子系统真实指令；调仓日回写下期额度（滞后一期，额度穿透）。
+            // Mode B: even without a trade suggestion, run L1 to produce the next-period quota (the quota allocation is independent of the suggestions),
+            // L2 passes through the real instruction of the sub-system; the next-period quota is written back on the rebalancing day (lagging one period behind, quota penetration).
             getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
             if (!suggestions.empty()) {
                 _executeSuggestions(datetime, suggestions, ktype, executed);
@@ -654,13 +654,13 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 }
             }
         } else if (!suggestions.empty()) {
-            // 模式 A：AF 的 L2 换算后父统一下单
+            // Mode A: after the L2 conversion of AF, the parent orders uniformly
             getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
             _executeSuggestions(datetime, suggestions, ktype, executed);
         }
     }
 
-    // 调仓换手率：成交金额 / 调仓前总资产（仅实际发生调仓成交的调仓日记录）
+    // The rebalancing turnover rate: the turnover amount / the total assets before rebalancing (only recorded on the rebalancing days with actual rebalancing trades)
     if (is_adjust && m_trade_on_close && !executed.empty()) {
         double turnover_cash = 0.0;
         for (auto& tr : executed) {
@@ -670,7 +670,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         m_adjust_turnover.emplace_back(datetime, assets > 0.0 ? turnover_cash / assets : 0.0);
     }
 
-    // trace：输出调仓建议与成交
+    // trace: output the rebalancing suggestions and trades
     if (getParam<bool>("trace")) {
         HKU_INFO("[{}] {} adjust suggestions={} executed={}", getPath(), name(), suggestions.size(),
                  executed.size());
@@ -713,7 +713,7 @@ TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
         if (last_dt == Null<Datetime>() || last_dt >= date) {
             continue;
         }
-        // 标的最后交易日已过（退市）：以最后交易日收盘价强制清仓
+        // The last trading day of the instrument has passed (delisting): force liquidation at the close price of the last trading day
         price_t price = kdata.getKRecord(kdata.size() - 1).closePrice;
         TradeRecord tr = m_tm->sell(date, pos.stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_SYSTEM,
                                     "DELIST");
@@ -731,10 +731,10 @@ void MultiSystem::setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date,
     HKU_WARN_IF_RETURN(quota <= 0.0, void(), "Invalid quota {} for subsystem {}!", quota,
                        sub_sys->name());
 
-    // 把子系统的「总资产」调整到目标额度：
-    //   - 配额增加：存入现金（checkin 差额）
-    //   - 配额减少：提取现金（checkout 差额；现金不足时由子系统自行减仓，此处记录警告）
-    // 聚合子系统（嵌套）同样通过调整其虚拟账户总资产，触发其内部分配（额度穿透）。
+    // Adjust the "total assets" of the sub-system to the target quota:
+    //   - Quota increase: deposit the cash (checkin the difference)
+    //   - Quota decrease: withdraw the cash (checkout the difference; when the cash is insufficient the sub-system reduces the position itself, a warning is recorded here)
+    // The aggregate sub-system (nested) also triggers its internal allocation by adjusting the total assets of its virtual account (quota penetration).
     FundsRecord funds = sub_tm->getFunds(date, KQuery::DAY);
     price_t diff = quota - funds.total_assets();
     if (diff > 0.0) {

@@ -14,15 +14,15 @@
 namespace hku {
 
 /**
- * MACD平滑异同移动平均线
- * @param n1 短期EMA时间窗，默认12
- * @param n2 长期EMA时间窗，默认26
- * @param n3 （短期EMA-长期EMA）EMA平滑时间窗，默认9
+ * MACD moving average convergence / divergence
+ * @param n1 short-term EMA time window, 12 by default
+ * @param n2 long-term EMA time window, 26 by default
+ * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA), 9 by default
  * @return
  * <pre>
- * MACD BAR： MACD直柱，即MACD快线－MACD慢线
- * DIFF: 快线,即（短期EMA-长期EMA）
- * DEA: 慢线，即快线的n3周期EMA平滑
+ * MACD BAR: MACD histogram, i.e. MACD fast line - MACD slow line
+ * DIFF: fast line, i.e. (short-term EMA - long-term EMA)
+ * DEA: slow line, i.e. the n3-period EMA smoothing of the fast line
  * </pre>
  * @ingroup Indicator
  */
@@ -30,16 +30,16 @@ Indicator HKU_API MACD(int n1 = 12, int n2 = 26, int n3 = 9);
 Indicator HKU_API MACD(const IndParam& n1, const IndParam& n2, const IndParam& n3);
 
 /**
- * MACD平滑异同移动平均线
- * @param data 待计算数据
- * @param n1 短期EMA时间窗，默认12
- * @param n2 长期EMA时间窗，默认26
- * @param n3 （短期EMA-长期EMA）EMA平滑时间窗，默认9
+ * MACD moving average convergence / divergence
+ * @param data the data to be calculated
+ * @param n1 short-term EMA time window, 12 by default
+ * @param n2 long-term EMA time window, 26 by default
+ * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA), 9 by default
  * @return
  * <pre>
- * MACD BAR： MACD直柱，即MACD快线－MACD慢线
- * DIFF: 快线,即（短期EMA-长期EMA）
- * DEA: 慢线，即快线的n3周期EMA平滑
+ * MACD BAR: MACD histogram, i.e. MACD fast line - MACD slow line
+ * DIFF: fast line, i.e. (short-term EMA - long-term EMA)
+ * DEA: slow line, i.e. the n3-period EMA smoothing of the fast line
  * </pre>
  * @ingroup Indicator
  */

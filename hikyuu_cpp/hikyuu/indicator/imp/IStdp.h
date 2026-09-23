@@ -16,8 +16,8 @@
 namespace hku {
 
 /*
- * 计算N周期内总体标准差
- * 参数： n: N日时间窗口
+ * Calculate the population standard deviation within N periods
+ * Parameters: n: N-day time window
  */
 class IStdp : public hku::IndicatorImp {
     INDICATOR_IMP(IStdp)

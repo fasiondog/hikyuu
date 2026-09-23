@@ -1,7 +1,7 @@
 /*
  * test_HHV.cpp
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019-4-1
  *      Author: fasiondog
  */
 
@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHV") {
     Indicator result;
 
@@ -69,7 +69,7 @@ TEST_CASE("test_HHV") {
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], 2);
 
-    /** 一个实际出错过的例子 */
+    /** A case that really failed before */
     a = {4508.4, 3994.6, 2815.6, 3438.6, 2525.0, 12943.1, 16302.7, 8211.5, 5704.6, 4660.4, 4868.6,
          8107.4, 3940.5, 6332.1, 3129.0, 4750.9, 4582.6,  5859.2,  3825.7, 7030.2, 9430.0};
     result = HHV(PRICELIST(a), 10);
@@ -81,7 +81,7 @@ TEST_CASE("test_HHV") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHV_dyn") {
     PriceList a;
     for (int i = 0; i < 10; ++i) {
@@ -138,7 +138,7 @@ TEST_CASE("test_HHV_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHV_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

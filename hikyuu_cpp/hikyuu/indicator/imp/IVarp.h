@@ -16,7 +16,7 @@
 namespace hku {
 
 /*
- * 估算总体样本方差
+ * Estimate the population sample variance
  */
 class IVarp : public hku::IndicatorImp {
     INDICATOR_IMP(IVarp)

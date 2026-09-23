@@ -13,7 +13,7 @@
 
 namespace hku {
 
-// 找到数组最后一个Null<price_t>，并将之前的数据全部置为Null
+// Find the last Null<price_t> in the array and set all the preceding data to Null
 class IPriceList : public IndicatorImp {
     INDICATOR_IMP(IPriceList)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

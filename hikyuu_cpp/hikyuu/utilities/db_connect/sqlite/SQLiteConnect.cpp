@@ -15,7 +15,8 @@
 
 namespace hku {
 
-// sqlite3 多线程处理时，等待其他锁释放回调处理
+// The callback handling of waiting for the other locks to be released in the sqlite3 multi-threaded
+// processing
 static int sqlite_busy_call_back(void *ptr, int count) {
     std::this_thread::yield();
     return 1;
@@ -25,8 +26,8 @@ SQLiteConnect::SQLiteConnect(const Parameter &param) : DBConnectBase(param), m_d
     try {
         m_dbname = getParam<std::string>("db");
         int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
-        // 多线程模式下，不同数据库连接不能使用 SQLITE_OPEN_SHAREDCACHE
-        // 将导致 table is locked!
+        // In the multi-threaded mode the different database connections must not use
+        // SQLITE_OPEN_SHAREDCACHE, otherwise it would cause "table is locked!"
         //| SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_SHAREDCACHE;
         if (haveParam("flags")) {
             flags = getParam<int>("flags");
@@ -77,8 +78,8 @@ SQLiteConnect::~SQLiteConnect() {
 bool SQLiteConnect::ping() {
     HKU_IF_RETURN(!m_db, false);
 
-    // sqlite打开时并不会对文件是否是有效sqlite文件进行检查，
-    // 只有执行 sql 语句时，才会报 SQLITE_NOTADB(26) 错误
+    // When sqlite opens a file it does not check whether the file is a valid sqlite file,
+    // the SQLITE_NOTADB(26) error is reported only when an sql statement is executed
     int rc = sqlite3_exec(m_db, "PRAGMA synchronous;", NULL, NULL, NULL);
     return rc == SQLITE_OK;
 }

@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SP_Uniform") {
     auto sp = SP_Uniform(0.0, 0.1);
     CHECK_EQ(sp->name(), "SP_Uniform");

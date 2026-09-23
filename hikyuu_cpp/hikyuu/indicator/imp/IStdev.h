@@ -12,10 +12,10 @@
 namespace hku {
 
 /*
- * 计算N周期内样本标准差
- * 参数： n: N日时间窗口
- * TODO      ma : 计算均值的函数原型
- *       link：均值参数联动标志，默认true
+ * Calculate the sample standard deviation within N periods
+ * Parameters: n: N-day time window
+ * TODO      ma : the function prototype for calculating the average
+ *       link: the linkage flag of the average parameters, true by default
  *
  */
 class IStdev : public hku::IndicatorImp {

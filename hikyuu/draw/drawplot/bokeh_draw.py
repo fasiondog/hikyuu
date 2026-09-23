@@ -1,10 +1,11 @@
 # -*- coding: utf8 -*-
 # cp936
 """
-交互模式下绘制相关图形，如K线图，美式K线图
+Draw the related charts in the interactive mode, such as the K-line chart and the American K-line chart
 """
 
 from hikyuu import *
+from hikyuu import htr
 
 from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models import DatetimeTickFormatter, HoverTool, Title, Label
@@ -13,7 +14,7 @@ from bokeh.io import output_notebook, output_file, show
 
 
 def trans_color(color):
-    """将 matplotlib 常用的 color 转换为对应的 bokeh color，如果无法转换则返回原值"""
+    """Convert the common matplotlib color to the corresponding bokeh color; return the original value if it fails"""
     color_dict = {'r': 'red', 'g': 'green', 'k': 'black', 'b': 'blue', 'y': 'yellow', 'm': 'mediumorchid'}
     return color_dict[color] if color in color_dict else color
 
@@ -44,13 +45,13 @@ def use_bokeh_in_notebook(in_notebook=False):
 
 
 def gcf():
-    """获取当前Axis"""
+    """Get the current Axis"""
     global g_figure
     return g_figure
 
 
 def gca():
-    """获取当前figure"""
+    """Get the current figure"""
     global g_axes
     return g_axes
 
@@ -63,9 +64,9 @@ def show_gcf():
 
 
 def create_one_axes_figure(figsize=(800, 450)):
-    """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
+    """Generate a figure containing only 1 axes, and return its axes object
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: ax
     """
     global g_figure
@@ -76,9 +77,9 @@ def create_one_axes_figure(figsize=(800, 450)):
 
 
 def create_two_axes_figure(figsize=(800, 450)):
-    """生成一个含有2个坐标轴的figure，并返回坐标轴列表
+    """Generate a figure containing 2 axes, and return the list of the axes
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: (ax1, ax2)    
     """
     global g_figure
@@ -91,9 +92,9 @@ def create_two_axes_figure(figsize=(800, 450)):
 
 
 def create_three_axes_figure(figsize=(800, 450)):
-    """生成一个含有2个坐标轴的figure，并返回坐标轴列表
+    """Generate a figure containing 3 axes, and return the list of the axes
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: (ax1, ax2)    
     """
     global g_figure
@@ -107,11 +108,12 @@ def create_three_axes_figure(figsize=(800, 450)):
 
 
 def create_figure(n=1, figsize=(800, 450)):
-    """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
+    """Generate a window containing the specified number of axes; at most 4 axes are supported.
 
-    :param int n: 坐标轴数量
-    :param figsize: (宽, 高)
-    :return: (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
+    :param int n: the number of the axes
+    :param figsize: (width, height)
+    :return: (ax1, ax2, ...) depending on the specified number of the axes; None is returned
+        when the number is out of [1, 4]
     """
     if n == 1:
         return create_one_axes_figure(figsize)
@@ -130,11 +132,11 @@ def get_date_format(kdata):
 
 
 def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
-    """绘制K线图
+    """Draw the K-line chart
 
-    :param KData kdata: K线数据
-    :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
-    :param axes:        指定的坐标轴
+    :param KData kdata: the K-line data
+    :param bool new:    whether to display in a new window; it takes effect only when axes is not specified
+    :param axes:        the specified axes
     :param colorup:     the color of the rectangle where close >= open
     :param colordown:   the color of the rectangle where close < open
     """
@@ -186,9 +188,9 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     axes.add_tools(
         HoverTool(
             tooltips=[
-                ("index", "$index"), ('日期', get_date_format(k)), ("开盘价", "@open{0.0000}"), ("最高价", "@high{0.0000}"),
-                ("最低价", "@low{0.0000}"), ("收盘价", "@close{0.0000}"), ("成交金额", "@amount{0.0000}"),
-                ("成交量", "@volume{0.0000}")
+                ("index", "$index"), (htr('Date'), get_date_format(k)), (htr('Open'), "@open{0.0000}"),
+                (htr('High'), "@high{0.0000}"), (htr('Low'), "@low{0.0000}"), (htr('Close'), "@close{0.0000}"),
+                (htr('Amount'), "@amount{0.0000}"), (htr('Volume'), "@volume{0.0000}")
             ],
             formatters={"@datetime": "datetime"}
         )
@@ -201,10 +203,9 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
 
     last_record = kdata[-1]
     color = colorup if last_record.close > kdata[-2].close else colordown
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime, last_record.open, last_record.high, last_record.low, last_record.close, 100 *
-        (last_record.close - kdata[-2].close) / kdata[-2].close
-    )
+    text = htr('{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f} Change:{:.2f}%').format(
+        last_record.datetime, last_record.open, last_record.high, last_record.low, last_record.close,
+        100 * (last_record.close - kdata[-2].close) / kdata[-2].close)
 
     label = Label(
         x=axes.width * 0.01,
@@ -212,7 +213,6 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
         x_units='screen',
         y_units='screen',
         text=text,
-        render_mode='css',
         text_font_size='14px',
         text_color=color,
         background_fill_color='white',
@@ -224,21 +224,21 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
 
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
-    """绘制美式K线图
+    """Draw the American K-line chart
 
-    :param KData kdata: K线数据
-    :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
-    :param axes:        指定的坐标轴
+    :param KData kdata: the K-line data
+    :param bool new:    whether to display in a new window; it takes effect only when axes is not specified
+    :param axes:        the specified axes
     :param colorup:     the color of the lines where close >= open
     :param colordown:   the color of the lines where close < open
     :param ticksize:    open/close tick marker in points
     """
-    print("Bokeh 暂不支持绘制美式K线图, 请使用 matplotlib")
+    print(htr("Bokeh does not support the American K-line chart yet, please use matplotlib"))
     return None
 
 
 def get_color(index):
-    """获取 index 指定的颜色，如果没有固定返回 index=0 的颜色"""
+    """Get the color specified by index; return the color of index=0 if it does not exist"""
     color_list = ['blue', 'orange', 'green', 'red', 'purple', 'darkgoldenrod', 'pink', 'darkcyan']
     return color_list[index] if index in range(len(color_list)) else color_list[0]
 
@@ -256,21 +256,21 @@ def iplot(
     *args,
     **kwargs
 ):
-    """绘制indicator曲线
+    """Draw the indicator curve
 
-    :param Indicator indicator: indicator实例
-    :param axes:            指定的坐标轴
-    :param new:             是否在新窗口中显示，只在没有指定axes时生效
-    :param kref:            参考的K线数据，以便绘制日期X坐标
-    :param legend_on:       是否打开图例
-    :param text_on:         是否在左上角显示指标名称及其参数
-    :param text_color:      指标名称解释文字的颜色，默认为黑色
-    :param zero_on:         是否需要在y=0轴上绘制一条直线
-    :param str label:       label显示文字信息，text_on 及 legend_on 为 True 时生效
-    :param args:            pylab plot参数
-    :param kwargs:          pylab plot参数，如：marker（标记类型）、
-                             markerfacecolor（标记颜色）、
-                             markeredgecolor（标记的边缘颜色）
+    :param Indicator indicator: the Indicator instance
+    :param axes:            the specified axes
+    :param new:             whether to display in a new window; it takes effect only when axes is not specified
+    :param kref:            the referenced K-line data, used to draw the date X coordinate
+    :param legend_on:       whether to turn on the legend
+    :param text_on:         whether to display the indicator name and its parameters in the upper left corner
+    :param text_color:      the color of the indicator name text, black by default
+    :param zero_on:         whether to draw a straight line on the y=0 axis
+    :param str label:       the text displayed by the label; it takes effect when text_on and legend_on are True
+    :param args:            the pylab plot arguments
+    :param kwargs:          the pylab plot arguments, such as marker (the marker type),
+                             markerfacecolor (the marker color) and
+                             markeredgecolor (the marker edge color)
     """
     if not indicator:
         print("indicator is None")
@@ -299,7 +299,8 @@ def iplot(
         axes.add_tools(
             HoverTool(
                 tooltips=[
-                    ("index", "$index"), ('指标', indicator.name), ('日期', get_date_format(kref)), ("值", "@value{0.0000}")
+                    ("index", "$index"), (htr('Indicator'), indicator.name), (htr('Date'), get_date_format(kref)),
+                    (htr('Value'), "@value{0.0000}")
                 ],
                 formatters={"@datetime": "datetime"}
             )
@@ -315,19 +316,21 @@ def iplot(
             axes.legend.location = "top_left"
         else:
             axes.line(x='datetime', y='value', line_width=width, line_color=line_color, source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name), ("值", "@value{0.0000}")]))
+        axes.add_tools(
+            HoverTool(tooltips=[("index", "$index"),
+                                (htr('Indicator'), indicator.name),
+                                (htr('Value'), "@value{0.0000}")]))
 
     if zero_on:
         axes.line(x=x_value, y=[0 for i in range(len(indicator))], line_color='black')
 
     if text_on:
         label = Label(
-            x=int(axes.plot_width * 0.01),
-            y=int(axes.plot_height * 0.88),
+            x=int(axes.width * 0.01),
+            y=int(axes.height * 0.88),
             x_units='screen',
             y_units='screen',
             text=label,
-            render_mode='css',
             text_font_size='14px',
             text_color=trans_color(text_color),
             background_fill_color='white',
@@ -355,22 +358,22 @@ def ibar(
     *args,
     **kwargs
 ):
-    """绘制indicator柱状图
+    """Draw the indicator bar chart
 
-    :param Indicator indicator: Indicator实例
-    :param axes:       指定的坐标轴
-    :param new:        是否在新窗口中显示，只在没有指定axes时生效
-    :param kref:       参考的K线数据，以便绘制日期X坐标
-    :param legend_on:  是否打开图例
-    :param text_on:    是否在左上角显示指标名称及其参数
-    :param text_color: 指标名称解释文字的颜色，默认为黑色
-    :param str label:  label显示文字信息，text_on 及 legend_on 为 True 时生效
-    :param zero_on:    是否需要在y=0轴上绘制一条直线
-    :param width:      Bar的宽度
-    :param color:      Bar的颜色
-    :param edgecolor:  Bar边缘颜色
-    :param args:       pylab plot参数
-    :param kwargs:     pylab plot参数
+    :param Indicator indicator: the Indicator instance
+    :param axes:       the specified axes
+    :param new:        whether to display in a new window; it takes effect only when axes is not specified
+    :param kref:       the referenced K-line data, used to draw the date X coordinate
+    :param legend_on:  whether to turn on the legend
+    :param text_on:    whether to display the indicator name and its parameters in the upper left corner
+    :param text_color: the color of the indicator name text, black by default
+    :param str label:  the text displayed by the label; it takes effect when text_on and legend_on are True
+    :param zero_on:    whether to draw a straight line on the y=0 axis
+    :param width:      the width of the bar
+    :param color:      the color of the bar
+    :param edgecolor:  the edge color of the bar
+    :param args:       the pylab plot arguments
+    :param kwargs:     the pylab plot arguments
     """
     if not indicator:
         print("indicator is None")
@@ -397,7 +400,8 @@ def ibar(
         axes.add_tools(
             HoverTool(
                 tooltips=[
-                    ("index", "$index"), ('指标', indicator.name), ('日期', get_date_format(kref)), ("值", "@value{0.0000}")
+                    ("index", "$index"), (htr('Indicator'), indicator.name), (htr('Date'), get_date_format(kref)),
+                    (htr('Value'), "@value{0.0000}")
                 ],
                 formatters={"@datetime": "datetime"}
             )
@@ -412,16 +416,18 @@ def ibar(
             axes.legend.location = "top_left"
         else:
             axes.vbar(x='datetime', top='value', width=width, color=line_color, source=source)
-        axes.add_tools(HoverTool(tooltips=[("index", "$index"), ('指标', indicator.name), ("值", "@value{0.0000}")]))
+        axes.add_tools(
+            HoverTool(tooltips=[("index", "$index"),
+                                (htr('Indicator'), indicator.name),
+                                (htr('Value'), "@value{0.0000}")]))
 
     if text_on:
         label = Label(
-            x=int(axes.plot_width * 0.01),
-            y=int(axes.plot_height * 0.88),
+            x=int(axes.width * 0.01),
+            y=int(axes.height * 0.88),
             x_units='screen',
             y_units='screen',
             text=label,
-            render_mode='css',
             text_font_size='14px',
             text_color=trans_color(text_color),
             background_fill_color='white',
@@ -434,25 +440,24 @@ def ibar(
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD
+    """Draw MACD
 
-    :param axes: 指定的坐标轴
+    :param axes: the specified axes
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
     text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1])
     label = Label(
-        x=int(axes.plot_width * 0.01),
-        y=int(axes.plot_height * 0.88),
+        x=int(axes.width * 0.01),
+        y=int(axes.height * 0.88),
         x_units='screen',
         y_units='screen',
         text=text,
-        render_mode='css',
         text_font_size='14px',
         background_fill_color='white',
         background_fill_alpha=0.5
@@ -468,29 +473,28 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
 
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD。
-    当BAR值变化与参考序列ref变化不一致时，显示为灰色，
-    当BAR和参考序列ref同时上涨，显示红色
-    当BAR和参考序列ref同时下跌，显示绿色
+    """Draw MACD.
+    It is drawn in gray when the change of the BAR value is inconsistent with that of the
+    reference sequence ref, in red when both BAR and the reference sequence ref rise, and in
+    green when both of them fall.
 
-    :param axes: 指定的坐标轴
-    :param ref: 参考序列，EMA
+    :param axes: the specified axes
+    :param ref: the reference sequence, EMA
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
 
     text = 'MACD(%s,%s,%s) DIF:%.2f, DEA:%.2f, BAR:%.2f' % (n1, n2, n3, fmacd[-1], smacd[-1], bmacd[-1])
     label = Label(
-        x=int(axes.plot_width * 0.01),
-        y=int(axes.plot_height * 0.88),
+        x=int(axes.width * 0.01),
+        y=int(axes.height * 0.88),
         x_units='screen',
         y_units='screen',
         text=text,
-        render_mode='css',
         text_font_size='14px',
         background_fill_color='white',
         background_fill_alpha=0.5
@@ -514,15 +518,16 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
 
 
 def sgplot(sg, new=True, axes=None, style=1, kdata=None):
-    """绘制买入/卖出信号
+    """Draw the buy/sell signals
 
-    :param SignalBase sg: 信号指示器
-    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
-    :param axes: 指定在那个轴对象中进行绘制
-    :param style: 1 | 2 信号箭头绘制样式
-    :param KData kdata: 指定的KData（即信号发生器的交易对象），
-                       如该值为None，则认为该信号发生器已经指定了交易对象，
-                       否则，使用该参数作为交易对象
+    :param SignalBase sg: the signal generator
+    :param new: it takes effect only when axes is not specified; when True, a new window object is
+        created and the drawing is done in it
+    :param axes: the axes object in which to draw
+    :param style: 1 | 2, the drawing style of the signal arrows
+    :param KData kdata: the specified KData (i.e. the trading object of the signal generator);
+        when it is None, the signal generator is assumed to have its trading object specified,
+        otherwise this argument is used as the trading object
     """
     kdata = sg.to if kdata is None else kdata
     date_index = dict([(d, i) for i, d in enumerate(kdata.get_datetime_list())])

@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  AF 内置算法部件（L1/L2/L3 虚函数的具体实现）。
+ *  The built-in AF algorithm parts (the concrete implementations of the L1/L2/L3 virtual functions).
  */
 
 #pragma once

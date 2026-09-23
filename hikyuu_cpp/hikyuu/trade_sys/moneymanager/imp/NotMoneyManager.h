@@ -1,7 +1,7 @@
 /*
  * NotMoneyManager.h
  *
- *  Created on: 2017年5月22日
+ *  Created on: 2017-5-22
  *      Author: Administrator
  */
 
@@ -14,7 +14,7 @@
 namespace hku {
 
 /*
- * 无资金管理策略，即有多少钱买多少
+ * No money management strategy, i.e. it buys as much as the available money allows
  */
 class NotMoneyManager : public MoneyManagerBase {
     MONEY_MANAGER_IMP(NotMoneyManager)

@@ -14,9 +14,9 @@
 namespace hku {
 
 /**
- * 求自然对数
- * 用法：LN(X)以e为底的对数
- * 例如：LN(CLOSE)求收盘价的对数
+ * Calculate the natural logarithm
+ * Usage: LN(X) is the logarithm with the base e
+ * For example: LN(CLOSE) gives the logarithm of the close price
  * @ingroup Indicator
  */
 Indicator HKU_API LN();

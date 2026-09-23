@@ -9,8 +9,8 @@ from hikyuu import Datetime, hku_info
 
 class EasyTraderOrderBroker:
     '''
-    使用华泰客户端实例
-    注意：buy|sell 中已屏蔽实际通过easytrade下单，防止调试误操作，请自行根据需要打开
+    Use the Huatai client instance
+    Note: the actual ordering through easytrader is blocked in buy|sell to prevent misoperations during debugging, please enable it as needed
     '''
 
     def __init__(self, user):
@@ -20,13 +20,13 @@ class EasyTraderOrderBroker:
     def buy(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         # self.user.buy(code, price=price, amount=num)
         market_code = f"{market}{code}"
-        print(f"计划买入：{market_code}  {price}  {num}")
+        print(f"Plan to buy: {market_code}  {price}  {num}")
         self.buffer[market_code] = (num, stoploss, goal_price)
 
     def sell(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
         # self.user.sell(code, price=price, amount=num)
         market_code = f"{market}{code}"
-        print(f"计划卖出：{market_code}  {price}  {num}")
+        print(f"Plan to sell: {market_code}  {price}  {num}")
         if market_code in self.buffer:
             old_num = self.buffer[market_code][0]
             if old_num == num:
@@ -35,7 +35,7 @@ class EasyTraderOrderBroker:
                 self.buffer[market_code] = (old_num - num, stoploss, goal_price)
 
     def get_asset_info(self):
-        '''以下只适用于华泰'''
+        '''The following is only applicable to Huatai'''
         balance = self.user.balance
         cash = balance['可用金额']
 

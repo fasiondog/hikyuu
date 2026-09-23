@@ -20,31 +20,35 @@ void HKU_API startDataServer(const std::string& addr = "tcp://0.0.0.0:9201", siz
 void HKU_API stopDataServer();
 
 /**
- * 从 dataserver 数据缓存服务器拉取更新最新的缓存数据
- * @param addr 缓存服务地址，如: tcp://192.168.1.1:9201
- * @param stklist 待更新的股票列表
- * @param ktype 指定更新的K线类型
+ * Pull and update the latest cached data from the dataserver cache server
+ * @param addr cache service address, e.g. tcp://192.168.1.1:9201
+ * @param stklist the stock list to be updated
+ * @param ktype the K-line type to be updated
  */
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
                                      const KQuery::KType& ktype);
 
 /**
- * 从行情缓存服务拉取最新 K 线并就地更新（本地缓冲 + 镜像共享内存），不含客户端路由判定。
- * @details 仅供主进程 IPC handler 直接调用：getDataFromBufferServer 在客户端模式会委托主进程，
- *          主进程侧必须走本函数以避免重入客户端分支（同进程测试下 isIpcClientMode() 可能为真）。
- * @param addr 缓存服务地址，如: tcp://192.168.1.1:9201
- * @param stklist 待更新的股票列表
- * @param ktype 指定更新的K线类型
+ * Pull the latest K-lines from the market data cache service and update them in place (the local
+ * buffer + the mirror shared memory), without the client routing judgment.
+ * @details It is called directly by the IPC handler of the main process only:
+ *          getDataFromBufferServer delegates to the main process in the client mode, so the main
+ *          process side must go through this function to avoid re-entering the client branch (in
+ * the same-process test isIpcClientMode() may be true).
+ * @param addr cache service address, e.g. tcp://192.168.1.1:9201
+ * @param stklist the stock list to be updated
+ * @param ktype the K-line type to be updated
  */
 void HKU_API pullFromBufferServerLocal(const std::string& addr, const StockList& stklist,
                                        const KQuery::KType& ktype);
 
 /**
- * @brief 从 dataserver 获取指定证券大于等于指定日期的缓存 spot 数据
- * @param addr 缓存服务地址，如: tcp://192.168.1.1:9201
- * @param market 市场代码
- * @param code 证券代码
- * @param datetime 查询时间
+ * @brief Get the cached spot data of the given security from the dataserver, with the date greater
+ * than or equal to the given date
+ * @param addr cache service address, e.g. tcp://192.168.1.1:9201
+ * @param market market code
+ * @param code security code
+ * @param datetime query time
  * @return vector<SpotRecord>
  */
 vector<SpotRecord> HKU_API getSpotFromBufferServer(const std::string& addr,

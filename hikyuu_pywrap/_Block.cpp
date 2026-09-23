@@ -1,7 +1,7 @@
 /*
  * _Block.cpp
  *
- *  Created on: 2015年2月10日
+ *  Created on: 2015-02-10
  *      Author: fasiondog
  */
 
@@ -21,7 +21,7 @@ string (Block::*getName)() const = &Block::name;
 void (Block::*setName)(const string&) = &Block::name;
 
 void export_Block(py::module& m) {
-    py::class_<Block>(m, "Block", "板块类，可视为证券的容器")
+    py::class_<Block>(m, "Block", "The block class, which can be regarded as a container of the securities")
       .def(py::init<>())
       .def(py::init<const string&, const string&>(), py::arg("category"), py::arg("name"))
       .def(py::init<const string&, const string&, const string&>(), py::arg("category"),
@@ -33,33 +33,33 @@ void export_Block(py::module& m) {
       .def("__str__", to_py_str<Block>)
       .def("__repr__", to_py_str<Block>)
 
-      .def_property("category", getCategory, setCategory, "板块所属分类")
-      .def_property("name", getName, setName, "板块名称")
+      .def_property("category", getCategory, setCategory, "The block category")
+      .def_property("name", getName, setName, "The block name")
       .def_property("index_stock", &Block::getIndexStock, &Block::setIndexStock,
-                    py::return_value_policy::copy, "对应指数")
+                    py::return_value_policy::copy, "The corresponding index")
 
       .def("is_null", &Block::isNull, R"(is_null(self)
         
-    是否为null值)")
+    Whether it is a null value)")
 
       .def("empty", &Block::empty, R"(empty(self)
     
-    是否为空)")
+    Whether it is empty)")
 
       .def("add", py::overload_cast<const Stock&>(&Block::add), R"(add(self, stock)
 
-    加入指定的证券
+    Add the specified security
 
-    :param Stock stock: 待加入的证券
-    :return: 是否成功加入
+    :param Stock stock: the security to add
+    :return: whether it was added successfully
     :rtype: bool)")
 
       .def("add", py::overload_cast<const string&>(&Block::add), R"(add(self, market_code)
 
-    根据"市场简称证券代码"加入指定的证券
+    Add the specified security by "market abbreviation + security code"
 
-    :param str market_code: 市场简称证券代码
-    :return: 是否成功加入
+    :param str market_code: the market abbreviation + the security code
+    :return: whether it was added successfully
     :rtype: bool)")
 
       .def(
@@ -72,35 +72,35 @@ void export_Block(py::module& m) {
         },
         R"(add(self, sequence)
 
-    加入定的证券列表
+    Add the specified security list
 
-    :param sequence stks: 全部由 Stock 组成的序列或全部由字符串市场简称证券代码组成的序列
-    :return: True 全部成功 | False 存在失败)")
+    :param sequence stks: a sequence composed entirely of the Stocks, or a sequence composed entirely of the string "market abbreviation + security code"
+    :return: True all succeed | False some fail)")
 
       .def("remove", py::overload_cast<const Stock&>(&Block::remove), R"(remove(self, stock)
 
-    移除指定证券
+    Remove the specified security
 
-    :param Stock stock: 指定的证券
-    :return: 是否成功
+    :param Stock stock: the specified security
+    :return: whether it was successful
     :rtype: bool)")
 
       .def("remove", py::overload_cast<const string&>(&Block::remove), R"(remove(market_code)
 
-    移除指定证券
+    Remove the specified security
 
-    :param str market_code: 市场简称证券代码
-    :return: True 成功 | False 失败
+    :param str market_code: the market abbreviation + the security code
+    :return: True success | False failure
     :rtype: bool)")
 
-      .def("clear", &Block::clear, "移除包含的所有证券")
+      .def("clear", &Block::clear, "Remove all the contained securities")
 
-      .def("__len__", &Block::size, "包含的证券数量")
+      .def("__len__", &Block::size, "The number of the contained securities")
 
       .def("__getitem__", &Block::get, R"(__getitem__(self, market_code)
 
-    :param str market_code: 证券代码
-    :return: Stock 实例)")
+    :param str market_code: the security code
+    :return: the Stock instance)")
 
       .def(
         "__iter__",
@@ -126,9 +126,9 @@ void export_Block(py::module& m) {
         },
         py::arg("filter") = py::none(), R"(get_stock_list(self[, filter=None])
         
-    获取证券列表
+    Get the security list
 
-    :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数)")
+    :param func filter: a filter function whose input parameter is the stock and which returns True | False)")
 
       .def(py::hash(py::self))
       .def(py::self == py::self)

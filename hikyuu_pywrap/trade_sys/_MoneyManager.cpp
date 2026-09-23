@@ -67,131 +67,131 @@ public:
 void export_MoneyManager(py::module& m) {
     py::class_<MoneyManagerBase, MMPtr, PyMoneyManagerBase>(m, "MoneyManagerBase",
                                                             py::dynamic_attr(),
-                                                            R"(资金管理策略基类
+                                                            R"(The money manager strategy base class
 
-公共参数：
+Common parameters:
 
-    - auto-checkin=False (bool) : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
-    - max-stock=20000 (int) : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
-    - disable_ev_force_clean_position=False (bool) : 禁用市场环境失效时强制清仓
-    - disable_cn_force_clean_position=False (bool) : 禁用系统有效条件失效时强制清仓
+    - auto-checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money manager strategy, automatically deposit (checkin) enough cash into the account.
+    - max-stock=20000 (int): the maximum number of the kinds of the held securities (i.e. how many stocks are held, not the position size of each stock)
+    - disable_ev_force_clean_position=False (bool): disable forcibly clearing the positions when the market environment becomes invalid
+    - disable_cn_force_clean_position=False (bool): disable forcibly clearing the positions when the system valid condition becomes invalid
 
-自定义资金管理策略接口：
+The custom money manager strategy interfaces:
 
-    - _buyNotify : 【可选】接收实际买入通知，预留用于多次增减仓处理
-    - _sellNotify : 【可选】接收实际卖出通知，预留用于多次增减仓处理
-    - _getBuyNumber : 【必须】获取指定交易对象可买入的数量
-    - _getSellNumber : 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
-    - _reset : 【可选】重置私有属性
-    - _clone : 【必须】克隆接口)")
+    - _buyNotify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
+    - _sellNotify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing
+    - _getBuyNumber : [Required] Get the quantity that can be bought of the specified trading object
+    - _getSellNumber : [Optional] Get the quantity that can be sold of the specified trading object; if it is not overloaded, default to selling all the held quantity
+    - _reset : [Optional] Reset the private attributes
+    - _clone : [Required] The clone interface)")
       .def(py::init<>())
       .def(py::init<const MoneyManagerBase&>())
-      .def(py::init<const string&>(), R"(初始化构造函数
+      .def(py::init<const string&>(), R"(The initialization constructor
         
-    :param str name: 名称)")
+    :param str name: the name)")
 
       .def("__str__", to_py_str<MoneyManagerBase>)
       .def("__repr__", to_py_str<MoneyManagerBase>)
 
       .def_property("name", py::overload_cast<>(&MoneyManagerBase::name, py::const_),
                     py::overload_cast<const string&>(&MoneyManagerBase::name),
-                    py::return_value_policy::copy, "名称")
+                    py::return_value_policy::copy, "Name")
       .def_property("tm", &MoneyManagerBase::getTM, &MoneyManagerBase::setTM,
-                    "设置或获取交易管理对象")
+                    "Set or get the trade manager object")
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
-                    py::return_value_policy::copy, "设置或获取查询条件")
+                    py::return_value_policy::copy, "Set or get the query condition")
 
-      .def("current_buy_count", &MoneyManagerBase::currentBuyCount, "当前连续买入计数")
-      .def("current_sell_count", &MoneyManagerBase::currentSellCount, "当前连续卖出计数")
+      .def("current_buy_count", &MoneyManagerBase::currentBuyCount, "The current consecutive buy count")
+      .def("current_sell_count", &MoneyManagerBase::currentSellCount, "The current consecutive sell count")
 
       .def("get_param", &MoneyManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (MoneyManagerBase::*)(const std::string&, const boost::any&)>(
              &MoneyManagerBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &MoneyManagerBase::haveParam, "是否存在指定参数")
+      .def("have_param", &MoneyManagerBase::haveParam, "Whether the specified parameter exists")
 
-      .def("reset", &MoneyManagerBase::reset, "复位操作")
-      .def("clone", &MoneyManagerBase::clone, "克隆操作")
+      .def("reset", &MoneyManagerBase::reset, "The reset operation")
+      .def("clone", &MoneyManagerBase::clone, "The clone operation")
 
       .def("_buy_notify", &MoneyManagerBase::_buyNotify,
            R"(_buy_notify(self, trade_record)
 
-    【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
+    [Overload interface] When the trading system performs the actual buy operation, notify the trade changes; it only needs to be overloaded when there are multiple position increases/decreases
 
-    :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录)")
+    :param TradeRecord trade_record: the actual buy trade record when the actual buying occurs)")
 
       .def("_sell_notify", &MoneyManagerBase::_sellNotify,
            R"(_sell_notify(self, trade_record)
 
-    【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
+    [Overload interface] When the trading system performs the actual sell operation, notify the actual trade changes; it only needs to be overloaded when there are multiple position increases/decreases
 
-    :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录)")
+    :param TradeRecord trade_record: the actual sell trade record when the actual selling occurs)")
 
       .def("get_buy_num", &MoneyManagerBase::getBuyNumber,
            R"(get_buy_num(self, datetime, stock, price, risk, part_from)
 
-    获取指定交易对象可买入的数量
+    Get the quantity that can be bought of the specified trading object
 
-    :param Datetime datetime: 交易时间
-    :param Stock stock: 交易对象
-    :param float price: 交易价格
-    :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-    :param System.Part part_from: 来源系统组件
-    :return: 可买入数量
+    :param Datetime datetime: the trading time
+    :param Stock stock: the trading object
+    :param float price: the trading price
+    :param float risk: the risk taken in the trade; if it is 0, it means a total loss, i.e. the market value falls to 0 yuan
+    :param System.Part part_from: the source system part
+    :return: the quantity that can be bought
     :rtype: float)")
 
       .def("get_sell_num", &MoneyManagerBase::getSellNumber,
            R"(get_sell_num(self, datetime, stock, price, risk, part_from)
 
-    获取指定交易对象可卖出的数量
+    Get the quantity that can be sold of the specified trading object
     
-    :param Datetime datetime: 交易时间
-    :param Stock stock: 交易对象
-    :param float price: 交易价格
-    :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-    :param System.Part part_from: 来源系统组件
-    :return: 可卖出数量
+    :param Datetime datetime: the trading time
+    :param Stock stock: the trading object
+    :param float price: the trading price
+    :param float risk: the new risk taken in the trade; if it is 0, it means a total loss, i.e. the market value falls to 0 yuan
+    :param System.Part part_from: the source system part
+    :return: the quantity that can be sold
     :rtype: float)")
 
       .def("_get_buy_num", &MoneyManagerBase::_getBuyNumber,
            R"(_get_buy_num(self, datetime, stock, price, risk, part_from)
 
-    【重载接口】获取指定交易对象可买入的数量
+    [Overload interface] Get the quantity that can be bought of the specified trading object
 
-    :param Datetime datetime: 交易时间
-    :param Stock stock: 交易对象
-    :param float price: 交易价格
-    :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-    :param System.Part part_from: 来源系统组件
-    :return: 可买入数量
+    :param Datetime datetime: the trading time
+    :param Stock stock: the trading object
+    :param float price: the trading price
+    :param float risk: the risk taken in the trade; if it is 0, it means a total loss, i.e. the market value falls to 0 yuan
+    :param System.Part part_from: the source system part
+    :return: the quantity that can be bought
     :rtype: float)")
 
       .def("_get_sell_num", &MoneyManagerBase::_getSellNumber,
            R"(_get_sell_num(self, datetime, stock, price, risk, part_from)
 
-    【重载接口】获取指定交易对象可卖出的数量。如未重载，默认为卖出全部已持仓数量。
+    [Overload interface] Get the quantity that can be sold of the specified trading object. If it is not overloaded, default to selling all the held quantity.
 
-    :param Datetime datetime: 交易时间
-    :param Stock stock: 交易对象
-    :param float price: 交易价格
-    :param float risk: 新的交易承担的风险，如果为0，表示全部损失，即市值跌至0元
-    :param System.Part part_from: 来源系统组件
-    :return: 可卖出数量
+    :param Datetime datetime: the trading time
+    :param Stock stock: the trading object
+    :param float price: the trading price
+    :param float risk: the new risk taken in the trade; if it is 0, it means a total loss, i.e. the market value falls to 0 yuan
+    :param System.Part part_from: the source system part
+    :return: the quantity that can be sold
     :rtype: float)")
 
       .def("get_sell_short_num", &MoneyManagerBase::getSellShortNumber)
@@ -199,77 +199,78 @@ void export_MoneyManager(py::module& m) {
       .def("_get_sell_short_num", &MoneyManagerBase::_getSellShortNumber)
       .def("_get_buy_short_num", &MoneyManagerBase::_getBuyShortNumber)
 
-      .def("_reset", &MoneyManagerBase::_reset, R"(【重载接口】子类复位接口，复位内部私有变量)")
+      .def("_reset", &MoneyManagerBase::_reset, R"([Overload interface] The subclass reset interface, resetting the internal private variables)")
 
         DEF_PICKLE(MMPtr);
 
     m.def("MM_Nothing", MM_Nothing, R"(MM_Nothing()
 
-    特殊的资金管理策略，相当于不做资金管理，有多少钱买多少。)");
+    A special money manager strategy, equivalent to no money management; buy as much as the money available.)");
 
     m.def("MM_FixedRisk", MM_FixedRisk, py::arg("risk") = 1000.00,
           R"(MM_FixedRisk([risk = 1000.00])
 
-    固定风险资金管理策略对每笔交易限定一个预先确定的或者固定的资金风险，如每笔交易固定风险1000元。公式：交易数量 = 固定风险 / 交易风险。
+    The fixed risk money manager strategy limits each trade to a pre-determined or fixed capital risk, e.g. a fixed risk of 1000 yuan per trade. The formula: the trading quantity = the fixed risk / the trading risk.
 
-    :param float risk: 固定风险
-    :return: 资金管理策略实例)");
+    :param float risk: the fixed risk
+    :return: the money manager strategy instance)");
 
     m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
           R"(MM_FixedCapital([capital = 10000.0])
 
-    固定资金管理策略。买入数量 = 当前现金 / capital
+    The fixed capital money manager strategy. The buy quantity = the current cash / capital
 
-    :param float capital: 固定资本单位
-    :return: 资金管理策略实例)");
+    :param float capital: the fixed capital unit
+    :return: the money manager strategy instance)");
 
     m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
           R"(MM_FixedCapitalFunds([capital = 10000.0]) 
 
-    固定资本管理策略。买入数量 = 当前总资产 / capital
+    The fixed total capital money manager strategy. The buy quantity = the current total assets / capital
   
-    :param float capital: 固定资本单位
-    :return: 资金管理策略实例)");
+    :param float capital: the fixed capital unit
+    :return: the money manager strategy instance)");
 
     m.def("MM_FixedCount", MM_FixedCount, py::arg("n") = 100, R"(MM_FixedCount([n = 100])
 
-    固定交易数量资金管理策略。每次买入固定的数量。
+    The fixed trading quantity money manager strategy. Buy a fixed quantity each time.
     
-    :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
-    :return: 资金管理策略实例)");
+    :param float n: the quantity to buy each time (it should be an integer multiple of the minimum trading quantity of the trading object; the program does not check this here)
+    :return: the money manager strategy instance)");
 
     m.def("MM_FixedPercent", MM_FixedPercent, py::arg("p") = 0.03, R"(MM_FixedPercent([p = 0.03])
 
-    固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
+    The fixed percentage risk model. The formula: P (the position size) = the account balance * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
     
-    :param float p: 百分比
-    :return: 资金管理策略实例)");
+    :param float p: the percentage
+    :return: the money manager strategy instance)");
 
     m.def("MM_FixedUnits", MM_FixedUnits, py::arg("n") = 33, R"(MM_FixedUnits([n = 33])
 
-    固定单位资金管理策略。公式: 买入数量 = 当前现金 / n / 当前风险risk
+    The fixed unit money manager strategy. The formula: the buy quantity = the current cash / n / the current risk
 
-    :param int n: n个资金单位
-    :return: 资金管理策略实例)");
+    :param int n: n capital units
+    :return: the money manager strategy instance)");
 
     m.def("MM_WilliamsFixedRisk", MM_WilliamsFixedRisk, py::arg("p") = 0.1,
           py::arg("max_loss") = 1000.0,
           R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    威廉斯固定风险资金管理策略。买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
+    The Williams fixed risk money manager strategy. The buy quantity = (the account balance × the risk percentage p) ÷ the maximum loss (max_loss)
 
-    :param float p: 风险百分比
-    :param float max_loss: 最大损失
-    :return: 资金管理策略实例)");
+    :param float p: the risk percentage
+    :param float max_loss: the maximum loss
+    :return: the money manager strategy instance)");
 
     m.def("MM_FixedCountTps", MM_FixedCountTps, py::arg("buy_counts"), py::arg("sell_counts"),
           R"(MM_FixedCountTps([buy_counts, sell_counts])
           
-    连续买入/卖出固定数量资金管理策略。
+    The consecutive buy/sell fixed quantity money manager strategy.
     
-    :param list buy_counts: 买入数量列表
-    :param list sell_counts: 卖出数量列表
-    :return: 资金管理策略实例)");
+    :param list buy_counts: the buy quantity list
+    :param list sell_counts: the sell quantity list
+    :return: the money manager strategy instance)");
 
-    // 注：组合级资金分配（AF_*）已迁出至 _AllocateFunds.cpp（AllocateFundsBase）。
+    // Note: the portfolio-level fund allocation (AF_*) has been moved out to _AllocateFunds.cpp
+    // (AllocateFundsBase).
 }

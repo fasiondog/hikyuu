@@ -11,9 +11,9 @@ import threading
 
 
 class SingletonType(type):
-    """基于 metalclass 实现单例
+    """Implement the singleton based on metaclass
 
-    示例：
+    Example:
     class MyClass(metaclass=SingletonType):
         def __init__(self,name):
             self.name = name

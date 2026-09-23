@@ -11,11 +11,12 @@
 
 namespace hku {
 
-// 计算线性回归斜率、拟合优度R²和相对最大残差，N支持变量
-// 结果集：
-//   result(0): 斜率
-//   result(1): 拟合优度 R²
-//   result(2): 相对最大残差 RelMaxRes = max|yi - ŷi| / ȳ
+// Calculate the linear regression slope, the goodness of fit R² and the relative maximum
+// residual; N supports a variable
+// Result set:
+//   result(0): slope
+//   result(1): goodness of fit R²
+//   result(2): relative maximum residual RelMaxRes = max|yi - ŷi| / ȳ
 class ISlope : public IndicatorImp {
     INDICATOR_IMP(ISlope)
     INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE

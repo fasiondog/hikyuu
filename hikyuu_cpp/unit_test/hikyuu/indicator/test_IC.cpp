@@ -1,7 +1,7 @@
 /*
  * test_ABS.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IC") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -30,7 +30,7 @@ TEST_CASE("test_IC") {
     KData ref_k = ref_stk.getKData(query);
     Indicator result;
 
-    /** @arg 传入非法 n */
+    /** @arg An invalid n is passed */
     CHECK_THROWS_AS(IC(MA(CLOSE()), stks, -1), std::exception);
 
     /** @arg n = 1 */
@@ -42,28 +42,28 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[22], doctest::Approx(0.8));
     CHECK_EQ(result[99], 0.5);
 
-    /** @arg 传入空的 stks */
+    /** @arg An empty stks is passed */
     result = IC(MA(CLOSE()), StockList(), 1)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
     CHECK_EQ(result.discard(), result.size());
 
-    /** @arg 传入的 stks 数量不足，需要大于等于2 */
+    /** @arg The passed stks is insufficient, 2 or more are needed */
     result = IC(MA(CLOSE()), {sm["sh600004"]}, 1)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), ref_k.size());
     CHECK_EQ(result.discard(), result.size());
 
-    /** @arg ref_stk 数据长度不足 */
+    /** @arg The data length of ref_stk is insufficient */
     result = IC(MA(CLOSE()), stks, 1)(ref_stk.getKData(KQuery(-1)));
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), result.size());
 
-    /** @arg 传入的 stks 中夹杂有 null stock，实际的 stks 长度小于2 */
+    /** @arg The passed stks contains a null stock, so its actual length is less than 2 */
     result = IC(MA(CLOSE()), {sm["sh600004"], Stock()}, 1)(ref_stk.getKData(KQuery(-2)));
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
@@ -72,7 +72,7 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
 
-    /** @arg 传入的 stks 长度为2，query 的长度为2*/
+    /** @arg The passed stks length is 2 and the query length is 2 */
     result = IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, 1)(ref_stk.getKData(KQuery(-2)));
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
@@ -81,7 +81,7 @@ TEST_CASE("test_IC") {
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_EQ(result[1], doctest::Approx(-1.0));
 
-    // 严格模式
+    // The strict mode
     result =
       IC(CLOSE(), {sm["sh600004"], sm["sh600005"]}, 1, true, true)(ref_stk.getKData(KQuery(-2)));
     CHECK_EQ(result.name(), "IC");
@@ -91,7 +91,7 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[0], doctest::Approx(-1.0));
     CHECK_UNARY(std::isnan(result[1]));
 
-    /** @arg 正常执行 */
+    /** @arg The normal execution */
     result = IC(CLOSE(), stks, 1)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
@@ -101,7 +101,7 @@ TEST_CASE("test_IC") {
     CHECK_EQ(result[3], doctest::Approx(0.4));
     CHECK_EQ(result[99], doctest::Approx(0.5));
 
-    // 严格模式
+    // The strict mode
     result = IC(CLOSE(), stks, 1, true, true)(ref_k);
     CHECK_EQ(result.name(), "IC");
     CHECK_UNARY(!result.empty());
@@ -124,7 +124,7 @@ TEST_CASE("test_IC_benchmark") {
     KQuery query = KQuery(-1000);
     KData ref_k = ref_stk.getKData(query);
 
-    int cycle = 100;  // 测试循环次数
+    int cycle = 100;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_IC_benchmark, cycle, fmt::format("data len: {}", ref_k.size()));
@@ -141,7 +141,7 @@ TEST_CASE("test_IC_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IC_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

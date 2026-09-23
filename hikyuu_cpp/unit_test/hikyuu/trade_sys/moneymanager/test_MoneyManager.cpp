@@ -54,13 +54,13 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MoneyManager") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm["sh000001"];
     TradeManagerPtr tm = crtTM();
 
-    /** @arg 基本操作 */
+    /** @arg The basic operation */
     MoneyManagerPtr p(new MoneyManagerTest);
     MoneyManagerTest *p_src = (MoneyManagerTest *)p.get();
     CHECK_EQ(p->name(), "MoneyManagerTest");
@@ -76,7 +76,7 @@ TEST_CASE("test_MoneyManager") {
     p->reset();
     CHECK_EQ(p_src->getX(), 0);
 
-    /** @arg 克隆操作 */
+    /** @arg The clone operation */
     p_src->setX(10);
     MoneyManagerPtr p_clone = p->clone();
     CHECK_NE(p, p_clone);

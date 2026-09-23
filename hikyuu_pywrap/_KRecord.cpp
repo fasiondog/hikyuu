@@ -16,7 +16,7 @@ namespace py = pybind11;
 #endif
 
 void export_KReord(py::module& m) {
-    py::class_<KRecord>(m, "KRecord", "K线记录，组成K线数据，属性可读写")
+    py::class_<KRecord>(m, "KRecord", "The K-line record, composing the K-line data; the attributes are readable and writable")
       .def(py::init<>())
       .def(py::init<const Datetime&>())
       .def(py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t>())
@@ -24,15 +24,15 @@ void export_KReord(py::module& m) {
       .def("__str__", to_py_str<KRecord>)
       .def("__repr__", to_py_str<KRecord>)
 
-      .def_readwrite("datetime", &KRecord::datetime, "时间")
-      .def_readwrite("open", &KRecord::openPrice, "开盘价")
-      .def_readwrite("high", &KRecord::highPrice, "最高价")
-      .def_readwrite("low", &KRecord::lowPrice, "最低价")
-      .def_readwrite("close", &KRecord::closePrice, "收盘价")
-      .def_readwrite("amount", &KRecord::transAmount, "成交金额")
-      .def_readwrite("volume", &KRecord::transCount, "成交量")
+      .def_readwrite("datetime", &KRecord::datetime, "The time")
+      .def_readwrite("open", &KRecord::openPrice, "The open price")
+      .def_readwrite("high", &KRecord::highPrice, "The high price")
+      .def_readwrite("low", &KRecord::lowPrice, "The low price")
+      .def_readwrite("close", &KRecord::closePrice, "The close price")
+      .def_readwrite("amount", &KRecord::transAmount, "The amount")
+      .def_readwrite("volume", &KRecord::transCount, "The volume")
 
-      .def("is_valid", &KRecord::isValid, "KRecord是否有效")
+      .def("is_valid", &KRecord::isValid, "Whether the KRecord is valid")
 
       .def(py::self == py::self)
       .def(py::self != py::self)
@@ -44,7 +44,7 @@ void export_KReord(py::module& m) {
         HKU_IF_RETURN(total == 0, py::array());
 
         struct RawData {
-            int64_t datetime;  // 转换后的毫秒时间戳
+            int64_t datetime;  // The converted millisecond timestamp
             double open;
             double high;
             double low;
@@ -65,7 +65,7 @@ void export_KReord(py::module& m) {
             data[i].volume = k.transCount;
         }
 
-        // 定义NumPy结构化数据类型
+        // Define the NumPy structured data type
         py::dtype dtype =
           py::dtype(vector_to_python_list<string>(
                       {"datetime", "open", "high", "low", "close", "amount", "volume"}),
@@ -82,7 +82,7 @@ void export_KReord(py::module& m) {
             return py::module_::import("pandas").attr("DataFrame")();
         }
 
-        // 创建数组
+        // Create the array
         py::array_t<int64_t> datetime_arr(total);
         py::array_t<double> open_arr(total);
         py::array_t<double> high_arr(total);
@@ -91,7 +91,7 @@ void export_KReord(py::module& m) {
         py::array_t<double> amount_arr(total);
         py::array_t<double> vol_arr(total);
 
-        // 获取缓冲区并填充数据
+        // Get the buffer and fill the data
         auto datetime_buf = datetime_arr.request();
         auto open_buf = open_arr.request();
         auto high_buf = high_arr.request();
@@ -119,7 +119,7 @@ void export_KReord(py::module& m) {
             vol_ptr[i] = ks[i].transCount;
         }
 
-        // 构建 DataFrame
+        // Build the DataFrame
         py::dict columns;
         columns["datetime"] = datetime_arr.attr("astype")("datetime64[ns]");
         columns["open"] = open_arr;
@@ -135,11 +135,11 @@ void export_KReord(py::module& m) {
     m.def("df_to_krecords", df_to_krecords,
           R"(df_to_krecords(df: pd.DataFrame[, columns: dict]) -> KRecordList
           
-    将DataFrame转换为KRecordList, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume")
+    Convert a DataFrame to a KRecordList; the column names must be specified in order, defaulting to: ("datetime", "open", "high", "low", "close", "amount", "volume")
 
-    :param DataFrame df: 输入的DataFrame
-    :param dict columns: 指定DataFrame的列名，对应KRecord的成员变量名称
-    :return: 转换后的KRecordList)",
+    :param DataFrame df: the input DataFrame
+    :param dict columns: specify the column names of the DataFrame, corresponding to the member variable names of the KRecord
+    :return: the converted KRecordList)",
           py::arg("df"),
           py::arg("columns") =
             StringList{"datetime", "open", "high", "low", "close", "amount", "volume"});

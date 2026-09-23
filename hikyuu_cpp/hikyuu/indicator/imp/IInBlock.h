@@ -13,7 +13,7 @@
 
 namespace hku {
 
-/* 已指标形式返回是否在指定板块中 */
+/* Return whether it is in the given block, in the form of an indicator */
 class IInBlock : public IndicatorImp {
     INDICATOR_IMP(IInBlock)
     INDICATOR_IMP_SUPPORT_INCREMENT

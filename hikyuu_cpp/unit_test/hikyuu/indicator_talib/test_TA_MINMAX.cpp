@@ -20,13 +20,13 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MINMAX") {
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_MINMAX(1));
     CHECK_THROWS(TA_MINMAX(100001));
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
         a.push_back(i);
@@ -48,7 +48,7 @@ TEST_CASE("test_TA_MINMAX") {
         CHECK_EQ(result.get(i, 1), expect1[i]);
     }
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     data = TA_MA(getKData("sh000001", KQuery(-10)).close(), 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_MINMAX(data, 3);
@@ -66,7 +66,7 @@ TEST_CASE("test_TA_MINMAX") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MINMAX_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

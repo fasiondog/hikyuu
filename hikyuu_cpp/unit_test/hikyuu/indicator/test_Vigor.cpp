@@ -18,19 +18,19 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VIGOR") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KData kdata;
     Indicator vigor;
 
-    /** @arg kdata为空时 */
+    /** @arg When kdata is empty */
     vigor = VIGOR(kdata, 1);
     CHECK_EQ(vigor.size(), 0);
     CHECK_EQ(vigor.empty(), true);
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     KQuery query = KQuery(0, 10);
     kdata = stock.getKData(query);
     CHECK_EQ(kdata.size(), 10);
@@ -53,7 +53,7 @@ TEST_CASE("test_VIGOR_benchemark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_VIGOR_benchemark, cycle, fmt::format("data len: {}", c.size()));
@@ -71,7 +71,7 @@ TEST_CASE("test_VIGOR_benchemark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VIGOR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

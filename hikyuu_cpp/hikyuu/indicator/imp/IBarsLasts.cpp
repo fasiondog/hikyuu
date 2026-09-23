@@ -29,10 +29,10 @@ void IBarsLasts::_calculate(const Indicator& ind) {
         return;
     }
 
-    // 获取参数N
+    // Get the parameter N
     int n = getParam<int>("n");
 
-    // 参数验证：如果n <= 0，返回全NaN序列
+    // Parameter validation: if n <= 0, return a sequence of all NaN
     if (n <= 0) {
         m_discard = total;
         return;
@@ -41,7 +41,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
     auto const* src = ind.data();
     auto* dst = this->data();
 
-    // 特殊情况：只有一个有效数据点
+    // Special case: there is only one valid data point
     if (total == ind_discard + 1) {
         if (src[ind_discard] != 0.0 && n == 1) {
             dst[ind_discard] = 0.0;
@@ -52,7 +52,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
         return;
     }
 
-    // 记录所有条件成立的位置
+    // Record the positions where the condition holds
     std::vector<size_t> true_positions;
     for (size_t i = ind_discard; i < total; i++) {
         if (src[i] != 0.0) {
@@ -60,18 +60,18 @@ void IBarsLasts::_calculate(const Indicator& ind) {
         }
     }
 
-    // 如果条件成立次数不足 N 次，全部返回 NaN
+    // If the condition holds fewer than N times, return NaN for everything
     if (true_positions.size() < n) {
         m_discard = total;
         return;
     }
 
-    // 找到第 N 次条件成立的位置，从该位置开始有效
+    // Find the position where the condition holds for the N-th time; it is valid from that position
     size_t first_valid_pos = true_positions[n - 1];
 
-    // 反向遍历，类似 BARSLAST 的逻辑
+    // Traverse in reverse order, similar to the BARSLAST logic
     size_t pos = total;
-    size_t count = 0;  // 记录已经处理了多少次条件成立
+    size_t count = 0;  // Records how many times the condition has held
 
     for (size_t i = total - 1; i >= first_valid_pos; i--) {
         if (src[i] != 0.0) {
@@ -98,7 +98,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
 }
 
 void IBarsLasts::_dyn_calculate(const Indicator& ind) {
-    // 获取动态参数 n
+    // Get the dynamic parameter n
     Indicator ind_param(getIndParamImp("n"));
     HKU_CHECK(ind_param.size() == ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param.size(), ind.size());
@@ -116,17 +116,18 @@ void IBarsLasts::_dyn_calculate(const Indicator& ind) {
     auto* dst = this->data();
     auto const* n_data = ind_param.data();
 
-    // 对每个位置单独计算
+    // Calculate for every position separately
     for (size_t i = m_discard; i < total; i++) {
         int n = static_cast<int>(n_data[i]);
 
-        // 参数验证：如果n <= 0，返回NaN
+        // Parameter validation: if n <= 0, return NaN
         if (n <= 0) {
             dst[i] = Null<price_t>();
             continue;
         }
 
-        // 从当前位置向前查找第 n 次条件成立的位置
+        // Search backward from the current position for the position where the condition holds for
+        // the n-th time
         int count = 0;
         size_t target_pos = Null<size_t>();
 
@@ -143,7 +144,8 @@ void IBarsLasts::_dyn_calculate(const Indicator& ind) {
             }
         }
 
-        // 如果找到了第 n 次条件成立的位置，计算距离
+        // If the position where the condition holds for the n-th time is found, calculate the
+        // distance
         if (target_pos != Null<size_t>()) {
             dst[i] = static_cast<price_t>(i - target_pos);
         } else {

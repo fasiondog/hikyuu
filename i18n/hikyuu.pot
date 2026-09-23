@@ -17,8 +17,467 @@ msgstr ""
 "X-Poedit-KeywordsList: htr;hctr:1c,2\n"
 "X-Poedit-SearchPath-0: hikyuu_cpp/hikyuu\n"
 "X-Poedit-SearchPath-1: hikyuu_pywrap\n"
+"X-Poedit-SearchPath-2: hikyuu/draw\n"
 "X-Poedit-SearchPathExcluded-0: hikyuu_cpp/hikyuu/utilities\n"
 
 #: hikyuu_pywrap/plugin/_backtest.cpp:22
 msgid "on_bar is not callable!"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:85
+msgid "Account Initial Capital"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:86
+msgid "Total Invested Principal"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:87
+msgid "Total Invested Assets"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:88
+msgid "Total Borrowed Cash"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:89
+msgid "Total Borrowed Assets"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:90
+msgid "Total Dividends"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:91
+msgid "Cash Balance"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:92
+msgid "Open Position Net Value"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:93
+msgid "Current Total Assets"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:94
+msgid "Total Cost of Closed Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:95
+msgid "Total Net Profit of Closed Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:96
+msgid "Max Cash Usage per Trade %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:97
+msgid "Avg Cash Usage per Trade %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:98
+msgid "Open Position Account Return %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:99
+msgid "Closed Trade Account Return %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:100
+msgid "Account CAGR %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:101
+msgid "Account Avg Annual Return %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:102
+msgid "Total Profit of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:103
+msgid "Total Loss of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:104
+msgid "Total Closed Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:105
+msgid "Number of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:106
+msgid "Number of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:107
+msgid "Winning Trade Ratio %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:108
+msgid "Profit Expectancy"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:109
+msgid "Avg Profit per Winning Trade"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:110
+msgid "Avg Loss per Losing Trade"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:111
+msgid "Avg Win / Avg Loss Ratio"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:112
+msgid "Profit Factor"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:113
+msgid "Largest Single Win"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:114
+msgid "Largest Single Win %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:115
+msgid "Largest Single Loss"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:116
+msgid "Largest Single Loss %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:117
+msgid "Avg Holding Period of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:118
+msgid "Max Holding Period of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:119
+msgid "Avg Holding Period of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:120
+msgid "Max Holding Period of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:121
+msgid "Total Time Flat"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:122
+msgid "Time Flat / Total Time %"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:123
+msgid "Avg Time Flat"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:124
+msgid "Max Time Flat"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:125
+msgid "Max Consecutive Wins"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:126
+msgid "Max Consecutive Losses"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:127
+msgid "Max Consecutive Win Amount"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:128
+msgid "Max Consecutive Loss Amount"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:129
+msgid "R-Multiple Expectancy"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:130
+msgid "Trade Opportunities per Year"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:131
+msgid "Annual Expected R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:132
+msgid "Avg R-Multiple of Winning Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:133
+msgid "Avg R-Multiple of Losing Trades"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:134
+msgid "Max Single Win R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:135
+msgid "Max Single Loss R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:136
+msgid "Max Consecutive Win R-Multiple"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:137
+msgid "Max Consecutive Loss R-Multiple"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:905
+#, python-format
+msgid "Total Invested Assets: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:907
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%    Current Drawdown from Peak: {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:911
+#, python-format
+msgid "Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:925
+#, python-format
+msgid "{} Return Curve"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:928
+#, python-format
+msgid "{} Cumulative Return {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:929
+#, python-format
+msgid "Account({}) Cumulative Return"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:277
+#, python-format
+msgid "{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f} Change:{:.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:328
+#, python-format
+msgid "{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:530
+#, python-format
+msgid "The indicator length is 0; the indicator should have been calculated (i.e. it has values)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:535
+#, python-format
+msgid "Failed to get the date list! The indicator should be a time series"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:548
+#, python-format
+msgid "Insufficient monthly data!"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:557
+#, python-format
+msgid "Year-Month Return (%) Heatmap"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:558
+#, python-format
+msgid "Month"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:559
+#, python-format
+msgid "Year"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:996
+#, python-format
+msgid "No data, please check the date range! start_date={}, end_date={}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1002
+#, python-format
+msgid "Failed to get the tm return curve, please check the tm initial date! tm.init_datetime={} start_date={}, end_date={}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1040
+#, python-format
+msgid "Annual Return"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1070
+#, python-format
+msgid "{} Year-Month Return (%) Heatmap"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1117
+#, python-format
+msgid "Insufficient yearly data!"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1149
+#, python-format
+msgid "Highest Return Range"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1152
+#, python-format
+msgid "Lowest Return Range"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1170
+#, python-format
+msgid "{} Annual Return (%) Bar Chart"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1172
+#, python-format
+msgid "Return (%)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1180
+#, python-format
+msgid "The system has no trade manager initialized"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:50
+msgid " (Daily)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:52
+msgid " (Weekly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:54
+msgid " (Monthly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:56
+msgid " (Quarterly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:58
+msgid " (Half-Yearly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:60
+msgid " (Yearly)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:62
+msgid " (1-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:64
+msgid " (3-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:66
+msgid " (5-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:68
+msgid " (15-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:70
+msgid " (30-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:72
+msgid " (60-min)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:74
+msgid " (2-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:76
+msgid " (4-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:78
+msgid " (6-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/common.py:80
+msgid " (12-hour)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:190
+msgid "Date"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:190
+msgid "Open"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "High"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "Low"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:191
+msgid "Close"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:192
+msgid "Amount"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:192
+msgid "Volume"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:236
+msgid "Bokeh does not support the American K-line chart yet, please use matplotlib"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:302
+msgid "Indicator"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:303
+msgid "Value"
+msgstr ""
+
+#: hikyuu/draw/drawplot/echarts_draw.py:542
+msgid "System Cumulative Return"
+msgstr ""
+
+#: hikyuu/draw/drawplot/echarts_draw.py:562
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/elder.py:55
+msgid "The lengths of the two sequences are not equal"
+msgstr ""
+
+#: hikyuu/draw/elder.py:56
+msgid "Number must be greater than 0"
+msgstr ""
+
+#: hikyuu/draw/drawplot/__init__.py:100
+#, python-format
+msgid "Unknown engine: {}"
 msgstr ""

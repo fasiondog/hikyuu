@@ -35,8 +35,8 @@ bool IndicatorImp::ms_enable_increment_calculate{true};
 
 void IndicatorImp::initEngine() {
 #if HKU_ENABLE_MIMALLOC
-    mi_option_enable(mi_option_large_os_pages);  // 启用大页面
-    mi_option_enable(mi_option_use_numa_nodes);  // 启用NUMA支持
+    mi_option_enable(mi_option_large_os_pages);  // Enable the large pages
+    mi_option_enable(mi_option_use_numa_nodes);  // Enable the NUMA support
     // mi_option_set(mi_option_purge_delay, 0);
     // mi_option_set(mi_option_purge_delay, 100);
     // mi_option_disable(mi_option_purge_decommits);
@@ -148,9 +148,11 @@ HKU_API std::ostream &operator<<(std::ostream &os, const IndicatorImpPtr &imp) {
     return os;
 }
 
-// 构造出身发号器。唯一定义于本文件（非 inline），保证跨 DLL 只有一份计数器：
-// 派生指标可能在插件 dll（如 extind）中构造，但其基类构造函数由核心 dll 导出并执行，
-// in-class 初始器随之在核心侧求值，id 空间统一。
+// The construction id generator. It is defined in this file only (not inline), ensuring that
+// there is a single counter across the DLLs: a derived indicator may be constructed in a
+// plugin dll (such as extind), but its base class constructor is exported and executed by the
+// core dll, so the in-class initializer is evaluated on the core side and the id space is
+// unified.
 uint64_t IndicatorImp::nextOriginId() noexcept {
     static std::atomic<uint64_t> seq{1};
     return seq.fetch_add(1, std::memory_order_relaxed);
@@ -260,7 +262,7 @@ bool IndicatorImp::can_inner_calculate() {
 void IndicatorImp::setContext(const KData &k) {
     const KData &old_k = getContext();
 
-    // 上下文没变化的情况下根据自身标识进行计算
+    // Calculate according to its own identifier when the context has not changed
     if (old_k == k) {
         if (m_need_calculate) {
             calculate();
@@ -275,7 +277,7 @@ void IndicatorImp::setContext(const KData &k) {
 
     m_need_calculate = true;
 
-    // 子节点设置上下文
+    // Set the context for the child nodes
     if (m_left)
         m_left->setContext(k);
     if (m_right)
@@ -283,15 +285,15 @@ void IndicatorImp::setContext(const KData &k) {
     if (m_three)
         m_three->setContext(k);
 
-    // 对动态参数设置上下文
+    // Set the context for the dynamic parameters
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
         iter->second->setContext(k);
     }
 
-    // 启动重新计算
+    // Start the recalculation
     calculate();
 
-    // 清理根节点之下所有节点中间计算数据
+    // Clean up the intermediate calculation data of all the nodes below the root node
     if (!m_parent) {
         vector<IndicatorImpPtr> nodes;
         getAllSubNodes(nodes);
@@ -411,7 +413,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     IndicatorImpPtr p = _clone();
     p->m_params = m_params;
     p->m_name = m_name;
-    p->m_origin_id = m_origin_id;  // 出身证复印：克隆链共享构造身份
+    p->m_origin_id = m_origin_id;  // Copy the origin id: the clone chain shares the identity
     p->m_is_python_object = m_is_python_object;
     p->m_need_self_alike_compare = m_need_self_alike_compare;
     p->m_is_serial = m_is_serial;
@@ -448,7 +450,7 @@ IndicatorImpPtr IndicatorImp::clone() {
     }
 
     if (!m_parent) {
-        // 重构各子节点的父节点
+        // Rebuild the parent node of every child node
         std::forward_list<IndicatorImp *> stack;
         stack.push_front(p.get());
         while (!stack.empty()) {
@@ -476,7 +478,7 @@ IndicatorImpPtr IndicatorImp::clone() {
 
 IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
     HKU_INFO("This indicator not support operator()! {}", *this);
-    // 保证对齐
+    // Guarantee the alignment
     IndicatorImpPtr result = make_shared<IndicatorImp>();
     size_t total = ind.size();
     result->_readyBuffer(total, m_result_num);
@@ -795,7 +797,7 @@ bool IndicatorImp::needCalculate() {
         return true;
     }
 
-    // 子节点设置上下文
+    // Set the context for the child nodes
     if (m_left) {
         m_need_calculate = m_left->needCalculate();
         if (m_need_calculate) {
@@ -941,11 +943,13 @@ Indicator IndicatorImp::calculate() {
                     _calculate(Indicator());
                 }
             } else {
-                // 动态周期叶子没有右子节点驱动 buffer 定长。当执行器跨股票重绑 context 时，
-                // 空输入会让 _dyn_calculate 在 total == 0 处提前返回而完全不触碰 buffer，
-                // 导致上一只股票的数据与长度残留在 buffer 中（脏缓冲区）。这里在调用前按
-                // 当前 context 长度预尺寸并 null 填充 buffer，使得即便 _dyn_calculate 什么都不写，
-                // size()/data() 也能返回正确（可能更短）的长度。
+                // A dynamic period leaf has no right child to drive its fixed-length buffer. When
+                // the executor rebinds the context across stocks, an empty input makes
+                // _dyn_calculate return early at total == 0 without touching the buffer at all,
+                // leaving the data and the length of the previous stock in the buffer (a dirty
+                // buffer). Here the buffer is pre-sized and null filled according to the current
+                // context length before the call, so that even if _dyn_calculate writes nothing,
+                // size()/data() return the correct (possibly shorter) length.
                 if (isNeedContext()) {
                     _readyBuffer(getContext().size(), m_result_num);
                 }
@@ -1034,7 +1038,8 @@ Indicator IndicatorImp::calculate() {
             break;
     }
 
-    // 使用原型方式时，不加此判断无法立刻重新计算
+    // When the prototype way is used, the recalculation cannot happen immediately without this
+    // check
     if (size() != 0) {
         m_need_calculate = false;
     }
@@ -1046,8 +1051,9 @@ Indicator IndicatorImp::calculate() {
         result = shared_from_this();
     } catch (const std::exception &e) {
         if (runningInPython()) {
-            // Python中继承的实现会出现bad_weak_ptr错误，通过此方式避免
-            // 切换至 pybind11 后，目前应已不在出现，目前保留观察
+            // The implementation inherited in Python raised a bad_weak_ptr error, this way avoids
+            // it. After switching to pybind11 it should no longer happen, it is kept for
+            // observation for now.
             result = clone();
         } else {
             HKU_ERROR("IndicatorImp::calculate() error! {}", e.what());
@@ -1930,7 +1936,7 @@ void IndicatorImp::execute_if() {
 void IndicatorImp::_dyn_calculate(const Indicator &ind) {
     // SPEND_TIME(IndicatorImp__dyn_calculate);
     const auto &ind_param = getIndParamImp("n");
-    // CVAL或PRICELIST可能会大于ind.size()
+    // CVAL or PRICELIST may be larger than ind.size()
     HKU_CHECK(ind_param->size() >= ind.size(), "ind_param->size()={}, ind.size()={}!",
               ind_param->size(), ind.size());
     m_discard = std::max(ind.discard(), ind_param->discard());
@@ -2049,10 +2055,12 @@ bool IndicatorImp::contains(const string &name) const {
 }
 
 void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
-    // 使用栈来模拟递归调用，避免深层递归导致的栈溢出
+    // Use a stack to simulate the recursive calls, avoiding the stack overflow caused by a deep
+    // recursion
     std::stack<IndicatorImpPtr> nodeStack;
 
-    // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
+    // Push the child nodes of the current node onto the stack (in the reverse order to keep the
+    // original processing order)
     if (m_three) {
         nodeStack.push(m_three);
     }
@@ -2063,15 +2071,16 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
         nodeStack.push(m_right);
     }
 
-    // 处理栈中的节点
+    // Process the nodes in the stack
     while (!nodeStack.empty()) {
         IndicatorImpPtr current = nodeStack.top();
         nodeStack.pop();
 
-        // 添加当前节点到结果列表
+        // Add the current node to the result list
         nodes.push_back(current);
 
-        // 将当前节点的子节点入栈（按相反顺序入栈以保持原有处理顺序）
+        // Push the child nodes of the current node onto the stack (in the reverse order to keep the
+        // original processing order)
         if (current->m_three) {
             nodeStack.push(current->m_three);
         }
@@ -2082,11 +2091,11 @@ void IndicatorImp::getAllSubNodes(vector<IndicatorImpPtr> &nodes) const {
             nodeStack.push(current->m_right);
         }
 
-        // 添加当前节点的内部节点（如果有的话）
+        // Add the internal node of the current node (if there is one)
         current->getSelfInnerNodesWithInputConext(nodes);
     }
 
-    // 添加当前节点的内部节点
+    // Add the internal node of the current node
     getSelfInnerNodesWithInputConext(nodes);
 }
 
@@ -2144,7 +2153,8 @@ void IndicatorImp::repeatALikeNodes() {
 }
 
 void IndicatorImp::repeatSeparateKTypeLeafALikeNodes() {
-    // 需要再上层节点已完成优化后，重新获取所有子节点
+    // All the child nodes need to be fetched again after the optimization of the upper layer is
+    // done
     vector<IndicatorImpPtr> all_nodes;
     getAllSubNodes(all_nodes);
 
@@ -2183,15 +2193,15 @@ void IndicatorImp::repeatSeparateKTypeLeafALikeNodes() {
 }
 
 void IndicatorImp::_printTree(int depth, bool isLast, bool show_long_name) const {
-    // 打印当前节点
+    // Print the current node
     std::string indent;
     if (depth > 0) {
-        // 构建层级缩进
+        // Build the level indentation
         indent = std::string((depth - 1) * 3, ' ');
         indent += isLast ? "└─ " : "├─ ";
     }
 
-    // 打印节点名称
+    // Print the node name
     std::string name = (show_long_name ? long_name() : this->name());
     if (m_parent) {
         if (this == m_parent->m_three.get()) {
@@ -2204,13 +2214,13 @@ void IndicatorImp::_printTree(int depth, bool isLast, bool show_long_name) const
     }
     std::cout << indent << name;
 
-    // 如果是叶子节点，直接换行
+    // If it is a leaf node, break the line directly
     if (isLeaf()) {
         std::cout << std::endl;
         return;
     }
 
-    // 有子节点，先换行再打印子节点
+    // When there are child nodes, break the line first and then print the child nodes
     std::cout << std::endl;
 
     std::vector<IndicatorImp *> children;
@@ -2227,7 +2237,7 @@ void IndicatorImp::_printTree(int depth, bool isLast, bool show_long_name) const
     if (children.empty())
         return;
 
-    // 递归打印子节点
+    // Print the child nodes recursively
     for (size_t i = 0; i < children.size(); ++i) {
         bool lastChild = (i == children.size() - 1);
         std::cout << std::string(depth * 3, ' ');

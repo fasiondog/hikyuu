@@ -16,11 +16,13 @@
 namespace hku {
 
 /**
- * 向前赋值将当前位置到若干周期前的数据设为1
+ * Forward assignment, it sets the data from the current position to several periods before to 1
  * @details
  * <pre>
- * 用法：BACKSET(X,N),X非0,则将当前位置到N周期前的数值设为1。
- * 例如：BACKSET(CLOSE>OPEN,2)若收阳则将该周期及前一周期数值设为1,否则为0
+ * Usage: BACKSET(X,N): if X is not 0, the values from the current position to N periods before are
+ * set to 1.
+ * For example: BACKSET(CLOSE>OPEN,2) sets the values of the current period and the previous period
+ * to 1 if the candle closes up, otherwise 0
  * </pre>
  * @ingroup Indicator
  */

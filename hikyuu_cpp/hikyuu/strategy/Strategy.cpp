@@ -27,14 +27,14 @@ void Strategy::sig_handler(int sig) {
             auto* scheduler = getScheduler();
             scheduler->stop();
         } catch (...) {
-            // 忽略异常
+            // Ignore the exception
         }
         std::exit(EXIT_SUCCESS);
     }
 }
 
 void Strategy::register_signal() {
-    // 确保只注册一次
+    // Make sure it is registered only once
     bool expected = false;
     if (ms_sig_registered.compare_exchange_strong(expected, true)) {
         if (std::signal(SIGINT, sig_handler) == SIG_ERR) {
@@ -76,8 +76,8 @@ Strategy::Strategy(const StrategyContext& context, const string& name, const str
 }
 
 Strategy::~Strategy() {
-    // ms_keep_running 用于全局 ctrl-c 终止，不能在释放时释放，否则新创建的策略对象将运行
-    // ms_keep_running = false;
+    // ms_keep_running is used for the global ctrl-c termination; it must not be released on the
+    // release, otherwise a newly created strategy object would run ms_keep_running = false;
     event([]() {});
 }
 
@@ -101,9 +101,9 @@ bool Strategy::running() const {
 void Strategy::_init() {
     StockManager& sm = StockManager::instance();
 
-    // sm 尚未初始化，则初始化
+    // Initialize sm when it has not been initialized yet
     if (sm.thread_id() == std::thread::id()) {
-        // 注册 ctrl-c 终止信号
+        // Register the ctrl-c termination signal
         if (!runningInPython()) {
             // std::signal(SIGINT, sig_handler);
             register_signal();
@@ -111,7 +111,7 @@ void Strategy::_init() {
 
         CLS_INFO("{} is running! You can press Ctrl-C to terminte ...", m_name);
 
-        // 初始化
+        // Initialization
         hikyuu_init(m_config_file, false, m_context);
 
     } else {
@@ -124,7 +124,7 @@ void Strategy::_init() {
 
     CLS_CHECK(!m_context.getStockCodeList().empty(), "The context does not contain any stocks!");
 
-    // 先将行情接收代理停止，以便后面加入处理函数
+    // Stop the market data receiving agent first, so that the handlers can be added later
     stopSpotAgent();
 }
 
@@ -339,7 +339,7 @@ void Strategy::_runDailyAt() {
 }
 
 /*
- * 在主线程中处理事件队列，避免 python GIL
+ * Process the event queue in the main thread, avoiding the python GIL
  */
 void Strategy::_startEventLoop() {
     while (ms_keep_running) {
@@ -380,7 +380,8 @@ price_t Strategy::getPriceByTime(const Stock& stk, const TimeDelta& time,
     Datetime start = today() + time;
     Datetime end = start + time;
     if ((now() - today()) != TimeDelta()) {
-        // 非日线级别如分钟线，尝试获取当前时间之后的价格，强制限定为当前时间
+        // For a non-daily level such as the minute line, the price after the current time is
+        // clamped to the current time
         if (end > now()) {
             end = now();
         }
@@ -433,7 +434,7 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
         if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
             sell_num = max_trade_num;
         } else if ((sell_num + num) < min_trade_num) {
-            sell_num = MAX_DOUBLE;  // 指示卖出剩余全部
+            sell_num = MAX_DOUBLE;  // Indicate selling all the remaining
         }
         ret = sell(stk, 0.0, sell_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
     }
@@ -446,7 +447,7 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
     HKU_WARN_IF_RETURN(value == 0.0, ret, "{} {} order value is zero!", stk.market_code(),
                        stk.name());
 
-    auto k = getLastKData(stk, 1, KQuery::DAY, KQuery::NO_RECOVER);  // 取日线当前价
+    auto k = getLastKData(stk, 1, KQuery::DAY, KQuery::NO_RECOVER);  // The current daily-line price
     HKU_IF_RETURN(k.empty() || k[0].datetime.startOfDay() != today(), ret);
 
     price_t price = k[0].closePrice;
@@ -501,7 +502,7 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
     auto tm = crtBrokerTM(broker, costfunc, sys->name(), other_brokers);
     tm->fetchAssetInfoFromBroker(broker);
     sys->setTM(tm);
-    sys->setSP(SlippagePtr());  // 清除移滑价差算法
+    sys->setSP(SlippagePtr());  // Clear the slippage algorithm
     sys->run(stk, query);
 }
 

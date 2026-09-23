@@ -1,7 +1,10 @@
 /*
  * build_in.h
  *
- *  v5：PF 兼容层（工厂直通到 MultiSystem），见 docs/design/pf_af_compat/design.md §4
+ *  v5: PF compatibility layer (the factory directly passes through to MultiSystem), see
+ *  docs/design/pf_af_compat/design.md §4
+ *  Created on: 2016-3-28
+ *      Author: fasiondog
  */
 
 #pragma once

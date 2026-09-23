@@ -29,7 +29,7 @@ void IIsLimitDown::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
-    m_discard = 1;  // 第一根K线没有前一根K线, 无法判断是否跌停, 直接舍弃
+    m_discard = 1;  // No previous K-line, so the limit down cannot be judged; discard it
     _increment_calculate(ind, 0);
 }
 
@@ -41,11 +41,12 @@ void IIsLimitDown::_increment_calculate(const Indicator& data, size_t start_pos)
     value_t limit_down = 0.0;
     const Stock& stock = kdata.getStock();
     if (stock.type() == STOCKTYPE_A) {
-        limit_down = 0.9;  // A股跌停幅度为10%, 但ST股票跌停幅度为5%, 由于没有ST历史日期暂不处理
+        limit_down =
+          0.9;  // 10% for the A-shares, but 5% for the ST stocks (not handled: no ST date)
     } else if (stock.type() == STOCKTYPE_A_BJ) {
-        limit_down = 0.7;  // 北交所跌停幅度为30%
+        limit_down = 0.7;  // 30% for the Beijing Stock Exchange
     } else if (stock.type() == STOCKTYPE_GEM || stock.type() == STOCKTYPE_START) {
-        limit_down = 0.8;  // 创业板和科创板跌停幅度为20%
+        limit_down = 0.8;  // 20% for the ChiNext and the STAR Market
     }
 
     auto const* ks = kdata.data();
@@ -57,7 +58,7 @@ void IIsLimitDown::_increment_calculate(const Indicator& data, size_t start_pos)
         }
     } else {
         for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = 0.0;  // 不支持的股票类型, 默认为非跌停
+            dst[i] = 0.0;  // An unsupported security type, regarded as not limit down
         }
     }
 }

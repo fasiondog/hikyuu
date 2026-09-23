@@ -1,7 +1,7 @@
 /*
  * SG_Flex.cpp
  *
- *  Created on: 2016年4月11日
+ *  Created on: 2016-4-11
  *      Author: fasiondog
  */
 

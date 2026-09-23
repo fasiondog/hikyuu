@@ -12,10 +12,10 @@
 namespace hku {
 
 /**
- * 使用分位数法则进行数据截断处理
- * @param int n 窗口大小
- * @param quantile_min 最小分位数
- * @param quantile_max 最大分位数
+ * Perform the data truncation with the quantile rule
+ * @param int n window size
+ * @param quantile_min minimum quantile
+ * @param quantile_max maximum quantile
  * @return Indicator
  * @ingroup Indicator
  */

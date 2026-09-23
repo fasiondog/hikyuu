@@ -77,7 +77,8 @@ Indicator Indicator2InImp::prepare(const Indicator& ind) {
     Indicator ref = m_ref_ind;
     auto dates = ref.getDatetimeList();
     if (is_value || dates.empty()) {
-        // 如果不是时间序列，则以 ind 为基准，按右端对齐，不足用 nan 填充, 超长则截断左端
+        // If it is not a time series, take ind as the reference and align at the right end, filling
+        // with nan when it is shorter and truncating the left end when it is longer
         if (ref.size() > ind.size()) {
             ref = SLICE(ref, ref.size() - ind.size(), ref.size());
         } else if (ref.size() < ind.size()) {
@@ -87,7 +88,7 @@ Indicator Indicator2InImp::prepare(const Indicator& ind) {
             }
         }
     } else if (k != ind.getContext()) {
-        // 如果是时间序列，当两者的上下文不同，则按日期对齐
+        // If it is a time series and the contexts of the two are different, align them by date
         ref = ALIGN(m_ref_ind, ind, getParam<bool>("fill_null"));
     }
 

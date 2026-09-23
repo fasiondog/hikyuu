@@ -29,13 +29,14 @@
 # 1. 20171122, Added by fasiondog
 # ===============================================================================
 
-from hikyuu import Query
+from hikyuu import Query, htr
 
 
 def get_draw_title(kdata):
-    """根据typ值，返回相应的标题，如 上证指数（日线）
-    参数：kdata: KData实例
-    返回：一个包含stock名称的字符串，可用作绘图时的标题
+    """Return the corresponding title according to the ktype, such as SH/000001 上证指数 （日线）
+
+    :param kdata: the KData instance
+    :return: a string containing the stock name, which can be used as the title when drawing
     """
     if not kdata:
         return ""
@@ -47,37 +48,37 @@ def get_draw_title(kdata):
 
     s1 = ''
     if query.ktype == Query.DAY:
-        s1 = u' （日线）'
+        s1 = htr(' (Daily)')
     elif query.ktype == Query.WEEK:
-        s1 = u' （周线）'
+        s1 = htr(' (Weekly)')
     elif query.ktype == Query.MONTH:
-        s1 = u' （月线）'
+        s1 = htr(' (Monthly)')
     elif query.ktype == Query.QUARTER:
-        s1 = u' （季线）'
+        s1 = htr(' (Quarterly)')
     elif query.ktype == Query.HALFYEAR:
-        s1 = u' （半年线）'
+        s1 = htr(' (Half-Yearly)')
     elif query.ktype == Query.YEAR:
-        s1 = u' （年线）'
+        s1 = htr(' (Yearly)')
     elif query.ktype == Query.MIN:
-        s1 = u' （1分钟线）'
+        s1 = htr(' (1-min)')
     elif query.ktype == Query.MIN3:
-        s1 = u' （3分钟线）'
+        s1 = htr(' (3-min)')
     elif query.ktype == Query.MIN5:
-        s1 = u' （5分钟线）'
+        s1 = htr(' (5-min)')
     elif query.ktype == Query.MIN15:
-        s1 = u' （15分钟线）'
+        s1 = htr(' (15-min)')
     elif query.ktype == Query.MIN30:
-        s1 = u' （30分钟线）'
+        s1 = htr(' (30-min)')
     elif query.ktype == Query.MIN60:
-        s1 = u' （60分钟线）'
+        s1 = htr(' (60-min)')
     elif query.ktype == Query.HOUR2:
-        s1 = u' （2小时线）'
+        s1 = htr(' (2-hour)')
     elif query.ktype == Query.HOUR4:
-        s1 = u' （4小时线）'
+        s1 = htr(' (4-hour)')
     elif query.ktype == Query.HOUR6:
-        s1 = u' （6小时线）'
+        s1 = htr(' (6-hour)')
     elif query.ktype == Query.HOUR12:
-        s1 = u' （12小时线）'
+        s1 = htr(' (12-hour)')
 
     name = stock.name
 

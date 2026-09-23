@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_TRANGE") {
     auto x = TA_TRANGE(KData());
     CHECK_EQ(x.name(), "TA_TRANGE");
@@ -40,7 +40,7 @@ TEST_CASE("test_TA_TRANGE") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_TRANGE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

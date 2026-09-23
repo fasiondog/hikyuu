@@ -14,11 +14,11 @@
 namespace hku {
 
 /**
- * 乘幂
+ * Power
  * @details
  * <pre>
- * SIGNED_POWER(A,B)返回A的B次幂, 但保留原始符号
- * 例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
+ * SIGNED_POWER(A,B) returns A to the power of B, but keeps the original sign
+ * For example: SIGNED_POWER(CLOSE,3) gives the cube of the close price and keeps the original sign
  * </pre>
  * @ingroup Indicator
  */

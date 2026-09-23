@@ -94,13 +94,13 @@ public:
 
 private:
     int64_t m_id;
-    uint32_t m_type;          //证券类型
-    uint32_t m_precision;     //价格精度
-    double m_tick;            //最小跳动量
-    double m_tickValue;       //每一个tick价格
-    double m_minTradeNumber;  //每笔最小交易量
-    double m_maxTradeNumber;  //每笔最大交易量
-    string m_description;     //描述信息
+    uint32_t m_type;          // Security type
+    uint32_t m_precision;     // Price precision
+    double m_tick;            // Minimum tick size
+    double m_tickValue;       // Price of every tick
+    double m_minTradeNumber;  // Minimum trade quantity per order
+    double m_maxTradeNumber;  // Maximum trade quantity per order
+    string m_description;     // Description
 };
 
 }  // namespace hku

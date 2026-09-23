@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ISINF") {
     price_t nan = Null<price_t>();
     price_t positive_inf = std::numeric_limits<price_t>::infinity();
@@ -46,7 +46,7 @@ TEST_CASE("test_ISINF") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ISINF_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

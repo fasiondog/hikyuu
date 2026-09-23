@@ -1,7 +1,7 @@
 /*
  * PG_FixedPercent.h
  *
- *  Created on: 2016年5月6日
+ *  Created on: 2016-5-6
  *      Author: Administrator
  */
 
@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 固定持仓天数盈利目标策略
- * @param days: 允许持仓天数（按交易日算）,默认5天
+ * Profit goal strategy of a fixed holding days
+ * @param days: the allowed holding days (counted in trading days), 5 days by default
  * @return PGPtr
  * @ingroup ProfitGoal
  */

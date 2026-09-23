@@ -1,7 +1,7 @@
 /*
  * CrossSignal.cpp
  *
- *  Created on: 2015年2月20日
+ *  Created on: 2015-2-20
  *      Author: fasiondog
  */
 

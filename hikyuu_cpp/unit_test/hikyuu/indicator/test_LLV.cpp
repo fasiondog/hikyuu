@@ -1,7 +1,7 @@
 /*
  * test_LLV.cpp
  *
- *  Created on: 2019年4月1日
+ *  Created on: 2019-4-1
  *      Author: fasiondog
  */
 
@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLV") {
     Indicator result;
 
@@ -62,7 +62,7 @@ TEST_CASE("test_LLV") {
     CHECK_EQ(result[9], data[0]);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLV_dyn") {
     Indicator result;
 
@@ -119,7 +119,7 @@ TEST_CASE("test_LLV_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLV_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -149,7 +149,7 @@ TEST_CASE("test_LLV_export") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLV_dyn_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -12,31 +12,37 @@
 namespace hku {
 
 /**
- * @brief 创建滚动ICIR权重多因子模型实例
+ * @brief Create a rolling ICIR weight multi-factor model instance
  * @ingroup MultiFactor
- * @return MultiFactorPtr 滚动ICIR权重多因子模型指针
- * @details 创建一个空的滚动ICIR权重多因子模型，需要后续设置因子集合
+ * @return MultiFactorPtr the rolling ICIR weight multi-factor model pointer
+ * @details Create an empty rolling ICIR weight multi-factor model; the factor set needs to be set
+ *          afterwards
  */
 MultiFactorPtr HKU_API MF_ICIRWeight();
 
 /**
- * @brief 创建滚动ICIR权重多因子模型实例（完整参数版本）
+ * @brief Create a rolling ICIR weight multi-factor model instance (the full parameter version)
  * @ingroup MultiFactor
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空（相当于SH000001）
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param ic_rolling_n IC滚动窗口大小，默认为120
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 滚动ICIR权重多因子模型指针
- * @details 
- * 创建滚动ICIR权重多因子模型实例，使用指定参数进行因子合成计算。
- * 该模型基于滚动窗口内的IC值计算IR权重，适用于动态调整因子权重的场景。
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default (equivalent
+ *                to SH000001)
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param ic_rolling_n the IC rolling window size, 120 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the rolling ICIR weight multi-factor model pointer
+ * @details
+ * Create a rolling ICIR weight multi-factor model instance, it uses the given parameters for the
+ * factor synthesis calculation.
+ * This model calculates the IR weights from the IC values within the rolling window; it is suitable
+ * for the scenarios where the factor weights are adjusted dynamically.
  * <pre>
- * 示例：
- * // 创建滚动ICIR权重模型
+ * Example:
+ * // Create the rolling ICIR weight model
  * auto mf = MF_ICIRWeight(stocks, query, Stock("SH000001"), 5, 120, true, 0, false);
  * </pre>
  */
@@ -46,24 +52,28 @@ MultiFactorPtr HKU_API MF_ICIRWeight(const StockList& stks, const KQuery& query,
                                      bool save_all_factors = false);
 
 /**
- * @brief 创建滚动ICIR权重多因子模型实例（使用因子集版本）
+ * @brief Create a rolling ICIR weight multi-factor model instance (the factor set version)
  * @ingroup MultiFactor
- * @param factorset 因子集合
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param ic_rolling_n IC滚动窗口大小，默认为120
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 滚动ICIR权重多因子模型指针
- * @details 
- * 创建滚动ICIR权重多因子模型实例，使用指定的因子集合进行计算。
- * 该模型基于滚动窗口内的IC值计算IR权重，适用于动态调整因子权重的场景。
+ * @param factorset factor set
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param ic_rolling_n the IC rolling window size, 120 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the rolling ICIR weight multi-factor model pointer
+ * @details
+ * Create a rolling ICIR weight multi-factor model instance, it uses the given factor set for the
+ * calculation.
+ * This model calculates the IR weights from the IC values within the rolling window; it is suitable
+ * for the scenarios where the factor weights are adjusted dynamically.
  * <pre>
- * 示例：
- * // 使用因子集创建滚动ICIR权重模型
+ * Example:
+ * // Create the rolling ICIR weight model with the factor set
  * auto mf = MF_ICIRWeight(factor_set, stocks, query);
  * </pre>
  */
@@ -78,24 +88,28 @@ inline MultiFactorPtr MF_ICIRWeight(const FactorSet& factorset, const StockList&
 }
 
 /**
- * @brief 创建滚动ICIR权重多因子模型实例（使用指标列表版本）
+ * @brief Create a rolling ICIR weight multi-factor model instance (the indicator list version)
  * @ingroup MultiFactor
- * @param inds 指标列表，将自动转换为因子集
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param ic_rolling_n IC滚动窗口大小，默认为120
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 滚动ICIR权重多因子模型指针
- * @details 
- * 创建滚动ICIR权重多因子模型实例，使用指标列表自动构建因子集进行计算。
- * 该模型基于滚动窗口内的IC值计算IR权重，适用于动态调整因子权重的场景。
+ * @param inds the indicator list, it is converted into a factor set automatically
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param ic_rolling_n the IC rolling window size, 120 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the rolling ICIR weight multi-factor model pointer
+ * @details
+ * Create a rolling ICIR weight multi-factor model instance, it builds the factor set automatically
+ * with the indicator list for the calculation.
+ * This model calculates the IR weights from the IC values within the rolling window; it is suitable
+ * for the scenarios where the factor weights are adjusted dynamically.
  * <pre>
- * 示例：
- * // 使用指标列表创建滚动ICIR权重模型
+ * Example:
+ * // Create the rolling ICIR weight model with the indicator list
  * auto mf = MF_ICIRWeight(indicators, stocks, query);
  * </pre>
  */

@@ -4,9 +4,9 @@
  *  Created on: 2024-08-24
  *      Author: fasiondog
  *
- *  聚合系统（MultiSystem）实盘入口。
- *  阶段 4：将 MultiSystem 跑在 Strategy 运行时中，父账户使用与券商同步的 BrokerTM，
- *  子系统使用各自的影子/虚拟账户（模式 A/B 由 MultiSystem 内部决定）。
+ *  The live trading entry of the aggregate system (MultiSystem).
+ *  Stage 4: run MultiSystem in the Strategy runtime, the parent account uses the BrokerTM synchronized with the broker,
+ *  the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally by MultiSystem).
  */
 
 #pragma once
@@ -16,39 +16,39 @@
 namespace hku {
 
 /**
- * @brief 在策略运行时中执行聚合系统 MultiSystem
- * @note 父账户调仓统一在收盘阶段执行。子系统的延迟成交（buy_delay/sell_delay=true 时于下一 bar 开盘兑现）
- *       由 MultiSystem 在开盘阶段缓存、同交易日收盘阶段汇总为对上建议后在父账户下单，故延迟/非延迟子系统均支持。
- *       盘中模式应成对注册 runMomentOnOpen/runMomentOnClose；若仅注册收盘驱动，当日开盘兑现的延迟成交不会被采集
- *       （MultiSystem 内部已做防越界与防跨日残留处理，不会误并前一交易日缓冲）。
+ * @brief Execute the aggregate system MultiSystem in the strategy runtime
+ * @note The parent account rebalancing is uniformly executed at the close stage. The delayed trades of the sub-systems (fulfilled at the open of the next bar when buy_delay/sell_delay=true)
+ *       are cached by MultiSystem at the open stage, aggregated into the parent suggestions at the close stage of the same trading day and then ordered on the parent account, so both the delayed and non-delayed sub-systems are supported.
+ *       In the intraday mode runMomentOnOpen/runMomentOnClose should be registered in pairs; if only the close drive is registered, the delayed trades fulfilled at the open of that day will not be collected
+ *       (MultiSystem has already done the out-of-bounds and cross-day residue handling internally, it will not wrongly merge the previous trading day's buffer).
  */
 class HKU_API RunMultiSystemInStrategy {
 public:
     RunMultiSystemInStrategy() = default;
 
     /**
-     * @param ms 聚合交易系统（MultiSystem）
-     * @param driver_stock 对齐时间轴的驱动标的（应覆盖各子系统的交易日）
-     * @param broker 订单代理（与父账户资产同步的订单代理）
-     * @param query 查询条件（起点可指定，终点自动到最新）
-     * @param costfunc 成本函数
+     * @param ms the aggregate trading system (MultiSystem)
+     * @param driver_stock the driving instrument aligning the time axis (it should cover the trading days of every sub-system)
+     * @param broker the order broker (the order broker synchronized with the parent account assets)
+     * @param query the query condition (the start point can be specified, the end point automatically goes to the latest)
+     * @param costfunc the cost function
      */
     RunMultiSystemInStrategy(const std::shared_ptr<MultiSystem>& ms, const Stock& driver_stock,
                              const OrderBrokerPtr& broker, const KQuery& query,
                              const TradeCostPtr& costfunc);
     virtual ~RunMultiSystemInStrategy() = default;
 
-    /** 每日整跑：刷新子系统 KData 至最新后，以驱动标的对齐时间轴重跑整个回测范围 */
+    /** The daily full run: after refreshing the sub-system KData to the latest, rerun the whole backtesting range with the driving instrument aligning the time axis */
     void run();
 
-    /** 盘中模式：开盘阶段驱动一次 */
+    /** The intraday mode: drive once at the open stage */
     void runMomentOnOpen();
 
-    /** 盘中模式：收盘阶段驱动一次 */
+    /** The intraday mode: drive once at the close stage */
     void runMomentOnClose();
 
 private:
-    /** 将各子系统 KData 刷新到各自标的的最新范围（实盘每日数据更新） */
+    /** Refresh the KData of every sub-system to the latest range of its own instrument (the daily data update of the live trading) */
     void _refreshSubKData();
 
 private:
@@ -59,15 +59,15 @@ private:
 };
 
 /**
- * @brief 创建聚合系统策略（MultiSystem 实盘入口）
- * @param ms 聚合交易系统（MultiSystem）
- * @param stk_market_code 驱动标的（如 "SH000001"，作为对齐时间轴）
- * @param query 查询条件
- * @param broker 订单代理
- * @param costfunc 成本函数
- * @param name 策略名称
- * @param other_brokers 其他订单代理（如邮件通知等）
- * @param config_file 配置文件
+ * @brief Create the aggregate system strategy (the MultiSystem live trading entry)
+ * @param ms the aggregate trading system (MultiSystem)
+ * @param stk_market_code the driving instrument (e.g. "SH000001", used to align the time axis)
+ * @param query the query condition
+ * @param broker the order broker
+ * @param costfunc the cost function
+ * @param name the strategy name
+ * @param other_brokers the other order brokers (e.g. the email notification)
+ * @param config_file the config file
  */
 StrategyPtr HKU_API crtMultiSysStrategy(const std::shared_ptr<MultiSystem>& ms,
                                         const string& stk_market_code, const KQuery& query,

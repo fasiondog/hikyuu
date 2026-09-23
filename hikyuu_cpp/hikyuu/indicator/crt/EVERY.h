@@ -16,11 +16,12 @@
 namespace hku {
 
 /**
- * 一直存在
+ * Always existing
  * @details
  * <pre>
- * 用法：EVERY (X,N) 表示条件X在N周期一直存在
- * 例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
+ * Usage: EVERY (X,N) means the condition X always exists within N periods
+ * For example: EVERY(CLOSE>OPEN,10) means the candles are bullish all the way within the previous
+ * 10 days
  * </pre>
  * @ingroup Indicator
  */

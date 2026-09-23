@@ -129,10 +129,12 @@ Indicator Indicator::operator()(const Indicator& ind) {
         return p->calculate();
     }
 
-    // AST 节点裁剪: 算子(m_imp)与被操作数(ind)语义等价时, 复用已计算的 ind
-    // (持有合法 buffer), 而非返回 m_imp 的克隆空壳(m_imp 若未 calculate 则 size==0).
-    // 注: 复用 ind 使返回值与 ind 共享底层节点, 依赖 hikyuu 不可变参数语义
-    // (alike 已校验 m_params 相同, setParam 触发原地重算, 共享安全).
+    // AST node pruning: when the operator (m_imp) is semantically equivalent to the operand (ind),
+    // reuse the already calculated ind (which holds a valid buffer), instead of returning an empty
+    // clone shell of m_imp (the size of m_imp is 0 when it has not been calculated). Note: reusing
+    // ind makes the return value share the underlying node with ind, which relies on the immutable
+    // parameter semantics of hikyuu (alike has verified that m_params are the same, setParam
+    // triggers an in-place recalculation and the sharing is safe).
     if (m_imp->alike(*ind.getImp())) {
         return ind;
     }

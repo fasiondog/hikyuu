@@ -2,6 +2,8 @@
  * EqualWeightAllocateFunds.cpp
  *
  *  Copyright (c) 2025 hikyuu.org
+ *  Created on: 2018-2-8
+ *      Author: fasiondog
  */
 
 #include "EqualWeightAllocateFunds.h"

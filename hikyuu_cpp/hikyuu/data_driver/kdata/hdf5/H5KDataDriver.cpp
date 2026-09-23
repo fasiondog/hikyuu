@@ -1,7 +1,7 @@
 /*
  * H5KDataDriver.cpp
  *
- *  Created on: 2017年10月11日
+ *  Created on: 2017-10-11
  *      Author: fasiondog
  */
 
@@ -88,7 +88,7 @@ H5KDataDriver::H5KDataDriver() : KDataDriver("hdf5"), m_h5DataType(H5::CompType(
 H5KDataDriver::~H5KDataDriver() {}
 
 bool H5KDataDriver::_init() {
-    // 关闭HDF异常自动打印
+    // Turn off the automatic printing of the HDF exceptions
     H5::Exception::dontPrint();
 
     StringList keys = m_params.getNameList();
@@ -563,7 +563,7 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
         }
 
     } else if (query.queryType() == KQuery::INDEX) {
-        // 按索引方式查询
+        // Query by index
         HKU_IF_RETURN(query.start() >= query.end(), result);
         if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
             result = _getBaseKRecordList(market, code, kType, query.start(), query.end());
@@ -572,7 +572,7 @@ KRecordList H5KDataDriver::getKRecordList(const string& market, const string& co
         }
 
     } else {
-        // 按日期方式查询
+        // Query by date
         size_t out_start = 0, out_end = 0;
         if (KQuery::DAY == kType || KQuery::MIN5 == kType || KQuery::MIN == kType) {
             if (_getBaseIndexRangeByDate(market, code, query, out_start, out_end)) {
@@ -630,7 +630,7 @@ KRecordList H5KDataDriver::_getBaseKRecordList(const string& market, const strin
         HKU_WARN(e.what());
 
     } catch (...) {
-        // 忽略
+        // Ignore
     }
 
     return result;
@@ -709,7 +709,7 @@ KRecordList H5KDataDriver::_getIndexKRecordList(const string& market, const stri
         HKU_WARN("Invalid date! {}", e.what());
 
     } catch (...) {
-        // 忽略
+        // Ignore
     }
 
     return result;

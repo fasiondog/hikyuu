@@ -13,7 +13,7 @@
 
 namespace hku {
 
-/* COST(k, X) 表示X%获利盘的价格是多少 */
+/* COST(k, X) means what the price is when X% of the positions are profitable */
 class ICost : public IndicatorImp {
     INDICATOR_IMP(ICost)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

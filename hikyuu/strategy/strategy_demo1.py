@@ -3,8 +3,8 @@
 # cp936
 
 #
-# 警告：Hikyuu 为量化研究工具，本身不包含程序化交易接口。此部分仅为策略调度运行时示例，
-#      供自行实现程序化交易时参考，请自行负责程序化交易可能造成的损失。
+# Warning: Hikyuu is a quantitative research tool and does not include a programmatic trading interface itself. This part is only an example of the strategy scheduling runtime,
+#      for reference when implementing programmatic trading by yourself; you are responsible for the losses that programmatic trading may cause.
 #
 
 from hikyuu import *
@@ -28,26 +28,26 @@ def my_func2(stg: Strategy):
         print(s)
 
 
-# 注意：
-#   1.每一个Strategy 只能作为独立进程执行，即 python xxx.py 的方式执行！
-#   2.请开启 HikyuuTdx 行情采集，否则接收不到数据
-# Strategy 方式运行示例
+# Note:
+#   1. Each Strategy can only be executed as an independent process, i.e. run in the way of python xxx.py!
+#   2. Please enable the HikyuuTdx quote collection, otherwise no data can be received
+# An example of running in the Strategy way
 if __name__ == '__main__':
-    # 创建策略运行时，必须指定 stock 和 ktype 列表
-    # strategy 只会加载指定的 stock, ktype 的数据，行情接收也只会更新这些数据
-    # 如需使用交易日历，请记得同时指定 sh000001
+    # When creating the strategy runtime, the stock and ktype lists must be specified
+    # The strategy only loads the data of the specified stock and ktype, and quote receiving only updates these data
+    # If the trading calendar is needed, remember to specify sh000001 at the same time
     s = Strategy(['sh600000', 'sz000001'],  [Query.MIN, Query.DAY])
 
-    # 当前自动延迟10秒/20秒后执行，忽略节假日限制
+    # Currently it is executed automatically after a delay of 10/20 seconds, ignoring the holiday restriction
     s.run_daily_at(my_func1, Datetime.now() - Datetime.today() + Seconds(10), False)
     s.run_daily_at(my_func1, Datetime.now() - Datetime.today() + Seconds(20), False)
 
-    # 收到指定 stock 的行情更新
+    # Received a quote update of the specified stock
     s.on_change(on_change)
 
-    # 收到行情更新
+    # Received a quote update
     s.on_received_spot(on_spot)
 
-    # 每隔 1 分钟循环一次 (ignore_market 忽略开闭市时间限制, 否则仅在开盘期间执行)
+    # Loop once every 1 minute (ignore_market ignores the open/close time restriction, otherwise it runs only during the trading session)
     s.run_daily(my_func2, Minutes(1))  # , ignore_market=True)
     s.start()

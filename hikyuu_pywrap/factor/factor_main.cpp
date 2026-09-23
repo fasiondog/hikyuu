@@ -21,88 +21,88 @@ void export_factor_main(py::module& m) {
     m.def("has_factor", &hasFactor, py::arg("name"), py::arg("ktype") = KQuery::DAY,
           R"(has_factor(name[, ktype=KQuery.DAY])
     
-    检查因子是否存在
+    Check whether the factor exists
 
-    :param str name: 因子名称
-    :param KQuery.KType ktype: K线类型，默认为日线
-    :return: 如果因子存在返回 True，否则返回 False
+    :param str name: the factor name
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line
+    :return: if the factor exists, return True; otherwise, return False
     :rtype: bool)");
 
     m.def("get_factor", &getFactor, py::arg("name"), py::arg("ktype") = KQuery::DAY,
           R"(get_factor(name[, ktype=KQuery.DAY])
     
-    获取因子元数据
+    Get the factor metadata
 
-    :param str name: 因子名称
-    :param KQuery.KType ktype: K线类型，默认为日线
-    :return: 因子对象，如果不存在则返回空因子
+    :param str name: the factor name
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line
+    :return: the factor object; if it does not exist, return an empty factor
     :rtype: Factor)");
 
     m.def("save_factor", &saveFactor, py::arg("factor"), py::arg("update_before") = true,
           R"(save_factor(factor[, update_before=True])
     
-    保存因子到数据库
+    Save the factor to the database
 
-    :param Factor factor: 要保存的因子对象
-    :param bool update_before: 是否在保存前，检查并更新已有因子，默认True)。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新
-    :note: 以 name + ktype 作为唯一标识)");
+    :param Factor factor: the factor object to save
+    :param bool update_before: whether to check and update the existing factor before saving, defaulting to True). Note: it usually must be true, otherwise it will cause the data errors, unless you are certain that all the factor values have been updated
+    :note: with name + ktype as the unique identifier)");
 
     m.def("remove_factor", &removeFactor, py::arg("name"), py::arg("ktype"),
           R"(remove_factor(name, ktype)
     
-    从数据库中删除因子
+    Delete the factor from the database
 
-    :param str name: 因子名称
-    :param KQuery.KType ktype: K线类型
-    :note: 以 name + ktype 作为唯一标识)");
+    :param str name: the factor name
+    :param KQuery.KType ktype: the K-line type
+    :note: with name + ktype as the unique identifier)");
 
     m.def("get_all_factors", &getAllFactors,
           R"(get_all_factors()
     
-    获取所有因子元数据
+    Get all the factor metadata
 
-    :return: 所有因子对象列表
+    :return: the list of all the factor objects
     :rtype: list)");
 
     m.def("update_all_factors_values", &updateAllFactorsValues, py::arg("ktype") = KQuery::DAY,
           R"(update_all_factors_values([ktype=KQuery.DAY])
     
-    更新所有因子值
+    Update all the factor values
 
-    :param KQuery.KType ktype: K线类型，默认为日线)");
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line)");
 
     m.def("save_factorset", &saveFactorSet, py::arg("set"),
           R"(save_factorset(set)
     
-    保存因子集到数据库
+    Save the factor set to the database
 
-    :param FactorSet set: 要保存的因子集对象
-    :note: 以 name + ktype 作为唯一标识)");
+    :param FactorSet set: the factor set object to save
+    :note: with name + ktype as the unique identifier)");
 
     m.def("get_factorset", &getFactorSet, py::arg("name"), py::arg("ktype") = KQuery::DAY,
           R"(get_factorset(name[, ktype=KQuery.DAY])
     
-    获取因子集
+    Get the factor set
 
-    :param str name: 因子集名称
-    :param KQuery.KType ktype: K线类型，默认为日线
-    :return: 因子集对象，如果不存在则返回空因子集
+    :param str name: the factor set name
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line
+    :return: the factor set object; if it does not exist, return an empty factor set
     :rtype: FactorSet)");
 
     m.def("remove_factorset", &removeFactorSet, py::arg("name"), py::arg("ktype"),
           R"(remove_factorset(name, ktype)
     
-    从数据库中删除因子集
+    Delete the factor set from the database
 
-    :param str name: 因子集名称
-    :param KQuery.KType ktype: K线类型
-    :note: 以 name + ktype 作为唯一标识)");
+    :param str name: the factor set name
+    :param KQuery.KType ktype: the K-line type
+    :note: with name + ktype as the unique identifier)");
 
     m.def("get_all_factorsets", &getAllFactorSets,
           R"(get_all_factorsets()
     
-    获取所有因子集
+    Get all the factor sets
 
-    :return: 所有因子集对象列表
+    :return: the list of all the factor set objects
     :rtype: list)");
 }

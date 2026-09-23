@@ -90,7 +90,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
 
     std::vector<py::list> tmp;
 
-    StringList names{"组合名称", "证券代码", "证券名称"};
+    StringList names{"组合名称", "证券代码", "证券名称"};  // The public contract column names, kept
     Performance per;
     auto keys = per.names();
     for (const auto& key : keys) {
@@ -168,21 +168,21 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
 void export_analysis(py::module& m) {
     m.def("combinate_index", combinate_index, R"(combinate_index(seq)
 
-    获取序列组合的下标索引, 输入序列的长度最大不超过15，否则抛出异常
+    Get the index of the sequence combination; the length of the input sequence is at most 15, otherwise an exception is raised
 
-    :param inds: list 或 tuple 等可使用索引的可迭代对象
-    :return: 返回组合的索引，可用于获取输入中相应索引位置的值
+    :param inds: an iterable object that can be indexed, such as a list or a tuple
+    :return: return the combination index, which can be used to get the values at the corresponding index positions in the input
     :rtype: list)");
 
     m.def("combinate_ind", combinate_indicator, py::arg("inds"), py::arg("n") = 7,
           R"(combinate_ind(inds[, n=7])
 
-    对输入的指标序列进行组合, 如输入为 [ind1, ind2], 输出为 [EXIST(ind1,n), EXIST(ind2,n),
+    Combine the input indicator sequence, e.g. if the input is [ind1, ind2], the output is [EXIST(ind1,n), EXIST(ind2,n),
     EXIST(ind1,n)&EXIST(ind2,n)]
 
-    :param list|tuple|seq inds: 待组合的指标列表
-    :param int n: 指标在 n 周期内存在
-    :return: 组合后的指标列表
+    :param list|tuple|seq inds: the indicator list to combine
+    :param int n: the indicator exists within the n periods
+    :return: the combined indicator list
     :rtype: list)");
 
     m.def("inner_combinate_ind_analysis", combinate_ind_analysis);

@@ -131,7 +131,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param int n: Number of periode (From 1 to 100000)
 :param float nbdevup: Deviation multiplier for upper band
 :param float nbdevdn: Deviation multiplier for lower band
-:rtype: 具有三个结果集的 Indicator
+:rtype: an Indicator with three result sets
 
     * result(0): Upper Band
     * result(1): Middle Band
@@ -396,7 +396,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param int min_n: Value less than minimum will be changed to Minimum period (From 2 to 100000)
 :param int max_n: Value higher than maximum will be changed to Maximum period (From 2 to 100000)
 :param int matype: Type of Moving Average
-:param bool fill_null: 日期对齐时，缺失日期数据填充nan值)");
+:param bool fill_null: fill the missing date data with the nan values during the date alignment)");
 
     TA_IN1_OUT_N_PY(TA_MAX, 30, R"(TA_MAX - Highest value over a specified period
 

@@ -60,7 +60,7 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& st
         result.commission = lowestCommission;
     }
 
-    // 上证买入时，有过户费
+    // The Shanghai Stock Exchange charges a transfer fee on a buy
     if (stock.market() == "SH") {
         result.transferfee = num > 1000 ? roundEx(getParam<price_t>("transferfee") * num, precision)
                                         : getParam<price_t>("lowest_transferfee");
@@ -86,7 +86,7 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& s
         result.commission = lowestCommission;
     }
 
-    // A股和创业板有印花税，其他无
+    // The A-shares and the ChiNext have the stamp duty, the others do not
     if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM) {
         result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"), precision);
     } else {

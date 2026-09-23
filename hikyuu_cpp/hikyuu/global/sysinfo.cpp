@@ -29,9 +29,9 @@ namespace hku {
 
 struct InnerSysInfo {
     Datetime expire_time{Datetime::max()};
-    bool runningInPython{false};      // 是否是在 python 中运行
-    bool pythonInInteractive{false};  // python 是否运行在交互模式下
-    bool pythonInJupyter{false};      // python 是否运行在 Jupyter中
+    bool runningInPython{false};      // Whether it is running in python
+    bool pythonInInteractive{false};  // Whether python runs in the interactive mode
+    bool pythonInJupyter{false};      // Whether python runs in Jupyter
 
     LatestVersionInfo latest_version_info;
     std::shared_mutex latest_version_mutex;
@@ -116,7 +116,7 @@ static boost::uuids::uuid readUUID() {
 
     std::string filename = fmt::format("{}/uid", dir);
 
-    // 必须读满 16 字节，否则视为文件损坏
+    // 16 bytes must be read, otherwise the file is regarded as corrupted
     auto try_read = [&filename](boost::uuids::uuid& out) -> bool {
         if (!existFile(filename)) {
             return false;
@@ -170,7 +170,7 @@ void updateSysInfoExpiredTime(Datetime time) {
 
 void HKU_API reminderLicenseExpiration() {
     auto remain = g_sys_info->expire_time - Datetime::now();
-    // 不可使用 htr, 因为翻译已经被释放
+    // htr must not be used, because the translation has been released
     HKU_WARN_IF(remain > Days(0) && remain < Days(10), "Note! Your license will expire in {} days.",
                 remain.days());
 }

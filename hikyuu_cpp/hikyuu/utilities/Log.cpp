@@ -10,7 +10,7 @@
 #include "os.h"
 #include "Log.h"
 
-// 使用 stdout_color 将无法将日志输出重定向至 python
+// With stdout_color the log output cannot be redirected to python
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <iostream>
 #include "spdlog/sinks/ostream_sink.h"

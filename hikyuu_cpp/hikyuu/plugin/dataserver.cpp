@@ -29,9 +29,11 @@ void HKU_API stopDataServer() {
 
 void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& stklist,
                                      const KQuery::KType& ktype) {
-    // 客户端模式：本地无预加载缓冲（pullFromBufferServerLocal 的 preload 检查会直接返回）
-	// 主进程拉取→应用缓冲→镜像共享内存，全体客户端随后经 shm 读到更新。主进程不可达
-    // 时该转发内部告警并返回 false，此处静默返回，不中断调用方流程。
+    // The client mode: there is no local preload buffer (the preload check of
+    // pullFromBufferServerLocal returns directly) The main process pulls, applies to the buffer and
+    // mirrors to the shared memory, and all the clients then read the update through shm. When the
+    // main process is unreachable the forwarding warns internally and returns false; here it
+    // returns silently without interrupting the caller flow.
     if (StockManager::instance().isIpcClientMode()) {
         std::vector<std::string> codes;
         codes.reserve(stklist.size());

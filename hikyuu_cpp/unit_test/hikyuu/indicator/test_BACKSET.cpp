@@ -23,11 +23,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BACKSET") {
     Indicator result;
 
-    /** @arg 未指定输入ind */
+    /** @arg No input ind is given */
     result = BACKSET();
     CHECK_EQ(result.name(), "BACKSET");
     CHECK_EQ(result.size(), 0);
@@ -121,7 +121,7 @@ TEST_CASE("test_BACKSET") {
     CHECK_EQ(result[10], 1);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BACKSET_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -154,7 +154,7 @@ TEST_CASE("test_BACKSET_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BACKSET_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -64,7 +64,7 @@ bool HKU_UTILS_API existFile(const std::string &filename) noexcept {
 bool HKU_UTILS_API createDir(const std::string &pathname) noexcept {
     std::string npath = HKU_PATH(pathname);
 
-    // 目录已存在，直接返回成功
+    // The directory already exists, return a success directly
     if (access(npath.c_str(), 0) == 0) {
         return true;
     }
@@ -74,13 +74,14 @@ bool HKU_UTILS_API createDir(const std::string &pathname) noexcept {
         return true;
     }
 #else
-    // 默认权限：rwxrwx--x
+    // The default permission: rwxrwx--x
     if (mkdir(npath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_IXOTH) == 0) {
         return true;
     }
 #endif
 
-    // mkdir失败的情况下，重新判断目录是否存在，保护并发情况下创建同一目录的情况
+    // When mkdir fails, check the directory existence again to protect the case of creating the
+    // same directory concurrently
     return access(npath.c_str(), 0) == 0;
 }
 
@@ -106,71 +107,73 @@ bool HKU_UTILS_API isColorTerminal() noexcept {
 #endif
 }
 
-// 删除文件
+// Delete the file
 bool HKU_UTILS_API removeFile(const std::string &filename) noexcept {
     return std::remove(HKU_PATH(filename).c_str()) == 0;
 }
 
 #ifdef _WIN32
-// 删除目录及其包含的文件和子目录
+// Delete the directory and the files and subdirectories it contains
 bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
     std::string strPath = HKU_PATH(path);
-    struct _finddata_t fb;  // 查找相同属性文件的存储结构体
-    // 制作用于正则化路径
+    struct _finddata_t fb;  // The structure storing the found files of the same attribute
+    // Create it for the path regularization
     if (strPath.at(strPath.length() - 1) != '\\' && strPath.at(strPath.length() - 1) != '/') {
         strPath.append("\\");
     }
     std::string findPath = strPath + "*";
-    intptr_t handle;  // 用long类型会报错
+    intptr_t handle;  // Using the long type would report an error
     handle = _findfirst(findPath.c_str(), &fb);
-    // 找到第一个匹配的文件
+    // Find the first matching file
     if (handle != -1L) {
         std::string pathTemp;
-        do  // 循环找到的文件
+        do  // Loop over the found files
         {
-            // 系统有个系统文件，名为“..”和“.”,对它不做处理
+            // The system has the system files named ".." and ".", they are not processed
             if (strcmp(fb.name, "..") != 0 &&
-                strcmp(fb.name, ".") != 0)  // 对系统隐藏文件的处理标记
+                strcmp(fb.name, ".") != 0)  // The marker of the handling of the system hidden files
             {
-                // 制作完整路径
+                // Build the complete path
                 pathTemp.clear();
                 pathTemp = strPath + std::string(fb.name);
-                // 属性值为16，则说明是文件夹，迭代
+                // An attribute value of 16 means it is a folder, iterate
                 if (fb.attrib == _A_SUBDIR)  //_A_SUBDIR=16
                 {
                     removeDir(GBToUTF8(pathTemp));
                 }
-                // 非文件夹的文件，直接删除。对文件属性值的情况没做详细调查，可能还有其他情况。
+                // A file that is not a folder is deleted directly. The file attribute values were
+                // not investigated in detail, there may be other cases.
                 else {
                     remove(pathTemp.c_str());
                 }
             }
-        } while (0 == _findnext(handle, &fb));  // 判断放前面会失去第一个搜索的结果
-        // 关闭文件夹，只有关闭了才能删除。找这个函数找了很久，标准c中用的是closedir
-        // 经验介绍：一般产生Handle的函数执行后，都要进行关闭的动作。
+        } while (0 == _findnext(handle, &fb));  // Putting the check in front loses the first result
+        // Close the folder, it can be deleted only after the closing; the standard C uses closedir
+        // Experience: usually every function producing a handle must be followed by a closing
+        // action.
         _findclose(handle);
     }
-    // 移除文件夹
+    // Remove the folder
     return _rmdir(strPath.c_str()) == 0;
 }
 
 #else   // #ifdef _WIN32
-// 删除目录及其包含的文件和子目录
+// Delete the directory and the files and subdirectories it contains
 bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
     std::string strPath(path);
     if (strPath.at(strPath.length() - 1) != '\\' && strPath.at(strPath.length() - 1) != '/') {
         strPath.append("/");
     }
-    DIR *d = opendir(strPath.c_str());  // 打开这个目录
+    DIR *d = opendir(strPath.c_str());  // Open this directory
     if (d != NULL) {
         struct dirent *dt = NULL;
 
-        // 逐个读取目录中的文件到dt
+        // Read the files in the directory one by one into dt
         while (NULL != (dt = readdir(d))) {
-            // 系统有个系统文件，名为“..”和“.”,对它不做处理
+            // The system has the system files named ".." and ".", they are not processed
             if (std::strcmp(dt->d_name, "..") != 0 && std::strcmp(dt->d_name, ".") != 0) {
-                struct stat st;        // 文件的信息
-                std::string fileName;  // 文件夹中的文件名
+                struct stat st;        // The file information
+                std::string fileName;  // The file name inside the folder
                 fileName = strPath + std::string(dt->d_name);
                 stat(fileName.c_str(), &st);
                 if (S_ISDIR(st.st_mode)) {
@@ -204,7 +207,7 @@ bool HKU_UTILS_API copyFile(const std::string &src, const std::string &dst, bool
 
 bool HKU_UTILS_API renameFile(const std::string &oldname, const std::string &newname,
                               bool overlay) noexcept {
-    // 先判定文件是否存在，保证 std::rename 的行为和系统无关
+    // Judge the file existence first, ensuring the std::rename behavior is system independent
     if (overlay) {
         HKU_ERROR_IF_RETURN(existFile(newname) && !removeFile(newname), false,
                             "Error renaming file! The new file is occupied");
@@ -219,7 +222,7 @@ bool HKU_UTILS_API renameFile(const std::string &oldname, const std::string &new
 }
 
 /*
- * 获取用户路径
+ * Get the user path
  */
 static std::string _getUserDir() {
     char *home = getenv("HOME");
@@ -290,16 +293,16 @@ std::string HKU_UTILS_API getDllSelfDir() {
     dlclose(handle);
 #endif
 
-    // 提取目录部分（不包含文件名）
+    // Extract the directory part (without the file name)
     if (!libraryPath.empty()) {
 #if HKU_OS_WINDOWS
-        // Windows路径处理
+        // The Windows path handling
         size_t pos = libraryPath.find_last_of("\\/");
         if (pos != std::string::npos) {
             return libraryPath.substr(0, pos);
         }
 #else
-        // Unix路径处理
+        // The Unix path handling
         char *dir = dirname(const_cast<char *>(libraryPath.c_str()));
         if (dir) {
             return dir;
@@ -403,7 +406,7 @@ std::string HKU_UTILS_API getSystemLanguage() {
 std::string HKU_UTILS_API getSystemLanguage() {
     CFLocaleRef currentLocale = CFLocaleCopyCurrent();
 
-    // 显式类型转换
+    // An explicit type conversion
     CFStringRef languageCode = (CFStringRef)CFLocaleGetValue(currentLocale, kCFLocaleLanguageCode);
 
     if (languageCode == nullptr || !(CFStringGetTypeID() == CFGetTypeID(languageCode))) {
@@ -483,7 +486,7 @@ uint64_t HKU_UTILS_API getMemoryIdleSize() {
     mach_port_t hostPort = mach_host_self();
 
     if (host_statistics(hostPort, HOST_VM_INFO, (host_info_t)&vmstat, &count) == KERN_SUCCESS) {
-        // 计算空闲内存：空闲页 + 非活跃页
+        // Calculate the free memory: the free pages + the inactive pages
         uint64_t pageSize = static_cast<uint64_t>(vm_page_size);
         uint64_t freeMemory =
           static_cast<uint64_t>(vmstat.free_count + vmstat.inactive_count) * pageSize;

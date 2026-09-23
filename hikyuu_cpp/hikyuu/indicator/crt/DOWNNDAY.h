@@ -17,7 +17,7 @@
 namespace hku {
 
 /**
- * 连跌周期, DOWNNDAY(CLOSE,M)表示连跌M个周期
+ * Consecutive falling periods; DOWNNDAY(CLOSE,M) means falling for M consecutive periods
  * @ingroup Indicator
  */
 inline Indicator DOWNNDAY(const Indicator& ind, int n = 3) {

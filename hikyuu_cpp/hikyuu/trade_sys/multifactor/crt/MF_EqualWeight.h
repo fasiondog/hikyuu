@@ -11,29 +11,33 @@
 namespace hku {
 
 /**
- * @brief 创建等权重多因子模型实例
+ * @brief Create an equal weight multi-factor model instance
  * @ingroup MultiFactor
- * @return MultiFactorPtr 等权重多因子模型指针
- * @details 创建一个空的等权重多因子模型，需要后续设置因子集合
+ * @return MultiFactorPtr the equal weight multi-factor model pointer
+ * @details Create an empty equal weight multi-factor model; the factor set needs to be set
+ *          afterwards
  */
 MultiFactorPtr HKU_API MF_EqualWeight();
 
 /**
- * @brief 创建等权重多因子模型实例（完整参数版本）
+ * @brief Create an equal weight multi-factor model instance (the full parameter version)
  * @ingroup MultiFactor
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为SH000001
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 等权重多因子模型指针
- * @details 
- * 创建等权重多因子模型实例，使用指定参数进行因子合成计算。
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, SH000001 by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the equal weight multi-factor model pointer
+ * @details
+ * Create an equal weight multi-factor model instance, it uses the given parameters for the factor
+ * synthesis calculation.
  * <pre>
- * 示例：
- * // 创建等权重模型
+ * Example:
+ * // Create the equal weight model
  * auto mf = MF_EqualWeight(stocks, query, Stock("SH000001"), 5, true, 0, false);
  * </pre>
  */
@@ -42,22 +46,25 @@ MultiFactorPtr HKU_API MF_EqualWeight(const StockList& stks, const KQuery& query
                                       bool save_all_factors);
 
 /**
- * @brief 创建等权重多因子模型实例（使用因子集版本）
+ * @brief Create an equal weight multi-factor model instance (the factor set version)
  * @ingroup MultiFactor
- * @param factset 因子集合
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 等权重多因子模型指针
- * @details 
- * 创建等权重多因子模型实例，使用指定的因子集合进行计算。
+ * @param factset factor set
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the equal weight multi-factor model pointer
+ * @details
+ * Create an equal weight multi-factor model instance, it uses the given factor set for the
+ * calculation.
  * <pre>
- * 示例：
- * // 使用因子集创建等权重模型
+ * Example:
+ * // Create the equal weight model with the factor set
  * auto mf = MF_EqualWeight(factor_set, stocks, query);
  * </pre>
  */
@@ -71,22 +78,25 @@ inline MultiFactorPtr MF_EqualWeight(const FactorSet& factset, const StockList& 
 }
 
 /**
- * @brief 创建等权重多因子模型实例（使用指标列表版本）
+ * @brief Create an equal weight multi-factor model instance (the indicator list version)
  * @ingroup MultiFactor
- * @param inds 指标列表，将自动转换为因子集
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 等权重多因子模型指针
- * @details 
- * 创建等权重多因子模型实例，使用指标列表自动构建因子集进行计算。
+ * @param inds the indicator list, it is converted into a factor set automatically
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the equal weight multi-factor model pointer
+ * @details
+ * Create an equal weight multi-factor model instance, it builds the factor set automatically with
+ * the indicator list for the calculation.
  * <pre>
- * 示例：
- * // 使用指标列表创建等权重模型
+ * Example:
+ * // Create the equal weight model with the indicator list
  * auto mf = MF_EqualWeight(indicators, stocks, query);
  * </pre>
  */

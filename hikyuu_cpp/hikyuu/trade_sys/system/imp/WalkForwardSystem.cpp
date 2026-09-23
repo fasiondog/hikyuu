@@ -63,7 +63,8 @@ void WalkForwardSystem::initParam() {
     setParam<int>("test_len", 20);
     setParam<bool>("se_trace", false);
 
-    // 当前选中的系统和上次的系统不一致时，在开盘时清空已有持仓
+    // When the currently selected system differs from the previous one, clear the existing position
+    // at the open
     setParam<bool>("clean_hold_when_select_changed", true);
 }
 

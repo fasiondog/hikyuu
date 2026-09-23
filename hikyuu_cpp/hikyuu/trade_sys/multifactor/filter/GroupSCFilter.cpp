@@ -31,32 +31,32 @@ ScoreRecordList GroupSCFilter::_filter(const ScoreRecordList& scores, const Date
                                        const KQuery& query) {
     ScoreRecordList ret;
 
-    // 如果没有数据或分组数为0，直接返回空列表
+    // Return an empty list directly when there is no data or the group count is 0
     int group = getParam<int>("group");
     if (scores.empty() || group == 0) {
         return ret;
     }
 
-    // 计算每组应包含的股票数
+    // Calculate the number of the stocks every group should contain
     size_t total_count = scores.size();
-    size_t stocks_per_group = (total_count + group - 1) / group;  // 向上取整
+    size_t stocks_per_group = (total_count + group - 1) / group;  // Round up
 
-    // 检查索引是否有效
+    // Check whether the index is valid
     int group_index = getParam<int>("group_index");
     if (group_index >= group) {
         return ret;
     }
 
-    // 计算当前组的起始和结束位置
+    // Calculate the start and the end position of the current group
     size_t start = group_index * stocks_per_group;
     size_t end = std::min(start + stocks_per_group, total_count);
 
-    // 如果起始位置超出范围，返回空列表
+    // Return an empty list when the start position is out of range
     if (start >= total_count) {
         return ret;
     }
 
-    // 从原始数据中提取当前组的数据
+    // Extract the data of the current group from the original data
     ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
         ret.emplace_back(scores[i]);

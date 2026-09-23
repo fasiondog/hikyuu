@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_MEDIAN") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -29,7 +29,7 @@ TEST_CASE("test_AGG_MEDIAN") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Null<Datetime>(), KQuery::MIN));
 
-    /** @arg 单日分钟线聚合 */
+    /** @arg The single day minute line aggregation */
     auto ind = AGG_MEDIAN(CLOSE(), KQuery::MIN);
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
@@ -51,7 +51,7 @@ TEST_CASE("test_AGG_MEDIAN") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_MEDIAN_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * 当前资产情况记录，由TradeManager::getFunds返回
+ * Record of the current asset situation, returned by TradeManager::getFunds
  * @ingroup TradeManagerClass
  */
 class HKU_API FundsRecord {
@@ -24,46 +24,47 @@ public:
     FundsRecord(price_t cash, price_t market_value, price_t short_market_value, price_t base_cash,
                 price_t base_asset, price_t borrow_cash, price_t borrow_asset);
 
-    price_t cash{0.0};               /**< 当前现金 */
-    price_t market_value{0.0};       /**< 当前多头市值 */
-    price_t short_market_value{0.0}; /**< 当前空头仓位市值 */
-    price_t base_cash{0.0};          /**< 当前投入本金principal */
-    price_t base_asset{0.0};         /**< 当前投入的资产价值 */
-    price_t borrow_cash{0.0};        /**< 当前借入的资金，即负债 */
-    price_t borrow_asset{0.0};       /**< 当前借入证券资产价值 */
+    price_t cash{0.0};               /**< Current cash */
+    price_t market_value{0.0};       /**< Current long market value */
+    price_t short_market_value{0.0}; /**< Current short position market value */
+    price_t base_cash{0.0};          /**< Currently invested principal */
+    price_t base_asset{0.0};         /**< Value of the currently invested assets */
+    price_t borrow_cash{0.0};        /**< Currently borrowed funds, i.e. the liability */
+    price_t borrow_asset{0.0};       /**< Value of the currently borrowed security assets */
 
-    // 当前总资产 = 现金 + 多头市值 + 空头数量×（借入价格 - 当前价格)
+    // Current total assets = cash + long market value + short quantity × (borrow price - current
+    // price)
     //          = cash + market_value + borrow_asset - short_market_value
-    // 当前负债 = 借入的资金 + 借入的资产价值
+    // Current liabilities = borrowed funds + value of the borrowed assets
     //         = borrow_cash + borrow_asset
-    // 当前净资产 = 总资产 - 负债
+    // Current net assets = total assets - liabilities
     //          = cash + market_value - short_market_value - borrow_cash
-    // 当前投入本值资产 = 投入本金 + 投入资产价值
+    // Currently invested principal value assets = invested principal + invested asset value
     //                = base_cash + base_asset
-    // 当前收益 = 当前净资产 - 当前投入本值资产
+    // Current profit = current net assets - currently invested principal value assets
     //         = cash + market_value - short_market_value - borrow_cash - base_cash - base_asset
 
-    // 当前总资产
+    // Current total assets
     price_t total_assets() const {
         return cash + market_value + borrow_asset - short_market_value;
     }
 
-    // 当前净资产
+    // Current net assets
     price_t net_assets() const {
         return cash + market_value - short_market_value - borrow_cash;
     }
 
-    // 总负债
+    // Total liabilities
     price_t total_borrow() const {
         return borrow_cash + borrow_asset;
     }
 
-    // 当前投入本值资产
+    // Currently invested principal value assets
     price_t total_base() const {
         return base_cash + base_asset;
     }
 
-    // 当前收益
+    // Current profit
     price_t profit() const {
         return cash + market_value - short_market_value - borrow_cash - base_cash - base_asset;
     }
@@ -72,7 +73,7 @@ public:
 
     FundsRecord& operator+=(const FundsRecord& other);
 
-    // 序列化支持
+    // Serialization support
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
@@ -93,7 +94,7 @@ typedef vector<FundsRecord> FundsList;
 typedef vector<FundsRecord> FundsRecordList;
 
 /**
- * 输出TradeRecord信息
+ * Output the TradeRecord information
  * @ingroup TradeManagerClass
  */
 HKU_API std::ostream& operator<<(std::ostream&, const FundsRecord&);

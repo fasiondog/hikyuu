@@ -1,7 +1,7 @@
 /*
  * ioredirect.cpp
  *
- *  Created on: 2018年8月27日
+ *  Created on: 2018-08-27
  *      Author: fasiondog
  */
 

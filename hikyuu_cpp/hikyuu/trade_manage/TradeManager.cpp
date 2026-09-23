@@ -94,9 +94,9 @@ TradeManager::TradeManager(const Datetime& datetime, price_t initcash, const Tra
   m_checkin_stock(0.0),
   m_checkout_stock(0.0),
   m_borrow_cash(0.0) {
-    setParam<bool>("support_borrow_cash", false);   // 是否自动融资
-    setParam<bool>("support_borrow_stock", false);  // 是否自动融券
-    setParam<bool>("save_action", true);            // 是否保存命令
+    setParam<bool>("support_borrow_cash", false);   // Whether to finance automatically
+    setParam<bool>("support_borrow_stock", false);  // Whether to borrow stocks automatically
+    setParam<bool>("save_action", true);            // Whether to save the commands
     m_init_cash = roundEx(initcash, 2);
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
@@ -154,7 +154,7 @@ TradeManagerPtr TradeManager::_clone() {
 }
 
 double TradeManager::getMarginRate(const Datetime& datetime, const Stock& stock) {
-    // TODO 获取保证金比率，默认固定取60%
+    // TODO get the margin ratio, it is fixed to 60% by default
     return 0.6;
 }
 
@@ -171,13 +171,14 @@ Datetime TradeManager::firstDatetime() const {
 }
 
 double TradeManager::getHoldNumber(const Datetime& datetime, const Stock& stock) {
-    // 日期小于账户建立日期，返回0
+    // The date is earlier than the account creation date, return 0
     HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
-    // 根据权息信息调整持仓数量
+    // Adjust the position quantity according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 如果指定的日期大于等于最后交易日期，则直接取当前持仓记录
+    // If the given date is later than or equal to the last trade date, take the current position
+    // record directly
     if (datetime >= lastDatetime()) {
         position_map_type::const_iterator pos_iter = m_position.find(stock.id());
         if (pos_iter != m_position.end()) {
@@ -186,11 +187,13 @@ double TradeManager::getHoldNumber(const Datetime& datetime, const Stock& stock)
         return 0.0;
     }
 
-    // 在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
+    // In the historical trade records, recalculate the position quantity of the trading object at
+    // the given query date
     double number = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
-        // 交易记录中的交易日期已经大于查询日期，则跳出循环
+        // Break the loop when the trade date in the trade record is already later than the query
+        // date
         if (iter->datetime > datetime) {
             break;
         }
@@ -205,7 +208,7 @@ double TradeManager::getHoldNumber(const Datetime& datetime, const Stock& stock)
                 number -= iter->number;
 
             } else {
-                // 其他情况忽略
+                // The other cases are ignored
             }
         }
     }
@@ -213,13 +216,14 @@ double TradeManager::getHoldNumber(const Datetime& datetime, const Stock& stock)
 }
 
 double TradeManager::getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
-    // 日期小于账户建立日期，返回0
+    // The date is earlier than the account creation date, return 0
     HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
-    // 根据权息信息调整持仓数量
+    // Adjust the position quantity according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 如果指定的日期大于等于最后交易日期，则直接取当前持仓记录
+    // If the given date is later than or equal to the last trade date, take the current position
+    // record directly
     if (datetime >= lastDatetime()) {
         position_map_type::const_iterator pos_iter = m_short_position.find(stock.id());
         if (pos_iter != m_short_position.end()) {
@@ -228,11 +232,13 @@ double TradeManager::getShortHoldNumber(const Datetime& datetime, const Stock& s
         return 0;
     }
 
-    // 在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
+    // In the historical trade records, recalculate the position quantity of the trading object at
+    // the given query date
     double number = 0;
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
-        // 交易记录中的交易日期已经大于查询日期，则跳出循环
+        // Break the loop when the trade date in the trade record is already later than the query
+        // date
         if (iter->datetime > datetime) {
             break;
         }
@@ -245,7 +251,7 @@ double TradeManager::getShortHoldNumber(const Datetime& datetime, const Stock& s
                 number -= iter->number;
 
             } else {
-                // 其他情况忽略
+                // The other cases are ignored
             }
         }
     }
@@ -255,7 +261,7 @@ double TradeManager::getShortHoldNumber(const Datetime& datetime, const Stock& s
 double TradeManager::getDebtNumber(const Datetime& datetime, const Stock& stock) {
     HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
-    // 根据权息信息调整持仓数量
+    // Adjust the position quantity according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     if (datetime >= lastDatetime()) {
@@ -287,7 +293,7 @@ double TradeManager::getDebtNumber(const Datetime& datetime, const Stock& stock)
 price_t TradeManager::getDebtCash(const Datetime& datetime) {
     HKU_IF_RETURN(datetime < m_init_datetime, 0.0);
 
-    // 根据权息信息调整持仓数量
+    // Adjust the position quantity according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     HKU_IF_RETURN(datetime >= lastDatetime(), m_borrow_cash);
@@ -356,10 +362,11 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
     HKU_IF_RETURN(stock.isNull(), result);
     HKU_IF_RETURN(datetime < m_init_datetime, result);
 
-    // 根据权息信息调整持仓数量
+    // Adjust the position quantity according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 如果指定的日期大于等于最后交易日期，则直接取当前持仓记录
+    // If the given date is later than or equal to the last trade date, take the current position
+    // record directly
     if (datetime >= lastDatetime()) {
         position_map_type::const_iterator pos_iter = m_position.find(stock.id());
         if (pos_iter != m_position.end()) {
@@ -368,10 +375,12 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
         return result;
     }
 
-    // 在历史交易记录中，重新计算在指定的查询日期时，该交易对象的持仓数量
+    // In the historical trade records, recalculate the position quantity of the trading object at
+    // the given query date
     double number = 0.0;
     for (auto iter = m_trade_list.begin(); iter != m_trade_list.end(); ++iter) {
-        // 交易记录中的交易日期已经大于查询日期，则跳出循环
+        // Break the loop when the trade date in the trade record is already later than the query
+        // date
         if (iter->datetime > datetime) {
             break;
         }
@@ -386,14 +395,14 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
                 number -= iter->number;
 
             } else {
-                // 其他情况忽略
+                // The other cases are ignored
             }
         }
     }
 
     HKU_IF_RETURN(0.0 == number, result);
 
-    // 倒序遍历历史持仓，寻找最后一条持仓记录
+    // Traverse the historical positions in reverse order to find the last position record
     for (auto iter = m_position_history.rbegin(); iter != m_position_history.rend(); ++iter) {
         if (iter->stock == stock) {
             result = *iter;
@@ -428,7 +437,7 @@ bool TradeManager::checkin(const Datetime& datetime, price_t cash) {
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     int precision = getParam<int>("precision");
@@ -446,7 +455,7 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     int precision = getParam<int>("precision");
@@ -474,10 +483,10 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 加入当前持仓
+    // Add it to the current positions
     int precision = getParam<int>("precision");
     price_t market_value = roundEx(price * number * stock.unit(), precision);
     position_map_type::iterator pos_iter = m_position.find(stock.id());
@@ -489,20 +498,20 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
     } else {
         PositionRecord& pos = pos_iter->second;
         pos.number += number;
-        // pos.stoploss 不变
+        // pos.stoploss stays unchanged
         pos.totalNumber += number;
         pos.buyMoney = roundEx(pos.buyMoney + market_value, precision);
-        // pos.totalCost 不变
-        // pos.totalRisk 不变
-        // pos.sellMoney 不变
+        // pos.totalCost stays unchanged
+        // pos.totalRisk stays unchanged
+        // pos.sellMoney stays unchanged
         pos.buyCount++;
     }
 
-    // 加入交易记录
+    // Add it to the trade records
     m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_CHECKIN_STOCK, price, price, 0.0,
                                        number, CostRecord(), 0.0, m_cash, PART_INVALID));
 
-    // 更新累计存入资产价值记录
+    // Update the record of the accumulated deposited asset value
     m_checkin_stock = roundEx(m_checkin_stock + market_value, precision);
 
     return true;
@@ -519,15 +528,15 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 当前是否有持仓
+    // Whether there is a current position
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "Try to checkout nonexistent stock!");
 
     PositionRecord& pos = pos_iter->second;
-    // 取出数量超出了当前持仓数量
+    // The withdrawn quantity exceeds the current position quantity
     HKU_ERROR_IF_RETURN(number > pos.number, false,
                         "{} {} Try to checkout number({}) beyond position number({})!", datetime,
                         stock.market_code(), number, pos.number);
@@ -537,17 +546,18 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
     pos.sellMoney = roundEx(pos.sellMoney + price * number * stock.unit(), precision);
     pos.sellCount++;
 
-    // 取出后当前所有持仓数量为0，清除当前持仓，存入历史持仓
+    // After the withdrawal all the current position quantities become 0, clear the current position
+    // and store it into the historical positions
     if (0 == pos.number) {
         m_position_history.push_back(pos);
         m_position.erase(stock.id());
     }
 
-    // 更新交易记录
+    // Update the trade records
     m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_CHECKOUT_STOCK, price, price, 0.0,
                                        number, CostRecord(), 0.0, m_cash, PART_INVALID));
 
-    // 更新累计取出股票价值
+    // Update the accumulated withdrawn stock value
     m_checkout_stock = roundEx(m_checkout_stock - price * number * stock.unit(), precision);
 
     return true;
@@ -558,7 +568,7 @@ bool TradeManager::borrowCash(const Datetime& datetime, price_t cash) {
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} datetime must be >= lastDatetime({})!", datetime, lastDatetime());
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     int precision = getParam<int>("precision");
@@ -581,7 +591,7 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
                         "{} must be >= the datetime({}) of last loan record!", datetime,
                         m_loan_list.back().datetime);
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     int precision = getParam<int>("precision");
@@ -608,7 +618,7 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
             break;
     }
 
-    // 欲归还的钱多余实际欠款
+    // The money to be returned is more than the actual debt
     HKU_ERROR_IF_RETURN(return_cash != 0.0, false, "{} return cash must <= borrowed cash!",
                         datetime);
 
@@ -650,22 +660,22 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 加入当前持仓
+    // Add it to the current positions
     int precision = getParam<int>("precision");
     price_t market_value = roundEx(price * number * stock.unit(), precision);
     CostRecord cost = getBorrowStockCost(datetime, stock, price, number);
 
-    // 更新现金，扣除借入时花费的成本
+    // Update the cash, deducting the cost spent when borrowing
     m_cash = roundEx(m_cash - cost.total, precision);
 
-    // 加入交易记录
+    // Add it to the trade records
     m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_BORROW_STOCK, price, price, 0.0,
                                        number, cost, 0.0, m_cash, PART_INVALID));
 
-    // 更新当前借入股票信息
+    // Update the current borrowed stock information
     borrow_stock_map_type::iterator iter = m_borrow_stock.find(stock.id());
     if (iter == m_borrow_stock.end()) {
         BorrowRecord record(stock, number, market_value);
@@ -694,24 +704,24 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
-    // 查询借入股票信息
+    // Query the borrowed stock information
     borrow_stock_map_type::iterator bor_iter = m_borrow_stock.find(stock.id());
 
-    // 并未借入股票
+    // No stock was borrowed
     HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), false,
                         "{} {} Try to return nonborrowed stock! ", datetime, stock.market_code());
 
     BorrowRecord& bor = bor_iter->second;
 
-    // 欲归还的数量大于借入的数量
+    // The quantity to be returned is greater than the borrowed quantity
     HKU_ERROR_IF_RETURN(number > bor.number, false,
                         "{} {} Try to return number({}) > borrow number({})!", datetime,
                         stock.market_code(), number, bor.number);
 
-    // 更新借入股票信息
+    // Update the borrowed stock information
     int precision = getParam<int>("precision");
     CostRecord cost, cur_cost;
     price_t market_value = 0.0;
@@ -761,10 +771,10 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
         m_borrow_stock.erase(bor_iter);
     }
 
-    // 更新现金，扣除归还时花费的成本
+    // Update the cash, deducting the cost spent when returning
     m_cash = roundEx(m_cash - cost.total, precision);
 
-    // 更新交易记录
+    // Update the trade records
     m_trade_list.push_back(TradeRecord(stock, datetime, BUSINESS_RETURN_STOCK, price, price, 0.0,
                                        number, cost, 0.0, m_cash, PART_INVALID));
 
@@ -790,8 +800,9 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
-#if 0  // 取消此处的检查，放松限制，另外也可以提高效率。另外，TM只负责交易管理，不许检查
-    //检查当日是否存在日线数据，不存在则认为不可交易
+#if 0  // The check here is cancelled to relax the restriction and improve the efficiency; TM is
+       // only responsible for the trade management and is not allowed to check
+    // Check whether the daily line data exists for the day; when it does not exist it is regarded as not tradable
     bd::date daydate = datetime.date();
     KRecord krecord = stock.getKRecord(daydate, KQuery::DAY);
     if (!krecord.isValid()) {
@@ -801,7 +812,7 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         return result;
     }
 
-    //买入的价格是否在当日最高/最低价范围之内
+    // Whether the buy price is within the highest / lowest price range of the day
     if (realPrice > krecord.highPrice || realPrice < krecord.lowPrice) {
         HKU_ERROR(datetime << " " << stock.market_code()
                 << " Invalid buy price(" << realPrice
@@ -812,27 +823,28 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     }
 #endif
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
-    // 实际交易需要的现金＝交易数量＊实际交易价格＋交易总成本
+    // The cash needed by the actual trade = the trade quantity * the actual trade price + the total
+    // trade cost
     int precision = getParam<int>("precision");
     // price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
 
     if (getParam<bool>("support_borrow_cash")) {
-        // 获取要求的本金额
+        // Get the required principal amount
         CostRecord bor_cost = getBorrowCashCost(datetime, money);
         double rate = getMarginRate(datetime, stock);
         price_t x = roundEx(m_cash / rate + cost.total + bor_cost.total, precision);
         if (x < money) {
-            // 能够获得的融资不够，自动追加本金
+            // The financing that can be obtained is not enough, add the principal automatically
             checkin(datetime, roundUp(money - x, precision));
         }
 
-        // 融资，借入资金
+        // Financing, borrow the funds
         borrowCash(datetime, roundUp(money, precision));
     }
 
@@ -840,15 +852,15 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
                        "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
                        stock.market_code(), roundEx(money + cost.total, precision), m_cash);
 
-    // 更新现金
+    // Update the cash
     m_cash = roundEx(m_cash - money - cost.total, precision);
 
-    // 加入交易记录
+    // Add it to the trade records
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
                          cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
-    // 更新当前持仓记录
+    // Update the current position record
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         PositionRecord position(
@@ -899,7 +911,9 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
-    // 对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
+    // For the case where the dividend and the capital increase make the quantity not an integer
+    // multiple of the minimum trade quantity, the whole position can only be sold with
+    // number=MAX_DOUBLE
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Sell number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -907,21 +921,21 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
                         "{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
-    // 未持仓
+    // There is no position
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     HKU_TRACE_IF_RETURN(pos_iter == m_position.end(), result,
                         "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
                         stock.market_code(), datetime, realPrice, number, getSystemPartName(from));
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     PositionRecord& position = pos_iter->second;
 
-    // 调整欲卖出的数量，如果卖出数量等于MAX_DOUBLE，则表示卖出全部
+    // Adjust the quantity to be sold; a sell quantity equal to MAX_DOUBLE means selling everything
     double real_number = number == MAX_DOUBLE ? position.number : number;
 
-    // 欲卖出的数量大于当前持仓的数量
+    // The quantity to be sold is greater than the current position quantity
     HKU_ERROR_IF_RETURN(position.number < real_number, result,
                         "{} {} Try to sell number({}) > number of position({})!", datetime,
                         stock.market_code(), real_number, position.number);
@@ -931,15 +945,15 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
 
-    // 更新现金余额
+    // Update the cash balance
     m_cash = roundEx(m_cash + money - cost.total, precision);
 
-    // 更新交易记录
+    // Update the trade records
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
                          real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
-    // 更新当前持仓情况
+    // Update the current position
     position.number -= real_number;
     position.stoploss = stoploss;
     position.goalPrice = goalPrice;
@@ -951,11 +965,11 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     if (position.number == 0) {
         position.cleanDatetime = datetime;
         m_position_history.push_back(position);
-        // 删除当前持仓
+        // Delete the current position
         m_position.erase(stock.id());
     }
 
-    // 如果存在借款，则归还
+    // Return the loan if there is one
     if (getParam<bool>("support_borrow_cash") && m_borrow_cash > 0.0 && m_cash > 0.0) {
         returnCash(datetime, m_borrow_cash < m_cash ? m_borrow_cash : m_cash);
     }
@@ -1000,7 +1014,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
       "{} {} Sell short's stoploss({:<.4f}) must be > realPrice({:<.4f}) or = 0! ", datetime,
       stock.market_code(), stoploss, realPrice);
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     int precision = getParam<int>("precision");
@@ -1016,7 +1030,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         borrowStock(datetime, stock, realPrice, number);
     }
 
-    // 判断是否存在已借入的股票及其数量
+    // Judge whether there is a borrowed stock and its quantity
     borrow_stock_map_type::const_iterator bor_iter;
     bor_iter = m_borrow_stock.find(stock.id());
     HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), result,
@@ -1026,19 +1040,20 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     double can_sell_num = 0;
     position_map_type::iterator pos_iter = m_short_position.find(stock.id());
     if (pos_iter == m_short_position.end()) {
-        // 借入的股票并未卖出过
+        // The borrowed stock has not been sold
         can_sell_num = total_borrow_num;
 
     } else {
-        // 借入的股票已经卖出过
+        // The borrowed stock has been sold
         HKU_ERROR_IF_RETURN(pos_iter->second.number >= total_borrow_num, result,
                             "{} {} Borrowed Stock had all selled!", datetime, stock.market_code());
 
-        // 可以卖出的数量 = 借入的总数 - 已卖出的数量
+        // The quantity that can be sold = the total borrowed - the already sold quantity
         can_sell_num = total_borrow_num - pos_iter->second.number;
     }
 
-    // 如果计划卖出的数量大于可卖出的数量，则已可每卖出的数量卖出
+    // If the planned sell quantity is greater than the sellable quantity, sell the sellable
+    // quantity
     double sell_num = number;
     if (number > can_sell_num) {
         sell_num = can_sell_num;
@@ -1048,15 +1063,15 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     price_t money = roundEx(realPrice * sell_num * stock.unit() - cost.total, precision);
 
-    // 更新现金
+    // Update the cash
     m_cash = roundEx(m_cash + money, precision);
 
-    // 加入交易记录
+    // Add it to the trade records
     result = TradeRecord(stock, datetime, BUSINESS_SELL_SHORT, planPrice, realPrice, goalPrice,
                          sell_num, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
-    // 更新当前空头持仓记录
+    // Update the current short position record
     price_t risk = roundEx((stoploss - realPrice) * sell_num * stock.unit(), precision);
 
     if (pos_iter == m_short_position.end()) {
@@ -1111,17 +1126,18 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
                         "{} {} buyShort number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
-    // 未持有空头仓位
+    // There is no short position
     position_map_type::iterator pos_iter = m_short_position.find(stock.id());
     HKU_WARN_IF_RETURN(pos_iter == m_short_position.end(), result,
                        "{} {} This stock was not sell never! ", datetime, stock.market_code());
 
-    // 根据权息调整当前持仓情况
+    // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
 
     PositionRecord& position = pos_iter->second;
 
-    // 调整欲买入的数量，如果买入数量等于MAX_DOUBLE或者大于实际仓位，则表示全部买入
+    // Adjust the quantity to be bought; a buy quantity equal to MAX_DOUBLE or greater than the
+    // actual position means buying everything
     double real_number =
       (number == MAX_DOUBLE || number > position.number) ? position.number : number;
 
@@ -1130,15 +1146,15 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
 
-    // 更新现金余额
+    // Update the cash balance
     m_cash = roundEx(m_cash - money - cost.total, precision);
 
-    // 更新交易记录
+    // Update the trade records
     result = TradeRecord(stock, datetime, BUSINESS_BUY_SHORT, planPrice, realPrice, goalPrice,
                          real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
-    // 更新当前空头持仓情况
+    // Update the current short position
     position.number -= real_number;
     position.buyMoney = roundEx(position.buyMoney + money + cost.total, precision);
     position.totalCost = roundEx(position.totalCost + cost.total, precision);
@@ -1148,7 +1164,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
     if (position.number == 0) {
         position.cleanDatetime = datetime;
         m_short_position_history.push_back(position);
-        // 删除当前持仓
+        // Delete the current position
         m_short_position.erase(stock.id());
     }
 
@@ -1174,16 +1190,19 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 }
 
 price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
-    // 如果指定时间大于更新权息最后时间，则先更新权息
+    // If the given time is later than the last ex-rights/ex-dividend update time, update the
+    // ex-rights/ex-dividend data first
     if (datetime > m_last_update_datetime) {
         updateWithWeight(datetime);
         return m_cash;
     }
 
-    // 如果指定时间等于最后权息更新时间，则直接返回当前现金
+    // If the given time equals the last ex-rights/ex-dividend update time, return the current cash
+    // directly
     HKU_IF_RETURN(datetime == m_last_update_datetime, m_cash);
 
-    // 指定时间小于最后权息更新时间，则通过计算指定时刻的资产获取资金余额
+    // If the given time is earlier than the last ex-rights/ex-dividend update time, get the funds
+    // balance by calculating the assets at the given moment
     FundsRecord funds = getFunds(datetime, ktype);
     return funds.cash;
 }
@@ -1195,7 +1214,7 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
     string ktype(inktype);
     to_upper(ktype);
 
-    price_t value{0.0};  // 当前市值
+    price_t value{0.0};  // Current market value
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
@@ -1203,7 +1222,7 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
         value = roundEx((value + record.number * price * record.stock.unit()), precision);
     }
 
-    price_t short_value = 0.0;  // 当前空头仓位市值
+    price_t short_value = 0.0;  // Current market value of the short position
     iter = m_short_position.begin();
     for (; iter != m_short_position.end(); ++iter) {
         const PositionRecord& record = iter->second;
@@ -1229,17 +1248,19 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     FundsRecord funds;
     int precision = getParam<int>("precision");
 
-    // datetime为Null时，直接返回当前账户中的现金和买入时占用的资金，以及累计存取资金
+    // When datetime is Null, return the cash in the current account and the funds occupied at the
+    // buy, as well as the accumulated deposit and withdrawal funds
     HKU_IF_RETURN(indatetime == Null<Datetime>() || indatetime == lastDatetime(), getFunds(ktype));
 
     Datetime datetime(indatetime.year(), indatetime.month(), indatetime.day(), 23, 59);
     price_t market_value = 0.0;
     price_t short_market_value = 0.0;
     if (datetime > lastDatetime()) {
-        // 根据权息数据调整持仓
+        // Adjust the position according to the ex-rights/ex-dividend data
         updateWithWeight(datetime);
 
-        // 查询日期大于等于最后交易日期时，直接计算当前持仓证券的市值
+        // When the query date is later than or equal to the last trade date, calculate the market
+        // value of the currently held securities directly
         position_map_type::const_iterator iter = m_position.begin();
         for (; iter != m_position.end(); ++iter) {
             price_t price = iter->second.stock.getMarketValue(datetime, ktype);
@@ -1270,7 +1291,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         return funds;
     }  // if datetime >= lastDatetime()
 
-    // 当查询日期小于最后交易日期时，遍历交易记录，计算当日的市值和现金
+    // When the query date is earlier than the last trade date, traverse the trade records and
+    // calculate the market value and the cash of that day
     price_t cash = m_init_cash;
     struct Stock_Number {
         Stock_Number() : number(0) {}
@@ -1294,7 +1316,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     TradeRecordList::const_iterator iter = m_trade_list.begin();
     for (; iter != m_trade_list.end(); ++iter) {
         if (iter->datetime > datetime) {
-            // 如果交易记录的日期大于指定的日期则跳出循环，处理完毕
+            // If the date of the trade record is later than the given date, break the loop; it is
+            // done
             break;
         }
 
@@ -1480,22 +1503,23 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
 }
 
 /******************************************************************************
- *  每次执行交易操作时，先根据权息信息调整持有仓位及现金记录
- *  采用滞后更新的策略，即只在需要获取当前持仓情况及卖出时更新当前的持仓及资产情况
- *  输入参数： 本次操作的日期
- *  历史记录： 1) 2009/12/22 added
+ *  Every time a trade operation is executed, adjust the held position and the cash records
+ * according to the ex-rights/ex-dividend information first A lazy update strategy is adopted, i.e.
+ * the current position and the assets are updated only when the current position information is
+ * needed or a sell happens Input parameter: the date of this operation History: 1) added on
+ * 2009/12/22
  *****************************************************************************/
 void TradeManager::updateWithWeight(const Datetime& datetime) {
     HKU_IF_RETURN(datetime <= m_last_update_datetime, void());
 
-    // 权息信息查询日期范围
+    // Query date range of the ex-rights/ex-dividend information
     Datetime start_date(lastDatetime().date() + bd::days(1));
     Datetime end_date(datetime.date() + bd::days(1));
 
     int precision = getParam<int>("precision");
     TradeRecordList new_trade_buffer;
 
-    // 更新持仓信息，并缓存新增的交易记录
+    // Update the position information and cache the newly added trade records
     position_map_type::iterator position_iter = m_position.begin();
     for (; position_iter != m_position.end(); ++position_iter) {
         PositionRecord& position = position_iter->second;
@@ -1504,13 +1528,15 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         StockWeightList weights = stock.getWeight(start_date, end_date);
         StockWeightList::const_iterator weight_iter = weights.begin();
         for (; weight_iter != weights.end(); ++weight_iter) {
-            // 如果没有红利并且也（派股和转增股数量都为零），则跳过
+            // Skip it when there is no dividend and the numbers of the bonus shares and the
+            // capitalized shares are both zero
             if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
                 0.0 == weight_iter->increasement() && 0.0 == weight_iter->suogu()) {
                 continue;
             }
 
-            // 必须在加入配送股之前，因为配送股会引起持仓数量的变化
+            // It must be done before the bonus shares are added, because the bonus shares change
+            // the position quantity
             if (weight_iter->bonus() != 0.0) {
                 price_t bonus = roundEx(position.number * weight_iter->bonus() * 0.1, precision);
                 position.sellMoney += bonus;
@@ -1535,12 +1561,12 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
                 double suogu_number = position.number * weight_iter->suogu();
                 double change_number = 0.0;
                 if (suogu_number < position.number) {
-                    // 缩股采用上进位
+                    // The share contraction adopts the round-up
                     double old_number = position.number;
                     position.number = roundUp(suogu_number, 0);
                     change_number = position.number - old_number;
                 } else if (suogu_number > position.number) {
-                    // 扩股截位法
+                    // The share expansion adopts the truncation
                     double old_number = position.number;
                     position.number = roundDown(suogu_number, 0);
                     change_number = position.number - old_number;
@@ -1650,7 +1676,7 @@ void TradeManager::tocsv(const string& path) {
 
     string sep(",");
 
-    // 导出交易记录
+    // Export the trade records
     std::ofstream file(filename1.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename1);
 
@@ -1697,7 +1723,7 @@ void TradeManager::tocsv(const string& path) {
     }
     file.close();
 
-    // 导出已平仓记录
+    // Export the closed position records
     file.open(filename2.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
     file << "#建仓日期,平仓日期,证券代码,证券名称,累计持仓数量,"
@@ -1718,7 +1744,7 @@ void TradeManager::tocsv(const string& path) {
     }
     file.close();
 
-    // 导出未平仓记录
+    // Export the open position records
     file.open(filename3.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
     file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
@@ -1748,8 +1774,8 @@ void TradeManager::tocsv(const string& path) {
     }
     file.close();
 
-    // 到处执行命令
-    // 导出已平仓记录
+    // Export the order execution commands
+    // Export the closed position records
     file.open(filename4.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename4);
     list<string>::const_iterator action_iter = m_actions.begin();
@@ -1871,7 +1897,7 @@ bool TradeManager::_add_buy_tr(const TradeRecord& tr) {
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
 
-    // 更新当前持仓记录
+    // Update the current position record
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
     if (pos_iter == m_position.end()) {
         PositionRecord position(
@@ -1904,27 +1930,27 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
     HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is Null!");
     HKU_ERROR_IF_RETURN(tr.number == 0, false, "tr.number is zero!");
 
-    // 未持仓
+    // There is no position
     position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
     HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "No position!");
 
     PositionRecord& position = pos_iter->second;
 
-    // 欲卖出的数量大于当前持仓的数量
+    // The quantity to be sold is greater than the current position quantity
     HKU_ERROR_IF_RETURN(position.number < tr.number, false, "Try sell number greater position!");
 
     int precision = getParam<int>("precision");
     price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
 
-    // 更新现金余额
+    // Update the cash balance
     m_cash = roundEx(m_cash + money - tr.cost.total, precision);
 
-    // 更新交易记录
+    // Update the trade records
     TradeRecord new_tr(tr);
     new_tr.cash = m_cash;
     m_trade_list.push_back(new_tr);
 
-    // 更新当前持仓情况
+    // Update the current position
     position.number -= tr.number;
     position.stoploss = tr.stoploss;
     position.goalPrice = tr.goalPrice;
@@ -1936,7 +1962,7 @@ bool TradeManager::_add_sell_tr(const TradeRecord& tr) {
     if (position.number == 0) {
         position.cleanDatetime = tr.datetime;
         m_position_history.push_back(position);
-        // 删除当前持仓
+        // Delete the current position
         m_position.erase(tr.stock.id());
     }
 

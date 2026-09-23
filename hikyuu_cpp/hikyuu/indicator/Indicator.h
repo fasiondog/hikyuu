@@ -14,11 +14,13 @@
 
 namespace hku {
 
-#define IND_EQ_THRESHOLD 0.000001  ///< 判断浮点数相等的阈值,两者差值小于此数
+#define IND_EQ_THRESHOLD 0.000001  ///< Threshold for judging float equality
 
 /**
- * 指标类，具体由IndicatorImp实现，实现新指标时应继承IndicatorImp
- * @details 实现新指标时，应继承IndicatorImp类，并定义相关的指标生成函数，如:
+ * Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,
+ * IndicatorImp should be inherited
+ * @details When implementing a new indicator, the IndicatorImp class should be inherited and the
+ * related indicator creation function should be defined, e.g.:
  * <pre>
  * class Ma: public IndicatorImp {
  * public:
@@ -53,68 +55,72 @@ public:
     Indicator& operator=(const Indicator&) noexcept;
     Indicator& operator=(Indicator&&) noexcept;
 
-    /** 使用已有参数计算新值，返回全新的Indicator */
+    /** Calculate a new value with the existing parameters, returning a brand new Indicator */
     Indicator operator()(const Indicator& ind);
 
-    /** 生成新的克隆，并使用参数 k 作为新实例的上下文 */
+    /** Create a new clone and use the parameter k as the context of the new instance */
     Indicator operator()(const KData& k) const;
 
-    /** 生成新的克隆，同 clone */
+    /** Create a new clone, the same as clone */
     Indicator operator()();
 
-    /** 指标名称 */
+    /** Indicator name */
     string name() const noexcept;
     void name(const string& name) noexcept;
 
     IndicatorImp::OPType getOPType() const noexcept;
 
-    /** 返回形如：Name(param1_val,param2_val,...) */
+    /** It is returned in the form: Name(param1_val,param2_val,...) */
     string long_name() const;
 
-    /** 克隆操作 */
+    /** Clone operation */
     Indicator clone() const;
 
-    /** 设置上下文 */
+    /** Set the context */
     void setContext(const Stock&, const KQuery&);
     void setContext(const KData&);
 
-    /** 获取上下文 */
+    /** Get the context */
     KData getContext() const;
 
-    /** 在有上下文时，自动将上下文扩展至当前最新数据并计算 */
+    /** When there is a context, the context is automatically extended to the current latest data
+     *  and calculated */
     void extend();
 
-    /** 显示指标公式 */
+    /** Display the indicator formula */
     string formula() const;
 
-    /** 结果中需抛弃的个数 */
+    /** Number of the values that need to be discarded in the result */
     size_t discard() const noexcept;
 
-    /** 设置抛弃的个数，如果小于原有的discard则无效 */
+    /** Set the number to discard; it has no effect if it is less than the original discard */
     void setDiscard(size_t discard) noexcept;
 
-    /** 根据自身数值，更新抛弃的个数, force=true则强制更新, 否则从当前自身的 discard() 开始更新 */
+    /** Update the discard number according to its own values; force=true forces the update,
+     *  otherwise it updates starting from its current discard() */
     void updateDiscard(bool force = false) noexcept;
 
-    /** 返回有几个结果集输出 */
+    /** Return how many result sets are output */
     size_t getResultNumber() const noexcept;
 
-    /** 判断是否为空 **/
+    /** Judge whether it is empty **/
     bool empty() const noexcept;
 
-    /** 获取大小 **/
+    /** Get the size **/
     size_t size() const noexcept;
 
-    /** 只获取第一个结果集中相应位置输出，等同于get(pos, 0) */
+    /** Get the output at the corresponding position of the first result set only, the same as
+     *  get(pos, 0) */
     value_t operator[](size_t pos) const;
 
-    /** 只获取第一个结果集中相应位置输出，等同于getByDate(date, 0) */
+    /** Get the output at the corresponding position of the first result set only, the same as
+     *  getByDate(date, 0) */
     value_t operator[](Datetime) const;
 
     /**
-     * 获取第num个结果集中指定位置的数据
-     * @param pos 结果集中的位置
-     * @param num 第几个结果集
+     * Get the data at the given position of the num-th result set
+     * @param pos the position in the result set
+     * @param num the num-th result set
      */
     value_t get(size_t pos, size_t num = 0) const;
 
@@ -122,43 +128,45 @@ public:
     value_t back(size_t num = 0) const;
 
     /**
-     * 获取指定位置的日期
-     * @param pos 结果集中的位置
+     * Get the date of the given position
+     * @param pos the position in the result set
      */
     Datetime getDatetime(size_t pos) const;
 
     /**
-     * 获取指定日期的数据
-     * @param date 指定日期
-     * @param num 第几个结果集
+     * Get the data of the given date
+     * @param date the given date
+     * @param num the num-th result set
      */
     value_t getByDate(Datetime date, size_t num = 0) const;
 
-    /** 获取指定日期相应的索引位置 */
+    /** Get the index position corresponding to the given date */
     size_t getPos(Datetime) const;
 
     /**
-     * 以指标的方式获取指定的结果集,不保留其公式。
-     * 对于不在需要进行运算的指标，可以通过该方法清除已占用的内存。
-     * @param num 指定的结果集
+     * Get the given result set as an indicator, its formula is not kept.
+     * For an indicator that no longer needs to be calculated, the occupied memory can be released
+     * through this method.
+     * @param num the given result set
      */
     Indicator getResult(size_t num) const;
 
     /**
-     * 以 PriceList 的方式获取指定的结果集
-     * @param num 指定的结果集
+     * Get the given result set as a PriceList
+     * @param num the given result set
      */
     PriceList getResultAsPriceList(size_t num) const;
 
-    /** 指定结果集中是否包含 nan 值 */
+    /** Whether the given result set contains nan values */
     bool existNan(size_t result_idx) const;
 
     /**
-     * 获取 DatetimeList
+     * Get the DatetimeList
      */
     DatetimeList getDatetimeList() const;
 
-    /** 判断是否和另一个指标等效，即计算效果相同 */
+    /** Judge whether it is equivalent to another indicator, i.e. the calculation effect is the
+     *  same */
     bool alike(const Indicator& other) const;
 
     bool haveParam(const string& name) const {
@@ -199,17 +207,19 @@ public:
     }
 
     /**
-     * 判断两个ind的值是否相等
-     * @note operator==重载生成新的新的Indicator，此函数用于对两个ind进行值比较
+     * Judge whether the values of two ind are equal
+     * @note The operator== overload creates a new Indicator; this function is used to compare the
+     *       values of two ind
      */
     bool equal(const Indicator& other) const noexcept;
 
-    /** 判断是否是同一个实例 */
+    /** Judge whether it is the same instance */
     bool isSame(const Indicator& other) const noexcept {
         return !m_imp && m_imp == other.m_imp;
     }
 
-    /** 判断指标公式中是否包含指定名称的指标（特殊用途） */
+    /** Judge whether the indicator formula contains the indicator with the given name (for special
+     *  use) */
     bool contains(const string& name) const {
         return m_imp ? m_imp->contains(name) : false;
     }
@@ -403,7 +413,7 @@ inline bool Indicator::isPythonObject() const noexcept {
 }
 
 //--------------------------------------------------------------
-// 指标操作
+// Indicator operations
 //-------------------------------------------------------------
 HKU_API Indicator operator+(const Indicator&, const Indicator&);
 HKU_API Indicator operator-(const Indicator&, const Indicator&);
@@ -463,10 +473,10 @@ HKU_API Indicator operator|(const Indicator&, Indicator::value_t);
 HKU_API Indicator operator|(Indicator::value_t, const Indicator&);
 
 /**
- * 将ind1和ind2的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2)
- * 则此时ind包含多个结果，按ind1、ind2的顺序存放
- * @param ind1 指标1
- * @param ind2 指标2
+ * Combine the results of ind1 and ind2 into one Indicator. For example, for ind = WEAVE(ind1, ind2)
+ * the ind contains multiple results at this time, stored in the order of ind1 and ind2
+ * @param ind1 indicator 1
+ * @param ind2 indicator 2
  * @ingroup Indicator
  */
 Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
@@ -479,15 +489,16 @@ inline Indicator WEAVE(const Indicator& ind1, const Indicator& ind2, const Args&
 }
 
 /**
- * 条件函数, 根据条件求不同的值。
+ * Conditional function, it returns different values according to the condition.
  * @details
  * <pre>
- * 用法：IF(X,A,B)若X不为0则返回A,否则返回B
- * 例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
+ * Usage: IF(X,A,B) returns A if X is not 0, otherwise it returns B
+ * For example: IF(CLOSE>OPEN,HIGH,LOW) returns the high price if the period closes up, otherwise
+ * it returns the low price
  * </pre>
- * @param x 条件指标
- * @param a 待选指标 a
- * @param b 待选指标 b
+ * @param x condition indicator
+ * @param a candidate indicator a
+ * @param b candidate indicator b
  * @ingroup Indicator
  */
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, const Indicator& b);
@@ -496,26 +507,28 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t 
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
 
 /**
- * 组合计算多个指标
+ * Combine and calculate multiple indicators
  * @details
- * 将多个指标组合在一起进行统一计算，自动处理指标间的依赖关系和上下文设置。
- * 该函数会获取所有输入指标的所有子节点并去重，然后为每个指标设置指定的K线数据上下文，
- * 最后执行计算并返回结果。
+ * Combine multiple indicators for a unified calculation, the dependency between the indicators and
+ * the context settings are handled automatically. This function gets all the child nodes of all the
+ * input indicators and removes the duplicates, then sets the given K-line data context for every
+ * indicator, and finally performs the calculation and returns the result.
  *
  * <pre>
- * 用法示例：
+ * Usage example:
  * IndicatorList inds = {MA(CLOSE(), 5), MA(CLOSE(), 10), MACD(CLOSE())};
  * IndicatorList results = combineCalculateIndicators(inds, kdata);
- * // results 包含所有计算后的指标结果
+ * // results contains all the calculated indicator results
  *
- * // 只获取第一个结果列
+ * // Get the first result column only
  * IndicatorList first_results = combineCalculateIndicators(inds, kdata, true);
  * </pre>
  *
- * @param indicators 指标列表，需要进行组合计算的指标集合
- * @param kdata K线数据上下文，用于设置指标计算的环境
- * @param tovalue 是否只返回第一个结果列，默认为false（返回所有结果列）
- * @return IndicatorList 计算后的指标结果列表
+ * @param indicators indicator list, the indicator set to be calculated in combination
+ * @param kdata K-line data context, used to set the environment of the indicator calculation
+ * @param tovalue whether to return the first result column only, false by default (all the result
+ *                columns are returned)
+ * @return IndicatorList the calculated indicator result list
  * @ingroup Indicator
  */
 IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,

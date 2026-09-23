@@ -3,8 +3,8 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  AF 工厂实现：组装 AllocateFundsBase 的具体实现（L1/L2/L3 三个部件）。
- *  见 docs/design/pf_af_compat/design.md §5
+ *  The AF factory implementation: assemble the concrete implementations of AllocateFundsBase (the three parts L1/L2/L3).
+ *  See docs/design/pf_af_compat/design.md §5
  */
 
 #include "AF_EqualWeight.h"
@@ -22,7 +22,7 @@
 namespace hku {
 
 AFPtr HKU_API AF_EqualWeight() {
-    // 等权 = L1 默认 1/N（等价 master EqualWeightAllocateFunds 归一化后的等比例语义）
+    // The equal weight = the L1 default 1/N (equivalent to the normalized equal-proportion semantics of master EqualWeightAllocateFunds)
     return std::make_shared<EqualWeightAllocateFunds>();
 }
 

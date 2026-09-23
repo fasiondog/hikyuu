@@ -20,16 +20,16 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_PerformanceOptimal") {
     auto se = SE_PerformanceOptimal();
     CHECK_EQ(se->name(), "SE_PerformanceOptimal");
 
-    /** @arg 尝试加入空系统 */
+    /** @arg Try to add an empty system */
     CHECK_THROWS(se->addSystem(SYSPtr()));
     CHECK_UNARY(se->getProtoSystemList().empty());
 
-    /** @arg 尝试加入含有空系统的系统列表 */
+    /** @arg Try to add a system list containing an empty system */
     auto sys = create_test_sys(2, 3);
     sys->setStock(getStock("sz000001"));
     se->addSystemList(SystemList{sys});
@@ -37,7 +37,7 @@ TEST_CASE("test_SE_PerformanceOptimal") {
     CHECK_THROWS(se->addSystemList(SystemList{sys, SYSPtr()}));
     CHECK_EQ(se->getProtoSystemList().size(), 2);
 
-    /** @arg 尝试加入未指定证券标的的系统 */
+    /** @arg Try to add a system without a given security */
     sys = create_test_sys(2, 3);
     // CHECK_THROWS(se->addSystem(sys));
     se->addSystem(sys);
@@ -45,18 +45,18 @@ TEST_CASE("test_SE_PerformanceOptimal") {
     OptimalSelectorBase* raw_se = dynamic_cast<OptimalSelectorBase*>(se.get());
     CHECK_UNARY(raw_se->getRunRanges().empty());
 
-    /** @arg 尝试加入未指定证券标的的系统列表 */
+    /** @arg Try to add a system list without a given security */
     sys = create_test_sys(2, 3);
     se->addSystemList({sys});
     se->calculate(SystemList(), KQueryByIndex(-50));
     CHECK_UNARY(raw_se->getRunRanges().empty());
 
-    /** @arg 候选系统列表长度为0 */
+    /** @arg The candidate system list length is 0 */
     se->removeAll();
     REQUIRE(se->getProtoSystemList().empty());
     se->calculate(SystemList(), KQueryByIndex(-50));
 
-    /** @arg 只有一个候选系统 */
+    /** @arg There is a single candidate system */
     Stock stk = getStock("sz000001");
     sys = create_test_sys(2, 3);
     sys->setStock(stk);
@@ -111,7 +111,7 @@ TEST_CASE("test_SE_PerformanceOptimal") {
         CHECK_EQ(sw[0].sys->name(), sys->name());
     }
 
-    /** @arg 多候选系统，取最大值 */
+    /** @arg Multiple candidate systems, take the maximum */
     se->removeAll();
     vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
     for (const auto& param : params) {
@@ -159,7 +159,7 @@ TEST_CASE("test_SE_PerformanceOptimal") {
         CHECK_EQ(sw[0].sys->name(), "test_sys_3_5");
     }
 
-    /** @arg 多候选系统，取最小值 */
+    /** @arg Multiple candidate systems, take the minimum */
     // se->setParam<bool>("trace", true);
     se->setParam<int>("mode", 1);
     se->reset();
@@ -212,7 +212,7 @@ TEST_CASE("test_SE_PerformanceOptimal") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SE_PerformanceOptimal_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());
@@ -232,7 +232,7 @@ TEST_CASE("test_SE_PerformanceOptimal_export") {
     OptimalSelectorBase* raw_se1 = dynamic_cast<OptimalSelectorBase*>(se1.get());
     auto run_ranges1 = raw_se1->getRunRanges();
 
-    // 目前计算后必须reset才能正常序列化后重加载
+    // Currently a reset is needed after the calculation to serialize and reload normally
     se1->reset();
 
     {

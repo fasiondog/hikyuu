@@ -11,7 +11,7 @@
 
 namespace hku {
 
-/* 分位数截断处理 */
+/* Quantile truncation */
 class IQuantileTrunc : public IndicatorImp {
     INDICATOR_IMP(IQuantileTrunc)
     INDICATOR_IMP_SUPPORT_INCREMENT

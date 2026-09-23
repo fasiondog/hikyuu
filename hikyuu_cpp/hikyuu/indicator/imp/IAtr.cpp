@@ -1,7 +1,7 @@
 /*
  * IAtr.cpp
  *
- *  Created on: 2016年5月4日
+ *  Created on: 2016-5-4
  *      Author: Administrator
  */
 
@@ -39,7 +39,7 @@ void IAtr::_calculate(const Indicator& data) {
 
     int n = getParam<int>("n");
 
-    // 不使用n, 而是使用 n+1, 避免 MA(TR) 和 ATR 首值不一致
+    // Use n+1 instead of n, to avoid the inconsistency between the first values of MA(TR) and ATR
     m_discard = n + 1;
     if (m_discard >= total) {
         m_discard = total;

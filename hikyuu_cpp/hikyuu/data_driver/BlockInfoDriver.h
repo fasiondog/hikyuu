@@ -1,7 +1,7 @@
 /*
  * BlockInfoDriver.h
  *
- *  Created on: 2015年2月10日
+ *  Created on: 2015-2-10
  *      Author: fasiondog
  */
 
@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * 板块数据驱动
+ * Block data driver
  * @ingroup DataDriver
  */
 class HKU_API BlockInfoDriver {
@@ -25,64 +25,66 @@ public:
     BlockInfoDriver(const string& name);
     virtual ~BlockInfoDriver() {};
 
-    /** 获取驱动名称 */
+    /** Get the driver name */
     const string& name() const;
 
     /**
-     * 驱动初始化
+     * Driver initialization
      * @param params
      * @return
      */
     bool init(const Parameter& params);
 
     /**
-     * 子类如果需要缓存，可实现该方法将数据加载至自身的缓存
+     * If a subclass needs a cache, it can implement this method to load the data into its own cache
      */
     virtual void load() {}
 
     /**
-     * 驱动初始化，具体实现时应注意将之前打开的相关资源关闭。
+     * Driver initialization; when it is implemented concretely, attention should be paid to closing
+     * the related resources opened before.
      */
     virtual bool _init() = 0;
 
     /**
-     * 获取所有板块分类
+     * Get all the block categories
      * @return StringList
      */
     virtual StringList getAllCategory() = 0;
 
     /**
-     * 获取指定的板块
-     * @param category 指定的板块分类
-     * @param name 板块名称
-     * @return 指定的板块
+     * Get the given block
+     * @param category the given block category
+     * @param name block name
+     * @return the given block
      */
     virtual Block getBlock(const string& category, const string& name) = 0;
 
     /**
-     * 获取指定分类的板块列表
-     * @param category 板块分类
-     * @return 板块列表
+     * Get the block list of the given category
+     * @param category block category
+     * @return block list
      */
     virtual BlockList getBlockList(const string& category) = 0;
 
     /**
-     * 获取所有板块
-     * @return 所有板块列表
+     * Get all the blocks
+     * @return all the block lists
      */
     virtual BlockList getBlockList() = 0;
 
     /**
-     * 保存指定的板块
-     * @note 如果已存在同名板块，则覆盖；如果板块分类或名称存在修改，需要手工在修改前删除原板块
+     * Save the given block
+     * @note A block with the same name is overwritten; if the block category or name is modified,
+     *       the original block needs to be deleted manually before the modification
      * @param block
      */
     virtual void save(const Block& block) = 0;
 
     /**
-     * 删除指定的板块
-     * @param category 板块分类
-     * @param name 板块名称
+     * Delete the given block
+     * @param category block category
+     * @param name block name
      */
     virtual void remove(const string& category, const string& name) = 0;
 

@@ -33,9 +33,10 @@ namespace hku {
 
 namespace {
 
-// 进程内互斥量注册表：POSIX 记录锁以 "进程" 为持有单位，同进程内重复加锁不会失败，
-// 因此需要进程内互斥量保证相同路径的加锁串行，并避免解锁时误释放同一进程的其他锁。
-// 不考虑过期清理。
+// The in-process mutex registry: a POSIX record lock is held per process, so locking the same
+// path repeatedly inside one process would not fail; therefore an in-process mutex is needed to
+// serialize the locking of the same path and to avoid releasing another lock of the same process
+// by mistake at the unlock. The expiration cleanup is not considered.
 std::mutex& localMutex(const std::string& key) {
     static std::mutex s_mutex;
     static std::map<std::string, std::unique_ptr<std::mutex>> s_locks;
@@ -47,7 +48,8 @@ std::mutex& localMutex(const std::string& key) {
     return *mtx;
 }
 
-// 确保锁文件所在目录存在（Windows 的 OPEN_ALWAYS 不会自动创建父目录）
+// Make sure the directory of the lock file exists (OPEN_ALWAYS on Windows does not create the
+// parent directory automatically)
 void createParentDir(const std::string& filename) {
     size_t pos = filename.find_last_of("/\\");
     if (pos == std::string::npos || pos == 0) {
@@ -58,10 +60,10 @@ void createParentDir(const std::string& filename) {
 
 }  // namespace
 
-// 规范化锁文件路径作为注册表键：统一分隔符、折叠重复分隔符与 "."、去掉末尾分隔符，
-// 使 "a.lock"、"./a.lock"、"a.lock/"、"a//b.lock" 等写法映射到同一个键，避免
-// “同一 inode 两个键” 导致进程内互斥静默失效。
-// 其他不合理字符等，最终在调用 OS open 时统一报错，此处不做校验拦截。
+// Normalize the lock file path as the registry key: unify the separators, collapse the repeated
+// separators and ".", remove the trailing separator, so that "a.lock", "./a.lock", "a.lock/"
+// and "a//b.lock" map to the same key, avoiding "two keys for the same inode" making the
+// in-process mutex fail silently. The other unreasonable characters are reported uniformly when
 std::string HKU_UTILS_API normalizeLockKey(std::string_view filename) {
 #if HKU_OS_WINDOWS
     constexpr std::string_view sep = "/\\";
@@ -73,7 +75,7 @@ std::string HKU_UTILS_API normalizeLockKey(std::string_view filename) {
     if (!filename.empty() && filename.find_first_of(sep) == 0) {
         key = "/";
     }
-    // 切分路径分量，忽略空分量与 "."，不折叠 ".."
+    // Split the path components, ignoring the empty ones and ".", without collapsing ".."
     for (size_t beg = 0, end = 0;; beg = end + 1) {
         end = filename.find_first_of(sep, beg);
         const std::string_view part =
@@ -134,12 +136,14 @@ bool FileLock::tryLock() noexcept {
         return true;
     }
 
-    // 被移动后的对象 m_filename 为空、m_localLock 未关联互斥量，不可再加锁
+    // After being moved, m_filename is empty and m_localLock has no associated mutex, so no more
+    // locking is possible
     if (m_filename.empty()) {
         return false;
     }
 
-    // 先占进程内互斥量：POSIX 记录锁无法拦截同一进程内的重复加锁
+    // Take the in-process mutex first: a POSIX record lock cannot intercept a repeated lock inside
+    // the same process
     if (!m_localLock.owns_lock()) {
         if (!m_localLock.try_lock()) {
             return false;
@@ -194,7 +198,7 @@ bool FileLock::lockFile() noexcept {
 
     OVERLAPPED overlapped;
     std::memset(&overlapped, 0, sizeof(overlapped));
-    // 锁整个文件范围：偏移 0，长度 MAXDWORD
+    // Lock the whole file range: the offset 0 and the length MAXDWORD
     if (!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY, 0, MAXDWORD,
                       MAXDWORD, &overlapped)) {
         DWORD err = ::GetLastError();
@@ -229,7 +233,8 @@ void FileLock::unlockFile() noexcept {
 bool FileLock::lockFile() noexcept {
     createParentDir(m_filename);
 
-    // O_CREAT: 锁文件不存在时自动创建；不使用 O_EXCL，也不截断已有内容
+    // O_CREAT: the lock file is created automatically when it does not exist; O_EXCL is not used
+    // and the existing content is not truncated
     int fd = ::open(m_filename.c_str(), O_CREAT | O_RDWR, 0666);
     if (fd < 0) {
         HKU_ERROR("Failed to open lock file: {} ({})", m_filename, std::strerror(errno));
@@ -241,7 +246,7 @@ bool FileLock::lockFile() noexcept {
     fl.l_type = F_WRLCK;
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
-    fl.l_len = 0;  // 0 表示锁至文件末尾（即整文件）
+    fl.l_len = 0;  // 0 means locking to the end of the file (i.e. the whole file)
 
     int ret = 0;
     do {
@@ -249,7 +254,8 @@ bool FileLock::lockFile() noexcept {
     } while (ret == -1 && errno == EINTR);
 
     if (ret == -1) {
-        // EACCES/EAGAIN 表示已被其他进程持有，属正常竞争，不记为错误
+        // EACCES/EAGAIN means it is held by another process, which is a normal contention and not
+        // recorded as an error
         if (errno != EACCES && errno != EAGAIN) {
             HKU_ERROR("Failed to lock file: {} ({})", m_filename, std::strerror(errno));
         }

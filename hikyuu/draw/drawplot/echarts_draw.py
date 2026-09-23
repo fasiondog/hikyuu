@@ -8,14 +8,15 @@ from pyecharts.commons.utils import JsCode
 from hikyuu.core import KData, System
 from .common import get_draw_title
 from hikyuu import *
+from hikyuu import htr
 
 
 class MultiLineTextChart(ChartBase):
     def __init__(self, init_opts: opts.InitOpts = opts.InitOpts()):
         super().__init__(init_opts=init_opts)
-        self._last_x = 50  # 默认起始 x 坐标
-        self._last_y = 5  # 默认起始 y 坐标
-        self._line_height = 20  # 默认行高
+        self._last_x = 50  # the default start x coordinate
+        self._last_y = 5  # the default start y coordinate
+        self._line_height = 20  # the default line height
 
     def reset_position(self, x=None, y=None):
         if x is not None:
@@ -25,12 +26,12 @@ class MultiLineTextChart(ChartBase):
 
     def add(self, text: str, x=None, y=None, text_style=None):
         """
-        添加多行文本
+        Add multi-line text
 
-        :param text: 要显示的文本内容
-        :param x: 文本区域的左上角 x 坐标
-        :param y: 文本区域的左上角 y 坐标
-        :param text_style: 文本样式，如字体大小、颜色等
+        :param text: the text content to display
+        :param x: the x coordinate of the upper left corner of the text area
+        :param y: the y coordinate of the upper left corner of the text area
+        :param text_style: the text style, such as the font size and the color
         """
         if text_style is None:
             text_style = {"fontSize": 14, "color": "#333", "fontFamily": "Arial"}
@@ -42,7 +43,7 @@ class MultiLineTextChart(ChartBase):
         if y is None:
             y = self._last_y + self._line_height
 
-        # 默认左右边距各50
+        # the default left and right margins are 50 respectively
         width = int(self.width.strip('px')) - 100
         if x is not None:
             width -= x
@@ -71,14 +72,14 @@ class MultiLineTextChart(ChartBase):
 
     def _split_text(self, text: str, width: int, font_size: int):
         """
-        根据宽度和字体大小分割文本为多行
+        Split the text into several lines according to the width and the font size
 
-        :param text: 要分割的文本
-        :param width: 文本区域的宽度
-        :param font_size: 字体大小
-        :return: 分割后的文本行列表
+        :param text: the text to split
+        :param width: the width of the text area
+        :param font_size: the font size
+        :return: the list of the split text lines
         """
-        # 假设每个字符的宽度大致为字体大小的一半
+        # Assume the width of each character is about half of the font size
         max_chars_per_line = int(width / (font_size / 2))
         lines = []
         current_line = ""
@@ -94,7 +95,7 @@ class MultiLineTextChart(ChartBase):
         return lines
 
 
-# 控制k线图和volume图的位置
+# Control the position of the K-line chart and the volume chart
 grid_pos = [
     opts.GridOpts(pos_left="5%", pos_right="1%", height="57%"),
     opts.GridOpts(pos_left="5%", pos_right="1%", pos_top="73%", height="10%")
@@ -173,10 +174,9 @@ def kplot_line(kdata: KData):
     kdata_points = [(round(r.open, 2), round(r.close, 2), round(r.low, 2), round(r.high, 2)) for r in kdata]
     title = get_draw_title(kdata)
     last_record = kdata[-1]
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
-        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low,
-        last_record.close, 100 * (last_record.close - kdata[-2].close) / kdata[-2].close
-    )
+    text = htr('{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f} Change:{:.2f}%').format(
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close,
+        100 * (last_record.close - kdata[-2].close) / kdata[-2].close)
 
     kline = (
         Kline()
@@ -193,7 +193,7 @@ def kplot_line(kdata: KData):
             datazoom_opts=[
                 opts.DataZoomOpts(
                     is_show=len(datetimes) > 200,
-                    xaxis_index=[0, 1],  # 同时控制k线图和volume图的x轴缩放
+                    xaxis_index=[0, 1],  # zoom the x axis of both the K-line chart and the volume chart
                     type_="slider",
                     pos_top="85%",
                     range_start=(100 - 200 * 100 / len(datetimes)) if len(datetimes) > 200 else 0,
@@ -236,15 +236,15 @@ def kplot_line(kdata: KData):
             brush_opts=opts.BrushOpts(
                 x_axis_index="all",
                 brush_link="all",
-                out_of_brush={"colorAlpha": 0.1},  # brush之外的candle会显示为淡色
+                out_of_brush={"colorAlpha": 0.1},  # the candles out of the brush are drawn in a light color
             ),
             toolbox_opts=opts.ToolboxOpts(
                 feature=opts.ToolBoxFeatureOpts(
-                    save_as_image=opts.ToolBoxFeatureSaveAsImageOpts(is_show=True),  # 保存为图片
-                    data_view=opts.ToolBoxFeatureDataViewOpts(is_show=False),  # 数据视图
-                    magic_type=opts.ToolBoxFeatureMagicTypeOpts(is_show=False),  # 动态类型切换
-                    data_zoom=opts.ToolBoxFeatureDataZoomOpts(yaxis_index=False),  # 区域缩放
-                    brush=opts.ToolBoxFeatureBrushOpts(type_=["lineX"]),  # 选择组件, type_目前没有效果
+                    save_as_image=opts.ToolBoxFeatureSaveAsImageOpts(is_show=True),  # save as an image
+                    data_view=opts.ToolBoxFeatureDataViewOpts(is_show=False),  # the data view
+                    magic_type=opts.ToolBoxFeatureMagicTypeOpts(is_show=False),  # switch the chart type
+                    data_zoom=opts.ToolBoxFeatureDataZoomOpts(yaxis_index=False),  # zoom the area
+                    brush=opts.ToolBoxFeatureBrushOpts(type_=["lineX"]),  # the brush component; type_ has no effect yet
                 )
             ),
             title_opts=opts.TitleOpts(title=title),
@@ -275,7 +275,7 @@ def volume_barplot(kdata: KData):
             yaxis_index=1,
             label_opts=opts.LabelOpts(is_show=False),
             itemstyle_opts=opts.ItemStyleOpts(
-                # 处理volume bar的颜色，上涨为红色，下跌为绿色
+                # the color of the volume bar: red when it rises, and green when it falls
                 color=JsCode(
                     """
                 function(params) {
@@ -539,30 +539,30 @@ def sys_performance(sys, ref_stk=None):
     funds = VALUE(funds)
     funds_return = [f.total_assets / f.total_base if f.total_base != 0.0 else constant.null_price for f in funds_list]
     funds_return = VALUE(funds_return, align_dates=ref_dates)
-    funds_return.name = "系统累积收益率"
+    funds_return.name = htr("System Cumulative Return")
     ref_return = ALIGN(ROCR(ref_k.close, 0), ref_dates)
     ref_return.name = f"{ref_stk.name}({ref_stk.market_code})"
 
     per = Performance()
     text = per.report(sys.tm, sh000001_k[-1].datetime)
 
-    # 计算最大回撤
+    # calculate the max drawdown
     max_pullback = MDD(funds)[-1]
 
-    # 计算 sharp
+    # calculate the Sharpe ratio
     bond = ZHBOND10(ref_dates)
-    sigma = STDEV(ROCP(funds), 0)  # n=0: 全期样本标准差（expand-all）
+    sigma = STDEV(ROCP(funds), 0)  # n=0: the sample standard deviation of the whole period (expand-all)
     sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
-    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
+    sharp = (per['Account Avg Annual Return %'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
 
-    invest_total = per['累计投入本金'] + per['累计投入资产']
-    cur_fund = per['当前总资产']
-    t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
+    invest_total = per['Total Invested Principal'] + per['Total Invested Assets']
+    cur_fund = per['Current Total Assets']
+    t1 = htr('Total Invested Assets: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}').format(
         invest_total, cur_fund, cur_fund - invest_total)
-    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%'.format(
-        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback)
-    t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
-        per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
+    t2 = htr('Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%').format(
+        funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback)
+    t3 = htr('Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
+        per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
 
     line = iplot(ref_return, ref_k)
     line = iplot(funds_return, ref_k, line)

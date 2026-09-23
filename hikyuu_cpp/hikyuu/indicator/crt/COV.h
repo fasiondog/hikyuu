@@ -12,11 +12,12 @@
 namespace hku {
 
 /**
- * 计算样本协方差
- * @param ind1 指标1
- * @param ind2 指标2
- * @param n 滚动窗口 （大于2或等于0），等于0时使用输入的ind实际长度。
- * @param fill_null 日期对齐时，缺失日期填充 nan 值
+ * Calculate the sample covariance
+ * @param ind1 indicator 1
+ * @param ind2 indicator 2
+ * @param n the rolling window (greater than 2 or equal to 0); when it is 0 the actual length of the
+ *          input ind is used.
+ * @param fill_null fill the missing dates with nan when the dates are aligned
  * @ingroup Indicator
  */
 Indicator HKU_API COV(const Indicator& ind1, const Indicator& ind2, int n = 10,

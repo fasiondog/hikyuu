@@ -22,16 +22,16 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BETA") {
     Indicator result;
 
-    // 空指标
+    // An empty indicator
     result = BETA(Indicator(), Indicator(), 60);
     CHECK_UNARY(result.empty());
 
-    // 创建测试数据
-    // 股票收益率和市场收益率
+    // Create the test data
+    // The stock return and the market return
     PriceList stock_returns{0.01, 0.02, -0.01, 0.015, 0.005, -0.02, 0.012, 0.018, -0.008, 0.02};
     PriceList market_returns{0.008,  0.015, -0.005, 0.012,  0.003,
                              -0.015, 0.008, 0.012,  -0.003, 0.015};
@@ -39,38 +39,38 @@ TEST_CASE("test_BETA") {
     Indicator stock_ind = PRICELIST(stock_returns);
     Indicator market_ind = PRICELIST(market_returns);
 
-    // 非法参数 n
+    // The invalid parameter n
     CHECK_THROWS_AS(BETA(stock_ind, market_ind, -1), std::exception);
     CHECK_THROWS_AS(BETA(stock_ind, market_ind, 1), std::exception);
 
-    // 正常情况，n = 0（全样本计算）
+    // The normal case, n = 0 (calculated on the whole sample)
     result = BETA(stock_ind, market_ind, 0);
     CHECK_EQ(result.name(), "BETA");
     CHECK_EQ(result.size(), stock_returns.size());
     CHECK_EQ(result.discard(), 9);
-    // 根据 IBeta 实现，kx = first_stock_value, ky = first_market_value
-    // 从第二个数据点开始累加计算
+    // Per the IBeta implementation, kx = first_stock_value and ky = first_market_value
+    // The accumulation starts from the second data point
     // stock: [0.01, 0.02, -0.01, 0.015, 0.005, -0.02, 0.012, 0.018, -0.008, 0.02]
     // market: [0.008, 0.015, -0.005, 0.012, 0.003, -0.015, 0.008, 0.012, -0.003, 0.015]
     CHECK_EQ(result[9], doctest::Approx(1.41516).epsilon(0.001));
 
-    // 测试滚动窗口 n = 8
+    // Test the rolling window n = 8
     result = BETA(stock_ind, market_ind, 8);
     CHECK_EQ(result.name(), "BETA");
     CHECK_EQ(result.size(), stock_returns.size());
     CHECK_EQ(result.discard(), 7);
 
-    // 验证前几个值为 nan（需要足够数据才能计算）
+    // Verify that the first few values are nan (enough data is needed to calculate)
     for (size_t i = 0; i < result.discard(); ++i) {
         CHECK_UNARY(std::isnan(result[i]));
     }
 
-    // 验证具体计算结果
-    // 窗口 [0:8) 的 Beta 值
+    // Verify the concrete calculation result
+    // The Beta value of the window [0:8)
     CHECK_EQ(result[7], doctest::Approx(1.38916).epsilon(0.001));
-    // 窗口 [1:9) 的 Beta 值
+    // The Beta value of the window [1:9)
     CHECK_EQ(result[8], doctest::Approx(1.42331).epsilon(0.001));
-    // 窗口 [2:10) 的 Beta 值
+    // The Beta value of the window [2:10)
     CHECK_EQ(result[9], doctest::Approx(1.42331).epsilon(0.001));
 }
 
@@ -107,7 +107,7 @@ TEST_CASE("test_BETA_benchmark") {
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
     Indicator h = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_BETA_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -124,7 +124,7 @@ TEST_CASE("test_BETA_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BETA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

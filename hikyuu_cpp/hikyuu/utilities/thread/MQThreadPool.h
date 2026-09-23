@@ -30,8 +30,9 @@
 namespace hku {
 
 /**
- * @brief 普通多任务队列线程池，任务之间彼此独立不能互相等待
- * @note 任务运行之间如存在先后顺序，请使用 StealThreadPool。
+ * @brief An ordinary multi task queue thread pool; the tasks are independent of each other and
+ * cannot wait for each other
+ * @note If the tasks have a sequential order, please use StealThreadPool.
  * @details
  * @ingroup ThreadPool
  */
@@ -42,25 +43,26 @@ class HKU_UTILS_API MQThreadPool {
 #endif
 public:
     /**
-     * 默认构造函数，创建和当前系统CPU数一致的线程数
+     * Default constructor, it creates the number of the threads equal to the number of the CPUs of
+     * the current system
      */
     MQThreadPool() : MQThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
-     * 构造函数，创建指定数量的线程
-     * @param n 指定的线程数
-     * @param until_empty 任务队列为空时，自动停止运行
+     * Constructor, it creates the given number of the threads
+     * @param n the given number of the threads
+     * @param until_empty it stops running automatically when the task queue is empty
      */
     explicit MQThreadPool(size_t n, bool until_empty = true)
     : m_done(false), m_worker_num(n), m_runnging_until_empty(until_empty) {
         try {
             m_thread_need_stop.resize(m_worker_num);
             for (int i = 0; i < m_worker_num; i++) {
-                // 创建工作线程及其任务队列
+                // Create the worker threads and their task queues
                 m_queues.push_back(
                   std::unique_ptr<ThreadSafeQueue<task_type>>(new ThreadSafeQueue<task_type>));
             }
-            // 初始完毕所有线程资源后再启动线程
+            // The threads are started after all the thread resources have been initialized
             for (int i = 0; i < m_worker_num; i++) {
                 m_threads.push_back(std::thread(&MQThreadPool::worker_thread, this, i));
             }
@@ -71,7 +73,7 @@ public:
     }
 
     /**
-     * 析构函数，等待并阻塞至线程池内所有任务完成
+     * Destructor, it waits and blocks until all the tasks in the thread pool are finished
      */
     ~MQThreadPool() {
         if (!m_done) {
@@ -80,12 +82,12 @@ public:
         m_threads.clear();
     }
 
-    /** 获取工作线程数 */
+    /** Get the number of the worker threads */
     size_t worker_num() const {
         return m_worker_num;
     }
 
-    /** 剩余任务数 */
+    /** Number of the remaining tasks */
     size_t remain_task_count() const {
         size_t total = 0;
         for (size_t i = 0; i < m_worker_num; i++) {
@@ -94,7 +96,7 @@ public:
         return total;
     }
 
-    /** 先线程池提交任务后返回的对应 future 的类型 */
+    /** The type of the corresponding future returned after submitting a task to the thread pool */
     template <typename ResultType>
     using task_handle = std::future<ResultType>;
 
@@ -103,7 +105,7 @@ public:
 #pragma warning(disable : 4996)
 #endif
 
-    /** 向线程池提交任务 */
+    /** Submit a task to the thread pool */
     template <typename FunctionType>
     auto submit(FunctionType &&f) {
         if (m_done) {
@@ -114,7 +116,7 @@ public:
         std::packaged_task<result_type()> task(std::forward<FunctionType>(f));
         task_handle<result_type> res(task.get_future());
 
-        // 向空队列或任务数最小的队列中加入任务
+        // Add the task to the empty queue or the queue with the smallest number of the tasks
         size_t min_count = std::numeric_limits<size_t>::max();
         int index = 0;
         for (int i = 0; i < m_worker_num; ++i) {
@@ -140,13 +142,13 @@ public:
 #pragma warning(pop)
 #endif
 
-    /** 返回线程池结束状态 */
+    /** Return the end state of the thread pool */
     bool done() const {
         return m_done;
     }
 
     /**
-     * 等待各线程完成当前执行的任务后立即结束退出
+     * It waits for every thread to finish the currently executed task and then exits immediately
      */
     void stop() {
         if (m_done.exchange(true, std::memory_order_relaxed)) {
@@ -173,15 +175,15 @@ public:
     }
 
     /**
-     * 等待并阻塞至线程池内所有任务完成
-     * @note 至此线程池能工作线程结束不可再使用
+     * It waits and blocks until all the tasks in the thread pool are finished
+     * @note From then on the thread pool cannot be used after the worker threads are ended
      */
     void join() {
         if (m_done) {
             return;
         }
 
-        // 指示各工作线程在未获取到工作任务时，停止运行
+        // It instructs every worker thread to stop running when no work task is got
         if (!m_runnging_until_empty) {
             m_done = true;
             for (size_t i = 0; i < m_worker_num; i++) {
@@ -194,7 +196,7 @@ public:
             m_queues[i]->notify_all();
         }
 
-        {  // 等待线程结束
+        {  // Wait for the threads to be finished
             std::lock_guard<std::mutex> lock(m_mutex_join);
             for (size_t i = 0; i < m_worker_num; i++) {
                 if (m_threads[i].joinable()) {
@@ -214,21 +216,21 @@ public:
         }
     };
 
-    /** 协程执行器 */
+    /** Coroutine executor */
     ExecutorWrapper executor() {
         return ExecutorWrapper{this};
     }
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;      // 线程池全局需终止指示
-    size_t m_worker_num;          // 工作线程数量
-    bool m_runnging_until_empty;  // 运行直到队列空时停止
+    std::atomic_bool m_done;      // The global termination indication of the thread pool
+    size_t m_worker_num;          // Number of the worker threads
+    bool m_runnging_until_empty;  // It runs until the queue is empty and then stops
 
-    std::vector<std::unique_ptr<ThreadSafeQueue<task_type>>> m_queues;  // 线程任务队列
-    std::vector<InterruptFlag> m_thread_need_stop;                      // 线程终止标志
-    std::vector<std::thread> m_threads;                                 // 工作线程
-    std::mutex m_mutex_join;                                            // 用于保护 joinable
+    std::vector<std::unique_ptr<ThreadSafeQueue<task_type>>> m_queues;  // Thread task queues
+    std::vector<InterruptFlag> m_thread_need_stop;                      // Thread termination flags
+    std::vector<std::thread> m_threads;                                 // Worker threads
+    std::mutex m_mutex_join;                                            // Used to protect joinable
 
     void worker_thread(int index) {
         auto *local_queue = m_queues[index].get();

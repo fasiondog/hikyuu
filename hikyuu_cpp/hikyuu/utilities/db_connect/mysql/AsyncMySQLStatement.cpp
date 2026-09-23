@@ -19,27 +19,27 @@ namespace hku {
 struct AsyncMySQLStatement::Impl {
     AsyncMySQLConnect* connect{nullptr};
     std::shared_ptr<boost::mysql::statement> stmt;
-    boost::mysql::results results;                 // 用于 async_execute（有参数的情况）
-    boost::mysql::execution_state exec_state;      // 用于流式读取的状态
-    std::vector<boost::mysql::row> current_batch;  // 当前批次的数据（拥有所有权）
+    boost::mysql::results results;             // Used by async_execute (the case with parameters)
+    boost::mysql::execution_state exec_state;  // The state used for the streaming reading
+    std::vector<boost::mysql::row> current_batch;  // The data of the current batch (owned)
     std::vector<boost::mysql::field> params;
-    size_t current_row{0};      // 当前批次内的行索引
-    size_t total_rows_read{0};  // 已读取的总行数
+    size_t current_row{0};      // The row index within the current batch
+    size_t total_rows_read{0};  // The total number of the rows read
     bool has_result{false};
     bool needs_reset{false};
-    bool is_streaming{false};  // 是否使用流式模式
+    bool is_streaming{false};  // Whether the streaming mode is used
 
-    // 辅助函数：获取当前行的 field_view
+    // Helper function: get the field_view of the current row
     boost::mysql::field_view getField(int idx) const {
         if (is_streaming) {
-            // 流式模式：从 current_batch 中获取
+            // The streaming mode: get it from current_batch
             SQL_CHECK(current_row > 0 && current_row <= current_batch.size(), -1,
                       "Invalid row index in streaming mode!");
             const auto& row = current_batch[current_row - 1];
             SQL_CHECK(idx < static_cast<int>(row.size()), -1, "Column index out of range!");
             return row[idx];
         } else {
-            // 非流式模式：从 results 中获取
+            // The non-streaming mode: get it from results
             const auto& rows = results.rows();
             SQL_CHECK(current_row > 0 && current_row <= rows.size(), -1, "Invalid row index!");
             const auto& row = *(rows.begin() + (current_row - 1));
@@ -57,16 +57,17 @@ AsyncMySQLStatement::AsyncMySQLStatement(AsyncMySQLConnect* connect, const std::
 }
 
 AsyncMySQLStatement::~AsyncMySQLStatement() {
-    // boost.mysql 的 statement 会自动清理
+    // The statement of boost.mysql is cleaned up automatically
 }
 
 net::awaitable<void> AsyncMySQLStatement::sub_exec() {
-    // 如果还没有prepared statement，则准备语句
+    // Prepare the statement when there is no prepared statement yet
     if (!m_impl->stmt) {
         boost::mysql::error_code ec;
         boost::mysql::diagnostics diag;
 
-        // 异步连接在构造时无法主动连接，这里需要先建立连接
+        // An asynchronous connection cannot connect actively at the construction, so the connection
+        // must be established first here
         if (!m_impl->connect->m_impl->initialized) {
             co_await m_impl->connect->connect();
         }
@@ -75,7 +76,7 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
         m_impl->needs_reset = true;
 
         if (ec) {
-            // 判断是否为连接层错误
+            // Judge whether it is a connection layer error
             int error_value = ec.value();
             bool is_connection_error = false;
 
@@ -99,7 +100,7 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
                 SQL_THROW(ec.value(), "Failed prepare statement! {}", m_sql_string);
             }
 
-            // 重连后重新准备
+            // Prepare it again after the reconnection
             m_impl->stmt = co_await m_impl->connect->m_impl->get_statement(m_sql_string, ec, diag);
             if (ec) {
                 HKU_ERROR(
@@ -110,11 +111,11 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
             }
         }
     } else {
-        // 复用已有的prepared statement，只重置执行状态
-        m_impl->results = {};           // 重置 results
-        m_impl->exec_state = {};        // 重置执行状态
-        m_impl->current_batch.clear();  // 清空当前批次
-        // 注意：不要在这里清空 params，因为 bind 已经在 exec 之前调用了
+        // Reuse the existing prepared statement and reset the execution state only
+        m_impl->results = {};           // Reset results
+        m_impl->exec_state = {};        // Reset the execution state
+        m_impl->current_batch.clear();  // Clear the current batch
+        // Note: do not clear params here, because bind has already been called before exec
         // m_impl->params.clear();
         m_impl->current_row = 0;
         m_impl->total_rows_read = 0;
@@ -127,21 +128,21 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
     try {
         boost::mysql::diagnostics diag;
         if (m_impl->params.empty()) {
-            // 没有参数，使用流式执行
+            // Without parameters, use the streaming execution
             co_await conn->async_start_execution(m_sql_string, m_impl->exec_state, diag,
                                                  boost::asio::use_awaitable);
         } else {
-            // 有参数，使用预处理语句执行
+            // With parameters, use the prepared statement execution
             std::vector<boost::mysql::field_view> param_views;
             param_views.reserve(m_impl->params.size());
             for (const auto& f : m_impl->params) {
                 param_views.push_back(boost::mysql::field_view(f));
             }
 
-            // 绑定参数
+            // Bind the parameters
             auto bound = m_impl->stmt->bind(param_views.begin(), param_views.end());
 
-            // 使用流式执行，与无参数的情况保持一致
+            // Use the streaming execution, consistent with the case without parameters
             co_await conn->async_start_execution(bound, m_impl->exec_state, diag,
                                                  boost::asio::use_awaitable);
         }
@@ -150,13 +151,13 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
         m_impl->current_row = 0;
         m_impl->total_rows_read = 0;
 
-        // 如果需要读取结果集，读取第一批数据
+        // Read the first batch of data when the result set needs to be read
         if (m_impl->exec_state.should_read_rows()) {
             boost::mysql::diagnostics read_diag;
             boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
               m_impl->exec_state, read_diag, boost::asio::use_awaitable);
 
-            // 将 rows_view 转换为 vector<row> 以拥有数据所有权
+            // Convert rows_view into vector<row> to own the data
             m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
             m_impl->total_rows_read += m_impl->current_batch.size();
         }
@@ -174,7 +175,7 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
     m_impl->has_result = true;
     m_impl->needs_reset = true;
 
-    // 清空参数，以便下次绑定时索引从0开始
+    // Clear the parameters so that the index starts from 0 at the next bind
     m_impl->params.clear();
 }
 
@@ -187,39 +188,39 @@ net::awaitable<bool> AsyncMySQLStatement::sub_moveNext() {
     auto* conn = static_cast<boost::mysql::tcp_connection*>(m_impl->connect->getRawConnection());
 
     if (m_impl->is_streaming) {
-        // 流式模式
+        // The streaming mode
         m_impl->current_row++;
 
-        // 如果当前批次还有数据，直接返回
+        // If the current batch still has data, return directly
         if (m_impl->current_row <= m_impl->current_batch.size()) {
             co_return true;
         }
 
-        // 当前批次已读完，尝试读取下一批
+        // The current batch has been read, try to read the next batch
         if (m_impl->exec_state.should_read_rows()) {
             try {
                 boost::mysql::diagnostics diag;
                 boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
                   m_impl->exec_state, diag, boost::asio::use_awaitable);
 
-                // 将 rows_view 转换为 vector<row>
+                // Convert rows_view into vector<row>
                 m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
                 m_impl->total_rows_read += m_impl->current_batch.size();
-                m_impl->current_row = 1;  // 重置为第一批的第一行
+                m_impl->current_row = 1;  // Reset to the first row of the first batch
 
                 co_return !m_impl->current_batch.empty();
             } catch (...) {
-                // 读取失败，结束迭代
+                // The reading failed, end the iteration
                 _reset();
                 co_return false;
             }
         } else {
-            // 没有更多数据
+            // There is no more data
             _reset();
             co_return false;
         }
     } else {
-        // 非流式模式
+        // The non-streaming mode
         const auto& rows = m_impl->results.rows();
         if (m_impl->current_row >= rows.size()) {
             _reset();
@@ -233,19 +234,19 @@ net::awaitable<bool> AsyncMySQLStatement::sub_moveNext() {
 
 uint64_t AsyncMySQLStatement::sub_getLastRowid() {
     if (m_impl->is_streaming) {
-        // 流式模式：从 execution_state 获取
+        // The streaming mode: get it from execution_state
         return m_impl->exec_state.last_insert_id();
     } else {
-        // 非流式模式：从 results 获取
+        // The non-streaming mode: get it from results
         return m_impl->results.last_insert_id();
     }
 }
 
 void AsyncMySQLStatement::_reset() {
     if (m_impl->needs_reset) {
-        m_impl->results = {};           // 重置 results
-        m_impl->exec_state = {};        // 重置执行状态
-        m_impl->current_batch.clear();  // 清空当前批次
+        m_impl->results = {};           // Reset results
+        m_impl->exec_state = {};        // Reset the execution state
+        m_impl->current_batch.clear();  // Clear the current batch
         m_impl->params.clear();
         m_impl->params.shrink_to_fit();
         m_impl->current_row = 0;
@@ -259,7 +260,7 @@ void AsyncMySQLStatement::sub_bindNull(int idx) {
     SQL_CHECK(idx == static_cast<int>(m_impl->params.size()), -1,
               "Parameter index must be sequential! Expected index: {}, but got: {}",
               m_impl->params.size(), idx);
-    m_impl->params.push_back(boost::mysql::field());  // 默认构造为 NULL
+    m_impl->params.push_back(boost::mysql::field());  // Constructed as NULL by default
 }
 
 void AsyncMySQLStatement::sub_bindInt(int idx, int64_t value) {
@@ -286,7 +287,7 @@ void AsyncMySQLStatement::sub_bindDatetime(int idx, const Datetime& item) {
               "Parameter index must be sequential! Expected index: {}, but got: {}",
               m_impl->params.size(), idx);
 
-    // 使用 boost.mysql 原生 datetime 类型
+    // Use the native datetime type of boost.mysql
     boost::mysql::datetime dt(
       static_cast<std::uint16_t>(item.year()), static_cast<std::uint8_t>(item.month()),
       static_cast<std::uint8_t>(item.day()), static_cast<std::uint8_t>(item.hour()),
@@ -330,13 +331,13 @@ int AsyncMySQLStatement::sub_getNumColumns() const {
     HKU_IF_RETURN(!m_impl->has_result, 0);
 
     if (m_impl->is_streaming) {
-        // 流式模式：从当前批次获取元数据
+        // The streaming mode: get the metadata from the current batch
         if (m_impl->current_batch.empty()) {
             return 0;
         }
         return static_cast<int>(m_impl->current_batch[0].size());
     } else {
-        // 非流式模式：从 results 获取
+        // The non-streaming mode: get it from results
         const auto& metadata = m_impl->results.meta();
         HKU_IF_RETURN(metadata.empty(), 0);
         return static_cast<int>(metadata.size());

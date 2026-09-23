@@ -1,7 +1,7 @@
 /*
  * SL_FixedValue.h
  *
- *  Created on: 2016年5月7日
+ *  Created on: 2016-5-7
  *      Author: Administrator
  */
 
@@ -14,8 +14,9 @@
 namespace hku {
 
 /**
- * 固定价格移滑价差算法
- * @details 买入实际价格 = 计划买入价格 + 偏移价格，卖出实际价格 = 计划卖出价格 - 偏移价格
+ * Fixed price slippage algorithm
+ * @details Actual buy price = planned buy price + offset price, actual sell price = planned sell
+ *          price - offset price
  * @param value
  * @return
  */

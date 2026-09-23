@@ -18,17 +18,17 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TR") {
     KData k;
 
-    /** @arg k 为空 */
+    /** @arg k is empty */
     auto ret = TR(k);
     CHECK_EQ(ret.size(), 0);
     CHECK_EQ(ret.discard(), 0);
     CHECK_EQ(ret.name(), "TR");
 
-    /** @arg 正常k */
+    /** @arg A normal k */
     k = getKData("sh000001", KQueryByIndex(-10));
     REQUIRE(k.size() > 0);
     ret = ret(k);
@@ -50,7 +50,7 @@ TEST_CASE("test_TR_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_TR_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -68,7 +68,7 @@ TEST_CASE("test_TR_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

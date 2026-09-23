@@ -104,7 +104,8 @@ void ISumBars::_dyn_calculate(const Indicator& ind) {
         for (size_t j = i; j >= ind.discard(); j--) {
             sum += ind[j];
             if (sum >= a) {
-                n = price_t(i - j);  // 与静态版 dst[i] = i - pos 一致（向前累加的周期数 >= 0）
+                n =
+                  price_t(i - j);  // Same as dst[i] = i - pos of the static version (periods >= 0)
                 break;
             }
             if (j == ind.discard()) {

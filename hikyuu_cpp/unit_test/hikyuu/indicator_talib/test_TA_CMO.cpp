@@ -20,17 +20,17 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CMO") {
     KData kdata = getKData("sh000001", KQuery(-10));
 
     Indicator c = CLOSE(kdata);
 
-    /** @arg 非法 n < 2 || n > 100000 */
+    /** @arg Invalid n < 2 || n > 100000 */
     CHECK_THROWS(TA_CMO(c, 1));
     CHECK_THROWS(TA_CMO(c, 100001));
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     Indicator result = TA_CMO(CLOSE(kdata), 2);
     CHECK_EQ(result.name(), "TA_CMO");
     CHECK_EQ(result.discard(), 2);
@@ -38,7 +38,7 @@ TEST_CASE("test_TA_CMO") {
     CHECK_EQ(result[2], doctest::Approx(-74.8826).epsilon(0.0001));
     CHECK_EQ(result[9], doctest::Approx(-61.9996).epsilon(0.0001));
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     auto data = TA_MA(c, 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_CMO(data, 2);
@@ -48,7 +48,7 @@ TEST_CASE("test_TA_CMO") {
     CHECK_EQ(result[9], doctest::Approx(-97.5916).epsilon(0.0001));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CMO_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -82,7 +82,7 @@ TEST_CASE("test_TA_CMO_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_TA_CMO_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -99,7 +99,7 @@ TEST_CASE("test_TA_CMO_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CMO_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

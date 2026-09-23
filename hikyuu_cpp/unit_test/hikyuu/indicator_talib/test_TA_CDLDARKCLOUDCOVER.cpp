@@ -20,14 +20,14 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CDLDARKCLOUDCOVER") {
     KData kdata = getKData("sh000001", KQuery(-30));
 
-    /** @arg 非法 n < 0 */
+    /** @arg An invalid n < 0 */
     CHECK_THROWS(TA_CDLDARKCLOUDCOVER(kdata, -0.1));
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     Indicator result = TA_CDLDARKCLOUDCOVER(kdata);
     CHECK_EQ(result.name(), "TA_CDLDARKCLOUDCOVER");
     CHECK_EQ(result.discard(), 11);
@@ -43,7 +43,7 @@ TEST_CASE("test_TA_CDLDARKCLOUDCOVER") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_CDLDARKCLOUDCOVER_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -20,9 +20,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_DIFF") {
-    /** @arg 正常测试 */
+    /** @arg The normal test */
     PriceList d;
     for (size_t i = 0; i < 10; ++i) {
         d.push_back(i);
@@ -55,7 +55,7 @@ TEST_CASE("test_DIFF") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_DIFF_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

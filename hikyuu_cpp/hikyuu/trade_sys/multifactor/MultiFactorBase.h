@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 合成多因子，当只有一个因子时相当于简易的评分板
+ * Multi-factor synthesis; when there is only one factor it is equivalent to a simple score board
  * @ingroup MultiFactor
  */
 class HKU_API MultiFactorBase : public enable_shared_from_this<MultiFactorBase> {
@@ -34,75 +34,78 @@ public:
     MultiFactorBase(const MultiFactorBase&);
     virtual ~MultiFactorBase() = default;
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const {
         return m_name;
     }
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name) {
         m_name = name;
     }
 
-    /** 获取参考日期列表 */
+    /** Get the reference date list */
     const DatetimeList& getDatetimeList();
 
-    /** 获取查询范围 */
+    /** Get the query range */
     const KQuery& getQuery() const {
         return m_query;
     }
 
-    /** 设置查询范围 */
+    /** Set the query range */
     void setQuery(const KQuery& query);
 
-    /** 获取参考证券 */
+    /** Get the reference security */
     const Stock& getRefStock() const {
         return m_ref_stk;
     }
 
-    /** 设置参考证券 */
+    /** Set the reference security */
     void setRefStock(const Stock& stk);
 
-    /** 获取证券列表 */
+    /** Get the security list */
     const StockList& getStockList() const {
         return m_stks;
     }
 
-    /** 设置计算范围证券列表 */
+    /** Set the security list of the calculation range */
     void setStockList(const StockList& stks);
 
-    /** 获取证券列表当前证券数量 */
+    /** Get the current number of the securities in the security list */
     size_t getStockListNumber() const {
         return m_stks.size();
     }
 
-    /** 获取原始因子集合 */
+    /** Get the original factor set */
     const FactorSet& getRefFactorSet() const {
         return m_factorset;
     }
 
-    /** 设置原始因子集合 */
+    /** Set the original factor set */
     void setRefFactorSet(const FactorSet& factorset);
 
-    /** 获取指定证券合成因子 */
+    /** Get the synthesized factor of the given security */
     const Indicator& getFactor(const Stock&);
 
     /**
-     * 获取所有证券合成后的新因子，顺序与传入的证券组合相同
+     * Get the new factors synthesized from all the securities, in the same order as the passed
+     * security portfolio
      */
     const IndicatorList& getAllFactors();
 
-    /** 获取指定日期截面的所有因子值，已经降序排列 */
+    /** Get all the factor values of the given date cross-section, they are already in the
+     * descending order */
     ScoreRecordList getScores(const Datetime&);
 
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end = Null<size_t>());
 
     /**
-     * 获取指定日期截面 [start, end] 范围内的因子值（评分）, 并通过filer进行过滤
-     * @param date 指定日期
-     * @param start 排序起始点
-     * @param end 排序起始点(不含该点)
-     * @param filter 过滤函数
+     * Get the factor values (scores) within the given date cross-section range [start, end], and
+     * filter them through filter
+     * @param date the given date
+     * @param start the sorting start point
+     * @param end the sorting end point (excluded)
+     * @param filter the filter function
      */
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               std::function<bool(const ScoreRecord&)>&& filter);
@@ -113,45 +116,52 @@ public:
     ScoreRecordList getScores(const Datetime& date, size_t start, size_t end,
                               const ScoresFilterPtr& filter);
 
-    /** 获取所有截面数据，已按降序排列 */
+    /** Get all the cross-section data, they are already in the descending order */
     const vector<ScoreRecordList>& getAllScores();
 
     /**
-     * 获取合成因子的IC, 长度与参考日期同 (非严格IC模式)
-     * @note ndays 对于使用 IC/ICIR 加权的新因子，最好保持好 ic_n 一致，
-     *       但对于等权计算的新因子，不一定非要使用 ic_n 计算。
-     *       所以，ndays 增加了一个特殊值 0, 表示直接使用 ic_n 参数计算 IC
-     * @param ndays 计算相对 ndays 日收益率的IC值
+     * Get the IC of the synthesized factor, its length is the same as the reference dates (the
+     * non-strict IC mode)
+     * @note For a new factor using the IC/ICIR weighting, ndays had better stay consistent with
+     * ic_n; but for a new factor calculated with the equal weight, ic_n does not have to be used.
+     *       Therefore a special value 0 is added to ndays, meaning the IC is calculated directly
+     * with the ic_n parameter
+     * @param ndays calculate the IC value relative to the ndays day return
      */
     Indicator getIC(int ndays = 0);
 
     /**
-     * 获取合成因子的 ICIR
-     * @param ir_n 计算 IR 的 n 窗口
-     * @param ic_n 计算 IC 的 n 窗口
+     * Get the ICIR of the synthesized factor
+     * @param ir_n the n window for calculating the IR
+     * @param ic_n the n window for calculating the IC
      */
     Indicator getICIR(int ir_n, int ic_n = 0);
 
     /**
-     * 获取所有处理过的原始因子值（归一化、标准化）。每次都会计算。
-     * @note 考虑到内存占用，该数据没有缓存，一般用与测试或者想查看处理过的原始因子值
+     * Get all the processed original factor values (normalized and standardized). It is calculated
+     * every time.
+     * @note Considering the memory usage, this data is not cached; it is generally used for the
+     *       testing or when you want to view the processed original factor values
      * @return vector<IndicatorList>  stks x inds
      */
     vector<IndicatorList> getAllSrcFactors();
 
     /**
-     * 设置因子标准化/归一化操作
-     * @param norm 标准化操作
+     * Set the factor standardization / normalization operation
+     * @param norm the standardization operation
      */
     void setNormalize(NormPtr norm);
 
     /**
-     * 对指定名称的指标应用特定的标准化/归一化、行业中性化、风格因子中性化操作。
-     * @note 标准化操作、行业中性化、风格因子中性化彼此无关，可同时指定也可分开指定。
-     * @param name 指标名称
-     * @param norm 标准化操作
-     * @param category 指标所属板块类别(需要中性化指定)
-     * @param style_inds 指标风格列表
+     * Apply the given standardization / normalization, industry neutralization and style factor
+     * neutralization operations to the indicator with the given name.
+     * @note The standardization, the industry neutralization and the style factor neutralization
+     * are independent of each other; they can be given together or separately.
+     * @param name indicator name
+     * @param norm the standardization operation
+     * @param category the block category the indicator belongs to (it needs to be given for the
+     *                 neutralization)
+     * @param style_inds the style list of the indicator
      */
     void addSpecialNormalize(const string& name, NormalizePtr norm, const string& category = "",
                              const IndicatorList& style_inds = IndicatorList());
@@ -170,33 +180,41 @@ public:
     }
 
     /**
-     * 执行计算。默认取结果时，会自动计算。
+     * Execute the calculation. It is calculated automatically when the result is got by default.
      *
-     * 并发语义（PR1）：
-     *   - 支持多个线程同时对同一未计算实例首次触发 calculate / getter；
-     *   - 计算成功后允许多线程并发只读；
-     *   - 不支持 getter 与 reset/setQuery/setStockList/setRefFactorSet/setParam 并发；
-     *   - 不支持调用方持有 getter 返回的内部引用期间另一线程修改实例。
+     * Concurrency semantics (PR1):
+     *   - Multiple threads are supported to trigger calculate / getter for the first time on the
+     * same uncalculated instance at the same time;
+     *   - After a successful calculation, multiple threads are allowed to read concurrently;
+     *   - The getter is not supported to be concurrent with
+     *     reset/setQuery/setStockList/setRefFactorSet/setParam;
+     *   - It is not supported that another thread modifies the instance while the caller holds the
+     *     internal reference returned by the getter.
      *
-     * 失败语义：
-     *   - 计算抛出异常时，基类派生缓存被清理，m_calculated 保持 false；
-     *   - 异常向上传播，下一调用者可重新计算（DCLP，非 single-flight）。
+     * Failure semantics:
+     *   - When the calculation throws an exception, the derived cache of the base class is cleaned
+     * up and m_calculated stays false;
+     *   - The exception propagates upward, the next caller can recalculate (DCLP, not
+     *     single-flight).
      */
     void calculate();
 
 private:
     void initParam();
 
-    // 清除所有计算后生成的派生数据，保留配置成员。
-    // calculate() 构建前和异常后均调用，确保重试基于干净状态。
+    // Clear all the derived data generated after the calculation, keeping the configuration
+    // members. It is called before the construction in calculate() and after an exception, ensuring
+    // that the retry is based on a clean state.
     void clearCalculatedData();
 
-    // 构造每个指标的行业归属标签（整数板块序号）与板块数，以便进行行业中性化处理。
-    // 返回 {factor_name -> (labels, blk_count)}：
-    //   labels[i] = 股票 i 所属板块在 blks 中的下标（0..blk_count-1），无归属则为 blk_count。
+    // Build the industry attribution labels (integer block indexes) and the block count of every
+    // indicator, so that the industry neutralization can be performed.
+    // It returns {factor_name -> (labels, blk_count)}:
+    //   labels[i] = the index of the block the stock i belongs to in blks (0..blk_count-1), and it
+    //   is blk_count if there is no attribution.
     unordered_map<string, std::pair<PriceList, size_t>> _buildDummyIndex();
 
-    void _buildIndex();  // 计算完成后创建截面索引
+    void _buildIndex();  // Create the cross-section index after the calculation is finished
 
     void _checkData();
 
@@ -206,21 +224,29 @@ protected:
 protected:
     bool m_is_python_object{false};
     string m_name;
-    FactorSet m_factorset;  // 输入的原始因子集
-    StockList m_stks;       // 证券组合
-    Stock m_ref_stk;        // 指定的参考证券, 仅为对齐日期
-    KQuery m_query;         // 计算的日期范围条件
+    FactorSet m_factorset;  // The input original factor set
+    StockList m_stks;       // Security portfolio
+    Stock m_ref_stk;        // The given reference security, it is used to align the dates only
+    KQuery m_query;         // The date range condition of the calculation
 
-    NormPtr m_norm;                                    // 全局标准化/归一化操作
-    unordered_map<string, NormPtr> m_special_norms;    // 对特定指标执行特定的标准化操作
-    unordered_map<string, string> m_special_category;  // 对特定指标执行行业中性化时指定的板块分类
+    NormPtr m_norm;                                    // Global standardization / normalization
+                                                       // operation
+    unordered_map<string, NormPtr> m_special_norms;    // The specific standardization operation
+                                                       // performed on a specific indicator
+    unordered_map<string, string> m_special_category;  // The block category given when the industry
+                                                       // neutralization is performed on a specific
+                                                       // indicator
     unordered_map<string, IndicatorList>
-      m_special_style_inds;  // 对特定指标执行风格因子中性化时指定的风格因子
+      m_special_style_inds;  // The style factors given when the style factor neutralization is
+                             // performed on a specific indicator
 
-    // 以下变量为计算后生成
-    DatetimeList m_ref_dates;  // 依据参考证券和query计算的参考日期，合成因子和该日期对齐
-    unordered_map<Stock, size_t> m_stk_map;  // 证券->合成后因子位置索引
-    IndicatorList m_all_factors;             // 保存所有证券合成后的新因子
+    // The following variables are generated after the calculation
+    DatetimeList m_ref_dates;  // The reference dates calculated from the reference security and the
+                               // query, the synthesized factor is aligned to these dates
+    unordered_map<Stock, size_t> m_stk_map;  // Security -> the position index of the synthesized
+                                             // factor
+    IndicatorList m_all_factors;             // Saves the new factors synthesized from all the
+                                             // securities
     unordered_map<Datetime, size_t> m_date_index;
     vector<ScoreRecordList> m_stk_factor_by_date;
     Indicator m_ic;
@@ -230,7 +256,7 @@ private:
     std::atomic<bool> m_calculated{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -248,7 +274,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_special_norms);
         ar& BOOST_SERIALIZATION_NVP(m_special_category);
         ar& BOOST_SERIALIZATION_NVP(m_special_style_inds);
-        // 以下不需要保存，加载后重新计算
+        // The following do not need to be saved, they are recalculated after loading
         // ar& BOOST_SERIALIZATION_NVP(m_stk_map);
         // ar& BOOST_SERIALIZATION_NVP(m_all_factors);
         // ar& BOOST_SERIALIZATION_NVP(m_date_index);
@@ -289,7 +315,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(MultiFactorBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public MultiFactorBase {
  *     MULTIFACTOR_NO_PRIVATE_MEMBER_SERIALIZATION

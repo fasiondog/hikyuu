@@ -17,48 +17,54 @@ namespace hku {
  */
 
 /**
- * @brief 固定指标计算时使用的查询范围的起始索引
- * @param start_index 起始索引位置，为负数时，表示从当前最新的往前移 index 个时间点开始计算
+ * @brief Fix the start index of the query range used in the indicator calculation
+ * @param start_index the start index position; when it is negative, the calculation starts from the
+ *                    index time points before the current latest one
  * @return Indicator
- * @note 对某些随时间起点变化的指标（如AD），固定起始索引确保从股票第一条数据开始计算。
- *       示例：FIXED_START_INDEX(AD())(getKData("sz000001", Query(-500)))
+ * @note For some indicators that change with the time start point (such as AD), the fixed start
+ *       index ensures that the calculation starts from the first data of the stock.
+ *       Example: FIXED_START_INDEX(AD())(getKData("sz000001", Query(-500)))
  */
 Indicator HKU_API FIXED_START_INDEX(int start_index = 0);
 
 /**
- * @brief 固定指标计算时使用的查询范围的起始索引
- * @param ind 输入指标
- * @param start_index 起始索引位置，为负数时，表示从当前最新的往前移 index 个时间点开始计算
+ * @brief Fix the start index of the query range used in the indicator calculation
+ * @param ind the input indicator
+ * @param start_index the start index position; when it is negative, the calculation starts from the
+ *                    index time points before the current latest one
  * @return Indicator
- * @note 对某些随时间起点变化的指标（如AD），固定起始索引确保从股票第一条数据开始计算。
- *       示例：FIXED_START_INDEX(AD(), 0)(getKData("sz000001", Query(-500)))
+ * @note For some indicators that change with the time start point (such as AD), the fixed start
+ *       index ensures that the calculation starts from the first data of the stock.
+ *       Example: FIXED_START_INDEX(AD(), 0)(getKData("sz000001", Query(-500)))
  */
 Indicator HKU_API FIXED_START_INDEX(const Indicator& ind, int start_index = 0);
 
 /**
- * @brief 固定指标计算时使用的查询范围的起始日期
- * @param start_date 起始日期
+ * @brief Fix the start date of the query range used in the indicator calculation
+ * @param start_date start date
  * @return Indicator
- * @note 对某些随时间起点变化的指标（如AD），固定起始日期确保从指定日期开始计算。
- *       示例：FIXED_START_DATE(AD(), Datetime("2020-01-01"))(getKData("sz000001", Query(-500)))
+ * @note For some indicators that change with the time start point (such as AD), the fixed start
+ *       date ensures that the calculation starts from the given date.
+ *       Example: FIXED_START_DATE(AD(), Datetime("2020-01-01"))(getKData("sz000001", Query(-500)))
  */
 Indicator HKU_API FIXED_START_DATE(const Datetime& start_date = Datetime::min());
 
 /**
- * @brief 固定指标计算时使用的查询范围的起始日期
- * @param ind 输入指标
- * @param start_date 起始日期
+ * @brief Fix the start date of the query range used in the indicator calculation
+ * @param ind the input indicator
+ * @param start_date start date
  * @return Indicator
- * @note 对某些随时间起点变化的指标（如AD），固定起始日期确保从指定日期开始计算。
- *       示例：FIXED_START_DATE(AD(), Datetime("2020-01-01"))(getKData("sz000001", Query(-500)))
+ * @note For some indicators that change with the time start point (such as AD), the fixed start
+ *       date ensures that the calculation starts from the given date.
+ *       Example: FIXED_START_DATE(AD(), Datetime("2020-01-01"))(getKData("sz000001", Query(-500)))
  */
 Indicator HKU_API FIXED_START_DATE(const Indicator& ind,
                                    const Datetime& start_date = Datetime::min());
 
 /**
- * @brief 将指标数据转换到指定周期
- * @param ktype 指定周期
- * @param fill_null 扩展时填充null数据，否则为使用最近值填充
+ * @brief Convert the indicator data to the given period
+ * @param ktype the given period
+ * @param fill_null fill the null data when extending, otherwise the latest value is used to fill
  * @return Indicator
  */
 Indicator HKU_API WITHKTYPE(const KQuery::KType& ktype, bool fill_null = false);
@@ -179,13 +185,14 @@ inline Indicator WITHHOUR4(const Indicator& ind, bool fill_null = false) {
 }
 
 /**
- * @brief 计算指标值在指定板块中的排名
- * @param block 指定板块
- * @param ref_ind 指标
- * @param mode 排名模式，0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大),
- * 2-降序排名百分比, 3-升序排名百分比
- * @param fill_null 是否填充null数据
- * @param market 指定市场（对齐日期）
+ * @brief Calculate the rank of the indicator values within the given block
+ * @param block the given block
+ * @param ref_ind indicator
+ * @param mode rank mode: 0-descending rank (the highest indicator value has the rank 1),
+ *             1-ascending rank (the larger the indicator value, the larger the rank value),
+ *             2-descending rank percentage, 3-ascending rank percentage
+ * @param fill_null whether to fill the null data
+ * @param market the given market (align the dates)
  * @return Indicator
  */
 Indicator HKU_API RANK(const Block& block, const Indicator& ref_ind, int mode = 0,
@@ -194,10 +201,12 @@ Indicator HKU_API RANK(const Block& block, int mode = 0, bool fill_null = true,
                        const string& market = "SH");
 
 /**
- * @brief 聚合其他K线周期统计值，聚合计算指定K线类型数据均值到以上下文中的K线周期
- * @param ktype 指定K线周期
- * @param fill_null 是否填充null数据
- * @param unit 聚合周期单位，默认为1。按上下文K线 unit 个周期计算
+ * @brief Aggregate the statistics of the other K-line periods; aggregate the mean of the data of
+ * the given K-line type into the K-line period of the context
+ * @param ktype the given K-line period
+ * @param fill_null whether to fill the null data
+ * @param unit aggregation period unit, 1 by default. It is calculated by unit periods of the
+ *             context K-line
  * @return Indicator
  */
 #define AGG_FUNC_DEFINE(agg_name)                                                              \
@@ -224,16 +233,16 @@ AGG_FUNC_DEFINE(AGG_MEDIAN)
 AGG_FUNC_DEFINE(AGG_PROD)
 
 /**
- * @brief 时间采样聚合指标
+ * @brief Time sampling aggregation indicator
  *
- * 在指定时间点对指标数据进行采样。如果找不到精确匹配的时间，
- * 会选择最接近目标时间之前的有效数据。
+ * Sample the indicator data at the given time point. If an exactly matching time cannot be found,
+ * the valid data closest to and before the target time is selected.
  *
- * @param ind 输入指标
- * @param ktype 指定K线周期
- * @param time 指定采样时间，格式为 HH:MM，默认为 "9:35"
- * @param fill_null 是否填充null数据
- * @param unit 聚合周期单位
+ * @param ind the input indicator
+ * @param ktype the given K-line period
+ * @param time the given sampling time in the format HH:MM, "9:35" by default
+ * @param fill_null whether to fill the null data
+ * @param unit aggregation period unit
  * @return Indicator
  */
 Indicator HKU_API AGG_SAMPLE(const Indicator& ind, const string& time = "9:35",
@@ -241,17 +250,17 @@ Indicator HKU_API AGG_SAMPLE(const Indicator& ind, const string& time = "9:35",
                              int unit = 1);
 
 /**
- * @brief 时间段最大值聚合指标
+ * @brief Time range maximum aggregation indicator
  *
- * 在指定时间段 [start_time, last_time] 内统计指标数据的最大值，
- * 包含 start_time 和 last_time 本身。
+ * Count the maximum of the indicator data within the given time range [start_time, last_time],
+ * including start_time and last_time themselves.
  *
- * @param ind 输入指标
- * @param start_time 时间段开始时间，格式为 HH:MM，默认为 "9:30"
- * @param last_time 时间段结束时间，格式为 HH:MM，默认为 "10:00"
- * @param ktype 指定K线周期
- * @param fill_null 是否填充null数据
- * @param unit 聚合周期单位
+ * @param ind the input indicator
+ * @param start_time the start time of the time range in the format HH:MM, "9:30" by default
+ * @param last_time the end time of the time range in the format HH:MM, "10:00" by default
+ * @param ktype the given K-line period
+ * @param fill_null whether to fill the null data
+ * @param unit aggregation period unit
  * @return Indicator
  */
 Indicator HKU_API AGG_SAMPLE_MAX(const Indicator& ind, const string& start_time = "9:30",
@@ -260,17 +269,17 @@ Indicator HKU_API AGG_SAMPLE_MAX(const Indicator& ind, const string& start_time 
                                  int unit = 1);
 
 /**
- * @brief 时间段最小值聚合指标
+ * @brief Time range minimum aggregation indicator
  *
- * 在指定时间段 [start_time, last_time] 内统计指标数据的最小值，
- * 包含 start_time 和 last_time 本身。
+ * Count the minimum of the indicator data within the given time range [start_time, last_time],
+ * including start_time and last_time themselves.
  *
- * @param ind 输入指标
- * @param start_time 时间段开始时间，格式为 HH:MM，默认为 "9:30"
- * @param last_time 时间段结束时间，格式为 HH:MM，默认为 "10:00"
- * @param ktype 指定K线周期
- * @param fill_null 是否填充null数据
- * @param unit 聚合周期单位
+ * @param ind the input indicator
+ * @param start_time the start time of the time range in the format HH:MM, "9:30" by default
+ * @param last_time the end time of the time range in the format HH:MM, "10:00" by default
+ * @param ktype the given K-line period
+ * @param fill_null whether to fill the null data
+ * @param unit aggregation period unit
  * @return Indicator
  */
 Indicator HKU_API AGG_SAMPLE_MIN(const Indicator& ind, const string& start_time = "9:30",
@@ -279,17 +288,17 @@ Indicator HKU_API AGG_SAMPLE_MIN(const Indicator& ind, const string& start_time 
                                  int unit = 1);
 
 /**
- * @brief 时间段平均值聚合指标
+ * @brief Time range average aggregation indicator
  *
- * 在指定时间段 [start_time, last_time] 内统计指标数据的平均值，
- * 包含 start_time 和 last_time 本身。
+ * Count the average of the indicator data within the given time range [start_time, last_time],
+ * including start_time and last_time themselves.
  *
- * @param ind 输入指标
- * @param start_time 时间段开始时间，格式为 HH:MM，默认为 "9:30"
- * @param last_time 时间段结束时间，格式为 HH:MM，默认为 "10:00"
- * @param ktype 指定K线周期
- * @param fill_null 是否填充null数据
- * @param unit 聚合周期单位
+ * @param ind the input indicator
+ * @param start_time the start time of the time range in the format HH:MM, "9:30" by default
+ * @param last_time the end time of the time range in the format HH:MM, "10:00" by default
+ * @param ktype the given K-line period
+ * @param fill_null whether to fill the null data
+ * @param unit aggregation period unit
  * @return Indicator
  */
 Indicator HKU_API AGG_SAMPLE_MEAN(const Indicator& ind, const string& start_time = "9:30",
@@ -319,9 +328,10 @@ Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func,
                            int unit = 1);
 
 /**
- * @brief 按周期分组就散
- * @param ktype 指定K线周期
- * @param unit 分组周期单位，默认为1。按 ktype 参数 unit 个周期计算
+ * @brief Group by period
+ * @param ktype the given K-line period
+ * @param unit grouping period unit, 1 by default. It is calculated by unit periods of the ktype
+ *             parameter
  * @return Indicator
  */
 #define GROUP_FUNC_DEFINE(group_name)                                                            \

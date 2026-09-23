@@ -1,7 +1,7 @@
 /*
  * BoolSignal.cpp
  *
- *  Created on: 2017年7月2日
+ *  Created on: 2017-7-2
  *      Author: fasiondog
  */
 

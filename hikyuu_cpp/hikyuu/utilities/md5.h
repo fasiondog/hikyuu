@@ -18,18 +18,18 @@
 namespace hku {
 
 /**
- * @brief 计算 md5 值
+ * @brief Calculate the md5 value
  *
- * @param input 待计算数据起始指针
- * @param len 待计算数据字节长度
+ * @param input the start pointer of the data to be calculated
+ * @param len the byte length of the data to be calculated
  * @return std::string
  */
 std::string HKU_UTILS_API md5(const unsigned char* input, size_t len);
 
 /**
- * @brief 计算字符串 md5
+ * @brief Calculate the md5 of a string
  *
- * @param src 待计算的字符串
+ * @param src the string to be calculated
  * @return std::string
  */
 inline std::string md5(const std::string& src) {

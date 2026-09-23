@@ -1,7 +1,7 @@
 /*
  * BoolSignal.h
  *
- *  Created on: 2017年7月2日
+ *  Created on: 2017-7-2
  *      Author: fasiondog
  */
 
@@ -28,7 +28,7 @@ private:
     Indicator m_bool_sell;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

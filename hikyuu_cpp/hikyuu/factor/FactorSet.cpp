@@ -85,19 +85,19 @@ void FactorSet::add(const Factor& factor) {
 
     const string& factor_name = factor.name();
 
-    // 检查是否已存在同名因子
+    // Check whether a factor with the same name exists already
     auto it = m_data->nameIndexMap.find(factor_name);
     if (it != m_data->nameIndexMap.end()) {
-        // 存在同名因子，覆盖之
+        // A factor with the same name exists, overwrite it
         size_t index = it->second;
         m_data->factors[index] = factor;
         HKU_WARN("Factor '{}' already exists, it will be overwritten!", factor_name);
 
     } else {
-        // 添加新因子到 vector 末尾
+        // Append the new factor to the end of the vector
         size_t index = m_data->factors.size();
         m_data->factors.push_back(factor);
-        // 在 map 中记录名称到索引的映射
+        // Record the name to index mapping in the map
         m_data->nameIndexMap[factor_name] = index;
     }
 }
@@ -136,22 +136,23 @@ void FactorSet::add(const std::map<string, Indicator>& inds) {
 void FactorSet::remove(const string& name) {
     auto it = m_data->nameIndexMap.find(name);
     if (it == m_data->nameIndexMap.end()) {
-        return;  // 因子不存在
+        return;  // The factor does not exist
     }
 
     size_t index_to_remove = it->second;
     size_t last_index = m_data->factors.size() - 1;
 
-    // 如果要删除的不是最后一个元素，需要调整后续元素的索引
+    // When the element to delete is not the last one, the index of the following element must be
+    // adjusted
     if (index_to_remove != last_index) {
-        // 将最后一个元素移动到要删除的位置
+        // Move the last element to the position to be deleted
         m_data->factors[index_to_remove] = std::move(m_data->factors[last_index]);
-        // 更新移动元素在 map 中的索引
+        // Update the index of the moved element in the map
         const string& moved_factor_name = m_data->factors[index_to_remove].name();
         m_data->nameIndexMap[moved_factor_name] = index_to_remove;
     }
 
-    // 删除最后一个元素和 map 中的条目
+    // Delete the last element and the map entry
     m_data->factors.pop_back();
     m_data->nameIndexMap.erase(it);
 }
@@ -176,7 +177,7 @@ void FactorSet::remove_from_db() const {
 
 void FactorSet::load_from_db() {
     FactorSet loaded_set = getFactorSet(name(), ktype());
-    // getFactorSet 返回的对象是 Null, Null为全局
+    // The object returned by getFactorSet is Null, which is global
     if (!loaded_set.isNull()) {
         m_data = std::move(loaded_set.m_data);
     }
@@ -240,11 +241,12 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
                 return executor.executeValues(kdata);
             };
 
-            // 这里直接向全局线程池 submit 范围任务，且有外层调用者自身就在 work 线程里 submit
-            // 本函数时（嵌套调用）的可能。`wait_for_all_non_blocking` 必须支持在等待期间
-            // work-steal 已提交的子任务（否则当池被外层任务占满时会死锁：外层等待本任务、
-            // 本任务等待子任务、却没有空闲 worker 去执行子任务）。修改这一段前请确认
-            // `GlobalStealThreadPool` 的 non_blocking 等待确有 steal 语义。
+            // A range task is submitted to the global thread pool directly here, and an outer
+            // caller may itself submit this function from a work thread (a nested call).
+            // wait_for_all_non_blocking must support work-stealing the submitted subtasks during
+            // the waiting (otherwise, when the pool is filled by the outer tasks, it would
+            // deadlock: the outer waits for this task, this task waits for the subtasks and no idle
+            // worker executes them). Before changing this part,
             auto* task_group = get_global_task_group();
             HKU_ASSERT(task_group);
             auto ranges = parallelIndexRange(0, stk_total, task_group->worker_num());
@@ -266,7 +268,7 @@ vector<IndicatorList> FactorSet::getValues(const StockList& stocks, const KQuery
         }
     }
 
-    // 创建结果容器，每个股票对应一个 IndicatorList
+    // Create the result container, one IndicatorList per stock
     size_t stk_total = stocks.size();
     size_t factor_total = m_data->factors.size();
     result.resize(stk_total);

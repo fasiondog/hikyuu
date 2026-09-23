@@ -1,10 +1,10 @@
 /*
  * AF_EqualWeight.h
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  *
- *  v5：AF 具备独立类层次（AllocateFundsBase），工厂返回 AFPtr。
+ *  v5: AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
  */
 
 #pragma once
@@ -16,8 +16,9 @@
 namespace hku {
 
 /**
- * @brief 等权重资产分配，对选中的资产进行等比例分配
- * @details L1 默认等权 1/N（等价 master EqualWeightAllocateFunds 归一化后的等比例语义）
+ * @brief Equal weight asset allocation, it allocates the selected assets in equal proportions
+ * @details L1 default equal weight 1/N (equivalent to the normalized equal-proportion semantics of
+ *          master EqualWeightAllocateFunds)
  * @return AFPtr
  * @ingroup AllocateFunds
  */

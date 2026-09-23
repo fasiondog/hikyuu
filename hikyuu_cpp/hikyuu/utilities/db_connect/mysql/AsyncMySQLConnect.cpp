@@ -19,7 +19,7 @@
 
 namespace hku {
 
-// 辅助函数：打印 diagnostics 诊断信息（内部使用，不对外暴露）
+// Helper function: print the diagnostics information (internal use, not exposed)
 static void printAsyncMySQLDiag(const boost::mysql::error_code& ec,
                                 const boost::mysql::diagnostics& diag, const std::string& context) {
     if (!diag.server_message().empty()) {
@@ -31,9 +31,10 @@ static void printAsyncMySQLDiag(const boost::mysql::error_code& ec,
     }
 }
 
-// Pimpl 实现结构体
+// The Pimpl implementation struct
 struct AsyncMySQLConnect::Impl {
-    boost::asio::io_context* io_context_ptr = nullptr;  // 指向外部 io_context，不拥有
+    boost::asio::io_context* io_context_ptr =
+      nullptr;  // Points to the external io_context, not owned
     std::unique_ptr<boost::mysql::tcp_connection> conn;
     std::unique_ptr<LruCache<std::string, std::shared_ptr<boost::mysql::statement>>>
       statement_cache;
@@ -48,7 +49,7 @@ struct AsyncMySQLConnect::Impl {
         }
     }
 
-    // 从当前协程环境获取 io_context（只在首次调用时执行）
+    // Get the io_context from the current coroutine environment (it is done at the first call only)
     net::awaitable<void> ensure_initialized() {
         if (!initialized) {
             auto executor = co_await net::this_coro::executor;
@@ -65,7 +66,7 @@ struct AsyncMySQLConnect::Impl {
             co_return ret;
         }
 
-        // 创建 statement 并准备关闭的 lambda
+        // Create the statement and prepare the lambda for the closing
         auto* connection_ptr = conn.get();
         auto deleter = [connection_ptr](boost::mysql::statement* stmt) {
             if (stmt && connection_ptr) {
@@ -74,7 +75,7 @@ struct AsyncMySQLConnect::Impl {
             delete stmt;
         };
 
-        // 使用 async_prepare_statement
+        // Use async_prepare_statement
         boost::mysql::diagnostics prep_diag;
         try {
             boost::mysql::statement stmt =
@@ -97,7 +98,7 @@ struct AsyncMySQLConnect::Impl {
 
 AsyncMySQLConnect::AsyncMySQLConnect(const Parameter& param)
 : AsyncDBConnectBase(param), m_impl(std::make_unique<Impl>()) {
-    // 获取预处理语句缓存大小，并创建缓存
+    // Get the prepared statement cache size and create the cache
     int64_t cache_size = tryGetParam<int64_t>("statement_cache_size", 3);
     m_params.set("statement_cache_size", cache_size);
     m_impl->statement_cache =
@@ -125,7 +126,7 @@ net::awaitable<bool> AsyncMySQLConnect::tryConnect() {
 }
 
 net::awaitable<void> AsyncMySQLConnect::connect() {
-    // 确保已初始化（从协程环境获取 io_context）
+    // Make sure it is initialized (get the io_context from the coroutine environment)
     co_await m_impl->ensure_initialized();
 
     std::string host = tryGetParam<std::string>("host", "127.0.0.1");
@@ -190,13 +191,13 @@ net::awaitable<bool> AsyncMySQLConnect::ping() {
         need_reconnect = true;
     }
 
-    // 在 try-catch 外部处理重连
+    // Handle the reconnection outside the try-catch
     if (need_reconnect) {
         bool reconnected = false;
         try {
             reconnected = co_await tryConnect();
         } catch (...) {
-            // 忽略重连异常
+            // Ignore the reconnection exception
         }
 
         if (!reconnected) {
@@ -236,13 +237,13 @@ net::awaitable<int64_t> AsyncMySQLConnect::exec(const std::string& sql_string) {
         SQL_THROW(ec.value(), "SQL error: {}! error msg: {}", sql_string, ec.message());
     }
 
-    // 如果需要重试，在 try-catch 外部执行
+    // When a retry is needed, do it outside the try-catch
     if (need_retry) {
         bool reconnected = false;
         try {
             reconnected = co_await ping();
         } catch (...) {
-            // 忽略 ping 异常
+            // Ignore the ping exception
         }
 
         if (reconnected) {

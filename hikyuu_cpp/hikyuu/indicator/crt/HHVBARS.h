@@ -16,11 +16,12 @@
 namespace hku {
 
 /**
- * 上一高点位置 求上一高点到当前的周期数。
+ * Position of the previous high; the number of periods from the previous high to the current one.
  * @details
  * <pre>
- * 用法：HHVBARS(X,N):求N周期内X最高值到当前周期数N=0表示从第一个有效值开始统计
- * 例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
+ * Usage: HHVBARS(X,N): the number of periods from the highest value of X within N periods until
+ * now; N=0 means counting starts from the first valid value
+ * For example: HHVBARS(HIGH,0) gives the number of periods from the historical new high until now
  * </pre>
  * @ingroup Indicator
  */

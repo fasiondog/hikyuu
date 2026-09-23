@@ -33,9 +33,9 @@ using boost::any_cast;
 
 //------------------------------------------------------------------------------
 //
-// 常见基本类型包装的 any_t 和 std::string 的互相转换函数
-// any_to_string 要用户自定义类型需包含从 std::string 进行构造的构造函数
-// string_to_any 需要用户自定义实现 std::to_string 特化方法
+// The mutual conversion functions between the any_t wrapping the common basic types and std::string
+// For a user-defined type, any_to_string requires it to have a constructor from std::string
+// string_to_any requires the user to implement the std::to_string specialization method
 //
 //------------------------------------------------------------------------------
 

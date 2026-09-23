@@ -17,8 +17,9 @@
 namespace hku {
 
 /**
- * 系统有效条件基类
- * @note 系统有效性和待交易的对象有关也可能没关，所以保留setTradeObj接口
+ * Base class of the system valid condition
+ * @note The system validity may or may not be related to the object to be traded, so the
+ *       setTradeObj interface is kept
  * @ingroup Condition
  */
 class HKU_API ConditionBase : public enable_shared_from_this<ConditionBase> {
@@ -30,10 +31,10 @@ public:
     explicit ConditionBase(const string& name);
     virtual ~ConditionBase();
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const;
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name);
 
     size_t size() const;
@@ -42,61 +43,62 @@ public:
 
     price_t const* data() const;
 
-    /** 复位操作 */
+    /** Reset operation */
     void reset();
 
-    /** 设置交易对象 */
+    /** Set the trading object */
     void setTO(const KData& kdata);
 
-    /** 获取交易对象 */
+    /** Get the trading object */
     KData getTO() const;
 
-    /** 设置交易管理实例 */
+    /** Set the trade management instance */
     void setTM(const TradeManagerPtr& tm);
 
-    /** 获取交易管理实例 */
+    /** Get the trade management instance */
     TradeManagerPtr getTM() const;
 
-    /** 设置系统信号指示器 */
+    /** Set the system signal generator */
     void setSG(const SGPtr& sg);
 
-    /** 获取系统信号指示器 */
+    /** Get the system signal generator */
     SGPtr getSG() const;
 
-    /** 获取系统有效的日期列表，注意：和交易对象不等长 */
+    /** Get the valid date list of the system; note: it is not as long as the trading object */
     DatetimeList getDatetimeList() const;
 
     /**
-     * 以指标的形式获取实际值，与交易对象等长，<=0表示无效，>0表示系统有效
-     * @note 带日期的时间序列指标
+     * Get the actual value in the form of an indicator, it is as long as the trading object; <=0
+     * means invalid and >0 means the system is valid
+     * @note A time series indicator with the dates
      */
     Indicator getValues() const;
 
     /**
-     * 加入有效时间，在_calculate中调用
-     * @param datetime 系统有效日期
-     * @param value 值
+     * Add a valid time, it is called in _calculate
+     * @param datetime the valid date of the system
+     * @param value the value
      */
     void _addValid(const Datetime& datetime, price_t value = 1.0);
 
     typedef shared_ptr<ConditionBase> ConditionPtr;
-    /** 克隆操作 */
+    /** Clone operation */
     ConditionPtr clone();
 
     /**
-     * 指定时间系统是否有效
-     * @param datetime 指定时间
-     * @return true 有效 | false 失效
+     * Whether the system is valid at the given time
+     * @param datetime the given time
+     * @return true valid | false invalid
      */
     bool isValid(const Datetime& datetime);
 
-    /** 子类计算接口 */
+    /** Subclass calculation interface */
     virtual void _calculate() = 0;
 
-    /** 子类reset接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual ConditionPtr _clone() = 0;
 
 public:
@@ -123,7 +125,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -135,7 +137,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
+        // m_kdata/m_tm/m_sg are set temporarily when the system runs, they do not need to be
+        // serialized
     }
 
     template <class Archive>
@@ -145,7 +148,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_kdata/m_tm/m_sg是系统运行时临时设置，不需要序列化
+        // m_kdata/m_tm/m_sg are set temporarily when the system runs, they do not need to be
+        // serialized
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -158,7 +162,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(ConditionBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public ConditionBase {
  *     CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -182,7 +187,7 @@ private:                                                        \
 #endif
 
 /**
- * 客户程序都应使用该指针类型
+ * Client programs should all use this pointer type
  * @ingroup Condition
  */
 typedef shared_ptr<ConditionBase> ConditionPtr;

@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 变动率指标 (price / prevPrice) * 100
+ * Rate of change indicator (price / prevPrice) * 100
  * @ingroup Indicator
  */
 Indicator HKU_API ROCR100(int n = 10);

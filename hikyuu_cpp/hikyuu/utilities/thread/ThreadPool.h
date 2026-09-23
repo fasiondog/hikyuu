@@ -27,29 +27,32 @@
 namespace hku {
 
 /**
- * @brief 普通集中式任务队列线程池，任务之间彼此独立不能互相等待
- * @note 任务运行之间如存在先后顺序，请使用 StealThreadPool。
+ * @brief An ordinary centralized task queue thread pool; the tasks are independent of each other
+ * and cannot wait for each other
+ * @note If the tasks have a sequential order, please use StealThreadPool.
  * @details
  * @ingroup ThreadPool
  */
 class ThreadPool {
 public:
     /**
-     * 默认构造函数，创建和当前系统CPU数一致的线程数
+     * Default constructor, it creates the number of the threads equal to the number of the CPUs of
+     * the current system
      */
     ThreadPool() : ThreadPool(std::thread::hardware_concurrency()) {}
 
     /**
-     * 构造函数，创建指定数量的线程
-     * @param n 指定的线程数
-     * @param until_empty join时，等待任务队列为空后停止运行
+     * Constructor, it creates the given number of the threads
+     * @param n the given number of the threads
+     * @param until_empty when joining, it waits for the task queue to be empty and then stops
+     *                    running
      */
     explicit ThreadPool(size_t n, bool until_empty = true)
     : m_done(false), m_worker_num(n), m_running_until_empty(until_empty) {
         try {
-            // 初始完毕所有线程资源后再启动线程
+            // The threads are started after all the thread resources have been initialized
             for (int i = 0; i < m_worker_num; i++) {
-                // 创建工作线程及其任务队列
+                // Create the worker threads and their task queues
                 m_threads.emplace_back(&ThreadPool::worker_thread, this, i);
             }
         } catch (...) {
@@ -59,7 +62,7 @@ public:
     }
 
     /**
-     * 析构函数，等待并阻塞至线程池内所有任务完成
+     * Destructor, it waits and blocks until all the tasks in the thread pool are finished
      */
     ~ThreadPool() {
         if (!m_done) {
@@ -68,12 +71,12 @@ public:
         m_threads.clear();
     }
 
-    /** 获取工作线程数 */
+    /** Get the number of the worker threads */
     size_t worker_num() const {
         return m_worker_num;
     }
 
-    /** 先线程池提交任务后返回的对应 future 的类型 */
+    /** The type of the corresponding future returned after submitting a task to the thread pool */
     template <typename ResultType>
     using task_handle = std::future<ResultType>;
 
@@ -82,7 +85,7 @@ public:
 #pragma warning(disable : 4996)
 #endif
 
-    /** 向线程池提交任务 */
+    /** Submit a task to the thread pool */
     template <typename FunctionType>
     auto submit(FunctionType&& f) {
         if (m_done) {
@@ -99,25 +102,26 @@ public:
 #pragma warning(pop)
 #endif
 
-    /** 返回线程池结束状态 */
+    /** Return the end state of the thread pool */
     bool done() const {
         return m_done;
     }
 
-    /** 剩余任务数 */
+    /** Number of the remaining tasks */
     size_t remain_task_count() const {
         return m_master_work_queue.size();
     }
 
     /**
-     * 等待各线程完成当前执行的任务后立即结束退出
+     * It waits for every thread to finish the currently executed task and then exits immediately
      */
     void stop() {
         if (m_done.exchange(true, std::memory_order_relaxed)) {
             return;
         }
 
-        // 同时加入结束任务指示，以便在dll退出时也能够终止
+        // At the same time the end task indication is added, so that it can also be terminated when
+        // the dll exits
         for (size_t i = 0; i < m_worker_num; i++) {
             m_master_work_queue.push(FuncWrapper());
         }
@@ -137,20 +141,20 @@ public:
     }
 
     /**
-     * 等待并阻塞至线程池内所有任务完成
-     * @note 至此线程池能工作线程结束不可再使用
+     * It waits and blocks until all the tasks in the thread pool are finished
+     * @note From then on the thread pool cannot be used after the worker threads are ended
      */
     void join() {
         if (m_done) {
             return;
         }
 
-        // 指示各工作线程在未获取到工作任务时，停止运行
+        // It instructs every worker thread to stop running when no work task is got
         if (!m_running_until_empty) {
             m_done = true;
         }
 
-        // 仍旧有可能某个线程没有获取到，导致没有终止
+        // It is still possible that some thread does not get it and thus is not terminated
         for (size_t i = 0; i < 2 * m_worker_num; i++) {
             m_master_work_queue.push(FuncWrapper());
         }
@@ -178,20 +182,20 @@ public:
         }
     };
 
-    /** 协程执行器 */
+    /** Coroutine executor */
     ExecutorWrapper executor() {
         return ExecutorWrapper{this};
     }
 
 private:
     typedef FuncWrapper task_type;
-    std::atomic_bool m_done;     // 线程池全局需终止指示
-    size_t m_worker_num;         // 工作线程数量
-    bool m_running_until_empty;  // 任务队列为空时，自动停止运行
+    std::atomic_bool m_done;     // The global termination indication of the thread pool
+    size_t m_worker_num;         // Number of the worker threads
+    bool m_running_until_empty;  // It stops running automatically when the task queue is empty
 
-    ThreadSafeQueue<task_type> m_master_work_queue;  // 主线程任务队列
-    std::vector<std::thread> m_threads;              // 工作线程
-    std::mutex m_mutex_join;                         // 用于保护 joinable
+    ThreadSafeQueue<task_type> m_master_work_queue;  // Task queue of the master thread
+    std::vector<std::thread> m_threads;              // Worker threads
+    std::mutex m_mutex_join;                         // Used to protect joinable
 
     void worker_thread(int index) {
         while (!m_done) {

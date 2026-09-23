@@ -16,6 +16,7 @@ namespace hku {
 
 FixedWeightListAllocateFunds::FixedWeightListAllocateFunds() : AllocateFundsBase("AF_FixedWeightList") {
     setParam<PriceList>("weights", PriceList());
+
 }
 
 FixedWeightListAllocateFunds::~FixedWeightListAllocateFunds() {}
@@ -42,7 +43,7 @@ AllocateFundsBase::Weights FixedWeightListAllocateFunds::_allocate(const Datetim
           date, tm, contexts, query,
           std::vector<double>(contexts.size(), 1.0 / std::max<size_t>(contexts.size(), 1)));
     }
-    // 不归一化：按序逐一取固定比例
+    // Without normalization: take the fixed proportions one by one in order
     return _applyWeights(date, tm, contexts, query, std::vector<double>(ws.begin(), ws.end()));
 }
 

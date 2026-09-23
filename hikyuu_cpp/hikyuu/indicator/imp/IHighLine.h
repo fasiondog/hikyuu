@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2016年4月1日
+ *  Created on: 2016-4-1
  *      Author: fasiondog
  */
 
@@ -16,8 +16,8 @@
 namespace hku {
 
 /*
- * N日内最高价，一般使用最高价数据作为输入
- * 参数： n: N日时间窗口
+ * The highest price within N days, the high price data is generally used as the input
+ * Parameters: n: N-day time window
  */
 class IHighLine : public IndicatorImp {
     INDICATOR_IMP(IHighLine)

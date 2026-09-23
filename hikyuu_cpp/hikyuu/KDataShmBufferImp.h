@@ -11,26 +11,31 @@
 
 namespace hku {
 
-struct KRecordView;  // 定义见 data_driver/KDataDriver.h
+struct KRecordView;  // Defined in data_driver/KDataDriver.h
 
 /**
- * 客户端共享内存零拷贝 K 线视图
- * @details 客户端模式下 NO_RECOVER 查询直接以裸指针视图读取主进程发布的共享内存快照，
- * 不拷贝记录（所有客户端共享同一物理页），与主进程 KDataSharedBufferImp 的零拷贝语义对齐。
- * 视图指针由 m_pin（类型擦除持有 KDataShmReader）pin 住映射，epoch 换代后旧映射仍存活。
- * 仅当驱动支持视图（客户端 IPC 代理驱动且快照覆盖、无需反缩放）时经 create() 构造成功，
- * 否则返回空指针，由上层回退 KDataPrivatedBufferImp 拷贝路径。
- * @note 只读映射：data() 的可写重载返回 const_cast 指针仅为接口兼容，写入将崩溃，
- *       与主进程 KDataSharedBufferImp 的“谨慎使用（强制调整数据）”契约属同类风险。
+ * Zero-copy K-line view of the client shared memory
+ * @details In client mode a NO_RECOVER query directly reads the shared memory snapshot published by
+ * the main process through a raw pointer view, without copying the records (all the clients share
+ * the same physical page), which aligns with the zero-copy semantics of KDataSharedBufferImp in the
+ * main process. The view pointer is pinned by m_pin (which holds a type-erased KDataShmReader), so
+ * the old mapping stays alive after the epoch is replaced. It is constructed successfully through
+ * create() only when the driver supports the view (a client IPC proxy driver with the snapshot
+ * covered and no reverse scaling needed), otherwise a null pointer is returned and the upper layer
+ * falls back to the KDataPrivatedBufferImp copy path.
+ * @note Read-only mapping: the writable overload of data() returns a const_cast pointer only for
+ *       interface compatibility, a write will crash, which is the same kind of risk as the "use
+ * with caution (forced data adjustment)" contract of KDataSharedBufferImp in the main process.
  * @ingroup StockManage
  */
 class HKU_API KDataShmBufferImp : public KDataImp {
 public:
     /**
-     * 工厂：客户端模式下尝试构造共享内存零拷贝视图
-     * @param stock 目标证券
-     * @param query 查询条件（应为 NO_RECOVER，由调用方保证）
-     * @return 成功返回视图 imp；不适用（非客户端/未覆盖/需反缩放/区间无效）返回 nullptr
+     * Factory: try to construct the shared memory zero-copy view in client mode
+     * @param stock the target security
+     * @param query the query condition (should be NO_RECOVER, guaranteed by the caller)
+     * @return the view imp on success; nullptr when it does not apply (not a client / not covered /
+     *         reverse scaling needed / invalid range)
      */
     static KDataImpPtr create(const Stock& stock, const KQuery& query);
 
@@ -75,7 +80,8 @@ public:
     }
 
     virtual KRecord* data() noexcept override {
-        // 只读共享内存映射，写入将崩溃；仅为与 KDataImp 接口兼容（见类注释）
+        // Read-only shared memory mapping, a write will crash; it exists only for compatibility
+        // with the KDataImp interface (see the class comment)
         return const_cast<KRecord*>(m_data);
     }
 
@@ -91,7 +97,7 @@ private:
     size_t m_end{0};
     size_t m_size{0};
     const KRecord* m_data{nullptr};
-    std::shared_ptr<void> m_pin;  ///< 持有 shm 映射存活（类型擦除的 KDataShmReaderPtr）
+    std::shared_ptr<void> m_pin;  ///< Keeps the shm mapping alive (type-erased KDataShmReaderPtr)
 };
 
 } /* namespace hku */

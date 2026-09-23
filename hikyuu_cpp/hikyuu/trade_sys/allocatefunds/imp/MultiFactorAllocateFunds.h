@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  AF_MultiFactor 的语义载体：L1 以 SubSystemContext::score 为权重。
+ *  The semantic carrier of AF_MultiFactor: L1 takes SubSystemContext::score as the weight.
  */
 
 #pragma once
@@ -15,11 +15,11 @@
 namespace hku {
 
 /**
- * 多因子评分权重的资产分配，即直接以 SE 返回的评分作为权重。
- * @details L1 系统级分配以 SubSystemContext::score（MultiSystem 回填的 SE 得分）为权重，不归一化。
- *          全部得分为 0 时回退等权，避免零权重导致无法分配。
- * @note 依赖 MultiSystem 在 L1 前用 SelectorBase::getSelected() 结果回填 score
- *       （见 design.md §5.3 / O2）。
+ * The multi-factor scoring weight asset allocation, i.e. directly taking the scores returned by SE as the weights.
+ * @details The L1 system-level allocation takes SubSystemContext::score (the SE score backfilled by MultiSystem) as the weight, without normalization.
+ *          When all the scores are 0 it falls back to the equal weight, to avoid the zero weight causing the failure to allocate.
+ * @note It depends on MultiSystem backfilling score with the result of SelectorBase::getSelected() before L1
+ *       (see design.md §5.3 / O2).
  * @ingroup AllocateFunds
  */
 class MultiFactorAllocateFunds : public AllocateFundsBase {

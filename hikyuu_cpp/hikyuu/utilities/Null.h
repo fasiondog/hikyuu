@@ -20,12 +20,12 @@ namespace hku {
 
 /**
  * @ingroup Utilities
- * @addtogroup NullTools Null defines Null 值定义
+ * @addtogroup NullTools Null defines, the Null value definitions
  * @{
  */
 
 /**
- * 提供指定给定类型的Null值
+ * It provides the Null value of the given type
  */
 template <typename T>
 class Null {
@@ -37,7 +37,7 @@ public:
 };
 
 /**
- * 提供int的Null值
+ * It provides the Null value of int
  */
 template <>
 class Null<int> {
@@ -49,7 +49,7 @@ public:
 };
 
 /**
- * 提供unsigned int的Null值
+ * It provides the Null value of unsigned int
  */
 template <>
 class Null<unsigned int> {
@@ -61,7 +61,7 @@ public:
 };
 
 /**
- * 提供long long（64位整型）的Null值
+ * It provides the Null value of long long (the 64-bit integer)
  */
 template <>
 class Null<long long> {
@@ -74,7 +74,7 @@ public:
 
 #if !defined(_MSC_VER) && !HKU_OS_OSX
 /**
- * int64_t Null值
+ * The int64_t Null value
  */
 template <>
 class Null<int64_t> {
@@ -87,7 +87,7 @@ public:
 #endif
 
 /**
- * 提供unsigned long long（无符号64位整型）的Null值
+ * It provides the Null value of unsigned long long (the unsigned 64-bit integer)
  */
 template <>
 class Null<unsigned long long> {
@@ -102,7 +102,7 @@ public:
   HKU_OS_IOS || (defined(__GNUC__) && __GNUC__ >= 8) ||                                     \
   (defined(__clang__) && !HKU_OS_ANDROID && !HKU_OS_WINDOWS)
 /**
- * 提供size_t的Null值
+ * It provides the Null value of size_t
  */
 template <>
 class Null<std::size_t> {
@@ -115,7 +115,7 @@ public:
 #endif
 
 /**
- * 提供double的Null值
+ * It provides the Null value of double
  */
 template <>
 class Null<double> {
@@ -144,7 +144,7 @@ inline bool operator==(float val, const Null<double>&) {
 }
 
 /**
- * 提供double的Null值
+ * It provides the Null value of double
  */
 template <>
 class Null<float> {

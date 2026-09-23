@@ -32,7 +32,7 @@ void IBarsCount::_calculate(const Indicator& ind) {
 
     auto* dst = this->data();
 
-    // 如果没有上下文，直接取该指标的discard进行计算
+    // If there is no context, take the discard of this indicator for the calculation directly
     if (stk.isNull()) {
         for (size_t i = m_discard; i < total; i++) {
             dst[i] = i + 1 - m_discard;
@@ -41,7 +41,7 @@ void IBarsCount::_calculate(const Indicator& ind) {
         return;
     }
 
-    // 对于1分钟线取得当日交易分钟数
+    // For the 1-minute line, get the number of the trading minutes of the day
     KQuery q = k.getQuery();
     auto const* krecords = k.data();
     if (q.kType() == KQuery::MIN) {
@@ -59,7 +59,7 @@ void IBarsCount::_calculate(const Indicator& ind) {
         return;
     }
 
-    // 取得上市以来总交易日数
+    // Get the total number of the trading days since the listing
     size_t k_start_pos = k.startPos();
     if (k_start_pos != Null<size_t>()) {
         for (size_t i = m_discard; i < total; i++) {

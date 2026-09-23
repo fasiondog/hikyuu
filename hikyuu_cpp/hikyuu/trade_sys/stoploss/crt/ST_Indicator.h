@@ -1,7 +1,7 @@
 /*
  * ST_Indicator.h
  *
- *  Created on: 2016年4月19日
+ *  Created on: 2016-4-19
  *      Author: Administrator
  */
 

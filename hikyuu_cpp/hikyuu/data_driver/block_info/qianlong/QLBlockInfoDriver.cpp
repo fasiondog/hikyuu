@@ -1,7 +1,7 @@
 /*
  * QLBlockInfoDriver.cpp
  *
- *  Created on: 2015年2月10日
+ *  Created on: 2015-2-10
  *      Author: fasiondog
  */
 
@@ -40,22 +40,22 @@ Block QLBlockInfoDriver ::getBlock(const string& category, const string& name) {
     while (std::getline(inifile, line_str)) {
         trim(line_str);
 
-        // 空行或注释行，跳过
+        // Skip the empty or the comment lines
         if (line_str.empty() || line_str.at(0) == ';') {
             continue;
         }
 
-        // 检查第一个出现的注释符，并将其及其之后的字符清除
+        // Check the first comment marker and clear it together with the following characters
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
             trim(line_str);
         }
 
-        // section行
+        // A section line
         if (line_str.at(0) == '[') {
             if (is_find) {
-                break;  // 跳出循环
+                break;  // Break the loop
             }
             size_t len = line_str.size();
             if (line_str[len - 1] != ']') {
@@ -122,18 +122,18 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
     while (std::getline(inifile, line_str)) {
         trim(line_str);
 
-        // 空行或注释行，跳过
+        // Skip the empty or the comment lines
         if (line_str.empty() || line_str.at(0) == ';')
             continue;
 
-        // 检查第一个出现的注释符，并将其及其之后的字符清除
+        // Check the first comment marker and clear it together with the following characters
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
             trim(line_str);
         }
 
-        // section行
+        // A section line
         if (line_str.at(0) == '[') {
             size_t len = line_str.size();
             if (line_str[len - 1] != ']')
@@ -149,7 +149,7 @@ BlockList QLBlockInfoDriver::getBlockList(const string& category) {
 
         } else {
             if (section.empty())
-                break;  // 缺少section定义，后续无须处理，直接跳出循环
+                break;  // The section definition is missing, no further processing is needed
 
             pos = line_str.find(',');
             if (pos == std::string::npos || pos == line_str.size() - 1)

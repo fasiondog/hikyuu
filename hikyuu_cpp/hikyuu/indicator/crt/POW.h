@@ -16,11 +16,11 @@
 namespace hku {
 
 /**
- * 乘幂
+ * Power
  * @details
  * <pre>
- * 用法：POW(A,B)返回A的B次幂
- * 例如：POW(CLOSE,3)求得收盘价的3次方
+ * Usage: POW(A,B) returns A to the power of B
+ * For example: POW(CLOSE,3) gives the cube of the close price
  * </pre>
  * @ingroup Indicator
  */

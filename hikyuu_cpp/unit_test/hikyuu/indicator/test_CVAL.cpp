@@ -1,7 +1,7 @@
 /*
  * test_CVAL.cpp
  *
- *  Created on: 2017年6月25日
+ *  Created on: 2017-6-25
  *      Author: Administrator
  */
 
@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL") {
     Indicator result;
 
@@ -68,7 +68,7 @@ TEST_CASE("test_CVAL") {
     CHECK_EQ(result.getResultNumber(), 1);
     CHECK_EQ(result[0], 100);
 
-    /** @arg 测试discard, 未指定ind discard=2 */
+    /** @arg Test the discard, the ind discard is not given (=2) */
     result = CVAL(100, 2);
     CHECK_EQ(result.getParam<double>("value"), 100);
     CHECK_EQ(result.getParam<int>("discard"), 2);
@@ -78,7 +78,7 @@ TEST_CASE("test_CVAL") {
     CHECK_EQ(result.getResultNumber(), 1);
     CHECK_UNARY(std::isnan(result[0]));
 
-    /** @arg 测试discard, ind discard=2 */
+    /** @arg Test the discard, the ind discard=2 */
     ind = PRICELIST(d);
     CHECK_EQ(ind.size(), 20);
     result = CVAL(ind, 100, 2);
@@ -93,54 +93,59 @@ TEST_CASE("test_CVAL") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL_nested_size_propagation") {
-    // 修复前: CVAL(one, 10) 中 one=CVAL(10) → 走 Indicator::operator()
-    //   alike(新空壳 ICval, 已计算 CVAL10) 为 true → 短路返回 m_imp 的克隆空壳
-    //   (m_imp 未 calculate, size==0) → 违反 CVAL.h "其长度和输入的ind相同" 契约
-    // 修复后: 复用已计算的 ind, size 正确传播
+    // Before the fix: one=CVAL(10) inside CVAL(one, 10) -> goes through Indicator::operator()
+    //   alike (a new empty shell ICval and the calculated CVAL10) is true -> short-circuits and
+    //   returns a clone of the empty shell m_imp (m_imp was not calculated, size==0) -> violating
+    //   the CVAL.h contract "its length equals that of the input ind"
+    // After the fix: the calculated ind is reused and the size is propagated correctly
 
     Indicator one = CVAL(10);
     CHECK_EQ(one.size(), 1);
     CHECK_EQ(one[0], 10);
     CHECK_EQ(one.discard(), 0);
 
-    // alike==true 嵌套(值相同) → 触发修复后的 return ind
+    // A nested call with alike==true (the same value) -> triggers the fixed return ind
     Indicator two = CVAL(one, 10);
-    CHECK_EQ(two.size(), one.size());  // 修复前 0, 修复后 1
+    CHECK_EQ(two.size(), one.size());  // 0 before the fix and 1 after
     CHECK_EQ(two.discard(), one.discard());
     CHECK_EQ(two[0], 10);
-    // 白盒断言: 验证走的是 return ind 路径(指针复用), 而非克隆空壳
+    // A white box assertion: verify that the return ind path (a pointer reuse) is taken instead of
+    // a cloned empty shell
     CHECK_EQ(two.getImp().get(), one.getImp().get());
 
-    // alike==false 嵌套(值不同 5!=10) → 走正常分支 B(clone + calculate)
+    // A nested call with alike==false (different values 5!=10) -> goes through the normal branch B
+    // (clone + calculate)
     Indicator three = CVAL(two, 5);
     CHECK_EQ(three.size(), 1);
     CHECK_EQ(three.discard(), 0);
     CHECK_EQ(three[0], 5);
-    // 白盒断言: 验证未走短路分支(独立克隆)
+    // A white box assertion: verify that the short-circuit branch (an independent clone) is not
+    // taken
     CHECK_NE(three.getImp().get(), two.getImp().get());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL_nested_state_sharing") {
-    // 修复使 alike==true 时返回 ind(共享底层节点), 而非 m_imp 的独立克隆.
-    // 这是修复引入的语义变更: 返回值与 ind 共享同一 IndicatorImp.
-    // hikyuu 不可变参数语义下, alike 已校验 m_params 相同,
-    // setParam 触发原地重算(不立即改 buffer), 共享安全.
-    // 本用例固化该共享行为为预期不变式.
+    // The fix returns ind (sharing the underlying node) when alike==true instead of an independent
+    // clone of m_imp. This is a semantic change introduced by the fix: the returned value shares
+    // the same IndicatorImp with ind. Under the immutable parameter semantics of hikyuu, alike has
+    // verified that m_params are equal, and setParam triggers an in-place recalculation (without
+    // changing the buffer immediately), so the sharing is safe. This case fixes that sharing
+    // behavior as an expected invariant.
 
     Indicator base = CVAL(100);
     CHECK_EQ(base.size(), 1);
     CHECK_EQ(base[0], 100);
 
-    // 自嵌套: base.operator()(base) → alike(this==other) true → return ind(即 base)
+    // A self nesting: base.operator()(base) -> alike (this==other) true -> return ind (i.e. base)
     Indicator result = base(base);
     CHECK_EQ(result.size(), base.size());
-    // 指针完全相同: AST 裁剪直接复用入参
+    // The pointers are exactly the same: the AST trimming reuses the argument directly
     CHECK_EQ(result.getImp().get(), base.getImp().get());
 
-    // 状态共享立案: 修改 result 的参数同步影响 base(共享同一 imp)
+    // The state sharing case: modifying the parameters of result also affects base (the same imp)
     result.setParam<double>("value", 999.0);
     CHECK_EQ(base.getParam<double>("value"), 999.0);
     CHECK_EQ(result.getParam<double>("value"), 999.0);
@@ -151,7 +156,7 @@ TEST_CASE("test_CVAL_nested_state_sharing") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CVAL_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

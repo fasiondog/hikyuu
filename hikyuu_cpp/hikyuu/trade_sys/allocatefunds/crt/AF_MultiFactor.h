@@ -6,7 +6,7 @@
  *  Created on: 2024-03-30
  *      Author: fasiondog
  *
- *  v5：AF 具备独立类层次（AllocateFundsBase），工厂返回 AFPtr。
+ *  v5: AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
  */
 
 #pragma once
@@ -18,9 +18,10 @@
 namespace hku {
 
 /**
- * 创建 MultiFactor 评分权重的资产分配算法实例，即直接以SE返回的评分作为权重。
- * @details L1 以 SubSystemContext::score 为权重。
- *          依赖 MultiSystem 在 L1 前回填 SE 得分（design.md §5.3 / O2）。
+ * Create an asset allocation algorithm instance with the MultiFactor score weights, i.e. the scores
+ * returned by SE are used as the weights directly.
+ * @details L1 uses SubSystemContext::score as the weight. It depends on MultiSystem back-filling the
+ *          SE score before L1 (design.md §5.3 / O2).
  * @return AFPtr
  * @ingroup AllocateFunds
  */

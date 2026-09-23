@@ -40,7 +40,7 @@ public:
                                           const Datetime& return_datetime, const Stock& stock,
                                           price_t price, double num) const override;
 
-    /** 子类私有变量克隆接口 */
+    /** Clone interface of the private variables of the subclass */
     virtual TradeCostPtr _clone() override;
 };
 

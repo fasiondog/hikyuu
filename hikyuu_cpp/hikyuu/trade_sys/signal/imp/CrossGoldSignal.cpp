@@ -1,7 +1,7 @@
 /*
  * CrossGoldSignal.cpp
  *
- *  Created on: 2017年6月13日
+ *  Created on: 2017-6-13
  *      Author: fasiondog
  */
 

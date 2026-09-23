@@ -11,7 +11,7 @@
 
 namespace hku {
 
-/* note: 双输入但同一上下文*/
+/* note: two inputs but the same context */
 class Indicator2InImp : public IndicatorImp {
 public:
     Indicator2InImp();
@@ -33,7 +33,7 @@ protected:
     Indicator m_ref_ind;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

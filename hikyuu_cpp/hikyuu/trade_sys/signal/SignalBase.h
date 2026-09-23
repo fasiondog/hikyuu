@@ -18,7 +18,7 @@
 namespace hku {
 
 /**
- * 信号指示器基类
+ * Base class of the signal generator
  * @ingroup Signal
  */
 class HKU_API SignalBase : public enable_shared_from_this<SignalBase> {
@@ -31,28 +31,30 @@ public:
     virtual ~SignalBase();
 
     /**
-     * 指定时刻是否可以买入
-     * @param datetime 指定时刻
-     * @return true 可以买入 | false 不可买入
+     * Whether a buy is possible at the given moment
+     * @param datetime the given moment
+     * @return true a buy is possible | false a buy is not possible
      */
     bool shouldBuy(const Datetime& datetime) const;
 
     /**
-     * 指定时刻是否可以卖出
-     * @param datetime 指定时刻
-     * @return true 可以卖出 | false 不可卖出
+     * Whether a sell is possible at the given moment
+     * @param datetime the given moment
+     * @return true a sell is possible | false a sell is not possible
      */
     bool shouldSell(const Datetime& datetime) const;
 
     /**
-     * 获取指定时刻的买入信号数值，返回值小于等于0时，表示无买入信号
+     * Get the buy signal value of the given moment; a value less than or equal to 0 means there is
+     * no buy signal
      * @param datetime
      * @return double
      */
     double getBuyValue(const Datetime& datetime) const;
 
     /**
-     * 获取指定时刻的买出信号数值，返回值大于等于0时，表示无卖出信号
+     * Get the sell signal value of the given moment; a value greater than or equal to 0 means there
+     * is no sell signal
      * @param datetime
      * @return double
      */
@@ -61,46 +63,50 @@ public:
     double getValue(const Datetime& datetime) const;
 
     /**
-     * 下一时刻是否可以买入，相当于最后时刻是否指示买入
+     * Whether a buy is possible at the next moment, equivalent to whether the last moment indicates
+     * a buy
      */
     bool nextTimeShouldBuy() const;
 
     /**
-     * 下一时刻是否可以卖出，相当于最后时刻是否指示卖出
+     * Whether a sell is possible at the next moment, equivalent to whether the last moment
+     * indicates a sell
      */
     bool nextTimeShouldSell() const;
 
-    /** 获取所有买入指示日期列表 */
+    /** Get the date list of all the buy indications */
     DatetimeList getBuySignal() const;
 
-    /** 获取所有卖出指示日期列表 */
+    /** Get the date list of all the sell indications */
     DatetimeList getSellSignal() const;
 
     void _addSignal(const Datetime& datetime, double value);
 
     /**
-     * 加入买入信号，在_calculate中调用
-     * @param datetime 发生买入信号的日期
-     * @param value 信号值，默认为1.0, 必须大于0，否则抛出异常
+     * Add a buy signal, it is called in _calculate
+     * @param datetime the date when the buy signal occurs
+     * @param value signal value, 1.0 by default; it must be greater than 0, otherwise an exception
+     * is thrown
      */
     void _addBuySignal(const Datetime& datetime, double value = 1.0);
 
     /**
-     * 加入卖出信号，在_calculate中调用
-     * @param datetime
-     * @param value 信号值，默认为-1.0，必须小于0，否则抛出异常
+     * Add a sell signal, it is called in _calculate
+     * @param datetime the date when the sell signal occurs
+     * @param value signal value, -1.0 by default; it must be less than 0, otherwise an exception is
+     *              thrown
      */
     void _addSellSignal(const Datetime& datetime, double value = -1.0);
 
     /**
-     * 指定交易对象，指K线数据
-     * @param kdata 指定的交易对象
+     * Set the trading object, it refers to the K-line data
+     * @param kdata the given trading object
      */
     void setTO(const KData& kdata);
 
     /**
-     * 获取交易对象
-     * @return 交易对象(KData)
+     * Get the trading object
+     * @return the trading object (KData)
      */
     const KData& getTO() const;
 
@@ -108,26 +114,26 @@ public:
     const Datetime& getCycleStart() const;
     const Datetime& getCycleEnd() const;
 
-    /** 复位操作 */
+    /** Reset operation */
     void reset();
 
     typedef shared_ptr<SignalBase> SignalPtr;
-    /** 克隆操作 */
+    /** Clone operation */
     SignalPtr clone();
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const;
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name);
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual SignalPtr _clone() = 0;
 
-    /** 子类计算接口，在setTO中调用 */
+    /** Subclass calculation interface, it is called in setTO */
     virtual void _calculate(const KData&) = 0;
 
     bool isPythonObject() const noexcept {
@@ -141,14 +147,14 @@ protected:
     string m_name;
     KData m_kdata;
     bool m_is_python_object{false};
-    bool m_calculated{false};  // 仅针对 setTO 时的计算
+    bool m_calculated{false};  // It is for the calculation at setTO only
 
-    /* 多头持仓 */
+    /* Long positions */
     bool m_hold_long;
-    /* 空头持仓 */
+    /* Short positions */
     bool m_hold_short;
 
-    // 用 map 保存，以便获取时能保持顺序
+    // A map is used for the storage, so that the order can be kept when getting
     std::map<Datetime, double> m_buySig;
     std::map<Datetime, double> m_sellSig;
 
@@ -156,7 +162,7 @@ protected:
     Datetime m_cycle_end;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -170,7 +176,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
-        // m_kdata都是系统运行时临时设置，不需要序列化
+        // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
     }
@@ -184,7 +190,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_hold_short);
         ar& BOOST_SERIALIZATION_NVP(m_buySig);
         ar& BOOST_SERIALIZATION_NVP(m_sellSig);
-        // m_kdata都是系统运行时临时设置，不需要序列化
+        // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
         // ar & BOOST_SERIALIZATION_NVP(m_calculated);
     }
@@ -199,7 +205,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SignalBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public SignalBase {
  *     SIGNAL_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -230,7 +237,7 @@ public:                                       \
     virtual void _calculate(const KData&) override;
 
 /**
- * 客户程序都应使用该指针类型，操作信号指示器
+ * Client programs should all use this pointer type to operate the signal generator
  * @ingroup Signal
  */
 typedef shared_ptr<SignalBase> SignalPtr;

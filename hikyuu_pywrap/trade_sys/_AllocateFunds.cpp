@@ -3,12 +3,15 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  组合级资金分配（AF）绑定。AF 承载 L1/L2/L3 三个可替换算法部件：
- *   - L1 _allocate  子系统上下文 → 权重
- *   - L2 _to_targets 权重       → 父账户可执行数量
- *   - L3 _check_risk 组合风控裁剪
- *  MM 已限定为单系统形态，不再承载组合级分配。
- *  见 docs/design/pf_af_compat/design.md §5
+ *  The portfolio-level fund allocation (AF) binding. AF carries three replaceable algorithm parts
+ *  L1/L2/L3:
+ *   - L1 _allocate   sub-system context -> weight
+ *   - L2 _to_targets weight -> the executable quantity of the parent account
+ *   - L3 _check_risk portfolio risk control clipping
+ *  MM is restricted to the single system form, it no longer carries the portfolio-level allocation.
+ *  See docs/design/pf_af_compat/design.md §5
+ *  Created on: 2016-03-28
+ *      Author: fasiondog
  */
 
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
@@ -37,14 +40,14 @@ public:
         PYBIND11_OVERLOAD(void, AllocateFundsBase, _reset, );
     }
 
-    // L1：子系统上下文 → 权重
+    // L1: sub-system context -> weight
     Weights _allocate(const Datetime& date, const TradeManagerPtr& tm, SubSystemContextList& contexts,
                       const KQuery& query) override {
         PYBIND11_OVERLOAD_NAME(Weights, AllocateFundsBase, "_allocate", _allocate, date, tm, contexts,
                                query);
     }
 
-    // L2：权重 → 父账户可执行数量
+    // L2: weight -> the executable quantity of the parent account
     void _toTargets(const Datetime& date, const TradeManagerPtr& tm,
                     TradeSuggestionList& suggestions, const Weights& sys_weight,
                     const KQuery& query) override {
@@ -52,7 +55,7 @@ public:
                                suggestions, sys_weight, query);
     }
 
-    // L3：组合风控裁剪
+    // L3: portfolio risk control clipping
     void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
                     TradeSuggestionList& suggestions, const KQuery& query) override {
         PYBIND11_OVERLOAD_NAME(void, AllocateFundsBase, "_check_risk", _checkRisk, date, tm,
@@ -63,118 +66,119 @@ public:
 void export_AllocateFunds(py::module& m) {
     py::class_<AllocateFundsBase, AllocateFundsPtr, PyAllocateFundsBase>(
       m, "AllocateFundsBase", py::dynamic_attr(),
-      R"(组合级资金分配（AF）基类，仅聚合系统（MultiSystem）使用
+      R"(The portfolio-level fund allocation (AF) base class, used by the aggregate system (MultiSystem) only
 
-AF 由三个可替换算法部件构成（各自对应一个重载接口）：
+AF is composed of three replaceable algorithm parts (each of them corresponds to one overload interface):
 
-    - _allocate   【必须】L1 系统级分配：子系统上下文 → 权重
-    - _to_targets 【可选】L2 行为级换算：权重 → 父账户可执行数量
-    - _check_risk 【可选】L3 组合风控裁剪
+    - _allocate   [Required] L1 system-level allocation: sub-system context -> weight
+    - _to_targets [Optional] L2 behavior-level conversion: weight -> the executable quantity of the parent account
+    - _check_risk [Optional] L3 portfolio risk control clipping
 
-公共参数：
+Common parameters:
 
-    - max-single-position=1.0 (float) : L3 单标的集中度上限（占总资产比例），<=0 或 >=1 表示不限制
-    - weight-list="" (str) : L1 固定权重列表（逗号分隔），非空时按序覆盖等权默认
-    - fixed-amount=0.0 (float) : L2 固定金额；模式 A 为每标的目标市值，模式 B 为每子系统额度)")
+    - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the total assets); <=0 or >=1 means no limit
+    - weight-list="" (str) : the L1 fixed weight list (comma separated); when it is not empty it overrides the equal weight default in order
+    - fixed-amount=0.0 (float) : the L2 fixed amount; in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system)")
       .def(py::init<>())
       .def(py::init<const AllocateFundsBase&>())
-      .def(py::init<const string&>(), R"(初始化构造函数
+      .def(py::init<const string&>(), R"(The initialization constructor
 
-    :param str name: 名称)")
+    :param str name: the name)")
 
       .def("__str__", to_py_str<AllocateFundsBase>)
       .def("__repr__", to_py_str<AllocateFundsBase>)
 
       .def_property("name", py::overload_cast<>(&AllocateFundsBase::name, py::const_),
                     py::overload_cast<const string&>(&AllocateFundsBase::name),
-                    py::return_value_policy::copy, "名称")
+                    py::return_value_policy::copy, "The algorithm component name")
       .def_property("tm", &AllocateFundsBase::getTM, &AllocateFundsBase::setTM,
-                    "设置或获取交易管理对象")
+                    "Set or get the trade management object")
       .def_property("query", &AllocateFundsBase::getQuery, &AllocateFundsBase::setQuery,
-                    py::return_value_policy::copy, "设置或获取查询条件")
+                    py::return_value_policy::copy, "Set or get the query condition")
       .def_property("mode", &AllocateFundsBase::getMode, &AllocateFundsBase::setMode,
-                    py::return_value_policy::copy, "分配模式：A（信号汇总）/ B（资金划拨）")
+                    py::return_value_policy::copy,
+                    "The allocation mode: A (signal aggregation) / B (fund allocation)")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (AllocateFundsBase::*)(const std::string&, const boost::any&)>(
              &AllocateFundsBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &AllocateFundsBase::haveParam, "是否存在指定参数")
-      .def("reset", &AllocateFundsBase::reset, "复位操作")
-      .def("clone", &AllocateFundsBase::clone, "克隆操作")
+      .def("have_param", &AllocateFundsBase::haveParam, "Whether the specified parameter exists")
+      .def("reset", &AllocateFundsBase::reset, "The reset operation")
+      .def("clone", &AllocateFundsBase::clone, "The clone operation")
 
       .def("allocate", &AllocateFundsBase::allocate, py::arg("date"), py::arg("tm"),
            py::arg("suggestions"), py::arg("contexts"), py::arg("query"),
            R"(allocate(self, date, tm, suggestions, contexts, query)
 
-    L1/L2/L3 统一入口（通常由 MultiSystem 内部调用）)")
+    The unified entry of L1/L2/L3 (usually called by MultiSystem internally))")
 
       .def("_allocate", &AllocateFundsBase::_allocate, py::arg("date"), py::arg("tm"),
            py::arg("contexts"), py::arg("query"),
            R"(_allocate(self, date, tm, contexts, query)
 
-    【重载接口】L1 系统级分配：由子系统上下文决定各子系统权重
+    [Overload interface] L1 system-level allocation: decide the weight of every sub-system by the sub-system context
 
-    :return: 权重表 { System: weight })")
+    :return: the weight table { System: weight })")
 
       .def("_to_targets", &AllocateFundsBase::_toTargets, py::arg("date"), py::arg("tm"),
            py::arg("suggestions"), py::arg("sys_weight"), py::arg("query"),
            R"(_to_targets(self, date, tm, suggestions, sys_weight, query)
 
-    【重载接口】L2 行为级换算：将权重换算为父账户可执行数量，就地改写 suggestions)")
+    [Overload interface] L2 behavior-level conversion: convert the weights into the executable quantity of the parent account, rewrite suggestions in place)")
 
       .def("_check_risk", &AllocateFundsBase::_checkRisk, py::arg("date"), py::arg("tm"),
            py::arg("suggestions"), py::arg("query"),
            R"(_check_risk(self, date, tm, suggestions, query)
 
-    【重载接口】L3 组合风控裁剪，就地改写 suggestions 数量)")
+    [Overload interface] L3 portfolio risk control clipping, rewrite the quantity of suggestions in place)")
 
       .def("_reset", &AllocateFundsBase::_reset,
-           R"(【重载接口】子类复位接口，复位内部私有变量)")
+           R"([Overload interface] The subclass reset interface, reset the internal private variables)")
 
         DEF_PICKLE(AllocateFundsPtr);
 
     //--------------------------------------------------------------------------------------
-    // AF 内置算法
+    // The built-in AF algorithms
     m.def("AF_EqualWeight", AF_EqualWeight, R"(AF_EqualWeight()
 
-    等权重资产分配，对选中的资产进行等比例分配（L1 等权 1/N）)");
+    The equal weight asset allocation; allocate the selected assets with an equal ratio (L1 equal weight 1/N))");
 
     m.def("AF_FixedAmount", AF_FixedAmount, py::arg("amount") = 20000.0, R"(AF_FixedAmount(amount=20000.0)
 
-    固定金额资产分配（L1 等权 + L2 固定金额）
+    The fixed amount asset allocation (L1 equal weight + L2 fixed amount)
 
-    :param float amount: 交易最大金额)");
+    :param float amount: the maximum trading amount)");
 
     m.def("AF_FixedWeight", AF_FixedWeight, py::arg("weight") = 0.1, R"(AF_FixedWeight(weight=0.1)
 
-    固定比例资产分配（L1 直接返回固定比例，不归一化）
+    The fixed proportion asset allocation (L1 returns the fixed proportion directly, without normalization)
 
-    :param float weight: 指定的资产比例 (0, 1])");
+    :param float weight: the specified asset proportion (0, 1])");
 
     m.def("AF_FixedWeightList", AF_FixedWeightList, py::arg("weights"),
           R"(AF_FixedWeightList(weights)
 
-    固定比例列表资产分配（L1 按序取 weights[i]，不归一化）
+    The fixed proportion list asset allocation (L1 takes weights[i] in order, without normalization)
 
-    :param list weights: 指定的资产比例列表)");
+    :param list weights: the specified asset proportion list)");
 
     m.def("AF_MultiFactor", AF_MultiFactor, R"(AF_MultiFactor()
 
-    创建 MultiFactor 评分权重的资产分配算法实例, 即直接以SE返回的评分作为权重。)");
+    Create a MultiFactor scoring weight asset allocation algorithm instance, i.e. directly using the scores returned by the SE as the weights.)");
 }

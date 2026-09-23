@@ -1,7 +1,7 @@
 /*
  * SubSystemContext.h
  *
- *  递归组合重构：AF 的 L1 上下文（含模式 B 额度）
+ *  Recursive combination refactoring: the L1 context of AF (including the mode B quota)
  */
 
 #pragma once
@@ -19,20 +19,20 @@ namespace hku {
 
 using json = nlohmann::json;
 
-class System;  // 前向声明，避免与 System.h 形成包含环（System.h 已包含 MoneyManagerBase.h）
+class System;  // Forward declaration, to avoid a circular include with System.h (System.h already includes MoneyManagerBase.h)
 
 /**
- * AF 的 L1 上下文（含模式 B 额度）
- * @note 聚合 System 在驱动子系统前，构造该上下文供 AF 进行系统级分配
+ * The L1 context of AF (including the mode B quota)
+ * @note Before driving the sub-systems, the aggregate System constructs this context for AF to perform the system-level allocation
  */
 struct HKU_API SubSystemContext {
     std::shared_ptr<System> sys;
-    FundsRecord funds;          // 子系统虚拟账户当前资金
-    PriceList profit_curve;     // 至当前的收益曲线（父缓存 + 增量追加）
+    FundsRecord funds;          // The current funds of the sub-system virtual account
+    PriceList profit_curve;     // The profit curve up to now (the parent cache + the incremental append)
     double total_return{0.0};
-    double current_weight{0.0};  // 该子系统当前在父账户中的实际占比
-    double score{0.0};           // 调仓日 SE 得分（非调仓日/未选中为 0），供 AF_MultiFactor 等以得分为权重
-    price_t quota{0.0};          // 【模式 B】分配给该子系统的额度（写入其虚拟账户）
+    double current_weight{0.0};  // The actual proportion of this sub-system in the parent account
+    double score{0.0};           // The SE score on the rebalancing day (0 on the non-rebalancing days / for the unselected), used by AF_MultiFactor etc. to take the scores as the weights
+    price_t quota{0.0};          // [Mode B] the quota allocated to this sub-system (written into its virtual account)
     size_t suggestion_count{0};
     json ext;
 };

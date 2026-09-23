@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2026 hikyuu.org
  *
- *  Created on: 2026年6月9日
+ *  Created on: 2026-6-9
  *      Author: fasiondog
  */
 
@@ -22,11 +22,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点：测试基本功能和符号保留特性 */
+/** @par Test point: test the basic functionality and the sign preservation */
 TEST_CASE("test_SIGNED_POWER") {
     Indicator result;
 
-    // 测试正数、负数和0的组合
+    // Test the combination of the positive numbers, the negative numbers and 0
     PriceList a;
     a.push_back(-2);
     a.push_back(-1);
@@ -36,14 +36,14 @@ TEST_CASE("test_SIGNED_POWER") {
 
     Indicator data = PRICELIST(a);
 
-    // 测试3次方 - 验证符号保留
+    // Test the cube - verify the sign preservation
     result = SIGNED_POWER(data, 3);
     CHECK_EQ(result.name(), "SIGNED_POWER");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 5);
-    // (-2)^3 = -8，保留负号
+    // (-2)^3 = -8, the negative sign is kept
     CHECK_EQ(result[0], doctest::Approx(-8.0));
-    // (-1)^3 = -1，保留负号
+    // (-1)^3 = -1, the negative sign is kept
     CHECK_EQ(result[1], doctest::Approx(-1.0));
     // 0^3 = 0
     CHECK_EQ(result[2], doctest::Approx(0.0));
@@ -52,13 +52,14 @@ TEST_CASE("test_SIGNED_POWER") {
     // 2^3 = 8
     CHECK_EQ(result[4], doctest::Approx(8.0));
 
-    // 测试2次方 - 验证符号保留（负数平方应为负数的平方，但保留符号）
+    // Test the square - verify the sign preservation (the square of a negative number keeps the
+    // sign)
     result = SIGNED_POWER(data, 2);
     CHECK_EQ(result.name(), "SIGNED_POWER");
     CHECK_EQ(result.discard(), 0);
-    // (-2)^2 = -4（保留负号）
+    // (-2)^2 = -4 (the negative sign is kept)
     CHECK_EQ(result[0], doctest::Approx(-4.0));
-    // (-1)^2 = -1（保留负号）
+    // (-1)^2 = -1 (the negative sign is kept)
     CHECK_EQ(result[1], doctest::Approx(-1.0));
     // 0^2 = 0
     CHECK_EQ(result[2], doctest::Approx(0.0));
@@ -67,28 +68,28 @@ TEST_CASE("test_SIGNED_POWER") {
     // 2^2 = 4
     CHECK_EQ(result[4], doctest::Approx(4.0));
 
-    // 测试单个数值
+    // Test a single value
     result = SIGNED_POWER(-11, 3);
     CHECK_EQ(result.name(), "SIGNED_POWER");
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
-    // -11^3 = -1331，保留负号
+    // -11^3 = -1331, the negative sign is kept
     CHECK_EQ(result[0], doctest::Approx(-1331.0));
 
     result = SIGNED_POWER(5, 3);
     CHECK_EQ(result[0], doctest::Approx(125.0));
 }
 
-/** @par 检测点：测试动态参数版本 */
+/** @par Test point: test the dynamic parameter version */
 TEST_CASE("test_SIGNED_POWER_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
     Indicator c = CLOSE(kdata);
 
-    // 使用整数参数作为参考
+    // Use an integer parameter as the reference
     Indicator expect = SIGNED_POWER(c, 3);
 
-    // 测试使用CVAL作为动态参数
+    // Test using CVAL as the dynamic parameter
     Indicator result = SIGNED_POWER(c, CVAL(c, 3));
     CHECK_EQ(expect.size(), result.size());
     CHECK_EQ(expect.discard(), result.discard());
@@ -96,7 +97,7 @@ TEST_CASE("test_SIGNED_POWER_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 
-    // 测试使用IndParam包装的动态参数
+    // Test the dynamic parameter wrapped with IndParam
     result = SIGNED_POWER(c, IndParam(CVAL(c, 3)));
     CHECK_EQ(expect.size(), result.size());
     CHECK_EQ(expect.discard(), result.discard());
@@ -110,7 +111,7 @@ TEST_CASE("test_SIGNED_POWER_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SIGNED_POWER_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

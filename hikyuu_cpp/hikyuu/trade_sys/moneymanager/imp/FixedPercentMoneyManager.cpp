@@ -1,7 +1,7 @@
 /*
  * PercentRiskMoneyManager.cpp
  *
- *  Created on: 2015年4月4日
+ *  Created on: 2015-4-4
  *      Author: fasiondog
  */
 
@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::FixedPercentMoneyManager)
 namespace hku {
 
 FixedPercentMoneyManager::FixedPercentMoneyManager() : MoneyManagerBase("MM_FixedPercent") {
-    setParam<double>("p", 0.02);  // 总资产百分比
+    setParam<double>("p", 0.02);  // Percentage of the total assets
 }
 
 FixedPercentMoneyManager::~FixedPercentMoneyManager() {}

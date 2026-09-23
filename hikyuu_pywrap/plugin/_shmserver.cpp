@@ -17,24 +17,24 @@ void export_plugin_shmserver(py::module& m) {
       py::arg("publish_shm") = true, py::arg("recv_spot") = true,
       R"(start_shm_server(datadir: str='', publish_shm: bool=True, recv_spot: bool=True) -> bool
 
-    在当前进程内启动 shm(共享内存)数据服务，供其他 hikyuu 进程作为客户端零拷贝读取，避免多进程重复加载数据。
-    服务由独立插件 shmserver 提供（VIP 插件，需有效授权）。
-    客户端进程需显式开启 use_shm_server（配置文件或 load_hikyuu(use_shm_server=True)）才会接入本服务。
+    Start the shm (shared memory) data server within the current process, for the other hikyuu processes to read with zero copy as the clients, avoiding the repeated data loading of the multiple processes.
+    The service is provided by the standalone shmserver plugin (a VIP plugin, requiring a valid license).
+    The client processes need to explicitly enable use_shm_server (in the configuration file or load_hikyuu(use_shm_server=True)) to join this service.
 
-    须在 hikyuu 初始化之后调用（import hikyuu 默认完成初始化）；早于初始化调用会因数据未就绪而返回 False。
+    It must be called after the hikyuu initialization (import hikyuu completes the initialization by default); calling it before the initialization will return False because the data is not ready.
 
-    :param str datadir: 数据目录，为空时使用当前 StockManager 数据目录
-    :param bool publish_shm: 是否发布两类共享内存快照（K线热数据 + 基础信息）
-    :param bool recv_spot: 是否由本进程接收实时行情（内部订阅 quotation_server 并驱动实时更新）
-    :return: 启动成功返回 True；本进程已处于客户端模式、插件缺失或授权无效时返回 False)");
+    :param str datadir: the data directory; when it is empty, the current StockManager data directory is used
+    :param bool publish_shm: whether to publish the two kinds of the shared memory snapshots (the K-line hot data + the basic information)
+    :param bool recv_spot: whether this process receives the real-time market data (internally subscribing to quotation_server and driving the real-time updates)
+    :return: return True when started successfully; return False when this process is already in the client mode, the plugin is missing or the license is invalid)");
 
     m.def("stop_shm_server", stopShmServer, R"(stop_shm_server() -> None
 
-    停止当前进程内的 shm 数据服务，释放共享内存段并注销相关挂钩)");
+    Stop the shm data server within the current process, releasing the shared memory segments and unregistering the related hooks)");
 
     m.def("is_shm_server_running", isShmServerRunning, R"(is_shm_server_running() -> bool
 
-    查询当前进程内的 shm 数据服务是否在运行
+    Query whether the shm data server within the current process is running
 
-    :return: 运行中返回 True，否则 False)");
+    :return: return True when running, otherwise False)");
 }

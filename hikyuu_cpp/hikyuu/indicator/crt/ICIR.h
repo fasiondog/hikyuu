@@ -13,19 +13,24 @@
 namespace hku {
 
 /**
- * @brief 计算指定的因子相对于参考证券的 ICIR （实际为 RankIC）
- * @details IR:信息比率(Information Ratio,简称IR)=
- * IC的多周期均值/IC的标准方差，代表因子获取稳定Alpha的能力。
- * @note IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
- *       天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
- *       如需严格“t 时刻因子值→t+1 时刻收益“计算，请设置 strict=True (注意此模式下, 后n位为 NA)
- * @param ind 因子公式
- * @param stks 证券组合
- * @param query 查询条件
- * @param n IC对应的N日收益率
- * @param rolling_n 滚动时间窗口
- * @param spearman 使用 spearman 相关系数，否则为 pearson
- * @param strict 是否严格模式
+ * @brief Calculate the ICIR of the given factor relative to the reference security (actually
+ * RankIC)
+ * @details IR: Information Ratio (IR for short) =
+ * the multi-period mean of the IC / the standard deviation of the IC, it represents the ability of
+ * the factor to obtain a stable Alpha.
+ * @note The IC originally needs "the factor value at t -> the return at t+1"; here it is changed
+ *       to calculating "the factor value at t -> the return of the N
+ *       days before t" (such as the return of the past 5 days), which is called the "current IC".
+ *       (Otherwise the current values would all be missing NA)
+ *       If a strict "the factor value at t -> the return at t+1" calculation is needed, please set
+ *       strict=True (note that in this mode the last n values are NA)
+ * @param ind factor formula
+ * @param stks the security portfolio
+ * @param query query condition
+ * @param n the N-day return corresponding to the IC
+ * @param rolling_n the rolling time window
+ * @param spearman use the spearman correlation coefficient, otherwise pearson
+ * @param strict whether it is the strict mode
  * @return Indicator
  * @ingroup Indicator
  */

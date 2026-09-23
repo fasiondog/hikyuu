@@ -14,12 +14,14 @@
 namespace hku {
 
 /**
- * 获利盘比例
+ * Proportion of the profitable positions
  * @details
  * <pre>
- * 用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
- * 例如: 返回0.1表示10%获利盘;WINNER(10.5)表示10.5元价格的获利盘比例
- * 该函数仅对日线分析周期有效。
+ * Usage: WINNER(CLOSE) means the proportion of the profitable positions if sold at the current
+ * close price.
+ * For example: returning 0.1 means 10% of the positions are profitable; WINNER(10.5) means the
+ * proportion of the profitable positions at the price of 10.5 yuan
+ * This function is valid for the daily analysis period only.
  * </pre>
  * @ingroup Indicator
  */

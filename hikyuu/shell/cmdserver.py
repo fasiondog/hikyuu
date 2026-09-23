@@ -105,12 +105,12 @@ def set_server_logger_level(logger, level):
 
 def server(self, args):
     """
-    start: 启动服务，无参数时，默认为start
-    stop: 停止服务
-    status: 查看当前服务器运行状态
-    set_logger_level: 设置 logger 级别 
-        logger(str): （可选）logger 名称
-        level(int): 打印级别
+    start: start the service; when there is no argument, defaults to start
+    stop: stop the service
+    status: check the current running status of the server
+    set_logger_level: set the logger level
+        logger(str): (optional) the logger name
+        level(int): the print level
     """
     if args == "":
         start_server()

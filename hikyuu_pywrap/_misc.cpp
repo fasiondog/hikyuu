@@ -16,34 +16,35 @@ void export_misc(py::module& m) {
           py::arg("reset") = false, py::arg("reset_all") = false,
           R"(parallel_run_sys(sys_list, query[, reset=False, reset_all=False])
 
-  并行运行多个系系统, 并返回 list FundsList, 各账户对应资产（按query时间段）
+  Run multiple systems in parallel, and return a list of FundsList, the assets of each account (within the query time range)
 
-  :param sys_list: 系统列表
-  :param query: 查询条件
-  :param bool reset: 执行前是否依据系统部件共享属性复位
-  :param bool reset_all: 强制复位所有部件)");
+  :param sys_list: the system list
+  :param query: the query condition
+  :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
+  :param bool reset_all: forcibly reset all the parts)");
+
 
 
 
     m.def("get_funds_list", &getFundsList,
           R"(parallel_get_funds_list(tm_list: list, ref_dates: DatetimeList) -> list[Funds])
     
-    一次性从多个账户中获取多个指定时刻的账户资金信息
+    Get the account fund information of multiple specified moments from multiple accounts at once
 
-    :param list tm_list: 账户列表
-    :param DatetimeList ref_dates: 获取时刻列表
-    :return: 账户资金列表)");
+    :param list tm_list: the account list
+    :param DatetimeList ref_dates: the list of the moments to get
+    :return: the list of the account funds)");
 
     m.def(
       "get_performance_list", &getPerformanceList, py::arg("tm_list"),
       py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY, py::arg("ext") = true,
       R"(get_performance_list(tm_list: list, datetime: Datetime = now(), ktype: KType = DAY, ext: bool = True) -> list[Performance])
     
-    一次性获取多个账户的指定时刻的账户表现
+    Get the account performance of multiple accounts at the specified moment at once
 
-    :param list tm_list: 账户列表
-    :param Datetime datetime: 指定时刻
-    :param KType ktype: 指定K线类型
-    :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为基础统计项）
+    :param list tm_list: the account list
+    :param Datetime datetime: the specified moment
+    :param KType ktype: the specified K-line type
+    :param bool ext: whether to count the extended information (requiring the donating user permission; otherwise, they are still the basic statistics items)
     )");
 }

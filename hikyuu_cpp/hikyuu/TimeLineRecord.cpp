@@ -1,7 +1,7 @@
 /*
  * TimeLineRecord.cpp
  *
- *  Created on: 2019年1月27日
+ *  Created on: 2019-1-27
  *      Author: fasiondog
  */
 

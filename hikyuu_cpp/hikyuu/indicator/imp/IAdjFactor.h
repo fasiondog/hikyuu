@@ -11,7 +11,7 @@
 
 namespace hku {
 
-// 后复权累计比例因子
+// Cumulative backward adjustment ratio factor
 class IAdjFactor : public IndicatorImp {
     INDICATOR_IMP(IAdjFactor)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

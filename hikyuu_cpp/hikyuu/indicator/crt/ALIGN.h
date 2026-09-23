@@ -20,7 +20,7 @@ namespace hku {
 #endif
 
 /**
- * 按指定日期对齐
+ * Align by the given dates
  * @ingroup Indicator
  */
 Indicator HKU_API ALIGN(bool fill_null = true);

@@ -47,7 +47,7 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Signal") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -56,7 +56,7 @@ TEST_CASE("test_Signal") {
     SignalTest *p_src = (SignalTest *)p.get();
 
     SUBCASE("Basic operation") {
-        /** @arg 基本操作 */
+        /** @arg The basic operation */
         CHECK_EQ(p_src->getX(), 0);
         CHECK_EQ(p->name(), "SignalBase");
         p->name("SignalTest");
@@ -70,7 +70,7 @@ TEST_CASE("test_Signal") {
         p->_addSellSignal(Datetime(200101030000));
         CHECK_EQ(p->shouldSell(Datetime(200101030000)), true);
 
-        /** @arg 克隆操作 */
+        /** @arg The clone operation */
         p_src->setX(10);
         SignalPtr p_clone = p->clone();
         CHECK_NE(p, p_clone);
@@ -79,7 +79,7 @@ TEST_CASE("test_Signal") {
         CHECK_EQ(p_clone->shouldBuy(Datetime(200101010000)), true);
         CHECK_EQ(p_clone->shouldSell(Datetime(200101030000)), true);
 
-        /** @arg 插入重复买入日期 */
+        /** @arg Insert a duplicate buy date */
         p->reset();
         p->setParam<bool>("alternate", true);
         REQUIRE(!p->shouldBuy(Datetime(200201010000)));
@@ -96,7 +96,7 @@ TEST_CASE("test_Signal") {
         p->_addBuySignal(Datetime(200201010000));
         CHECK_UNARY(p->shouldBuy(Datetime(200201010000)));
 
-        /** @arg 插入重复卖出日期 */
+        /** @arg Insert a duplicate sell date */
         p->reset();
         p->setParam<bool>("alternate", true);
         p->_addBuySignal(Datetime(200201010000));
@@ -114,7 +114,7 @@ TEST_CASE("test_Signal") {
         p->_addSellSignal(Datetime(200201020000));
         CHECK_UNARY(p->shouldSell(Datetime(200201020000)));
 
-        /** @arg 插入买入日期已经存在卖出指示 */
+        /** @arg Insert a buy date that already has a sell indication */
         p->reset();
         p->setParam<bool>("alternate", false);
         p->_addSellSignal(Datetime(200202010000));
@@ -130,7 +130,7 @@ TEST_CASE("test_Signal") {
         p->_addBuySignal(Datetime(200202010000));
         CHECK_UNARY(!p->shouldBuy(Datetime(200202010000)));
 
-        /** @arg 插入卖出日期已经存在买入指示 */
+        /** @arg Insert a sell date that already has a buy indication */
         p->reset();
         p->setParam<bool>("alternate", false);
         p->_addBuySignal(Datetime(200202010000));
@@ -164,8 +164,7 @@ TEST_CASE("test_Signal") {
     }
 }
 
-
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Signal_clone_cycle_bounds") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -184,14 +183,14 @@ TEST_CASE("test_Signal_clone_cycle_bounds") {
     CHECK_EQ(p->getCycleStart(), t0);
     CHECK_EQ(p->getCycleEnd(), t1);
 
-    /** @arg clone 后周期边界必须完整复制，不能把 end 写成 start */
+    /** @arg After clone the cycle boundary must be copied completely, end must not become start */
     SignalPtr c = p->clone();
     CHECK_NE(p, c);
     CHECK_EQ(c->getCycleStart(), t0);
     CHECK_EQ(c->getCycleEnd(), t1);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Signal_clone_operator_behavior") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -202,7 +201,7 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
     Datetime t1 = k[10].datetime;
     REQUIRE(t0 < t1);
 
-    // 父信号：cycle=true，已 startCycle（模拟 Operator 父节点持有周期边界）
+    // The parent signal: cycle=true and startCycle already called (an Operator parent holds it)
     SignalPtr parent(new SignalTest);
     parent->setParam<bool>("cycle", true);
     parent->setTO(k);
@@ -210,15 +209,15 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
     CHECK_EQ(parent->getCycleStart(), t0);
     CHECK_EQ(parent->getCycleEnd(), t1);
 
-    // clone 后边界必须完整；修前 end 会变成 t0
+    // The boundary must be complete after clone; before the fix end became t0
     SignalPtr cloned = parent->clone();
     CHECK_EQ(cloned->getCycleStart(), t0);
     CHECK_EQ(cloned->getCycleEnd(), t1);
 
-    // 模拟 OperatorSignal::sub_sg_calculate 的级联：
+    // Simulate the cascading of OperatorSignal::sub_sg_calculate:
     //   child->startCycle(parent.m_cycle_start, parent.m_cycle_end)
-    // 修前：startCycle(t0, t0) 触发 HKU_CHECK(start < close)
-    // 修后：startCycle(t0, t1) 合法通过并产生买入信号
+    // Before the fix: startCycle(t0, t0) triggers HKU_CHECK(start < close)
+    // After the fix: startCycle(t0, t1) passes legally and produces a buy signal
     auto child = SG_Cycle();
     child->setTO(k);
     REQUIRE_NOTHROW(child->startCycle(cloned->getCycleStart(), cloned->getCycleEnd()));

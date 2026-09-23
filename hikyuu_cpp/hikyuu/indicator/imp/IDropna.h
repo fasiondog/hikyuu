@@ -23,7 +23,7 @@ public:
     IDropna();
     virtual ~IDropna() override;
 
-    // 禁止子节点合并, 上级默认已为 false
+    // Forbid the child node merging, it is already false by default at the upper level
     // virtual bool selfAlike(const IndicatorImp& other) const noexcept override {
     //     return false;
     // }

@@ -26,27 +26,30 @@ namespace hku {
  */
 
 /**
- * Hikyuu核心初始化，客户端必须在程序入口处调用
- * @param config_file_name 配置信息文件名
- * @param ignore_preload 忽略配置信息中的预加载设置，即不加载数据至内存。
- *                       用于某些场合启动hikyuu，但仅用于获取数据库的基本信息。
- * @param context 指定加载数据上下文，用于独立策略时仅加载指定的股票数据
+ * Hikyuu core initialization, the client must call it at the program entry
+ * @param config_file_name config file name
+ * @param ignore_preload ignore the preload settings in the config, i.e. do not load the data into
+ *                        memory. Used in the cases where hikyuu is started only to get the basic
+ *                        information of the database.
+ * @param context the given data loading context, used to load the given stock data only when the
+ *                strategy runs standalone
  */
 void HKU_API hikyuu_init(const string& config_file_name, bool ignore_preload = false,
                          const StrategyContext& context = StrategyContext({"all"}));
 
 /**
- * @brief 尝试从默认配置文件获取配置参数进行初始化
- * @param context 策略上下文
- * @param ignore_preload 忽略配置信息中的预加载设置，即不加载数据至内存。
- *                       用于某些场合启动hikyuu，但仅用于获取数据库的基本信息。
+ * @brief Try to get the config parameters from the default config file to initialize
+ * @param context strategy context
+ * @param ignore_preload ignore the preload settings in the config, i.e. do not load the data into
+ *                        memory. Used in the cases where hikyuu is started only to get the basic
+ *                        information of the database.
  */
 void HKU_API hikyuu_init(const StrategyContext& context = StrategyContext({"all"}),
                          bool ignore_preload = false);
 
 /**
- * @brief 尝试从 ini 文件获取配置参数
- * @param config_file_name ini 文件名
+ * @brief Try to get the config parameters from the ini file
+ * @param config_file_name ini file name
  * @param baseParam [out]
  * @param blockParam [out]
  * @param kdataParam [out]

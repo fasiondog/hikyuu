@@ -1,7 +1,9 @@
 /*
  * build_in.h
  *
- *  v5：AF 独立类层次（AllocateFundsBase），见 docs/design/pf_af_compat/design.md §5
+ *  v5: AF independent class hierarchy (AllocateFundsBase), see docs/design/pf_af_compat/design.md §5
+ *  Created on: 2018-2-1
+ *      Author: fasiondog
  */
 
 #pragma once

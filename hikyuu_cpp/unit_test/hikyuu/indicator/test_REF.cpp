@@ -1,7 +1,7 @@
 /*
  * test_REF.cpp
  *
- *  Created on: 2015年3月21日
+ *  Created on: 2015-3-21
  *      Author: fasiondog
  */
 
@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REF") {
     Indicator result;
 
@@ -56,7 +56,7 @@ TEST_CASE("test_REF") {
     CHECK_EQ(result.discard(), 10);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REF_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -80,7 +80,7 @@ TEST_CASE("test_REF_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
-    
+
     auto temp = IF(CVAL(1), 9, 10);
     result = REF(CLOSE(), temp + 1);
     result.setContext(kdata);
@@ -100,8 +100,6 @@ TEST_CASE("test_REF_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
-
-
 }
 
 //-----------------------------------------------------------------------------
@@ -109,7 +107,7 @@ TEST_CASE("test_REF_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REF_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

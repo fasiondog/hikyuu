@@ -16,23 +16,26 @@
 
 namespace hku {
 
-// sqlite3 多线程处理时，等待其他锁释放回调处理
+// The callback handling of waiting for the other locks to be released in the sqlite3 multi-threaded
+// processing
 static int sqlite_busy_call_back_in_async(void *ptr, int count) {
     std::this_thread::yield();
     return 1;
 }
 
-// Pimpl 实现结构体
+// The Pimpl implementation struct
 struct AsyncSQLiteConnect::Impl {
     sqlite3 *m_db = nullptr;
     std::string m_dbname;
     bool initialized = false;
-    ThreadPool m_thread_pool{1};  // 单线程池用于执行同步 SQLite 操作
+    ThreadPool m_thread_pool{
+      1};  // A single thread pool used to run the synchronous SQLite operations
 };
 
 AsyncSQLiteConnect::AsyncSQLiteConnect(const Parameter &param)
 : AsyncDBConnectBase(param), m_impl(std::make_unique<Impl>()) {
-    // 注意：构造函数中不能使用 co_await，连接在首次使用时建立
+    // Note: co_await cannot be used in the constructor, the connection is established at the first
+    // use
     try {
         m_impl->m_dbname = getParam<std::string>("db");
     } catch (std::out_of_range &e) {
@@ -58,7 +61,7 @@ net::awaitable<void> AsyncSQLiteConnect::connect() {
         co_return;
     }
 
-    // 在线程池中执行同步初始化操作
+    // Run the synchronous initialization operations in the thread pool
     auto init_func = [this]() -> int {
         try {
             _connect();
@@ -91,23 +94,23 @@ void AsyncSQLiteConnect::_connect() {
     }
 #endif
 
-    // 1. 打开数据库
+    // 1. Open the database
     int rc = sqlite3_open_v2(m_impl->m_dbname.c_str(), &m_impl->m_db, flags, NULL);
     SQL_CHECK(rc == SQLITE_OK, rc, "{}",
               m_impl->m_db ? sqlite3_errmsg(m_impl->m_db) : "Failed to open database");
 
 #if HKU_ENABLE_SQLCIPHER
-    // 2. 设置密钥（如果需要）
+    // 2. Set the key (if needed)
     if (!key.empty()) {
         rc = sqlite3_key(m_impl->m_db, key.c_str(), static_cast<int>(key.size()));
         SQL_CHECK(rc == SQLITE_OK, rc, "{}", sqlite3_errmsg(m_impl->m_db));
     }
 #endif
 
-    // 3. 设置 busy handler
+    // 3. Set the busy handler
     sqlite3_busy_handler(m_impl->m_db, sqlite_busy_call_back_in_async, (void *)m_impl->m_db);
 
-    // 4. 启用扩展错误码
+    // 4. Enable the extended error codes
     if (sqlite3_libversion_number() >= 3003008) {
         sqlite3_extended_result_codes(m_impl->m_db, true);
     }
@@ -133,8 +136,8 @@ net::awaitable<bool> AsyncSQLiteConnect::ping() {
         }
     }
 
-    // sqlite打开时并不会对文件是否是有效sqlite文件进行检查，
-    // 只有执行 sql 语句时，才会报 SQLITE_NOTADB(26) 错误
+    // When sqlite opens a file it does not check whether the file is a valid sqlite file,
+    // the SQLITE_NOTADB(26) error is reported only when an sql statement is executed
     auto ping_func = [this]() -> int {
         return sqlite3_exec(m_impl->m_db, "PRAGMA synchronous;", NULL, NULL, NULL);
     };

@@ -27,10 +27,10 @@ RunMultiSystemInStrategy::RunMultiSystemInStrategy(const std::shared_ptr<MultiSy
         HKU_THROW("Invalid query: {}", query);
     }
 
-    // 父账户使用与券商同步的 BrokerTM；子系统账户由 MultiSystem::readyForRun 按模式创建
+    // The parent account uses the BrokerTM synchronized with the broker; the sub-system accounts are created by MultiSystem::readyForRun by mode
     auto tm = crtBrokerTM(broker, costfunc, ms->name());
     m_ms->setTM(tm);
-    m_ms->setSP(SlippagePtr());  // 聚合形态父不经过滑点算法
+    m_ms->setSP(SlippagePtr());  // The aggregate parent does not go through the slippage algorithm
     m_ms->readyForRun();
 }
 

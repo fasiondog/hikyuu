@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  AF_FixedWeightList 的语义载体：L1 按序取固定比例列表（不归一化）。
+ *  The semantic carrier of AF_FixedWeightList: L1 takes the fixed proportion list in order (without normalization).
  */
 
 #pragma once
@@ -15,10 +15,10 @@
 namespace hku {
 
 /**
- * 固定比例列表资产分配。
- * @details L1 系统级分配按子系统顺序**逐一取 weights[i]，不归一化**；数量不符时回退等权。
- *          等价 master FixedWeightListAllocateFunds 的 auto_adjust_weight=false。
- * @param weights 各子系统固定比例列表
+ * The fixed proportion list asset allocation.
+ * @details The L1 system-level allocation **takes weights[i] one by one in the sub-system order, without normalization**; when the quantity does not match it falls back to the equal weight.
+ *          Equivalent to master FixedWeightListAllocateFunds with auto_adjust_weight=false.
+ * @param weights the fixed proportion list of every sub-system
  * @ingroup AllocateFunds
  */
 class FixedWeightListAllocateFunds : public AllocateFundsBase {

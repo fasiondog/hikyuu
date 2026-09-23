@@ -17,9 +17,9 @@
 namespace hku {
 
 /**
- * 平均绝对偏差，求X的N日平均绝对偏差
- * @param ind 待计算的数据
- * @param n 时间窗口
+ * Mean absolute deviation, it gives the N-day mean absolute deviation of X
+ * @param ind the data to be calculated
+ * @param n time window
  * @ingroup Indicator
  */
 inline Indicator AVEDEV(const Indicator& ind, int n = 22) {

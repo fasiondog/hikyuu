@@ -40,10 +40,10 @@ public:
 private:
     friend class MySQLStatement;
 
-    // 提供给 MySQLStatement 访问原始连接的方法
+    // The method provided to MySQLStatement to access the original connection
     void *getRawConnection() const noexcept;
 
-    // 内部辅助方法
+    // Internal helper methods
     bool tryConnect() noexcept;
     void connect();
     void close();

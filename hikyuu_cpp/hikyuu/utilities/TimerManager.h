@@ -18,7 +18,7 @@
 namespace hku {
 
 /**
- * 定时管理与调度
+ * Timer management and scheduling
  * @ingroup Utilities
  */
 class TimerManager {
@@ -31,8 +31,8 @@ public:
     TimerManager& operator=(TimerManager&&) = delete;
 
     /**
-     * 构造函数
-     * @param work_num 定时任务执行线程池线程数量
+     * Constructor
+     * @param work_num the number of the threads in the thread pool executing the timer tasks
      */
     explicit TimerManager(size_t work_num = 1)
     : m_stop(true),
@@ -45,9 +45,10 @@ public:
     }
 
     /**
-     * 指定线程池方式构造，以便共享其他线程池
-     * @note 请自行保证 tg 的生命周期在 TimerManager 存活期间始终有效
-     * @param tg 指定任务组线程池
+     * Constructor with the given thread pool, so as to share the other thread pools
+     * @note Please guarantee by yourself that the lifetime of tg is always valid while TimerManager
+     *       is alive
+     * @param tg the given task group thread pool
      */
     explicit TimerManager(ThreadPool* tg)
     : m_stop(true), m_current_timer_id(-1), m_work_num(1), m_tg(tg), m_use_extend_tg(true) {
@@ -55,7 +56,7 @@ public:
         start();
     }
 
-    /** 析构函数 */
+    /** Destructor */
     ~TimerManager() {
         stop();
         for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
@@ -63,12 +64,12 @@ public:
         }
     }
 
-    /** 启动调度, 可在停止后重新启动 */
+    /** Start the scheduling, it can be restarted after a stop */
     void start() {
-        // 已经在执行状态，直接返回
+        // It is already in the executing state, return directly
         HKU_IF_RETURN(!m_stop, void());
 
-        // 设置执行状态
+        // Set the executing state
         m_stop = false;
 
         std::unique_lock<std::mutex> lock(m_mutex);
@@ -80,16 +81,16 @@ public:
         }
 
         /*
-         * 根据已有 timer 重建执行队列，并删除已无效的 timer
+         * Rebuild the execution queue according to the existing timers and delete the invalid ones
          */
 
-        std::forward_list<int> invalid_timers;  // 记录已无效的 timer
+        std::forward_list<int> invalid_timers;  // Records the invalid timers
         for (auto iter = m_timers.begin(); iter != m_timers.end(); ++iter) {
             int time_id = iter->first;
             const Timer* timer = iter->second;
             Datetime now = Datetime::now();
 
-            // 记录已失效的 timer id
+            // Record the invalid timer id
             if (timer->m_repeat_num <= 0 || (timer->m_end_date != Datetime::max() &&
                                              timer->m_end_date + timer->m_end_time < now)) {
                 invalid_timers.push_front(time_id);
@@ -138,7 +139,7 @@ public:
             m_queue.push(s);
         }
 
-        // 清除已无效的 timer
+        // Clear the invalid timers
         for (auto id : invalid_timers) {
             _removeTimer(id);
         }
@@ -149,7 +150,7 @@ public:
         m_detect_thread = std::thread([this]() { detectThread(); });
     }
 
-    /** 终止调度 */
+    /** Terminate the scheduling */
     void stop() {
         if (!m_stop) {
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -171,34 +172,35 @@ public:
         }
     }
 
-    /** 获取当前定时任务数量 */
+    /** Get the current number of the timer tasks */
     size_t size() {
         std::lock_guard<std::mutex> lock(m_mutex);
         return m_timers.size();
     }
 
-    /** 当前是否为空 */
+    /** Whether it is currently empty */
     bool empty() {
         return size() == 0;
     }
 
-    /** 返回当前停止状态 */
+    /** Return the current stop state */
     bool stopped() const {
         return m_stop;
     }
 
     /**
-     * 增加计划任务, 添加失败时抛出异常
-     * @tparam F 任务类型
-     * @tparam Args 任务参数
-     * @param start_date 允许运行的起始日期
-     * @param end_date 允许运行的结束日期
-     * @param start_time 允许运行的起始时间
-     * @param end_time 允许运行的结束时间
-     * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param duration 间隔时间，需大于 TimeDelta(0)
-     * @param f 待执行的延迟任务
-     * @param args 任务具体参数
+     * Add a scheduled task; an exception is thrown when the addition fails
+     * @tparam F the task type
+     * @tparam Args the task parameters
+     * @param start_date the start date allowed to run
+     * @param end_date the end date allowed to run
+     * @param start_time the start time allowed to run
+     * @param end_time the end time allowed to run
+     * @param repeat_num the number of the repetitions, it must be greater than 0; it means an
+     * infinite loop when it equals std::numeric_limits<int>::max()
+     * @param duration the interval, it needs to be greater than TimeDelta(0)
+     * @param f the delayed task to be executed
+     * @param args the concrete task parameters
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -222,13 +224,14 @@ public:
     }
 
     /**
-     * 增加重复定时任务，添加失败时抛出异常
-     * @tparam F 任务类型
-     * @tparam Args 任务参数
-     * @param repeat_num 重复次数，必须大于0，等于std::numeric_limits<int>::max()时表示无限循环
-     * @param duration 间隔时间，需大于 TimeDelta(0)
-     * @param f 待执行的延迟任务
-     * @param args 任务具体参数
+     * Add a repeated timer task; an exception is thrown when the addition fails
+     * @tparam F the task type
+     * @tparam Args the task parameters
+     * @param repeat_num the number of the repetitions, it must be greater than 0; it means an
+     * infinite loop when it equals std::numeric_limits<int>::max()
+     * @param duration the interval, it needs to be greater than TimeDelta(0)
+     * @param f the delayed task to be executed
+     * @param args the concrete task parameters
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -241,12 +244,12 @@ public:
     }
 
     /**
-     * 增加延迟运行任务（只执行一次）, 添加失败时抛出异常
-     * @tparam F 任务类型
-     * @tparam Args 任务参数
-     * @param delay 延迟时间，需大于 TimeDelta(0)
-     * @param f 待执行的延迟任务
-     * @param args 任务具体参数
+     * Add a delayed task (executed once only); an exception is thrown when the addition fails
+     * @tparam F the task type
+     * @tparam Args the task parameters
+     * @param delay the delay time, it needs to be greater than TimeDelta(0)
+     * @param f the delayed task to be executed
+     * @param args the concrete task parameters
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -257,12 +260,14 @@ public:
     }
 
     /**
-     * 在指定时刻执行任务（只执行一次）, 添加失败时抛出异常
-     * @tparam F 任务类型
-     * @tparam Args 任务参数
-     * @param time_point 指定的运行时刻（包含具体的日、时、分、秒...）
-     * @param f 待执行的延迟任务
-     * @param args 任务具体参数
+     * Execute the task at the given moment (once only); an exception is thrown when the addition
+     * fails
+     * @tparam F the task type
+     * @tparam Args the task parameters
+     * @param time_point the given running moment (including the concrete day, hour, minute, second
+     *                   ...)
+     * @param f the delayed task to be executed
+     * @param args the concrete task parameters
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -276,14 +281,15 @@ public:
     }
 
     /**
-     * 在日内指定时刻执行任务, 添加失败时抛出异常
-     * @tparam F 任务类型
-     * @tparam Args 任务参数
-     * @param start_date 允许执行的开始日期
-     * @param end_date 允许执行的结束日期
-     * @param time 指定运行的日内时刻
-     * @param f 待执行的延迟任务
-     * @param args 任务具体参数
+     * Execute the task at the given time within the day; an exception is thrown when the addition
+     * fails
+     * @tparam F the task type
+     * @tparam Args the task parameters
+     * @param start_date the start date allowed to be executed
+     * @param end_date the end date allowed to be executed
+     * @param time the given running time within the day
+     * @param f the delayed task to be executed
+     * @param args the concrete task parameters
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -302,12 +308,12 @@ public:
     }
 
     /**
-     * 每日在指定时刻执行任务, 添加失败时抛出异常
-     * @tparam F 任务类型
-     * @tparam Args 任务参数
-     * @param time 指定运行的日内时刻
-     * @param f 待执行的延迟任务
-     * @param args 任务具体参数
+     * Execute the task at the given time every day; an exception is thrown when the addition fails
+     * @tparam F the task type
+     * @tparam Args the task parameters
+     * @param time the given running time within the day
+     * @param f the delayed task to be executed
+     * @param args the concrete task parameters
      * @return timer id
      */
     template <typename F, typename... Args>
@@ -317,8 +323,8 @@ public:
     }
 
     /**
-     * 移除定时任务
-     * @param timerid 定时器id
+     * Remove a timer task
+     * @param timerid timer id
      */
     void removeTimer(int timerid) {
         std::unique_lock<std::mutex> lock(m_mutex);
@@ -345,7 +351,8 @@ private:
 
             IntervalS s = m_queue.top();
             if (s.m_time_point == Datetime::min()) {
-                break;  // 结束检测线程，用于 dll 能够安全退出，因为atomic在dll退出时可能无效
+                break;  // End the detection thread so that the dll can exit safely, because the
+                        // atomic may be invalid when the dll exits
             }
 
             TimeDelta diff = s.m_time_point - now;
@@ -356,7 +363,7 @@ private:
 
             m_queue.pop();
 
-            // 重新获取当前时间
+            // Get the current time again
             now = Datetime::now();
 
             auto timer_iter = m_timers.find(s.m_timer_id);
@@ -376,24 +383,25 @@ private:
                 continue;
             }
 
-            // 计算下一次执行的时间点
+            // Calculate the time point of the next execution
             Datetime today = now.startOfDay();
             if (timer->m_start_time >= TimeDelta()) {
-                // 非指定时刻执行的定时器
+                // The timer not executed at the given moment
                 s.m_time_point = s.m_time_point + timer->m_duration;
                 if (s.m_time_point < now) {
-                    // 系统时间发生向前调整
+                    // The system time is adjusted forward
                     s.m_time_point = now;
                 }
 
-                // 如果限定了当日可执行的时间段，且下一执行时刻超出了当日的限定时间
+                // If the executable time range of the day is limited and the next execution moment
+                // exceeds the limit of the day
                 if (timer->m_start_time != timer->m_end_time &&
                     s.m_time_point > today + timer->m_end_time) {
                     s.m_time_point = today + timer->m_start_time + TimeDelta(1);
                 }
 
             } else {
-                // 指定了每日运行时刻的定时器
+                // The timer with the given daily running time
                 s.m_time_point =
                   s.m_time_point + (today - s.m_time_point.startOfDay() + TimeDelta(1));
             }
@@ -404,12 +412,12 @@ private:
                 continue;
             }
 
-            // 将下一运行时间推入队列
+            // Push the next running time into the queue
             m_queue.push(s);
         }
     }
 
-    // 分配 timer_id
+    // Allocate the timer_id
     int getNewTimerId() {
         int max_int = std::numeric_limits<int>::max();
         HKU_WARN_IF_RETURN(m_timers.size() >= size_t(max_int), -1, "Timer queue is full!");
@@ -441,22 +449,25 @@ private:
             m_func();
         }
 
-        Datetime m_start_date = Datetime::min().startOfDay();  // 允许执行的起始日期（包含该日期）
-        Datetime m_end_date = Datetime::max().startOfDay();  // 允许执行的终止日期（包含该日期）
+        Datetime m_start_date = Datetime::min().startOfDay();  // The start date allowed to be
+                                                               // executed (inclusive)
+        Datetime m_end_date = Datetime::max().startOfDay();  // The end date allowed to be executed
+                                                             // (inclusive)
         /*
-         * 注：如果 m_start_time < TimeDelta(0), 则 m_end_time 代表每日指定的运行时刻，此时忽略
+         * Note: if m_start_time < TimeDelta(0), m_end_time represents the given daily running time,
+         *       and
          * m_duration
          */
-        TimeDelta m_start_time;  // 允许执行的当日起始时间（包含该时间）
-        TimeDelta m_end_time;    // 允许执行的当日结束时间（包含该时间）
-        TimeDelta m_duration;    // 延迟时长或间隔时长
-        int m_repeat_num = 1;    // 重复执行次数，max标识无限循环
+        TimeDelta m_start_time;  // The start time of the day allowed to be executed (inclusive)
+        TimeDelta m_end_time;    // The end time of the day allowed to be executed (inclusive)
+        TimeDelta m_duration;    // The delay or the interval
+        int m_repeat_num = 1;    // The number of the repetitions, max means an infinite loop
         std::function<void()> m_func;
     };
 
     struct IntervalS {
-        Datetime m_time_point;  // 执行的精确时间点
-        int m_timer_id = -1;    // 对应的 Timer, 负数无效
+        Datetime m_time_point;  // The exact time point of the execution
+        int m_timer_id = -1;    // The corresponding Timer, a negative value is invalid
         bool operator<(const IntervalS& other) const {
             return m_time_point > other.m_time_point;
         }
@@ -544,7 +555,7 @@ private:
 
     std::unordered_map<int, Timer*> m_timers;
     int m_current_timer_id;
-    size_t m_work_num;  // 任务执行线程池线程数量
+    size_t m_work_num;  // The number of the threads in the task execution thread pool
     ThreadPool* m_tg{nullptr};
     bool m_use_extend_tg{false};
 };

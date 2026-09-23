@@ -25,7 +25,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SG_AMA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

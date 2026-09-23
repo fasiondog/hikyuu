@@ -15,21 +15,23 @@
 namespace hku {
 
 /**
- * 自动事务处理，在代码块中自动启动事务，并在代码块退出后自动提交
- * @note 当有多个数据更改是，如果在程序处理中间发送异常时，可能导致数据被部分提交
+ * Automatic transaction handling: it starts a transaction automatically in the code block and
+ * commits it automatically after the code block exits
+ * @note When there are multiple data changes, an exception thrown in the middle of the program
+ *       processing may cause the data to be partially committed
  * @ingroup DBConnect
  */
 class AutoTransAction {
 public:
     /**
-     * 构造函数
-     * @param driver 数据库连接指针
+     * Constructor
+     * @param driver the database connection pointer
      */
     explicit AutoTransAction(const DBConnectPtr& driver) : m_driver(driver) {
         m_driver->transaction();
     }
 
-    /** 析构函数 */
+    /** Destructor */
     ~AutoTransAction() {
         try {
             m_driver->commit();
@@ -40,7 +42,7 @@ public:
         }
     }
 
-    /** 获取数据库连接 */
+    /** Get the database connection */
     const DBConnectPtr& connect() const {
         return m_driver;
     }
@@ -55,17 +57,21 @@ private:
 };
 
 /**
- * 手动事务处理，允许嵌套启动事务，必须手工启动和提交事务，自动退出时不会自动提交事务，而是回滚！
- * @details 必须有一次有效的手工启动事务，多次嵌套启动事务将被视为一次事务处理。
- *          手工提交一次事务后，如有新的事务处理，须再次手工启动事务。
- * @note 嵌套时，可能发送内部事务已提交，但外部事务处理失败被回滚（仅回滚相应事务处理的部分）的情况
+ * Manual transaction handling; it allows the nested starting of the transaction and requires a
+ * manual start and commit; on the automatic exit it does not commit automatically but rolls back!
+ * @details There must be one effective manual transaction start; multiple nested starts are
+ * regarded as one transaction handling. After a manual commit, the transaction must be started
+ * manually again if there is new transaction handling.
+ * @note When nested, it may happen that the inner transaction has been committed but the outer
+ *       transaction handling fails and is rolled back (only the part of the corresponding
+ * transaction handling is rolled back)
  * @ingroup DBConnect
  */
 class TransAction {
 public:
     /**
-     * 构造函数
-     * @param driver 数据库连接指针
+     * Constructor
+     * @param driver the database connection pointer
      */
     explicit TransAction(const DBConnectPtr& driver)
     : m_driver(driver), m_committed(false), m_started(true) {
@@ -73,9 +79,9 @@ public:
         m_driver->transaction();
     }
 
-    /** 析构函数 */
+    /** Destructor */
     ~TransAction() {
-        // 如果没有主动提交事务，视为需要回滚
+        // If the transaction has not been committed actively it is regarded as needing a rollback
         if (m_started && !m_committed) {
             HKU_WARN("The transaction is rolled back!");
             m_driver->rollback();
@@ -84,12 +90,12 @@ public:
         }
     }
 
-    /** 获取数据库连接 */
+    /** Get the database connection */
     const DBConnectPtr& connect() const {
         return m_driver;
     }
 
-    /** 启动事务 */
+    /** Start the transaction */
     void begin() {
         if (!m_started) {
             m_driver->transaction();
@@ -98,7 +104,7 @@ public:
         }
     }
 
-    /** 结束并提交事务 */
+    /** End and commit the transaction */
     void end() {
         HKU_CHECK(m_started, "No transaction has started!");
         if (!m_committed) {

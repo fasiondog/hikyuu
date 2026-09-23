@@ -10,49 +10,60 @@
 #include "PositionRecord.h"
 
 namespace hku {
-// 持仓扩展信息（只适合一买一卖的情况，一买多卖的情况，部分统计不准确仅供参考)
+// Extended position information (it is suitable for the one-buy-one-sell case only; for the
+// one-buy-multiple-sell case some statistics are inaccurate and are for reference only)
 struct HKU_API PositionExtInfo final {
     PositionRecord position;
-    price_t maxHighPrice{0.};       // 期间最高价最大值
-    price_t minLowPrice{0.0};       // 期间最低价最小值
-    price_t maxClosePrice{0.};      // 期间收盘价最高值
-    price_t minClosePrice{0.0};     // 期间收盘价最低值
-    price_t currentClosePrice{0.};  // 当前收盘价
-    price_t maxPullBack1{0.};       // 最大回撤比例1(仅使用最大收盘价和最低收盘价计算)(负数)
-    price_t maxPullBack2{0.};       // 最大回撤比例2(使用期间最高价最大值和最低价最小值计算)（负数）
-    price_t currentProfit{0.};      // 当前浮动盈亏(不含预计卖出成本)
+    price_t maxHighPrice{0.};       // Maximum of the high prices in the period
+    price_t minLowPrice{0.0};       // Minimum of the low prices in the period
+    price_t maxClosePrice{0.};      // Maximum of the close prices in the period
+    price_t minClosePrice{0.0};     // Minimum of the close prices in the period
+    price_t currentClosePrice{0.};  // Current close price
+    price_t maxPullBack1{0.};       // Maximum drawdown ratio 1 (calculated from the maximum and
+                                    // the minimum close prices only) (negative)
+    price_t maxPullBack2{0.};       // Maximum drawdown ratio 2 (calculated from the maximum high
+                                    // price and the minimum low price in the period) (negative)
+    price_t currentProfit{0.};      // Current floating profit and loss (excluding the estimated
+                                    // sell cost)
 
-    /** 当前回撤比例1(仅使用最大收盘价和当前收盘价计算) */
+    /** Current drawdown ratio 1 (calculated from the maximum close price and the current close
+     *  price only) */
     price_t currentPullBack1() const {
         price_t ret = (maxClosePrice - currentClosePrice) / maxClosePrice;
         return ret > 0. ? 0. : ret;
     }
 
-    /** 当前回撤百分比2(使用期间最高价最大值和当前收盘价计算) */
+    /** Current drawdown percentage 2 (calculated from the maximum high price in the period and the
+     *  current close price) */
     price_t currentPullBack2() const {
         price_t ret = (maxHighPrice - currentClosePrice) / maxHighPrice;
         return ret > 0. ? 0. : ret;
     }
 
-    /** 期间最大浮盈1 (正数, 仅使用收盘价计算, 不含预计卖出成本, 多次买卖时统计不准) */
+    /** Maximum floating profit 1 in the period (positive, calculated from the close prices only,
+     *  excluding the estimated sell cost; inaccurate when there are multiple trades) */
     price_t maxFloatingProfit1() const {
         price_t ret = maxClosePrice * position.number + position.sellMoney - position.buyMoney;
         return ret < 0. ? 0. : ret;
     }
 
-    /** 期间最大浮盈2 (正数, 使用最高值最大值进行计算,不含预计卖出成本，多次买卖时统计不准) */
+    /** Maximum floating profit 2 in the period (positive, calculated from the maximum of the high
+     *  prices, excluding the estimated sell cost; inaccurate when there are multiple trades) */
     price_t maxFloatingProfit2() const {
         price_t ret = maxHighPrice * position.number + position.sellMoney - position.buyMoney;
         return ret < 0. ? 0. : ret;
     }
 
-    /** 期间最大浮亏1（负数，仅使用收盘价计算, 不含预计卖出成本，多次买卖时统计不准) */
+    /** Maximum floating loss 1 in the period (negative, calculated from the close prices only,
+     *  excluding the estimated sell cost; inaccurate when there are multiple trades) */
     price_t minLossProfit1() const {
         price_t ret = minClosePrice * position.number + position.sellMoney - position.buyMoney;
         return ret > 0. ? 0. : ret;
     }
 
-    /** 期间最大浮亏2（负数，仅期间最低价计算, 不含预计卖出成本，多次买卖时统计不准) */
+    /** Maximum floating loss 2 in the period (negative, calculated from the low prices in the
+     *  period only, excluding the estimated sell cost; inaccurate when there are multiple trades)
+     */
     price_t minLossProfit2() const {
         price_t ret = minLowPrice * position.number + position.sellMoney - position.buyMoney;
         return ret > 0. ? 0. : ret;
@@ -89,7 +100,7 @@ struct HKU_API PositionExtInfo final {
     }
 
 //===================
-// 序列化支持
+// Serialization support
 //===================
 #if HKU_SUPPORT_SERIALIZATION
 private:

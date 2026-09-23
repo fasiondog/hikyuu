@@ -36,18 +36,18 @@ from email.header import Header
 
 class MailOrderBroker:
     """
-    邮件订单代理
+    Email order broker
     """
 
     def __init__(self, host, sender, pwd, receivers):
         """
-        邮件订单代理，执行买入/卖出操作时发送 Email
+        Email order broker, sends an email when executing the buy/sell operations
 
-        :param str host: smtp服务器地址
-        :param int port: smtp服务器端口
-        :param str sender: 发件邮箱（既用户名）
-        :param str pwd: 密码
-        :param list receivers: 接受者邮箱列表
+        :param str host: the smtp server address
+        :param int port: the smtp server port
+        :param str sender: the sender mailbox (i.e. the user name)
+        :param str pwd: the password
+        :param list receivers: the list of the receiver mailboxes
         """
         self._host = host
         self._pwd = pwd
@@ -55,10 +55,10 @@ class MailOrderBroker:
         self._receivers = receivers
 
     def _sendmail(self, title, msg):
-        """发送邮件
+        """Send an email
 
-        :param str title: 邮件标题
-        :param str msg: 邮件内容
+        :param str title: the email title
+        :param str msg: the email content
         """
         message = MIMEText(msg, 'plain', 'utf-8')
         message['From'] = self._sender
@@ -73,29 +73,29 @@ class MailOrderBroker:
         smtpObj.sendmail(self._sender, self._receivers, message.as_string())
 
     def buy(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
-        """执行买入操作，向指定的邮箱发送邮件，格式如下::
+        """Execute the buy operation, send an email to the specified mailbox, in the following format::
 
-            邮件标题：【Hkyuu提醒】买入 证券代码
-            邮件内容：买入：证券代码，价格：买入的价格，数量：买入数量
+            Email title: [Hkyuu Notice] Buy the stock code
+            Email content: Buy: the stock code, price: the buy price, number: the buy number
 
-        :param str code: 证券代码
-        :param float price: 买入价格
-        :param int num: 买入数量
+        :param str code: the stock code
+        :param float price: the buy price
+        :param int num: the buy number
         """
-        action = "买入：{}{}，价格：{}，数量：{} ".format(market, code, price, num)
-        title = "【Hkyuu提醒】买入 {}".format(code)
+        action = "Buy: {}{}, price: {}, number: {} ".format(market, code, price, num)
+        title = "[Hkyuu Notice] Buy {}".format(code)
         self._sendmail(title, action)
 
     def sell(self, market, code, price, num, stoploss, goal_price, part_from, remark=""):
-        """执行卖出操作，向指定的邮箱发送邮件，格式如下::
+        """Execute the sell operation, send an email to the specified mailbox, in the following format::
 
-            邮件标题：【Hkyuu提醒】卖出 证券代码
-            邮件内容：卖出：证券代码，价格：卖出的价格，数量：卖出数量
+            Email title: [Hkyuu Notice] Sell the stock code
+            Email content: Sell: the stock code, price: the sell price, number: the sell number
 
-        :param str code: 证券代码
-        :param float price: 卖出价格
-        :param int num: 卖出数量
+        :param str code: the stock code
+        :param float price: the sell price
+        :param int num: the sell number
         """
-        title = "【Hkyuu提醒】卖出 {}{}".format(market, code)
-        action = "卖出：{}，价格：{}，数量：{} ".format(code, price, num)
+        title = "[Hkyuu Notice] Sell {}{}".format(market, code)
+        action = "Sell: {}, price: {}, number: {} ".format(code, price, num)
         self._sendmail(title, action)

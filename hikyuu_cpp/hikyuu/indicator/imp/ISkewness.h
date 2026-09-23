@@ -16,7 +16,7 @@
 namespace hku {
 
 /*
- * 计算未调整的总体偏度
+ * Calculate the unadjusted population skewness
  */
 class ISkewness : public hku::IndicatorImp {
     INDICATOR_IMP(ISkewness)

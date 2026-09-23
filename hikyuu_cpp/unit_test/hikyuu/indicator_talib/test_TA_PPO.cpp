@@ -20,12 +20,12 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_PPO") {
     KData kdata = getKData("sh000001", KQuery(-30));
     Indicator c = CLOSE(kdata);
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_PPO(c, 1, 26, 0));
     CHECK_THROWS(TA_PPO(c, 100001, 26, 0));
     CHECK_THROWS(TA_PPO(c, 12, 1, 0));
@@ -33,7 +33,7 @@ TEST_CASE("test_TA_PPO") {
     CHECK_THROWS(TA_PPO(c, 12, 26, -1));
     CHECK_THROWS(TA_PPO(c, 12, 26, 9));
 
-    // /** @arg 正常情况 */
+    // /** @arg The normal case */
     Indicator result = TA_PPO(CLOSE(kdata));
     CHECK_EQ(result.name(), "TA_PPO");
     CHECK_EQ(result.discard(), 25);
@@ -42,7 +42,7 @@ TEST_CASE("test_TA_PPO") {
     CHECK_EQ(result[25], doctest::Approx(-1.571039).epsilon(0.0001));
     CHECK_EQ(result[29], doctest::Approx(-2.557277).epsilon(0.0001));
 
-    // /** @arg 计算数据的 discard 不为0 */
+    // /** @arg The discard of the calculated data is not 0 */
     auto data = TA_MA(c, 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_PPO(data);
@@ -58,7 +58,7 @@ TEST_CASE("test_TA_PPO") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_PPO_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

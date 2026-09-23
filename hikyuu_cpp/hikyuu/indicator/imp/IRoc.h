@@ -15,7 +15,7 @@
 
 namespace hku {
 
-// 变动率指标 ((price / prevPrice)-1)*100
+// Rate of change indicator ((price / prevPrice)-1)*100
 class IRoc : public hku::IndicatorImp {
     INDICATOR_IMP(IRoc)
     INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE

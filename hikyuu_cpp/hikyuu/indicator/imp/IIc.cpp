@@ -23,12 +23,15 @@ namespace hku {
 
 IIc::IIc() : IndicatorImp("IC", 1) {
     m_need_self_alike_compare = true;
-    setParam<int>("n", 1);  // 调仓周期
-    // 对齐时是否以 nan 值进行填充，否则以小于当前日期的最后值作为填充
+    setParam<int>("n", 1);  // Position adjustment cycle
+    // Whether to fill with nan during the alignment, otherwise the last value earlier than the
+    // current date is used as the fill
     setParam<bool>("fill_null", true);
-    setParam<bool>("use_spearman", true);  // 默认使用SPEARMAN计算相关系数, 否则使用pearson相关系数
+    setParam<bool>("use_spearman",
+                   true);  // Use SPEARMAN by default, otherwise the pearson correlation
 
-    // 严格IC计算，即未来收益不知道时填充NA，相当于非严格情况下左移n
+    // Strict IC calculation, i.e. fill NA when the future return is unknown; it is equivalent to
+    // shifting left by n in the non-strict case
     setParam<bool>("strict", false);
 }
 
@@ -73,12 +76,12 @@ bool IIc::selfAlike(const IndicatorImp& other) const noexcept {
 }
 
 void IIc::_calculate(const Indicator& inputInd) {
-    // 先申请内存，保持和参考日期等长
+    // Allocate the memory first, keeping the same length as the reference dates
     auto ref_dates = getContext().getDatetimeList();
     size_t days_total = ref_dates.size();
     _readyBuffer(days_total, 1);
 
-    // 检测异常输入数据
+    // Detect the abnormal input data
     m_discard = days_total;
     HKU_IF_RETURN(days_total < 2, void());
 
@@ -95,21 +98,25 @@ void IIc::_calculate(const Indicator& inputInd) {
 
     bool fill_null = getParam<bool>("fill_null");
 
-    // 计算每支证券对齐后的因子值与 n 日收益率
-    vector<Indicator> all_inds(stk_count);     // 保存每支证券对齐后的因子值
-    vector<Indicator> all_returns(stk_count);  // 保存每支证券对齐后的 n 日收益率
+    // Calculate the aligned factor value and the n-day return of every security
+    vector<Indicator> all_inds(stk_count);     // Save the aligned factor value of every security
+    vector<Indicator> all_returns(stk_count);  // Save the aligned n-day return of every security
 
     KQuery query = getContext().getQuery();
 
-    // 注：使用超额收益和绝对收益计算最终结果无差异（理论推导无差异，如多一步超额计算收益引入的为计算误差，基本可以忽略）
+    // Note: using the excess return and the absolute return gives the same final result (they are
+    // identical in theory; an extra excess return calculation only introduces a negligible
+    // calculation error)
     global_parallel_for_index_void(
       0, stk_count, [&, n, fill_null, ind = inputInd.clone()](size_t i) {
           auto k = m_stks[i].getKData(query);
-          // 假设 IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-          // 天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
+          // Suppose IC originally needs "the factor value at t -> the return at t+1"; it is changed
+          // to calculate "the factor value at t -> the return of the N days before t" (such as the
+          // return of the past 5 days), which is called the "current IC". (Otherwise the current
+          // values would all be missing NA.)
           all_inds[i] = ALIGN(REF(ind, n), ref_dates, fill_null)(k).getResult(0)();
 
-          // 计算绝对收益
+          // Calculate the absolute return
           all_returns[i] = ALIGN(ROCP(CLOSE(), n), ref_dates, fill_null)(k).getResult(0)();
       });
 
@@ -122,7 +129,7 @@ void IIc::_calculate(const Indicator& inputInd) {
 
     auto* dst = this->data();
     global_parallel_for_index_void(m_discard, days_total, [&, stk_count, dst](size_t i) {
-        // 计算日截面 spearman 相关系数即 ic 值
+        // Calculate the daily cross-sectional spearman correlation coefficient, i.e. the IC value
         PriceList tmp(stk_count, Null<price_t>());
         PriceList tmp_return(stk_count, Null<price_t>());
         for (size_t j = 0; j < stk_count; j++) {
@@ -138,7 +145,8 @@ void IIc::_calculate(const Indicator& inputInd) {
     });
 
     if (getParam<bool>("strict")) {
-        // 严格模式，即当前时刻对应未来收益计算结果
+        // The strict mode, i.e. the calculation result of the current moment corresponding to the
+        // future return
         for (size_t i = m_discard; i < days_total; i++) {
             dst[i - n] = dst[i];
         }
@@ -196,7 +204,7 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
     PriceList ret(days_total, Null<price_t>());
     auto* dst = ret.data();
     global_parallel_for_index_void(0, days_total, [&, stk_count, dst](size_t i) {
-        // 计算日截面 spearman 相关系数即 ic 值
+        // Calculate the daily cross-sectional spearman correlation coefficient, i.e. the IC value
         PriceList tmp(stk_count, Null<price_t>());
         PriceList tmp_return(stk_count, Null<price_t>());
         for (size_t j = 0; j < stk_count; j++) {
@@ -212,7 +220,8 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
     });
 
     if (strict) {
-        // 严格模式，即当前时刻对应未来收益计算结果
+        // The strict mode, i.e. the calculation result of the current moment corresponding to the
+        // future return
         for (size_t i = n; i < days_total; i++) {
             dst[i - n] = dst[i];
         }

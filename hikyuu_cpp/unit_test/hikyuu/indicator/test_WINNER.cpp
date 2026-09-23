@@ -19,7 +19,7 @@
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WINNER") {
     auto k = getKData("sz000001", KQueryByIndex(-50));
     auto result = WINNER(k.close());
@@ -39,7 +39,7 @@ TEST_CASE("test_WINNER_benchmark") {
     Stock stock = getStock("sz000001");
     KData kdata = stock.getKData(KQuery(0));
 
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_WINNER_benchmark, cycle, fmt::format("data len: {}", kdata.size()));
@@ -58,7 +58,7 @@ TEST_CASE("test_WINNER_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WINNER_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

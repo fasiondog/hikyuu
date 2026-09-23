@@ -12,7 +12,8 @@
 namespace hku {
 
 /**
- * 仅能手动添加信号的信号指示器，用于测试或其他特殊用途
+ * A signal generator whose signals can only be added manually, used for the testing or other
+ * special purposes
  * @return SignalPtr
  */
 SignalPtr HKU_API SG_Manual();

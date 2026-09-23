@@ -14,8 +14,8 @@
 
 namespace hku {
 
-// 用于记录分析文件时的格式错误信息(行号、错误的行内容）
-// 仅限IniParser内部使用
+// Used to record the format error information during the file parsing (the line number and the
+// wrong line content) For the internal use of IniParser only
 class ParsingError {
 public:
     ParsingError() {
@@ -47,11 +47,11 @@ IniParser::IniParser() {}
 IniParser::~IniParser() {}
 
 /**
- * 读取并分析指定的ini文件
- * @details 可多次读取不同的ini文件后，再统一处理信息
- * @throw std::invalid_argument 当指定的文件无法打开时，抛出该异常
- * @throw std::logic_error 当文件格式错误时，抛出该异常
- * @param filename 指定文件名
+ * Read and parse the given ini file
+ * @details Multiple different ini files may be read and then the information is processed together
+ * @throw std::invalid_argument this exception is thrown when the given file cannot be opened
+ * @throw std::logic_error this exception is thrown when the file format is wrong
+ * @param filename the given file name
  */
 void IniParser::read(const std::string& filename) {
     std::ifstream inifile(HKU_PATH(filename), std::ifstream::in);
@@ -59,8 +59,8 @@ void IniParser::read(const std::string& filename) {
         throw(std::invalid_argument("Can't read file(" + filename + ")!"));
     }
 
-    size_t line_no = 0;          // 当前行号，用于记录错误信息
-    ParsingError parsing_error;  // 记录格式分析错误
+    size_t line_no = 0;          // The current line number, used to record the error information
+    ParsingError parsing_error;  // Records the format parsing error
 
     std::string section;
     std::string key;
@@ -71,19 +71,19 @@ void IniParser::read(const std::string& filename) {
         line_no++;
         trim(line_str);
 
-        // 空行或注释行，跳过
+        // Skip the empty or the comment lines
         if (line_str.empty() || line_str.at(0) == ';') {
             continue;
         }
 
-        // 检查第一个出现的注释符，并将其及其之后的字符清除
+        // Check the first comment marker and clear it together with the following characters
         size_t pos = line_str.find(';');
         if (pos != std::string::npos) {
             line_str.assign(line_str, 0, pos);
             trim(line_str);
         }
 
-        // section行
+        // A section line
         if (line_str.at(0) == '[') {
             size_t len = line_str.size();
             if (line_str[len - 1] != ']') {
@@ -103,7 +103,7 @@ void IniParser::read(const std::string& filename) {
         } else {
             if (section.empty()) {
                 parsing_error.append(line_no, "Missing section header!");
-                break;  // 缺少section定义，后续无须处理，直接跳出循环
+                break;  // The section definition is missing, no further processing is needed
             }
 
             pos = line_str.find('=');
@@ -139,21 +139,21 @@ void IniParser::read(const std::string& filename) {
 }
 
 /**
- * 清除现有已读入的信息
+ * Clear the information already read
  */
 void IniParser::clear() {
     m_sections.clear();
 }
 
 /**
- * 判断指定的section是否存在
+ * Judge whether the given section exists
  */
 bool IniParser::hasSection(const std::string& section) const {
     return m_sections.count(section) ? true : false;
 }
 
 /**
- * 判断指定option是否存在
+ * Judge whether the given option exists
  */
 bool IniParser::hasOption(const std::string& section, const std::string& option) const {
     if (m_sections.count(section) == 0) {
@@ -169,8 +169,8 @@ bool IniParser::hasOption(const std::string& section, const std::string& option)
 }
 
 /**
- * 获取所有的secton
- * @return 所有的section列表
+ * Get all the sections
+ * @return the list of all the sections
  */
 IniParser::StringListPtr IniParser::getSectionList() const {
     StringListPtr result = std::make_shared<std::list<std::string>>();
@@ -182,10 +182,10 @@ IniParser::StringListPtr IniParser::getSectionList() const {
 }
 
 /**
- * 获取指定Section下的所有option
- * @throw 若指定的section不存在，将抛出std::invalid_argument异常
- * @param section 指定的section
- * @return 指定的section下所有option列表
+ * Get all the options under the given section
+ * @throw std::invalid_argument is thrown when the given section does not exist
+ * @param section the given section
+ * @return the list of all the options under the given section
  */
 IniParser::StringListPtr IniParser::getOptionList(const std::string& section) const {
     if (m_sections.count(section) == 0) {
@@ -203,13 +203,15 @@ IniParser::StringListPtr IniParser::getOptionList(const std::string& section) co
 }
 
 /**
- * 获取指定的option值
- * @throw std::invalid_argument 当指定option不存在对应值，并且没有指定缺省值时，抛出该异常
- * @param section 指定的section
- * @param option 指定的option
+ * Get the value of the given option
+ * @throw std::invalid_argument this exception is thrown when the given option has no value and no
+ * default value is given
+ * @param section the given section
+ * @param option the given option
  * @param default_str
- * 缺省值，在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值，此时如果不存在对应option值，
- *                    将抛出std::invalid_argument异常。默认为空，没有指定缺省值。
+ * the default value, it is returned when there is no corresponding option value. When it is empty
+ * there is no default value, and if there is no corresponding option value a std::invalid_argument
+ * exception is thrown. It is empty by default.
  */
 std::string IniParser::get(const std::string& section, const std::string& option,
                            const std::string& default_str) const {
@@ -233,21 +235,23 @@ std::string IniParser::get(const std::string& section, const std::string& option
 }
 
 /**
- * 获取指定的option值，并将其转换为int类型
- * @throw std::invalid_argument 当指定option不存在对应值，并且没有指定缺省值时，抛出该异常;
- *        或者当指定的缺省值（非空）无法转换为int类型时，无论指定的option值是否存在都将抛出该异常。
- * @throw std::domain_error 当指定的option值，无法转换为int类型时，抛出该异常
- * @param section 指定的section
- * @param option 指定的option
- * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
- *                    默认为空，没有指定缺省值。
+ * Get the value of the given option and convert it into int
+ * @throw std::invalid_argument this exception is thrown when the given option has no value and no
+ * default value is given; it is also thrown when the given default value (non-empty) cannot be
+ * converted into int,
+ * @throw std::domain_error this exception is thrown when the given option value cannot be converted
+ * into int
+ * @param section the given section
+ * @param option the given option
+ * @param default_str the default value, returned when there is no corresponding option value; an
+ * empty value means none It is empty by default, i.e. no default value is given.
  */
 int IniParser::getInt(const std::string& section, const std::string& option,
                       const std::string& default_str) const {
     int result = 0;
     size_t remain = 0;
 
-    // 先检查default_str是否可以转换为int
+    // First check whether default_str can be converted into int
     if (!default_str.empty()) {
         result = std::stoi(default_str, &remain);
         if (remain != default_str.size()) {
@@ -266,21 +270,23 @@ int IniParser::getInt(const std::string& section, const std::string& option,
 }
 
 /**
- * 获取指定的option值，并将其转换为float类型
- * @throw std::invalid_argument 当指定option不存在对应值，并且没有指定缺省值时，抛出该异常;
- *        或者当指定的缺省值（非空）无法转换为float类型时，无论指定的option值是否存在都将抛出该异常。
- * @throw std::domain_error 当指定的option值，无法转换为float类型时，抛出该异常
- * @param section 指定的section
- * @param option 指定的option
- * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
- *                    默认为空，没有指定缺省值。
+ * Get the value of the given option and convert it into float
+ * @throw std::invalid_argument this exception is thrown when the given option has no value and no
+ * default value is given; it is also thrown when the given default value (non-empty) cannot be
+ * converted into float,
+ * @throw std::domain_error this exception is thrown when the given option value cannot be converted
+ * into float
+ * @param section the given section
+ * @param option the given option
+ * @param default_str the default value, returned when there is no corresponding option value; an
+ * empty value means none It is empty by default, i.e. no default value is given.
  */
 float IniParser::getFloat(const std::string& section, const std::string& option,
                           const std::string& default_str) const {
     float result;
     size_t remain = 0;
 
-    // 先检查default_str是否可以转换为float
+    // First check whether default_str can be converted into float
     if (!default_str.empty()) {
         result = std::stof(default_str, &remain);
         if (remain != default_str.size()) {
@@ -299,21 +305,23 @@ float IniParser::getFloat(const std::string& section, const std::string& option,
 }
 
 /**
- * 获取指定的option值，并将其转换为double类型
- * @throw std::invalid_argument 当指定option不存在对应值，并且没有指定缺省值时，抛出该异常;
- *        或者当指定的缺省值（非空）无法转换为double类型时，无论指定的option值是否存在都将抛出该异常。
- * @throw std::domain_error 当指定的option值，无法转换为double类型时，抛出该异常
- * @param section 指定的section
- * @param option 指定的option
- * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
- *                    默认为空，没有指定缺省值。
+ * Get the value of the given option and convert it into double
+ * @throw std::invalid_argument this exception is thrown when the given option has no value and no
+ * default value is given; it is also thrown when the given default value (non-empty) cannot be
+ * converted into double,
+ * @throw std::domain_error this exception is thrown when the given option value cannot be converted
+ * into double
+ * @param section the given section
+ * @param option the given option
+ * @param default_str the default value, returned when there is no corresponding option value; an
+ * empty value means none It is empty by default, i.e. no default value is given.
  */
 double IniParser::getDouble(const std::string& section, const std::string& option,
                             const std::string& default_str) const {
     double result;
     size_t remain = 0;
 
-    // 先检查default_str是否可以转换为float
+    // First check whether default_str can be converted into float
     if (!default_str.empty()) {
         result = std::stod(default_str, &remain);
         if (remain != default_str.size()) {
@@ -332,20 +340,22 @@ double IniParser::getDouble(const std::string& section, const std::string& optio
 }
 
 /**
- * 获取指定的option值，并将其转换为bool类型
- * @details option表示为true时，可接受的值为：1|true|yes|on （不区分大小写） \n
- *          option表示为false时，可接受的值为：0|false|no|off （不区分大小写）
- * @throw std::invalid_argument 当指定option不存在对应值，并且没有指定缺省值时，抛出该异常;
- *        或者当指定的缺省值（非空）无法转换为bool类型时，无论指定的option值是否存在都将抛出该异常。
- * @throw std::domain_error 当指定的option值，无法转换为bool类型时，抛出该异常
- * @param section 指定的section
- * @param option 指定的option
- * @param default_str 缺省值。在不存在对应的option值时，返回该值。当该值为空时，表示没有缺省值。
- *                    默认为空，没有指定缺省值。
+ * Get the value of the given option and convert it into bool
+ * @details when the option means true, the acceptable values are: 1|true|yes|on (case insensitive)
+ * \n when the option means false, the acceptable values are: 0|false|no|off (case insensitive)
+ * @throw std::invalid_argument this exception is thrown when the given option has no value and no
+ * default value is given; it is also thrown when the given default value (non-empty) cannot be
+ * converted into bool,
+ * @throw std::domain_error this exception is thrown when the given option value cannot be converted
+ * into bool
+ * @param section the given section
+ * @param option the given option
+ * @param default_str the default value, returned when there is no corresponding option value; an
+ * empty value means none It is empty by default, i.e. no default value is given.
  */
 bool IniParser::getBool(const std::string& section, const std::string& option,
                         const std::string& default_str) const {
-    // 先检查default_str是否可以转换为bool
+    // First check whether default_str can be converted into bool
     std::string new_default_str(default_str);
     if (!default_str.empty()) {
         if (new_default_str != "1" && new_default_str != "0") {

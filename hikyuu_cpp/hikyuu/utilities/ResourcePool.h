@@ -23,7 +23,7 @@
 namespace hku {
 
 /**
- * 资源获取超时异常
+ * Resource acquisition timeout exception
  */
 class GetResourceTimeoutException : public hku::exception {
 public:
@@ -37,7 +37,7 @@ public:
 };
 
 /**
- * 新资源创建失败异常
+ * New resource creation failure exception
  */
 class CreateResourceException : public hku::exception {
 public:
@@ -51,7 +51,7 @@ public:
 };
 
 /**
- * 通用共享资源池
+ * General shared resource pool
  * @ingroup Utilities
  */
 template <typename ResourceType>
@@ -62,26 +62,27 @@ public:
     ResourcePool &operator=(const ResourcePool &) = delete;
 
     /**
-     * 构造函数
-     * @param param 连接参数
-     * @param maxPoolSize 允许的最大共享资源数，为 0 表示不限制
-     * @param maxIdleNum 运行的最大空闲资源数，为 0 表示用完即刻释放，无缓存
+     * Constructor
+     * @param param connection parameters
+     * @param maxPoolSize the maximum number of the shared resources allowed, 0 means unlimited
+     * @param maxIdleNum the maximum number of the idle resources allowed; 0 means releasing
+     *                   immediately after use without a cache
      */
     explicit ResourcePool(const Parameter &param, size_t maxPoolSize = 0, size_t maxIdleNum = 100)
     : m_maxPoolSize(maxPoolSize), m_maxIdelSize(maxIdleNum), m_count(0), m_param(param) {}
 
     /**
-     * 析构函数，释放所有缓存的资源
+     * Destructor, it releases all the cached resources
      */
     virtual ~ResourcePool() {
         std::unique_lock<std::mutex> lock(m_mutex);
 
-        // 将所有已分配资源的 closer 和 pool 解绑
+        // Unbind the closer of all the allocated resources from the pool
         for (auto iter = m_closer_set.begin(); iter != m_closer_set.end(); ++iter) {
             (*iter)->unbind();
         }
 
-        // 删除所有空闲资源
+        // Delete all the idle resources
         while (!m_resourceList.empty()) {
             ResourceType *p = m_resourceList.front();
             m_resourceList.pop();
@@ -91,34 +92,35 @@ public:
         }
     }
 
-    /** 获取当前允许的最大资源数 */
+    /** Get the current maximum number of the resources allowed */
     size_t maxPoolSize() const {
         return m_maxIdelSize;
     }
 
-    /** 获取当前允许的最大空闲资源数 */
+    /** Get the current maximum number of the idle resources allowed */
     size_t maxIdleSize() const {
         return m_maxIdelSize;
     }
 
-    /** 设置最大资源数 */
+    /** Set the maximum number of the resources */
     void maxPoolSize(size_t num) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_maxPoolSize = num;
     }
 
-    /** 设置允许的最大空闲资源数 */
+    /** Set the maximum number of the idle resources allowed */
     void maxIdleSize(size_t num) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_maxIdelSize = num;
     }
 
-    /** 资源实例指针类型 */
+    /** Resource instance pointer type */
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 获取可用资源，如超出允许的最大资源数将返回空指针
-     * @exception CreateResourceException 新资源创建可能抛出异常
+     * Get an available resource; a null pointer is returned when the maximum number of the
+     * resources allowed is exceeded
+     * @exception CreateResourceException the new resource creation may throw an exception
      */
     ResourcePtr get() {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -150,8 +152,8 @@ public:
     }
 
     /**
-     * 在指定的超时时间内获取可用资源
-     * @param ms_timeout 超时时间，单位毫秒
+     * Get an available resource within the given timeout
+     * @param ms_timeout the timeout in milliseconds
      * @exception GetResourceTimeoutException, CreateResourceException
      */
     ResourcePtr getWaitFor(uint64_t ms_timeout) {  // NOSONAR
@@ -160,7 +162,8 @@ public:
         ResourceType *p = nullptr;
         if (m_resourceList.empty()) {
             if (m_maxPoolSize > 0 && m_count >= m_maxPoolSize) {
-                // HKU_TRACE("超出最大资源数，等待空闲资源");
+                // HKU_TRACE("The maximum number of the resources is exceeded, waiting for an idle
+                // resource");
                 if (ms_timeout > 0) {
                     if (m_cond.wait_for(lock,
                                         std::chrono::duration<uint64_t, std::milli>(ms_timeout),
@@ -197,24 +200,26 @@ public:
     }
 
     /**
-     * 获取可用资源，如超出允许的最大资源数，将阻塞等待直到获得空闲资源
-     * @exception CreateResourceException 新资源创建可能抛出异常
+     * Get an available resource; it blocks and waits until an idle resource is obtained when the
+     * maximum number of the resources allowed is exceeded
+     * @exception CreateResourceException the new resource creation may throw an exception
      */
     ResourcePtr getAndWait() {
         return getWaitFor(0);
     }
 
-    /** 当前活动的资源数, 即全部资源数（含空闲及被使用的资源） */
+    /** The number of the currently active resources, i.e. all the resources (including the idle and
+     *  the used ones) */
     size_t count() const {
         return m_count;
     }
 
-    /** 当前空闲的资源数 */
+    /** The current number of the idle resources */
     size_t idleCount() const {
         return m_resourceList.size();
     }
 
-    /** 释放当前所有的空闲资源 */
+    /** Release all the currently idle resources */
     void releaseIdleResource() {
         std::lock_guard<std::mutex> lock(m_mutex);
         _releaseIdleResourceNoLock();
@@ -233,9 +238,9 @@ private:
     }
 
 private:
-    size_t m_maxPoolSize;  // 允许的最大共享资源数
-    size_t m_maxIdelSize;  // 允许的最大空闲资源数
-    size_t m_count;        // 当前活动的资源数
+    size_t m_maxPoolSize;  // The maximum number of the shared resources allowed
+    size_t m_maxIdelSize;  // The maximum number of the idle resources allowed
+    size_t m_count;        // The number of the currently active resources
     Parameter m_param;
     std::mutex m_mutex;
     std::condition_variable m_cond;
@@ -248,7 +253,7 @@ private:
 
         void operator()(ResourceType *conn) {  // NOSONAR
             if (conn) {
-                // 如果绑定了 pool，则归还资源；否则删除
+                // If the pool is bound, the resource is returned; otherwise it is deleted
                 if (m_pool) {
                     // HKU_DEBUG("retuan to pool");
                     m_pool->returnResource(conn, this);
@@ -259,7 +264,7 @@ private:
             }
         }
 
-        // 解绑资源池
+        // Unbind the resource pool
         void unbind() {
             m_pool = nullptr;
         }
@@ -268,7 +273,7 @@ private:
         ResourcePool *m_pool;
     };
 
-    /** 归还至资源池 */
+    /** Return it to the resource pool */
     void returnResource(ResourceType *p, ResourceCloser *closer) {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (p) {
@@ -284,27 +289,31 @@ private:
             // HKU_WARN("Trying to return an empty pointer!");
         }
         if (closer) {
-            m_closer_set.erase(closer);  // 移除该 closer
+            m_closer_set.erase(closer);  // Remove this closer
         }
     }
 
-    std::unordered_set<ResourceCloser *> m_closer_set;  // 占用资源的 closer
+    std::unordered_set<ResourceCloser *> m_closer_set;  // The closers occupying the resources
 };
 
 /**
- * @brief 带版本的资源池（强制要求资源类型支持版本接口）
- * @details 要求资源类具备 int getVersion() 和 void setVersion(int) 两个接口函数。
- *          当参数发生变化时，自动递增版本号并释放所有空闲的旧版本资源。
+ * @brief Versioned resource pool (the resource type is required to support the version interfaces)
+ * @details The resource class is required to have the two interface functions int getVersion() and
+ *          void setVersion(int).
+ *          When the parameters change, the version number is increased automatically and all the
+ * idle old version resources are released.
  *
- *          **重要约束**：ResourceType 必须实现 getVersion() 和 setVersion(int) 方法。
+ *          **Important constraint**: ResourceType must implement the getVersion() and
+ *          setVersion(int) methods.
  *
- * @tparam ResourceType 资源类型，必须实现 getVersion() 和 setVersion(int) 方法
+ * @tparam ResourceType the resource type, it must implement the getVersion() and setVersion(int)
+ *                      methods
  * @ingroup Utilities
  */
 template <typename ResourceType>
 class ResourceVersionPool {
 public:
-    // 编译期检查：ResourceType 必须支持 getVersion 和 setVersion
+    // Compile-time check: ResourceType must support getVersion and setVersion
     static_assert(hku::detail::has_resource_getVersion_v<ResourceType>,
                   "ResourceType must implement getVersion() method.");
     static_assert(hku::detail::has_resource_setVersion_v<ResourceType>,
@@ -315,10 +324,11 @@ public:
     ResourceVersionPool &operator=(const ResourceVersionPool &) = delete;
 
     /**
-     * 构造函数
-     * @param param 连接参数
-     * @param maxPoolSize 允许的最大共享资源数，为 0 表示不限制
-     * @param maxIdleNum 运行的最大空闲资源数，为 0 表示用完即刻释放，无缓存
+     * Constructor
+     * @param param connection parameters
+     * @param maxPoolSize the maximum number of the shared resources allowed, 0 means unlimited
+     * @param maxIdleNum the maximum number of the idle resources allowed; 0 means releasing
+     *                   immediately after use without a cache
      */
     explicit ResourceVersionPool(const Parameter &param, size_t maxPoolSize = 0,
                                  size_t maxIdleNum = 100)
@@ -329,17 +339,17 @@ public:
       m_version(0) {}
 
     /**
-     * 析构函数，释放所有缓存的资源
+     * Destructor, it releases all the cached resources
      */
     virtual ~ResourceVersionPool() {
         std::unique_lock<std::mutex> lock(m_mutex);
 
-        // 将所有已分配资源的 closer 和 pool 解绑
+        // Unbind the closer of all the allocated resources from the pool
         for (auto iter = m_closer_set.begin(); iter != m_closer_set.end(); ++iter) {
             (*iter)->unbind();
         }
 
-        // 删除所有空闲资源
+        // Delete all the idle resources
         while (!m_resourceList.empty()) {
             ResourceType *p = m_resourceList.front();
             m_resourceList.pop();
@@ -349,35 +359,36 @@ public:
         }
     }
 
-    /** 获取当前允许的最大资源数 */
+    /** Get the current maximum number of the resources allowed */
     size_t maxPoolSize() const {
         return m_maxIdelSize;
     }
 
-    /** 获取当前允许的最大空闲资源数 */
+    /** Get the current maximum number of the idle resources allowed */
     size_t maxIdleSize() const {
         return m_maxIdelSize;
     }
 
-    /** 设置最大资源数 */
+    /** Set the maximum number of the resources */
     void maxPoolSize(size_t num) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_maxPoolSize = num;
     }
 
-    /** 设置允许的最大空闲资源数 */
+    /** Set the maximum number of the idle resources allowed */
     void maxIdleSize(size_t num) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_maxIdelSize = num;
     }
 
-    /** 指定参数是否存在 */
+    /** Whether the given parameter exists */
     bool haveParam(const std::string &name) {
         std::lock_guard<std::mutex> lock(m_mutex);
         return m_param.have(name);
     }
 
-    /** 获取指定参数的值，如参数不存在或类型不匹配抛出异常 */
+    /** Get the value of the given parameter; an exception is thrown when the parameter does not
+     * exist or the type does not match */
     template <typename ValueType>
     ValueType getParam(const std::string &name) {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -385,62 +396,69 @@ public:
     }
 
     /**
-     * @brief 设定指定参数的值，参数仅在生成新的资源时生效
-     * @details 在原本存在该参数的情况下，新设定的值类型须和原有参数类型相同，否则将抛出异常
-     * @param name 参数名
-     * @param value 参数值
+     * @brief Set the value of the given parameter; the parameter takes effect only when a new
+     * resource is created
+     * @details When the parameter already exists, the type of the newly set value must be the same
+     * as that of the original parameter, otherwise an exception is thrown
+     * @param name parameter name
+     * @param value parameter value
      * @exception std::logic_error
      */
     template <typename ValueType>
     void setParam(const std::string &name, const ValueType &value) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        // 如果参数未实际发送变化，则直接返回
+        // If the parameter has not actually changed, return directly
         HKU_IF_RETURN(m_param.have(name) && value == m_param.get<ValueType>(name), void());
         m_param.set<ValueType>(name, value);
         m_version++;
-        _releaseIdleResourceNoLock();  // 释放当前空闲资源，以便新参数值生效
+        _releaseIdleResourceNoLock();  // Release the current idle resources so that the new
+                                       // parameter values take effect
     }
 
     /**
-     * @brief 设置资源参数，参数仅在生成新的资源时生效
-     * @param param 参数对象
+     * @brief Set the resource parameters; they take effect only when a new resource is created
+     * @param param the parameter object
      */
     void setParameter(const Parameter &param) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_param = param;
         m_version++;
-        _releaseIdleResourceNoLock();  // 释放当前空闲资源，以便新参数值生效
+        _releaseIdleResourceNoLock();  // Release the current idle resources so that the new
+                                       // parameter values take effect
     }
 
     /**
-     * @brief 设置资源参数，参数仅在生成新的资源时生效
-     * @param param 参数对象
+     * @brief Set the resource parameters; they take effect only when a new resource is created
+     * @param param the parameter object
      */
     void setParameter(Parameter &&param) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_param = std::move(param);
         m_version++;
-        _releaseIdleResourceNoLock();  // 释放当前空闲资源，以便新参数值生效
+        _releaseIdleResourceNoLock();  // Release the current idle resources so that the new
+                                       // parameter values take effect
     }
 
-    /** 获取当前资源池版本 */
+    /** Get the current version of the resource pool */
     int getVersion() {
         std::lock_guard<std::mutex> lock(m_mutex);
         return m_version;
     }
 
-    /** 递增当前资源池版本，相当于通知资源池资源版本发生变化 */
+    /** Increase the current version of the resource pool, equivalent to notifying the resource pool
+     *  that the resource version has changed */
     void incVersion(int version) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_version++;
     }
 
-    /** 资源实例指针类型 */
+    /** Resource instance pointer type */
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 获取可用资源，如超出允许的最大资源数将返回空指针
-     * @exception CreateResourceException 新资源创建可能抛出异常
+     * Get an available resource; a null pointer is returned when the maximum number of the
+     * resources allowed is exceeded
+     * @exception CreateResourceException the new resource creation may throw an exception
      */
     ResourcePtr get() {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -473,8 +491,8 @@ public:
     }
 
     /**
-     * 在指定的超时时间内获取可用资源
-     * @param ms_timeout 超时时间，单位毫秒
+     * Get an available resource within the given timeout
+     * @param ms_timeout the timeout in milliseconds
      * @exception GetResourceTimeoutException, CreateResourceException
      */
     ResourcePtr getWaitFor(uint64_t ms_timeout) {  // NOSONAR
@@ -483,7 +501,8 @@ public:
         ResourceType *p = nullptr;
         if (m_resourceList.empty()) {
             if (m_maxPoolSize > 0 && m_count >= m_maxPoolSize) {
-                // HKU_TRACE("超出最大资源数，等待空闲资源");
+                // HKU_TRACE("The maximum number of the resources is exceeded, waiting for an idle
+                // resource");
                 if (ms_timeout > 0) {
                     if (m_cond.wait_for(lock,
                                         std::chrono::duration<uint64_t, std::milli>(ms_timeout),
@@ -521,24 +540,26 @@ public:
     }
 
     /**
-     * 获取可用资源，如超出允许的最大资源数，将阻塞等待直到获得空闲资源
-     * @exception CreateResourceException 新资源创建可能抛出异常
+     * Get an available resource; it blocks and waits until an idle resource is obtained when the
+     * maximum number of the resources allowed is exceeded
+     * @exception CreateResourceException the new resource creation may throw an exception
      */
     ResourcePtr getAndWait() {
         return getWaitFor(0);
     }
 
-    /** 当前活动的资源数, 即全部资源数（含空闲及被使用的资源） */
+    /** The number of the currently active resources, i.e. all the resources (including the idle and
+     *  the used ones) */
     size_t count() const {
         return m_count;
     }
 
-    /** 当前空闲的资源数 */
+    /** The current number of the idle resources */
     size_t idleCount() const {
         return m_resourceList.size();
     }
 
-    /** 释放当前所有的空闲资源 */
+    /** Release all the currently idle resources */
     void releaseIdleResource() {
         std::lock_guard<std::mutex> lock(m_mutex);
         _releaseIdleResourceNoLock();
@@ -557,9 +578,9 @@ private:
     }
 
 private:
-    size_t m_maxPoolSize;  // 允许的最大共享资源数
-    size_t m_maxIdelSize;  // 允许的最大空闲资源数
-    size_t m_count;        // 当前活动的资源数
+    size_t m_maxPoolSize;  // The maximum number of the shared resources allowed
+    size_t m_maxIdelSize;  // The maximum number of the idle resources allowed
+    size_t m_count;        // The number of the currently active resources
     Parameter m_param;
     std::mutex m_mutex;
     std::condition_variable m_cond;
@@ -573,7 +594,7 @@ private:
 
         void operator()(ResourceType *conn) {  // NOSONAR
             if (conn) {
-                // 如果绑定了 pool，则归还资源；否则删除
+                // If the pool is bound, the resource is returned; otherwise it is deleted
                 if (m_pool) {
                     // HKU_DEBUG("retuan to pool");
                     m_pool->returnResource(conn, this);
@@ -584,7 +605,7 @@ private:
             }
         }
 
-        // 解绑资源池
+        // Unbind the resource pool
         void unbind() {
             m_pool = nullptr;
         }
@@ -593,11 +614,13 @@ private:
         ResourceVersionPool *m_pool;
     };
 
-    /** 归还至资源池 */
+    /** Return it to the resource pool */
     void returnResource(ResourceType *p, ResourceCloser *closer) {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (p) {
-            // 当前归还资源的版本和资源池版本相等，且空闲资源列表小于最大空闲资源数时，接受归还的资源
+            // When the version of the currently returned resource equals the resource pool version
+            // and the idle resource list is less than the maximum number of the idle resources, the
+            // returned resource is accepted
             if (p->getVersion() == m_version && m_resourceList.size() < m_maxIdelSize) {
                 m_resourceList.push(p);
                 m_cond.notify_all();
@@ -610,11 +633,11 @@ private:
             // HKU_WARN("Trying to return an empty pointer!");
         }
         if (closer) {
-            m_closer_set.erase(closer);  // 移除该 closer
+            m_closer_set.erase(closer);  // Remove this closer
         }
     }
 
-    std::unordered_set<ResourceCloser *> m_closer_set;  // 占用资源的 closer
+    std::unordered_set<ResourceCloser *> m_closer_set;  // The closers occupying the resources
 };
 
 }  // namespace hku

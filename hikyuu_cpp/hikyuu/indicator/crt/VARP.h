@@ -16,8 +16,8 @@
 namespace hku {
 
 /**
- * 计算N周期内总体样本方差
- * @param n N日时间窗口
+ * Calculate the population sample variance within N periods
+ * @param n N-day time window
  * @ingroup Indicator
  */
 Indicator HKU_API VARP(int n = 10);

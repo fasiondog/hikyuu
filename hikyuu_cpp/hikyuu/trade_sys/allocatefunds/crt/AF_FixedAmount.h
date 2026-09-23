@@ -3,10 +3,10 @@
  *
  * Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2025年12月9日
+ *  Created on: 2025-12-9
  *      Author: stone
  *
- *  v5：AF 具备独立类层次（AllocateFundsBase），工厂返回 AFPtr。
+ *  v5: AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
  */
 
 #pragma once
@@ -18,11 +18,12 @@
 namespace hku {
 
 /**
- * @brief 固定金额分配，每个选中的资产都不能超过此金额交易
- * @details L1 等权 + L2 读取参数 fixed-amount（模式 A 每标的固定金额 /
- *          模式 B 每子系统固定额度）。与 master FixedAmountFunds 存在边界差异：
- *          master 断言 amount>500 且剩余现金 <0.6×amount 时停止，新体系为 >=0 且按净额调仓。
- * @param amount 指定的固定交易金额
+ * @brief Fixed amount allocation, the trade of every selected asset cannot exceed this amount
+ * @details L1 equal weight + L2 reads the parameter fixed-amount (mode A: a fixed amount per
+ *          instrument / mode B: a fixed quota per sub-system). There are boundary differences with
+ *          master FixedAmountFunds: master asserts amount>500 and stops when the remaining cash is
+ *          less than 0.6×amount, while the new system uses >=0 and rebalances by the net amount.
+ * @param amount the given fixed trade amount
  * @return AFPtr
  * @ingroup AllocateFunds
  */

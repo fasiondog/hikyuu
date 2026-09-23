@@ -60,7 +60,7 @@ void init_hikyuu_test() {
 
 int main(int argc, char** argv) {
 #if defined(_WIN32)
-    // Windows 下设置控制台程序输出代码页为 UTF8
+    // Set the console output code page to UTF8 on Windows
     auto old_cp = GetConsoleOutputCP();
     SetConsoleOutputCP(CP_UTF8);
 #endif

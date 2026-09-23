@@ -20,12 +20,13 @@
 namespace hku {
 
 /**
- * 区间存在
+ * Existence in an interval
  * @details
  * <pre>
- * 用法：LAST (X,M,N) 表示条件X在前M周期到前N周期存在
- * 例如：LAST(CLOSE>OPEN,10,5)
- * 表示从前10日到前5日内一直阳线。若A为0,表示从第一天开始,B为0,表示到最后日止。
+ * Usage: LAST (X,M,N) means the condition X exists from M periods ago to N periods ago
+ * For example: LAST(CLOSE>OPEN,10,5)
+ * means the candles are bullish all the way from 10 days ago to 5 days ago. If A is 0 it means
+ * starting from the first day, if B is 0 it means ending at the last day.
  * </pre>
  * @ingroup Indicator
  */

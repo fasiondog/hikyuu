@@ -16,11 +16,11 @@
 
 namespace hku {
 
-// 前向声明，避免循环依赖
+// Forward declaration, to avoid the circular dependency
 class AsyncSQLiteConnect;
 
 /**
- * SQLite 异步 Statement
+ * Asynchronous SQLite statement
  * @ingroup SQLite
  */
 class HKU_UTILS_API AsyncSQLiteStatement : public AsyncSQLStatementBase {

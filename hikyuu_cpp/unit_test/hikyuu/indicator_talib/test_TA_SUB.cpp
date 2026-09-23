@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_SUB") {
     Indicator data0 = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
     Indicator data1 = PRICELIST(PriceList{9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
@@ -35,7 +35,7 @@ TEST_CASE("test_TA_SUB") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     data0 = TA_MA(getKData("sz000001", KQuery(-30)).close(), 4);
     data1 = TA_MA(getKData("sz000002", KQuery(-30)).close(), 5);
     CHECK_UNARY(data0.discard() > 0);
@@ -53,7 +53,7 @@ TEST_CASE("test_TA_SUB") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_SUB_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

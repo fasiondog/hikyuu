@@ -14,12 +14,12 @@
 namespace hku {
 
 /**
- * 多元线性回归实现
+ * The multiple linear regression implementation
  *
- * @param stk 股票对象
- * @param query K线查询条件
- * @param inds 指标列表（自变量）
- * @return 回归系数向量 [alpha, beta1, beta2, ...]
+ * @param stk the stock object
+ * @param query the K-line query condition
+ * @param inds the indicator list (the independent variables)
+ * @return the regression coefficient vector [alpha, beta1, beta2, ...]
  */
 std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
                                      const IndicatorList& inds) {
@@ -83,12 +83,12 @@ std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
 }
 
 /**
- * 多元线性回归完整版本实现
+ * The complete version of the multiple linear regression implementation
  *
- * @param stk 股票对象
- * @param query K线查询条件
- * @param inds 指标列表（自变量）
- * @return 回归结果向量 [alpha, beta1, ..., betan, e1, ..., en, RSS, R²]
+ * @param stk the stock object
+ * @param query the K-line query condition
+ * @param inds the indicator list (the independent variables)
+ * @return the regression result vector [alpha, beta1, ..., betan, e1, ..., en, RSS, R2]
  */
 std::vector<double> multi_regression_full(const Stock& stk, const KQuery& query,
                                           const IndicatorList& inds) {

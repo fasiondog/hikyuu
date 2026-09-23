@@ -1,7 +1,7 @@
 /*
  * SelectorBase.h
  *
- *  Created on: 2016年2月21日
+ *  Created on: 2016-2-21
  *      Author: fasiondog
  */
 
@@ -21,30 +21,30 @@ namespace hku {
 class HKU_API Portfolio;
 
 /**
- * 交易对象选择模块
+ * Trading object selection module
  * @ingroup Selector
  */
 class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
-    /** 默认构造函数 */
+    /** Default constructor */
     SelectorBase();
     SelectorBase(const SelectorBase&) = default;
 
     /**
-     * 构造函数，同时指定算法名称
-     * @param name 指定名称
+     * Constructor, it also gives the algorithm name
+     * @param name the given name
      */
     explicit SelectorBase(const string& name);
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~SelectorBase();
 
-    /** 获取算法名称 */
+    /** Get the algorithm name */
     const string& name() const;
 
-    /** 设置算法名称 */
+    /** Set the algorithm name */
     void name(const string& name);
 
     using PFPtr = shared_ptr<Portfolio>;
@@ -57,87 +57,90 @@ public:
     }
 
     /**
-     * 添加备选股票及其交易策略原型
-     * @param stock 备选股票
-     * @param protoSys 交易系统策略原型
+     * Add a candidate stock and its trading strategy prototype
+     * @param stock candidate stock
+     * @param protoSys trading system strategy prototype
      */
     void addStock(const Stock& stock, const SystemPtr& protoSys);
 
     /**
-     * 加入一组相同交易策略的股票
-     * @note 如果存在无效的stock，则自动忽略，不会返回false
-     * @param stkList 备选股票列表
-     * @param protoSys 交易系统策略原型
+     * Add a group of stocks with the same trading strategy
+     * @note An invalid stock is ignored automatically, false is not returned
+     * @param stkList candidate stock list
+     * @param protoSys trading system strategy prototype
      */
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
     /**
-     * 直接加入已有系统策略示例
-     * @note 应该已经绑定 stock
+     * Add an existing system strategy instance directly
+     * @note The stock should already be bound
      * @param sys
      */
     void addSystem(const SYSPtr& sys);
 
     /**
-     * 直接加入已有系统策略示例
-     * @note 应该已经绑定 stock
+     * Add an existing system strategy instance directly
+     * @note The stock should already be bound
      * @param sys
      */
     void addSystemList(const SystemList& sys);
 
     /**
-     * @brief 获取原型系统列表
+     * @brief Get the prototype system list
      * @return const SystemList&
      */
     const SystemList& getProtoSystemList() const;
 
     /**
-     * @brief 获取由 PF 实际运行的系统列表
+     * @brief Get the system list actually run by PF
      * @return const SystemList&
      */
     const SystemList& getRealSystemList() const;
 
-    /** 获取指定时刻收盘时选中的标的 */
+    /** Get the targets selected at the close of the given moment */
     SystemWeightList getSelected(Datetime date);
 
     /**
-     * @brief 复位
-     * @note 复位不会清除已有的原型系统
+     * @brief Reset
+     * @note The reset does not clear the existing prototype systems
      */
     void reset();
 
     /**
-     * 清除已有的系统原型
+     * Clear the existing system prototypes
      */
     void removeAll();
 
     typedef shared_ptr<SelectorBase> SelectorPtr;
     SelectorPtr clone();
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual SelectorPtr _clone() = 0;
 
-    /** 子类计算接口 */
+    /** Subclass calculation interface */
     virtual void _calculate() = 0;
 
-    /** 子类获取指定时刻收盘时选中的标的 */
+    /** Subclass interface to get the targets selected at the close of the given moment */
     virtual SystemWeightList _getSelected(Datetime date) = 0;
 
 
 
-    /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
+    /** Add a prototype system in the subclass used for the logical operations; it generally does
+     *  not need to be implemented by the subclass */
     virtual void _addSystem(const SYSPtr& sys) {}
 
-    /** 用于逻辑运算的子类中添加原型系统，一般不需要子类实现 */
+    /** Add a prototype system in the subclass used for the logical operations; it generally does
+     *  not need to be implemented by the subclass */
     virtual void _removeAll() {}
 
-    /* 仅供PF调用，由PF通知其实际运行的系统列表，并启动计算 */
+    /* Called by PF only; PF notifies it of the system list it actually runs and starts the
+     * calculation */
     virtual void calculate(const SystemList& pf_realSysList, const KQuery& query);
 
-    /* 仅供PF调用，建立实际系统到原型系统映射 */
+    /* Called by PF only, it builds the mapping from the actual systems to the prototype systems */
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {}
 
     void calculate_proto(const KQuery& query);
@@ -146,8 +149,9 @@ public:
 
 public:
     //------------------------------------------------------------------------
-    // 和 MF 相关的 Selector 才有用，放在这里主要为了 SEPtr 可以直接获取 MF 相关信息
-    // 非 MF 相关的 Selecter 无用
+    // It is useful for the Selector related to MF only; it is placed here mainly so that SEPtr can
+    // get the MF related information directly
+    // It is useless for the Selector not related to MF
     //------------------------------------------------------------------------
     MFPtr getMF() const {
         return m_mf;
@@ -162,10 +166,12 @@ public:
         return m_sc_filter;
     }
 
-    /** 设置截面评分记录过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
+    /** Set the cross-section score record filter, it is used for the MF related Selector only, to
+     *  filter when the Score list is got from MF */
     void setScoresFilter(const ScoresFilterPtr& filter);
 
-    /** 在已有过滤基础上追加过滤，仅用于 MF 相关的 Selector，从 MF 获取 Score 列表时进行过滤 */
+    /** Append a filter on the basis of the existing filters, it is used for the MF related Selector
+     *  only, to filter when the Score list is got from MF */
     void addScoresFilter(const ScoresFilterPtr& filter);
 
     bool isPythonObject() const noexcept {
@@ -182,18 +188,19 @@ protected:
 protected:
     string m_name;
     bool m_is_python_object{false};
-    bool m_calculated{false};  // 是否已计算过
+    bool m_calculated{false};  // Whether it has been calculated
     bool m_proto_calculated{false};
     KQuery m_query;
     KQuery m_proto_query;
 
-    SystemList m_pro_sys_list;   // 原型系统列表
-    SystemList m_real_sys_list;  // PF组合中实际运行的系统，有PF执行时设定，顺序与原型列表一一对应
+    SystemList m_pro_sys_list;   // Prototype system list
+    SystemList m_real_sys_list;  // The systems actually run in the PF portfolio, set when PF
+                                 // executes, in the same order as the prototype list
 
-    std::weak_ptr<Portfolio> m_pf;  // 仅存储不序列化，对 PF 的引用
+    std::weak_ptr<Portfolio> m_pf;  // Stored but not serialized, the reference to PF
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -228,7 +235,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SelectorBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public SelectorBase {
  *     SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -260,7 +268,7 @@ public:                                                            \
     virtual void _calculate() override;
 
 /**
- * 客户程序都应使用该指针类型
+ * Client programs should all use this pointer type
  * @ingroup Selector
  */
 typedef shared_ptr<SelectorBase> SelectorPtr;

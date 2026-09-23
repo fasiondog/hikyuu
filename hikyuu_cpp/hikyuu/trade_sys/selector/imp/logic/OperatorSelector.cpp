@@ -140,9 +140,10 @@ void OperatorSelector::_removeAll() {
 SelectorPtr OperatorSelector::_clone() {
     HKU_THROW("OperatorSelector Could't support clone!");
 #if 0    
-    // OperatorSelector 不支持 clone 操作
-    // 如果要实现 clone, 需要实现类似 indicator 一整套机制
-    // 需要寻找最底层的系统策略实例，并在生成 clone 对象后，对原上传该系统实例也需要用该clone对象
+    // OperatorSelector does not support the clone operation
+    // Implementing clone would require a whole mechanism similar to the indicator one
+    // it would need to find the most underlying system strategy instance and, after creating the
+    // clone object, the original system instance would also have to use that clone
     auto p = make_shared<OperatorSelector>();
     p->cloneRebuild(m_se1, m_se2);
     return p;

@@ -16,9 +16,9 @@
 namespace hku {
 
 /**
- * 向下舍入(向数值减小方向舍入)取整
- * 用法：FLOOR(A)返回沿A数值减小方向最接近的整数
- * 例如：FLOOR(12.3)求得12
+ * Round down (round in the direction of decreasing value) to an integer
+ * Usage: FLOOR(A) returns the nearest integer in the direction of decreasing value of A
+ * For example: FLOOR(12.3) gives 12
  * @ingroup Indicator
  */
 Indicator HKU_API FLOOR();

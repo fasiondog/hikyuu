@@ -153,7 +153,8 @@ public:
     /**
      *	The const reference returned here is only
      *    guaranteed to be valid till the next insert/delete
-     *  修改为非常量引用，以便修改。但请注意这是危险操作！
+     *  It is changed to a non-const reference so that it can be modified. But note that this is a
+     * dangerous operation!
      */
     Value& get(const Key& k) {
         Guard g(lock_);

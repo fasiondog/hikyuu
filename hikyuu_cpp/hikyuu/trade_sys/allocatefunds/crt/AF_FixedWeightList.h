@@ -3,10 +3,10 @@
  *
  * Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  *
- *  v5：AF 具备独立类层次（AllocateFundsBase），工厂返回 AFPtr。
+ *  v5: AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
  */
 
 #pragma once
@@ -18,10 +18,10 @@
 namespace hku {
 
 /**
- * @brief 固定比例资产分配
- * @details L1 按序逐一取 weights[i]，**不归一化**，
- *          等价 master FixedWeightListAllocateFunds 的 auto_adjust_weight=false
- * @param weights 指定的资产比例列表
+ * @brief Fixed proportion asset allocation
+ * @details L1 takes weights[i] one by one in order, **without normalization**, equivalent to master
+ *          FixedWeightListAllocateFunds with auto_adjust_weight=false
+ * @param weights the given asset proportion list
  * @return AFPtr
  * @ingroup AllocateFunds
  */

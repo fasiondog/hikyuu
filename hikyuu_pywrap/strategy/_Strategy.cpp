@@ -28,37 +28,37 @@ void export_Strategy(py::module& m) {
                  const unordered_map<string, int64_t>&, const std::string&, const std::string&>(),
         py::arg("code_list"), py::arg("ktype_list"),
         py::arg("preload_num") = unordered_map<string, int64_t>(), py::arg("name") = "Strategy",
-        py::arg("config") = "", R"(创建策略运行时
+        py::arg("config") = "", R"(Create the strategy runtime
            
-    :param list code_list: 证券代码列表，如：["sz000001", "sz000002"], "all" 代表全部证券
-    :param list ktype_list: K线类型列表, 如: ["day", "min"]
-    :param dict preload_num: 预加载的K线数量，如：{"day_max": 1000, "min_max": 2000}
-    :param str name: 策略名称
-    :param str config: 配置文件名称(如需要使用独立的配置文件，否则为空时使用默认的hikyuu配置文件))")
+    :param list code_list: the security code list, e.g.: ["sz000001", "sz000002"]; "all" means all the securities
+    :param list ktype_list: the K-line type list, e.g.: ["day", "min"]
+    :param dict preload_num: the number of the preloaded K-lines, e.g.: {"day_max": 1000, "min_max": 2000}
+    :param str name: the strategy name
+    :param str config: the configuration file name (if a standalone configuration file is needed; otherwise, when it is empty, the default hikyuu configuration file is used))")
 
       .def(py::init<const StrategyContext&, const string&, const string&>(), py::arg("context"),
            py::arg("name") = "Strategy", py::arg("config") = "",
-           R"(使用上下文创建策略运行时
+           R"(Create the strategy runtime with a context
 
-    :param StrategyContext context: 上下文实例
-    :param str name: 策略名称
-    :param str config: 配置文件名称(如需要使用独立的配置文件，否则为空时使用默认的hikyuu配置文件))")
+    :param StrategyContext context: the context instance
+    :param str name: the strategy name
+    :param str config: the configuration file name (if a standalone configuration file is needed; otherwise, when it is empty, the default hikyuu configuration file is used))")
 
       .def_property("name", py::overload_cast<>(&Strategy::name, py::const_),
                     py::overload_cast<const string&>(&Strategy::name),
-                    py::return_value_policy::copy, "策略名称")
+                    py::return_value_policy::copy, "The strategy name")
 
-      .def_property_readonly("running", &Strategy::running, "获取当前运行状态")
+      .def_property_readonly("running", &Strategy::running, "Get the current running state")
       .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
-                             "获取策略上下文")
-      .def_property("tm", &Strategy::getTM, &Strategy::setTM, "关联的交易管理实例")
-      .def_property("sp", &Strategy::getSP, &Strategy::setSP, "移滑价差算法")
-      .def_property_readonly("is_backtesting", &Strategy::isBacktesting, "回测状态")
+                             "Get the strategy context")
+      .def_property("tm", &Strategy::getTM, &Strategy::setTM, "The associated trade manager instance")
+      .def_property("sp", &Strategy::getSP, &Strategy::setSP, "The slippage algorithm")
+      .def_property_readonly("is_backtesting", &Strategy::isBacktesting, "The backtest state")
 
       .def(
         "start",
         [](Strategy& self, bool auto_recieve_spot) {
-            // python 中在 start 之前，强制加入一个空函数，用于捕获 KeyboardInterrupt 来终止策略
+            // In python, before start, forcibly add an empty function, used to catch KeyboardInterrupt to terminate the strategy
             py::object func = py::eval("lambda stg: None");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
             auto new_func = [=](Strategy* stg) {
@@ -81,9 +81,9 @@ void export_Strategy(py::module& m) {
         },
         py::arg("auto_recieve_spot") = true, R"(start(self)
 
-    启动策略执行，请在完成相关回调设置后执行。
+    Start the strategy execution; please execute it after completing the related callback settings.
 
-    :param bool auto_recieve_spot: 是否自动接收行情数据)")
+    :param bool auto_recieve_spot: whether to receive the market data automatically)")
 
       .def(
         "on_change",
@@ -111,9 +111,9 @@ void export_Strategy(py::module& m) {
         },
         R"(onchang(self, func)
            
-    设置证券数据更新回调通知
+    Set the callback notification of the security data update
 
-    :param func: 一个可调用的对象如普通函数, func(stg: Strategy, stock: Stock, spot: SpotRecord)")
+    :param func: a callable object such as an ordinary function, func(stg: Strategy, stock: Stock, spot: SpotRecord)")
 
       .def(
         "on_received_spot",
@@ -141,9 +141,9 @@ void export_Strategy(py::module& m) {
         },
         R"(on_received_spot(self, func)
 
-    设置证券数据更新通知回调
+    Set the callback notification of the security data update
 
-    :param func: 可调用对象如普通函数, func(stg: Strategy, revTime: Datetime))")
+    :param func: a callable object such as an ordinary function, func(stg: Strategy, revTime: Datetime))")
 
       .def(
         "run_daily",
@@ -173,13 +173,13 @@ void export_Strategy(py::module& m) {
         py::arg("func"), py::arg("time"), py::arg("market") = "SH",
         py::arg("ignore_market") = false, R"(run_daily(self, func)
         
-    设置日内循环执行回调。如果忽略市场开闭市，则自启动时刻开始按间隔时间循环，
-    否则第一次执行时将开盘时间对齐时间间隔，且在非开市时间停止执行。
+    Set the callback executed in a loop within the day. If the market open/close is ignored, it loops from the start moment by the interval time,
+    otherwise, at the first execution, the time interval is aligned with the market open time, and the execution stops in the non-trading time.
 
-    :param func: 可调用对象如普通函数，func(stg: Strategy)
-    :param TimeDelta time: 间隔时间，如间隔3秒：TimeDelta(0, 0, 0, 3) 或 Seconds(3)
-    :param str market: 使用哪个市场的开闭市时间
-    :param ignore_market: 忽略市场开闭市时间)")
+    :param func: a callable object such as an ordinary function, func(stg: Strategy)
+    :param TimeDelta time: the interval time, e.g. an interval of 3 seconds: TimeDelta(0, 0, 0, 3) or Seconds(3)
+    :param str market: which market's open/close times to use
+    :param ignore_market: ignore the market open/close times)")
 
       .def(
         "run_daily_at",
@@ -208,48 +208,48 @@ void export_Strategy(py::module& m) {
         py::arg("func"), py::arg("time"), py::arg("ignore_holiday") = true,
         R"(run_daily_at(self, func)
 
-    设置每日定点执行回调
+    Set the callback executed at a fixed time every day
 
-    :param func: 可调用对象如普通函数，func(stg: Strategy)
-    :param TimeDelta time: 执行时刻，如每日15点：TimeDelta(0, 15)
-    :param ignore_holiday: 节假日不执行)")
+    :param func: a callable object such as an ordinary function, func(stg: Strategy)
+    :param TimeDelta time: the execution moment, e.g. at 15 o'clock every day: TimeDelta(0, 15)
+    :param ignore_holiday: do not execute on the holidays)")
 
       .def("today", &Strategy::today, R"(today(self)
 
-    获取当前交易日日期（使用该方法而不是 Datatime.today(), 以便回测和实盘一直）)")
+    Get the current trading day date (use this method instead of Datetime.today(), so that the backtest and the live trading are consistent))")
 
       .def("now", &Strategy::now, R"(now(self)   
 
-    获取当前时间（使用该方法而不是 Datatime.now(), 以便回测和实盘一直）)")
+    Get the current time (use this method instead of Datetime.now(), so that the backtest and the live trading are consistent))")
 
       .def("next_datetime", &Strategy::nextDatetime, R"(next_datetime(self)
 
-    下一交易时间点（回测使用）)")
+    The next trading time point (used for the backtest))")
 
       .def("get_current_price", &Strategy::getCurrentPrice, py::arg("stk"), py::arg("ktype"),
-           "获取当前价格，无效时返回 constant.null_price")
+           "Get the current price; when invalid, return constant.null_price")
 
       .def("get_price_by_time", &Strategy::getPriceByTime, py::arg("stk"), py::arg("time"),
            py::arg("ktype") = KQuery::MIN,
            R"(get_price_by_time(self, stk, time, ktype)
 
-    获取当日指定时间点的价格
-    :param Stock stk: 股票对象
-    :param TimeDelta time: 指定时间
-    :param KQuery.KType ktype: K线类型，默认为分钟线
-    :return: 价格，无效时返回 constant.null_price)")
+    Get the price at the specified time point of the current day
+    :param Stock stk: the stock object
+    :param TimeDelta time: the specified time
+    :param KQuery.KType ktype: the K-line type, defaulting to the minute line
+    :return: the price; when invalid, return constant.null_price)")
 
       .def("get_kdata", &Strategy::getKData, py::arg("stk"), py::arg("start_date"),
            py::arg("end_date"), py::arg("ktype"), py::arg("recover_type") = KQuery::NO_RECOVER,
            R"(get_kdata(self, stk, start_date, end_date, ktype, recover_type)
 
-    获取指定证券指定日期范围内的K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
-    :param Stock stk: 指定的证券
-    :param Datetime start_date: 开始日期
-    :param Datetime end_date: 结束日期
-    :param KQuery.KType ktype: K线类型
-    :param KQuery.RecoverType recover_type: 恢复方式
-    :return: K线数据
+    Get the K-line data of the specified security within the specified date range (to keep the live trading and the backtest consistent, please use this method to get the K-line data)
+    :param Stock stk: the specified security
+    :param Datetime start_date: the start date
+    :param Datetime end_date: the end date
+    :param KQuery.KType ktype: the K-line type
+    :param KQuery.RecoverType recover_type: the recovery type
+    :return: the K-line data
     :rtype: KData)")
 
       .def(
@@ -265,35 +265,35 @@ void export_Strategy(py::module& m) {
            py::arg("recover_type") = KQuery::NO_RECOVER,
            R"(get_last_kdata(self, stk, start_date, ktype, recover_type)
 
-    获取指定证券从指定日期开始到当前时间的对应K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+    Get the K-line data of the specified security from the specified date to the current time (to keep the live trading and the backtest consistent, please use this method to get the K-line data)
 
-    或 指定当前能获取到的最后 last_num 条 K线数据(为保证实盘和回测一致，请使用本方法获取K线数据)
+    or get the last last_num K-line records that can currently be obtained (to keep the live trading and the backtest consistent, please use this method to get the K-line data)
 
-    :param Stock stk: 指定的证券
-    :param Datetime start_date: 开始日期  (或为 int 类型，表示从当前日期往前推多少个交易日)
-    :param KQuery.KType ktype: K线类型
-    :param KQuery.RecoverType recover_type: 恢复方式
-    :return: K线数据
+    :param Stock stk: the specified security
+    :param Datetime start_date: the start date  (or an int type, indicating how many trading days to go back from the current date)
+    :param KQuery.KType ktype: the K-line type
+    :param KQuery.RecoverType recover_type: the recovery type
+    :return: the K-line data
     :rtype: KData)")
 
       .def("order", py::overload_cast<const Stock&, double, const string&>(&Strategy::order),
            py::arg("stock"), py::arg("num"), py::arg("remark") = "",
            R"(order(self, stock, num, remark='')
 
-    按数量下单（正数为买入，负数为卖出）
-    :param Stock stock: 指定的证券
-    :param int num: 下单数量
-    :param str remark: 下单备注)")
+    Place an order by the quantity (a positive number is a buy, a negative number is a sell)
+    :param Stock stock: the specified security
+    :param int num: the order quantity
+    :param str remark: the order remark)")
 
       .def("order_value",
            py::overload_cast<const Stock&, price_t, const string&>(&Strategy::orderValue),
            py::arg("stock"), py::arg("value"), py::arg("remark") = "",
            R"(order_value(self, stock, value, remark='')
 
-    按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
-    :param Stock stock: 指定的证券
-    :param float value: 投入买入资金
-    :param str remark: 下单备注)")
+    Place an order by the expected security market value, i.e. how much money of the security you want to buy (a positive number is a buy, a negative number is a sell)
+    :param Stock stock: the specified security
+    :param float value: the funds invested to buy
+    :param str remark: the order remark)")
 
       .def(
         "buy",
@@ -320,15 +320,15 @@ void export_Strategy(py::module& m) {
           py::arg("cost_func"), py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
           R"(run_in_strategy(sys, stock, query, broker, cost_func, [other_brokers=[]])
           
-    在策略运行时中执行系统交易 SYS
-    目前仅支持 buy_delay| sell_delay 均为 false 的系统，即 close 时执行交易
+    Execute the system trading SYS in the strategy runtime
+    Currently only the systems with both buy_delay|sell_delay being false are supported, i.e. trading at the close
  
-    :param sys: 交易系统
-    :param stock: 交易对象
-    :param query: 查询条件
-    :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param other_brokers: 其他的订单代理)");
+    :param sys: the trading system
+    :param stock: the trading object
+    :param query: the query condition
+    :param broker: the order broker (dedicated to the order broker synchronizing with the account assets)
+    :param cost_func: the cost function
+    :param other_brokers: the other order brokers)");
 
 
 
@@ -343,19 +343,19 @@ void export_Strategy(py::module& m) {
           py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "",
           R"(crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, [other_brokers=[]], [name='MultiSYSStrategy'], [config=''])
 
-    创建聚合系统策略（MultiSystem 实盘入口）。
-    父账户使用与券商同步的 BrokerTM，子系统使用各自的影子/虚拟账户（模式 A/B 由 MultiSystem 内部决定）。
-    目前仅支持 buy_delay | sell_delay 均为 false 的子系统，即 close 时执行交易。
+    Create the aggregate system strategy (the MultiSystem live trading entry).
+    The parent account uses the BrokerTM synchronized with the broker, the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally by MultiSystem).
+    Currently only the sub-systems with both buy_delay | sell_delay being false are supported, i.e. the trade is executed at the close.
 
-    :param ms: 聚合交易系统 MultiSystem
-    :param str stk_market_code: 驱动标的（如 'SH000001'，作为对齐时间轴）
-    :param query: 查询条件
-    :param broker: 订单代理（与父账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param other_brokers: 其他的订单代理
-    :param str name: 策略名称
-    :param str config: 配置文件
-    :return: 策略运行时实例
+    :param ms: the aggregate trading system MultiSystem
+    :param str stk_market_code: the driving instrument (e.g. 'SH000001', used to align the time axis)
+    :param query: the query condition
+    :param broker: the order broker (the order broker synchronized with the parent account assets)
+    :param cost_func: the cost function
+    :param other_brokers: the other order brokers
+    :param str name: the strategy name
+    :param str config: the config file
+    :return: the strategy runtime instance
     :rtype: Strategy)");
 
 

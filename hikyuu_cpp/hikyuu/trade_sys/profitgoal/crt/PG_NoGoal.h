@@ -1,7 +1,7 @@
 /*
  * PG_NoGoal.h
  *
- *  Created on: 2016年5月6日
+ *  Created on: 2016-5-6
  *      Author: Administrator
  */
 
@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 无盈利目标策略，通常为了进行测试或对比
+ * No profit goal strategy, it is usually used for the testing or the comparison
  * @return PGPtr
  */
 ProfitGoalPtr HKU_API PG_NoGoal();

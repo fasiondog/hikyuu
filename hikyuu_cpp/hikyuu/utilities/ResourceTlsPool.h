@@ -13,63 +13,79 @@
 #include "exception.h"
 
 /**
- * 线程局部资源池 - 完全无锁设计（Ring Buffer 实现）
+ * Thread local resource pool - a completely lock free design (the Ring Buffer implementation)
  *
- * @details 使用 thread_local 存储，每个线程拥有独立的资源池实例。
- *          内部使用固定数组 + Ring Buffer 管理空闲资源，避免动态内存分配和锁竞争。
- *          由于资源完全隔离在线程内部，不需要任何锁或原子操作，性能最优。
+ * @details It uses the thread_local storage, every thread has an independent resource pool
+ * instance. A fixed array + Ring Buffer is used internally to manage the idle resources, avoiding
+ * the dynamic memory allocation and the lock contention. Since the resources are completely
+ * isolated inside the thread, no lock or atomic operation is needed and the performance is optimal.
  *
- *          **核心特性**：
- *          - 完全无锁：基于 thread_local，无需同步机制
- *          - Ring Buffer：使用固定数组实现循环队列，O(1) 时间复杂度的资源获取和归还
- *          - 零动态分配：编译期确定容量，运行时无需 malloc/free
- *          - 线程隔离：每个线程独立实例，避免跨线程竞争
+ *          **Core features**:
+ *          - Completely lock free: based on thread_local, no synchronization mechanism is needed
+ *          - Ring Buffer: a fixed array is used to implement the circular queue, the acquisition
+ * and the return of the resources have an O(1) time complexity
+ *          - Zero dynamic allocation: the capacity is determined at compile time, no malloc/free is
+ *          needed at runtime
+ *          - Thread isolation: every thread has an independent instance, avoiding the cross-thread
+ *          contention
  *
- *          **重要限制**：
- *          - 不适用于协程环境：协程可能在不同的线程间迁移执行，导致资源跨线程归还
- *          - 跨线程归还时资源会被直接删除并输出警告日志，无法实现资源复用
- *          - 如果需要在协程环境中使用资源池，建议使用全局共享池（如 ResourceAsioPool）
- *          - 仅适用于传统多线程模型，确保资源在同一线程内获取和释放
+ *          **Important limitations**:
+ *          - It is not suitable for the coroutine environment: a coroutine may be migrated between
+ *          different threads, causing the resource to be returned across the threads
+ *          - On a cross-thread return the resource is deleted directly and a warning log is output,
+ *          so the resource reuse cannot be achieved
+ *          - If a resource pool is needed in the coroutine environment, it is recommended to use
+ * the global shared pool (such as ResourceAsioPool)
+ *          - It is suitable for the traditional multi-thread model only, ensuring that the resource
+ * is acquired and released within the same thread
  *
- *          **跨线程安全检查机制**：
- *          - 资源获取时会记录所有者线程 ID
- *          - 资源归还时检查当前线程是否与所有者线程一致
- *          - 如果不一致：直接删除资源并输出警告日志，避免访问 thread_local 变量引发未定义行为
- *          - 如果一致：正常归还到池中实现复用
+ *          **Cross-thread safety check mechanism**:
+ *          - The owner thread ID is recorded when the resource is acquired
+ *          - Whether the current thread is the same as the owner thread is checked when the
+ * resource is returned
+ *          - If they are not the same: the resource is deleted directly and a warning log is
+ * output, avoiding the undefined behavior caused by accessing the thread_local variables
+ *          - If they are the same: it is returned to the pool normally to achieve the reuse
  *
- * @tparam ResourceType 资源类型，必须支持构造函数 ResourceType(const Parameter&)
- * @tparam MAX_POOL_SIZE_LIMIT 物理容量上限（编译期固定），默认值为 2
+ * @tparam ResourceType the resource type, it must support the constructor
+ * ResourceType(const Parameter&)
+ * @tparam MAX_POOL_SIZE_LIMIT the upper limit of the physical capacity (fixed at compile time), 2
+ * by default
  * @ingroup Utilities
  *
- * @par 使用示例
+ * @par Usage example
  * @code
- * // 步骤1：初始化默认参数（程序启动时调用一次）
+ * // Step 1: initialize the default parameters (called once at the program startup)
  * Parameter param;
  * param.set("host", "localhost");
  * param.set("port", 3306);
  * ResourceTlsPool<MyResource>::init(param);
  *
- * // 步骤2：获取线程局部资源池实例
+ * // Step 2: get the thread local resource pool instance
  * auto& pool = ResourceTlsPool<MyResource>::getInstance();
  *
- * // 步骤3a：同步获取资源（推荐用法）
+ * // Step 3a: acquire a resource synchronously (the recommended usage)
  * auto resource = pool.get();
  * if (resource) {
  *     resource->doWork();
- * } // 离开作用域时自动归还到池
+ * }  // It is returned to the pool automatically when leaving the scope
  *
- * // 步骤3b：创建独立资源（不归入池管理）
+ * // Step 3b: create an independent resource (not managed by the pool)
  * auto standalone = pool.createStandalone();
  * if (standalone) {
  *     standalone.value()->doWork();
- * } // 离开作用域时自动 delete
+ * }  // It is deleted automatically when leaving the scope
  * @endcode
  *
- * @note 构造函数为私有，必须通过 init() + getInstance() 模式使用
- * @note 每个线程有独立的资源池实例，线程间不共享资源
- * @note 内部使用 Ring Buffer 管理空闲资源指针，避免 std::vector 的动态扩容
- * @note 不支持 asyncGet() 等异步方法，因为 TLS 资源获取本身就是同步且快速的
- * @warning 不建议在协程环境中使用，协程的线程迁移会导致资源无法复用
+ * @note The constructor is private, it must be used through the init() + getInstance() pattern
+ * @note Every thread has an independent resource pool instance, the resources are not shared
+ * between the threads
+ * @note A Ring Buffer is used internally to manage the idle resource pointers, avoiding the dynamic
+ *       expansion of std::vector
+ * @note The asynchronous methods such as asyncGet() are not supported, because the TLS resource
+ *       acquisition itself is synchronous and fast
+ * @warning It is not recommended to use it in the coroutine environment; the thread migration of
+ * the coroutine would make the resource reuse impossible
  */
 namespace hku {
 
@@ -77,24 +93,26 @@ template <typename ResourceType, size_t MAX_POOL_SIZE_LIMIT = 2>
 class ResourceTlsPool {
 public:
     /**
-     * 初始化全局默认参数（可选）
+     * Initialize the global default parameters (optional)
      *
-     * @param param 默认资源创建参数
+     * @param param the default resource creation parameters
      *
-     * @note 应在程序启动时调用一次，设置全局默认值
-     * @note 后续调用 getInstance() 无参版本时将使用这些默认值
-     * @note 如果未调用此方法，将使用 Parameter{}
-     * @note 最大资源数由模板参数 MAX_POOL_SIZE_LIMIT 决定（默认 32）
+     * @note It should be called once at the program startup to set the global default values
+     * @note These default values are used when the no-argument version of getInstance() is called
+     *       afterwards
+     * @note Parameter{} is used if this method is not called
+     * @note The maximum number of the resources is determined by the template parameter
+     *       MAX_POOL_SIZE_LIMIT (32 by default)
      *
      * @example
      * @code
-     * // 程序启动时初始化
+     * // Initialize it at the program startup
      * Parameter defaultParam;
      * defaultParam.set("host", "localhost");
      * defaultParam.set("port", 3306);
      * ResourceTlsPool<MyResource>::init(defaultParam);
      *
-     * // 后续使用无需传参
+     * // No parameter is needed for the later usage
      * auto& pool = ResourceTlsPool<MyResource>::getInstance();
      * @endcode
      */
@@ -103,20 +121,21 @@ public:
     }
 
     /**
-     * 获取当前线程的资源池实例（单例模式）
+     * Get the resource pool instance of the current thread (the singleton pattern)
      *
-     * @return 当前线程的资源池引用
+     * @return the resource pool reference of the current thread
      *
-     * @note thread_local 保证每个线程有独立的资源池实例
-     * @note 使用 init() 设置的默认参数创建实例，最大池大小由模板参数 MAX_POOL_SIZE_LIMIT 决定
-     * @note 首次调用时创建实例，后续调用返回同一实例
+     * @note thread_local guarantees that every thread has an independent resource pool instance
+     * @note The instance is created with the default parameters set by init(), the maximum pool
+     * size is determined by the template parameter MAX_POOL_SIZE_LIMIT
+     * @note The instance is created at the first call and the same instance is returned afterwards
      *
      * @example
      * @code
-     * // 先初始化默认参数
+     * // Initialize the default parameters first
      * ResourceTlsPool<MyResource>::init(param);
      *
-     * // 后续直接获取，无需传参
+     * // Get it directly afterwards without a parameter
      * auto& pool = ResourceTlsPool<MyResource>::getInstance();
      * @endcode
      */
@@ -126,7 +145,7 @@ public:
     }
 
     /**
-     * 析构函数，释放当前线程的所有缓存资源
+     * Destructor, it releases all the cached resources of the current thread
      */
     virtual ~ResourceTlsPool() {
         for (size_t i = 0; i < m_freeCount; ++i) {
@@ -138,10 +157,10 @@ public:
         m_freeCount = 0;
     }
 
-    /** 资源删除器，用于 shared_ptr 自动归还资源 */
+    /** The resource deleter, used by shared_ptr to return the resource automatically */
     struct ResourceDeleter {
         ResourceTlsPool *pool;
-        std::thread::id owner_thread_id;  // 记录获取资源时的线程ID
+        std::thread::id owner_thread_id;  // Records the thread ID when the resource is acquired
 
         void operator()(ResourceType *resource) const {
             if (!resource) {
@@ -150,44 +169,52 @@ public:
 
             auto current_thread = std::this_thread::get_id();
             if (current_thread != owner_thread_id) {
-                // 跨线程归还：直接删除资源，避免访问 thread_local 变量
+                // A cross-thread return: the resource is deleted directly to avoid accessing the
+                // thread_local variables
                 HKU_WARN(
                   "Resource returned from different thread, deleting directly to avoid "
                   "undefined behavior");
                 delete resource;
             } else if (pool) {
-                // 同线程归还：正常归还到池
+                // A same-thread return: it is returned to the pool normally
                 pool->returnResource(resource);
             } else {
-                // pool 为空（可能在析构期间），直接删除
+                // The pool is empty (possibly during the destruction), delete it directly
                 delete resource;
             }
         }
     };
 
-    /** 资源实例指针类型（使用 shared_ptr 管理生命周期） */
+    /** The resource instance pointer type (the lifetime is managed with shared_ptr) */
     typedef std::shared_ptr<ResourceType> ResourcePtr;
 
     /**
-     * 获取可用资源（同步操作）
+     * Get an available resource (a synchronous operation)
      *
-     * @return ResourcePtr 的 expected 对象，成功时包含资源指针，失败时包含错误信息
+     * @return the expected object of ResourcePtr, it contains the resource pointer on success and
+     *         the error information on failure
      *
-     * @note 完全无锁操作，性能极高（O(1) 时间复杂度）
-     * @note 返回的 shared_ptr 在析构时会自动归还资源到池（通过自定义删除器）
-     * @note 如果当前资源数已达上限且无空闲资源，返回错误信息
-     * @note 这是同步方法，在同一线程内调用立即返回，无需等待
-     * @note 优先从 Ring Buffer 的空闲列表获取资源，若无则创建新资源
+     * @note It is a completely lock free operation with an extremely high performance (an O(1) time
+     *       complexity)
+     * @note The returned shared_ptr returns the resource to the pool automatically at its
+     * destruction (through the custom deleter)
+     * @note If the current number of the resources has reached the upper limit and there is no idle
+     *       resource, the error information is returned
+     * @note This is a synchronous method, it returns immediately when called within the same
+     * thread, without waiting
+     * @note The resource is preferentially got from the idle list of the Ring Buffer; a new one is
+     *       created if there is none
      *
-     * @par 执行流程
-     * 1. 检查 Ring Buffer 是否有空闲资源（m_freeCount > 0）
-     *    - 有：从头部出队，返回资源指针
-     * 2. 若无空闲资源，检查是否达到最大资源数限制（m_count >= m_maxCount）
-     *    - 是：返回错误
-     * 3. 创建新资源并增加计数
+     * @par Execution flow
+     * 1. Check whether the Ring Buffer has an idle resource (m_freeCount > 0)
+     *    - Yes: dequeue it from the head and return the resource pointer
+     * 2. If there is no idle resource, check whether the maximum number of the resources is reached
+     *    (m_count >= m_maxCount)
+     *    - Yes: return an error
+     * 3. Create a new resource and increase the count
      */
     stdx::expected<ResourcePtr, std::string> get() {
-        // 1. 尝试从空闲列表获取（Ring Buffer 头部出队）
+        // 1. Try to get it from the idle list (dequeue from the head of the Ring Buffer)
         if (m_freeCount > 0) {
             ResourceType *p = m_resourceList[m_head];
             m_resourceList[m_head] = nullptr;
@@ -196,12 +223,12 @@ public:
             return ResourcePtr(p, ResourceDeleter{this, std::this_thread::get_id()});
         }
 
-        // 2. 无空闲资源，检查是否可以创建新资源
+        // 2. There is no idle resource, check whether a new one can be created
         if (m_count >= m_maxCount) {
             return stdx::unexpected("No available resources and maximum pool size reached");
         }
 
-        // 3. 创建新资源
+        // 3. Create a new resource
         ResourceType *p = nullptr;
         try {
             p = new ResourceType(m_param);
@@ -216,14 +243,18 @@ public:
     }
 
     /**
-     * 创建独立管理的资源（不归入资源池）
+     * Create an independently managed resource (not included in the resource pool)
      *
-     * @return 资源指针的 expected 对象，成功时包含资源指针，失败时包含错误信息
+     * @return the expected object of the resource pointer, it contains the resource pointer on
+     *         success and the error information on failure
      *
-     * @note 返回的资源由调用者完全管理，不会归还到资源池
-     * @note 资源析构时会直接 delete，而不是归还到池
-     * @note 使用资源池内置的参数创建资源
-     * @note 适用于需要临时资源或特殊配置的场景
+     * @note The returned resource is fully managed by the caller and is not returned to the
+     * resource pool
+     * @note The resource is deleted directly at its destruction instead of being returned to the
+     * pool
+     * @note The resource is created with the built-in parameters of the resource pool
+     * @note It is suitable for the scenarios needing a temporary resource or a special
+     * configuration
      *
      * @example
      * @code
@@ -231,7 +262,7 @@ public:
      * if (result) {
      *     auto res = std::move(result.value());
      *     res->doWork();
-     * } // 离开作用域时自动 delete
+     * }  // It is deleted automatically when leaving the scope
      * @endcode
      */
     stdx::expected<std::unique_ptr<ResourceType>, std::string> createStandalone() {
@@ -245,26 +276,27 @@ public:
             return stdx::unexpected("Failed to create standalone resource: Unknown error");
         }
 
-        // 返回标准的 unique_ptr，使用默认 deleter（直接 delete）
+        // Return a standard unique_ptr with the default deleter (a direct delete)
         return std::unique_ptr<ResourceType>(p);
     }
 
-    /** 当前活动的资源数（含空闲及被使用的资源） */
+    /** The number of the currently active resources (including the idle and the used ones) */
     size_t count() const {
         return m_count;
     }
 
-    /** 当前空闲的资源数 */
+    /** The current number of the idle resources */
     size_t idleCount() const {
         return m_freeCount;
     }
 
-    /** 获取允许的最大资源数（逻辑上限） */
+    /** Get the maximum number of the resources allowed (the logical upper limit) */
     size_t maxCount() const {
         return m_maxCount;
     }
 
-    /** 设置最大资源数（逻辑上限，不能超过物理容量） */
+    /** Set the maximum number of the resources (the logical upper limit, it cannot exceed the
+     *  physical capacity) */
     void maxCount(size_t num) {
         if (num > MAX_POOL_SIZE_LIMIT) {
             HKU_WARN("maxCount({}) exceeds physical limit ({}), truncated to {}", num,
@@ -276,12 +308,15 @@ public:
     }
 
     /**
-     * 释放当前所有的空闲资源
+     * Release all the currently idle resources
      *
-     * @note 遍历 Ring Buffer 中的所有空闲资源并删除，将 m_count 减去 m_freeCount
-     * @note 此操作会立即释放所有未被使用的资源，但不会影响正在使用的资源
-     * @note 适用于需要主动回收内存的场景（如程序空闲期）
-     * @note 时间复杂度：O(m_freeCount)，需要遍历所有空闲资源
+     * @note It traverses all the idle resources in the Ring Buffer and deletes them, subtracting
+     *       m_freeCount from m_count
+     * @note This operation releases all the unused resources immediately, but it does not affect
+     * the resources in use
+     * @note It is suitable for the scenarios needing to actively reclaim the memory (such as the
+     *       idle period of the program)
+     * @note The time complexity is O(m_freeCount), all the idle resources need to be traversed
      */
     void releaseIdleResource() {
         for (size_t i = 0; i < m_freeCount; ++i) {
@@ -300,16 +335,16 @@ private:
     ResourceTlsPool &operator=(const ResourceTlsPool &) = delete;
 
     /**
-     * 构造函数（私有，仅通过 getInstance() 访问）
+     * Constructor (private, accessible through getInstance() only)
      *
-     * @param param 资源创建参数
+     * @param param the resource creation parameters
      */
     explicit ResourceTlsPool(const Parameter &param) : m_param(param) {
         m_resourceList.fill(nullptr);
     }
 
     /**
-     * 默认构造函数（私有，仅通过 getInstance() 访问）
+     * Default constructor (private, accessible through getInstance() only)
      */
     ResourceTlsPool() {
         m_resourceList.fill(nullptr);
@@ -317,22 +352,26 @@ private:
 
 private:
     /**
-     * 归还资源到池（Ring Buffer 尾部入队）
+     * Return the resource to the pool (enqueue at the tail of the Ring Buffer)
      *
-     * @param p 待归还的资源指针
+     * @param p the resource pointer to be returned
      *
-     * @note 此方法由 ResourceDeleter 自动调用，用户无需手动调用
-     * @note Ring Buffer 实现：将资源指针放入尾部位置，然后移动 tail 索引
-     * @note 如果 Ring Buffer 已满（m_freeCount == MAX_POOL_SIZE_LIMIT），直接删除资源
-     * @note 时间复杂度：O(1)，无锁操作
+     * @note This method is called automatically by ResourceDeleter, the user does not need to call
+     * it manually
+     * @note Ring Buffer implementation: the resource pointer is put at the tail position and then
+     * the tail index is moved
+     * @note If the Ring Buffer is full (m_freeCount == MAX_POOL_SIZE_LIMIT), the resource is
+     * deleted directly
+     * @note The time complexity is O(1), it is a lock free operation
      *
-     * @par Ring Buffer 工作原理
-     * - 使用固定大小的数组 m_resourceList[MAX_POOL_SIZE_LIMIT]
-     * - m_head 指向下一个可出队的位置（获取资源时从这里取）
-     * - m_tail 指向下一个可入队的位置（归还资源时放到这里）
-     * - 通过模运算实现循环：index = (index + 1) % MAX_POOL_SIZE_LIMIT
-     * - 当 head == tail 且 m_freeCount == 0 时，表示空队列
-     * - 当 m_freeCount == MAX_POOL_SIZE_LIMIT 时，表示满队列
+     * @par The working principle of the Ring Buffer
+     * - A fixed size array m_resourceList[MAX_POOL_SIZE_LIMIT] is used
+     * - m_head points to the next dequeue position (the resource is taken from here when acquired)
+     * - m_tail points to the next enqueue position (the resource is put here when returned)
+     * - The circulation is implemented with the modulo operation:
+     *   index = (index + 1) % MAX_POOL_SIZE_LIMIT
+     * - When head == tail and m_freeCount == 0, it means an empty queue
+     * - When m_freeCount == MAX_POOL_SIZE_LIMIT, it means a full queue
      */
     void returnResource(ResourceType *p) {
         if (p && m_freeCount < MAX_POOL_SIZE_LIMIT) {
@@ -340,20 +379,23 @@ private:
             m_tail = (m_tail + 1) % MAX_POOL_SIZE_LIMIT;
             m_freeCount++;
         } else if (p) {
-            // 如果 Ring Buffer 已满，直接删除资源
+            // If the Ring Buffer is full, delete the resource directly
             delete p;
         }
     }
 
 private:
-    size_t m_maxCount = MAX_POOL_SIZE_LIMIT;  // 逻辑资源上限（运行时可配置，不能超过物理容量）
-    size_t m_count = 0;                       // 当前活动的资源数（含空闲和被使用）
-    size_t m_freeCount = 0;                   // 空闲资源数量
-    size_t m_head = 0;                        // Ring Buffer 头部索引（出队位置）
-    size_t m_tail = 0;                        // Ring Buffer 尾部索引（入队位置）
-    Parameter m_param;                        // 资源创建参数
+    size_t m_maxCount = MAX_POOL_SIZE_LIMIT;  // The logical resource upper limit (configurable at
+                                              // runtime, it cannot exceed the physical capacity)
+    size_t m_count = 0;                       // The number of the currently active resources
+                                              // (including the idle and the used ones)
+    size_t m_freeCount = 0;                   // The number of the idle resources
+    size_t m_head = 0;  // The head index of the Ring Buffer (the dequeue position)
+    size_t m_tail = 0;  // The tail index of the Ring Buffer (the enqueue position)
+    Parameter m_param;  // Resource creation parameters
     std::array<ResourceType *, MAX_POOL_SIZE_LIMIT>
-      m_resourceList{};  // 空闲资源数组（Ring Buffer，物理容量固定）
+      m_resourceList{};  // The idle resource array (the Ring Buffer, the physical capacity is
+                         // fixed)
 
 private:
     static Parameter ms_defaultParam;

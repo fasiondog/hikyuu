@@ -12,7 +12,7 @@
 namespace hku {
 
 /**
- * 边缘跳变，从大于0.0，跳变到 <= 0.0
+ * Edge jump, jumping from greater than 0.0 to <= 0.0
  * @ingroup Indicator
  */
 Indicator HKU_API JUMPDOWN();

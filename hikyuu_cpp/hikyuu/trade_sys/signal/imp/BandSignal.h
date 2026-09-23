@@ -1,7 +1,7 @@
 /*
  * BandSignal.h
  *
- *   Created on: 2023年09月23日
+ *   Created on: 2023-09-23
  *       Author: yangrq1018
  */
 
@@ -28,7 +28,7 @@ private:
     price_t m_lower = 0.0, m_upper = 0.0;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

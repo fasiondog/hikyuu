@@ -41,10 +41,11 @@ public:
 private:
     friend class AsyncMySQLStatement;
 
-    // 提供给 AsyncMySQLStatement 访问原始连接的方法（使用 void* 避免暴露 boost.mysql 类型）
+    // The method provided to AsyncMySQLStatement to access the original connection (void* is used
+    // to avoid exposing the boost.mysql types)
     void *getRawConnection() const;
 
-    // 内部辅助方法
+    // Internal helper methods
     net::awaitable<bool> tryConnect();
     net::awaitable<void> connect();
     void close();

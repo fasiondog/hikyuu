@@ -12,15 +12,24 @@
 namespace hku {
 
 /**
- * 计算 Beta 系数，如衡量资产收益与市场收益之间的敏感性
+ * Calculate the Beta coefficient, such as measuring the sensitivity between the asset return and
+ * the market return
+
  * Beta = Cov(stock_return, market_return) / Var(market_return)
  *
- * @note BETA本身不会对输入数据进行收益率转换(pct_change)处理，
- *       输入的指标应为已经计算好的收益率数据。
- * @param ind1 输入指标, 如股票收益率指标
- * @param ind2 对照指标, 如市场收益率指标
- * @param n 滚动窗口 （大于2或等于0），等于0时使用输入的ind实际长度。
- * @param fill_null 日期对齐时，缺失日期填充 nan 值
+ * @note BETA itself does not perform the return conversion (pct_change) on the input data,
+
+ *       the input indicators should be the already calculated return data.
+
+ * @param ind1 the input indicator, such as the stock return indicator
+
+ * @param ind2 the reference indicator, such as the market return indicator
+
+ * @param n the rolling window (greater than 2 or equal to 0); when it is 0 the actual length of the
+ *          input ind is used.
+
+ * @param fill_null fill the missing dates with nan when the dates are aligned
+
  * @ingroup Indicator
  */
 Indicator HKU_API BETA(const Indicator& ind1, const Indicator& ind2, int n = 10,

@@ -1,7 +1,7 @@
 /*
  * CROSS_SG.h
  *
- *  Created on: 2015年2月20日
+ *  Created on: 2015-2-20
  *      Author: fasiondog
  */
 
@@ -15,10 +15,11 @@
 namespace hku {
 
 /**
- * 双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。
- * @param fast 快线
- * @param slow 慢线
- * @return 信号指示器
+ * Two line crossing indicator: it buys when the fast line crosses the slow line upward from below,
+ * and sells when the fast line crosses the slow line downward from above.
+ * @param fast fast line
+ * @param slow slow line
+ * @return signal generator
  * @ingroup Signal
  */
 SignalPtr HKU_API SG_Cross(const Indicator& fast, const Indicator& slow);

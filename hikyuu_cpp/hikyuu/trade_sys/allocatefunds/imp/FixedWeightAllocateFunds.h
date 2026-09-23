@@ -3,7 +3,9 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  AF_FixedWeight 的语义载体：L1 固定比例（不归一化）。
+ *  The semantic carrier of AF_FixedWeight: L1 fixed proportion (without normalization).
+ *  Created on: 2018-2-8
+ *      Author: fasiondog
  */
 
 #pragma once
@@ -15,11 +17,11 @@
 namespace hku {
 
 /**
- * 固定比例资产分配，每个选中的资产都只占总资产固定的比例。
- * @details L1 系统级分配对每个选中子系统**直接返回固定 weight，不归一化**
- *          （等价 master FixedWeightAllocateFunds 的 auto_adjust_weight=false）。
- *          不使用 weight-list 参数，避免被归一化。
- * @param weight 每个子系统占父总资产的比例 (0, 1]
+ * The fixed proportion asset allocation, every selected asset only accounts for a fixed proportion of the total assets.
+ * @details The L1 system-level allocation **directly returns the fixed weight without normalization** for every selected sub-system
+ *          (equivalent to master FixedWeightAllocateFunds with auto_adjust_weight=false).
+ *          The weight-list parameter is not used, to avoid being normalized.
+ * @param weight the proportion of every sub-system in the parent total assets (0, 1]
  * @ingroup AllocateFunds
  */
 class FixedWeightAllocateFunds : public AllocateFundsBase {

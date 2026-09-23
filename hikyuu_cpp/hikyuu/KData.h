@@ -16,7 +16,7 @@ namespace hku {
 class HKU_API Indicator;
 
 /**
- * K线数据
+ * K-line (candlestick) data
  * @ingroup StockManage
  */
 class HKU_API KData {
@@ -29,8 +29,8 @@ public:
 
     KData& operator=(const KData&) noexcept;
 
-    // 移动语义对 KData 没有实际用处，而且会导致 KData 可能存在空 imp 的情况
-    // 主要是 boost::any_cast 需要，予以保留，但使用时不要到 KData 执行 std::move
+    // Move semantics brings no real benefit to KData, and it may leave KData with a null imp.
+    // They are kept mainly because boost::any_cast needs them, but do not std::move a KData.
     KData(KData&&);
     KData& operator=(KData&&);
 
@@ -42,18 +42,18 @@ public:
 
     DatetimeList getDatetimeList() const;
 
-    /** 获取指定位置的KRecord，未作越界检查 */
+    /** Get the KRecord at the given position, no bounds check is performed */
     const KRecord& getKRecord(size_t pos) const noexcept;
 
-    /** 按日期查询KRecord */
+    /** Query the KRecord by date */
     const KRecord& getKRecord(Datetime datetime) const noexcept;
 
-    /** 同getKRecord @see getKRecord */
+    /** Same as getKRecord @see getKRecord */
     const KRecord& operator[](size_t pos) const noexcept {
         return getKRecord(pos);
     }
 
-    /** 同getKRecord @see getKRecord */
+    /** Same as getKRecord @see getKRecord */
     const KRecord& operator[](Datetime datetime) const {
         return getKRecord(datetime);
     }
@@ -62,81 +62,88 @@ public:
     const KRecord& back() const;
 
     /**
-     * 通过当前 KData 获取一个保持数据类型、复权类型不变的新的 KData
-     * @note 新的 KData 并不一定是原 KData 的子集
-     * @param start 起始日期
-     * @param end 结束日期
+     * Get a new KData from the current one, keeping the data type and price adjustment type
+     * unchanged
+     * @note The new KData is not necessarily a subset of the original one
+     * @param start start date
+     * @param end end date
      */
     KData getKData(const Datetime& start, const Datetime& end) const;
 
     KData getKData(const KQuery& query) const;
 
     /**
-     * 获取相同时间范围内的其他类型K线数据，如日线下对应的分钟线数据
+     * Get the K-line data of another type over the same time range, e.g. the minute data
+     * corresponding to the daily data
      * @param ktype
      * @return KData
      */
     KData getKData(const KQuery::KType& ktype) const;
 
     /**
-     * 通过索引获取其子集 [star, end)
-     * @param start 起始索引
-     * @param end 结束索引
+     * Get the subset [start, end) by index
+     * @param start start index
+     * @param end end index
      * @return KData
      */
     KData getSubKData(int64_t start, int64_t end = Null<int64_t>()) const;
 
-    /** 按日期查询对应的索引位置，注：是 KData 中的位置，不是在 Stock 中原始K记录的位置 */
+    /** Get the index position of the given date. Note: it is the position inside this KData, not
+     * the position of the original K-line record in the Stock */
     size_t getPos(const Datetime& datetime) const noexcept;
 
-    /** 按日期获取在原始 K 线记录中的位置 */
+    /** Get the position in the original K-line record by date */
     size_t getPosInStock(Datetime datetime) const;
 
-    /** 获取关联的KQuery */
+    /** Get the associated KQuery */
     const KQuery& getQuery() const;
 
-    /** 获取关联的Stock，如果没有关联返回Null<Stock> */
+    /** Get the associated Stock; Null<Stock> is returned if there is no association */
     const Stock& getStock() const;
 
-    /** 获取在原始K线记录中对应的起始位置，如果为空返回0 */
+    /** Get the start position in the original K-line record; 0 if it is empty */
     size_t startPos() const;
 
-    /** 获取在原始K线记录中对应的最后一条记录的位置，如果为空返回0,其他等于endPos - 1 */
+    /** Get the position of the last record in the original K-line record; 0 if it is empty,
+     *  otherwise endPos - 1 */
     size_t lastPos() const;
 
-    /** 获取在原始K线记录中对应范围的下一条记录的位置，如果为空返回0,其他等于lastPos + 1 */
+    /** Get the position of the next record after the range in the original K-line record; 0 if it
+     * is empty, otherwise lastPos + 1 */
     size_t endPos() const;
 
-    /** 输出数据到指定的文件中 */
+    /** Write the data to the given file */
     void tocsv(const string& filename);
 
     string toString() const;
 
-    /** 开盘价 */
+    /** Open price */
     Indicator open() const;
 
-    /** 最高价 */
+    /** High price */
     Indicator high() const;
 
-    /** 收盘价 */
+    /** Close price */
     Indicator close() const;
 
-    /** 最低价 */
+    /** Low price */
     Indicator low() const;
 
-    /** 成交量 */
+    /** Trading volume */
     Indicator vol() const;
 
-    /** 成交金额 */
+    /** Trading amount */
     Indicator amo() const;
 
     /**
-     * 特殊用途！谨慎！按当前K线范围，获取指定日期范围的其他类型的按日期查询的 Query 条件
+     * Special purpose! Use with care! Get a query condition by date for another K-line type over
+     * the given date range, based on the current K-line range
      * @note
-     *  1. 指定日期范围必须在当前K线数据范围内，否则截断在 K 线范围内
-     *  2. start_datetime/end_datetime 的精度应和当前 KData 一致
-     *  3. 如果原截止条件为 Null<Datetime>()且未指定end_datetime, 则返回的查询条件为
-     * Null<Datetime>()
+     *  1. The given date range must fall inside the current K-line data range, otherwise it is
+     *     truncated to the K-line range
+     *  2. The precision of start_datetime / end_datetime should match the current KData
+     *  3. If the original end condition is Null<Datetime>() and end_datetime is not given, the
+     *     returned query condition is Null<Datetime>()
      * @param start_datetime
      * @param end_datetime
      * @param ktype
@@ -147,11 +154,11 @@ public:
 
 public:
     const KRecord* data() const noexcept;
-    KRecord* data() noexcept;  // 谨慎使用（用于强制调整数据）
+    KRecord* data() noexcept;  // Use with care (intended for forcibly adjusting the data)
 
     KDataImpPtr getImp() const noexcept;
 
-    // 常量迭代器定义
+    // Constant iterator definition
     class const_iterator {
     public:
         using iterator_category = std::forward_iterator_tag;
@@ -190,8 +197,8 @@ public:
         }
 
     private:
-        const KData& container_;  // 常量引用容器
-        size_t index_;            // 当前索引
+        const KData& container_;  // Const reference to the container
+        size_t index_;            // Current index
     };
 
     using iterator = const_iterator;
@@ -213,7 +220,7 @@ public:
 private:
     std::shared_ptr<KDataImp>& get_null_kdata_imp() {
         static std::shared_ptr<KDataImp> instance =
-          std::make_shared<KDataImp>();  // 第一次调用时初始化
+          std::make_shared<KDataImp>();  // Initialized on the first call
         return instance;
     }
 
@@ -222,12 +229,12 @@ private:
 };
 
 /**
- * 输出KData信息
+ * Print the KData information
  * @details
  * <pre>
  * KData{
  *   size : 738501
- *   stock: Stock(SH, 000001, 上证指数, 指数, 1, 1990-Dec-19 00:00:00, +infinity),
+ *   stock: Stock(SH, 000001, Shanghai Composite Index, Index, 1, 1990-Dec-19 00:00:00, +infinity),
  *   query: KQuery(0, 99999999999, INDEX, MIN, NO_RECOVER)
  *  }
  * </pre>
@@ -236,20 +243,20 @@ private:
 HKU_API std::ostream& operator<<(std::ostream& os, const KData& kdata);
 
 /**
- * 根据股票标识按指定的查询条件查询的 K 线数据
- * @param market_code 股票标识
- * @param query 查询条件
+ * Get the K-line data of the given security identifier with the given query condition
+ * @param market_code security identifier
+ * @param query query condition
  * @ingroup StockManage
  */
 KData HKU_API getKData(const string& market_code, const KQuery& query);
 
 /**
- * 根据股票标识直接按日期查询获取相应的 K 线数据
- * @param market_code 股票标识
- * @param start 起始日期
- * @param end 结束日期
- * @param ktype K线类型
- * @param recoverType 复权类型
+ * Get the K-line data of the given security identifier directly by date
+ * @param market_code security identifier
+ * @param start start date
+ * @param end end date
+ * @param ktype K-line type
+ * @param recoverType price adjustment type
  * @ingroup StockManage
  */
 KData HKU_API getKData(const string& market_code, const Datetime& start = Datetime::min(),
@@ -258,12 +265,12 @@ KData HKU_API getKData(const string& market_code, const Datetime& start = Dateti
                        KQuery::RecoverType recoverType = KQuery::NO_RECOVER);
 
 /**
- * 根据股票标识直接按索引位置查询获取相应的 K 线数据
- * @param market_code 股票标识
- * @param start 起始索引
- * @param end 结束索引
- * @param ktype K线类型
- * @param recoverType 复权类型
+ * Get the K-line data of the given security identifier directly by index position
+ * @param market_code security identifier
+ * @param start start index
+ * @param end end index
+ * @param ktype K-line type
+ * @param recoverType price adjustment type
  * @ingroup StockManage
  */
 KData HKU_API getKData(const string& market_code, int64_t start = 0, int64_t end = Null<int64_t>(),
@@ -294,7 +301,7 @@ inline DatetimeList KData::getDatetimeList() const {
 }
 
 inline const KRecord& KData::getKRecord(size_t pos) const noexcept {
-    return m_imp->getKRecord(pos);  // 不会抛出异常
+    return m_imp->getKRecord(pos);  // Never throws
 }
 
 inline const KRecord& KData::getKRecord(Datetime datetime) const noexcept {

@@ -14,10 +14,10 @@
 namespace hku {
 
 /*
- * 亚历山大.艾尔德力度指数
- * 参见《走进我的交易室》（2007年 地震出版社） (Alexander Elder) P131
- * 计算公式：（收盘价今－收盘价昨）＊成交量今
- * n: 用于EMA平滑的周期窗口，必须为大于0的整数
+ * Alexander Elder's force index
+ * See "Come Into My Trading Room" (2007, Earthquake Press) (Alexander Elder) P131
+ * Calculation formula: (today's close price - yesterday's close price) * today's volume
+ * n: the period window used for the EMA smoothing, it must be an integer greater than 0
  */
 class IVigor : public IndicatorImp {
     INDICATOR_IMP(IVigor)

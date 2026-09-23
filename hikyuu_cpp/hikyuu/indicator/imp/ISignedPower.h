@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 乘幂
+ * Power
  */
 class ISignedPower : public IndicatorImp {
     INDICATOR_IMP(ISignedPower)

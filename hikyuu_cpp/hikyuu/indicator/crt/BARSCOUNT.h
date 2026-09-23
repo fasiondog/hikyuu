@@ -16,12 +16,13 @@
 namespace hku {
 
 /**
- * 有效值周期数, 求总的周期数。
+ * Number of the valid value periods; gives the total number of the periods.
  * @details
  * <pre>
- * 用法：BARSCOUNT(X)第一个有效数据到当前的天数。
- * 例如：BARSCOUNT(CLOSE)对于日线数据取得上市以来总交易日数，
- *       对于1分钟线取得当日交易分钟数
+ * Usage: BARSCOUNT(X) gives the number of days from the first valid data until now.
+ * For example: for the daily line data BARSCOUNT(CLOSE) gets the total number of the trading days
+ *       since the listing, and for the 1-minute line it gets the number of the trading minutes of
+ *       the day
  * </pre>
  * @ingroup Indicator
  */

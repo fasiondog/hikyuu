@@ -9,25 +9,34 @@
 #define DOC_H_
 
 /******************************************************************************
- * 该文件仅用于生成doxygen文档
+ * This file is used by doxygen to generate the documentation only
  *****************************************************************************/
 
 /**
  * @mainpage
- * 测试用例文档，用于组织和描述测试用例。 \n
+ * The test case documentation, used to organize and describe the test cases. \n
  *
- * @section test_rule 测试工程的组织原则
- * 组织原则1：测试工程与源代码工程在物理上隔离，使用完全独立的并行目录，但内部目录结构应于源代码工程保持一致。
+ * @section test_rule The organization principles of the test project
+ * Principle 1: the test project is physically isolated from the source code project, using a fully
+ * independent parallel directory, but the internal directory structure should stay consistent with
+ * the source code project.
  * \n
- * 组织原则2：针对一个模块（通常为一个类），应建立一个测试套件（test_suite），其命名规则为：test_模块名（类名)_suite，
- *          例如，针对类IniParser，建立一个测试套件：test_iniparser_suite。建议全部使用小写字母。 \n
- * 组织原则3：针对每一测试套件，使用一个单独的测试文件，文件命名规则：test_模块名（类名）.cpp。 \n
- * 组织原则4：针对每一个函数或类成员方法，建立一个独立的测试用例，命名规则为：test_函数名(或test_类名_方法名)。
- *          对于重名的情况，可以在其后，加上“_case”或其他标识进行简单区分。\n
- * 组织原则5：对于每一测试用例，应在对应的测试套件文件中予以定义和实现。\n
+ * Principle 2: for a module (usually a class) a test suite (test_suite) should be created, its
+ * naming rule is: test_module name (class name)_suite, for example, for the class IniParser a test
+ * suite test_iniparser_suite is created. It is recommended to use lowercase letters only. \n
+ * Principle 3: for every test suite a separate test file is used, its naming rule is:
+ * test_module name (class name).cpp. \n
+ * Principle 4: for every function or class member method an independent test case is created, its
+ * naming rule is: test_function name (or test_class name_method name).
+ *          In the case of a duplicate name, "_case" or another identifier can be appended for a
+ *          simple distinction. \n
+ * Principle 5: every test case should be defined and implemented in the corresponding test suite
+ * file. \n
  *
- * @section maintenance_rule 维护原则
- * 在源代码工程发生变更时（如增加新功能、修改BUG），应对相应的测试用例进行检查和修正，以保证测试工程的持续可用。
+ * @section maintenance_rule Maintenance principles
+ * When the source code project changes (such as adding a new feature or fixing a BUG), the
+ * corresponding test cases should be checked and corrected to guarantee the continuous usability of
+ * the test project.
  */
 
 /**

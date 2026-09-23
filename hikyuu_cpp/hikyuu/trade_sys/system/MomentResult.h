@@ -1,8 +1,8 @@
 /*
  * MomentResult.h
  *
- *  递归组合重构：某一时刻、某一系统实例的完整运行结果（建议）
- *  单证券与聚合形态返回【完全相同】的结构，这是嵌套的前提。
+ *  Recursive combination refactoring: the complete running result (suggestion) of a system instance at a certain moment
+ *  The single-security and the aggregate forms return the [completely identical] structure, which is the premise of the nesting.
  */
 
 #pragma once
@@ -25,22 +25,22 @@ namespace hku {
 using json = nlohmann::json;
 
 /**
- * 某一时刻、某一系统实例的完整运行结果（建议）
- * @note 单证券与聚合形态返回【完全相同】的结构，这是嵌套的前提
- * @note 运行期中间数据，不参与序列化
+ * The complete running result (suggestion) of a system instance at a certain moment
+ * @note The single-security and the aggregate forms return the [completely identical] structure, which is the premise of the nesting
+ * @note It is the runtime intermediate data, not participating in the serialization
  */
 struct HKU_API MomentResult {
-    Datetime datetime;                  // 对应时刻
-    FundsRecord funds_before_open;      // 【开盘交易前】快照 → tradesOnOpen 比重的分母
-    FundsRecord funds_before_close;     // 【收盘交易前】快照（= open 执行后）→ tradesOnClose 比重的分母
-    FundsRecord funds;                  // 本时刻最终余额 / 总资产 / 市值（含多空与融资融券）
-    std::vector<PositionRecord> positions;  // 当前持仓（聚合形态为多标的；惰性填充）
-    TradeRecordList tradesOnOpen;       // 【开盘】阶段执行的交易
-    TradeRecordList tradesOnClose;      // 【收盘】阶段执行的交易
-    std::vector<TradeRequest> delayOnNextOpen;  // 延迟至下一时刻开盘执行的请求
-    TradeSuggestionList suggestions;    // 本时刻产生的建议指令（完整语义）
+    Datetime datetime;                  // The corresponding moment
+    FundsRecord funds_before_open;      // The [before open trade] snapshot -> the denominator of the tradesOnOpen ratio
+    FundsRecord funds_before_close;     // The [before close trade] snapshot (= after the open execution) -> the denominator of the tradesOnClose ratio
+    FundsRecord funds;                  // The final balance / total assets / market value at this moment (including the long/short and the margin trading)
+    std::vector<PositionRecord> positions;  // The current positions (multiple instruments for the aggregate form; lazily filled)
+    TradeRecordList tradesOnOpen;       // The trades executed at the [open] stage
+    TradeRecordList tradesOnClose;      // The trades executed at the [close] stage
+    std::vector<TradeRequest> delayOnNextOpen;  // The requests delayed to the open of the next moment
+    TradeSuggestionList suggestions;    // The suggestion instructions produced at this moment (the complete semantics)
 
-    json ext;                           // 可扩展区（惰性构造，默认空对象）
+    json ext;                           // The extensible area (lazily constructed, an empty object by default)
 
     TradeRecordList allTrades() const {
         TradeRecordList r = tradesOnOpen;

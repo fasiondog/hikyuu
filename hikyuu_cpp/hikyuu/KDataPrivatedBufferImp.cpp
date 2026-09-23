@@ -79,11 +79,11 @@ size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const noexcept {
 }
 
 void KDataPrivatedBufferImp::_recover() {
-    // 不支持复权时，直接返回
+    // Return directly when the adjustment is not supported
     if (m_buffer.empty() || m_query.recoverType() == KQuery::NO_RECOVER)
         return;
 
-    // 日线以上复权处理
+    // The adjustment handling for the daily line and above
     int64_t secs = KQuery::getKTypeInSeconds(m_query.kType());
     if (secs > KQuery::getKTypeInSeconds(KQuery::DAY)) {
         _recoverForUpDay();
@@ -178,11 +178,16 @@ void KDataPrivatedBufferImp::_recoverForUpDay() {
 }
 
 /******************************************************************************
- * 前复权公式:复权后价格＝[(复权前价格-现金红利)＋配(新)股价格×流通股份变动比例]÷(1＋流通股份变动比例)
- * 向前复权指以除权后的股价为基准（即除权后的股价不变），将除权前的股价降下来。
- * 复权计算时首先从上市日开始，逐日向后判断，遇到除权日，则将上市日到除权日之间（不包括除权日）的
- * 全部股价通过复权计算降下来；然后再继续向后判断，遇到下一个除权日，则再次将上市日到该除权日之间
- * （不包括除权日）的全部股价通过复权计算降下来。
+ * The forward adjustment formula: the adjusted price = [(the pre-adjustment price - the cash
+ * dividend) + the rights (new) share price x the change ratio of the outstanding shares] / (1 + the
+ * change ratio of the outstanding shares) The forward adjustment takes the price after the
+ * ex-rights as the base (i.e. the price after the ex-rights stays unchanged) and lowers the prices
+ * before the ex-rights. In the adjustment calculation it starts from the listing date and goes
+ * forward day by day; when an ex-rights date is met, all the prices between the listing date and
+ * the ex-rights date (excluding the ex-rights date) are lowered by the adjustment calculation; then
+ * it continues forward, and when the next ex-rights date is met, the prices between the listing
+ * date and that ex-rights date (excluding the ex-rights date) are lowered by the adjustment
+ * calculation again.
  *****************************************************************************/
 void KDataPrivatedBufferImp::_recoverForward() {
     size_t total = m_buffer.size();
@@ -195,7 +200,8 @@ void KDataPrivatedBufferImp::_recoverForward() {
 
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {
-        // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
+        // Calculate the change ratio of the outstanding shares; the case where only the outstanding
+        // share capital changes is not handled
         if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
              weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
              weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
@@ -205,7 +211,7 @@ void KDataPrivatedBufferImp::_recoverForward() {
         while (i < total && m_buffer[i].datetime < weightIter->datetime()) {
             i++;
         }
-        pre_pos = i;  // 除权日
+        pre_pos = i;  // The ex-rights date
 
         price_t denominator = 0.0, temp = 0.0;
         if (weightIter->suogu() != 0.0) {
@@ -213,8 +219,9 @@ void KDataPrivatedBufferImp::_recoverForward() {
         } else {
             price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
                                     weightIter->increasement());
-            // change 小于 0 时为缩股
-            denominator = 1.0 + change;  // 分母 = (1+流通股份变动比例)
+            // A change less than 0 means a share contraction
+            denominator =
+              1.0 + change;  // The denominator = (1 + the change ratio of the outstanding shares)
             temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
         }
 
@@ -235,10 +242,16 @@ void KDataPrivatedBufferImp::_recoverForward() {
 }
 
 /******************************************************************************
- * 后复权公式:复权后价格＝复权前价格×(1＋流通股份变动比例)-配(新)股价格×流通股份变动比例＋现金红利
- * 向后复权指以除权前的股价为基准（即除权前的股价不变），将除权后的股价升上去。复权计算时首先从最新日开始，
- * 逐日向前判断，遇到除权日，则将除权日到最新日之间（包括除权日）的全部股价通过复权计算升上去；然后再继续
- * 向前判断，遇到下一个除权日，则再次将除权日到最新日之间（包括除权日）的全部股价通过复权计算升上去。
+ * The backward adjustment formula: the adjusted price = the pre-adjustment price x (1 + the change
+ * ratio of the outstanding shares) - the rights (new) share price x the change ratio of the
+ * outstanding shares + the cash dividend The backward adjustment takes the price before the
+ * ex-rights as the base (i.e. the price before the ex-rights stays unchanged) and raises the prices
+ * after the ex-rights. In the adjustment calculation it starts from the latest date and goes
+ * backward day by day; when an ex-rights date is met, all the prices between the ex-rights date and
+ * the latest date (including the ex-rights date) are raised by the adjustment calculation; then it
+ * continues backward, and when the next ex-rights date is met, the prices between that ex-rights
+ * date and the latest date (including the ex-rights date) are raised by the adjustment calculation
+ * again.
  *****************************************************************************/
 void KDataPrivatedBufferImp::_recoverBackward() {
     size_t total = m_buffer.size();
@@ -251,7 +264,8 @@ void KDataPrivatedBufferImp::_recoverBackward() {
 
     size_t pre_pos = total - 1;
     for (; weightIter != weightList.rend(); ++weightIter) {
-        // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
+        // Calculate the change ratio of the outstanding shares; the case where only the outstanding
+        // share capital changes is not handled
         if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
              weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
              weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
@@ -262,7 +276,7 @@ void KDataPrivatedBufferImp::_recoverBackward() {
             i--;
         }
 
-        // 分钟数据，需要跳过第一个时间点
+        // For the minute data the first time point needs to be skipped
         if (i != pre_pos && m_buffer[i].datetime != m_buffer[i].datetime.startOfDay()) {
             i++;
         }
@@ -273,18 +287,18 @@ void KDataPrivatedBufferImp::_recoverBackward() {
         if (weightIter->suogu() != 0.0) {
             denominator = weightIter->suogu();
         } else {
-            // 流通股份变动比例
+            // The change ratio of the outstanding shares
             price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
                                     weightIter->increasement());
-            // change 小于 0 时为缩股
-            denominator = 1.0 + change;  //(1+流通股份变动比例)
+            // A change less than 0 means a share contraction
+            denominator = 1.0 + change;  // (1 + the change ratio of the outstanding shares)
             temp = 0.1 * weightIter->bonus() - weightIter->priceForSell() * change;
         }
 
         if (denominator == 1.0 && temp == 0.0)
             continue;
 
-        price_t volume_multiplier = 1.0 / denominator;  // 成交量调整倍数
+        price_t volume_multiplier = 1.0 / denominator;  // The volume adjustment multiplier
 
         for (i = pre_pos; i < total; ++i) {
             m_buffer[i].openPrice = m_buffer[i].openPrice * denominator + temp;
@@ -298,12 +312,17 @@ void KDataPrivatedBufferImp::_recoverBackward() {
 }
 
 /******************************************************************************
- * 等比前复权公式:复权后价格＝复权前价格*复权率
- * 复权率＝｛[(股权登记日收盘价-现金红利)＋配(新)股价格×流通股份变动比例]÷(1＋流通股份变动比例)｝÷股权登记日收盘价
- * 向前复权指以除权后的股价为基准（即除权后的股价不变），将除权前的股价降下来。
- * 复权计算时首先从上市日开始，逐日向后判断，遇到除权日，则将上市日到除权日之间（不包括除权日）的
- * 全部股价通过复权计算降下来；然后再继续向后判断，遇到下一个除权日，则再次将上市日到该除权日之间
- * （不包括除权日）的全部股价通过复权计算降下来。
+ * The proportional forward adjustment formula: the adjusted price = the pre-adjustment price * the
+ * adjustment ratio the adjustment ratio = {[(the close price of the record date - the cash
+ * dividend) + the rights (new) share price x the change ratio of the outstanding shares] / (1 + the
+ * change ratio of the outstanding shares)} / the close price of the record date The forward
+ * adjustment takes the price after the ex-rights as the base (i.e. the price after the ex-rights
+ * stays unchanged) and lowers the prices before the ex-rights. In the adjustment calculation it
+ * starts from the listing date and goes forward day by day; when an ex-rights date is met, all the
+ * prices between the listing date and the ex-rights date (excluding the ex-rights date) are lowered
+ * by the adjustment calculation; then it continues forward, and when the next ex-rights date is
+ * met, the prices between the listing date and that ex-rights date (excluding the ex-rights date)
+ * are lowered by the adjustment calculation again.
  *****************************************************************************/
 void KDataPrivatedBufferImp::_recoverEqualForward() {
     size_t total = m_buffer.size();
@@ -316,11 +335,12 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
         return;
     }
 
-    KRecordList kdata = m_buffer;  // 防止同一天两条权息记录
+    KRecordList kdata = m_buffer;  // Prevent two ex-rights/ex-dividend records on the same day
     StockWeightList::const_iterator weightIter = weightList.begin();
     size_t pre_pos = 0;
     for (; weightIter != weightList.end(); ++weightIter) {
-        // 计算流通股份变动比例,但不处理仅仅只有流通股本改变的情况
+        // Calculate the change ratio of the outstanding shares; the case where only the outstanding
+        // share capital changes is not handled
         if ((weightIter->countAsGift() == 0.0 && weightIter->countForSell() == 0.0 &&
              weightIter->priceForSell() == 0.0 && weightIter->bonus() == 0.0 &&
              weightIter->increasement() == 0.0 && weightIter->suogu() == 0.0))
@@ -330,26 +350,26 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
         while (i < total && m_buffer[i].datetime < weightIter->datetime()) {
             i++;
         }
-        pre_pos = i;  // 除权日
+        pre_pos = i;  // The ex-rights date
 
-        // 股权登记日（即除权日的前一天数据）收盘价
+        // The close price of the record date (i.e. the data of the day before the ex-rights date)
         if (pre_pos == 0) {
             continue;
         }
         price_t closePrice = kdata[pre_pos - 1].closePrice;
         if (closePrice == 0.0) {
-            continue;  // 除零保护
+            continue;  // Protection against a division by zero
         }
 
         price_t denominator = 0.0, temp = 0.0;
         if (weightIter->suogu() != 0.0) {
             denominator = weightIter->suogu();
         } else {
-            // 流通股份变动比例
+            // The change ratio of the outstanding shares
             price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
                                     weightIter->increasement());
-            // change 小于 0 时为缩股
-            denominator = 1.0 + change;  //(1+流通股份变动比例)
+            // A change less than 0 means a share contraction
+            denominator = 1.0 + change;  // (1 + the change ratio of the outstanding shares)
             temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
         }
 
@@ -357,7 +377,8 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
             continue;
 
         price_t k = (closePrice + temp) / (denominator * closePrice);
-        price_t volume_k = 1.0 / denominator;  // 成交量修正因子（股本变动的倒数）
+        price_t volume_k =
+          1.0 / denominator;  // The volume correction factor (the reciprocal of the change)
 
         for (i = 0; i < pre_pos; ++i) {
             m_buffer[i].openPrice = k * m_buffer[i].openPrice;
@@ -371,11 +392,17 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
 }
 
 /******************************************************************************
- * 等比后复权公式:复权后价格＝复权前价格÷复权率
- * 复权率＝｛[(股权登记日收盘价-现金红利)＋配(新)股价格×流通股份变动比例]÷(1＋流通股份变动比例)｝÷股权登记日收盘价
- * 向后复权指以除权前的股价为基准（即除权前的股价不变），将除权后的股价升上去。复权计算时首先从最新日开始，
- * 逐日向前判断，遇到除权日，则将除权日到最新日之间（包括除权日）的全部股价通过复权计算升上去；然后再继续
- * 向前判断，遇到下一个除权日，则再次将除权日到最新日之间（包括除权日）的全部股价通过复权计算升上去。
+ * The proportional backward adjustment formula: the adjusted price = the pre-adjustment price / the
+ * adjustment ratio the adjustment ratio = {[(the close price of the record date - the cash
+ * dividend) + the rights (new) share price x the change ratio of the outstanding shares] / (1 + the
+ * change ratio of the outstanding shares)} / the close price of the record date The backward
+ * adjustment takes the price before the ex-rights as the base (i.e. the price before the ex-rights
+ * stays unchanged) and raises the prices after the ex-rights. In the adjustment calculation it
+ * starts from the latest date and goes backward day by day; when an ex-rights date is met, all the
+ * prices between the ex-rights date and the latest date (including the ex-rights date) are raised
+ * by the adjustment calculation; then it continues backward, and when the next ex-rights date is
+ * met, the prices between that ex-rights date and the latest date (including the ex-rights date)
+ * are raised by the adjustment calculation again.
  *****************************************************************************/
 void KDataPrivatedBufferImp::_recoverEqualBackward() {
     size_t total = m_buffer.size();
@@ -393,14 +420,14 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
             i--;
         }
 
-        // 分钟数据，需要跳过第一个时间点
+        // For the minute data the first time point needs to be skipped
         if (i != pre_pos && m_buffer[i].datetime != m_buffer[i].datetime.startOfDay()) {
             i++;
         }
 
-        pre_pos = i;  // 除权日
+        pre_pos = i;  // The ex-rights date
 
-        // 股权登记日（即除权日的前一天数据）收盘价
+        // The close price of the record date (i.e. the data of the day before the ex-rights date)
         if (pre_pos == 0) {
             continue;
         }
@@ -411,11 +438,11 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
         if (weightIter->suogu() != 0.0) {
             denominator = weightIter->suogu();
         } else {
-            // 流通股份变动比例
+            // The change ratio of the outstanding shares
             price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
                                     weightIter->increasement());
-            // change 小于 0 时为缩股
-            denominator = 1.0 + change;  //(1+流通股份变动比例)
+            // A change less than 0 means a share contraction
+            denominator = 1.0 + change;  // (1 + the change ratio of the outstanding shares)
             temp = closePrice + weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
         }
 
@@ -438,7 +465,7 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
 
 KDataImpPtr KDataPrivatedBufferImp::getOtherFromSelf(const KQuery& query) const {
     KDataImpPtr ret;
-    // 其它限制由上层保护
+    // The other restrictions are guarded by the upper layer
     if (query.queryType() == KQuery::INDEX && m_query.queryType() == KQuery::INDEX) {
         ret = _getOtherFromSelfByIndex(query);
     } else if (query.queryType() == KQuery::DATE) {

@@ -12,14 +12,14 @@
 namespace hku {
 
 /**
- * 节点返回码
+ * Node return code
  */
 enum NodeErrorCode {
     SUCCESS = 0,
-    UNKNOWN_ERROR = 1,  ///< 未知错误
-    NNG_ERROR,          ///< nng内部错误
-    MISSING_CMD,        ///< 缺失命令
-    INVALID_CMD,        ///< 无效命令，没有相应的处理服务
+    UNKNOWN_ERROR = 1,  ///< Unknown error
+    NNG_ERROR,          ///< The internal nng error
+    MISSING_CMD,        ///< Missing command
+    INVALID_CMD,        ///< Invalid command, there is no corresponding processing service
 };
 
 class NodeError : public hku::exception {

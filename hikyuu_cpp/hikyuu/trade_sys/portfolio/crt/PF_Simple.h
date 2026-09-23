@@ -1,12 +1,12 @@
 /*
  * PF_Simple.h
  *
- *  Created on: 2018年1月13日
+ *  Created on: 2018-1-13
  *      Author: fasiondog
  *
- *  v5：PF 兼容层（工厂直通）——PF 本质是 MultiSystem 的一个具体实现（预置配置），
- *  故本工厂直接返回 MultiSystemPtr，不再引入 Portfolio / SimplePortfolio 外壳类。
- *  见 docs/design/pf_af_compat/design.md §4
+ *  v5: PF compatibility layer (factory pass-through) -- PF is essentially a concrete implementation (preset configuration) of MultiSystem,
+ *  so this factory directly returns MultiSystemPtr, no longer introducing the Portfolio / SimplePortfolio shell class.
+ *  See docs/design/pf_af_compat/design.md §4
  */
 
 #pragma once
@@ -21,27 +21,32 @@
 namespace hku {
 
 /**
- * @brief 创建资产组合
+ * @brief Create a portfolio
  * @details
  * <pre>
- * 调仓模式 adjust_mode 说明：
- *  - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
- *    决定周期间隔；
- *  - "day" 模式，adjust_cycle 为调仓间隔天数
- *  - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
- *    为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
- *    如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
- *    将会顺延至当前周期内的第一个交易日
+ * Description of the rebalancing mode adjust_mode:
+ *  - In the "query" mode it follows the ktype in the input parameter query; at this time
+ * adjust_cycle determines the cycle interval with the ktype in query;
+ *  - In the "day" mode adjust_cycle is the number of the days between the rebalancing;
+ *  - In the "week" | "month" | "quarter" | "year" mode, adjust_cycle is the corresponding N-th day
+ * of every week, the n-th day of every month, the n-th day of every quarter and the n-th day of
+ * every year; when delay_to_trading_day is false, the rebalancing is skipped if that day is not a
+ * trading day; when delay_to_trading_day is true, it is postponed to the first trading day within
+ * the current cycle if that day is not a trading day; for example, if the rebalancing is specified
+ * on the 1st day of every month but the 1st is not a trading day, it is postponed to the first
+ * trading day of that month
  * </pre>
- * @note v5：返回 MultiSystemPtr，语义为 MultiSystem 模式 B（额度划拨 + 下期额度回写）；
- *       adjust_mode / delay_to_trading_day 由 MultiSystem 内化展开为调仓日表（design.md §4.3）。
- * @param tm 交易账户
- * @param se 系统选择器
- * @param af 资金分配算法（AFPtr，含 L1/L2/L3 三个可替换部件）
- * @param adjust_cycle 调仓周期（受 adjust_mode 影响）, 默认为1
- * @param adjust_mode 调仓模式 "query" | "day" | "week" | "month" | "year"
- * @param delay_to_trading_day true 时，如果调仓日不是交易日将会被顺延至当前周期内的第一个交易日
- * @return 组合实例（MultiSystemPtr）
+ * @note v5: returns MultiSystemPtr, the semantics is MultiSystem mode B (quota allocation + the
+ *       next-period quota write-back); adjust_mode / delay_to_trading_day are expanded by
+ *       MultiSystem internally into the rebalancing day table (design.md §4.3).
+ * @param tm trade account
+ * @param se system selector
+ * @param af fund allocation algorithm (AFPtr, containing three replaceable parts L1/L2/L3)
+ * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default
+ * @param adjust_mode the rebalancing mode "query" | "day" | "week" | "month" | "year"
+ * @param delay_to_trading_day when it is true, it is postponed to the first trading day within the
+ *                             current cycle if the rebalancing day is not a trading day
+ * @return the portfolio instance (MultiSystemPtr)
  * @ingroup Portfolio
  */
 MultiSystemPtr HKU_API PF_Simple(const TMPtr& tm = TradeManagerPtr(), const SEPtr& se = SE_Fixed(),

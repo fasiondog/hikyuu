@@ -1,7 +1,7 @@
 /*
  * SystemWeight.h
  *
- *  Created on: 2018年1月29日
+ *  Created on: 2018-1-29
  *      Author: fasiondog
  */
 
@@ -14,8 +14,9 @@
 namespace hku {
 
 /**
- * 系统权重，权重有效范围为 [0.0, 1.0]
- * @details 用于指定系统对应权重告知资产分配算法
+ * System weight, the valid range of the weight is [0.0, 1.0]
+ * @details It is used to give the corresponding weight of a system to the asset allocation
+ * algorithm
  * @ingroup Selector
  */
 struct HKU_API SystemWeight {
@@ -31,7 +32,7 @@ struct HKU_API SystemWeight {
 
 private:
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

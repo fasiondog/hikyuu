@@ -27,7 +27,7 @@ void IWinner::_calculate(const Indicator &data) {
         return;
     }
 
-    // 获取输入指标的上下文
+    // Get the context of the input indicator
     auto context = data.getContext();
     if (context == Null<KData>()) {
         m_discard = total;

@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TransList_query_by_index") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm["sz000001"];
@@ -58,7 +58,7 @@ TEST_CASE("test_TransList_query_by_index") {
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg 未指定start, end*/
+    /** @arg start and end are not given */
     query = KQuery();
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 8884);
@@ -66,7 +66,7 @@ TEST_CASE("test_TransList_query_by_index") {
     CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, 0));
     CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg 未指定end*/
+    /** @arg end is not given */
     query = KQuery(-3);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
@@ -81,7 +81,7 @@ TEST_CASE("test_TransList_query_by_index") {
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
     CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg end 等于总数*/
+    /** @arg end equals the total count */
     query = KQuery(8881, 8884);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
@@ -89,14 +89,14 @@ TEST_CASE("test_TransList_query_by_index") {
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
     CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg end 比总数少1*/
+    /** @arg end is one less than the total count */
     query = KQuery(8881, 8883);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
-    /** @arg end 大于总数*/
+    /** @arg end is greater than the total count */
     query = KQuery(8881, 8885);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
@@ -104,30 +104,30 @@ TEST_CASE("test_TransList_query_by_index") {
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
     CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg start 等于总数*/
+    /** @arg start equals the total count */
     query = KQuery(8884);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg start 比总数少1*/
+    /** @arg start is one less than the total count */
     query = KQuery(8883);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg start 大于总数*/
+    /** @arg start is greater than the total count */
     query = KQuery(8885);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg start>0, end<0, 且两者有交集*/
+    /** @arg start>0 and end<0 and they overlap */
     query = KQuery(8881, -1);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
-    /** @arg start<0, end>0, 且两者有交集*/
+    /** @arg start<0 and end>0 and they overlap */
     query = KQuery(-3, 8883);
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
@@ -135,14 +135,14 @@ TEST_CASE("test_TransList_query_by_index") {
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TransList_query_by_date") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm["sz000001"];
     KQuery query;
     TransList result;
 
-    /** @arg start 小于数据起始日期，未指定end*/
+    /** @arg start is earlier than the data start date and end is not given */
     query = KQueryByDate(Datetime(201812030000));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 8884);
@@ -150,7 +150,7 @@ TEST_CASE("test_TransList_query_by_date") {
     CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, 0));
     CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg start 等于数据起始日期，未指定end*/
+    /** @arg start equals the data start date and end is not given */
     query = KQueryByDate(Datetime(2019, 2, 1, 9, 25, 2));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 8884);
@@ -158,7 +158,7 @@ TEST_CASE("test_TransList_query_by_date") {
     CHECK_EQ(result[563], TransRecord(Datetime(2019, 2, 1, 9, 58, 47), 11.04, 91, 0));
     CHECK_EQ(result[8883], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg start大于数据起始日期，未指定end*/
+    /** @arg start is later than the data start date and end is not given */
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);
@@ -166,19 +166,19 @@ TEST_CASE("test_TransList_query_by_date") {
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
     CHECK_EQ(result[2], TransRecord(Datetime(2019, 2, 11, 15, 0, 0), 11.21, 5794, 2));
 
-    /** @arg start 等于 end*/
+    /** @arg start equals end */
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59), Datetime(2019, 2, 11, 14, 56, 59));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg start, end 都在数据范围内, 且end为最后一条记录日期 */
+    /** @arg Both start and end are inside the data range and end is the last record date */
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59), Datetime(2019, 2, 11, 15, 0, 0));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result[0], TransRecord(Datetime(2019, 2, 11, 14, 56, 59), 11.20, 210, 1));
     CHECK_EQ(result[1], TransRecord(Datetime(2019, 2, 11, 14, 57, 2), 11.20, 31, 1));
 
-    /** @arg start 在数据范围内, end大于最后一条记录日期 */
+    /** @arg start is inside the data range and end is later than the last record date */
     query = KQueryByDate(Datetime(2019, 2, 11, 14, 56, 59), Datetime(201902120000));
     result = stock.getTransList(query);
     CHECK_EQ(result.size(), 3);

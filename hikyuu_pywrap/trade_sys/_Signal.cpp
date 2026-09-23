@@ -38,18 +38,18 @@ public:
 
 void export_Signal(py::module& m) {
     py::class_<SignalBase, SGPtr, PySignalBase>(m, "SignalBase", py::dynamic_attr(),
-                                                R"(信号指示器基类
-    信号指示器负责产生买入、卖出信号。
+                                                R"(The signal indicator base class
+    The signal indicator is responsible for generating the buy and the sell signals.
 
-公共参数：
+Common parameters:
 
-    - alternate (bool|True) ：买入和卖出信号是否交替出现。单线型的信号通常通过拐点、斜率等判断信号的产生，此种情况下可能出现连续出现买入信号或连续出现卖出信号的情况，此时可通过该参数控制买入、卖出信号是否交替出现。而双线交叉型的信号通常本身买入和卖出已经是交替出现，此时该参数无效。
+    - alternate (bool|True): whether the buy and the sell signals appear alternately. The single-line signals usually judge the generation of the signals through the inflection points, the slopes, etc.; in this case, the consecutive buy signals or the consecutive sell signals may appear, and this parameter can control whether the buy and the sell signals appear alternately. The double-line cross signals usually have the buys and the sells already alternating, in which case this parameter is invalid.
 
-自定义的信号指示器接口：
+The custom signal indicator interfaces:
 
-    - _calculate : 【必须】子类计算接口
-    - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)")
+    - _calculate : [Required] the subclass calculation interface
+    - _clone : [Required] the clone interface
+    - _reset : [Optional] reload the private variables)")
 
       .def(py::init<>())
       .def(py::init<const string&>())
@@ -60,63 +60,63 @@ void export_Signal(py::module& m) {
 
       .def_property("name", py::overload_cast<>(&SignalBase::name, py::const_),
                     py::overload_cast<const string&>(&SignalBase::name),
-                    py::return_value_policy::copy, "名称")
+                    py::return_value_policy::copy, "Name")
       .def_property("to", &SignalBase::getTO, &SignalBase::setTO, py::return_value_policy::copy,
-                    "设置或获取交易对象")
+                    "Set or get the trading object")
 
       .def("get_param", &SignalBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (SignalBase::*)(const std::string&, const boost::any&)>(
              &SignalBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &SignalBase::haveParam, "是否存在指定参数")
+      .def("have_param", &SignalBase::haveParam, "Whether the specified parameter exists")
 
       .def("should_buy", &SignalBase::shouldBuy, R"(should_buy(self, datetime)
 
-    指定时刻是否可以买入
+    Whether it can be bought at the specified moment
 
-    :param Datetime datetime: 指定时刻
+    :param Datetime datetime: the specified moment
     :rtype: bool)")
 
       .def("should_sell", &SignalBase::shouldSell, R"(should_sell(self, datetime)
 
-    指定时刻是否可以卖出
+    Whether it can be sold at the specified moment
 
-    :param Datetime datetime: 指定时刻
+    :param Datetime datetime: the specified moment
     :rtype: bool)")
 
       .def("next_time_should_buy", &SignalBase::nextTimeShouldBuy,
            R"(next_time_should_byu(self)
 
-    下一时刻是否可以买入，相当于最后时刻是否指示买入)")
+    Whether it can be bought at the next moment, equivalent to whether the last moment indicates buying)")
 
       .def("next_time_should_sell", &SignalBase::nextTimeShouldSell, R"(next_time_should_sell(self)
       
-    下一时刻是否可以卖出，相当于最后时刻是否指示卖出)")
+    Whether it can be sold at the next moment, equivalent to whether the last moment indicates selling)")
 
       .def("get_buy_signal", &SignalBase::getBuySignal, R"(get_buy_signal(self)
 
-    获取所有买入指示日期列表
+    Get the list of all the buy indication dates
     
     :rtype: DatetimeList)")
 
       .def("get_sell_signal", &SignalBase::getSellSignal, R"(get_sell_signal(self)
 
-    获取所有卖出指示日期列表
+    Get the list of all the sell indication dates
 
     :rtype: DatetimeList)")
 
@@ -126,24 +126,24 @@ void export_Signal(py::module& m) {
            py::arg("value") = 1.0,
            R"(_add_buy_signal(self, datetime)
 
-    加入买入信号，在_calculate中调用
+    Add a buy signal, called in _calculate
 
-    :param Datetime datetime: 指示买入的日期)")
+    :param Datetime datetime: the date indicating buying)")
 
       .def("_add_sell_signal", &SignalBase::_addSellSignal, py::arg("datetime"),
            py::arg("value") = -1.0, R"(_add_sell_signal(self, datetime)
 
-    加入卖出信号，在_calculate中调用
+    Add a sell signal, called in _calculate
 
-    :param Datetime datetime: 指示卖出的日期)")
+    :param Datetime datetime: the date indicating selling)")
 
-      .def("reset", &SignalBase::reset, "复位操作")
-      .def("clone", &SignalBase::clone, "克隆操作")
+      .def("reset", &SignalBase::reset, "The reset operation")
+      .def("clone", &SignalBase::clone, "The clone operation")
       .def("_calculate", &SignalBase::_calculate, R"(_calculate(self, kdata)
       
-    【重载接口】子类计算接口)")
+    [Overload interface] The subclass calculation interface)")
 
-      .def("_reset", &SignalBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
+      .def("_reset", &SignalBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
 
       .def("__add__", [](const SignalPtr& self, const SignalPtr& other) { return self + other; })
       .def("__add__", [](const SignalPtr& self, double other) { return self + other; })
@@ -166,18 +166,18 @@ void export_Signal(py::module& m) {
     m.def("SG_Bool", SG_Bool, py::arg("buy"), py::arg("sell"), py::arg("alternate") = true,
           R"(SG_Bool(buy, sell)
 
-    布尔信号指示器，使用运算结果为类似bool数组的Indicator分别作为买入、卖出指示。
+    The boolean signal indicator, using the Indicators whose operation results are like bool arrays as the buy and the sell indications respectively.
 
-    :param Indicator buy: 买入指示（结果Indicator中相应位置>0则代表买入）
-    :param Indicator sell: 卖出指示（结果Indicator中相应位置>0则代表卖出）
-    :param bool alternate: 是否交替买入卖出，默认为True
-    :return: 信号指示器)");
+    :param Indicator buy: the buy indication (if the corresponding position in the result Indicator is >0, it means buying)
+    :param Indicator sell: the sell indication (if the corresponding position in the result Indicator is >0, it means selling)
+    :param bool alternate: whether to buy and sell alternately, defaulting to True
+    :return: the signal indicator)");
 
     m.def("SG_Single", SG_Single, py::arg("ind"), py::arg("filter_n") = 10,
           py::arg("filter_p") = 0.1,
           R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1])
     
-    生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
+    Generate the single-line inflection point signal indicator. It uses the curve inflection point algorithm given in Trade Your Way to Financial Freedom [BOOK1]_ to judge the curve trend; the formula is as follows::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
@@ -185,58 +185,58 @@ void export_Signal(py::module& m) {
         or Buy When AMA - AMA[2] > filter
         or Buy When AMA - AMA[3] > filter 
     
-    :param Indicator ind: 输入指标
-    :param int filter_n: N日周期
-    :param float filter_p: 过滤器百分比
-    :return: 信号指示器)");
+    :param Indicator ind: the input indicator
+    :param int filter_n: the N-day period
+    :param float filter_p: the filter percentage
+    :return: the signal indicator)");
 
     m.def("SG_Single2", SG_Single2, py::arg("ind"), py::arg("filter_n") = 10,
           py::arg("filter_p") = 0.1,
           R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
     
-    生成单线拐点信号指示器2 [BOOK1]_::
+    Generate the single-line inflection point signal indicator 2 [BOOK1]_::
 
         filter = percentage * STDEV((AMA-AMA[1], N)
 
         Buy  When AMA - @lowest(AMA,n) > filter
         Sell When @highest(AMA, n) - AMA > filter
     
-    :param Indicator ind: 输入指标
-    :param int filter_n: N日周期
-    :param float filter_p: 过滤器百分比
-    :return: 信号指示器)");
+    :param Indicator ind: the input indicator
+    :param int filter_n: the N-day period
+    :param float filter_p: the filter percentage
+    :return: the signal indicator)");
 
     m.def("SG_Cross", SG_Cross, py::arg("fast"), py::arg("slow"),
           R"(SG_Cross(fast, slow)
 
-    双线交叉指示器，当快线从下向上穿越慢线时，买入；当快线从上向下穿越慢线时，卖出。如：5日MA上穿10日MA时买入，5日MA线下穿MA10日线时卖出:: 
+    The double-line cross indicator; when the fast line crosses the slow line from below upward, buy; when the fast line crosses the slow line from above downward, sell. E.g.: buy when the 5-day MA crosses above the 10-day MA, and sell when the 5-day MA crosses below the 10-day MA:: 
 
         SG_Cross(MA(C, n=10), MA(C, n=30))
 
-    :param Indicator fast: 快线
-    :param Indicator slow: 慢线
-    :return: 信号指示器)");
+    :param Indicator fast: the fast line
+    :param Indicator slow: the slow line
+    :return: the signal indicator)");
 
     m.def("SG_CrossGold", SG_CrossGold, py::arg("fast"), py::arg("slow"),
           R"(SG_CrossGold(fast, slow)
 
-    金叉指示器，当快线从下向上穿越慢线且快线和慢线的方向都是向上时为金叉，买入；
-    当快线从上向下穿越慢线且快线和慢线的方向都是向下时死叉，卖出。::
+    The golden cross indicator; when the fast line crosses the slow line from below upward and both the fast line and the slow line are heading upward, it is a golden cross, buy;
+    when the fast line crosses the slow line from above downward and both the fast line and the slow line are heading downward, it is a death cross, sell. ::
 
         SG_CrossGold(MA(C, n=10), MA(C, n=30))
 
-    :param Indicator fast: 快线
-    :param Indicator slow: 慢线
-    :return: 信号指示器)");
+    :param Indicator fast: the fast line
+    :param Indicator slow: the slow line
+    :return: the signal indicator)");
 
     m.def("SG_Flex", SG_Flex, py::arg("ind"), py::arg("slow_n"),
           R"(SG_Flex(ind, slow_n)
 
-    使用自身的EMA(slow_n)作为慢线，自身作为快线，快线向上穿越慢线买入，快线向下穿越慢线卖出。
+    Use its own EMA(slow_n) as the slow line and itself as the fast line; buy when the fast line crosses the slow line upward, and sell when the fast line crosses the slow line downward.
 
-    :param Indicator ind: 输入指标
-    :param int slow_n: 慢线EMA周期
-    :return: 信号指示器)");
+    :param Indicator ind: the input indicator
+    :param int slow_n: the EMA period of the slow line
+    :return: the signal indicator)");
 
     m.def("SG_Band",
           py::overload_cast<const Indicator&, const Indicator&, const Indicator&>(SG_Band),
@@ -245,42 +245,42 @@ void export_Signal(py::module& m) {
           py::arg("lower"), py::arg("upper"),
           R"(SG_Band(ind, lower, upper)
           
-    指标区间指示器, 当指标超过上轨时，买入；
-    当指标低于下轨时，卖出。::
+    The indicator range indicator; when the indicator exceeds the upper band, buy;
+    when the indicator is below the lower band, sell. ::
 
         SG_Band(MA(C, n=10), 100, 200)
         SG_Band(CLOSE, MA(LOW), MA(HIGH)))");
 
     m.def("SG_AllwaysBuy", SG_AllwaysBuy, R"(SG_AllwaysBuy()
     
-    一个特殊的SG，持续每天发出买入信号，通常配合 PF 使用)");
+    A special SG that issues the buy signal every day continuously, usually used together with the PF)");
 
     m.def("SG_Cycle", SG_Cycle, R"(SG_Cycle()
     
-    一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号)");
+    A special SG, used together with the PF, with the PF position adjustment period as the buy signal)");
 
     m.def("SG_OneSide", SG_OneSide, py::arg("ind"), py::arg("is_buy"),
           R"(SG_OneSide(ind, is_buy)
           
-    根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号。也可以使用 SG_Buy 或 SG_Sell 函数。
+    Build the one-sided signal (containing only the buy or the sell signal) from the input indicator; if the indicator value is greater than 0, add the signal. The SG_Buy or the SG_Sell functions can also be used.
     
-    :param Indicator ind: 输入指标
-    :param bool is_buy: 构建的是买入信号，否则为卖出信号
-    :return: 信号指示器)");
+    :param Indicator ind: the input indicator
+    :param bool is_buy: what is built is the buy signal; otherwise, it is the sell signal
+    :return: the signal indicator)");
 
     m.def("SG_Buy", SG_Buy, py::arg("ind"), R"(SG_Buy(ind)
     
-    生成单边买入信号
+    Generate the one-sided buy signal
 
-    :param Indicator ind: 输入指标
-    :return: 信号指示器)");
+    :param Indicator ind: the input indicator
+    :return: the signal indicator)");
 
     m.def("SG_Sell", SG_Sell, py::arg("ind"), R"(SG_Sell(ind)
     
-    生成单边卖出信号
+    Generate the one-sided sell signal
 
-    :param Indicator ind: 输入指标
-    :return: 信号指示器)");
+    :param Indicator ind: the input indicator
+    :return: the signal indicator)");
 
     m.def(
       "SG_Add",
@@ -293,15 +293,15 @@ void export_Signal(py::module& m) {
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Add(sg1, sg2, alternate)
 
-    生成两个指标之和的信号
+    Generate the signal of the sum of the two indicators
 
-    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
-    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+    Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
+    it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
-    :param SignalBase sg1: 输入信号1
-    :param SignalBase sg2: 输入信号2
-    :param bool alternate: 是否交替买入卖出，默认为True
-    :return: 信号指示器)");
+    :param SignalBase sg1: the input signal 1
+    :param SignalBase sg2: the input signal 2
+    :param bool alternate: whether to buy and sell alternately, defaulting to True
+    :return: the signal indicator)");
 
     m.def(
       "SG_Sub",
@@ -314,15 +314,15 @@ void export_Signal(py::module& m) {
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Sub(sg1, sg2, alternate)
 
-    生成两个指标之差的信号
+    Generate the signal of the difference of the two indicators
 
-    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
-    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+    Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
+    it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
-    :param SignalBase sg1: 输入信号1
-    :param SignalBase sg2: 输入信号2
-    :param bool alternate: 是否交替买入卖出，默认为True
-    :return: 信号指示器)");
+    :param SignalBase sg1: the input signal 1
+    :param SignalBase sg2: the input signal 2
+    :param bool alternate: whether to buy and sell alternately, defaulting to True
+    :return: the signal indicator)");
 
     m.def(
       "SG_Mul",
@@ -335,14 +335,14 @@ void export_Signal(py::module& m) {
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Mul(sg1, sg2, alternate)
 
-    生成两个指标之差的信号
+    Generate the signal of the difference of the two indicators
 
-    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
-    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+    Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
+    it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
-    :param SignalBase sg1: 输入信号1
-    :param SignalBase sg2: 输入信号2
-    :param bool alternate: 是否交替买入卖出，默认为True)");
+    :param SignalBase sg1: the input signal 1
+    :param SignalBase sg2: the input signal 2
+    :param bool alternate: whether to buy and sell alternately, defaulting to True)");
 
     m.def(
       "SG_Div",
@@ -355,14 +355,14 @@ void export_Signal(py::module& m) {
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Div(sg1, sg2, alternate)
 
-    生成两个指标之差的信号
+    Generate the signal of the difference of the two indicators
 
-    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
-    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+    Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
+    it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
-    :param SignalBase sg1: 输入信号1
-    :param SignalBase sg2: 输入信号2
-    :param bool alternate: 是否交替买入卖出，默认为True)");
+    :param SignalBase sg1: the input signal 1
+    :param SignalBase sg2: the input signal 2
+    :param bool alternate: whether to buy and sell alternately, defaulting to True)");
 
     m.def(
       "SG_And",
@@ -375,14 +375,14 @@ void export_Signal(py::module& m) {
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_And(sg1, sg2, alternate)
 
-    生成两个指标与的信号
+    Generate the signal of the AND of the two indicators
 
-    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
-    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+    Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
+    it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
-    :param SignalBase sg1: 输入信号1
-    :param SignalBase sg2: 输入信号2
-    :param bool alternate: 是否交替买入卖出，默认为True)");
+    :param SignalBase sg1: the input signal 1
+    :param SignalBase sg2: the input signal 2
+    :param bool alternate: whether to buy and sell alternately, defaulting to True)");
 
     m.def(
       "SG_Or",
@@ -395,12 +395,12 @@ void export_Signal(py::module& m) {
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Or(sg1, sg2, alternate)
 
-    生成两个指标与的信号
+    Generate the signal of the AND of the two indicators
 
-    由于 SG 的 alternate 默认为 True, 在使用如  "sg1 + sg2 + sg3" 的形式时，容易忽略 sg1 + sg2 的 alternate 属性
-    建议使用: SG_Add(sg1, sg2, False) + sg3 来避免 alternate 的问题
+    Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
+    it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
 
-    :param SignalBase sg1: 输入信号1
-    :param SignalBase sg2: 输入信号2
-    :param bool alternate: 是否交替买入卖出，默认为True)");
+    :param SignalBase sg1: the input signal 1
+    :param SignalBase sg2: the input signal 2
+    :param bool alternate: whether to buy and sell alternately, defaulting to True)");
 }

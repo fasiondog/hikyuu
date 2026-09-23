@@ -2,6 +2,8 @@
  * FixedWeightAllocateFunds.cpp
  *
  *  Copyright (c) 2025 hikyuu.org
+ *  Created on: 2018-2-8
+ *      Author: fasiondog
  */
 
 #include "FixedWeightAllocateFunds.h"
@@ -14,6 +16,7 @@ namespace hku {
 
 FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_FixedWeight") {
     setParam<double>("weight", 0.1);
+
 }
 
 FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
@@ -30,7 +33,7 @@ AllocateFundsBase::Weights FixedWeightAllocateFunds::_allocate(const Datetime& d
                                                                SubSystemContextList& contexts,
                                                                const KQuery& query) {
     double weight = getParam<double>("weight");
-    // 不归一化：每个选中子系统都只占父总资产的固定比例（等价 master auto_adjust_weight=false）
+    // Without normalization: every selected sub-system only accounts for a fixed proportion of the parent total assets (equivalent to master auto_adjust_weight=false)
     return _applyWeights(date, tm, contexts, query, std::vector<double>(contexts.size(), weight));
 }
 

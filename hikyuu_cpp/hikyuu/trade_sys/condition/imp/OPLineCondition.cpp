@@ -1,7 +1,7 @@
 /*
  * OPCondition.cpp
  *
- *  Created on: 2016年5月9日
+ *  Created on: 2016-5-9
  *      Author: Administrator
  */
 

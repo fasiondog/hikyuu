@@ -53,14 +53,14 @@ static bool isAsyncMySQL(AsyncDBConnectBase *db) {
 #pragma GCC diagnostic pop
 #endif
 /*
- * 升级和创建数据库
+ * Upgrade and create the database
  */
 void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,
                              const std::vector<std::string> &upgrade_scripts, int start_version,
                              const char *create_script) {
     HKU_TRACE("check {} database version ...", module_name);
 
-    // 如果模块版本表不存在，则创建该表
+    // Create the module version table if it does not exist
     if (!driver->tableExist("module_version")) {
         bool need_create = true;
 #if HKU_ENABLE_SQLITE
@@ -87,13 +87,13 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 #endif
     }
 
-    // 如果没有升级脚本，也没有创建脚本，则直接返回
+    // Return directly when there is neither an upgrade script nor a creation script
     if (upgrade_scripts.empty() && !create_script) {
         // Do nothing
         return;
     }
 
-    // 尝试获取模板数据库版本
+    // Try to get the template database version
     int version = 0;
     try {
         version = driver->queryInt(
@@ -104,20 +104,22 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
         // Do noting
     }
 
-    // 模块数据库版本为0（不存在模块数据库）时，如果指定了数据库创建脚本，则创建数据库，否则直接返回
+    // When the module database version is 0 (the module database does not exist), create the
+    // database if a creation script is given, otherwise return directly
     if (0 == version) {
         if (!create_script) {
             return;
         }
 
-        // 创建数据库，并将模块数据库版本设为1
+        // Create the database and set the module database version to 1
         driver->exec(create_script);
         driver->exec(fmt::format(
           "INSERT INTO `module_version` (module, version) VALUES (\"{}\", 1);", module_name));
         version = 1;
     }
 
-    // 当前版本号小于升级脚步对应的起始版本号还少1，说明缺失中间版本的升级脚本，无法升级
+    // When the current version is smaller than the start version of the upgrade script by one, an
+    // intermediate version upgrade script is missing and the upgrade cannot proceed
     if (version < start_version - 1) {
         HKU_ERROR("THe {} database is too old, can't upgrade!", module_name);
         return;
@@ -125,24 +127,26 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 
     int upgrade_scripts_count = static_cast<int>(upgrade_scripts.size());
 
-    // 不存在升级脚本，直接返回
+    // There is no upgrade script, return directly
     if (0 == upgrade_scripts_count) {
         return;
     }
 
-    // 需要被升级到的最终版本
+    // The final version to be upgraded to
     int to_version = start_version + upgrade_scripts_count - 1;
     HKU_TRACE("current {} database version: {}", module_name, version);
 
-    // 当前版本已经大于等于待升至的版本，无需升级，直接返回
+    // The current version is already not lower than the target version, no upgrade is needed,
+    // return directly
     if (version >= to_version) {
         HKU_TRACE("current version({}) greater the upgrade version({}), ignored!", version,
                   to_version);
         return;
     }
 
-    // 如果当前的版本号小于脚步对应的起始版本号，则从脚步索引从0开始；
-    // 否则应从 (当前版本后 - 0号脚步对应的起始版本号) + 1 对应的升级脚步开始执行
+    // If the current version is smaller than the start version of the script, the script index
+    // starts from 0; otherwise the execution starts from the upgrade script whose index is (the
+    // current version - the start version of script 0) + 1
     int start_index = version < start_version ? 0 : version - start_version + 1;
     HKU_TRACE("update {} database ..., update script index: {}", module_name, start_index);
     for (int i = start_index; i < upgrade_scripts_count; i++) {
@@ -154,7 +158,7 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 }
 
 /*
- * 异步版本：升级和创建数据库
+ * The asynchronous version: upgrade and create the database
  */
 net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
                                              const char *module_name,
@@ -162,7 +166,7 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
                                              int start_version, const char *create_script) {
     HKU_TRACE("check {} database version ...", module_name);
 
-    // 如果模块版本表不存在，则创建该表
+    // Create the module version table if it does not exist
     if (!(co_await driver->tableExist("module_version"))) {
         bool need_create = true;
 #if HKU_ENABLE_SQLITE
@@ -189,12 +193,12 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
 #endif
     }
 
-    // 如果没有升级脚本，也没有创建脚本，则直接返回
+    // Return directly when there is neither an upgrade script nor a creation script
     if (upgrade_scripts.empty() && !create_script) {
         co_return;
     }
 
-    // 尝试获取模板数据库版本
+    // Try to get the template database version
     int version = 0;
     try {
         version = co_await driver->queryInt(
@@ -205,20 +209,22 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
         // Do noting
     }
 
-    // 模块数据库版本为0（不存在模块数据库）时，如果指定了数据库创建脚本，则创建数据库，否则直接返回
+    // When the module database version is 0 (the module database does not exist), create the
+    // database if a creation script is given, otherwise return directly
     if (0 == version) {
         if (!create_script) {
             co_return;
         }
 
-        // 创建数据库，并将模块数据库版本设为1
+        // Create the database and set the module database version to 1
         co_await driver->exec(create_script);
         co_await driver->exec(fmt::format(
           "INSERT INTO `module_version` (module, version) VALUES (\"{}\", 1);", module_name));
         version = 1;
     }
 
-    // 当前版本号小于升级脚步对应的起始版本号还少1，说明缺失中间版本的升级脚本，无法升级
+    // When the current version is smaller than the start version of the upgrade script by one, an
+    // intermediate version upgrade script is missing and the upgrade cannot proceed
     if (version < start_version - 1) {
         HKU_ERROR("THe {} database is too old, can't upgrade!", module_name);
         co_return;
@@ -226,24 +232,26 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
 
     int upgrade_scripts_count = static_cast<int>(upgrade_scripts.size());
 
-    // 不存在升级脚本，直接返回
+    // There is no upgrade script, return directly
     if (0 == upgrade_scripts_count) {
         co_return;
     }
 
-    // 需要被升级到的最终版本
+    // The final version to be upgraded to
     int to_version = start_version + upgrade_scripts_count - 1;
     HKU_TRACE("current {} database version: {}", module_name, version);
 
-    // 当前版本已经大于等于待升至的版本，无需升级，直接返回
+    // The current version is already not lower than the target version, no upgrade is needed,
+    // return directly
     if (version >= to_version) {
         HKU_TRACE("current version({}) greater the upgrade version({}), ignored!", version,
                   to_version);
         co_return;
     }
 
-    // 如果当前的版本号小于脚步对应的起始版本号，则从脚步索引从0开始；
-    // 否则应从 (当前版本后 - 0号脚步对应的起始版本号) + 1 对应的升级脚步开始执行
+    // If the current version is smaller than the start version of the script, the script index
+    // starts from 0; otherwise the execution starts from the upgrade script whose index is (the
+    // current version - the start version of script 0) + 1
     int start_index = version < start_version ? 0 : version - start_version + 1;
     HKU_TRACE("update {} database ..., update script index: {}", module_name, start_index);
     for (int i = start_index; i < upgrade_scripts_count; i++) {

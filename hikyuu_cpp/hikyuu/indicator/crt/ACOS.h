@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 余弦值
+ * Cosine value
  * @ingroup Indicator
  */
 Indicator HKU_API ACOS();

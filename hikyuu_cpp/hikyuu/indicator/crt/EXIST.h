@@ -16,11 +16,11 @@
 namespace hku {
 
 /**
- * 存在
+ * Existence
  * @details
  * <pre>
- * 用法：EXIST(X,N) 表示条件X在N周期有存在
- * 例如：EXIST(C>O,10) 表示前10日内存在着阳线
+ * Usage: EXIST(X,N) means the condition X exists within N periods
+ * For example: EXIST(C>O,10) means there are bullish candles within the previous 10 days
  * </pre>
  * @ingroup Indicator
  */

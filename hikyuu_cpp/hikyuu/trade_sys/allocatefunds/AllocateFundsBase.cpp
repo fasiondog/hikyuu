@@ -3,8 +3,11 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  组合级资金分配（AF）基类实现。L1/L2/L3 三个算法部件的默认实现由
- *  MoneyManagerBase 的组合级实现迁移而来（见 docs/design/pf_af_compat/design.md §5）。
+ *  Implementation of the portfolio-level fund allocation (AF) base class. The default
+ *  implementations of the three algorithm parts L1/L2/L3 are migrated from the portfolio-level
+ *  implementation of MoneyManagerBase (see docs/design/pf_af_compat/design.md §5).
+ *  Created on: 2018-1-30
+ *      Author: fasiondog
  */
 
 #include "AllocateFundsBase.h"
@@ -29,7 +32,7 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsPtr& af) {
 
 AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     setParam<double>("max-single-position", 1.0);
-    // 组合级分配参数：weight-list 固定权重（L1）、fixed-amount 固定金额（L2）
+    // The portfolio-level allocation parameters: weight-list fixed weights (L1), fixed-amount fixed amount (L2)
     setParam<string>("weight-list", "");
     setParam<double>("fixed-amount", 0.0);
 }
@@ -83,7 +86,7 @@ AllocateFundsPtr AllocateFundsBase::clone() {
 }
 
 //============================================================================
-// 组合级资金分配（AF L1/L2/L3），供聚合 System（MultiSystem）调用
+// The portfolio-level fund allocation (AF L1/L2/L3), called by the aggregate System (MultiSystem)
 //============================================================================
 
 void AllocateFundsBase::allocate(const Datetime& date, const TradeManagerPtr& tm,
@@ -101,9 +104,9 @@ AllocateFundsBase::Weights AllocateFundsBase::_allocate(const Datetime& date,
     if (contexts.empty()) {
         return Weights();
     }
-    // L1 权重来源：
-    //   1) 参数 weight-list 非空：按序解析为各子系统固定权重并归一化（AF_FixedWeightList 语义）；
-    //   2) 否则等权 1/N（AF_EqualWeight，默认）。
+    // The L1 weight source:
+    //   1) the parameter weight-list is not empty: parse it into the fixed weights of every sub-system in order and normalize them (the AF_FixedWeightList semantics);
+    //   2) otherwise the equal weight 1/N (AF_EqualWeight, the default).
     std::vector<double> weights = _parseWeightList(contexts.size());
     if (weights.size() != contexts.size()) {
         weights.assign(contexts.size(), 1.0 / contexts.size());
@@ -120,7 +123,7 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(const Datetime& date
     if (contexts.empty()) {
         return result;
     }
-    // 模式 B 额度：fixed-amount>0 时每子系统固定额度（AF_FixedAmount），否则权重 × 父总资产。
+    // The mode B quota: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount), otherwise weight x the parent total assets.
     double fixed_amount = getParam<double>("fixed-amount");
     double total_assets = tm ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
     double eq = 1.0 / contexts.size();
@@ -129,8 +132,8 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(const Datetime& date
         double w = (i < weights.size()) ? weights[i] : eq;
         result[ctx.sys] = w;
         if (m_mode == "B" && tm) {
-            // 模式 B：L1 产出「真实额度」写入 contexts[i].quota，由父在调仓日回写给子系统
-            //（供下期运行，额度滞后一期）。
+            // Mode B: L1 produces the "real quota" and writes it into contexts[i].quota, the parent writes it back to the sub-system on the rebalancing day
+            // (for the next period, the quota lags one period behind).
             ctx.quota = (fixed_amount > 0.0) ? fixed_amount : (w * total_assets);
         }
     }
@@ -141,7 +144,7 @@ std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
     std::vector<double> result;
     string wl = getParam<string>("weight-list");
     if (wl.empty()) {
-        return result;  // 空 → 调用方回退等权
+        return result;  // Empty -> the caller falls back to the equal weight
     }
     std::stringstream ss(wl);
     string item;
@@ -149,7 +152,7 @@ std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
     while (std::getline(ss, item, ',')) {
         size_t b = item.find_first_not_of(" \t\r\n");
         if (b == string::npos) {
-            continue;  // 纯空白项跳过
+            continue;  // Skip the pure blank items
         }
         size_t e = item.find_last_not_of(" \t\r\n");
         item = item.substr(b, e - b + 1);
@@ -161,12 +164,12 @@ std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
             v = 0.0;
         }
         if (v < 0.0) {
-            v = 0.0;  // 负权重按 0 处理（不支持做空额度分配）
+            v = 0.0;  // The negative weights are treated as 0 (the short quota allocation is not supported)
         }
         result.push_back(v);
         sum += v;
     }
-    // 数量须与子系统一致且总和 >0，否则视为无效，回退等权
+    // The quantity must match the sub-systems and the sum must be > 0, otherwise it is invalid and falls back to the equal weight
     if (result.size() != expect_n || sum <= 0.0) {
         HKU_WARN_IF(result.size() != expect_n,
                     "weight-list size({}) != subsystems({}), fallback to equal weight!",
@@ -175,7 +178,7 @@ std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
         return result;
     }
     for (auto& v : result) {
-        v /= sum;  // 归一化，使权重和为 1
+        v /= sum;  // Normalize so that the weight sum is 1
     }
     return result;
 }
@@ -185,8 +188,8 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
                                    const KQuery& query) {
     KQuery::KType ktype = query.kType();
     if (m_mode == "B") {
-        // 模式 B：透传子系统真实指令（number 即子管理人的下单量），父不换算。
-        // 只对 SELL 建议做「不超父当前持仓」的防御性裁剪。
+        // Mode B: pass through the real instruction of the sub-system (number is the order quantity of the sub-manager), the parent does not convert it.
+        // Only the SELL suggestions are defensively clipped to not exceed the current position of the parent.
         for (auto& s : suggestions) {
             if (s.type == SuggestionType::SELL) {
                 double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
@@ -200,7 +203,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
 
     FundsRecord funds = tm->getFunds(date, ktype);
     double total_assets = funds.total_assets();
-    // 模式 A + fixed-amount>0：每标的目标市值取固定金额（AF_FixedAmount 的行为级语义），优先于按比重换算。
+    // Mode A + fixed-amount>0: the target market value of every instrument takes the fixed amount (the AF_FixedAmount behavior-level semantics), it takes precedence over the conversion by proportion.
     double fixed_amount = getParam<double>("fixed-amount");
     for (auto& s : suggestions) {
         if (s.plan_price <= 0.0) {
@@ -214,12 +217,12 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         }
         double current = tm->getPosition(date, s.stock).number;
         if (s.type == SuggestionType::BUY) {
-            // 模式 A（默认）：目标持仓市值 = 子系统权重 × 子建议仓位比重 × 父总资产。
-            //   - fixed-amount>0：每标的固定金额（AF_FixedAmount），优先于按比重换算；
-            //   - assets_ratio>0：尊重子系统上送的内部仓位比重（如子半仓则父也按半仓映射）；
-            //   - assets_ratio<=0（无比重信息）：回退按满仓（ratio=1）等权到仓。
-            // 换算为目标股数，净调仓量 =（目标 - 当前）；若为负（当前已超配），转 SELL 减仓至目标，
-            // 避免“负 BUY”在执行阶段被丢弃导致超配仓位无法再平衡（与 PF 周期性再平衡语义对齐）。
+            // Mode A (the default): target position market value = sub-system weight x the sub-suggestion position ratio x the parent total assets.
+            //   - fixed-amount>0: a fixed amount per instrument (AF_FixedAmount), it takes precedence over the conversion by proportion;
+            //   - assets_ratio>0: respect the internal position ratio submitted by the sub-system (e.g. the parent is mapped by half position when the sub-system is at half position);
+            //   - assets_ratio<=0 (no ratio information): fall back to the full position (ratio=1) equal weight to position.
+            // Convert into the target share quantity, the net rebalancing quantity = (target - current); when it is negative (the current position is over-allocated), turn to SELL to reduce to the target,
+            // to avoid the "negative BUY" being discarded at the execution stage causing the over-allocated position to be unable to rebalance (aligned with the PF periodic rebalancing semantics).
             double target_value;
             if (fixed_amount > 0.0) {
                 target_value = fixed_amount;
@@ -231,12 +234,12 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             double delta = target_shares - current;
             if (delta < 0.0) {
                 s.type = SuggestionType::SELL;
-                s.number = -delta;  // 减仓数量（正数），执行阶段按 SELL 卖出
+                s.number = -delta;  // The position-reducing quantity (a positive number), sold by SELL at the execution stage
             } else {
                 s.number = delta;
             }
         } else {
-            // SELL / CLEAR：退出该标的（卖出当前全部持仓）
+            // SELL / CLEAR: exit the instrument (sell all the current holdings)
             s.number = -current;
         }
     }
@@ -244,11 +247,11 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
 
 void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
                                    TradeSuggestionList& suggestions, const KQuery& query) {
-    // L3 组合风控（模式 A 默认启用；模式 B 尊重子管理人自主权，仅做总量校验 = 不裁剪）。
+    // L3 portfolio risk control (enabled by default in mode A; mode B respects the autonomy of the sub-manager, only the total amount check is performed = no clipping).
     if (m_mode == "B") {
         return;
     }
-    // 集中度上限：单标的目标持仓市值 ≤ 总资产 × max-single-position（<=0 或 >=1 表示不限制）。
+    // The concentration upper limit: the target position market value of a single instrument <= total assets x max-single-position (<=0 or >=1 means no limit).
     double max_ratio = getParam<double>("max-single-position");
     if (max_ratio <= 0.0 || max_ratio >= 1.0) {
         return;

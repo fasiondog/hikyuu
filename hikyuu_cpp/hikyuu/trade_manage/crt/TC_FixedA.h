@@ -14,25 +14,28 @@
 namespace hku {
 
 /**
- * 沪深A股交易成本算法,计算每次买入或卖出的成本
+ * Trade cost algorithm for the Shanghai and Shenzhen A-share; it calculates the cost of every buy
+ * or sell
  * @details
  * <pre>
- * 计算规则为：
- *   1）上证交易所
- *      买入：佣金＋过户费
- *      卖出：佣金＋过户费＋印花税
- *   2）深证交易所：
- *      买入：佣金
- *      卖出：佣金＋印花税
- *   其中：佣金和过户费均有最低值，当前佣金比例为千分之1.8（最低5元），印花税为千分之一
- *         上证过户费为交易数量的千分之一，不足1元，按一元计
+ * The calculation rules are:
+ *   1) Shanghai Stock Exchange
+ *      Buy: commission + transfer fee
+ *      Sell: commission + transfer fee + stamp duty
+ *   2) Shenzhen Stock Exchange:
+ *      Buy: commission
+ *      Sell: commission + stamp duty
+ *   Where: both the commission and the transfer fee have a minimum value; the current commission
+ *   ratio is 1.8 per mille (5 yuan minimum), and the stamp duty is 1 per mille
+ *         The transfer fee of the Shanghai Stock Exchange is 1 per mille of the traded quantity,
+ * and it is counted as one yuan when it is less than 1 yuan
  * </pre>
  *
- * @param commission 佣金比例，默认千分之1.8，即0.0018
- * @param lowestCommission 最低佣金值，默认5元
- * @param stamptax 印花税，默认千分之一，即0.001
- * @param transferfee 过户费，默认每股千分之一，即0.001
- * @param lowestTransferfee 最低过户费，默认1元
+ * @param commission commission ratio, 1.8 per mille by default, i.e. 0.0018
+ * @param lowestCommission minimum commission value, 5 yuan by default
+ * @param stamptax stamp duty, 1 per mille by default, i.e. 0.001
+ * @param transferfee transfer fee, 1 per mille per share by default, i.e. 0.001
+ * @param lowestTransferfee minimum transfer fee, 1 yuan by default
  * @see FixedATradeCost
  * @ingroup TradeCost
  */

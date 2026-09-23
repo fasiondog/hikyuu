@@ -12,15 +12,19 @@
 namespace hku {
 
 /**
- * 返回板块各成分该指标相应输出按计算类型得到的计算值.
- * @note 注意: INSUM使用模式4/5时相当于RANK功能, 但不适合在MF中使用, 在 MF 中使用时计算量为 N x N
- * 级别, 计算缓慢。如果希望在 MF 中使用，建议直接使用 RANK[捐赠用户] 指标。
- * @param block 指定板块
- * @param query 指定范围
- * @param ind 指定指标
- * @param mode 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名(指标值最高的排名值为1)
- * 5-升序排名(指标值最低的排名值为1),
- * @param fill_null 日期对齐时缺失数据填充 nan 值。
+ * Return the calculated value of the corresponding output of this indicator for every member of the
+ * block according to the calculation type.
+ * @note Note: when INSUM uses mode 4/5 it is equivalent to the RANK function, but it is not
+ *       suitable for use in MF; when it is used in MF the calculation amount is of the N x N
+ *       level, and the calculation is slow. If it is expected to be used in MF, it is recommended
+ *       to use the RANK [donation user] indicator directly.
+ * @param block the given block
+ * @param query the given range
+ * @param ind the given indicator
+ * @param mode calculation type: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-descending
+ *             rank (the highest indicator value has the rank 1),
+ *             5-ascending rank (the lowest indicator value has the rank 1),
+ * @param fill_null fill the missing data with nan when the dates are aligned.
  * @return Indicator
  */
 Indicator HKU_API INSUM(const Block& block, const KQuery& query, const Indicator& ind, int mode,

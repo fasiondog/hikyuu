@@ -13,8 +13,8 @@ from hikyuu import *
 def TurtleSG(self, k):
     n = self.get_param("n")
     c = CLOSE(k)
-    h = REF(HHV(c, n), 1)  # 前n日高点
-    L = REF(LLV(c, n), 1)  # 前n日低点
+    h = REF(HHV(c, n), 1)  # the high of the previous n days
+    L = REF(LLV(c, n), 1)  # the low of the previous n days
     for i in range(h.discard, len(k)):
         if (c[i] >= h[i]):
             self._add_buy_signal(k[i].datetime)
@@ -29,11 +29,11 @@ if __name__ == "__main__":
     s = get_stock("sh000001")
     k = s.get_kdata(Query(-500))
 
-    # 只有设置交易对象时，才会开始实际计算
+    # The actual calculation starts only when the trading object is set
     sg.to = k
     dates = k.get_datetime_list()
     for d in dates:
         if (sg.should_buy(d)):
-            print("买入：%s" % d)
+            print("Buy: %s" % d)
         elif (sg.should_sell(d)):
-            print("卖出: %s" % d)
+            print("Sell: %s" % d)

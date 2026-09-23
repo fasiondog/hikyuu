@@ -11,17 +11,18 @@
 namespace hku {
 
 /**
- * ETF交易成本算法,计算每次买入或卖出的成本
+ * Trade cost algorithm for the ETF; it calculates the cost of every buy or sell
  * @details
  * <pre>
- * 计算规则为：
- *   买入：佣金（最低5元）
- *   卖出：佣金（最低5元）
- *   其中：佣金比例默认万分之1（0.0001），最低佣金5元
+ * The calculation rules are:
+ *   Buy: commission (5 yuan minimum)
+ *   Sell: commission (5 yuan minimum)
+ *   Where: the commission ratio is 0.1 per ten thousand (0.0001) by default, and the minimum
+ *   commission is 5 yuan
  * </pre>
  *
- * @param commission 佣金比例，默认万分之1，即0.0001
- * @param lowestCommission 最低佣金值，默认5元
+ * @param commission commission ratio, 0.1 per ten thousand by default, i.e. 0.0001
+ * @param lowestCommission minimum commission value, 5 yuan by default
  * @see FixedETFTradeCost
  * @ingroup TradeCost
  */

@@ -16,7 +16,7 @@ namespace py = pybind11;
 #endif
 
 void export_StockWeight(py::module& m) {
-    py::class_<StockWeight>(m, "StockWeight", "权息记录")
+    py::class_<StockWeight>(m, "StockWeight", "The dividend record")
       .def(py::init<>())
       .def(py::init<const Datetime&>())
       .def(py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t, price_t,
@@ -25,15 +25,15 @@ void export_StockWeight(py::module& m) {
       .def("__str__", to_py_str<StockWeight>)
       .def("__repr__", to_py_str<StockWeight>)
 
-      .def_property_readonly("datetime", &StockWeight::datetime, "权息日期")
-      .def_property_readonly("count_as_gift", &StockWeight::countAsGift, "每10股送X股")
-      .def_property_readonly("count_for_sell", &StockWeight::countForSell, "每10股配X股")
-      .def_property_readonly("price_for_sell", &StockWeight::priceForSell, "配股价")
-      .def_property_readonly("bonus", &StockWeight::bonus, "每10股红利")
-      .def_property_readonly("increasement", &StockWeight::increasement, "每10股转增X股")
-      .def_property_readonly("total_count", &StockWeight::totalCount, "总股本（万股）")
-      .def_property_readonly("free_count", &StockWeight::freeCount, "流通股（万股）")
-      .def_property_readonly("suogu", &StockWeight::suogu, "扩缩股比例")
+      .def_property_readonly("datetime", &StockWeight::datetime, "The dividend date")
+      .def_property_readonly("count_as_gift", &StockWeight::countAsGift, "X shares sent per 10 shares")
+      .def_property_readonly("count_for_sell", &StockWeight::countForSell, "X shares allotted per 10 shares")
+      .def_property_readonly("price_for_sell", &StockWeight::priceForSell, "The allotment price")
+      .def_property_readonly("bonus", &StockWeight::bonus, "The dividend per 10 shares")
+      .def_property_readonly("increasement", &StockWeight::increasement, "X shares converted per 10 shares")
+      .def_property_readonly("total_count", &StockWeight::totalCount, "The total share capital (10,000 shares)")
+      .def_property_readonly("free_count", &StockWeight::freeCount, "The circulating shares (10,000 shares)")
+      .def_property_readonly("suogu", &StockWeight::suogu, "The share expansion/contraction ratio")
 
         DEF_PICKLE(StockWeight);
 
@@ -42,7 +42,7 @@ void export_StockWeight(py::module& m) {
         HKU_IF_RETURN(total == 0, py::array());
 
         struct RawData {
-            int64_t date;  // 日期(仅到天)
+            int64_t date;  // The date (only up to the day)
             double countAsGift;
             double countForSell;
             double priceForSell;
@@ -53,7 +53,7 @@ void export_StockWeight(py::module& m) {
             double suogu;
         };
 
-        // 使用 malloc 分配内存
+        // Allocate the memory with malloc
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
         for (size_t i = 0, len = sw.size(); i < len; i++) {
             const StockWeight& w = sw[i];
@@ -75,7 +75,7 @@ void export_StockWeight(py::module& m) {
           vector_to_python_list<string>({"datetime64[D]", "d", "d", "d", "d", "d", "d", "d", "d"}),
           vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48, 56, 64}), 72);
 
-        // 使用 capsule 管理内存
+        // Manage the memory with the capsule
         return py::array(dtype, total, static_cast<RawData*>(data),
                          py::capsule(data, [](void* p) { std::free(p); }));
     });
@@ -86,7 +86,7 @@ void export_StockWeight(py::module& m) {
             return py::module_::import("pandas").attr("DataFrame")();
         }
 
-        // 创建数组
+        // Create the array
         py::array_t<int64_t> datetime_arr(total);
         py::array_t<double> countAsGift_arr(total);
         py::array_t<double> countForSell_arr(total);
@@ -97,7 +97,7 @@ void export_StockWeight(py::module& m) {
         py::array_t<double> freeCount_arr(total);
         py::array_t<double> suogu_arr(total);
 
-        // 获取缓冲区并填充数据
+        // Get the buffer and fill the data
         auto datetime_buf = datetime_arr.request();
         auto countAsGift_buf = countAsGift_arr.request();
         auto countForSell_buf = countForSell_arr.request();
@@ -131,7 +131,7 @@ void export_StockWeight(py::module& m) {
             suogu_ptr[i] = w.suogu();
         }
 
-        // 构建 DataFrame
+        // Build the DataFrame
         py::dict columns;
         columns["datetime"] = datetime_arr.attr("astype")("datetime64[ns]");
         columns["countAsGift"] = countAsGift_arr;

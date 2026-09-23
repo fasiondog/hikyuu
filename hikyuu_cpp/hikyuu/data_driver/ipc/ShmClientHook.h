@@ -17,27 +17,33 @@ namespace hku {
 namespace ipc {
 
 /**
- * 三条实时转发回调（shmserver 插件 connect 成功后注册、断开时注册空集注销）
- * @details 转发目标的实现（协议编解码、传输、共享内存读写）全部在 shmserver 插件内；核心库
- * 不持有任何插件接口类型，仅以本结构保存行情路径（Stock / dataserver）所需的转发函数，
- * 未注册（独立模式 / 未安装插件）时全部转发为安全空操作。
+ * The three realtime forwarding callbacks (they are registered after the shmserver plugin connects
+ * successfully, and an empty set is registered to unregister them on disconnection)
+ * @details The implementation of the forwarding target (protocol encoding and decoding,
+ * transmission, shared memory reading and writing) is entirely inside the shmserver plugin; the
+ * core library does not hold any plugin interface type, it only saves the forwarding functions
+ * needed by the market data path (Stock / dataserver) in this struct, and all the forwardings are
+ * safe no-ops when they are not registered (standalone mode / the plugin is not installed).
  */
 struct ShmClientForwarders {
-    /** Stock::realtimeUpdate 转发：服务端已应用返回 true */
+    /** Stock::realtimeUpdate forwarding: true is returned when the server has applied it */
     std::function<bool(const std::string& market_code, const KQuery::KType& ktype,
                        const KRecord& record)>
       realtimeUpdate;
 
-    /** Stock::getLastUpdateTime 转发：返回服务端缓冲最后更新时刻，未注册 / 失败返回 Datetime::min() */
+    /** Stock::getLastUpdateTime forwarding: it returns the last update moment of the server buffer,
+     *  Datetime::min() is returned when it is not registered / it fails */
     std::function<Datetime(const std::string& market_code, const KQuery::KType& ktype)>
       getLastUpdateTime;
 
-    /** 客户端委托服务进程从行情缓存服务（buffer server）拉取 K 线：服务端已受理返回 true */
+    /** The client asks the service process to pull the K-lines from the market data cache service
+     *  (buffer server): true is returned when the server has accepted it */
     std::function<bool(const std::string& addr, const std::vector<std::string>& codes,
                        const KQuery::KType& ktype)>
       pullFromBufferServer;
 
-    /** 是否为空（全部回调为空即视为注销状态） */
+    /** Whether it is empty (when all the callbacks are empty it is regarded as the unregistered
+     *  state) */
     inline explicit operator bool() const noexcept {
         return static_cast<bool>(realtimeUpdate) || static_cast<bool>(getLastUpdateTime) ||
                static_cast<bool>(pullFromBufferServer);
@@ -45,45 +51,59 @@ struct ShmClientForwarders {
 };
 
 /**
- * 注册 / 注销 shm 客户端转发回调（插件 connect 成功 / 断开时调用；传入空集合即注销）
- * @note 注册仅发生在 StockManager 初始化协商期，转发调用发生在行情线程；实现采用无锁发布-订阅
- * （发布-获取），转发侧只读注册期创建的稳定对象。回调对象生命周期随插件实例，插件销毁前须先注销
+ * Register / unregister the shm client forwarding callbacks (called when the plugin connects
+ * successfully / disconnects; passing an empty set means unregistering)
+ * @note The registration happens only in the StockManager initialization negotiation period, and
+ * the forwarding calls happen in the market data thread; the implementation adopts lock-free
+ *       publish-subscribe (publish-acquire), and the forwarding side only reads the stable object
+ *       created in the registration period. The lifetime of the callback object follows the plugin
+ *       instance, and it must be unregistered before the plugin is destroyed
  */
 HKU_API void registerShmClient(ShmClientForwarders fwd) noexcept;
 
-/** 当前是否已注册客户端转发；未注册（独立模式 / 未安装插件）返回 false */
+/** Whether the client forwarding is currently registered; false is returned when it is not
+ *  registered (standalone mode / the plugin is not installed) */
 HKU_API bool shmClient() noexcept;
 
 /**
- * 客户端实时更新转发（Stock::realtimeUpdate 调用）
- * @return true 服务端已应用 | false 未注册客户端、通讯失败或服务端未应用
+ * Client realtime update forwarding (called by Stock::realtimeUpdate)
+ * @return true the server has applied it | false the client is not registered, the communication
+ *         failed or the server did not apply it
  */
 HKU_API bool forwardRealtimeUpdate(const std::string& market_code, const KQuery::KType& ktype,
                                    const KRecord& record);
 
 /**
- * 客户端向服务进程查询指定证券×类型缓冲的最后更新时刻（Stock::getLastUpdateTime 调用）
- * @return 服务端缓冲的最后更新时刻；未注册客户端、通讯失败或证券不存在时返回 Datetime::min()
+ * The client queries the service process for the last update moment of the buffer of the given
+ * security x type (called by Stock::getLastUpdateTime)
+ * @return the last update moment of the server buffer; Datetime::min() is returned when the client
+ *         is not registered, the communication failed or the security does not exist
  */
 HKU_API Datetime forwardGetLastUpdateTime(const std::string& market_code,
                                           const KQuery::KType& ktype);
 
 /**
- * 客户端委托服务进程从行情缓存服务（buffer server）拉取最新 K 线并更新
- * @return true 服务端已受理 | false 未注册客户端或通讯失败（调用方仅记日志，不中断）
+ * The client asks the service process to pull the latest K-line from the market data cache service
+ * (buffer server) and update it
+ * @return true the server has accepted it | false the client is not registered or the communication
+ *         failed (the caller only logs it, without interrupting)
  */
 HKU_API bool forwardPullFromBufferServer(const std::string& addr,
                                          const std::vector<std::string>& codes,
                                          const KQuery::KType& ktype);
 
 /**
- * 设置长阻塞等待期间的中断检查器（如等待数据服务就绪），返回 true 表示应中断等待
- * @details Python 环境下由绑定层注册（重新获取 GIL 后检查挂起信号），使等待可被 Ctrl+C 打断。
- * 属核心库通用设施：等待逻辑整体在插件内，插件经 ipc::checkInterrupted() 回调此处注册的实现。
+ * Set the interruption checker during a long blocking wait (such as waiting for the data service to
+ * be ready); true means the wait should be interrupted
+ * @details In the python environment it is registered by the binding layer (the pending signal is
+ *          checked after the GIL is re-acquired), so that the wait can be interrupted by Ctrl+C. It
+ *          is a general facility of the core library: the waiting logic is entirely inside the
+ *          plugin, and the plugin calls back the implementation registered here through
+ *          ipc::checkInterrupted().
  */
 HKU_API void setInterruptChecker(std::function<bool()> checker);
 
-/** 调用已注册的中断检查器，未注册时返回 false */
+/** Call the registered interruption checker; false is returned when none is registered */
 HKU_API bool checkInterrupted();
 
 }  // namespace ipc

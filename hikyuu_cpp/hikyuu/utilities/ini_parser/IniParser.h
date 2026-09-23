@@ -33,24 +33,26 @@
 namespace hku {
 
 /**
- * 支持简单的ini格式文件的读取 \n
+ * It supports the reading of a simple ini format file \n
  * @details
- * 典型的ini文件格式如下, 其中";"为行注释符号：\n
+ * A typical ini file format is as follows, where ";" is the line comment symbol: \n
  *     [section1] \n
- *     ;第一段 \n
+ *     ;The first section \n
  *     key1 = value1 \n
  *     key2 = value2 \n
  *     \n
  *     [section2] \n
- *     ;第二段 \n
- *     key1 = value1 ;注释1 \n
- *     key2 = value2 ;注释2 \n
+ *     ;The second section \n
+ *     key1 = value1 ;comment 1 \n
+ *     key2 = value2 ;comment 2 \n
  *
- * @note 同一个section可以在不同的位置定义，但如果不同位置的section中包含同名的option（key），
- *       则该option（key）的值为最后读入的值。这可能造成潜在的错误。建议不要将同一个section
- *       在不同的位置定义。\n
- *       对于配置信息分散在多个文件中的情况，可以通过多次调用read成员方法全部读入后，再统一处理。\n
- *       该类目前不支持复制操作，暂时没有此需求 \n
+ * @note The same section can be defined in different positions, but if the sections at different
+ *       positions contain an option (key) with the same name,
+ *       the value of that option (key) is the last read value. This may cause a potential error. It
+ * is recommended not to define the same section in different positions. \n When the configuration
+ * information is scattered in multiple files, all of them can be read in by calling the read member
+ * method multiple times and then processed uniformly. \n This class does not support the copy
+ * operation at present, there is no such requirement for now \n
  *
  * @author fasiondog
  * @date 20100519
@@ -80,7 +82,8 @@ public:
     std::string get(const std::string& section, const std::string& option,
                     const std::string& default_str = std::string()) const;
 
-    // 以下默认值类型使用string的原因是因为int/float/double/bool类型没有空对象
+    // The reason why the following default value type uses string is that the int/float/double/bool
+    // types have no empty object
     int getInt(const std::string& section, const std::string& option,
                const std::string& default_str = std::string()) const;
 

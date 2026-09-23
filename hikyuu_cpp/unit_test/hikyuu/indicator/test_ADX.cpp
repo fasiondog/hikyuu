@@ -18,7 +18,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ADX") {
     auto k = getKData("sh000001", KQuery(-100));
 
@@ -28,7 +28,7 @@ TEST_CASE("test_ADX") {
     CHECK_EQ(adx.getResultNumber(), 3);
 }
 
-/** @par 检测点：验证具体计算结果 */
+/** @par Test point: verify the concrete calculation result */
 TEST_CASE("test_ADX_calculation") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -65,7 +65,7 @@ TEST_CASE("test_ADX_calculation") {
     }
 }
 
-/** @par 检测点：验证结果集顺序 */
+/** @par Test point: verify the order of the result sets */
 TEST_CASE("test_ADX_result_order") {
     auto k = getKData("sh000001", KQuery(-100));
 
@@ -88,7 +88,7 @@ TEST_CASE("test_ADX_result_order") {
 TEST_CASE("test_ADX_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_ADX_benchmark, cycle, fmt::format("data len: {}", kdata.size()));
@@ -106,7 +106,7 @@ TEST_CASE("test_ADX_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ADX_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2026 hikyuu.org
  *
- *  Created for: 回归 IDDecline::_increment_calculate 运算符反向 bug
+ *  Created for: the regression of the reversed operator bug of IDDecline::_increment_calculate
  *      Author: woleigegg
  */
 
@@ -22,38 +22,44 @@ using namespace hku;
  */
 
 /**
- * @par 检测点
- * 核心回归: 全量计算 == 增量计算 (复用同一实例连续 setContext 触发 _increment_calculate)。
+ * @par Test points
+ * The core regression: the full calculation == the incremental calculation (setContext is called
+ * repeatedly on the same instance to trigger _increment_calculate).
  *
- * 背景: IDDecline::_increment_calculate 曾因比较运算符从 '<' 误写为 '>' (从 ADVANCE
- * 复制未改符号), 导致增量路径实际统计的是上涨家数。该 bug 仅在 _increment_calculate
- * 暴露, _calculate 全量路径用 '<' 是正确的。
+ * Background: IDDecline::_increment_calculate once used '>' instead of '<' in the comparison
+ * operator (copied from ADVANCE without changing the sign), so the incremental path counted the
+ * number of the rising securities. The bug was exposed only in _increment_calculate; the full path
+ * _calculate used '<' correctly.
  *
- * 触发机制: 必须复用同一个 Indicator 实例连续调用 setContext —— 第一次 setContext
- * (小窗口) 产生并缓存 m_old_context, 第二次 setContext (大窗口, 尾部延伸) 使
- * can_increment_calculate() 成立, 强制进入 _increment_calculate。若用 operator()/
- * clone() 会丢弃 m_old_context 导致静默回退全量, 测试假性通过。
+ * Trigger mechanism: the same Indicator instance must be reused with consecutive setContext calls
+ * -- the first setContext (a small window) produces and caches m_old_context and the second
+ * setContext (a large window extended at the tail) makes can_increment_calculate() hold, forcing
+ * the entry into _increment_calculate. Using operator()/ clone() would drop m_old_context and
+ * silently fall back to the full calculation, making the test pass falsely.
  *
- * 捕捉逻辑: full 全程用 '<' (正确下跌家数); inc 的 [start_pos, total) 走增量, 修复前
- * 用 '>' (错误, 算的是上涨家数), 与 full 不相等 → CHECK_EQ 失败暴露 bug; 修复后用 '<'
- * 与 full 一致 → 通过。
+ * The catching logic: full uses '<' all along (the correct falling count); the [start_pos, total)
+ * part of inc goes through the incremental path and before the fix it used '>' (wrong, counting the
+ * rising securities) so it differed from full and CHECK_EQ failed, exposing the bug; after the fix
+ * '<' matches full and the test passes.
  */
 TEST_CASE("test_Decline_increment_equivalence") {
     StockManager& sm = StockManager::instance();
-    // 用个股上下文 (非 INDEX) 满足 supportIncrementCalculate
+    // A single stock context (not INDEX) is used to satisfy supportIncrementCalculate
     Stock stk = sm.getStock("SH600000");
-    // KQuery(-20,-10) 与 KQuery(-20) 首根物理对齐, 后者尾部延伸, 满足增量准入
+    // The first bar of KQuery(-20,-10) and KQuery(-20) are physically aligned and the latter is
+    // extended at the tail, satisfying the incremental admission
     KData k_full = stk.getKData(KQuery(-20));
     KData k_partial = stk.getKData(KQuery(-20, -10));
 
-    // (1) 全量基准: 独立实例
+    // (1) The full baseline: an independent instance
     Indicator ind_full = DECLINE();
     ind_full.setContext(k_full);
 
-    // (2) 增量测试: 复用同一实例连续 setContext 触发内部状态机
+    // (2) The incremental test: the same instance is reused with consecutive setContext to trigger
+    // the internal state machine
     Indicator ind_inc = DECLINE();
-    ind_inc.setContext(k_partial);  // 缓存 m_old_context
-    ind_inc.setContext(k_full);     // 尾部延伸 -> 进入 _increment_calculate
+    ind_inc.setContext(k_partial);  // Cache m_old_context
+    ind_inc.setContext(k_full);     // Extended at the tail -> enter _increment_calculate
 
     CHECK_EQ(ind_full.size(), ind_inc.size());
     CHECK_EQ(ind_full.discard(), ind_inc.discard());
@@ -65,8 +71,9 @@ TEST_CASE("test_Decline_increment_equivalence") {
         CHECK_EQ(ind_inc[i], doctest::Approx(ind_full[i]).epsilon(0.0001));
     }
 
-    // (3) 方向性硬断言 (双保险): 非横盘行情下 DECLINE ≠ ADVANCE
-    // 修复前若 bug 存在, ind_inc 增量结果会等于 ADVANCE; 修复后必不相等
+    // (3) The directional hard assertion (a double safety): DECLINE != ADVANCE in a non-sideways
+    // market With the bug present the incremental result of ind_inc equaled ADVANCE; after the fix
+    // they must differ
     Indicator ind_adv = ADVANCE();
     ind_adv.setContext(k_full);
     size_t last_idx = ind_full.size() - 1;
@@ -77,13 +84,15 @@ TEST_CASE("test_Decline_increment_equivalence") {
 }
 
 /**
- * @par 检测点
- * DECLINE 与 ADVANCE 互为镜像, 锁定方向语义: DECLINE 统计下跌, ADVANCE 统计上涨。
- * 验证: 在有足够多股票数据的交易日 (D+A >= 10, 排除极少数据对齐的异质日),
- *   存在某日 D != A (非全平盘, < / > 运算符实际区分下跌/上涨)。
- * 注: 修复前 _increment_calculate 用 '>' 会导致 DECLINE 增量结果等于 ADVANCE;
- *   修复后全量与增量均用 '<', DECLINE 与 ADVANCE 在非横盘日必然不同。
- *   部分时点因 ALIGN 日期对齐一端为 NaN (停牌/未上市填充), 仅在双值点验证。
+ * @par Test points
+ * DECLINE and ADVANCE mirror each other, locking the direction semantics: DECLINE counts the falls
+ * and ADVANCE the rises. Verification: on the trading days with enough stock data (D+A >= 10,
+ * excluding the heterogeneous days with very few aligned data) there exists a day with D != A (not
+ * all flat, so the < / > operators really distinguish the   falls from the rises). Note: before the
+ * fix _increment_calculate using '>' made the incremental DECLINE result equal ADVANCE; after the
+ * fix both the full and the incremental paths use '<', so DECLINE and ADVANCE must   differ on a
+ * non-sideways day. At some moments one end is NaN due to the ALIGN date alignment (the suspension
+ * / not listed   filling), so only the double-value points are verified.
  */
 TEST_CASE("test_Decline_vs_Advance_mirror") {
     StockManager& sm = StockManager::instance();
@@ -99,7 +108,7 @@ TEST_CASE("test_Decline_vs_Advance_mirror") {
     CHECK_EQ(advance.name(), "ADVANCE");
     CHECK_EQ(decline.size(), advance.size());
 
-    // 在有足够数据的双值点 (D+A>=10) 验证方向区分
+    // Verify the direction distinction at the double-value points with enough data (D+A>=10)
     bool found_distinct = false;
     for (size_t i = 0; i < decline.size(); ++i) {
         if (std::isnan(decline[i]) || std::isnan(advance[i])) {
@@ -113,21 +122,23 @@ TEST_CASE("test_Decline_vs_Advance_mirror") {
             }
         }
     }
-    // 真实行情 20 日内必存在非全平盘日 (D != A)
+    // There must be a non-flat day (D != A) within 20 days of the real market data
     CHECK_UNARY(found_distinct);
 }
 
 /**
- * @par 检测点
- * ignore_context 模式: 不依赖上下文, 直接按 query/market/stk_type 全市场统计。
- * 验证可正常计算且存在有效 (非 NaN) 输出点。
+ * @par Test points
+ * The ignore_context mode: it does not depend on the context and counts the whole market by
+ * query/market/stk_type directly. Verify that it calculates normally and that there are valid
+ * (non-NaN) output points.
  */
 TEST_CASE("test_Decline_ignore_context") {
     Indicator decline = DECLINE(KQuery(-10), "SH", STOCKTYPE_A, true, true);
     CHECK_EQ(decline.name(), "DECLINE");
     CHECK_EQ(decline.empty(), false);
     CHECK_GT(decline.size(), 0);
-    // 遍历找首个非 NaN 有效点断言 (discard 点可能因对齐为 NaN)
+    // Traverse to find the first valid non-NaN point for the assertion (the discard points may be
+    // NaN due to the alignment)
     bool has_valid = false;
     for (size_t i = 0; i < decline.size(); ++i) {
         if (!std::isnan(decline[i])) {

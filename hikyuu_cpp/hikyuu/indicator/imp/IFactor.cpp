@@ -1,7 +1,7 @@
 /*
  * IFactor.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -34,11 +34,14 @@ IndicatorImpPtr IFactor::_clone() {
 }
 
 bool IFactor::selfAlike(const IndicatorImp& other) const noexcept {
-    // Factor 以“名字 + K线类型”作为唯一标识（见 Factor.h 文档），故意不比较公式内容。
-    // 因此两个 FACTOR 节点仅在名字和 K线类型都相同时，才会被 CompiledFactorPlan
-    // 当作同一节点做 CSE 合并。上游 FactorSet::add 已校验 K线类型并按名字去重
-    //（后加入者覆盖先加入者），所以结构良好的 FactorSet 不会把“标识相同但公式不同”
-    // 的两个因子同时喂进 compiled 路径。dynamic_cast 保证非 IFactor 节点不会判等。
+    // Factor uses the "name + K-line type" as the unique identifier (see the Factor.h
+    // documentation) and deliberately does not compare the formula content. Therefore two FACTOR
+    // nodes are treated as the same node by CompiledFactorPlan for the CSE merge only when both the
+    // name and the K-line type are the same. The upstream FactorSet::add has already verified the
+    // K-line type and removed the duplicates by name (the later one overwrites the earlier one), so
+    // a well-formed FactorSet would not feed two factors with the same identifier but different
+    // formulas into the compiled path at the same time. dynamic_cast guarantees that a non-IFactor
+    // node is not judged equal.
     const auto* other_ctx = dynamic_cast<const IFactor*>(&other);
     HKU_IF_RETURN(other_ctx == nullptr, false);
     return m_factor.name() == other_ctx->m_factor.name() &&

@@ -15,10 +15,11 @@
 namespace hku {
 
 /**
- * 成本记录
- * @details 总成本 = 佣金 + 印花税 + 过户费 + 其他费用
- * @note 该结构主要用于存放成本记录结果，一般当做struct直接使用，
- *       该类本身不对总成本进行计算，也不保证上面的公式成立
+ * Cost record
+ * @details Total cost = commission + stamp duty + transfer fee + other fees
+ * @note This structure is mainly used to store the cost record result; it is generally used
+ * directly as a struct. The class itself does not calculate the total cost, and it does not
+ * guarantee that the above formula holds
  * @ingroup TradeCost
  */
 class HKU_API CostRecord {
@@ -27,11 +28,11 @@ public:
     CostRecord(price_t commission, price_t stamptax, price_t transferfee, price_t others,
                price_t total);
 
-    price_t commission;  /**< 佣金     */
-    price_t stamptax;    /**< 印花税   */
-    price_t transferfee; /**< 过户费   */
-    price_t others;      /**< 其他费用 */
-    price_t total;       /**< 总成本   */
+    price_t commission;  /**< Commission     */
+    price_t stamptax;    /**< Stamp duty     */
+    price_t transferfee; /**< Transfer fee   */
+    price_t others;      /**< Other fees     */
+    price_t total;       /**< Total cost     */
 
     string toString() const;
 
@@ -50,7 +51,7 @@ private:
 };
 
 /**
- * 输出成本信息
+ * Output the cost information
  * @ingroup TradeCost
  */
 HKU_API std::ostream& operator<<(std::ostream& os, const CostRecord&);

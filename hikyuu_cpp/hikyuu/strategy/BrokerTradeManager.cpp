@@ -129,7 +129,8 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
 
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
-    // 实际交易需要的现金＝交易数量＊实际交易价格＋交易总成本
+    // The cash needed by the actual trade = the trade quantity * the actual trade price + the total
+    // trade cost
     int precision = getParam<int>("precision");
     // price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
@@ -138,14 +139,14 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
                        "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
                        stock.market_code(), roundEx(money + cost.total, precision), m_cash);
 
-    // 更新现金
+    // Update the cash
     m_cash = roundEx(m_cash - money - cost.total, precision);
 
-    // 加入交易记录
+    // Add it to the trade records
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
                          cost, stoploss, m_cash, from, remark);
 
-    // 更新当前持仓记录
+    // Update the current position record
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         m_position[stock.id()] = PositionRecord(
@@ -187,7 +188,9 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
-    // 对于分红扩股造成不满足最小交易量整数倍的情况，只能通过number=MAX_DOUBLE的方式全仓卖出
+    // For the case where the dividend and the capital increase make the quantity not an integer
+    // multiple of the minimum trade quantity, the whole position can only be sold with
+    // number=MAX_DOUBLE
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Sell number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -195,7 +198,7 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
                         "{} {} Sell number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
 
-    // 未持仓
+    // There is no position
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     HKU_TRACE_IF_RETURN(pos_iter == m_position.end(), result,
                         "{} {} This stock was not bought never! ({}, {:<.4f}, {}, {})", datetime,
@@ -203,10 +206,10 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
 
     PositionRecord& position = pos_iter->second;
 
-    // 调整欲卖出的数量，如果卖出数量等于MAX_DOUBLE，则表示卖出全部
+    // Adjust the quantity to be sold; a sell quantity equal to MAX_DOUBLE means selling everything
     double real_number = number == MAX_DOUBLE ? position.number : number;
 
-    // 欲卖出的数量大于当前持仓的数量
+    // The quantity to be sold is greater than the current position quantity
     HKU_ERROR_IF_RETURN(position.number < real_number, result,
                         "{} {} Try to sell number({}) > number of position({})!", datetime,
                         stock.market_code(), real_number, position.number);
@@ -216,14 +219,14 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
 
-    // 更新现金余额
+    // Update the cash balance
     m_cash = roundEx(m_cash + money - cost.total, precision);
 
-    // 更新交易记录
+    // Update the trade records
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
                          real_number, cost, stoploss, m_cash, from, remark);
 
-    // 更新当前持仓情况
+    // Update the current position
     position.number -= real_number;
     position.stoploss = stoploss;
     position.goalPrice = goalPrice;
@@ -232,7 +235,7 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     position.sellMoney = roundEx(position.sellMoney + money, precision);
 
     if (position.number == 0) {
-        // 删除当前持仓
+        // Delete the current position
         m_position.erase(stock.id());
     }
 
@@ -256,7 +259,7 @@ FundsRecord BrokerTradeManager::getFunds(KQuery::KType inktype) const {
     string ktype(inktype);
     to_upper(ktype);
 
-    price_t value{0.0};  // 当前市值
+    price_t value{0.0};  // Current market value
     position_map_type::const_iterator iter = m_position.begin();
     for (; iter != m_position.end(); ++iter) {
         const PositionRecord& record = iter->second;

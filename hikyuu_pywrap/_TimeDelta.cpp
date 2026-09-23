@@ -21,9 +21,9 @@ TimeDelta (TimeDelta::*TimeDelta_neg)() const = &TimeDelta::operator-;
 
 void export_TimeDelta(py::module& m) {
     py::class_<TimeDelta>(m, "TimeDelta",
-                          R"(时间时长，用于时间计算。可通过以下方式构建：
+                          R"(The time duration, used for the time calculation. It can be built in the following ways:
 
-    - 通过 datetime.timedelta 构建。TimdeDelta(timedelta实例)
+    - Build from a datetime.timedelta. TimeDelta(a timedelta instance)
     - TimeDelta(days=0, hours=0, minutes=0, seconds=0, milliseconds=0, microseconds=0)
 
         - -99999999 <= days <= 99999999
@@ -33,7 +33,7 @@ void export_TimeDelta(py::module& m) {
         - -86399000000 <= milliseconds <= 86399000000
         - -86399000000 <= microseconds <= 86399000000
 
-    以上参数限制，主要为防止求总微秒数时可能出现溢出的情况。如只使用一个参数不希望存在上述限制时，可使用快捷函数：
+    The parameter limits above are mainly to prevent a possible overflow when summing the total microseconds. When only one parameter is used and the limits above are not desired, the shortcut functions can be used:
     Days, Hours, Minutes, Seconds, Milliseconds, Microseconds)")
 
       .def(py::init<>())
@@ -44,85 +44,85 @@ void export_TimeDelta(py::module& m) {
       .def("__str__", &TimeDelta::str)
       .def("__repr__", &TimeDelta::repr)
 
-      .def_property_readonly("days", &TimeDelta::days, "天数 [-99999999, 99999999]")
-      .def_property_readonly("hours", &TimeDelta::hours, "小时数 [0, 23]")
-      .def_property_readonly("minutes", &TimeDelta::minutes, "分钟数 [0, 59]")
-      .def_property_readonly("seconds", &TimeDelta::seconds, "秒数 [0, 59]")
-      .def_property_readonly("milliseconds", &TimeDelta::milliseconds, "毫秒数 [0, 999]")
-      .def_property_readonly("microseconds", &TimeDelta::microseconds, "微秒数 [0, 999]")
-      .def_property_readonly("ticks", &TimeDelta::ticks, "同总微秒数")
+      .def_property_readonly("days", &TimeDelta::days, "The number of days [-99999999, 99999999]")
+      .def_property_readonly("hours", &TimeDelta::hours, "The number of hours [0, 23]")
+      .def_property_readonly("minutes", &TimeDelta::minutes, "The number of minutes [0, 59]")
+      .def_property_readonly("seconds", &TimeDelta::seconds, "The number of seconds [0, 59]")
+      .def_property_readonly("milliseconds", &TimeDelta::milliseconds, "The number of milliseconds [0, 999]")
+      .def_property_readonly("microseconds", &TimeDelta::microseconds, "The number of microseconds [0, 999]")
+      .def_property_readonly("ticks", &TimeDelta::ticks, "The same as the total microseconds")
 
       .def("isNegative", &TimeDelta::isNegative, R"(isNegative(self)
 
-    是否为负时长
+    Whether it is a negative duration
 
     :rtype: bool)")
 
       .def("total_days", &TimeDelta::total_days, R"(total_days(self)
 
-    获取带小数的总天数
+    Get the total number of days with decimals
 
     :rtype: float)")
 
       .def("total_hours", &TimeDelta::total_hours, R"(total_hours(self)
 
-    获取带小数的总小时数
+    Get the total number of hours with decimals
 
     :rtype: float)")
 
       .def("total_minutes", &TimeDelta::total_minutes, R"(total_minutes(self)
 
-    获取带小数的总分钟数
+    Get the total number of minutes with decimals
 
     :rtype: float)")
 
       .def("total_seconds", &TimeDelta::total_seconds, R"(total_seconds(self)
 
-    获取带小数的总秒数
+    Get the total number of seconds with decimals
 
     :rtype: float)")
 
       .def("total_milliseconds", &TimeDelta::total_milliseconds, R"(total_milliseconds(self)
 
-    获取带小数的总毫秒数
+    Get the total number of milliseconds with decimals
 
     :rtype: float)")
 
       .def("max", &TimeDelta::max, R"(max()
 
-    支持的最大时长
+    The maximum supported duration
 
     :return: TimeDelta(99999999, 23, 59, 59, 999, 999))")
 
       .def("min", &TimeDelta::min, R"(min()
 
-    支持的最小时长
+    The minimum supported duration
 
     :return: TimeDelta(-99999999, 0, 0, 0, 0, 0))")
 
       .def("resolution", &TimeDelta::resolution, R"(resolution()
 
-    支持的最小精度
+    The minimum supported precision
         
     :return: TimeDelta(0, 0, 0, 0, 0, 1))")
 
       .def("max_ticks", &TimeDelta::maxTicks, R"(max_ticks()
 
-    支持的最大 ticks （即微秒数）
+    The maximum supported ticks (i.e. the number of microseconds)
 
     :rtype: int)")
 
       .def("min_ticks", &TimeDelta::minTicks, R"(min_ticks()
 
-    支持的最小 ticks （即微秒数）
+    The minimum supported ticks (i.e. the number of microseconds)
 
     :rtype: int)")
 
       .def("from_ticks", &TimeDelta::fromTicks, R"(from_ticks(ticks)
 
-    使用 ticks（即微秒数） 值创建
+    Create with the ticks (i.e. the number of microseconds) value
 
-    :param int ticks: 微秒数
+    :param int ticks: the number of microseconds
     :rtype: TimeDelta)")
 
       .def(py::hash(py::self))
@@ -149,49 +149,49 @@ void export_TimeDelta(py::module& m) {
 
     m.def("Days", Days, R"(Days(days)
 
-      TimeDelta 快捷创建函数
+      The TimeDelta shortcut creation function
 
-      :param int days: 天数 [-99999999, 99999999]
+      :param int days: the number of days [-99999999, 99999999]
       :rtype: TimeDelta)");
 
     m.def("Hours", Hours, R"(Hours(hours)
 
-      TimeDelta 快捷创建函数
+      The TimeDelta shortcut creation function
 
-      :param int hours: 小时数
+      :param int hours: the number of hours
       :rtype: TimeDelta)");
 
     m.def("Minutes", Minutes, R"(Minutes(mins)
 
-      TimeDelta 快捷创建函数
+      The TimeDelta shortcut creation function
 
-      :param int mins: 分钟数
+      :param int mins: the number of minutes
       :rtype: TimeDelta)");
 
     m.def("Seconds", Seconds, R"(Seconds(secs)
 
-      TimeDelta 快捷创建函数
+      The TimeDelta shortcut creation function
 
-      :param int secs: 秒数
+      :param int secs: the number of seconds
       :rtype: TimeDelta)");
 
     m.def("Milliseconds", Milliseconds, R"(Milliseconds(milliseconds)
 
-      TimeDelta 快捷创建函数
+      The TimeDelta shortcut creation function
 
-      :param int milliseconds: 毫秒数
+      :param int milliseconds: the number of milliseconds
       :rtype: TimeDelta)");
 
     m.def("Microseconds", Microseconds, R"(Microseconds(microsecs)
 
-      TimeDelta 快捷创建函数
+      The TimeDelta shortcut creation function
 
-      :param int microsecs: 微秒数
+      :param int microsecs: the number of microseconds
       :rtype: TimeDelta)");
 
     m.def("UTCOffset", UTCOffset, R"(UTCOffset()
 
-      获取当前系统 UTC 偏移量
+      Get the current system UTC offset
 
       :rtype: TimeDelta)");
 }

@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 判断当前数据是否为最后一个数据，若为最后一个数据，则返回1，否则返回0.
+ * Judge whether the current data is the last one; it returns 1 if it is the last one, otherwise 0.
  * @ingroup Indicator
  */
 Indicator HKU_API ISLASTBAR();

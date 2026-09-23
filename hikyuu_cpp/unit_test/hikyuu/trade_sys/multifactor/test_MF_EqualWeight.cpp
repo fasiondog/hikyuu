@@ -1,7 +1,7 @@
 /*
  * test_ABS.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -52,7 +52,7 @@ TEST_CASE("test_nan_sort_in_MF") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MF_EqualWeight") {
     StockManager& sm = StockManager::instance();
     StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -62,16 +62,16 @@ TEST_CASE("test_MF_EqualWeight") {
     DatetimeList ref_dates = ref_k.getDatetimeList();
     IndicatorList src_inds{MA(CLOSE()), AMA(CLOSE(), EMA(CLOSE()))};
 
-    /** @arg 输入的原始因子列表为空 */
+    /** @arg The input original factor list is empty */
     CHECK_THROWS_AS(MF_EqualWeight(IndicatorList{}, stks, query, ref_stk), std::exception);
 
-    /** @arg 输入的参考证券为空 */
+    /** @arg The input reference security is empty */
     CHECK_THROWS_AS(MF_EqualWeight(IndicatorList{}, stks, query, Null<Stock>()), std::exception);
 
-    /** @arg 输入非法 ic_n */
+    /** @arg An invalid ic_n is passed */
     CHECK_THROWS_AS(MF_EqualWeight(src_inds, stks, KQuery(-2), ref_stk, 0), std::exception);
 
-    /** @arg 临界状态, 原始因子数量为1, 证券数量2, 数据长度为2 */
+    /** @arg The boundary state: 1 factor, 2 securities and the data length 2 */
     src_inds = {MA(CLOSE())};
     stks = {sm["sh600005"], sm["sh600004"]};
     query = KQuery(-2);
@@ -117,7 +117,7 @@ TEST_CASE("test_MF_EqualWeight") {
     CHECK_EQ(cross[1].stock, sm["sh600005"]);
     CHECK_EQ(cross[1].value, doctest::Approx(3.3209).epsilon(0.001));
 
-    /** @arg 原始因子数量为3, 证券数量4, 数据长度为20, 指定比较收益率 3 日 */
+    /** @arg 3 factors, 4 securities, the data length 20 and the comparison return of 3 days */
     int ndays = 3;
     src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)), EMA(ROCR(CLOSE(), ndays))};
     stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
@@ -159,7 +159,7 @@ TEST_CASE("test_MF_EqualWeight_benchmark") {
     auto ref_k = ref_stk.getKData(query);
     auto ref_dates = ref_k.getDatetimeList();
 
-    int cycle = 10;  // 测试循环次数
+    int cycle = 10;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_MF_EqualWeight_benchmark, cycle,
@@ -179,7 +179,7 @@ TEST_CASE("test_MF_EqualWeight_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MF_EqualWeight_export") {
     StockManager& sm = StockManager::instance();
     int ndays = 3;

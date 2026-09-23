@@ -29,8 +29,8 @@
 # 1. 20100224, Added by fasiondog
 # ===============================================================================
 """
-绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)
-参见：《精明交易者》（2006年 广东经济出版社） 
+Draw the Perry J. Kaufman adaptive moving average system (AMA)
+See: 《精明交易者》（2006年 广东经济出版社）
 """
 
 from hikyuu import (
@@ -43,7 +43,7 @@ from .drawplot import (show_gcf, create_figure, ax_set_locator_formatter, adjust
 def draw(
     stock, query=Query(-130), n=10, filter_n=20, filter_p=0.1, sg_type="CROSS", show_high_low=False, arrow_style=1
 ):
-    """绘制佩里.J.考夫曼（Perry J.Kaufman） 自适应移动平均系统(AMA)"""
+    """Draw the Perry J. Kaufman adaptive moving average system (AMA)"""
     kdata = stock.get_kdata(query)
 
     ax1, ax2 = create_figure(2)

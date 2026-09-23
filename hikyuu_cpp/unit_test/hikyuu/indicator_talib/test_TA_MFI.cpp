@@ -20,15 +20,15 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MFI") {
     KData kdata = getKData("sz000001", KQuery(-30));
 
-    /** @arg 非法 n < 2 || n > 100000 */
+    /** @arg Invalid n < 2 || n > 100000 */
     CHECK_THROWS(TA_MFI(kdata, 1));
     CHECK_THROWS(TA_MFI(kdata, 100001));
 
-    /** @arg 正常值  */
+    /** @arg The normal value */
     Indicator result = TA_MFI(kdata);
     CHECK_EQ(result.name(), "TA_MFI");
     CHECK_EQ(result.discard(), 14);
@@ -42,7 +42,7 @@ TEST_CASE("test_TA_MFI") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MFI_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -1,7 +1,7 @@
 /*
  * LIUTONGPANG.h
  *
- *  Created on: 2019年3月6日
+ *  Created on: 2019-3-6
  *      Author: fasiondog
  */
 
@@ -15,7 +15,7 @@
 
 namespace hku {
 
-/** 流通盘，单位万股 */
+/** Outstanding shares, in units of 10 thousand shares */
 Indicator HKU_API LIUTONGPAN();
 Indicator HKU_API LIUTONGPAN(const KData&);
 

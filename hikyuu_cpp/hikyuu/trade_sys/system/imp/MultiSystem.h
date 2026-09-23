@@ -4,10 +4,10 @@
  *  Created on: 2024-09-13
  *      Author: fasiondog
  *
- *  递归组合重构：聚合交易系统（组合回测）
- *  持有多个子系统（单证券或嵌套聚合），在开盘/收盘阶段分别驱动并汇总下单。
- *  阶段 3：双模式（A/B）+ 任意嵌套 + MM L1/L2/L3 + 调仓周期 + 层级路径。
- *  模式 A（默认）：父给子「影子账户」，父按权重统一分配并下单（功能等价 PF 信号汇总）。
+ *  Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
+ *  It holds multiple sub-systems (single-security or nested aggregate), drives and aggregates the orders at the open/close stages respectively.
+ *  Stage 3: dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
+ *  Mode A (the default): the parent gives the sub-systems a "shadow account", the parent allocates and orders by weight uniformly (functionally equivalent to the PF signal aggregation).
  */
 
 #pragma once
@@ -19,13 +19,13 @@
 
 namespace hku {
 
-class SelectorBase;  // 前向声明，避免与 SelectorBase.h（内含 System.h）形成包含环
+class SelectorBase;  // Forward declaration, to avoid a circular include with SelectorBase.h (which includes System.h)
 
 class HKU_API MultiSystem : public System {
 public:
     MultiSystem() : System() {
         _initAxisParam();
-        // 聚合形态父系统的默认 MM 为模式 A（信号汇总，基类 allocate 实现等权分配）
+        // The default MM of the aggregate parent system is mode A (signal aggregation, the base allocate implements the equal weight allocation)
         if (!getMM()) {
             setMM(MM_Nothing());
         }
@@ -51,10 +51,10 @@ public:
     }
     virtual ~MultiSystem() = default;
 
-    /** 添加子系统（含循环引用检测，拒绝包含自身或已存在的节点） */
+    /** Add a sub-system (with the circular reference detection, it rejects the node that contains itself or an existing node) */
     void add(const SystemPtr& sys);
 
-    /** 获取子系统列表 */
+    /** Get the sub-system list */
     const SystemList& getSystemList() const {
         return m_sys_list;
     }
@@ -68,16 +68,16 @@ public:
 
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false) override;
 
-    /** master 兼容重载：等价 master `Portfolio::run(query)`，以市场交易日历为驱动轴运行。
-     *  - 驱动轴：已显式注入的固定时间轴（axis-mode == "calendar" 且非空）优先，
-     *            否则取 StockManager 市场交易日历 `get_trading_calendar(query)`（默认 SH 市场）；
-     *  - 上下文 KData：仅提供 query/ktype 与价格查询上下文，优先取自身标的 `getStock()`，
-     *            其次取首个（递归）子系统标的，最后退化为日历基准指数（如 sh000001）的 KData；
-     *  - 不修改 axis-mode / 固定时间轴参数，仅本次运行使用日历轴驱动。
-     *  @param query 查询条件（同时作为子系统与价格的查询上下文）
-     *  @param reset 运行前是否复位（转发给各子系统）
-     *  @param resetAll 运行前是否强制全量复位
-     *  @note ktype 非日线时，与 master 一致，要求 adjust-mode 为 query/day（日历轴为日线序列）。 */
+    /** master compatibility overload: equivalent to master `Portfolio::run(query)`, it runs with the market trading calendar as the driving axis.
+     *  - Driving axis: the explicitly injected fixed time axis (axis-mode == "calendar" and not empty) takes precedence,
+     *            otherwise the StockManager market trading calendar `get_trading_calendar(query)` is used (the SH market by default);
+     *  - Context KData: it only provides the query/ktype and the price query context, its own instrument `getStock()` takes precedence,
+     *            then the first (recursive) sub-system instrument, and finally it degenerates to the KData of the calendar benchmark index (e.g. sh000001);
+     *  - The axis-mode / fixed time axis parameters are not modified, the calendar axis only drives this run.
+     *  @param query the query condition (also used as the query context of the sub-systems and the prices)
+     *  @param reset whether to reset before running (forwarded to every sub-system)
+     *  @param resetAll whether to force a full reset before running
+     *  @note when ktype is not the daily line, consistent with master, adjust-mode is required to be query/day (the calendar axis is a daily line sequence). */
     void run(const KQuery& query, bool reset = true, bool resetAll = false);
 
     virtual MomentResult runMoment(const Datetime& datetime) override;
@@ -89,168 +89,168 @@ public:
     virtual void _forceResetAll() override;
     virtual SystemPtr _clone() override;
 
-    /** 层级路径 */
+    /** The hierarchy path */
     virtual const string& getPath() const override {
         return m_path;
     }
 
-    /** 设置资金分配实例（组合级资金分配 AF，承载 L1/L2/L3 三个算法部件） */
+    /** Set the fund allocation instance (the portfolio-level fund allocation AF, carrying the three algorithm parts L1/L2/L3) */
     void setAF(const AllocateFundsPtr& af) {
         if (af) {
             m_af = af;
         }
     }
 
-    /** 获取资金分配实例 */
+    /** Get the fund allocation instance */
     const AllocateFundsPtr& getAF() const {
         return m_af;
     }
 
-    /** 设置运行模式：A（信号汇总，默认）/ B（资金划拨 / FOF-MOM）。
-     *  模式 B 下父在调仓日通过 L1 产出真实额度并回写各子系统。
-     *  @note 模式由 AF 持有（唯一来源），本方法直接写入当前 AF。 */
+    /** Set the running mode: A (signal aggregation, the default) / B (fund allocation / FOF-MOM).
+     *  In mode B the parent produces the real quota through L1 and writes it back to every sub-system on the rebalancing day.
+     *  @note The mode is held by AF (the only source), this method writes it directly into the current AF. */
     void setMode(const string& mode) {
         if (m_af) {
             m_af->setMode(mode);
         }
     }
 
-    /** 获取运行模式（来自 AF） */
+    /** Get the running mode (from AF) */
     const string& getMode() const;
 
-    /** 设置子系统影子账户初始资金（模式 A 固定值 / 模式 B 初始额度） */
+    /** Set the initial fund of the sub-system shadow account (a fixed value in mode A / the initial quota in mode B) */
     void setSubInitCash(price_t cash) {
         m_sub_init_cash = cash > 0.0 ? cash : m_sub_init_cash;
     }
 
-    /** 获取子系统影子账户初始资金 */
+    /** Get the initial fund of the sub-system shadow account */
     price_t getSubInitCash() const {
         return m_sub_init_cash;
     }
 
-    /** 设置调仓周期（天）；<=1 表示每个收盘日都再平衡 */
+    /** Set the rebalancing cycle (days); <=1 means rebalancing on every close day */
     void setAdjustCycle(int cycle) {
         m_adjust_cycle = cycle > 0 ? cycle : 1;
     }
 
-    /** 获取调仓周期（天） */
+    /** Get the rebalancing cycle (days) */
     int getAdjustCycle() const {
         return m_adjust_cycle;
     }
 
-    /** 设置是否在收盘阶段执行调仓下单 */
+    /** Set whether to execute the rebalancing orders at the close stage */
     void setTradeOnClose(bool v) {
         m_trade_on_close = v;
     }
 
-    /** 获取是否在收盘阶段执行调仓下单 */
+    /** Get whether to execute the rebalancing orders at the close stage */
     bool getTradeOnClose() const {
         return m_trade_on_close;
     }
 
-    /** 设置交易对象选择器（可选；设置后仅运行 SE 选中的子系统，未选中可清仓） */
+    /** Set the trading object selector (optional; after it is set only the sub-systems selected by SE run, the unselected ones can be liquidated) */
     void setSE(const std::shared_ptr<SelectorBase>& se) {
         m_se = se;
     }
 
-    /** 获取交易对象选择器 */
+    /** Get the trading object selector */
     const std::shared_ptr<SelectorBase>& getSE() const {
         return m_se;
     }
 
-    /** 设置未选中子系统是否强制清仓（sell_at_not_selected） */
+    /** Set whether to force liquidating the unselected sub-systems (sell_at_not_selected) */
     void setSellAtNotSelected(bool v) {
         m_sell_at_not_selected = v;
     }
 
-    /** 获取未选中子系统是否强制清仓 */
+    /** Get whether to force liquidating the unselected sub-systems */
     bool getSellAtNotSelected() const {
         return m_sell_at_not_selected;
     }
 
-    /** 获取各调仓日的换手率（成交金额 / 调仓前总资产） */
+    /** Get the turnover rate of every rebalancing day (the turnover amount / the total assets before rebalancing) */
     const std::vector<std::pair<Datetime, double>>& getAdjustTurnover() const {
         return m_adjust_turnover;
     }
 
-    /** 设置驱动时间轴模式（参数 axis-mode）：
-     *  - "kdata"（默认）：以 run(kdata) 入参 KData 自带日期序列为驱动轴（既有行为）
-     *  - "calendar"：以 setDateAxis() 注入的固定日期表（如全市场交易日历）为驱动轴；
-     *               入参 KData 退化为 query/ktype 与价格查询上下文，其自带日期不再驱动。
-     *  非法取值告警并回退 "kdata"。 */
+    /** Set the driving time axis mode (the axis-mode parameter):
+     *  - "kdata" (the default): the date sequence of the input KData of run(kdata) is used as the driving axis (the existing behavior)
+     *  - "calendar": the fixed date table (e.g. the market-wide trading calendar) injected by setDateAxis() is used as the driving axis;
+     *               the input KData degenerates into the query/ktype and the price query context, its own dates no longer drive.
+     *  An invalid value is warned and it falls back to "kdata". */
     void setAxisMode(const string& mode);
 
-    /** 获取驱动时间轴模式 */
+    /** Get the driving time axis mode */
     string getAxisMode() const {
         return tryGetParam<string>("axis-mode", "kdata");
     }
 
-    /** 设置调仓模式（承接 master PF 的 adjust_mode，见 design.md §4.3）：
-     *  - "query" / "day"（默认）：沿用 m_adjust_cycle 的「每 N 个收盘日」计数判定；
-     *  - "week" / "month" / "quarter" / "year"：在驱动轴上按「周期内第 adjust_cycle 日」展开调仓日表；
-     *  非法取值告警并回退 "query"。 */
+    /** Set the rebalancing mode (taking over the master PF adjust_mode, see design.md §4.3):
+     *  - "query" / "day" (the default): continue the "every N close days" counting judgment of m_adjust_cycle;
+     *  - "week" / "month" / "quarter" / "year": expand the rebalancing day table by "the adjust_cycle-th day within the cycle" on the driving axis;
+     *  An invalid value is warned and it falls back to "query". */
     void setAdjustMode(const string& mode);
 
-    /** 获取调仓模式 */
+    /** Get the rebalancing mode */
     string getAdjustMode() const {
         return tryGetParam<string>("adjust-mode", "query");
     }
 
-    /** 设置调仓日非交易日时是否顺延至当周期内首个交易日（仅 week/month/quarter/year 展开时生效） */
+    /** Set whether to postpone to the first trading day within the current cycle when the rebalancing day is not a trading day (it takes effect only when week/month/quarter/year are expanded) */
     void setDelayToTradingDay(bool v) {
         setParam<bool>("delay-to-trading-day", v);
     }
 
-    /** 获取是否顺延至交易日 */
+    /** Get whether to postpone to the trading day */
     bool getDelayToTradingDay() const {
         return tryGetParam<bool>("delay-to-trading-day", true);
     }
 
-    /** 按 master Portfolio 算法，在给定交易日轴上计算调仓日集合（纯函数，便于单测与外部预览）。
-     *  @param dates 已排序的交易日轴（通常是驱动轴；停牌/非交易日不应出现在轴上）
-     *  @param mode "week" | "month" | "quarter" | "year"（其余取值如 query/day/非法值返回空）
-     *  @param adjust_cycle 周期内第 N 日（<=0 视为 1）；week 模式下为 dayOfWeek（0=周日,1=周一…6=周六）
-     *  @param delay_to_trading_day true 时顺延至当周期内首个交易日；false 时仅在恰为第 N 日命中
-     *  @return 升序去重的调仓日列表
-     *  @note 与 master Portfolio::_calculateAdjustDate* 行为对齐（见 design.md §4.3） */
+    /** Calculate the rebalancing day set on the given trading day axis by the master Portfolio algorithm (a pure function, convenient for the unit tests and the external preview).
+     *  @param dates the sorted trading day axis (usually the driving axis; the suspended/non-trading days should not appear on the axis)
+     *  @param mode "week" | "month" | "quarter" | "year" (the other values such as query/day/invalid return empty)
+     *  @param adjust_cycle the N-th day within the cycle (<=0 is treated as 1); in the week mode it is dayOfWeek (0=Sunday, 1=Monday ... 6=Saturday)
+     *  @param delay_to_trading_day when true it is postponed to the first trading day within the current cycle; when false it only hits when it is exactly the N-th day
+     *  @return the ascending deduplicated rebalancing day list
+     *  @note Aligned with the master Portfolio::_calculateAdjustDate* behavior (see design.md §4.3) */
     static DatetimeList calcAdjustDates(const DatetimeList& dates, const string& mode,
                                         int adjust_cycle, bool delay_to_trading_day);
 
-    /** 设置固定时间轴（仅 axis-mode == "calendar" 时作为驱动轴；空轴时回退 kdata 轴并告警） */
+    /** Set the fixed time axis (it is used as the driving axis only when axis-mode == "calendar"; when the axis is empty it falls back to the kdata axis with a warning) */
     void setDateAxis(const DatetimeList& dates) {
         m_date_axis = dates;
     }
 
-    /** 获取固定时间轴 */
+    /** Get the fixed time axis */
     const DatetimeList& getDateAxis() const {
         return m_date_axis;
     }
 
-    /** 清空固定时间轴（清空后 calendar 模式回退为 kdata 轴） */
+    /** Clear the fixed time axis (after clearing, the calendar mode falls back to the kdata axis) */
     void clearDateAxis() {
         m_date_axis.clear();
     }
 
-    /** 设置外部调仓日表（非空时优先作为调仓日判据，用于映射 master 的
-     *  adjust_mode = "week"/"month"/"quarter"/"year" 与 delay_to_trading_day；
-     *  传入日期统一归一化为当日零点后存入，只有命中表内日期才视为调仓日）。 */
+    /** Set the external rebalancing day table (when it is not empty it takes precedence as the rebalancing day criterion, used to map the master
+     *  adjust_mode = "week"/"month"/"quarter"/"year" and delay_to_trading_day;
+     *  the input dates are normalized to the zero hour of that day and stored, only the dates hitting the table are regarded as the rebalancing days). */
     void setAdjustDates(const DatetimeList& dates);
 
-    /** 获取外部调仓日表（已归一化为当日零点） */
+    /** Get the external rebalancing day table (already normalized to the zero hour of that day) */
     const std::set<Datetime>& getAdjustDates() const {
         return m_adjust_dates;
     }
 
-    /** 清空外部调仓日表（清空后回退 m_adjust_cycle 的收盘日计数判定） */
+    /** Clear the external rebalancing day table (after clearing it falls back to the close-day counting judgment of m_adjust_cycle) */
     void clearAdjustDates() {
         m_adjust_dates.clear();
     }
 
-    /** 模式 B 额度回写（写入子系统虚拟账户，供下期运行；聚合子系统自动穿透） */
+    /** The mode B quota write-back (written into the sub-system virtual account for the next period; the aggregate sub-system penetrates automatically) */
     virtual void setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date,
                                    price_t quota) override;
 
-    /** 将本时刻直接子系统的成交转译为对上建议（嵌套能力粘合剂） */
+    /** Translate the trades of the direct sub-systems at this moment into the parent suggestions (the glue of the nesting capability) */
     virtual TradeSuggestionList toSuggestions() const override {
         return m_last_suggestions;
     }
@@ -263,70 +263,70 @@ public:
 
 private:
     SystemList m_sys_list;
-    string m_path;                 // 层级路径，如 I/D/A
-    size_t m_close_day_index{0};    // 收盘日计数，用于调仓周期判定
-    price_t m_sub_init_cash{100000.0};  // 子系统影子账户初始资金（模式 A）
-    int m_adjust_cycle{1};          // 调仓周期（天）；<=1 表示每个收盘日都再平衡
-    bool m_trade_on_close{true};    // 是否在收盘阶段执行调仓下单
-    AllocateFundsPtr m_af{AF_EqualWeight()};  // 组合级资金分配（AF，含 L1/L2/L3）；运行模式由其持有
-    std::shared_ptr<SelectorBase> m_se;  // 交易对象选择器（可选）
-    bool m_sell_at_not_selected{true};   // 未选中子系统是否强制清仓（仅在设置 SE 后生效）
-    std::vector<std::pair<Datetime, double>> m_adjust_turnover;  // 调仓日换手率（成交额/调仓前总资产）
-    TradeSuggestionList m_last_suggestions;  // 最近一次收盘产生的对上建议
-    std::vector<TradeRecordList> m_open_trades;  // 当日各子系统开盘成交（延迟请求兑现），供收盘汇总
-    std::vector<FundsRecord> m_sub_funds_before;  // 当日各子系统「交易前」资金快照，供 _toSuggestions 计算三比重（运行时态，不序列化）
-    Datetime m_open_trades_date;  // m_open_trades/m_sub_funds_before 所属交易日；收盘阶段据此防越界与跨日残留（运行时态，不序列化）
-    DatetimeList m_date_axis;     // 固定时间轴：axis-mode="calendar" 时的驱动日期表（运行时态，不序列化）
-    std::set<Datetime> m_adjust_dates;  // 外部调仓日表（归一化至当日零点；非空时优先于 m_adjust_cycle，运行时态，不序列化）
-    std::set<Datetime> m_auto_adjust_dates;  // adjust-mode 自动展开的调仓日表（运行时态，不序列化，不覆盖外部注入）
+    string m_path;                 // The hierarchy path, e.g. I/D/A
+    size_t m_close_day_index{0};    // The close-day counter, used for the rebalancing cycle judgment
+    price_t m_sub_init_cash{100000.0};  // The initial fund of the sub-system shadow account (mode A)
+    int m_adjust_cycle{1};          // The rebalancing cycle (days); <=1 means rebalancing on every close day
+    bool m_trade_on_close{true};    // Whether to execute the rebalancing orders at the close stage
+    AllocateFundsPtr m_af{AF_EqualWeight()};  // The portfolio-level fund allocation (AF, including L1/L2/L3); the running mode is held by it
+    std::shared_ptr<SelectorBase> m_se;  // The trading object selector (optional)
+    bool m_sell_at_not_selected{true};   // Whether to force liquidating the unselected sub-systems (it takes effect only after SE is set)
+    std::vector<std::pair<Datetime, double>> m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total assets before rebalancing)
+    TradeSuggestionList m_last_suggestions;  // The parent suggestion produced by the last close
+    std::vector<TradeRecordList> m_open_trades;  // The open trades of every sub-system on that day (the delayed requests fulfilled), used for the close aggregation
+    std::vector<FundsRecord> m_sub_funds_before;  // The "before-trade" fund snapshot of every sub-system on that day, used by _toSuggestions to calculate the three ratios (runtime state, not serialized)
+    Datetime m_open_trades_date;  // The trading day to which m_open_trades/m_sub_funds_before belong; the close stage uses it to prevent out-of-bounds and cross-day residue (runtime state, not serialized)
+    DatetimeList m_date_axis;     // The fixed time axis: the driving date table when axis-mode="calendar" (runtime state, not serialized)
+    std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the zero hour of that day; when not empty it takes precedence over m_adjust_cycle, runtime state, not serialized)
+    std::set<Datetime> m_auto_adjust_dates;  // The rebalancing day table auto-expanded by adjust-mode (runtime state, not serialized, does not override the external injection)
 
-    /** 按指定驱动轴运行：axis 为空时以入参 KData 自带日期序列为轴，否则以 axis 为驱动轴
-     *  （固定时间轴驱动时，轴上日期未必存在于入参 KData，停牌/非交易日不构成缺口） */
+    /** Run by the specified driving axis: when axis is empty the date sequence of the input KData is used as the axis, otherwise axis is the driving axis
+     *  (when driven by the fixed time axis, the dates on the axis may not exist in the input KData, the suspended/non-trading days do not constitute a gap) */
     void _runAxis(const KData& kdata, const DatetimeList* axis, bool reset, bool resetAll);
 
-    /** 递归查找系统自身或其（嵌套聚合）子系统的标的，未找到返回空 Stock */
+    /** Recursively find the instrument of the system itself or its (nested aggregate) sub-systems, return an empty Stock when not found */
     static Stock _findStock(const SystemPtr& sys);
 
-    /** 注册聚合系统自身参数（axis-mode / adjust-mode / delay-to-trading-day） */
+    /** Register the parameters of the aggregate system itself (axis-mode / adjust-mode / delay-to-trading-day) */
     void _initAxisParam() {
         setParam<string>("axis-mode", "kdata");
-        // v5：承接 master PF 的 adjust_mode / delay_to_trading_day（见 docs/design/pf_af_compat/design.md §4.3）
+        // v5: take over the master PF adjust_mode / delay_to_trading_day (see docs/design/pf_af_compat/design.md §4.3)
         setParam<string>("adjust-mode", "query");
         setParam<bool>("delay-to-trading-day", true);
     }
 
-    // 检查 candidate 子树（含自身）是否包含 target（用于循环引用检测）
+    // Check whether the candidate subtree (including itself) contains target (used for the circular reference detection)
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
 
-    /** 将一组成交按标的聚合为净建议（标注来源子系统 sys）。
-     *  funds_before 为子系统当日「交易前」资金快照，用于计算建议的三比重（cash/assets/target_position）。 */
+    /** Aggregate a group of trades into a net suggestion by instrument (marked with the source sub-system sys).
+     *  funds_before is the "before-trade" fund snapshot of the sub-system on that day, used to calculate the three ratios (cash/assets/target_position) of the suggestion. */
     TradeSuggestionList _toSuggestions(const SystemPtr& sys, const TradeRecordList& trades,
                                        const FundsRecord& funds_before) const;
 
-    /** 判定给定日期是否为调仓日（仅调仓日执行再平衡）：
-     *  外部调仓日表优先，其次 adjust-mode 自动展开表，最后回退 m_adjust_cycle 的收盘日计数 */
+    /** Judge whether the given date is a rebalancing day (the rebalancing is executed only on the rebalancing day):
+     *  the external rebalancing day table takes precedence, then the adjust-mode auto-expanded table, and finally the close-day counting of m_adjust_cycle */
     bool _isAdjustDate(const Datetime& date) const;
 
-    /** v5：把 adjust-mode ∈ {week,month,quarter,year} 内化为调仓日表（design.md §4.3）。
-     *  仅在外部 setAdjustDates() 未注入（m_adjust_dates 为空）时生效，结果写入 m_auto_adjust_dates。 */
+    /** v5: internalize adjust-mode ∈ {week,month,quarter,year} into the rebalancing day table (design.md §4.3).
+     *  It takes effect only when the external setAdjustDates() is not injected (m_adjust_dates is empty), the result is written into m_auto_adjust_dates. */
     void _expandAdjustDates(const DatetimeList& axis);
 
-    /** 在父真实账户执行已换算的建议（先卖后买） */
+    /** Execute the converted suggestions on the parent real account (sell first then buy) */
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                              KQuery::KType ktype, TradeRecordList& out_trades);
 
-    /** 收盘阶段：驱动各子系统生成信号，合并「开盘+收盘」成交转译为对上建议，
-     *  MM 分配后由父统一下单；返回父实际成交。供 runMoment / runMomentOnClose 复用。 */
+    /** The close stage: drive every sub-system to generate signals, merge the "open+close" trades and translate them into the parent suggestions,
+     *  after the MM allocation the parent orders uniformly; return the actual trades of the parent. Reused by runMoment / runMomentOnClose. */
     TradeRecordList _closePhase(const Datetime& datetime);
 
-    /** 获取指定标的在指定日期的收盘价（用于未选中子系统清仓建议定价）；无数据返回 0 */
+    /** Get the close price of the specified instrument on the specified date (used to price the liquidation suggestion of the unselected sub-system); return 0 when there is no data */
     price_t _getClosePrice(const Datetime& date, const Stock& stock) const;
 
-    /** 开盘阶段强制卖出已退市标的的父持仓（退市 = 标的最后交易日早于当前运行日期） */
+    /** Force selling the parent holdings of the delisted instrument at the open stage (delisting = the last trading day of the instrument is earlier than the current running date) */
     TradeRecordList _forceSellDelisted(const Datetime& date);
 
 //========================================
-// 序列化支持
+// Serialization support
 //========================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -341,14 +341,14 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);
         ar& BOOST_SERIALIZATION_NVP(m_sell_at_not_selected);
         if (version < 1) {
-            // v5 兼容：旧档案此位置为 m_mode（运行模式已迁移至 AllocateFundsBase），读出后回灌 AF。
+            // v5 compatibility: this position was m_mode in the old archives (the running mode has been migrated to AllocateFundsBase), it is written back into AF after being read.
             string legacy_mode = "A";
             ar& boost::serialization::make_nvp("m_mode", legacy_mode);
             if (m_af) {
                 m_af->setMode(legacy_mode);
             }
         } else {
-            // v5：资金分配实例（含 L1/L2/L3 与运行模式）随聚合系统一起序列化
+            // v5: the fund allocation instance (including L1/L2/L3 and the running mode) is serialized together with the aggregate system
             ar& BOOST_SERIALIZATION_NVP(m_af);
         }
         ar& BOOST_SERIALIZATION_NVP(m_se);
@@ -359,9 +359,9 @@ private:
 typedef shared_ptr<MultiSystem> MultiSystemPtr;
 
 /**
- * master 兼容别名：master 中 PF_Simple / PF_WithoutAF 返回 PortfolioPtr。
- * feature/next 中 PF 即 MultiSystem 的具体实现（见 docs/design/pf_af_compat/design.md §4.5），
- * 保留该别名以便存量 `PortfolioPtr pf = PF_Simple(...)` 继续编译（不再支持 Portfolio 类方法）。
+ * master compatibility alias: in master PF_Simple / PF_WithoutAF return PortfolioPtr.
+ * In feature/next PF is a concrete implementation of MultiSystem (see docs/design/pf_af_compat/design.md §4.5),
+ * this alias is kept so that the existing `PortfolioPtr pf = PF_Simple(...)` keeps compiling (the Portfolio class methods are no longer supported).
  * @ingroup Portfolio
  */
 using PortfolioPtr = MultiSystemPtr;

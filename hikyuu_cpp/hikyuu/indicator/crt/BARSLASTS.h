@@ -16,14 +16,16 @@
 namespace hku {
 
 /**
- * 第N次条件成立位置到当前的周期数。
+ * The number of periods from the position where the condition holds for the N-th time to the
+ * current one.
  * @details
  * <pre>
- * 用法：BARSLASTS(X, N): 第N次 X 不为 0 到现在的天数。
- * 例如：BARSLASTS(CLOSE/REF(CLOSE,1)>=1.1, 2) 表示第2个涨停板到当前的周期数。
- * 注意：当N=1时，BARSLASTS(X, 1) 等价于 BARSLAST(X)。
+ * Usage: BARSLASTS(X, N): the number of days from the N-th time X is not 0 until now.
+ * For example: BARSLASTS(CLOSE/REF(CLOSE,1)>=1.1, 2) gives the number of periods from the second
+ * limit-up until now.
+ * Note: when N=1, BARSLASTS(X, 1) is equivalent to BARSLAST(X).
  * </pre>
- * @param n 第N次条件成立，n为正整数
+ * @param n the N-th time the condition holds, n is a positive integer
  * @ingroup Indicator
  */
 Indicator HKU_API BARSLASTS(int n);

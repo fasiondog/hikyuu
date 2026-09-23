@@ -16,13 +16,13 @@
 
 namespace hku {
 
-// 注意仅在 hikyuu 相关项目内部使用，避免对项目造成污染
+// Note: use it inside hikyuu related projects only, to avoid polluting other projects
 
 void loadLocalLanguage(const std::string &path = "i8n");
 
 std::string HKU_API lang_htr(const char *id);
 
-// 按上下文获取翻译
+// Get the translation by context
 std::string HKU_API lang_hctr(const char *ctx, const char *id);
 
 template <typename... Args>

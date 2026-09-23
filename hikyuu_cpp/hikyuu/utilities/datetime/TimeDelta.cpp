@@ -19,7 +19,7 @@ namespace hku {
 
 TimeDelta::TimeDelta(int64_t days, int64_t hours, int64_t minutes, int64_t seconds,
                      int64_t milliseconds, int64_t microseconds) {
-    // 各参数添加限制，防止出现总和溢出的情况
+    // Limits are added to the parameters to prevent a total overflow
     HKU_CHECK(days <= 99999999 && days >= -99999999, "Out of range! Input days: {}", days);
     HKU_CHECK(hours >= -100000 && hours <= 100000, "Out of range! Input hours: {}", hours);
     HKU_CHECK(minutes >= -100000 && minutes <= 100000, "Out of range! Input minutes: {}", minutes);
@@ -42,7 +42,7 @@ TimeDelta::TimeDelta(bt::time_duration td) {
     m_duration = td;
 }
 
-/** 从字符串构造，格式：-1 days, hh:mm:ss.000000) */
+/** Construct from a string, the format: -1 days, hh:mm:ss.000000) */
 TimeDelta::TimeDelta(const std::string& delta) {
     std::string val(delta);
     std::string errmsg(fmt::format("Invalid format: {}", delta));
@@ -198,10 +198,10 @@ TimeDelta HKU_UTILS_API UTCOffset() {
     static long int g_timezone = 0;
 #if HKU_OS_WINDOWS
     std::call_once(g_tz_set, []() {
-        // 获取当前时间戳
+        // Get the current timestamp
         time_t now = std::time(nullptr);
 
-        // 在 Windows 上使用 gmtime_s
+        // gmtime_s is used on Windows
         struct tm local_tm;
         struct tm utc_tm;
         errno_t err = gmtime_s(&utc_tm, &now);
@@ -211,14 +211,15 @@ TimeDelta HKU_UTILS_API UTCOffset() {
 
         time_t local_time = mktime(&local_tm);
         time_t utc_time = mktime(&utc_tm);
-        // 计算偏移量（秒）
+        // Calculate the offset (seconds)
         g_timezone = local_time - utc_time;
     });
 #else
     std::call_once(g_tz_set, []() {
-        tzset();  // 初始化时区信息
+        tzset();  // Initialize the time zone information
 
-        // timezone是"UTC - 本地时间"的秒数（UTC+8时，timezone = -28800）
+        // timezone is the number of the seconds of "UTC - the local time" (for UTC+8, timezone =
+        // -28800)
         g_timezone = -timezone;
     });
 #endif

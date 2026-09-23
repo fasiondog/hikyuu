@@ -11,9 +11,9 @@ build:
   tools:
     python: "3.11"
 
-# Build documentation in the docs/ directory with Sphinx
+# Build the Chinese source tree (docs/zh) — paths are relative to the repository root
 sphinx:
-  configuration: docs/source/conf.py
+  configuration: docs/zh/conf.py
 
 # We recommend specifying your dependencies to enable reproducible builds:
 # https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html

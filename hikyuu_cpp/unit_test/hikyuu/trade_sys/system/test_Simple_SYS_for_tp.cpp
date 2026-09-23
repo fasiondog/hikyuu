@@ -25,24 +25,24 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点（止盈策略）  */
+/** @par Test point (the take-profit strategy) */
 TEST_CASE("test_SYS_Simple_for_tp") {
     TradeRecordList tr_list;
     price_t current_cash;
 
     StockManager& sm = StockManager::instance();
 
-    // 初始参数
-    Datetime init_date(199001010000LL);   // 账户初始日期
-    price_t init_cash = 100000;           // 账户初始金额
-    TradeCostPtr costfunc = TC_Zero();    // 零成本函数
-    Stock stk = sm["sh600000"];           // 选定标的
-    Datetime start_date(199911100000LL);  // 测试起始日期
-    Datetime end_date(200002250000LL);    // 测试结束日期
+    // The initial parameters
+    Datetime init_date(199001010000LL);   // Account initial date
+    price_t init_cash = 100000;           // Account initial amount
+    TradeCostPtr costfunc = TC_Zero();    // The zero cost function
+    Stock stk = sm["sh600000"];           // The selected security
+    Datetime start_date(199911100000LL);  // Test start date
+    Datetime end_date(200002250000LL);    // Test end date
 
     KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
 
-    // 构建系统部件
+    // Build the system parts
     TMPtr tm = crtTM(init_date, init_cash, costfunc, "TEST_TM");
     SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
     MMPtr mm = MM_FixedCount(100);
@@ -50,7 +50,7 @@ TEST_CASE("test_SYS_Simple_for_tp") {
     TPPtr tp = ST_Indicator(MA(CLOSE(), 5));
     SYSPtr sys;
 
-    /** @arg 指定了TM、SG、MM、ST、TP，但未指定其他策略组件，非延迟操作 */
+    /** @arg TM, SG, MM, ST and TP are given but the others are not, a non-delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", false);
     sys->setParam("sell_delay", false);
@@ -117,7 +117,7 @@ TEST_CASE("test_SYS_Simple_for_tp") {
     // CHECK_LT(std::fabs(tr_list[4].cash - current_cash), 0.00001);
     // CHECK_EQ(tr_list[4].from, PART_TAKEPROFIT);
 
-    /** @arg 指定了TM、SG、MM、ST、TP，但未指定其他策略组件，延迟操作 */
+    /** @arg TM, SG, MM, ST and TP are given but the others are not, a delayed operation */
     sys = SYS_Simple();
     sys->setParam("buy_delay", true);
     sys->setParam("sell_delay", true);

@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SAFTYLOSS") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -28,13 +28,13 @@ TEST_CASE("test_SAFTYLOSS") {
     KData kdata;
     Indicator close, result;
 
-    /** @arg 源数据为空 */
+    /** @arg The source data is empty */
     result = SAFTYLOSS(CLOSE(kdata), 2, 1);
     CHECK_EQ(result.empty(), true);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 参数n1、n2非法 */
+    /** @arg The parameters n1 and n2 are invalid */
     query = KQuery(0, 20);
     kdata = stock.getKData(query);
     close = CLOSE(kdata);
@@ -42,7 +42,7 @@ TEST_CASE("test_SAFTYLOSS") {
     CHECK_THROWS_AS(SAFTYLOSS(close, 0, 0), std::exception);
     CHECK_THROWS_AS(SAFTYLOSS(close, 2, 0), std::exception);
 
-    /** @arg 正常参数 */
+    /** @arg The normal parameters */
     result = SAFTYLOSS(close, 2, 1, 1.0);
     CHECK_EQ(result.empty(), false);
     CHECK_EQ(result.size(), close.size());
@@ -115,7 +115,7 @@ TEST_CASE("test_SAFTYLOSS") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SAFTYLOSS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-50));
@@ -146,7 +146,7 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SAFTYLOSS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

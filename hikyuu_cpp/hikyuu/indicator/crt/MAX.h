@@ -1,7 +1,7 @@
 /*
  * MAX.h
  *
- *  Created on: 2019年4月8日
+ *  Created on: 2019-4-8
  *      Author: fasiondog
  */
 
@@ -18,11 +18,12 @@ namespace hku {
 #endif
 
 /**
- * 求最大值
+ * Calculate the maximum
  * @details
  * <pre>
- * 用法: MAX(A,B)返回A和B中的较大值
- * 例如: MAX(CLOSE-OPEN,0)表示若收盘价大于开盘价返回它们的差值，否则返回0
+ * Usage: MAX(A,B) returns the larger one of A and B
+ * For example: MAX(CLOSE-OPEN,0) returns their difference if the close price is greater than the
+ * open price, otherwise it returns 0
  * </pre>
  * @ingroup Indicator
  */

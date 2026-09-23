@@ -17,7 +17,7 @@ using namespace hikyuu::flat;
 
 namespace hku {
 
-string SpotAgent::ms_pubUrl{"ipc:///tmp/hikyuu_real.ipc"};  // 数据发送服务地址
+string SpotAgent::ms_pubUrl{"ipc:///tmp/hikyuu_real.ipc"};  // The data sending service address
 const char* SpotAgent::ms_startTag = ":spot:[start spot]";
 const char* SpotAgent::ms_endTag = ":spot:[end spot]";
 const char* SpotAgent::ms_spotTopic = ":spot:";
@@ -158,7 +158,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     // SPEND_TIME(receive_data);
     const uint8_t* spot_list_buf = (const uint8_t*)(buf) + ms_spotTopicLength;
 
-    // 校验数据
+    // Validate the data
     flatbuffers::Verifier verify(spot_list_buf, buf_len);
     HKU_CHECK(VerifySpotListBuffer(verify), "Invalid data!");
 
@@ -167,7 +167,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
 #pragma warning(disable : 4267)
 #endif
 
-    // 更新K线数据
+    // Update the K-line data
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
     size_t total = spots->size();
@@ -252,7 +252,7 @@ void SpotAgent::work_thread() {
                                 HKU_ERROR_UNKNOWN;
                             }
                         });
-                    }  // else {继续等待数据}
+                    }  // else {keep waiting for the data}
                     break;
             }
         } catch (std::exception& e) {

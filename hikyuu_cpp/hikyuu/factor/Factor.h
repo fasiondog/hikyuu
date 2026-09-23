@@ -19,23 +19,24 @@ public:
     Factor();
 
     /**
-     * 只指定因子名称 (+ k线类型)，将尝试自动从数据库加载因子
-     * @param name 因子名称
-     * @param ktype K线类型
+     * Only the factor name (+ K-line type) is given, it will try to load the factor from the
+     * database automatically
+     * @param name factor name
+     * @param ktype K-line type
      */
     explicit Factor(const string& name, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
-     * 构造新因子(因子名称 + K线类型 为因子的唯一标识)
-     * @param name 因子名称
-     * @param formula 计算公式指标, 一旦创建不可更改
-     * @param ktype K线类型
-     * @param brief 简要描述
-     * @param details 详细描述
-     * @param start_date 因子数据起始日期
-     * @param save_value 是否需要持久化保存因子值数据
-     * @param block 板块信息，证券集合，如果为空，为全部
-     * @param recover_type 复权方式
+     * Construct a new factor (factor name + K-line type is the unique identifier of the factor)
+     * @param name factor name
+     * @param formula calculation formula indicator, it cannot be changed once created
+     * @param ktype K-line type
+     * @param brief brief description
+     * @param details detailed description
+     * @param start_date start date of the factor data
+     * @param save_value whether the factor value data needs to be saved persistently
+     * @param block block information, a security set; all the securities if it is empty
+     * @param recover_type adjustment (recover) type
      */
     Factor(const string& name, const Indicator& formula, const KQuery::KType& ktype = KQuery::DAY,
            const string& brief = "", const string& details = "", bool save_value = false,
@@ -50,15 +51,17 @@ public:
     Factor& operator=(Factor&& other) noexcept;
 
     /**
-     * 获取指定股票的指定查询参数的计算结果
-     * @param stock 证券
-     * @param query 查询参数
-     * @param align 是否对齐日期（按指定 align_dates 或默认交易日历)，默认 false
-     * @param fill_null 是否填充空值，默认 false
-     * @param tovalue 是否转换为数值，默认 false
-     * @param check 是否检查股票属于自身指定的 block，默认 false
-     * @param align_dates 对齐日期列表，默认为空
-     * @return 计算结果指标
+     * Get the calculation result of the given query condition on the given stock
+     * @param stock security
+     * @param query query condition
+     * @param align whether to align the dates (according to the given align_dates or the default
+     *              trading calendar), false by default
+     * @param fill_null whether to fill the null values, false by default
+     * @param tovalue whether to convert to values, false by default
+     * @param check whether to check that the stock belongs to the block specified by itself, false
+     *              by default
+     * @param align_dates the align date list, empty by default
+     * @return the calculation result indicator
      */
     Indicator getValue(const Stock& stock, const KQuery& query, bool align = false,
                        bool fill_null = false, bool tovalue = false, bool check = false,
@@ -72,28 +75,31 @@ public:
     }
 
     /**
-     * 获取指定股票列表的指定查询参数的计算结果
-     * @param stocks 证券列表
-     * @param query 查询参数
-     * @param align 是否对齐日期（按指定align_dates或默认交易日历)，默认 false
-     * @param fill_null 是否填充空值，默认 false
-     * @param tovalue 是否转换为数值，默认 false
-     * @param check 是否检查股票列表属于自身指定的 block，默认 false
-     * @param align_dates 对齐日期列表，默认为空
-     * @return 按股票顺序排列的计算结果列表
+     * Get the calculation results of the given query condition on the given stock list
+     * @param stocks security list
+     * @param query query condition
+     * @param align whether to align the dates (according to the given align_dates or the default
+     *              trading calendar), false by default
+     * @param fill_null whether to fill the null values, false by default
+     * @param tovalue whether to convert to values, false by default
+     * @param check whether to check that the stock list belongs to the block specified by itself,
+     *              false by default
+     * @param align_dates the align date list, empty by default
+     * @return the calculation result list arranged in the stock order
      */
     IndicatorList getValues(const StockList& stocks, const KQuery& query, bool align = false,
                             bool fill_null = false, bool tovalue = false, bool check = false,
                             const DatetimeList& align_dates = {}) const;
 
     /**
-     * 获取指定查询参数的所有计算结果
-     * @param query 查询参数
-     * @param align 是否对齐日期（按指定align_dates或默认交易日历)，默认 false
-     * @param fill_null 是否填充空值，默认 false
-     * @param tovalue 是否转换为数值，默认 false
-     * @param align_dates 对齐日期列表，默认为空
-     * @return 所有股票的计算结果列表
+     * Get all the calculation results of the given query condition
+     * @param query query condition
+     * @param align whether to align the dates (according to the given align_dates or the default
+     *              trading calendar), false by default
+     * @param fill_null whether to fill the null values, false by default
+     * @param tovalue whether to convert to values, false by default
+     * @param align_dates the align date list, empty by default
+     * @return the calculation result list of all the stocks
      */
     IndicatorList getAllValues(const KQuery& query, bool align = false, bool fill_null = false,
                                bool tovalue = false, const DatetimeList& align_dates = {});
@@ -149,15 +155,18 @@ public:
     string str() const;
 
     /**
-     * 保存因子即其所有计算结果到数据库，如果因子已存在则更新，否则插入新记录
-     * @note 因子名称不区分大小写，以 name + ktype 作为唯一标识
-     * @param update_before 是否在保存前，检查并更新已有因子，默认
-     * true。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新
+     * Save the factor and all its calculation results to the database; the existing factor is
+     * updated, otherwise a new record is inserted
+     * @note The factor name is case insensitive, name + ktype is used as the unique identifier
+     * @param update_before whether to check and update the existing factor before saving, true by
+     * default. Note: it usually must be true, otherwise the data will be wrong, unless you are sure
+     * that all the factor values have been updated
      */
     void save_to_db(bool update_before = true);
 
     /**
-     * 特殊因子保存值到数据库, 其值不是不通过指标计算，如: PRICELIST，需要自行指定设置
+     * Save the values of a special factor to the database; its values are not obtained through the
+     * indicator calculation, such as PRICELIST, so they need to be set manually
      */
     void save_special_values_to_db(const Stock& stock, const DatetimeList& dates,
                                    const PriceList& values, bool replace = false);
@@ -166,27 +175,30 @@ public:
                                    bool replace = false);
 
     /**
-     * 从数据库中删除因子及其数据, 注：为防止误操作，特殊因子的值不会删除，需自行手工删除
+     * Delete the factor and its data from the database; note: to prevent misoperation, the values
+     * of a special factor are not deleted, they need to be deleted manually
      */
     void remove_from_db();
 
     /**
-     * 从数据库中加载因子，以 name + ktype 作为唯一标识，如果不存在则不修改当前对象
+     * Load the factor from the database, name + ktype is used as the unique identifier; the current
+     * object is not modified if it does not exist
      */
     void load_from_db();
 
 private:
     struct Data {
-        string name;                  ///< 因子名称
-        string ktype;                 ///< K线类型
-        string brief;                 ///< 简要描述
-        string details;               ///< 详细描述
-        Datetime create_at;           ///< 创建时间
-        Datetime update_at;           ///< 更新时间
-        Datetime start_date;          ///< 开始日期，数据存储时的起始日期
-        Indicator formula;            ///< 计算公式指标
-        Block block;                  ///< 板块信息，证券集合，如果为空，为全部
-        bool need_save_value{false};  ///< 是否需要持久化保存因子值数据
+        string name;                  ///< Factor name
+        string ktype;                 ///< K-line type
+        string brief;                 ///< Brief description
+        string details;               ///< Detailed description
+        Datetime create_at;           ///< Creation time
+        Datetime update_at;           ///< Update time
+        Datetime start_date;          ///< Start date, the start date of the data storage
+        Indicator formula;            ///< Calculation formula indicator
+        Block block;                  ///< Block information, a security set; all if it is empty
+        bool need_save_value{false};  ///< Whether the factor value data needs to be saved
+                                      ///< persistently
         KQuery::RecoverType recover_type{KQuery::RecoverType::NO_RECOVER};
 
         Data() = default;

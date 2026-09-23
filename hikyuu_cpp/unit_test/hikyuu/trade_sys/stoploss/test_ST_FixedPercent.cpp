@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_FixedPercent_SL") {
     /** @arg p = 0.2 */
     StoplossPtr sp = ST_FixedPercent(0.2);
@@ -42,7 +42,7 @@ TEST_CASE("test_FixedPercent_SL") {
     result = sp->getPrice(Datetime(199101030000), 66.397);
     CHECK_EQ(result, doctest::Approx(0.0));
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS_AS(ST_FixedPercent(0.0), std::exception);
     CHECK_THROWS_AS(ST_FixedPercent(1.01), std::exception);
     CHECK_THROWS_AS(ST_FixedPercent(-1.0), std::exception);

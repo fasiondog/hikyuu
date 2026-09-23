@@ -18,35 +18,36 @@
 namespace hku {
 
 /**
- * @brief URL 编码（百分号编码）
+ * @brief URL encoding (the percent encoding)
  *
- * 将字符串中的特殊字符转换为 URL 安全的百分号编码格式。
- * 字母数字以及 - _ . ~ 字符保持不变，其他字符转换为 %XX 格式。
+ * Convert the special characters in the string into the URL safe percent encoded format.
+ * The alphanumeric characters and - _ . ~ stay unchanged, the other characters are converted into
+ * the %XX format.
  *
- * @param istr 待编码的输入字符串
- * @return std::string 编码后的字符串
+ * @param istr the input string to be encoded
+ * @return std::string the encoded string
  *
- * @par 示例
+ * @par Example
  * @code
- * url_escape("hello world")      // 返回 "hello%20world"
- * url_unescape("hello%20world")  // 返回 "hello world"
+ * url_escape("hello world")      // Returns "hello%20world"
+ * url_unescape("hello%20world")  // Returns "hello world"
  * @endcode
  */
 std::string HKU_UTILS_API url_escape(const char* istr);
 
 /**
- * @brief URL 解码
+ * @brief URL decoding
  *
- * 将百分号编码的字符串转换回原始字符串。
- * 将 %XX 格式的编码转换回对应的字符。
+ * Convert the percent encoded string back to the original string.
+ * Convert the encoding in the %XX format back to the corresponding character.
  *
- * @param istr 待解码的输入字符串
- * @return std::string 解码后的原始字符串
+ * @param istr the input string to be decoded
+ * @return std::string the decoded original string
  *
- * @par 示例
+ * @par Example
  * @code
- * url_unescape("hello%20world")  // 返回 "hello world"
- * url_unescape("a%2Bb%3Dc")      // 返回 "a+b=c"
+ * url_unescape("hello%20world")  // Returns "hello world"
+ * url_unescape("a%2Bb%3Dc")      // Returns "a+b=c"
  * @endcode
  */
 std::string HKU_UTILS_API url_unescape(const char* istr);

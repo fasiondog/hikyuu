@@ -28,12 +28,12 @@
 namespace hku {
 
 /**
- * IndicatorImpBuffer类，完全自定义内存管理，兼容malloc和mi_malloc
- * 对外提供类似std::vector的接口
+ * IndicatorImpBuffer class, it fully customizes the memory management and is compatible with malloc
+ * and mi_malloc; it provides a std::vector-like interface to the outside
  */
 class HKU_API IndicatorImpBuffer {
 public:
-// 类型定义
+// Type definitions
 #if HKU_USE_LOW_PRECISION
     typedef float value_type;
 #else
@@ -51,11 +51,11 @@ public:
     typedef ptrdiff_t difference_type;
 
 private:
-    // 内部数据结构
+    // Internal data structure
     struct Buffer {
-        pointer data;        // 数据指针
-        size_type size;      // 当前元素数量
-        size_type capacity;  // 分配的容量
+        pointer data;        // Data pointer
+        size_type size;      // Current number of elements
+        size_type capacity;  // Allocated capacity
 
         Buffer() : data(nullptr), size(0), capacity(0) {}
         ~Buffer() {
@@ -70,10 +70,10 @@ private:
     Buffer m_buffer;
 
 public:
-    /** 默认构造函数 */
+    /** Default constructor */
     IndicatorImpBuffer() = default;
 
-    /** 指定容量构造函数 */
+    /** Constructor with the given capacity */
     explicit IndicatorImpBuffer(size_type count) {
         if (count > 0) {
             m_buffer.allocate(count);
@@ -82,7 +82,7 @@ public:
         }
     }
 
-    /** 带初始值的构造函数 */
+    /** Constructor with an initial value */
     IndicatorImpBuffer(size_type count, const value_type& value) {
         if (count > 0) {
             m_buffer.allocate(count);
@@ -91,7 +91,7 @@ public:
         }
     }
 
-    /** 拷贝构造函数 */
+    /** Copy constructor */
     IndicatorImpBuffer(const IndicatorImpBuffer& other) {
         if (other.m_buffer.size > 0) {
             m_buffer.allocate(other.m_buffer.capacity);
@@ -101,23 +101,23 @@ public:
         }
     }
 
-    /** 移动构造函数 */
+    /** Move constructor */
     IndicatorImpBuffer(IndicatorImpBuffer&& other) noexcept {
-        // 直接转移资源
+        // Transfer the resources directly
         m_buffer.data = other.m_buffer.data;
         m_buffer.size = other.m_buffer.size;
         m_buffer.capacity = other.m_buffer.capacity;
 
-        // 清空源对象
+        // Clear the source object
         other.m_buffer.data = nullptr;
         other.m_buffer.size = 0;
         other.m_buffer.capacity = 0;
     }
 
-    /** 从迭代器范围构造 */
+    /** Construct from an iterator range */
     template <typename InputIterator>
     IndicatorImpBuffer(InputIterator first, InputIterator last) {
-        // 计算距离
+        // Calculate the distance
         size_type count = static_cast<size_type>(std::distance(first, last));
         if (count > 0) {
             reserve(count);
@@ -126,7 +126,7 @@ public:
         }
     }
 
-    /** 初始化列表构造函数 */
+    /** Initializer list constructor */
     IndicatorImpBuffer(std::initializer_list<value_type> init_list) {
         if (init_list.size() > 0) {
             reserve(init_list.size());
@@ -135,32 +135,32 @@ public:
         }
     }
 
-    /** 赋值操作符 */
+    /** Assignment operator */
     IndicatorImpBuffer& operator=(const IndicatorImpBuffer& other) {
         if (this != &other) {
             if (other.m_buffer.size > m_buffer.capacity) {
-                // 需要重新分配内存
+                // The memory needs to be reallocated
                 Buffer new_buffer;
                 new_buffer.allocate(other.m_buffer.capacity);
                 std::uninitialized_copy(other.m_buffer.data,
                                         other.m_buffer.data + other.m_buffer.size, new_buffer.data);
                 new_buffer.size = other.m_buffer.size;
 
-                // 清理旧资源并替换
+                // Clean up the old resources and replace them
                 m_buffer.deallocate();
                 m_buffer.data = new_buffer.data;
                 m_buffer.size = new_buffer.size;
                 m_buffer.capacity = new_buffer.capacity;
 
-                // 清空new_buffer以避免双重释放
+                // Clear new_buffer to avoid a double free
                 new_buffer.data = nullptr;
                 new_buffer.size = 0;
                 new_buffer.capacity = 0;
             } else {
-                // 销毁现有元素
+                // Destroy the existing elements
                 destroy_elements(m_buffer.data, m_buffer.data + m_buffer.size);
 
-                // 复制新元素
+                // Copy the new elements
                 std::copy(other.m_buffer.data, other.m_buffer.data + other.m_buffer.size,
                           m_buffer.data);
                 m_buffer.size = other.m_buffer.size;
@@ -169,19 +169,19 @@ public:
         return *this;
     }
 
-    /** 移动赋值操作符 */
+    /** Move assignment operator */
     IndicatorImpBuffer& operator=(IndicatorImpBuffer&& other) noexcept {
         if (this != &other) {
-            // 清理当前对象的资源
+            // Clean up the resources of the current object
             clear();
             m_buffer.deallocate();
 
-            // 转移资源
+            // Transfer the resources
             m_buffer.data = other.m_buffer.data;
             m_buffer.size = other.m_buffer.size;
             m_buffer.capacity = other.m_buffer.capacity;
 
-            // 清空源对象
+            // Clear the source object
             other.m_buffer.data = nullptr;
             other.m_buffer.size = 0;
             other.m_buffer.capacity = 0;
@@ -189,24 +189,24 @@ public:
         return *this;
     }
 
-    /** 析构函数 */
+    /** Destructor */
     ~IndicatorImpBuffer() {
         clear();
     }
 
-    /** 重载new操作符 */
+    /** Overloaded new operator */
     static void* operator new(size_t size);
 
-    /** 重载delete操作符 */
+    /** Overloaded delete operator */
     static void operator delete(void* ptr) noexcept;
 
-    /** 重载new[]操作符 */
+    /** Overloaded new[] operator */
     static void* operator new[](size_t size);
 
-    /** 重载delete[]操作符 */
+    /** Overloaded delete[] operator */
     static void operator delete[](void* ptr) noexcept;
 
-    // 容量相关接口
+    // Capacity related interface
     size_type size() const noexcept {
         return m_buffer.size;
     }
@@ -220,14 +220,14 @@ public:
         return static_cast<size_type>(-1) / sizeof(value_type);
     }
 
-    // 修改器接口
+    // Modifier interface
     void resize(size_type count) {
         if (count < m_buffer.size) {
-            // 缩小
+            // Shrink
             destroy_elements(m_buffer.data + count, m_buffer.data + m_buffer.size);
             m_buffer.size = count;
         } else if (count > m_buffer.size) {
-            // 扩大
+            // Expand
             if (count > m_buffer.capacity) {
                 reserve(count);
             }
@@ -239,11 +239,11 @@ public:
 
     void resize(size_type count, const value_type& value) {
         if (count < m_buffer.size) {
-            // 缩小
+            // Shrink
             destroy_elements(m_buffer.data + count, m_buffer.data + m_buffer.size);
             m_buffer.size = count;
         } else if (count > m_buffer.size) {
-            // 扩大
+            // Expand
             if (count > m_buffer.capacity) {
                 reserve(count);
             }
@@ -269,7 +269,7 @@ public:
         m_buffer.size = 0;
     }
 
-    // 元素访问接口
+    // Element access interface
     reference at(size_type pos) {
         if (pos >= m_buffer.size) {
             throw std::out_of_range("IndicatorImpBuffer::at: position out of range");
@@ -309,7 +309,7 @@ public:
         return m_buffer.data;
     }
 
-    // 迭代器接口
+    // Iterator interface
     iterator begin() noexcept {
         return m_buffer.data;
     }
@@ -347,7 +347,7 @@ public:
         return rend();
     }
 
-    // 修改器接口
+    // Modifier interface
     void push_back(const value_type& value) {
         if (m_buffer.size >= m_buffer.capacity) {
             reserve(m_buffer.size + 1);
@@ -399,7 +399,7 @@ public:
 
         if (m_buffer.size + count > m_buffer.capacity) {
             reserve(calculate_growth(m_buffer.size + count));
-            // 重新计算位置，因为reserve可能导致内存重新分配
+            // Recalculate the position because reserve may cause the memory to be reallocated
             pos = m_buffer.data + pos_offset;
         }
 
@@ -424,7 +424,7 @@ public:
 
         if (m_buffer.size + count > m_buffer.capacity) {
             reserve(calculate_growth(m_buffer.size + count));
-            // 重新计算位置，因为reserve可能导致内存重新分配
+            // Recalculate the position because reserve may cause the memory to be reallocated
             pos = m_buffer.data + pos_offset;
         }
 
@@ -445,7 +445,7 @@ public:
 
         if (m_buffer.size >= m_buffer.capacity) {
             reserve(calculate_growth(m_buffer.size + 1));
-            // 重新计算位置，因为reserve可能导致内存重新分配
+            // Recalculate the position because reserve may cause the memory to be reallocated
             pos = m_buffer.data + pos_offset;
         }
 
@@ -462,9 +462,9 @@ public:
 
     iterator erase(const_iterator pos) {
         iterator pos_it = const_cast<iterator>(pos);
-        // 先销毁要删除的元素
+        // Destroy the elements to be erased first
         std::destroy_at(pos_it);
-        // 然后移动后面的元素
+        // Then move the following elements
         std::move(pos_it + 1, m_buffer.data + m_buffer.size, pos_it);
         --m_buffer.size;
         return pos_it;
@@ -477,10 +477,10 @@ public:
         iterator first_it = const_cast<iterator>(first);
         iterator last_it = const_cast<iterator>(last);
 
-        // 销毁被删除范围内的元素
+        // Destroy the elements within the erased range
         destroy_elements(first_it, last_it);
 
-        // 移动后面的元素
+        // Move the following elements
         std::move(last_it, m_buffer.data + m_buffer.size, first_it);
         size_type count = last - first;
         m_buffer.size -= count;
@@ -494,7 +494,7 @@ public:
         std::swap(m_buffer.capacity, other.m_buffer.capacity);
     }
 
-    // STL算法兼容接口
+    // STL algorithm compatible interface
     template <typename UnaryPredicate>
     iterator erase_if(UnaryPredicate p) {
         iterator it = std::remove_if(begin(), end(), p);
@@ -523,12 +523,12 @@ private:
     }
 
     void move_elements_backward(pointer first, pointer last, pointer dest) {
-        // 手动实现元素向后移动，避免std::move_backward的复杂性
+        // Move the elements backward manually to avoid the complexity of std::move_backward
         difference_type count = last - first;
         if (count <= 0)
             return;
 
-        // 从后往前移动元素
+        // Move the elements from the back to the front
         for (difference_type i = count - 1; i >= 0; --i) {
             *(dest + i) = std::move(*(first + i));
         }
@@ -540,13 +540,13 @@ private:
             return std::max(new_size, static_cast<size_type>(16));
         }
         // return std::max(new_size, current_capacity * 2);
-        // Indicator缓存都是预先申请空间或resize, 不按2倍增长
-        // 按实盘分钟线增量增加
+        // The Indicator cache always requests the space or resizes in advance, it does not grow
+        // by 2x; it increases by the actual minute-line increment
         return std::max(new_size, current_capacity) + 240;
     }
 };
 
-// 非成员函数
+// Non-member functions
 inline void swap(IndicatorImpBuffer& lhs, IndicatorImpBuffer& rhs) noexcept {
     lhs.swap(rhs);
 }

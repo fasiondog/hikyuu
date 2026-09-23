@@ -4,34 +4,35 @@
 namespace hku {
 
 /**
- * @brief 平均趋向指数(ADX2) - 使用EMA平滑方式
+ * @brief Average directional index (ADX2) - using the EMA smoothing way
  *
- * ADX2属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。
- * 与ADX的区别在于使用EMA（指数移动平均）而非Wilder平滑。
+ * ADX2 is a trend strength indicator, it does not distinguish the rising or falling direction, it
+ * only judges whether there is a trend.
+ * Unlike ADX, it uses EMA (exponential moving average) instead of the Wilder smoothing.
  *
- * 结果集：
- * - result(0): ADX本身（趋势强度，值域0~100）
- * - result(1): +DI（上升动向线，多头力量）
- * - result(2): -DI（下降动向线，空头力量）
+ * Result set:
+ * - result(0): ADX itself (trend strength, value range 0~100)
+ * - result(1): +DI (upward directional line, bull power)
+ * - result(2): -DI (downward directional line, bear power)
  *
- * 判断标准：
- * - ADX >= 25：存在清晰单边趋势（上涨/下跌都行）
- * - ADX < 25：无趋势，箱体震荡
- * - ADX数值越大，趋势越猛
+ * Judgment criteria:
+ * - ADX >= 25: a clear one-sided trend exists (either rising or falling)
+ * - ADX < 25: no trend, range-bound oscillation
+ * - The larger the ADX value, the stronger the trend
  *
- * @param kdata 待计算的源数据
- * @param n 计算周期，默认14，必须为大于1的整数
- * @return 具有三个结果集的 Indicator
+ * @param kdata the source data to be calculated
+ * @param n calculation period, 14 by default, it must be an integer greater than 1
+ * @return the Indicator with three result sets
  */
 Indicator HKU_API ADX2(const KData& kdata, int n = 14);
 
 /**
- * @brief 平均趋向指数(ADX2) - 使用EMA平滑方式
+ * @brief Average directional index (ADX2) - using the EMA smoothing way
  *
- * 创建ADX2指标计算器，需通过setContext设置上下文
+ * Create an ADX2 indicator calculator, the context needs to be set through setContext
  *
- * @param n 计算周期，默认14，必须为大于1的整数
- * @return ADX2指标计算器
+ * @param n calculation period, 14 by default, it must be an integer greater than 1
+ * @return the ADX2 indicator calculator
  */
 Indicator HKU_API ADX2(int n = 14);
 

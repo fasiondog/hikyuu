@@ -10,7 +10,7 @@
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/StockManager.h>
-#include "../test_config.h"  // 添加test_config.h包含以使用check_indicator
+#include "../test_config.h"  // test_config.h is included to use check_indicator
 #include "../plugin_valid.h"
 #include <fstream>
 
@@ -22,51 +22,51 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点：测试Factor基本功能 */
+/** @par Test point: test the basic functionality of Factor */
 TEST_CASE("test_Factor_basic") {
-    // 创建测试用的 Indicator
+    // Create the Indicator used by the test
     Indicator ma5 = MA(CLOSE(), 5);
 
-    // 测试构造函数
+    // Test the constructor
     Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "测试因子", "详细描述");
 
-    // 测试基本属性
+    // Test the basic attributes
     CHECK_EQ(factor.name(), "TEST_FACTOR");
     CHECK_EQ(factor.ktype(), KQuery::DAY);
     CHECK_FALSE(factor.isNull());
     CHECK_EQ(factor.brief(), "测试因子");
     CHECK_EQ(factor.details(), "详细描述");
 
-    // 测试 formula 属性
+    // Test the formula attribute
     Indicator formula = factor.formula();
-    // 不直接检查 empty()，而是检查名称
+    // Instead of checking empty() directly, the name is checked
     CHECK_EQ(formula.name(), "TEST_FACTOR");
 
-    // 测试 block 属性（默认为空）
+    // Test the block attribute (empty by default)
     const Block& block = factor.block();
     CHECK_UNARY(block.isNull());
     CHECK_EQ(block.size(), 0);
 
-    // 测试日期属性（可能为空，这是正常的）
+    // Test the date attributes (they may be empty, which is normal)
     CHECK_EQ(factor.startDate(), Datetime::min());
 
-    // 测试持久化属性
+    // Test the persistence attribute
     CHECK_FALSE(factor.needSaveValue());
     factor.needSaveValue(true);
     CHECK_UNARY(factor.needSaveValue());
 }
 
-/** @par 检测点：测试Factor带Block构造 */
+/** @par Test point: test the Factor construction with a Block */
 TEST_CASE("test_Factor_with_block") {
-    // 创建测试 Block
+    // Create the test Block
     Block test_block("行业", "测试板块");
 
-    // 创建带 Block 的 Factor
+    // Create a Factor with a Block
     Indicator ma5 = MA(CLOSE(), 5);
     Factor factor("BLOCK_FACTOR", ma5, KQuery::DAY, "带板块因子", "测试板块功能", false,
                   Datetime::min(), test_block);
 
-    // 验证 Block 属性
+    // Verify the Block attribute
     const Block& block = factor.block();
     CHECK_FALSE(block.isNull());
     CHECK_EQ(block.category(), "行业");
@@ -74,62 +74,62 @@ TEST_CASE("test_Factor_with_block") {
     CHECK_EQ(block.size(), 0);
 }
 
-/** @par 检测点：测试Factor getValues方法的check参数 */
+/** @par Test point: test the check parameter of the Factor getValues method */
 TEST_CASE("test_Factor_getValues_check") {
     HKU_IF_RETURN(!pluginValid(), void());
-    // 创建测试 Indicator
+    // Create the test Indicator
     Indicator ma5 = MA(CLOSE(), 5);
     KQuery query_obj(0, Null<int64_t>(), KQuery::DAY);
 
-    // 创建不带 Block 的 Factor
+    // Create a Factor without a Block
     SUBCASE("Factor without block") {
         Factor factor("NO_BLOCK_FACTOR", ma5, KQuery::DAY);
 
-        // check=false 时应该正常工作
+        // It should work normally with check=false
         CHECK_NOTHROW(factor.getValues(StockList{}, query_obj, false));
 
-        // check=true 时也应该正常工作（因为没有 Block 限制）
+        // It should also work with check=true (there is no Block restriction)
         CHECK_NOTHROW(factor.getValues(StockList{}, query_obj, true));
     }
 
-    // 创建带 Block 的 Factor
+    // Create a Factor with a Block
     SUBCASE("Factor with block") {
         Block test_block("行业", "测试板块");
         Factor factor("BLOCK_FACTOR", ma5, KQuery::DAY, "测试", "描述", false, Datetime::min(),
                       test_block);
 
-        // 验证 Block 设置正确
+        // Verify that the Block is set correctly
         CHECK_FALSE(factor.block().isNull());
 
-        // check=false 时应该正常工作
+        // It should work normally with check=false
         CHECK_NOTHROW(factor.getValues(StockList{}, query_obj, false));
 
-        // check=true 时，空股票列表应该正常工作
+        // With check=true an empty stock list should work normally
         CHECK_NOTHROW(factor.getValues(StockList{}, query_obj, true));
     }
 }
 
-/** @par 检测点：测试Factor getValues方法的完整参数组合 */
+/** @par Test point: test the full parameter combination of the Factor getValues method */
 TEST_CASE("test_Factor_getValues_complete_params") {
     HKU_IF_RETURN(!pluginValid(), void());
-    // 准备测试数据
+    // Prepare the test data
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     CHECK_FALSE(stock.isNull());
 
     StockList stocks = {stock};
-    KQuery query(0, 10, KQuery::DAY);  // 获取前10天数据
+    KQuery query(0, 10, KQuery::DAY);  // Get the data of the first 10 days
 
-    // 创建测试 Factor
+    // Create the test Factor
     Indicator ma5 = MA(CLOSE(), 5);
     Factor factor("PARAM_TEST", ma5, KQuery::DAY);
 
-    // 测试不同的参数组合
+    // Test the different parameter combinations
     SUBCASE("Default parameters") {
         IndicatorList result = factor.getValues(stocks, query);
-        // 验证返回结果不为空
+        // Verify that the returned result is not empty
         CHECK_FALSE(result.empty());
-        // 验证每个股票都有对应的指标结果
+        // Verify that every stock has a corresponding indicator result
         CHECK_EQ(result.size(), stocks.size());
     }
 
@@ -164,7 +164,7 @@ TEST_CASE("test_Factor_getValues_complete_params") {
     }
 }
 
-/** @par 检测点：测试Factor getValues方法的边界条件 */
+/** @par Test point: test the boundary conditions of the Factor getValues method */
 TEST_CASE("test_Factor_getValues_edge_cases") {
     HKU_IF_RETURN(!pluginValid(), void());
     Indicator ma5 = MA(CLOSE(), 5);
@@ -172,130 +172,130 @@ TEST_CASE("test_Factor_getValues_edge_cases") {
 
     KQuery query(0, 10, KQuery::DAY);
 
-    // 测试空股票列表
+    // Test an empty stock list
     SUBCASE("Empty stock list") {
         StockList empty_stocks;
         IndicatorList result = factor.getValues(empty_stocks, query);
-        // 空股票列表应该返回空结果
+        // An empty stock list should return an empty result
         CHECK_UNARY(result.empty());
     }
 
-    // 测试无效查询范围
+    // Test an invalid query range
     SUBCASE("Invalid query range") {
         StockManager& sm = StockManager::instance();
         Stock stock = sm.getStock("sh600000");
         CHECK_FALSE(stock.isNull());
         StockList stocks = {stock};
 
-        KQuery invalid_query(1000000, 1000010, KQuery::DAY);  // 超出实际数据范围
+        KQuery invalid_query(1000000, 1000010, KQuery::DAY);  // Beyond the actual data range
         IndicatorList result = factor.getValues(stocks, invalid_query);
-        // 应该返回空的指标结果
-        CHECK_FALSE(result.empty());     // 容器不为空
-        CHECK_UNARY(result[0].empty());  // 但指标数据为空
+        // An empty indicator result should be returned
+        CHECK_FALSE(result.empty());     // The container is not empty
+        CHECK_UNARY(result[0].empty());  // But the indicator data is empty
     }
 
-    // 测试不同K线类型
+    // Test the different K-line types
     SUBCASE("Different KType") {
         StockManager& sm = StockManager::instance();
         Stock stock = sm.getStock("sh600000");
         CHECK_FALSE(stock.isNull());
         StockList stocks = {stock};
 
-        // 日线查询
+        // The daily line query
         KQuery day_query(0, 5, KQuery::DAY);
         IndicatorList day_result = factor.getValues(stocks, day_query);
         CHECK_FALSE(day_result.empty());
 
-        // 周线查询
+        // The weekly line query
         KQuery week_query(0, 5, KQuery::WEEK);
         IndicatorList week_result = factor.getValues(stocks, week_query);
         CHECK_FALSE(week_result.empty());
 
-        // 月线查询
+        // The monthly line query
         KQuery month_query(0, 5, KQuery::MONTH);
         IndicatorList month_result = factor.getValues(stocks, month_query);
         CHECK_FALSE(month_result.empty());
     }
 }
 
-/** @par 检测点：测试Factor getValues方法的结果正确性 */
+/** @par Test point: test the result correctness of the Factor getValues method */
 TEST_CASE("test_Factor_getValues_result_correctness") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
-    Stock stock1 = sm.getStock("sh000001");  // 上证指数
-    Stock stock2 = sm.getStock("sz000001");  // 深证成指
+    Stock stock1 = sm.getStock("sh000001");  // The Shanghai Composite Index
+    Stock stock2 = sm.getStock("sz000001");  // The Shenzhen Component Index
     CHECK_FALSE(stock1.isNull());
     CHECK_FALSE(stock2.isNull());
 
-    StockList stocks = {stock1, stock2};  // 使用两个不同市场的证券
-    KQuery query(0, 20, KQuery::DAY);     // 获取20天数据进行验证
+    StockList stocks = {stock1, stock2};  // Two securities of two different markets
+    KQuery query(0, 20, KQuery::DAY);     // Get 20 days of data for the verification
 
-    // 创建MA5指标进行测试
+    // Create an MA5 indicator for the test
     Indicator ma5 = MA(CLOSE(), 5);
     Factor ma5_factor("MA5_TEST", ma5, KQuery::DAY);
 
     SUBCASE("Basic functionality and result validation") {
-        // 测试基本功能并验证计算结果
+        // Test the basic functionality and verify the calculation result
         IndicatorList result = ma5_factor.getValues(stocks, query);
         CHECK_FALSE(result.empty());
-        CHECK_EQ(result.size(), 2);  // 应该有两个结果
+        CHECK_EQ(result.size(), 2);  // There should be two results
 
-        // 验证每个股票的结果
+        // Verify the result of every stock
         for (size_t i = 0; i < result.size(); ++i) {
             Indicator ind = result[i];
             CHECK_FALSE(ind.empty());
             CHECK_EQ(ind.size(), 20);
             CHECK_EQ(ind.discard(), 4);
-            CHECK_EQ(ind.getResultNumber(), 1);  // 验证结果集数量
+            CHECK_EQ(ind.getResultNumber(), 1);  // Verify the number of the result sets
 
-            // 使用现有的check_indicator方法验证Indicator的基本属性
+            // Verify the basic attributes of the Indicator with the existing check_indicator method
             KData kdata = stocks[i].getKData(query);
             Indicator close_prices = CLOSE(kdata);
             Indicator expected_ma = MA(close_prices, 5);
 
-            // 使用check_indicator验证结果一致性
+            // Verify the result consistency with check_indicator
             check_indicator(ind, expected_ma);
         }
     }
 
     SUBCASE("Parameter combinations validation") {
-        // 测试不同参数组合的功能性验证
+        // The functional verification of the different parameter combinations
         IndicatorList result1 = ma5_factor.getValues(stocks, query, false, false, false);
         IndicatorList result2 = ma5_factor.getValues(stocks, query, true, false, false);
         IndicatorList result3 = ma5_factor.getValues(stocks, query, false, true, false);
         IndicatorList result4 = ma5_factor.getValues(stocks, query, false, false, true);
 
-        // 所有结果都应该有效
+        // All the results should be valid
         CHECK_FALSE(result1.empty());
         CHECK_FALSE(result2.empty());
         CHECK_FALSE(result3.empty());
         CHECK_FALSE(result4.empty());
 
-        // 验证每个结果都有两个股票的数据
+        // Verify that every result has the data of the two stocks
         CHECK_EQ(result1.size(), 2);
         CHECK_EQ(result2.size(), 2);
         CHECK_EQ(result3.size(), 2);
         CHECK_EQ(result4.size(), 2);
 
-        // 验证基本尺寸
+        // Verify the basic size
         for (size_t i = 0; i < 2; ++i) {
             CHECK_EQ(result1[i].size(), 20);
             CHECK_EQ(result2[i].size(), 20);
             CHECK_EQ(result3[i].size(), 20);
             CHECK_EQ(result4[i].size(), 20);
 
-            // 使用check_indicator验证一致性
+            // Verify the consistency with check_indicator
             check_indicator(result1[i], result1[i]);
         }
     }
 
     SUBCASE("Edge case handling validation") {
-        // 测试边界情况
+        // Test the boundary cases
         StockList empty_stocks;
         IndicatorList empty_result = ma5_factor.getValues(empty_stocks, query);
         CHECK_UNARY(empty_result.empty());
 
-        // 测试无效查询范围
+        // Test an invalid query range
         KQuery invalid_query(1000000, 1000010, KQuery::DAY);
         IndicatorList invalid_result = ma5_factor.getValues(stocks, invalid_query);
         CHECK_FALSE(invalid_result.empty());
@@ -307,7 +307,7 @@ TEST_CASE("test_Factor_getValues_result_correctness") {
     }
 
     SUBCASE("Multiple KType validation") {
-        // 测试不同K线类型
+        // Test the different K-line types
         KQuery day_query(0, 10, KQuery::DAY);
         KQuery week_query(0, 10, KQuery::WEEK);
         KQuery month_query(0, 10, KQuery::MONTH);
@@ -320,18 +320,18 @@ TEST_CASE("test_Factor_getValues_result_correctness") {
         CHECK_FALSE(week_result.empty());
         CHECK_FALSE(month_result.empty());
 
-        // 验证都有两个股票的结果
+        // Verify that all of them have the results of the two stocks
         CHECK_EQ(day_result.size(), 2);
         CHECK_EQ(week_result.size(), 2);
         CHECK_EQ(month_result.size(), 2);
 
-        // 验证都有合理的数据
+        // Verify that all of them have reasonable data
         for (size_t i = 0; i < 2; ++i) {
             CHECK_GT(day_result[i].size(), 0);
             CHECK_GT(week_result[i].size(), 0);
             CHECK_GT(month_result[i].size(), 0);
 
-            // 使用check_indicator验证基本结构
+            // Verify the basic structure with check_indicator
             check_indicator(day_result[i], day_result[i]);
             check_indicator(week_result[i], week_result[i]);
             check_indicator(month_result[i], month_result[i]);
@@ -339,7 +339,7 @@ TEST_CASE("test_Factor_getValues_result_correctness") {
     }
 
     SUBCASE("Result consistency validation") {
-        // 测试多次调用结果的一致性
+        // Test the consistency of the results of multiple calls
         IndicatorList result1 = ma5_factor.getValues(stocks, query);
         IndicatorList result2 = ma5_factor.getValues(stocks, query);
 
@@ -348,117 +348,117 @@ TEST_CASE("test_Factor_getValues_result_correctness") {
         CHECK_EQ(result1.size(), result2.size());
         CHECK_EQ(result1.size(), 2);
 
-        // 验证每只股票的结果一致性
+        // Verify the consistency of the result of every stock
         for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
             Indicator ind1 = result1[stock_idx];
             Indicator ind2 = result2[stock_idx];
 
-            // 使用check_indicator验证两次调用结果一致
+            // Verify with check_indicator that the two calls agree
             check_indicator(ind1, ind2);
         }
     }
 
     SUBCASE("Calculation accuracy validation") {
-        // 测试计算精度 - 使用已知数据验证计算结果
+        // Test the calculation precision - verify the result with known data
         KQuery short_query(0, 10, KQuery::DAY);
         IndicatorList result = ma5_factor.getValues(stocks, short_query);
 
         CHECK_FALSE(result.empty());
         CHECK_EQ(result.size(), 2);
 
-        // 验证每只股票的计算结果
+        // Verify the calculation result of every stock
         for (size_t i = 0; i < 2; ++i) {
             Indicator ind = result[i];
             CHECK_FALSE(ind.empty());
             CHECK_EQ(ind.size(), 10);
             CHECK_EQ(ind.discard(), 4);
 
-            // 创建期望结果进行精确比较
+            // Create the expected result for an exact comparison
             KData kdata = stocks[i].getKData(short_query);
             Indicator close_prices = CLOSE(kdata);
             Indicator expected_ma = MA(close_prices, 5);
 
-            // 使用check_indicator进行精确验证
+            // Do an exact verification with check_indicator
             check_indicator(ind, expected_ma);
         }
     }
 
     SUBCASE("Multi-stock processing validation") {
-        // 测试多股票处理能力（已经是多股票了，这里是额外验证）
+        // Test the multi-stock handling (it is already multi-stock, this is an extra verification)
         Stock stock3 = sm.getStock("sh600036");
 
         if (!stock3.isNull()) {
             StockList multi_stocks = {stock1, stock2, stock3};
             IndicatorList results = ma5_factor.getValues(multi_stocks, query);
 
-            // 应该为每只股票返回一个指标结果
+            // An indicator result should be returned for every stock
             CHECK_EQ(results.size(), 3);
 
-            // 验证每个结果的基本属性
+            // Verify the basic attributes of every result
             for (const auto& ind : results) {
-                // 使用check_indicator验证基本结构
+                // Verify the basic structure with check_indicator
                 check_indicator(ind, ind);
             }
         }
     }
 }
 
-/** @par 检测点：测试Factor getAllValues方法 */
+/** @par Test point: test the Factor getAllValues method */
 TEST_CASE("test_Factor_getAllValues") {
     KQuery query_obj(0, Null<int64_t>(), KQuery::DAY);
     KQuery week_query_obj(0, Null<int64_t>(), KQuery::WEEK);
     KQuery month_query_obj(0, Null<int64_t>(), KQuery::MONTH);
 
-    // 测试不带 Block 的 Factor
+    // Test a Factor without a Block
     SUBCASE("Factor without block") {
         Indicator ma5 = MA(CLOSE(), 5);
         Factor factor("ALL_NO_BLOCK", ma5, KQuery::DAY);
 
-        // 应该能正常调用（虽然可能返回空结果）
+        // It should be callable (although it may return an empty result)
         CHECK_NOTHROW(factor.getAllValues(query_obj));
-        // 验证方法可以正常调用，不抛出异常
+        // Verify that the method can be called normally without throwing
     }
 
-    // 测试带 Block 的 Factor
+    // Test a Factor with a Block
     SUBCASE("Factor with block") {
         Block test_block("行业", "测试板块");
         Indicator ma5 = MA(CLOSE(), 5);
         Factor factor("ALL_BLOCK_FACTOR", ma5, KQuery::DAY, "测试", "描述", false, Datetime::min(),
                       test_block);
 
-        // 验证 Block 设置正确
+        // Verify that the Block is set correctly
         CHECK_FALSE(factor.block().isNull());
 
-        // 应该能正常调用
+        // It should be callable
         CHECK_NOTHROW(factor.getAllValues(query_obj));
-        // 验证方法可以正常调用，不抛出异常
+        // Verify that the method can be called normally without throwing
     }
 
-    // 测试不同查询参数
+    // Test the different query parameters
     SUBCASE("Different query parameters") {
         Indicator ma5 = MA(CLOSE(), 5);
         Factor factor("QUERY_TEST", ma5, KQuery::DAY);
 
-        // 测试日线查询
+        // Test the daily line query
         CHECK_NOTHROW(factor.getAllValues(query_obj));
 
-        // 测试周线查询
+        // Test the weekly line query
         CHECK_NOTHROW(factor.getAllValues(week_query_obj));
 
-        // 测试月线查询
+        // Test the monthly line query
         CHECK_NOTHROW(factor.getAllValues(month_query_obj));
     }
 }
 
-/** @par 检测点：测试Factor拷贝和赋值语义 */
+/** @par Test point: test the copy and assignment semantics of Factor */
 TEST_CASE("test_Factor_copy_semantics") {
-    // 创建原始 Factor
+    // Create the original Factor
     Indicator ma5 = MA(CLOSE(), 5);
     Block test_block("行业", "测试板块");
     Factor original("COPY_TEST", ma5, KQuery::DAY, "拷贝测试", "详细描述", true,
                     Datetime(202001010000LL), test_block);
 
-    // 测试拷贝构造
+    // Test the copy constructor
     Factor copy1(original);
     CHECK_EQ(copy1.name(), "COPY_TEST");
     CHECK_EQ(copy1.ktype(), KQuery::DAY);
@@ -469,7 +469,7 @@ TEST_CASE("test_Factor_copy_semantics") {
     CHECK_EQ(copy1.block().category(), "行业");
     CHECK_EQ(copy1.block().name(), "测试板块");
 
-    // 测试拷贝赋值
+    // Test the copy assignment
     Factor copy2;
     copy2 = original;
     CHECK_EQ(copy2.name(), "COPY_TEST");
@@ -481,83 +481,84 @@ TEST_CASE("test_Factor_copy_semantics") {
     CHECK_EQ(copy2.block().category(), "行业");
     CHECK_EQ(copy2.block().name(), "测试板块");
 
-    // 测试移动构造
+    // Test the move constructor
     Factor moved1(std::move(original));
     CHECK_EQ(moved1.name(), "COPY_TEST");
     CHECK_EQ(moved1.ktype(), KQuery::DAY);
 
-    // 原始对象应该变为空
+    // The original object should become empty
     CHECK_UNARY(original.isNull());
 
-    // 测试移动赋值
+    // Test the move assignment
     Factor moved2;
     moved2 = std::move(copy1);
     CHECK_EQ(moved2.name(), "COPY_TEST");
     CHECK_EQ(moved2.ktype(), KQuery::DAY);
 
-    // 原对象应该变为空
+    // The original object should become empty
     CHECK_UNARY(copy1.isNull());
 }
 
-/** @par 检测点：测试Factor getValues方法的align参数功能 */
+/** @par Test point: test the align parameter of the Factor getValues method */
 TEST_CASE("test_Factor_getValues_align") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();
-    Stock stock1 = sm.getStock("sh000001");  // 上证指数
-    Stock stock2 = sm.getStock("sz000001");  // 深证成指
+    Stock stock1 = sm.getStock("sh000001");  // The Shanghai Composite Index
+    Stock stock2 = sm.getStock("sz000001");  // The Shenzhen Component Index
     CHECK_FALSE(stock1.isNull());
     CHECK_FALSE(stock2.isNull());
 
-    StockList stocks = {stock1, stock2};  // 使用两个不同市场的证券
-    KQuery query(0, 30, KQuery::DAY);     // 获取30天数据进行对齐测试
+    StockList stocks = {stock1, stock2};  // Two securities of two different markets
+    KQuery query(0, 30, KQuery::DAY);     // Get 30 days of data for the alignment test
 
-    // 创建测试指标
+    // Create the test indicator
     Indicator ma5 = MA(CLOSE(), 5);
     Factor factor("ALIGN_TEST", ma5, KQuery::DAY);
 
     SUBCASE("Align=false basic functionality") {
-        // 测试不使用对齐的基本功能
+        // Test the basic functionality without the alignment
         IndicatorList result = factor.getValues(stocks, query, false);
         CHECK_FALSE(result.empty());
-        CHECK_EQ(result.size(), 2);  // 两个股票的结果
+        CHECK_EQ(result.size(), 2);  // The results of the two stocks
 
-        // 验证每个股票的结果
+        // Verify the result of every stock
         for (size_t i = 0; i < result.size(); ++i) {
             Indicator ind = result[i];
             CHECK_FALSE(ind.empty());
             CHECK_GT(ind.size(), 0);
 
-            // 验证基本结构
+            // Verify the basic structure
             check_indicator(ind, ind);
         }
     }
 
     SUBCASE("Align=true trading calendar alignment") {
-        // 测试使用交易日历对齐
+        // Test the alignment with the trading calendar
         IndicatorList result = factor.getValues(stocks, query, true);
         CHECK_FALSE(result.empty());
-        CHECK_EQ(result.size(), 2);  // 两个股票的结果
+        CHECK_EQ(result.size(), 2);  // The results of the two stocks
 
-        // 获取交易日历进行对比验证
+        // Get the trading calendar for the comparison
         DatetimeList trading_dates = sm.getTradingCalendar(query);
         CHECK_FALSE(trading_dates.empty());
 
-        // 验证每个股票的结果
+        // Verify the result of every stock
         for (size_t i = 0; i < result.size(); ++i) {
             Indicator ind_aligned = result[i];
             CHECK_FALSE(ind_aligned.empty());
             CHECK_GT(ind_aligned.size(), 0);
 
-            // 验证指标的大小与交易日历一致（这是对齐的核心验证）
+            // Verify that the indicator size matches the trading calendar (the core alignment
+            // check)
             CHECK_EQ(ind_aligned.size(), trading_dates.size());
 
-            // 验证基本结构
+            // Verify the basic structure
             check_indicator(ind_aligned, ind_aligned);
         }
     }
 
     SUBCASE("Align comparison between true and false") {
-        // 对比align=true和align=false的结果差异
+        // Compare the difference between align=true and align=false
         IndicatorList result_false = factor.getValues(stocks, query, false);
         IndicatorList result_true = factor.getValues(stocks, query, true);
 
@@ -566,7 +567,7 @@ TEST_CASE("test_Factor_getValues_align") {
         CHECK_EQ(result_false.size(), result_true.size());
         CHECK_EQ(result_false.size(), 2);
 
-        // 验证每只股票的结果
+        // Verify the result of every stock
         for (size_t i = 0; i < 2; ++i) {
             Indicator ind_false = result_false[i];
             Indicator ind_true = result_true[i];
@@ -574,31 +575,31 @@ TEST_CASE("test_Factor_getValues_align") {
             CHECK_FALSE(ind_false.empty());
             CHECK_FALSE(ind_true.empty());
 
-            // 验证两者都能正常工作并返回合理结果
+            // Verify that both work and return a reasonable result
             CHECK_GT(ind_false.size(), 0);
             CHECK_GT(ind_true.size(), 0);
 
-            // 验证discard逻辑合理性
+            // Verify the sanity of the discard logic
             CHECK_GE(ind_true.discard(), 0);
             CHECK_GE(ind_false.discard(), 0);
 
-            // 验证结构完整性
+            // Verify the structural integrity
             check_indicator(ind_false, ind_false);
             check_indicator(ind_true, ind_true);
         }
 
-        // 获取交易日历验证align=true的效果
+        // Get the trading calendar to verify the effect of align=true
         DatetimeList trading_dates = sm.getTradingCalendar(query);
         CHECK_FALSE(trading_dates.empty());
 
-        // 验证align=true时结果大小与交易日历匹配
+        // Verify that with align=true the result size matches the trading calendar
         for (size_t i = 0; i < result_true.size(); ++i) {
             CHECK_EQ(result_true[i].size(), trading_dates.size());
         }
     }
 
     SUBCASE("Align with fill_null parameter") {
-        // 测试align=true配合fill_null参数
+        // Test align=true together with the fill_null parameter
         IndicatorList result1 = factor.getValues(stocks, query, true, false);  // fill_null=false
         IndicatorList result2 = factor.getValues(stocks, query, true, true);   // fill_null=true
 
@@ -608,7 +609,7 @@ TEST_CASE("test_Factor_getValues_align") {
         CHECK_EQ(result1.size(), 2);
         CHECK_EQ(result2.size(), 2);
 
-        // 验证每只股票的结果
+        // Verify the result of every stock
         for (size_t i = 0; i < 2; ++i) {
             Indicator ind1 = result1[i];
             Indicator ind2 = result2[i];
@@ -616,22 +617,22 @@ TEST_CASE("test_Factor_getValues_align") {
             CHECK_FALSE(ind1.empty());
             CHECK_FALSE(ind2.empty());
 
-            // 两者应该有相同的大小（都使用交易日历对齐）
+            // Both should have the same size (both aligned with the trading calendar)
             CHECK_EQ(ind1.size(), ind2.size());
 
-            // 验证都与交易日历大小匹配
+            // Verify that both match the trading calendar size
             DatetimeList trading_dates = sm.getTradingCalendar(query);
             CHECK_EQ(ind1.size(), trading_dates.size());
             CHECK_EQ(ind2.size(), trading_dates.size());
 
-            // 验证结构
+            // Verify the structure
             check_indicator(ind1, ind1);
             check_indicator(ind2, ind2);
         }
     }
 
     SUBCASE("Align with different query ranges") {
-        // 测试不同查询范围下的对齐效果
+        // Test the alignment effect with different query ranges
         KQuery short_query(0, 10, KQuery::DAY);
         KQuery medium_query(0, 20, KQuery::DAY);
         KQuery long_query(0, 40, KQuery::DAY);
@@ -648,7 +649,7 @@ TEST_CASE("test_Factor_getValues_align") {
         CHECK_EQ(medium_result.size(), 2);
         CHECK_EQ(long_result.size(), 2);
 
-        // 验证每个股票的结果
+        // Verify the result of every stock
         for (size_t stock_idx = 0; stock_idx < 2; ++stock_idx) {
             Indicator short_ind = short_result[stock_idx];
             Indicator medium_ind = medium_result[stock_idx];
@@ -658,11 +659,11 @@ TEST_CASE("test_Factor_getValues_align") {
             CHECK_FALSE(medium_ind.empty());
             CHECK_FALSE(long_ind.empty());
 
-            // 验证大小关系（更长的查询范围应该有更多的交易日）
+            // Verify the size relation (a longer query range should have more trading days)
             CHECK_LE(short_ind.size(), medium_ind.size());
             CHECK_LE(medium_ind.size(), long_ind.size());
 
-            // 验证都使用了正确的交易日历对齐
+            // Verify that both use the correct trading calendar alignment
             DatetimeList short_dates = sm.getTradingCalendar(short_query);
             DatetimeList medium_dates = sm.getTradingCalendar(medium_query);
             DatetimeList long_dates = sm.getTradingCalendar(long_query);
@@ -671,7 +672,7 @@ TEST_CASE("test_Factor_getValues_align") {
             CHECK_EQ(medium_ind.size(), medium_dates.size());
             CHECK_EQ(long_ind.size(), long_dates.size());
 
-            // 验证结构
+            // Verify the structure
             check_indicator(short_ind, short_ind);
             check_indicator(medium_ind, medium_ind);
             check_indicator(long_ind, long_ind);
@@ -679,17 +680,17 @@ TEST_CASE("test_Factor_getValues_align") {
     }
 
     SUBCASE("Multi-stock align validation") {
-        // 测试多股票情况下的对齐功能（使用三个股票）
+        // Test the alignment with multiple stocks (three stocks are used)
         Stock stock3 = sm.getStock("sh600036");
 
         if (!stock3.isNull()) {
             StockList multi_stocks = {stock1, stock2, stock3};
             IndicatorList results = factor.getValues(multi_stocks, query, true);
 
-            // 应该为每只股票返回一个指标结果
+            // An indicator result should be returned for every stock
             CHECK_EQ(results.size(), 3);
 
-            // 验证每个结果都正确使用了交易日历对齐
+            // Verify that every result is aligned with the trading calendar correctly
             DatetimeList trading_dates = sm.getTradingCalendar(query);
             CHECK_FALSE(trading_dates.empty());
 
@@ -697,14 +698,14 @@ TEST_CASE("test_Factor_getValues_align") {
                 CHECK_FALSE(ind.empty());
                 CHECK_EQ(ind.size(), trading_dates.size());
 
-                // 验证结构
+                // Verify the structure
                 check_indicator(ind, ind);
             }
         }
     }
 
     SUBCASE("Align with different KType") {
-        // 测试不同K线类型下的对齐功能
+        // Test the alignment for the different K-line types
         KQuery day_query(0, 15, KQuery::DAY);
         KQuery week_query(0, 15, KQuery::WEEK);
         KQuery month_query(0, 15, KQuery::MONTH);
@@ -721,7 +722,7 @@ TEST_CASE("test_Factor_getValues_align") {
         CHECK_EQ(week_result.size(), 2);
         CHECK_EQ(month_result.size(), 2);
 
-        // 验证每个股票的结果
+        // Verify the result of every stock
         for (size_t i = 0; i < 2; ++i) {
             Indicator day_ind = day_result[i];
             Indicator week_ind = week_result[i];
@@ -731,17 +732,17 @@ TEST_CASE("test_Factor_getValues_align") {
             CHECK_FALSE(week_ind.empty());
             CHECK_FALSE(month_ind.empty());
 
-            // 获取对应K线类型的交易日历
+            // Get the trading calendar of the corresponding K-line type
             DatetimeList day_dates = sm.getTradingCalendar(day_query);
             DatetimeList week_dates = sm.getTradingCalendar(week_query);
             DatetimeList month_dates = sm.getTradingCalendar(month_query);
 
-            // 验证大小匹配（这是验证对齐效果的关键）
+            // Verify that the sizes match (the key to verifying the alignment)
             CHECK_EQ(day_ind.size(), day_dates.size());
             CHECK_EQ(week_ind.size(), week_dates.size());
             CHECK_EQ(month_ind.size(), month_dates.size());
 
-            // 验证结构
+            // Verify the structure
             check_indicator(day_ind, day_ind);
             check_indicator(week_ind, week_ind);
             check_indicator(month_ind, month_ind);
@@ -749,52 +750,52 @@ TEST_CASE("test_Factor_getValues_align") {
     }
 }
 
-/** @par 检测点：测试Factor哈希和比较 */
+/** @par Test point: test the hashing and the comparison of Factor */
 TEST_CASE("test_Factor_hash_compare") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    // 创建相同的 Factor
+    // Create an identical Factor
     Factor factor1("HASH_TEST", ma5, KQuery::DAY);
     Factor factor2("HASH_TEST", ma5, KQuery::DAY);
 
-    // 创建不同的 Factor
+    // Create a different Factor
     Factor factor3("HASH_TEST", ma10, KQuery::DAY);
     Factor factor4("DIFFERENT", ma5, KQuery::DAY);
 
-    // 测试不同的 Factor 应该有不同的哈希值
+    // Test that different Factors should have different hash values
     CHECK_NE(factor1.hash(), factor3.hash());
     CHECK_NE(factor1.hash(), factor4.hash());
 
-    // 测试标准库哈希函数
+    // Test the standard library hash function
     std::hash<Factor> hasher;
     CHECK_NE(hasher(factor1), hasher(factor3));
 }
 
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点：测试Factor基本序列化功能 */
+/** @par Test point: test the basic serialization of Factor */
 TEST_CASE("test_Factor_basic_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/Factor_basic.xml";
 
-    // 创建测试 Factor
+    // Create the test Factor
     Indicator ma5 = MA(CLOSE(), 5);
     Factor factor1("SERIALIZE_TEST", ma5, KQuery::DAY, "序列化测试因子",
                    "这是一个用于测试序列化的因子", true);
 
-    // 设置一些属性
+    // Set some attributes
     factor1.createAt(Datetime(202001010000LL));
     factor1.updateAt(Datetime(202001020000LL));
 
-    // 序列化到文件
+    // Serialize to a file
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(factor1);
     }
 
-    // 从文件反序列化
+    // Deserialize from the file
     Factor factor2;
     {
         std::ifstream ifs(filename);
@@ -802,7 +803,7 @@ TEST_CASE("test_Factor_basic_serialize") {
         ia >> BOOST_SERIALIZATION_NVP(factor2);
     }
 
-    // 验证反序列化后的对象属性
+    // Verify the attributes of the deserialized object
     CHECK_EQ(factor1.name(), factor2.name());
     CHECK_EQ(factor1.ktype(), factor2.ktype());
     CHECK_EQ(factor1.brief(), factor2.brief());
@@ -811,41 +812,41 @@ TEST_CASE("test_Factor_basic_serialize") {
     CHECK_EQ(factor1.createAt(), factor2.createAt());
     CHECK_EQ(factor1.updateAt(), factor2.updateAt());
 
-    // 验证 formula
+    // Verify the formula
     Indicator formula1 = factor1.formula();
     Indicator formula2 = factor2.formula();
     CHECK_EQ(formula1.name(), formula2.name());
     CHECK_EQ(formula1.size(), formula2.size());
 
-    // 验证 block（应该都是空的）
+    // Verify the block (all of them should be empty)
     CHECK_UNARY(factor1.block().isNull());
     CHECK_UNARY(factor2.block().isNull());
     CHECK_EQ(factor1.block().size(), factor2.block().size());
 }
 
-/** @par 检测点：测试带Block的Factor序列化 */
+/** @par Test point: test the serialization of a Factor with a Block */
 TEST_CASE("test_Factor_with_block_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/Factor_with_block.xml";
 
-    // 创建测试 Block
+    // Create the test Block
     Block test_block("行业", "序列化测试板块");
     test_block.add("sh600000");
     test_block.add("sz000001");
 
-    // 创建带 Block 的 Factor
+    // Create a Factor with a Block
     Indicator ma10 = MA(CLOSE(), 10);
     Factor factor1("BLOCK_SERIALIZE_TEST", ma10, KQuery::WEEK, "带板块序列化测试",
                    "测试包含Block的Factor序列化", false, Datetime(202001010000LL), test_block);
 
-    // 序列化到文件
+    // Serialize to a file
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(factor1);
     }
 
-    // 从文件反序列化
+    // Deserialize from the file
     Factor factor2;
     {
         std::ifstream ifs(filename);
@@ -853,7 +854,7 @@ TEST_CASE("test_Factor_with_block_serialize") {
         ia >> BOOST_SERIALIZATION_NVP(factor2);
     }
 
-    // 验证基本属性
+    // Verify the basic attributes
     CHECK_EQ(factor1.name(), factor2.name());
     CHECK_EQ(factor1.ktype(), factor2.ktype());
     CHECK_EQ(factor1.brief(), factor2.brief());
@@ -861,7 +862,7 @@ TEST_CASE("test_Factor_with_block_serialize") {
     CHECK_EQ(factor1.needSaveValue(), factor2.needSaveValue());
     CHECK_EQ(factor1.startDate(), factor2.startDate());
 
-    // 验证 Block 属性
+    // Verify the Block attribute
     const Block& block1 = factor1.block();
     const Block& block2 = factor2.block();
     CHECK_FALSE(block1.isNull());
@@ -870,12 +871,12 @@ TEST_CASE("test_Factor_with_block_serialize") {
     CHECK_EQ(block1.name(), block2.name());
     CHECK_EQ(block1.size(), block2.size());
 
-    // 验证 Block 中的股票代码
+    // Verify the stock codes in the Block
     auto stocks1 = block1.getStockList();
     auto stocks2 = block2.getStockList();
     CHECK_EQ(stocks1.size(), stocks2.size());
 
-    // 创建股票代码集合进行比较
+    // Create a stock code set for the comparison
     std::set<string> codes1, codes2;
     for (const auto& stock : stocks1) {
         codes1.insert(stock.code());
@@ -885,28 +886,28 @@ TEST_CASE("test_Factor_with_block_serialize") {
     }
     CHECK_EQ(codes1.size(), codes2.size());
 
-    // 验证所有代码都匹配
+    // Verify that all the codes match
     for (const auto& code : codes1) {
         CHECK_UNARY(codes2.find(code) != codes2.end());
     }
 }
 
-/** @par 检测点：测试空Factor序列化 */
+/** @par Test point: test the serialization of an empty Factor */
 TEST_CASE("test_Factor_empty_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/Factor_empty.xml";
 
-    // 创建空 Factor
+    // Create an empty Factor
     Factor factor1;
 
-    // 序列化到文件
+    // Serialize to a file
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(factor1);
     }
 
-    // 从文件反序列化
+    // Deserialize from the file
     Factor factor2;
     {
         std::ifstream ifs(filename);
@@ -917,19 +918,19 @@ TEST_CASE("test_Factor_empty_serialize") {
     CHECK_EQ(factor1.name(), factor2.name());
     CHECK_EQ(factor1.ktype(), factor2.ktype());
 
-    // 验证反序列化后的Factor具有默认值
+    // Verify that the deserialized Factor has the default values
     CHECK_EQ(factor2.name(), "");
-    // ktype对于默认构造的Factor可能是空字符串
-    CHECK_EQ(factor2.ktype(), "");  // 修改为期望的空字符串
+    // For a default constructed Factor the ktype may be an empty string
+    CHECK_EQ(factor2.ktype(), "");  // Changed to the expected empty string
     CHECK_FALSE(factor2.needSaveValue());
 }
 
-/** @par 检测点：测试多个Factor序列化 */
+/** @par Test point: test the serialization of multiple Factors */
 TEST_CASE("test_Factor_list_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/Factor_list.xml";
 
-    // 创建多个 Factor
+    // Create multiple Factors
     vector<Factor> factors1;
 
     Indicator ma5 = MA(CLOSE(), 5);
@@ -940,7 +941,7 @@ TEST_CASE("test_Factor_list_serialize") {
     factors1.emplace_back("FACTOR_2", ma10, KQuery::WEEK, "因子2", "第二个测试因子");
     factors1.emplace_back("FACTOR_3", ma20, KQuery::MONTH, "因子3", "第三个测试因子");
 
-    // 设置不同的属性
+    // Set the different attributes
     factors1[0].needSaveValue(true);
     factors1[0].createAt(Datetime(202001010000LL));
     factors1[1].needSaveValue(false);
@@ -948,14 +949,14 @@ TEST_CASE("test_Factor_list_serialize") {
     factors1[2].needSaveValue(true);
     factors1[2].createAt(Datetime(202001030000LL));
 
-    // 序列化到文件
+    // Serialize to a file
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
         oa << BOOST_SERIALIZATION_NVP(factors1);
     }
 
-    // 从文件反序列化
+    // Deserialize from the file
     vector<Factor> factors2;
     {
         std::ifstream ifs(filename);
@@ -963,7 +964,7 @@ TEST_CASE("test_Factor_list_serialize") {
         ia >> BOOST_SERIALIZATION_NVP(factors2);
     }
 
-    // 验证序列化结果
+    // Verify the serialization result
     CHECK_EQ(factors1.size(), factors2.size());
     CHECK_EQ(factors1.size(), 3);
 
@@ -975,7 +976,7 @@ TEST_CASE("test_Factor_list_serialize") {
         CHECK_EQ(factors1[i].needSaveValue(), factors2[i].needSaveValue());
         CHECK_EQ(factors1[i].createAt(), factors2[i].createAt());
 
-        // 验证 formula
+        // Verify the formula
         Indicator formula1 = factors1[i].formula();
         Indicator formula2 = factors2[i].formula();
         CHECK_EQ(formula1.name(), formula2.name());

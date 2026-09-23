@@ -12,7 +12,7 @@
 namespace hku {
 
 /*
- * 替换指定数值，通常用于替换 Nan 值
+ * Replace the given value, it is usually used to replace the Nan values
  */
 class IReplace : public IndicatorImp {
     INDICATOR_IMP(IReplace)

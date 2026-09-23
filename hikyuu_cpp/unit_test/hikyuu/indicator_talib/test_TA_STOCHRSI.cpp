@@ -20,12 +20,12 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_STOCHRSI") {
     KData kdata = getKData("sh000001", KQuery(-15));
     Indicator c = CLOSE(kdata);
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_STOCHRSI(c, 1, 5, 3, 0));
     CHECK_THROWS(TA_STOCHRSI(c, 100001, 5, 3, 0));
     CHECK_THROWS(TA_STOCHRSI(c, 14, 0, 3, 0));
@@ -35,7 +35,7 @@ TEST_CASE("test_TA_STOCHRSI") {
     CHECK_THROWS(TA_STOCHRSI(c, 14, 5, 3, -1));
     CHECK_THROWS(TA_STOCHRSI(c, 14, 5, 3, 9));
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     Indicator result = TA_STOCHRSI(c, 2);
     CHECK_EQ(result.name(), "TA_STOCHRSI");
     CHECK_EQ(result.discard(), 8);
@@ -46,7 +46,7 @@ TEST_CASE("test_TA_STOCHRSI") {
     CHECK_EQ(result[14], doctest::Approx(6.863976).epsilon(0.0001));
     CHECK_EQ(result.get(14, 1), doctest::Approx(17.41548).epsilon(0.0001));
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     auto data = TA_MA(c, 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_STOCHRSI(data, 2);
@@ -64,7 +64,7 @@ TEST_CASE("test_TA_STOCHRSI") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_STOCHRSI_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

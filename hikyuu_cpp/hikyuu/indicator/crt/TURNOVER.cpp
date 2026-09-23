@@ -11,7 +11,7 @@
 
 namespace hku {
 
-// 不需要乘以 100，成交量已经是手数即100
+// No need to multiply by 100, the trading volume is already in lots, i.e. 100
 Indicator HKU_API TURNOVER(int n) {
     HKU_ASSERT(n >= 1);
     return n == 1 ? (VOL() / LIUTONGPAN()) : (SUM(VOL(), n) / SUM(LIUTONGPAN(), n));

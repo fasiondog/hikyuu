@@ -20,11 +20,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REPLACE") {
     double nan = Null<double>();
 
-    /** @arg 替换非 nan 值, 不忽略 discard */
+    /** @arg Replace a non-nan value, the discard is not ignored */
     Indicator input = PRICELIST(PriceList{nan, nan, 3, 4.3, 5, 4.3, 7, 8, 9, 10}, 2);
     Indicator expect = PRICELIST(PriceList{nan, nan, 3, 4, 5, 4, 7, 8, 9, 10}, 2);
     Indicator result = REPLACE(input, 4.3, 4);
@@ -38,7 +38,7 @@ TEST_CASE("test_REPLACE") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 替换非 Nan值为 nan 值，忽略 discard */
+    /** @arg Replace a non-Nan value with nan, the discard is ignored */
     input = PRICELIST(PriceList{nan, nan, 3, 4.3, 5, 4.3, 7, 8, 9, 10}, 2);
     expect = PRICELIST(PriceList{nan, nan, nan, 4.3, 5, 4.3, 7, 8, 9, 10}, 3);
     result = REPLACE(input, 3, nan, true);
@@ -51,7 +51,7 @@ TEST_CASE("test_REPLACE") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 替换 Nan值为 0，不忽略 discard */
+    /** @arg Replace the Nan values with 0, the discard is not ignored */
     input = PRICELIST(PriceList{nan, nan, 3, nan, 5, 4.3, 7, 8, 9, 10}, 2);
     expect = PRICELIST(PriceList{nan, nan, 3, 0.0, 5, 4.3, 7, 8, 9, 10}, 2);
     result = REPLACE(input, nan, 0.0);
@@ -64,7 +64,7 @@ TEST_CASE("test_REPLACE") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 替换 Nan值为 0，忽略 discard */
+    /** @arg Replace the Nan values with 0, the discard is ignored */
     input = PRICELIST(PriceList{nan, nan, 3, nan, 5, 4.3, 7, 8, 9, 10}, 2);
     expect = PRICELIST(PriceList{1., 1., 3, 1.0, 5, 4.3, 7, 8, 9, 10});
     result = REPLACE(input, nan, 1.0, true);
@@ -83,7 +83,7 @@ TEST_CASE("test_REPLACE") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_REPLACE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

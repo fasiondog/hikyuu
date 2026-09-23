@@ -21,13 +21,13 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SG_OneSide") {
     auto k = getKData("sh000001", KQuery(-30));
     Indicator ind;
     SignalPtr sg;
 
-    /** @arg 输入ind为空 */
+    /** @arg The input ind is empty */
     sg = SG_OneSide(ind, true);
     sg->setTO(k);
     CHECK_UNARY(sg->getBuySignal().empty());
@@ -38,7 +38,7 @@ TEST_CASE("test_SG_OneSide") {
     CHECK_UNARY(sg->getBuySignal().empty());
     CHECK_UNARY(sg->getSellSignal().empty());
 
-    /** @arg 单边买入信号 */
+    /** @arg A one-sided buy signal */
     ind = CLOSE() > REF(CLOSE(), 1);
     auto sg_buy = SG_OneSide(ind, true);
     sg_buy->setTO(k);
@@ -53,7 +53,7 @@ TEST_CASE("test_SG_OneSide") {
         }
     }
 
-    /** @arg 单边卖出信号 */
+    /** @arg A one-sided sell signal */
     ind = CLOSE() < REF(CLOSE(), 1);
     auto sg_sell = SG_OneSide(ind, false);
     sg_sell->setTO(k);
@@ -68,11 +68,11 @@ TEST_CASE("test_SG_OneSide") {
         }
     }
 
-    /** @arg 尝试改变 alternate 参数 */
+    /** @arg Try to change the alternate parameter */
     sg_sell->setParam<bool>("alternate", false);
     CHECK_THROWS(sg_sell->setParam<bool>("alternate", true));
 
-    /** @arg 单边买入 + 单边卖出 */
+    /** @arg A one-sided buy + a one-sided sell */
     sg = sg_buy + sg_sell;
     sg->setParam<bool>("alternate", true);
     sg->setTO(k);

@@ -20,11 +20,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_STOCH") {
     KData kdata = getKData("sz000001", KQuery(-10));
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_STOCH(kdata, 0, 3, 0, 3, 0));
     CHECK_THROWS(TA_STOCH(kdata, 100001, 3, 0, 3, 0));
     CHECK_THROWS(TA_STOCH(kdata, 5, 0, 0, 3, 0));
@@ -36,20 +36,20 @@ TEST_CASE("test_TA_STOCH") {
     CHECK_THROWS(TA_STOCH(kdata, 5, 3, 0, 3, -1));
     CHECK_THROWS(TA_STOCH(kdata, 5, 3, 0, 3, 9));
 
-    /** @arg KData 为空 */
+    /** @arg KData is empty */
     Indicator result = TA_STOCH(KData());
     CHECK_EQ(result.name(), "TA_STOCH");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.getResultNumber(), 2);
 
-    /** @arg KData 长度小于默认参数抛弃数量 */
+    /** @arg The KData length is less than the discard count of the default parameters */
     result = TA_STOCH(getKData("sh000001", KQuery(-1)));
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.getResultNumber(), 2);
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     result = TA_STOCH(kdata);
     CHECK_EQ(result.name(), "TA_STOCH");
     CHECK_EQ(result.discard(), 8);
@@ -67,7 +67,7 @@ TEST_CASE("test_TA_STOCH") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_STOCH_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

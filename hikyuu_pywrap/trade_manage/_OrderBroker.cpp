@@ -1,7 +1,7 @@
 /*
  * _OrderBroker.cpp
  *
- *  Created on: 2017年6月28日
+ *  Created on: 2017-06-28
  *      Author: fasiondog
  */
 
@@ -40,67 +40,67 @@ void export_OrderBroker(py::module& m) {
       .def(py::init<const Stock&, price_t, price_t>())
       .def("__str__", &BrokerPositionRecord::str)
       .def("__repr__", &BrokerPositionRecord::str)
-      .def_readwrite("stock", &BrokerPositionRecord::stock, "持仓对象")
-      .def_readwrite("number", &BrokerPositionRecord::number, "持仓数量")
-      .def_readwrite("money", &BrokerPositionRecord::money, "买入花费总资金");
+      .def_readwrite("stock", &BrokerPositionRecord::stock, "The position object")
+      .def_readwrite("number", &BrokerPositionRecord::number, "The position quantity")
+      .def_readwrite("money", &BrokerPositionRecord::money, "The total funds spent on buying");
 
     py::class_<OrderBrokerBase, OrderBrokerPtr, PyOrderBrokerBase>(
       m, "OrderBrokerBase",
-      R"(订单代理包装基类，用户可以参考自定义自己的订单代理，加入额外的处理
+      R"(The order broker wrapper base class; users can refer to it to customize their own order brokers, adding the extra processing
       
-    :param bool real: 下单前是否重新实时获取实时分笔数据
-    :param float slip: 如果当前的卖一价格和指示买入的价格绝对差值不超过slip则下单，否则忽略; 对卖出操作无效，立即以当前价卖出)")
+    :param bool real: whether to re-fetch the real-time tick data before placing the order
+    :param float slip: if the absolute difference between the current ask price and the instructed buy price does not exceed slip, place the order, otherwise ignore; it is invalid for the sell operation, selling immediately at the current price)")
 
       .def(py::init<>())
       .def(py::init<const string&>(), R"(
-    :param str name: 代理名称)")
+    :param str name: the broker name)")
 
       .def("__str__", to_py_str<OrderBrokerBase>)
       .def("__repr__", to_py_str<OrderBrokerBase>)
 
       .def_property("name", py::overload_cast<>(&OrderBrokerBase::name, py::const_),
                     py::overload_cast<const string&>(&OrderBrokerBase::name),
-                    py::return_value_policy::copy, "名称（可读写）")
+                    py::return_value_policy::copy, "The name (readable and writable)")
 
-      .def("buy", &OrderBrokerBase::buy, "详情见子类实现接口: _buy")
-      .def("sell", &OrderBrokerBase::sell, "详情见子类实现接口: _sell")
-      .def("get_asset_info", &OrderBrokerBase::getAssetInfo, "详情见子类实现接口: _get_asset_info")
+      .def("buy", &OrderBrokerBase::buy, "For the details, see the subclass implementation interface: _buy")
+      .def("sell", &OrderBrokerBase::sell, "For the details, see the subclass implementation interface: _sell")
+      .def("get_asset_info", &OrderBrokerBase::getAssetInfo, "For the details, see the subclass implementation interface: _get_asset_info")
 
       .def(
         "_buy", &OrderBrokerBase::_buy,
         R"(_buy(self, datetime, market, code, price, num, stoploss, goal_price, part_from, remark)
 
-    【子类接口】执行买入操作
+    [Subclass interface] Execute the buy operation
 
-    :param Datetime datetime: 策略指示时间
-    :param str market: 市场标识
-    :param str code: 证券代码
-    :param float price: 买入价格
-    :param float num: 买入数量
-    :param float stoploss: 计划止损价
-    :param float goal_price: 计划盈利目标价
-    :param SystemPart part_from: 信号来源,
-    :param str remark: 订单备注)")
+    :param Datetime datetime: the strategy instruction time
+    :param str market: the market identifier
+    :param str code: the security code
+    :param float price: the buy price
+    :param float num: the buy quantity
+    :param float stoploss: the planned stop-loss price
+    :param float goal_price: the planned profit target price
+    :param SystemPart part_from: the signal source,
+    :param str remark: the order remark)")
 
       .def(
         "_sell", &OrderBrokerBase::_sell,
         R"(_sell(self, datetime, market, code, price, num, stoploss, goal_price, part_from, remark)
 
-    【子类接口】执行卖出操作
+    [Subclass interface] Execute the sell operation
 
-    :param Datetime datetime: 策略指示时间
-    :param str market: 市场标识
-    :param str code: 证券代码
-    :param float price: 卖出价格
-    :param float num: 卖出数量
-    :param float stoploss: 计划止损价
-    :param float goal_price: 计划盈利目标价
-    :param SystemPart part_from: 信号来源
-    :param str remark: 订单备注)")
+    :param Datetime datetime: the strategy instruction time
+    :param str market: the market identifier
+    :param str code: the security code
+    :param float price: the sell price
+    :param float num: the sell quantity
+    :param float stoploss: the planned stop-loss price
+    :param float goal_price: the planned profit target price
+    :param SystemPart part_from: the signal source
+    :param str remark: the order remark)")
 
       .def("_get_asset_info", &OrderBrokerBase::_getAssetInfo, R"(_get_asset_info(self)
 
-    【子类接口】获取当前资产信息，子类需返回符合如下规范的 json 字符串:
+    [Subclass interface] Get the current asset information; the subclass needs to return a json string conforming to the following specification:
 
     {
         "datetime": "2001-01-01 18:00:00.12345",
@@ -113,6 +113,6 @@ void export_OrderBroker(py::module& m) {
          ]
     }    
 
-    :return: 以字符串（json格式）方式返回当前资产信息
+    :return: return the current asset information as a string (in json format)
     :rtype: str)");
 }

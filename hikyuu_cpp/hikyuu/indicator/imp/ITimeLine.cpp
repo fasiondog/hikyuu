@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2019年3月6日
+ *  Created on: 2019-3-6
  *      Author: fasiondog
  */
 

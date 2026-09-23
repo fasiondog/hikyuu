@@ -61,30 +61,30 @@ void (IndicatorImp::*set_ind_param2)(const string&, const IndParam&) = &Indicato
 
 void export_IndicatorImp(py::module& m) {
     py::class_<IndicatorImp, IndicatorImpPtr, PyIndicatorImp>(
-      m, "IndicatorImp", R"(指标实现类，定义新指标时，应从此类继承
+      m, "IndicatorImp", R"(The indicator implementation class; when defining a new indicator, you should inherit from this class
     
-    子类需实现以下接口：
+    The subclass needs to implement the following interfaces:
 
         - _clone() -> IndicatorImp
-        - _calculate(ind) ：指标计算
-        - isNeedContext(bool) ：是否依赖上下文)")
+        - _calculate(ind): the indicator calculation
+        - isNeedContext(bool): whether it depends on the context)")
       .def(py::init<>())
 
       .def(py::init<const string&>(), R"(
-    :param str name: 指标名称)")
+    :param str name: the indicator name)")
 
       .def(py::init<const string&, size_t>(), R"(
-    :param str name: 指标名称
-    :param int result_num: 指标结果集数量)")
+    :param str name: the indicator name
+    :param int result_num: the number of the indicator result sets)")
 
       .def("__str__", to_py_str<IndicatorImp>)
       .def("__repr__", to_py_str<IndicatorImp>)
 
-      .def_property("name", read_name, write_name, py::return_value_policy::copy, "指标名称")
-      .def_property_readonly("discard", &IndicatorImp::discard, "结果中需抛弃的个数")
+      .def_property("name", read_name, write_name, py::return_value_policy::copy, "The indicator name")
+      .def_property_readonly("discard", &IndicatorImp::discard, "The number of the points to discard in the result")
 
       .def("get_parameter", &IndicatorImp::getParameter, py::return_value_policy::copy,
-           "获取内部参数类对象")
+           "Get the internal parameter class object")
 
       .def("have_param", &IndicatorImp::haveParam)
       .def("get_param", &IndicatorImp::getParam<boost::any>)

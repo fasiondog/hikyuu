@@ -67,7 +67,7 @@ void ISlope::_calculate(const Indicator& ind) {
         price_t denominator_r2 = denominator * (cnt * y2sum - ysum * ysum);
         dst_r2[i] = numerator / denominator_r2;
 
-        // 计算相对最大残差
+        // Calculate the relative maximum residual
         price_t y_mean = ysum / cnt;
         price_t x_mean = xsum / cnt;
         price_t intercept = y_mean - slope * x_mean;
@@ -95,7 +95,7 @@ void ISlope::_calculate(const Indicator& ind) {
         price_t denominator_r2 = denominator * (n * y2sum - ysum * ysum);
         dst_r2[i] = numerator / denominator_r2;
 
-        // 计算相对最大残差
+        // Calculate the relative maximum residual
         price_t y_mean = ysum / n;
         price_t x_mean = xsum / n;
         price_t intercept = y_mean - slope * x_mean;
@@ -152,7 +152,7 @@ void ISlope::_increment_calculate(const Indicator& ind, size_t start_pos) {
         price_t denominator_r2 = denominator * (n * y2sum - ysum * ysum);
         dst_r2[i] = numerator / denominator_r2;
 
-        // 计算相对最大残差
+        // Calculate the relative maximum residual
         price_t y_mean = ysum / n;
         price_t x_mean = xsum / n;
         price_t intercept = y_mean - slope * x_mean;
@@ -202,7 +202,7 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     price_t denominator_r2 = denominator * (n * y2sum - ysum * ysum);
     price_t r2 = numerator / denominator_r2;
 
-    // 计算相对最大残差
+    // Calculate the relative maximum residual
     price_t y_mean = ysum / n;
     price_t x_mean = xsum / n;
     price_t intercept = y_mean - slope * x_mean;

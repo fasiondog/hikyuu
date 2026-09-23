@@ -1,7 +1,7 @@
 /*
  * test_ABS.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 #include "../test_config.h"
@@ -19,9 +19,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ZSCORE") {
-    /** @arg 只有一条有效数据 */
+    /** @arg There is only one valid record */
     PriceList a{0.3};
     Indicator data = PRICELIST(a);
     REQUIRE(data.size() == 1);
@@ -31,11 +31,11 @@ TEST_CASE("test_ZSCORE") {
     CHECK_EQ(result.discard(), 1);
     CHECK_UNARY(std::isnan(result[0]));
 
-    /** @arg 输入的 nsigma < 0 */
+    /** @arg The input nsigma < 0 */
     KData k = getKData("SH000001", KQuery(-5));
     CHECK_THROWS_AS(ZSCORE(k.close(), true, -0.5), std::exception);
 
-    /** @arg 正常计算，不剔除异常值 */
+    /** @arg The normal calculation without removing the outliers */
     result = ZSCORE(k.close());
     CHECK_EQ(result.name(), "ZSCORE");
     CHECK_UNARY(!result.empty());
@@ -47,7 +47,7 @@ TEST_CASE("test_ZSCORE") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-    /** @arg 过滤异常值，不递归*/
+    /** @arg Filter the outliers, not recursively */
     k = getKData("SH000001", KQuery(3600, 4000));
     Indicator c = k.close();
     result = ZSCORE(c, true, 3.0, false);
@@ -56,7 +56,7 @@ TEST_CASE("test_ZSCORE") {
         CHECK_EQ(result[i], doctest::Approx(expect[i]));
     }
 
-    /** @arg 过滤异常值，递归*/
+    /** @arg Filter the outliers recursively */
     k = getKData("SH000001", KQuery(3600, 4000));
     c = k.close();
     auto result2 = ZSCORE(c, true, 3.0, true);
@@ -76,7 +76,7 @@ TEST_CASE("test_ZSCORE_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_ZSCORE_benchmark, cycle,
@@ -95,7 +95,7 @@ TEST_CASE("test_ZSCORE_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_ZSCORE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

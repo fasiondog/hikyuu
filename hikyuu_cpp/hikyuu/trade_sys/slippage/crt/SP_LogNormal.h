@@ -1,7 +1,7 @@
 /*
  * SP_LogNormal.h
  *
- *  Created on: 2025年10月25日
+ *  Created on: 2025-10-25
  *      Author: fasiondog
  */
 
@@ -12,10 +12,11 @@
 namespace hku {
 
 /**
- * 对数正态分布随机价格移滑价差算法, 买入和卖出操作是基于对数正态分布的随机价格偏移
- * @param mean 对数正态分布的均值参数
- * @param stddev 对数正态分布的标准差参数
- * @return 滑点对象指针
+ * Log-normal distribution random price slippage algorithm: the buy and sell operations are a random
+ * price offset based on the log-normal distribution
+ * @param mean the mean parameter of the log-normal distribution
+ * @param stddev the standard deviation parameter of the log-normal distribution
+ * @return the slippage object pointer
  */
 SlippagePtr HKU_API SP_LogNormal(double mean = 0.0, double stddev = 0.05);
 

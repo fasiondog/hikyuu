@@ -28,9 +28,9 @@ from .indicator import *
 
 
 def KDJ(kdata=None, n=9, m1=3, m2=3):
-    """ 经典 KDJ 随机指标
+    """ The classic KDJ stochastic indicator
 
-        :param KData kdata: 关联的K线数据
+        :param KData kdata: the associated K-line data
         :param int n:
         :param int m1:
         :param int m2:

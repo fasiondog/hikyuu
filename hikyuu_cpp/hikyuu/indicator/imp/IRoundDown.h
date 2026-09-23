@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 向下截取，如10.1截取后为10
+ * Truncate downward, e.g. 10.1 is truncated to 10
  */
 class IRoundDown : public IndicatorImp {
     INDICATOR_IMP(IRoundDown)

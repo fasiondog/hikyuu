@@ -49,9 +49,9 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Stoploss") {
-    /** @arg 基本操作 */
+    /** @arg The basic operation */
     StoplossPtr p(new StoplossTest);
     CHECK_EQ(p->name(), "StoplossTest");
     CHECK_EQ(p->getPrice(Datetime(200101010000), 1.0), 0.0);
@@ -64,7 +64,7 @@ TEST_CASE("test_Stoploss") {
     p->reset();
     CHECK_EQ(p_src->getX(), 0);
 
-    /** @arg 测试克隆操作 */
+    /** @arg Test the clone operation */
     p_src->setX(10);
     StoplossPtr p_clone = p->clone();
     CHECK_EQ(p_clone->name(), "StoplossTest");

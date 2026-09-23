@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 # cp936
 """
-交互模式下绘制相关图形，如K线图，美式K线图
+Draw the related charts in the interactive mode, such as the K-line chart and the American K-line chart
 """
 import sys
 import os
@@ -19,7 +19,7 @@ from matplotlib.ticker import FuncFormatter, FixedLocator
 from matplotlib.image import imread
 
 from hikyuu import *
-from hikyuu import constant, isnan, Indicator, KData, IF, ALIGN
+from hikyuu import constant, isnan, Indicator, KData, IF, ALIGN, htr
 
 from .common import get_draw_title
 
@@ -28,7 +28,7 @@ ICON_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 def set_mpl_params():
-    '''设置交互及中文环境参数'''
+    '''Set the interactive and the language environment parameters'''
     if in_interactive_session():
         rcParams['interactive'] = True
     else:
@@ -58,9 +58,9 @@ def set_mpl_params():
 
 
 def create_one_axes_figure(figsize=(10, 6)):
-    """生成一个仅含有1个坐标轴的figure，并返回其坐标轴对象
+    """Generate a figure containing only 1 axes, and return its axes object
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: ax
     """
     rect1 = [0.05, 0.05, 0.9, 0.90]
@@ -70,9 +70,9 @@ def create_one_axes_figure(figsize=(10, 6)):
 
 
 def create_two_axes_figure(figsize=(10, 8)):
-    """生成一个含有2个坐标轴的figure，并返回坐标轴列表
+    """Generate a figure containing 2 axes, and return the list of the axes
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: (ax1, ax2)
     """
     rect1 = [0.05, 0.35, 0.9, 0.60]
@@ -86,9 +86,9 @@ def create_two_axes_figure(figsize=(10, 8)):
 
 
 def create_three_axes_figure(figsize=(10, 8)):
-    """生成一个含有3个坐标轴的figure，并返回坐标轴列表
+    """Generate a figure containing 3 axes, and return the list of the axes
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: (ax1, ax2, ax3)
     """
     rect1 = [0.05, 0.45, 0.9, 0.50]
@@ -104,9 +104,9 @@ def create_three_axes_figure(figsize=(10, 8)):
 
 
 def create_four_axes_figure(figsize=(10, 8)):
-    """生成一个含有4个坐标轴的figure，并返回坐标轴列表
+    """Generate a figure containing 4 axes, and return the list of the axes
 
-    :param figsize: (宽, 高)
+    :param figsize: (width, height)
     :return: (ax1, ax2, ax3, ax4)
     """
     rect1 = [0.05, 0.50, 0.9, 0.45]
@@ -124,11 +124,12 @@ def create_four_axes_figure(figsize=(10, 8)):
 
 
 def create_figure(n=1, figsize=(10, 8)):
-    """生成含有指定坐标轴数量的窗口，最大只支持4个坐标轴。
+    """Generate a window containing the specified number of axes; at most 4 axes are supported.
 
-    :param int n: 坐标轴数量
-    :param figsize: (宽, 高)
-    :return: (ax1, ax2, ...) 根据指定的坐标轴数量而定，超出[1,4]个坐标轴时，返回None
+    :param int n: the number of the axes
+    :param figsize: (width, height)
+    :return: (ax1, ax2, ...) depending on the specified number of the axes; None is returned
+        when the number is out of [1, 4]
     """
     if n == 1:
         return create_one_axes_figure(figsize)
@@ -144,8 +145,8 @@ def create_figure(n=1, figsize=(10, 8)):
 
 
 class StockFuncFormatter(object):
-    """用于坐标轴显示日期
-    关于matplotlib中FuncFormatter的使用方法，请参见：
+    """Display the date on the axes
+    For the usage of FuncFormatter in matplotlib, see:
     http://matplotlib.sourceforge.net/examples/api/date_index_formatter.html
     """
 
@@ -161,7 +162,7 @@ class StockFuncFormatter(object):
 
 
 def getDayLocatorAndFormatter(dates):
-    """获取显示日线时使用的Major Locator和Major Formatter"""
+    """Get the major locator and the major formatter used when displaying the daily line"""
     sep = int(len(dates) / 10)
     loc = [
         (i, str(d) if (i != (len(dates) - 1)) and (i % sep != 0) else "{}-{}-{}".format(d.year, d.month, d.day))
@@ -175,7 +176,7 @@ def getDayLocatorAndFormatter(dates):
 
 
 def getMinLocatorAndFormatter(dates):
-    """获取显示分钟线时使用的Major Locator和Major Formatter"""
+    """Get the major locator and the major formatter used when displaying the minute line"""
     sep = len(dates) / 5
     loc = [
         (i, str(d) if i % sep != 0 else "{}-{}-{} {}:{}".format(d.year, d.month, d.day, d.hour, d.minute))
@@ -189,11 +190,12 @@ def getMinLocatorAndFormatter(dates):
 
 
 def ax_set_locator_formatter(axes, dates, typ):
-    """ 设置指定坐标轴的日期显示，根据指定的K线类型优化X轴坐标显示
+    """Set the date display of the specified axes, and optimize the X-axis display according to
+    the specified K-line type
 
-    :param axes: 指定的坐标轴
-    :param dates: Datetime构成可迭代序列
-    :param Query.KType typ: K线类型
+    :param axes: the specified axes
+    :param dates: an iterable sequence of Datetime
+    :param Query.KType typ: the K-line type
     """
     major_loc, major_fm = None, None
     if typ == Query.DAY:
@@ -216,10 +218,10 @@ def ax_set_locator_formatter(axes, dates, typ):
 
 
 def adjust_axes_show(axeslist):
-    """用于调整上下紧密相连的坐标轴显示时，其上一坐标轴最小值刻度和下一坐标轴最大值刻度
-    显示重叠的问题。
+    """Adjust the display of the axes that are closely connected up and down, so that the
+    minimum tick of the upper axis does not overlap the maximum tick of the lower one.
 
-    :param axeslist: 上下相连的坐标轴列表 (ax1,ax2,...)
+    :param axeslist: the list of the axes connected up and down (ax1, ax2, ...)
     """
     for ax in axeslist[:-1]:
         for label in ax.get_xticklabels():
@@ -229,11 +231,11 @@ def adjust_axes_show(axeslist):
 
 
 def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
-    """绘制K线图
+    """Draw the K-line chart
 
-    :param KData kdata: K线数据
-    :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
-    :param axes:        指定的坐标轴
+    :param KData kdata: the K-line data
+    :param bool new:    whether to display in a new window; it takes effect only when axes is not specified
+    :param axes:        the specified axes
     :param colorup:     the color of the rectangle where close >= open
     :param colordown:   the color of the rectangle where close < open
     """
@@ -274,10 +276,9 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
     axes.set_title(title)
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f 涨幅:%.2f%%' % (
+    text = htr('{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f} Change:{:.2f}%').format(
         last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close,
-        100 * (last_record.close - kdata[-2].close) / kdata[-2].close
-    )
+        100 * (last_record.close - kdata[-2].close) / kdata[-2].close)
     axes.text(
         0.99, 0.97, text, horizontalalignment='right', verticalalignment='top', transform=axes.transAxes, color=color
     )
@@ -289,11 +290,11 @@ def kplot(kdata, new=True, axes=None, colorup='r', colordown='g'):
 
 
 def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
-    """绘制美式K线图
+    """Draw the American K-line chart
 
-    :param KData kdata: K线数据
-    :param bool new:    是否在新窗口中显示，只在没有指定axes时生效
-    :param axes:        指定的坐标轴
+    :param KData kdata: the K-line data
+    :param bool new:    whether to display in a new window; it takes effect only when axes is not specified
+    :param axes:        the specified axes
     :param colorup:     the color of the lines where close >= open
     :param colordown:   the color of the lines where close < open
     :param ticksize:    open/close tick marker in points
@@ -326,9 +327,8 @@ def mkplot(kdata, new=True, axes=None, colorup='r', colordown='g', ticksize=3):
     axes.set_title(title)
     last_record = kdata[-1]
     color = 'r' if last_record.close > kdata[-2].close else 'g'
-    text = u'%s 开:%.2f 高:%.2f 低:%.2f 收:%.2f' % (
-        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close
-    )
+    text = htr('{} Open:{:.2f} High:{:.2f} Low:{:.2f} Close:{:.2f}').format(
+        last_record.datetime.number / 10000, last_record.open, last_record.high, last_record.low, last_record.close)
     axes.text(
         0.99, 0.97, text, horizontalalignment='right', verticalalignment='top', transform=axes.transAxes, color=color
     )
@@ -353,21 +353,21 @@ def iplot(
     *args,
     **kwargs
 ):
-    """绘制indicator曲线
+    """Draw the indicator curve
 
-    :param Indicator indicator: indicator实例
-    :param axes:            指定的坐标轴
-    :param new:             是否在新窗口中显示，只在没有指定axes时生效
-    :param kref:            参考的K线数据，以便绘制日期X坐标
-    :param legend_on:       是否打开图例
-    :param text_on:         是否在左上角显示指标名称及其参数
-    :param text_color:      指标名称解释文字的颜色，默认为黑色
-    :param zero_on:         是否需要在y=0轴上绘制一条直线
-    :param str label:       label显示文字信息，text_on 及 legend_on 为 True 时生效
-    :param args:            pylab plot参数
-    :param kwargs:          pylab plot参数，如：marker（标记类型）、
-                             markerfacecolor（标记颜色）、
-                             markeredgecolor（标记的边缘颜色）
+    :param Indicator indicator: the Indicator instance
+    :param axes:            the specified axes
+    :param new:             whether to display in a new window; it takes effect only when axes is not specified
+    :param kref:            the referenced K-line data, used to draw the date X coordinate
+    :param legend_on:       whether to turn on the legend
+    :param text_on:         whether to display the indicator name and its parameters in the upper left corner
+    :param text_color:      the color of the indicator name text, black by default
+    :param zero_on:         whether to draw a straight line on the y=0 axis
+    :param str label:       the text displayed by the label; it takes effect when text_on and legend_on are True
+    :param args:            the pylab plot arguments
+    :param kwargs:          the pylab plot arguments, such as marker (the marker type),
+                             markerfacecolor (the marker color) and
+                             markeredgecolor (the marker edge color)
     """
     if not indicator:
         print("indicator is None")
@@ -381,7 +381,7 @@ def iplot(
 
     py_ind = ALIGN(indicator, kref) if kref is not None else indicator
 
-    # 解决缺值时无法绘图的问题 by stone 20251217
+    # Fix the problem that the chart cannot be drawn when there are null values, by stone 20251217
     # py_indicatr = [None if x == constant.null_price else x for x in indicator]
     # axes.plot(py_indicatr, linestyle=linestyle, label=label, *args, **kwargs)
 
@@ -443,22 +443,22 @@ def ibar(
     *args,
     **kwargs
 ):
-    """绘制indicator柱状图
+    """Draw the indicator bar chart
 
-    :param Indicator indicator: Indicator实例
-    :param axes:       指定的坐标轴
-    :param new:        是否在新窗口中显示，只在没有指定axes时生效
-    :param kref:       参考的K线数据，以便绘制日期X坐标
-    :param legend_on:  是否打开图例
-    :param text_on:    是否在左上角显示指标名称及其参数
-    :param text_color: 指标名称解释文字的颜色，默认为黑色
-    :param str label:  label显示文字信息，text_on 及 legend_on 为 True 时生效
-    :param zero_on:    是否需要在y=0轴上绘制一条直线
-    :param width:      Bar的宽度
-    :param color:      Bar的颜色
-    :param edgecolor:  Bar边缘颜色
-    :param args:       pylab plot参数
-    :param kwargs:     pylab plot参数
+    :param Indicator indicator: the Indicator instance
+    :param axes:       the specified axes
+    :param new:        whether to display in a new window; it takes effect only when axes is not specified
+    :param kref:       the referenced K-line data, used to draw the date X coordinate
+    :param legend_on:  whether to turn on the legend
+    :param text_on:    whether to display the indicator name and its parameters in the upper left corner
+    :param text_color: the color of the indicator name text, black by default
+    :param str label:  the text displayed by the label; it takes effect when text_on and legend_on are True
+    :param zero_on:    whether to draw a straight line on the y=0 axis
+    :param width:      the width of the bar
+    :param color:      the color of the bar
+    :param edgecolor:  the edge color of the bar
+    :param args:       the pylab plot arguments
+    :param kwargs:     the pylab plot arguments
     """
     if not indicator:
         print("indicator is None")
@@ -515,39 +515,45 @@ def ibar(
 
 def iheatmap(ind, axes=None):
     """
-    绘制指标收益年-月收益热力图
+    Draw the year-month return heatmap of the indicator
 
-    指标收益率 = (当前月末值 - 上月末值) / 上月末值 * 100
+    The indicator return = (the value at the end of the current month - the value at the end of
+    the last month) / the value at the end of the last month * 100
 
-    指标应已计算（即有值），且为时间序列
+    The indicator should have been calculated (i.e. it has values) and be a time series
 
-    :param ind: 指定指标
-    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
+    :param ind: the specified indicator
+    :param axes: the axes object to draw in; None by default, which means a new axes object is created
     :return: None
     """
     if axes is None:
         axes = create_figure()
 
     if len(ind) == 0:
-        hku_error("指标长度为0, 指标应已计算（即有值")
+        hku_error(htr("The indicator length is 0; the indicator should have been calculated (i.e. it has values)"))
         return
 
     dates = ind.get_datetime_list()
     if len(dates) == 0:
-        hku_error("获取日期列表失败！指标应为时间序列")
+        hku_error(htr("Failed to get the date list! The indicator should be a time series"))
         return
 
-    data = pd.DataFrame({'date': dates, 'value': ind.value_to_np()})
+    values = ind.value_to_np()
+    if values.dtype.names is not None:
+        # value_to_np returns a structured array when the indicator holds several result sets,
+        # and only the first result set is drawn here
+        values = values[values.dtype.names[0]]
+    data = pd.DataFrame({'date': dates, 'value': values})
     data = data[(data[['value']] != 0).all(axis=1)]
 
-    # 提取年月信息
+    # Extract the year and the month information
     data['year'] = data['date'].apply(lambda v: v.year)
     data['month'] = data['date'].apply(lambda v: v.month)
 
-    # 获取每个月的收益
+    # Get the return of each month
     monthly = data.groupby(['year', 'month']).last()['value'].reset_index()
     if len(monthly) < 2:
-        hku_warn("月数据不足！")
+        hku_warn(htr("Insufficient monthly data!"))
         return
 
     monthly['return'] = ((monthly['value'] - monthly['value'].shift(1)) / monthly['value'].shift(1)) * 100.
@@ -555,20 +561,20 @@ def iheatmap(ind, axes=None):
     pivot_data = monthly.pivot_table(index='year', columns='month', values='return')
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, annot=True, fmt="<.2f", ax=axes)
-    # 设置标题和坐标轴标签
-    axes.set_title('年-月度收益率(%)热力图')
-    axes.set_xlabel('月度')
-    axes.set_ylabel('年份')
+    # Set the title and the axis labels
+    axes.set_title(htr('Year-Month Return (%) Heatmap'))
+    axes.set_xlabel(htr('Month'))
+    axes.set_ylabel(htr('Year'))
 
 
 def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD
+    """Draw MACD
 
-    :param axes: 指定的坐标轴
+    :param axes: the specified axes
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
@@ -588,15 +594,15 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
     axt.grid(False)
     axt.set_yticks([])
 
-    # 计算MACD柱和DIF/DEA的y轴极值,并对齐
+    # Calculate and align the y-axis extremes of the MACD bar and the DIF/DEA
     y_all = np.concatenate([np.asarray(bmacd), np.asarray(fmacd), np.asarray(smacd)])
     y_min = np.nanmin(y_all)
     y_max = np.nanmax(y_all)
-    y_pad = (y_max - y_min) * 0.1  # 上下各留10%空白
+    y_pad = (y_max - y_min) * 0.1  # 10% blank space at the top and the bottom
     y_min -= y_pad
     y_max += y_pad
-    axes.set_ylim(y_min, y_max)  # 设置MACD柱y轴范围
-    axt.set_ylim(y_min, y_max)  # 设置DIF/DEA的y轴范围
+    axes.set_ylim(y_min, y_max)  # set the y range of the MACD bar
+    axt.set_ylim(y_min, y_max)  # set the y range of the DIF/DEA
 
     fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
     smacd.plot(axes=axt, legend_on=False, text_on=False)
@@ -606,17 +612,17 @@ def ax_draw_macd(axes, kdata, n1=12, n2=26, n3=9):
 
 
 def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
-    """绘制MACD。
-    当BAR值变化与参考序列ref变化不一致时，显示为灰色，
-    当BAR和参考序列ref同时上涨，显示红色
-    当BAR和参考序列ref同时下跌，显示绿色
+    """Draw MACD.
+    It is drawn in gray when the change of the BAR value is inconsistent with that of the
+    reference sequence ref, in red when both BAR and the reference sequence ref rise, and in
+    green when both of them fall.
 
-    :param axes: 指定的坐标轴
-    :param ref: 参考序列，EMA
+    :param axes: the specified axes
+    :param ref: the reference sequence, EMA
     :param KData kdata: KData
-    :param int n1: 指标 MACD 的参数1
-    :param int n2: 指标 MACD 的参数2
-    :param int n3: 指标 MACD 的参数3
+    :param int n1: the parameter 1 of the MACD indicator
+    :param int n2: the parameter 2 of the MACD indicator
+    :param int n3: the parameter 3 of the MACD indicator
     """
     macd = MACD(CLOSE(kdata), n1, n2, n3)
     bmacd, fmacd, smacd = macd.get_result(0), macd.get_result(1), macd.get_result(2)
@@ -647,15 +653,15 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
     axt.grid(False)
     axt.set_yticks([])
 
-    # 计算MACD柱和DIF/DEA的y轴极值,并对齐
+    # Calculate and align the y-axis extremes of the MACD bar and the DIF/DEA
     y_all = np.concatenate([np.asarray(bmacd), np.asarray(fmacd), np.asarray(smacd)])
     y_min = np.nanmin(y_all)
     y_max = np.nanmax(y_all)
-    y_pad = (y_max - y_min) * 0.1  # 上下各留10%空白
+    y_pad = (y_max - y_min) * 0.1  # 10% blank space at the top and the bottom
     y_min -= y_pad
     y_max += y_pad
-    axes.set_ylim(y_min, y_max)  # 设置MACD柱y轴范围
-    axt.set_ylim(y_min, y_max)  # 设置DIF/DEA的y轴范围
+    axes.set_ylim(y_min, y_max)  # set the y range of the MACD bar
+    axt.set_ylim(y_min, y_max)  # set the y range of the DIF/DEA
 
     fmacd.plot(axes=axt, linestyle='--', legend_on=False, text_on=False)
     smacd.plot(axes=axt, legend_on=False, text_on=False)
@@ -665,15 +671,16 @@ def ax_draw_macd2(axes, ref, kdata, n1=12, n2=26, n3=9):
 
 
 def sgplot(sg, new=True, axes=None, style=1, kdata=None):
-    """绘制买入/卖出信号
+    """Draw the buy/sell signals
 
-    :param SignalBase sg: 信号指示器
-    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
-    :param axes: 指定在那个轴对象中进行绘制
-    :param style: 1 | 2 信号箭头绘制样式
-    :param KData kdata: 指定的KData（即信号发生器的交易对象），
-                       如该值为None，则认为该信号发生器已经指定了交易对象，
-                       否则，使用该参数作为交易对象
+    :param SignalBase sg: the signal generator
+    :param new: it takes effect only when axes is not specified; when True, a new window object is
+        created and the drawing is done in it
+    :param axes: the axes object in which to draw
+    :param style: 1 | 2, the drawing style of the signal arrows
+    :param KData kdata: the specified KData (i.e. the trading object of the signal generator);
+        when it is None, the signal generator is assumed to have its trading object specified,
+        otherwise this argument is used as the trading object
     """
     kdata = sg.to if kdata is None else kdata
     refdates = kdata.get_datetime_list()
@@ -726,15 +733,16 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
 
 
 def evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2):
-    """绘制市场有效判断
+    """Draw the market environment (the validity judgement)
 
-    :param EnvironmentBase cn: 系统有效条件
-    :param KData ref_kdata: 用于日期参考
-    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
-    :param axes: 指定在那个轴对象中进行绘制
-    :param upcolor: 有效时的颜色
-    :param downcolor: 无效时的颜色
-    :param alpha: 透明度
+    :param EnvironmentBase cn: the market environment
+    :param KData ref_kdata: used as the date reference
+    :param new: it takes effect only when axes is not specified; when True, a new window object is
+        created and the drawing is done in it
+    :param axes: the axes object in which to draw
+    :param upcolor: the color when the environment is valid
+    :param downcolor: the color when the environment is invalid
+    :param alpha: the transparency
     """
     refdates = ref_kdata.get_datetime_list()
     if axes is None:
@@ -753,16 +761,17 @@ def evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', 
 
 
 def cnplot(cn, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2):
-    """绘制系统有效条件
+    """Draw the condition (the system valid condition)
 
-    :param ConditionBase cn: 系统有效条件
-    :param new: 仅在未指定axes的情况下生效，当为True时，创建新的窗口对象并在其中进行绘制
-    :param axes: 指定在那个轴对象中进行绘制
-    :param KData kdata: 指定的KData，如该值为None，则认为该系统有效条件已经
-                        指定了交易对象，否则，使用该参数作为交易对象
-    :param upcolor: 有效数时的颜色
-    :param downcolor: 无效时的颜色
-    :param alpha: 透明度
+    :param ConditionBase cn: the condition base
+    :param new: it takes effect only when axes is not specified; when True, a new window object is
+        created and the drawing is done in it
+    :param axes: the axes object in which to draw
+    :param KData kdata: the specified KData; when it is None, the condition is assumed to have its
+        trading object specified, otherwise this argument is used as the trading object
+    :param upcolor: the color when the condition is valid
+    :param downcolor: the color when the condition is invalid
+    :param alpha: the transparency
     """
     if kdata is None:
         kdata = cn.to
@@ -786,14 +795,14 @@ def cnplot(cn, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue',
 
 
 def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
-    """绘制系统实际买入/卖出信号
+    """Draw the actual buy/sell signals of the system
 
-    :param SystemBase sys: 系统实例
-    :param new:   仅在未指定axes的情况下生效，当为True时，
-                   创建新的窗口对象并在其中进行绘制
-    :param axes:  指定在那个轴对象中进行绘制
-    :param style: 1 | 2 信号箭头绘制样式
-    :param bool only_draw_close: 不绘制K线，仅绘制 close
+    :param SystemBase sys: the system instance
+    :param new:   it takes effect only when axes is not specified; when True,
+                   a new window object is created and the drawing is done in it
+    :param axes:  the axes object in which to draw
+    :param style: 1 | 2, the drawing style of the signal arrows
+    :param bool only_draw_close: do not draw the K-line, and draw the close only
     """
     kdata = sys.to
 
@@ -861,12 +870,14 @@ def sysplot(sys, new=True, axes=None, style=1, only_draw_close=False):
 
 def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: bool = True, log: bool = False):
     """
-    绘制系统绩效，即账户累积收益率曲线
+    Draw the system performance, i.e. the account cumulative return curve
 
-    :param TradeManager tm: 账户实例
-    :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
-    :param bool ext: 是否统计扩展信息（捐赠用户，否则仍为默认统计项）
-    :param bool log: Y轴是否使用对数坐标
+    :param TradeManager tm: the account (the TradeManager) instance
+    :param Stock ref_stk: the reference stock, sh000300 (the CSI 300) by default; the return curve
+        of the reference object is drawn
+    :param bool ext: whether to calculate the extended information (for the donators; otherwise the
+        default statistics are still used)
+    :param bool log: whether the Y axis uses the logarithmic coordinates
     :return: None
     """
     if ref_stk is None:
@@ -888,26 +899,28 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     per = tm.get_performance(sh000001_k[-1].datetime, ext=ext)
     text = per.report()
 
-    # 计算最大回撤百分比
+    # Calculate the max drawdown percentage
     max_pullback = MDD(funds)[-1]
 
-    # 计算当前点到历史最高点的回撤百分比
+    # Calculate the percentage of the drawdown from the current point to the historical highest point
     mdd_current = MDD_CURRENT(funds)[-1]
 
-    # 计算 sharp
+    # Calculate the Sharpe ratio
     bond = ZHBOND10(ref_dates)
-    sigma = STDEV(ROCP(funds), 0)  # n=0: 全期样本标准差（expand-all）
+    sigma = STDEV(ROCP(funds), 0)  # n=0: the sample standard deviation of the whole period (expand-all)
     sigma = 15.874507866387544 * sigma[-1]  # 15.874 = sqrt(252)
-    sharp = (per['帐户平均年收益率%'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
+    sharp = (per['Account Avg Annual Return %'] - bond[-1]) * 0.01 / sigma if sigma != 0.0 else 0.0
 
-    invest_total = per['累计投入本金'] + per['累计投入资产']
-    cur_fund = per['当前总资产']
-    t1 = '投入总资产: {:<.2f}    当前总资产: {:<.2f}    当前盈利: {:<.2f}'.format(
+    invest_total = per['Total Invested Principal'] + per['Total Invested Assets']
+    cur_fund = per['Current Total Assets']
+    t1 = htr('Total Invested Assets: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}').format(
         invest_total, cur_fund, cur_fund - invest_total)
-    t2 = '当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回撤: {:<.2f}%    当前距历史最高点回撤: {:<.2f}%'.format(
-        funds_return[-1]*100 - 100, per["帐户平均年收益率%"], max_pullback, mdd_current)
-    t3 = '系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}'.format(
-        per['赢利交易比例%'], per['净赢利/亏损比例'], sharp)
+    t2 = htr(
+        'Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%'
+        '    Current Drawdown from Peak: {:<.2f}%').format(
+            funds_return[-1] * 100 - 100, per["Account Avg Annual Return %"], max_pullback, mdd_current)
+    t3 = htr('Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
+        per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
 
     import matplotlib.pyplot as plt
     fg = plt.figure(figsize=(15, 10))
@@ -918,9 +931,13 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
     if log:
         ax1.set_yscale('log')
 
-    ref_return.plot(axes=ax1, legend_on=True, label=f'{ref_stk.name}({ref_stk.market_code}) 收益曲线')
-    funds_return.plot(axes=ax1, legend_on=True, label=f'{tm.name} 累积收益率 {funds_return[-1]*100.:<.2f}%')
-    ax1.set_title(f"账户({tm.name}) 累积收益率")
+    ref_return.plot(axes=ax1,
+                    legend_on=True,
+                    label=htr('{} Return Curve').format(f'{ref_stk.name}({ref_stk.market_code})'))
+    funds_return.plot(axes=ax1,
+                      legend_on=True,
+                      label=htr('{} Cumulative Return {:<.2f}%').format(tm.name, funds_return[-1] * 100.))
+    ax1.set_title(htr('Account({}) Cumulative Return').format(tm.name))
     label = t1 + '\n\n' + t2 + '\n\n' + t3
     ax2.text(0,
              1,
@@ -950,17 +967,19 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
         ax1.yaxis.set_minor_formatter(NullFormatter())
         ax1.yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}'))
         ax1.yaxis.set_minor_formatter(FuncFormatter(lambda x, pos: f'{x:.1f}'))
-    return ax1  # 返回主图axis
+    return ax1  # return the main axes
 
 
 def sys_performance(sys, ref_stk=None, ext=True, log=False):
     """
-    绘制系统绩效，即账户累积收益率曲线
+    Draw the system performance, i.e. the account cumulative return curve
 
-    :param SystemBase sys: SYS实例
-    :param Stock ref_stk: 参考股票, 默认为沪深300: sh000300, 绘制参考标的的收益曲线
-    :param bool ext: 是否统计扩展信息（需捐赠用户权限，否则仍为默认统计项）
-    :param bool log: Y轴是否使用对数坐标
+    :param SystemBase sys: the SYS instance
+    :param Stock ref_stk: the reference stock, sh000300 (the CSI 300) by default; the return curve
+        of the reference object is drawn
+    :param bool ext: whether to calculate the extended information (for the donators; otherwise the
+        default statistics are still used)
+    :param bool log: whether the Y axis uses the logarithmic coordinates
     :return: None
     """
     if ref_stk is None:
@@ -972,13 +991,13 @@ def sys_performance(sys, ref_stk=None, ext=True, log=False):
 
 def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     """
-    绘制账户收益年-月收益热力图
+    Draw the year-month return heatmap of the account
 
-    :param tm: 交易账户
-    :param start_date: 开始日期
-    :param end_date: 结束日期，默认为今天
-    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
-    :param show_high_low: 是否显示月度最高收益和最低收益，默认为False
+    :param tm: the trade manager (the account)
+    :param start_date: the start date
+    :param end_date: the end date, today by default
+    :param axes: the axes object to draw in; None by default, which means a new axes object is created
+    :param show_high_low: whether to display the monthly highest and lowest returns, False by default
     :return: None
     """
     if axes is None:
@@ -989,30 +1008,31 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
 
     dates = get_date_range(start_date, end_date)
     if len(dates) == 0:
-        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        hku_error(htr("No data, please check the date range! start_date={}, end_date={}"), start_date, end_date)
         return
 
     funds = tm.get_funds_curve(dates)
     if len(funds) == 0:
-        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
-                  tm.init_datetime, start_date, end_date)
+        hku_error(
+            htr("Failed to get the tm return curve, please check the tm initial date!"
+                " tm.init_datetime={} start_date={}, end_date={}"), tm.init_datetime, start_date, end_date)
         return
 
     data = pd.DataFrame({'date': dates, 'value': funds})
     data = data[(data[['value']] != 0).all(axis=1)]
 
-    # 提取年月信息
+    # Extract the year and the month information
     data['year'] = data['date'].apply(lambda v: v.year)
     data['month'] = data['date'].apply(lambda v: v.month)
 
-    # 获取每个月的最后值、最高值和最低值
+    # Get the last value, the highest value and the lowest value of each month
     monthly = data.groupby(['year', 'month']).agg(
         last_value=('value', 'last'),
         max_value=('value', 'max'),
         min_value=('value', 'min')
     ).reset_index()
     if len(monthly) < 2:
-        hku_warn("月数据不足！")
+        hku_warn(htr("Insufficient monthly data!"))
         return
 
     monthly['return'] = ((monthly['last_value'] - monthly['last_value'].shift(1)) /
@@ -1032,8 +1052,9 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
         (yearly_value.loc[0, 'last_value'] - yearly_first.loc[0, 'value']) / yearly_first.loc[0, 'value']) * 100.
 
     year_return_df = yearly_value.set_index('year')['year_return']
+    annual_col = htr('Annual Return')
     pivot_data[''] = np.nan
-    pivot_data['年度收益'] = year_return_df
+    pivot_data[annual_col] = year_return_df
 
     annot_matrix = []
     for year in pivot_data.index:
@@ -1052,7 +1073,7 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
                     row.append("")
             elif col == '':
                 row.append("")
-            elif col == '年度收益':
+            elif col == annual_col:
                 row.append(f"{year_return_df.loc[year]:.2f}" if year in year_return_df.index else "")
         annot_matrix.append(row)
 
@@ -1060,21 +1081,21 @@ def tm_heatmap(tm, start_date, end_date=None, axes=None, show_high_low=False):
     v_limit = max(max_abs_return, 5)
 
     sns.heatmap(pivot_data, cmap='RdYlGn_r', center=0, vmin=-v_limit, vmax=v_limit, annot=annot_matrix, fmt='', ax=axes)
-    # 设置标题和坐标轴标签
-    axes.set_title(f'{tm.name} 年-月度收益率(%)热力图')
-    axes.set_xlabel('月度')
-    axes.set_ylabel('年份')
+    # Set the title and the axis labels
+    axes.set_title(htr('{} Year-Month Return (%) Heatmap').format(tm.name))
+    axes.set_xlabel(htr('Month'))
+    axes.set_ylabel(htr('Year'))
 
 
 def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True):
     """
-    绘制账户各年度收益柱状图
+    Draw the annual return bar chart of the account
 
-    :param tm: 交易账户
-    :param start_date: 开始日期
-    :param end_date: 结束日期，默认为今天
-    :param axes: 绘制的轴对象，默认为None，表示创建新的轴对象
-    :param show_high_low: 是否显示年度最高收益和最低收益，默认为False
+    :param tm: the trade manager (the account)
+    :param start_date: the start date
+    :param end_date: the end date, today by default
+    :param axes: the axes object to draw in; None by default, which means a new axes object is created
+    :param show_high_low: whether to display the yearly highest and lowest returns, False by default
     :return: None
     """
     if axes is None:
@@ -1085,13 +1106,14 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
 
     dates = get_date_range(start_date, end_date)
     if len(dates) == 0:
-        hku_error("没有数据，请检查日期范围！start_date={}, end_date={}", start_date, end_date)
+        hku_error(htr("No data, please check the date range! start_date={}, end_date={}"), start_date, end_date)
         return
 
     funds = tm.get_funds_curve(dates)
     if len(funds) == 0:
-        hku_error("获取 tm 收益曲线失败，请检查 tm 初始日期！tm.init_datetime={} start_date={}, end_date={}",
-                  tm.init_datetime, start_date, end_date)
+        hku_error(
+            htr("Failed to get the tm return curve, please check the tm initial date!"
+                " tm.init_datetime={} start_date={}, end_date={}"), tm.init_datetime, start_date, end_date)
         return
 
     data = pd.DataFrame({'date': dates, 'value': funds})
@@ -1107,7 +1129,7 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
     yearly_first = data.groupby('year').first()['value'].reset_index()
 
     if len(yearly) < 1:
-        hku_warn("年度数据不足！")
+        hku_warn(htr("Insufficient yearly data!"))
         return
 
     yearly['return'] = ((yearly['last_value'] - yearly['last_value'].shift(1)) /
@@ -1139,10 +1161,10 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
         if show_high_low:
             if max_ret > ret:
                 axes.bar(x_pos[i], max_ret - ret, bottom=ret, width=bar_width,
-                         color=max_color, alpha=0.4, label='最高收益范围' if i == 0 else "")
+                         color=max_color, alpha=0.4, label=htr('Highest Return Range') if i == 0 else "")
             if min_ret < ret:
                 axes.bar(x_pos[i], ret - min_ret, bottom=min_ret, width=bar_width,
-                         color=min_color, alpha=0.7, label='最低收益范围' if i == 0 else "")
+                         color=min_color, alpha=0.7, label=htr('Lowest Return Range') if i == 0 else "")
 
         axes.bar(x_pos[i], ret, width=bar_width, color=base_color, alpha=0.9)
 
@@ -1160,24 +1182,24 @@ def tm_year_profit(tm, start_date, end_date=None, axes=None, show_high_low=True)
     if show_high_low:
         axes.legend()
 
-    axes.set_title(f'{tm.name} 年度收益率(%)柱状图')
-    axes.set_xlabel('年份')
-    axes.set_ylabel('收益率(%)')
+    axes.set_title(htr('{} Annual Return (%) Bar Chart').format(tm.name))
+    axes.set_xlabel(htr('Year'))
+    axes.set_ylabel(htr('Return (%)'))
     axes.grid(axis='y', linestyle='--', alpha=0.7)
 
 
 def sys_heatmap(sys, axes=None):
     """
-    绘制系统收益年-月收益热力图
+    Draw the year-month return heatmap of the system
     """
-    hku_check(sys.tm is not None, "系统未初始化交易账户")
+    hku_check(sys.tm is not None, htr("The system has no trade manager initialized"))
     query = sys.query
     k = get_kdata('sh000001', query)
     tm_heatmap(sys.tm, k[0].datetime, k[-1].datetime, axes)
 
 
 # ============================================================================
-# 通达信画图函数
+# The TDX drawing functions
 # ============================================================================
 DRAWNULL = constant.null_price
 
@@ -1189,21 +1211,22 @@ def RGB(r: int, g: int, b: int):
 
 def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: float = 2.0,
               empty: bool = False, color='m', alpha=1.0, kdata=None, new=False, axes=None):
-    """在满足cond的条件下，在 price1 和 price2 之间绘制一个宽度为 width 的柱状图。
+    """Draw a bar with the width of width between price1 and price2 when cond is satisfied.
 
-    注意: cond, price1, price2 应含有数据，否则请指定 kdata 作为指标计算的上下文
+    Note: cond, price1 and price2 should contain data; otherwise, specify kdata as the context of
+    the indicator calculation
 
-    参数说明:
-        cond (Indicator): 条件表达式，用于确定是否绘制柱状线
-        price1 (Indicator): 第一个价格
-        price2 (Indicator): 第二个价格
-        width (float, optional): 柱状宽度. Defaults to 2.0.
-        empty (bool, optional): 空心. Defaults to False.
-        kdata (_type_, optional): 指定的上下文K线. Defaults to None.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
-        color (str, optional): 颜色. Defaults to 'm'.
-        alpha (float, optional): 透明度. Defaults to 1.0.
+    The parameters:
+        cond (Indicator): the condition expression, used to determine whether to draw the bar
+        price1 (Indicator): the first price
+        price2 (Indicator): the second price
+        width (float, optional): the width of the bar. Defaults to 2.0.
+        empty (bool, optional): hollow. Defaults to False.
+        kdata (_type_, optional): the specified context K-line. Defaults to None.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): draw in the specified axes. Defaults to None.
+        color (str, optional): the color. Defaults to 'm'.
+        alpha (float, optional): the transparency. Defaults to 1.0.
     """
     hku_check(cond is not None and price1 is not None and price2 is not None, "cond, price1, price2 cannot be None")
 
@@ -1233,22 +1256,22 @@ def STICKLINE(cond: Indicator, price1: Indicator, price2: Indicator, width: floa
 
 
 def DRAWBAND(val1: Indicator, color1='m', val2: Indicator = None, color2='b', kdata=None, alpha=0.2, new=False, axes=None, linestyle='-'):
-    """画出带状线
+    """Draw the band
 
-    用法:DRAWBAND(val1, color1, val2, color2), 当 val1 > val2 时,在 val1 和 val2 之间填充 color1;
-    当 val1 < val2 时,填充 color2,这里的颜色均使用 matplotlib 颜色代码.
-    例如:DRAWBAND(OPEN, 'r', CLOSE, 'b')
+    Usage: DRAWBAND(val1, color1, val2, color2); when val1 > val2, the area between val1 and val2 is
+    filled with color1; when val1 < val2, it is filled with color2. The colors here all use the
+    matplotlib color codes.
+    For example: DRAWBAND(OPEN, 'r', CLOSE, 'b')
 
-    Args:
-        val1 (Indicator): 指标1
-        color1 (str, optional): 颜色1. Defaults to 'm'.
-        val2 (Indicator, optional): 指标2. Defaults to None.
-        color2 (str, optional): 颜色2. Defaults to 'b'.
-        kdata (_type_, optional): 指定指标上下文. Defaults to None.
-        alpha (float, optional): 透明度. Defaults to 0.2.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 在指定的坐标轴中绘制. Defaults to None.
-        linestyle (str, optional): 包络线类型. Defaults to '-'.
+        val1 (Indicator): the indicator 1
+        color1 (str, optional): the color 1. Defaults to 'm'.
+        val2 (Indicator, optional): the indicator 2. Defaults to None.
+        color2 (str, optional): the color 2. Defaults to 'b'.
+        kdata (_type_, optional): the indicator context. Defaults to None.
+        alpha (float, optional): the transparency. Defaults to 0.2.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): draw in the specified axes. Defaults to None.
+        linestyle (str, optional): the envelope line type. Defaults to '-'.
     """
     hku_check(val1 is not None, "val1 cannot be None")
 
@@ -1279,19 +1302,20 @@ def DRAWBAND(val1: Indicator, color1='m', val2: Indicator = None, color2='b', kd
 
 
 def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str = 'm', linewidth=1.0, new=False, axes=None, *args, **kwargs):
-    """在图形上绘制折线段。
+    """Draw a polyline on the chart.
 
-    用法：PLOYLINE(COND，PRICE)，当COND条件满足时，以PRICE位置为顶点画折线连接。
-    例如：PLOYLINE(HIGH>=HHV(HIGH,20),HIGH, kdata=k)表示在创20天新高点之间画折线。
+    Usage: PLOYLINE(COND, PRICE); when the COND condition is satisfied, a polyline is drawn with
+    the PRICE position as the vertices.
+    For example: PLOYLINE(HIGH>=HHV(HIGH,20),HIGH, kdata=k) draws a polyline between the points
+    that hit a new 20-day high.
 
-    Args:
-        cond (Indicator): 指定条件
-        price (Indicator): 位置
-        kdata (KData, optional): 指定的上下文. Defaults to None.
-        color (str, optional): 颜色. Defaults to 'b'.
-        linewidth (float, optional): 宽度. Defaults to 1.0.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定的axes. Defaults to None.
+        cond (Indicator): the specified condition
+        price (Indicator): the position
+        kdata (KData, optional): the specified context. Defaults to None.
+        color (str, optional): the color. Defaults to 'b'.
+        linewidth (float, optional): the width. Defaults to 1.0.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     hku_check(cond is not None and price is not None, "cond, price cannot be None")
 
@@ -1320,22 +1344,26 @@ def PLOYLINE(cond: Indicator, price: Indicator, kdata: KData = None, color: str 
 
 
 def DRAWLINE(cond1: Indicator, price1: Indicator, cond2: Indicator, price2: Indicator, expand: int = 0, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
-    """在图形上绘制直线段。
+    """Draw a straight line on the chart.
 
-    用法：DRAWLINE(cond1, price1, cond2, price2, expand)
-    当COND1条件满足时，在PRICE1位置画直线起点，当COND2条件满足时，在PRICE2位置画直线终点，EXPAND为延长类型。
-    例如：DRAWLINE(HIGH>=HHV(HIGH,20),HIGH,LOW<=LLV(LOW,20),LOW,1)表示在创20天新高与创20天新低之间画直线并且向右延长
+    Usage: DRAWLINE(cond1, price1, cond2, price2, expand)
+    When the COND1 condition is satisfied, the start point of the line is drawn at the PRICE1
+    position; when the COND2 condition is satisfied, the end point is drawn at the PRICE2
+    position, and EXPAND is the extension type.
+    For example: DRAWLINE(HIGH>=HHV(HIGH,20),HIGH,LOW<=LLV(LOW,20),LOW,1) draws a straight line
+    between the points that hit a new 20-day high and a new 20-day low, and extends it to the
+    right.
 
-    Args:
-        cond1 (Indicator): 条件1
-        price1 (Indicator): 位置1
-        cond2 (Indicator): 条件2
-        price2 (Indicator): 位置2
-        expand (int, optional): 0: 不延长 | 1: 向右延长 | 10: 向左延长 | 11: 双向延长. Defaults to 0.
-        kdata (KData, optional): 指定的上下文. Defaults to None.
-        color (str, optional): 指定颜色. Defaults to 'm'.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+        cond1 (Indicator): the condition 1
+        price1 (Indicator): the position 1
+        cond2 (Indicator): the condition 2
+        price2 (Indicator): the position 2
+        expand (int, optional): 0: no extension | 1: extend to the right | 10: extend to the left
+            | 11: extend to both directions. Defaults to 0.
+        kdata (KData, optional): the specified context. Defaults to None.
+        color (str, optional): the specified color. Defaults to 'm'.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     hku_check(cond1 is not None and cond2 is not None and price1 is not None and price2 is not None,
               "cond1, cond2, price1, price2 cannot be None")
@@ -1389,19 +1417,20 @@ def DRAWLINE(cond1: Indicator, price1: Indicator, cond2: Indicator, price2: Indi
 
 
 def DRAWTEXT(cond: Indicator, price: Indicator, text: str, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
-    """在图形上显示文字。
+    """Display the text on the chart.
 
-    用法: DRAWTEXT(cond, price, text), 当 cond 条件满足时, 在 price 位置书写文字 text。
-    例如: DRAWTEXT(CLOSE/OPEN>1.08,LOW,'大阳线')表示当日实体阳线大于8%时在最低价位置显示'大阳线'字样.
+    Usage: DRAWTEXT(cond, price, text); when the cond condition is satisfied, the text is drawn
+    at the price position.
+    For example: DRAWTEXT(CLOSE/OPEN>1.08,LOW,'大阳线') displays the text '大阳线' at the lowest
+    price position when the real body of the bullish candle of the day is greater than 8%.
 
-    Args:
-        cond (Indicator): 条件
-        price (Indicator): 显示位置
-        text (str): 待显示文字
-        kdata (KData, optional): 指定的上下文. Defaults to None.
-        color (str, optional): 指定颜色. Defaults to 'm'.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+        cond (Indicator): the condition
+        price (Indicator): the display position
+        text (str): the text to display
+        kdata (KData, optional): the specified context. Defaults to None.
+        color (str, optional): the specified color. Defaults to 'm'.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     hku_check(cond is not None and price is not None, "cond, price cannot be None")
 
@@ -1423,24 +1452,26 @@ def DRAWTEXT(cond: Indicator, price: Indicator, text: str, kdata: KData = None, 
 
 
 def DRAWTEXT_FIX(cond: Indicator, x: float, y: float,  type: int, text: str, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
-    """固定位置显示文字
+    """Display the text at a fixed position
 
-    用法:DRAWTEXT_FIX(cond,x y, text), cond 中一般需要加 ISLASTBAR,当 cond 条件满足时,
-    在当前指标窗口内(X,Y)位置书写文字TEXT,X,Y为书写点在窗口中相对于左上角的百分比
+    Usage: DRAWTEXT_FIX(cond, x, y, text); ISLASTBAR is usually added to cond. When the cond
+    condition is satisfied, the text is drawn at the (X, Y) position in the current indicator
+    window, where X and Y are the percentages of the writing point relative to the upper left
+    corner of the window.
 
-    例如:DRAWTEXT_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08),0.5,0.5,0,'大阳线')表示最后一个交易日实体阳线
-    大于8%时在窗口中间位置显示'大阳线'字样.
+    For example: DRAWTEXT_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08),0.5,0.5,0,'大阳线') displays the
+    text '大阳线' in the middle of the window when the real body of the bullish candle of the
+    last trading day is greater than 8%.
 
-    Args:
-        cond (Indicator): 条件
-        x (float): x轴坐标
-        y (float): y轴坐标
-        type (int, optional): 0 左对齐 | 1 右对齐. 
-        text (str): 待显示文字
-        kdata (KData, optional): 指定的上下文. Defaults to None.
-        color (str, optional): 指定颜色. Defaults to 'm'.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定坐标轴. Defaults to None.
+        cond (Indicator): the condition
+        x (float): the x coordinate
+        y (float): the y coordinate
+        type (int, optional): 0 left aligned | 1 right aligned.
+        text (str): the text to display
+        kdata (KData, optional): the specified context. Defaults to None.
+        color (str, optional): the specified color. Defaults to 'm'.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     hku_check(cond is not None, "cond cannot be None")
     if kdata is not None:
@@ -1460,19 +1491,20 @@ def DRAWTEXT_FIX(cond: Indicator, x: float, y: float,  type: int, text: str, kda
 
 
 def DRAWNUMBER(cond: Indicator, price: Indicator, number: Indicator, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
-    """画出数字.
+    """Draw the number.
 
-    用法:DRAWNUMBER(cond, price, number),当 cond 条件满足时,在 price 位置书写数字 number.
-    例如:DRAWNUMBER(CLOSE/OPEN>1.08,LOW,C)表示当日实体阳线大于8%时在最低价位置显示收盘价。
+    Usage: DRAWNUMBER(cond, price, number); when the cond condition is satisfied, the number is
+    drawn at the price position.
+    For example: DRAWNUMBER(CLOSE/OPEN>1.08,LOW,C) displays the close price at the lowest price
+    position when the real body of the bullish candle of the day is greater than 8%.
 
-    Args:
-        cond (Indicator): 条件
-        price (Indicator): 绘制位置
-        number (Indicator): 待绘制数字
-        kdata (KData, optional): 指定的上下文. Defaults to None.
-        color (str, optional): 指定颜色. Defaults to 'm'.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+        cond (Indicator): the condition
+        price (Indicator): the drawing position
+        number (Indicator): the number to draw
+        kdata (KData, optional): the specified context. Defaults to None.
+        color (str, optional): the specified color. Defaults to 'm'.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     hku_check(cond is not None and price is not None, "cond, price cannot be None")
 
@@ -1495,12 +1527,16 @@ def DRAWNUMBER(cond: Indicator, price: Indicator, number: Indicator, kdata: KDat
 
 
 def DRAWNUMBER_FIX(cond: Indicator, x: float, y: float, type: int, number: float, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
-    """固定位置显示数字.
+    """Display the number at a fixed position.
 
-    用法:DRAWNUMBER_FIX(cond,x,y,type,number), cond 中一般需要加 ISLASTBAR, 当 cond 条件满足时,
-    在当前指标窗口内 (x, y) 位置书写数字 number, x,y为书写点在窗口中相对于左上角的百分比,type:0为左对齐,1为右对齐。
+    Usage: DRAWNUMBER_FIX(cond, x, y, type, number); ISLASTBAR is usually added to cond. When the
+    cond condition is satisfied, the number is drawn at the (x, y) position in the current
+    indicator window, where x and y are the percentages of the writing point relative to the
+    upper left corner of the window, and type: 0 for left aligned, 1 for right aligned.
 
-    例如:DRAWNUMBER_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08), 0.5,0.5,0,C)表示最后一个交易日实体阳线大于8%时在窗口中间位置显示收盘价
+    For example: DRAWNUMBER_FIX(ISLASTBAR() & (CLOSE/OPEN>1.08), 0.5,0.5,0,C) displays the close
+    price in the middle of the window when the real body of the bullish candle of the last
+    trading day is greater than 8%
 
     Args:
         cond (Indicator): _description_
@@ -1517,27 +1553,29 @@ def DRAWNUMBER_FIX(cond: Indicator, x: float, y: float, type: int, number: float
 
 
 def DRAWSL(cond: Indicator, price: Indicator, slope: Union[Indicator, float, int], length: Union[Indicator, float, int], direct: int, kdata: KData = None, color: str = 'm', new=False, axes=None, *args, **kwargs):
-    """绘制斜线.
+    """Draw the slanted line.
 
-    用法:DRAWSL(cond,price,slope,length,diect),当 cond 条件满足时,在 price 位置画斜线, slope 为斜率, 
-    lengh为长度, direct 为0向右延伸,1向左延伸,2双向延伸。
+    Usage: DRAWSL(cond, price, slope, length, diect); when the cond condition is satisfied, a
+    slanted line is drawn at the price position, where slope is the slope, length is the length,
+    and direct: 0 for extending to the right, 1 for extending to the left, 2 for extending to
+    both directions.
 
-    注意:
-    1. K线间的纵向高度差为 slope;
-    2. slope 为 0 时, 为水平线;
-    3. slope 为 10000 时, 为垂直线, length 为向上的像素高度, direct 表示向上或向下延伸
-    4. slope 和 length 支持变量;
+    Note:
+    1. The vertical height difference between the K-lines is slope;
+    2. When slope is 0, it is a horizontal line;
+    3. When slope is 10000, it is a vertical line, length is the pixel height upward, and direct
+       indicates extending upward or downward;
+    4. slope and length support the variables;
 
-    Args:
-        cond (Indicator): 条件指标
-        price (Indicator): 价格
-        slope (int|float|Indicator): 斜率
-        length (int|float|Indicator): 长度
-        direct (int): 方向
-        kdata (KData, optional): 指定的上下文. Defaults to None.
-        color (str, optional): 颜色. Defaults to 'm'.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+        cond (Indicator): the condition indicator
+        price (Indicator): the price
+        slope (int|float|Indicator): the slope
+        length (int|float|Indicator): the length
+        direct (int): the direction
+        kdata (KData, optional): the specified context. Defaults to None.
+        color (str, optional): the color. Defaults to 'm'.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     hku_check(cond is not None and price is not None, "cond, price cannot be None")
     hku_check(direct in (0, 1, 2), "direct must be 0,1,2")
@@ -1580,18 +1618,18 @@ def DRAWSL(cond: Indicator, price: Indicator, slope: Union[Indicator, float, int
 
 
 def DRAWIMG(cond: Indicator, price: Indicator, img: str, kdata: KData = None, new=False, axes=None, *args, **kwargs):
-    """画图片
+    """Draw the image
 
-    用法:DRAWIMG(cond,price,'图像文件文件名'),当条件 cond 满足时,在 price 位置画指定的图片
-    例如:DRAWIMG(O>C,CLOSE, '123.png')。
+    Usage: DRAWIMG(cond, price, 'the image file name'); when the cond condition is satisfied,
+    the specified image is drawn at the price position.
+    For example: DRAWIMG(O>C, CLOSE, '123.png').
 
-    Args:
-        cond (Indicator): 指定条件
-        price (Indicator): 指定价格
-        img (str): 图像文件名
-        kdata (KData, optional): 指定上下文. Defaults to None.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 在指定坐标轴中绘制. Defaults to None.
+        cond (Indicator): the specified condition
+        price (Indicator): the specified price
+        img (str): the image file name
+        kdata (KData, optional): the context. Defaults to None.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): draw in the specified axes. Defaults to None.
     """
     hku_check(cond is not None and price is not None, "cond, price cannot be None")
 
@@ -1613,7 +1651,7 @@ def DRAWIMG(cond: Indicator, price: Indicator, img: str, kdata: KData = None, ne
     y0, y1 = axes.get_ylim()
     xw = x1 - x0
     yh = y1 - y0
-    pixel = 20.  # 显示像素大小
+    pixel = 20.  # the display pixel size
     w = xw / pw * pixel
     h = yh / ph * pixel
     for i in range(cond.discard, len(cond)):
@@ -1630,26 +1668,26 @@ DRAWBMP = DRAWIMG
 
 
 def DRAWICON(cond: Indicator, price: Indicator, type: int, kdata: KData = None, new=False, axes=None, *args, **kwargs):
-    """绘制内置 icon
+    """Draw the built-in icon
 
-    用法:DRAWICON(cond,price,1),当条件 cond 满足时,在 price 位置编号为1的内置图标
-    例如:DRAWICON(O>C,CLOSE, 1)。
+    Usage: DRAWICON(cond, price, 1); when the cond condition is satisfied, the built-in icon
+    with the number 1 is drawn at the price position.
+    For example: DRAWICON(O>C, CLOSE, 1).
 
-    可以使用 SHOWICONS() 显示所有内置图标。
+    SHOWICONS() can be used to display all the built-in icons.
 
-    Args:
-        cond (Indicator): 指定条件
-        price (Indicator): 指定价格
-        type (int): icon 编号
-        kdata (KData, optional): 指定上下文. Defaults to None.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 在指定坐标轴中绘制. Defaults to None.
+        cond (Indicator): the specified condition
+        price (Indicator): the specified price
+        type (int): the icon number
+        kdata (KData, optional): the context. Defaults to None.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): draw in the specified axes. Defaults to None.
     """
     DRAWIMG(cond, price, f'{ICON_PATH}/icon/{type}.png', kdata, new, axes, *args, **kwargs)
 
 
 def SHOWICONS():
-    """显示所有内置图标"""
+    """Display all the built-in icons"""
     axes = create_one_axes_figure([8, 6])
     p = axes.get_window_extent()
     pw = p.x1 - p.x0
@@ -1658,7 +1696,7 @@ def SHOWICONS():
     y0, y1 = axes.get_ylim()
     xw = x1 - x0
     yh = y1 - y0
-    pixel = 100.  # 显示像素大小
+    pixel = 100.  # the display pixel size
     w = xw / pw * pixel
     h = yh / ph * pixel
 
@@ -1681,25 +1719,29 @@ def SHOWICONS():
 
 
 def DRAWRECTREL(left: int, top: int, right: int, bottom: int, color='m', frame=True, fill=True, alpha=0.1, new=False, axes=None, *args, **kwargs):
-    """相对位置上画矩形.
+    """Draw a rectangle at the relative position.
 
-    注意：原点为坐标轴左上角(0, 0)，和 matplotlib 不同。
-    用法: DRAWRECTREL(left,top,right,bottom,color), 以图形窗口 (left, top) 为左上角, (right, bottom) 为
-         右下角绘制矩形, 坐标单位是窗口沿水平和垂直方向的1/1000,取值范围是0—999,超出范围则可能显示在图形窗口外,矩形
-         中间填充颜色COLOR,COLOR为0表示不填充.
-    例如:DRAWRECTREL(0,0,500,500,RGB(255,255,0)) 表示在图形最左上部1/4位置用黄色绘制矩形
+    Note: the origin is the upper left corner (0, 0) of the axes, which is different from
+    matplotlib.
+    Usage: DRAWRECTREL(left, top, right, bottom, color); a rectangle is drawn with (left, top)
+    of the chart window as the upper left corner and (right, bottom) as the lower right corner.
+    The unit of the coordinates is 1/1000 of the window along the horizontal and the vertical
+    directions, and the value range is 0-999; out of the range, it may be displayed outside
+    the chart window. The middle of the rectangle is filled with the color COLOR, and COLOR=0
+    means no filling.
+    For example: DRAWRECTREL(0,0,500,500,RGB(255,255,0)) draws a rectangle in yellow at the
+    leftmost upper 1/4 of the chart.
 
-    Args:
-        left (int): 左上角x
-        top (int): 左上角y
-        right (int): 右下角x
-        bottom (int): 右下角y
-        color (str, optional): 指定颜色. Defaults to 'm'.
-        frame (bool, optional): 添加边框. Defaults to False.
-        fill (bool, optional): 颜色填充. Defaults to True.
-        alpha (float, optional): 透明度. Defaults to 0.1.
-        new (bool, optional): 在新窗口中绘制. Defaults to False.
-        axes (_type_, optional): 指定的坐标轴. Defaults to None.
+        left (int): the x of the upper left corner
+        top (int): the y of the upper left corner
+        right (int): the x of the lower right corner
+        bottom (int): the y of the lower right corner
+        color (str, optional): the specified color. Defaults to 'm'.
+        frame (bool, optional): add the border. Defaults to False.
+        fill (bool, optional): fill the color. Defaults to True.
+        alpha (float, optional): the transparency. Defaults to 0.1.
+        new (bool, optional): draw in a new window. Defaults to False.
+        axes (_type_, optional): the specified axes. Defaults to None.
     """
     if axes is None:
         axes = create_figure() if new else gca()

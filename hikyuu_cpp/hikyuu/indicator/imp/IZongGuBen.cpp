@@ -50,7 +50,7 @@ void IZongGuBen::_increment_calculate(const Indicator& data, size_t start_pos) {
     for (; sw_iter != sw_list.end(); ++sw_iter) {
         price_t total_count = sw_iter->totalCount();
         if (total_count == 0) {
-            continue;  // 忽略流通盘为0的权息
+            continue;  // Ignore the ex-rights/ex-dividend record whose outstanding shares are 0
         }
 
         while (pos < total && k[pos].datetime < sw_iter->datetime()) {

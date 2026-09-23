@@ -22,6 +22,6 @@ void export_plugin_checkdata(py::module& m) {
           py::object x_dict = json_m.attr("loads")(x);
           return py::make_tuple(x_dict, y);
       },
-      "检查数据", py::arg("stock_list"), py::arg("start_date"), py::arg("end_date"),
+      "Check the data", py::arg("stock_list"), py::arg("start_date"), py::arg("end_date"),
       py::arg("ktype"));
 }

@@ -20,17 +20,17 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MA") {
     KData kdata = getKData("sh000001", KQuery(-10));
     Indicator c = CLOSE(kdata);
 
-    // /** @arg 非法 n < 1 || n > 100000 */
+    // /** @arg An invalid n < 1 || n > 100000 */
     CHECK_THROWS(TA_MA(c, 0));
     CHECK_THROWS(TA_MA(c, 2, -1));
     CHECK_THROWS(TA_MA(c, 2, 9));
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     Indicator result = TA_MA(CLOSE(kdata), 3);
     CHECK_EQ(result.name(), "TA_MA");
     CHECK_EQ(result.discard(), 2);
@@ -44,7 +44,7 @@ TEST_CASE("test_TA_MA") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

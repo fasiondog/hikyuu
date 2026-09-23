@@ -13,7 +13,8 @@
 namespace hku {
 
 /**
- * 策略上下文，定义策略执行时包含的证券/K线级别信息
+ * Strategy context, it defines the security / K-line level information contained when the strategy
+ * is executed
  * @ingroup Strategy
  *
  */
@@ -23,31 +24,34 @@ public:
     virtual ~StrategyContext() = default;
 
     /**
-     * 构造函数
-     * @param stockCodeList 指定的证券代码列表，如：如：{"sz000001", "sz000002"}
+     * Constructor
+     * @param stockCodeList the given security code list, e.g. {"sz000001", "sz000002"}
      */
     explicit StrategyContext(const vector<string>& stockCodeList);
 
     /**
-     * 构造函数
-     * @note 证券列表中如果包含 ("ALL") 则表示全部证券;
-     *       1. 指定K线类型列表同时影响着K线数据的优先加载顺序，靠前的将优先加载。
-     *       2. 未指定 ktypelist 或 preloadNum 时，将使用全局配置文件参数
-     * @param stockCodeList 指定的证券代码列表，如：{"sh000001", "sz000001"}
-     * @param ktypeList 指定的 K线数据列表，如：{"day", "min"}
-     * @param preloadNum 指定的预加载数量，如：{{"min_max", 100}, {"day_max", 200}}
+     * Constructor
+     * @note If the security list contains ("ALL") it means all the securities;
+     *       1. The given K-line type list also determines the priority loading order of the K-line
+     *          data, the earlier ones are loaded first.
+     *       2. When ktypelist or preloadNum is not given, the global config file parameters are
+     *          used
+     * @param stockCodeList the given security code list, e.g. {"sh000001", "sz000001"}
+     * @param ktypeList the given K-line data list, e.g. {"day", "min"}
+     * @param preloadNum the given preload number, e.g. {{"min_max", 100}, {"day_max", 200}}
      */
     StrategyContext(const vector<string>& stockCodeList, const vector<KQuery::KType>& ktypeList,
                     const unordered_map<string, int64_t>& preloadNum = {});
 
-    // 自定义移动构造与赋值会引起 python 中无法正常退出
+    // A user-defined move constructor and assignment cause python to fail to exit normally
     // StrategyContext(const StrategyContext&) = default;
     // StrategyContext(StrategyContext&& rv) = delete;
     // StrategyContext& operator=(const StrategyContext&) = default;
     // StrategyContext& operator=(StrategyContext&&) = delete;
 
     /**
-     * 是否为加载全部证券，只要 stockCodeList 包含 "ALL"(不区分大小写) ，即认为加载全部
+     * Whether all the securities are loaded; as long as stockCodeList contains "ALL"(case
+     * insensitive) it is regarded as loading everything
      * @return true
      * @return false
      */
@@ -84,15 +88,18 @@ public:
     }
 
     /**
-     * 隐含的默认必须被加载的证券列表
-     * @note 影响交易日历判断、和某些常被作为默认比较基准的证券，通常被作为某些函数的默认值
+     * The implicit security list that must be loaded by default
+     * @note It affects the trading calendar judgment and some securities that are often used as the
+     *       default comparison benchmark, and is usually used as the default value of some
+     *       functions
      */
     const vector<string>& getMustLoadStockCodeList() const noexcept {
         return m_mustLoad;
     }
 
     /**
-     * 返回所有需要加载的证券列表（含指定的证券列表和默认包含必须加载的证券列表）
+     * Return all the security code lists that need to be loaded (including the given security list
+     * and the default must-load security list)
      * @return vector<string>
      */
     vector<string> getAllNeedLoadStockCodeList() const noexcept;
@@ -105,7 +112,7 @@ private:
 
 private:
     Datetime m_startDatetime{19901219};
-    vector<string> m_mustLoad{"sh000001", "sh000300"};  // 默认必须加载的 stock
+    vector<string> m_mustLoad{"sh000001", "sh000300"};  // The stock that must be loaded by default
     vector<string> m_stockCodeList;
     vector<KQuery::KType> m_ktypeList;
     unordered_map<string, int64_t> m_preloadNum;

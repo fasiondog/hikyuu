@@ -44,13 +44,15 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput);
 #define GBToUTF8 hku::gb_to_utf8
 
 /**
- * Windows平台下用于将字符串由UTF8转换为GB2312编码（仅用于打印，如需用于路径，请使用 HKU_PATH），
- * Linux平台下不做任何事
- * @note 目前 Visual Studio 2019 已修正 UTF8 问题，大部分情况下无需使用，HKU_STR/HKU_CSTR，
- *       但windows的路径和文件名仍旧是GB，需要进行转换处理。
+ * Under Windows it is used to convert a string from UTF8 to the GB2312 encoding (for the printing
+ * only; use HKU_PATH if it is needed for a path),
+ * Under Linux it does nothing
+ * @note Currently Visual Studio 2019 has fixed the UTF8 problem, so it is not needed in most cases;
+ * HKU_STR/HKU_CSTR,
+ *       but the paths and file names under Windows are still GB and need the conversion processing.
  */
 #if defined(_MSC_VER) && _MSC_VER < 1928  // 1928 (Visual Studio 2019)
-// 将utf8编码的字符串转换为GB2312编码
+// Convert a UTF8 encoded string to the GB2312 encoding
 #define HKU_STR(s) UTF8ToGB(s)
 #define HKU_CSTR(s) UTF8ToGB(s)
 #else
@@ -59,9 +61,9 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput);
 #endif
 
 /**
- * 用于处理路径文件名，兼容windows中文平台
- * HKU_PATH 适用于 std::string
- * HKU_CPATH 适用于 char *
+ * Used to process the path file names, compatible with the Chinese Windows platform
+ * HKU_PATH is for std::string
+ * HKU_CPATH is for char *
  */
 #if defined(_MSC_VER)
 #define HKU_PATH(s) UTF8ToGB(s)
@@ -77,14 +79,14 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput);
 #endif
 
 /**
- * 四舍五入，ROUND_HALF_EVEN 银行家舍入法
- * @param number  待四舍五入的数据
- * @param ndigits 保留小数位数
- * @return 处理过的数据
+ * Rounding, the ROUND_HALF_EVEN banker's rounding method
+ * @param number  the data to be rounded
+ * @param ndigits the number of the decimal places to keep
+ * @return the processed data
  */
 template <typename ValueT>
 ValueT roundEx(ValueT number, int ndigits = 0) {
-    // 切换至：ROUND_HALF_EVEN 银行家舍入法
+    // Switch to: ROUND_HALF_EVEN, the banker's rounding method
     // ValueT pow1, pow2, y, z;
     // ValueT x = number;
     // if (ndigits >= 0) {
@@ -107,12 +109,13 @@ ValueT roundEx(ValueT number, int ndigits = 0) {
     // else
     //     z *= pow1;
 
-    // 国内一般使用传统四舍五入法
+    // In China the traditional rounding method is generally used
     if (ndigits < 0)
-        return number;  // 无效位数直接返回原值
+        return number;  // An invalid number of the digits returns the original value directly
 
     const double factor = std::pow(10.0, ndigits);
-    const double epsilon = 1e-10 * factor;  // 动态调整epsilon避免精度误差
+    const double epsilon =
+      1e-10 * factor;  // Adjust epsilon dynamically to avoid the precision error
 
     if (number >= 0)
         return static_cast<ValueT>(std::floor(number * factor + 0.5 + epsilon) / factor);
@@ -126,10 +129,10 @@ template <>
 float HKU_UTILS_API roundEx(float number, int ndigits);
 
 /**
- * 向上截取，如10.1截取后为11
- * @param number  待处理数据
- * @param ndigits 保留小数位数
- * @return 处理过的数据
+ * Truncate upward, e.g. 10.1 is truncated to 11
+ * @param number  the data to be processed
+ * @param ndigits the number of the decimal places to keep
+ * @return the processed data
  */
 template <typename ValueT>
 ValueT roundUp(ValueT number, int ndigits = 0) {
@@ -163,10 +166,10 @@ ValueT roundUp(ValueT number, int ndigits = 0) {
 }
 
 /**
- * 向下截取，如10.1截取后为10
- * @param number  待处理数据
- * @param ndigits 保留小数位数
- * @return 处理过的数据
+ * Truncate downward, e.g. 10.1 is truncated to 10
+ * @param number  the data to be processed
+ * @param ndigits the number of the decimal places to keep
+ * @return the processed data
  */
 template <typename ValueT>
 ValueT roundDown(ValueT number, int ndigits = 0) {
@@ -208,29 +211,29 @@ extern template float HKU_UTILS_API roundDown(float number, int ndigits);
 #pragma warning(pop)
 #endif
 
-/** ASCII转小写字符串 */
+/** Convert an ASCII string to lowercase */
 inline void to_lower(std::string &s) noexcept {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
 }
 
-/** 转大写字符串 */
+/** Convert a string to uppercase */
 inline void to_upper(std::string &s) noexcept {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
 }
 
-/** UTF-8转小写字符串 */
+/** Convert a UTF-8 string to lowercase */
 std::string HKU_UTILS_API utf8_to_lower(const std::string &s) noexcept;
 
-/** UTF-8转大写字符串 */
+/** Convert a UTF-8 string to uppercase */
 std::string HKU_UTILS_API utf8_to_upper(const std::string &s) noexcept;
 
-/** UTF-8字符串大小写折叠比较 */
+/** Case folding comparison of UTF-8 strings */
 bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2) noexcept;
 
-/** UTF-8字符串包含子字符串 */
+/** Whether a UTF-8 string contains a substring */
 bool HKU_UTILS_API utf8_contains(const std::string &s, const std::string &sub) noexcept;
 
-/** 删除字符串两端空格 */
+/** Remove the spaces at both ends of a string */
 inline void trim(std::string &s) {
     if (s.empty()) {
         return;
@@ -244,9 +247,9 @@ inline void trim(std::string &s) {
 
 #if CPP_STANDARD >= CPP_STANDARD_17
 /**
- * 分割字符串
- * @param str 待封的字符串
- * @param c 分割符
+ * Split a string
+ * @param str the string to be split
+ * @param c the separator
  */
 inline std::vector<std::string_view> split(const std::string &str, char c) {
     std::vector<std::string_view> result;
@@ -264,11 +267,12 @@ inline std::vector<std::string_view> split(const std::string &str, char c) {
 }
 
 /**
- * 分割字符串
- * @param str 待分割的string_view
- * @param c 分割字符
- * @return string_view 组成的 vector
- * @note 注意返回结果的生命周期应小于输入的字符串相同！
+ * Split a string
+ * @param str the string_view to be split
+ * @param c the separator character
+ * @return a vector composed of string_view
+ * @note Note that the lifetime of the returned result should be shorter than that of the input
+ *       string!
  */
 inline std::vector<std::string_view> split(const std::string_view &view, char c) {
     std::vector<std::string_view> result;
@@ -307,9 +311,9 @@ inline std::vector<std::string_view> split(const std::string_view &str,
 
 #else
 /**
- * 分割字符串
- * @param str 待封的字符串
- * @param c 分割符
+ * Split a string
+ * @param str the string to be split
+ * @param c the separator
  */
 inline std::vector<std::string> split(const std::string &str, char c) {
     std::vector<std::string> result;
@@ -347,9 +351,9 @@ inline std::vector<std::string> split(const std::string &str, const std::string 
 #endif /* #if CPP_STANDARD >= CPP_STANDARD_17 */
 
 /**
- * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
- * @param bytes 输入的 byte 数组
- * @param in_len byte 数组长度
+ * Convert bytes to a hexadecimal string, e.g. "abcd" is converted to "61626364"
+ * @param bytes the input byte array
+ * @param in_len the length of the byte array
  */
 inline std::string byteToHexStr(const char *bytes, size_t in_len) {
     std::string hexstr;
@@ -376,17 +380,17 @@ inline std::string byteToHexStr(const char *bytes, size_t in_len) {
 }
 
 /**
- * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
- * @param bytes std::string 格式的输入
+ * Convert bytes to a hexadecimal string, e.g. "abcd" is converted to "61626364"
+ * @param bytes the input in the std::string format
  */
 inline std::string byteToHexStr(const std::string &bytes) {
     return byteToHexStr(bytes.c_str(), bytes.size());
 }
 
 /**
- * byte 转 16 进制字符串, 如 "abcd" 转换为 "0x61 0x62 0x63 0x64"
- * @param bytes 输入的 byte 数组
- * @param in_len byte 数组长度
+ * Convert bytes to a hexadecimal string, e.g. "abcd" is converted to "0x61 0x62 0x63 0x64"
+ * @param bytes the input byte array
+ * @param in_len the length of the byte array
  */
 inline std::string byteToHexStrForPrint(const char *bytes, size_t in_len) {
     std::string hexstr;
@@ -420,22 +424,22 @@ inline std::string byteToHexStrForPrint(const char *bytes, size_t in_len) {
 }
 
 /**
- * byte 转 16 进制字符串, 如 "abcd" 转换为 "61626364"
- * @param bytes 输入的 byte 数组
+ * Convert bytes to a hexadecimal string, e.g. "abcd" is converted to "61626364"
+ * @param bytes the input byte array
  */
 inline std::string byteToHexStrForPrint(const std::string &bytes) {
     return byteToHexStrForPrint(bytes.c_str(), bytes.size());
 }
 
-/** 判断 double 是否为整数 */
+/** Judge whether a double is an integer */
 bool HKU_UTILS_API isInteger(double num);
 
-/** 判断 float 是否为整数 */
+/** Judge whether a float is an integer */
 bool HKU_UTILS_API isInteger(float num);
 
 /**
- * @brief 获取已排序的向量中指定分位数的值
- * @param vec 已排序的数组
+ * @brief Get the value of the given quantile in a sorted vector
+ * @param vec the sorted array
  * @param quantile
  * @return Indicator::value_t
  */

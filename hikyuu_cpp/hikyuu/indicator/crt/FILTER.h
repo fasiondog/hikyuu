@@ -16,11 +16,13 @@
 namespace hku {
 
 /**
- * 信号过滤, 过滤连续出现的信号。
+ * Signal filtering, it filters the signals that appear consecutively.
  * @details
  * <pre>
- * 用法：FILTER(X,N): X 满足条件后，删除其后 N 周期内的数据置为 0
- * 例如：FILTER(CLOSE>OPEN,5) 查找阳线，5天内再次出现的阳线不被记录在内。
+ * Usage: FILTER(X,N): after X satisfies the condition, the data within the following N periods is
+ * deleted and set to 0
+ * For example: FILTER(CLOSE>OPEN,5) finds the bullish candles, and the bullish candles appearing
+ * again within 5 days are not recorded.
  * </pre>
  * @ingroup Indicator
  */

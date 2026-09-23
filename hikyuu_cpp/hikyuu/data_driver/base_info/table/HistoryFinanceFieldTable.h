@@ -16,4 +16,4 @@ struct HistoryFinanceFieldTable {
     std::string name;
 };
 
-}
+}  // namespace hku
