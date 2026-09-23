@@ -28,7 +28,7 @@ TEST_CASE("test_FACTOR") {
 
     // Create a simple MA factor for the test
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "测试因子", "用于测试FACTOR指标");
+    Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "test factor", "used to test the FACTOR indicator");
 
     /** @arg Test the basic functionality of FACTOR */
     Indicator result = FACTOR(factor);
@@ -64,7 +64,7 @@ TEST_CASE("test_FACTOR_different_factors") {
 
     // Test the moving average factors with different parameters
     Indicator ma10 = MA(CLOSE(), 10);
-    Factor factor_ma10("MA10_FACTOR", ma10, KQuery::DAY, "10日均线因子", "10日移动平均因子");
+    Factor factor_ma10("MA10_FACTOR", ma10, KQuery::DAY, "10-day MA factor", "10-day moving average factor");
 
     Indicator result = FACTOR(factor_ma10);
     result.setContext(kdata);
@@ -78,8 +78,8 @@ TEST_CASE("test_FACTOR_different_factors") {
 
     // Test the other types of factors
     Indicator ma3 = MA(HIGH(), 3);
-    Factor factor_high_ma3("HIGH_MA3_FACTOR", ma3, KQuery::DAY, "高点3日均线因子",
-                           "高点3日移动平均因子");
+    Factor factor_high_ma3("HIGH_MA3_FACTOR", ma3, KQuery::DAY, "3-day MA of high factor",
+                           "3-day moving average of high factor");
 
     Indicator result2 = FACTOR(factor_high_ma3);
     result2.setContext(kdata);
@@ -119,7 +119,7 @@ TEST_CASE("test_FACTOR_export") {
 
     // Create the test factor
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor("EXPORT_TEST_FACTOR", ma5, KQuery::DAY, "导出测试因子", "用于序列化测试");
+    Factor factor("EXPORT_TEST_FACTOR", ma5, KQuery::DAY, "export test factor", "used for serialization testing");
 
     Indicator x1 = FACTOR(factor);
     x1.setContext(kdata);

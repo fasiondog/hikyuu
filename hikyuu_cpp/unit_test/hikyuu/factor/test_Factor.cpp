@@ -28,14 +28,14 @@ TEST_CASE("test_Factor_basic") {
     Indicator ma5 = MA(CLOSE(), 5);
 
     // Test the constructor
-    Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "测试因子", "详细描述");
+    Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "test factor", "detailed description");
 
     // Test the basic attributes
     CHECK_EQ(factor.name(), "TEST_FACTOR");
     CHECK_EQ(factor.ktype(), KQuery::DAY);
     CHECK_FALSE(factor.isNull());
-    CHECK_EQ(factor.brief(), "测试因子");
-    CHECK_EQ(factor.details(), "详细描述");
+    CHECK_EQ(factor.brief(), "test factor");
+    CHECK_EQ(factor.details(), "detailed description");
 
     // Test the formula attribute
     Indicator formula = factor.formula();
@@ -59,18 +59,18 @@ TEST_CASE("test_Factor_basic") {
 /** @par Test point: test the Factor construction with a Block */
 TEST_CASE("test_Factor_with_block") {
     // Create the test Block
-    Block test_block("行业", "测试板块");
+    Block test_block("industry", "test sector");
 
     // Create a Factor with a Block
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor("BLOCK_FACTOR", ma5, KQuery::DAY, "带板块因子", "测试板块功能", false,
+    Factor factor("BLOCK_FACTOR", ma5, KQuery::DAY, "factor with sector", "test sector feature", false,
                   Datetime::min(), test_block);
 
     // Verify the Block attribute
     const Block& block = factor.block();
     CHECK_FALSE(block.isNull());
-    CHECK_EQ(block.category(), "行业");
-    CHECK_EQ(block.name(), "测试板块");
+    CHECK_EQ(block.category(), "industry");
+    CHECK_EQ(block.name(), "test sector");
     CHECK_EQ(block.size(), 0);
 }
 
@@ -94,8 +94,8 @@ TEST_CASE("test_Factor_getValues_check") {
 
     // Create a Factor with a Block
     SUBCASE("Factor with block") {
-        Block test_block("行业", "测试板块");
-        Factor factor("BLOCK_FACTOR", ma5, KQuery::DAY, "测试", "描述", false, Datetime::min(),
+        Block test_block("industry", "test sector");
+        Factor factor("BLOCK_FACTOR", ma5, KQuery::DAY, "test", "description", false, Datetime::min(),
                       test_block);
 
         // Verify that the Block is set correctly
@@ -421,9 +421,9 @@ TEST_CASE("test_Factor_getAllValues") {
 
     // Test a Factor with a Block
     SUBCASE("Factor with block") {
-        Block test_block("行业", "测试板块");
+        Block test_block("industry", "test sector");
         Indicator ma5 = MA(CLOSE(), 5);
-        Factor factor("ALL_BLOCK_FACTOR", ma5, KQuery::DAY, "测试", "描述", false, Datetime::min(),
+        Factor factor("ALL_BLOCK_FACTOR", ma5, KQuery::DAY, "test", "description", false, Datetime::min(),
                       test_block);
 
         // Verify that the Block is set correctly
@@ -454,32 +454,32 @@ TEST_CASE("test_Factor_getAllValues") {
 TEST_CASE("test_Factor_copy_semantics") {
     // Create the original Factor
     Indicator ma5 = MA(CLOSE(), 5);
-    Block test_block("行业", "测试板块");
-    Factor original("COPY_TEST", ma5, KQuery::DAY, "拷贝测试", "详细描述", true,
+    Block test_block("industry", "test sector");
+    Factor original("COPY_TEST", ma5, KQuery::DAY, "copy test", "detailed description", true,
                     Datetime(202001010000LL), test_block);
 
     // Test the copy constructor
     Factor copy1(original);
     CHECK_EQ(copy1.name(), "COPY_TEST");
     CHECK_EQ(copy1.ktype(), KQuery::DAY);
-    CHECK_EQ(copy1.brief(), "拷贝测试");
-    CHECK_EQ(copy1.details(), "详细描述");
+    CHECK_EQ(copy1.brief(), "copy test");
+    CHECK_EQ(copy1.details(), "detailed description");
     CHECK_UNARY(copy1.needSaveValue());
     CHECK_EQ(copy1.startDate(), Datetime(202001010000LL));
-    CHECK_EQ(copy1.block().category(), "行业");
-    CHECK_EQ(copy1.block().name(), "测试板块");
+    CHECK_EQ(copy1.block().category(), "industry");
+    CHECK_EQ(copy1.block().name(), "test sector");
 
     // Test the copy assignment
     Factor copy2;
     copy2 = original;
     CHECK_EQ(copy2.name(), "COPY_TEST");
     CHECK_EQ(copy2.ktype(), KQuery::DAY);
-    CHECK_EQ(copy2.brief(), "拷贝测试");
-    CHECK_EQ(copy2.details(), "详细描述");
+    CHECK_EQ(copy2.brief(), "copy test");
+    CHECK_EQ(copy2.details(), "detailed description");
     CHECK_UNARY(copy2.needSaveValue());
     CHECK_EQ(copy2.startDate(), Datetime(202001010000LL));
-    CHECK_EQ(copy2.block().category(), "行业");
-    CHECK_EQ(copy2.block().name(), "测试板块");
+    CHECK_EQ(copy2.block().category(), "industry");
+    CHECK_EQ(copy2.block().name(), "test sector");
 
     // Test the move constructor
     Factor moved1(std::move(original));
@@ -781,8 +781,8 @@ TEST_CASE("test_Factor_basic_serialize") {
 
     // Create the test Factor
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor1("SERIALIZE_TEST", ma5, KQuery::DAY, "序列化测试因子",
-                   "这是一个用于测试序列化的因子", true);
+    Factor factor1("SERIALIZE_TEST", ma5, KQuery::DAY, "serialization test factor",
+                   "a factor used to test serialization", true);
 
     // Set some attributes
     factor1.createAt(Datetime(202001010000LL));
@@ -830,14 +830,14 @@ TEST_CASE("test_Factor_with_block_serialize") {
     filename += "/Factor_with_block.xml";
 
     // Create the test Block
-    Block test_block("行业", "序列化测试板块");
+    Block test_block("industry", "serialization test sector");
     test_block.add("sh600000");
     test_block.add("sz000001");
 
     // Create a Factor with a Block
     Indicator ma10 = MA(CLOSE(), 10);
-    Factor factor1("BLOCK_SERIALIZE_TEST", ma10, KQuery::WEEK, "带板块序列化测试",
-                   "测试包含Block的Factor序列化", false, Datetime(202001010000LL), test_block);
+    Factor factor1("BLOCK_SERIALIZE_TEST", ma10, KQuery::WEEK, "serialization test with sector",
+                   "test the serialization of a Factor containing a Block", false, Datetime(202001010000LL), test_block);
 
     // Serialize to a file
     {
@@ -937,9 +937,9 @@ TEST_CASE("test_Factor_list_serialize") {
     Indicator ma10 = MA(CLOSE(), 10);
     Indicator ma20 = MA(CLOSE(), 20);
 
-    factors1.emplace_back("FACTOR_1", ma5, KQuery::DAY, "因子1", "第一个测试因子");
-    factors1.emplace_back("FACTOR_2", ma10, KQuery::WEEK, "因子2", "第二个测试因子");
-    factors1.emplace_back("FACTOR_3", ma20, KQuery::MONTH, "因子3", "第三个测试因子");
+    factors1.emplace_back("FACTOR_1", ma5, KQuery::DAY, "factor 1", "first test factor");
+    factors1.emplace_back("FACTOR_2", ma10, KQuery::WEEK, "factor 2", "second test factor");
+    factors1.emplace_back("FACTOR_3", ma20, KQuery::MONTH, "factor 3", "third test factor");
 
     // Set the different attributes
     factors1[0].needSaveValue(true);

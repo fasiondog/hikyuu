@@ -84,8 +84,8 @@ TEST_CASE("test_FactorSet_basic") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
-    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor", "test 5-day MA");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10-day MA factor", "test 10-day MA");
 
     // Test the constructor and the basic attributes
     FactorSet fs("TestFactorSet");
@@ -110,11 +110,11 @@ TEST_CASE("test_FactorSet_basic") {
     // Test getting the factor
     Factor retrieved1 = fs.get("MA5");
     CHECK_EQ(retrieved1.name(), "MA5");
-    CHECK_EQ(retrieved1.brief(), "5日均线因子");
+    CHECK_EQ(retrieved1.brief(), "5-day MA factor");
 
     Factor retrieved2 = fs.get("MA10");
     CHECK_EQ(retrieved2.name(), "MA10");
-    CHECK_EQ(retrieved2.brief(), "10日均线因子");
+    CHECK_EQ(retrieved2.brief(), "10-day MA factor");
 
     // Test a factor that does not exist
     CHECK_THROWS(fs.get("NONEXIST"));
@@ -139,9 +139,9 @@ TEST_CASE("test_FactorSet_ktype_check") {
     Indicator week_ma = MA(CLOSE(), 10);
     Indicator month_ma = MA(CLOSE(), 20);
 
-    Factor day_factor("DAY_MA", day_ma, KQuery::DAY, "日线因子");
-    Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
-    Factor month_factor("MONTH_MA", month_ma, KQuery::MONTH, "月线因子");
+    Factor day_factor("DAY_MA", day_ma, KQuery::DAY, "daily bar factor");
+    Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "weekly bar factor");
+    Factor month_factor("MONTH_MA", month_ma, KQuery::MONTH, "monthly bar factor");
 
     // Test the daily line FactorSet
     SUBCASE("DAY FactorSet") {
@@ -211,8 +211,8 @@ TEST_CASE("test_FactorSet_duplicate_name") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma5_new = MA(CLOSE(), 5);  // The same name but a different indicator
 
-    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "原始版本");
-    Factor factor2("MA5", ma5_new, KQuery::DAY, "5日均线因子", "更新版本");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor", "original version");
+    Factor factor2("MA5", ma5_new, KQuery::DAY, "5-day MA factor", "updated version");
 
     FactorSet fs("TestFactorSet");
 
@@ -222,8 +222,8 @@ TEST_CASE("test_FactorSet_duplicate_name") {
 
     // Get and verify the first factor
     Factor retrieved1 = fs.get("MA5");
-    CHECK_EQ(retrieved1.brief(), "5日均线因子");
-    CHECK_EQ(retrieved1.details(), "原始版本");
+    CHECK_EQ(retrieved1.brief(), "5-day MA factor");
+    CHECK_EQ(retrieved1.details(), "original version");
 
     // Adding a factor with the same name should overwrite the existing one
     fs.add(factor2);
@@ -231,14 +231,14 @@ TEST_CASE("test_FactorSet_duplicate_name") {
 
     // Verify the overwritten factor
     Factor retrieved2 = fs.get("MA5");
-    CHECK_EQ(retrieved2.brief(), "5日均线因子");
-    CHECK_EQ(retrieved2.details(), "更新版本");  // 应该是新的值
+    CHECK_EQ(retrieved2.brief(), "5-day MA factor");
+    CHECK_EQ(retrieved2.details(), "updated version");  // it should be the new value
 
     // Verify the iteration order (there should be one element only)
     size_t count = 0;
     for (const auto& factor : fs) {
         CHECK_EQ(factor.name(), "MA5");
-        CHECK_EQ(factor.details(), "更新版本");
+        CHECK_EQ(factor.details(), "updated version");
         count++;
     }
     CHECK_EQ(count, 1);
@@ -308,8 +308,8 @@ TEST_CASE("test_FactorSet_iterator") {
     Indicator ma5 = MA(CLOSE(), 5);
     Indicator ma10 = MA(CLOSE(), 10);
 
-    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线");
-    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor", "test 5-day MA");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10-day MA factor", "test 10-day MA");
 
     // Create a FactorSet and add the factor
     FactorSet fs("TestFactorSet");
@@ -413,53 +413,53 @@ TEST_CASE("test_FactorSet_block") {
     CHECK_EQ(fs2.block().size(), 0);
 
     // Create the Block for the test
-    Block test_block("行业", "测试板块");
+    Block test_block("industry", "test sector");
 
     // Test the constructor with an explicit Block parameter
     FactorSet fs3("TestWithBlock", KQuery::WEEK, test_block);
     CHECK_EQ(fs3.name(), "TESTWITHBLOCK");
     CHECK_EQ(fs3.ktype(), KQuery::WEEK);
     CHECK_FALSE(fs3.block().isNull());
-    CHECK_EQ(fs3.block().category(), "行业");
-    CHECK_EQ(fs3.block().name(), "测试板块");
+    CHECK_EQ(fs3.block().category(), "industry");
+    CHECK_EQ(fs3.block().name(), "test sector");
     CHECK_EQ(fs3.block().size(), 0);  // A newly created Block should be empty
 
     // Test the Block setter / getter
-    Block new_block("概念", "新概念板块");
+    Block new_block("concept", "new concept sector");
     fs1.block(new_block);
     CHECK_FALSE(fs1.block().isNull());
-    CHECK_EQ(fs1.block().category(), "概念");
-    CHECK_EQ(fs1.block().name(), "新概念板块");
+    CHECK_EQ(fs1.block().category(), "concept");
+    CHECK_EQ(fs1.block().name(), "new concept sector");
 
     // Test the Block sharing under the copy semantics
     FactorSet fs4(fs3);
-    CHECK_EQ(fs4.block().category(), "行业");
-    CHECK_EQ(fs4.block().name(), "测试板块");
+    CHECK_EQ(fs4.block().category(), "industry");
+    CHECK_EQ(fs4.block().name(), "test sector");
 
     // Modifying the Block of the copy should affect the original object (a shallow copy)
     Block modified_block = fs4.block();
-    modified_block.category("地域");
-    modified_block.name("修改后的板块");
+    modified_block.category("region");
+    modified_block.name("modified sector");
     fs4.block(modified_block);
 
-    CHECK_EQ(fs3.block().category(), "地域");
-    CHECK_EQ(fs3.block().name(), "修改后的板块");
+    CHECK_EQ(fs3.block().category(), "region");
+    CHECK_EQ(fs3.block().name(), "modified sector");
 }
 
 /** @par Test point: test the block match check of FactorSet */
 TEST_CASE("test_FactorSet_block_check") {
     // Create the Blocks for the test
-    Block block1("行业", "科技板块");
-    Block block2("行业", "金融板块");
-    Block block3("概念", "新能源概念");
+    Block block1("industry", "tech sector");
+    Block block2("industry", "finance sector");
+    Block block3("concept", "new energy concept");
 
     // Create the test factor (note that the Block parameter is the last one)
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor1("MA5_B1", ma5, KQuery::DAY, "MA5因子", "block1测试", false, Datetime::min(),
+    Factor factor1("MA5_B1", ma5, KQuery::DAY, "MA5 factor", "block1 test", false, Datetime::min(),
                    block1);
-    Factor factor2("MA5_B2", ma5, KQuery::DAY, "MA5因子", "block2测试", false, Datetime::min(),
+    Factor factor2("MA5_B2", ma5, KQuery::DAY, "MA5 factor", "block2 test", false, Datetime::min(),
                    block2);
-    Factor factor3("MA5_B3", ma5, KQuery::DAY, "MA5因子", "block3测试", false, Datetime::min(),
+    Factor factor3("MA5_B3", ma5, KQuery::DAY, "MA5 factor", "block3 test", false, Datetime::min(),
                    block3);
 
     // Test the FactorSet constructed with block1
@@ -516,8 +516,8 @@ TEST_CASE("test_FactorSet_block_check") {
 
         // Create a factor with an empty Block
         Block empty_block;
-        Factor factor_empty("EMPTY", ma5, KQuery::DAY, "空Block因子", "", false, Datetime::min(),
-                            empty_block);
+        Factor factor_empty("EMPTY", ma5, KQuery::DAY, "empty Block factor", "", false,
+                            Datetime::min(), empty_block);
 
         // A factor with an empty Block should be added normally
         CHECK_NOTHROW(fs.add(factor_empty));
@@ -563,9 +563,9 @@ TEST_CASE("test_FactorSet_order_preservation") {
     Indicator ma20 = MA(CLOSE(), 20);
 
     // Create the Factor objects
-    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子");
-    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子");
-    Factor factor3("MA20", ma20, KQuery::DAY, "20日均线因子");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10-day MA factor");
+    Factor factor3("MA20", ma20, KQuery::DAY, "20-day MA factor");
 
     // Create a FactorSet and add the factors in a specific order
     FactorSet fs("ORDER_TEST", KQuery::DAY);
@@ -586,7 +586,7 @@ TEST_CASE("test_FactorSet_order_preservation") {
 
     // Test adding a factor with the same name repeatedly
     SUBCASE("Duplicate factor name handling") {
-        Factor duplicate_factor("MA5", ma5, KQuery::DAY, "重复的5日均线");
+        Factor duplicate_factor("MA5", ma5, KQuery::DAY, "duplicate 5-day MA");
         fs.add(duplicate_factor);
         // The size should stay unchanged
         CHECK_EQ(fs.size(), 3);
@@ -663,8 +663,8 @@ TEST_CASE("test_FactorSet_getValues") {
     Indicator ma10 = MA(CLOSE(), 10);
 
     // Create the Factor objects
-    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子");
-    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子");
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor");
+    Factor factor2("MA10", ma10, KQuery::DAY, "10-day MA factor");
 
     // Create the FactorSet
     FactorSet fs("TEST_SET", KQuery::DAY);
@@ -852,14 +852,14 @@ TEST_CASE("test_FactorSet_getValues_check") {
 
     // Create a FactorSet with a Block
     SUBCASE("FactorSet with block") {
-        Block test_block("行业", "测试板块");
+        Block test_block("industry", "test sector");
         test_block.add(stock1);  // Add the first stock only
 
         FactorSet factorset("BLOCK_SET", KQuery::DAY, test_block);
 
         // Create a Factor using the same Block
         Indicator ma5 = MA(CLOSE(), 5);
-        Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "测试因子", "", false, Datetime::min(),
+        Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "test factor", "", false, Datetime::min(),
                       test_block);
 
         factorset.add(factor);
@@ -1667,17 +1667,17 @@ TEST_CASE("test_FactorSet_integration") {
     // Test the integration with the Block system
     SUBCASE("Block system integration") {
         // Create a real Block (if possible)
-        Block real_block("行业", "真实测试板块");
+        Block real_block("industry", "real test sector");
 
         FactorSet fs("BLOCK_INTEGRATION", KQuery::DAY, real_block);
-        CHECK_EQ(fs.block().category(), "行业");
-        CHECK_EQ(fs.block().name(), "真实测试板块");
+        CHECK_EQ(fs.block().category(), "industry");
+        CHECK_EQ(fs.block().name(), "real test sector");
 
         // Test the Block related operations
-        Block new_block("概念", "新概念");
+        Block new_block("concept", "new concept");
         fs.block(new_block);
-        CHECK_EQ(fs.block().category(), "概念");
-        CHECK_EQ(fs.block().name(), "新概念");
+        CHECK_EQ(fs.block().category(), "concept");
+        CHECK_EQ(fs.block().name(), "new concept");
     }
 }
 
@@ -1694,11 +1694,11 @@ TEST_CASE("test_FactorSet_serialization") {
     Indicator ma10 = MA(CLOSE(), 10);
 
     // Create the Block for the test
-    Block test_block("行业", "测试板块");
+    Block test_block("industry", "test sector");
 
-    Factor factor1("MA5", ma5, KQuery::DAY, "5日均线因子", "测试5日均线", false, Datetime::min(),
-                   test_block);
-    Factor factor2("MA10", ma10, KQuery::DAY, "10日均线因子", "测试10日均线", false,
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor", "test 5-day MA", false,
+                   Datetime::min(), test_block);
+    Factor factor2("MA10", ma10, KQuery::DAY, "10-day MA factor", "test 10-day MA", false,
                    Datetime::min(), test_block);
 
     // Test the basic serialization - an empty FactorSet
@@ -1756,17 +1756,17 @@ TEST_CASE("test_FactorSet_serialization") {
 
         Factor retrieved_ma5 = fs2.get("MA5");
         CHECK_EQ(retrieved_ma5.name(), "MA5");
-        CHECK_EQ(retrieved_ma5.brief(), "5日均线因子");
+        CHECK_EQ(retrieved_ma5.brief(), "5-day MA factor");
 
         Factor retrieved_ma10 = fs2.get("MA10");
         CHECK_EQ(retrieved_ma10.name(), "MA10");
-        CHECK_EQ(retrieved_ma10.brief(), "10日均线因子");
+        CHECK_EQ(retrieved_ma10.brief(), "10-day MA factor");
     }
 
     // Test the serialization of the different K-line types
     SUBCASE("Different KType serialization") {
         Indicator week_ma = MA(CLOSE(), 5);
-        Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "周线因子");
+        Factor week_factor("WEEK_MA", week_ma, KQuery::WEEK, "weekly bar factor");
 
         FactorSet fs1("WEEK_TEST", KQuery::WEEK);
         fs1.add(week_factor);

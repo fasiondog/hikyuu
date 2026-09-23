@@ -39,7 +39,7 @@ const std::map<string, string>& legacyKeyMap() {
       {"已平仓交易总数", "Total Closed Trades"},
       {"赢利交易数", "Number of Winning Trades"},
       {"亏损交易数", "Number of Losing Trades"},
-      {"赢利交易比例%", "Winning Trade Ratio %"},
+      {"赢利交易比例%", "Win Rate %"},
       {"赢利期望值", "Profit Expectancy"},
       {"赢利交易平均赢利", "Avg Profit per Winning Trade"},
       {"亏损交易平均亏损", "Avg Loss per Losing Trade"},
@@ -147,7 +147,7 @@ Performance::Performance()
           "Total Closed Trades",
           "Number of Winning Trades",
           "Number of Losing Trades",
-          "Winning Trade Ratio %",
+          "Win Rate %",
           "Profit Expectancy",
           "Avg Profit per Winning Trade",
           "Avg Loss per Losing Trade",
@@ -498,7 +498,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     }
 
     if (m_result["Total Closed Trades"] != 0.0) {
-        m_result["Winning Trade Ratio %"] =
+        m_result["Win Rate %"] =
           100 * m_result["Number of Winning Trades"] / m_result["Total Closed Trades"];
         m_result["R-Multiple Expectancy"] =
           roundEx(total_r / m_result["Total Closed Trades"], precision);
@@ -510,8 +510,8 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     }
 
     m_result["Profit Expectancy"] =
-      0.01 * m_result["Winning Trade Ratio %"] * m_result["Avg Profit per Winning Trade"] +
-      (1 - 0.01 * m_result["Winning Trade Ratio %"]) * m_result["Avg Loss per Losing Trade"];
+      0.01 * m_result["Win Rate %"] * m_result["Avg Profit per Winning Trade"] +
+      (1 - 0.01 * m_result["Win Rate %"]) * m_result["Avg Loss per Losing Trade"];
 
     int64_t duration = 0;
     if (tm->firstDatetime() != Null<Datetime>()) {

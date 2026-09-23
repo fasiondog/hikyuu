@@ -1,4 +1,4 @@
-﻿/*
+/*
  * TradeManager.cpp
  *
  *  Created on: 2013-2-13
@@ -1786,11 +1786,11 @@ void TradeManager::tocsv(const string& path) {
 }
 
 bool TradeManager::addPosition(const PositionRecord& pr) {
-    HKU_ERROR_IF_RETURN(pr.stock.isNull(), false, "Invalid postion record! stock is null!");
+    HKU_ERROR_IF_RETURN(pr.stock.isNull(), false, "Invalid position record! stock is null!");
     HKU_ERROR_IF_RETURN(pr.cleanDatetime != Null<Datetime>(), false,
                         "Position cleanDatetime({}) must be Null!", pr.cleanDatetime);
     HKU_ERROR_IF_RETURN(pr.takeDatetime < initDatetime(), false,
-                        "Poistion takeDatetime({}) > initDatetime({})", pr.takeDatetime,
+                        "Position takeDatetime({}) > initDatetime({})", pr.takeDatetime,
                         initDatetime());
     HKU_ERROR_IF_RETURN(!m_trade_list.empty(), false, "Exist trade list!");
 
