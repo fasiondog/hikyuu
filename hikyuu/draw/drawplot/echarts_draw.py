@@ -561,8 +561,8 @@ def sys_performance(sys, ref_stk=None):
         invest_total, cur_fund, cur_fund - invest_total)
     t2 = htr('Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%').format(
         funds_return[-1]*100 - 100, per["Account Avg Annual Return %"], max_pullback)
-    t3 = htr('Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
-        per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
+    t3 = htr('Win Rate: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
+        per['Win Rate %'], per['Profit Factor'], sharp)
 
     line = iplot(ref_return, ref_k)
     line = iplot(funds_return, ref_k, line)

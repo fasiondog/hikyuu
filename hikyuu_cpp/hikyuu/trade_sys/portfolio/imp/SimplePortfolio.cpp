@@ -142,7 +142,7 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] [{}] - {}: {},  {}: {}, {}: {}", htr("beforce adjust"), htr("total funds"),
+        HKU_INFO("[PF] [{}] - {}: {},  {}: {}, {}: {}", htr("before rebalance"), htr("total funds"),
                  funds.cash + funds.market_value, htr("cash"), funds.cash, htr("market_value"),
                  funds.market_value);
     }

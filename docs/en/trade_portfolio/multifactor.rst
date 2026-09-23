@@ -25,8 +25,8 @@ Built-in Factor Composition Algorithms
     Compose the factor by the specified weights = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
-    :param sequense(float) weights: the weight list (must be the same length as the number of the factors)
+    :param sequence(stock) stks: the list of the securities to calculate
+    :param sequence(float) weights: the weight list (must be the same length as the number of the factors)
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC
@@ -52,7 +52,7 @@ Built-in Factor Composition Algorithms
     Compose the factor with the equal weights, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC
@@ -77,7 +77,7 @@ Built-in Factor Composition Algorithms
     Compose the factor with the rolling IC weights, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC
@@ -103,7 +103,7 @@ Built-in Factor Composition Algorithms
     Compose the factor with the rolling ICIR weights, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC

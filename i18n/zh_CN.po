@@ -183,7 +183,7 @@ msgstr "当前市值"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:415
 msgid "kType of query must be DAY when adjust_mode is not \"query\"!"
-msgstr "查询，但 adjust_mode 为 “query” 时，仅支持日线！"
+msgstr "adjust_mode 不为 “query” 时，查询的 kType 必须为日线！"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/Portfolio.cpp:428
 msgid "There is no system in portfolio!"
@@ -208,7 +208,7 @@ msgid "After compensate: the sum cash of sub_tm"
 msgstr "轧差补偿后: 子账号现金总和"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:142
-msgid "beforce adjust"
+msgid "before rebalance"
 msgstr "调仓前"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/SimplePortfolio.cpp:142
@@ -328,7 +328,7 @@ msgid "[PF] will remove system: {}"
 msgstr "[PF] 将被移除的系统: {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutAFPortfolio.cpp:386
-msgid "current seleect system count"
+msgid "current selected system count"
 msgstr "当前选中系统数量"
 
 #: hikyuu_cpp/hikyuu/trade_sys/portfolio/imp/WithoutAFPortfolio.cpp:408
@@ -338,8 +338,8 @@ msgstr "[PF] 移除系统: {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:273
 msgid ""
-"You are using forward or equal_forward kdata, which is a future function!"
-msgstr "你正在使用前复权或等比前向数据运行系统，这相当于使用了未来函数!"
+"You are using forward or equal_forward adjusted K-line data, which introduces look-ahead bias!"
+msgstr "你正在使用前复权或等比前复权 K 线数据，会引入前视偏差（未来函数）!"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:498
 #, c++-format
@@ -354,7 +354,7 @@ msgstr "[{}] 当日原始价(不复权) {}"
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:531
 #, c++-format
 msgid "[{}] current EV is invalid"
-msgstr "[{}] 当前市场环境有效"
+msgstr "[{}] 当前市场环境无效"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:536
 #, c++-format
@@ -374,7 +374,7 @@ msgstr "[{}] 市场环境指示买入"
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:566
 #, c++-format
 msgid "[{}] current CN is invalid"
-msgstr "[{}] 当前系统条件有效"
+msgstr "[{}] 当前系统条件无效"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:571
 #, c++-format
@@ -413,7 +413,7 @@ msgstr "[{}] 信号指示卖空"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:635
 #, c++-format
-msgid "[{}] current postion: {}"
+msgid "[{}] current position: {}"
 msgstr "[{}] 当前持仓数量: {}"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:639
@@ -503,8 +503,8 @@ msgstr "[{}] 因一字板，延迟至下一开盘卖出"
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:935
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1006
 #, c++-format
-msgid "[{}] delay to sell, one-price donw-limint board"
-msgstr "[{}] 因一字跌停板，延迟至下一开盘卖出"
+msgid "[{}] sell delayed: limit-down lock"
+msgstr "[{}] 因一字跌停板，延迟卖出"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:942
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:990
@@ -537,8 +537,8 @@ msgstr "[{}] 因一字板，延迟至下一开盘买空"
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1114
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1194
 #, c++-format
-msgid "[{}] delay to buy short, one-price up-limint board"
-msgstr "[{}] 因一字涨停板，延迟至下一开盘买空"
+msgid "[{}] short covering delayed: limit-up lock"
+msgstr "[{}] 因一字涨停板，延迟回补空头"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1122
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1178
@@ -555,8 +555,8 @@ msgstr "[{}] 因一字板，延迟至下一开盘卖空"
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1303
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1376
 #, c++-format
-msgid "[{}] delay to sell short, one-price down-limint board"
-msgstr "[{}] 因一字跌停板，延迟至下一开盘卖空"
+msgid "[{}] short selling delayed: limit-down lock"
+msgstr "[{}] 因一字跌停板，延迟卖空"
 
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1311
 #: hikyuu_cpp/hikyuu/trade_sys/system/System.cpp:1360
@@ -959,7 +959,7 @@ msgid "Number of Losing Trades"
 msgstr "亏损交易数"
 
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:107
-msgid "Winning Trade Ratio %"
+msgid "Win Rate %"
 msgstr "赢利交易比例%"
 
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:108
@@ -1094,7 +1094,7 @@ msgstr "当前策略收益: {:<.2f}%    年化收益率: {:<.2f}%    最大回�
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:911
 #, python-format
-msgid "Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgid "Win Rate: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
 msgstr "系统胜率: {:<.2f}%    盈/亏比: 1 : {:<.2f}    夏普比率: {:<.2f}"
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:925

@@ -17,7 +17,7 @@
 
 Built on mature systematic trading concepts, the framework decomposes quantitative analysis into
 independent modular components: **market environment assessment, system validity conditions, signal
-indicator parsing, stop-loss / take-profit models, money management models, profit goal estimation,
+generators, stop-loss / take-profit models, money management models, profit goal estimation,
 slippage simulation algorithms, multi-factor modeling, portfolio analysis and fund allocation**. You can
 combine these components freely to build your own strategy library, verify the stability and effectiveness
 of your strategies through simulated backtesting, and complete quantitative research and data analysis.

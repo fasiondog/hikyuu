@@ -273,7 +273,8 @@ void System::setTO(const KData& kdata) {
 
     HKU_WARN_IF(
       query.recoverType() == KQuery::FORWARD || query.recoverType() == KQuery::EQUAL_FORWARD,
-      htr("You are using forward or equal_forward kdata, which is a future function!"));
+      htr("You are using forward or equal_forward adjusted K-line data, which introduces "
+          "look-ahead bias!"));
 
     // sg->setTO must come before cn->setTO, because cn uses sg; this prevents sg from being
     // calculated twice
@@ -639,7 +640,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     price_t src_current_price = src_today.closePrice;  // The original price without adjustment
 
     PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
-    HKU_INFO_IF(trace, htr("[{}] current postion: {}", name(), position.number));
+    HKU_INFO_IF(trace, htr("[{}] current position: {}", name(), position.number));
     if (position.number != 0) {
         TradeRecord tr;
         if (src_current_price <= position.stoploss) {
@@ -942,7 +943,7 @@ TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part f
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price donw-limint board", name()));
+            HKU_INFO_IF(trace, htr("[{}] sell delayed: limit-down lock", name()));
             _submitSellRequest(today, src_today, from);
             return result;
         }
@@ -1015,7 +1016,7 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price donw-limint board", name()));
+            HKU_INFO_IF(trace, htr("[{}] sell delayed: limit-down lock", name()));
             _submitSellRequest(today, src_today, m_sellRequest.from);
             return result;
         }
@@ -1123,7 +1124,7 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > preday.closePrice) {
-            HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price up-limint board", name()));
+            HKU_INFO_IF(trace, htr("[{}] short covering delayed: limit-up lock", name()));
             _submitBuyShortRequest(today, src_today, from);
             return result;
         }
@@ -1203,7 +1204,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > preday.closePrice) {
-            HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price up-limint board", name()));
+            HKU_INFO_IF(trace, htr("[{}] short covering delayed: limit-up lock", name()));
             _submitBuyShortRequest(today, src_today, m_buyShortRequest.from);
             return result;
         }
@@ -1311,8 +1312,7 @@ TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, P
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace,
-                        htr("[{}] delay to sell short, one-price down-limint board", name()));
+            HKU_INFO_IF(trace, htr("[{}] short selling delayed: limit-down lock", name()));
             _submitSellShortRequest(today, src_today, from);
             return result;
         }
@@ -1384,8 +1384,7 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
-            HKU_INFO_IF(trace,
-                        htr("[{}] delay to sell short, one-price down-limint board", name()));
+            HKU_INFO_IF(trace, htr("[{}] short selling delayed: limit-down lock", name()));
             _submitSellShortRequest(today, src_today, m_sellShortRequest.from);
             return result;
         }

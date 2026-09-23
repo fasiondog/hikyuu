@@ -919,8 +919,8 @@ def tm_performance(tm: TradeManager, query: Query, ref_stk: Stock = None, ext: b
         'Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%'
         '    Current Drawdown from Peak: {:<.2f}%').format(
             funds_return[-1] * 100 - 100, per["Account Avg Annual Return %"], max_pullback, mdd_current)
-    t3 = htr('Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
-        per['Winning Trade Ratio %'], per['Profit Factor'], sharp)
+    t3 = htr('Win Rate: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}').format(
+        per['Win Rate %'], per['Profit Factor'], sharp)
 
     import matplotlib.pyplot as plt
     fg = plt.figure(figsize=(15, 10))

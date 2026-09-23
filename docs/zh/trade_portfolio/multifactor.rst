@@ -25,8 +25,8 @@
     按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn，支持多种输入类型
 
     :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param sequense(float) weights: 权重列表(需和因子数量等长)
+    :param sequence(stock) stks: 计算证券列表
+    :param sequence(float) weights: 权重列表(需和因子数量等长)
     :param Query query: 日期范围
     :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
@@ -52,7 +52,7 @@
     等权重合成因子，支持多种输入类型
 
     :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
+    :param sequence(stock) stks: 计算证券列表
     :param Query query: 日期范围
     :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
@@ -77,7 +77,7 @@
     滚动IC权重合成因子，支持多种输入类型
 
     :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
+    :param sequence(stock) stks: 计算证券列表
     :param Query query: 日期范围
     :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率
@@ -103,7 +103,7 @@
     滚动ICIR权重合成因子，支持多种输入类型
 
     :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
+    :param sequence(stock) stks: 计算证券列表
     :param Query query: 日期范围
     :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
     :param int ic_n: 默认 IC 对应的 N 日收益率

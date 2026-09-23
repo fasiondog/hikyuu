@@ -205,11 +205,11 @@
 | 20 | 已平仓交易总数 | Total Closed Trades |
 | 21 | 赢利交易数 | Number of Winning Trades |
 | 22 | 亏损交易数 | Number of Losing Trades |
-| 23 | 赢利交易比例% | Winning Trade Ratio % |
+| 23 | 赢利交易比例% | Win Rate % |
 | 24 | 赢利期望值 | Profit Expectancy |
 | 25 | 赢利交易平均赢利 | Avg Profit per Winning Trade |
 | 26 | 亏损交易平均亏损 | Avg Loss per Losing Trade |
-| 27 | 平均赢利/平均亏损比例 | Avg Win / Avg Loss Ratio |
+| 27 | 平均赢利/平均亏损比例（每笔） | Avg Win / Avg Loss Ratio（**不要**与 payoff ratio 或 Profit Factor 混用：本项 = 平均单笔盈利 / 平均单笔亏损；Profit Factor = 总盈利 / 总亏损） |
 | 28 | 净赢利/亏损比例 | Profit Factor |
 | 29 | 最大单笔赢利 | Largest Single Win |
 | 30 | 最大单笔盈利百分比% | Largest Single Win % |
@@ -255,7 +255,7 @@
 | 年化收益率 | `Annualized Return` | 业绩表语境用 §8 的 `Account Avg Annual Return %` |
 | 最大回撤 | `Max Drawdown` | 同 §8 |
 | 当前距历史最高点回撤 | `Current Drawdown from Peak` | |
-| 系统胜率 | `Winning Trade Ratio %` | 同 §8 |
+| 系统胜率 | `Win Rate %`（图上标签 `Win Rate`） | 同 §8 |
 | 盈/亏比 | `Profit Factor` | 同 §8 |
 | 夏普比率 | `Sharpe Ratio` | |
 | 投入总资产 / 当前总资产 / 当前盈利 | `Total Invested Assets` / `Current Total Assets` / `Current Profit` | 同 §8 |

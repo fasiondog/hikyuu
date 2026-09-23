@@ -100,7 +100,7 @@ The custom signal generator interfaces:
     :rtype: bool)")
 
       .def("next_time_should_buy", &SignalBase::nextTimeShouldBuy,
-           R"(next_time_should_byu(self)
+           R"(next_time_should_buy(self)
 
     Whether it can be bought at the next moment, equivalent to whether the last moment indicates buying)")
 
@@ -337,7 +337,7 @@ The custom signal generator interfaces:
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Mul(sg1, sg2, alternate)
 
-    Generate the signal of the difference of the two indicators
+    Generate the signal of the product of the two signal generators
 
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
@@ -357,7 +357,7 @@ The custom signal generator interfaces:
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Div(sg1, sg2, alternate)
 
-    Generate the signal of the difference of the two indicators
+    Generate the signal of the quotient of the two signal generators
 
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem
@@ -397,7 +397,7 @@ The custom signal generator interfaces:
           py::arg("sg1"), py::arg("sg2"), py::arg("alternate"),
           R"(SG_Or(sg1, sg2, alternate)
 
-    Generate the signal of the AND of the two indicators
+    Generate the signal of the logical OR of the two signal generators
 
     Since the alternate of the SG defaults to True, when using the form like "sg1 + sg2 + sg3", it is easy to overlook the alternate attribute of sg1 + sg2,
     it is recommended to use: SG_Add(sg1, sg2, False) + sg3 to avoid the alternate problem

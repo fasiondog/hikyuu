@@ -442,7 +442,7 @@ void export_Selector(py::module& m) {
       :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
 
     - Use an Indicator sequence:
-      :param sequense(Indicator) input: the original factor list
+      :param sequence(Indicator) input: the original factor list
       :param int topn: only select the first topn systems in the cross-section; when it is less than or equal to 0, there is no limit
       :param int ic_n: the N-day return corresponding to the default IC
       :param int ic_rolling_n: the IC rolling period
@@ -509,7 +509,7 @@ void export_Selector(py::module& m) {
       :param ScoresFilterBase filter: the scores filter
 
     - Use an Indicator sequence:
-      :param sequense(Indicator) input: the original factor list
+      :param sequence(Indicator) input: the original factor list
       :param int ic_n: the N-day return corresponding to the default IC
       :param int ic_rolling_n: the IC rolling period
       :param Stock ref_stk: the reference security, used for the date alignment; when unspecified, it is sh000001

@@ -291,7 +291,7 @@ Common parameters:
 
       .def_property_readonly("first_datetime", &TradeManagerBase::firstDatetime,
                              "(Read-only) the date when the first buy trade occurred; if no trade "
-                             "has occurred, return Datetime>()")
+                             "has occurred, return Null<Datetime>()")
       .def_property_readonly(
         "last_datetime", &TradeManagerBase::lastDatetime,
         "(Read-only) the date of the last trade; note that it is unrelated to the trade type; if "
@@ -494,7 +494,7 @@ Common parameters:
 
       .def("get_base_assets_curve", &TradeManagerBase::getBaseAssetsCurve, py::arg("dates"),
            py::arg("ktype") = KQuery::DAY,
-           R"(get_profit_curve(self, dates[, ktype = Query.DAY])
+           R"(get_base_assets_curve(self, dates[, ktype = Query.DAY])
 
     Get the invested principal asset curve (the invested capital)
 
@@ -508,7 +508,7 @@ Common parameters:
 
     :param Datetime datetime: the trading time
     :param float cash: the amount of the cash deposited
-    :rtype: TradeRecord)")
+    :rtype: bool)")
 
       .def("checkout", &TradeManagerBase::checkout, R"(checkout(self, datetime, cash)
 
@@ -516,7 +516,7 @@ Common parameters:
 
     :param Datetime datetime: the trading time
     :param float cash: the amount of the funds withdrawn
-    :rtype: TradeRecord)")
+    :rtype: bool)")
 
       .def("checkin_stock", &TradeManagerBase::checkinStock)
       .def("checkout_stock", &TradeManagerBase::checkoutStock)
@@ -575,7 +575,7 @@ Common parameters:
     :return: True (success) | False (failure)
     :rtype: bool)")
 
-      .def("add_position", &TradeManagerBase::addPosition, R"(add_postion(self, position)
+      .def("add_position", &TradeManagerBase::addPosition, R"(add_position(self, position)
 
     After establishing the initial account, add the position record directly; it is only used to build an account with the initial positions
 
@@ -591,7 +591,7 @@ Common parameters:
       .def("update_with_weight", &TradeManagerBase::updateWithWeight,
            R"(update_with_weight(self, date)
 
-      Update the current positions and the trade records according to the dividend information; it must be called in the chronological order
+      Update the current positions and the trade records according to the equity/dividend adjustment information; it must be called in the chronological order
 
       :param Datetime date: the current moment)")
 
@@ -676,8 +676,8 @@ Common parameters:
       .def(
         "get_position_ext_info", &TradeManagerBase::getPositionExtInfoDict, py::arg("current_time"),
         py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-        R"(get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
-          
+        R"(get_position_ext_info(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo])
+
     Get the position details of the specified time after the last trading moment of the account, returned as a dictionary, with the stock as the key and the PositionExtInfo as the value
  
     :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)

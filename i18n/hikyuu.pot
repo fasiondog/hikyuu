@@ -113,7 +113,7 @@ msgid "Number of Losing Trades"
 msgstr ""
 
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:107
-msgid "Winning Trade Ratio %"
+msgid "Win Rate %"
 msgstr ""
 
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:108
@@ -248,7 +248,7 @@ msgstr ""
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:911
 #, python-format
-msgid "Winning Trade Ratio: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgid "Win Rate: {:<.2f}%    Profit Factor: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
 msgstr ""
 
 #: hikyuu/draw/drawplot/matplotlib_draw.py:925

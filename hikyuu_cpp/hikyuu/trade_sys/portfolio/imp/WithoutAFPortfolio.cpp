@@ -391,7 +391,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     //---------------------------------------------------
     bool trade_on_close = getParam<bool>("trade_on_close");
     auto current_selected_list = m_se->getSelected(date);
-    HKU_INFO_IF(trace, "[PF] {}: {}", htr("current seleect system count"),
+    HKU_INFO_IF(trace, "[PF] {}: {}", htr("current selected system count"),
                 current_selected_list.size());
 
     m_selected_list.clear();

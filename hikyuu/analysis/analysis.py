@@ -18,7 +18,7 @@ def combinate_ind_analysis(
     n=7,
     keys=[
         "Total Invested Principal", "Current Total Assets", "Cash Balance",
-        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
         "Number of Losing Trades"
     ]
 ):
@@ -72,7 +72,7 @@ def combinate_ind_analysis_multi(
     n=7,
     keys=[
         "Total Invested Principal", "Current Total Assets", "Cash Balance",
-        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
         "Number of Losing Trades"
     ]
 ):
@@ -114,7 +114,7 @@ def combinate_ind_analysis_multi(
 
 def analysis_sys_list(stks, query, sys_proto, keys=[
         "Total Invested Principal", "Current Total Assets", "Cash Balance",
-        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
         "Number of Losing Trades"
     ]):
     if not keys:
@@ -147,7 +147,7 @@ def analysis_sys_list(stks, query, sys_proto, keys=[
 
 def analysis_sys_list_multi(stks, query, sys_proto, keys=[
         "Total Invested Principal", "Current Total Assets", "Cash Balance",
-        "Open Position Net Value", "Winning Trade Ratio %", "Number of Winning Trades",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
         "Number of Losing Trades"
     ]):
     if not keys:
