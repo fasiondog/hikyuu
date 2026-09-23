@@ -1,32 +1,35 @@
 .. py:currentmodule:: hikyuu.trade_sys
 .. highlight:: python
 
-Selector Algorithm Component|SE
+Selector Algorithm Part|SE
 ===============================
 
-Implements the algorithm for evaluating and selecting the targets and the system strategies.
+Implements the algorithms for evaluating and selecting instruments and system strategies.
 
 Common parameters:
 
-    * **get_n** *(int | 0)* : Only take the first get_n selected systems; when it is less than or equal to 0, take all
-    * **depend_on_proto_sys** *(bool |False)* : The prototype systems need to be able to run independently
+    * **get_n** *(int | 0)* : Keep only the first get_n selected systems; when it is less than or equal to 0, all selected systems are kept
+    * **depend_on_proto_sys** *(bool |False)* : Requires the prototype (template) systems to be runnable on their own
 
         ::
 
-            Usually the prototype systems do not participate in the calculation, but in some special scenarios
-            it is necessary to depend on the companion system strategy; in this case the behavior of the actually
-            executed system can be considered to follow the buy/sell trades of the companion system, e.g. relying
-            on the SG for the selection (however, since the scenario relying only on the SG is not rigorous,
-            because the SG of the prototype system and the actual system is the same)
-            In this case, the prototype system needs to be executed before its own calculation, and then the SE can use it.
-            For the case where the actual system and the followed system are completely different, a special SE can be designed.
+            Normally the prototype (template) systems do not take part in the calculation.
+            In some special scenarios, however, the selector has to rely on a companion system
+            strategy, i.e. a system that the actually executed system mirrors: the actual
+            system's behavior can then be viewed as following the buy/sell trades of that
+            mirrored (followed) system; for example, relying on the signal generator (SG) to
+            make the selection. (Relying on the SG alone is not a rigorous setup, though,
+            because the prototype system and the actual system share the same SG.)
+            In this case the prototype system must be executed before the SE performs its own
+            calculation, so that the SE can use its results. When the actual system and the
+            followed system are entirely different, a dedicated SE can be designed.
 
-For the multi-factor scoring based selectors, it is recommended to use SE_MultiFactor2, which allows adding a combined filter for the cross-sectional scoring records returned by the MF. See: :doc:`scfilter`
+For selectors based on multi-factor scoring, SE_MultiFactor2 is recommended, as it allows a composite filter to be applied to the cross-sectional score records returned by the MF. See :doc:`scfilter`.
 
 ::
 
-    # For an SE_MultiFactor2 instance, set the filter: the score is not Nan | split into 10 groups and take group 0 |
-    # the price is greater than or equal to 10 yuan | the amount is not in the last 20% of the daily ranking | take the top 10
+    # For an SE_MultiFactor2 instance, set the filter chain: score is not NaN | split into 10 groups and keep group 0 |
+    # price is at least 10 yuan | turnover amount is not in the bottom 20% of the daily ranking | keep the top 10
     se.set_scores_filter(SCFilter_IgnoreNan()|SCFilter_Group(10, 0)SCFilter_Price(
             10.) | SCFilter_AmountLimit(0.2) | SCFilter_TopN(10))
 
@@ -37,129 +40,129 @@ Built-in Selectors
 
 .. py:function:: SE_Fixed([stk_list, sys])
 
-    The fixed selector, i.e. always selecting the initially defined targets and their system strategy prototypes
+    The fixed selector: it always selects the initially specified instruments along with their system strategy prototypes
     
-    :param list stk_list: the initially defined targets
+    :param list stk_list: the initially specified instruments
     :param System sys: the system strategy prototype
     :return: the SE selector instance
 
 .. py:function:: SE_Signal([stk_list, sys])
 
-    The signal selector, selecting only by the system buy signals
+    The signal selector: it selects instruments solely according to the buy signals of their systems
     
-    :param list stk_list: the initially defined targets
+    :param list stk_list: the initially specified instruments
     :param System sys: the system strategy prototype
     :return: the SE selector instance
 
 .. py:function:: SE_MultiFactor(input[, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight"])
 
-    Create a multi-factor scoring based selector, supporting several creation ways:
+    Create a selector based on multi-factor scoring. It supports several forms of input:
 
     - Specify the MF directly: ``SE_MultiFactor(mf, topn=10)``
     - Use a FactorSet: ``SE_MultiFactor(factor_set, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight")``
     - Use an Indicator sequence: ``SE_MultiFactor(indicators, topn=10, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight")``
       
-    :param input: the factor input, which can be a MultiFactorBase object, a FactorSet object or an Indicator sequence
-    :param int topn: only select the first topn systems in the cross-section; when it is less than or equal to 0, there is no limit
-    :param int ic_n: the N-day return corresponding to the default IC
-    :param int ic_rolling_n: the IC rolling period
+    :param input: the factor input: a MultiFactorBase object, a FactorSet object, or an Indicator sequence
+    :param int topn: select only the top topn systems on each cross-section; when it is less than or equal to 0, no limit is applied
+    :param int ic_n: the N-day return horizon used in the default IC calculation
+    :param int ic_rolling_n: the IC rolling window
     :param Stock ref_stk: the reference security (when unspecified, defaults to sh000300, the CSI 300)
-    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
-    :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
+    :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
+    :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
     :return: the SE selector instance
 
     .. code-block:: python
     
-        # Use an Indicator list (the original way)
+        # From an Indicator list (the legacy way)
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         selector1 = SE_MultiFactor(indicators, topn=10)
         
-        # Use a FactorSet (the new way)
+        # From a FactorSet (the newer way)
         factor_set = FactorSet("my_factors")
         factor_set.add(MA(CLOSE(), 5))
         factor_set.add(MA(CLOSE(), 10))
         selector2 = SE_MultiFactor(factor_set, topn=10)
         
-        # Use the pre-created MultiFactor object directly
+        # From a pre-created MultiFactor object, passed directly
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor(mf, topn=10)
 
 .. py:function:: SE_MultiFactor2(input[, ic_n=5, ic_rolling_n=120, ref_stk=None, spearman=True, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan()])
 
-    Create a multi-factor scoring based selector, supporting several creation ways. :doc:`scfilter`
+    Create a selector based on multi-factor scoring; it supports several forms of input. See :doc:`scfilter`.
 
     - Specify the MF directly: ``SE_MultiFactor2(mf, filter)``
     - Use a FactorSet: ``SE_MultiFactor2(factor_set, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan())``
     - Use an Indicator sequence: ``SE_MultiFactor2(indicators, ic_n=5, ic_rolling_n=120, ref_stk=None, mode="MF_ICIRWeight", filter=SCFilter_IgnoreNan())``
 
-    SE_MultiFactor2 has a separate parameter "mf_recover_type", set with set_param. It specifies that the mf uses a fixed recovery type to calculate, e.g. a fixed forward adjustment.
+    SE_MultiFactor2 exposes an additional parameter, "mf_recover_type", which is set via set_param. It forces the MF to be calculated with a fixed recovery (price-adjustment) type, e.g. a fixed forward adjustment.
 
-    :param input: the factor input, which can be a MultiFactorBase object, a FactorSet object or an Indicator sequence
-    :param int ic_n: the N-day return corresponding to the default IC
-    :param int ic_rolling_n: the IC rolling period
+    :param input: the factor input: a MultiFactorBase object, a FactorSet object, or an Indicator sequence
+    :param int ic_n: the N-day return horizon used in the default IC calculation
+    :param int ic_rolling_n: the IC rolling window
     :param Stock ref_stk: the reference security (when unspecified, defaults to sh000300, the CSI 300)
-    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
-    :param str mode: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight" the factor composition algorithm name
-    :param ScoresFilter filter: the scores filter
+    :param bool spearman: when True (the default), use the Spearman correlation coefficient; otherwise use Pearson
+    :param str mode: the factor composition algorithm name: "MF_ICIRWeight" | "MF_ICWeight" | "MF_EqualWeight"
+    :param ScoresFilter filter: the cross-sectional scores filter
     :return: the SE selector instance
 
     .. code-block:: python
     
-        # Use an Indicator list
+        # From an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         selector1 = SE_MultiFactor2(indicators)
         
-        # Use a FactorSet
+        # From a FactorSet
         factor_set = FactorSet("my_factors")
         factor_set.add(MA(CLOSE(), 5))
         factor_set.add(MA(CLOSE(), 10))
         selector2 = SE_MultiFactor2(factor_set)
         
-        # Use the pre-created MultiFactor object directly
+        # From a pre-created MultiFactor object, passed directly
         mf = MF_ICIRWeight(factor_set, stocks, query)
         selector3 = SE_MultiFactor2(mf)
         
 Custom Selector Strategy
 ------------------------
 
-The custom selector strategy interface:
+The selector strategy interface for customization consists of the following override hooks:
 
-* :py:meth:`SelectorBase.is_match_af` - [Required] Judge whether it matches the AF
-* :py:meth:`SelectorBase.get_selected` - [Required] Get the list of the system instances at the specified moment
-* :py:meth:`SelectorBase._calculate` - [Required] The calculation interface
-* :py:meth:`SelectorBase._reset` - [Optional] Reset the private attributes
-* :py:meth:`SelectorBase._clone` - [Required] The clone interface
+* :py:meth:`SelectorBase.is_match_af` - [Required] Determine whether the selector matches the AF
+* :py:meth:`SelectorBase.get_selected` - [Required] Return the list of system instances at the specified datetime
+* :py:meth:`SelectorBase._calculate` - [Required] The calculation hook
+* :py:meth:`SelectorBase._reset` - [Optional] Reset private attributes
+* :py:meth:`SelectorBase._clone` - [Required] The clone hook
 
 Selector Strategy Base Class
 ----------------------------
 
 .. py:class:: SelectorBase
 
-    The selector strategy base class, implementing the algorithm for evaluating and selecting the targets and the system strategies
+    The selector strategy base class, which implements the algorithms for evaluating and selecting instruments and system strategies
     
-    .. py:attribute:: name Name
+    .. py:attribute:: name The selector name
 
-    .. py:attribute:: proto_sys_list The prototype system list
+    .. py:attribute:: proto_sys_list The list of prototype (template) systems
 
-    .. py:attribute:: real_sys_list The actual system list at runtime
+    .. py:attribute:: real_sys_list The list of actual systems at runtime
     
     .. py:method:: __init__(self[, name="SelectorBase])
     
-        The initialization constructor
+        Constructor.
         
-        :param str name: the name
+        :param str name: the selector name
         
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
+        Get the value of the specified parameter.
         
         :param str name: the parameter name
         :return: the parameter value
-        :raises out_of_range: no such parameter
+        :raises out_of_range: raised if no such parameter exists
         
     .. py:method:: set_param(self, name, value)
     
-        Set the parameter
+        Set the value of a parameter.
         
         :param str name: the parameter name
         :param value: the parameter value
@@ -168,63 +171,63 @@ Selector Strategy Base Class
 
     .. py:method:: reset(self)
     
-        The reset operation
+        Reset the selector.
     
     .. py:method:: clone(self)
     
-        The clone operation        
+        Return a clone of the selector.        
         
     .. py:method:: add_stock(self, stock, sys)
 
-        Add the initial target and its corresponding system strategy prototype
+        Add an initial instrument and its corresponding system strategy prototype.
         
-        :param Stock stock: the initial target to add
+        :param Stock stock: the initial instrument to add
         :param System sys: the system strategy prototype
 
     .. py:method:: add_stock_list(self, stk_list, sys)
     
-        Add the initial target list and its system strategy prototype
+        Add a list of initial instruments together with their shared system strategy prototype.
         
-        :param StockList stk_list: the initial target list to add
+        :param StockList stk_list: the list of initial instruments to add
         :param System sys: the system strategy prototype
     
     .. py:method:: remove_all(self)
     
-        Remove all the added prototype systems
+        Remove all prototype systems that have been added.
 
     .. py:method:: set_scores_filter(self, scfilter)
 
-        Set the ScoresFilter, which will replace the existing filter; only applicable to SE_MultiFactor
+        Set the ScoresFilter, replacing the existing filter; applicable only to SE_MultiFactor
     
         :param ScoresFilter filter: ScoresFilter
 
     .. py:method:: add_scores_filter(self, scfilter)
 
-        Add a new filter on top of the existing one; only applicable to SE_MultiFactor
+        Append an additional filter on top of the existing one; applicable only to SE_MultiFactor
 
         :param ScoresFilter filter: the new filter    
 
 
     .. py:method:: get_selected(self, datetime)
     
-        [Overload interface] Get the selected system instances at the specified moment
+        [Override hook] Return the selected system instances at the specified datetime.
         
-        :param Datetime datetime: the specified moment
-        :return: the list of the selected system instances
+        :param Datetime datetime: the specified datetime
+        :return: the list of selected system instances
         :rtype: SystemList
 
 
      .. py:method:: _calculate(self)
 
-        [Overload interface] The subclass calculation interface
+        [Override hook] The subclass calculation hook.
 
      .. py:method:: _reset(self)
     
-        [Overload interface] The subclass reset interface, resetting the internal private variables
+        [Override hook] The subclass reset hook, used to reset internal private state.
     
     .. py:method:: _clone(self)
     
-        [Overload interface] The subclass clone interface    
+        [Override hook] The subclass clone hook.    
     
     
     

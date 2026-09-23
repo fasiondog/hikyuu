@@ -4,46 +4,46 @@
 System Strategy|SYS
 ===================
 
-A system is the complete strategy for a single trading object, including the environment judgement, the system validity condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used to simulate the backtest.
+A System is a complete trading strategy for a single instrument. It bundles together the environment judgment, the system validity condition, money management, the stop-loss, the take-profit, the profit goal, and the slippage parts, and is used to run backtests.
 
-For multiple targets (multiple securities), :class:`MultiSystem` can be used to aggregate multiple System instances (single-security or nested :class:`MultiSystem`) into a portfolio, backtested uniformly under the same trade account (TM). :class:`MultiSystem` adds the sub-systems through ``add(subsystem)``, and supports **arbitrary nesting** and circular reference detection; every sub-system keeps its own SG/MM/EV/CN/ST/TP/PG/SP strategy, only the parent system keeps the books and orders uniformly.
+For multiple instruments (multiple securities), :class:`MultiSystem` can be used to aggregate multiple System instances (each for a single security, or even a nested :class:`MultiSystem`) into a portfolio that is backtested uniformly under the same trading account (TM). Sub-systems are added to :class:`MultiSystem` through ``add(subsystem)``; it supports **arbitrary nesting** and circular-reference detection. Each sub-system keeps its own SG/MM/EV/CN/ST/TP/PG/SP strategies, and only the parent keeps the books and places orders uniformly.
 
-:class:`MultiSystem` supports two running modes (``set_mode``):
+:class:`MultiSystem` supports two run modes (``set_mode``):
 
-- **Mode A (signal aggregation, the default)**: the parent gives every sub-system a fixed "shadow account" (the virtual funds are decoupled from the parent), the sub-systems act as pure signal sources; the parent converts the quantities by the weights (the equal weight by default) through MM L1/L2 and orders uniformly.
-- **Mode B (fund allocation / FOF-MOM)**: the parent gives every sub-system a "real account with the quota allocated by the upper layer" (the initial quota ``set_sub_init_cash``), the sub-systems decide autonomously within their own quota, the parent **passes through** their real instructions through MM L2; on the rebalancing day the parent writes back the next-period quota (lagging one period behind, supporting the nested penetration).
+- **Mode A (signal aggregation, the default)**: the parent grants each sub-system a fixed "shadow account" whose virtual funds are decoupled from the parent, and the sub-systems act purely as signal sources; the parent converts the signaled quantities by the configured weights (equal weight by default) through MM L1/L2 and places all orders uniformly.
+- **Mode B (capital allocation / FOF-MOM)**: the parent grants each sub-system a "real account with a quota allocated by the upper layer" (the initial quota is set via ``set_sub_init_cash``); the sub-systems make autonomous decisions within their own quotas, and the parent **passes through** their real orders through MM L2. On each rebalance day the parent writes back the next-period quota (lagged by one period, with support for nested pass-through).
 
-The aggregate backtest also supports:
+Aggregated backtesting also supports:
 
-- **MM L1/L2/L3 layering**: L1 system-level allocation (the nominal weight in mode A / the real quota in mode B), L2 behavior-level conversion (conversion by proportion in A / pass-through in B), L3 portfolio risk control (the concentration upper limit ``max-single-position``, 1.0 by default meaning no limit).
-- **Rebalancing cycle** (``set_adjust_cycle``): rebalance on every close day by default; after setting the days greater than 1, the rebalancing happens only on the cycle day.
-- **Trading object selection (SE)** (``set_se``): optional, on the rebalancing day only the selected sub-systems run, the unselected ones can be force liquidated (``set_sell_at_not_selected``).
-- **Turnover rate** (``get_adjust_turnover``): records the ratio of the turnover amount to the total assets before rebalancing on every rebalancing day.
-- **Delisting/suspension**: the parent uniformly force sells the holdings of the delisted instruments at the open stage; the sub-systems automatically skip the suspended days.
+- **MM L1/L2/L3 layering**: L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B), L2 performs behavior-level conversion (proportional conversion in A / pass-through in B), and L3 provides portfolio risk control (the concentration limit ``max-single-position``, which defaults to 1.0, meaning no limit).
+- **Rebalancing cycle** (``set_adjust_cycle``): by default, rebalancing happens on every close day; once the number of days is set to a value greater than 1, rebalancing occurs only on the cycle days.
+- **Instrument selection (SE)** (``set_se``): optional; on a rebalance day, only the selected sub-systems run, and the unselected ones can be force-liquidated (``set_sell_at_not_selected``).
+- **Turnover rate** (``get_adjust_turnover``): on each rebalance day, records the ratio of the traded amount to the total assets before rebalancing.
+- **Delisting/suspension**: the parent uniformly force-sells the positions in delisted instruments during the open stage; the sub-systems automatically skip the suspended bars.
 
 Common parameters:
 
-    * **buy_delay=True** *(bool)* : Whether the buy operation is delayed to be traded at the open of the next bar
-    * **sell_delay=True** *(bool)* : Whether the sell operation is delayed to be traded at the open of the next bar
-    * **delay_use_current_price=True** *(bool)* : In the case of a delayed operation, whether to use the price of the bar at the current trade time to calculate the new stop-loss price/take-profit price/goal price, or to use the result calculated last time
-    * **max_delay_count=3** *(int)* : The limit of the number of the consecutive delayed trade requests; it should be greater than or equal to 0, and 0 means only 1 delay is allowed
-    * **tp_monotonic=True** *(bool)* : The take profit increases monotonically
-    * **tp_delay_n=3** *(int)* : The number of days when the take profit starts to be delayed, i.e. the take profit strategy judgement takes effect from several days after the actual trade
-    * **ignore_sell_sg=False** *(bool)* : Ignore the sell signal, and sell only by the stop-loss/take-profit and other ways
-    * **can_trade_when_high_eq_low=False** *(bool)* : Whether trading is allowed when the highest price equals the lowest price (a limit-up with a single price cannot be bought, and a limit-down with a single price cannot be sold)
+    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar
+    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar
+    * **delay_use_current_price=True** *(bool)* : For a delayed operation, whether to use the price of the bar at the current trading time to calculate the new stop-loss/take-profit/goal price, or to reuse the result calculated previously
+    * **max_delay_count=3** *(int)* : The maximum number of consecutive delayed trade requests; must be greater than or equal to 0, and 0 means only one delay is allowed
+    * **tp_monotonic=True** *(bool)* : Whether the take-profit level increases monotonically
+    * **tp_delay_n=3** *(int)* : The number of days by which the take-profit is delayed, i.e. the take-profit judgment takes effect starting a given number of days after the actual trade
+    * **ignore_sell_sg=False** *(bool)* : Whether to ignore SG sell signals, so that selling happens only through the stop-loss/take-profit and other such means
+    * **can_trade_when_high_eq_low=False** *(bool)* : Whether trading is allowed when the highest price equals the lowest price (a single-price limit-up cannot be bought, and a single-price limit-down cannot be sold)
 
-    * **ev_open_position=False** *(bool)*: Whether to use the environment judgement for the initial position opening
-    * **cn_open_position=False** *(bool)*: Whether to use the system validity condition for the initial position opening
+    * **ev_open_position=False** *(bool)*: Whether to apply the environment judgment to the initial position opening
+    * **cn_open_position=False** *(bool)*: Whether to apply the system validity condition to the initial position opening
     
-    * **shared_tm=False** *(bool)*: Whether the tm part is a shared part
-    * **shared_ev=True** *(bool)*: Whether the ev part is a shared part
-    * **shared_cn=False** *(bool)*: Whether the cv part is a shared part    
-    * **shared_mm=False** *(bool)*: Whether the mm part is a shared part
-    * **shared_sg=False** *(bool)*: Whether the sg part is a shared part
-    * **shared_st=False** *(bool)*: Whether the st part is a shared part
-    * **shared_tp=False** *(bool)*: Whether the tp part is a shared part
-    * **shared_pg=False** *(bool)*: Whether the pg part is a shared part
-    * **shared_sp=False** *(bool)*: Whether the sp part is a shared part
+    * **shared_tm=False** *(bool)*: Whether the tm part is shared
+    * **shared_ev=True** *(bool)*: Whether the ev part is shared
+    * **shared_cn=False** *(bool)*: Whether the cn part is shared    
+    * **shared_mm=False** *(bool)*: Whether the mm part is shared
+    * **shared_sg=False** *(bool)*: Whether the sg part is shared
+    * **shared_st=False** *(bool)*: Whether the st part is shared
+    * **shared_tp=False** *(bool)*: Whether the tp part is shared
+    * **shared_pg=False** *(bool)*: Whether the pg part is shared
+    * **shared_sp=False** *(bool)*: Whether the sp part is shared
 
 
 .. raw:: html
@@ -59,38 +59,38 @@ Common parameters:
         <tbody>
             <tr>
                 <td>EV_Xxx</td>
-                <td>Environment judgement strategy</td>
-                <td>Used to judge the market environment; an actual trade happens only when the market is valid. This strategy can usually be shared among different system strategy instances to reduce the amount of calculation.</td>
+                <td>Environment judgment strategy</td>
+                <td>Assesses the market environment; an actual trade occurs only when the market is valid. This strategy can usually be shared across different system instances to reduce computation.</td>
             </tr>
             <tr>
                 <td>CN_Xxx</td>
                 <td>System validity condition</td>
-                <td>Used to judge the applicability condition of the system itself; an actual trade happens only when the condition is valid.</td>
+                <td>Defines the applicability conditions of the system itself; an actual trade occurs only when the condition is valid.</td>
             </tr>
             <tr>
                 <td>SG_Xxx</td>
                 <td>Signal generator</td>
-                <td>Responsible for generating the buy and sell signals.</td>
+                <td>Generates the buy and sell signals.</td>
             </tr>            
             <tr>
                 <td>ST_Xxx</td>
                 <td>Stop-loss/take-profit strategy</td>
-                <td>Stop-loss: takes effect only when the trade has a loss, used to terminate the trade<br>Take-profit: takes effect only when the trade is already profitable; whether the increase is guaranteed is controlled by the system common parameter tp_monotonic</td>
+                <td>Stop-loss: takes effect only when the trade is at a loss, and is used to terminate the trade<br>Take-profit: takes effect only when the trade is already profitable; whether the level is guaranteed to move only upward is controlled by the common system parameter tp_monotonic</td>
             </tr>
             <tr>
                 <td>MM_Xxx</td>
                 <td>Money management strategy</td>
-                <td>Used to control the trade risk, deciding the buy/sell number of each trade</td>
+                <td>Used to control trading risk, deciding the buy/sell quantity of each trade</td>
             </tr>            
             <tr>
                 <td>PG_Xxx</td>
                 <td>Profit goal strategy</td>
-                <td>Exits the trade when it reaches the profit goal; it is essentially a special take-profit strategy</td>
+                <td>Exits the trade when its profit goal is reached; it is essentially a special take-profit strategy</td>
             </tr>
             <tr>
                 <td>SP_Xxx</td>
                 <td>Slippage algorithm</td>
-                <td>Used only in the backtest, simulating the difference between the planned price and the actual price that occurs in the actual trading during the backtest</td>
+                <td>Used only in backtests; simulates the difference between the planned price and the actual fill price that would occur in live trading</td>
             </tr>              
         </tbody>
     </table>
@@ -102,25 +102,25 @@ Create a System and Run the Backtest
 
 .. py:function:: SYS_Simple([tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg=None, sp=None])
 
-    Create a simple system instance (no multiple position increases or decreases in each trade, i.e. everything is sold when selling after each buy). When the system instance runs (calling the run method), it needs at least one matching trade manager instance, one money management strategy
-    and one signal generator), which can be specified after the system instance is created. If nothing is output when calling run, and there is no correct result, it may be that tm, sg, mm are not set. For the backtest, use the run method, e.g.::
+    Create a simple system instance (a trade is not scaled in or out repeatedly: after each buy, the whole position is sold in one go when selling). When the system instance runs (by calling the run method), it requires at least one matching trade manager instance, one money management strategy
+    and one signal generator, which can also be specified after the system instance is created. If calling run produces no output and no correct result, tm, sg, or mm may not have been set. To run a backtest, use the run method, e.g.::
     
         # Create a simulated trading account for the backtest, with an initial capital of 300,000
         my_tm = crtTM(init_cash = 300000)
 
-        # Create the signal generator (the 5-day EMA is the fast line, and the 10-day EMA of the 5-day EMA itself is the slow line; buy when the fast line crosses the slow line upward, otherwise sell)
+        # Create the signal generator (the 5-day EMA is the fast line, and the 10-day EMA of that EMA itself is the slow line; buy when the fast line crosses above the slow line, and sell otherwise)
         my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 
-        # Buy a fixed number of 1000 shares each time
+        # Buy a fixed quantity of 1,000 shares each time
         my_mm = MM_FixedCount(1000)
 
-        # Create the trade system and run it
+        # Create the system and run it
         sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
         sys.run(sm['sz000001'], Query(-150))
     
     :param TradeManager tm: the trade manager instance 
     :param MoneyManager mm: the money management strategy
-    :param EnvironmentBase ev: the environment judgement strategy
+    :param EnvironmentBase ev: the environment judgment strategy
     :param ConditionBase cn: the system validity condition
     :param SignalBase sg: the signal generator
     :param StoplossBase st: the stop-loss strategy
@@ -135,11 +135,11 @@ System Part Enum Definitions
 
 .. py:class:: System.Part
 
-    The system part enumeration values; the buy/sell and other operations of the system can be triggered by these parts, used to identify the source of the actual trade instruction; see: :py:class:`TradeRecord`.
+    The system part enumeration values. The system's buy/sell and other operations can be triggered by these parts, and the enumeration is used to identify the source of an actual trade instruction; see :py:class:`TradeRecord`.
     
-    In actual use, the simplified way of System.ENVIRONMENT can be used instead of System.Part.ENVIRONMENT, and the others are similar.
+    In practice, the shorthand System.ENVIRONMENT can be used in place of System.Part.ENVIRONMENT, and similarly for the others.
 
-    - System.Part.ENVIRONMENT  - Environment judgement strategy
+    - System.Part.ENVIRONMENT  - Environment judgment strategy
     - System.Part.CONDITION    - System validity condition
     - System.Part.SIGNAL       - Signal generator
     - System.Part.STOPLOSS     - Stop-loss strategy
@@ -147,12 +147,12 @@ System Part Enum Definitions
     - System.Part.MONEYMANAGER - Money management strategy
     - System.Part.PROFITGOAL   - Profit goal strategy
     - System.Part.SLIPPAGE     - Slippage algorithm
-    - System.Part.INVALID      - The invalid value boundary; when it is greater than or equal to this value, the part is invalid
+    - System.Part.INVALID      - The invalid-value boundary; any value greater than or equal to this value denotes an invalid part
 
     
 .. py:function:: get_system_part_name(part)
 
-    Get the string name of the part
+    Get the string name of a part
     
         - System.Part.ENVIRONMENT  - "EV"
         - System.Part.CONDITION    - "CN"
@@ -170,7 +170,7 @@ System Part Enum Definitions
 
 .. py:function:: get_system_part_enum(part_name)
 
-     Get the corresponding enumeration value by the string name of the system part
+     Get the enumeration value corresponding to the string name of a system part
 
     :param str part_name: the string name of the system part; see: :py:func:`getSystemPartName`
     :rtype: System.Part
@@ -182,7 +182,7 @@ System Base Class Definition
 
 .. py:class:: System
 
-    The system base class. To extend or implement more complex system trading behaviors, inherit from this class.
+    The system base class. To extend it or implement more complex systematic trading behavior, inherit from this class.
     
     .. py:attribute:: name  
     
@@ -198,7 +198,7 @@ System Base Class Definition
         
     .. py:attribute:: ev  
     
-        The environment judgement strategy
+        The environment judgment strategy
         
     .. py:attribute:: cn  
     
@@ -226,7 +226,7 @@ System Base Class Definition
 
     .. py:method:: get_param(self, name)
 
-        Get the specified parameter
+        Get the value of the specified parameter
     
         :param str name: the parameter name
         :return: the parameter value
@@ -234,7 +234,7 @@ System Base Class Definition
         
     .. py:method:: set_param(self, name, value)
     
-        Set the parameter
+        Set the value of a parameter
         
         :param str name: the parameter name
         :param value: the parameter value
@@ -249,19 +249,19 @@ System Base Class Definition
         
     .. py:method:: get_trade_record_list(self)
     
-        Get the actually executed trade records; the difference from TM is that it does not include the trade records brought by the rights/adjustment
+        Get the records of trades actually executed; unlike TM, this does not include the trade records caused by rights/dividend adjustments
         
         :rtype: TradeRecordList
         
     .. py:method:: get_buy_trade_request_list(self)
     
-        Get the buy request list; in the "delay" mode, check whether there is a buy operation at the next moment
+        Get the list of buy requests; in "delay" mode, use this to check whether a buy operation will occur on the next bar
         
         :rtype: list[TradeRequest]
 
     .. py:method:: get_sell_trade_request_list(self)
     
-        Get the sell request list; in the "delay" mode, check whether there is a sell operation at the next moment
+        Get the list of sell requests; in "delay" mode, use this to check whether a sell operation will occur on the next bar
         
         :rtype: list[TradeRequest]
                 
@@ -269,22 +269,22 @@ System Base Class Definition
     
         Run the system and execute the backtest
         
-        :param Stock stock: the traded security
-        :param Query query: the K-line data query condition
-        :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
-        :param bool reset_all: force resetting all the parts
+        :param Stock stock: the security to trade
+        :param Query query: the bar data query conditions
+        :param bool reset: whether to reset according to the shared attributes of the system parts before execution
+        :param bool reset_all: force a reset of all parts
 
     .. py:method:: reset(self)
     
-        Reset, but excluding the existing trading objects and the shared parts
+        Reset the system, excluding the current instrument and the shared parts
         
     .. py:method:: force_reset_all(self)
 
-        Force resetting all the components and clearing the existing trading objects, ignoring the sharing attributes of the components
+        Force-reset all parts and clear the existing instrument, ignoring the shared attributes of the parts
 
     .. py:method:: clone(self)
     
-        The clone operation; it clones according to the sharing attributes of the parts, and the shared parts are not actually cloned, keeping them shared
+        Clone the system according to the shared attributes of the parts; the shared parts are not actually duplicated and remain shared
         
         
         
@@ -293,28 +293,28 @@ Trade Request Records
 
 .. py:class:: TradeRequest
 
-    The trade request record. The trade request information registered inside the system when implementing the delayed operations. The main purpose of exposing this structure is to be used in the "delay" mode (the trade is delayed to the open of the next bar); in this case the system actually knows that a trade will happen in the next bar, and :py:meth:`System.getBuyTradeRequestList` and :py:meth:`System.getSellTradeRequestList` can be used to know whether the next BAR needs to be bought/sold. It is mainly used for reminding or printing the operations needed in the next bar. It has no effect on the running of the system itself.
+    A trade request record. It holds the trade request information registered inside the system when delayed operations are performed. This structure is exposed mainly for use in "delay" mode (where the trade is delayed to the open of the next bar): in this case the system already knows that a trade will happen on the next bar, and :py:meth:`System.getBuyTradeRequestList` and :py:meth:`System.getSellTradeRequestList` can be used to find out whether the next bar needs a buy or a sell. It is mainly used for alerting on or printing the operations needed on the next bar. It has no effect on the running of the system itself.
     
     .. py:attribute:: valid 
         
-        Whether the trade request record is valid (True | False)
+        Whether this trade request record is valid (True | False)
     
     .. py:attribute:: business
     
-        The trade business type; see: :py:class:`hikyuu.trade_manage.BUSINESS`
+        The trade business type; see :py:class:`hikyuu.trade_manage.BUSINESS`
     
     .. py:attribute:: datetime
     
-        The moment when the trade request was issued
+        The time at which the trade request was issued
     
     .. py:attribute:: stoploss
     
-        The stop-loss price at the moment when the trade request was issued
+        The stop-loss price at the time the trade request was issued
     
     .. py:attribute:: part
     
-        The source of the trade request; see: :py:class:`System.Part`
+        The source part of the trade request; see :py:class:`System.Part`
     
     .. py:attribute:: count
     
-        The number of the consecutive delays due to the operation failures
+        The number of consecutive delays caused by failed operations
