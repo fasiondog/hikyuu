@@ -78,7 +78,7 @@
 | 已平仓交易总数 | Total Closed Trades |
 | 赢利交易数 | Number of Winning Trades |
 | 亏损交易数 | Number of Losing Trades |
-| 赢利交易比例% | Winning Trade Ratio % |
+| 赢利交易比例% | Win Rate % |
 | 赢利期望值 | Profit Expectancy |
 | 赢利交易平均赢利 | Avg Profit per Winning Trade |
 | 亏损交易平均亏损 | Avg Loss per Losing Trade |

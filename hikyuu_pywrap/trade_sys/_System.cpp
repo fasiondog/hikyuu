@@ -33,7 +33,8 @@ DatetimeList toDatetimeList(const py::object& dates) {
         return result;
     }
     if (!py::hasattr(dates, "__iter__")) {
-        throw py::type_error("dates must be an iterable sequence of Datetime (list/tuple/DatetimeList)");
+        throw py::type_error(
+          "dates must be an iterable sequence of Datetime (list/tuple/DatetimeList)");
     }
     for (auto item : py::iter(dates)) {
         result.push_back(py::cast<Datetime>(item));
@@ -271,14 +272,17 @@ void export_System(py::module& m) {
     :rtype: System.Part)");
 
     //--------------------------------------------------------------------------------------
-    // Recursive combination refactoring: the extensible information model (MomentResult / TradeSuggestion / SubSystemContext)
+    // Recursive combination refactoring: the extensible information model (MomentResult /
+    // TradeSuggestion / SubSystemContext)
     py::enum_<SuggestionType>(m, "SuggestionType", "The suggestion type")
       .value("HOLD", SuggestionType::HOLD)
       .value("BUY", SuggestionType::BUY)
       .value("SELL", SuggestionType::SELL)
       .value("CLEAR", SuggestionType::CLEAR);
 
-    py::class_<TradeSuggestion>(m, "TradeSuggestion", "The suggestion instruction with the complete semantic expression (without normalization)")
+    py::class_<TradeSuggestion>(
+      m, "TradeSuggestion",
+      "The suggestion instruction with the complete semantic expression (without normalization)")
       .def(py::init<>())
       .def_readwrite("stock", &TradeSuggestion::stock)
       .def_readwrite("sys", &TradeSuggestion::sys)
@@ -296,7 +300,9 @@ void export_System(py::module& m) {
       .def_readwrite("score", &TradeSuggestion::score)
       .def_readwrite("remark", &TradeSuggestion::remark);
 
-    py::class_<MomentResult>(m, "MomentResult", "The complete running result (suggestion) of the system instance at a certain moment")
+    py::class_<MomentResult>(
+      m, "MomentResult",
+      "The complete running result (suggestion) of the system instance at a certain moment")
       .def(py::init<>())
       .def_readwrite("datetime", &MomentResult::datetime)
       .def_readwrite("funds_before_open", &MomentResult::funds_before_open)
@@ -310,7 +316,8 @@ void export_System(py::module& m) {
       .def("allTrades", &MomentResult::allTrades)
       .def("empty", &MomentResult::empty);
 
-    py::class_<SubSystemContext>(m, "SubSystemContext", "The MM L1 context (including the mode B quota)")
+    py::class_<SubSystemContext>(m, "SubSystemContext",
+                                 "The MM L1 context (including the mode B quota)")
       .def(py::init<>())
       .def_readwrite("sys", &SubSystemContext::sys)
       .def_readwrite("funds", &SubSystemContext::funds)
@@ -334,14 +341,18 @@ itself, it has no effect on the operation.)")
       .def("__str__", to_py_str<TradeRequest>)
       .def("__repr__", to_py_str<TradeRequest>)
 
-      .def_readwrite("valid", &TradeRequest::valid, "Whether this trade request record is valid (True | False)")
+      .def_readwrite("valid", &TradeRequest::valid,
+                     "Whether this trade request record is valid (True | False)")
       .def_readwrite("business", &TradeRequest::business,
                      "The trade business type, see: :py:class:`hikyuu.trade_manage.BUSINESS`")
-      .def_readwrite("datetime", &TradeRequest::datetime, "The moment when the trade request was issued")
-      .def_readwrite("stoploss", &TradeRequest::stoploss, "The stop-loss price at the moment when the trade request was issued")
+      .def_readwrite("datetime", &TradeRequest::datetime,
+                     "The moment when the trade request was issued")
+      .def_readwrite("stoploss", &TradeRequest::stoploss,
+                     "The stop-loss price at the moment when the trade request was issued")
       .def_readwrite("part", &TradeRequest::from,
                      "The source of the trade request, see: :py:class:`System.Part`")
-      .def_readwrite("count", &TradeRequest::count, "The number of the consecutive delays due to the operation failures")
+      .def_readwrite("count", &TradeRequest::count,
+                     "The number of the consecutive delays due to the operation failures")
         DEF_PICKLE(TradeRequest);
 
     //--------------------------------------------------------------------------------------
@@ -349,7 +360,7 @@ itself, it has no effect on the operation.)")
       m, "System", py::dynamic_attr(),
       R"(The system base class. To extend or implement the more complex system trading behaviors, you can inherit from this class.
 
-A system refers to the complete strategy for a single trading object, including the environment judgement, the system valid condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used for the simulated backtesting.
+A system refers to the complete strategy for a single trading object, including the market environment, the system valid condition, the money management, the stop-loss, the take-profit, the profit goal and the slippage; it is used for the simulated backtesting.
 
 Common parameters:
 
@@ -357,9 +368,9 @@ Common parameters:
   - delay_use_current_price=True (bool): in the case of the delayed operation, whether to calculate the new stop-loss/take-profit/target price with the price of the bar at the current trade, or use the result calculated last time
   - max_delay_count=3 (int): the limit on the number of the consecutive delayed trade requests; it should be greater than or equal to 0, and 0 means only one delay is allowed
   - tp_monotonic=True (bool): the take-profit increases monotonically
-  - tp_delay_n=3 (int): the number of the days when the take-profit delay starts, i.e. the take-profit strategy judgement takes effect only after several days of the actual trading
+  - tp_delay_n=3 (int): the number of the days when the take-profit delay starts, i.e. the take-profit strategy judgment takes effect only after several days of the actual trading
   - ignore_sell_sg=False (bool): ignore the sell signal, and sell only by the stop-loss/take-profit and the other ways
-  - ev_open_position=False (bool): whether to use the market environment judgement for the initial position building
+  - ev_open_position=False (bool): whether to use the market environment for the initial position building
   - cn_open_position=False (bool): whether to use the system valid condition for the initial position building)")
 
       .def(py::init<const string&>())
@@ -373,27 +384,29 @@ Common parameters:
       .def_property("name", py::overload_cast<>(&System::name, py::const_),
                     py::overload_cast<const string&>(&System::name), py::return_value_policy::copy,
                     "The system name")
-      .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy, "The query condition")
+      .def_property_readonly("query", &System::getQuery, py::return_value_policy::copy,
+                             "The query condition")
 
       .def_property("to", &System::getTO, &System::setTO, "The trading object KData")
 
-      //   .def_property("tm", &System::getTM, &System::setTM, "The associated trade manager instance")
+      //   .def_property("tm", &System::getTM, &System::setTM, "The associated trade manager
+      //   instance")
 
       .def_property(
         "tm", &System::getTM, [](PySystem& self, py::object py_tm) { self.set_tm(py_tm); },
         "The associated trade manager instance")
       .def_property(
         "mm", &System::getMM, [](PySystem& self, py::object py_mm) { self.set_mm(py_mm); },
-        "The money manager strategy")
+        "The money management strategy")
       .def_property(
         "ev", &System::getEV, [](PySystem& self, py::object py_ev) { self.set_ev(py_ev); },
-        "The market environment judgement strategy")
+        "The market environment strategy")
       .def_property(
         "cn", &System::getCN, [](PySystem& self, py::object py_tm) { self.set_cn(py_tm); },
         "The system valid condition")
       .def_property(
         "sg", &System::getSG, [](PySystem& self, py::object py_sig) { self.set_sg(py_sig); },
-        "The signal indicator")
+        "The signal generator")
       .def_property(
         "st", &System::getST, [](PySystem& self, py::object py_st) { self.set_st(py_st); },
         "The stop-loss strategy")
@@ -427,7 +440,7 @@ Common parameters:
 
       .def("have_param", &System::haveParam, "Whether the specified parameter exists")
 
-      .def("set_not_shared_all", &System::setNotSharedAll, "Set all the components to non-shared")
+      .def("set_not_shared_all", &System::setNotSharedAll, "Set all the parts to non-shared")
 
       .def("get_stock", &System::getStock, R"(get_stock(self)
 
@@ -471,7 +484,7 @@ Common parameters:
       .def("force_reset_all", &System::forceResetAll,
            R"(force_reset_all(self)
 
-    Forcibly reset all the components and clear the existing trading object, ignoring the sharing attributes of the components.)")
+    Forcibly reset all the parts and clear the existing trading object, ignoring the sharing attributes of the parts.)")
 
       .def("clone", &System::clone,
            R"(clone(self)
@@ -504,20 +517,23 @@ Common parameters:
             py::module json_module = py::module::import("json");
             return json_module.attr("loads")(json_str);
         },
-        "After the backtest is completed, return the trade records of the last day, and the delayed buy and sell requests that need to be delayed")
+        "After the backtest is completed, return the trade records of the last day, and the "
+        "delayed buy and sell requests that need to be delayed")
 
         DEF_PICKLE(System);
 
     //--------------------------------------------------------------------------------------
     // Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
-    py::class_<MultiSystem, System, std::shared_ptr<MultiSystem>>(m, "MultiSystem", py::dynamic_attr(),
+    py::class_<MultiSystem, System, std::shared_ptr<MultiSystem>>(
+      m, "MultiSystem", py::dynamic_attr(),
       R"(The aggregate trading system (portfolio backtesting). It holds multiple sub-systems (single-security or nested aggregate), drives and aggregates the orders at the open/close stages respectively.
 Every sub-system has its own independent virtual account (a shadow account in mode A / the quota allocated by the parent in mode B), the parent system allocates and orders uniformly on its own account.)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
       .def(py::init<const SystemList&, const string&>(), py::arg("sys_list"),
            py::arg("name") = "MultiSystem")
-      .def("add", &MultiSystem::add, py::arg("sys"), "Add a sub-system (with the circular reference detection)")
+      .def("add", &MultiSystem::add, py::arg("sys"),
+           "Add a sub-system (with the circular reference detection)")
       .def("get_system_list", &MultiSystem::getSystemList, "Get the sub-system list")
       .def("run", py::overload_cast<const KData&, bool, bool>(&MultiSystem::run), py::arg("kdata"),
            py::arg("reset") = true, py::arg("reset_all") = false,
@@ -550,10 +566,12 @@ Every sub-system has its own independent virtual account (a shadow account in mo
       .def("runMomentOnOpen", &MultiSystem::runMomentOnOpen, py::arg("datetime"))
       .def("runMomentOnClose", &MultiSystem::runMomentOnClose, py::arg("datetime"))
       .def("ready_for_run", &MultiSystem::readyForRun)
-      .def("set_mode", &MultiSystem::setMode, py::arg("mode"), "Set the running mode: A (signal aggregation) / B (fund allocation)")
+      .def("set_mode", &MultiSystem::setMode, py::arg("mode"),
+           "Set the running mode: A (signal aggregation) / B (fund allocation)")
       .def_property_readonly("mode", &MultiSystem::getMode, "The current running mode (A/B)")
       .def("set_sub_init_cash", &MultiSystem::setSubInitCash, py::arg("cash"),
-           "Set the initial fund of the sub-system shadow account (a fixed value in mode A / the initial quota in mode B)")
+           "Set the initial fund of the sub-system shadow account (a fixed value in mode A / the "
+           "initial quota in mode B)")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
            "Set the rebalancing cycle (days), <=1 means rebalancing on every close day")
       .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
@@ -568,7 +586,8 @@ Every sub-system has its own independent virtual account (a shadow account in mo
         "set_date_axis",
         [](MultiSystem& ms, const py::object& dates) { ms.setDateAxis(toDatetimeList(dates)); },
         py::arg("dates"),
-        "Set the fixed date table (accepting list/tuple/DatetimeList; it is used as the driving axis only when axis_mode == \"calendar\";"
+        "Set the fixed date table (accepting list/tuple/DatetimeList; it is used as the driving "
+        "axis only when axis_mode == \"calendar\";"
         "an empty table falls back to the kdata axis with a warning)")
       .def("get_date_axis", &MultiSystem::getDateAxis, "Get the fixed date table")
       .def("clear_date_axis", &MultiSystem::clearDateAxis, "Clear the fixed date table")
@@ -585,14 +604,16 @@ Every sub-system has its own independent virtual account (a shadow account in mo
       .def(
         "get_adjust_dates",
         [](const MultiSystem& ms) {
-            // Return a list (DatetimeList) instead of the C++ std::set: consistent with get_date_axis,
-            // and avoid the set conversion failure when Datetime has no __hash__ on the Python side
+            // Return a list (DatetimeList) instead of the C++ std::set: consistent with
+            // get_date_axis, and avoid the set conversion failure when Datetime has no __hash__ on
+            // the Python side
             const auto& dates = ms.getAdjustDates();
             return DatetimeList(dates.begin(), dates.end());
         },
         "Get the external rebalancing day table (already normalized to the zero hour of that day)")
       .def("clear_adjust_dates", &MultiSystem::clearAdjustDates,
-           "Clear the external rebalancing day table (fall back to the rebalancing cycle counting judgment)")
+           "Clear the external rebalancing day table (fall back to the rebalancing cycle counting "
+           "judgment)")
       .def_static(
         "calc_adjust_dates",
         [](const py::object& dates, const string& mode, int adjust_cycle,
@@ -624,108 +645,125 @@ Every sub-system has its own independent virtual account (a shadow account in mo
     :param str mode: "query" / "day" / "week" / "month" / "quarter" / "year")")
       .def("get_adjust_mode", &MultiSystem::getAdjustMode, "Get the rebalancing mode")
       .def("set_delay_to_trading_day", &MultiSystem::setDelayToTradingDay, py::arg("delay"),
-           "Set whether to postpone to the first trading day within the current cycle when the rebalancing day is not a trading day (it takes effect only when week/month/quarter/year are expanded)")
+           "Set whether to postpone to the first trading day within the current cycle when the "
+           "rebalancing day is not a trading day (it takes effect only when "
+           "week/month/quarter/year are expanded)")
       .def("get_delay_to_trading_day", &MultiSystem::getDelayToTradingDay,
            "Get whether the rebalancing day is postponed to the trading day")
-      .def("set_se", &MultiSystem::setSE, py::arg("se"), "Set the trading object selector (optional, only the rebalancing-day stock selection filtering)")
+      .def("set_se", &MultiSystem::setSE, py::arg("se"),
+           "Set the trading object selector (optional, only the rebalancing-day stock selection "
+           "filtering)")
       .def_property_readonly("se", &MultiSystem::getSE, "The trading object selector")
       .def("set_sell_at_not_selected", &MultiSystem::setSellAtNotSelected, py::arg("on"),
            "Set whether to force liquidating the unselected sub-systems (SE is required)")
       .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
-           "Get the turnover rate of every rebalancing day (a list of (date, turnover amount / total assets))")
-      // Consistent with the set_* of PySystem: hold the GIL and release() to keep it alive when setting the Python custom parts,
-      // to prevent the Python-side parts (e.g. the custom MM/SG) from being GC'd early causing the C++ side to hold a dangling pointer (use-after-free).
-      .def_property("tm", &MultiSystem::getTM,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setTM(o.cast<TradeManagerPtr>());
-                        tmp.release();
-                    },
-                    "The associated trade management instance")
-      .def_property("mm", &MultiSystem::getMM,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setMM(o.cast<MMPtr>());
-                        tmp.release();
-                    },
-                    "The money manager strategy")
-      .def_property("ev", &MultiSystem::getEV,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setEV(o.cast<EnvironmentPtr>());
-                        tmp.release();
-                    },
-                    "The market environment judgment strategy")
-      .def_property("cn", &MultiSystem::getCN,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setCN(o.cast<CNPtr>());
-                        tmp.release();
-                    },
-                    "The system precondition")
-      .def_property("sg", &MultiSystem::getSG,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setSG(o.cast<SGPtr>());
-                        tmp.release();
-                    },
-                    "The signal generator")
-      .def_property("st", &MultiSystem::getST,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setST(o.cast<StoplossPtr>());
-                        tmp.release();
-                    },
-                    "The stop-loss strategy")
-      .def_property("tp", &MultiSystem::getTP,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setTP(o.cast<StoplossPtr>());
-                        tmp.release();
-                    },
-                    "The take-profit strategy")
-      .def_property("pg", &MultiSystem::getPG,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setPG(o.cast<PGPtr>());
-                        tmp.release();
-                    },
-                    "The profit goal strategy")
-      .def_property("sp", &MultiSystem::getSP,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setSP(o.cast<SlippagePtr>());
-                        tmp.release();
-                    },
-                    "The slippage algorithm")
-      .def_property("af", &MultiSystem::getAF,
-                    [](MultiSystem& self, py::object o) {
-                        py::gil_scoped_acquire gil;
-                        auto tmp = o;
-                        self.setAF(o.cast<AllocateFundsPtr>());
-                        tmp.release();
-                    },
-                    "The portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3; used by the aggregate system only)")
+           "Get the turnover rate of every rebalancing day (a list of (date, turnover amount / "
+           "total assets))")
+      // Consistent with the set_* of PySystem: hold the GIL and release() to keep it alive when
+      // setting the Python custom parts, to prevent the Python-side parts (e.g. the custom MM/SG)
+      // from being GC'd early causing the C++ side to hold a dangling pointer (use-after-free).
+      .def_property(
+        "tm", &MultiSystem::getTM,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setTM(o.cast<TradeManagerPtr>());
+            tmp.release();
+        },
+        "The associated trade management instance")
+      .def_property(
+        "mm", &MultiSystem::getMM,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setMM(o.cast<MMPtr>());
+            tmp.release();
+        },
+        "The money management strategy")
+      .def_property(
+        "ev", &MultiSystem::getEV,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setEV(o.cast<EnvironmentPtr>());
+            tmp.release();
+        },
+        "The market environment judgment strategy")
+      .def_property(
+        "cn", &MultiSystem::getCN,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setCN(o.cast<CNPtr>());
+            tmp.release();
+        },
+        "The system precondition")
+      .def_property(
+        "sg", &MultiSystem::getSG,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setSG(o.cast<SGPtr>());
+            tmp.release();
+        },
+        "The signal generator")
+      .def_property(
+        "st", &MultiSystem::getST,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setST(o.cast<StoplossPtr>());
+            tmp.release();
+        },
+        "The stop-loss strategy")
+      .def_property(
+        "tp", &MultiSystem::getTP,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setTP(o.cast<StoplossPtr>());
+            tmp.release();
+        },
+        "The take-profit strategy")
+      .def_property(
+        "pg", &MultiSystem::getPG,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setPG(o.cast<PGPtr>());
+            tmp.release();
+        },
+        "The profit goal strategy")
+      .def_property(
+        "sp", &MultiSystem::getSP,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setSP(o.cast<SlippagePtr>());
+            tmp.release();
+        },
+        "The slippage algorithm")
+      .def_property(
+        "af", &MultiSystem::getAF,
+        [](MultiSystem& self, py::object o) {
+            py::gil_scoped_acquire gil;
+            auto tmp = o;
+            self.setAF(o.cast<AllocateFundsPtr>());
+            tmp.release();
+        },
+        "The portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3; used by the "
+        "aggregate system only)")
       .def("clone", &MultiSystem::clone);
 
     //--------------------------------------------------------------------------------------
-    // v5: the PF compatibility layer (factory pass-through to MultiSystem), keeping the master call style unchanged
-    // (see docs/design/pf_af_compat/design.md §4; the return type changes from PortfolioPtr to MultiSystem)
-    m.def(
-      "PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
-      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    // v5: the PF compatibility layer (factory pass-through to MultiSystem), keeping the master call
+    // style unchanged (see docs/design/pf_af_compat/design.md §4; the return type changes from
+    // PortfolioPtr to MultiSystem)
+    m.def("PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+          py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+          R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
     Create a multi-instrument, single-system-strategy portfolio (v5: returns MultiSystem, the semantics is the mode B quota allocation)
 
@@ -803,14 +841,14 @@ Every sub-system has its own independent virtual account (a shadow account in mo
       py::arg("tp") = py::none(), py::arg("pg") = py::none(), py::arg("sp") = py::none(),
       R"(SYS_Simple([tm=None, mm=None, ev=None, cn=None, sg=None, st=None, tp=None, pg=None, sp=None])
 
-  Create a simple system instance (no multiple position increases or decreases per trade, i.e. after each buy, sell all when selling); when the system instance runs (calling the run method), it needs at least a matching trade manager instance, a money manager strategy
-  and a signal indicator), which can be specified after creating the system instance. If there is no output when calling run,
+  Create a simple system instance (no multiple position increases or decreases per trade, i.e. after each buy, sell all when selling); when the system instance runs (calling the run method), it needs at least a matching trade manager instance, a money management strategy
+  and a signal generator), which can be specified after creating the system instance. If there is no output when calling run,
   and no correct results, it may be that tm, sg, mm are not set. For the backtest, use the run method, e.g.::
     
         # Create a simulated trading account for the backtest, with an initial capital of 300,000
         my_tm = crtTM(init_cash = 300000)
 
-        # Create the signal indicator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
+        # Create the signal generator (with the 5-day EMA as the fast line and the 10-day EMA of the 5-day EMA itself as the slow line; buy when the fast line crosses the slow line upward, and sell otherwise)
         my_sg = SG_Flex(EMA(C, n=5), slow_n=10)
 
         # Fixedly buy 1000 shares each time
@@ -821,10 +859,10 @@ Every sub-system has its own independent virtual account (a shadow account in mo
         sys.run(sm['sz000001'], Query(-150))
     
     :param TradeManager tm: the trade manager instance 
-    :param MoneyManager mm: the money manager strategy
-    :param EnvironmentBase ev: the market environment judgement strategy
+    :param MoneyManager mm: the money management strategy
+    :param EnvironmentBase ev: the market environment strategy
     :param ConditionBase cn: the system valid condition
-    :param SignalBase sg: the signal indicator
+    :param SignalBase sg: the signal generator
     :param StoplossBase st: the stop-loss strategy
     :param StoplossBase tp: the take-profit strategy
     :param ProfitGoalBase pg: the profit goal strategy

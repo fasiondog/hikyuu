@@ -45,11 +45,11 @@ public:
 };
 
 void export_Environment(py::module& m) {
-    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(m, "EnvironmentBase",
-                                                                   py::dynamic_attr(),
-                                                                   R"(The market environment judgement strategy base class
+    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(
+      m, "EnvironmentBase", py::dynamic_attr(),
+      R"(The market environment strategy base class
 
-The custom market environment judgement strategy interfaces:
+The custom market environment strategy interfaces:
 
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
@@ -105,8 +105,11 @@ The custom market environment judgement strategy interfaces:
 
       .def("reset", &EnvironmentBase::reset, "The reset operation")
       .def("clone", &EnvironmentBase::clone, "The clone operation")
-      .def("_reset", &EnvironmentBase::_reset, "[Overload interface] The subclass reset interface, used to reset the internal private variables")
-      .def("_calculate", &EnvironmentBase::_calculate, "[Overload interface] The subclass calculation interface")
+      .def("_reset", &EnvironmentBase::_reset,
+           "[Overload interface] The subclass reset interface, used to reset the internal private "
+           "variables")
+      .def("_calculate", &EnvironmentBase::_calculate,
+           "[Overload interface] The subclass calculation interface")
 
       .def("__and__",
            [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self & other; })
@@ -131,7 +134,7 @@ The custom market environment judgement strategy interfaces:
     m.def("EV_TwoLine", EV_TwoLine, py::arg("fast"), py::arg("slow"), py::arg("market") = "SH",
           R"(EV_TwoLine(fast, slow[, market = 'SH'])
 
-    The fast/slow line judgement strategy; when the fast line of the market index is greater than the slow line, the market is valid, otherwise invalid.
+    The fast/slow line strategy; when the fast line of the market index is greater than the slow line, the market is valid, otherwise invalid.
 
     :param Indicator fast: the fast line indicator
     :param Indicator slow: the slow line indicator
@@ -140,7 +143,7 @@ The custom market environment judgement strategy interfaces:
     m.def("EV_Bool", EV_Bool, py::arg("ind"), py::arg("market") = "SH",
           R"(EV_Bool(ind, market='SH')
 
-    The boolean signal indicator market environment
+    The boolean signal generator market environment
 
     :param Indicator ind: a bool-type indicator; if the corresponding position in the indicator is >0, it means the market is valid, otherwise invalid
     :param str market: the specified market, used to get the corresponding trading calendar)");

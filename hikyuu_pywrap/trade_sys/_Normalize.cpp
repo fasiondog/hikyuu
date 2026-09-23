@@ -81,7 +81,7 @@ void export_Normlize(py::module& m) {
           py::arg("recursive") = false, R"(The Z-score standardization operation
           
     :param out_extreme: whether to remove the outliers
-    :param nsigma: the outlier judgement multiple ±3.0
+    :param nsigma: the outlier judgment multiple ±3.0
     :param recursive: whether to process the outliers recursively)");
 
     m.def("NORM_Quantile", &NORM_Quantile, py::arg("quantile_min") = 0.01,

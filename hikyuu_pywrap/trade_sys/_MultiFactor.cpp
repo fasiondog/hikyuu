@@ -140,13 +140,13 @@ void export_MultiFactor(py::module& m) {
 
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
                                                                py::dynamic_attr(),
-                                                               R"(The market environment judgement strategy base class
+                                                               R"(The multi-factor model base class
 
-The custom market environment judgement strategy interfaces:
+The custom multi-factor model override hooks:
 
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
-    - _reset : [Optional] Reload the private variables)")
+    - _reset : [Optional] Reset the internal member variables)")
       .def(py::init<>())
       .def(py::init<const MultiFactorBase&>())
 
@@ -189,7 +189,8 @@ The custom market environment judgement strategy interfaces:
     :param Stock stk: the reference security)")
 
       .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy,
-           "Get the reference date list (obtained from the reference security through the query condition)")
+           "Get the reference date list (obtained from the reference security through the query "
+           "condition)")
 
       .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy,
            "Get the security list specified at the creation")
@@ -377,7 +378,7 @@ The custom market environment judgement strategy interfaces:
     Compose the factor with the equal weights, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC
@@ -430,8 +431,8 @@ The custom market environment judgement strategy interfaces:
     Compose the factor by the specified weights = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
-    :param sequense(float) weights: the weight list (must be the same length as the number of the factors)
+    :param sequence(stock) stks: the list of the securities to calculate
+    :param sequence(float) weights: the weight list (must be the same length as the number of the factors)
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC
@@ -484,7 +485,7 @@ The custom market environment judgement strategy interfaces:
     Compose the factor with the rolling IC weights, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC
@@ -537,7 +538,7 @@ The custom market environment judgement strategy interfaces:
     Compose the factor with the rolling ICIR weights, supporting several input types
 
     :param input: the factor input, which can be a FactorSet object or an Indicator sequence
-    :param sequense(stock) stks: the list of the securities to calculate
+    :param sequence(stock) stks: the list of the securities to calculate
     :param Query query: the date range
     :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
     :param int ic_n: the N-day return corresponding to the default IC

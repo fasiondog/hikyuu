@@ -282,18 +282,23 @@ Common parameters:
                     py::overload_cast<const string&>(&TradeManagerBase::name),
                     py::return_value_policy::copy, "Name")
 
-      .def_property_readonly("init_cash", &TradeManagerBase::initCash, "(Read-only) the initial capital")
-      .def_property_readonly("current_cash", &TradeManagerBase::currentCash, "(Read-only) the current cash")
+      .def_property_readonly("init_cash", &TradeManagerBase::initCash,
+                             "(Read-only) the initial capital")
+      .def_property_readonly("current_cash", &TradeManagerBase::currentCash,
+                             "(Read-only) the current cash")
       .def_property_readonly("init_datetime", &TradeManagerBase::initDatetime,
                              "(Read-only) the account establishment date")
 
       .def_property_readonly("first_datetime", &TradeManagerBase::firstDatetime,
-                             "(Read-only) the date when the first buy trade occurred; if no trade has occurred, return Datetime>()")
+                             "(Read-only) the date when the first buy trade occurred; if no trade "
+                             "has occurred, return Null<Datetime>()")
       .def_property_readonly(
         "last_datetime", &TradeManagerBase::lastDatetime,
-        "(Read-only) the date of the last trade; note that it is unrelated to the trade type; if no trade has occurred, return the account establishment date")
-      .def_property_readonly("precision", &TradeManagerBase::precision,
-                             "(Read-only) the price precision, the same as the common parameter 'precision'")
+        "(Read-only) the date of the last trade; note that it is unrelated to the trade type; if "
+        "no trade has occurred, return the account establishment date")
+      .def_property_readonly(
+        "precision", &TradeManagerBase::precision,
+        "(Read-only) the price precision, the same as the common parameter 'precision'")
 
       .def_property("cost_func", get_costFunc, set_costFunc, "The trade cost algorithm")
 
@@ -301,7 +306,7 @@ Common parameters:
                     &TradeManagerBase::setBrokerLastDatetime,
                     R"(The moment when the order broker operations actually start.
         
-    By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal indicator, the TradeManager will execute the buy/sell operations at the historical moments; at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions. At this time, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be specified. The attribute brokeLastDatetime is used to specify that moment.))")
+    By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal generator, the TradeManager will execute the buy/sell operations at the historical moments; at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions. At this time, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be specified. The attribute brokeLastDatetime is used to specify that moment.))")
 
       .def("get_param", &TradeManagerBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -489,7 +494,7 @@ Common parameters:
 
       .def("get_base_assets_curve", &TradeManagerBase::getBaseAssetsCurve, py::arg("dates"),
            py::arg("ktype") = KQuery::DAY,
-           R"(get_profit_curve(self, dates[, ktype = Query.DAY])
+           R"(get_base_assets_curve(self, dates[, ktype = Query.DAY])
 
     Get the invested principal asset curve (the invested capital)
 
@@ -503,7 +508,7 @@ Common parameters:
 
     :param Datetime datetime: the trading time
     :param float cash: the amount of the cash deposited
-    :rtype: TradeRecord)")
+    :rtype: bool)")
 
       .def("checkout", &TradeManagerBase::checkout, R"(checkout(self, datetime, cash)
 
@@ -511,7 +516,7 @@ Common parameters:
 
     :param Datetime datetime: the trading time
     :param float cash: the amount of the funds withdrawn
-    :rtype: TradeRecord)")
+    :rtype: bool)")
 
       .def("checkin_stock", &TradeManagerBase::checkinStock)
       .def("checkout_stock", &TradeManagerBase::checkoutStock)
@@ -570,7 +575,7 @@ Common parameters:
     :return: True (success) | False (failure)
     :rtype: bool)")
 
-      .def("add_position", &TradeManagerBase::addPosition, R"(add_postion(self, position)
+      .def("add_position", &TradeManagerBase::addPosition, R"(add_position(self, position)
 
     After establishing the initial account, add the position record directly; it is only used to build an account with the initial positions
 
@@ -586,7 +591,7 @@ Common parameters:
       .def("update_with_weight", &TradeManagerBase::updateWithWeight,
            R"(update_with_weight(self, date)
 
-      Update the current positions and the trade records according to the dividend information; it must be called in the chronological order
+      Update the current positions and the trade records according to the equity/dividend adjustment information; it must be called in the chronological order
 
       :param Datetime date: the current moment)")
 
@@ -671,14 +676,14 @@ Common parameters:
       .def(
         "get_position_ext_info", &TradeManagerBase::getPositionExtInfoDict, py::arg("current_time"),
         py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-        R"(get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
-          
+        R"(get_position_ext_info(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo])
+
     Get the position details of the specified time after the last trading moment of the account, returned as a dictionary, with the stock as the key and the PositionExtInfo as the value
- 
+
     :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)
     :param Query.KType ktype: the K-line type
     :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-    :return: the list of the extended position details)")
+    :return: the dict of the extended position details, with the stock as the key and the PositionExtInfo as the value)")
 
       .def(
         "get_history_position_ext_info_list", &TradeManagerBase::getHistoryPositionExtInfoList,
