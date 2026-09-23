@@ -371,7 +371,7 @@ li.unchecked::marker { content: "\2610"; }
 li.checked::marker { content: "\2612"; }
 </style></head><body style="font-weight:400; font-style:normal;">
 <p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu 是一款</span><span style="font-weight:700;">遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。</span><span>为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。</span></p>
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。捐赠插件授权需要采集部分硬件信息，如申请，视为同意采集。</span></p>
+<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。自 2.8.3 版本起，捐赠插件授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。</span></p>
 <p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>详情参见：</span><a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">捐赠权益</span></a><span style="font-weight:700;"> ，感谢大家的支持！</span></p></body></html>
 """
         self.label_46.setText(label_46_txt)

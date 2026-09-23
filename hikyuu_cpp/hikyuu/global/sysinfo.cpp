@@ -7,6 +7,7 @@
 
 #include <hikyuu/GlobalInitializer.h>
 #include <stdio.h>
+#include <cstdio>
 #include <shared_mutex>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -16,6 +17,7 @@
 #include "hikyuu/DataType.h"
 #include "hikyuu/StockManager.h"
 #include "hikyuu/utilities/os.h"
+#include "hikyuu/utilities/FileLock.h"
 #include "hikyuu/utilities/http_client/AsioHttpClient.h"
 #include "sysinfo.h"
 
@@ -109,19 +111,49 @@ static boost::uuids::uuid readUUID() {
 #pragma GCC diagnostic ignored "-Wunused-result"
 #endif
     boost::uuids::uuid uid;
-    std::string filename = fmt::format("{}/.hikyuu/uid", getUserDir());
-    if (existFile(filename)) {
-        FILE* fp = fopen(filename.c_str(), "rb");
-        if (fp) {
-            fread((void*)uid.data, 1, 16, fp);
-            fclose(fp);
+    std::string dir = fmt::format("{}/.hikyuu", getUserDir());
+    createDir(dir);
+
+    std::string filename = fmt::format("{}/uid", dir);
+
+    // 必须读满 16 字节，否则视为文件损坏
+    auto try_read = [&filename](boost::uuids::uuid& out) -> bool {
+        if (!existFile(filename)) {
+            return false;
         }
-    } else {
-        uid = boost::uuids::random_generator()();
-        FILE* fp = fopen(filename.c_str(), "wb");
-        if (fp) {
-            fwrite(uid.data, 16, 1, fp);
-            fclose(fp);
+        FILE* fp = fopen(filename.c_str(), "rb");
+        if (!fp) {
+            return false;
+        }
+        bool ok = (fread((void*)out.data, 1, 16, fp) == 16);
+        fclose(fp);
+        if (!ok) {
+            out = boost::uuids::nil_uuid();
+        }
+        return ok;
+    };
+
+    if (!try_read(uid)) {
+        FileLock lock(fmt::format("{}.lock", filename));
+        if (!lock.waitLock(100, 100)) {
+            return uid;
+        }
+
+        if (!try_read(uid)) {
+            boost::uuids::uuid new_uid = boost::uuids::random_generator()();
+            std::string tmp_filename =
+              fmt::format("{}.tmp.{}", filename, boost::uuids::to_string(new_uid));
+            FILE* fp = fopen(tmp_filename.c_str(), "wb");
+            if (fp) {
+                size_t n = fwrite(new_uid.data, 16, 1, fp);
+                fflush(fp);
+                fclose(fp);
+                if (n == 1 && std::rename(tmp_filename.c_str(), filename.c_str()) == 0) {
+                    uid = new_uid;
+                } else {
+                    std::remove(tmp_filename.c_str());
+                }
+            }
         }
     }
 
@@ -144,9 +176,11 @@ void HKU_API reminderLicenseExpiration() {
 }
 
 void sendFeedback() {
-    boost::uuids::uuid uid = readUUID();
-    std::thread t([uid] {
+    std::thread t([] {
         try {
+            boost::uuids::uuid uid = readUUID();
+            HKU_IF_RETURN(uid.is_nil(), void());
+
             AsioHttpClient client(FEEDBACK_SERVER_ADDR, 2000);
             json req;
             req["uid"] = boost::uuids::to_string(uid);

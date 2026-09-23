@@ -154,6 +154,7 @@ end
 
 
 local boost_config = {
+        version = ">=1.92.0",
         system = false,
         configs = {
             shared = true, -- is_plat("windows"),

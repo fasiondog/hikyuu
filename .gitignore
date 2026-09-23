@@ -74,6 +74,7 @@
 .vim.ai
 .copilot*
 .github/copilot-instructions.md
+.cache
 
 nohup.out
 temp
@@ -142,3 +143,4 @@ quotes/
 wget-*
 hikyuu/cpp/i18n/zh_CN/hikyuu_plugin.mo
 soft_copyright_application
+compile_commands.json
