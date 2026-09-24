@@ -249,6 +249,12 @@ Python 侧依赖见 [requirements.txt](requirements.txt)。
 
 ---
 
-<p align="center">
-  基于 <a href="https://github.com/fasiondog/hikyuu/blob/master/LICENSE">Apache License 2.0</a> 开源协议发布 · 由 <a href="https://github.com/fasiondog">fasiondog</a> 维护
-</p>
+## Star History
+
+<a href="https://www.star-history.com/?repos=fasiondog%2Fhikyuu&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&legend=top-left" />
+ </picture>
+</a>
