@@ -47,12 +47,28 @@ def _is_exempt_heading(line):
     return any(keyword in title for keyword in _DONATION_KEYWORDS)
 
 
+_FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
+
+
 def fingerprint(path):
     headings, images = [], []
     # While inside an exempt section: level of its heading, otherwise None.
     skip_level = None
+    # Fenced code block marker (``` or ~~~), so comment lines such as
+    # "# comment" inside code samples are not mistaken for H1 headings.
+    fence = None
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
+            fm = _FENCE.match(line)
+            if fm:
+                marker = fm.group(1)[0]
+                if fence is None:
+                    fence = marker
+                elif fence == marker:
+                    fence = None
+                continue
+            if fence is not None:
+                continue
             m = _HEADING.match(line)
             if skip_level is not None:
                 if m and len(m.group(1)) <= skip_level:
