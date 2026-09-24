@@ -198,22 +198,22 @@ sys.run(sm['sz000001'], Query(-150))
 
 | 层级                   | 组件                             | 说明                             |
 | :--------------------- | :------------------------------- | :------------------------------- |
-| **投资组合层**   | <b> · PortfolioPF</a>           | 投资组合 - 多系统的策略调度      |
-|                        | <b> · SelectorSE</a>            | 系统对象选择 - 系统策略筛选      |
-|                        | <b> · AllocateFundsAF</a>       | 资金分配 - 多系统的资金分配      |
-|                        | <b> · MultiFactorMF</a>         | 多因子模型 - 因子评分与排序      |
-| **交易系统 SYS** | <b> · EnvironmentEV</a>         | 市场环境判断 - 大盘环境有效性    |
-|                        | <b> · ConditionCN</a>           | 系统有效条件 - 系统适用条件      |
-|                        | <b> · SignalSG</a>              | 信号指示器 - 产生买卖信号        |
-|                        | <b> · Stoploss/StopprofitST</a> | 止损 / 止盈 - 风险控制退出       |
-|                        | <b> · MoneyManagerMM</a>        | 资金管理 - 买卖数量控制          |
-|                        | <b> · ProfitGoalPG</a>          | 盈利目标 - 目标达成退出          |
-|                        | <b> · SlippageSP</a>            | 移滑价差 - 回测价格模拟          |
-| **交易管理**     | <b> · TradeManagerTM</a>        | 交易管理 - 账户资金与持仓记录    |
-|                        | <b> · OrderBrokerOB</a>         | 订单执行 - 实盘下单 broker 对接  |
-| **数据层**       | <b> · StockManagerSM</a>        | 证券管理 - StockManager 统一管理 |
-|                        | <b> · KDataKD</a>               | K 线数据 - KData 量价序列        |
-|                        | <b> · QueryQ</a>                | 数据查询 - Query 时间范围筛选    |
+| **投资组合层**   | <b> · Portfolio|PF</a>          | 投资组合 - 多系统的策略调度      |
+|                        | <b> · Selector|SE</a>           | 系统对象选择 - 系统策略筛选      |
+|                        | <b> · AllocateFunds|AF</a>      | 资金分配 - 多系统的资金分配      |
+|                        | <b> · MultiFactor|MF</a>         | 多因子模型 - 因子评分与排序      |
+| **交易系统 SYS** | <b> · Environment|EV</a>        | 市场环境判断 - 大盘环境有效性    |
+|                        | <b> · Condition|CN</a>           | 系统有效条件 - 系统适用条件      |
+|                        | <b> · Signal|SG</a>              | 信号指示器 - 产生买卖信号        |
+|                        | <b> · Stoploss/Stopprofit|ST</a> | 止损 / 止盈 - 风险控制退出       |
+|                        | <b> · MoneyManager|MM</a>        | 资金管理 - 买卖数量控制          |      
+|                        | <b> · ProfitGoal|PG</a>          | 盈利目标 - 目标达成退出          |
+|                        | <b> · Slippage|SP</a>            | 移滑价差 - 回测价格模拟          |
+| **交易管理**     | <b> · TradeManager|TM</a>        | 交易管理 - 账户资金与持仓记录    |
+|                        | <b> · OrderBroker|OB</a>         | 订单执行 - 实盘下单 broker 对接  |
+| **数据层**       | <b> · StockManager</a>        | 证券管理 - StockManager 统一管理 |
+|                        | <b> · KData</a>               | K 线数据 - KData 量价序列        |
+|                        | <b> · Query</a>                | 数据查询 - Query 时间范围筛选    |
 
 ---
 
