@@ -251,20 +251,9 @@ client tools without worrying about third-party platform restrictions.
 
 ## ❤️ Sponsorship
 
-| Plan                        | Description                                                                            | Method                | Link                                        |
-| :-------------------------- | :------------------------------------------------------------------------------------- | :-------------------- | :------------------------------------------ |
-| ☕ **Buy me a coffee** | ¥30 · one-time support (includes historical daily data)                              | Alipay                | [Donate](https://pay.ldxp.cn/item/gflv3v)   |
-| 📅 **180-day subscription** | ¥50 · half-year subscription (includes historical daily data)                        | Alipay                | [Donate](https://pay.ldxp.cn/item/du4h8s)   |
-| 🗓️ **365-day subscription** | ¥100 · one-year subscription (includes historical daily/minute/hour/tick data)       | Alipay                | [Donate](https://pay.ldxp.cn/item/ehbz9b)   |
-| 🌌 **Join Zsxq**      | ¥300/year · half price to renew · 3 devices · private WeChat group and part library (includes historical daily/minute/hour/tick data) | WeChat / Zsxq app | [Join](https://t.zsxq.com/YSATD)            |
-
-> 🎁 **Donation plans and benefits**: [https://hikyuu.readthedocs.io/en/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/en/latest/vip/donate-plan.html)
-
-Support group for sponsors only (when joining, please note: Hikyuu subscription)
-
-<p align="center">
-  <img src="docs/en/_static/support.jpg" alt="Sponsor support" width="150">
-</p>
+> 🙏 **Overseas sponsorship is being arranged.** International payment channels are not available yet. If you would like to support Hikyuu from overseas, please email **fasiondog@sina.com** and we will work out a way together.
+>
+> Supporters in China can use the Alipay / WeChat subscription plans listed in the [Chinese edition](readme.zh.md). Non-monetary support is equally welcome — see [How you can help](#-how-you-can-help) below.
 
 ---
 
@@ -291,6 +280,13 @@ Python-side dependencies are listed in [requirements.txt](requirements.txt).
 
 ---
 
-<p align="center">
-  Released under the <a href="https://github.com/fasiondog/hikyuu/blob/master/LICENSE">Apache License 2.0</a> · maintained by <a href="https://github.com/fasiondog">fasiondog</a>
-</p>
+## Star History
+
+<a href="https://www.star-history.com/?repos=fasiondog%2Fhikyuu&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=fasiondog/hikyuu&type=date&legend=top-left" />
+ </picture>
+</a>
+
