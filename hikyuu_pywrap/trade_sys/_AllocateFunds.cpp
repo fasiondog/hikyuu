@@ -41,10 +41,10 @@ public:
     }
 
     // L1: sub-system context -> weight
-    Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
-                      SubSystemContextList& contexts, const KQuery& query) override {
-        PYBIND11_OVERLOAD_NAME(Weights, AllocateFundsBase, "_allocate", _allocate, date, tm,
-                               contexts, query);
+    Weights _allocate(const Datetime& date, const TradeManagerPtr& tm, SubSystemContextList& contexts,
+                      const KQuery& query) override {
+        PYBIND11_OVERLOAD_NAME(Weights, AllocateFundsBase, "_allocate", _allocate, date, tm, contexts,
+                               query);
     }
 
     // L2: weight -> the executable quantity of the parent account
@@ -148,9 +148,8 @@ Common parameters:
 
     [Overload interface] L3 portfolio risk control clipping, rewrite the quantity of suggestions in place)")
 
-      .def(
-        "_reset", &AllocateFundsBase::_reset,
-        R"([Overload interface] The subclass reset interface, reset the internal private variables)")
+      .def("_reset", &AllocateFundsBase::_reset,
+           R"([Overload interface] The subclass reset interface, reset the internal private variables)")
 
         DEF_PICKLE(AllocateFundsPtr);
 
@@ -160,8 +159,7 @@ Common parameters:
 
     The equal weight asset allocation; allocate the selected assets with an equal ratio (L1 equal weight 1/N))");
 
-    m.def("AF_FixedAmount", AF_FixedAmount, py::arg("amount") = 20000.0,
-          R"(AF_FixedAmount(amount=20000.0)
+    m.def("AF_FixedAmount", AF_FixedAmount, py::arg("amount") = 20000.0, R"(AF_FixedAmount(amount=20000.0)
 
     The fixed amount asset allocation (L1 equal weight + L2 fixed amount)
 

@@ -57,12 +57,9 @@ void export_Condition(py::module& m) {
                     py::overload_cast<const string&>(&ConditionBase::name),
                     py::return_value_policy::copy, "Name")
 
-      .def_property("to", &ConditionBase::getTO, &ConditionBase::setTO,
-                    "Set or get the trading object")
-      .def_property("tm", &ConditionBase::getTM, &ConditionBase::setTM,
-                    "Set or get the trade manager account")
-      .def_property("sg", &ConditionBase::getSG, &ConditionBase::setSG,
-                    "Set or get the trading signal generator")
+      .def_property("to", &ConditionBase::getTO, &ConditionBase::setTO, "Set or get the trading object")
+      .def_property("tm", &ConditionBase::getTM, &ConditionBase::setTM, "Set or get the trade manager account")
+      .def_property("sg", &ConditionBase::getSG, &ConditionBase::setSG, "Set or get the trading signal generator")
 
       .def("get_param", &ConditionBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -110,11 +107,8 @@ void export_Condition(py::module& m) {
 
     :param Datetime datetime: the valid time)")
 
-      .def("_calculate", &ConditionBase::_calculate,
-           "[Overload interface] The subclass calculation interface")
-      .def("_reset", &ConditionBase::_reset,
-           "[Overload interface] The subclass reset interface, resetting the internal private "
-           "variables")
+      .def("_calculate", &ConditionBase::_calculate, "[Overload interface] The subclass calculation interface")
+      .def("_reset", &ConditionBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
 
       .def("__len__", &ConditionBase::size)
 
