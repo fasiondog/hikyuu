@@ -103,6 +103,8 @@ HikyuuTDX
 importdata
 ```
 
+> ℹ️ **Data coverage**: HikyuuTDX downloads **China A-share** historical data only and needs a one-time initial configuration in the GUI. Overseas markets (US stocks, etc.) are not available yet and will be supported gradually.
+
 ### Step 3: Run your first backtest
 
 ```python
