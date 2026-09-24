@@ -4,314 +4,315 @@
 Live Trading
 ============
 
-Programmatic (automated) trading is what quantitative frameworks are commonly built for: at its core, it boils down to scheduled task execution plus event-driven notification callbacks.
+Programmatic (i.e. automated) trading is what the various quantitative frameworks commonly provide; at its core, it boils down to scheduled task execution plus notification callbacks.
 
-Hikyuu focuses on fast strategy analysis and does not provide live trading itself. The Strategy runtime is offered solely as a reference showing how to connect a strategy to a live trading environment. You are fully responsible for any profits or losses that result from using it.
+Hikyuu focuses primarily on fast strategy analysis and does not itself provide live trading. The Strategy runtime is provided only as a reference for learning how to integrate Hikyuu with a live trading setup; you are solely responsible for any resulting profits or losses.
 
-For complete examples, see the demos in the strategy subdirectory under the installation directory.
+For details, see the demos in the strategy subdirectory of the installation directory.
 
 
 Common parameters:
 
-    * **spot_worker_num=1** *(int)* : number of internal worker threads used to receive market data
-    * **quotation_server=""** *(string)* : address of the market data service; if empty, the local default configuration (hikyuu.ini) is used
+    * **spot_worker_num=1** *(int)* : number of internal threads used when receiving market data
+    * **quotation_server=""** *(string)* : the market data service address; when empty, the local default configuration (hikyuu.ini) is used
 
 
 .. py:class:: Strategy
 
-    Strategy runtime.
+    The strategy runtime.
 
-    A Strategy can be created in one of the following ways:
+    A strategy runtime can be created in the following ways:
 
     .. code-block:: python
 
-        # Option 1: create with default parameters
+        # Option 1: create with the default parameters
         stg = Strategy()
 
-        # Option 2: specify the security code list and bar (candlestick) types
+        # Option 2: specify the security code list and bar types
         stg = Strategy(
             code_list=["sz000001", "sz000002"],
             ktype_list=["day", "min"],
             preload_num={"day_max": 1000, "min_max": 2000},
             name="MyStrategy",
-            config=""  # Path to the configuration file; if empty, the default hikyuu configuration file is used
+            config=""  # the configuration file path; when empty, the default hikyuu configuration file is used
         )
 
-        # Option 3: create from a context
+        # Option 3: create with a context
         context = StrategyContext(stock_list=["sz000001"], ktype_list=["day"])
         stg = Strategy(context, name="MyStrategy", config="")
 
     .. py:attribute:: name
 
-        Strategy name. Read/write.
+        The strategy name. Read/write.
 
     .. py:attribute:: context
 
-        Strategy context. Read-only; holds the security code list, bar types, and other settings.
+        The strategy context, a read-only attribute containing the security code list, bar types, and other settings.
 
     .. py:attribute:: tm
 
-        Associated trade manager instance. Read/write; manages account assets and orders.
+        The associated trade manager instance. Read/write. Used to manage account assets and orders.
 
     .. py:attribute:: sp
 
-        Slippage algorithm. Read/write; used only in backtest mode.
+        The slippage algorithm. Read/write. Used only during backtesting.
 
     .. py:attribute:: running
 
-        Current running state. Read-only; returns True or False.
+        The current running state, a read-only attribute returning True or False.
 
     .. py:attribute:: is_backtesting
 
-        Whether the strategy is running as a backtest. Read-only.
+        The backtest state, a read-only attribute.
 
     .. py:method:: start(self, auto_recieve_spot=True)
 
-        Starts the strategy. Call this only after you have finished registering all required callbacks.
+        Start the strategy. Call this method only after all relevant callbacks have been set up.
 
-        Note: The strategy cannot be started from the Python interactive interpreter.
+        Note: the strategy cannot be started in the Python interactive interpreter.
 
-        :param bool auto_recieve_spot: whether to receive market data automatically. Defaults to True
+        :param bool auto_recieve_spot: whether to receive market data automatically; defaults to True
 
     .. py:method:: on_change(self, func)
 
-        Registers a callback for security data updates.
+        Register the callback for security data updates.
 
-        The callback fires whenever market data changes and is typically used for debugging. It is triggered on every incoming market-data collection message, regardless of market open/close times.
+        This callback fires whenever market data changes and is usually used for debugging. It is triggered on every received market-data collection message, regardless of market open/close hours.
 
-        :param func: callable that accepts three arguments: func(stg: Strategy, stock: Stock, spot: SpotRecord)
+        :param func: a callable that must accept three parameters: func(stg: Strategy, stock: Stock, spot: SpotRecord)
 
     .. py:method:: on_received_spot(self, func)
 
-        Registers a callback fired after market data is received.
+        Register the callback fired after a complete batch of market data has been received.
 
-        The callback is notified once a complete batch of market data has been received and is mostly used for debug logging. The batch does not necessarily contain any of the securities in the context, and it fires on every incoming market-data collection message, regardless of market open/close times.
+        Fires after a complete batch of market data has been received; usually used only for debug printing. The batch does not necessarily contain the securities in the context,
+        and the callback is triggered on every received market-data collection message, regardless of market open/close hours.
 
-        :param func: callable that accepts two arguments: func(stg: Strategy, revTime: Datetime)
+        :param func: a callable that must accept two parameters: func(stg: Strategy, revTime: Datetime)
 
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
 
-        Registers a callback that runs repeatedly during the trading day. If market open/close times are ignored, the callback loops at the given interval starting from when the strategy starts; otherwise, the first execution is aligned to the market open time, and execution pauses outside trading hours.
+        Register a callback that runs repeatedly throughout the trading day. If market open/close hours are ignored, it loops from the start moment at the given interval;
+        otherwise, on the first run the interval is aligned to the market open time, and execution pauses outside trading hours.
 
-        :param func: callable that accepts one argument: func(stg: Strategy)
-        :param TimeDelta time: loop interval, e.g. every 3 seconds: TimeDelta(0, 0, 0, 3) or Seconds(3)
-        :param str market: market whose open/close times to use. Defaults to "SH"
-        :param ignore_market: whether to ignore market open/close times. Defaults to False
+        :param func: a callable that must accept one parameter: func(stg: Strategy)
+        :param TimeDelta time: the time interval, e.g. an interval of 3 seconds: TimeDelta(0, 0, 0, 3) or Seconds(3)
+        :param str market: which market's open/close hours to use; defaults to "SH"
+        :param ignore_market: whether to ignore market open/close hours; defaults to False
 
     .. py:method:: run_daily_at(self, func, time, ignore_holiday=True)
 
-        Registers a callback that runs every day at a fixed time.
+        Register a callback that runs at a fixed time every day.
 
-        :param func: callable that accepts one argument: func(stg: Strategy)
-        :param TimeDelta time: time of day to run, e.g. 15:00 every day: TimeDelta(0, 15). Must be less than one day
-        :param ignore_holiday: if True, the callback is not executed on holidays. Defaults to True
+        :param func: a callable that must accept one parameter: func(stg: Strategy)
+        :param TimeDelta time: the execution time, e.g. 15:00 every day: TimeDelta(0, 15); must be less than 1 day
+        :param ignore_holiday: do not execute on holidays; defaults to True
 
-       .. note:: Only one task can be registered for a given time of day; registering a second task at the same time raises an exception
+        .. note:: only one task can be registered at a given time; registering another one at the same time raises an exception
 
     .. py:method:: today(self)
 
-        Returns the current trading day. Use this method instead of Datetime.today() so that backtest and live-trading behavior stay consistent.
+        Get the current trading-day date (use this method instead of Datetime.today(), so that backtesting and live trading stay consistent).
 
-        :return: current trading day
+        :return: the current trading-day date
         :rtype: Datetime
 
     .. py:method:: now(self)
 
-        Returns the current time. Use this method instead of Datetime.now() so that backtest and live-trading behavior stay consistent.
+        Get the current time (use this method instead of Datetime.now(), so that backtesting and live trading stay consistent).
 
-        :return: current time
+        :return: the current time
         :rtype: Datetime
 
     .. py:method:: next_datetime(self)
 
-        Returns the next trading timestamp (used during backtesting).
+        The next trading time point (used in backtesting).
 
-        :return: next trading timestamp; in live trading, returns Null<Datetime>()
+        :return: the next trading time point; in live trading, returns Null<Datetime>()
         :rtype: Datetime
 
     .. py:method:: get_current_price(self, stk, ktype)
 
-        Returns the current price.
+        Get the current price.
 
-        :param Stock stk: target security
-        :param KQuery.KType ktype: bar type
-        :return: current price; returns constant.null_price when the price is invalid
+        :param Stock stk: the specified security
+        :param KQuery.KType ktype: the bar type
+        :return: the current price; returns constant.null_price when invalid
         :rtype: price_t
 
     .. py:method:: get_last_kdata(self, stk, start_date, ktype, recover_type)
 
-        Form 1: returns the bar data for the specified security from the given start date up to the current time (to keep live trading and backtests consistent, always use this method to obtain bar data)
-
+        Form 1: get the bar data of the specified security from the specified date to the current time (to keep live trading and backtesting consistent, use this method to obtain bar data).
         get_last_kdata(self, stk, start_date, ktype, recover_type)
 
-        Form 2: returns the most recent lastnum bars currently available for the specified security (to keep live trading and backtests consistent, always use this method to obtain bar data)
-
+        Form 2: get the last ``lastnum`` bars currently available for the specified security (to keep live trading and backtesting consistent, use this method to obtain bar data).
         get_last_kdata(self, stk, lastnum, ktype, recover_type)
 
-        :param Stock stk: target security
-        :param int lastnum: number of most recent records (Form 2)
-        :param Datetime start_date: start date (Form 1)
-        :param KQuery.KType ktype: bar type
-        :param KQuery.RecoverType recover_type: adjustment type. Defaults to KQuery.NO_RECOVER
-        :return: bar data
+        :param Stock stk: the specified security
+        :param int lastnum: the last N bars
+        :param Datetime start_date: the start date
+        :param KQuery.KType ktype: the bar type
+        :param KQuery.RecoverType recover_type: the price adjustment type; defaults to KQuery.NO_RECOVER
+        :return: the bar data
         :rtype: KData
 
 
     .. py:method:: get_kdata(self, stk, start_date, end_date, ktype, recover_type)
 
-        Returns the bar data for the specified security within the given date range (to keep live trading and backtests consistent, always use this method to obtain bar data)
+        Get the bar data of the specified security over the specified date range (to keep live trading and backtesting consistent, use this method to obtain bar data).
 
-        :param Stock stk: target security
-        :param Datetime start_date: start date
-        :param Datetime end_date: end date; if it is Null or later than the current time, nextDatetime() is used automatically
-        :param KQuery.KType ktype: bar type
-        :param KQuery.RecoverType recover_type: adjustment type. Defaults to KQuery.NO_RECOVER
-        :return: bar data
+        :param Stock stk: the specified security
+        :param Datetime start_date: the start date
+        :param Datetime end_date: the end date; if it is Null or later than the current time, nextDatetime() is used automatically
+        :param KQuery.KType ktype: the bar type
+        :param KQuery.RecoverType recover_type: the price adjustment type; defaults to KQuery.NO_RECOVER
+        :return: the bar data
         :rtype: KData
 
     .. py:method:: order(self, stock, num, remark='')
 
-        Submits an order by quantity (a positive quantity buys, a negative quantity sells).
+        Place an order by quantity (a positive value buys, a negative value sells).
 
-        The quantity actually filled is constrained by the security's minimum and maximum tradable quantities:
+        The actual traded quantity is constrained by the security's minimum and maximum tradable quantity:
 
-        - When buying, if the requested quantity exceeds the maximum tradable quantity, the order is filled at the maximum tradable quantity
-        - When selling, if the requested quantity exceeds the maximum tradable quantity and is not equal to MAX_DOUBLE, the order is filled at the maximum tradable quantity
-        - When selling, if the requested quantity is below the minimum tradable quantity, the entire holding is sold
+        - When buying, if the order quantity exceeds the maximum tradable quantity, it is filled at the maximum tradable quantity.
+        - When selling, if the order quantity exceeds the maximum tradable quantity and is not equal to MAX_DOUBLE, it is filled at the maximum tradable quantity.
+        - When selling, if the order quantity is below the minimum tradable quantity, the entire position is sold.
 
-        :param Stock stock: target security
-        :param float num: order quantity
-        :param str remark: order remark
-        :return: trade record
+        :param Stock stock: the specified security
+        :param float num: the order quantity
+        :param str remark: the order remark
+        :return: the trade record
         :rtype: TradeRecord
 
     .. py:method:: order_value(self, stock, value, remark='')
 
-        Submits an order sized to a target market value, i.e. how much money you want to put into the security (a positive value buys, a negative value sells).
+        Place an order by target market value, i.e. the amount of capital to allocate to buying the security (a positive value buys, a negative value sells).
 
-        This method derives the quantity from the current price and takes commission and other costs into account, making sure the order does not exceed the available funds. If funds are insufficient, the buy quantity is reduced automatically; if not even the minimum tradable quantity can be bought, no order is placed.
+        This method calculates the quantity to trade from the current price and takes fees and other factors into account, ensuring that the available funds are not exceeded.
+        If the funds are insufficient, the buy quantity is reduced automatically; if even the minimum tradable quantity cannot be bought, no order is placed.
 
-        :param Stock stock: target security
-        :param float value: amount of cash to invest
-        :param str remark: order remark
-        :return: trade record
+        :param Stock stock: the specified security
+        :param float value: the funds to invest when buying
+        :param str remark: the order remark
+        :return: the trade record
         :rtype: TradeRecord
 
     .. py:method:: buy(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
 
-        Submits a buy order.
+        The buy operation.
 
-        :param Stock stock: target security
-        :param price_t price: buy price; 0 means use the current market price
-        :param float num: quantity to buy
-        :param float stoploss: stop-loss price. Defaults to 0
-        :param float goal_price: price target (take-profit). Defaults to 0
-        :param SystemPart part: system part originating the order. Defaults to PART_SIGNAL
-        :param str remark: free-form remark
-        :return: trade record
+        :param Stock stock: the specified security
+        :param price_t price: the buy price; 0 means using the current market price
+        :param float num: the buy quantity
+        :param float stoploss: the stop-loss price; defaults to 0
+        :param float goal_price: the take-profit target price; defaults to 0
+        :param SystemPart part: the system part; defaults to PART_SIGNAL
+        :param str remark: the remark
+        :return: the trade record
         :rtype: TradeRecord
 
     .. py:method:: sell(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
 
-        Submits a sell order.
+        The sell operation.
 
-        :param Stock stock: target security
-        :param price_t price: sell price; 0 means use the current market price
-        :param float num: quantity to sell
-        :param price_t stoploss: stop-loss price. Defaults to 0
-        :param price_t goal_price: price target (take-profit). Defaults to 0
-        :param SystemPart part: system part originating the order. Defaults to PART_SIGNAL
-        :param str remark: free-form remark
-        :return: trade record
+        :param Stock stock: the specified security
+        :param price_t price: the sell price; 0 means using the current market price
+        :param float num: the sell quantity
+        :param price_t stoploss: the stop-loss price; defaults to 0
+        :param price_t goal_price: the take-profit target price; defaults to 0
+        :param SystemPart part: the system part; defaults to PART_SIGNAL
+        :param str remark: the remark
+        :return: the trade record
         :rtype: TradeRecord
 
 
 .. py:function:: start_spot_agent(print=False, worker_num=1, addr="")
 
-    Starts the market-data receiving agent.
+    Start the market-data receiving agent.
 
-    Raises an exception if the agent is already running.
+    An exception is raised if it is already running.
 
-    :param bool print: whether to print logs. Defaults to False
-    :param int worker_num: number of worker threads. Defaults to 1
-    :param str addr: address of the market data collection service; if empty, the market server address from the hikyuu configuration file is used
+    :param bool print: whether to print logs; defaults to False
+    :param int worker_num: the number of worker threads; defaults to 1
+    :param str addr: the market-data collection service address; when empty, the market server address in the hikyuu configuration file is used
 
 .. py:function:: stop_spot_agent()
 
-    Stops the market-data receiving agent.
+    Stop the market-data receiving agent.
 
 .. py:function:: spot_agent_is_running()
 
-    Checks whether the market-data receiving agent is running.
+    Check whether the market-data receiving agent is running.
 
     :return: True or False
 
 .. py:function:: spot_agent_is_connected()
 
-    Checks whether the market-data receiving agent is connected.
+    Check whether the market-data receiving agent is connected.
 
     :return: True or False
 
 
 .. py:function:: crtBrokerTM(broker, cost_func=TC_Zero(), name="SYS", other_brokers=[])
 
-    Creates a broker-backed trade manager.
+    Create a broker-backed trade manager.
 
-    :param broker: broker instance
-    :param TradeCost cost_func: transaction cost function. Defaults to TC_Zero()
-    :param str name: name. Defaults to "SYS"
-    :param list other_brokers: additional order brokers. Defaults to an empty list
-    :return: trade manager instance
+    :param broker: the broker instance
+    :param TradeCost cost_func: the trade cost function; defaults to TC_Zero()
+    :param str name: the name; defaults to "SYS"
+    :param list other_brokers: the list of other order brokers; defaults to an empty list
+    :return: the trade manager instance
     :rtype: TradeManagerPtr
 
 
 .. py:function:: run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])
 
-    Form 1: runs the trading system SYS inside the strategy runtime
+    Form 1: run the trading system SYS within the strategy runtime.
 
     run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])
-    Currently, only systems with both buy_delay and sell_delay set to false are supported, i.e. trading is executed at the close.
+    Currently, only systems with both buy_delay and sell_delay set to false are supported, i.e. trades are executed at the close.
 
-    :param sys: trading system
-    :param stock: instrument to trade
-    :param query: query criteria
-    :param broker: order broker (the broker dedicated to synchronizing orders with account assets)
-    :param cost_func: cost function
-    :param list other_brokers: additional order brokers. Defaults to an empty list
+    :param sys: the trading system
+    :param stock: the trading object
+    :param query: the query condition
+    :param broker: the order broker (the order broker dedicated to synchronizing with the account assets)
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers; defaults to an empty list
 
-    Form 2: runs the portfolio strategy PF inside the strategy runtime
+    Form 2: run the portfolio strategy PF within the strategy runtime.
 
-    Currently, only systems with both buy_delay and sell_delay set to false are supported, i.e. trading is executed at the close.
+    Currently, only systems with both buy_delay and sell_delay set to false are supported, i.e. trades are executed at the close.
 
-    :param Portfolio pf: portfolio
-    :param Query query: query criteria
-    :param broker: order broker (the broker dedicated to synchronizing orders with account assets)
-    :param cost_func: cost function
-    :param list other_brokers: additional order brokers. Defaults to an empty list
+    :param Portfolio pf: the portfolio
+    :param Query query: the query condition
+    :param broker: the order broker (the order broker dedicated to synchronizing with the account assets)
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers; defaults to an empty list
 
 
 .. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")
 
-    Creates a strategy from a trading system.
+    Create a system strategy.
 
-    :param sys: trading system
-    :param str stk_market_code: security market code
-    :param query: query criteria
-    :param broker: order broker
-    :param cost_func: cost function
-    :param list other_brokers: additional order brokers. Defaults to an empty list
-    :param str name: strategy name. Defaults to "SYSStrategy"
-    :param str config: path to the configuration file. Defaults to empty
+    :param sys: the trading system
+    :param str stk_market_code: the security market code
+    :param query: the query condition
+    :param broker: the order broker
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers; defaults to an empty list
+    :param str name: the strategy name; defaults to "SYSStrategy"
+    :param str config: the configuration file path; defaults to an empty string
 
 
 .. py:function:: crt_pf_strategy(pf, query, broker, cost_func, other_brokers=[], name="PFStrategy", config="")
 
-    Creates a strategy from a portfolio.
+    Create a strategy from a portfolio.
 
-    :param pf: portfolio
-    :param query: query criteria
-    :param broker: order broker
-    :param cost_func: cost function
-    :param list other_brokers: additional order brokers. Defaults to an empty list
-    :param str name: strategy name. Defaults to "PFStrategy"
-    :param str config: path to the configuration file. Defaults to empty
+    :param pf: the portfolio
+    :param query: the query condition
+    :param broker: the order broker
+    :param cost_func: the cost function
+    :param list other_brokers: the other order brokers; defaults to an empty list
+    :param str name: the strategy name; defaults to "PFStrategy"
+    :param str config: the configuration file path; defaults to an empty string
