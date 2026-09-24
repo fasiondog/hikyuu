@@ -10,6 +10,12 @@ Design doc 04 §6 / design doc 05 §4.1 check 16:
       (readme.md -> /en/latest/, readme.zh.md -> /zh-cn/latest/);
     - no cross-language links (en must not point to /zh-cn/, zh must not point to /en/).
 
+The donation / sponsorship section is exempt: its content (images, sub-headings)
+is allowed to diverge between the two languages. A section is recognized by an
+ATX heading whose title contains one of the _DONATION_KEYWORDS; everything from
+that heading up to (but not including) the next heading of the same or a higher
+level is skipped when fingerprints are built.
+
 Usage:
     python3 docs/tools/check_readme_parity.py
 
@@ -28,12 +34,35 @@ _HEADING = re.compile(r"^(#{1,6})\s+\S")
 _IMAGE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)|<img[^>]+src=[\"']([^\"']+)[\"']")
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)|href=[\"']([^\"']+)[\"']")
 
+# Headings whose title contains any of these mark a language-specific section
+# whose content is allowed to diverge between the two READMEs (case-insensitive).
+_DONATION_KEYWORDS = ("donation", "donate", "sponsor", "捐赠", "捐款", "赞赏", "打赏")
+
+
+def _is_exempt_heading(line):
+    m = _HEADING.match(line)
+    if not m:
+        return False
+    title = line[len(m.group(1)):].strip().lower()
+    return any(keyword in title for keyword in _DONATION_KEYWORDS)
+
 
 def fingerprint(path):
     headings, images = [], []
+    # While inside an exempt section: level of its heading, otherwise None.
+    skip_level = None
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             m = _HEADING.match(line)
+            if skip_level is not None:
+                if m and len(m.group(1)) <= skip_level:
+                    # A new section starts here; fall through and process it.
+                    skip_level = None
+                else:
+                    continue
+            if m and _is_exempt_heading(line):
+                skip_level = len(m.group(1))
+                continue
             if m:
                 headings.append(len(m.group(1)))
             for match in _IMAGE.finditer(line):
