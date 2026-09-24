@@ -83,7 +83,7 @@ Common parameters:
 
     .. py:method:: on_received_spot(self, func)
 
-        Register the callback for security data updates.
+        Register the callback fired after a complete batch of market data has been received.
 
         Fires after a complete batch of market data has been received; usually used only for debug printing. The batch does not necessarily contain the securities in the context,
         and the callback is triggered on every received market-data collection message, regardless of market open/close hours.
@@ -279,7 +279,6 @@ Common parameters:
     :param broker: the order broker (the order broker dedicated to synchronizing with the account assets)
     :param cost_func: the cost function
     :param list other_brokers: the other order brokers; defaults to an empty list
-
 
 
 .. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")

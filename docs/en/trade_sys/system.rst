@@ -4,7 +4,7 @@
 System Strategy|SYS
 ===================
 
-A System is a complete trading strategy for a single instrument. It bundles together the environment judgment, the system validity condition, money management, the stop-loss, the take-profit, the profit goal, and the slippage parts, and is used to run backtests.
+A System is a complete trading strategy for a single instrument. It bundles together the market environment, the system validity condition, money management, the stop-loss, the take-profit, the profit goal, and the slippage parts, and is used to run backtests.
 
 For multiple instruments (multiple securities), :class:`MultiSystem` can be used to aggregate multiple System instances (each for a single security, or even a nested :class:`MultiSystem`) into a portfolio that is backtested uniformly under the same trading account (TM). Sub-systems are added to :class:`MultiSystem` through ``add(subsystem)``; it supports **arbitrary nesting** and circular-reference detection. Each sub-system keeps its own SG/MM/EV/CN/ST/TP/PG/SP strategies, and only the parent keeps the books and places orders uniformly.
 
@@ -32,7 +32,7 @@ Common parameters:
     * **ignore_sell_sg=False** *(bool)* : Whether to ignore SG sell signals, so that selling happens only through the stop-loss/take-profit and other such means
     * **can_trade_when_high_eq_low=False** *(bool)* : Whether trading is allowed when the highest price equals the lowest price (a single-price limit-up cannot be bought, and a single-price limit-down cannot be sold)
 
-    * **ev_open_position=False** *(bool)*: Whether to apply the environment judgment to the initial position opening
+    * **ev_open_position=False** *(bool)*: Whether to apply the market environment to the initial position opening
     * **cn_open_position=False** *(bool)*: Whether to apply the system validity condition to the initial position opening
     
     * **shared_tm=False** *(bool)*: Whether the tm part is shared
@@ -59,8 +59,8 @@ Common parameters:
         <tbody>
             <tr>
                 <td>EV_Xxx</td>
-                <td>Environment judgment strategy</td>
-                <td>Assesses the market environment; an actual trade occurs only when the market is valid. This strategy can usually be shared across different system instances to reduce computation.</td>
+                <td>Market environment strategy</td>
+                <td>Assesses the market environment; an actual trade occurs only when the market is valid. This part can usually be shared across different system instances to reduce computation.</td>
             </tr>
             <tr>
                 <td>CN_Xxx</td>
@@ -254,15 +254,15 @@ System Base Class Definition
         :rtype: TradeRecordList
         
     .. py:method:: get_buy_trade_request_list(self)
-    
+
         Get the list of buy requests; in "delay" mode, use this to check whether a buy operation will occur on the next bar
-        
+
         :rtype: list[TradeRequest]
 
     .. py:method:: get_sell_trade_request_list(self)
-    
+
         Get the list of sell requests; in "delay" mode, use this to check whether a sell operation will occur on the next bar
-        
+
         :rtype: list[TradeRequest]
                 
     .. py:function:: run(self, stock, query[, reset=True])
@@ -277,7 +277,7 @@ System Base Class Definition
     .. py:method:: reset(self)
     
         Reset the system, excluding the current instrument and the shared parts
-        
+
     .. py:method:: force_reset_all(self)
 
         Force-reset all parts and clear the existing instrument, ignoring the shared attributes of the parts
