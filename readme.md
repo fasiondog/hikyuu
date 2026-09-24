@@ -1,4 +1,6 @@
-![title](docs/en/_static/00000-title.png)
+<p align="center">
+  <img src="docs/en/_static/00000-title.png" width="200" alt="title">
+</p>
 
 <p align="center">
   <b>English</b> | <a href="readme.zh.md">简体中文</a>
@@ -6,7 +8,7 @@
 
 ---
 
-![img](https://static.pepy.tech/badge/hikyuu) ![img](https://static.pepy.tech/badge/hikyuu/month) ![img](https://static.pepy.tech/badge/hikyuu/week) ![img](https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg) ![img](https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg) ![License](https://img.shields.io/github/license/fasiondog/hikyuu.svg)
+![img](https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg) ![img](https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg) ![License](https://img.shields.io/github/license/fasiondog/hikyuu.svg) ![img](https://static.pepy.tech/badge/hikyuu)
 
 ## ⚡ Hikyuu Ultra-Fast Quant Framework
 
@@ -276,13 +278,6 @@ sys.run(sm['sz000001'], Query(-150))
 ---
 
 ## ❤️ Sponsorship
-
-Sponsorship helps keep Hikyuu moving forward. The channels below are Alipay / WeChat Pay (China) and
-Zsxq; see the donation page for the plans and the benefits attached to each one.
-
-<p align="center">
-  <img src="docs/en/_static/dingyue.png" alt="Sponsorship QR code" width="600">
-</p>
 
 | Plan                        | Description                                                                            | Method                | Link                                        |
 | :-------------------------- | :------------------------------------------------------------------------------------- | :-------------------- | :------------------------------------------ |

@@ -1,20 +1,22 @@
-![title](docs/zh/_static/00000-title.png)
+<p align="center">
+  <img src="docs/zh/_static/00000-title.png" width="200" alt="title">
+</p>
+
+![img](https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg) ![img](https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg) ![License](https://img.shields.io/github/license/fasiondog/hikyuu.svg) ![img](https://static.pepy.tech/badge/hikyuu)
+
+---
 
 <p align="center">
   <a href="readme.md">English</a> | <b>简体中文</b>
 </p>
 
----
+## ⚡ Hikyuu Quant Framework
 
-![img](https://static.pepy.tech/badge/hikyuu) ![img](https://static.pepy.tech/badge/hikyuu/month) ![img](https://static.pepy.tech/badge/hikyuu/week) ![img](https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg) ![img](https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg) ![License](https://img.shields.io/github/license/fasiondog/hikyuu.svg)
+> 基于 C++/Python 开发的开源高性能量化交易研究框架，聚焦策略分析、回测。核心能力覆盖四大维度：**交易模型研发 · 极速计算引擎 · 高效回测体系**。
 
-## ⚡ Hikyuu Ultra-Fast Quant Framework
+框架依托成熟的系统化交易和投资组合理念，将量化分析体系拆解为 **市场环境研判、策略生效条件判定、信号指标解析、盈亏风控模型、资金配比模型、收益目标测算、滑点模拟算法、多因子建模、投资组合分析、资金分配** 等独立模块化组件。用户可自由组合模块、搭建专属策略模型库，通过模拟回测验证策略稳定性与有效性，完成量化策略研究与数据分析工作。同时框架预留拓展接口，支持开发者自主开发、对接合规的第三方交易接口（如 QMT 等官方合规终端接口），满足个性化技术拓展与私有适配需求。
 
-> 基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展（深度适配国内 A 股市场）。核心能力覆盖四大维度：**交易模型研发 · 极速计算引擎 · 高效回测体系 · 实盘交易拓展**。
-
-框架依托成熟的系统化交易研究理念，将量化分析体系拆解为 **市场环境研判、策略生效条件判定、信号指标解析、盈亏风控模型、资金配比模型、收益目标测算、滑点模拟算法、多因子建模、投资组合分析、资金分配** 等独立模块化组件。用户可自由组合模块、搭建专属策略模型库，通过模拟回测验证策略稳定性与有效性，完成量化策略研究与数据分析工作。同时框架预留拓展接口，支持开发者自主开发、对接合规的第三方交易接口（如 QMT 等官方合规终端接口），满足个性化技术拓展与私有适配需求。
-
-> ⚠️ **免责声明**：本项目为开源金融技术研究工具，仅供个人学习、学术研究与数据分析使用，不构成任何投资建议与交易指导，不提供、不内置证券交易服务。框架仅提供通用接口拓展能力，仅建议用户对接持牌机构提供的合规交易终端接口；用户自主新增、对接各类交易接口、开发拓展功能以及对应的实操行为，均由用户自行承担全部风险与法律责任，严禁对接非法交易通道、用于违规交易场景。
+> ⚠️ **免责声明**：本项目为开源金融技术研究工具，仅供个人学习、学术研究与数据分析使用，不构成任何投资建议与交易指导，不提供、不内置证券交易服务。用户自主新增、对接各类交易接口、开发拓展功能以及对应的实操行为，均由用户自行承担全部风险与法律责任，严禁对接非法交易通道、用于违规交易场景。
 
 ---
 
@@ -43,13 +45,12 @@
 
 ## 🔗 快速导航
 
-| 项目                          | 链接                                                                                                                                           |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🏠**项目首页**          | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                      |
-| 📚**帮助文档**          | [https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)                                  |
-| 🚀**入门示例**          | [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True) |
-| 🧰**策略部件库**        | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                                |
-| 🐧**Ubuntu 虚拟机环境** | [百度网盘下载（提取码: ht8j）](https://pan.baidu.com/s/1CAiUWDdgV0c0VhPpe4AgVw?pwd=ht8j)                                                        |
+| 项目                   | 链接                                                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🏠**项目首页**   | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                         |
+| 📚**帮助文档**   | [https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)                                     |
+| 🚀**入门示例**   | [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True) |
+| 🧰**策略部件库** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                                   |
 
 ---
 
@@ -75,7 +76,7 @@ pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ### 第 2 步：导入行情数据
 
-任选一种方式导入历史行情数据：
+任选一种方式导入A股历史行情数据：
 
 ```bash
 # 图形界面（推荐首次使用，会自动生成配置文件）
@@ -157,7 +158,7 @@ sys.run(sm['sz000001'], Query(-150))
 
 ### 🔓 开源透明，数据安全可控
 
-**Apache 2.0** 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。
+**Apache 2.0** 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制，但请遵循协议。
 
 ---
 
@@ -218,28 +219,24 @@ sys.run(sm['sz000001'], Query(-150))
 
 ## 📂 浏览源码
 
-> 欢迎 **Star ⭐**、**Fork 🍴**，参与贡献
+> 欢迎 **Star ⭐**，参与贡献
 
-| 平台                 | 链接                                                                      | 推荐    |
-| :------------------- | :------------------------------------------------------------------------ | :------ |
-| **码云 Gitee** | [https://gitee.com/fasiondog/hikyuu](https://gitee.com/fasiondog/hikyuu)   | ✅ 推荐 |
-| **GitHub**     | [https://github.com/fasiondog/hikyuu](https://github.com/fasiondog/hikyuu) |         |
-| **GitCode**    | [https://gitcode.com/hikyuu/hikyuu](https://gitcode.com/hikyuu/hikyuu)     |         |
+| 平台                 | 链接                                                                      | 推荐        |
+| :------------------- | :------------------------------------------------------------------------ | :---------- |
+| **GitHub**     | [https://github.com/fasiondog/hikyuu](https://github.com/fasiondog/hikyuu) | 海外        |
+| **码云 Gitee** | [https://gitee.com/fasiondog/hikyuu](https://gitee.com/fasiondog/hikyuu)   | ✅ 国内推荐 |
+| **GitCode**    | [https://gitcode.com/hikyuu/hikyuu](https://gitcode.com/hikyuu/hikyuu)     | ✅ 国内推荐 |
 
 ---
 
 ## ❤️ 感谢捐赠，让 Hikyuu 走得更远
 
-<p align="center">
-  <img src="docs/zh/_static/dingyue.png" alt="订阅二维码" width="600">
-</p>
-
-| 方案                       | 说明                                                                                            | 方式               | 链接                                       |
-| :------------------------- | :---------------------------------------------------------------------------------------------- | :----------------- | :----------------------------------------- |
-| ☕**请作者喝杯咖啡** | ¥30 · 一次性的小小支持(赠历史日线)                                                            | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/gflv3v) |
-| 📅**订阅 180 天**    | ¥50 · 半年期订阅权益(赠历史日线)                                                              | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/du4h8s) |
-| 🗓️**订阅 365 天**  | ¥100 · 全年期订阅权益(赠历史日/分/时/笔数据)                                                  | 支付宝             | [前往捐赠](https://pay.ldxp.cn/item/ehbz9b) |
-| 🌌**加入知识星球**   | ¥300/年 · 首年300元，续费半价。3台设备登录 · 专属微信群及策略部件库，(赠历史日/分/时/笔数据) | 微信 / 知识星球APP | [前往加入](https://t.zsxq.com/YSATD)        |
+| 方案                       | 说明                                                                                                         | 方式               | 链接                                   |
+| :------------------------- | :----------------------------------------------------------------------------------------------------------- | :----------------- | :------------------------------------- |
+| ☕**请作者喝杯咖啡** | ¥30 · 一次性的小小支持(赠历史日线及3个月捐赠权益)                                                          | 支付宝             | [前往捐赠](https://wzyp.cn/item/gflv3v) |
+| 📅**订阅 180 天**    | ¥50 · 半年期捐赠权益(赠历史日线)                                                                           | 支付宝             | [前往捐赠](https://wzyp.cn/item/du4h8s) |
+| 🗓️**订阅 365 天**  | ¥100 · 全年期捐赠权益(赠历史日/分/时/笔数据)                                                               | 支付宝             | [前往捐赠](https://wzyp.cn/item/ehbz9b) |
+| 🌌**加入知识星球**   | ¥300/年 · 首年300元，续费半价。捐赠权益1年可3台设备登录 · 专属微信群及策略部件库，(赠历史日/分/时/笔数据) | 微信 / 知识星球APP | [前往加入](https://t.zsxq.com/YSATD)    |
 
 > 🎁 **捐赠计划与附赠详见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
 
