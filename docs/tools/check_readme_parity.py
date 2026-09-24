@@ -16,6 +16,12 @@ ATX heading whose title contains one of the _DONATION_KEYWORDS; everything from
 that heading up to (but not including) the next heading of the same or a higher
 level is skipped when fingerprints are built.
 
+The quick-links section is exempt as well: its table points at
+language-specific resources (the localized documentation site/project and the
+en/zh notebook trees), so both the fingerprint and the link-discipline checks
+skip everything under a heading whose title contains one of the
+_QUICK_LINKS_KEYWORDS ("Quick Links" / "快速导航").
+
 Another intentionally allowed divergence is the hero tagline (the centered
 paragraph under the title mascot and above the badge row): its wording is
 prose, and its line-break layout is language-specific. CJK is compact while
@@ -52,13 +58,20 @@ _TAG_STRIP = re.compile(r"<[^>]+>")
 # whose content is allowed to diverge between the two READMEs (case-insensitive).
 _DONATION_KEYWORDS = ("donation", "donate", "sponsor", "捐赠", "捐款", "赞赏", "打赏")
 
+# The quick-links table points at language-specific resources (localized
+# documentation sites and the en/zh notebook trees), so its links are allowed
+# to differ between the two READMEs.
+_QUICK_LINKS_KEYWORDS = ("quick link", "快速导航", "快速链接")
+
+_EXEMPT_SECTION_KEYWORDS = _DONATION_KEYWORDS + _QUICK_LINKS_KEYWORDS
+
 
 def _is_exempt_heading(line):
     m = _HEADING.match(line)
     if not m:
         return False
     title = line[len(m.group(1)):].strip().lower()
-    return any(keyword in title for keyword in _DONATION_KEYWORDS)
+    return any(keyword in title for keyword in _EXEMPT_SECTION_KEYWORDS)
 
 
 _FENCE = re.compile(r"^\s{0,3}(`{3,}|~{3,})")
@@ -98,6 +111,38 @@ def fingerprint(path):
             for match in _IMAGE.finditer(line):
                 images.append(os.path.basename(match.group(1) or match.group(2)))
     return headings, images
+
+
+def strip_exempt_sections(text):
+    """Remove exempt sections (see _is_exempt_heading) from markdown text.
+
+    Everything from an exempt heading up to (but not including) the next
+    heading of the same or a higher level is dropped -- including the heading
+    itself -- so the link-language and notebook-path checks do not flag
+    intentionally language-specific links inside those sections.
+    """
+    kept = []
+    # While inside an exempt section: level of its heading, otherwise None.
+    skip_level = None
+    fence = None
+    for line in text.splitlines(keepends=True):
+        fm = _FENCE.match(line)
+        if fm:
+            marker = fm.group(1)[0]
+            if fence is None:
+                fence = marker
+            elif fence == marker:
+                fence = None
+        elif fence is None:
+            m = _HEADING.match(line)
+            if skip_level is not None and m and len(m.group(1)) <= skip_level:
+                # A new section starts here; fall through and keep the line.
+                skip_level = None
+            if m and _is_exempt_heading(line):
+                skip_level = len(m.group(1))
+        if skip_level is None:
+            kept.append(line)
+    return "".join(kept)
 
 
 def links(path):
@@ -160,10 +205,13 @@ def main():
         errors.append("readme.zh.md is missing the hero tagline (centered text "
                       "paragraph with a <strong> line after the mascot)")
 
-    # Link language discipline.
-    if "readthedocs.io/zh-cn/" in en_text:
+    # Link language discipline. Exempt sections (donation, quick links) may
+    # point at language-specific sites and are stripped before the check.
+    en_links_text = strip_exempt_sections(en_text)
+    zh_links_text = strip_exempt_sections(zh_text)
+    if "readthedocs.io/zh-cn/" in en_links_text:
         errors.append("readme.md must not link to the Chinese site (/zh-cn/)")
-    if "readthedocs.io/en/" in zh_text:
+    if "readthedocs.io/en/" in zh_links_text:
         errors.append("readme.zh.md must not link to the English site (/en/)")
 
     en_headings, en_images = fingerprint(EN_README)
@@ -176,7 +224,7 @@ def main():
                          sorted(set(zh_images) - set(en_images))))
 
     # Notebook links must point at the language-specific tree (design doc 01 §2.3).
-    for name, text in (("readme.md", en_text), ("readme.zh.md", zh_text)):
+    for name, text in (("readme.md", en_links_text), ("readme.zh.md", zh_links_text)):
         for m in re.finditer(r"examples/notebook/(?!en/|zh/)([^)\s\"']+)", text):
             errors.append("%s links to the old unlocalized notebook path: examples/notebook/%s"
                           % (name, m.group(1)))
