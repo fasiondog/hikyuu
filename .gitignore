@@ -75,6 +75,7 @@
 .copilot*
 .github/copilot-instructions.md
 .cache
+.pytest_cache
 
 nohup.out
 temp
