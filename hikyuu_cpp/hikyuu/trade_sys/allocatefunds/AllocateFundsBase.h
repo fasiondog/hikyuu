@@ -1,7 +1,7 @@
 /*
  * AllocateMoney.h
  *
- *  Created on: 2018年1月30日
+ *  Created on: 2018-1-30
  *      Author: fasiondog
  */
 
@@ -15,88 +15,92 @@
 namespace hku {
 
 /**
- * 资产分配调整算法
- * @details 根据资产市值对资产比例进行分配调整。单纯的资金调整，请使用资金管理算法。
+ * Asset allocation adjustment algorithm
+ * @details It allocates and adjusts the asset proportions according to the asset market value. For
+ *          a pure fund adjustment, please use the money management algorithm.
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
-    /** 默认构造函数 */
+    /** Default constructor */
     AllocateFundsBase();
     AllocateFundsBase(const AllocateFundsBase&) = default;
 
     /**
-     * 构造函数
-     * @param name 算法名称
+     * Constructor
+     * @param name algorithm name
      */
     explicit AllocateFundsBase(const string& name);
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~AllocateFundsBase();
 
-    /** 获取算法名称 */
+    /** Get the algorithm name */
     const string& name() const;
 
-    /** 修改算法名称 */
+    /** Modify the algorithm name */
     void name(const string& name);
 
     /**
-     * 执行资产分配调整，仅供 PF 调用
-     * @param date 指定日期
-     * @param se_list 系统实例选择器选出的系统实例
-     * @param running_list 当前运行中的系统实例
-     * @return 需延迟执行卖出操作的系统列表，其中权重为相应需卖出的数量
+     * Execute the asset allocation adjustment, it is called by PF only
+     * @param date the given date
+     * @param se_list the system instances selected by the system instance selector
+     * @param running_list the currently running system instances
+     * @return the system list that needs a delayed sell operation, where the weight is the
+     *         corresponding quantity to be sold
      */
     SystemWeightList adjustFunds(const Datetime& date, const SystemWeightList& se_list,
                                  const std::unordered_set<SYSPtr>& running_list);
 
-    /** 获取交易账户 */
+    /** Get the trade account */
     const TMPtr& getTM() const;
 
-    /** 设定交易账户，由 PF 设定 */
+    /** Set the trade account, it is set by PF */
     void setTM(const TMPtr&);
 
-    /** 设置 Portfolio 的影子账户, 仅由 Portfolio 调用 */
+    /** Set the shadow account of Portfolio, it is called by Portfolio only */
     void setCashTM(const TMPtr&);
 
     const TMPtr& getCashTM(const TMPtr&) const;
 
-    /** 获取关联查询条件 */
+    /** Get the associated query condition */
     const KQuery& getQuery() const;
 
-    /** 设置查询条件， 由 PF 设定 */
+    /** Set the query condition, it is set by PF */
     void setQuery(const KQuery& query);
 
-    /** 复位 */
+    /** Reset */
     void reset();
 
     typedef shared_ptr<AllocateFundsBase> AFPtr;
 
-    /** 克隆操作 */
+    /** Clone operation */
     AFPtr clone();
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆私有变量接口 */
+    /** Interface for the subclass to clone its private variables */
     virtual AFPtr _clone() = 0;
 
     /**
-     * 子类分配权重接口，获取实际分配资产的系统实例及其权重
-     * @details 实际调用子类接口 _allocateWeight
-     * @param date 指定日期
-     * @param se_list 系统实例选择器选出的系统实例
-     * @return 子类只需要返回每个系统的相对比例即可
+     * Subclass weight allocation interface, it gets the system instances actually allocated the
+     * assets and their weights
+     * @details It actually calls the subclass interface _allocateWeight
+     * @param date the given date
+     * @param se_list the system instances selected by the system instance selector
+     * @return the subclass only needs to return the relative proportion of every system
      */
     virtual SystemWeightList _allocateWeight(const Datetime& date,
                                              const SystemWeightList& se_list) = 0;
 
 public:
     /*
-     * 内部函数，仅为测试需要设置为 public。
-     * 对由子类分配的计划权重根据内部参数设置进行调整
+     * An internal function, it is set to public for the testing only.
+     * It adjusts the planned weights allocated by the subclass according to the internal parameter
+     * settings
      */
     static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
                              bool auto_adjust, bool ignore_zero);
@@ -108,11 +112,12 @@ public:
 private:
     void initParam();
 
-    /* 同时调整已运行中的子系统（已分配资金或已持仓） */
+    /* It also adjusts the sub-systems already running (the ones already allocated funds or holding
+     * positions) */
     SystemWeightList _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
                                           const std::unordered_set<SYSPtr>& running_list);
 
-    /* 不调整已在运行中的子系统 */
+    /* It does not adjust the sub-systems already running */
     void _adjust_without_running(const Datetime& date, const SystemWeightList& se_list,
                                  const std::unordered_set<SYSPtr>& running_list);
 
@@ -120,13 +125,14 @@ protected:
     bool m_is_python_object{false};
 
 private:
-    string m_name;    // 组件名称
-    KQuery m_query;   // 查询条件
-    TMPtr m_tm;       // 运行期由PF设定，PF的实际账户
-    TMPtr m_cash_tm;  // 运行期由PF设定，tm 的影子账户，由于协调分配资金
+    string m_name;    // Component name
+    KQuery m_query;   // Query condition
+    TMPtr m_tm;       // Set by PF at runtime, the actual account of PF
+    TMPtr m_cash_tm;  // Set by PF at runtime, the shadow account of tm, used to coordinate the fund
+                      // allocation
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -157,7 +163,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(AllocateFundsBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public AllocateFundsBase {
  *     ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION

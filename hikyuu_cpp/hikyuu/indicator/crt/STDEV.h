@@ -14,17 +14,17 @@
 namespace hku {
 
 /**
- * 计算N周期内样本标准差
- * @param n N日时间窗口
+ * Calculate the sample standard deviation within N periods
+ * @param n N-day time window
  * @ingroup Indicator
  */
 Indicator HKU_API STDEV(int n = 10);
 Indicator HKU_API STDEV(const IndParam& n);
 
 /**
- * 计算N周期内样本标准差
- * @param data 输入数据，单一输入
- * @param n N日时间窗口
+ * Calculate the sample standard deviation within N periods
+ * @param data the input data, a single input
+ * @param n N-day time window
  * @ingroup Indicator
  */
 inline Indicator STDEV(const Indicator& data, int n = 10) {

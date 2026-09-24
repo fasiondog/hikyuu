@@ -1,7 +1,7 @@
 /*
  * FixedUnitsMoneyManager.h
  *
- *  Created on: 2016年5月3日
+ *  Created on: 2016-5-3
  *      Author: Administrator
  */
 

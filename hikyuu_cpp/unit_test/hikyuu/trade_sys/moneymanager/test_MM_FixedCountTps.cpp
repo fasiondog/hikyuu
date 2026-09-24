@@ -19,20 +19,20 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MM_FixedCountTpsTps") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     TradeManagerPtr tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
 
-    /** @arg 买入/卖出数量中含有小于0的值 */
+    /** @arg The buy / sell quantity contains a value less than 0 */
     CHECK_THROWS_AS(MM_FixedCountTps({100., -1}, {100., 100.}), std::exception);
     CHECK_THROWS_AS(MM_FixedCountTps({100., 100.}, {100., -100.}), std::exception);
 
-    /** @arg 买入卖出总量不等（仅打印警告）*/
+    /** @arg The total buy and sell quantities differ (a warning is printed only) */
     auto _ = MM_FixedCountTps({100., 100.}, {200., 200.});
 
-    /** @arg n = 100, 一个初始资金为0的交易账户自动补充资金，能够执行买入操作 */
+    /** @arg n = 100; a trade account with the initial capital 0 auto-fills and can buy */
     tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
     CHECK_EQ(tm->initCash(), 0.0);
     auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});

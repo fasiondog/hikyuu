@@ -8,35 +8,47 @@
 #pragma once
 
 #include <string>
-#include "hikyuu/DataType.h"  // 提供 HKU_API 空回退定义（mac/linux 不注入 -D HKU_API）
+#include "hikyuu/DataType.h"  // Provides the empty fallback definition of HKU_API (mac/linux does
+                              // not inject -D HKU_API)
 
 namespace hku {
 
 /**
- * 在当前进程内启动 shm 数据服务（加载 shmserver 插件并拉起服务端）
- * @details 范式同 startDataServer：门面先置 server 角色（防自连接，见设计 §5.5），再经
- * StockManager 加载 shmserver 插件并调用其 start()。插件为 VIP 授权，未授权 / 未安装时返回 false。
- * @param datadir 数据目录，为空时取 StockManager 当前数据目录
- * @param publish_shm 是否发布两类共享内存快照（K 线热数据 + 基础信息）
- * @param recv_spot 是否由本进程接收实时行情（内部调用 startSpotAgent，须在 init 之后）
- * @return 启动成功返回 true；本进程已处于客户端模式、插件缺失或授权无效时返回 false
- * @note 须在主程序初始化（import hikyuu 默认完成）之后调用；早于 init 将因数据未就绪而失败
+ * Start the shm data service in the current process (it loads the shmserver plugin and starts the
+ * server side)
+ * @details The paradigm is the same as startDataServer: the facade first sets the server role (to
+ *          prevent self-connection, see design §5.5), then loads the shmserver plugin through
+ *          StockManager and calls its start(). The plugin requires a VIP license, false is returned
+ *          when it is not licensed / not installed.
+ * @param datadir data directory; the current data directory of StockManager is used when it is
+ * empty
+ * @param publish_shm whether to publish the two kinds of shared memory snapshots (the K-line hot
+ *                    data + the basic information)
+ * @param recv_spot whether this process receives the realtime market data (it calls startSpotAgent
+ *                  internally, and it must be after init)
+ * @return true is returned on a successful start; false is returned when this process is already in
+ *         the client mode, the plugin is missing or the license is invalid
+ * @note It must be called after the main program initialization (which is completed by importing
+ *       hikyuu by default); calling it earlier than init fails because the data is not ready
  * @ingroup DataDriver
  */
 bool HKU_API startShmServer(const std::string& datadir = "", bool publish_shm = true,
                             bool recv_spot = true) noexcept;
 
 /**
- * 停止当前进程内的 shm 数据服务
- * @details 必须早于 nng_fini()：服务端 nng worker 持有在飞接收操作，若留待 nng 全局状态拆除后
- * 再由取消回调触发，会在已销毁的内部结构上重新装载接收而崩溃。由 GlobalInitializer::clean() 调用。
+ * Stop the shm data service in the current process
+ * @details It must be earlier than nng_fini(): the server side nng worker holds the in-flight
+ *          receiving operations, and if it is left until after the global nng state is torn down
+ *          and then triggered by the cancel callback, it would reload the receiving on the
+ * destroyed internal structures and crash. It is called by GlobalInitializer::clean().
  * @ingroup DataDriver
  */
 void HKU_API stopShmServer() noexcept;
 
 /**
- * 查询当前进程内 shm 数据服务是否在运行
- * @return 服务在运行返回 true；插件未加载 / 未启动返回 false
+ * Query whether the shm data service in the current process is running
+ * @return true is returned when the service is running; false is returned when the plugin is not
+ *         loaded / not started
  * @ingroup DataDriver
  */
 bool HKU_API isShmServerRunning() noexcept;

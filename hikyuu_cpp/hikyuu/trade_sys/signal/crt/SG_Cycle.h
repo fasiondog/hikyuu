@@ -12,7 +12,7 @@
 namespace hku {
 
 /**
- * 以 PF 调仓周期为买入信号
+ * It uses the PF rebalancing cycle as the buy signal
  * @return SignalPtr
  */
 SignalPtr HKU_API SG_Cycle();

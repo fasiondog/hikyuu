@@ -1,7 +1,7 @@
 /*
  * QLBlockInfoDriver.h
  *
- *  Created on: 2015年2月10日
+ *  Created on: 2015-2-10
  *      Author: fasiondog
  */
 

@@ -11,33 +11,39 @@
 namespace hku {
 
 /**
- * @brief 创建指定权重多因子模型实例
+ * @brief Create a given weight multi-factor model instance
  * @ingroup MultiFactor
- * @return MultiFactorPtr 指定权重多因子模型指针
- * @details 创建一个空的指定权重多因子模型，需要后续设置因子集合和权重
+ * @return MultiFactorPtr the given weight multi-factor model pointer
+ * @details Create an empty given weight multi-factor model; the factor set and the weights need to
+ *          be set afterwards
  */
 MultiFactorPtr HKU_API MF_Weight();
 
 /**
- * @brief 创建指定权重多因子模型实例（完整参数版本）
+ * @brief Create a given weight multi-factor model instance (the full parameter version)
  * @ingroup MultiFactor
- * @param weights 权重列表，必须与因子数量相等
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空（相当于SH000001）
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 指定权重多因子模型指针
- * @details 
- * 创建指定权重多因子模型实例，使用指定参数进行因子合成计算。
- * 计算公式：factor = ind1 * w1 + ind2 * w2 + ... + indn * wn
- * 权重列表大小必须与因子数量相等，否则将抛出异常。
+ * @param weights the weight list, it must be equal to the number of the factors
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default (equivalent
+ *                to SH000001)
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the given weight multi-factor model pointer
+ * @details
+ * Create a given weight multi-factor model instance, it uses the given parameters for the factor
+ * synthesis calculation.
+ * Calculation formula: factor = ind1 * w1 + ind2 * w2 + ... + indn * wn
+ * The size of the weight list must be equal to the number of the factors, otherwise an exception is
+ * thrown.
  * <pre>
- * 示例：
- * // 创建指定权重模型
- * PriceList weights = {0.3, 0.4, 0.3};  // 权重必须与因子数相等
+ * Example:
+ * // Create the given weight model
+ * PriceList weights = {0.3, 0.4, 0.3};  // The weights must equal the number of the factors
  * auto mf = MF_Weight(weights, stocks, query, Stock("SH000001"), 5, true, 0, false);
  * </pre>
  */
@@ -46,27 +52,32 @@ MultiFactorPtr HKU_API MF_Weight(const PriceList& weights, const StockList& stks
                                  bool spearman = true, int mode = 0, bool save_all_factors = false);
 
 /**
- * @brief 创建指定权重多因子模型实例（使用因子集版本）
+ * @brief Create a given weight multi-factor model instance (the factor set version)
  * @ingroup MultiFactor
- * @param factorset 因子集合
- * @param weights 权重列表，必须与因子集的因子数量相等
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 指定权重多因子模型指针
- * @details 
- * 创建指定权重多因子模型实例，使用指定的因子集合和权重进行计算。
- * 计算公式：factor = ind1 * w1 + ind2 * w2 + ... + indn * wn
- * 特别注意：会严格检查权重列表大小是否与因子集大小相等，如果不相等将抛出异常。
- * 这是保证多因子合成正确性的关键检查，确保每个因子都有对应的权重。
+ * @param factorset factor set
+ * @param weights the weight list, it must be equal to the number of the factors in the factor set
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the given weight multi-factor model pointer
+ * @details
+ * Create a given weight multi-factor model instance, it uses the given factor set and weights for
+ * the calculation.
+ * Calculation formula: factor = ind1 * w1 + ind2 * w2 + ... + indn * wn
+ * Note: it strictly checks whether the size of the weight list is equal to the size of the factor
+ * set, and an exception is thrown if they are not equal.
+ * This is the key check guaranteeing the correctness of the multi-factor synthesis, ensuring that
+ * every factor has its corresponding weight.
  * <pre>
- * 示例：
- * // 使用因子集创建指定权重模型
- * PriceList weights = {0.3, 0.4, 0.3};  // 必须与因子数量匹配
+ * Example:
+ * // Create the given weight model with the factor set
+ * PriceList weights = {0.3, 0.4, 0.3};  // It must match the number of the factors
  * auto mf = MF_Weight(factor_set, weights, stocks, query);
  * </pre>
  */
@@ -84,27 +95,32 @@ inline MultiFactorPtr MF_Weight(const FactorSet& factorset, const PriceList& wei
 }
 
 /**
- * @brief 创建指定权重多因子模型实例（使用指标列表版本）
+ * @brief Create a given weight multi-factor model instance (the indicator list version)
  * @ingroup MultiFactor
- * @param inds 指标列表，将自动转换为因子集
- * @param weights 权重列表，必须与指标列表的长度相等
- * @param stks 计算证券列表
- * @param query 日期范围查询条件
- * @param ref_stk 参考证券，用于日期对齐，默认为空
- * @param ic_n 默认IC对应的N日收益率周期，默认为5
- * @param spearman 是否使用spearman计算相关系数，true为spearman，false为pearson，默认为true
- * @param mode 获取截面数据时的排序模式：0-降序，1-升序，2-不排序，默认为0
- * @param save_all_factors 是否保留所有因子数据，默认为false
- * @return MultiFactorPtr 指定权重多因子模型指针
- * @details 
- * 创建指定权重多因子模型实例，使用指标列表自动构建因子集并应用指定权重进行计算。
- * 计算公式：factor = ind1 * w1 + ind2 * w2 + ... + indn * wn
- * 特别注意：会严格检查权重列表大小是否与指标数量相等，这是保证多因子合成正确性的关键。
- * 如果权重数量与指标数量不匹配，将抛出异常，防止错误的因子合成结果。
+ * @param inds the indicator list, it is converted into a factor set automatically
+ * @param weights the weight list, it must be equal to the length of the indicator list
+ * @param stks the security list to be calculated
+ * @param query the date range query condition
+ * @param ref_stk the reference security, used for the date alignment, empty by default
+ * @param ic_n the N-day return period corresponding to the default IC, 5 by default
+ * @param spearman whether to use spearman to calculate the correlation coefficient: true means
+ *                 spearman, false means pearson, true by default
+ * @param mode the sorting mode when getting the cross-section data: 0-descending, 1-ascending,
+ *             2-no sorting, 0 by default
+ * @param save_all_factors whether to keep all the factor data, false by default
+ * @return MultiFactorPtr the given weight multi-factor model pointer
+ * @details
+ * Create a given weight multi-factor model instance, it builds the factor set automatically with
+ * the indicator list and applies the given weights for the calculation.
+ * Calculation formula: factor = ind1 * w1 + ind2 * w2 + ... + indn * wn
+ * Note: it strictly checks whether the size of the weight list is equal to the number of the
+ * indicators, which is the key to guaranteeing the correctness of the multi-factor synthesis.
+ * If the number of the weights does not match the number of the indicators an exception is thrown,
+ * preventing a wrong factor synthesis result.
  * <pre>
- * 示例：
- * // 使用指标列表创建指定权重模型
- * PriceList weights = {0.3, 0.4, 0.3};  // 必须与指标数量完全匹配
+ * Example:
+ * // Create the given weight model with the indicator list
+ * PriceList weights = {0.3, 0.4, 0.3};  // It must match the number of the indicators exactly
  * auto mf = MF_Weight(indicators, weights, stocks, query);
  * </pre>
  */

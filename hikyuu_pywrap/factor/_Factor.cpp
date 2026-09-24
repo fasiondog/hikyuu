@@ -12,19 +12,19 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_Factor(py::module& m) {
-    py::class_<Factor>(m, "Factor", "因子元数据")
+    py::class_<Factor>(m, "Factor", "The factor metadata")
       .def(py::init<>(), R"(__init__(self)
     
-    默认构造函数，创建空的因子对象)")
+    The default constructor, creating an empty factor object)")
 
       .def(py::init<const string&, const KQuery::KType&>(), py::arg("name"),
            py::arg("ktype") = KQuery::DAY,
            R"(__init__(self, name[, ktype=KQuery.DAY])
     
-    构造函数，只指定因子名称和K线类型，将尝试自动从数据库加载因子
+    The constructor specifying only the factor name and the K-line type, which will try to load the factor from the database automatically
 
-    :param str name: 因子名称
-    :param KQuery.KType ktype: K线类型，默认为日线)")
+    :param str name: the factor name
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line)")
 
       .def(
         py::init([](const string& name, const Indicator& formula, const KQuery::KType& ktype,
@@ -41,64 +41,64 @@ void export_Factor(py::module& m) {
         py::arg("recover_type") = KQuery::NO_RECOVER,
         R"(__init__(self, name, formula[, ktype=KQuery.DAY[, brief=""[, details=""[, need_save_value=False[, start_date=Datetime.min()[, block=Block()]]]]]])
     
-    构造函数，创建新的因子对象（因子名称 + K线类型 为因子的唯一标识）
+    The constructor creating a new factor object (the factor name + the K-line type is the unique identifier of the factor)
 
-    :param str name: 因子名称
-    :param Indicator formula: 计算公式指标，一旦创建不可更改
-    :param KQuery.KType ktype: K线类型，默认为日线
-    :param str brief: 简要描述，默认为空
-    :param str details: 详细描述，默认为空
-    :param bool need_save_value: 是否需要持久化保存因子值数据，默认为False
-    :param Datetime start_date: 开始日期，数据存储时的起始日期，默认为最小日期
-    :param Block block: 板块信息，证券集合，如果为空则为全部，默认为空
-    :param KQuery.RecoverType recover_type: 恢复类型，默认为NO_RECOVER
-    :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识)")
+    :param str name: the factor name
+    :param Indicator formula: the calculation formula indicator, which cannot be changed once created
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line
+    :param str brief: the brief description, defaulting to empty
+    :param str details: the detailed description, defaulting to empty
+    :param bool need_save_value: whether the factor value data needs to be persisted, defaulting to False
+    :param Datetime start_date: the start date, the starting date when storing the data, defaulting to the minimum date
+    :param Block block: the block information, the security set; if it is empty, it is all, defaulting to empty
+    :param KQuery.RecoverType recover_type: the recovery type, defaulting to NO_RECOVER
+    :note: the factor name is not case-sensitive, with name + ktype as the unique identifier)")
 
       .def("__str__", &Factor::str)
       .def("__repr__", &Factor::str)
 
       .def_property("name", py::overload_cast<>(&Factor::name, py::const_),
                     py::overload_cast<const string&>(&Factor::name), py::return_value_policy::copy,
-                    "因子名称")
+                    "The factor name")
       .def_property("ktype", py::overload_cast<>(&Factor::ktype, py::const_),
                     py::overload_cast<const string&>(&Factor::ktype), py::return_value_policy::copy,
-                    "因子频率类型")
+                    "The factor frequency type")
       .def_property("create_at", py::overload_cast<>(&Factor::createAt, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::createAt),
-                    py::return_value_policy::copy, "创建日期")
+                    py::return_value_policy::copy, "The creation date")
       .def_property("update_at", py::overload_cast<>(&Factor::updateAt, py::const_),
                     py::overload_cast<const Datetime&>(&Factor::updateAt),
-                    py::return_value_policy::copy, "更改日期")
+                    py::return_value_policy::copy, "The modification date")
       .def_property("formula", py::overload_cast<>(&Factor::formula, py::const_),
                     py::overload_cast<const Indicator&>(&Factor::formula),
-                    py::return_value_policy::copy, "因子公式")
+                    py::return_value_policy::copy, "The factor formula")
       .def_property("start_date", py::overload_cast<>(&Factor::startDate, py::const_),
-                    py::overload_cast<const Datetime&>(&Factor::startDate), "数据存储起始日期")
+                    py::overload_cast<const Datetime&>(&Factor::startDate), "The start date of the data storage")
       .def_property("block", py::overload_cast<>(&Factor::block, py::const_),
                     py::overload_cast<const Block&>(&Factor::block), py::return_value_policy::copy,
-                    "证券集合")
+                    "The security set")
       .def_property("brief", py::overload_cast<>(&Factor::brief, py::const_),
                     py::overload_cast<const string&>(&Factor::brief), py::return_value_policy::copy,
-                    "基础说明")
+                    "The basic description")
       .def_property("details", py::overload_cast<>(&Factor::details, py::const_),
                     py::overload_cast<const string&>(&Factor::details),
-                    py::return_value_policy::copy, "详细说明")
+                    py::return_value_policy::copy, "The detailed description")
       .def_property("need_save_value", py::overload_cast<>(&Factor::needSaveValue, py::const_),
-                    py::overload_cast<bool>(&Factor::needSaveValue), "是否持久化保存因子值数据")
+                    py::overload_cast<bool>(&Factor::needSaveValue), "Whether to persist the factor value data")
       .def_property("recover_type", py::overload_cast<>(&Factor::recoverType, py::const_),
                     py::overload_cast<KQuery::RecoverType>(&Factor::recoverType),
-                    py::return_value_policy::copy, "复权类型")
+                    py::return_value_policy::copy, "The recovery type")
 
-      .def("is_null", &Factor::isNull, "是否为空因子")
+      .def("is_null", &Factor::isNull, "Whether it is an empty factor")
 
       .def("save_to_db", &Factor::save_to_db, py::arg("update_before") = true,
            R"(save_to_db(self[, update_before=True])
     
-    保存因子元数据到数据库，如果因子已存在则更新，否则插入新记录
+    Save the factor metadata to the database; if the factor already exists, update it, otherwise insert a new record
     
-    :note: 因子名称不区分大小写，以 name + ktype 作为唯一标识
+    :note: the factor name is not case-sensitive, with name + ktype as the unique identifier
     
-    :param bool update_before: 是否在保存前，检查并更新已有因子，默认True)。注意：通常必须为true，否则会导致数据错误，除非你确定所有因子值都已更新)")
+    :param bool update_before: whether to check and update the existing factor before saving, defaulting to True). Note: it usually must be true, otherwise it will cause the data errors, unless you are certain that all the factor values have been updated)")
 
       .def("save_special_values_to_db",
            py::overload_cast<const Stock&, const Indicator&, bool>(&Factor::save_special_values_to_db),
@@ -111,34 +111,34 @@ void export_Factor(py::module& m) {
            R"(save_special_values_to_db(self, stock, values[, replace=False])
 save_special_values_to_db(self, stock, dates, values[, replace=False])
 
-    特殊因子保存值到数据库，支持两种输入格式：
-    1. 直接保存 Indicator 对象的结果数据（通常为 PRICELIST），自动从 Indicator 提取日期与值
-    2. 保存预计算的日期-值对数据，适用于已有独立的日期列表与价格列表
-       （如外部导入的财务数据、机器学习预测结果），无需先包装成 Indicator
+    Save the special factor values to the database, supporting two input formats:
+    1. Save the result data of an Indicator object directly (usually a PRICELIST), extracting the dates and the values from the Indicator automatically
+    2. Save the pre-calculated date-value pair data, applicable when there are already independent date and price lists
+       (such as the externally imported finance data or the machine learning prediction results), without needing to be wrapped into an Indicator first
 
-    重载1 - 保存 Indicator 对象:
-    :param Stock stock: 证券对象
-    :param Indicator values: 已计算好的指标对象（必须已绑定K线数据）
-    :param bool replace: 是否替换已有数据，默认False
+    Overload 1 - save the Indicator object:
+    :param Stock stock: the security object
+    :param Indicator values: the already calculated indicator object (it must have been bound to the K-line data)
+    :param bool replace: whether to replace the existing data, defaulting to False
 
-    重载2 - 保存预计算数据:
-    :param Stock stock: 证券对象
-    :param DatetimeList dates: 特殊因子日期列表
-    :param PriceList values: 特殊因子值列表
-    :param bool replace: 是否替换已有数据，默认False
+    Overload 2 - save the pre-calculated data:
+    :param Stock stock: the security object
+    :param DatetimeList dates: the special factor date list
+    :param PriceList values: the special factor value list
+    :param bool replace: whether to replace the existing data, defaulting to False
 
-    使用场景:
-    - 保存复合指标计算结果
-    - 保存外部导入的财务数据
-    - 保存机器学习模型预测结果
-    - 保存人工标注的特殊因子值)")
+    Usage scenarios:
+    - Save the composite indicator calculation results
+    - Save the externally imported finance data
+    - Save the machine learning model prediction results
+    - Save the manually annotated special factor values)")
 
       .def("remove_from_db", &Factor::remove_from_db,
            R"(remove_from_db(self)
     
-    从数据库中删除因子及其数据。注：为防止误操作，特殊因子的值不会删除，需自行手工删除。
+    Delete the factor and its data from the database. Note: to prevent the misoperations, the values of the special factors will not be deleted; you need to delete them manually yourself.
     
-    :note: 以 name + ktype 作为唯一标识进行删除)")
+    :note: delete with name + ktype as the unique identifier)")
 
       .def(
         "get_all_values", &Factor::getAllValues, py::arg("query"), py::arg("align") = false,
@@ -146,14 +146,14 @@ save_special_values_to_db(self, stock, dates, values[, replace=False])
         py::arg("align_dates") = DatetimeList{},
         R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=False[, align_dates=DatetimeList()]]]])
     
-    获取指定查询参数的所有计算结果
+    Get all the calculation results of the specified query parameters
 
-    :param Query query: 查询参数
-    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
-    :param bool fill_null: 是否填充空值，默认 False
-    :param bool tovalue: 是否转换为数值，默认 False
-    :param DatetimeList align_dates: 对齐日期列表，默认为空
-    :return: 所有股票的计算结果列表
+    :param Query query: the query parameters
+    :param bool align: whether to align the dates (e.g. by the specified align_dates or the default trading calendar), defaulting to False
+    :param bool fill_null: whether to fill the empty values, defaulting to False
+    :param bool tovalue: whether to convert to the values, defaulting to False
+    :param DatetimeList align_dates: the aligned date list, defaulting to empty
+    :return: the list of the calculation results of all the stocks
     :rtype: list)")
 
       .def("get_value",
@@ -171,16 +171,16 @@ save_special_values_to_db(self, stock, dates, values[, replace=False])
         py::arg("align_dates") = DatetimeList{},
         R"(get_value(self, stock, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
     
-    获取指定股票的指定查询参数的计算结果
+    Get the calculation result of the specified stock with the specified query parameters
 
-    :param Stock stock: 证券对象
-    :param Query query: 查询参数
-    :param bool align: 是否进行日期对齐 (如按指定 align_dates 或默认交易日历)，默认 False
-    :param bool fill_null: 是否填充空值，默认 False
-    :param bool tovalue: 是否转换为数值，默认 False
-    :param bool check: 是否检查股票属于自身指定的 block，默认 False
-    :param DatetimeList align_dates: 对齐日期列表，默认为空
-    :return: 计算结果指标
+    :param Stock stock: the security object
+    :param Query query: the query parameters
+    :param bool align: whether to align the dates (e.g. by the specified align_dates or the default trading calendar), defaulting to False
+    :param bool fill_null: whether to fill the empty values, defaulting to False
+    :param bool tovalue: whether to convert to the values, defaulting to False
+    :param bool check: whether to check that the stock belongs to the block specified by itself, defaulting to False
+    :param DatetimeList align_dates: the aligned date list, defaulting to empty
+    :return: the calculation result indicator
     :rtype: Indicator)")
 
       .def(
@@ -195,16 +195,16 @@ save_special_values_to_db(self, stock, dates, values[, replace=False])
         py::arg("align_dates") = DatetimeList{},
         R"(get_values(self, stocks, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
     
-    获取指定股票列表的指定查询参数的计算结果
+    Get the calculation results of the specified stock list with the specified query parameters
 
-    :param list stocks: 证券列表
-    :param Query query: 查询参数
-    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
-    :param bool fill_null: 是否填充空值，默认 False
-    :param bool tovalue: 是否转换为数值，默认 False
-    :param bool check: 是否检查股票列表属于自身指定的 block，默认 False
-    :param DatetimeList align_dates: 对齐日期列表，默认为空
-    :return: 按股票顺序排列的计算结果列表
+    :param list stocks: the security list
+    :param Query query: the query parameters
+    :param bool align: whether to align the dates (e.g. by the specified align_dates or the default trading calendar), defaulting to False
+    :param bool fill_null: whether to fill the empty values, defaulting to False
+    :param bool tovalue: whether to convert to the values, defaulting to False
+    :param bool check: whether to check that the stock list belongs to the block specified by itself, defaulting to False
+    :param DatetimeList align_dates: the aligned date list, defaulting to empty
+    :return: the list of the calculation results arranged by the stock order
     :rtype: list)")
 
       .def(py::hash(py::self))

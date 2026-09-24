@@ -1,7 +1,7 @@
 /*
  * Portfolio.h
  *
- *  Created on: 2016年2月21日
+ *  Created on: 2016-2-21
  *      Author: fasiondog
  */
 
@@ -15,99 +15,99 @@
 namespace hku {
 
 /*
- * 资产组合
+ * Portfolio
  * @ingroup Portfolio
  */
 class HKU_API Portfolio : public enable_shared_from_this<Portfolio> {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
-    /** 默认构造函数 */
+    /** Default constructor */
     Portfolio();
 
     /**
-     * @brief 指定名称的构造函数
-     * @param name 名称
+     * @brief Constructor with the given name
+     * @param name name
      */
     explicit Portfolio(const string& name);
 
     /**
-     * @brief 构造函数
-     * @param name 组合名称
-     * @param tm 账户
-     * @param se 选择器
-     * @param af 资产分配算法
+     * @brief Constructor
+     * @param name portfolio name
+     * @param tm account
+     * @param se selector
+     * @param af asset allocation algorithm
      */
     Portfolio(const string& name, const TradeManagerPtr& tm, const SelectorPtr& se,
               const AFPtr& af);
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~Portfolio();
 
-    /** 组合名称 */
+    /** Portfolio name */
     const string& name() const;
 
-    /** 设置组合名称 */
+    /** Set the portfolio name */
     void name(const string& name);
 
     /**
-     * @brief 运行资产组合
-     * @param query 查询条件, 其 KType 必须为 KQuery::DAY
-     * @param force 是否强制重计算
+     * @brief Run the portfolio
+     * @param query query condition, its KType must be KQuery::DAY
+     * @param force whether to force the recalculation
      */
     void run(const KQuery& query, bool force = false);
 
-    /** 修改查询条件 */
+    /** Modify the query condition */
     void setQuery(const KQuery& query);
 
-    /** 获取查询条件 */
+    /** Get the query condition */
     const KQuery& getQuery() const;
 
-    /** 获取账户 */
+    /** Get the account */
     TMPtr getTM() const;
 
-    /** 设置账户 */
+    /** Set the account */
     void setTM(const TMPtr& tm);
 
-    /** 获取选择器 */
+    /** Get the selector */
     SEPtr getSE() const;
 
-    /** 设置选择器 */
+    /** Set the selector */
     void setSE(const SEPtr& se);
 
-    /** 获取资产分配算法 */
+    /** Get the asset allocation algorithm */
     AFPtr getAF() const;
 
-    /** 设置资产分配算法 */
+    /** Set the asset allocation algorithm */
     void setAF(const AFPtr& af);
 
     const SystemList& getRealSystemList() const;
 
-    /** 复位操作 */
+    /** Reset operation */
     void reset();
 
-    /** 克隆操作 */
+    /** Clone operation */
     typedef shared_ptr<Portfolio> PortfolioPtr;
     PortfolioPtr clone();
 
-    /** 运行前准备 */
+    /** Preparation before running */
     void readyForRun();
 
     void runMoment(const Datetime& date, const Datetime& nextCycle, bool adjust);
 
-    /** 获取运行日期列表 */
+    /** Get the running date list */
     const DatetimeList& getRunningDates() const noexcept;
 
-    /** 获取调仓日列表 */
+    /** Get the rebalancing date list */
     DatetimeList getAdjustDates() const;
 
-    /** 获取调仓周期结束日期列表 */
+    /** Get the rebalancing cycle end date list */
     DatetimeList getCycleEndDates() const;
 
-    /** 获取调仓换手率列表 */
+    /** Get the rebalancing turnover rate list */
     const std::vector<std::pair<Datetime, double>>& getAdjustTurnover() const noexcept;
 
-    /** 用于打印输出 */
+    /** Used for the printing output */
     virtual string str() const;
 
     virtual void _reset() {}
@@ -120,7 +120,8 @@ public:
     virtual void _runMomentOnClose(const Datetime& date, const Datetime& nextCycle, bool adjust) {}
 
     /**
-     * 回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求
+     * After the backtest is finished, return the trade record of the last day together with the
+     * delayed buy and sell requests
      */
     virtual json lastSuggestion() const;
 
@@ -131,40 +132,42 @@ public:
 private:
     void initParam();
 
-    // 计算调仓日
+    // Calculate the rebalancing dates
     void _calculateAdjustDate();
     void _calculateAdjustDateOnMode(int adjust_cycle, const string& mode);
     void _calculateAdjustDateOnModeDelayToTradingDay(int adjust_cycle, const string& mode);
 
 protected:
-    // 跟踪打印当前TM持仓情况
+    // Track and print the current TM positions
     void traceMomentTMAfterRunAtOpen(const Datetime& date);
     void traceMomentTMAfterRunAtClose(const Datetime& date);
 
 protected:
     string m_name;
     TMPtr m_tm;
-    TMPtr m_cash_tm;  // 仅仅负责内部资金的管理（即只需要 checkout 到子账号, 从账户checkin现金）
+    TMPtr m_cash_tm;  // It is responsible for the internal fund management only (i.e. it only needs
+                      // to checkout to the sub-accounts and check in cash from the accounts)
     SEPtr m_se;
     AFPtr m_af;
 
-    KQuery m_query;         // 关联的查询条件
-    bool m_need_calculate;  // 是否需要计算标志
+    KQuery m_query;         // The associated query condition
+    bool m_need_calculate;  // Flag of whether the calculation is needed
     bool m_is_python_object{false};
 
-    SystemList m_real_sys_list;  // 所有实际运行的子系统列表
+    SystemList m_real_sys_list;  // List of all the actually running sub-systems
 
-    // 用于中间计算的临时数据
+    // Temporary data used for the intermediate calculation
     std::unordered_set<SYSPtr> m_running_sys_set;
-    DatetimeList m_dates;            // 运行日期列表
-    vector<uint8_t> m_adjust_flags;  // 调仓日标志
-    DatetimeList m_cycle_end_dates;  // 调仓周期结束日期
+    DatetimeList m_dates;            // Running date list
+    vector<uint8_t> m_adjust_flags;  // Rebalancing day flags
+    DatetimeList m_cycle_end_dates;  // Rebalancing cycle end dates
 
     std::vector<std::pair<Datetime, double>>
-      m_adjust_turnover;  // 调仓周期换手率（需子类自行实现，未实现则没有）
+      m_adjust_turnover;  // Rebalancing cycle turnover rate (the subclass needs to implement it
+                          // itself, it is absent if not implemented)
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -210,7 +213,7 @@ public:                                                                         
       override;
 
 /**
- * 客户程序都应使用该指针类型
+ * Client programs should all use this pointer type
  * @ingroup Selector
  */
 typedef shared_ptr<Portfolio> PortfolioPtr;

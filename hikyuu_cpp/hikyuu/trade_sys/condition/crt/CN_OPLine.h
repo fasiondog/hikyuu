@@ -1,7 +1,7 @@
 /*
  * CN_OPLine.h
  *
- *  Created on: 2016年5月10日
+ *  Created on: 2016-5-10
  *      Author: Administrator
  */
 
@@ -15,7 +15,9 @@
 namespace hku {
 
 /**
- * 固定使用股票最小交易量进行交易，计算权益曲线的op值，当权益曲线高于op时，系统有效，否则无效。
+ * It always trades with the minimum trade quantity of the stock and calculates the op value of the
+ * equity curve; the system is valid when the equity curve is higher than op, otherwise it is
+ * invalid.
  * @param op
  * @return
  */

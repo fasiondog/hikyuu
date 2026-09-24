@@ -1,7 +1,7 @@
 /*
  * StockMapIterator.h
  *
- *  Created on: 2015年2月8日
+ *  Created on: 2015-2-8
  *      Author: fasiondog
  */
 

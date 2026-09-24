@@ -1931,8 +1931,8 @@ public:                                                                         
 
 //-------------------------------------------------------------------
 //
-// 不带自增ID的表绑定
-// ROWID：由于 MYSQL 和 SQLITE 语法不一样，需明确指定
+// Table binding without an auto-increment ID
+// ROWID: because the MYSQL and SQLITE syntaxes are different, it must be specified explicitly
 //        MYSQL: _rowid
 //        sqlite: rowid
 //
@@ -2960,7 +2960,8 @@ public:                                                                         
 
 //-------------------------------------------------------------------
 //
-// 需显式指定 ID, 用于 DuckDB 或列数据库无法自动生成 ID 的情况
+// The ID must be specified explicitly, used in the case where DuckDB or a column database cannot
+// generate the ID automatically
 //
 //-------------------------------------------------------------------
 #define COL_TABLE_BIND0(TableT, table)              \

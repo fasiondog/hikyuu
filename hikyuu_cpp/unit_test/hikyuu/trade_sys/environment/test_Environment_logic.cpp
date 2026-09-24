@@ -56,19 +56,19 @@ static void check_expect(const EVPtr& ev, const std::vector<std::pair<Datetime, 
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment_add") {
     EVPtr ev1, ev2;
     KQuery query(Datetime(20010101), Datetime(20010105));
 
-    /** @arg 两个ev均为空 */
+    /** @arg Both ev are empty */
     EVPtr ret = ev1 + ev2;
     ret->setQuery(query);
     CHECK_EQ(ret->name(), "EV_Add");
     auto ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 其中一个 ev 为空 */
+    /** @arg One of the ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     REQUIRE((ev1 && !ev2));
     ret->reset();
@@ -89,7 +89,7 @@ TEST_CASE("test_Environment_add") {
     expect = {{Datetime(20010103), -4.0}, {Datetime(20010104), -5.0}};
     check_expect(ret, expect);
 
-    /** @arg 两个ev均不为空 */
+    /** @arg Neither ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     ev2 = std::make_shared<EnvironmentTest2>();
     REQUIRE((ev1 & ev2));
@@ -104,19 +104,19 @@ TEST_CASE("test_Environment_add") {
     check_expect(ret, expect);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment_sub") {
     EVPtr ev1, ev2;
     KQuery query(Datetime(20010101), Datetime(20010105));
 
-    /** @arg 两个ev均为空 */
+    /** @arg Both ev are empty */
     EVPtr ret = ev1 - ev2;
     ret->setQuery(query);
     CHECK_EQ(ret->name(), "EV_Sub");
     auto ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 其中一个 ev 为空 */
+    /** @arg One of the ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     REQUIRE((ev1 && !ev2));
     ret->reset();
@@ -137,7 +137,7 @@ TEST_CASE("test_Environment_sub") {
     expect = {{Datetime(20010103), 4.0}, {Datetime(20010104), 5.0}};
     check_expect(ret, expect);
 
-    /** @arg 两个ev均不为空 */
+    /** @arg Neither ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     ev2 = std::make_shared<EnvironmentTest2>();
     REQUIRE((ev1 & ev2));
@@ -152,20 +152,20 @@ TEST_CASE("test_Environment_sub") {
     check_expect(ret, expect);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment_multi") {
     EVPtr ev1, ev2;
     KQuery query(Datetime(20010101), Datetime(20010105));
     std::vector<std::pair<Datetime, price_t>> expect{};
 
-    /** @arg 两个ev均为空 */
+    /** @arg Both ev are empty */
     EVPtr ret = ev1 * ev2;
     ret->setQuery(query);
     CHECK_EQ(ret->name(), "EV_Multi");
     auto ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 其中一个 ev 为空 */
+    /** @arg One of the ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     REQUIRE((ev1 && !ev2));
     ret->reset();
@@ -184,7 +184,7 @@ TEST_CASE("test_Environment_multi") {
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 两个ev均不为空 */
+    /** @arg Neither ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     ev2 = std::make_shared<EnvironmentTest2>();
     REQUIRE((ev1 & ev2));
@@ -200,20 +200,20 @@ TEST_CASE("test_Environment_multi") {
     check_expect(ret, expect);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment_div") {
     EVPtr ev1, ev2;
     KQuery query(Datetime(20010101), Datetime(20010105));
     std::vector<std::pair<Datetime, price_t>> expect{};
 
-    /** @arg 两个ev均为空 */
+    /** @arg Both ev are empty */
     EVPtr ret = ev1 / ev2;
     ret->setQuery(query);
     CHECK_EQ(ret->name(), "EV_Div");
     auto ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 其中一个 ev 为空 */
+    /** @arg One of the ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     REQUIRE((ev1 && !ev2));
     ret->reset();
@@ -231,7 +231,7 @@ TEST_CASE("test_Environment_div") {
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 两个ev均不为空 */
+    /** @arg Neither ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     ev2 = std::make_shared<EnvironmentTest2>();
     REQUIRE((ev1 & ev2));
@@ -247,20 +247,20 @@ TEST_CASE("test_Environment_div") {
     check_expect(ret, expect);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment_and") {
     EVPtr ev1, ev2;
     KQuery query(Datetime(20010101), Datetime(20010105));
     std::vector<std::pair<Datetime, price_t>> expect{};
 
-    /** @arg 两个ev均为空 */
+    /** @arg Both ev are empty */
     EVPtr ret = ev1 & ev2;
     ret->setQuery(query);
     CHECK_EQ(ret->name(), "EV_And");
     auto ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 其中一个 ev 为空 */
+    /** @arg One of the ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     REQUIRE((ev1 && !ev2));
     ret->reset();
@@ -278,7 +278,7 @@ TEST_CASE("test_Environment_and") {
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 两个ev均不为空 */
+    /** @arg Neither ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     ev2 = std::make_shared<EnvironmentTest2>();
     REQUIRE((ev1 & ev2));
@@ -289,19 +289,19 @@ TEST_CASE("test_Environment_and") {
     CHECK_EQ(ind.size(), 0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Environment_or") {
     EVPtr ev1, ev2;
     KQuery query(Datetime(20010101), Datetime(20010105));
 
-    /** @arg 两个ev均为空 */
+    /** @arg Both ev are empty */
     EVPtr ret = ev1 | ev2;
     ret->setQuery(query);
     CHECK_EQ(ret->name(), "EV_Or");
     auto ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 其中一个 ev 为空 */
+    /** @arg One of the ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     REQUIRE((ev1 && !ev2));
     ret->reset();
@@ -323,7 +323,7 @@ TEST_CASE("test_Environment_or") {
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg 两个ev均不为空 */
+    /** @arg Neither ev is empty */
     ev1 = std::make_shared<EnvironmentTest1>();
     ev2 = std::make_shared<EnvironmentTest2>();
     REQUIRE((ev1 & ev2));

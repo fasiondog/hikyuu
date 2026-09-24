@@ -53,9 +53,9 @@ private:
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Slippage") {
-    /** @arg 基本操作 */
+    /** @arg The basic operation */
     SlippagePtr p(new SlippageTest);
     CHECK_EQ(p->name(), "SlippageTest");
     CHECK_EQ(p->getRealBuyPrice(Datetime(200101010000), 1.0), 0.0);
@@ -70,7 +70,7 @@ TEST_CASE("test_Slippage") {
     p->reset();
     CHECK_EQ(p_src->getX(), 0);
 
-    /** @arg 测试克隆操作 */
+    /** @arg Test the clone operation */
     p_src->setX(10);
     SlippagePtr p_clone = p->clone();
     CHECK_EQ(p_clone->name(), "SlippageTest");

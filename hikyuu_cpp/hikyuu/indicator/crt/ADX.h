@@ -7,54 +7,55 @@
 namespace hku {
 
 /**
- * ADX平均趋向指数
+ * ADX average directional index
  * @details
  * <pre>
- * ADX（Average Directional Index 平均趋向指数）属于趋势强度指标，不分辨涨跌方向，只判断有没有趋势。
+ * ADX (Average Directional Index) is a trend strength indicator, it does not distinguish the rising
+ * or falling direction, it only judges whether there is a trend.
  *
- * 采用威尔德（Wilder）原始公式，周期N=14：
+ * The original formula of Wilder is used, with the period N = 14:
  *
- * 1. TR 真实波幅（三选一最大值）：
+ * 1. TR true range (the maximum of the three choices):
  *    TR = max(H-L, |H-C_prev|, |L-C_prev|)
  *
- * 2. 动向波动 DM：
- *    +DM = H - H_prev（如果H>H_prev且上攻幅度>下探幅度），否则为0
- *    -DM = L_prev - L（如果L<L_prev且下探幅度>上攻幅度），否则为0
+ * 2. DM directional movement:
+ *    +DM = H - H_prev (if H > H_prev and the upward move > the downward move), otherwise 0
+ *    -DM = L_prev - L (if L < L_prev and the downward move > the upward move), otherwise 0
  *
- * 3. Wilder平滑（初始为N周期简单平均，后续递归）：
+ * 3. Wilder smoothing (a simple average of N periods at the beginning, recursive afterwards):
  *    ATR_t = ATR_{t-1} × (N-1)/N + TR_t/N
  *    S+DM_t = S+DM_{t-1} × (N-1)/N + +DM_t/N
  *    S-DM_t = S-DM_{t-1} × (N-1)/N + -DM_t/N
  *
- * 4. ±DI 动向指数（百分比0~100）：
+ * 4. ±DI directional indicator (percentage 0~100):
  *    +DI = (S+DM / ATR) × 100
  *    -DI = (S-DM / ATR) × 100
  *
- * 5. DX 动向指数：
+ * 5. DX directional indicator:
  *    DX = |+DI - (-DI)| / (+DI + -DI) × 100
  *
- * 6. ADX 平均动向指数（DX再做一次Wilder平滑）：
+ * 6. ADX average directional index (DX is smoothed by Wilder once more):
  *    ADX_t = ADX_{t-1} × (N-1)/N + DX_t/N
  *
- * 结果集：
- * - 0: ADX本身（趋势强度，值域0~100）
- * - 1: +DI（上升动向线，多头力量）
- * - 2: -DI（下降动向线，空头力量）
+ * Result set:
+ * - 0: ADX itself (trend strength, value range 0~100)
+ * - 1: +DI (upward directional line, bull power)
+ * - 2: -DI (downward directional line, bear power)
  *
- * 判断标准：
- * - ADX ≥ 25：存在清晰单边趋势（上涨/下跌都行）
- * - ADX ＜ 25：无趋势，箱体震荡
- * - ADX数值越大，趋势越猛
+ * Judgment criteria:
+ * - ADX >= 25: a clear one-sided trend exists (either rising or falling)
+ * - ADX < 25: no trend, range-bound oscillation
+ * - The larger the ADX value, the stronger the trend
  * </pre>
- * @param n 计算周期，默认14
+ * @param n calculation period, 14 by default
  * @ingroup Indicator
  */
 Indicator HKU_API ADX(int n = 14);
 
 /**
- * ADX平均趋向指数
- * @param kdata 待计算的源数据
- * @param n 计算周期，默认14
+ * ADX average directional index
+ * @param kdata the source data to be calculated
+ * @param n calculation period, 14 by default
  * @ingroup Indicator
  */
 Indicator HKU_API ADX(const KData& kdata, int n = 14);

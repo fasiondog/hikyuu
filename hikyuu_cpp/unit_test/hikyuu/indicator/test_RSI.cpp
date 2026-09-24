@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RSI") {
     auto k = getKData("sh000001", KQuery(-10));
 

@@ -49,129 +49,129 @@ public:
 
 void export_Slippage(py::module& m) {
     py::class_<SlippageBase, SPPtr, PySlippageBase>(m, "SlippageBase", py::dynamic_attr(),
-                                                    R"(移滑价差算法基类
+                                                    R"(The slippage algorithm base class
 
-自定义移滑价差接口：
+The custom slippage interfaces:
 
-    - getRealBuyPrice : 【必须】计算实际买入价格
-    - getRealSellPrice : 【必须】计算实际卖出价格
-    - _calculate : 【必须】子类计算接口
-    - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)")
+    - getRealBuyPrice : [Required] Calculate the actual buy price
+    - getRealSellPrice : [Required] Calculate the actual sell price
+    - _calculate : [Required] The subclass calculation interface
+    - _clone : [Required] The clone interface
+    - _reset : [Optional] Reload the private variables)")
 
       .def(py::init<>())
       .def(py::init<const SlippageBase&>())
-      .def(py::init<const string&>(), R"(初始化构造函数
+      .def(py::init<const string&>(), R"(The initialization constructor
         
-    :param str name: 名称)")
+    :param str name: the name)")
 
       .def("__str__", to_py_str<SlippageBase>)
       .def("__repr__", to_py_str<SlippageBase>)
 
       .def_property("name", py::overload_cast<>(&SlippageBase::name, py::const_),
                     py::overload_cast<const string&>(&SlippageBase::name),
-                    py::return_value_policy::copy, "名称")
-      .def_property("to", &SlippageBase::getTO, &SlippageBase::setTO, "关联交易对象")
+                    py::return_value_policy::copy, "Name")
+      .def_property("to", &SlippageBase::getTO, &SlippageBase::setTO, "The associated trading object")
 
       .def("get_param", &SlippageBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (SlippageBase::*)(const std::string&, const boost::any&)>(
              &SlippageBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &SlippageBase::haveParam, "是否存在指定参数")
+      .def("have_param", &SlippageBase::haveParam, "Whether the specified parameter exists")
 
       .def("get_real_buy_price", &SlippageBase::getRealBuyPrice,
            R"(get_real_buy_price(self, datetime, price)
 
-    【重载接口】计算实际买入价格
+    [Overload interface] Calculate the actual buy price
 
-    :param Datetime datetime: 买入时间
-    :param float price: 计划买入价格
-    :return: 实际买入价格
+    :param Datetime datetime: the buy time
+    :param float price: the planned buy price
+    :return: the actual buy price
     :rtype: float)")
 
       .def("get_real_sell_price", &SlippageBase::getRealSellPrice,
            R"(get_real_sell_price(self, datetime, price)
 
-    【重载接口】计算实际卖出价格
+    [Overload interface] Calculate the actual sell price
 
-    :param Datetime datetime: 卖出时间
-    :param float price: 计划卖出价格
-    :return: 实际卖出价格
+    :param Datetime datetime: the sell time
+    :param float price: the planned sell price
+    :return: the actual sell price
     :rtype: float)")
 
-      .def("reset", &SlippageBase::reset, "复位操作")
-      .def("clone", &SlippageBase::clone, "克隆操作")
-      .def("_calculate", &SlippageBase::_calculate, "【重载接口】子类计算接口")
-      .def("_reset", &SlippageBase::_reset, "【重载接口】子类复位接口，复位内部私有变量")
+      .def("reset", &SlippageBase::reset, "The reset operation")
+      .def("clone", &SlippageBase::clone, "The clone operation")
+      .def("_calculate", &SlippageBase::_calculate, "[Overload interface] The subclass calculation interface")
+      .def("_reset", &SlippageBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
 
         DEF_PICKLE(SPPtr);
 
     m.def("SP_FixedPercent", &SP_FixedPercent, py::arg("p") = 0.001,
           R"(SP_FixedPercent([p=0.001])
 
-    固定百分比移滑价差算法，买入实际价格 = 计划买入价格 * (1 + p)，卖出实际价格 = 计划卖出价格 * (1 - p)
+    The fixed percentage slippage algorithm; the actual buy price = the planned buy price * (1 + p), and the actual sell price = the planned sell price * (1 - p)
 
-    :param float p: 偏移的固定百分比
-    :return: 移滑价差算法实例)");
+    :param float p: the fixed percentage of the offset
+    :return: the slippage algorithm instance)");
 
     m.def("SP_FixedValue", &SP_FixedValue, py::arg("value") = 0.01, R"(SP_FixedValue([value=0.01])
 
-    固定价格移滑价差算法，买入实际价格 = 计划买入价格 + 偏移价格，卖出实际价格 = 计划卖出价格 - 偏移价格
+    The fixed price slippage algorithm; the actual buy price = the planned buy price + the offset price, and the actual sell price = the planned sell price - the offset price
 
-    :param float value: 偏移价格
-    :return: 移滑价差算法实例)");
+    :param float value: the offset price
+    :return: the slippage algorithm instance)");
 
     m.def("SP_Uniform", &SP_Uniform, py::arg("min_value") = -0.05, py::arg("max_value") = 0.05,
           R"(SP_Uniform([min_value=-0.05, max_value=0.05])
 
-    均匀分布随机价格移滑价差算法, 买入和卖出操作是价格在[min_value, max_value]范围内的均匀分布随机偏移
+    The uniform distribution random price slippage algorithm; the buy and the sell operations are the random price offsets uniformly distributed within the range [min_value, max_value]
     
-    :param float min_value: 最小偏移价格
-    :param float max_value: 最大偏移价格
-    :return: 移滑价差算法实例)");
+    :param float min_value: the minimum offset price
+    :param float max_value: the maximum offset price
+    :return: the slippage algorithm instance)");
 
     m.def("SP_Normal", &SP_Normal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
           R"(SP_Normal([mean=0.0, stddev=0.05])
 
-    正态分布随机价格移滑价差算法, 买入和卖出操作是价格在正态分布[mean, stddev]范围内的随机偏移
+    The normal distribution random price slippage algorithm; the buy and the sell operations are the random price offsets within the normal distribution [mean, stddev] range
     
-    :param float mean: 正态分布的均值
-    :param float stddev: 正态分布的标准差
-    :return: 移滑价差算法实例)");
+    :param float mean: the mean of the normal distribution
+    :param float stddev: the standard deviation of the normal distribution
+    :return: the slippage algorithm instance)");
 
     m.def("SP_LogNormal", &SP_LogNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
           R"(SP_LogNormal([mean=0.0, stddev=0.05])
 
-    对数正态分布随机价格移滑价差算法, 买入和卖出操作是价格在对数正态分布[mean, stddev]范围内的随机偏移
+    The log-normal distribution random price slippage algorithm; the buy and the sell operations are the random price offsets within the log-normal distribution [mean, stddev] range
 
-    :param float mean: 对数正态分布的均值
-    :param float stddev: 对数正态分布的标准差
-    :return: 移滑价差算法实例)");
+    :param float mean: the mean of the log-normal distribution
+    :param float stddev: the standard deviation of the log-normal distribution
+    :return: the slippage algorithm instance)");
 
     m.def("SP_TruncNormal", &SP_TruncNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
           py::arg("min_value") = -0.11, py::arg("max_value") = 0.1,
           R"(SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
          
-    截断正态分布随机价格移滑价差算法, 买入和卖出操作是价格在截断正态分布[mean, stddev, min_value, max_value]范围内的随机偏移
+    The truncated normal distribution random price slippage algorithm; the buy and the sell operations are the random price offsets within the truncated normal distribution [mean, stddev, min_value, max_value] range
     
-    :param float mean: 截断正态分布的均值
-    :param float stddev: 截断正态分布的标准差
-    :param float min_value: 最小截断值
-    :param float max_value: 最大截断值
-    :return: 移滑价差算法实例)");
+    :param float mean: the mean of the truncated normal distribution
+    :param float stddev: the standard deviation of the truncated normal distribution
+    :param float min_value: the minimum truncation value
+    :param float max_value: the maximum truncation value
+    :return: the slippage algorithm instance)");
 }

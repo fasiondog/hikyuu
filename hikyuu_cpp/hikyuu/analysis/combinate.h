@@ -15,10 +15,13 @@
 namespace hku {
 
 /**
- * 获取指定序列索引的组合，返回由序列下标索引组成的组合集合
- * @note 组合的总数是 2**n - 1 个，所以inputs的长度需要控制
- * @exception 输入序列的最大长度仅支持15，超过时将抛出异常 HKUException
- * @param inputs 任意类型的序列
+ * Get the combinations of the given sequence indexes, returning the combination set composed of the
+ * sequence subscript indexes
+ * @note The total number of the combinations is 2**n - 1, so the length of inputs needs to be
+ *       controlled
+ * @exception The maximum length supported for the input sequence is 15 only, HKUException is thrown
+ *            when it is exceeded
+ * @param inputs a sequence of any type
  * @return
  */
 template <class T>
@@ -44,25 +47,25 @@ std::vector<std::vector<size_t>> combinateIndex(const std::vector<T>& inputs) {
 }
 
 /**
- * @brief 对输入的指标序列进行组合
+ * @brief Combine the input indicator sequence
  * @details
- * 如输入为 [ind1, ind2], 输出为 [EXIST(ind1,n), EXIST(ind2,n),
+ * For example, when the input is [ind1, ind2], the output is [EXIST(ind1,n), EXIST(ind2,n),
  * EXIST(ind1,n)&EXIST(ind2,n)]
- * @param inputs 待组合的指标列表
- * @param n 指标在 n 周期内存在
+ * @param inputs the indicator list to combine
+ * @param n the indicator exists within n periods
  * @return std::vector<Indicator>
  */
 std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs, int n);
 
 /**
- * @brief 对指定的证券及买入、卖出信号指标进行组合测试
- * @param stk 指定证券
- * @param query 指定范围条件
- * @param tm 指定交易管理实例
- * @param sys 指定交易策略实例
- * @param buy_inds 买入信号指标列表
- * @param sell_inds 卖出信号指标列表
- * @param n 组合时间范围参数
+ * @brief Combination test of the given security and the buy / sell signals
+ * @param stk the given security
+ * @param query the given range condition
+ * @param tm the given trade management instance
+ * @param sys the given trading strategy instance
+ * @param buy_inds buy indicator list
+ * @param sell_inds sell indicator list
+ * @param n combination time range parameter
  * @return std::map<std::string, Performance>
  */
 std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
@@ -70,13 +73,13 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n);
 
 /**
- * @brief combinateIndicatorAnalysisWithBlock 输出结果定义
+ * @brief Output result definition of combinateIndicatorAnalysisWithBlock
  */
 struct HKU_API CombinateAnalysisOutput {
-    string combinateName;  ///< 买入、卖出指标组合名称
-    string market_code;    ///< 证券代码
-    string name;           ///< 证券名称
-    PriceList values;      ///< 统计各项指标值
+    string combinateName;  ///< Name of the buy / sell indicator combination
+    string market_code;    ///< Security code
+    string name;           ///< Security name
+    PriceList values;      ///< The values of every statistics item
 
     CombinateAnalysisOutput() = default;
     CombinateAnalysisOutput(const CombinateAnalysisOutput&) = default;
@@ -98,14 +101,14 @@ struct HKU_API CombinateAnalysisOutput {
 };
 
 /**
- * @brief 对指定的证券列表，进行买入、卖出信号指标组合测试
- * @param blk 指定板块
- * @param query 指定范围条件
- * @param tm 指定交易实例
- * @param sys 指定系统策略实例
- * @param buy_inds 买入指标列表
- * @param sell_inds 卖出指标列表
- * @param n 组合时间范围参数
+ * @brief Combination test of the buy / sell signals on the given security list
+ * @param blk the given block
+ * @param query the given range condition
+ * @param tm the given trade instance
+ * @param sys the given system strategy instance
+ * @param buy_inds buy indicator list
+ * @param sell_inds sell indicator list
+ * @param n combination time range parameter
  * @return vector<CombinateAnalysisOutput>
  */
 vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(

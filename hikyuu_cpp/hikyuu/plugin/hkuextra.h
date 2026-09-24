@@ -13,34 +13,35 @@
 namespace hku {
 
 /**
- * @brief 注册扩展 K 线类型, 按时间合成
- * @param ktype 扩展 K 线类型
- * @param basetype 对应的基础 K 线类型
- * @param minutes 每根K线所包含的分钟数
- * @param getPhaseEnd 获取K线所属的阶段结束时间
+ * @brief Register an extended K-line type, synthesized by the time
+ * @param ktype extended K-line type
+ * @param basetype the corresponding base K-line type
+ * @param minutes the number of the minutes contained in every K-line
+ * @param getPhaseEnd get the phase end time to which the K-line belongs
  */
 void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t minutes,
                                 std::function<Datetime(const Datetime&)> getPhaseEnd);
 
 /**
- * 注册K线扩展类型，按 bar 数量合成
- * @param ktype 扩展 K 线类型
- * @param basetype 对应的基础 K 线类型
- * @param nbars 每根K线所包含的基础K线数
+ * Register an extended K-line type, synthesized by the number of the bars
+ * @param ktype extended K-line type
+ * @param basetype the corresponding base K-line type
+ * @param nbars the number of the base K-lines contained in every K-line
  */
 void HKU_API registerExtraKType(const string& ktype, const string& basetype, int32_t nbars);
 
 /**
- * 释放扩展K线
- * @note 某些情况下，注册扩展K线时，使用了 python 定义的周期结束日期转换函数，退出时可能引起 python
- * GIL 报错，需手工提前释放扩展K线
+ * Release the extended K-line
+ * @note In some cases, when the extended K-line is registered, a python-defined phase end date
+ *       conversion function is used, which may cause a python
+ * GIL error on exit; the extended K-line needs to be released manually in advance
  */
 void HKU_API releaseExtraKType();
 
 void HKU_API enableKDataCache(bool enable);
 
 //-------------------------------
-// 以下函数为内部使用，无需引出
+// The following functions are for internal use, they do not need to be exposed
 //-------------------------------
 
 bool isExtraKType(const string& ktype);

@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 反正切值
+ * Arctangent value
  * @ingroup Indicator
  */
 Indicator HKU_API ATAN();

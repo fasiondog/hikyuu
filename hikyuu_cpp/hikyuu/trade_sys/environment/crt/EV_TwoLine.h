@@ -1,7 +1,7 @@
 /*
  * EV_TwoLine.h
  *
- *  Created on: 2016年5月17日
+ *  Created on: 2016-5-17
  *      Author: Administrator
  */
 
@@ -15,10 +15,11 @@
 namespace hku {
 
 /**
- * 快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
- * @param fast 快线指标
- * @param slow 慢线指标
- * @param market 市场名称，默认为"SH"
+ * Fast and slow line strategy: the market is valid when the fast line of the market index
+ * is greater than the slow line, otherwise it is invalid.
+ * @param fast fast line indicator
+ * @param slow slow line indicator
+ * @param market market name, "SH" by default
  * @return
  */
 EVPtr HKU_API EV_TwoLine(const Indicator& fast, const Indicator& slow, const string& market = "SH");

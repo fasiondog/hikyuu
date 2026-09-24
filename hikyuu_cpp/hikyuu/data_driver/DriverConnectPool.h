@@ -16,8 +16,8 @@
 namespace hku {
 
 /**
- * 驱动资源池
- * @tparam DriverConnectT 驱动类型，要求具备 DriverType *clone() 方法
+ * Driver resource pool
+ * @tparam DriverConnectT driver type, it is required to have the DriverType *clone() method
  * @ingroup DataDriver
  */
 template <class DriverConnectT>
@@ -31,10 +31,11 @@ public:
     typedef std::shared_ptr<DriverConnectT> DriverConnectPtr;
 
     /**
-     * 构造函数
-     * @param prototype 驱动原型，所有权将被转移至该 pool
-     * @param maxConnect 允许的最大连接数，为 0 表示不限制
-     * @param maxIdleConnect 运行的最大空闲连接数，等于 0 时表示立刻释放，默认为CPU数
+     * Constructor
+     * @param prototype driver prototype, the ownership is transferred to this pool
+     * @param maxConnect the maximum number of connections allowed, 0 means unlimited
+     * @param maxIdleConnect the maximum number of idle connections allowed, 0 means releasing
+     *                       immediately, the default is the number of CPUs
      */
     explicit DriverConnectPool(const DriverPtr &prototype, size_t maxConnect = 0,
                                size_t maxIdleConnect = std::thread::hardware_concurrency())
@@ -45,7 +46,7 @@ public:
       m_closer(this) {}
 
     /**
-     * 析构函数，释放所有缓存的连接
+     * Destructor, it releases all the cached connections
      */
     virtual ~DriverConnectPool() {
         while (!m_driverList.empty()) {
@@ -57,7 +58,8 @@ public:
         }
     }
 
-    /** 获取可用连接，如超出允许的最大连接数，将阻塞等待，直到获得空闲资源 */
+    /** Get an available connection; if the maximum number of connections allowed is exceeded, it
+     *  blocks and waits until an idle resource is obtained */
     DriverConnectPtr getConnect() noexcept {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (m_driverList.empty()) {
@@ -77,17 +79,17 @@ public:
         return m_prototype;
     }
 
-    /** 当前活动的连接数 */
+    /** Number of the currently active connections */
     size_t count() const {
         return m_count;
     }
 
-    /** 当前空闲的资源数 */
+    /** Number of the currently idle resources */
     size_t idleCount() const {
         return m_driverList.size();
     }
 
-    /** 释放当前所有的空闲资源 */
+    /** Release all the currently idle resources */
     void releaseIdleConnect() {
         std::lock_guard<std::mutex> lock(m_mutex);
         while (!m_driverList.empty()) {
@@ -101,7 +103,7 @@ public:
     }
 
 private:
-    /** 归还至连接池 */
+    /** Return it to the connection pool */
     void returnDriver(DriverConnectT *p) {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (p) {
@@ -119,10 +121,10 @@ private:
     }
 
 private:
-    size_t m_maxSize;       //允许的最大连接数
-    size_t m_maxIdelSize;   //允许的最大空闲连接数
-    size_t m_count;         //当前活动的连接数
-    DriverPtr m_prototype;  // 驱动原型
+    size_t m_maxSize;       // The maximum number of connections allowed
+    size_t m_maxIdelSize;   // The maximum number of idle connections allowed
+    size_t m_count;         // The number of currently active connections
+    DriverPtr m_prototype;  // Driver prototype
     std::mutex m_mutex;
     std::condition_variable m_cond;
     std::queue<DriverConnectT *> m_driverList;

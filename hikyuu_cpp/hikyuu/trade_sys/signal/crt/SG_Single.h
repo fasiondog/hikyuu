@@ -1,7 +1,7 @@
 /*
  * SINGLE_SG.h
  *
- *  Created on: 2015年2月22日
+ *  Created on: 2015-2-22
  *      Author: fasiondog
  */
 
@@ -15,10 +15,11 @@
 namespace hku {
 
 /**
- * 单线拐点信号指示器
+ * Single line inflection point signal
  * @details
  * <pre>
- * 使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：
+ * The curve inflection point algorithm given in "Smarter Trading" is used to judge the curve trend,
+ * the formula is as follows:
  *
  *     filter = percentage * STDEV((AMA-AMA[1], N)
  *     Buy  When AMA - AMA[1] > filter
@@ -26,26 +27,27 @@ namespace hku {
  *     or Buy When AMA - AMA[3] > filter
  * </pre>
  * @param ind
- * @param filter_n N日周期
- * @param filter_p 过滤器百分比
+ * @param filter_n N-day period
+ * @param filter_p filter percentage
  * @return
  * @ingroup Signal
  */
 SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filter_p = 0.1);
 
 /**
- * 单线拐点信号指示器2
+ * Single line inflection point signal 2
  * @details
  * <pre>
- * 使用《精明交易者》中给出的曲线拐点算法判断曲线趋势，公式如下：
+ * The curve inflection point algorithm given in "Smarter Trading" is used to judge the curve trend,
+ * the formula is as follows:
  *
  *     filter = percentage * STDEV((AMA-AMA[1], N)
  *     Buy  When AMA - lowest(AMA,n) > filter
  *     Sell When highest(AMA, n) - AMA > filter
  * </pre>
  * @param ind
- * @param filter_n N日周期
- * @param filter_p 过滤器百分比
+ * @param filter_n N-day period
+ * @param filter_p filter percentage
  * @return
  * @ingroup Signal
  */

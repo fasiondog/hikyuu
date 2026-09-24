@@ -1,7 +1,7 @@
 /*
  * HHV.h
  *
- *  Created on: 2016年4月2日
+ *  Created on: 2016-4-2
  *      Author: fasiondog
  */
 
@@ -14,17 +14,17 @@
 namespace hku {
 
 /**
- * N日内最高价, N=0则从第一个有效值开始
- * @param n N日时间窗口
+ * The highest price within N days; when N=0 it starts from the first valid value
+ * @param n N-day time window
  * @ingroup Indicator
  */
 Indicator HKU_API HHV(int n = 20);
 Indicator HKU_API HHV(const IndParam& n);
 
 /**
- * N日内最高价, N=0则从第一个有效值开始
- * @param ind 待计算的数据
- * @param n N日时间窗口
+ * The highest price within N days; when N=0 it starts from the first valid value
+ * @param ind the data to be calculated
+ * @param n N-day time window
  * @ingroup Indicator
  */
 inline Indicator HHV(const Indicator& ind, int n = 20) {

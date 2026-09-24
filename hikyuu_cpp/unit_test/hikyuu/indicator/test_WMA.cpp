@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WMA") {
     Indicator result;
 
@@ -78,7 +78,7 @@ TEST_CASE("test_WMA") {
     CHECK_EQ(result[9], doctest::Approx(6.).epsilon(0.0001));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WMA_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -114,7 +114,7 @@ TEST_CASE("test_WMA_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_WMA_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -131,7 +131,7 @@ TEST_CASE("test_WMA_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WMA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

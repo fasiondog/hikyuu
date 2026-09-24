@@ -1,7 +1,7 @@
 /*
  * SingleSignal2.cpp
  *
- *  Created on: 2016年4月16日
+ *  Created on: 2016-4-16
  *      Author: fasiondog
  */
 

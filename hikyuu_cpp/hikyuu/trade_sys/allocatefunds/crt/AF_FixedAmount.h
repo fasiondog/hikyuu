@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2025年12月9日
+ *  Created on: 2025-12-9
  *      Author: stone
  */
 
@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * @brief 固定金额分配，每个选中的资产都不能超过此金额交易
- * @param amount 指定的固定交易金额
+ * @brief Fixed amount allocation, the trade of every selected asset cannot exceed this amount
+ * @param amount the given fixed trade amount
  * @return AFPtr
  * @ingroup AllocateFunds
  */

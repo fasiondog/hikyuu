@@ -42,31 +42,35 @@ using HttpHeaders = std::map<std::string, std::string>;
 using HttpParams = std::map<std::string, std::string>;
 
 /**
- * @brief HTTP 数据块回调函数类型
+ * @brief HTTP data chunk callback function type
  *
- * 用于流式响应处理，每次接收到数据块时调用。
- * 适用于大文件下载、实时数据流等场景，避免一次性加载到内存。
+ * It is used for the streaming response processing and is called every time a data chunk is
+ * received.
+ * It is suitable for the scenarios such as the large file download and the realtime data stream,
+ * avoiding loading everything into the memory at once.
  *
- * @param data 数据块指针
- * @param size 数据块大小（字节数）
+ * @param data the data chunk pointer
+ * @param size the data chunk size (the number of the bytes)
  *
- * @note 回调函数应保持非阻塞，避免执行耗时操作
- * @note 不应在回调中抛出异常，否则会终止请求
+ * @note The callback function should stay non-blocking, avoiding the time-consuming operations
+ * @note An exception should not be thrown in the callback, otherwise the request is terminated
  */
 using HttpChunkCallback = std::function<void(const char* data, size_t size)>;
 
 class HKU_UTILS_API AsioHttpClient;
 
-// HttpConnection 前向声明
+// Forward declaration of HttpConnection
 struct HttpConnection;
 
 /**
- * @brief HTTP 响应类
+ * @brief HTTP response class
  *
- * 封装完整的 HTTP 响应信息，包括状态码、响应头、响应体等。
- * 适用于传统的一次性加载整个响应体的场景。
+ * It encapsulates the complete HTTP response information, including the status code, the response
+ * headers and the response body.
+ * It is suitable for the traditional scenario of loading the whole response body at once.
  *
- * @note 对于大响应体（>100MB）或内存受限场景，建议使用 AsioHttpStreamResponse
+ * @note For a large response body (>100MB) or a memory limited scenario, AsioHttpStreamResponse is
+ *       recommended
  */
 class HKU_UTILS_API AsioHttpResponse final {
     friend class HKU_UTILS_API AsioHttpClient;
@@ -82,40 +86,40 @@ public:
     AsioHttpResponse& operator=(AsioHttpResponse&& rhs) noexcept;
 
     /**
-     * @brief 获取响应体内容
-     * @return 完整的响应体字符串
+     * @brief Get the response body content
+     * @return the complete response body string
      */
     const std::string& body() const noexcept {
         return m_body;
     }
 
     /**
-     * @brief 将响应体解析为 JSON 对象
-     * @return JSON 对象
-     * @throws nlohmann::json::exception 当响应体不是合法 JSON 时
+     * @brief Parse the response body into a JSON object
+     * @return the JSON object
+     * @throws nlohmann::json::exception when the response body is not a valid JSON
      */
     hku::json json() const;
 
     /**
-     * @brief 获取 HTTP 状态码
-     * @return HTTP 状态码（如 200, 404, 500 等）
+     * @brief Get the HTTP status code
+     * @return the HTTP status code (such as 200, 404, 500, etc.)
      */
     int status() const noexcept {
         return m_status;
     }
 
     /**
-     * @brief 获取 HTTP 状态描述
-     * @return 状态描述文本（如 "OK", "Not Found" 等）
+     * @brief Get the HTTP status description
+     * @return the status description text (such as "OK", "Not Found", etc.)
      */
     const std::string& reason() const noexcept {
         return m_reason;
     }
 
     /**
-     * @brief 获取指定的响应头字段值
-     * @param key 响应头键名（不区分大小写）
-     * @return 响应头值，若不存在则返回空字符串
+     * @brief Get the value of the given response header field
+     * @param key the response header key name (case insensitive)
+     * @return the response header value; an empty string is returned when it does not exist
      */
     std::string getHeader(const std::string& key) const noexcept {
         auto it = m_headers.find(key);
@@ -123,8 +127,8 @@ public:
     }
 
     /**
-     * @brief 获取响应体长度
-     * @return Content-Length 的值，若未设置或解析失败则返回 0
+     * @brief Get the response body length
+     * @return the value of Content-Length; 0 is returned when it is not set or the parsing fails
      */
     size_t getContentLength() const noexcept {
         auto it = m_headers.find("Content-Length");
@@ -146,27 +150,28 @@ private:
 };
 
 /**
- * @brief 流式 HTTP 响应类
+ * @brief Streaming HTTP response class
  *
- * 用于处理大响应体的流式下载，避免一次性加载到内存。
- * 支持 Content-Length 和 Transfer-Encoding: chunked 两种模式。
+ * It is used for the streaming download of a large response body, avoiding loading everything into
+ * the memory at once.
+ * Both the Content-Length and the Transfer-Encoding: chunked modes are supported.
  *
- * ## 适用场景
- * - 大文件下载（>100MB）
- * - 实时数据流处理
+ * ## Applicable scenarios
+ * - Large file download (>100MB)
+ * - Realtime data stream processing
  * - Server-Sent Events (SSE)
- * - 内存受限环境
+ * - Memory limited environment
  *
- * ## 不适用场景
- * - 需要随机访问响应数据
- * - 需要完整数据才能处理的场景（如 JSON 解析）
+ * ## Inapplicable scenarios
+ * - Random access to the response data is needed
+ * - The scenario where the complete data is needed for the processing (such as a JSON parsing)
  *
- * ## 性能对比
- * - 传统方式内存占用 = 文件大小
- * - 流式方式内存占用 ≈ 8KB（恒定缓冲区）
+ * ## Performance comparison
+ * - The memory usage of the traditional way = the file size
+ * - The memory usage of the streaming way is about 8KB (a constant buffer)
  *
- * @note 流式请求同样受配置的超时时间限制
- * @note 需捕获 HttpTimeoutException 和其他网络异常
+ * @note A streaming request is also limited by the configured timeout
+ * @note HttpTimeoutException and the other network exceptions need to be caught
  */
 class HKU_UTILS_API AsioHttpStreamResponse final {
     friend class HKU_UTILS_API AsioHttpClient;
@@ -182,25 +187,25 @@ public:
     AsioHttpStreamResponse& operator=(AsioHttpStreamResponse&& rhs) noexcept;
 
     /**
-     * @brief 获取 HTTP 状态码
-     * @return HTTP 状态码（如 200, 404, 500 等）
+     * @brief Get the HTTP status code
+     * @return the HTTP status code (such as 200, 404, 500, etc.)
      */
     int status() const noexcept {
         return m_status;
     }
 
     /**
-     * @brief 获取 HTTP 状态描述
-     * @return 状态描述文本（如 "OK", "Not Found" 等）
+     * @brief Get the HTTP status description
+     * @return the status description text (such as "OK", "Not Found", etc.)
      */
     const std::string& reason() const noexcept {
         return m_reason;
     }
 
     /**
-     * @brief 获取指定的响应头字段值
-     * @param key 响应头键名（不区分大小写）
-     * @return 响应头值，若不存在则返回空字符串
+     * @brief Get the value of the given response header field
+     * @param key the response header key name (case insensitive)
+     * @return the response header value; an empty string is returned when it does not exist
      */
     std::string getHeader(const std::string& key) const noexcept {
         auto it = m_headers.find(key);
@@ -208,8 +213,8 @@ public:
     }
 
     /**
-     * @brief 获取响应体总长度
-     * @return Content-Length 的值，若未设置或解析失败则返回 0
+     * @brief Get the total length of the response body
+     * @return the value of Content-Length; 0 is returned when it is not set or the parsing fails
      */
     size_t getContentLength() const noexcept {
         auto it = m_headers.find("Content-Length");
@@ -224,8 +229,8 @@ public:
     }
 
     /**
-     * @brief 判断是否为分块传输编码
-     * @return true 表示使用 Transfer-Encoding: chunked，false 表示使用 Content-Length
+     * @brief Judge whether it is a chunked transfer encoding
+     * @return true means Transfer-Encoding: chunked is used and false means Content-Length is used
      */
     bool isChunked() const noexcept {
         auto it = m_headers.find("Transfer-Encoding");
@@ -233,8 +238,8 @@ public:
     }
 
     /**
-     * @brief 获取已读取的总字节数
-     * @return 累计已读取并传递给回调函数的字节数
+     * @brief Get the total number of the bytes already read
+     * @return the accumulated number of the bytes read and passed to the callback function
      */
     uint64_t totalBytesRead() const noexcept {
         return m_total_bytes_read;
@@ -248,198 +253,216 @@ private:
 };
 
 /**
- * @brief 基于 Boost.Beast/Asio 的高性能 HTTP 客户端
+ * @brief High performance HTTP client based on Boost.Beast/Asio
  *
- * 支持 HTTP/1.1 和 HTTPS 协议，提供同步和异步两种请求模式。
- * 采用连接池技术提升性能，支持流式响应处理大文件下载。
+ * It supports the HTTP/1.1 and HTTPS protocols and provides the synchronous and asynchronous
+ * request modes. It uses the connection pool technology to improve the performance and supports the
+ * streaming response for the large file download.
  *
- * ## 基础特性
- * - 底层网络库：Boost.Beast (HTTP/1.1) + Boost.Asio (异步 I/O)
- * - 协程支持：C++20 coroutines，返回类型为 boost::asio::awaitable<T>
- * - 连接池：自动管理 HTTP 长连接，支持版本检测
- * - SSL/TLS：可选的 HTTPS 支持（需 OpenSSL）
- * - 超时控制：DNS 解析、连接、发送、接收各阶段超时
- * - 流式处理：支持 Content-Length 和 Transfer-Encoding: chunked
+ * ## Basic features
+ * - Underlying network library: Boost.Beast (HTTP/1.1) + Boost.Asio (the asynchronous I/O)
+ * - Coroutine support: the C++20 coroutines, the return type is boost::asio::awaitable<T>
+ * - Connection pool: it manages the HTTP persistent connections automatically and supports the
+ * version detection
+ * - SSL/TLS: the optional HTTPS support (OpenSSL is required)
+ * - Timeout control: the timeout of every stage of the DNS resolution, the connection, the sending
+ * and the receiving
+ * - Streaming: Content-Length and Transfer-Encoding: chunked are supported
  *
- * ## 运行模式
- * - **内部 io_context 模式**：默认构造函数和带 URL 的构造函数会创建独立的 io_context
- *   并启动后台线程运行事件循环，用户无需手动管理
- * - **外部 io_context 模式**：通过带外部 io_context 参数的构造函数注入，
- *   由外部完全控制生命周期，多个客户端可共享同一 io_context
+ * ## Running modes
+ * - **The internal io_context mode**: the default constructor and the constructor with a URL create
+ * an independent io_context
+ *   and start the background threads to run the event loop, the user does not need to manage it
+ *   manually
+ * - **The external io_context mode**: it is injected through the constructor with an external
+ * io_context parameter,
+ *   the lifetime is fully controlled from outside and multiple clients can share the same
+ * io_context
  *
- * ## 异步操作模式
- * - **等待完成模式**（async_*）：适用于需获取返回值、处理异常或保证顺序的场景
- * - **即发即忘模式**：适用于后台日志、监控上报等不关心结果的场景（待实现）
+ * ## Asynchronous operation modes
+ * - **The wait-for-completion mode** (async_*): it is suitable for the scenarios needing a return
+ * value, an exception handling or a guaranteed order
+ * - **The fire-and-forget mode**: it is suitable for the scenarios not caring about the result,
+ * such as the background logging and the monitoring reporting (to be implemented)
  *
- * ## 资源管理
- * - 使用 std::unique_ptr<net::io_context> 管理内部 io_context
- * - 创建 executor_work_guard 防止 io_context 在无任务时退出
- * - 析构时先释放 work_guard，再等待工作线程完成，最后停止 io_context
- * - 禁用移动操作，确保资源安全
+ * ## Resource management
+ * - std::unique_ptr<net::io_context> is used to manage the internal io_context
+ * - An executor_work_guard is created to prevent the io_context from exiting when there is no task
+ * - At the destruction the work_guard is released first, then it waits for the worker threads to be
+ * finished, and finally the io_context is stopped
+ * - The move operations are disabled to ensure the resource safety
  *
- * ## 构建配置
+ * ## Build configuration
  * ```bash
- * # 启用 HTTP 客户端
+ * # Enable the HTTP client
  * xmake f --http_client=y
  *
- * # 启用 HTTPS 支持（需要 OpenSSL）
+ * # Enable the HTTPS support (OpenSSL is required)
  * xmake f --http_client_ssl=y
  * ```
  *
- * ## 使用示例
+ * ## Usage example
  * @code
- * // 简单 GET 请求（同步）
+ * // A simple GET request (synchronous)
  * AsioHttpClient client("https://api.example.com");
  * auto response = client.get("/users");
  * std::cout << response.body() << std::endl;
  *
- * // 异步 GET 请求（C++20 协程）
+ * // An asynchronous GET request (the C++20 coroutine)
  * co_await client.async_get("/users");
  *
- * // 流式下载大文件
+ * // A streaming download of a large file
  * std::ofstream file("download.bin", std::ios::binary);
  * co_await client.async_getStream("/largefile",
  *     [&file](const char* data, size_t size) {
  *         file.write(data, size);
  *     });
  *
- * // 自定义 CA 证书（HTTPS）
+ * // A custom CA certificate (HTTPS)
  * client.setCaFile("/path/to/ca.pem");
  * @endcode
  *
- * @note 该类不可移动或拷贝，因为管理着后台线程和 io_context 的生命周期
- * @note 使用外部 io_context 时需确保其生命周期长于客户端
- * @see AsioHttpResponse 完整响应类
- * @see AsioHttpStreamResponse 流式响应类
+ * @note This class cannot be moved or copied, because it manages the lifetimes of the background
+ *       threads and the io_context
+ * @note When an external io_context is used, its lifetime must be longer than the client
+ * @see AsioHttpResponse the complete response class
+ * @see AsioHttpStreamResponse the streaming response class
  */
 class HKU_UTILS_API AsioHttpClient {
 public:
     using executor_type = boost::asio::any_io_executor;
 
-    /// @brief 默认超时时间（毫秒）
-    static constexpr int32_t DEFAULT_TIMEOUT_MS = 30000;  // 30 秒
+    /// @brief Default timeout (ms)
+    static constexpr int32_t DEFAULT_TIMEOUT_MS = 30000;  // 30 seconds
 
-    /// @brief 最大超时时间（毫秒），当传入<=0 时使用此值
-    static constexpr int32_t MAX_TIMEOUT_MS = 60000;  // 60 秒
+    /// @brief Maximum timeout (ms), it is used when a value <= 0 is passed
+    static constexpr int32_t MAX_TIMEOUT_MS = 60000;  // 60 seconds
 
     /**
-     * @brief 构造函数（内部 io_context 模式）
+     * @brief Constructor (the internal io_context mode)
      *
-     * 创建内部的 io_context 并启动后台线程运行事件循环。
+     * It creates the internal io_context and starts the background threads to run the event loop.
      *
-     * @param thread_count 工作线程数量，默认为 1
-     * @param max_concurrency 连接池最大并发连接数，0 表示无限制
+     * @param thread_count the number of the worker threads, 1 by default
+     * @param max_concurrency the maximum number of the concurrent connections of the connection
+     * pool, 0 means unlimited
      */
     explicit AsioHttpClient(int32_t thread_count = 1, size_t max_concurrency = 0);
 
     /**
-     * @brief 构造函数（带 URL 的内部 io_context 模式）
+     * @brief Constructor (the internal io_context mode with a URL)
      *
-     * 创建内部的 io_context 并启动后台线程，同时设置目标 URL。
+     * It creates the internal io_context, starts the background threads and sets the target URL.
      *
-     * @param url 目标 URL（如 "https://api.example.com:8080/v1"）
-     * @param timeout 超时时间（毫秒），若<=0 则使用 MAX_TIMEOUT_MS
-     * @param thread_count 工作线程数量，默认为 1
-     * @param max_concurrency 连接池最大并发连接数，0 表示无限制
+     * @param url the target URL (e.g. "https://api.example.com:8080/v1")
+     * @param timeout the timeout (ms); MAX_TIMEOUT_MS is used when it is <= 0
+     * @param thread_count the number of the worker threads, 1 by default
+     * @param max_concurrency the maximum number of the concurrent connections of the connection
+     * pool, 0 means unlimited
      */
     explicit AsioHttpClient(const std::string& url, int32_t timeout = DEFAULT_TIMEOUT_MS,
                             int32_t thread_count = 1, size_t max_concurrency = 0);
 
     /**
-     * @brief 构造函数（外部 io_context 模式）
+     * @brief Constructor (the external io_context mode)
      *
-     * 使用外部提供的 io_context，不拥有其所有权。
-     * 适用于多个客户端共享同一事件循环的场景。
+     * It uses the io_context provided from outside and does not own it.
+     * It is suitable for the scenario where multiple clients share the same event loop.
      *
-     * @param ctx 外部 io_context 引用，由调用方管理生命周期
-     * @param url 目标 URL（如 "https://api.example.com:8080/v1"）
-     * @param timeout 超时时间（毫秒），若<=0 则使用 MAX_TIMEOUT_MS
-     * @param max_concurrency 连接池最大并发连接数，0 表示无限制
+     * @param ctx the external io_context reference, its lifetime is managed by the caller
+     * @param url the target URL (e.g. "https://api.example.com:8080/v1")
+     * @param timeout the timeout (ms); MAX_TIMEOUT_MS is used when it is <= 0
+     * @param max_concurrency the maximum number of the concurrent connections of the connection
+     * pool, 0 means unlimited
      *
-     * @note 外部 io_context 必须由调用方负责运行和维护
+     * @note The external io_context must be run and maintained by the caller
      */
     explicit AsioHttpClient(net::io_context& ctx, const std::string& url,
                             int32_t timeout = DEFAULT_TIMEOUT_MS, size_t max_concurrency = 0);
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      *
-     * 按以下顺序安全释放资源：
-     * 1. 释放 executor_work_guard，允许 io_context 自然退出
-     * 2. 等待所有工作线程完成
-     * 3. 显式停止 io_context
+     * The resources are released safely in the following order:
+     * 1. Release the executor_work_guard, allowing the io_context to exit naturally
+     * 2. Wait for all the worker threads to be finished
+     * 3. Explicitly stop the io_context
      *
-     * @note 确保所有异步操作安全完成，不会强制中断
+     * @note It ensures that all the asynchronous operations are finished safely, without a forced
+     *       interruption
      */
     virtual ~AsioHttpClient();
 
-    // 禁用拷贝操作
+    // The copy operations are disabled
     AsioHttpClient(const AsioHttpClient&) = delete;
     AsioHttpClient& operator=(const AsioHttpClient&) = delete;
 
-    // 禁用移动操作，因为管理后台线程和 io_context 的生命周期不安全
+    // The move operations are disabled, because managing the lifetimes of the background threads
+    // and the io_context is unsafe
     AsioHttpClient(AsioHttpClient&&) = delete;
     AsioHttpClient& operator=(AsioHttpClient&&) = delete;
 
     /**
-     * @brief 检查客户端是否有效
-     * @return true 表示 URL 已正确设置，可以发起请求
+     * @brief Check whether the client is valid
+     * @return true means the URL has been set correctly and a request can be initiated
      */
     bool valid() const noexcept {
         return !m_url.empty();
     }
 
     /**
-     * @brief 获取当前设置的 URL
-     * @return 完整的 URL 字符串
+     * @brief Get the currently set URL
+     * @return the complete URL string
      */
     const std::string& url() const noexcept {
         return m_url;
     }
 
     /**
-     * @brief 设置目标 URL
+     * @brief Set the target URL
      *
-     * 解析 URL 并提取协议、主机、端口、路径等信息。
-     * 会自动更新连接池参数。
+     * It parses the URL and extracts the information such as the protocol, the host, the port and
+     * the path. The connection pool parameters are updated automatically.
      *
-     * @param url 完整的 URL（如 "https://api.example.com:8080/v1/users"）
+     * @param url the complete URL (e.g. "https://api.example.com:8080/v1/users")
      *
-     * @note URL 解析失败时会设置错误标志
+     * @note An error flag is set when the URL parsing fails
      */
     void setUrl(const std::string& url);
 
     /**
-     * @brief 设置超时时间
+     * @brief Set the timeout
      *
-     * 控制 DNS 解析、连接、发送、接收各阶段的超时时间。
+     * It controls the timeout of every stage of the DNS resolution, the connection, the sending and
+     * the receiving.
      *
-     * @param ms 超时时间（毫秒）
+     * @param ms the timeout (ms)
      *
-     * @note 若 ms <= 0，会自动使用 MAX_TIMEOUT_MS（60000 毫秒）作为默认值
-     * @note 超时设置对所有后续请求生效
+     * @note When ms <= 0, MAX_TIMEOUT_MS (60000 ms) is used automatically as the default value
+     * @note The timeout setting takes effect for all the subsequent requests
      */
     void setTimeout(int32_t ms);
 
     /**
-     * @brief 获取当前超时时间
-     * @return 超时时间（毫秒）
+     * @brief Get the current timeout
+     * @return the timeout (ms)
      */
     int32_t getTimeout() const noexcept {
         return static_cast<int32_t>(m_timeout.count());
     }
 
     /**
-     * @brief 获取 io_context 的执行器
+     * @brief Get the executor of the io_context
      *
-     * 用于在 AsioHttpClient 管理的 io_context 上启动自定义协程或异步操作。
-     * 遵循执行器暴露规范，不暴露内部实现细节。
+     * It is used to start a custom coroutine or an asynchronous operation on the io_context managed
+     * by AsioHttpClient. It follows the executor exposure convention and does not expose the
+     * internal implementation details.
      *
-     * @return net::any_io_executor io_context 的执行器
+     * @return net::any_io_executor the executor of the io_context
      *
      * @example
      * @code
-     * // 在客户端的事件循环中执行自定义任务
+     * // Execute a custom task in the event loop of the client
      * co_spawn(client.get_executor(), []() -> net::awaitable<void> {
      *     co_await some_async_operation();
      * }, net::detached);
@@ -450,59 +473,64 @@ public:
     }
 
     /**
-     * @brief 设置默认请求头（移动语义）
-     * @param headers 请求头映射表，将被移动到内部存储
+     * @brief Set the default request headers (the move semantics)
+     * @param headers the request header map, it is moved into the internal storage
      */
     void setDefaultHeaders(std::map<std::string, std::string>&& headers) {
         m_default_headers = std::move(headers);
     }
 
     /**
-     * @brief 设置自定义 CA 证书文件路径
+     * @brief Set the custom CA certificate file path
      *
-     * 用于 HTTPS 连接时验证服务器证书。
-     * 配置优先级：自定义 CA 证书 > 系统默认证书库。
+     * It is used to verify the server certificate during an HTTPS connection.
+     * Configuration priority: the custom CA certificate > the system default certificate store.
      *
-     * @param filename CA 证书文件路径（PEM 格式）
+     * @param filename the CA certificate file path (the PEM format)
      *
-     * @note 必须在建立 HTTPS 连接前设置
-     * @note 文件不存在或格式错误会在连接时抛出异常
-     * @see HttpAsyncClient 异步通信、资源管理与超时控制规范第 7 条
+     * @note It must be set before the HTTPS connection is established
+     * @note An exception is thrown at the connection when the file does not exist or its format is
+     *       wrong
+     * @see HttpAsyncClient the asynchronous communication, resource management and timeout control
+     * specification, item 7
      */
     void setCaFile(const std::string& filename);
 
     /**
-     * @brief 设置默认请求头（拷贝语义）
-     * @param headers 请求头映射表，会被拷贝到内部存储
+     * @brief Set the default request headers (the copy semantics)
+     * @param headers the request header map, it is copied into the internal storage
      */
     void setDefaultHeaders(const HttpHeaders& headers) {
         m_default_headers = headers;
     }
 
-    // ==================== 异步请求方法 ====================
-    // 返回 net::awaitable，需在协程中使用 co_await 调用
+    // ==================== Asynchronous request methods ====================
+    // They return net::awaitable and need to be called with co_await in a coroutine
 
     /**
-     * @brief 通用异步 HTTP 请求
+     * @brief General asynchronous HTTP request
      *
-     * 底层的异步请求实现，支持所有 HTTP 方法和自定义参数。
-     * 自动处理 DNS 解析、连接建立、请求发送、响应接收全过程。
+     * The underlying asynchronous request implementation, it supports all the HTTP methods and the
+     * custom parameters.
+     * It handles the whole process of the DNS resolution, the connection establishment, the request
+     * sending and the response receiving automatically.
      *
-     * @param method HTTP 方法（GET, POST, PUT, DELETE 等）
-     * @param path 请求路径（如 "/api/users"）
-     * @param params URL 查询参数（GET 请求）或表单参数（POST 表单）
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针（POST/PUT 请求）
-     * @param body_len 请求体长度
-     * @param content_type 内容类型（如 "application/json", "text/plain"）
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @param method the HTTP method (GET, POST, PUT, DELETE, etc.)
+     * @param path the request path (e.g. "/api/users")
+     * @param params the URL query parameters (a GET request) or the form parameters (a POST form)
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer (a POST/PUT request)
+     * @param body_len the request body length
+     * @param content_type the content type (e.g. "application/json", "text/plain")
+     * @return AsioHttpResponse the complete HTTP response
      *
-     * @throws HttpTimeoutException 超时时
-     * @throws boost::system::system_error 网络错误时
+     * @throws HttpTimeoutException on a timeout
+     * @throws boost::system::system_error on a network error
      *
-     * @note 超时或网络错误时会抛出 boost::system::system_error 异常
-     * @note 可通过捕获 system_error 并检查 error_code 判断具体错误原因
-     * @note operation_aborted 表示因超时被取消
+     * @note A boost::system::system_error exception is thrown on a timeout or a network error
+     * @note The concrete error cause can be determined by catching system_error and checking its
+     *       error_code
+     * @note operation_aborted means it was cancelled due to a timeout
      */
     net::awaitable<AsioHttpResponse> async_request(const std::string& method,
                                                    const std::string& path,
@@ -512,10 +540,10 @@ public:
                                                    const std::string& content_type);
 
     /**
-     * @brief 异步 GET 请求（无参数）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous GET request (without parameters)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_get(const std::string& path,
                                                const HttpHeaders& headers = {}) {
@@ -523,11 +551,11 @@ public:
     }
 
     /**
-     * @brief 异步 GET 请求（带查询参数）
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous GET request (with the query parameters)
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_get(const std::string& path, const HttpParams& params,
                                                const HttpHeaders& headers) {
@@ -535,14 +563,14 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（带参数和请求体）
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param len 请求体长度
-     * @param content_type 内容类型
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (with the parameters and the request body)
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param len the request body length
+     * @param content_type the content type
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const HttpParams& params,
                                                 const HttpHeaders& headers, const char* body,
@@ -551,13 +579,13 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（仅请求体）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param len 请求体长度
-     * @param content_type 内容类型
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (the request body only)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param len the request body length
+     * @param content_type the content type
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const HttpHeaders& headers,
                                                 const char* body, size_t len,
@@ -566,13 +594,13 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（字符串内容）
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param content 请求体字符串
-     * @param content_type 内容类型，默认为 "text/plain"
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (the string content)
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param content the request body string
+     * @param content_type the content type, "text/plain" by default
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const HttpParams& params,
                                                 const HttpHeaders& headers,
@@ -583,12 +611,12 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（字符串内容，无参数）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param content 请求体字符串
-     * @param content_type 内容类型，默认为 "text/plain"
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (the string content, without parameters)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param content the request body string
+     * @param content_type the content type, "text/plain" by default
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const HttpHeaders& headers,
                                                 const std::string& content,
@@ -597,14 +625,14 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（JSON 数据，带参数）
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body JSON 对象
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (the JSON data, with the parameters)
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @param body the JSON object
+     * @return AsioHttpResponse the complete HTTP response
      *
-     * @note 自动设置 Content-Type 为 "application/json"
+     * @note Content-Type is set to "application/json" automatically
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const HttpParams& params,
                                                 const HttpHeaders& headers, const json& body) {
@@ -612,11 +640,11 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（JSON 数据，带请求头）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param body JSON 对象
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (the JSON data, with the request headers)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param body the JSON object
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const HttpHeaders& headers,
                                                 const json& body) {
@@ -624,34 +652,36 @@ public:
     }
 
     /**
-     * @brief 异步 POST 请求（JSON 数据，简化版）
-     * @param path 请求路径
-     * @param body JSON 对象
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Asynchronous POST request (the JSON data, the simplified version)
+     * @param path request path
+     * @param body the JSON object
+     * @return AsioHttpResponse the complete HTTP response
      */
     net::awaitable<AsioHttpResponse> async_post(const std::string& path, const json& body) {
         co_return co_await async_post(path, {}, body);
     }
 
     /**
-     * @brief 流式异步 HTTP 请求（支持大文件下载）
+     * @brief Streaming asynchronous HTTP request (it supports the large file download)
      *
-     * 使用回调函数处理响应数据块，避免一次性加载到内存。
-     * 自动支持 Content-Length 和 Transfer-Encoding: chunked 两种模式。
+     * It uses a callback function to process the response data chunks, avoiding loading everything
+     * into the memory at once. Both the Content-Length and the Transfer-Encoding: chunked modes are
+     * supported automatically.
      *
-     * @param method HTTP 方法 (GET, POST 等)
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @param chunk_callback 数据块回调函数，每次接收到数据时调用
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param method the HTTP method (GET, POST, etc.)
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @param chunk_callback the data chunk callback function, it is called every time data is
+     *                       received
+     * @return AsioHttpStreamResponse the streaming response object
      *
-     * @note 回调函数应保持非阻塞，避免执行耗时操作
-     * @note 不应在回调中抛出异常，否则会终止请求
-     * @note 注意共享数据的线程安全
+     * @note The callback function should stay non-blocking, avoiding the time-consuming operations
+     * @note An exception should not be thrown in the callback, otherwise the request is terminated
+     * @note Pay attention to the thread safety of the shared data
      */
     net::awaitable<AsioHttpStreamResponse> async_requestStream(
       const std::string& method, const std::string& path, const HttpParams& params,
@@ -659,13 +689,13 @@ public:
       const std::string& content_type, const HttpChunkCallback& chunk_callback);
 
     /**
-     * @brief 流式异步 GET 请求（带参数）
+     * @brief Streaming asynchronous GET request (with the parameters)
      *
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     net::awaitable<AsioHttpStreamResponse> async_getStream(
       const std::string& path, const HttpParams& params, const HttpHeaders& headers,
@@ -675,12 +705,12 @@ public:
     }
 
     /**
-     * @brief 流式异步 GET 请求（无参数）
+     * @brief Streaming asynchronous GET request (without parameters)
      *
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     net::awaitable<AsioHttpStreamResponse> async_getStream(
       const std::string& path, const HttpHeaders& headers,
@@ -690,16 +720,16 @@ public:
     }
 
     /**
-     * @brief 流式异步 POST 请求（带参数和请求体）
+     * @brief Streaming asynchronous POST request (with the parameters and the request body)
      *
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     net::awaitable<AsioHttpStreamResponse> async_postStream(
       const std::string& path, const HttpParams& params, const HttpHeaders& headers,
@@ -710,15 +740,15 @@ public:
     }
 
     /**
-     * @brief 流式异步 POST 请求（仅请求体）
+     * @brief Streaming asynchronous POST request (the request body only)
      *
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     net::awaitable<AsioHttpStreamResponse> async_postStream(
       const std::string& path, const HttpHeaders& headers, const char* body, size_t body_len,
@@ -727,47 +757,48 @@ public:
                                                content_type, chunk_callback);
     }
 
-    // ==================== 同步请求方法 ====================
-    // 阻塞直到请求完成，内部使用异步实现
+    // ==================== Synchronous request methods ====================
+    // They block until the request is finished and use the asynchronous implementation internally
 
     /**
-     * @brief 通用同步 HTTP 请求
+     * @brief General synchronous HTTP request
      *
-     * 阻塞式请求，内部使用异步实现并等待完成。
-     * 适用于非协程环境或需要同步调用的场景。
+     * A blocking request, it uses the asynchronous implementation internally and waits for its
+     * completion.
+     * It is suitable for a non-coroutine environment or the scenario needing a synchronous call.
      *
-     * @param method HTTP 方法（GET, POST, PUT, DELETE 等）
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @param method the HTTP method (GET, POST, PUT, DELETE, etc.)
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @return AsioHttpResponse the complete HTTP response
      *
-     * @throws HttpTimeoutException 超时时
-     * @throws boost::system::system_error 网络错误时
+     * @throws HttpTimeoutException on a timeout
+     * @throws boost::system::system_error on a network error
      */
     AsioHttpResponse request(const std::string& method, const std::string& path,
                              const HttpParams& params, const HttpHeaders& headers, const char* body,
                              size_t body_len, const std::string& content_type);
 
     /**
-     * @brief 同步 GET 请求（无参数）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous GET request (without parameters)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse get(const std::string& path, const HttpHeaders& headers = {}) {
         return request("GET", path, {}, headers, nullptr, 0, "");
     }
 
     /**
-     * @brief 同步 GET 请求（带查询参数）
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous GET request (with the query parameters)
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse get(const std::string& path, const HttpParams& params,
                          const HttpHeaders& headers) {
@@ -775,14 +806,14 @@ public:
     }
 
     /**
-     * @brief 同步 POST 请求（带参数和请求体）
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param len 请求体长度
-     * @param content_type 内容类型
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (with the parameters and the request body)
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param len the request body length
+     * @param content_type the content type
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const HttpParams& params,
                           const HttpHeaders& headers, const char* body, size_t len,
@@ -791,13 +822,13 @@ public:
     }
 
     /**
-     * @brief 同步 POST 请求（仅请求体）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param len 请求体长度
-     * @param content_type 内容类型
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (the request body only)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param len the request body length
+     * @param content_type the content type
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const HttpHeaders& headers, const char* body,
                           size_t len, const std::string& content_type) {
@@ -805,13 +836,13 @@ public:
     }
 
     /**
-     * @brief 同步 POST 请求（字符串内容，带参数）
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param content 请求体字符串
-     * @param content_type 内容类型，默认为 "text/plain"
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (the string content, with the parameters)
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param content the request body string
+     * @param content_type the content type, "text/plain" by default
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const HttpParams& params,
                           const HttpHeaders& headers, const std::string& content,
@@ -820,12 +851,12 @@ public:
     }
 
     /**
-     * @brief 同步 POST 请求（字符串内容，无参数）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param content 请求体字符串
-     * @param content_type 内容类型，默认为 "text/plain"
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (the string content, without parameters)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param content the request body string
+     * @param content_type the content type, "text/plain" by default
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const HttpHeaders& headers,
                           const std::string& content,
@@ -834,12 +865,12 @@ public:
     }
 
     /**
-     * @brief 同步 POST 请求（JSON 数据，带参数）
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body JSON 对象
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (the JSON data, with the parameters)
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @param body the JSON object
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const HttpParams& params,
                           const HttpHeaders& headers, const json& body) {
@@ -847,45 +878,47 @@ public:
     }
 
     /**
-     * @brief 同步 POST 请求（JSON 数据，带请求头）
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param body JSON 对象
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (the JSON data, with the request headers)
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param body the JSON object
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const HttpHeaders& headers, const json& body) {
         return post(path, {}, headers, body);
     }
 
     /**
-     * @brief 同步 POST 请求（JSON 数据，简化版）
-     * @param path 请求路径
-     * @param body JSON 对象
-     * @return AsioHttpResponse 完整的 HTTP 响应
+     * @brief Synchronous POST request (the JSON data, the simplified version)
+     * @param path request path
+     * @param body the JSON object
+     * @return AsioHttpResponse the complete HTTP response
      */
     AsioHttpResponse post(const std::string& path, const json& body) {
         return post(path, {}, body);
     }
 
     /**
-     * @brief 同步流式 HTTP 请求（支持大文件下载）
+     * @brief Synchronous streaming HTTP request (it supports the large file download)
      *
-     * 阻塞式流式请求，使用回调函数处理响应数据块。
-     * 自动支持 Content-Length 和 Transfer-Encoding: chunked 两种模式。
+     * A blocking streaming request, it uses a callback function to process the response data
+     * chunks. Both the Content-Length and the Transfer-Encoding: chunked modes are supported
+     * automatically.
      *
-     * @param method HTTP 方法 (GET, POST 等)
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @param chunk_callback 数据块回调函数，每次接收到数据时调用
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param method the HTTP method (GET, POST, etc.)
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @param chunk_callback the data chunk callback function, it is called every time data is
+     *                       received
+     * @return AsioHttpStreamResponse the streaming response object
      *
-     * @note 回调函数应保持非阻塞，避免执行耗时操作
-     * @note 不应在回调中抛出异常，否则会终止请求
-     * @note 注意共享数据的线程安全
+     * @note The callback function should stay non-blocking, avoiding the time-consuming operations
+     * @note An exception should not be thrown in the callback, otherwise the request is terminated
+     * @note Pay attention to the thread safety of the shared data
      */
     AsioHttpStreamResponse requestStream(const std::string& method, const std::string& path,
                                          const HttpParams& params, const HttpHeaders& headers,
@@ -894,13 +927,13 @@ public:
                                          const HttpChunkCallback& chunk_callback);
 
     /**
-     * @brief 同步流式 GET 请求（带参数）
+     * @brief Synchronous streaming GET request (with the parameters)
      *
-     * @param path 请求路径
-     * @param params URL 查询参数
-     * @param headers 额外的 HTTP 请求头
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param params the URL query parameters
+     * @param headers the extra HTTP request headers
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     AsioHttpStreamResponse getStream(const std::string& path, const HttpParams& params,
                                      const HttpHeaders& headers,
@@ -909,12 +942,12 @@ public:
     }
 
     /**
-     * @brief 同步流式 GET 请求（无参数）
+     * @brief Synchronous streaming GET request (without parameters)
      *
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     AsioHttpStreamResponse getStream(const std::string& path, const HttpHeaders& headers,
                                      const HttpChunkCallback& chunk_callback) {
@@ -922,16 +955,16 @@ public:
     }
 
     /**
-     * @brief 同步流式 POST 请求（带参数和请求体）
+     * @brief Synchronous streaming POST request (with the parameters and the request body)
      *
-     * @param path 请求路径
-     * @param params URL 查询参数或表单参数
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param params the URL query parameters or the form parameters
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     AsioHttpStreamResponse postStream(const std::string& path, const HttpParams& params,
                                       const HttpHeaders& headers, const char* body, size_t body_len,
@@ -942,15 +975,15 @@ public:
     }
 
     /**
-     * @brief 同步流式 POST 请求（仅请求体）
+     * @brief Synchronous streaming POST request (the request body only)
      *
-     * @param path 请求路径
-     * @param headers 额外的 HTTP 请求头
-     * @param body 请求体指针
-     * @param body_len 请求体长度
-     * @param content_type 内容类型
-     * @param chunk_callback 数据块回调函数
-     * @return AsioHttpStreamResponse 流式响应对象
+     * @param path request path
+     * @param headers the extra HTTP request headers
+     * @param body the request body pointer
+     * @param body_len the request body length
+     * @param content_type the content type
+     * @param chunk_callback the data chunk callback function
+     * @return AsioHttpStreamResponse the streaming response object
      */
     AsioHttpStreamResponse postStream(const std::string& path, const HttpHeaders& headers,
                                       const char* body, size_t body_len,
@@ -962,81 +995,84 @@ public:
 
 private:
     /**
-     * @brief 解析 URL
+     * @brief Parse the URL
      *
-     * 提取协议、主机、端口、路径等信息。
-     * 仅负责解析逻辑，不修改外部状态。
+     * It extracts the information such as the protocol, the host, the port and the path.
+     * It is responsible for the parsing logic only and does not modify the external state.
      */
     void _parseUrl() noexcept;
 
     /**
-     * @brief DNS 解析
+     * @brief DNS resolution
      *
-     * 异步解析主机名为 IP 地址列表。
+     * It resolves the host name into an IP address list asynchronously.
      *
-     * @return IP 端点列表
+     * @return the IP endpoint list
      */
     net::awaitable<std::vector<tcp::endpoint>> _resolveDNS();
 
     struct SocketVariant;
 
     /**
-     * @brief 建立 TCP 连接
+     * @brief Establish the TCP connection
      *
-     * 尝试连接到 DNS 解析得到的端点列表。
+     * It tries to connect to the endpoint list obtained from the DNS resolution.
      *
-     * @param socket_variant Socket 变体（TCP 或 SSL）
-     * @param dns_endpoints DNS 解析得到的端点列表
+     * @param socket_variant the socket variant (TCP or SSL)
+     * @param dns_endpoints the endpoint list obtained from the DNS resolution
      */
     net::awaitable<void> _connect(SocketVariant& socket_variant,
                                   const std::vector<tcp::endpoint>& dns_endpoints);
 
     /**
-     * @brief 从连接池获取已连接的 socket
+     * @brief Get a connected socket from the connection pool
      *
-     * 带版本检查的连接池复用机制。
+     * The connection pool reuse mechanism with the version check.
      *
-     * @return pair<连接对象，是否新创建> 若为 true 表示是新创建的连接
+     * @return pair<the connection object, whether it is newly created>; true means it is a newly
+     *         created connection
      */
     net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> _getConnection();
 
     /**
-     * @brief 构建完整的 URI（路径 + 查询参数）
+     * @brief Build the complete URI (the path + the query parameters)
      *
-     * 负责将基础路径、资源路径和查询参数组合成合法的 URI。
-     * 自动处理路径分段 URL 编码、斜杠拼接去重等逻辑。
+     * It is responsible for combining the base path, the resource path and the query parameters
+     * into a legal URI. It handles the logic such as the URL encoding of the path segments and the
+     * deduplication of the slashes automatically.
      *
-     * @param path 资源路径（如 "api/v1/users" 或 "/api/v1/users"）
-     * @param params 查询参数映射
-     * @return 构建好的完整 URI 字符串
+     * @param path the resource path (e.g. "api/v1/users" or "/api/v1/users")
+     * @param params the query parameter map
+     * @return the complete constructed URI string
      */
     std::string _buildURI(const std::string& path, const HttpParams& params);
 
 private:
 #if HKU_ENABLE_HTTP_CLIENT_SSL
     struct SslContext;
-    std::unique_ptr<SslContext> m_ssl_ctx;  // SSL 上下文（仅在启用 SSL 时使用）
+    std::unique_ptr<SslContext> m_ssl_ctx;  // SSL context (used when SSL is enabled only)
 #endif
 
-    bool m_is_valid_url{false};                               // URL 是否有效
-    bool m_is_https{false};                                   // 是否使用 HTTPS 协议
-    std::string m_url;                                        // 完整的 URL
-    std::string m_base_path;                                  // URL 的基础路径部分
-    std::string m_host;                                       // 主机名
-    std::string m_port;                                       // 端口号
-    std::chrono::milliseconds m_timeout{DEFAULT_TIMEOUT_MS};  // 超时时间
-    std::map<std::string, std::string> m_default_headers;     // 默认请求头
-    std::string m_ca_file;                                    // 自定义 CA 证书文件路径
+    bool m_is_valid_url{false};                               // Whether the URL is valid
+    bool m_is_https{false};                                   // Whether the HTTPS protocol is used
+    std::string m_url;                                        // The complete URL
+    std::string m_base_path;                                  // The base path part of the URL
+    std::string m_host;                                       // Host name
+    std::string m_port;                                       // Port number
+    std::chrono::milliseconds m_timeout{DEFAULT_TIMEOUT_MS};  // Timeout
+    std::map<std::string, std::string> m_default_headers;     // Default request headers
+    std::string m_ca_file;                                    // Custom CA certificate file path
 
-    // 连接池相关成员
+    // Connection pool related members
     std::unique_ptr<ResourceAsioVersionPool<HttpConnection, std::mutex>> m_connection_pool;
 
-    // io_context 管理
-    std::unique_ptr<net::io_context> m_own_ctx;  // 内部 io_context
-    net::io_context* m_ctx{nullptr};             // 当前使用的 io_context
-    std::vector<std::thread> m_worker_threads;   // 后台运行 io_context 的线程池
+    // io_context management
+    std::unique_ptr<net::io_context> m_own_ctx;  // Internal io_context
+    net::io_context* m_ctx{nullptr};             // The io_context currently used
+    std::vector<std::thread> m_worker_threads;   // The thread pool running the io_context in the
+                                                 // background
     std::unique_ptr<net::executor_work_guard<net::io_context::executor_type>>
-      m_work_guard;  // 防止 io_context 在无任务时退出
+      m_work_guard;  // Prevents the io_context from exiting when there is no task
 };
 
 }  // namespace hku

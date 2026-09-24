@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_round") {
     double x;
 
@@ -117,7 +117,7 @@ TEST_CASE("test_split_by_char") {
 TEST_CASE("test_split_by_string") {
     std::string x("");
 
-    // 分割字符串为空
+    // The split string is empty
     auto splits = split(x, "");
     CHECK_EQ(splits.size(), 1);
     CHECK_EQ(splits[0], x);
@@ -127,7 +127,7 @@ TEST_CASE("test_split_by_string") {
     CHECK_EQ(splits.size(), 1);
     CHECK_EQ(splits[0], x);
 
-    // 分割字符串长度为1
+    // The split string length is 1
     x = "100.1.";
     splits = split(x, ".");
     CHECK_EQ(splits.size(), 3);
@@ -135,7 +135,7 @@ TEST_CASE("test_split_by_string") {
     CHECK_EQ(splits[1], "1");
     CHECK_EQ(splits[2], "");
 
-    // 分割字符串长度为2
+    // The split string length is 2
     x = "100.1.234.1.56";
     splits = split(x, ".1");
     CHECK_EQ(splits.size(), 3);

@@ -14,7 +14,7 @@
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_StrategyContext") {
     StrategyContext sc;
     sc.setKTypeList(

@@ -12,10 +12,12 @@
 namespace hku {
 
 /*
- * 根据上下文或输入参数获取10年期中国国债收益率
- * 1. 上下文日期优先
- * 2. 如果时间早于不存在国债数据的情况下，使用默认值替代
- * 3. 时间如果大于已有国债数据，则取最后的国债数据
+ * Get the yield of the 10-year Chinese treasury bond according to the context or the input
+ * parameters
+ * 1. The context date has priority
+ * 2. If the time is earlier than the case where no treasury bond data exists, the default value is
+ * used instead
+ * 3. If the time is later than the existing treasury bond data, the last treasury bond data is used
  */
 class IZhBond10 : public IndicatorImp {
     INDICATOR_IMP(IZhBond10)

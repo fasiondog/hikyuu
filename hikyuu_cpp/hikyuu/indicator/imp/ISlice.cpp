@@ -37,7 +37,7 @@ void ISlice::_checkParam(const string& name) const {
 }
 
 void ISlice::_calculate(const Indicator& data) {
-    // 如果在叶子节点，直接取自身的data参数
+    // On a leaf node, take its own data parameter directly
     if (isLeaf()) {
         m_discard = 0;
         const PriceList& x = getParam<const PriceList&>("data");
@@ -65,7 +65,8 @@ void ISlice::_calculate(const Indicator& data) {
         return;
     }
 
-    // 不在叶子节点上，则忽略本身的data参数，认为其输入实际为函数入参中的data
+    // Not on a leaf node, ignore its own data parameter and regard its input as the data in the
+    // function arguments
     int result_index = getParam<int>("result_index");
     HKU_ERROR_IF_RETURN(result_index >= 0 && result_index >= data.getResultNumber(), void(),
                         "result_index out of range!");
@@ -103,7 +104,7 @@ void ISlice::_calculate(const Indicator& data) {
         memcpy(dst, src, (endix - startix) * sizeof(value_t));
     }
 
-    // 更新抛弃数量
+    // Update the discard number
     m_discard = data.discard() <= size_t(startix) ? 0 : data.discard() - startix;
 }
 

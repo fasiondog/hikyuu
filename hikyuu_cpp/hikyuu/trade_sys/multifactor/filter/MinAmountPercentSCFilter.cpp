@@ -49,19 +49,19 @@ ScoreRecordList MinAmountPercentSCFilter::_filter(const ScoreRecordList& scores,
                   return a.second > b.second;
               });
 
-    // 计算需要保留的数量(过滤掉后10%)
+    // Calculate the number to keep (the last 10% is filtered out)
     size_t total = amount_list.size();
     if (total == 0) {
         return ret;
     }
 
     double min_amount_percent_limit = getParam<double>("min_amount_percent_limit");
-    size_t keep_count = total * (1 - min_amount_percent_limit);  // 保留前90%
+    size_t keep_count = total * (1 - min_amount_percent_limit);  // Keep the first 90%
     if (keep_count == 0) {
-        keep_count = 1;  // 至少保留一个
+        keep_count = 1;  // Keep at least one
     }
 
-    // 将前keep_count个记录加入结果
+    // Add the first keep_count records into the result
     for (size_t i = 0; i < keep_count && i < amount_list.size(); ++i) {
         size_t index = amount_list[i].first;
         ret.emplace_back(scores[index]);

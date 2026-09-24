@@ -21,15 +21,17 @@ public:
     TMReportPluginInterface() = default;
     virtual ~TMReportPluginInterface() = default;
 
-    // 获取账户截止至指定时刻的最大回撤百分比（包含该时刻）（仅根据收盘价计算）
+    // Get the maximum drawdown percentage of the account up to the given moment (inclusive), it is
+    // calculated from the close price only
     virtual price_t getMaxPullBack(const TMPtr& tm, const Datetime& date,
                                    const KQuery::KType& ktype) = 0;
 
     /**
-     * @brief 获取账户历史持仓扩展详情
-     * @param tm 指定账户
-     * @param ktype k线类型
-     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @brief Get the extended detail of the historical positions of the account
+     * @param tm the given account
+     * @param ktype K-line type
+     * @param trade_mode trade mode, it affects some statistics items: 0-trade at the close, 1-trade
+     *                   at the next open
      * @return std::vector<PositionExtInfo>
      */
     virtual std::vector<PositionExtInfo> getHistoryPositionExtInfoList(const TMPtr& tm,
@@ -37,11 +39,13 @@ public:
                                                                        int trade_mode) = 0;
 
     /**
-     * @brief 获取账户最后交易时刻后持仓详情
-     * @param tm 指定账户
-     * @param current_time 当前时刻（需大于等于最后交易时刻）
-     * @param ktype k线类型
-     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @brief Get the detail of the positions after the last trade moment of the account
+     * @param tm the given account
+     * @param current_time the current moment (it should be greater than or equal to the last trade
+     *                     moment)
+     * @param ktype K-line type
+     * @param trade_mode trade mode, it affects some statistics items: 0-trade at the close, 1-trade
+     *                   at the next open
      * @return std::vector<PositionExtInfo>
      */
     virtual std::vector<PositionExtInfo> getPositionExtInfoList(const TMPtr& tm,
@@ -50,12 +54,14 @@ public:
                                                                 int trade_mode) = 0;
 
     /**
-     * @brief 获取账户指定时刻的指定证券的持仓详情
-     * @param tm 账户
-     * @param stock 持仓的股票
-     * @param current_time 当前时刻（需大于等于最后交易时刻）
-     * @param ktype k线类型
-     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @brief Get the position detail of the given security of the account at the given moment
+     * @param tm account
+     * @param stock the held stock
+     * @param current_time the current moment (it should be greater than or equal to the last trade
+     *                     moment)
+     * @param ktype K-line type
+     * @param trade_mode trade mode, it affects some statistics items: 0-trade at the close, 1-trade
+     *                   at the next open
      * @return PositionExtInfo
      */
     virtual PositionExtInfo getPositionExtInfo(const TMPtr& tm, const Stock& stock,
@@ -63,16 +69,16 @@ public:
                                                const KQuery::KType& ktype, int trade_mode) = 0;
 
     /**
-     * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
-     * 以便用于计算当前市值
-     * @param tm 指定的交易管理实例
-     * @param datetime 统计截止时刻
+     * Count the system performance up to a certain moment; datetime must be greater than or equal
+     * to lastDatetime so that it can be used to calculate the current market value
+     * @param tm the given trade management instance
+     * @param datetime the statistics end moment
      */
     virtual Performance getExtPerformance(const TMPtr& tm, const Datetime& datetime,
                                           const KQuery::KType& ktype) = 0;
 
     /**
-     * @brief 获取指定截止时间前各月的收益百分比
+     * @brief Get the monthly return percentages before the given end time
      * @param tm
      * @param datetime
      * @return std::vector<std::pair<Datetime, double>>
@@ -81,7 +87,7 @@ public:
       const TMPtr& tm, const Datetime& datetime) = 0;
 
     /**
-     * @brief 获取指定截止时间前各年的收益百分比
+     * @brief Get the yearly return percentages before the given end time
      * @param tm
      * @param datetime
      * @return std::vector<std::pair<Datetime, double>>

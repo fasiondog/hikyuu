@@ -38,9 +38,9 @@ BASE_DIR = os.path.dirname(__file__)
 
 
 if sys.platform == 'win32':
-    # add_dll_directory() 有时不生效
+    # add_dll_directory() sometimes does not take effect
     os.add_dll_directory(os.path.join(os.path.dirname(__file__), 'cpp'))
-    # 添加动态库所在的目录路径
+    # Add the directory path where the dynamic library is located
     current_path = os.environ.get('PATH', '')
     dll_directory = os.path.join(BASE_DIR, 'cpp')
     new_path = f"{dll_directory};{current_path}"
@@ -55,6 +55,9 @@ else:
 try:
     from .util import *
     from .extend import *
+    # The i18n translation helper, which shares the same gettext domain with the C++ part;
+    # the msgid must be in English, and the caller formats the returned text itself
+    from .core import htr
     from .indicator import *
     from .trade_manage import *
     from .trade_sys import *
@@ -67,9 +70,10 @@ except Exception as e:
     # hku_fatal(traceback.format_exc())
     print("{}: {}".format(info[0].__name__, info[1]))
     print(traceback.format_exc())
-    print("""请使用 pipdeptree -p hikyuu 检查是否存在缺失的依赖包。
-如果没有问题可以在 https://gitee.com/fasiondog/hikyuu 或 https://github.com/fasiondog/hikyuu
-上提交 issue，同时附上 "用户目录/.hikyuu" 下的 hikyuu_py.log 和 hikyuu.log 日志文件 """)
+    print("""Please use pipdeptree -p hikyuu to check whether any dependency package is missing.
+If everything is fine, you can submit an issue at https://gitee.com/fasiondog/hikyuu or
+https://github.com/fasiondog/hikyuu, attaching the hikyuu_py.log and hikyuu.log files under
+"~/.hikyuu" """)
     raise e
 
 
@@ -80,36 +84,36 @@ sm = StockManager.instance()
 
 
 def hku_cleanup():
-    # macosx 中clickhouse必须在python中等待退出，其他平台无问题
+    # On macosx, clickhouse must wait for exit in python; there is no problem on other platforms
     local_sm = StockManager.instance()
     local_sm.cancel_load()
     while not local_sm.data_ready:
         time.sleep(0.1)
 
-    # 释放所有K线数据, 用于防止python实现的扩展K线转换函数由于GIL导致退出时异常
+    # Release all K-line data, to prevent the python-implemented extended K-line conversion function from raising an exception at exit due to the GIL
     release_extra_ktype()
 
 
 atexit.register(hku_cleanup)
 
 
-# 尝试寻找 hikyuu_plugin python包，并获取其所在目录
+# Try to find the hikyuu_plugin python package and get its directory
 try:
     import hikyuu_plugin
     plugin_path = os.path.dirname(hikyuu_plugin.__file__)
     plugin_version = hikyuu_plugin.__version__
 
-    # 获取主版本号（格式为x.x.x）
+    # Get the major version (in the format x.x.x)
     def get_major_version(version_str):
         parts = version_str.split('.')
         return '.'.join(parts[:3]) if len(parts) >= 3 else version_str
 
-    # 比较hikyuu和hikyuu_plugin的版本号
+    # Compare the versions of hikyuu and hikyuu_plugin
     hikyuu_major_version = get_major_version(__version__)
     plugin_major_version = get_major_version(plugin_version)
 
     if hikyuu_major_version != plugin_major_version:
-        hku_warn("hikyuu版本 ({}) 与 hikyuu_plugin版本 ({}) 不匹配，请确保使用兼容版本！".format(__version__, plugin_version))
+        hku_warn("The hikyuu version ({}) does not match the hikyuu_plugin version ({}), please make sure to use compatible versions!".format(__version__, plugin_version))
 
 except ImportError:
     plugin_path = Path.home() / '.hikyuu' / 'plugin'
@@ -146,13 +150,13 @@ if in_interactive_session():
     set_python_in_interactive(True)
 
 
-# 如果是在 jupyter 环境中运行，重定向C++ stdout/stderr输出至python
+# If running in a jupyter environment, redirect the C++ stdout/stderr output to python
 if in_ipython_frontend():
     set_python_in_jupyter(True)
     hku_info("running in jupyter")
     iodog.open()
 
-# windows 终端下执行无法正常显示 c++ 输出中文
+# When executed in a windows terminal, the C++ output cannot display Chinese properly
 if sys.platform == 'win32' and not in_ipython_frontend():
     lang, _ = locale.getdefaultlocale()
     if lang and 'zh' in lang.lower():
@@ -163,10 +167,11 @@ use_draw_engine('matplotlib')
 
 def hku_save(var, filename):
     """
-    序列化，将hikyuu内建类型的变量（如Stock、TradeManager等）保存在指定的文件中，格式为二进制。
+    Serialization: save a variable of a hikyuu built-in type (such as Stock, TradeManager, etc.)
+    to the specified file in binary format.
 
-    :param var: hikyuu内建类型的变量
-    :param str filename: 指定的文件名
+    :param var: a variable of a hikyuu built-in type
+    :param str filename: the specified file name
     """
     with open(filename, 'wb') as f:
         pickle.dump(var, f)
@@ -174,10 +179,10 @@ def hku_save(var, filename):
 
 def hku_load(filename):
     """
-    将通过 hku_save 保存的变量，读取到var中。
+    Read the variable saved by hku_save into var.
 
-    :param str filename: 待载入的序列化文件。
-    :return: 之前被序列化保存的文件
+    :param str filename: the serialization file to be loaded.
+    :return: the variable previously saved by serialization
     """
     with open(filename, 'rb') as f:
         out = pickle.load(f)
@@ -186,10 +191,10 @@ def hku_load(filename):
 
 def set_global_context(stk, query):
     """
-    设置全局的 K 线上下文
+    Set the global K-line context
 
-    :param Stock stk: 指定的全局Stock
-    :param Query query: 指定的查询条件
+    :param Stock stk: the specified global Stock
+    :param Query query: the specified query condition
     """
     global K, O, C, H, L, A, V
     K = stk.get_kdata(query)
@@ -203,19 +208,19 @@ def set_global_context(stk, query):
 
 def get_global_context():
     """
-    获取当前的全局 K 线上下文
+    Get the current global K-line context
 
     :rtype: KData
     """
     return C.getContext()
 
 
-# 预定义block变量的只有load_hikyuu后，才会生效
-blocka = None  # 全部A股
-blocka_shsz = None  # 沪深A股
-zsbk_a = None  # 指数板块A股
-blocksh = None  # 全部沪市
-zsbk_sh = None  # 指数板块上证
+# The predefined block variables take effect only after load_hikyuu
+blocka = None  # All A-share
+blocka_shsz = None  # Shanghai-Shenzhen A-share
+zsbk_a = None  # Index block A-share
+blocksh = None  # All Shanghai market
+zsbk_sh = None  # Index block Shanghai
 blocksz = None
 zsbk_sz = None
 blockbj = None
@@ -234,11 +239,11 @@ blocketf = None
 
 def load_hikyuu(**kwargs):
     """
-    初始化加载 hikyuu 数据库，并初始化全局变量。
+    Initialize and load the hikyuu database, and initialize the global variables.
 
-    示例:
+    Example:
 
-    # 仅预加载 sh000001 日线数据，关闭行情接收
+    # Only preload the sh000001 daily data, with quote receiving disabled
     options = {
         "stock_list": ["sh000001"],
         "ktype_list": ["day"],
@@ -252,39 +257,39 @@ def load_hikyuu(**kwargs):
     }
     load_hikyuu(**options)
 
-    参数:
-        config_file (str): 配置文件路径，默认为 ~/.hikyuu/hikyuu.ini
+    Parameters:
+        config_file (str): the configuration file path, defaults to ~/.hikyuu/hikyuu.ini
 
-        stock_list (list): 指定加载的股票列表，默认为全部A股('all'), 如：['sh000001', 'sz399001']
-        ktype_list (list): 指定加载的K线类型列表，默认按配置文件设置加载. 如: ['day', 'week', 'month']
-                    支持的K线类型有:
+        stock_list (list): the stocks to load, defaults to all A-shares ('all'), e.g. ['sh000001', 'sz399001']
+        ktype_list (list): the K-line types to load, defaults to the configuration file settings. e.g. ['day', 'week', 'month']
+                    Supported K-line types:
                     'day', 'week', 'month', 'quarter', 'halfyear', 'year', 'min', 'min5',
                     'min15', 'min30', 'min60', 'hour2', 'timeline', 'trans'
         preload_num (dict): {'day_max': 100000, 'week_max': 100000, 'month_max': 100000, ...}
-        load_history_finance (boolean): 预加载历史财务数至内存，默认为 True
-        load_weight (boolean): 加载权息数据，默认为 True
+        load_history_finance (boolean): preload the historical finance data into memory, defaults to True
+        load_weight (boolean): load the weight data, defaults to True
 
-        start_spot (boolean): 启动行情接收，默认为 True
-        spot_worker_num (int): 行情接收数据处理线程数，默认为 1
-        reload_time (str): 指定数据重新加载时间(时:分)，格式为 HH:MM, 默认为 00:00
-        lazy_preload (boolean): 日线以下使用懒加载方式进行预加载，默认为 False
+        start_spot (boolean): start quote receiving, defaults to True
+        spot_worker_num (int): the number of quote data processing threads, defaults to 1
+        reload_time (str): the data reload time (hour:minute), in the format HH:MM, defaults to 00:00
+        lazy_preload (boolean): preload the levels below daily with the lazy loading mode, defaults to False
 
-        use_shm_server (boolean): 本进程是否作为客户端接入既有 shm 数据服务，默认为 False。
-            默认以独立模式运行；同一 datadir 已有服务且需共享数据快照时置 True，本进程将自动接入。
-        shm_server_wait_timeout (int): 客户端接入协商的总时长预算（秒），含连接探测与就绪
-            等待；0 表示无限等待，默认 600，超时后降级独立模式。
+        use_shm_server (boolean): whether this process connects to an existing shm data service as a client, defaults to False.
+            It runs in standalone mode by default; set it to True when a service with the same datadir already exists and the data snapshot needs to be shared, then this process will connect automatically.
+        shm_server_wait_timeout (int): the total time budget (seconds) for the client connection negotiation, including the connection probing and the readiness
+            waiting; 0 means waiting indefinitely, defaults to 600, and it degrades to standalone mode after the timeout.
     """
     if 'config_file' in kwargs:
         config_file = kwargs['config_file']
         if not os.path.exists(config_file):
-            hku_fatal("配置文件不存在: {}".format(config_file))
+            hku_fatal("The configuration file does not exist: {}".format(config_file))
             return
     else:
         from .data.hku_config_template import generate_default_config
         config_file = os.path.expanduser('~') + "/.hikyuu/hikyuu.ini"
         if not os.path.exists(config_file):
-            # 创建默认配置
-            hku_info("创建默认配置文件")
+            # Create the default configuration
+            hku_info("Creating the default configuration file")
             generate_default_config()
 
     import configparser
@@ -303,8 +308,8 @@ def load_hikyuu(**kwargs):
         hku_param["plugindir"] = os.path.join(os.path.dirname(__file__), "plugin")
     hku_param["reload_time"] = ini.get('hikyuu', 'reload_time', fallback="00:00")
     hku_param["lazy_preload"] = ini.getboolean("hikyuu", "lazy_preload", fallback=False)
-    # shm 数据服务配置（[hikyuu] 段，未显式配置时取默认值）：默认关闭，进程以独立模式运行；
-    # 作为客户端接入既有服务，需在配置或 load_hikyuu 参数中显式开启 use_shm_server=True
+    # shm data service configuration ([hikyuu] section, the defaults are used when not explicitly configured): disabled by default, the process runs in standalone mode;
+    # to connect to an existing service as a client, use_shm_server=True must be explicitly enabled in the configuration or the load_hikyuu parameters
     hku_param["use_shm_server"] = ini.getboolean("hikyuu", "use_shm_server", fallback=False)
     hku_param["shm_server_wait_timeout"] = ini.getint("hikyuu", "shm_server_wait_timeout", fallback=600)
 
@@ -335,7 +340,7 @@ def load_hikyuu(**kwargs):
         kdata_param[p] = ini.get('kdata', p)
 
     context = StrategyContext(["all"])
-    # 兼容原有通过环境变量设置加载选项的方式（优先级低）
+    # Compatible with the original way of setting the load options through environment variables (lower priority)
     if 'HKU_STOCK_LIST' in os.environ:
         context.stock_list = os.environ['HKU_STOCK_LIST'].split(";")
     if 'HKU_KTYPE_LIST' in os.environ:
@@ -349,7 +354,7 @@ def load_hikyuu(**kwargs):
         load_stk_weight = load_str in ("1", "TRUE")
         hku_param.set("load_stock_weight", load_stk_weight)
 
-    # 优先使用传入参数作为加载上下文
+    # Prefer the passed-in parameters as the load context
     if 'stock_list' in kwargs:
         context.stock_list = kwargs['stock_list']
     if 'ktype_list' in kwargs:
@@ -367,7 +372,7 @@ def load_hikyuu(**kwargs):
 
     sm.init(base_param, block_param, kdata_param, preload_param, hku_param, context)
 
-    # 默认不启动行情接收, 防止启动在开盘后因自身合成缺失导致从 dataserver 获取行情也缺失
+    # Do not start quote receiving by default, to prevent the quotes from the dataserver also being missing when starting after the market opens due to the missing self-synthesis
     start_spot = False
     if 'HKU_START_SPOT' in os.environ:
         spot_str = os.environ['HKU_START_SPOT'].upper()
@@ -381,7 +386,7 @@ def load_hikyuu(**kwargs):
     if 'spot_worker_num' in kwargs:
         spot_worker_num = kwargs['spot_worker_num']
 
-    # 启动行情接收代理
+    # Start the quote receiving agent
     if start_spot:
         start_spot_agent(False, spot_worker_num)
 
@@ -405,7 +410,7 @@ def load_hikyuu(**kwargs):
     global zsbk_zz100
     global blocketf
 
-    blocka = sm.get_block("A", "ALL")  # 全A，含北交所
+    blocka = sm.get_block("A", "ALL")  # All A-share, including the Beijing Stock Exchange
     zsbk_a = blocka
 
     blocka_shsz = sm.get_block("A", "沪深")
@@ -439,7 +444,7 @@ def load_hikyuu(**kwargs):
 
 # ==============================================================================
 #
-# 设置关键类型简称
+# Set the abbreviations of the key types
 #
 # ==============================================================================
 O = OPEN()
@@ -454,23 +459,23 @@ Q = Query
 
 # ==============================================================================
 #
-# 粗略的选股函数
+# A rough stock-picking function
 #
 # ==============================================================================
 
 
 def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=True):
     """
-    示例：
-    #选出涨停股
+    Example:
+    # Select the limit-up stocks
     C = CLOSE()
     x = select(C / REF(C, 1) - 1 >= 0.0995)
 
-    :param Indicator cond: 条件指标
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期
-    :param bool print_out: 打印选中的股票
-    :rtype: 选中的股票列表
+    :param Indicator cond: the condition indicator
+    :param Datetime start: the start date
+    :param Datetime end: the end date
+    :param bool print_out: print the selected stocks
+    :rtype: the list of the selected stocks
     """
     q = Query(start, end)
     d = sm.get_trading_calendar(q, 'SH')
@@ -496,12 +501,12 @@ def select(cond, start=Datetime(201801010000), end=Datetime.now(), print_out=Tru
 
 
 def select2(inds, start=Datetime(201801010000), end=Datetime.now(), stks=None):
-    """导出最后时刻指定证券的所有指定指标值
+    """Export all the specified indicator values of the specified securities at the last moment
 
-    如：
+    E.g.:
         select2([CLOSE(), VOLUME()], stks=blocka)
 
-    返回一个DataFrame, 列名是指标名称, 行是证券代码和证券名称:
+    Return a DataFrame, the column names are the indicator names, the rows are the code and the name of the securities:
 
         证券代码  证券名称  CLOSE  VOLUME
         SH600000 浦发银行  14.09   1000
@@ -509,10 +514,10 @@ def select2(inds, start=Datetime(201801010000), end=Datetime.now(), stks=None):
         SZ000001 平安银行  13.09   3000
         ...
 
-    :param Indicator inds: 指标列表
-    :param Datetime start: 起始日期
-    :param Datetime end: 结束日期（不包括该日期）
-    :param list stks: 指定的证券列表
+    :param Indicator inds: the indicator list
+    :param Datetime start: the start date
+    :param Datetime end: the end date (excluding this date)
+    :param list stks: the specified securities list
     :rtype: pandas.DataFrame
     """
     q = Query(start, end)
@@ -547,7 +552,7 @@ def select2(inds, start=Datetime(201801010000), end=Datetime.now(), stks=None):
 
 # ==============================================================================
 #
-# 增加临时的实时数据更新函数 realtime_update
+# Add the temporary realtime data update function realtime_update
 #
 # ==============================================================================
 
@@ -589,10 +594,10 @@ def realtime_update_wrap():
 
     def realtime_update_closure(source='qq', delta=60, stk_list=None):
         """
-        更新实时日线数据
-        :param str source: 数据源 ('qq' | 'qmt')
-        :param int delta: 最小更新间隔时间, 防止更新过于频繁
-        :param sequence stk_list: 待更新的stock列表, 如为 None 则更新全部
+        Update the realtime daily data
+        :param str source: the data source ('qq' | 'qmt')
+        :param int delta: the minimum update interval, to prevent updating too frequently
+        :param sequence stk_list: the stock list to update; if None, update all
         """
         from datetime import timedelta, datetime
         nonlocal pre_update_time
@@ -600,10 +605,10 @@ def realtime_update_wrap():
         if (source == 'qmt') or (pre_update_time is None) or (now_update_time - pre_update_time) > timedelta(0, delta, 0):
             realtime_update_inner(source, stk_list)
             pre_update_time = datetime.now()
-            print(f"更新完毕！更新时间: {pre_update_time}")
+            print(f"Update completed! Update time: {pre_update_time}")
         else:
-            print(f"更新间隔小于 {str(delta)} 秒，未更新")
-            print(f"上次更新时间: {pre_update_time}")
+            print(f"The update interval is less than {str(delta)} seconds, not updated")
+            print(f"Last update time: {pre_update_time}")
 
     return realtime_update_closure
 
@@ -613,25 +618,25 @@ realtime_update = realtime_update_wrap()
 
 def auto_sync_globals(func):
     """
-    装饰器：自动同步全局变量到调用者的命名空间
+    Decorator: automatically synchronize the global variables to the namespace of the caller
     """
     def wrapper(*args, **kwargs):
-        # 执行原始函数
+        # Call the original function
         result = func(*args, **kwargs)
 
-        # 自动同步全局变量
+        # Synchronize the global variables automatically
         try:
             import sys
             import inspect
 
-            # 获取调用栈
+            # Get the call stack
             frame = inspect.currentframe()
             try:
-                # 向上查找调用栈
+                # Search up the call stack
                 caller_frame = frame.f_back
                 while caller_frame:
                     caller_globals = caller_frame.f_globals
-                    # 检查是否是从hikyuu导入的全局变量且值为None
+                    # Check whether it is a global variable imported from hikyuu whose value is still None
                     var_names = ['blocka', 'blocka_shsz', 'zsbk_a', 'blocksh', 'zsbk_sh', 'blocksz', 'zsbk_sz',
                                  'blockbj', 'zsbk_bj', 'blockg', 'zsbk_cyb', 'blockstart', 'blockzxb', 'blocketf',
                                  'zsbk_zxb', 'zsbk_sh50', 'zsbk_sh180', 'zsbk_hs300', 'zsbk_zz100']
@@ -642,23 +647,23 @@ def auto_sync_globals(func):
                             caller_globals[var_name] is None and
                             var_name in globals() and
                                 globals()[var_name] is not None):
-                            # 更新调用者的全局变量
+                            # Update the global variables of the caller
                             caller_globals[var_name] = globals()[var_name]
                             updated_vars.append(var_name)
 
                     # if updated_vars:
-                    #     print(f"自动同步全局变量: {', '.join(updated_vars)}")
+                    #     print(f"Auto-synced global variables: {', '.join(updated_vars)}")
 
                     caller_frame = caller_frame.f_back
             finally:
                 del frame
         except Exception:
-            # 静默忽略错误
+            # Silently ignore the errors
             pass
 
         return result
     return wrapper
 
 
-# 为load_hikyuu函数应用自动同步装饰器
+# Apply the auto-sync decorator to the load_hikyuu function
 load_hikyuu = auto_sync_globals(load_hikyuu)

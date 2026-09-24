@@ -12,14 +12,14 @@
 namespace hku {
 
 /**
- * 历史财务信息记录
+ * Historical financial information record
  * @ingroup StockManage
  */
 struct HKU_API HistoryFinanceInfo {
-    Datetime fileDate;    ///< 用于区分一季报、半年报、三季报、年报
-    Datetime reportDate;  ///< 财务报告日期
-    vector<float>
-      values;  ///< 详细财务信息，字段索引可使用 StockManager.getHistoryFinanceAllFields 查询
+    Datetime fileDate;     ///< Used to distinguish the Q1, half-year, Q3 and annual reports
+    Datetime reportDate;   ///< Financial report date
+    vector<float> values;  ///< Detailed financial information; the field index can be queried with
+                           ///< StockManager.getHistoryFinanceAllFields
 
     HistoryFinanceInfo() = default;
     HistoryFinanceInfo(const HistoryFinanceInfo&) = default;

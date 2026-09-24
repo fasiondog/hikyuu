@@ -27,7 +27,7 @@ namespace hku {
 
 /**
  * @ingroup Utilities
- * @addtogroup Exception Exception 异常处理
+ * @addtogroup Exception Exception handling
  * @{
  */
 

@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 是否为 NaN 值
- * @param ignore_discard 是否忽略discard值，默认为false
+ * Whether it is a NaN value
+ * @param ignore_discard whether to ignore the discard values, false by default
  * @ingroup Indicator
  */
 Indicator HKU_API ISNA(bool ignore_discard = false);

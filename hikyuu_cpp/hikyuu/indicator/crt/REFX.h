@@ -12,9 +12,11 @@
 namespace hku {
 
 /**
- * REF增强（不安全引用）, 用于数据左移或右移，周期为整数时，功能同 REF
- * @note 不应用于回测，通常用于AI模型训练等场景
- * @param n 引用周期
+ * Enhanced REF (unsafe reference), used to shift the data left or right; when the period is an
+ * integer it works the same as REF
+ * @note It should not be used for a backtest, it is usually used in scenarios such as the AI model
+ *       training
+ * @param n reference period
  * @ingroup Indicator
  */
 Indicator HKU_API REFX(int n);

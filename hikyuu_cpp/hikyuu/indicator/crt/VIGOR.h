@@ -14,15 +14,21 @@
 namespace hku {
 
 /**
- * 亚历山大 艾尔德力度指数
+ * Alexander Elder's force index
+
  * @details
  * <pre>
- * 参见《走进我的交易室》（2007年 地震出版社） (Alexander Elder) P131
- * 计算公式：（收盘价今－收盘价昨）＊成交量今
- * 一般可以再使用EMA或MA进行平滑
+ * See "Come Into My Trading Room" (2007, Earthquake Press) (Alexander Elder) P131
+
+ * Calculation formula: (today's close price - yesterday's close price) * today's volume
+
+ * EMA or MA can generally be used for the smoothing afterwards
+
  * </pre>
- * @param kdata 待计算的K线数据
- * @param n EMA平滑窗口，必须大于等于1
+ * @param kdata the K-line data to be calculated
+
+ * @param n EMA smoothing window, it must be greater than or equal to 1
+
  * @ingroup Indicator
  */
 Indicator HKU_API VIGOR(const KData& kdata, int n = 2);

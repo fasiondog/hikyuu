@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 分时线记录
+ * Time-sharing (intraday) line record
  * @ingroup StockManage
  */
 class HKU_API TimeLineRecord {
@@ -30,19 +30,19 @@ public:
 };
 
 /**
- * 分时线
+ * Time-sharing (intraday) line
  * @ingroup StockManage
  */
 typedef vector<TimeLineRecord> TimeLineList;
 
 /**
- * 输出TimeLineRecord信息，如：TimeSharingRecord(datetime, price, vol)
+ * Output the TimeLineRecord information, e.g. TimeSharingRecord(datetime, price, vol)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream&, const TimeLineRecord&);
 
 /**
- * 输出TimeLine信息
+ * Output the TimeLine information
  * @details
  * <pre>
  * TimeLine{
@@ -56,7 +56,7 @@ HKU_API std::ostream& operator<<(std::ostream&, const TimeLineRecord&);
 HKU_API std::ostream& operator<<(std::ostream& os, const TimeLineList&);
 
 /**
- * 比较两个TimeLineRecord是否相等，一般仅测试时使用
+ * Compare whether two TimeLineRecord are equal, generally used in tests only
  * @ingroup StockManage
  */
 bool HKU_API operator==(const TimeLineRecord& d1, const TimeLineRecord& d2);

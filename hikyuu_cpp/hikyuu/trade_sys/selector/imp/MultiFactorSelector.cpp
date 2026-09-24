@@ -15,17 +15,18 @@ BOOST_CLASS_EXPORT(hku::MultiFactorSelector)
 namespace hku {
 
 MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
-    setParam<bool>("only_should_buy", false);  // 只选择同时发出买入信号的系统
-    setParam<bool>("ignore_null", true);       // 忽略 MF 中 score 值为 nan 的证券
-    setParam<bool>("ignore_le_zero", false);   // 忽略 MF 中 score 值小于等于 0 的证券
+    setParam<bool>("only_should_buy", false);  // Select the systems that also issue a buy signal
+    setParam<bool>("ignore_null", true);       // Ignore the securities whose score is nan in the MF
+    setParam<bool>("ignore_le_zero", false);  // Ignore the securities whose score is <= 0 in the MF
     setParam<int>("topn", 10);
-    setParam<bool>("reverse", false);  // 逆序，此时 topn 代表最末尾的几个，相当于按最低值排序
+    setParam<bool>("reverse", false);  // Reverse order, topn means the last few (lowest values)
     setParam<int>("ic_n", 5);
     setParam<int>("ic_rolling_n", 120);
     setParam<Stock>("ref_stk", Stock());
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
-    setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
+    setParam<int>("mf_recover_type",
+                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
@@ -47,7 +48,8 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", "CUSTOM");
-    setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
+    setParam<int>("mf_recover_type",
+                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
     setFactorSet(mf->getRefFactorSet());
 }
 
@@ -154,8 +156,9 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
           return !(ignore_null && std::isnan(sc.value)) && !(ignore_le_zero && sc.value <= 0.0);
       });
 
-    // 推荐用 MultiFactorSelector2 全部使用filter，这里仅兼容旧版接口
-    // 应用用户自定义的评分过滤器（支持 set_scores_filter / add_scores_filter）
+    // MultiFactorSelector2 with filters is recommended; this is kept for the old interface
+    // compatibility only Apply the user-defined score filters (set_scores_filter /
+    // add_scores_filter are supported)
     if (m_sc_filter) {
         scores = m_sc_filter->filter(scores, date, m_query);
     }
@@ -167,11 +170,11 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
     }
 
     if (!reverse) {
-        // 正序排列
+        // Sort in the ascending order
         scores = filterTopN(date, scores, topn, only_should_buy);
 
     } else {
-        // 倒序排列
+        // Sort in the descending order
         scores = filterTopNReverse(date, scores, topn, only_should_buy, ignore_null);
     }
 

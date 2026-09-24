@@ -1,7 +1,7 @@
 /*
  * SingleSignal2.h
  *
- *  Created on: 2016年4月16日
+ *  Created on: 2016-4-16
  *      Author: fasiondog
  */
 
@@ -28,7 +28,7 @@ private:
     Indicator m_ind;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

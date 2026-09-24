@@ -25,15 +25,18 @@ KDataShmBufferImp::KDataShmBufferImp(const Stock& stock, const KQuery& query,
 KDataShmBufferImp::~KDataShmBufferImp() {}
 
 KDataImpPtr KDataShmBufferImp::create(const Stock& stock, const KQuery& query) {
-    // 仅客户端模式尝试视图：主进程预加载走 KDataSharedBufferImp，无需再经驱动
+    // The view is attempted in the client mode only: the preload of the main process uses
+    // KDataSharedBufferImp and does not need the driver again
     HKU_IF_RETURN(!StockManager::instance().isIpcClientMode(), nullptr);
 
     auto driver = stock.getKDataDirver();
     HKU_IF_RETURN(!driver, nullptr);
 
-    // 合并为单次 getConnect：原实现分别经 Stock::getIndexRange 与 driver->getConnect()
-    // 各取一次连接（两次池 mutex + 两次 refreshShmInfo 排他锁），高并发下锁竞争使 MF 等
-    // 多因子全市场计算性能退化约一半；合并后一次连接复用两个操作，锁获取减半。
+    // Merged into a single getConnect: the original implementation took a connection through
+    // Stock::getIndexRange and driver->getConnect() respectively (two pool mutexes + two exclusive
+    // locks of refreshShmInfo); under a high concurrency the lock contention degraded the
+    // performance of the whole market calculations such as MF by about half; after the merge a
+    // single connection is reused by the two operations and the lock acquisitions are halved.
     auto conn = driver->getConnect();
     HKU_IF_RETURN(!conn, nullptr);
 
@@ -43,7 +46,9 @@ KDataImpPtr KDataShmBufferImp::create(const Stock& stock, const KQuery& query) {
 
     if (KQuery::isBaseKType(query.kType())) {
         if (query.queryType() == KQuery::INDEX) {
-            // INDEX 查询：经同一连接获取总数后解析负索引/越界，与 Stock::_getIndexRangeByIndex 语义一致
+            // An INDEX query: the total count is obtained through the same connection and then the
+            // negative index / out of range is resolved, the same semantics as
+            // Stock::_getIndexRangeByIndex
             size_t total = conn->getCount(market, code, query.kType());
             HKU_IF_RETURN(total == 0, nullptr);
 
@@ -82,11 +87,13 @@ KDataImpPtr KDataShmBufferImp::create(const Stock& stock, const KQuery& query) {
     }
 
     KRecordView view;
-    // 复用同一连接：tryGetKRecordView 仅按会话期固定快照（协商映射见连接 mapSessionShm）检查覆盖
-    // 并返回零拷贝视图，命中时不触发额外 IPC；快照未覆盖或驱动不支持视图时返回 false，由调用方
-    // 回退 KDataPrivatedBufferImp 私有副本拷贝路径（经 getKRecordList 走 IPC / 本地取数）
-    HKU_IF_RETURN(!conn->tryGetKRecordView(market, code, query.kType(), start, end, view),
-                  nullptr);
+    // Reuse the same connection: tryGetKRecordView only checks the coverage against the snapshot
+    // fixed for the session lifetime (see mapSessionShm for the negotiation mapping) and returns a
+    // zero-copy view without triggering an extra IPC on a hit; it returns false when the snapshot
+    // does not cover it or the driver does not support the view, and the caller falls back to the
+    // private copy path of KDataPrivatedBufferImp (fetching through getKRecordList over IPC /
+    // locally)
+    HKU_IF_RETURN(!conn->tryGetKRecordView(market, code, query.kType(), start, end, view), nullptr);
     return KDataImpPtr(new KDataShmBufferImp(stock, query, view, start));
 }
 
@@ -131,7 +138,8 @@ DatetimeList KDataShmBufferImp::getDatetimeList() const {
 }
 
 KDataImpPtr KDataShmBufferImp::getOtherFromSelf(const KQuery& query) const {
-    // 派生查询若仍满足视图条件则复用零拷贝视图，否则回退私有副本拷贝路径
+    // If a derived query still meets the view condition the zero-copy view is reused, otherwise it
+    // falls back to the private copy path
     auto imp = create(m_stock, query);
     return imp ? imp : std::make_shared<KDataPrivatedBufferImp>(m_stock, query);
 }

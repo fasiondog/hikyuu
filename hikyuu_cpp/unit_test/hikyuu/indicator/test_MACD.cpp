@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MACD") {
     PriceList d;
     for (size_t i = 0; i < 20; ++i) {
@@ -33,7 +33,7 @@ TEST_CASE("test_MACD") {
     Indicator macd, bar, diff, dea;
     Indicator ema1, ema2, fast, slow, bmacd;
 
-    /** @arg 源数据为空 */
+    /** @arg The source data is empty */
     macd = MACD(Indicator(), 12, 26, 9);
     CHECK_EQ(macd.size(), 0);
     CHECK_EQ(macd.empty(), true);
@@ -156,7 +156,7 @@ TEST_CASE("test_MACD") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MACD_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-50));
@@ -191,7 +191,7 @@ TEST_CASE("test_MACD_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MACD_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

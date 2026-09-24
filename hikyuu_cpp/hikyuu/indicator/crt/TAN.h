@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 正切值
+ * Tangent value
  * @ingroup Indicator
  */
 Indicator HKU_API TAN();

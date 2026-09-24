@@ -12,19 +12,20 @@
 namespace hku {
 
 /**
- * 账户资产最大寻优选择器
+ * Selector that optimizes the maximum account assets
  * @return SEPtr
  */
 SEPtr HKU_API SE_MaxFundsOptimal();
 
 /**
- * 使用 Performance 统计结果进行寻优的选择器
+ * Selector that performs the optimization with the Performance statistics results
  * @return SEPtr
  */
-SEPtr HKU_API SE_PerformanceOptimal(const string& key = "帐户平均年收益率%", int mode = 0);
+SEPtr HKU_API SE_PerformanceOptimal(const string& key = "Account Avg Annual Return %",
+                                    int mode = 0);
 
 /**
- * 使用自定义评估函数进行寻优的选择器
+ * Selector that performs the optimization with a custom evaluation function
  * @param evaluate
  * @return SEPtr
  */

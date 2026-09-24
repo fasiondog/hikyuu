@@ -16,15 +16,16 @@
 namespace hku {
 
 /**
- * @brief 资源版本接口特征检测工具
- * @details 提供编译期类型检查，用于验证资源类型是否支持版本管理接口
+ * @brief Detection utility of the resource version interface traits
+ * @details It provides a compile-time type check, used to verify whether the resource type supports
+ *          the version management interfaces
  * @ingroup Utilities
  */
 namespace detail {
 
 /**
- * @brief 检测资源类型是否具有 getVersion() 方法
- * @tparam T 待检测的资源类型
+ * @brief Detect whether the resource type has a getVersion() method
+ * @tparam T the resource type to be detected
  */
 template <typename T>
 struct has_resource_getVersion {
@@ -36,8 +37,8 @@ struct has_resource_getVersion {
 };
 
 /**
- * @brief 检测资源类型是否具有 setVersion(int) 方法
- * @tparam T 待检测的资源类型
+ * @brief Detect whether the resource type has a setVersion(int) method
+ * @tparam T the resource type to be detected
  */
 template <typename T>
 struct has_resource_setVersion {
@@ -50,15 +51,15 @@ struct has_resource_setVersion {
 };
 
 /**
- * @brief getVersion 检测的便捷别名
- * @tparam T 待检测的资源类型
+ * @brief A convenient alias of the getVersion detection
+ * @tparam T the resource type to be detected
  */
 template <typename T>
 static constexpr bool has_resource_getVersion_v = has_resource_getVersion<T>::value;
 
 /**
- * @brief setVersion 检测的便捷别名
- * @tparam T 待检测的资源类型
+ * @brief A convenient alias of the setVersion detection
+ * @tparam T the resource type to be detected
  */
 template <typename T>
 static constexpr bool has_resource_setVersion_v = has_resource_setVersion<T>::value;

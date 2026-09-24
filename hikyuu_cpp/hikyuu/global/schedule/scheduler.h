@@ -13,12 +13,12 @@
 namespace hku {
 
 /**
- * 获取全局调度实例指针
+ * Get the pointer of the global scheduler instance
  */
 HKU_API TimerManager* getScheduler();
 
 /**
- * 用于程序退出时释放全局调度实例，仅内部使用
+ * Used to release the global scheduler instance on program exit, for internal use only
  */
 void releaseScheduler();
 

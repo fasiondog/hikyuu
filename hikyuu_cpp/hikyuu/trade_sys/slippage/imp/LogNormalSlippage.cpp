@@ -1,7 +1,7 @@
 /*
  * LogNormalSlippage.cpp
  *
- *  Created on: 2025年10月25日
+ *  Created on: 2025-10-25
  *      Author: fasiondog
  */
 
@@ -39,9 +39,10 @@ price_t LogNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t pri
     std::lognormal_distribution<double> dis(mean, stddev);
 
     double value = dis(ms_gen);
-    // 为了使滑点值在均值附近分布，我们减去exp(mean+stddev^2/2)得到中心化的值
+    // To distribute the slippage values around the mean, exp(mean+stddev^2/2) is subtracted to
+    // center them
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
-    // 买入时价格总是变高（不利方向）
+    // On a buy the price always goes higher (the unfavorable direction)
     return price + std::abs(centered_value);
 }
 
@@ -52,9 +53,10 @@ price_t LogNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t pr
     std::lognormal_distribution<double> dis(mean, stddev);
 
     double value = dis(ms_gen);
-    // 为了使滑点值在均值附近分布，我们减去exp(mean+stddev^2/2)得到中心化的值
+    // To distribute the slippage values around the mean, exp(mean+stddev^2/2) is subtracted to
+    // center them
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
-    // 卖出时价格总是变低（不利方向）
+    // On a sell the price always goes lower (the unfavorable direction)
     return price - std::abs(centered_value);
 }
 

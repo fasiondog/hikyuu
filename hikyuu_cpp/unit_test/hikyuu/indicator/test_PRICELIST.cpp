@@ -19,16 +19,16 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_PRICELIST") {
     PriceList tmp_list;
     Indicator result;
 
-    /** @arg PriceList 为空 */
+    /** @arg The PriceList is empty */
     result = PRICELIST(tmp_list);
     CHECK_EQ(result.size(), tmp_list.size());
     CHECK_EQ(result.empty(), true);
-    /** @arg PriceList 非空 */
+    /** @arg The PriceList is not empty */
     for (size_t i = 0; i < 10; ++i) {
         tmp_list.push_back(i);
     }
@@ -39,13 +39,13 @@ TEST_CASE("test_PRICELIST") {
         CHECK_EQ(result[i], tmp_list[i]);
     }
 
-    /** @arg 数组指针为空 */
+    /** @arg The array pointer is null */
     price_t* p_tmp = NULL;
     result = PRICELIST(p_tmp, 10);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.empty(), true);
 
-    /** @arg 数组指针非空 */
+    /** @arg The array pointer is not null */
     price_t tmp[10];
     for (size_t i = 0; i < 10; ++i) {
         tmp[i] = i;
@@ -55,14 +55,14 @@ TEST_CASE("test_PRICELIST") {
         CHECK_EQ(result[i], tmp[i]);
     }
 
-    /** @arg 从PriceList构造 */
+    /** @arg Constructed from a PriceList */
     result = PRICELIST(tmp_list);
     CHECK_EQ(result.size(), 10);
     for (size_t i = 0; i < 10; ++i) {
         CHECK_EQ(result[i], tmp_list[i]);
     }
 
-    /** @arg 从PriceLIst， discard为1 */
+    /** @arg From a PriceList with discard=1 */
     result = PRICELIST(tmp_list, 1);
     CHECK_EQ(result.size(), 10);
     CHECK_EQ(result.discard(), 1);
@@ -77,7 +77,7 @@ TEST_CASE("test_PRICELIST") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_PRICELIST_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

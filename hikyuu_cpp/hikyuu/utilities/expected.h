@@ -13,17 +13,17 @@
 #include "cppdef.h"
 
 #if CPP_STANDARD >= CPP_STANDARD_23
-// C++23 及以上使用 std::expected
+// std::expected is used from C++23
 #include <expected>
 namespace stdx {
-// 核心类型
+// Core type
 using std::expected;
 using std::unexpected;
 
-// 异常类型
+// Exception type
 using std::bad_expected_access;
 
-// in_place 标签（用于构造）
+// The in_place tag (used for the construction)
 using std::in_place;
 using std::in_place_t;
 using std::in_place_type;
@@ -33,23 +33,23 @@ using std::unexpect_t;
 }  // namespace stdx
 
 #else
-// C++23 以下使用 tl::expected
+// tl::expected is used below C++23
 #include <tl/expected.hpp>
 namespace stdx {
-// 核心类型
+// Core type
 using tl::expected;
 using tl::unexpected;
 
-// 异常类型
+// Exception type
 using tl::bad_expected_access;
 
-// in_place 标签（用于构造）
+// The in_place tag (used for the construction)
 using std::in_place;
 using std::in_place_t;
 using std::in_place_type;
 using std::in_place_type_t;
 
-// tl::expected 的 unexpect 标签
+// The unexpect tag of tl::expected
 using tl::unexpect;
 using tl::unexpect_t;
 }  // namespace stdx

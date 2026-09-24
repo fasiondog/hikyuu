@@ -38,47 +38,49 @@ namespace bt = boost::posix_time;
 namespace bd = boost::gregorian;
 
 /**
- * 日期类型
- * @details 构造失败将抛出异常 std::out_of_range
+ * Date type
+ * @details An exception std::out_of_range is thrown when the construction fails
  * @ingroup DataType
  */
 class HKU_UTILS_API Datetime {
 public:
-    /** 返回所能表示的最小日期：1400-Jan-01 00:00:00 */
+    /** Return the minimum expressible date: 1400-Jan-01 00:00:00 */
     static Datetime min();
 
-    /** 返回所能表示的最大日期：9999-Dec-31 00:00:00 */
+    /** Return the maximum expressible date: 9999-Dec-31 00:00:00 */
     static Datetime max();
 
-    /** 返回本地计算机当前时刻 */
+    /** Return the current moment of the local machine */
     static Datetime now();
 
-    /** 返回本地计算机今日日期 */
+    /** Return today's date of the local machine */
     static Datetime today();
 
     /**
-     * 兼容oracle
-     * datetime格式，除最高端的字节外，每个字节依次表示世纪、世纪年、月、日、时、分、秒
+     * Compatible with oracle
+     * datetime format: except the most significant byte, every byte represents the century, the
+     * year in the century, the month, the day, the hour, the minute and the second in turn
      */
     static Datetime fromHex(uint64_t time);
 
     /**
-     * @brief 从时间戳（微秒）创建Datetime对象
-     * @param timestamp 微妙级别的时间戳(从1970年1月1日0时0分0秒开始)
+     * @brief Create a Datetime object from a timestamp (microseconds)
+     * @param timestamp the timestamp in microseconds (starting from 00:00:00 on January 1, 1970)
      * @return Datetime
      */
     static Datetime fromTimestamp(int64_t timestamp);
 
     /**
-     * @brief 从时间戳（微秒）创建Datetime对象，并加上本地UTC时间偏差
-     * @param timestamp 微妙级别的时间戳(从1970年1月1日0时0分0秒开始)
+     * @brief Create a Datetime object from a timestamp (microseconds) and add the local UTC time
+     * offset
+     * @param timestamp the timestamp in microseconds (starting from 00:00:00 on January 1, 1970)
      * @return Datetime
      */
     static Datetime fromTimestampUTC(int64_t timestamp);
 
     /**
-     * @brief 从 std::chrono::local_time 创建 Datetime 对象
-     * @tparam Duration chrono duration 类型
+     * @brief Create a Datetime object from std::chrono::local_time
+     * @tparam Duration the chrono duration type
      * @param local_time chrono local_time
      * @return Datetime
      */
@@ -86,57 +88,58 @@ public:
     static Datetime fromLocalTime(std::chrono::local_time<Duration> local_time);
 
     /**
-     * @brief 从 std::chrono::time_point 创建 Datetime 对象，并加上本地UTC时间偏差
-     * @tparam Clock 时钟类型
-     * @tparam Duration chrono duration 类型
-     * @param time_point chrono time_point（通常表示 UTC 时间）
+     * @brief Create a Datetime object from std::chrono::time_point and add the local UTC time
+     * offset
+     * @tparam Clock the clock type
+     * @tparam Duration the chrono duration type
+     * @param time_point chrono time_point (usually representing a UTC time)
      * @return Datetime
      */
     template <typename Clock, typename Duration>
     static Datetime fromTimePointUTC(std::chrono::time_point<Clock, Duration> time_point);
 
 public:
-    /** 默认构造函数，Null<Datetime> */
+    /** Default constructor, Null<Datetime> */
     Datetime();
 
     Datetime(const Datetime &);
 
     /**
-     * 构造函数
-     * @param year 年
-     * @param month 月
-     * @param day 日
-     * @param hh 时
-     * @param mm 分
-     * @param sec 秒
-     * @param millisec 毫秒
-     * @param microsec 微秒
+     * Constructor
+     * @param year year
+     * @param month month
+     * @param day day
+     * @param hh hour
+     * @param mm minute
+     * @param sec second
+     * @param millisec millisecond
+     * @param microsec microsecond
      */
     Datetime(long year, long month, long day, long hh = 0, long mm = 0, long sec = 0,
              long millisec = 0, long microsec = 0);
 
-    /** 从boost::gregorian::date构造日期类型 */
+    /** Construct the date type from boost::gregorian::date */
     explicit Datetime(const bd::date &);
 
-    /** 从boost::posix_time::ptime构造 */
+    /** Construct from boost::posix_time::ptime */
     explicit Datetime(const bt::ptime &);
 
     /**
-     * 通过数字方式构造日期类型
-     * @details 支持以下两种数字格式
+     * Construct the date type with a number
+     * @details The following number formats are supported
      * <pre>
-     *     1、YYYYMMDDhhmm，如 200101010000
-     *     2、YYYYMMDD, 如 20010101
-     *     3、YYYYMMDDhhmmss，如 20010101000000
+     *     1. YYYYMMDDhhmm, e.g. 200101010000
+     *     2. YYYYMMDD, e.g. 20010101
+     *     3. YYYYMMDDhhmmss, e.g. 20010101000000
      * </pre>
      */
     explicit Datetime(unsigned long long);
 
     /**
-     * 通过字符串方式构造日期类型
-     * @details 支持以下格式的字符串构造：
+     * Construct the date type with a string
+     * @details The following string formats are supported for the construction:
      * <pre>
-     *     1、"2001-01-01" 或 "2001/1/1"
+     *     1. "2001-01-01" or "2001/1/1"
      *     2、"20010101"
      *     3、"2001-01-01 18:00:00.12345"
      *     4、"20010101T181159"
@@ -147,43 +150,43 @@ public:
 
     Datetime &operator=(const Datetime &);
 
-    /** 年份，如果是 Null 将抛出异常 */
+    /** Year; an exception is thrown if it is Null */
     long year() const;
 
-    /** 月份 [1, 12]，如果是 Null 将抛出异常 */
+    /** Month [1, 12]; an exception is thrown if it is Null */
     long month() const;
 
-    /** 日 [1, 31]，如果是 Null 将抛出异常 */
+    /** Day [1, 31]; an exception is thrown if it is Null */
     long day() const;
 
-    /** 时 [0, 23]，如果是 Null 将抛出异常 */
+    /** Hour [0, 23]; an exception is thrown if it is Null */
     long hour() const;
 
-    /** 分钟 [0, 59]，如果是 Null 将抛出异常 */
+    /** Minute [0, 59]; an exception is thrown if it is Null */
     long minute() const;
 
-    /** 秒 [0, 59]，如果是 Null 将抛出异常 */
+    /** Second [0, 59]; an exception is thrown if it is Null */
     long second() const;
 
-    /** 毫秒 [0, 999]，如果是 Null 将抛出异常 */
+    /** Millisecond [0, 999]; an exception is thrown if it is Null */
     long millisecond() const;
 
-    /** 微秒 [0, 999]，如果是 Null 将抛出异常 */
+    /** Microsecond [0, 999]; an exception is thrown if it is Null */
     long microsecond() const;
 
-    /** 是否为 Null<Datetime> */
+    /** Whether it is Null<Datetime> */
     bool isNull() const;
 
-    /** 日期运算，加指定时长 */
+    /** Date operation, add the given duration */
     Datetime operator+(TimeDelta d) const;
 
-    /** 日期运算，减指定时长 */
+    /** Date operation, subtract the given duration */
     Datetime operator-(TimeDelta d) const;
 
     /**
-     * 日期运算，加 chrono duration
-     * @tparam Rep 表示类型
-     * @tparam Period 周期类型
+     * Date operation, add a chrono duration
+     * @tparam Rep the representation type
+     * @tparam Period the period type
      * @param duration chrono duration
      * @return Datetime
      */
@@ -191,9 +194,9 @@ public:
     Datetime operator+(std::chrono::duration<Rep, Period> duration) const;
 
     /**
-     * 日期运算，减 chrono duration
-     * @tparam Rep 表示类型
-     * @tparam Period 周期类型
+     * Date operation, subtract a chrono duration
+     * @tparam Rep the representation type
+     * @tparam Period the period type
      * @param duration chrono duration
      * @return Datetime
      */
@@ -201,156 +204,158 @@ public:
     Datetime operator-(std::chrono::duration<Rep, Period> duration) const;
 
     /**
-     * 返回如YYYYMMDDhhmm格式的数字，方便比较操作
-     * Null<Datetime>()对应的 number 为 Null<unsigned long long>
-     * @note 精度到分钟
+     * Return a number in the YYYYMMDDhhmm format, convenient for the comparison operations
+     * The number corresponding to Null<Datetime>() is Null<unsigned long long>
+     * @note The precision is up to the minute
      */
     uint64_t number() const noexcept;
 
-    /** 返回如YYYYMMDD格式的数字*/
+    /** Return a number in the YYYYMMDD format */
     uint64_t ym() const noexcept;
 
-    /** 返回如YYYYMMDD格式的数字*/
+    /** Return a number in the YYYYMMDD format */
     uint64_t ymd() const noexcept;
 
-    /** 返回如YYYYMMDDHH格式的数字*/
+    /** Return a number in the YYYYMMDDHH format */
     uint64_t ymdh() const noexcept;
 
-    /** 返回如YYYYMMDDhhmm格式的数字*/
+    /** Return a number in the YYYYMMDDhhmm format */
     uint64_t ymdhm() const noexcept;
 
-    /** 返回如YYYYMMDDhhmmss格式的数字*/
+    /** Return a number in the YYYYMMDDhhmmss format */
     uint64_t ymdhms() const noexcept;
 
     /**
-     * 转化为 oracle datetime 方式的数字，后 7 个字节分别表示世纪、世纪中的年、月、日、时、分、秒
-     * @note 精度到秒
+     * Convert to a number in the oracle datetime way; the last 7 bytes represent the century, the
+     * year in the century, the month, the day, the hour, the minute and the second respectively
+     * @note The precision is up to the second
      */
     uint64_t hex() const noexcept;
 
-    /** 距离最小日期过去的微秒数 */
+    /** The number of the microseconds elapsed since the minimum date */
     uint64_t ticks() const noexcept;
 
-    /** 时间戳，距离1970-01-01 00:00:00的微秒数 */
+    /** Timestamp, the number of the microseconds since 1970-01-01 00:00:00 */
     uint64_t timestamp() const noexcept;
 
-    /** 时间戳，距离1970-01-01 00:00:00的微秒数, 并扣除本地 UTC 偏差时间 */
+    /** Timestamp, the number of the microseconds since 1970-01-01 00:00:00, with the local UTC
+     *  offset deducted */
     uint64_t timestampUTC() const noexcept;
 
     /**
-     * 转化为字符串，供打印阅读，格式：
+     * Convert to a string for the reading and printing, the format is:
      * <pre>
-     * 毫秒数、微秒数为零时： 2019-01-02 01:01:00
-     * 毫秒数、微秒数不为零时：2019-01-02 01:01:00:000001
+     * When the milliseconds and microseconds are zero: 2019-01-02 01:01:00
+     * When they are not zero: 2019-01-02 01:01:00:000001
      * </pre>
      */
     std::string str() const;
 
     /**
-     * 转化为字符串,
-     * 格式为：Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
+     * Convert to a string,
+     * the format is: Datetime(year, month, day, hour, minute, second, millisecond, microsecond)
      */
     std::string repr() const;
 
-    /** 返回 boost::posix_time::ptime */
+    /** Return boost::posix_time::ptime */
     bt::ptime ptime() const;
 
-    /** 返回 boost::gregorian::date */
+    /** Return boost::gregorian::date */
     bd::date date() const;
 
-    /** 返回 std::time_t */
+    /** Return std::time_t */
     std::time_t to_time_t() const;
 
     /**
-     * 转换为 std::chrono::local_time
-     * @tparam Duration 目标 chrono duration 类型，默认为 microseconds
+     * Convert to std::chrono::local_time
+     * @tparam Duration the target chrono duration type, microseconds by default
      * @return chrono local_time
      */
     template <typename Duration = std::chrono::microseconds>
     std::chrono::local_time<Duration> to_local_time() const;
 
-    /** 返回一周中的第几天，周日为0，周一为1 */
+    /** Return the day of the week, Sunday is 0 and Monday is 1 */
     int dayOfWeek() const;
 
-    /** 返回一年中的第几天，1月1日为1年中的第一天 */
+    /** Return the day of the year, January 1 is the first day of the year */
     int dayOfYear() const;
 
-    /** 当日起始日期，即0点 */
+    /** The start date of the day, i.e. 0 o'clock */
     Datetime startOfDay() const;
 
-    /** 当日结束日期，即23:59:59 */
+    /** The end date of the day, i.e. 23:59:59 */
     Datetime endOfDay() const;
 
     /**
-     * 返回指定的本周中第几天的日期，周日为0天，周六为第6天
-     * @param day 指明本周的第几天，如不在0~6之间，将返回Null
+     * Return the date of the given day of this week; Sunday is day 0 and Saturday is day 6
+     * @param day the day of this week; Null is returned if it is not between 0 and 6
      */
     Datetime dateOfWeek(int day) const;
 
-    /** 返回周起始日期（周一） */
+    /** Return the start date of the week (Monday) */
     Datetime startOfWeek() const;
 
-    /** 返回周结束日期（周日） */
+    /** Return the end date of the week (Sunday) */
     Datetime endOfWeek() const;
 
-    /** 返回月度起始日期 */
+    /** Return the start date of the month */
     Datetime startOfMonth() const;
 
-    /** 返回月末日期，如12月31日 */
+    /** Return the end date of the month, such as December 31 */
     Datetime endOfMonth() const;
 
-    /** 返回季度起始日期 */
+    /** Return the start date of the quarter */
     Datetime startOfQuarter() const;
 
-    /** 返回季度结束日期 */
+    /** Return the end date of the quarter */
     Datetime endOfQuarter() const;
 
-    /** 返回半年起始日期 */
+    /** Return the start date of the half year */
     Datetime startOfHalfyear() const;
 
-    /** 返回半年结束日期 */
+    /** Return the end date of the half year */
     Datetime endOfHalfyear() const;
 
-    /** 返回年度起始日期 */
+    /** Return the start date of the year */
     Datetime startOfYear() const;
 
-    /** 返回年度结束日期 */
+    /** Return the end date of the year */
     Datetime endOfYear() const;
 
-    /** 下一自然日 */
+    /** The next natural day */
     Datetime nextDay() const;
 
-    /** 下周起始日期（周一） */
+    /** The start date of the next week (Monday) */
     Datetime nextWeek() const;
 
-    /** 下月起始日期 */
+    /** The start date of the next month */
     Datetime nextMonth() const;
 
-    /** 下一季度起始日期 */
+    /** The start date of the next quarter */
     Datetime nextQuarter() const;
 
-    /** 下一半年度起始日期 */
+    /** The start date of the next half year */
     Datetime nextHalfyear() const;
 
-    /** 下一年度起始日期 */
+    /** The start date of the next year */
     Datetime nextYear() const;
 
-    /** 上一自然日 */
+    /** The previous natural day */
     Datetime preDay() const;
 
-    /** 上一周周一日期 */
+    /** The Monday date of the previous week */
     Datetime preWeek() const;
 
-    /** 上一月起始日期 */
+    /** The start date of the previous month */
     Datetime preMonth() const;
 
-    /** 上一季度起始日期 */
+    /** The start date of the previous quarter */
     Datetime preQuarter() const;
 
-    /** 上一半年度起始日期 */
+    /** The start date of the previous half year */
     Datetime preHalfyear() const;
 
-    /** 上一年度起始日期 */
+    /** The start date of the previous year */
     Datetime preYear() const;
 
 private:
@@ -360,23 +365,25 @@ private:
 HKU_UTILS_API std::ostream &operator<<(std::ostream &, const Datetime &);
 
 /**
- * 日期列表
+ * Date list
  * @ingroup DataType
  */
 typedef std::vector<Datetime> DatetimeList;
 
 /**
- * 获取指定范围的日历日期列表[start,end)，仅仅是日，不含时分秒。
- * @note 如果指定的结束日期过大，可能会耗费大量内存
- * @param start 起始日期
- * @param end 结束日期, 如果为空，将使用 Datetime::max
- * @return [start, end)范围内的日历日期
+ * Get the calendar date list within the given range [start,end), it contains the days only, without
+ * the hour, minute and second.
+ * @note A large amount of memory may be consumed if the given end date is too large
+ * @param start start date
+ * @param end end date; Datetime::max is used when it is empty
+ * @return the calendar dates within the range [start, end)
  */
 DatetimeList HKU_UTILS_API getDateRange(const Datetime &start, const Datetime &end);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// 关系比较函数, 不直接在类中定义是为了支持 Null<>() == d，Null可以放在左边
+// The relational comparison functions are not defined in the class directly in order to support
+// Null<>() == d, i.e. Null can be placed on the left
 //
 ///////////////////////////////////////////////////////////////////////////////
 bool operator==(const Datetime &, const Datetime &);
@@ -412,7 +419,7 @@ inline bool operator<=(const Datetime &d1, const Datetime &d2) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// 加、减法运算补充
+// Supplement of the addition and subtraction operations
 //
 ///////////////////////////////////////////////////////////////////////////////
 inline Datetime operator+(const TimeDelta &delta, const Datetime &date) {
@@ -430,7 +437,7 @@ inline TimeDelta operator-(const Datetime &d1, const Datetime &d2) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// inline 成员函数定义
+// Definition of the inline member functions
 //
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -3,7 +3,7 @@
  *
  *  Copyright (c) hikyuu.org
  *
- *  Created on: 2015年2月8日
+ *  Created on: 2015-2-8
  *      Author: fasiondog
  */
 
@@ -34,7 +34,7 @@ Block::Block(const string& category, const string& name, const string& indexCode
         if (!stock.isNull()) {
             m_data->m_indexStock = stock;
         } else {
-            // 直接忽略不再打印
+            // Ignore it directly, no more printing
             HKU_TRACE("Can't find index stock: {}, will ignore!", indexCode);
         }
     }
@@ -130,7 +130,8 @@ bool Block::add(const Stock& stock) {
 bool Block::add(const string& market_code) {
     const StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock(market_code);
-    // stock 为空时不打印日志，防止打印过多，尤其是部分累积不用的板块在初始化时会打印很多日志
+    // No log is printed when the stock is empty, to prevent too much printing, especially because
+    // some accumulating and unused blocks print a lot of logs during the initialization
     HKU_IF_RETURN(stock.isNull() || have(stock), false);
     if (!m_data) [[unlikely]]
         m_data = make_shared<Data>();
@@ -195,7 +196,7 @@ uint64_t Block::strongHash() const {
         XXH64_update(state, &stkid, sizeof(stkid));
     }
 
-    // 获取最终哈希值
+    // Get the final hash value
     uint64_t result = XXH64_digest(state);
     XXH64_freeState(state);
     return result;

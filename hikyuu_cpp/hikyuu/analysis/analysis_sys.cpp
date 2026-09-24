@@ -97,7 +97,8 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, 
 
     HKU_ERROR_IF_RETURN(stk.isNull(), result, "stock is null!");
 
-    // 保证只统计到 query 指定的最后日期，而不是默认到现在，否则仍有持仓的系统收益不合适
+    // Guarantee that the statistics only go to the last date given by query rather than to now by
+    // default, otherwise the return of a system still holding a position would be inappropriate
     auto date_list = StockManager::instance().getTradingCalendar(query);
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
@@ -143,7 +144,8 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_l
 
     HKU_ERROR_IF_RETURN(stk.isNull(), result, "stock is null!");
 
-    // 保证只统计到 query 指定的最后日期，而不是默认到现在，否则仍有持仓的系统收益不合适
+    // Guarantee that the statistics only go to the last date given by query rather than to now by
+    // default, otherwise the return of a system still holding a position would be inappropriate
     auto date_list = StockManager::instance().getTradingCalendar(query);
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();

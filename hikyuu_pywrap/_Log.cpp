@@ -22,6 +22,6 @@ void export_log(py::module& m) {
       .value("OFF", LOG_LEVEL::LOG_OFF)
       .export_values();
 
-    m.def("get_log_level", get_log_level, "获取当前日志级别");
-    m.def("set_log_level", set_log_level, "设置当前日志级别");
+    m.def("get_log_level", get_log_level, "Get the current log level");
+    m.def("set_log_level", set_log_level, "Set the current log level");
 }

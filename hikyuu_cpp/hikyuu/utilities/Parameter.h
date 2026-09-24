@@ -135,10 +135,11 @@ struct ParamItemRecord {
 #endif
 
 /**
- * 供需要命名参数设定的类使用
- * @details 在需要命名参数设定的类定义中，增加宏PARAMETER_SUPPORT，如：
+ * Used by the classes that need the named parameter settings
+ * @details In the definition of a class that needs the named parameter settings, add the
+ *          PARAMETER_SUPPORT macro, e.g.:
  * @code
- * #//C++示例：
+ * #// C++ example:
  * class Test {
  *     PARAMETER_SUPPORT
  *
@@ -166,22 +167,24 @@ struct ParamItemRecord {
  *
  * @note
  * <pre>
- * 由于Python的限制，目前只支持int、bool、double三种类型，增加新的类型支持，
- * 需要修改以下几处，对于不支持的类型将在add时直接抛出异常，请勿捕捉次异常，
- * 这样导致的程序终止，可以尽快补充需支持的类型：
- * 1、Parameter::support
- * 2、std::ostream& operator <<(std::ostream &os, const Parameter& param)
- * 3、_Parameter.cpp中的AnyToPython、arameter::add<object>、Parameter::set<object>
+ * Because of the limitation of Python, only the int, bool and double types are supported at
+ * present; to add the support of a new type, the following places need to be modified; for an
+ * unsupported type an exception is thrown directly at add, please do not catch this exception, so
+ * that the program termination caused in this way can complete the types to be supported as soon as
+ * possible: 1、Parameter::support 2、std::ostream& operator <<(std::ostream &os, const Parameter&
+ * param)
+ * 3. AnyToPython, Parameter::add<object> and Parameter::set<object> in _Parameter.cpp
  * 4、getNameValueList
- * 5、Parameter的序列化支持 <br/>
- * 在Python中，增加和修改参数，需要先创建或获取Parameter对象实例，通过Parameter示例
- * 造成，之后将Parameter实例直接设定修改，如：
- * 1、在init中增加参数
+ * 5. The serialization support of Parameter <br/>
+ * In Python, to add and modify the parameters a Parameter object instance needs to be created or
+ * got first, and through the Parameter instance it is done, afterwards the Parameter instance is
+ * set and modified directly, e.g.:
+ * 1. Add the parameters in init
  *    param = Parameter();
  *    param.add("n", 1")
  *    param.add("bool", false)
  *    self.setParameter(param)
- * 2、修改参数
+ * 2. Modify the parameters
  *    param = x.getParameter()
  *    param.set("n", 10)
  *    param.set("bool", true)
@@ -202,38 +205,38 @@ public:
 
     Parameter& operator=(Parameter&&);
 
-    /** 判断输入对象是否属于支持的类型 */
+    /** Judge whether the input object belongs to a supported type */
     static bool support(const boost::any&);
 
-    /** 获取所有参数名称列表 */
+    /** Get the name list of all the parameters */
     StringList getNameList() const;
 
-    /** 返回形如"name1=val1,name2=val2,..."的字符串 */
+    /** Return a string in the form "name1=val1,name2=val2,..." */
     string getNameValueList() const;
 
-    /** 是否存在指定名称的参数 */
+    /** Whether a parameter with the given name exists */
     bool have(const string& name) const noexcept {
         return m_params.find(name) != m_params.end();
     }
 
-    /** 获取参数个数 */
+    /** Get the number of the parameters */
     size_t size() const {
         return m_params.size();
     }
 
     /**
-     * 获取指定参数的实际类型
-     * @param name 指定参数名称
+     * Get the actual type of the given parameter
+     * @param name the given parameter name
      * @return "string" | "int" | "double" | "bool" | "Stock" | "Block"
      *         "KQuery" | "KData" | "PriceList" | "DatetimeList"
      */
     string type(const string& name) const;
 
     /**
-     * 设定指定的参数值
-     * @note 已经存在的参数修改其值，不存在的参数进行增加
-     * @param name 参数名称
-     * @param value 参数值
+     * Set the given parameter value
+     * @note An existing parameter has its value modified, a non-existing one is added
+     * @param name parameter name
+     * @param value parameter value
      */
     template <typename ValueType>
     void set(const string& name, ValueType&& value);
@@ -242,18 +245,20 @@ public:
     void set(const string& name, const ValueType& value);
 
     /**
-     * 获取指定的参数值，参数不存在或类型不匹配时，抛出异常
-     * @param name 参数名
-     * @return 参数值
+     * Get the given parameter value; an exception is thrown when the parameter does not exist or
+     * the type does not match
+     * @param name parameter name
+     * @return parameter value
      */
     template <typename ValueType>
     ValueType get(const string& name) const;
 
     /**
-     * 尝试获取指定的参数值，参数不存在或类型不匹配时，返回缺省值
-     * @param name 参数名
-     * @param val 缺省值
-     * @return 参数值
+     * Try to get the given parameter value; the default value is returned when the parameter does
+     * not exist or the type does not match
+     * @param name parameter name
+     * @param val the default value
+     * @return parameter value
      */
     template <typename ValueType>
     ValueType tryGet(const string& name, const ValueType& val) const;
@@ -273,7 +278,7 @@ private:
     param_map_t m_params;
 
 //================================
-// 序列化支持
+// Serialization support
 //================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -381,14 +386,14 @@ public:                                                                     \
     }
 
 /**
- * 支持自定义类参数检查及变化通知
- * 子类需要实现重载以下虚函数接口:
+ * It supports the parameter checking and the change notification of a custom class
+ * The subclass needs to implement (overload) the following virtual function interfaces:
  *    virtual void _checkParam(const string& name) const
- * 基类需要实现以下接口:
+ * The base class needs to implement the following interfaces:
  *    void baseCheckParam(const string& name) const
  *    void paramChanged()
- * 另：python 中一般不需要引出 paramChanged/checkParam/_checkParam，python
- * 类继承时可以自己在初始化时进行检查
+ * Note: paramChanged/checkParam/_checkParam generally do not need to be exposed in python, the
+ * python subclass can do the checking itself during the initialization
  */
 #define PARAMETER_SUPPORT_WITH_CHECK                                         \
 protected:                                                                   \
@@ -524,7 +529,7 @@ void Parameter::set(const string& name, const ValueType& value) {
             if ((m_params[name].type() == typeid(int) ||
                  m_params[name].type() == typeid(int64_t)) &&
                 (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
-                // 忽略，允许设定
+                // Ignored, the setting is allowed
             } else {
                 throw std::logic_error("Mismatching type! need type " +
                                        string(m_params[name].type().name()) +
@@ -548,7 +553,7 @@ void Parameter::set(const string& name, ValueType&& value) {
             if ((m_params[name].type() == typeid(int64_t) ||
                  m_params[name].type() == typeid(int)) &&
                 (typeid(ValueType) == typeid(int64_t) || typeid(ValueType) == typeid(int))) {
-                // 忽略，允许设定
+                // Ignored, the setting is allowed
             } else {
                 throw std::logic_error("Mismatching type! need type " +
                                        string(m_params[name].type().name()) +
@@ -585,7 +590,7 @@ void Parameter::set(const string& name, ValueType&& value) {
             if ((m_params[name].type() == typeid(int) ||
                  m_params[name].type() == typeid(int64_t)) &&
                 (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
-                // 忽略，允许设定
+                // Ignored, the setting is allowed
             } else {
                 throw std::logic_error("Mismatching type! need type " +
                                        string(m_params[name].type().name()) +

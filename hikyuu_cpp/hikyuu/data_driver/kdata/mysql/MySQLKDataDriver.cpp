@@ -1,7 +1,7 @@
 /*
  * MySQLKDataDriverImp.cpp
  *
- *  Created on: 2014年9月3日
+ *  Created on: 2014-9-3
  *      Author: fasiondog
  */
 
@@ -23,7 +23,7 @@ MySQLKDataDriver::~MySQLKDataDriver() {
 bool MySQLKDataDriver::_init() {
     HKU_CHECK(m_connect == nullptr, "Maybe repeat initialization!");
     Parameter connect_param;
-    connect_param.set<string>("db", "");  // 数据库名称须在SQL语句中明确指定
+    connect_param.set<string>("db", "");  // The database must be given in the SQL statement
     connect_param.set<string>("host", getParamFromOther<string>(m_params, "host", "127.0.0.1"));
     connect_param.set<string>("usr", getParamFromOther<string>(m_params, "usr", "root"));
     connect_param.set<string>("pwd", getParamFromOther<string>(m_params, "pwd", ""));
@@ -123,7 +123,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
         }
 
     } catch (...) {
-        // 表可能不存在
+        // The table may not exist
     }
     return result;
 }
@@ -158,7 +158,7 @@ KRecordList MySQLKDataDriver::_getKRecordList(const string& market, const string
             }
         }
     } catch (...) {
-        // 表可能不存在
+        // The table may not exist
     }
     return result;
 }
@@ -171,7 +171,7 @@ size_t MySQLKDataDriver::getCount(const string& market, const string& code,
         result = m_connect->queryNumber(
           fmt::format("select count(1) from {}", _getTableName(market, code, kType)), 0);
     } catch (...) {
-        // 表可能不存在, 不打印异常信息
+        // The table may not exist, the exception information is not printed
         result = 0;
     }
 
@@ -209,7 +209,7 @@ bool MySQLKDataDriver::getIndexRangeByDate(const string& market, const string& c
         }
 
     } catch (...) {
-        // 表可能不存在, 不打印异常信息
+        // The table may not exist, the exception information is not printed
         out_start = 0;
         out_end = 0;
         return false;

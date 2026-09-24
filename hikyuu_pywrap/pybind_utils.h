@@ -56,7 +56,8 @@ std::vector<T> python_bytes_to_vector(const py::bytes& obj) {
 
 template <typename T>
 std::vector<T> python_list_to_vector(const py::sequence& obj) {
-    // 如果 len(obj) 长度为零，即使类型不是所期望的也可能成功，但无风险
+    // If len(obj) is zero it may succeed even when the type is not the expected one, but there is
+    // no risk
     auto total = len(obj);
     std::vector<T> vect(total);
     for (auto i = 0; i < total; ++i) {
@@ -86,8 +87,8 @@ std::string to_py_str(const T& item) {
     return out.str();
 }
 
-// 直接使用 pybind11 重载 _clone，在 C++ 中会丢失 python 中的类型
-// 参考：https://github.com/pybind/pybind11/issues/1049 进行修改
+// Using the pybind11 overload of _clone directly would lose the python type in C++
+// Refer to https://github.com/pybind/pybind11/issues/1049 for the modification
 // PYBIND11_OVERLOAD(IndicatorImpPtr, IndicatorImp, _clone, );
 #define PY_CLONE(pyclassname, classname)                                         \
 public:                                                                          \
@@ -103,7 +104,7 @@ public:                                                                         
         return this->_clone();                                                   \
     }
 
-// 用于检查以 py::object 方式传递的函数参数个数是否符合预期
+// Used to check whether the number of the function arguments passed as py::object is as expected
 inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
     py::module_ inspect = py::module_::import("inspect");
     py::object sig = inspect.attr("signature")(func);
@@ -112,15 +113,16 @@ inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
 }
 
 /*
- * 将utf8编码的字符串转换为utf32编码
- * @param utf8_str 待转换的字符串
- * @param out 存储转换结果的数组(需自行预先分配内存)
- * @param out_len out数组的长度
- * @return 实际转码点数
+ * Convert a utf8 encoded string to the utf32 encoding
+ * @param utf8_str the string to be converted
+ * @param out the array storing the conversion result (the memory needs to be allocated in advance
+ *            by yourself)
+ * @param out_len the length of the out array
+ * @return the actual number of the converted code points
  */
 size_t utf8_to_utf32(const std::string& utf8_str, int32_t* out, size_t out_len) noexcept;
 
-// 从 python 对象获取 StockList 列表
+// Get the StockList from a python object
 inline StockList get_stock_list_from_python(const py::object& stks) {
     StockList ret;
     HKU_IF_RETURN(stks.is_none(), ret);

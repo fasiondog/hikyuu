@@ -13,9 +13,10 @@
 #include "../Stock.h"
 
 //===========================================================================
-// 以下为Stock的序列化，目前仅实现了在StockManager中管理的Stock的序列化
-// 注意，该段代码在namespace hku之外
-// TODO 实现非StockManager管理的Stock的序列化
+// The following is the serialization of Stock; currently only the serialization of the Stock
+// managed in StockManager is implemented
+// Note: this piece of code is outside namespace hku
+// TODO implement the serialization of the Stock that is not managed by StockManager
 //===========================================================================
 #if HKU_SUPPORT_SERIALIZATION
 

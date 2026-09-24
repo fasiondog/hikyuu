@@ -23,15 +23,16 @@ ICycle::ICycle() : IndicatorImp("CYCLE", 1) {
 ICycle::~ICycle() {}
 
 void ICycle::_initParams() {
-    setParam<int>("adjust_cycle", 1);              // 调仓周期
-    setParam<string>("adjust_mode", "query");      // 调仓模式
-    setParam<bool>("delay_to_trading_day", true);  // 延迟至交易日
+    setParam<int>("adjust_cycle", 1);              // Position adjustment cycle
+    setParam<string>("adjust_mode", "query");      // Position adjustment mode
+    setParam<bool>("delay_to_trading_day", true);  // Delay to the trading day
 }
 
 void ICycle::_checkParam(const string& name) const {
     if ("adjust_mode" == name || "adjust_cycle" == name) {
         if (!haveParam("adjust_mode") || !haveParam("adjust_cycle")) {
-            // 同时判断两个参数时，可能一个参数还未设定
+            // When the two parameters are judged at the same time, one of them may not have been
+            // set yet
             return;
         }
         string adjust_mode = getParam<string>("adjust_mode");

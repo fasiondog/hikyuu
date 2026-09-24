@@ -9,7 +9,7 @@
 
 namespace hku {
 
-// 替换掉分位数范围外数值
+// Replace the values outside the quantile range
 PriceList quantile_trunc(const PriceList &src, double quantile_min, double quantile_max) {
     size_t total = src.size();
     PriceList ret(total);

@@ -14,18 +14,26 @@
 namespace hku {
 
 /**
- * 创建一个指定长度的常数指标
- * @param value 常量
- * @param discard 抛弃数量，默认0
+ * Create a constant indicator with the given length
+
+ * @param value the constant
+
+ * @param discard the number to discard, 0 by default
+
  * @ingroup Indicator
  */
 Indicator HKU_API CVAL(double value, size_t discard=0);
 
 /**
- * 创建一个常数指标，其长度和输入的ind相同，其值固定为指定value
- * @param ind 待计算的数据
- * @param value 常量
- * @param discard 抛弃数量，默认0
+ * Create a constant indicator whose length is the same as the input ind and whose value is fixed to
+ * the given value
+
+ * @param ind the data to be calculated
+
+ * @param value the constant
+
+ * @param discard the number to discard, 0 by default
+
  * @ingroup Indicator
  */
 Indicator HKU_API CVAL(const Indicator& ind, double value = 0.0, int discard = 0);

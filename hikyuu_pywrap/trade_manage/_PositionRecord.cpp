@@ -16,7 +16,7 @@ namespace py = pybind11;
 #endif
 
 void export_PositionRecord(py::module& m) {
-    py::class_<PositionRecord>(m, "PositionRecord", "持仓记录")
+    py::class_<PositionRecord>(m, "PositionRecord", "The position record")
       .def(py::init<>())
       .def(py::init<const Stock&, const Datetime&, const Datetime&, double, price_t, price_t,
                     double, price_t, price_t, price_t, price_t>())
@@ -24,58 +24,58 @@ void export_PositionRecord(py::module& m) {
       .def("__str__", &PositionRecord::str)
       .def("__repr__", &PositionRecord::str)
 
-      .def_readwrite("stock", &PositionRecord::stock, "交易对象（Stock）")
-      .def_readwrite("take_datetime", &PositionRecord::takeDatetime, "初次建仓时刻（Datetime）")
+      .def_readwrite("stock", &PositionRecord::stock, "The trading object (Stock)")
+      .def_readwrite("take_datetime", &PositionRecord::takeDatetime, "The initial position building moment (Datetime)")
       .def_readwrite("clean_datetime", &PositionRecord::cleanDatetime,
-                     "平仓日期，当前持仓记录中为 constant.null_datetime")
-      .def_readwrite("number", &PositionRecord::number, "当前持仓数量（float）")
-      .def_readwrite("stoploss", &PositionRecord::stoploss, "当前止损价（float）")
-      .def_readwrite("goal_price", &PositionRecord::goalPrice, "当前的目标价格（float）")
-      .def_readwrite("total_number", &PositionRecord::totalNumber, "累计持仓数量（float）")
-      .def_readwrite("buy_money", &PositionRecord::buyMoney, "累计买入资金（float）")
-      .def_readwrite("total_cost", &PositionRecord::totalCost, "累计交易总成本（float）")
+                     "The closing date; in the current position records it is constant.null_datetime")
+      .def_readwrite("number", &PositionRecord::number, "The current position quantity (float)")
+      .def_readwrite("stoploss", &PositionRecord::stoploss, "The current stop-loss price (float)")
+      .def_readwrite("goal_price", &PositionRecord::goalPrice, "The current target price (float)")
+      .def_readwrite("total_number", &PositionRecord::totalNumber, "The cumulative position quantity (float)")
+      .def_readwrite("buy_money", &PositionRecord::buyMoney, "The cumulative buy funds (float)")
+      .def_readwrite("total_cost", &PositionRecord::totalCost, "The cumulative total trading cost (float)")
       .def_readwrite("total_risk", &PositionRecord::totalRisk,
-                     "累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本")
-      .def_readwrite("sell_money", &PositionRecord::sellMoney, "累计卖出资金（float）")
-      .def_readwrite("buy_count", &PositionRecord::buyCount, "累计买入次数（size_t）")
-      .def_readwrite("sell_count", &PositionRecord::sellCount, "累计卖出次数（size_t）")
+                     "The cumulative trading risk = each (the buy price - the stop-loss) * the buy quantity, excluding the trading costs")
+      .def_readwrite("sell_money", &PositionRecord::sellMoney, "The cumulative sell funds (float)")
+      .def_readwrite("buy_count", &PositionRecord::buyCount, "The cumulative buy count (size_t)")
+      .def_readwrite("sell_count", &PositionRecord::sellCount, "The cumulative sell count (size_t)")
       .def_property_readonly("total_profit", &PositionRecord::totalProfit,
                              R"(total_profit(self):
 
-    累计盈利 = 累计卖出资金 - 累计买入资金 - 累计交易成本
-    注意: 只对已清仓的记录有效, 未清仓的记录返回0  )")
+    The cumulative profit = the cumulative sell funds - the cumulative buy funds - the cumulative trading cost
+    Note: it is only valid for the closed records; the open records return 0  )")
 
         DEF_PICKLE(PositionRecord);
 
-    py::class_<PositionExtInfo>(m, "PositionExtInfo", "扩展持仓信息")
+    py::class_<PositionExtInfo>(m, "PositionExtInfo", "The extended position information")
       .def(py::init<>())
       .def_readwrite("position", &PositionExtInfo::position, "PositionRecord")
       .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice,
-                     "当前收盘价（float）")
-      .def_readwrite("max_high_price", &PositionExtInfo::maxHighPrice, "期间最高价最大值")
-      .def_readwrite("min_low_price", &PositionExtInfo::minLowPrice, "期间最低价最小值")
-      .def_readwrite("max_close_price", &PositionExtInfo::maxClosePrice, "期间收盘价最高值")
-      .def_readwrite("min_close_price", &PositionExtInfo::minClosePrice, "期间收盘价最低值")
-      .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice, "当前收盘价")
+                     "The current close price (float)")
+      .def_readwrite("max_high_price", &PositionExtInfo::maxHighPrice, "The maximum of the highest prices in the period")
+      .def_readwrite("min_low_price", &PositionExtInfo::minLowPrice, "The minimum of the lowest prices in the period")
+      .def_readwrite("max_close_price", &PositionExtInfo::maxClosePrice, "The highest close price in the period")
+      .def_readwrite("min_close_price", &PositionExtInfo::minClosePrice, "The lowest close price in the period")
+      .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice, "The current close price")
       .def_readwrite("max_pull_back1", &PositionExtInfo::maxPullBack1,
-                     "最大回撤比例1(仅使用最大收盘价和最低收盘价计算)(负数)")
+                     "The maximum drawdown ratio 1 (calculated only with the maximum close price and the lowest close price) (a negative number)")
       .def_readwrite("max_pull_back2", &PositionExtInfo::maxPullBack2,
-                     "最大回撤比例2(使用期间最高价最大值和最低价最小值计算)（负数）")
+                     "The maximum drawdown ratio 2 (calculated with the maximum of the highest prices and the minimum of the lowest prices in the period) (a negative number)")
       .def_readwrite("current_profit", &PositionExtInfo::currentProfit,
-                     "当前浮动盈亏(不含预计卖出成本)")
+                     "The current floating profit and loss (excluding the estimated sell cost)")
 
       .def("current_pull_back1", &PositionExtInfo::currentPullBack1,
-           "当前回撤百分比1(仅使用最大收盘价和当前收盘价计算)")
+           "The current drawdown percentage 1 (calculated only with the maximum close price and the current close price)")
       .def("current_pull_back2", &PositionExtInfo::currentPullBack2,
-           "当前回撤百分比2(使用期间最高价最大值和最低价最小值计算)")
+           "The current drawdown percentage 2 (calculated with the maximum of the highest prices in the period and the current close price)")
       .def("max_floating_profit1", &PositionExtInfo::maxFloatingProfit1,
-           "期间最大浮盈1 (正数, 仅使用收盘价计算, 不含预计卖出成本, 多次买卖时统计不准)")
+           "The maximum floating profit 1 in the period (a positive number, calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
       .def("max_floating_profit2", &PositionExtInfo::maxFloatingProfit2,
-           "期间最大浮盈2 (正数, 使用最高值最大值进行计算,不含预计卖出成本，多次买卖时统计不准)")
+           "The maximum floating profit 2 in the period (a positive number, calculated with the maximum of the highest prices, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
       .def("min_loss_profit1", &PositionExtInfo::minLossProfit1,
-           "期间最大浮亏1（负数，仅使用收盘价计算, 不含预计卖出成本，多次买卖时统计不准)")
+           "The maximum floating loss 1 in the period (a negative number, calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
       .def("min_loss_profit2", &PositionExtInfo::minLossProfit2,
-           "期间最大浮亏2（负数，仅期间最低价计算, 不含预计卖出成本，多次买卖时统计不准)")
+           "The maximum floating loss 2 in the period (a negative number, calculated only with the lowest price in the period, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
 
         DEF_PICKLE(PositionExtInfo);
 
@@ -88,21 +88,21 @@ void export_PositionRecord(py::module& m) {
           struct alignas(8) RawData {
               int32_t code[10];
               int32_t name[20];
-              int64_t take_datetime;        // 买入日期
-              int64_t hold_days;            // 已持仓天数
-              double number;                // 当前持仓数量
-              double invest;                // 当前投入金额
-              double current_market_value;  // 当前市值
-              double profit;                // 当前盈亏金额
-              double profit_ratio;          // 当前盈亏比例
-              double stoploss;              // 当前止损价
-              double goal_price;            // 当前的目标价格
-              int64_t clean_datetime;       // 卖出日期
-              double total_number;          // 累计持仓数量
-              double total_cost;            // 累计交易成本
-              double total_risk;  // 累计交易风险 = 各次 （买入价格-止损)*买入数量, 不包含交易成本
-              double buy_money;   // 累计投入金额
-              double sell_money;  // 累计卖出资金
+              int64_t take_datetime;        // The buy date
+              int64_t hold_days;            // The held days
+              double number;                // The current position quantity
+              double invest;                // The current invested amount
+              double current_market_value;  // The current market value
+              double profit;                // The current profit/loss amount
+              double profit_ratio;          // The current profit/loss ratio
+              double stoploss;              // The current stop-loss price
+              double goal_price;            // The current target price
+              int64_t clean_datetime;       // The sell date
+              double total_number;          // The cumulative position quantity
+              double total_cost;            // The cumulative trading cost
+              double total_risk;  // The cumulative trading risk = each (the buy price - the stop-loss) * the buy quantity, excluding the trading costs
+              double buy_money;   // The cumulative invested amount
+              double sell_money;  // The cumulative sell funds
           };
 
           RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
@@ -154,9 +154,9 @@ void export_PositionRecord(py::module& m) {
           return py::array(dtype, total, static_cast<RawData*>(data),
                            py::capsule(data, [](void* p) { std::free(p); }));
       },
-      R"(将持仓列表转换为Numpy
+      R"(Convert the position list to Numpy
     
-    注意: 其中的当前市值、利润、盈亏等计算值均以日线计算, 如使用日线一下级别回测时, 对未清仓的持仓记录需要自行重新计算！)");
+    Note: the calculated values such as the current market value, the profit and the profit/loss are all calculated by the daily line; when backtesting with a level below the daily line, you need to recalculate the open position records yourself!)");
 
     m.def(
       "positions_to_df",
@@ -166,7 +166,7 @@ void export_PositionRecord(py::module& m) {
               return py::module_::import("pandas").attr("DataFrame")();
           }
 
-          // 创建各列数据容器
+          // Create the data containers of each column
           py::list code_list(total);
           py::list name_list(total);
           py::array_t<int64_t> take_time_arr(total);
@@ -185,7 +185,7 @@ void export_PositionRecord(py::module& m) {
           py::array_t<double> buy_money_arr(total);
           py::array_t<double> sell_money_arr(total);
 
-          // 获取各数组缓冲区
+          // Get the buffers of each array
           auto take_time_buf = take_time_arr.request();
           auto hold_days_buf = hold_days_arr.request();
           auto hold_number_buf = hold_number_arr.request();
@@ -218,7 +218,7 @@ void export_PositionRecord(py::module& m) {
           double* buy_money_ptr = static_cast<double*>(buy_money_buf.ptr);
           double* sell_money_ptr = static_cast<double*>(sell_money_buf.ptr);
 
-          // 填充数据
+          // Fill the data
           for (size_t i = 0; i < total; i++) {
               const PositionRecord& p = positions[i];
               if (!p.stock.isNull()) {
@@ -268,7 +268,7 @@ void export_PositionRecord(py::module& m) {
               sell_money_ptr[i] = p.sellMoney;
           }
 
-          // 构建 DataFrame
+          // Build the DataFrame
           auto pandas = py::module_::import("pandas");
           py::dict columns;
           columns[htr("market_code").c_str()] =
@@ -295,11 +295,11 @@ void export_PositionRecord(py::module& m) {
       },
       R"(positions_to_df(positions)
 
-    将持仓记录列表转换为 pandas DataFrame
+    Convert the position record list to a pandas DataFrame
 
-    注意: 其中的当前市值、利润、盈亏等计算值均以日线计算, 如使用日线一下级别回测时, 对未清仓的持仓记录需要自行重新计算！
+    Note: the calculated values such as the current market value, the profit and the profit/loss are all calculated by the daily line; when backtesting with a level below the daily line, you need to recalculate the open position records yourself!
 
-    :param PositionRecordList positions: 持仓记录列表
-    :return: 包含持仓记录的 pandas DataFrame
+    :param PositionRecordList positions: the position record list
+    :return: a pandas DataFrame containing the position records
     :rtype: pandas.DataFrame)");
 }

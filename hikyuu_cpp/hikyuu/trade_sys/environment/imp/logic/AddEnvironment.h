@@ -26,7 +26,7 @@ private:
     EnvironmentPtr m_ev2;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

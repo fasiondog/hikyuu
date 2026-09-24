@@ -1,7 +1,7 @@
 /*
  * test_BETWEEN.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 
@@ -20,11 +20,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BETWEEN") {
     Indicator result;
 
-    /** @arg 所有参数均为 ind */
+    /** @arg All the parameters are ind */
     PriceList aval;
     for (int i = 0; i < 10; i++) {
         aval.push_back(i);
@@ -55,7 +55,7 @@ TEST_CASE("test_BETWEEN") {
         }
     }
 
-    /** @arg a 为ind，b、c均为数字 */
+    /** @arg a is an ind while b and c are numbers */
     result = BETWEEN(a, 5, 3);
     CHECK_EQ(result.name(), "BETWEEN");
     CHECK_EQ(result.discard(), 0);
@@ -67,7 +67,7 @@ TEST_CASE("test_BETWEEN") {
         }
     }
 
-    /** @arg a 为数字，b、c中一个为 ind，一个为数字 */
+    /** @arg a is a number; of b and c one is an ind and the other a number */
     result = BETWEEN(2, b, 2);
     CHECK_EQ(result.name(), "BETWEEN");
     CHECK_EQ(result.discard(), 0);
@@ -84,7 +84,7 @@ TEST_CASE("test_BETWEEN") {
         CHECK_EQ(result[i], 1);
     }
 
-    /** @arg a、b、c均为数字 */
+    /** @arg a, b and c are all numbers */
     result = BETWEEN(1, 2, 3);
     CHECK_EQ(result.name(), "BETWEEN");
     CHECK_EQ(result.size(), 1);
@@ -97,7 +97,7 @@ TEST_CASE("test_BETWEEN") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BETWEEN_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

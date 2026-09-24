@@ -21,14 +21,14 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GROUP_FUNC") {
     HKU_IF_RETURN(!pluginValid(), void());
 
     auto stk = getStock("sh000001");
     auto mink = stk.getKData(KQueryByDate(Datetime(20111115), Datetime(20111120), KQuery::MIN));
 
-    /** @arg 分钟线按日分组 */
+    /** @arg The minute lines grouped by day */
     // group_func_t =
     //   std::function<void(Indicator::value_t * dst, const DatetimeList& src_ds,
     //                      const Indicator::value_t* src, size_t group_start, size_t group_last)>;

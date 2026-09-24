@@ -1,7 +1,7 @@
 /*
  * SL_FixedValue.h
  *
- *  Created on: 2016年5月7日
+ *  Created on: 2016-5-7
  *      Author: Administrator
  */
 
@@ -12,10 +12,10 @@
 namespace hku {
 
 /**
- * 均匀分布随机价格移滑价差算法, 买入和卖出操作是价格在[min_value,
- * max_value]范围内的均匀分布随机偏移
- * @param min_value 偏移价格下限
- * @param max_value 偏移价格上限
+ * Uniform distribution random price slippage algorithm: the buy and sell operations are a random
+ * offset of the price with a uniform distribution within the range [min_value, max_value]
+ * @param min_value the lower limit of the offset price
+ * @param max_value the upper limit of the offset price
  * @return
  */
 SlippagePtr HKU_API SP_Uniform(double min_value = -0.05, double max_value = 0.05);

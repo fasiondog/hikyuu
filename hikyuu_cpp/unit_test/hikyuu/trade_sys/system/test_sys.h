@@ -1,7 +1,7 @@
 /*
  * test_sys.h
  *
- *  Created on: 2018年1月20日
+ *  Created on: 2018-1-20
  *      Author: fasiondog
  */
 
@@ -13,9 +13,9 @@
 
 using namespace hku;
 
-class TestEV1: public EnvironmentBase {
+class TestEV1 : public EnvironmentBase {
 public:
-    TestEV1(): EnvironmentBase("TEST_EV1") {};
+    TestEV1() : EnvironmentBase("TEST_EV1") {};
     virtual ~TestEV1() {}
 
     virtual EnvironmentPtr _clone() {
@@ -30,9 +30,9 @@ public:
     };
 };
 
-class TestEV2: public EnvironmentBase {
+class TestEV2 : public EnvironmentBase {
 public:
-    TestEV2(): EnvironmentBase("TEST_EV2") {};
+    TestEV2() : EnvironmentBase("TEST_EV2") {};
     virtual ~TestEV2() {}
 
     virtual EnvironmentPtr _clone() {
@@ -51,9 +51,9 @@ public:
     };
 };
 
-class TestEV3: public EnvironmentBase {
+class TestEV3 : public EnvironmentBase {
 public:
-    TestEV3(): EnvironmentBase("TEST_EV3") {};
+    TestEV3() : EnvironmentBase("TEST_EV3") {};
     virtual ~TestEV3() {}
 
     virtual EnvironmentPtr _clone() {
@@ -66,9 +66,9 @@ public:
     };
 };
 
-class TestCN1: public ConditionBase {
+class TestCN1 : public ConditionBase {
 public:
-    TestCN1(): ConditionBase("Test_CN1") {}
+    TestCN1() : ConditionBase("Test_CN1") {}
     virtual ~TestCN1() {}
 
     virtual ConditionPtr _clone() {
@@ -83,9 +83,9 @@ public:
     }
 };
 
-class TestCN2: public ConditionBase {
+class TestCN2 : public ConditionBase {
 public:
-    TestCN2(): ConditionBase("Test_CN2") {}
+    TestCN2() : ConditionBase("Test_CN2") {}
     virtual ~TestCN2() {}
 
     virtual ConditionPtr _clone() {
@@ -102,9 +102,9 @@ public:
     }
 };
 
-class TestCN3: public ConditionBase {
+class TestCN3 : public ConditionBase {
 public:
-    TestCN3(): ConditionBase("Test_CN3") {}
+    TestCN3() : ConditionBase("Test_CN3") {}
     virtual ~TestCN3() {}
 
     virtual ConditionPtr _clone() {
@@ -116,7 +116,5 @@ public:
         _addValid(Datetime(200001060000LL));
     }
 };
-
-
 
 #endif /* LIBS_HIKYUU_TRADE_SYS_SYSTEM_TEST_SYS_H_ */

@@ -1,7 +1,7 @@
 /*
  * AF_EqualWeight.h
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  */
 
@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * @brief 等权重资产分配，对选中的资产进行等比例分配
+ * @brief Equal weight asset allocation, it allocates the selected assets in equal proportions
  * @return AFPtr
  * @ingroup AllocateFunds
  */

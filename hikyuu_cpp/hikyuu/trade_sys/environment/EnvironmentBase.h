@@ -18,8 +18,8 @@
 namespace hku {
 
 /**
- * 环境判定策略基类
- * @note 外部环境应该和具体的交易对象没有关系
+ * Base class of the market environment strategy
+ * @note The external environment should have nothing to do with the concrete trading object
  * @ingroup Environment
  */
 class HKU_API EnvironmentBase : public enable_shared_from_this<EnvironmentBase> {
@@ -30,67 +30,70 @@ public:
     explicit EnvironmentBase(const string& name);
     virtual ~EnvironmentBase();
 
-    // 用于 python clone, 但由于 mutex, 是非线程安全的
+    // Used for the python clone, but it is not thread safe because of the mutex
     EnvironmentBase(const EnvironmentBase&);
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const {
         return m_name;
     }
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name) {
         m_name = name;
     }
 
-    /** 复位 */
+    /** Reset */
     void reset();
 
-    /** 设置查询条件 */
+    /** Set the query condition */
     void setQuery(const KQuery& query);
 
-    /** 获取查询条件 */
+    /** Get the query condition */
     const KQuery& getQuery() const {
         return m_query;
     }
 
     typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
     /**
-     * 克隆操作
-     * @note Environment不同于其他的系统策略组件，它是不和特定的交易对象绑定的，可以共享，本质是
-     *       上是不需要clone操作的，这里仅仅是为了整齐以及可能存在的特殊场景使用。
+     * Clone operation
+     * @note Unlike the other trading-system parts, the Environment is not bound to a specific
+     *       instrument and can be shared, so essentially the clone operation is not needed
+     * here; it exists only for the consistency and the possibly existing special scenarios.
      */
     EnvironmentPtr clone();
 
     /**
-     * 加入有效时间，在_calculate中调用
-     * @param datetime 系统有效日期
-     * @param value 默认为1.0，大于0表示有效，小于等于0表示无效
+     * Add a valid time, it is called in _calculate
+     * @param datetime the valid date of the system
+     * @param value 1.0 by default; greater than 0 means valid and less than or equal to 0 means
+     *              invalid
      */
     void _addValid(const Datetime& datetime, price_t value = 1.0);
 
     /**
-     * 判断指定日期的外部环境是否有效
-     * @param datetime 指定日期
-     * @return true 有效 | false 无效
+     * Judge whether the external environment of the given date is valid
+     * @param datetime the given date
+     * @return true valid | false invalid
      */
     bool isValid(const Datetime& datetime) const;
 
     price_t getValue(const Datetime& datetime) const;
 
     /**
-     * 以指标的形式获取实际值，与交易对象等长，<=0表示无效，>0表示系统有效
-     * @note 带日期的时间序列指标
+     * Get the actual value in the form of an indicator, it is as long as the trading object; <=0
+     * means invalid and >0 means the system is valid
+     * @note A time series indicator with the dates
      */
     Indicator getValues() const;
 
-    /** 子类计算接口 */
+    /** Subclass calculation interface */
     virtual void _calculate() = 0;
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual EnvironmentPtr _clone() = 0;
 
     bool isPythonObject() const noexcept {
@@ -107,7 +110,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -116,7 +119,8 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        // ev可能多个系统共享，保留m_query可能用于查错
+        // ev may be shared by multiple systems; m_query is kept and may be used for the
+        // troubleshooting
         ar& BOOST_SERIALIZATION_NVP(m_query);
         ar& BOOST_SERIALIZATION_NVP(m_date_index);
         ar& BOOST_SERIALIZATION_NVP(m_values);
@@ -143,7 +147,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(EnvironmentBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public EnvironmentBase {
  *     ENVIRONMENT_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -167,7 +172,7 @@ private:                                                          \
 #endif
 
 /**
- * 客户程序都应使用该指针类型
+ * Client programs should all use this pointer type
  * @ingroup Environment
  */
 typedef shared_ptr<EnvironmentBase> EnvironmentPtr;
@@ -181,7 +186,7 @@ public:                                        \
     virtual void _calculate() override;
 
 /**
- * 输出Environment信息，如：Environment(name, params[...])
+ * Output the Environment information, e.g. Environment(name, params[...])
  * @ingroup Environment
  */
 HKU_API std::ostream& operator<<(std::ostream& os, const EnvironmentPtr&);

@@ -12,7 +12,7 @@ namespace py = pybind11;
 using namespace hku;
 
 void export_IndParam(py::module& m) {
-    py::class_<IndParam>(m, "IndParam", "技术指标")
+    py::class_<IndParam>(m, "IndParam", "The technical indicator")
       .def(py::init<>())
       .def(py::init<IndicatorImpPtr>())
       .def(py::init<Indicator>())

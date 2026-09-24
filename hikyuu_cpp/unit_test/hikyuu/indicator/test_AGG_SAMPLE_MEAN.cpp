@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_MEAN") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -29,14 +29,14 @@ TEST_CASE("test_AGG_SAMPLE_MEAN") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试默认参数（9:30-10:00时间段平均值） */
+    /** @arg Test the default parameter (the average in the 9:30-10:00 range) */
     auto ind = AGG_SAMPLE_MEAN(CLOSE());
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MEAN");
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 验证时间段平均值 - 计算9:30到10:00之间的平均收盘价 */
+    /** @arg Verify the average - calculate the mean close between 9:30 and 10:00 */
     double sum_value = 0.0;
     int count = 0;
     for (auto& kr : mink) {
@@ -51,7 +51,7 @@ TEST_CASE("test_AGG_SAMPLE_MEAN") {
     CHECK_EQ(result[0], doctest::Approx(expected_value));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_MEAN_time_range") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -59,13 +59,13 @@ TEST_CASE("test_AGG_SAMPLE_MEAN_time_range") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Datetime(20111116), KQuery::MIN));
 
-    /** @arg 测试指定时间段参数（10:00-11:00） */
+    /** @arg Test the given time range parameter (10:00-11:00) */
     auto ind = AGG_SAMPLE_MEAN(CLOSE(), "10:00", "11:00");
     auto result = ind(k);
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result.name(), "AGG_SAMPLE_MEAN");
 
-    /** @arg 验证时间段平均值 */
+    /** @arg Verify the average of the time range */
     double sum_value = 0.0;
     int count = 0;
     for (auto& kr : mink) {
@@ -85,7 +85,7 @@ TEST_CASE("test_AGG_SAMPLE_MEAN_time_range") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_SAMPLE_MEAN_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

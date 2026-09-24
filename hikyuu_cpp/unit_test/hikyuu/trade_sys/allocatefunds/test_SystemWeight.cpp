@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点，不自动调仓 */
+/** @par Test point, no automatic position adjustment */
 TEST_CASE("test_SystemWeight") {
     // SystemWeight w;
     // CHECK_EQ(w.getWeight(), 1.0);

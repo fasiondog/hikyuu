@@ -17,12 +17,12 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 Portfolio基础操作 */
+/** @par Test point: the basic operations of Portfolio */
 TEST_CASE("test_PF_for_base") {
     PortfolioPtr pf = PF_Simple();
     CHECK_EQ(pf->name(), "PF_Simple");
 
-    /** @arg 克隆操作 */
+    /** @arg The clone operation */
     PFPtr pf2 = pf->clone();
     CHECK_NE(pf2.get(), pf.get());
     CHECK_EQ(pf2->name(), pf->name());

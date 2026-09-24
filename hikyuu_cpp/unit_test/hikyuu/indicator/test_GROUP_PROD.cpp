@@ -21,14 +21,14 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GROUP_PROD") {
     HKU_IF_RETURN(!pluginValid(), void());
 
     auto stk = getStock("sh000001");
     auto mink = stk.getKData(KQueryByDate(Datetime(20111115), Datetime(20111120), KQuery::MIN));
 
-    /** @arg 分钟线按日分组 */
+    /** @arg The minute lines grouped by day */
     auto ind = GROUP_PROD(CLOSE(), KQuery::DAY);
     auto result = ind(mink);
     CHECK_EQ(result.name(), "GROUP_PROD");

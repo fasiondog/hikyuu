@@ -20,26 +20,26 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_HT_PHASOR") {
     KData kdata = getKData("sh000001", KQuery(-10));
     Indicator c = CLOSE(kdata);
 
-    /** @arg KData 为空 */
+    /** @arg KData is empty */
     Indicator result = TA_HT_PHASOR(KData().close());
     CHECK_EQ(result.name(), "TA_HT_PHASOR");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.getResultNumber(), 2);
 
-    /** @arg KData 长度小于默认参数抛弃数量 */
+    /** @arg The KData length is less than the discard count of the default parameters */
     result = TA_HT_PHASOR(c);
     CHECK_EQ(result.name(), "TA_HT_PHASOR");
     CHECK_EQ(result.discard(), 10);
     CHECK_EQ(result.size(), 10);
     CHECK_EQ(result.getResultNumber(), 2);
 
-    // /** @arg 正常情况 */
+    // /** @arg The normal case */
     kdata = getKData("sh000001", KQuery(-40));
     result = TA_HT_PHASOR(CLOSE(kdata));
     CHECK_EQ(result.name(), "TA_HT_PHASOR");
@@ -57,7 +57,7 @@ TEST_CASE("test_TA_HT_PHASOR") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_HT_PHASOR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

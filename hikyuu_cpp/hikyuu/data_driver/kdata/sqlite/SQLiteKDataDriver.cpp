@@ -1,7 +1,7 @@
 /*
  * SQLiteKDataDriver.cpp
  *
- *   Created on: 2023年09月14日
+ *   Created on: 2023-09-14
  *       Author: yangrq1018
  */
 
@@ -157,7 +157,7 @@ KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const strin
             }
         }
     } catch (...) {
-        // 表可能不存在
+        // The table may not exist
         HKU_ERROR("Failed to get record by index: {}", key);
     }
     return result;
@@ -196,7 +196,7 @@ KRecordList SQLiteKDataDriver::_getKRecordList(const string& market, const strin
             }
         }
     } catch (...) {
-        // 表可能不存在
+        // The table may not exist
         HKU_ERROR("Failed to get record by date: {}", key);
     }
     return result;
@@ -242,7 +242,7 @@ bool SQLiteKDataDriver::getIndexRangeByDate(const string& market, const string& 
                                                    tablename, query.endDatetime().number()),
                                        0);
     } catch (...) {
-        // 表可能不存在, 不打印异常信息
+        // The table may not exist, the exception information is not printed
         out_start = 0;
         out_end = 0;
         return false;

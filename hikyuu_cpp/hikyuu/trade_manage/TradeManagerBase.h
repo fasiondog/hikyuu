@@ -23,11 +23,12 @@ namespace hku {
 class HKU_API Performance;
 
 /**
- * 账户交易管理基类，管理帐户的交易记录及资金使用情况
+ * Base class of the account trade management; it manages the trade records and the fund usage of
+ * the account
  * @details
  * <pre>
- * 默认参数：
- * precision(int): 2 计算精度
+ * Default parameters:
+ * precision(int): 2 calculation precision
  * </pre>
  * @ingroup TradeManagerClass
  */
@@ -41,43 +42,43 @@ public:
 
     TradeManagerBase(const string& name, const TradeCostPtr& costFunc)
     : m_name(name), m_costfunc(costFunc), m_broker_last_datetime(Datetime::now()) {
-        setParam<int>("precision", 2);  // 计算精度
+        setParam<int>("precision", 2);  // Calculation precision
     }
 
     virtual ~TradeManagerBase() {}
 
-    /** 账户名称 */
+    /** Account name */
     const string& name() const {
         return m_name;
     }
 
-    /** 设置账户名称 */
+    /** Set the account name */
     void name(const string& name) {
         m_name = name;
     }
 
-    /** 交易精度 */
+    /** Trade precision */
     int precision() const {
         return getParam<int>("precision");
     }
 
-    /** 获取交易成本算法指针 */
+    /** Get the trade cost algorithm pointer */
     TradeCostPtr costFunc() const {
         return m_costfunc;
     }
 
-    /** 设置交易成本算法指针 */
+    /** Set the trade cost algorithm pointer */
     void costFunc(const TradeCostPtr& func) {
         m_costfunc = func;
     }
 
     /**
-     * 计算买入成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 买入价格
-     * @param num 买入数量
-     * @return CostRecord 交易成本记录
+     * Calculate the buy cost
+     * @param datetime trade date
+     * @param stock traded security
+     * @param price buy price
+     * @param num buy quantity
+     * @return CostRecord trade cost record
      */
     CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                           double num) const {
@@ -85,12 +86,12 @@ public:
     }
 
     /**
-     * 计算卖出成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 卖出价格
-     * @param num 卖出数量
-     * @return CostRecord 交易成本记录
+     * Calculate the sell cost
+     * @param datetime trade date
+     * @param stock traded security
+     * @param price sell price
+     * @param num sell quantity
+     * @return CostRecord trade cost record
      */
     CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
                            double num) const {
@@ -98,19 +99,19 @@ public:
     }
 
     /**
-     * 计算计入现金时的费用成本
-     * @param datetime 借入日期
-     * @param cash 现金额
+     * Calculate the cost charged when the cash is credited
+     * @param datetime borrow date
+     * @param cash cash amount
      */
     CostRecord getBorrowCashCost(const Datetime& datetime, price_t cash) {
         return m_costfunc ? m_costfunc->getBorrowCashCost(datetime, cash) : CostRecord();
     }
 
     /**
-     * 计算归还融资成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param cash 归还金额
+     * Calculate the cost of repaying the margin financing
+     * @param borrow_datetime borrow date
+     * @param return_datetime repayment date
+     * @param cash repaid amount
      */
     CostRecord getReturnCashCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
                                  price_t cash) {
@@ -119,11 +120,11 @@ public:
     }
 
     /**
-     * 计算融劵借入成本
-     * @param datetime 融劵日期
-     * @param stock 借入的对象
-     * @param price 每股价格
-     * @param num 借入的数量
+     * Calculate the cost of borrowing through securities lending
+     * @param datetime securities lending date
+     * @param stock borrowed security
+     * @param price price per share
+     * @param num borrowed quantity
      */
     CostRecord getBorrowStockCost(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num) {
@@ -132,12 +133,12 @@ public:
     }
 
     /**
-     * 计算融劵归还成本
-     * @param borrow_datetime 借入日期
-     * @param return_datetime 归还日期
-     * @param stock 归还的对象
-     * @param price 归还时每股价格
-     * @param num 归还的数量
+     * Calculate the cost of returning through securities lending
+     * @param borrow_datetime borrow date
+     * @param return_datetime return date
+     * @param stock returned security
+     * @param price price per share when returning
+     * @param num returned quantity
      */
     CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
                                   const Stock& stock, price_t price, double num) {
@@ -146,17 +147,17 @@ public:
                           : CostRecord();
     }
 
-    /** 从哪个时刻开始启动订单代理进行下单操作   */
+    /** From which moment the order broker is started to place orders */
     Datetime getBrokerLastDatetime() const {
         return m_broker_last_datetime;
     }
 
-    /** 设置开始订单代理操作的时刻 */
+    /** Set the moment from which the order broker starts operating */
     void setBrokerLastDatetime(const Datetime& date) {
         m_broker_last_datetime = date;
     }
 
-    /** 复位，清空交易、持仓记录 */
+    /** Reset, clearing the trade and position records */
     void reset() {
         _reset();
     }
@@ -165,7 +166,7 @@ public:
         HKU_WARN("The subclass does not implement a reset method");
     }
 
-    /** 执行 clone 操作 */
+    /** Perform the clone operation */
     shared_ptr<TradeManagerBase> clone() {
         shared_ptr<TradeManagerBase> p = _clone();
         HKU_CHECK(p, "Invalid ptr from _clone!");
@@ -184,33 +185,33 @@ public:
     }
 
     /**
-     * 注册订单代理
-     * @param broker 订单代理实例
+     * Register an order broker
+     * @param broker order broker instance
      */
     void regBroker(const OrderBrokerPtr& broker) {
         m_broker_list.push_back(broker);
     }
 
     /**
-     * 清空已注册的订单代理
+     * Clear the registered order brokers
      */
     void clearBroker() {
         m_broker_list.clear();
     }
 
     /**
-     * 获取指定日期列表中的所有日资产记录
-     * @param dates 日期列表
-     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
-     * @return 日资产记录列表
+     * Get all the daily asset records of the given date list
+     * @param dates date list
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return daily asset record list
      */
     FundsList getFundsList(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
-     * 获取资产净值曲线，含借入的资产
-     * @param dates 日期列表，根据该日期列表获取其对应的资产净值曲线
-     * @param ktype K线类型，必须与日期列表匹配，默认KQuery::DAY
-     * @return 资产净值列表
+     * Get the net value curve of the assets, including the borrowed assets
+     * @param dates date list, the net value curve is derived from it
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return net asset value list
      */
     PriceList getFundsCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
@@ -223,10 +224,10 @@ public:
     }
 
     /**
-     * 获取收益曲线，即扣除历次存入资金后的资产净值曲线
-     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
-     * @return 收益曲线
+     * Get the profit curve, i.e. the net asset value curve after deducting every deposit
+     * @param dates date list, the profit curve is derived from it; it should be in ascending order
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return profit curve
      */
     PriceList getProfitCurve(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
@@ -239,10 +240,10 @@ public:
     }
 
     /**
-     * 获取累积收益率曲线
-     * @param dates 日期列表
-     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
-     * @return 收益率曲线
+     * Get the cumulative return rate curve
+     * @param dates date list
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return return rate curve
      */
     PriceList getProfitCumChangeCurve(const DatetimeList& dates,
                                       const KQuery::KType& ktype = KQuery::DAY) {
@@ -255,10 +256,10 @@ public:
     }
 
     /**
-     * 获取投入本值资产曲线
-     * @param dates 日期列表，根据该日期列表获取其对应的收益曲线，应为递增顺序
-     * @param ktype K线类型，必须与日期列表匹配，默认为KQuery::DAY
-     * @return 价格曲线
+     * Get the invested base asset curve
+     * @param dates date list, the curve is derived from it; it should be in ascending order
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return price curve
      */
     PriceList getBaseAssetsCurve(const DatetimeList& dates,
                                  const KQuery::KType& ktype = KQuery::DAY) {
@@ -271,51 +272,53 @@ public:
     }
 
     /**
-     * 根据权息信息更新当前持仓与交易情况
-     * @note 必须按时间顺序调用
-     * @param datetime 当前时刻
+     * Update the current positions and trades according to the weight (adjustment) information
+     * @note It must be called in chronological order
+     * @param datetime the current moment
      */
     virtual void updateWithWeight(const Datetime& datetime) {
         HKU_WARN("The subclass does not implement a updateWithWeight method");
     }
 
     /**
-     * 获取指定对象的保证金比率
-     * @param datetime 日期
-     * @param stock 指定对象
+     * Get the margin rate of the given security
+     * @param datetime date
+     * @param stock the given security
      */
     virtual double getMarginRate(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement a getMarginRate method");
         return 0.0;
     }
 
-    /** 初始资金 */
+    /** Initial cash */
     virtual price_t initCash() const {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
-    /** 账户建立日期 */
+    /** Account creation date */
     virtual Datetime initDatetime() const {
         HKU_WARN("The subclass does not implement this method");
         return Datetime();
     }
 
-    /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
+    /** Date of the first buy trade; Null<Datetime>() is returned if no trade has happened */
     virtual Datetime firstDatetime() const {
         HKU_WARN("The subclass does not implement this method");
         return Datetime();
     }
 
-    /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
+    /** Date of the last trade, regardless of the trade type; the account creation date is returned
+     *  if no trade has happened */
     virtual Datetime lastDatetime() const {
         HKU_WARN("The subclass does not implement this method");
         return Datetime();
     }
 
     /**
-     * 返回当前现金
-     * @note 仅返回当前信息，不会根据权息进行调整
+     * Return the current cash
+     * @note Only the current information is returned, it is not adjusted according to the weight
+     *       information
      */
     virtual price_t currentCash() const {
         HKU_WARN("The subclass does not implement this method");
@@ -323,8 +326,9 @@ public:
     }
 
     /**
-     * 获取指定日期的现金
-     * @note 如果不带日期参数，无法根据权息信息调整持仓
+     * Get the cash of the given date
+     * @note Without the date parameter the positions cannot be adjusted according to the weight
+     *       information
      */
     virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
         HKU_WARN("The subclass does not implement this method");
@@ -332,10 +336,10 @@ public:
     }
 
     /**
-     * 当前是否持有指定的证券
-     * @note 这里未使用日期参数，必须保证是按日期顺序执行
-     * @param stock 指定证券
-     * @return true 是 | false 否
+     * Whether the given security is currently held
+     * @note The date parameter is not used here, so execution in chronological order is required
+     * @param stock the given security
+     * @return true yes | false no
      */
     virtual bool have(const Stock& stock) const {
         HKU_WARN("The subclass does not implement this method");
@@ -343,76 +347,76 @@ public:
     }
 
     /**
-     * 当前空头仓位是否持有指定的证券
-     * @note 这里未使用日期参数，必须保证是按日期顺序执行
-     * @param stock 指定证券
-     * @return true 是 | false 否
+     * Whether the given security is currently held in the short position
+     * @note The date parameter is not used here, so execution in chronological order is required
+     * @param stock the given security
+     * @return true yes | false no
      */
     virtual bool haveShort(const Stock& stock) const {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
 
-    /** 当前持有的证券种类数量 */
+    /** Number of security types currently held */
     virtual size_t getStockNumber() const {
         HKU_WARN("The subclass does not implement this method");
         return 0;
     }
 
-    /** 当前空头持有的证券种类数量 */
+    /** Number of security types currently held short */
     virtual size_t getShortStockNumber() const {
         HKU_WARN("The subclass does not implement this method");
         return 0;
     }
 
-    /** 获取指定时刻的某证券持有数量 */
+    /** Get the held quantity of a security at the given moment */
     virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
-    /** 获取指定时刻的空头某证券持有数量 */
+    /** Get the short held quantity of a security at the given moment */
     virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
-    /** 获取指定时刻已借入的股票数量 */
+    /** Get the number of borrowed shares at the given moment */
     virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
-    /** 获取指定时刻已借入的现金额 */
+    /** Get the amount of borrowed cash at the given moment */
     virtual price_t getDebtCash(const Datetime& datetime) {
         HKU_WARN("The subclass does not implement this method");
         return 0.0;
     }
 
-    /** 获取全部交易记录 */
+    /** Get all the trade records */
     virtual TradeRecordList getTradeList() const {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecordList();
     }
 
     /**
-     * 获取指定日期范围内的交易记录[start, end)
-     * @param start 起始日期
-     * @param end 结束日期
-     * @return 交易记录列表
+     * Get the trade records within the given date range [start, end)
+     * @param start start date
+     * @param end end date
+     * @return trade record list
      */
     virtual TradeRecordList getTradeList(const Datetime& start, const Datetime& end) const {
         HKU_WARN("The subclass does not implement this method");
         return TradeRecordList();
     }
 
-    /** 获取当前全部持仓记录 */
+    /** Get all the current position records */
     virtual PositionRecordList getPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
-    /** 获取当前全部持仓记录字典 */
+    /** Get the dictionary of all the current position records */
     std::unordered_map<Stock, PositionRecord> getPositionDict() const {
         std::unordered_map<Stock, PositionRecord> ret;
         for (const auto& pos : getPositionList()) {
@@ -421,28 +425,28 @@ public:
         return ret;
     }
 
-    /** 获取全部历史持仓记录，即已平仓记录 */
+    /** Get all the historical position records, i.e. the closed position records */
     virtual PositionRecordList getHistoryPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
-    /** 获取当前全部空头仓位记录 */
+    /** Get all the current short position records */
     virtual PositionRecordList getShortPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
-    /** 获取全部空头历史仓位记录 */
+    /** Get all the historical short position records */
     virtual PositionRecordList getShortHistoryPositionList() const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecordList();
     }
 
     /**
-     * 获取指定证券的持仓记录
-     * @param date 指定日期
-     * @param stock 指定的证券
+     * Get the position record of the given security
+     * @param date the given date
+     * @param stock the given security
      */
     virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) {
         HKU_WARN("The subclass does not implement this method");
@@ -450,24 +454,24 @@ public:
     }
 
     /**
-     * 获取指定证券的空头持仓记录
-     * @param stock 指定的证券
+     * Get the short position record of the given security
+     * @param stock the given security
      */
     virtual PositionRecord getShortPosition(const Stock& stock) const {
         HKU_WARN("The subclass does not implement this method");
         return PositionRecord();
     }
 
-    /** 获取当前借入的股票列表 */
+    /** Get the list of currently borrowed shares */
     virtual BorrowRecordList getBorrowStockList() const {
         HKU_WARN("The subclass does not implement this method");
         return BorrowRecordList();
     }
 
     /**
-     * 存入资金
-     * @param datetime 存入时间
-     * @param cash 存入的资金量
+     * Deposit funds
+     * @param datetime deposit time
+     * @param cash deposited amount
      * @return true | false
      */
     virtual bool checkin(const Datetime& datetime, price_t cash) {
@@ -476,9 +480,9 @@ public:
     }
 
     /**
-     * 取出资金
-     * @param datetime 取出时间
-     * @param cash 取出的资金量
+     * Withdraw funds
+     * @param datetime withdrawal time
+     * @param cash withdrawn amount
      * @return true | false
      */
     virtual bool checkout(const Datetime& datetime, price_t cash) {
@@ -487,11 +491,11 @@ public:
     }
 
     /**
-     * 存入资产
-     * @param datetime 存入日期
-     * @param stock 待存入的股票
-     * @param price 存入股票的每股价格
-     * @param number 存入股票的数量
+     * Deposit assets
+     * @param datetime deposit date
+     * @param stock the stock to deposit
+     * @param price price per share of the deposited stock
+     * @param number number of deposited shares
      * @return true | false
      */
     virtual bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
@@ -501,13 +505,13 @@ public:
     }
 
     /**
-     * 取出当前资产
-     * @param datetime 取出日期
-     * @param stock 待取出的股票
-     * @param price 取出的每股价格
-     * @param number 取出的数量
+     * Withdraw the current assets
+     * @param datetime withdrawal date
+     * @param stock the stock to withdraw
+     * @param price withdrawal price per share
+     * @param number withdrawn quantity
      * @return true | false
-     * @note 应该不会被用到
+     * @note It should never be used
      */
     virtual bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
                                double number) {
@@ -516,17 +520,18 @@ public:
     }
 
     /**
-     * 买入操作
-     * @param datetime 买入时间
-     * @param stock 买入的证券
-     * @param realPrice 实际买入价格
-     * @param number 买入数量
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划买入价格
-     * @param from 记录是哪个系统部件发出的买入指示
-     * @param remark 备注
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Buy operation
+     * @param datetime buy time
+     * @param stock the security to buy
+     * @param realPrice actual buy price
+     * @param number buy quantity
+     * @param stoploss stop-loss price
+     * @param goalPrice target price
+     * @param planPrice planned buy price
+     * @param from records which system part issued the buy instruction
+     * @param remark remark
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                             double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
@@ -537,17 +542,18 @@ public:
     }
 
     /**
-     * 卖出操作
-     * @param datetime 卖出时间
-     * @param stock 卖出的证券
-     * @param realPrice 实际卖出价格
-     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
-     * @param stoploss 新的止损价
-     * @param goalPrice 新的目标价格
-     * @param planPrice 原计划卖出价格
-     * @param from 记录是哪个系统部件发出的卖出指示
-     * @param remark 卖出备注
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Sell operation
+     * @param datetime sell time
+     * @param stock the security to sell
+     * @param realPrice actual sell price
+     * @param number sell quantity; MAX_DOUBLE means selling everything
+     * @param stoploss new stop-loss price
+     * @param goalPrice new target price
+     * @param planPrice originally planned sell price
+     * @param from records which system part issued the sell instruction
+     * @param remark sell remark
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
@@ -558,17 +564,18 @@ public:
     }
 
     /**
-     * 卖空
-     * @param datetime 卖空时间
-     * @param stock 卖空的证券
-     * @param realPrice 实际卖空价格
-     * @param number 卖出数量
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划卖空价格
-     * @param from 记录是哪个系统部件发出的买入指示
-     * @param remark 备注
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Short sell
+     * @param datetime short sell time
+     * @param stock the security to short sell
+     * @param realPrice actual short sell price
+     * @param number sell quantity
+     * @param stoploss stop-loss price
+     * @param goalPrice target price
+     * @param planPrice planned short sell price
+     * @param from records which system part issued the sell instruction
+     * @param remark remark
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
@@ -579,17 +586,18 @@ public:
     }
 
     /**
-     * 卖空后回补
-     * @param datetime 买入时间
-     * @param stock 买入的证券
-     * @param realPrice 实际买入价格
-     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划买入价格
-     * @param from 记录是哪个系统部件发出的卖出指示
-     * @param remark 备注
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Cover a short position
+     * @param datetime buy time
+     * @param stock the security to buy
+     * @param realPrice actual buy price
+     * @param number buy quantity; MAX_DOUBLE means covering the entire short position
+     * @param stoploss stop-loss price
+     * @param goalPrice target price
+     * @param planPrice planned buy price
+     * @param from records which system part issued the buy instruction
+     * @param remark remark
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
@@ -600,9 +608,9 @@ public:
     }
 
     /**
-     * 借入资金，从其他来源借取的资金，如融资
-     * @param datetime 借入时间
-     * @param cash 借入的现金
+     * Borrow funds, i.e. funds borrowed from another source, e.g. margin
+     * @param datetime borrow time
+     * @param cash borrowed cash
      * @return true | false
      */
     virtual bool borrowCash(const Datetime& datetime, price_t cash) {
@@ -611,9 +619,9 @@ public:
     }
 
     /**
-     * 归还资金
-     * @param datetime 归还日期
-     * @param cash 归还现金
+     * Repay funds
+     * @param datetime repayment date
+     * @param cash repaid cash
      * @return true | false
      */
     virtual bool returnCash(const Datetime& datetime, price_t cash) {
@@ -622,11 +630,11 @@ public:
     }
 
     /**
-     * 借入证券
-     * @param datetime 借入时间
-     * @param stock 借入的stock
-     * @param price 借入时单股价格
-     * @param number 借入时数量
+     * Borrow a security
+     * @param datetime borrow time
+     * @param stock the borrowed stock
+     * @param price price per share when borrowing
+     * @param number borrowed quantity
      * @return true | false
      */
     virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
@@ -636,11 +644,11 @@ public:
     }
 
     /**
-     * 归还证券
-     * @param datetime 归还时间
-     * @param stock 归还的stock
-     * @param price 归还时单股价格
-     * @param number 归还数量
+     * Return a borrowed security
+     * @param datetime return time
+     * @param stock the returned stock
+     * @param price price per share when returning
+     * @param number returned quantity
      * @return true | false
      */
     virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
@@ -650,9 +658,9 @@ public:
     }
 
     /**
-     * 获取账户当前时刻的资产详情
-     * @param ktype 日期的类型
-     * @return 资产详情
+     * Get the asset details of the account at the current moment
+     * @param ktype the type of the date
+     * @return asset details
      */
     virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const {
         HKU_WARN("The subclass does not implement this method");
@@ -660,11 +668,11 @@ public:
     }
 
     /**
-     * 获取指定时刻的资产市值详情
-     * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
-     * @param ktype 日期的类型
-     * @return 资产详情
-     * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
+     * Get the market value details of the assets at the given moment
+     * @param datetime it must be later than the initial date of the account, or Null<Datetime>()
+     * @param ktype the type of the date
+     * @return asset details
+     * @note When datetime equals Null<Datetime>(), it is the same as getFunds(KType)
      */
     virtual FundsRecord getFunds(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) {
         HKU_WARN("The subclass does not implement this method");
@@ -672,10 +680,11 @@ public:
     }
 
     /**
-     * 直接加入交易记录
-     * @note 如果加入初始化账户记录，将清除全部已有交易及持仓记录
-     * @param tr 待加入的交易记录
-     * @return bool true 成功 | false 失败
+     * Add a trade record directly
+     * @note If an account initialization record is added, all the existing trade and position
+     *       records are cleared
+     * @param tr the trade record to add
+     * @return bool true on success | false on failure
      */
     virtual bool addTradeRecord(const TradeRecord& tr) {
         HKU_WARN("The subclass does not implement this method");
@@ -683,34 +692,37 @@ public:
     }
 
     /**
-     * 直接加入持仓记录
-     * @param pr 持仓记录
-     * @return true 成功
-     * @return false 失败
+     * Add a position record directly
+     * @param pr position record
+     * @return true on success
+     * @return false on failure
      */
     virtual bool addPosition(const PositionRecord& pr) {
         HKU_WARN("The subclass does not implement this method");
         return false;
     }
 
-    /** 字符串输出 */
+    /** String output */
     virtual string str() const {
         HKU_WARN("The subclass does not implement this method");
         return string();
     }
 
     /**
-     * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
-     * @param path 输出文件所在目录
+     * Export the trade records, open position records, closed position records and the net value
+     * curve of the assets in csv format
+     * @param path the directory of the output file
      */
     virtual void tocsv(const string& path) {
         HKU_WARN("The subclass does not implement this method");
     }
 
     /**
-     * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
-     * @param broker 订单代理实例
-     * @param datetime 同步时，通常为当前时间（Null)，也可以强制为指定的时间点
+     * Synchronize the current account asset information (funds, positions, ...) from the order
+     * broker instance
+     * @param broker order broker instance
+     * @param datetime the synchronization time; usually the current time (Null), it can also be
+     *        forced to a given moment
      */
     virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
                                           const Datetime& datetime = Null<Datetime>()) {
@@ -718,40 +730,43 @@ public:
     }
 
     //-------------------------------------------------------------
-    // 以下为捐赠功能
+    // The following are donation features
     //-------------------------------------------------------------
     /**
-     * 统计截至某一时刻的系统绩效, datetime必须大于等于lastDatetime，
-     * 以便用于计算当前市值
-     * @param datetime 统计截止时刻
-     * @param ktype k线类型
-     * @param ext 是否需要扩展统计项(捐赠用户)
+     * Calculate the system performance up to a given moment; datetime must be no earlier than
+     * lastDatetime, so that the current market value can be calculated
+     * @param datetime the end moment of the statistics
+     * @param ktype K-line type
+     * @param ext whether the extended statistics are needed (donating users)
      */
     Performance getPerformance(const Datetime& datetime = Datetime::now(),
                                const KQuery::KType& ktype = KQuery::DAY, bool ext = true);
 
     /**
-     * @brief 获取指定时刻时账户的最大回撤百分比（负数）（仅根据收盘价计算）
-     * @param date 指定日期（包含该时刻）
-     * @param ktype k线类型
+     * @brief Get the maximum drawdown percentage (a negative number) of the account at the given
+     *        moment (calculated from the close price only)
+     * @param date the given date (inclusive)
+     * @param ktype K-line type
      * @return price_t
      */
     price_t getMaxPullBack(const Datetime& date, const KQuery::KType& ktype = KQuery::DAY);
 
     /**
-     * @brief 获取账户历史持仓扩展详情
-     * @param ktype k线类型
-     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @brief Get the extended details of the historical positions of the account
+     * @param ktype K-line type
+     * @param trade_mode trade mode, it affects some statistics: 0 - trade at the close,
+     *        1 - trade at the next open
      * @return std::vector<PositionExtInfo>
      */
     std::vector<PositionExtInfo> getHistoryPositionExtInfoList(
       const KQuery::KType& ktype = KQuery::DAY, int trade_mode = 0);
 
     /**
-     * @brief 获取账户最后交易时刻后持仓详情
-     * @param current_time 当前时刻（需大于等于最后交易时刻）
-     * @param ktype k线类型
-     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * @brief Get the position details after the last trade moment of the account
+     * @param current_time the current moment (it must be no earlier than the last trade moment)
+     * @param ktype K-line type
+     * @param trade_mode trade mode, it affects some statistics: 0 - trade at the close,
+     *        1 - trade at the next open
      * @return std::vector<PositionExtInfo>
      */
     std::vector<PositionExtInfo> getPositionExtInfoList(
@@ -759,17 +774,19 @@ public:
       int trade_mode = 0);
 
     /**
-     * 获取账户最后交易时刻后持仓详情, 以 Stock 为 key, PositionExtInfo 为 value
-     * @param current_time 当前时刻（需大于等于最后交易时刻）
-     * @param ktype k线类型
-     * @param trade_mode 交易模式，影响部分统计项: 0-收盘时交易, 1-下一开盘时交易
+     * Get the position details after the last trade moment of the account, with Stock as the key
+     * and PositionExtInfo as the value
+     * @param current_time the current moment (it must be no earlier than the last trade moment)
+     * @param ktype K-line type
+     * @param trade_mode trade mode, it affects some statistics: 0 - trade at the close,
+     *        1 - trade at the next open
      */
     std::unordered_map<Stock, PositionExtInfo> getPositionExtInfoDict(
       const Datetime& datetime = Datetime::now(), const KQuery::KType& ktype = KQuery::DAY,
       int trade_mode = 0);
 
     /**
-     * 获取账户最后交易时刻后持仓详情
+     * Get the position details after the last trade moment of the account
      */
     PositionExtInfo getPositionExtInfo(const Stock& stock,
                                        const Datetime& current_time = Datetime::now(),
@@ -777,7 +794,7 @@ public:
                                        int trade_mode = 0);
 
     /**
-     * @brief 获取指定截止时间前各月的收益百分比
+     * @brief Get the profit percentage of each month before the given end time
      * @param datetime
      * @return std::vector<std::pair<Datetime, double>>
      */
@@ -785,7 +802,7 @@ public:
       const Datetime& datetime = Datetime::now());
 
     /**
-     * @brief 获取指定截止时间前各年的收益百分比
+     * @brief Get the profit percentage of each year before the given end time
      * @param datetime
      * @return std::vector<std::pair<Datetime, double>>
      */
@@ -797,16 +814,17 @@ public:
     }
 
 protected:
-    string m_name;            // 账户名称
-    TradeCostPtr m_costfunc;  // 成本算法
+    string m_name;            // Account name
+    TradeCostPtr m_costfunc;  // Cost algorithm
 
-    Datetime m_broker_last_datetime;     // 订单代理最近一次执行操作的时刻,当前启动运行时间
-    list<OrderBrokerPtr> m_broker_list;  // 订单代理列表
+    Datetime m_broker_last_datetime;     // The last moment an order broker performed an operation,
+                                         // i.e. the current startup time
+    list<OrderBrokerPtr> m_broker_list;  // Order broker list
 
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -845,7 +863,7 @@ inline void TradeManagerBase::baseCheckParam(const string& name) const {
 inline void TradeManagerBase::paramChanged() {}
 
 /**
- * 客户程序应使用此类型进行实际操作
+ * Client programs should use this type for the actual operations
  * @ingroup TradeManagerClass
  */
 typedef shared_ptr<TradeManagerBase> TradeManagerPtr;

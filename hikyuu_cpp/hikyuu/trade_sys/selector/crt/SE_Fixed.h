@@ -1,7 +1,7 @@
 /*
  * SE_Fixed.h
  *
- *  Created on: 2018年1月13日
+ *  Created on: 2018-1-13
  *      Author: fasiondog
  */
 
@@ -14,19 +14,20 @@
 namespace hku {
 
 /**
- * @brief 固定选择器，每天都选择指定的交易系统
- * @param weight 固定权重
+ * @brief Fixed selector, it selects the given trading system every day
+ * @param weight fixed weight
  * @return SelectorPtr
  * @ingroup Selector
  */
 SelectorPtr HKU_API SE_Fixed(double weight = 1.0);
 
 /**
- * @brief 固定选择器，每天都选择指定的交易系统
- * @details 对指定的每个股票以原型系统创建相应的交易系统
- * @param stock_list 指定的股票列表
- * @param sys 原型系统
- * @param weight 固定权重
+ * @brief Fixed selector, it selects the given trading system every day
+ * @details It creates the corresponding trading system with the prototype system for every given
+ *          stock
+ * @param stock_list the given stock list
+ * @param sys prototype system
+ * @param weight fixed weight
  * @return SelectorPtr
  * @ingroup Selector
  */

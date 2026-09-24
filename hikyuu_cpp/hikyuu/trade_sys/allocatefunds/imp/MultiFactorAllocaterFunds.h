@@ -12,7 +12,8 @@
 namespace hku {
 
 /*
- * 创建 MultiFactor 评分权重的资产分配算法实例, 即直接以SE返回的评分作为权重。
+ * Create an asset allocation algorithm instance with the MultiFactor score weights, i.e. the scores
+ * returned by SE are used as the weights directly.
  */
 class MultiFactorAllocaterFunds : public AllocateFundsBase {
     ALLOCATEFUNDS_IMP(MultiFactorAllocaterFunds)

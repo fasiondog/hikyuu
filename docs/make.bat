@@ -3,34 +3,35 @@
 pushd %~dp0
 
 REM Command file for Sphinx documentation
+REM   make.bat        构建中英两棵树 -> build\html\{en,zh}
+REM   make.bat en     仅构建英文树   -> build\html\en
+REM   make.bat zh     仅构建中文树   -> build\html\zh
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set SOURCEDIR=source
-set BUILDDIR=build
-set SPHINXPROJ=Hikyuu
-
-if "%1" == "" goto help
+set BUILDDIR=build\html
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
 	echo.
 	echo.The 'sphinx-build' command was not found. Make sure you have Sphinx
 	echo.installed, then set the SPHINXBUILD environment variable to point
-	echo.to the full path of the 'sphinx-build' executable. Alternatively you
-	echo.may add the Sphinx directory to PATH.
-	echo.
-	echo.If you don't have Sphinx installed, grab it from
-	echo.https://www.sphinx-doc.org/
+	echo.to the full path of the 'sphinx-build' executable. Alternatively,
+	echo.you may add the Sphinx directory to PATH; if you don't have Sphinx
+	echo.installed, grab it from https://www.sphinx-doc.org/
 	exit /b 1
 )
 
-%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+if "%1" == "" goto both
+
+%SPHINXBUILD% -b html %1 %BUILDDIR%\%1 %SPHINXOPTS% %O%
 goto end
 
-:help
-%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+:both
+%SPHINXBUILD% -b html en %BUILDDIR%\en %SPHINXOPTS% %O%
+%SPHINXBUILD% -b html zh %BUILDDIR%\zh %SPHINXOPTS% %O%
+goto end
 
 :end
 popd

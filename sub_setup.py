@@ -18,7 +18,7 @@ def parse_requirements(filename):
 requirements = parse_requirements('requirements.txt')
 
 current_plat = sys.platform
-# 移除PyQt5的特殊处理
+# Remove the special handling of PyQt5
 # if current_plat == 'linux':
 #     requirements.remove('PyQt5')
 
@@ -32,7 +32,7 @@ with open('xmake.lua', 'r', encoding='utf-8') as f:
             break
 
 if not hku_version:
-    print("无法在 xmake.lua 中找到 set_version 语句，获取版本号失败！")
+    print("Cannot find the set_version statement in xmake.lua, failed to get the version number!")
     exit(0)
 
 print('current hikyuu version:', hku_version)
@@ -121,7 +121,7 @@ setup(
         'Programming Language :: Python :: 3.13',
     ],
     entry_points={
-        # win11下使用 GUI 方式，会立刻 timeout，导致无法下载
+        # On win11, using the GUI mode times out immediately, so the download fails
         # 'gui_scripts': [
         #     'HikyuuTDX=hikyuu.gui.HikyuuTDX:start',
         # ],

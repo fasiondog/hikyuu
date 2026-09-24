@@ -12,7 +12,7 @@
 namespace hku {
 
 /**
- * 时间截面数据归一化基类
+ * Base class of the time cross-section data normalization
  */
 class HKU_API NormalizeBase {
     PARAMETER_SUPPORT_WITH_CHECK
@@ -25,12 +25,12 @@ public:
 
     virtual ~NormalizeBase() = default;
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const {
         return m_name;
     }
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name) {
         m_name = name;
     }
@@ -51,7 +51,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -80,7 +80,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(NormalizeBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public NormalizeBase {
  *     NORMALIZE_NO_PRIVATE_MEMBER_SERIALIZATION

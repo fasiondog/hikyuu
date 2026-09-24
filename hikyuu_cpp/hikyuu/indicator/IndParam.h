@@ -15,7 +15,7 @@ class HKU_API Indicator;
 class HKU_API IndicatorImp;
 
 /**
- * @brief 动态指标参数，用于作为其他指标的参数
+ * @brief Dynamic indicator parameter, used as the parameter of the other indicators
  * @ingroup Indicator
  */
 class HKU_API IndParam {

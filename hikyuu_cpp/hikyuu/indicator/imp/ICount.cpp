@@ -1,7 +1,7 @@
 /*
  * Icount.cpp
  *
- *  Created on: 2019年3月25日
+ *  Created on: 2019-3-25
  *      Author: fasiondog
  */
 

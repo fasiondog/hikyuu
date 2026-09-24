@@ -1,7 +1,7 @@
 /*
  * test_Block.cpp
  *
- *  Created on: 2015年2月9日
+ *  Created on: 2015-2-9
  *      Author: fasiondog
  */
 #include "doctest/doctest.h"
@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_Block_serialize") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

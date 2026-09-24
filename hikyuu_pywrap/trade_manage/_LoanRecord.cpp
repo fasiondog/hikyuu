@@ -12,13 +12,13 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_LoanRecord(py::module& m) {
-    py::class_<LoanRecord>(m, "LoanRecord", "借款记录（融资记录）")
+    py::class_<LoanRecord>(m, "LoanRecord", "The loan record (the financing record)")
       .def(py::init<>())
       .def(py::init<const Datetime&, price_t>())
       .def("__str__", to_py_str<LoanRecord>)
       .def("__repr__", to_py_str<LoanRecord>)
-      .def_readwrite("datetime", &LoanRecord::datetime, "借款时间")
-      .def_readwrite("value", &LoanRecord::value, "借款金额")
+      .def_readwrite("datetime", &LoanRecord::datetime, "The loan time")
+      .def_readwrite("value", &LoanRecord::value, "The loan amount")
 
         DEF_PICKLE(LoanRecord);
 }

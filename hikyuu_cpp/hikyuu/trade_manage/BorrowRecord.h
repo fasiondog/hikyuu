@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 记录当前借入的股票信息
+ * Record the information of the currently borrowed shares
  * @ingroup TradeManagerClass
  */
 class HKU_API BorrowRecord {
@@ -25,17 +25,17 @@ public:
     BorrowRecord(const Stock&, double number, price_t value);
 
     Stock stock;
-    double number;  // 借入总数量
-    price_t value;  // 借入总价值
+    double number;  // Total borrowed quantity
+    price_t value;  // Total borrowed value
 
     struct Data {
         Data() : datetime(Null<Datetime>()), price(0.0), number(0) {}
         Data(const Datetime& datetime, price_t price, double number)
         : datetime(datetime), price(price), number(number) {}
 
-        Datetime datetime;  // 借入时间
-        price_t price;      // 借入时的单价
-        double number;      // 借入数量
+        Datetime datetime;  // Borrow time
+        price_t price;      // Price per share at borrowing
+        double number;      // Borrowed quantity
 
 #if HKU_SUPPORT_SERIALIZATION
     private:
@@ -61,9 +61,9 @@ public:
 #endif
     };
 
-    list<Data> record_list;  // 当前的借入记录
+    list<Data> record_list;  // Current borrowed records
 
-// 序列化支持
+// Serialization support
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;

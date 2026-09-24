@@ -42,7 +42,7 @@ void IAdvance::_checkParam(const string& name) const {
 }
 
 void IAdvance::_calculate(const Indicator& ind) {
-    // ref_date_list 参数会影响 IndicatorImp 全局，勿随意修改
+    // The ref_date_list parameter affects the IndicatorImp globally, do not modify it at will
     string market;
     KQuery q;
     int stk_type = STOCKTYPE_A;
@@ -75,7 +75,7 @@ void IAdvance::_calculate(const Indicator& ind) {
     m_discard = 1;
     _readyBuffer(total, 1);
 
-    // 需要将 Query 转换为 KQueryByDate
+    // The Query needs to be converted into KQueryByDate
     q = KQueryByDate(dates.front(), dates.back() + Seconds(KQuery::getKTypeInSeconds(q.kType())),
                      q.kType(), q.recoverType());
 
@@ -126,11 +126,14 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     StockManager& sm = StockManager::instance();
     auto* dst = this->data();
-    // 强制清理将要重算的 dst 区间, 防止 increment_execute_leaf_or_op 拷贝过来的
-    // 旧汇总值被全市场遍历二次累加(脏读双累加: 旧值非 NaN 时 isnan?1:+1 会再 +1)。
-    // 从 start_pos 起清(而非 start_pos-1): start_pos-1 是旧窗口最后一根的正确汇总,
-    // 增量内层循环从 x.discard()>=1 起写 dst[i+start_pos-1], 最小写 dst[start_pos],
-    // 从不写 dst[start_pos-1], 故保留其旧值。
+    // Force clearing the dst range that is about to be recalculated, to prevent the old summary
+    // value copied by increment_execute_leaf_or_op from being accumulated twice by the whole
+    // market traversal (a dirty read double accumulation: when the old value is not NaN,
+    // isnan ? 1 : +1 adds one more). The clearing starts from start_pos (not start_pos-1)
+    // because start_pos-1 is the correct summary of the last bar of the old window; the
+    // incremental inner loop writes dst[i+start_pos-1] starting from x.discard()>=1, writing
+    // dst[start_pos] at the earliest, and never writes dst[start_pos-1], so its old value is
+    // kept.
     for (size_t i = start_pos; i < this->size(); ++i) {
         dst[i] = Null<value_t>();
     }

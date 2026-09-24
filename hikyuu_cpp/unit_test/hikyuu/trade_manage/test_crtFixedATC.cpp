@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TC_FixedA") {
     StockManager& sm = StockManager::instance();
     Stock stock;
@@ -36,7 +36,7 @@ TEST_CASE("test_TC_FixedA") {
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 1000);
     CHECK_EQ(result, expect);
 
-    /** @arg 买入沪市股票，少于1000股，佣金少于5元 */
+    /** @arg Buy a Shanghai stock, fewer than 1000 shares, a commission below 5 */
     stock = sm.getStock("sh600004");
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 100);
     expect.commission = 5.0;
@@ -45,7 +45,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 6.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 买入沪市股票，等于1000股，佣金大于5元 */
+    /** @arg Buy a Shanghai stock, exactly 1000 shares, a commission above 5 */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
     expect.commission = 18.0;
     expect.stamptax = 0.0;
@@ -53,7 +53,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 19.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 买入沪市股票，大于1000股，佣金大于5元 */
+    /** @arg Buy a Shanghai stock, more than 1000 shares, a commission above 5 */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 2100);
     expect.commission = 37.80;
     expect.stamptax = 0.0;
@@ -61,7 +61,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 39.9;
     CHECK_EQ(result, expect);
 
-    /** @arg 卖出沪市股票，少于1000股，佣金少于5元 */
+    /** @arg Sell a Shanghai stock, fewer than 1000 shares, a commission below 5 */
     stock = sm.getStock("sh600004");
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 100);
     expect.commission = 5.0;
@@ -70,7 +70,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 7.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 卖出沪市股票，等于1000股，佣金大于5元 */
+    /** @arg Sell a Shanghai stock, exactly 1000 shares, a commission above 5 */
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 1000);
     expect.commission = 18.0;
     expect.stamptax = 10.0;
@@ -78,7 +78,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 29.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 卖出沪市股票，大于1000股，佣金大于5元 */
+    /** @arg Sell a Shanghai stock, more than 1000 shares, a commission above 5 */
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 2100);
     expect.commission = 37.80;
     expect.stamptax = 21;
@@ -86,7 +86,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 60.9;
     CHECK_EQ(result, expect);
 
-    /** @arg 买入深市股票，少于1000股，佣金少于5元 */
+    /** @arg Buy a Shenzhen stock, fewer than 1000 shares, a commission below 5 */
     stock = sm.getStock("sz000001");
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 100);
     expect.commission = 5.0;
@@ -95,7 +95,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 5.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 买入深市股票，等于1000股，佣金大于5元 */
+    /** @arg Buy a Shenzhen stock, exactly 1000 shares, a commission above 5 */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
     expect.commission = 18.0;
     expect.stamptax = 0.0;
@@ -103,7 +103,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 18.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 买入深市股票，大于1000股，佣金大于5元 */
+    /** @arg Buy a Shenzhen stock, more than 1000 shares, a commission above 5 */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 2100);
     expect.commission = 37.80;
     expect.stamptax = 0.0;
@@ -111,7 +111,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 37.8;
     CHECK_EQ(result, expect);
 
-    /** @arg 卖出深市股票，少于1000股，佣金少于5元 */
+    /** @arg Sell a Shenzhen stock, fewer than 1000 shares, a commission below 5 */
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 100);
     expect.commission = 5.0;
     expect.stamptax = 1.0;
@@ -119,7 +119,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 6.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 卖出深市股票，等于1000股，佣金大于5元 */
+    /** @arg Sell a Shenzhen stock, exactly 1000 shares, a commission above 5 */
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 1000);
     expect.commission = 18.0;
     expect.stamptax = 10.0;
@@ -127,7 +127,7 @@ TEST_CASE("test_TC_FixedA") {
     expect.total = 28.0;
     CHECK_EQ(result, expect);
 
-    /** @arg 卖出深市股票，大于1000股，佣金大于5元 */
+    /** @arg Sell a Shenzhen stock, more than 1000 shares, a commission above 5 */
     result = cost_func->getSellCost(Datetime(200101010000), stock, 10.0, 2100);
     expect.commission = 37.80;
     expect.stamptax = 21;
@@ -137,7 +137,7 @@ TEST_CASE("test_TC_FixedA") {
 }
 
 #if HKU_SUPPORT_SERIALIZATION
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_FixedATC_export") {
     StockManager& sm = StockManager::instance();
 

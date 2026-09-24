@@ -20,21 +20,21 @@ void sysinfo_init();
 void sysinfo_clean();
 
 /**
- * 获取Hikyuu当前版本号
- * @return 版本号
+ * Get the current version number of Hikyuu
+ * @return version number
  */
 std::string HKU_API getVersion();
 
 /**
- * 获取详细版本号，包含构建时间
+ * Get the detailed version number, including the build time
  */
 std::string HKU_API getVersionWithBuild();
 
-/* 获取包括Git commit信息的版本号 */
+/* Get the version number including the Git commit information */
 std::string HKU_API getVersionWithGit();
 
 /**
- * 判断是否有更新的版本可以升级
+ * Judge whether there is a newer version to upgrade to
  */
 bool HKU_API CanUpgrade();
 
@@ -61,31 +61,31 @@ LatestVersionInfo HKU_API getLatestVersionInfo();
 
 void updateSysInfoExpiredTime(Datetime time);
 
-// 许可过期提醒
+// License expiration reminder
 void HKU_API reminderLicenseExpiration();
 
-/** 发送反馈信息 */
+/** Send the feedback information */
 void HKU_API sendFeedback();
 
-/** 用于发送 python 版本信息 */
+/** Used to send the python version information */
 void HKU_API sendPythonVersionFeedBack(int major, int minor, int micro);
 
-/** 当前是否运行在 python 环境中 */
+/** Whether it is currently running in the python environment */
 bool HKU_API runningInPython();
 
-/** 当前是否运行在 Jupyter 环境中 */
+/** Whether it is currently running in the Jupyter environment */
 bool HKU_API pythonInJupyter();
 
-/** python 是否运行在交互模式下 */
+/** Whether python is running in the interactive mode */
 bool HKU_API pythonInInteractive();
 
-/** 设置是否运行在 python 下*/
+/** Set whether it is running under python */
 void HKU_API setRunningInPython(bool inpython);
 
-/** 设置 python 是否运行在交互模式下 */
+/** Set whether python runs in the interactive mode */
 void HKU_API setPythonInInteractive(bool interactive);
 
-/** 当前是否运行在 Jupyter 环境中 */
+/** Set whether it is running in the Jupyter environment */
 void HKU_API setPythonInJupyter(bool injupyter);
 
 }  // namespace hku

@@ -12,18 +12,18 @@
 namespace hku {
 
 /**
- * 两个市场环境判定相与，等效于两者的交集
- * @param ev1 市场环境判定1
- * @param ev2 市场环境判定2
- * @return AndCondition 实例指针
+ * The AND of two market environments, equivalent to the intersection of the two
+ * @param ev1 market environment 1
+ * @param ev2 market environment 2
+ * @return the AndCondition instance pointer
  */
 HKU_API EnvironmentPtr operator&(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2);
 
 /**
- * 两个市场环境判定相或，等效于两者的并集
- * @param ev1 市场环境判定1
- * @param ev2 市场环境判定2
- * @return OrCondition 实例指针
+ * The OR of two market environments, equivalent to the union of the two
+ * @param ev1 market environment 1
+ * @param ev2 market environment 2
+ * @return the OrCondition instance pointer
  */
 HKU_API EnvironmentPtr operator|(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2);
 

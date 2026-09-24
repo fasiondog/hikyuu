@@ -1,7 +1,7 @@
 /*
  * FixedSelector.cpp
  *
- *  Created on: 2018年1月12日
+ *  Created on: 2018-1-12
  *      Author: fasiondog
  */
 

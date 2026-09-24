@@ -12,9 +12,9 @@
 namespace hku {
 
 /*
- * 指数移动平均线(Exponential Moving Average)
- * 参数： n: 计算均值的周期窗口，必须为大于0的整数
- * 抛弃数 = 0
+ * Exponential Moving Average (EMA)
+ * Parameters: n: the period window for calculating the average, it must be an integer greater than
+ * 0 Discard number = 0
  */
 class IEma : public IndicatorImp {
     INDICATOR_IMP(IEma)

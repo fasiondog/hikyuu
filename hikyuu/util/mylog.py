@@ -11,7 +11,7 @@ import functools
 import multiprocessing
 
 
-# 统计函数运行时间
+# Count the function running time
 def spend_time(func):
     @functools.wraps(func)
     def wrappedFunc(*args, **kargs):
@@ -25,7 +25,7 @@ def spend_time(func):
 
     return wrappedFunc
 
-# 统计函数运行时间
+# Count the function running time
 
 
 def hku_benchmark(count=10):
@@ -96,10 +96,10 @@ def class_logger(cls, enable=False):
 
 
 def add_class_logger_handler(class_list, level=logging.INFO, handler=None):
-    """为指定的类增加日志 handler，并设定级别
+    """Add a log handler to the specified classes and set the level
 
-    :param class_list: 类列表
-    :param level: 日志级别
+    :param class_list: the class list
+    :param level: the log level
     :param handler: logging handler
     """
     for cls in class_list:
@@ -234,7 +234,7 @@ def hku_fatal_if(exp, msg, *args, **kwargs):
             callback()
 
 
-# 跟踪函数运行
+# Trace the function running
 def with_trace(level=logging.INFO):
     def with_trace_wrap(func):
         @functools.wraps(func)
@@ -250,10 +250,10 @@ def with_trace(level=logging.INFO):
 
 
 def capture_multiprocess_all_logger(queue, level=None):
-    """重设所有子进程中的 logger 输出指定的 queue，并重设level
+    """Reset the logger output of all the subprocesses to the specified queue, and reset the level
 
-    @param multiprocessing.Queue queue 指定的 mp Queue
-    @param level 日志输出等级, None为保持原有等级
+    @param multiprocessing.Queue queue the specified mp Queue
+    @param level the log output level; None keeps the original level
     """
     if queue is None:
         return

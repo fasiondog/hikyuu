@@ -48,7 +48,8 @@ KData::KData() : m_imp(get_null_kdata_imp()) {}
 KData::KData(KDataImpPtr imp) : m_imp(imp ? imp : get_null_kdata_imp()) {}
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    // 在重加载或setKDateList时，已存在KData存在数据无效风险（但无内存访问问题)
+    // On a reload or setKDateList an existing KData risks having invalid data (but there is no
+    // memory access problem)
     if (stock.isNull()) {
         m_imp = get_null_kdata_imp();
         return;
@@ -58,15 +59,18 @@ KData::KData(const Stock& stock, const KQuery& query) {
         stock.loadKDataToBuffer(query.kType());
     }
 
-    // 非预加载也可能被主动加载至缓存
+    // A non-preloaded type may also be loaded into the cache actively
     if (query.recoverType() == KQuery::NO_RECOVER && stock.isBuffer(query.kType())) {
-        // 当Stock已缓存了该类型的K线数据，且不进行复权
+        // When the Stock has already cached the K-line data of that type and no adjustment is
+        // applied
         m_imp = make_shared<KDataSharedBufferImp>(stock, query);
         return;
     }
 
-    // 客户端共享内存零拷贝视图：NO_RECOVER 且主进程快照覆盖该证券/类型时直接裸指针视图，
-    // 不满足（非客户端/未覆盖/需反缩放/区间无效）时 create 返回 nullptr，回退下方私有副本路径
+    // The client shared memory zero-copy view: with NO_RECOVER and the main process snapshot
+    // covering this security / type, a raw pointer view is used directly; when it does not apply
+    // (not a client / not covered / reverse scaling needed / invalid range) create returns nullptr
+    // and it falls back to the private copy path below
     if (query.recoverType() == KQuery::NO_RECOVER) {
         if (auto view_imp = KDataShmBufferImp::create(stock, query)) {
             m_imp = std::move(view_imp);
@@ -198,7 +202,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
     }
 
     auto day_ktype_seconds = KQuery::getKTypeInSeconds(KQuery::DAY);
-    // 从日线及以上转日线以下
+    // Convert from the daily line and above to below the daily line
     if (KQuery::getKTypeInSeconds(ktype) < day_ktype_seconds &&
         KQuery::getKTypeInSeconds(query.kType()) >= day_ktype_seconds) {
         if (end_ != Null<Datetime>()) {
@@ -206,7 +210,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         }
     }
 
-    // 从日线以下转日线及以上
+    // Convert from below the daily line to the daily line and above
     if (KQuery::getKTypeInSeconds(ktype) >= day_ktype_seconds &&
         KQuery::getKTypeInSeconds(query.kType()) < day_ktype_seconds) {
         start = start.startOfDay();

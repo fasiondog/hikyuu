@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * 移滑价差算法基类
+ * Base class of the slippage algorithm
  * @ingroup Slippage
  */
 class HKU_API SlippageBase : public enable_shared_from_this<SlippageBase> {
@@ -27,48 +27,48 @@ public:
     SlippageBase(const SlippageBase&) = default;
     virtual ~SlippageBase() {}
 
-    /** 设置交易对象 */
+    /** Set the trading object */
     void setTO(const KData& kdata);
 
-    /** 获取交易对象 */
+    /** Get the trading object */
     KData getTO() const;
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const;
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name);
 
-    /** 复位操作 */
+    /** Reset operation */
     void reset();
 
     typedef shared_ptr<SlippageBase> SlippagePtr;
-    /** 克隆操作 */
+    /** Clone operation */
     SlippagePtr clone();
 
     /**
-     * 计算实际买入价格
-     * @param datetime 买入时刻
-     * @param planPrice 计划买入价格
-     * @return 实际买入价格
+     * Calculate the actual buy price
+     * @param datetime buy moment
+     * @param planPrice planned buy price
+     * @return the actual buy price
      */
     virtual price_t getRealBuyPrice(const Datetime& datetime, price_t planPrice) = 0;
 
     /**
-     * 计算实际卖出价格
-     * @param datetime 卖出时刻
-     * @param planPrice 计划卖出价格
-     * @return 实际卖出价格
+     * Calculate the actual sell price
+     * @param datetime sell moment
+     * @param planPrice planned sell price
+     * @return the actual sell price
      */
     virtual price_t getRealSellPrice(const Datetime& datetime, price_t planPrice) = 0;
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual SlippagePtr _clone() = 0;
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类计算接口，由setTO调用 */
+    /** Subclass calculation interface, it is called by setTO */
     virtual void _calculate() = 0;
 
     bool isPythonObject() const noexcept {
@@ -81,7 +81,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -110,7 +110,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(SlippageBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public SlippageBase {
  *     SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -143,7 +144,7 @@ public:                                                                  \
     virtual void _calculate() override;
 
 /**
- * 客户程序都应使用该指针类型，操作移滑价差算法
+ * Client programs should all use this pointer type to operate the slippage algorithm
  * @ingroup Slippage
  */
 typedef shared_ptr<SlippageBase> SlippagePtr;

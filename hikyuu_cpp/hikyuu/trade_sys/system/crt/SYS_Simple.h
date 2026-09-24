@@ -14,26 +14,38 @@
 namespace hku {
 
 /**
- * 生成简单系统实例
+ * Create a simple system instance
  * @details
  * <pre>
- * 继承的系统参数：
- * max_delay_count [int | 3]: 最大连续延迟交易请求的限制次数，如最高价=最低价时
+ * Inherited system parameters:
+ * max_delay_count [int | 3]: the maximum number of the consecutive delayed trade requests, such as
+ * when the high price equals the low price
  * delay_use_plan_number [bool | true]:
- * 延迟操作时使用上一时刻计算的数量，因为实际人工操作时，可能无法实时计算买入数量
- * support_borrow_cash [bool | false]：在现金不足时，是否支持借入现金，融资
- * support_borrow_stock [bool | fals]): 在没有持仓时，是否支持借入证券，融券
+ * A delayed operation uses the quantity calculated at the previous moment, because in the actual
+ * manual operation the buy quantity may not be calculated in real time
+ * support_borrow_cash [bool | false]: whether borrowing cash is supported when the cash is
+ * insufficient, i.e. margin financing
+ * support_borrow_stock [bool | fals]): whether borrowing securities is supported when there is no
+ * position, i.e. securities lending
  *
- * 本系统参数：
- * ev_dealy [bool | true]: 系统环境失效时，是否延迟在下一时刻开盘执行
- * cn_delay [bool | true]: 系统条件失效时，是否延迟在下一时刻开盘执行
- * sg_delay [bool | true]: 发出信号指示时，是否延迟在下一时刻开盘执行
- * sl_delay [bool | true]: 发出止损指令时，是否延迟在下一时刻开盘执行
- * tp_delay [bool | true]: 发出止赢指令时，是否延迟在下一时刻开盘执行
- * pg_delay [bool | true]: 发出盈利目标达成信号时，是否延迟在下一时刻开盘执行
- * tp_ascend [bool | true]: 止赢是否单调递增
- * tp_delay_n [int | 3]: 止赢延迟判定生效时间，给市场足够的时间向预定方向移动
- * ignore_sell_sg [bool | false ]: ignore_sell_sg 忽略卖出信号，只使用止损/止赢等其他方式卖出
+ * Parameters of this system:
+ * ev_dealy [bool | true]: whether to delay the execution to the open of the next moment when the
+ * system environment becomes invalid
+ * cn_delay [bool | true]: whether to delay the execution to the open of the next moment when the
+ * system condition becomes invalid
+ * sg_delay [bool | true]: whether to delay the execution to the open of the next moment when a
+ * signal indication is issued
+ * sl_delay [bool | true]: whether to delay the execution to the open of the next moment when a
+ * stop-loss instruction is issued
+ * tp_delay [bool | true]: whether to delay the execution to the open of the next moment when a
+ * take-profit instruction is issued
+ * pg_delay [bool | true]: whether to delay the execution to the open of the next moment when the
+ * profit goal reaching signal is issued
+ * tp_ascend [bool | true]: whether the take-profit increases monotonically
+ * tp_delay_n [int | 3]: the effective time of the take-profit delay judgment, it gives the market
+ * enough time to move in the expected direction
+ * ignore_sell_sg [bool | false ]: ignore_sell_sg ignores the sell signal and sells with the other
+ * ways such as the stop-loss / take-profit only
  * </pre>
  * @see SystemBase
  * @ingroup System

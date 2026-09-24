@@ -13,10 +13,12 @@
 
 using namespace hku;
 
-#define ENABLE_BENCHMARK_TEST 0  // 是否开启性能测试相关用例执行，默认不开启
+#define ENABLE_BENCHMARK_TEST \
+    0  // Whether to run the performance test related cases, off by default
 
-// 跨编译器：强制编译器不优化、不删除指定变量
-// 用于 benchmark，防止编译器把“没用”的中间计算删掉
+// Cross-compiler: force the compiler not to optimize and not to delete the given variables
+// Used for the benchmark, preventing the compiler from deleting the "useless" intermediate
+// calculations
 #if defined(_MSC_VER)
 #define DO_NOT_OPTIMIZE(var)                                             \
     do {                                                                 \

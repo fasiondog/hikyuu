@@ -1,7 +1,7 @@
 /*
  * _Portfolio.cpp
  *
- *  Created on: 2016年3月29日
+ *  Created on: 2016-03-29
  *      Author: fasiondog
  */
 
@@ -67,7 +67,7 @@ void PyPortfolio::set_af(py::object af) {
 
 void export_Portfolio(py::module& m) {
     py::class_<Portfolio, PortfolioPtr, PyPortfolio>(m, "Portfolio", py::dynamic_attr(),
-                                                     R"(实现多标的、多策略的投资组合)")
+                                                     R"(Implements a portfolio of multiple targets and multiple strategies)")
       .def(py::init<>())
       .def(py::init<const string&>())
       .def(py::init<const string&, const TradeManagerPtr&, const SelectorPtr&, const AFPtr&>())
@@ -77,49 +77,49 @@ void export_Portfolio(py::module& m) {
 
       .def_property("name", py::overload_cast<>(&Portfolio::name, py::const_),
                     py::overload_cast<const string&>(&Portfolio::name),
-                    py::return_value_policy::copy, "名称")
+                    py::return_value_policy::copy, "Name")
       .def_property("query", &Portfolio::getQuery, &Portfolio::setQuery,
-                    py::return_value_policy::copy, "查询条件")
+                    py::return_value_policy::copy, "The query condition")
 
       .def_property(
         "tm", &Portfolio::getTM, [](PyPortfolio& self, py::object tm) { self.set_tm(tm); },
-        "设置或获取交易管理对象")
+        "Set or get the trade manager object")
       .def_property(
         "se", &Portfolio::getSE, [](PyPortfolio& self, py::object se) { self.set_se(se); },
-        "设置或获取交易对象选择算法")
+        "Set or get the trading object selection algorithm")
       .def_property(
         "af", &Portfolio::getAF, [](PyPortfolio& self, py::object af) { self.set_af(af); },
-        "设置或获取资产分配算法")
+        "Set or get the asset allocation algorithm")
       .def_property_readonly("real_sys_list", &Portfolio::getRealSystemList,
-                             py::return_value_policy::copy, "由 PF 运行时设定的实际运行系统列表")
+                             py::return_value_policy::copy, "The actual running system list set by the PF at runtime")
 
       .def("get_param", &Portfolio::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (Portfolio::*)(const std::string&, const boost::any&)>(
              &Portfolio::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &Portfolio::haveParam, "是否存在指定参数")
+      .def("have_param", &Portfolio::haveParam, "Whether the specified parameter exists")
 
-      .def("reset", &Portfolio::reset, "复位操作")
-      .def("clone", &Portfolio::clone, "克隆操作")
+      .def("reset", &Portfolio::reset, "The reset operation")
+      .def("clone", &Portfolio::clone, "The clone operation")
 
-      .def("get_running_dates", &Portfolio::getRunningDates, "获取运行日期列表")
-      .def("get_adjust_dates", &Portfolio::getAdjustDates, "获取调仓日列表")
-      .def("get_cycle_end_dates", &Portfolio::getCycleEndDates, "获取调仓周期结束日期列表")
+      .def("get_running_dates", &Portfolio::getRunningDates, "Get the running date list")
+      .def("get_adjust_dates", &Portfolio::getAdjustDates, "Get the position adjustment date list")
+      .def("get_cycle_end_dates", &Portfolio::getCycleEndDates, "Get the list of the position adjustment period end dates")
       .def(
         "get_adjust_turnover",
         [](const Portfolio& pf) {
@@ -130,16 +130,16 @@ void export_Portfolio(py::module& m) {
             }
             return ret;
         },
-        "获取调仓换手率列表")
+        "Get the list of the position adjustment turnover rates")
 
       .def("run", &Portfolio::run, py::arg("query"), py::arg("force") = false,
            R"(run(self, query[, force=false])
     
-    运行投资组合策略。在查询条件及各组件没有变化时，PF在第二次执行时，默认不会实际进行计算。
-    但由于各个组件的参数可能改变，此种情况无法自动判断是否需要重计算，可以手工指定进行强制计算。
+    Run the portfolio strategy. When the query condition and the parts have not changed, the PF will not actually calculate by default when it is executed the second time.
+    However, since the parameters of the parts may change, whether a recalculation is needed cannot be judged automatically; you can specify a forced calculation manually.
         
-    :param Query query: 查询条件
-    :param bool force: 强制重新计算)")
+    :param Query query: the query condition
+    :param bool force: force recalculating)")
 
       .def(
         "last_suggestion",
@@ -149,7 +149,7 @@ void export_Portfolio(py::module& m) {
             py::module json_module = py::module::import("json");
             return json_module.attr("loads")(json_str);
         },
-        "回测完成后，返回最后一天交易记录，以及需要延迟的买入和卖出延迟请求")
+        "After the backtest is completed, return the trade records of the last day, and the delayed buy and sell requests that need to be delayed")
 
         DEF_PICKLE(Portfolio);
 
@@ -172,24 +172,24 @@ void export_Portfolio(py::module& m) {
       py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
       R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
-    创建一个多标的、单系统策略的投资组合
+    Create a portfolio of multiple targets with a single system strategy
 
-    调仓模式 adjust_mode 说明：
-    - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
-      决定周期间隔；
-    - "day" 模式，adjust_cycle 为调仓间隔天数
-    - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
-      为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
-      如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
-      将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
-      的第一个交易日。    
+    Description of the position adjustment mode adjust_mode:
+    - The "query" mode follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
+      
+    - The "day" mode: adjust_cycle is the position adjustment interval in days;
+    - For the "week" | "month" | "quarter" | "year" modes, adjust_cycle
+      is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
+      if the day is not a trading day the position adjustment will be skipped; when delay_to_trading_day is true, if the day is not a trading day,
+      it will be postponed to the first trading day in the current period; e.g. if the position adjustment is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+      
 
-    :param TradeManager tm: 交易管理
-    :param SelectorBase se: 交易对象选择算法
-    :param AllocateFundsBase af: 资金分配算法
-    :param int adjust_cycle: 调仓周期
-    :param str adjust_mode: 调仓模式
-    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日)");
+    :param TradeManager tm: the trade management
+    :param SelectorBase se: the trading object selection algorithm
+    :param AllocateFundsBase af: the asset allocation algorithm
+    :param int adjust_cycle: the position adjustment period
+    :param str adjust_mode: the position adjustment mode
+    :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period)");
 
     m.def(
       "PF_WithoutAF",
@@ -214,24 +214,24 @@ void export_Portfolio(py::module& m) {
       py::arg("sell_at_not_selected") = false,
       R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False,sell_at_not_selected=False])
     
-    创建无资金分配算法的投资组合，所有单系统策略使用共同的 tm 管理账户
+    Create a portfolio without an asset allocation algorithm; all the single-system strategies use the common tm to manage the account
 
-    调仓模式 adjust_mode 说明：
-    - "query" 模式，跟随输入参数 query 中的 ktype，此时 adjust_cycle 为以 query 中的 ktype
-      决定周期间隔；
-    - "day" 模式，adjust_cycle 为调仓间隔天数
-    - "week" | "month" | "quarter" | "year" 模式时，adjust_cycle
-      为对应的每周第N日、每月第n日、每季度第n日、每年第n日，在 delay_to_trading_day 为 false 时
-      如果当日不是交易日将会被跳过调仓；当 delay_to_trading_day 为 true时，如果当日不是交易日
-      将会顺延至当前周期内的第一个交易日，如指定每月第1日调仓，但当月1日不是交易日，则将顺延至当月
-      的第一个交易日。    
+    Description of the position adjustment mode adjust_mode:
+    - The "query" mode follows the ktype in the input parameter query; in this case adjust_cycle is the period interval determined by the ktype in the query;
+      
+    - The "day" mode: adjust_cycle is the position adjustment interval in days;
+    - For the "week" | "month" | "quarter" | "year" modes, adjust_cycle
+      is the corresponding Nth day of the week, the Nth day of the month, the Nth day of the quarter, or the Nth day of the year; when delay_to_trading_day is false,
+      if the day is not a trading day the position adjustment will be skipped; when delay_to_trading_day is true, if the day is not a trading day,
+      it will be postponed to the first trading day in the current period; e.g. if the position adjustment is specified on the 1st day of each month, but the 1st day of the month is not a trading day, it will be postponed to the first trading day of that month.    
+      
 
-    :param TradeManager tm: 交易管理
-    :param SelectorBase se: 交易对象选择算法
-    :param int adjust_cycle: 调仓周期
-    :param str adjust_mode: 调仓模式
-    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
-    :param bool trade_on_close: 交易是否在收盘时进行
-    :param bool sys_use_self_tm: 原型系统使用自身附带的tm进行计算
-    :param bool sell_at_not_selected: 调仓日未选中的股票是否强制卖出)");
+    :param TradeManager tm: the trade management
+    :param SelectorBase se: the trading object selection algorithm
+    :param int adjust_cycle: the position adjustment period
+    :param str adjust_mode: the position adjustment mode
+    :param bool delay_to_trading_day: if the day is not a trading day, it will be postponed to the first trading day in the current period
+    :param bool trade_on_close: whether the trade is executed at the close
+    :param bool sys_use_self_tm: the prototype systems use their own tm to calculate
+    :param bool sell_at_not_selected: whether the stocks not selected on the position adjustment day are forcibly sold)");
 }

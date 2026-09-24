@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 乘幂
+ * Power
  */
 class ISqrt : public IndicatorImp {
     INDICATOR_IMP(ISqrt)

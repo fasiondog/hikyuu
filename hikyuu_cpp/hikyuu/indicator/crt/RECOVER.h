@@ -12,7 +12,8 @@
 namespace hku {
 
 /**
- * 复权类指标，可接收 CLOSE/OPEN/HIGH/LOW 指标，或 KData(默认使用 close) 作为输入参数
+ * Adjustment indicators; they accept the CLOSE/OPEN/HIGH/LOW indicators or a KData (close is used
+ * by default) as the input parameter
  * @return Indicator
  * @ingroup Indicator
  */

@@ -22,10 +22,11 @@ public:
     virtual ~PluginBase() = default;
 
     /**
-     * @brief 返回插件信息
+     * @brief Return the plugin information
      * @details
-     * 插件信息为json格式，包含name(string)、version(int)、description(string)、author(string)字段
-     * 如：{"name":"unknown","version": 1.0,"description":"","author":"unknown"}
+     * The plugin information is in the json format, containing the name (string), version (int),
+     * description (string) and author (string) fields
+     * e.g.: {"name":"unknown","version": 1.0,"description":"","author":"unknown"}
      * @return std::string
      */
     virtual std::string info() const noexcept = 0;

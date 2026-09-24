@@ -1,270 +1,275 @@
-# AGENTS.md — Hikyuu 项目 AI 开发指南
+# AGENTS.md — Hikyuu Project AI Development Guide
 
-> 本文件为 AI 编码代理（及新加入的开发者）提供在 hikyuu 仓库中工作所需的核心上下文：
-> 项目结构、构建/测试命令、代码规范与常见注意事项。**先读本文件，再动手改代码。**
+> This file provides the core context needed to work in the hikyuu repository for AI coding agents (and newly joined developers):
+> the project structure, the build/test commands, the code conventions and the common caveats. **Read this file first, before changing any code.**
 
-## 1. 项目概览
+## 1. Project Overview
 
-- **Hikyuu** 是一个基于 **C++/Python** 的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展（深度适配国内 A 股市场）。
-- 核心能力：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。
-- 项目组成：**高性能 C++ 核心库**（`hikyuu_cpp`）+ **pybind11 绑定层**（`hikyuu_pywrap`）+ **Python 接口层**（`hikyuu` 包）+ **交互式探索工具**（`hikyuu.interactive`）。
-- 开源协议：Apache License 2.0；默认分支 `master`，另有 `release`、`bugfix`、`feature/*` 分支。
-- 项目文档：[https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)（Sphinx，中文为主）。
+- **Hikyuu** is an open-source ultra-high-speed quantitative trading research framework based on **C++/Python**, focusing on the strategy analysis, the backtesting and the live trading capability extensions (deeply adapted to the domestic China A-share market).
+- The core capabilities: the trading model development, the ultra-fast computing engine, the efficient backtesting system and the live trading extensions.
+- The project composition: the **high-performance C++ core library** (`hikyuu_cpp`) + the **pybind11 binding layer** (`hikyuu_pywrap`) + the **Python interface layer** (the `hikyuu` package) + the **interactive exploration tools** (`hikyuu.interactive`).
+- License: Apache License 2.0; the default branch is `master`, plus the `release`, `bugfix` and `feature/*` branches.
+- Project documentation: [https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html) (Sphinx, mainly in Chinese).
 
-## 2. 仓库结构
+## 2. Repository Structure
 
 ```
 hikyuu/
-├── xmake.lua                 # 顶层构建脚本（xmake 工程，定义全局 options/依赖）
-├── copy_dependents.lua       # 拷贝第三方依赖头文件/库的任务
-├── requirements.txt          # Python 侧依赖
-├── setup.py / sub_setup.py   # Python 包安装脚本
-├── hikyuu_cpp/               # C++ 核心引擎库
-│   ├── hikyuu/               #   ├─ 核心代码：Stock/KData/Indicator/StockManager...
-│   │   ├── data_driver/      #   ├─ 数据驱动引擎（HDF5/MySQL/SQLite/TDX）
-│   │   ├── trade_sys/        #   ├─ 交易系统组件（SG/MM/ST/CN/EV/PG/SP/PF/SE/AF/MF）
-│   │   ├── trade_manage/     #   ├─ 交易管理（TradeManager/OrderBroker）
-│   │   ├── indicator/        #   ├─ 指标库（含 indicator_talib）
-│   │   ├── strategy/         #   ├─ 策略上下文
-│   │   ├── factor/           #   ├─ 多因子
-│   │   ├── utilities/        #   ├─ 基础工具（日志/配置/网络等）
-│   │   └── xmake.lua         #   └─ 核心 target("hikyuu") 定义
-│   ├── unit_test/            # C++ 单元测试（doctest），targets: unit-test / small-test / real-test
-│   └── demo/                 # C++ 示例
-├── hikyuu_pywrap/            # pybind11 绑定（target "core" → core.so / core.pyd）
-│   ├── main.cpp              # 绑定注册入口
-│   ├── indicator/ trade_sys/ trade_manage/ data_driver/ ...   # 各模块绑定
+├── xmake.lua                 # The top-level build script (an xmake project, defining the global options/dependencies)
+├── copy_dependents.lua       # The task that copies the third-party dependency headers/libraries
+├── requirements.txt          # The Python-side dependencies
+├── setup.py / sub_setup.py   # The Python package installation scripts
+├── hikyuu_cpp/               # The C++ core engine library
+│   ├── hikyuu/               #   ├─ The core code: Stock/KData/Indicator/StockManager...
+│   │   ├── data_driver/      #   ├─ The data driver engine (HDF5/MySQL/SQLite/TDX)
+│   │   ├── trade_sys/        #   ├─ The trading system parts (SG/MM/ST/CN/EV/PG/SP/PF/SE/AF/MF)
+│   │   ├── trade_manage/     #   ├─ The trade management (TradeManager/OrderBroker)
+│   │   ├── indicator/        #   ├─ The indicator library (including indicator_talib)
+│   │   ├── strategy/         #   ├─ The strategy context
+│   │   ├── factor/           #   ├─ The multi-factor
+│   │   ├── utilities/        #   ├─ The basic utilities (logging/configuration/networking, etc.)
+│   │   └── xmake.lua         #   └─ The core target("hikyuu") definition
+│   ├── unit_test/            # The C++ unit tests (doctest), targets: unit-test / small-test / real-test
+│   └── demo/                 # The C++ demos
+├── hikyuu_pywrap/            # The pybind11 bindings (the target "core" → core.so / core.pyd)
+│   ├── main.cpp              # The binding registration entry
+│   ├── indicator/ trade_sys/ trade_manage/ data_driver/ ...   # The bindings of each module
 │   └── xmake.lua
-├── hikyuu/                   # Python 接口包
-│   ├── __init__.py           # 包入口：加载编译产物 core.so 及依赖库
-│   ├── core.py / extend.py   # 核心对象导入与扩展
-│   ├── indicator/            # Python 侧指标扩展（.pyi 存根与实现）
+├── hikyuu/                   # The Python interface package
+│   ├── __init__.py           # The package entry: loading the compiled core.so and the dependency libraries
+│   ├── core.py / extend.py   # The core object imports and extensions
+│   ├── indicator/            # The Python-side indicator extensions (the .pyi stubs and the implementations)
 │   ├── trade_sys/ trade_manage/ analysis/ data/ draw/ util/
 │   ├── fetcher/ gui/ strategy/ interactive.py / hub.py
-│   ├── plugin/               # 运行时插件（数据导入、行情等）
-│   ├── cpp/                  # 编译产物目录：core310~core313.so、lib*.dylib 等（gitignore）
-│   ├── test/                 # Python 测试（test.py 为入口）
-│   └── examples/             # 示例与 notebook 教程
-├── docs/                     # Sphinx 文档（docs/source，中文；docs/make.sh 构建）
-├── test_data/                # C++ 测试数据（运行测试时自动拷贝）
-├── i18n/                     # 国际化/语言文件
-├── docker/                   # 容器化配置
-└── .github/workflows/        # CI：ubuntu.yml / windows.yml / macosx.yml
+│   ├── plugin/               # The runtime plugins (the data import, the market data, etc.)
+│   ├── cpp/                  # The compiled artifacts directory: core310~core313.so, lib*.dylib, etc. (gitignored)
+│   ├── test/                 # The Python tests (test.py is the entry)
+│   └── examples/             # The examples and the notebook tutorials
+├── docs/                     # The Sphinx documentation (dual-source: docs/zh Chinese + docs/en English; docs/make.sh builds)
+├── test_data/                # The C++ test data (copied automatically when running the tests)
+├── i18n/                     # The internationalization/language files
+├── docker/                   # The containerization configuration
+└── .github/workflows/        # The CI: ubuntu.yml / windows.yml / macosx.yml
 ```
 
-## 3. 构建系统（xmake）
+## 3. Build System (xmake)
 
-- 构建工具：**xmake**（顶层 `set_xmakever("3.0.0")`，CI 用 3.0.8）。C++ 标准 **C++20**；Windows 用 clang-cl。
-- 第三方依赖全部通过 xmake 包管理（`add_requires`）拉取：boost、hdf5、mysql、fmt、spdlog、sqlite3、flatbuffers、nng、nlohmann_json、eigen、xxhash、utf8proc、ta-lib、mimalloc、pybind11、doctest 等；外部仓库 `hikyuu-extern-libs`（github/gitee）。
-- 关键配置项（`xmake f` 选项）：`mysql`、`hdf5`、`sqlite`、`tdx`、`ta_lib`、`low_precision`、`omp`、`serialize`、`leak_check`、`stacktrace`、`log_level`、`async_log`、`feedback`、`spend_time` 等。
-- 产物输出到 `build/{mode}/{plat}/{arch}/lib`；Python 包运行所需的 `core.so` 与依赖库需拷贝到 `hikyuu/cpp/`（见下方工作流）。
+- Build tool: **xmake** (the top-level `set_xmakever("3.0.0")`, and the CI uses 3.0.8). The C++ standard is **C++20**; Windows uses clang-cl.
+- All the third-party dependencies are pulled through the xmake package management (`add_requires`): boost, hdf5, mysql, fmt, spdlog, sqlite3, flatbuffers, nng, nlohmann_json, eigen, xxhash, utf8proc, ta-lib, mimalloc, pybind11, doctest, etc.; the external repository is `hikyuu-extern-libs` (github/gitee).
+- The key configuration items (the `xmake f` options): `mysql`, `hdf5`, `sqlite`, `tdx`, `ta_lib`, `low_precision`, `omp`, `serialize`, `leak_check`, `stacktrace`, `log_level`, `async_log`, `feedback`, `spend_time`, etc.
+- The artifacts are output to `build/{mode}/{plat}/{arch}/lib`; the `core.so` and the dependency libraries needed by the Python package at runtime must be copied to `hikyuu/cpp/` (see the workflow below).
 
-### 常用命令
+### Common Commands
 
 ```bash
-# 配置（首次或变更依赖/选项后）
+# Configure (the first time, or after changing the dependencies/options)
 xmake f -k shared -y -vD
 
-# 编译 C++ 核心库
+# Build the C++ core library
 xmake -b core
 
-# 编译并运行 C++ 单元测试（doctest，small-test 不依赖真实数据）
+# Build and run the C++ unit tests (doctest; small-test does not depend on the real data)
 xmake r small-test
 
-# 执行完整单测（含 indicator/trade_sys 等大部分模块）
+# Run the full unit tests (covering most modules such as indicator/trade_sys)
 xmake r unit-test
 
-# 真实数据测试（需 HKU_USE_REAL_DATA_TEST 与真实行情数据，通常只在 CI/本地有数据时跑）
+# The real data test (requiring HKU_USE_REAL_DATA_TEST and the real market data; usually run only in the CI or locally with the data)
 xmake r real-test
 
-# 调试/覆盖率模式
+# The debug/coverage mode
 xmake f -m debug -y          # debug
-xmake f -m coverage -y       # coverage（生成 lcov/genhtml 报告）
+xmake f -m coverage -y       # coverage (generating the lcov/genhtml reports)
 ```
 
-> 注意：运行 `xmake r` 系列测试时，构建系统会自动把 `test_data`、`hikyuu/plugin`、`i18n` 拷贝到可执行文件所在目录（见 `hikyuu_cpp/unit_test/xmake.lua` 的 `prepare_run`）。
+> Note: when running the `xmake r` series tests, the build system automatically copies `test_data`, `hikyuu/plugin` and `i18n` to the directory of the executable (see the `prepare_run` in `hikyuu_cpp/unit_test/xmake.lua`).
 
-### IDE / LSP 索引（clangd）
+### IDE / LSP Indexing (clangd)
 
-`hikyuu_cpp/hikyuu/` 源码普遍以 `#include "hikyuu/xxx.h"`（依赖各 target 的 `add_includedirs("..")`，即以 `hikyuu_cpp` 为包含根目录），`hikyuu_pywrap/` 则用 `#include <hikyuu/xxx.h>`（依赖 `add_includedirs("../hikyuu_cpp")`）。因此 **clangd 必须拿到编译数据库**，否则会退化为 fallback 参数（编译目录 = 文件自身所在目录），对新建文件报成片的 `Unknown type name 'XXX'`、`'hikyuu/xxx.h' file not found` —— 这类报错是**索引问题而非代码问题**，不要靠改代码去「修」。
+The sources of `hikyuu_cpp/hikyuu/` generally use `#include "hikyuu/xxx.h"` (relying on the `add_includedirs("..")` of each target, i.e. with `hikyuu_cpp` as the include root), while `hikyuu_pywrap/` uses `#include <hikyuu/xxx.h>` (relying on `add_includedirs("../hikyuu_cpp")`). Therefore, **clangd must get the compilation database**, otherwise it will degrade to the fallback arguments (with the compilation directory = the directory of the file itself), reporting masses of `Unknown type name 'XXX'` and `'hikyuu/xxx.h' file not found` for the newly created files — such errors are **an indexing problem, not a code problem**; do not try to "fix" them by changing the code.
 
 ```bash
-# 生成到工程根目录 compile_commands.json（clangd 原生自动发现的 locations）
+# Generate compile_commands.json in the project root (the locations discovered natively by clangd)
 xmake project -k compile_commands --lsp=clangd
 ```
 
-- 新增/删除源文件、变更 `xmake f` 选项（依赖/开关）后需重跑一次；生成物已 gitignore（`.vscode`、`.clangd` 均在忽略列表内），勿提交。
-- 不要用 `.clangd` 的 `-I.` 代替编译数据库：相对路径按编译目录解析，对 fallback 命令会指向源文件所在目录而非包含根，**实测无效**。
-- 若仍想把数据库放在 `.vscode/` 等子目录下，可用 `clangd.arguments: --compile-commands-dir=<dir>` 指定目录。
-- 手改 `hikyuu_cpp/hikyuu/config.h`、`version.h` 无效（均由 `add_configfiles` 依据 `config.h.in`/`version.h.in` 在构建时生成，且已 gitignore）；clangd 识别 `HKU_*` 条件编译宏同样依赖编译数据库里携带的 `-D` 定义，因此变更后须重新生成 `compile_commands.json`。
+- Re-run it after adding/deleting the source files or changing the `xmake f` options (the dependencies/switches); the generated artifacts are gitignored (`.vscode` and `.clangd` are both in the ignore list), do not commit them.
+- Do not use the `-I.` of `.clangd` to replace the compilation database: the relative paths are resolved against the compilation directory, and for the fallback commands they point to the directory of the source file rather than the include root — **verified to be ineffective**.
+- If you still want to put the database in `.vscode/` or another subdirectory, you can use `clangd.arguments: --compile-commands-dir=<dir>` to specify the directory.
+- Manually editing `hikyuu_cpp/hikyuu/config.h` and `version.h` has no effect (both are generated at the build time by `add_configfiles` from `config.h.in`/`version.h.in`, and are gitignored); the recognition of the `HKU_*` conditional compilation macros by clangd also depends on the `-D` definitions carried in the compilation database, so you must regenerate `compile_commands.json` after changing them.
 
-## 4. 测试
+## 4. Testing
 
-### Python 测试（hikyuu/test/）
+### Python Tests (hikyuu/test/)
 
 ```bash
 export PYTHONPATH=.
-python3 hikyuu/test/test.py     # CI 使用的入口
+python3 hikyuu/test/test.py     # the entry used by the CI
 ```
 
-- 各模块独立测试文件：`Indicator.py`、`KData.py`、`Signal.py`、`MoneyManager.py`、`Stoploss.py`、`AllocateFunds.py`、`Datetime.py`、`Parameter.py` 等，可单独运行（如 `python3 hikyuu/test/Indicator.py`）。
-- 新增 Python 功能应在 `hikyuu/test/` 下补充对应测试。
+- The independent test files of each module: `Indicator.py`, `KData.py`, `Signal.py`, `MoneyManager.py`, `Stoploss.py`, `AllocateFunds.py`, `Datetime.py`, `Parameter.py`, etc., which can be run individually (e.g. `python3 hikyuu/test/Indicator.py`).
+- The new Python features should add the corresponding tests under `hikyuu/test/`.
 
-### C++ 测试（hikyuu_cpp/unit_test/）
+### C++ Tests (hikyuu_cpp/unit_test/)
 
-基于 **doctest**，目录结构与核心库模块一一对应。测试工程组织须遵循以下原则：
+Based on **doctest**, the directory structure corresponds one-to-one with the core library modules. The test project organization must follow the principles below:
 
-#### 组织原则
+#### The Organization Principles
 
-1. **物理隔离，结构并行**：测试工程与源代码工程物理隔离，使用完全独立的并行目录（`hikyuu_cpp/unit_test/hikyuu/…` 对 `hikyuu_cpp/hikyuu/…`），内部目录结构保持一致。
-2. **一模块一套件**：针对一个模块（通常为一个类），建立一个测试套件（test_suite），命名规则为 `test_模块名_suite`，例如 `test_iniparser_suite`，全部使用小写字母。测试套件在文件顶部用 `@defgroup` / `@ingroup` 声明，见 `test_iniparser.cpp`、`test_Stock.cpp` 等现有文件。
-3. **一套件一文件**：每个测试套件使用一个独立测试文件，文件命名规则为 `test_模块名.cpp`，例如 `test_iniparser.cpp`、`test_Stock.cpp`。
-4. **一函数/方法一用例**：针对每一个函数或类成员方法，建立一个独立的测试用例（`TEST_CASE`），命名规则为 `test_函数名` 或 `test_类名_方法名`。重名时可在其后加 `_case` 或其他标识进行区分。
-5. **公开接口尽可能覆盖**：公开接口应尽可能添加测试；对于必须 mock 才能模拟的场景可不考虑。
-6. **@arg 标注测试点**：在每个测试用例内，用 `/** @arg … */` 注释明确标注每一个测试点，便于代码审查与快速定位。示例：
+1. **Physical isolation with a parallel structure**: the test project and the source code project are physically isolated, using completely independent parallel directories (`hikyuu_cpp/unit_test/hikyuu/…` against `hikyuu_cpp/hikyuu/…`), with a consistent internal directory structure.
+2. **One module, one suite**: for one module (usually one class), establish a test suite, named `test_<module>_suite`, e.g. `test_iniparser_suite`, all in lowercase. Declare the suite at the top of the file with `@defgroup` / `@ingroup`, see the existing files such as `test_iniparser.cpp` and `test_Stock.cpp`.
+3. **One suite, one file**: each test suite uses an independent test file, named `test_<module>.cpp`, e.g. `test_iniparser.cpp` and `test_Stock.cpp`.
+4. **One function/method, one case**: for each function or class member method, establish an independent test case (`TEST_CASE`), named `test_<function_name>` or `test_<class_name>_<method_name>`. When the names collide, you can add `_case` or another identifier after them to distinguish.
+5. **Cover the public interfaces as much as possible**: the public interfaces should have tests added as much as possible; the scenarios that must be mocked to simulate may be skipped.
+6. **Mark the test points with @arg**: within each test case, use the `/** @arg … */` comments to clearly mark each test point, for the code review and the quick locating. Example:
 
 ```cpp
 TEST_CASE("test_IniParser_hasSection") {
     IniParser ini_parser;
-    // …准备数据…
-    /** @arg 存在指定的 section */
+    // …prepare the data…
+    /** @arg the specified section exists */
     CHECK_UNARY(ini_parser.hasSection("test1"));
-    /** @arg 不存在指定 section */
+    /** @arg the specified section does not exist */
     CHECK_UNARY(!ini_parser.hasSection("test2"));
 }
 ```
 
-7. **边界条件必须覆盖**：每个函数/方法的测试中，边界条件必须覆盖，尤其注意：
+7. **The boundary conditions must be covered**: in the tests of each function/method, the boundary conditions must be covered, paying special attention to:
 
-   - **循环边界**：0 次、1 次、恰好 N 次、N-1、N+1 次迭代的情况（例如空容器、单元素、多元素）。
-   - **极值边界**：最小值/最大值、空字符串、空范围、`Null<T>()`、越界索引、零值、负值（若允许）。
-   - **分支边界**：`if/else`、`switch` 的每个分支，三元表达式两侧，提前 `return` / `break` / `continue` 的路径。
-   - **错误/异常路径**：非法输入、文件不存在、格式错误等应触发异常的情况。
-8. **覆盖率要求**：整体应尽可能达到分支覆盖，最低要求为行覆盖。**必须 mock 才能模拟的代码路径可豁免**（如需要网络、数据库、实盘连接等外部依赖才能触发的分支）。`xmake f -m coverage -y` 可生成 lcov 覆盖率报告进行自查。
+   - **The loop boundaries**: 0, 1, exactly N, N-1, N+1 iterations (e.g. an empty container, a single element, multiple elements).
+   - **The extreme value boundaries**: the minimum/maximum, an empty string, an empty range, `Null<T>()`, an out-of-bounds index, zero, a negative value (if allowed).
+   - **The branch boundaries**: each branch of `if/else` and `switch`, both sides of the ternary expressions, and the paths of the early `return` / `break` / `continue`.
+   - **The error/exception paths**: the invalid inputs, the missing files, the malformed formats, etc., which should trigger the exceptions.
+8. **The coverage requirements**: overall, aim for the branch coverage, with the line coverage as the minimum requirement. **The code paths that must be mocked to simulate are exempted** (e.g. the branches that can only be triggered by the external dependencies such as the network, the database and the live trading connections). `xmake f -m coverage -y` can generate the lcov coverage report for a self-check.
 
-#### 运行目标
+#### The Run Targets
 
-- `unit-test`：覆盖大部分模块的完整单测集。
-- `small-test`：最小回归集，CI 默认使用。
-- `real-test`：需真实行情数据，配合 `HKU_USE_REAL_DATA_TEST` 使用。
+- `unit-test`: the complete unit test set covering most modules.
+- `small-test`: the minimal regression set, used by the CI by default.
+- `real-test`: requires the real market data, used together with `HKU_USE_REAL_DATA_TEST`.
 
-## 5. 代码规范
+## 5. Code Conventions
 
-| 语言   | 规范                                        | 要点                                                                              |
-| ------ | ------------------------------------------- | --------------------------------------------------------------------------------- |
-| C++    | `.clang-format`（Google 风格为基础）      | 4 空格缩进、列宽 100、Attach 大括号、`-Wno-sign-compare` 等告警开关见 xmake.lua |
-| Python | `hikyuu/.style.yapf`（yapf）+ `.flake8` | 4 空格缩进、列宽 120（flake8`max-line-length=120`）                             |
-| Lua    | `.lua-format`                             | 构建脚本格式化                                                                    |
+| Language | Convention                                    | Key points                                                                                                                              |
+| -------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| C++      | `.clang-format` (Google style as the base)    | a 4-space indent, a column width of 100, the attached braces; the warning switches such as `-Wno-sign-compare` are in xmake.lua |
+| Python   | `hikyuu/.style.yapf` (yapf) + `.flake8`       | a 4-space indent, a column width of 120 (flake8 `max-line-length=120`)                                                                  |
+| Lua      | `.lua-format`                                 | format the build scripts                                                                                                                 |
 
-- 提交前用 `clang-format` / `yapf` 格式化改动文件，避免与现有风格偏离。
-- 新增公开 API 需要同步维护 `.pyi` 存根（`hikyuu/__init__.pyi`、`core.pyi`、`extend.pyi` 及 `hikyuu/cpp/core3xx.pyi`）以及文档（`docs/source/`）。
+- Format the changed files with `clang-format` / `yapf` before committing, to avoid deviating from the existing style.
+- Adding a new public API requires maintaining the `.pyi` stubs (`hikyuu/__init__.pyi`, `core.pyi`, `extend.pyi` and `hikyuu/cpp/core3xx.pyi`) and the documentation (`docs/zh/` and `docs/en/`; the two trees must be updated in pairs with a consistent structure) synchronously.
 
-### 命名规范（C++）
+### Naming Conventions (C++)
 
-以下规范自 `hikyuu_cpp/hikyuu/` 现有代码提炼，新增/修改代码须遵循：
+The conventions below are distilled from the existing code of `hikyuu_cpp/hikyuu/`; the new/modified code must follow them:
 
-| 标识符类别                        | 规范                                                                                                                  | 示例                                                                                                                                                               |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 命名空间                          | 全小写                                                                                                                | `namespace hku;`                                                                                                                                                 |
-| 类 / 结构体                       | `PascalCase`，业务域 + 核心概念；导出类加 `HKU_API` 宏                                                            | `class HKU_API StockManager`、`class SignalBase`、`struct ParamItemRecord`                                                                                   |
-| 公开成员函数                      | `camelCase`，动词起首（`should/get/set/is/has/reload…`）                                                         | `shouldBuy()`、`getBuyValue()`、`reloadWith()`、`isIpcClientMode()`、`setTO()`、`nextTimeShouldBuy()`                                                  |
-| 受保护 / 私有成员函数             | `_` 前缀 + `camelCase`（子类需 override 的钩子以 `_` 开头）                                                     | `_calculate()`、`_reset()`、`_clone()`、`_addBuySignal()`、`_testingSetIpcClientMode()`                                                                  |
-| 成员变量                          | `m_` 前缀 + `camelCase`                                                                                           | `m_name`、`m_kdata`、`m_is_python_object`、`m_buySig`、`m_cycle_start`、`m_ipc_client_mode`                                                            |
-| 类静态成员变量                    | `ms_` 前缀 + `camelCase`（区别于非静态成员的 `m_`）                                                             | `ms_sm`、`ms_init_mutex`、`ms_stockDict`（注：`StockManager` 旧代码沿用 `m_sm`/`m_init_mutex`/`m_stockDict` 为历史遗留，新增静态成员一律用 `ms_`） |
-| 全局变量 / 文件作用域 static 全局 | `g_` 前缀 + `camelCase`                                                                                           | `g_load_event`、`g_shm_server_role`、`g_all_base_ktype`、`g_ktype2min`、`g_log_level`                                                                    |
-| 函数内 static 局部变量            | `g_` 前缀 + `camelCase`（与全局变量一致，便于识别长生命周期存储）                                                 | `static std::once_flag g_tz_set;`、`static long int g_timezone;`                                                                                               |
-| 类型别名 / 智能指针别名           | 业务对象名 +`Ptr`（`typedef shared_ptr<T> XPtr;`）                                                                | `typedef shared_ptr<SignalBase> SignalPtr;`                                                                                                                      |
-| 枚举类型 / 枚举值                 | 枚举类型`PascalCase`；枚举值全大写 + 下划线                                                                         | `KQuery::QueryType { INDEX, DATE, INVALID }`                                                                                                                     |
-| 宏 / 编译开关 / 常量              | 全大写 + 下划线                                                                                                       | `HKU_API`、`HKU_SUPPORT_SERIALIZATION`、`HKU_ENABLE_NODE`、`IND_EQ_THRESHOLD`                                                                              |
-| 函数参数                          | `camelCase`                                                                                                         | `baseInfoParam`、`kdataParam`、`datetime`、`context`                                                                                                       |
-| 局部变量                          | `camelCase`                                                                                                         | `initParam()` 内部局部变量风格                                                                                                                                   |
-| 头/源文件名                       | `PascalCase`；**一 `class` 一文件**（类名与文件名一致）；扁平 `struct`/POD/小工具类型可多个共存于同一文件 | `StockManager.h`、`SignalBase.h`；`SG_Cross.h`、`MM_FixedPercent.h`、`ST_FixedPercent.h`、`SP_Normal.h`                                                |
-| 实现派生类文件                    | `PascalCase`，置于对应模块的 `imp/` 子目录                                                                        | `imp/CrossSignal.h`、`imp/FixedPercentMoneyManager.h`                                                                                                          |
+| The identifier category                    | The convention                                                                                                                  | The examples                                                                                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Namespace                                  | all lowercase                                                                                                                    | `namespace hku;`                                                                                                                                                           |
+| Class / struct                             | `PascalCase`, the business domain + the core concept; the exported classes carry the `HKU_API` macro                             | `class HKU_API StockManager`, `class SignalBase`, `struct ParamItemRecord`                                                                                                 |
+| Public member functions                    | `camelCase`, starting with a verb (`should/get/set/is/has/reload…`)                                                              | `shouldBuy()`, `getBuyValue()`, `reloadWith()`, `isIpcClientMode()`, `setTO()`, `nextTimeShouldBuy()`                                                                      |
+| Protected / private member functions       | the `_` prefix + `camelCase` (the hooks that the subclasses need to override start with `_`)                                     | `_calculate()`, `_reset()`, `_clone()`, `_addBuySignal()`, `_testingSetIpcClientMode()`                                                                                    |
+| Member variables                           | the `m_` prefix + `camelCase`                                                                                                    | `m_name`, `m_kdata`, `m_is_python_object`, `m_buySig`, `m_cycle_start`, `m_ipc_client_mode`                                                                                |
+| Class static member variables              | the `ms_` prefix + `camelCase` (distinguished from the non-static `m_`)                                                          | `ms_sm`, `ms_init_mutex`, `ms_stockDict` (note: the old code of `StockManager` still uses `m_sm`/`m_init_mutex`/`m_stockDict` as a historical legacy; all the newly added static members use `ms_`) |
+| Global variables / file-scope statics      | the `g_` prefix + `camelCase`                                                                                                    | `g_load_event`, `g_shm_server_role`, `g_all_base_ktype`, `g_ktype2min`, `g_log_level`                                                                                      |
+| The static local variables in functions    | the `g_` prefix + `camelCase` (consistent with the global variables, easy to identify the long-lived storage)                    | `static std::once_flag g_tz_set;`, `static long int g_timezone;`                                                                                                           |
+| Type aliases / smart pointer aliases       | the business object name +`Ptr` (`typedef shared_ptr<T> XPtr;`)                                                                  | `typedef shared_ptr<SignalBase> SignalPtr;`                                                                                                                                |
+| Enumeration types / enumeration values     | the enumeration type in `PascalCase`; the enumeration values in all uppercase + underscores                                       | `KQuery::QueryType { INDEX, DATE, INVALID }`                                                                                                                               |
+| Macros / compilation switches / constants  | all uppercase + underscores                                                                                                       | `HKU_API`, `HKU_SUPPORT_SERIALIZATION`, `HKU_ENABLE_NODE`, `IND_EQ_THRESHOLD`                                                                                              |
+| Function parameters                        | `camelCase`                                                                                                                       | `baseInfoParam`, `kdataParam`, `datetime`, `context`                                                                                                                       |
+| Local variables                            | `camelCase`                                                                                                                       | the local variable style inside `initParam()`                                                                                                                              |
+| Header/source file names                   | `PascalCase`; **one `class` per file** (the class name matches the file name); the flat `struct`/POD/small utility types may coexist in one file | `StockManager.h`, `SignalBase.h`; `SG_Cross.h`, `MM_FixedPercent.h`, `ST_FixedPercent.h`, `SP_Normal.h`                                                                    |
+| The files of the derived implementations   | `PascalCase`, placed in the `imp/` subdirectory of the corresponding module                                                       | `imp/CrossSignal.h`, `imp/FixedPercentMoneyManager.h`                                                                                                                      |
 
-> 注：`hku` 是整个 C++ 核心库唯一的顶层命名空间；新增公开类须带 `HKU_API` 导出宏；工厂构造函数集中在各模块 `crt/` 子目录，派生实现集中在 `imp/` 子目录。
+> Note: `hku` is the only top-level namespace of the entire C++ core library; the newly added public classes must carry the `HKU_API` export macro; the factory constructors are centralized in the `crt/` subdirectory of each module, and the derived implementations are centralized in the `imp/` subdirectory.
 >
-> **文件组织约束**：每个 `class` 必须独占一个头/源文件（文件名与类名一致）；仅扁平 `struct`、POD、小工具结构、枚举、typedef 别名等轻量定义可与其他类型共存于同一文件。例如 `Parameter.h` 中的 `struct ParamItemRecord` 与 `class Parameter` 共存属于合规例外，但 `class StockManager`、`class SignalBase` 等核心业务类各自独立成文件。
+> **The file organization constraint**: each `class` must exclusively occupy one header/source file (the file name matches the class name); only the lightweight definitions such as the flat `struct`s, the PODs, the small utility structures, the enumerations and the typedef aliases may coexist with the other types in the same file. E.g. the coexistence of `struct ParamItemRecord` and `class Parameter` in `Parameter.h` is a compliant exception, but the core business classes such as `class StockManager` and `class SignalBase` are each in their own file.
 
-### 命名规范（Python）
+### Naming Conventions (Python)
 
-以下规范自 `hikyuu/` 包现有代码（不含 `cpp/` 编译产物与 `test/`）提炼：
+The conventions below are distilled from the existing code of the `hikyuu/` package (excluding the `cpp/` compiled artifacts and `test/`):
 
-| 标识符类别          | 规范                                                                                                   | 示例                                                                                                           |
-| ------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| 包 / 模块文件名     | `snake_case`                                                                                         | `indicator/`、`trade_manage/`、`trade_sys/`、`util/singleton.py`、`draw/drawplot/matplotlib_draw.py` |
-| 类                  | `PascalCase`                                                                                         | `class Spot`、`class OrderBrokerWrap`、`class SingletonType`、`class System`                           |
-| 公开函数 / 方法     | `snake_case`，动词起首                                                                               | `concat_to_df()`、`df_to_ind()`、`run_in_strategy()`、`get_part()`                                     |
-| 私有 / 内部方法     | 单下划线前缀 +`snake_case`（约定为内部使用，不强约束）                                               | `_buy()`、`_sell()`、`_get_asset_info()`、`_clone()`                                                   |
-| 魔术方法            | 双下划线包裹，Python 标准                                                                              | `__init__`、`__iter__`、`__str__`、`__repr__`                                                          |
-| 模块级常量          | `SCREAMING_SNAKE_CASE`                                                                               | `BASE_DIR`、`DRAWNULL`、`HDF5_COMPRESS_LEVEL`、`KDATA`、`CLOSE`、`OPEN`、`HIGH`、`LOW`         |
-| 全局上下文短变量    | 单字母大写（K 线字段/对象缩写）                                                                        | `O`、`C`、`H`、`L`、`A`、`V`、`D`、`K`、`Q`（在 `hikyuu/__init__.py` 中作为全局便捷别名）  |
-| 类变量 / 枚举式常量 | 全大写                                                                                                 | `System.ENVIRONMENT`、`System.SIGNAL`、`System.STOPLOSS`                                                 |
-| 实例变量            | `snake_case`；私有以单下划线开头                                                                     | `self._name`、`self._params`、`self._broker`、`self._instance_lock`、`self._stop_event`              |
-| 局部变量            | `snake_case`                                                                                         | `df`、`ind_list`、`head_stock_code`、`params`、`cloned`                                              |
-| 函数参数            | `snake_case`，类型注解变量名同样 `snake_case`                                                      | `head_stock_code`、`col_name`、`col_date`、`allocate_weight_func`、`get_real_buy_price`              |
-| 自定义装饰器        | `hku_` 前缀 + `snake_case`                                                                         | `@hku_catch`、`@hku_check_ignore`                                                                          |
-| property / 访问器   | `snake_case`（`flat/Spot.py` 中 `PascalCase` 访问器为 flatbuffers 生成代码，**非**本规范） | `hikyuu/` 自身代码访问器方法以 `snake_case` 为主                                                           |
+| The identifier category              | The convention                                                                                         | The examples                                                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Package / module file names          | `snake_case`                                                                                            | `indicator/`, `trade_manage/`, `trade_sys/`, `util/singleton.py`, `draw/drawplot/matplotlib_draw.py`     |
+| Classes                              | `PascalCase`                                                                                            | `class Spot`, `class OrderBrokerWrap`, `class SingletonType`, `class System`                             |
+| Public functions / methods           | `snake_case`, starting with a verb                                                                      | `concat_to_df()`, `df_to_ind()`, `run_in_strategy()`, `get_part()`                                       |
+| Private / internal methods           | a single underscore prefix + `snake_case` (conventionally for internal use, not strictly enforced)      | `_buy()`, `_sell()`, `_get_asset_info()`, `_clone()`                                                     |
+| Magic methods                        | wrapped in double underscores, the Python standard                                                      | `__init__`, `__iter__`, `__str__`, `__repr__`                                                            |
+| Module-level constants               | `SCREAMING_SNAKE_CASE`                                                                                  | `BASE_DIR`, `DRAWNULL`, `HDF5_COMPRESS_LEVEL`, `KDATA`, `CLOSE`, `OPEN`, `HIGH`, `LOW`                   |
+| The short global context variables   | a single uppercase letter (the abbreviations of the K-line fields/objects)                              | `O`, `C`, `H`, `L`, `A`, `V`, `D`, `K`, `Q` (as the global convenience aliases in `hikyuu/__init__.py`)  |
+| Class variables / enumeration constants | all uppercase                                                                                        | `System.ENVIRONMENT`, `System.SIGNAL`, `System.STOPLOSS`                                                 |
+| Instance variables                   | `snake_case`; the private ones start with a single underscore                                            | `self._name`, `self._params`, `self._broker`, `self._instance_lock`, `self._stop_event`                  |
+| Local variables                      | `snake_case`                                                                                            | `df`, `ind_list`, `head_stock_code`, `params`, `cloned`                                                  |
+| Function parameters                  | `snake_case`; the annotated variable names are also `snake_case`                                        | `head_stock_code`, `col_name`, `col_date`, `allocate_weight_func`, `get_real_buy_price`                  |
+| Custom decorators                    | the `hku_` prefix + `snake_case`                                                                        | `@hku_catch`, `@hku_check_ignore`                                                                        |
+| property / accessors                 | `snake_case` (the `PascalCase` accessors in `flat/Spot.py` are the flatbuffers generated code, **not** this convention) | the accessor methods of the `hikyuu/` code itself are mainly `snake_case`                                |
 
-> 注：`hikyuu/cpp/core3xx.pyi` 等由 pybind11-stubgen 生成的存根中可能出现与上述不一致的命名，属于绑定层生成产物，不视为 Python 侧手写规范。
+> Note: the stubs generated by pybind11-stubgen, such as `hikyuu/cpp/core3xx.pyi`, may contain the naming inconsistent with the above; they belong to the binding layer generated artifacts and are not regarded as the Python-side handwritten conventions.
 
-### 生成 .pyi 存根（pybind11-stubgen）
+### Generating the .pyi Stubs (pybind11-stubgen)
 
-C++ 绑定层（`core.so` / `core.pyd`）的 `.pyi` 存根使用 **pybind11-stubgen** 生成：
+The `.pyi` stubs of the C++ binding layer (`core.so` / `core.pyd`) are generated with **pybind11-stubgen**:
 
 ```bash
-# 1. 安装 pybind11-stubgen（未安装时）
+# 1. Install pybind11-stubgen (if it is not installed)
 pip install pybind11-stubgen
 
-# 2. 生成存根（在仓库根目录执行，输出到当前目录；需确保项目目录已在 PYTHONPATH 中，
-#    且编译产物已在 hikyuu/cpp/ 下可正常 import hikyuu）
+# 2. Generate the stubs (run it in the repository root, outputting to the current directory; make sure the project directory
+#    is in the PYTHONPATH, and the compiled artifacts are under hikyuu/cpp/ so that import hikyuu works)
 pybind11-stubgen -o . hikyuu
 ```
 
-- 不要手工生成存根，仅需要发布或人工请求时生成
-- 修改了 `hikyuu_pywrap/` 下的绑定（新增/变更类、函数、参数）后，应重新生成并同步对应存根。
+- Do not generate the stubs by hand; only generate them when releasing or when requested manually.
+- After modifying the bindings under `hikyuu_pywrap/` (adding/changing the classes, the functions and the parameters), the corresponding stubs should be regenerated and synchronized.
 
-## 6. 架构与关键组件
+## 6. Architecture and Key Components
 
-系统化交易框架的核心组件（可独立替换、自由组合），C++ 实现位于 `hikyuu_cpp/hikyuu/trade_sys/`，Python 层对应 `hikyuu/trade_sys/`、`hikyuu/trade_manage/` 等：
+The core components of the systematic trading framework (independently replaceable and freely composable); the C++ implementations are in `hikyuu_cpp/hikyuu/trade_sys/`, and the Python counterparts are in `hikyuu/trade_sys/`, `hikyuu/trade_manage/`, etc.:
 
-| 层级         | 组件                                                                                                         | 说明                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| 投资组合层   | PortfolioPF / SelectorSE / AllocateFundsAF / MultiFactorMF                                                   | 多系统调度、策略筛选、资金分配、多因子                   |
-| 交易系统 SYS | EnvironmentEV / ConditionCN / SignalSG / Stoploss·StopprofitST / MoneyManagerMM / ProfitGoalPG / SlippageSP | 市场环境、有效条件、信号、风控、资金管理、盈利目标、滑点 |
-| 交易管理     | TradeManagerTM / OrderBrokerOB                                                                               | 账户资金持仓记录、实盘下单对接                           |
-| 数据层       | StockManagerSM / KDataKD / QueryQ                                                                            | 证券管理、K 线数据、时间范围查询                         |
+| The level          | The components                                                                                               | The description                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| The portfolio level | PortfolioPF / SelectorSE / AllocateFundsAF / MultiFactorMF                                                    | the multi-system scheduling, the strategy screening, the fund allocation, the multi-factor                 |
+| The trading system SYS | EnvironmentEV / ConditionCN / SignalSG / Stoploss·StopprofitST / MoneyManagerMM / ProfitGoalPG / SlippageSP | the market environment, the valid condition, the signal, the risk control, the money management, the profit goal, the slippage |
+| The trade management | TradeManagerTM / OrderBrokerOB                                                                              | the account funds and position records, the live trading order connection                                   |
+| The data level     | StockManagerSM / KDataKD / QueryQ                                                                             | the security management, the K-line data, the time range query                                              |
 
-- 数据存储支持：HDF5（默认）/ MySQL / ClickHouse / SQLite / TDX。
-- 新指标/新策略组件建议先在 C++ 核心实现（含绑定与单测），再在 Python 层暴露；纯 Python 扩展放在 `hikyuu/` 对应子包中。
+- The data storage supports: HDF5 (the default) / MySQL / ClickHouse / SQLite / TDX.
+- For the new indicators/new strategy components, it is recommended to implement them in the C++ core first (including the bindings and the unit tests), and then expose them at the Python layer; the pure Python extensions go into the corresponding subpackages of `hikyuu/`.
 
-## 7. 文档
+## 7. Documentation
 
-- Sphinx + myst_parser，源文件在 `docs/source/`（`.rst` 与 `.md` 混用， 新增文件时优先使用md），默认中文。
-- 本地构建：`cd docs && ./make.sh`（即 `sphinx-build -M html source build`）。
-- 修改公开接口/新增组件时同步更新 `docs/source/` 下对应章节（`indicator/`、`trade_sys/`、`trade_manage/`、`stock_manager.rst`、`factor.md` 等）。
+- Sphinx + myst_parser, **dual-source and bilingual**: `docs/zh/` (Chinese) and `docs/en/` (English) are two **independent Sphinx trees**, each with its own `conf.py`, without using gettext.
+- The files are still a mix of `.rst` and `.md` (the new files prefer `.md`).
+- The local build: `cd docs && ./make.sh` (building both trees → `build/html/{en,zh}`); `./make.sh en` / `./make.sh zh` build only one tree.
+- **They must be maintained in pairs**: when changing the documentation of either language, synchronize the other tree within the same PR, keeping the file sets / the toctree / the heading levels / the labels / the images / the code blocks consistent.
+- When modifying the public interfaces/adding the components, synchronize the corresponding sections under **both trees** (`indicator/`, `trade_sys/`, `trade_manage/`, `stock_manager.rst`, `factor.md`, etc.).
+- The RTD hosting configuration: `docs/en/.readthedocs.yaml`, `docs/zh/.readthedocs.yaml` (the configuration files are **not** placed at the repository root); the cross-language jumps are provided by the RTD Flyout, and hardcoding the `/en/`, `/zh-cn/` links in the sources is forbidden.
+- **When doing Chinese-English translation (covering the C++/Python comment anglicization, the docstrings, the bilingual docs, the README, etc.), the wording must refer to the glossary `docs/tools/glossary.zh-en.md`**; new terms must be registered in the glossary first (via PR review), and then be used — do not invent synonymous translations.
 
-## 8. AI 开发工作流与注意事项
+## 8. The AI Development Workflow and Caveats
 
-1. **定位代码**：C++ 逻辑 → `hikyuu_cpp/hikyuu/`；绑定 → `hikyuu_pywrap/`；Python 层 → `hikyuu/`；测试 → `hikyuu_cpp/unit_test/` 与 `hikyuu/test/`。
-2. **修改 C++ 后必须重新编译并让 Python 包加载新产物**：
+1. **Locate the code**: the C++ logic → `hikyuu_cpp/hikyuu/`; the bindings → `hikyuu_pywrap/`; the Python layer → `hikyuu/`; the tests → `hikyuu_cpp/unit_test/` and `hikyuu/test/`.
+2. **After modifying the C++ code, you must recompile and let the Python package load the new artifacts**:
 
    ```bash
    xmake -b core
-   # 将编译产物同步到 hikyuu/cpp/（供 import hikyuu 加载）
+   # Synchronize the compiled artifacts to hikyuu/cpp/ (for import hikyuu to load)
    ```
 
-   Python 包入口 `hikyuu/__init__.py` 从 `hikyuu/cpp/` 加载 `core.so` 及依赖库（mac/linux 会设置 `LD_LIBRARY_PATH`）。
-3. **只改 Python 层时无需重编 C++**，但要注意 `.pyi` 存根与实现保持同步，且 `hikyuu/core.py`/`extend.py` 承担核心对象导出。
-4. **编译产物不要提交**：`*.so`、`*.pyd`、`*.dll`、`build/` 均在 `.gitignore` 中；`hikyuu/cpp/` 下的 `core3xx.so` 等为本机构建产物。
-5. **新增依赖**：C++ 依赖在 `xmake.lua` 中 `add_requires`（注意平台差异与版本，如 hdf5 在 Windows 为 1.13.3、mysql 按平台不同版本）；Python 依赖加到 `requirements.txt`。
-6. **测试优先**：改动涉及 C++ 核心时，至少跑 `xmake r unit-test` + `python3 hikyuu/test/test.py`；涉及具体模块时跑对应单测文件。
-7. **CI 会验证**：`.github/workflows/` 下 ubuntu（aarch64/x86_64）、windows、macosx 三套流水线，PR 合入 `master` 前需通过构建与测试。
-8. **提交信息**：仓库使用中文或英文均可，历史中常见 `fix(xxx): 描述` 的 conventional commits 风格（如 `fix(data): 修复 SQL 后端派生周期 K 线跨界聚合`）。
-9. **谨慎处理**：`hikyuu_pywrap` 使用 unity build（`c++.unity_build`），新增 .cpp 时注意 unity_group 分组；修改 `xmake.lua` 后需重新 `xmake f` 配置。
+   The Python package entry `hikyuu/__init__.py` loads `core.so` and the dependency libraries from `hikyuu/cpp/` (mac/linux sets the `LD_LIBRARY_PATH`).
+3. **When only changing the Python layer, there is no need to recompile the C++**, but note that the `.pyi` stubs must stay in sync with the implementations, and `hikyuu/core.py`/`extend.py` carry the core object exports.
+4. **Do not commit the compiled artifacts**: `*.so`, `*.pyd`, `*.dll`, `build/` are all in `.gitignore`; the `core3xx.so`, etc. under `hikyuu/cpp/` are the local build artifacts.
+5. **Adding new dependencies**: the C++ dependencies go into `xmake.lua` with `add_requires` (note the platform differences and the versions, e.g. hdf5 is 1.13.3 on Windows, and mysql varies by platform); the Python dependencies go into `requirements.txt`.
+6. **Tests first**: when the change involves the C++ core, run at least `xmake r unit-test` + `python3 hikyuu/test/test.py`; when a specific module is involved, run its corresponding test file.
+7. **The CI will verify**: the three pipelines of ubuntu (aarch64/x86_64), windows and macosx under `.github/workflows/`; the PRs must pass the builds and the tests before merging into `master`.
+8. **The commit messages uniformly use English**: in the conventional commits style, e.g. `fix(data): fix cross-period aggregation of derived K-lines in the SQL backend`; the historical early commits have Chinese messages, but all the new commits use English, and the body text is also in English.
+9. **The AI must not commit proactively**: an AI coding agent is forbidden to execute `git commit`, and should also avoid `git add`; after completing each step, list "the list of the files to be committed + the suggested English commit message (a directly copyable `git commit -m "..."`)" and inform the user, letting the user decide the commit timing and the granularity.
+10. **Handle with care**: `hikyuu_pywrap` uses a unity build (`c++.unity_build`); pay attention to the unity_group grouping when adding the .cpp files; after modifying `xmake.lua`, you need to reconfigure with `xmake f`.
 
-## 9. 快速自查清单（提交前）
+## 9. The Quick Self-check Checklist (before committing)
 
-- [ ] `clang-format` / `yapf` 已格式化改动文件
-- [ ] C++ 改动已编译通过且 Python 侧可正常 `import hikyuu`
-- [ ] 相关单测已运行（C++：`xmake r small-test`；Python：`python3 hikyuu/test/test.py`）
-- [ ] 未提交任何编译产物/本地数据文件
+- [ ] The changed files have been formatted with `clang-format` / `yapf`
+- [ ] The C++ changes have compiled successfully and the Python side can `import hikyuu` normally
+- [ ] The related unit tests have been run (C++: `xmake r small-test`; Python: `python3 hikyuu/test/test.py`)
+- [ ] No compiled artifacts/local data files have been committed

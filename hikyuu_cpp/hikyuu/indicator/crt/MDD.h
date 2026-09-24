@@ -12,17 +12,25 @@
 namespace hku {
 
 /**
- * 最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
- * @note 不处理小于等0的值和nan值
- * @param n 时间窗口大小
+ * Maximum drawdown percentage (there is no time window limit when n=0); it is a positive value as
+ * per the industry convention
+
+ * @note the values less than or equal to 0 and the nan values are not handled
+
+ * @param n time window size
+
  * @ingroup Indicator
  */
 Indicator HKU_API MDD(int n = 0);
 
 /**
- * 最大回撤百分比(n=0 则无时间窗口限制), 按行业惯例为正值
- * @param ind 待计算的数据
- * @param n 时间窗口大小
+ * Maximum drawdown percentage (there is no time window limit when n=0); it is a positive value as
+ * per the industry convention
+
+ * @param ind the data to be calculated
+
+ * @param n time window size
+
  * @ingroup Indicator
  */
 inline Indicator MDD(const Indicator& ind, int n = 0) {

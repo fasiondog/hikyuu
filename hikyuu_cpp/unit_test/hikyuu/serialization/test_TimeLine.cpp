@@ -1,7 +1,7 @@
 /*
  * test_TimeLine.cpp
  *
- *  Created on: 2019年2月10日
+ *  Created on: 2019-2-10
  *      Author: fasiondog
  */
 
@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeLineRecord_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/TimeLineRecord.xml";
@@ -46,7 +46,7 @@ TEST_CASE("test_TimeLineRecord_serialize") {
     CHECK_EQ(t1.vol, t2.vol);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TimeLineList_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/TimeLineList.xml";

@@ -16,7 +16,7 @@
 namespace hku {
 
 /*
- * 计算未调整的总体峰度（超额峰度 = 峰度 - 3）
+ * Calculate the unadjusted population kurtosis (excess kurtosis = kurtosis - 3)
  */
 class IKurtosis : public hku::IndicatorImp {
     INDICATOR_IMP(IKurtosis)

@@ -4,10 +4,10 @@
 
 // clang-format off
 
-// Debug 模式
+// Debug mode
 #define HKU_DEBUG_MODE ${HKU_DEBUG_MODE}
 
-// 是否启用本地最大向量化
+// Whether to enable the local maximum vectorization
 #define HKU_LOCAL_VECTORIZE ${HKU_LOCAL_VECTORIZE}
 
 // support serialization
@@ -19,34 +19,34 @@
 #define HKU_SUPPORT_BINARY_ARCHIVE ${SUPPORT_BINARY_ARCHIVE}  //must 1 for python
 #endif /* HKU_SUPPORT_SERIALIZATION*/
 
-// 检查下标越界
+// Check the subscript out of bounds
 #define CHECK_ACCESS_BOUND ${CHECK_ACCESS_BOUND}
 
-// 启用MSVC内存泄漏检查
+// Enable the MSVC memory leak check
 #define ENABLE_MSVC_LEAK_DETECT ${ENABLE_MSVC_LEAK_DETECT}
 
-// 启用内存泄漏检测，用于 linux 系统
+// Enable the memory leak detection, used for the linux system
 #define HKU_ENABLE_LEAK_DETECT ${HKU_ENABLE_LEAK_DETECT}
 
-// 启用发送用户使用信息
+// Enable the sending of the user usage information
 #define HKU_ENABLE_SEND_FEEDBACK ${HKU_ENABLE_SEND_FEEDBACK}
 
-// 启用 hdf5 K线数据引擎
+// Enable the hdf5 K-line data engine
 #define HKU_ENABLE_HDF5_KDATA ${HKU_ENABLE_HDF5_KDATA}
 
-// 启用 MySQL K线数据引擎
+// Enable the MySQL K-line data engine
 #define HKU_ENABLE_MYSQL_KDATA ${HKU_ENABLE_MYSQL_KDATA}
 
-// 启用 SQLite K线数据引擎
+// Enable the SQLite K-line data engine
 #define HKU_ENABLE_SQLITE_KDATA ${HKU_ENABLE_SQLITE_KDATA}
 
-// 启用通达信本地 K线数据引擎
+// Enable the TDX local K-line data engine
 #define HKU_ENABLE_TDX_KDATA ${HKU_ENABLE_TDX_KDATA}
 
-// 使用低精度版本，Indicator 使用 float 类型进行计算
+// Use the low precision version, the Indicator is calculated with the float type
 #define HKU_USE_LOW_PRECISION ${HKU_USE_LOW_PRECISION}
 
-// 使用 TA-Lib
+// Use TA-Lib
 #define HKU_ENABLE_TA_LIB ${HKU_ENABLE_TA_LIB}
 
 #define HKU_ENABLE_MIMALLOC ${HKU_ENABLE_MIMALLOC}

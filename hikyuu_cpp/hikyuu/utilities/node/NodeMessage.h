@@ -19,25 +19,27 @@ using json = nlohmann::json;
 
 namespace hku {
 
-#define NODE_STATUS_TIMEOUT 150  ///< 节点状态超时时长（秒），超时认为连接中断
-#define NODE_STATUS_INTERVAL 60  ///< 发送状态的间隔时间（秒）（心跳）
+#define NODE_STATUS_TIMEOUT \
+    150                          ///< The node status timeout in seconds; the connection is regarded
+                                 ///< as interrupted on a timeout
+#define NODE_STATUS_INTERVAL 60  ///< The interval of sending the status in seconds (the heartbeat)
 
 /*
- * 消息格式
+ * Message format
  * req ->
  *  {"cmd": int, ...}
  *
  * <- res
- *  {"ret": code, "msg": str} // msg 存在错误时返回错误信息 （可选）
+ *  {"ret": code, "msg": str}  // msg is the error information returned on an error (optional)
  *
  *
  */
 
 /**
- * 对消息进行解码，消息类型和消息体必须匹配
- * @tparam T 消息体类型
- * @param msg 消息
- * @exception NodeErrorCode 消息类型不匹配
+ * Decode the message; the message type and the message body must match
+ * @tparam T the message body type
+ * @param msg message
+ * @exception NodeErrorCode the message type does not match
  */
 inline json decodeMsg(nng_msg *msg) {
     HKU_ASSERT(msg != nullptr);
@@ -48,12 +50,12 @@ inline json decodeMsg(nng_msg *msg) {
 }
 
 /**
- * @brief 消息编码
- * @tparam T 消息体类型
- * @param msg 消息
- * @param in 编码输入
- * @exception NodeNngError nng 操作失败
- * @exception yas::io_exception yas 序列化异常
+ * @brief Message encoding
+ * @tparam T the message body type
+ * @param msg message
+ * @param in the encoding input
+ * @exception NodeNngError the nng operation failed
+ * @exception yas::io_exception the yas serialization exception
  */
 inline void encodeMsg(nng_msg *msg, const json &in) {
     HKU_ASSERT(msg != nullptr);
@@ -65,10 +67,10 @@ inline void encodeMsg(nng_msg *msg, const json &in) {
 }
 
 /**
- * 构造错误消息响应
- * @param msg [out] 消息
- * @param errcode 错误码
- * @param errmsg 错误消息
+ * Build an error message response
+ * @param msg [out] message
+ * @param errcode error code
+ * @param errmsg error message
  */
 inline void errorMsg(nng_msg *msg, NodeErrorCode errcode, const std::string &errmsg) {
     json res;

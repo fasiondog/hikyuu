@@ -4,12 +4,13 @@
  *  Created on: 2026-07-31
  *      Author: woleigegg
  *
- *  风格因子中性化残差回归（calculate_style_residuals）的白盒测试。
+ *  The white box test of the style factor neutralization residual regression
+ * (calculate_style_residuals).
  *
- *   - golden 值：一元线性回归解析解核对；
- *   - 边界：样本不足全 NaN、自变量含 NaN 行置 NaN、秩亏共线不崩溃；
- *   - 全局状态：并发调用前后 Eigen::nbThreads() 不变（防回归：
- *     若重新引入运行时 Eigen::setNbThreads，本测试将失败）。
+ *   - golden values: checked against the analytical solution of the unary linear regression;
+ *   - boundaries: all NaN with few samples, NaN rows with a NaN variable, no crash when collinear;
+ *   - the global state: Eigen::nbThreads() is unchanged around the concurrent calls
+ * (anti-regression: if a runtime Eigen::setNbThreads is reintroduced this test fails).
  */
 
 #include "../../test_config.h"
@@ -25,8 +26,8 @@ using namespace hku;
  * @{
  */
 
-/** @par golden：perfect fit 一元回归，残差全 0
- *  y = [1,2,3,4], x = [1,2,3,4]：解析解 slope=1, intercept=0，残差全 0
+/** @par golden: a perfect fit unary regression with all the residuals 0
+ *  y = [1,2,3,4] and x = [1,2,3,4]: the analytical solution is slope=1, intercept=0, residuals 0
  */
 TEST_CASE("test_style_regression_perfect_fit") {
     PriceList y{1.0, 2.0, 3.0, 4.0};
@@ -39,12 +40,12 @@ TEST_CASE("test_style_regression_perfect_fit") {
     }
 }
 
-/** @par golden：非 perfect fit 一元回归，解析解核对
- *  y = [2,1,4,3], x = [0,1,2,3]：
+/** @par golden: a non-perfect fit unary regression checked against the analytical solution
+ *  y = [2,1,4,3] and x = [0,1,2,3]:
  *    x_mean=1.5, y_mean=2.5
  *    slope = Σ(x-x̄)(y-ȳ)/Σ(x-x̄)² = 3/5 = 0.6
  *    intercept = ȳ - slope*x̄ = 2.5 - 0.6*1.5 = 1.6
- *    残差 = y - (1.6 + 0.6x) = [0.4, -1.2, 1.2, -0.4]
+ *    the residuals = y - (1.6 + 0.6x) = [0.4, -1.2, 1.2, -0.4]
  */
 TEST_CASE("test_style_regression_golden_values") {
     PriceList y{2.0, 1.0, 4.0, 3.0};
@@ -58,9 +59,9 @@ TEST_CASE("test_style_regression_golden_values") {
     }
 }
 
-/** @par 边界：样本不足（valid_count <= k+1）返回全 NaN，不崩溃 */
+/** @par Boundary: with few samples (valid_count <= k+1) all NaN is returned without a crash */
 TEST_CASE("test_style_regression_insufficient_samples") {
-    PriceList y{1.0, 2.0};  // 2 个样本
+    PriceList y{1.0, 2.0};  // 2 samples
     vector<PriceList> x{{1.0, 2.0}};
     auto residuals = calculate_style_residuals(y, x);
 
@@ -70,26 +71,26 @@ TEST_CASE("test_style_regression_insufficient_samples") {
     }
 }
 
-/** @par 边界：自变量含 NaN 的行残差置 NaN，其他行正常 */
+/** @par Boundary: the residual of a row with a NaN variable is NaN and the other rows are normal */
 TEST_CASE("test_style_regression_nan_row") {
-    // y = 1 + 2x 的完美数据，第 2 行 x 为 NaN
+    // The perfect data of y = 1 + 2x, with the x of row 2 being NaN
     PriceList y{1.0, 3.0, 5.0, 7.0};
     vector<PriceList> x{{0.0, 1.0, Null<price_t>(), 3.0}};
     auto residuals = calculate_style_residuals(y, x);
 
     CHECK_EQ(residuals.size(), y.size());
-    // 有效行（0, 1, 3）perfect fit 残差 0
+    // The valid rows (0, 1, 3) have a perfect fit and the residuals are 0
     CHECK_EQ(residuals[0], doctest::Approx(0.0).epsilon(1e-9));
     CHECK_EQ(residuals[1], doctest::Approx(0.0).epsilon(1e-9));
-    // NaN 行不参与拟合，残差置 NaN
+    // The NaN row does not participate in the fit, its residual is NaN
     CHECK_UNARY(std::isnan(residuals[2]));
     CHECK_EQ(residuals[3], doctest::Approx(0.0).epsilon(1e-9));
 }
 
-/** @par 边界：秩亏共线自变量（两列完全共线）不崩溃，不产生 Inf */
+/** @par Boundary: collinear variables (two fully collinear columns) neither crash nor give Inf */
 TEST_CASE("test_style_regression_rank_deficient") {
     PriceList y{1.0, 2.0, 3.0, 4.0};
-    // 两列完全共线：x1 = 2*x0
+    // The two columns are fully collinear: x1 = 2*x0
     vector<PriceList> x{{1.0, 2.0, 3.0, 4.0}, {2.0, 4.0, 6.0, 8.0}};
     auto residuals = calculate_style_residuals(y, x);
 
@@ -100,10 +101,10 @@ TEST_CASE("test_style_regression_rank_deficient") {
     }
 }
 
-/** @par 全局状态：并发调用前后 Eigen 线程配置不变
- *  Eigen::nbThreads() 在 <Eigen/Core> 中无条件存在（未启用 OpenMP 时返回 1），
- *  因此无条件断言：无论初始值是 1 还是 N，并发结束后必须保持不变。
- *  防回归：若重新引入运行时 Eigen::setNbThreads 全局切换，本测试将失败。
+/** @par The global state: the Eigen thread configuration is unchanged around the concurrent calls
+ *  Eigen::nbThreads() exists unconditionally in <Eigen/Core> (it returns 1 without OpenMP),
+ *  so it is asserted unconditionally: whether it starts as 1 or N, it must stay afterwards.
+ *  Anti-regression: if a runtime global Eigen::setNbThreads switch is reintroduced, this fails. 
  */
 TEST_CASE("test_style_regression_eigen_threads_unchanged") {
     PriceList y{2.0, 1.0, 4.0, 3.0, 6.0, 5.0, 8.0, 7.0};
@@ -114,7 +115,7 @@ TEST_CASE("test_style_regression_eigen_threads_unchanged") {
     std::vector<std::thread> threads;
     for (size_t i = 0; i < 8; i++) {
         threads.emplace_back([&, i]() {
-            // 每线程写自己的槽，主线程 join 后再校验
+            // Every thread writes its own slot and the main thread verifies after the join
             for (size_t j = 0; j < 20; j++) {
                 results[i] = calculate_style_residuals(y, x);
             }
@@ -123,7 +124,7 @@ TEST_CASE("test_style_regression_eigen_threads_unchanged") {
     for (auto& t : threads) {
         t.join();
     }
-    // 并发调用前后 Eigen 全局线程配置必须不变
+    // The Eigen global thread configuration must not change around the concurrent calls
     CHECK_EQ(Eigen::nbThreads(), threads_before);
     for (const auto& r : results) {
         CHECK_EQ(r.size(), y.size());

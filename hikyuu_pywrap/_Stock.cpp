@@ -19,7 +19,7 @@ KRecord (Stock::*getKRecord2)(const Datetime&,
                               const KQuery::KType& kType) const = &Stock::getKRecord;
 
 void export_Stock(py::module& m) {
-    py::class_<Stock>(m, "Stock", "证券对象")
+    py::class_<Stock>(m, "Stock", "The security object")
       .def(py::init<>())
       .def(py::init<const string&, const string&, const string&>(), py::arg("market"),
            py::arg("code"), py::arg("name"))
@@ -28,49 +28,49 @@ void export_Stock(py::module& m) {
       .def("__str__", &Stock::toString)
       .def("__repr__", &Stock::toString)
 
-      .def_property_readonly("id", &Stock::id, "内部id")
+      .def_property_readonly("id", &Stock::id, "The internal id")
       .def_property("market", py::overload_cast<>(&Stock::market, py::const_),
                     py::overload_cast<const string&>(&Stock::market), py::return_value_policy::copy,
-                    "所属市场简称，市场简称是市场的唯一标识")
+                    "The market abbreviation it belongs to; the market abbreviation is the unique identifier of the market")
       .def_property("code", py::overload_cast<>(&Stock::code, py::const_),
                     py::overload_cast<const string&>(&Stock::code), py::return_value_policy::copy,
-                    "证券代码")
+                    "The security code")
       .def_property_readonly("market_code", py::overload_cast<>(&Stock::market_code, py::const_),
-                             "市场简称+证券代码，如: sh000001")
+                             "The market abbreviation + the security code, e.g.: sh000001")
       .def_property("name", py::overload_cast<>(&Stock::name, py::const_),
                     py::overload_cast<const string&>(&Stock::name), py::return_value_policy::copy,
-                    "证券名称")
+                    "The security name")
       .def_property("type", py::overload_cast<>(&Stock::type, py::const_),
-                    py::overload_cast<uint32_t>(&Stock::type), "证券类型，参见：constant")
+                    py::overload_cast<uint32_t>(&Stock::type), "The security type, see: constant")
       .def_property("valid", py::overload_cast<>(&Stock::valid, py::const_),
-                    py::overload_cast<bool>(&Stock::valid), "该证券当前是否有效")
+                    py::overload_cast<bool>(&Stock::valid), "Whether the security is currently valid")
       .def_property("start_datetime", py::overload_cast<>(&Stock::startDatetime, py::const_),
                     py::overload_cast<const Datetime&>(&Stock::startDatetime),
-                    py::return_value_policy::copy, "证券起始日期")
+                    py::return_value_policy::copy, "The start date of the security")
       .def_property("last_datetime", py::overload_cast<>(&Stock::lastDatetime, py::const_),
                     py::overload_cast<const Datetime&>(&Stock::lastDatetime),
-                    py::return_value_policy::copy, "证券最后日期")
+                    py::return_value_policy::copy, "The last date of the security")
       .def_property("tick", py::overload_cast<>(&Stock::tick, py::const_),
-                    py::overload_cast<price_t>(&Stock::tick), "最小跳动量")
+                    py::overload_cast<price_t>(&Stock::tick), "The minimum tick")
       .def_property("tick_value", py::overload_cast<>(&Stock::tickValue, py::const_),
-                    py::overload_cast<price_t>(&Stock::tickValue), "最小跳动量价值")
-      .def_property_readonly("unit", &Stock::unit, "每单位价值 = tickValue / tick")
+                    py::overload_cast<price_t>(&Stock::tickValue), "The minimum tick value")
+      .def_property_readonly("unit", &Stock::unit, "The per-unit value = tickValue / tick")
       .def_property("precision", py::overload_cast<>(&Stock::precision, py::const_),
-                    py::overload_cast<int>(&Stock::precision), "价格精度")
+                    py::overload_cast<int>(&Stock::precision), "The price precision")
       .def_property("atom", py::overload_cast<>(&Stock::atom, py::const_),
-                    py::overload_cast<double>(&Stock::atom), "最小交易数量，同min_tradeNumber")
+                    py::overload_cast<double>(&Stock::atom), "The minimum trading quantity, the same as min_tradeNumber")
       .def_property("min_trade_number", py::overload_cast<>(&Stock::minTradeNumber, py::const_),
-                    py::overload_cast<double>(&Stock::minTradeNumber), "最小交易数量")
+                    py::overload_cast<double>(&Stock::minTradeNumber), "The minimum trading quantity")
       .def_property("max_trade_number", py::overload_cast<>(&Stock::maxTradeNumber, py::const_),
-                    py::overload_cast<double>(&Stock::maxTradeNumber), "最大交易数量")
+                    py::overload_cast<double>(&Stock::maxTradeNumber), "The maximum trading quantity")
 
       .def("is_null", &Stock::isNull, R"(is_null(self)
 
-        是否为Null
+        Whether it is Null
 
         :rtype: bool)")
 
-      .def("is_buffer", &Stock::isBuffer, R"(指定类型的K线数据是否被缓存)")
+      .def("is_buffer", &Stock::isBuffer, R"(Whether the K-line data of the specified type is cached)")
 
       .def(
         "get_index_range",
@@ -81,92 +81,92 @@ void export_Stock(py::module& m) {
         },
         R"(get_index_range(self, query) -> (size_t, size_t)
 
-        根据KQuery指定的条件, 获取对应的K线位置范围: [start_pos, end_pos)
+        Get the corresponding K-line position range [start_pos, end_pos) according to the condition specified by the KQuery
         
-        :param query [in] 指定的查询条件
+        :param query [in] the specified query condition
         :return (start_pos, end_pos)")
 
       .def("get_kdata", &Stock::getKData, R"(get_kdata(self, query)
 
-        获取K线数据
+        Get the K-line data
 
-        :param Query query: 查询条件
-        :return: 满足查询条件的K线数据
+        :param Query query: the query condition
+        :return: the K-line data satisfying the query condition
         :rtype: KData)")
 
       .def("get_timeline_list", &Stock::getTimeLineList, R"(get_timeline_list(self, query)
 
-        获取分时线
+        Get the time-line
 
-        :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
+        :param Query query: the query condition(the K-line type and the recovery type parameters in the query condition are useless at this time)
         :rtype: TimeLineList)")
 
       .def("get_trans_list", &Stock::getTransList, R"(get_trans_list(self, query)
 
-        获取历史分笔数据
+        Get the historical tick data
 
-        :param Query query: 查询条件（查询条件中的K线类型、复权类型参数此时无用）
+        :param Query query: the query condition(the K-line type and the recovery type parameters in the query condition are useless at this time)
         :rtype: TransList)")
 
       .def("get_count", &Stock::getCount, py::arg("ktype") = KQuery::DAY,
            R"(get_count(self, [ktype=Query.DAY])
 
-        获取不同类型K线数据量
+        Get the amount of the K-line data of the different types
 
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录数
+        :param Query.KType ktype: the K-line data category
+        :return: the number of the K-line records
         :rtype: int)")
 
       .def("get_market_value", &Stock::getMarketValue, R"(get_market_value(self, date, ktype)
 
-        获取指定时刻的市值，即小于等于指定时刻的最后一条记录的收盘价
+        Get the market value at the specified moment, i.e. the close price of the last record less than or equal to the specified moment
 
-        :param Datetime date: 指定时刻
-        :param Query.KType ktype: K线数据类别
-        :return: 指定时刻的市值
+        :param Datetime date: the specified moment
+        :param Query.KType ktype: the K-line data category
+        :return: the market value at the specified moment
         :rtype: float)")
 
       .def("get_krecord", getKRecord1, py::arg("pos"), py::arg("ktype") = KQuery::DAY,
            R"(get_krecord(self, pos[, ktype=Query.DAY])
 
-        获取指定索引的K线数据记录，未作越界检查
+        Get the K-line data record at the specified index, without the out-of-bounds check
 
-        :param int pos: 指定的索引位置
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录
+        :param int pos: the specified index position
+        :param Query.KType ktype: the K-line data category
+        :return: the K-line record
         :rtype: KRecord)")
 
       .def("get_krecord", getKRecord2, py::arg("date"), py::arg("ktype") = KQuery::DAY,
            R"(get_krecord(self, date[, ktype=Query.DAY])
 
-        根据数据类型（日线/周线等），获取指定时刻的KRecord
+        Get the KRecord at the specified moment according to the data type (the daily line, the weekly line, etc.)
 
-        :param Datetime date: 指定日期时刻
-        :param Query.KType ktype: K线数据类别
-        :return: K线记录
+        :param Datetime date: the specified date-time
+        :param Query.KType ktype: the K-line data category
+        :return: the K-line record
         :rtype: KRecord)")
 
       .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, start, end,
           ktype)
 
-        获取K线记录 [start, end)，一般不直接使用.
+        Get the K-line records [start, end); it is generally not used directly.
 
-        :param int start: 起始位置
-        :param int end: 结束位置
-        :param Query.KType ktype: K线类别
-        :return: K线记录列表
+        :param int start: the start position
+        :param int end: the end position
+        :param Query.KType ktype: the K-line category
+        :return: the K-line record list
         :rtype: KRecordList)")
 
       .def("get_datetime_list", &Stock::getDatetimeList, R"(get_datetime_list(self, query)
 
-        获取日期列表
+        Get the date list
 
-        :param Query query: 查询条件
+        :param Query query: the query condition
         :rtype: DatetimeList)")
 
       .def("get_finance_info", &Stock::getFinanceInfo, R"(get_finance_info(self)
 
-        获取当前财务信息
+        Get the current finance information
 
         :rtype: Parameter)")
 
@@ -174,28 +174,28 @@ void export_Stock(py::module& m) {
            py::arg("ktype") = KQuery::DAY,
            R"(realtime_update(self, krecord)
 
-        只用于更新缓存中的日线数据
+        Only used to update the daily-line data in the cache
 
-        :param KRecord krecord: 新增的实时K线记录
-        :param KQuery.KType ktype: K 线类型)")
+        :param KRecord krecord: the newly added real-time K-line record
+        :param KQuery.KType ktype: the K-line type)")
 
       .def("get_last_update_time", &Stock::getLastUpdateTime, py::arg("ktype") = KQuery::DAY,
            R"(get_last_update_time(self, [ktype=Query.DAY])
 
-        获取指定类型K线数据的最后更新时刻。客户端模式下，普通证券转发至主进程
-        取其缓冲刷新时刻，临时证券（setKRecordList）则返回本地写入时刻。
+        Get the last update moment of the specified type of the K-line data. In the client mode, the ordinary securities are forwarded to the master process
+        to take its buffer refresh moment; the temporary securities (setKRecordList) return the local writing moment.
 
-        :param KQuery.KType ktype: K 线类型
+        :param KQuery.KType ktype: the K-line type
         :rtype: Datetime)")
 
       .def("get_weight", &Stock::getWeight, py::arg("start") = Datetime::min(),
            py::arg("end") = Datetime(),
            R"(get_weight(self, [start, end])
 
-        获取指定时间段[start,end)内的权息信息。未指定起始、结束时刻时，获取全部权息记录。
+        Get the dividend information within the specified time range [start, end). When the start and the end moments are not specified, get all the dividend records.
 
-        :param Datetime start: 起始时刻
-        :param Datetime end: 结束时刻
+        :param Datetime start: the start moment
+        :param Datetime end: the end moment
         :rtype: StockWeightList)")
 
       .def(
@@ -209,9 +209,9 @@ void export_Stock(py::module& m) {
         },
         py::arg("category") = py::none(), R"(get_belong_to_block_list(self[, category=None])
       
-      获取所属板块列表
+      Get the list of the belonging blocks
 
-      :param str category: 指定的板块分类，为 None 时，返回所有板块分类下的所属板块
+      :param str category: the specified block category; when it is None, return the belonging blocks under all the block categories
       :rtype: list)")
 
       .def(
@@ -226,31 +226,31 @@ void export_Stock(py::module& m) {
         },
         R"(get_history_finance(self)
         
-        获取所有历史财务信息历史记录， 字段信息可参考 StockManager 中的相关方法: get_history_finance_all_fields/get_history_finance_field_index/get_history_finance_field_name 方法
-        日常建议直接使用指标 FINANCE 获取财务数据)")
+        Get all the historical finance records; for the field information, refer to the related methods in StockManager: the get_history_finance_all_fields/get_history_finance_field_index/get_history_finance_field_name methods
+        For the daily use, it is recommended to use the FINANCE indicator directly to get the finance data)")
 
       .def("get_trading_calendar", &Stock::getTradingCalendar, py::arg("query"),
            R"(get_trading_calendar(self, query)
 
-        获取自身市场的交易日日历（（不是本身的交易日期）
+        Get the trading calendar of its own market (not its own trading dates)
 
-        :param KQuery query: Query查询条件
-        :return: 日期列表
+        :param KQuery query: the Query condition
+        :return: the date list
         :rtype: DatetimeList)")
 
       .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer, R"(load_kdata_to_buffer(self,
           ktype)
 
-        将指定类别的K线数据加载至内存缓存, 如果已经存在缓存，需要先 release_kdata_buffer
+        Load the K-line data of the specified category into the memory cache; if the cache already exists, you need to release_kdata_buffer first
 
-        :param Query.KType ktype: K线类型)")
+        :param Query.KType ktype: the K-line type)")
 
       .def("release_kdata_buffer", &Stock::releaseKDataBuffer, R"(release_kdata_buffer(self,
           ktype)
 
-        释放指定类别的内存K线数据
+        Release the memory K-line data of the specified category
 
-        :param Query.KType ktype: K线类型)")
+        :param Query.KType ktype: the K-line type)")
 
       .def(
         "set_krecord_list",
@@ -269,10 +269,10 @@ void export_Stock(py::module& m) {
         py::arg("krecord_list"), py::arg("ktype") = KQuery::DAY,
         R"(set_krecord_list(self, krecord_list[, ktype=Query.DAY])
 
-      "谨慎调用！！！直接设置当前内存 KRecordList, 仅供需临时增加的外部 Stock 设置 K 线数据
+      "Call with caution!!! Set the current memory KRecordList directly; it is only used to set the K-line data for the external Stocks that need to be added temporarily
 
       :param krecord_list: KRecordList or list of KRecord
-      :param Query.KType ktype: K线类别)")
+      :param Query.KType ktype: the K-line category)")
 
       .def(
         "set_kdata_from_df",
@@ -286,8 +286,8 @@ void export_Stock(py::module& m) {
         py::arg("ktype") = KQuery::DAY,
         R"(set_kdata_from_df(self, df, cols, [ktype=Query.DAY])
 
-      谨慎调用！！！直接设置当前内存数据，意味着 Stock 的基础数据变更。
-      从 DataFrame 中获取 KRecordList, 并设置给当前Stock。df, 必须按顺序指定列名，默认为: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
+      Call with caution!!! Set the current memory data directly, which means the basic data of the Stock is changed.
+      Get the KRecordList from the DataFrame and set it to the current Stock. df must specify the column names in order, defaulting to: ("datetime", "open", "high", "low", "close", "amount", "volume"))")
 
       .def(py::hash(py::self))
       .def(py::self == py::self)

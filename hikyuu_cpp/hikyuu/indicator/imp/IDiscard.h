@@ -13,7 +13,7 @@
 
 namespace hku {
 
-/* 以指标公式的方式设置抛弃值 */
+/* Set the discard value in the way of an indicator formula */
 class IDiscard : public IndicatorImp {
     INDICATOR_IMP(IDiscard)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

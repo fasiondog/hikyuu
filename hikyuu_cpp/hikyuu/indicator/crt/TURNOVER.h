@@ -11,8 +11,8 @@
 namespace hku {
 
 /**
- * @brief 换手率=股票成交量/流通股股数×100%
- * @param n 窗口周期
+ * @brief Turnover rate = stock volume / number of the outstanding shares × 100%
+ * @param n window period
  * @return Indicator
  */
 Indicator HKU_API TURNOVER(int n = 1);

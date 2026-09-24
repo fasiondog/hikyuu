@@ -93,7 +93,8 @@ struct Field {
     explicit Field(const char *name) : name(name) {}
     explicit Field(const std::string &name) : name(name) {}
 
-    // in 和 not_in 不支持 字符串，一般不会用到 in ("stra", "strb") 的 SQL 操作
+    // in and not_in do not support strings; the SQL operation in ("stra", "strb") is generally not
+    // used
     template <typename T>
     DBCondition in(const std::vector<T> &vals) {
         HKU_CHECK(!vals.empty(), "input vals can't be empty!");
@@ -117,8 +118,9 @@ struct Field {
     std::string name;
 };
 
-// linux下类成员函数模板特化必须放在类外实现
-// 否则编译时会报：explicit specialization in non-namespace scope
+// Under linux the template specialization of a class member function must be implemented outside
+// the class
+// Otherwise the compilation reports: explicit specialization in non-namespace scope
 template <>
 inline DBCondition Field::in<std::string>(const std::vector<std::string> &vals) {
     HKU_CHECK(!vals.empty(), "input vals can't be empty!");

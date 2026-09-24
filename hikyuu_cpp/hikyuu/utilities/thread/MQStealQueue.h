@@ -26,7 +26,7 @@ public:
         m_cond.notify_one();
     }
 
-    /** 将数据插入队列头部 */
+    /** Insert the data into the head of the queue */
     void push_front(T&& data) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_front(std::move(data));
@@ -69,9 +69,9 @@ public:
     }
 
     /**
-     * 尝试从队列尾部偷取一条数据
-     * @param res 存储偷取的数据
-     * @return 如果原本队列为空返回 false，否则为 true
+     * Try to steal a piece of data from the tail of the queue
+     * @param res stores the stolen data
+     * @return false is returned if the queue was originally empty, otherwise true
      */
     bool try_steal(T& res) {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -92,7 +92,7 @@ public:
         return m_queue.empty();
     }
 
-    // 队列大小，无锁
+    // Queue size, lock free
     size_t size() const {
         return m_queue.size();
     }

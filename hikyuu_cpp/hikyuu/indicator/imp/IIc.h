@@ -27,7 +27,7 @@ private:
     StockList m_stks;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

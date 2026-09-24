@@ -67,7 +67,7 @@ void IIndex::_calculate(const Indicator& ind) {
         HKU_WARN("Not known the index code, will use {} as default.", market_code);
     }
 
-    // 调整 market_code 参数为当前指数 market_code
+    // Adjust the market_code parameter to the market_code of the current index
     setParam<string>("market_code", market_code);
 
     KQuery query = k.getQuery();

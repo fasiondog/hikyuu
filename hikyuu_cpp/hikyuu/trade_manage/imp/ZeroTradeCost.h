@@ -21,28 +21,28 @@ public:
     virtual ~ZeroTradeCost();
 
     /**
-     * 计算买入成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 买入价格
-     * @param num 买入数量
-     * @return CostRecord 交易成本记录
+     * Calculate the buy cost
+     * @param datetime trade date
+     * @param stock the traded security object
+     * @param price buy price
+     * @param num buy quantity
+     * @return CostRecord the trade cost record
      */
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num) const override;
 
     /**
-     * 计算卖出成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 卖出价格
-     * @param num 卖出数量
-     * @return CostRecord 交易成本记录
+     * Calculate the sell cost
+     * @param datetime trade date
+     * @param stock the traded security object
+     * @param price sell price
+     * @param num sell quantity
+     * @return CostRecord the trade cost record
      */
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
                                    double num) const override;
 
-    /** 子类私有变量克隆接口 */
+    /** Clone interface of the private variables of the subclass */
     virtual TradeCostPtr _clone() override;
 };
 

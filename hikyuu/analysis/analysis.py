@@ -16,19 +16,23 @@ def combinate_ind_analysis(
     buy_inds,
     sell_inds,
     n=7,
-    keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]
+    keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]
 ):
     '''
-    对单只股票进行指标组合测试
+    Run the indicator combination test on a single stock
 
-    :param Stock stk: 指定股票
-    :param Query query: 指定的查询条件
-    :param TradeManager tm: 交易管理实例
-    :param System sys: 系统交易策略实例
-    :param list buy_inds: 买入信号指标列表
-    :param list sell_ins: 卖出信号指标列表
-    :param int n: 买入信号组合时同时存在的周期范围
-    :param list keys: 输出 Performance 统计项
+    :param Stock stk: the specified stock
+    :param Query query: the specified query condition
+    :param TradeManager tm: the trade manager instance
+    :param System sys: the system trading strategy instance
+    :param list buy_inds: the list of the buy signal generators
+    :param list sell_ins: the list of the sell signal generators
+    :param int n: the period range existing at the same time when combining the buy signals
+    :param list keys: the Performance statistics items to output
     :rtype: pd.DataFrame
     '''
     if not keys:
@@ -66,19 +70,23 @@ def combinate_ind_analysis_multi(
     buy_inds,
     sell_inds,
     n=7,
-    keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]
+    keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]
 ):
     '''
-    对指定的股票集进行指标组合测试
+    Run the indicator combination test on the specified stock set
 
-    :param list|Block|sm stks: 指定的股票集
-    :param Query q: 查询条件
-    :param TradeManager tm: 交易管理实例
-    :param System sys: 系统实例
-    :param list buy_inds: 买入信号指标列表
-    :param list sell_inds: 卖出信号指标列表
-    :param int n: 买入信号组合时的周期
-    :param list keys: 输出 Performance 统计项
+    :param list|Block|sm stks: the specified stock set
+    :param Query q: the query condition
+    :param TradeManager tm: the trade manager instance
+    :param System sys: the system instance
+    :param list buy_inds: the list of the buy signal generators
+    :param list sell_inds: the list of the sell signal generators
+    :param int n: the period when combining the buy signals
+    :param list keys: the Performance statistics items to output
     '''
     if not keys:
         for key in keys:
@@ -104,7 +112,11 @@ def combinate_ind_analysis_multi(
     return pd.DataFrame(ret)
 
 
-def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+def analysis_sys_list(stks, query, sys_proto, keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]):
     if not keys:
         for key in keys:
             if not Performance.exist(key):
@@ -133,7 +145,11 @@ def analysis_sys_list(stks, query, sys_proto, keys=["累计投入本金", "当�
     return pd.DataFrame(ret)
 
 
-def analysis_sys_list_multi(stks, query, sys_proto, keys=["累计投入本金", "当前总资产", "现金余额", "未平仓头寸净值", "赢利交易比例%", "赢利交易数", "亏损交易数"]):
+def analysis_sys_list_multi(stks, query, sys_proto, keys=[
+        "Total Invested Principal", "Current Total Assets", "Cash Balance",
+        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
+        "Number of Losing Trades"
+    ]):
     if not keys:
         for key in keys:
             if not Performance.exist(key):

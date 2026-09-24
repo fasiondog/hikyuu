@@ -1,7 +1,7 @@
 /*
  * Block.h
  *
- *  Created on: 2015年2月8日
+ *  Created on: 2015-02-08
  *      Author: fasiondog
  */
 
@@ -14,7 +14,7 @@
 namespace hku {
 
 /**
- * 板块类，可视为证券的容器
+ * Sector (Block) class, which can be regarded as a container of securities
  * @ingroup StockManage
  */
 class HKU_API Block {
@@ -28,10 +28,12 @@ public:
     Block& operator=(Block&&) noexcept;
     virtual ~Block();
 
-    /** 从证券列表创建板块，分类和名称为空，通常用于临时板块 */
+    /** Create a sector from a security list; the category and name are empty, usually used for a
+     *  temporary sector */
     explicit Block(const StockList& stocks);
 
-    /** 从证券代码列表创建板块，分类和名称为空，通常用于临时板块 */
+    /** Create a sector from a security code list; the category and name are empty, usually used for
+     *  a temporary sector */
     explicit Block(const StringList& market_codes);
 
     typedef StockMapIterator const_iterator;
@@ -63,98 +65,98 @@ public:
         return !(*this == blk);
     }
 
-    /** 获取板块类别 */
+    /** Get the sector category */
     string category() const noexcept {
         return m_data ? m_data->m_category : "";
     }
 
-    /** 获取板块名称 */
+    /** Get the sector name */
     string name() const noexcept {
         return m_data ? m_data->m_name : "";
     }
 
-    /** 设置板块类别 */
+    /** Set the sector category */
     void category(const string& category) {
         if (!m_data)
             m_data = make_shared<Data>();
         m_data->m_category = category;
     }
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name) {
         if (!m_data)
             m_data = make_shared<Data>();
         m_data->m_name = name;
     }
 
-    /** 是否包含指定的证券 */
+    /** Whether the given security is contained */
     bool have(const string& market_code) const;
 
-    /** 是否包含指定的证券 */
+    /** Whether the given security is contained */
     bool have(const Stock& stock) const;
 
-    /** 获取指定的证券 */
+    /** Get the given security */
     Stock get(const string& market_code) const;
 
-    /** 获取指定的证券 */
+    /** Get the given security */
     Stock operator[](const string& market_code) const {
         return get(market_code);
     }
 
-    /** 获取板块下所有证券 */
+    /** Get all the securities in the sector */
     StockList getStockList(
       std::function<bool(const Stock&)>&& filter = std::function<bool(const Stock&)>()) const;
 
-    /** 加入指定证券 */
+    /** Add the given security */
     bool add(const Stock& stock);
 
-    /** 加入指定证券 */
+    /** Add the given security */
     bool add(const string& market_code);
 
     /**
-     * 加入指定的证券列表
-     * @param stocks 证券列表
-     * @return true 全部成功
-     * @return false 存在失败
+     * Add the given security list
+     * @param stocks security list
+     * @return true all succeeded
+     * @return false at least one failed
      */
     bool add(const StockList& stocks);
 
     /**
-     * 加入指定的证券列表
-     * @param market_codes 证券标识列表
-     * @return true 全部成功
-     * @return false 存在失败
+     * Add the given security list
+     * @param market_codes security identifier list
+     * @return true all succeeded
+     * @return false at least one failed
      */
     bool add(const StringList& market_codes);
 
-    /** 移除指定证券 */
+    /** Remove the given security */
     bool remove(const string& market_code);
 
-    /** 移除指定证券 */
+    /** Remove the given security */
     bool remove(const Stock& stock);
 
-    /** 包含的证券数量 */
+    /** Number of contained securities */
     size_t size() const noexcept {
         return m_data ? m_data->m_stockDict.size() : 0;
     }
 
-    /** 是否为空 */
+    /** Whether it is empty */
     bool empty() const noexcept {
         return size() == 0;
     }
 
-    /** 清除包含的所有证券 */
+    /** Remove all contained securities */
     void clear() {
         if (m_data)
             m_data->m_stockDict.clear();
     }
 
-    /** 获取对应的指数，可能为空 Stock */
+    /** Get the corresponding index; it may be a null Stock */
     Stock getIndexStock() const noexcept {
         return m_data ? m_data->m_indexStock : Stock();
     }
 
-    /** 设置对应的指数 */
+    /** Set the corresponding index */
     void setIndexStock(const Stock& stk);
 
     uint64_t strongHash() const;
@@ -163,7 +165,7 @@ private:
     struct HKU_API Data {
         string m_category;
         string m_name;
-        Stock m_indexStock;  // 对应指数，可能不存在
+        Stock m_indexStock;  // The corresponding index, which may not exist
         StockMapIterator::stock_map_t m_stockDict;
     };
     shared_ptr<Data> m_data;
@@ -175,7 +177,7 @@ typedef vector<Block> BlockList;
 HKU_API std::ostream& operator<<(std::ostream& os, const Block&);
 
 /**
- * @brief 获取 StockManager 中的 Block
+ * @brief Get a Block from StockManager
  * @param category
  * @param name
  * @return HKU_API

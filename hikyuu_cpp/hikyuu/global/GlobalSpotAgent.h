@@ -11,17 +11,19 @@
 namespace hku {
 
 /**
- * 启动 Spot 数据接收代理，如果之前已经处于运行状态，将抛出异常
- * @param print 打印接收数据进展
- * @param worker_num 接收数据后处理时的工作任务组线程数
- * @param addr 服务端地址，为空表示使用 hikyuu 配置文件中的行情服务器地址
+ * Start the Spot data receiving agent; an exception is thrown if it is already running
+ * @param print print the progress of the received data
+ * @param worker_num number of the worker task group threads used for the post-processing of the
+ *                   received data
+ * @param addr server address; empty means using the market data server address in the hikyuu config
+ *             file
  * @ingroup Agent
  */
 void HKU_API startSpotAgent(bool print = true, size_t worker_num = 1,
                             const string& addr = string());
 
 /**
- * 终止 Spot 数据接收代理
+ * Terminate the Spot data receiving agent
  * @ingroup Agent
  */
 void HKU_API stopSpotAgent();

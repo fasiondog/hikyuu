@@ -17,7 +17,7 @@ namespace hku {
 
 #define HKU_IND_ALIGN_SIZE 64
 
-// 重载new和delete操作符
+// Overload the new and delete operators
 void* IndicatorImpBuffer::operator new(size_t size) {
 #if HKU_ENABLE_MIMALLOC
     void* ptr = mi_malloc_aligned(size, HKU_IND_ALIGN_SIZE);
@@ -74,7 +74,7 @@ void IndicatorImpBuffer::operator delete[](void* ptr) noexcept {
 #endif
 }
 
-// Buffer成员函数实现
+// Implementation of the Buffer member functions
 void IndicatorImpBuffer::Buffer::allocate(IndicatorImpBuffer::size_type new_capacity) {
     if (new_capacity == 0) {
         data = nullptr;

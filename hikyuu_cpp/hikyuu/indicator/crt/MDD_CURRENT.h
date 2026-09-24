@@ -12,15 +12,18 @@
 namespace hku {
 
 /**
- * 当前点到历史最高点的回撤百分比，按行业惯例为正值
- * @note 不处理小于等于0的值和nan值，这些位置返回nan
+ * The drawdown percentage from the current point to the historical highest point; it is a positive
+ * value as per the industry convention
+ * @note the values less than or equal to 0 and the nan values are not handled, nan is returned at
+ *       those positions
  * @ingroup Indicator
  */
 Indicator HKU_API MDD_CURRENT();
 
 /**
- * 当前点到历史最高点的回撤百分比，按行业惯例为正值
- * @param ind 待计算的数据
+ * The drawdown percentage from the current point to the historical highest point; it is a positive
+ * value as per the industry convention
+ * @param ind the data to be calculated
  * @ingroup Indicator
  */
 inline Indicator MDD_CURRENT(const Indicator& ind) {

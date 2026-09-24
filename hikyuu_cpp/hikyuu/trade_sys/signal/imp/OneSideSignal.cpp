@@ -17,7 +17,7 @@ namespace hku {
 
 OneSideSignal::OneSideSignal() : SignalBase("SG_OneSide") {
     setParam<bool>("alternate", false);
-    setParam<bool>("is_buy", true);  // 买入信号，否则为添加卖出信号
+    setParam<bool>("is_buy", true);  // A buy signal, otherwise a sell signal is added
 }
 
 OneSideSignal::OneSideSignal(const Indicator& ind, bool is_buy)

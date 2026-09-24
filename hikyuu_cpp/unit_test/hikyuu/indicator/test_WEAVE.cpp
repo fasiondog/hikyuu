@@ -12,7 +12,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WAEVE_export") {
     KData k = getKData("sh000001", KQuery(-20));
     auto c = k.close();
@@ -45,12 +45,12 @@ TEST_CASE("test_WAEVE_export") {
         CHECK_EQ(ret.get(i, 5), a[i]);
     }
 
-    /** @arg 超出参数个数 */
+    /** @arg More than the allowed number of parameters */
     CHECK_THROWS(WEAVE(c, c, c, c, c, c, c));
 }
 
 #if HKU_SUPPORT_SERIALIZATION
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WAEVE_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS") {
     Indicator result;
 
@@ -159,7 +159,7 @@ TEST_CASE("test_SUMBARS") {
     CHECK_UNARY(std::isnan(result[1]));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -198,28 +198,29 @@ TEST_CASE("test_SUMBARS_dyn") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_with_cval_dyn_param") {
-    // 原始触发场景: CVAL 嵌套作 SUMBARS 动态参数.
-    // 修复前: CVAL(one, 10) 中 one=CVAL(10) → 走 Indicator::operator() → alike true
-    //   → 短路返回未计算的空壳(size==0) → SUMBARS 抛
-    //   HKU_CHECK(ind_param.size()==ind.size()) 异常.
-    // 修复后: 复用 ind, CVAL(one,10).size()==1, SUMBARS 正常计算.
+    // The original trigger scenario: a nested CVAL used as the SUMBARS dynamic parameter.
+    // Before the fix: one=CVAL(10) inside CVAL(one, 10) -> goes through Indicator::operator() ->
+    // alike true
+    //   -> it short-circuits and returns an uncalculated empty shell (size==0) -> SUMBARS throws
+    //   the HKU_CHECK(ind_param.size()==ind.size()) exception.
+    // After the fix: ind is reused, CVAL(one,10).size()==1 and SUMBARS calculates normally.
 
     Indicator one = CVAL(10);
     CHECK_EQ(one.size(), 1);
     CHECK_EQ(one[0], 10);
 
     Indicator seq = CVAL(one, 10);
-    CHECK_EQ(seq.size(), one.size());  // 修复前 0
+    CHECK_EQ(seq.size(), one.size());  // 0 before the fix
     CHECK_EQ(seq[0], 10);
 
-    // 可达: ind[0]=10 >= a[0]=10, 首根即满足, 距离 0
+    // Reachable: ind[0]=10 >= a[0]=10, satisfied at the first bar, the distance is 0
     Indicator r = SUMBARS(one, seq);
     CHECK_EQ(r.size(), 1);
     CHECK_EQ(r[0], 0);
 
-    // 不可达: 10 < 20
+    // Unreachable: 10 < 20
     Indicator seq2 = CVAL(one, 20);
     CHECK_EQ(seq2.size(), one.size());
     Indicator r2 = SUMBARS(one, seq2);
@@ -228,34 +229,37 @@ TEST_CASE("test_SUMBARS_with_cval_dyn_param") {
 }
 
 //-----------------------------------------------------------------------------
-// 动态/静态路径符号回归（修复 _dyn_calculate 返回负号的 bug）
+// The sign regression of the dynamic/static paths (fixing the negative sign bug of _dyn_calculate)
 //-----------------------------------------------------------------------------
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_sign_regression") {
-    // 反例：末位需向左回溯 2 根才累加到 a，距离 > 0（非退化解）
-    //   修复前动态版返回 -2（符号错误），修复后返回 2（与静态版一致）
+    // A counter example: the last bar must go back 2 bars to accumulate to a, the distance is > 0
+    // (a non-degenerate solution)
+    //   before the fix the dynamic version returned -2 (a wrong sign) and after the fix it returns
+    //   2 (matching the static one)
     PriceList a;
     a.push_back(5);
     a.push_back(3);
     a.push_back(2);  // [5, 3, 2]
     Indicator data = PRICELIST(a);
 
-    // 静态路径（标量参数）
+    // The static path (a scalar parameter)
     Indicator s = SUMBARS(data, 10);
     CHECK_UNARY(std::isnan(s[0]));
     CHECK_UNARY(std::isnan(s[1]));
-    CHECK_EQ(s[2], 2);  // i=2 向左回溯到 j=0, 距离 2
+    CHECK_EQ(s[2], 2);  // i=2 goes back to j=0, the distance is 2
 
-    // 动态路径（IndParam 序列参数，常量序列）
+    // The dynamic path (an IndParam sequence parameter, a constant sequence)
     Indicator d1 = SUMBARS(data, CVAL(data, 10));
     CHECK_UNARY(std::isnan(d1[0]));
     CHECK_UNARY(std::isnan(d1[1]));
-    CHECK_EQ(d1[2], 2);  // 修复前为 -2
+    CHECK_EQ(d1[2], 2);  // -2 before the fix
 
     Indicator d2 = SUMBARS(data, IndParam(CVAL(data, 10)));
     CHECK_EQ(d2[2], 2);
 
-    // 动态/静态逐位数值对称（discard 不要求相等，见下用例）
+    // The per-bar value symmetry of the dynamic/static paths (the discard need not be equal, see
+    // the case below)
     CHECK_EQ(s.size(), d1.size());
     for (size_t i = 0; i < s.size(); i++) {
         if (std::isnan(s[i])) {
@@ -266,16 +270,16 @@ TEST_CASE("test_SUMBARS_dyn_sign_regression") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_static_equivalence") {
-    // 多个位置的距离 > 0，覆盖非退化解等价类
+    // Several positions have a distance > 0, covering the non-degenerate solution equivalence class
     PriceList a;
     for (int i = 0; i < 10; i++) {
         a.push_back(i * 10);  // [0,10,20,30,40,50,60,70,80,90]
     }
     Indicator data = PRICELIST(a);
 
-    // 静态: discard=4, [4]=2, [5..8]=1, [9]=0
+    // Static: discard=4, [4]=2, [5..8]=1, [9]=0
     Indicator s = SUMBARS(data, 90);
     CHECK_EQ(s[4], 2);
     CHECK_EQ(s[5], 1);
@@ -299,34 +303,37 @@ TEST_CASE("test_SUMBARS_dyn_static_equivalence") {
     check_eq(s, SUMBARS(data, IndParam(CVAL(data, 90))));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_unreachable_discard") {
-    // 全段累加不可达：动态版仅逐位写 NaN 且不推进 discard，静态版整体丢弃
+    // The whole-range accumulation is unreachable: the dynamic version writes NaN per bar without
+    // advancing the discard, while the static version discards everything
     PriceList a;
     for (int i = 0; i < 10; i++) {
-        a.push_back(1);  // 全 1
+        a.push_back(1);  // All 1
     }
     Indicator data = PRICELIST(a);
 
-    Indicator s = SUMBARS(data, 100);  // 全段不可达
-    CHECK_EQ(s.discard(), s.size());  // 静态版整体丢弃
+    Indicator s = SUMBARS(data, 100);  // The whole range is unreachable
+    CHECK_EQ(s.discard(), s.size());   // The static version discards everything
     for (size_t i = 0; i < s.size(); i++) {
         CHECK_UNARY(std::isnan(s[i]));
     }
 
     Indicator d = SUMBARS(data, CVAL(data, 100));
-    CHECK_EQ(d.discard(), data.discard());  // 动态版不扩大 discard（== 输入 discard）
+    CHECK_EQ(d.discard(), data.discard());  // The dynamic version keeps the input discard
     for (size_t i = 0; i < d.size(); i++) {
         CHECK_UNARY(std::isnan(d[i]));
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_edge") {
-    // 1. a <= 0：首根即 sum>=a 成立，距离恒为 0（验证 i==j 退化解，不死循环）
+    // 1. a <= 0: sum>=a holds at the first bar so the distance is always 0 (verifying the i==j
+    // degenerate solution, no infinite loop)
     {
         PriceList a;
-        for (int i = 0; i < 5; i++) a.push_back(i + 1);  // [1,2,3,4,5]
+        for (int i = 0; i < 5; i++)
+            a.push_back(i + 1);  // [1,2,3,4,5]
         Indicator data = PRICELIST(a);
 
         Indicator s0 = SUMBARS(data, 0);
@@ -344,12 +351,14 @@ TEST_CASE("test_SUMBARS_dyn_edge") {
         }
     }
 
-    // 2. 输入序列带 discard > 0：内层 j 循环下界为 ind.discard()，验证终止不越界
+    // 2. The input sequence has a discard > 0: the lower bound of the inner j loop is
+    // ind.discard(), verifying the termination without an out of range access
     {
         PriceList a;
         a.push_back(10);
-        for (int i = 0; i < 6; i++) a.push_back(1);  // [10,1,1,1,1,1,1]
-        Indicator ma = MA(PRICELIST(a), 2);  // discard=1, [1]=(10+1)/2=5.5, 之后恒为 1
+        for (int i = 0; i < 6; i++)
+            a.push_back(1);                  // [10,1,1,1,1,1,1]
+        Indicator ma = MA(PRICELIST(a), 2);  // discard=1, [1]=(10+1)/2=5.5, and then always 1
         CHECK_EQ(ma.discard(), 1);
 
         Indicator s = SUMBARS(ma, 2);
@@ -363,9 +372,9 @@ TEST_CASE("test_SUMBARS_dyn_edge") {
         CHECK_EQ(d[3], 1);
     }
 
-    // 3. 极端长度
+    // 3. The extreme lengths
     {
-        // 空序列：不崩溃
+        // An empty sequence: no crash
         PriceList empty;
         Indicator data = PRICELIST(empty);
         Indicator s = SUMBARS(data, 10);
@@ -373,15 +382,16 @@ TEST_CASE("test_SUMBARS_dyn_edge") {
         CHECK_EQ(s.size(), 0);
         CHECK_EQ(d.size(), 0);
 
-        // 单根可达（静态路径可用 CVAL；动态路径用 PRICELIST 构造 size=1 的 a 序列，
-        // 规避 CVAL 嵌套在单元素上 size 传播为 0 的缺陷）
+        // A single reachable bar (the static path can use CVAL; the dynamic path builds an a
+        // sequence of size=1 with PRICELIST, avoiding the defect that a nested CVAL propagates a
+        // size of 0 on a single element)
         Indicator one = CVAL(10);
         CHECK_EQ(SUMBARS(one, 10)[0], 0);
         PriceList one_pl;
         one_pl.push_back(10);
         CHECK_EQ(SUMBARS(one, IndParam(PRICELIST(one_pl)))[0], 0);
 
-        // 单根不可达
+        // A single unreachable bar
         CHECK_UNARY(std::isnan(SUMBARS(one, 20)[0]));
         PriceList unreach_pl;
         unreach_pl.push_back(20);
@@ -389,9 +399,9 @@ TEST_CASE("test_SUMBARS_dyn_edge") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn_varying_param") {
-    // 动态参数 a 序列逐位变化，手工核算
+    // The dynamic parameter a sequence varies per bar, verified by hand
     PriceList a;
     a.push_back(1);
     a.push_back(2);
@@ -409,10 +419,10 @@ TEST_CASE("test_SUMBARS_dyn_varying_param") {
     Indicator aseq = PRICELIST(pa);
 
     Indicator d = SUMBARS(data, IndParam(aseq));
-    CHECK_UNARY(std::isnan(d[0]));  // a=5, 累加至 j=0 sum=1 <5
-    CHECK_UNARY(std::isnan(d[1]));  // a=100, 不可达
+    CHECK_UNARY(std::isnan(d[0]));  // a=5, accumulated to j=0 sum=1 < 5
+    CHECK_UNARY(std::isnan(d[1]));  // a=100, unreachable
     CHECK_EQ(d[2], 0);              // a=3, j=2 sum=3>=3
-    CHECK_EQ(d[3], 1);             // a=3, j=3 sum=2, j=2 sum=5>=3 -> i-j=1
+    CHECK_EQ(d[3], 1);              // a=3, j=3 sum=2, j=2 sum=5>=3 -> i-j=1
     CHECK_EQ(d[4], 1);              // a=3, j=4 sum=1, j=3 sum=3>=3 -> i-j=1
 }
 
@@ -421,7 +431,7 @@ TEST_CASE("test_SUMBARS_dyn_varying_param") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_SUMBARS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

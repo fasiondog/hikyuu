@@ -12,15 +12,24 @@
 namespace hku {
 
 /**
- * 原始 RSRS（底层 β）指标，基于滚动N日OLS回归
- * 公式：High = α + β · Low
+ * Original RSRS (underlying β) indicator, based on the rolling N-day OLS regression
+
+ * Formula: High = α + β · Low
+
  *
- * 每根K线贡献一个坐标点 (Low[i], High[i])，使用滚动窗口内的N个点进行OLS回归。
- * β 为最原始的 RSRS 斜率，代表支撑阻力强弱。
- * 缺陷：不同行情区间 β 中枢波动大，不能跨时段直接对比。
+ * Every K-line contributes a coordinate point (Low[i], High[i]), and the N points within the rolling
+ * window are used for the OLS regression.
+
+ * β is the most original RSRS slope, representing the strength of the support and resistance.
+
+ * Defect: the β center fluctuates greatly in different market ranges, so it cannot be compared
+ * directly across the periods.
+
  *
- * @param n 滚动窗口，默认为20
- * @param kdata K线数据
+ * @param n the rolling window, 20 by default
+
+ * @param kdata K-line data
+
  * @ingroup Indicator
  */
 Indicator HKU_API RSRS_BETA(int n = 20);

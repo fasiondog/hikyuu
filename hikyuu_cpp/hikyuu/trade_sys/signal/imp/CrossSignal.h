@@ -1,7 +1,7 @@
 /*
  * CrossSignal.h
  *
- *  Created on: 2015年2月20日
+ *  Created on: 2015-2-20
  *      Author: fasiondog
  */
 
@@ -28,7 +28,7 @@ private:
     Indicator m_slow;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

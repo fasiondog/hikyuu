@@ -14,11 +14,14 @@
 namespace hku {
 
 /**
- * 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社）
- * @param n 计算均值的周期窗口，必须为大于2的整数，默认为10天
- * @param fast_n 对应快速周期N，默认为2
- * @param slow_n 对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响
- * @return 具有2个结果集，result(0)为AMA，result(1)为ER
+ * Perry J. Kaufman adaptive moving average, see "Smarter Trading" (2006, Guangdong Economy
+ * Publishing House)
+ * @param n the period window for calculating the average, it must be an integer greater than 2,
+ *          10 days by default
+ * @param fast_n the corresponding fast period N, 2 by default
+ * @param slow_n the N value of the corresponding slow EMA line, 30 by default; the indicator
+ *               converges when it exceeds about 60 and there is not much influence
+ * @return it has 2 result sets, result(0) is AMA and result(1) is ER
  * @ingroup Indicator
  */
 Indicator HKU_API AMA(int n = 10, int fast_n = 2, int slow_n = 30);
@@ -32,11 +35,14 @@ Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, int slow_n = 30
 Indicator HKU_API AMA(const IndParam& n, const IndParam& fast_n, const IndParam& slow_n);
 
 /**
- * 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均，参见《精明交易者》（2006年 广东经济出版社）
- * @param ind 待计算的数据
- * @param n 计算均值的周期窗口，必须为大于2的整数，默认为10天
- * @param fast_n 对应快速周期N，默认为2
- * @param slow_n 对应慢速EMA线的N值，默认为30，不过当超过60左右该指标会收敛不会有太大的影响
+ * Perry J. Kaufman adaptive moving average, see "Smarter Trading" (2006, Guangdong Economy
+ * Publishing House)
+ * @param ind the data to be calculated
+ * @param n the period window for calculating the average, it must be an integer greater than 2,
+ *          10 days by default
+ * @param fast_n the corresponding fast period N, 2 by default
+ * @param slow_n the N value of the corresponding slow EMA line, 30 by default; the indicator
+ *               converges when it exceeds about 60 and there is not much influence
  * @ingroup Indicator
  */
 inline Indicator AMA(const Indicator& ind, int n = 10, int fast_n = 2, int slow_n = 30) {

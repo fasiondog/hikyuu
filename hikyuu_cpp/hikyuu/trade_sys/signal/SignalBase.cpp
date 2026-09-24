@@ -35,9 +35,9 @@ SignalBase::SignalBase(const string& name) : m_name(name), m_hold_long(false), m
 SignalBase::~SignalBase() {}
 
 void SignalBase::initParam() {
-    setParam<bool>("cycle", false);                 // 仅在指定周期范围内计算
-    setParam<bool>("alternate", true);              // 买入卖出信号交替出现
-    setParam<bool>("support_borrow_stock", false);  // 支持发出空头信号
+    setParam<bool>("cycle", false);                 // Calculate within the given cycle range only
+    setParam<bool>("alternate", true);              // The buy and sell signals appear alternately
+    setParam<bool>("support_borrow_stock", false);  // Support issuing a short signal
 }
 
 void SignalBase::baseCheckParam(const string& name) const {}

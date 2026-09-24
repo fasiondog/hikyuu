@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_COUNT") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -29,7 +29,7 @@ TEST_CASE("test_AGG_COUNT") {
     auto mink =
       getKData("sh000001", KQueryByDate(Datetime(20111115), Null<Datetime>(), KQuery::MIN));
 
-    /** @arg 单日聚合分钟线 */
+    /** @arg Aggregate the minute lines of a single day */
     auto ind = AGG_COUNT(CLOSE(), KQuery::MIN);
     auto result = ind(k);
     CHECK_EQ(result.name(), "AGG_COUNT");
@@ -41,7 +41,7 @@ TEST_CASE("test_AGG_COUNT") {
     }
     CHECK_EQ(sum, mink.size());
 
-    /** @arg 单日聚合分钟线，复合运算 */
+    /** @arg Aggregate the minute lines of a single day with a compound operation */
     auto x = (ind + ind)(k);
     sum = 0.0;
     for (const auto& v : x) {
@@ -49,7 +49,7 @@ TEST_CASE("test_AGG_COUNT") {
     }
     CHECK_EQ(sum, 2 * mink.size());
 
-    /** @arg 单日聚合分钟线, 多结果集 */
+    /** @arg Aggregate the minute lines of a single day with multiple result sets */
     ind = AGG_COUNT(KDATA(), KQuery::MIN);
     result = ind(k);
     CHECK_EQ(result.name(), "AGG_COUNT");
@@ -62,7 +62,7 @@ TEST_CASE("test_AGG_COUNT") {
     }
     CHECK_EQ(sum, mink.size());
 
-    /** @arg 双日滑动聚合分钟线 */
+    /** @arg Aggregate the minute lines with a two-day sliding window */
     ind = AGG_COUNT(CLOSE(), KQuery::MIN, false, 2);
     result = ind(k);
     CHECK_EQ(result.size(), k.size());
@@ -70,7 +70,7 @@ TEST_CASE("test_AGG_COUNT") {
     CHECK_EQ(result[1], 480);
     CHECK_EQ(result[15], 480);
 
-    /** @arg 扩展K线类型 DAY3 聚合分钟线 */
+    /** @arg Aggregate the minute lines into the extended K-line type DAY3 */
     k = getKData("sh000001", KQueryByDate(Datetime(20111101), Datetime(20111117), KQuery::DAY3));
     result = AGG_COUNT(CLOSE(), KQuery::MIN)(k);
     CHECK_EQ(result.size(), k.size());
@@ -80,7 +80,7 @@ TEST_CASE("test_AGG_COUNT") {
     CHECK_EQ(result[3], 720);
     CHECK_EQ(result[4], 240);
 
-    /** @arg 扩展K线类型 MIN3 聚合分笔线 */
+    /** @arg Aggregate the tick lines into the extended K-line type MIN3 */
     k = getKData("sh000001", KQueryByDate(Datetime(20111101), Datetime(20111103), KQuery::MIN3));
     result = AGG_COUNT(CLOSE(), KQuery::MIN)(k);
     CHECK_EQ(result.size(), k.size());
@@ -93,7 +93,7 @@ TEST_CASE("test_AGG_COUNT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AGG_COUNT_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

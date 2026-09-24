@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BARSLASTCOUNT") {
     auto k = getKData("sz000001", KQuery(-10));
     Indicator ret = BARSLASTCOUNT(CLOSE() > (OPEN()))(k);
@@ -35,7 +35,7 @@ TEST_CASE("test_BARSLASTCOUNT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_BARSLASTCOUNT_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

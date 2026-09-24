@@ -45,7 +45,7 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all
         Indicator ret = PRICELIST(sumByDate);
         ret.name("IC");
 
-        // 更新 discard
+        // Update the discard
         size_t discard = days_total;
         for (size_t di = 0; di < days_total; di++) {
             if (!std::isnan(ret[di])) {

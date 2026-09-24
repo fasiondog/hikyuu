@@ -15,7 +15,7 @@
 namespace hku {
 
 /**
- * 交易请求记录
+ * Trade request record
  * @ingroup System
  */
 class HKU_API TradeRequest {
@@ -28,16 +28,16 @@ public:
     Datetime datetime;
     price_t stoploss{0.0};
     price_t goal{0.0};
-    double number{0.0};             // 计划的买入/卖出数量，使用发出请求时刻的收盘价，
-                                    // 用于避免实际买入时需用重新计算数量时，人工执行速度较慢
-                                    // 可通过系统参数进行设置，是否使用
-    SystemPart from{PART_INVALID};  // 记录SystemBase::Part
+    double number{0.0};             // The planned buy / sell quantity, using the close price of the
+                                    // moment when the request is issued; it avoids the slow manual
+                                    // It can be set through the system parameters whether to use it
+    SystemPart from{PART_INVALID};  // Records SystemBase::Part
     string remark;
-    int count{0};  // 因操作失败，连续延迟的次数
+    int count{0};  // The number of the consecutive delays due to the failed operation
     KRecord krecord;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

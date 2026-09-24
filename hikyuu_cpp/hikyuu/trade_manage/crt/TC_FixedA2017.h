@@ -1,7 +1,7 @@
 /*
  * TC_FixedA2015.h
  *
- *  Created on: 2016年5月4日
+ *  Created on: 2016-5-4
  *      Author: Administrator
  */
 
@@ -14,25 +14,28 @@
 namespace hku {
 
 /**
- * 2015年8月1日后沪深A股交易成本算法,计算每次买入或卖出的成本
- * 2017年1月1日后深市也开始收取过户费
+ * Trade cost algorithm for the Shanghai and Shenzhen A-share after August 1, 2015; it calculates
+ * the cost of every buy or sell
+ * The Shenzhen market also started to charge the transfer fee after January 1, 2017
  * @details
  * <pre>
- * 计算规则为：
- *   1）上证交易所
- *      买入：佣金＋过户费
- *      卖出：佣金＋过户费＋印花税
- *   2）深证交易所：
- *      买入：佣金
- *      卖出：佣金＋印花税
- *   其中：当前佣金比例为千分之1.8（最低5元），印花税为千分之一
- *        2015年后上证过户费为成交金额的0.00002
+ * The calculation rules are:
+ *   1) Shanghai Stock Exchange
+ *      Buy: commission + transfer fee
+ *      Sell: commission + transfer fee + stamp duty
+ *   2) Shenzhen Stock Exchange:
+ *      Buy: commission
+ *      Sell: commission + stamp duty
+ *   Where: the current commission ratio is 1.8 per mille (5 yuan minimum), and the stamp duty is
+ *   1 per mille
+ *        After 2015 the transfer fee of the Shanghai Stock Exchange is 0.00002 of the turnover
+ * amount
  * </pre>
  *
- * @param commission 佣金比例，默认千分之1.8，即0.0018
- * @param lowestCommission 最低佣金值，默认5元
- * @param stamptax 印花税，默认千分之一，即0.001
- * @param transferfee 过户费，默认千分之0.2，即0.00002
+ * @param commission commission ratio, 1.8 per mille by default, i.e. 0.0018
+ * @param lowestCommission minimum commission value, 5 yuan by default
+ * @param stamptax stamp duty, 1 per mille by default, i.e. 0.001
+ * @param transferfee transfer fee, 0.2 per mille by default, i.e. 0.00002
  * @see FixedATradeCost
  * @ingroup TradeCost
  */

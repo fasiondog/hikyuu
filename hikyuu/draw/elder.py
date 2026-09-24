@@ -29,31 +29,36 @@
 # 1. 20100224, Added by fasiondog
 #===============================================================================
 """
-绘制亚历山大.艾尔德交易系统图形
-参见：《走进我的交易室》（2007年 地震出版社） Alexander Elder
+Draw the trading system chart of Alexander Elder
+See: 《走进我的交易室》（2007年 地震出版社） Alexander Elder
 """
 from pylab import plot
 from numpy import mean
 
-from hikyuu import (Query, constant, Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS, CVAL, PRICELIST)
+from hikyuu import (Query, constant, Indicator, CLOSE, EMA, MACD, VIGOR, SAFTYLOSS, CVAL, PRICELIST, htr)
 from .drawplot import (
     create_figure, show_gcf, ax_draw_macd2, adjust_axes_show, ax_set_locator_formatter
 )
 
 
 def _find_ema_coefficient(closes, emas, number=66, percent=0.95):
-    """计算EMA通道系数。
-    在《走进我的交易室》中，艾尔德介绍的价格通道为：
-        通道上轨 ＝ EMA ＋ EMA＊通道系数
-        通道下轨 ＝ EMA － EMA＊通道系数
-    其中一条绘制得恰到好处的通道应能将绝大多数价格包含在内，一般调节通道系数使其能够包含95％的价格
-    参数：closes：收盘价序列
-          emas：收盘价对应的EMA序列
-          number: 以最近多少天的数据来计算，即取最后N天的数据作为计算标准
-          percent：通道包含多少的价格，如0.95表示通道将包含95%的价格
+    """Calculate the coefficient of the EMA channel.
+
+    In 《走进我的交易室》（2007年 地震出版社）, the price channel introduced by Elder is:
+
+        the upper rail of the channel = EMA + EMA * the channel coefficient
+        the lower rail of the channel = EMA - EMA * the channel coefficient
+
+    A well-drawn channel should contain the vast majority of the prices, and the coefficient is
+    generally adjusted so that the channel contains 95% of the prices.
+
+    :param closes: the close price sequence
+    :param emas: the EMA sequence corresponding to the close prices
+    :param number: how many recent days are used for the calculation, i.e. the last N days
+    :param percent: the ratio of the prices contained in the channel, such as 0.95 for 95%
     """
-    assert len(closes) == len(emas), "数据长度不等"
-    assert number >= 1, "Number必须大于0"
+    assert len(closes) == len(emas), htr("The lengths of the two sequences are not equal")
+    assert number >= 1, htr("Number must be greater than 0")
 
     tmp_closes = closes[-number:]
     tmp_emas = emas[-number:]
@@ -100,7 +105,7 @@ def _draw_ema_pipe(axes, kdata, ema, n=22, w=0.10):
 
 
 def draw(stock, query=Query(-130), ma_n=22, ma_w='auto', vigor_n=13):
-    """绘制亚历山大.艾尔德交易系统图形"""
+    """Draw the trading system chart of Alexander Elder"""
     kdata = stock.get_kdata(query)
     close = CLOSE(kdata)
     ema = EMA(close, ma_n)

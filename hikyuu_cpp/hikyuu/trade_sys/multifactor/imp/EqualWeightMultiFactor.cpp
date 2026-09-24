@@ -43,7 +43,7 @@ IndicatorList EqualWeightMultiFactor::_calculate(const vector<IndicatorList>& al
             }
         }
 
-        // 均值权重
+        // The mean weight
         for (size_t di = 0; di < days_total; di++) {
             sumByDate[di] =
               (countByDate[di] == 0) ? Null<value_t>() : sumByDate[di] / countByDate[di];

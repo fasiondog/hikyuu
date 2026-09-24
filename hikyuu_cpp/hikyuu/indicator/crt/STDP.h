@@ -14,8 +14,8 @@
 namespace hku {
 
 /**
- * 计算N周期内总体标准差
- * @param n N日时间窗口
+ * Calculate the population standard deviation within N periods
+ * @param n N-day time window
  * @ingroup Indicator
  */
 Indicator HKU_API STDP(int n = 10);

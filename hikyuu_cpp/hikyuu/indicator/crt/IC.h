@@ -13,14 +13,17 @@
 namespace hku {
 
 /**
- * @brief 计算指定的因子相对于参考证券的 IC （实际为 RankIC）
- * @note IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-        天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-        如需严格“t 时刻因子值→t+1 时刻收益“计算，请设置 strict=True (注意此模式下, 后n位为 NA)
- * @param stks 证券组合
- * @param n 时间窗口 (对应 n 日收益率)
- * @param spearman 使用 spearman 相关系数，否则为 pearson
- * @param strict 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”
+ * @brief Calculate the IC of the given factor relative to the reference security (actually RankIC)
+ * @note The IC originally needs "the factor value at t -> the return at t+1"; here it is changed to
+ *        calculating "the factor value at t -> the return of the N days before t" (such as the
+ *        return of the past 5 days), which is called the "current IC". (Otherwise the current
+ * values would all be missing NA) If a strict "the factor value at t -> the return at t+1"
+ * calculation is needed, please set strict=True (note that in this mode the last n values are NA)
+ * @param stks the security portfolio
+ * @param n time window (corresponding to the n-day return)
+ * @param spearman use the spearman correlation coefficient, otherwise pearson
+ * @param strict strict mode, it follows the IC definition "the factor value at t -> the return at
+ *               t+1"
  * @return Indicator
  * @ingroup Indicator
  */
@@ -39,14 +42,16 @@ inline Indicator IC(const Indicator& ind, const Block& blk, int n = 1, bool spea
 }
 
 /**
- * @brief 计算指定的因子列表相对于指定的收益列表的
- * IC，其中，inds和returns均为已经计算好并按日期对齐后的结果。inds不需要按n右移。
- * @note 仅为数值计算，返回结果无对齐日期
- * @param inds 因子列表，inds不需要按n右移。
- * @param returns 收益列表
- * @param n 时间窗口 (对应 n 日收益率)
- * @param use_spearman 使用 spearman 相关系数，否则为 pearson
- * @param strict 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”
+ * @brief Calculate the IC of the given factor list relative to the given return list,
+ * where inds and returns are both already calculated and aligned by date. inds does not need to be
+ * shifted right by n.
+ * @note It is a numeric calculation only, the returned result has no aligned dates
+ * @param inds factor list, inds does not need to be shifted right by n.
+ * @param returns return list
+ * @param n time window (corresponding to the n-day return)
+ * @param use_spearman use the spearman correlation coefficient, otherwise pearson
+ * @param strict strict mode, it follows the IC definition "the factor value at t -> the return at
+ *               t+1"
  */
 Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n = 1, bool use_spearman = true,
                      bool strict = false);

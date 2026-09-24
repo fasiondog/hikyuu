@@ -24,13 +24,13 @@ public:
     SQLiteStatement() = delete;
 
     /**
-     * 构造函数
-     * @param driver 数据库连接
-     * @param sql_statement SQL语句
+     * Constructor
+     * @param driver database connection
+     * @param sql_statement SQL statement
      */
     SQLiteStatement(DBConnectBase *driver, const std::string &sql_statement);
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~SQLiteStatement() override;
 
     virtual void sub_exec() override;

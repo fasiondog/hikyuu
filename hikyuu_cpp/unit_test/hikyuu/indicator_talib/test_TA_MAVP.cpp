@@ -63,40 +63,40 @@ static void check_output(const Indicator& result, const Indicator& in1, const In
     CHECK_EQ(result.discard(), expect.discard());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_params") {
     KData k1 = getKData("sz000001", KQuery(-35));
     KData k2 = getKData("sz000002", KQuery(-35));
     Indicator result, a, b, expect;
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_MAVP(CVAL(1), 1));
     CHECK_THROWS(TA_MAVP(CVAL(1), 100001));
     CHECK_THROWS(TA_MAVP(CVAL(1), 2, 1));
     CHECK_THROWS(TA_MAVP(CVAL(1), 2, 100001));
 
-    /** @arg 输入两个空指标, 不指定上下文 */
+    /** @arg Two empty indicators, without a context */
     result = TA_MAVP(Indicator(), Indicator());
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
     // CHECK_EQ(result.name(), "TA_MAVP(Indicator)");
 
-    /** @arg 输入两个空指标, 指定上下文 */
+    /** @arg Two empty indicators, with a context */
     result = TA_MAVP(Indicator(), Indicator())(k1);
     CHECK_EQ(result.size(), k1.size());
     CHECK_EQ(result.discard(), k1.size());
     // CHECK_EQ(result.name(), "TA_MAVP(Indicator)");
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 输入序列均为时间无关序列，计算a, 参考b
+    // Without a context, both inputs are time independent; a is calculated with b as the reference
     //-------------------------------------------------------
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
+    /** @arg Both a and b are of length 1 (equal and less than 2), without a context */
     a = PRICELIST(PriceList{1.});
     b = PRICELIST(PriceList{2.});
     CHECK_EQ(a.size(), 1);
@@ -107,7 +107,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     // CHECK_EQ(result.name(), "TA_MAVP(PRICELIST)");
     CHECK_UNARY(std::isnan(result[0]));
 
-    /** @arg a 长度为0，b 长度为1，不指定上下文 */
+    /** @arg The length of a is 0 and that of b is 1, without a context */
     a = PRICELIST();
     b = PRICELIST(PriceList{1.});
     CHECK_EQ(a.size(), 0);
@@ -116,7 +116,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    /** @arg The lengths of a and b are both 2, without a context */
     a = PRICELIST(PriceList{1., 2.});
     b = PRICELIST(PriceList{1., 2.});
     CHECK_EQ(a.size(), 2);
@@ -126,7 +126,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20，不指定上下文 */
+    /** @arg a is of length 29 and b of 20, without a context */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29});
     b = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
@@ -141,7 +141,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29，不指定上下文 */
+    /** @arg a is of length 20 and b of 29, without a context */
     a = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29});
@@ -153,7 +153,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.size(), 20);
     CHECK_EQ(result.discard(), 20);
 
-    /** @arg a 长度为30，b 长度为30，不指定上下文 */
+    /** @arg a is of length 30 and b of 30, without a context */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
@@ -165,7 +165,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为35，不指定上下文 */
+    /** @arg a is of length 30 and b of 35, without a context */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
@@ -179,7 +179,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30，不指定上下文 */
+    /** @arg a is of length 35 and b of 30, without a context */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
                             19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
@@ -196,16 +196,16 @@ TEST_CASE("test_TA_MAVP_all_not_time_without_context") {
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     //-------------------------------------------------------
-    // 指定上下文，输入序列均为时间无关序列，计算a, 参考b
+    // With a context, both inputs are time independent; a is calculated with b as the reference
     //-------------------------------------------------------
     KData k1 = getKData("sz000001", KQuery(-35));
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
-    /** @arg a, b 长度都为1 (长度相等且小于2)，指定上下文 */
+    /** @arg Both a and b are of length 1 (equal and less than 2), with a context */
     a = PRICELIST(PriceList{1.});
     b = PRICELIST(PriceList{2.});
     CHECK_EQ(a.size(), 1);
@@ -218,7 +218,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
         CHECK_UNARY(std::isnan(result[i]));
     }
 
-    /** @arg a 长度为0，b 长度为1，指定上下文 */
+    /** @arg a is of length 0 and b of 1, with a context */
     a = PRICELIST();
     b = PRICELIST(PriceList{1.});
     CHECK_EQ(a.size(), 0);
@@ -227,7 +227,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 35);
 
-    /** @arg a 长度为2，b 长度为2，指定上下文 */
+    /** @arg a is of length 2 and b of 2, with a context */
     a = PRICELIST(PriceList{1., 2.});
     b = PRICELIST(PriceList{1., 2.});
     CHECK_EQ(a.size(), 2);
@@ -237,7 +237,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     CHECK_EQ(result.size(), k1.size());
     CHECK_EQ(result.discard(), k1.size());
 
-    /** @arg a 长度为29，b 长度为20，指定上下文 */
+    /** @arg a is of length 29 and b of 20, with a context */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29});
     b = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
@@ -256,7 +256,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 35);
 
-    /** @arg a 长度为20，b 长度为29，指定上下文 */
+    /** @arg a is of length 20 and b of 29, with a context */
     a = PRICELIST(PriceList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29});
@@ -275,7 +275,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 35);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
@@ -295,7 +295,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
     CHECK_EQ(result.size(), k1.size());
     CHECK_EQ(result.discard(), 34);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
                             19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35});
     REQUIRE(a.size() == 30);
@@ -310,7 +310,7 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
       PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
                           19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35}));
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     a = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18,
                             19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35});
     b = PRICELIST(PriceList{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15,
@@ -327,17 +327,17 @@ TEST_CASE("test_TA_MAVP_all_not_time_with_context") {
                            5));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 参考指标为时间无关序列，计算指标为时间序列, 计算a, 参考b
+    // Without a context, the reference is time independent, the calculated one is a time series
     //-------------------------------------------------------
     Stock stk = getStock("sz000001");
     KData k;
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k = stk.getKData(KQuery(-1));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{2.}));
@@ -350,7 +350,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     k = stk.getKData(KQueryByDate(Datetime(20240101)));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{2.}));
@@ -363,7 +363,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2 */
+    /** @arg The lengths of a and b are both 2 */
     k = stk.getKData(KQuery(-2));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.0, 2.}));
@@ -376,7 +376,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k = stk.getKData(KQuery(-29));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -392,7 +392,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k = stk.getKData(KQuery(-20));
     a = k.close();
     b = hku::CONTEXT(
@@ -408,7 +408,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 20);
     CHECK_EQ(result.discard(), 20);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k = stk.getKData(KQuery(-30));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -425,7 +425,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k = stk.getKData(KQuery(-30));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10., 11., 12.,
@@ -442,7 +442,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k = stk.getKData(KQuery(-35));
     a = k.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -462,17 +462,18 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_without_context") 
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 参考指标为时间无关序列且为独立上下文，计算指标为时间序列, 计算a, 参考b
+    // Without a context, the reference is time independent with its own context, the calculated one
+    // is a time series; a is calculated with b as the reference
     //-------------------------------------------------------
     Stock stk = getStock("sz000001");
     KData k;
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k = stk.getKData(KQuery(-1));
     a = k.close();
     b = PRICELIST(PriceList{2.});
@@ -485,7 +486,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     k = stk.getKData(KQueryByDate(Datetime(20240101)));
     a = k.close();
     b = PRICELIST(PriceList{2.});
@@ -498,7 +499,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2 */
+    /** @arg The lengths of a and b are both 2 */
     k = stk.getKData(KQuery(-2));
     a = k.close();
     b = PRICELIST(PriceList{1., 2.});
@@ -511,7 +512,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k = stk.getKData(KQuery(-29));
     a = k.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -529,7 +530,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k = stk.getKData(KQuery(-20));
     a = k.close();
     b =
@@ -545,7 +546,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 20);
     CHECK_EQ(result.discard(), 20);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k = stk.getKData(KQuery(-30));
     a = k.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -562,7 +563,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k = stk.getKData(KQuery(-30));
     a = k.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10., 11., 12.,
@@ -579,7 +580,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k = stk.getKData(KQuery(-35));
     a = k.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -599,10 +600,11 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_without_context
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     //-------------------------------------------------------
-    // 指定上下文, 参考指标为时间无关序列，计算指标为时间序列, 计算a, 参考b
+    // With a context, the reference is time independent, the calculated one is a time series; a is
+    // calculated with b as the reference
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
@@ -610,7 +612,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k1 = stk1.getKData(KQuery(-1));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.}));
@@ -624,7 +626,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     k1 = stk1.getKData(KQueryByDate(Datetime(20240101)));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.}));
@@ -638,7 +640,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2 */
+    /** @arg The lengths of a and b are both 2 */
     k1 = stk1.getKData(KQuery(-2));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1., 2.}));
@@ -652,7 +654,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k1 = stk1.getKData(KQuery(-29));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -671,7 +673,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k1 = stk1.getKData(KQuery(-20));
     a = k1.close();
     b = hku::CONTEXT(
@@ -690,7 +692,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-30));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -710,7 +712,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 34);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k1 = stk1.getKData(KQuery(-30));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10., 11., 12.,
@@ -729,7 +731,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-35));
     a = k1.close();
     b = hku::CONTEXT(PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -750,10 +752,11 @@ TEST_CASE("test_TA_MAVP_ref_not_time_with_context_ind_is_time_bind_context") {
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") {
     //-------------------------------------------------------
-    // 指定上下文, 参考指标为时间无关序列，计算指标为时间序列, 计算a, 参考b
+    // With a context, the reference is time independent, the calculated one is a time series; a is
+    // calculated with b as the reference
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
@@ -761,7 +764,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     Indicator result, a, b, expect;
     double nan = Null<double>();
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k1 = stk1.getKData(KQuery(-1));
     a = k1.close();
     b = PRICELIST(PriceList{1.});
@@ -775,7 +778,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     k1 = stk1.getKData(KQueryByDate(Datetime(20240101)));
     a = k1.close();
     b = PRICELIST(PriceList{1.});
@@ -789,7 +792,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2 */
+    /** @arg The lengths of a and b are both 2 */
     k1 = stk1.getKData(KQuery(-2));
     a = k1.close();
     b = PRICELIST(PriceList{1., 2.});
@@ -803,7 +806,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k1 = stk1.getKData(KQuery(-29));
     a = k1.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -822,7 +825,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k1 = stk1.getKData(KQuery(-20));
     a = k1.close();
     b =
@@ -841,7 +844,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-30));
     a = k1.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -860,7 +863,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k1 = stk1.getKData(KQuery(-30));
     a = k1.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10., 11., 12.,
@@ -879,7 +882,7 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.size(), 35);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-35));
     a = k1.close();
     b = PRICELIST(PriceList{1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9.,  10.,
@@ -900,17 +903,18 @@ TEST_CASE("test_TA_MAVP_ref_not_time_without_context_ind_is_time_bind_context") 
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 参考指标为时间序列且为公式，计算指标为时间序列, 计算a, 参考b
+    // Without a context, the reference is a time series formula, the calculated one is a time
+    // series
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
     KData k1, k2;
     Indicator result, a, b, expect;
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k1 = stk1.getKData(KQuery(-1));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-1));
@@ -924,7 +928,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     k1 = stk1.getKData(KQueryByDate(Datetime(20240101)));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-1));
@@ -938,7 +942,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2 */
+    /** @arg The lengths of a and b are both 2 */
     k1 = stk1.getKData(KQuery(-2));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-2));
@@ -952,7 +956,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k1 = stk1.getKData(KQuery(-29));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-20));
@@ -966,7 +970,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k1 = stk1.getKData(KQuery(-20));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-29));
@@ -980,7 +984,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 20);
     CHECK_EQ(result.discard(), 20);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-30));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-30));
@@ -994,7 +998,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k1 = stk1.getKData(KQuery(-30));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-35));
@@ -1008,7 +1012,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-35));
     a = k1.close();
     k2 = stk2.getKData(KQuery(-30));
@@ -1023,10 +1027,11 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_with_context_ind_is_time_not_bind_conte
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     //-------------------------------------------------------
-    // 指定上下文, 参考指标为时间序列且为公式原型，计算指标为时间序列, 计算a, 参考b
+    // With a context, the reference is a time series formula prototype, the calculated one is a
+    // time series; a is calculated with b as the reference
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
@@ -1034,7 +1039,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     KData k1, k2, k3;
     Indicator result, a, b;
 
-    /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
+    /** @arg Both a and b are of length 1 (equal and less than 2), without a context */
     k1 = stk1.getKData(KQuery(-1));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-1));
@@ -1049,7 +1054,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1，不指定上下文 */
+    /** @arg The length of a is 0 and that of b is 1, without a context */
     k1 = stk1.getKData(KQueryByDate(Datetime(20240101)));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-1));
@@ -1070,7 +1075,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    /** @arg The lengths of a and b are both 2, without a context */
     k1 = stk1.getKData(KQuery(-2));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-2));
@@ -1091,7 +1096,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k1 = stk1.getKData(KQuery(-29));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-20));
@@ -1112,7 +1117,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k1 = stk1.getKData(KQuery(-20));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-29));
@@ -1133,7 +1138,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-30));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-30));
@@ -1154,7 +1159,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k1 = stk1.getKData(KQuery(-30));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-35));
@@ -1175,7 +1180,7 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-35));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-30));
@@ -1197,11 +1202,11 @@ TEST_CASE("test_TA_MAVP_ref_is_prototype_ind_is_time_with_context") {
     CHECK_EQ(result.discard(), 30);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_context") {
     //-------------------------------------------------------
-    // 指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列(无独立上下文), 计算a,
-    // 参考b
+    // With a context, the reference is a time series with its own context, the calculated one is a
+    // (without its own context) time series; a is calculated with b as the reference
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
@@ -1209,7 +1214,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     KData k1, k2, k3;
     Indicator result, a, b;
 
-    /** @arg a,b 长度都为1 (长度相等且小于2)，不指定上下文 */
+    /** @arg Both a and b are of length 1 (equal and less than 2), without a context */
     k1 = stk1.getKData(KQuery(-1));
     a = MA(k1.close(), 2);
     k2 = stk2.getKData(KQuery(-1));
@@ -1224,7 +1229,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1，不指定上下文 */
+    /** @arg The length of a is 0 and that of b is 1, without a context */
     a = MA(CLOSE(), 2);
     k2 = stk2.getKData(KQuery(-1));
     b = hku::CONTEXT(EMA(k2.close(), 2));
@@ -1245,7 +1250,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    /** @arg The lengths of a and b are both 2, without a context */
     k1 = stk1.getKData(KQuery(-2));
     a = MA(CLOSE(k1), 2);
     k2 = stk2.getKData(KQuery(-2));
@@ -1267,7 +1272,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为29，b 长度为20，不指定上下文 */
+    /** @arg a is of length 29 and b of 20, without a context */
     k1 = stk1.getKData(KQuery(-29));
     a = MA(CLOSE(k1), 2);
     k2 = stk2.getKData(KQuery(-20));
@@ -1290,7 +1295,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为20，b 长度为29，不指定上下文 */
+    /** @arg a is of length 20 and b of 29, without a context */
     k1 = stk1.getKData(KQuery(-20));
     a = MA(CLOSE(k1), 2);
     k2 = stk2.getKData(KQuery(-29));
@@ -1313,7 +1318,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为30，b 长度为30，不指定上下文 */
+    /** @arg a is of length 30 and b of 30, without a context */
     k1 = stk1.getKData(KQuery(-30));
     a = MA(CLOSE(k1), 2);
     k2 = stk2.getKData(KQuery(-30));
@@ -1329,7 +1334,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为30，b 长度为35，不指定上下文 */
+    /** @arg a is of length 30 and b of 35, without a context */
     k1 = stk1.getKData(KQuery(-30));
     a = MA(CLOSE(k1), 2);
     k2 = stk2.getKData(KQuery(-35));
@@ -1345,7 +1350,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为35，b 长度为30，不指定上下文 */
+    /** @arg a is of length 35 and b of 30, without a context */
     k1 = stk1.getKData(KQuery(-35));
     a = MA(CLOSE(k1), 2);
     k2 = stk2.getKData(KQuery(-30));
@@ -1362,11 +1367,11 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_without_context_bind_c
     CHECK_EQ(result.discard(), 30);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_context") {
     //-------------------------------------------------------
-    // 不指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列(且独立上下文), 计算a,
-    // 参考b
+    // Without a context, the reference is a time series with its own context, the calculated one is
+    // a (with its own context) time series; a is calculated with b as the reference
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
@@ -1374,7 +1379,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     Indicator result, a, b;
     KQuery query;
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k1 = stk1.getKData(KQuery(-1));
     a = hku::CONTEXT(MA(k1.close(), 2));
     k2 = stk2.getKData(KQuery(-1));
@@ -1388,7 +1393,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     a = hku::CONTEXT(MA(CLOSE(), 2));
     k2 = stk2.getKData(KQuery(-1));
     b = hku::CONTEXT(EMA(k2.close(), 2));
@@ -1401,7 +1406,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    /** @arg The lengths of a and b are both 2, without a context */
     k1 = stk1.getKData(KQuery(-2));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-2));
@@ -1415,7 +1420,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k1 = stk1.getKData(KQuery(-29));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-20));
@@ -1430,7 +1435,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k1 = stk1.getKData(KQuery(-20));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-29));
@@ -1445,7 +1450,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 20);
     CHECK_EQ(result.discard(), 20);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-30));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-30));
@@ -1459,7 +1464,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k1 = stk1.getKData(KQuery(-30));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-35));
@@ -1474,7 +1479,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 30);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-35));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-30));
@@ -1489,10 +1494,11 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_not_bind_
     CHECK_EQ(result.discard(), 34);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_context") {
     //-------------------------------------------------------
-    // 指定上下文, 参考指标为时间序列且为独立上下文，计算指标为时间序列且有独立上下文, 计算a, 参考b
+    // With a context, the reference is a time series with its own context, the calculated one is a
+    // time series with its own context; a is calculated with b as the reference
     //-------------------------------------------------------
     Stock stk1 = getStock("sz000001");
     Stock stk2 = getStock("sz000002");
@@ -1501,7 +1507,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     Indicator result, a, b;
     KQuery query;
 
-    /** @arg a,b 长度都为1 (长度相等且小于2) */
+    /** @arg The lengths of a and b are both 1 (equal and less than 2) */
     k1 = stk1.getKData(KQuery(-1));
     a = hku::CONTEXT(MA(k1.close(), 2));
     k2 = stk2.getKData(KQuery(-1));
@@ -1516,7 +1522,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 1);
 
-    /** @arg a 长度为0，b 长度为1 */
+    /** @arg The length of a is 0 and that of b is 1 */
     a = hku::CONTEXT(MA(CLOSE(), 2));
     k2 = stk2.getKData(KQuery(-1));
     b = hku::CONTEXT(EMA(k2.close(), 2));
@@ -1530,7 +1536,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg a 长度为2，b 长度为2，不指定上下文 */
+    /** @arg The lengths of a and b are both 2, without a context */
     k1 = stk1.getKData(KQuery(-2));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-2));
@@ -1545,7 +1551,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 2);
     CHECK_EQ(result.discard(), 2);
 
-    /** @arg a 长度为29，b 长度为20 */
+    /** @arg The length of a is 29 and that of b is 20 */
     k1 = stk1.getKData(KQuery(-29));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-20));
@@ -1561,7 +1567,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 29);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为20，b 长度为29 */
+    /** @arg The length of a is 20 and that of b is 29 */
     k1 = stk1.getKData(KQuery(-20));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-29));
@@ -1577,7 +1583,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 20);
     CHECK_EQ(result.discard(), 20);
 
-    /** @arg a 长度为30，b 长度为30 */
+    /** @arg The length of a is 30 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-30));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-30));
@@ -1592,7 +1598,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为30，b 长度为35 */
+    /** @arg The length of a is 30 and that of b is 35 */
     k1 = stk1.getKData(KQuery(-30));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-35));
@@ -1608,7 +1614,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
     CHECK_EQ(result.size(), 30);
     CHECK_EQ(result.discard(), 29);
 
-    /** @arg a 长度为35，b 长度为30 */
+    /** @arg The length of a is 35 and that of b is 30 */
     k1 = stk1.getKData(KQuery(-35));
     a = hku::CONTEXT(MA(CLOSE(k1), 2));
     k2 = stk2.getKData(KQuery(-30));
@@ -1629,7 +1635,7 @@ TEST_CASE("test_TA_MAVP_ref_has_alone_context_ind_is_time_with_context_bind_cont
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAVP_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

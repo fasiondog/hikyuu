@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019 hikyuu.org
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  */
 
@@ -14,8 +14,9 @@
 namespace hku {
 
 /**
- * @brief 固定比例资产分配，每个选中的资产都只占总资产固定的比例
- * @param weight 指定的资产比例 (0, 1]
+ * @brief Fixed proportion asset allocation, every selected asset accounts for a fixed proportion of
+ * the total assets only
+ * @param weight the given asset proportion (0, 1]
  * @return AFPtr
  * @ingroup AllocateFunds
  */

@@ -24,7 +24,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MM_FixedCount_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

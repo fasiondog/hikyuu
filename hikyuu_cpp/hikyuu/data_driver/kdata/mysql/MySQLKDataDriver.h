@@ -1,7 +1,7 @@
 /*
  * MySQLKDataDriverImp.h
  *
- *  Created on: 2014年9月3日
+ *  Created on: 2014-9-3
  *      Author: fasiondog
  */
 

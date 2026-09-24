@@ -1,7 +1,7 @@
 /*
  * EqualWeightAllocateFunds.h
  *
- *  Created on: 2018年2月8日
+ *  Created on: 2018-2-8
  *      Author: fasiondog
  */
 

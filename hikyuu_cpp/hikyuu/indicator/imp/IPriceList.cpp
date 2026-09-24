@@ -61,7 +61,7 @@ void IPriceList::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
 
     if (k != Null<KData>() && align_dates.size() > 0) {
-        // 如果本身是时间序列，则使用时间进行对齐
+        // If it is a time series itself, align it by time
         auto tmp = ALIGN(PRICELIST(x, std::move(align_dates), x_discard), k);
         HKU_ASSERT(tmp.size() == total);
         auto* dst = this->data();
@@ -73,7 +73,8 @@ void IPriceList::_calculate(const Indicator& data) {
         return;
     }
 
-    // 如果指定了上下文，则按上下文数值右对齐，保证和上下文等长
+    // If a context is given, align at the right end by the context values, keeping the same length
+    // as the context
     if (x_discard >= x_total) {
         m_discard = total;
         return;

@@ -14,10 +14,12 @@
 namespace hku {
 
 /*
- * 真实波动幅度（TR）是以下三个值中的最大值：
- *  1. 当前周期最高价与最低价之差
- *  2. 当前周期最高价与前一周期收盘价之差的绝对值
- *  3. 当前周期最低价与前一周期收盘价之差的绝对值
+ * The true range (TR) is the maximum of the following three values:
+ *  1. the difference between the high price and the low price of the current period
+ *  2. the absolute value of the difference between the high price of the current period and the
+ *     close price of the previous period
+ *  3. the absolute value of the difference between the low price of the current period and the
+ *     close price of the previous period
  */
 class ITr : public IndicatorImp {
     INDICATOR_IMP(ITr)

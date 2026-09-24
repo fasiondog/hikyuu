@@ -1,7 +1,7 @@
 /*
  * TdxKDataDriver.cpp
  *
- *  Created on: 2017年10月12日
+ *  Created on: 2017-10-12
  *      Author: fasiondog
  */
 
@@ -34,7 +34,7 @@ struct TdxDayData {
         record.closePrice = price_t(close) * 0.01;
         record.transAmount = price_t(amount) * 0.0001;
         record.transCount = price_t(vol);
-        // 注：指数的成交量单位是股，和HDF5数据不同，HDF是手
+        // Note: the volume unit of the indices is shares, unlike the HDF5 data which is in lots
     }
 };
 

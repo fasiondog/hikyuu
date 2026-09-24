@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2019, hikyuu.org
  *
- *  Created on: 2016年4月2日
+ *  Created on: 2016-4-2
  *      Author: fasiondog
  */
 
@@ -16,17 +16,17 @@
 namespace hku {
 
 /**
- * N日内最低价
- * @param n N日时间窗口, N=0则从第一个有效值开始。
+ * The lowest price within N days
+ * @param n N-day time window; when N=0 it starts from the first valid value.
  * @ingroup Indicator
  */
 Indicator HKU_API LLV(int n = 20);
 Indicator HKU_API LLV(const IndParam& n);
 
 /**
- * N日内最低价, N=0则从第一个有效值开始。
- * @param ind 待计算的数据
- * @param n N日时间窗口
+ * The lowest price within N days; when N=0 it starts from the first valid value.
+ * @param ind the data to be calculated
+ * @param n N-day time window
  * @ingroup Indicator
  */
 inline Indicator LLV(const Indicator& ind, int n = 20) {

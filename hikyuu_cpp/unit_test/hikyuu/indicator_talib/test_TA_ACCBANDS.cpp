@@ -20,15 +20,15 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_ACCBANDS") {
     KData kdata = getKData("sz000001", KQuery(-30));
 
-    /** @arg 非法 n < 2 || n > 100000 */
+    /** @arg Invalid n < 2 || n > 100000 */
     CHECK_THROWS(TA_ACCBANDS(kdata, 1));
     CHECK_THROWS(TA_ACCBANDS(kdata, 100001));
 
-    /** @arg 正常值  */
+    /** @arg The normal value */
     Indicator result = TA_ACCBANDS(kdata, 10);
     CHECK_EQ(result.name(), "TA_ACCBANDS");
     CHECK_EQ(result.discard(), 9);
@@ -45,7 +45,7 @@ TEST_CASE("test_TA_ACCBANDS") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_ACCBANDS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

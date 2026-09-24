@@ -16,8 +16,9 @@
 namespace hku {
 
 /**
- * 数据偏差平方和，求X的N日数据偏差平方和
- * @param n N日时间窗口
+ * Sum of squares of the data deviations, it gives the N-day sum of squares of the data deviations
+ * of X
+ * @param n N-day time window
  * @ingroup Indicator
  */
 Indicator HKU_API DEVSQ(int n = 10);

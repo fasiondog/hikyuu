@@ -14,9 +14,10 @@
 namespace hku {
 
 /*
- * 统计总数 统计满足条件的周期数。
- * COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
- * COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
+ * Count the total number; count the number of the periods satisfying the condition.
+ * COUNT(X,N) counts the number of the periods satisfying the X condition within N periods; if N=0
+ * it starts from the first valid value.
+ * COUNT(CLOSE>OPEN,20) counts the number of the periods closing up within 20 periods
  */
 class ICount : public IndicatorImp {
     INDICATOR_IMP(ICount)

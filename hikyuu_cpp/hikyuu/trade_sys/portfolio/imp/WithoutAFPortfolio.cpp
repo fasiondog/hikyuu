@@ -1,7 +1,7 @@
 /*
  * WithoutAFPortfolio.cpp
  *
- *  Created on: 2016年2月21日
+ *  Created on: 2016-2-21
  *      Author: fasiondog
  */
 
@@ -25,9 +25,9 @@ WithoutAFPortfolio::WithoutAFPortfolio(const TradeManagerPtr& tm, const Selector
 WithoutAFPortfolio::~WithoutAFPortfolio() {}
 
 void WithoutAFPortfolio::initParam() {
-    setParam<bool>("trade_on_close", true);         // 在收盘时交易
-    setParam<bool>("sys_use_self_tm", false);       // 原型系统计算时使用自身附带的tm
-    setParam<bool>("sell_at_not_selected", false);  // 强制卖出在选股日未选中的持仓
+    setParam<bool>("trade_on_close", true);         // Trade at the close
+    setParam<bool>("sys_use_self_tm", false);       // Use the own tm of the prototype system
+    setParam<bool>("sell_at_not_selected", false);  // Force selling the unselected positions
 }
 
 void WithoutAFPortfolio::_reset() {
@@ -38,11 +38,11 @@ void WithoutAFPortfolio::_reset() {
 }
 
 void WithoutAFPortfolio::_readyForRun() {
-    // 从 se 获取原型系统列表
+    // Get the prototype system list from se
     auto pro_sys_list = m_se->getProtoSystemList();
     HKU_WARN_IF_RETURN(pro_sys_list.empty(), void(), "Can't fetch proto_sys_lsit from Selector!");
 
-    // 仅支持都是延迟买卖或都是立刻买卖模式
+    // Only the modes where all are delayed or all are immediate are supported
     bool trade_on_close = getParam<bool>("trade_on_close");
     bool sys_use_self_tm = getParam<bool>("sys_use_self_tm");
 
@@ -61,7 +61,7 @@ void WithoutAFPortfolio::_readyForRun() {
             auto se_sys = sys->clone();
             se_sys->setParam<bool>("shared_tm", false);
             if (!sys_use_self_tm || !se_sys->getTM()) {
-                // 使用自身 tm 或自身无tm 时，复制使用 pf tm
+                // When using its own tm or having no tm of its own, the pf tm is copied and used
                 se_sys->setTM(m_tm->clone());
                 se_sys_list.emplace_back(se_sys);
             }
@@ -83,14 +83,15 @@ void WithoutAFPortfolio::_readyForRun() {
         }
     }
 
-    // 告知 se 计算
+    // Tell se to calculate
     m_se->calculate(se_sys_list, m_query);
 }
 
 void WithoutAFPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
                                           bool adjust) {
-    // m_force_sell_sys_list 此处用于缓存本轮未选中但仍在运行中的系统
-    // 开盘时处理不在本轮选中系统但仍在持仓的系统，如果以没有持仓则清除
+    // m_force_sell_sys_list is used here to cache the systems not selected in this round but still
+    // running At the open, process the systems not selected in this round but still holding a
+    // position; they are removed when there is no position left
     bool trace = getParam<bool>("trace");
     for (auto iter = m_force_sell_sys_list.begin(); iter != m_force_sell_sys_list.end();) {
         auto& sys = *iter;
@@ -110,8 +111,8 @@ void WithoutAFPortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& 
     }
 
     if (!adjust) {
-        // 先执行不在选中系统池中的系统，让其执行可能得卖出
-        // 注：如果某些多次买入的系统发出买入暂无法避免
+        // Run the systems outside the selected system pool first, letting them perform the possible
+        // sell Note: a buy issued by some system that buys multiple times cannot be avoided for now
         if (getParam<bool>("sell_at_not_selected")) {
             for (auto& sys : m_force_sell_sys_list) {
                 sys->runMomentOnOpen(date);
@@ -130,13 +131,14 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
                                            bool adjust) {
     bool trace = getParam<bool>("trace");
     //---------------------------------------------------
-    // 非调仓日:
-    // 1. 先执行不在选中系统池中的系统，让其执行可能得卖出
-    // 2. 然后依次执行当前运行中的系统
+    // A non-adjustment day:
+    // 1. Run the systems outside the selected system pool first, letting them perform the possible
+    // sell
+    // 2. Then run the currently running systems in turn
     //---------------------------------------------------
     if (!adjust) {
-        // 先执行不在选中系统池中的系统，让其执行可能得卖出
-        // 注：如果某些多次买入的系统发出买入暂无法避免
+        // Run the systems outside the selected system pool first, letting them perform the possible
+        // sell Note: a buy issued by some system that buys multiple times cannot be avoided for now
         if (getParam<bool>("sell_at_not_selected")) {
             for (auto& sys : m_force_sell_sys_list) {
                 sys->runMomentOnClose(date);
@@ -151,7 +153,7 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
     }
 
     //---------------------------------------------------
-    // 调仓日，重新选择系统池
+    // On the adjustment day, re-select the system pool
     //---------------------------------------------------
     bool trade_on_close = getParam<bool>("trade_on_close");
     auto current_selected_list = m_se->getSelected(date);
@@ -163,7 +165,7 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
         m_selected_list.push_back(m_se_sys_to_pf_sys_dict[sw.sys]);
     }
 
-    // 从当前运行池中移除不在选中系统池中的系统
+    // Remove the systems outside the selected system pool from the current running pool
     std::unordered_set<SYSPtr> tmp_selected_set;
     for (auto& sys : m_selected_list) {
         tmp_selected_set.insert(sys);
@@ -186,7 +188,8 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
         m_running_sys_list.remove(sys);
     }
 
-    // 移除的系统如果有持仓，则先执行一次让其卖出，将其加入m_force_sell_sys_list
+    // When a removed system has a position, run it once to let it sell and add it to
+    // m_force_sell_sys_list
     if (!trade_on_close) {
         for (auto& sys : will_remove_sys_list) {
             auto stk = sys->getStock();
@@ -198,7 +201,7 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
         }
     }
 
-    // 加入当前运行系统集合，并设置调仓周期
+    // Add it into the current running system set and set the position adjustment cycle
     for (auto& sys : m_selected_list) {
         auto [it, ok] = m_running_sys_set.insert(sys);
         if (ok) {
@@ -210,13 +213,13 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
     }
 
     //----------------------------------------------------------------------------
-    // 依次执行运行中所有系统
+    // Run all the running systems in turn
     //----------------------------------------------------------------------------
     for (auto& sys : m_running_sys_list) {
         sys->runMomentOnClose(date);
     }
 
-    // 如果是收盘时执行模式，则将待移除系统中的持仓卖出
+    // In the execute-at-close mode, sell the positions of the systems to be removed
     if (trade_on_close) {
         for (auto& sys : will_remove_sys_list) {
             auto stk = sys->getStock();
@@ -234,7 +237,7 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
         }
     }
 
-    // 计算调仓换手率
+    // Calculate the position adjustment turnover
     if (running_sys_count > 0) {
         m_adjust_turnover.emplace_back(
           date, static_cast<double>(in_sys_count + out_sys_count) / running_sys_count);
@@ -243,8 +246,9 @@ void WithoutAFPortfolio::_runMomentOnClose(const Datetime& date, const Datetime&
 
 void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
                                                          const Datetime& nextCycle, bool adjust) {
-    // m_force_sell_sys_list 此处用于缓存本轮未选中但仍在运行中的系统
-    // 开盘时处理不在本轮选中系统但仍在持仓的系统，如果以没有持仓则清除
+    // m_force_sell_sys_list is used here to cache the systems not selected in this round but still
+    // running At the open, process the systems not selected in this round but still holding a
+    // position; they are removed when there is no position left
     bool trace = getParam<bool>("trace");
     for (auto iter = m_force_sell_sys_list.begin(); iter != m_force_sell_sys_list.end();) {
         auto& sys = *iter;
@@ -259,13 +263,14 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
     }
 
     //---------------------------------------------------
-    // 非调仓日:
-    // 1. 先执行不在选中系统池中的系统，让其执行可能得卖出
-    // 2. 然后依次执行当前运行中的系统
+    // A non-adjustment day:
+    // 1. Run the systems outside the selected system pool first, letting them perform the possible
+    // sell
+    // 2. Then run the currently running systems in turn
     //---------------------------------------------------
     if (!adjust) {
-        // 先执行不在选中系统池中的系统，让其执行可能得卖出
-        // 注：如果某些多次买入的系统发出买入暂无法避免
+        // Run the systems outside the selected system pool first, letting them perform the possible
+        // sell Note: a buy issued by some system that buys multiple times cannot be avoided for now
         for (auto& sys : m_force_sell_sys_list) {
             sys->runMoment(date);
         }
@@ -277,7 +282,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
     }
 
     //---------------------------------------------------
-    // 调仓日，重新选择系统池
+    // On the adjustment day, re-select the system pool
     //---------------------------------------------------
     bool trade_on_close = getParam<bool>("trade_on_close");
     auto current_selected_list = m_se->getSelected(date);
@@ -289,7 +294,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
         m_selected_list.push_back(m_se_sys_to_pf_sys_dict[sw.sys]);
     }
 
-    // 从当前运行池中移除不在选中系统池中的系统
+    // Remove the systems outside the selected system pool from the current running pool
     std::unordered_set<SYSPtr> tmp_selected_set;
     for (auto& sys : m_selected_list) {
         tmp_selected_set.insert(sys);
@@ -308,7 +313,8 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
         m_running_sys_list.remove(sys);
     }
 
-    // 移除的系统如果有持仓，则先执行一次让其卖出，将其加入m_force_sell_sys_list
+    // When a removed system has a position, run it once to let it sell and add it to
+    // m_force_sell_sys_list
     if (!trade_on_close) {
         for (auto& sys : will_remove_sys_list) {
             auto stk = sys->getStock();
@@ -320,7 +326,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
         }
     }
 
-    // 加入当前运行系统集合，并设置调仓周期
+    // Add it into the current running system set and set the position adjustment cycle
     for (auto& sys : m_selected_list) {
         auto [it, ok] = m_running_sys_set.insert(sys);
         if (ok) {
@@ -331,13 +337,13 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
     }
 
     //----------------------------------------------------------------------------
-    // 依次执行运行中所有系统
+    // Run all the running systems in turn
     //----------------------------------------------------------------------------
     for (auto& sys : m_running_sys_list) {
         sys->runMoment(date);
     }
 
-    // 如果是收盘时执行模式，则将待移除系统中的持仓卖出
+    // In the execute-at-close mode, sell the positions of the systems to be removed
     if (trade_on_close) {
         for (auto& sys : will_remove_sys_list) {
             auto stk = sys->getStock();
@@ -353,7 +359,9 @@ void WithoutAFPortfolio::_runMomentWithoutAFNotForceSell(const Datetime& date,
 void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
                                                       const Datetime& nextCycle, bool adjust) {
     bool trace = getParam<bool>("trace");
-    // 开盘时处理强制卖出系统列表，如果以没有持仓，则从列表中删除，否则执行卖出且保留（下一交易日判断是否仍有持仓）
+    // At the open, process the forced sell system list; a system without a position is removed from
+    // the list, otherwise the sell is executed and it is kept (whether it still has a position is
+    // judged on the next trading day)
     for (auto iter = m_force_sell_sys_list.begin(); iter != m_force_sell_sys_list.end();) {
         auto& sys = *iter;
         auto stk = sys->getStock();
@@ -369,7 +377,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     }
 
     //---------------------------------------------------
-    // 非调仓日，只需依次执行当前运行中的系统
+    // On a non-adjustment day, just run the currently running systems in turn
     //---------------------------------------------------
     if (!adjust) {
         for (auto& sys : m_running_sys_list) {
@@ -379,11 +387,11 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
     }
 
     //---------------------------------------------------
-    // 调仓日，重新选择系统池
+    // On the adjustment day, re-select the system pool
     //---------------------------------------------------
     bool trade_on_close = getParam<bool>("trade_on_close");
     auto current_selected_list = m_se->getSelected(date);
-    HKU_INFO_IF(trace, "[PF] {}: {}", htr("current seleect system count"),
+    HKU_INFO_IF(trace, "[PF] {}: {}", htr("current selected system count"),
                 current_selected_list.size());
 
     m_selected_list.clear();
@@ -391,7 +399,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
         m_selected_list.push_back(m_se_sys_to_pf_sys_dict[sw.sys]);
     }
 
-    // 从当前运行池中移除不在选中系统池中的系统
+    // Remove the systems outside the selected system pool from the current running pool
     std::unordered_set<SYSPtr> tmp_selected_set;
     for (auto& sys : m_selected_list) {
         tmp_selected_set.insert(sys);
@@ -410,7 +418,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
         m_running_sys_list.remove(sys);
     }
 
-    // 移除的系统如果有持仓，则强制立刻卖出，且为开盘时执行
+    // When a removed system has a position, force an immediate sell executed at the open
     if (!trade_on_close) {
         for (auto& sys : will_remove_sys_list) {
             auto stk = sys->getStock();
@@ -420,7 +428,7 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
         }
     }
 
-    // 加入当前运行系统集合，并设置调仓周期
+    // Add it into the current running system set and set the position adjustment cycle
     for (auto& sys : m_selected_list) {
         auto [it, ok] = m_running_sys_set.insert(sys);
         if (ok) {
@@ -430,13 +438,13 @@ void WithoutAFPortfolio::_runMomentWithoutAFForceSell(const Datetime& date,
         }
     }
     //----------------------------------------------------------------------------
-    // 依次执行运行中所有系统
+    // Run all the running systems in turn
     //----------------------------------------------------------------------------
     for (auto& sys : m_running_sys_list) {
         sys->runMoment(date);
     }
 
-    // 如果是收盘时执行模式，则将待移除系统中的持仓卖出
+    // In the execute-at-close mode, sell the positions of the systems to be removed
     if (trade_on_close) {
         for (auto& sys : will_remove_sys_list) {
             auto stk = sys->getStock();

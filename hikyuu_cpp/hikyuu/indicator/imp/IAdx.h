@@ -6,9 +6,9 @@
 
 namespace hku {
 
-// ADX 平均趋向指数实现类
-// 采用威尔德（Wilder）原始公式，周期N=14
-// 平滑系数 = 1/N，初始值为N周期简单平均
+// Implementation class of the ADX average directional index
+// The original formula of Wilder is used, with the period N = 14
+// Smoothing coefficient = 1/N, the initial value is the simple average of N periods
 class IAdx : public IndicatorImp {
     INDICATOR_IMP(IAdx)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

@@ -1,7 +1,7 @@
 /*
  * FixedRiskMM.cpp
  *
- *  Created on: 2016年5月1日
+ *  Created on: 2016-5-1
  *      Author: Administrator
  */
 

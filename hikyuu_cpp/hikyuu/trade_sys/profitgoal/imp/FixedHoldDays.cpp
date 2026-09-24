@@ -1,7 +1,7 @@
 /*
  * FixedHoldDays.cpp
  *
- *  Created on: 2018年1月20日
+ *  Created on: 2018-1-20
  *      Author: fasiondog
  */
 

@@ -17,19 +17,22 @@
 namespace hku {
 
 /**
- * K 线记录裸指针视图（零拷贝）
- * @details 由支持共享内存视图的驱动（客户端 IPC 代理驱动）填充，data 指向只读共享内存中
- * 连续的 count 条 KRecord；pin 以类型擦除方式持有底层映射存活（如 KDataShmReader 的
- * shared_ptr），视图有效期内不得释放。不支持视图的驱动返回 false，调用方回退拷贝路径。
+ * Raw pointer view of the K-line records (zero copy)
+ * @details It is filled by the driver that supports the shared memory view (the client IPC proxy
+ * driver), data points to the count consecutive KRecord in the read-only shared memory; pin holds
+ * the underlying mapping alive in a type-erased way (such as the shared_ptr of KDataShmReader), and
+ * it must not be released within the valid period of the view. A driver that does not support the
+ * view returns false, and the caller falls back to the copy path.
  */
 struct KRecordView {
-    const KRecord* data{nullptr};  ///< 区间首记录指针（连续 count 条）
-    size_t count{0};               ///< 区间记录数
-    shared_ptr<void> pin;          ///< 持有映射存活（类型擦除）
+    const KRecord* data{nullptr};  ///< Pointer of the first record of the range (count consecutive
+                                   ///< records)
+    size_t count{0};               ///< Number of the records in the range
+    shared_ptr<void> pin;          ///< Holds the mapping alive (type-erased)
 };
 
 /**
- * K线数据驱动基类
+ * Base class of the K-line data driver
  * @ingroup DataDriver
  */
 class HKU_API KDataDriver {
@@ -41,31 +44,31 @@ public:
     KDataDriver(const Parameter& params);
 
     /**
-     * 构造函数
-     * @param name 驱动名称
+     * Constructor
+     * @param name driver name
      */
     KDataDriver(const string& name);
     virtual ~KDataDriver() {}
 
-    /** 获取驱动名称 */
+    /** Get the driver name */
     const string& name() const;
 
-    /** 驱动初始化 */
+    /** Driver initialization */
     bool init(const Parameter&);
 
     typedef shared_ptr<KDataDriver> KDataDriverPtr;
     /**
-     * 克隆实现
+     * Clone implementation
      */
     KDataDriverPtr clone();
 
     /**
-     * 子类克隆函数实现
+     * Subclass clone function implementation
      */
     virtual KDataDriverPtr _clone() = 0;
 
     /**
-     * 子类初始化私有变量接口
+     * Interface for the subclass to initialize its private variables
      * @return
      */
     virtual bool _init() {
@@ -73,85 +76,88 @@ public:
     }
 
     /**
-     * 判断该引擎是否是位置索引方式查询速度更快，还是按日期方式查询更快
+     * Judge whether the query by position index is faster for this engine, or the query by date is
+     * faster
      */
     virtual bool isIndexFirst() = 0;
 
     /**
-     * 是否支持并行数据加载
+     * Whether parallel data loading is supported
      */
     virtual bool canParallelLoad() = 0;
 
     /**
-     * 获取指定类型的K线数据量
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param kType  K线类型
+     * Get the amount of the K-line data of the given type
+     * @param market market abbreviation
+     * @param code   security code
+     * @param kType  K-line type
      * @return
      */
     virtual size_t getCount(const string& market, const string& code, const KQuery::KType& kType);
 
     /**
-     * 获取指定日期范围对应的K线记录索引
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param query  查询条件
-     * @param out_start [out] 对应K线记录位置
-     * @param out_end [out] 对应的K线记录位置
+     * Get the K-line record index corresponding to the given date range
+     * @param market market abbreviation
+     * @param code   security code
+     * @param query  query condition
+     * @param out_start [out] the position of the corresponding K-line record
+     * @param out_end [out] the position of the corresponding K-line record
      * @return
      */
     virtual bool getIndexRangeByDate(const string& market, const string& code, const KQuery& query,
                                      size_t& out_start, size_t& out_end);
 
     /**
-     * 获取 K 线数据
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param query  查询条件
+     * Get the K-line data
+     * @param market market abbreviation
+     * @param code   security code
+     * @param query  query condition
      */
     virtual KRecordList getKRecordList(const string& market, const string& code,
                                        const KQuery& query);
 
     /**
-     * 获取指定区间的 K 线记录裸指针视图（零拷贝，可选实现）
-     * @details 仅客户端共享内存路径支持；[start_ix, end_ix) 须为已解析的正索引。
-     * 默认返回 false，调用方回退 getKRecordList 拷贝路径。
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param kType  K线类型
-     * @param start_ix 起始索引（含）
-     * @param end_ix   结束索引（不含）
-     * @param out    [out] 视图句柄
-     * @return 支持且命中返回 true
+     * Get the raw pointer view of the K-line records of the given range (zero copy, optional
+     * implementation)
+     * @details Only the client shared memory path supports it; [start_ix, end_ix) must be a
+     *          resolved positive index. It returns false by default, and the caller falls back to
+     *          the getKRecordList copy path.
+     * @param market market abbreviation
+     * @param code   security code
+     * @param kType  K-line type
+     * @param start_ix start index (inclusive)
+     * @param end_ix   end index (exclusive)
+     * @param out    [out] view handle
+     * @return true is returned when it is supported and hit
      */
     virtual bool tryGetKRecordView(const string& market, const string& code,
                                    const KQuery::KType& kType, size_t start_ix, size_t end_ix,
                                    KRecordView& out);
 
     /**
-     * 获取分时线
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param query  查询条件
+     * Get the time-sharing (intraday) line
+     * @param market market abbreviation
+     * @param code   security code
+     * @param query  query condition
      * @return
      */
     virtual TimeLineList getTimeLineList(const string& market, const string& code,
                                          const KQuery& query);
 
     /**
-     * 获取历史分笔数据
-     * @param market 市场简称
-     * @param code   证券代码
-     * @param query  查询条件
+     * Get the historical tick data
+     * @param market market abbreviation
+     * @param code   security code
+     * @param query  query condition
      * @return
      */
     virtual TransList getTransList(const string& market, const string& code, const KQuery& query);
 
     //---------------------------------------------------
-    // 以下为列式数据库接口
+    // The following is the column-oriented database interface
     //---------------------------------------------------
 
-    /** 是否列优先(列数据库存储K线数据) */
+    /** Whether it is column-first (the K-line data is stored in a column database) */
     virtual bool isColumnFirst() const {
         return false;
     }

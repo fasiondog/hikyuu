@@ -20,13 +20,13 @@ public:
     InterruptFlag(const InterruptFlag& other)
     : m_flag(other.m_flag.load(std::memory_order_relaxed)) {}
 
-    // 赋值运算符
+    // Assignment operator
     InterruptFlag& operator=(const InterruptFlag& other) {
         m_flag.store(other.m_flag.load(std::memory_order_relaxed), std::memory_order_relaxed);
         return *this;
     }
 
-    // 转换为 bool 类型
+    // Convert to the bool type
     operator bool() const {
         return m_flag.load(std::memory_order_relaxed);
     }

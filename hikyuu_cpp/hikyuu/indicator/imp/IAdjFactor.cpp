@@ -21,13 +21,15 @@ IAdjFactor::IAdjFactor() : IndicatorImp("ADJ_FACTOR", 1) {
 
 IAdjFactor::~IAdjFactor() {}
 
-// 计算对应日线复权因子(非严格上市日期，仅从 in_kdata 包含的数据开始计算)
-// 注意，因为内部函数，在无权息数据清空下，直接返回空结果
-// base_factor: 基准因子值，用于增量计算（默认为 1.0，表示从头开始计算）
-// 参考 KDataPrivatedBufferImp::_recoverEqualBackward() 的实现
+// Calculate the daily-line adjustment factor (the listing date is not strict, the calculation
+// starts from the data contained in in_kdata). Note that as an internal function it returns an
+// empty result directly when there is no ex-rights/ex-dividend data.
+// base_factor: the base factor value used for the incremental calculation (1.0 by default,
+// which means calculating from the beginning). Refer to the implementation of
+// KDataPrivatedBufferImp::_recoverEqualBackward().
 static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KData& in_kdata,
                                                                       price_t base_factor = 1.0) {
-    // 获取对应日线范围K线数据
+    // Get the K-line data of the corresponding daily-line range
     KData kdata = in_kdata.getKData(KQuery::DAY);
 
     size_t total = kdata.size();
@@ -37,34 +39,34 @@ static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KDat
 
     auto* krecords = kdata.data();
 
-    // 获取所有权息数据（已按日期排序）
+    // Get all the ex-rights/ex-dividend data (already sorted by date)
     Datetime start_date = krecords[0].datetime;
     Datetime end_date = krecords[total - 1].datetime + Days(1);
     StockWeightList sw_list = kdata.getStock().getWeight(start_date, end_date);
 
     // if (sw_list.empty()) {
-    //     // 没有权息数据，返回空结果
+    //     // There is no ex-rights/ex-dividend data, return an empty result
     //     return result;
     // }
 
-    // 初始化所有因子为基准因子
+    // Initialize all the factors to the base factor
     vector<price_t> factors(total, base_factor);
 
     StockWeightList::const_reverse_iterator weightIter = sw_list.rbegin();
     size_t pre_pos = total - 1;
 
     for (; weightIter != sw_list.rend(); ++weightIter) {
-        // 找到除权日在K线中的位置
+        // Find the position of the ex-rights date in the K-lines
         size_t i = pre_pos;
         while (i > 0 && krecords[i].datetime > weightIter->datetime()) {
             i--;
         }
 
-        pre_pos = i;  // 除权日位置
+        pre_pos = i;  // The ex-rights date position
 
-        // 获取股权登记日（除权日前一天）的收盘价
+        // Get the close price of the record date (the day before the ex-rights date)
         if (pre_pos == 0) {
-            continue;  // 没有前一天的数据，无法计算
+            continue;  // There is no data of the previous day, it cannot be calculated
         }
 
         price_t closePrice = krecords[pre_pos - 1].closePrice;
@@ -76,7 +78,8 @@ static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KDat
         if (weightIter->suogu() != 0.0) {
             denominator = weightIter->suogu();
         } else {
-            // 流通股份变动比例 = 0.1 × (送股 + 配股 + 转增)
+            // The change ratio of the outstanding shares = 0.1 * (bonus shares + rights shares +
+            // capitalized shares)
             price_t change = 0.1 * (weightIter->countAsGift() + weightIter->countForSell() +
                                     weightIter->increasement());
             denominator = 1.0 + change;
@@ -87,16 +90,16 @@ static vector<std::pair<Datetime, Indicator::value_t>> cum_adj_factor(const KDat
             continue;
         }
 
-        // 计算后复权系数
+        // Calculate the backward adjustment coefficient
         price_t k = (denominator * closePrice) / temp;
 
-        // 将除权日到最新日之间的所有因子乘以 k
+        // Multiply all the factors from the ex-rights date to the latest date by k
         for (size_t j = pre_pos; j < total; ++j) {
             factors[j] *= k;
         }
     }
 
-    // 构建结果
+    // Build the result
     for (size_t i = 0; i < total; ++i) {
         result.emplace_back(krecords[i].datetime, factors[i]);
     }
@@ -115,7 +118,7 @@ void IAdjFactor::_calculate(const Indicator& ind) {
     _readyBuffer(total, 1);
     m_discard = 0;
 
-    // 复用增量计算方法，start_pos = 0 表示从头开始计算
+    // Reuse the incremental calculation method; start_pos = 0 means calculating from the beginning
     _increment_calculate(ind, 0);
 }
 
@@ -134,40 +137,43 @@ void IAdjFactor::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto* dst = data();
     auto* kdata = k.data();
 
-    // 关键：复权因子必须基于日线计算
-    // 优化策略：利用已计算的基准因子，只计算新增部分的权息影响
+    // Key: the adjustment factor must be calculated based on the daily line
+    // Optimization strategy: use the already calculated base factor and calculate only the
+    // ex-rights/ex-dividend influence of the newly added part
 
-    // 1. 确定基准因子和起始日期
+    // 1. Determine the base factor and the start date
     price_t base_factor = 1.0;
     Datetime calc_start_date;
 
     if (start_pos > 0) {
-        // 使用前一个位置的因子值作为基准
+        // Use the factor value of the previous position as the base
         base_factor = dst[start_pos - 1];
         calc_start_date = kdata[start_pos - 1].datetime.startOfDay();
     } else if (!m_old_context.empty()) {
-        // 首次增量计算但有旧上下文，使用旧上下文的起始日期
-        base_factor = 1.0;  // 从头开始计算
+        // The first incremental calculation with an old context: use the start date of the old
+        // context
+        base_factor = 1.0;  // Calculate from the beginning
         calc_start_date = m_old_context[0].datetime.startOfDay();
     } else {
-        // 真正的首次计算，从第一个K线开始
+        // The real first calculation, starting from the first K-line
         calc_start_date = kdata[0].datetime.startOfDay();
     }
 
     Datetime calc_end_date = kdata[total - 1].datetime + k.getQuery().kTypeInSeconds();
 
-    // 2. 获取增量部分对应的K线数据（从 calc_start_date 开始）
+    // 2. Get the K-line data corresponding to the incremental part (starting from calc_start_date)
     KData inc_kdata = k.getStock().getKData(KQueryByDate(calc_start_date, calc_end_date));
 
     if (inc_kdata.empty()) {
-        // 没有数据，增量部分全部使用基准因子
+        // There is no data, the whole incremental part uses the base factor
         for (size_t i = start_pos; i < total; ++i) {
             dst[i] = base_factor;
         }
         return;
     }
 
-    // 3. 计算增量部分的日线复权因子（传入基准因子）
+    // 3. Calculate the daily-line adjustment factor of the incremental part (the base factor is
+    // passed in)
     auto daily_factors = cum_adj_factor(inc_kdata, base_factor);
     if (k.getQuery().kType() == KQuery::DAY) {
         for (size_t i = start_pos; i < total; ++i) {
@@ -177,35 +183,36 @@ void IAdjFactor::_increment_calculate(const Indicator& ind, size_t start_pos) {
     }
 
     if (daily_factors.empty()) {
-        // 无权息数据，增量部分全部使用基准因子
+        // There is no ex-rights/ex-dividend data, the whole incremental part uses the base factor
         for (size_t i = start_pos; i < total; ++i) {
             dst[i] = base_factor;
         }
         return;
     }
 
-    // 4. 将日线复权因子对齐到当前K线周期，从 start_pos 开始
+    // 4. Align the daily-line adjustment factor to the current K-line period, starting from
+    // start_pos
     size_t d_idx = 0;
     Datetime start_date = kdata[start_pos].datetime.startOfDay();
 
-    // 找到与 start_pos 对应日期匹配的日线因子索引
+    // Find the index of the daily-line factor matching the date of start_pos
     while (d_idx < daily_factors.size() && daily_factors[d_idx].first < start_date) {
         ++d_idx;
     }
 
-    // 5. 从 start_pos 开始填充增量部分
+    // 5. Fill the incremental part starting from start_pos
     price_t cumulative_factor = base_factor;
 
     for (size_t i = start_pos; i < total; ++i) {
         const Datetime& k_date = kdata[i].datetime.startOfDay();
 
-        // 处理所有在当前K线日期之前或当天的日线因子
+        // Process all the daily-line factors earlier than or equal to the current K-line date
         while (d_idx < daily_factors.size() && daily_factors[d_idx].first <= k_date) {
             cumulative_factor = daily_factors[d_idx].second;
             ++d_idx;
         }
 
-        // 设置当前K线的复权因子
+        // Set the adjustment factor of the current K-line
         dst[i] = cumulative_factor;
     }
 }

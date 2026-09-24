@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_DROPNA") {
     Indicator result;
 
@@ -33,7 +33,7 @@ TEST_CASE("test_DROPNA") {
 
     Indicator data = PRICELIST(a);
 
-    /** @arg 无 nan 值 */
+    /** @arg There is no nan value */
     result = DROPNA(data);
     CHECK_EQ(result.name(), "DROPNA");
     CHECK_EQ(result.discard(), 0);
@@ -41,7 +41,7 @@ TEST_CASE("test_DROPNA") {
         CHECK_EQ(result[i], data[i]);
     }
 
-    /** @arg 全部为 nan 值 */
+    /** @arg All the values are nan */
     a.clear();
     for (int i = 0; i < 10; i++) {
         a.push_back(Null<price_t>());
@@ -52,7 +52,7 @@ TEST_CASE("test_DROPNA") {
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.discard(), 0);
 
-    /** @arg 中间存在 nan 值 */
+    /** @arg There is a nan value in the middle */
     a.push_back(Null<price_t>());
     a.push_back(12);
     a.push_back(Null<price_t>());
@@ -71,7 +71,7 @@ TEST_CASE("test_DROPNA") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_DROPNA_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

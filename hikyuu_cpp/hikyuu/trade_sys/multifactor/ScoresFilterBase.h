@@ -13,8 +13,9 @@
 namespace hku {
 
 /**
- * 评分过滤器
- * @note 虽然直接使用 std::function 即可，但如果使用 python 函数会造成并行死锁
+ * Score filter
+ * @note Although std::function could be used directly, using a python function would cause a
+ *       parallel deadlock
  * @ingroup Selector
  */
 class HKU_API ScoresFilterBase {
@@ -59,7 +60,7 @@ protected:
     bool m_is_python_object{false};
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

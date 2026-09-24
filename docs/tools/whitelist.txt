@@ -1,0 +1,33 @@
+# 中文保留白名单（领域数据 / 真实输出样例，不得翻译）
+#
+# 用途：CI 的"代码中文残留"检查（维护规范 §4.1 检查 14）据此排除误报。
+# 格式：每行一个路径（文件或目录），可带 " # 保留理由" 注释；目录路径表示其下所有文件豁免。
+# 规则：只增不减，新增需评审（设计文档 01 §4）。
+
+# --- 领域数据：A 股行情 / 板块数据抓取（第三方接口字段名、板块名） ---
+hikyuu/fetcher/stock/            # 东财/新浪/QQ 等 A 股数据源字段与板块名
+
+# --- 领域数据：A 股数据导入 / 数据驱动脚本与 SQL ---
+hikyuu/data/                     # A 股数据源相关脚本 + 71 个 sql 升级/建库脚本
+
+# --- 领域数据：国内用户 GUI（中文界面是有意设计） ---
+hikyuu/gui/                      # 面向国内 A 股用户，中文界面有意保留
+
+# --- 领域数据：板块定义（板块名是公开契约，代码以 sm.get_block("指数板块", ...) 引用） ---
+hikyuu/config/block/             # dybk/gnbk/hybk/zsbk/self 板块定义
+
+# --- 领域数据：TDX（通达信）相关测试，面向国内用户 ---
+hikyuu/test/test_tdx_import.py
+hikyuu/test/test_tdx_real_data_import.py
+hikyuu/test/test_real_tdx_import.py
+hikyuu/test/test_init.py
+
+# --- 领域数据：板块测试数据 + 中文配置键（指数板块 = zsbk.ini 等） ---
+test_data/
+
+# --- 参考文献：中文书名（BOOK1~BOOK7 引用条目，真实出版物名） ---
+docs/en/reference.rst
+docs/zh/reference.rst
+
+# --- 真实输出样例：证券名与类型为领域数据，翻译会与真实输出不符 ---
+hikyuu_cpp/hikyuu/KData.h:237    # operator<< 文档中的输出样例 Stock(SH, 000001, 上证指数, 指数, ...)

@@ -18,12 +18,12 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LIUTONGPAN") {
     KData k;
     Indicator liutong;
 
-    /** @arg 查询指数的流通盘, 没有流通盘数据 */
+    /** @arg Query the outstanding shares of an index, there is no such data */
     k = getKData("sh000001", KQueryByIndex(-100));
     REQUIRE(k.size() > 0);
     liutong = LIUTONGPAN(k);
@@ -31,7 +31,7 @@ TEST_CASE("test_LIUTONGPAN") {
     CHECK_EQ(liutong.size(), k.size());
     CHECK_EQ(liutong.discard(), k.size());
 
-    /** @arg 查询股票流通盘，日线 */
+    /** @arg Query the outstanding shares of a stock, the daily line */
     Stock stk = getStock("SH600004");
     KQuery query = KQueryByDate(Datetime(200301010000), Datetime(200708250000));
     k = stk.getKData(query);
@@ -50,7 +50,7 @@ TEST_CASE("test_LIUTONGPAN") {
         }
     }
 
-    /** @arg 查询股票流通盘，5分钟线 */
+    /** @arg Query the outstanding shares of a stock, the 5-minute line */
     query = KQueryByDate(Datetime(200301010000), Datetime(200708250000), KQuery::MIN5);
     k = stk.getKData(query);
     liutong = LIUTONGPAN(k);
@@ -76,7 +76,7 @@ TEST_CASE("test_LIUTONGPAN_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_LIUTONGPAN_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -94,7 +94,7 @@ TEST_CASE("test_LIUTONGPAN_benchmark") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LIUTONGPAN_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

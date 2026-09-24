@@ -33,7 +33,7 @@ TEST_CASE("test_getUserDir") {
 }
 
 TEST_CASE("test_dir_operation") {
-    // 创建并删除空目录
+    // Create and remove an empty directory
     std::string dirname("tmp");
     CHECK_UNARY_FALSE(existFile(dirname));
 
@@ -43,7 +43,7 @@ TEST_CASE("test_dir_operation") {
     CHECK_UNARY(removeDir(dirname));
     CHECK_UNARY_FALSE(existFile(dirname));
 
-    // 删除非空目录
+    // Remove a non-empty directory
     CHECK_UNARY(createDir(dirname));
     CHECK_UNARY(createDir(fmt::format("{}/{}", dirname, dirname)));
     CHECK_UNARY(createDir(fmt::format("{}/{}/{}", dirname, dirname, dirname)));
@@ -59,7 +59,7 @@ TEST_CASE("test_dir_operation") {
 }
 
 TEST_CASE("test_dir_operation_unicode") {
-    // 创建并删除空目录
+    // Create and remove an empty directory
     std::string dirname("中文");
     CHECK_UNARY_FALSE(existFile(dirname));
 
@@ -69,7 +69,7 @@ TEST_CASE("test_dir_operation_unicode") {
     CHECK_UNARY(removeDir(dirname));
     CHECK_UNARY_FALSE(existFile(dirname));
 
-    // 删除非空目录
+    // Remove a non-empty directory
     CHECK_UNARY(createDir(dirname));
     CHECK_UNARY(createDir(fmt::format("{}/{}", dirname, dirname)));
     CHECK_UNARY(createDir(fmt::format("{}/{}/{}", dirname, dirname, dirname)));
@@ -108,7 +108,7 @@ TEST_CASE("test_copyFile") {
     CHECK_UNARY(existFile("中文temp2.txt"));
     CHECK_UNARY(removeFile("中文temp2.txt"));
 
-    // 85M 左右的文件，在 v831 上拷贝耗时 6s，直接使用 cp 命令耗时 5s
+    // A file of about 85M takes 6s to copy on v831 while the cp command takes 5s
     // {
     //     SPEND_TIME(copyt_85M_file);
     //     copyFile("test_data/large_user.db", "test_data/large_user.db2");
@@ -119,28 +119,28 @@ TEST_CASE("test_renameFile") {
     std::string oldname("中文old.txt");
     std::string newname("中文new.txt");
 
-    // 指定的旧名文件不存在
+    // The given old name file does not exist
     CHECK_UNARY_FALSE(existFile(oldname));
     CHECK_UNARY_FALSE(renameFile(oldname, newname, false));
     CHECK_UNARY_FALSE(renameFile(oldname, newname, true));
     CHECK_UNARY_FALSE(existFile(newname));
     CHECK_UNARY_FALSE(existFile(newname));
 
-    // 指定的新名未被占用，非覆盖模式
+    // The given new name is free, the non-overwrite mode
     createTestFile(oldname);
     CHECK_UNARY_FALSE(existFile(newname));
     CHECK_UNARY(renameFile(oldname, newname, false));
     CHECK_UNARY_FALSE(existFile(oldname));
     CHECK_UNARY(existFile(newname));
 
-    // 指定的新名已被占用，非覆盖模式
+    // The given new name is occupied, the non-overwrite mode
     createTestFile(oldname);
     CHECK_UNARY(existFile(newname));
     CHECK_UNARY_FALSE(renameFile(oldname, newname, false));
     CHECK_UNARY(existFile(oldname));
     CHECK_UNARY(existFile(newname));
 
-    // 指定的新名未被占用，覆盖模式
+    // The given new name is free, the overwrite mode
     removeFile(newname);
     createTestFile(oldname);
     CHECK_UNARY_FALSE(existFile(newname));
@@ -148,7 +148,7 @@ TEST_CASE("test_renameFile") {
     CHECK_UNARY_FALSE(existFile(oldname));
     CHECK_UNARY(existFile(newname));
 
-    // 指定的新名已被占用，覆盖模式
+    // The given new name is occupied, the overwrite mode
     createTestFile(oldname);
     CHECK_UNARY(existFile(newname));
     CHECK_UNARY(renameFile(oldname, newname, true));

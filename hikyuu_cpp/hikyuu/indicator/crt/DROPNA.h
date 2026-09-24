@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 删除nan值
+ * Remove the nan values
  * @ingroup Indicator
  */
 Indicator HKU_API DROPNA();

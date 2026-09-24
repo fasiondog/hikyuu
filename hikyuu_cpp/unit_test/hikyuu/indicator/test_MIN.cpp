@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MIN") {
     /** @arg n > 0 */
     KData k = getStock("sh600004").getKData(KQuery(-8));
@@ -46,7 +46,7 @@ TEST_CASE("test_MIN") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_MIN_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

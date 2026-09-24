@@ -17,7 +17,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LogNormalSlippage") {
     auto sp = SP_LogNormal(0.0, 0.1);
     CHECK_EQ(sp->name(), "SP_LogNormal");

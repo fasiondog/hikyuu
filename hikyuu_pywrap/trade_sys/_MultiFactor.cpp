@@ -69,8 +69,8 @@ void export_MultiFactor(py::module& m) {
       .def(py::init<const Stock&, ScoreRecord::value_t>())
       .def("__str__", to_py_str<ScoreRecord>)
       .def("__repr__", to_py_str<ScoreRecord>)
-      .def_readwrite("stock", &ScoreRecord::stock, "证券")
-      .def_readwrite("value", &ScoreRecord::value, "分值");
+      .def_readwrite("stock", &ScoreRecord::stock, "The security")
+      .def_readwrite("value", &ScoreRecord::value, "The score");
 
     m.def("scorerecords_to_np", [](const ScoreRecordList& scs) {
         size_t total = scs.size();
@@ -82,7 +82,7 @@ void export_MultiFactor(py::module& m) {
             double value;
         };
 
-        // 使用 malloc 分配内存
+        // Allocate the memory with malloc
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
         std::string ucode, uname;
         for (size_t i = 0, len = scs.size(); i < len; i++) {
@@ -92,13 +92,13 @@ void export_MultiFactor(py::module& m) {
             data[i].value = sc.value;
         }
 
-        // 定义NumPy结构化数据类型
+        // Define the NumPy structured data type
         py::dtype dtype =
           py::dtype(vector_to_python_list<string>({htr("market_code"), htr("name"), htr("score")}),
                     vector_to_python_list<string>({"U10", "U20", "d"}),
                     vector_to_python_list<int64_t>({0, 40, 120}), sizeof(RawData));
 
-        // 使用 capsule 管理内存
+        // Manage the memory with the capsule
         return py::array(dtype, total, static_cast<RawData*>(data),
                          py::capsule(data, [](void* p) { std::free(p); }));
     });
@@ -109,16 +109,16 @@ void export_MultiFactor(py::module& m) {
             return py::module_::import("pandas").attr("DataFrame")();
         }
 
-        // 创建 Python 字符串对象数组
+        // Create the python string object array
         py::list code_list(total);
         py::list name_list(total);
         py::array_t<double> value_arr(total);
 
-        // 获取 value 数组缓冲区
+        // Get the buffer of the value array
         auto value_buf = value_arr.request();
         double* value_ptr = static_cast<double*>(value_buf.ptr);
 
-        // 填充数据
+        // Fill the data
         for (size_t i = 0; i < total; i++) {
             const ScoreRecord& sc = scs[i];
             code_list[i] = py::str(sc.stock.market_code());
@@ -126,7 +126,7 @@ void export_MultiFactor(py::module& m) {
             value_ptr[i] = sc.value;
         }
 
-        // 构建 DataFrame
+        // Build the DataFrame
         auto pandas = py::module_::import("pandas");
         py::dict columns;
         columns[htr("market_code").c_str()] =
@@ -140,13 +140,13 @@ void export_MultiFactor(py::module& m) {
 
     py::class_<MultiFactorBase, MultiFactorPtr, PyMultiFactor>(m, "MultiFactorBase",
                                                                py::dynamic_attr(),
-                                                               R"(市场环境判定策略基类
+                                                               R"(The multi-factor model base class
 
-自定义市场环境判定策略接口：
+The custom multi-factor model override hooks:
 
-    - _calculate : 【必须】子类计算接口
-    - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)")
+    - _calculate : [Required] The subclass calculation interface
+    - _clone : [Required] The clone interface
+    - _reset : [Optional] Reset the internal member variables)")
       .def(py::init<>())
       .def(py::init<const MultiFactorBase&>())
 
@@ -155,55 +155,56 @@ void export_MultiFactor(py::module& m) {
 
       .def_property("name", py::overload_cast<>(&MultiFactorBase::name, py::const_),
                     py::overload_cast<const string&>(&MultiFactorBase::name),
-                    py::return_value_policy::copy, "名称")
+                    py::return_value_policy::copy, "Name")
       .def_property("query", &MultiFactorBase::getQuery, &MultiFactorBase::setQuery,
-                    py::return_value_policy::copy, R"(查询条件)")
+                    py::return_value_policy::copy, R"(The query condition)")
 
       .def("get_param", &MultiFactorBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (MultiFactorBase::*)(const std::string&, const boost::any&)>(
              &MultiFactorBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &MultiFactorBase::haveParam, "是否存在指定参数")
+      .def("have_param", &MultiFactorBase::haveParam, "Whether the specified parameter exists")
 
       .def("get_ref_stock", &MultiFactorBase::getRefStock, py::return_value_policy::copy,
-           "获取参考证券")
+           "Get the reference security")
       .def("set_ref_stock", &MultiFactorBase::setRefStock, R"(set_ref_stock(self, stk)
       
-    设置参考证券
+    Set the reference security
     
-    :param Stock stk: 参考证券)")
+    :param Stock stk: the reference security)")
 
       .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy,
-           "获取参考日期列表（由参考证券通过查询条件获得）")
+           "Get the reference date list (obtained from the reference security through the query "
+           "condition)")
 
       .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy,
-           "获取创建时指定的证券列表")
+           "Get the security list specified at the creation")
       .def("set_stock_list", &MultiFactorBase::setStockList, R"(set_stock_list(self, stks)
       
-    设置计算范围指定的证券列表
+    Set the security list specified for the calculation range
     
-    :param list stks: 新的待计算证券列表)")
+    :param list stks: the new security list to calculate)")
 
       .def("get_stock_list_num", &MultiFactorBase::getStockListNumber,
-           "获取创建时指定的证券列表中证券数量")
+           "Get the number of the securities in the security list specified at the creation")
 
       .def("get_ref_factorset", &MultiFactorBase::getRefFactorSet, py::return_value_policy::copy,
-           "获取创建时输入的原始因子集合")
+           "Get the original factor set input at the creation")
 
       .def(
         "set_ref_factorset",
@@ -229,32 +230,32 @@ void export_MultiFactor(py::module& m) {
         [](MultiFactorBase& self, FactorSet factorset) { self.setRefFactorSet(factorset); },
         R"(set_ref_factorset(self, factorset)
       
-    设置原始因子集合
+    Set the original factor set
     
-    :param FactorSet factorset: 新的原始因子集合)")
+    :param FactorSet factorset: the new original factor set)")
 
       .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy,
            py::arg("stock"), R"(get_factor(self, stock)
 
-    获取指定证券合成后的新因子
+    Get the new composed factor of the specified security
 
-    :param Stock stock: 指定证券)")
+    :param Stock stock: the specified security)")
 
       .def("get_all_factors", &MultiFactorBase::getAllFactors, py::return_value_policy::copy,
            R"(get_all_factors(self)
 
-    获取所有证券合成后的因子列表
+    Get the list of the composed factors of all the securities
 
-    :return: [factor1, factor2, ...] 顺序与参考证券顺序相同)")
+    :return: [factor1, factor2, ...] in the same order as the reference securities)")
 
       .def(
         "set_normalize", [](PyMultiFactor& self, py::object norm) { self.set_norm(norm); },
         py::arg("norm"),
         R"(set_normalize(self, norm)
 
-    设置标准化或归一化方法（影响全部因子）
+    Set the standardization or normalization method (affecting all the factors)
     
-    :param NormalizeBase norm: 标准化或归一化方法实例)")
+    :param NormalizeBase norm: the standardization or normalization method instance)")
 
       .def(
         "add_special_normalize",
@@ -266,32 +267,32 @@ void export_MultiFactor(py::module& m) {
         py::arg("style_inds") = IndicatorList(),
         R"(add_special_normalize(self, name[, norm=None, category="", style_inds=[]])
         
-    对指定名称的指标应用特定的标准化/归一化、行业中性化、风格因子中性化操作。标准化操作、行业中性化、风格因子中性化彼此无关，可同时指定也可分开指定。
+    Apply a specific standardization/normalization, industry neutralization or style factor neutralization operation to the indicator with the specified name. The standardization operation, the industry neutralization and the style factor neutralization are independent of each other; they can be specified together or separately.
 
-    :param str name: 特殊归一化方法名称
-    :param Normalize norm: 特殊归一化方法
-    :param str category: 行业中性化时，指定板块类别
-    :param list[Indicator] style_inds: 用于中性化的风格指标列表)")
+    :param str name: the special normalization method name
+    :param Normalize norm: the special normalization method
+    :param str category: for the industry neutralization, specify the block category
+    :param list[Indicator] style_inds: the list of the style indicators used for the neutralization)")
 
       .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
 
-    获取合成因子的IC, 长度与参考日期同
+    Get the IC of the composed factor, with the same length as the reference dates
 
-    ndays 对于使用 IC/ICIR 加权的新因子，最好保持好 ic_n 一致，
-    但对于等权计算的新因子，不一定非要使用 ic_n 计算。
-    所以，ndays 增加了一个特殊值 0, 表示直接使用 ic_n 参数计算 IC
+    For the new factors weighted with IC/ICIR, it is best to keep ndays consistent with ic_n,
+    but for the new factors calculated with the equal weights, it is not necessarily required to calculate with ic_n.
+    Therefore, ndays has a special value 0, which means calculating the IC directly with the ic_n parameter
      
     :rtype: Indicator)")
 
       .def("get_icir", &MultiFactorBase::getICIR, py::arg("ir_n"), py::arg("ic_n") = 0,
            R"(get_icir(self, ir_n[, ic_n=0])
 
-    获取合成因子的 ICIR
+    Get the ICIR of the composed factor
 
-    :param int ir_n: 计算 IR 的 n 窗口
-    :param int ic_n: 计算 IC 的 n 窗口 (同 get_ic 中的 ndays))")
+    :param int ir_n: the n window for calculating the IR
+    :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic))")
 
-      .def("clone", &MultiFactorBase::clone, "克隆操作")
+      .def("clone", &MultiFactorBase::clone, "The clone operation")
 
       .def(
         "get_scores",
@@ -321,24 +322,24 @@ void export_MultiFactor(py::module& m) {
         py::arg("filter") = py::none(),
         R"(get_score(self, date[, start=0, end=Null])
 
-    获取指定日期截面的所有因子值，已经降序排列，相当于各证券日期截面评分。
+    Get all the factor values of the cross-section on the specified date, already sorted descending, equivalent to the cross-section scores of the securities on that date.
 
-    :param Datetime date: 指定日期
-    :param int start: 取当日排名开始
-    :param int end: 取当日排名结束(不包含本身)
-    :param function filter: (ScoreRecord)->bool 或 (Datetime, ScoreRecord)->bool 为原型的可调用对象
+    :param Datetime date: the specified date
+    :param int start: the start of the daily ranking to take
+    :param int end: the end of the daily ranking to take (exclusive)
+    :param function filter: a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
     :rtype: ScoreRecordList)")
 
       .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,
            R"(get_all_scores(self)
 
-    获取所有日期的所有评分，长度与参考日期相同
+    Get all the scores of all the dates, with the same length as the reference dates
 
     :return: ScoreRecordList)")
 
       .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors, R"(get_all_src_factors(self)
 
-    获取所有原始因子列表(如果指定了标准化、行业中性化, 返回为已处理的因子列表)
+    Get the list of all the original factors (if the standardization or the industry neutralization is specified, the returned list is the processed factor list)
 
     :rtype: list
     :return: list IndicatorList stks x inds)")
@@ -353,14 +354,14 @@ void export_MultiFactor(py::module& m) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
 
-          // 判断输入类型
+          // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
-              // 输入是FactorSet
+              // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return MF_EqualWeight(factset, c_stks, query, ref_stock, ic_n, spearman, mode,
                                     save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
-              // 输入是序列（假设为Indicator列表）
+              // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
               return MF_EqualWeight(c_inds, c_stks, query, ref_stock, ic_n, spearman, mode,
                                     save_all_factors);
@@ -374,25 +375,25 @@ void export_MultiFactor(py::module& m) {
       py::arg("save_all_factors") = false,
       R"(MF_EqualWeight(input, stks, query, ref_stk[, ic_n=5])
 
-    等权重合成因子，支持多种输入类型
+    Compose the factor with the equal weights, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequence(stock) stks: the list of the securities to calculate
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         mf1 = MF_EqualWeight(indicators, stocks, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_EqualWeight(factor_set, stocks, query))");
 
@@ -406,14 +407,14 @@ void export_MultiFactor(py::module& m) {
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
           PriceList c_weights = python_list_to_vector<price_t>(weights_obj);
 
-          // 判断输入类型
+          // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
-              // 输入是FactorSet
+              // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return MF_Weight(factset, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode,
                                save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
-              // 输入是序列（假设为Indicator列表）
+              // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
               return MF_Weight(c_inds, c_weights, c_stks, query, ref_stock, ic_n, spearman, mode,
                                save_all_factors);
@@ -427,27 +428,27 @@ void export_MultiFactor(py::module& m) {
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
       R"(MF_Weight(input, stks, weights, query, ref_stk[, ic_n=5, spearman=True, mode=0, save_all_factors=False])
 
-    按指定权重合成因子 = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn，支持多种输入类型
+    Compose the factor by the specified weights = ind1 * weight1 + ind2 * weight2 + ... + indn * weightn, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param sequense(float) weights: 权重列表(需和因子数量等长)
-    :param Query query: 日期范围
-    :param Stock ref_stk: 参考证券用于日期对齐 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequence(stock) stks: the list of the securities to calculate
+    :param sequence(float) weights: the weight list (must be the same length as the number of the factors)
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         weights = [0.6, 0.4]
         mf1 = MF_Weight(indicators, stocks, weights, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_Weight(factor_set, stocks, weights, query))");
 
@@ -460,14 +461,14 @@ void export_MultiFactor(py::module& m) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
 
-          // 判断输入类型
+          // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
-              // 输入是FactorSet
+              // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return MF_ICWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
                                  mode, save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
-              // 输入是序列（假设为Indicator列表）
+              // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
               return MF_ICWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
                                  mode, save_all_factors);
@@ -481,26 +482,26 @@ void export_MultiFactor(py::module& m) {
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
       R"(MF_ICWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    滚动IC权重合成因子，支持多种输入类型
+    Compose the factor with the rolling IC weights, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param Query query: 日期范围
-    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param int ic_rolling_n: IC 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequence(stock) stks: the list of the securities to calculate
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param int ic_rolling_n: the IC rolling period
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         mf1 = MF_ICWeight(indicators, stocks, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_ICWeight(factor_set, stocks, query))");
 
@@ -513,14 +514,14 @@ void export_MultiFactor(py::module& m) {
           StockList c_stks = get_stock_list_from_python(stks);
           Stock ref_stock = ref_stk.is_none() ? Stock() : ref_stk.cast<Stock>();
 
-          // 判断输入类型
+          // Judge the input type
           if (py::isinstance<FactorSet>(input)) {
-              // 输入是FactorSet
+              // The input is a FactorSet
               FactorSet factset = input.cast<FactorSet>();
               return MF_ICIRWeight(factset, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
                                    mode, save_all_factors);
           } else if (py::isinstance<py::sequence>(input)) {
-              // 输入是序列（假设为Indicator列表）
+              // The input is a sequence (assumed to be an Indicator list)
               IndicatorList c_inds = python_list_to_vector<Indicator>(input);
               return MF_ICIRWeight(c_inds, c_stks, query, ref_stock, ic_n, ic_rolling_n, spearman,
                                    mode, save_all_factors);
@@ -534,26 +535,26 @@ void export_MultiFactor(py::module& m) {
       py::arg("mode") = 0, py::arg("save_all_factors") = false,
       R"(MF_ICIRWeight(input, stks, query, ref_stk[, ic_n=5, ic_rolling_n=120])
 
-    滚动ICIR权重合成因子，支持多种输入类型
+    Compose the factor with the rolling ICIR weights, supporting several input types
 
-    :param input: 因子输入，可以是FactorSet对象或Indicator序列
-    :param sequense(stock) stks: 计算证券列表
-    :param Query query: 日期范围
-    :param Stock ref_stk: 用于日期对齐的参考证券 (未指定时，默认为 sh000001)
-    :param int ic_n: 默认 IC 对应的 N 日收益率
-    :param int ic_rolling_n: IC 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param int mode: 获取截面数据时排序模式: 0-降序, 1-升序, 2-不排序
-    :param bool save_all_factors: 是否保存所有因子值,影响 get_actor/get_all_factors 方法
+    :param input: the factor input, which can be a FactorSet object or an Indicator sequence
+    :param sequence(stock) stks: the list of the securities to calculate
+    :param Query query: the date range
+    :param Stock ref_stk: the reference security used for the date alignment (when unspecified, defaults to sh000001)
+    :param int ic_n: the N-day return corresponding to the default IC
+    :param int ic_rolling_n: the IC rolling period
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
+    :param int mode: the sorting mode when getting the cross-section data: 0-descending, 1-ascending, 2-no sorting
+    :param bool save_all_factors: whether to save all the factor values, affecting the get_actor/get_all_factors methods
     :rtype: MultiFactorBase
 
     .. code-block:: python
     
-        # 使用Indicator列表
+        # Use an Indicator list
         indicators = [MA(CLOSE(), 5), MA(CLOSE(), 10)]
         mf1 = MF_ICIRWeight(indicators, stocks, query)
         
-        # 使用FactorSet
+        # Use a FactorSet
         factor_set = FactorSet(indicators)
         mf2 = MF_ICIRWeight(factor_set, stocks, query))");
 }

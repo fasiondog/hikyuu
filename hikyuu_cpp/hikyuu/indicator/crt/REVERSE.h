@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 求相反数，REVERSE(X)返回-X
+ * Calculate the opposite number, REVERSE(X) returns -X
  * @ingroup Indicator
  */
 Indicator HKU_API REVERSE();

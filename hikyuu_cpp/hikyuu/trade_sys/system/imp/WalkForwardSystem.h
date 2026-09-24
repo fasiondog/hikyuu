@@ -44,15 +44,15 @@ private:
     void syncDataToSystem(const SYSPtr&);
 
 private:
-    SEPtr m_se;        // 寻优SE
-    TMPtr m_train_tm;  // 用于优化评估计算的账户
+    SEPtr m_se;        // The optimizing SE
+    TMPtr m_train_tm;  // The account used for the optimization evaluation calculation
     SYSPtr m_cur_sys;
     size_t m_cur_kdata{0};
     vector<KData> m_train_kdata_list;
     vector<RunRanges> m_run_ranges;
 
 //========================================
-// 序列化支持
+// Serialization support
 //========================================
 #if HKU_SUPPORT_SERIALIZATION
 private:

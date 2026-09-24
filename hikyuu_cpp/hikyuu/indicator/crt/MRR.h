@@ -12,14 +12,14 @@
 namespace hku {
 
 /**
- * 最大盈利百分比(和MDD向对应的相反方向计算)
+ * Maximum profit percentage (calculated in the opposite direction corresponding to MDD)
  * @ingroup Indicator
  */
 Indicator HKU_API MRR(int n = 0);
 
 /**
- * 最大盈利百分比
- * @param ind 待计算的数据
+ * Maximum profit percentage
+ * @param ind the data to be calculated
  * @ingroup Indicator
  */
 inline Indicator MRR(const Indicator& ind, int n = 0) {

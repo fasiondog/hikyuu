@@ -20,16 +20,16 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MACDFIX") {
     KData kdata = getKData("sh000001", KQuery(-35));
     Indicator c = CLOSE(kdata);
 
-    // /** @arg 非法参数 */
+    // /** @arg Invalid parameters */
     CHECK_THROWS(TA_MACDFIX(c, 0));
     CHECK_THROWS(TA_MACDFIX(c, 100001));
 
-    // /** @arg 正常情况 */
+    // /** @arg The normal case */
     Indicator result = TA_MACDFIX(CLOSE(kdata), 3);
     CHECK_EQ(result.name(), "TA_MACDFIX");
     CHECK_EQ(result.discard(), 27);
@@ -48,7 +48,7 @@ TEST_CASE("test_TA_MACDFIX") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MACDFIX_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

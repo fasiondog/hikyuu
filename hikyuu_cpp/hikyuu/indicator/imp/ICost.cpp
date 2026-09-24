@@ -27,8 +27,8 @@ void ICost::_checkParam(const string& name) const {
     }
 }
 
-// 假设成本分布：DMA(x, HSL=A) = A*X+(1-A)*Y'
-// 实际算法：DMA(CLOSE() + (HIGH() - LOW()) * x / 100.0, HSL());
+// Assume the cost distribution: DMA(x, HSL=A) = A*X+(1-A)*Y'
+// The actual algorithm: DMA(CLOSE() + (HIGH() - LOW()) * x / 100.0, HSL());
 void ICost::_calculate(const Indicator& data) {
     HKU_WARN_IF(!isLeaf() && !data.empty(),
                 "The input is ignored because {} depends on the context!", m_name);
@@ -39,7 +39,7 @@ void ICost::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
 
-    // 先将 discard 设为全部，后续更新
+    // Set the discard to everything first, it is updated later
     m_discard = total;
 
     Stock stock = k.getStock();
@@ -49,7 +49,7 @@ void ICost::_calculate(const Indicator& data) {
     StockWeightList sw_list = stock.getWeight(Datetime::min(), lastdate + Days(1));
     HKU_IF_RETURN(sw_list.empty(), void());
 
-    // 寻找第一个流通盘不为0的权息
+    // Find the first ex-rights/ex-dividend record whose outstanding shares are not 0
     price_t pre_free_count = 0.0;
     Datetime pre_sw_date;
     auto sw_iter = sw_list.begin();
@@ -61,7 +61,8 @@ void ICost::_calculate(const Indicator& data) {
         }
     }
 
-    // 没有流通盘相关权息数据, 或者该权息日期大于最后一根K线日期, 直接返回
+    // Return directly when there is no ex-rights/ex-dividend data with outstanding shares, or when
+    // the date of that record is later than the last K-line date
     HKU_IF_RETURN(sw_iter == sw_list.end() || pre_sw_date > lastdate, void());
 
     auto* dst = this->data();
@@ -73,14 +74,15 @@ void ICost::_calculate(const Indicator& data) {
         price_t free_count = sw_iter->freeCount();
         Datetime cur_sw_date = sw_iter->datetime();
         if (free_count <= 0.0) {
-            continue;  // 忽略流通盘为0的权息
+            continue;  // Ignore the ex-rights/ex-dividend record whose outstanding shares are 0
         }
 
         while (pos < total && kdata[pos].datetime < cur_sw_date) {
             const KRecord& krecord = kdata[pos];
             if (krecord.datetime >= pre_sw_date) {
                 x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-                // transCount 为手数，流通股为万股
+                // transCount is in lots and the outstanding shares are in units of 10 thousand
+                // shares
                 a = krecord.transCount / pre_free_count * 0.01;
                 dst[pos] = pos > 0 ? a * x + (1 - a) * dst[pos - 1] : x;
             }
@@ -108,7 +110,7 @@ void ICost::_calculate(const Indicator& data) {
         dst[pos] = a * x + (1 - a) * dst[pos - 1];
     }
 
-    // 更新 discard
+    // Update the discard
     for (size_t i = 0; i < total; i++) {
         if (!std::isnan(dst[i])) {
             m_discard = i;

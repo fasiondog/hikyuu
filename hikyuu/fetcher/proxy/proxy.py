@@ -15,8 +15,8 @@ from .zhima import get_proxy
 
 
 def request_with_proxy(url):
-    """通过代理进行请求，访问失败将抛出异常"""
-    # 获取到的 ip 可能无法访问相应的 url，重试10次，以便找到能用的 proxy
+    """Make a request through the proxy; an exception is raised when the access fails"""
+    # The obtained ip may not be able to access the url; retry 10 times to find a usable proxy
     new = False
     proxies = {'http': '127.0.0.1'}
     for i in range(10):  # pylint: disable=unused-variable
@@ -31,9 +31,9 @@ def request_with_proxy(url):
             if i == 6:
                 new = True
             time.sleep(2)
-    raise Exception("无法通过代理访问！")
+    raise Exception("Unable to access through the proxy!")
 
 
 def request_with_local(url):
-    """通过本机ip直接获取请求，访问失败将抛出异常"""
+    """Make the request directly with the local ip; an exception is raised when the access fails"""
     return requests.get(url).text

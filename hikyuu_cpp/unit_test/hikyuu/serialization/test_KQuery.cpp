@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KQuery_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/KQuery.xml";
@@ -48,12 +48,12 @@ TEST_CASE("test_KQuery_serialize") {
     CHECK_EQ(q1.end(), q1.end());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KQueryByDate_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/KQueryByDate.xml";
 
-    /** KQueryByDate保存，KQuery读取 */
+    /** Saved as KQueryByDate and read as KQuery */
     KQuery q1 = KQueryByDate(Datetime(200101010000), Datetime(200102100000));
     {
         std::ofstream ofs(filename);
@@ -74,7 +74,7 @@ TEST_CASE("test_KQueryByDate_serialize") {
     CHECK_EQ(q1.startDatetime(), q1.startDatetime());
     CHECK_EQ(q1.endDatetime(), q1.endDatetime());
 
-    /* KQueryByDate读取 */
+    /* Read as KQueryByDate */
     KQuery q3 = KQueryByDate(Datetime(200101010000), Datetime(200102100000));
     {
         std::ofstream ofs(filename);

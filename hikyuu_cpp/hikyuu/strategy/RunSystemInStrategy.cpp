@@ -26,7 +26,7 @@ RunSystemInStrategy::RunSystemInStrategy(const SYSPtr& sys, const OrderBrokerPtr
 
     auto tm = crtBrokerTM(broker, costfunc, sys->name());
     m_sys->setTM(tm);
-    m_sys->setSP(SlippagePtr());  // 清除移滑价差算法
+    m_sys->setSP(SlippagePtr());  // Clear the slippage algorithm
     m_sys->readyForRun();
 }
 

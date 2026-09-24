@@ -21,7 +21,8 @@ FundsList TradeManagerBase::getFundsList(const DatetimeList& dates, const KQuery
     FundsList result;
     HKU_IF_RETURN(total == 0, result);
 
-    // 先计算最后日期，防止后续并行计算时更新权息涉及线程安全
+    // Calculate the last date first, to prevent the thread safety issue of updating the
+    // ex-rights/ex-dividend data in the subsequent parallel calculation
     auto last_funds = getFunds(dates.back(), ktype);
 
     result = global_parallel_for_index(

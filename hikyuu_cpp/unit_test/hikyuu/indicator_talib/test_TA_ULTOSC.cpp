@@ -20,11 +20,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_ULTOSC") {
     KData kdata = getKData("sz000001", KQuery(-10));
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_ULTOSC(kdata, 0, 14, 28));
     CHECK_THROWS(TA_ULTOSC(kdata, 100001, 14, 28));
     CHECK_THROWS(TA_ULTOSC(kdata, 7, 0, 28));
@@ -32,20 +32,20 @@ TEST_CASE("test_TA_ULTOSC") {
     CHECK_THROWS(TA_ULTOSC(kdata, 7, 14, 0));
     CHECK_THROWS(TA_ULTOSC(kdata, 7, 14, 100001));
 
-    /** @arg KData 为空 */
+    /** @arg KData is empty */
     Indicator result = TA_ULTOSC(KData());
     CHECK_EQ(result.name(), "TA_ULTOSC");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
     CHECK_EQ(result.getResultNumber(), 1);
 
-    /** @arg KData 长度小于默认参数抛弃数量 */
+    /** @arg The KData length is less than the discard count of the default parameters */
     result = TA_ULTOSC(getKData("sh000001", KQuery(-1)));
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.getResultNumber(), 1);
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     kdata = getKData("sz000001", KQuery(-30));
     result = TA_ULTOSC(kdata);
     CHECK_EQ(result.name(), "TA_ULTOSC");
@@ -62,7 +62,7 @@ TEST_CASE("test_TA_ULTOSC") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_ULTOSC_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

@@ -26,7 +26,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 全部为delay模式系统实例，不调整持仓*/
+/** @par Test point: all the instances are in the delay mode and the positions are not adjusted */
 TEST_CASE("test_PF_for_delay_and_no_adjust") {
     StockManager& sm = StockManager::instance();
 

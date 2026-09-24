@@ -1,7 +1,7 @@
 /*
  * SimplePortfolio.cpp
  *
- *  Created on: 2016年2月21日
+ *  Created on: 2016-2-21
  *      Author: fasiondog
  */
 
@@ -34,26 +34,27 @@ void SimplePortfolio::_reset() {
 void SimplePortfolio::_readyForRun() {
     HKU_CHECK(m_af, "m_af is null!");
 
-    // se算法和af算法不匹配
+    // The se algorithm and the af algorithm do not match
     HKU_CHECK(m_se->isMatchAF(m_af), "The current SE and AF do not match!");
 
-    // 检查账户是否存在初始资产
+    // Check whether the account has the initial assets
     FundsRecord funds = m_tm->getFunds();
     HKU_CHECK(funds.total_assets() > 0.0, "The current tm is zero assets!");
 
-    // 从 se 获取原型系统列表
+    // Get the prototype system list from se
     const auto& pro_sys_list = m_se->getProtoSystemList();
     HKU_WARN_IF_RETURN(pro_sys_list.empty(), void(), "Can't fetch proto_sys_lsit from Selector!");
 
-    // 生成资金账户
+    // Create the cash account
     m_cash_tm = m_tm->clone();
 
-    // 配置资产分配器
+    // Configure the asset allocator
     m_af->setTM(m_tm);
     m_af->setCashTM(m_cash_tm);
     m_af->setQuery(m_query);
 
-    // 获取所有备选子系统，为无关联账户的子系统分配子账号，对所有子系统做好启动准备
+    // Get all the candidate subsystems, assign sub accounts to those without an associated account
+    // and prepare every subsystem for the startup
     TMPtr pro_tm = crtTM(m_tm->initDatetime(), 0.0, m_tm->costFunc(), "TM_SUB");
     size_t total = pro_sys_list.size();
     m_real_sys_list.reserve(total);
@@ -64,7 +65,8 @@ void SimplePortfolio::_readyForRun() {
             m_se->bindRealToProto(sys, pro_sys);
             m_real_sys_list.emplace_back(sys);
 
-            // 为内部实际执行的系统创建初始资金为0的子账户
+            // Create sub accounts with an initial capital of 0 for the systems actually executed
+            // internally
             sys->setTM(pro_tm->clone());
             string sys_name = fmt::format("{}_{}_{}", sys->name(), sys->getStock().market_code(),
                                           sys->getStock().name());
@@ -77,14 +79,14 @@ void SimplePortfolio::_readyForRun() {
         }
     }
 
-    // 告知 se 当前实际运行的系统列表
+    // Tell se the list of the systems actually running
     m_se->calculate(m_real_sys_list, m_query);
 }
 
 void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nextCycle,
                                        bool adjust) {
     //---------------------------------------------------
-    // 检测运行系统中是否存在已退市的证券
+    // Check whether there is a delisted security among the running systems
     //---------------------------------------------------
     for (auto iter = m_running_sys_set.begin(); iter != m_running_sys_set.end(); /*++iter*/) {
         auto& sys = *iter;
@@ -102,11 +104,12 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
     }
 
     //---------------------------------------------------
-    // 开盘前处理各个子账户、资金账户、总账户之间可能的误差
+    // Handle the possible deviation among the sub accounts, the cash account and the total account
+    // before the open
     //---------------------------------------------------
     int precision = m_tm->getParam<int>("precision");
 
-    // 更新所有运行中系统的权息
+    // Update the ex-rights/ex-dividend data of all the running systems
     price_t sum_cash = 0.0;
     for (auto& running_sys : m_running_sys_set) {
         TMPtr sub_tm = running_sys->getTM();
@@ -114,7 +117,7 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
         sum_cash += sub_tm->currentCash();
     }
 
-    // 开盘前，进行轧差处理（平衡 sub_sys, cash_tm, tm 之间的误差）
+    // Do the netting before the open (balancing the deviation among sub_sys, cash_tm and tm)
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[PF] {}: {}, {}: {}, {}: {}", htr("The sum cash of sub_tm"), sum_cash,
                 htr("cash tm"), m_cash_tm->currentCash(), htr("tm cash"), m_tm->currentCash());
@@ -135,17 +138,18 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
     }
 
     //----------------------------------------------------------------------
-    // 跟踪打印执行调仓前的资产情况
+    // Print the assets before the position adjustment for the trace
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
-        HKU_INFO("[PF] [{}] - {}: {},  {}: {}, {}: {}", htr("beforce adjust"), htr("total funds"),
+        HKU_INFO("[PF] [{}] - {}: {},  {}: {}, {}: {}", htr("before rebalance"), htr("total funds"),
                  funds.cash + funds.market_value, htr("cash"), funds.cash, htr("market_value"),
                  funds.market_value);
     }
 
     //----------------------------------------------------------------------
-    // 开盘时，优先处理上一交易日遗留的调仓卖出失败的系统
+    // At the open, handle first the systems whose position adjustment sell failed on the previous
+    // trading day
     //----------------------------------------------------------------------
     HKU_INFO_IF(trace, "[PF] {}: {}", htr("process delay adjust sys, size"),
                 m_delay_adjust_sys_list.size());
@@ -156,7 +160,8 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
             HKU_INFO_IF(trace, htr("[PF] Delay adjust sell: {}", tr));
             m_tm->addTradeRecord(tr);
 
-            // 卖出后，尝试将资金取出转移至影子总账户
+            // After the sell, try to withdraw the funds and transfer them to the shadow total
+            // account
             TMPtr sub_tm = sys.sys->getTM();
             auto sub_cash = sub_tm->currentCash();
             if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
@@ -164,7 +169,8 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
             }
 
         } else {
-            // 强制卖出失败的情况下，如果当前仍有持仓，则需要下一交易日继续进行处理
+            // When a forced sell fails and there is still a position, the processing continues on
+            // the next trading day
             PositionRecord position = sys.sys->getTM()->getPosition(date, sys.sys->getStock());
             if (position.number > 0.0) {
                 HKU_INFO_IF(trace, htr("[{}] failed to force sell, delay to next day", name()));
@@ -176,7 +182,8 @@ void SimplePortfolio::_runMomentOnOpen(const Datetime& date, const Datetime& nex
     m_delay_adjust_sys_list.swap(tmp_continue_adjust_sys_list);
 
     //---------------------------------------------------
-    // 检测当前运行中的系统是否存在延迟买卖信号（即开盘时买卖的系统）
+    // Check whether any running system has a delayed buy / sell signal (i.e. a system that trades
+    // at the open)
     //---------------------------------------------------
     for (auto& sys : m_running_sys_set) {
         auto tr = sys->pfProcessDelaySellRequest(date);
@@ -198,18 +205,19 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
                                         bool adjust) {
     bool trace = getParam<bool>("trace");
     //---------------------------------------------------
-    // 调仓日，进行资金分配调整
+    // On the adjustment day, adjust the funds allocation
     //---------------------------------------------------
     if (adjust) {
-        // 先从已运行系统列表中立即移除已没有持仓且没有延迟买卖信号的系统, 并回笼资金
+        // Remove the systems without a position and without a delayed buy / sell signal from the
+        // running system list immediately and recall the funds
         m_tmp_will_remove_sys.clear();
         for (auto& sys : m_running_sys_set) {
             auto sub_tm = sys->getTM();
-            // 没有持仓
+            // There is no position
             if (0 == sub_tm->getHoldNumber(date, sys->getStock()) &&
                 ((sys->getParam<bool>("buy_delay") && !sys->haveDelayBuyRequest()) &&
                  (sys->getParam<bool>("sell_delay") && !sys->haveDelayBuyRequest()))) {
-                // 没有延迟买卖信号
+                // There is no delayed buy / sell signal
                 HKU_INFO_IF(trace, htr("[PF] remove no signal delay sys: {}", sys->name()));
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
 
@@ -228,13 +236,15 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             m_running_sys_set.erase(sw.sys);
         }
 
-        // 从选股策略获取选中的系统列表
+        // Get the selected system list from the selection strategy
         m_tmp_selected_list = m_se->getSelected(date);
 
-        // 如果 AF 为 对已持仓系统进行权重调整，则对未选中的运行系统的延迟请求进行处理
-        // 否则，认为已运行系统自行控制卖出，不受当前是否选中的影响
+        // When AF adjusts the weights of the held systems, process the delayed requests of the
+        // unselected running systems otherwise the running systems are considered to control the
+        // selling themselves, unaffected by the current selection
         if (m_af->getParam<bool>("adjust_running_sys")) {
-            // 如果选中的系统不在已有列表中, 则先清除其延迟买入操作，防止在调仓日出现未来信号
+            // When a selected system is not in the existing list, clear its delayed buy operation
+            // first, preventing a future signal on the adjustment day
             for (auto& sw : m_tmp_selected_list) {
                 if (sw.sys) {
                     if (m_running_sys_set.find(sw.sys) == m_running_sys_set.end()) {
@@ -253,7 +263,9 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             }
         }
 
-        // 资产分配算法调整各子系统资产分配，AF统一在收盘时进行调仓，返回的是收盘调仓失败时的系统（需要延迟到一下开盘时继续执行）
+        // The asset allocation algorithm adjusts the asset allocation of every subsystem; AF
+        // adjusts the positions uniformly at the close and returns the systems whose close
+        // adjustment failed (they need to be processed at the next open)
         auto tmp_continue_adjust_sys_list =
           m_af->adjustFunds(date, m_tmp_selected_list, m_running_sys_set);
 
@@ -265,7 +277,8 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             }
         }
 
-        // 如果选中的系统不在已有列表中，且账户已经被分配了资金，则将其加入运行系统列表
+        // When a selected system is not in the existing list and funds have been allocated to its
+        // account, add it to the running system list
         for (auto& sys : m_tmp_selected_list) {
             if (sys.sys) {
                 if (m_running_sys_set.find(sys.sys) == m_running_sys_set.end()) {
@@ -277,13 +290,14 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             }
         }
 
-        // 从已运行系统列表中立即移除已没有持仓且没有资金的系统及没有持仓且没有延迟买卖信号的系统
+        // Remove immediately from the running system list the systems without a position and
+        // without funds, and the systems without a position and without a delayed buy / sell signal
         m_tmp_will_remove_sys.clear();
         for (auto& sys : m_running_sys_set) {
             auto sub_tm = sys->getTM();
-            // 没有持仓
+            // There is no position
             if (sub_tm->currentCash() < 1.0 && 0 == sub_tm->getHoldNumber(date, sys->getStock())) {
-                // 没有现金
+                // There is no cash
                 HKU_INFO_IF(trace, htr("[PF] remove sys: {}", sys->name()));
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
             }
@@ -294,7 +308,7 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             m_running_sys_set.erase(sw.sys);
         }
 
-        // 计算调仓换手率
+        // Calculate the position adjustment turnover
         if (running_sys_count > 0) {
             m_adjust_turnover.emplace_back(
               date, static_cast<double>(in_sys_count + out_sys_count) / running_sys_count);
@@ -302,7 +316,7 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
     }
 
     //----------------------------------------------------------------------
-    // 跟踪打印执行调仓后的资产情况
+    // Print the assets after the position adjustment for the trace
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());
@@ -312,7 +326,8 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
     }
 
     //----------------------------------------------------------------------------
-    // 执行所有运行中的系统，无论是延迟还是非延迟，当天运行中的系统都需要被执行一次
+    // Run all the running systems; whether delayed or not, every running system must be run once a
+    // day
     //----------------------------------------------------------------------------
     std::unordered_set<System*> delay_adjust_sys_set;
     for (auto& sw : m_delay_adjust_sys_list) {
@@ -347,7 +362,7 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
     }
 
     //----------------------------------------------------------------------
-    // 跟踪各个子系统执行后的资产情况
+    // Print the assets of every subsystem after the execution for the trace
     //----------------------------------------------------------------------
     if (trace) {
         auto funds = m_tm->getFunds(date, m_query.kType());

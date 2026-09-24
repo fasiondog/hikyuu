@@ -17,15 +17,15 @@ void export_build_in(py::module& m) {
       py::arg("cost_func") = TC_Zero(), py::arg("name") = "SYS",
       R"(crtTM([date = Datetime(199001010000), init_cash = 100000, cost_func = TC_Zero(), name = "SYS"])
 
-    创建交易管理模块，管理帐户的交易记录及资金使用情况
+    Create the trade manager module, managing the trade records and the fund usage of the account
     
-    :param Datetime date:  账户建立日期
-    :param float init_cash:    初始资金
-    :param TradeCost cost_func: 交易成本算法
-    :param string name:        账户名称
+    :param Datetime date:  the account establishment date
+    :param float init_cash:    the initial capital
+    :param TradeCost cost_func: the trade cost algorithm
+    :param string name:        the account name
     :rtype: TradeManager)");
 
-    m.def("TC_TestStub", TC_TestStub, "仅用于测试");
+    m.def("TC_TestStub", TC_TestStub, "For testing only");
 
     m.def(
       "TC_FixedA", TC_FixedA, py::arg("commission") = 0.0018, py::arg("lowest_commission") = 5.0,
@@ -33,14 +33,14 @@ void export_build_in(py::module& m) {
       py::arg("lowest_transferfee") = 1.0,
       R"(TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.001, lowest_transferfee=1.0])
 
-    2015年8月1日之前的A股交易成本算法
+    The A-share trade cost algorithm before August 1, 2015
 
-    :param float commission: 佣金比例
-    :param float lowest_commission: 最低佣金值
-    :param float stamptax: 印花税
-    :param float transferfee: 过户费
-    :param float lowest_transferfee: 最低过户费
-    :return: :py:class:`TradeCostBase` 子类实例)");
+    :param float commission: the commission ratio
+    :param float lowest_commission: the lowest commission value
+    :param float stamptax: the stamp tax
+    :param float transferfee: the transfer fee
+    :param float lowest_transferfee: the lowest transfer fee
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def(
       "TC_FixedA2015", TC_FixedA2015, py::arg("commission") = 0.0018,
@@ -48,13 +48,13 @@ void export_build_in(py::module& m) {
       py::arg("transferfee") = 0.00002,
       R"(TC_FixedA2015([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.00002])
 
-    2015年8月1日上证过户费改为成交金额的千分之0.02
+    Since August 1, 2015, the SSE transfer fee is changed to 0.02 per mille of the amount
 
-    :param float commission: 佣金比例
-    :param float lowest_commission: 最低佣金值
-    :param float stamptax: 印花税
-    :param float transferfee: 过户费
-    :return: :py:class:`TradeCostBase` 子类实例)");
+    :param float commission: the commission ratio
+    :param float lowest_commission: the lowest commission value
+    :param float stamptax: the stamp tax
+    :param float transferfee: the transfer fee
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def(
       "TC_FixedA2017", TC_FixedA2017, py::arg("commission") = 0.0018,
@@ -62,23 +62,23 @@ void export_build_in(py::module& m) {
       py::arg("transferfee") = 0.00002,
       R"(TC_FixedA2017([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.00002])
 
-    2017年1月1日起将对深市过户费项目单独列示，标准为成交金额0.02‰双向收取。
+    Since January 1, 2017, the SZSE transfer fee item is listed separately, charged in both directions at 0.02‰ of the amount.
 
-    :param float commission: 佣金比例
-    :param float lowest_commission: 最低佣金值
-    :param float stamptax: 印花税
-    :param float transferfee: 过户费
-    :return: :py:class:`TradeCostBase` 子类实例)");
+    :param float commission: the commission ratio
+    :param float lowest_commission: the lowest commission value
+    :param float stamptax: the stamp tax
+    :param float transferfee: the transfer fee
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def("TC_FixedETF", TC_FixedETF, py::arg("commission") = 0.0001,
           py::arg("lowest_commission") = 5.0,
           R"(TC_FixedETF([commission=0.0001, lowest_commission=5.0])
 
-    ETF交易成本算法，买卖双向收取佣金，无印花税和过户费。
+    The ETF trade cost algorithm; the commission is charged in both the buy and the sell directions, with no stamp tax and no transfer fee.
 
-    :param float commission: 佣金比例，默认万分之1
-    :param float lowest_commission: 最低佣金值，默认5元/笔
-    :return: :py:class:`TradeCostBase` 子类实例)");
+    :param float commission: the commission ratio, defaulting to 1 per ten thousand
+    :param float lowest_commission: the lowest commission value, defaulting to 5 yuan per trade
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
 
-    m.def("TC_Zero", TC_Zero, "零交易成本算法");
+    m.def("TC_Zero", TC_Zero, "The zero trade cost algorithm");
 }

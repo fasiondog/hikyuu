@@ -1,7 +1,7 @@
 /*
  * TdxKDataDriver.h
  *
- *  Created on: 2017年10月12日
+ *  Created on: 2017-10-12
  *      Author: fasiondog
  */
 

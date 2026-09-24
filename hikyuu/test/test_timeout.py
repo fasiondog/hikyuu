@@ -7,10 +7,10 @@ from hikyuu.util.timeout import timeout, TerminableThread
 
 
 class TestTimeout(unittest.TestCase):
-    """测试timeout装饰器的各种情况"""
+    """Test various cases of the timeout decorator"""
 
     def test_normal_function(self):
-        """测试正常执行的函数"""
+        """Test a normally executed function"""
         @timeout(2)
         def normal_func():
             return "success"
@@ -19,7 +19,7 @@ class TestTimeout(unittest.TestCase):
         self.assertEqual(result, "success")
 
     def test_timeout_function(self):
-        """测试超时的函数"""
+        """Test a timed-out function"""
         @timeout(0.1)
         def slow_func():
             time.sleep(0.5)
@@ -29,7 +29,7 @@ class TestTimeout(unittest.TestCase):
             slow_func()
 
     def test_exception_in_function(self):
-        """测试函数内部抛出异常"""
+        """Test an exception raised inside the function"""
         @timeout(1)
         def error_func():
             raise ValueError("test error")
@@ -38,21 +38,21 @@ class TestTimeout(unittest.TestCase):
             error_func()
 
     def test_zero_timeout(self):
-        """测试零超时值"""
+        """Test a zero timeout value"""
         with self.assertRaises(ValueError):
             @timeout(0)
             def test_func():
                 pass
 
     def test_negative_timeout(self):
-        """测试负数超时值"""
+        """Test a negative timeout value"""
         with self.assertRaises(ValueError):
             @timeout(-1)
             def test_func():
                 pass
 
     def test_nested_calls(self):
-        """测试嵌套调用"""
+        """Test nested calls"""
         @timeout(0.2)
         def inner_func():
             time.sleep(0.1)
@@ -68,7 +68,7 @@ class TestTimeout(unittest.TestCase):
         self.assertEqual(result, "outer-inner")
 
     def test_multiple_threads(self):
-        """测试多线程并发"""
+        """Test multi-thread concurrency"""
         import concurrent.futures
         
         @timeout(0.2)
@@ -84,7 +84,7 @@ class TestTimeout(unittest.TestCase):
         self.assertEqual(results, expected)
 
     def test_terminable_thread_cleanup(self):
-        """测试TerminableThread的清理功能"""
+        """Test the cleanup function of TerminableThread"""
         def quick_func():
             return "quick"
 
@@ -92,12 +92,12 @@ class TestTimeout(unittest.TestCase):
         thread.start()
         thread.join()
         
-        # 线程应该已经结束
+        # The thread should have finished
         self.assertFalse(thread.is_alive())
         
-        # 测试terminate方法在已结束线程上的行为
+        # Test the behavior of terminate on a finished thread
         result = thread.terminate(Exception)
-        self.assertTrue(result)  # 应该返回True表示无需终止
+        self.assertTrue(result)  # Should return True, meaning no termination is needed
 
 
 if __name__ == '__main__':

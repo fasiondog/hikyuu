@@ -12,8 +12,8 @@
 using namespace hku;
 namespace py = pybind11;
 
-// pybind 默认会将 vector 和 list 互转，数据量过大的情况下会影响性能
-// 只考虑引出影响可能性能的类型
+// pybind converts between the vector and the list by default, which affects the performance when the data volume is too large
+// Only consider exporting the types that may affect the performance
 
 void export_bind_stl(py::module& m) {
     // py::bind_vector<PriceList>(m, "PriceList");

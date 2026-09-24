@@ -1,7 +1,7 @@
 /*
  * test_ABS.cpp
  *
- *  Created on: 2019年4月2日
+ *  Created on: 2019-4-2
  *      Author: fasiondog
  */
 #include "doctest/doctest.h"
@@ -19,7 +19,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_NOT") {
     Indicator result;
 
@@ -46,7 +46,7 @@ TEST_CASE("test_NOT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_NOT_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

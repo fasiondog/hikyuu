@@ -167,7 +167,7 @@ void DataDriverFactory::regKDataDriver(const KDataDriverPtr& driver) {
     HKU_CHECK(m_kdataDriverPools->find(new_type) == m_kdataDriverPools->end(),
               "Repeat regKDataDriver!");
     (*m_kdataPrototypeDrivers)[new_type] = driver;
-    // 不在此创建连接池
+    // The connection pool is not created here
     //(*m_kdataDriverPools)[new_type] = make_shared<KDataDriverPool>();
 }
 
@@ -190,7 +190,7 @@ KDataDriverConnectPoolPtr DataDriverFactory::getKDataDriverPool(const Parameter&
         result = iter->second;
     } else {
         auto prototype_iter = m_kdataPrototypeDrivers->find(name);
-        HKU_CHECK(prototype_iter != m_kdataPrototypeDrivers->end(), "Unregistered driver：{}",
+        HKU_CHECK(prototype_iter != m_kdataPrototypeDrivers->end(), "Unregistered driver: {}",
                   name);
         HKU_CHECK(prototype_iter->second->init(params), "Failed init driver: {}", name);
         (*m_kdataDriverPools)[name] = make_shared<KDataDriverConnectPool>(

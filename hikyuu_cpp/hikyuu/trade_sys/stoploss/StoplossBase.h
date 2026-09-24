@@ -16,8 +16,9 @@
 namespace hku {
 
 /**
- * 止损/止赢策略基类
- * @details 负责向系统提供当前计划交易的预期止损价
+ * Base class of the stop-loss / take-profit strategy
+ * @details It is responsible for providing the expected stop-loss price of the current planned
+ * trade to the system
  * @ingroup Stoploss
  */
 class HKU_API StoplossBase : public enable_shared_from_this<StoplossBase> {
@@ -29,61 +30,67 @@ public:
     StoplossBase(const StoplossBase&) = default;
     virtual ~StoplossBase();
 
-    /** 获取名称 */
+    /** Get the name */
     const string& name() const;
 
-    /** 设置名称 */
+    /** Set the name */
     void name(const string& name);
 
-    /** 设置交易管理实例 */
+    /** Set the trade management instance */
     void setTM(const TradeManagerPtr& tm);
 
-    /** 获取交易管理实例 */
+    /** Get the trade management instance */
     TradeManagerPtr getTM() const;
 
-    /** 设置交易对象 */
+    /** Set the trading object */
     void setTO(const KData& kdata);
 
-    /** 获取交易对象  */
+    /** Get the trading object */
     KData getTO() const;
 
-    /** 复位操作 */
+    /** Reset operation */
     void reset();
 
     typedef shared_ptr<StoplossBase> StoplossPtr;
-    /** 克隆操作 */
+    /** Clone operation */
     StoplossPtr clone();
 
     /**
-     * 获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。
-     * 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
-     * @param datetime 交易时间
-     * @param price 计划买入的价格
-     * @note 一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的
-     *       价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为
-     *       price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价
-     *       的30%作为止损，则不需要考虑price参数
+     * Get the planned stop-loss price of the current expected trade (a buy); 0 is returned if there
+     * is no stop-loss price.
+     * It is used by the system to query the planned stop-loss price of the current trade from the
+     * stop-loss strategy module before the trade is executed.
+     * @param datetime trade time
+     * @param price the planned buy price
+     * @note Generally the algorithms of the stop-loss and the take-profit can be interchanged, but
+     *       the getPrice of the stop-loss can be passed the price of the planned trade, for example
+     *       taking 30% of the buy price as the stop-loss. The take-profit does not consider the
+     *       passed price parameter, i.e. it regards price as 0.0. In fact, even for the stop-loss
+     * it is not recommended to use the price parameter; for example 30% of the previous day's low
+     *       price can be used as the stop-loss, then the price parameter does not need to be
+     *       considered
      */
     virtual price_t getPrice(const Datetime& datetime, price_t price) = 0;
 
     /**
-     * 获取本次预期交易（卖空）时的计划止损价格，如果不存在止损价，则返回0。
-     * 用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
-     * @param datetime 交易日期
-     * @param price 计划交易的价格
-     * @note 默认实现时，和getPrice返回结果相同
+     * Get the planned stop-loss price of the current expected trade (a short sell); 0 is returned
+     * if there is no stop-loss price. It is used by the system to query the planned stop-loss price
+     * of the current trade from the stop-loss strategy module before the trade is executed.
+     * @param datetime trade date
+     * @param price the planned trade price
+     * @note In the default implementation it returns the same result as getPrice
      */
     virtual price_t getShortPrice(const Datetime& datetime, price_t price) {
         return getPrice(datetime, price);
     }
 
-    /** 子类复位接口 */
+    /** Subclass reset interface */
     virtual void _reset() {}
 
-    /** 子类克隆接口 */
+    /** Subclass clone interface */
     virtual StoplossPtr _clone() = 0;
 
-    /** 子类初始化计算接口，由setTO调用 */
+    /** Interface for the subclass to initialize the calculation, it is called by setTO */
     virtual void _calculate() {};
 
     bool isPythonObject() const noexcept {
@@ -97,7 +104,7 @@ protected:
     KData m_kdata;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -107,7 +114,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        // m_kdata都是系统运行时临时设置，不需要序列化
+        // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
 
@@ -116,7 +123,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        // m_kdata都是系统运行时临时设置，不需要序列化
+        // m_kdata is set temporarily when the system runs, it does not need to be serialized
         // ar & BOOST_SERIALIZATION_NVP(m_kdata);
     }
 
@@ -130,7 +137,8 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(StoplossBase)
 
 #if HKU_SUPPORT_SERIALIZATION
 /**
- * 对于没有私有变量的继承子类，可直接使用该宏定义序列化
+ * For an inheriting subclass without private variables, this macro can be used directly for the
+ * serialization
  * @code
  * class Drived: public StoplossBase {
  *     STOPLOSS_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -162,7 +170,7 @@ public:                                       \
     virtual price_t getPrice(const Datetime&, price_t) override;
 
 /**
- * 客户程序都应使用该指针类型，操作止损策略实例
+ * Client programs should all use this pointer type to operate the stop-loss strategy instance
  * @ingroup Stoploss
  */
 typedef shared_ptr<StoplossBase> StoplossPtr;

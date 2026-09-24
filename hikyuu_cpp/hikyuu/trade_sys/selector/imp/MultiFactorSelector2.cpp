@@ -20,7 +20,8 @@ MultiFactorSelector2::MultiFactorSelector2() : SelectorBase("SE_MultiFactor2") {
     setParam<Stock>("ref_stk", Stock());
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
-    setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
+    setParam<int>("mf_recover_type",
+                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
 }
 
 MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf) : SelectorBase("SE_MultiFactor2") {
@@ -35,7 +36,8 @@ MultiFactorSelector2::MultiFactorSelector2(const MFPtr& mf) : SelectorBase("SE_M
     }
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", "CUSTOM");
-    setParam<int>("mf_recover_type", KQuery::INVALID_RECOVER_TYPE);  // 指定MF的计算时的复权方式
+    setParam<int>("mf_recover_type",
+                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
     // setIndicators(mf->getRefIndicators());
     setFactorSet(mf->getRefFactorSet());
 }

@@ -14,11 +14,11 @@
 namespace hku {
 
 /**
- * 统计连续满足条件的周期数
+ * Count the number of the consecutive periods satisfying the condition
  * @details
  * <pre>
- * 用法：BARSLASTCOUNT(X)，其中X为条件表达式。
- * 例如：BARSLASTCOUNT(CLOSE>OPEN)表示统计连续收阳的周期数
+ * Usage: BARSLASTCOUNT(X), where X is a condition expression.
+ * For example: BARSLASTCOUNT(CLOSE>OPEN) counts the number of the consecutive periods closing up
  * </pre>
  * @ingroup Indicator
  */

@@ -12,25 +12,25 @@
 namespace hku {
 
 /**
- * 接收外部实时数据结构
+ * Data structure of the received external realtime data
  * @ingroup Agent
  */
 struct HKU_API SpotRecord {
-    string market;              ///< 市场标识
-    string code;                ///< 证券代码
-    string name;                ///< 证券名称
-    Datetime datetime;          ///< 数据时间
-    price_t yesterday_close;    ///< 昨日收盘价
-    price_t open;               ///< 开盘价
-    price_t high;               ///< 最高价
-    price_t low;                ///< 最低价
-    price_t close;              ///< 收盘价
-    price_t amount;             ///< 成交金额 （千元）
-    price_t volume;             ///< 成交量（手）
-    vector<double> bid;         ///< 委买价
-    vector<double> bid_amount;  ///< 委买量
-    vector<double> ask;         ///< 委卖价
-    vector<double> ask_amount;  ///< 委卖量
+    string market;              ///< Market identifier
+    string code;                ///< Security code
+    string name;                ///< Security name
+    Datetime datetime;          ///< Data time
+    price_t yesterday_close;    ///< Yesterday close price
+    price_t open;               ///< Open price
+    price_t high;               ///< High price
+    price_t low;                ///< Low price
+    price_t close;              ///< Close price
+    price_t amount;             ///< Turnover amount (in units of 1 thousand yuan)
+    price_t volume;             ///< Trading volume (in lots)
+    vector<double> bid;         ///< Bid price
+    vector<double> bid_amount;  ///< Bid quantity
+    vector<double> ask;         ///< Ask price
+    vector<double> ask_amount;  ///< Ask quantity
 };
 
 }  // namespace hku

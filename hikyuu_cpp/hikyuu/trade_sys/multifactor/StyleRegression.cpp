@@ -4,13 +4,18 @@
  *  Created on: 2026-07-27
  *      Author: woleigegg
  *
- *  风格因子中性化残差回归，从 MultiFactorBase 中提取的串行内核。
+ *  The residual regression of the style factor neutralization, a serial kernel extracted from
+ *  MultiFactorBase.
  *
- *  设计要点：
- *    - 保留 Eigen ColPivHouseholderQR 求解，其本身不在 Eigen 并行算法集合内；
- *    - 拟合值改用显式逐行点积，避免触发 general matrix-matrix 乘法的并行路径；
- *    - 不调用进程级 Eigen::setNbThreads，避免并发 MF 互相污染全局配置；
- *    - 保留原 calculate_residuals 的有效样本/秩不足/NaN 语义。
+ *  Design points:
+ *    - The Eigen ColPivHouseholderQR solver is kept, which is not in the Eigen parallel
+ *      algorithm set itself;
+ *    - The fitted values use an explicit row-by-row dot product, avoiding the parallel path of
+ *      the general matrix-matrix multiplication;
+ *    - The process level Eigen::setNbThreads is not called, avoiding the concurrent MFs
+ *      polluting the global config mutually;
+ *    - The valid sample / rank deficiency / NaN semantics of the original calculate_residuals
+ *      are kept.
  */
 
 #include <cmath>
@@ -28,28 +33,28 @@ PriceList calculate_style_residuals(const PriceList& y, const vector<PriceList>&
     }
 
     PriceList residuals(n, Null<price_t>());
-    size_t k = x.size();  // 解释变量个数
+    size_t k = x.size();  // The number of the explanatory variables
 
-    // 构建设计矩阵和因变量向量
+    // Build the design matrix and the dependent variable vector
     Eigen::MatrixXd Xmat(n, k + 1);
     Eigen::VectorXd Yvec(n);
 
-    // 第一列为常数项（全1）
+    // The first column is the constant term (all 1)
     Xmat.col(0).setConstant(1.0);
 
-    // 标记有效数据点
+    // Mark the valid data points
     std::vector<bool> valid(n, true);
 
     for (size_t i = 0; i < n; ++i) {
         Yvec(i) = y[i];
 
-        // 检查因变量是否有效
+        // Check whether the dependent variable is valid
         if (std::isnan(y[i]) || std::isinf(y[i])) {
             valid[i] = false;
             continue;
         }
 
-        // 填充自变量并检查有效性
+        // Fill the independent variables and check their validity
         for (size_t j = 0; j < k; ++j) {
             Xmat(i, j + 1) = x[j][i];
             if (std::isnan(x[j][i]) || std::isinf(x[j][i])) {
@@ -59,15 +64,15 @@ PriceList calculate_style_residuals(const PriceList& y, const vector<PriceList>&
         }
     }
 
-    // 计算有效数据点数量
+    // Count the valid data points
     size_t valid_count = std::count(valid.begin(), valid.end(), true);
 
-    // 数据点不足
+    // There are not enough data points
     if (valid_count <= k + 1) {
         return residuals;
     }
 
-    // 创建有效数据的子矩阵
+    // Create the submatrix of the valid data
     Eigen::MatrixXd X_valid(valid_count, k + 1);
     Eigen::VectorXd Y_valid(valid_count);
 
@@ -80,15 +85,16 @@ PriceList calculate_style_residuals(const PriceList& y, const vector<PriceList>&
         }
     }
 
-    // 使用 QR 分解求解线性回归 β = (X'X)^(-1)X'Y
+    // Solve the linear regression with the QR decomposition: beta = (X'X)^(-1)X'Y
     Eigen::VectorXd beta = X_valid.colPivHouseholderQr().solve(Y_valid);
 
-    // 检查解是否有效
+    // Check whether the solution is valid
     if (beta.hasNaN()) {
         return residuals;
     }
 
-    // 计算残差：逐行点积拟合值，避免 general matrix-matrix 并行路径
+    // Calculate the residuals: the fitted value is a row-by-row dot product, avoiding the general
+    // matrix-matrix parallel path
     for (size_t i = 0; i < n; ++i) {
         if (!valid[i]) {
             continue;

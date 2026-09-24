@@ -17,7 +17,7 @@
 namespace hku {
 
 /**
- * 连大, NDAY(X,Y,N)表示条件X>Y持续存在N个周期
+ * Consecutive greater; NDAY(X,Y,N) means the condition X>Y exists persistently for N periods
  * @ingroup Indicator
  */
 inline Indicator NDAY(const Indicator& x, const Indicator& y, int n = 3) {

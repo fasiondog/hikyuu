@@ -16,29 +16,29 @@ void export_util(py::module& m) {
     m.def("roundEx", roundEx<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundEx(number[, ndigits=0])
 
-    四舍五入，ROUND_HALF_EVEN 银行家舍入法
+    Round half up, with the ROUND_HALF_EVEN banker's rounding
 
-    :param float number  待四舍五入的数据
-    :param int ndigits 保留小数位数
+    :param float number  the data to round
+    :param int ndigits the number of the decimal places to keep
     :rype: float)");
 
     m.def("roundUp", roundUp<float>, py::arg("number"), py::arg("ndigits") = 0);
     m.def("roundUp", roundUp<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundUp(number[, ndigits=0])
 
-    向上截取，如10.1截取后为11
+    Round up, e.g. 10.1 becomes 11 after rounding
 
-    :param float number  待处理数据
-    :param int ndigits 保留小数位数
+    :param float number  the data to process
+    :param int ndigits the number of the decimal places to keep
     :rtype: float)");
 
     m.def("roundDown", roundDown<float>, py::arg("number"), py::arg("ndigits") = 0);
     m.def("roundDown", roundDown<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundDown(number[, ndigits=0])
 
-    向下截取，如10.1截取后为10
+    Round down, e.g. 10.1 becomes 10 after rounding
 
-    :param float number  待处理数据
-    :param int ndigits 保留小数位数
+    :param float number  the data to process
+    :param int ndigits the number of the decimal places to keep
     :rtype: float)");
 }

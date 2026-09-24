@@ -45,15 +45,15 @@ public:
 };
 
 void export_Environment(py::module& m) {
-    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(m, "EnvironmentBase",
-                                                                   py::dynamic_attr(),
-                                                                   R"(市场环境判定策略基类
+    py::class_<EnvironmentBase, EnvironmentPtr, PyEnvironmentBase>(
+      m, "EnvironmentBase", py::dynamic_attr(),
+      R"(The market environment strategy base class
 
-自定义市场环境判定策略接口：
+The custom market environment strategy interfaces:
 
-    - _calculate : 【必须】子类计算接口
-    - _clone : 【必须】克隆接口
-    - _reset : 【可选】重载私有变量)")
+    - _calculate : [Required] The subclass calculation interface
+    - _clone : [Required] The clone interface
+    - _reset : [Optional] Reload the private variables)")
       .def(py::init<>())
       .def(py::init<const EnvironmentBase&>())
       .def(py::init<const string&>())
@@ -63,50 +63,53 @@ void export_Environment(py::module& m) {
 
       .def_property("name", py::overload_cast<>(&EnvironmentBase::name, py::const_),
                     py::overload_cast<const string&>(&EnvironmentBase::name),
-                    py::return_value_policy::copy, "名称")
+                    py::return_value_policy::copy, "Name")
       .def_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,
-                    py::return_value_policy::copy, "设置或获取查询条件")
+                    py::return_value_policy::copy, "Set or get the query condition")
 
       .def("get_param", &EnvironmentBase::getParam<boost::any>, R"(get_param(self, name)
 
-    获取指定的参数
+    Get the specified parameter
 
-    :param str name: 参数名称
-    :return: 参数值
-    :raises out_of_range: 无此参数)")
+    :param str name: the parameter name
+    :return: the parameter value
+    :raises out_of_range: no such parameter)")
 
       .def("set_param",
            static_cast<void (EnvironmentBase::*)(const std::string&, const boost::any&)>(
              &EnvironmentBase::setParam),
            R"(set_param(self, name, value)
 
-    设置参数
+    Set the parameter
 
-    :param str name: 参数名称
-    :param value: 参数值
-    :raises logic_error: Unsupported type! 不支持的参数类型)")
+    :param str name: the parameter name
+    :param value: the parameter value
+    :raises logic_error: Unsupported type! The parameter type is not supported)")
 
-      .def("have_param", &EnvironmentBase::haveParam, "是否存在指定参数")
+      .def("have_param", &EnvironmentBase::haveParam, "Whether the specified parameter exists")
 
       .def("is_valid", &EnvironmentBase::isValid, R"(is_valid(self, datetime)
 
-    指定时间系统是否有效
+    Whether the system is valid at the specified time
 
-    :param Datetime datetime: 指定时间
-    :return: True 有效 | False 无效)")
+    :param Datetime datetime: the specified time
+    :return: True valid | False invalid)")
 
       .def("_add_valid", &EnvironmentBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
            R"(_add_valid(self, datetime)
 
-    加入有效时间，在_calculate中调用
+    Add a valid time, called in _calculate
 
-    :param Datetime datetime: 有效时间
-    :param float value: 默认值为1.0, 大于0表示有效, 小于等于0表示无效)")
+    :param Datetime datetime: the valid time
+    :param float value: defaulting to 1.0; greater than 0 means valid, and less than or equal to 0 means invalid)")
 
-      .def("reset", &EnvironmentBase::reset, "复位操作")
-      .def("clone", &EnvironmentBase::clone, "克隆操作")
-      .def("_reset", &EnvironmentBase::_reset, "【重载接口】子类复位接口，用于复位内部私有变量")
-      .def("_calculate", &EnvironmentBase::_calculate, "【重载接口】子类计算接口")
+      .def("reset", &EnvironmentBase::reset, "The reset operation")
+      .def("clone", &EnvironmentBase::clone, "The clone operation")
+      .def("_reset", &EnvironmentBase::_reset,
+           "[Overload interface] The subclass reset interface, used to reset the internal private "
+           "variables")
+      .def("_calculate", &EnvironmentBase::_calculate,
+           "[Overload interface] The subclass calculation interface")
 
       .def("__and__",
            [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self & other; })
@@ -131,17 +134,17 @@ void export_Environment(py::module& m) {
     m.def("EV_TwoLine", EV_TwoLine, py::arg("fast"), py::arg("slow"), py::arg("market") = "SH",
           R"(EV_TwoLine(fast, slow[, market = 'SH'])
 
-    快慢线判断策略，市场指数的快线大于慢线时，市场有效，否则无效。
+    The fast/slow line strategy; when the fast line of the market index is greater than the slow line, the market is valid, otherwise invalid.
 
-    :param Indicator fast: 快线指标
-    :param Indicator slow: 慢线指标
-    :param string market: 市场名称)");
+    :param Indicator fast: the fast line indicator
+    :param Indicator slow: the slow line indicator
+    :param string market: the market name)");
 
     m.def("EV_Bool", EV_Bool, py::arg("ind"), py::arg("market") = "SH",
           R"(EV_Bool(ind, market='SH')
 
-    布尔信号指标市场环境
+    The boolean signal generator market environment
 
-    :param Indicator ind: bool类型的指标，指标中相应位置>0则代表市场有效，否则无效
-    :param str market: 指定的市场，用于获取相应的交易日历)");
+    :param Indicator ind: a bool-type indicator; if the corresponding position in the indicator is >0, it means the market is valid, otherwise invalid
+    :param str market: the specified market, used to get the corresponding trading calendar)");
 }

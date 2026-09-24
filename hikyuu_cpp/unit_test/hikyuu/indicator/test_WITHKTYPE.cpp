@@ -26,7 +26,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_equal_ktype") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -64,7 +64,7 @@ TEST_CASE("test_WITHKTYPE_equal_ktype") {
     check_indicator(ret, wk.close());
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_extent") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -93,7 +93,7 @@ TEST_CASE("test_WITHKTYPE_extent") {
 #if HKU_ENABLE_TA_LIB
     ret = WITHWEEK(TA_MA(CLOSE(), 3))(k);
     expect = ALIGN(TA_MA(CLOSE(wk), 3), k, false);
-    // WITHKTYPE query 为 INDEX 索引时会夺取一些数据，会造成 discard 有所不同
+    // When the WITHKTYPE query is an INDEX it takes some data, which makes the discard differ
     // check_indicator(ret, expect);
     for (size_t i = expect.discard(); i < ret.size(); ++i) {
         CHECK_EQ(ret[i], doctest::Approx(expect[i]).epsilon(0.00001));
@@ -105,7 +105,7 @@ TEST_CASE("test_WITHKTYPE_extent") {
 #endif
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_sample") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -125,7 +125,7 @@ TEST_CASE("test_WITHKTYPE_sample") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_WITHKTYPE_export") {
     HKU_IF_RETURN(!pluginValid(), void());
     StockManager& sm = StockManager::instance();

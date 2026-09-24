@@ -14,17 +14,17 @@
 namespace hku {
 
 /**
- * 指数移动平均线(Exponential Moving Average)
- * @param n 计算均值的周期窗口，必须为大于0的整数
+ * Exponential Moving Average (EMA)
+ * @param n the period window for calculating the average, it must be an integer greater than 0
  * @ingroup Indicator
  */
 Indicator HKU_API EMA(int n = 22);
 Indicator HKU_API EMA(const IndParam& n);
 
 /**
- * 指数移动平均线(Exponential Moving Average)
- * @param data 待计算的源数据
- * @param n 计算均值的周期窗口，必须为大于0的整数
+ * Exponential Moving Average (EMA)
+ * @param data the source data to be calculated
+ * @param n the period window for calculating the average, it must be an integer greater than 0
  * @ingroup Indicator
  */
 inline Indicator EMA(const Indicator& data, int n = 22) {

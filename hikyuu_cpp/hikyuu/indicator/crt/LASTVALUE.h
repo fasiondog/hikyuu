@@ -14,8 +14,10 @@
 namespace hku {
 
 /**
- * 取输入指标最后值为常数，即结果中所有值均为输入指标的最后值，谨慎使用
- * @note 等同于通达信 CONST 指标, 由于 Windows 下 CONST 命名冲突，取名 LASTVALUE
+ * Take the last value of the input indicator as a constant, i.e. all the values in the result are
+ * the last value of the input indicator; use it with caution
+ * @note It is equivalent to the TDX CONST indicator; it is named LASTVALUE because of the name
+ *       conflict of CONST under Windows
  * @ingroup Indicator
  */
 Indicator HKU_API LASTVALUE(bool ignore_discard = false);

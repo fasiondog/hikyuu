@@ -25,11 +25,11 @@ using namespace hku;
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IF") {
     KData kdata = getStock("SH600000").getKData(KQuery(-10));
 
-    /** @arg 三个参数均为 indicator */
+    /** @arg All the three parameters are indicator */
     Indicator x = IF(CLOSE() > OPEN(), CVAL(1), CVAL(0));
     x.setContext(kdata);
     Indicator c = CLOSE(kdata);
@@ -42,7 +42,7 @@ TEST_CASE("test_IF") {
         }
     }
 
-    /** @arg 测试调用operator()(const Indicator&) */
+    /** @arg Test calling operator()(const Indicator&) */
     x = IF(REF(0) > REF(1), 1, 0);
     c = CLOSE(kdata);
     x = x(c);
@@ -53,7 +53,7 @@ TEST_CASE("test_IF") {
             CHECK_EQ(x[i], c[i] > c[i - 1] ? 1 : 0);
     }
 
-    /** @arg 参数其中之一为数字 */
+    /** @arg One of the parameters is a number */
     x = IF(CLOSE() > OPEN(), 1, CVAL(0));
     x.setContext(kdata);
     for (int i = 0; i < x.size(); i++) {
@@ -74,7 +74,7 @@ TEST_CASE("test_IF") {
         }
     }
 
-    /** @arg 两个参数为数字 */
+    /** @arg Two of the parameters are numbers */
     x = IF(CLOSE() > OPEN(), 1, 0);
     x.setContext(kdata);
     for (int i = 0; i < x.size(); i++) {
@@ -95,7 +95,7 @@ TEST_CASE("test_IF") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_IF_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

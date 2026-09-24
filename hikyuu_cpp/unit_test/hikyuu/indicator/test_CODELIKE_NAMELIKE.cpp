@@ -22,16 +22,16 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CODELIKE") {
     StockManager& sm = StockManager::instance();
 
-    /** @arg 开头匹配测试 - 无通配符 */
+    /** @arg The prefix match test - without a wildcard */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
-        // sh000001的代码是000001，以"000"开头，应该匹配成功
+        // The code of sh000001 is 000001, starting with "000", so it should match
         Indicator result = CODELIKE(kdata, "000");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -39,12 +39,12 @@ TEST_CASE("test_CODELIKE") {
         }
     }
 
-    /** @arg 开头匹配测试 - 不匹配 */
+    /** @arg The prefix match test - no match */
     {
         Stock stock = sm.getStock("sh600000");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
-        // sh600000的代码是600000，不以"000"开头，应该匹配失败
+        // The code of sh600000 is 600000, not starting with "000", so it should not match
         Indicator result = CODELIKE(kdata, "000");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -52,12 +52,12 @@ TEST_CASE("test_CODELIKE") {
         }
     }
 
-    /** @arg 通配符?完全匹配测试 */
+    /** @arg The wildcard ? exact match test */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
-        // 000001匹配??????（6个?）
+        // 000001 matches ?????? (6 question marks)
         Indicator result = CODELIKE(kdata, "??????");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -65,13 +65,13 @@ TEST_CASE("test_CODELIKE") {
         }
     }
 
-    /** @arg 深圳股票测试 */
+    /** @arg The Shenzhen stock test */
     {
         Stock stock = sm.getStock("sz000001");
         if (!stock.isNull()) {
             KData kdata = stock.getKData(KQuery(-10));
             CHECK_EQ(10, kdata.size());
-            // sz000001的代码是000001，以"000"开头
+            // The code of sz000001 is 000001, starting with "000"
             Indicator result = CODELIKE(kdata, "000");
             CHECK_EQ(result.size(), kdata.size());
             for (size_t i = 0; i < result.size(); ++i) {
@@ -81,16 +81,16 @@ TEST_CASE("test_CODELIKE") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_NAMELIKE") {
     StockManager& sm = StockManager::instance();
 
-    /** @arg 开头匹配测试 */
+    /** @arg The prefix match test */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
-        // sh000001的名称是"上证指数"，以"上证"开头，应该匹配成功
+        // The name of sh000001 is "上证指数", starting with "上证", so it should match
         Indicator result = NAMELIKE(kdata, "上证");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -98,12 +98,12 @@ TEST_CASE("test_NAMELIKE") {
         }
     }
 
-    /** @arg 不匹配测试 */
+    /** @arg The no-match test */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
-        // sh000001的名称是"上证指数"，不以"深证"开头
+        // The name of sh000001 is "上证指数", not starting with "深证"
         Indicator result = NAMELIKE(kdata, "深证");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -111,12 +111,12 @@ TEST_CASE("test_NAMELIKE") {
         }
     }
 
-    /** @arg 通配符测试 */
+    /** @arg The wildcard test */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
-        // 使用通配符进行完全匹配
+        // An exact match with a wildcard
         Indicator result = NAMELIKE(kdata, "*指数");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -125,17 +125,17 @@ TEST_CASE("test_NAMELIKE") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_CODELIKE_NAMELIKE_wildcard") {
     StockManager& sm = StockManager::instance();
 
-    /** @arg 通配符*匹配任意序列 */
+    /** @arg The wildcard * matches any sequence */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
 
-        // *可以匹配任意序列（完全匹配）
+        // * matches any sequence (an exact match)
         Indicator result = CODELIKE(kdata, "*");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
@@ -149,21 +149,21 @@ TEST_CASE("test_CODELIKE_NAMELIKE_wildcard") {
         }
     }
 
-    /** @arg 通配符组合测试 */
+    /** @arg The wildcard combination test */
     {
         Stock stock = sm.getStock("sh000001");
         KData kdata = stock.getKData(KQuery(-10));
         CHECK_EQ(10, kdata.size());
 
-        // 测试*和?的组合（完全匹配）
-        // 000001匹配"0*1"（以0开头，以1结尾）
+        // Test the combination of * and ? (an exact match)
+        // 000001 matches "0*1" (starts with 0 and ends with 1)
         Indicator result = CODELIKE(kdata, "0*1");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {
             CHECK_EQ(result[i], 1.0);
         }
 
-        // 000001匹配"0????1"（以0开头，中间4个任意字符，以1结尾）
+        // 000001 matches "0????1" (starts with 0, 4 arbitrary characters, ends with 1)
         result = CODELIKE(kdata, "0????1");
         CHECK_EQ(result.size(), kdata.size());
         for (size_t i = 0; i < result.size(); ++i) {

@@ -42,7 +42,7 @@ public:
                                                          Datetime start, Datetime end) override;
 
 private:
-    // 股票基本信息数据库实例
+    // The database instance of the stock basic information
     ResourcePool<SQLiteConnect>* m_pool;
 };
 

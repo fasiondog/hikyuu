@@ -15,7 +15,7 @@
 
 namespace hku {
 
-/** 以指标公式的方式设置抛弃值 */
+/** Set the discard value in the way of an indicator formula */
 Indicator HKU_API DISCARD(int discard);
 
 inline Indicator DISCARD(const Indicator& ind, int discard) {

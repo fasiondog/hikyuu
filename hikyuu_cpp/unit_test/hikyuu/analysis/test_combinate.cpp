@@ -17,17 +17,17 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_combinateIndex") {
     std::vector<float> nums;
     std::vector<std::vector<size_t>> result;
     std::vector<std::vector<size_t>> expect;
 
-    /** @arg 输入序列长度为0 */
+    /** @arg The input sequence length is 0 */
     result = combinateIndex(nums);
     CHECK_UNARY(result.empty());
 
-    /** @arg 输入序列长度为1 */
+    /** @arg The input sequence length is 1 */
     nums.push_back(0.1f);
     result = combinateIndex(nums);
     expect = {{0}};
@@ -39,7 +39,7 @@ TEST_CASE("test_combinateIndex") {
         }
     }
 
-    /** @arg 输入序列长度为2 */
+    /** @arg The input sequence length is 2 */
     nums.push_back(0.2f);
     result = combinateIndex(nums);
     expect = {{0}, {0, 1}, {1}};
@@ -51,7 +51,7 @@ TEST_CASE("test_combinateIndex") {
         }
     }
 
-    /** @arg 输入序列长度为3 */
+    /** @arg The input sequence length is 3 */
     nums.push_back(0.3f);
     result = combinateIndex(nums);
     expect = {{0}, {0, 1}, {1}, {0, 2}, {0, 1, 2}, {1, 2}, {2}};
@@ -63,7 +63,7 @@ TEST_CASE("test_combinateIndex") {
         }
     }
 
-    /** @arg 输入序列长度为4 */
+    /** @arg The input sequence length is 4 */
     nums.push_back(0.4f);
     result = combinateIndex(nums);
     expect = {{0},       {0, 1}, {1},       {0, 2},       {0, 1, 2}, {1, 2}, {2}, {0, 3},

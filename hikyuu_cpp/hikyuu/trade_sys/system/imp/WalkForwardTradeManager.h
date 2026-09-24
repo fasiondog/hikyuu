@@ -15,7 +15,7 @@ class WalkForwardTradeManager : public TradeManagerBase {
 public:
     WalkForwardTradeManager() : TradeManagerBase("", TC_Zero()) {}
 
-    // 只允许执行>=run_start的实际交易
+    // Only the actual trades with a date >= run_start are allowed
     WalkForwardTradeManager(const TMPtr& tm, const Datetime& run_start) : m_run_start(run_start) {
         HKU_ASSERT(tm);
         m_tm = tm;
@@ -38,171 +38,174 @@ public:
     }
 
     /**
-     * 根据权息信息更新当前持仓与交易情况
-     * @note 必须按时间顺序调用
-     * @param datetime 当前时刻
+     * Update the current positions and trades according to the weight (adjustment) information
+     * @note It must be called in chronological order
+     * @param datetime the current moment
      */
     virtual void updateWithWeight(const Datetime& datetime) override {
         m_tm->updateWithWeight(datetime);
     }
 
     /**
-     * 获取指定对象的保证金比率
-     * @param datetime 日期
-     * @param stock 指定对象
+     * Get the margin rate of the given security
+     * @param datetime date
+     * @param stock the given security
      */
     virtual double getMarginRate(const Datetime& datetime, const Stock& stock) override {
         return (datetime >= m_run_start) ? m_tm->getMarginRate(datetime, stock) : 0.0;
     }
 
-    /** 初始资金 */
+    /** Initial cash */
     virtual price_t initCash() const override {
         return m_tm->initCash();
     }
 
-    /** 账户建立日期 */
+    /** Account creation date */
     virtual Datetime initDatetime() const override {
         return m_tm->initDatetime();
     }
 
-    /** 第一笔买入交易发生日期，如未发生交易返回Null<Datetime>() */
+    /** Date of the first buy trade; Null<Datetime>() is returned if no trade has happened */
     virtual Datetime firstDatetime() const override {
         return m_tm->firstDatetime();
     }
 
-    /** 最后一笔交易日期，注意和交易类型无关，如未发生交易返回账户建立日期 */
+    /** Date of the last trade, regardless of the trade type; the account creation date is returned
+     *  if no trade has happened */
     virtual Datetime lastDatetime() const override {
         return m_tm->lastDatetime();
     }
 
     /**
-     * 返回当前现金
-     * @note 仅返回当前信息，不会根据权息进行调整
+     * Return the current cash
+     * @note Only the current information is returned, it is not adjusted according to the weight
+     *       information
      */
     virtual price_t currentCash() const override {
         return m_tm->currentCash();
     }
 
     /**
-     * 获取指定日期的现金
-     * @note 如果不带日期参数，无法根据权息信息调整持仓
+     * Get the cash of the given date
+     * @note Without the date parameter the positions cannot be adjusted according to the weight
+     *       information
      */
     virtual price_t cash(const Datetime& datetime, KQuery::KType ktype = KQuery::DAY) override {
         return m_tm->cash(datetime, ktype);
     }
 
     /**
-     * 当前是否持有指定的证券
-     * @note 这里未使用日期参数，必须保证是按日期顺序执行
-     * @param stock 指定证券
-     * @return true 是 | false 否
+     * Whether the given security is currently held
+     * @note The date parameter is not used here, so execution in chronological order is required
+     * @param stock the given security
+     * @return true yes | false no
      */
     virtual bool have(const Stock& stock) const override {
         return m_tm->have(stock);
     }
 
     /**
-     * 当前空头仓位是否持有指定的证券
-     * @note 这里未使用日期参数，必须保证是按日期顺序执行
-     * @param stock 指定证券
-     * @return true 是 | false 否
+     * Whether the given security is currently held in the short position
+     * @note The date parameter is not used here, so execution in chronological order is required
+     * @param stock the given security
+     * @return true yes | false no
      */
     virtual bool haveShort(const Stock& stock) const override {
         return m_tm->haveShort(stock);
     }
 
-    /** 当前持有的证券种类数量 */
+    /** Number of security types currently held */
     virtual size_t getStockNumber() const override {
         return m_tm->getStockNumber();
     }
 
-    /** 当前空头持有的证券种类数量 */
+    /** Number of security types currently held short */
     virtual size_t getShortStockNumber() const override {
         return m_tm->getShortStockNumber();
     }
 
-    /** 获取指定时刻的某证券持有数量 */
+    /** Get the held quantity of a security at the given moment */
     virtual double getHoldNumber(const Datetime& datetime, const Stock& stock) override {
         return m_tm->getHoldNumber(datetime, stock);
     }
 
-    /** 获取指定时刻的空头某证券持有数量 */
+    /** Get the short held quantity of a security at the given moment */
     virtual double getShortHoldNumber(const Datetime& datetime, const Stock& stock) override {
         return m_tm->getShortHoldNumber(datetime, stock);
     }
 
-    /** 获取指定时刻已借入的股票数量 */
+    /** Get the number of borrowed shares at the given moment */
     virtual double getDebtNumber(const Datetime& datetime, const Stock& stock) override {
         return m_tm->getDebtNumber(datetime, stock);
     }
 
-    /** 获取指定时刻已借入的现金额 */
+    /** Get the amount of borrowed cash at the given moment */
     virtual price_t getDebtCash(const Datetime& datetime) override {
         return m_tm->getDebtCash(datetime);
     }
 
-    /** 获取全部交易记录 */
+    /** Get all the trade records */
     virtual TradeRecordList getTradeList() const override {
         return m_tm->getTradeList();
     }
 
     /**
-     * 获取指定日期范围内的交易记录[start, end)
-     * @param start 起始日期
-     * @param end 结束日期
-     * @return 交易记录列表
+     * Get the trade records within the given date range [start, end)
+     * @param start start date
+     * @param end end date
+     * @return trade record list
      */
     virtual TradeRecordList getTradeList(const Datetime& start,
                                          const Datetime& end) const override {
         return m_tm->getTradeList(start, end);
     }
 
-    /** 获取当前全部持仓记录 */
+    /** Get all the current position records */
     virtual PositionRecordList getPositionList() const override {
         return m_tm->getPositionList();
     }
 
-    /** 获取全部历史持仓记录，即已平仓记录 */
+    /** Get all the historical position records, i.e. the closed position records */
     virtual PositionRecordList getHistoryPositionList() const override {
         return m_tm->getHistoryPositionList();
     }
 
-    /** 获取当前全部空头仓位记录 */
+    /** Get all the current short position records */
     virtual PositionRecordList getShortPositionList() const override {
         return m_tm->getShortPositionList();
     }
 
-    /** 获取全部空头历史仓位记录 */
+    /** Get all the historical short position records */
     virtual PositionRecordList getShortHistoryPositionList() const override {
         return m_tm->getShortHistoryPositionList();
     }
 
     /**
-     * 获取指定证券的持仓记录
-     * @param date 指定日期
-     * @param stock 指定的证券
+     * Get the position record of the given security
+     * @param date the given date
+     * @param stock the given security
      */
     virtual PositionRecord getPosition(const Datetime& date, const Stock& stock) override {
         return m_tm->getPosition(date, stock);
     }
 
     /**
-     * 获取指定证券的空头持仓记录
-     * @param stock 指定的证券
+     * Get the short position record of the given security
+     * @param stock the given security
      */
     virtual PositionRecord getShortPosition(const Stock& stock) const override {
         return m_tm->getShortPosition(stock);
     }
 
-    /** 获取当前借入的股票列表 */
+    /** Get the list of currently borrowed shares */
     virtual BorrowRecordList getBorrowStockList() const override {
         return m_tm->getBorrowStockList();
     }
 
     /**
-     * 存入资金
-     * @param datetime 存入时间
-     * @param cash 存入的资金量
+     * Deposit funds
+     * @param datetime deposit time
+     * @param cash deposited amount
      * @return true | false
      */
     virtual bool checkin(const Datetime& datetime, price_t cash) override {
@@ -210,9 +213,9 @@ public:
     }
 
     /**
-     * 取出资金
-     * @param datetime 取出时间
-     * @param cash 取出的资金量
+     * Withdraw funds
+     * @param datetime withdrawal time
+     * @param cash withdrawn amount
      * @return true | false
      */
     virtual bool checkout(const Datetime& datetime, price_t cash) override {
@@ -220,11 +223,11 @@ public:
     }
 
     /**
-     * 存入资产
-     * @param datetime 存入日期
-     * @param stock 待存入的股票
-     * @param price 存入股票的每股价格
-     * @param number 存入股票的数量
+     * Deposit assets
+     * @param datetime deposit date
+     * @param stock the stock to deposit
+     * @param price price per share of the deposited stock
+     * @param number number of deposited shares
      * @return true | false
      */
     virtual bool checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
@@ -234,13 +237,13 @@ public:
     }
 
     /**
-     * 取出当前资产
-     * @param datetime 取出日期
-     * @param stock 待取出的股票
-     * @param price 取出的每股价格
-     * @param number 取出的数量
+     * Withdraw the current assets
+     * @param datetime withdrawal date
+     * @param stock the stock to withdraw
+     * @param price withdrawal price per share
+     * @param number withdrawn quantity
      * @return true | false
-     * @note 应该不会被用到
+     * @note It should never be used
      */
     virtual bool checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
                                double number) override {
@@ -249,16 +252,17 @@ public:
     }
 
     /**
-     * 买入操作
-     * @param datetime 买入时间
-     * @param stock 买入的证券
-     * @param realPrice 实际买入价格
-     * @param number 买入数量
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划买入价格
-     * @param from 记录是哪个系统部件发出的买入指示
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Buy operation
+     * @param datetime buy time
+     * @param stock the security to buy
+     * @param realPrice actual buy price
+     * @param number buy quantity
+     * @param stoploss stop-loss price
+     * @param goalPrice target price
+     * @param planPrice planned buy price
+     * @param from records which system part issued the buy instruction
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord buy(const Datetime& datetime, const Stock& stock, price_t realPrice,
                             double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
@@ -270,16 +274,17 @@ public:
     }
 
     /**
-     * 卖出操作
-     * @param datetime 卖出时间
-     * @param stock 卖出的证券
-     * @param realPrice 实际卖出价格
-     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
-     * @param stoploss 新的止损价
-     * @param goalPrice 新的目标价格
-     * @param planPrice 原计划卖出价格
-     * @param from 记录是哪个系统部件发出的卖出指示
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Sell operation
+     * @param datetime sell time
+     * @param stock the security to sell
+     * @param realPrice actual sell price
+     * @param number sell quantity; MAX_DOUBLE means selling everything
+     * @param stoploss new stop-loss price
+     * @param goalPrice new target price
+     * @param planPrice originally planned sell price
+     * @param from records which system part issued the sell instruction
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                              double number = MAX_DOUBLE, price_t stoploss = 0.0,
@@ -291,16 +296,17 @@ public:
     }
 
     /**
-     * 卖空
-     * @param datetime 卖空时间
-     * @param stock 卖空的证券
-     * @param realPrice 实际卖空价格
-     * @param number 卖出数量
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划卖空价格
-     * @param from 记录是哪个系统部件发出的买入指示
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Short sell
+     * @param datetime short sell time
+     * @param stock the security to short sell
+     * @param realPrice actual short sell price
+     * @param number sell quantity
+     * @param stoploss stop-loss price
+     * @param goalPrice target price
+     * @param planPrice planned short sell price
+     * @param from records which system part issued the buy instruction
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord sellShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                   double number, price_t stoploss = 0.0, price_t goalPrice = 0.0,
@@ -313,16 +319,17 @@ public:
     }
 
     /**
-     * 卖空后回补
-     * @param datetime 买入时间
-     * @param stock 买入的证券
-     * @param realPrice 实际买入价格
-     * @param number 卖出数量，如果是 MAX_DOUBLE, 表示全部卖出
-     * @param stoploss 止损价
-     * @param goalPrice 目标价格
-     * @param planPrice 计划买入价格
-     * @param from 记录是哪个系统部件发出的卖出指示
-     * @return 返回对应的交易记录，如果操作失败，business等于BUSINESS_INVALID
+     * Cover a short position
+     * @param datetime buy time
+     * @param stock the security to buy
+     * @param realPrice actual buy price
+     * @param number sell quantity; MAX_DOUBLE means selling everything
+     * @param stoploss stop-loss price
+     * @param goalPrice target price
+     * @param planPrice planned buy price
+     * @param from records which system part issued the sell instruction
+     * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
+     *         failed
      */
     virtual TradeRecord buyShort(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                  double number = MAX_DOUBLE, price_t stoploss = 0.0,
@@ -336,9 +343,9 @@ public:
     }
 
     /**
-     * 借入资金，从其他来源借取的资金，如融资
-     * @param datetime 借入时间
-     * @param cash 借入的现金
+     * Borrow funds, the funds borrowed from other sources, such as margin financing
+     * @param datetime borrow time
+     * @param cash borrowed cash
      * @return true | false
      */
     virtual bool borrowCash(const Datetime& datetime, price_t cash) override {
@@ -346,9 +353,9 @@ public:
     }
 
     /**
-     * 归还资金
-     * @param datetime 归还日期
-     * @param cash 归还现金
+     * Return the funds
+     * @param datetime return date
+     * @param cash returned cash
      * @return true | false
      */
     virtual bool returnCash(const Datetime& datetime, price_t cash) override {
@@ -356,11 +363,11 @@ public:
     }
 
     /**
-     * 借入证券
-     * @param datetime 借入时间
-     * @param stock 借入的stock
-     * @param price 借入时单股价格
-     * @param number 借入时数量
+     * Borrow securities
+     * @param datetime borrow time
+     * @param stock the borrowed stock
+     * @param price price per share at borrowing
+     * @param number quantity at borrowing
      * @return true | false
      */
     virtual bool borrowStock(const Datetime& datetime, const Stock& stock, price_t price,
@@ -370,11 +377,11 @@ public:
     }
 
     /**
-     * 归还证券
-     * @param datetime 归还时间
-     * @param stock 归还的stock
-     * @param price 归还时单股价格
-     * @param number 归还数量
+     * Return the securities
+     * @param datetime return time
+     * @param stock the returned stock
+     * @param price price per share at returning
+     * @param number returned quantity
      * @return true | false
      */
     virtual bool returnStock(const Datetime& datetime, const Stock& stock, price_t price,
@@ -384,20 +391,20 @@ public:
     }
 
     /**
-     * 获取账户当前时刻的资产详情
-     * @param ktype 日期的类型
-     * @return 资产详情
+     * Get the asset detail of the account at the current moment
+     * @param ktype the type of the date
+     * @return asset detail
      */
     virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override {
         return m_tm->getFunds(ktype);
     }
 
     /**
-     * 获取指定时刻的资产市值详情
-     * @param datetime 必须大于帐户建立的初始日期，或为Null<Datetime>()
-     * @param ktype 日期的类型
-     * @return 资产详情
-     * @note 当datetime等于Null<Datetime>()时，与getFunds(KType)同
+     * Get the asset market value detail at the given moment
+     * @param datetime it must be greater than the account creation date, or Null<Datetime>()
+     * @param ktype the type of the date
+     * @return asset detail
+     * @note When datetime equals Null<Datetime>() it is the same as getFunds(KType)
      */
     virtual FundsRecord getFunds(const Datetime& datetime,
                                  KQuery::KType ktype = KQuery::DAY) override {
@@ -405,41 +412,44 @@ public:
     }
 
     /**
-     * 直接加入交易记录
-     * @note 如果加入初始化账户记录，将清除全部已有交易及持仓记录
-     * @param tr 待加入的交易记录
-     * @return bool true 成功 | false 失败
+     * Add a trade record directly
+     * @note If an account initialization record is added, all the existing trade and position
+     *       records are cleared
+     * @param tr the trade record to add
+     * @return bool true success | false failure
      */
     virtual bool addTradeRecord(const TradeRecord& tr) override {
         return (tr.datetime >= m_run_start) ? m_tm->addTradeRecord(tr) : false;
     }
 
     /**
-     * 直接加入持仓记录
-     * @param pr 持仓记录
-     * @return true 成功
-     * @return false 失败
+     * Add a position record directly
+     * @param pr position record
+     * @return true success
+     * @return false failure
      */
     virtual bool addPosition(const PositionRecord& pr) override {
         return m_tm->addPosition(pr);
     }
 
-    /** 字符串输出 */
+    /** String output */
     virtual string str() const override {
         return m_tm->str();
     }
 
     /**
-     * 以csv格式输出交易记录、未平仓记录、已平仓记录、资产净值曲线
-     * @param path 输出文件所在目录
+     * Output the trade records, the open positions, the closed positions and the net asset value
+     * curve in the csv format
+     * @param path the directory of the output files
      */
     virtual void tocsv(const string& path) override {
         m_tm->tocsv(path);
     }
 
     /**
-     * 从订单代理实例同步当前账户资产信息（包含资金、持仓等）
-     * @param broker 订单代理实例
+     * Synchronize the current account asset information (including the funds, the positions, etc.)
+     * from the order broker instance
+     * @param broker the order broker instance
      */
     virtual void fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
                                           const Datetime& datetime = Null<Datetime>()) override {
@@ -451,7 +461,7 @@ private:
     Datetime m_run_start;
 
 //============================================
-// 序列化支持
+// Serialization support
 //============================================
 #if HKU_SUPPORT_SERIALIZATION
     friend class boost::serialization::access;

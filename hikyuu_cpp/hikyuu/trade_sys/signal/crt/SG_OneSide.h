@@ -15,20 +15,21 @@
 namespace hku {
 
 /**
- * 根据输入指标构建单边信号（单纯的只包含买入或卖出信号），如果指标值大于0，则加入信号
- * @param ind 指示指标
- * @param is_buy 加入的是买入信号还是卖出信号
- * @return 信号指示器
+ * Build a one-sided signal (containing the buy or the sell signals only) from the input indicator;
+ * a signal is added if the indicator value is greater than 0
+ * @param ind the indicating indicator
+ * @param is_buy whether the added signal is a buy or a sell signal
+ * @return signal generator
  * @ingroup Signal
  */
 SignalPtr HKU_API SG_OneSide(const Indicator& ind, bool is_buy);
 
-/** 生成单边买入信号 */
+/** Generate a one-sided buy signal */
 inline SignalPtr SG_Buy(const Indicator& ind) {
     return SG_OneSide(ind, true);
 }
 
-/** 生成单边卖出信号 */
+/** Generate a one-sided sell signal */
 inline SignalPtr SG_Sell(const Indicator& ind) {
     return SG_OneSide(ind, false);
 }

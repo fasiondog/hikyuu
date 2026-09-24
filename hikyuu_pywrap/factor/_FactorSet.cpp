@@ -12,30 +12,30 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_FactorSet(py::module& m) {
-    py::class_<FactorSet>(m, "FactorSet", "因子元数据")
+    py::class_<FactorSet>(m, "FactorSet", "The factor metadata")
       .def(py::init<>(), R"(__init__(self)
     
-    默认构造函数，创建空的因子集)")
+    The default constructor, creating an empty factor set)")
 
       .def(py::init<const string&, const KQuery::KType&, const Block&>(), py::arg("name"),
            py::arg("ktype") = KQuery::DAY, py::arg("block") = Block(),
            R"(__init__(self, name[, ktype=KQuery.DAY[, block=Block()]])
     
-    构造函数，创建指定名称和类型的因子集
+    The constructor creating the factor set with the specified name and type
 
-    :param str name: 因子集名称
-    :param KQuery.KType ktype: K线类型，默认为日线
-    :param Block block: 板块信息，证券集合，默认为空)")
+    :param str name: the factor set name
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line
+    :param Block block: the block information, the security set, defaulting to empty)")
 
       .def(py::init<const IndicatorList&, const KQuery::KType&>(), py::arg("inds"),
            py::arg("ktype") = KQuery::DAY,
            R"(__init__(self, inds[, ktype=KQuery.DAY])
     
-    构造函数，使用指定的指标列表创建因子集合，因子名称默认为指标名称
+    The constructor creating the factor set with the specified indicator list, where the factor names default to the indicator names
 
-    :note: 同名的指标会被覆盖，最终保留最后一个同名指标
-    :param list inds: 指标列表
-    :param KQuery.KType ktype: 因子集合的K线类型，默认为日线)")
+    :note: the indicators with the same name will be overwritten, and finally the last indicator with the same name is kept
+    :param list inds: the indicator list
+    :param KQuery.KType ktype: the K-line type of the factor set, defaulting to the daily line)")
 
       .def(py::init([](const py::sequence& factors, const KQuery::KType& ktype, const Block& block,
                        const string& name) {
@@ -46,39 +46,39 @@ void export_FactorSet(py::module& m) {
            py::arg("name") = "",
            R"(__init__(self, factors[, ktype=KQuery.DAY[, block=Block(), name='']])
     
-    构造函数，使用指定的因子列表创建因子集合
+    The constructor creating the factor set with the specified factor list
 
-    :note: 同名的因子会被覆盖，最终保留最后一个同名因子
-    :param list factors: 因子列表
-    :param KQuery.KType ktype: K线类型，默认为日线
-    :param Block block: 板块，默认为空
-    :param str name: 因子集合名称，默认为空)")
+    :note: the factors with the same name will be overwritten, and finally the last factor with the same name is kept
+    :param list factors: the factor list
+    :param KQuery.KType ktype: the K-line type, defaulting to the daily line
+    :param Block block: the block, defaulting to empty
+    :param str name: the factor set name, defaulting to empty)")
 
       .def("__str__", &FactorSet::str)
       .def("__repr__", &FactorSet::str)
 
       .def_property("name", py::overload_cast<>(&FactorSet::name, py::const_),
                     py::overload_cast<const string&>(&FactorSet::name),
-                    py::return_value_policy::copy, "因子名称")
+                    py::return_value_policy::copy, "The factor name")
       .def_property("ktype", py::overload_cast<>(&FactorSet::ktype, py::const_),
                     py::overload_cast<const string&>(&FactorSet::ktype),
-                    py::return_value_policy::copy, "因子频率类型")
+                    py::return_value_policy::copy, "The factor frequency type")
 
       .def_property("block", py::overload_cast<>(&FactorSet::block, py::const_),
                     py::overload_cast<const Block&>(&FactorSet::block),
-                    py::return_value_policy::copy, "因子集合对应板块")
+                    py::return_value_policy::copy, "The block corresponding to the factor set")
 
       .def("is_null", &FactorSet::isNull, R"(is_null(self)
         
-    是否为null值)")
+    Whether it is a null value)")
 
       .def("empty", &FactorSet::empty, R"(empty(self)
     
-    是否为空)")
+    Whether it is empty)")
 
       .def("clear", &FactorSet::clear, R"(clear(self))
 
-    清空因子元数据)")
+    Clear the factor metadata)")
 
       .def("have", &FactorSet::have)
       .def("remove", &FactorSet::remove)
@@ -89,7 +89,7 @@ void export_FactorSet(py::module& m) {
       .def("add", py::overload_cast<const FactorList&>(&FactorSet::add))
       .def("add", py::overload_cast<const std::map<string, Indicator>&>(&FactorSet::add))
 
-      .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy, "获取因子列表")
+      .def("get_factors", &FactorSet::getAllFactors, py::return_value_policy::copy, "Get the factor list")
 
       .def(
         "get_all_values", &FactorSet::getAllValues, py::arg("query"), py::arg("align") = false,
@@ -97,14 +97,14 @@ void export_FactorSet(py::module& m) {
         py::arg("align_dates") = DatetimeList{},
         R"(get_all_values(self, query[, align=False[, fill_null=False[, tovalue=True[, align_dates=DatetimeList()]]]])
     
-    获取所有因子的指定查询参数的计算结果
+    Get the calculation results of all the factors with the specified query parameters
 
-    :param Query query: 查询参数
-    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
-    :param bool fill_null: 是否填充空值，默认 False
-    :param bool tovalue: 是否转换为数值，默认 True
-    :param DatetimeList align_dates: 对齐日期列表，默认为空
-    :return: 所有因子的计算结果列表
+    :param Query query: the query parameters
+    :param bool align: whether to align the dates (e.g. by the specified align_dates or the default trading calendar), defaulting to False
+    :param bool fill_null: whether to fill the empty values, defaulting to False
+    :param bool tovalue: whether to convert to the values, defaulting to True
+    :param DatetimeList align_dates: the aligned date list, defaulting to empty
+    :return: the list of the calculation results of all the factors
     :rtype: list)")
 
       .def(
@@ -120,44 +120,44 @@ void export_FactorSet(py::module& m) {
         py::arg("align_dates") = DatetimeList{},
         R"(get_values(self, stocks, query[, align=False[, fill_null=False[, tovalue=False[, check=False[, align_dates=DatetimeList()]]]]])
     
-    获取指定股票列表的指定查询参数的计算结果
+    Get the calculation results of the specified stock list with the specified query parameters
 
-    :param list stocks: 证券列表
-    :param Query query: 查询参数
-    :param bool align: 是否进行日期对齐(如按指定align_dates或默认交易日历)，默认 False
-    :param bool fill_null: 是否填充空值，默认 False
-    :param bool tovalue: 是否转换为数值，默认 False
-    :param bool check: 是否检查股票列表属于自身指定的 block，默认 False
-    :param DatetimeList align_dates: 对齐日期列表，默认为空
-    :return: 按股票顺序排列的计算结果列表
+    :param list stocks: the security list
+    :param Query query: the query parameters
+    :param bool align: whether to align the dates (e.g. by the specified align_dates or the default trading calendar), defaulting to False
+    :param bool fill_null: whether to fill the empty values, defaulting to False
+    :param bool tovalue: whether to convert to the values, defaulting to False
+    :param bool check: whether to check that the stock list belongs to the block specified by itself, defaulting to False
+    :param DatetimeList align_dates: the aligned date list, defaulting to empty
+    :return: the list of the calculation results arranged by the stock order
     :rtype: list)")
 
       .def("save_to_db", &FactorSet::save_to_db,
            R"(save_to_db(self)
     
-    保存因子集到数据库
+    Save the factor set to the database
     
-    :note: 以 name + ktype 作为唯一标识)")
+    :note: with name + ktype as the unique identifier)")
 
       .def("remove_from_db", &FactorSet::remove_from_db,
            R"(remove_from_db(self)
     
-    从数据库中删除因子集
+    Delete the factor set from the database
     
-    :note: 以 name + ktype 作为唯一标识)")
+    :note: with name + ktype as the unique identifier)")
 
       .def("load_from_db", &FactorSet::load_from_db,
            R"(load_from_db(self)
     
-    从数据库中加载因子集
+    Load the factor set from the database
     
-    :note: 以 name + ktype 作为唯一标识，如果不存在则不修改当前对象)")
+    :note: with name + ktype as the unique identifier; if it does not exist, the current object is not modified)")
 
       .def("__getitem__", py::overload_cast<const string&>(&FactorSet::get, py::const_),
            py::return_value_policy::copy)
       .def("__getitem__", py::overload_cast<size_t>(&FactorSet::get, py::const_),
            py::return_value_policy::copy)
-      .def("__len__", &FactorSet::size, "包含的因子数量")
+      .def("__len__", &FactorSet::size, "The number of the contained factors")
       .def(
         "__iter__",
         [](const FactorSet& self) { return py::make_iterator(self.begin(), self.end()); },

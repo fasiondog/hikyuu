@@ -13,7 +13,7 @@
 
 namespace hku {
 
-/* 获取换手率，等于 VOL(k) / CAPITAL(k) */
+/* Get the turnover rate, it equals VOL(k) / CAPITAL(k) */
 class IHsl : public IndicatorImp {
     INDICATOR_IMP(IHsl)
     INDICATOR_IMP_NO_PRIVATE_MEMBER_SERIALIZATION

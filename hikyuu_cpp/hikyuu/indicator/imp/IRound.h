@@ -16,7 +16,7 @@
 namespace hku {
 
 /**
- * 四舍五入
+ * Rounding
  */
 class IRound : public IndicatorImp {
     INDICATOR_IMP(IRound)

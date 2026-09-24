@@ -16,7 +16,7 @@
 namespace hku {
 
 /*
- * 存在, EXIST(X,N) 表示条件X在N周期有存在
+ * Existence, EXIST(X,N) means the condition X exists within N periods
  */
 class IExist : public IndicatorImp {
     INDICATOR_IMP(IExist)

@@ -1,0 +1,248 @@
+.. py:currentmodule:: hikyuu.indicator
+.. highlight:: python
+
+技术指标总览
+============
+
+**辅助类指标**
+
+* :py:func:`ALIGN` - 按指定的参考日期对齐
+* :py:func:`CODELIKE` - 证券代码模式匹配
+* :py:func:`CYCLE` - PF调仓周期指标，主要用于PF调仓日验证，及作为SG
+* :py:func:`CVAL` - 创建指定长度的固定数值指标
+* :py:func:`CONTEXT` - 独立上下文
+* :py:func:`DISCARD` - 以指标公式的方式设置指标结果的丢弃数据量。
+* :py:func:`DROPNA` - 删除 nan 值
+* :py:func:`FIXED_START_INDEX` - [捐赠用户]固定指标计算时使用的查询范围的起始索引
+* :py:func:`FIXED_START_DATE` - [捐赠用户]固定指标计算时使用的查询范围的起始日期
+* :py:func:`INBLOCK` - 当前上下文证券是否在指定的板块中。
+* :py:func:`ISNA` - 判断是否为 nan 值
+* :py:func:`ISINF` - 判断是否为 +inf 值
+* :py:func:`ISINFA` - 判断是否为 -inf 值
+* :py:func:`JUMPDOWN` - 边缘跳变，从大于 0.0，跳变到 <= 0.0（下降沿）
+* :py:func:`JUMPUP` - 边缘跳变，从小于等于 0.0，跳变到 > 0.0（上升沿）
+* :py:func:`LASTVALUE` - 等同于通达信 CONST 指标。取输入指标最后值为常数, 即结果中所有值均为输入指标的最后值, 谨慎使用。含未来函数, 谨慎使用。
+* :py:func:`NAMELIKE` - 证券名称模式匹配
+* :py:func:`PRICELIST` - 将PriceList或Indicator的结果集包装为Indicator，同名 VALUE
+* :py:func:`REF` - 向前引用 （即右移），引用若干周期前的数据
+* :py:func:`REFX` - REF增强, 可左移或右移。左移时为未来函数，勿用于回测。
+* :py:func:`REPLACE` - 替换指标中指定值，默认为替换 nan 值为 0.0
+* :py:func:`RESULT` - 以指标公式的方式返回指定指标中相应的结果集
+* :py:func:`SLICE` - 获取某指标中指定范围 [start, end) 的数据，生成新的指标
+* :py:func:`WEAVE` - 将两个ind的结果合并到一个ind中
+* :py:func:`WITHKTYPE` - [捐赠用户]将指标数据转换到指定的K线类型。相关便捷函数: WITHWEEK, WITHMONTH, WITHQUARTER, WITHYEAR, WITHMIN, WITHMIN5 ...
+* :py:func:`ZSCORE` - ZScore 标准化
+
+
+**行情指标**
+
+* :py:func:`KDATA` - 包装KData成Indicator，用于其他指标计算
+* :py:func:`KDATA_PART` - 根据字符串选择返回指标KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL
+* :py:func:`OPEN`  - 包装KData的开盘价成Indicator
+* :py:func:`HIGH`  - 包装KData的最高价成Indicator
+* :py:func:`LOW`   - 包装KData的最低价成Indicator
+* :py:func:`CLOSE` - 包装KData的收盘价成Indicator
+* :py:func:`AMO`   - 包装KData的成交金额成Indicator
+* :py:func:`VOL`   - 包装KData的成交量成Indicator
+* :py:func:`ADJ_FACTOR` - 复权因子（配合因子管理系统使用）
+* :py:func:`ADJ_OPEN` - 复权开盘价
+* :py:func:`ADJ_HIGH` - 复权最高价
+* :py:func:`ADJ_LOW` - 复权最低价
+* :py:func:`ADJ_CLOSE` - 复权收盘价
+* :py:func:`ADJ_VOL` - 复权成交量
+* :py:func:`RECOVER_FORWARD` - 前向复权
+* :py:func:`RECOVER_BACKWARD` - 后向复权
+* :py:func:`RECOVER_EQUAL_FORWARD` - 等比前向复权
+* :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后向复权
+* :py:func:`FINANCE` - 历史财务信息
+* :py:func:`HSL` - 换手率
+* :py:func:`CAPITAL` - 流通盘，同名：LIUTONGPAN
+* :py:func:`TIMELINE`   - 分时价格
+* :py:func:`TIMELINEVOL`   - 分时成交量
+* :py:func:`ZHBOND10` - 10年期中国国债收益率
+* :py:func:`ZONGGUBEN` - 总股本
+* :py:func:`STKTYPE` - 股票类型指标
+* :py:func:`ISLIMITUP` - 判断是否涨停
+* :py:func:`ISLIMITDOWN` - 判断是否跌停
+    
+
+**大盘指标**
+
+* :py:func:`ADVANCE` - 上涨家数
+* :py:func:`DECLINE` - 下跌家数
+* :py:func:`INDEXO` - 返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXH` - 返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXL` - 返回对应的大盘最低价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXC` - 返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXA` - 返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXV` - 返回对应的大盘成交量,分别是上证指数,深证成指,科创50,创业板指
+* :py:func:`INDEXADV` - 通达信 880005 大盘上涨家数, 可能无法盘中更新!
+* :py:func:`INDEXDEC` - 通达信 880005 大盘下跌家数, 可能无法盘中更新!
+
+
+**逻辑算术函数**
+
+指标本身直接支持 "+"、"-"、"*" 、"/"、"&"（与）、"|"（或）、"<"、">"、"<="、">="、"=="、"!=" 操作。
+
+* :py:func:`BETWEEN` - 介于(介于两个数之间)
+* :py:func:`CEILING` - 向上舍入(向数值增大方向舍入)取整
+* :py:func:`CROSS` - 交叉函数
+* :py:func:`DOWNNDAY` - 连跌周期数
+* :py:func:`EVERY` - 一直存在
+* :py:func:`EXIST` - 存在, EXIST(X,N) 表示条件X在N周期有存在
+* :py:func:`FLOOR` - 向下舍入(向数值减小方向舍入)取整
+* :py:func:`IF` - 根据条件求不同的值
+* :py:func:`INTPART` - 取整(绝对值减小取整，即取得数据的整数部分)
+* :py:func:`LAST` - 区间存在
+* :py:func:`LONGCROSS` - 两条线维持一定周期后交叉
+* :py:func:`NOT` - 求逻辑非
+* :py:func:`UPNDAY` - 连涨周期数
+* :py:func:`NDAY` - 连大
+
+
+**数学指标**
+
+* :py:func:`ABS` - 求绝对值
+* :py:func:`ACOS` - 反余弦值
+* :py:func:`ASIN` - 反正弦值
+* :py:func:`ATAN` - 反正切值
+* :py:func:`COS` - 余弦值
+* :py:func:`EXP` - e的X次幂
+* :py:func:`LN` - 求自然对数, LN(X)以e为底的对数
+* :py:func:`LOG` - 以10为底的对数
+* :py:func:`MAX` - 最大值
+* :py:func:`MIN` - 最小值
+* :py:func:`MOD` - 取整后求模。该函数仅为兼容通达信。实际上，指标求模可直接使用 % 操作符。
+* :py:func:`POW` - 乘幂
+* :py:func:`SIGNED_POWER` - 带符号乘幂
+* :py:func:`REVERSE` - 求相反数
+* :py:func:`ROUND` - 四舍五入
+* :py:func:`ROUNDUP` -  向上截取，如10.1截取后为11
+* :py:func:`ROUNDDOWN` - 向下截取，如10.1截取后为10
+* :py:func:`SIN` - 正弦值
+* :py:func:`SGN` - 求符号值
+* :py:func:`SLOPE` - 计算线性回归斜率、拟合优度R²和相对最大残差
+* :py:func:`SQRT` - 开平方
+* :py:func:`TAN` - 正切值
+
+**统计指标**
+
+* :py:func:`AVEDEV` - 平均绝对偏差
+* :py:func:`BETA` - Beta系数，衡量资产收益与市场收益之间的敏感性
+* :py:func:`DEVSQ` - 数据偏差平方和
+* :py:func:`STD` - 估算标准差，同 STDEV
+* :py:func:`STDEV` - 计算N周期内样本标准差
+* :py:func:`STDP` - 总体标准差
+* :py:func:`VAR` - 估算样本方差
+* :py:func:`VARP` - 总体样本方差
+* :py:func:`CORR` - 样本相关系数与协方差
+* :py:func:`COV` - 样本协方差
+* :py:func:`SPEARMAN` - Spearman相关系数
+* :py:func:`SKEW` - 总体偏度
+* :py:func:`KURT` - 超额峰度
+
+**横向统计**
+
+* :py:func:`BLOCKSETNUM` - 返回板块股个数
+* :py:func:`INSUM` - 返回板块各成分该指标相应输出按计算类型得到的计算值.计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-排名(1对应指标值最低), 5-排名(从1开始对应指标值最高).
+* :py:func:`RANK` - [捐赠用户]计算指标值在指定板块中的排名
+
+**技术指标**
+
+* :py:func:`AD` - 累积/派发线
+* :py:func:`ADX` - 平均趋向指数（Average Directional Index），趋势强度指标（Wilder平滑）
+* :py:func:`ADX2` - 平均趋向指数（ADX2），趋势强度指标（EMA平滑）
+* :py:func:`AMA` - 佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
+* :py:func:`ATR` - 平均真实波动幅度，真实波动幅度 TR 的简单移动均值
+* :py:func:`BACKSET` - 向前赋值将当前位置到若干周期前的数据设为1
+* :py:func:`BARSCOUNT` - 有效值周期数, 求总的周期数。
+* :py:func:`BARSLAST` - 上一次条件成立位置, 上一次条件成立到当前的周期数
+* :py:func:`BARSLASTS` - 第N次条件成立位置到当前的周期数（支持动态参数）
+* :py:func:`BARSLASTCOUNT` - 统计连续满足条件的周期数
+* :py:func:`BARSSINCE` - 第一个条件成立位置到当前的周期数
+* :py:func:`COUNT` - 统计满足条件的周期数
+* :py:func:`COST` - 成本分布
+* :py:func:`DIFF` - 差分指标，即data[i] - data[i-n]
+* :py:func:`DMA` - 动态移动平均
+* :py:func:`EMA` - 指数移动平均线(Exponential Moving Average)
+* :py:func:`FILTER` - 信号过滤, 过滤连续出现的信号
+* :py:func:`HHV` - N日内最高价
+* :py:func:`HHVBARS` - 上一高点位置 求上一高点到当前的周期数
+* :py:func:`KALMAN` - 卡尔曼滤波
+* :py:func:`KDJ` - 经典随机指标
+* :py:func:`LLV` - N日内最低价
+* :py:func:`LLVBARS` - 上一低点位置 求上一低点到当前的周期数
+* :py:func:`MA`  - 简单移动平均数
+* :py:func:`MACD` - 平滑异同移动平均线
+* :py:func:`MDD` - 最大回撤百分比
+* :py:func:`MDD_CURRENT` - 当前点到历史最高点的回撤百分比
+* :py:func:`ROC` - 变动率指标: ((price / prevPrice)-1)*100
+* :py:func:`ROCP` - 变动率指标: (price - prevPrice) / prevPrice
+* :py:func:`ROCR` - 变动率指标: (price / prevPrice)
+* :py:func:`ROCR100` - 变动率指标: (price / prevPrice) * 100
+* :py:func:`RSRS_BULL` - RSRS 右偏标准分指标（层级4），基于光大研报进阶版修正 RSRS
+* :py:func:`RSRS_BETA` - 原始 RSRS（底层 β）指标，基于滚动N日OLS回归
+* :py:func:`RSI` - 相对强弱指标
+* :py:func:`SMA` - 移动平均线
+* :py:func:`SAFTYLOSS` - 亚历山大 艾尔德安全地带止损线
+* :py:func:`SUM` - 求总和
+* :py:func:`SUMBARS` - 累加到指定周期数, 向前累加到指定值到现在的周期数
+* :py:func:`TR` - 真实波动幅度
+* :py:func:`TS_RANK` - 时间序列排名（Alpha101），计算当前值在过去N个周期内的排名比例
+* :py:func:`VIGOR` - 亚历山大.艾尔德力度指数
+
+
+**时间指标**
+
+* :py:func:`DATE` - 取得该周期从1900以来的年月日
+* :py:func:`TIME` - 取得该周期的时分秒
+* :py:func:`YEAR` - 取得该周期的年份
+* :py:func:`MONTH` - 取得该周期的月份
+* :py:func:`WEEK` - 取得该周期的星期数，函数返回有效值范围为(0-6)，0表示星期天
+* :py:func:`DAY` - 取得该周期的日期
+* :py:func:`HOUR` - 取得该周期的小时数
+* :py:func:`MINUTE` - 取得该周期的分钟数
+
+**因子类指标**
+
+* :py:func:`FACTOR` - 因子指标转换，将Factor对象转换为Indicator
+* :py:func:`IC` - 计算因子 IC 值
+* :py:func:`IR` - 用于计算账户收益与参照收益的IR
+* :py:func:`ICIR` - 计算因子 IC 的 IR 值
+
+
+**聚合指标[捐赠用户]**
+
+* :py:func:`AGG_COUNT` - 聚合函数: 非空值计数
+* :py:func:`AGG_MAD` - 聚合函数: 平均绝对偏差
+* :py:func:`AGG_MAX` - 聚合函数: 最大值
+* :py:func:`AGG_MIN` - 聚合函数: 最大值
+* :py:func:`AGG_MEAN` - 聚合函数: 平均值
+* :py:func:`AGG_MEDIAN` - 聚合函数: 中位数
+* :py:func:`AGG_PROD` - 聚合函数: 乘积
+* :py:func:`AGG_SAMPLE` - 聚合函数: 时间采样（在指定时间点对指标数据进行采样）
+* :py:func:`AGG_SAMPLE_MAX` - 聚合函数: 时间段最大值（在指定时间段内统计指标数据的最大值）
+* :py:func:`AGG_SAMPLE_MIN` - 聚合函数: 时间段最小值（在指定时间段内统计指标数据的最小值）
+* :py:func:`AGG_SAMPLE_MEAN` - 聚合函数: 时间段平均值（在指定时间段内统计指标数据的平均值）
+* :py:func:`AGG_SUM` - 聚合函数: 总和
+* :py:func:`AGG_STD` - 聚合函数: 标准差
+* :py:func:`AGG_VAR` - 聚合函数: 方差
+* :py:func:`AGG_QUANTILE` - 聚合函数: 分位数
+* :py:func:`AGG_VWAP` - 聚合函数: 成交量加权平均价
+* :py:func:`AGG_FUNC` - 聚合函数: 自定义聚合函数
+
+**分组指标[捐赠用户]**
+
+* :py:func:`GROUP_COUNT` - 分组函数: 非空值计数
+* :py:func:`GROUP_MAX` - 分组函数: 分组累计最大值
+* :py:func:`GROUP_MIN` - 分组函数: 分组累计最小值
+* :py:func:`GROUP_MEAN` - 分组函数: 分组累计平均值
+* :py:func:`GROUP_PROD` - 分组函数: 分组累计乘积
+* :py:func:`GROUP_SUM` - 分组函数: 分组累计总和
+* :py:func:`GROUP_FUNC` - 分组函数: 自定义分组计算函数
+
+
+**其他转换辅助**
+
+* :py:func:`concat_to_df` - 合并指标列表为 DateFrame
+* :py:func:`df_to_ind` - 将 DataFrame 指定列转为指标

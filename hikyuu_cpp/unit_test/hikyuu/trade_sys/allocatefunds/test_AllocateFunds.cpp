@@ -20,7 +20,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_AllocateFunds") {
     SEPtr se = SE_Fixed();
     AFPtr af = AF_EqualWeight();
@@ -33,20 +33,20 @@ TEST_CASE("test_AllocateFunds") {
     SystemList ac_list;
     SystemWeightList sw_list;
 
-    /** @arg 测试setTM */
+    /** @arg Test setTM */
     CHECK_UNARY(!af->getTM());
     af->setTM(tm);
     CHECK_UNARY(af->getTM());
 
-    /** @arg 测试clone */
+    /** @arg Test clone */
     AFPtr af2 = af->clone();
     CHECK_NE(af2.get(), af.get());
     CHECK_EQ(af2->name(), af->name());
 
     //----------------------------------------------------
-    // 测试对计划权重的调整
+    // Test the adjustment of the planned weights
     //----------------------------------------------------
-    /** @arg 不自动调整 auto_adjust = false  */
+    /** @arg No automatic adjustment with auto_adjust = false */
     SystemWeightList sw(10);
     SystemWeightList expect_sw(10);
     for (size_t i = 0; i < 10; i++) {

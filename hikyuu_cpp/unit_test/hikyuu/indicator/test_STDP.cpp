@@ -21,9 +21,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_STDP") {
-    /** @arg n > 1 的正常情况 */
+    /** @arg The normal case with n > 1 */
     PriceList d;
     for (size_t i = 0; i < 15; ++i) {
         d.push_back(i + 1);
@@ -43,7 +43,7 @@ TEST_CASE("test_STDP") {
         CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.0001));
     }
 
-    /** @arg n = 1时 */
+    /** @arg When n = 1 */
     CHECK_THROWS_AS(STDP(ind, 1), std::exception);
 
     /** @arg operator() */
@@ -56,7 +56,7 @@ TEST_CASE("test_STDP") {
     }
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_STDP_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -89,7 +89,7 @@ TEST_CASE("test_STDP_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_STDP_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

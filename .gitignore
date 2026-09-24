@@ -75,6 +75,7 @@
 .copilot*
 .github/copilot-instructions.md
 .cache
+.pytest_cache
 
 nohup.out
 temp
@@ -88,6 +89,7 @@ hikyuu.code-workspace
 /install
 /build
 /docs/build
+/docs/_build
 /docs/notepad-workspace
 /docs/design
 /cppcheck-cppcheck-build-dir

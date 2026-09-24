@@ -63,7 +63,7 @@ inline Datetime pydatetime_to_Datetime(const pybind11::object& source) {
         throw std::invalid_argument("Can't convert this python object to Datetime!");
     }
 
-    // Datetime 最小只到 1400年 1 月 1日，最大只到 9999 年 12月 31 日 0点
+    // Datetime only goes down to January 1, 1400 and up to 0:00 on December 31, 9999
     if (year < 1400) {
         value = Datetime::min();
     } else if (Datetime(year, month, day) == Datetime::max()) {
@@ -165,7 +165,7 @@ public:
                 value = vect;
 
             } else {
-                // 尝试 python 原生 datetime 的转换
+                // Try the conversion of the native python datetime
                 std::vector<Datetime> vect(total);
                 for (size_t i = 0; i < total; i++) {
                     vect[i] = pydatetime_to_Datetime(pyseq[i]);

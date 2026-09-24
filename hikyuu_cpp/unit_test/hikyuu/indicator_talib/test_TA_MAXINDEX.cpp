@@ -20,13 +20,13 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAXINDEX") {
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_MAXINDEX(1));
     CHECK_THROWS(TA_MAXINDEX(100001));
 
-    /** @arg 正常数据 */
+    /** @arg The normal data */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
         a.push_back(i / 10);
@@ -44,7 +44,7 @@ TEST_CASE("test_TA_MAXINDEX") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg 计算数据的 discard 不为0 */
+    /** @arg The discard of the calculated data is not 0 */
     data = TA_MA(getKData("sh000001", KQuery(-10)).close(), 3);
     CHECK_EQ(data.discard(), 2);
     result = TA_MAXINDEX(data, 3);
@@ -60,7 +60,7 @@ TEST_CASE("test_TA_MAXINDEX") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_MAXINDEX_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

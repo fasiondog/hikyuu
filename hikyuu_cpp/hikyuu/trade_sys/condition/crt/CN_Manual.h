@@ -12,7 +12,7 @@
 namespace hku {
 
 /**
- * 仅能手工添加有效性的CN，用于测试或其他特殊用途
+ * A CN whose validity can only be added manually, used for the testing or other special purposes
  * @return CNPtr
  */
 CNPtr HKU_API CN_Manual();

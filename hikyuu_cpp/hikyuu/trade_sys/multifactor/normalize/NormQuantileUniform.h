@@ -12,7 +12,7 @@
 namespace hku {
 
 /*
- * 分位数均匀分布标准化
+ * Quantile uniform distribution standardization
  */
 class NormQuantileUniform : public NormalizeBase {
     NORMALIZE_IMP(NormQuantileUniform)

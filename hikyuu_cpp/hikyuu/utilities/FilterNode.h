@@ -19,7 +19,7 @@
 namespace hku {
 
 /**
- * @brief 过滤节点
+ * @brief Filter node
  */
 class FilterNode {
 public:
@@ -28,8 +28,9 @@ public:
     virtual ~FilterNode() = default;
 
     /**
-     * @brief 构造函数
-     * @param exclusive 是否排他。为 true 时，只执行第一个遇到的满足过滤条件的子节点
+     * @brief Constructor
+     * @param exclusive whether it is exclusive. When it is true only the first encountered child
+     * node satisfying the filter condition is executed
      */
     explicit FilterNode(bool exclusive) : m_exclusive(exclusive) {}
 
@@ -69,8 +70,9 @@ public:
     }
 
     /**
-     * @brief 设置排他模式
-     * @param exclusive true: 只执行第一个匹配的子节点；false: 执行所有匹配的子节点
+     * @brief Set the exclusive mode
+     * @param exclusive true: only the first matching child node is executed; false: all the
+     * matching child nodes are executed
      */
     void exclusive(bool exclusive) {
         m_exclusive = exclusive;
@@ -169,9 +171,11 @@ inline const any_t& FilterNode::value() const {
 typedef std::shared_ptr<FilterNode> FilterNodePtr;
 
 /**
- * @brief 绑定过滤节点，通过 std::function 绑定自定义的 filter 和 process 处理函数
- * @note 使用默认构造函数创建时，m_filter 和 m_process 为空，filter() 返回 true，process()
- * 不执行任何操作
+ * @brief Bind a filter node; the custom filter and process handler functions are bound through
+ * std::function
+ * @note When it is created with the default constructor, m_filter and m_process are empty, filter()
+ *       returns true and process()
+ *       does not perform any operation
  */
 class BindFilterNode : public FilterNode {
 public:
@@ -207,22 +211,23 @@ private:
 };
 
 /**
- * @brief 异步串行事件处理器
- * @tparam EventT 事件类型，需要支持哈希和相等比较
- * @note 所有事件处理在单线程池中串行执行，保证同一时刻只有一个事件在处理
+ * @brief Asynchronous serial event processor
+ * @tparam EventT the event type, it needs to support hashing and equality comparison
+ * @note All the event processing is executed serially in a single thread pool, guaranteeing that
+ * only one event is being processed at the same moment
  */
 template <class EventT>
 class AsyncSerialEventProcessor {
 public:
     /**
-     * @brief 构造函数
-     * @param quit_wait 退出时等待所有任务完成
+     * @brief Constructor
+     * @param quit_wait wait for all the tasks to be finished on exit
      */
     explicit AsyncSerialEventProcessor(bool quit_wait = true) : m_quit_wait(quit_wait) {
         m_tg = std::unique_ptr<ThreadPool>(new ThreadPool(1));
     }
 
-    /** 析构函数 */
+    /** Destructor */
     virtual ~AsyncSerialEventProcessor() {
         if (m_quit_wait) {
             m_tg->join();
@@ -232,11 +237,11 @@ public:
     }
 
     /**
-     * @brief 添加事件处理节点
+     * @brief Add an event processing node
      *
-     * @param event 事件
-     * @param action 对应的处理节点
-     * @return 返回加入的节点
+     * @param event event
+     * @param action the corresponding processing node
+     * @return the added node
      */
     FilterNodePtr addAction(const EventT& event, const FilterNodePtr& action) {
         HKU_CHECK(action, "Input action is null!");
@@ -251,10 +256,10 @@ public:
     }
 
     /**
-     * @brief 分派事件消息
+     * @brief Dispatch an event message
      *
-     * @param event 事件
-     * @param data 事件附加信息
+     * @param event event
+     * @param data the additional event information
      */
     void dispatch(const EventT& event, const any_t& data) {
         m_tg->submit([this, event, data] {

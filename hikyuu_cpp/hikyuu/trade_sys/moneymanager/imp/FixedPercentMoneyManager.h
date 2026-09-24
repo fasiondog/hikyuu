@@ -1,7 +1,7 @@
 /*
  * PercentRiskMoneyManager.h
  *
- *  Created on: 2015年4月4日
+ *  Created on: 2015-4-4
  *      Author: fasiondog
  */
 
@@ -14,10 +14,13 @@
 namespace hku {
 
 /*
- * 百分比风险模型
- * 参见：《通往财务自由之路》2008年6月 机械工业出版社 范 K.撒普（Van K. Tharp.）P312
- * 公式：P（头寸规模）＝ C（总风险）/ R（每股的风险） ［这里C现金为总风险］
- * 参数：percent：每笔交易总风险占总资产的百分比，如0.02表示总资产的2%
+ * Percentage risk model
+ * See "Financial Freedom Through Electronic Day Trading" (June 2008, China Machine Press) by Van
+ * K. Tharp, P312
+ * Formula: P (position size) = C (total risk) / R (risk per share) [here C, the cash, is the total
+ * risk]
+ * Parameter: percent: the percentage of the total risk of every trade in the total assets, e.g.
+ * 0.02 means 2% of the total assets
  */
 class HKU_API FixedPercentMoneyManager : public MoneyManagerBase {
     MONEY_MANAGER_IMP(FixedPercentMoneyManager)

@@ -71,7 +71,7 @@ public:
         HKU_CHECK(ret.shape()[0] == shape[0],
                   "The length of the return value of the Python function is inconsistent with "
                   "the input!");
-        const Indicator::value_t* data = ret.data();  // 数据指针（直接访问底层内存）
+        const Indicator::value_t* data = ret.data();  // The data pointer (accessing the underlying memory directly)
         memcpy(dst + group_start, data, total * sizeof(Indicator::value_t));
     }
 
@@ -86,13 +86,13 @@ void export_extend_Indicator(py::module& m) {
           py::arg("ind"), py::arg("start_index") = 0,
           R"(FIXED_START_INDEX([ind, start_index=0])
 
-    固定指标计算时使用的查询范围的起始索引。
+    Fix the start index of the query range used when calculating the indicator.
 
-    对某些随时间起点变化的指标（如 AD），固定起始索引确保从股票第一条数据开始计算。
+    For some indicators that change with the time start point (such as AD), fixing the start index ensures the calculation from the first data of the stock.
 
-    :param Indicator ind: 输入指标
-    :param int start_index: 起始索引位置，默认为 0；为负数时，表示从当前最新的往前移 index 个时间点开始计算
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param int start_index: the start index position, defaulting to 0; when it is negative, it means starting the calculation from the time point moved forward by index from the current latest
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def("FIXED_START_DATE", py::overload_cast<const Datetime&>(FIXED_START_DATE),
@@ -102,13 +102,13 @@ void export_extend_Indicator(py::module& m) {
           py::arg("start_date") = Datetime::min(),
           R"(FIXED_START_DATE([ind, start_date=Datetime.min()])
 
-    固定指标计算时使用的查询范围的起始日期。
+    Fix the start date of the query range used when calculating the indicator.
 
-    对某些随时间起点变化的指标（如 AD），固定起始日期确保从指定日期开始计算。
+    For some indicators that change with the time start point (such as AD), fixing the start date ensures the calculation from the specified date.
 
-    :param Indicator ind: 输入指标
-    :param Datetime start_date: 起始日期，默认为 Datetime.min()
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param Datetime start_date: the start date, defaulting to Datetime.min()
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def("WITHKTYPE", py::overload_cast<const KQuery::KType&, bool>(WITHKTYPE), py::arg("ktype"),
@@ -117,11 +117,11 @@ void export_extend_Indicator(py::module& m) {
           py::arg("ind"), py::arg("ktype"), py::arg("fill_null") = false,
           R"(WITHKTYPE([ind, ktype, fill_null])
 
-    将指标数据转换到指定周期
+    Convert the indicator data to the specified period
 
-    :param Indicator ind: 指标数据
-    :param KQuery.KType ktype: 指标周期
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param KQuery.KType ktype: the indicator period
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHDAY", py::overload_cast<bool>(WITHDAY), py::arg("fill_null") = false);
@@ -129,10 +129,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHDAY([ind, fill_null])
 
-    将指标数据转换到日线
+    Convert the indicator data to the daily line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHWEEK", py::overload_cast<bool>(WITHWEEK), py::arg("fill_null") = false);
@@ -140,10 +140,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHWEEK([ind, fill_null])
 
-    将指标数据转换到周线
+    Convert the indicator data to the weekly line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHMONTH", py::overload_cast<bool>(WITHMONTH), py::arg("fill_null") = false);
@@ -151,10 +151,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHMONTH([ind, fill_null])
 
-    将指标数据转换到月线
+    Convert the indicator data to the monthly line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHQUARTER", py::overload_cast<bool>(WITHQUARTER), py::arg("fill_null") = false);
@@ -162,10 +162,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHQUARTER([ind, fill_null])
 
-    将指标数据转换到季线
+    Convert the indicator data to the quarterly line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHHALFYEAR", py::overload_cast<bool>(WITHHALFYEAR), py::arg("fill_null") = false);
@@ -173,10 +173,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHHALFYEAR([ind, fill_null])
 
-    将指标数据转换到半年线
+    Convert the indicator data to the half-year line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHYEAR", py::overload_cast<bool>(WITHYEAR), py::arg("fill_null") = false);
@@ -184,10 +184,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHYEAR([ind, fill_null])
 
-    将指标数据转换到年线
+    Convert the indicator data to the yearly line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHMIN", py::overload_cast<bool>(WITHMIN), py::arg("fill_null") = false);
@@ -195,10 +195,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHMIN([ind, fill_null])
 
-    将指标数据转换到分钟线
+    Convert the indicator data to the minute line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHMIN5", py::overload_cast<bool>(WITHMIN5), py::arg("fill_null") = false);
@@ -206,10 +206,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHMIN5([ind, fill_null])
 
-    将指标数据转换到5分钟线
+    Convert the indicator data to the 5-minute line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHMIN15", py::overload_cast<bool>(WITHMIN15), py::arg("fill_null") = false);
@@ -217,10 +217,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHMIN15([ind, fill_null])
 
-    将指标数据转换到15分钟线
+    Convert the indicator data to the 15-minute line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHMIN30", py::overload_cast<bool>(WITHMIN30), py::arg("fill_null") = false);
@@ -228,10 +228,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHMIN30([ind, fill_null])
 
-    将指标数据转换到30分钟线
+    Convert the indicator data to the 30-minute line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHMIN60", py::overload_cast<bool>(WITHMIN60), py::arg("fill_null") = false);
@@ -239,10 +239,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHMIN60([ind, fill_null])
 
-    将指标数据转换到60分钟线
+    Convert the indicator data to the 60-minute line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHHOUR", py::overload_cast<bool>(WITHHOUR), py::arg("fill_null") = false);
@@ -250,10 +250,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHHOUR([ind, fill_null])
 
-    将指标数据转换到60分钟线
+    Convert the indicator data to the 60-minute line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHHOUR2", py::overload_cast<bool>(WITHHOUR2), py::arg("fill_null") = false);
@@ -261,10 +261,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHHOUR2([ind, fill_null])
 
-    将指标数据转换到2小时线
+    Convert the indicator data to the 2-hour line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def("WITHHOUR4", py::overload_cast<bool>(WITHHOUR4), py::arg("fill_null") = false);
@@ -272,10 +272,10 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false,
           R"(WITHHOUR4([ind, fill_null])
 
-    将指标数据转换到4小时线
+    Convert the indicator data to the 4-hour line
 
-    :param Indicator ind: 指标数据
-    :param bool fill_null: 是否填充空值
+    :param Indicator ind: the indicator data
+    :param bool fill_null: whether to fill the empty values
     :rtype: Indicator)");
 
     m.def(
@@ -298,24 +298,24 @@ void export_extend_Indicator(py::module& m) {
       py::arg("market") = "SH",
       R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
       
-    计算指标值在指定板块中的排名
+    Calculate the ranking of the indicator value in the specified block
 
-    :param stks: 指定证券列表 或 Block
-    :param ref_ind: 参考指标
-    :param mode: 排序方式: 0-降序排名(指标值最高值排名为1), 1-升序排名(指标值越大排名值越大), 2-降序排名百分比, 3-升序排名百分比, 4-降序排名百分比(0~1), 5-升序排名百分比(0~1)
-    :param fill_null: 是否填充缺失值
-    :param market: 板块所属市场
-    :return: 指标值在指定板块中的排名
+    :param stks: the specified security list or Block
+    :param ref_ind: the reference indicator
+    :param mode: the sorting way: 0-descending ranking (the highest indicator value is ranked 1), 1-ascending ranking (the greater the indicator value, the greater the ranking value), 2-the descending ranking percentage, 3-the ascending ranking percentage, 4-the descending ranking percentage (0~1), 5-the ascending ranking percentage (0~1)
+    :param fill_null: whether to fill the missing values
+    :param market: the market the block belongs to
+    :return: the ranking of the indicator value in the specified block
     :rtype: Indicator)");
 
-    PY_AGG_IND_DEFINE(AGG_MEAN, "聚合函数: 平均值, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_COUNT, "聚合函数: 非空值计数, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_SUM, "聚合函数: 总和, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_MAX, "聚合函数: 最大值, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_MIN, "聚合函数: 最小值, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_MAD, "聚合函数: 平均绝对偏差, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_MEDIAN, "聚合函数: 中位数, 可参考 AGG_STD 帮助")
-    PY_AGG_IND_DEFINE(AGG_PROD, "聚合函数: 乘积, 可参考 AGG_STD 帮助")
+    PY_AGG_IND_DEFINE(AGG_MEAN, "The aggregation function: the average value, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_COUNT, "The aggregation function: the non-empty value counting, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_SUM, "The aggregation function: the total sum, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MAX, "The aggregation function: the maximum value, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MIN, "The aggregation function: the minimum value, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MAD, "The aggregation function: the average absolute deviation, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MEDIAN, "The aggregation function: the median, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_PROD, "The aggregation function: the product, refer to the AGG_STD help")
 
     m.def("AGG_SAMPLE",
           py::overload_cast<const Indicator&, const string&, const KQuery::KType&, bool, int>(
@@ -324,16 +324,16 @@ void export_extend_Indicator(py::module& m) {
           py::arg("fill_null") = false, py::arg("unit") = 1,
           R"(AGG_SAMPLE(ind[, time="9:35", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间采样聚合指标，在指定时间点对指标数据进行采样。
+    The time sampling aggregation indicator, sampling the indicator data at the specified time points.
 
-    如果找不到精确匹配的时间，会选择最接近目标时间之前的有效数据。
+    If the exactly matching time cannot be found, the valid data closest before the target time is selected.
 
-    :param Indicator ind: 输入指标
-    :param str time: 指定采样时间，格式为 HH:MM，默认为 "9:35"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str time: the specified sampling time, in the format HH:MM, defaulting to "9:35"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def(
@@ -344,17 +344,17 @@ void export_extend_Indicator(py::module& m) {
       py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
       R"(AGG_SAMPLE_MAX(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间段最大值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最大值。
+    The maximum in the time period aggregation indicator, counting the maximum of the indicator data within the specified time period [start_time, last_time].
 
-    包含 start_time 和 last_time 本身。
+    It includes the start_time and the last_time themselves.
 
-    :param Indicator ind: 输入指标
-    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
-    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str start_time: the start time of the time period, in the format HH:MM, defaulting to "9:30"
+    :param str last_time: the end time of the time period, in the format HH:MM, defaulting to "10:00"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def(
@@ -365,17 +365,17 @@ void export_extend_Indicator(py::module& m) {
       py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
       R"(AGG_SAMPLE_MIN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间段最小值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的最小值。
+    The minimum in the time period aggregation indicator, counting the minimum of the indicator data within the specified time period [start_time, last_time].
 
-    包含 start_time 和 last_time 本身。
+    It includes the start_time and the last_time themselves.
 
-    :param Indicator ind: 输入指标
-    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
-    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str start_time: the start time of the time period, in the format HH:MM, defaulting to "9:30"
+    :param str last_time: the end time of the time period, in the format HH:MM, defaulting to "10:00"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def(
@@ -386,17 +386,17 @@ void export_extend_Indicator(py::module& m) {
       py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
       R"(AGG_SAMPLE_MEAN(ind[, start_time="9:30", last_time="10:00", ktype=Query.MIN, fill_null=False, unit=1])
 
-    时间段平均值聚合指标，在指定时间段 [start_time, last_time] 内统计指标数据的平均值。
+    The average in the time period aggregation indicator, counting the average of the indicator data within the specified time period [start_time, last_time].
 
-    包含 start_time 和 last_time 本身。
+    It includes the start_time and the last_time themselves.
 
-    :param Indicator ind: 输入指标
-    :param str start_time: 时间段开始时间，格式为 HH:MM，默认为 "9:30"
-    :param str last_time: 时间段结束时间，格式为 HH:MM，默认为 "10:00"
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位
-    :return: 指标数据
+    :param Indicator ind: the input indicator
+    :param str start_time: the start time of the time period, in the format HH:MM, defaulting to "9:30"
+    :param str last_time: the end time of the time period, in the format HH:MM, defaulting to "10:00"
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def("AGG_STD",
@@ -405,18 +405,18 @@ void export_extend_Indicator(py::module& m) {
           py::arg("unit") = 1, py::arg("ddof") = 1,
           R"(AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
-    聚合其他K线周期的标准差, 如计算日线时聚合分钟线收盘价的标准差
+    Aggregate the standard deviation of the other K-line periods, e.g. calculating the standard deviation of the minute-line close prices aggregated when calculating the daily line
 
         >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
         >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
         >>> ind(k)
 
-    :param Indicator ind: 指标数据
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (滚动聚合分组单位, 如使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
-    :return: 指标数据
+    :param Indicator ind: the indicator data
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the rolling aggregation grouping unit; e.g. when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :param int ddof: the degree of freedom (1: the sample standard deviation, 0: the population standard deviation)
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def("AGG_VAR",
@@ -425,18 +425,18 @@ void export_extend_Indicator(py::module& m) {
           py::arg("unit") = 1, py::arg("ddof") = 1,
           R"(AGG_VAR(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
-    聚合其他K线周期的方差, 如计算日线时聚合分钟线收盘价的方差
+    Aggregate the variance of the other K-line periods, e.g. calculating the variance of the minute-line close prices aggregated when calculating the daily line
 
         >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
         >>> ind = AGG_VAR(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
         >>> ind(k)
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :param int ddof: 自由度(1: 样本标准差, 0: 总体标准差)
-    :return: 指标数据
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :param int ddof: the degree of freedom (1: the sample standard deviation, 0: the population standard deviation)
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def(
@@ -446,14 +446,14 @@ void export_extend_Indicator(py::module& m) {
       py::arg("unit") = 1, py::arg("quantile") = 0.75,
       R"(AGG_QUANTILE(ind[, ktype=Query.MIN, fill_null=False, unit=1, quantile=0.75])
 
-    聚合其他K线周期分位数, 可参考 AGG_STD 帮助
+    Aggregate the quantile of the other K-line periods, refer to the AGG_STD help
 
-    :param Indicator ind: 待计算指标
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :param float quantile: 分位数 (0, 1) 之间
-    :return: 指标数据
+    :param Indicator ind: the indicator to calculate
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :param float quantile: the quantile, between (0, 1)
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def("AGG_VWAP", py::overload_cast<const KData&, const KQuery::KType&, bool, int>(&AGG_VWAP),
@@ -463,19 +463,19 @@ void export_extend_Indicator(py::module& m) {
           py::arg("ktype") = KQuery::MIN, py::arg("fill_null") = false, py::arg("unit") = 1,
           R"(AGG_VWAP([ktype=Query.MIN, fill_null=False, unit=1])
 
-    聚合其他K线成交量加权平均价格(Volume Weighted Average Price)
+    Aggregate the volume weighted average price of the other K-line periods (Volume Weighted Average Price)
     
-    VWAP 是成交量加权的平均价格，计算方式是将每一分钟（或单位时间）的成交量乘以该分钟的成交价格，
-    然后对所有乘积求和，最后除以总成交量。
+    VWAP is the volume-weighted average price, calculated by multiplying the volume of each minute (or unit time) by the trading price of that minute,
+    then summing all the products, and finally dividing by the total volume.
 
-    用法：AGG_VWAP([ktype, fill_null, unit])
+    Usage: AGG_VWAP([ktype, fill_null, unit])
     
-    例如：AGG_VWAP(Query.MIN) 计算分钟线的VWAP值
+    For example: AGG_VWAP(Query.MIN) calculates the VWAP value of the minute lines
 
-    :param KQuery.KType ktype: 聚合的K线周期类型
-    :param bool fill_null: 是否填充缺失值，默认为False
-    :param int unit: 聚合周期单位，默认为1。上下文K线分组单位，使用日线计算分钟线聚合时，unit=2代表聚合2天的分钟线
-    :return: 指标数据
+    :param KQuery.KType ktype: the aggregated K-line period type
+    :param bool fill_null: whether to fill the missing values, defaulting to False
+    :param int unit: the aggregation period unit, defaulting to 1. The grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days
+    :return: the indicator data
     :rtype: Indicator)");
 
     m.def(
@@ -493,28 +493,28 @@ void export_extend_Indicator(py::module& m) {
       py::arg("fill_null") = false, py::arg("unit") = 1,
       R"(AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
       
-    使用自定函数聚合其他K线周期的指标。
+    Aggregate the indicators of the other K-line periods with a custom function.
     
-    示例, 计算日线时聚合分钟线收盘价的和:
+    Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
       >>> ind = AGG_FUNC(CLOSE(), lambda ds, x: np.sum(x))
       >>> ind(k)
 
-    :param Indicator ind: 待计算指标
-    :param callable agg_func: 自定义聚合函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回针对list的聚合结果, 注意是单个值
-    :param KQuery.KType ktype: 聚合的K线周期
-    :param bool fill_null: 是否填充缺失值
-    :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
-    :return: 聚合结果
+    :param Indicator ind: the indicator to calculate
+    :param callable agg_func: the custom aggregation function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the aggregation result for the list; note that it is a single value
+    :param KQuery.KType ktype: the aggregated K-line period
+    :param bool fill_null: whether to fill the missing values
+    :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
+    :return: the aggregation result
     :rtype: Indicator)");
 
-    PY_GROUP_IND_DEFINE(GROUP_COUNT, "分组累积计数")
-    PY_GROUP_IND_DEFINE(GROUP_SUM, "分组累积和")
-    PY_GROUP_IND_DEFINE(GROUP_PROD, "分组累积乘积")
-    PY_GROUP_IND_DEFINE(GROUP_MEAN, "分组累积平均")
-    PY_GROUP_IND_DEFINE(GROUP_MAX, "分组累积最大值")
-    PY_GROUP_IND_DEFINE(GROUP_MIN, "分组累积最小值")
+    PY_GROUP_IND_DEFINE(GROUP_COUNT, "The group cumulative counting")
+    PY_GROUP_IND_DEFINE(GROUP_SUM, "The group cumulative sum")
+    PY_GROUP_IND_DEFINE(GROUP_PROD, "The group cumulative product")
+    PY_GROUP_IND_DEFINE(GROUP_MEAN, "The group cumulative average")
+    PY_GROUP_IND_DEFINE(GROUP_MAX, "The group cumulative maximum")
+    PY_GROUP_IND_DEFINE(GROUP_MIN, "The group cumulative minimum")
 
     m.def(
       "GROUP_FUNC",
@@ -530,17 +530,17 @@ void export_extend_Indicator(py::module& m) {
       py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
       R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1])
       
-    自定义分组累积计算指标。
+    The custom group cumulative calculation indicator.
     
-    示例, 计算日线时聚合分钟线收盘价的和:
+    Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
       >>> ind = GROUP_FUNC(CLOSE(), lambda dates, data: data/2.0)
       >>> ind(k)
 
-    :param Indicator ind: 待计算指标
-    :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
-    :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
+    :param Indicator ind: the indicator to calculate
+    :param callable group_func: the custom group cumulative function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the cumulative calculation result with the same length as the input; the type must also be np.array
+    :param KQuery.KType ktype: the grouped K-line period
+    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator)");
 }

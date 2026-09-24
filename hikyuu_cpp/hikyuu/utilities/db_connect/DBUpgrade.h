@@ -14,12 +14,14 @@
 namespace hku {
 
 /**
- * 升级及创建数据库
- * @param driver 数据库连接
- * @param module_name 模块名
- * @param upgrade_scripts 升级脚本数据数组（每个为一个版本的升级脚本）
- * @param start_version 升级脚本数组起始对应的版本
- * @param create_script 数据库创建脚本，若对应的数据库不存在则使用该脚本创建数据库
+ * Upgrade and create the database
+ * @param driver database connection
+ * @param module_name module name
+ * @param upgrade_scripts the upgrade script data array (every one is the upgrade script of one
+ *                        version)
+ * @param start_version the version corresponding to the start of the upgrade script array
+ * @param create_script the database creation script; it is used to create the database when the
+ *                      corresponding database does not exist
  * @ingroup DataDriver
  */
 void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name,

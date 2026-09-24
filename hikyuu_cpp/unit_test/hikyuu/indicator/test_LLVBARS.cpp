@@ -23,7 +23,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLVBARS") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm.getStock("sh000001");
@@ -32,7 +32,7 @@ TEST_CASE("test_LLVBARS") {
 
     Indicator result;
 
-    /** @arg n = 0, 低点顺序下降 */
+    /** @arg n = 0, the lows fall in order */
     PriceList a;
     for (int i = 0; i < 10; ++i) {
         a.push_back(10 - i);
@@ -47,7 +47,7 @@ TEST_CASE("test_LLVBARS") {
         CHECK_EQ(result[i], 0);
     }
 
-    /** @arg n = 0, 低点升序 */
+    /** @arg n = 0, the lows are in an ascending order */
     a.clear();
     for (int i = 0; i < 10; ++i) {
         a.push_back(i);
@@ -62,7 +62,7 @@ TEST_CASE("test_LLVBARS") {
         CHECK_EQ(result[i], i);
     }
 
-    /** @arg n = 0， 顺序随机 */
+    /** @arg n = 0, the order is random */
     result = LLVBARS(c, 0);
     CHECK_EQ(result.name(), "LLVBARS");
     CHECK_EQ(result.size(), 10);
@@ -132,7 +132,7 @@ TEST_CASE("test_LLVBARS") {
     CHECK_EQ(result[9], 0);
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_HHVBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -176,7 +176,7 @@ TEST_CASE("test_HHVBARS_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_LLVBARS_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

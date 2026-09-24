@@ -23,9 +23,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VAR") {
-    /** @arg n > 1 的正常情况 */
+    /** @arg The normal case with n > 1 */
     PriceList d;
     for (size_t i = 0; i < 15; ++i) {
         d.push_back(i + 1);
@@ -50,7 +50,7 @@ TEST_CASE("test_VAR") {
         CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.001));
     }
 
-    /** @arg 非法参数 n = 1时 */
+    /** @arg The invalid parameter n = 1 */
     CHECK_THROWS_AS(VAR(ind, 1), std::exception);
 
     /** @arg operator() */
@@ -63,7 +63,7 @@ TEST_CASE("test_VAR") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg n =0 时 */
+    /** @arg When n =0 */
     dev = VAR(ind, 0);
     CHECK_EQ(dev.size(), 15);
     CHECK_EQ(dev.discard(), 14);
@@ -78,7 +78,7 @@ TEST_CASE("test_VAR_benchmark") {
     Stock stock = getStock("sh000001");
     KData kdata = stock.getKData(KQuery(0));
     Indicator c = kdata.close();
-    int cycle = 1000;  // 测试循环次数
+    int cycle = 1000;  // Test loop count
 
     {
         BENCHMARK_TIME_MSG(test_VAR_benchmark, cycle, fmt::format("data len: {}", c.size()));
@@ -91,7 +91,7 @@ TEST_CASE("test_VAR_benchmark") {
 }
 #endif
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VAR_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -124,7 +124,7 @@ TEST_CASE("test_VAR_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VAR_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

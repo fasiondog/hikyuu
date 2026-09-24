@@ -1,12 +1,14 @@
 /*
  * test_MF_IndustryNeutralize.cpp
  *
- * 行业中性化的白盒单元测试 + 端到端路由验证。
+ * The white box unit test of the industry neutralization + the end-to-end routing verification.
  *
- *   - 白盒用例直接测试 calculate_industry_residuals 纯函数（经 industry_neutralize.h
- *     inline 暴露），构造 PriceList 验证数学性质，无任何外部数据依赖。
- *   - E2E 用例验证 _buildDummyIndex -> calculate_industry_residuals 的路由连通性，
- *     依赖 test_data/block/hybk.ini（中文板块名，需 supportChineseSimple）。
+ *   - The white box case tests the calculate_industry_residuals pure function directly (exposed
+ *     inline via industry_neutralize.h); a PriceList is built to verify the math properties with no
+ * external data dependency.
+ *   - The E2E case verifies the routing connectivity of _buildDummyIndex ->
+ * calculate_industry_residuals, depending on test_data/block/hybk.ini (Chinese block names,
+ * supportChineseSimple needed).
  */
 
 #include "../../test_config.h"
@@ -28,18 +30,19 @@ using namespace hku;
  */
 
 //-----------------------------------------------------------------------------
-// 白盒测试：calculate_industry_residuals 纯函数
+// The white box test: the calculate_industry_residuals pure function
 //-----------------------------------------------------------------------------
 
-/** @par 置换不变性 —— 核心反例，锁定本次 bug 修复
- *  行业中性化结果必须与板块编号方式无关。原实现对整数编号做单变量回归，
- *  重排板块列表会改变残差；组内去均值则不受编号影响。
+/** @par Permutation invariance - the core counter example that pins down this bug fix
+ *  The result must not depend on the block numbering. The original implementation did a unary
+ * regression on the integer numbering, so reordering the block list changed the residuals; removing
+ * the group mean is unaffected.
  */
 TEST_CASE("test_industry_residuals_permutation_invariance") {
     PriceList y{10.0, 20.0, 30.0, 40.0};
     size_t blk_count = 2;
 
-    // 场景 A：组 0 = {10,20}(均值15)，组 1 = {30,40}(均值35)
+    // Scenario A: group 0 = {10,20} (mean 15) and group 1 = {30,40} (mean 35)
     PriceList labelsA{0.0, 0.0, 1.0, 1.0};
     auto resA = calculate_industry_residuals(y, labelsA, blk_count);
     CHECK_EQ(resA.size(), y.size());
@@ -48,7 +51,7 @@ TEST_CASE("test_industry_residuals_permutation_invariance") {
     CHECK_EQ(resA[2], doctest::Approx(-5.0).epsilon(1e-9));
     CHECK_EQ(resA[3], doctest::Approx(5.0).epsilon(1e-9));
 
-    // 场景 B：完全颠倒行业编号 —— 残差必须与 A 完全一致
+    // Scenario B: the industry numbering is reversed - the residuals must match A exactly
     PriceList labelsB{1.0, 1.0, 0.0, 0.0};
     auto resB = calculate_industry_residuals(y, labelsB, blk_count);
     for (size_t i = 0; i < y.size(); i++) {
@@ -56,46 +59,48 @@ TEST_CASE("test_industry_residuals_permutation_invariance") {
     }
 }
 
-/** @par 边界：行业孤儿（无归属）与标签 NaN —— 残差置 NaN，不参与组内均值 */
+/** @par Boundary: an industry orphan (no membership) and a NaN label - the residual is NaN and it
+ * is excluded from the group mean */
 TEST_CASE("test_industry_residuals_orphan_and_nan_label") {
     PriceList y{10.0, 20.0, 30.0};
     size_t blk_count = 2;
-    // 索引1: label=2 >= blk_count (孤儿)；索引2: 标签 NaN
+    // Index 1: label=2 >= blk_count (an orphan); index 2: a NaN label
     PriceList labels{0.0, 2.0, Null<price_t>()};
     auto res = calculate_industry_residuals(y, labels, blk_count);
 
-    // 索引0: 组0 仅自身，残差 = 10 - 10 = 0
+    // Index 0: group 0 has itself only, the residual = 10 - 10 = 0
     CHECK_EQ(res[0], doctest::Approx(0.0).epsilon(1e-9));
-    // 孤儿与标签缺失：残差 NaN
+    // The orphan and the missing label: the residual is NaN
     CHECK_UNARY(std::isnan(res[1]));
     CHECK_UNARY(std::isnan(res[2]));
 }
 
-/** @par 边界：k=1 全市场同行业 —— 退化为去全局均值 */
+/** @par Boundary: k=1, the whole market in one industry - it degenerates to the global mean */
 TEST_CASE("test_industry_residuals_single_group_global_mean") {
     PriceList y{10.0, 20.0, 30.0};
     size_t blk_count = 1;
     PriceList labels{0.0, 0.0, 0.0};
     auto res = calculate_industry_residuals(y, labels, blk_count);
-    // 全局均值 = 20，残差 = {-10, 0, 10}
+    // The global mean = 20 and the residuals = {-10, 0, 10}
     CHECK_EQ(res[0], doctest::Approx(-10.0).epsilon(1e-9));
     CHECK_EQ(res[1], doctest::Approx(0.0).epsilon(1e-9));
     CHECK_EQ(res[2], doctest::Approx(10.0).epsilon(1e-9));
 }
 
-/** @par 边界：同行业含无效数据 —— 算组内均值时跳过 NaN，残差对无效点置 NaN */
+/** @par Boundary: the industry contains invalid data - the NaN is skipped in the group mean and the
+ * residual of an invalid point is NaN */
 TEST_CASE("test_industry_residuals_group_with_invalid_y") {
     PriceList y{10.0, Null<price_t>(), 20.0};
     size_t blk_count = 1;
     PriceList labels{0.0, 0.0, 0.0};
     auto res = calculate_industry_residuals(y, labels, blk_count);
-    // 有效组内均值 = (10+20)/2 = 15
+    // The valid group mean = (10+20)/2 = 15
     CHECK_EQ(res[0], doctest::Approx(-5.0).epsilon(1e-9));
     CHECK_UNARY(std::isnan(res[1]));
     CHECK_EQ(res[2], doctest::Approx(5.0).epsilon(1e-9));
 }
 
-/** @par 边界：全 NaN/Inf 输入 —— 不崩溃，不抛浮点异常，返回全 NaN */
+/** @par Boundary: an all NaN/Inf input - no crash, no floating point exception, all NaN */
 TEST_CASE("test_industry_residuals_all_invalid") {
     PriceList y{Null<price_t>(), std::numeric_limits<price_t>::infinity(),
                 -std::numeric_limits<price_t>::infinity()};
@@ -108,35 +113,38 @@ TEST_CASE("test_industry_residuals_all_invalid") {
     }
 }
 
-/** @par 边界：负数/超大标签 —— 守卫 static_cast<size_t> 的 UB，不崩溃不越界
- *  static_cast<size_t>(负数) 是 C++ UB，可能溢出为 SIZE_MAX 导致 sums[g] 越界段错误。
- *  实现须在 cast 前用 double 比较拦截 label<0 或 label>=blk_count。
- */
+/** @par Boundary: a negative / oversized label - guard the UB of static_cast<size_t>, no crash
+ *  static_cast<size_t>(negative) is a C++ UB: it may overflow to SIZE_MAX and cause an out of range
+ * segfault of sums[g]. The implementation must intercept label<0 or label>=blk_count with a double
+ * compare before the  cast. 
+*/
 TEST_CASE("test_industry_residuals_negative_and_oversized_label") {
     PriceList y{10.0, 20.0, 30.0, 40.0};
     size_t blk_count = 2;
-    // label[0]=-1(负数UB风险), [1]=999(超大越界), [2]=0(合法), [3]=1(合法)
+    // label[0]=-1 (a negative UB risk), [1]=999 (oversized), [2]=0 (valid), [3]=1 (valid)
     PriceList labels{-1.0, 999.0, 0.0, 1.0};
     auto res = calculate_industry_residuals(y, labels, blk_count);
-    // 负数与超大标签：残差 NaN（不崩溃不越界）
+    // The negative and the oversized labels: the residual is NaN (no crash, no out of range)
     CHECK_UNARY(std::isnan(res[0]));
     CHECK_UNARY(std::isnan(res[1]));
-    // 合法标签：组0仅30（均值30，残差0），组1仅40（均值40，残差0）
+    // The valid labels: group 0 has 30 only (mean 30, residual 0), group 1 has 40 only (mean 40)
     CHECK_EQ(res[2], doctest::Approx(0.0).epsilon(1e-9));
     CHECK_EQ(res[3], doctest::Approx(0.0).epsilon(1e-9));
 }
 
 //-----------------------------------------------------------------------------
-// E2E 路由验证：_buildDummyIndex -> calculate_industry_residuals 连通性
+// The E2E routing verification: _buildDummyIndex -> calculate_industry_residuals connectivity
 //-----------------------------------------------------------------------------
 
-/** @par 端到端路由：启用行业中性化后，同一行业股票截面残差之和 ≈ 0
- *  动态发现策略：遍历"行业板块"所有板块，找第一个含≥2只有效 K 线股票的板块
- *  作为同行业探针对。不硬编码特定股票代码，CI 数据变动自动适配；若整个分类
- *  无同行业对，REQUIRE 失败明确暴露数据不足，不静默通过。
+/** @par The end-to-end routing: with the neutralization on, the cross-sectional residual sum of the
+ * stocks in one industry is about 0 The dynamic discovery: iterate over the blocks of the industry
+ * category and find the first one  that contains at least 2 stocks with valid K-lines as the
+ * same-industry probe pair. No stock code is hard coded, so a CI data change is adapted;  if the
+ * whole category has no same-industry pair, a REQUIRE failure exposes the insufficient data instead
+ * of passing  silently.
  *
- *  注：测试环境用 QLBlockInfoDriver（读 ini），其 save 抛"Not support"，无法用
- *  sm.addBlock 注入内存 Mock，故采用动态发现。
+ *  Note: the test environment uses QLBlockInfoDriver (reading an ini) whose save throws  "Not
+ * support", so sm.addBlock cannot inject an in-memory Mock, hence the dynamic discovery.
  */
 TEST_CASE("test_mf_industry_neutralize_routing") {
     if (!supportChineseSimple()) {
@@ -146,7 +154,7 @@ TEST_CASE("test_mf_industry_neutralize_routing") {
     StockManager& sm = StockManager::instance();
     KQuery query = KQuery(-30);
 
-    // 动态发现一对同行业且有数据的股票
+    // Dynamically discover a pair of stocks in the same industry that have data
     Stock stk_a, stk_b;
     auto blks = sm.getBlockList("行业板块");
     for (const auto& blk : blks) {
@@ -181,8 +189,9 @@ TEST_CASE("test_mf_industry_neutralize_routing") {
     mf->setNormalize(NORM_NOTHING());
     mf->addSpecialNormalize("MA", NORM_NOTHING(), "行业板块");
 
-    // 关键：必须先触发 calculate() 填充 m_ref_dates，否则 getAllSrcFactors() 因
-    // m_ref_dates 为空（days_total=0）跳过截面中性化循环，静默返回原始因子值。
+    // Key: calculate() must be triggered first to fill m_ref_dates, otherwise getAllSrcFactors()
+    // would skip the cross-sectional loop with an empty m_ref_dates (days_total=0) and return the
+    // // raw factor values silently.
     mf->getDatetimeList();
 
     auto all_src = mf->getAllSrcFactors();
@@ -192,8 +201,9 @@ TEST_CASE("test_mf_industry_neutralize_routing") {
     REQUIRE_GT(ref_dates.size(), 5u);
     size_t di = ref_dates.size() / 2;
 
-    // 反静默失效探针：同行业残差和≈0。若 name 路由匹配失败（ALIGN 改名导致
-    // m_special_category 不命中），输出原始 MA 值，两只不同股价 MA 之和不会为 0。
+    // A probe against a silent failure: the residual sum of the same industry is about 0. If the
+    // name routing misses (an ALIGN rename makes m_special_category miss), the raw MA values are
+    // output     // and the MA sum of two stocks with different prices cannot be 0.
     double r0 = all_src[0][0][di];
     double r1 = all_src[1][0][di];
     CHECK_UNARY_FALSE(std::isnan(r0));

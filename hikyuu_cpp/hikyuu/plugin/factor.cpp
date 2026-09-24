@@ -141,11 +141,11 @@ bool isValidFactorName(const string& name) {
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
 
-    // 非clickhouse驱动不限制因子名称
+    // The non-clickhouse drivers do not restrict the factor name
     HKU_IF_RETURN(driver_type != "clickhouse", true);
 
     auto* plugin = sm.getPlugin<DataDriverPluginInterface>(HKU_PLUGIN_CLICKHOUSE_DRIVER);
-    HKU_IF_RETURN(!plugin, true);  // 如果没有数据驱动插件，则不限制因子名称
+    HKU_IF_RETURN(!plugin, true);  // Without a data driver plugin the factor name is unrestricted
     return plugin->isValidFactorName(name);
 }
 

@@ -93,22 +93,26 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto const* src = ind.data();
     auto* dst = this->data();
 
-    // 标准最大回撤语义: dd_j = (run_max_j - src[j]) / run_max_j,
-    // 其中 run_max_j = max(src[window_left..j]) 为到 j 为止的累计最大值。
-    // 原实现错误地用窗口全局 max 作为所有点的回撤基准, 当窗口最高点出现在
-    // 最低点之后时会引入未来数据(look-ahead bias), 高估回撤。
-    // 此处放弃原 O(1) 快路径状态机(其 current_dd > window_max_dd 判断在标准
-    // MDD 语义下原理性不成立, 因不同 j 的 dd 用不同的 run_max_j 基准),
-    // 退化为每点 O(n) 暴力扫描, 用 run_max 基准保证正确性。
+    // The standard maximum drawdown semantics: dd_j = (run_max_j - src[j]) / run_max_j, where
+    // run_max_j = max(src[window_left..j]) is the accumulated maximum up to j.
+    // The original implementation wrongly used the global maximum of the window as the drawdown
+    // base of all the points; when the highest point of the window appears after the lowest point
+    // it introduces the look-ahead bias and overestimates the drawdown.
+    // Here the original O(1) fast path state machine is abandoned (its judgment of
+    // current_dd > window_max_dd does not hold in principle under the standard MDD semantics,
+    // because the dd of different j uses a different run_max_j base), and it degenerates to an
+    // O(n) brute force scan per point, using the run_max base to guarantee the correctness.
     for (size_t i = start_pos; i < total; ++i) {
         Indicator::value_t current_nav = src[i];
         if (std::isnan(current_nav) || current_nav <= 0.0) {
-            // 无效点不写 dst[i], 保持原值, 与原语义一致
+            // An invalid point does not write dst[i] and keeps the original value, the same as the
+            // original semantics
             continue;
         }
 
         size_t window_left = i + 1 - n;
-        Indicator::value_t run_max = 0.0;  // 不用 src[window_left] 初始化, 避免 NaN 污染比较
+        Indicator::value_t run_max =
+          0.0;  // Not initialized with src[window_left], avoiding NaN pollution
         Indicator::value_t window_max_dd = 0.0;
         bool has_valid = false;
         for (size_t j = window_left; j <= i; ++j) {
@@ -120,7 +124,7 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
             if (v > run_max) {
                 run_max = v;
             }
-            // run_max 必然 > 0(数据约束为正), 除法安全
+            // run_max is always > 0 (the data is constrained to be positive), the division is safe
             Indicator::value_t dd = (run_max - v) / run_max;
             if (dd > window_max_dd) {
                 window_max_dd = dd;

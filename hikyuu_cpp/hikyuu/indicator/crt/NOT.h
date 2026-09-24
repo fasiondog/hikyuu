@@ -14,14 +14,14 @@
 namespace hku {
 
 /**
- * 求逻辑非。NOT(X)返回非X,即当X<=0时返回1，否则返回0。
+ * Logical NOT. NOT(X) returns the negation of X, i.e. it returns 1 when X<=0, otherwise 0.
  * @ingroup Indicator
  */
 Indicator HKU_API NOT();
 
 /**
- * 求逻辑非。NOT(X)返回非X,即当X=0时返回1，否则返回0。
- * @param ind 待计算的数据
+ * Logical NOT. NOT(X) returns the negation of X, i.e. it returns 1 when X=0, otherwise 0.
+ * @param ind the data to be calculated
  * @ingroup Indicator
  */
 inline Indicator NOT(const Indicator& ind) {

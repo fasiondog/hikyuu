@@ -20,11 +20,11 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_SAREXT") {
     KData kdata = getKData("sz000001", KQuery(-10));
 
-    /** @arg 非法参数 */
+    /** @arg Invalid parameters */
     CHECK_THROWS(TA_SAREXT(kdata, Null<double>()));
     CHECK_THROWS(TA_SAREXT(kdata, 0, -1.0));
     CHECK_THROWS(TA_SAREXT(kdata, 0, 0, -1.));
@@ -34,18 +34,18 @@ TEST_CASE("test_TA_SAREXT") {
     CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, -1.));
     CHECK_THROWS(TA_SAREXT(kdata, 0, 0, 0, 0, 0, 0, 0, -1.));
 
-    /** @arg KData 为空 */
+    /** @arg KData is empty */
     Indicator result = TA_SAREXT(KData());
     CHECK_EQ(result.name(), "TA_SAREXT");
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result.size(), 0);
 
-    /** @arg KData 长度小于默认参数抛弃数量 */
+    /** @arg The KData length is less than the discard count of the default parameters */
     result = TA_SAREXT(getKData("sh000001", KQuery(-1)));
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), 1);
 
-    /** @arg 正常情况 */
+    /** @arg The normal case */
     result = TA_SAREXT(kdata);
     CHECK_EQ(result.name(), "TA_SAREXT");
     CHECK_EQ(result.discard(), 1);
@@ -61,7 +61,7 @@ TEST_CASE("test_TA_SAREXT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_TA_SAREXT_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

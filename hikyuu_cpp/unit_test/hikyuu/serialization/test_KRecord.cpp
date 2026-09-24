@@ -22,7 +22,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_KRecord_serialize") {
     string filename(StockManager::instance().tmpdir());
     filename += "/KRecord.xml";

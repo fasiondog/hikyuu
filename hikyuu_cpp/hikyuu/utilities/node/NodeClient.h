@@ -30,12 +30,12 @@ public:
         close();
     }
 
-    /** 设置服务端地址 */
+    /** Set the server address */
     void setServerAddr(const std::string& serverAddr) {
         m_server_addr = serverAddr;
     }
 
-    /** 连接服务器 */
+    /** Connect to the server */
     bool dial() noexcept {
         std::lock_guard<std::mutex> lock(m_mutex);
         close();
@@ -46,7 +46,7 @@ public:
         m_connected = true;
 
         try {
-            // 设置发送结果 socket 连接参数
+            // Set the socket connection parameters for sending the result
             rv = nng_socket_set_ms(m_socket, NNG_OPT_RECONNMINT, 10);
             NODE_NNG_CHECK(rv, "Failed nng_socket_set_ms!");
 
@@ -75,7 +75,7 @@ public:
         return false;
     }
 
-    /** 关闭连接 */
+    /** Close the connection */
     void close() noexcept {
         if (m_connected) {
             nng_close(m_socket);
@@ -83,23 +83,23 @@ public:
         }
     }
 
-    /** 当前连接状态 */
+    /** Current connection state */
     bool connected() const {
         return m_connected;
     }
 
-    /** 获取最后一次接收到服务端响应的时间 */
+    /** Get the time of the last received server response */
     Datetime getLastAckTime() const {
         return m_last_ack_time;
     }
 
     /**
-     * 发送消息
-     * @param req 发送请求消息
-     * @param res 返回响应
+     * Send a message
+     * @param req the request message to be sent
+     * @param res the returned response
      */
     bool post(const json& req, json& res) noexcept {
-        // 保证和服务器的通信必须是 req/res 模式
+        // Guarantee that the communication with the server must be in the req/res mode
         std::lock_guard<std::mutex> lock(m_mutex);
         return _send(req) && _recv(res);
     }
@@ -165,9 +165,9 @@ private:
 
 private:
     std::mutex m_mutex;
-    std::string m_server_addr;  // 服务端地址
+    std::string m_server_addr;  // Server address
     nng_socket m_socket;
-    Datetime m_last_ack_time{Datetime::now()};  // 最后一次接收服务端响应的时间
+    Datetime m_last_ack_time{Datetime::now()};  // The time of the last received server response
     std::atomic_bool m_connected{false};
     std::atomic_bool m_show_log{true};
 };

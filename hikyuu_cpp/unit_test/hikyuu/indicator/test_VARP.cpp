@@ -24,9 +24,9 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VARP") {
-    /** @arg n > 1 的正常情况 */
+    /** @arg The normal case with n > 1 */
     PriceList d;
     for (size_t i = 0; i < 15; ++i) {
         d.push_back(i + 1);
@@ -51,7 +51,7 @@ TEST_CASE("test_VARP") {
         CHECK_EQ(expected[i], doctest::Approx(dev[i]).epsilon(0.0001));
     }
 
-    /** @arg n = 1时 */
+    /** @arg When n = 1 */
     CHECK_THROWS_AS(VARP(ind, 1), std::exception);
 
     /** @arg operator() */
@@ -63,14 +63,14 @@ TEST_CASE("test_VARP") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg n =0 时 */
+    /** @arg When n =0 */
     dev = VARP(ind, 0);
     CHECK_EQ(dev.size(), 15);
     CHECK_EQ(dev.discard(), 14);
     CHECK_EQ(dev[14], doctest::Approx(19.0933).epsilon(0.0001));
 }
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VARP_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
@@ -103,7 +103,7 @@ TEST_CASE("test_VARP_dyn") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_VARP_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

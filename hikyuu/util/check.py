@@ -33,11 +33,11 @@ class HKUIngoreError(Exception):
 
 
 def checkif(expression, message, excepion=None, **kwargs):
-    """如果 expression 为 True，则抛出异常。注意：该函数的判定和 assert 是相反的。
+    """Raise an exception if the expression is True. Note: the judgment of this function is the opposite of assert.
 
-    :param boolean expression: 判断条件
-    :param str message: 异常注解信息
-    :param Exception exception: 指定的异常类，为None时，为默认 HKUCheckError 异常
+    :param boolean expression: the judgment condition
+    :param str message: the exception annotation message
+    :param Exception exception: the specified exception class; when None, the default HKUCheckError exception is used
     """
     if expression:
         if excepion is None:
@@ -55,11 +55,11 @@ def hku_check(exp, msg, *args, **kwargs):
 
 
 def hku_check_throw(expression, message, excepion=None, **kwargs):
-    """如果 expression 为 False，则抛出异常。
+    """Raise an exception if the expression is False.
 
-    :param boolean expression: 判断条件
-    :param str message: 异常注解信息
-    :param Exception exception: 指定的异常类，为None时，为默认 HKUCheckError 异常
+    :param boolean expression: the judgment condition
+    :param str message: the exception annotation message
+    :param Exception exception: the specified exception class; when None, the default HKUCheckError exception is used
     """
     if not expression:
         st = traceback.extract_stack()[-2]
@@ -72,7 +72,7 @@ def hku_check_throw(expression, message, excepion=None, **kwargs):
 
 
 def hku_check_ignore(exp, *args, **kwargs):
-    """可忽略的检查"""
+    """An ignorable check"""
     if not exp:
         st = traceback.extract_stack()[-2]
         check_exp = st._line.split(',')[0]
@@ -95,13 +95,13 @@ def get_exception_info():
 
 
 def hku_catch(ret=None, trace=False, callback=None, retry=1, with_msg=False, re_raise=False):
-    """捕获发生的异常, 包装方式: @hku_catch()
-    :param ret: 异常发生时返回值, with_msg为True时, 返回为 (ret, errmsg)
-    :param boolean trace: 打印异常堆栈信息
-    :param func callback: 发生异常后的回调函数, 入参同func
-    :param int retry: 尝试执行的次数
-    :param boolean with_msg: 是否返回异常错误信息, 为True时, 函数返回为 (ret, errmsg)
-    :param boolean re_raise: 是否将错误信息以异常的方式重新抛出
+    """Catch the raised exceptions, wrapped as: @hku_catch()
+    :param ret: the return value when an exception occurs; when with_msg is True, the return is (ret, errmsg)
+    :param boolean trace: print the exception stack information
+    :param func callback: the callback function after an exception occurs, with the same input as func
+    :param int retry: the number of the execution attempts
+    :param boolean with_msg: whether to return the exception error message; when True, the function returns (ret, errmsg)
+    :param boolean re_raise: whether to raise the error message again as an exception
     """
     def hku_catch_wrap(func):
         @functools.wraps(func)
@@ -154,7 +154,7 @@ def hku_to_async(func):
 
 
 def hku_run_ignore_exception(func, *args, **kwargs):
-    """运行函数并忽略异常"""
+    """Run the function and ignore the exceptions"""
     try:
         return func(*args, **kwargs)
     except:

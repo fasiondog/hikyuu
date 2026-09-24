@@ -76,19 +76,19 @@ void export_plugin_backtest(py::module& m) {
       py::arg("support_short") = false, py::arg("sp") = SlippagePtr(),
       R"(backtest([context], on_bar, tm, start_date, end_date, ktype, ref_market, mode)
 
-    事件驱动式回测, 通常直接测试 Strategy 中的主体函数
+    The event-driven backtest, usually directly testing the main functions in the Strategy
 
-    如果 hikyuu 已经加载数据，可以忽略 context 参数。否则通 Strategy 类似，需要主动传入 context 参数，
-    context 中包含需要加载的股票代码、K线类型、K线数量、K线起始日期等信息。
+    If hikyuu has already loaded the data, the context parameter can be ignored. Otherwise, similar to the Strategy, you need to pass in the context parameter actively,
+    and the context contains the stock codes, the K-line types, the number of the K-lines, the K-line start dates, etc. that need to be loaded.
       
-    :param StrategyContext context: 策略上下文 ()
-    :param func on_bar: 策略主体执行函数, 如: on_bar(stg: Strategy)
-    :param TradeManager tm: 策略测试账户
-    :param Datetime start_date: 起始日期
-    :param Datetime end_date: 结束日期（不包含其本身）
-    :param Query.KType ktype: K线类型(按该类型逐 Bar 执行测试)
-    :param str ref_market: 所属市场
-    :param mode 模式  0: 当前bar收盘价执行买卖操作; 1: 下一bar开盘价执行买卖操作
-    :param support_short: 是否支持卖空
-    :param Slippage sp: 滑点算法)");
+    :param StrategyContext context: the strategy context ()
+    :param func on_bar: the strategy main execution function, e.g.: on_bar(stg: Strategy)
+    :param TradeManager tm: the strategy test account
+    :param Datetime start_date: the start date
+    :param Datetime end_date: the end date (exclusive)
+    :param Query.KType ktype: the K-line type (executing the test Bar by Bar according to this type)
+    :param str ref_market: the market it belongs to
+    :param mode the mode  0: execute the buy/sell operations at the close price of the current bar; 1: execute the buy/sell operations at the open price of the next bar
+    :param support_short: whether short selling is supported
+    :param Slippage sp: the slippage algorithm)");
 }

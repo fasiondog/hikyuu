@@ -59,14 +59,14 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
     hkuParam.set<string>("reload_time", config.get("hikyuu", "reload_time", "00:00"));
     hkuParam.set<string>("lazy_preload", config.get("hikyuu", "lazy_preload", "False"));
 
-    // 加载权息数据
+    // Load the ex-rights/ex-dividend data
     hkuParam.set<bool>("load_stock_weight", config.getBool("hikyuu", "load_stock_weight", "True"));
 
-    // 加载历史财务数据
+    // Load the historical financial data
     hkuParam.set<bool>("load_history_finance",
                        config.getBool("hikyuu", "load_history_finance", "True"));
 
-    // 插件目录
+    // Plugin directory
     hkuParam.set<string>("plugindir", config.get("hikyuu", "plugindir",
                                                  fmt::format("{}/.hikyuu/plugin", getUserDir())));
 

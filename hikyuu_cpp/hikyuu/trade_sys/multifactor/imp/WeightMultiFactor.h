@@ -12,7 +12,8 @@
 namespace hku {
 
 /**
- * 指定指标权重评分板，证券得分为其个指标的权重之和
+ * Score board with the given indicator weights; the score of a security is the weighted sum of its
+ * indicators
  */
 class WeightMultiFactor : public MultiFactorBase {
     MULTIFACTOR_IMP(WeightMultiFactor)
@@ -25,7 +26,7 @@ public:
     virtual ~WeightMultiFactor() override = default;
 
 private:
-    PriceList m_weights;  // 每个指标权重，与输入 inds 列表等长
+    PriceList m_weights;  // The weight of every indicator, it is as long as the input inds list
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

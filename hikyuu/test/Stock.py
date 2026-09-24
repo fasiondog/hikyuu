@@ -3,8 +3,8 @@
 # gb18030
 
 # ===============================================================================
-# 作者：fasiondog
-# 历史：1）20120928, Added by fasiondog
+# Author: fasiondog
+# History: 1)20120928, Added by fasiondog
 # ===============================================================================
 
 import unittest
@@ -60,8 +60,8 @@ class StockTest(unittest.TestCase):
         self.assertEqual(b.market_code, 'SH000001')
 
     def test_external_stock(self):
-        stk = Stock("xy", "00z", "测试")
-        self.assertEqual(stk.name, "测试")
+        stk = Stock("xy", "00z", "test")
+        self.assertEqual(stk.name, "test")
         self.assertEqual(stk.market, "XY")
         self.assertEqual(stk.code, "00z")
         self.assertEqual(stk.market_code, "XY00z")

@@ -24,12 +24,13 @@ template double HKU_UTILS_API roundEx(double number, int ndigits);
 
 template <>
 float roundEx(float number, int ndigits) {
-    // 国内一般使用传统四舍五入法
+    // The traditional round-half-up is generally used in China
     if (ndigits < 0)
-        return number;  // 无效位数直接返回原值
+        return number;  // An invalid digit count returns the original value directly
 
     const float factor = std::pow(10.0, ndigits);
-    const float epsilon = 1e-10 * factor;  // 动态调整epsilon避免精度误差
+    const float epsilon =
+      1e-10 * factor;  // Adjust epsilon dynamically to avoid the precision error
 
     if (number >= 0)
         return std::floor(number * factor + 0.5 + epsilon) / factor;
@@ -44,10 +45,10 @@ template float HKU_UTILS_API roundDown(float number, int ndigits);
 
 #if defined(_MSC_VER)
 /**
- * 将UTF8编码的字符串转换为GB2312编码的字符串
- * @param szinput 待转换的原始UTF8编码的字符串
- * @return 以GB2312编码的字符串
- * @note 仅在Windows平台下生效
+ * Convert a UTF8 encoded string into a GB2312 encoded string
+ * @param szinput the original UTF8 encoded string to be converted
+ * @return the string encoded in GB2312
+ * @note It takes effect on the Windows platform only
  */
 std::string HKU_UTILS_API utf8_to_gb(const char *szinput) {
     wchar_t *strSrc;
@@ -90,10 +91,10 @@ std::string HKU_UTILS_API utf8_to_gb(const std::string &szinput) {
 }
 
 /**
- * 将GB2312编码的字符串转换为UTF8编码的字符串
- * @param szinput 待转换的原始GB2312编码的字符串
- * @return 以UTF8编码的字符串
- * @note 仅在Windows平台下生效
+ * Convert a GB2312 encoded string into a UTF8 encoded string
+ * @param szinput the original GB2312 encoded string to be converted
+ * @return the string encoded in UTF8
+ * @note It takes effect on the Windows platform only
  */
 std::string HKU_UTILS_API gb_to_utf8(const char *szinput) {
     wchar_t *strSrc;
@@ -178,31 +179,34 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
 #endif /* defined(_MSC_VER) */
 
 bool HKU_UTILS_API isInteger(double num) {
-    // 处理特殊值：NaN（非数值）或无穷大
+    // Handle the special values: NaN (not a number) or infinity
     if (std::isnan(num) || std::isinf(num)) {
         return false;
     }
 
-    // 计算小数部分（对 1.0 取模）
-    double fractionalPart = num - std::floor(num);  // 等价于 num % 1.0，但处理负数更稳妥
+    // Calculate the fractional part (the modulo against 1.0)
+    double fractionalPart = num - std::floor(num);  // Same as num % 1.0, but safer for negatives
 
-    // 允许微小误差（因浮点数精度问题，如 5.0000000001 应视为 5）
+    // A tiny error is allowed (due to the floating point precision, e.g. 5.0000000001 should be
+    // regarded as 5)
     const double epsilon = 1e-9;
     return std::fabs(fractionalPart) < epsilon || std::fabs(fractionalPart - 1.0) < epsilon;
 }
 
 bool HKU_UTILS_API isInteger(float num) {
-    // 处理特殊值：NaN（非数值）或无穷大（使用float专用函数）
+    // Handle the special values: NaN (not a number) or infinity (the float specific functions are
+    // used)
     if (std::isnan(num) || std::isinf(num)) {
         return false;
     }
 
-    // 计算小数部分（使用float专用的floor函数）
+    // Calculate the fractional part (the float specific floor function is used)
     float fractionalPart = num - std::floor(num);
 
-    // 调整适合float的精度误差（float精度低于double，epsilon需更大）
-    const float epsilon = 1e-5f;  // float典型精度范围内的误差阈值
-    // 判断小数部分是否接近0或1.0（处理类似5.9999997这种情况）
+    // Adjust the precision error for float (the float precision is lower than double, so a larger
+    // epsilon is needed)
+    const float epsilon = 1e-5f;  // The error threshold within the typical float precision range
+    // Judge whether the fractional part is close to 0 or 1.0 (handling the cases like 5.9999997)
     return std::fabs(fractionalPart) < epsilon || std::fabs(fractionalPart - 1.0f) < epsilon;
 }
 
@@ -297,7 +301,7 @@ std::string HKU_UTILS_API utf8_to_upper(const std::string &s) noexcept {
     return result;
 }
 
-/* UTF-8字符串大小写折叠比较 */
+/* The UTF-8 string case folding comparison */
 bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2) noexcept {
     if (s1.empty() && s2.empty()) {
         return true;
@@ -339,7 +343,7 @@ bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2)
     }
 }
 
-/* UTF-8字符串包含子字符串 */
+/* Whether the UTF-8 string contains the substring */
 bool HKU_UTILS_API utf8_contains(const std::string &s, const std::string &sub) noexcept {
     if (sub.empty()) {
         return true;

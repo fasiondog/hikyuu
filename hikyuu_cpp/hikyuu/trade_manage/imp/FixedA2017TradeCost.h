@@ -1,7 +1,7 @@
 /*
  * AShareTradeCost.h
  *
- *  Created on: 2018年4月11日
+ *  Created on: 2018-4-11
  *      Author: Administrator
  */
 
@@ -14,7 +14,8 @@
 namespace hku {
 
 /*
- * 2017年1月1日起将对深市过户费项目单独列示，标准为成交金额0.02‰双向收取。
+ * From January 1, 2017 the transfer fee item of the Shenzhen market is listed separately, with the
+ * standard of 0.02‰ of the turnover amount charged in both directions.
  */
 class FixedA2017TradeCost : public TradeCostBase {
     TRADE_COST_NO_PRIVATE_MEMBER_SERIALIZATION
@@ -26,28 +27,28 @@ public:
     virtual void _checkParam(const string& name) const override;
 
     /**
-     * 计算买入成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 买入价格
-     * @param num 买入数量
-     * @return CostRecord 交易成本记录
+     * Calculate the buy cost
+     * @param datetime trade date
+     * @param stock the traded security object
+     * @param price buy price
+     * @param num buy quantity
+     * @return CostRecord the trade cost record
      */
     virtual CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
                                   double num) const override;
 
     /**
-     * 计算卖出成本
-     * @param datetime 交易日期
-     * @param stock 交易的证券对象
-     * @param price 卖出价格
-     * @param num 卖出数量
-     * @return CostRecord 交易成本记录
+     * Calculate the sell cost
+     * @param datetime trade date
+     * @param stock the traded security object
+     * @param price sell price
+     * @param num sell quantity
+     * @return CostRecord the trade cost record
      */
     virtual CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
                                    double num) const override;
 
-    /** 子类私有变量克隆接口 */
+    /** Clone interface of the private variables of the subclass */
     virtual TradeCostPtr _clone() override;
 };
 

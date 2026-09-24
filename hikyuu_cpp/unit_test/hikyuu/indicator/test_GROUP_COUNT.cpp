@@ -21,7 +21,7 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GROUP_COUNT") {
     HKU_IF_RETURN(!pluginValid(), void());
 
@@ -29,7 +29,7 @@ TEST_CASE("test_GROUP_COUNT") {
     auto k = stk.getKData(KQueryByDate(Datetime(20111115)));
     auto mink = stk.getKData(KQueryByDate(Datetime(20111115), Datetime(20111120), KQuery::MIN));
 
-    /** @arg 分钟线按日分组 */
+    /** @arg The minute lines grouped by day */
     auto ind = GROUP_COUNT(CLOSE(), KQuery::DAY);
     auto result = ind(mink);
     CHECK_EQ(result.name(), "GROUP_COUNT");
@@ -39,7 +39,7 @@ TEST_CASE("test_GROUP_COUNT") {
       result.back(),
       stk.getKData(KQueryByDate(Datetime(20111118), Datetime(20111119), KQuery::MIN)).size());
 
-    /** @arg 日线按日分组 */
+    /** @arg The daily lines grouped by day */
     result = ind(k);
     CHECK_EQ(result.name(), "GROUP_COUNT");
     CHECK_EQ(result.size(), k.size());
@@ -48,7 +48,7 @@ TEST_CASE("test_GROUP_COUNT") {
         CHECK_EQ(result[i], 1);
     }
 
-    /** @arg 日线按周分组 */
+    /** @arg The daily lines grouped by week */
     auto wk = stk.getKData(KQueryByDate(Datetime(20111115), Null<Datetime>(), KQuery::WEEK));
     result = ind(wk);
     CHECK_EQ(result.name(), "GROUP_COUNT");
@@ -64,7 +64,7 @@ TEST_CASE("test_GROUP_COUNT") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_GROUP_COUNT_export") {
     HKU_IF_RETURN(!pluginValid(), void());
 

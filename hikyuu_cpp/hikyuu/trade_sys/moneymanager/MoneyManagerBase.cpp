@@ -85,7 +85,7 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
                         datetime, stock.market_code(), price, risk);
 
     if (PART_ENVIRONMENT == from) {
-        // 强制全部卖出
+        // Force selling everything
         HKU_IF_RETURN(!getParam<bool>("disable_ev_force_clean_position"), MAX_DOUBLE);
     }
 
@@ -93,7 +93,7 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    // 如果风险小于等于0，则忽略
+    // Ignore it when the risk is not greater than 0
     HKU_IF_RETURN(risk <= 0.0, 0.0);
 
     return _getSellNumber(datetime, stock, price, risk, from);
@@ -121,14 +121,14 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                         "Ignore! Is less than the minimum number of transactions({:<.4f}<{}) {}", n,
                         min_trade, stock.market_code());
 
-    // 转换为最小交易量的整数倍
+    // Convert it into an integer multiple of the minimum trade quantity
     n = int64_t(n / min_trade) * min_trade;
 
     double max_trade = stock.maxTradeNumber();
     HKU_WARN_IF_RETURN(n > max_trade, max_trade,
                        "Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
 
-    // 在现金不足时，自动补充存入现金
+    // Automatically deposit more cash when the cash is not enough
     if (getParam<bool>("auto-checkin")) {
         price_t cash = m_tm->cash(datetime, m_query.kType());
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
@@ -178,7 +178,7 @@ double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stoc
 
 double MoneyManagerBase::_getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                         price_t risk, SystemPart from) {
-    // 默认卖出全部
+    // Sell everything by default
     return MAX_DOUBLE;
 }
 
@@ -189,7 +189,7 @@ double MoneyManagerBase::_getSellShortNumber(const Datetime& datetime, const Sto
 
 double MoneyManagerBase::_getBuyShortNumber(const Datetime& datetime, const Stock& stock,
                                             price_t price, price_t risk, SystemPart from) {
-    // 默认全部平仓
+    // Liquidate everything by default
     return MAX_DOUBLE;
 }
 

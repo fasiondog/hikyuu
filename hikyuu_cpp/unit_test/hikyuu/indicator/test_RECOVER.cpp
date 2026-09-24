@@ -19,20 +19,20 @@ using namespace hku;
  * @{
  */
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RECOVER") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sz000001");
     KData kdata;
     KQuery query;
 
-    /** @arg 非法 ind */
+    /** @arg An invalid ind */
     CHECK_THROWS_AS(RECOVER_FORWARD(MA()), std::exception);
     CHECK_THROWS_AS(RECOVER_BACKWARD(MA()), std::exception);
     CHECK_THROWS_AS(RECOVER_EQUAL_FORWARD(MA()), std::exception);
     CHECK_THROWS_AS(RECOVER_EQUAL_BACKWARD(MA()), std::exception);
 
-    /** @arg 日线以下复权 */
+    /** @arg The adjustment below the daily line */
     Datetime start = Datetime(199509250000);
     Datetime end = Null<Datetime>();
     query = KQueryByDate(start, end, KQuery::MIN60);
@@ -75,7 +75,7 @@ TEST_CASE("test_RECOVER") {
     CHECK_EQ(result.name(), "RECOVER_EQUAL_FORWARD");
     CHECK_UNARY(result.equal(kdata2.low()));
 
-    /** @arg 日线复权 */
+    /** @arg The daily line adjustment */
     query = KQueryByDate(start, end, KQuery::DAY);
     kdata = stock.getKData(query);
     REQUIRE(kdata.size() > 0);
@@ -113,7 +113,7 @@ TEST_CASE("test_RECOVER") {
     CHECK_EQ(result.name(), "RECOVER_EQUAL_FORWARD");
     CHECK_UNARY(result.equal(kdata2.low()));
 
-    /** @arg 日线以上复权 */
+    /** @arg The adjustment above the daily line */
     query = KQueryByDate(start, end, KQuery::WEEK);
     kdata = stock.getKData(query);
     REQUIRE(kdata.size() > 0);
@@ -151,7 +151,7 @@ TEST_CASE("test_RECOVER") {
     CHECK_EQ(result.name(), "RECOVER_EQUAL_FORWARD");
     CHECK_UNARY(result.equal(kdata2.low()));
 
-    /** @arg 直接以 KData 作为输入参数 */
+    /** @arg A KData is used as the input parameter directly */
     query = KQueryByDate(start, end, KQuery::WEEK);
     kdata = stock.getKData(query);
     REQUIRE(kdata.size() > 0);
@@ -171,7 +171,7 @@ TEST_CASE("test_RECOVER") {
 //-----------------------------------------------------------------------------
 #if HKU_SUPPORT_SERIALIZATION
 
-/** @par 检测点 */
+/** @par Test points */
 TEST_CASE("test_RECOVER_export") {
     StockManager& sm = StockManager::instance();
     string filename(sm.tmpdir());

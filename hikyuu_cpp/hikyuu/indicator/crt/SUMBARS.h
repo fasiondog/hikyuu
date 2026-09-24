@@ -16,19 +16,27 @@
 namespace hku {
 
 /**
- * 累加到指定周期数, 向前累加到指定值到现在的周期数
+ * Accumulate to the given number of periods; the number of periods from the accumulation forward to
+ * the given value until now
  * @details
  * <pre>
- * 用法：SUMBARS(X,A):将X向前累加直到大于等于A,返回这个区间的周期数
- * 例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
+ * Usage: SUMBARS(X,A): accumulate X forward until it is greater than or equal to A, and return the
+ * number of periods of this interval
+ * For example: SUMBARS(VOL,CAPITAL) gives the number of periods from the full turnover until now
  * </pre>
- * @note discard 语义(标量参数 vs 序列参数存在差异):
- *  - 标量参数 `SUMBARS(ind, double)`: 若某位累加到序列最左端仍 < a, 整段被标为 discard
- *    (静态全局优化, 因标量 a 单调不可达时此前各位更不可达).
- *  - 序列参数 `SUMBARS(ind, IndParam)`: 不可达位逐位写 NaN, 但不推进 discard
- *    (动态 a 序列非单调, a[i] 不可达不代表 a[i+1] 不可达, 推进会抹杀后续可计算位).
- *  即动态路径不保证"discard 之后全为有效数值". 下游应按 `std::isnan` 处理,
- *  不应假设"discard 之后皆有效".
+ * @note discard semantics (there is a difference between the scalar parameter and the sequence
+ *       parameter):
+ *  - Scalar parameter `SUMBARS(ind, double)`: if a position is still < a after accumulating to the
+ *    leftmost end of the sequence, the whole segment is marked as discard
+ *    (a static global optimization, because when the scalar a is unreachable monotonically the
+ *    earlier positions are even more unreachable).
+ *  - Sequence parameter `SUMBARS(ind, IndParam)`: NaN is written to every unreachable position, but
+ *    discard is not advanced
+ *    (the dynamic a sequence is not monotonic; a[i] being unreachable does not mean a[i+1] is
+ *    unreachable, and advancing would wipe out the later calculable positions).
+ *  That is, the dynamic path does not guarantee "all the values after discard are valid". The
+ *  downstream should handle it with `std::isnan`,
+ *  and should not assume "everything after discard is valid".
  * @ingroup Indicator
  */
 Indicator HKU_API SUMBARS(double a);

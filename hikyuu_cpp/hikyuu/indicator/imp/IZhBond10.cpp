@@ -15,7 +15,8 @@ BOOST_CLASS_EXPORT(hku::IZhBond10)
 namespace hku {
 
 IZhBond10::IZhBond10() : IndicatorImp("ZHBOND10") {
-    // 在没有上下文时使用该参数，否则使用上下文中的日期, 数据应该是按升序排列的
+    // This parameter is used when there is no context, otherwise the dates in the context are used;
+    // the data should be sorted in ascending order
     setParam<DatetimeList>("dates", DatetimeList());
     setParam<double>("default", 4.0);
 }
@@ -49,7 +50,8 @@ void IZhBond10::_calculate(const Indicator& data) {
     value_t default_val = (value_t)getParam<double>("default");
     auto* dst = this->data();
 
-    // 需要获取全部数据，在指定日期超过已有数据时，取最后一条数据的值作为当前值
+    // All the data needs to be fetched; when the given date is later than the existing data, the
+    // value of the last record is taken as the current value
     const auto& bonds = StockManager::instance().getZhBond10();
     size_t bonds_size = bonds.size();
     if (0 == bonds_size) {

@@ -1,7 +1,7 @@
 /*
  * AllocateMoney.cpp
  *
- *  Created on: 2018年1月30日
+ *  Created on: 2018-1-30
  *      Author: fasiondog
  */
 
@@ -37,35 +37,44 @@ AllocateFundsBase::AllocateFundsBase(const string& name) : m_name("AllocateMoney
 AllocateFundsBase::~AllocateFundsBase() {}
 
 void AllocateFundsBase::initParam() {
-    // 是否调整之前已经持仓策略的持仓。不调整时，仅使用总账户当前剩余资金进行分配，否则将使用总市值进行分配
-    // 注意：无论是否调整已持仓策略，权重比例都是相对于总资产，不是针对剩余现金余额
-    //       仅针对剩余现金比例调整没有意义，即使分配由于交易成本原因可能也无法完成实际交易
-    //  adjust_running_sys: True - 主动根据资产分配对已持仓策略进行增减仓
-    //  adjust_running_sys: False - 不会根据当前分配权重对已持仓策略进行强制加减仓
+    // Whether to adjust the positions of the strategies already held; when not, only the current
+    // remaining funds of the total account are allocated, otherwise the total market value is
+    // allocated Note: whether or not the held strategies are adjusted, the weight ratios are
+    // relative to the total assets rather than to the remaining cash balance
+    //       adjusting against the remaining cash ratio only is meaningless, and the allocation may
+    //       not even complete a real trade due to the trade cost
+    //  adjust_running_sys: True - actively increase or reduce the positions of the held strategies
+    //  according to the asset allocation adjust_running_sys: False - the held strategies are not
+    //  forcibly increased or reduced according to the current allocation weights
     setParam<bool>("adjust_running_sys", true);
 
-    // 自动调整权重，此时认为传入的权重为各证券的相互比例（详见ignore_zero_weight说明）
-    // 否则，以传入的权重为指定权重不做调整（此时传入的各个权重需要小于1）
+    // Automatically adjust the weights; in this case the passed weights are regarded as the mutual
+    // ratios of the securities (see the ignore_zero_weight description) otherwise the passed
+    // weights are taken as the given weights without adjustment (in this case every passed weight
+    // must be less than 1)
     setParam<bool>("auto_adjust_weight", true);
 
-    // 该参数在 auto_adjust_weight 时生效
-    // 是否过滤子类返回的比例权重列表中的 0 值（包含小于0）和 nan 值
-    // 如：子类返回权重比例列表 [6, 2, 0, 0, 0], 则
-    //   过滤 0 值，则实际调整后的权重为 Xi / sum(Xi)：[6/8, 2/8]
-    //   不过滤，m 设为非零元素个数，n为总元素个数，(Xi / Sum(Xi)) * (m / n)：
+    // This parameter takes effect when auto_adjust_weight is used
+    // Whether to filter out the 0 values (including the negative ones) and the nan values in the
+    // ratio weight list returned by the subclass For example, when the subclass returns the weight
+    // ratio list [6, 2, 0, 0, 0]:
+    //   with the 0 values filtered out, the actually adjusted weights are Xi / sum(Xi): [6/8, 2/8]
+    //   without filtering, m is the number of the non-zero elements and n is the number of all the
+    //   elements, (Xi / Sum(Xi)) * (m / n):
     //           [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0]
-    //          即，保留分为5份后，仅在2份中保持相对比例
+    //          i.e. the total is divided into 5 parts and the relative ratio is kept within the 2
+    //          parts only
     setParam<bool>("ignore_zero_weight", false);
 
-    // 忽略选中系统列表中的系统得分为 null 的系统,
-    // 注意：某些SE（如SE_MultiFactor）本身可能也存在类似控制
+    // Ignore the systems whose score is null in the selected system list,
+    // Note: some SEs (such as SE_MultiFactor) may have a similar control themselves
     setParam<bool>("ignore_se_score_is_null", false);
 
-    // 忽略选中系统列表中的系统得分小于等于 0 的系统
+    // Ignore the systems whose score is not greater than 0 in the selected system list
     setParam<bool>("ignore_se_score_lt_zero", false);
 
-    setParam<double>("reserve_percent", 0.0);  // 保留不参与重分配的资产比例
-    setParam<bool>("trace", false);            // 打印跟踪
+    setParam<double>("reserve_percent", 0.0);  // Ratio of the assets reserved from the reallocation
+    setParam<bool>("trace", false);            // Print the trace
 }
 
 void AllocateFundsBase::baseCheckParam(const string& name) const {
@@ -100,7 +109,7 @@ AFPtr AllocateFundsBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_query = m_query;
 
-    /* m_tm, m_cash_tm 由 PF 运行时指定，不需要 clone
+    /* m_tm and m_cash_tm are given by PF at runtime, no clone is needed
     if (m_tm)
         p->m_tm = m_tm->clone();
     if (m_cash_tm)
@@ -134,13 +143,13 @@ SystemWeightList AllocateFundsBase::adjustFunds(const Datetime& date,
 }
 
 /*
- * 降序排列 SystemWeightList
- * can_allocate_weight - 剩余可用于分配的总权重
- * auto_adjust - 是否自动按比例调整，根据权重调整为总权重为 1
+ * Sort the SystemWeightList in the descending order
+ * can_allocate_weight - the remaining total weight available for the allocation
+ * auto_adjust - whether to adjust automatically by ratio, making the total weight 1
  */
 void AllocateFundsBase::adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
                                      bool auto_adjust, bool ignore_zero) {
-    // 降序排列，同时保证 nan 排在最后
+    // Sort in the descending order, keeping the nan at the end
     std::sort(sw_list.begin(), sw_list.end(), [](const SystemWeight& a, const SystemWeight& b) {
         if (std::isnan(a.weight) && std::isnan(b.weight)) {
             return false;
@@ -165,10 +174,12 @@ void AllocateFundsBase::adjustWeight(SystemWeightList& sw_list, double can_alloc
     }
 
     if (auto_adjust) {
-        //   过滤 0 值，则实际调整后的权重为 Xi / sum(Xi)：[6/8, 2/8]
-        //   不过滤，m 设为非零元素个数，n为总元素个数，(Xi / Sum(Xi)) * (m / n)：
+        //   with the 0 values filtered out, the actually adjusted weights are Xi / sum(Xi): [6/8,
+        //   2/8] without filtering, m is the number of the non-zero elements and n is the number of
+        //   all the elements, (Xi / Sum(Xi)) * (m / n):
         //           [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0]
-        //          即，保留分为5份后，仅在2份中保持相对比例
+        //          i.e. the total is divided into 5 parts and the relative ratio is kept within the
+        //          2 parts only
         double per_weight = ignore_zero
                               ? 1.0 / sum * can_allocate_weight
                               : (new_list.size() * can_allocate_weight) / (sum * sw_list.size());
@@ -180,26 +191,29 @@ void AllocateFundsBase::adjustWeight(SystemWeightList& sw_list, double can_alloc
     sw_list.swap(new_list);
 }
 
-// 所有的权重分配都是针对总资产的，不针对剩余现金
-// 不会根据当前分配权重对已持仓策略进行强制加减仓
+// All the weight allocations are relative to the total assets rather than to the remaining cash
+// The held strategies are not forcibly increased or reduced according to the current weights
 void AllocateFundsBase::_adjust_without_running(const Datetime& date,
                                                 const SystemWeightList& se_list,
                                                 const std::unordered_set<SYSPtr>& running_set) {
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[AF] {} _adjust_without_running", date);
 
-    // 从分配算法获取计划的资产分配权重
+    // Get the planned asset allocation weights from the allocation algorithm
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, void());
 
-    // 获取当前总资产市值，计算剩余可分配权重与现金
+    // Get the current total assets market value and calculate the remaining allocatable weight and
+    // cash
     int precision = m_tm->getParam<int>("precision");
-    FundsRecord funds = m_tm->getFunds(date, m_query.kType());  // 总资产从总账户获取
+    FundsRecord funds =
+      m_tm->getFunds(date, m_query.kType());  // The total assets come from the total account
     price_t total_funds =
       funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
     double reserve_percent = getParam<double>("reserve_percent");
     price_t reserve_funds = total_funds * reserve_percent;
-    price_t can_allocate_cash = m_cash_tm->currentCash();  // 可分配资金从资金账户中获取
+    price_t can_allocate_cash =
+      m_cash_tm->currentCash();  // The allocatable funds come from the cash account
     if (can_allocate_cash + reserve_funds > total_funds) {
         can_allocate_cash = roundDown(total_funds - reserve_funds, precision);
     }
@@ -211,12 +225,15 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
                 can_allocate_weight, can_allocate_cash, funds.cash, total_funds, reserve_funds);
     HKU_IF_RETURN(can_allocate_cash <= 1.0, void());
 
-    // 调整权重（累积权重和归一）并按降序排列, 并过滤掉 0 值和 Nan 值
+    // Adjust the weights (accumulate and normalize them), sort them in the descending order and
+    // filter out the 0 and NaN values
     adjustWeight(sw_list, can_allocate_weight, getParam<bool>("auto_adjust_weight"),
                  getParam<bool>("ignore_zero_weight"));
 
-    // 遍历选中子系统列表，并将剩余现金按权重比例转入子账户
-    double sum_weight = 0.0;  // 由于不调整已运行系统，已运行系统实际占用比例可能和要求的比例不一致
+    // Traverse the selected subsystem list and transfer the remaining cash into the sub accounts by
+    // the weight ratios
+    double sum_weight =
+      0.0;  // The running systems are not adjusted, so their actual ratio may differ
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
         if (can_allocate_cash <= 1.0 || sum_weight >= can_allocate_weight) {
             break;
@@ -226,9 +243,11 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
             continue;
         }
 
-        // 如果是运行中系统，不使用计算的权重，按子系统实际资产更新累积占用权重
-        // 注意：必须用 sub_tm，不能用总账户 m_tm（否则每个 running 都会把 sum_weight 抬到 ~1）
-        // kType 使用 AF 统一的 m_query，保证与 total_funds 同一估值上下文
+        // For a running system the calculated weight is not used; the accumulated occupied weight
+        // is updated with the actual assets of the subsystem Note: sub_tm must be used rather than
+        // the total account m_tm (otherwise every running system would raise sum_weight to about 1)
+        // kType uses the unified m_query of AF, guaranteeing the same valuation context as
+        // total_funds
         if (running_set.find(iter->sys) != running_set.cend()) {
             TMPtr sub_tm = iter->sys->getTM();
             FundsRecord sub_funds = sub_tm->getFunds(date, m_query.kType());
@@ -236,21 +255,21 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
             continue;
         }
 
-        // 计算实际可用的权重
+        // Calculate the actually available weight
         price_t current_weight = iter->weight + sum_weight > can_allocate_weight
                                    ? can_allocate_weight - sum_weight
                                    : iter->weight;
 
-        // 该系统期望分配的资金
+        // The funds this system expects to be allocated
         price_t will_cash = roundUp(total_funds * current_weight, precision);
         if (will_cash <= 0.0) {
             continue;
         }
 
-        // 计算子账户实际可获取的的资金
+        // Calculate the funds the sub account can actually get
         price_t need_cash = will_cash <= can_allocate_cash ? will_cash : can_allocate_cash;
 
-        // 如果需要的资金连一手都买不了，直接忽略跳过
+        // Skip it when the needed funds cannot buy even one lot
         KRecord krecord =
           iter->sys->getStock().getKRecord(date, iter->sys->getTO().getQuery().kType());
         if (krecord.isValid() &&
@@ -258,14 +277,14 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
             continue;
         }
 
-        // 尝试从总账户中取出资金存入子账户
+        // Try to withdraw the funds from the total account and deposit them into the sub account
         TMPtr sub_tm = iter->sys->getTM();
         if (m_cash_tm->checkout(date, need_cash)) {
             sub_tm->checkin(date, need_cash);
             HKU_INFO_IF(trace, "[AF] ({}, {}, weight: {:<.4f}) fetched cash: {}", iter->sys->name(),
                         iter->sys->getStock().market_code(), current_weight, need_cash);
 
-            // 计算剩余的可用于分配的资金
+            // Calculate the remaining funds available for the allocation
             can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
             sum_weight += current_weight;
 
@@ -284,11 +303,11 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[AF] {} _adjust_with_running", date);
 
-    // 如果选中列表为空，则需要全部执行清仓，这里不能返回
+    // When the selected list is empty everything must be liquidated, so it must not return here
     // HKU_IF_RETURN(se_list.size() == 0, delay_list);
 
     //-----------------------------------------------------------------
-    // 回收所有运行中系统剩余资金，用于重新分配
+    // Recall the remaining funds of all the running systems for the reallocation
     //-----------------------------------------------------------------
     for (const auto& sys : running_set) {
         if (sys) {
@@ -301,19 +320,20 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
         }
     }
 
-    // 获取计划分配的资产权重
+    // Get the planned asset allocation weights
     SystemWeightList sw_list = _allocateWeight(date, se_list);
     HKU_IF_RETURN(sw_list.size() == 0, delay_list);
 
-    // 按权重降序排列
+    // Sort in the descending weight order
     double reserve_percent = getParam<double>("reserve_percent");
     double can_allocate_weight = 1.0 - reserve_percent;
     adjustWeight(sw_list, can_allocate_weight, getParam<bool>("auto_adjust_weight"),
                  getParam<bool>("ignore_zero_weight"));
 
     //-----------------------------------------------------------------
-    // 先将已不在 sw_list 中的运行系统进行强制清仓，回收可分配资金
-    // 不需要区分延迟买入系统，不管什么类型的系统，都是立刻使用收盘价进行清仓
+    // Force a liquidation of the running systems no longer in sw_list first, recalling the
+    // allocatable funds The delayed buy systems need no distinction; whatever the type, the
+    // liquidation is done immediately with the close price
     //-----------------------------------------------------------------
     std::unordered_set<SYSPtr> running_in_sw_set;
     for (const auto& sw : sw_list) {
@@ -326,7 +346,8 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
         if (running_in_sw_set.find(sys) == running_in_sw_set.cend()) {
             PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
             if (position.takeDatetime >= date) {
-                // 如果持仓买入日期为当日，则延迟至下一日开盘处理
+                // When the buy date of the position is today, it is delayed to the open of the next
+                // day
                 delay_list.emplace_back(sys, position.number);
             } else {
                 auto tr = sys->sellForceOnClose(date, position.number, PART_ALLOCATEFUNDS);
@@ -335,12 +356,13 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                     auto sub_cash = sub_tm->currentCash();
                     if (sub_tm->checkout(date, sub_cash)) {
                         m_cash_tm->checkin(date, sub_cash);
-                        m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                        m_tm->addTradeRecord(tr);  // Add the trade record into the total account
                         HKU_INFO_IF(trace, "[AF] Clean position sell: {}, recycle cash: {:<.2f}",
                                     sys->name(), sub_cash);
                     }
                 } else {
-                    // 清仓卖出失败情况，也加入到延迟卖出列表中，以便下一交易日可执行
+                    // A failed liquidation sell is also added into the delayed sell list so that it
+                    // can be executed on the next trading day
                     if (position.number > 0.0) {
                         delay_list.emplace_back(sys, position.number);
                         HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
@@ -351,21 +373,22 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     }
 
     //-----------------------------------------------------------------
-    // 对于仍在选中系统中的运行系统，根据其权重进行减仓处理，回收可分配资金
+    // For the running systems still in the selected system, reduce their positions according to
+    // their weights and recall the allocatable funds
     //-----------------------------------------------------------------
-    // 获取当前总资产市值，计算需保留的资产
+    // Get the current total assets market value and calculate the assets to be reserved
     int precision = m_cash_tm->getParam<int>("precision");
     FundsRecord funds = m_tm->getFunds(date, m_query.kType());
     price_t total_funds = funds.total_assets();
     price_t reserve_funds = roundEx(total_funds * reserve_percent, precision);
 
-    std::unordered_set<SYSPtr> reduced_running_set;  // 缓存已执行过减仓的运行中系统
+    std::unordered_set<SYSPtr> reduced_running_set;  // Cache the running systems already reduced
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
         if (!iter->sys) {
             continue;
         }
 
-        // 如果当前系统是运行中的系统
+        // If the current system is a running system
         if (running_set.find(iter->sys) != running_set.cend()) {
             TMPtr sub_tm = iter->sys->getTM();
             const KQuery& query = iter->sys->getTO().getQuery();
@@ -373,16 +396,17 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
             price_t sub_total_funds = sub_funds.total_assets();
             price_t sub_will_funds = total_funds * iter->weight;
 
-            // 如果需要执行减仓
+            // If the position reduction needs to be executed
             if (sub_total_funds > sub_will_funds) {
-                reduced_running_set.insert(iter->sys);  // 缓存执行了减仓的系统
+                reduced_running_set.insert(
+                  iter->sys);  // Cache the system whose position was reduced
                 price_t need_back_funds = sub_total_funds - sub_will_funds;
                 Stock stock = iter->sys->getStock();
 
-                // 获取当前最后的收盘价
+                // Get the current last close price
                 price_t last_close_price = stock.getMarketValue(date, query.kType());
                 if (last_close_price <= 0.0) {
-                    // 证券已失效，无法处理，资产全部损失
+                    // The security is invalid and cannot be processed, all the assets are lost
                     HKU_WARN_IF(trace, "{} has been delisted!", iter->sys->name());
                     continue;
                 }
@@ -390,11 +414,11 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                 PositionRecord position = sub_tm->getPosition(date, stock);
                 double hold_num = position.number;
                 if (hold_num <= 0.0) {
-                    // 实际无持仓
+                    // There is actually no position
                     continue;
                 }
 
-                // 预期需要卖出的数量
+                // The quantity expected to be sold
                 double min_num = stock.minTradeNumber();
                 double need_back_num =
                   static_cast<int64_t>(need_back_funds / last_close_price / min_num) * min_num;
@@ -407,7 +431,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                 }
 
                 if (position.takeDatetime >= date) {
-                    // 今日刚刚买入的交易，需要延迟调仓
+                    // A trade bought today needs a delayed position adjustment
                     delay_list.emplace_back(iter->sys, need_back_num);
                     HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
                                 iter->sys->name(), need_back_num);
@@ -417,13 +441,14 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                         auto sub_cash = sub_tm->currentCash();
                         if (sub_tm->checkout(date, sub_cash)) {
                             m_cash_tm->checkin(date, sub_cash);
-                            m_tm->addTradeRecord(tr);  // 向总账户加入交易记录
+                            m_tm->addTradeRecord(
+                              tr);  // Add the trade record into the total account
                             HKU_INFO_IF(trace,
                                         "[AF] Deduce position {}, sell num: {}, recycle cash: {}",
                                         iter->sys->name(), need_back_num, sub_cash);
                         }
                     } else {
-                        // 卖出失败的情况，也加入到延迟交易列表中
+                        // A failed sell is also added into the delayed trade list
                         delay_list.emplace_back(iter->sys, need_back_num);
                         HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
                                     iter->sys->name(), need_back_num);
@@ -434,9 +459,10 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
     }
 
     //-----------------------------------------------------------------
-    // 遍历当前选中系统，按指定权重分配资金
+    // Traverse the currently selected systems and allocate the funds by the given weights
     //-----------------------------------------------------------------
-    // 计算可用于分配的现金, 小于等于需保留的资产，则直接返回
+    // Calculate the cash available for the allocation; return directly when it is not greater than
+    // the assets to be reserved
     price_t current_cash = m_cash_tm->currentCash();
     price_t can_allocate_cash = roundDown(current_cash - reserve_funds, precision);
 
@@ -448,7 +474,7 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
 
     HKU_IF_RETURN(can_allocate_cash < 1.0, delay_list);
 
-    // 遍历选中子系统列表，并调整资产
+    // Traverse the selected subsystem list and adjust the assets
     price_t sum_weight = 0.0;
     for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
         if (sum_weight >= can_allocate_weight || can_allocate_cash < 1.0) {
@@ -459,10 +485,10 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
             continue;
         }
 
-        // 系统期望分配的资产额
+        // The asset amount the system expects to be allocated
         price_t will_funds = roundUp(total_funds * iter->weight, precision);
 
-        // 如果该系统是当前运行中系统
+        // If this system is a currently running system
         if (running_set.find(iter->sys) != running_set.cend()) {
             auto sub_tm = iter->sys->getTM();
             const KQuery& query = iter->sys->getTO().getQuery();
@@ -470,13 +496,15 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
             price_t sub_total_funds = sub_funds.cash + sub_funds.market_value +
                                       sub_funds.borrow_asset - sub_funds.short_market_value;
 
-            // 如果是已经执行过减仓的系统
+            // If the position of this system has already been reduced
             if (reduced_running_set.find(iter->sys) != reduced_running_set.cend()) {
-                // 剩余可分配资金不变，已占用权重按实际权重累积
+                // The remaining allocatable funds stay unchanged and the occupied weight is
+                // accumulated with the actual weight
                 sum_weight += sub_total_funds / total_funds;
 
             } else {
-                // 未执行过减仓的系统，需要予以相应资金分配
+                // A system whose position has not been reduced needs the corresponding funds
+                // allocation
                 if (sub_total_funds >= will_funds) {
                     sum_weight += sub_total_funds / total_funds;
 
@@ -486,7 +514,8 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                         need_cash = can_allocate_cash;
                     }
 
-                    // 如果期望的资金连一手都买不起(含退市），则跳过
+                    // Skip it when the expected funds cannot buy even one lot (including a
+                    // delisting)
                     auto last_price = iter->sys->getStock().getMarketValue(date, query.kType());
                     if (need_cash < last_price * iter->sys->getStock().minTradeNumber()) {
                         continue;
@@ -498,26 +527,26 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
                                     need_cash);
 
                         can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
-                        // 更新已分配的累积权重
+                        // Update the accumulated allocated weight
                         sum_weight += (sub_total_funds + need_cash) / total_funds;
                     }
                 }
             }
         } else {
-            // 非运行中的系统
-            // 计算子账户实际可获取的的资金
+            // A system that is not running
+            // Calculate the funds the sub account can actually get
             price_t need_cash = will_funds <= can_allocate_cash ? will_funds : can_allocate_cash;
 
-            // 尝试从资金账户中取出资金存入子账户
+            // Try to withdraw the funds from the cash account and deposit them into the sub account
             TMPtr sub_tm = iter->sys->getTM();
             if (m_cash_tm->checkout(date, need_cash)) {
                 sub_tm->checkin(date, need_cash);
                 HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(), need_cash);
 
-                // 更新剩余可分配资金
+                // Update the remaining allocatable funds
                 can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
 
-                // 更新已分配的累积权重
+                // Update the accumulated allocated weight
                 sum_weight += iter->weight;
 
             } else {

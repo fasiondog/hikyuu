@@ -11,17 +11,17 @@ import click
 
 
 # ------------------------------------------------------------------------------
-# 前置检查
+# Pre-check
 # ------------------------------------------------------------------------------
 def check_xmake():
-    """检查是否按照了编译工具 xmake"""
+    """Check whether the build tool xmake is installed"""
     print("checking xmake ...")
     xmake = os.system("xmake --version")
     return False if xmake != 0 else True
 
 
 def get_python_version():
-    """获取当前 python版本"""
+    """Get the current python version"""
     py_version = platform.python_version_tuple()
     min_version = int(py_version[1])
     main_version = int(py_version[0])
@@ -32,7 +32,7 @@ def get_python_version():
 
 
 def get_current_compile_info():
-    """获取当前编译信息, 其中 mode 无效"""
+    """Get the current build information; mode is invalid here"""
     current_bits = 64 if sys.maxsize > 2**32 else 32
     if sys.platform == 'win32':
         current_arch = 'x64' if current_bits == 64 else 'x86'
@@ -50,7 +50,7 @@ def get_current_compile_info():
 
 
 def get_history_compile_info():
-    """获取历史编译信息"""
+    """Get the historical build information"""
     try:
         with open('compile_info', 'r') as f:
             result = json.load(f)
@@ -65,15 +65,15 @@ def get_history_compile_info():
 
 
 def save_current_compile_info(compile_info):
-    """保持当前编译信息"""
+    """Save the current build information"""
     with open('compile_info', 'w') as f:
         json.dump(compile_info, f)
 
 
 def clear_with_python_changed(mode):
     """
-    python版本发生变化时，清理之前的python编译结果
-    应该仅在 pyhon 版本发生变化时被调用
+    Clean up the previous python build results when the python version changes
+    Should be called only when the python version changes
     """
     current_plat = sys.platform
     current_bits = 64 if sys.maxsize > 2**32 else 32
@@ -96,17 +96,17 @@ def clear_with_python_changed(mode):
         build_pywrap_dir = 'build/{mode}/macosx/i386/.objs/macosx/i386/{mode}/hikyuu_pywrap'.format(
             mode=mode)
     else:
-        print("************不支持的平台**************")
+        print("************Unsupported platform**************")
         exit(0)
     if os.path.lexists(build_pywrap_dir):
         shutil.rmtree(build_pywrap_dir)
 
 
 # ------------------------------------------------------------------------------
-# 执行构建
+# Execute the build
 # ------------------------------------------------------------------------------
 def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_precision=False, arrow=False):
-    """ 执行编译 """
+    """ Execute the build """
     global g_verbose
     g_verbose = verbose
     if not check_xmake():
@@ -119,7 +119,7 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
     current_compile_info['low_precision'] = low_precision
     current_compile_info['arrow'] = arrow
 
-    # 如果 python版本或者编译模式发生变化，则重新编译
+    # If the python version or the build mode changed, rebuild
     history_compile_info = get_history_compile_info()
     if current_compile_info != history_compile_info:
         clear_with_python_changed(mode)
@@ -136,12 +136,12 @@ def start_build(verbose=False, mode='release', feedback=True, worker_num=2, low_
     print(cmd)
     os.system(cmd)
 
-    # 保存当前的编译信息
+    # Save the current build information
     save_current_compile_info(current_compile_info)
 
 
 # ------------------------------------------------------------------------------
-# 控制台命令
+# Console commands
 # ------------------------------------------------------------------------------
 
 
@@ -151,13 +151,13 @@ def cli():
 
 
 @click.command()
-@click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
+@click.option('-v', '--verbose', is_flag=True, help='show the detailed build information')
 @click.option('-feedback',
               '--feedback',
               default=True,
               type=bool,
-              help='允许发送反馈信息')
-@click.option('-j', '--j', default=2, help="并行编译数量")
+              help='allow sending feedback information')
+@click.option('-j', '--j', default=2, help="the number of parallel builds")
 @click.option('-m',
               '--mode',
               default='release',
@@ -165,32 +165,32 @@ def cli():
                   'release', 'debug', 'coverage', 'asan', 'tsan', 'msan',
                   'lsan'
               ]),
-              help='编译模式')
+              help='the build mode')
 @click.option('-low_precision',
               '--low_precision',
               default=False,
               type=bool,
-              help='使用低精度版本')
+              help='use the low precision version')
 @click.option('-arrow',
               '--arrow',
               default=False,
               type=bool,
-              help='arrow支持')
+              help='arrow support')
 def build(verbose, mode, feedback, j, low_precision, arrow):
-    """ 执行编译 """
+    """ Execute the build """
     start_build(verbose, mode, feedback, j, low_precision, arrow)
 
 
 @click.command()
-@click.option('-all', "--all", is_flag=True, help="执行全部测试, 否则仅仅进行最小范围测试）")
-@click.option("-compile", "--compile", is_flag=False, help='强制重新编译')
+@click.option('-all', "--all", is_flag=True, help="run all the tests, otherwise only the minimal test scope)")
+@click.option("-compile", "--compile", is_flag=False, help='force rebuilding')
 @click.option('-feedback',
               '--feedback',
               default=True,
               type=bool,
-              help='允许发送反馈信息')
-@click.option('-v', '--verbose', is_flag=True, help='显示详细的编译信息')
-@click.option('-j', '--j', default=2, help="并行编译数量")
+              help='allow sending feedback information')
+@click.option('-v', '--verbose', is_flag=True, help='show the detailed build information')
+@click.option('-j', '--j', default=2, help="the number of parallel builds")
 @click.option('-m',
               '--mode',
               default='release',
@@ -198,20 +198,20 @@ def build(verbose, mode, feedback, j, low_precision, arrow):
                   'release', 'debug', 'coverage', 'asan', 'msan', 'tsan',
                   'lsan'
               ]),
-              help='编译模式')
-@click.option('-case', '--case', default='', help="执行指定的 TestCase")
+              help='the build mode')
+@click.option('-case', '--case', default='', help="run the specified TestCase")
 @click.option('-low_precision',
               '--low_precision',
               default=False,
               type=bool,
-              help='使用低精度版本')
+              help='use the low precision version')
 @click.option('-arrow',
               '--arrow',
               default=False,
               type=bool,
-              help='arrow支持')
+              help='arrow support')
 def test(all, compile, verbose, mode, case, feedback, j, low_precision, arrow):
-    """ 执行单元测试 """
+    """ Run the unit tests """
     start_build(verbose, mode, feedback, j, low_precision, arrow)
     if all:
         os.system("xmake -j {} -b {} unit-test".format(
@@ -226,7 +226,7 @@ def test(all, compile, verbose, mode, case, feedback, j, low_precision, arrow):
 
 
 def clear_build():
-    """ 清除当前编译设置及结果 """
+    """ Clear the current build settings and results """
     if os.path.lexists('.xmake'):
         print('delete .xmake')
         shutil.rmtree('.xmake', True)
@@ -259,7 +259,7 @@ def clear():
 
 @click.command()
 def uninstall():
-    """ 卸载已安装的 python 包 """
+    """ Uninstall the installed python package """
     if sys.platform == 'win32':
         site_lib_dir = sys.base_prefix + "/lib/site-packages"
     else:
@@ -306,20 +306,20 @@ def copy_include(install_dir):
 
 
 @click.command()
-@click.option('-j', '--j', default=2, help="并行编译数量")
-@click.option('-o', '--o', help="指定的安装目录")
+@click.option('-j', '--j', default=2, help="the number of parallel builds")
+@click.option('-o', '--o', help="the specified installation directory")
 @click.option('-low_precision',
               '--low_precision',
               default=False,
               type=bool,
-              help='使用低精度版本')
+              help='use the low precision version')
 @click.option('-arrow',
               '--arrow',
               default=False,
               type=bool,
-              help='arrow支持')
+              help='arrow support')
 def install(j, o, low_precision, arrow):
-    """ 编译并安装 Hikyuu python 库 """
+    """ Build and install the Hikyuu python library """
     install_dir = o
     if install_dir is None:
         if sys.platform == 'win32':
@@ -341,35 +341,35 @@ def install(j, o, low_precision, arrow):
 
 
 @click.command()
-@click.option('-j', '--j', default=2, help="并行编译数量")
+@click.option('-j', '--j', default=2, help="the number of parallel builds")
 @click.option('-feedback',
               '--feedback',
               default=True,
               type=bool,
-              help='允许发送反馈信息')
+              help='allow sending feedback information')
 @click.option('-low_precision',
               '--low_precision',
               default=False,
               type=bool,
-              help='使用低精度版本')
+              help='use the low precision version')
 @click.option('-arrow',
               '--arrow',
               default=False,
               type=bool,
-              help='arrow支持')
-@click.option('-c', '--clear', is_flag=False, help='先清除之前编译结果')
+              help='arrow support')
+@click.option('-c', '--clear', is_flag=False, help='clear the previous build results first')
 def wheel(feedback, j, low_precision, clear, arrow):
-    """ 生成 python 的 wheel 安装包 """
-    # 清理之前遗留的打包产物
+    """ Generate the python wheel package """
+    # Clean up the leftover packaging artifacts
     if clear:
         clear_build()
 
-    # 尝试编译
+    # Try to build
     start_build(False, 'release', feedback, j, low_precision, arrow)
 
     copy_include('hikyuu')
 
-    # 构建打包命令
+    # Build the packaging command
     print("start pacakaging bdist_wheel ...")
     current_plat = sys.platform
     cpu_arch = platform.machine()
@@ -389,7 +389,7 @@ def wheel(feedback, j, low_precision, clear, arrow):
     elif current_plat == 'darwin' and cpu_arch == 'arm64':
         plat = "macosx_11_0_arm64"
     else:
-        print("*********尚未实现该平台的支持*******")
+        print("*********The support for this platform is not implemented yet*******")
         return
 
     py_version = get_python_version()
@@ -403,7 +403,7 @@ def wheel(feedback, j, low_precision, clear, arrow):
 
 @click.command()
 def upload():
-    """ 发布上传至 pypi，仅供发布者使用！！！ """
+    """ Publish and upload to pypi, for the publisher only!!! """
     if not os.path.lexists('dist'):
         print("Not found wheel package! Pleae wheel first")
         return
@@ -419,7 +419,7 @@ def upload():
 
 
 # ------------------------------------------------------------------------------
-# 添加 click 命令
+# Add the click commands
 # ------------------------------------------------------------------------------
 cli.add_command(build)
 cli.add_command(test)

@@ -93,22 +93,26 @@ void IMrr::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto const* src = ind.data();
     auto* dst = this->data();
 
-    // 标准最大盈利比率语义: rr_j = src[j] / run_min_j - 1,
-    // 其中 run_min_j = min(src[window_left..j]) 为到 j 为止的累计最小值。
-    // 原实现错误地用窗口全局 min 作为所有点的盈利基准, 当窗口最低点出现在
-    // 最高点之后时会引入未来数据(look-ahead bias), 高估盈利比率。
-    // 此处放弃原 O(1) 快路径状态机(其 current_rr > window_max_rr 判断在标准
-    // MRR 语义下原理性不成立), 退化为每点 O(n) 暴力扫描, 用 run_min 基准保证
-    // 正确性。与 IMdd 修复对称。
+    // The standard maximum rise rate semantics: rr_j = src[j] / run_min_j - 1, where
+    // run_min_j = min(src[window_left..j]) is the accumulated minimum up to j.
+    // The original implementation wrongly used the global minimum of the window as the rise base
+    // of all the points; when the lowest point of the window appears after the highest point it
+    // introduces the look-ahead bias and overestimates the rise rate.
+    // Here the original O(1) fast path state machine is abandoned (its judgment of
+    // current_rr > window_max_rr does not hold in principle under the standard MRR semantics)
+    // and it degenerates to an O(n) brute force scan per point, using the run_min base to
+    // guarantee the correctness. It is symmetric to the IMdd fix.
     for (size_t i = start_pos; i < total; ++i) {
         Indicator::value_t current_price = src[i];
         if (std::isnan(current_price) || current_price <= 0.0) {
-            // 无效点不写 dst[i], 保持原值, 与原语义一致
+            // An invalid point does not write dst[i] and keeps the original value, the same as the
+            // original semantics
             continue;
         }
 
         size_t window_left = i + 1 - n;
-        Indicator::value_t run_min = 0.0;  // 首个有效点赋初值, 避免 NaN 污染比较
+        Indicator::value_t run_min =
+          0.0;  // Assigned at the first valid point, avoiding NaN pollution
         Indicator::value_t window_max_rr = 0.0;
         bool has_valid = false;
         for (size_t j = window_left; j <= i; ++j) {
@@ -117,14 +121,14 @@ void IMrr::_increment_calculate(const Indicator& ind, size_t start_pos) {
                 continue;
             }
             if (!has_valid) {
-                run_min = v;  // 首个有效点初始化 run_min
+                run_min = v;  // Initialize run_min at the first valid point
                 has_valid = true;
-                continue;  // 首点 rr = v/v - 1 = 0, 跳过
+                continue;  // For the first point rr = v/v - 1 = 0, skip it
             }
             if (v < run_min) {
                 run_min = v;
             }
-            // run_min 必然 > 0(数据约束为正), 除法安全
+            // run_min is always > 0 (the data is constrained to be positive), the division is safe
             Indicator::value_t rr = v / run_min - 1.0;
             if (rr > window_max_rr) {
                 window_max_rr = rr;

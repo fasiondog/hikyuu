@@ -1,7 +1,7 @@
 /*
  * NoGoalProfitGoal.h
  *
- *  Created on: 2016年5月6日
+ *  Created on: 2016-5-6
  *      Author: Administrator
  */
 
