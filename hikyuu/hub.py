@@ -13,6 +13,7 @@ from hikyuu.util.singleton import SingletonType
 from hikyuu.util.check import checkif
 from hikyuu.util import hku_info
 import os
+import locale
 import stat
 import errno
 import sys
@@ -31,7 +32,6 @@ try:
 except Exception as e:
     print(e)
     print("You need install git! see: https://git-scm.com/downloads")
-
 
 Base = declarative_base()
 
@@ -83,9 +83,7 @@ class PartModel(Base):
     doc = Column(String)  # the help description
     module_name = Column(String)  # the actual module name imported by the strategy
     label = Column(String)  # the label
-    __table_args__ = (
-        UniqueConstraint('name', name='uq_part_model_name'),
-    )
+    __table_args__ = (UniqueConstraint('name', name='uq_part_model_name'), )
 
     def __str__(self):
         return 'PartModel(id={}, hub_name={}, part={}, name={}, author={}, module_name={})'.format(
@@ -101,7 +99,9 @@ class HubNameRepeatError(Exception):
         self.name = name
 
     def __str__(self):
-        return "A repository with the same name ({}) already exists, please use another repository name!".format(self.name)
+        return "A repository with the same name ({}) already exists, please use another repository name!".format(
+            self.name
+        )
 
 
 class HubNotFoundError(Exception):
@@ -170,7 +170,6 @@ def dbsession(func):
 
 class HubManager(metaclass=SingletonType):
     """Strategy repository management"""
-
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
         usr_dir = os.path.expanduser('~')
@@ -186,8 +185,7 @@ class HubManager(metaclass=SingletonType):
             columns = inspector.get_columns(PartModel.__tablename__)
             column_exists = any(column['name'] == 'label' for column in columns)
             if not column_exists:
-                add_column_sql = sqlalchemy.text(
-                    f"ALTER TABLE {PartModel.__tablename__} ADD COLUMN label TEXT;")
+                add_column_sql = sqlalchemy.text(f"ALTER TABLE {PartModel.__tablename__} ADD COLUMN label TEXT;")
                 with engine.connect() as connection:
                     connection.execute(add_column_sql)
 
@@ -195,7 +193,8 @@ class HubManager(metaclass=SingletonType):
             index_exists = any(index['name'] == "uq_part_model_name" for index in indexes)
             if not index_exists:
                 create_index_sql = sqlalchemy.text(
-                    f"CREATE INDEX uq_part_model_name ON {PartModel.__tablename__} (name);")
+                    f"CREATE INDEX uq_part_model_name ON {PartModel.__tablename__} (name);"
+                )
                 with engine.connect() as connection:
                     connection.execute(create_index_sql)
 
@@ -229,10 +228,17 @@ class HubManager(metaclass=SingletonType):
         for model in hub_models:
             sys.path.append(os.path.dirname(model.local))
 
-        # Check and download the default hikyuu strategy repository; hikyuu_hub avoids the module name conflicting with hikyuu when importing
+        # Check and download the default hikyuu strategy repository; hikyuu_hub avoids the module
+        # name conflicting with hikyuu when importing. Use gitee for Chinese locales and GitHub for
+        # the others.
         hikyuu_hub_path = self._session.query(HubModel.local).filter(HubModel.name == 'default').first()
         if hikyuu_hub_path is None:
-            self.add_remote_hub('default', 'https://gitee.com/fasiondog/hikyuu_hub.git', 'main')
+            lang, _ = locale.getdefaultlocale()
+            if lang and 'zh' in lang.lower():
+                default_hub_url = 'https://gitee.com/fasiondog/hikyuu_hub.git'
+            else:
+                default_hub_url = 'https://github.com/fasiondog/hikyuu_hub.git'
+            self.add_remote_hub('default', default_hub_url, 'main')
 
     def download_remote_hub(self, local_dir, url, branch):
         print('Downloading the hikyuu strategy repository to: "{}"'.format(local_dir))
@@ -244,7 +250,10 @@ class HubManager(metaclass=SingletonType):
         try:
             git.Repo.clone_from(url, local_dir, branch=branch)
         except:
-            raise RuntimeError("git (https://git-scm.com/) must be installed, or please check whether the network works and the url ({}) is correct!".format(url))
+            raise RuntimeError(
+                "git (https://git-scm.com/) must be installed, or please check whether the network works and the url ({}) is correct!"
+                .format(url)
+            )
         print('Download completed')
 
     @dbsession
@@ -394,10 +403,14 @@ class HubManager(metaclass=SingletonType):
                                 # part_module = importlib.import_module(module_name)
                                 part_module = self._get_module(module_name)
                             except ModuleNotFoundError:
-                                self.logger.error('{}: the part.py file is missing, location: "{}"!'.format(module_name, entry.path))
+                                self.logger.error(
+                                    '{}: the part.py file is missing, location: "{}"!'.format(module_name, entry.path)
+                                )
                                 continue
                             except Exception as e:
-                                self.logger.error('{}: unable to import the file: {}! {}'.format(module_name, entry.path, str(e)))
+                                self.logger.error(
+                                    '{}: unable to import the file: {}! {}'.format(module_name, entry.path, str(e))
+                                )
                                 continue
 
                             module_vars = vars(part_module)
@@ -437,9 +450,10 @@ class HubManager(metaclass=SingletonType):
         """
         name_parts = name.split('.')
         checkif(
-            len(name_parts) < 2
-            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')),
-            name, PartNameError
+            len(name_parts) < 2 or (
+                name_parts[-2]
+                not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')
+            ), name, PartNameError
         )
 
         # If no repository name is specified, the 'default' repository is used by default
@@ -467,9 +481,10 @@ class HubManager(metaclass=SingletonType):
         """
         name_parts = name.split('.')
         checkif(
-            len(name_parts) < 2
-            or (name_parts[-2] not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')),
-            name, PartNameError
+            len(name_parts) < 2 or (
+                name_parts[-2]
+                not in ('af', 'cn', 'ev', 'mf', 'mm', 'pg', 'se', 'sg', 'sp', 'st', 'pf', 'sys', 'ind', 'other')
+            ), name, PartNameError
         )
 
         # If no repository name is specified, the 'default' repository is used by default
