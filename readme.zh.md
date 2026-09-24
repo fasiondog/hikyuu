@@ -3,6 +3,11 @@
 </p>
 
 <p align="center">
+  基于 C++/Python 开发的开源高性能量化交易研究框架，聚焦策略分析与回测<br>
+  <strong>交易模型研发 · 极速计算引擎 · 高效回测体系</strong>
+</p>
+
+<p align="center">
   <img src="https://github.com/fasiondog/hikyuu/workflows/win-build/badge.svg" alt="Windows build">
   <img src="https://github.com/fasiondog/hikyuu/workflows/ubuntu-build/badge.svg" alt="Ubuntu build">
   <img src="https://img.shields.io/github/license/fasiondog/hikyuu.svg" alt="License">
@@ -14,8 +19,6 @@
 </p>
 
 ## ⚡ Hikyuu Quant Framework
-
-> 基于 C++/Python 开发的开源高性能量化交易研究框架，聚焦策略分析与回测。核心能力覆盖三大维度：**交易模型研发 · 极速计算引擎 · 高效回测体系**。
 
 框架依托成熟的系统化交易与投资组合理念，将量化分析体系拆解为市场环境、信号、止损 / 止盈、资金管理、收益目标、滑点、多因子、资金分配等可独立替换的**策略部件**，自由组合即可搭建专属策略库，并通过回测验证有效性。同时预留扩展接口，可对接合规的第三方交易终端（如 QMT 等官方合规接口），满足个性化适配需求。
 
@@ -50,10 +53,10 @@
 
 | 项目                   | 链接                                                                                                                                              |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🏠 **项目首页**  | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                         |
-| 📚 **帮助文档**  | [https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)                                     |
-| 🚀 **入门示例**  | [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True) |
-| 🧰 **策略部件库** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                                   |
+| 🏠**项目首页**   | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                         |
+| 📚**帮助文档**   | [https://hikyuu.readthedocs.io/zh-cn/latest/index.html](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)                                     |
+| 🚀**入门示例**   | [Jupyter Notebook 系列教程](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/zh/000-Index.ipynb?flush_cache=True) |
+| 🧰**策略部件库** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                                   |
 
 ---
 
@@ -119,10 +122,10 @@ sys.run(sm['sz000001'], Query(-150))
 
 | 现象                                              | 解决办法                                                                     |
 | :------------------------------------------------ | :--------------------------------------------------------------------------- |
-| Windows 下 `pip install` 卡在下载 PyQt / PySide6 | 换清华源：`pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple` |
-| `HikyuuTDX` 图形界面无法导入数据                 | 改用命令行 `importdata`（需先运行过一次 GUI 以生成配置文件）               |
-| 提示缺少 hdf5 / dll 相关错误                     | 执行 `pip install tables` 重新安装 HDF5 支持                               |
-| **从源码构建**时的构建工具                       | 本项目使用 **xmake**，不是 cmake                                           |
+| Windows 下`pip install` 卡在下载 PyQt / PySide6 | 换清华源：`pip install hikyuu -i https://pypi.tuna.tsinghua.edu.cn/simple` |
+| `HikyuuTDX` 图形界面无法导入数据                | 改用命令行`importdata`（需先运行过一次 GUI 以生成配置文件）                |
+| 提示缺少 hdf5 / dll 相关错误                      | 执行`pip install tables` 重新安装 HDF5 支持                                |
+| **从源码构建**时的构建工具                  | 本项目使用**xmake**，不是 cmake                                        |
 
 > 💡 更多问题请查 [帮助文档](https://hikyuu.readthedocs.io/zh-cn/latest/index.html)，或在 [Gitee 提交 issue](https://gitee.com/fasiondog/hikyuu/issues)。
 
@@ -175,24 +178,24 @@ sys.run(sm['sz000001'], Query(-150))
 
 > 遵循系统化交易理念严谨架构，每个部件可独立替换、自由组合
 
-| 层级               | 部件                          | 说明                          |
-| :----------------- | :---------------------------- | :---------------------------- |
-| **投资组合层**     | `Portfolio / PF`              | 投资组合：多系统的策略调度    |
-|                    | `Selector / SE`               | 系统对象选择：系统策略筛选    |
-|                    | `AllocateFunds / AF`          | 资金分配：多系统的资金分配    |
-|                    | `MultiFactor / MF`            | 多因子模型：因子评分与排序    |
-| **交易系统 SYS**   | `Environment / EV`            | 市场环境：大盘环境有效性判断  |
-|                    | `Condition / CN`              | 系统有效条件：系统适用条件    |
-|                    | `Signal / SG`                 | 信号指示器：产生买卖信号      |
-|                    | `Stoploss / Stopprofit / ST`  | 止损 / 止盈：风险控制退出     |
-|                    | `MoneyManager / MM`           | 资金管理：买卖数量控制        |
-|                    | `ProfitGoal / PG`             | 盈利目标：目标达成退出        |
-|                    | `Slippage / SP`               | 滑点：回测价格模拟            |
-| **交易管理**       | `TradeManager / TM`           | 交易管理：账户资金与持仓记录  |
-|                    | `OrderBroker / OB`            | 订单执行：实盘下单 broker 对接 |
-| **数据层**         | `StockManager`                | 证券统一管理                  |
-|                    | `KData`                       | K 线量价序列                  |
-|                    | `Query`                       | 时间范围查询筛选              |
+| 层级                   | 部件                           | 说明                           |
+| :--------------------- | :----------------------------- | :----------------------------- |
+| **投资组合层**   | `Portfolio / PF`             | 投资组合：多系统的策略调度     |
+|                        | `Selector / SE`              | 系统对象选择：系统策略筛选     |
+|                        | `AllocateFunds / AF`         | 资金分配：多系统的资金分配     |
+|                        | `MultiFactor / MF`           | 多因子模型：因子评分与排序     |
+| **交易系统 SYS** | `Environment / EV`           | 市场环境：大盘环境有效性判断   |
+|                        | `Condition / CN`             | 系统有效条件：系统适用条件     |
+|                        | `Signal / SG`                | 信号指示器：产生买卖信号       |
+|                        | `Stoploss / Stopprofit / ST` | 止损 / 止盈：风险控制退出      |
+|                        | `MoneyManager / MM`          | 资金管理：买卖数量控制         |
+|                        | `ProfitGoal / PG`            | 盈利目标：目标达成退出         |
+|                        | `Slippage / SP`              | 滑点：回测价格模拟             |
+| **交易管理**     | `TradeManager / TM`          | 交易管理：账户资金与持仓记录   |
+|                        | `OrderBroker / OB`           | 订单执行：实盘下单 broker 对接 |
+| **数据层**       | `StockManager`               | 证券统一管理                   |
+|                        | `KData`                      | K 线量价序列                   |
+|                        | `Query`                      | 时间范围查询筛选               |
 
 ---
 
@@ -210,12 +213,12 @@ sys.run(sm['sz000001'], Query(-150))
 
 ## ❤️ 感谢捐赠，让 Hikyuu 走得更远
 
-| 方案                  | 说明                                                                                                                   | 方式                | 链接                                   |
-| :-------------------- | :--------------------------------------------------------------------------------------------------------------------- | :------------------ | :------------------------------------- |
-| ☕ **请作者喝杯咖啡** | ¥30 · 一次性的小小支持（赠历史日线及 3 个月捐赠权益）                                                                  | 支付宝              | [前往捐赠](https://wzyp.cn/item/gflv3v) |
-| 📅 **订阅 180 天**    | ¥50 · 半年期捐赠权益（赠历史日线）                                                                                     | 支付宝              | [前往捐赠](https://wzyp.cn/item/du4h8s) |
-| 🗓️ **订阅 365 天**    | ¥100 · 全年期捐赠权益（赠历史日 / 分 / 时 / 笔数据）                                                                   | 支付宝              | [前往捐赠](https://wzyp.cn/item/ehbz9b) |
-| 🌌 **加入知识星球**   | ¥300/年 · 首年 300 元，续费半价；捐赠权益 1 年可 3 台设备登录 · 专属微信群及策略部件库（赠历史日 / 分 / 时 / 笔数据） | 微信 / 知识星球 APP | [前往加入](https://t.zsxq.com/YSATD)   |
+| 方案                       | 说明                                                                                                                     | 方式                | 链接                                   |
+| :------------------------- | :----------------------------------------------------------------------------------------------------------------------- | :------------------ | :------------------------------------- |
+| ☕**请作者喝杯咖啡** | ¥30 · 一次性的小小支持（赠历史日线及 3 个月捐赠权益）                                                                  | 支付宝              | [前往捐赠](https://wzyp.cn/item/gflv3v) |
+| 📅**订阅 180 天**    | ¥50 · 半年期捐赠权益（赠历史日线）                                                                                     | 支付宝              | [前往捐赠](https://wzyp.cn/item/du4h8s) |
+| 🗓️**订阅 365 天**  | ¥100 · 全年期捐赠权益（赠历史日 / 分 / 时 / 笔数据）                                                                   | 支付宝              | [前往捐赠](https://wzyp.cn/item/ehbz9b) |
+| 🌌**加入知识星球**   | ¥300/年 · 首年 300 元，续费半价；捐赠权益 1 年可 3 台设备登录 · 专属微信群及策略部件库（赠历史日 / 分 / 时 / 笔数据） | 微信 / 知识星球 APP | [前往加入](https://t.zsxq.com/YSATD)    |
 
 > 🎁 **捐赠计划与附赠详见**：[https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html](https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html)
 
