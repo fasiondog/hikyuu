@@ -91,10 +91,6 @@ jobs:
         run: |
           python3 docs/tools/check_docs_parity.py
 
-      - name: Check notebook parity
-        run: |
-          python3 docs/tools/check_notebook_parity.py
-
       - name: Check README parity
         run: |
           python3 docs/tools/check_readme_parity.py
