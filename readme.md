@@ -3,7 +3,9 @@
 </p>
 
 <p align="center">
-  An open-source, high-performance quantitative trading research framework based on C++/Python, focused on strategy analysis and backtesting. <strong>Trading model development · Ultra-fast computation engine · Efficient backtesting system</strong>
+  An open-source, high-performance quantitative trading framework in C++/Python<br>
+  focused on strategy analysis and backtesting<br>
+  <strong>Trading model R&amp;D · Ultra-fast engine · Efficient backtesting</strong>
 </p>
 
 <p align="center">

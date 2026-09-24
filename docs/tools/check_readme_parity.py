@@ -16,6 +16,16 @@ ATX heading whose title contains one of the _DONATION_KEYWORDS; everything from
 that heading up to (but not including) the next heading of the same or a higher
 level is skipped when fingerprints are built.
 
+Another intentionally allowed divergence is the hero tagline (the centered
+paragraph under the title mascot and above the badge row): its wording is
+prose, and its line-break layout is language-specific. CJK is compact while
+the equivalent English text is 1.5-2x longer, so the English tagline needs
+more <br> breaks at semantic boundaries and may use concise wording variants
+(e.g. "Trading model R&D" vs "交易模型研发"). Only structural presence is
+checked -- both READMEs must have a centered, non-image tagline paragraph
+containing a <strong> line right after the mascot; its text and the number of
+<br> tags are never compared.
+
 Usage:
     python3 docs/tools/check_readme_parity.py
 
@@ -33,6 +43,10 @@ ZH_README = os.path.join(REPO_ROOT, "readme.zh.md")
 _HEADING = re.compile(r"^(#{1,6})\s+\S")
 _IMAGE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)|<img[^>]+src=[\"']([^\"']+)[\"']")
 _LINK = re.compile(r"\[[^\]]*\]\(([^)]+)\)|href=[\"']([^\"']+)[\"']")
+
+# A centered HTML paragraph block in the hero area.
+_P_BLOCK = re.compile(r'<p\s+align="center">\s*(.*?)\s*</p>', re.DOTALL | re.IGNORECASE)
+_TAG_STRIP = re.compile(r"<[^>]+>")
 
 # Headings whose title contains any of these mark a language-specific section
 # whose content is allowed to diverge between the two READMEs (case-insensitive).
@@ -97,6 +111,26 @@ def links(path):
     return found
 
 
+def has_hero_tagline(text):
+    """The first centered <p> after the mascot image must be the tagline:
+    a non-image paragraph with visible text and a <strong> capabilities line.
+    Its wording and <br> count are deliberately not compared across languages.
+    """
+    blocks = _P_BLOCK.findall(text[:2000])
+    seen_mascot = False
+    for inner in blocks:
+        if "00000-title" in inner:
+            seen_mascot = True
+            continue
+        if not seen_mascot:
+            continue
+        if "<img" in inner.lower():
+            continue  # badge row or language switch, not the tagline
+        plain = _TAG_STRIP.sub("", inner).strip()
+        return bool(plain) and "<strong>" in inner.lower()
+    return False
+
+
 def main():
     errors = []
 
@@ -117,6 +151,14 @@ def main():
         errors.append("readme.md has no navigation link to readme.zh.md")
     if "readme.md" not in zh_text:
         errors.append("readme.zh.md has no navigation link to readme.md")
+
+    # Hero tagline slot must exist in both; wording and line breaks may differ.
+    if not has_hero_tagline(en_text):
+        errors.append("readme.md is missing the hero tagline (centered text "
+                      "paragraph with a <strong> line after the mascot)")
+    if not has_hero_tagline(zh_text):
+        errors.append("readme.zh.md is missing the hero tagline (centered text "
+                      "paragraph with a <strong> line after the mascot)")
 
     # Link language discipline.
     if "readthedocs.io/zh-cn/" in en_text:
