@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Hikyuu Quant Framework — an open-source, high-performance quantitative trading research framework based on C++/Python, focused on strategy analysis and backtesting<br>
+  An open-source, high-performance quantitative trading research framework based on C++/Python, focused on strategy analysis and backtesting<br>
   <strong>Trading model development · Ultra-fast computation engine · Efficient backtesting system</strong>
 </p>
 
@@ -18,11 +18,11 @@
   <b>English</b> | <a href="readme.zh.md">简体中文</a>
 </p>
 
-Built on mature systematic trading and portfolio management concepts, Hikyuu is focused on a fast research
-workflow for strategy (or asset) portfolios. It decomposes quantitative analysis into independently
-replaceable **strategy parts** — market environment, signals, stop-loss / take-profit, money management,
-profit goals, slippage, multi-factor models and fund allocation — which you can freely combine into your
-own strategy library and validate through backtesting.
+Hikyuu Quant Framework builds on mature systematic trading and portfolio management concepts, with a core
+focus on a fast research workflow for strategy (or asset) portfolios. It decomposes quantitative analysis
+into independently replaceable **strategy parts** — market environment, signals, stop-loss / take-profit,
+money management, profit goals, slippage, multi-factor models and fund allocation — which you can freely
+combine into your own strategy library and validate through backtesting.
 
 > ⚠️ **Disclaimer**: This project is an open-source financial technology research tool. It is intended
 > for personal study, academic research and data analysis only. It does not constitute any investment
