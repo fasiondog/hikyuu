@@ -88,6 +88,10 @@ msgstr "加载证券类型信息……"
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1215
+msgid "Release stock weight/finance cache after shm base info published"
+msgstr "共享内存基础信息发布后，释放权息/财务数据缓存"
+
 #: hikyuu_cpp/hikyuu/StockManager.cpp:988
 msgid "Waiting for preload data loading to complete..."
 msgstr "等待预加载数据完毕…"

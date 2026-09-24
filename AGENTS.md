@@ -243,7 +243,7 @@ The core components of the systematic trading framework (independently replaceab
 - The files are still a mix of `.rst` and `.md` (the new files prefer `.md`).
 - The local build: `cd docs && ./make.sh` (building both trees → `build/html/{en,zh}`); `./make.sh en` / `./make.sh zh` build only one tree.
 - **They must be maintained in pairs**: when changing the documentation of either language, synchronize the other tree within the same PR, keeping the file sets / the toctree / the heading levels / the labels / the images / the code blocks consistent.
-- When modifying the public interfaces/adding the components, synchronize the corresponding sections under **both trees** (`indicator/`, `trade_sys/`, `trade_manage/`, `stock_manager.rst`, `factor.md`, etc.).
+- When modifying the public interfaces/adding the parts, synchronize the corresponding sections under **both trees** (`indicator/`, `trade_sys/`, `trade_manage/`, `stock_manager.rst`, `factor.md`, etc.).
 - The RTD hosting configuration: `docs/en/.readthedocs.yaml`, `docs/zh/.readthedocs.yaml` (the configuration files are **not** placed at the repository root); the cross-language jumps are provided by the RTD Flyout, and hardcoding the `/en/`, `/zh-cn/` links in the sources is forbidden.
 - **When doing Chinese-English translation (covering the C++/Python comment anglicization, the docstrings, the bilingual docs, the README, etc.), the wording must refer to the glossary `docs/tools/glossary.zh-en.md`**; new terms must be registered in the glossary first (via PR review), and then be used — do not invent synonymous translations.
 

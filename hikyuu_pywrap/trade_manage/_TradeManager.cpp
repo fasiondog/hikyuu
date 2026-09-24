@@ -679,11 +679,11 @@ Common parameters:
         R"(get_position_ext_info(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo])
 
     Get the position details of the specified time after the last trading moment of the account, returned as a dictionary, with the stock as the key and the PositionExtInfo as the value
- 
+
     :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)
     :param Query.KType ktype: the K-line type
     :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-    :return: the list of the extended position details)")
+    :return: the dict of the extended position details, with the stock as the key and the PositionExtInfo as the value)")
 
       .def(
         "get_history_position_ext_info_list", &TradeManagerBase::getHistoryPositionExtInfoList,
