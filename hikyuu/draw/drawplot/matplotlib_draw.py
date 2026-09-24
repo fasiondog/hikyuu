@@ -733,7 +733,7 @@ def sgplot(sg, new=True, axes=None, style=1, kdata=None):
 
 
 def evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2):
-    """Draw the market environment (the validity judgement)
+    """Draw the market environment (the validity judgment)
 
     :param EnvironmentBase cn: the market environment
     :param KData ref_kdata: used as the date reference

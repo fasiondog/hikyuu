@@ -9,6 +9,8 @@
 
 #include "hikyuu/KRecord.h"
 #include "hikyuu/KQuery.h"
+#include "hikyuu/TimeLineRecord.h"
+#include "hikyuu/TransRecord.h"
 #include "hikyuu/utilities/plugin/PluginBase.h"
 
 namespace hku {

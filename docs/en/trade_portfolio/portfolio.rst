@@ -37,7 +37,7 @@ The PF parts:
             <tr>
                 <td>SE_Xxx</td>
                 <td>System selection algorithm</td>
-                <td>Implements the algorithm for evaluating and selecting instruments and system strategies.</td>
+                <td>Implements the algorithm for evaluating and selecting instruments and system strategies.<br>Note: the optimization selector in the walk-forward optimization system also carries the SE prefix, but it is a different part, not the one described here.</td>
             </tr>
             <tr>
                 <td>AF_Xxx</td>

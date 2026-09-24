@@ -70,7 +70,7 @@ class TestCrtCN(unittest.TestCase):
 
         k = sm['sh000001'].get_kdata(Query(-100))
         self.assertEqual(k.empty(), False)
-        p.sg = SignalBase()  # The signal indicator must already be specified when setting the trading object of cn
+        p.sg = SignalBase()  # The signal generator must already be specified when setting the trading object of cn
         p.to = k  # The _calculate function is called only when cn sets the trading object
         self.assertEqual(p.is_valid(Datetime(201108120000)), True)
         self.assertEqual(p.is_valid(Datetime(201108250000)), True)

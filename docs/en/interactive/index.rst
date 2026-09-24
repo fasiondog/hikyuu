@@ -7,7 +7,7 @@ To draw the figures with matplotlib, you must understand the two basic objects i
 
 For the detailed examples of the drawing:
 
-`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True>`_
+`<https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True>`_
 
 
 Drawing the Combined Window
@@ -380,11 +380,11 @@ The following functions have been set as the plot functions of the corresponding
 
     Draw the buy/sell signals
 
-    :param SignalBase sg: the signal indicator
+    :param SignalBase sg: the signal generator
     :param new:   only taking effect when the axes is not specified; when True, create a new window object and draw in it
     :param axes:  specify in which axes object to draw
     :param style: 1 | 2 the signal arrow drawing style
-    :param KData kdata: the specified KData (i.e. the trading object of the signal generator); if this value is None, it is considered that the signal generator has already specified the trading object; otherwise, use this parameter as the trading object
+    :param KData kdata: the specified KData (i.e. the traded K-line data (TO) of the signal generator); if this value is None, it is considered that the signal generator has already specified the traded K-line data (TO); otherwise, use this parameter as the traded K-line data (TO)
 
 
 .. py:function:: cnplot(cn[, new=True, axes=None, kdata=None, upcolor='red', downcolor='blue', alpha=0.2])
@@ -394,7 +394,7 @@ The following functions have been set as the plot functions of the corresponding
     :param ConditionBase cn: the system valid condition
     :param new:  only taking effect when the axes is not specified; when True, create a new window object and draw in it
     :param axes: specify in which axes object to draw
-    :param KData kdata: the specified KData; if this value is None, it is considered that the system valid condition has already specified the trading object; otherwise, use this parameter as the trading object
+    :param KData kdata: the specified KData; if this value is None, it is considered that the system valid condition has already specified the traded K-line data (TO); otherwise, use this parameter as the traded K-line data (TO)
     :param upcolor: the color when valid
     :param downcolor: the color when invalid
     :param alpha: the transparency    
@@ -402,7 +402,7 @@ The following functions have been set as the plot functions of the corresponding
 
 .. py:function:: evplot(ev, ref_kdata, new=True, axes=None, upcolor='red', downcolor='blue', alpha=0.2)
 
-    Draw the market valid judgement
+    Draw the market valid judgment
 
     :param EnvironmentBase cn: the system valid condition
     :param KData ref_kdata: used as the date reference

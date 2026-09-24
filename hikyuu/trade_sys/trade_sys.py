@@ -70,12 +70,12 @@ def crtCN(func, params={}, name='crtCN'):
 # ------------------------------------------------------------------
 def crtEV(func, params={}, name='crtEV'):
     """
-    Quickly create an environment judgement strategy
+    Quickly create a market environment strategy
 
-    :param func: the environment judgement strategy function
+    :param func: the market environment strategy function
     :param {} params: the parameter dictionary
     :param str name: the custom name
-    :return: the custom environment judgement strategy instance
+    :return: the custom market environment strategy instance
     """
     meta_x = type(name, (EnvironmentBase, ), {'__init__': part_init, '_clone': part_clone})
     meta_x._calculate = func

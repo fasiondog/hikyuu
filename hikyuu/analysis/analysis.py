@@ -29,8 +29,8 @@ def combinate_ind_analysis(
     :param Query query: the specified query condition
     :param TradeManager tm: the trade manager instance
     :param System sys: the system trading strategy instance
-    :param list buy_inds: the list of the buy signal indicators
-    :param list sell_ins: the list of the sell signal indicators
+    :param list buy_inds: the list of the buy signal generators
+    :param list sell_ins: the list of the sell signal generators
     :param int n: the period range existing at the same time when combining the buy signals
     :param list keys: the Performance statistics items to output
     :rtype: pd.DataFrame
@@ -83,8 +83,8 @@ def combinate_ind_analysis_multi(
     :param Query q: the query condition
     :param TradeManager tm: the trade manager instance
     :param System sys: the system instance
-    :param list buy_inds: the list of the buy signal indicators
-    :param list sell_inds: the list of the sell signal indicators
+    :param list buy_inds: the list of the buy signal generators
+    :param list sell_inds: the list of the sell signal generators
     :param int n: the period when combining the buy signals
     :param list keys: the Performance statistics items to output
     '''

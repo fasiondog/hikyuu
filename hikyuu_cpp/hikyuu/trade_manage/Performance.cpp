@@ -255,9 +255,9 @@ void Performance::addKey(const string& key, const string& chinese) {
 }
 
 void Performance::setValue(const string& key, double value) {
-    HKU_ERROR_IF_RETURN(!isEnglishKey(key), void(),
-                        "Performance - setValue: only the English key is supported, but got \"{}\"!",
-                        key);
+    HKU_ERROR_IF_RETURN(
+      !isEnglishKey(key), void(),
+      "Performance - setValue: only the English key is supported, but got \"{}\"!", key);
     m_result[key] = value;
 }
 

@@ -12,7 +12,9 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_SystemPart(py::module& m) {
-    py::enum_<SystemPart>(m, "SystemPart", "The enumeration definition of the system related parts (the individual strategies), used to modify the related part parameters")
+    py::enum_<SystemPart>(m, "SystemPart",
+                          "The enumeration definition of the system related parts (the individual "
+                          "strategies), used to modify the related part parameters")
       .value("ENVIRONMENT", PART_ENVIRONMENT, "The external environment")
       .value("CONDITION", PART_CONDITION, "The system precondition")
       .value("SIGNAL", PART_SIGNAL, "The signal generator")
