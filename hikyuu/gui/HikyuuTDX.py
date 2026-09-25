@@ -13,7 +13,9 @@ from logging.handlers import QueueListener
 import hikyuu
 
 # 替换PyQt5导入为PySide6
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QFileDialog, QMessageBox,
+    QLabel, QRadioButton, QCheckBox, QSizePolicy)
 from PySide6.QtCore import Slot, QObject, Signal, QTranslator, QLocale
 from PySide6.QtGui import QIcon, QTextCursor, QFont, QPalette, QPixmap
 
@@ -107,9 +109,38 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self._text_color = palette.color(QPalette.WindowText).name()
         self.setupUi(self)
         self.initUI()
+        self._tune_for_i18n()
         self.initLogger()
         self.initThreads()
         self._initLanguageSelector()
+
+    def _tune_for_i18n(self):
+        # 英文等译文更长，会撑大控件最小宽度、破坏左右比例（QStackedWidget 取各页最大最小宽度）。
+        # 仅对非中文生效：长描述标签开换行、长单选/复选允许水平收缩(Ignored，超出时省略)，
+        # 中文先还原原始状态以保证与原版一致；切换可逆。
+        labels = self.findChildren(QLabel)
+        btns = list(self.findChildren(QRadioButton)) + list(self.findChildren(QCheckBox))
+        if not hasattr(self, '_i18n_orig'):
+            self._i18n_orig = {
+                'labels': {id(w): w.wordWrap() for w in labels},
+                'btns': {id(w): w.sizePolicy() for w in btns},
+            }
+        # 先还原到原始状态，再按当前语言度量决定（保证可逆、且中文与原版一致）
+        for w in labels:
+            w.setWordWrap(self._i18n_orig['labels'][id(w)])
+        for w in btns:
+            w.setSizePolicy(self._i18n_orig['btns'][id(w)])
+        if resolveUiLanguage().startswith('zh'):
+            return
+        LIMIT = 400
+        for w in labels:
+            if w.minimumSizeHint().width() > LIMIT:
+                w.setWordWrap(True)
+        for w in btns:
+            if w.minimumSizeHint().width() > LIMIT:
+                sp = QSizePolicy(w.sizePolicy())
+                sp.setHorizontalPolicy(QSizePolicy.Policy.Ignored)
+                w.setSizePolicy(sp)
 
     def _set_donation_text(self):
         # 捐赠说明 HTML：保留 CSS 头部，中文文案走 self.tr 以便中英双语；语言切换后重设
@@ -187,6 +218,7 @@ li.checked::marker { content: "\2612"; }
         # 刷新 .ui 静态文案与运行时动态文案
         self.retranslateUi(self)
         self.retranslateDynamic()
+        self._tune_for_i18n()
 
     def retranslateDynamic(self):
         # initUI 中以 setText 覆盖的动态文案，语言切换后需重新设置

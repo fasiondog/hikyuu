@@ -56,6 +56,12 @@ class Ui_MainWindow(object):
         self.language_comboBox.addItem("")
         self.language_comboBox.addItem("")
         self.language_comboBox.setObjectName(u"language_comboBox")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.language_comboBox.sizePolicy().hasHeightForWidth())
+        self.language_comboBox.setSizePolicy(sizePolicy1)
+        self.language_comboBox.setMaximumSize(QSize(200, 16777215))
 
         self.horizontalLayout_lang.addWidget(self.language_comboBox)
 
@@ -68,9 +74,6 @@ class Ui_MainWindow(object):
 
         self.groupBox_2 = QGroupBox(self.tab_4)
         self.groupBox_2.setObjectName(u"groupBox_2")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
         self.groupBox_2.setSizePolicy(sizePolicy1)
         self.verticalLayout_12 = QVBoxLayout(self.groupBox_2)
