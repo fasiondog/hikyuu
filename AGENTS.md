@@ -266,6 +266,7 @@ The core components of the systematic trading framework (independently replaceab
 8. **The git commit messages uniformly use English**: in the conventional commits style, e.g. `fix(data): fix cross-period aggregation of derived K-lines in the SQL backend`; the historical early commits have Chinese messages, but all the new commits use English, and the body text is also in English.
 9. **The AI must not commit proactively**: an AI coding agent is forbidden to execute `git commit`, and should also avoid `git add`; after completing each step, list "the list of the files to be committed + the suggested English commit message (a directly copyable `git commit -m "..."`)" and inform the user, letting the user decide the commit timing and the granularity.
 10. **Handle with care**: `hikyuu_pywrap` uses a unity build (`c++.unity_build`); pay attention to the unity_group grouping when adding the .cpp files; after modifying `xmake.lua`, you need to reconfigure with `xmake f`.
+11. **Never format generated Python files**: do not run yapf on `hikyuu/flat/Spot.py` and `hikyuu/flat/SpotList.py` (flatc output) or `hikyuu/gui/data/MainWindow.py` (pyside6-uic output) — they are regenerated from their sources and any formatting is lost. They are also excluded from flake8 in the root `.flake8`.
 
 ## 9. The Quick Self-check Checklist (before committing)
 

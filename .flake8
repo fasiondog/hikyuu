@@ -1,2 +1,14 @@
 [flake8]
 max-line-length = 120
+
+# Generated code (flatc / pyside6-uic): never lint or reformat
+extend-exclude =
+    hikyuu/flat/Spot.py
+    hikyuu/flat/SpotList.py
+    hikyuu/gui/data/MainWindow.py
+
+# Belt-and-suspenders: ignore line-length even if the files are passed explicitly
+per-file-ignores =
+    hikyuu/flat/Spot.py: E501
+    hikyuu/flat/SpotList.py: E501
+    hikyuu/gui/data/MainWindow.py: E501
