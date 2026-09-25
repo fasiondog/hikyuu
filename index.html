@@ -1,12 +1,67 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-lang="zh">
 
 <head>
   <meta charset="UTF-8">
   <title>Hikyuu - 量化交易研究框架</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="keywords" content="hikyuu,quant,backtester,trade,量化交易,系统交易" />
-  <meta name="description" content="Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架" />
+  <meta name="keywords" id="metaKeywords" content="hikyuu,quant,backtester,trade,量化交易,系统交易" />
+  <meta name="description" id="metaDescription" content="Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架" />
+  <script>
+    // 在渲染前确定语言（避免闪烁）：URL ?lang= > localStorage > 浏览器语言 > 时区推断
+    (function () {
+      var supported = ['zh', 'en'];
+      function norm(v) {
+        return String(v || '').slice(0, 2).toLowerCase();
+      }
+      var lang = '';
+      try {
+        var m = location.search.match(/[?&]lang=([a-zA-Z-]+)/);
+        if (m && supported.indexOf(norm(m[1])) >= 0) {
+          lang = norm(m[1]);
+        }
+        if (!lang) {
+          lang = norm(localStorage.getItem('hikyuu-lang'));
+        }
+      } catch (e) {}
+      if (supported.indexOf(lang) < 0) {
+        // 浏览器语言优先：命中任一 zh-* 即中文，明确为其他语言则英文
+        var navs = (navigator.languages && navigator.languages.length
+          ? navigator.languages
+          : [navigator.language || navigator.userLanguage || '']).filter(Boolean);
+        if (navs.length) {
+          lang = 'en';
+          for (var i = 0; i < navs.length; i++) {
+            if (norm(navs[i]) === 'zh') {
+              lang = 'zh';
+              break;
+            }
+          }
+        }
+      }
+      if (supported.indexOf(lang) < 0) {
+        // 无语言信息时按来源地区兜底：中国/港澳台时区归为中文用户
+        try {
+          var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+          if (/^(Asia\/(Shanghai|Chongqing|Harbin|Kashgar|Urumqi|Macao|Macau|Hong_Kong|Taipei)|China)/i.test(tz)) {
+            lang = 'zh';
+          }
+        } catch (e) {}
+      }
+      document.documentElement.setAttribute('data-lang', lang === 'zh' ? 'zh' : 'en');
+      document.documentElement.setAttribute('data-i18n-pending', '');
+      setTimeout(function () {
+        document.documentElement.removeAttribute('data-i18n-pending');
+      }, 3000);
+    })();
+  </script>
+  <noscript>
+    <style>
+      html[data-i18n-pending] body {
+        visibility: visible;
+      }
+    </style>
+  </noscript>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -117,6 +172,52 @@
 
     .nav-links a:hover::after {
       width: 100%;
+    }
+
+    .nav-links {
+      margin-left: auto;
+    }
+
+    /* 语言文案尚未落地前先隐藏正文，避免中文闪现（脚本异常或超时会自动放开） */
+    html[data-i18n-pending] body {
+      visibility: hidden;
+    }
+
+    /* Language switch */
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-left: 1.25rem;
+      padding: 0.25rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+    }
+
+    .lang-switch button {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      line-height: 1.4;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .lang-switch button:hover {
+      color: var(--white);
+    }
+
+    .lang-switch button.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
     }
 
     /* Hero Section */
@@ -903,12 +1004,16 @@
     <div class="nav-container">
       <a href="#" class="nav-logo">Hikyuu</a>
       <ul class="nav-links">
-        <li><a href="#features">核心优势</a></li>
-        <li><a href="#code">代码示例</a></li>
-        <li><a href="#architecture">架构设计</a></li>
-        <li><a href="#source">源码地址</a></li>
-        <li><a href="#community">社区支持</a></li>
+        <li><a href="#features"><span data-i18n="nav.features">核心优势</span></a></li>
+        <li><a href="#code"><span data-i18n="nav.code">代码示例</span></a></li>
+        <li><a href="#architecture"><span data-i18n="nav.architecture">架构设计</span></a></li>
+        <li><a href="#source"><span data-i18n="nav.source">源码地址</span></a></li>
+        <li><a href="#community"><span data-i18n="nav.community">社区支持</span></a></li>
       </ul>
+      <div class="lang-switch" id="langSwitch">
+        <button type="button" data-lang-btn="zh">中文</button>
+        <button type="button" data-lang-btn="en">English</button>
+      </div>
     </div>
   </nav>
 
@@ -917,20 +1022,20 @@
     <div class="hero-glow"></div>
     <div class="hero-content">
       <div class="hero-text">
-        <span class="hero-badge"><i class="fas fa-star"></i> 开源超高速量化交易框架</span>
+        <span class="hero-badge"><i class="fas fa-star"></i> <span data-i18n="hero.badge">开源超高速量化交易框架</span></span>
         <h1 class="hero-title"><img src="images/hikyuu_48x48.png" class="hero-title-icon" alt="Hikyuu" />Hikyuu<br>Ultra-Fast Quant Framework</h1>
         <p class="hero-description">
-          基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展（深度适配国内 A 股市场）。核心能力覆盖四大维度：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。
+          <span data-i18n="hero.description">基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展。核心能力覆盖四大维度：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。</span>
         </p>
         <div class="hero-buttons">
-          <a href="https://hikyuu.readthedocs.io" class="btn btn-primary">
-            <i class="fas fa-book"></i> 安装与帮助
+          <a href="https://hikyuu.readthedocs.io" class="btn btn-primary" data-href-en="https://hikyuu-en.readthedocs.io/en/latest/">
+            <i class="fas fa-book"></i> <span data-i18n="hero.btn.docs">安装与帮助</span>
           </a>
-          <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn btn-secondary">
-            <i class="fas fa-play-circle"></i> 入门与示例
+          <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn btn-secondary" data-lang-only="zh" data-href-en="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True">
+            <i class="fas fa-play-circle"></i> <span data-i18n="hero.btn.examples">入门与示例</span>
           </a>
-          <a href="https://gitee.com/fasiondog/hikyuu_hub" class="btn btn-secondary">
-            <i class="fas fa-puzzle-piece"></i> 策略部件库
+          <a href="https://gitee.com/fasiondog/hikyuu_hub" class="btn btn-secondary" data-href-en="https://github.com/fasiondog/hikyuu_hub">
+            <i class="fas fa-puzzle-piece"></i> <span data-i18n="hero.btn.hub">策略部件库</span>
           </a>
         </div>
       </div>
@@ -942,15 +1047,15 @@
     <div class="stats-container">
       <div class="stat-item">
         <div class="stat-number">166ms</div>
-        <div class="stat-label">预热后 1913 万 K 线求和耗时（AMD 7950x）</div>
+        <div class="stat-label"><span data-i18n="stat.performance">预热后 1913 万 K 线求和耗时（AMD 7950x）</span></div>
       </div>
       <div class="stat-item">
         <div class="stat-number">10+</div>
-        <div class="stat-label">核心策略组件 · 自由组合构建资产库</div>
+        <div class="stat-label"><span data-i18n="stat.parts">核心策略组件 · 自由组合构建资产库</span></div>
       </div>
       <div class="stat-item">
-        <div class="stat-number">4 种</div>
-        <div class="stat-label">存储方式（HDF5 / MySQL / ClickHouse / SQLite）</div>
+        <div class="stat-number"><span data-i18n="stat.storage.count">4 种</span></div>
+        <div class="stat-label"><span data-i18n="stat.storage">存储方式（HDF5 / MySQL / ClickHouse / SQLite）</span></div>
       </div>
     </div>
   </section>
@@ -958,63 +1063,63 @@
   <!-- Features Section -->
   <section class="features" id="features">
     <div class="section-header">
-      <span class="section-badge">核心优势</span>
-      <h2 class="section-title">为什么选择 Hikyuu</h2>
-      <p class="section-description">强大的功能特性，助力您的量化交易研究</p>
+      <span class="section-badge"><span data-i18n="features.badge">核心优势</span></span>
+      <h2 class="section-title"><span data-i18n="features.title">为什么选择 Hikyuu</span></h2>
+      <p class="section-description"><span data-i18n="features.description">强大的功能特性，助力您的量化交易研究</span></p>
     </div>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon purple">
           <i class="fas fa-puzzle-piece"></i>
         </div>
-        <h3 class="feature-title">组合灵活，分类构建策略资产库</h3>
+        <h3 class="feature-title"><span data-i18n="features.compose.title">组合灵活，分类构建策略资产库</span></h3>
         <p class="feature-description">
-          对系统化交易方法进行轻量化抽象，涵盖市场环境判断、系统有效条件、信号指示器、止损/止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配等核心组件。基于这些组件自由搭建专属策略库，灵活组合、高效回测，大幅提升研究效率。
+          <span data-i18n="features.compose.desc">对系统化交易方法进行轻量化抽象，涵盖市场环境判断、系统有效条件、信号指示器、止损/止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配等核心组件。基于这些组件自由搭建专属策略库，灵活组合、高效回测，大幅提升研究效率。</span>
         </p>
       </div>
       <div class="feature-card">
         <div class="feature-icon blue">
           <i class="fas fa-bolt"></i>
         </div>
-        <h3 class="feature-title">极致性能，轻松构建专属量化应用</h3>
+        <h3 class="feature-title"><span data-i18n="features.perf.title">极致性能，轻松构建专属量化应用</span></h3>
         <p class="feature-description">
-          C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x 实测：A 股全市场 1913 万日 K 线预热后，计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。
+          <span data-i18n="features.perf.desc">C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x 实测：A 股全市场 1913 万日 K 线预热后，计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。</span>
         </p>
       </div>
       <div class="feature-card">
         <div class="feature-icon amber">
           <i class="fas fa-code"></i>
         </div>
-        <h3 class="feature-title">语法简洁，策略探索更高效自由</h3>
+        <h3 class="feature-title"><span data-i18n="features.syntax.title">语法简洁，策略探索更高效自由</span></h3>
         <p class="feature-description">
-          同时支持面向对象与命令行两种编程范式。命令行风格语法极简、表达直观，搭配 hikyuu.interactive 内置的 K 线、指标、信号可视化能力，策略验证与回测分析更加得心应手。
+          <span data-i18n="features.syntax.desc">同时支持面向对象与命令行两种编程范式。命令行风格语法极简、表达直观，搭配 hikyuu.interactive 内置的 K 线、指标、信号可视化能力，策略验证与回测分析更加得心应手。</span>
         </p>
       </div>
       <div class="feature-card">
         <div class="feature-icon purple">
           <i class="fas fa-cloud"></i>
         </div>
-        <h3 class="feature-title">自主可控，搭建专属云量化平台</h3>
+        <h3 class="feature-title"><span data-i18n="features.cloud.title">自主可控，搭建专属云量化平台</span></h3>
         <p class="feature-description">
-          结合 Python + Jupyter 与云服务器，搭建完全自主可控的云量化平台，手机、平板、电脑随时随地访问。无缝对接 numpy、scipy、pandas、TensorFlow 等 AI 与数据分析工具，按需自定义界面、实现服务化部署。
+          <span data-i18n="features.cloud.desc">结合 Python + Jupyter 与云服务器，搭建完全自主可控的云量化平台，手机、平板、电脑随时随地访问。无缝对接 numpy、scipy、pandas、TensorFlow 等 AI 与数据分析工具，按需自定义界面、实现服务化部署。</span>
         </p>
       </div>
       <div class="feature-card">
         <div class="feature-icon blue">
           <i class="fas fa-database"></i>
         </div>
-        <h3 class="feature-title">模块化可扩展数据存储</h3>
+        <h3 class="feature-title"><span data-i18n="features.storage.title">模块化可扩展数据存储</span></h3>
         <p class="feature-description">
-          支持 HDF5、MySQL、ClickHouse、SQLite 四种存储方式。默认 HDF5 文件体积小、读写快、备份便捷。插件扩展的 ClickHouse 存储读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级高频数据。
+          <span data-i18n="features.storage.desc">支持 HDF5、MySQL、ClickHouse、SQLite 四种存储方式。默认 HDF5 文件体积小、读写快、备份便捷。插件扩展的 ClickHouse 存储读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级高频数据。</span>
         </p>
       </div>
       <div class="feature-card">
         <div class="feature-icon amber">
           <i class="fas fa-shield-alt"></i>
         </div>
-        <h3 class="feature-title">开源透明，数据安全可控</h3>
+        <h3 class="feature-title"><span data-i18n="features.license.title">开源透明，数据安全可控</span></h3>
         <p class="feature-description">
-          Apache 2.0 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。
+          <span data-i18n="features.license.desc">Apache 2.0 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。</span>
         </p>
       </div>
     </div>
@@ -1024,13 +1129,13 @@
   <section class="code-section" id="code">
     <div class="code-container">
       <div class="code-text">
-        <span class="section-badge" style="background: rgba(255,255,255,0.1); color: var(--white);">快速上手</span>
-        <h2 class="section-title">简洁的API设计</h2>
+        <span class="section-badge" style="background: rgba(255,255,255,0.1); color: var(--white);"><span data-i18n="code.badge">快速上手</span></span>
+        <h2 class="section-title"><span data-i18n="code.title">简洁的API设计</span></h2>
         <p class="section-description">
-          几行代码即可创建一个完整的量化策略回测系统。Hikyuu提供直观的API，让策略开发更高效。
+          <span data-i18n="code.description">几行代码即可创建一个完整的量化策略回测系统。Hikyuu提供直观的API，让策略开发更高效。</span>
         </p>
-        <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn btn-primary" style="margin-top: 2rem;">
-          <i class="fas fa-external-link-alt"></i> 查看更多示例
+        <a href="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/000-Index.ipynb?flush_cache=True" class="btn btn-primary" style="margin-top: 2rem;" data-href-en="https://nbviewer.jupyter.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True">
+          <i class="fas fa-external-link-alt"></i> <span data-i18n="code.more">查看更多示例</span>
         </a>
       </div>
       <div class="code-block">
@@ -1039,17 +1144,17 @@
           <div class="code-dot yellow"></div>
           <div class="code-dot green"></div>
         </div>
-        <pre><code><span class="comment"># 创建模拟交易账户进行回测，初始资金30万</span>
+        <pre><code><span class="comment" data-i18n="code.comment.tm"># 创建模拟交易账户进行回测，初始资金30万</span>
 my_tm = <span class="function">crtTM</span>(init_cash = <span class="number">300000</span>)
 
-<span class="comment"># 创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线）</span>
-<span class="comment"># 快线向上穿越慢线时买入，反之卖出</span>
+<span class="comment" data-i18n="code.comment.sg1"># 创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线）</span>
+<span class="comment" data-i18n="code.comment.sg2"># 快线向上穿越慢线时买入，反之卖出</span>
 my_sg = <span class="function">SG_Flex</span>(<span class="function">EMA</span>(<span class="function">CLOSE</span>(), n=<span class="number">5</span>), slow_n=<span class="number">10</span>)
 
-<span class="comment"># 固定每次买入1000股</span>
+<span class="comment" data-i18n="code.comment.mm"># 固定每次买入1000股</span>
 my_mm = <span class="function">MM_FixedCount</span>(<span class="number">1000</span>)
 
-<span class="comment"># 创建交易系统并运行</span>
+<span class="comment" data-i18n="code.comment.run"># 创建交易系统并运行</span>
 sys = <span class="function">SYS_Simple</span>(tm = my_tm, sg = my_sg, mm = my_mm)
 sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>], <span class="function">Query</span>(<span class="number">-150</span>))</code></pre>
       </div>
@@ -1059,44 +1164,44 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
   <!-- Architecture Section -->
   <section class="architecture" id="architecture">
     <div class="section-header">
-      <span class="section-badge">系统架构</span>
-      <h2 class="section-title">交易系统化架构</h2>
-      <p class="section-description">遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合</p>
+      <span class="section-badge"><span data-i18n="arch.badge">系统架构</span></span>
+      <h2 class="section-title"><span data-i18n="arch.title">交易系统化架构</span></h2>
+      <p class="section-description"><span data-i18n="arch.description">遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合</span></p>
     </div>
     <div class="arch-diagram">
       <!-- 投资组合层 -->
       <div class="arch-layer arch-layer-portfolio">
         <div class="arch-layer-label">
-          投资组合层
+          <span data-i18n="arch.layer.portfolio">投资组合层</span>
           <span class="arch-layer-code">Portfolio</span>
         </div>
         <div class="arch-modules" style="grid-template-columns: repeat(4, 1fr);">
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/portfolio.html">
             <div class="arch-module-code">PF</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">投资组合</span>
-              <span class="arch-module-desc">多标的策略调度</span>
+              <span class="arch-module-name" data-i18n="arch.pf.name">投资组合</span>
+              <span class="arch-module-desc" data-i18n="arch.pf.desc">多标的策略调度</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/selector.html">
             <div class="arch-module-code">SE</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">交易对象选择</span>
-              <span class="arch-module-desc">选股策略筛选</span>
+              <span class="arch-module-name" data-i18n="arch.se.name">交易对象选择</span>
+              <span class="arch-module-desc" data-i18n="arch.se.desc">选股策略筛选</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/allocate_funds.html">
             <div class="arch-module-code">AF</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">资金分配</span>
-              <span class="arch-module-desc">多标的资金调度</span>
+              <span class="arch-module-name" data-i18n="arch.af.name">资金分配</span>
+              <span class="arch-module-desc" data-i18n="arch.af.desc">多标的资金调度</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_portfolio/multifactor.html">
             <div class="arch-module-code">MF</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">多因子模型</span>
-              <span class="arch-module-desc">因子评分与排序</span>
+              <span class="arch-module-name" data-i18n="arch.mf.name">多因子模型</span>
+              <span class="arch-module-desc" data-i18n="arch.mf.desc">因子评分与排序</span>
             </div>
           </a>
         </div>
@@ -1104,57 +1209,57 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
       <!-- 交易系统层 -->
       <div class="arch-layer arch-layer-sys">
         <div class="arch-layer-label">
-          交易系统
-          <span class="arch-layer-code">SYS · 单对象</span>
+          <span data-i18n="arch.layer.sys">交易系统</span>
+          <span class="arch-layer-code" data-i18n="arch.layer.sys.code">SYS · 单对象</span>
         </div>
         <div class="arch-modules" style="grid-template-columns: repeat(4, 1fr);">
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/environment.html">
             <div class="arch-module-code">EV</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">市场环境判断</span>
-              <span class="arch-module-desc">大盘环境有效性</span>
+              <span class="arch-module-name" data-i18n="arch.ev.name">市场环境判断</span>
+              <span class="arch-module-desc" data-i18n="arch.ev.desc">大盘环境有效性</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/condition.html">
             <div class="arch-module-code">CN</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">系统有效条件</span>
-              <span class="arch-module-desc">系统适用条件</span>
+              <span class="arch-module-name" data-i18n="arch.cn.name">系统有效条件</span>
+              <span class="arch-module-desc" data-i18n="arch.cn.desc">系统适用条件</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/signal.html">
             <div class="arch-module-code">SG</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">信号指示器</span>
-              <span class="arch-module-desc">产生买卖信号</span>
+              <span class="arch-module-name" data-i18n="arch.sg.name">信号指示器</span>
+              <span class="arch-module-desc" data-i18n="arch.sg.desc">产生买卖信号</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/stoploss.html">
             <div class="arch-module-code">ST</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">止损 / 止盈</span>
-              <span class="arch-module-desc">风险控制退出</span>
+              <span class="arch-module-name" data-i18n="arch.st.name">止损 / 止盈</span>
+              <span class="arch-module-desc" data-i18n="arch.st.desc">风险控制退出</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/money_manager.html">
             <div class="arch-module-code">MM</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">资金管理</span>
-              <span class="arch-module-desc">买卖数量控制</span>
+              <span class="arch-module-name" data-i18n="arch.mm.name">资金管理</span>
+              <span class="arch-module-desc" data-i18n="arch.mm.desc">买卖数量控制</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/profitgoal.html">
             <div class="arch-module-code">PG</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">盈利目标</span>
-              <span class="arch-module-desc">目标达成退出</span>
+              <span class="arch-module-name" data-i18n="arch.pg.name">盈利目标</span>
+              <span class="arch-module-desc" data-i18n="arch.pg.desc">目标达成退出</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_sys/slippage.html">
             <div class="arch-module-code">SP</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">移滑价差</span>
-              <span class="arch-module-desc">回测价格模拟</span>
+              <span class="arch-module-name" data-i18n="arch.sp.name">移滑价差</span>
+              <span class="arch-module-desc" data-i18n="arch.sp.desc">回测价格模拟</span>
             </div>
           </a>
         </div>
@@ -1162,22 +1267,22 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
       <!-- 交易管理层 -->
       <div class="arch-layer arch-layer-trade">
         <div class="arch-layer-label">
-          交易管理
-          <span class="arch-layer-code">执行 & 记录</span>
+          <span data-i18n="arch.layer.trade">交易管理</span>
+          <span class="arch-layer-code" data-i18n="arch.layer.trade.code">执行 & 记录</span>
         </div>
         <div class="arch-modules" style="grid-template-columns: repeat(2, 1fr);">
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_manage/TradeManager.html">
             <div class="arch-module-code">TM</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">交易管理</span>
-              <span class="arch-module-desc">账户资金与持仓记录</span>
+              <span class="arch-module-name" data-i18n="arch.tm.name">交易管理</span>
+              <span class="arch-module-desc" data-i18n="arch.tm.desc">账户资金与持仓记录</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/trade_manage/OrderBroker.html">
             <div class="arch-module-code">OB</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">订单执行</span>
-              <span class="arch-module-desc">实盘下单 broker 对接</span>
+              <span class="arch-module-name" data-i18n="arch.ob.name">订单执行</span>
+              <span class="arch-module-desc" data-i18n="arch.ob.desc">实盘下单 broker 对接</span>
             </div>
           </a>
         </div>
@@ -1185,29 +1290,29 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
       <!-- 数据层 -->
       <div class="arch-layer arch-layer-data">
         <div class="arch-layer-label">
-          数据层
+          <span data-i18n="arch.layer.data">数据层</span>
           <span class="arch-layer-code">Stock & KData</span>
         </div>
         <div class="arch-modules" style="grid-template-columns: repeat(3, 1fr);">
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/stock_manager.html">
             <div class="arch-module-code">SM</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">证券管理</span>
-              <span class="arch-module-desc">StockManager 统一管理</span>
+              <span class="arch-module-name" data-i18n="arch.sm.name">证券管理</span>
+              <span class="arch-module-desc" data-i18n="arch.sm.desc">StockManager 统一管理</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/base/datatype.html">
             <div class="arch-module-code">KD</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">K 线数据</span>
-              <span class="arch-module-desc">KData 量价序列</span>
+              <span class="arch-module-name" data-i18n="arch.kd.name">K 线数据</span>
+              <span class="arch-module-desc" data-i18n="arch.kd.desc">KData 量价序列</span>
             </div>
           </a>
           <a class="arch-module" target="_blank" rel="noopener" href="https://hikyuu.readthedocs.io/zh-cn/latest/base/datatype.html">
             <div class="arch-module-code">Q</div>
             <div class="arch-module-info">
-              <span class="arch-module-name">数据查询</span>
-              <span class="arch-module-desc">Query 时间范围筛选</span>
+              <span class="arch-module-name" data-i18n="arch.q.name">数据查询</span>
+              <span class="arch-module-desc" data-i18n="arch.q.desc">Query 时间范围筛选</span>
             </div>
           </a>
         </div>
@@ -1218,22 +1323,22 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
   <!-- Source Code Section -->
   <section class="source-code" id="source">
     <div class="section-header">
-      <span class="section-badge">开源项目</span>
-      <h2 class="section-title">浏览源码</h2>
-      <p class="section-description">欢迎 Star、Fork，参与贡献</p>
+      <span class="section-badge"><span data-i18n="source.badge">开源项目</span></span>
+      <h2 class="section-title"><span data-i18n="source.title">浏览源码</span></h2>
+      <p class="section-description"><span data-i18n="source.description">欢迎 Star、Fork，参与贡献</span></p>
     </div>
     <div class="source-links">
-      <a href="https://gitee.com/fasiondog/hikyuu" class="source-link">
-        <i class="fas fa-code-branch"></i>
-        <span>码云 Gitee（推荐）</span>
-      </a>
       <a href="https://github.com/fasiondog/hikyuu" class="source-link">
         <i class="fab fa-github"></i>
-        <span>GitHub</span>
+        <span data-i18n="source.github">GitHub</span>
+      </a>
+      <a href="https://gitee.com/fasiondog/hikyuu" class="source-link">
+        <i class="fas fa-code-branch"></i>
+        <span data-i18n="source.gitee">码云 Gitee</span>
       </a>
       <a href="https://gitcode.com/hikyuu/hikyuu" class="source-link">
         <i class="fas fa-code"></i>
-        <span>GitCode</span>
+        <span data-i18n="source.gitcode">GitCode（推荐）</span>
       </a>
     </div>
   </section>
@@ -1242,77 +1347,87 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
   <section class="community" id="community">
     <!-- 支持项目 / 捐赠 -->
     <div class="section-header">
-      <span class="section-badge"><i class="fas fa-heart"></i> 支持项目</span>
-      <h2 class="section-title">感谢捐赠，让 Hikyuu 走得更远</h2>
-      <p class="section-description">因作者精力有限，对捐赠用户的问题会优先解答、确保响应</p>
+      <span class="section-badge"><i class="fas fa-heart"></i> <span data-i18n="donate.badge">支持项目</span></span>
+      <h2 class="section-title"><span data-i18n="donate.title">感谢捐赠，让 Hikyuu 走得更远</span></h2>
+      <p class="section-description"><span data-i18n="donate.description">因作者精力有限，对捐赠用户的问题会优先解答、确保响应</span></p>
     </div>
-    <div style="max-width: 1100px; margin: 0 auto 4rem;">
+    <div style="max-width: 1100px; margin: 0 auto 4rem;" data-lang-only="zh">
       <div class="community-grid">
         <a class="community-card" href="https://wzyp.cn/item/gflv3v" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
-          <h4><i class="fas fa-mug-hot" style="color: var(--primary-light);"></i> 请作者喝杯咖啡</h4>
+          <h4><i class="fas fa-mug-hot" style="color: var(--primary-light);"></i> <span data-i18n="donate.coffee">请作者喝杯咖啡</span></h4>
           <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥30</div>
-          <p>支付宝扫码 · 一次性的小小支持</p>
-          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往捐赠 <i class="fas fa-arrow-right"></i></span>
+          <p><span data-i18n="donate.coffee.desc">支付宝扫码 · 一次性的小小支持</span></p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span data-i18n="donate.cta">前往捐赠</span> <i class="fas fa-arrow-right"></i></span>
         </a>
         <a class="community-card" href="https://wzyp.cn/item/du4h8s" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
-          <h4><i class="fas fa-calendar-day" style="color: var(--primary-light);"></i> 订阅 180 天</h4>
+          <h4><i class="fas fa-calendar-day" style="color: var(--primary-light);"></i> <span data-i18n="donate.180half">订阅 180 天</span></h4>
           <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥50</div>
-          <p>支付宝扫码 · 半年期订阅权益</p>
-          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往捐赠 <i class="fas fa-arrow-right"></i></span>
+          <p><span data-i18n="donate.halfyear">支付宝扫码 · 半年期订阅权益</span></p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span data-i18n="donate.cta">前往捐赠</span> <i class="fas fa-arrow-right"></i></span>
         </a>
         <a class="community-card" href="https://wzyp.cn/item/ehbz9b" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
-          <h4><i class="fas fa-calendar-alt" style="color: var(--primary-light);"></i> 订阅 365 天</h4>
+          <h4><i class="fas fa-calendar-alt" style="color: var(--primary-light);"></i> <span data-i18n="donate.365full">订阅 365 天</span></h4>
           <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥100</div>
-          <p>支付宝扫码 · 全年期订阅权益</p>
-          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往捐赠 <i class="fas fa-arrow-right"></i></span>
+          <p><span data-i18n="donate.fullyear">支付宝扫码 · 全年期订阅权益</span></p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span data-i18n="donate.cta">前往捐赠</span> <i class="fas fa-arrow-right"></i></span>
         </a>
         <a class="community-card" href="https://t.zsxq.com/YSATD" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">
-          <h4><i class="fas fa-star" style="color: var(--primary-light);"></i> 加入知识星球</h4>
-          <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥300/年</div>
-          <p>3 台设备登录 · 续费半价 · 专属微信群及策略部件库</p>
-          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">前往加入 <i class="fas fa-arrow-right"></i></span>
+          <h4><i class="fas fa-star" style="color: var(--primary-light);"></i> <span data-i18n="donate.zsxq">加入知识星球</span></h4>
+          <div style="font-size: 2rem; font-weight: 800; margin: 0.5rem 0; background: linear-gradient(135deg, var(--primary-light), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥300<span data-i18n="donate.peryear">/年</span></div>
+          <p><span data-i18n="donate.zsxq.desc">3 台设备登录 · 续费半价 · 专属微信群及策略部件库</span></p>
+          <span style="display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.15); color: var(--primary-light); border-radius: 9999px; font-size: 0.875rem; font-weight: 600;"><span data-i18n="donate.join">前往加入</span> <i class="fas fa-arrow-right"></i></span>
         </a>
       </div>
-      <p style="max-width: 800px; margin: 2rem auto 0; text-align: center; color: #94a3b8; font-size: 0.875rem;">
-        <i class="fas fa-gift"></i> 捐赠计划与附赠详见
-        <a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html" target="_blank" rel="noopener" style="color: var(--primary-light); text-decoration: none; font-weight: 600;">捐赠计划说明</a>
+      <p style="max-width: 800px; margin: 2rem auto 0; text-align: center; color: #94a3b8; font-size: 0.875rem;" data-lang-only="zh">
+        <i class="fas fa-gift"></i> <span data-i18n="donate.note">捐赠计划与附赠详见</span>
+        <a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/donate-plan.html" target="_blank" rel="noopener" style="color: var(--primary-light); text-decoration: none; font-weight: 600;" data-href-en="https://hikyuu-en.readthedocs.io/en/latest/vip/vip-plan.html"><span data-i18n="donate.plan">捐赠计划说明</span></a>
       </p>
     </div>
+    <!-- 英文：仅保留赞助邀约与私下联系方式 -->
+    <p style="max-width: 800px; margin: 0 auto 4rem; text-align: center; color: #94a3b8; font-size: 0.95rem;" data-lang-only="en">
+      <i class="fas fa-envelope" style="color: var(--primary-light);"></i>
+      <span data-i18n="donate.contact">有意赞助或深度合作请私下联系作者：</span>
+      <a href="mailto:fasiondog@sina.com" style="color: var(--primary-light); text-decoration: none; font-weight: 600;">fasiondog@sina.com</a>
+      <br>
+      <i class="fab fa-github" style="color: var(--primary-light);"></i>
+      <span data-i18n="donate.contact.viaissue">也可以通过 GitHub issue 联系：</span>
+      <a href="https://github.com/fasiondog/hikyuu/issues" target="_blank" rel="noopener" style="color: var(--primary-light); text-decoration: none; font-weight: 600;">GitHub Issues</a>
+    </p>
 
     <!-- 加入我们 -->
     <div class="section-header">
-      <span class="section-badge">社区支持</span>
-      <h2 class="section-title">加入我们</h2>
-      <p class="section-description">交流以微信群为主、QQ 群为辅。加入任一社群请备注「加入 hikyuu」，未备注将无法通过验证～</p>
+      <span class="section-badge"><span data-i18n="community.badge">社区支持</span></span>
+      <h2 class="section-title"><span data-i18n="community.title">加入我们</span></h2>
+      <p class="section-description"><span data-i18n="community.description">交流以微信群为主、QQ 群为辅。加入任一社群请备注「加入 hikyuu」，未备注将无法通过验证～</span></p>
     </div>
     <div class="community-grid">
-      <div class="community-card">
-        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 微信群</h4>
-        <img src="images/weixin_group.jpg" alt="微信群二维码" />
-        <p>加入请备注「加入 hikyuu」</p>
+      <div class="community-card" data-lang-only="zh">
+        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> <span data-i18n="community.wechat">微信群</span></h4>
+        <img src="images/weixin_group.jpg" alt="微信群二维码" data-i18n-alt="community.alt.wechat" />
+        <p><span data-i18n="community.note">加入请备注「加入 hikyuu」</span></p>
       </div>
-      <div class="community-card">
-        <h4><i class="fas fa-comments" style="color: var(--primary);"></i> QQ 群</h4>
-        <img src="images/10003-qq.png" alt="QQ群二维码" />
-        <p>加入请备注「加入 hikyuu」</p>
+      <div class="community-card" data-lang-only="zh">
+        <h4><i class="fas fa-comments" style="color: var(--primary);"></i> <span data-i18n="community.qq">QQ 群</span></h4>
+        <img src="images/10003-qq.png" alt="QQ群二维码" data-i18n-alt="community.alt.qq" />
+        <p><span data-i18n="community.note">加入请备注「加入 hikyuu」</span></p>
       </div>
-      <div class="community-card">
-        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> 公众号</h4>
-        <img src="images/weixin_gongzhonghao.jpg" alt="hikyuu量化" />
-        <p>关注获取最新资讯、性能测试与技术文章</p>
+      <div class="community-card" data-lang-only="zh">
+        <h4><i class="fab fa-weixin" style="color: #07c160;"></i> <span data-i18n="community.official">公众号</span></h4>
+        <img src="images/weixin_gongzhonghao.jpg" alt="hikyuu量化" data-i18n-alt="community.alt.official" />
+        <p><span data-i18n="community.official.desc">关注获取最新资讯、性能测试与技术文章</span></p>
       </div>
-      <div class="community-card">
-        <h4><i class="fas fa-star" style="color: var(--accent);"></i> 知识星球</h4>
-        <img src="images/xingqiu.png" alt="Hikyuu量化星球" />
-        <p>首年 300 元 / 续费半价 · 3 台设备登录 · 含专属微信群及策略部件库</p>
+      <div class="community-card" data-lang-only="zh">
+        <h4><i class="fas fa-star" style="color: var(--accent);"></i> <span data-i18n="community.zsxq">知识星球</span></h4>
+        <img src="images/xingqiu.png" alt="Hikyuu量化星球" data-i18n-alt="community.alt.zsxq" />
+        <p><span data-i18n="community.zsxq.desc">首年 300 元 / 续费半价 · 3 台设备登录 · 含专属微信群及策略部件库</span></p>
       </div>
     </div>
     <div style="max-width: 800px; margin: 3rem auto 0; text-align: center;">
       <p style="color: #94a3b8;">
-        <b style="color: #cbd5e1;">需要的帮助：</b>测试反馈 BUG · 编写文档 · 开发新功能 · 网站优化
+        <b style="color: #cbd5e1;"><span data-i18n="contribute.needed">需要的帮助：</span></b><span data-i18n="contribute.list">测试反馈 BUG · 编写文档 · 开发新功能 · 网站优化</span>
         <br>
-        <a href="https://gitee.com/fasiondog/hikyuu/issues" style="color: var(--primary-light); text-decoration: none; font-weight: 600;">
-          建议通过在码云上开 issue 方式来贡献以上内容 <i class="fas fa-arrow-right"></i>
+        <a href="https://gitee.com/fasiondog/hikyuu/issues" style="color: var(--primary-light); text-decoration: none; font-weight: 600;" data-href-en="https://github.com/fasiondog/hikyuu/issues">
+          <span data-i18n="contribute.link">建议通过在码云上开 issue 方式来贡献以上内容</span> <i class="fas fa-arrow-right"></i>
         </a>
       </p>
     </div>
@@ -1323,17 +1438,361 @@ sys.<span class="function">run</span>(sm[<span class="string">'sz000001'</span>]
     <div class="footer-content">
       <div class="footer-logo">Hikyuu</div>
       <div class="footer-links">
-        <a href="https://hikyuu.readthedocs.io">文档</a>
-        <a href="https://gitee.com/fasiondog/hikyuu">Gitee</a>
+        <a href="https://hikyuu.readthedocs.io" data-href-en="https://hikyuu-en.readthedocs.io/en/latest/"><span data-i18n="footer.docs">文档</span></a>
         <a href="https://github.com/fasiondog/hikyuu">GitHub</a>
-        <a href="#community">社区</a>
+        <a href="#community"><span data-i18n="footer.community">社区</span></a>
       </div>
       <div class="footer-license">
-        <p>基于 <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License V2</a> 开源协议发布</p>
-        <p style="margin-top: 0.5rem; font-size: 0.875rem;">由 <a href="https://gitee.com/fasiondog" style="color: var(--primary-light); text-decoration: none;">fasiondog</a> 维护</p>
+        <p><span data-i18n="footer.license.prefix">基于</span> <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License V2</a> <span data-i18n="footer.license.suffix">开源协议发布</span></p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem;"><span data-i18n="footer.author.prefix">由</span> <a href="https://gitee.com/fasiondog" style="color: var(--primary-light); text-decoration: none;">fasiondog</a> <span data-i18n="footer.author.suffix">维护</span></p>
       </div>
     </div>
   </footer>
+
+  <script>
+    // ===================== Site i18n (zh / en) =====================
+    // Terms follow hikyuu master English docs (docs/en) and the i18n glossary.
+    var I18N = {
+      zh: {
+        'meta.title': 'Hikyuu - 量化交易研究框架',
+        'meta.description': 'Hikyuu - 聚焦于交易策略设计的开源量化交易研究框架',
+        'meta.keywords': 'hikyuu,quant,backtester,trade,量化交易,系统交易',
+
+        'nav.features': '核心优势',
+        'nav.code': '代码示例',
+        'nav.architecture': '架构设计',
+        'nav.source': '源码地址',
+        'nav.community': '社区支持',
+
+        'hero.badge': '开源超高速量化交易框架',
+        'hero.description': '基于 C++/Python 开发的开源超高速量化交易研究框架，聚焦策略分析、回测与实盘能力扩展。核心能力覆盖四大维度：交易模型研发、极速计算引擎、高效回测体系、实盘交易拓展。',
+        'hero.btn.docs': '安装与帮助',
+        'hero.btn.examples': '入门与示例',
+        'hero.btn.hub': '策略部件库',
+
+        'stat.performance': '预热后 1913 万 K 线求和耗时（AMD 7950x）',
+        'stat.parts': '核心策略组件 · 自由组合构建资产库',
+        'stat.storage.count': '4 种',
+        'stat.storage': '存储方式（HDF5 / MySQL / ClickHouse / SQLite）',
+
+        'features.badge': '核心优势',
+        'features.title': '为什么选择 Hikyuu',
+        'features.description': '强大的功能特性，助力您的量化交易研究',
+        'features.compose.title': '组合灵活，分类构建策略资产库',
+        'features.compose.desc': '对系统化交易方法进行轻量化抽象，涵盖市场环境判断、系统有效条件、信号指示器、止损/止盈策略、资金管理、盈利目标、滑点算法、交易对象筛选、资金分配等核心组件。基于这些组件自由搭建专属策略库，灵活组合、高效回测，大幅提升研究效率。',
+        'features.perf.title': '极致性能，轻松构建专属量化应用',
+        'features.perf.desc': 'C++ 核心库原生支持多线程与多核加速；Python 接口层集成 TA-Lib，与 numpy、pandas 无缝互转。AMD 7950x 实测：A 股全市场 1913 万日 K 线预热后，计算 20 日均线并求和仅需 166 毫秒。核心库可独立剥离，快速构建自定义工具。',
+        'features.syntax.title': '语法简洁，策略探索更高效自由',
+        'features.syntax.desc': '同时支持面向对象与命令行两种编程范式。命令行风格语法极简、表达直观，搭配 hikyuu.interactive 内置的 K 线、指标、信号可视化能力，策略验证与回测分析更加得心应手。',
+        'features.cloud.title': '自主可控，搭建专属云量化平台',
+        'features.cloud.desc': '结合 Python + Jupyter 与云服务器，搭建完全自主可控的云量化平台，手机、平板、电脑随时随地访问。无缝对接 numpy、scipy、pandas、TensorFlow 等 AI 与数据分析工具，按需自定义界面、实现服务化部署。',
+        'features.storage.title': '模块化可扩展数据存储',
+        'features.storage.desc': '支持 HDF5、MySQL、ClickHouse、SQLite 四种存储方式。默认 HDF5 文件体积小、读写快、备份便捷。插件扩展的 ClickHouse 存储读写速度优于 HDF5、空间占用远低于 MySQL，更适配分钟级高频数据。',
+        'features.license.title': '开源透明，数据安全可控',
+        'features.license.desc': 'Apache 2.0 开源协议，代码透明审计无忧。核心数据、策略全量本地可控，C++ 核心库可独立剥离使用，自由打造专属客户端工具，无需担心第三方平台限制。',
+
+        'code.badge': '快速上手',
+        'code.title': '简洁的API设计',
+        'code.description': '几行代码即可创建一个完整的量化策略回测系统。Hikyuu提供直观的API，让策略开发更高效。',
+        'code.more': '查看更多示例',
+        'code.comment.tm': '# 创建模拟交易账户进行回测，初始资金30万',
+        'code.comment.sg1': '# 创建信号指示器（以5日EMA为快线，5日EMA自身的10日EMA作为慢线）',
+        'code.comment.sg2': '# 快线向上穿越慢线时买入，反之卖出',
+        'code.comment.mm': '# 固定每次买入1000股',
+        'code.comment.run': '# 创建交易系统并运行',
+
+        'arch.badge': '系统架构',
+        'arch.title': '交易系统化架构',
+        'arch.description': '遵循系统化交易理念严谨架构，每个组件可独立替换、自由组合',
+        'arch.layer.portfolio': '投资组合层',
+        'arch.layer.sys': '交易系统',
+        'arch.layer.sys.code': 'SYS · 单对象',
+        'arch.layer.trade': '交易管理',
+        'arch.layer.trade.code': '执行 & 记录',
+        'arch.layer.data': '数据层',
+        'arch.pf.name': '投资组合', 'arch.pf.desc': '多标的策略调度',
+        'arch.se.name': '交易对象选择', 'arch.se.desc': '选股策略筛选',
+        'arch.af.name': '资金分配', 'arch.af.desc': '多标的资金调度',
+        'arch.mf.name': '多因子模型', 'arch.mf.desc': '因子评分与排序',
+        'arch.ev.name': '市场环境判断', 'arch.ev.desc': '大盘环境有效性',
+        'arch.cn.name': '系统有效条件', 'arch.cn.desc': '系统适用条件',
+        'arch.sg.name': '信号指示器', 'arch.sg.desc': '产生买卖信号',
+        'arch.st.name': '止损 / 止盈', 'arch.st.desc': '风险控制退出',
+        'arch.mm.name': '资金管理', 'arch.mm.desc': '买卖数量控制',
+        'arch.pg.name': '盈利目标', 'arch.pg.desc': '目标达成退出',
+        'arch.sp.name': '移滑价差', 'arch.sp.desc': '回测价格模拟',
+        'arch.tm.name': '交易管理', 'arch.tm.desc': '账户资金与持仓记录',
+        'arch.ob.name': '订单执行', 'arch.ob.desc': '实盘下单 broker 对接',
+        'arch.sm.name': '证券管理', 'arch.sm.desc': 'StockManager 统一管理',
+        'arch.kd.name': 'K 线数据', 'arch.kd.desc': 'KData 量价序列',
+        'arch.q.name': '数据查询', 'arch.q.desc': 'Query 时间范围筛选',
+
+        'source.badge': '开源项目',
+        'source.title': '浏览源码',
+        'source.description': '欢迎 Star、Fork，参与贡献',
+        'source.github': 'GitHub',
+        'source.gitee': '码云 Gitee（推荐）',
+        'source.gitcode': 'GitCode（推荐）',
+
+        'donate.badge': '支持项目',
+        'donate.title': '感谢捐赠，让 Hikyuu 走得更远',
+        'donate.description': '因作者精力有限，对捐赠用户的问题会优先解答、确保响应',
+        'donate.coffee': '请作者喝杯咖啡',
+        'donate.coffee.desc': '支付宝扫码 · 一次性的小小支持',
+        'donate.180half': '订阅 180 天',
+        'donate.365full': '订阅 365 天',
+        'donate.halfyear': '支付宝扫码 · 半年期订阅权益',
+        'donate.fullyear': '支付宝扫码 · 全年期订阅权益',
+        'donate.zsxq': '加入知识星球',
+        'donate.peryear': '/年',
+        'donate.zsxq.desc': '3 台设备登录 · 续费半价 · 专属微信群及策略部件库',
+        'donate.cta': '前往捐赠',
+        'donate.join': '前往加入',
+        'donate.note': '捐赠计划与附赠详见',
+        'donate.plan': '捐赠计划说明',
+        'donate.contact': '有意赞助或深度合作请私下联系作者：',
+        'donate.contact.viaissue': '也可以通过 GitHub issue 联系：',
+
+        'community.badge': '社区支持',
+        'community.title': '加入我们',
+        'community.description': '交流以微信群为主、QQ 群为辅。加入任一社群请备注「加入 hikyuu」，未备注将无法通过验证～',
+        'community.wechat': '微信群',
+        'community.qq': 'QQ 群',
+        'community.official': '公众号',
+        'community.zsxq': '知识星球',
+        'community.note': '加入请备注「加入 hikyuu」',
+        'community.official.desc': '关注获取最新资讯、性能测试与技术文章',
+        'community.zsxq.desc': '首年 300 元 / 续费半价 · 3 台设备登录 · 含专属微信群及策略部件库',
+        'community.alt.wechat': '微信群二维码',
+        'community.alt.qq': 'QQ群二维码',
+        'community.alt.official': 'hikyuu量化',
+        'community.alt.zsxq': 'Hikyuu量化星球',
+
+        'contribute.needed': '需要的帮助：',
+        'contribute.list': '测试反馈 BUG · 编写文档 · 开发新功能 · 网站优化',
+        'contribute.link': '建议通过在码云上开 issue 方式来贡献以上内容',
+
+        'footer.docs': '文档',
+        'footer.community': '社区',
+        'footer.license.prefix': '基于',
+        'footer.license.suffix': '开源协议发布',
+        'footer.author.prefix': '由',
+        'footer.author.suffix': '维护'
+      },
+
+      en: {
+        'meta.title': 'Hikyuu - Quantitative Trading Research Framework',
+        'meta.description': 'Hikyuu - an open-source, extremely fast quantitative trading research framework focused on trading strategy design',
+        'meta.keywords': 'hikyuu,quant,backtester,trading system,systematic trading,quantitative trading,backtest',
+
+        'nav.features': 'Features',
+        'nav.code': 'Code Example',
+        'nav.architecture': 'Architecture',
+        'nav.source': 'Source Code',
+        'nav.community': 'Community',
+
+        'hero.badge': 'Open-Source Ultra-Fast Quantitative Trading Framework',
+        'hero.description': 'Hikyuu Quant Framework is an open-source, extremely fast quantitative trading research framework written in C++/Python. It focuses on strategy analysis, backtesting and the extension to live trading, with capabilities in four dimensions: trading model development, an extremely fast computation engine, an efficient backtesting system, and live-trading extension.',
+        'hero.btn.docs': 'Install & Help',
+        'hero.btn.examples': 'Getting Started',
+        'hero.btn.hub': 'Strategy Part Library',
+
+        'stat.performance': 'Summing 19.13 million K-line records after warm-up (AMD 7950x)',
+        'stat.parts': 'Core strategy parts · combine freely to build your strategy library',
+        'stat.storage.count': '4',
+        'stat.storage': 'Storage backends (HDF5 / MySQL / ClickHouse / SQLite)',
+
+        'features.badge': 'Core Advantages',
+        'features.title': 'Why Choose Hikyuu',
+        'features.description': 'Powerful features empowering your quantitative trading research',
+        'features.compose.title': 'Flexible Composition: Build Your Strategy Library by Category',
+        'features.compose.desc': 'A lightweight abstraction of systematic trading methods, covering the core parts of market environment, system validity condition, signal generator, stop-loss / take-profit, money management, profit goal, slippage, trading object selection and fund allocation. Build your own strategy library from these parts, combine them freely, backtest efficiently and greatly boost research productivity.',
+        'features.perf.title': 'Extreme Performance: Build Your Own Quant Application',
+        'features.perf.desc': 'The C++ core library natively supports multithreading and multi-core acceleration; the Python interface integrates TA-Lib and converts seamlessly to and from numpy and pandas. Measured on an AMD 7950x: after warm-up over the 19.13 million daily K-line records of the whole Chinese A-share market, computing and summing the 20-day moving average takes only 166 ms. The core library can be stripped out to build custom tools.',
+        'features.syntax.title': 'Concise Syntax: Faster and Freer Strategy Exploration',
+        'features.syntax.desc': 'Both object-oriented and command-line paradigms are supported. The command-line style is minimal and expressive; combined with the built-in plotting of K-lines, indicators and signals in hikyuu.interactive, strategy validation and backtest analysis become effortless.',
+        'features.cloud.title': 'Self-Controlled: Build Your Own Cloud Quant Platform',
+        'features.cloud.desc': 'Combine Python + Jupyter with a cloud server to build a fully self-controlled quant platform, accessible from phone, tablet or PC anywhere, anytime. It works seamlessly with numpy, scipy, pandas, TensorFlow and other AI and data-analysis tools, so you can customize the UI and deploy it as a service.',
+        'features.storage.title': 'Modular and Extensible Data Storage',
+        'features.storage.desc': 'Four storage backends are supported: HDF5, MySQL, ClickHouse and SQLite. The default HDF5 store is compact, fast to read and write and easy to back up. The plugin-based ClickHouse store is faster than HDF5 and uses far less space than MySQL, making it a better fit for minute-level high-frequency data.',
+        'features.license.title': 'Open and Transparent: Your Data Stays in Your Control',
+        'features.license.desc': 'Released under the Apache 2.0 license with transparent, auditable code. Your market data and strategies stay fully local and under your control, and the C++ core library can be used standalone to build custom client tools without worrying about third-party platform restrictions.',
+
+        'code.badge': 'Quick Start',
+        'code.title': 'Clean API Design',
+        'code.description': 'A few lines of code create a complete quantitative strategy backtesting system. Hikyuu provides an intuitive API that makes strategy development more efficient.',
+        'code.more': 'View More Examples',
+        'code.comment.tm': '# create a simulated trading account for backtesting, with initial capital of 300,000',
+        'code.comment.sg1': '# create a signal generator (fast line: 5-day EMA; slow line: 10-day EMA of the 5-day EMA;',
+        'code.comment.sg2': '# buy when the fast line crosses above the slow line, sell otherwise)',
+        'code.comment.mm': '# buy a fixed 1000 shares each time',
+        'code.comment.run': '# create the trading system and run it',
+
+        'arch.badge': 'System Architecture',
+        'arch.title': 'Systematic Trading Architecture',
+        'arch.description': 'A rigorous architecture following systematic trading concepts: every part can be replaced independently and combined freely',
+        'arch.layer.portfolio': 'Portfolio Layer',
+        'arch.layer.sys': 'Trading System',
+        'arch.layer.sys.code': 'SYS · Single Instrument',
+        'arch.layer.trade': 'Trade Management',
+        'arch.layer.trade.code': 'Execution & Records',
+        'arch.layer.data': 'Data Layer',
+        'arch.pf.name': 'Portfolio', 'arch.pf.desc': 'Schedules systems across instruments',
+        'arch.se.name': 'Trading Object Selection', 'arch.se.desc': 'Screens instruments by strategy',
+        'arch.af.name': 'Fund Allocation', 'arch.af.desc': 'Allocates capital across instruments',
+        'arch.mf.name': 'Multi-factor Model', 'arch.mf.desc': 'Factor scoring and ranking',
+        'arch.ev.name': 'Market Environment', 'arch.ev.desc': 'Overall market validity',
+        'arch.cn.name': 'System Validity Condition', 'arch.cn.desc': 'Conditions the system applies to',
+        'arch.sg.name': 'Signal Generator', 'arch.sg.desc': 'Generates buy/sell signals',
+        'arch.st.name': 'Stop-loss / Take-profit', 'arch.st.desc': 'Risk-control exits',
+        'arch.mm.name': 'Money Management', 'arch.mm.desc': 'Controls buy/sell quantity',
+        'arch.pg.name': 'Profit Goal', 'arch.pg.desc': 'Exits once the goal is reached',
+        'arch.sp.name': 'Slippage', 'arch.sp.desc': 'Simulates prices in backtests',
+        'arch.tm.name': 'Trade Management', 'arch.tm.desc': 'Account funds and position records',
+        'arch.ob.name': 'Order Broker', 'arch.ob.desc': 'Connects to live-trading brokers',
+        'arch.sm.name': 'Stock Manager', 'arch.sm.desc': 'Unified management by StockManager',
+        'arch.kd.name': 'K-line Data', 'arch.kd.desc': 'KData price/volume series',
+        'arch.q.name': 'Data Query', 'arch.q.desc': 'Query date-range filtering',
+
+        'source.badge': 'Open Source Project',
+        'source.title': 'Browse the Source Code',
+        'source.description': 'Star, fork and feel free to contribute',
+        'source.github': 'GitHub (recommended)',
+        'source.gitee': 'Gitee',
+        'source.gitcode': 'GitCode',
+
+        'donate.badge': 'Support the Project',
+        'donate.title': 'Sponsorship',
+        'donate.description': 'Hikyuu is developed and maintained in the author\'s spare time. Sponsorship is warmly welcome: please get in touch with the author privately to discuss the amount, the term and the benefits.',
+        'donate.coffee': 'Buy the author a coffee',
+        'donate.coffee.desc': 'Alipay QR code · a small one-off support',
+        'donate.180half': '180-day subscription',
+        'donate.365full': '365-day subscription',
+        'donate.halfyear': 'Alipay QR code · half-year subscription benefits',
+        'donate.fullyear': 'Alipay QR code · full-year subscription benefits',
+        'donate.zsxq': 'Join the Zsxq community',
+        'donate.peryear': '/year',
+        'donate.zsxq.desc': '3 devices · half-price renewal · private WeChat group and strategy part library',
+        'donate.cta': 'Donate now',
+        'donate.join': 'Join now',
+        'donate.note': 'Donation plans and bonuses are described in',
+        'donate.plan': 'the donation plan',
+        'donate.contact': 'Interested in sponsoring or in a deeper collaboration? Please contact the author privately:',
+        'donate.contact.viaissue': 'You can also get in touch through a GitHub issue:',
+
+        'community.badge': 'Community Support',
+        'community.title': 'Get Involved',
+        'community.description': 'Hikyuu is driven by its contributors: open an issue to report a bug or request a feature, or send a pull request with fixes, new indicators and strategy parts. Issues and pull requests are the main channels for getting involved.',
+        'community.wechat': 'WeChat Group',
+        'community.qq': 'QQ Group',
+        'community.official': 'WeChat Official Account',
+        'community.zsxq': 'Zsxq Knowledge Planet',
+        'community.note': 'Please leave the note "Join hikyuu"',
+        'community.official.desc': 'Follow for the latest news, performance benchmarks and technical articles',
+        'community.zsxq.desc': '¥300 first year / half-price renewal · 3 devices · private WeChat group and strategy part library',
+        'community.alt.wechat': 'WeChat group QR code',
+        'community.alt.qq': 'QQ group QR code',
+        'community.alt.official': 'Hikyuu Quant official account',
+        'community.alt.zsxq': 'Hikyuu Quant knowledge planet',
+
+        'contribute.needed': 'Help needed: ',
+        'contribute.list': 'testing and bug reports · writing documentation · developing new features · website improvements',
+        'contribute.link': 'Open an issue or send a pull request on GitHub to contribute any of the above',
+
+        'footer.docs': 'Docs',
+        'footer.community': 'Community',
+        'footer.license.prefix': 'Released under the',
+        'footer.license.suffix': '',
+        'footer.author.prefix': 'Maintained by',
+        'footer.author.suffix': ''
+      }
+    };
+
+    (function () {
+      var current = document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
+
+      // 记录原始 href：部分链接在英文下指向不同的文档/资源
+      document.querySelectorAll('[data-href-en]').forEach(function (el) {
+        el.setAttribute('data-href-zh', el.getAttribute('href'));
+      });
+      document.querySelectorAll('a[href*="hikyuu.readthedocs.io"]:not([data-href-en])').forEach(function (el) {
+        el.setAttribute('data-doc-zh', el.getAttribute('href'));
+      });
+
+      function applyLang(lang) {
+        var dict = I18N[lang] || I18N.zh;
+        document.documentElement.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+        document.documentElement.setAttribute('data-lang', lang);
+
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+          var val = dict[el.getAttribute('data-i18n')];
+          if (val !== undefined) {
+            el.textContent = val;
+          }
+        });
+        document.querySelectorAll('[data-i18n-alt]').forEach(function (el) {
+          var val = dict[el.getAttribute('data-i18n-alt')];
+          if (val !== undefined) {
+            el.setAttribute('alt', val);
+          }
+        });
+        document.querySelectorAll('[data-href-en]').forEach(function (el) {
+          el.setAttribute('href', lang === 'en' ? el.getAttribute('data-href-en') : el.getAttribute('data-href-zh'));
+        });
+        // 中/英文档站点：/zh-cn/ <-> /en/
+        // 中文: hikyuu.readthedocs.io/zh-cn/  ←→  英文: hikyuu-en.readthedocs.io/en/
+        document.querySelectorAll('[data-doc-zh]').forEach(function (el) {
+          var base = el.getAttribute('data-doc-zh');
+          el.setAttribute('href', lang === 'en'
+            ? base.replace('hikyuu.readthedocs.io/zh-cn/', 'hikyuu-en.readthedocs.io/en/')
+            : base);
+        });
+        // 仅在指定语言下展示的元素（如入门视频入口仅面向中文用户）
+        document.querySelectorAll('[data-lang-only]').forEach(function (el) {
+          el.style.display = el.getAttribute('data-lang-only') === lang ? '' : 'none';
+        });
+
+        if (dict['meta.title']) {
+          document.title = dict['meta.title'];
+        }
+        var desc = document.getElementById('metaDescription');
+        if (desc && dict['meta.description']) {
+          desc.setAttribute('content', dict['meta.description']);
+        }
+        var keywords = document.getElementById('metaKeywords');
+        if (keywords && dict['meta.keywords']) {
+          keywords.setAttribute('content', dict['meta.keywords']);
+        }
+
+        document.querySelectorAll('#langSwitch button').forEach(function (btn) {
+          btn.classList.toggle('active', btn.getAttribute('data-lang-btn') === lang);
+          btn.setAttribute('aria-pressed', btn.getAttribute('data-lang-btn') === lang ? 'true' : 'false');
+        });
+      }
+
+      document.querySelectorAll('#langSwitch button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var lang = btn.getAttribute('data-lang-btn');
+          if (lang === current) return;
+          current = lang;
+          try {
+            localStorage.setItem('hikyuu-lang', lang);
+          } catch (e) {}
+          applyLang(lang);
+        });
+      });
+
+      try {
+        applyLang(current);
+      } catch (err) {
+        if (window.console) {
+          window.console.error('[i18n] failed to apply language', err);
+        }
+      } finally {
+        document.documentElement.removeAttribute('data-i18n-pending');
+      }
+    })();
+  </script>
 
   <script>
     // Navbar scroll effect
