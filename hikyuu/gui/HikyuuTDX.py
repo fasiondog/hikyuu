@@ -41,13 +41,38 @@ from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
 
+_gui_translator = None
+
+
+def getGuiConfigDir():
+    """GUI 界面配置目录（与 hikyuu.ini 数据配置分离）"""
+    return os.path.expanduser('~') + '/.hikyuu'
+
+
+def readIniLanguage():
+    """读取 importdata-gui.ini 中的语言偏好：zh / en / auto（缺省 auto=跟随系统）。不触碰 hikyuu.ini。"""
+    try:
+        ini = getGuiConfigDir() + '/importdata-gui.ini'
+        if os.path.exists(ini):
+            cfg = ConfigParser()
+            cfg.read(ini, encoding='utf-8')
+            return cfg.get('gui', 'language', fallback='auto').strip().lower()
+    except Exception:
+        pass
+    return 'auto'
+
+
 def resolveUiLanguage():
-    """界面语言直接依据当前系统环境判定：系统 locale 为中文则 zh，否则 en。不读取任何 ini 配置。"""
+    """界面有效语言：ini 显式指定 zh/en 时用之；为 auto/缺省/非法时按当前系统语言判定。"""
+    pref = readIniLanguage()
+    if pref in ('zh', 'en'):
+        return pref
     return 'zh' if QLocale.system().name().startswith('zh') else 'en'
 
 
 def install_translator(app):
-    """根据语言偏好装载 Qt 翻译器。中文为源语言，无需 .qm；其他语言加载 translations/gui_<lang>.qm。"""
+    """根据语言偏好装载 Qt 翻译器，并记录到模块级 _gui_translator 以便运行时切换。"""
+    global _gui_translator
     lang = resolveUiLanguage()
     if lang.startswith('zh'):
         return None
@@ -56,6 +81,7 @@ def install_translator(app):
     translator = QTranslator(app)
     if os.path.exists(qm) and translator.load(qm):
         app.installTranslator(translator)
+        _gui_translator = translator
         return translator
     logging.warning('translation file not found or failed to load: %s', qm)
     return None
@@ -83,6 +109,90 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
         self.initLogger()
         self.initThreads()
+        self._initLanguageSelector()
+
+    def _set_donation_text(self):
+        # 捐赠说明 HTML：保留 CSS 头部，中文文案走 self.tr 以便中英双语；语言切换后重设
+        label_46_txt = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style="font-weight:400; font-style:normal;">
+"""
+        _p_style = '<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">'
+        label_46_txt += (
+            _p_style + '<span>' + self.tr('Hikyuu 是一款') + '</span>'
+            + '<span style="font-weight:700;">' + self.tr('遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。') + '</span>'
+            + '<span>' + self.tr('为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。') + '</span></p>\n'
+            + _p_style + '<span>' + self.tr('捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。自 2.8.3 版本起，捐赠插件授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。') + '</span></p>\n'
+            + _p_style + '<span>' + self.tr('详情参见：') + '</span>'
+            + '<a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">' + self.tr('捐赠权益') + '</span></a>'
+            + '<span style="font-weight:700;"> ' + self.tr('，感谢大家的支持！') + '</span></p></body></html>\n'
+        )
+        self.label_46.setText(label_46_txt)
+
+    def _initLanguageSelector(self):
+        combo = self.language_comboBox
+        combo.setItemData(0, 'auto')
+        combo.setItemData(1, 'zh')
+        combo.setItemData(2, 'en')
+        pref = readIniLanguage()
+        combo.blockSignals(True)
+        combo.setCurrentIndex({'auto': 0, 'zh': 1, 'en': 2}.get(pref, 0))
+        combo.blockSignals(False)
+        combo.currentIndexChanged.connect(self.on_language_changed)
+
+    def on_language_changed(self, index):
+        pref = self.language_comboBox.itemData(index) or 'auto'
+        self._writeIniLanguage(pref)
+        self._apply_language(pref)
+
+    def _writeIniLanguage(self, pref):
+        # read-modify-write，仅更新 [gui] language，保留其他既有配置项
+        try:
+            if not os.path.lexists(self.getUserConfigDir()):
+                os.mkdir(self.getUserConfigDir())
+            ini = self.getUserConfigDir() + '/importdata-gui.ini'
+            cfg = ConfigParser()
+            if os.path.exists(ini):
+                cfg.read(ini, encoding='utf-8')
+            if not cfg.has_section('gui'):
+                cfg.add_section('gui')
+            cfg.set('gui', 'language', pref)
+            with open(ini, 'w', encoding='utf-8') as f:
+                cfg.write(f)
+        except Exception as e:
+            self.logger.warning('failed to save language preference: %s', e)
+
+    def _apply_language(self, pref):
+        global _gui_translator
+        app = QApplication.instance()
+        if pref in ('zh', 'en'):
+            eff = pref
+        else:
+            eff = 'zh' if QLocale.system().name().startswith('zh') else 'en'
+        if _gui_translator is not None:
+            app.removeTranslator(_gui_translator)
+            _gui_translator.deleteLater()
+            _gui_translator = None
+        if not eff.startswith('zh'):
+            base = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+            qm = os.path.join(base, 'translations', 'gui_%s.qm' % eff)
+            translator = QTranslator(app)
+            if os.path.exists(qm) and translator.load(qm):
+                app.installTranslator(translator)
+                _gui_translator = translator
+        # 刷新 .ui 静态文案与运行时动态文案
+        self.retranslateUi(self)
+        self.retranslateDynamic()
+
+    def retranslateDynamic(self):
+        # initUI 中以 setText 覆盖的动态文案，语言切换后需重新设置
+        self._set_donation_text()
+        if not getattr(self, '_is_collect_running', False):
+            self.collect_status_label.setText(self.tr("已停止"))
 
     def closeEvent(self, event):
         if self.import_running:
@@ -381,27 +491,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         liandong_img = QPixmap(f"{current_dir}/images/liandongxiaopu.png")
         self.label_56.setPixmap(liandong_img)
 
-        # 修改 label_46 的 HTML 文本，直接在 HTML 中设置字体大小
-
-        label_46_txt = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
-p, li { white-space: pre-wrap; }
-hr { height: 1px; border-width: 0; }
-li.unchecked::marker { content: "\2610"; }
-li.checked::marker { content: "\2612"; }
-</style></head><body style="font-weight:400; font-style:normal;">
-"""
-        _p_style = '<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">'
-        label_46_txt += (
-            _p_style + '<span>' + self.tr('Hikyuu 是一款') + '</span>'
-            + '<span style="font-weight:700;">' + self.tr('遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。') + '</span>'
-            + '<span>' + self.tr('为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。') + '</span></p>\n'
-            + _p_style + '<span>' + self.tr('捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。自 2.8.3 版本起，捐赠插件授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。') + '</span></p>\n'
-            + _p_style + '<span>' + self.tr('详情参见：') + '</span>'
-            + '<a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">' + self.tr('捐赠权益') + '</span></a>'
-            + '<span style="font-weight:700;"> ' + self.tr('，感谢大家的支持！') + '</span></p></body></html>\n'
-        )
-        self.label_46.setText(label_46_txt)
+        # 捐赠说明为运行时 setText 覆盖的动态文案，语言切换后需在 _set_donation_text 中重设
+        self._set_donation_text()
         self.label_46.setOpenExternalLinks(True)
 
         self.label_license.setText(view_license())
@@ -587,6 +678,8 @@ li.checked::marker { content: "\2612"; }
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
+        # 语言偏好：与“保存设置”一同持久化，避免重建 ini 时丢失 [gui] 段
+        import_config['gui'] = {'language': self.language_comboBox.currentData() or 'auto'}
         import_config['quotation'] = {
             'stock': self.import_stock_checkBox.isChecked(),
             'fund': self.import_fund_checkBox.isChecked(),

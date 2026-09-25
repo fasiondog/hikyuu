@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -44,6 +44,28 @@ class Ui_MainWindow(object):
         self.tab_4.setObjectName(u"tab_4")
         self.verticalLayout_13 = QVBoxLayout(self.tab_4)
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.horizontalLayout_lang = QHBoxLayout()
+        self.horizontalLayout_lang.setObjectName(u"horizontalLayout_lang")
+        self.label_language = QLabel(self.tab_4)
+        self.label_language.setObjectName(u"label_language")
+
+        self.horizontalLayout_lang.addWidget(self.label_language)
+
+        self.language_comboBox = QComboBox(self.tab_4)
+        self.language_comboBox.addItem("")
+        self.language_comboBox.addItem("")
+        self.language_comboBox.addItem("")
+        self.language_comboBox.setObjectName(u"language_comboBox")
+
+        self.horizontalLayout_lang.addWidget(self.language_comboBox)
+
+        self.horizontalSpacer_lang = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_lang.addItem(self.horizontalSpacer_lang)
+
+
+        self.verticalLayout_13.addLayout(self.horizontalLayout_lang)
+
         self.groupBox_2 = QGroupBox(self.tab_4)
         self.groupBox_2.setObjectName(u"groupBox_2")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -1364,6 +1386,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u6570\u636e\u5bfc\u5165\u5de5\u5177", None))
+        self.label_language.setText(QCoreApplication.translate("MainWindow", u"\u754c\u9762\u8bed\u8a00", None))
+        self.language_comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"\u8ddf\u968f\u7cfb\u7edf", None))
+        self.language_comboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"\u4e2d\u6587", None))
+        self.language_comboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"English", None))
+
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u6570\u636e\u6e90\u8bbe\u7f6e", None))
         self.pytdx_radioButton.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528Pytdx\u4e0b\u8f7d\u6570\u636e", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4f7f\u7528", None))
