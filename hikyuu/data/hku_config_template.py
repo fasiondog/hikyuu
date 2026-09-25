@@ -29,10 +29,10 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
-; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
-; 以下开关默认关闭; 未启动服务端时, 进程自动以独立模式加载全部数据; 作为客户端接入既有服务时取消注释并置 True
+; Shared memory (SHM) data service: the server must be started explicitly by calling start_shm_server() in some process (a standalone VIP plugin, valid authorization required)
+; The following switch is disabled by default; when no server is running, the process automatically loads all data in standalone mode; uncomment and set it to True to connect as a client to an existing service
 ;use_shm_server = True
-; 客户端接入协商总预算(秒), 含连接探测与就绪等待; 0=无限等待, 超时后降级独立模式
+; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
 
 [block]
@@ -108,10 +108,10 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
-; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
-; 以下开关默认关闭; 未启动服务端时, 进程自动以独立模式加载全部数据; 作为客户端接入既有服务时取消注释并置 True
+; Shared memory (SHM) data service: the server must be started explicitly by calling start_shm_server() in some process (a standalone VIP plugin, valid authorization required)
+; The following switch is disabled by default; when no server is running, the process automatically loads all data in standalone mode; uncomment and set it to True to connect as a client to an existing service
 ;use_shm_server = True
-; 客户端接入协商总预算(秒), 含连接探测与就绪等待; 0=无限等待, 超时后降级独立模式
+; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
 
 [block]
@@ -174,10 +174,10 @@ datadir = {dir}
 reload_time = {reload_time}
 quotation_server = {quotation_server}
 lazy_preload = {lazy_preload}
-; shm 数据服务: 服务端需在某个进程内显式调用 start_shm_server() 启动 (独立 VIP 插件, 需有效授权)
-; 以下开关默认关闭; 未启动服务端时, 进程自动以独立模式加载全部数据; 作为客户端接入既有服务时取消注释并置 True
+; Shared memory (SHM) data service: the server must be started explicitly by calling start_shm_server() in some process (a standalone VIP plugin, valid authorization required)
+; The following switch is disabled by default; when no server is running, the process automatically loads all data in standalone mode; uncomment and set it to True to connect as a client to an existing service
 ;use_shm_server = True
-; 客户端接入协商总预算(秒), 含连接探测与就绪等待; 0=无限等待, 超时后降级独立模式
+; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
 
 [block]
@@ -231,7 +231,6 @@ port = {port}
 usr = {usr}
 pwd = {pwd}
 """
-
 
 import_config_template = """
 [quotation]
@@ -344,16 +343,40 @@ def generate_default_config():
     from hikyuu.data.hku_config_template import hdf5_template
     user_dir = os.path.expanduser('~')
     data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
-    hdf5_config = hdf5_template.format(dir=data_dir, reload_time="00:00", quotation_server='ipc:///tmp/hikyuu_real.ipc',
-                                       lazy_preload=False, day=True, week=False,
-                                       month=False, quarter=False, halfyear=False, year=False,
-                                       min1=False, min5=False, min15=False, min30=False,
-                                       min60=False, hour2=False, timeline=False, trans=False,
-                                       day_max=100000, week_max=100000,
-                                       month_max=100000, quarter_max=100000, halfyear_max=100000,
-                                       year_max=100000, min1_max=5120, min5_max=5120, min15_max=5120,
-                                       min30_max=5120, min60_max=5120, hour2_max=5120,
-                                       timeline_max=5120, trans_max=5120)
+    hdf5_config = hdf5_template.format(
+        dir=data_dir,
+        reload_time="00:00",
+        quotation_server='ipc:///tmp/hikyuu_real.ipc',
+        lazy_preload=False,
+        day=True,
+        week=False,
+        month=False,
+        quarter=False,
+        halfyear=False,
+        year=False,
+        min1=False,
+        min5=False,
+        min15=False,
+        min30=False,
+        min60=False,
+        hour2=False,
+        timeline=False,
+        trans=False,
+        day_max=100000,
+        week_max=100000,
+        month_max=100000,
+        quarter_max=100000,
+        halfyear_max=100000,
+        year_max=100000,
+        min1_max=5120,
+        min5_max=5120,
+        min15_max=5120,
+        min30_max=5120,
+        min60_max=5120,
+        hour2_max=5120,
+        timeline_max=5120,
+        trans_max=5120
+    )
     config_dir = f"{user_dir}/.hikyuu"
     if not os.path.lexists(config_dir):
         os.makedirs(config_dir)
