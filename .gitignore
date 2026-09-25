@@ -27,6 +27,7 @@
 .clangd
 .vs
 .ipynb_checkpoints
+*.pkl
 
 # AI Tools
 .workbuddy
