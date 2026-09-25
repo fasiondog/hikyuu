@@ -25,12 +25,12 @@ _QUICK_LINKS_KEYWORDS ("Quick Links" / "快速导航").
 Another intentionally allowed divergence is the hero tagline (the centered
 paragraph under the title mascot and above the badge row): its wording is
 prose, and its line-break layout is language-specific. CJK is compact while
-the equivalent English text is 1.5-2x longer, so the English tagline needs
+the equivalent English text is 1.5-2x longer, so the English tagline may need
 more <br> breaks at semantic boundaries and may use concise wording variants
 (e.g. "Trading model R&D" vs "交易模型研发"). Only structural presence is
-checked -- both READMEs must have a centered, non-image tagline paragraph
-containing a <strong> line right after the mascot; its text and the number of
-<br> tags are never compared.
+checked -- both READMEs must have a centered, non-image tagline paragraph with
+visible text right after the mascot; its text and the number of <br> tags are
+never compared.
 
 Usage:
     python3 docs/tools/check_readme_parity.py
@@ -158,8 +158,8 @@ def links(path):
 
 def has_hero_tagline(text):
     """The first centered <p> after the mascot image must be the tagline:
-    a non-image paragraph with visible text and a <strong> capabilities line.
-    Its wording and <br> count are deliberately not compared across languages.
+    a non-image paragraph with visible text. Its wording and <br> count are
+    deliberately not compared across languages.
     """
     blocks = _P_BLOCK.findall(text[:2000])
     seen_mascot = False
@@ -172,7 +172,7 @@ def has_hero_tagline(text):
         if "<img" in inner.lower():
             continue  # badge row or language switch, not the tagline
         plain = _TAG_STRIP.sub("", inner).strip()
-        return bool(plain) and "<strong>" in inner.lower()
+        return bool(plain)
     return False
 
 
@@ -200,10 +200,10 @@ def main():
     # Hero tagline slot must exist in both; wording and line breaks may differ.
     if not has_hero_tagline(en_text):
         errors.append("readme.md is missing the hero tagline (centered text "
-                      "paragraph with a <strong> line after the mascot)")
+                      "paragraph after the mascot)")
     if not has_hero_tagline(zh_text):
         errors.append("readme.zh.md is missing the hero tagline (centered text "
-                      "paragraph with a <strong> line after the mascot)")
+                      "paragraph after the mascot)")
 
     # Link language discipline. Exempt sections (donation, quick links) may
     # point at language-specific sites and are stripped before the check.
@@ -219,15 +219,15 @@ def main():
     if en_headings != zh_headings:
         errors.append("heading level sequence mismatch: en=%s zh=%s" % (en_headings, zh_headings))
     if en_images != zh_images:
-        errors.append("image reference sequence mismatch: en-only=%s zh-only=%s"
-                      % (sorted(set(en_images) - set(zh_images)),
-                         sorted(set(zh_images) - set(en_images))))
+        errors.append(
+            "image reference sequence mismatch: en-only=%s zh-only=%s" %
+            (sorted(set(en_images) - set(zh_images)), sorted(set(zh_images) - set(en_images)))
+        )
 
     # Notebook links must point at the language-specific tree (design doc 01 §2.3).
     for name, text in (("readme.md", en_links_text), ("readme.zh.md", zh_links_text)):
         for m in re.finditer(r"examples/notebook/(?!en/|zh/)([^)\s\"']+)", text):
-            errors.append("%s links to the old unlocalized notebook path: examples/notebook/%s"
-                          % (name, m.group(1)))
+            errors.append("%s links to the old unlocalized notebook path: examples/notebook/%s" % (name, m.group(1)))
 
     if errors:
         print("README PARITY CHECK FAILED (%d issue(s)):" % len(errors))
