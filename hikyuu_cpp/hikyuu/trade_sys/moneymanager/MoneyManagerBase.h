@@ -95,6 +95,9 @@ public:
      * @param from signal source
      * @note The default implementation returns MAX_DOUBLE, i.e. selling everything; this interface
      * is needed only for the multiple position reductions
+     * @note When the risk is not greater than 0 (the price has reached or fallen below the stop
+     * loss price), the MMs which do not support multi-trading will liquidate the whole position
+     * directly (return MAX_DOUBLE), otherwise the subclass _getSellNumber is left to decide
      */
     double getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                          SystemPart from);
@@ -168,6 +171,9 @@ protected:
     KQuery m_query;
     TradeManagerPtr m_tm;
     unordered_map<Stock, std::pair<size_t, size_t>> m_buy_sell_counts;
+    // Whether the subclass supports multi-trading (multiple position building/reducing); it is a
+    // class capability which is assigned directly by the subclass constructor and not serialized
+    bool m_support_mult_buy_sell{false};
     bool m_is_python_object{false};
 
 //============================================

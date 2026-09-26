@@ -13,11 +13,15 @@ BOOST_CLASS_EXPORT(hku::FixedCountTpsMM)
 
 namespace hku {
 
-FixedCountTpsMM::FixedCountTpsMM() : MoneyManagerBase("MM_FixedCountTpsMM") {}
+FixedCountTpsMM::FixedCountTpsMM() : MoneyManagerBase("MM_FixedCountTpsMM") {
+    m_support_mult_buy_sell = true;
+}
 
 FixedCountTpsMM::FixedCountTpsMM(const vector<double>& buy_counts,
                                  const vector<double>& sell_counts)
 : MoneyManagerBase("MM_FixedCountTpsMM"), m_buy_counts(buy_counts), m_sell_counts(sell_counts) {
+    m_support_mult_buy_sell = true;
+
     double total_buy_count = 0.0;
     for (size_t i = 0, total = buy_counts.size(); i < total; i++) {
         HKU_CHECK(buy_counts[i] >= 0.0, "buy_counts[{}] must >= 0.0!", i);

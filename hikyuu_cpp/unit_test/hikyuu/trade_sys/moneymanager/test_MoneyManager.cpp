@@ -48,6 +48,29 @@ private:
     int m_x;
 };
 
+class MultSellMoneyManagerTest : public MoneyManagerBase {
+public:
+    MultSellMoneyManagerTest(bool support_mult) : MoneyManagerBase("MultSellMoneyManagerTest") {
+        m_support_mult_buy_sell = support_mult;
+    }
+    virtual ~MultSellMoneyManagerTest() {}
+
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
+        return 0;
+    }
+
+    // Return a fixed value to distinguish subclass sizing from the base guard
+    virtual double _getSellNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                  price_t risk, SystemPart from) {
+        return 100.0;
+    }
+
+    virtual MoneyManagerPtr _clone() {
+        return MoneyManagerPtr(new MultSellMoneyManagerTest(m_support_mult_buy_sell));
+    }
+};
+
 /**
  * @defgroup test_MoneyManager test_MoneyManager
  * @ingroup test_hikyuu_trade_sys_suite
@@ -84,6 +107,35 @@ TEST_CASE("test_MoneyManager") {
     CHECK_EQ(p->name(), "MoneyManagerTest");
     // CHECK_EQ(p_src->getTM() == tm);
     CHECK_EQ(p_src->getX(), 10);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getSellNumber_risk_guard") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+
+    /** @arg MM which does not support multi-trading: risk <= 0 liquidates the whole position */
+    MoneyManagerPtr p(new MultSellMoneyManagerTest(false));
+    p->setTM(crtTM());
+    CHECK_UNARY(
+      (p->getSellNumber(Datetime(200001010000), stock, 10.0, 0.0, PART_SIGNAL) == MAX_DOUBLE));
+    CHECK_UNARY(
+      (p->getSellNumber(Datetime(200001010000), stock, 10.0, -1.0, PART_SIGNAL) == MAX_DOUBLE));
+
+    /** @arg MM which does not support multi-trading: risk > 0 is sized by the subclass */
+    CHECK_EQ(p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL), 100.0);
+
+    /** @arg MM which supports multi-trading: risk <= 0 is still delegated to the subclass */
+    MoneyManagerPtr p2(new MultSellMoneyManagerTest(true));
+    p2->setTM(crtTM());
+    CHECK_EQ(p2->getSellNumber(Datetime(200001010000), stock, 10.0, 0.0, PART_SIGNAL), 100.0);
+    CHECK_EQ(p2->getSellNumber(Datetime(200001010000), stock, 10.0, -1.0, PART_SIGNAL), 100.0);
+    CHECK_EQ(p2->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL), 100.0);
+
+    /** @arg The capability flag is rebuilt by the subclass constructor after cloning */
+    MoneyManagerPtr p3 = p2->clone();
+    CHECK_UNARY(
+      (p3->getSellNumber(Datetime(200001010000), stock, 10.0, 0.0, PART_SIGNAL) == 100.0));
 }
 
 /** @} */

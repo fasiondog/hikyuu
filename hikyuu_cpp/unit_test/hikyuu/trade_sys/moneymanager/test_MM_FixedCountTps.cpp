@@ -77,4 +77,17 @@ TEST_CASE("test_MM_FixedCountTpsTps") {
     CHECK_EQ(mm->currentSellCount(stock), 0);
 }
 
+/** @par Test points */
+TEST_CASE("test_MM_FixedCountTps_mult_sell_guard") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg FixedCountTpsMM supports multi-trading: risk <= 0 skips the guard and is delegated to
+     * the subclass tranche logic (returns the current tranche quantity instead of liquidating) */
+    auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
+    mm->setTM(crtTM());
+    CHECK_EQ(mm->getSellNumber(Datetime(200001210000), stock, 24.11, 0.0, PART_SIGNAL), 200);
+    CHECK_EQ(mm->getSellNumber(Datetime(200001210000), stock, 24.11, -1.0, PART_SIGNAL), 200);
+}
+
 /** @} */

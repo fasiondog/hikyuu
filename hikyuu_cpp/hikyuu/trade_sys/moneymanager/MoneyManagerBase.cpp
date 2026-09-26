@@ -93,8 +93,10 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    // Ignore it when the risk is not greater than 0
-    HKU_IF_RETURN(risk <= 0.0, 0.0);
+    // When the risk is not greater than 0, the price has reached or fallen below the stop loss
+    // price. The MMs which do not support multi-trading liquidate the whole position directly,
+    // otherwise the subclass _getSellNumber is left to decide
+    HKU_IF_RETURN(risk <= 0.0 && !m_support_mult_buy_sell, MAX_DOUBLE);
 
     return _getSellNumber(datetime, stock, price, risk, from);
 }
