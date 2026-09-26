@@ -90,9 +90,9 @@ private:
 };
 
 unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) {
-    SpotRecord* result = nullptr;
+    std::unique_ptr<SpotRecord> result;
     try {
-        result = new SpotRecord;
+        result = std::make_unique<SpotRecord>();
         if (spot->market())
             result->market = spot->market()->str();
         if (spot->code())
@@ -144,14 +144,14 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         }
 
     } catch (std::exception& e) {
-        result = nullptr;
+        result.reset();
         HKU_ERROR(e.what());
     } catch (...) {
-        result = nullptr;
+        result.reset();
         HKU_ERROR_UNKNOWN;
     }
 
-    return unique_ptr<SpotRecord>(result);
+    return result;
 }
 
 void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
