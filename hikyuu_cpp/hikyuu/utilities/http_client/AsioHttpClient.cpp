@@ -753,9 +753,10 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 }
 
                 if (captured_ec) {
-                    HKU_THROW("SSL handshake failed: {} (the server certificate may be untrusted "
-                              "or the hostname mismatched; a trusted CA can be set via setCaFile)",
-                              captured_ec.message());
+                    HKU_THROW(
+                      "SSL handshake failed: {} (the server certificate may be untrusted "
+                      "or the hostname mismatched; a trusted CA can be set via setCaFile)",
+                      captured_ec.message());
                 }
             }
 #endif
@@ -1018,9 +1019,10 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
         }
 
         if (captured_ec) {
-            HKU_THROW("SSL handshake failed: {} (the server certificate may be untrusted or the "
-                      "hostname mismatched; a trusted CA can be set via setCaFile)",
-                      captured_ec.message());
+            HKU_THROW(
+              "SSL handshake failed: {} (the server certificate may be untrusted or the "
+              "hostname mismatched; a trusted CA can be set via setCaFile)",
+              captured_ec.message());
         }
     }
 #endif
