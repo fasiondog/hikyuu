@@ -1220,8 +1220,8 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
     if (getParam<bool>("delay_use_current_price")) {
         // Take the stop-loss price corresponding to the close price of the current moment
         stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-        number =
-          _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice, m_buyRequest.from);
+        number = _getBuyShortNumber(today.datetime, planPrice, stoploss - planPrice,
+                                    m_buyShortRequest.from);
         goalPrice = _getShortGoalPrice(today.datetime, planPrice);
 
     } else {
@@ -1266,7 +1266,7 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
     if (m_buyShortRequest.valid) {
         if (m_buyShortRequest.count > getParam<int>("max_delay_count")) {
             // The maximum number of the delays has been exceeded, clear the buy request
-            m_buyRequest.clear();
+            m_buyShortRequest.clear();
             return;
         }
         m_buyShortRequest.count++;
