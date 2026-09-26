@@ -413,7 +413,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const noexcept {
     string nktype(ktype);
     to_upper(nktype);
     HKU_IF_RETURN(m_data->pMutex.find(nktype) == m_data->pMutex.end(), false);
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
     return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
 }
 
@@ -1329,7 +1329,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     to_upper(nktype);
 
     // Write lock
-    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
     if (!m_data->pKData[nktype]) {
@@ -1359,7 +1359,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     to_upper(nktype);
 
     // Write lock
-    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
     if (!m_data->pKData[nktype]) {
