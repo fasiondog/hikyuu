@@ -96,6 +96,18 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     }
     m_initializing = true;
     m_thread_id = std::this_thread::get_id();
+    // Roll back the init flags on any exception so a failed init can be retried
+    struct Guard {
+        bool& initializing;
+        std::thread::id& thread_id;
+        bool committed{false};
+        ~Guard() {
+            initializing = false;
+            if (!committed)
+                thread_id = std::thread::id();
+        }
+    } guard{m_initializing, m_thread_id};
+
     HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
 
     if (m_i18n_path.empty()) {
@@ -187,7 +199,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // Initialize the internal scheduled task (reload)
     initInnerTask();
 
-    m_initializing = false;
+    guard.committed = true;
 }
 
 void StockManager::loadData() {
@@ -659,15 +671,28 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 void StockManager::reload() {
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
+    // Reset the flag even if loadData throws, so reload is not permanently gated out
+    struct Guard {
+        bool& initializing;
+        ~Guard() {
+            initializing = false;
+        }
+    } guard{m_initializing};
 
     HKU_INFO("start reload ...");
     loadData();
-    m_initializing = false;
 }
 
 void StockManager::reloadWith(const StrategyContext& context) {
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
+    // Reset the flag even if loadData throws, so reload is not permanently gated out
+    struct Guard {
+        bool& initializing;
+        ~Guard() {
+            initializing = false;
+        }
+    } guard{m_initializing};
 
     if (!context.empty()) {
         m_context = context;
@@ -677,7 +702,6 @@ void StockManager::reloadWith(const StrategyContext& context) {
 
     HKU_INFO("start reload ...");
     loadData();
-    m_initializing = false;
 }
 
 const string& StockManager::tmpdir() const {
