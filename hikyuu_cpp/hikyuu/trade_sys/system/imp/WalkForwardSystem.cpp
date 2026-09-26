@@ -102,13 +102,13 @@ void WalkForwardSystem::_forceResetAll() {
 }
 
 SystemPtr WalkForwardSystem::_clone() {
-    WalkForwardSystem* p = new WalkForwardSystem();
+    auto p = make_shared<WalkForwardSystem>();
     p->m_se = m_se->clone();
     p->m_se->reset();
     if (m_train_tm) {
         p->m_train_tm = m_train_tm->clone();
     }
-    return SystemPtr(p);
+    return p;
 }
 
 void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, bool isMoment) {
