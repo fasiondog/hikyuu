@@ -347,9 +347,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         m_result["Total Net Profit of Closed Trades"] =
           roundEx(m_result["Total Net Profit of Closed Trades"] + profit, precision);
 
-        price_t profit_percent = profit / (pos.buyMoney + pos.totalCost) * 100.;
+        price_t cost_base = pos.buyMoney + pos.totalCost;
+        price_t profit_percent = cost_base != 0.0 ? profit / cost_base * 100. : 0.0;
 
-        price_t r = roundEx(profit / pos.totalRisk, precision);
+        price_t r = pos.totalRisk != 0.0 ? roundEx(profit / pos.totalRisk, precision) : 0.0;
         total_r += r;
 
         if (profit > 0.0) {
