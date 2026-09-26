@@ -1519,6 +1519,9 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     int precision = getParam<int>("precision");
     TradeRecordList new_trade_buffer;
 
+    // Account cash before this batch's dividends, used as the replay base below
+    price_t cash_base = m_cash;
+
     // Update the position information and cache the newly added trade records
     position_map_type::iterator position_iter = m_position.begin();
     for (; position_iter != m_position.end(); ++position_iter) {
@@ -1582,19 +1585,20 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         } /* for weight */
     } /* for position */
 
-    std::sort(
+    // Sort by datetime, then replay from cash_base so each record's cash matches its own time.
+    // Only BONUS changes cash; stable_sort keeps a bonus ahead of same-date gift records.
+    std::stable_sort(
       new_trade_buffer.begin(), new_trade_buffer.end(),
       std::bind(std::less<Datetime>(), std::bind(&TradeRecord::datetime, std::placeholders::_1),
                 std::bind(&TradeRecord::datetime, std::placeholders::_2)));
 
     size_t total = new_trade_buffer.size();
+    price_t running_cash = cash_base;
     for (size_t i = 0; i < total; ++i) {
         if (new_trade_buffer[i].business == BUSINESS_BONUS) {
-            price_t bonus = new_trade_buffer[i].realPrice;
-            for (size_t j = i; j < total; ++j) {
-                new_trade_buffer[j].cash += bonus;
-            }
+            running_cash += new_trade_buffer[i].realPrice;
         }
+        new_trade_buffer[i].cash = running_cash;
     }
 
     for (size_t i = 0; i < total; ++i) {

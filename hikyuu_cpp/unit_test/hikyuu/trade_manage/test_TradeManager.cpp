@@ -768,8 +768,9 @@ TEST_CASE("test_getTradeList") {
     tr_list = tm->getTradeList(Datetime(199305210000L), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 6);
+    // cash_base 94430 + a single dividend 30 = 94460 (the old code double counted it as 94490)
     CHECK_EQ(tr_list[0], TradeRecord(stk, Datetime(199305240000L), BUSINESS_BONUS, 30, 30, 0, 0,
-                                     cost, 0, 94490, PART_INVALID));
+                                     cost, 0, 94460, PART_INVALID));
     CHECK_EQ(tr_list[5], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
@@ -798,6 +799,47 @@ TEST_CASE("test_getTradeList") {
                                      cost, 0, 94430, PART_INVALID));
     CHECK_EQ(tr_list[3], TradeRecord(stk, Datetime(199305250000L), BUSINESS_BUY, 0, 27.5, 0, 100,
                                      cost, 0, 91710, PART_INVALID));
+}
+
+/** @par Test point: updateWithWeight must not double count a dividend in a record's cash snapshot
+ *  (issue #511). sz000001 on 1993-05-24 pays a 3.0 dividend plus gift/increasement shares. After
+ *  buying 100 shares on 05-20 the cash is 94430; the 05-25 buy triggers the update (bonus = 30), so
+ *  the BONUS and the same-date GIFT records must both carry 94460, not the inflated 94490.*/
+TEST_CASE("test_TradeManager_updateWithWeight_bonus_cash_no_double_count") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);  // cash -> 94430
+    tm->buy(Datetime(199305250000L), stk, 27.5, 100);  // trigger the 1993-05-24 weight update
+
+    TradeRecordList tr_list = tm->getTradeList();
+    const TradeRecord* bonus = nullptr;
+    const TradeRecord* gift = nullptr;
+    for (const auto& t : tr_list) {
+        if (t.datetime == Datetime(199305240000L)) {
+            if (t.business == BUSINESS_BONUS)
+                bonus = &t;
+            if (t.business == BUSINESS_GIFT)
+                gift = &t;
+        }
+    }
+
+    /** @arg BONUS cash = batch-start cash + a single dividend, not double counted */
+    CHECK(bonus != nullptr);
+    if (bonus) {
+        CHECK_EQ(bonus->realPrice, 30);
+        CHECK_EQ(bonus->cash, 94460);
+    }
+
+    /** @arg Same-date GIFT shares the correct post-dividend cash snapshot */
+    CHECK(gift != nullptr);
+    if (gift) {
+        CHECK_EQ(gift->cash, 94460);
+    }
+
+    /** @arg Historical cash replay agrees with the record snapshot */
+    CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
 }
 
 /** @par Test point: test addTradeRecord */
