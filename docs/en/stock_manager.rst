@@ -412,38 +412,6 @@ StockManager/Block/Stock
         :rtype: bool
 
 
-    .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
-
-        Register a temporary Stock backed by CSV files of bar data. This is useful for ad-hoc
-        testing when the only market data available is a set of CSV bars.
-
-        The added stock is placed on the "TMP" market; prefix its code with "tmp" to retrieve it
-        through the manager, e.g. sm['tmp0001']
-
-        The first line of each CSV file is a header and must contain the following columns:
-        Datetime (Date or the Chinese alias 日期 is also accepted), OPEN (开盘价),
-        HIGH (最高价), LOW (最低价), CLOSE (收盘价), AMOUNT (成交金额), and VOLUME
-        (VOL, COUNT, or 成交量 are also accepted). The Chinese names are literal header aliases
-        recognized by the CSV loader.
-
-        :param str code: a self-assigned security code; it must not clash with an existing
-                         Stock, otherwise Null<Stock> is returned
-        :param str day_filename: path to the daily-bar CSV file
-        :param str min_filename: path to the minute-bar CSV file
-        :param float tick: minimum price tick, defaults to 0.01
-        :param float tick_value: monetary value of one tick, defaults to 0.01
-        :param int precision: price precision in decimal places, defaults to 2
-        :param int min_trade_num: minimum order quantity, defaults to 1
-        :param int max_trade_num: maximum order quantity, defaults to 1000000
-        :return: the newly added Stock
-        :rtype: Stock
-
-    .. py:method:: remove_temp_csv_stock(self, code)
-
-        Remove a previously added temporary Stock
-
-        :param str code: the custom code specified when it was created
-
     .. py:method:: add_stock(self, stock)
 
         Use with caution!!! Intended only for registering temporary external Stocks; typically

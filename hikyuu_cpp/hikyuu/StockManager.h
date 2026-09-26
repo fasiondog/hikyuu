@@ -263,32 +263,6 @@ public:
      */
     void removeStock(const string& market_code);
 
-    /**
-     * Add a temporary Stock from a CSV file (K-line data); it can be used for a temporary test when
-     * the K-line data is only available in CSV format
-     * @details The market of the added temporary Stock is "TMP"
-     * @param code a self-assigned security code, which must not duplicate an existing Stock,
-     *        otherwise Null<Stock> is returned
-     * @param day_filename daily CSV file name
-     * @param min_filename minute CSV file name
-     * @param tick minimum tick size, 0.01 by default
-     * @param tickValue value of the minimum tick, 0.01 by default
-     * @param precision price precision, 2 by default
-     * @param minTradeNumber minimum quantity per trade, 1 by default
-     * @param maxTradeNumber maximum quantity per trade, 1000000 by default
-     * @return
-     */
-    Stock addTempCsvStock(const string& code, const string& day_filename,
-                          const string& min_filename, price_t tick = 0.01, price_t tickValue = 0.01,
-                          int precision = 2, size_t minTradeNumber = 1,
-                          size_t maxTradeNumber = 1000000);
-
-    /**
-     * Remove an added temporary Stock
-     * @param code
-     */
-    void removeTempCsvStock(const string& code);
-
     /** Whether all the data is ready */
     bool dataReady() const;
 

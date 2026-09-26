@@ -466,30 +466,26 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
-    // CSV is loaded into the memory entirely, the other types are loaded according to the
-    // configured preload parameters
+    // Load the K-line data according to the configured preload parameters
     KQuery query = KQuery(0, Null<int64_t>(), kType);
 
-    if (driver->name() != "TMPCSV") {
-        const auto& param = StockManager::instance().getPreloadParameter();
-        string preload_type = fmt::format("{}_max", kType);
-        to_lower(preload_type);
-        int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
-        HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
-                            max_num);
-        int64_t start = total <= (size_t)max_num ? 0 : total - max_num;
-        query = KQuery(start, Null<int64_t>(), kType);
-        if (driver->isColumnFirst() && market_code() != "SH000001") {
-            Stock sh000001 = StockManager::instance().getStock("SH000001");
-            if (!sh000001.isNull()) {
-                if (!sh000001.isBuffer(kType)) {
-                    sh000001.loadKDataToBuffer(kType);
-                }
+    const auto& param = StockManager::instance().getPreloadParameter();
+    string preload_type = fmt::format("{}_max", kType);
+    to_lower(preload_type);
+    int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
+    HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
+    int64_t start = total <= (size_t)max_num ? 0 : total - max_num;
+    query = KQuery(start, Null<int64_t>(), kType);
+    if (driver->isColumnFirst() && market_code() != "SH000001") {
+        Stock sh000001 = StockManager::instance().getStock("SH000001");
+        if (!sh000001.isNull()) {
+            if (!sh000001.isBuffer(kType)) {
+                sh000001.loadKDataToBuffer(kType);
+            }
 
-                auto k = sh000001.getKRecord(0, kType);
-                if (k.isValid()) {
-                    query = KQueryByDate(k.datetime, Null<Datetime>(), kType);
-                }
+            auto k = sh000001.getKRecord(0, kType);
+            if (k.isValid()) {
+                query = KQueryByDate(k.datetime, Null<Datetime>(), kType);
             }
         }
     }

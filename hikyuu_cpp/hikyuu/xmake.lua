@@ -149,7 +149,6 @@ target("hikyuu")
     add_files("./data_driver/*.cpp", {unity_group="data_driver"})
     add_files("./data_driver/ipc/**.cpp", {unity_group="data_driver"})
     add_files("./data_driver/block_info/qianlong/**.cpp", {unity_group="data_driver"})
-    add_files("./data_driver/kdata/cvs/**.cpp", {unity_group="data_driver"})
     if get_config("hdf5") or get_config("sqlite") then
         add_files("./utilities/db_connect/sqlite/**.cpp", {unity_group="sqlite"})
         add_files("./data_driver/base_info/sqlite/**.cpp", {unity_group="sqlite"})

@@ -300,41 +300,6 @@ void export_StockManager(py::module& m) {
     :return: the date list
     :rtype: DatetimeList)")
 
-      .def("add_temp_csv_stock", &StockManager::addTempCsvStock, py::arg("code"),
-           py::arg("day_filename"), py::arg("min_filename"), py::arg("tick") = 0.01,
-           py::arg("tick_value") = 0.01, py::arg("precision") = 2, py::arg("min_trade_num") = 1,
-           py::arg("max_trade_num") = 1000000,
-           R"(add_temp_csv_stock(code, day_filename, min_filename[, tick=0.01, tick_value=0.01,
-        precision=2, min_trade_num = 1, max_trade_num=1000000])
-
-    Add a temporary Stock from the CSV files (the K-line data), which can be used for the temporary testing when there are only the K-line data in the CSV format.
-
-    The market of the added stock is "TMP"; if it needs to be obtained through sm, you need to add tmp, e.g.: sm['tmp0001']
-
-    The first line of the CSV file is the header, which needs to contain
-    Datetime (or Date, 日期), OPEN (or 开盘价), HIGH (or 最高价), LOW (or 最低价), CLOSE (or 收盘价), AMOUNT (or 成交金额), VOLUME (or VOL, COUNT, 成交量).
-
-    Note: please make sure the csv is stored in the utf8 format, otherwise the Chinese cannot be recognized
-
-    :param str code: the security code numbered by yourself; it cannot be the same as the existing Stock, otherwise it will return Null<Stock>
-    :param str day_filename: the daily-line CSV file name
-    :param str min_filename: the minute-line CSV file name
-    :param float tick: the minimum tick, defaulting to 0.01
-    :param float tick_value: the minimum tick value, defaulting to 0.01
-    :param int precision: the price precision, defaulting to 2
-    :param int min_trade_num: the minimum trading quantity per order, defaulting to 1
-    :param int max_trade_num: the maximum trading quantity per order, defaulting to 1000000
-    :return: the added Stock
-    :rtype: Stock)",
-           py::keep_alive<1, 2>())
-
-      .def("remove_temp_csv_stock", &StockManager::removeTempCsvStock,
-           R"(remove_temp_csv_stock(self, code)
-
-    Remove the added temporary Stock
-
-    :param str code: the custom code at the creation)")
-
       .def("is_holiday", &StockManager::isHoliday, R"(is_holiday(self, d)
 
     Judge whether the date corresponding to the specified time is a holiday (only using the A-share market)
