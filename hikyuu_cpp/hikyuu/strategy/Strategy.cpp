@@ -423,18 +423,21 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
         if (buy_num > max_trade_num) {
             buy_num = max_trade_num;
         }
-        ret = buy(stk, 0.0, num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+        ret = buy(stk, 0.0, buy_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
 
     } else {
         if (num == -MAX_DOUBLE) {
             ret = sell(stk, 0.0, MAX_DOUBLE, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
             return ret;
         }
-        double sell_num = int64_t(std::abs(num) / min_trade_num) * min_trade_num;
+        double abs_num = std::abs(num);
+        double sell_num = int64_t(abs_num / min_trade_num) * min_trade_num;
         if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
             sell_num = max_trade_num;
-        } else if ((sell_num + num) < min_trade_num) {
-            sell_num = MAX_DOUBLE;  // Indicate selling all the remaining
+        } else if (abs_num != sell_num) {
+            // The request contains an odd lot (a non-integer multiple of min_trade_num), which can
+            // never be sold alone; sell all the remaining position to carry the odd lot away
+            sell_num = MAX_DOUBLE;
         }
         ret = sell(stk, 0.0, sell_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
     }
