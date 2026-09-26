@@ -298,7 +298,7 @@ void System::setTO(const KData& kdata) {
 }
 
 SystemPtr System::clone() {
-    SystemPtr p = _clone();
+    SystemPtr p;
     try {
         p = _clone();
     } catch (...) {
