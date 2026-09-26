@@ -830,6 +830,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     }
 
     double min_num = m_stock.minTradeNumber();
+    HKU_ASSERT(min_num != 0.0);
     number = int64_t(number / min_num) * min_num;
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
@@ -893,6 +894,7 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
       _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
 
     double min_num = m_stock.minTradeNumber();
+    HKU_ASSERT(min_num != 0.0);
     // Round the quantity to be sold to an integer multiple of the minimum trade unit; when the
     // remainder is less than the minimum trade unit, sell everything at once
     double real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
