@@ -646,6 +646,10 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 conn_ptr->ssl_socket.emplace(*m_ctx, m_ssl_ctx->ssl_ctx);
                 SSL_set_tlsext_host_name(conn_ptr->ssl_socket->native_handle(), m_host.c_str());
 
+                // Verify the server certificate chain and the hostname (anti-MITM)
+                conn_ptr->ssl_socket->set_verify_mode(ssl::verify_peer);
+                conn_ptr->ssl_socket->set_verify_callback(ssl::host_name_verification(m_host));
+
                 auto timer = net::steady_timer{*m_ctx};
                 timer.expires_after(m_timeout);
 
@@ -749,7 +753,9 @@ net::awaitable<std::pair<std::shared_ptr<HttpConnection>, bool>> AsioHttpClient:
                 }
 
                 if (captured_ec) {
-                    HKU_THROW("SSL handshake failed: {}", captured_ec.message());
+                    HKU_THROW("SSL handshake failed: {} (the server certificate may be untrusted "
+                              "or the hostname mismatched; a trusted CA can be set via setCaFile)",
+                              captured_ec.message());
                 }
             }
 #endif
@@ -968,6 +974,10 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
         // Set the SNI (Server Name Indication)
         SSL_set_tlsext_host_name(socket_variant.ssl->native_handle(), m_host.c_str());
 
+        // Verify the server certificate chain and the hostname (anti-MITM)
+        socket_variant.ssl->set_verify_mode(ssl::verify_peer);
+        socket_variant.ssl->set_verify_callback(ssl::host_name_verification(m_host));
+
         // Use the event driven SSL handshake with a timeout
         auto timer = net::steady_timer{*m_ctx};
         timer.expires_after(m_timeout);
@@ -1008,7 +1018,9 @@ net::awaitable<void> AsioHttpClient::_connect(SocketVariant& socket_variant,
         }
 
         if (captured_ec) {
-            HKU_THROW("SSL handshake failed: {}", captured_ec.message());
+            HKU_THROW("SSL handshake failed: {} (the server certificate may be untrusted or the "
+                      "hostname mismatched; a trusted CA can be set via setCaFile)",
+                      captured_ec.message());
         }
     }
 #endif
