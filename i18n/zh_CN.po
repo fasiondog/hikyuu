@@ -152,6 +152,86 @@ msgstr ""
 "证券代码 证券名称 建仓日期 持有天数 持有数量 投入资金 当前市值 当前收益 当前"
 "收益率 相对账户初始资金收益率\n"
 
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1663
+msgid "trade_records"
+msgstr "交易记录"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1664
+msgid "closed_positions"
+msgstr "已平仓记录"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1665
+msgid "open_positions"
+msgstr "未平仓记录"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1686
+msgid "fill_date"
+msgstr "成交日期"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "fill_number"
+msgstr "成交数量"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "commission"
+msgstr "佣金"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "stamp_tax"
+msgstr "印花税"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "transfer_fee"
+msgstr "过户费"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1689
+msgid "other_cost"
+msgstr "其他成本"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1690
+msgid "signal_part"
+msgstr "信号来源"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1731
+msgid "entry_date"
+msgstr "建仓日期"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1731
+msgid "exit_date"
+msgstr "平仓日期"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1733
+msgid "total_profit"
+msgstr "总盈利"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1734
+msgid "profit_loss_ratio"
+msgstr "赢亏比率"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1734
+msgid "buy_count"
+msgstr "累计买入次数"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1734
+msgid "sell_count"
+msgstr "累计卖出次数"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1754
+msgid "current_number"
+msgstr "当前持仓数量"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1756
+msgid "floating_profit"
+msgstr "累计浮动盈亏"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1756
+msgid "profit_cost_price"
+msgstr "当前盈亏成本价"
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1757
+msgid "floating_profit_ratio"
+msgstr "浮动盈亏比率"
+
 #: hikyuu_cpp/hikyuu/trade_sys/multifactor/MultiFactorBase.cpp:446
 msgid ""
 "mf param \"save_all_factors\" is false, can't get all factors!, please set "

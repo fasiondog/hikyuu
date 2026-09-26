@@ -11,6 +11,7 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include "TradeManager.h"
+#include "../lang.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"
 
@@ -1657,19 +1658,12 @@ void TradeManager::_saveAction(const TradeRecord& record) {
 }
 
 void TradeManager::tocsv(const string& path) {
-    string filename1, filename2, filename3, filename4;
-    if (m_name.empty()) {
-        string date = m_init_datetime.str();
-        filename1 = path + "/" + date + "_交易记录.csv";
-        filename2 = path + "/" + date + "_已平仓记录.csv";
-        filename3 = path + "/" + date + "_未平仓记录.csv";
-        filename4 = path + "/" + date + "_actions.txt";
-    } else {
-        filename1 = path + "/" + m_name + "_交易记录.csv";
-        filename2 = path + "/" + m_name + "_已平仓记录.csv";
-        filename3 = path + "/" + m_name + "_未平仓记录.csv";
-        filename4 = path + "/" + m_name + "_actions.txt";
-    }
+    string date = m_init_datetime.str();
+    string prefix = m_name.empty() ? date : m_name;
+    string filename1 = path + "/" + prefix + "_" + lang_htr("trade_records") + ".csv";
+    string filename2 = path + "/" + prefix + "_" + lang_htr("closed_positions") + ".csv";
+    string filename3 = path + "/" + prefix + "_" + lang_htr("open_positions") + ".csv";
+    string filename4 = path + "/" + prefix + "_actions.txt";
 
 #if defined(_MSC_VER)
     filename1 = utf8_to_gb(filename1);
@@ -1684,13 +1678,17 @@ void TradeManager::tocsv(const string& path) {
     std::ofstream file(filename1.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename1);
 
+    // The key itself is used as the column name when no translation is available
+    auto col = [](const char* key) { return lang_htr(key) + ","; };
+
     file.setf(std::ios_base::fixed);
     file.precision(3);
-    file << "#成交日期,证券代码,证券名称,业务名称,计划交易价格,"
-            "实际成交价格,目标价格,成交数量,佣金,印花税,过户费,其他成本,交易总成本,"
-            "止损价,现金余额,信号来源,日期,开盘价,最高价,最低价,收盘价,"
-            "成交金额,成交量,备注"
-         << std::endl;
+    file << "#" << col("fill_date") << col("market_code") << col("stock_name") << col("business")
+         << col("planPrice") << col("realPrice") << col("goalPrice") << col("fill_number")
+         << col("commission") << col("stamp_tax") << col("transfer_fee") << col("other_cost")
+         << col("cost_total") << col("stoploss") << col("cash") << col("signal_part") << col("Date")
+         << col("Open") << col("High") << col("Low") << col("Close") << col("Amount")
+         << col("Volume") << col("remark") << std::endl;
     TradeRecordList::const_iterator trade_iter = m_trade_list.begin();
     for (; trade_iter != m_trade_list.end(); ++trade_iter) {
         const TradeRecord& record = *trade_iter;
@@ -1730,10 +1728,10 @@ void TradeManager::tocsv(const string& path) {
     // Export the closed position records
     file.open(filename2.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename2);
-    file << "#建仓日期,平仓日期,证券代码,证券名称,累计持仓数量,"
-            "累计花费资金,累计交易成本,已转化资金,总盈利,累积风险,赢亏比率,持仓天数,累计买入次数,"
-            "累计卖出次数"
-         << std::endl;
+    file << "#" << col("entry_date") << col("exit_date") << col("market_code") << col("stock_name")
+         << col("total_number") << col("buy_money") << col("total_cost") << col("sell_money")
+         << col("total_profit") << col("total_risk") << col("profit_loss_ratio") << col("hold_days")
+         << col("buy_count") << col("sell_count") << std::endl;
     PositionRecordList::const_iterator history_iter = m_position_history.begin();
     for (; history_iter != m_position_history.end(); ++history_iter) {
         const PositionRecord& record = *history_iter;
@@ -1751,9 +1749,10 @@ void TradeManager::tocsv(const string& path) {
     // Export the open position records
     file.open(filename3.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename3);
-    file << "#建仓日期,平仓日期,证券代码,证券名称,当前持仓数量,累计持仓数量,"
-            "累计花费资金,累计交易成本,已转化资金,累积风险,累计买入次数,累计卖出次数,"
-            "累计浮动盈亏,当前盈亏成本价, 浮动盈亏比率"
+    file << "#" << col("entry_date") << col("exit_date") << col("market_code") << col("stock_name")
+         << col("current_number") << col("total_number") << col("buy_money") << col("total_cost")
+         << col("sell_money") << col("total_risk") << col("buy_count") << col("sell_count")
+         << col("floating_profit") << col("profit_cost_price") << col("floating_profit_ratio")
          << std::endl;
     position_map_type::const_iterator position_iter = m_position.begin();
     for (; position_iter != m_position.end(); ++position_iter) {
