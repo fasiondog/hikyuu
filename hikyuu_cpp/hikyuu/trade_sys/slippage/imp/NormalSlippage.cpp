@@ -14,10 +14,7 @@ BOOST_CLASS_EXPORT(hku::NormalSlippage)
 
 namespace hku {
 
-std::random_device NormalSlippage::ms_rd;
-std::mt19937 NormalSlippage::ms_gen(ms_rd());
-
-NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal") {
+NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
 }
@@ -36,7 +33,7 @@ price_t NormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price)
 
     std::normal_distribution<double> dis(mean, stddev);
 
-    double value = dis(ms_gen);
+    double value = dis(m_gen);
     return price + std::abs(value);
 }
 
@@ -46,7 +43,7 @@ price_t NormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price
 
     std::normal_distribution<double> dis(mean, stddev);
 
-    double value = dis(ms_gen);
+    double value = dis(m_gen);
     return price - std::abs(value);
 }
 

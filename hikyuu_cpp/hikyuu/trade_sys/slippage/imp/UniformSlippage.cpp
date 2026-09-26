@@ -13,7 +13,7 @@ BOOST_CLASS_EXPORT(hku::UniformSlippage)
 
 namespace hku {
 
-UniformSlippage::UniformSlippage() : SlippageBase("SP_Uniform") {
+UniformSlippage::UniformSlippage() : SlippageBase("SP_Uniform"), m_gen(std::random_device{}()) {
     setParam<double>("min_value", -0.05);
     setParam<double>("max_value", 0.05);
 }
@@ -37,14 +37,16 @@ void UniformSlippage::_checkParam(const string& name) const {
 price_t UniformSlippage ::getRealBuyPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
-    double value = min_v + (rand() / (RAND_MAX + 1.0)) * (max_v - min_v);
+    std::uniform_real_distribution<double> dis(min_v, max_v);
+    double value = dis(m_gen);
     return price + std::abs(value);
 }
 
 price_t UniformSlippage ::getRealSellPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
-    double value = min_v + (rand() / (RAND_MAX + 1.0)) * (max_v - min_v);
+    std::uniform_real_distribution<double> dis(min_v, max_v);
+    double value = dis(m_gen);
     return price - std::abs(value);
 }
 

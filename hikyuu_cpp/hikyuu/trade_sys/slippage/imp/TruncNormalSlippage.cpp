@@ -14,10 +14,8 @@ BOOST_CLASS_EXPORT(hku::TruncNormalSlippage)
 
 namespace hku {
 
-std::random_device TruncNormalSlippage::ms_rd;
-std::mt19937 TruncNormalSlippage::ms_gen(ms_rd());
-
-TruncNormalSlippage::TruncNormalSlippage() : SlippageBase("SP_TruncNormal") {
+TruncNormalSlippage::TruncNormalSlippage()
+: SlippageBase("SP_TruncNormal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
     setParam<double>("min_value", -0.1);
@@ -55,7 +53,7 @@ price_t TruncNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t p
     double value;
     // Generate a value within the truncated range
     do {
-        value = dis(ms_gen);
+        value = dis(m_gen);
     } while (value < min_v || value > max_v);
 
     // On a buy the price always goes higher (the unfavorable direction)
@@ -73,7 +71,7 @@ price_t TruncNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t 
     double value;
     // Generate a value within the truncated range
     do {
-        value = dis(ms_gen);
+        value = dis(m_gen);
     } while (value < min_v || value > max_v);
 
     // On a sell the price always goes lower (the unfavorable direction)

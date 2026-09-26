@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <random>
 #include "../SlippageBase.h"
 
 namespace hku {
@@ -21,8 +22,7 @@ public:
     virtual void _checkParam(const string& name) const override;
 
 private:
-    static std::random_device ms_rd;
-    static std::mt19937 ms_gen;
+    std::mt19937 m_gen;
 };
 
 } /* namespace hku */

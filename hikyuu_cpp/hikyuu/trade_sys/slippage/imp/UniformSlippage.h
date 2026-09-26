@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <random>
 #include "../SlippageBase.h"
 
 namespace hku {
@@ -19,6 +20,9 @@ public:
     UniformSlippage();
     virtual ~UniformSlippage();
     virtual void _checkParam(const string& name) const override;
+
+private:
+    std::mt19937 m_gen;
 };
 
 } /* namespace hku */
