@@ -32,21 +32,33 @@ RunSystemInStrategy::RunSystemInStrategy(const SYSPtr& sys, const OrderBrokerPtr
 
 void RunSystemInStrategy::run(const Stock& stock) {
     if (m_sys->getParam<bool>("buy_delay") && m_buyRequest.valid) {
-        KData k = stock.getKData(
-          KQueryByIndex(-1, Null<int64_t>(), m_query.kType(), m_query.recoverType()));
-        const auto& stock = m_sys->getStock();
-        m_broker->buy(m_buyRequest.datetime, stock.market(), stock.code(), 10.0,
-                      m_buyRequest.number, m_buyRequest.stoploss, m_buyRequest.goal,
-                      m_buyRequest.from, "");
+        // Fetch the latest bar without adjustment as the order reference price (the broker needs
+        // the real price, consistent with the original-price coordinates of the request)
+        KData k =
+          stock.getKData(KQueryByIndex(-1, Null<int64_t>(), m_query.kType(), KQuery::NO_RECOVER));
+        if (!k.empty()) {
+            price_t price = k.back().closePrice;
+            m_broker->buy(m_buyRequest.datetime, stock.market(), stock.code(), price,
+                          m_buyRequest.number, m_buyRequest.stoploss, m_buyRequest.goal,
+                          m_buyRequest.from, "");
+        } else {
+            HKU_WARN("Skip submitting the delayed buy order, {} has no loaded data!",
+                     stock.market_code());
+        }
     }
 
     if (m_sys->getParam<bool>("sell_delay") && m_sellRequest.valid) {
-        KData k = stock.getKData(
-          KQueryByIndex(-1, Null<int64_t>(), m_query.kType(), m_query.recoverType()));
-        const auto& stock = m_sys->getStock();
-        m_broker->sell(m_sellRequest.datetime, stock.market(), stock.code(), 10.0,
-                       m_sellRequest.number, m_sellRequest.stoploss, m_sellRequest.goal,
-                       m_sellRequest.from, "");
+        KData k =
+          stock.getKData(KQueryByIndex(-1, Null<int64_t>(), m_query.kType(), KQuery::NO_RECOVER));
+        if (!k.empty()) {
+            price_t price = k.back().closePrice;
+            m_broker->sell(m_sellRequest.datetime, stock.market(), stock.code(), price,
+                           m_sellRequest.number, m_sellRequest.stoploss, m_sellRequest.goal,
+                           m_sellRequest.from, "");
+        } else {
+            HKU_WARN("Skip submitting the delayed sell order, {} has no loaded data!",
+                     stock.market_code());
+        }
     }
 
     m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);
@@ -63,6 +75,8 @@ void RunSystemInStrategy::run(const Stock& stock) {
 
 void RunSystemInStrategy::runMomentOnOpen(const Stock& stock) {
     auto k = stock.getKData(m_query);
+    HKU_WARN_IF_RETURN(k.empty(), void(), "Skip runMomentOnOpen, {} has no loaded data!",
+                       stock.market_code());
     m_sys->setTO(k);
     m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);
     m_sys->runMomentOnOpen(k.back().datetime);
@@ -70,6 +84,8 @@ void RunSystemInStrategy::runMomentOnOpen(const Stock& stock) {
 
 void RunSystemInStrategy::runMomentOnClose(const Stock& stock) {
     auto k = stock.getKData(m_query);
+    HKU_WARN_IF_RETURN(k.empty(), void(), "Skip runMomentOnClose, {} has no loaded data!",
+                       stock.market_code());
     m_sys->setTO(k);
     m_sys->getTM()->fetchAssetInfoFromBroker(m_broker);
     m_sys->runMomentOnClose(k.back().datetime);
