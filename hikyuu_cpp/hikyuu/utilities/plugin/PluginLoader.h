@@ -51,20 +51,26 @@ public:
 
 #if HKU_OS_WINDOWS
         m_handle = LoadLibrary(HKU_PATH(filename).c_str());
-        HKU_WARN_IF_RETURN(print && !m_handle, false, "load plugin({}) failed! errcode: {}",
-                           filename, GetLastError());
+        if (!m_handle) {
+            HKU_WARN_IF(print, "load plugin({}) failed! errcode: {}", filename, GetLastError());
+            return false;
+        }
 
 #else
         m_handle = dlopen(filename.c_str(), RTLD_LAZY);
-        HKU_WARN_IF_RETURN(print && !m_handle, false, "load plugin({}) failed! {}", filename,
-                           dlerror());
+        if (!m_handle) {
+            HKU_WARN_IF(print, "load plugin({}) failed! {}", filename, dlerror());
+            return false;
+        }
 #endif
 
         typedef PluginBase* (*CreateFunction)();
         CreateFunction createFunction =
           reinterpret_cast<CreateFunction>(getFunciton("createPlugin"));
-        HKU_WARN_IF_RETURN(print && !createFunction, false, "Failed to get plugin({}) handle!",
-                           filename);
+        if (!createFunction) {
+            HKU_WARN_IF(print, "Failed to get plugin({}) handle!", filename);
+            return false;
+        }
 
         m_plugin.reset(createFunction());
         if (!m_plugin) {
