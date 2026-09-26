@@ -158,6 +158,7 @@ TEST_CASE("test_IniParser_hasSection") {
 
 - Format the changed files with `clang-format` / `yapf` before committing, to avoid deviating from the existing style.
 - Adding a new public API requires maintaining the `.pyi` stubs (`hikyuu/__init__.pyi`, `core.pyi`, `extend.pyi` and `hikyuu/cpp/core3xx.pyi`) and the documentation (`docs/zh/` and `docs/en/`; the two trees must be updated in pairs with a consistent structure) synchronously.
+- Keep code comments concise and free of filler: state the intent in as few words as possible, and do not restate what the code already expresses or over-explain its background. One short line is preferred over a paragraph.
 
 ### Naming Conventions (C++)
 
