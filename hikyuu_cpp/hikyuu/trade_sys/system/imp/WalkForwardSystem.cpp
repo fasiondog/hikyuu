@@ -90,6 +90,8 @@ void WalkForwardSystem::_reset() {
         m_train_tm->reset();
     }
 
+    m_train_kdata_list.clear();
+    m_run_ranges.clear();
     m_trade_list.clear();
     m_buyRequest.clear();
     m_sellRequest.clear();
@@ -190,6 +192,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     size_t run_ranges_len = m_run_ranges.size();
     HKU_IF_RETURN(run_ranges_len == 0, void());
 
+    m_train_kdata_list.clear();
     const KQuery& query = kdata.getQuery();
     const Stock& stock = kdata.getStock();
 
