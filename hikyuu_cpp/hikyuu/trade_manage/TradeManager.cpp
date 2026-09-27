@@ -559,7 +559,7 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
                                        number, CostRecord(), 0.0, m_cash, PART_INVALID));
 
     // Update the accumulated withdrawn stock value
-    m_checkout_stock = roundEx(m_checkout_stock - price * number * stock.unit(), precision);
+    m_checkout_stock = roundEx(m_checkout_stock + price * number * stock.unit(), precision);
 
     return true;
 }
@@ -597,6 +597,10 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
 
     int precision = getParam<int>("precision");
 
+    // All the values live on the rounding grid of the precision; treat the sub-grid residual as
+    // zero so that the rounding drift cannot fail the equality based termination and validation
+    price_t epsilon = 0.5 * std::pow(10.0, -double(precision));
+
     CostRecord cost, cur_cost;
     price_t in_cash = roundEx(cash, precision);
     price_t return_cash = in_cash;
@@ -615,12 +619,13 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
         cost.transferfee = roundEx(cost.transferfee + cur_cost.transferfee, precision);
         cost.others = roundEx(cost.others + cur_cost.others, precision);
         cost.total = roundEx(cost.total + cur_cost.total, precision);
-        if (return_cash == 0.0)
+        if (return_cash < epsilon)
             break;
     }
 
-    // The money to be returned is more than the actual debt
-    HKU_ERROR_IF_RETURN(return_cash != 0.0, false, "{} return cash must <= borrowed cash!",
+    // The money to be returned is more than the actual debt (the residual below the grid unit is
+    // treated as fully repaid)
+    HKU_ERROR_IF_RETURN(return_cash > epsilon, false, "{} return cash must <= borrowed cash!",
                         datetime);
 
     price_t out_cash = roundEx(in_cash + cost.total, precision);
@@ -631,7 +636,7 @@ bool TradeManager::returnCash(const Datetime& datetime, price_t cash) {
     return_cash = in_cash;
     do {
         iter = m_loan_list.begin();
-        if (return_cash == iter->value) {
+        if (std::abs(return_cash - iter->value) < epsilon) {
             m_loan_list.pop_front();
             break;
         } else if (return_cash < iter->value) {
@@ -730,12 +735,12 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
     list<BorrowRecord::Data>::iterator iter = bor.record_list.begin();
     for (; iter != bor.record_list.end(); ++iter) {
         if (remain_num <= iter->number) {
-            cur_cost = getReturnStockCost(iter->datetime, datetime, stock, price, number);
+            cur_cost = getReturnStockCost(iter->datetime, datetime, stock, price, remain_num);
             market_value =
               roundEx(market_value + iter->price * remain_num * stock.unit(), precision);
             remain_num = 0;
         } else {  // number > iter->number
-            cur_cost = getReturnStockCost(iter->datetime, datetime, stock, price, number);
+            cur_cost = getReturnStockCost(iter->datetime, datetime, stock, price, iter->number);
             market_value =
               roundEx(market_value + iter->price * iter->number * stock.unit(), precision);
             remain_num -= iter->number;
@@ -840,13 +845,19 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         CostRecord bor_cost = getBorrowCashCost(datetime, money);
         double rate = getMarginRate(datetime, stock);
         price_t x = roundEx(m_cash / rate + cost.total + bor_cost.total, precision);
-        if (x < money) {
-            // The financing that can be obtained is not enough, add the principal automatically
-            checkin(datetime, roundUp(money - x, precision));
-        }
+        price_t need_cash = roundEx(money + cost.total, precision);
 
-        // Financing, borrow the funds
-        borrowCash(datetime, roundUp(money, precision));
+        // The buying power must be validated before any side effect (ISS-045)
+        HKU_WARN_IF_RETURN(x < need_cash, result,
+                           "{} {} Can't buy, need cash({:<.4f}) > buying power({:<.4f})!", datetime,
+                           stock.market_code(), need_cash, x);
+
+        // Borrow only the cash shortfall (including the estimated borrow cost); use the own cash
+        // first (ISS-045)
+        price_t gap = roundEx(need_cash - m_cash + bor_cost.total, precision);
+        if (gap > 0.0) {
+            borrowCash(datetime, gap);
+        }
     }
 
     HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
@@ -1086,7 +1097,7 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         position.stoploss = stoploss;
         position.goalPrice = goalPrice;
         position.totalNumber += sell_num;
-        position.buyMoney = roundEx(position.buyMoney + cost.total);
+        position.buyMoney = roundEx(position.buyMoney + cost.total, precision);
         position.totalCost = roundEx(cost.total + position.totalCost, precision);
         position.totalRisk = roundEx(position.totalRisk + risk, precision);
         position.sellMoney = roundEx(position.sellMoney + money, precision);
@@ -1146,6 +1157,12 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
+
+    // The cash must cover the buyback and its cost (ISS-046: the cash could be overdrawn)
+    HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
+                       "{} {} Can't buyShort, need cash({:<.4f}) > current cash({:<.4f})!",
+                       datetime, stock.market_code(), roundEx(money + cost.total, precision),
+                       m_cash);
 
     // Update the cash balance
     m_cash = roundEx(m_cash - money - cost.total, precision);
@@ -1297,7 +1314,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     price_t cash = m_init_cash;
     struct Stock_Number {
         Stock_Number() : number(0) {}
-        Stock_Number(const Stock& stock, size_t number) : stock(stock), number(number) {}
+        Stock_Number(const Stock& stock, double number) : stock(stock), number(number) {}
 
         Stock stock;
         double number;
@@ -1434,7 +1451,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
 
                 } else {
                     BorrowRecord& bor = bor_stock_iter->second;
-                    size_t remain_num = iter->number;
+                    double remain_num = iter->number;
                     do {
                         list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
                         if (remain_num == bor_iter->number) {
@@ -1473,7 +1490,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
 
     stock_iter = stock_map.begin();
     for (; stock_iter != stock_map.end(); ++stock_iter) {
-        const size_t& number = stock_iter->second.number;
+        const double& number = stock_iter->second.number;
         if (number == 0) {
             continue;
         }
@@ -1485,7 +1502,7 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
 
     short_stock_iter = short_stock_map.begin();
     for (; short_stock_iter != short_stock_map.end(); ++short_stock_iter) {
-        const size_t& number = short_stock_iter->second.number;
+        const double& number = short_stock_iter->second.number;
         if (number == 0) {
             continue;
         }

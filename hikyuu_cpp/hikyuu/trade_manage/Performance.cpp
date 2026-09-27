@@ -301,8 +301,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     m_result["Total Borrowed Cash"] = funds.borrow_cash;
     m_result["Total Borrowed Assets"] = funds.borrow_asset;
     m_result["Open Position Net Value"] = funds.market_value;
-    m_result["Current Total Assets"] =
-      funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset;
+    m_result["Current Total Assets"] = funds.total_assets();
     price_t total_money = funds.base_cash + funds.base_asset;
 
     const TradeRecordList& trade_list = tm->getTradeList();
