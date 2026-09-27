@@ -54,10 +54,9 @@ ProfitGoalPtr ProfitGoalBase::clone() {
 void ProfitGoalBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
+    _reset();
     if (!kdata.empty()) {
         _calculate();
-    } else {
-        _reset();
     }
 }
 
