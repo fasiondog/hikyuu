@@ -101,16 +101,24 @@ KRecordList SQLiteKDataDriver::getKRecordList(const string& market, const string
     KQuery::KType ktype = query.kType();
     if (query.queryType() == KQuery::INDEX) {
         if (!isBaseKType(ktype)) {
+            // Non-base ktypes are converted from the base ktype by position: each new candle
+            // aggregates "multiplier" consecutive base candles (see convertToNewInterval), so the
+            // target index i maps to the base range [i * multiplier, (i + 1) * multiplier)
             KQuery::KType base_ktype = getBaseKType(ktype);
-            int64_t start, end, num;
-            start = query.start();
-            end = query.end();
-            num = end - start;
-            int32_t multiplier = KQuery::getKTypeInMin(ktype) / KQuery::getKTypeInMin(base_ktype);
-            end = getCount(market, code, base_ktype);
-            start = end - num * multiplier;
-            HKU_ERROR_IF(start < 0, "Invalid start index: {}", start);
-            result = _getKRecordList(market, code, ktype, start, end);
+            int64_t multiplier = KQuery::getKTypeInMin(ktype) / KQuery::getKTypeInMin(base_ktype);
+            int64_t base_count = static_cast<int64_t>(getCount(market, code, base_ktype));
+            auto scaleIndex = [base_count, multiplier](int64_t ix) -> int64_t {
+                if (ix <= 0)
+                    return 0;
+                if (ix > base_count / multiplier)
+                    return base_count;
+                int64_t scaled = ix * multiplier;
+                return scaled > base_count ? base_count : scaled;
+            };
+            int64_t start_ix = scaleIndex(query.start());
+            int64_t end_ix = query.end() == Null<int64_t>() ? base_count : scaleIndex(query.end());
+            result = _getKRecordList(market, code, ktype, static_cast<size_t>(start_ix),
+                                     static_cast<size_t>(end_ix));
         } else {
             result = _getKRecordList(market, code, ktype, query.start(), query.end());
         }
