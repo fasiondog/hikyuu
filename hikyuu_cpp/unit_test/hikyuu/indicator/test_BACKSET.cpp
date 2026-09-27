@@ -9,6 +9,7 @@
 
 #include "doctest/doctest.h"
 #include <fstream>
+#include <random>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BACKSET.h>
 #include <hikyuu/indicator/crt/CVAL.h>
@@ -119,6 +120,23 @@ TEST_CASE("test_BACKSET") {
     CHECK_EQ(result[8], 1);
     CHECK_EQ(result[9], 1);
     CHECK_EQ(result[10], 1);
+
+    /** @arg The backfill window reaching below the n-th boundary must survive */
+    a.clear();
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(1);
+    a.push_back(0);
+    data = PRICELIST(a);
+    result = BACKSET(data, 3);
+    CHECK_EQ(result.size(), 5);
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], 0);
+    CHECK_EQ(result[1], 1);
+    CHECK_EQ(result[2], 1);
+    CHECK_EQ(result[3], 1);
+    CHECK_EQ(result[4], 0);
 }
 
 /** @par Test points */
@@ -146,6 +164,73 @@ TEST_CASE("test_BACKSET_dyn") {
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+
+    /** @arg Mixed 0/1 input, whose backfill window must survive on the dynamic parameter path */
+    PriceList pa;
+    pa.push_back(0);
+    pa.push_back(0);
+    pa.push_back(0);
+    pa.push_back(1);
+    pa.push_back(0);
+    Indicator x = PRICELIST(pa);
+    result = BACKSET(x, CVAL(x, 3));
+    CHECK_EQ(result.size(), 5);
+    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result[0], 0);
+    CHECK_EQ(result[1], 1);
+    CHECK_EQ(result[2], 1);
+    CHECK_EQ(result[3], 1);
+    CHECK_EQ(result[4], 0);
+}
+
+/**
+ * @par Test points
+ * Differential audit against the documented meaning: dst[j] = 1 iff X holds on some bar within
+ * [j, j + n - 1]. Both the static and the dynamic path must match the brute-force reference on
+ * random 0/1 series, so neither backfill nor overwrite may depend on the scan shape.
+ */
+TEST_CASE("test_BACKSET_random_against_definition") {
+    std::mt19937 rng(42);
+    auto spec = [](const PriceList& x, size_t n) {
+        PriceList r(x.size(), 0.0);
+        for (size_t j = 0; j < x.size(); ++j) {
+            size_t end = j + n;
+            if (end > x.size()) {
+                end = x.size();
+            }
+            for (size_t i = j; i < end; ++i) {
+                if (x[i] != 0.0) {
+                    r[j] = 1.0;
+                    break;
+                }
+            }
+        }
+        return r;
+    };
+
+    for (int round = 0; round < 300; ++round) {
+        size_t len = 1 + rng() % 30;
+        size_t n = 1 + rng() % 6;
+        PriceList a;
+        for (size_t i = 0; i < len; ++i) {
+            a.push_back(rng() % 2);
+        }
+        PriceList expect = spec(a, n);
+
+        Indicator result = BACKSET(PRICELIST(a), (int)n);
+        CHECK_EQ(result.size(), expect.size());
+        CHECK_EQ(result.discard(), 0);
+        for (size_t i = 0; i < len; ++i) {
+            CHECK_EQ(result[i], expect[i]);
+        }
+
+        Indicator x = PRICELIST(a);
+        result = BACKSET(x, CVAL(x, (int)n));
+        CHECK_EQ(result.size(), expect.size());
+        for (size_t i = 0; i < len; ++i) {
+            CHECK_EQ(result[i], expect[i]);
+        }
     }
 }
 
