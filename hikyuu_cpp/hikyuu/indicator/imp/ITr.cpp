@@ -30,7 +30,7 @@ void ITr::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
     m_discard = 1;
 
-    _increment_calculate(data, 0);
+    _increment_calculate(data, m_discard);
 }
 
 void ITr::_increment_calculate(const Indicator& data, size_t start_pos) {
