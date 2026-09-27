@@ -138,5 +138,39 @@ TEST_CASE("test_SQLiteBlockInfoDriver_remove_persistence") {
 }
 
 /**
+ * Test saving a block with an existing name overwrites the cached block
+ * @par Test points
+ */
+TEST_CASE("test_SQLiteBlockInfoDriver_save_overwrite") {
+    TempBlockDB db;
+    SQLiteBlockInfoDriver driver;
+    REQUIRE(driver.init(db.driverParam()));
+    driver.load();
+
+    /** @arg the seeded block a has one stock and the category has two blocks */
+    CHECK_EQ(driver.getBlock(CATEGORY, "a").size(), 1);
+    CHECK_EQ(driver.getBlockList(CATEGORY).size(), 2);
+
+    /** @arg saving an empty block under the same name overwrites the cached block in place */
+    driver.save(Block(CATEGORY, "a"));
+    Block updated = driver.getBlock(CATEGORY, "a");
+    CHECK_UNARY_FALSE(updated.isNull());
+    CHECK_EQ(updated.size(), 0);
+    CHECK_EQ(driver.getBlockList(CATEGORY).size(), 2);
+
+    /** @arg the sibling block and the other category are untouched */
+    CHECK_UNARY_FALSE(driver.getBlock(CATEGORY, "b").isNull());
+    CHECK_UNARY_FALSE(driver.getBlock(OTHER_CATEGORY, "c").isNull());
+
+    /** @arg the database reflects the overwrite after a reload: block a has no rows */
+    SQLiteBlockInfoDriver reloaded;
+    REQUIRE(reloaded.init(db.driverParam()));
+    reloaded.load();
+    CHECK_UNARY(reloaded.getBlock(CATEGORY, "a").isNull());
+    CHECK_UNARY_FALSE(reloaded.getBlock(CATEGORY, "b").isNull());
+    CHECK_EQ(reloaded.getBlockList(CATEGORY).size(), 1);
+}
+
+/**
  * @}
  */
