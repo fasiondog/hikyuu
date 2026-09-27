@@ -27,6 +27,11 @@ void IDma::_calculate(const Indicator& ind) {
     Indicator ref = prepare(ind);
 
     m_discard = std::max(ind.discard(), ref.discard());
+    if (m_discard >= total) {
+        m_discard = total;
+        return;
+    }
+
     auto* y = this->data();
     const auto* a = ref.data();
     const auto* x = ind.data();
