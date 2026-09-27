@@ -216,7 +216,7 @@ void SimplePortfolio::_runMomentOnClose(const Datetime& date, const Datetime& ne
             // There is no position
             if (0 == sub_tm->getHoldNumber(date, sys->getStock()) &&
                 ((sys->getParam<bool>("buy_delay") && !sys->haveDelayBuyRequest()) &&
-                 (sys->getParam<bool>("sell_delay") && !sys->haveDelayBuyRequest()))) {
+                 (sys->getParam<bool>("sell_delay") && !sys->haveDelaySellRequest()))) {
                 // There is no delayed buy / sell signal
                 HKU_INFO_IF(trace, htr("[PF] remove no signal delay sys: {}", sys->name()));
                 m_tmp_will_remove_sys.emplace_back(sys, 0.0);
