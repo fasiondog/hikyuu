@@ -176,8 +176,10 @@ void IAdjFactor::_increment_calculate(const Indicator& ind, size_t start_pos) {
     // passed in)
     auto daily_factors = cum_adj_factor(inc_kdata, base_factor);
     if (k.getQuery().kType() == KQuery::DAY) {
+        // The window starts at the bar before start_pos, so daily_factors[0] belongs to that bar.
+        size_t offset = start_pos > 0 ? 1 : 0;
         for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = daily_factors[i - start_pos].second;
+            dst[i] = daily_factors[i - start_pos + offset].second;
         }
         return;
     }
