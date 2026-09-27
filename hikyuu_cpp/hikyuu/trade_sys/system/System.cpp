@@ -1259,7 +1259,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyShortRequest.clear();
-    return result;
+    return record;
 }
 
 void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from) {
