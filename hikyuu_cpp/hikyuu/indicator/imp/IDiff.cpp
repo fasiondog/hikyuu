@@ -38,6 +38,11 @@ void IDiff::_calculate(const Indicator& data) {
     _increment_calculate(data, m_discard);
 }
 
+size_t IDiff::min_increment_start() const {
+    // src[i - n] is read starting at i == start_pos.
+    return getParam<int>("n");
+}
+
 void IDiff::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n = getParam<int>("n");
     auto const* src = data.data();
