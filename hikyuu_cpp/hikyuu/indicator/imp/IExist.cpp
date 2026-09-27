@@ -74,7 +74,7 @@ void IExist::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     price_t exist = 0;
     size_t pre_pos = start_pos + n - 1;
-    for (size_t i = start_pos + 1 - n; i <= m_discard; i++) {
+    for (size_t i = start_pos + 1 - n; i <= start_pos; i++) {
         if (src[i] != 0) {
             pre_pos = i;
             exist = 1.0;
