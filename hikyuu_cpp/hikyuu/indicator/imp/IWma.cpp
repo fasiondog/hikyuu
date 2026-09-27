@@ -69,7 +69,8 @@ bool IWma::supportIncrementCalculate() const {
 }
 
 size_t IWma::min_increment_start() const {
-    return getParam<int>("n") - 1;
+    // The seed reads n elements before start_pos, so start_pos must be >= n.
+    return getParam<int>("n");
 }
 
 void IWma::_increment_calculate(const Indicator& ind, size_t start_pos) {
@@ -85,8 +86,6 @@ void IWma::_increment_calculate(const Indicator& ind, size_t start_pos) {
     }
 
     value_t divider = n * (n + 1) / 2.0;
-    // dst[m_discard] = sum / divider;
-
     size_t trailingIdx = start_pos - n;
     for (size_t i = start_pos; i < total; i++) {
         value_t tmp = src[i];

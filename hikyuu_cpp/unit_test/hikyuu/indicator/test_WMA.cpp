@@ -126,6 +126,48 @@ TEST_CASE("test_WMA_benchmark") {
 }
 #endif
 
+/**
+ * @par Test points
+ * Incremental calculate must match a full calculation, including the narrow boundary where the
+ * framework puts start_pos at n-1.
+ *
+ * Background: min_increment_start() returned n-1 while _increment_calculate seeded at
+ * src[start_pos-n], which needs n elements before start_pos. At start_pos == n-1 that index became
+ * (size_t)-1: the seed loop was skipped (SIZE_MAX < start_pos) and src[trailingIdx++] read
+ * src[-1] before wrapping back to 0, so every value from start_pos on diverged.
+ */
+TEST_CASE("test_WMA_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 20));
+    CHECK_EQ(k_full.size(), 20);
+
+    Indicator expect = WMA(CLOSE(), 10);
+    expect.setContext(k_full);
+
+    auto check_with_history = [&](size_t history) {
+        Indicator got = WMA(CLOSE(), 10);
+        got.setContext(stock.getKData(KQuery(0, history)));  // cache m_old_context
+        got.setContext(k_full);                              // extended at the tail
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            double a = expect[i];
+            double b = got[i];
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    };
+
+    /** @arg The old context holds exactly n bars, so start_pos == n - 1 (the boundary) */
+    check_with_history(10);
+
+    /** @arg The old context holds more than n bars, the usual incremental path */
+    check_with_history(15);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
