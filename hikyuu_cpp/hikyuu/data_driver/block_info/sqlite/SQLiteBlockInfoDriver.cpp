@@ -168,7 +168,9 @@ void SQLiteBlockInfoDriver::remove(const string& category, const string& name) {
     HKU_IF_RETURN(block_iter == category_iter->second.end(), void());
 
     category_iter->second.erase(block_iter);
-    m_buffer.erase(category_iter);
+    if (category_iter->second.empty()) {
+        m_buffer.erase(category_iter);
+    }
 }
 
 }  // namespace hku
