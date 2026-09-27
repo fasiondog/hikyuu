@@ -76,7 +76,7 @@ void ISma::_dyn_calculate(const Indicator& ind) {
       iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("n"));
     iter = m_ind_params.find("m");
     Indicator m =
-      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("m"));
+      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<double>("m"));
 
     HKU_CHECK(n.size() == ind.size(), "ind_param(n).size()={}, ind.size()={}!", n.size(),
               ind.size());

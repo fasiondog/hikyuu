@@ -139,6 +139,16 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
     for (size_t i = result.discard(); i < result.size(); i++) {
         CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
     }
+
+    /** @arg Mixed dynamic and static params (ISS-035: getParam<int>("p") threw bad_cast) */
+    result = SAFTYLOSS(c, CVAL(c, 10), CVAL(c, 3), 2.0);
+    CHECK_EQ(expect.size(), result.size());
+    for (size_t i = 0; i < result.discard(); i++) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    for (size_t i = result.discard(); i < result.size(); i++) {
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+    }
 }
 
 //-----------------------------------------------------------------------------

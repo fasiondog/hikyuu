@@ -106,7 +106,7 @@ void ISaftyLoss::_dyn_calculate(const Indicator& ind) {
       iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("n2"));
     iter = m_ind_params.find("p");
     Indicator p =
-      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("p"));
+      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<double>("p"));
 
     HKU_CHECK(n1.size() == ind.size(), "ind_param(n1).size()={}, ind.size()={}!", n1.size(),
               ind.size());
