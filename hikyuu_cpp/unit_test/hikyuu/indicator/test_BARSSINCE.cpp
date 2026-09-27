@@ -99,6 +99,22 @@ TEST_CASE("test_BARSSINCEN") {
     CHECK_EQ(result.size(), 5);
     CHECK_EQ(result.discard(), 2);
     check_indicator(result, PRICELIST({nan, nan, 1., 2., 1.}, 2));
+
+    /** @arg Within the window only the current bar holds, so the distance is 0 and not Null.
+     *
+     * The n >= 2 window must be the last n bars including the current one, matching the n == 1
+     * branch above whose window is {i}.
+     */
+    PriceList b;
+    b.push_back(0);
+    b.push_back(0);
+    b.push_back(0);
+    b.push_back(1);
+    data = PRICELIST(b);
+    result = BARSSINCEN(data, 3);
+    CHECK_EQ(result.name(), "BARSSINCE");
+    CHECK_EQ(result.size(), 4);
+    check_indicator(result, PRICELIST({nan, nan, nan, 0.}, 3));
 }
 
 //-----------------------------------------------------------------------------
