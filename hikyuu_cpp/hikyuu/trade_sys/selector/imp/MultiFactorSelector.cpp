@@ -26,7 +26,8 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
     setParam<int>("mf_recover_type",
-                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
+                  KQuery::INVALID_RECOVER_TYPE);    // The MF calculation adjustment type
+    setParam<bool>("keep_mf_recover_type", false);  // Keep the existing recover type of the MF
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
@@ -49,7 +50,8 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", "CUSTOM");
     setParam<int>("mf_recover_type",
-                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
+                  KQuery::INVALID_RECOVER_TYPE);    // The MF calculation adjustment type
+    setParam<bool>("keep_mf_recover_type", false);  // Keep the existing recover type of the MF
     setFactorSet(mf->getRefFactorSet());
 }
 
