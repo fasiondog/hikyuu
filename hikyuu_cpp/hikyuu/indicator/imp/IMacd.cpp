@@ -50,10 +50,8 @@ void IMacd::_calculate(const Indicator& data) {
     _increment_calculate(data, m_discard + 1);
 }
 
-size_t IMacd::min_increment_start() const {
-    return 1;
-}
-
+// Not an incremental path: resuming DIF needs ema1/ema2 separately while the outputs only keep
+// their difference, so this serves as the full-series engine of _calculate.
 void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n1 = getParam<int>("n1");
     int n2 = getParam<int>("n2");

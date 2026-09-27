@@ -186,6 +186,43 @@ TEST_CASE("test_MACD_dyn") {
     }
 }
 
+/**
+ * @par Test points
+ * Reusing one Indicator instance with consecutive setContext (tail extended) must match a full
+ * calculation.
+ *
+ * Background: MACD used to declare incremental support, but resuming DIF needs ema1/ema2
+ * separately while its outputs only keep their difference, so the state could not be resumed and
+ * the tail diverged. Incremental calculate is now disabled; this case guards that re-enabling it
+ * means carrying the EMA state, not inferring it from the results.
+ */
+TEST_CASE("test_MACD_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(-50));
+    KData k_partial = stock.getKData(KQuery(-50, -30));
+
+    Indicator ind_full = MACD(CLOSE(), 12, 26, 9);
+    ind_full.setContext(k_full);
+
+    Indicator ind_inc = MACD(CLOSE(), 12, 26, 9);
+    ind_inc.setContext(k_partial);  // cache m_old_context
+    ind_inc.setContext(k_full);     // tail extended: must fall back to a full recalculation
+
+    CHECK_EQ(ind_full.size(), ind_inc.size());
+    CHECK_EQ(ind_full.discard(), ind_inc.discard());
+    for (size_t i = 0; i < ind_full.size(); ++i) {
+        for (size_t r = 0; r < 3; ++r) {
+            double a = ind_full.get(i, r);
+            double b = ind_inc.get(i, r);
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
