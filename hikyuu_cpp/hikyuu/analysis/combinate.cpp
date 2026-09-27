@@ -10,6 +10,7 @@
 #include "hikyuu/indicator/crt/EXIST.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
 #include "combinate.h"
+#include "analysis_sys.h"
 
 namespace hku {
 
@@ -46,7 +47,7 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
     std::map<std::string, Performance> result;
     // The statistics must stop at the last trading day of the query, as analysis_sys does; now()
     // would value the open positions with data beyond the backtest window.
-    DatetimeList date_list = StockManager::instance().getTradingCalendar(query);
+    DatetimeList date_list = getAnalysisCalendar(StockList{stk}, query);
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
@@ -81,7 +82,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     size_t total = stocks.size();
     HKU_IF_RETURN(total == 0, result);
 
-    DatetimeList date_list = StockManager::instance().getTradingCalendar(query);
+    DatetimeList date_list = getAnalysisCalendar(stocks, query);
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 

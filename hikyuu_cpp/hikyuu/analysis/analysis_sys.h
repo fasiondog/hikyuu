@@ -13,6 +13,16 @@
 
 namespace hku {
 
+/**
+ * Get the trading calendar for an analysis run. A positive absolute index query is first converted
+ * to the actual date range covered by the given securities, because those indexes are interpreted
+ * in each security's own K-line space, whereas the market calendar (backed by the market index
+ * stock) would interpret them in the index stock's space. Date queries and relative (negative)
+ * index queries are passed through unchanged.
+ * @note Internal helper shared by analysis_sys and combinate, not part of the public API
+ */
+DatetimeList getAnalysisCalendar(const StockList& stk_list, const KQuery& query);
+
 struct HKU_API AnalysisSystemOutput {
     string market_code;  ///< Security code
     string name;         ///< Security name
