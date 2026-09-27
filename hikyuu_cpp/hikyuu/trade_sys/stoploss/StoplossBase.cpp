@@ -56,6 +56,8 @@ void StoplossBase::setTO(const KData& kdata) {
     m_kdata = kdata;
     if (!kdata.empty()) {
         _calculate();
+    } else {
+        _reset();
     }
 }
 

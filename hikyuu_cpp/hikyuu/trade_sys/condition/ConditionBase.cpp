@@ -63,8 +63,9 @@ ConditionPtr ConditionBase::clone() {
 void ConditionBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(kdata == m_kdata, void());
     m_kdata = kdata;
+    m_date_index.clear();
+    m_values.clear();
     if (!kdata.empty()) {
-        m_date_index.clear();
         size_t total = kdata.size();
         m_values.resize(total);
         auto const* ks = m_kdata.data();
