@@ -71,6 +71,36 @@ public:
     }
 };
 
+class ThrowCloneMoneyManagerTest : public MoneyManagerBase {
+public:
+    ThrowCloneMoneyManagerTest() : MoneyManagerBase("ThrowCloneMoneyManagerTest") {}
+    virtual ~ThrowCloneMoneyManagerTest() {}
+
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
+        return 0;
+    }
+
+    virtual MoneyManagerPtr _clone() {
+        throw std::runtime_error("test clone failure");
+    }
+};
+
+class SelfCloneMoneyManagerTest : public MoneyManagerBase {
+public:
+    SelfCloneMoneyManagerTest() : MoneyManagerBase("SelfCloneMoneyManagerTest") {}
+    virtual ~SelfCloneMoneyManagerTest() {}
+
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
+        return 0;
+    }
+
+    virtual MoneyManagerPtr _clone() {
+        return shared_from_this();
+    }
+};
+
 /**
  * @defgroup test_MoneyManager test_MoneyManager
  * @ingroup test_hikyuu_trade_sys_suite
@@ -136,6 +166,19 @@ TEST_CASE("test_MoneyManager_getSellNumber_risk_guard") {
     MoneyManagerPtr p3 = p2->clone();
     CHECK_UNARY(
       (p3->getSellNumber(Datetime(200001010000), stock, 10.0, 0.0, PART_SIGNAL) == 100.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_clone_fail_fast") {
+    /** @arg The subclass _clone throws: the base clone throws instead of the self-ptr fallback
+     * (ISS-028) */
+    MoneyManagerPtr p(new ThrowCloneMoneyManagerTest);
+    CHECK_THROWS_AS(p->clone(), std::exception);
+
+    /** @arg The subclass _clone returns self: the base clone throws instead of the self-ptr
+     * fallback (ISS-028) */
+    MoneyManagerPtr p2(new SelfCloneMoneyManagerTest);
+    CHECK_THROWS_AS(p2->clone(), std::exception);
 }
 
 /** @} */

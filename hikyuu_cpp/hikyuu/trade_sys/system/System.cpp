@@ -298,18 +298,9 @@ void System::setTO(const KData& kdata) {
 }
 
 SystemPtr System::clone() {
-    SystemPtr p;
-    try {
-        p = _clone();
-    } catch (...) {
-        HKU_ERROR("Subclass _clone failed!");
-        p = SystemPtr();
-    }
-
-    if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!");
-        return shared_from_this();
-    }
+    SystemPtr p = _clone();
+    HKU_CHECK(p && p.get() != this,
+              "Failed clone! The subclass _clone of {} must return a new object!", m_name);
 
     if (m_tm)
         p->m_tm = getParam<bool>("shared_tm") ? m_tm : m_tm->clone();
