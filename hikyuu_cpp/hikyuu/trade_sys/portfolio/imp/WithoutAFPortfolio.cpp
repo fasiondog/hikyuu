@@ -61,10 +61,11 @@ void WithoutAFPortfolio::_readyForRun() {
             auto se_sys = sys->clone();
             se_sys->setParam<bool>("shared_tm", false);
             if (!sys_use_self_tm || !se_sys->getTM()) {
-                // When using its own tm or having no tm of its own, the pf tm is copied and used
+                // When not using its own tm or having no tm of its own, the pf tm is copied and
+                // used
                 se_sys->setTM(m_tm->clone());
-                se_sys_list.emplace_back(se_sys);
             }
+            se_sys_list.emplace_back(se_sys);
 
             m_se->bindRealToProto(se_sys, pro_sys);
             m_real_sys_list.emplace_back(sys);
