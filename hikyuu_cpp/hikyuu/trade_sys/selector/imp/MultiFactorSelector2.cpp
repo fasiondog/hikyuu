@@ -69,7 +69,9 @@ void MultiFactorSelector2::_reset() {
 
 SelectorPtr MultiFactorSelector2::_clone() {
     auto p = make_shared<MultiFactorSelector2>();
-    p->m_mf = m_mf->clone();
+    if (m_mf) {
+        p->m_mf = m_mf->clone();
+    }
     p->m_stk_sys_dict = m_stk_sys_dict;
     p->m_factorset = m_factorset;
     return p;
