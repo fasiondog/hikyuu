@@ -49,6 +49,11 @@ void ISaftyLoss::_calculate(const Indicator& data) {
     _increment_calculate(data, m_discard);
 }
 
+size_t ISaftyLoss::min_increment_start() const {
+    // The inner loop reads src[k - 1] from j == start_pos + 1 - n2 with k starting at j + 2 - n1.
+    return getParam<int>("n1") + getParam<int>("n2") - 2;
+}
+
 void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
     size_t total = data.size();
 

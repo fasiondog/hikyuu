@@ -151,6 +151,49 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
     }
 }
 
+/**
+ * @par Test points
+ * Incremental calculate must match a full calculation, including a first context that was fully
+ * discarded.
+ *
+ * Background: ISaftyLoss declared incremental support but not min_increment_start(), so the
+ * framework could only raise start_pos with the previous m_discard. When the first context was
+ * shorter than n1 + n2 - 2, that m_discard degraded to its own size and left start_pos below the
+ * real precondition, so the inner loops read src[-1] or silently wrote 0 into the range that must
+ * stay NaN.
+ */
+TEST_CASE("test_SAFTYLOSS_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 30));
+    CHECK_EQ(k_full.size(), 30);
+
+    Indicator expect = SAFTYLOSS(CLOSE(), 10, 3, 2.0);
+    expect.setContext(k_full);
+
+    auto check_with_history = [&](size_t history) {
+        Indicator got = SAFTYLOSS(CLOSE(), 10, 3, 2.0);
+        got.setContext(stock.getKData(KQuery(0, history)));  // cache m_old_context
+        got.setContext(k_full);                              // extended at the tail
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            double a = expect[i];
+            double b = got[i];
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    };
+
+    /** @arg The first context was fully discarded, so start_pos fell below n1 + n2 - 2 */
+    check_with_history(5);
+
+    /** @arg The first context already had valid results, the usual incremental path */
+    check_with_history(20);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
