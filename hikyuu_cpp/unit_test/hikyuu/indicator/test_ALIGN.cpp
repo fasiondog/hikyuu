@@ -349,6 +349,37 @@ TEST_CASE("test_ALIGN_not_fill_null") {
     check_indicator(result, k.close());
 }
 
+/**
+ * @par Test points
+ * With fill_null = false, reference dates falling between two data dates must forward fill the
+ * last known data value.
+ *
+ * Background: this branch is only taken when the input indicator carries its own context dates,
+ * which the other cases here do not cover. When every reference date is later than the first data
+ * date, pos stays 0 and the trailing forward-fill loop read dst[-1], then spread that garbage over
+ * the whole result, discarding the values already aligned correctly.
+ */
+TEST_CASE("test_ALIGN_not_fill_null_forward_fill") {
+    Stock stk = getStock("sh000001");
+    KData k = stk.getKData(KQuery(0, 2));
+    REQUIRE_EQ(k.size(), 2);
+    DatetimeList data_dates = k.getDatetimeList();
+
+    // two reference dates strictly between the two daily bars
+    DatetimeList ref;
+    ref.push_back(data_dates[0] + TimeDelta(0, 12));
+    ref.push_back(data_dates[0] + TimeDelta(0, 13));
+
+    Indicator close_ind = CLOSE(k);
+    Indicator result = ALIGN(close_ind, ref, false);
+    REQUIRE_EQ(result.size(), 2);
+
+    /** @arg Both reference dates take the close of the first bar */
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_EQ(result[i], doctest::Approx(close_ind[0]).epsilon(0.0001));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

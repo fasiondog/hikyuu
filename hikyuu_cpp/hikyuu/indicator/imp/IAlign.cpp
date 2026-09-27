@@ -177,7 +177,8 @@ void IAlign::_calculate(const Indicator& ind) {
                 } else {
                     for (size_t r = 0; r < m_result_num; r++) {
                         auto* dst = this->data(r);
-                        for (size_t i = pos; i < total; i++) {
+                        // index 0 has no previous slot to fill from
+                        for (size_t i = pos == 0 ? 1 : pos; i < total; i++) {
                             dst[i] = dst[i - 1];
                         }
                     }
