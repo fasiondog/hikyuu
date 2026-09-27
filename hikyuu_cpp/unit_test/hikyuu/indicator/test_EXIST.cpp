@@ -179,6 +179,32 @@ TEST_CASE("test_EXIST_increment_equivalence") {
     }
 }
 
+/**
+ * @par Test points
+ * A NaN in the condition series means no data: it neither satisfies nor breaks the condition,
+ * consistent with IBarsSince and with every consumer (SG_Bool, IF, conditions all treat NaN as
+ * not holding).
+ */
+TEST_CASE("test_EXIST_nan_is_not_a_condition") {
+    PriceList a;
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(Null<price_t>());
+    a.push_back(0);
+    a.push_back(0);
+
+    Indicator x = PRICELIST(a);
+    Indicator result = EXIST(x, 3);
+    CHECK_EQ(result.size(), 5);
+    // the first two bars have no full window
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

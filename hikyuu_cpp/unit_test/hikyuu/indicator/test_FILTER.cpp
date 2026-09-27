@@ -164,6 +164,28 @@ TEST_CASE("test_FILTER_dyn") {
     }
 }
 
+/**
+ * @par Test points
+ * A NaN in the condition series means no data: it neither fires the filter nor opens the
+ * n-bar suppression window (a NaN used to trigger the window and mute the following signals).
+ */
+TEST_CASE("test_FILTER_nan_is_not_a_condition") {
+    PriceList a;
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(Null<price_t>());
+    a.push_back(0);
+    a.push_back(0);
+
+    Indicator x = PRICELIST(a);
+    Indicator result = FILTER(x, 3);
+    CHECK_EQ(result.size(), 5);
+    CHECK_EQ(result.discard(), 0);
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

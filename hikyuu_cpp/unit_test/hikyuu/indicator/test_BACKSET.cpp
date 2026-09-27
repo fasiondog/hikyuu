@@ -187,8 +187,9 @@ TEST_CASE("test_BACKSET_dyn") {
 /**
  * @par Test points
  * Differential audit against the documented meaning: dst[j] = 1 iff X holds on some bar within
- * [j, j + n - 1]. Both the static and the dynamic path must match the brute-force reference on
- * random 0/1 series, so neither backfill nor overwrite may depend on the scan shape.
+ * [j, j + n - 1], where a NaN bar is missing data and never counts as a hit. Both the static and
+ * the dynamic path must match the brute-force reference on random 0/1/NaN series, so neither
+ * backfill nor overwrite may depend on the scan shape.
  */
 TEST_CASE("test_BACKSET_random_against_definition") {
     std::mt19937 rng(42);
@@ -200,7 +201,7 @@ TEST_CASE("test_BACKSET_random_against_definition") {
                 end = x.size();
             }
             for (size_t i = j; i < end; ++i) {
-                if (x[i] != 0.0) {
+                if (!std::isnan(x[i]) && x[i] != 0.0) {
                     r[j] = 1.0;
                     break;
                 }
@@ -214,7 +215,9 @@ TEST_CASE("test_BACKSET_random_against_definition") {
         size_t n = 1 + rng() % 6;
         PriceList a;
         for (size_t i = 0; i < len; ++i) {
-            a.push_back(rng() % 2);
+            // 0/1 conditions plus missing data
+            int r = static_cast<int>(rng() % 3);
+            a.push_back(r == 0 ? 0.0 : (r == 1 ? 1.0 : Null<price_t>()));
         }
         PriceList expect = spec(a, n);
 

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/COUNT.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/REF.h>
@@ -88,6 +89,32 @@ TEST_CASE("test_COUNT_dyn") {
     }
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
+    }
+}
+
+/**
+ * @par Test points
+ * A NaN in the condition series means no data: it neither satisfies nor breaks the condition,
+ * consistent with IBarsSince and with every consumer (SG_Bool, IF, conditions all treat NaN as
+ * not holding).
+ */
+TEST_CASE("test_COUNT_nan_is_not_a_condition") {
+    PriceList a;
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(Null<price_t>());
+    a.push_back(0);
+    a.push_back(0);
+
+    Indicator x = PRICELIST(a);
+    Indicator result = COUNT(x, 3);
+    CHECK_EQ(result.size(), 5);
+    // the first two bars have no full window
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
     }
 }
 

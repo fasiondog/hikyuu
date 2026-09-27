@@ -144,6 +144,31 @@ TEST_CASE("test_EVERY_dyn") {
     }
 }
 
+/**
+ * @par Test points
+ * A NaN in the condition series means no data: it cannot be asserted as satisfied, so EVERY is 0
+ * (consistent with IBarsSince and with every consumer).
+ */
+TEST_CASE("test_EVERY_nan_is_not_a_condition") {
+    PriceList a;
+    a.push_back(1);
+    a.push_back(1);
+    a.push_back(Null<price_t>());
+    a.push_back(1);
+    a.push_back(1);
+
+    Indicator x = PRICELIST(a);
+    Indicator result = EVERY(x, 3);
+    CHECK_EQ(result.size(), 5);
+    // the first two bars have no full window
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

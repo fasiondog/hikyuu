@@ -46,7 +46,7 @@ void ICount::_calculate(const Indicator& data) {
         m_discard = data.discard();
         int count = 0;
         for (size_t i = m_discard; i < total; ++i) {
-            if (src[i] != 0) {
+            if (!std::isnan(src[i]) && src[i] != 0) {
                 count++;
             }
             dst[i] = count;
@@ -64,7 +64,7 @@ void ICount::_calculate(const Indicator& data) {
     int sum = 0;
     size_t first_end = startPos + n >= total ? total : startPos + n;
     for (size_t i = startPos; i < first_end; ++i) {
-        if (src[i] != 0) {
+        if (!std::isnan(src[i]) && src[i] != 0) {
             sum++;
         }
     }
@@ -74,10 +74,10 @@ void ICount::_calculate(const Indicator& data) {
     }
 
     for (size_t i = first_end; i < total; ++i) {
-        if (src[i] != 0) {
+        if (!std::isnan(src[i]) && src[i] != 0) {
             sum++;
         }
-        if (src[i - n] != 0) {
+        if (!std::isnan(src[i - n]) && src[i - n] != 0) {
             sum--;
         }
         dst[i] = sum;
@@ -95,7 +95,7 @@ void ICount::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     }
     price_t count = 0;
     for (size_t i = start; i <= curPos; i++) {
-        if (ind[i] != 0.0) {
+        if (!std::isnan(ind[i]) && ind[i] != 0.0) {
             count++;
         }
     }
