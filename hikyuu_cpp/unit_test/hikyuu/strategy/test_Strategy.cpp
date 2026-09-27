@@ -32,7 +32,7 @@ TEST_CASE("test_Strategy_order") {
     strategy.setTM(tm);
 
     /** @arg The buy request with a non-integer multiple of minTradeNumber is rounded down to the
-     * lot multiple (ISS-120) */
+     * lot multiple */
     TradeRecord tr = strategy.order(stock, 333);
     CHECK_EQ(tr.business, BUSINESS_BUY);
     CHECK_EQ(tr.number, 300);
@@ -43,14 +43,14 @@ TEST_CASE("test_Strategy_order") {
     CHECK_EQ(tr.number, stock.maxTradeNumber());
 
     /** @arg The sell request with an exact lot multiple only sells the requested quantity instead
-     * of liquidating (ISS-006) */
+     * of liquidating */
     tr = strategy.order(stock, -200);
     CHECK_EQ(tr.business, BUSINESS_SELL);
     CHECK_EQ(tr.number, 200);
     CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), stock.maxTradeNumber() + 100);
 
     /** @arg The sell request containing an odd lot (a non-integer multiple of minTradeNumber)
-     * sells all the remaining position to carry the odd lot away (ISS-006) */
+     * sells all the remaining position to carry the odd lot away */
     tr = strategy.order(stock, -150);
     CHECK_EQ(tr.business, BUSINESS_SELL);
     CHECK_EQ(tr.number, stock.maxTradeNumber() + 100);
