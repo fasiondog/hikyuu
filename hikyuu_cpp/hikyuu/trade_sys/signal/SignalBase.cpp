@@ -77,6 +77,12 @@ void SignalBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_calculated && m_kdata == kdata, void());
     m_kdata = kdata;
     m_calculated = false;
+
+    m_buySig.clear();
+    m_sellSig.clear();
+    m_hold_long = false;
+    m_hold_short = false;
+
     HKU_IF_RETURN(kdata.empty(), void());
 
     bool cycle = getParam<bool>("cycle");
