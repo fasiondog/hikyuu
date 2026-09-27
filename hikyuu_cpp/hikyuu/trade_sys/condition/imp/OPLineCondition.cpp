@@ -39,7 +39,9 @@ void OPLineCondition::_calculate() {
 
     sys->setTM(tm);
     sys->setMM(mm);
-    sys->setSG(m_sg);
+    // The embedded backtest owns a cloned SG: SYS_Simple resets and re-runs its SG during run(),
+    // which would otherwise wipe and mutate the SG shared with the outer system
+    sys->setSG(m_sg->clone());
 
     sys->run(m_kdata.getStock(), m_kdata.getQuery());
     KQuery::KType ktype = query.kType();
@@ -48,6 +50,9 @@ void OPLineCondition::_calculate() {
     Indicator op = m_op(profit);
 
     Indicator x = profit - op;
+    HKU_CHECK(x.size() == dates.size(),
+              "The result size ({}) of the OP line indicator must be equal to the KData size ({})",
+              x.size(), dates.size());
     auto const* xdata = x.data();
     for (size_t i = 0; i < x.size(); i++) {
         if (xdata[i] > 0) {
