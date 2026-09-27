@@ -150,8 +150,8 @@ protected:
     SEPtr m_se;
     AFPtr m_af;
 
-    KQuery m_query;         // The associated query condition
-    bool m_need_calculate;  // Flag of whether the calculation is needed
+    KQuery m_query;               // The associated query condition
+    bool m_need_calculate{true};  // Flag of whether the calculation is needed
     bool m_is_python_object{false};
 
     SystemList m_real_sys_list;  // List of all the actually running sub-systems
