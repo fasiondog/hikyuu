@@ -119,7 +119,7 @@ public:
     string getUpdateSQL() {
         return fmt::format(
           "update `{}`.`{}` set `open`=?, `high`=?, `low`=?, "
-          "`close`=?, `amount`=? `count`=? where `date`=?",
+          "`close`=?, `amount`=?, `count`=? where `date`=?",
           m_db_name, m_code);
     }
 
