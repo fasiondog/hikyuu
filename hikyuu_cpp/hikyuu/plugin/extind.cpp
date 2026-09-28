@@ -192,7 +192,7 @@ GROUP_FUNC_IMP(GROUP_MIN)
 GROUP_FUNC_IMP(GROUP_MAX)
 
 Indicator HKU_API GROUP_FUNC(const Indicator& ind, group_func_t group_func,
-                             const KQuery::KType& ktype, int unit) {
+                             const KQuery::KType& ktype) {
     Indicator ret;
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<ExtendIndicatorsPluginInterface>(HKU_PLUGIN_EXTEND_INDICATOR);
@@ -200,7 +200,6 @@ Indicator HKU_API GROUP_FUNC(const Indicator& ind, group_func_t group_func,
 
     Parameter params;
     params.set<string>("ktype", ktype);
-    params.set<int>("unit", unit);
     return plugin->getGroupFuncIndicator(ind, group_func, params);
 }
 

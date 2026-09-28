@@ -40,10 +40,10 @@ private:
     py::object m_func;
 };
 
-#define PY_GROUP_IND_DEFINE(group_func, doc)                                           \
-    m.def(#group_func,                                                                 \
-          py::overload_cast<const Indicator&, const KQuery::KType&, int>(&group_func), \
-          py::arg("ind"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1, doc);
+#define PY_GROUP_IND_DEFINE(group_func, doc)                              \
+    m.def(#group_func,                                                    \
+          py::overload_cast<const Indicator&, const KQuery::KType&>(&group_func), \
+          py::arg("ind"), py::arg("ktype") = KQuery::DAY, doc);
 
 #if HKU_OS_LINUX
 class __attribute__((visibility("default"))) PyGroupFunc {
@@ -518,17 +518,17 @@ void export_extend_Indicator(py::module& m) {
 
     m.def(
       "GROUP_FUNC",
-      [](const Indicator& ind, py::object group_func, const KQuery::KType& ktype, int unit) {
+      [](const Indicator& ind, py::object group_func, const KQuery::KType& ktype) {
           HKU_CHECK(!group_func.is_none(), "group_func is None!");
           HKU_CHECK(py::hasattr(group_func, "__call__"), "agg_func not callable!");
           HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
                     "Number of parameters does not match!");
           PyGroupFunc func_obj(group_func.attr("__call__"));
-          Indicator ret = GROUP_FUNC(ind, func_obj, ktype, unit);
+          Indicator ret = GROUP_FUNC(ind, func_obj, ktype);
           return ret;
       },
-      py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY, py::arg("unit") = 1,
-      R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1])
+      py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY,
+      R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY])
       
     The custom group cumulative calculation indicator.
     
@@ -541,6 +541,5 @@ void export_extend_Indicator(py::module& m) {
     :param Indicator ind: the indicator to calculate
     :param callable group_func: the custom group cumulative function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the cumulative calculation result with the same length as the input; the type must also be np.array
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator)");
 }
