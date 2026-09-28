@@ -120,6 +120,25 @@ private:
     double m_number;
 };
 
+class ConfigurableBuyNumberMMTest : public MoneyManagerBase {
+public:
+    ConfigurableBuyNumberMMTest(double number)
+    : MoneyManagerBase("ConfigurableBuyNumberMMTest"), m_number(number) {}
+    virtual ~ConfigurableBuyNumberMMTest() {}
+
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
+        return m_number;
+    }
+
+    virtual MoneyManagerPtr _clone() {
+        return MoneyManagerPtr(new ConfigurableBuyNumberMMTest(m_number));
+    }
+
+private:
+    double m_number;
+};
+
 /**
  * @defgroup test_MoneyManager test_MoneyManager
  * @ingroup test_hikyuu_trade_sys_suite
@@ -231,6 +250,39 @@ TEST_CASE("test_MoneyManager_getBuyNumber_unit_cash_estimate") {
     MoneyManagerPtr mm3(new FixedBuyNumberMMTest);
     mm3->setTM(crtTM(Datetime(200001010000), 15.0));
     CHECK_EQ(mm3->getBuyNumber(Datetime(200001010000), unit2_stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_cash_shortage_binary_search") {
+    // crtTM defaults to TC_Zero (cost.total == 0), so need_cash == n * price * unit;
+    // sh000001 has minTradeNumber == 1, so the affordable lot grid here is per-share
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg cash affords only part of the requested size: reduced to the exact largest
+     * affordable quantity (5500 == 55000 / 10.0) */
+    MoneyManagerPtr mm1(new ConfigurableBuyNumberMMTest(10000.0));
+    mm1->setTM(crtTM(Datetime(200001010000), 55000.0));
+    CHECK_EQ(mm1->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 5500.0);
+
+    /** @arg cash exactly affords the reduction target: that quantity is kept
+     * (inclusive boundary) */
+    MoneyManagerPtr mm2(new ConfigurableBuyNumberMMTest(10000.0));
+    mm2->setTM(crtTM(Datetime(200001010000), 50000.0));
+    CHECK_EQ(mm2->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 5000.0);
+
+    /** @arg cash exactly affords the full requested size: returned unchanged, the search
+     * is skipped */
+    MoneyManagerPtr mm3(new ConfigurableBuyNumberMMTest(10000.0));
+    mm3->setTM(crtTM(Datetime(200001010000), 100000.0));
+    CHECK_EQ(mm3->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+
+    /** @arg even one share is unaffordable: the search floors the quantity at min_trade
+     * and returns 0 (9 < 10, one share at price 10) */
+    MoneyManagerPtr mm4(new ConfigurableBuyNumberMMTest(10000.0));
+    mm4->setTM(crtTM(Datetime(200001010000), 9.0));
+    CHECK_EQ(mm4->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
 }
 
 /** @} */

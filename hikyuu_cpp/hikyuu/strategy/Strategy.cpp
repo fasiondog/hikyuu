@@ -479,13 +479,28 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
         // * the unit of the stock + the total trade cost (consistent with TradeManager::buy)
         price_t need_cash = n * price * stk.unit() + cost.total;
         price_t current_cash = m_tm->currentCash();
-        while (n > min_trade && need_cash > current_cash) {
-            n = n - min_trade;
-            cost = m_tm->getBuyCost(now(), stk, price, n);
-            need_cash = n * price * stk.unit() + cost.total;
-        }
         if (need_cash > current_cash) {
-            n = 0.0;
+            // need_cash(k) is monotonically increasing in k, so binary search the largest
+            // affordable multiple of min_trade — O(log(n/min_trade)) cost evaluations instead of
+            // decrementing lot by lot (consistent with MoneyManagerBase::getBuyNumber)
+            double low = min_trade, high = n;
+            while (high - low > min_trade) {
+                double mid = int64_t((low + high) / (2.0 * min_trade)) * min_trade;
+                if (mid <= low || mid >= high) {
+                    break;
+                }
+                cost = m_tm->getBuyCost(now(), stk, price, mid);
+                if (mid * price * stk.unit() + cost.total <= current_cash) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            n = low;
+            cost = m_tm->getBuyCost(now(), stk, price, n);
+            if (n * price * stk.unit() + cost.total > current_cash) {
+                n = 0.0;
+            }
         }
         if (n == 0.0) {
             HKU_WARN("{} {} can buy number is zero!", stk.market_code(), stk.name());

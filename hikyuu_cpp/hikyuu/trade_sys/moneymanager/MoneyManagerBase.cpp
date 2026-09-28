@@ -140,13 +140,28 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
         price_t need_cash = n * price * stock.unit() + cost.total;
         price_t current_cash = m_tm->cash(datetime, m_query.kType());
-        while (n > min_trade && need_cash > current_cash) {
-            n = n - min_trade;
-            cost = m_tm->getBuyCost(datetime, stock, price, n);
-            need_cash = n * price * stock.unit() + cost.total;
-        }
         if (need_cash > current_cash) {
-            n = 0.0;
+            // need_cash(k) is monotonically increasing in k, so binary search the largest
+            // affordable multiple of min_trade — O(log(n/min_trade)) cost evaluations instead of
+            // decrementing lot by lot
+            double low = min_trade, high = n;
+            while (high - low > min_trade) {
+                double mid = int64_t((low + high) / (2.0 * min_trade)) * min_trade;
+                if (mid <= low || mid >= high) {
+                    break;
+                }
+                cost = m_tm->getBuyCost(datetime, stock, price, mid);
+                if (mid * price * stock.unit() + cost.total <= current_cash) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            n = low;
+            cost = m_tm->getBuyCost(datetime, stock, price, n);
+            if (n * price * stock.unit() + cost.total > current_cash) {
+                n = 0.0;
+            }
         }
     }
 
