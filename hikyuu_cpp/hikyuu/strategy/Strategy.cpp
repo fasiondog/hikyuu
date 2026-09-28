@@ -377,6 +377,10 @@ price_t Strategy::getCurrentPrice(const Stock& stk, const KQuery::KType& ktype) 
 
 KData Strategy::getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
                          const KQuery::KType& ktype, KQuery::RecoverType recover_type) const {
+    // Boundary note: when end_date equals now(), it is used as-is, and the current bar is
+    // excluded by the right-open interval; only when end_date is null or in the future is it
+    // clamped to nextDatetime(), which includes the current bar. That is, the visibility of
+    // the current bar depends on how the caller specifies end_date.
     Datetime new_end_date = end_date;
     if (end_date.isNull() || end_date > now()) {
         new_end_date = nextDatetime();
