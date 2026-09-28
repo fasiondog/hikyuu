@@ -8,6 +8,8 @@
 #include "TaT3.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaT3)
 #endif
@@ -49,7 +51,9 @@ void TaT3::_calculate(const Indicator& data) {
     auto* dst = this->data();
     int outBegIdx;
     int outNbElement;
-    TA_T3(m_discard, total - 1, src, n, vfactor, &outBegIdx, &outNbElement, dst + m_discard);
+    hku::checkTARetCode(
+      TA_T3(m_discard, total - 1, src, n, vfactor, &outBegIdx, &outNbElement, dst + m_discard),
+      m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

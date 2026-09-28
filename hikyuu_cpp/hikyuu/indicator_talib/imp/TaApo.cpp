@@ -8,6 +8,8 @@
 #include "TaApo.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaApo)
 #endif
@@ -51,8 +53,9 @@ void TaApo::_calculate(const Indicator& data) {
     double* dst = this->data();
     int outBegIdx;
     int outNbElement;
-    TA_APO(m_discard, total - 1, src, fast_n, slow_n, matype, &outBegIdx, &outNbElement,
-           dst + m_discard);
+    hku::checkTARetCode(TA_APO(m_discard, total - 1, src, fast_n, slow_n, matype, &outBegIdx,
+                               &outNbElement, dst + m_discard),
+                        m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

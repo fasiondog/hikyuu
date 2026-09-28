@@ -9,6 +9,7 @@
 
 #include "hikyuu/indicator/Indicator.h"
 #include "hikyuu/indicator/Indicator2InImp.h"
+#include "ta_retcode.h"
 
 #define TA_IN1_OUT_DEF(func)                          \
     class Cls_##func : public IndicatorImp {          \

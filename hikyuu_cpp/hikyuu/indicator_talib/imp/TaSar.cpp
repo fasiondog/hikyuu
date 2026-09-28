@@ -8,6 +8,8 @@
 #include "TaSar.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaSar)
 #endif
@@ -58,8 +60,9 @@ void TaSar::_calculate(const Indicator& data) {
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_SAR(m_discard, total - 1, high, low, acceleration, maximum, &outBegIdx, &outNbElement,
-           dst + m_discard);
+    hku::checkTARetCode(TA_SAR(m_discard, total - 1, high, low, acceleration, maximum, &outBegIdx,
+                               &outNbElement, dst + m_discard),
+                        m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

@@ -8,6 +8,8 @@
 #include "TaMacdext.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaMacdext)
 #endif
@@ -64,9 +66,10 @@ void TaMacdext::_calculate(const Indicator& data) {
 
     int outBegIdx;
     int outNbElement;
-    TA_MACDEXT(m_discard, total - 1, src, fast_n, fast_matype, slow_n, slow_matype, signal_n,
-               signal_matype, &outBegIdx, &outNbElement, dst0 + m_discard, dst1 + m_discard,
-               dst2 + m_discard);
+    hku::checkTARetCode(TA_MACDEXT(m_discard, total - 1, src, fast_n, fast_matype, slow_n,
+                                   slow_matype, signal_n, signal_matype, &outBegIdx, &outNbElement,
+                                   dst0 + m_discard, dst1 + m_discard, dst2 + m_discard),
+                        m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

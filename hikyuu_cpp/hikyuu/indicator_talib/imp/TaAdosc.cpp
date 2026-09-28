@@ -8,6 +8,8 @@
 #include "TaAdosc.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaAdosc)
 #endif
@@ -67,8 +69,9 @@ void TaAdosc::_calculate(const Indicator& data) {
     auto* dst = this->data();
     int outBegIdx;
     int outNbElement;
-    TA_ADOSC(m_discard, total - 1, high, low, close, vol, fast_n, slow_n, &outBegIdx, &outNbElement,
-             dst + m_discard);
+    hku::checkTARetCode(TA_ADOSC(m_discard, total - 1, high, low, close, vol, fast_n, slow_n,
+                                 &outBegIdx, &outNbElement, dst + m_discard),
+                        m_name);
     HKU_ASSERT(m_discard == outBegIdx);
 }
 
