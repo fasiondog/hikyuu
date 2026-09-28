@@ -307,8 +307,10 @@ private:
     price_t _getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
     price_t _getShortStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
-    price_t _getTakeProfitPrice(const Datetime& datetime, price_t currentPrice);
-    price_t _getShortTakeProfitPrice(const Datetime& datetime, price_t currentPrice);
+    /** The take-profit indicator runs on the adjusted KData, so its result is mapped back to the
+     * original (unadjusted) price coordinate the same way the stop-loss does */
+    price_t _getTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price);
+    price_t _getShortTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
     /** Per-share risk of opening a short: stop-loss price - entry price; stop-loss 0 means no
      * stop-loss, in which case the full entry price is taken as the worst-case risk */
@@ -658,14 +660,6 @@ inline price_t System ::_getRealBuyPrice(const Datetime& datetime, price_t planP
 
 inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t planPrice) {
     return m_sp ? m_sp->getRealSellPrice(datetime, planPrice) : planPrice;
-}
-
-inline price_t System ::_getTakeProfitPrice(const Datetime& datetime, price_t currentPrice) {
-    return m_tp ? m_tp->getPrice(datetime, currentPrice) : 0.0;
-}
-
-inline price_t System ::_getShortTakeProfitPrice(const Datetime& datetime, price_t currentPrice) {
-    return m_tp ? m_tp->getShortPrice(datetime, currentPrice) : 0.0;
 }
 
 inline price_t System ::_getShortOpenRisk(price_t stoploss, price_t price) {

@@ -14,6 +14,21 @@ BOOST_CLASS_EXPORT(hku::System)
 
 namespace hku {
 
+namespace {
+// Map a price in the adjusted KData coordinate of the current bar back to the original
+// (unadjusted) coordinate through the affine transformation determined by the bar range;
+// on a one-price board fall back to the original low price
+price_t mapAdjustedToOriginal(const KRecord& today, const KRecord& src_today, price_t price) {
+    if (today.highPrice == today.lowPrice) {
+        return src_today.lowPrice;
+    }
+    price_t adjust = (price - today.lowPrice) / (today.highPrice - today.lowPrice) *
+                       (src_today.highPrice - src_today.lowPrice) +
+                     src_today.lowPrice;
+    return adjust >= 0.0 ? adjust : 0.0;
+}
+}  // namespace
+
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
     os << sys.str();
     return os;
@@ -633,11 +648,10 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
 
     //----------------------------------------------------------
     // Process the stop-loss, take-profit and goal signals
-    // The stop-loss uses the stop-loss price of the current position and the original price without
-    // adjustment The profit goal uses the original price without adjustment
+    // The exit checks all use the original price without adjustment (the stop-loss and
+    // take-profit indicators run on the adjusted KData and their results are mapped back)
     //----------------------------------------------------------
 
-    price_t current_price = today.closePrice;
     price_t src_current_price = src_today.closePrice;  // The original price without adjustment
 
     PositionRecord position = m_tm->getPosition(today.datetime, m_stock);
@@ -656,9 +670,12 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
             tr = _sell(today, src_today, PART_PROFITGOAL);
 
         } else {
-            price_t current_take_profile = _getTakeProfitPrice(today.datetime, current_price);
+            // The take-profit indicator runs on the adjusted KData, and the result is mapped back
+            // to the original price coordinate so that it stays comparable across bars
+            price_t current_take_profile = _getTakeProfitPrice(today, src_today, today.closePrice);
             if (current_take_profile != 0.0) {
-                if (current_take_profile < m_lastTakeProfit) {
+                // The long take-profit level only rises and is never lowered
+                if (getParam<bool>("tp_monotonic") && current_take_profile < m_lastTakeProfit) {
                     current_take_profile = m_lastTakeProfit;
                 } else {
                     m_lastTakeProfit = current_take_profile;
@@ -667,15 +684,19 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                 int tp_delay_n = getParam<int>("tp_delay_n");
                 size_t pos = m_kdata.getPos(today.datetime);
                 size_t position_pos = m_kdata.getPos(position.takeDatetime);
+                // The position may have been opened before the current KData window; in that case
+                // the delay is counted from the window start, and the subtraction must not
+                // underflow when the opening date is outside the window
+                size_t bars_since_open = position_pos == Null<size_t>()
+                                           ? pos + 1
+                                           : (pos >= position_pos ? pos - position_pos : 0);
                 // Sell when the current price is not higher than the take-profit price and the
                 // take-profit delay condition is met
                 price_t profit = position.number * src_today.closePrice - position.totalCost;
-                if (pos - position_pos >= tp_delay_n && current_price <= current_take_profile &&
+                if (bars_since_open >= tp_delay_n && src_current_price <= current_take_profile &&
                     profit > (position.buyMoney - position.sellMoney)) {
-                    HKU_INFO_IF(
-                      trace,
-                      htr("[{}] TP to sell, current price after restoration: {}, take_profit: {}",
-                          name(), current_price, current_take_profile));
+                    HKU_INFO_IF(trace, htr("[{}] TP to sell, current price: {}, take_profit: {}",
+                                           name(), src_current_price, current_take_profile));
                     tr = _sell(today, src_today, PART_TAKEPROFIT);
                 }
             }
@@ -703,10 +724,14 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
             tr = _buyShort(today, src_today, PART_PROFITGOAL);
 
         } else {
-            price_t current_take_profile = _getShortTakeProfitPrice(today.datetime, current_price);
+            // The take-profit indicator runs on the adjusted KData, and the result is mapped back
+            // to the original price coordinate so that it stays comparable across bars
+            price_t current_take_profile =
+              _getShortTakeProfitPrice(today, src_today, today.closePrice);
             if (current_take_profile != 0.0) {
-                // The short take-profit price ratchets downward and is never raised
-                if (current_take_profile > m_lastShortTakeProfit) {
+                // The short take-profit level only lowers and is never raised
+                if (getParam<bool>("tp_monotonic") &&
+                    current_take_profile > m_lastShortTakeProfit) {
                     current_take_profile = m_lastShortTakeProfit;
                 } else {
                     m_lastShortTakeProfit = current_take_profile;
@@ -715,6 +740,12 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                 int tp_delay_n = getParam<int>("tp_delay_n");
                 size_t pos = m_kdata.getPos(today.datetime);
                 size_t position_pos = m_kdata.getPos(shortPosition.takeDatetime);
+                // The position may have been opened before the current KData window; in that case
+                // the delay is counted from the window start, and the subtraction must not
+                // underflow when the opening date is outside the window
+                size_t bars_since_open = position_pos == Null<size_t>()
+                                           ? pos + 1
+                                           : (pos >= position_pos ? pos - position_pos : 0);
                 // For a short position buyMoney already contains the fees, so the unrealized
                 // profit is sellMoney - cover value - buyMoney
                 price_t profit = shortPosition.sellMoney -
@@ -722,12 +753,11 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                                  shortPosition.buyMoney;
                 // Cover when the current price is not lower than the take-profit price and the
                 // take-profit delay condition is met
-                if (pos - position_pos >= tp_delay_n && current_price >= current_take_profile &&
+                if (bars_since_open >= tp_delay_n && src_current_price >= current_take_profile &&
                     profit > 0.0) {
-                    HKU_INFO_IF(trace,
-                                htr("[{}] TP to buy short, current price after restoration: {}, "
-                                    "take_profit: {}",
-                                    name(), current_price, current_take_profile));
+                    HKU_INFO_IF(
+                      trace, htr("[{}] TP to buy short, current price: {}, take_profit: {}", name(),
+                                 src_current_price, current_take_profile));
                     tr = _buyShort(today, src_today, PART_TAKEPROFIT);
                 }
             }
@@ -1549,23 +1579,30 @@ TradeRecord System::pfProcessDelayBuyRequest(const Datetime& date) {
 
 price_t System::_getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
-    HKU_IF_RETURN(today.highPrice == today.lowPrice, src_today.lowPrice);
-    price_t stoploss = m_st->getPrice(today.datetime, price);
-    price_t adjust = (stoploss - today.lowPrice) / (today.highPrice - today.lowPrice) *
-                       (src_today.highPrice - src_today.lowPrice) +
-                     src_today.lowPrice;
-    return adjust >= 0.0 ? adjust : 0.0;
+    return mapAdjustedToOriginal(today, src_today, m_st->getPrice(today.datetime, price));
 }
 
 price_t System ::_getShortStoplossPrice(const KRecord& today, const KRecord& src_today,
                                         price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
-    HKU_IF_RETURN(today.highPrice == today.lowPrice, src_today.lowPrice);
-    price_t stoploss = m_st->getShortPrice(today.datetime, price);
-    price_t adjust = (stoploss - today.lowPrice) / (today.highPrice - today.lowPrice) *
-                       (src_today.highPrice - src_today.lowPrice) +
-                     src_today.lowPrice;
-    return adjust >= 0.0 ? adjust : 0.0;
+    return mapAdjustedToOriginal(today, src_today, m_st->getShortPrice(today.datetime, price));
+}
+
+price_t System::_getTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price) {
+    HKU_IF_RETURN(!m_tp, 0.0);
+    price_t level = m_tp->getPrice(today.datetime, price);
+    // Zero means no take-profit price on this bar and must not be turned into a real level by
+    // the mapping (e.g. into the low price of a one-price board)
+    HKU_IF_RETURN(level == 0.0, 0.0);
+    return mapAdjustedToOriginal(today, src_today, level);
+}
+
+price_t System ::_getShortTakeProfitPrice(const KRecord& today, const KRecord& src_today,
+                                          price_t price) {
+    HKU_IF_RETURN(!m_tp, 0.0);
+    price_t level = m_tp->getShortPrice(today.datetime, price);
+    HKU_IF_RETURN(level == 0.0, 0.0);
+    return mapAdjustedToOriginal(today, src_today, level);
 }
 
 json System::lastSuggestion() const {
