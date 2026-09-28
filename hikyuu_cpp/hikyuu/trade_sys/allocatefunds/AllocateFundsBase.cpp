@@ -411,6 +411,12 @@ SystemWeightList AllocateFundsBase::_adjust_with_running(
 
                 // The quantity expected to be sold
                 double min_num = stock.minTradeNumber();
+                if (min_num <= 0.0) {
+                    // Guard against a division by zero from abnormal stock data (ISS-087)
+                    HKU_WARN_IF(trace, "{} invalid min trade number: {}", stock.market_code(),
+                                min_num);
+                    continue;
+                }
                 double need_back_num =
                   static_cast<int64_t>(need_back_funds / last_close_price / min_num) * min_num;
                 if (hold_num - need_back_num < min_num) {
