@@ -20,6 +20,8 @@ TruncNormalSlippage::TruncNormalSlippage()
     setParam<double>("stddev", 0.05);
     setParam<double>("min_value", -0.1);
     setParam<double>("max_value", 0.1);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 TruncNormalSlippage::~TruncNormalSlippage() {}
@@ -39,6 +41,15 @@ void TruncNormalSlippage::_checkParam(const string& name) const {
         double min_v = getParam<double>("min_value");
         double max_v = getParam<double>("max_value");
         HKU_ASSERT(min_v <= max_v);
+    }
+}
+
+void TruncNormalSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
     }
 }
 

@@ -17,6 +17,8 @@ namespace hku {
 NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 NormalSlippage::~NormalSlippage() {}
@@ -24,6 +26,15 @@ NormalSlippage::~NormalSlippage() {}
 void NormalSlippage::_checkParam(const string& name) const {
     if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
+    }
+}
+
+void NormalSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
     }
 }
 

@@ -20,6 +20,7 @@ public:
     NormalSlippage();
     virtual ~NormalSlippage();
     virtual void _checkParam(const string& name) const override;
+    virtual void _reset() override;
 
 private:
     std::mt19937 m_gen;

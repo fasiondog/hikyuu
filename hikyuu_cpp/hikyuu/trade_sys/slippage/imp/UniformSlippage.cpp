@@ -16,6 +16,8 @@ namespace hku {
 UniformSlippage::UniformSlippage() : SlippageBase("SP_Uniform"), m_gen(std::random_device{}()) {
     setParam<double>("min_value", -0.05);
     setParam<double>("max_value", 0.05);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 UniformSlippage::~UniformSlippage() {}
@@ -31,6 +33,15 @@ void UniformSlippage::_checkParam(const string& name) const {
         double min_v = getParam<double>("min_value");
         double max_v = getParam<double>("max_value");
         HKU_ASSERT(min_v <= max_v);
+    }
+}
+
+void UniformSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
     }
 }
 

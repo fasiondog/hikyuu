@@ -18,6 +18,8 @@ LogNormalSlippage::LogNormalSlippage()
 : SlippageBase("SP_LogNormal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 LogNormalSlippage::~LogNormalSlippage() {}
@@ -27,6 +29,15 @@ void LogNormalSlippage::_checkParam(const string& name) const {
         HKU_ASSERT(!std::isnan(getParam<double>("mean")));
     } else if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
+    }
+}
+
+void LogNormalSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
     }
 }
 
