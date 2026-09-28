@@ -199,15 +199,15 @@ void AllocateFundsBase::_adjust_without_running(const Datetime& date,
     int precision = m_tm->getParam<int>("precision");
     FundsRecord funds =
       m_tm->getFunds(date, m_query.kType());  // The total assets come from the total account
-    price_t total_funds =
-      funds.cash + funds.market_value + funds.borrow_asset - funds.short_market_value;
+    price_t total_funds = funds.total_assets();
     double reserve_percent = getParam<double>("reserve_percent");
-    price_t reserve_funds = total_funds * reserve_percent;
+    price_t reserve_funds = roundEx(total_funds * reserve_percent, precision);
+    // The reserved funds are subtracted from the cash pool, keeping the same convention as
+    // _adjust_with_running; otherwise the reserved part would be allocated away when the pool cash
+    // is less than (total_funds - reserve_funds) (ISS-091)
     price_t can_allocate_cash =
-      m_cash_tm->currentCash();  // The allocatable funds come from the cash account
-    if (can_allocate_cash + reserve_funds > total_funds) {
-        can_allocate_cash = roundDown(total_funds - reserve_funds, precision);
-    }
+      roundDown(m_cash_tm->currentCash() - reserve_funds,
+                precision);  // The allocatable funds come from the cash account
     double can_allocate_weight = 1.0 - reserve_percent;
     HKU_INFO_IF(trace,
                 "can_allocate_weight: {:<.4f}, can_allocate_cash: {:<.2f}, current cash: {:<.2f}, "

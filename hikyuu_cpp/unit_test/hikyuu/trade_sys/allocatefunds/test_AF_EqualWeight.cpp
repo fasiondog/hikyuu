@@ -202,6 +202,98 @@ TEST_CASE("test_AF_without_running_uses_sub_tm_funds") {
     }
 }
 
+/** @par Test points: the without_running path subtracts the reserved funds from the cash pool,
+ * keeping the same convention as _adjust_with_running (ISS-091) */
+TEST_CASE("test_AF_without_running_reserve_convention") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sz000001"];
+    CHECK_UNARY(!stock.isNull());
+
+    Datetime buy_date(201101040000L);
+    Datetime date(201101050000L);
+
+    // The total account book value is 100000; the pool holds only part of the cash (the rest is
+    // occupied by the subsystem assets), i.e. pool_cash < total_funds - reserve_funds
+    TMPtr tm = crtTM(Datetime(200101010000L), 100000);
+    TMPtr cash_tm = crtTM(Datetime(200101010000L), 50000);
+
+    TMPtr sub_tm_running = crtTM(Datetime(200101010000L), 30000);
+    auto tr = sub_tm_running->buy(buy_date, stock, 10.0, 1000, 0.0, 10.0, 10.0);
+    CHECK_UNARY(!tr.isNull());
+
+    TMPtr sub_tm_new = crtTM(Datetime(200101010000L), 0);
+    SYSPtr sys_running = SYS_Simple(sub_tm_running);
+    SYSPtr sys_new = SYS_Simple(sub_tm_new);
+
+    AFPtr af = std::make_shared<AF_PassThroughWeight>();
+    af->setParam<bool>("adjust_running_sys", false);
+    af->setParam<bool>("auto_adjust_weight", false);
+    af->setParam<double>("reserve_percent", 0.1);
+    af->setTM(tm);
+    af->setCashTM(cash_tm);
+    af->setQuery(KQueryByDate(Datetime(201101010000L), Datetime(201201010000L)));
+
+    std::unordered_set<SYSPtr> running_set;
+    running_set.insert(sys_running);
+
+    /** @arg The pool cash is less than total - reserve: the allocation is truncated by
+     * pool - reserve and the reserved funds are kept (regression: the old cap semantics allocated
+     * the whole pool ignoring the reserve) */
+    {
+        SystemWeightList se_list;
+        se_list.emplace_back(sys_new, 0.6);  // will_cash = 60000 > pool - reserve = 40000
+
+        price_t pool_before = cash_tm->currentCash();
+        CHECK_EQ(pool_before, 50000.0);
+        price_t running_cash_before = sub_tm_running->currentCash();
+
+        af->adjustFunds(date, se_list, running_set);
+
+        CHECK_EQ(sub_tm_new->currentCash(), doctest::Approx(40000.0));
+        CHECK_EQ(cash_tm->currentCash(), doctest::Approx(10000.0));
+        CHECK_EQ(sub_tm_running->currentCash(), doctest::Approx(running_cash_before));
+    }
+
+    /** @arg The pool cash is not greater than the reserved funds: nothing is allocated */
+    {
+        price_t new_cash = sub_tm_new->currentCash();
+        if (new_cash > 0.0) {
+            CHECK_UNARY(sub_tm_new->checkout(date, new_cash));
+            CHECK_UNARY(cash_tm->checkin(date, new_cash));
+        }
+        CHECK_EQ(sub_tm_new->currentCash(), doctest::Approx(0.0));
+        CHECK_EQ(cash_tm->currentCash(), doctest::Approx(50000.0));
+
+        af->setParam<double>("reserve_percent", 0.6);  // reserve_funds = 60000 > pool 50000
+
+        SystemWeightList se_list;
+        se_list.emplace_back(sys_new, 0.6);
+
+        af->adjustFunds(date, se_list, running_set);
+
+        CHECK_EQ(sub_tm_new->currentCash(), doctest::Approx(0.0));
+        CHECK_EQ(cash_tm->currentCash(), doctest::Approx(50000.0));
+    }
+
+    /** @arg The pool cash equals the total assets (the PF startup scenario): the subtract
+     * convention yields the same allocation as the old cap semantics (total - reserve) */
+    {
+        af->setParam<double>("reserve_percent", 0.1);
+
+        // Top up the pool to 100000 so that pool_cash == total_funds
+        CHECK_UNARY(cash_tm->checkin(date, 50000.0));
+        CHECK_EQ(cash_tm->currentCash(), doctest::Approx(100000.0));
+
+        SystemWeightList se_list;
+        se_list.emplace_back(sys_new, 1.0);  // will_cash = 100000, truncated to 90000
+
+        af->adjustFunds(date, se_list, running_set);
+
+        CHECK_EQ(sub_tm_new->currentCash(), doctest::Approx(90000.0));
+        CHECK_EQ(cash_tm->currentCash(), doctest::Approx(10000.0));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
