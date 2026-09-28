@@ -308,6 +308,11 @@ private:
     price_t _getShortStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price);
 
     price_t _getTakeProfitPrice(const Datetime& datetime, price_t currentPrice);
+    price_t _getShortTakeProfitPrice(const Datetime& datetime, price_t currentPrice);
+
+    /** Per-share risk of opening a short: stop-loss price - entry price; stop-loss 0 means no
+     * stop-loss, in which case the full entry price is taken as the worst-case risk */
+    price_t _getShortOpenRisk(price_t stoploss, price_t price);
 
     price_t _getGoalPrice(const Datetime& datetime, price_t price);
     price_t _getShortGoalPrice(const Datetime&, price_t price);
@@ -657,6 +662,14 @@ inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t plan
 
 inline price_t System ::_getTakeProfitPrice(const Datetime& datetime, price_t currentPrice) {
     return m_tp ? m_tp->getPrice(datetime, currentPrice) : 0.0;
+}
+
+inline price_t System ::_getShortTakeProfitPrice(const Datetime& datetime, price_t currentPrice) {
+    return m_tp ? m_tp->getShortPrice(datetime, currentPrice) : 0.0;
+}
+
+inline price_t System ::_getShortOpenRisk(price_t stoploss, price_t price) {
+    return stoploss > 0.0 ? stoploss - price : price;
 }
 
 inline price_t System ::_getGoalPrice(const Datetime& datetime, price_t price) {

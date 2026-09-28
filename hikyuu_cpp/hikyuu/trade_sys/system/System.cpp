@@ -534,6 +534,11 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
             tr = _sell(today, src_today, PART_ENVIRONMENT);
             HKU_INFO_IF(trace, htr("[{}] EV to sell", name()));
         }
+        // If a short position is held, cover and buy back immediately
+        else if (m_tm->haveShort(m_stock)) {
+            tr = _buyShort(today, src_today, PART_ENVIRONMENT);
+            HKU_INFO_IF(trace, htr("[{}] EV to buy short", name()));
+        }
 
         m_pre_ev_valid = current_ev_valid;
         return tr.isNull() ? result : tr;
@@ -568,6 +573,11 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_CONDITION);
             HKU_INFO_IF(trace, htr("[{}] CN to sell", name()));
+        }
+        // If a short position is held, cover and buy back immediately
+        else if (m_tm->haveShort(m_stock)) {
+            tr = _buyShort(today, src_today, PART_CONDITION);
+            HKU_INFO_IF(trace, htr("[{}] CN to buy short", name()));
         }
 
         m_pre_cn_valid = current_cn_valid;
@@ -667,6 +677,58 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                       htr("[{}] TP to sell, current price after restoration: {}, take_profit: {}",
                           name(), current_price, current_take_profile));
                     tr = _sell(today, src_today, PART_TAKEPROFIT);
+                }
+            }
+        }
+
+        return tr.isNull() ? result : tr;
+    }
+
+    //----------------------------------------------------------
+    // Process the stop-loss, take-profit and goal signals for the short position
+    //----------------------------------------------------------
+    PositionRecord shortPosition = m_tm->getShortPosition(m_stock);
+    HKU_INFO_IF(trace, htr("[{}] current short position: {}", name(), shortPosition.number));
+    if (shortPosition.number != 0) {
+        TradeRecord tr;
+        if (shortPosition.stoploss != 0.0 && src_current_price >= shortPosition.stoploss) {
+            HKU_INFO_IF(trace, htr("[{}] ST to buy short, current price: {}, stoploss: {}", name(),
+                                   src_current_price, shortPosition.stoploss));
+            tr = _buyShort(today, src_today, PART_STOPLOSS);
+
+        } else if (src_current_price <= _getShortGoalPrice(today.datetime, src_current_price)) {
+            HKU_INFO_IF(trace, "[{}] {}: {}, {}: {}", name(), htr("PG to buy short, current price"),
+                        src_current_price, htr("goal price"),
+                        _getShortGoalPrice(today.datetime, src_current_price));
+            tr = _buyShort(today, src_today, PART_PROFITGOAL);
+
+        } else {
+            price_t current_take_profile = _getShortTakeProfitPrice(today.datetime, current_price);
+            if (current_take_profile != 0.0) {
+                // The short take-profit price ratchets downward and is never raised
+                if (current_take_profile > m_lastShortTakeProfit) {
+                    current_take_profile = m_lastShortTakeProfit;
+                } else {
+                    m_lastShortTakeProfit = current_take_profile;
+                }
+
+                int tp_delay_n = getParam<int>("tp_delay_n");
+                size_t pos = m_kdata.getPos(today.datetime);
+                size_t position_pos = m_kdata.getPos(shortPosition.takeDatetime);
+                // For a short position buyMoney already contains the fees, so the unrealized
+                // profit is sellMoney - cover value - buyMoney
+                price_t profit = shortPosition.sellMoney -
+                                 shortPosition.number * src_today.closePrice -
+                                 shortPosition.buyMoney;
+                // Cover when the current price is not lower than the take-profit price and the
+                // take-profit delay condition is met
+                if (pos - position_pos >= tp_delay_n && current_price >= current_take_profile &&
+                    profit > 0.0) {
+                    HKU_INFO_IF(trace,
+                                htr("[{}] TP to buy short, current price after restoration: {}, "
+                                    "take_profit: {}",
+                                    name(), current_price, current_take_profile));
+                    tr = _buyShort(today, src_today, PART_TAKEPROFIT);
                 }
             }
         }
@@ -1162,14 +1224,19 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
 
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
-                                        goalPrice, planPrice, PART_SIGNAL);
+                                        goalPrice, planPrice, from);
     if (BUSINESS_BUY_SHORT != record.business) {
         m_buyShortRequest.clear();
         return result;
     }
 
     m_sell_short_days = 0;
-    m_lastTakeProfit = realPrice;  // The take-profit is assigned the buy price
+    // The last short take-profit price is initialized to 0 when there is no short position
+    if (!m_tm->haveShort(m_stock)) {
+        m_lastShortTakeProfit = 0.0;
+    } else {
+        m_lastShortTakeProfit = src_today.closePrice;
+    }
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyShortRequest.clear();
@@ -1239,14 +1306,19 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
-                                        goalPrice, planPrice, PART_SIGNAL);
+                                        goalPrice, planPrice, m_buyShortRequest.from);
     if (BUSINESS_BUY_SHORT != record.business) {
         m_buyShortRequest.clear();
         return result;
     }
 
     m_sell_short_days = 0;
-    m_lastTakeProfit = realPrice;  // The take-profit is assigned the buy price
+    // The last short take-profit price is initialized to 0 when there is no short position
+    if (!m_tm->haveShort(m_stock)) {
+        m_lastShortTakeProfit = 0.0;
+    } else {
+        m_lastShortTakeProfit = src_today.openPrice;
+    }
     m_trade_list.push_back(record);
     _buyNotifyAll(record);
     m_buyShortRequest.clear();
@@ -1264,7 +1336,7 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
 
     } else {
         m_buyShortRequest.valid = true;
-        m_buyShortRequest.business = BUSINESS_BUY;
+        m_buyShortRequest.business = BUSINESS_BUY_SHORT;
         m_buyShortRequest.from = from;
         m_buyShortRequest.count = 1;
     }
@@ -1334,7 +1406,8 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     // Calculate the stop-loss price
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
-    double number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice, from);
+    double number =
+      _getSellShortNumber(today.datetime, planPrice, _getShortOpenRisk(stoploss, planPrice), from);
     if (number <= 0) {
         m_sellShortRequest.clear();
         return result;
@@ -1343,7 +1416,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
     TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
-                                         goalPrice, planPrice, PART_SIGNAL);
+                                         goalPrice, planPrice, from);
     if (BUSINESS_SELL_SHORT != record.business) {
         m_sellShortRequest.clear();
         return result;  // The sell operation failed
@@ -1391,8 +1464,9 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
     price_t goalPrice = 0.0;
     if (getParam<bool>("delay_use_current_price")) {
         stoploss = _getShortStoplossPrice(today, src_today, today.openPrice);
-        number = _getSellShortNumber(today.datetime, planPrice, stoploss - planPrice,
-                                     m_sellShortRequest.from);
+        number =
+          _getSellShortNumber(today.datetime, planPrice, _getShortOpenRisk(stoploss, planPrice),
+                              m_sellShortRequest.from);
         goalPrice = _getShortGoalPrice(today.datetime, planPrice);
     } else {
         stoploss = m_sellShortRequest.stoploss;
@@ -1439,11 +1513,12 @@ void System::_submitSellShortRequest(const KRecord& today, const KRecord& src_to
     }
 
     m_sellShortRequest.datetime = today.datetime;
-    m_sellShortRequest.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
-    m_sellShortRequest.goal = _getGoalPrice(today.datetime, src_today.closePrice);
+    m_sellShortRequest.stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
+    m_sellShortRequest.goal = _getShortGoalPrice(today.datetime, src_today.closePrice);
     m_sellShortRequest.number =
-      _getSellNumber(today.datetime, src_today.closePrice,
-                     src_today.closePrice - m_sellShortRequest.stoploss, m_sellShortRequest.from);
+      _getSellShortNumber(today.datetime, src_today.closePrice,
+                          _getShortOpenRisk(m_sellShortRequest.stoploss, src_today.closePrice),
+                          m_sellShortRequest.from);
 }
 
 TradeRecord System::_processRequest(const KRecord& today, const KRecord& src_today) {

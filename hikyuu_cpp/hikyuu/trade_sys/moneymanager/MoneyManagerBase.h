@@ -107,8 +107,12 @@ public:
      * @param datetime trade date
      * @param stock the trading object
      * @param price trade price
+     * @param risk the per-share risk (stop-loss price - trade price); the short stop-loss is above
+     *             the entry, so a valid risk is positive
      * @param from signal source
-     * @param risk the trade risk taken; Null<price_t> means there is no loss upper limit
+     * @note When the risk is not greater than 0 (the price has reached or risen above the stop
+     * loss price), the order is rejected and 0 is returned, otherwise the subclass
+     * _getSellShortNumber is left to decide
      */
     double getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                               price_t risk, SystemPart from);
@@ -118,8 +122,11 @@ public:
      * @param datetime trade date
      * @param stock the trading object
      * @param price trade price
+     * @param risk the per-share risk (stop-loss price - trade price)
      * @param from signal source
-     * @param risk the trade risk taken; Null<price_t> means there is no loss upper limit
+     * @note When the risk is not greater than 0 (the price has reached or risen above the stop
+     * loss price), the MMs which do not support multi-trading will cover the whole position
+     * directly (return MAX_DOUBLE), otherwise the subclass _getBuyShortNumber is left to decide
      */
     double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                              price_t risk, SystemPart from);

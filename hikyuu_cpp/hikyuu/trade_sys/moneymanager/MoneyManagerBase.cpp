@@ -100,7 +100,7 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
     HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
     HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
-                       "risk less zero (Mayby single-line price board, can ignored)! "
+                       "risk less zero (Maybe single-line price board, can ignored)! "
                        "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
                        datetime, stock.market_code(), stock.name(), price, risk,
                        getSystemPartName(from));
@@ -152,9 +152,13 @@ double MoneyManagerBase::getSellShortNumber(const Datetime& datetime, const Stoc
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk >= 0.0, 0.0,
-                        "risk is positive! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+    // For a short sell the stop-loss is above the entry, so the per-share risk (stoploss - price)
+    // must be positive; a non-positive risk means the price has already reached the stop-loss
+    HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
+                       "risk not positive (Maybe single-line price board, can ignored)! "
+                       "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
+                       datetime, stock.market_code(), stock.name(), price, risk,
+                       getSystemPartName(from));
     return _getSellShortNumber(datetime, stock, price, risk, from);
 }
 
@@ -163,9 +167,20 @@ double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stoc
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk >= 0.0, 0.0,
-                        "risk is positive! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+
+    if (PART_ENVIRONMENT == from) {
+        // Force covering the whole short position
+        HKU_IF_RETURN(!getParam<bool>("disable_ev_force_clean_position"), MAX_DOUBLE);
+    }
+
+    if (PART_CONDITION == from) {
+        HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
+    }
+
+    // When the risk is not greater than 0, the price has risen to or above the stop-loss price;
+    // the MMs which do not support multi-trading cover the whole position directly
+    HKU_IF_RETURN(risk <= 0.0 && !m_support_mult_buy_sell, MAX_DOUBLE);
+
     return _getBuyShortNumber(datetime, stock, price, risk, from);
 }
 
