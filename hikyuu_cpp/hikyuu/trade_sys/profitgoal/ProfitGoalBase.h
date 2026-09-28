@@ -65,7 +65,10 @@ public:
      * Calculate the target price when buying
      * @param datetime the current time
      * @param price the current price
-     * @return Null<price_t> means no target is set; 0 means a sell is needed
+     * @return Null<price_t> means no target is set; 0 means a sell is needed. Note: when there
+     * is no position yet (e.g. at the buy moment), returning a pre-calculated target price based
+     * on the current price is also a valid semantic, which will be recorded as the goalPrice of
+     * the trade record
      */
     virtual price_t getGoal(const Datetime& datetime, price_t price) = 0;
 
