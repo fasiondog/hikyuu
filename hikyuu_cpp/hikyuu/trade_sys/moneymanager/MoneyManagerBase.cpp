@@ -99,6 +99,12 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                         datetime, stock.market_code(), price, risk);
     HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
+    // Protects all the money managers from a division by zero or an invalid price propagated by
+    // dirty data, so that no inf/nan position count can be produced (ISS-094)
+    HKU_ERROR_IF_RETURN(
+      !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
+      datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
+
     HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
                        "risk less zero (Maybe single-line price board, can ignored)! "
                        "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
