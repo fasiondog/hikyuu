@@ -6,6 +6,7 @@
  */
 
 #include <csignal>
+#include <cstdlib>
 #include <unordered_set>
 #include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/ini_parser/IniParser.h"
@@ -22,14 +23,22 @@ std::atomic<bool> Strategy::ms_sig_registered = false;
 
 void Strategy::sig_handler(int sig) {
     if (sig == SIGINT || sig == SIGTERM) {
-        try {
-            ms_keep_running = false;
-            auto* scheduler = getScheduler();
-            scheduler->stop();
-        } catch (...) {
-            // Ignore the exception
-        }
-        std::exit(EXIT_SUCCESS);
+        // Only async-signal-safe operations are allowed in the signal handler
+        ms_keep_running = false;
+        _Exit(EXIT_SUCCESS);
+
+        // The old graceful shutdown path is not async-signal-safe: getScheduler (call_once +
+        // malloc), TimerManager::stop (mutex/swap/join/delete) and std::exit (atexit/flush) may
+        // deadlock or corrupt the heap when the interrupted thread holds the relevant lock. Keep
+        // it for reference; switch to a self-pipe wake-up scheme if graceful shutdown is needed.
+        // try {
+        //     ms_keep_running = false;
+        //     auto* scheduler = getScheduler();
+        //     scheduler->stop();
+        // } catch (...) {
+        //     // Ignore the exception
+        // }
+        // std::exit(EXIT_SUCCESS);
     }
 }
 
