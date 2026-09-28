@@ -90,4 +90,43 @@ TEST_CASE("test_MM_FixedCountTps_mult_sell_guard") {
     CHECK_EQ(mm->getSellNumber(Datetime(200001210000), stock, 24.11, -1.0, PART_SIGNAL), 200);
 }
 
+/** @par Test points */
+TEST_CASE("test_MM_FixedCountTps_short_trade_immunity") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0, TC_FixedA());
+    tm->setParam<bool>("support_borrow_stock", true);
+    auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
+    mm->setTM(tm);
+
+    /** @arg The short-side trades do not pollute the long tranche counters (ISS-093) */
+    auto tr = tm->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm->buyNotify(tr);
+    tr = tm->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm->buyNotify(tr);
+    CHECK_EQ(mm->currentBuyCount(stock), 2);
+    CHECK_EQ(mm->currentSellCount(stock), 0);
+
+    /** @arg Opening a short neither resets the long buy counter nor counts as a long sell */
+    tr = tm->sellShort(Datetime(200001210000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    CHECK_UNARY(!tr.isNull());
+    mm->sellNotify(tr);
+    CHECK_EQ(mm->currentBuyCount(stock), 2);
+    CHECK_EQ(mm->currentSellCount(stock), 0);
+
+    /** @arg Covering the short neither advances the long buy counter nor counts as a long buy */
+    tr = tm->buyShort(Datetime(200001220000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    CHECK_UNARY(!tr.isNull());
+    mm->buyNotify(tr);
+    CHECK_EQ(mm->currentBuyCount(stock), 2);
+    CHECK_EQ(mm->currentSellCount(stock), 0);
+
+    /** @arg The long-side flows keep driving the tranches normally after the short-side trades */
+    tr = tm->sell(Datetime(200001230000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    CHECK_UNARY(!tr.isNull());
+    mm->sellNotify(tr);
+    CHECK_EQ(mm->currentBuyCount(stock), 0);
+    CHECK_EQ(mm->currentSellCount(stock), 1);
+}
+
 /** @} */

@@ -212,23 +212,31 @@ size_t MoneyManagerBase::currentSellCount(const Stock& stk) const {
 }
 
 void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
-    auto iter = m_buy_sell_counts.find(tr.stock);
-    if (iter == m_buy_sell_counts.end()) {
-        m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(1, 0);
-    } else {
-        iter->second.first++;
-        iter->second.second = 0;
+    // Only the long-side opening updates the consecutive trade counters; the short-side trades
+    // (BUSINESS_BUY_SHORT etc.) must not pollute the long tranches (ISS-093)
+    if (tr.business == BUSINESS_BUY) {
+        auto iter = m_buy_sell_counts.find(tr.stock);
+        if (iter == m_buy_sell_counts.end()) {
+            m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(1, 0);
+        } else {
+            iter->second.first++;
+            iter->second.second = 0;
+        }
     }
     _buyNotify(tr);
 }
 
 void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
-    auto iter = m_buy_sell_counts.find(tr.stock);
-    if (iter == m_buy_sell_counts.end()) {
-        m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(0, 1);
-    } else {
-        iter->second.first = 0;
-        iter->second.second++;
+    // Only the long-side closing updates the consecutive trade counters; the short-side trades
+    // (BUSINESS_SELL_SHORT etc.) must not pollute the long tranches (ISS-093)
+    if (tr.business == BUSINESS_SELL) {
+        auto iter = m_buy_sell_counts.find(tr.stock);
+        if (iter == m_buy_sell_counts.end()) {
+            m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(0, 1);
+        } else {
+            iter->second.first = 0;
+            iter->second.second++;
+        }
     }
     _sellNotify(tr);
 }
