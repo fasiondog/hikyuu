@@ -57,4 +57,10 @@ TEST_CASE("test_NormalSlippage_seed") {
     CHECK_NE(sp3->getRealBuyPrice(Datetime(202201010930), 10.0), first);
 }
 
+TEST_CASE("test_NormalSlippage_checkParam") {
+    auto sp = SP_Normal(0.0, 0.05);
+    /** @arg a nan mean is rejected */
+    CHECK_THROWS_AS(sp->setParam("mean", Null<double>()), std::exception);
+}
+
 /** @} */

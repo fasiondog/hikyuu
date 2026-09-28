@@ -24,7 +24,9 @@ NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_
 NormalSlippage::~NormalSlippage() {}
 
 void NormalSlippage::_checkParam(const string& name) const {
-    if ("stddev" == name) {
+    if ("mean" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>("mean")));
+    } else if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
     }
 }
