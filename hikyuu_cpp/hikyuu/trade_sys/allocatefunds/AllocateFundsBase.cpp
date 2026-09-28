@@ -30,7 +30,7 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase") {
     initParam();
 }
 
-AllocateFundsBase::AllocateFundsBase(const string& name) : m_name("AllocateMoneyBase") {
+AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     initParam();
 }
 

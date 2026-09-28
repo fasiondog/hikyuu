@@ -38,6 +38,10 @@ TEST_CASE("test_AllocateFunds") {
     af->setTM(tm);
     CHECK_UNARY(af->getTM());
 
+    /** @arg the name passed to the constructor takes effect instead of the hardcoded default
+     *  (ISS-086) */
+    CHECK_EQ(af->name(), "AF_EqualWeight");
+
     /** @arg Test clone */
     AFPtr af2 = af->clone();
     CHECK_NE(af2.get(), af.get());
