@@ -426,6 +426,8 @@ bool H5KDataDriver::_getBaseIndexRangeByDate(const string& market, const string&
         return false;
 
     } catch (...) {
+        // Intentional: on unexpected HDF5 errors, degrade to the partially located range and
+        // report success instead of failing the whole date query (do not change to return false)
         HKU_INFO("error in {}{}", market, code);
         dataspace.close();
         dataset.close();
