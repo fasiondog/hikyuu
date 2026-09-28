@@ -59,4 +59,14 @@ TEST_CASE("test_TruncNormalSlippage_seed") {
 }
 
 
+TEST_CASE("test_TruncNormalSlippage_far_range") {
+    /** @arg a truncated range far from the mean terminates and clamps into the range */
+    auto sp = SP_TruncNormal(0.0, 0.01, 0.05, 0.08);
+    for (int i = 0; i < 100; ++i) {
+        price_t value = sp->getRealBuyPrice(Datetime(202201010930), 10.0) - 10.0;
+        CHECK_GE(value, 0.05 - 1e-12);
+        CHECK_LE(value, 0.08 + 1e-12);
+    }
+}
+
 /** @} */

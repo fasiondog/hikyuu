@@ -50,6 +50,8 @@ price_t UniformSlippage ::getRealBuyPrice(const Datetime& datetime, price_t pric
     double max_v = getParam<double>("max_value");
     std::uniform_real_distribution<double> dis(min_v, max_v);
     double value = dis(m_gen);
+    // The range is an amplitude range: the sampled value is folded to a positive
+    // amplitude via abs and then applied in the unfavorable direction
     return price + std::abs(value);
 }
 
@@ -58,6 +60,8 @@ price_t UniformSlippage ::getRealSellPrice(const Datetime& datetime, price_t pri
     double max_v = getParam<double>("max_value");
     std::uniform_real_distribution<double> dis(min_v, max_v);
     double value = dis(m_gen);
+    // The range is an amplitude range: the sampled value is folded to a positive
+    // amplitude via abs and then applied in the unfavorable direction
     return price - std::abs(value);
 }
 
