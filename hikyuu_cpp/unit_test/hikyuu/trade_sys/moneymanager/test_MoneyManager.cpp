@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
+#include <hikyuu/data_driver/DataDriverFactory.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/MoneyManagerBase.h>
 
@@ -101,6 +102,24 @@ public:
     }
 };
 
+class FixedBuyNumberMMTest : public MoneyManagerBase {
+public:
+    FixedBuyNumberMMTest() : MoneyManagerBase("FixedBuyNumberMMTest"), m_number(100.0) {}
+    virtual ~FixedBuyNumberMMTest() {}
+
+    virtual double _getBuyNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                 price_t risk, SystemPart from) {
+        return m_number;
+    }
+
+    virtual MoneyManagerPtr _clone() {
+        return MoneyManagerPtr(new FixedBuyNumberMMTest);
+    }
+
+private:
+    double m_number;
+};
+
 /**
  * @defgroup test_MoneyManager test_MoneyManager
  * @ingroup test_hikyuu_trade_sys_suite
@@ -179,6 +198,39 @@ TEST_CASE("test_MoneyManager_clone_fail_fast") {
      * fallback (ISS-028) */
     MoneyManagerPtr p2(new SelfCloneMoneyManagerTest);
     CHECK_THROWS_AS(p2->clone(), std::exception);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_unit_cash_estimate") {
+    // tickValue / tick = 2.0 makes stock.unit() != 1, the TM cost func is TC_Zero (cost.total == 0)
+    Stock unit2_stock("TEST", "MMUNIT", "MM Unit Test", 1, true, Datetime(199001010000),
+                      Datetime(209901010000), 1.0, 2.0, 2, 1, 100000);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    unit2_stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!unit2_stock.isNull());
+    CHECK_EQ(unit2_stock.unit(), 2.0);
+
+    StockManager &sm = StockManager::instance();
+    Stock unit1_stock = sm["sh000001"];
+    REQUIRE_UNARY(!unit1_stock.isNull());
+
+    /** @arg unit == 1: the estimate keeps the original behavior (cash 1000 exactly affords
+     * 100 shares at price 10) */
+    MoneyManagerPtr mm1(new FixedBuyNumberMMTest);
+    mm1->setTM(crtTM(Datetime(200001010000), 1000.0));
+    CHECK_EQ(mm1->getBuyNumber(Datetime(200001010000), unit1_stock, 10.0, 1.0, PART_SIGNAL), 100.0);
+
+    /** @arg unit == 2: the estimate multiplies by stock.unit(), reducing the number to the
+     * affordable 50 (regression for the missing unit, ISS-092) */
+    MoneyManagerPtr mm2(new FixedBuyNumberMMTest);
+    mm2->setTM(crtTM(Datetime(200001010000), 1000.0));
+    CHECK_EQ(mm2->getBuyNumber(Datetime(200001010000), unit2_stock, 10.0, 1.0, PART_SIGNAL), 50.0);
+
+    /** @arg unit == 2: even one minimum trade quantity is unaffordable, returns 0 */
+    MoneyManagerPtr mm3(new FixedBuyNumberMMTest);
+    mm3->setTM(crtTM(Datetime(200001010000), 15.0));
+    CHECK_EQ(mm3->getBuyNumber(Datetime(200001010000), unit2_stock, 10.0, 1.0, PART_SIGNAL), 0.0);
 }
 
 /** @} */

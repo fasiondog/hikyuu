@@ -132,12 +132,12 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
         }
     } else {
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-        price_t need_cash = n * price + cost.total;
+        price_t need_cash = n * price * stock.unit() + cost.total;
         price_t current_cash = m_tm->cash(datetime, m_query.kType());
         while (n > min_trade && need_cash > current_cash) {
             n = n - min_trade;
             cost = m_tm->getBuyCost(datetime, stock, price, n);
-            need_cash = n * price + cost.total;
+            need_cash = n * price * stock.unit() + cost.total;
         }
         if (need_cash > current_cash) {
             n = 0.0;
