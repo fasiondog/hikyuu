@@ -237,14 +237,17 @@ parameters; all the processes will run completely in the standalone mode, with t
 The service address is in the system temporary directory (on unix, take the environment variable ``TMPDIR``, defaulting to ``/tmp``; on Windows, take the system temporary directory);
 the socket / named pipe file name is like ``hikyuu_shm_server_{hash}.ipc`` (on Windows, the named pipe with the same name),
 and there are also the accompanying ``.lock`` files; the server also uses ``hikyuu_ks.last`` / ``hikyuu_bi.last`` to record the current shared memory
-segment names, used to clean up the residual segments of the last abnormally exited server. When the server exits normally, it deletes the shared memory segments; the lock files and the record files
-are empty files themselves, and the residuals can be safely deleted manually.
+segment names, used to clean up the residual segments of the last abnormally exited server, and uses ``hikyuu_shmserver.lock`` as the
+single-instance file lock (see below). When the server exits normally, it deletes the shared memory segments; all the files above can be safely
+deleted manually after the residuals (the single-instance lock is automatically released by the operating system when the process terminates).
 
-.. warning::
+.. note::
 
-    The shared memory segment names and their record files (``hikyuu_ks.last`` / ``hikyuu_bi.last``) are globally fixed and are not isolated by
-    ``datadir``. Therefore, after modifying the ``datadir`` in the configuration, if the server started with the old ``datadir`` is
-    **still running**, the old and the new servers will share the same segment record file: when the later starter publishes the snapshot, it will clean up the shared memory segment currently used by the previous
-    server according to the record, causing the clients newly connected to it afterwards to fail to hit the snapshot and degrade to the IPC requests (the data is still
-    correct, the existing clients are not affected, and only the new clients' latency increases). In actual use, ``datadir`` is generally fixed, so the impact is
-    limited; if you need to switch ``datadir``, it is recommended to first close all the hikyuu processes running with the old ``datadir``, and then start the processes with the new configuration.
+    When the server starts, it takes a non-blocking exclusive file lock on ``hikyuu_shmserver.lock``: **only one shmserver instance is
+    allowed to run on the same host at a time**. When an existing instance is alive, a newly started instance will log a FATAL message
+    and exit directly; the lock is automatically released by the operating system when the process terminates (including Ctrl-C and
+    crashes), so it does not affect the next normal startup. The shared memory segment names and their record files
+    (``hikyuu_ks.last`` / ``hikyuu_bi.last``) are globally fixed and are not isolated by ``datadir``. Under the single-instance
+    constraint, what the later starter cleans up must be the residual segments of the previous exited server, so there is no problem of
+    two running servers deleting each other's segments; if you need to switch ``datadir``, please close the current server process first,
+    otherwise the new instance will refuse to start and exit due to the single-instance lock.
