@@ -464,15 +464,21 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
 
     price_t price = k[0].closePrice;
     if (value > 0.0) {
-        double n = value / price;
-        CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
-        price_t need_cash = n * price + cost.total;
-        price_t current_cash = m_tm->currentCash();
         double min_trade = stk.minTradeNumber();
+
+        // Convert it into an integer multiple of the minimum trade quantity
+        // (consistent with the MoneyManagerBase::getBuyNumber convention, ISS-135)
+        double n = int64_t(value / price / min_trade) * min_trade;
+        CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
+
+        // The cash needed by the actual trade = the trade quantity * the actual trade price
+        // * the unit of the stock + the total trade cost (consistent with TradeManager::buy)
+        price_t need_cash = n * price * stk.unit() + cost.total;
+        price_t current_cash = m_tm->currentCash();
         while (n > min_trade && need_cash > current_cash) {
             n = n - min_trade;
             cost = m_tm->getBuyCost(now(), stk, price, n);
-            need_cash = n * price + cost.total;
+            need_cash = n * price * stk.unit() + cost.total;
         }
         if (need_cash > current_cash) {
             n = 0.0;
