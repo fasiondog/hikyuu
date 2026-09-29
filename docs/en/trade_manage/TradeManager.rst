@@ -307,6 +307,8 @@ Common parameters:
     .. py:method:: get_position(self, date, stock)
 
         Get the position record of the security at the specified time; returns PositionRecord() if the security is not currently held
+        Note: only number is the exact value at the specified time; the other economic fields (takeDatetime, buyMoney, totalCost,
+        totalRisk, sellMoney, etc.) are taken from the most recent closed position record of the security, for reference only
         
         :param Datetime date: the specified time
         :param Stock stock: the specified security

@@ -401,6 +401,8 @@ Common parameters:
       .def("get_position", &TradeManagerBase::getPosition, R"(get_position(self, date, stock)
 
     Get the position record of the security on the specified date; if the stock is not currently held, return PositionRecord()
+    Note: only number is the exact value on the specified date; the other economic fields (e.g. takeDatetime, buyMoney, totalCost,
+    sellMoney) are taken from the most recent closed position record of the security, for reference only
 
     :param Datetime date: the specified date
     :param Stock stock: the specified security

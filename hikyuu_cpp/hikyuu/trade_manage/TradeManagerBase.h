@@ -449,6 +449,9 @@ public:
 
     /**
      * Get the position record of the given security
+     * @note Only number is the exact value on the given date; the other economic fields (e.g.
+     *       takeDatetime, buyMoney, totalCost, sellMoney) are taken from the most recent closed
+     *       position record of the security, for reference only
      * @param date the given date
      * @param stock the given security
      */

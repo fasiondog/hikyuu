@@ -307,6 +307,8 @@
     .. py:method:: get_position(self, date, stock)
 
         获取指定时间证券持仓记录，如当前未持有该票，返回 PositionRecord()
+        注：仅 number 为指定时点的精确值；其余经济字段（takeDatetime、buyMoney、totalCost、totalRisk、sellMoney 等）
+        取自该证券最近一次平仓记录，仅作参考
         
         :param Datetime date: 指定时间
         :param Stock stock: 指定的证券
