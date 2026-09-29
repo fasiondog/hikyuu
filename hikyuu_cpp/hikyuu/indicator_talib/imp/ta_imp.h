@@ -862,7 +862,7 @@
         _readyBuffer(total, 1);                                                                \
         int lookback = func_lookback();                                                        \
         if (lookback < 0 || lookback >= total) {                                               \
-            m_discard = 0;                                                                     \
+            m_discard = total;                                                                 \
             return;                                                                            \
         }                                                                                      \
                                                                                                \
