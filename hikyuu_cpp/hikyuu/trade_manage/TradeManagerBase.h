@@ -201,6 +201,8 @@ public:
 
     /**
      * Get all the daily asset records of the given date list
+     * @note The dates must be in ascending order; the internal parallel calculation advances the
+     *       ex-rights ratchet via the last date first, so it is thread-safe by itself
      * @param dates date list
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return daily asset record list
@@ -273,7 +275,9 @@ public:
 
     /**
      * Update the current positions and trades according to the weight (adjustment) information
-     * @note It must be called in chronological order
+     * @note It must be called in chronological order; not thread-safe, it mutates the internal
+     *       state (positions, cash and the trade list), concurrent access to the same instance
+     *       must be serialized externally
      * @param datetime the current moment
      */
     virtual void updateWithWeight(const Datetime& datetime) {
