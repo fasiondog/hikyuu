@@ -7,8 +7,6 @@
  *      Author: fasiondog
  */
 
-#include "../crt/SLICE.h"
-#include "../crt/SMA.h"
 #include "../crt/CVAL.h"
 #include "ISma.h"
 
@@ -63,11 +61,16 @@ void ISma::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 void ISma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, double m) {
     HKU_IF_RETURN(n < 1, void());
-    Indicator slice = SLICE(ind, 0, curPos + 1);
-    Indicator sma = SMA(slice, n, m);
-    if (sma.size() > 0) {
-        _set(sma[sma.size() - 1], curPos);
+    // Intentional: replicate the static SMA recursion on the prefix [0, curPos] with raw scalars,
+    // bitwise identical to SMA(SLICE(ind, 0, curPos + 1)) but without per-bar allocations.
+    auto const* src = ind.data();
+    double dn = n;
+    double p = dn - m;
+    price_t prev = src[ind.discard()];
+    for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
+        prev = (m * src[i] + p * prev) / dn;
     }
+    _set(prev, curPos);
 }
 
 void ISma::_dyn_calculate(const Indicator& ind) {

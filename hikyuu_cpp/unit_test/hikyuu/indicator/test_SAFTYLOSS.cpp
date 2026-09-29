@@ -11,6 +11,8 @@
 #include <hikyuu/indicator/crt/SAFTYLOSS.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/SLICE.h>
 
 using namespace hku;
 
@@ -148,6 +150,46 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
     }
     for (size_t i = result.discard(); i < result.size(); i++) {
         CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
+    }
+
+    /** @arg The dynamic n1/n2/p vary per bar: value at bar i must equal SAFTYLOSS of the prefix,
+     *  including the leading Null region before n1 + n2 - 2 */
+    PriceList raw;
+    for (int i = 0; i < 16; ++i) {
+        raw.push_back(10.0 + i * i * 0.37);
+    }
+    Indicator src = PRICELIST(raw);
+    PriceList v1, v2, v3;
+    for (int i = 0; i < 16; ++i) {
+        v1.push_back(i < 6 ? 2.0 : 4.0);
+        v2.push_back(i % 2 == 0 ? 2.0 : 3.0);
+        v3.push_back(i < 8 ? 1.0 : 2.0);
+    }
+    result = SAFTYLOSS(src, PRICELIST(v1), PRICELIST(v2), PRICELIST(v3));
+    CHECK_EQ(result.size(), src.size());
+    for (size_t i = 0; i < src.size(); ++i) {
+        Indicator expect_prefix = SAFTYLOSS(SLICE(src, 0, i + 1), int(v1[i]), int(v2[i]), v3[i]);
+        if (std::isnan(expect_prefix[expect_prefix.size() - 1])) {
+            CHECK_UNARY(std::isnan(result[i]));
+        } else {
+            CHECK_EQ(expect_prefix[expect_prefix.size() - 1], doctest::Approx(result[i]));
+        }
+    }
+
+    /** @arg The dynamic n1 below 2 or n2 below 2 yield Null at those bars */
+    PriceList bad1, bad2;
+    for (int i = 0; i < 16; ++i) {
+        bad1.push_back(i < 3 ? 1.0 : 3.0);
+        bad2.push_back(i == 4 ? 1.0 : 2.0);
+    }
+    result = SAFTYLOSS(src, PRICELIST(bad1), PRICELIST(bad2), CVAL(src, 2.0));
+    for (size_t i = 0; i < 3; ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    CHECK_UNARY(std::isnan(result[4]));
+    for (size_t i = 5; i < src.size(); ++i) {
+        Indicator expect_prefix = SAFTYLOSS(SLICE(src, 0, i + 1), 3, 2, 2.0);
+        CHECK_EQ(expect_prefix[expect_prefix.size() - 1], doctest::Approx(result[i]));
     }
 }
 

@@ -6,9 +6,7 @@
  */
 
 #include <cmath>
-#include "../crt/AMA.h"
 #include "../crt/CVAL.h"
-#include "../crt/SLICE.h"
 #include "IAma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -151,13 +149,43 @@ void IAma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_
         slow_n = 0;
     }
 
-    Indicator slice = SLICE(ind, 0, curPos + 1);
-    Indicator ama = AMA(slice, n, fast_n, slow_n);
-    if (ama.size() > 0) {
-        size_t index = ama.size() - 1;
-        _set(ama.get(index, 0), curPos, 0);
-        _set(ama.get(index, 1), curPos, 1);
+    // Intentional: replicate the static AMA two-phase recursion on the prefix [0, curPos] with raw
+    // scalars, bitwise identical to AMA(SLICE(ind, 0, curPos + 1)) but without per-bar allocations.
+    auto const* src = ind.data();
+    size_t total = curPos + 1;
+
+    price_t fastest = 2.0 / (fast_n + 1);
+    price_t slowest = 2.0 / (slow_n + 1);
+    price_t delta = fastest - slowest;
+
+    price_t prevol = 0.0, vol = 0.0, er = 1.0;
+    price_t ama = src[ind.discard()];
+    size_t start = ind.discard();
+    size_t first_end = start + n + 1 >= total ? total : start + n + 1;
+    for (size_t i = start + 1; i < first_end; ++i) {
+        vol += std::fabs(src[i] - src[i - 1]);
+        er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
+        if (er > 1.0)
+            er = 1.0;
+        price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
+        ama += c * (src[i] - ama);
     }
+
+    prevol = vol;
+    for (size_t i = first_end; i < total; ++i) {
+        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i + 1 - n] - src[i - n]);
+        er = (vol == 0.0) ? 1.0 : (src[i] - src[i - n]) / vol;
+        if (er > 1.0)
+            er = 1.0;
+        if (er < -1.0)
+            er = -1.0;
+        price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
+        ama += c * (src[i] - ama);
+        prevol = vol;
+    }
+
+    _set(ama, curPos, 0);
+    _set(er, curPos, 1);
 }
 
 void IAma::_dyn_calculate(const Indicator& ind) {

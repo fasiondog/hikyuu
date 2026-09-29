@@ -12,6 +12,7 @@
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/SLICE.h>
 
 using namespace hku;
 
@@ -118,6 +119,44 @@ TEST_CASE("test_AMA_dyn") {
     for (size_t i = result.discard(); i < result.size(); i++) {
         CHECK_EQ(expect.get(i, 0), doctest::Approx(result.get(i, 0)));
         CHECK_EQ(expect.get(i, 1), doctest::Approx(result.get(i, 1)));
+    }
+
+    /** @arg The dynamic n varies per bar: ama/er at bar i must equal AMA of the [0, i] prefix */
+    PriceList raw;
+    for (int i = 0; i < 16; ++i) {
+        raw.push_back(10.0 + i * i * 0.37);
+    }
+    Indicator src = PRICELIST(raw);
+    PriceList n_values, fast_values, slow_values;
+    for (int i = 0; i < 16; ++i) {
+        n_values.push_back(i < 5 ? 2.0 : (i < 10 ? 6.0 : 3.0));
+        fast_values.push_back(i % 2 == 0 ? 2.0 : 3.0);
+        slow_values.push_back(i < 8 ? 5.0 : 10.0);
+    }
+    result = AMA(src, IndParam(PRICELIST(n_values)), IndParam(PRICELIST(fast_values)),
+                 IndParam(PRICELIST(slow_values)));
+    CHECK_EQ(result.size(), src.size());
+    CHECK_EQ(result.getResultNumber(), 2);
+    for (size_t i = 0; i < src.size(); ++i) {
+        Indicator expect_prefix =
+          AMA(SLICE(src, 0, i + 1), int(n_values[i]), int(fast_values[i]), int(slow_values[i]));
+        CHECK_EQ(expect_prefix.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect_prefix.get(i, 1), doctest::Approx(result.get(i, 1)));
+    }
+
+    /** @arg The invalid dynamic params are clamped (n<1 -> 1, fast_n<0 -> 0, slow_n<0 -> 0) */
+    PriceList bad_n, bad_fast, bad_slow;
+    for (int i = 0; i < 16; ++i) {
+        bad_n.push_back(i < 4 ? 0.0 : 2.0);
+        bad_fast.push_back(-3.0);
+        bad_slow.push_back(i < 4 ? -1.0 : 4.0);
+    }
+    result = AMA(src, IndParam(PRICELIST(bad_n)), IndParam(PRICELIST(bad_fast)),
+                 IndParam(PRICELIST(bad_slow)));
+    for (size_t i = 0; i < src.size(); ++i) {
+        Indicator expect_prefix = AMA(SLICE(src, 0, i + 1), i < 4 ? 1 : 2, 0, i < 4 ? 0 : 4);
+        CHECK_EQ(expect_prefix.get(i, 0), doctest::Approx(result.get(i, 0)));
+        CHECK_EQ(expect_prefix.get(i, 1), doctest::Approx(result.get(i, 1)));
     }
 }
 

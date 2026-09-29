@@ -12,6 +12,7 @@
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/SLICE.h>
 #include <hikyuu/indicator/crt/MA.h>
 
 using namespace hku;
@@ -105,6 +106,26 @@ TEST_CASE("test_EMA_dyn") {
     for (size_t i = expect.discard(); i < expect.size(); i++) {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
+
+    /** @arg The dynamic n varies per bar: value at bar i must equal EMA of the [0, i] prefix */
+    PriceList raw;
+    for (int i = 0; i < 12; ++i) {
+        raw.push_back(10.0 + i * i * 0.37);
+    }
+    Indicator src = PRICELIST(raw);
+    PriceList n_values;
+    for (int i = 0; i < 12; ++i) {
+        n_values.push_back(i % 3 == 0 ? 2.0 : (i % 3 == 1 ? 5.0 : 9.0));
+    }
+    result = EMA(src, IndParam(PRICELIST(n_values)));
+    CHECK_EQ(result.size(), src.size());
+    for (size_t i = 0; i < src.size(); ++i) {
+        Indicator expect_prefix = EMA(SLICE(src, 0, i + 1), int(n_values[i]));
+        CHECK_EQ(expect_prefix[expect_prefix.size() - 1], doctest::Approx(result[i]));
+    }
+
+    /** @arg The first valid bar is the seed value itself */
+    CHECK_EQ(result[0], doctest::Approx(raw[0]));
 }
 
 //-----------------------------------------------------------------------------
