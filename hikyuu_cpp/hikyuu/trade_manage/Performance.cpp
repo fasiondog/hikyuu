@@ -304,7 +304,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     m_result["Current Total Assets"] = funds.total_assets();
     price_t total_money = funds.base_cash + funds.base_asset;
 
-    const TradeRecordList& trade_list = tm->getTradeList();
+    const TradeRecordList& trade_list = tm->getRefTradeList();
     TradeRecordList::const_iterator trade_iter = trade_list.begin();
     for (; trade_iter != trade_list.end(); ++trade_iter) {
         if (trade_iter->business == BUSINESS_BONUS) {

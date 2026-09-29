@@ -1626,7 +1626,7 @@ json System::lastSuggestion() const {
 
     json suggestion;
     if (tm_lastdatetime == kdata_lastdatetime) {
-        auto tr_list = m_tm->getTradeList();
+        const TradeRecordList& tr_list = m_tm->getRefTradeList();
         json on_last_close = json::array();
         for (const auto& record : tr_list) {
             if (m_stock == record.stock && record.datetime == kdata_lastdatetime) {

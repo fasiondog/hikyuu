@@ -932,6 +932,31 @@ TEST_CASE("test_getTradeList") {
                                      cost, 0, 91710, PART_INVALID));
 }
 
+/** @par Test point: getRefTradeList returns the same content as getTradeList without copying */
+TEST_CASE("test_getRefTradeList") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+
+    /** @arg The reference content equals the copied list */
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+
+    const TradeRecordList& ref_list = tm->getRefTradeList();
+    TradeRecordList copy_list = tm->getTradeList();
+    CHECK_EQ(ref_list.size(), copy_list.size());
+    for (size_t i = 0; i < copy_list.size(); ++i) {
+        CHECK_EQ(ref_list[i], copy_list[i]);
+    }
+
+    /** @arg The reference stays valid and observes later trades (no stale snapshot) */
+    size_t prev_size = ref_list.size();
+    tm->buy(Datetime(199408010000L), stk, 9.0, 100);
+    CHECK_GT(ref_list.size(), prev_size);
+    CHECK_EQ(ref_list.back(), tm->getTradeList().back());
+}
+
 /** @par Test point: updateWithWeight must not double count a dividend in a record's cash snapshot
  *  (issue #511). sz000001 on 1993-05-24 pays a 3.0 dividend plus gift/increasement shares. After
  *  buying 100 shares on 05-20 the cash is 94430; the 05-25 buy triggers the update (bonus = 30), so

@@ -143,6 +143,11 @@ public:
         return m_trade_list;
     }
 
+    /** Get the reference of all the trade records, only for read-only access (no copy) */
+    virtual const TradeRecordList& getRefTradeList() const override {
+        return m_trade_list;
+    }
+
     /**
      * Get the trade records within the given date range [start, end)
      * @param start start date

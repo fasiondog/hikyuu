@@ -404,6 +404,18 @@ public:
     }
 
     /**
+     * Get the reference of all the trade records, avoiding copying the whole list for read-only
+     * access. The returned reference is only valid before the next modification of the
+     * TradeManager. The default implementation returns an empty list; subclasses holding a
+     * persistent trade list should override it.
+     */
+    virtual const TradeRecordList& getRefTradeList() const {
+        HKU_WARN("The subclass does not implement this method");
+        static const TradeRecordList g_empty_trade_list;
+        return g_empty_trade_list;
+    }
+
+    /**
      * Get the trade records within the given date range [start, end)
      * @param start start date
      * @param end end date
