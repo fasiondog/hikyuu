@@ -1365,7 +1365,7 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
         if (body != nullptr && body_len > 0) {
 #if HKU_ENABLE_HTTP_CLIENT_ZIP
             req.set(http::field::content_type, content_type);
-            auto content_encoding = req["Content-Type"];
+            auto content_encoding = req["Content-Encoding"];
             if (content_encoding == "gzip") {
                 gzip::Compressor comp(Z_DEFAULT_COMPRESSION);
                 std::string output;
