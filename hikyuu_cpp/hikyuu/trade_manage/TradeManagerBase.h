@@ -207,7 +207,8 @@ public:
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return daily asset record list
      */
-    FundsList getFundsList(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
+    virtual FundsList getFundsList(const DatetimeList& dates,
+                                   const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the net value curve of the assets, including the borrowed assets

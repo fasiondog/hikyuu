@@ -361,6 +361,19 @@ public:
                                  KQuery::KType ktype = KQuery::DAY) override;
 
     /**
+     * Get all the daily asset records of the given date list
+     * @note The dates are processed in ascending order internally and the output keeps the input
+     *       order; the dates taking the current-state branch are calculated serially first (they
+     *       may advance the ex-rights data), then the historical dates are replayed from the
+     *       trade list in one pass, O(trades + dates x positions)
+     * @param dates date list
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return daily asset record list
+     */
+    virtual FundsList getFundsList(const DatetimeList& dates,
+                                   const KQuery::KType& ktype = KQuery::DAY) override;
+
+    /**
      * Add a trade record directly
      * @note If an account initialization record is added, all the existing trade and position
      *       records are cleared

@@ -8,12 +8,14 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+#include <numeric>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include "TradeManager.h"
 #include "../lang.h"
 #include "../trade_sys/system/SystemPart.h"
 #include "../KData.h"
+#include "../utilities/thread/algorithm.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TradeManager)
@@ -1508,8 +1510,8 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
         }
 
         price_t price = short_stock_iter->second.stock.getMarketValue(datetime, ktype);
-        short_market_value =
-          roundEx(short_market_value + price * number * stock_iter->second.stock.unit(), precision);
+        short_market_value = roundEx(
+          short_market_value + price * number * short_stock_iter->second.stock.unit(), precision);
     }
 
     funds.cash = cash;
@@ -1518,6 +1520,338 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
     funds.base_cash = checkin_cash - checkout_cash;
     funds.base_asset = checkin_stock - checkout_stock;
     return funds;
+}
+
+FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KType& ktype) {
+    size_t total = dates.size();
+    FundsList result(total);
+    HKU_IF_RETURN(total == 0, result);
+
+    // Without trade records, the replay below has nothing to do; delegate to the generic
+    // per-date implementation (this also bypasses the Null lastDatetime comparisons)
+    HKU_IF_RETURN(m_trade_list.empty(), TradeManagerBase::getFundsList(dates, ktype));
+
+    // Process the dates in ascending order while keeping the input order in the result. The
+    // maximum date is calculated first (it may advance the ex-rights data, i.e. state mutation),
+    // exactly the same guarantee as the generic version pre-computing dates.back(); the branch
+    // decisions of the remaining dates then use the updated lastDatetime(), and the replay
+    // afterwards sees the final trade list.
+    size_t max_pos = 0;
+    for (size_t i = 1; i < total; ++i) {
+        if (dates[max_pos] == Null<Datetime>() ||
+            (dates[i] != Null<Datetime>() && dates[max_pos] < dates[i])) {
+            max_pos = i;
+        }
+    }
+    if (dates[max_pos] == Null<Datetime>()) {
+        // All the dates are Null, only the current-state branch is hit
+        for (size_t i = 0; i < total; ++i) {
+            result[i] = getFunds(dates[i], ktype);
+        }
+        return result;
+    }
+    result[max_pos] = getFunds(dates[max_pos], ktype);
+    Datetime last_dt = lastDatetime();
+
+    std::vector<size_t> sorted_index(total);
+    std::iota(sorted_index.begin(), sorted_index.end(), 0);
+    std::stable_sort(sorted_index.begin(), sorted_index.end(),
+                     [&dates](size_t a, size_t b) { return dates[a] < dates[b]; });
+
+    std::vector<size_t> replay_pos;  // positions of the dates taking the replay branch
+    for (size_t pos : sorted_index) {
+        if (pos == max_pos) {
+            continue;
+        }
+
+        const Datetime& d = dates[pos];
+        if (d == Null<Datetime>() || d == last_dt) {
+            result[pos] = getFunds(d, ktype);
+            continue;
+        }
+
+        Datetime d_end(d.year(), d.month(), d.day(), 23, 59);
+        if (d_end > last_dt) {
+            result[pos] = getFunds(d, ktype);
+        } else {
+            replay_pos.push_back(pos);
+        }
+    }
+
+    HKU_IF_RETURN(replay_pos.empty(), result);
+
+    // Replay the trade list once and snapshot the holdings at each replay date. This is exactly
+    // what the replay branch of getFunds does per date, but the whole list is traversed only
+    // once: O(trades + dates x positions) instead of O(dates x trades).
+    struct Holding {
+        Stock stock;
+        double number;
+    };
+    struct DateSnapshot {
+        price_t cash;
+        price_t checkin_cash;
+        price_t checkout_cash;
+        price_t checkin_stock;
+        price_t checkout_stock;
+        price_t borrow_cash;
+        price_t borrow_asset;
+        std::vector<Holding> holdings;        // ascending by the stock id
+        std::vector<Holding> short_holdings;  // ascending by the stock id
+    };
+
+    size_t num_replay = replay_pos.size();
+    std::vector<DateSnapshot> snapshots(num_replay);
+
+    // Same as the local accumulator struct of the getFunds replay branch
+    struct StockNumber {
+        StockNumber() : number(0) {}
+        StockNumber(const Stock& stock, double number) : stock(stock), number(number) {}
+
+        Stock stock;
+        double number;
+    };
+
+    int precision = getParam<int>("precision");
+    price_t cash = m_init_cash;
+    price_t checkin_cash = 0.0, checkout_cash = 0.0;
+    price_t checkin_stock = 0.0, checkout_stock = 0.0;
+    price_t borrow_cash = 0.0, borrow_asset = 0.0;
+    std::map<uint64_t, StockNumber> stock_map;
+    std::map<uint64_t, StockNumber> short_stock_map;
+    std::map<uint64_t, BorrowRecord> bor_stock_map;
+    auto trade_iter = m_trade_list.begin();
+
+    for (size_t r = 0; r < num_replay; ++r) {
+        const Datetime& d = dates[replay_pos[r]];
+        Datetime d_end(d.year(), d.month(), d.day(), 23, 59);
+
+        for (; trade_iter != m_trade_list.end() && trade_iter->datetime <= d_end; ++trade_iter) {
+            cash = trade_iter->cash;
+            switch (trade_iter->business) {
+                case BUSINESS_INIT:
+                    checkin_cash += trade_iter->realPrice;
+                    break;
+
+                case BUSINESS_BUY:
+                case BUSINESS_GIFT:
+                case BUSINESS_SUOGU: {
+                    auto iter = stock_map.find(trade_iter->stock.id());
+                    if (iter != stock_map.end()) {
+                        iter->second.number += trade_iter->number;
+                    } else {
+                        stock_map.emplace(trade_iter->stock.id(),
+                                          StockNumber(trade_iter->stock, trade_iter->number));
+                    }
+                    break;
+                }
+
+                case BUSINESS_SELL: {
+                    auto iter = stock_map.find(trade_iter->stock.id());
+                    if (iter != stock_map.end()) {
+                        iter->second.number -= trade_iter->number;
+                    } else {
+                        HKU_WARN("{} {} Sell error in m_trade_list!", d,
+                                 trade_iter->stock.market_code());
+                    }
+                    break;
+                }
+
+                case BUSINESS_SELL_SHORT: {
+                    auto iter = short_stock_map.find(trade_iter->stock.id());
+                    if (iter != short_stock_map.end()) {
+                        iter->second.number += trade_iter->number;
+                    } else {
+                        short_stock_map.emplace(trade_iter->stock.id(),
+                                                StockNumber(trade_iter->stock, trade_iter->number));
+                    }
+                    break;
+                }
+
+                case BUSINESS_BUY_SHORT: {
+                    auto iter = short_stock_map.find(trade_iter->stock.id());
+                    if (iter != short_stock_map.end()) {
+                        iter->second.number -= trade_iter->number;
+                    } else {
+                        HKU_WARN("{} {} BuyShort Error in m_trade_list!", d,
+                                 trade_iter->stock.market_code());
+                    }
+                    break;
+                }
+
+                case BUSINESS_BONUS:
+                    break;
+
+                case BUSINESS_CHECKIN:
+                    checkin_cash += trade_iter->realPrice;
+                    break;
+
+                case BUSINESS_CHECKOUT:
+                    checkout_cash += trade_iter->realPrice;
+                    break;
+
+                case BUSINESS_CHECKIN_STOCK: {
+                    auto iter = stock_map.find(trade_iter->stock.id());
+                    if (iter != stock_map.end()) {
+                        iter->second.number += trade_iter->number;
+                    } else {
+                        stock_map.emplace(trade_iter->stock.id(),
+                                          StockNumber(trade_iter->stock, trade_iter->number));
+                    }
+                    checkin_stock =
+                      roundEx(checkin_stock + trade_iter->realPrice * trade_iter->number *
+                                                trade_iter->stock.unit(),
+                              precision);
+                    break;
+                }
+
+                case BUSINESS_CHECKOUT_STOCK: {
+                    auto iter = stock_map.find(trade_iter->stock.id());
+                    if (iter != stock_map.end()) {
+                        iter->second.number -= trade_iter->number;
+                    } else {
+                        HKU_WARN("{} {} CheckoutStock Error in m_trade_list!", d,
+                                 trade_iter->stock.market_code());
+                    }
+                    checkout_stock =
+                      roundEx(checkout_stock + trade_iter->realPrice * trade_iter->number *
+                                                 trade_iter->stock.unit(),
+                              precision);
+                    break;
+                }
+
+                case BUSINESS_BORROW_CASH:
+                    borrow_cash += trade_iter->realPrice;
+                    break;
+
+                case BUSINESS_RETURN_CASH:
+                    borrow_cash -= trade_iter->realPrice;
+                    break;
+
+                case BUSINESS_BORROW_STOCK: {
+                    borrow_asset =
+                      roundEx(borrow_asset + trade_iter->realPrice * trade_iter->number *
+                                               trade_iter->stock.unit(),
+                              precision);
+                    auto iter = bor_stock_map.find(trade_iter->stock.id());
+                    if (iter == bor_stock_map.end()) {
+                        BorrowRecord bor;
+                        BorrowRecord::Data data(trade_iter->datetime, trade_iter->realPrice,
+                                                trade_iter->number);
+                        bor.record_list.push_back(data);
+                        bor_stock_map.emplace(trade_iter->stock.id(), std::move(bor));
+                    } else {
+                        BorrowRecord::Data data(trade_iter->datetime, trade_iter->realPrice,
+                                                trade_iter->number);
+                        iter->second.record_list.push_back(data);
+                    }
+                    break;
+                }
+
+                case BUSINESS_RETURN_STOCK: {
+                    auto iter = bor_stock_map.find(trade_iter->stock.id());
+                    if (iter == bor_stock_map.end()) {
+                        HKU_WARN("{} {} Error return stock in m_trade_list!", trade_iter->datetime,
+                                 trade_iter->stock.market_code());
+                    } else {
+                        BorrowRecord& bor = iter->second;
+                        double remain_num = trade_iter->number;
+                        do {
+                            auto bor_iter = bor.record_list.begin();
+                            if (remain_num == bor_iter->number) {
+                                borrow_asset -=
+                                  roundEx(bor_iter->price * remain_num * trade_iter->stock.unit(),
+                                          precision);
+                                bor.record_list.pop_front();
+                                break;
+
+                            } else if (remain_num < bor_iter->number) {
+                                borrow_asset -=
+                                  roundEx(bor_iter->price * remain_num * trade_iter->stock.unit(),
+                                          precision);
+                                bor_iter->number -= remain_num;
+                                break;
+
+                            } else {  // remain_num > bor_iter->number
+                                borrow_asset -= roundEx(
+                                  bor_iter->price * bor_iter->number * trade_iter->stock.unit(),
+                                  precision);
+                                remain_num -= bor_iter->number;
+                                bor.record_list.pop_front();
+                            }
+                        } while (!bor.record_list.empty());
+
+                        if (bor.record_list.empty()) {
+                            bor_stock_map.erase(iter);
+                        }
+                    }
+                    break;
+                }
+
+                default:
+                    HKU_WARN("{} {} Unknown business in m_trade_list!", d,
+                             trade_iter->stock.market_code());
+                    break;
+            }
+        }
+
+        // Snapshot the current accumulators; the map iteration order (ascending by the stock id)
+        // is preserved, so the market value accumulation below is identical to the per-date
+        // replay of getFunds
+        DateSnapshot& snap = snapshots[r];
+        snap.cash = cash;
+        snap.checkin_cash = checkin_cash;
+        snap.checkout_cash = checkout_cash;
+        snap.checkin_stock = checkin_stock;
+        snap.checkout_stock = checkout_stock;
+        snap.borrow_cash = borrow_cash;
+        snap.borrow_asset = borrow_asset;
+        for (const auto& kv : stock_map) {
+            snap.holdings.push_back(Holding{kv.second.stock, kv.second.number});
+        }
+        for (const auto& kv : short_stock_map) {
+            snap.short_holdings.push_back(Holding{kv.second.stock, kv.second.number});
+        }
+    }
+
+    // The market value of each date is independent; calculate them in parallel, mirroring the
+    // per-date market value computation of the getFunds replay branch
+    global_parallel_for_index_void(0, num_replay, [&](size_t r) {
+        const DateSnapshot& snap = snapshots[r];
+        const Datetime& d = dates[replay_pos[r]];
+        Datetime d_end(d.year(), d.month(), d.day(), 23, 59);
+
+        FundsRecord funds;
+        price_t market_value = 0.0;
+        for (const auto& holding : snap.holdings) {
+            if (holding.number == 0) {
+                continue;
+            }
+            price_t price = holding.stock.getMarketValue(d_end, ktype);
+            market_value =
+              roundEx(market_value + price * holding.number * holding.stock.unit(), precision);
+        }
+
+        price_t short_market_value = 0.0;
+        for (const auto& holding : snap.short_holdings) {
+            if (holding.number == 0) {
+                continue;
+            }
+            price_t price = holding.stock.getMarketValue(d_end, ktype);
+            short_market_value = roundEx(
+              short_market_value + price * holding.number * holding.stock.unit(), precision);
+        }
+
+        funds.cash = snap.cash;
+        funds.market_value = market_value;
+        funds.short_market_value = short_market_value;
+        funds.base_cash = snap.checkin_cash - snap.checkout_cash;
+        funds.base_asset = snap.checkin_stock - snap.checkout_stock;
+        funds.borrow_cash = snap.borrow_cash;
+        funds.borrow_asset = snap.borrow_asset;
+        result[replay_pos[r]] = funds;
+    });
+
+    return result;
 }
 
 /******************************************************************************

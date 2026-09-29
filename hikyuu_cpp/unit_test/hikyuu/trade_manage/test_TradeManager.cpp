@@ -957,6 +957,45 @@ TEST_CASE("test_getRefTradeList") {
     CHECK_EQ(ref_list.back(), tm->getTradeList().back());
 }
 
+/** @par Test point: getFundsList must match the per-date getFunds exactly (the merge replay uses
+ *  the same accumulators and the same order), including unsorted input, duplicates, the date
+ *  equal to the last trade date, and dates after the last trade date */
+TEST_CASE("test_getFundsList_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199012010000), 100000);
+    tm->buy(Datetime(199101020000L), stk, 60.0, 100);
+    tm->sell(Datetime(199206150000L), stk, 75.0, 50);
+    tm->checkin(Datetime(199301050000), 20000);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+
+    /** @arg Unsorted input mixing every branch: before the first trade, between trades, equal to
+     *  the last trade date, after the last trade date, and a duplicate */
+    DatetimeList dates = {Datetime(199301050000), Datetime(199012150000), Datetime(199407110000),
+                          Datetime(199101050000), Datetime(199501010000), Datetime(199206200000),
+                          Datetime(199101050000)};
+
+    FundsList funds_list = tm->getFundsList(dates);
+    CHECK_EQ(funds_list.size(), dates.size());
+    for (size_t i = 0; i < dates.size(); ++i) {
+        FundsRecord expect = tm->getFunds(dates[i]);
+        const FundsRecord& got = funds_list[i];
+        CHECK_EQ(got.cash, expect.cash);
+        CHECK_EQ(got.market_value, expect.market_value);
+        CHECK_EQ(got.short_market_value, expect.short_market_value);
+        CHECK_EQ(got.base_cash, expect.base_cash);
+        CHECK_EQ(got.base_asset, expect.base_asset);
+        CHECK_EQ(got.borrow_cash, expect.borrow_cash);
+        CHECK_EQ(got.borrow_asset, expect.borrow_asset);
+    }
+
+    /** @arg The input order is preserved */
+    CHECK_EQ(funds_list[0], tm->getFunds(Datetime(199301050000)));
+    CHECK_EQ(funds_list[1], tm->getFunds(Datetime(199012150000)));
+    CHECK_EQ(funds_list[2], tm->getFunds(Datetime(199407110000)));
+}
+
 /** @par Test point: updateWithWeight must not double count a dividend in a record's cash snapshot
  *  (issue #511). sz000001 on 1993-05-24 pays a 3.0 dividend plus gift/increasement shares. After
  *  buying 100 shares on 05-20 the cash is 94430; the 05-25 buy triggers the update (bonus = 30), so
