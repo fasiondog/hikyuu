@@ -6,6 +6,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <set>
 #include "GlobalInitializer.h"
@@ -1215,7 +1216,39 @@ bool Stock::isTransactionTime(Datetime time) {
     return time >= openTime2 && time <= closeTime2 + Seconds(30);
 }
 
+// The market data is not trusted (it may come from a remote server or external input): reject the
+// abnormal bars before they land in the memory cache and are mirrored to the shared memory of all
+// the IPC clients
+static bool isValidRealtimeKRecord(const KRecord& record) {
+    if (record.datetime.isNull()) {
+        return false;
+    }
+
+    if (!std::isfinite(record.openPrice) || record.openPrice <= 0.0 ||
+        !std::isfinite(record.highPrice) || record.highPrice <= 0.0 ||
+        !std::isfinite(record.lowPrice) || record.lowPrice <= 0.0 ||
+        !std::isfinite(record.closePrice) || record.closePrice <= 0.0) {
+        return false;
+    }
+
+    if (record.highPrice < record.lowPrice || record.highPrice < record.openPrice ||
+        record.highPrice < record.closePrice || record.lowPrice > record.openPrice ||
+        record.lowPrice > record.closePrice) {
+        return false;
+    }
+
+    if (!std::isfinite(record.transAmount) || record.transAmount < 0.0 ||
+        !std::isfinite(record.transCount) || record.transCount < 0.0) {
+        return false;
+    }
+
+    return true;
+}
+
 void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
+    HKU_WARN_IF_RETURN(!isValidRealtimeKRecord(record), void(),
+                       "The invalid krecord, skip it! {} {}", market_code(), record);
+
     // The client mode without a local buffer (an ordinary proxy security): it is forwarded to the
     // main process to apply (updating its buffer and mirroring to the shared memory segment, from
     // which all the clients read), keeping the ability of the client to update the market data
