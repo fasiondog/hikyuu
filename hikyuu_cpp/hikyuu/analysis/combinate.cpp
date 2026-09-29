@@ -34,6 +34,9 @@ std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& 
 std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
   const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
+    HKU_CHECK(tm, "tm is null!");
+    HKU_CHECK(sys, "sys is null!");
+
     auto inds = combinateIndicator(buy_inds, n);
     std::vector<SignalPtr> sgs;
     for (const auto& buy_ind : inds) {
@@ -66,6 +69,9 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
 vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
   const Block& blk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
+    HKU_CHECK(tm, "tm is null!");
+    HKU_CHECK(sys, "sys is null!");
+
     SPEND_TIME(combinateIndicatorAnalysisWithBlock);
     auto inds = combinateIndicator(buy_inds, n);
     std::vector<SignalPtr> sgs;

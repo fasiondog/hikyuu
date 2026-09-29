@@ -212,4 +212,39 @@ TEST_CASE("test_combinateIndicatorAnalysis_index_query") {
     }
 }
 
+/**
+ * @par Test points
+ * Null tm/sys must be rejected at the entry with a catchable hku::exception instead of an
+ * uncatchable null-dereference UB. The WithBlock clones happen on the caller thread outside
+ * the per-stock try block, so a null pointer there would crash the whole process.
+ */
+TEST_CASE("test_combinateIndicatorAnalysis_null_tm_sys") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL));
+    Indicator buy = CLOSE() > OPEN();
+    Indicator sell = CLOSE() < 0;
+    auto tm = crtTM();
+    auto sys = SYS_Simple(tm, MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Bool(buy, sell));
+
+    /** @arg tm is null (single stock) */
+    CHECK_THROWS_AS(
+      combinateIndicatorAnalysis(stk, query, TradeManagerPtr(), sys, {buy}, {sell}, 1),
+      hku::exception);
+
+    /** @arg sys is null (single stock) */
+    CHECK_THROWS_AS(combinateIndicatorAnalysis(stk, query, tm, SystemPtr(), {buy}, {sell}, 1),
+                    hku::exception);
+
+    /** @arg tm is null (block) */
+    CHECK_THROWS_AS(
+      combinateIndicatorAnalysisWithBlock(Block(), query, TradeManagerPtr(), sys, {buy}, {sell}, 1),
+      hku::exception);
+
+    /** @arg sys is null (block) */
+    CHECK_THROWS_AS(
+      combinateIndicatorAnalysisWithBlock(Block(), query, tm, SystemPtr(), {buy}, {sell}, 1),
+      hku::exception);
+}
+
 /** @} */
