@@ -42,7 +42,9 @@ void HKU_API getDataFromBufferServer(const std::string& addr, const StockList& s
                 codes.emplace_back(stk.market_code());
             }
         }
-        ipc::forwardPullFromBufferServer(addr, codes, ktype);
+        bool ret = ipc::forwardPullFromBufferServer(addr, codes, ktype);
+        HKU_INFO("Forwarded pull request of {} codes to the main process ({})", codes.size(),
+                 ret ? "success" : "failed");
         return;
     }
     pullFromBufferServerLocal(addr, stklist, ktype);
@@ -87,6 +89,8 @@ void HKU_API pullFromBufferServerLocal(const std::string& addr, const StockList&
 
         const auto& jdata = res["data"];
         // HKU_INFO("{}", to_string(jdata));
+        size_t received_num = 0;
+        size_t updated_num = 0;
         for (auto iter = jdata.cbegin(); iter != jdata.cend(); ++iter) {
             const auto& r = *iter;
             try {
@@ -97,16 +101,20 @@ void HKU_API pullFromBufferServerLocal(const std::string& addr, const StockList&
                 }
 
                 const auto& jklist = r["data"];
+                received_num += jklist.size();
                 for (auto kiter = jklist.cbegin(); kiter != jklist.cend(); ++kiter) {
                     const auto& k = *kiter;
                     KRecord kr(Datetime(k[0].get<string>()), k[1], k[2], k[3], k[4], k[5], k[6]);
                     stk.realtimeUpdate(kr, ktype);
+                    updated_num++;
                 }
 
             } catch (const std::exception& e) {
                 HKU_ERROR("Failed decode json: {}! {}", to_string(r), e.what());
             }
         }
+        HKU_INFO("Pulled {} records from the buffer server ({} updated)", received_num,
+                 updated_num);
 
     } catch (const std::exception& e) {
         HKU_ERROR("Failed get data from buffer server! {}", e.what());
