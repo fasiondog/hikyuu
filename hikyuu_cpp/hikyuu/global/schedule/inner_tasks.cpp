@@ -50,6 +50,15 @@ void initInnerTask() {
 }
 
 void reloadHikyuuTask() {
+    // Concurrency contract (intentional, no barrier needed before reload):
+    // 1. All timer tasks (this one and the strategy run_daily tasks) are serialized on the
+    //    single worker thread of the global scheduler, so no timer task runs concurrently
+    //    with the reload;
+    // 2. The spot agent is stopped first, so no new spot events arrive during the reload;
+    // 3. Concurrent reads from other threads (e.g. a strategy event loop) are safe by
+    //    design: the data layer uses fine-grained locks (per-stock per-ktype kdata buffer
+    //    mutex, stock dict shared_mutex, weight/finance mutexes) and the K-line preload
+    //    always runs in the background with queries served from the driver in real time.
     // Stop the market data receiving first
     auto* agent = getGlobalSpotAgent();
     bool agent_running = agent->isRunning();
