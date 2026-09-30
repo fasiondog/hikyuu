@@ -9,8 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_MultiFactor.h>
-#include <hikyuu/trade_sys/selector/imp/MultiFactorSelector.h>
-#include <hikyuu/trade_sys/selector/imp/MultiFactorSelector2.h>
+#include <hikyuu/trade_sys/selector/crt/SE_MultiFactor2.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
@@ -194,12 +193,12 @@ TEST_CASE("test_SE_MultiFactor_custom_mf") {
 /** @par Test points */
 TEST_CASE("test_SE_MultiFactor_clone_without_mf") {
     /** @arg Cloning before the MF is set does not crash and keeps the empty mf (ISS-089) */
-    auto se1 = make_shared<MultiFactorSelector>();
+    auto se1 = SE_MultiFactor();
     SelectorPtr se2;
     CHECK_NOTHROW(se2 = se1->clone());
     CHECK_UNARY(se2);
 
-    auto se3 = make_shared<MultiFactorSelector2>();
+    auto se3 = SE_MultiFactor2();
     SelectorPtr se4;
     CHECK_NOTHROW(se4 = se3->clone());
     CHECK_UNARY(se4);

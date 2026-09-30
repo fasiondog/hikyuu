@@ -243,6 +243,10 @@ void MultiFactorSelector::_calculate() {
     }
 }
 
+SelectorPtr HKU_API SE_MultiFactor() {
+    return make_shared<MultiFactorSelector>();
+}
+
 SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn) {
     return make_shared<MultiFactorSelector>(mf, topn);
 }

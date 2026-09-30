@@ -5,6 +5,10 @@
  *      Author: hikyuu
  */
 
+#include "hikyuu/utilities/osdef.h"
+
+#if !HKU_OS_WINDOWS
+
 #include <algorithm>
 #include <filesystem>
 #include <string>
@@ -174,3 +178,5 @@ TEST_CASE("test_SQLiteBlockInfoDriver_save_overwrite") {
 /**
  * @}
  */
+
+#endif /* !HKU_OS_WINDOWS */

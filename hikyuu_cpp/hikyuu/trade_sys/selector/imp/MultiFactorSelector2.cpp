@@ -136,6 +136,10 @@ void MultiFactorSelector2::_calculate() {
     }
 }
 
+SelectorPtr HKU_API SE_MultiFactor2() {
+    return make_shared<MultiFactorSelector2>();
+}
+
 SelectorPtr HKU_API SE_MultiFactor2(const MFPtr& mf, const ScoresFilterPtr& filter) {
     auto p = make_shared<MultiFactorSelector2>(mf);
     p->setScoresFilter(filter);

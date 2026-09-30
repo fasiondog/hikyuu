@@ -5,6 +5,10 @@
  *      Author: hikyuu
  */
 
+#include "hikyuu/utilities/osdef.h"
+
+#if !HKU_OS_WINDOWS
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -286,3 +290,5 @@ TEST_CASE("test_SQLiteKDataDriver_minute_session_boundaries") {
 /**
  * @}
  */
+
+#endif /* !HKU_OS_WINDOWS */
