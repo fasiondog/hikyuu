@@ -34,7 +34,7 @@ shm 数据服务（单机共享内存）
 
     服务地址为 IPC 运行时目录下的固定名，与 ``datadir`` 解耦；客户端与服务端须使用同一
     ``datadir`` 以保证数据一致。IPC 运行时目录可通过 ``shm_ipc_dir`` 配置或环境变量
-    ``HIKYUU_IPC_DIR`` 指定，默认 ``~/.hikyuu/ipc``（见 `配置项`_）。
+    ``HIKYUU_IPC_DIR`` 指定，默认 ``~/.hikyuu/ipc``\（见 `配置项`_）。
 
     本特性是"单机内多进程共享一份数据"，与跨机器的 **行情采集数据服务** （``vip/dataserver``、
     ``get_data_from_buffer_server``）以及行情采集地址（``quotation_server``）是相互独立的概念，
@@ -187,10 +187,10 @@ docker 容器共享
 跨容器共享服务时，客户端容器需能访问两类资源：**IPC 运行目录中的 socket 文件** 与 **/dev/shm 中的
 共享内存段**。配置要点：
 
-- 服务端与客户端使用 **同一 datadir**（连同数据目录一并挂载进容器），且插件版本一致；
-- 在 ``hikyuu.ini`` 中将 ``shm_ipc_dir`` 配置为 **挂载范围内的绝对路径**（不依赖容器内 ``HOME``）；
+- 服务端与客户端使用 **同一 datadir**\（连同数据目录一并挂载进容器），且插件版本一致；
+- 在 ``hikyuu.ini`` 中将 ``shm_ipc_dir`` 配置为 **挂载范围内的绝对路径**\（不依赖容器内 ``HOME``）；
 - 客户端容器以 ``--ipc=host`` 运行（或 ``--ipc=container:<服务端容器名>``），与服务端共享 /dev/shm；
-- 若服务端运行于容器内且未使用 ``--ipc=host``，须调大 ``--shm-size``（默认仅 64MB，K 线段可达
+- 若服务端运行于容器内且未使用 ``--ipc=host``，须调大 ``--shm-size``\（默认仅 64MB，K 线段可达
   GB 级）；
 - Windows 宿主下的容器均为 Linux 容器（Docker Desktop / WSL2），而 Windows 原生进程使用命名管道
   与 Windows 共享内存，无法与 Linux 容器互通，故服务端也应放入容器（或 WSL）内运行。
@@ -229,8 +229,8 @@ docker 容器共享
 
 **Windows 宿主示例（Docker Desktop / WSL2，服务端与客户端均为 Linux 容器）**
 
-宿主目录 ``D:/hikyuu`` 下放置 ``.hikyuu``（配置）与 ``stock``（数据），``hikyuu.ini`` 中配置
-``shm_ipc_dir = /home/user/.hikyuu/ipc``（容器内路径，两个容器挂载点一致）：
+宿主目录 ``D:/hikyuu`` 下放置 ``.hikyuu``\（配置）与 ``stock``\（数据），``hikyuu.ini`` 中配置
+``shm_ipc_dir = /home/user/.hikyuu/ipc``\（容器内路径，两个容器挂载点一致）：
 
 .. code-block:: powershell
 
@@ -349,7 +349,7 @@ docker 容器共享
 
 **IPC 运行目录下会残留哪些文件？**
 
-IPC 运行目录默认为 ``~/.hikyuu/ipc``（可经 ``[hikyuu] shm_ipc_dir`` 配置或环境变量
+IPC 运行目录默认为 ``~/.hikyuu/ipc``\（可经 ``[hikyuu] shm_ipc_dir`` 配置或环境变量
 ``HIKYUU_IPC_DIR`` 覆盖）。socket / 命名管道文件名形如 ``hikyuu_shm_server.ipc``
 （Windows 下为同名命名管道），另有配套的 ``.lock`` 文件；服务端还会用 ``hikyuu_ks.last`` /
 ``hikyuu_bi.last`` 记录当前共享内存段名，用于清理上一个异常退出的服务端残留段，并以
