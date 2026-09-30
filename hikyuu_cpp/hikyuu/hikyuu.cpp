@@ -66,6 +66,12 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
     hkuParam.set<bool>("load_history_finance",
                        config.getBool("hikyuu", "load_history_finance", "True"));
 
+    // shm data service (connect to an existing service as the client; disabled by default, the
+    // process runs in the standalone mode when it is not enabled)
+    hkuParam.set<bool>("use_shm_server", config.getBool("hikyuu", "use_shm_server", "False"));
+    hkuParam.set<int64_t>("shm_server_wait_timeout",
+                          config.getInt("hikyuu", "shm_server_wait_timeout", "600"));
+
     // Plugin directory
     hkuParam.set<string>("plugindir", config.get("hikyuu", "plugindir",
                                                  fmt::format("{}/.hikyuu/plugin", getUserDir())));
