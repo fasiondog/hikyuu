@@ -135,6 +135,44 @@ TEST_CASE("test_MF_Weight") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_MF_Weight_clone") {
+    StockManager& sm = StockManager::instance();
+    int ndays = 3;
+    IndicatorList src_inds = {MA(ROCR(CLOSE(), ndays)), AMA(ROCR(CLOSE(), ndays)),
+                              EMA(ROCR(CLOSE(), ndays))};
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    KQuery query = KQuery(-20);
+    Stock ref_stk = sm["sh000001"];
+    PriceList weights{0.2, 0.3, 0.5};
+
+    auto mf1 = MF_Weight(src_inds, weights, stks, query, ref_stk, ndays);
+    mf1->setParam<bool>("save_all_factors", true);
+    auto ic1 = mf1->getIC();
+    auto scores1 = mf1->getScores(mf1->getDatetimeList().back());
+
+    /** @arg The cloned WeightMultiFactor carries the private weights, so the calculated results
+     * are the same as the original (ISS-023: the lost m_weights made the clone read out of
+     * bounds) */
+    auto mf2 = mf1->clone();
+    CHECK_EQ(mf2->name(), mf1->name());
+    auto ic2 = mf2->getIC();
+    CHECK_EQ(ic1.size(), ic2.size());
+    CHECK_EQ(ic1.discard(), ic2.discard());
+    CHECK_UNARY(ic1.equal(ic2));
+
+    auto scores2 = mf2->getScores(mf1->getDatetimeList().back());
+    REQUIRE_EQ(scores1.size(), scores2.size());
+    for (size_t i = 0, len = scores1.size(); i < len; i++) {
+        CHECK_EQ(scores1[i].stock, scores2[i].stock);
+        CHECK_EQ(scores1[i].value, doctest::Approx(scores2[i].value).epsilon(0.0001));
+    }
+
+    for (const auto& stk : stks) {
+        CHECK_UNARY(mf1->getFactor(stk).equal(mf2->getFactor(stk)));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

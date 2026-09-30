@@ -3,13 +3,15 @@
 shm Data Server (single-machine shared memory)
 ==============================================
 
-When multiple hikyuu processes run on the same machine at the same time (such as Jupyter research, strategy backtesting, data collection), and they use the **same data directory** (the ``datadir`` of the ``[hikyuu]`` section in ``hikyuu.ini``), one of the processes can act as the **server**, publishing the loaded data as the shared memory snapshots, and the other processes, as **clients**, read them with zero copy, avoiding each process repeatedly preloading and repeatedly occupying the memory.
+Complete the configuration before use: the client processes need to enable ``use_shm_server`` in the ``[hikyuu]`` section of ``hikyuu.ini``; see the `Configuration Items`_ section below for the details.
 
-Effect: only the server bears the time-consuming preloading and all the memory overhead; the startup time and the memory usage of the clients drop greatly, and the data seen by each process remains consistent.
+When running hikyuu on the same machine, you can execute ``shmserver`` (or ``shmserver.py`` under the ``gui`` directory of the installation) to start a resident **shared memory data service (shm server)** process separately, which completes the time-consuming data preloading and publishes the **K-line hot data and the basic information** as the two kinds of the shared memory snapshots; the other processes (such as Jupyter research, strategy backtesting, and data collection), as the **clients**, join via IPC and read the snapshots with zero copy, avoiding each process repeatedly preloading and repeatedly occupying the memory. The shared memory K-line cache / the zero-copy K-line view also takes effect in the single-process scenario.
+
+Effect: only the server bears the time-consuming K-line preloading and the major memory overhead; the startup time and the memory usage of the clients drop greatly, and the data seen by each process remains consistent.
 
 .. important::
 
-    Different from the old version's "automatically negotiating the master and the slave at the process startup", the server is **not created automatically**: you must **explicitly call** :func:`start_shm_server` in a process to start the service. Any hikyuu process (including the caller itself) will **never** automatically become the server because it cannot connect to the service — when the connection fails, it only degrades to the standalone mode, loading all the data by itself (the behavior is exactly the same as when this feature is not enabled).
+    The server is **not created automatically**: you must **explicitly call** :func:`start_shm_server` in a process to start the service. Any hikyuu process (including the caller itself) will **never** automatically become the server because it cannot connect to the service — when the connection fails, it only degrades to the standalone mode, loading all the data by itself (the behavior is exactly the same as when this feature is not enabled).
 
     This feature (**both the server and the client sides**) is entirely provided by the standalone VIP plugin ``shmserver`` and requires a valid VIP license:
 
@@ -19,7 +21,7 @@ Effect: only the server bears the time-consuming preloading and all the memory o
 
 .. note::
 
-    The negotiation is at the granularity of ``datadir`` (the service address is derived from the hash of ``datadir``); the processes using different ``datadir`` are independent of each other and do not interfere with each other.
+    The service address is a fixed name under the IPC runtime directory, decoupled from ``datadir``; the client and the server must use the same ``datadir`` to keep the data consistent. The IPC runtime directory can be specified by the ``shm_ipc_dir`` configuration or the environment variable ``HIKYUU_IPC_DIR``, defaulting to ``~/.hikyuu/ipc`` (see `Configuration Items`_).
 
     This feature is "sharing one copy of the data among multiple processes within a single machine", which is an independent concept from the cross-machine **market data collection service** (``vip/dataserver``, ``get_data_from_buffer_server``) and the market data collection address (``quotation_server``); do not confuse them.
 
@@ -33,7 +35,7 @@ The server is controlled to start and stop within its own process with the Pytho
     Start the shm data server within the current process, for the other hikyuu processes to read with zero copy as the clients. It must be called after the hikyuu
     initialization (``import hikyuu`` completes the initialization by default); calling it before the initialization will return ``False`` because the data is not ready.
 
-    :param str datadir: the data directory; when empty, the current StockManager data directory is used
+    :param str datadir: the data directory; when empty, the current StockManager data directory is used (retained for compatibility; the service address is decoupled from datadir and constructed from a fixed name under the IPC runtime directory)
     :param bool publish_shm: whether to publish the two kinds of the shared memory snapshots (the K-line hot data + the basic information)
     :param bool recv_spot: whether this process receives the real-time market data (internally subscribing to ``quotation_server`` and driving the real-time updates)
     :return: return ``True`` when started successfully; return ``False`` when this process is already in the client mode, the plugin is missing, or the license is invalid
@@ -70,7 +72,7 @@ Typical usage: start the service in a resident server process, and the other res
     The server process only acts as the snapshot publisher and does not need to join the other shm services. ``use_shm_server`` is disabled by default; the server
     process completes the initialization and the publishing in the standalone mode without any extra handling; only when ``use_shm_server=True`` is explicitly set in the configuration file,
     the server process needs to skip the client probing with ``load_hikyuu(use_shm_server=False)`` — otherwise this process
-    will first act as a client to connect to the existing service, and after retrying for about 10 seconds, print
+    will first act as a client to connect to the existing service, and after waiting up to ``shm_server_wait_timeout`` (600 seconds by default) until the timeout, print
     the ``Failed connect to hikyuu shm server, fallback to standalone mode!`` warning and then degrade to the standalone mode
     (the data can still be loaded and published normally, with only an extra startup wait and a harmless warning). The command line tool ``shmserver`` has explicitly
     disabled the client probing.
@@ -115,7 +117,7 @@ How It Works
 Configuration Items
 -------------------
 
-They are all in the ``[hikyuu]`` section of ``hikyuu.ini``, and take effect on the **client** (the server is controlled by the parameters of :func:`start_shm_server`).
+They are all in the ``[hikyuu]`` section of ``hikyuu.ini``. ``use_shm_server`` / ``shm_server_wait_timeout`` take effect on the **client** (the server is controlled by the parameters of :func:`start_shm_server`); ``shm_ipc_dir`` takes effect on both the server and the clients.
 ``use_shm_server`` defaults to ``False``; it only needs to be explicitly enabled when joining an existing service:
 
 ::
@@ -127,6 +129,9 @@ They are all in the ``[hikyuu]`` section of ``hikyuu.ini``, and take effect on t
     use_shm_server = True
     ; the total duration budget of the client negotiation (seconds, including the connection probing and the readiness waiting); 0 means waiting infinitely, degrading to the standalone mode after the timeout
     shm_server_wait_timeout = 600
+    ; the IPC runtime directory of the shm data service (where the socket / lock / segment record files live), written to the user home directory when the configuration is generated
+    ; change it to the absolute path mounted at the same location between the host and the docker containers in the sharing scenarios
+    shm_ipc_dir = /home/user/.hikyuu/ipc
 
 .. list-table::
    :header-rows: 1
@@ -144,6 +149,71 @@ They are all in the ``[hikyuu]`` section of ``hikyuu.ini``, and take effect on t
      - ``600``
      - The total duration budget of the client negotiation (seconds, including the connection probing and the readiness waiting); ``0`` means waiting infinitely; after the timeout, the client
        degrades to the standalone mode to start, avoiding hanging forever.
+   * - ``shm_ipc_dir``
+     - ``~/.hikyuu/ipc``
+     - The IPC runtime directory of the shm data service (where the socket, the single-instance lock and the segment record files live), effective on both the server and the clients;
+       it can also be overridden by the environment variable ``HIKYUU_IPC_DIR`` (with a higher priority than this configuration item). It is under the user home directory by default and needs no configuration;
+       it is recommended to configure an absolute path in the docker and other container sharing scenarios (the ``HOME`` inside the container may differ from the host).
+
+Sharing via docker containers
+-----------------------------
+
+When sharing the service across containers, the client containers need to access two kinds of resources: **the socket file in the IPC runtime directory** and **the shared memory segments in /dev/shm**. Key points of the configuration:
+
+- The server and the clients use the **same datadir** (mount the data directory into the containers as well), and the plugin versions are consistent;
+- Configure ``shm_ipc_dir`` in ``hikyuu.ini`` as an **absolute path within the mounted range** (not relying on the ``HOME`` inside the container);
+- Run the client containers with ``--ipc=host`` (or ``--ipc=container:<server container name>``) to share /dev/shm with the server;
+- If the server runs inside a container without ``--ipc=host``, increase ``--shm-size`` (only 64MB by default; a K-line segment can reach the GB level);
+- The containers on a Windows host are all Linux containers (Docker Desktop / WSL2), while the Windows native processes use the named pipes and the Windows shared memory, which cannot interoperate with the Linux containers; therefore the server should also run inside a container (or WSL).
+
+**Linux host example (the server runs on the host, the clients run in the containers)**
+
+Run the server directly on the host (or as a resident process with ``shmserver``), and configure in ``hikyuu.ini``:
+
+::
+
+    shm_ipc_dir = /data/hikyuu-ipc
+
+The client containers mount the configuration, the data and the IPC runtime directory at the **same paths**:
+
+::
+
+    docker run -it --rm \
+      --ipc=host \
+      -v /data/hikyuu-ipc:/data/hikyuu-ipc \
+      -v /home/user/.hikyuu:/home/user/.hikyuu \
+      -v /home/user/stock:/home/user/stock \
+      my-hikyuu-image
+
+The ``hikyuu.ini`` used inside the container is the same mounted one (``shm_ipc_dir`` points to the mounted path); enable ``use_shm_server = True`` to join the server on the host.
+
+The server can also run inside a container (together with the clients as ``--ipc=host``, the shared memory segments live in the host /dev/shm):
+
+::
+
+    docker run -d --name shmserver \
+      --ipc=host \
+      -v /home/user/.hikyuu:/home/user/.hikyuu \
+      -v /home/user/stock:/home/user/stock \
+      my-hikyuu-image shmserver
+
+**Windows host example (Docker Desktop / WSL2, the server and the clients are all Linux containers)**
+
+Place ``.hikyuu`` (the configuration) and ``stock`` (the data) under the host directory ``D:/hikyuu``, and configure ``shm_ipc_dir = /home/user/.hikyuu/ipc`` (the path inside the containers; the mount points of the two containers are consistent) in ``hikyuu.ini``:
+
+.. code-block:: powershell
+
+    # The server container
+    docker run -d --name shmserver --ipc=host `
+      -v D:/hikyuu/.hikyuu:/home/user/.hikyuu `
+      -v D:/hikyuu/stock:/home/user/stock `
+      my-hikyuu-image shmserver
+
+    # A client container
+    docker run -it --rm --ipc=host `
+      -v D:/hikyuu/.hikyuu:/home/user/.hikyuu `
+      -v D:/hikyuu/stock:/home/user/stock `
+      my-hikyuu-image
 
 Data Access Paths
 -----------------
@@ -173,6 +243,8 @@ Every K-line query of the client chooses the path according to the following pri
     The ``[preload]`` configuration of the client process itself is automatically ignored (all set to ``False``).
 
     The adjustment processing is always done locally on the client; what the server transmits is the original data without adjustment.
+
+    In the client mode, the **rights and the historical finance** are lazily loaded on demand and cached locally: they are loaded only when the rights / finance data of a security is accessed for the first time (the basic information snapshot of the server does not contain the finance data at the initial publishing; the snapshot is refreshed after the finance preloading completes), instead of being loaded all at once with the preloading; the subsequent accesses hit the local cache, avoiding the client repeatedly fetching the data for each security.
 
 Block Reading and Writing in the Client Mode
 --------------------------------------------
@@ -232,19 +304,23 @@ If the Python main thread of the server holds the GIL for a long time (e.g. a pi
 ``use_shm_server`` defaults to ``False``: do not start the server, and do not enable this option in any process's configuration or ``load_hikyuu``
 parameters; all the processes will run completely in the standalone mode, with the behavior the same as when this feature is not enabled.
 
-**Which files will be left in the temporary directory?**
+**Which files will be left in the IPC runtime directory?**
 
-The service address is in the system temporary directory (on unix, take the environment variable ``TMPDIR``, defaulting to ``/tmp``; on Windows, take the system temporary directory);
-the socket / named pipe file name is like ``hikyuu_shm_server_{hash}.ipc`` (on Windows, the named pipe with the same name),
+The IPC runtime directory defaults to ``~/.hikyuu/ipc`` (it can be overridden by the ``[hikyuu] shm_ipc_dir`` configuration or the environment
+variable ``HIKYUU_IPC_DIR``).
+The socket / named pipe file name is like ``hikyuu_shm_server.ipc`` (on Windows, the named pipe with the same name),
 and there are also the accompanying ``.lock`` files; the server also uses ``hikyuu_ks.last`` / ``hikyuu_bi.last`` to record the current shared memory
-segment names, used to clean up the residual segments of the last abnormally exited server. When the server exits normally, it deletes the shared memory segments; the lock files and the record files
-are empty files themselves, and the residuals can be safely deleted manually.
+segment names, used to clean up the residual segments of the last abnormally exited server, and uses ``hikyuu_shmserver.lock`` as the
+single-instance file lock (see below). When the server exits normally, it deletes the shared memory segments; all the files above can be safely
+deleted manually after the residuals (the single-instance lock is automatically released by the operating system when the process terminates).
 
-.. warning::
+.. note::
 
-    The shared memory segment names and their record files (``hikyuu_ks.last`` / ``hikyuu_bi.last``) are globally fixed and are not isolated by
-    ``datadir``. Therefore, after modifying the ``datadir`` in the configuration, if the server started with the old ``datadir`` is
-    **still running**, the old and the new servers will share the same segment record file: when the later starter publishes the snapshot, it will clean up the shared memory segment currently used by the previous
-    server according to the record, causing the clients newly connected to it afterwards to fail to hit the snapshot and degrade to the IPC requests (the data is still
-    correct, the existing clients are not affected, and only the new clients' latency increases). In actual use, ``datadir`` is generally fixed, so the impact is
-    limited; if you need to switch ``datadir``, it is recommended to first close all the hikyuu processes running with the old ``datadir``, and then start the processes with the new configuration.
+    When the server starts, it takes a non-blocking exclusive file lock on ``hikyuu_shmserver.lock``: **only one shmserver instance is
+    allowed to run on the same host at a time**. When an existing instance is alive, a newly started instance will log a FATAL message
+    and exit directly; the lock is automatically released by the operating system when the process terminates (including Ctrl-C and
+    crashes), so it does not affect the next normal startup. The shared memory segment names and their record files
+    (``hikyuu_ks.last`` / ``hikyuu_bi.last``) are globally fixed and are not isolated by ``datadir``. Under the single-instance
+    constraint, what the later starter cleans up must be the residual segments of the previous exited server, so there is no problem of
+    two running servers deleting each other's segments; if you need to switch ``datadir``, please close the current server process first,
+    otherwise the new instance will refuse to start and exit due to the single-instance lock.

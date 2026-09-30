@@ -14,14 +14,14 @@ BOOST_CLASS_EXPORT(hku::TruncNormalSlippage)
 
 namespace hku {
 
-std::random_device TruncNormalSlippage::ms_rd;
-std::mt19937 TruncNormalSlippage::ms_gen(ms_rd());
-
-TruncNormalSlippage::TruncNormalSlippage() : SlippageBase("SP_TruncNormal") {
+TruncNormalSlippage::TruncNormalSlippage()
+: SlippageBase("SP_TruncNormal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
     setParam<double>("min_value", -0.1);
     setParam<double>("max_value", 0.1);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 TruncNormalSlippage::~TruncNormalSlippage() {}
@@ -44,6 +44,15 @@ void TruncNormalSlippage::_checkParam(const string& name) const {
     }
 }
 
+void TruncNormalSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
+    }
+}
+
 price_t TruncNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
@@ -53,11 +62,22 @@ price_t TruncNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t p
     std::normal_distribution<double> dis(mean, stddev);
 
     double value;
-    // Generate a value within the truncated range
+    // Generate a value within the truncated range; clamp to the boundary after a
+    // bounded number of rejections, otherwise a range far from the mean would
+    // practically never terminate
+    int count = 0;
     do {
-        value = dis(ms_gen);
-    } while (value < min_v || value > max_v);
+        value = dis(m_gen);
+        ++count;
+    } while ((value < min_v || value > max_v) && count < 128);
+    if (value < min_v) {
+        value = min_v;
+    } else if (value > max_v) {
+        value = max_v;
+    }
 
+    // The range is an amplitude range: the sampled value is folded to a positive
+    // amplitude via abs and then applied in the unfavorable direction
     // On a buy the price always goes higher (the unfavorable direction)
     return price + std::abs(value);
 }
@@ -71,11 +91,22 @@ price_t TruncNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t 
     std::normal_distribution<double> dis(mean, stddev);
 
     double value;
-    // Generate a value within the truncated range
+    // Generate a value within the truncated range; clamp to the boundary after a
+    // bounded number of rejections, otherwise a range far from the mean would
+    // practically never terminate
+    int count = 0;
     do {
-        value = dis(ms_gen);
-    } while (value < min_v || value > max_v);
+        value = dis(m_gen);
+        ++count;
+    } while ((value < min_v || value > max_v) && count < 128);
+    if (value < min_v) {
+        value = min_v;
+    } else if (value > max_v) {
+        value = max_v;
+    }
 
+    // The range is an amplitude range: the sampled value is folded to a positive
+    // amplitude via abs and then applied in the unfavorable direction
     // On a sell the price always goes lower (the unfavorable direction)
     return price - std::abs(value);
 }

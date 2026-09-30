@@ -6,9 +6,6 @@
  */
 
 #include "IMacd.h"
-#include "../crt/EMA.h"
-#include "../crt/MACD.h"
-#include "../crt/SLICE.h"
 #include "../crt/CVAL.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -50,10 +47,8 @@ void IMacd::_calculate(const Indicator& data) {
     _increment_calculate(data, m_discard + 1);
 }
 
-size_t IMacd::min_increment_start() const {
-    return 1;
-}
-
+// Not an incremental path: resuming DIF needs ema1/ema2 separately while the outputs only keep
+// their difference, so this serves as the full-series engine of _calculate.
 void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n1 = getParam<int>("n1");
     int n2 = getParam<int>("n2");
@@ -91,14 +86,28 @@ void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 void IMacd::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, int n3) {
     HKU_IF_RETURN(n1 <= 0 || n2 <= 0 || n3 <= 0, void());
-    Indicator slice = SLICE(ind, 0, curPos + 1);
-    Indicator macd = MACD(slice, n1, n2, n3);
-    if (macd.size() > 0) {
-        size_t index = macd.size() - 1;
-        _set(macd.get(index, 0), curPos, 0);
-        _set(macd.get(index, 1), curPos, 1);
-        _set(macd.get(index, 2), curPos, 2);
+    // Intentional: replicate the static MACD recursion on the prefix [0, curPos] in a single pass
+    // with three running scalars, bitwise identical to MACD(SLICE(ind, 0, curPos + 1)) but without
+    // per-bar allocations.
+    auto const* src = ind.data();
+    price_t m1 = 2.0 / (n1 + 1);
+    price_t m2 = 2.0 / (n2 + 1);
+    price_t m3 = 2.0 / (n3 + 1);
+    price_t ema1 = src[ind.discard()];
+    price_t ema2 = src[ind.discard()];
+    price_t diff = 0.0;
+    price_t dea = 0.0;
+    price_t bar = 0.0;
+    for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
+        ema1 = (src[i] - ema1) * m1 + ema1;
+        ema2 = (src[i] - ema2) * m2 + ema2;
+        diff = ema1 - ema2;
+        dea = diff * m3 + dea - dea * m3;
+        bar = diff - dea;
     }
+    _set(bar, curPos, 0);
+    _set(diff, curPos, 1);
+    _set(dea, curPos, 2);
 }
 
 void IMacd::_dyn_calculate(const Indicator& ind) {

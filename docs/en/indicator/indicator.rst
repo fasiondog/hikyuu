@@ -1002,52 +1002,47 @@ Built-in Technical Indicators
     :param data: the input data
     :rtype: Indicator
 
-.. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY])
       
     The custom group cumulative counting
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator        
 
-.. py:function:: GROUP_MAX(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_MAX(ind[, ktype=Query.DAY])
       
     The custom group cumulative maximum
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator        
 
-.. py:function:: GROUP_MIN(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_MIN(ind[, ktype=Query.DAY])
       
     The custom group cumulative minimum
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator        
 
-.. py:function:: GROUP_PROD(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_PROD(ind[, ktype=Query.DAY])
       
     The custom group cumulative product
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator
 
-.. py:function:: GROUP_SUM(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_SUM(ind[, ktype=Query.DAY])
       
     The custom group cumulative sum
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator    
 
-.. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
+.. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY])
       
     The custom group cumulative calculation indicator.
     
@@ -1060,7 +1055,6 @@ Built-in Technical Indicators
     :param Indicator ind: the indicator to calculate
     :param callable group_func: the custom group cumulative function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the cumulative calculation result with the same length as the input; the type must also be np.array
     :param KQuery.KType ktype: the grouped K-line period
-    :param int unit: the grouping period unit (the grouping K-line period unit; when using the daily line to calculate the minute-lines, unit=2 means the minute-lines accumulated by 2 days)
     :rtype: Indicator    
 
 

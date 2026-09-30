@@ -51,7 +51,8 @@ public:
     }
 
     DllLoader& operator=(DllLoader&& rhs) {
-        if (this == &rhs) {
+        if (this != &rhs) {
+            unload();
             m_handle = rhs.m_handle;
             m_search_paths = std::move(rhs.m_search_paths);
             rhs.m_handle = nullptr;
@@ -83,6 +84,7 @@ public:
 #else
             dlclose(m_handle);
 #endif
+            m_handle = nullptr;
         }
     }
 

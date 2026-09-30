@@ -27,6 +27,7 @@ public:
     virtual ~IDiff() override;
 
     virtual void _checkParam(const string& name) const override;
+    virtual size_t min_increment_start() const override;
 };
 
 } /* namespace hku */

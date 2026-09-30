@@ -8,6 +8,8 @@
 #include "TaMavp.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaMavp)
 #endif
@@ -65,8 +67,9 @@ void TaMavp::_calculate(const Indicator& ind) {
     auto* dst = this->data();
     int outBegIdx;
     int outNbElement;
-    TA_MAVP(m_discard, total - 1, src0, src1, min_n, max_n, matype, &outBegIdx, &outNbElement,
-            dst + m_discard);
+    hku::checkTARetCode(TA_MAVP(m_discard, total - 1, src0, src1, min_n, max_n, matype, &outBegIdx,
+                                &outNbElement, dst + m_discard),
+                        m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

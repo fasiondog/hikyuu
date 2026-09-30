@@ -14,12 +14,12 @@ BOOST_CLASS_EXPORT(hku::LogNormalSlippage)
 
 namespace hku {
 
-std::random_device LogNormalSlippage::ms_rd;
-std::mt19937 LogNormalSlippage::ms_gen(ms_rd());
-
-LogNormalSlippage::LogNormalSlippage() : SlippageBase("SP_LogNormal") {
+LogNormalSlippage::LogNormalSlippage()
+: SlippageBase("SP_LogNormal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 LogNormalSlippage::~LogNormalSlippage() {}
@@ -32,13 +32,22 @@ void LogNormalSlippage::_checkParam(const string& name) const {
     }
 }
 
+void LogNormalSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
+    }
+}
+
 price_t LogNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
 
     std::lognormal_distribution<double> dis(mean, stddev);
 
-    double value = dis(ms_gen);
+    double value = dis(m_gen);
     // To distribute the slippage values around the mean, exp(mean+stddev^2/2) is subtracted to
     // center them
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
@@ -52,7 +61,7 @@ price_t LogNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t pr
 
     std::lognormal_distribution<double> dis(mean, stddev);
 
-    double value = dis(ms_gen);
+    double value = dis(m_gen);
     // To distribute the slippage values around the mean, exp(mean+stddev^2/2) is subtracted to
     // center them
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);

@@ -301,11 +301,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     m_result["Total Borrowed Cash"] = funds.borrow_cash;
     m_result["Total Borrowed Assets"] = funds.borrow_asset;
     m_result["Open Position Net Value"] = funds.market_value;
-    m_result["Current Total Assets"] =
-      funds.cash + funds.market_value - funds.borrow_cash - funds.borrow_asset;
+    m_result["Current Total Assets"] = funds.total_assets();
     price_t total_money = funds.base_cash + funds.base_asset;
 
-    const TradeRecordList& trade_list = tm->getTradeList();
+    const TradeRecordList& trade_list = tm->getRefTradeList();
     TradeRecordList::const_iterator trade_iter = trade_list.begin();
     for (; trade_iter != trade_list.end(); ++trade_iter) {
         if (trade_iter->business == BUSINESS_BONUS) {
@@ -347,9 +346,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         m_result["Total Net Profit of Closed Trades"] =
           roundEx(m_result["Total Net Profit of Closed Trades"] + profit, precision);
 
-        price_t profit_percent = profit / (pos.buyMoney + pos.totalCost) * 100.;
+        price_t cost_base = pos.buyMoney + pos.totalCost;
+        price_t profit_percent = cost_base != 0.0 ? profit / cost_base * 100. : 0.0;
 
-        price_t r = roundEx(profit / pos.totalRisk, precision);
+        price_t r = pos.totalRisk != 0.0 ? roundEx(profit / pos.totalRisk, precision) : 0.0;
         total_r += r;
 
         if (profit > 0.0) {

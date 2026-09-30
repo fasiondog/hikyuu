@@ -74,14 +74,14 @@ void IBarsSince::_calculate(const Indicator &ind) {
     for (size_t i = first; i < total; ++i) {
         size_t pos = 0;
         bool found = false;
-        for (size_t j = i + 1 - n; j < i; j++) {
+        for (size_t j = i + 1 - n; j <= i; j++) {
             if (!std::isnan(src[j]) && src[j] != 0.0) {
                 pos = i - j;
                 found = true;
                 break;
             }
         }
-        dst[i] = found ? pos : Null<value_t>();
+        dst[i] = found ? value_t(pos) : Null<value_t>();
     }
     updateDiscard();
 }

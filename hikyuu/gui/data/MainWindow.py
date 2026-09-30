@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.10.2
+## Created by: Qt User Interface Compiler version 6.11.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -44,11 +44,36 @@ class Ui_MainWindow(object):
         self.tab_4.setObjectName(u"tab_4")
         self.verticalLayout_13 = QVBoxLayout(self.tab_4)
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
-        self.groupBox_2 = QGroupBox(self.tab_4)
-        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.horizontalLayout_lang = QHBoxLayout()
+        self.horizontalLayout_lang.setObjectName(u"horizontalLayout_lang")
+        self.label_language = QLabel(self.tab_4)
+        self.label_language.setObjectName(u"label_language")
+
+        self.horizontalLayout_lang.addWidget(self.label_language)
+
+        self.language_comboBox = QComboBox(self.tab_4)
+        self.language_comboBox.addItem("")
+        self.language_comboBox.addItem("")
+        self.language_comboBox.addItem("")
+        self.language_comboBox.setObjectName(u"language_comboBox")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.language_comboBox.sizePolicy().hasHeightForWidth())
+        self.language_comboBox.setSizePolicy(sizePolicy1)
+        self.language_comboBox.setMaximumSize(QSize(200, 16777215))
+
+        self.horizontalLayout_lang.addWidget(self.language_comboBox)
+
+        self.horizontalSpacer_lang = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_lang.addItem(self.horizontalSpacer_lang)
+
+
+        self.verticalLayout_13.addLayout(self.horizontalLayout_lang)
+
+        self.groupBox_2 = QGroupBox(self.tab_4)
+        self.groupBox_2.setObjectName(u"groupBox_2")
         sizePolicy1.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
         self.groupBox_2.setSizePolicy(sizePolicy1)
         self.verticalLayout_12 = QVBoxLayout(self.groupBox_2)
@@ -1216,50 +1241,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addWidget(self.line_2)
 
-        self.verticalLayout_15 = QVBoxLayout()
-        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
-        self.label_47 = QLabel(self.tab_star)
-        self.label_47.setObjectName(u"label_47")
-        font1 = QFont()
-        font1.setBold(True)
-        self.label_47.setFont(font1)
-
-        self.verticalLayout_15.addWidget(self.label_47)
-
-        self.horizontalLayout_20 = QHBoxLayout()
-        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
-        self.label_45 = QLabel(self.tab_star)
-        self.label_45.setObjectName(u"label_45")
-
-        self.horizontalLayout_20.addWidget(self.label_45)
-
-        self.email_lineEdit = QLineEdit(self.tab_star)
-        self.email_lineEdit.setObjectName(u"email_lineEdit")
-
-        self.horizontalLayout_20.addWidget(self.email_lineEdit)
-
-        self.fetch_trial_pushButton = QPushButton(self.tab_star)
-        self.fetch_trial_pushButton.setObjectName(u"fetch_trial_pushButton")
-
-        self.horizontalLayout_20.addWidget(self.fetch_trial_pushButton)
-
-
-        self.verticalLayout_15.addLayout(self.horizontalLayout_20)
-
-
-        self.verticalLayout_18.addLayout(self.verticalLayout_15)
-
-        self.line_3 = QFrame(self.tab_star)
-        self.line_3.setObjectName(u"line_3")
-        self.line_3.setFrameShape(QFrame.Shape.HLine)
-        self.line_3.setFrameShadow(QFrame.Shadow.Sunken)
-
-        self.verticalLayout_18.addWidget(self.line_3)
-
         self.verticalLayout_16 = QVBoxLayout()
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.label_48 = QLabel(self.tab_star)
         self.label_48.setObjectName(u"label_48")
+        font1 = QFont()
+        font1.setBold(True)
         self.label_48.setFont(font1)
 
         self.verticalLayout_16.addWidget(self.label_48)
@@ -1364,6 +1351,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u6570\u636e\u5bfc\u5165\u5de5\u5177", None))
+        self.label_language.setText(QCoreApplication.translate("MainWindow", u"\u754c\u9762\u8bed\u8a00", None))
+        self.language_comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"\u8ddf\u968f\u7cfb\u7edf", None))
+        self.language_comboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"\u4e2d\u6587", None))
+        self.language_comboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"English", None))
+
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u6570\u636e\u6e90\u8bbe\u7f6e", None))
         self.pytdx_radioButton.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528Pytdx\u4e0b\u8f7d\u6570\u636e", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"\u540c\u65f6\u4f7f\u7528", None))
@@ -1529,9 +1521,6 @@ class Ui_MainWindow(object):
                         "\u7684\u670b\u53cb\u6ca1\u6709\u5f71\u54cd\u3002\u81ea 2.8.3 \u7248\u672c\u8d77\uff0c\u63d2\u4ef6\u8bb8\u53ef\u6388\u6743\u4e0d\u518d\u9700\u8981\u91c7\u96c6\u786c\u4ef6\u4fe1\u606f\uff0c\u6388\u6743\u9a8c\u8bc1\u6539\u4e3a\u8054\u7f51\u65b9\u5f0f\u5b8c\u6210\uff0c\u652f\u6301\u6700\u957f 30 \u5929\u79bb\u7ebf\u5bbd\u9650\u671f\uff0c\u4e14 A \u80a1\u4ea4\u6613\u65f6\u95f4\u6bb5\u5185\u4e0d\u4f1a\u8fdb\u884c\u8054\u7f51\u9a8c\u8bc1\uff0c\u4e0d\u5f71\u54cd\u76d8\u4e2d\u8fd0\u884c\u3002</span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:700;\">\u8be6\u60c5\u53c2\u89c1\uff1a</span><a href=\"https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html\"><span style=\" font-size:12pt; text-decoration: underline; color:#3586ff;\">\u6350\u8d60\u6743\u76ca</span></a><span style=\" font-size:12pt; font-weight:700;\"> \uff0c\u611f\u8c22\u5927\u5bb6\u7684\u652f\u6301\uff01</span></p></body></ht"
                         "ml>", None))
-        self.label_47.setText(QCoreApplication.translate("MainWindow", u"\u7533\u8bf7\u6350\u8d60\u529f\u80fd\u8bd5\u7528\uff0830\u5929\u8bd5\u7528\uff09", None))
-        self.label_45.setText(QCoreApplication.translate("MainWindow", u"\u7535\u5b50\u90ae\u4ef6\u5730\u5740:", None))
-        self.fetch_trial_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u7533\u8bf7\u8bd5\u7528\u8bb8\u53ef", None))
         self.label_48.setText(QCoreApplication.translate("MainWindow", u"\u52a0\u5165\u77e5\u8bc6\u661f\u7403\u8fdb\u884c\u6350\u8d60\uff08\u53ef\u540c\u65f6\u57283\u53f0\u8bbe\u5907\u4e0a\u4f7f\u7528\u6350\u8d60\u529f\u80fd\uff09,\u6216\u8005\u8bf7\u4f5c\u8005\u559d\u676f\u2615\ufe0f\uff0c\u8c22\u8c22", None))
         self.label_44.setText("")
         self.label_56.setText("")

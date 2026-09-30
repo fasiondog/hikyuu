@@ -2,9 +2,9 @@
 
 语言：**简体中文** | [English](../README.md)
 
-示例 notebook 采用双源维护：
+示例 notebook 按语言分目录维护，各自独立演化：
 
 - `zh/` — 中文 notebook（markdown 单元为中文）
 - `en/` — 英文 notebook（markdown 单元为英文）
 
-两侧的 code 单元逐字节一致，仅 markdown 单元语言不同。
+两侧不再要求同步，内容允许存在差异。

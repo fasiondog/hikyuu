@@ -13,8 +13,10 @@ from logging.handlers import QueueListener
 import hikyuu
 
 # 替换PyQt5导入为PySide6
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-from PySide6.QtCore import Slot, QObject, Signal
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QFileDialog, QMessageBox,
+    QLabel, QRadioButton, QCheckBox, QSizePolicy)
+from PySide6.QtCore import Slot, QObject, Signal, QTranslator, QLocale
 from PySide6.QtGui import QIcon, QTextCursor, QFont, QPalette, QPixmap
 
 import mysql.connector
@@ -35,10 +37,56 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import (can_upgrade, get_latest_version_info, fetch_trial_license,
-                    view_license, is_valid_license, get_expire_date, Datetime, TimeDelta)
+from hikyuu import (can_upgrade, get_latest_version_info, view_license, is_valid_license,
+                    get_expire_date, Datetime, TimeDelta)
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
+
+
+_gui_translator = None
+
+
+def getGuiConfigDir():
+    """GUI 界面配置目录（与 hikyuu.ini 数据配置分离）"""
+    return os.path.expanduser('~') + '/.hikyuu'
+
+
+def readIniLanguage():
+    """读取 importdata-gui.ini 中的语言偏好：zh / en / auto（缺省 auto=跟随系统）。不触碰 hikyuu.ini。"""
+    try:
+        ini = getGuiConfigDir() + '/importdata-gui.ini'
+        if os.path.exists(ini):
+            cfg = ConfigParser()
+            cfg.read(ini, encoding='utf-8')
+            return cfg.get('gui', 'language', fallback='auto').strip().lower()
+    except Exception:
+        pass
+    return 'auto'
+
+
+def resolveUiLanguage():
+    """界面有效语言：ini 显式指定 zh/en 时用之；为 auto/缺省/非法时按当前系统语言判定。"""
+    pref = readIniLanguage()
+    if pref in ('zh', 'en'):
+        return pref
+    return 'zh' if QLocale.system().name().startswith('zh') else 'en'
+
+
+def install_translator(app):
+    """根据语言偏好装载 Qt 翻译器，并记录到模块级 _gui_translator 以便运行时切换。"""
+    global _gui_translator
+    lang = resolveUiLanguage()
+    if lang.startswith('zh'):
+        return None
+    base = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    qm = os.path.join(base, 'translations', 'gui_%s.qm' % lang)
+    translator = QTranslator(app)
+    if os.path.exists(qm) and translator.load(qm):
+        app.installTranslator(translator)
+        _gui_translator = translator
+        return translator
+    logging.warning('translation file not found or failed to load: %s', qm)
+    return None
 
 
 class EmittingStream(QObject):
@@ -61,12 +109,126 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self._text_color = palette.color(QPalette.WindowText).name()
         self.setupUi(self)
         self.initUI()
+        self._tune_for_i18n()
         self.initLogger()
         self.initThreads()
+        self._initLanguageSelector()
+
+    def _tune_for_i18n(self):
+        # 英文等译文更长，会撑大控件最小宽度、破坏左右比例（QStackedWidget 取各页最大最小宽度）。
+        # 仅对非中文生效：长描述标签开换行、长单选/复选允许水平收缩(Ignored，超出时省略)，
+        # 中文先还原原始状态以保证与原版一致；切换可逆。
+        labels = self.findChildren(QLabel)
+        btns = list(self.findChildren(QRadioButton)) + list(self.findChildren(QCheckBox))
+        if not hasattr(self, '_i18n_orig'):
+            self._i18n_orig = {
+                'labels': {id(w): w.wordWrap() for w in labels},
+                'btns': {id(w): w.sizePolicy() for w in btns},
+            }
+        # 先还原到原始状态，再按当前语言度量决定（保证可逆、且中文与原版一致）
+        for w in labels:
+            w.setWordWrap(self._i18n_orig['labels'][id(w)])
+        for w in btns:
+            w.setSizePolicy(self._i18n_orig['btns'][id(w)])
+        if resolveUiLanguage().startswith('zh'):
+            return
+        LIMIT = 400
+        for w in labels:
+            if w.minimumSizeHint().width() > LIMIT:
+                w.setWordWrap(True)
+        for w in btns:
+            if w.minimumSizeHint().width() > LIMIT:
+                sp = QSizePolicy(w.sizePolicy())
+                sp.setHorizontalPolicy(QSizePolicy.Policy.Ignored)
+                w.setSizePolicy(sp)
+
+    def _set_donation_text(self):
+        # 捐赠说明 HTML：保留 CSS 头部，中文文案走 self.tr 以便中英双语；语言切换后重设
+        label_46_txt = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: "\2610"; }
+li.checked::marker { content: "\2612"; }
+</style></head><body style="font-weight:400; font-style:normal;">
+"""
+        _p_style = '<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">'
+        label_46_txt += (
+            _p_style + '<span>' + self.tr('Hikyuu 是一款') + '</span>'
+            + '<span style="font-weight:700;">' + self.tr('遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。') + '</span>'
+            + '<span>' + self.tr('为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。') + '</span></p>\n'
+            + _p_style + '<span>' + self.tr('捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。自 2.8.3 版本起，捐赠插件授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。') + '</span></p>\n'
+            + _p_style + '<span>' + self.tr('详情参见：') + '</span>'
+            + '<a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">' + self.tr('捐赠权益') + '</span></a>'
+            + '<span style="font-weight:700;"> ' + self.tr('，感谢大家的支持！') + '</span></p></body></html>\n'
+        )
+        self.label_46.setText(label_46_txt)
+
+    def _initLanguageSelector(self):
+        combo = self.language_comboBox
+        combo.setItemData(0, 'auto')
+        combo.setItemData(1, 'zh')
+        combo.setItemData(2, 'en')
+        pref = readIniLanguage()
+        combo.blockSignals(True)
+        combo.setCurrentIndex({'auto': 0, 'zh': 1, 'en': 2}.get(pref, 0))
+        combo.blockSignals(False)
+        combo.currentIndexChanged.connect(self.on_language_changed)
+
+    def on_language_changed(self, index):
+        pref = self.language_comboBox.itemData(index) or 'auto'
+        self._writeIniLanguage(pref)
+        self._apply_language(pref)
+
+    def _writeIniLanguage(self, pref):
+        # read-modify-write，仅更新 [gui] language，保留其他既有配置项
+        try:
+            if not os.path.lexists(self.getUserConfigDir()):
+                os.mkdir(self.getUserConfigDir())
+            ini = self.getUserConfigDir() + '/importdata-gui.ini'
+            cfg = ConfigParser()
+            if os.path.exists(ini):
+                cfg.read(ini, encoding='utf-8')
+            if not cfg.has_section('gui'):
+                cfg.add_section('gui')
+            cfg.set('gui', 'language', pref)
+            with open(ini, 'w', encoding='utf-8') as f:
+                cfg.write(f)
+        except Exception as e:
+            self.logger.warning('failed to save language preference: %s', e)
+
+    def _apply_language(self, pref):
+        global _gui_translator
+        app = QApplication.instance()
+        if pref in ('zh', 'en'):
+            eff = pref
+        else:
+            eff = 'zh' if QLocale.system().name().startswith('zh') else 'en'
+        if _gui_translator is not None:
+            app.removeTranslator(_gui_translator)
+            _gui_translator.deleteLater()
+            _gui_translator = None
+        if not eff.startswith('zh'):
+            base = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+            qm = os.path.join(base, 'translations', 'gui_%s.qm' % eff)
+            translator = QTranslator(app)
+            if os.path.exists(qm) and translator.load(qm):
+                app.installTranslator(translator)
+                _gui_translator = translator
+        # 刷新 .ui 静态文案与运行时动态文案
+        self.retranslateUi(self)
+        self.retranslateDynamic()
+        self._tune_for_i18n()
+
+    def retranslateDynamic(self):
+        # initUI 中以 setText 覆盖的动态文案，语言切换后需重新设置
+        self._set_donation_text()
+        if not getattr(self, '_is_collect_running', False):
+            self.collect_status_label.setText(self.tr("已停止"))
 
     def closeEvent(self, event):
         if self.import_running:
-            QMessageBox.about(self, '提示', '正在执行导入任务，请耐心等候！')
+            QMessageBox.about(self, self.tr('提示'), self.tr('正在执行导入任务，请耐心等候！'))
             event.ignore()
             return
 
@@ -124,6 +286,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 f.write(
                     hku_config_template.hdf5_template.format(
                         dir=data_dir, reload_time=old_reload_time,
+                        home=os.path.expanduser('~'),
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
@@ -170,6 +333,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
                         reload_time=old_reload_time,
+                        home=os.path.expanduser('~'),
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
@@ -219,6 +383,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                     hku_config_template.clickhouse_template.format(
                         dir=data_dir,
                         reload_time=old_reload_time,
+                        home=os.path.expanduser('~'),
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
@@ -277,9 +442,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def on_save_pushButton_clicked(self):
         try:
             self.saveConfig()
-            QMessageBox.about(self, '', '保存成功')
+            QMessageBox.about(self, '', self.tr("保存成功"))
         except Exception as e:
-            QMessageBox.about(self, "错误", str(e))
+            QMessageBox.about(self, self.tr("错误"), str(e))
 
     def normalOutputWritten(self, text):
         """普通打印信息重定向"""
@@ -361,24 +526,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         liandong_img = QPixmap(f"{current_dir}/images/liandongxiaopu.png")
         self.label_56.setPixmap(liandong_img)
 
-        # 修改 label_46 的 HTML 文本，直接在 HTML 中设置字体大小
-
-        label_46_txt = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">
-p, li { white-space: pre-wrap; }
-hr { height: 1px; border-width: 0; }
-li.unchecked::marker { content: "\2610"; }
-li.checked::marker { content: "\2612"; }
-</style></head><body style="font-weight:400; font-style:normal;">
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>Hikyuu 是一款</span><span style="font-weight:700;">遵循Apache-2.0协议免费开源的高性能量化交易计算引擎，核心框架、回测、指标、交易模型等基础功能对所有用户完全免费、无限制。</span><span>为支持项目长期稳定维护、持续更新与漏洞修复，现推出自愿捐赠计划 ，为捐赠用户提供独立插件式增值功能 ，所有增值功能均不影响核心框架的使用与自由编译。</span></p>
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>捐赠增值功能以独立插件形式提供，与 Hikyuu 核心框架完全分离， 不修改、不侵入、不限制核心代码 ，不影响用户自行编译与二次开发。自 2.8.3 版本起，捐赠插件授权不再需要采集硬件信息，授权验证改为联网方式完成，支持最长 30 天离线宽限期，且 A 股交易时间段内不会进行联网验证，不影响盘中运行。</span></p>
-<p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span>详情参见：</span><a href="https://hikyuu.readthedocs.io/zh-cn/latest/vip/vip-plan.html"><span style="text-decoration: underline; color:#3586ff;">捐赠权益</span></a><span style="font-weight:700;"> ，感谢大家的支持！</span></p></body></html>
-"""
-        self.label_46.setText(label_46_txt)
+        # 捐赠说明为运行时 setText 覆盖的动态文案，语言切换后需在 _set_donation_text 中重设
+        self._set_donation_text()
         self.label_46.setOpenExternalLinks(True)
 
         self.label_license.setText(view_license())
-        self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
         self.setWindowIcon(icon)
         QApplication.instance().setWindowIcon(icon)
@@ -395,7 +547,7 @@ li.checked::marker { content: "\2612"; }
         self.time_start_dateEdit.setDate(today - datetime.timedelta(7))
         self.trans_start_dateEdit.setMinimumDate(today - datetime.timedelta(90))
         self.time_start_dateEdit.setMinimumDate(today - datetime.timedelta(300))
-        self.collect_status_label.setText("已停止")
+        self.collect_status_label.setText(self.tr("已停止"))
 
         # 初始化导入行情数据类型配置
         self.import_stock_checkBox.setChecked(import_config.getboolean('quotation', 'stock', fallback=True))
@@ -560,6 +712,8 @@ li.checked::marker { content: "\2612"; }
 
     def getCurrentConfig(self):
         import_config = ConfigParser()
+        # 语言偏好：与“保存设置”一同持久化，避免重建 ini 时丢失 [gui] 段
+        import_config['gui'] = {'language': self.language_comboBox.currentData() or 'auto'}
         import_config['quotation'] = {
             'stock': self.import_stock_checkBox.isChecked(),
             'fund': self.import_fund_checkBox.isChecked(),
@@ -674,14 +828,6 @@ li.checked::marker { content: "\2612"; }
             '1MIN': self.hdf5_min_progressBar,
             '5MIN': self.hdf5_5min_progressBar
         }
-
-    @Slot()
-    def on_fetch_trial_pushButton_clicked(self):
-        email = self.email_lineEdit.text()
-        info = fetch_trial_license(email)
-        QMessageBox.about(self, "获取试用许可", info)
-        self.label_license.setText(view_license())
-        self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
     @Slot()
     def on_pytdx_radioButton_clicked(self):
@@ -803,7 +949,7 @@ li.checked::marker { content: "\2612"; }
     @Slot()
     def on_clickhouse_tmpdir_pushButton_clicked(self):
         if not is_valid_license():
-            QMessageBox.critical(self, "clickhouse引擎", "需要捐赠授权才能使用clickhouse引擎")
+            QMessageBox.critical(self, self.tr("clickhouse引擎"), self.tr("需要捐赠授权才能使用clickhouse引擎"))
             return
 
         dlg = QFileDialog()
@@ -829,14 +975,14 @@ li.checked::marker { content: "\2612"; }
             cnx.close()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                QMessageBox.critical(self, "测试数据库连接", "MYSQL密码或用户名错误！")
+                QMessageBox.critical(self, self.tr("测试数据库连接"), self.tr("MYSQL密码或用户名错误！"))
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                QMessageBox.critical(self, "测试数据库连接", "MySQL数据库不存在！")
+                QMessageBox.critical(self, self.tr("测试数据库连接"), self.tr("MySQL数据库不存在！"))
             else:
-                QMessageBox.critical(self, "测试数据库连接", err.msg)
+                QMessageBox.critical(self, self.tr("测试数据库连接"), err.msg)
             return
 
-        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
+        QMessageBox.about(self, self.tr("测试数据库连接"), self.tr(" 连接成功！"))
 
     @Slot()
     def on_clickhouse_test_pushButton_clicked(self):
@@ -852,10 +998,10 @@ li.checked::marker { content: "\2612"; }
             cnx = clickhouse_connect.get_client(**db_config)
             cnx.close()
         except Exception as err:
-            QMessageBox.critical(self, "测试数据库连接失败", str(err))
+            QMessageBox.critical(self, self.tr("测试数据库连接失败"), str(err))
             return
 
-        QMessageBox.about(self, "测试数据库连接", " 连接成功！")
+        QMessageBox.about(self, self.tr("测试数据库连接"), self.tr(" 连接成功！"))
 
     def reset_progress_bar(self):
         self.hdf5_weight_label.setText('')
@@ -868,7 +1014,7 @@ li.checked::marker { content: "\2612"; }
         self.import_detail_textEdit.clear()
 
     def on_escapte_time(self, escape):
-        self.import_status_label.setText("耗时：{:>.2f} 秒".format(escape))
+        self.import_status_label.setText(self.tr("耗时：{:>.2f} 秒").format(escape))
 
     def on_message_from_thread(self, msg):
         if not msg or len(msg) < 2:
@@ -879,7 +1025,7 @@ li.checked::marker { content: "\2612"; }
         if msg_name == 'ESCAPE_TIME':
             self.escape_time = msg_task_name
             self.import_status_label.setText(
-                "耗时：{:>.2f} 秒 （{:>.2f}分钟） {}".format(
+                self.tr("耗时：{:>.2f} 秒 （{:>.2f}分钟） {}").format(
                     self.escape_time, self.escape_time / 60, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
 
@@ -890,21 +1036,21 @@ li.checked::marker { content: "\2612"; }
             elif msg_task_name == 'THREAD':
                 status = msg[2]
                 if status == 'FAILURE':
-                    self.import_status_label.setText("耗时：{:>.2f} 秒 导入异常！".format(self.escape_time))
+                    self.import_status_label.setText(self.tr("耗时：{:>.2f} 秒 导入异常！").format(self.escape_time))
                     self.import_detail_textEdit.append(msg[3])
                 self.hdf5_import_thread.terminate()
                 self.hdf5_import_thread = None
                 self.escape_time_thread.stop()
                 self.escape_time_thread = None
                 self.start_import_pushButton.setEnabled(True)
-                self.import_detail_textEdit.append("导入完毕！")
-                self.hdf5_weight_label.setText("导入完毕!")
+                self.import_detail_textEdit.append(self.tr("导入完毕！"))
+                self.hdf5_weight_label.setText(self.tr("导入完毕!"))
                 if can_upgrade():
                     release_info = get_latest_version_info()
                     self.import_detail_textEdit.append("========================================================")
                     self.import_detail_textEdit.append(
-                        "Hikyuu 新版本 ({}) 已发布，建议更新".format(release_info['version']))
-                    self.import_detail_textEdit.append("更新命令: pip instal hikyuu --upgrade")
+                        self.tr("Hikyuu 新版本 ({}) 已发布，建议更新").format(release_info['version']))
+                    self.import_detail_textEdit.append(self.tr("更新命令: pip instal hikyuu --upgrade"))
                     self.import_detail_textEdit.append(f'{release_info["remark"]}')
                     self.import_detail_textEdit.append("========================================================")
                 if is_valid_license():
@@ -915,7 +1061,7 @@ li.checked::marker { content: "\2612"; }
                             self.import_detail_textEdit.append(
                                 "========================================================")
                             self.import_detail_textEdit.append(
-                                "您的授权即将到期，截止日期：{}!".format(expire_date))
+                                self.tr("您的授权即将到期，截止日期：{}!").format(expire_date))
                             self.import_detail_textEdit.append(
                                 "========================================================")
                 self.import_running = False
@@ -926,29 +1072,29 @@ li.checked::marker { content: "\2612"; }
                     self.hdf5_import_progress_bar[ktype].setValue(progress)
                 else:
                     if self.use_download == 'qmt':
-                        self.import_detail_textEdit.append('导入 {} 记录数：{}'.format(msg[4], msg[5]))
+                        self.import_detail_textEdit.append(self.tr('导入 {} 记录数：{}').format(msg[4], msg[5]))
                     else:
-                        self.import_detail_textEdit.append('导入 {} {} 记录数：{}'.format(msg[3], msg[4], msg[5]))
+                        self.import_detail_textEdit.append(self.tr('导入 {} {} 记录数：{}').format(msg[3], msg[4], msg[5]))
 
             elif msg_task_name == 'IMPORT_TRANS':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.hdf5_trans_progressBar.setValue(progress)
                 else:
-                    self.import_detail_textEdit.append('导入 {} 分笔记录数：{}'.format(msg[3], msg[5]))
+                    self.import_detail_textEdit.append(self.tr('导入 {} 分笔记录数：{}').format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_TIME':
                 ktype, progress = msg[2:4]
                 if ktype != 'FINISHED':
                     self.hdf5_time_progressBar.setValue(progress)
                 else:
-                    self.import_detail_textEdit.append('导入 {} 分时记录数：{}'.format(msg[3], msg[5]))
+                    self.import_detail_textEdit.append(self.tr('导入 {} 分时记录数：{}').format(msg[3], msg[5]))
 
             elif msg_task_name == 'IMPORT_WEIGHT':
                 if msg[2] == '导入权息数据完毕!':
-                    self.import_detail_textEdit.append('导入权息记录数：{}'.format(msg[3]))
+                    self.import_detail_textEdit.append(self.tr('导入权息记录数：{}').format(msg[3]))
                 elif msg[2] == '导入通达信财务信息完毕!':
-                    self.import_detail_textEdit.append('导入通达信财务记录数：{}'.format(msg[3]))
+                    self.import_detail_textEdit.append(self.tr('导入通达信财务记录数：{}').format(msg[3]))
 
             elif msg_task_name == 'IMPORT_FINANCE':
                 # self.finance_progressBar.setValue(msg[2])
@@ -956,18 +1102,18 @@ li.checked::marker { content: "\2612"; }
 
             elif msg_task_name == 'IMPORT_BLOCKINFO':
                 if msg[2] != 'FINISHED':
-                    self.import_detail_textEdit.append(msg[2])
+                    self.import_detail_textEdit.append(self.tr('板块信息更新完毕: {}').format(msg[3]))
 
             elif msg_task_name == 'IMPORT_ZH_BOND10':
                 if msg[2] != 'FINISHED':
-                    self.import_detail_textEdit.append(msg[2])
+                    self.import_detail_textEdit.append(self.tr('10年期中国国债收益率下载完毕'))
 
     @Slot()
     def on_start_import_pushButton_clicked(self):
         try:
             self.saveConfig()
         except Exception as e:
-            QMessageBox.about(self, "保存配置信息失败", str(e))
+            QMessageBox.about(self, self.tr("保存配置信息失败"), str(e))
             return
 
         config = self.getCurrentConfig()
@@ -976,30 +1122,30 @@ li.checked::marker { content: "\2612"; }
                 if not os.path.lexists(config['hdf5']['dir']):
                     os.makedirs(f"{config['hdf5']['dir']}/tmp")
                 elif not os.path.isdir(config['hdf5']['dir']):
-                    QMessageBox.about(self, "错误", '指定的目标数据存放目录不存在！')
+                    QMessageBox.about(self, self.tr("错误"), self.tr('指定的目标数据存放目录不存在！'))
                     return
 
             if config.getboolean('tdx', 'enable'):
                 if not os.path.lexists(config['tdx']['dir']):
                     os.makedirs(f"{config['tdx']['dir']}/tmp")
                 elif not os.path.isdir(config['tdx']['dir']):
-                    QMessageBox.about(self, "错误", "请确认通达信安装目录是否正确！")
+                    QMessageBox.about(self, self.tr("错误"), self.tr("请确认通达信安装目录是否正确！"))
                     return
 
             if config.getboolean('mysql', 'enable'):
                 if not os.path.lexists(config['mysql']['tmpdir']):
                     os.makedirs(config['mysql']['tmpdir'])
                 elif not os.path.isdir(config['mysql']['tmpdir']):
-                    QMessageBox.about(self, "错误", "请确认临时目录是否正确！")
+                    QMessageBox.about(self, self.tr("错误"), self.tr("请确认临时目录是否正确！"))
                     return
         except Exception as e:
-            QMessageBox.about(self, "错误", str(e))
+            QMessageBox.about(self, self.tr("错误"), str(e))
             return
 
         now = hikyuu.Datetime.now()
         today = hikyuu.Datetime.today()
         if now.day_of_week() not in (0, 6) and hikyuu.TimeDelta(0, 8, 30) < now - today < hikyuu.TimeDelta(0, 15, 45):
-            reply = QMessageBox.question(self, '警告', '交易日8:30-15:45分之间导入数据将导致盘后数据错误，是否仍要继续执行导入?',
+            reply = QMessageBox.question(self, self.tr('警告'), self.tr('交易日8:30-15:45分之间导入数据将导致盘后数据错误，是否仍要继续执行导入?'),
                                          QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if reply == QMessageBox.No:
                 return
@@ -1009,9 +1155,9 @@ li.checked::marker { content: "\2612"; }
         self.reset_progress_bar()
 
         if config.getboolean('weight', 'enable', fallback=False):
-            self.hdf5_weight_label.setText("正在导入")
+            self.hdf5_weight_label.setText(self.tr("正在导入"))
 
-        self.import_status_label.setText("正在启动任务....")
+        self.import_status_label.setText(self.tr("正在启动任务...."))
         QApplication.processEvents()
 
         if self.use_download == 'tdx':
@@ -1020,12 +1166,12 @@ li.checked::marker { content: "\2612"; }
             self.hdf5_import_thread = UsePytdxImportToH5Thread(self, config)
         elif self.use_download == 'qmt':
             if sys.platform != 'win32':
-                QMessageBox.about(self, "错误", "qmt导入功能仅支持Windows系统！")
+                QMessageBox.about(self, self.tr("错误"), self.tr("qmt导入功能仅支持Windows系统！"))
                 return
             try:
                 import xtquant
             except ImportError:
-                QMessageBox.about(self, "错误", "请安装xtquant后再次尝试！")
+                QMessageBox.about(self, self.tr("错误"), self.tr("请安装xtquant后再次尝试！"))
                 return
             self.hdf5_import_thread = UseQmtImportToH5Thread(self, config)
 
@@ -1042,7 +1188,7 @@ li.checked::marker { content: "\2612"; }
         self.sched_import_pushButton.setEnabled(False)
         if self._is_sched_import_running:
             self._is_sched_import_running = False
-            self.sched_import_pushButton.setText("启动定时导入")
+            self.sched_import_pushButton.setText(self.tr("启动定时导入"))
             self.sched_import_thread.terminate()
             self.sched_import_thread.wait()
             self.logger.info("已停止定时导入")
@@ -1054,7 +1200,7 @@ li.checked::marker { content: "\2612"; }
         try:
             self.saveConfig()
         except Exception as e:
-            QMessageBox.about(self, "保存配置信息错误", str(e))
+            QMessageBox.about(self, self.tr("保存配置信息错误"), str(e))
             return
 
         self.start_import_pushButton.setEnabled(False)
@@ -1062,7 +1208,7 @@ li.checked::marker { content: "\2612"; }
         self.sched_import_thread = SchedImportThread(self.getCurrentConfig())
         self.sched_import_thread.message.connect(self.on_start_import_pushButton_clicked)
         self.sched_import_thread.start()
-        self.sched_import_pushButton.setText("停止定时导入")
+        self.sched_import_pushButton.setText(self.tr("停止定时导入"))
         self.sched_import_pushButton.setEnabled(True)
 
     @Slot()
@@ -1075,9 +1221,9 @@ li.checked::marker { content: "\2612"; }
                 self.collect_spot_thread = None
             self._is_collect_running = False
             self.logger.info("停止采集")
-            self.collect_status_label.setText("已停止")
-            self.collect_start_pushButton.setText("启动采集")
-            QMessageBox.about(self, '', '已停止')
+            self.collect_status_label.setText(self.tr("已停止"))
+            self.collect_start_pushButton.setText(self.tr("启动采集"))
+            QMessageBox.about(self, '', self.tr('已停止'))
         else:
             if self.collect_spot_thread is None or self.collect_spot_thread.isFinished():
                 self.collect_spot_thread = CollectSpotThread(
@@ -1086,9 +1232,9 @@ li.checked::marker { content: "\2612"; }
                 )
                 self.collect_spot_thread.start()
             self._is_collect_running = True
-            self.collect_status_label.setText("运行中")
-            self.collect_start_pushButton.setText("停止采集")
-            QMessageBox.about(self, '', '已启动，请在控制台日志查看是否正常运行')
+            self.collect_status_label.setText(self.tr("运行中"))
+            self.collect_start_pushButton.setText(self.tr("停止采集"))
+            QMessageBox.about(self, '', self.tr('已启动，请在控制台日志查看是否正常运行'))
 
 
 class_logger(MyMainWindow)
@@ -1100,6 +1246,7 @@ def start():
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     app = QApplication(sys.argv)
+    install_translator(app)
     myWin = MyMainWindow(capture_output=True)
     myWin.show()
     sys.exit(app.exec())
@@ -1148,6 +1295,7 @@ if __name__ == "__main__":
     logging.getLogger("pytdx").setLevel(logging.WARNING)
 
     app = QApplication(sys.argv)
+    install_translator(app)
     # 全局设置默认字体，放在创建窗口之前！
     if sys.platform == 'win32':
         # 检查Microsoft YaHei字体是否存在

@@ -40,54 +40,35 @@ void IBackset::_calculate(const Indicator& ind) {
     auto const* src = ind.data();
     auto* dst = this->data();
 
-    size_t i = total;
-    size_t end_i = m_discard + n;
-    if (end_i > total) {
-        end_i = total;
-    }
-    while (i-- > end_i) {
-        if (src[i] != 0.0) {
-            dst[i] = 1.0;
-            size_t j = i;
-            size_t end_j = i - n + 1;
-            while (j-- > end_j) {
-                dst[j] = 1.0;
-            }
-        } else {
-            if (dst[i] != 1.0) {
-                dst[i] = 0.0;
-            }
+    // Scan backwards, keeping how many more bars a hit still backfills, so that a window reaching
+    // below the n-th bar is not overwritten afterwards.
+    size_t fill = 0;
+    for (size_t i = total; i-- > m_discard;) {
+        if (!std::isnan(src[i]) && src[i] != 0.0) {
+            fill = n;
         }
-    }
-
-    // i = end_i - 1;
-    while (true) {
-        if (src[i] != 0.0) {
-            for (size_t j = m_discard; j <= i; j++) {
-                dst[j] = 1.0;
-            }
-            break;
-        } else {
-            dst[i] = 0.0;
-            if (i == m_discard) {
-                break;
-            }
-            i--;
+        dst[i] = fill > 0 ? 1.0 : 0.0;
+        if (fill > 0) {
+            fill--;
         }
     }
 }
 
 void IBackset::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    size_t start = _get_step_start(curPos, step, ind.discard());
-    if (ind[curPos] == 0.0) {
-        for (size_t i = start; i <= curPos; i++) {
-            _set(0.0, curPos);
-        }
-    } else {
-        for (size_t i = start; i <= curPos; i++) {
-            _set(1.0, curPos);
+    // BACKSET is not causal: the bar itself is decided by it and the following step - 1 bars.
+    size_t end = curPos + step;
+    if (end > ind.size()) {
+        end = ind.size();
+    }
+
+    bool found = false;
+    for (size_t i = curPos; i < end; i++) {
+        if (!std::isnan(ind[i]) && ind[i] != 0.0) {
+            found = true;
+            break;
         }
     }
+    _set(found ? 1.0 : 0.0, curPos);
 }
 
 Indicator HKU_API BACKSET(int n) {

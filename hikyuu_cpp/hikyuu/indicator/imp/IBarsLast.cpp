@@ -31,7 +31,7 @@ void IBarsLast::_calculate(const Indicator& ind) {
     auto* dst = this->data();
 
     if (total == m_discard + 1) {
-        if (src[m_discard] != 0.0) {
+        if (!std::isnan(src[m_discard]) && src[m_discard] != 0.0) {
             dst[m_discard] = 0.0;
         } else {
             m_discard = total;
@@ -41,7 +41,7 @@ void IBarsLast::_calculate(const Indicator& ind) {
 
     size_t pos = total;
     for (size_t i = total - 1; i != m_discard; i--) {
-        if (src[i] != 0.0) {
+        if (!std::isnan(src[i]) && src[i] != 0.0) {
             for (size_t j = i; j < pos; j++) {
                 dst[j] = j - i;
             }
@@ -49,7 +49,7 @@ void IBarsLast::_calculate(const Indicator& ind) {
         }
     }
 
-    if (src[m_discard] != 0.0) {
+    if (!std::isnan(src[m_discard]) && src[m_discard] != 0.0) {
         for (size_t i = m_discard; i < pos; i++) {
             dst[i] = i - m_discard;
         }

@@ -90,6 +90,8 @@ void WalkForwardSystem::_reset() {
         m_train_tm->reset();
     }
 
+    m_train_kdata_list.clear();
+    m_run_ranges.clear();
     m_trade_list.clear();
     m_buyRequestList.clear();
     m_sellRequestList.clear();
@@ -102,13 +104,13 @@ void WalkForwardSystem::_forceResetAll() {
 }
 
 SystemPtr WalkForwardSystem::_clone() {
-    WalkForwardSystem* p = new WalkForwardSystem();
+    auto p = make_shared<WalkForwardSystem>();
     p->m_se = m_se->clone();
     p->m_se->reset();
     if (m_train_tm) {
         p->m_train_tm = m_train_tm->clone();
     }
-    return SystemPtr(p);
+    return p;
 }
 
 void WalkForwardSystem::syncDataFromSystem(const SYSPtr& sys, bool isMoment) {
@@ -190,6 +192,7 @@ void WalkForwardSystem::run(const KData& kdata, bool reset, bool resetAll) {
     size_t run_ranges_len = m_run_ranges.size();
     HKU_IF_RETURN(run_ranges_len == 0, void());
 
+    m_train_kdata_list.clear();
     const KQuery& query = kdata.getQuery();
     const Stock& stock = kdata.getStock();
 

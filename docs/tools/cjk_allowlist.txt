@@ -12,7 +12,6 @@ trade_portfolio/mf_example.ipynb  # category="行业板块" 公开契约键 + �
 base/other_utils.rst              # select2 输出样例：证券代码/证券名称列 + 证券名
 #
 # --- 代码真实接受的中文字面量（接口契约） ---
-stock_manager.rst                 # add_temp_stock CSV 表头中文别名（KDataTempCsvDriver 真实接受：日期/开盘价/成交量）
 indicator/indicator.rst           # NAMELIKE 示例以中文名/通配模式匹配（"上证*"、"上证指数"）
 interactive/index.rst             # DRAWTEXT/DRAWTEXT_FIX 示例字面文本 '大阳线'（用户自绘文本）
 hub.rst                           # search_part('趋势') 示例（hikyuu_hub 部件名为中文）

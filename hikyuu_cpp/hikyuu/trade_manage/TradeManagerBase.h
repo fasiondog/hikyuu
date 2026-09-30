@@ -201,11 +201,14 @@ public:
 
     /**
      * Get all the daily asset records of the given date list
+     * @note The dates must be in ascending order; the internal parallel calculation advances the
+     *       ex-rights ratchet via the last date first, so it is thread-safe by itself
      * @param dates date list
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return daily asset record list
      */
-    FundsList getFundsList(const DatetimeList& dates, const KQuery::KType& ktype = KQuery::DAY);
+    virtual FundsList getFundsList(const DatetimeList& dates,
+                                   const KQuery::KType& ktype = KQuery::DAY);
 
     /**
      * Get the net value curve of the assets, including the borrowed assets
@@ -273,7 +276,9 @@ public:
 
     /**
      * Update the current positions and trades according to the weight (adjustment) information
-     * @note It must be called in chronological order
+     * @note It must be called in chronological order; not thread-safe, it mutates the internal
+     *       state (positions, cash and the trade list), concurrent access to the same instance
+     *       must be serialized externally
      * @param datetime the current moment
      */
     virtual void updateWithWeight(const Datetime& datetime) {
@@ -400,6 +405,18 @@ public:
     }
 
     /**
+     * Get the reference of all the trade records, avoiding copying the whole list for read-only
+     * access. The returned reference is only valid before the next modification of the
+     * TradeManager. The default implementation returns an empty list; subclasses holding a
+     * persistent trade list should override it.
+     */
+    virtual const TradeRecordList& getRefTradeList() const {
+        HKU_WARN("The subclass does not implement this method");
+        static const TradeRecordList g_empty_trade_list;
+        return g_empty_trade_list;
+    }
+
+    /**
      * Get the trade records within the given date range [start, end)
      * @param start start date
      * @param end end date
@@ -445,6 +462,9 @@ public:
 
     /**
      * Get the position record of the given security
+     * @note Only number is the exact value on the given date; the other economic fields (e.g.
+     *       takeDatetime, buyMoney, totalCost, sellMoney) are taken from the most recent closed
+     *       position record of the security, for reference only
      * @param date the given date
      * @param stock the given security
      */

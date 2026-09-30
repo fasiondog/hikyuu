@@ -181,8 +181,8 @@ public:
     void remove_from_db();
 
     /**
-     * Load the factor from the database, name + ktype is used as the unique identifier; the current
-     * object is not modified if it does not exist
+     * Load the factor from the database, name + ktype is used as the unique identifier; if it does
+     * not exist, the current object is replaced by an empty (Null) factor
      */
     void load_from_db();
 

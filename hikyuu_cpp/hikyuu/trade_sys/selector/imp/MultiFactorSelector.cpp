@@ -26,7 +26,8 @@ MultiFactorSelector::MultiFactorSelector() : SelectorBase("SE_MultiFactor") {
     setParam<bool>("use_spearman", true);
     setParam<string>("mode", "MF_ICIRWeight");
     setParam<int>("mf_recover_type",
-                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
+                  KQuery::INVALID_RECOVER_TYPE);    // The MF calculation adjustment type
+    setParam<bool>("keep_mf_recover_type", false);  // Keep the existing recover type of the MF
 }
 
 MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
@@ -49,7 +50,8 @@ MultiFactorSelector::MultiFactorSelector(const MFPtr& mf, int topn)
     setParam<bool>("use_spearman", mf->getParam<bool>("use_spearman"));
     setParam<string>("mode", "CUSTOM");
     setParam<int>("mf_recover_type",
-                  KQuery::INVALID_RECOVER_TYPE);  // The MF calculation adjustment type
+                  KQuery::INVALID_RECOVER_TYPE);    // The MF calculation adjustment type
+    setParam<bool>("keep_mf_recover_type", false);  // Keep the existing recover type of the MF
     setFactorSet(mf->getRefFactorSet());
 }
 
@@ -76,7 +78,9 @@ void MultiFactorSelector::_reset() {
 
 SelectorPtr MultiFactorSelector::_clone() {
     auto p = make_shared<MultiFactorSelector>();
-    p->m_mf = m_mf->clone();
+    if (m_mf) {
+        p->m_mf = m_mf->clone();
+    }
     p->m_stk_sys_dict = m_stk_sys_dict;
     p->m_factorset = m_factorset;
     return p;
@@ -235,6 +239,10 @@ void MultiFactorSelector::_calculate() {
     for (const auto& sys : m_real_sys_list) {
         m_stk_sys_dict.insert({sys->getStock(), sys});
     }
+}
+
+SelectorPtr HKU_API SE_MultiFactor() {
+    return make_shared<MultiFactorSelector>();
 }
 
 SelectorPtr HKU_API SE_MultiFactor(const MFPtr& mf, int topn) {

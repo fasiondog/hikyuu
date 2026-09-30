@@ -158,7 +158,7 @@
 | 数据导入 | data import | `plugin/` 导入器（如 `KDataTo*Importer`） |
 | 基础信息 | base info | `BaseInfoDriver` |
 | 财务数据 | finance data | `HistoryFinanceInfo` / `FinanceInfo` |
-| 共享内存数据服务 | shared-memory data service (IPC) | `ShmServer` / `dataserver` 插件、`KDataShm*` |
+| 共享内存数据服务 | shared-memory data service (IPC)，缩写 SHM | `ShmServer` / `dataserver` 插件、`KDataShm*`、`start_shm_server()` |
 | 插件 | plugin | `plugin/` |
 | 参数 | parameter | `Parameter` |
 | 策略上下文 | strategy context | `StrategyContext` |
@@ -295,6 +295,8 @@
 | OB | order broker | 订单执行 |
 | SM | stock manager | 证券管理 |
 | KD | k-data | K 线数据 |
+| SHM | shared memory | 共享内存 |
+| IPC | inter-process communication | 进程间通信 |
 
 ## 11. 风格禁忌（避免中式英语）
 

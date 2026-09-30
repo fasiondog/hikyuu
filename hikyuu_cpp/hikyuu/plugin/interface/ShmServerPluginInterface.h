@@ -42,8 +42,8 @@ public:
 
     /**
      * Start the shm server
-     * @param datadir data directory; the current data directory of StockManager is used when it is
-     *                empty
+     * @param datadir data directory; retained for interface compatibility, the listening address is
+     *                no longer derived from it (a fixed name under the IPC runtime directory)
      * @param publish_shm whether to publish the two kinds of shared memory snapshots
      * @param recv_spot whether this process receives the realtime market data (it calls
      *                  startSpotAgent internally)
@@ -71,8 +71,9 @@ public:
 
     /**
      * Probe and connect to the existing shm service, blocking and waiting for its data to be ready
-     * @param datadir data directory (the service address is derived from its hash, guaranteeing
-     * that only the processes with the same data set interconnect)
+     * @param datadir data directory; retained for interface compatibility, the service address is
+     *                no longer derived from it (a fixed name under the IPC runtime directory; the
+     *                client and the server must use the same datadir to keep the data consistent)
      * @param wait_timeout_sec the total budget for waiting to be ready (seconds), 0 means waiting
      *                         infinitely
      * @return true it has been connected and the service is ready (this process should enter the

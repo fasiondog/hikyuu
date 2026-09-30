@@ -62,19 +62,10 @@ void AllocateFundsBase::reset() {
     _reset();
 }
 
-AllocateFundsPtr AllocateFundsBase::clone() {
-    AllocateFundsPtr p;
-    try {
-        p = _clone();
-    } catch (...) {
-        HKU_ERROR("Subclass _clone failed!");
-        p = AllocateFundsPtr();
-    }
-
-    if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!");
-        return shared_from_this();
-    }
+AFPtr AllocateFundsBase::clone() {
+    AFPtr p = _clone();
+    HKU_CHECK(p && p.get() != this,
+              "Failed clone! The subclass _clone of {} must return a new object!", m_name);
 
     p->m_params = m_params;
     p->m_name = m_name;

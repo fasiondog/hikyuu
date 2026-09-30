@@ -122,15 +122,28 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
                                               const DatetimeList& dates, size_t test_len,
                                               bool trace) {
     // SPEND_TIME(OptimalSelectorBase_calculate_parallel);
+    // The training runs the candidate clones concurrently and each range has its own query, so the
+    // candidates must not share their EV (shared_ev defaults to true), otherwise the racing
+    // setQuery calls with different queries would cross-clobber the EV state (ISS-084). The local
+    // protos take effect from the next clone level on, leaving the user prototypes untouched.
+    SystemList pro_list;
+    pro_list.reserve(m_pro_sys_list.size());
+    for (const auto& sys : m_pro_sys_list) {
+        auto local = sys->clone();
+        local->setParam<bool>("shared_ev", false);
+        pro_list.emplace_back(local);
+    }
+
     auto sys_list = global_parallel_for_index(
-      0, train_ranges.size(), [this, &train_ranges, &dates, query = m_query, trace](size_t i) {
+      0, train_ranges.size(),
+      [this, &pro_list, &train_ranges, &dates, query = m_query, trace](size_t i) {
           Datetime start_date = dates[train_ranges[i].first];
           Datetime end_date = dates[train_ranges[i].second];
           KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
           CLS_INFO_IF(trace, "iteration: {}|{}, range: {}", i + 1, train_ranges.size(), q);
 
           auto selected_sys_list = std::make_shared<SystemWeightList>();
-          for (const auto& sys : m_pro_sys_list) {
+          for (const auto& sys : pro_list) {
               try {
                   auto nsys = sys->clone();
                   nsys->run(q, true);

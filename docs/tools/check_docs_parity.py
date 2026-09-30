@@ -100,7 +100,7 @@ def parse_title_hierarchy(path):
         return parse_rst_title_hierarchy(path)
     if path.endswith(".md"):
         return parse_md_title_hierarchy(path)
-    return []  # .ipynb handled separately by check_notebook_parity.py
+    return []  # .ipynb title hierarchies are not compared
 
 
 def parse_rst_items(path):

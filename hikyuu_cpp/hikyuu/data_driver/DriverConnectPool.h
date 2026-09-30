@@ -60,7 +60,7 @@ public:
 
     /** Get an available connection; if the maximum number of connections allowed is exceeded, it
      *  blocks and waits until an idle resource is obtained */
-    DriverConnectPtr getConnect() noexcept {
+    DriverConnectPtr getConnect() {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (m_driverList.empty()) {
             if (m_maxSize > 0 && m_count >= m_maxSize) {

@@ -1088,3 +1088,117 @@ msgstr ""
 #: hikyuu_cpp/hikyuu/trade_manage/Performance.cpp:137
 msgid "Max Consecutive Loss R-Multiple"
 msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:905
+#, python-format
+msgid "Total Invested Assets: {:<.2f}    Current Total Assets: {:<.2f}    Current Profit: {:<.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:907
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%    Current Drawdown from Peak: {:<.2f}%"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:911
+#, python-format
+msgid "Win Rate: {:<.2f}%    Avg Win/Avg Loss: 1 : {:<.2f}    Sharpe Ratio: {:<.2f}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:530
+#, python-format
+msgid "The indicator length is 0; the indicator should have been calculated (i.e. it has values)"
+msgstr ""
+
+#: hikyuu/draw/drawplot/matplotlib_draw.py:1002
+#, python-format
+msgid "Failed to get the tm return curve, please check the tm initial date! tm.init_datetime={} start_date={}, end_date={}"
+msgstr ""
+
+#: hikyuu/draw/drawplot/bokeh_draw.py:236
+msgid "Bokeh does not support the American K-line chart yet, please use matplotlib"
+msgstr ""
+
+#: hikyuu/draw/drawplot/echarts_draw.py:562
+#, python-format
+msgid "Current Strategy Return: {:<.2f}%    Annualized Return: {:<.2f}%    Max Drawdown: {:<.2f}%"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1663
+msgid "trade_records"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1664
+msgid "closed_positions"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1665
+msgid "open_positions"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1686
+msgid "fill_date"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "fill_number"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "commission"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "stamp_tax"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1688
+msgid "transfer_fee"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1689
+msgid "other_cost"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1690
+msgid "signal_part"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1731
+msgid "entry_date"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1731
+msgid "exit_date"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1733
+msgid "total_profit"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1734
+msgid "profit_loss_ratio"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1734
+msgid "buy_count"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1734
+msgid "sell_count"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1754
+msgid "current_number"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1756
+msgid "floating_profit"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1756
+msgid "profit_cost_price"
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/trade_manage/TradeManager.cpp:1757
+msgid "floating_profit_ratio"
+msgstr ""

@@ -8,6 +8,8 @@
 #include "TaMama.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaMama)
 #endif
@@ -48,8 +50,9 @@ void TaMama::_calculate(const Indicator& data) {
 
     int outBegIdx;
     int outNbElement;
-    TA_MAMA(m_discard, total - 1, src, fast_limit, slow_limit, &outBegIdx, &outNbElement,
-            dst0 + m_discard, dst1 + m_discard);
+    hku::checkTARetCode(TA_MAMA(m_discard, total - 1, src, fast_limit, slow_limit, &outBegIdx,
+                                &outNbElement, dst0 + m_discard, dst1 + m_discard),
+                        m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

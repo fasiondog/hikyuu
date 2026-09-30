@@ -28,7 +28,7 @@ import datetime
 import mysql.connector
 import queue
 from multiprocessing import Queue, Process
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, QCoreApplication
 from hikyuu.gui.data.ImportWeightToSqliteTask import ImportWeightToSqliteTask
 from hikyuu.gui.data.ImportPytdxToH5Task import ImportPytdxToH5
 from hikyuu.gui.data.ImportPytdxTransToH5Task import ImportPytdxTransToH5
@@ -118,15 +118,15 @@ class UsePytdxImportToH5Thread(QThread):
             task_count += (market_count*2)
 
         self.logger.info('搜索通达信服务器')
-        self.send_message(['INFO', '搜索通达信服务器'])
+        self.send_message(['INFO', QCoreApplication.translate("ImportProgress", '搜索通达信服务器')])
         self.hosts = search_best_tdx()
         if not self.hosts:
             self.logger.warn('无法连接通达信行情服务器！请检查网络设置！')
-            self.send_message(['INFO', '无法连接通达信行情服务器！请检查网络设置！'])
+            self.send_message(['INFO', QCoreApplication.translate("ImportProgress", '无法连接通达信行情服务器！请检查网络设置！')])
             return
 
         if task_count == 0:
-            self.send_message(['INFO', '未选择需要导入的行情数据！'])
+            self.send_message(['INFO', QCoreApplication.translate("ImportProgress", '未选择需要导入的行情数据！')])
             return
 
         use_tdx_number = min(
@@ -250,7 +250,7 @@ class UsePytdxImportToH5Thread(QThread):
 
         # 正在导入代码表
         self.logger.info('导入股票代码表')
-        self.send_message(['INFO', '导入股票代码表'])
+        self.send_message(['INFO', QCoreApplication.translate("ImportProgress", '导入股票代码表')])
 
         if self.config.getboolean('hdf5', 'enable', fallback=True):
             connect = sqlite3.connect("{}/stock.db".format(
@@ -303,8 +303,10 @@ class UsePytdxImportToH5Thread(QThread):
                                       self.quotations)
             if count > 0:
                 self.logger.info("{} 新增股票数: {}".format(market, count))
-                self.send_message(
-                    ['INFO', '{} 新增股票数：{}'.format(market, count)])
+                self.send_message([
+                    'INFO',
+                    QCoreApplication.translate("ImportProgress", "{} 新增股票数：{}").format(market, count)
+                ])
         pytdx_api.disconnect()
         connect.close()
 
@@ -327,7 +329,7 @@ class UsePytdxImportToH5Thread(QThread):
                         self.send_message(
                             [taskname, 'FINISHED', market, ktype, total])
                     elif taskname == 'IMPORT_BLOCKINFO':
-                        self.send_message([taskname, ktype])
+                        self.send_message([taskname, ktype, total])
                     elif taskname == 'IMPORT_ZH_BOND10':
                         self.send_message([taskname, ktype])
                     elif taskname == 'IMPORT_WEIGHT':

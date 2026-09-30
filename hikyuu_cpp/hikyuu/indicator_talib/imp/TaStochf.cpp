@@ -8,6 +8,8 @@
 #include "TaStochf.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaStochf)
 #endif
@@ -66,8 +68,10 @@ void TaStochf::_calculate(const Indicator& data) {
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_STOCHF(m_discard, total - 1, high, low, close, fastk_n, fastd_n, fastd_matype, &outBegIdx,
-              &outNbElement, dst0 + m_discard, dst1 + m_discard);
+    hku::checkTARetCode(
+      TA_STOCHF(m_discard, total - 1, high, low, close, fastk_n, fastd_n, fastd_matype, &outBegIdx,
+                &outNbElement, dst0 + m_discard, dst1 + m_discard),
+      m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

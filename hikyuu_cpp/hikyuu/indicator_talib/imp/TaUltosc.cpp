@@ -8,6 +8,8 @@
 #include "TaUltosc.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaUltosc)
 #endif
@@ -62,8 +64,9 @@ void TaUltosc::_calculate(const Indicator& data) {
     m_discard = back;
     int outBegIdx;
     int outNbElement;
-    TA_ULTOSC(m_discard, total - 1, high, low, close, n1, n2, n3, &outBegIdx, &outNbElement,
-              dst + m_discard);
+    hku::checkTARetCode(TA_ULTOSC(m_discard, total - 1, high, low, close, n1, n2, n3, &outBegIdx,
+                                  &outNbElement, dst + m_discard),
+                        m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

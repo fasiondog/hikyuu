@@ -5,8 +5,6 @@
  *      Author: fasiondog
  */
 
-#include "../crt/SLICE.h"
-#include "../crt/EMA.h"
 #include "IEma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -62,11 +60,15 @@ void IEma::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 void IEma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    Indicator slice = SLICE(ind, 0, curPos + 1);
-    Indicator ema = EMA(slice, step);
-    if (ema.size() > 0) {
-        _set(ema[ema.size() - 1], curPos);
+    // Intentional: replicate the static EMA recursion on the prefix [0, curPos] with raw scalars,
+    // bitwise identical to EMA(SLICE(ind, 0, curPos + 1)) but without per-bar allocations.
+    auto const* src = ind.data();
+    value_t multiplier = 2.0 / (step + 1.0);
+    value_t prev = src[ind.discard()];
+    for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
+        prev = (src[i] - prev) * multiplier + prev;
     }
+    _set(prev, curPos);
 }
 
 Indicator HKU_API EMA(int n) {

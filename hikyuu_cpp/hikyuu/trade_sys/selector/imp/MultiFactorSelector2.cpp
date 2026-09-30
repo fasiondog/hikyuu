@@ -69,7 +69,9 @@ void MultiFactorSelector2::_reset() {
 
 SelectorPtr MultiFactorSelector2::_clone() {
     auto p = make_shared<MultiFactorSelector2>();
-    p->m_mf = m_mf->clone();
+    if (m_mf) {
+        p->m_mf = m_mf->clone();
+    }
     p->m_stk_sys_dict = m_stk_sys_dict;
     p->m_factorset = m_factorset;
     return p;
@@ -130,6 +132,10 @@ void MultiFactorSelector2::_calculate() {
     for (const auto& sys : m_real_sys_list) {
         m_stk_sys_dict.insert({sys->getStock(), sys});
     }
+}
+
+SelectorPtr HKU_API SE_MultiFactor2() {
+    return make_shared<MultiFactorSelector2>();
 }
 
 SelectorPtr HKU_API SE_MultiFactor2(const MFPtr& mf, const ScoresFilterPtr& filter) {

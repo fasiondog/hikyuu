@@ -207,6 +207,47 @@ TEST_CASE("test_SE_PerformanceOptimal") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_calculate_deterministic") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    auto dates = StockManager::instance().getTradingCalendar(query);
+
+    se->calculate(SystemList(), query);
+    vector<string> first_selected;
+    first_selected.reserve(dates.size());
+    for (const auto& date : dates) {
+        auto sw = se->getSelected(date);
+        first_selected.push_back(sw.empty() ? string() : sw[0].sys->name());
+    }
+
+    /** @arg repeated full recalculations with the same input select the same system for each date,
+     *  i.e. the concurrent walk-forward training is not cross-clobbered by the shared EV
+     *  (ISS-084) */
+    for (size_t round = 0; round < 2; round++) {
+        se->reset();
+        se->calculate(SystemList(), query);
+        for (size_t i = 0; i < dates.size(); i++) {
+            auto sw = se->getSelected(dates[i]);
+            if (first_selected[i].empty()) {
+                CHECK_UNARY(sw.empty());
+            } else {
+                REQUIRE_UNARY(!sw.empty());
+                CHECK_EQ(sw[0].sys->name(), first_selected[i]);
+            }
+        }
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

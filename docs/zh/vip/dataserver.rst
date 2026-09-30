@@ -1,5 +1,5 @@
-dataserver
-============
+dataserver(数据缓存服务器)
+==============================
 
 pip 安装的，可在 shell 下直接执行 dataserver 命令。或使用 Python 执行安装目录下 gui/dataserver.py 文件。
 

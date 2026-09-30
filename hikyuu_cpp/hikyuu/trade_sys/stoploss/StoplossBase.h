@@ -78,10 +78,12 @@ public:
      * of the current trade from the stop-loss strategy module before the trade is executed.
      * @param datetime trade date
      * @param price the planned trade price
-     * @note In the default implementation it returns the same result as getPrice
+     * @note Unlike a long stop-loss, a short one must be above the planned trade price. The default
+     *       implementation returns 0 (no short stop-loss is provided), subclasses supporting short
+     *       selling must override it; it must not fall back to the long-side getPrice result
      */
     virtual price_t getShortPrice(const Datetime& datetime, price_t price) {
-        return getPrice(datetime, price);
+        return 0.0;
     }
 
     /** Subclass reset interface */

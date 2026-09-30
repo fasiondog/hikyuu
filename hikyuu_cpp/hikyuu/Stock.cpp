@@ -6,6 +6,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <set>
 #include "GlobalInitializer.h"
@@ -413,7 +414,7 @@ bool Stock::isBuffer(KQuery::KType ktype) const noexcept {
     string nktype(ktype);
     to_upper(nktype);
     HKU_IF_RETURN(m_data->pMutex.find(nktype) == m_data->pMutex.end(), false);
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
     return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
 }
 
@@ -466,30 +467,26 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     auto driver = m_kdataDriver->getConnect();
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
-    // CSV is loaded into the memory entirely, the other types are loaded according to the
-    // configured preload parameters
+    // Load the K-line data according to the configured preload parameters
     KQuery query = KQuery(0, Null<int64_t>(), kType);
 
-    if (driver->name() != "TMPCSV") {
-        const auto& param = StockManager::instance().getPreloadParameter();
-        string preload_type = fmt::format("{}_max", kType);
-        to_lower(preload_type);
-        int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
-        HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type,
-                            max_num);
-        int64_t start = total <= (size_t)max_num ? 0 : total - max_num;
-        query = KQuery(start, Null<int64_t>(), kType);
-        if (driver->isColumnFirst() && market_code() != "SH000001") {
-            Stock sh000001 = StockManager::instance().getStock("SH000001");
-            if (!sh000001.isNull()) {
-                if (!sh000001.isBuffer(kType)) {
-                    sh000001.loadKDataToBuffer(kType);
-                }
+    const auto& param = StockManager::instance().getPreloadParameter();
+    string preload_type = fmt::format("{}_max", kType);
+    to_lower(preload_type);
+    int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
+    HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
+    int64_t start = total <= (size_t)max_num ? 0 : total - max_num;
+    query = KQuery(start, Null<int64_t>(), kType);
+    if (driver->isColumnFirst() && market_code() != "SH000001") {
+        Stock sh000001 = StockManager::instance().getStock("SH000001");
+        if (!sh000001.isNull()) {
+            if (!sh000001.isBuffer(kType)) {
+                sh000001.loadKDataToBuffer(kType);
+            }
 
-                auto k = sh000001.getKRecord(0, kType);
-                if (k.isValid()) {
-                    query = KQueryByDate(k.datetime, Null<Datetime>(), kType);
-                }
+            auto k = sh000001.getKRecord(0, kType);
+            if (k.isValid()) {
+                query = KQueryByDate(k.datetime, Null<Datetime>(), kType);
             }
         }
     }
@@ -1219,7 +1216,39 @@ bool Stock::isTransactionTime(Datetime time) {
     return time >= openTime2 && time <= closeTime2 + Seconds(30);
 }
 
+// The market data is not trusted (it may come from a remote server or external input): reject the
+// abnormal bars before they land in the memory cache and are mirrored to the shared memory of all
+// the IPC clients
+static bool isValidRealtimeKRecord(const KRecord& record) {
+    if (record.datetime.isNull()) {
+        return false;
+    }
+
+    if (!std::isfinite(record.openPrice) || record.openPrice <= 0.0 ||
+        !std::isfinite(record.highPrice) || record.highPrice <= 0.0 ||
+        !std::isfinite(record.lowPrice) || record.lowPrice <= 0.0 ||
+        !std::isfinite(record.closePrice) || record.closePrice <= 0.0) {
+        return false;
+    }
+
+    if (record.highPrice < record.lowPrice || record.highPrice < record.openPrice ||
+        record.highPrice < record.closePrice || record.lowPrice > record.openPrice ||
+        record.lowPrice > record.closePrice) {
+        return false;
+    }
+
+    if (!std::isfinite(record.transAmount) || record.transAmount < 0.0 ||
+        !std::isfinite(record.transCount) || record.transCount < 0.0) {
+        return false;
+    }
+
+    return true;
+}
+
 void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
+    HKU_WARN_IF_RETURN(!isValidRealtimeKRecord(record), void(),
+                       "The invalid krecord, skip it! {} {}", market_code(), record);
+
     // The client mode without a local buffer (an ordinary proxy security): it is forwarded to the
     // main process to apply (updating its buffer and mirroring to the shared memory segment, from
     // which all the clients read), keeping the ability of the client to update the market data
@@ -1333,7 +1362,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     to_upper(nktype);
 
     // Write lock
-    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
     if (!m_data->pKData[nktype]) {
@@ -1363,7 +1392,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     to_upper(nktype);
 
     // Write lock
-    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
     if (!m_data->pKData[nktype]) {

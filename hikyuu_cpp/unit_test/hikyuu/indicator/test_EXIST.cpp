@@ -141,6 +141,70 @@ TEST_CASE("test_EXIST_dyn") {
     }
 }
 
+/**
+ * @par Test points
+ * The core regression: full calculation == incremental calculation (the same Indicator instance is
+ * reused with consecutive setContext calls, so the tail-extended second call enters
+ * _increment_calculate).
+ *
+ * Background: IExist::_increment_calculate used `i <= m_discard` as the seed-scan bound. The
+ * framework zeroes m_discard right before calling _increment_calculate (IndicatorImp
+ * increment_execute_leaf_or_op), so the seed scan never ran, dst[start_pos] was written 0 and the
+ * following up-to-n values lost the window state. The full path set start_pos == m_discard so it
+ * was coincidentally correct, hiding the bug. The fix uses `i <= start_pos`.
+ */
+TEST_CASE("test_EXIST_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    // The partial window is a prefix of the full one, extended at the tail -> incremental admission
+    KData k_full = stock.getKData(KQuery(-20));
+    KData k_partial = stock.getKData(KQuery(-20, -10));
+
+    // (1) The full baseline: an independent instance
+    Indicator ind_full = EXIST(CLOSE() > OPEN(), 5);
+    ind_full.setContext(k_full);
+
+    // (2) The incremental test: reuse the same instance with consecutive setContext
+    Indicator ind_inc = EXIST(CLOSE() > OPEN(), 5);
+    ind_inc.setContext(k_partial);  // cache m_old_context
+    ind_inc.setContext(k_full);     // extended at the tail -> enter _increment_calculate
+
+    CHECK_EQ(ind_full.size(), ind_inc.size());
+    CHECK_EQ(ind_full.discard(), ind_inc.discard());
+    for (size_t i = 0; i < ind_full.size(); ++i) {
+        if (std::isnan(ind_full[i]) && std::isnan(ind_inc[i])) {
+            continue;
+        }
+        CHECK_EQ(ind_inc[i], doctest::Approx(ind_full[i]).epsilon(0.0001));
+    }
+}
+
+/**
+ * @par Test points
+ * A NaN in the condition series means no data: it neither satisfies nor breaks the condition,
+ * consistent with IBarsSince and with every consumer (SG_Bool, IF, conditions all treat NaN as
+ * not holding).
+ */
+TEST_CASE("test_EXIST_nan_is_not_a_condition") {
+    PriceList a;
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(Null<price_t>());
+    a.push_back(0);
+    a.push_back(0);
+
+    Indicator x = PRICELIST(a);
+    Indicator result = EXIST(x, 3);
+    CHECK_EQ(result.size(), 5);
+    // the first two bars have no full window
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[0]));
+    CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

@@ -393,31 +393,6 @@ StockManager/Block/Stock
         :rtype: bool
     
 
-    .. py:method:: add_temp_csv_stock(self, code, day_filename, min_filename[, tick=0.01, tick_value=0.01, precision=2, min_trade_num = 1, max_trade_num=1000000])
-
-        从CSV文件（K线数据）增加临时的Stock，可用于只有CSV格式的K线数据时，进行临时测试。
-
-        添加的 stock 对应的 market 为 "TMP", 如需通过 sm 获取，需加入 tmp，如：sm['tmp0001']
-        
-        CSV文件第一行为标题，需含有 Datetime（或Date、日期）、OPEN（或开盘价）、HIGH（或最高价）、LOW（或最低价）、CLOSE（或收盘价）、AMOUNT（或成交金额）、VOLUME（或VOL、COUNT、成交量）。
-        
-        :param str code: 自行编号的证券代码，不能和已有的Stock相同，否则将返回Null<Stock>。
-        :param str day_filename: 日线CSV文件名
-        :param str min_filename: 分钟线CSV文件名
-        :param float tick: 最小跳动量，默认0.01
-        :param float tick_value: 最小跳动量价值，默认0.01
-        :param int precision: 价格精度，默认2
-        :param int min_trade_num: 单笔最小交易量，默认1
-        :param int max_trade_num: 单笔最大交易量，默认1000000
-        :return: 加入的Stock
-        :rtype: Stock
-
-    .. py:method:: remove_temp_csv_stock(self, code)
-    
-        移除增加的临时Stock
-        
-        :param str code: 创建时自定义的编码
-
     .. py:method:: add_stock(self, stock)
 
         谨慎调用！！！仅供增加某些临时的外部 Stock, 通常配合 Stock.set_krecord_list 方法直接使用外部来源的数据

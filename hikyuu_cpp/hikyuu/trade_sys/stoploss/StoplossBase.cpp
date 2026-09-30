@@ -39,18 +39,9 @@ void StoplossBase::reset() {
 }
 
 StoplossPtr StoplossBase::clone() {
-    StoplossPtr p;
-    try {
-        p = _clone();
-    } catch (...) {
-        HKU_ERROR("Subclass _clone failed!");
-        p = StoplossPtr();
-    }
-
-    if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!");
-        return shared_from_this();
-    }
+    StoplossPtr p = _clone();
+    HKU_CHECK(p && p.get() != this,
+              "Failed clone! The subclass _clone of {} must return a new object!", m_name);
 
     p->m_is_python_object = m_is_python_object;
     p->m_name = m_name;
@@ -63,6 +54,7 @@ StoplossPtr StoplossBase::clone() {
 void StoplossBase::setTO(const KData& kdata) {
     HKU_IF_RETURN(m_kdata == kdata, void());
     m_kdata = kdata;
+    _reset();
     if (!kdata.empty()) {
         _calculate();
     }

@@ -143,6 +143,11 @@ public:
         return m_trade_list;
     }
 
+    /** Get the reference of all the trade records, only for read-only access (no copy) */
+    virtual const TradeRecordList& getRefTradeList() const override {
+        return m_trade_list;
+    }
+
     /**
      * Get the trade records within the given date range [start, end)
      * @param start start date
@@ -169,6 +174,9 @@ public:
 
     /**
      * Get the position record of the given security
+     * @note Only number is the exact value on the given date; the other economic fields (e.g.
+     *       takeDatetime, buyMoney, totalCost, sellMoney) are taken from the most recent closed
+     *       position record of the security, for reference only
      * @param date the given date
      * @param stock the given security
      */
@@ -351,6 +359,19 @@ public:
      */
     virtual FundsRecord getFunds(const Datetime& datetime,
                                  KQuery::KType ktype = KQuery::DAY) override;
+
+    /**
+     * Get all the daily asset records of the given date list
+     * @note The dates are processed in ascending order internally and the output keeps the input
+     *       order; the dates taking the current-state branch are calculated serially first (they
+     *       may advance the ex-rights data), then the historical dates are replayed from the
+     *       trade list in one pass, O(trades + dates x positions)
+     * @param dates date list
+     * @param ktype K-line type, it must match the date list, KQuery::DAY by default
+     * @return daily asset record list
+     */
+    virtual FundsList getFundsList(const DatetimeList& dates,
+                                   const KQuery::KType& ktype = KQuery::DAY) override;
 
     /**
      * Add a trade record directly

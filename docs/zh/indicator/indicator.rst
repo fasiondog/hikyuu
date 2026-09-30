@@ -1002,52 +1002,47 @@
     :param data: 输入数据
     :rtype: Indicator
 
-.. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY])
       
     自定义分组累积计数
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator        
 
-.. py:function:: GROUP_MAX(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_MAX(ind[, ktype=Query.DAY])
       
     自定义分组累积最大值
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator        
 
-.. py:function:: GROUP_MIN(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_MIN(ind[, ktype=Query.DAY])
       
     自定义分组累积计录最小值
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator        
 
-.. py:function:: GROUP_PROD(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_PROD(ind[, ktype=Query.DAY])
       
     自定义分组累积乘积
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator
 
-.. py:function:: GROUP_SUM(ind[, ktype=Query.DAY,  unit=1])
+.. py:function:: GROUP_SUM(ind[, ktype=Query.DAY])
       
     自定义分组累积和
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator    
 
-.. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY,  unit=1]
+.. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY])
       
     自定义分组累积计算指标。
     
@@ -1060,7 +1055,6 @@
     :param Indicator ind: 待计算指标
     :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
     :param KQuery.KType ktype: 分组的K线周期
-    :param int unit: 分组周期单位 (分组的K线周期单位, 使用日线计算分钟线, unit=2代表按2天累积计算的分钟线)
     :rtype: Indicator    
 
 

@@ -69,11 +69,20 @@ void IAtr::_calculate(const Indicator& data) {
     }
 }
 
+size_t IAtr::min_increment_start() const {
+    // dst[start_pos - 1] must hold a computed ATR, and the TR seed looks back one more bar.
+    return getParam<int>("n") + 1;
+}
+
 void IAtr::_increment_calculate(const Indicator& data, size_t start_pos) {
     const KData& kdata = getContext();
     size_t total = kdata.size();
 
     int n = getParam<int>("n");
+
+    // Same convention as _calculate: hide the first value to stay consistent with MA(TR). The
+    // framework zeroes m_discard before calling, and updateDiscard would otherwise stop at dst[n].
+    m_discard = n + 1;
 
     auto* k = kdata.data();
     vector<value_t> buf(total);

@@ -613,7 +613,7 @@ void DBConnectBase::batchRemove(InputIterator first, InputIterator last, bool au
 
     try {
         for (InputIterator iter = first; iter != last; ++iter) {
-            remove(*iter);
+            remove(*iter, false);
         }
 
         if (autotrans) {

@@ -330,20 +330,16 @@ Indicator HKU_API AGG_FUNC(const Indicator& ind, agg_func_t agg_func,
 /**
  * @brief Group by period
  * @param ktype the given K-line period
- * @param unit grouping period unit, 1 by default. It is calculated by unit periods of the ktype
- *             parameter
  * @return Indicator
  */
 #define GROUP_FUNC_DEFINE(group_name)                                                            \
-    Indicator HKU_API group_name(const Indicator& ind, const KQuery::KType& ktype = KQuery::DAY, \
-                                 int unit = 1);
+    Indicator HKU_API group_name(const Indicator& ind, const KQuery::KType& ktype = KQuery::DAY);
 
-#define GROUP_FUNC_IMP(group_name)                                                             \
-    Indicator HKU_API group_name(const Indicator& ind, const KQuery::KType& ktype, int unit) { \
-        Parameter params;                                                                      \
-        params.set<string>("ktype", ktype);                                                    \
-        params.set<int>("unit", unit);                                                         \
-        return getExtIndicator(#group_name, ind, params);                                      \
+#define GROUP_FUNC_IMP(group_name)                                                            \
+    Indicator HKU_API group_name(const Indicator& ind, const KQuery::KType& ktype) {          \
+        Parameter params;                                                                     \
+        params.set<string>("ktype", ktype);                                                   \
+        return getExtIndicator(#group_name, ind, params);                                     \
     }
 
 GROUP_FUNC_DEFINE(GROUP_COUNT)
@@ -357,7 +353,7 @@ using group_func_t =
   std::function<void(Indicator::value_t* dst, const DatetimeList& src_ds,
                      const Indicator::value_t* src, size_t group_start, size_t group_last)>;
 Indicator HKU_API GROUP_FUNC(const Indicator& ind, group_func_t group_func,
-                             const KQuery::KType& ktype = KQuery::DAY, int unit = 1);
+                             const KQuery::KType& ktype = KQuery::DAY);
 
 /** @} */
 }  // namespace hku

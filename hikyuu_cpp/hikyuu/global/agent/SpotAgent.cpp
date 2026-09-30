@@ -90,9 +90,9 @@ private:
 };
 
 unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) {
-    SpotRecord* result = nullptr;
+    std::unique_ptr<SpotRecord> result;
     try {
-        result = new SpotRecord;
+        result = std::make_unique<SpotRecord>();
         if (spot->market())
             result->market = spot->market()->str();
         if (spot->code())
@@ -144,22 +144,26 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
         }
 
     } catch (std::exception& e) {
-        result = nullptr;
+        result.reset();
         HKU_ERROR(e.what());
     } catch (...) {
-        result = nullptr;
+        result.reset();
         HKU_ERROR_UNKNOWN;
     }
 
-    return unique_ptr<SpotRecord>(result);
+    return result;
 }
 
 void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     // SPEND_TIME(receive_data);
+    // The message is the topic prefix (":spot:") followed by the SpotList flatbuffer;
+    // the verifier must only cover the flatbuffer part, otherwise its upper bound extends
+    // past the end of the allocation (6 bytes over-read on crafted/corrupted messages).
+    HKU_CHECK(buf_len > ms_spotTopicLength, "Invalid data length: {}!", buf_len);
     const uint8_t* spot_list_buf = (const uint8_t*)(buf) + ms_spotTopicLength;
 
     // Validate the data
-    flatbuffers::Verifier verify(spot_list_buf, buf_len);
+    flatbuffers::Verifier verify(spot_list_buf, buf_len - ms_spotTopicLength);
     HKU_CHECK(VerifySpotListBuffer(verify), "Invalid data!");
 
 #if defined(_MSC_VER)

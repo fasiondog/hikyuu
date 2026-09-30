@@ -89,6 +89,28 @@ TEST_CASE("test_BARSLAST") {
     CHECK_UNARY(std::isnan(result[0]));
 }
 
+/**
+ * @par Test points
+ * A NaN in the condition series means no data: it is not a hit, so BARSLAST keeps skipping until
+ * an older real hit (or reports all NaN when the condition never truly held).
+ */
+TEST_CASE("test_BARSLAST_nan_is_not_a_condition") {
+    PriceList a;
+    a.push_back(0);
+    a.push_back(0);
+    a.push_back(Null<price_t>());
+    a.push_back(0);
+    a.push_back(0);
+
+    Indicator x = PRICELIST(a);
+    Indicator result = BARSLAST(x);
+    CHECK_EQ(result.size(), 5);
+    CHECK_EQ(result.discard(), 5);
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

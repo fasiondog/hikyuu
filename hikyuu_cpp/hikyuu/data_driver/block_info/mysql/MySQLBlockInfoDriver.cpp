@@ -130,7 +130,7 @@ void MySQLBlockInfoDriver::save(const Block& block) {
     if (category_iter == m_buffer.end()) {
         m_buffer.emplace(block.category(), unordered_map<string, Block>{{block.name(), block}});
     } else {
-        category_iter->second.emplace(block.name(), block);
+        category_iter->second.insert_or_assign(block.name(), block);
     }
 
     auto connect = getConnect();
@@ -173,7 +173,9 @@ void MySQLBlockInfoDriver::remove(const string& category, const string& name) {
     HKU_IF_RETURN(block_iter == category_iter->second.end(), void());
 
     category_iter->second.erase(block_iter);
-    m_buffer.erase(category_iter);
+    if (category_iter->second.empty()) {
+        m_buffer.erase(category_iter);
+    }
 }
 
 }  // namespace hku

@@ -3,9 +3,7 @@
 </p>
 
 <p align="center">
-  An open-source, high-performance quantitative trading framework in C++/Python<br>
-  focused on strategy analysis and backtesting<br>
-  <strong>Trading model R&amp;D · Ultra-fast engine · Efficient backtesting</strong>
+  An open-source, ultra-fast, and efficient quantitative trading framework in C++/Python
 </p>
 
 <p align="center">
@@ -64,7 +62,7 @@ combine into your own strategy library and validate through backtesting.
 | Item                         | Link                                                                                                                                          |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🏠 **Project home page**     | [https://hikyuu.org/](https://hikyuu.org/)                                                                                                     |
-| 📚 **Documentation**         | [https://hikyuu.readthedocs.io/en/latest/index.html](https://hikyuu.readthedocs.io/en/latest/index.html)                                       |
+| 📚 **Documentation**         | [https://hikyuu-en.readthedocs.io/en/latest/](https://hikyuu-en.readthedocs.io/en/latest/)                                       |
 | 🚀 **Getting started**       | [Jupyter Notebook tutorial series](https://nbviewer.org/github/fasiondog/hikyuu/blob/master/hikyuu/examples/notebook/en/000-Index.ipynb?flush_cache=True) |
 | 🧰 **Strategy part library** | [https://gitee.com/fasiondog/hikyuu_hub](https://gitee.com/fasiondog/hikyuu_hub)                                                              |
 

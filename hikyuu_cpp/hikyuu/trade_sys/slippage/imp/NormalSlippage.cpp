@@ -14,19 +14,29 @@ BOOST_CLASS_EXPORT(hku::NormalSlippage)
 
 namespace hku {
 
-std::random_device NormalSlippage::ms_rd;
-std::mt19937 NormalSlippage::ms_gen(ms_rd());
-
-NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal") {
+NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+    // 0 means a random seed; a non-zero seed makes the backtest reproducible
+    setParam<int64_t>("seed", 0);
 }
 
 NormalSlippage::~NormalSlippage() {}
 
 void NormalSlippage::_checkParam(const string& name) const {
-    if ("stddev" == name) {
+    if ("mean" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>("mean")));
+    } else if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
+    }
+}
+
+void NormalSlippage::_reset() {
+    int64_t seed = getParam<int64_t>("seed");
+    if (seed != 0) {
+        m_gen.seed(static_cast<uint32_t>(seed));
+    } else {
+        m_gen.seed(std::random_device{}());
     }
 }
 
@@ -36,7 +46,7 @@ price_t NormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price)
 
     std::normal_distribution<double> dis(mean, stddev);
 
-    double value = dis(ms_gen);
+    double value = dis(m_gen);
     return price + std::abs(value);
 }
 
@@ -46,7 +56,7 @@ price_t NormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price
 
     std::normal_distribution<double> dis(mean, stddev);
 
-    double value = dis(ms_gen);
+    double value = dis(m_gen);
     return price - std::abs(value);
 }
 

@@ -45,10 +45,15 @@ void sysinfo_init() {
       HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
 }
 void sysinfo_clean() {
-    if (g_sys_info) {
-        delete g_sys_info;
-        g_sys_info = nullptr;
-    }
+    // Intentional: the detached feedback thread in sendFeedback() may still touch g_sys_info
+    // after clean, so never delete it here (use-after-free race), and never null it either --
+    // keeping the static pointer leaves the block "still reachable" at exit, invisible to
+    // LeakSanitizer (same as StockManager::m_sm); nulling it alone would turn the block into
+    // a reported definite loss.
+    // if (g_sys_info) {
+    //     delete g_sys_info;
+    //     g_sys_info = nullptr;
+    // }
 }
 
 bool HKU_API runningInPython() {

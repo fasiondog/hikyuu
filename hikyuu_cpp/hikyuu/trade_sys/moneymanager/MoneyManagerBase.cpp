@@ -56,18 +56,9 @@ void MoneyManagerBase::reset() {
 }
 
 MoneyManagerPtr MoneyManagerBase::clone() {
-    MoneyManagerPtr p;
-    try {
-        p = _clone();
-    } catch (...) {
-        HKU_ERROR("Subclass _clone failed!");
-        p = MoneyManagerPtr();
-    }
-
-    if (!p || p.get() == this) {
-        HKU_ERROR("Failed clone! Will use self-ptr!");
-        return shared_from_this();
-    }
+    MoneyManagerPtr p = _clone();
+    HKU_CHECK(p && p.get() != this,
+              "Failed clone! The subclass _clone of {} must return a new object!", m_name);
 
     p->m_params = m_params;
     p->m_name = m_name;
@@ -93,8 +84,10 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    // Ignore it when the risk is not greater than 0
-    HKU_IF_RETURN(risk <= 0.0, 0.0);
+    // When the risk is not greater than 0, the price has reached or fallen below the stop loss
+    // price. The MMs which do not support multi-trading liquidate the whole position directly,
+    // otherwise the subclass _getSellNumber is left to decide
+    HKU_IF_RETURN(risk <= 0.0 && !m_support_mult_buy_sell, MAX_DOUBLE);
 
     return _getSellNumber(datetime, stock, price, risk, from);
 }
@@ -106,8 +99,14 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                         datetime, stock.market_code(), price, risk);
     HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
+    // Protects all the money managers from a division by zero or an invalid price propagated by
+    // dirty data, so that no inf/nan position count can be produced (ISS-094)
+    HKU_ERROR_IF_RETURN(
+      !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
+      datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
+
     HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
-                       "risk less zero (Mayby single-line price board, can ignored)! "
+                       "risk less zero (Maybe single-line price board, can ignored)! "
                        "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
                        datetime, stock.market_code(), stock.name(), price, risk,
                        getSystemPartName(from));
@@ -139,15 +138,30 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
         }
     } else {
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-        price_t need_cash = n * price + cost.total;
+        price_t need_cash = n * price * stock.unit() + cost.total;
         price_t current_cash = m_tm->cash(datetime, m_query.kType());
-        while (n > min_trade && need_cash > current_cash) {
-            n = n - min_trade;
-            cost = m_tm->getBuyCost(datetime, stock, price, n);
-            need_cash = n * price + cost.total;
-        }
         if (need_cash > current_cash) {
-            n = 0.0;
+            // need_cash(k) is monotonically increasing in k, so binary search the largest
+            // affordable multiple of min_trade — O(log(n/min_trade)) cost evaluations instead of
+            // decrementing lot by lot
+            double low = min_trade, high = n;
+            while (high - low > min_trade) {
+                double mid = int64_t((low + high) / (2.0 * min_trade)) * min_trade;
+                if (mid <= low || mid >= high) {
+                    break;
+                }
+                cost = m_tm->getBuyCost(datetime, stock, price, mid);
+                if (mid * price * stock.unit() + cost.total <= current_cash) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            n = low;
+            cost = m_tm->getBuyCost(datetime, stock, price, n);
+            if (n * price * stock.unit() + cost.total > current_cash) {
+                n = 0.0;
+            }
         }
     }
 
@@ -159,9 +173,13 @@ double MoneyManagerBase::getSellShortNumber(const Datetime& datetime, const Stoc
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk >= 0.0, 0.0,
-                        "risk is positive! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+    // For a short sell the stop-loss is above the entry, so the per-share risk (stoploss - price)
+    // must be positive; a non-positive risk means the price has already reached the stop-loss
+    HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
+                       "risk not positive (Maybe single-line price board, can ignored)! "
+                       "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
+                       datetime, stock.market_code(), stock.name(), price, risk,
+                       getSystemPartName(from));
     return _getSellShortNumber(datetime, stock, price, risk, from);
 }
 
@@ -170,9 +188,20 @@ double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stoc
     HKU_ERROR_IF_RETURN(!m_tm, 0.0,
                         "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
                         datetime, stock.market_code(), price, risk);
-    HKU_ERROR_IF_RETURN(risk >= 0.0, 0.0,
-                        "risk is positive! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+
+    if (PART_ENVIRONMENT == from) {
+        // Force covering the whole short position
+        HKU_IF_RETURN(!getParam<bool>("disable_ev_force_clean_position"), MAX_DOUBLE);
+    }
+
+    if (PART_CONDITION == from) {
+        HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
+    }
+
+    // When the risk is not greater than 0, the price has risen to or above the stop-loss price;
+    // the MMs which do not support multi-trading cover the whole position directly
+    HKU_IF_RETURN(risk <= 0.0 && !m_support_mult_buy_sell, MAX_DOUBLE);
+
     return _getBuyShortNumber(datetime, stock, price, risk, from);
 }
 
@@ -204,23 +233,31 @@ size_t MoneyManagerBase::currentSellCount(const Stock& stk) const {
 }
 
 void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
-    auto iter = m_buy_sell_counts.find(tr.stock);
-    if (iter == m_buy_sell_counts.end()) {
-        m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(1, 0);
-    } else {
-        iter->second.first++;
-        iter->second.second = 0;
+    // Only the long-side opening updates the consecutive trade counters; the short-side trades
+    // (BUSINESS_BUY_SHORT etc.) must not pollute the long tranches (ISS-093)
+    if (tr.business == BUSINESS_BUY) {
+        auto iter = m_buy_sell_counts.find(tr.stock);
+        if (iter == m_buy_sell_counts.end()) {
+            m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(1, 0);
+        } else {
+            iter->second.first++;
+            iter->second.second = 0;
+        }
     }
     _buyNotify(tr);
 }
 
 void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
-    auto iter = m_buy_sell_counts.find(tr.stock);
-    if (iter == m_buy_sell_counts.end()) {
-        m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(0, 1);
-    } else {
-        iter->second.first = 0;
-        iter->second.second++;
+    // Only the long-side closing updates the consecutive trade counters; the short-side trades
+    // (BUSINESS_SELL_SHORT etc.) must not pollute the long tranches (ISS-093)
+    if (tr.business == BUSINESS_SELL) {
+        auto iter = m_buy_sell_counts.find(tr.stock);
+        if (iter == m_buy_sell_counts.end()) {
+            m_buy_sell_counts[tr.stock] = std::make_pair<size_t, size_t>(0, 1);
+        } else {
+            iter->second.first = 0;
+            iter->second.second++;
+        }
     }
     _sellNotify(tr);
 }

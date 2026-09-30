@@ -21,6 +21,32 @@
 
 namespace hku {
 
+/**
+ * Centralized escaping point for SQL string values: safely wraps any value into
+ * a double-quoted string literal.
+ *
+ * Embedded double quotes are escaped by doubling (SQL standard), preventing
+ * values from closing the literal early and breaking out into SQL injection.
+ * Note: MySQL by default also recognizes backslash escape sequences, which is
+ * inconsistent with SQLite; backslashes are not handled here. Also, with
+ * MySQL ANSI_QUOTES enabled, "..." is parsed as an identifier (doubling still
+ * keeps the token intact, no injection, but the semantics change).
+ */
+inline std::string sqlStringLiteral(const std::string &val) {
+    std::string escaped;
+    escaped.reserve(val.size() + 2);
+    escaped += '"';
+    for (char c : val) {
+        if (c == '"') {
+            escaped += "\"\"";
+        } else {
+            escaped += c;
+        }
+    }
+    escaped += '"';
+    return escaped;
+}
+
 struct ASC {
     explicit ASC(const char *name) : name(name) {}
     explicit ASC(const std::string &name) : name(name) {}
@@ -108,11 +134,11 @@ struct Field {
     }
 
     DBCondition like(const std::string &pattern) {
-        return DBCondition(fmt::format(R"(({} like "{}"))", name, pattern));
+        return DBCondition(fmt::format("({} like {})", name, sqlStringLiteral(pattern)));
     }
 
     DBCondition like(const char *pattern) {
-        return DBCondition(fmt::format(R"(({} like "{}"))", name, pattern));
+        return DBCondition(fmt::format("({} like {})", name, sqlStringLiteral(pattern)));
     }
 
     std::string name;
@@ -124,27 +150,23 @@ struct Field {
 template <>
 inline DBCondition Field::in<std::string>(const std::vector<std::string> &vals) {
     HKU_CHECK(!vals.empty(), "input vals can't be empty!");
-    std::ostringstream out;
-    out << "(" << name << " in (";
-    size_t total = vals.size();
-    for (size_t i = 0; i < total - 1; i++) {
-        out << "\"" << vals[i] << "\",";
+    std::vector<std::string> literals;
+    literals.reserve(vals.size());
+    for (const auto &val : vals) {
+        literals.push_back(sqlStringLiteral(val));
     }
-    out << "\"" << vals[total - 1] << "\"))";
-    return DBCondition(out.str());
+    return DBCondition(fmt::format("({} in ({}))", name, fmt::join(literals, ",")));
 }
 
 template <>
 inline DBCondition Field::not_in<std::string>(const std::vector<std::string> &vals) {
     HKU_CHECK(!vals.empty(), "input vals can't be empty!");
-    std::ostringstream out;
-    out << "(" << name << " not in (";
-    size_t total = vals.size();
-    for (size_t i = 0; i < total - 1; i++) {
-        out << "\"" << vals[i] << "\",";
+    std::vector<std::string> literals;
+    literals.reserve(vals.size());
+    for (const auto &val : vals) {
+        literals.push_back(sqlStringLiteral(val));
     }
-    out << "\"" << vals[total - 1] << "\"))";
-    return DBCondition(out.str());
+    return DBCondition(fmt::format("({} not in ({}))", name, fmt::join(literals, ",")));
 }
 
 inline std::ostream &operator<<(std::ostream &out, const DBCondition &d) {
@@ -196,59 +218,59 @@ inline DBCondition operator<=(const Field &field, T val) {
 
 template <>
 inline DBCondition operator!=(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<>{})", field.name, sqlStringLiteral(val)));
 }
 
 template <>
 inline DBCondition operator>(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}>"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}>{})", field.name, sqlStringLiteral(val)));
 }
 
 template <>
 inline DBCondition operator<(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}<"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<{})", field.name, sqlStringLiteral(val)));
 }
 
 template <>
 inline DBCondition operator>=(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}>="{}"))", field.name, val));
+    return DBCondition(fmt::format("({}>={})", field.name, sqlStringLiteral(val)));
 }
 
 template <>
 inline DBCondition operator<=(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<={})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator==(const Field &field, const std::string &val) {
-    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
+    return DBCondition(fmt::format("({}={})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator!=(const Field &field, const std::string &val) {
-    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<>{})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator>(const Field &field, const std::string &val) {
-    return DBCondition(fmt::format(R"(({}>"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}>{})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator<(const Field &field, const std::string &val) {
-    return DBCondition(fmt::format(R"(({}<"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<{})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator>=(const Field &field, const std::string &val) {
-    return DBCondition(fmt::format(R"(({}>="{}"))", field.name, val));
+    return DBCondition(fmt::format("({}>={})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator<=(const Field &field, const std::string &val) {
-    return DBCondition(fmt::format(R"(({}<="{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<={})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator==(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}="{}"))", field.name, val));
+    return DBCondition(fmt::format("({}={})", field.name, sqlStringLiteral(val)));
 }
 
 inline DBCondition operator!=(const Field &field, const char *val) {
-    return DBCondition(fmt::format(R"(({}<>"{}"))", field.name, val));
+    return DBCondition(fmt::format("({}<>{})", field.name, sqlStringLiteral(val)));
 }
 
 }  // namespace hku

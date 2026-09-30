@@ -22,7 +22,6 @@
 #include "hikyuu/utilities/thread/algorithm.h"
 #include "StockManager.h"
 #include "global/schedule/inner_tasks.h"
-#include "data_driver/kdata/cvs/KDataTempCsvDriver.h"
 #include "plugin/interface/plugins.h"
 #include "plugin/device.h"
 #include "plugin/hkuextra.h"
@@ -97,6 +96,18 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     }
     m_initializing = true;
     m_thread_id = std::this_thread::get_id();
+    // Roll back the init flags on any exception so a failed init can be retried
+    struct Guard {
+        bool& initializing;
+        std::thread::id& thread_id;
+        bool committed{false};
+        ~Guard() {
+            initializing = false;
+            if (!committed)
+                thread_id = std::thread::id();
+        }
+    } guard{m_initializing, m_thread_id};
+
     HKU_CHECK(!context.empty(), "No stock code list is included in the context!");
 
     if (m_i18n_path.empty()) {
@@ -188,7 +199,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // Initialize the internal scheduled task (reload)
     initInnerTask();
 
-    m_initializing = false;
+    guard.committed = true;
 }
 
 void StockManager::loadData() {
@@ -660,15 +671,32 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 void StockManager::reload() {
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
+    // Reset the flag even if loadData throws, so reload is not permanently gated out
+    struct Guard {
+        bool& initializing;
+        ~Guard() {
+            initializing = false;
+        }
+    } guard{m_initializing};
 
     HKU_INFO("start reload ...");
     loadData();
-    m_initializing = false;
+
+    // The cached non-preloaded private buffers are frozen copies; drop them so the next query is
+    // rebuilt from the reloaded data
+    clearKDataCache();
 }
 
 void StockManager::reloadWith(const StrategyContext& context) {
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
+    // Reset the flag even if loadData throws, so reload is not permanently gated out
+    struct Guard {
+        bool& initializing;
+        ~Guard() {
+            initializing = false;
+        }
+    } guard{m_initializing};
 
     if (!context.empty()) {
         m_context = context;
@@ -678,7 +706,8 @@ void StockManager::reloadWith(const StrategyContext& context) {
 
     HKU_INFO("start reload ...");
     loadData();
-    m_initializing = false;
+
+    clearKDataCache();
 }
 
 const string& StockManager::tmpdir() const {
@@ -897,31 +926,6 @@ bool StockManager::isTradingHours(const Datetime& d, const string& market) const
                     (hour >= marketinfo.openTime2() && hour <= marketinfo.closeTime2()),
                   true);
     return false;
-}
-
-Stock StockManager::addTempCsvStock(const string& code, const string& day_filename,
-                                    const string& min_filename, price_t tick, price_t tickValue,
-                                    int precision, size_t minTradeNumber, size_t maxTradeNumber) {
-    string new_code(code);
-    to_upper(new_code);
-    Stock result("TMP", new_code, day_filename, STOCKTYPE_TMP, true, Datetime(199901010000),
-                 Null<Datetime>(), tick, tickValue, precision, minTradeNumber, maxTradeNumber);
-
-    Parameter param;
-    param.set<string>("type", "TMPCSV");
-    auto driver_pool = DataDriverFactory::getKDataDriverPool(param);
-    auto driver = driver_pool->getPrototype();
-    KDataTempCsvDriver* p = dynamic_cast<KDataTempCsvDriver*>(driver.get());
-    p->setDayFileName(day_filename);
-    p->setMinFileName(min_filename);
-    result.setKDataDriver(driver_pool);
-    result.loadKDataToBuffer(KQuery::DAY);
-    result.loadKDataToBuffer(KQuery::MIN);
-    return addStock(result) ? result : Null<Stock>();
-}
-
-void StockManager::removeTempCsvStock(const string& code) {
-    removeStock(fmt::format("TMP{}", code));
 }
 
 bool StockManager::addStock(const Stock& stock) {

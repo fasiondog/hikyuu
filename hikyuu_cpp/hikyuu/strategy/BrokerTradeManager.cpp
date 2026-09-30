@@ -57,6 +57,7 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
         m_cash = asset["cash"].get<price_t>();
 
         m_position.clear();
+        int precision = getParam<int>("precision");
         auto& positions = asset["positions"];
         for (auto iter = positions.cbegin(); iter != positions.cend(); ++iter) {
             try {
@@ -77,8 +78,9 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
                 pos.goalPrice = jpos["goal_price"].get<price_t>();
                 pos.totalNumber = pos.number;
                 price_t cost_price = jpos["cost_price"].get<price_t>();
-                pos.buyMoney = pos.number * cost_price;
-                pos.totalRisk = (pos.stoploss - cost_price) * pos.number;
+                pos.buyMoney = roundEx(pos.number * cost_price * stock.unit(), precision);
+                pos.totalRisk =
+                  roundEx((cost_price - pos.stoploss) * pos.number * stock.unit(), precision);
                 m_position[stock.id()] = pos;
             } catch (const std::exception& e) {
                 HKU_ERROR(e.what());

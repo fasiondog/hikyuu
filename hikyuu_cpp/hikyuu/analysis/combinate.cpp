@@ -10,6 +10,7 @@
 #include "hikyuu/indicator/crt/EXIST.h"
 #include "hikyuu/trade_sys/signal/crt/SG_Bool.h"
 #include "combinate.h"
+#include "analysis_sys.h"
 
 namespace hku {
 
@@ -33,6 +34,9 @@ std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& 
 std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
   const Stock& stk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
+    HKU_CHECK(tm, "tm is null!");
+    HKU_CHECK(sys, "sys is null!");
+
     auto inds = combinateIndicator(buy_inds, n);
     std::vector<SignalPtr> sgs;
     for (const auto& buy_ind : inds) {
@@ -44,12 +48,18 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
     }
 
     std::map<std::string, Performance> result;
+    // The statistics must stop at the last trading day of the query, as analysis_sys does; now()
+    // would value the open positions with data beyond the backtest window.
+    DatetimeList date_list = getAnalysisCalendar(StockList{stk}, query);
+    HKU_IF_RETURN(date_list.empty(), result);
+    Datetime last_datetime = date_list.back();
+
     for (const auto& sg : sgs) {
         sys->setSG(sg);
         sys->setTM(tm);
         sys->run(stk, query);
         Performance per;
-        per.statistics(tm, Datetime::now());
+        per.statistics(tm, last_datetime);
         result[sg->name()] = std::move(per);
     }
 
@@ -59,6 +69,9 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
 vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
   const Block& blk, const KQuery& query, TradeManagerPtr tm, SystemPtr sys,
   const std::vector<Indicator>& buy_inds, const std::vector<Indicator>& sell_inds, int n) {
+    HKU_CHECK(tm, "tm is null!");
+    HKU_CHECK(sys, "sys is null!");
+
     SPEND_TIME(combinateIndicatorAnalysisWithBlock);
     auto inds = combinateIndicator(buy_inds, n);
     std::vector<SignalPtr> sgs;
@@ -75,6 +88,10 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
     size_t total = stocks.size();
     HKU_IF_RETURN(total == 0, result);
 
+    DatetimeList date_list = getAnalysisCalendar(stocks, query);
+    HKU_IF_RETURN(date_list.empty(), result);
+    Datetime last_datetime = date_list.back();
+
     // auto work_num = std::thread::hardware_concurrency();
     // ThreadPool tg(work_num);
     auto* tg = get_global_task_group();
@@ -87,7 +104,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
         for (size_t i = range.first; i < range.second; i++) {
             buf.emplace_back(stocks[i]);
         }
-        tasks.emplace_back(tg->submit([sgs, stks = std::move(buf), n_query = query,
+        tasks.emplace_back(tg->submit([sgs, stks = std::move(buf), n_query = query, last_datetime,
                                        n_tm = tm->clone(), n_sys = sys->clone()]() {
             vector<CombinateAnalysisOutput> ret;
             Performance per;
@@ -100,7 +117,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
                         n_sys->setSG(n_sg);
                         n_sys->setTM(n_tm);
                         n_sys->run(n_stk, n_query);
-                        per.statistics(n_tm, Datetime::now());
+                        per.statistics(n_tm, last_datetime);
                         out.combinateName = n_sg->name();
                         out.market_code = n_stk.market_code();
                         out.name = n_stk.name();

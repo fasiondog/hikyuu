@@ -8,6 +8,8 @@
 #include "TaStddev.h"
 #include <ta-lib/ta_func.h>
 
+#include "ta_retcode.h"
+
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::TaStddev)
 #endif
@@ -50,7 +52,9 @@ void TaStddev::_calculate(const Indicator& data) {
 
     int outBegIdx;
     int outNbElement;
-    TA_STDDEV(m_discard, total - 1, src, n, nbdev, &outBegIdx, &outNbElement, dst + m_discard);
+    hku::checkTARetCode(
+      TA_STDDEV(m_discard, total - 1, src, n, nbdev, &outBegIdx, &outNbElement, dst + m_discard),
+      m_name);
     HKU_ASSERT((outBegIdx == m_discard) && (outBegIdx + outNbElement) <= total);
 }
 

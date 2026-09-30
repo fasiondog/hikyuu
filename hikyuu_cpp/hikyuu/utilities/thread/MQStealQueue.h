@@ -64,7 +64,7 @@ public:
             return std::shared_ptr<T>();
         }
         std::shared_ptr<T> res(std::make_shared<T>(std::move(m_queue.front())));
-        m_queue.pop();
+        m_queue.pop_front();
         return res;
     }
 

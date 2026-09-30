@@ -35,6 +35,7 @@ public:
             m_impl = rhs.m_impl;
             rhs.m_impl = nullptr;
         }
+        return *this;
     }
 
     std::string info() const noexcept override {

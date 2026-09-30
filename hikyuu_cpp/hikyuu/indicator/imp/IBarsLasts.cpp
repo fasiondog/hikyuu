@@ -43,7 +43,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
 
     // Special case: there is only one valid data point
     if (total == ind_discard + 1) {
-        if (src[ind_discard] != 0.0 && n == 1) {
+        if (!std::isnan(src[ind_discard]) && src[ind_discard] != 0.0 && n == 1) {
             dst[ind_discard] = 0.0;
             m_discard = ind_discard;
         } else {
@@ -55,7 +55,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
     // Record the positions where the condition holds
     std::vector<size_t> true_positions;
     for (size_t i = ind_discard; i < total; i++) {
-        if (src[i] != 0.0) {
+        if (!std::isnan(src[i]) && src[i] != 0.0) {
             true_positions.push_back(i);
         }
     }
@@ -74,7 +74,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
     size_t count = 0;  // Records how many times the condition has held
 
     for (size_t i = total - 1; i >= first_valid_pos; i--) {
-        if (src[i] != 0.0) {
+        if (!std::isnan(src[i]) && src[i] != 0.0) {
             count++;
             size_t target_idx = true_positions.size() - count;
 
@@ -132,7 +132,7 @@ void IBarsLasts::_dyn_calculate(const Indicator& ind) {
         size_t target_pos = Null<size_t>();
 
         for (size_t j = i; j >= ind_discard; j--) {
-            if (src[j] != 0.0) {
+            if (!std::isnan(src[j]) && src[j] != 0.0) {
                 count++;
                 if (count == n) {
                     target_pos = j;

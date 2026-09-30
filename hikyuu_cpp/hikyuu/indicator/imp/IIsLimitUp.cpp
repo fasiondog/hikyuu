@@ -30,7 +30,7 @@ void IIsLimitUp::_calculate(const Indicator& ind) {
 
     _readyBuffer(total, 1);
     m_discard = 1;  // No previous K-line, so the limit up cannot be judged; discard it
-    _increment_calculate(ind, 0);
+    _increment_calculate(ind, 1);
 }
 
 void IIsLimitUp::_increment_calculate(const Indicator& data, size_t start_pos) {

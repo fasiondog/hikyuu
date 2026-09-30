@@ -13,6 +13,14 @@
 namespace hku {
 
 /**
+ * @brief Create an empty MultiFactor selector without a factor set
+ * @details For testing only; not exported to Python. The factor set is set later
+ * @return SelectorPtr
+ * @ingroup Selector
+ */
+SelectorPtr HKU_API SE_MultiFactor();
+
+/**
  * @brief Stock selection algorithm based on MultiFactor
  * @param mf the MultiFactor instance
  * @param topn select the first topn systems in the time cross-section only

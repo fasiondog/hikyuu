@@ -106,6 +106,42 @@ TEST_CASE("test_ADJ_FACTOR") {
     }
 }
 
+/**
+ * @par Test points
+ * The incremental mapping must not shift the daily factor by one bar.
+ *
+ * Background: for the DAY kType the branch filled dst[i] with daily_factors[i - start_pos], while
+ * the calculation window deliberately starts at the bar before start_pos (it needs the record-date
+ * close), so daily_factors[0] belongs to start_pos - 1. Every new bar therefore got the previous
+ * trading day's factor, and the factor of an ex-rights day itself was wrong.
+ */
+TEST_CASE("test_ADJ_FACTOR_increment_equivalence") {
+    Stock stk = getStock("SZ000001");
+    REQUIRE(!stk.isNull());
+
+    // the bundled test data of SZ000001 changes its factor at index 3086, 3921 and 4251
+    KData k_part = stk.getKData(KQuery(0, 3086));
+    KData k_full = stk.getKData(KQuery(0, 4261));
+    REQUIRE(k_full.size() == k_part.size() + 1175);
+
+    Indicator expect = ADJ_FACTOR(k_full);
+    size_t changes = 0;
+    for (size_t i = k_part.size(); i < expect.size(); ++i) {
+        if (expect[i] != expect[i - 1]) {
+            ++changes;
+        }
+    }
+    REQUIRE(changes == 3);
+
+    Indicator got = ADJ_FACTOR();
+    got.setContext(k_part);  // cache m_old_context
+    got.setContext(k_full);  // extended at the tail -> the incremental branch
+    CHECK_EQ(got.size(), expect.size());
+    for (size_t i = 0; i < expect.size(); ++i) {
+        CHECK_EQ(got[i], doctest::Approx(expect[i]).epsilon(0.0001));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

@@ -94,7 +94,7 @@ public:
 
     /** Get the current maximum number of the resources allowed */
     size_t maxPoolSize() const {
-        return m_maxIdelSize;
+        return m_maxPoolSize;
     }
 
     /** Get the current maximum number of the idle resources allowed */
@@ -361,7 +361,7 @@ public:
 
     /** Get the current maximum number of the resources allowed */
     size_t maxPoolSize() const {
-        return m_maxIdelSize;
+        return m_maxPoolSize;
     }
 
     /** Get the current maximum number of the idle resources allowed */
@@ -449,7 +449,7 @@ public:
      *  that the resource version has changed */
     void incVersion(int version) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_version++;
+        m_version += version;
     }
 
     /** Resource instance pointer type */

@@ -41,6 +41,29 @@ private:
     int m_x;
 };
 
+class SignalCalcTest : public SignalBase {
+public:
+    SignalCalcTest() : SignalBase("SignalCalcTest") {}
+    virtual ~SignalCalcTest() {}
+
+    virtual void _calculate(const KData &kdata) override {
+        _addBuySignal(kdata.front().datetime);
+        _addSellSignal(kdata.back().datetime);
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new SignalCalcTest);
+    }
+
+    bool holdLong() const {
+        return m_hold_long;
+    }
+
+    void setHoldLong(bool hold) {
+        m_hold_long = hold;
+    }
+};
+
 /**
  * @defgroup test_Signal test_Signal
  * @ingroup test_hikyuu_trade_sys_suite
@@ -224,6 +247,36 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
     CHECK_EQ(child->getCycleStart(), t0);
     CHECK_EQ(child->getCycleEnd(), t1);
     CHECK_EQ(child->getBuyValue(t0), 1.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_Signal_setTO_recalculate") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    REQUIRE_UNARY(!stock.isNull());
+
+    auto sg = make_shared<SignalCalcTest>();
+    KData k1 = stock.getKData(KQueryByIndex(10, 30));
+    KData k2 = stock.getKData(KQueryByIndex(10, 31));
+    REQUIRE_UNARY(!k1.empty() && !k2.empty());
+    Datetime d10 = k1[0].datetime;
+    Datetime d29 = k1.back().datetime;
+
+    sg->setTO(k1);
+    CHECK_UNARY(sg->shouldBuy(d10));
+    CHECK_UNARY(sg->shouldSell(d29));
+
+    /** @arg The hold flags are reset before the recalculation (ISS-027) */
+    sg->setHoldLong(true);
+
+    /** @arg Recalculating on a changed KData clears the stale signals: the overlapping date value
+     * is not accumulated and the old window signals disappear (ISS-027) */
+    sg->setTO(k2);
+    CHECK_EQ(sg->getBuyValue(d10), doctest::Approx(1.0));
+    CHECK_UNARY(!sg->shouldSell(d29));
+    CHECK_UNARY(sg->shouldSell(k2.back().datetime));
+    CHECK_UNARY(sg->shouldBuy(k2.front().datetime));
+    CHECK_UNARY(!sg->holdLong());
 }
 
 /** @} */

@@ -417,6 +417,137 @@ TEST_CASE("test_TradeManager_can_not_checkoutStock") {
     CHECK_EQ(tm->checkinStock(Datetime(199901010000), stock, 10.0, 200), false);
 }
 
+/** @par Test points */
+TEST_CASE("test_TradeManager_checkoutStock_base_asset") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
+
+    /** @arg After depositing the stock the base asset is the deposited value */
+    CHECK_EQ(tm->checkinStock(Datetime(199901020000), stock, 10.0, 100), true);
+    FundsRecord funds = tm->getFunds(Datetime(199901020000));
+    CHECK_EQ(funds.base_asset, 1000.0);
+
+    /** @arg After withdrawing the stock the base asset must be zero (ISS-040: the checkout
+     * subtracted the value so the base asset was doubled by the checkin + checkout) */
+    CHECK_EQ(tm->checkoutStock(Datetime(199901030000), stock, 10.0, 100), true);
+    funds = tm->getFunds(Datetime(199901030000));
+    CHECK_EQ(funds.base_asset, 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_getFunds_fractional_stock") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
+
+    /** @arg The fractional shares produced by the dividend replay must not be truncated in
+     * getFunds (ISS-041: depositing 1000 + 151.5 shares) */
+    CHECK_EQ(tm->checkinStock(Datetime(200001040000), stock, 10.0, 1000), true);
+    CHECK_EQ(tm->checkinStock(Datetime(200001050000), stock, 10.0, 151.5), true);
+
+    price_t price = stock.getMarketValue(Datetime(200001060000), KQuery::DAY);
+    REQUIRE_UNARY(price > 0.0);
+    FundsRecord funds = tm->getFunds(Datetime(200001060000));
+    CHECK_EQ(funds.market_value, doctest::Approx(price * 1151.5));
+}
+
+namespace {
+
+class ReturnStockCostFunc : public TradeCostBase {
+public:
+    ReturnStockCostFunc() : TradeCostBase("ReturnStockCostFunc") {}
+
+    CostRecord getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
+                          double num) const override {
+        return CostRecord();
+    }
+
+    CostRecord getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
+                           double num) const override {
+        return CostRecord();
+    }
+
+    CostRecord getReturnStockCost(const Datetime& borrow_datetime, const Datetime& return_datetime,
+                                  const Stock& stock, price_t price, double num) const override {
+        return CostRecord(num * 0.01, 0.0, 0.0, 0.0, num * 0.01);
+    }
+
+    TradeCostPtr _clone() override {
+        return TradeCostPtr(new ReturnStockCostFunc);
+    }
+};
+
+}  // namespace
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_returnStock_cost") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm =
+      crtTM(Datetime(199901010000), 100000, TradeCostPtr(new ReturnStockCostFunc));
+
+    /** @arg 分两笔借入再一次性归还，费用按各分段实际数量计（ISS-042：修复前每段按全额 number
+     * 重复计费） */
+    CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10.0, 50), true);
+    CHECK_EQ(tm->borrowStock(Datetime(199901030000), stock, 10.0, 50), true);
+    CHECK_EQ(tm->returnStock(Datetime(199901040000), stock, 10.0, 100), true);
+
+    const TradeRecord tr = tm->getTradeList().back();
+    CHECK_EQ(tr.business, BUSINESS_RETURN_STOCK);
+    CHECK_EQ(tr.cost.total, doctest::Approx(1.0));
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_buy_margin") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 6000, TC_Zero());
+    tm->setParam<bool>("support_borrow_cash", true);
+
+    /** @arg Enough own cash: no borrowing at all (ISS-045: the full amount was borrowed
+     * unconditionally) */
+    TradeRecord tr = tm->buy(Datetime(199901020000), stock, 10.0, 100);
+    CHECK_EQ(tr.business, BUSINESS_BUY);
+    CHECK_EQ(tm->getDebtCash(Datetime(199901020000)), 0.0);
+
+    /** @arg Insufficient cash: borrow only the shortfall (ISS-045) */
+    tr = tm->buy(Datetime(199901030000), stock, 10.0, 600);
+    CHECK_EQ(tr.business, BUSINESS_BUY);
+    CHECK_EQ(tr.number, 600);
+    CHECK_EQ(tm->getDebtCash(Datetime(199901030000)), 1000);
+
+    /** @arg Insufficient buying power: fail cleanly without any residue (ISS-045: the validation
+     * ran after the auto checkin and the full borrowing) */
+    tr = tm->buy(Datetime(199901040000), stock, 10.0, 5000);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+    CHECK_EQ(tm->getDebtCash(Datetime(199901040000)), 1000);
+    CHECK_EQ(tm->currentCash(), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_buyShort_cash_check") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero());
+
+    CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10.0, 100), true);
+    CHECK_EQ(tm->sellShort(Datetime(199901030000), stock, 10.0, 100).business, BUSINESS_SELL_SHORT);
+
+    /** @arg The cash is insufficient to buy back: reject without overdrawing (ISS-046) */
+    CHECK_EQ(tm->checkout(Datetime(199901040000), 101000), true);
+    CHECK_EQ(tm->currentCash(), 0.0);
+    TradeRecord tr = tm->buyShort(Datetime(199901050000), stock, 10.0, 100);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+    CHECK_EQ(tm->currentCash(), 0.0);
+
+    /** @arg Enough cash after checkin: buy back normally */
+    tm->checkin(Datetime(199901060000), 1000);
+    tr = tm->buyShort(Datetime(199901070000), stock, 10.0, 100);
+    CHECK_EQ(tr.business, BUSINESS_BUY_SHORT);
+    CHECK_EQ(tm->getShortPosition(stock).number, 0.0);
+}
+
 TEST_CASE("test_TradeManager_short_orders_use_executed_number") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -768,8 +899,9 @@ TEST_CASE("test_getTradeList") {
     tr_list = tm->getTradeList(Datetime(199305210000L), Null<Datetime>());
 
     CHECK_EQ(tr_list.size(), 6);
+    // cash_base 94430 + a single dividend 30 = 94460 (the old code double counted it as 94490)
     CHECK_EQ(tr_list[0], TradeRecord(stk, Datetime(199305240000L), BUSINESS_BONUS, 30, 30, 0, 0,
-                                     cost, 0, 94490, PART_INVALID));
+                                     cost, 0, 94460, PART_INVALID));
     CHECK_EQ(tr_list[5], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
 
@@ -798,6 +930,111 @@ TEST_CASE("test_getTradeList") {
                                      cost, 0, 94430, PART_INVALID));
     CHECK_EQ(tr_list[3], TradeRecord(stk, Datetime(199305250000L), BUSINESS_BUY, 0, 27.5, 0, 100,
                                      cost, 0, 91710, PART_INVALID));
+}
+
+/** @par Test point: getRefTradeList returns the same content as getTradeList without copying */
+TEST_CASE("test_getRefTradeList") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+
+    /** @arg The reference content equals the copied list */
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+
+    const TradeRecordList& ref_list = tm->getRefTradeList();
+    TradeRecordList copy_list = tm->getTradeList();
+    CHECK_EQ(ref_list.size(), copy_list.size());
+    for (size_t i = 0; i < copy_list.size(); ++i) {
+        CHECK_EQ(ref_list[i], copy_list[i]);
+    }
+
+    /** @arg The reference stays valid and observes later trades (no stale snapshot) */
+    size_t prev_size = ref_list.size();
+    tm->buy(Datetime(199408010000L), stk, 9.0, 100);
+    CHECK_GT(ref_list.size(), prev_size);
+    CHECK_EQ(ref_list.back(), tm->getTradeList().back());
+}
+
+/** @par Test point: getFundsList must match the per-date getFunds exactly (the merge replay uses
+ *  the same accumulators and the same order), including unsorted input, duplicates, the date
+ *  equal to the last trade date, and dates after the last trade date */
+TEST_CASE("test_getFundsList_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199012010000), 100000);
+    tm->buy(Datetime(199101020000L), stk, 60.0, 100);
+    tm->sell(Datetime(199206150000L), stk, 75.0, 50);
+    tm->checkin(Datetime(199301050000), 20000);
+    tm->buy(Datetime(199407110000L), stk, 8.55, 200);
+
+    /** @arg Unsorted input mixing every branch: before the first trade, between trades, equal to
+     *  the last trade date, after the last trade date, and a duplicate */
+    DatetimeList dates = {Datetime(199301050000), Datetime(199012150000), Datetime(199407110000),
+                          Datetime(199101050000), Datetime(199501010000), Datetime(199206200000),
+                          Datetime(199101050000)};
+
+    FundsList funds_list = tm->getFundsList(dates);
+    CHECK_EQ(funds_list.size(), dates.size());
+    for (size_t i = 0; i < dates.size(); ++i) {
+        FundsRecord expect = tm->getFunds(dates[i]);
+        const FundsRecord& got = funds_list[i];
+        CHECK_EQ(got.cash, expect.cash);
+        CHECK_EQ(got.market_value, expect.market_value);
+        CHECK_EQ(got.short_market_value, expect.short_market_value);
+        CHECK_EQ(got.base_cash, expect.base_cash);
+        CHECK_EQ(got.base_asset, expect.base_asset);
+        CHECK_EQ(got.borrow_cash, expect.borrow_cash);
+        CHECK_EQ(got.borrow_asset, expect.borrow_asset);
+    }
+
+    /** @arg The input order is preserved */
+    CHECK_EQ(funds_list[0], tm->getFunds(Datetime(199301050000)));
+    CHECK_EQ(funds_list[1], tm->getFunds(Datetime(199012150000)));
+    CHECK_EQ(funds_list[2], tm->getFunds(Datetime(199407110000)));
+}
+
+/** @par Test point: updateWithWeight must not double count a dividend in a record's cash snapshot
+ *  (issue #511). sz000001 on 1993-05-24 pays a 3.0 dividend plus gift/increasement shares. After
+ *  buying 100 shares on 05-20 the cash is 94430; the 05-25 buy triggers the update (bonus = 30), so
+ *  the BONUS and the same-date GIFT records must both carry 94460, not the inflated 94490.*/
+TEST_CASE("test_TradeManager_updateWithWeight_bonus_cash_no_double_count") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sz000001");
+
+    TradeManagerPtr tm = crtTM(Datetime(199305010000), 100000);
+    tm->buy(Datetime(199305200000L), stk, 55.7, 100);  // cash -> 94430
+    tm->buy(Datetime(199305250000L), stk, 27.5, 100);  // trigger the 1993-05-24 weight update
+
+    TradeRecordList tr_list = tm->getTradeList();
+    const TradeRecord* bonus = nullptr;
+    const TradeRecord* gift = nullptr;
+    for (const auto& t : tr_list) {
+        if (t.datetime == Datetime(199305240000L)) {
+            if (t.business == BUSINESS_BONUS)
+                bonus = &t;
+            if (t.business == BUSINESS_GIFT)
+                gift = &t;
+        }
+    }
+
+    /** @arg BONUS cash = batch-start cash + a single dividend, not double counted */
+    CHECK(bonus != nullptr);
+    if (bonus) {
+        CHECK_EQ(bonus->realPrice, 30);
+        CHECK_EQ(bonus->cash, 94460);
+    }
+
+    /** @arg Same-date GIFT shares the correct post-dividend cash snapshot */
+    CHECK(gift != nullptr);
+    if (gift) {
+        CHECK_EQ(gift->cash, 94460);
+    }
+
+    /** @arg Historical cash replay agrees with the record snapshot */
+    CHECK_EQ(tm->cash(Datetime(199305240000L)), 94460);
 }
 
 /** @par Test point: test addTradeRecord */
@@ -851,6 +1088,28 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
                                      100000, 0, 0, cost, 0, 100000, PART_INVALID));
     CHECK_EQ(tr_list[7], TradeRecord(stk, Datetime(199407110000L), BUSINESS_BUY, 0, 8.55, 0, 200,
                                      cost, 0, 90142.50, PART_INVALID));
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_returnCash_multi_loan") {
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
+
+    /** @arg Repay multiple loans sequentially with an exact amount */
+    tm->borrowCash(Datetime(199901020000), 100.10);
+    tm->borrowCash(Datetime(199901030000), 0.20);
+    CHECK_EQ(tm->returnCash(Datetime(199901040000), 100.30), true);
+    CHECK_EQ(tm->getDebtCash(Datetime(199901050000)), 0.0);
+
+    /** @arg Returning more than the debt but within the grid unit is treated as fully repaid
+     * (ISS-127) */
+    tm->borrowCash(Datetime(199901060000), 100.00);
+    CHECK_EQ(tm->returnCash(Datetime(199901070000), 100.004), true);
+    CHECK_EQ(tm->getDebtCash(Datetime(199901080000)), 0.0);
+
+    /** @arg Returning more than the debt beyond the grid unit is rejected (ISS-127) */
+    tm->borrowCash(Datetime(199901090000), 100.00);
+    CHECK_EQ(tm->returnCash(Datetime(199901100000), 100.01), false);
+    CHECK_EQ(tm->getDebtCash(Datetime(199901110000)), 100.0);
 }
 
 /** @} */

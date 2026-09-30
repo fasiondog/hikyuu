@@ -6,6 +6,7 @@
  */
 
 #include <csignal>
+#include <cstdlib>
 #include <unordered_set>
 #include "hikyuu/utilities/os.h"
 #include "hikyuu/utilities/ini_parser/IniParser.h"
@@ -22,14 +23,22 @@ std::atomic<bool> Strategy::ms_sig_registered = false;
 
 void Strategy::sig_handler(int sig) {
     if (sig == SIGINT || sig == SIGTERM) {
-        try {
-            ms_keep_running = false;
-            auto* scheduler = getScheduler();
-            scheduler->stop();
-        } catch (...) {
-            // Ignore the exception
-        }
-        std::exit(EXIT_SUCCESS);
+        // Only async-signal-safe operations are allowed in the signal handler
+        ms_keep_running = false;
+        _Exit(EXIT_SUCCESS);
+
+        // The old graceful shutdown path is not async-signal-safe: getScheduler (call_once +
+        // malloc), TimerManager::stop (mutex/swap/join/delete) and std::exit (atexit/flush) may
+        // deadlock or corrupt the heap when the interrupted thread holds the relevant lock. Keep
+        // it for reference; switch to a self-pipe wake-up scheme if graceful shutdown is needed.
+        // try {
+        //     ms_keep_running = false;
+        //     auto* scheduler = getScheduler();
+        //     scheduler->stop();
+        // } catch (...) {
+        //     // Ignore the exception
+        // }
+        // std::exit(EXIT_SUCCESS);
     }
 }
 
@@ -368,6 +377,10 @@ price_t Strategy::getCurrentPrice(const Stock& stk, const KQuery::KType& ktype) 
 
 KData Strategy::getKData(const Stock& stk, const Datetime& start_date, const Datetime& end_date,
                          const KQuery::KType& ktype, KQuery::RecoverType recover_type) const {
+    // Boundary note: when end_date equals now(), it is used as-is, and the current bar is
+    // excluded by the right-open interval; only when end_date is null or in the future is it
+    // clamped to nextDatetime(), which includes the current bar. That is, the visibility of
+    // the current bar depends on how the caller specifies end_date.
     Datetime new_end_date = end_date;
     if (end_date.isNull() || end_date > now()) {
         new_end_date = nextDatetime();
@@ -423,18 +436,21 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
         if (buy_num > max_trade_num) {
             buy_num = max_trade_num;
         }
-        ret = buy(stk, 0.0, num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+        ret = buy(stk, 0.0, buy_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
 
     } else {
         if (num == -MAX_DOUBLE) {
             ret = sell(stk, 0.0, MAX_DOUBLE, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
             return ret;
         }
-        double sell_num = int64_t(std::abs(num) / min_trade_num) * min_trade_num;
+        double abs_num = std::abs(num);
+        double sell_num = int64_t(abs_num / min_trade_num) * min_trade_num;
         if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
             sell_num = max_trade_num;
-        } else if ((sell_num + num) < min_trade_num) {
-            sell_num = MAX_DOUBLE;  // Indicate selling all the remaining
+        } else if (abs_num != sell_num) {
+            // The request contains an odd lot (a non-integer multiple of min_trade_num), which can
+            // never be sold alone; sell all the remaining position to carry the odd lot away
+            sell_num = MAX_DOUBLE;
         }
         ret = sell(stk, 0.0, sell_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
     }
@@ -452,18 +468,39 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
 
     price_t price = k[0].closePrice;
     if (value > 0.0) {
-        double n = value / price;
-        CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
-        price_t need_cash = n * price + cost.total;
-        price_t current_cash = m_tm->currentCash();
         double min_trade = stk.minTradeNumber();
-        while (n > min_trade && need_cash > current_cash) {
-            n = n - min_trade;
-            cost = m_tm->getBuyCost(now(), stk, price, n);
-            need_cash = n * price + cost.total;
-        }
+
+        // Convert it into an integer multiple of the minimum trade quantity
+        // (consistent with the MoneyManagerBase::getBuyNumber convention, ISS-135)
+        double n = int64_t(value / price / min_trade) * min_trade;
+        CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
+
+        // The cash needed by the actual trade = the trade quantity * the actual trade price
+        // * the unit of the stock + the total trade cost (consistent with TradeManager::buy)
+        price_t need_cash = n * price * stk.unit() + cost.total;
+        price_t current_cash = m_tm->currentCash();
         if (need_cash > current_cash) {
-            n = 0.0;
+            // need_cash(k) is monotonically increasing in k, so binary search the largest
+            // affordable multiple of min_trade — O(log(n/min_trade)) cost evaluations instead of
+            // decrementing lot by lot (consistent with MoneyManagerBase::getBuyNumber)
+            double low = min_trade, high = n;
+            while (high - low > min_trade) {
+                double mid = int64_t((low + high) / (2.0 * min_trade)) * min_trade;
+                if (mid <= low || mid >= high) {
+                    break;
+                }
+                cost = m_tm->getBuyCost(now(), stk, price, mid);
+                if (mid * price * stk.unit() + cost.total <= current_cash) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            n = low;
+            cost = m_tm->getBuyCost(now(), stk, price, n);
+            if (n * price * stk.unit() + cost.total > current_cash) {
+                n = 0.0;
+            }
         }
         if (n == 0.0) {
             HKU_WARN("{} {} can buy number is zero!", stk.market_code(), stk.name());

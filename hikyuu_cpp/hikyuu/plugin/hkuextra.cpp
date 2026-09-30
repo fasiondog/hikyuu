@@ -40,6 +40,13 @@ void HKU_API enableKDataCache(bool enable) {
     plugin->enableKDataCache(enable);
 }
 
+void HKU_API clearKDataCache() {
+    auto& sm = StockManager::instance();
+    auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA, false);
+    HKU_IF_RETURN(!plugin, void());
+    plugin->clearKDataCache();
+}
+
 bool isExtraKType(const string& ktype) {
     auto& sm = StockManager::instance();
     auto* plugin = sm.getPlugin<HkuExtraPluginInterface>(HKU_PLUGIN_HKU_EXTRA);

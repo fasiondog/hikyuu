@@ -146,7 +146,7 @@ public:
 
     /** Whether the current thread is a worker thread */
     static bool is_work_thread() {
-        return m_local_work_queue != nullptr;
+        return local_work_queue() != nullptr;
     }
 
     /** The type of the corresponding future returned after submitting a task to the thread pool */
@@ -161,7 +161,7 @@ public:
     /** Submit a task to the thread pool */
     template <typename FunctionType>
     auto submit(FunctionType&& f) {
-        if (m_thread_need_stop.isSet() || m_done.load(std::memory_order_acquire)) {
+        if (thread_need_stop().isSet() || m_done.load(std::memory_order_acquire)) {
             throw std::logic_error(
               "You can't submit a task to the stopped GlobalStealThreadPool!!");
         }
@@ -171,9 +171,9 @@ public:
         task_handle<result_type> res(task.get_future());
 
         std::thread::id id = std::this_thread::get_id();
-        if (m_local_work_queue && id == m_thread_id) {
+        if (local_work_queue() && id == thread_id()) {
             // The local thread tasks enter the queue from the front (recursion becomes a stack)
-            m_local_work_queue->push_front(std::move(task));
+            local_work_queue()->push_front(std::move(task));
         } else {
             m_master_work_queue.push(std::move(task));
             m_cv.notify_one();
@@ -300,16 +300,16 @@ public:
 
 public:
     bool run_available_task_once() {
-        HKU_IF_RETURN(m_done.load(std::memory_order_acquire) || m_thread_need_stop.isSet(), false);
+        HKU_IF_RETURN(m_done.load(std::memory_order_acquire) || thread_need_stop().isSet(), false);
         bool task_run = false;
         task_type task;
-        if (m_local_work_queue) {
+        if (local_work_queue()) {
             if (pop_task_from_local_queue(task)) {
                 if (!task.isNullTask()) {
                     task();
                     task_run = true;
                 } else {
-                    m_thread_need_stop.set();
+                    thread_need_stop().set();
                 }
             } else if (pop_task_from_other_thread_queue(task)) {
                 task();
@@ -319,7 +319,7 @@ public:
                     task();
                     task_run = true;
                 } else {
-                    m_thread_need_stop.set();
+                    thread_need_stop().set();
                 }
             }
         } else if (pop_task_from_master_queue(task)) {
@@ -347,37 +347,37 @@ private:
                                                              // thread)
     std::vector<std::thread> m_threads;                      // Worker threads
 
-// Thread local variables
-#if HKU_OS_WINDOWS
-    static WorkStealQueue* m_local_work_queue;  // Local task queue
-    static int m_index;                         // The index in the thread pool
-    static InterruptFlag m_thread_need_stop;    // The indication for stopping the thread
-    static std::thread::id m_thread_id;
+    // Per-thread states. Windows does not allow thread_local data members in a class declared
+    // dllexport/dllimport, so function-local thread_local storage is used on all platforms
+    static WorkStealQueue*& local_work_queue() {  // Local task queue
+        static thread_local WorkStealQueue* queue = nullptr;
+        return queue;
+    }
 
-#else
-#if CPP_STANDARD >= CPP_STANDARD_17 && !defined(__clang__)
-    inline static thread_local WorkStealQueue* m_local_work_queue = nullptr;  // Local task queue
-    inline static thread_local int m_index = -1;                  // The index in the thread pool
-    inline static thread_local InterruptFlag m_thread_need_stop;  // The indication for stopping the
-                                                                  // thread
-    inline static thread_local std::thread::id m_thread_id;
-#else
-    static thread_local WorkStealQueue* m_local_work_queue;  // Local task queue
-    static thread_local int m_index;                         // The index in the thread pool
-    static thread_local InterruptFlag m_thread_need_stop;  // The indication for stopping the thread
-    static thread_local std::thread::id m_thread_id;
-#endif
-#endif
+    static int& thread_index() {  // The index in the thread pool
+        static thread_local int index = -1;
+        return index;
+    }
+
+    static InterruptFlag& thread_need_stop() {  // The indication for stopping the thread
+        static thread_local InterruptFlag need_stop;
+        return need_stop;
+    }
+
+    static std::thread::id& thread_id() {
+        static thread_local std::thread::id id;
+        return id;
+    }
 
     void worker_thread(int index) {
-        m_thread_id = std::this_thread::get_id();
-        m_interrupt_flags[index] = &m_thread_need_stop;
-        m_index = index;
-        m_local_work_queue = m_queues[index].get();
-        while (!m_thread_need_stop.isSet() && !m_done.load(std::memory_order_acquire)) {
+        thread_id() = std::this_thread::get_id();
+        m_interrupt_flags[index] = &thread_need_stop();
+        thread_index() = index;
+        local_work_queue() = m_queues[index].get();
+        while (!thread_need_stop().isSet() && !m_done.load(std::memory_order_acquire)) {
             run_pending_task();
         }
-        m_local_work_queue = nullptr;
+        local_work_queue() = nullptr;
         m_interrupt_flags[index] = nullptr;
     }
 
@@ -390,13 +390,13 @@ private:
             if (!task.isNullTask()) {
                 task();
             } else {
-                m_thread_need_stop.set();
+                thread_need_stop().set();
             }
         } else if (pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
                 task();
             } else {
-                m_thread_need_stop.set();
+                thread_need_stop().set();
             }
         } else if (pop_task_from_other_thread_queue(task)) {
             task();
@@ -409,7 +409,7 @@ private:
             m_cv.wait(lk, [this] {
                 return this->m_done.load(std::memory_order_acquire) ||
                        !this->m_master_work_queue.empty() ||
-                       (m_local_work_queue && !m_local_work_queue->empty()) ||
+                       (local_work_queue() && !local_work_queue()->empty()) ||
                        has_other_remain_task();
             });
 
@@ -425,13 +425,13 @@ private:
     // cppcheck-suppress functionStatic  // Suppress the cppcheck suggestion of converting it into a
     // static function
     bool pop_task_from_local_queue(task_type& task) {
-        return m_local_work_queue && m_local_work_queue->try_pop(task);
+        return local_work_queue() && local_work_queue()->try_pop(task);
     }
 
     bool pop_task_from_other_thread_queue(task_type& task) {
         for (int i = 0; i < m_worker_num; ++i) {
-            int index = (m_index + i + 1) % m_worker_num;
-            if (index != m_index && m_queues[index]->try_steal(task)) {
+            int index = (thread_index() + i + 1) % m_worker_num;
+            if (index != thread_index() && m_queues[index]->try_steal(task)) {
                 return true;
             }
         }
@@ -440,7 +440,7 @@ private:
 
     bool has_other_remain_task() {
         for (int i = 0; i < m_worker_num; ++i) {
-            if (i != m_index && m_queues[i] && !m_queues[i]->empty()) {
+            if (i != thread_index() && m_queues[i] && !m_queues[i]->empty()) {
                 return true;
             }
         }

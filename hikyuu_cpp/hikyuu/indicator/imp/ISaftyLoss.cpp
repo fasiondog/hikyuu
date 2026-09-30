@@ -5,9 +5,7 @@
  *      Author: fasiondog
  */
 
-#include "../crt/SLICE.h"
 #include "../crt/CVAL.h"
-#include "../crt/SAFTYLOSS.h"
 #include "ISaftyLoss.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -47,6 +45,11 @@ void ISaftyLoss::_calculate(const Indicator& data) {
     }
 
     _increment_calculate(data, m_discard);
+}
+
+size_t ISaftyLoss::min_increment_start() const {
+    // The inner loop reads src[k - 1] from j == start_pos + 1 - n2 with k starting at j + 2 - n1.
+    return getParam<int>("n1") + getParam<int>("n2") - 2;
 }
 
 void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
@@ -90,11 +93,42 @@ void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 void ISaftyLoss::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, double p) {
     HKU_IF_RETURN(n1 < 2 || n2 < 2, void());
-    Indicator slice = SLICE(ind, 0, curPos + 1);
-    Indicator st = SAFTYLOSS(slice, n1, n2, p);
-    if (st.size() > 0) {
-        _set(st[st.size() - 1], curPos);
+    // Intentional: the result at curPos only depends on the trailing [curPos + 2 - n1 - n2, curPos]
+    // window, so compute it directly from ind instead of rebuilding the whole prefix. The value is
+    // bitwise identical to SAFTYLOSS(SLICE(ind, 0, curPos + 1)) and drops from O(curPos) to
+    // O(n1 * n2) per bar. Before the static discard (n1 + n2 - 2 bars after ind.discard()), the
+    // old slice-based path yielded Null, which is preserved here.
+    size_t start = ind.discard();
+    if (curPos + 1 <= start + n1 + n2 - 2) {
+        _set(Null<price_t>(), curPos);
+        return;
     }
+
+    auto const* src = ind.data();
+    price_t result = 0.0;
+    for (size_t j = curPos + 1 - n2; j <= curPos; ++j) {
+        price_t sum = 0.0;
+        size_t num = 0;
+        for (size_t k = j + 2 - n1; k <= j; ++k) {
+            price_t pre = src[k - 1];
+            price_t cur = src[k];
+            if (pre > cur) {
+                sum += pre - cur;
+                ++num;
+            }
+        }
+
+        price_t temp = src[j];
+        if (num != 0) {
+            temp = temp - (p * sum / num);
+        }
+
+        if (temp > result) {
+            result = temp;
+        }
+    }
+
+    _set(result, curPos);
 }
 
 void ISaftyLoss::_dyn_calculate(const Indicator& ind) {
@@ -106,7 +140,7 @@ void ISaftyLoss::_dyn_calculate(const Indicator& ind) {
       iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("n2"));
     iter = m_ind_params.find("p");
     Indicator p =
-      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("p"));
+      iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<double>("p"));
 
     HKU_CHECK(n1.size() == ind.size(), "ind_param(n1).size()={}, ind.size()={}!", n1.size(),
               ind.size());

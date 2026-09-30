@@ -23,6 +23,12 @@ WeightMultiFactor::WeightMultiFactor(const PriceList& weights, const StockList& 
 : MultiFactorBase(stks, query, ref_stk, "MF_Weight", ic_n, spearman, mode, save_all_factors),
   m_weights(weights) {}
 
+MultiFactorPtr WeightMultiFactor::_clone() {
+    return make_shared<WeightMultiFactor>(
+      m_weights, m_stks, m_query, m_ref_stk, getParam<int>("ic_n"), getParam<bool>("use_spearman"),
+      getParam<int>("mode"), getParam<bool>("save_all_factors"));
+}
+
 vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all_stk_inds) {
     size_t days_total = m_ref_dates.size();
     size_t stk_count = m_stks.size();

@@ -35,6 +35,61 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_lang">
+          <item>
+           <widget class="QLabel" name="label_language">
+            <property name="text">
+             <string>界面语言</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="language_comboBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <item>
+             <property name="text">
+              <string>跟随系统</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>中文</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>English</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_lang">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1918,50 +1973,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </item>
         <item>
          <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_15">
-          <item>
-           <widget class="QLabel" name="label_47">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>申请捐赠功能试用（30天试用）</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_20">
-            <item>
-             <widget class="QLabel" name="label_45">
-              <property name="text">
-               <string>电子邮件地址:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="email_lineEdit"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="fetch_trial_pushButton">
-              <property name="text">
-               <string>申请试用许可</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="Line" name="line_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>

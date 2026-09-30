@@ -2,9 +2,9 @@
 
 Language: **English** | [简体中文](zh/README.md)
 
-The example notebooks are maintained in a dual-source layout:
+The example notebooks are organized by language and evolve independently:
 
-- `en/` — English notebooks (English markdown cells; the code cells are single-source and identical to `zh/`)
+- `en/` — English notebooks (English markdown cells)
 - `zh/` — Chinese notebooks (Chinese markdown cells)
 
-The code cells of the two trees are byte-identical; only the markdown cells differ in language.
+The two trees are no longer kept in sync; their content may differ between languages.

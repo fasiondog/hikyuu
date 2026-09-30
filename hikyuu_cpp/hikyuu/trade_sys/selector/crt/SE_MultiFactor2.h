@@ -14,6 +14,14 @@
 namespace hku {
 
 /**
+ * @brief Create an empty MultiFactor2 selector without a factor set
+ * @details For testing only; not exported to Python. The factor set is set later
+ * @return SelectorPtr
+ * @ingroup Selector
+ */
+SelectorPtr HKU_API SE_MultiFactor2();
+
+/**
  * @brief Stock selection algorithm based on MultiFactor
  * @param mf the MultiFactor instance
  * @param filter the score filter

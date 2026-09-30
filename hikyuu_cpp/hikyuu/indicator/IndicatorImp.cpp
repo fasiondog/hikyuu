@@ -1918,11 +1918,11 @@ void IndicatorImp::execute_if() {
 
     setDiscard(discard);
 
-    auto *left = m_left->data(0);
-    auto *right = m_right->data(0);
     auto *three = m_three->data(0);
     for (size_t r = 0; r < m_result_num; ++r) {
         auto *dst = this->data(r);
+        auto *left = m_left->data(r);
+        auto *right = m_right->data(r);
         for (size_t i = start_pos; i < total; ++i) {
             if (three[i - diff_cond] > 0.0) {
                 dst[i] = left[i - diff_left];
