@@ -32,8 +32,9 @@ shm 数据服务（单机共享内存）
 
 .. note::
 
-    协商以 ``datadir`` 为粒度（服务地址由 ``datadir`` 的哈希派生），使用不同 ``datadir`` 的
-    进程各自独立、互不干扰。
+    服务地址为 IPC 运行时目录下的固定名，与 ``datadir`` 解耦；客户端与服务端须使用同一
+    ``datadir`` 以保证数据一致。IPC 运行时目录可通过 ``shm_ipc_dir`` 配置或环境变量
+    ``HIKYUU_IPC_DIR`` 指定，默认 ``~/.hikyuu/ipc``（见 `配置项`_）。
 
     本特性是"单机内多进程共享一份数据"，与跨机器的 **行情采集数据服务** （``vip/dataserver``、
     ``get_data_from_buffer_server``）以及行情采集地址（``quotation_server``）是相互独立的概念，
@@ -50,7 +51,8 @@ shm 数据服务（单机共享内存）
     初始化之后调用（``import hikyuu`` 默认完成初始化）；早于初始化调用会因数据未就绪而返回
     ``False``。
 
-    :param str datadir: 数据目录，为空时使用当前 StockManager 数据目录
+    :param str datadir: 数据目录，为空时使用当前 StockManager 数据目录（兼容保留；服务地址已与
+        datadir 解耦，改由 IPC 运行时目录下的固定名构造）
     :param bool publish_shm: 是否发布两类共享内存快照（K 线热数据 + 基础信息）
     :param bool recv_spot: 是否由本进程接收实时行情（内部订阅 ``quotation_server`` 并驱动实时更新）
     :return: 启动成功返回 ``True``；本进程已处于客户端模式、插件缺失或授权无效时返回 ``False``
@@ -140,8 +142,9 @@ shm 数据服务（单机共享内存）
 配置项
 ------
 
-均位于 ``hikyuu.ini`` 的 ``[hikyuu]`` 节，作用于 **客户端** （服务端由 :func:`start_shm_server`
-的参数控制）。``use_shm_server`` 默认为 ``False``，仅当需要接入既有服务时才需显式开启：
+均位于 ``hikyuu.ini`` 的 ``[hikyuu]`` 节。``use_shm_server`` / ``shm_server_wait_timeout`` 作用于
+**客户端** （服务端由 :func:`start_shm_server` 的参数控制）；``shm_ipc_dir`` 对服务端与客户端均生效。
+``use_shm_server`` 默认为 ``False``，仅当需要接入既有服务时才需显式开启：
 
 ::
 
@@ -152,6 +155,9 @@ shm 数据服务（单机共享内存）
     use_shm_server = True
     ; 客户端接入协商的总时长预算（秒，含连接探测与就绪等待）；0 表示无限等待，超时后降级为独立模式
     shm_server_wait_timeout = 600
+    ; shm 数据服务的 IPC 运行时目录（socket / 锁 / 段名记录落点），默认配置生成时写入用户家目录
+    ; docker 共享场景改为宿主与容器挂载的相同绝对路径
+    shm_ipc_dir = /home/user/.hikyuu/ipc
 
 .. list-table::
    :header-rows: 1
@@ -169,6 +175,76 @@ shm 数据服务（单机共享内存）
      - ``600``
      - 客户端接入协商的总时长预算（秒，含连接探测与就绪等待）；``0`` 表示无限等待；超时后客户端
        降级为独立模式启动，避免永久挂起。
+   * - ``shm_ipc_dir``
+     - ``~/.hikyuu/ipc``
+     - shm 数据服务的 IPC 运行时目录（socket、单实例锁、段名记录文件的落点），服务端与客户端均
+       生效；亦可经环境变量 ``HIKYUU_IPC_DIR`` 覆盖（优先级高于本配置项）。默认位于用户家目录下，
+       无需配置；docker 等容器共享场景建议配置为绝对路径（容器内 ``HOME`` 可能与宿主不同）。
+
+docker 容器共享
+---------------
+
+跨容器共享服务时，客户端容器需能访问两类资源：**IPC 运行目录中的 socket 文件** 与 **/dev/shm 中的
+共享内存段**。配置要点：
+
+- 服务端与客户端使用 **同一 datadir**（连同数据目录一并挂载进容器），且插件版本一致；
+- 在 ``hikyuu.ini`` 中将 ``shm_ipc_dir`` 配置为 **挂载范围内的绝对路径**（不依赖容器内 ``HOME``）；
+- 客户端容器以 ``--ipc=host`` 运行（或 ``--ipc=container:<服务端容器名>``），与服务端共享 /dev/shm；
+- 若服务端运行于容器内且未使用 ``--ipc=host``，须调大 ``--shm-size``（默认仅 64MB，K 线段可达
+  GB 级）；
+- Windows 宿主下的容器均为 Linux 容器（Docker Desktop / WSL2），而 Windows 原生进程使用命名管道
+  与 Windows 共享内存，无法与 Linux 容器互通，故服务端也应放入容器（或 WSL）内运行。
+
+**Linux 宿主示例（服务端运行于宿主，客户端运行于容器）**
+
+服务端在宿主上直接运行（``shmserver`` 常驻亦可），``hikyuu.ini`` 中配置：
+
+::
+
+    shm_ipc_dir = /data/hikyuu-ipc
+
+客户端容器将配置、数据与 IPC 运行目录按 **相同路径** 挂载：
+
+::
+
+    docker run -it --rm \
+      --ipc=host \
+      -v /data/hikyuu-ipc:/data/hikyuu-ipc \
+      -v /home/user/.hikyuu:/home/user/.hikyuu \
+      -v /home/user/stock:/home/user/stock \
+      my-hikyuu-image
+
+容器内使用的 ``hikyuu.ini`` 即挂载进来的同一份（``shm_ipc_dir`` 指向挂载路径），开启
+``use_shm_server = True`` 即可接入宿主服务端。
+
+服务端也可运行于容器内（与客户端同为 ``--ipc=host``，共享内存段落在宿主 /dev/shm）：
+
+::
+
+    docker run -d --name shmserver \
+      --ipc=host \
+      -v /home/user/.hikyuu:/home/user/.hikyuu \
+      -v /home/user/stock:/home/user/stock \
+      my-hikyuu-image shmserver
+
+**Windows 宿主示例（Docker Desktop / WSL2，服务端与客户端均为 Linux 容器）**
+
+宿主目录 ``D:/hikyuu`` 下放置 ``.hikyuu``（配置）与 ``stock``（数据），``hikyuu.ini`` 中配置
+``shm_ipc_dir = /home/user/.hikyuu/ipc``（容器内路径，两个容器挂载点一致）：
+
+.. code-block:: powershell
+
+    # 服务端容器
+    docker run -d --name shmserver --ipc=host `
+      -v D:/hikyuu/.hikyuu:/home/user/.hikyuu `
+      -v D:/hikyuu/stock:/home/user/stock `
+      my-hikyuu-image shmserver
+
+    # 客户端容器
+    docker run -it --rm --ipc=host `
+      -v D:/hikyuu/.hikyuu:/home/user/.hikyuu `
+      -v D:/hikyuu/stock:/home/user/stock `
+      my-hikyuu-image
 
 数据获取路径
 ------------
@@ -271,14 +347,14 @@ shm 数据服务（单机共享内存）
 ``use_shm_server`` 默认为 ``False``：不启动服务端、也不在任何进程的配置或 ``load_hikyuu``
 参数中开启该选项，所有进程即完全按独立模式运行，行为与未启用本特性时一致。
 
-**临时目录下会残留哪些文件？**
+**IPC 运行目录下会残留哪些文件？**
 
-服务地址位于系统临时目录（unix 取环境变量 ``TMPDIR``，缺省 ``/tmp``；Windows 取系统临时目录），
-socket / 命名管道文件名形如 ``hikyuu_shm_server_{hash}.ipc`` （Windows 下为同名命名管道），
-另有配套的 ``.lock`` 文件；服务端还会用 ``hikyuu_ks.last`` / ``hikyuu_bi.last`` 记录当前共享内存
-段名，用于清理上一个异常退出的服务端残留段，并以 ``hikyuu_shmserver.lock`` 作为单实例文件锁
-（见下）。服务端正常退出时会删除共享内存段；上述文件残留后均可安全手工删除（单实例锁在进程
-终止时由操作系统自动释放）。
+IPC 运行目录默认为 ``~/.hikyuu/ipc``（可经 ``[hikyuu] shm_ipc_dir`` 配置或环境变量
+``HIKYUU_IPC_DIR`` 覆盖）。socket / 命名管道文件名形如 ``hikyuu_shm_server.ipc``
+（Windows 下为同名命名管道），另有配套的 ``.lock`` 文件；服务端还会用 ``hikyuu_ks.last`` /
+``hikyuu_bi.last`` 记录当前共享内存段名，用于清理上一个异常退出的服务端残留段，并以
+``hikyuu_shmserver.lock`` 作为单实例文件锁（见下）。服务端正常退出时会删除共享内存段；上述
+文件残留后均可安全手工删除（单实例锁在进程终止时由操作系统自动释放）。
 
 .. note::
 

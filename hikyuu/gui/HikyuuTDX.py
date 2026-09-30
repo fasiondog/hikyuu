@@ -286,6 +286,7 @@ li.checked::marker { content: "\2612"; }
                 f.write(
                     hku_config_template.hdf5_template.format(
                         dir=data_dir, reload_time=old_reload_time,
+                        home=os.path.expanduser('~'),
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
@@ -332,6 +333,7 @@ li.checked::marker { content: "\2612"; }
                     hku_config_template.mysql_template.format(
                         dir=data_dir,
                         reload_time=old_reload_time,
+                        home=os.path.expanduser('~'),
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),
@@ -381,6 +383,7 @@ li.checked::marker { content: "\2612"; }
                     hku_config_template.clickhouse_template.format(
                         dir=data_dir,
                         reload_time=old_reload_time,
+                        home=os.path.expanduser('~'),
                         lazy_preload=current_config.getboolean('lazy_preload', 'enable', fallback=False),
                         quotation_server=current_config.get(
                             'collect', 'quotation_server', fallback='ipc:///tmp/hikyuu_real.ipc'),

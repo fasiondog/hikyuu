@@ -34,6 +34,9 @@ lazy_preload = {lazy_preload}
 ;use_shm_server = True
 ; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
+; IPC runtime directory of the shm data service (socket / lock / segment record files)
+; Change it to an absolute path shared between the host and docker containers mounted at the same location if needed
+shm_ipc_dir = {home}/.hikyuu/ipc
 
 [block]
 type = sqlite3
@@ -113,6 +116,9 @@ lazy_preload = {lazy_preload}
 ;use_shm_server = True
 ; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
+; IPC runtime directory of the shm data service (socket / lock / segment record files)
+; Change it to an absolute path shared between the host and docker containers mounted at the same location if needed
+shm_ipc_dir = {home}/.hikyuu/ipc
 
 [block]
 type = mysql
@@ -179,6 +185,9 @@ lazy_preload = {lazy_preload}
 ;use_shm_server = True
 ; Total client handshake budget in seconds, including connection probing and the readiness wait; 0 = wait forever; on timeout it falls back to standalone mode
 ;shm_server_wait_timeout = 600
+; IPC runtime directory of the shm data service (socket / lock / segment record files)
+; Change it to an absolute path shared between the host and docker containers mounted at the same location if needed
+shm_ipc_dir = {home}/.hikyuu/ipc
 
 [block]
 type = clickhouse
@@ -345,6 +354,7 @@ def generate_default_config():
     data_dir = "c:\\stock" if sys.platform == 'win32' else f"{user_dir}/stock"
     hdf5_config = hdf5_template.format(
         dir=data_dir,
+        home=user_dir,
         reload_time="00:00",
         quotation_server='ipc:///tmp/hikyuu_real.ipc',
         lazy_preload=False,

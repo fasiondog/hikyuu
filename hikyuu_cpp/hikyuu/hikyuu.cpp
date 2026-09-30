@@ -71,6 +71,12 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
     hkuParam.set<bool>("use_shm_server", config.getBool("hikyuu", "use_shm_server", "False"));
     hkuParam.set<int64_t>("shm_server_wait_timeout",
                           config.getInt("hikyuu", "shm_server_wait_timeout", "600"));
+    // IPC runtime directory of the shm data service (socket / lock / segment record files);
+    // empty means the plugin default ~/.hikyuu/ipc. Note: IniParser::get treats an empty
+    // default as "no default" and throws when the option is missing, so guard with hasOption
+    hkuParam.set<string>("shm_ipc_dir", config.hasOption("hikyuu", "shm_ipc_dir")
+                                          ? config.get("hikyuu", "shm_ipc_dir")
+                                          : string());
 
     // Plugin directory
     hkuParam.set<string>("plugindir", config.get("hikyuu", "plugindir",
