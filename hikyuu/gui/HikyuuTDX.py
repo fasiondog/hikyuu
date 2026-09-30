@@ -37,8 +37,8 @@ from hikyuu.gui.data.CollectSpotThread import CollectSpotThread
 from hikyuu.gui.data.SchedImportThread import SchedImportThread
 from hikyuu.gui.spot_server import release_nng_senders
 
-from hikyuu import (can_upgrade, get_latest_version_info, fetch_trial_license,
-                    view_license, is_valid_license, get_expire_date, Datetime, TimeDelta)
+from hikyuu import (can_upgrade, get_latest_version_info, view_license, is_valid_license,
+                    get_expire_date, Datetime, TimeDelta)
 from hikyuu.data import hku_config_template
 from hikyuu.util import *
 
@@ -528,7 +528,6 @@ li.checked::marker { content: "\2612"; }
         self.label_46.setOpenExternalLinks(True)
 
         self.label_license.setText(view_license())
-        self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
         self.setWindowIcon(icon)
         QApplication.instance().setWindowIcon(icon)
@@ -826,14 +825,6 @@ li.checked::marker { content: "\2612"; }
             '1MIN': self.hdf5_min_progressBar,
             '5MIN': self.hdf5_5min_progressBar
         }
-
-    @Slot()
-    def on_fetch_trial_pushButton_clicked(self):
-        email = self.email_lineEdit.text()
-        info = fetch_trial_license(email)
-        QMessageBox.about(self, self.tr("获取试用许可"), info)
-        self.label_license.setText(view_license())
-        self.fetch_trial_pushButton.setEnabled(not is_valid_license())
 
     @Slot()
     def on_pytdx_radioButton_clicked(self):

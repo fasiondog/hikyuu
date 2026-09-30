@@ -601,21 +601,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>&lt;p&gt;&lt;span&gt;Hikyuu focuses on core technology for quantitative trading, covering model development, an ultra-fast computing engine, an efficient backtesting framework and live-trading extensions. Donation features are provided as independently licensed plugins, entirely outside hikyuu, and do not affect self-compilation. Since version 2.8.3, plugin licensing no longer collects hardware information and uses online verification with an offline grace period of up to 30 days; verification is not performed during A-share trading hours. See &quot;Donor benefits&quot; for details. Thank you for your support!&lt;/span&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../data/MainWindow.ui" line="1979"/>
-        <source>申请捐赠功能试用（30天试用）</source>
-        <translation>Apply for a donation-feature trial (30 days)</translation>
-    </message>
-    <message>
-        <location filename="../data/MainWindow.ui" line="1988"/>
-        <source>电子邮件地址:</source>
-        <translation>Email address:</translation>
-    </message>
-    <message>
-        <location filename="../data/MainWindow.ui" line="1998"/>
-        <source>申请试用许可</source>
-        <translation>Request Trial License</translation>
-    </message>
-    <message>
         <location filename="../data/MainWindow.ui" line="2023"/>
         <source>加入知识星球进行捐赠（可同时在3台设备上使用捐赠功能）,或者请作者喝杯☕️，谢谢</source>
         <translation>Join the Zhishi Xingqiu (Knowledge Planet) community to donate (donation features can be used on up to 3 devices at the same time), or buy the author a ☕️ — thank you</translation>
@@ -701,11 +686,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <location filename="../HikyuuTDX.py" line="1200"/>
         <source>已停止</source>
         <translation>Stopped</translation>
-    </message>
-    <message>
-        <location filename="../HikyuuTDX.py" line="802"/>
-        <source>获取试用许可</source>
-        <translation>Request Trial License</translation>
     </message>
     <message>
         <location filename="../HikyuuTDX.py" line="926"/>
