@@ -39,6 +39,11 @@ public:
     virtual bool canLazyLoad(const KQuery::KType& ktype) = 0;
 
     virtual void enableKDataCache(bool enable) = 0;
+
+    /**
+     * Clear the cached non-preloaded K-line private buffers; called by the core after a reload
+     */
+    virtual void clearKDataCache() = 0;
 };
 
 }  // namespace hku

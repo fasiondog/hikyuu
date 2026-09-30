@@ -40,6 +40,11 @@ void HKU_API releaseExtraKType();
 
 void HKU_API enableKDataCache(bool enable);
 
+/**
+ * Clear the cached non-preloaded K-line private buffers after a reload
+ */
+void HKU_API clearKDataCache();
+
 //-------------------------------
 // The following functions are for internal use, they do not need to be exposed
 //-------------------------------

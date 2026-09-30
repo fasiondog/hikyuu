@@ -681,6 +681,10 @@ void StockManager::reload() {
 
     HKU_INFO("start reload ...");
     loadData();
+
+    // The cached non-preloaded private buffers are frozen copies; drop them so the next query is
+    // rebuilt from the reloaded data
+    clearKDataCache();
 }
 
 void StockManager::reloadWith(const StrategyContext& context) {
@@ -702,6 +706,8 @@ void StockManager::reloadWith(const StrategyContext& context) {
 
     HKU_INFO("start reload ...");
     loadData();
+
+    clearKDataCache();
 }
 
 const string& StockManager::tmpdir() const {
