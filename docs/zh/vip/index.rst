@@ -7,4 +7,5 @@
    indicator
    backtest
    dataserver
+   shm_server
    dynamick

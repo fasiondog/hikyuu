@@ -21,7 +21,6 @@ Welcome to Hikyuu's documentation!
    interactive/index
    base/index
    stock_manager
-   shm_server
    indicator/index
    trade_manage/trade_manage
    trade_sys/trade_sys

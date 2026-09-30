@@ -3,13 +3,15 @@
 shm Data Server (single-machine shared memory)
 ==============================================
 
-When multiple hikyuu processes run on the same machine at the same time (such as Jupyter research, strategy backtesting, data collection), and they use the **same data directory** (the ``datadir`` of the ``[hikyuu]`` section in ``hikyuu.ini``), one of the processes can act as the **server**, publishing the loaded data as the shared memory snapshots, and the other processes, as **clients**, read them with zero copy, avoiding each process repeatedly preloading and repeatedly occupying the memory.
+Complete the configuration before use: the client processes need to enable ``use_shm_server`` in the ``[hikyuu]`` section of ``hikyuu.ini``; see the `Configuration Items`_ section below for the details.
 
-Effect: only the server bears the time-consuming preloading and all the memory overhead; the startup time and the memory usage of the clients drop greatly, and the data seen by each process remains consistent.
+When running hikyuu on the same machine, you can execute ``shmserver`` (or ``shmserver.py`` under the ``gui`` directory of the installation) to start a resident **shared memory data service (shm server)** process separately, which completes the time-consuming data preloading and publishes the **K-line hot data and the basic information** as the two kinds of the shared memory snapshots; the other processes (such as Jupyter research, strategy backtesting, and data collection), as the **clients**, join via IPC and read the snapshots with zero copy, avoiding each process repeatedly preloading and repeatedly occupying the memory. The shared memory K-line cache / the zero-copy K-line view also takes effect in the single-process scenario.
+
+Effect: only the server bears the time-consuming K-line preloading and the major memory overhead; the startup time and the memory usage of the clients drop greatly, and the data seen by each process remains consistent.
 
 .. important::
 
-    Different from the old version's "automatically negotiating the master and the slave at the process startup", the server is **not created automatically**: you must **explicitly call** :func:`start_shm_server` in a process to start the service. Any hikyuu process (including the caller itself) will **never** automatically become the server because it cannot connect to the service — when the connection fails, it only degrades to the standalone mode, loading all the data by itself (the behavior is exactly the same as when this feature is not enabled).
+    The server is **not created automatically**: you must **explicitly call** :func:`start_shm_server` in a process to start the service. Any hikyuu process (including the caller itself) will **never** automatically become the server because it cannot connect to the service — when the connection fails, it only degrades to the standalone mode, loading all the data by itself (the behavior is exactly the same as when this feature is not enabled).
 
     This feature (**both the server and the client sides**) is entirely provided by the standalone VIP plugin ``shmserver`` and requires a valid VIP license:
 
@@ -70,7 +72,7 @@ Typical usage: start the service in a resident server process, and the other res
     The server process only acts as the snapshot publisher and does not need to join the other shm services. ``use_shm_server`` is disabled by default; the server
     process completes the initialization and the publishing in the standalone mode without any extra handling; only when ``use_shm_server=True`` is explicitly set in the configuration file,
     the server process needs to skip the client probing with ``load_hikyuu(use_shm_server=False)`` — otherwise this process
-    will first act as a client to connect to the existing service, and after retrying for about 10 seconds, print
+    will first act as a client to connect to the existing service, and after waiting up to ``shm_server_wait_timeout`` (600 seconds by default) until the timeout, print
     the ``Failed connect to hikyuu shm server, fallback to standalone mode!`` warning and then degrade to the standalone mode
     (the data can still be loaded and published normally, with only an extra startup wait and a harmless warning). The command line tool ``shmserver`` has explicitly
     disabled the client probing.
@@ -173,6 +175,8 @@ Every K-line query of the client chooses the path according to the following pri
     The ``[preload]`` configuration of the client process itself is automatically ignored (all set to ``False``).
 
     The adjustment processing is always done locally on the client; what the server transmits is the original data without adjustment.
+
+    In the client mode, the **rights and the historical finance** are lazily loaded on demand and cached locally: they are loaded only when the rights / finance data of a security is accessed for the first time (the basic information snapshot of the server does not contain the finance data at the initial publishing; the snapshot is refreshed after the finance preloading completes), instead of being loaded all at once with the preloading; the subsequent accesses hit the local cache, avoiding the client repeatedly fetching the data for each security.
 
 Block Reading and Writing in the Client Mode
 --------------------------------------------

@@ -5,71 +5,38 @@
 
 ## 2.8.3 - 开发中
 
-**⚠️ 破坏性变更（Breaking Changes）**
+**🚀 新增特性**
 
-* refactor(i18n): Performance 业绩统计项 key 由中文改为英文，`Performance.names()` 返回英文 key
+* feat(shm): 新增插件化共享内存数据服务，新增客户端/单机共享内存零拷贝K线视图、K线共享内存缓存、IPC客户端模式实时更新转发与基础信息共享内存快照；客户端模式权息与历史财务改为懒加载并本地缓存，主进程可直接从行情缓存服务拉取K线
+* feat(gui): 新增界面语言选择与动态切换，完成英文翻译
+* feat(i18n): 核心C++/Python注释、docstrings及文档英文化，新增英文README、快速开始指南、AI开发指南(AGENTS.md)与中英量化学术语表
+* feat(slippage): 新增seed参数支持可复现回测，截断正态拒绝采样边界化，NormalSlippage均值做nan校验
+* feat(plugin): ClickHouse/MySQL/HDF5导入器支持市场与证券类型注册，移除市场注册起始日期参数
+* feat(data): 新增单机自动协商KData数据服务；db_connect新增sqlStringLiteral安全SQL转义；hkuextra客户端模式新增clearKDataCache接口
+* feat(hub): 非中文环境默认从GitHub克隆默认hub
+* refactor: boost依赖要求提升至1.92.0
 
-  * 旧中文 key 仍可使用（如 `performance["当前总资产"]`），已标记废弃，运行时输出告警，建议尽快迁移
-  * 中文环境下 `performance.report()` 输出仍为中文（由 gettext 译文提供，见 `i18n/zh_CN.po`）
-  * `SE_PerformanceOptimal` 参数默认值改为 `key="Account Avg Annual Return %"`（原“帐户平均年收益率%”，旧值仍可用）
-  * hikyuu.analysis、hikyuu.draw 模块内部默认 key 已同步更新
-  * 新旧 key 对照表：
 
-| 旧中文 key | 新英文 key |
-| --- | --- |
-| 帐户初始金额 | Account Initial Capital |
-| 累计投入本金 | Total Invested Principal |
-| 累计投入资产 | Total Invested Assets |
-| 累计借入现金 | Total Borrowed Cash |
-| 累计借入资产 | Total Borrowed Assets |
-| 累计红利 | Total Dividends |
-| 现金余额 | Cash Balance |
-| 未平仓头寸净值 | Open Position Net Value |
-| 当前总资产 | Current Total Assets |
-| 已平仓交易总成本 | Total Cost of Closed Trades |
-| 已平仓净利润总额 | Total Net Profit of Closed Trades |
-| 单笔交易最大占用现金比例% | Max Cash Usage per Trade % |
-| 交易平均占用现金比例% | Avg Cash Usage per Trade % |
-| 未平仓帐户收益率% | Open Position Account Return % |
-| 已平仓帐户收益率% | Closed Trade Account Return % |
-| 帐户年复合收益率% | Account CAGR % |
-| 帐户平均年收益率% | Account Avg Annual Return % |
-| 赢利交易赢利总额 | Total Profit of Winning Trades |
-| 亏损交易亏损总额 | Total Loss of Losing Trades |
-| 已平仓交易总数 | Total Closed Trades |
-| 赢利交易数 | Number of Winning Trades |
-| 亏损交易数 | Number of Losing Trades |
-| 赢利交易比例% | Win Rate % |
-| 赢利期望值 | Profit Expectancy |
-| 赢利交易平均赢利 | Avg Profit per Winning Trade |
-| 亏损交易平均亏损 | Avg Loss per Losing Trade |
-| 平均赢利/平均亏损比例 | Avg Win / Avg Loss Ratio |
-| 净赢利/亏损比例 | Profit Factor |
-| 最大单笔赢利 | Largest Single Win |
-| 最大单笔盈利百分比% | Largest Single Win % |
-| 最大单笔亏损 | Largest Single Loss |
-| 最大单笔亏损百分比% | Largest Single Loss % |
-| 赢利交易平均持仓时间 | Avg Holding Period of Winning Trades |
-| 赢利交易最大持仓时间 | Max Holding Period of Winning Trades |
-| 亏损交易平均持仓时间 | Avg Holding Period of Losing Trades |
-| 亏损交易最大持仓时间 | Max Holding Period of Losing Trades |
-| 空仓总时间 | Total Time Flat |
-| 空仓时间/总时间% | Time Flat / Total Time % |
-| 平均空仓时间 | Avg Time Flat |
-| 最长空仓时间 | Max Time Flat |
-| 最大连续赢利笔数 | Max Consecutive Wins |
-| 最大连续亏损笔数 | Max Consecutive Losses |
-| 最大连续赢利金额 | Max Consecutive Win Amount |
-| 最大连续亏损金额 | Max Consecutive Loss Amount |
-| R乘数期望值 | R-Multiple Expectancy |
-| 交易机会频率/年 | Trade Opportunities per Year |
-| 年度期望R乘数 | Annual Expected R-Multiple |
-| 赢利交易平均R乘数 | Avg R-Multiple of Winning Trades |
-| 亏损交易平均R乘数 | Avg R-Multiple of Losing Trades |
-| 最大单笔赢利R乘数 | Max Single Win R-Multiple |
-| 最大单笔亏损R乘数 | Max Single Loss R-Multiple |
-| 最大连续赢利R乘数 | Max Consecutive Win R-Multiple |
-| 最大连续亏损R乘数 | Max Consecutive Loss R-Multiple |
+**⚡️ 优化改进**
+
+* perf(trade_manage): getFundsList改为一次性回放交易列表，新增getRefTradeList避免只读访问时拷贝整表；修正保证金/借入/资产口径与分红重复计入(#511)
+* perf(trade_sys): 可买数量改用二分查找替代逐手递减
+* fix(trade_sys): 修正止盈价格映射至不复权坐标、空头止损方向与退出检查、止损/止盈缓存重置
+* perf(indicator): 动态参数路径用标量递归替代SLICE+rebuild
+* fix(indicator): 统一修复增量计算边界与越界读取(ADJ_FACTOR/BACKSET/BARSSINCEN/ALIGN/SAFTYLOSS/ISLIMIT/QUANTILE_TRUNC/ATR/DIFF/REF/WMA/MACD/DMA/EXIST等)
+* fix(strategy): 修正订单参考价理、totalRisk符号与单位、连续交易计数仅多头、can_allocate_cash统一扣减预留资金、WalkForward各训练区间隔离EV等
+* fix(utilities): GlobalStealThreadPool改线程局部存储，修正MQStealQueue/ResourcePool/DllLoader/PluginLoader移动语义与加载守卫
+
+**🐞 缺陷修复**
+
+* fix(data_driver): 修复SQL后端派生周期K线跨界聚合、Python自定义KDataDriver的getIndexRangeByDate返回end被错误替换为start、HDF5日期索引回退逻辑；移除冗余TMPCSV临时机制
+* fix(stock): 修复实时更新拒绝无效K线记录、客户端模式缓冲门控；shm客户端每日自动重载延迟5分钟执行
+* fix(global): 修复FlatBuffers校验范围、parseFlatSpot/StockManager初始化异常安全
+* fix(analysis): 修复组合分析入口对null tm/sys的空指针解引用、日期范围与结束于查询最后交易日；修正Portfolio延迟卖单移除条件、self-tm系统保留在WithoutAF选择器池
+* refactor(clone): 简化clone实现并增强子类异常处理，System/Portfolio/WalkForward改为异常安全
+* fix(trade): 空头Broker订单使用实际执行数量同步
+* fix(draw): payoff面板Avg Win/Avg Loss key
+* fix(stock): 增强参数验证日志可读性
 
 ## 2.8.2 - 2026年8月20日
 

@@ -1,5 +1,5 @@
-dataserver
-==========
+dataserver (Data Cache Server)
+==============================
 
 If installed with pip, the dataserver command can be executed directly in the shell. Or execute the gui/dataserver.py file under the installation directory with Python.
 
