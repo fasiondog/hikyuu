@@ -6,7 +6,7 @@
  *
  *  Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
  *  It holds multiple sub-systems (single-security or nested aggregate), drives and aggregates the orders at the open/close stages respectively.
- *  Stage 3: dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
+ *  Dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
  *  Mode A (the default): the parent gives the sub-systems a "shadow account", the parent allocates and orders by weight uniformly (functionally equivalent to the PF signal aggregation).
  */
 

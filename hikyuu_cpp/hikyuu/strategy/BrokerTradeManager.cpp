@@ -280,7 +280,34 @@ FundsRecord BrokerTradeManager::getFunds(KQuery::KType inktype) const {
 }
 
 FundsRecord BrokerTradeManager::getFunds(const Datetime& datetime, KQuery::KType ktype) {
-    return (datetime >= m_datetime) ? getFunds(ktype) : FundsRecord();
+    // The snapshot only records the cash and the position quantities at the bookkeeping time;
+    // the market value of those holdings drifts with the price as time flows. A dated query must
+    // revalue the current positions at `datetime` (the aggregate layer asks by the bar time to
+    // size the rebalancing), instead of returning the snapshot-time value or zeros. A Null
+    // datetime falls back to the current snapshot time.
+    FundsRecord funds;
+    int precision = getParam<int>("precision");
+
+    string kt(ktype);
+    to_upper(kt);
+    const Datetime& dt = datetime.isNull() ? m_datetime : datetime;
+
+    price_t value{0.0};  // Market value of the holdings at the queried moment
+    position_map_type::const_iterator iter = m_position.begin();
+    for (; iter != m_position.end(); ++iter) {
+        const PositionRecord& record = iter->second;
+        auto price = record.stock.getMarketValue(dt, kt);
+        value = roundEx((value + record.number * price * record.stock.unit()), precision);
+    }
+
+    funds.cash = m_cash;
+    funds.market_value = value;
+    funds.short_market_value = 0.0;
+    funds.base_cash = m_cash;
+    funds.base_asset = 0.0;
+    funds.borrow_cash = 0.0;
+    funds.borrow_asset = 0.0;
+    return funds;
 }
 
 string BrokerTradeManager::str() const {

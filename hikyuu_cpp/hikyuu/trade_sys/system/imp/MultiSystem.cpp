@@ -5,7 +5,7 @@
  *      Author: fasiondog
  *
  *  Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
- *  Stage 3: dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
+ *  Dual modes (A/B) + arbitrary nesting + MM L1/L2/L3 + rebalancing cycle + hierarchy path.
  */
 
 #include "MultiSystem.h"
