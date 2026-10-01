@@ -22,7 +22,7 @@ static inline bool is_unambiguous(char c) {
     return IS_ALPHANUM(c) || c == '-' || c == '_' || c == '.' || c == '~';
 }
 
-static inline unsigned char hex2i(char hex) {
+static inline unsigned char hex2i(unsigned char hex) {
     return hex <= '9' ? hex - '0' : hex <= 'F' ? hex - 'A' + 10 : hex - 'a' + 10;
 }
 
@@ -34,7 +34,7 @@ std::string url_escape(const char* istr) {
         if (is_unambiguous(*p)) {
             ostr += *p;
         } else {
-            snprintf(szHex, 4, "%%%02X", *p);
+            snprintf(szHex, 4, "%%%02X", static_cast<unsigned char>(*p));
             ostr += szHex;
         }
         ++p;
@@ -47,7 +47,7 @@ std::string url_unescape(const char* istr) {
     const char* p = istr;
     while (*p != '\0') {
         if (*p == '%' && IS_HEX(p[1]) && IS_HEX(p[2])) {
-            ostr += ((hex2i(p[1]) << 4) | hex2i(p[2]));
+            ostr += static_cast<char>((hex2i(p[1]) << 4) | hex2i(p[2]));
             p += 3;
         } else {
             ostr += *p;

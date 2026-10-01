@@ -325,6 +325,12 @@ private:
  * @note This class cannot be moved or copied, because it manages the lifetimes of the background
  *       threads and the io_context
  * @note When an external io_context is used, its lifetime must be longer than the client
+ * @note Lifetime contract: do not destroy the client while an asynchronous request is still in
+ *       flight. The coroutines of the async_* methods run on behalf of this object, so an
+ * unfinished one both outlives its owner and keeps a connection borrowed from the internal pool,
+ * which makes the destructor wait for a return that can never happen. The synchronous methods are
+ *       safe by construction, since they only return after the whole exchange has finished and the
+ *       connection has been given back
  * @see AsioHttpResponse the complete response class
  * @see AsioHttpStreamResponse the streaming response class
  */
@@ -337,6 +343,13 @@ public:
 
     /// @brief Maximum timeout (ms), it is used when a value <= 0 is passed
     static constexpr int32_t MAX_TIMEOUT_MS = 60000;  // 60 seconds
+
+    /// @brief Default upper limit of the response body, it bounds the memory of one response
+    /// (the same value as the beast default, so the behavior does not change unless it is raised)
+    static constexpr size_t DEFAULT_MAX_RESPONSE_SIZE = 8 * 1024 * 1024;  // 8 MB
+
+    /// @brief Default upper limit of the response header (the same value as the beast default)
+    static constexpr size_t DEFAULT_MAX_HEADER_SIZE = 8 * 1024;  // 8 KB
 
     /**
      * @brief Constructor (the internal io_context mode)
@@ -452,6 +465,51 @@ public:
     }
 
     /**
+     * @brief Set the upper limit of the response body size (bytes)
+     *
+     * The limit bounds the memory of a single response: the whole body is accumulated in memory
+     * by the non streaming requests, so it applies to them and to the gzip decompression output.
+     * The streaming requests keep a fixed internal chunk buffer and hand every chunk over to the
+     * callback, so they are not limited by this value on purpose.
+     *
+     * @param bytes the maximum response body size, 0 resets it to DEFAULT_MAX_RESPONSE_SIZE
+     *
+     * @note The default keeps the beast default size, raise it to accept a larger response
+     * @note When the peer declares or sends more, HttpResponseTooLargeException is thrown and the
+     * connection is closed instead of being reused
+     * @note The setting takes effect for all the subsequent requests
+     */
+    void setMaxResponseSize(size_t bytes);
+
+    /**
+     * @brief Get the current upper limit of the response body size
+     * @return the maximum response body size (bytes)
+     */
+    size_t getMaxResponseSize() const noexcept {
+        return m_max_response_size;
+    }
+
+    /**
+     * @brief Set the upper limit of the response header size (bytes)
+     *
+     * It counts the status line, all the field names and values and the delimiter sequences.
+     *
+     * @param bytes the maximum response header size, 0 resets it to DEFAULT_MAX_HEADER_SIZE
+     *
+     * @note When the header is not complete within the limit, HttpResponseTooLargeException is
+     * thrown and the connection is closed instead of being reused
+     */
+    void setMaxHeaderSize(size_t bytes);
+
+    /**
+     * @brief Get the current upper limit of the response header size
+     * @return the maximum response header size (bytes)
+     */
+    size_t getMaxHeaderSize() const noexcept {
+        return m_max_header_size;
+    }
+
+    /**
      * @brief Get the executor of the io_context
      *
      * It is used to start a custom coroutine or an asynchronous operation on the io_context managed
@@ -506,6 +564,8 @@ public:
 
     // ==================== Asynchronous request methods ====================
     // They return net::awaitable and need to be called with co_await in a coroutine
+    // The client must stay alive until the awaited request has finished, see the lifetime contract
+    // of the class documentation
 
     /**
      * @brief General asynchronous HTTP request
@@ -1053,13 +1113,19 @@ private:
     std::unique_ptr<SslContext> m_ssl_ctx;  // SSL context (used when SSL is enabled only)
 #endif
 
-    bool m_is_valid_url{false};                               // Whether the URL is valid
-    bool m_is_https{false};                                   // Whether the HTTPS protocol is used
-    std::string m_url;                                        // The complete URL
-    std::string m_base_path;                                  // The base path part of the URL
-    std::string m_host;                                       // Host name
-    std::string m_port;                                       // Port number
+    bool m_is_valid_url{false};  // Whether the URL is valid
+    bool m_is_https{false};      // Whether the HTTPS protocol is used
+    std::string m_url;           // The complete URL
+    std::string m_base_path;     // The base path part of the URL
+    std::string m_host;          // Host name
+    std::string m_host_header;   // Host name in the form of the Host header
+                                 // (an IPv6 literal keeps its brackets and a non default port is
+                                 // appended)
+    bool m_host_is_ip{false};    // Whether the host is an IPv4 or IPv6 literal
+    std::string m_port;          // Port number
     std::chrono::milliseconds m_timeout{DEFAULT_TIMEOUT_MS};  // Timeout
+    size_t m_max_response_size{DEFAULT_MAX_RESPONSE_SIZE};    // Maximum response body size
+    size_t m_max_header_size{DEFAULT_MAX_HEADER_SIZE};        // Maximum response header size
     std::map<std::string, std::string> m_default_headers;     // Default request headers
     std::string m_ca_file;                                    // Custom CA certificate file path
 
@@ -1067,7 +1133,7 @@ private:
     std::unique_ptr<ResourceAsioVersionPool<HttpConnection, std::mutex>> m_connection_pool;
 
     // io_context management
-    std::unique_ptr<net::io_context> m_own_ctx;  // Internal io_context
+    std::shared_ptr<net::io_context> m_own_ctx;  // Internal io_context
     net::io_context* m_ctx{nullptr};             // The io_context currently used
     std::vector<std::thread> m_worker_threads;   // The thread pool running the io_context in the
                                                  // background
