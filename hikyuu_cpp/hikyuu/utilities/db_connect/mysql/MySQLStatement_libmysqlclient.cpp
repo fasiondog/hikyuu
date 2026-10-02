@@ -230,7 +230,9 @@ bool MySQLStatement::sub_moveNext() {
     ret = mysql_stmt_fetch(m_impl->stmt);
     if (ret == 0) {
         return true;
-    } else if (ret == 1) {
+    } else if (ret == MYSQL_DATA_TRUNCATED) {
+        SQL_THROW(ret, "Data truncated in mysql_stmt_fetch! SQL: {}", m_sql_string);
+    } else if (ret != MYSQL_NO_DATA) {
         SQL_THROW(ret, "Error occurred in mysql_stmt_fetch! {}", mysql_stmt_error(m_impl->stmt));
     }
     return false;
@@ -404,11 +406,9 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
                    m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_NEWDECIMAL) {
             std::vector<char>* p =
               boost::any_cast<std::vector<char>>(&(m_impl->result_buffer[idx]));
-            std::ostringstream buf;
-            for (unsigned long i = 0; i < m_impl->result_length[idx]; i++) {
-                buf << (*p)[i];
-            }
-            item = std::stod(buf.str());
+            SQL_CHECK(m_impl->result_length[idx] <= p->size(), -1, "Invalid column length! idx: {}",
+                      idx);
+            item = std::stod(std::string(p->data(), m_impl->result_length[idx]));
         } else {
             HKU_THROW("Field type({}) mismatch! idx: {}", int(m_impl->result_bind[idx].buffer_type),
                       idx);
@@ -492,11 +492,9 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
         }
 
         std::vector<char>* p = boost::any_cast<std::vector<char>>(&(m_impl->result_buffer[idx]));
-        std::ostringstream buf;
-        for (unsigned long i = 0; i < m_impl->result_length[idx]; i++) {
-            buf << (*p)[i];
-        }
-        item = buf.str();
+        SQL_CHECK(m_impl->result_length[idx] <= p->size(), -1, "Invalid column length! idx: {}",
+                  idx);
+        item.assign(p->data(), m_impl->result_length[idx]);
     } catch (...) {
         HKU_THROW("Field type mismatch! idx: {}", idx);
     }
@@ -516,11 +514,9 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::string& item) {
 
     try {
         std::vector<char>* p = boost::any_cast<std::vector<char>>(&m_impl->result_buffer[idx]);
-        std::ostringstream buf;
-        for (unsigned long i = 0; i < m_impl->result_length[idx]; i++) {
-            buf << (*p)[i];
-        }
-        item = buf.str();
+        SQL_CHECK(m_impl->result_length[idx] <= p->size(), -1, "Invalid column length! idx: {}",
+                  idx);
+        item.assign(p->data(), m_impl->result_length[idx]);
     } catch (...) {
         HKU_THROW("Field type mismatch! idx: {}", idx);
     }
