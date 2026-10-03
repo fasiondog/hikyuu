@@ -27,6 +27,13 @@ public:
         m_is_python_object = true;
     }
 
+    // The Python binding layer channel for declaring the multi-trading capability: a Python
+    // custom MM sets it in its constructor (the protected member is not directly reachable from
+    // Python)
+    void pySetSupportMultBuySell(bool support) {
+        m_support_mult_buy_sell = support;
+    }
+
     void _reset() override {
         PYBIND11_OVERLOAD(void, MoneyManagerBase, _reset, );
     }
@@ -100,6 +107,21 @@ The custom money management strategy interfaces:
                     "Set or get the trade manager object")
       .def_property("query", &MoneyManagerBase::getQuery, &MoneyManagerBase::setQuery,
                     py::return_value_policy::copy, "Set or get the query condition")
+
+      .def_property(
+        "support_mult_buy_sell",
+        [](const MoneyManagerBase& mm) { return mm.isSupportMultBuySell(); },
+        [](MoneyManagerBase& mm, bool support) {
+            HKU_CHECK(mm.isPythonObject(),
+                      "Only a Python custom money manager can set support_mult_buy_sell!");
+            static_cast<PyMoneyManagerBase&>(mm).pySetSupportMultBuySell(support);
+        },
+        R"(Whether the MM supports multiple position building/reducing (default False)
+
+    A Python custom MM which handles the risk<=0 liquidation itself in _getSellNumber /
+    _getBuyShortNumber should declare this capability by setting it to True in its constructor,
+    otherwise the base class will force liquidating the whole position when the risk is not
+    greater than 0)")
 
       .def("current_buy_count", &MoneyManagerBase::currentBuyCount,
            "The current consecutive buy count")

@@ -236,15 +236,17 @@ void SpotAgent::work_thread() {
             }
             switch (m_status) {
                 case WAITING:
-                    if (memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
+                    if (length >= ms_startTagLength &&
+                        memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
                         ms_start_rev_time = Datetime::now();
                         m_status = RECEIVING;
                     }
                     break;
                 case RECEIVING:
-                    if (memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
+                    if (length >= ms_endTagLength && memcmp(buf, ms_endTag, ms_endTagLength) == 0) {
                         m_status = WAITING;
-                    } else if (memcmp(buf, ms_startTag, ms_startTagLength) != 0) {
+                    } else if (length >= ms_startTagLength &&
+                               memcmp(buf, ms_startTag, ms_startTagLength) != 0) {
                         std::shared_ptr<char[]> data_buf(new char[length]);
                         memcpy(data_buf.get(), buf, length);
                         m_receive_data_tg->submit([this, length, new_buf = std::move(data_buf)]() {

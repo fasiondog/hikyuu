@@ -5,6 +5,9 @@
  *     Author: fasiondog
  */
 
+#include <atomic>
+#include <typeinfo>
+
 #include <hikyuu/GlobalInitializer.h>
 #include "../GlobalInitializer.h"
 #include "GlobalSpotAgent.h"
@@ -12,20 +15,30 @@
 
 namespace hku {
 
-SpotAgent* g_spot_agent = nullptr;
+static std::atomic<SpotAgent*> g_spot_agent{nullptr};
 
 SpotAgent* getGlobalSpotAgent() {
-    if (!g_spot_agent) {
-        g_spot_agent = new SpotAgent();
+    SpotAgent* agent = g_spot_agent.load(std::memory_order_acquire);
+    if (agent) {
+        return agent;
     }
-    return g_spot_agent;
+
+    SpotAgent* new_agent = new SpotAgent();
+    SpotAgent* expected = nullptr;
+    if (g_spot_agent.compare_exchange_strong(expected, new_agent, std::memory_order_acq_rel,
+                                             std::memory_order_acquire)) {
+        return new_agent;
+    }
+
+    delete new_agent;
+    return expected;
 }
 
 void releaseGlobalSpotAgent() {
-    if (g_spot_agent) {
+    SpotAgent* agent = g_spot_agent.exchange(nullptr);
+    if (agent) {
         HKU_TRACE("relase spot agent");
-        delete g_spot_agent;
-        g_spot_agent = nullptr;
+        delete agent;
     }
 }
 

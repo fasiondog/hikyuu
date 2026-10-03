@@ -63,6 +63,7 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
+    p->m_support_mult_buy_sell = m_support_mult_buy_sell;
     p->m_tm = m_tm;
     p->m_query = m_query;
     p->m_buy_sell_counts = m_buy_sell_counts;

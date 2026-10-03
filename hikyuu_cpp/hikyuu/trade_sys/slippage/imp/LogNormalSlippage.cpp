@@ -35,7 +35,16 @@ void LogNormalSlippage::_checkParam(const string& name) const {
 void LogNormalSlippage::_reset() {
     int64_t seed = getParam<int64_t>("seed");
     if (seed != 0) {
-        m_gen.seed(static_cast<uint32_t>(seed));
+        uint64_t useed = static_cast<uint64_t>(seed);
+        if (useed > 0xffffffffull) {
+            // A seed beyond the 32-bit range would silently lose its high bits on truncation:
+            // mix the full 64 bits instead (seeds within the 32-bit range keep the historical
+            // seeding so the existing reproducible sequences stay unchanged)
+            std::seed_seq seq{static_cast<uint32_t>(useed), static_cast<uint32_t>(useed >> 32)};
+            m_gen.seed(seq);
+        } else {
+            m_gen.seed(static_cast<uint32_t>(useed));
+        }
     } else {
         m_gen.seed(std::random_device{}());
     }

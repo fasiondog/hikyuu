@@ -19,8 +19,8 @@ namespace hku {
  * Base class of the money management (**single system/single security** form)
  * @details Responsibility: given the market data, price, risk and cash of a single instrument (its
  *          own account), it decides the buy/sell quantity. The portfolio-level fund allocation
- *          (L1/L2/L3) has been migrated to AllocateFundsBase (AF); the two no longer share the class
- *          hierarchy, the parameter family or the allocation mode.
+ *          (L1/L2/L3) has been migrated to AllocateFundsBase (AF); the two no longer share the
+ * class hierarchy, the parameter family or the allocation mode.
  * @ingroup MoneyManager
  */
 class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase> {
@@ -177,6 +177,12 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether the MM supports multiple position building/reducing (the capability flag assigned
+     *  by the subclass constructor) */
+    bool isSupportMultBuySell() const noexcept {
+        return m_support_mult_buy_sell;
+    }
+
 protected:
     string m_name;
     KQuery m_query;
@@ -212,7 +218,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         if (version < 1) {
-            // v5 compatibility: m_mode was at this position in the old archives (the portfolio-level allocation mode), it is discarded after being read.
+            // v5 compatibility: m_mode was at this position in the old archives (the
+            // portfolio-level allocation mode), it is discarded after being read.
             string legacy_mode = "A";
             ar& boost::serialization::make_nvp("m_mode", legacy_mode);
         }

@@ -36,6 +36,9 @@ bool MySQLKDataDriver::_init() {
 
 string MySQLKDataDriver ::_getTableName(const string& market, const string& code,
                                         const KQuery::KType& ktype) {
+    HKU_CHECK(market.find('`') == string::npos && market.find('\0') == string::npos &&
+                code.find('`') == string::npos && code.find('\0') == string::npos,
+              "Invalid market or code! market: '{}', code: '{}'", market, code);
     string table;
     if (ktype == KQuery::TIMELINE) {
         table = fmt::format("`{}_time`.`{}`", market, code);
@@ -233,11 +236,9 @@ TimeLineList MySQLKDataDriver::getTimeLineList(const string& market, const strin
 
 TimeLineList MySQLKDataDriver::_getTimeLineListByDate(const string& market, const string& code,
                                                       const KQuery& query) {
-    string table = fmt::format("`{}_time`.`{}`", market, code);
-    to_lower(table);
-
     TimeLineList result;
     try {
+        string table = _getTableName(market, code, KQuery::TIMELINE);
         SQLStatementPtr st = m_connect->getStatement(fmt::format(
           "select `date`, `price`, `vol` from {} where date >= {} and date < {} order by date",
           table, query.startDatetime().number(), query.endDatetime().number()));
@@ -270,11 +271,9 @@ TimeLineList MySQLKDataDriver::_getTimeLineListByDate(const string& market, cons
 
 TimeLineList MySQLKDataDriver::_getTimeLineListByIndex(const string& market, const string& code,
                                                        const KQuery& query) {
-    string table = fmt::format("`{}_time`.`{}`", market, code);
-    to_lower(table);
-
     TimeLineList result;
     try {
+        string table = _getTableName(market, code, KQuery::TIMELINE);
         m_connect->transaction();
 
         int64_t startix = query.start(), endix = query.end();
@@ -352,11 +351,9 @@ TransList MySQLKDataDriver::getTransList(const string& market, const string& cod
 
 TransList MySQLKDataDriver::_getTransListByDate(const string& market, const string& code,
                                                 const KQuery& query) {
-    string table = fmt::format("`{}_trans`.`{}`", market, code);
-    to_lower(table);
-
     TransList result;
     try {
+        string table = _getTableName(market, code, KQuery::TRANS);
         SQLStatementPtr st = m_connect->getStatement(
           fmt::format("select `date`, `price`, `vol`, `buyorsell` from {} where date >= {} and "
                       "date < {} order by date",
@@ -391,11 +388,9 @@ TransList MySQLKDataDriver::_getTransListByDate(const string& market, const stri
 
 TransList MySQLKDataDriver::_getTransListByIndex(const string& market, const string& code,
                                                  const KQuery& query) {
-    string table = fmt::format("`{}_trans`.`{}`", market, code);
-    to_lower(table);
-
     TransList result;
     try {
+        string table = _getTableName(market, code, KQuery::TRANS);
         m_connect->transaction();
 
         int64_t startix = query.start(), endix = query.end();

@@ -135,6 +135,45 @@ struct TempDayKDataDB {
     }
 };
 
+// Daily bars with a fully suspended (all-zero) week: 2024/1/5(Fri) price 1, 2024/1/10(Wed) and
+// 2024/1/12(Fri) all zero, 2024/1/16(Tue) price 2
+struct TempSuspendedDayKDataDB {
+    string path;
+
+    TempSuspendedDayKDataDB() {
+        path = (fs::temp_directory_path() / "hku_test_sqlite_kdata_susday.sqlite3").string();
+        fs::remove(path);
+
+        Parameter conn_param;
+        conn_param.set<string>("db", path);
+        SQLiteConnect connect(conn_param);
+        connect.exec(
+          "create table '600000' (date integer primary key, open real not null, "
+          "high real not null, low real not null, close real not null, "
+          "amount real not null, count real not null)");
+        static const int64_t dates[4] = {20240105, 20240110, 20240112, 20240116};
+        static const int closes[4] = {1, 0, 0, 2};
+        for (int i = 0; i < 4; ++i) {
+            connect.exec(fmt::format(
+              "insert into '600000' (date, open, high, low, close, amount, count) values "
+              "({}, {}, {}, {}, {}, 0, 0)",
+              dates[i], closes[i], closes[i], closes[i], closes[i]));
+        }
+    }
+
+    ~TempSuspendedDayKDataDB() {
+        fs::remove(path);
+    }
+
+    Parameter driverParam() const {
+        Parameter param;
+        param.set<string>("type", "sqlite3");
+        param.set<bool>("convert", true);
+        param.set<string>("SH_DAY", path);
+        return param;
+    }
+};
+
 // MIN5 bars crossing the lunch break (1/5) and with a missing 9:45 bar (1/8),
 // close prices: 10, 11, 12, 13, 20, 21, 22
 struct TempMinuteSessionDB {
@@ -245,6 +284,25 @@ TEST_CASE("test_SQLiteKDataDriver_daily_calendar_buckets") {
     auto ranged = driver.getKRecordList(
       MARKET, CODE, KQueryByDate(Datetime(20240108), Datetime(20240117), KQuery::WEEK));
     CHECK_EQ(closePrices(ranged), std::vector<price_t>{4, 6});
+}
+
+/**
+ * Test a fully suspended (all-zero) daily phase gets a real bucket timestamp instead of a Null one
+ * @par Test points
+ */
+TEST_CASE("test_SQLiteKDataDriver_suspended_day_bucket_datetime") {
+    TempSuspendedDayKDataDB db;
+    SQLiteKDataDriver driver;
+    REQUIRE(driver.init(db.driverParam()));
+
+    /** @arg the suspended week keeps its all-zero bucket, and its datetime falls back to the
+             last bar of the phase instead of staying a Null timestamp */
+    CHECK_EQ(driver.getCount(MARKET, CODE, KQuery::WEEK), 3);
+    auto weeks =
+      driver.getKRecordList(MARKET, CODE, KQueryByIndex(0, Null<int64_t>(), KQuery::WEEK));
+    CHECK_EQ(closePrices(weeks), std::vector<price_t>{1, 0, 2});
+    CHECK_EQ(datetimes(weeks),
+             std::vector<Datetime>{Datetime(20240105), Datetime(20240112), Datetime(20240116)});
 }
 
 /**
