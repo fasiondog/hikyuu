@@ -30,6 +30,8 @@
 
 namespace hku {
 
+constexpr unsigned long long MAX_INITIAL_BUFFER_SIZE = 1ull << 20;
+
 // The Pimpl implementation struct
 struct MySQLStatement::Impl {
     MYSQL* db{nullptr};
@@ -45,6 +47,35 @@ struct MySQLStatement::Impl {
     std::vector<unsigned long> result_length;
     std::vector<char> result_is_null;
     std::vector<char> result_error;
+
+    static bool isStringType(enum enum_field_types t) {
+        return t == MYSQL_TYPE_VAR_STRING || t == MYSQL_TYPE_STRING || t == MYSQL_TYPE_BLOB ||
+               t == MYSQL_TYPE_TINY_BLOB || t == MYSQL_TYPE_MEDIUM_BLOB ||
+               t == MYSQL_TYPE_LONG_BLOB || t == MYSQL_TYPE_VARCHAR || t == MYSQL_TYPE_DECIMAL ||
+               t == MYSQL_TYPE_NEWDECIMAL;
+    }
+
+    void fetchTruncatedColumns() {
+        for (size_t i = 0; i < result_bind.size(); ++i) {
+            if (!result_error[i] || result_is_null[i]) {
+                continue;
+            }
+
+            MYSQL_BIND& bind = result_bind[i];
+            if (isStringType(bind.buffer_type) && result_length[i] > bind.buffer_length) {
+                std::vector<char>* p = boost::any_cast<std::vector<char>>(&result_buffer[i]);
+                p->resize(result_length[i] + 1);
+                bind.buffer = p->data();
+                bind.buffer_length = result_length[i] + 1;
+                int ret = mysql_stmt_fetch_column(stmt, &bind, i, 0);
+                SQL_CHECK(ret == 0, ret, "Failed fetch truncated column {}! {}", i,
+                          mysql_stmt_error(stmt));
+                result_error[i] = 0;
+            } else {
+                SQL_THROW(MYSQL_DATA_TRUNCATED, "Data truncated in column {}!", i);
+            }
+        }
+    }
 };
 
 MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_statement)
@@ -179,7 +210,10 @@ void MySQLStatement::_bindResult() {
                    field->type == MYSQL_TYPE_BLOB || field->type == MYSQL_TYPE_TINY_BLOB ||
                    field->type == MYSQL_TYPE_VARCHAR || field->type == MYSQL_TYPE_DECIMAL ||
                    field->type == MYSQL_TYPE_NEWDECIMAL) {
-            unsigned long length = field->length + 1;
+            unsigned long long want = (unsigned long long)field->length + 1;
+            unsigned long length = want > MAX_INITIAL_BUFFER_SIZE
+                                     ? (unsigned long)MAX_INITIAL_BUFFER_SIZE
+                                     : (unsigned long)want;
             m_impl->result_bind[idx].buffer_length = length;
             m_impl->result_buffer.emplace_back(std::vector<char>(length));
             auto& buf = m_impl->result_buffer.back();
@@ -231,7 +265,8 @@ bool MySQLStatement::sub_moveNext() {
     if (ret == 0) {
         return true;
     } else if (ret == MYSQL_DATA_TRUNCATED) {
-        SQL_THROW(ret, "Data truncated in mysql_stmt_fetch! SQL: {}", m_sql_string);
+        m_impl->fetchTruncatedColumns();
+        return true;
     } else if (ret != MYSQL_NO_DATA) {
         SQL_THROW(ret, "Error occurred in mysql_stmt_fetch! {}", mysql_stmt_error(m_impl->stmt));
     }

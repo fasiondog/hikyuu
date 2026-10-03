@@ -92,8 +92,9 @@ public:
         return m_queue.empty();
     }
 
-    // Queue size, lock free
+    /** Queue size */
     size_t size() const {
+        std::lock_guard<std::mutex> lk(m_mutex);
         return m_queue.size();
     }
 

@@ -275,7 +275,8 @@ net::awaitable<AsyncSQLStatementPtr> AsyncMySQLConnect::getStatement(
 net::awaitable<bool> AsyncMySQLConnect::tableExist(const std::string& tablename) {
     bool result = false;
     try {
-        auto st = co_await getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));
+        auto st =
+          co_await getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", sqlIdentifier(tablename)));
         co_await st->exec();
         result = true;
     } catch (...) {
@@ -285,11 +286,11 @@ net::awaitable<bool> AsyncMySQLConnect::tableExist(const std::string& tablename)
 }
 
 net::awaitable<void> AsyncMySQLConnect::resetAutoIncrement(const std::string& tablename) {
-    int64_t count =
-      co_await queryNumber<int64_t>(fmt::format("select count(1) from {}", tablename));
+    int64_t count = co_await queryNumber<int64_t>(
+      fmt::format("select count(1) from {}", sqlIdentifier(tablename)));
     SQL_CHECK(count == 0, -1, "The ID cannot be reset when data is present in table({})",
               tablename);
-    co_await exec(fmt::format("alter {} auto_increment=1", tablename));
+    co_await exec(fmt::format("ALTER TABLE {} AUTO_INCREMENT = 1", sqlIdentifier(tablename)));
 }
 
 net::awaitable<void> AsyncMySQLConnect::transaction() {

@@ -144,6 +144,14 @@ public:
     template <typename T, typename... Args>
     void bind(int idx, const T &, const Args &...rest);
 
+    /**
+     * Bind a full set of condition values to the anonymous placeholders of the statement, in order
+     *
+     * It stays synchronous, like the other bind operations, and has to be the only binder of the
+     * statement. @see SQLStatementBase::bind_params
+     */
+    void bind_params(const BoundValues &params);
+
     /** Get the number of the table columns */
     int getNumColumns() const;
 
@@ -346,6 +354,21 @@ template <typename T, typename... Args>
 void AsyncSQLStatementBase::bind(int idx, const T &item, const Args &...rest) {
     bind(idx, item);
     bind(idx + 1, rest...);
+}
+
+inline void AsyncSQLStatementBase::bind_params(const BoundValues &params) {
+    for (size_t i = 0, len = params.size(); i < len; ++i) {
+        std::visit(
+          [&](const auto &value) {
+              using U = std::decay_t<decltype(value)>;
+              if constexpr (std::is_same_v<U, std::nullptr_t>) {
+                  bind(static_cast<int>(i));
+              } else {
+                  bind(static_cast<int>(i), value);
+              }
+          },
+          params[i]);
+    }
 }
 
 }  // namespace hku

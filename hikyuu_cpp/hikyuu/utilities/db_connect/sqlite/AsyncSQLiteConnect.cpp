@@ -181,8 +181,8 @@ net::awaitable<AsyncSQLStatementPtr> AsyncSQLiteConnect::getStatement(
 net::awaitable<bool> AsyncSQLiteConnect::tableExist(const std::string &tablename) {
     bool result = false;
     try {
-        auto st = co_await getStatement(
-          fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
+        auto st = co_await getStatement("select count(1) from sqlite_master where name=?");
+        st->bind(0, tablename);
         co_await st->exec();
         if (co_await st->moveNext()) {
             int tmp;
@@ -198,11 +198,13 @@ net::awaitable<bool> AsyncSQLiteConnect::tableExist(const std::string &tablename
 }
 
 net::awaitable<void> AsyncSQLiteConnect::resetAutoIncrement(const std::string &tablename) {
-    int64_t count =
-      co_await queryNumber<int64_t>(fmt::format("select count(1) from {}", tablename));
+    int64_t count = co_await queryNumber<int64_t>(
+      fmt::format("select count(1) from {}", sqlIdentifier(tablename)));
     SQL_CHECK(count == 0, -1, "The ID cannot be reset when data is present in table({})",
               tablename);
-    co_await exec(fmt::format("UPDATE sqlite_sequence SET seq=0 WHERE name='{}'", tablename));
+    auto seq_stmt = co_await getStatement("UPDATE sqlite_sequence SET seq=0 WHERE name=?");
+    seq_stmt->bind(0, tablename);
+    co_await seq_stmt->exec();
 }
 
 net::awaitable<void> AsyncSQLiteConnect::transaction() {

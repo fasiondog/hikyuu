@@ -561,7 +561,12 @@ inline TimeDelta Microseconds(int64_t microsecs) {
 }
 
 /**
- * Get the current UTC time offset
+ * Get the current UTC time offset of the local machine
+ *
+ * The offset is computed once and cached for the whole process lifetime, and it does not include
+ * any daylight saving time adjustment (the standard time zone offset is returned). It is exact for
+ * the time zones without DST (e.g. CN UTC+8); do not rely on it for the DST-aware conversions
+ * across the DST boundaries.
  * @return TimeDelta
  */
 TimeDelta HKU_UTILS_API UTCOffset();

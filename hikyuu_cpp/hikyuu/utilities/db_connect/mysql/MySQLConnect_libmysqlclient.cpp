@@ -183,7 +183,8 @@ SQLStatementPtr MySQLConnect::getStatement(const std::string& sql_statement) {
 bool MySQLConnect::tableExist(const std::string& tablename) {
     bool result = false;
     try {
-        SQLStatementPtr st = getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", tablename));
+        SQLStatementPtr st =
+          getStatement(fmt::format("SELECT 1 FROM {} LIMIT 1;", sqlIdentifier(tablename)));
         st->exec();
         result = true;
     } catch (...) {
@@ -193,10 +194,11 @@ bool MySQLConnect::tableExist(const std::string& tablename) {
 }
 
 void MySQLConnect::resetAutoIncrement(const std::string& tablename) {
-    int64_t count = queryNumber<int64_t>(fmt::format("select count(1) from {}", tablename));
+    int64_t count =
+      queryNumber<int64_t>(fmt::format("select count(1) from {}", sqlIdentifier(tablename)));
     SQL_CHECK(count == 0, -1, "The ID cannot be reset when data is present in table({})",
               tablename);
-    exec(fmt::format("alter {} auto_increment=1", tablename));
+    exec(fmt::format("ALTER TABLE {} AUTO_INCREMENT = 1", sqlIdentifier(tablename)));
 }
 
 void MySQLConnect::transaction() {

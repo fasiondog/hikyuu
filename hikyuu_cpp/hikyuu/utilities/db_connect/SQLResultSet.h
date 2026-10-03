@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <iterator>
 #include "hikyuu/utilities/arithmetic.h"
 #include "hikyuu/utilities/Log.h"
@@ -44,25 +45,22 @@ public:
      */
     SQLResultSet(const DBConnectPtr& connect, const std::string& sql)
     : m_connect(connect),
-      m_where(sql),
       m_sql_template("id IN (SELECT id FROM {} WHERE {} {} LIMIT {} OFFSET {}) {}") {
-        trim(m_where);
-        if (m_where.empty()) {
-            m_where = "1=1";
-            m_orderby_inner = "ORDER BY id";
-            // m_orderby_outer = "";
-            return;
-        }
+        // the plain path: the clauses can only be located in the text the caller wrote
+        WhereParts parts = splitWhereParts(sql);
+        _setup(parts.where, parts.orderBy, parts.limit, BoundValues{});
+    }
 
-        std::string tmp = utf8_to_upper(m_where);
-        size_t pos = tmp.rfind("ORDER");
-        if (pos != std::string::npos) {
-            m_orderby_inner = fmt::format("{}, id ASC", m_where.substr(pos));
-            m_orderby_outer = m_orderby_inner;
-            m_where = m_where.erase(pos, std::string::npos);
-        } else {
-            m_orderby_inner = "ORDER BY id";
-        }
+    /**
+     * Build a new paged query result instance from a condition
+     * @param connect
+     * @param cond the query condition, whose values stay bound to placeholders
+     */
+    SQLResultSet(const DBConnectPtr& connect, const DBCondition& cond)
+    : m_connect(connect),
+      m_sql_template("id IN (SELECT id FROM {} WHERE {} {} LIMIT {} OFFSET {}) {}") {
+        // a condition already carries its parts, nothing has to be parsed out of the text
+        _setup(cond.sql(), cond.getOrderBy(), cond.getLimit(), cond.params());
     }
 
     /** Get its database connection */
@@ -98,7 +96,9 @@ public:
         HKU_IF_RETURN(!m_connect, 0);
         std::string sql =
           fmt::format("select count(1) from {} where {}", TableT::getTableName(), m_where);
-        return m_connect->queryNumber<size_t>(sql, 0);
+        size_t total = m_connect->queryNumber<size_t>(sql, 0, m_params);
+        // the row limit of the condition caps the reported size, the pages are cut the same way
+        return m_limit >= 0 ? std::min(total, static_cast<size_t>(m_limit)) : total;
     }
 
     /**
@@ -119,7 +119,8 @@ public:
     size_t getPageCount() {
         size_t total = size();
         size_t n = total / page_size;
-        return n * page_size > total ? n : n + 1;
+        // the last page counts only when it holds rows: an exact multiple needs no extra page
+        return n * page_size >= total ? n : n + 1;
     }
 
     /**
@@ -129,9 +130,8 @@ public:
      */
     std::vector<TableT> getPage(size_t page) {
         std::vector<TableT> result;
-        m_connect->batchLoad(
-          result, fmt::format(m_sql_template, TableT::getTableName(), m_where, m_orderby_inner,
-                              page_size, page * page_size, m_orderby_outer));
+        HKU_IF_RETURN(!m_connect || _pageLimit(page) <= 0, result);
+        m_connect->batchLoadView(result, _selectSQL(page), m_params);
         return result;
     }
 
@@ -146,6 +146,46 @@ public:
     }
 
 private:
+    /** Prepare the parts of the query: the filter, the order-by of the inner and outer select */
+    void _setup(const std::string& where, const std::string& orderBy, int limit,
+                BoundValues params) {
+        m_params = std::move(params);
+        m_limit = limit;
+
+        std::string text = where;
+        trim(text);
+        m_where = text.empty() ? "1=1" : text;
+
+        if (orderBy.empty()) {
+            m_orderby_inner = "ORDER BY id";
+        } else {
+            m_orderby_inner = fmt::format("{}, id ASC", orderBy);
+            m_orderby_outer = m_orderby_inner;
+        }
+    }
+
+    /**
+     * The number of rows the given page has to fetch, or 0 when the row limit of the condition is
+     * already used up by the earlier pages
+     */
+    size_t _pageLimit(size_t page) const {
+        if (m_limit < 0) {
+            return page_size;
+        }
+
+        const size_t offset = page * page_size;
+        const size_t left = static_cast<size_t>(m_limit);
+        return offset >= left ? 0 : std::min(page_size, left - offset);
+    }
+
+    /** The full select statement of the given page, the values still bound to placeholders */
+    std::string _selectSQL(size_t page) const {
+        return fmt::format(
+          "{} where {}", TableT::getSelectSQL(),
+          fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,
+                      m_orderby_inner, _pageLimit(page), page * page_size, m_orderby_outer));
+    }
+
     TableT get(size_t index) {
         TableT result{Null<TableT>()};
         HKU_IF_RETURN(index == Null<size_t>(), result);
@@ -153,9 +193,9 @@ private:
         size_t page = index / page_size;
         if (m_connect && page != m_current_page) {
             m_buffer.clear();
-            m_connect->batchLoad(
-              m_buffer, fmt::format(fmt::runtime(m_sql_template), TableT::getTableName(), m_where,
-                                    m_orderby_inner, page_size, page * page_size, m_orderby_outer));
+            if (_pageLimit(page) > 0) {
+                m_connect->batchLoadView(m_buffer, _selectSQL(page), m_params);
+            }
             m_current_page = page;
         }
 
@@ -175,6 +215,8 @@ private:
     std::string m_sql_template;
     std::string m_orderby_inner;
     std::string m_orderby_outer;
+    BoundValues m_params;
+    int m_limit = -1;
     size_t m_current_page = Null<size_t>();
 };
 

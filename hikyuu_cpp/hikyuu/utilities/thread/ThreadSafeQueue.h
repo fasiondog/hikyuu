@@ -80,8 +80,9 @@ public:
         return m_queue.empty();
     }
 
-    /** Queue size, ! it is not locked, use it with caution */
+    /** Queue size */
     size_t size() const {
+        std::lock_guard<std::mutex> lk(m_mutex);
         return m_queue.size();
     }
 
