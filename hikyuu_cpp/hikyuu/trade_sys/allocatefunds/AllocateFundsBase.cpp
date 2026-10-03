@@ -12,6 +12,7 @@
 
 #include "AllocateFundsBase.h"
 
+#include <map>
 #include <sstream>
 
 namespace hku {
@@ -203,9 +204,18 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // (the AF_FixedAmount behavior-level semantics), it takes precedence over the conversion by
     // proportion.
     double fixed_amount = getParam<double>("fixed-amount");
-    for (auto& s : suggestions) {
-        if (s.plan_price <= 0.0) {
-            s.number = 0.0;
+
+    // Multiple sub-systems may trade the same instrument: aggregate the BUY target market value
+    // by instrument first, to avoid per-suggestion deltas computed against the same position
+    struct StockTarget {
+        double value{0.0};   // The aggregated target market value
+        price_t price{0.0};  // The plan price of the first suggestion of this instrument
+        size_t first_index{0};
+    };
+    std::map<Stock, StockTarget> buy_targets;
+    for (size_t i = 0; i < suggestions.size(); ++i) {
+        const auto& s = suggestions[i];
+        if (s.type != SuggestionType::BUY || s.plan_price <= 0.0) {
             continue;
         }
         double weight = 1.0;
@@ -213,30 +223,47 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         if (it != sys_weight.end()) {
             weight = it->second;
         }
-        double current = tm->getPosition(date, s.stock).number;
-        if (s.type == SuggestionType::BUY) {
+        double v;
+        if (fixed_amount > 0.0) {
+            v = fixed_amount;
+        } else {
             // Mode A (the default): target position market value = sub-system weight x the
             // sub-suggestion position ratio x the parent total assets.
-            //   - fixed-amount>0: a fixed amount per instrument (AF_FixedAmount), it takes
-            //   precedence over the conversion by proportion;
             //   - assets_ratio>0: respect the internal position ratio submitted by the sub-system
             //   (e.g. the parent is mapped by half position when the sub-system is at half
             //   position);
             //   - assets_ratio<=0 (no ratio information): fall back to the full position (ratio=1)
             //   equal weight to position.
-            // Convert into the target share quantity, the net rebalancing quantity = (target -
-            // current); when it is negative (the current position is over-allocated), turn to SELL
-            // to reduce to the target, to avoid the "negative BUY" being discarded at the execution
-            // stage causing the over-allocated position to be unable to rebalance (aligned with the
-            // PF periodic rebalancing semantics).
-            double target_value;
-            if (fixed_amount > 0.0) {
-                target_value = fixed_amount;
-            } else {
-                double ratio = (s.assets_ratio > 0.0) ? s.assets_ratio : 1.0;
-                target_value = weight * ratio * total_assets;
+            double ratio = (s.assets_ratio > 0.0) ? s.assets_ratio : 1.0;
+            v = weight * ratio * total_assets;
+        }
+        auto& t = buy_targets[s.stock];
+        t.value += v;
+        if (t.price == 0.0) {
+            t.price = s.plan_price;
+            t.first_index = i;
+        }
+    }
+
+    for (size_t i = 0; i < suggestions.size(); ++i) {
+        auto& s = suggestions[i];
+        if (s.plan_price <= 0.0) {
+            s.number = 0.0;
+            continue;
+        }
+        double current = tm->getPosition(date, s.stock).number;
+        if (s.type == SuggestionType::BUY) {
+            auto it = buy_targets.find(s.stock);
+            if (it == buy_targets.end() || i != it->second.first_index) {
+                // A non-first suggestion of the same instrument, merged into the first one
+                s.number = 0.0;
+                continue;
             }
-            double target_shares = target_value / s.plan_price;
+            // The net rebalancing quantity = (target - current); when it is negative (the
+            // current position is over-allocated), turn to SELL to reduce to the target.
+            price_t unit = s.stock.unit();
+            double target_shares =
+              (unit > 0.0) ? it->second.value / (it->second.price * unit) : 0.0;
             double delta = target_shares - current;
             if (delta < 0.0) {
                 s.type = SuggestionType::SELL;
@@ -273,9 +300,11 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
             continue;
         }
         double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
-        double target_value = (current + s.number) * s.plan_price;
+        price_t unit = s.stock.unit();
+        double target_value = (current + s.number) * s.plan_price * (unit > 0.0 ? unit : 1.0);
         if (target_value > cap) {
-            double max_shares = cap / s.plan_price;
+            double max_shares =
+              (s.plan_price > 0.0) ? cap / (s.plan_price * (unit > 0.0 ? unit : 1.0)) : 0.0;
             s.number = max_shares > current ? max_shares - current : 0.0;
         }
     }

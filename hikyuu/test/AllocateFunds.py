@@ -16,6 +16,11 @@ def test_to_targets(self, date, tm, suggestions, sys_weight, query):
     self._l2_called = True
 
 
+def test_to_targets_mutate(self, date, tm, suggestions, sys_weight, query):
+    for s in suggestions:
+        s.number = 999.0
+
+
 def test_check_risk(self, date, tm, suggestions, query):
     self._l3_called = True
 
@@ -44,6 +49,17 @@ class TestCrtAF(unittest.TestCase):
         self.assertTrue(af._l2_called)
         af._check_risk(Datetime(200101010000), tm, [], Query(-100))
         self.assertTrue(af._l3_called)
+
+    def test_py_af_suggestions_inplace(self):
+        """The in-place rewrite of the suggestions by the Python custom AF must take effect (opaque container)"""
+        af = crtAF(test_allocate, name="TestAF4", to_targets_func=test_to_targets_mutate)
+        lst = TradeSuggestionList()
+        s = TradeSuggestion()
+        s.number = 1.0
+        lst.append(s)
+        tm = crtTM(Datetime(200101010000))
+        af._to_targets(Datetime(200101010000), tm, lst, {}, Query(-100))
+        self.assertEqual(lst[0].number, 999.0)
 
 
 def suite():

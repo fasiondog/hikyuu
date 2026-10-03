@@ -524,7 +524,9 @@ Common parameters:
 
     //--------------------------------------------------------------------------------------
     // Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
-    py::class_<MultiSystem, System, std::shared_ptr<MultiSystem>>(
+    // PyMultiSystem is registered as the trampoline alias, the Python subclass overrides take
+    // effect
+    py::class_<MultiSystem, PyMultiSystem, System, std::shared_ptr<MultiSystem>>(
       m, "MultiSystem", py::dynamic_attr(),
       R"(The aggregate trading system (portfolio backtesting). It holds multiple sub-systems (single-security or nested aggregate), drives and aggregates the orders at the open/close stages respectively.
 Every sub-system has its own independent virtual account (a shadow account in mode A / the quota allocated by the parent in mode B), the parent system allocates and orders uniformly on its own account.)")

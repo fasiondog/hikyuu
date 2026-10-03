@@ -84,8 +84,10 @@ SelectorPtr SelectorBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_query = m_query;
     p->m_proto_query = m_proto_query;
-    p->m_calculated = m_calculated;
-    p->m_proto_calculated = m_proto_calculated;
+    // The clone's internal systems are new instances, the cached calculation results reference
+    // the original ones, the clone must recalculate
+    p->m_calculated = false;
+    p->m_proto_calculated = false;
 
     p->m_real_sys_list.reserve(m_real_sys_list.size());
     for (const auto& sys : m_real_sys_list) {

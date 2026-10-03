@@ -27,7 +27,8 @@ RunMultiSystemInStrategy::RunMultiSystemInStrategy(const std::shared_ptr<MultiSy
         HKU_THROW("Invalid query: {}", query);
     }
 
-    // The parent account uses the BrokerTM synchronized with the broker; the sub-system accounts are created by MultiSystem::readyForRun by mode
+    // The parent account uses the BrokerTM synchronized with the broker; the sub-system accounts
+    // are created by MultiSystem::readyForRun by mode
     auto tm = crtBrokerTM(broker, costfunc, ms->name());
     m_ms->setTM(tm);
     m_ms->setSP(SlippagePtr());  // The aggregate parent does not go through the slippage algorithm
@@ -35,8 +36,16 @@ RunMultiSystemInStrategy::RunMultiSystemInStrategy(const std::shared_ptr<MultiSy
 }
 
 void RunMultiSystemInStrategy::_refreshSubKData() {
-    for (auto& sub : m_ms->getSystemList()) {
-        if (!sub->getStock().isNull()) {
+    _refreshSubKDataRecursive(m_ms);
+}
+
+void RunMultiSystemInStrategy::_refreshSubKDataRecursive(const std::shared_ptr<MultiSystem>& ms) {
+    HKU_WARN_IF_RETURN(!ms, void(), "Null nested MultiSystem!");
+    for (auto& sub : ms->getSystemList()) {
+        // The nested aggregate has no instrument of its own, penetrate it to refresh its leaves
+        if (sub->isComposite()) {
+            _refreshSubKDataRecursive(std::dynamic_pointer_cast<MultiSystem>(sub));
+        } else if (!sub->getStock().isNull()) {
             sub->setTO(sub->getStock().getKData(m_query));
         }
     }
@@ -46,12 +55,16 @@ void RunMultiSystemInStrategy::run() {
     _refreshSubKData();
     KData k = m_driver_stock.getKData(m_query);
     m_ms->getTM()->fetchAssetInfoFromBroker(m_broker);
-    m_ms->run(k);
+    // reset=false: the live daily replay must not clear the sub-system state (the pending
+    // delayed requests, the mode B quota)
+    m_ms->run(k, false);
 }
 
 void RunMultiSystemInStrategy::runMomentOnOpen() {
     _refreshSubKData();
     KData k = m_driver_stock.getKData(m_query);
+    HKU_WARN_IF_RETURN(k.empty(), void(), "Skip runMomentOnOpen, {} has no loaded data!",
+                       m_driver_stock.market_code());
     m_ms->setTO(k);
     m_ms->getTM()->fetchAssetInfoFromBroker(m_broker);
     m_ms->runMomentOnOpen(k.back().datetime);
@@ -60,6 +73,8 @@ void RunMultiSystemInStrategy::runMomentOnOpen() {
 void RunMultiSystemInStrategy::runMomentOnClose() {
     _refreshSubKData();
     KData k = m_driver_stock.getKData(m_query);
+    HKU_WARN_IF_RETURN(k.empty(), void(), "Skip runMomentOnClose, {} has no loaded data!",
+                       m_driver_stock.market_code());
     m_ms->setTO(k);
     m_ms->getTM()->fetchAssetInfoFromBroker(m_broker);
     m_ms->runMomentOnClose(k.back().datetime);

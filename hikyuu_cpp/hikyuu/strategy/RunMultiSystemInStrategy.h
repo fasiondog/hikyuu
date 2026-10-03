@@ -83,6 +83,10 @@ private:
      * data update of the live trading) */
     void _refreshSubKData();
 
+    /** Recursively refresh the leaf sub-systems under the aggregate system (the nested aggregate's
+     * getStock() is empty and must be penetrated) */
+    void _refreshSubKDataRecursive(const std::shared_ptr<MultiSystem>& ms);
+
 private:
     std::shared_ptr<MultiSystem> m_ms;
     Stock m_driver_stock;

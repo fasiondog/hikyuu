@@ -36,3 +36,7 @@ PYBIND11_MAKE_OPAQUE(TradeRecordList);
 PYBIND11_MAKE_OPAQUE(SystemWeightList);
 // PYBIND11_MAKE_OPAQUE(SystemList);
 PYBIND11_MAKE_OPAQUE(ScoreRecordList);
+// The AF virtual functions (allocate/_to_targets/_check_risk) rewrite the suggestions/contexts in
+// place, they must be opaque (otherwise the Python custom AF rewrite is lost with the copy)
+PYBIND11_MAKE_OPAQUE(TradeSuggestionList);
+PYBIND11_MAKE_OPAQUE(SubSystemContextList);

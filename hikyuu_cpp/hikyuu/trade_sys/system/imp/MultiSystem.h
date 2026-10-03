@@ -14,6 +14,7 @@
 
 #pragma once
 #include <set>
+#include <unordered_map>
 #include "../System.h"
 #include "../../../trade_manage/crt/crtTM.h"
 #include "../../moneymanager/crt/MM_Nothing.h"
@@ -325,8 +326,16 @@ private:
     Datetime m_open_trades_date;  // The trading day to which m_open_trades/m_sub_funds_before
                                   // belong; the close stage uses it to prevent out-of-bounds and
                                   // cross-day residue (runtime state, not serialized)
-    DatetimeList m_date_axis;     // The fixed time axis: the driving date table when
-                                  // axis-mode="calendar" (runtime state, not serialized)
+    TradeSuggestionList m_pending_suggestions;  // The suggestions accumulated on the
+                                                // non-rebalancing days (runtime, not serialized)
+    TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at
+                                                     // the next open when trade_on_close=false
+    std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
+                                     // (runtime, not serialized)
+    mutable std::unordered_map<string, KData>
+      m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
+    DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
+                                        // axis-mode="calendar" (runtime state, not serialized)
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
                                         // zero hour of that day; when not empty it takes precedence
                                         // over m_adjust_cycle, runtime state, not serialized)
@@ -362,7 +371,8 @@ private:
      * sub-system sys). funds_before is the "before-trade" fund snapshot of the sub-system on that
      * day, used to calculate the three ratios (cash/assets/target_position) of the suggestion. */
     TradeSuggestionList _toSuggestions(const SystemPtr& sys, const TradeRecordList& trades,
-                                       const FundsRecord& funds_before) const;
+                                       const FundsRecord& funds_before,
+                                       const Datetime& datetime) const;
 
     /** Judge whether the given date is a rebalancing day (the rebalancing is executed only on the
      * rebalancing day): the external rebalancing day table takes precedence, then the adjust-mode
@@ -386,6 +396,13 @@ private:
     /** Get the close price of the specified instrument on the specified date (used to price the
      * liquidation suggestion of the unselected sub-system); return 0 when there is no data */
     price_t _getClosePrice(const Datetime& date, const Stock& stock) const;
+
+    /** Get the open price of the specified instrument on the specified date; return 0 when there
+     * is no data */
+    price_t _getOpenPrice(const Datetime& date, const Stock& stock) const;
+
+    /** Get the KData of the instrument within the run query (with the per-run cache) */
+    KData _getStockKData(const Stock& stock) const;
 
     /** Force selling the parent holdings of the delisted instrument at the open stage (delisting =
      * the last trading day of the instrument is earlier than the current running date) */

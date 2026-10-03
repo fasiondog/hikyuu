@@ -342,6 +342,7 @@ SystemPtr System::clone() {
     p->m_stock = m_stock;
     p->m_kdata = m_kdata;
     p->m_src_kdata = m_src_kdata;
+    p->m_path = m_path;
 
     p->m_calculated = m_calculated;
     p->m_pre_ev_valid = m_pre_ev_valid;
@@ -507,6 +508,32 @@ MomentResult System::runMoment(const Datetime& datetime) {
     PositionRecord position = m_tm->getPosition(datetime, m_stock);
     if (position.number > 0.0) {
         result.positions.push_back(position);
+    }
+    PositionRecord short_position = m_tm->getShortPosition(m_stock);
+    if (short_position.number > 0.0) {
+        result.positions.push_back(short_position);
+    }
+    // Collect the pending delayed requests, for the upper layer to perceive the requests
+    // fulfilled at the next open
+    for (const auto& req : m_buyRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
+    for (const auto& req : m_sellRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
+    for (const auto& req : m_sellShortRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
+    for (const auto& req : m_buyShortRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
     }
     return result;
 }

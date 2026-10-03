@@ -487,8 +487,8 @@ TEST_CASE("test_TradeManager_returnStock_cost") {
     TradeManagerPtr tm =
       crtTM(Datetime(199901010000), 100000, TradeCostPtr(new ReturnStockCostFunc));
 
-    /** @arg 分两笔借入再一次性归还，费用按各分段实际数量计（ISS-042：修复前每段按全额 number
-     * 重复计费） */
+    /** @arg Borrow in two lots and return in one, the cost is charged by the actual number of
+     * each segment (previously each segment was charged repeatedly by the full number) */
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10.0, 50), true);
     CHECK_EQ(tm->borrowStock(Datetime(199901030000), stock, 10.0, 50), true);
     CHECK_EQ(tm->returnStock(Datetime(199901040000), stock, 10.0, 100), true);
