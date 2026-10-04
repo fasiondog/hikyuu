@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include <ctime>
-#include <ctime>
+#include <cmath>
 #include "TimeDelta.h"
 #include "hikyuu/utilities/arithmetic.h"
 #include "hikyuu/utilities/osdef.h"
@@ -54,7 +54,7 @@ TimeDelta::TimeDelta(const std::string& delta) {
     HKU_CHECK(vals.size() == 3, "{}", errmsg);
     int64_t hours = std::stoll(std::string(vals[0]));
     int64_t minutes = std::stoll(std::string(vals[1]));
-    int64_t microseconds = static_cast<int64_t>(std::stod(std::string(vals[2])) * 1000000.0);
+    int64_t microseconds = std::llround(std::stod(std::string(vals[2])) * 1000000.0);
     int64_t total = (((days * 24) + hours) * 60 + minutes) * 60000000LL + microseconds;
     HKU_CHECK(total >= m_min_micro_seconds && total <= m_max_micro_seconds, "Out of total range!");
     m_duration = bt::time_duration(0, 0, 0, total);

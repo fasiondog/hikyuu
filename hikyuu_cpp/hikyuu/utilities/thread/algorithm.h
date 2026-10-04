@@ -712,6 +712,75 @@ inline auto await_future<void>(std::shared_ptr<std::future<void>> fut_ptr)
     fut_ptr->get();  // It may throw an exception
 }
 
+namespace detail {
+
+/**
+ * @brief Submit func to a (possibly foreign) executor and obtain its result as a shared future
+ *
+ * The awaitable completion handler is never handed to the foreign executor: the calling
+ * coroutine keeps polling the future on its own executor (see await_future). Therefore the
+ * worker side cannot post back to a home io_context that has already been destroyed, and if
+ * the worker drops the task (e.g. its pool is stopped) the future simply reports a broken
+ * promise. If the executor refuses to accept the task synchronously (e.g. its pool is already
+ * stopped), the returned future delivers that exception instead of staying pending forever.
+ */
+template <typename Executor, typename Func>
+inline auto submit_future(Executor exec, Func&& func)
+  -> std::shared_ptr<std::future<typename std::invoke_result_t<Func>>> {
+    using result_type = typename std::invoke_result_t<Func>;
+
+    std::future<result_type> future;
+    try {
+        auto task = std::make_shared<std::packaged_task<result_type()>>(std::forward<Func>(func));
+        future = task->get_future();
+        exec.execute([task = std::move(task)]() mutable { (*task)(); });
+    } catch (...) {
+        std::promise<result_type> promise;
+        promise.set_exception(std::current_exception());
+        future = promise.get_future();
+    }
+    return std::make_shared<std::future<result_type>>(std::move(future));
+}
+
+/**
+ * @brief Wait for a future inside a coroutine with the co_run_ec error mapping
+ *
+ * The wait is driven by a cancellation-aware timer on the coroutine executor: cancelling the
+ * coroutine aborts the wait immediately (the original boost::system::system_error, usually
+ * operation_aborted, is rethrown) while func keeps running on the worker executor until it
+ * finishes, since arbitrary code cannot be force-interrupted; its result is then discarded.
+ * Exceptions thrown by func are mapped to io_error/invalid_argument as in co_run_ec; a task
+ * dropped by the worker (broken promise) surfaces as an I/O error.
+ */
+template <typename T>
+inline asio::awaitable<T> await_future_ec(std::shared_ptr<std::future<T>> future) {
+    auto exec = co_await asio::this_coro::executor;
+    asio::steady_timer timer(exec);
+    try {
+        while (future->wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+            timer.expires_after(std::chrono::microseconds(100));
+            co_await timer.async_wait(asio::use_awaitable);
+        }
+        if constexpr (std::is_void_v<T>) {
+            future->get();
+            co_return;
+        } else {
+            co_return future->get();
+        }
+    } catch (const boost::system::system_error&) {
+        // Timer cancellation/failure (e.g. operation_aborted): keep the original error code
+        throw;
+    } catch (const std::exception&) {
+        throw boost::system::system_error(
+          boost::system::errc::make_error_code(boost::system::errc::io_error));
+    } catch (...) {
+        throw boost::system::system_error(
+          boost::system::errc::make_error_code(boost::system::errc::invalid_argument));
+    }
+}
+
+}  // namespace detail
+
 /**
  * @brief Execute the function asynchronously on the given executor, allowing the exception to pass
  * through (keeping the original exception type)
@@ -749,68 +818,24 @@ inline auto await_future<void>(std::shared_ptr<std::future<void>> fut_ptr)
  * @return asio::awaitable<T> the result of the asynchronous operation (the original exception type
  * may be thrown)
  *
+ * @note func is executed on exec, while the result is collected by polling a future on the
+ * coroutine's own executor (100 microseconds granularity, see await_future). The completion
+ * handler never leaves the coroutine executor, so it is safe to destroy the coroutine's
+ * io_context while func is still running: the result is simply discarded. Cancelling the
+ * coroutine (e.g. via a cancellation slot) aborts the co_await with operation_aborted; func
+ * itself is not interrupted and keeps running until it finishes. If exec rejects the task, the
+ * corresponding exception is rethrown at the co_await point.
+ *
  * @see co_run_ec - the version converting the exception into an error_code, suitable for a unified
  * error handling
  */
 template <typename Executor, typename Func>
-auto co_run(Executor exec, Func&& func) -> asio::awaitable<typename std::invoke_result_t<Func>> {
-    using ResultType = typename std::invoke_result_t<Func>;
-
-    if constexpr (std::is_void_v<ResultType>) {
-        // The void return type: the completion signature is void(std::exception_ptr)
-        return asio::async_initiate<decltype(asio::use_awaitable), void(std::exception_ptr)>(
-          [exec, func = std::forward<Func>(func)](auto handler) mutable {
-              auto io_exec = asio::get_associated_executor(handler);
-
-              exec.execute(
-                [func = std::move(func), handler = std::move(handler), io_exec]() mutable {
-                    std::exception_ptr e_ptr = nullptr;
-                    try {
-                        func();
-                    } catch (...) {
-                        e_ptr = std::current_exception();
-                    }
-
-                    asio::post(io_exec,
-                               [handler = std::move(handler), e_ptr = std::move(e_ptr)]() mutable {
-                                   // Asio handles the exception_ptr automatically and throws it at
-                                   // the co_await point
-                                   handler(e_ptr);
-                               });
-                });
-          },
-          asio::use_awaitable);
-    } else {
-        // The non-void return type: the completion signature must contain the exception scenario
-        // The correct signature: void(std::exception_ptr, ResultType)
-        return asio::async_initiate<decltype(asio::use_awaitable),
-                                    void(std::exception_ptr,
-                                         ResultType)  // Key fix: add exception_ptr
-                                    >(
-          [exec, func = std::forward<Func>(func)](auto handler) mutable {
-              auto io_exec = asio::get_associated_executor(handler);
-
-              exec.execute(
-                [func = std::move(func), handler = std::move(handler), io_exec]() mutable {
-                    std::exception_ptr e_ptr = nullptr;
-                    ResultType result{};
-
-                    try {
-                        result = func();
-                    } catch (...) {
-                        e_ptr = std::current_exception();
-                    }
-
-                    asio::post(io_exec, [handler = std::move(handler), e_ptr = std::move(e_ptr),
-                                         result = std::move(result)]() mutable {
-                        // Key fix: pass the exception/result through the handler instead of
-                        // throwing directly
-                        handler(e_ptr, std::move(result));
-                    });
-                });
-          },
-          asio::use_awaitable);
-    }
+auto co_run(Executor exec, Func func) -> asio::awaitable<typename std::invoke_result_t<Func>> {
+    // Take func by value: as a coroutine parameter it must outlive the caller's temporary, since
+    // the coroutine may be kept suspended long after the call expression ends
+    // Never move the awaitable handler onto exec: poll the future from the home executor so a
+    // destroyed home io_context can never be posted back to
+    co_return co_await await_future(detail::submit_future(exec, std::forward<Func>(func)));
 }
 
 /**
@@ -848,66 +873,20 @@ auto co_run(Executor exec, Func&& func) -> asio::awaitable<typename std::invoke_
  * @return net::awaitable<T> the result of the asynchronous operation (boost::system::system_error
  * is thrown on an error)
  *
+ * @note Same lifetime and cancellation semantics as co_run: func runs on exec and the result is
+ * polled on the coroutine's own executor (100 microseconds granularity); the coroutine's
+ * io_context may be destroyed while func is still running. Cancelling the wait throws
+ * boost::system::system_error with the original error code (usually operation_aborted);
+ * exceptions of func are mapped to io_error/invalid_argument.
+ *
  * @see co_run - the standard version allowing the exception to pass through, keeping the original
  * exception type
  */
 template <typename Executor, typename Func>
-auto co_run_ec(Executor exec, Func&& func) -> asio::awaitable<typename std::invoke_result_t<Func>> {
-    using ResultType = typename std::invoke_result_t<Func>;
-
-    if constexpr (std::is_void_v<ResultType>) {
-        // The specialization version for the void return type
-        return asio::async_initiate<decltype(asio::use_awaitable), void(net::error_code)>(
-          [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
-              auto io_exec = asio::get_associated_executor(handler);
-
-              exec.execute([func = std::move(func),
-                            handler = std::forward<decltype(handler)>(handler), io_exec]() mutable {
-                  net::error_code ec;
-
-                  try {
-                      func();
-                  } catch (const std::exception&) {
-                      ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
-                  } catch (...) {
-                      ec =
-                        boost::system::errc::make_error_code(boost::system::errc::invalid_argument);
-                  }
-
-                  asio::post(io_exec,
-                             [handler = std::move(handler), ec]() mutable { handler(ec); });
-              });
-          },
-          asio::use_awaitable);
-    } else {
-        // The ordinary version for the non-void return type
-        return asio::async_initiate<decltype(asio::use_awaitable),
-                                    void(net::error_code, ResultType)>(
-          [exec, func = std::forward<Func>(func)](auto&& handler) mutable {
-              auto io_exec = asio::get_associated_executor(handler);
-
-              exec.execute([func = std::move(func),
-                            handler = std::forward<decltype(handler)>(handler), io_exec]() mutable {
-                  ResultType result{};
-                  net::error_code ec;
-
-                  try {
-                      result = func();
-                  } catch (const std::exception&) {
-                      ec = boost::system::errc::make_error_code(boost::system::errc::io_error);
-                  } catch (...) {
-                      ec =
-                        boost::system::errc::make_error_code(boost::system::errc::invalid_argument);
-                  }
-
-                  asio::post(io_exec, [handler = std::move(handler), ec,
-                                       result = std::move(result)]() mutable {
-                      handler(ec, std::move(result));
-                  });
-              });
-          },
-          asio::use_awaitable);
-    }
+auto co_run_ec(Executor exec, Func func) -> asio::awaitable<typename std::invoke_result_t<Func>> {
+    // See co_run: func is held by value for the lifetime of the suspended coroutine
+    co_return co_await detail::await_future_ec(
+      detail::submit_future(exec, std::forward<Func>(func)));
 }
 
 #endif  // CPP_STANDARD >= CPP_STANDARD_20

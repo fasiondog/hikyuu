@@ -51,6 +51,17 @@ public:
 };
 
 /**
+ * The resource pool was closed (its destructor ran) while a getter was waiting
+ */
+class ResourcePoolClosedException : public hku::exception {
+public:
+    ResourcePoolClosedException(const std::string &msg)
+    : hku::exception(fmt::format("ResourcePoolClosedException {}", msg)) {}
+
+    virtual ~ResourcePoolClosedException() {}
+};
+
+/**
  * General shared resource pool
  * @ingroup Utilities
  */
@@ -77,6 +88,12 @@ public:
     virtual ~ResourcePool() {
         std::unique_lock<std::mutex> lock(m_mutex);
 
+        // Mark closed and wake all waiters, then wait until every blocked getter has left so it
+        // never touches the pool after destruction
+        m_closed = true;
+        m_cond.notify_all();
+        m_exit_cond.wait(lock, [this] { return m_waiting == 0; });
+
         // Unbind the closer of all the allocated resources from the pool
         for (auto iter = m_closer_set.begin(); iter != m_closer_set.end(); ++iter) {
             (*iter)->unbind();
@@ -94,11 +111,13 @@ public:
 
     /** Get the current maximum number of the resources allowed */
     size_t maxPoolSize() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_maxPoolSize;
     }
 
     /** Get the current maximum number of the idle resources allowed */
     size_t maxIdleSize() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_maxIdelSize;
     }
 
@@ -124,6 +143,9 @@ public:
      */
     ResourcePtr get() {
         std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_closed) {
+            HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
+        }
         ResourcePtr result;
         ResourceType *p = nullptr;
         if (m_resourceList.empty()) {
@@ -158,23 +180,28 @@ public:
      */
     ResourcePtr getWaitFor(uint64_t ms_timeout) {  // NOSONAR
         std::unique_lock<std::mutex> lock(m_mutex);
+        if (m_closed) {
+            HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
+        }
         ResourcePtr result;
         ResourceType *p = nullptr;
         if (m_resourceList.empty()) {
             if (m_maxPoolSize > 0 && m_count >= m_maxPoolSize) {
-                // HKU_TRACE("The maximum number of the resources is exceeded, waiting for an idle
-                // resource");
+                m_waiting++;
+                auto pred = [this] { return m_closed || !m_resourceList.empty(); };
                 if (ms_timeout > 0) {
-                    if (m_cond.wait_for(lock,
-                                        std::chrono::duration<uint64_t, std::milli>(ms_timeout),
-                                        [&] { return !m_resourceList.empty(); })) {
-                        HKU_CHECK_THROW(!m_resourceList.empty(), GetResourceTimeoutException,
-                                        "Failed get resource!");
-                    } else {
-                        HKU_THROW_EXCEPTION(GetResourceTimeoutException, "Failed get resource!");
-                    }
+                    m_cond.wait_for(lock, std::chrono::duration<uint64_t, std::milli>(ms_timeout),
+                                    pred);
                 } else {
-                    m_cond.wait(lock, [this] { return !m_resourceList.empty(); });
+                    m_cond.wait(lock, pred);
+                }
+                m_waiting--;
+                m_exit_cond.notify_all();
+                if (m_closed) {
+                    HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
+                }
+                if (ms_timeout > 0 && m_resourceList.empty()) {
+                    HKU_THROW_EXCEPTION(GetResourceTimeoutException, "Failed get resource!");
                 }
             } else {
                 try {
@@ -211,11 +238,13 @@ public:
     /** The number of the currently active resources, i.e. all the resources (including the idle and
      *  the used ones) */
     size_t count() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_count;
     }
 
     /** The current number of the idle resources */
     size_t idleCount() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_resourceList.size();
     }
 
@@ -242,9 +271,12 @@ private:
     size_t m_maxIdelSize;  // The maximum number of the idle resources allowed
     size_t m_count;        // The number of the currently active resources
     Parameter m_param;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     std::condition_variable m_cond;
+    std::condition_variable m_exit_cond;  // waiters signal here when closing wakes them
     std::queue<ResourceType *> m_resourceList;
+    bool m_closed = false;
+    size_t m_waiting = 0;  // getters currently blocked on m_cond
 
     class ResourceCloser {
     public:
@@ -277,7 +309,7 @@ private:
     void returnResource(ResourceType *p, ResourceCloser *closer) {
         std::unique_lock<std::mutex> lock(m_mutex);
         if (p) {
-            if (m_resourceList.size() < m_maxIdelSize) {
+            if (!m_closed && m_resourceList.size() < m_maxIdelSize) {
                 m_resourceList.push(p);
                 m_cond.notify_all();
             } else {
@@ -344,6 +376,12 @@ public:
     virtual ~ResourceVersionPool() {
         std::unique_lock<std::mutex> lock(m_mutex);
 
+        // Mark closed and wake all waiters, then wait until every blocked getter has left so it
+        // never touches the pool after destruction
+        m_closed = true;
+        m_cond.notify_all();
+        m_exit_cond.wait(lock, [this] { return m_waiting == 0; });
+
         // Unbind the closer of all the allocated resources from the pool
         for (auto iter = m_closer_set.begin(); iter != m_closer_set.end(); ++iter) {
             (*iter)->unbind();
@@ -361,11 +399,13 @@ public:
 
     /** Get the current maximum number of the resources allowed */
     size_t maxPoolSize() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_maxPoolSize;
     }
 
     /** Get the current maximum number of the idle resources allowed */
     size_t maxIdleSize() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_maxIdelSize;
     }
 
@@ -462,6 +502,9 @@ public:
      */
     ResourcePtr get() {
         std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_closed) {
+            HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
+        }
         ResourcePtr result;
         ResourceType *p = nullptr;
         if (m_resourceList.empty()) {
@@ -497,23 +540,28 @@ public:
      */
     ResourcePtr getWaitFor(uint64_t ms_timeout) {  // NOSONAR
         std::unique_lock<std::mutex> lock(m_mutex);
+        if (m_closed) {
+            HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
+        }
         ResourcePtr result;
         ResourceType *p = nullptr;
         if (m_resourceList.empty()) {
             if (m_maxPoolSize > 0 && m_count >= m_maxPoolSize) {
-                // HKU_TRACE("The maximum number of the resources is exceeded, waiting for an idle
-                // resource");
+                m_waiting++;
+                auto pred = [this] { return m_closed || !m_resourceList.empty(); };
                 if (ms_timeout > 0) {
-                    if (m_cond.wait_for(lock,
-                                        std::chrono::duration<uint64_t, std::milli>(ms_timeout),
-                                        [&] { return !m_resourceList.empty(); })) {
-                        HKU_CHECK_THROW(!m_resourceList.empty(), GetResourceTimeoutException,
-                                        "Failed get resource!");
-                    } else {
-                        HKU_THROW_EXCEPTION(GetResourceTimeoutException, "Failed get resource!");
-                    }
+                    m_cond.wait_for(lock, std::chrono::duration<uint64_t, std::milli>(ms_timeout),
+                                    pred);
                 } else {
-                    m_cond.wait(lock, [this] { return !m_resourceList.empty(); });
+                    m_cond.wait(lock, pred);
+                }
+                m_waiting--;
+                m_exit_cond.notify_all();
+                if (m_closed) {
+                    HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
+                }
+                if (ms_timeout > 0 && m_resourceList.empty()) {
+                    HKU_THROW_EXCEPTION(GetResourceTimeoutException, "Failed get resource!");
                 }
             } else {
                 try {
@@ -551,11 +599,13 @@ public:
     /** The number of the currently active resources, i.e. all the resources (including the idle and
      *  the used ones) */
     size_t count() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_count;
     }
 
     /** The current number of the idle resources */
     size_t idleCount() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_resourceList.size();
     }
 
@@ -582,9 +632,12 @@ private:
     size_t m_maxIdelSize;  // The maximum number of the idle resources allowed
     size_t m_count;        // The number of the currently active resources
     Parameter m_param;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     std::condition_variable m_cond;
+    std::condition_variable m_exit_cond;  // waiters signal here when closing wakes them
     std::queue<ResourceType *> m_resourceList;
+    bool m_closed = false;
+    size_t m_waiting = 0;  // getters currently blocked on m_cond
     int m_version;
 
     class ResourceCloser {
@@ -621,7 +674,8 @@ private:
             // When the version of the currently returned resource equals the resource pool version
             // and the idle resource list is less than the maximum number of the idle resources, the
             // returned resource is accepted
-            if (p->getVersion() == m_version && m_resourceList.size() < m_maxIdelSize) {
+            if (!m_closed && p->getVersion() == m_version &&
+                m_resourceList.size() < m_maxIdelSize) {
                 m_resourceList.push(p);
                 m_cond.notify_all();
             } else {

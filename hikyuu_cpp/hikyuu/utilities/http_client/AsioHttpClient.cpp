@@ -1232,6 +1232,10 @@ net::awaitable<AsioHttpResponse> AsioHttpClient::async_request(
   const HttpHeaders& headers, const char* body, size_t body_len, const std::string& content_type) {
     HKU_CHECK(m_is_valid_url, "Invalid url: {}", m_url);
 
+    // Reject CRLF in headers before any connection is opened
+    validateHttpHeaders(m_default_headers);
+    validateHttpHeaders(headers);
+
     // Make sure the io_context is set (the default constructor may not initialize it)
     if (m_ctx == nullptr) {
         auto exec = co_await net::this_coro::executor;
@@ -1585,6 +1589,10 @@ net::awaitable<AsioHttpStreamResponse> AsioHttpClient::async_requestStream(
   const HttpChunkCallback& chunk_callback) {
     HKU_CHECK(m_is_valid_url, "Invalid url: {}", m_url);
     HKU_CHECK(chunk_callback != nullptr, "Chunk callback must not be null");
+
+    // Reject CRLF in headers before any connection is opened
+    validateHttpHeaders(m_default_headers);
+    validateHttpHeaders(headers);
 
     // Make sure the io_context is set (the default constructor may not initialize it)
     if (m_ctx == nullptr) {

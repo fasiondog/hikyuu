@@ -41,6 +41,29 @@ using tcp = net::tcp;
 using HttpHeaders = std::map<std::string, std::string>;
 using HttpParams = std::map<std::string, std::string>;
 
+/** Check one request header: the name must be a token and the value must not carry CR/LF */
+inline void validateHttpHeader(const std::string& name, const std::string& value) {
+    static const std::string token_special = "!#$%&'*+-.^_`|~";
+    HKU_CHECK(!name.empty(), "Empty http header name");
+    for (unsigned char c : name) {
+        bool is_token = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                        (c >= '0' && c <= '9') || token_special.find(c) != std::string::npos;
+        HKU_CHECK(is_token, "Invalid http header name: {}", name);
+    }
+    for (unsigned char c : value) {
+        // HTAB is the only allowed control character; CR/LF would inject headers
+        HKU_CHECK(c == '\t' || c >= ' ', "Control character in http header '{}'", name);
+        HKU_CHECK(c != 0x7f, "Control character in http header '{}'", name);
+    }
+}
+
+/** Validate every header before it is serialized into a request */
+inline void validateHttpHeaders(const HttpHeaders& headers) {
+    for (const auto& [name, value] : headers) {
+        validateHttpHeader(name, value);
+    }
+}
+
 /**
  * @brief HTTP data chunk callback function type
  *
@@ -535,6 +558,7 @@ public:
      * @param headers the request header map, it is moved into the internal storage
      */
     void setDefaultHeaders(std::map<std::string, std::string>&& headers) {
+        validateHttpHeaders(headers);
         m_default_headers = std::move(headers);
     }
 
@@ -559,6 +583,7 @@ public:
      * @param headers the request header map, it is copied into the internal storage
      */
     void setDefaultHeaders(const HttpHeaders& headers) {
+        validateHttpHeaders(headers);
         m_default_headers = headers;
     }
 

@@ -69,6 +69,16 @@ public:
             }
         } catch (...) {
             m_done = true;
+            // Wake up and join the already started worker threads before the members are
+            // destroyed, otherwise the workers would access the destroyed members
+            m_cv.notify_all();
+            size_t started = m_threads.size();
+            for (size_t i = 0; i < started; i++) {
+                m_interrupt_flags[i].set();
+                if (m_threads[i].joinable()) {
+                    m_threads[i].join();
+                }
+            }
             throw;
         }
     }
@@ -116,6 +126,15 @@ public:
             throw std::logic_error("You can't submit a task to the stopped StealThreadPool!!");
         }
 
+        // The counter is incremented before the task is pushed so that join() can observe an
+        // in-flight task even while it is between pop and execution. A second m_done check after
+        // the increment guards against the race where join() flips m_done right before the push.
+        m_running_task_count.fetch_add(1, std::memory_order_relaxed);
+        if (m_done) {
+            m_running_task_count.fetch_sub(1, std::memory_order_relaxed);
+            throw std::logic_error("You can't submit a task to the stopped StealThreadPool!!");
+        }
+
         int index = -1;
         auto iter = m_thread_index.find(std::this_thread::get_id());
         if (iter != m_thread_index.end()) {
@@ -125,12 +144,17 @@ public:
         typedef typename std::invoke_result<FunctionType>::type result_type;
         std::packaged_task<result_type()> task(std::forward<FunctionType>(f));
         task_handle<result_type> res(task.get_future());
-        if (index != -1 && !m_interrupt_flags[index]) {
-            // The local thread tasks enter the queue from the front (recursion becomes a stack)
-            m_queues[index]->push_front(std::move(task));
-        } else {
-            m_master_work_queue.push(std::move(task));
-            m_cv.notify_one();
+        try {
+            if (index != -1 && !m_interrupt_flags[index]) {
+                // The local thread tasks enter the queue from the front (recursion becomes a stack)
+                m_queues[index]->push_front(std::move(task));
+            } else {
+                m_master_work_queue.push(std::move(task));
+                m_cv.notify_one();
+            }
+        } catch (...) {
+            m_running_task_count.fetch_sub(1, std::memory_order_relaxed);
+            throw;
         }
         return res;
     }
@@ -148,17 +172,21 @@ public:
      * It waits for every thread to finish the currently executed task and then exits immediately
      */
     void stop() {
-        if (m_done) {
+        // Serialize with join(): two threads must never join the same worker concurrently
+        std::lock_guard<std::mutex> lock(m_join_mutex);
+        if (m_done.exchange(true, std::memory_order_acq_rel)) {
             return;
         }
 
-        m_done = true;
-
         // At the same time the end task indication is added, so that it can also be terminated when
-        // the dll exits
-        for (size_t i = 0; i < m_worker_num; i++) {
-            m_interrupt_flags[i].set();
-            m_queues[i]->push_front(FuncWrapper());
+        // the dll exits. The state change is done under m_cv_mutex so a worker cannot evaluate the
+        // wait predicate before m_done becomes visible and then miss the notify (lost wakeup).
+        {
+            std::lock_guard<std::mutex> lk(m_cv_mutex);
+            for (size_t i = 0; i < m_worker_num; i++) {
+                m_interrupt_flags[i].set();
+                m_queues[i]->push_front(FuncWrapper());
+            }
         }
 
         m_cv.notify_all();  // Wake up all the worker threads
@@ -179,39 +207,40 @@ public:
      * @note From then on the thread pool cannot be used after the worker threads are ended
      */
     void join() {
+        // It instructs every worker thread to stop running when no work task is got
+        if (m_running_until_empty) {
+            // Wait until there is no queued nor in-flight task. The counter already covers queued
+            // tasks (incremented at submit time), so a zero counter means the pool is truly idle.
+            // Done outside the join mutex so a concurrent stop() is not blocked; stop() discards
+            // queued tasks without decrementing the counter, so m_done must also break the wait.
+            while (!m_done.load(std::memory_order_acquire) &&
+                   m_running_task_count.load(std::memory_order_acquire) != 0) {
+                std::this_thread::yield();
+            }
+        }
+
+        // Serialize with other join()/stop() calls: the workers must be joined exactly once
+        std::lock_guard<std::mutex> lock(m_join_mutex);
         if (m_done) {
             return;
         }
 
-        // It instructs every worker thread to stop running when no work task is got
-        if (m_running_until_empty) {
-            while (true) {
-                if (m_master_work_queue.size() != 0) {
-                    std::this_thread::yield();
-                } else {
-                    bool can_quit = true;
-                    for (size_t i = 0; i < m_worker_num; i++) {
-                        if (!m_queues[i]->empty()) {
-                            can_quit = false;
-                            break;
-                        }
-                    }
-                    if (can_quit) {
-                        break;
-                    } else {
-                        std::this_thread::yield();
-                    }
+        m_done = true;
+
+        // The state change and the sentinel pushes are done under m_cv_mutex so a worker cannot
+        // evaluate the wait predicate before m_done becomes visible and then miss the notify
+        // (lost wakeup).
+        {
+            std::lock_guard<std::mutex> lk(m_cv_mutex);
+            if (m_running_until_empty) {
+                for (size_t i = 0; i < m_worker_num; i++) {
+                    m_interrupt_flags[i].set();
                 }
             }
 
-            m_done = true;
             for (size_t i = 0; i < m_worker_num; i++) {
-                m_interrupt_flags[i].set();
+                m_master_work_queue.push(FuncWrapper());
             }
-        }
-
-        for (size_t i = 0; i < m_worker_num; i++) {
-            m_master_work_queue.push(FuncWrapper());
         }
 
         // Wake up all the worker threads
@@ -224,7 +253,6 @@ public:
             }
         }
 
-        m_done = true;
         m_master_work_queue.clear();
         for (size_t i = 0; i < m_worker_num; i++) {
             m_queues[i]->clear();
@@ -246,12 +274,27 @@ public:
 
 private:
     typedef FuncWrapper task_type;
+
+    // Decrements the in-flight task counter on scope exit. Used to balance the increment done in
+    // submit() once a popped task has finished executing (including when it throws).
+    struct RunningTaskGuard {
+        std::atomic<size_t>& counter;
+        explicit RunningTaskGuard(std::atomic<size_t>& c) : counter(c) {}
+        ~RunningTaskGuard() {
+            counter.fetch_sub(1, std::memory_order_relaxed);
+        }
+    };
+
     std::atomic_bool m_done;     // The global termination indication of the thread pool
     size_t m_worker_num;         // Number of the worker threads
     bool m_running_until_empty;  // It stops running automatically when the task queue is empty
     std::condition_variable
-      m_cv;                 // Semaphore, it blocks the threads and waits when there is no task
-    std::mutex m_cv_mutex;  // The mutex working together with the semaphore
+      m_cv;                   // Semaphore, it blocks the threads and waits when there is no task
+    std::mutex m_cv_mutex;    // The mutex working together with the semaphore
+    std::mutex m_join_mutex;  // Serializes join()/stop() so workers are joined exactly once
+
+    std::atomic<size_t> m_running_task_count{0};  // Submitted but not yet finished tasks (queued +
+                                                  // in-flight)
 
     std::vector<InterruptFlag> m_interrupt_flags;           // Worker thread states
     ThreadSafeQueue<task_type> m_master_work_queue;         // Task queue of the master thread
@@ -273,17 +316,20 @@ private:
         task_type task;
         if (pop_task_from_local_queue(task, index)) {
             if (!task.isNullTask()) {
+                RunningTaskGuard guard(m_running_task_count);
                 task();
             } else {
                 m_interrupt_flags[index].set();
             }
         } else if (pop_task_from_master_queue(task)) {
             if (!task.isNullTask()) {
+                RunningTaskGuard guard(m_running_task_count);
                 task();
             } else {
                 m_interrupt_flags[index].set();
             }
         } else if (pop_task_from_other_thread_queue(task, index)) {
+            RunningTaskGuard guard(m_running_task_count);
             task();
         } else {
             std::unique_lock<std::mutex> lk(m_cv_mutex);

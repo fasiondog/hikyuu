@@ -45,7 +45,10 @@
  *          - Whether the current thread is the same as the owner thread is checked when the
  * resource is returned
  *          - If they are not the same: the resource is deleted directly and a warning log is
- * output, avoiding the undefined behavior caused by accessing the thread_local variables
+ * output, avoiding the undefined behavior caused by accessing the thread_local variables.
+ *          Note that the pool accounting (m_count) is maintained by the owner thread only and is
+ * not touched on a cross-thread return, so the pool capacity consumed by the returned resource is
+ * never recovered afterwards. This is the accepted consequence of an unsupported usage pattern.
  *          - If they are the same: it is returned to the pool normally to achieve the reuse
  *
  *          The main differences from ResourceTlsPool:
@@ -171,13 +174,9 @@ public:
      * Destructor, it releases all the cached resources of the current thread
      */
     virtual ~ResourceTlsVersionPool() {
-        for (size_t i = 0; i < m_freeCount; ++i) {
-            if (m_resourceList[i]) {
-                delete m_resourceList[i];
-                m_resourceList[i] = nullptr;
-            }
-        }
-        m_freeCount = 0;
+        // The idle resources are ring-distributed starting from m_head, so release them through
+        // releaseIdleResource() which walks the slots with the correct modulo indexing
+        releaseIdleResource();
     }
 
     /** The resource deleter, used by shared_ptr to return the resource automatically */
@@ -193,7 +192,9 @@ public:
             auto current_thread = std::this_thread::get_id();
             if (current_thread != owner_thread_id) {
                 // A cross-thread return: the resource is deleted directly to avoid accessing the
-                // thread_local variables
+                // thread_local variables. The owner pool state (maintained by its owner thread
+                // only) is not touched, so the pool capacity consumed here is never recovered
+                // afterwards.
                 HKU_WARN(
                   "Resource returned from different thread, deleting directly to avoid "
                   "undefined behavior");
@@ -441,13 +442,13 @@ private:
 private:
     size_t m_maxCount = MAX_POOL_SIZE_LIMIT;  // The logical resource upper limit (configurable at
                                               // runtime, it cannot exceed the physical capacity)
-    size_t m_count = 0;                       // The number of the currently active resources
-                                              // (including the idle and the used ones)
-    size_t m_freeCount = 0;                   // The number of the idle resources
-    size_t m_head = 0;  // The head index of the Ring Buffer (the dequeue position)
-    size_t m_tail = 0;  // The tail index of the Ring Buffer (the enqueue position)
-    Parameter m_param;  // Resource creation parameters
-    int m_version = 0;  // The version number of the current thread
+    size_t m_count = 0;      // The number of the currently active resources (including the idle and
+                             // the used ones); maintained by the owner thread only
+    size_t m_freeCount = 0;  // The number of the idle resources
+    size_t m_head = 0;       // The head index of the Ring Buffer (the dequeue position)
+    size_t m_tail = 0;       // The tail index of the Ring Buffer (the enqueue position)
+    Parameter m_param;       // Resource creation parameters
+    int m_version = 0;       // The version number of the current thread
     std::array<ResourceType *, MAX_POOL_SIZE_LIMIT>
       m_resourceList{};  // The idle resource array (the Ring Buffer, the physical capacity is
                          // fixed)
