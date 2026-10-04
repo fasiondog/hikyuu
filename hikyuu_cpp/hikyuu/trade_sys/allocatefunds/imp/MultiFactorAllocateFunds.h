@@ -19,7 +19,7 @@ namespace hku {
  * @details The L1 system-level allocation takes SubSystemContext::score (the SE score backfilled by MultiSystem) as the weight, without normalization.
  *          When all the scores are 0 it falls back to the equal weight, to avoid the zero weight causing the failure to allocate.
  * @note It depends on MultiSystem backfilling score with the result of SelectorBase::getSelected() before L1
- *       (see design.md §5.3 / O2).
+ *       
  * @ingroup AllocateFunds
  */
 class MultiFactorAllocateFunds : public AllocateFundsBase {

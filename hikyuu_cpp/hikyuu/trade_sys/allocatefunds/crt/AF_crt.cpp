@@ -4,7 +4,6 @@
  *  Copyright (c) 2025 hikyuu.org
  *
  *  The AF factory implementation: assemble the concrete implementations of AllocateFundsBase (the three parts L1/L2/L3).
- *  See docs/design/pf_af_compat/design.md §5
  */
 
 #include "AF_EqualWeight.h"

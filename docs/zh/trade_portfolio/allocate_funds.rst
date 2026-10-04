@@ -58,7 +58,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 .. note::
 
    master 的 ``adjust_running_sys`` / ``auto_adjust_weight`` / ``ignore_zero_weight`` / ``reserve_percent``
-   等参数在 v6 **无独立开关**：其中 ``auto_adjust_weight`` 的语义由 ``AF_FixedWeight`` /
+   等参数在**当前实现无独立开关**：其中 ``auto_adjust_weight`` 的语义由 ``AF_FixedWeight`` /
    ``AF_FixedWeightList`` 的「**不归一化**」直接承载；其余参数无对应，需由使用方自行处理。
 
 
@@ -96,7 +96,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     .. note::
 
        master 旧实现断言 ``amount > 500`` 且剩余现金 ``< 0.6 × amount`` 时停止；
-       v6 实现要求 ``fixed-amount >= 0``，且按净额调仓，**边界行为不同**。
+       当前实现要求 ``fixed-amount >= 0``，且按净额调仓，**边界行为不同**。
 
     :param float amount: 交易最大金额
     :return: 资产分配算法实例（``AFPtr``）
@@ -157,7 +157,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     :header-rows: 1
 
     * - master
-      - v6
+      - 当前实现
     * - ``class MyAF(AllocateFundsBase)``
       - ``class MyAF(AllocateFundsBase)``（同名类保留，语义不变）
     * - ``_allocateWeight(date, se_list)``
@@ -180,7 +180,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
-    .. py:attribute:: mode  分配模式：``"A"``（信号汇总 + 父统一下单）或 ``"B"``（额度划拨 + 下期额度回写）
+    .. py:attribute:: mode  分配模式：``"A"`` 信号汇总（Signal Aggregation，默认；父统一下单）或 ``"B"`` 资金配置（Fund Allocation；调仓日先按额度校准选中子系统再驱动，父透传其真实指令）
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 

@@ -186,17 +186,25 @@ def crtSE(calculate, get_selected, params={}, name='crtSE'):
 # ------------------------------------------------------------------
 def crtAF(allocate_func, params={}, name='crtAF', to_targets_func=None, check_risk_func=None):
     """
-    Quickly create an asset allocation algorithm (AF)
+    Quickly create an asset allocation algorithm (AF), used by the aggregate system
+    (MultiSystem) only. The three callbacks correspond to the L1/L2/L3 layers and are executed
+    by the AF in the L1 -> L2 -> L3 order on every rebalancing day.
 
-    :param allocate_func: the L1 system-level allocation interface, the prototype is
-        ``func(self, date, tm, contexts, query)``, it returns ``{System: weight}``; in mode B it
-        writes back ``contexts[i].quota`` in place and returns an empty table
+    :param allocate_func: [Required] the L1 system-level allocation interface, the prototype is
+        ``func(self, date, tm, contexts, query)``, it decides "how much each sub-system may
+        manage"; in mode A ("Signal Aggregation") it returns the weight table ``{System: weight}``;
+        in mode B ("Fund Allocation") it writes the real quota into ``contexts[i].quota`` in place
+        and returns an empty table
     :param {} params: the parameter dictionary
     :param str name: the custom name
-    :param to_targets_func: the L2 behavior-level conversion interface, the prototype is
-        ``func(self, date, tm, suggestions, sys_weight, query)``, optional
-    :param check_risk_func: the L3 portfolio risk control interface, the prototype is
-        ``func(self, date, tm, suggestions, query)``, optional
+    :param to_targets_func: [Optional] the L2 behavior-level conversion interface, the prototype
+        is ``func(self, date, tm, suggestions, sys_weight, query)``; in mode A it converts the
+        sub-system suggestions into the target positions of the parent account (target market value
+        = weight x position ratio x the parent total assets), in mode B the sub-system instruction
+        passes through
+    :param check_risk_func: [Optional] the L3 portfolio risk control interface, the prototype is
+        ``func(self, date, tm, suggestions, query)``, e.g. the single instrument concentration cap
+        (skipped in mode B)
     :return: the custom asset allocation algorithm instance
     """
     meta_x = type(name, (AllocateFundsBase, ), {'__init__': part_init, '_clone': part_clone})

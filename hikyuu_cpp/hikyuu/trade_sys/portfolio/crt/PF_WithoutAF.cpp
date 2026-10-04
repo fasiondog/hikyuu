@@ -6,8 +6,8 @@
  *  Created on: 2025-02-18
  *      Author: fasiondog
  *
- *  v5: the PF compatibility layer factory implementation -- the factory passes through to MultiSystem (mode A).
- *  See docs/design/pf_af_compat/design.md §4
+ *  The PF factory implementation -- passes through to the MultiSystem preset configuration
+ *  (mode A "Signal Aggregation").
  */
 
 #include "PF_WithoutAF.h"
@@ -19,7 +19,7 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust
                                     bool trade_on_close, bool sys_use_self_tm,
                                     bool sell_at_not_selected) {
     auto sys = std::make_shared<MultiSystem>("PF_WithoutAF");
-    // The essence of PF_WithoutAF: MultiSystem mode A (signal aggregation + the parent uniform ordering, see design.md §4.2 / §4.4)
+    // The preset: MultiSystem mode A "Signal Aggregation" (the signal sources + the parent uniform ordering)
     sys->setAF(AF_EqualWeight());
     sys->setMode("A");
     sys->setTM(tm);
@@ -30,7 +30,7 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust
     sys->setTradeOnClose(trade_on_close);
     sys->setSellAtNotSelected(sell_at_not_selected);
 
-    // sys_use_self_tm has no corresponding semantics in the new system (the sub-systems always use the shadow account TM_SUB, shared_tm=false)
+    // sys_use_self_tm has no corresponding semantics here (the sub-systems always use the shadow account TM_SUB, shared_tm=false)
     HKU_WARN_IF(sys_use_self_tm,
                 "PF_WithoutAF: sys_use_self_tm is ignored (no equivalent in MultiSystem)!");
     HKU_WARN_IF(!tm, "PF_WithoutAF: tm is null!");

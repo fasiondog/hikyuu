@@ -204,7 +204,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // v5: m_mode has been migrated to AllocateFundsBase (portfolio-level allocation), it is no
+        // m_mode has been migrated to AllocateFundsBase (portfolio-level allocation), it is no
         // longer saved.
         // m_query and m_tm are set temporarily when the system runs, they do not need to be
         // serialized
@@ -218,7 +218,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         if (version < 1) {
-            // v5 compatibility: m_mode was at this position in the old archives (the
+            // m_mode was at this position in the old archives (the
             // portfolio-level allocation mode), it is discarded after being read.
             string legacy_mode = "A";
             ar& boost::serialization::make_nvp("m_mode", legacy_mode);

@@ -54,7 +54,15 @@ Built-in Portfolios
 
 .. py:function:: PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
-    Create a multi-instrument portfolio with a single system strategy (**returns MultiSystem; semantics: mode B — quota allocation + next-period quota write-back**).
+    Create a multi-instrument portfolio with a single system strategy (**returns MultiSystem running in mode B "Fund Allocation"**).
+
+    Mode B semantics (quota allocation, FOF/MOM style): on every rebalancing day the AF allocates the
+    quota to each selected sub-system (L1); each selected sub-system is calibrated to its quota BEFORE
+    it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the
+    gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
+    (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
+    autonomy is respected). The unselected sub-systems are force cleared on the rebalancing day. The
+    sub-system shadow accounts start from zero and follow the cost function of the parent account.
 
     The rebalancing mode adjust_mode:
     - In "query" mode, rebalancing follows the ktype of the input query, and adjust_cycle determines the interval in units of that ktype;
@@ -71,7 +79,14 @@ Built-in Portfolios
 
 .. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
 
-    Create a portfolio without a fund allocation algorithm (**returns MultiSystem; semantics: mode A — signal aggregation + uniform ordering by the parent**).
+    Create a portfolio without a fund allocation algorithm (**returns MultiSystem running in mode A "Signal Aggregation"**).
+
+    Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
+    accounts (the signal cash is reset on every rebalancing day); the parent converts the suggestions
+    into the target positions of the parent account by the AF L2 (target market value = weight x
+    position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta
+    against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
+    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
 
     The rebalancing mode adjust_mode is the same as described above.
 
@@ -81,7 +96,7 @@ Built-in Portfolios
     :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
     :param bool trade_on_close: whether the trades are executed at the close
-    :param bool sys_use_self_tm: whether the prototype system uses its own tm for the calculation (**has no corresponding semantics in v5; ignored with a warning**)
+    :param bool sys_use_self_tm: whether the prototype system uses its own tm for the calculation (**has no corresponding semantics; ignored with a warning**)
     :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold
     :rtype: MultiSystem
 
@@ -94,7 +109,7 @@ Differences from master and the migration
 
     * - Dimension
       - master
-      - v5 (factory pass-through)
+      - The current implementation (the factory passes through to MultiSystem)
     * - Return type
       - ``PortfolioPtr``
       - ``MultiSystemPtr`` (``PortfolioPtr`` is a compatibility alias for ``MultiSystemPtr``, so the existing ``PortfolioPtr pf = PF_Simple(...)`` still compiles)
@@ -104,10 +119,10 @@ Differences from master and the migration
         Among them, ``run(query)`` also provides a compatibility overload (equivalent to the master ``Portfolio.run(query)`` and driven by the market trading calendar), so the existing ``pf.run(query)`` calls need no rewrite
     * - Account hierarchy
       - Real TM + shadow TM + sub-system accounts
-      - The parent's real TM + the sub-system shadow accounts ``TM_SUB`` (:meth:`MultiSystem.set_sub_init_cash`)
+      - The parent's real TM + the sub-system shadow accounts ``TM_SUB`` (mode B: starting from zero and following the cost function of the parent account; mode A: the signal cash set via :meth:`MultiSystem.set_sub_init_cash`, reset on every rebalancing day)
     * - Fund allocation
       - checkout / checkin on the rebalancing day
-      - Mode B: the next-period quota write-back (lagging one period behind); mode A: no allocation
+      - Mode B: calibrated BEFORE driving on every rebalancing day (recycle / clear / reduce / inject, in the same order as the master ``SimplePortfolio``); mode A: no real fund allocation
     * - Unmapped parameters
       - ``sys_use_self_tm`` takes effect
       - Ignored with ``HKU_WARN``

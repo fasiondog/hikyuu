@@ -4,7 +4,7 @@
  *  Created on: 2018-2-8
  *      Author: fasiondog
  *
- *  v5: AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
+ *  AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
  */
 
 #pragma once

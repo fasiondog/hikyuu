@@ -124,7 +124,7 @@ void OptimalSelectorBase::_calculate_parallel(const vector<std::pair<size_t, siz
     // SPEND_TIME(OptimalSelectorBase_calculate_parallel);
     // The training runs the candidate clones concurrently and each range has its own query, so the
     // candidates must not share their EV (shared_ev defaults to true), otherwise the racing
-    // setQuery calls with different queries would cross-clobber the EV state (ISS-084). The local
+    // setQuery calls with different queries would cross-clobber the EV state. The local
     // protos take effect from the next clone level on, leaving the user prototypes untouched.
     SystemList pro_list;
     pro_list.reserve(m_pro_sys_list.size());

@@ -10,7 +10,7 @@
 #include <hikyuu/trade_sys/system/TradeSuggestion.h>
 #include <hikyuu/trade_sys/system/SubSystemContext.h>
 #include <hikyuu/trade_sys/system/imp/MultiSystem.h>
-// v5: the PF compatibility layer (factory pass-through, see docs/design/pf_af_compat/design.md §4)
+// The PF factories pass through to the MultiSystem preset configurations
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include "../pybind_utils.h"
@@ -528,8 +528,19 @@ Common parameters:
     // effect
     py::class_<MultiSystem, PyMultiSystem, System, std::shared_ptr<MultiSystem>>(
       m, "MultiSystem", py::dynamic_attr(),
-      R"(The aggregate trading system (portfolio backtesting). It holds multiple sub-systems (single-security or nested aggregate), drives and aggregates the orders at the open/close stages respectively.
-Every sub-system has its own independent virtual account (a shadow account in mode A / the quota allocated by the parent in mode B), the parent system allocates and orders uniformly on its own account.)")
+      R"(The aggregate trading system (portfolio backtesting). It holds multiple sub-systems (single-security or nested aggregate), drives them on the open/close stages of a fully aligned time axis, and places the orders on the single real account of the top layer. Arbitrary nesting and a rebalancing cycle are supported; the portfolio-level fund allocation lives in the AF (L1/L2/L3, see AllocateFundsBase).
+
+Running modes (held by the AF, set via set_mode or the AF factories):
+
+- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is reset on every rebalancing day); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent total assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
+
+- Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account.
+
+Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for details):
+
+- L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);
+- L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x position ratio x the parent total assets, aggregated per instrument; mode B: the sub-system instruction passes through);
+- L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max-single-position); mode B skips the clipping.)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
       .def(py::init<const SystemList&, const string&>(), py::arg("sys_list"),
@@ -569,11 +580,13 @@ Every sub-system has its own independent virtual account (a shadow account in mo
       .def("runMomentOnClose", &MultiSystem::runMomentOnClose, py::arg("datetime"))
       .def("ready_for_run", &MultiSystem::readyForRun)
       .def("set_mode", &MultiSystem::setMode, py::arg("mode"),
-           "Set the running mode: A (signal aggregation) / B (fund allocation)")
-      .def_property_readonly("mode", &MultiSystem::getMode, "The current running mode (A/B)")
+           "Set the running mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation")
+      .def_property_readonly("mode", &MultiSystem::getMode,
+                             "The current running mode: \"A\" Signal Aggregation / \"B\" Fund Allocation")
       .def("set_sub_init_cash", &MultiSystem::setSubInitCash, py::arg("cash"),
-           "Set the initial fund of the sub-system shadow account (a fixed value in mode A / the "
-           "initial quota in mode B)")
+           "Set the signal cash of the sub-system shadow account, reset on every rebalancing day "
+           "in mode A. In mode B the shadow accounts start from zero and the quota comes from the "
+           "L1 allocation, so this value is unused")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
            "Set the rebalancing cycle (days), <=1 means rebalancing on every close day")
       .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
@@ -758,16 +771,23 @@ Every sub-system has its own independent virtual account (a shadow account in mo
       .def("clone", &MultiSystem::clone);
 
     //--------------------------------------------------------------------------------------
-    // v5: the PF compatibility layer (factory pass-through to MultiSystem), keeping the master call
-    // style unchanged (see docs/design/pf_af_compat/design.md §4; the return type changes from
-    // PortfolioPtr to MultiSystem)
+    // The PF factories pass through to MultiSystem, keeping the master call style unchanged
+    // (the return type changes from PortfolioPtr to MultiSystem)
     m.def("PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
           py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
           py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
           py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
           R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
-    Create a multi-instrument, single-system-strategy portfolio (v5: returns MultiSystem, the semantics is the mode B quota allocation)
+    Create a multi-instrument, single-system-strategy portfolio (returns MultiSystem running in mode B "Fund Allocation").
+
+    Mode B semantics (quota allocation, FOF/MOM style): on every rebalancing day the AF allocates the
+    quota to each selected sub-system (L1); each selected sub-system is calibrated to its quota BEFORE
+    it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the
+    gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
+    (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
+    autonomy is respected). The unselected sub-systems are force cleared on the rebalancing day. The
+    sub-system shadow accounts start from zero and follow the cost function of the parent account.
 
     The rebalancing mode adjust_mode description:
     - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval
@@ -796,7 +816,14 @@ Every sub-system has its own independent virtual account (a shadow account in mo
       py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
       R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
 
-    Create a portfolio without a fund allocation algorithm (v5: returns MultiSystem, the semantics is the mode A signal aggregation)
+    Create a portfolio without a fund allocation algorithm (returns MultiSystem running in mode A "Signal Aggregation").
+
+    Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
+    accounts (the signal cash is reset on every rebalancing day); the parent converts the suggestions
+    into the target positions of the parent account by the AF L2 (target market value = weight x
+    position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta
+    against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
+    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
 
     The rebalancing mode adjust_mode description:
     - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval
@@ -815,7 +842,7 @@ Every sub-system has its own independent virtual account (a shadow account in mo
     :param str adjust_mode: the rebalancing mode
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close
-    :param bool sys_use_self_tm: the prototype system uses its own tm for the calculation (ignored with a warning in v5)
+    :param bool sys_use_self_tm: the prototype system uses its own tm for the calculation (ignored with a warning)
     :param bool sell_at_not_selected: whether to force selling the stocks not selected on the rebalancing day
     :rtype: MultiSystem)");
 

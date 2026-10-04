@@ -9,7 +9,6 @@
  *   - L2 _to_targets weight -> the executable quantity of the parent account
  *   - L3 _check_risk portfolio risk control clipping
  *  MM is restricted to the single system form, it no longer carries the portfolio-level allocation.
- *  See docs/design/pf_af_compat/design.md §5
  *  Created on: 2016-03-28
  *      Author: fasiondog
  */
@@ -66,13 +65,28 @@ public:
 void export_AllocateFunds(py::module& m) {
     py::class_<AllocateFundsBase, AllocateFundsPtr, PyAllocateFundsBase>(
       m, "AllocateFundsBase", py::dynamic_attr(),
-      R"(The portfolio-level fund allocation (AF) base class, used by the aggregate system (MultiSystem) only
+      R"(The portfolio-level fund allocation (AF) base class, used by the aggregate system (MultiSystem) only.
 
-AF is composed of three replaceable algorithm parts (each of them corresponds to one overload interface):
+AF is composed of three replaceable algorithm parts (each of them corresponds to one overload interface),
+executed by allocate() in the L1 -> L2 -> L3 order:
 
-    - _allocate   [Required] L1 system-level allocation: sub-system context -> weight
-    - _to_targets [Optional] L2 behavior-level conversion: weight -> the executable quantity of the parent account
-    - _check_risk [Optional] L3 portfolio risk control clipping
+    - _allocate   [Required] L1 system-level allocation: decide "how much each sub-system may manage".
+                  The input is the sub-system context list, the output is the weight table
+                  {System: weight}; in mode B ("Fund Allocation") it also writes the real cash quota
+                  into contexts[i].quota (the weight x the parent total assets, or the fixed amount).
+                  Examples: AF_EqualWeight (1/N), AF_FixedWeight, AF_MultiFactor (weighted by the SE score).
+    - _to_targets [Optional] L2 behavior-level conversion: convert the sub-system suggestions into the
+                  executable quantity of the parent account (the folding point from the sub-system space
+                  to the individual instrument space). In mode A ("Signal Aggregation") the target
+                  position market value = weight x position ratio x the parent total assets, aggregated
+                  per instrument and rebalanced by the delta against the current position; in mode B the
+                  real instruction of the sub-system passes through unchanged.
+    - _check_risk [Optional] L3 portfolio risk control: clip the suggestions at the portfolio dimension
+                  (e.g. the single instrument concentration cap max-single-position); mode B respects
+                  the sub-manager autonomy and skips the clipping.
+
+The running mode is held by the AF (the mode property): "A" Signal Aggregation (the default) / "B" Fund
+Allocation; see the MultiSystem class docstring for the full description of the two modes.
 
 Common parameters:
 
@@ -98,7 +112,7 @@ Common parameters:
                     py::return_value_policy::copy, "Set or get the query condition")
       .def_property("mode", &AllocateFundsBase::getMode, &AllocateFundsBase::setMode,
                     py::return_value_policy::copy,
-                    "The allocation mode: A (signal aggregation) / B (fund allocation)")
+                    "The allocation mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -127,27 +141,45 @@ Common parameters:
            py::arg("suggestions"), py::arg("contexts"), py::arg("query"),
            R"(allocate(self, date, tm, suggestions, contexts, query)
 
-    The unified entry of L1/L2/L3 (usually called by MultiSystem internally))")
+    The unified entry of the L1/L2/L3 pipeline (L1 _allocate -> L2 _to_targets -> L3 _check_risk),
+    called by MultiSystem internally on the rebalancing day after the sub-system suggestions are
+    collected. Custom algorithms normally only override the three hooks instead of this entry.
+
+    :param Datetime date: the trade date
+    :param TradeManager tm: the real trade account of the parent (aggregate) system
+    :param TradeSuggestionList suggestions: [in/out] the suggestions submitted by every sub-system; L2/L3 rewrite them in place
+    :param SubSystemContextList contexts: the context of every sub-system (the virtual account funds / the mode B quota)
+    :param Query query: the query condition (the k-line type, etc.))")
 
       .def("_allocate", &AllocateFundsBase::_allocate, py::arg("date"), py::arg("tm"),
            py::arg("contexts"), py::arg("query"),
            R"(_allocate(self, date, tm, contexts, query)
 
-    [Overload interface] L1 system-level allocation: decide the weight of every sub-system by the sub-system context
+    [Overload interface] L1 system-level allocation: decide "how much each sub-system may manage" by the
+    sub-system context list. In mode B it also writes the real quota into contexts[i].quota.
 
+    :param Datetime date: the trade date
+    :param TradeManager tm: the real trade account of the parent (aggregate) system
+    :param SubSystemContextList contexts: the context of every sub-system (the virtual account funds / the mode B quota)
+    :param Query query: the query condition (the k-line type, etc.)
     :return: the weight table { System: weight })")
 
       .def("_to_targets", &AllocateFundsBase::_toTargets, py::arg("date"), py::arg("tm"),
            py::arg("suggestions"), py::arg("sys_weight"), py::arg("query"),
            R"(_to_targets(self, date, tm, suggestions, sys_weight, query)
 
-    [Overload interface] L2 behavior-level conversion: convert the weights into the executable quantity of the parent account, rewrite suggestions in place)")
+    [Overload interface] L2 behavior-level conversion: convert the sub-system suggestions into the
+    executable quantity of the parent account (mode A: target market value = weight x position ratio x
+    the parent total assets, aggregated per instrument and rebalanced by the delta against the current
+    position; mode B: pass the real instruction through), rewrite suggestions in place)")
 
       .def("_check_risk", &AllocateFundsBase::_checkRisk, py::arg("date"), py::arg("tm"),
            py::arg("suggestions"), py::arg("query"),
            R"(_check_risk(self, date, tm, suggestions, query)
 
-    [Overload interface] L3 portfolio risk control clipping, rewrite the quantity of suggestions in place)")
+    [Overload interface] L3 portfolio risk control: clip the suggestions at the portfolio dimension
+    (e.g. the single instrument concentration cap max-single-position); mode B skips the clipping
+    (the sub-manager autonomy is respected), rewrite the quantity of suggestions in place)")
 
       .def(
         "_reset", &AllocateFundsBase::_reset,

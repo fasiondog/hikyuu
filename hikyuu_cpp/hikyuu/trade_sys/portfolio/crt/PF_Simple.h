@@ -4,9 +4,11 @@
  *  Created on: 2018-1-13
  *      Author: fasiondog
  *
- *  v5: PF compatibility layer (factory pass-through) -- PF is essentially a concrete implementation (preset configuration) of MultiSystem,
- *  so this factory directly returns MultiSystemPtr, no longer introducing the Portfolio / SimplePortfolio shell class.
- *  See docs/design/pf_af_compat/design.md §4
+ *  PF is a preset configuration of MultiSystem, so this factory directly returns MultiSystemPtr,
+ *  no shell class is introduced. The returned aggregate system runs in
+ *  **mode B "Fund Allocation"**: every selected sub-system is calibrated to the quota allocated by
+ *  the AF on the rebalancing day and trades with the exact quota, the parent mirrors its real
+ *  instructions on the parent account (see the MultiSystem class comment for the full semantics).
  */
 
 #pragma once
@@ -36,12 +38,15 @@ namespace hku {
  * on the 1st day of every month but the 1st is not a trading day, it is postponed to the first
  * trading day of that month
  * </pre>
- * @note v5: returns MultiSystemPtr, the semantics is MultiSystem mode B (quota allocation + the
- *       next-period quota write-back); adjust_mode / delay_to_trading_day are expanded by
- *       MultiSystem internally into the rebalancing day table (design.md §4.3).
+ * @note Returns MultiSystemPtr running in mode B "Fund Allocation": on the rebalancing day the
+ *       AF allocates the quota to every selected sub-system (L1) and the sub-system is calibrated
+ *       to the quota before it is driven; the sub-system suggestions are mirrored by the parent
+ *       (L2 pass-through) and the L3 portfolio risk control is skipped. The unselected
+ *       sub-systems are force cleared on the rebalancing day. adjust_mode / delay_to_trading_day
+ *       are expanded by MultiSystem internally into the rebalancing day table.
  * @param tm trade account
  * @param se system selector
- * @param af fund allocation algorithm (AFPtr, containing three replaceable parts L1/L2/L3)
+ * @param af fund allocation algorithm (AFPtr, carrying the L1/L2/L3 layers, see AllocateFundsBase)
  * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default
  * @param adjust_mode the rebalancing mode "query" | "day" | "week" | "month" | "year"
  * @param delay_to_trading_day when it is true, it is postponed to the first trading day within the

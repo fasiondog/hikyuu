@@ -4,8 +4,8 @@
  *  Created on: 2018-1-13
  *      Author: fasiondog
  *
- *  v5: the PF compatibility layer factory implementation -- the factory passes through to MultiSystem (mode B).
- *  See docs/design/pf_af_compat/design.md §4
+ *  The PF factory implementation -- passes through to the MultiSystem preset configuration
+ *  (mode B "Fund Allocation").
  */
 
 #include "PF_Simple.h"
@@ -16,7 +16,7 @@ MultiSystemPtr HKU_API PF_Simple(const TMPtr& tm, const SEPtr& se, const AFPtr& 
                                  int adjust_cycle, const string& adjust_mode,
                                  bool delay_to_trading_day) {
     auto sys = std::make_shared<MultiSystem>("PF_Simple");
-    // The essence of PF: MultiSystem mode B (quota allocation + the next-period quota write-back, see design.md §4.2 / §4.4)
+    // The preset: MultiSystem mode B "Fund Allocation" (the quota-first calibration on the rebalancing day)
     // Note: call setAF first then setMode, so that setMode takes effect on the current AF.
     sys->setAF(af ? af : AF_EqualWeight());
     sys->setMode("B");

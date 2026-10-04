@@ -6,9 +6,12 @@
  *  Created on: 2025-02-18
  *      Author: fasiondog
  *
- *  v5: PF compatibility layer (factory pass-through) -- PF is essentially a concrete implementation (preset configuration) of MultiSystem,
- *  so this factory directly returns MultiSystemPtr, no longer introducing the WithoutAFPortfolio shell class.
- *  See docs/design/pf_af_compat/design.md §4
+ *  PF is a preset configuration of MultiSystem, so this factory directly returns MultiSystemPtr,
+ *  no shell class is introduced. The returned aggregate system runs in
+ *  **mode A "Signal Aggregation"**: the sub-systems are pure signal sources on their shadow
+ *  accounts (the signal cash is reset on every rebalancing day), the parent converts the
+ *  suggestions into the executable quantity by the L2 target conversion and orders uniformly on
+ *  the parent account (see the MultiSystem class comment for the full semantics).
  */
 
 #pragma once
@@ -40,9 +43,12 @@ namespace hku {
  * </pre>
  * @note In the mode without a fund allocation algorithm, only all buying and selling at the open or
  *       all buying and selling at the close is supported!
- * @note v5: returns MultiSystemPtr, the semantics is MultiSystem mode A (signal aggregation + the
- *       unified ordering by the parent); sys_use_self_tm has no corresponding semantics in the new
- *       system (the sub-systems always use shadow accounts), it is ignored with a warning.
+ * @note Returns MultiSystemPtr running in mode A "Signal Aggregation": the sub-system suggestions
+ *       are converted into the target positions of the parent account by the AF L2 (weight x
+ *       position ratio x the parent total assets, aggregated per instrument) and the L3 portfolio
+ *       risk control applies; the unselected sub-systems are not force cleared by default
+ *       (sell_at_not_selected=false). sys_use_self_tm has no corresponding semantics here (the
+ *       sub-systems always use shadow accounts), it is ignored with a warning.
  * @param tm trade account
  * @param se system selector
  * @param adjust_cycle the rebalancing cycle (affected by adjust_mode), 1 by default
@@ -52,7 +58,7 @@ namespace hku {
  * @param trade_on_close execute the trade at the close
  * @param sys_use_self_tm use the trade account of the prototype system itself for the calculation
  *                        (valid in the mode without a fund allocation only); it has no
- *                        corresponding semantics in v5, ignored with a warning
+ *                        corresponding semantics here, ignored with a warning
  * @param sell_at_not_selected whether to force selling the stocks not selected on the rebalancing
  *                             day, false by default
  * @return the portfolio instance (MultiSystemPtr)

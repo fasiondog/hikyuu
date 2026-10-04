@@ -1,8 +1,7 @@
 /*
  * build_in.h
  *
- *  v5: PF compatibility layer (the factory directly passes through to MultiSystem), see
- *  docs/design/pf_af_compat/design.md §4
+ *  The PF factories pass through to the MultiSystem preset configurations
  *  Created on: 2016-3-28
  *      Author: fasiondog
  */

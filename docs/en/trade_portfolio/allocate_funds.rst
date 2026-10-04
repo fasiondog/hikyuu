@@ -59,7 +59,7 @@ Common parameters (portfolio-level)
 .. note::
 
    The master parameters ``adjust_running_sys`` / ``auto_adjust_weight`` / ``ignore_zero_weight`` / ``reserve_percent``
-   have **no dedicated switches** in v5: the semantics of ``auto_adjust_weight`` are carried directly by the "**no normalization**" behavior of ``AF_FixedWeight`` /
+   have **no dedicated switches** in the current implementation: the semantics of ``auto_adjust_weight`` are carried directly by the "**no normalization**" behavior of ``AF_FixedWeight`` /
    ``AF_FixedWeightList``; the remaining parameters have no counterparts and must be handled by the user.
 
 
@@ -97,7 +97,7 @@ Built-in Asset Allocation Algorithms
     .. note::
 
        The old master implementation asserts ``amount > 500`` and stops once the remaining cash drops below ``0.6 x amount``;
-       the v5 implementation requires ``fixed-amount >= 0`` and rebalances by the net amount, so the **boundary behavior differs**.
+       the current implementation requires ``fixed-amount >= 0`` and rebalances by the net amount, so the **boundary behavior differs**.
 
     :param float amount: the maximum trade amount
     :return: the fund allocation algorithm instance (``AFPtr``)
@@ -158,7 +158,7 @@ Migration mapping:
     :header-rows: 1
 
     * - master
-      - v5
+      - The current implementation
     * - ``class MyAF(AllocateFundsBase)``
       - ``class MyAF(AllocateFundsBase)`` (the class of the same name is retained, with unchanged semantics)
     * - ``_allocateWeight(date, se_list)``
@@ -181,7 +181,7 @@ Asset Allocation Algorithm Base Class
     .. py:attribute:: name  Name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
-    .. py:attribute:: mode  The allocation mode: ``"A"`` (signal aggregation + unified parent-account ordering) or ``"B"`` (quota allocation + next-period quota write-back)
+    .. py:attribute:: mode  The allocation mode: ``"A"`` Signal Aggregation (the default; the parent orders uniformly) or ``"B"`` Fund Allocation (on the rebalancing day the selected sub-systems are calibrated to their quota before being driven, and the parent mirrors their real instructions)
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 

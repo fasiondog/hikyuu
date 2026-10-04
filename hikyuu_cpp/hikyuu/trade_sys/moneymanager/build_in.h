@@ -18,7 +18,6 @@
 #include "crt/MM_FixedCountTps.h"
 #include "crt/MM_FixedUnits.h"
 #include "crt/MM_WilliamsFixedRisk.h"
-// v5: the portfolio-level fund allocation (L1/L2/L3) has been migrated to AllocateFundsBase (AF), MM only keeps the single-system form,
-//      see docs/design/pf_af_compat/design.md §5.2
+// The portfolio-level fund allocation (L1/L2/L3) lives in AllocateFundsBase (AF); MM keeps the single-system form only
 
 #endif /* MONEYMANAGER_BUILD_IN_H_ */

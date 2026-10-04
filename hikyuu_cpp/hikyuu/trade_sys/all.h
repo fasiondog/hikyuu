@@ -21,7 +21,7 @@
 #include "selector/build_in.h"
 #include "multifactor/build_in.h"
 
-// v5: the PF/AF compatibility layer (factory pass-through, see docs/design/pf_af_compat/design.md)
+// The PF/AF compatibility layer (the factory passes through to the MultiSystem preset configurations)
 #include "allocatefunds/build_in.h"
 #include "portfolio/build_in.h"
 

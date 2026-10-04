@@ -1,7 +1,7 @@
 /*
  * build_in.h
  *
- *  v5: AF independent class hierarchy (AllocateFundsBase), see docs/design/pf_af_compat/design.md §5
+ *  AF has an independent class hierarchy (AllocateFundsBase)
  *  Created on: 2018-2-1
  *      Author: fasiondog
  */
