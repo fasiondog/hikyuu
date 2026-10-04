@@ -11,7 +11,7 @@ target("hikyuu")
         if is_plat("macosx") then
             set_policy("build.sanitizer.address", true)
         elseif is_plat("linux") then
-            -- 需要 export LD_PRELOAD=libasan.so
+            -- requires export LD_PRELOAD=libasan.so
             set_policy("build.sanitizer.address", true)
             set_policy("build.sanitizer.leak", true)
             -- set_policy("build.sanitizer.memory", true)
@@ -92,7 +92,7 @@ target("hikyuu")
     end
 
     if is_plat("macosx") then
-        -- macosx下boost序列化需要
+        -- required by the boost serialization on macOS
         if is_kind("shared") then 
             add_defines("HKU_API=__attribute__((visibility(\"default\")))")
             add_defines("HKU_UTILS_API=__attribute__((visibility(\"default\")))")
@@ -119,7 +119,7 @@ target("hikyuu")
     add_files("./trade_manage/**.cpp", {unity_group="trade_manage"})
     
     add_files("./trade_sys/**.cpp|allocatefunds/**.cpp|portfolio/**.cpp|condition/**.cpp|system/**.cpp")
-    -- v5：PF/AF 兼容层工厂（工厂直通，见 docs/design/pf_af_compat/design.md §4 / §5）
+    -- PF/AF preset configurations (the factories pass through to the aggregate system)
     add_files("./trade_sys/allocatefunds/**.cpp", {unity_group="allocatefunds"})
     add_files("./trade_sys/portfolio/**.cpp", {unity_group="portfolio"})
     add_files("./trade_sys/condition/*.cpp", "./trade_sys/condition/imp/logic/*.cpp", {unity_group="condition"})
@@ -129,8 +129,9 @@ target("hikyuu")
     add_files("./trade_sys/system/**.cpp", {unity_group="system"})
     add_files("./trade_sys/moneymanager/**.cpp", {unity_group="moneymanager"})
     add_files("./trade_sys/multifactor/*.cpp|StyleRegression.cpp", "./trade_sys/multifactor/imp/*.cpp", {unity_group="multifactor"})
-    -- StyleRegression.cpp 单独编译：包含 Eigen 头，避免 unity build 拼接后
-    -- Eigen 内联实现泄漏给同组其他源码（编译变慢 + 潜在 ODR 风险）
+    -- StyleRegression.cpp is compiled separately: it includes the Eigen headers, otherwise the
+    -- unity build would leak the Eigen inline implementations into the other sources of the
+    -- group (slower compilation + potential ODR risk)
     add_files("./trade_sys/multifactor/StyleRegression.cpp", {unity_group = false})
     add_files("./trade_sys/multifactor/filter/*.cpp", {unity_group="multifactor_filter"})
     add_files("./trade_sys/multifactor/normalize/*.cpp", {unity_group="multifactor_norm"})
@@ -181,7 +182,8 @@ target("hikyuu")
     before_build(function(target)
         import("lib.detect.find_library")
         if is_plat("linux") then
-            -- boost.mysql 依赖的 charconv 会自动检测包含__float128
+            -- the charconv used by boost.mysql auto-detects the __float128 support
+            -- (it needs the quadmath library when it is present)
             local quadmath = find_library("quadmath*",{
                 "/usr/lib",
                 "/usr/lib64",
