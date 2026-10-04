@@ -4,15 +4,36 @@
  *  Created on: 2024-09-13
  *      Author: fasiondog
  *
- *  Recursive combination refactoring: the aggregate trading system (portfolio backtesting)
- *  It holds multiple sub-systems (single-security or nested aggregate), drives and aggregates the
- * orders at the open/close stages respectively. Dual modes (A/B) + arbitrary nesting + MM L1/L2/L3
- * + rebalancing cycle + hierarchy path. Mode A (the default): the parent gives the sub-systems a
- * "shadow account", the parent allocates and orders by weight uniformly (functionally equivalent to
- * the PF signal aggregation).
+ *  The aggregate trading system (portfolio backtesting).
+ *
+ *  It holds multiple sub-systems (single-security systems or nested aggregates) and drives them
+ *  on the open/close stages of a fully aligned time axis, then places the orders on the single
+ *  real account of the top layer. It supports arbitrary nesting (with circular reference
+ *  detection) and a rebalancing cycle, and carries the portfolio-level fund allocation (AF,
+ *  see AllocateFundsBase for the L1/L2/L3 layers).
+ *
+ *  Running modes (the mode is held by the AF, set via setMode / the AF factories):
+ *
+ *  - **Mode A "Signal Aggregation" (the default)**: every sub-system gets a shadow account
+ *    funded with `m_sub_init_cash` as a pure signal source. On the rebalancing day the shadow
+ *    signal cash is reset, so every sub-system keeps submitting its position intent; the parent
+ *    converts the suggestions into the executable quantity by the L2 target conversion
+ *    (weight x position ratio x the parent total assets) and orders uniformly on its own account.
+ *    The shadow bookkeeping never touches the real funds.
+ *
+ *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
+ *    calibrated to its quota on the rebalancing day BEFORE it is driven (recycle the shadow cash,
+ *    clear the unselected, reduce the over-quota part, inject the gap), so the sub-system trades
+ *    with the exact allocated quota; the parent mirrors the real instructions of the sub-systems
+ *    (L2 pass-through) on its own account. The shadow accounts start from zero and follow the
+ *    cost function of the parent account, keeping in step with the parent trades.
+ *
+ *  See the doc comments of AllocateFundsBase for the precise L1/L2/L3 semantics and
+ *  PF_Simple / PF_WithoutAF for the preset configurations of the two modes.
  */
 
 #pragma once
+#include <map>
 #include <set>
 #include <unordered_map>
 #include "../System.h"
@@ -119,22 +140,26 @@ public:
         return m_af;
     }
 
-    /** Set the running mode: A (signal aggregation, the default) / B (fund allocation / FOF-MOM).
-     *  In mode B the parent produces the real quota through L1 and writes it back to every
-     * sub-system on the rebalancing day.
-     *  @note The mode is held by AF (the only source), this method writes it directly into the
-     * current AF. */
+    /** Set the running mode (the mode is held by the AF, the only source):
+     *  - "A" **Signal Aggregation** (the default): the sub-systems are pure signal sources on
+     *    their shadow accounts, the parent converts the suggestions by the L2 target conversion
+     *    and orders uniformly on its own account;
+     *  - "B" **Fund Allocation** (quota allocation, FOF/MOM style): every selected sub-system is
+     *    calibrated to the quota allocated by L1 on the rebalancing day and trades with the exact
+     *    quota, the parent mirrors its real instructions (L2 pass-through).
+     *  See the class comment and AllocateFundsBase for the full semantics. */
     void setMode(const string& mode) {
         if (m_af) {
             m_af->setMode(mode);
         }
     }
 
-    /** Get the running mode (from AF) */
+    /** Get the running mode: "A" Signal Aggregation / "B" Fund Allocation (from the AF) */
     const string& getMode() const;
 
-    /** Set the initial fund of the sub-system shadow account (a fixed value in mode A / the initial
-     * quota in mode B) */
+    /** Set the signal cash of the sub-system shadow account, reset on every rebalancing day in
+     * mode A (Signal Aggregation). In mode B (Fund Allocation) the shadow accounts start from
+     * zero and the quota comes from the L1 allocation, so this value is unused. */
     void setSubInitCash(price_t cash) {
         m_sub_init_cash = cash > 0.0 ? cash : m_sub_init_cash;
     }
@@ -205,7 +230,7 @@ public:
         return tryGetParam<string>("axis-mode", "kdata");
     }
 
-    /** Set the rebalancing mode (taking over the master PF adjust_mode, see design.md §4.3):
+    /** Set the rebalancing mode (aligned with the master PF adjust_mode):
      *  - "query" / "day" (the default): continue the "every N close days" counting judgment of
      * m_adjust_cycle;
      *  - "week" / "month" / "quarter" / "year": expand the rebalancing day table by "the
@@ -241,7 +266,7 @@ public:
      *  @param delay_to_trading_day when true it is postponed to the first trading day within the
      * current cycle; when false it only hits when it is exactly the N-th day
      *  @return the ascending deduplicated rebalancing day list
-     *  @note Aligned with the master Portfolio::_calculateAdjustDate* behavior (see design.md §4.3)
+     *  @note Aligned with the master Portfolio::_calculateAdjustDate* behavior 
      */
     static DatetimeList calcAdjustDates(const DatetimeList& dates, const string& mode,
                                         int adjust_cycle, bool delay_to_trading_day);
@@ -303,7 +328,8 @@ private:
     string m_path;                // The hierarchy path, e.g. I/D/A
     size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment
     price_t m_sub_init_cash{
-      100000.0};  // The initial fund of the sub-system shadow account (mode A)
+      100000.0};  // The signal cash of the sub-system shadow account (mode A, reset on every
+                  // rebalancing day; unused in mode B)
     int m_adjust_cycle{
       1};  // The rebalancing cycle (days); <=1 means rebalancing on every close day
     bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
@@ -326,6 +352,11 @@ private:
     Datetime m_open_trades_date;  // The trading day to which m_open_trades/m_sub_funds_before
                                   // belong; the close stage uses it to prevent out-of-bounds and
                                   // cross-day residue (runtime state, not serialized)
+    Datetime m_signal_reset_date;  // The last day when the mode A (Signal Aggregation) signal
+                                   // cash reset ran; it
+                                   // prevents multiple resets within the same trading day (the
+                                   // close stage may be driven several times a day) (runtime
+                                   // state, not serialized)
     TradeSuggestionList m_pending_suggestions;  // The suggestions accumulated on the
                                                 // non-rebalancing days (runtime, not serialized)
     TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at
@@ -342,6 +373,9 @@ private:
     std::set<Datetime>
       m_auto_adjust_dates;  // The rebalancing day table auto-expanded by adjust-mode (runtime
                             // state, not serialized, does not override the external injection)
+    std::map<Datetime, Datetime>
+      m_cycle_ends;  // The rebalancing-day -> cycle-end (the next rebalancing day) mapping, used by
+                     // the cycle-type signal driving (runtime state, rebuilt with each run)
 
     /** Run by the specified driving axis: when axis is empty the date sequence of the input KData
      * is used as the axis, otherwise axis is the driving axis (when driven by the fixed time axis,
@@ -357,8 +391,7 @@ private:
      * delay-to-trading-day) */
     void _initAxisParam() {
         setParam<string>("axis-mode", "kdata");
-        // v5: take over the master PF adjust_mode / delay_to_trading_day (see
-        // docs/design/pf_af_compat/design.md §4.3)
+        // Aligned with the master PF adjust_mode / delay_to_trading_day
         setParam<string>("adjust-mode", "query");
         setParam<bool>("delay-to-trading-day", true);
     }
@@ -379,10 +412,45 @@ private:
      * auto-expanded table, and finally the close-day counting of m_adjust_cycle */
     bool _isAdjustDate(const Datetime& date) const;
 
-    /** v5: internalize adjust-mode ∈ {week,month,quarter,year} into the rebalancing day table
-     * (design.md §4.3). It takes effect only when the external setAdjustDates() is not injected
+    /** Internalize adjust-mode ∈ {week,month,quarter,year} into the rebalancing day table.
+     * It takes effect only when the external setAdjustDates() is not injected
      * (m_adjust_dates is empty), the result is written into m_auto_adjust_dates. */
     void _expandAdjustDates(const DatetimeList& axis);
+
+    /** master compatibility: build the rebalancing-day -> cycle-end (the next rebalancing day)
+     * mapping on the driving axis, used to drive the cycle-type signals (e.g. SG_Cycle) of the
+     * sub-systems on the rebalancing day */
+    void _buildCycleEnds(const DatetimeList& axis);
+
+    /** Get the cycle end (the next rebalancing day) of the given rebalancing day; when the day is
+     * not in the mapping, fall back to the next day */
+    Datetime _getNextCycleEnd(const Datetime& date) const;
+
+    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): reduce the over quota position of the
+     * sub-system (the sub book sells on its own and the parent sells the same quantity
+     * immediately, the executed records are appended to out_executed). It runs in the reduction
+     * phase before the injection phase, so the freed cash is available to the whole portfolio. */
+    void _reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& date, price_t quota,
+                                 KQuery::KType ktype, TradeRecordList& out_executed);
+
+    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): inject the cash gap when the sub-system is
+     * below the quota (limited by the free cash of the parent pool). It runs in the injection
+     * phase after the reduction phase. */
+    void _injectSubSystemGap(const SystemPtr& sys, const Datetime& date, price_t quota,
+                             KQuery::KType ktype);
+
+    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): clear the sub-system shadow account (force
+     * selling its holdings and recycling the cash); the parent account holding is cleared by the
+     * CLEAR suggestion submitted by the caller */
+    void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
+
+    /** Mode A (Signal Aggregation): reset the sub-system shadow account on the rebalancing day
+     * (force selling its holdings, recycling the cash and injecting the initial signal cash
+     * again). The shadow account is a pure signal source: without the reset it runs out of cash
+     * after its first position and can never submit a new buy signal, which leaves the parent
+     * cash idle and makes the re-entered stocks impossible to buy back. */
+    void _resetSubSystemSignalCash(const SystemPtr& sys, const Datetime& date,
+                                   KQuery::KType ktype);
 
     /** Execute the converted suggestions on the parent real account (sell first then buy) */
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
@@ -424,15 +492,15 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);
         ar& BOOST_SERIALIZATION_NVP(m_sell_at_not_selected);
         if (version < 1) {
-            // v5 compatibility: this position was m_mode in the old archives (the running mode has
-            // been migrated to AllocateFundsBase), it is written back into AF after being read.
+            // Old archives stored the running mode here (it has been migrated to
+            // AllocateFundsBase); write it back into the AF after being read.
             string legacy_mode = "A";
             ar& boost::serialization::make_nvp("m_mode", legacy_mode);
             if (m_af) {
                 m_af->setMode(legacy_mode);
             }
         } else {
-            // v5: the fund allocation instance (including L1/L2/L3 and the running mode) is
+            // The fund allocation instance (including L1/L2/L3 and the running mode) is
             // serialized together with the aggregate system
             ar& BOOST_SERIALIZATION_NVP(m_af);
         }
@@ -445,9 +513,9 @@ typedef shared_ptr<MultiSystem> MultiSystemPtr;
 
 /**
  * master compatibility alias: in master PF_Simple / PF_WithoutAF return PortfolioPtr.
- * In feature/next PF is a concrete implementation of MultiSystem (see
- * docs/design/pf_af_compat/design.md §4.5), this alias is kept so that the existing `PortfolioPtr
- * pf = PF_Simple(...)` keeps compiling (the Portfolio class methods are no longer supported).
+ * Here PF is a preset configuration of MultiSystem, this alias is kept so that the existing
+ * `PortfolioPtr pf = PF_Simple(...)` keeps compiling (the Portfolio class methods are no longer
+ * supported).
  * @ingroup Portfolio
  */
 using PortfolioPtr = MultiSystemPtr;

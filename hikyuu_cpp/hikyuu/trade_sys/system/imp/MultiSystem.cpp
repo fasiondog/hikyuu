@@ -82,7 +82,13 @@ void MultiSystem::readyForRun() {
         // The shadow account is created only once: re-creating it would wipe the sub-account
         // state of the reset=false live replay (the pending delayed requests, the mode B quota)
         if (!m_shadow_sys.count(sys.get())) {
-            TMPtr sub_tm = crtTM(m_tm->initDatetime(), m_sub_init_cash, TC_Zero(), "TM_SUB");
+            // Mode B (master SimplePortfolio compatibility): the sub-account starts from zero and
+            // is injected with the exact quota on every rebalancing day (the cost function follows
+            // the parent account, so the shadow book keeps in step with the parent trades).
+            // Mode A (signal aggregation): the fixed shadow cash (pure signal source).
+            price_t init_cash = (getMode() == "B") ? 0.0 : m_sub_init_cash;
+            TMPtr sub_tm =
+              crtTM(m_tm->initDatetime(), init_cash, m_tm->costFunc(), "TM_SUB");
             sys->setTM(sub_tm);
             m_shadow_sys.insert(sys.get());
         }
@@ -90,8 +96,17 @@ void MultiSystem::readyForRun() {
         // The hierarchy path is written recursively
         sys->setPath(m_path + "/" + sys->name());
         if (sys->getTO().empty()) {
-            HKU_WARN("Subsystem {} has no trading object (setTO), it will run with no trades!",
-                     sys->name());
+            // master compatibility: when the sub-system has no trading object but its instrument is
+            // set, build the TO with the query of this run (SimplePortfolio did the same for the
+            // real systems cloned from the proto systems)
+            Stock stk = sys->getStock();
+            if (!stk.isNull() && !m_kdata.empty()) {
+                sys->setTO(stk.getKData(m_kdata.getQuery()));
+            } else {
+                HKU_WARN(
+                  "Subsystem {} has no trading object (setTO), it will run with no trades!",
+                  sys->name());
+            }
         } else {
             // The reset clears the internal state of the SG and other components, so the TO must
             // be reset to trigger the components to recalculate with the current TO (when
@@ -119,6 +134,7 @@ void MultiSystem::_reset() {
     m_pending_suggestions.clear();
     m_open_pending_suggestions.clear();
     m_kdata_cache.clear();
+    m_signal_reset_date = Null<Datetime>();
 }
 
 void MultiSystem::_forceResetAll() {
@@ -137,6 +153,7 @@ void MultiSystem::_forceResetAll() {
     m_pending_suggestions.clear();
     m_open_pending_suggestions.clear();
     m_kdata_cache.clear();
+    m_signal_reset_date = Null<Datetime>();
 }
 
 SystemPtr MultiSystem::_clone() {
@@ -223,6 +240,163 @@ void MultiSystem::_expandAdjustDates(const DatetimeList& axis) {
     if (getParam<bool>("trace")) {
         HKU_INFO("[{}] adjust-mode={} expand adjust dates: {} (axis={})", name(), mode,
                  m_auto_adjust_dates.size(), axis.size());
+    }
+}
+
+void MultiSystem::_buildCycleEnds(const DatetimeList& axis) {
+    m_cycle_ends.clear();
+    HKU_IF_RETURN(axis.empty(), void());
+
+    // The rebalancing-day sequence: the explicit (setAdjustDates) or auto-expanded
+    // (adjust-mode) table intersected with the axis takes precedence; otherwise fall back to the
+    // close-day counting of m_adjust_cycle (consistent with _isAdjustDate)
+    DatetimeList adjust_dates;
+    const std::set<Datetime>* table =
+      !m_adjust_dates.empty()
+        ? &m_adjust_dates
+        : (!m_auto_adjust_dates.empty() ? &m_auto_adjust_dates : nullptr);
+    if (table) {
+        for (const auto& d : axis) {
+            if (table->find(d.startOfDay()) != table->end()) {
+                adjust_dates.emplace_back(d);
+            }
+        }
+    } else {
+        const int cycle = m_adjust_cycle > 0 ? m_adjust_cycle : 1;
+        for (size_t i = 0; i < axis.size(); i += cycle) {
+            adjust_dates.emplace_back(axis[i]);
+        }
+    }
+
+    // The cycle end of a rebalancing day is the next rebalancing day; the last one runs to the end
+    // of the axis (aligned with master Portfolio::m_cycle_end_dates)
+    const size_t total = adjust_dates.size();
+    for (size_t i = 0; i < total; ++i) {
+        m_cycle_ends[adjust_dates[i].startOfDay()] =
+          i + 1 < total ? adjust_dates[i + 1] : axis.back() + Minutes(1);
+    }
+}
+
+Datetime MultiSystem::_getNextCycleEnd(const Datetime& date) const {
+    auto iter = m_cycle_ends.find(date.startOfDay());
+    return iter != m_cycle_ends.end() ? iter->second : date + Days(1);
+}
+
+void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& date,
+                                          price_t quota, KQuery::KType ktype,
+                                          TradeRecordList& out_executed) {
+    TMPtr sub_tm = sys->getTM();
+    HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
+
+    // The sub cash has been recycled before, so the sub total here is the holding market value
+    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    price_t sub_total = funds.total_assets() - funds.cash;
+    if (sub_total <= quota || quota <= 0.0) {
+        return;
+    }
+
+    // Above the quota: reduce the position by the over quota market value (the master algorithm)
+    price_t need_back_funds = sub_total - quota;
+    Stock stock = sys->getStock();
+    if (stock.isNull()) {
+        return;
+    }
+    price_t last_close_price = stock.getMarketValue(date, ktype);
+    if (last_close_price <= 0.0) {
+        return;  // The security is invalid (e.g. delisted), nothing to do
+    }
+    double min_num = stock.minTradeNumber();
+    if (min_num <= 0.0) {
+        return;
+    }
+    PositionRecord position = sub_tm->getPosition(date, stock);
+    double hold_num = position.number;
+    if (hold_num <= 0.0) {
+        return;
+    }
+    double need_back_num =
+      static_cast<double>(static_cast<int64_t>(need_back_funds / last_close_price / min_num))
+      * min_num;
+    if (hold_num - need_back_num < min_num) {
+        need_back_num = hold_num;
+    }
+    if (need_back_num <= 0.0) {
+        return;
+    }
+
+    price_t close_price = _getClosePrice(date, stock);
+    if (close_price <= 0.0) {
+        return;
+    }
+
+    // The sub-system sells on its own book, and the parent sells the same quantity immediately
+    // (the master AF executed the reduction inside the sub account and recorded it in the total
+    // account), so the freed cash is already in the parent pool when the injection phase runs
+    TradeRecord tr = sys->sellForceOnClose(date, need_back_num, PART_PORTFOLIO);
+    if (!tr.isNull()) {
+        FundsRecord f2 = sub_tm->getFunds(date, ktype);
+        if (f2.cash > 0.0) {
+            sub_tm->checkout(date, f2.cash);
+        }
+    }
+    TradeRecord parent_tr =
+      m_tm->sell(date, stock, close_price, need_back_num, 0.0, 0.0, close_price, PART_PORTFOLIO,
+                 "MultiSystem");
+    if (!parent_tr.isNull()) {
+        out_executed.push_back(parent_tr);
+    }
+}
+
+void MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& date, price_t quota,
+                                      KQuery::KType ktype) {
+    TMPtr sub_tm = sys->getTM();
+    HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
+
+    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    price_t sub_total = funds.total_assets() - funds.cash;
+    if (sub_total >= quota || quota <= 0.0) {
+        return;
+    }
+
+    // Below the quota: inject the cash gap (limited by the free cash of the parent pool)
+    price_t diff = quota - sub_total;
+    price_t parent_cash = m_tm->getFunds(date, ktype).cash;
+    if (diff > parent_cash) {
+        diff = parent_cash;
+    }
+    if (diff > 0.0) {
+        sub_tm->checkin(date, diff);
+    }
+}
+
+void MultiSystem::_clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype) {
+    TMPtr sub_tm = sys->getTM();
+    HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
+
+    Stock stock = sys->getStock();
+    if (!stock.isNull()) {
+        PositionRecord position = sub_tm->getPosition(date, stock);
+        if (position.number > 0.0 && _getClosePrice(date, stock) > 0.0) {
+            sys->sellForceOnClose(date, MAX_DOUBLE, PART_PORTFOLIO);
+        }
+    }
+    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    if (funds.cash > 0.0) {
+        sub_tm->checkout(date, funds.cash);
+    }
+}
+
+void MultiSystem::_resetSubSystemSignalCash(const SystemPtr& sys, const Datetime& date,
+                                            KQuery::KType ktype) {
+    TMPtr sub_tm = sys->getTM();
+    HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
+
+    // Clear the shadow holding and the cash (bookkeeping only: the parent account position is
+    // managed by the L2 target conversion, the shadow is a pure signal source), then inject the
+    // initial signal cash again, so the sub-system can submit a fresh position intent
+    _clearSubSystem(sys, date, ktype);
+    if (m_sub_init_cash > 0.0) {
+        sub_tm->checkin(date, m_sub_init_cash);
     }
 }
 
@@ -321,7 +495,7 @@ Stock MultiSystem::_findStock(const SystemPtr& sys) {
 
 void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
     // master compatibility overload: equivalent to Portfolio::run(query), it uses the market
-    // trading calendar as the driving axis (see design.md §4.5)
+    // trading calendar as the driving axis
     auto& sm = StockManager::instance();
 
     // Consistent with master: when ktype is not the daily line, it is only allowed when adjust-mode
@@ -356,6 +530,13 @@ void MultiSystem::run(const KQuery& query, bool reset, bool resetAll) {
 
 void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool reset,
                            bool resetAll) {
+    // master compatibility: when no sub-system was explicitly added, adopt the proto systems held
+    // by the SE (addStock has already cloned the proto per instrument and set its stock)
+    if (m_sys_list.empty() && m_se) {
+        for (const auto& proto : m_se->getProtoSystemList()) {
+            add(proto);
+        }
+    }
     HKU_WARN_IF_RETURN(m_sys_list.empty(), void(), "No subsystem specified!");
     m_kdata = kdata;
     // The KData cache is rebuilt with each run
@@ -389,11 +570,15 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
         tm_last_datetime = tm_last_datetime.startOfDay();
     }
 
-    // v5: adjust-mode internalization -- when it is not query/day, expand the rebalancing day table
-    // on the "driving axis" (design.md §4.3). The expansion only depends on the driving axis
+    // adjust-mode internalization -- when it is not query/day, expand the rebalancing day table
+    // on the "driving axis". The expansion only depends on the driving axis
     // itself, decoupled from the driving loop; the external setAdjustDates() injection takes
     // precedence.
     _expandAdjustDates(axis ? *axis : m_kdata.getDatetimeList());
+
+    // master compatibility: build the rebalancing-day -> cycle-end mapping (the next rebalancing
+    // day), used to drive the cycle-type signals of the sub-systems on the rebalancing day
+    _buildCycleEnds(axis ? *axis : m_kdata.getDatetimeList());
 
     if (axis) {
         // Driven by the fixed time axis: the dates on the axis may not exist in the input KData
@@ -726,12 +911,13 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     }
 
     bool is_adjust = _isAdjustDate(datetime);
+    TradeRecordList executed;  // The parent executed trades (incl. the immediate calibration sells)
 
     // The SE stock selection on the rebalancing day: only collect the suggestions of the selected
     // sub-systems; the unselected ones are liquidated by sell_at_not_selected. The SE filtering is
     // not enabled on the non-rebalancing days (every sub-system runs normally).
     std::set<System*> selected;
-    std::unordered_map<System*, double> se_scores;  // v5: the SE scores, used by AF_MultiFactor
+    std::unordered_map<System*, double> se_scores;  // The SE scores, used by AF_MultiFactor
                                                     // etc. to take the scores as the weights
     if (m_se && is_adjust) {
         SystemWeightList sws = m_se->getSelected(datetime);
@@ -743,12 +929,100 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         }
     }
 
+    // Mode B (master SimplePortfolio compatibility): on the rebalancing day the quota must be
+    // allocated BEFORE driving the sub-systems, so every selected sub-system trades with its exact
+    // allocated quota (the master AF adjusted the funds first and ran the systems afterwards)
+    bool quota_calibrated = false;
+    AllocateFundsBase::Weights af_weights;
+    std::unordered_map<System*, price_t> quota_map;
+    if (is_adjust && getMode() == "B" && m_se && getAF()) {
+        SubSystemContextList quota_ctxs;
+        for (size_t i = 0; i < m_sys_list.size(); ++i) {
+            SystemPtr& sys = m_sys_list[i];
+            if (selected.count(sys.get()) == 0) {
+                continue;
+            }
+            SubSystemContext ctx;
+            ctx.sys = sys;
+            if (sys->getTM()) {
+                ctx.funds = sys->getTM()->getFunds(datetime, ktype);
+            }
+            quota_ctxs.push_back(ctx);
+        }
+        if (!quota_ctxs.empty()) {
+            af_weights = m_af->allocateQuota(datetime, m_tm, quota_ctxs, m_kdata.getQuery());
+            for (auto& ctx : quota_ctxs) {
+                quota_map[ctx.sys.get()] = ctx.quota;
+            }
+            quota_calibrated = true;
+        }
+    }
+
+    // Mode B (master SimplePortfolio compatibility): the calibration runs in the master order --
+    // recycle the cash -> liquidate the unselected -> reduce the over quota -> inject the gap, so
+    // the freed cash is already in the parent pool when the following injection runs
+    if (quota_calibrated) {
+        for (size_t i = 0; i < m_sys_list.size(); ++i) {
+            SystemPtr& sys = m_sys_list[i];
+            if (selected.count(sys.get()) == 0) {
+                // The unselected: the parent liquidates its holding immediately (the master AF
+                // force sold inside the sub account and recorded it in the total account)
+                if (m_sell_at_not_selected && !sys->getStock().isNull() &&
+                    m_tm->have(sys->getStock())) {
+                    price_t price = _getClosePrice(datetime, sys->getStock());
+                    if (price > 0.0) {
+                        TradeRecord tr = m_tm->sell(
+                          datetime, sys->getStock(), price,
+                          m_tm->getPosition(datetime, sys->getStock()).number, 0.0, 0.0, price,
+                          PART_PORTFOLIO, "MultiSystem");
+                        if (!tr.isNull()) {
+                            executed.push_back(tr);
+                        }
+                    }
+                }
+                _clearSubSystem(sys, datetime, ktype);
+            } else {
+                // The selected: recycle the sub cash first (bookkeeping)
+                TMPtr sub_tm = sys->getTM();
+                if (sub_tm) {
+                    FundsRecord funds = sub_tm->getFunds(datetime, ktype);
+                    if (funds.cash > 0.0) {
+                        sub_tm->checkout(datetime, funds.cash);
+                    }
+                }
+            }
+        }
+        // The reduction of all the over quota sub-systems runs before the injection (the master
+        // AF order), so the freed cash is available to the injection phase
+        for (size_t i = 0; i < m_sys_list.size(); ++i) {
+            SystemPtr& sys = m_sys_list[i];
+            if (selected.count(sys.get()) == 0) {
+                continue;
+            }
+            auto qit = quota_map.find(sys.get());
+            if (qit != quota_map.end()) {
+                _reduceSubSystemToQuota(sys, datetime, qit->second, ktype, executed);
+            }
+        }
+        for (size_t i = 0; i < m_sys_list.size(); ++i) {
+            SystemPtr& sys = m_sys_list[i];
+            if (selected.count(sys.get()) == 0) {
+                continue;
+            }
+            auto qit = quota_map.find(sys.get());
+            if (qit != quota_map.end()) {
+                _injectSubSystemGap(sys, datetime, qit->second, ktype);
+            }
+        }
+    }
+
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         SystemPtr sys = m_sys_list[i];
         if (m_se && is_adjust && selected.count(sys.get()) == 0) {
-            // The unselected sub-system: if the parent holds a position on its instrument, generate
-            // a liquidation suggestion
-            if (m_sell_at_not_selected && !sys->getStock().isNull() &&
+            // The unselected sub-system: it has been liquidated (executed immediately) when the
+            // quota was calibrated; in the legacy flow (no SE / mode A) the liquidation suggestion
+            // is generated here
+            if (!quota_calibrated && m_sell_at_not_selected && !sys->getStock().isNull() &&
                 m_tm->have(sys->getStock())) {
                 TradeSuggestion s;
                 s.stock = sys->getStock();
@@ -758,9 +1032,39 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 s.number = m_tm->getPosition(datetime, s.stock).number;
                 suggestions.push_back(s);
             }
+            // Mode B (master compatibility): clear the sub-system shadow account as well (the
+            // master AF liquidated the sub account and recycled all its funds)
+            if (getMode() == "B" && !quota_calibrated) {
+                _clearSubSystem(sys, datetime, ktype);
+            }
             continue;
         }
 
+        // Mode A (signal aggregation): reset the shadow signal cash on the rebalancing day (once
+        // a day), so every sub-system can submit a fresh position intent -- the shadow is a pure
+        // signal source and would run out of cash after its first position otherwise, leaving the
+        // parent cash idle and the re-entered stocks impossible to buy back
+        if (is_adjust && getMode() != "B"
+            && (m_signal_reset_date.isNull() || datetime > m_signal_reset_date)) {
+            bool reset_this = m_se ? (selected.count(sys.get()) > 0) : true;
+            if (reset_this) {
+                _resetSubSystemSignalCash(sys, datetime, ktype);
+                if (i < m_sub_funds_before.size() && sys->getTM()) {
+                    m_sub_funds_before[i] = sys->getTM()->getFunds(datetime, ktype);
+                }
+                m_signal_reset_date = datetime;
+            }
+        }
+
+        // master compatibility: on the rebalancing day, drive the cycle-type signals (e.g.
+        // SG_Cycle, which emits its buy signal only at the start of a cycle) before running the
+        // selected sub-system, as SimplePortfolio did for every running system
+        if (is_adjust) {
+            auto sg = sys->getSG();
+            if (sg) {
+                sg->startCycle(datetime, _getNextCycleEnd(datetime));
+            }
+        }
         MomentResult sub = sys->runMomentOnClose(datetime);
         // The sub-system decision may be reflected in the open trade (the delayed buy) or the close
         // trade (the immediate buy/sell), it is merged and translated into the parent suggestion
@@ -777,7 +1081,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         SubSystemContext ctx;
         ctx.sys = sys;
         ctx.funds = sys->getTM()->getFunds(datetime, ktype);
-        // v5: backfill the SE score (0 on the non-rebalancing days / for the unselected ones), used
+        // Backfill the SE score (0 on the non-rebalancing days / for the unselected ones), used
         // by AF_MultiFactor etc. to take the scores as the weights
         auto score_it = se_scores.find(sys.get());
         if (score_it != se_scores.end()) {
@@ -788,13 +1092,12 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
 
     m_close_day_index++;
 
-    TradeRecordList executed;
     if (!is_adjust) {
         // Non-rebalancing day: accumulate the suggestions to the next rebalancing day
         m_pending_suggestions.insert(m_pending_suggestions.end(), suggestions.begin(),
                                      suggestions.end());
         m_last_suggestions = suggestions;
-        return executed;
+        return TradeRecordList();
     }
 
     // Rebalancing day: merge the pending suggestions; the unselected sub-systems' ones are
@@ -812,37 +1115,51 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     m_pending_suggestions.clear();
 
     if (getMode() == "B") {
-        // Mode B: even without a trade suggestion, run L1 to produce the next-period quota (the
-        // quota allocation is independent of the suggestions), L2 passes through the real
-        // instruction of the sub-system; the next-period quota is written back on the
-        // rebalancing day (lagging one period behind, quota penetration).
-        getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
-        // The selected but zero-quota sub-systems are handled as the unselected ones
-        if (m_sell_at_not_selected) {
-            for (auto& ctx : contexts) {
-                if (ctx.quota <= 0.0 && !ctx.sys->getStock().isNull() &&
-                    m_tm->have(ctx.sys->getStock())) {
-                    TradeSuggestion s;
-                    s.stock = ctx.sys->getStock();
-                    s.sys = ctx.sys;
-                    s.type = SuggestionType::CLEAR;
-                    s.plan_price = _getClosePrice(datetime, s.stock);
-                    s.number = m_tm->getPosition(datetime, s.stock).number;
-                    suggestions.push_back(s);
+        if (quota_calibrated) {
+            // The quota has been calibrated into the sub-system shadow accounts before driving
+            // (the master order: adjust the funds first, run the systems afterwards). Here only
+            // the L2 pass-through and the L3 risk control remain, then the parent orders uniformly.
+            getAF()->allocateTargets(datetime, m_tm, suggestions, af_weights, m_kdata.getQuery());
+            if (!suggestions.empty()) {
+                if (m_trade_on_close) {
+                    _executeSuggestions(datetime, suggestions, ktype, executed);
+                } else {
+                    // trade_on_close=false: convert first, execute uniformly at the next open
+                    m_open_pending_suggestions = suggestions;
                 }
             }
-        }
-        if (!suggestions.empty()) {
-            if (m_trade_on_close) {
-                _executeSuggestions(datetime, suggestions, ktype, executed);
-            } else {
-                // trade_on_close=false: convert first, execute uniformly at the next open
-                m_open_pending_suggestions = suggestions;
+        } else {
+            // No SE (or no quota pre-calculation): keep the suggestion-driven legacy flow, L1 runs
+            // here and the next-period quota is written back on the rebalancing day (lagging one
+            // period behind, quota penetration).
+            getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery());
+            // The selected but zero-quota sub-systems are handled as the unselected ones
+            if (m_sell_at_not_selected) {
+                for (auto& ctx : contexts) {
+                    if (ctx.quota <= 0.0 && !ctx.sys->getStock().isNull() &&
+                        m_tm->have(ctx.sys->getStock())) {
+                        TradeSuggestion s;
+                        s.stock = ctx.sys->getStock();
+                        s.sys = ctx.sys;
+                        s.type = SuggestionType::CLEAR;
+                        s.plan_price = _getClosePrice(datetime, s.stock);
+                        s.number = m_tm->getPosition(datetime, s.stock).number;
+                        suggestions.push_back(s);
+                    }
+                }
             }
-        }
-        for (auto& ctx : contexts) {
-            if (ctx.quota > 0.0) {
-                setSubSystemQuota(ctx.sys, datetime, ctx.quota);
+            if (!suggestions.empty()) {
+                if (m_trade_on_close) {
+                    _executeSuggestions(datetime, suggestions, ktype, executed);
+                } else {
+                    // trade_on_close=false: convert first, execute uniformly at the next open
+                    m_open_pending_suggestions = suggestions;
+                }
+            }
+            for (auto& ctx : contexts) {
+                if (ctx.quota > 0.0) {
+                    setSubSystemQuota(ctx.sys, datetime, ctx.quota);
+                }
             }
         }
     } else if (!suggestions.empty()) {
@@ -969,10 +1286,17 @@ void MultiSystem::setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date,
     if (diff > 0.0) {
         sub_tm->checkin(date, diff);
     } else if (diff < 0.0) {
-        HKU_WARN_IF_RETURN(!sub_tm->checkout(date, -diff), void(),
-                           "Quota reduction {} exceeds sub cash, subsystem must reduce position "
-                           "itself! {}",
-                           -diff, sub_sys->name());
+        // The quota reduction needs free cash; when the sub-system is fully invested it cannot
+        // return the cash itself (it would have to reduce the position on its own). Keep the
+        // current quota (lags one period) and log at info level to avoid flooding the log with the
+        // inner TradeManager checkout errors on every rebalancing day.
+        if (funds.cash < -diff) {
+            HKU_INFO("Quota reduction {:.2f} exceeds sub cash({:.2f}), subsystem {} must reduce "
+                     "position itself, quota remains!",
+                     -diff, funds.cash, sub_sys->name());
+            return;
+        }
+        sub_tm->checkout(date, -diff);
     }
 }
 

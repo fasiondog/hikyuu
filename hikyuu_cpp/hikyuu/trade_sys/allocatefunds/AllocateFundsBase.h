@@ -8,12 +8,29 @@
  *
  *  AF is composed of three replaceable algorithm parts, each of them corresponds to one virtual
  *  function (L1/L2/L3):
- *   - L1 `_allocate`  sub-system context -> weight (mode A nominal weight / mode B real quota)
- *   - L2 `_toTargets` weight -> the executable quantity of the parent account (the folding point
- *      from the sub-system space to the individual instrument space)
- *   - L3 `_checkRisk` portfolio risk control clipping (concentration, etc.)
  *
- *  The overall entry is `allocate()`, it is always executed in the L1 -> L2 -> L3 order.
+ *  - **L1 system-level allocation** `_allocate`: decide "how much each sub-system may manage".
+ *    Input is the sub-system context list, output is the weight table; in mode B (Fund
+ *    Allocation) it also writes the real cash quota into `contexts[i].quota` (weight x the parent
+ *    total assets, or the fixed amount). Examples: AF_EqualWeight (1/N), AF_FixedWeight,
+ *    AF_MultiFactor (weighted by the SE score).
+ *
+ *  - **L2 behavior-level conversion** `_toTargets`: convert the sub-system suggestions into the
+ *    executable quantity of the parent account (the folding point from the sub-system space to
+ *    the individual instrument space). In mode A (Signal Aggregation) the target position market
+ *    value = weight x position ratio x the parent total assets, aggregated per instrument and
+ *    rebalanced by the delta to the current position; in mode B the real instruction of the
+ *    sub-system passes through unchanged.
+ *
+ *  - **L3 portfolio risk control** `_checkRisk`: clip the suggestions at the portfolio
+ *    dimension (e.g. the single instrument concentration cap `max-single-position`); mode B
+ *    respects the sub-manager autonomy and skips the clipping.
+ *
+ *  The overall entry is `allocate()` = L1 -> L2 -> L3. When the quota is needed before driving
+ *  the sub-systems (the mode B calibration), use `allocateQuota()` (L1 only) and
+ *  `allocateTargets()` (L2 -> L3) separately.
+ *  The mode is held here (`setMode`): "A" Signal Aggregation / "B" Fund Allocation, see the
+ *  MultiSystem class comment for the two modes.
  *  The single-security form uses MoneyManagerBase (MM); the two no longer share the class
  *  hierarchy, the parameter family or the allocation mode.
  *  Created on: 2018-1-30
@@ -49,9 +66,10 @@ using AFPtr = AllocateFundsPtr;
 
 /**
  * Base class of the portfolio-level fund allocation (AF). It contains three replaceable algorithm
- * parts L1/L2/L3.
+ * parts: L1 system-level allocation / L2 behavior-level conversion / L3 portfolio risk control
+ * (see the file comment for the details).
  * @note It is used by the aggregate form (MultiSystem) only; the single-security form never calls
- *       this class.
+ *       this class. The running mode is held here: "A" Signal Aggregation / "B" Fund Allocation.
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
@@ -131,6 +149,24 @@ public:
      */
     void allocate(const Datetime& date, const TradeManagerPtr& tm, TradeSuggestionList& suggestions,
                   SubSystemContextList& contexts, const KQuery& query);
+
+    /**
+     * L1 only: calculate the weights and (in mode B) write the real quota into contexts[i].quota,
+     * without converting any suggestion. It is used by the aggregate System when the quota is
+     * needed **before** driving the sub-systems (the mode B quota-first calibration).
+     * @return the L1 weight table (the input of allocateTargets)
+     */
+    Weights allocateQuota(const Datetime& date, const TradeManagerPtr& tm,
+                          SubSystemContextList& contexts, const KQuery& query);
+
+    /**
+     * L2 + L3 only: convert the suggestions into the executable quantity of the parent account and
+     * perform the portfolio risk control. It is used together with allocateQuota by the aggregate
+     * System when the suggestions are collected after the quota calibration.
+     */
+    void allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
+                         TradeSuggestionList& suggestions, const Weights& sys_weight,
+                         const KQuery& query);
 
     /** L1 system-level allocation: mode A returns the nominal weight (suggested weight), mode B
      *  returns the real quota (written into contexts[i].quota).

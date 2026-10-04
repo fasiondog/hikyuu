@@ -35,6 +35,7 @@
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include "create_test_sys.h"
@@ -717,7 +718,7 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
 }
 
 // ============================================================================
-// v5: adjust-mode internalization (rebalancing date expansion) and the PF/AF compatible factories
+// adjust-mode internalization (rebalancing date expansion) and the PF/AF preset factories
 // ============================================================================
 
 /** @par Check point: the adjust-mode parameter (default value, case normalization, invalid
@@ -976,7 +977,7 @@ TEST_CASE("test_PF_AF_compat_aliases") {
      * `PortfolioPtr pf = PF_Simple(...)` still compiles */
     static_assert(std::is_same_v<PortfolioPtr, MultiSystemPtr>,
                   "PortfolioPtr must alias MultiSystemPtr");
-    /** @arg AFPtr and AllocateFundsPtr are the same type (v5: AF is now independent of MM) */
+    /** @arg AFPtr and AllocateFundsPtr are the same type (AF is independent of MM) */
     static_assert(std::is_same_v<AFPtr, AllocateFundsPtr>, "AFPtr must alias AllocateFundsPtr");
 
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
@@ -1212,6 +1213,143 @@ TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     CHECK(suggestions2[0].type == SuggestionType::BUY);
     CHECK_EQ(suggestions2[0].number, doctest::Approx(0.0));
     CHECK_EQ(suggestions2[1].number, doctest::Approx(0.0));
+}
+
+/** @par Check point: master compatibility (the hub/legacy style) -- no sub-system added explicitly:
+ * the PF adopts the SE proto systems on run, builds the sub-system TO with the run query
+ * automatically, and drives the cycle-type signals (SG_Cycle) on the rebalancing days */
+TEST_CASE("test_MultiSystem_master_pf_compat") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto build_proto = []() {
+        auto proto =
+          SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        // SG_Cycle emits its buy signal only via startCycle on the rebalancing day (the master
+        // Portfolio driving); buy_delay=false keeps the trade on the same close
+        proto->setParam<bool>("buy_delay", false);
+        return proto;
+    };
+
+    /** @arg adjust_cycle=1: adopt the protos, auto-build the TOs, and trade on every day */
+    auto se = SE_Fixed();
+    se->addStockList({stk1, stk2}, build_proto());
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto pf = PF_Simple(tm, se, AF_EqualWeight(), 1, "query", true);
+    REQUIRE_EQ(pf->getSystemList().size(), 0);
+    pf->run(query);
+    REQUIRE_EQ(pf->getSystemList().size(), 2);
+    CHECK_UNARY(!pf->getSystemList()[0]->getTO().empty());
+    CHECK_UNARY(!pf->getSystemList()[1]->getTO().empty());
+    CHECK_GE(pf->getTM()->getTradeList().size(), 2);  // one BUY per instrument
+
+    /** @arg adjust_cycle=10: SG_Cycle must be driven only on the rebalancing day, so each
+     * instrument is bought exactly once (the subsequent days hold without re-buying) */
+    auto se2 = SE_Fixed();
+    se2->addStockList({stk1, stk2}, build_proto());
+    auto tm2 = crtTM(Datetime(200001010000LL), 100000.0);
+    auto pf2 = PF_Simple(tm2, se2, AF_EqualWeight(), 10, "query", true);
+    pf2->run(query);
+    size_t buy_count = 0;
+    for (const auto& tr : tm2->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            buy_count++;
+        }
+    }
+    CHECK_EQ(buy_count, 2);
+}
+
+/** @par Check point: the sub-system TO is built automatically from its instrument with the run
+ * query when it was not set */
+TEST_CASE("test_MultiSystem_auto_set_sub_to") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto ms = std::make_shared<MultiSystem>("ms");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    auto sys = create_alway_buy_sys();
+    sys->setStock(stk);  // the instrument is set, the trading object (TO) is NOT set
+    ms->add(sys);
+
+    ms->run(stk.getKData(query));
+    CHECK_EQ(sys->getTO().getQuery(), query);
+    CHECK_GE(ms->getTM()->getTradeList().size(), 2);
+}
+
+/** @par Check point: mode B with an SE (the hub/legacy style) -- the quota is calibrated into the
+ * sub shadow accounts before driving them (recycle the cash, reduce the over quota part, inject
+ * the gap), so the sub books keep in step with the parent account and the portfolio runs fully
+ * invested (the master SimplePortfolio behavior) */
+TEST_CASE("test_MultiSystem_mode_b_quota_calibration") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se = SE_Fixed();
+    se->addStockList({stk1, stk2}, create_alway_buy_sys());
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto pf = PF_Simple(tm, se, AF_EqualWeight(), 1, "query", true);
+    pf->run(query);
+    auto subs = pf->getSystemList();
+    REQUIRE_EQ(subs.size(), 2);
+
+    Datetime last_date(20000224);
+    auto pf_funds = tm->getFunds(last_date, query.kType());
+    REQUIRE_GT(pf_funds.total_assets(), 0.0);
+
+    // The sum of the sub shadow accounts keeps in step with the parent account (the calibration
+    // aligns every sub to its quota; only the round-lot dust may differ)
+    price_t sub_sum = 0.0;
+    for (auto& sub : subs) {
+        auto sub_tm = sub->getTM();
+        REQUIRE(sub_tm != nullptr);
+        sub_sum += sub_tm->getFunds(last_date, query.kType()).total_assets();
+    }
+    CHECK_LT(std::abs(sub_sum - pf_funds.total_assets()), 1500.0);
+
+    // The portfolio runs (nearly) fully invested: the idle cash stays a small part of the total
+    // assets (the sub cash is recycled on every rebalancing day)
+    CHECK_LT(pf_funds.cash, pf_funds.total_assets() * 0.1);
+}
+
+/** @par Check point: mode A (signal aggregation) -- the sub shadow signal cash is reset on every
+ * rebalancing day, so the sub-systems can keep submitting buy intents after their first position
+ * (before the fix the shadow ran out of cash and the portfolio stopped rebalancing) */
+TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se = SE_Fixed();
+    se->addStockList({stk1, stk2}, create_alway_buy_sys());
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto pf = PF_WithoutAF(tm, se, 1, "query", true);  // mode A
+    REQUIRE_EQ(pf->getMode(), "A");
+    pf->run(query);
+    auto subs = pf->getSystemList();
+    REQUIRE_EQ(subs.size(), 2);
+
+    // The shadow is reset to the initial signal cash on every rebalancing day and the sub-system
+    // rebuilds its position intent with it, so the sub book total assets stay around the init
+    // cash (without the reset the shadow would only hold the first position worth of assets)
+    Datetime last_date(20000224);
+    for (auto& sub : subs) {
+        price_t sub_total = sub->getTM()->getFunds(last_date, query.kType()).total_assets();
+        CHECK_GT(sub_total, 90000.0);
+    }
+
+    // The portfolio runs (nearly) fully invested instead of leaving the parent cash idle
+    auto pf_funds = tm->getFunds(last_date, query.kType());
+    REQUIRE_GT(pf_funds.total_assets(), 0.0);
+    CHECK_LT(pf_funds.cash, pf_funds.total_assets() * 0.1);
 }
 
 /** @} */

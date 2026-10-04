@@ -5,7 +5,7 @@
  *
  *  Implementation of the portfolio-level fund allocation (AF) base class. The default
  *  implementations of the three algorithm parts L1/L2/L3 are migrated from the portfolio-level
- *  implementation of MoneyManagerBase (see docs/design/pf_af_compat/design.md §5).
+ *  implementation of MoneyManagerBase.
  *  Created on: 2018-1-30
  *      Author: fasiondog
  */
@@ -85,8 +85,21 @@ AFPtr AllocateFundsBase::clone() {
 void AllocateFundsBase::allocate(const Datetime& date, const TradeManagerPtr& tm,
                                  TradeSuggestionList& suggestions, SubSystemContextList& contexts,
                                  const KQuery& query) {
-    auto weights = _allocate(date, tm, contexts, query);
-    _toTargets(date, tm, suggestions, weights, query);
+    auto weights = allocateQuota(date, tm, contexts, query);
+    allocateTargets(date, tm, suggestions, weights, query);
+}
+
+AllocateFundsBase::Weights AllocateFundsBase::allocateQuota(const Datetime& date,
+                                                            const TradeManagerPtr& tm,
+                                                            SubSystemContextList& contexts,
+                                                            const KQuery& query) {
+    return _allocate(date, tm, contexts, query);
+}
+
+void AllocateFundsBase::allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
+                                        TradeSuggestionList& suggestions, const Weights& sys_weight,
+                                        const KQuery& query) {
+    _toTargets(date, tm, suggestions, sys_weight, query);
     _checkRisk(date, tm, suggestions, query);
 }
 
