@@ -392,10 +392,30 @@ void AsioHttpClient::_parseUrl() noexcept {
     // The port of the Host header is left out when it is the default of the protocol
     const uint16_t default_port = port;
     std::string authority = m_url.substr(pos + 3);
-    pos = authority.find('/');
+    // The authority ends at the first '/', '?' or '#' (RFC 3986): a query or a fragment may
+    // follow without a path, and neither of them may leak into the host or the port
+    pos = authority.find_first_of("/?#");
     if (pos != std::string::npos) {
         base_path = authority.substr(pos);
         authority.resize(pos);
+        // A fragment is never sent to the server (RFC 9110), so it is dropped from the target
+        const size_t fragment = base_path.find('#');
+        if (fragment != std::string::npos) {
+            base_path.resize(fragment);
+        }
+        // A query without a path still yields an origin-form target starting with '/'
+        if (!base_path.empty() && base_path.front() == '?') {
+            base_path.insert(base_path.begin(), '/');
+        }
+    }
+
+    // The userinfo ("user:password@") precedes the host: strip everything up to the last '@' of
+    // the authority, whose host part cannot carry an '@' itself (RFC 3986). Without this a URL
+    // like http://trusted.com@evil.com/ would yield a host no other parser sees, breaking the
+    // whitelist decisions made on it
+    pos = authority.rfind('@');
+    if (pos != std::string::npos) {
+        authority = authority.substr(pos + 1);
     }
 
     // An IPv6 literal carries its own colons, so it is written inside brackets and the port
@@ -541,10 +561,8 @@ std::string AsioHttpClient::_buildURI(const std::string& path, const HttpParams&
             }
         }
 
-        // Handle the trailing /
-        if (!path.empty() && path.back() == '/') {
-            uri_stream << '/';
-        }
+        // The loop above already keeps every '/' of the path, a trailing one included: an
+        // extra one here would double it (get("/") used to send "//")
     }
 
     // Add the query parameters

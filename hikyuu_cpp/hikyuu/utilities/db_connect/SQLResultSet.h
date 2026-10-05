@@ -24,6 +24,11 @@ class SQLResultSetIterator;
  * @tparam TableT data structure
  * @tparam page_size the number of the data contained in every page
  * @ingroup DBConnect
+ *
+ * @note Not thread safe: a result set is designed to be used in a single thread (or a single
+ *       coroutine). Its internal page cache is filled on demand without any synchronization,
+ *       so sharing one instance across threads would race; give every thread its own instance
+ *       instead (the underlying connection may still be shared, the drivers serialize it)
  */
 template <class TableT, size_t page_size = 100>
 class SQLResultSet {

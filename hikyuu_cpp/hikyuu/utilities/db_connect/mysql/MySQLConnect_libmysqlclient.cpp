@@ -82,8 +82,11 @@ void MySQLConnect::connect() {
         mysql_options(m_impl->mysql, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &opt_true);
 #endif
 
+        // Multi-statements are not enabled on purpose: the library only generates single
+        // statements, and disabling them limits the damage of an SQL injection via the raw
+        // string-where APIs (no stacked statements can be executed)
         SQL_CHECK(mysql_real_connect(m_impl->mysql, host.c_str(), usr.c_str(), pwd.c_str(),
-                                     database.c_str(), port, NULL, CLIENT_MULTI_STATEMENTS) != NULL,
+                                     database.c_str(), port, NULL, 0) != NULL,
                   mysql_errno(m_impl->mysql), "Failed to connect to database! {}",
                   mysql_error(m_impl->mysql));
         SQL_CHECK(mysql_set_character_set(m_impl->mysql, "utf8") == 0, mysql_errno(m_impl->mysql),
@@ -138,12 +141,12 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
     }
 
     int ret = mysql_real_query(m_impl->mysql, sql_string.c_str(), sql_string.size());
-    if (ret) {
-        // Try to reconnect
+    if (ret && detail::isConnectionLostError(static_cast<int>(mysql_errno(m_impl->mysql))) &&
+        detail::isReadOnlySql(sql_string)) {
+        // Only read-only statements are replayed after a lost connection: a failed write may
+        // already have been committed server-side and replaying it would apply it twice
         if (ping()) {
             ret = mysql_real_query(m_impl->mysql, sql_string.c_str(), sql_string.size());
-        } else {
-            SQL_THROW(ret, "SQL error: {}! error msg: {}", sql_string, mysql_error(m_impl->mysql));
         }
     }
 

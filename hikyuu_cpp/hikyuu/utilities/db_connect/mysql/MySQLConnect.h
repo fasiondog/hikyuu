@@ -15,8 +15,38 @@
 #include "MySQLStatement.h"
 
 #include <memory>
+#include <cctype>
 
 namespace hku {
+
+namespace detail {
+
+/**
+ * Whether the SQL statement is read-only (SELECT/SHOW/DESC/DESCRIBE/EXPLAIN), i.e. safe to
+ * replay after a reconnection. A write statement that fails with a lost connection may already
+ * have been committed server-side, so replaying it would apply the write twice.
+ */
+inline bool isReadOnlySql(const std::string &sql) {
+    size_t pos = sql.find_first_not_of(" \t\r\n(");
+    if (pos == std::string::npos) {
+        return false;
+    }
+    std::string word;
+    while (pos < sql.size() && std::isalpha(static_cast<unsigned char>(sql[pos]))) {
+        word += static_cast<char>(std::toupper(static_cast<unsigned char>(sql[pos])));
+        ++pos;
+    }
+    return word == "SELECT" || word == "SHOW" || word == "DESC" || word == "DESCRIBE" ||
+           word == "EXPLAIN";
+}
+
+/** Whether the MySQL error code indicates a lost connection
+ * (CR_SERVER_GONE_ERROR/CR_SERVER_LOST) */
+inline bool isConnectionLostError(int errcode) {
+    return errcode == 2006 || errcode == 2013;
+}
+
+}  // namespace detail
 
 class HKU_UTILS_API MySQLConnect : public DBConnectBase {
 public:

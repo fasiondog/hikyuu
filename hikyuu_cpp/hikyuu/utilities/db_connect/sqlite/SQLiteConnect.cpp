@@ -86,7 +86,11 @@ bool SQLiteConnect::ping() {
 
 void SQLiteConnect::close() {
     if (m_db) {
-        sqlite3_close(m_db);
+        // sqlite3_close refuses to release the connection (SQLITE_BUSY) when statements are
+        // still outstanding, which would leak it since m_db is dropped right after. close_v2
+        // turns the handle into a harmless zombie that is freed automatically when the last
+        // outstanding statement is finalized
+        sqlite3_close_v2(m_db);
         m_db = nullptr;
     }
 }
@@ -189,7 +193,7 @@ bool SQLiteConnect::backup(const char *zFilename, int n_page, int step_sleep) no
         rc = sqlite3_errcode(pFile);
     }
 
-    sqlite3_close(pFile);
+    sqlite3_close_v2(pFile);
     return rc == SQLITE_OK;
 }
 

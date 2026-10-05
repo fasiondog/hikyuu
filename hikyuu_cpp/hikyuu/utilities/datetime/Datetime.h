@@ -235,12 +235,15 @@ public:
     /** The number of the microseconds elapsed since the minimum date */
     uint64_t ticks() const noexcept;
 
-    /** Timestamp, the number of the microseconds since 1970-01-01 00:00:00 */
-    uint64_t timestamp() const noexcept;
+    /** Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00. A date
+     *  before 1970 yields a negative value instead of wrapping around; the Null Datetime maps
+     *  to Null<int64_t>() */
+    int64_t timestamp() const noexcept;
 
-    /** Timestamp, the number of the microseconds since 1970-01-01 00:00:00, with the local UTC
-     *  offset deducted */
-    uint64_t timestampUTC() const noexcept;
+    /** Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00, with the
+     *  local UTC offset deducted. A date before 1970 yields a negative value instead of
+     *  wrapping around; the Null Datetime maps to Null<int64_t>() */
+    int64_t timestampUTC() const noexcept;
 
     /**
      * Convert to a string for the reading and printing, the format is:
@@ -490,7 +493,7 @@ inline std::chrono::local_time<Duration> Datetime::to_local_time() const {
     if (isNull()) {
         return std::chrono::local_time<Duration>::max();
     }
-    auto timestamp_us = static_cast<int64_t>(timestamp());
+    auto timestamp_us = timestamp();
     auto target_duration =
       std::chrono::duration_cast<Duration>(std::chrono::microseconds(timestamp_us));
     return std::chrono::local_time<Duration>(target_duration);

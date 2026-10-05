@@ -10,6 +10,7 @@
 #include "hikyuu/utilities/config.h"
 #include "MySQLConnect.h"
 
+#include <atomic>
 #include <memory>
 #include <boost/mysql.hpp>
 #include <boost/asio.hpp>
@@ -31,10 +32,19 @@ static void printDiagHelper(const boost::mysql::error_code& ec,
 
 // The Pimpl implementation struct
 struct MySQLConnect::Impl {
+    // Per-connection-generation state shared with the statement deleters, so a statement is not
+    // closed on a connection that has been destroyed by a reconnect
+    struct StatementCloseState {
+        boost::mysql::tcp_connection* conn{nullptr};
+        std::atomic_bool alive{true};
+    };
+
     boost::asio::io_context io_context;
     std::unique_ptr<boost::mysql::tcp_connection> conn;
     std::unique_ptr<LruCache<std::string, std::shared_ptr<boost::mysql::statement>>>
       statement_cache;
+    // Recreated for every new connection; the deleters hold the state of their own generation
+    std::shared_ptr<StatementCloseState> close_state;
 
     std::shared_ptr<boost::mysql::statement> get_statement(const std::string& sql,
                                                            boost::mysql::error_code& ec,
@@ -44,13 +54,14 @@ struct MySQLConnect::Impl {
             return ret;
         }
 
-        // Create the statement and prepare the lambda for the closing
-        auto* connection_ptr = conn.get();
-        auto deleter = [connection_ptr](boost::mysql::statement* stmt) {
-            if (stmt && connection_ptr) {
-                connection_ptr->close_statement(*stmt);
-                // Ignore the error at the closing, because the connection may have been lost
-                // already
+        // The deleter closes the statement only while its connection generation is alive
+        auto state = close_state;
+        auto deleter = [state](boost::mysql::statement* stmt) {
+            if (stmt && state->alive.load(std::memory_order_acquire)) {
+                boost::mysql::error_code close_ec;
+                boost::mysql::diagnostics close_diag;
+                state->conn->close_statement(*stmt, close_ec, close_diag);
+                // Ignore the closing error, as the connection may already have been lost
             }
             delete stmt;
         };
@@ -107,6 +118,11 @@ void MySQLConnect::connect() {
         unsigned short port = static_cast<unsigned short>(tryGetParam<int>("port", 3306));
 
         m_impl->conn = std::make_unique<boost::mysql::tcp_connection>(m_impl->io_context);
+
+        // A new connection generation starts
+        m_impl->close_state = std::make_shared<Impl::StatementCloseState>();
+        m_impl->close_state->conn = m_impl->conn.get();
+
         boost::mysql::handshake_params params(usr, pwd, database);
 
         boost::mysql::error_code ec;
@@ -140,7 +156,11 @@ void MySQLConnect::connect() {
 
 void MySQLConnect::close() {
     if (m_impl && m_impl->conn) {
+        // Close the cached statements while the connection is still alive, then mark this
+        // generation dead before destroying the connection
         m_impl->statement_cache->clear();
+        m_impl->close_state->alive.store(false, std::memory_order_release);
+
         m_impl->conn->close();
         m_impl->conn.reset();
     }
@@ -184,8 +204,10 @@ int64_t MySQLConnect::exec(const std::string& sql_string) {
     m_impl->conn->execute(sql_string, results, ec, diag);
 
     if (ec) [[unlikely]] {
-        // The execution failed, try to reconnect and execute again
-        if (ping()) {
+        // Only read-only statements are replayed after a lost connection: a failed write may
+        // already have been committed server-side and replaying it would apply it twice
+        if (detail::isConnectionLostError(ec.value()) && detail::isReadOnlySql(sql_string) &&
+            ping()) {
             m_impl->conn->execute(sql_string, results, ec, diag);
         }
 

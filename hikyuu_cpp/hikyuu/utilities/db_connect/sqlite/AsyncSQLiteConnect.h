@@ -15,6 +15,7 @@
 #include "../../thread/ThreadPool.h"
 
 #include <memory>
+#include <mutex>
 
 namespace hku {
 
@@ -79,14 +80,17 @@ private:
     // The method provided to AsyncSQLiteStatement to access the thread pool executor
     ThreadPool::ExecutorWrapper getThreadPoolExecutor() const noexcept;
 
+    // The mutex serializing every sqlite3 C API call on the shared handle: the connection is
+    // opened with NOMUTEX and the statement layer touches the handle from the user threads
+    // (prepare/bind/getColumn/finalize) while the step operations run on the pool thread
+    std::mutex &getDBMutex() const noexcept;
+
     // Internal helper methods - the asynchronous version
     net::awaitable<void> connect();
 
     // Internal helper methods - the synchronous version (used to ensure the connection has been
     // initialized when the Statement is constructed)
     void _connect();
-
-    void close();
 
 private:
     struct Impl;
