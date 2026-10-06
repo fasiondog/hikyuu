@@ -42,6 +42,13 @@ Functions
     :rtype: pandas.DataFrame
 
 
+.. py:function:: initLogger(not_use_color=False, filename="")
+
+    Initialize the log output
+
+    :param bool not_use_color: whether to disable the colored output
+    :param str filename: the log file name; when empty, it defaults to ./hikyuu.log in the current directory, and the directory must exist and be writable
+
 .. py:function:: get_log_level()
 
     Get the current log printing level
