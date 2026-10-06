@@ -3,7 +3,7 @@
 from hikyuu.core import (
     System, SystemPart, ConditionBase, EnvironmentBase, MoneyManagerBase,
     AllocateFundsBase, ProfitGoalBase, SelectorBase, SignalBase, SlippageBase, StoplossBase,
-    MultiFactorBase, ScoresFilterBase, NormalizeBase
+    MultiFactorBase, ScoresFilterBase, NormalizeBase, MultiSystem
 )
 
 
@@ -43,6 +43,9 @@ System.MONEYMANAGER = System.Part.MONEYMANAGER
 System.PROFITGOAL = System.Part.PROFITGOAL
 System.SLIPPAGE = System.Part.SLIPPAGE
 System.INVALID = System.Part.INVALID
+
+# Backward compatibility: the old Portfolio component was merged into MultiSystem
+Portfolio = MultiSystem
 
 
 # ------------------------------------------------------------------
