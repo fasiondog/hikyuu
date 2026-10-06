@@ -28,11 +28,19 @@
  *    (L2 pass-through) on its own account. The shadow accounts start from zero and follow the
  *    cost function of the parent account, keeping in step with the parent trades.
  *
- *  See the doc comments of AllocateFundsBase for the precise L1/L2/L3 semantics and
- *  PF_Simple / PF_WithoutAF for the preset configurations of the two modes.
+ *  - **Mode C "Shared Account Compatibility" (the legacy Portfolio behavior)**: no shadow account
+ *    is created, every sub-system trades DIRECTLY on the single real account of the parent
+ *    (`shared_tm`) and is sized by its own MM. The parent only gates the entry with the SE and
+ * keeps the running set driven day by day, so that the sell signal of a sub-system is realized on
+ * the very day it occurs; no L2 conversion is done and the parent does not place the order again.
+ * It exists to reproduce the results of the Portfolio before the refactoring.
+ *
+ *  See the doc comments of AllocateFundsBase for the precise L1/L2/L3 semantics and PF_Simple /
+ *  PF_WithoutAF for the preset configurations of the modes.
  */
 
 #pragma once
+#include <list>
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -154,8 +162,27 @@ public:
         }
     }
 
-    /** Get the running mode: "A" Signal Aggregation / "B" Fund Allocation (from the AF) */
+    /** Get the running mode: "A" Signal Aggregation / "B" Fund Allocation / "C" Shared Account
+     *  Compatibility (from the AF) */
     const string& getMode() const;
+
+    /** Mode C only: the running pool, i.e. the sub-systems admitted by the SE on the last
+     *  rebalancing day. A sub-system leaves the pool as soon as it is no longer selected (no matter
+     *  whether it still holds), which is the legacy rule of the Portfolio without AF. Runtime
+     *  state: kept across bars, cleared by reset / forceResetAll, NOT rebuilt by readyForRun.
+     *  Exposed for the tests and the debugging only. */
+    const std::set<System*>& getRunningSet() const {
+        return m_running_set;
+    }
+
+    /** Mode C only: the force-sell pool, i.e. the sub-systems that left the running pool while
+     *  still holding (the legacy m_force_sell_sys_list). They are driven again only on the
+     *  non-rebalancing days and only when sell_at_not_selected is on, and they leave the pool once
+     *  the holding is gone. With sell_at_not_selected off their position stays unfollowed (the
+     *  legacy semantics, see the design 9.3). */
+    const SystemList& getForceSellList() const {
+        return m_force_sell_list;
+    }
 
     /** Set the signal cash of the sub-system shadow account, reset on every rebalancing day in
      * mode A (Signal Aggregation). In mode B (Fund Allocation) the shadow accounts start from
@@ -362,6 +389,14 @@ private:
                                                      // the next open when trade_on_close=false
     std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
                                      // (runtime, not serialized)
+    // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides
+    // who gets the shared cash first (the cash competition order of the legacy Portfolio);
+    // m_running_set is the membership index of the very same content.
+    std::list<SystemPtr> m_running_order;
+    std::set<System*> m_running_set;
+    // Mode C: the force-sell pool (the legacy m_force_sell_sys_list). Runtime state, neither
+    // serialized nor copied by clone.
+    SystemList m_force_sell_list;
     mutable std::unordered_map<string, KData>
       m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
     DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
@@ -459,6 +494,39 @@ private:
      * and translate them into the parent suggestions, after the MM allocation the parent orders
      * uniformly; return the actual trades of the parent. Reused by runMoment / runMomentOnClose. */
     TradeRecordList _closePhase(const Datetime& datetime);
+
+    /** The common tail of the close stage: record the rebalancing-day turnover and the trace
+     *  output. Shared by the mode A/B tail and the mode C early return. */
+    void _finishClosePhase(const Datetime& datetime, const TradeSuggestionList& suggestions,
+                           const TradeRecordList& executed, bool is_adjust);
+
+    /** Mode C: the whole close stage of the shared-account mode, i.e. the dual pools of the legacy
+     *  Portfolio without AF (running pool + force-sell pool), driven in the pool order and with no
+     *  L2 conversion at all. */
+    void _closePhaseModeC(const Datetime& datetime, bool is_adjust, const SystemList& se_selected,
+                          TradeSuggestionList& suggestions, TradeRecordList& executed);
+
+    /** Mode C: drive one sub-system on the close stage; its trades ARE the trades of the real
+     *  account of the parent, so they are surfaced instead of being ordered again. */
+    void _runModeCClose(const SystemPtr& sys, const Datetime& datetime,
+                        TradeSuggestionList& suggestions, TradeRecordList& executed);
+
+    /** Mode C: add a sub-system to the running pool; true when it is a new admission. */
+    bool _addToRunning(const SystemPtr& sys);
+
+    /** Mode C: remove a sub-system from the running pool (both the order and the index). */
+    void _removeFromRunning(const SystemPtr& sys);
+
+    /** The slot of a sub-system inside m_sys_list (the open trade buffer and the before-trade fund
+     *  snapshot are addressed by it). */
+    size_t _subIndex(const SystemPtr& sys) const;
+
+    /** master compatibility: when no sub-system was added explicitly, adopt the prototype systems
+     *  held by the SE (addStock has already cloned a prototype per instrument and set its stock).
+     *  Called by both run() and readyForRun, so that a caller which only configures an SE (the
+     *  legacy Portfolio usage, and the live trading entry, which calls readyForRun before any run)
+     *  gets its sub-systems materialized. */
+    void _adoptSEProtos();
 
     /** Get the close price of the specified instrument on the specified date (used to price the
      * liquidation suggestion of the unselected sub-system); return 0 when there is no data */
