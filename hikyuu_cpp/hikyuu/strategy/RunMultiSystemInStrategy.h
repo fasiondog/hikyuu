@@ -19,6 +19,14 @@
  * bar's market price, corrects the order volume according to the current total assets, and places
  * orders through the broker.
  *
+ *  Mode C (the shared real account of the legacy Portfolio) needs no extra live path: its
+ *  sub-systems place their orders ON the parent BrokerTM itself, so those trades reach the broker
+ *  exactly like the orders of the parent do, and the dual pools of the mode (the running pool and
+ *  the force-sell pool) survive from one trading day to the next because the daily replay runs with
+ *  reset=false. The broker-snapshot revaluation described below is what the AF conversions of modes
+ *  A/B use; mode C does no conversion and places no second order, so it must not be "optimized"
+ *  into the A/B pipeline.
+ *
  *  Critical design contract (prevent misread):
  *  - BrokerTM only stores cash + position quantities at the snapshot fetch time; their MARKET VALUE
  * drifts with price as time flows. getFunds(datetime, ktype) MUST revalue the snapshot positions at
@@ -49,6 +57,9 @@ namespace hku {
  * fulfilled at the open of that day will not be collected (MultiSystem has already done the
  * out-of-bounds and cross-day residue handling internally, it will not wrongly merge the previous
  * trading day's buffer).
+ * @note Mode C only: its sub-systems share the parent account, so a live replay must keep using
+ *       reset=false, otherwise the running pool and the force-sell pool are dropped and the systems
+ *       that the SE stopped admitting would never get their one last drive.
  */
 class HKU_API RunMultiSystemInStrategy {
 public:

@@ -32,7 +32,12 @@ RunMultiSystemInStrategy::RunMultiSystemInStrategy(const std::shared_ptr<MultiSy
     auto tm = crtBrokerTM(broker, costfunc, ms->name());
     m_ms->setTM(tm);
     m_ms->setSP(SlippagePtr());  // The aggregate parent does not go through the slippage algorithm
+    // readyForRun first, THEN the trading objects: readyForRun is what materializes the
+    // sub-systems of an SE-only aggregate (it adopts the prototypes held by the SE) and creates the
+    // shadow / shared accounts, so refreshing before it would skip exactly those sub-systems and
+    // leave them without a trading object until the first scheduled run.
     m_ms->readyForRun();
+    _refreshSubKData();
 }
 
 void RunMultiSystemInStrategy::_refreshSubKData() {
@@ -46,7 +51,12 @@ void RunMultiSystemInStrategy::_refreshSubKDataRecursive(const std::shared_ptr<M
         if (sub->isComposite()) {
             _refreshSubKDataRecursive(std::dynamic_pointer_cast<MultiSystem>(sub));
         } else if (!sub->getStock().isNull()) {
-            sub->setTO(sub->getStock().getKData(m_query));
+            KData kd = sub->getStock().getKData(m_query);
+            // An empty KData (the data is not loaded yet, e.g. at construction time) must not
+            // overwrite an already valid trading object
+            if (!kd.empty()) {
+                sub->setTO(kd);
+            }
         }
     }
 }
@@ -55,8 +65,11 @@ void RunMultiSystemInStrategy::run() {
     _refreshSubKData();
     KData k = m_driver_stock.getKData(m_query);
     m_ms->getTM()->fetchAssetInfoFromBroker(m_broker);
-    // reset=false: the live daily replay must not clear the sub-system state (the pending
-    // delayed requests, the mode B quota)
+    // reset=false: the live daily replay must not clear the sub-system state (the pending delayed
+    // requests, the mode B quota, and in mode C the running pool plus the force-sell pool, which is
+    // exactly what lets a mode C sub-system keep its admission state from one trading day to the
+    // next). The trades of the mode C sub-systems land on the shared BrokerTM, so the broker orders
+    // are triggered by that account itself, no extra routing is needed here.
     m_ms->run(k, false);
 }
 
