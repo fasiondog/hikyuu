@@ -12,9 +12,37 @@
 
    自 ``feature/next`` 起，原独立的 ``Portfolio``（``SimplePortfolio`` / ``WithoutAFPortfolio``）已由
    :class:`MultiSystem` 承接：**PF 本质就是 MultiSystem 的一个预置配置**。
-   本页描述的 ``PF_Simple`` / ``PF_WithoutAF`` 是**兼容层工厂**，用于承接 master 存量调用方式，
-   其**返回值为** :class:`MultiSystem`，不再是 ``Portfolio`` 对象。
-   新项目建议直接使用 :class:`MultiSystem`（见 :doc:`../trade_sys/system`）。
+   本页描述的 ``PF_Simple`` / ``PF_WithoutAF`` / ``PF_SignalAggregate`` 是**预置工厂**，其**返回值为**
+   :class:`MultiSystem`，不再是 ``Portfolio`` 对象。新项目也可直接使用 :class:`MultiSystem`
+   （见 :doc:`../trade_sys/system`）。
+
+   组合的执行范式由 AF 承载的**运行模式**决定，三个工厂对应三种模式：
+
+   .. list-table::
+      :header-rows: 1
+
+      * - 工厂
+        - 模式
+        - 定位
+      * - ``PF_Simple``
+        - B 资金配置
+        - 配额划拨、子自主交易、父透传（FOF/MOM）
+      * - ``PF_SignalAggregate``
+        - A 信号汇总
+        - 子系统为纯信号源，父按 L2 目标换算统一下单
+      * - ``PF_WithoutAF``
+        - C 共享账户兼容
+        - 子系统直接在父真实账户上按自身 MM 交易（旧 Portfolio 行为）
+
+   每个工厂另提供按模式字母命名的薄别名 ``PF_ModeA`` / ``PF_ModeB`` / ``PF_ModeC``（同一实现、
+   参数一致、无行为差异），便于按模式检索对照。
+
+   .. warning::
+
+      ``PF_WithoutAF`` 的名字本义即"不经 AF 做整体资金分配"，对应**模式 C**（重构前 ``Portfolio``
+      的行为）。重构初期曾短暂把它映射到模式 A，现已改回模式 C：存量策略**无需任何改动**即可复现
+      重构前的回测结果。若在重构窗口内按"模式 A"语义使用过 ``PF_WithoutAF``，请改用
+      ``PF_SignalAggregate``。
 
 PF 部件说明:
 
@@ -76,12 +104,17 @@ PF 部件说明:
 
 .. py:function:: PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
 
-    创建无资金分配算法的投资组合（**返回 MultiSystem，运行于模式 A「信号汇总」（Signal Aggregation）**）。
+    创建无资金分配算法的投资组合（**返回 MultiSystem，运行于模式 C「共享账户兼容」（Shared Account
+    Compatibility）**），即重构前 ``WithoutAFPortfolio`` 的行为，用于复现重构**前**的回测结果。
 
-    模式 A 语义（信号汇总）：子系统在信号「影子账户」上作为纯信号源（信号资金每调仓日重置）；
-    父通过 AF L2 把建议换算为父账户目标持仓（目标市值 = 权重 × 仓位意图 × 父总资产，按标的聚合后
-    对当前持仓取差额再平衡），并应用 L3 组合风控（如 ``max-single-position``）。
-    未选中的子系统默认不清仓（``sell_at_not_selected=False``）。
+    模式 C 语义（共享账户）：不建影子账户，子系统**直接在父真实账户上**交易（``shared_tm``），
+    数量由其自身 MM 决定，因此多个子系统会挤占同一份现金（按入池次序竞争）；父只做 SE 准入与
+    持续驱动，**不做 L2 换算、不重复下单**；AF 在此仅作模式载体（L1 不分配额度、L3 默认关闭）。
+
+    驱动集由 SE 语义决定（SE 可自由替换）：调仓日被选中者进入运行池；**未被选中即出池**（与是否
+    持仓无关）。出池仍持仓者：``sell_at_not_selected=True`` 时父立即强平；为 ``False``（默认，对齐
+    旧引擎）时只在出池日补驱动一次，其后转入 ``force_sell`` 池——该池仅在非调仓日且
+    ``sell_at_not_selected=True`` 时才继续被驱动，故默认配置下残余持仓不再被盯盘（旧引擎既定行为）。
 
     调仓模式 adjust_mode 说明同上。
 
@@ -90,9 +123,33 @@ PF 部件说明:
     :param int adjust_cycle: 调仓周期
     :param str adjust_mode: 调仓模式 "query" | "day" | "week" | "month" | "quarter" | "year"
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
+    :param bool trade_on_close: 交易是否在收盘时进行（同时下发为子系统的 buy_delay/sell_delay 映射）
+    :param bool sys_use_self_tm: 仅为签名兼容保留（模式 C 一律共享父真实账户，**忽略并告警**）
+    :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出，默认 ``False`` 对齐旧引擎
+    :rtype: MultiSystem
+
+.. py:function:: PF_SignalAggregate([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=False, sub_init_cash=100000.0])
+
+    创建运行于**模式 A「信号汇总」（Signal Aggregation）**的投资组合（返回 MultiSystem）。
+
+    模式 A 语义（信号汇总）：子系统在信号「影子账户」上作为纯信号源（信号资金每调仓日重置）；
+    父通过 AF L2 把建议换算为父账户目标持仓（目标市值 = 权重 × 仓位意图 × 父总资产，按标的聚合后
+    对当前持仓取差额再平衡），并应用 L3 组合风控（如 ``max-single-position``）。
+    未选中的子系统默认不清仓（``sell_at_not_selected=False``）。
+
+    这是重构初期由 ``PF_WithoutAF`` 承担的预置；``PF_WithoutAF`` 已改回模式 C，模式 A 预置另立此名。
+
+    调仓模式 adjust_mode 说明同上。
+
+    :param TradeManager tm: 交易管理
+    :param SelectorBase se: 交易对象选择算法
+    :param AllocateFundsBase af: 资金分配算法（AF，承载 L1/L2/L3，默认等权，见 :doc:`allocate_funds`）
+    :param int adjust_cycle: 调仓周期
+    :param str adjust_mode: 调仓模式 "query" | "day" | "week" | "month" | "quarter" | "year"
+    :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行
-    :param bool sys_use_self_tm: 原型系统使用自身附带的 tm 进行计算（**无对应语义，忽略并告警**）
     :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出
+    :param float sub_init_cash: 子系统影子账户的信号资金（每调仓日重置）
     :rtype: MultiSystem
 
 
@@ -114,17 +171,21 @@ PF 部件说明:
         其中 ``run(query)`` 另提供兼容重载（等价 master ``Portfolio.run(query)``，以市场交易日历为驱动轴），存量 ``pf.run(query)`` 无需改写
     * - 账户层级
       - 真实 TM + 影子 TM + 子系统账户
-      - 父真实 TM + 子系统影子账户 ``TM_SUB``（模式 B 从 0 起步、跟随父账户成本函数；模式 A 以 :meth:`MultiSystem.set_sub_init_cash` 为信号资金、每调仓日重置）
+      - 父真实 TM + 子系统影子账户 ``TM_SUB``（模式 B 从 0 起步、跟随父账户成本函数；模式 A 以 :meth:`MultiSystem.set_sub_init_cash` 为信号资金、每调仓日重置）；**模式 C 例外**：不建影子账户，子系统共享父真实 TM（等价 master ``WithoutAFPortfolio`` 的 ``shared_tm``）
     * - 资金调拨
       - 调仓日 checkout / checkin
-      - 模式 B：调仓日**先校准后驱动**（回收/清仓/减持/注资与 master ``SimplePortfolio`` 同序）；模式 A：不划拨真实资金
+      - 模式 B：调仓日**先校准后驱动**（回收/清仓/减持/注资与 master ``SimplePortfolio`` 同序）；模式 A：不划拨真实资金；模式 C：无划拨、无换算，子系统直接下单
     * - 未映射参数
       - ``sys_use_self_tm`` 生效
-      - 忽略并 ``HKU_WARN``
+      - 模式 C 一律共享父真实账户，该参数不再作为分层能力，忽略并 ``HKU_WARN``（与 master 效果一致）
 
 迁移建议：
 
-- 位置传参调用 ``PF_Simple(...)`` / ``PF_WithoutAF(...)`` **无需修改**（返回类型别名可承接）。
+- 位置传参调用 ``PF_Simple(...)`` / ``PF_WithoutAF(...)`` **无需修改**（返回类型别名可承接）；
+  ``PF_WithoutAF`` 已恢复为模式 C，存量"共享账户 + 子系统自身 MM 定量"的策略可直接复现重构前结果
+  （已用 8 ETF 趋势布林带组合逐笔验证：129 买 / 62 卖与旧版本完全一致）。
+- 在重构窗口内把 ``PF_WithoutAF`` 当作"模式 A（影子信号 + 父换算）"使用的代码，请改用
+  ``PF_SignalAggregate(...)``（或别名 ``PF_ModeA``）。
 - ``pf.run(query)`` **无需修改**：:meth:`MultiSystem.run` 提供 ``query`` 兼容重载，
   以市场交易日历（``StockManager.get_trading_calendar``，默认 SH）为驱动轴，语义等价 master ``Portfolio.run(query)``。
 - 需要自定义驱动轴时，改用显式写法：
