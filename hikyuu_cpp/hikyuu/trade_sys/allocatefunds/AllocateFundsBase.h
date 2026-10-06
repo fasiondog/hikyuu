@@ -29,8 +29,8 @@
  *  The overall entry is `allocate()` = L1 -> L2 -> L3. When the quota is needed before driving
  *  the sub-systems (the mode B calibration), use `allocateQuota()` (L1 only) and
  *  `allocateTargets()` (L2 -> L3) separately.
- *  The mode is held here (`setMode`): "A" Signal Aggregation / "B" Fund Allocation, see the
- *  MultiSystem class comment for the two modes.
+ *  The mode is held here (`setMode`): "A" Signal Aggregation / "B" Fund Allocation / "C" Shared
+ *  Account Compatibility, see the MultiSystem class comment for the three modes.
  *  The single-security form uses MoneyManagerBase (MM); the two no longer share the class
  *  hierarchy, the parameter family or the allocation mode.
  *  Created on: 2018-1-30
@@ -69,7 +69,8 @@ using AFPtr = AllocateFundsPtr;
  * parts: L1 system-level allocation / L2 behavior-level conversion / L3 portfolio risk control
  * (see the file comment for the details).
  * @note It is used by the aggregate form (MultiSystem) only; the single-security form never calls
- *       this class. The running mode is held here: "A" Signal Aggregation / "B" Fund Allocation.
+ *       this class. The running mode is held here: "A" Signal Aggregation / "B" Fund Allocation
+ *       / "C" Shared Account Compatibility.
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
@@ -118,12 +119,22 @@ public:
         return m_query;
     }
 
-    /** Set the allocation mode: A (signal aggregation, the default) or B (fund allocation /
-     *  FOF-MOM).
+    /** Set the allocation mode: A (signal aggregation, the default), B (fund allocation /
+     *  FOF-MOM) or C (shared account, the legacy Portfolio compatibility).
      *  @note This field is the **only source** of the allocation mode; the aggregate system does
-     *        not keep one of its own any more. */
+     *        not keep one of its own any more.
+     *  @note In mode C the aggregate system drives the sub-systems directly on its own real
+     *        account and never calls allocate(): L1 takes no quota, L2 needs no conversion and L3
+     *        is off by default. The branches here are only a defensive pass-through for the case
+     *        of an AF being invoked in mode C. */
     void setMode(const string& mode) {
-        m_mode = (mode == "B" || mode == "b") ? "B" : "A";
+        if (mode == "B" || mode == "b") {
+            m_mode = "B";
+        } else if (mode == "C" || mode == "c") {
+            m_mode = "C";
+        } else {
+            m_mode = "A";
+        }
     }
 
     /** Get the allocation mode */
@@ -221,7 +232,9 @@ public:
 
 protected:
     string m_name;
-    string m_mode{"A"};  // The allocation mode: A=signal aggregation (the default) / B=fund allocation (FOF-MOM)
+    // The allocation mode: A=signal aggregation (default) / B=fund allocation (FOF-MOM)
+    // / C=shared account (the legacy Portfolio compatibility)
+    string m_mode{"A"};
     KQuery m_query;
     TradeManagerPtr m_tm;
     bool m_is_python_object{false};
@@ -238,7 +251,8 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_mode);
-        // m_query and m_tm are set temporarily when the system runs, they do not need to be serialized
+        // m_query and m_tm are set temporarily when the system runs, they do not need to be
+        // serialized
     }
 
     template <class Archive>
@@ -283,10 +297,10 @@ private:                                                            \
 #define ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define ALLOCATE_FUNDS_IMP(classname)                \
-public:                                              \
-    virtual AllocateFundsPtr _clone() override {     \
-        return std::make_shared<classname>();        \
+#define ALLOCATE_FUNDS_IMP(classname)            \
+public:                                          \
+    virtual AllocateFundsPtr _clone() override { \
+        return std::make_shared<classname>();    \
     }
 
 HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsBase&);

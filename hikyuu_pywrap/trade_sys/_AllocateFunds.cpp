@@ -79,14 +79,16 @@ executed by allocate() in the L1 -> L2 -> L3 order:
                   executable quantity of the parent account (the folding point from the sub-system space
                   to the individual instrument space). In mode A ("Signal Aggregation") the target
                   position market value = weight x position ratio x the parent total assets, aggregated
-                  per instrument and rebalanced by the delta against the current position; in mode B the
-                  real instruction of the sub-system passes through unchanged.
+                  per instrument and rebalanced by the delta against the current position; in mode B
+                  or mode C the real instruction of the sub-system passes through unchanged.
     - _check_risk [Optional] L3 portfolio risk control: clip the suggestions at the portfolio dimension
-                  (e.g. the single instrument concentration cap max-single-position); mode B respects
-                  the sub-manager autonomy and skips the clipping.
+                  (e.g. the single instrument concentration cap max-single-position); mode B and mode C
+                  respect the sub-strategy autonomy and skip the clipping.
 
-The running mode is held by the AF (the mode property): "A" Signal Aggregation (the default) / "B" Fund
-Allocation; see the MultiSystem class docstring for the full description of the two modes.
+The running mode is held by the AF (the mode property): "A" Signal Aggregation (the default) / "B"
+Fund Allocation / "C" Shared Account Compatibility (the legacy Portfolio behavior, the sub-systems
+trade directly on the real account of the parent); see the MultiSystem class docstring for the full
+description of the three modes.
 
 Common parameters:
 
@@ -112,7 +114,8 @@ Common parameters:
                     py::return_value_policy::copy, "Set or get the query condition")
       .def_property("mode", &AllocateFundsBase::getMode, &AllocateFundsBase::setMode,
                     py::return_value_policy::copy,
-                    "The allocation mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation")
+                    "The allocation mode: \"A\" Signal Aggregation (the default) / \"B\" Fund "
+                    "Allocation / \"C\" Shared Account Compatibility")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 

@@ -137,6 +137,8 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
         auto& ctx = contexts[i];
         double w = (i < weights.size()) ? weights[i] : eq;
         result[ctx.sys] = w;
+        // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
+        // MM working directly on the shared real account.
         if (m_mode == "B" && tm) {
             // Mode B: L1 produces the "real quota" and writes it into contexts[i].quota, the parent
             // writes it back to the sub-system on the rebalancing day (for the next period, the
@@ -196,10 +198,10 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
                                    TradeSuggestionList& suggestions, const Weights& sys_weight,
                                    const KQuery& query) {
     KQuery::KType ktype = query.kType();
-    if (m_mode == "B") {
-        // Mode B: pass through the real instruction of the sub-system (number is the order quantity
-        // of the sub-manager), the parent does not convert it. Only the SELL suggestions are
-        // defensively clipped to not exceed the current position of the parent.
+    if (m_mode == "B" || m_mode == "C") {
+        // Mode B / C: pass through the real instruction of the sub-system (number is the order
+        // quantity of the sub-manager), the parent does not convert it. Only the SELL suggestions
+        // are defensively clipped to not exceed the current position of the parent.
         for (auto& s : suggestions) {
             if (s.type == SuggestionType::SELL) {
                 double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
@@ -294,9 +296,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
 
 void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
                                    TradeSuggestionList& suggestions, const KQuery& query) {
-    // L3 portfolio risk control (enabled by default in mode A; mode B respects the autonomy of the
-    // sub-manager, only the total amount check is performed = no clipping).
-    if (m_mode == "B") {
+    // L3 portfolio risk control (enabled by default in mode A; mode B and mode C respect the
+    // autonomy of the sub-strategy, only the total amount check is performed = no clipping).
+    if (m_mode == "B" || m_mode == "C") {
         return;
     }
     // The concentration upper limit: the target position market value of a single instrument <=
