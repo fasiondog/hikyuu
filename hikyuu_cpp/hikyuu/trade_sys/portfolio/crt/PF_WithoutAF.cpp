@@ -7,7 +7,8 @@
  *      Author: fasiondog
  *
  *  The PF factory implementation -- passes through to the MultiSystem preset configuration
- *  (mode A "Signal Aggregation").
+ *  (mode C "Shared Account Compatibility", i.e. the legacy Portfolio without a fund allocation
+ *  algorithm).
  */
 
 #include "PF_WithoutAF.h"
@@ -19,9 +20,11 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust
                                     bool trade_on_close, bool sys_use_self_tm,
                                     bool sell_at_not_selected) {
     auto sys = std::make_shared<MultiSystem>("PF_WithoutAF");
-    // The preset: MultiSystem mode A "Signal Aggregation" (the signal sources + the parent uniform ordering)
+    // The preset: MultiSystem mode C "Shared Account Compatibility" (the legacy Portfolio: the
+    // sub-systems trade on the shared real account and are sized by their own MM). The AF is only
+    // the mode carrier here: L1 takes no quota, L2 needs no conversion, L3 is off by default.
     sys->setAF(AF_EqualWeight());
-    sys->setMode("A");
+    sys->setMode("C");
     sys->setTM(tm);
     sys->setSE(se);
     sys->setAdjustCycle(adjust_cycle);
@@ -30,9 +33,11 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust
     sys->setTradeOnClose(trade_on_close);
     sys->setSellAtNotSelected(sell_at_not_selected);
 
-    // sys_use_self_tm has no corresponding semantics here (the sub-systems always use the shadow account TM_SUB, shared_tm=false)
+    // Mode C always shares the real account of the parent, so the "own tm of the prototype
+    // system" branch of the legacy engine is not exposed as a per-layer capability (C-O3=A)
     HKU_WARN_IF(sys_use_self_tm,
-                "PF_WithoutAF: sys_use_self_tm is ignored (no equivalent in MultiSystem)!");
+                "PF_WithoutAF: sys_use_self_tm is ignored (mode C always shares the real account "
+                "of the parent)!");
     HKU_WARN_IF(!tm, "PF_WithoutAF: tm is null!");
     HKU_WARN_IF(!se, "PF_WithoutAF: se is null!");
     return sys;

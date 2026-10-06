@@ -11,6 +11,7 @@
 #define PORTFOLIO_BUILD_IN_H_
 
 #include "crt/PF_Simple.h"
+#include "crt/PF_SignalAggregate.h"
 #include "crt/PF_WithoutAF.h"
 
 #endif /* PORTFOLIO_BUILD_IN_H_ */

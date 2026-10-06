@@ -536,6 +536,8 @@ Running modes (held by the AF, set via set_mode or the AF factories):
 
 - Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account.
 
+- Mode C "Shared Account Compatibility" (the legacy Portfolio behavior): no shadow account is created, every sub-system trades DIRECTLY on the single real account of the top layer (shared_tm) and is sized by its own MM; the parent only gates the entry with the SE, keeps the running set driven day by day so that a sell signal is realized on the very day it occurs, and performs no L2 conversion. It exists to reproduce the results of the Portfolio before the refactoring.
+
 Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for details):
 
 - L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);
@@ -580,9 +582,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("runMomentOnClose", &MultiSystem::runMomentOnClose, py::arg("datetime"))
       .def("ready_for_run", &MultiSystem::readyForRun)
       .def("set_mode", &MultiSystem::setMode, py::arg("mode"),
-           "Set the running mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation")
+           "Set the running mode: \"A\" Signal Aggregation (the default) / \"B\" Fund Allocation "
+           "/ \"C\" Shared Account Compatibility (the legacy Portfolio behavior)")
       .def_property_readonly("mode", &MultiSystem::getMode,
-                             "The current running mode: \"A\" Signal Aggregation / \"B\" Fund Allocation")
+                             "The current running mode: \"A\" Signal Aggregation / \"B\" Fund "
+                             "Allocation / \"C\" Shared Account Compatibility")
       .def("set_sub_init_cash", &MultiSystem::setSubInitCash, py::arg("cash"),
            "Set the signal cash of the sub-system shadow account, reset on every rebalancing day "
            "in mode A. In mode B the shadow accounts start from zero and the quota comes from the "
@@ -816,14 +820,22 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
       R"(PF_WithoutAF([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
 
-    Create a portfolio without a fund allocation algorithm (returns MultiSystem running in mode A "Signal Aggregation").
+    Create a portfolio without a fund allocation algorithm (returns MultiSystem running in mode C
+    "Shared Account Compatibility", i.e. the legacy Portfolio behavior).
 
-    Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
-    accounts (the signal cash is reset on every rebalancing day); the parent converts the suggestions
-    into the target positions of the parent account by the AF L2 (target market value = weight x
-    position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta
-    against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
-    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
+    Mode C semantics (shared account): no shadow account is created, every sub-system trades DIRECTLY
+    on the single real account of the parent (shared_tm) and is sized by its own MM, so the
+    sub-systems compete for the same cash in the pool admission order. The parent only gates the entry
+    with the SE, keeps the running pool driven and performs no L2 conversion; the AF is only the mode
+    carrier here (L1 takes no quota, L3 is off by default).
+
+    On a rebalancing day a sub-system that the SE stops admitting leaves the running pool no matter
+    whether it still holds: sell_at_not_selected=True liquidates it at once, while the default False
+    gives it ONE last drive (so a sell signal of that very day is still realized) and then stops
+    following it, exactly as the Portfolio before the refactoring did. The driven set follows the SE
+    semantics: an "all selected" SE (e.g. SE_Fixed) degenerates mode C into driving every sub-system
+    every day. Use this factory when the results of the previous release have to be reproduced; the
+    mode A preset now lives in PF_SignalAggregate.
 
     The rebalancing mode adjust_mode description:
     - In the "query" mode, it follows the ktype in the input parameter query, at this time adjust_cycle determines the cycle interval
@@ -842,9 +854,78 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :param str adjust_mode: the rebalancing mode
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close
-    :param bool sys_use_self_tm: the prototype system uses its own tm for the calculation (ignored with a warning)
+    :param bool sys_use_self_tm: kept for the signature compatibility only; mode C always shares the real account of the parent, so it is ignored with a warning
     :param bool sell_at_not_selected: whether to force selling the stocks not selected on the rebalancing day
     :rtype: MultiSystem)");
+
+    m.def(
+      "PF_SignalAggregate", &PF_SignalAggregate, py::arg("tm") = TradeManagerPtr(),
+      py::arg("se") = SE_Fixed(), py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::arg("trade_on_close") = true, py::arg("sell_at_not_selected") = false,
+      py::arg("sub_init_cash") = 100000.0, py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
+      py::keep_alive<0, 3>(),
+      R"(PF_SignalAggregate([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=False, sub_init_cash=100000.0])
+
+    Create a portfolio running in mode A "Signal Aggregation" (the signal sources + the parent uniform ordering).
+
+    Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
+    accounts (the signal cash is reset on every rebalancing day); the parent converts the suggestions
+    into the target positions of the parent account by the AF L2 (target market value = weight x
+    position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta
+    against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
+    The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
+
+    This is the preset that PF_WithoutAF carried during the beginning of the three-mode
+    refactoring; PF_WithoutAF now means mode C (the legacy shared-account Portfolio) again, so the
+    mode A preset is named after what it does.
+
+    :param TradeManager tm: the trade manager
+    :param SelectorBase se: the trading object selection algorithm
+    :param AllocateFundsBase af: the portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3)
+    :param int adjust_cycle: the rebalancing cycle
+    :param str adjust_mode: the rebalancing mode "query" | "day" | "week" | "month" | "quarter" | "year"
+    :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
+    :param bool trade_on_close: whether the trade is executed at the close
+    :param bool sell_at_not_selected: whether to force selling the stocks not selected on the rebalancing day
+    :param float sub_init_cash: the signal cash of every sub-system shadow account, reset on every rebalancing day
+    :rtype: MultiSystem)");
+
+    //--------------------------------------------------------------------------------------
+    // The three presets also carry the letter-named aliases PF_ModeA / PF_ModeB / PF_ModeC: the
+    // very same function, the very same parameters and no behavior difference. The semantic names
+    // stay the primary ones; the aliases exist for the lookup and for comparing the modes.
+    m.def(
+      "PF_ModeA", &PF_SignalAggregate, py::arg("tm") = TradeManagerPtr(),
+      py::arg("se") = SE_Fixed(), py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::arg("trade_on_close") = true, py::arg("sell_at_not_selected") = false,
+      py::arg("sub_init_cash") = 100000.0, py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
+      py::keep_alive<0, 3>(),
+      R"(PF_ModeA([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sell_at_not_selected=False, sub_init_cash=100000.0])
+
+    Alias of PF_SignalAggregate (mode A "Signal Aggregation"): the same implementation, the same
+    parameters and no behavior difference.)");
+
+    m.def("PF_ModeB", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+          py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+          R"(PF_ModeB([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+
+    Alias of PF_Simple (mode B "Fund Allocation", FOF/MOM style): the same implementation, the same
+    parameters and no behavior difference.)");
+
+    m.def(
+      "PF_ModeC", &PF_WithoutAF, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("adjust_cycle") = 1, py::arg("adjust_mode") = "query",
+      py::arg("delay_to_trading_day") = true, py::arg("trade_on_close") = true,
+      py::arg("sys_use_self_tm") = false, py::arg("sell_at_not_selected") = false,
+      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(),
+      R"(PF_ModeC([tm, se, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True, trade_on_close=True, sys_use_self_tm=False, sell_at_not_selected=False])
+
+    Alias of PF_WithoutAF (mode C "Shared Account Compatibility", i.e. the Portfolio of the previous
+    release): the same implementation, the same parameters and no behavior difference.)");
 
     //--------------------------------------------------------------------------------------
     m.def(
