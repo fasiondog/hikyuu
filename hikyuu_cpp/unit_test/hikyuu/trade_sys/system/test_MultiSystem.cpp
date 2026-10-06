@@ -34,7 +34,11 @@
 #include <hikyuu/trade_sys/portfolio/build_in.h>
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
+#include <hikyuu/trade_sys/selector/crt/SE_Signal.h>
+#include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
@@ -63,8 +67,8 @@ static SYSPtr create_alway_buy_sys() {
 // MultiSystem structure
 // ============================================================================
 
-/** @par Check point: run mode semantics (default A; B/b normalized to B; invalid values fall
- * back to A) */
+/** @par Check point: run mode semantics (default A; B/b normalized to B; C/c normalized to C;
+ * invalid values fall back to A) */
 TEST_CASE("test_MultiSystem_mode") {
     MultiSystem ms;
     CHECK_EQ(ms.getMode(), "A");
@@ -74,6 +78,15 @@ TEST_CASE("test_MultiSystem_mode") {
 
     ms.setMode("b");  // lowercase is also recognized as B
     CHECK_EQ(ms.getMode(), "B");
+
+    ms.setMode("C");  // mode C: the shared account (the legacy Portfolio compatibility)
+    CHECK_EQ(ms.getMode(), "C");
+
+    ms.setMode("c");  // lowercase is also recognized as C
+    CHECK_EQ(ms.getMode(), "C");
+
+    ms.setMode("A");
+    CHECK_EQ(ms.getMode(), "A");
 
     ms.setMode("X");  // invalid value normalized to the default A
     CHECK_EQ(ms.getMode(), "A");
@@ -881,8 +894,8 @@ TEST_CASE("test_MultiSystem_calc_adjust_dates") {
     }
 }
 
-/** @par Check point: the PF compatible factories (PF_Simple → mode B / PF_WithoutAF → mode A,
- * parameters mapped item by item) */
+/** @par Check point: the PF preset factories (PF_Simple -> mode B / PF_WithoutAF -> mode C /
+ * PF_SignalAggregate -> mode A, parameters mapped item by item) */
 TEST_CASE("test_PF_factories") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
 
@@ -913,12 +926,12 @@ TEST_CASE("test_PF_factories") {
     REQUIRE(pf_def->getAF() != nullptr);
     CHECK_EQ(pf_def->getAF()->name(), "AF_EqualWeight");
 
-    /** @arg PF_WithoutAF: mode A; parameters passed through item by item; sys_use_self_tm has no
-     * corresponding semantics but must not crash */
+    /** @arg PF_WithoutAF: mode C (the legacy shared-account Portfolio); parameters passed through
+     * item by item; sys_use_self_tm is kept for the signature only and must not crash */
     auto pf2 = PF_WithoutAF(tm, SE_Fixed(), 3, "week", true, false, true, true);
     REQUIRE(pf2 != nullptr);
     CHECK_EQ(pf2->name(), "PF_WithoutAF");
-    CHECK_EQ(pf2->getMode(), "A");
+    CHECK_EQ(pf2->getMode(), "C");
     CHECK_EQ(pf2->getAdjustCycle(), 3);
     CHECK_EQ(pf2->getAdjustMode(), "week");
     CHECK_EQ(pf2->getDelayToTradingDay(), true);
@@ -927,12 +940,42 @@ TEST_CASE("test_PF_factories") {
     REQUIRE(pf2->getAF() != nullptr);
     CHECK_EQ(pf2->getAF()->name(), "AF_EqualWeight");
 
-    /** @arg PF_WithoutAF defaults: trade_on_close=true, sell_at_not_selected=false */
+    /** @arg PF_WithoutAF defaults: trade_on_close=true, sell_at_not_selected=false (the legacy
+     * semantics: a sub-system that stops being admitted is not force cleared) */
     auto pf2_def = PF_WithoutAF(tm, SE_Fixed());
+    CHECK_EQ(pf2_def->getMode(), "C");
     CHECK_EQ(pf2_def->getTradeOnClose(), true);
     CHECK_EQ(pf2_def->getSellAtNotSelected(), false);
     REQUIRE(pf2_def->getAF() != nullptr);
     CHECK_EQ(pf2_def->getAF()->name(), "AF_EqualWeight");
+
+    /** @arg PF_SignalAggregate: mode A (the preset PF_WithoutAF carried before); the af and the
+     * shadow signal cash are mapped item by item */
+    auto pf3 = PF_SignalAggregate(tm, SE_Fixed(), AF_FixedWeight(0.3), 5, "month", false, true,
+                                  true, 50000.0);
+    REQUIRE(pf3 != nullptr);
+    CHECK_EQ(pf3->name(), "PF_SignalAggregate");
+    CHECK_EQ(pf3->getMode(), "A");
+    CHECK_EQ(pf3->getAdjustCycle(), 5);
+    CHECK_EQ(pf3->getAdjustMode(), "month");
+    CHECK_EQ(pf3->getDelayToTradingDay(), false);
+    CHECK_EQ(pf3->getTradeOnClose(), true);
+    CHECK_EQ(pf3->getSellAtNotSelected(), true);
+    CHECK_EQ(pf3->getSubInitCash(), 50000.0);
+    REQUIRE(pf3->getAF() != nullptr);
+    CHECK_EQ(pf3->getAF()->name(), "AF_FixedWeight");
+
+    /** @arg PF_SignalAggregate defaults: equal weight af, cycle 1 / query mode / delay true /
+     * trade on close / no force sell / the default signal cash */
+    auto pf3_def = PF_SignalAggregate(tm, SE_Fixed());
+    CHECK_EQ(pf3_def->getMode(), "A");
+    CHECK_EQ(pf3_def->getAdjustCycle(), 1);
+    CHECK_EQ(pf3_def->getAdjustMode(), "query");
+    CHECK_EQ(pf3_def->getDelayToTradingDay(), true);
+    CHECK_EQ(pf3_def->getTradeOnClose(), true);
+    CHECK_EQ(pf3_def->getSellAtNotSelected(), false);
+    REQUIRE(pf3_def->getAF() != nullptr);
+    CHECK_EQ(pf3_def->getAF()->name(), "AF_EqualWeight");
 }
 
 /** @par Check point: the AF factories (return AFPtr; each built-in algorithm's name and
@@ -1049,6 +1092,306 @@ TEST_CASE("test_MultiSystem_shadow_tm_reuse") {
     CHECK(ms->getSystemList()[0]->getTM() == sub_tm);
 }
 
+/** @par Check point: mode C shares the real account of the parent (no shadow account) and
+ * restores the delay mapping of the legacy Portfolio; mode A/B keep the isolated shadow account */
+TEST_CASE("test_MultiSystem_mode_c_ready_for_run") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KData kdata = stk.getKData(KQuery(Datetime(19991110), Datetime(20000225)));
+    REQUIRE(kdata.size() > 2);
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto ms = std::make_shared<MultiSystem>("ms_c");
+    ms->setTM(tm);
+    ms->setMode("C");
+    auto sys = create_alway_buy_sys();
+    sys->setTO(kdata);
+    ms->add(sys);
+    ms->readyForRun();
+
+    /** @arg the sub-system account is the real account of the parent itself (no TM_SUB) */
+    CHECK(ms->getSystemList()[0]->getTM() == tm);
+    CHECK(ms->getSystemList()[0]->getParam<bool>("shared_tm"));
+
+    /** @arg trade_on_close=true (the default): the sub-system does not delay its orders */
+    CHECK(!ms->getSystemList()[0]->getParam<bool>("buy_delay"));
+    CHECK(!ms->getSystemList()[0]->getParam<bool>("sell_delay"));
+
+    /** @arg trade_on_close=false: the delay mapping follows it */
+    ms->setTradeOnClose(false);
+    ms->readyForRun();
+    CHECK(ms->getSystemList()[0]->getParam<bool>("buy_delay"));
+    CHECK(ms->getSystemList()[0]->getParam<bool>("sell_delay"));
+
+    /** @arg the running set is a runtime state: readyForRun does not build it */
+    CHECK(ms->getRunningSet().empty());
+
+    /** @arg mode A (the default) still gets an isolated shadow account */
+    auto ms_a = std::make_shared<MultiSystem>("ms_a");
+    auto tm_a = crtTM(Datetime(199001010000LL), 100000.0);
+    ms_a->setTM(tm_a);
+    auto sys_a = create_alway_buy_sys();
+    sys_a->setTO(kdata);
+    sys_a->setParam<bool>("buy_delay", true);
+    sys_a->setParam<bool>("sell_delay", true);
+    ms_a->add(sys_a);
+    ms_a->readyForRun();
+    CHECK(ms_a->getSystemList()[0]->getTM() != tm_a);
+    CHECK(!ms_a->getSystemList()[0]->getParam<bool>("shared_tm"));
+    /** @arg mode A leaves the delay parameters of the sub-systems alone */
+    CHECK(ms_a->getSystemList()[0]->getParam<bool>("buy_delay"));
+    CHECK(ms_a->getSystemList()[0]->getParam<bool>("sell_delay"));
+
+    /** @arg readyForRun never fills the pools (they belong to the close stage of a run), so a
+     * repeated preparation call stays idempotent; the clearing done by reset is asserted in
+     * test_MultiSystem_mode_c_shared_account_and_pools, where a real run has filled the pools */
+    ms->readyForRun();
+    CHECK(ms->getRunningSet().empty());
+    CHECK(ms->getForceSellList().empty());
+}
+
+/** @par Check point: readyForRun alone materializes the sub-systems from the SE prototypes (the
+ * live trading entry calls readyForRun before any run, so an SE-only aggregate must not be rejected
+ * as "no subsystem specified") */
+TEST_CASE("test_MultiSystem_ready_for_run_adopt_se_protos") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+
+    auto se = SE_Fixed();
+    se->addStockList({stk1, stk2}, create_alway_buy_sys());
+
+    auto ms = std::make_shared<MultiSystem>("ms_adopt");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    ms->setSE(se);
+    // No sub-system added on purpose: the SE holds the cloned prototypes per instrument
+    CHECK_EQ(ms->getSystemList().size(), 0);
+    ms->readyForRun();
+    CHECK_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg an explicit sub-system list is left untouched (no duplicate adoption) */
+    auto ms2 = std::make_shared<MultiSystem>("ms_no_adopt");
+    ms2->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    ms2->setSE(se);
+    auto sys = create_alway_buy_sys();
+    sys->setTO(stk1.getKData(KQuery(Datetime(19991110), Datetime(20000225))));
+    ms2->add(sys);
+    ms2->readyForRun();
+    CHECK_EQ(ms2->getSystemList().size(), 1);
+}
+
+/** @par Check point: mode C converges sys_use_self_tm onto the shared account of the parent
+ * (C-O3=A): the parameter is kept for the signature compatibility only, every sub-system still ends
+ * up trading on the account of the parent */
+TEST_CASE("test_MultiSystem_mode_c_sys_use_self_tm") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, create_alway_buy_sys());
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto pf = PF_WithoutAF(tm, se, 1, "query", true, true, /*sys_use_self_tm=*/true, false);
+    REQUIRE(pf->getMode() == "C");
+    pf->run(query);
+
+    /** @arg the "own tm" branch is not exposed as a per-layer capability: the adopted sub-systems
+     * share the real account of the parent anyway */
+    CHECK_GT(pf->getSystemList().size(), 0);
+    for (auto& sys : pf->getSystemList()) {
+        CHECK(sys->getTM() == tm);
+        CHECK(sys->getParam<bool>("shared_tm"));
+    }
+}
+
+/** @par Check point: a mode C aggregate nested under a mode A aggregate keeps working - the shadow
+ * account of the outer layer becomes the shared account inside, the inner trades are booked there
+ * and the translated suggestions stay available for the upper layer (the nesting translation of the
+ * design 9.3, which must never come out empty) */
+TEST_CASE("test_MultiSystem_mode_c_nested_under_mode_a") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    // the inner aggregate: mode C over two instruments (the sub-systems come from the SE
+    // prototypes)
+    auto se = SE_Fixed();
+    se->addStockList({stk1, stk2}, create_alway_buy_sys());
+    auto inner = PF_WithoutAF(crtTM(Datetime(199001010000LL), 100000.0), se, 1, "query", true, true,
+                              false, false);
+    REQUIRE(inner->getMode() == "C");
+
+    // the outer aggregate: mode A without an SE, the inner aggregate is its only sub-system
+    auto outer_tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto outer = std::make_shared<MultiSystem>("outer_mode_a");
+    outer->setTM(outer_tm);
+    outer->setMode("A");
+    outer->setAdjustCycle(1);
+    outer->setTradeOnClose(true);
+    outer->add(inner);
+    outer->run(query);
+
+    /** @arg the outer layer created a shadow account for the inner aggregate and the inner mode C
+     * shared that very account with its own sub-systems (no third account appears in between) */
+    auto inner_tm = inner->getTM();
+    CHECK(inner_tm != outer_tm);
+    for (auto& sys : inner->getSystemList()) {
+        CHECK(sys->getTM() == inner_tm);
+        CHECK(sys->getParam<bool>("shared_tm"));
+    }
+
+    /** @arg the inner aggregate traded on the shadow account and kept its running pool, and the
+     * translated suggestions are not empty (otherwise the outer layer would aggregate nothing) */
+    CHECK_GT(inner_tm->getTradeList().size(), 1);
+    CHECK_GT(inner->getRunningSet().size(), 0);
+    CHECK_GT(inner->toSuggestions().size(), 0);
+
+    /** @arg the outer layer converted them into its own orders on the real account */
+    CHECK_GT(outer_tm->getTradeList().size(), 1);
+}
+
+/** @par Check point: mode C trades on the shared real account of the parent; with a rebalancing
+ * cycle of one day every buy happens on a day the SE admits that sub-system, and the two pools
+ * stay mutually exclusive (the force-sell pool only holds what left the running pool while still
+ * held) */
+TEST_CASE("test_MultiSystem_mode_c_shared_account_and_pools") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k1 = stk1.getKData(query);
+    REQUIRE(k1.size() > 20);
+
+    auto proto = create_test_sys(3, 5);
+    auto se = SE_Signal({stk1, stk2}, proto);
+    REQUIRE(se != nullptr);
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto ms = std::make_shared<MultiSystem>("ms_c_pools");
+    ms->setTM(tm);
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->setAdjustCycle(1);
+    ms->setTradeOnClose(true);
+    ms->setSellAtNotSelected(false);
+    auto sys1 = create_test_sys(3, 5);
+    sys1->setTO(k1);
+    auto sys2 = create_test_sys(3, 5);
+    sys2->setTO(stk2.getKData(query));
+    ms->add(sys1);
+    ms->add(sys2);
+    ms->run(query);
+
+    /** @arg the sub-system account IS the real account of the parent (shared_tm) */
+    CHECK(ms->getSystemList()[0]->getTM() == tm);
+
+    /** @arg the shared account really traded: entries and exits both exist */
+    size_t buys = 0;
+    size_t sells = 0;
+    for (auto& t : tm->getTradeList()) {
+        if (t.business == BUSINESS_BUY) {
+            buys++;
+        } else if (t.business == BUSINESS_SELL) {
+            sells++;
+        }
+    }
+    CHECK_GT(buys, 0);
+    CHECK_GT(sells, 0);
+
+    /** @arg the admission invariant: with adjust_cycle=1 every buy day is a day the SE admitted
+     * that sub-system (mode C never trades behind the SE gate) */
+    size_t checked = 0;
+    for (auto& t : tm->getTradeList()) {
+        if (t.business != BUSINESS_BUY) {
+            continue;
+        }
+        bool admitted = false;
+        for (auto& sw : se->getSelected(t.datetime)) {
+            if (sw.sys && (sw.sys.get() == sys1.get() || sw.sys.get() == sys2.get())) {
+                admitted = true;
+                break;
+            }
+        }
+        CHECK(admitted);
+        checked++;
+    }
+    CHECK_GT(checked, 0);
+
+    /** @arg the dual pool invariant: a sub-system sits either in the running pool or in the
+     * force-sell pool (never both), and a force-sell member still holds its instrument */
+    for (auto& sys : ms->getSystemList()) {
+        bool in_running = (ms->getRunningSet().count(sys.get()) > 0);
+        bool in_force = false;
+        for (auto& held : ms->getForceSellList()) {
+            if (held.get() == sys.get()) {
+                in_force = true;
+                break;
+            }
+        }
+        bool both = in_running && in_force;
+        CHECK(!both);
+        if (in_force) {
+            CHECK(tm->have(sys->getStock()));
+        }
+    }
+
+    /** @arg reset drops both pools (they are runtime states) */
+    ms->reset();
+    CHECK(ms->getRunningSet().empty());
+    CHECK(ms->getForceSellList().empty());
+}
+
+/** @par Check point: mode C with sell_at_not_selected=true liquidates the systems that the SE
+ * stops admitting, so nothing is left unfollowed and the force-sell pool stays empty; with the
+ * switch off a removed system that still holds is handed over to the force-sell pool (the legacy
+ * behavior of leaving it unfollowed) */
+TEST_CASE("test_MultiSystem_mode_c_sell_at_not_selected") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto run_once = [&](bool sell_at_not_selected) {
+        auto se = SE_Signal({stk1, stk2}, create_test_sys(3, 5));
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+        auto ms = std::make_shared<MultiSystem>("ms_c_sans");
+        ms->setTM(tm);
+        ms->setMode("C");
+        ms->setSE(se);
+        ms->setAdjustCycle(1);
+        ms->setTradeOnClose(true);
+        ms->setSellAtNotSelected(sell_at_not_selected);
+        auto sys1 = create_test_sys(3, 5);
+        sys1->setTO(stk1.getKData(query));
+        auto sys2 = create_test_sys(3, 5);
+        sys2->setTO(stk2.getKData(query));
+        ms->add(sys1);
+        ms->add(sys2);
+        ms->run(query);
+        return std::make_pair(ms, tm);
+    };
+
+    /** @arg the forced liquidation is on: nothing may be left in the force-sell pool (a removed
+     * system is sold at once, so there is nothing to hand over) */
+    auto on_pair = run_once(true);
+    CHECK(on_pair.first->getForceSellList().empty());
+    CHECK_GT(on_pair.second->getTradeList().size(), 1);
+
+    /** @arg the forced liquidation is off: whatever still holds after leaving the running pool is
+     * handed to the force-sell pool, and every such member really still holds */
+    auto off_pair = run_once(false);
+    for (auto& held : off_pair.first->getForceSellList()) {
+        CHECK(off_pair.second->have(held->getStock()));
+        CHECK(off_pair.first->getRunningSet().count(held.get()) == 0);
+    }
+}
+
 /** @par Check point: trade_on_close=false defers execution to the next day's open (previously this
  * parameter silently failed with zero trades) */
 TEST_CASE("test_MultiSystem_trade_on_close_false") {
@@ -1059,7 +1402,8 @@ TEST_CASE("test_MultiSystem_trade_on_close_false") {
     REQUIRE(kdata.size() > 2);
 
     auto tm = crtTM(Datetime(199001010000LL), 100000.0);
-    auto ms = PF_WithoutAF(tm, SE_Fixed(), 1, "query", true, /*trade_on_close=*/false);
+    auto ms = PF_SignalAggregate(tm, SE_Fixed(), AF_EqualWeight(), 1, "query", true,
+                                 /*trade_on_close=*/false);
     REQUIRE(ms != nullptr);
     auto sys = create_alway_buy_sys();
     sys->setTO(kdata);
@@ -1331,7 +1675,7 @@ TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
     auto se = SE_Fixed();
     se->addStockList({stk1, stk2}, create_alway_buy_sys());
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
-    auto pf = PF_WithoutAF(tm, se, 1, "query", true);  // mode A
+    auto pf = PF_SignalAggregate(tm, se, AF_EqualWeight(), 1, "query", true);  // mode A
     REQUIRE_EQ(pf->getMode(), "A");
     pf->run(query);
     auto subs = pf->getSystemList();
