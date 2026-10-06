@@ -266,7 +266,7 @@ public:
      *  @param delay_to_trading_day when true it is postponed to the first trading day within the
      * current cycle; when false it only hits when it is exactly the N-th day
      *  @return the ascending deduplicated rebalancing day list
-     *  @note Aligned with the master Portfolio::_calculateAdjustDate* behavior 
+     *  @note Aligned with the master Portfolio::_calculateAdjustDate* behavior
      */
     static DatetimeList calcAdjustDates(const DatetimeList& dates, const string& mode,
                                         int adjust_cycle, bool delay_to_trading_day);
@@ -327,9 +327,8 @@ private:
     SystemList m_sys_list;
     string m_path;                // The hierarchy path, e.g. I/D/A
     size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment
-    price_t m_sub_init_cash{
-      100000.0};  // The signal cash of the sub-system shadow account (mode A, reset on every
-                  // rebalancing day; unused in mode B)
+    price_t m_sub_init_cash{100000.0};  // The signal cash of the sub-system shadow account (mode A,
+                                        // reset on every rebalancing day; unused in mode B)
     int m_adjust_cycle{
       1};  // The rebalancing cycle (days); <=1 means rebalancing on every close day
     bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
@@ -349,9 +348,9 @@ private:
       m_sub_funds_before;  // The "before-trade" fund snapshot of every sub-system on that day, used
                            // by _toSuggestions to calculate the three ratios (runtime state, not
                            // serialized)
-    Datetime m_open_trades_date;  // The trading day to which m_open_trades/m_sub_funds_before
-                                  // belong; the close stage uses it to prevent out-of-bounds and
-                                  // cross-day residue (runtime state, not serialized)
+    Datetime m_open_trades_date;   // The trading day to which m_open_trades/m_sub_funds_before
+                                   // belong; the close stage uses it to prevent out-of-bounds and
+                                   // cross-day residue (runtime state, not serialized)
     Datetime m_signal_reset_date;  // The last day when the mode A (Signal Aggregation) signal
                                    // cash reset ran; it
                                    // prevents multiple resets within the same trading day (the
@@ -426,22 +425,23 @@ private:
      * not in the mapping, fall back to the next day */
     Datetime _getNextCycleEnd(const Datetime& date) const;
 
-    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): reduce the over quota position of the
-     * sub-system (the sub book sells on its own and the parent sells the same quantity
-     * immediately, the executed records are appended to out_executed). It runs in the reduction
-     * phase before the injection phase, so the freed cash is available to the whole portfolio. */
+    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): reduce the over quota
+     * position of the sub-system (the sub book sells on its own and the parent sells the same
+     * quantity immediately, the executed records are appended to out_executed). It runs in the
+     * reduction phase before the injection phase, so the freed cash is available to the whole
+     * portfolio. */
     void _reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& date, price_t quota,
                                  KQuery::KType ktype, TradeRecordList& out_executed);
 
-    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): inject the cash gap when the sub-system is
-     * below the quota (limited by the free cash of the parent pool). It runs in the injection
-     * phase after the reduction phase. */
+    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): inject the cash gap when the
+     * sub-system is below the quota (limited by the free cash of the parent pool). It runs in the
+     * injection phase after the reduction phase. */
     void _injectSubSystemGap(const SystemPtr& sys, const Datetime& date, price_t quota,
                              KQuery::KType ktype);
 
-    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): clear the sub-system shadow account (force
-     * selling its holdings and recycling the cash); the parent account holding is cleared by the
-     * CLEAR suggestion submitted by the caller */
+    /** Mode B (Fund Allocation, master SimplePortfolio compatibility): clear the sub-system shadow
+     * account (force selling its holdings and recycling the cash); the parent account holding is
+     * cleared by the CLEAR suggestion submitted by the caller */
     void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
     /** Mode A (Signal Aggregation): reset the sub-system shadow account on the rebalancing day
@@ -449,8 +449,7 @@ private:
      * again). The shadow account is a pure signal source: without the reset it runs out of cash
      * after its first position and can never submit a new buy signal, which leaves the parent
      * cash idle and makes the re-entered stocks impossible to buy back. */
-    void _resetSubSystemSignalCash(const SystemPtr& sys, const Datetime& date,
-                                   KQuery::KType ktype);
+    void _resetSubSystemSignalCash(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
     /** Execute the converted suggestions on the parent real account (sell first then buy) */
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
@@ -519,6 +518,7 @@ typedef shared_ptr<MultiSystem> MultiSystemPtr;
  * @ingroup Portfolio
  */
 using PortfolioPtr = MultiSystemPtr;
+using PFPtr = MultiSystemPtr;
 
 }  // namespace hku
 
