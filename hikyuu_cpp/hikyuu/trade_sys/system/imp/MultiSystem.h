@@ -351,75 +351,20 @@ public:
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date) override;
 
 private:
-    SystemList m_sys_list;
-    string m_path;                // The hierarchy path, e.g. I/D/A
-    size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment
-    price_t m_sub_init_cash{100000.0};  // The signal cash of the sub-system shadow account (mode A,
-                                        // reset on every rebalancing day; unused in mode B)
-    int m_adjust_cycle{
-      1};  // The rebalancing cycle (days); <=1 means rebalancing on every close day
-    bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
-    AllocateFundsPtr m_af{AF_EqualWeight()};  // The portfolio-level fund allocation (AF, including
-                                              // L1/L2/L3); the running mode is held by it
-    std::shared_ptr<SelectorBase> m_se;       // The trading object selector (optional)
-    bool m_sell_at_not_selected{true};  // Whether to force liquidating the unselected sub-systems
-                                        // (it takes effect only after SE is set)
-    std::vector<std::pair<Datetime, double>>
-      m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
-                          // assets before rebalancing)
-    TradeSuggestionList m_last_suggestions;  // The parent suggestion produced by the last close
-    std::vector<TradeRecordList>
-      m_open_trades;  // The open trades of every sub-system on that day (the delayed requests
-                      // fulfilled), used for the close aggregation
-    std::vector<FundsRecord>
-      m_sub_funds_before;  // The "before-trade" fund snapshot of every sub-system on that day, used
-                           // by _toSuggestions to calculate the three ratios (runtime state, not
-                           // serialized)
-    Datetime m_open_trades_date;   // The trading day to which m_open_trades/m_sub_funds_before
-                                   // belong; the close stage uses it to prevent out-of-bounds and
-                                   // cross-day residue (runtime state, not serialized)
-    Datetime m_signal_reset_date;  // The last day when the mode A (Signal Aggregation) signal
-                                   // cash reset ran; it
-                                   // prevents multiple resets within the same trading day (the
-                                   // close stage may be driven several times a day) (runtime
-                                   // state, not serialized)
-    TradeSuggestionList m_pending_suggestions;  // The suggestions accumulated on the
-                                                // non-rebalancing days (runtime, not serialized)
-    TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at
-                                                     // the next open when trade_on_close=false
-    std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
-                                     // (runtime, not serialized)
-    // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides
-    // who gets the shared cash first (the cash competition order of the legacy Portfolio);
-    // m_running_set is the membership index of the very same content.
-    std::list<SystemPtr> m_running_order;
-    std::set<System*> m_running_set;
-    // Mode C: the force-sell pool (the legacy m_force_sell_sys_list). Runtime state, neither
-    // serialized nor copied by clone.
-    SystemList m_force_sell_list;
-    mutable std::unordered_map<string, KData>
-      m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
-    DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
-                                        // axis-mode="calendar" (runtime state, not serialized)
-    std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
-                                        // zero hour of that day; when not empty it takes precedence
-                                        // over m_adjust_cycle, runtime state, not serialized)
-    std::set<Datetime>
-      m_auto_adjust_dates;  // The rebalancing day table auto-expanded by adjust-mode (runtime
-                            // state, not serialized, does not override the external injection)
-    std::map<Datetime, Datetime>
-      m_cycle_ends;  // The rebalancing-day -> cycle-end (the next rebalancing day) mapping, used by
-                     // the cycle-type signal driving (runtime state, rebuilt with each run)
+    /** Recursively find the instrument of the system itself or its (nested aggregate) sub-systems,
+     * return an empty Stock when not found */
+    static Stock _findStock(const SystemPtr& sys);
 
+    // Check whether the candidate subtree (including itself) contains target (used for the circular
+    // reference detection)
+    static bool _subtreeContains(const SystemPtr& candidate, System* target);
+
+private:
     /** Run by the specified driving axis: when axis is empty the date sequence of the input KData
      * is used as the axis, otherwise axis is the driving axis (when driven by the fixed time axis,
      * the dates on the axis may not exist in the input KData, the suspended/non-trading days do not
      * constitute a gap) */
     void _runAxis(const KData& kdata, const DatetimeList* axis, bool reset, bool resetAll);
-
-    /** Recursively find the instrument of the system itself or its (nested aggregate) sub-systems,
-     * return an empty Stock when not found */
-    static Stock _findStock(const SystemPtr& sys);
 
     /** Register the parameters of the aggregate system itself (axis-mode / adjust-mode /
      * delay-to-trading-day) */
@@ -429,10 +374,6 @@ private:
         setParam<string>("adjust-mode", "query");
         setParam<bool>("delay-to-trading-day", true);
     }
-
-    // Check whether the candidate subtree (including itself) contains target (used for the circular
-    // reference detection)
-    static bool _subtreeContains(const SystemPtr& candidate, System* target);
 
     /** Aggregate a group of trades into a net suggestion by instrument (marked with the source
      * sub-system sys). funds_before is the "before-trade" fund snapshot of the sub-system on that
@@ -517,8 +458,12 @@ private:
     /** Mode C: remove a sub-system from the running pool (both the order and the index). */
     void _removeFromRunning(const SystemPtr& sys);
 
+    /** Delisting: remove the leaf sub-system trading the given stock out of the mode C pools,
+     *  searched recursively over the nested aggregates (a nested layer's pools are its own). */
+    void _removeStockFromPoolsRecursive(const Stock& stock);
+
     /** The slot of a sub-system inside m_sys_list (the open trade buffer and the before-trade fund
-     *  snapshot are addressed by it). */
+     *  snapshot are addressed by it); O(1) via m_sub_index. */
     size_t _subIndex(const SystemPtr& sys) const;
 
     /** master compatibility: when no sub-system was added explicitly, adopt the prototype systems
@@ -542,6 +487,70 @@ private:
     /** Force selling the parent holdings of the delisted instrument at the open stage (delisting =
      * the last trading day of the instrument is earlier than the current running date) */
     TradeRecordList _forceSellDelisted(const Datetime& date);
+
+private:
+    SystemList m_sys_list;
+    string m_path;                // The hierarchy path, e.g. I/D/A
+    size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment
+    price_t m_sub_init_cash{100000.0};  // The signal cash of the sub-system shadow account (mode A,
+                                        // reset on every rebalancing day; unused in mode B)
+    int m_adjust_cycle{
+      1};  // The rebalancing cycle (days); <=1 means rebalancing on every close day
+    bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
+    AllocateFundsPtr m_af{AF_EqualWeight()};  // The portfolio-level fund allocation (AF, including
+                                              // L1/L2/L3); the running mode is held by it
+    std::shared_ptr<SelectorBase> m_se;       // The trading object selector (optional)
+    bool m_sell_at_not_selected{true};  // Whether to force liquidating the unselected sub-systems
+                                        // (it takes effect only after SE is set)
+    std::vector<std::pair<Datetime, double>>
+      m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
+                          // assets before rebalancing)
+    TradeSuggestionList m_last_suggestions;  // The parent suggestion produced by the last close
+    std::vector<TradeRecordList>
+      m_open_trades;  // The open trades of every sub-system on that day (the delayed requests
+                      // fulfilled), used for the close aggregation
+    std::vector<FundsRecord>
+      m_sub_funds_before;  // The "before-trade" fund snapshot of every sub-system on that day, used
+                           // by _toSuggestions to calculate the three ratios (runtime state, not
+                           // serialized)
+    Datetime m_open_trades_date;   // The trading day to which m_open_trades/m_sub_funds_before
+                                   // belong; the close stage uses it to prevent out-of-bounds and
+                                   // cross-day residue (runtime state, not serialized)
+    Datetime m_signal_reset_date;  // The last day when the mode A (Signal Aggregation) signal
+                                   // cash reset ran; it
+                                   // prevents multiple resets within the same trading day (the
+                                   // close stage may be driven several times a day) (runtime
+                                   // state, not serialized)
+    TradeSuggestionList m_pending_suggestions;  // The suggestions accumulated on the
+                                                // non-rebalancing days (runtime, not serialized)
+    TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at
+                                                     // the next open when trade_on_close=false
+    std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
+                                     // (runtime, not serialized)
+    // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides
+    // who gets the shared cash first (the cash competition order of the legacy Portfolio);
+    // m_running_set is the membership index of the very same content.
+    std::list<SystemPtr> m_running_order;
+    std::set<System*> m_running_set;
+    // Mode C: the force-sell pool (the legacy m_force_sell_sys_list). Runtime state, neither
+    // serialized nor copied by clone.
+    SystemList m_force_sell_list;
+    // The slot of every sub-system inside m_sys_list (the O(1) backing of _subIndex). Runtime
+    // state: maintained by add(), rebuilt by readyForRun, neither serialized nor copied by clone.
+    std::unordered_map<System*, size_t> m_sub_index;
+    mutable std::unordered_map<string, KData>
+      m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
+    DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
+                                        // axis-mode="calendar" (runtime state, not serialized)
+    std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
+                                        // zero hour of that day; when not empty it takes precedence
+                                        // over m_adjust_cycle, runtime state, not serialized)
+    std::set<Datetime>
+      m_auto_adjust_dates;  // The rebalancing day table auto-expanded by adjust-mode (runtime
+                            // state, not serialized, does not override the external injection)
+    std::map<Datetime, Datetime>
+      m_cycle_ends;  // The rebalancing-day -> cycle-end (the next rebalancing day) mapping, used by
+                     // the cycle-type signal driving (runtime state, rebuilt with each run)
 
 //========================================
 // Serialization support

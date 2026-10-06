@@ -60,6 +60,11 @@ namespace hku {
  * @note Mode C only: its sub-systems share the parent account, so a live replay must keep using
  *       reset=false, otherwise the running pool and the force-sell pool are dropped and the systems
  *       that the SE stopped admitting would never get their one last drive.
+ * @note Live replay and adjust_cycle: the rebalancing-day counting persists across the daily
+ *       reset=false replays. A strategy process restart restarts the counting, so the first driven
+ *       day after a restart is treated as a rebalancing day; if the exact cycle semantics matter,
+ *       inject an explicit rebalancing-day table via setAdjustDates (or axis-mode=calendar)
+ *       instead of relying on adjust_cycle counting.
  */
 class HKU_API RunMultiSystemInStrategy {
 public:

@@ -60,6 +60,7 @@ void MultiSystem::add(const SystemPtr& sys) {
         }
     }
     m_sys_list.push_back(sys);
+    m_sub_index[sys.get()] = m_sys_list.size() - 1;
 }
 
 void MultiSystem::readyForRun() {
@@ -73,7 +74,14 @@ void MultiSystem::readyForRun() {
     // The aggregate form does not validate its own single-security parts such as SG/MM/ST (they
     // belong to every sub-system); it only prepares the running environment, the sub-system parts
     // are completed by the readyForRun of every sub-system in the validation loop.
-    m_close_day_index = 0;
+    // Rebuild the O(1) slot index (the list constructors bypass add()); NOTE: the close-day
+    // counter is deliberately NOT reset here -- this runs on every live replay day as well, and
+    // resetting it would turn every day into a rebalancing day (the counter restarts only via
+    // reset / forceResetAll, see _reset).
+    m_sub_index.clear();
+    for (size_t i = 0; i < m_sys_list.size(); ++i) {
+        m_sub_index[m_sys_list[i].get()] = i;
+    }
     if (m_path.empty()) {
         m_path = name();
     }
@@ -177,6 +185,8 @@ void MultiSystem::_reset() {
     m_running_order.clear();
     m_force_sell_list.clear();
     m_signal_reset_date = Null<Datetime>();
+    // The rebalancing cycle restarts with a fresh run; kept across the live reset=false replays
+    m_close_day_index = 0;
 }
 
 void MultiSystem::_forceResetAll() {
@@ -200,6 +210,8 @@ void MultiSystem::_forceResetAll() {
     m_running_order.clear();
     m_force_sell_list.clear();
     m_signal_reset_date = Null<Datetime>();
+    // The rebalancing cycle restarts with a fresh run; kept across the live reset=false replays
+    m_close_day_index = 0;
 }
 
 SystemPtr MultiSystem::_clone() {
@@ -226,7 +238,7 @@ SystemPtr MultiSystem::_clone() {
     if (m_se) {
         ret->m_se = m_se->clone();
     }
-    // m_shadow_sys / m_running_set / m_running_order / m_force_sell_list /
+    // m_shadow_sys / m_running_set / m_running_order / m_force_sell_list / m_sub_index /
     // m_pending_suggestions / m_open_pending_suggestions / m_kdata_cache are the runtime states,
     // not copied
     return ret;
@@ -1344,12 +1356,8 @@ void MultiSystem::_adoptSEProtos() {
 }
 
 size_t MultiSystem::_subIndex(const SystemPtr& sys) const {
-    for (size_t i = 0; i < m_sys_list.size(); ++i) {
-        if (m_sys_list[i].get() == sys.get()) {
-            return i;
-        }
-    }
-    return Null<size_t>();
+    auto iter = m_sub_index.find(sys.get());
+    return iter != m_sub_index.end() ? iter->second : Null<size_t>();
 }
 
 bool MultiSystem::_addToRunning(const SystemPtr& sys) {
@@ -1367,6 +1375,28 @@ void MultiSystem::_removeFromRunning(const SystemPtr& sys) {
         if (it->get() == sys.get()) {
             m_running_order.erase(it);
             break;
+        }
+    }
+}
+
+void MultiSystem::_removeStockFromPoolsRecursive(const Stock& stock) {
+    for (auto& sys : m_sys_list) {
+        if (!sys) {
+            continue;
+        }
+        if (sys->getStock() == stock) {
+            _removeFromRunning(sys);
+            for (auto it = m_force_sell_list.begin(); it != m_force_sell_list.end(); ++it) {
+                if (it->get() == sys.get()) {
+                    m_force_sell_list.erase(it);
+                    break;
+                }
+            }
+        } else if (sys->isComposite()) {
+            // A nested aggregate keeps its own pools; the delisting must be reflected there too
+            if (auto* inner = dynamic_cast<MultiSystem*>(sys.get())) {
+                inner->_removeStockFromPoolsRecursive(stock);
+            }
         }
     }
 }
@@ -1549,6 +1579,10 @@ TradeRecordList MultiSystem::_forceSellDelisted(const Datetime& date) {
         if (last_dt == Null<Datetime>() || last_dt >= date) {
             continue;
         }
+        // The sub-system trading this delisted instrument leaves the mode C pools at once, no
+        // matter whether the liquidation below succeeds: it can never trade again, and the pools
+        // are the "watched" sets (the design 9.3 delisting rule)
+        _removeStockFromPoolsRecursive(pos.stock);
         // The last trading day of the instrument has passed (delisting): force liquidation at the
         // close price of the last trading day within the query window
         KData kdata = _getStockKData(pos.stock);

@@ -63,6 +63,30 @@ static SYSPtr create_alway_buy_sys() {
     return sys;
 }
 
+/** Counting selector: admits every real system on every call and counts the calls. MultiSystem
+ *  consults the SE on the rebalancing days only, so the call count exposes the reb-day rhythm. */
+class CountingSE : public SelectorBase {
+public:
+    CountingSE() : SelectorBase("CountingSE") {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<CountingSE>();
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        call_count++;
+        SystemWeightList ret;
+        for (auto& sys : getRealSystemList()) {
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+
+    int call_count{0};
+};
+
 // ============================================================================
 // MultiSystem structure
 // ============================================================================
@@ -1390,6 +1414,144 @@ TEST_CASE("test_MultiSystem_mode_c_sell_at_not_selected") {
         CHECK(off_pair.second->have(held->getStock()));
         CHECK(off_pair.first->getRunningSet().count(held.get()) == 0);
     }
+}
+
+/** @par Check point: delisting removes the sub-system from the mode C pools (the design 9.3
+ * delisting rule): the delisted holding is force liquidated at the last bar close of the
+ * instrument, the sub-system leaves both pools and is not re-admitted (its SG emits no signal past
+ * its data end, so SE_Signal stops selecting it), while the other sub-systems keep trading */
+TEST_CASE("test_MultiSystem_mode_c_delisted") {
+    Stock alive_stk = getStock("sh600000");   // data runs through 2011-12-06
+    Stock delist_stk = getStock("sz000005");  // data ends 2011-04-29: it "delists" mid-window
+    REQUIRE(!alive_stk.isNull());
+    REQUIRE(!delist_stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20111207));
+    KData kd_alive = alive_stk.getKData(query);
+    KData kd_delist = delist_stk.getKData(query);
+    REQUIRE(kd_alive.size() > 100);
+    REQUIRE(kd_delist.size() > 100);
+    Datetime delist_day = kd_delist.getKRecord(kd_delist.size() - 1).datetime;
+
+    // The test db marks every stock valid through the market LastDate, so sz000005's lastDatetime
+    // does not reflect its shorter data end; override it (restored on exit) to simulate delisting
+    Datetime original_last = delist_stk.lastDatetime();
+    REQUIRE(original_last > delist_day);
+    delist_stk.lastDatetime(delist_day);
+
+    auto se = SE_Signal();
+    auto tm = crtTM(Datetime(199001010000LL), 1000000.0);
+    auto ms = std::make_shared<MultiSystem>("ms_c_delist");
+    ms->setTM(tm);
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->setAdjustCycle(1);
+    ms->setTradeOnClose(true);
+    ms->setSellAtNotSelected(false);
+    auto sys_delist = create_alway_buy_sys();
+    sys_delist->setTO(kd_delist);
+    auto sys_alive = create_alway_buy_sys();
+    sys_alive->setTO(kd_alive);
+    ms->add(sys_delist);
+    ms->add(sys_alive);
+    ms->run(query);
+
+    /** @arg the delisted holding was force liquidated after its last trading day */
+    bool delist_sell = false;
+    for (auto& t : tm->getTradeList()) {
+        if (t.business == BUSINESS_SELL && t.stock == delist_stk && t.datetime > delist_day) {
+            delist_sell = true;
+            break;
+        }
+    }
+    CHECK(delist_sell);
+    CHECK(!tm->have(delist_stk));
+
+    /** @arg the delisted sub-system left both pools */
+    CHECK(ms->getRunningSet().count(sys_delist.get()) == 0);
+    for (auto& held : ms->getForceSellList()) {
+        CHECK(held.get() != sys_delist.get());
+    }
+
+    /** @arg the alive sub-system kept trading after the delisting freed the cash, and stays in a
+     *  pool at the end */
+    bool alive_buy_after = false;
+    for (auto& t : tm->getTradeList()) {
+        if (t.business == BUSINESS_BUY && t.stock == alive_stk && t.datetime > delist_day) {
+            alive_buy_after = true;
+            break;
+        }
+    }
+    CHECK(alive_buy_after);
+    bool alive_in_pool = (ms->getRunningSet().count(sys_alive.get()) > 0);
+    for (auto& held : ms->getForceSellList()) {
+        if (held.get() == sys_alive.get()) {
+            alive_in_pool = true;
+        }
+    }
+    CHECK(alive_in_pool);
+
+    delist_stk.lastDatetime(original_last);
+}
+
+/** @par Check point: the live replay shape (run day by day with reset=false, readyForRun on every
+ * call) keeps the close-day counter, so with adjust_cycle=2 the SE is consulted only every second
+ * driven day; reset restarts the cycle. (readyForRun used to zero the counter on every call, which
+ * turned every replayed day into a rebalancing day.) */
+TEST_CASE("test_MultiSystem_adjust_cycle_live_replay") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kd = stk.getKData(query);
+    REQUIRE(kd.size() > 10);
+    const DatetimeList dates = kd.getDatetimeList();
+
+    auto run_replay = [&](const string& mode) {
+        auto se = std::make_shared<CountingSE>();
+        auto tm = crtTM(Datetime(199001010000LL), 1000000.0);
+        auto ms = std::make_shared<MultiSystem>("ms_replay_" + mode);
+        ms->setTM(tm);
+        ms->setMode(mode);
+        ms->setSE(se);
+        ms->setAdjustCycle(2);
+        ms->setTradeOnClose(true);
+        auto sys = create_alway_buy_sys();
+        sys->setTO(kd);
+        ms->add(sys);
+        ms->readyForRun();
+        for (auto& d : dates) {
+            KData day_kd = stk.getKData(KQuery(d, d + Days(1), query.kType()));
+            REQUIRE(day_kd.size() == 1);
+            ms->run(day_kd, false);
+        }
+        return std::make_pair(ms, se);
+    };
+
+    /** @arg mode C: the SE fires on every second driven day only (ceil(n/2) calls, strictly fewer
+     *  than the driven days) */
+    auto c_pair = run_replay("C");
+    const int expected = static_cast<int>((dates.size() + 1) / 2);
+    CHECK_EQ(c_pair.second->call_count, expected);
+    CHECK_LT(c_pair.second->call_count, static_cast<int>(dates.size()));
+
+    /** @arg the sub still traded under the replay driving */
+    size_t buys = 0;
+    for (auto& t : c_pair.first->getTM()->getTradeList()) {
+        if (t.business == BUSINESS_BUY) {
+            buys++;
+        }
+    }
+    CHECK_GT(buys, 0);
+
+    /** @arg reset restarts the cycle: the very next driven day is a rebalancing day again */
+    int before = c_pair.second->call_count;
+    c_pair.first->reset();
+    KData last_kd = stk.getKData(KQuery(dates.back(), dates.back() + Days(1), query.kType()));
+    c_pair.first->run(last_kd, false);
+    CHECK_EQ(c_pair.second->call_count, before + 1);
+
+    /** @arg mode A: the same gate holds (the SE is consulted on the rebalancing days only) */
+    auto a_pair = run_replay("A");
+    CHECK_EQ(a_pair.second->call_count, expected);
 }
 
 /** @par Check point: trade_on_close=false defers execution to the next day's open (previously this
