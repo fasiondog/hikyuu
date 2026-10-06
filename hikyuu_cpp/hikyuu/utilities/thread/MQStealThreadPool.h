@@ -129,7 +129,7 @@ public:
         // the increment guards against the race where join() flips m_done right before the push.
         m_running_task_count.fetch_add(1, std::memory_order_relaxed);
         if (m_done) {
-            m_running_task_count.fetch_sub(1, std::memory_order_relaxed);
+            _releaseRunningTask();
             throw std::logic_error("You can't submit a task to the stopped MQStealThreadPool!");
         }
 
@@ -159,7 +159,7 @@ public:
                       static_cast<int>(m_worker_num);
             m_queues[idx]->push(std::move(task));
         } catch (...) {
-            m_running_task_count.fetch_sub(1, std::memory_order_relaxed);
+            _releaseRunningTask();
             throw;
         }
         return res;
@@ -184,6 +184,13 @@ public:
         // stop could be silently dropped (and its future broken) or even executed
         if (m_done.exchange(true, std::memory_order_relaxed)) {
             return;
+        }
+
+        // Wake a concurrent joiner sleeping on the drain wait (stop discards the queued tasks,
+        // so the counter alone would never reach zero)
+        {
+            std::lock_guard<std::mutex> lk(m_idle_mutex);
+            m_idle_cv.notify_all();
         }
 
         // push_front the terminating null tasks so a blocked worker wakes up on the sentinel
@@ -215,14 +222,16 @@ public:
     void join() {
         // It instructs every worker thread to stop running when no work task is got
         if (m_runnging_until_empty) {
-            // Wait until there is no queued nor in-flight task. The counter already covers queued
-            // tasks (incremented at submit time), so a zero counter means the pool is truly idle.
-            // Done outside the join mutex so a concurrent stop() is not blocked; stop() discards
-            // queued tasks without decrementing the counter, so m_done must also break the wait.
-            while (!m_done.load(std::memory_order_acquire) &&
-                   m_running_task_count.load(std::memory_order_acquire) != 0) {
-                std::this_thread::yield();
-            }
+            // Sleep-wait until there is no queued nor in-flight task instead of spinning (a long
+            // running task would otherwise burn a core for the whole join). The counter already
+            // covers queued tasks (incremented at submit time), so a zero counter means the pool
+            // is truly idle. stop() discards queued tasks without decrementing the counter, so
+            // m_done must also break the wait (stop notifies m_idle_cv when it sets m_done).
+            std::unique_lock<std::mutex> lk(m_idle_mutex);
+            m_idle_cv.wait(lk, [this] {
+                return m_done.load(std::memory_order_acquire) ||
+                       m_running_task_count.load(std::memory_order_acquire) == 0;
+            });
         }
 
         // Serialize with other join()/stop() calls: the workers must be joined exactly once
@@ -232,6 +241,13 @@ public:
         }
 
         m_done = true;
+
+        // Wake a concurrent joiner sleeping on the drain wait
+        {
+            std::lock_guard<std::mutex> lk(m_idle_mutex);
+            m_idle_cv.notify_all();
+        }
+
         if (m_runnging_until_empty) {
             for (size_t i = 0; i < m_worker_num; i++) {
                 if (m_interrupt_flags[i]) {
@@ -273,13 +289,23 @@ public:
 private:
     typedef FuncWrapper task_type;
 
+    // Balances the increment done in submit(). Wakes a joiner sleeping on the drain wait when
+    // the last in-flight task finishes. The notify is done under m_idle_mutex so it cannot slip
+    // through the window between the waiter's predicate evaluation and its blocking.
+    void _releaseRunningTask() {
+        if (m_running_task_count.fetch_sub(1, std::memory_order_relaxed) == 1) {
+            std::lock_guard<std::mutex> lk(m_idle_mutex);
+            m_idle_cv.notify_all();
+        }
+    }
+
     // Decrements the in-flight task counter on scope exit. Used to balance the increment done in
     // submit() once a popped task has finished executing (including when it throws).
     struct RunningTaskGuard {
-        std::atomic<size_t>& counter;
-        explicit RunningTaskGuard(std::atomic<size_t>& c) : counter(c) {}
+        MQStealThreadPool& pool;
+        explicit RunningTaskGuard(MQStealThreadPool& p) : pool(p) {}
         ~RunningTaskGuard() {
-            counter.fetch_sub(1, std::memory_order_relaxed);
+            pool._releaseRunningTask();
         }
     };
 
@@ -294,6 +320,8 @@ private:
     std::vector<InterruptFlag> m_interrupt_flags;                    // Thread termination flags
     std::vector<std::thread> m_threads;                              // Worker threads
     std::mutex m_join_mutex;  // Serializes join()/stop() so workers are joined exactly once
+    std::mutex m_idle_mutex;  // Pairs with m_idle_cv: join() sleeps here for the pool to drain
+    std::condition_variable m_idle_cv;
 
     std::unordered_map<std::thread::id, int> m_thread_index;
     std::atomic<int> m_current_index{0};  // The queue index used when a new task is placed
@@ -312,11 +340,11 @@ private:
             if (task.isNullTask()) {
                 m_interrupt_flags[index].set();
             } else {
-                RunningTaskGuard guard(m_running_task_count);
+                RunningTaskGuard guard(*this);
                 task();
             }
         } else if (pop_task_from_other_thread_queue(task, index)) {
-            RunningTaskGuard guard(m_running_task_count);
+            RunningTaskGuard guard(*this);
             task();
         } else {
             // Block and wait for a new task in the local queue
@@ -328,7 +356,7 @@ private:
             if (task.isNullTask()) {
                 m_interrupt_flags[index].set();
             } else {
-                RunningTaskGuard guard(m_running_task_count);
+                RunningTaskGuard guard(*this);
                 task();
             }
         }

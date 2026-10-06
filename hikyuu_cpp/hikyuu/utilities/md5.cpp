@@ -7,6 +7,7 @@
  * platforms, so it was ported from dlib instead
  */
 
+#include <vector>
 #include "arithmetic.h"
 #include "md5.h"
 #include "Log.h"
@@ -171,17 +172,22 @@ void scramble_block(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, const ui
 std::string HKU_UTILS_API md5(const unsigned char* input, size_t len) {
     HKU_CHECK(input, "char *buf is null!");
     // make a temp version of input with enough space for padding and len appended
-    unsigned long extra_len = 64 - len % 64;
+    // NOTE: every length arithmetic below must stay in 64-bit: on Windows (LLP64) unsigned long
+    // is 32-bit and would truncate len above 4GB, corrupting both the block count and the
+    // appended bit length
+    size_t extra_len = 64 - len % 64;
     if (extra_len <= 8)
         extra_len += 64;
-    unsigned char* temp = new unsigned char[extra_len + len];
+    // RAII: no manual delete, nothing leaks when the hex conversion throws (e.g. bad_alloc)
+    std::vector<unsigned char> temp(static_cast<size_t>(extra_len) + len);
+    unsigned char* const temp_buf = temp.data();
 
     // number of 16 word blocks
-    const unsigned long N = (extra_len + static_cast<unsigned long>(len)) / 64;
+    const size_t N = (extra_len + len) / 64;
 
     const unsigned char* input2 = input;
-    unsigned char* temp2 = temp;
-    unsigned char* end = temp + len;
+    unsigned char* temp2 = temp_buf;
+    unsigned char* end = temp_buf + len;
 
     // copy input into temp
     while (temp2 != end) {
@@ -204,10 +210,10 @@ std::string HKU_UTILS_API md5(const unsigned char* input, size_t len) {
     // overflow so we will carry out the multiplication manually and end up with
     // the result in the base 65536 number with three digits
     // result = low + high*65536 + upper*65536*65536
-    unsigned long low = len & 0xFFFF;
-    unsigned long high = static_cast<unsigned long>(len) >> 16;
-    unsigned long upper;
-    unsigned long tmp;
+    size_t low = len & 0xFFFF;
+    size_t high = len >> 16;
+    size_t upper;
+    size_t tmp;
     tmp = low * 8;
     low = tmp & 0xFFFF;
     tmp = high * 8 + (tmp >> 16);
@@ -224,10 +230,8 @@ std::string HKU_UTILS_API md5(const unsigned char* input, size_t len) {
     *temp2 = static_cast<unsigned char>((high >> 8) & 0xFF);
     ++temp2;
     *temp2 = static_cast<unsigned char>((upper) & 0xFF);
-    ;
     ++temp2;
     *temp2 = static_cast<unsigned char>((upper >> 8) & 0xFF);
-    ;
     ++temp2;
     *temp2 = 0;
     ++temp2;
@@ -241,13 +245,13 @@ std::string HKU_UTILS_API md5(const unsigned char* input, size_t len) {
     // an array of 16 words
     uint32_t x[16];
 
-    for (unsigned long i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
         // copy a block of 16 words from m into x
-        for (unsigned long j = 0; j < 16; ++j) {
-            x[j] = ((static_cast<uint32_t>(temp[4 * (j + 16 * i) + 3]) << 24) |
-                    (static_cast<uint32_t>(temp[4 * (j + 16 * i) + 2]) << 16) |
-                    (static_cast<uint32_t>(temp[4 * (j + 16 * i) + 1]) << 8) |
-                    (static_cast<uint32_t>(temp[4 * (j + 16 * i)])));
+        for (size_t j = 0; j < 16; ++j) {
+            x[j] = ((static_cast<uint32_t>(temp_buf[4 * (j + 16 * i) + 3]) << 24) |
+                    (static_cast<uint32_t>(temp_buf[4 * (j + 16 * i) + 2]) << 16) |
+                    (static_cast<uint32_t>(temp_buf[4 * (j + 16 * i) + 1]) << 8) |
+                    (static_cast<uint32_t>(temp_buf[4 * (j + 16 * i)])));
         }
 
         uint32_t aa = a;
@@ -285,7 +289,6 @@ std::string HKU_UTILS_API md5(const unsigned char* input, size_t len) {
     output[14] = static_cast<unsigned char>((d >> 16) & 0xFF);
     output[15] = static_cast<unsigned char>((d >> 24) & 0xFF);
 
-    delete[] temp;
     return byteToHexStr((const char*)output, 16);
 }
 

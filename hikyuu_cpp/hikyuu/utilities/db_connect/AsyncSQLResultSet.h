@@ -31,6 +31,11 @@ class AsyncSQLResultSetIterator;
  *
  * @note It keeps the same API design as SQLResultSet, only the I/O operations are made asynchronous
  * @note It is suitable for the paged query under the high concurrency scenarios
+ *
+ * @note Precondition: same as SQLResultSet — TableT must be bound through the TABLE_BIND macros,
+ *       which make the ORM layer rely on an integer primary key column named "id"; the flat paged
+ *       query orders by it (`... ORDER BY id LIMIT/OFFSET`), so a table without an "id" column is
+ *       not supported by any query path (paged or not)
  */
 template <class TableT, size_t page_size = 100>
 class AsyncSQLResultSet {

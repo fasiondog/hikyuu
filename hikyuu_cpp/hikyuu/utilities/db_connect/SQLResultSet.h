@@ -29,6 +29,13 @@ class SQLResultSetIterator;
  *       coroutine). Its internal page cache is filled on demand without any synchronization,
  *       so sharing one instance across threads would race; give every thread its own instance
  *       instead (the underlying connection may still be shared, the drivers serialize it)
+ *
+ * @note Precondition: TableT must be bound through the TABLE_BIND macros, which make the whole
+ *       ORM layer rely on an integer primary key column named "id" (getSelectSQL selects it as
+ *       column 0, update/remove filter on it, valid() and load() read it). Paged query depends on
+ *       it too: the page window is built as `id IN (SELECT id ... ORDER BY id ...)` and the outer
+ *       select re-applies the same order. A table without such an "id" column is not supported by
+ *       any query path (paged or not), not just this one
  */
 template <class TableT, size_t page_size = 100>
 class SQLResultSet {
@@ -165,8 +172,13 @@ private:
             m_orderby_inner = "ORDER BY id";
         } else {
             m_orderby_inner = fmt::format("{}, id ASC", orderBy);
-            m_orderby_outer = m_orderby_inner;
         }
+
+        // the page rows are picked by id in the inner subquery, but the outer select reads them
+        // back with `id IN (...)`, whose result order is undefined without an ORDER BY of its own;
+        // without it the row sequence within a page (and hence the index-to-row mapping) is not
+        // guaranteed on every driver, so the outer query must re-apply the same order as the inner
+        m_orderby_outer = m_orderby_inner;
     }
 
     /**
@@ -244,13 +256,14 @@ public:
     }
 
     SQLResultSetIterator(const SQLResultSetIterator& other)
-    : m_set(other.m_set), m_index(other.m_index) {}
+    : m_set(other.m_set), m_index(other.m_index), m_value(other.m_value) {}
 
     SQLResultSetIterator& operator=(const SQLResultSetIterator& other) {
         if (this == &other)
             return *this;
         m_index = other.m_index;
         m_set = other.m_set;
+        m_value = other.m_value;
         return *this;
     }
 

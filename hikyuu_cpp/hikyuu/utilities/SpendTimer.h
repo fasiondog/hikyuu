@@ -15,6 +15,7 @@
 #define NOMINMAX
 #endif
 
+#include <atomic>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -254,7 +255,9 @@ private:
     std::vector<std::chrono::duration<double>> m_keep_seconds;
     std::vector<std::string> m_keep_desc;
 
-    static bool ms_closed;
+    // The global on/off state is toggled and read from arbitrary user threads, so it must be
+    // atomic to avoid a data race
+    static std::atomic<bool> ms_closed;
     friend void HKU_UTILS_API close_spend_time();
     friend void HKU_UTILS_API open_spend_time();
     friend bool HKU_UTILS_API get_spend_time_status();

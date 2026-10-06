@@ -16,6 +16,17 @@
 
 namespace hku {
 
+/**
+ * @brief Table binding macros
+ *
+ * Every TABLE_BINDN macro maps a struct to a database table and, by contract, requires the table
+ * to carry an integer primary key column named "id" (aliased to rowid on SQLite). The generated
+ * code relies on it throughout: getSelectSQL() selects "id" as column 0, load() reads it into
+ * m_id, valid() reports whether m_id is set, and getUpdateSQL()/remove filter on it. Downstream
+ * facilities inherit this precondition (e.g. SQLResultSet / AsyncSQLResultSet build their page
+ * window as `id IN (SELECT id ... ORDER BY id ...)`), so a table without an "id" column is not
+ * supported by any query path - paged or not.
+ */
 #define TABLE_BIND0(TableT, table)              \
 public:                                         \
     TableT() = default;                         \

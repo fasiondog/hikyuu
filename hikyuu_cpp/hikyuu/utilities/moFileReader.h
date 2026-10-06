@@ -168,37 +168,6 @@
  */
 MO_BEGIN_NAMESPACE
 
-const std::string g_css = R"(
-body {
-     background-color: black;
-     color: silver;
-}
-table {
-     width: 80%;
-}
-th {
-     background-color: orange;
-     color: black;
-}
-hr {
-     color: red;
-    width: 80%;
-     size: 5px;
-}
-a:link{
-    color: gold;
-}
-a:visited{
-    color: grey;
-}
-a:hover{
-    color:blue;
-}
-.copyleft{
-     font-size: 12px;
-     text-align: center;
-})";
-
 /**
  * \brief Keeps the Description of translated and original strings.
  *
@@ -330,7 +299,8 @@ public:
         /// \brief The file is invalid.
         EC_FILEINVALID,
 
-        /// \brief Empty Lookup-Table (returned by ExportAsHTML())
+        /// \brief The empty lookup-table (kept for the error-code numbering stability; the
+        ///        ExportAsHTML interface using it was removed because it emitted unescaped HTML)
         EC_TABLEEMPTY,
 
         /// \brief The magic number did not match
@@ -588,111 +558,6 @@ public:
         return numStrings;
     }
 
-    /** \brief Exports the whole content of the .mo-File as .html
-     * \param[in] infile The .mo-File to export.
-     * \param[in] filename Where to store the .html-file. If empty, the path and filename of the
-     * _infile with .html appended. \param[in,out] css The css-script for the visual style of the
-     *                     file, in case you don't like mine ;).
-     * \see g_css for the possible and used css-values.
-     */
-    static eErrorCode ExportAsHTML(const std::string &infile, const std::string &filename = "",
-                                   const std::string &css = g_css) {
-        // Read the file
-        moFileReader reader;
-        moFileReader::eErrorCode r = reader.ReadFile(infile.c_str());
-        if (r != moFileReader::EC_SUCCESS) {
-            return r;
-        }
-        if (reader.m_lookup.empty()) {
-            return moFileReader::EC_TABLEEMPTY;
-        }
-
-        // Beautify Output
-        std::string fname;
-        size_t pos = infile.find_last_of(MO_PATHSEP);
-        if (pos != std::string::npos) {
-            fname = infile.substr(pos + 1, infile.length());
-        } else {
-            fname = infile;
-        }
-
-        // if there is no filename given, we set it to the .mo + html, e.g. test.mo.html
-        std::string htmlfile(filename);
-        if (htmlfile.empty()) {
-            htmlfile = infile + std::string(".html");
-        }
-
-        // Ok, now prepare output.
-        std::ofstream stream(htmlfile.c_str());
-        if (stream.is_open()) {
-            stream
-              << R"(<!DOCTYPE HTML PUBLIC "- //W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">)"
-              << std::endl;
-            stream << "<html><head><style type=\"text/css\">\n" << std::endl;
-            stream << css << std::endl;
-            stream << "</style>" << std::endl;
-            stream << R"(<meta http-equiv="content-type" content="text/html; charset=utf-8">)"
-                   << std::endl;
-            stream << "<title>Dump of " << fname << "</title></head>" << std::endl;
-            stream << "<body>" << std::endl;
-            stream << "<center>" << std::endl;
-            stream << "<h1>" << fname << "</h1>" << std::endl;
-            stream << R"(<table border="1"><th colspan="2">Project Info</th>)" << std::endl;
-
-            std::stringstream parsee;
-            parsee << reader.Lookup("");
-
-            while (!parsee.eof()) {
-                char buffer[1024];
-                parsee.getline(buffer, 1024);
-                std::string name;
-                std::string value;
-
-                reader.GetPoEditorString(buffer, name, value);
-                if (!(name.empty() || value.empty())) {
-                    stream << "<tr><td>" << name << "</td><td>" << value << "</td></tr>"
-                           << std::endl;
-                }
-            }
-            stream << "</table>" << std::endl;
-            stream << "<hr noshade/>" << std::endl;
-
-            // Now output the content
-            stream << R"(<table border="1"><th colspan="2">Content</th>)" << std::endl;
-            for (const auto &it : reader.m_lookup) {
-                if (!it.first.empty())  // Skip the empty msgid, its the table we handled above.
-                {
-                    stream << "<tr><td>" << it.first << "</td><td>" << it.second << "</td></tr>"
-                           << std::endl;
-                }
-            }
-            stream << "</table><br/>" << std::endl;
-
-            // Separate tables for each context
-            for (const auto &it : reader.m_lookup_context) {
-                stream << R"(<table border="1"><th colspan="2">)" << it.first << "</th>"
-                       << std::endl;
-                for (const auto &its : it.second) {
-                    stream << "<tr><td>" << its.first << "</td><td>" << its.second << "</td></tr>"
-                           << std::endl;
-                }
-                stream << "</table><br/>" << std::endl;
-            }
-
-            stream << "</center>" << std::endl;
-            stream << "<div class=\"copyleft\">File generated by <a "
-                      "href=\"https://github.com/AnotherFoxGuy/MofileReader\" "
-                      "target=\"_blank\">moFileReaderSDK</a></div>"
-                   << std::endl;
-            stream << "</body></html>" << std::endl;
-            stream.close();
-        } else {
-            return moFileReader::EC_FILENOTFOUND;
-        }
-
-        return moFileReader::EC_SUCCESS;
-    }
-
 protected:
     /// \brief Keeps the last error as String.
     std::string m_error;
@@ -716,60 +581,6 @@ private:
     moContextLookupList m_lookup_context;
 
     int numStrings = 0;
-
-    // Replaces < with ( to satisfy html-rules.
-    static void MakeHtmlConform(std::string &_inout) {
-        std::string temp = _inout;
-        for (unsigned int i = 0; i < temp.length(); i++) {
-            if (temp[i] == '>') {
-                _inout.replace(i, 1, ")");
-            }
-            if (temp[i] == '<') {
-                _inout.replace(i, 1, "(");
-            }
-        }
-    }
-
-    // Extracts a value-pair from the po-edit-information
-    bool GetPoEditorString(const char *_buffer, std::string &_name, std::string &_value) {
-        std::string line(_buffer);
-        size_t first = line.find_first_of(':');
-
-        if (first != std::string::npos) {
-            _name = line.substr(0, first);
-            _value = line.substr(first + 1, line.length());
-
-            // Replace <> with () for Html-Conformity.
-            MakeHtmlConform(_value);
-            MakeHtmlConform(_name);
-
-            // Remove spaces from front and end.
-            Trim(_value);
-            Trim(_name);
-
-            return true;
-        }
-        return false;
-    }
-
-    // Removes spaces from front and end.
-    static void Trim(std::string &_in) {
-        if (_in.empty()) {
-            return;
-        }
-
-        _in.erase(0, _in.find_first_not_of(" "));
-        _in.erase(_in.find_last_not_of(" ") + 1);
-
-        /*while (_in[0] == ' ')
-        {
-            _in = _in.substr(1, _in.length());
-        }
-        while (_in[_in.length()] == ' ')
-        {
-            _in = _in.substr(0, _in.length() - 1);
-        }*/
-    }
 };
 
 #ifndef MO_NO_CONVENIENCE_CLASS

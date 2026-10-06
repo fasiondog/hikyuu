@@ -234,8 +234,10 @@ bool FileLock::lockFile() noexcept {
     createParentDir(m_filename);
 
     // O_CREAT: the lock file is created automatically when it does not exist; O_EXCL is not used
-    // and the existing content is not truncated
-    int fd = ::open(m_filename.c_str(), O_CREAT | O_RDWR, 0666);
+    // and the existing content is not truncated. O_NOFOLLOW refuses a symlinked lock path
+    // (ELOOP): otherwise the lock would silently synchronize on whatever inode the symlink
+    // points to and the mutual exclusion would be broken
+    int fd = ::open(m_filename.c_str(), O_CREAT | O_RDWR | O_NOFOLLOW, 0666);
     if (fd < 0) {
         HKU_ERROR("Failed to open lock file: {} ({})", m_filename, std::strerror(errno));
         return false;

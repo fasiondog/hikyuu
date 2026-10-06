@@ -30,10 +30,17 @@ class DBConnectBase;
 typedef std::shared_ptr<DBConnectBase> DBConnectPtr;
 
 /** @ingroup DBConnect */
-class null_blob_exception : public exception {
+class HKU_UTILS_API null_blob_exception : public exception {
 public:
     /** Construct */
     null_blob_exception() : exception("Blob is null!") {}
+
+    // The out-of-line destructor is the key function: it pins the vtable and the typeinfo to a
+    // single translation unit inside the library, so that the type thrown by a driver keeps
+    // matching catch (const null_blob_exception &) written in another binary (e.g. in the
+    // getColumn templates of this header), which otherwise fails with every TU holding its own
+    // private typeinfo
+    ~null_blob_exception() noexcept override;
 };
 
 /**

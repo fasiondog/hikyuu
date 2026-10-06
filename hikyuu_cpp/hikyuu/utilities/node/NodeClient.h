@@ -32,13 +32,14 @@ public:
 
     /** Set the server address */
     void setServerAddr(const std::string& serverAddr) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_server_addr = serverAddr;
     }
 
     /** Connect to the server */
     bool dial() noexcept {
         std::lock_guard<std::mutex> lock(m_mutex);
-        close();
+        _close();
         // HKU_TRACE("dial: {}", m_server_addr);
         int rv = nng_req0_open(&m_socket);
         // HKU_ERROR_IF_RETURN(rv != 0, false, "Failed open req socket! {}", nng_strerror(rv));
@@ -77,10 +78,8 @@ public:
 
     /** Close the connection */
     void close() noexcept {
-        if (m_connected) {
-            nng_close(m_socket);
-            m_connected = false;
-        }
+        std::lock_guard<std::mutex> lock(m_mutex);
+        _close();
     }
 
     /** Current connection state */
@@ -90,6 +89,7 @@ public:
 
     /** Get the time of the last received server response */
     Datetime getLastAckTime() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_last_ack_time;
     }
 
@@ -109,6 +109,14 @@ public:
     }
 
 private:
+    // Must be called with m_mutex held; nng_close on the socket must not race with _send/_recv
+    void _close() noexcept {
+        if (m_connected) {
+            nng_close(m_socket);
+            m_connected = false;
+        }
+    }
+
     bool _send(const json& req) const noexcept {
         bool success = false;
         // HKU_ERROR_IF_RETURN(!m_connected, success, "Not connected!");
@@ -164,7 +172,7 @@ private:
     }
 
 private:
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     std::string m_server_addr;  // Server address
     nng_socket m_socket;
     Datetime m_last_ack_time{Datetime::now()};  // The time of the last received server response

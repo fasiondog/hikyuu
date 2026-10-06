@@ -20,6 +20,10 @@ namespace hku {
 /**
  * @brief Calculate the md5 value
  *
+ * @warning MD5 is cryptographically broken and MUST NOT be used for any security purpose
+ *          (signatures, password hashing, authentication tokens and the like). It is provided
+ *          only for integrity checks and cache keys.
+ *
  * @param input the start pointer of the data to be calculated
  * @param len the byte length of the data to be calculated
  * @return std::string
@@ -28,6 +32,10 @@ std::string HKU_UTILS_API md5(const unsigned char* input, size_t len);
 
 /**
  * @brief Calculate the md5 of a string
+ *
+ * @warning MD5 is cryptographically broken and MUST NOT be used for any security purpose
+ *          (signatures, password hashing, authentication tokens and the like). It is provided
+ *          only for integrity checks and cache keys.
  *
  * @param src the string to be calculated
  * @return std::string

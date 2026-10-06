@@ -10,6 +10,7 @@
 #endif
 
 #include "url.h"
+#include <cstring>
 
 namespace hku {
 
@@ -29,6 +30,9 @@ static inline unsigned char hex2i(unsigned char hex) {
 std::string url_escape(const char* istr) {
     std::string ostr;
     const char* p = istr;
+    // Every character may expand into "%XX", reserve the worst case up front so the appends
+    // below never reallocate
+    ostr.reserve(std::strlen(istr) * 3);
     char szHex[4] = {0};
     while (*p != '\0') {
         if (is_unambiguous(*p)) {
@@ -45,6 +49,8 @@ std::string url_escape(const char* istr) {
 std::string url_unescape(const char* istr) {
     std::string ostr;
     const char* p = istr;
+    // The decoded output never grows beyond the encoded input
+    ostr.reserve(std::strlen(istr));
     while (*p != '\0') {
         if (*p == '%' && IS_HEX(p[1]) && IS_HEX(p[2])) {
             ostr += static_cast<char>((hex2i(p[1]) << 4) | hex2i(p[2]));

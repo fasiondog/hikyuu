@@ -154,11 +154,20 @@ private:
         nng_msg* msg = nullptr;
         json res;
 
-        try {
-            int rv = nng_aio_result(work->aio);
-            HKU_CHECK(rv == 0, "Failed nng_aio_result!");
+        // A failed receive carries no message: an error reply built below would call encodeMsg
+        // with a null msg, whose HKU_ASSERT rethrows from inside the catch handler and escapes
+        // into the nng C callback (std::terminate). Re-arm the receive on the context and keep this
+        // work slot alive instead, so only a fully received request reaches the try block
+        int rv = nng_aio_result(work->aio);
+        if (rv != 0) {
+            CLS_WARN("Failed to receive a request! {}", nng_strerror(rv));
+            work->state = Work::RECV;
+            nng_ctx_recv(work->ctx, work->aio);
+            return;
+        }
 
-            msg = nng_aio_get_msg(work->aio);
+        msg = nng_aio_get_msg(work->aio);
+        try {
             json req = decodeMsg(msg);
             NODE_CHECK(req.contains("cmd"), NodeErrorCode::MISSING_CMD, "Missing command!");
 
@@ -229,6 +238,7 @@ private:
             CLS_ERROR("{}", errmsg);
             res["ret"] = NodeErrorCode::UNKNOWN_ERROR;
             res["msg"] = errmsg;
+            encodeMsg(msg, res);
             nng_aio_set_msg(work->aio, msg);
             work->state = Work::SEND;
             nng_ctx_send(work->ctx, work->aio);

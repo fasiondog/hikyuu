@@ -45,6 +45,11 @@ namespace hku {
  *    Do not perform
  *    unlink/rename on the lock file, otherwise the inode the lock depends on is no longer unique
  * and the cross-process mutual exclusion is broken.
+ *  - The lock file must not be a symlink. The POSIX implementation opens the lock file with
+ *    O_NOFOLLOW and refuses to lock when the path is a symlink, so the lock always synchronizes
+ *    on the file named by the path itself. As a residual caveat: an attacker who can write to
+ *    the directory of the lock file can still replace or recreate it; keep the lock file in a
+ *    directory writable only by trusted users.
  *  - All the processes participating in the mutual exclusion must use exactly the same filename
  * (this class normalizes the path for the registry key, but it is still recommended to use the
  * absolute path uniformly).

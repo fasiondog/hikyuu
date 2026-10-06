@@ -14,7 +14,7 @@ namespace hku {
 
 /** SQL handling exception, it is mainly used to encapsulate the internal error of a concrete
  * database engine */
-class SQLException : public hku::exception {
+class HKU_UTILS_API SQLException : public hku::exception {
 public:
     /** Default constructor */
     SQLException() : SQLException(0, "Unknow error!") {}
@@ -39,6 +39,11 @@ public:
     int errcode() const {
         return m_errcode;
     }
+
+    // The out-of-line destructor is the key function, see null_blob_exception in
+    // SQLStatementBase.h: the drivers throw this type inside the library while the guards of
+    // DBConnectBase.h catch it in the binary of the caller
+    ~SQLException() noexcept override;
 
 private:
     int m_errcode;

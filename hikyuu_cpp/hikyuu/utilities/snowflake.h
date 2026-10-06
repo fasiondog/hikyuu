@@ -87,8 +87,13 @@ public:
 
         last_timestamp_ = timestamp;
 
-        return ((timestamp - TWEPOCH) << TIMESTAMP_LEFT_SHIFT) |
-               (datacenterid_ << DATACENTER_ID_SHIFT) | (workerid_ << WORKER_ID_SHIFT) | sequence_;
+        // The shift is performed in unsigned arithmetic: when the clock is earlier than Twepoch
+        // the delta is negative and shifting a negative signed value is undefined behavior. With
+        // unsigned shifts the result wraps, yielding negative ids like the Java implementation.
+        return static_cast<int64_t>(
+          (static_cast<uint64_t>(timestamp - TWEPOCH) << TIMESTAMP_LEFT_SHIFT) |
+          (static_cast<uint64_t>(datacenterid_) << DATACENTER_ID_SHIFT) |
+          (static_cast<uint64_t>(workerid_) << WORKER_ID_SHIFT) | static_cast<uint64_t>(sequence_));
     }
 
 private:

@@ -8,6 +8,7 @@
  */
 
 #include <cstring>
+#include <variant>
 #include <vector>
 #include "MySQLStatement.h"
 #include "MySQLConnect.h"
@@ -34,6 +35,9 @@ constexpr unsigned long long MAX_INITIAL_BUFFER_SIZE = 1ull << 20;
 
 // The Pimpl implementation struct
 struct MySQLStatement::Impl {
+    using Value = std::variant<std::monostate, int8_t, short, int32_t, int64_t, uint64_t, float,
+                               double, MYSQL_TIME, std::string, std::vector<char>>;
+
     MYSQL* db{nullptr};
     MYSQL_STMT* stmt{nullptr};
     MYSQL_RES* meta_result{nullptr};
@@ -44,10 +48,9 @@ struct MySQLStatement::Impl {
     std::vector<MYSQL_BIND> result_bind;
     // Parameter values are stored per placeholder slot (indexed by the bind position), so the
     // storage is bounded by the parameter count no matter how many times the statement is
-    // executed. The MYSQL_BIND buffers point into the heap holders of these any objects, which
-    // stay valid when the vector itself reallocates.
-    std::vector<boost::any> param_buffer;
-    std::vector<boost::any> result_buffer;
+    // executed.
+    std::vector<Value> param_buffer;
+    std::vector<Value> result_buffer;
     std::vector<unsigned long> result_length;
     std::vector<char> result_is_null;
     std::vector<char> result_error;
@@ -60,11 +63,8 @@ struct MySQLStatement::Impl {
     }
 
     /** Return the value slot of a placeholder so rebinding replaces the old value instead of
-     * appending a new one (storage stays bounded by the parameter count across exec calls) */
-    boost::any& paramSlot(int idx) {
-        if (param_buffer.size() <= static_cast<size_t>(idx)) {
-            param_buffer.resize(static_cast<size_t>(idx) + 1);
-        }
+     *  appending a new one (storage stays bounded by the parameter count across exec calls) */
+    Value& paramSlot(int idx) {
         return param_buffer[idx];
     }
 
@@ -76,7 +76,7 @@ struct MySQLStatement::Impl {
 
             MYSQL_BIND& bind = result_bind[i];
             if (isStringType(bind.buffer_type) && result_length[i] > bind.buffer_length) {
-                std::vector<char>* p = boost::any_cast<std::vector<char>>(&result_buffer[i]);
+                std::vector<char>* p = std::get_if<std::vector<char>>(&result_buffer[i]);
                 p->resize(result_length[i] + 1);
                 bind.buffer = p->data();
                 bind.buffer_length = result_length[i] + 1;
@@ -104,6 +104,7 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_sta
     if (param_count > 0) {
         m_impl->param_bind.resize(param_count);
         memset(m_impl->param_bind.data(), 0, param_count * sizeof(MYSQL_BIND));
+        m_impl->param_buffer.resize(param_count);
     }
 
     m_impl->meta_result = mysql_stmt_result_metadata(m_impl->stmt);
@@ -111,6 +112,7 @@ MySQLStatement::MySQLStatement(DBConnectBase* driver, const std::string& sql_sta
         int column_count = mysql_num_fields(m_impl->meta_result);
         m_impl->result_bind.resize(column_count);
         memset(m_impl->result_bind.data(), 0, column_count * sizeof(MYSQL_BIND));
+        m_impl->result_buffer.resize(column_count);
         m_impl->result_length.resize(column_count, 0);
         m_impl->result_is_null.resize(column_count, 0);
         m_impl->result_error.resize(column_count, 0);
@@ -171,7 +173,6 @@ void MySQLStatement::_reset() {
         int ret = mysql_stmt_reset(m_impl->stmt);
         SQL_CHECK(ret == 0, static_cast<int>(mysql_stmt_errno(m_impl->stmt)),
                   "Failed reset statement! {}", mysql_stmt_error(m_impl->stmt));
-        m_impl->result_buffer.clear();
         m_impl->needs_reset = false;
         m_impl->has_bind_result = false;
     }
@@ -193,6 +194,8 @@ void MySQLStatement::sub_exec() {
 
 void MySQLStatement::_bindResult() {
     HKU_IF_RETURN(!m_impl->meta_result, void());
+    // Restart the field cursor so re-binding after a repeated execution walks all fields again
+    mysql_field_seek(m_impl->meta_result, 0);
     MYSQL_FIELD* field;
     int idx = 0;
     while ((field = mysql_fetch_field(m_impl->meta_result))) {
@@ -210,33 +213,24 @@ void MySQLStatement::_bindResult() {
             // BIGINT UNSIGNED must be read through an unsigned buffer, otherwise values above
             // INT64_MAX would be misinterpreted as negative
             if (field->flags & UNSIGNED_FLAG) {
-                uint64_t item = 0;
-                m_impl->result_buffer.push_back(item);
-                auto& buf = m_impl->result_buffer.back();
-                m_impl->result_bind[idx].buffer = boost::any_cast<uint64_t>(&buf);
+                m_impl->result_buffer[idx] = uint64_t{0};
+                m_impl->result_bind[idx].buffer =
+                  std::get_if<uint64_t>(&m_impl->result_buffer[idx]);
                 m_impl->result_bind[idx].is_unsigned = true;
             } else {
-                int64_t item = 0;
-                m_impl->result_buffer.push_back(item);
-                auto& buf = m_impl->result_buffer.back();
-                m_impl->result_bind[idx].buffer = boost::any_cast<int64_t>(&buf);
+                m_impl->result_buffer[idx] = int64_t{0};
+                m_impl->result_bind[idx].buffer = std::get_if<int64_t>(&m_impl->result_buffer[idx]);
                 m_impl->result_bind[idx].is_unsigned = false;
             }
         } else if (field->type == MYSQL_TYPE_LONG || field->type == MYSQL_TYPE_INT24) {
-            int32_t item = 0;
-            m_impl->result_buffer.push_back(item);
-            auto& buf = m_impl->result_buffer.back();
-            m_impl->result_bind[idx].buffer = boost::any_cast<int32_t>(&buf);
+            m_impl->result_buffer[idx] = int32_t{0};
+            m_impl->result_bind[idx].buffer = std::get_if<int32_t>(&m_impl->result_buffer[idx]);
         } else if (field->type == MYSQL_TYPE_DOUBLE) {
-            double item = 0;
-            m_impl->result_buffer.push_back(item);
-            auto& buf = m_impl->result_buffer.back();
-            m_impl->result_bind[idx].buffer = boost::any_cast<double>(&buf);
+            m_impl->result_buffer[idx] = double{0};
+            m_impl->result_bind[idx].buffer = std::get_if<double>(&m_impl->result_buffer[idx]);
         } else if (field->type == MYSQL_TYPE_FLOAT) {
-            float item = 0;
-            m_impl->result_buffer.push_back(item);
-            auto& buf = m_impl->result_buffer.back();
-            m_impl->result_bind[idx].buffer = boost::any_cast<float>(&buf);
+            m_impl->result_buffer[idx] = float{0};
+            m_impl->result_bind[idx].buffer = std::get_if<float>(&m_impl->result_buffer[idx]);
         } else if (field->type == MYSQL_TYPE_VAR_STRING || field->type == MYSQL_TYPE_STRING ||
                    field->type == MYSQL_TYPE_BLOB || field->type == MYSQL_TYPE_TINY_BLOB ||
                    field->type == MYSQL_TYPE_VARCHAR || field->type == MYSQL_TYPE_DECIMAL ||
@@ -246,29 +240,23 @@ void MySQLStatement::_bindResult() {
                                      ? (unsigned long)MAX_INITIAL_BUFFER_SIZE
                                      : (unsigned long)want;
             m_impl->result_bind[idx].buffer_length = length;
-            m_impl->result_buffer.emplace_back(std::vector<char>(length));
-            auto& buf = m_impl->result_buffer.back();
-            std::vector<char>* p = boost::any_cast<std::vector<char>>(&buf);
-            m_impl->result_bind[idx].buffer = p->data();
+            m_impl->result_buffer[idx] = std::vector<char>(length);
+            m_impl->result_bind[idx].buffer =
+              std::get_if<std::vector<char>>(&m_impl->result_buffer[idx])->data();
         } else if (field->type == MYSQL_TYPE_TINY) {
-            int8_t item = 0;
-            m_impl->result_buffer.push_back(item);
-            auto& buf = m_impl->result_buffer.back();
-            m_impl->result_bind[idx].buffer = boost::any_cast<int8_t>(&buf);
+            m_impl->result_buffer[idx] = int8_t{0};
+            m_impl->result_bind[idx].buffer = std::get_if<int8_t>(&m_impl->result_buffer[idx]);
         } else if (field->type == MYSQL_TYPE_SHORT || field->type == MYSQL_TYPE_YEAR) {
-            short item = 0;
-            m_impl->result_buffer.push_back(item);
-            auto& buf = m_impl->result_buffer.back();
+            m_impl->result_buffer[idx] = short{0};
             m_impl->result_bind[idx].buffer_type = MYSQL_TYPE_SHORT;
-            m_impl->result_bind[idx].buffer = boost::any_cast<short>(&buf);
+            m_impl->result_bind[idx].buffer = std::get_if<short>(&m_impl->result_buffer[idx]);
         } else if (field->type == MYSQL_TYPE_DATETIME || field->type == MYSQL_TYPE_DATE ||
                    field->type == MYSQL_TYPE_TIMESTAMP || field->type == MYSQL_TYPE_TIME ||
                    field->type == MYSQL_TYPE_TIME2) {
             MYSQL_TIME item;
             memset(&item, 0, sizeof(item));
-            m_impl->result_buffer.push_back(item);
-            auto& buf = m_impl->result_buffer.back();
-            m_impl->result_bind[idx].buffer = boost::any_cast<MYSQL_TIME>(&buf);
+            m_impl->result_buffer[idx] = item;
+            m_impl->result_bind[idx].buffer = std::get_if<MYSQL_TIME>(&m_impl->result_buffer[idx]);
         } else {
             HKU_THROW("Unsupport field type: {}, field name: {}", int(field->type), field->name);
         }
@@ -317,7 +305,7 @@ void MySQLStatement::sub_bindInt(int idx, int64_t value) {
     buf = value;
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_LONGLONG;
     m_impl->param_bind[idx].is_unsigned = false;
-    m_impl->param_bind[idx].buffer = boost::any_cast<int64_t>(&buf);
+    m_impl->param_bind[idx].buffer = std::get_if<int64_t>(&buf);
 }
 
 void MySQLStatement::sub_bindUInt64(int idx, uint64_t value) {
@@ -327,7 +315,7 @@ void MySQLStatement::sub_bindUInt64(int idx, uint64_t value) {
     buf = value;
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_LONGLONG;
     m_impl->param_bind[idx].is_unsigned = true;
-    m_impl->param_bind[idx].buffer = boost::any_cast<uint64_t>(&buf);
+    m_impl->param_bind[idx].buffer = std::get_if<uint64_t>(&buf);
 }
 
 void MySQLStatement::sub_bindDouble(int idx, double item) {
@@ -336,7 +324,7 @@ void MySQLStatement::sub_bindDouble(int idx, double item) {
     auto& buf = m_impl->paramSlot(idx);
     buf = item;
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_DOUBLE;
-    m_impl->param_bind[idx].buffer = boost::any_cast<double>(&buf);
+    m_impl->param_bind[idx].buffer = std::get_if<double>(&buf);
 }
 
 void MySQLStatement::sub_bindDatetime(int idx, const Datetime& item) {
@@ -358,7 +346,7 @@ void MySQLStatement::sub_bindDatetime(int idx, const Datetime& item) {
     tm.time_type = MYSQL_TIMESTAMP_DATETIME;
     auto& buf = m_impl->paramSlot(idx);
     buf = tm;
-    MYSQL_TIME* p = boost::any_cast<MYSQL_TIME>(&buf);
+    MYSQL_TIME* p = std::get_if<MYSQL_TIME>(&buf);
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_DATETIME;
     m_impl->param_bind[idx].buffer = p;
     m_impl->param_bind[idx].buffer_length = sizeof(MYSQL_TIME);
@@ -370,7 +358,7 @@ void MySQLStatement::sub_bindText(int idx, const std::string& item) {
               "idx out of range! idx: {}, total: {}", idx, m_impl->param_bind.size());
     auto& buf = m_impl->paramSlot(idx);
     buf = item;
-    std::string* p = boost::any_cast<std::string>(&buf);
+    std::string* p = std::get_if<std::string>(&buf);
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
     m_impl->param_bind[idx].buffer = (void*)p->data();
     m_impl->param_bind[idx].buffer_length = item.size();
@@ -382,7 +370,7 @@ void MySQLStatement::sub_bindText(int idx, const char* item, size_t len) {
               "idx out of range! idx: {}, total: {}", idx, m_impl->param_bind.size());
     auto& buf = m_impl->paramSlot(idx);
     buf = std::string(item, len);
-    std::string* p = boost::any_cast<std::string>(&buf);
+    std::string* p = std::get_if<std::string>(&buf);
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_VAR_STRING;
     m_impl->param_bind[idx].buffer = (void*)p->data();
     m_impl->param_bind[idx].buffer_length = p->size();
@@ -394,7 +382,7 @@ void MySQLStatement::sub_bindBlob(int idx, const std::string& item) {
               "idx out of range! idx: {}, total: {}", idx, m_impl->param_bind.size());
     auto& buf = m_impl->paramSlot(idx);
     buf = item;
-    std::string* p = boost::any_cast<std::string>(&buf);
+    std::string* p = std::get_if<std::string>(&buf);
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_BLOB;
     m_impl->param_bind[idx].buffer = (void*)p->data();
     m_impl->param_bind[idx].buffer_length = item.size();
@@ -406,7 +394,7 @@ void MySQLStatement::sub_bindBlob(int idx, const std::vector<char>& item) {
               "idx out of range! idx: {}, total: {}", idx, m_impl->param_bind.size());
     auto& buf = m_impl->paramSlot(idx);
     buf = item;
-    std::vector<char>* p = boost::any_cast<std::vector<char>>(&buf);
+    std::vector<char>* p = std::get_if<std::vector<char>>(&buf);
     m_impl->param_bind[idx].buffer_type = MYSQL_TYPE_BLOB;
     m_impl->param_bind[idx].buffer = (void*)p->data();
     m_impl->param_bind[idx].buffer_length = p->size();
@@ -432,21 +420,21 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     try {
         if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_LONGLONG) {
             if (m_impl->result_bind[idx].is_unsigned) {
-                uint64_t u = boost::any_cast<uint64_t>(m_impl->result_buffer[idx]);
+                uint64_t u = std::get<uint64_t>(m_impl->result_buffer[idx]);
                 SQL_CHECK(u <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()), -1,
                           "Column {} unsigned value {} overflows int64", idx, u);
                 item = static_cast<int64_t>(u);
             } else {
-                item = boost::any_cast<int64_t>(m_impl->result_buffer[idx]);
+                item = std::get<int64_t>(m_impl->result_buffer[idx]);
             }
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_LONG ||
                    m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_INT24) {
-            item = boost::any_cast<int32_t>(m_impl->result_buffer[idx]);
+            item = std::get<int32_t>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_TINY) {
-            item = boost::any_cast<int8_t>(m_impl->result_buffer[idx]);
+            item = std::get<int8_t>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_SHORT ||
                    m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_YEAR) {
-            item = boost::any_cast<short>(m_impl->result_buffer[idx]);
+            item = std::get<short>(m_impl->result_buffer[idx]);
         } else {
             HKU_THROW("Field type mismatch! idx: {}", idx);
         }
@@ -474,9 +462,9 @@ void MySQLStatement::sub_getColumnAsUInt64(int idx, uint64_t& item) {
     try {
         if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_LONGLONG) {
             if (m_impl->result_bind[idx].is_unsigned) {
-                item = boost::any_cast<uint64_t>(m_impl->result_buffer[idx]);
+                item = std::get<uint64_t>(m_impl->result_buffer[idx]);
             } else {
-                int64_t s = boost::any_cast<int64_t>(m_impl->result_buffer[idx]);
+                int64_t s = std::get<int64_t>(m_impl->result_buffer[idx]);
                 SQL_CHECK(s >= 0, -1, "Column {} holds negative value {}, cannot be read as uint64",
                           idx, s);
                 item = static_cast<uint64_t>(s);
@@ -511,23 +499,29 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
 
     try {
         if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_DOUBLE) {
-            item = boost::any_cast<double>(m_impl->result_buffer[idx]);
+            item = std::get<double>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_FLOAT) {
-            item = boost::any_cast<float>(m_impl->result_buffer[idx]);
+            item = std::get<float>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_LONGLONG) {
-            item = boost::any_cast<int64_t>(m_impl->result_buffer[idx]);
+            // BIGINT is stored in the variant as uint64_t or int64_t depending on the column's
+            // unsigned flag; pick the active alternative, otherwise reading an unsigned BIGINT as
+            // double throws bad_variant_access (mirrors sub_getColumnAsInt64/UInt64)
+            if (m_impl->result_bind[idx].is_unsigned) {
+                item = std::get<uint64_t>(m_impl->result_buffer[idx]);
+            } else {
+                item = std::get<int64_t>(m_impl->result_buffer[idx]);
+            }
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_LONG ||
                    m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_INT24) {
-            item = boost::any_cast<int32_t>(m_impl->result_buffer[idx]);
+            item = std::get<int32_t>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_TINY) {
-            item = boost::any_cast<int8_t>(m_impl->result_buffer[idx]);
+            item = std::get<int8_t>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_SHORT ||
                    m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_YEAR) {
-            item = boost::any_cast<short>(m_impl->result_buffer[idx]);
+            item = std::get<short>(m_impl->result_buffer[idx]);
         } else if (m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_DECIMAL ||
                    m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_NEWDECIMAL) {
-            std::vector<char>* p =
-              boost::any_cast<std::vector<char>>(&(m_impl->result_buffer[idx]));
+            std::vector<char>* p = std::get_if<std::vector<char>>(&(m_impl->result_buffer[idx]));
             SQL_CHECK(m_impl->result_length[idx] <= p->size(), -1, "Invalid column length! idx: {}",
                       idx);
             item = std::stod(std::string(p->data(), m_impl->result_length[idx]));
@@ -557,7 +551,7 @@ void MySQLStatement::sub_getColumnAsDatetime(int idx, Datetime& item) {
     }
 
     try {
-        const MYSQL_TIME* tm = boost::any_cast<MYSQL_TIME>(&(m_impl->result_buffer[idx]));
+        const MYSQL_TIME* tm = std::get_if<MYSQL_TIME>(&(m_impl->result_buffer[idx]));
         if (tm->time_type == MYSQL_TIMESTAMP_DATETIME) {
             long millisec = tm->second_part / 1000;
             long microsec = tm->second_part - millisec * 1000;
@@ -593,7 +587,7 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
             m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_TIMESTAMP ||
             m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_DATE ||
             m_impl->result_bind[idx].buffer_type == MYSQL_TYPE_TIME) {
-            const MYSQL_TIME* tm = boost::any_cast<MYSQL_TIME>(&(m_impl->result_buffer[idx]));
+            const MYSQL_TIME* tm = std::get_if<MYSQL_TIME>(&(m_impl->result_buffer[idx]));
             if (tm->time_type == MYSQL_TIMESTAMP_DATETIME) {
                 long millisec = tm->second_part / 1000;
                 long microsec = tm->second_part - millisec * 1000;
@@ -613,7 +607,7 @@ void MySQLStatement::sub_getColumnAsText(int idx, std::string& item) {
             return;
         }
 
-        std::vector<char>* p = boost::any_cast<std::vector<char>>(&(m_impl->result_buffer[idx]));
+        std::vector<char>* p = std::get_if<std::vector<char>>(&(m_impl->result_buffer[idx]));
         SQL_CHECK(m_impl->result_length[idx] <= p->size(), -1, "Invalid column length! idx: {}",
                   idx);
         item.assign(p->data(), m_impl->result_length[idx]);
@@ -634,7 +628,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::string& item) {
     }
 
     try {
-        std::vector<char>* p = boost::any_cast<std::vector<char>>(&m_impl->result_buffer[idx]);
+        std::vector<char>* p = std::get_if<std::vector<char>>(&m_impl->result_buffer[idx]);
         SQL_CHECK(m_impl->result_length[idx] <= p->size(), -1, "Invalid column length! idx: {}",
                   idx);
         item.assign(p->data(), m_impl->result_length[idx]);
@@ -656,7 +650,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::vector<char>& item) {
 
     try {
         unsigned long len = m_impl->result_length[idx];
-        std::vector<char>* p = boost::any_cast<std::vector<char>>(&m_impl->result_buffer[idx]);
+        std::vector<char>* p = std::get_if<std::vector<char>>(&m_impl->result_buffer[idx]);
         item.resize(len);
         memcpy(item.data(), p->data(), len);
 

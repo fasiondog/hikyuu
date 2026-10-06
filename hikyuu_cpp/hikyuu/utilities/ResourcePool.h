@@ -490,6 +490,9 @@ public:
     void incVersion(int version) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_version += version;
+        // Release the idle resources as setParam/setParameter do: otherwise old-version entries
+        // would linger in the cache (get validates the version as a second line of defense)
+        _releaseIdleResourceNoLock();
     }
 
     /** Resource instance pointer type */
@@ -506,8 +509,10 @@ public:
             HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
         }
         ResourcePtr result;
-        ResourceType *p = nullptr;
-        if (m_resourceList.empty()) {
+        // Take the first idle resource of the current version; stale entries left by an
+        // incVersion call are destroyed, freeing capacity for a fresh one
+        ResourceType *p = _popCurrentIdle();
+        if (!p) {
             if (m_maxPoolSize > 0 && m_count >= m_maxPoolSize) {
                 return result;
             }
@@ -522,12 +527,7 @@ public:
                                     "Failed create a new Resource! Unknown error!");
             }
             m_count++;
-            result = ResourcePtr(p, ResourceCloser(this));
-            m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
-            return result;
         }
-        p = m_resourceList.front();
-        m_resourceList.pop();
         result = ResourcePtr(p, ResourceCloser(this));
         m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
         return result;
@@ -544,8 +544,8 @@ public:
             HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
         }
         ResourcePtr result;
-        ResourceType *p = nullptr;
-        if (m_resourceList.empty()) {
+        ResourceType *p = _popCurrentIdle();
+        if (!p) {
             if (m_maxPoolSize > 0 && m_count >= m_maxPoolSize) {
                 m_waiting++;
                 auto pred = [this] { return m_closed || !m_resourceList.empty(); };
@@ -560,10 +560,18 @@ public:
                 if (m_closed) {
                     HKU_THROW_EXCEPTION(ResourcePoolClosedException, "Failed get resource!");
                 }
-                if (ms_timeout > 0 && m_resourceList.empty()) {
-                    HKU_THROW_EXCEPTION(GetResourceTimeoutException, "Failed get resource!");
+                p = _popCurrentIdle();
+                if (!p) {
+                    // the wait ended with nothing of the current version to take: keep the
+                    // original timeout contract for getWaitFor; for the indefinite getAndWait
+                    // discarding stale entries always frees capacity, so hitting the limit here
+                    // means no resource can be served and reporting is safer than an empty pop
+                    if (ms_timeout > 0 || m_count >= m_maxPoolSize) {
+                        HKU_THROW_EXCEPTION(GetResourceTimeoutException, "Failed get resource!");
+                    }
                 }
-            } else {
+            }
+            if (!p) {
                 try {
                     p = new ResourceType(m_param);
                     p->setVersion(m_version);
@@ -575,13 +583,8 @@ public:
                                         "Failed create a new Resource! Unknown error!");
                 }
                 m_count++;
-                result = ResourcePtr(p, ResourceCloser(this));
-                m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
-                return result;
             }
         }
-        p = m_resourceList.front();
-        m_resourceList.pop();
         result = ResourcePtr(p, ResourceCloser(this));
         m_closer_set.insert(std::get_deleter<ResourceCloser>(result));
         return result;
@@ -625,6 +628,23 @@ private:
                 delete p;
             }
         }
+    }
+
+    // Pop the first idle resource carrying the current version, destroying older entries on the
+    // way: the version can also be raised through incVersion, and an old-version resource must
+    // never be handed out (the sibling version pools validate the version at take time the same
+    // way). Must be called with m_mutex held
+    ResourceType *_popCurrentIdle() {
+        while (!m_resourceList.empty()) {
+            ResourceType *p = m_resourceList.front();
+            m_resourceList.pop();
+            if (p && p->getVersion() == m_version) {
+                return p;
+            }
+            delete p;
+            m_count--;
+        }
+        return nullptr;
     }
 
 private:

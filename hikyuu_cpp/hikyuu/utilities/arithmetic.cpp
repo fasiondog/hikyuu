@@ -6,6 +6,8 @@
  */
 
 #include <stdexcept>
+#include <memory>
+#include <vector>
 #include <utf8proc.h>
 #include "arithmetic.h"
 
@@ -51,39 +53,33 @@ template float HKU_UTILS_API roundDown(float number, int ndigits);
  * @note It takes effect on the Windows platform only
  */
 std::string HKU_UTILS_API utf8_to_gb(const char *szinput) {
-    wchar_t *strSrc;
-    char *szRes;
     std::string nullStr;
     if (!szinput) {
         return nullStr;
     }
 
+    // RAII buffers: every failure path releases them, the conversion failure of one stage used
+    // to leak the buffer allocated by the previous stage
     int i = MultiByteToWideChar(CP_UTF8, 0, szinput, -1, NULL, 0);
     if (i == 0) {
         return nullStr;
     }
-    strSrc = new wchar_t[i + 1];
-    if (!MultiByteToWideChar(CP_UTF8, 0, szinput, -1, strSrc, i)) {
-        delete[] strSrc;
+    std::unique_ptr<wchar_t[]> strSrc(new wchar_t[i + 1]);
+    if (!MultiByteToWideChar(CP_UTF8, 0, szinput, -1, strSrc.get(), i)) {
         return nullStr;
     }
 
-    i = WideCharToMultiByte(CP_ACP, 0, strSrc, -1, NULL, 0, NULL, NULL);
+    i = WideCharToMultiByte(CP_ACP, 0, strSrc.get(), -1, NULL, 0, NULL, NULL);
     if (i == 0) {
         return nullStr;
     }
 
-    szRes = new char[i + 1];
-    if (!WideCharToMultiByte(CP_ACP, 0, strSrc, -1, szRes, i, NULL, NULL)) {
-        delete[] szRes;
+    std::unique_ptr<char[]> szRes(new char[i + 1]);
+    if (!WideCharToMultiByte(CP_ACP, 0, strSrc.get(), -1, szRes.get(), i, NULL, NULL)) {
         return nullStr;
     }
 
-    std::string result(szRes);
-
-    delete[] strSrc;
-    delete[] szRes;
-    return result;
+    return std::string(szRes.get());
 }
 
 std::string HKU_UTILS_API utf8_to_gb(const std::string &szinput) {
@@ -97,40 +93,33 @@ std::string HKU_UTILS_API utf8_to_gb(const std::string &szinput) {
  * @note It takes effect on the Windows platform only
  */
 std::string HKU_UTILS_API gb_to_utf8(const char *szinput) {
-    wchar_t *strSrc;
-    char *szRes;
     std::string nullstr;
     if (!szinput) {
         return nullstr;
     }
 
+    // RAII buffers: every failure path releases them, the conversion failure of one stage used
+    // to leak the buffer allocated by the previous stage
     int i = MultiByteToWideChar(CP_ACP, 0, szinput, -1, NULL, 0);
     if (0 == i) {
         return nullstr;
     }
-
-    strSrc = new wchar_t[i + 1];
-    if (!MultiByteToWideChar(CP_ACP, 0, szinput, -1, strSrc, i)) {
-        delete[] strSrc;
+    std::unique_ptr<wchar_t[]> strSrc(new wchar_t[i + 1]);
+    if (!MultiByteToWideChar(CP_ACP, 0, szinput, -1, strSrc.get(), i)) {
         return nullstr;
     }
 
-    i = WideCharToMultiByte(CP_UTF8, 0, strSrc, -1, NULL, 0, NULL, NULL);
+    i = WideCharToMultiByte(CP_UTF8, 0, strSrc.get(), -1, NULL, 0, NULL, NULL);
     if (0 == i) {
         return nullstr;
     }
 
-    szRes = new char[i + 1];
-    if (!WideCharToMultiByte(CP_UTF8, 0, strSrc, -1, szRes, i, NULL, NULL)) {
-        delete[] szRes;
+    std::unique_ptr<char[]> szRes(new char[i + 1]);
+    if (!WideCharToMultiByte(CP_UTF8, 0, strSrc.get(), -1, szRes.get(), i, NULL, NULL)) {
         return nullstr;
     }
 
-    std::string result(szRes);
-
-    delete[] strSrc;
-    delete[] szRes;
-    return result;
+    return std::string(szRes.get());
 }
 
 std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
@@ -139,41 +128,63 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
 
 #else /* else for defined(_MSC_VER) */
 std::string HKU_UTILS_API utf8_to_gb(const std::string &szinput) {
-    char *inbuf = const_cast<char *>(szinput.c_str());
-    size_t inlen = strlen(inbuf);
-    size_t outlen = inlen;
-    char *outbuf = (char *)malloc(outlen);
-    if (!outbuf) [[unlikely]] {
+    if (szinput.empty()) {
         return std::string();
     }
-    memset(outbuf, 0, outlen);
-    char *in = inbuf;
-    char *out = outbuf;
+
     iconv_t cd = iconv_open("gbk", "utf-8");
-    iconv(cd, &in, &inlen, &out, &outlen);
+    if (cd == (iconv_t)-1) [[unlikely]] {
+        // a failed open yields an invalid descriptor; using it would be UB, so bail out empty
+        return std::string();
+    }
+
+    // gbk never expands beyond the utf-8 byte count, so the input size is a safe capacity; one
+    // extra byte keeps a terminating NUL that iconv itself does not write
+    size_t inlen = szinput.size();
+    const size_t outcap = inlen;
+    std::vector<char> outbuf(outcap + 1, '\0');
+    char *in = const_cast<char *>(szinput.data());
+    char *out = outbuf.data();
+    size_t outleft = outcap;
+
+    size_t rc = iconv(cd, &in, &inlen, &out, &outleft);
     iconv_close(cd);
-    std::string result(outbuf);
-    free(outbuf);
-    return result;
+    if (rc == (size_t)-1) [[unlikely]] {
+        // conversion failed or was truncated: mirror the Windows path and return empty instead of
+        // silently yielding a partial result
+        return std::string();
+    }
+
+    // build from the byte count actually written, not from the buffer as a C string
+    return std::string(outbuf.data(), outcap - outleft);
 }
 
 std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput) {
-    char *inbuf = const_cast<char *>(szinput.c_str());
-    size_t inlen = strlen(inbuf);
-    size_t outlen = inlen * 2;
-    char *outbuf = (char *)malloc(outlen);
-    if (!outbuf) [[unlikely]] {
+    if (szinput.empty()) {
         return std::string();
     }
-    memset(outbuf, 0, outlen);
-    char *in = inbuf;
-    char *out = outbuf;
+
     iconv_t cd = iconv_open("utf-8", "gbk");
-    iconv(cd, &in, &inlen, &out, &outlen);
+    if (cd == (iconv_t)-1) [[unlikely]] {
+        return std::string();
+    }
+
+    // utf-8 expands a 2-byte gbk cjk to up to 3 bytes, so twice the input size is a safe
+    // capacity; one extra byte keeps the terminating NUL that iconv does not write
+    size_t inlen = szinput.size();
+    const size_t outcap = inlen * 2;
+    std::vector<char> outbuf(outcap + 1, '\0');
+    char *in = const_cast<char *>(szinput.data());
+    char *out = outbuf.data();
+    size_t outleft = outcap;
+
+    size_t rc = iconv(cd, &in, &inlen, &out, &outleft);
     iconv_close(cd);
-    std::string result(outbuf);
-    free(outbuf);
-    return result;
+    if (rc == (size_t)-1) [[unlikely]] {
+        return std::string();
+    }
+
+    return std::string(outbuf.data(), outcap - outleft);
 }
 
 #endif /* defined(_MSC_VER) */

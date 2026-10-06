@@ -16,9 +16,9 @@ namespace hku {
 #define MAX_SPEND_MSG_LEN 1024
 
 #if HKU_CLOSE_SPEND_TIME
-bool SpendTimer::ms_closed = true;
+std::atomic<bool> SpendTimer::ms_closed{true};
 #else
-bool SpendTimer::ms_closed = false;
+std::atomic<bool> SpendTimer::ms_closed{false};
 #endif
 
 static std::tuple<double, std::string> transUnit(std::chrono::duration<double> sec) {
@@ -33,12 +33,12 @@ static std::tuple<double, std::string> transUnit(std::chrono::duration<double> s
     } else if (sec.count() < 1) {
         unit = "ms";
         duration = sec.count() * 1000;
+    } else if (sec.count() > 3600) {
+        unit = " h";
+        duration = sec.count() / 3600;
     } else if (sec.count() > 60) {
         unit = " m";
         duration = sec.count() / 60;
-    } else if (sec.count() > 86400) {
-        unit = " h";
-        duration = sec.count() / 360;
     } else {
         unit = " s";
         duration = sec.count();
@@ -51,27 +51,28 @@ SpendTimer::~SpendTimer() {
         return;
     }
     show();
-    size_t total = m_keep_seconds.size();
-    if (total > 0) {
+    if (m_keep_seconds.size() > 0) {
+        // Record the interval from the last keep to the destruction
         m_keep_seconds.push_back(std::chrono::steady_clock::now() - m_pre_keep_time);
         double duration_ = 0.0;
         std::string unit;
-        for (size_t i = 0; i < total; i++) {
+        // Iterate over all segments including the final one pushed above; the final segment has
+        // no keep description
+        for (size_t i = 0; i < m_keep_seconds.size(); i++) {
             std::tie(duration_, unit) = transUnit(m_keep_seconds[i]);
+            const char* desc = i < m_keep_desc.size() ? m_keep_desc[i].c_str() : "";
 #ifdef __ANDROID__
             __android_log_print(ANDROID_LOG_INFO, "HKU", "%6zu keep: %7.3f %s - %s\n", i, duration_,
-                                unit.c_str(), m_keep_desc[i].c_str());
+                                unit.c_str(), desc);
 
 #if defined(HIKYUU_ENABLE_ANDROID_SHELL_OUTPUT) && HIKYUU_ENABLE_ANDROID_SHELL_OUTPUT
-            printf("%6zu keep: %7.3f %s - %s\n", i, duration_, unit.c_str(),
-                   m_keep_desc[i].c_str());
+            printf("%6zu keep: %7.3f %s - %s\n", i, duration_, unit.c_str(), desc);
 #endif
 
 #else
-            // printf("%5zu keep: %7.3f %s - %s\n", i, duration_, unit.c_str(),
-            // m_keep_desc[i].c_str());
+            // printf("%5zu keep: %7.3f %s - %s\n", i, duration_, unit.c_str(), desc);
             std::cout << std::setw(5) << " keep: " << i << std::setw(7) << std::setprecision(3)
-                      << duration_ << " " << unit << " - " << m_keep_desc[i] << std::endl;
+                      << duration_ << " " << unit << " - " << desc << std::endl;
 #endif /* __ANDROID__ */
         }
     }

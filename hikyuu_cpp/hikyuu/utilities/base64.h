@@ -19,10 +19,11 @@ namespace hku {
 /**
  * Decode a base64 string
  * @param encoded_string the base64 encoded string
- * @param remove_linebreaks whether to remove the separators in the url
+ * @param remove_linebreaks whether to remove the line breaks ('\n') from the input before
+ *        decoding
  * @return string the actually decoded binary content is stored in the returned string object
- * @note If the passed base64 encoded string contains illegal characters no warning is given, only
- *       the processable characters are processed
+ * @throws std::runtime_error if the input contains characters outside the base64 alphabet or a
+ *         trailing chunk that cannot produce any output byte
  */
 std::string HKU_UTILS_API base64_decode(std::string const& encoded_string,
                                         bool remove_linebreaks = false);

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <limits>
+#include <stdexcept>
 #include <string>
 
 #include "osdef.h"
@@ -111,7 +113,11 @@ inline any_t string_to_any<long long>(const std::string& data) {
 
 template <>
 inline any_t string_to_any<unsigned int>(const std::string& data) {
-    return any_t((unsigned int)(std::stoul(data)));
+    unsigned long v = std::stoul(data);
+    if (v > (std::numeric_limits<unsigned int>::max)()) {
+        throw std::out_of_range("string_to_any<unsigned int>: value out of range: " + data);
+    }
+    return any_t(static_cast<unsigned int>(v));
 }
 
 template <>
