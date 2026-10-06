@@ -153,10 +153,10 @@ TEST_CASE("test_IniParser_hasSection") {
 | Language | Convention                                   | Key points                                                                                                                       |
 | -------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | C++      | `.clang-format` (Google style as the base) | a 4-space indent, a column width of 100, the attached braces; the warning switches such as`-Wno-sign-compare` are in xmake.lua |
-| Python   | `hikyuu/.style.yapf` (yapf) + `.flake8`  | a 4-space indent, a column width of 120 (flake8`max-line-length=120`)                                                          |
+| Python   | `autopep8` + `.flake8` (+ root `.editorconfig`) | a 4-space indent, a column width of 120 (flake8`max-line-length=120`, mirrored in `.editorconfig`)                                            |
 | Lua      | `.lua-format`                              | format the build scripts                                                                                                         |
 
-- Format the changed files with `clang-format` / `yapf` before committing, to avoid deviating from the existing style.
+- Format the changed files with `clang-format` / `autopep8` before committing, to avoid deviating from the existing style. For Python: `autopep8 --in-place --max-line-length=120 <file>` (autopep8 only fixes PEP8 issues; it does NOT reflow multi-line imports or normalize string quotes, which matches the repo's de-facto style). Do NOT run it on the generated files listed in rule 11 below.
 - Adding a new public API requires maintaining the `.pyi` stubs (`hikyuu/__init__.pyi`, `core.pyi`, `extend.pyi` and `hikyuu/cpp/core3xx.pyi`) and the documentation (`docs/zh/` and `docs/en/`; the two trees must be updated in pairs with a consistent structure) synchronously.
 - Keep code comments concise and free of filler: state the intent in as few words as possible, and do not restate what the code already expresses or over-explain its background. One short line is preferred over a paragraph.
 
@@ -268,11 +268,11 @@ The core components of the systematic trading framework (independently replaceab
 8. **The git commit messages uniformly use English**: in the conventional commits style, e.g. `fix(data): fix cross-period aggregation of derived K-lines in the SQL backend`; the historical early commits have Chinese messages, but all the new commits use English, and the body text is also in English.
 9. **The AI must not commit proactively**: an AI coding agent is forbidden to execute `git commit`, and should also avoid `git add`; after completing each step, list "the list of the files to be committed + the suggested English commit message (a directly copyable `git commit -m "..."`)" and inform the user, letting the user decide the commit timing and the granularity.
 10. **Handle with care**: `hikyuu_pywrap` uses a unity build (`c++.unity_build`); pay attention to the unity_group grouping when adding the .cpp files; after modifying `xmake.lua`, you need to reconfigure with `xmake f`.
-11. **Never format generated Python files**: do not run yapf on `hikyuu/flat/Spot.py` and `hikyuu/flat/SpotList.py` (flatc output) or `hikyuu/gui/data/MainWindow.py` (pyside6-uic output) — they are regenerated from their sources and any formatting is lost. They are also excluded from flake8 in the root `.flake8`.
+11. **Never format generated Python files**: do not run autopep8 (or any other Python formatter) on `hikyuu/flat/Spot.py` and `hikyuu/flat/SpotList.py` (flatc output) or `hikyuu/gui/data/MainWindow.py` (pyside6-uic output) — they are regenerated from their sources and any formatting is lost. They are also excluded from flake8 in the root `.flake8`.
 
 ## 9. The Quick Self-check Checklist (before committing)
 
-- [ ] The changed files have been formatted with `clang-format` / `yapf`
+- [ ] The changed files have been formatted with `clang-format` / `autopep8`
 - [ ] The C++ changes have compiled successfully and the Python side can `import hikyuu` normally
 - [ ] The related unit tests have been run (C++: `xmake r small-test`; Python: `python3 hikyuu/test/test.py`)
 - [ ] No compiled artifacts/local data files have been committed
