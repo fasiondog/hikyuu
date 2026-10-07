@@ -40,7 +40,8 @@ void export_Indicator(py::module& m) {
       .def_property("name", ind_read_name, ind_write_name, "The indicator name")
       .def_property_readonly("long_name", &Indicator::long_name,
                              "Return in the form: Name(param1_val,param2_val,...)")
-      .def_property_readonly("discard", &Indicator::discard, "The number of the points to discard in the result")
+      .def_property_readonly("discard", &Indicator::discard,
+                             "The number of the points to discard in the result")
       .def_property_readonly("optype",
                              [](const Indicator& ind) { return getOPTypeName(ind.getOPType()); })
 
@@ -71,7 +72,8 @@ void export_Indicator(py::module& m) {
 
       .def("have_param", &Indicator::haveParam, "Whether the specified parameter exists")
 
-      .def("have_ind_param", &Indicator::haveIndParam, "Whether the specified dynamic period indicator parameter exists")
+      .def("have_ind_param", &Indicator::haveIndParam,
+           "Whether the specified dynamic period indicator parameter exists")
       .def("get_ind_param", &Indicator::getIndParam, R"(get_ind_param(self, name)
     
     Get the specified dynamic indicator parameter
@@ -82,7 +84,7 @@ void export_Indicator(py::module& m) {
     :raises out_of_range: no such parameter)")
 
       .def("set_ind_param", setIndParam1)
-      .def("set_ind_param", setIndParam2, R"(set_param(self, name, ind)
+      .def("set_ind_param", setIndParam2, R"(set_ind_param(self, name, ind)
 
     Set the dynamic indicator parameter
 
@@ -134,7 +136,7 @@ void export_Indicator(py::module& m) {
     Get the date at the specified position
 
     :param int pos: the specified index position
-    :rtype: float)")
+    :rtype: Datetime)")
 
       .def("get_by_datetime", &Indicator::getByDate, py::arg("datetime"),
            py::arg("result_index") = 0,
@@ -346,8 +348,11 @@ set_context(self, stock, query)
 
       .def(
         "value_to_np",
-        [](const Indicator& self) {
+        [](const Indicator& self) -> py::array {
             size_t ret_num = self.getResultNumber();
+            if (ret_num == 0) {
+                return py::array_t<double>({(size_t)0});
+            }
 
             // Initialize the array_t and get its internal buffer
             py::array_t<double> ret;
@@ -361,7 +366,8 @@ set_context(self, stock, query)
             for (size_t i = 0; i < ret_num; i++) {
                 names.push_back(fmt::format("value{}", i));
                 fields.push_back("d");
-                offsets.push_back(i * sizeof(Indicator::value_t));  // Simplify the offset calculation
+                offsets.push_back(i *
+                                  sizeof(Indicator::value_t));  // Simplify the offset calculation
             }
 
             auto dtype = py::dtype(

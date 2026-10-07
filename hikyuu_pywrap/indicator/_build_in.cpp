@@ -1659,7 +1659,7 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("NDAY", NDAY_1, py::arg("x"), py::arg("y"), py::arg("n") = 3);
-    m.def("NDAY", NDAY_1, py::arg("x"), py::arg("y"), py::arg("n"));
+    m.def("NDAY", NDAY_2, py::arg("x"), py::arg("y"), py::arg("n"));
     m.def("NDAY", NDAY_3, py::arg("x"), py::arg("y"), py::arg("n"), R"(NDAY(x, y[, n=3])
 
     Consecutively greater; NDAY(X,Y,N) means that the condition X>Y persists for N periods

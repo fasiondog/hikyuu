@@ -99,7 +99,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :param KData data: input KData
 :param int n: Number of period (From 2 to 100000)
 :return: result(0) - Aroon down
-         result(2) - Aroon up)")
+         result(1) - Aroon up")
 
     TA_K_OUT_N_PY(TA_AROONOSC, 14, R"(TA_AROONOSC - Aroon Oscillator
 
@@ -301,7 +301,7 @@ void export_Indicator_ta_lib(py::module& m) {
 
     TA_IN1_OUT_N_PY(TA_KAMA, 30, R"(TA_KAMA - Kaufman Adaptive Moving Average
 
-:param KData data: input KData
+:param Indicator data: input data
 :param int n: Number of period (From 2 to 100000))")
 
     TA_IN1_OUT_N_PY(TA_LINEARREG_ANGLE, 14, R"(TA_LINEARREG_ANGLE - Linear Regression Angle
@@ -449,7 +449,7 @@ void export_Indicator_ta_lib(py::module& m) {
 :return: result(0) - outMinIdx
          result(1) - outMaxIdx)")
 
-    TA_K_OUT_N_PY(TA_MINUS_DI, 14, R"(A_MINUS_DI - Minus Directional Indicator
+    TA_K_OUT_N_PY(TA_MINUS_DI, 14, R"(TA_MINUS_DI - Minus Directional Indicator
 
 :param KData data: input KData
 :param int n: Number of period (From 1 to 100000))")
