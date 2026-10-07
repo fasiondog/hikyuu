@@ -36,10 +36,11 @@ public:
     virtual ~PyMultiFactor() override {}
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        // PYBIND11_OVERLOAD_PURE_NAME(IndicatorList, MultiFactorBase, "_calculate", _calculate,
-        //                             all_stk_inds);
+        // Hand-rolled to explicitly convert the C++ nested vector to a Python list of lists before
+        // calling the Python subclass override. Caller path is Python-facing (Selector::select ->
+        // MultiFactorBase::calculate), so the GIL is already held here; no extra acquire needed.
         auto self = py::cast(this);
-        auto func = self.attr("_calculate")();
+        auto func = self.attr("_calculate");
         auto py_all_stk_inds = vector_to_python_list<IndicatorList>(all_stk_inds);
         auto py_ret = func(py_all_stk_inds);
         return py_ret.cast<IndicatorList>();

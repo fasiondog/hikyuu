@@ -41,6 +41,7 @@ void export_StockManager(py::module& m) {
                              "Whether all the data is ready (loaded)")
 
       .def("wait_data_ready", &StockManager::waitDataReady,
+           py::call_guard<py::gil_scoped_release>(),
            "A simple block, waiting for all the data to be ready (loaded)")
 
       .def("cancel_load", &StockManager::cancelLoad, "Cancel all the data loading")
