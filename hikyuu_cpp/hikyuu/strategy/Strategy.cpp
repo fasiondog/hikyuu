@@ -412,13 +412,13 @@ KData Strategy::getLastKData(const Stock& stk, size_t lastnum, const KQuery::KTy
     size_t out_start = 0, out_end = 0;
     HKU_IF_RETURN(!stk.getIndexRange(query, out_start, out_end), ret);
 
-    int64_t startidx = 0, endidx = 0;
-    endidx = out_end;
+    int64_t endidx = static_cast<int64_t>(out_end);
     int64_t num = static_cast<int64_t>(lastnum);
-    startidx = (endidx > num) ? endidx - num : out_start;
+    int64_t startidx = (endidx > num) ? endidx - num : static_cast<int64_t>(out_start);
 
-    query = KQueryByIndex(startidx, endidx, ktype, recover_type);
-    ret = stk.getKData(query);
+    KData probe = stk.getKData(KQueryByIndex(startidx, startidx + 1, ktype, KQuery::NO_RECOVER));
+    HKU_IF_RETURN(probe.empty(), ret);
+    ret = getKData(stk, probe[0].datetime, Null<Datetime>(), ktype, recover_type);
     return ret;
 }
 
@@ -535,15 +535,13 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
 TradeRecord Strategy::buy(const Stock& stk, price_t price, double num, double stoploss,
                           double goal_price, SystemPart part_from, const string& remark) {
     HKU_ASSERT(m_tm);
-    return m_tm->buy(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from,
-                     remark);
+    return m_tm->buy(now(), stk, price, num, stoploss, goal_price, price, part_from, remark);
 }
 
 TradeRecord Strategy::sell(const Stock& stk, price_t price, double num, price_t stoploss,
                            price_t goal_price, SystemPart part_from, const string& remark) {
     HKU_ASSERT(m_tm);
-    return m_tm->sell(Datetime::now(), stk, price, num, stoploss, goal_price, price, part_from,
-                      remark);
+    return m_tm->sell(now(), stk, price, num, stoploss, goal_price, price, part_from, remark);
 }
 
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
