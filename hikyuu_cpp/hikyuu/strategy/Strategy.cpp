@@ -104,7 +104,7 @@ void Strategy::baseCheckParam(const string& name) const {
 void Strategy::paramChanged() {}
 
 bool Strategy::running() const {
-    return ms_keep_running;
+    return ms_keep_running && m_running;
 }
 
 void Strategy::_init() {
@@ -144,9 +144,12 @@ void Strategy::start(bool autoRecieveSpot) {
                   m_run_daily_at_funcs.empty(),
                 "No any process function is set!");
 
-    // Fresh alive token + running flag per run; stop()/~Strategy flip them so cross-thread
-    // callbacks registered below become no-ops instead of touching a freed object.
-    m_token = std::make_shared<RunToken>();
+    // Re-arm the shared alive token so timers registered in previous runs resume; stop()/
+    // ~Strategy flip it so cross-thread callbacks become no-ops instead of touching a freed object.
+    if (!m_token) {
+        m_token = std::make_shared<RunToken>();
+    }
+    m_token->alive = true;
     m_running = true;
 
     _init();
@@ -156,6 +159,10 @@ void Strategy::start(bool autoRecieveSpot) {
     if (autoRecieveSpot) {
         auto token = m_token;
         auto& agent = *getGlobalSpotAgent();
+        // The agent is stopped here (see _init); clear stale registrations from previous
+        // start()/stop() cycles so they do not accumulate (single-strategy mode, see class doc).
+        agent.clearProcessList();
+        agent.clearPostProcessList();
         agent.addProcess([this, token](const SpotRecord& spot) {
             if (!token->alive) {
                 return;
@@ -265,7 +272,13 @@ void Strategy::_runDaily() {
     auto* scheduler = getScheduler();
     auto token = m_token;
 
-    for (const auto& run_at : m_run_daily_at_list) {
+    for (auto& run_at : m_run_daily_at_list) {
+        // Register each run_daily entry only once; the armed timers resume on the next start()
+        // through the shared token, so repeated start() does not duplicate periodic jobs.
+        if (run_at.registered) {
+            continue;
+        }
+        run_at.registered = true;
         // Guarded job (captured by value): skip when the strategy has been stopped/destroyed,
         // so a timer armed before stop() can never touch a freed object.
         auto job = [token, f = run_at.func]() {
@@ -275,7 +288,10 @@ void Strategy::_runDaily() {
             f();
         };
         // Periodic re-arm keeps using the guarded job, so once stopped it no-ops.
-        auto arm_duration = [scheduler, job, delta = run_at.delta]() {
+        auto arm_duration = [token, scheduler, job, delta = run_at.delta]() {
+            if (!token->alive) {
+                return;
+            }
             scheduler->addDurationFunc(std::numeric_limits<int>::max(), delta, job);
         };
 
@@ -378,6 +394,12 @@ void Strategy::_runDailyAt() {
     auto* scheduler = getScheduler();
     auto token = m_token;
     for (const auto& [time, func] : m_run_daily_at_funcs) {
+        // Register each task only once; the timers keep the shared token, so they resume after
+        // a stop()/start() cycle instead of being silently lost.
+        if (m_registered_daily_at.count(time) != 0) {
+            continue;
+        }
+        m_registered_daily_at.insert(time);
         scheduler->addFuncAtTimeEveryDay(time, [token, func]() {
             if (!token->alive) {
                 return;
@@ -385,7 +407,6 @@ void Strategy::_runDailyAt() {
             func();
         });
     }
-    m_run_daily_at_funcs.clear();
 }
 
 /*

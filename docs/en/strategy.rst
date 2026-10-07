@@ -92,7 +92,7 @@ Common parameters:
 
     .. py:method:: stop(self)
 
-        Stop the strategy event loop; registered market-data / timed callbacks become no-ops so start() returns and the object can be safely destroyed.
+        Stop the strategy event loop; registered market-data / timed callbacks become no-ops and queued callbacks are dropped, so start() returns. Destroy the object on the same thread after start() has returned.
 
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
 
@@ -181,7 +181,8 @@ Common parameters:
 
         - When buying, if the order quantity exceeds the maximum tradable quantity, it is filled at the maximum tradable quantity.
         - When selling, if the order quantity exceeds the maximum tradable quantity and is not equal to MAX_DOUBLE, it is filled at the maximum tradable quantity.
-        - When selling, if the order quantity is below the minimum tradable quantity, the entire position is sold.
+        - When selling, if the order quantity is below the minimum tradable quantity, the sell order is ignored with a warning (the position is not cleared).
+- When support_short is enabled, the part of a sell order beyond the current long position is opened short via stock borrowing (close-long-then-open-short).
 
         :param Stock stock: the specified security
         :param float num: the order quantity

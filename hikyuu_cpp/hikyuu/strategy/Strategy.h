@@ -10,6 +10,7 @@
 #include <atomic>
 #include <future>
 #include <forward_list>
+#include <set>
 #include <memory>
 #include "hikyuu/DataType.h"
 #include "hikyuu/StrategyContext.h"
@@ -247,10 +248,12 @@ protected:
         TimeDelta delta;
         string market;
         bool ignoreMarket{false};
+        bool registered{false};  // guards against duplicated timers across start()/stop() cycles
     };
     std::forward_list<RunDailyAt> m_run_daily_at_list;
 
     std::unordered_map<TimeDelta, std::function<void()>> m_run_daily_at_funcs;
+    std::set<TimeDelta> m_registered_daily_at;  // run_daily_at tasks already armed
 
 protected:
     static std::atomic_bool ms_keep_running;
