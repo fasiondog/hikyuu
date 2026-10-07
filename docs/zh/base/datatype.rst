@@ -202,6 +202,18 @@ TimeDelta 的运算规则基本与 datetime.timedelta 相同。
     
         获取当前的日期
 
+    .. py:method:: timestamp(self)
+
+        返回自 1970-01-01 00:00:00 起的微秒级时间戳（基于本地时间）。1970 年之前的日期返回负值；Null Datetime 返回 INT64_MIN（即 numpy/pandas datetime64 的 NaT 哨兵值）
+
+        :rtype: int
+
+    .. py:method:: timestamp_utc(self)
+
+        返回自 1970-01-01 00:00:00 起的微秒级时间戳（已扣除本地 UTC 偏移，即 UTC 时间）。1970 年之前的日期返回负值；Null Datetime 返回 INT64_MIN（即 numpy/pandas datetime64 的 NaT 哨兵值）
+
+        :rtype: int
+
 
 .. py:class:: TimeDelta
 

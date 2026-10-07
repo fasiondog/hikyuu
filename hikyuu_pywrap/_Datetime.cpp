@@ -101,9 +101,12 @@ void export_Datetime(py::module& m) {
       .def("end_of_year", &Datetime::endOfYear, "\nReturn the end date of the year")
       .def("endOfYear", &Datetime::endOfYear,
            "\nDeprecated alias for end_of_year; kept for backward compatibility")
-      .def("timestamp", &Datetime::timestamp, "\nReturn the timestamp (at the microsecond level)")
+      .def("timestamp", &Datetime::timestamp,
+           "\nReturn the timestamp (at the microsecond level); for a null Datetime returns "
+           "INT64_MIN, the numpy datetime64 NaT sentinel")
       .def("timestamp_utc", &Datetime::timestampUTC,
-           "\nReturn the timestamp (at the microsecond level), deducting the local UTC offset time")
+           "\nReturn the timestamp (at the microsecond level), deducting the local UTC offset "
+           "time; for a null Datetime returns INT64_MIN, the numpy datetime64 NaT sentinel")
       .def_static("min", &Datetime::min, "\nGet the minimum supported date, Datetime(1400, 1, 1)")
       .def_static("max", &Datetime::max, "\nGet the maximum supported date, Datetime(9999, 12, 31)")
       .def_static("now", &Datetime::now, "\nGet the current system date-time")

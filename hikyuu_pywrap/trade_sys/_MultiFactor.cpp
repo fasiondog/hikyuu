@@ -107,9 +107,6 @@ void export_MultiFactor(py::module& m) {
 
     m.def("scorerecords_to_df", [](const ScoreRecordList& scs) {
         size_t total = scs.size();
-        if (total == 0) {
-            return py::module_::import("pandas").attr("DataFrame")();
-        }
 
         // Create the python string object array
         py::list code_list(total);

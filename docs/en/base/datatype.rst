@@ -202,6 +202,22 @@ The operation rules of TimeDelta are basically the same as datetime.timedelta.
     
         Get the current date
 
+    .. py:method:: timestamp(self)
+
+        Return the microsecond timestamp since 1970-01-01 00:00:00 (local time). A date before
+        1970 yields a negative value; a null Datetime returns INT64_MIN, the numpy/pandas
+        datetime64 NaT sentinel
+
+        :rtype: int
+
+    .. py:method:: timestamp_utc(self)
+
+        Return the microsecond timestamp since 1970-01-01 00:00:00 with the local UTC offset
+        deducted (i.e. UTC time). A date before 1970 yields a negative value; a null Datetime
+        returns INT64_MIN, the numpy/pandas datetime64 NaT sentinel
+
+        :rtype: int
+
 
 .. py:class:: TimeDelta
 

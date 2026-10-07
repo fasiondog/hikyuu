@@ -164,9 +164,6 @@ void export_Selector(py::module& m) {
 
     m.def("systemweights_to_df", [](const SystemWeightList& sws) {
         size_t total = sws.size();
-        if (total == 0) {
-            return py::module_::import("pandas").attr("DataFrame")();
-        }
 
         // Create the python string object array
         py::list sysname_list(total);

@@ -237,12 +237,13 @@ public:
 
     /** Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00. A date
      *  before 1970 yields a negative value instead of wrapping around; the Null Datetime maps
-     *  to Null<int64_t>() */
+     *  to INT64_MIN (the numpy/pandas datetime64 NaT sentinel) */
     int64_t timestamp() const noexcept;
 
     /** Timestamp, the signed number of the microseconds since 1970-01-01 00:00:00, with the
      *  local UTC offset deducted. A date before 1970 yields a negative value instead of
-     *  wrapping around; the Null Datetime maps to Null<int64_t>() */
+     *  wrapping around; the Null Datetime maps to INT64_MIN (the numpy/pandas datetime64 NaT
+     *  sentinel) */
     int64_t timestampUTC() const noexcept;
 
     /**

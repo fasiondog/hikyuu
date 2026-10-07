@@ -308,29 +308,31 @@ uint64_t Datetime::ticks() const noexcept {
 
 int64_t Datetime::timestamp() const noexcept {
     try {
-        HKU_IF_RETURN(isNull(), Null<int64_t>());
+        // INT64_MIN is the numpy/pandas datetime64 NaT sentinel, so a null Datetime converts to a
+        // proper NaT instead of a fake valid date
+        HKU_IF_RETURN(isNull(), (std::numeric_limits<int64_t>::min)());
         TimeDelta d = (*this) - Datetime(1970, 1, 1);
         return d.ticks();
     } catch (const std::exception &e) {
         HKU_ERROR(e.what());
-        return Null<int64_t>();
+        return (std::numeric_limits<int64_t>::min)();
     } catch (...) {
         HKU_ERROR("Unknown error!");
-        return Null<int64_t>();
+        return (std::numeric_limits<int64_t>::min)();
     }
 }
 
 int64_t Datetime::timestampUTC() const noexcept {
     try {
-        HKU_IF_RETURN(isNull(), Null<int64_t>());
+        HKU_IF_RETURN(isNull(), (std::numeric_limits<int64_t>::min)());
         TimeDelta d = (*this) - Datetime(1970, 1, 1) - UTCOffset();
         return d.ticks();
     } catch (const std::exception &e) {
         HKU_ERROR(e.what());
-        return Null<int64_t>();
+        return (std::numeric_limits<int64_t>::min)();
     } catch (...) {
         HKU_ERROR("Unknown error!");
-        return Null<int64_t>();
+        return (std::numeric_limits<int64_t>::min)();
     }
 }
 

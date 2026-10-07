@@ -192,9 +192,6 @@ void export_PositionRecord(py::module& m) {
       "positions_to_df",
       [](const PositionRecordList& positions) {
           size_t total = positions.size();
-          if (total == 0) {
-              return py::module_::import("pandas").attr("DataFrame")();
-          }
 
           // Create the data containers of each column
           py::list code_list(total);
