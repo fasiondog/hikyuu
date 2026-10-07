@@ -12,6 +12,7 @@
 #include <hikyuu/config.h>
 #include <hikyuu/Stock.h>
 #include <memory>
+#include <type_traits>
 #include <pybind11/pybind11.h>
 
 #include <pybind11/operators.h>
@@ -76,6 +77,17 @@ std::vector<T> python_bytes_to_vector(const py::bytes& obj) {
 
 template <typename T>
 std::vector<T> python_list_to_vector(const py::sequence& obj) {
+    if constexpr (std::is_arithmetic_v<T>) {
+        using ArrayType = py::array_t<T, py::array::c_style>;
+        if (ArrayType::check_(obj)) {
+            auto arr = py::reinterpret_borrow<ArrayType>(obj);
+            if (arr.ndim() == 1) {
+                const T* p = arr.data();
+                return std::vector<T>(p, p + arr.size());
+            }
+        }
+    }
+
     // If len(obj) is zero it may succeed even when the type is not the expected one, but there is
     // no risk
     Py_ssize_t total = len(obj);

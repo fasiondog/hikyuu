@@ -11,6 +11,7 @@ import unittest
 
 import Datetime
 import Parameter
+import DataType
 import MarketInfo
 import StockTypeInfo
 import Stock
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     suite = unittest.TestSuite()
     suite.addTest(Datetime.suite())
     suite.addTest(Parameter.suite())
+    suite.addTest(DataType.suite())
 
     suite.addTest(MarketInfo.suite())
     suite.addTest(StockTypeInfo.suite())
