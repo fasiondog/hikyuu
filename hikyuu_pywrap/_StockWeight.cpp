@@ -26,13 +26,18 @@ void export_StockWeight(py::module& m) {
       .def("__repr__", to_py_str<StockWeight>)
 
       .def_property_readonly("datetime", &StockWeight::datetime, "The dividend date")
-      .def_property_readonly("count_as_gift", &StockWeight::countAsGift, "X shares sent per 10 shares")
-      .def_property_readonly("count_for_sell", &StockWeight::countForSell, "X shares allotted per 10 shares")
+      .def_property_readonly("count_as_gift", &StockWeight::countAsGift,
+                             "X shares sent per 10 shares")
+      .def_property_readonly("count_for_sell", &StockWeight::countForSell,
+                             "X shares allotted per 10 shares")
       .def_property_readonly("price_for_sell", &StockWeight::priceForSell, "The allotment price")
       .def_property_readonly("bonus", &StockWeight::bonus, "The dividend per 10 shares")
-      .def_property_readonly("increasement", &StockWeight::increasement, "X shares converted per 10 shares")
-      .def_property_readonly("total_count", &StockWeight::totalCount, "The total share capital (10,000 shares)")
-      .def_property_readonly("free_count", &StockWeight::freeCount, "The circulating shares (10,000 shares)")
+      .def_property_readonly("increasement", &StockWeight::increasement,
+                             "X shares converted per 10 shares")
+      .def_property_readonly("total_count", &StockWeight::totalCount,
+                             "The total share capital (10,000 shares)")
+      .def_property_readonly("free_count", &StockWeight::freeCount,
+                             "The circulating shares (10,000 shares)")
       .def_property_readonly("suogu", &StockWeight::suogu, "The share expansion/contraction ratio")
 
         DEF_PICKLE(StockWeight);
@@ -55,9 +60,11 @@ void export_StockWeight(py::module& m) {
 
         // Allocate the memory with malloc
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        HKU_CHECK(data != nullptr, "weights_to_np: malloc failed!");
         for (size_t i = 0, len = sw.size(); i < len; i++) {
             const StockWeight& w = sw[i];
-            data[i].date = (w.datetime() - Datetime(1970, 1, 1)).days();
+            data[i].date = w.datetime().isNull() ? std::numeric_limits<int64_t>::min()
+                                                 : (w.datetime() - Datetime(1970, 1, 1)).days();
             data[i].countAsGift = w.countAsGift();
             data[i].countForSell = w.countForSell();
             data[i].priceForSell = w.priceForSell();
@@ -82,9 +89,6 @@ void export_StockWeight(py::module& m) {
 
     m.def("weights_to_df", [](const StockWeightList& sw) {
         size_t total = sw.size();
-        if (total == 0) {
-            return py::module_::import("pandas").attr("DataFrame")();
-        }
 
         // Create the array
         py::array_t<int64_t> datetime_arr(total);
@@ -120,7 +124,8 @@ void export_StockWeight(py::module& m) {
 
         for (size_t i = 0; i < total; i++) {
             const StockWeight& w = sw[i];
-            datetime_ptr[i] = w.datetime().timestamp() * 1000LL;
+            datetime_ptr[i] =
+              w.datetime().isNull() ? w.datetime().timestamp() : w.datetime().timestamp() * 1000LL;
             countAsGift_ptr[i] = w.countAsGift();
             countForSell_ptr[i] = w.countForSell();
             priceForSell_ptr[i] = w.priceForSell();

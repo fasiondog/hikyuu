@@ -15,8 +15,10 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-void export_KReord(py::module& m) {
-    py::class_<KRecord>(m, "KRecord", "The K-line record, composing the K-line data; the attributes are readable and writable")
+void export_KRecord(py::module& m) {
+    py::class_<KRecord>(
+      m, "KRecord",
+      "The K-line record, composing the K-line data; the attributes are readable and writable")
       .def(py::init<>())
       .def(py::init<const Datetime&>())
       .def(py::init<const Datetime&, price_t, price_t, price_t, price_t, price_t, price_t>())
@@ -54,9 +56,11 @@ void export_KReord(py::module& m) {
         };
 
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        HKU_CHECK(data != nullptr, "krecords_to_np: malloc failed!");
         for (size_t i = 0; i < total; i++) {
             const KRecord& k = kdata[i];
-            data[i].datetime = k.datetime.timestamp() / 1000LL;
+            data[i].datetime =
+              k.datetime.isNull() ? k.datetime.timestamp() : k.datetime.timestamp() / 1000LL;
             data[i].open = k.openPrice;
             data[i].high = k.highPrice;
             data[i].low = k.lowPrice;
@@ -78,9 +82,6 @@ void export_KReord(py::module& m) {
 
     m.def("krecords_to_df", [](const KRecordList& kdata) {
         size_t total = kdata.size();
-        if (total == 0) {
-            return py::module_::import("pandas").attr("DataFrame")();
-        }
 
         // Create the array
         py::array_t<int64_t> datetime_arr(total);
@@ -110,7 +111,8 @@ void export_KReord(py::module& m) {
 
         auto* ks = kdata.data();
         for (size_t i = 0; i < total; i++) {
-            datetime_ptr[i] = ks[i].datetime.timestamp() * 1000LL;
+            datetime_ptr[i] = ks[i].datetime.isNull() ? ks[i].datetime.timestamp()
+                                                      : ks[i].datetime.timestamp() * 1000LL;
             open_ptr[i] = ks[i].openPrice;
             high_ptr[i] = ks[i].highPrice;
             low_ptr[i] = ks[i].lowPrice;

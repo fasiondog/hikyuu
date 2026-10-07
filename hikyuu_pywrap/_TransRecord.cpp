@@ -24,8 +24,9 @@ void export_TransRecord(py::module& m) {
       .def_readwrite("date", &TransRecord::datetime, "The time")
       .def_readwrite("price", &TransRecord::price, "The price")
       .def_readwrite("vol", &TransRecord::vol, "The volume")
-      .def_readwrite("direct", &TransRecord::direct,
-                     "The nature of the buy/sell order: 1--sell 0--buy 2--call auction, others unknown")
+      .def_readwrite(
+        "direct", &TransRecord::direct,
+        "The nature of the buy/sell order: 1--sell 0--buy 2--call auction, others unknown")
       .def(py::self == py::self)
 
         DEF_PICKLE(TransRecord);
@@ -45,9 +46,11 @@ void export_TransRecord(py::module& m) {
 
           // Allocate the memory with malloc
           RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+          HKU_CHECK(data != nullptr, "translist_to_np: malloc failed!");
           for (size_t i = 0, len = trans.size(); i < len; i++) {
               const TransRecord& record = trans[i];
-              data[i].datetime = record.datetime.timestamp() * 1000LL;
+              data[i].datetime = record.datetime.isNull() ? record.datetime.timestamp()
+                                                          : record.datetime.timestamp() * 1000LL;
               data[i].price = record.price;
               data[i].vol = record.vol;
               data[i].direct = record.direct;
@@ -56,7 +59,7 @@ void export_TransRecord(py::module& m) {
           // Define the NumPy structured data type
           auto dtype =
             py::dtype(vector_to_python_list<string>({"datetime", "price", "vol", "direct"}),
-                      vector_to_python_list<string>({"datetime64[ns]", "d", "d", "i4"}),
+                      vector_to_python_list<string>({"datetime64[ns]", "d", "d", "i8"}),
                       vector_to_python_list<int64_t>({0, 8, 16, 24}), 32);
 
           // Manage the memory with the capsule
@@ -69,9 +72,6 @@ void export_TransRecord(py::module& m) {
       "translist_to_df",
       [](const TransList& trans) {
           size_t total = trans.size();
-          if (total == 0) {
-              return py::module_::import("pandas").attr("DataFrame")();
-          }
 
           // Create the array
           py::array_t<int64_t> datetime_arr(total);
@@ -92,7 +92,8 @@ void export_TransRecord(py::module& m) {
 
           for (size_t i = 0; i < total; i++) {
               const TransRecord& record = trans[i];
-              datetime_ptr[i] = record.datetime.timestamp() * 1000LL;
+              datetime_ptr[i] = record.datetime.isNull() ? record.datetime.timestamp()
+                                                         : record.datetime.timestamp() * 1000LL;
               price_ptr[i] = record.price;
               vol_ptr[i] = record.vol;
               direct_ptr[i] = record.direct;

@@ -31,19 +31,24 @@ void export_Stock(py::module& m) {
       .def_property_readonly("id", &Stock::id, "The internal id")
       .def_property("market", py::overload_cast<>(&Stock::market, py::const_),
                     py::overload_cast<const string&>(&Stock::market), py::return_value_policy::copy,
-                    "The market abbreviation it belongs to; the market abbreviation is the unique identifier of the market")
+                    "The market abbreviation it belongs to; the market abbreviation is the unique "
+                    "identifier of the market. Note: the setter modifies the shared underlying "
+                    "stock info, affecting all Stock objects referencing it")
       .def_property("code", py::overload_cast<>(&Stock::code, py::const_),
                     py::overload_cast<const string&>(&Stock::code), py::return_value_policy::copy,
-                    "The security code")
+                    "The security code. Note: the setter modifies the shared underlying stock "
+                    "info, affecting all Stock objects referencing it")
       .def_property_readonly("market_code", py::overload_cast<>(&Stock::market_code, py::const_),
                              "The market abbreviation + the security code, e.g.: sh000001")
       .def_property("name", py::overload_cast<>(&Stock::name, py::const_),
                     py::overload_cast<const string&>(&Stock::name), py::return_value_policy::copy,
-                    "The security name")
+                    "The security name. Note: the setter modifies the shared underlying stock "
+                    "info, affecting all Stock objects referencing it")
       .def_property("type", py::overload_cast<>(&Stock::type, py::const_),
                     py::overload_cast<uint32_t>(&Stock::type), "The security type, see: constant")
       .def_property("valid", py::overload_cast<>(&Stock::valid, py::const_),
-                    py::overload_cast<bool>(&Stock::valid), "Whether the security is currently valid")
+                    py::overload_cast<bool>(&Stock::valid),
+                    "Whether the security is currently valid")
       .def_property("start_datetime", py::overload_cast<>(&Stock::startDatetime, py::const_),
                     py::overload_cast<const Datetime&>(&Stock::startDatetime),
                     py::return_value_policy::copy, "The start date of the security")
@@ -58,11 +63,14 @@ void export_Stock(py::module& m) {
       .def_property("precision", py::overload_cast<>(&Stock::precision, py::const_),
                     py::overload_cast<int>(&Stock::precision), "The price precision")
       .def_property("atom", py::overload_cast<>(&Stock::atom, py::const_),
-                    py::overload_cast<double>(&Stock::atom), "The minimum trading quantity, the same as min_tradeNumber")
+                    py::overload_cast<double>(&Stock::atom),
+                    "The minimum trading quantity, the same as min_tradeNumber")
       .def_property("min_trade_number", py::overload_cast<>(&Stock::minTradeNumber, py::const_),
-                    py::overload_cast<double>(&Stock::minTradeNumber), "The minimum trading quantity")
+                    py::overload_cast<double>(&Stock::minTradeNumber),
+                    "The minimum trading quantity")
       .def_property("max_trade_number", py::overload_cast<>(&Stock::maxTradeNumber, py::const_),
-                    py::overload_cast<double>(&Stock::maxTradeNumber), "The maximum trading quantity")
+                    py::overload_cast<double>(&Stock::maxTradeNumber),
+                    "The maximum trading quantity")
 
       .def("is_null", &Stock::isNull, R"(is_null(self)
 
@@ -70,18 +78,21 @@ void export_Stock(py::module& m) {
 
         :rtype: bool)")
 
-      .def("is_buffer", &Stock::isBuffer, R"(Whether the K-line data of the specified type is cached)")
+      .def("is_buffer", &Stock::isBuffer,
+           R"(Whether the K-line data of the specified type is cached)")
 
       .def(
         "get_index_range",
         [](const Stock& self, const KQuery& query) {
-            size_t start, end;
+            size_t start = 0, end = 0;
             self.getIndexRange(query, start, end);
             return py::make_tuple(start, end);
         },
         R"(get_index_range(self, query) -> (size_t, size_t)
 
         Get the corresponding K-line position range [start_pos, end_pos) according to the condition specified by the KQuery
+
+        On an invalid query (unrecognized ktype, or a date query whose start is not earlier than its end), (0, 0) is returned
         
         :param query [in] the specified query condition
         :return (start_pos, end_pos)")

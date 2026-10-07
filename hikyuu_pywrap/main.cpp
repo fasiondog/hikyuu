@@ -31,8 +31,8 @@ void export_MarketInfo(py::module& m);
 void export_StockTypeInfo(py::module& m);
 void export_StockWeight(py::module& m);
 void export_KQuery(py::module& m);
-void export_KReord(py::module& m);
-void export_TimeLineReord(py::module& m);
+void export_KRecord(py::module& m);
+void export_TimeLineRecord(py::module& m);
 void export_TransRecord(py::module& m);
 void export_KData(py::module& m);
 void export_Parameter(py::module& m);
@@ -81,12 +81,14 @@ PYBIND11_MODULE(core, m) {
     // Set the system running state
     setRunningInPython(true);
 
-    // Register the interrupt checker for the long IPC blocking waits (e.g. waiting for the data server readiness), responding to Ctrl+C;
-    // The waits happen in the C++ code that has released the GIL; the GIL needs to be re-acquired here before the signals can be checked.
+    // Register the interrupt checker for the long IPC blocking waits (e.g. waiting for the data
+    // server readiness), responding to Ctrl+C; The waits happen in the C++ code that has released
+    // the GIL; the GIL needs to be re-acquired here before the signals can be checked.
     ipc::setInterruptChecker([]() {
         py::gil_scoped_acquire gil;
         if (PyErr_CheckSignals() != 0) {
-            // Raise the pending exception (such as KeyboardInterrupt), which pybind11 converts to a Python exception
+            // Raise the pending exception (such as KeyboardInterrupt), which pybind11 converts to a
+            // Python exception
             throw py::error_already_set();
         }
         return false;
@@ -112,8 +114,8 @@ PYBIND11_MODULE(core, m) {
     export_StrategeContext(m);
     export_StockManager(m);
     export_KQuery(m);
-    export_KReord(m);
-    export_TimeLineReord(m);
+    export_KRecord(m);
+    export_TimeLineRecord(m);
     export_TransRecord(m);
     export_KData(m);
     export_Stock(m);
@@ -140,16 +142,20 @@ PYBIND11_MODULE(core, m) {
     m.def("set_python_in_jupyter", setPythonInJupyter);
     m.def("set_python_in_interactive", setPythonInInteractive);
 
-    m.def("close_spend_time", close_spend_time, "Globally disable the c++ part time-spending printing");
-    m.def("open_spend_time", close_spend_time, "Globally enable the c++ part time-spending printing");
+    m.def("close_spend_time", close_spend_time,
+          "Globally disable the c++ part time-spending printing");
+    m.def("open_spend_time", close_spend_time,
+          "Globally enable the c++ part time-spending printing");
 
     m.def("hikyuu_init",
           py::overload_cast<const string&, bool, const StrategyContext&>(&hikyuu_init),
           py::arg("filename"), py::arg("ignore_preload") = false,
           py::arg("context") = StrategyContext({"all"}),
-          // The initialization (including the IPC negotiation, waiting for the data readiness and the preloading) may take a long time; the GIL must be released,
-          // otherwise all the other threads of the current process are frozen, and waiting for the master process to load as an IPC client appears as a hang;
-          // meanwhile, the C++ background threads of the master process (such as the log thread) also need the GIL to output to sys.stdout.
+          // The initialization (including the IPC negotiation, waiting for the data readiness and
+          // the preloading) may take a long time; the GIL must be released, otherwise all the other
+          // threads of the current process are frozen, and waiting for the master process to load
+          // as an IPC client appears as a hang; meanwhile, the C++ background threads of the master
+          // process (such as the log thread) also need the GIL to output to sys.stdout.
           py::call_guard<py::gil_scoped_release>());
     m.def("hikyuu_init", py::overload_cast<const StrategyContext&, bool>(&hikyuu_init),
           py::arg("context"), py::arg("ignore_preload") = false,
@@ -171,8 +177,9 @@ PYBIND11_MODULE(core, m) {
     });
     m.def("can_upgrade", CanUpgrade);
 
-    m.def("htr", [](const std::string& key) { return lang_htr(key.c_str()); }, py::arg("key"),
-          R"(htr(key)
+    m.def(
+      "htr", [](const std::string& key) { return lang_htr(key.c_str()); }, py::arg("key"),
+      R"(htr(key)
 
     Translate the given text into the current runtime language.
 
@@ -225,12 +232,13 @@ PYBIND11_MODULE(core, m) {
     :param Query.KType ktype: the K-line type, 'DAY'|'WEEK'|'MONTH'|'QUARTER'|'HALFYEAR'|'YEAR'|'MIN'|'MIN5'|'MIN15'|'MIN30'|'MIN60'
     :param Query.RecoverType recover_type: the recovery type)");
 
-    m.def("get_kdata",
-          py::overload_cast<const string&, const Datetime&, const Datetime&, const KQuery::KType&,
-                            KQuery::RecoverType>(getKData),
-          py::arg("market_code"), py::arg("start") = Datetime::min(), py::arg("end") = null_date,
-          py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
-          R"(Get the K-line data within the [start, end) range by the security code and the start/end dates
+    m.def(
+      "get_kdata",
+      py::overload_cast<const string&, const Datetime&, const Datetime&, const KQuery::KType&,
+                        KQuery::RecoverType>(getKData),
+      py::arg("market_code"), py::arg("start") = Datetime::min(), py::arg("end") = null_date,
+      py::arg("ktype") = KQuery::DAY, py::arg("recover_type") = KQuery::NO_RECOVER,
+      R"(Get the K-line data within the [start, end) range by the security code and the start/end dates
 
     :param str market_code: the security code, e.g.: 'sh000001'
     :param int start: the start date

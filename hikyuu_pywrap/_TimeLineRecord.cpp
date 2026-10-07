@@ -1,5 +1,5 @@
 /*
- * _KRecord.cpp
+ * _TimeLineRecord.cpp
  *
  *  Created on: 2019-1-27
  *      Author: fasiondog
@@ -17,8 +17,9 @@ namespace py = pybind11;
 #pragma warning(disable : 4267)
 #endif
 
-void export_TimeLineReord(py::module& m) {
-    py::class_<TimeLineRecord>(m, "TimeLineRecord", "The time-line record; the attributes are readable and writable")
+void export_TimeLineRecord(py::module& m) {
+    py::class_<TimeLineRecord>(m, "TimeLineRecord",
+                               "The time-line record; the attributes are readable and writable")
       .def(py::init<>())
       .def(py::init<const Datetime&, price_t, price_t>())
       .def("__str__", to_py_str<TimeLineRecord>)
@@ -37,16 +38,18 @@ void export_TimeLineReord(py::module& m) {
           HKU_IF_RETURN(total == 0, py::array());
 
           struct RawData {
-              int64_t datetime;  // The converted millisecond timestamp
+              int64_t datetime;  // The converted nanosecond timestamp
               double price;
               double vol;
           };
 
           // Allocate the memory with malloc
           RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+          HKU_CHECK(data != nullptr, "timeline_to_np: malloc failed!");
           for (size_t i = 0, len = timeline.size(); i < len; i++) {
               const TimeLineRecord& record = timeline[i];
-              data[i].datetime = record.datetime.timestamp() * 1000LL;
+              data[i].datetime = record.datetime.isNull() ? record.datetime.timestamp()
+                                                          : record.datetime.timestamp() * 1000LL;
               data[i].price = record.price;
               data[i].vol = record.vol;
           }
@@ -66,9 +69,6 @@ void export_TimeLineReord(py::module& m) {
       "timeline_to_df",
       [](const TimeLineList& timeline) {
           size_t total = timeline.size();
-          if (total == 0) {
-              return py::module_::import("pandas").attr("DataFrame")();
-          }
 
           // Create the array
           py::array_t<int64_t> datetime_arr(total);
@@ -86,7 +86,8 @@ void export_TimeLineReord(py::module& m) {
 
           for (size_t i = 0; i < total; i++) {
               const TimeLineRecord& record = timeline[i];
-              datetime_ptr[i] = record.datetime.timestamp() * 1000LL;
+              datetime_ptr[i] = record.datetime.isNull() ? record.datetime.timestamp()
+                                                         : record.datetime.timestamp() * 1000LL;
               price_ptr[i] = record.price;
               vol_ptr[i] = record.vol;
           }

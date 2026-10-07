@@ -19,8 +19,10 @@ void export_KQuery(py::module& m) {
     kquery.def(py::init<>())
       .def("__str__", to_py_str<KQuery>)
       .def("__repr__", to_py_str<KQuery>)
-      .def_property_readonly("start", &KQuery::start, "The start index; it is invalid when created with the date query way")
-      .def_property_readonly("end", &KQuery::end, "The end index; it is invalid when created with the date query way")
+      .def_property_readonly("start", &KQuery::start,
+                             "The start index; it is invalid when created with the date query way")
+      .def_property_readonly("end", &KQuery::end,
+                             "The end index; it is invalid when created with the date query way")
       .def_property_readonly("start_datetime", &KQuery::startDatetime,
                              "The start date; it is invalid when created with the index query way")
       .def_property_readonly("end_datetime", &KQuery::endDatetime,
@@ -30,15 +32,19 @@ void export_KQuery(py::module& m) {
                              "The K-line type queried")
       .def_property_readonly("recover_type", py::overload_cast<>(&KQuery::recoverType, py::const_),
                              "The recovery type")
-      .def_property_readonly("ktype_in_sec", &KQuery::kTypeInSeconds, "Get the number of the seconds corresponding to the ktype")
-      .def("is_right_opening", &KQuery::isRightOpening, "Judge whether it is a right-open interval, i.e. the end time is not specified")
+      .def_property_readonly("ktype_in_sec", &KQuery::kTypeInSeconds,
+                             "Get the number of the seconds corresponding to the ktype")
+      .def("is_right_opening", &KQuery::isRightOpening,
+           "Judge whether it is a right-open interval, i.e. the end time is not specified")
       .def_static("is_valid_ktype", &KQuery::isValidKType, "Judge whether the KType is valid")
       .def_static("is_base_ktype", &KQuery::isBaseKType, "Judge whether it is a basic KType")
       .def_static("is_extra_ktype", &KQuery::isExtraKType, "Judge whether it is an extended KType")
       .def_static("get_base_ktype_list", &KQuery::getBaseKTypeList, "Get all the basic KTypes")
       .def_static("get_extra_ktype_list", &KQuery::getExtraKTypeList, "Get all the extended KTypes")
-      .def_static("get_ktype_in_min", &KQuery::getKTypeInMin, "Get the number of the minutes corresponding to the ktype")
-      .def_static("get_ktype_in_seconds", &KQuery::getKTypeInSeconds, "Get the number of the seconds corresponding to the ktype")
+      .def_static("get_ktype_in_min", &KQuery::getKTypeInMin,
+                  "Get the number of the minutes corresponding to the ktype")
+      .def_static("get_ktype_in_seconds", &KQuery::getKTypeInSeconds,
+                  "Get the number of the seconds corresponding to the ktype")
 
         DEF_PICKLE(KQuery);
 
@@ -46,8 +52,10 @@ void export_KQuery(py::module& m) {
       .value("NO_RECOVER", KQuery::RecoverType::NO_RECOVER, "No recovery")
       .value("FORWARD", KQuery::RecoverType::FORWARD, "The forward recovery")
       .value("BACKWARD", KQuery::RecoverType::BACKWARD, "The backward recovery")
-      .value("EQUAL_FORWARD", KQuery::RecoverType::EQUAL_FORWARD, "The equal-ratio forward recovery")
-      .value("EQUAL_BACKWARD", KQuery::RecoverType::EQUAL_BACKWARD, "The equal-ratio backward recovery")
+      .value("EQUAL_FORWARD", KQuery::RecoverType::EQUAL_FORWARD,
+             "The equal-ratio forward recovery")
+      .value("EQUAL_BACKWARD", KQuery::RecoverType::EQUAL_BACKWARD,
+             "The equal-ratio backward recovery")
       .value("INVALID", KQuery::RecoverType::INVALID_RECOVER_TYPE, "An invalid type")
       .export_values();
 
@@ -57,17 +65,28 @@ void export_KQuery(py::module& m) {
       .value("INVALID", KQuery::QueryType::INVALID, "An invalid type")
       .export_values();
 
-    // An internal enumeration type is used; the enumeration type needs to be registered first, otherwise an error occurs when loading
-    kquery.def(py::init<int64_t, int64_t, KQuery::KType, KQuery::RecoverType>(), py::arg("start"),
-               py::arg("end") = null_int, py::arg("ktype") = KQuery::DAY,
+    // An internal enumeration type is used; the enumeration type needs to be registered first,
+    // otherwise an error occurs when loading
+    kquery.def(py::init([](int64_t start, int64_t end, const std::string& ktype,
+                           KQuery::RecoverType recover_type) {
+                   HKU_CHECK(KQuery::isValidKType(ktype), "Invalid ktype: {}", ktype);
+                   return KQuery(start, end, ktype, recover_type);
+               }),
+               py::arg("start"), py::arg("end") = null_int, py::arg("ktype") = KQuery::DAY,
                py::arg("recover_type") = KQuery::NO_RECOVER,
-               "\tBuild the condition for getting the K-line data by the index [start, end) way");
+               "\tBuild the condition for getting the K-line data by the index [start, end) way; "
+               "raises HKUException if ktype is not a valid base or extra K-line type");
 
     Datetime null_date;
-    kquery.def(py::init<const Datetime&, const Datetime&, KQuery::KType, KQuery::RecoverType>(),
+    kquery.def(py::init([](const Datetime& start, const Datetime& end, const std::string& ktype,
+                           KQuery::RecoverType recover_type) {
+                   HKU_CHECK(KQuery::isValidKType(ktype), "Invalid ktype: {}", ktype);
+                   return KQuery(start, end, ktype, recover_type);
+               }),
                py::arg("start"), py::arg("end") = null_date, py::arg("ktype") = KQuery::DAY,
                py::arg("recover_type") = KQuery::NO_RECOVER,
-               "\tBuild the condition for getting the K-line data by the date [start, end) way");
+               "\tBuild the condition for getting the K-line data by the date [start, end) way; "
+               "raises HKUException if ktype is not a valid base or extra K-line type");
 
     kquery.attr("DAY") = "DAY";
     kquery.attr("WEEK") = "WEEK";

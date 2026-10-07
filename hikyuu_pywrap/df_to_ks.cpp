@@ -15,7 +15,9 @@ KRecordList df_to_krecords(const py::object& df, const StringList& cols) {
     KRecordList ret;
     py::module_ pandas = py::module_::import("pandas");
     py::object datetime_col = pandas.attr("to_datetime")(df.attr("__getitem__")(cols[0]));
-    py::array np_dates = datetime_col.attr("to_numpy")().attr("view")("int64");
+    // Normalize to ns before viewing as int64; pandas 2.x may yield us/s datetime64 columns
+    py::array np_dates =
+      datetime_col.attr("astype")("datetime64[ns]").attr("to_numpy")().attr("view")("int64");
 
     py::array_t<double> open_array =
       df.attr("__getitem__")(cols[1]).attr("to_numpy")().attr("astype")(py::dtype("float64"));

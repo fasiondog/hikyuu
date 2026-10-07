@@ -20,9 +20,11 @@ void export_StockManager(py::module& m) {
         "init", &StockManager::init, py::arg("base_info_param"), py::arg("block_param"),
         py::arg("kdata_param"), py::arg("preload_param"), py::arg("hikyuu_param"),
         py::arg("context") = StrategyContext({"all"}),
-        // The initialization (including the IPC negotiation, waiting for the data server readiness and the preloading) may take a long time; the GIL must be released,
-        // otherwise all the other threads of this process are frozen; waiting for the master process to load as an IPC client appears as a hang;
-        // as the master process, the service thread also needs the GIL to write the logs to sys.stdout.
+        // The initialization (including the IPC negotiation, waiting for the data server readiness
+        // and the preloading) may take a long time; the GIL must be released, otherwise all the
+        // other threads of this process are frozen; waiting for the master process to load as an
+        // IPC client appears as a hang; as the master process, the service thread also needs the
+        // GIL to write the logs to sys.stdout.
         py::call_guard<py::gil_scoped_release>(),
         R"(init(self, base_info_param, block_param, kdata_param, preload_param, hikyuu_param, context)
               
@@ -358,5 +360,6 @@ void export_StockManager(py::module& m) {
             return py::make_iterator<py::return_value_policy::reference_internal, StockMapIterator,
                                      StockMapIterator, const Stock&>(sm.begin(), sm.end());
         },
-        py::keep_alive<0, 1>());
+        py::keep_alive<0, 1>(),
+        R"(Iterate over the Stock references; they point into the internal map, so do not modify the stock table while iterating.)");
 }

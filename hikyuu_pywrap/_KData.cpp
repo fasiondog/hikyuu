@@ -17,31 +17,42 @@ const KRecord& (KData::*KData_getKRecord2)(Datetime datetime) const = &KData::ge
 
 void export_KData(py::module& m) {
     int64_t null_int64 = Null<int64_t>();
-    py::class_<KData>(
-      m, "KData",
-      "The K-line data obtained through Stock.getKData; it is an array composed of KRecords and can be traversed like a list")
+    py::class_<KData>(m, "KData",
+                      "The K-line data obtained through Stock.getKData; it is an array composed of "
+                      "KRecords and can be traversed like a list")
       .def(py::init<>())
       .def("__str__", &KData::toString)
       .def("__repr__", &KData::toString)
 
       .def_property_readonly("start_pos", &KData::startPos,
-                             "Get the corresponding start position in the original K-line records; if the KData is empty, return 0")
+                             "Get the corresponding start position in the original K-line records; "
+                             "if the KData is empty, return 0")
       .def_property_readonly(
         "end_pos", &KData::endPos,
-        "Get the position of the next record after the range in the original K-line records; if it is empty, return 0, otherwise it equals lastPos + 1")
-      .def_property_readonly(
-        "last_pos", &KData::lastPos,
-        "Get the position of the last record in the original K-line records; if it is empty, return 0, otherwise it equals endPos - 1")
+        "Get the position of the next record after the range in the original K-line records; if it "
+        "is empty, return 0, otherwise it equals lastPos + 1")
+      .def_property_readonly("last_pos", &KData::lastPos,
+                             "Get the position of the last record in the original K-line records; "
+                             "if it is empty, return 0, otherwise it equals endPos - 1")
 
-      .def_property_readonly("open", &KData::open,
-                             "Return the Indicator instance containing the open prices, equivalent to OPEN(k)")
-      .def_property_readonly("close", &KData::close,
-                             "Return the Indicator instance containing the close prices, equivalent to CLOSE(k)")
-      .def_property_readonly("high", &KData::high,
-                             "Return the Indicator instance containing the high prices, equivalent to HIGH(k)")
-      .def_property_readonly("low", &KData::low, "Return the Indicator instance containing the low prices, equivalent to LOW(k)")
-      .def_property_readonly("amo", &KData::amo, "Return the Indicator instance containing the amounts, equivalent to AMO(k)")
-      .def_property_readonly("vol", &KData::vol, "Return the Indicator instance containing the volumes, equivalent to VOL(k)")
+      .def_property_readonly(
+        "open", &KData::open,
+        "Return the Indicator instance containing the open prices, equivalent to OPEN(k)")
+      .def_property_readonly(
+        "close", &KData::close,
+        "Return the Indicator instance containing the close prices, equivalent to CLOSE(k)")
+      .def_property_readonly(
+        "high", &KData::high,
+        "Return the Indicator instance containing the high prices, equivalent to HIGH(k)")
+      .def_property_readonly(
+        "low", &KData::low,
+        "Return the Indicator instance containing the low prices, equivalent to LOW(k)")
+      .def_property_readonly(
+        "amo", &KData::amo,
+        "Return the Indicator instance containing the amounts, equivalent to AMO(k)")
+      .def_property_readonly(
+        "vol", &KData::vol,
+        "Return the Indicator instance containing the volumes, equivalent to VOL(k)")
 
       .def("get_datetime_list", &KData::getDatetimeList, R"(get_datetime_list(self)
 
@@ -77,7 +88,7 @@ void export_KData(py::module& m) {
         R"(get_pos(self, datetime)
 
         Get the index position of the K-line record at the specified time; if it is out of the data range, return None
-        
+
         :param Datetime datetime: the specified date
         :rtype: int)")
 
@@ -91,8 +102,8 @@ void export_KData(py::module& m) {
             }
             return ret;
         },
-        R"(get_pos_in_stock(self, datetime) 
-        
+        R"(get_pos_in_stock(self, datetime)
+
         Get the index position in the original K-line corresponding to the specified time
 
         :param Datetime datetime: the specified time
@@ -118,7 +129,7 @@ void export_KData(py::module& m) {
 
       .def("get_kdata", py::overload_cast<const KQuery::KType&>(&KData::getKData, py::const_),
            py::arg("ktype"), R"(get_kdata(self, ktype
-           
+
         Get the K-line data of the other type within the same time range, e.g. the minute-line data corresponding under the daily line
 
         :param KQuery::KType ktype: the specified needed K-line type)")
@@ -126,7 +137,7 @@ void export_KData(py::module& m) {
       .def("get_kdata",
            py::overload_cast<const Datetime&, const Datetime&>(&KData::getKData, py::const_),
            R"(get_kdata(self, start_date, end_date)
-      
+
         Get a new KData that keeps the data type and the recovery type unchanged through the current KData (note that it is not a subset of the original KData)
 
         :param Datetime start: the new start date
@@ -160,54 +171,63 @@ void export_KData(py::module& m) {
       .def(py::self == py::self)
       .def(py::self != py::self)
 
-      .def("__getitem__",
-           [](const KData& self, py::object obj) {
-               py::object ret;
-               if (py::isinstance<py::int_>(obj)) {
-                   int64_t i = obj.cast<int64_t>();
-                   int64_t length = self.size();
-                   int64_t index = i < 0 ? length + i : i;
-                   if (index < 0 || index >= length)
-                       throw std::out_of_range(fmt::format("index out of range: {}", i));
-                   ret = py::cast(self.getKRecord(index));
-                   return ret;
-               } else if (py::isinstance<Datetime>(obj)) {
-                   Datetime dt = py::cast<Datetime>(obj);
-                   auto krecord = self.getKRecord(dt);
-                   if (!krecord.isValid()) {
-                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
-                   }
-                   ret = py::cast(krecord);
-                   return ret;
-               } else if (py::isinstance<py::str>(obj)) {
-                   Datetime dt = Datetime(py::cast<std::string>(obj));
-                   auto krecord = self.getKRecord(dt);
-                   if (!krecord.isValid()) {
-                       throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
-                   }
-                   ret = py::cast(krecord);
-                   return ret;
-               } else if (py::isinstance<py::slice>(obj)) {
-                   py::slice slice = py::cast<py::slice>(obj);
-                   size_t start, stop, step, length;
+      .def(
+        "__getitem__",
+        [](const KData& self, py::object obj) {
+            py::object ret;
+            if (!py::isinstance<py::bool_>(obj) && PyIndex_Check(obj.ptr())) {
+                int64_t i = obj.cast<int64_t>();
+                int64_t length = self.size();
+                int64_t index = i < 0 ? length + i : i;
+                if (index < 0 || index >= length)
+                    throw std::out_of_range(fmt::format("index out of range: {}", i));
+                ret = py::cast(self.getKRecord(index));
+                return ret;
+            } else if (py::isinstance<Datetime>(obj)) {
+                Datetime dt = py::cast<Datetime>(obj);
+                auto krecord = self.getKRecord(dt);
+                if (!krecord.isValid()) {
+                    throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                }
+                ret = py::cast(krecord);
+                return ret;
+            } else if (py::isinstance<py::str>(obj)) {
+                Datetime dt = Datetime(py::cast<std::string>(obj));
+                auto krecord = self.getKRecord(dt);
+                if (!krecord.isValid()) {
+                    throw std::out_of_range(fmt::format("datetime out of range: {}", dt));
+                }
+                ret = py::cast(krecord);
+                return ret;
+            } else if (py::isinstance<py::slice>(obj)) {
+                py::slice slice = py::cast<py::slice>(obj);
+                size_t start, stop, step, length;
 
-                   if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
-                       throw std::invalid_argument("Invalid slice parameters");
-                   }
+                if (!slice.compute(self.size(), &start, &stop, &step, &length)) {
+                    throw std::invalid_argument("Invalid slice parameters");
+                }
 
-                   KRecordList result;
-                   result.reserve(length);
-                   for (size_t i = 0; i < length; ++i) {
-                       size_t index = start + i * step;
-                       result.push_back(self[static_cast<size_t>(index)]);
-                   }
+                KRecordList result;
+                result.reserve(length);
+                for (size_t i = 0; i < length; ++i) {
+                    size_t index = start + i * step;
+                    result.push_back(self[static_cast<size_t>(index)]);
+                }
 
-                   ret = py::cast(result);
-                   return ret;
-               }
+                ret = py::cast(result);
+                return ret;
+            }
 
-               throw std::out_of_range("Error index type");
-           })
+            throw std::out_of_range("Error index type");
+        },
+        R"(__getitem__(self, index)
+
+    Access the KRecord by index. Accepted forms:
+    - integer (Python int or any object with __index__, e.g. numpy.int64); bool is rejected to avoid silent True->1 coercion
+    - Datetime or date string, returning the matching KRecord
+    - slice, returning a list of KRecords
+
+    Negative integer indexes count from the end. Out-of-range indexes or dates raise IndexError.)")
 
       .def(
         "__iter__",
@@ -215,7 +235,8 @@ void export_KData(py::module& m) {
             return py::make_iterator<py::return_value_policy::reference_internal>(self.cbegin(),
                                                                                   self.cend());
         },
-        py::keep_alive<0, 1>())
+        py::keep_alive<0, 1>(),
+        R"(Iterate over the KRecord references; they point into the internal buffer, so do not modify or reload the KData while iterating.)")
 
       .def(
         "to_np",
@@ -224,7 +245,7 @@ void export_KData(py::module& m) {
             HKU_IF_RETURN(total == 0, py::array());
 
             struct RawData {
-                int64_t datetime;  // The converted millisecond timestamp
+                int64_t datetime;  // The converted nanosecond timestamp
                 double open;
                 double high;
                 double low;
@@ -233,10 +254,20 @@ void export_KData(py::module& m) {
                 double volume;
             };
 
+            // Define the NumPy structured data type (built before allocation to avoid leaking on
+            // failure)
+            auto dtype = py::dtype(
+              vector_to_python_list<string>(
+                {"datetime", "open", "high", "low", "close", "amount", "volume"}),
+              vector_to_python_list<string>({"datetime64[ns]", "d", "d", "d", "d", "d", "d"}),
+              vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
+
             RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+            HKU_CHECK(data != nullptr, "KData to_np: malloc failed!");
             for (size_t i = 0; i < total; i++) {
                 const KRecord& k = kdata[i];
-                data[i].datetime = k.datetime.timestamp() * 1000LL;
+                data[i].datetime =
+                  k.datetime.isNull() ? k.datetime.timestamp() : k.datetime.timestamp() * 1000LL;
                 data[i].open = k.openPrice;
                 data[i].high = k.highPrice;
                 data[i].low = k.lowPrice;
@@ -244,13 +275,6 @@ void export_KData(py::module& m) {
                 data[i].amount = k.transAmount;
                 data[i].volume = k.transCount;
             }
-
-            // Define the NumPy structured data type
-            auto dtype = py::dtype(
-              vector_to_python_list<string>(
-                {"datetime", "open", "high", "low", "close", "amount", "volume"}),
-              vector_to_python_list<string>({"datetime64[ns]", "d", "d", "d", "d", "d", "d"}),
-              vector_to_python_list<int64_t>({0, 8, 16, 24, 32, 40, 48}), 56);
 
             return py::array(dtype, total, static_cast<RawData*>(data),
                              py::capsule(data, [](void* p) { std::free(p); }));
@@ -261,9 +285,6 @@ void export_KData(py::module& m) {
         "to_df",
         [](const KData& self, bool with_stock) {
             size_t total = self.size();
-            if (total == 0) {
-                return py::module_::import("pandas").attr("DataFrame")();
-            }
 
             // Create the array
             py::array_t<int64_t> datetime_arr(total);
@@ -293,7 +314,8 @@ void export_KData(py::module& m) {
 
             auto* ks = self.data();
             for (size_t i = 0; i < total; i++) {
-                datetime_ptr[i] = ks[i].datetime.timestamp() * 1000LL;
+                datetime_ptr[i] = ks[i].datetime.isNull() ? ks[i].datetime.timestamp()
+                                                          : ks[i].datetime.timestamp() * 1000LL;
                 open_ptr[i] = ks[i].openPrice;
                 high_ptr[i] = ks[i].highPrice;
                 low_ptr[i] = ks[i].lowPrice;
@@ -333,7 +355,11 @@ void export_KData(py::module& m) {
         py::arg("with_stock") = false, R"(to_df(self, with_stock=False) -> pandas.DataFrame
 
     Convert to a pandas DataFrame
-        
+
+    When the KData is empty, a 0-row DataFrame with the standard columns (datetime, open, high, low,
+    close, amount, volume, plus market_code/name when with_stock is True) is returned, keeping the
+    schema consistent with the non-empty path.
+
     :param bool with_stock: include the code and the name of the Stock
     :rtype: pandas.DataFrame)")
 
