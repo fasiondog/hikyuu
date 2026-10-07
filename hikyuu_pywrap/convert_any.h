@@ -54,9 +54,11 @@ inline Datetime pydatetime_to_Datetime(const pybind11::object& source) {
         second = PyDateTime_TIME_GET_SECOND(src);
         minute = PyDateTime_TIME_GET_MINUTE(src);
         hour = PyDateTime_TIME_GET_HOUR(src);
-        day = 1;      // This date (day, month, year) = (1, 0, 70)
-        month = 1;    // represents 1-Jan-1940, which is the first
-        year = 1400;  // earliest available date for Datetime, not Python datetime
+        // Time-only values map to (1400-01-01 hour:minute:second), the earliest supported hikyuu
+        // Datetime date (Datetime::min), not the Python datetime epoch
+        day = 1;
+        month = 1;
+        year = 1400;
         microsecond = PyDateTime_TIME_GET_MICROSECOND(src);
 
     } else {
@@ -146,6 +148,13 @@ public:
             value = obj.cast<KData>();
             return true;
 
+        } else if (isinstance<bytes>(obj) || isinstance<bytearray>(obj)) {
+            // Reject bytes/bytearray explicitly; as py::sequence they would otherwise iterate as
+            // integer codepoints and be silently coerced into a PriceList
+            HKU_THROW_EXCEPTION(std::logic_error,
+                                "bytes/bytearray are not supported for boost::any conversion!");
+            return false;
+
         } else if (isinstance<sequence>(obj)) {
             sequence pyseq = obj.cast<sequence>();
             size_t total = pyseq.size();
@@ -153,6 +162,8 @@ public:
             if (isinstance<Datetime>(pyseq[0])) {
                 std::vector<Datetime> vect(total);
                 for (size_t i = 0; i < total; i++) {
+                    HKU_CHECK(isinstance<Datetime>(pyseq[i]),
+                              "sequence element %zu is not Datetime", i);
                     vect[i] = pyseq[i].cast<Datetime>();
                 }
                 value = vect;
@@ -160,6 +171,8 @@ public:
             } else if (PyFloat_Check(pyseq[0].ptr()) || PyLong_Check(pyseq[0].ptr())) {
                 std::vector<price_t> vect(total);
                 for (size_t i = 0; i < total; i++) {
+                    HKU_CHECK(PyFloat_Check(pyseq[i].ptr()) || PyLong_Check(pyseq[i].ptr()),
+                              "sequence element %zu is not numeric", i);
                     vect[i] = pyseq[i].cast<price_t>();
                 }
                 value = vect;
@@ -288,7 +301,7 @@ public:
             return o;
 
         } else if (x.type() == typeid(PriceList)) {
-            PriceList price_list = boost::any_cast<PriceList>(x);
+            const PriceList& price_list = boost::any_cast<const PriceList&>(x);
             list o;
             for (auto iter = price_list.begin(); iter != price_list.end(); ++iter) {
                 o.append(*iter);
@@ -297,7 +310,7 @@ public:
             return o;
 
         } else if (x.type() == typeid(DatetimeList)) {
-            const DatetimeList& date_list = boost::any_cast<DatetimeList>(x);
+            const DatetimeList& date_list = boost::any_cast<const DatetimeList&>(x);
             list o;
             for (auto iter = date_list.begin(); iter != date_list.end(); ++iter) {
                 o.append(*iter);

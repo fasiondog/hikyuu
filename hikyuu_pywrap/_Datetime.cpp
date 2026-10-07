@@ -12,8 +12,9 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_Datetime(py::module& m) {
-    py::class_<Datetime>(m, "Datetime",
-                         R"(The date-time class (accurate to the microsecond), built in the following ways:
+    py::class_<Datetime>(
+      m, "Datetime",
+      R"(The date-time class (accurate to the microsecond), built in the following ways:
     
     - From a string: Datetime("2010-1-1 10:00:00"), Datetime("2001-1-1"),
                  Datetime("20010101")、Datetime("20010101T232359)
@@ -43,20 +44,29 @@ void export_Datetime(py::module& m) {
       .def_property_readonly("second", &Datetime::second, "Second")
       .def_property_readonly("millisecond", &Datetime::millisecond, "Millisecond")
       .def_property_readonly("microsecond", &Datetime::microsecond, "Microsecond")
-      .def_property_readonly("number", &Datetime::number, "Return the number displayed as YYYYMMDDhhmm")
-      .def_property_readonly("hex", &Datetime::hex,
-                             "Return a 64-bit integer in which the last 7 bytes represent the century, the century year, the month, the day, the hour, the minute and the second")
+      .def_property_readonly("number", &Datetime::number,
+                             "Return the number displayed as YYYYMMDDhhmm")
+      .def_property_readonly(
+        "hex", &Datetime::hex,
+        "Return a 64-bit integer in which the last 7 bytes represent the century, the century "
+        "year, the month, the day, the hour, the minute and the second")
       .def_property_readonly("ym", &Datetime::ym, "Return the number displayed as YYYYMM")
       .def_property_readonly("ymd", &Datetime::ymd, "Return the number displayed as YYYYMMDD")
       .def_property_readonly("ymdh", &Datetime::ymdh, "Return the number displayed as YYYYMMDDhh")
-      .def_property_readonly("ymdhm", &Datetime::ymdhm, "Return the number displayed as YYYYMMDDhhmm")
-      .def_property_readonly("ymdhms", &Datetime::ymdhms, "Return the number displayed as YYYYMMDDhhmmss")
-      .def_property_readonly("ticks", &Datetime::ticks, "Return the microseconds elapsed since the minimum date")
+      .def_property_readonly("ymdhm", &Datetime::ymdhm,
+                             "Return the number displayed as YYYYMMDDhhmm")
+      .def_property_readonly("ymdhms", &Datetime::ymdhms,
+                             "Return the number displayed as YYYYMMDDhhmmss")
+      .def_property_readonly("ticks", &Datetime::ticks,
+                             "Return the microseconds elapsed since the minimum date")
 
-      .def("is_null", &Datetime::isNull, "\nWhether it is a Null value, equal to the object created directly by Datetime()")
+      .def("is_null", &Datetime::isNull,
+           "\nWhether it is a Null value, equal to the object created directly by Datetime()")
 
-      .def("day_of_week", &Datetime::dayOfWeek, "\nReturn the day of the week; Sunday is 0 and Monday is 1")
-      .def("day_of_year", &Datetime::dayOfYear, "\nReturn the day of the year; January 1st is the 1st day of the year")
+      .def("day_of_week", &Datetime::dayOfWeek,
+           "\nReturn the day of the week; Sunday is 0 and Monday is 1")
+      .def("day_of_year", &Datetime::dayOfYear,
+           "\nReturn the day of the year; January 1st is the 1st day of the year")
       .def("start_of_day", &Datetime::startOfDay, "\nReturn 00:00:00 of the current day")
       .def("end_of_day", &Datetime::endOfDay, "\nReturn 23:59:59 of the current day")
       .def("next_day", &Datetime::nextDay, "\nReturn the next natural day")
@@ -69,7 +79,8 @@ void export_Datetime(py::module& m) {
       .def("pre_week", &Datetime::preWeek, "\nReturn the Monday date of the previous week")
       .def("pre_month", &Datetime::preMonth, "\nReturn the first day of the previous month")
       .def("pre_quarter", &Datetime::preQuarter, "\nReturn the first day of the previous quarter")
-      .def("pre_halfyear", &Datetime::preHalfyear, "\nReturn the first day of the previous half-year")
+      .def("pre_halfyear", &Datetime::preHalfyear,
+           "\nReturn the first day of the previous half-year")
       .def("pre_year", &Datetime::preYear, "\nReturn the first day of the previous year")
       .def("date_of_week", &Datetime::dateOfWeek,
            R"(
@@ -83,10 +94,13 @@ void export_Datetime(py::module& m) {
       .def("end_of_month", &Datetime::endOfMonth, "\nReturn the last day of the month")
       .def("start_of_quarter", &Datetime::startOfQuarter, "\nReturn the start date of the quarter")
       .def("end_of_quarter", &Datetime::endOfQuarter, "\nReturn the end date of the quarter")
-      .def("start_of_halfyear", &Datetime::startOfHalfyear, "\nReturn the start date of the half-year")
+      .def("start_of_halfyear", &Datetime::startOfHalfyear,
+           "\nReturn the start date of the half-year")
       .def("end_of_halfyear", &Datetime::endOfHalfyear, "\nReturn the end date of the half-year")
       .def("start_of_year", &Datetime::startOfYear, "\nReturn the start date of the year")
-      .def("endOfYear", &Datetime::endOfYear, "\nReturn the end date of the year")
+      .def("end_of_year", &Datetime::endOfYear, "\nReturn the end date of the year")
+      .def("endOfYear", &Datetime::endOfYear,
+           "\nDeprecated alias for end_of_year; kept for backward compatibility")
       .def("timestamp", &Datetime::timestamp, "\nReturn the timestamp (at the microsecond level)")
       .def("timestamp_utc", &Datetime::timestampUTC,
            "\nReturn the timestamp (at the microsecond level), deducting the local UTC offset time")
@@ -94,10 +108,13 @@ void export_Datetime(py::module& m) {
       .def_static("max", &Datetime::max, "\nGet the maximum supported date, Datetime(9999, 12, 31)")
       .def_static("now", &Datetime::now, "\nGet the current system date-time")
       .def_static("today", &Datetime::today, "\nGet the current date")
-      .def_static("from_hex", &Datetime::fromHex, "\nCompatible with the oracle datetime represented by the last 7 bytes")
-      .def_static("from_timestamp", &Datetime::fromTimestamp, "\nCreate a Datetime object from the timestamp (in microseconds)")
+      .def_static("from_hex", &Datetime::fromHex,
+                  "\nCompatible with the oracle datetime represented by the last 7 bytes")
+      .def_static("from_timestamp", &Datetime::fromTimestamp,
+                  "\nCreate a Datetime object from the timestamp (in microseconds)")
       .def_static("from_timestamp_utc", &Datetime::fromTimestampUTC,
-                  "\nCreate a Datetime object from the timestamp (in microseconds), adding the local UTC offset")
+                  "\nCreate a Datetime object from the timestamp (in microseconds), adding the "
+                  "local UTC offset")
 
       .def(py::hash(py::self))
       .def(py::self == py::self)
@@ -133,8 +150,10 @@ void export_Datetime(py::module& m) {
 
           // Allocate the memory with malloc
           int64_t* data = static_cast<int64_t*>(std::malloc(total * sizeof(int64_t)));
+          HKU_CHECK(data != nullptr, "dates_to_np: malloc failed!");
           for (size_t i = 0; i < total; i++) {
-              data[i] = datelist[i].timestamp() * 1000LL;
+              data[i] =
+                datelist[i].isNull() ? datelist[i].timestamp() : datelist[i].timestamp() * 1000LL;
           }
 
           // Define the NumPy structured data type

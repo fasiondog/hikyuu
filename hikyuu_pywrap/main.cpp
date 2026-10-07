@@ -71,6 +71,8 @@ PYBIND11_MODULE(core313, m) {
 // #warning "current python version: 3.14"
 PYBIND11_MODULE(core314, m) {
 #else
+#error \
+  "unsupported python version; add a matching PYBIND11_MODULE(core3XX, m) branch in hikyuu_pywrap/main.cpp"
 PYBIND11_MODULE(core, m) {
 #endif
 

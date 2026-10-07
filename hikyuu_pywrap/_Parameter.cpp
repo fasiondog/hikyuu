@@ -11,12 +11,10 @@
 using namespace hku;
 namespace py = pybind11;
 
-bool (*parameter_eq)(const Parameter&, const Parameter&) = &operator==;
-bool (*parameter_ne)(const Parameter&, const Parameter&) = &operator!=;
-bool (*parameter_lt)(const Parameter&, const Parameter&) = &operator<;
-
 void export_Parameter(py::module& m) {
-    py::class_<Parameter>(m, "Parameter", "The parameter class, used by the classes that need the named parameter settings, similar to a dict")
+    py::class_<Parameter>(m, "Parameter",
+                          "The parameter class, used by the classes that need the named parameter "
+                          "settings, similar to a dict")
       .def(py::init<>())
       .def("__str__", to_py_str<Parameter>)
       .def("__repr__", to_py_str<Parameter>)

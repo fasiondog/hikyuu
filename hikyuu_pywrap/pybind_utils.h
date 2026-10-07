@@ -78,9 +78,9 @@ template <typename T>
 std::vector<T> python_list_to_vector(const py::sequence& obj) {
     // If len(obj) is zero it may succeed even when the type is not the expected one, but there is
     // no risk
-    auto total = len(obj);
+    Py_ssize_t total = len(obj);
     std::vector<T> vect(total);
-    for (auto i = 0; i < total; ++i) {
+    for (Py_ssize_t i = 0; i < total; ++i) {
         vect[i] = py::cast<T>(obj[i]);
     }
     return vect;
