@@ -194,6 +194,18 @@ public:
                              SystemPart part_from = SystemPart::PART_SIGNAL,
                              const string& remark = "");
 
+    /** Open a short position (borrow + sell); used when support_short is on */
+    virtual TradeRecord sellShort(const Stock& stk, price_t price, double num,
+                                  price_t stoploss = 0.0, price_t goal_price = 0.0,
+                                  SystemPart part_from = SystemPart::PART_SIGNAL,
+                                  const string& remark = "");
+
+    /** Close a short position (buy back + return); used when support_short is on */
+    virtual TradeRecord buyShort(const Stock& stk, price_t price, double num,
+                                 price_t stoploss = 0.0, price_t goal_price = 0.0,
+                                 SystemPart part_from = SystemPart::PART_SIGNAL,
+                                 const string& remark = "");
+
     virtual bool isBacktesting() const {
         return false;
     }
@@ -282,7 +294,6 @@ typedef shared_ptr<Strategy> StrategyPtr;
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,
                            const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                            const std::vector<OrderBrokerPtr>& other_brokers = {});
-
 
 /** @} */
 }  // namespace hku

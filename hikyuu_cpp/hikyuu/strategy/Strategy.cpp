@@ -94,6 +94,7 @@ Strategy::~Strategy() {
 void Strategy::_initParam() {
     setParam<int>("spot_worker_num", 1);
     setParam<string>("quotation_server", string());
+    setParam<bool>("support_short", false);
 }
 
 void Strategy::baseCheckParam(const string& name) const {
@@ -434,7 +435,7 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
     HKU_ERROR_IF_RETURN(!(min_trade_num > 0.0), ret, "{} {} invalid minTradeNumber({})!",
                         stk.market_code(), stk.name(), min_trade_num);
     if (num > 0.0) {
-        // 容易打印过多，此处不打印
+        // Keep it silent to avoid flooding the log when many sub-lot orders are rejected
         // HKU_WARN_IF_RETURN(num < min_trade_num, ret,
         //                    "Ignore! {} {} order num({}) is less than min trade number({})!",
         //                    stk.market_code(), stk.name(), num, min_trade_num);
@@ -451,6 +452,38 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
             return ret;
         }
         double abs_num = std::abs(num);
+        if (getParam<bool>("support_short")) {
+            // Close-long-then-open-short: sell the long side down to holding first,
+            // then borrow to open a short for the remainder.
+            double hold = m_tm->getHoldNumber(now(), stk);
+            double closed = 0.0;
+            if (abs_num >= hold && hold > 0.0) {
+                ret = sell(stk, 0.0, MAX_DOUBLE, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+                closed = hold;
+            } else {
+                double close_num = int64_t(abs_num / min_trade_num) * min_trade_num;
+                if (close_num > max_trade_num) {
+                    close_num = max_trade_num;
+                }
+                if (close_num > 0.0) {
+                    ret = sell(stk, 0.0, close_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+                }
+                closed = close_num;
+            }
+            double short_num = int64_t((abs_num - closed) / min_trade_num) * min_trade_num;
+            if (short_num > max_trade_num) {
+                short_num = max_trade_num;
+            }
+            if (short_num >= min_trade_num) {
+                // sellShort applies the margin rate and borrowable amount internally,
+                // partially filling when they are insufficient
+                ret = sellShort(stk, 0.0, short_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+            } else if (closed <= 0.0) {
+                HKU_WARN("Ignore! {} {} order num({}) is less than min trade number({})!",
+                         stk.market_code(), stk.name(), abs_num, min_trade_num);
+            }
+            return ret;
+        }
         double sell_num = int64_t(abs_num / min_trade_num) * min_trade_num;
         if (sell_num > max_trade_num) {
             sell_num = max_trade_num;
@@ -542,6 +575,18 @@ TradeRecord Strategy::sell(const Stock& stk, price_t price, double num, price_t 
                            price_t goal_price, SystemPart part_from, const string& remark) {
     HKU_ASSERT(m_tm);
     return m_tm->sell(now(), stk, price, num, stoploss, goal_price, price, part_from, remark);
+}
+
+TradeRecord Strategy::sellShort(const Stock& stk, price_t price, double num, price_t stoploss,
+                                price_t goal_price, SystemPart part_from, const string& remark) {
+    HKU_ASSERT(m_tm);
+    return m_tm->sellShort(now(), stk, price, num, stoploss, goal_price, price, part_from, remark);
+}
+
+TradeRecord Strategy::buyShort(const Stock& stk, price_t price, double num, price_t stoploss,
+                               price_t goal_price, SystemPart part_from, const string& remark) {
+    HKU_ASSERT(m_tm);
+    return m_tm->buyShort(now(), stk, price, num, stoploss, goal_price, price, part_from, remark);
 }
 
 void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& query,

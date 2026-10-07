@@ -35,7 +35,7 @@ Event-driven strategy backtest.
     :param Query.KType ktype: the K-line type (the test is executed bar by bar with this type)
     :param str ref_market: the market it belongs to
     :param int mode: 0 - execute the buy/sell operations with the close price of the current bar; 1 - execute the buy/sell operations with the open price of the next bar
-    :param support_short: whether short selling is supported
+    :param support_short: whether short selling is supported; when True, the part of a sell order beyond the current long position is opened short via stock borrowing (close-long-then-open-short), requiring the account to support borrowing stock
     :param Slippage sp: the slippage algorithm
 
 

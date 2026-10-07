@@ -226,6 +226,35 @@ Common parameters:
         :return: the trade record
         :rtype: TradeRecord
 
+    .. py:method:: sell_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+        Open a short position (borrow and sell the security); requires the account to support borrowing stock. Normally invoked by order() in a close-long-then-open-short manner when support_short is on.
+
+        :param Stock stock: the specified security
+        :param price_t price: the open-short price
+        :param float num: the quantity to open short
+        :param price_t stoploss: the stop-loss price; defaults to 0
+        :param price_t goal_price: the take-profit target price; defaults to 0
+        :param SystemPart part: the system part; defaults to PART_SIGNAL
+        :param str remark: the remark
+        :return: the trade record
+        :rtype: TradeRecord
+
+    .. py:method:: buy_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+        Close (cover) a short position (buy back and return the borrowed security).
+
+        :param Stock stock: the specified security
+        :param price_t price: the cover price
+        :param float num: the quantity to cover
+        :param price_t stoploss: the stop-loss price; defaults to 0
+        :param price_t goal_price: the take-profit target price; defaults to 0
+        :param SystemPart part: the system part; defaults to PART_SIGNAL
+        :param str remark: the remark
+        :return: the trade record
+        :rtype: TradeRecord
+
+
 
 .. py:function:: start_spot_agent(print=False, worker_num=1, addr="")
 

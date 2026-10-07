@@ -51,14 +51,16 @@ void export_Strategy(py::module& m) {
       .def_property_readonly("running", &Strategy::running, "Get the current running state")
       .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
                              "Get the strategy context")
-      .def_property("tm", &Strategy::getTM, &Strategy::setTM, "The associated trade manager instance")
+      .def_property("tm", &Strategy::getTM, &Strategy::setTM,
+                    "The associated trade manager instance")
       .def_property("sp", &Strategy::getSP, &Strategy::setSP, "The slippage algorithm")
       .def_property_readonly("is_backtesting", &Strategy::isBacktesting, "The backtest state")
 
       .def(
         "start",
         [](Strategy& self, bool auto_recieve_spot) {
-            // In python, before start, forcibly add an empty function, used to catch KeyboardInterrupt to terminate the strategy
+            // In python, before start, forcibly add an empty function, used to catch
+            // KeyboardInterrupt to terminate the strategy
             py::object func = py::eval("lambda stg: None");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
             auto new_func = [=](Strategy* stg) {
@@ -308,7 +310,27 @@ void export_Strategy(py::module& m) {
           &Strategy::sell),
         py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
         py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
-        py::arg("remark") = "");
+        py::arg("remark") = "")
+      .def(
+        "sell_short",
+        py::overload_cast<const Stock&, price_t, double, price_t, price_t, SystemPart,
+                          const string&>(&Strategy::sellShort),
+        py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
+        py::arg("remark") = "",
+        R"(sell_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+    Open a short position (borrow and sell); requires the trade manager to support borrowing stock)")
+      .def(
+        "buy_short",
+        py::overload_cast<const Stock&, price_t, double, price_t, price_t, SystemPart,
+                          const string&>(&Strategy::buyShort),
+        py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
+        py::arg("remark") = "",
+        R"(buy_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+    Close (cover) a short position (buy back and return the borrowed stock))");
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
           py::arg("name") = "SYS", py::arg("other_brokers") = std::vector<OrderBrokerPtr>());
@@ -330,18 +352,17 @@ void export_Strategy(py::module& m) {
     :param cost_func: the cost function
     :param other_brokers: the other order brokers)");
 
-
-
     m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),
           py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("name") = "SYSStrategy",
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "");
+          py::arg("name") = "SYSStrategy", py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
+          py::arg("config") = "");
 
-    m.def("crt_multi_sys_strategy", crtMultiSysStrategy, py::arg("ms"), py::arg("stk_market_code"),
-          py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("name") = "MultiSYSStrategy",
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "",
-          R"(crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, [other_brokers=[]], [name='MultiSYSStrategy'], [config=''])
+    m.def(
+      "crt_multi_sys_strategy", crtMultiSysStrategy, py::arg("ms"), py::arg("stk_market_code"),
+      py::arg("query"), py::arg("broker"), py::arg("cost_func"),
+      py::arg("name") = "MultiSYSStrategy",
+      py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "",
+      R"(crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, [other_brokers=[]], [name='MultiSYSStrategy'], [config=''])
 
     Create the aggregate system strategy (the MultiSystem live trading entry).
     The parent account uses the BrokerTM synchronized with the broker, the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally by MultiSystem).
@@ -357,6 +378,4 @@ void export_Strategy(py::module& m) {
     :param str config: the config file
     :return: the strategy runtime instance
     :rtype: Strategy)");
-
-
 }
