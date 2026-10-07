@@ -10,6 +10,7 @@
 #define PARAMETER_H_
 
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -25,6 +26,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/nvp.hpp>
+#include "hikyuu/utilities/Log.h"
 #include "../serialization/Block_serialization.h"
 #include "../serialization/KData_serialization.h"
 #include "../serialization/Datetime_serialization.h"
@@ -68,7 +70,11 @@ struct ParamItemRecord {
         } else if (arg.type() == typeid(double)) {
             type = "double";
             double x = boost::any_cast<double>(arg);
-            value = boost::lexical_cast<string>(x);
+            // 以 max_digits10 精度保存，避免 lexical_cast 默认 6 位有效数字的往返精度损失
+            std::ostringstream os;
+            os.precision(std::numeric_limits<double>::max_digits10);
+            os << x;
+            value = os.str();
         } else if (strcmp(arg.type().name(), typeid(string).name()) == 0) {
             type = "string";
             value = boost::any_cast<string>(arg);
@@ -227,8 +233,8 @@ public:
     /**
      * Get the actual type of the given parameter
      * @param name the given parameter name
-     * @return "string" | "int" | "double" | "bool" | "Stock" | "Block"
-     *         "KQuery" | "KData" | "PriceList" | "DatetimeList"
+     * @return "string" | "int64" | "double" | "bool" | "Datetime" | "Stock" | "Block"
+     *         | "KQuery" | "KData" | "PriceList" | "DatetimeList"
      */
     string type(const string& name) const;
 
@@ -238,9 +244,6 @@ public:
      * @param name parameter name
      * @param value parameter value
      */
-    template <typename ValueType>
-    void set(const string& name, ValueType&& value);
-
     template <typename ValueType>
     void set(const string& name, const ValueType& value);
 
@@ -330,7 +333,7 @@ private:
             } else if (record.type == "DatetimeList") {
                 m_params[record.name] = record.date_list;
             } else {
-                std::cout << "Unknown type! [Parameter::load]" << std::endl;
+                HKU_ERROR("Unknown type {} in Parameter::load, name: {}", record.type, record.name);
             }
         }
     }
@@ -484,8 +487,13 @@ ValueType Parameter::tryGet(const string& name, const ValueType& val) const {
 
 template <typename ValueType>
 void Parameter::set(const string& name, const ValueType& value) {
+    auto iter = m_params.find(name);
     if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
-        if (!have(name)) {
+        if (iter == m_params.end()) {
+            if (!support(value)) {
+                throw std::logic_error("Unsupported Type! input value type: " +
+                                       string(value.type().name()));
+            }
             if (value.type() == typeid(int)) {
                 m_params[name] = static_cast<int64_t>(boost::any_cast<int>(value));
             } else {
@@ -494,111 +502,47 @@ void Parameter::set(const string& name, const ValueType& value) {
             return;
         }
 
-        if (strcmp(m_params[name].type().name(), value.type().name()) != 0) {
+        if (iter->second.type() != value.type()) {
             throw std::logic_error("Mismatching type! need type " +
-                                   string(m_params[name].type().name()) + " but value type is " +
+                                   string(iter->second.type().name()) + " but value type is " +
                                    string(value.type().name()));
         }
-
-        m_params[name] = value;
+        iter->second = value;
 
     } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
-        if (!have(name)) {
+        if (iter == m_params.end()) {
             m_params[name] = static_cast<int64_t>(value);
             return;
         }
 
-        if (m_params[name].type() != typeid(int64_t) && m_params[name].type() != typeid(int)) {
+        if (iter->second.type() != typeid(int64_t) && iter->second.type() != typeid(int)) {
             throw std::logic_error(
               "Mismatching type! need type int or int64_t, but value type is " +
               string(typeid(ValueType).name()));
         }
-        m_params[name] = static_cast<int64_t>(value);
+        iter->second = static_cast<int64_t>(value);
 
     } else {
-        if (!have(name)) {
+        if (iter == m_params.end()) {
             if (!support(value)) {
-                throw std::logic_error("Unsuport Type! input valut type: " +
+                throw std::logic_error("Unsupported Type! input value type: " +
                                        string(typeid(ValueType).name()));
             }
             m_params[name] = value;
             return;
         }
 
-        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
-            if ((m_params[name].type() == typeid(int) ||
-                 m_params[name].type() == typeid(int64_t)) &&
+        if (iter->second.type() != typeid(ValueType)) {
+            if ((iter->second.type() == typeid(int) || iter->second.type() == typeid(int64_t)) &&
                 (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
-                // Ignored, the setting is allowed
+                // int 与 int64_t 视为同类型，允许互设
             } else {
                 throw std::logic_error("Mismatching type! need type " +
-                                       string(m_params[name].type().name()) +
-                                       " but value type is " + string(typeid(ValueType).name()));
-            }
-        }
-
-        m_params[name] = value;
-    }
-}
-
-template <typename ValueType>
-void Parameter::set(const string& name, ValueType&& value) {
-    if constexpr (std::same_as<std::decay_t<ValueType>, boost::any>) {
-        if (!have(name)) {
-            m_params[name] = std::forward<ValueType>(value);
-            return;
-        }
-
-        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
-            if ((m_params[name].type() == typeid(int64_t) ||
-                 m_params[name].type() == typeid(int)) &&
-                (typeid(ValueType) == typeid(int64_t) || typeid(ValueType) == typeid(int))) {
-                // Ignored, the setting is allowed
-            } else {
-                throw std::logic_error("Mismatching type! need type " +
-                                       string(m_params[name].type().name()) +
-                                       " but value type is " + string(typeid(ValueType).name()));
-            }
-        }
-
-        m_params[name] = std::forward<ValueType>(value);
-
-    } else if constexpr (std::same_as<std::decay_t<ValueType>, int>) {
-        if (!have(name)) {
-            m_params[name] = value;
-            return;
-        }
-
-        if (m_params[name].type() != typeid(int64_t) && m_params[name].type() != typeid(int)) {
-            throw std::logic_error(
-              "Mismatching type! need type int or int64_t, but value type is " +
-              string(typeid(ValueType).name()));
-        }
-        m_params[name] = static_cast<int64_t>(value);
-
-    } else {
-        if (!have(name)) {
-            if (!support(value)) {
-                throw std::logic_error("Unsuport Type! input valut type: " +
+                                       string(iter->second.type().name()) + " but value type is " +
                                        string(typeid(ValueType).name()));
             }
-            m_params[name] = std::forward<ValueType>(value);
-            return;
         }
-
-        if (strcmp(m_params[name].type().name(), typeid(ValueType).name()) != 0) {
-            if ((m_params[name].type() == typeid(int) ||
-                 m_params[name].type() == typeid(int64_t)) &&
-                (typeid(ValueType) == typeid(int) || typeid(ValueType) == typeid(int64_t))) {
-                // Ignored, the setting is allowed
-            } else {
-                throw std::logic_error("Mismatching type! need type " +
-                                       string(m_params[name].type().name()) +
-                                       " but value type is " + string(typeid(ValueType).name()));
-            }
-        }
-
-        m_params[name] = std::forward<ValueType>(value);
+        iter->second = value;
     }
 }
 
@@ -619,14 +563,21 @@ inline int Parameter::get(const string& name) const {
     if (iter == m_params.end()) {
         throw std::out_of_range("out_of_range in Parameter::get : " + name);
     }
+    int64_t x = 0;
     try {
         if (iter->second.type() == typeid(int)) {
-            return boost::any_cast<int>(iter->second);
+            x = boost::any_cast<int>(iter->second);
+        } else {
+            x = boost::any_cast<int64_t>(iter->second);
         }
-        return static_cast<int>(boost::any_cast<int64_t>(iter->second));
     } catch (...) {
         throw std::runtime_error("failed conversion param: " + name);
     }
+    if (x > int64_t(std::numeric_limits<int>::max()) ||
+        x < int64_t(std::numeric_limits<int>::min())) {
+        throw std::out_of_range("out_of_range in Parameter::get<int> : " + name);
+    }
+    return static_cast<int>(x);
 }
 
 template <>

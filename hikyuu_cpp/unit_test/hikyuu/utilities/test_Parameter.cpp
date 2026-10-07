@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include "hikyuu/utilities/Log.h"
+#include <algorithm>
 #include <hikyuu/utilities/Parameter.h>
 #include <hikyuu/StockManager.h>
 
@@ -55,6 +56,29 @@ TEST_CASE("test_Parameter") {
     /** @arg Add an unsupported parameter type */
     CHECK_THROWS_AS(param.set<size_t>("n", 10), std::logic_error);
     CHECK_THROWS_AS(param.set<float>("n", 10.0), std::logic_error);
+
+    /** @arg Set an unsupported type via boost::any */
+    CHECK_THROWS_AS(param.set("unsupported", boost::any(size_t(10))), std::logic_error);
+
+    /** @arg Modify an existing parameter via boost::any with a mismatching type */
+    CHECK_THROWS_AS(param.set("n", boost::any(string("x"))), std::logic_error);
+
+    /** @arg int parameters set via rvalue and lvalue are normalized to the same int64 type */
+    Parameter pi1, pi2;
+    pi1.set<int>("n", 1);
+    int n = 1;
+    pi2.set<int>("n", n);
+    CHECK(pi1.type("n") == "int64");
+    CHECK(pi2.type("n") == "int64");
+    CHECK_EQ(pi1, pi2);
+
+    /** @arg get<int> throws when the stored int64 value is out of the int range */
+    param.set<int64_t>("big", 21474836480ll);
+    param.set<int64_t>("small", -21474836480ll);
+    CHECK_THROWS_AS(param.get<int>("big"), std::out_of_range);
+    CHECK_THROWS_AS(param.get<int>("small"), std::out_of_range);
+    CHECK(param.get<int64_t>("big") == 21474836480ll);
+    CHECK(param.get<int64_t>("small") == -21474836480ll);
 
     /** @arg When modifying a parameter, the given type does not match the existing one */
     CHECK_THROWS_AS(param.set<float>("n", 10.0), std::logic_error);
@@ -151,6 +175,13 @@ TEST_CASE("test_Parameter") {
     for (int i = 0; i < 10; i++) {
         CHECK(x[i] == x2[i]);
     }
+
+    /** @arg KData is not the last item, getNameValueList still separates the items with ',' */
+    p = Parameter();
+    p.set<KData>("k", k);
+    p.set<int>("n", 1);
+    string nv = p.getNameValueList();
+    CHECK_EQ(std::count(nv.begin(), nv.end(), ','), 1);
 }
 
 /** @par Verify the getting of KData */
@@ -179,6 +210,7 @@ TEST_CASE("test_Parameter_serialize") {
     p1.set<int>("n", 10);
     p1.set<bool>("bool", true);
     p1.set<double>("p", 0.101);
+    p1.set<double>("prec", 0.1234567890123456);
     p1.set<string>("string", "This is string!");
     p1.set<Datetime>("date", Datetime(20260101));
     Stock stk = getStock("sh600000");
@@ -213,6 +245,7 @@ TEST_CASE("test_Parameter_serialize") {
     CHECK(p2.get<int>("n") == 10);
     CHECK(p2.get<bool>("bool") == true);
     CHECK(p2.get<double>("p") == 0.101);
+    CHECK(p2.get<double>("prec") == 0.1234567890123456);
     CHECK(p2.get<string>("string") == "This is string!");
     CHECK(p2.get<Stock>("stk") == stk);
     CHECK(p2.get<Block>("blk") == Block());
