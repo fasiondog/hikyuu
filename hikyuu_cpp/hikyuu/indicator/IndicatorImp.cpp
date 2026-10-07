@@ -538,7 +538,7 @@ IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
     HKU_CHECK_THROW(
-      (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
+      (num < MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
       "Try to access value out of bounds! num: {}, pos: {}, name: {}", num, pos, name());
 #endif
     return (*m_pBuffer[num])[pos];
@@ -547,7 +547,7 @@ IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
 IndicatorImp::value_t IndicatorImp::front(size_t num) const {
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
-    HKU_CHECK_THROW((num <= MAX_RESULT_NUM && m_pBuffer[num] && !m_pBuffer[num]->empty()),
+    HKU_CHECK_THROW((num < MAX_RESULT_NUM && m_pBuffer[num] && !m_pBuffer[num]->empty()),
                     std::out_of_range, "Try to access value out of bounds! num: {}, name: {}", num,
                     name());
 #endif
@@ -557,7 +557,7 @@ IndicatorImp::value_t IndicatorImp::front(size_t num) const {
 IndicatorImp::value_t IndicatorImp::back(size_t num) const {
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
-    HKU_CHECK_THROW((num <= MAX_RESULT_NUM && m_pBuffer[num] && !m_pBuffer[num]->empty()),
+    HKU_CHECK_THROW((num < MAX_RESULT_NUM && m_pBuffer[num] && !m_pBuffer[num]->empty()),
                     std::out_of_range, "Try to access value out of bounds! num: {}, name: {}", num,
                     name());
 #endif
@@ -568,7 +568,7 @@ void IndicatorImp::_set(value_t val, size_t pos, size_t num) {
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
     HKU_CHECK_THROW(
-      (num <= MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
+      (num < MAX_RESULT_NUM && m_pBuffer[num] && pos < m_pBuffer[num]->size()), std::out_of_range,
       "Try to access value out of bounds! num: {}, pos: {}, name: {}", num, pos, name());
 #endif
     (*m_pBuffer[num])[pos] = val;

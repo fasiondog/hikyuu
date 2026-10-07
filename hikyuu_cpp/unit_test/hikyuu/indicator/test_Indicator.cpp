@@ -1020,4 +1020,31 @@ TEST_CASE("test_Indicator_operator_alike_non_cval") {
     CHECK_EQ(result.getImp().get(), pl2.getImp().get());
 }
 
+/** @par Test points */
+TEST_CASE("test_indicator_access_result_num_bound") {
+    PriceList d;
+    for (size_t i = 0; i < 5; ++i) {
+        d.push_back(i + 1);  // [1,2,3,4,5]
+    }
+    Indicator ind = PRICELIST(d);
+    IndicatorImpPtr imp = ind.getImp();
+
+    /** @arg num within [0, MAX_RESULT_NUM) is still accessible */
+    CHECK_EQ(ind.get(0, 0), 1.0);
+    CHECK_EQ(ind.front(0), 1.0);
+    CHECK_EQ(ind.back(0), 5.0);
+
+    /** @arg data with an out-of-bounds result_idx returns nullptr instead of reading OOB */
+    CHECK_UNARY(imp->data(MAX_RESULT_NUM) == nullptr);
+    CHECK_UNARY(imp->data(0) != nullptr);
+
+#if CHECK_ACCESS_BOUND
+    /** @arg num == MAX_RESULT_NUM is an out-of-bounds index and should throw (the throw
+     *  guard of get/front/back is only compiled when CHECK_ACCESS_BOUND is enabled) */
+    CHECK_THROWS_AS(ind.get(0, MAX_RESULT_NUM), std::out_of_range);
+    CHECK_THROWS_AS(ind.front(MAX_RESULT_NUM), std::out_of_range);
+    CHECK_THROWS_AS(ind.back(MAX_RESULT_NUM), std::out_of_range);
+#endif
+}
+
 /** @} */

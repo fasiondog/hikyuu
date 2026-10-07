@@ -351,7 +351,7 @@ set_context(self, stock, query)
         [](const Indicator& self) -> py::array {
             size_t ret_num = self.getResultNumber();
             if (ret_num == 0) {
-                return py::array_t<double>({(size_t)0});
+                return py::array_t<double>((py::ssize_t)0);
             }
 
             // Initialize the array_t and get its internal buffer

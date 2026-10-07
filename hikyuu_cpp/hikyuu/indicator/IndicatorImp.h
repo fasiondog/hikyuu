@@ -587,11 +587,13 @@ inline bool IndicatorImp::haveIndParam(const string& name) const {
 }
 
 inline IndicatorImp::value_t* IndicatorImp::data(size_t result_idx) noexcept {
-    return m_pBuffer[result_idx] ? m_pBuffer[result_idx]->data() : nullptr;
+    return (result_idx < MAX_RESULT_NUM && m_pBuffer[result_idx]) ? m_pBuffer[result_idx]->data()
+                                                                  : nullptr;
 }
 
 inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const noexcept {
-    return m_pBuffer[result_idx] ? m_pBuffer[result_idx]->data() : nullptr;
+    return (result_idx < MAX_RESULT_NUM && m_pBuffer[result_idx]) ? m_pBuffer[result_idx]->data()
+                                                                  : nullptr;
 }
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
