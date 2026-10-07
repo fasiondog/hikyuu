@@ -1,8 +1,12 @@
 /*
+ * AF_FixedAmount.h
+ *
  * Copyright (c) 2019 hikyuu.org
  *
  *  Created on: 2025-12-9
  *      Author: stone
+ *
+ *  AF has an independent class hierarchy (AllocateFundsBase), the factory returns AFPtr.
  */
 
 #pragma once
@@ -15,6 +19,10 @@ namespace hku {
 
 /**
  * @brief Fixed amount allocation, the trade of every selected asset cannot exceed this amount
+ * @details L1 equal weight + L2 reads the parameter fixed-amount (mode A: a fixed amount per
+ *          instrument / mode B: a fixed quota per sub-system). There are boundary differences with
+ *          master FixedAmountFunds: master asserts amount>500 and stops when the remaining cash is
+ *          less than 0.6×amount, while the new system uses >=0 and rebalances by the net amount.
  * @param amount the given fixed trade amount
  * @return AFPtr
  * @ingroup AllocateFunds

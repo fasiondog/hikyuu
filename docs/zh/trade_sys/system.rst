@@ -6,7 +6,20 @@
 
 系统是指针对单个交易对象的完整策略，包括环境判断、系统有效条件、资金管理、止损、止盈、盈利目标、移滑价差的完整策略，用于模拟回测。
 
-对于多目标，在 Hikyuu 中需要使用投资组合，参见：:ref:`portfolio`。
+对于多目标（多证券），可使用 :class:`MultiSystem` 将多个 System 实例（单证券或嵌套的 :class:`MultiSystem`）聚合为一个组合，统一在同一交易账户（TM）下回测。:class:`MultiSystem` 通过 ``add(subsystem)`` 添加子系统，并支持**任意嵌套**与循环引用检测；各子系统保留自身的 SG/MM/EV/CN/ST/TP/PG/SP 策略，仅由父系统统一记账与下单。
+
+:class:`MultiSystem` 支持两种运行模式（``set_mode``；模式由 AF 持有，亦可经 ``set_af`` 的 AF 工厂设定）：
+
+- **模式 A「信号汇总」（Signal Aggregation，默认）**：每个子系统持有一个信号「影子账户」（初始信号资金 ``set_sub_init_cash``，**每调仓日重置**），作为纯信号源提交仓位意图；父通过 AF L2 按「权重 × 仓位意图 × 父总资产」换算目标市值并统一下单，影子账本不触碰真实资金。
+- **模式 B「资金配置」（Fund Allocation，配额划拨，FOF/MOM 风格）**：调仓日先由 AF L1 为每个选中子系统分配额度，并在驱动子系统**之前**将其影子账户校准到该额度（回收现金 → 清仓未选中 → 减持超配 → 注资低配），子系统以精确额度自主交易；父透传其真实指令（L2），L3 风控跳过（尊重子管理人自主性）。影子账户从 0 起步并跟随父账户成本函数，与父账户交易保持同步。
+
+聚合回测还支持：
+
+- **AF L1/L2/L3 分层**（详见 :doc:`../trade_portfolio/allocate_funds`）：L1 系统级分配（模式 A 名义权重 / 模式 B 真实额度，例：等权 1/N、固定权重、按 SE 得分加权）、L2 行为级换算（A 按「权重 × 仓位意图 × 父总资产」聚合到标的并按差额再平衡 / B 透传）、L3 组合风控（集中度上限 ``max-single-position``，默认 1.0 不限制；模式 B 跳过）。
+- **调仓周期**（``set_adjust_cycle``）：默认每个收盘日都再平衡；设置大于 1 的天数后仅在周期日调仓。
+- **交易对象选择（SE）**（``set_se``）：可选设置，调仓日仅运行选中子系统，未选中者可强制清仓（``set_sell_at_not_selected``）。
+- **换手率**（``get_adjust_turnover``）：记录各调仓日的成交金额与调仓前总资产之比。
+- **退市/停牌**：父在开盘阶段统一强制卖出已退市标的持仓；停牌日子系统自动跳过。
 
 公共参数：
 
@@ -242,17 +255,17 @@
         
         :rtype: TradeRecordList
         
-    .. py:method:: get_buy_trade_request(self)
+    .. py:method:: get_buy_trade_request_list(self)
     
-        获取买入请求，“delay”模式下查看下一时刻是否存在买入操作
+        获取买入请求列表，“delay”模式下查看下一时刻是否存在买入操作
         
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
 
-    .. py:method:: get_sell_trade_request(self)
+    .. py:method:: get_sell_trade_request_list(self)
     
-        获取卖出请求，“delay”模式下查看下一时刻是否存在卖出操作
+        获取卖出请求列表，“delay”模式下查看下一时刻是否存在卖出操作
         
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
                 
     .. py:function:: run(self, stock, query[, reset=True])
     
@@ -282,7 +295,7 @@
 
 .. py:class:: TradeRequest
 
-    交易请求记录。系统内部在实现延迟操作时登记的交易请求信息。暴露该结构的主要目的是用于在“delay”模式（延迟到下一个bar开盘时进行交易）的情况下，系统实际已知下一个Bar将要进行交易，此时可通过 :py:meth:`System.getBuyTradeRequest` 、 :py:meth:`System.getSellTradeRequest` 来获知下一个BAR是否需要买入/卖出。主要用于提醒或打印下一个Bar需要进行操作。对于系统本身的运行没有影响。
+    交易请求记录。系统内部在实现延迟操作时登记的交易请求信息。暴露该结构的主要目的是用于在“delay”模式（延迟到下一个bar开盘时进行交易）的情况下，系统实际已知下一个Bar将要进行交易，此时可通过 :py:meth:`System.getBuyTradeRequestList` 、 :py:meth:`System.getSellTradeRequestList` 来获知下一个BAR是否需要买入/卖出。主要用于提醒或打印下一个Bar需要进行操作。对于系统本身的运行没有影响。
     
     .. py:attribute:: valid 
         

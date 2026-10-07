@@ -11,6 +11,7 @@
 
 #include <hikyuu/config.h>
 #include <hikyuu/Stock.h>
+#include <memory>
 #include <pybind11/pybind11.h>
 
 #include <pybind11/operators.h>
@@ -25,6 +26,25 @@
 namespace py = pybind11;
 
 namespace hku {
+
+// Wrap a py::object so its lifetime can safely cross worker threads (e.g. TimerManager
+// entries). The deleter acquires the GIL before releasing; if the interpreter is going
+// down, skip decref (leak; process is exiting). Reusable across pybind bindings.
+inline std::shared_ptr<py::object> make_gil_safe(py::object obj) {
+    return std::shared_ptr<py::object>(new py::object(std::move(obj)), [](py::object* p) {
+        bool finalizing =
+#if PY_VERSION_HEX >= 0x030D0000
+          Py_IsFinalizing() != 0;
+#else
+            !Py_IsInitialized();
+#endif
+        if (finalizing) {
+            return;
+        }
+        py::gil_scoped_acquire gil;
+        delete p;
+    });
+}
 
 template <typename T>
 py::bytes vector_to_python_bytes(const std::vector<T>& vect) {

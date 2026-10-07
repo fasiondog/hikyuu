@@ -16,6 +16,17 @@
 
 namespace hku {
 
+/**
+ * @brief Table binding macros
+ *
+ * Every TABLE_BINDN macro maps a struct to a database table and, by contract, requires the table
+ * to carry an integer primary key column named "id" (aliased to rowid on SQLite). The generated
+ * code relies on it throughout: getSelectSQL() selects "id" as column 0, load() reads it into
+ * m_id, valid() reports whether m_id is set, and getUpdateSQL()/remove filter on it. Downstream
+ * facilities inherit this precondition (e.g. SQLResultSet / AsyncSQLResultSet build their page
+ * window as `id IN (SELECT id ... ORDER BY id ...)`), so a table without an "id" column is not
+ * supported by any query path - paged or not.
+ */
 #define TABLE_BIND0(TableT, table)              \
 public:                                         \
     TableT() = default;                         \
@@ -3394,7 +3405,7 @@ public:                                                                         
     }                                                                                             \
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
-               "\",\"" #f5 "\",\"" #f6 "\") values (?,?,?,?,?,?)";                                \
+               "\",\"" #f5 "\",\"" #f6 "\") values (?,?,?,?,?,?,?)";                                \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3472,7 +3483,7 @@ public:                                                                         
     }                                                                                             \
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
-               "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\") values (?,?,?,?,?,?)";                    \
+               "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\") values (?,?,?,?,?,?,?,?)";                    \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3552,7 +3563,7 @@ public:                                                                         
     }                                                                                             \
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
-               "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\") values (?,?,?,?,?,?)";        \
+               "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\") values (?,?,?,?,?,?,?,?,?)";        \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3635,7 +3646,7 @@ public:                                                                         
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9                        \
-               "\") values (?,?,?,?,?,?)";                                                        \
+               "\") values (?,?,?,?,?,?,?,?,?,?)";                                                        \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3721,7 +3732,7 @@ public:                                                                         
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
-               "\") values (?,?,?,?,?,?)";                                                        \
+               "\") values (?,?,?,?,?,?,?,?,?,?,?)";                                                        \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3809,7 +3820,7 @@ public:                                                                         
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
-               "\",\"" #f11 "\") values (?,?,?,?,?,?)";                                           \
+               "\",\"" #f11 "\") values (?,?,?,?,?,?,?,?,?,?,?,?)";                                           \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3856,17 +3867,17 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
         f12 = std::move(rv.f12);                                                                  \
         rv.m_id = 0;                                                                              \
         return *this;                                                                             \
@@ -3900,7 +3911,7 @@ public:                                                                         
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
-               "\",\"" #f11 "\",\"" #f12 "\") values (?,?,?,?,?,?)";                              \
+               "\",\"" #f11 "\",\"" #f12 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?)";                              \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -3948,17 +3959,17 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
         f12 = std::move(rv.f12);                                                                  \
         f13 = std::move(rv.f13);                                                                  \
         rv.m_id = 0;                                                                              \
@@ -3993,7 +4004,7 @@ public:                                                                         
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
-               "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\") values (?,?,?,?,?,?)";                 \
+               "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";                 \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4043,17 +4054,17 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
         f12 = std::move(rv.f12);                                                                  \
         f13 = std::move(rv.f13);                                                                  \
         f14 = std::move(rv.f14);                                                                  \
@@ -4089,7 +4100,7 @@ public:                                                                         
     static const char* getInsertSQL() {                                                           \
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
-               "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\") values (?,?,?,?,?,?)";    \
+               "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";    \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4141,17 +4152,17 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
         f12 = std::move(rv.f12);                                                                  \
         f13 = std::move(rv.f13);                                                                  \
         f14 = std::move(rv.f14);                                                                  \
@@ -4189,7 +4200,7 @@ public:                                                                         
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
                "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\",\"" #f15                   \
-               "\") values (?,?,?,?,?,?)";                                                        \
+               "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";                                                        \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4242,22 +4253,22 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
-        f12 = std::move(rv.f12));                                                                 \
-        f13 = std::move(rv.f13));                                                                 \
-        f14 = std::move(rv.f14));                                                                 \
-        f15 = std::move(rv.f15));                                                                 \
-        f16 = std::move(rv.f16));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
+        f12 = std::move(rv.f12);                                                                 \
+        f13 = std::move(rv.f13);                                                                 \
+        f14 = std::move(rv.f14);                                                                 \
+        f15 = std::move(rv.f15);                                                                 \
+        f16 = std::move(rv.f16);                                                                 \
         rv.m_id = 0;                                                                              \
         return *this;                                                                             \
     }                                                                                             \
@@ -4291,7 +4302,7 @@ public:                                                                         
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
                "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\",\"" #f15 "\",\"" #f16      \
-               "\") values (?,?,?,?,?,?)";                                                        \
+               "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";                                                        \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4346,23 +4357,23 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
-        f12 = std::move(rv.f12));                                                                 \
-        f13 = std::move(rv.f13));                                                                 \
-        f14 = std::move(rv.f14));                                                                 \
-        f15 = std::move(rv.f15));                                                                 \
-        f16 = std::move(rv.f16));                                                                 \
-        f17 = std::move(rv.f17));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
+        f12 = std::move(rv.f12);                                                                 \
+        f13 = std::move(rv.f13);                                                                 \
+        f14 = std::move(rv.f14);                                                                 \
+        f15 = std::move(rv.f15);                                                                 \
+        f16 = std::move(rv.f16);                                                                 \
+        f17 = std::move(rv.f17);                                                                 \
         rv.m_id = 0;                                                                              \
         return *this;                                                                             \
     }                                                                                             \
@@ -4396,7 +4407,7 @@ public:                                                                         
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
                "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\",\"" #f15 "\",\"" #f16      \
-               "\",\"" #f17 "\") values (?,?,?,?,?,?)";                                           \
+               "\",\"" #f17 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";                                           \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4455,24 +4466,24 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
-        f12 = std::move(rv.f12));                                                                 \
-        f13 = std::move(rv.f13));                                                                 \
-        f14 = std::move(rv.f14));                                                                 \
-        f15 = std::move(rv.f15));                                                                 \
-        f16 = std::move(rv.f16));                                                                 \
-        f17 = std::move(rv.f17));                                                                 \
-        f18 = std::move(rv.f18));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
+        f12 = std::move(rv.f12);                                                                 \
+        f13 = std::move(rv.f13);                                                                 \
+        f14 = std::move(rv.f14);                                                                 \
+        f15 = std::move(rv.f15);                                                                 \
+        f16 = std::move(rv.f16);                                                                 \
+        f17 = std::move(rv.f17);                                                                 \
+        f18 = std::move(rv.f18);                                                                 \
         rv.m_id = 0;                                                                              \
         return *this;                                                                             \
     }                                                                                             \
@@ -4506,7 +4517,7 @@ public:                                                                         
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
                "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\",\"" #f15 "\",\"" #f16      \
-               "\",\"" #f17 "\",\"" #f18 "\") values (?,?,?,?,?,?)";                              \
+               "\",\"" #f17 "\",\"" #f18 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";                              \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4566,25 +4577,25 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
-        f12 = std::move(rv.f12));                                                                 \
-        f13 = std::move(rv.f13));                                                                 \
-        f14 = std::move(rv.f14));                                                                 \
-        f15 = std::move(rv.f15));                                                                 \
-        f16 = std::move(rv.f16));                                                                 \
-        f17 = std::move(rv.f17));                                                                 \
-        f18 = std::move(rv.f18));                                                                 \
-        f19 = std::move(rv.f19));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
+        f12 = std::move(rv.f12);                                                                 \
+        f13 = std::move(rv.f13);                                                                 \
+        f14 = std::move(rv.f14);                                                                 \
+        f15 = std::move(rv.f15);                                                                 \
+        f16 = std::move(rv.f16);                                                                 \
+        f17 = std::move(rv.f17);                                                                 \
+        f18 = std::move(rv.f18);                                                                 \
+        f19 = std::move(rv.f19);                                                                 \
         rv.m_id = 0;                                                                              \
         return *this;                                                                             \
     }                                                                                             \
@@ -4618,7 +4629,7 @@ public:                                                                         
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
                "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\",\"" #f15 "\",\"" #f16      \
-               "\",\"" #f17 "\",\"" #f18 "\",\"" #f19 "\") values (?,?,?,?,?,?)";                 \
+               "\",\"" #f17 "\",\"" #f18 "\",\"" #f19 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";                 \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \
@@ -4680,26 +4691,26 @@ public:                                                                         
         if (this == &rv)                                                                          \
             return *this;                                                                         \
         m_id = rv.m_id;                                                                           \
-        f1 = std::move(rv.f1));                                                                   \
-        f2 = std::move(rv.f2));                                                                   \
-        f3 = std::move(rv.f3));                                                                   \
-        f4 = std::move(rv.f4));                                                                   \
-        f5 = std::move(rv.f5));                                                                   \
-        f6 = std::move(rv.f6));                                                                   \
-        f7 = std::move(rv.f7));                                                                   \
-        f8 = std::move(rv.f8));                                                                   \
-        f9 = std::move(rv.f9));                                                                   \
-        f10 = std::move(rv.f10));                                                                 \
-        f11 = std::move(rv.f11));                                                                 \
-        f12 = std::move(rv.f12));                                                                 \
-        f13 = std::move(rv.f13));                                                                 \
-        f14 = std::move(rv.f14));                                                                 \
-        f15 = std::move(rv.f15));                                                                 \
-        f16 = std::move(rv.f16));                                                                 \
-        f17 = std::move(rv.f17));                                                                 \
-        f18 = std::move(rv.f18));                                                                 \
-        f19 = std::move(rv.f19));                                                                 \
-        f20 = std::move(rv.f20));                                                                 \
+        f1 = std::move(rv.f1);                                                                   \
+        f2 = std::move(rv.f2);                                                                   \
+        f3 = std::move(rv.f3);                                                                   \
+        f4 = std::move(rv.f4);                                                                   \
+        f5 = std::move(rv.f5);                                                                   \
+        f6 = std::move(rv.f6);                                                                   \
+        f7 = std::move(rv.f7);                                                                   \
+        f8 = std::move(rv.f8);                                                                   \
+        f9 = std::move(rv.f9);                                                                   \
+        f10 = std::move(rv.f10);                                                                 \
+        f11 = std::move(rv.f11);                                                                 \
+        f12 = std::move(rv.f12);                                                                 \
+        f13 = std::move(rv.f13);                                                                 \
+        f14 = std::move(rv.f14);                                                                 \
+        f15 = std::move(rv.f15);                                                                 \
+        f16 = std::move(rv.f16);                                                                 \
+        f17 = std::move(rv.f17);                                                                 \
+        f18 = std::move(rv.f18);                                                                 \
+        f19 = std::move(rv.f19);                                                                 \
+        f20 = std::move(rv.f20);                                                                 \
         rv.m_id = 0;                                                                              \
         return *this;                                                                             \
     }                                                                                             \
@@ -4733,7 +4744,7 @@ public:                                                                         
         return "insert into \"" #table "\" (id, \"" #f1 "\",\"" #f2 "\",\"" #f3 "\",\"" #f4       \
                "\",\"" #f5 "\",\"" #f6 "\",\"" #f7 "\",\"" #f8 "\",\"" #f9 "\",\"" #f10           \
                "\",\"" #f11 "\",\"" #f12 "\",\"" #f13 "\",\"" #f14 "\",\"" #f15 "\",\"" #f16      \
-               "\",\"" #f17 "\",\"" #f18 "\",\"" #f19 "\",\"" #f20 "\") values (?,?,?,?,?,?)";    \
+               "\",\"" #f17 "\",\"" #f18 "\",\"" #f19 "\",\"" #f20 "\") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";    \
     }                                                                                             \
     static const char* getUpdateSQL() {                                                           \
         return "update \"" #table "\" set \"" #f1 "\"=?,\"" #f2 "\"=?,\"" #f3 "\"=?,\"" #f4       \

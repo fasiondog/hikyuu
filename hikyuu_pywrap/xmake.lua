@@ -5,8 +5,11 @@ target("core")
     set_kind("shared")
     set_default(false)
     -- if is_mode("debug") then 
-    --     set_default(false) --会默认禁用这个target的编译，除非显示指定xmake build _hikyuu才会去编译，但是target还存在，里面的files会保留到vcproj
-    --     --set_enable(false) --set_enable(false)会彻底禁用这个target，连target的meta也不会被加载，vcproj不会保留它
+    --     set_default(false) -- disables the build of this target by default: it is compiled
+    --         only when "xmake build _hikyuu" is given explicitly; the target still exists and
+    --         its files are kept in the vcproj
+    --     --set_enable(false) -- set_enable(false) fully disables this target: not even its
+    --         meta is loaded and the vcproj does not keep it
     -- end
 
     add_deps("hikyuu")
@@ -39,7 +42,7 @@ target("core")
     if is_plat("macosx") then
         add_linkdirs("/usr/lib")
 
-        -- macosx 下不能主动链接 python，所以需要使用如下编译选项
+        -- python cannot be linked actively on macOS, so the following compile options are used
         add_shflags("-undefined dynamic_lookup", "-headerpad_max_install_names")
     end    
 
@@ -70,7 +73,7 @@ target("core")
             if os.getenv("CONDA_PREFIX") ~= nil then
                 pydir = os.iorun("python -c \"import sys; print(sys.executable)\"")
             else
-                -- 直接用 python.program 在 conda 环境下切换有问题
+                -- using python.program directly has problems when switching within the conda environment
                 pydir = os.iorunv(python.program, {"-c", "import sys; print(sys.executable)"})
             end
             pydir = path.directory(pydir)
@@ -79,7 +82,7 @@ target("core")
                 file = io.open(pydir .. "/../pyvenv.cfg", "r")
                 for line in file:lines() do
                     if string.find(line, "home =") then
-                        -- 使用 string.gmatch 函数抽取路径
+                        -- extract the path with the string.gmatch function
                         for path in string.gmatch(line, "home = (.*)") do
                             pydir = path
                         end
@@ -175,7 +178,7 @@ target("core")
                 end
             end
 
-            -- 添加 macosx 签名
+            -- add the macOS signature
             local projectdir = os.projectdir() 
             local scan_dir = path.join(projectdir, "hikyuu/cpp")
             print("Start signing dynamic libraries in: " .. scan_dir)

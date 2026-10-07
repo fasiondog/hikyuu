@@ -1,23 +1,76 @@
 /*
- * AllocateMoney.h
+ * AllocateFundsBase.h
  *
+ *  Copyright (c) 2025 hikyuu.org
+ *
+ *  Base class of the portfolio-level fund allocation (AF), it is held by the aggregate form
+ *  (MultiSystem) only.
+ *
+ *  AF is composed of three replaceable algorithm parts, each of them corresponds to one virtual
+ *  function (L1/L2/L3):
+ *
+ *  - **L1 system-level allocation** `_allocate`: decide "how much each sub-system may manage".
+ *    Input is the sub-system context list, output is the weight table; in mode B (Fund
+ *    Allocation) it also writes the real cash quota into `contexts[i].quota` (weight x the parent
+ *    total assets, or the fixed amount). Examples: AF_EqualWeight (1/N), AF_FixedWeight,
+ *    AF_MultiFactor (weighted by the SE score).
+ *
+ *  - **L2 behavior-level conversion** `_toTargets`: convert the sub-system suggestions into the
+ *    executable quantity of the parent account (the folding point from the sub-system space to
+ *    the individual instrument space). In mode A (Signal Aggregation) the target position market
+ *    value = weight x position ratio x the parent total assets, aggregated per instrument and
+ *    rebalanced by the delta to the current position; in mode B the real instruction of the
+ *    sub-system passes through unchanged.
+ *
+ *  - **L3 portfolio risk control** `_checkRisk`: clip the suggestions at the portfolio
+ *    dimension (e.g. the single instrument concentration cap `max-single-position`); mode B
+ *    respects the sub-manager autonomy and skips the clipping.
+ *
+ *  The overall entry is `allocate()` = L1 -> L2 -> L3. When the quota is needed before driving
+ *  the sub-systems (the mode B calibration), use `allocateQuota()` (L1 only) and
+ *  `allocateTargets()` (L2 -> L3) separately.
+ *  The mode is held here (`setMode`): "A" Signal Aggregation / "B" Fund Allocation / "C" Shared
+ *  Account Compatibility, see the MultiSystem class comment for the three modes.
+ *  The single-security form uses MoneyManagerBase (MM); the two no longer share the class
+ *  hierarchy, the parameter family or the allocation mode.
  *  Created on: 2018-1-30
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_
-#define TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_
+#ifndef ALLOCATEFUNDSBASE_H_
+#define ALLOCATEFUNDSBASE_H_
+
+#include <unordered_map>
+#include <vector>
 
 #include "../../utilities/Parameter.h"
-#include "../selector/SystemWeight.h"
+#include "../system/SystemPart.h"
+#include "../system/TradeSuggestion.h"
+#include "../system/SubSystemContext.h"
+#include "../../trade_manage/TradeManager.h"
 
 namespace hku {
 
+class System;  // Forward declaration, to avoid a circular include with System.h
+using SYSPtr = std::shared_ptr<System>;
+
+class AllocateFundsBase;
+typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
+
 /**
- * Asset allocation adjustment algorithm
- * @details It allocates and adjusts the asset proportions according to the asset market value. For
- *          a pure fund adjustment, please use the money management algorithm.
+ * The pointer type that the client programs should use
+ * @ingroup AllocateFunds
+ */
+using AFPtr = AllocateFundsPtr;
+
+/**
+ * Base class of the portfolio-level fund allocation (AF). It contains three replaceable algorithm
+ * parts: L1 system-level allocation / L2 behavior-level conversion / L3 portfolio risk control
+ * (see the file comment for the details).
+ * @note It is used by the aggregate form (MultiSystem) only; the single-security form never calls
+ *       this class. The running mode is held here: "A" Signal Aggregation / "B" Fund Allocation
+ *       / "C" Shared Account Compatibility.
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
@@ -26,110 +79,165 @@ class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBa
 public:
     /** Default constructor */
     AllocateFundsBase();
-    AllocateFundsBase(const AllocateFundsBase&) = default;
-
-    /**
-     * Constructor
-     * @param name algorithm name
-     */
     explicit AllocateFundsBase(const string& name);
-
-    /** Destructor */
+    AllocateFundsBase(const AllocateFundsBase&) = default;
     virtual ~AllocateFundsBase();
 
-    /** Get the algorithm name */
-    const string& name() const;
+    /** Get the name */
+    const string& name() const {
+        return m_name;
+    }
 
-    /** Modify the algorithm name */
-    void name(const string& name);
-
-    /**
-     * Execute the asset allocation adjustment, it is called by PF only
-     * @param date the given date
-     * @param se_list the system instances selected by the system instance selector
-     * @param running_list the currently running system instances
-     * @return the system list that needs a delayed sell operation, where the weight is the
-     *         corresponding quantity to be sold
-     */
-    SystemWeightList adjustFunds(const Datetime& date, const SystemWeightList& se_list,
-                                 const std::unordered_set<SYSPtr>& running_list);
-
-    /** Get the trade account */
-    const TMPtr& getTM() const;
-
-    /** Set the trade account, it is set by PF */
-    void setTM(const TMPtr&);
-
-    /** Set the shadow account of Portfolio, it is called by Portfolio only */
-    void setCashTM(const TMPtr&);
-
-    const TMPtr& getCashTM(const TMPtr&) const;
-
-    /** Get the associated query condition */
-    const KQuery& getQuery() const;
-
-    /** Set the query condition, it is set by PF */
-    void setQuery(const KQuery& query);
+    /** Set the name */
+    void name(const string& name) {
+        m_name = name;
+    }
 
     /** Reset */
     void reset();
 
-    typedef shared_ptr<AllocateFundsBase> AFPtr;
-
     /** Clone operation */
-    AFPtr clone();
+    AllocateFundsPtr clone();
+
+    /** Set the trade account (the real account of the parent/aggregate system) */
+    void setTM(const TradeManagerPtr& tm) {
+        m_tm = tm;
+    }
+
+    /** Get the trade account */
+    TradeManagerPtr getTM() const {
+        return m_tm;
+    }
+
+    /** Set the query condition */
+    void setQuery(const KQuery& query) {
+        m_query = query;
+    }
+
+    /** Get the query condition */
+    const KQuery& getQuery() const {
+        return m_query;
+    }
+
+    /** Set the allocation mode: A (signal aggregation, the default), B (fund allocation /
+     *  FOF-MOM) or C (shared account, the legacy Portfolio compatibility).
+     *  @note This field is the **only source** of the allocation mode; the aggregate system does
+     *        not keep one of its own any more.
+     *  @note In mode C the aggregate system drives the sub-systems directly on its own real
+     *        account and never calls allocate(): L1 takes no quota, L2 needs no conversion and L3
+     *        is off by default. The branches here are only a defensive pass-through for the case
+     *        of an AF being invoked in mode C. */
+    void setMode(const string& mode) {
+        if (mode == "B" || mode == "b") {
+            m_mode = "B";
+        } else if (mode == "C" || mode == "c") {
+            m_mode = "C";
+        } else {
+            m_mode = "A";
+        }
+    }
+
+    /** Get the allocation mode */
+    const string& getMode() const {
+        return m_mode;
+    }
+
+    /** Weight table: sub-system -> weight (the L1 output and the L2 input) */
+    using Weights = std::unordered_map<SYSPtr, double>;
+
+    /**
+     * The unified entry of L1/L2/L3, it is called by the aggregate System (MultiSystem).
+     * Flow: L1 system-level allocation (nominal weight / real quota) -> L2 behavior-level
+     *       conversion (mode A by proportion / mode B pass-through) -> L3 portfolio risk control
+     *       clipping.
+     * @param date the trade date
+     * @param tm the real trade account of the parent (aggregate) system
+     * @param suggestions [in/out] the suggestions submitted by every sub-system; L2 rewrites them
+     *        in place into the executable quantity of the parent account
+     * @param contexts the context of every sub-system (the virtual account funds / the mode B
+     *        quota, etc.), used by L1 for the allocation
+     * @param query the query condition (the K-line type, etc.)
+     */
+    void allocate(const Datetime& date, const TradeManagerPtr& tm, TradeSuggestionList& suggestions,
+                  SubSystemContextList& contexts, const KQuery& query);
+
+    /**
+     * L1 only: calculate the weights and (in mode B) write the real quota into contexts[i].quota,
+     * without converting any suggestion. It is used by the aggregate System when the quota is
+     * needed **before** driving the sub-systems (the mode B quota-first calibration).
+     * @return the L1 weight table (the input of allocateTargets)
+     */
+    Weights allocateQuota(const Datetime& date, const TradeManagerPtr& tm,
+                          SubSystemContextList& contexts, const KQuery& query);
+
+    /**
+     * L2 + L3 only: convert the suggestions into the executable quantity of the parent account and
+     * perform the portfolio risk control. It is used together with allocateQuota by the aggregate
+     * System when the suggestions are collected after the quota calibration.
+     */
+    void allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
+                         TradeSuggestionList& suggestions, const Weights& sys_weight,
+                         const KQuery& query);
+
+    /** L1 system-level allocation: mode A returns the nominal weight (suggested weight), mode B
+     *  returns the real quota (written into contexts[i].quota).
+     *  @note It returns the equal weight (1/N) by default; when the parameter weight-list is not
+     *        empty the fixed weights are used instead (migrated from AF_FixedWeight /
+     *        AF_FixedWeightList). */
+    virtual Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
+                              SubSystemContextList& contexts, const KQuery& query);
+
+    /** Parse the parameter weight-list (the comma separated fixed weights) into a normalized weight
+     *  vector; an empty vector is returned when it is empty, when its size does not match the
+     *  sub-systems or when the sum is <= 0 (the caller falls back to the equal weight). Migrated
+     *  from AF_FixedWeight / AF_FixedWeightList. */
+    std::vector<double> _parseWeightList(size_t expect_n) const;
+
+    /** L1 skeleton: fill the L1 result by "sub-system index -> weight", and in mode B write
+     *  contexts[i].quota (when fixed-amount>0 the fixed quota takes precedence, otherwise
+     *  weight x the parent total assets).
+     *  @note **No normalization is performed**, the weight semantics is fully decided by the
+     *        subclass; the missing index (weights shorter than contexts) falls back to the equal
+     *        weight. */
+    Weights _applyWeights(const Datetime& date, const TradeManagerPtr& tm,
+                          SubSystemContextList& contexts, const KQuery& query,
+                          const std::vector<double>& weights) const;
+
+    /** L2 behavior-level conversion: in mode A it is converted into the parent account quantity by
+     *  assets_ratio / weight; in mode B the sub-system number is passed through.
+     *  @note The default implementation is mode A (equal weight to position): the number of every
+     *        suggestion is rewritten into the target share quantity "weight x the parent total
+     *        assets / the planned price"; the SELL/CLEAR flags are fully closed (MAX_DOUBLE). */
+    virtual void _toTargets(const Datetime& date, const TradeManagerPtr& tm,
+                            TradeSuggestionList& suggestions, const Weights& sys_weight,
+                            const KQuery& query);
+
+    /** L3 portfolio risk control clipping: mode A performs the portfolio dimension risk control
+     *  (concentration / turnover, etc.); mode B can be disabled or only performs the total amount
+     *  check.
+     *  @note The single instrument concentration is limited by the parameter max-single-position by
+     *        default. */
+    virtual void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
+                            TradeSuggestionList& suggestions, const KQuery& query);
 
     /** Subclass reset interface */
     virtual void _reset() {}
 
     /** Interface for the subclass to clone its private variables */
-    virtual AFPtr _clone() = 0;
-
-    /**
-     * Subclass weight allocation interface, it gets the system instances actually allocated the
-     * assets and their weights
-     * @details It actually calls the subclass interface _allocateWeight
-     * @param date the given date
-     * @param se_list the system instances selected by the system instance selector
-     * @return the subclass only needs to return the relative proportion of every system
-     */
-    virtual SystemWeightList _allocateWeight(const Datetime& date,
-                                             const SystemWeightList& se_list) = 0;
-
-public:
-    /*
-     * An internal function, it is set to public for the testing only.
-     * It adjusts the planned weights allocated by the subclass according to the internal parameter
-     * settings
-     */
-    static void adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
-                             bool auto_adjust, bool ignore_zero);
+    virtual AllocateFundsPtr _clone() = 0;
 
     bool isPythonObject() const noexcept {
         return m_is_python_object;
     }
 
-private:
-    void initParam();
-
-    /* It also adjusts the sub-systems already running (the ones already allocated funds or holding
-     * positions) */
-    SystemWeightList _adjust_with_running(const Datetime& date, const SystemWeightList& se_list,
-                                          const std::unordered_set<SYSPtr>& running_list);
-
-    /* It does not adjust the sub-systems already running */
-    void _adjust_without_running(const Datetime& date, const SystemWeightList& se_list,
-                                 const std::unordered_set<SYSPtr>& running_list);
-
 protected:
+    string m_name;
+    // The allocation mode: A=signal aggregation (default) / B=fund allocation (FOF-MOM)
+    // / C=shared account (the legacy Portfolio compatibility)
+    string m_mode{"A"};
+    KQuery m_query;
+    TradeManagerPtr m_tm;
     bool m_is_python_object{false};
-
-private:
-    string m_name;    // Component name
-    KQuery m_query;   // Query condition
-    TMPtr m_tm;       // Set by PF at runtime, the actual account of PF
-    TMPtr m_cash_tm;  // Set by PF at runtime, the shadow account of tm, used to coordinate the fund
-                      // allocation
 
 //============================================
 // Serialization support
@@ -139,18 +247,20 @@ private:
     friend class boost::serialization::access;
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
-        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_mode);
+        // m_query and m_tm are set temporarily when the system runs, they do not need to be
+        // serialized
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_query);
+        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
+        ar& BOOST_SERIALIZATION_NVP(m_mode);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -174,9 +284,9 @@ BOOST_SERIALIZATION_ASSUME_ABSTRACT(AllocateFundsBase)
  *     ...
  * };
  * @endcode
- * @ingroup Selector
+ * @ingroup AllocateFunds
  */
-#define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION               \
+#define ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION              \
 private:                                                            \
     friend class boost::serialization::access;                      \
     template <class Archive>                                        \
@@ -184,53 +294,17 @@ private:                                                            \
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(AllocateFundsBase); \
     }
 #else
-#define ALLOCATEFUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
+#define ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define ALLOCATEFUNDS_IMP(classname)          \
-public:                                       \
-    virtual AFPtr _clone() override {         \
-        return std::make_shared<classname>(); \
-    }                                         \
-    virtual SystemWeightList _allocateWeight(const Datetime&, const SystemWeightList&) override;
-
-typedef shared_ptr<AllocateFundsBase> AllocateFundsPtr;
-typedef shared_ptr<AllocateFundsBase> AFPtr;
+#define ALLOCATE_FUNDS_IMP(classname)            \
+public:                                          \
+    virtual AllocateFundsPtr _clone() override { \
+        return std::make_shared<classname>();    \
+    }
 
 HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsBase&);
-HKU_API std::ostream& operator<<(std::ostream&, const AFPtr&);
-
-inline const string& AllocateFundsBase::name() const {
-    return m_name;
-}
-
-inline void AllocateFundsBase::name(const string& name) {
-    m_name = name;
-}
-
-inline const TMPtr& AllocateFundsBase::getTM() const {
-    return m_tm;
-}
-
-inline void AllocateFundsBase::setTM(const TMPtr& tm) {
-    m_tm = tm;
-}
-
-inline void AllocateFundsBase::setCashTM(const TMPtr& tm) {
-    m_cash_tm = tm;
-}
-
-inline const TMPtr& AllocateFundsBase::getCashTM(const TMPtr&) const {
-    return m_cash_tm;
-}
-
-inline const KQuery& AllocateFundsBase::getQuery() const {
-    return m_query;
-}
-
-inline void AllocateFundsBase::setQuery(const KQuery& query) {
-    m_query = query;
-}
+HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsPtr&);
 
 } /* namespace hku */
 
@@ -239,7 +313,7 @@ template <>
 struct fmt::formatter<hku::AllocateFundsBase> : ostream_formatter {};
 
 template <>
-struct fmt::formatter<hku::AFPtr> : ostream_formatter {};
+struct fmt::formatter<hku::AllocateFundsPtr> : ostream_formatter {};
 #endif
 
-#endif /* TRADE_SYS_ALLOCATEFUNDS_ALLOCATEFUNDSBASE_H_ */
+#endif /* ALLOCATEFUNDSBASE_H_ */

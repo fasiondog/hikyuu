@@ -24,6 +24,7 @@ void export_SystemPart(py::module& m) {
       .value("PROFITGOAL", PART_PROFITGOAL, "The profit goal strategy")
       .value("SLIPPAGE", PART_SLIPPAGE, "The slippage algorithm")
       .value("ALLOCATEFUNDS", PART_ALLOCATEFUNDS, "The asset allocation algorithm")
+      .value("SYS", PART_SYSTEM, "The aggregate sub-system (added by the recursive combination refactoring)")
       .value("INVALID", PART_INVALID, "An invalid system part")
 
       // Support the abbreviations

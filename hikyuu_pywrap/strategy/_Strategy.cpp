@@ -9,7 +9,8 @@
 #include <hikyuu/strategy/Strategy.h>
 #include <hikyuu/strategy/BrokerTradeManager.h>
 #include <hikyuu/strategy/RunSystemInStrategy.h>
-#include <hikyuu/strategy/RunPortfolioInStrategy.h>
+#include <hikyuu/strategy/RunMultiSystemInStrategy.h>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/eval.h>
@@ -50,19 +51,21 @@ void export_Strategy(py::module& m) {
       .def_property_readonly("running", &Strategy::running, "Get the current running state")
       .def_property_readonly("context", &Strategy::context, py::return_value_policy::copy,
                              "Get the strategy context")
-      .def_property("tm", &Strategy::getTM, &Strategy::setTM, "The associated trade manager instance")
+      .def_property("tm", &Strategy::getTM, &Strategy::setTM,
+                    "The associated trade manager instance")
       .def_property("sp", &Strategy::getSP, &Strategy::setSP, "The slippage algorithm")
       .def_property_readonly("is_backtesting", &Strategy::isBacktesting, "The backtest state")
 
       .def(
         "start",
         [](Strategy& self, bool auto_recieve_spot) {
-            // In python, before start, forcibly add an empty function, used to catch KeyboardInterrupt to terminate the strategy
-            py::object func = py::eval("lambda stg: None");
-            HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
+            // In python, before start, forcibly add an empty function, used to catch
+            // KeyboardInterrupt to terminate the strategy
+            auto func = make_gil_safe(py::eval("lambda stg: None"));
+            HKU_CHECK(check_pyfunction_arg_num(*func, 1), "Number of parameters does not match!");
             auto new_func = [=](Strategy* stg) {
                 try {
-                    func(stg);
+                    (*func)(stg);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -84,15 +87,19 @@ void export_Strategy(py::module& m) {
 
     :param bool auto_recieve_spot: whether to receive the market data automatically)")
 
+      .def("stop", &Strategy::stop, R"(stop(self)
+
+    Stop the strategy event loop; registered market-data / timed callbacks become no-ops and queued callbacks are dropped, so start() returns. Destroy the object on the same thread after start() has returned.)")
+
       .def(
         "on_change",
         [](Strategy& self, py::object func) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 3), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg, const Stock& stk, const SpotRecord& spot) {
                 try {
-                    c_func(stg, stk, spot);
+                    (*c_func)(stg, stk, spot);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -119,10 +126,10 @@ void export_Strategy(py::module& m) {
         [](Strategy& self, py::object func) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 2), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg, Datetime revTime) {
                 try {
-                    c_func(stg, revTime);
+                    (*c_func)(stg, revTime);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -150,10 +157,10 @@ void export_Strategy(py::module& m) {
            bool ignore_market) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg) {
                 try {
-                    c_func(stg);
+                    (*c_func)(stg);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -185,10 +192,10 @@ void export_Strategy(py::module& m) {
         [](Strategy& self, py::object func, const TimeDelta& time, bool ignore_holiday) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg) {
                 try {
-                    c_func(stg);
+                    (*c_func)(stg);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -307,7 +314,27 @@ void export_Strategy(py::module& m) {
           &Strategy::sell),
         py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
         py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
-        py::arg("remark") = "");
+        py::arg("remark") = "")
+      .def(
+        "sell_short",
+        py::overload_cast<const Stock&, price_t, double, price_t, price_t, SystemPart,
+                          const string&>(&Strategy::sellShort),
+        py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
+        py::arg("remark") = "",
+        R"(sell_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+    Open a short position (borrow and sell); requires the trade manager to support borrowing stock)")
+      .def(
+        "buy_short",
+        py::overload_cast<const Stock&, price_t, double, price_t, price_t, SystemPart,
+                          const string&>(&Strategy::buyShort),
+        py::arg("stock"), py::arg("price"), py::arg("num"), py::arg("stoploss") = 0.0,
+        py::arg("goal_price") = 0.0, py::arg("part") = SystemPart::PART_SIGNAL,
+        py::arg("remark") = "",
+        R"(buy_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+    Close (cover) a short position (buy back and return the borrowed stock))");
 
     m.def("crtBrokerTM", crtBrokerTM, py::arg("broker"), py::arg("cost_func") = TC_Zero(),
           py::arg("name") = "SYS", py::arg("other_brokers") = std::vector<OrderBrokerPtr>());
@@ -329,28 +356,30 @@ void export_Strategy(py::module& m) {
     :param cost_func: the cost function
     :param other_brokers: the other order brokers)");
 
-    m.def("run_in_strategy",
-          py::overload_cast<const PFPtr&, const KQuery&, const OrderBrokerPtr&, const TradeCostPtr&,
-                            const std::vector<OrderBrokerPtr>&>(runInStrategy),
-          py::arg("pf"), py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
-          R"(run_in_strategy(pf, query, broker, cost_func, [other_brokers=[]])
-          
-    Execute the portfolio strategy PF in the strategy runtime
-    Currently only the systems with both buy_delay|sell_delay being false are supported, i.e. trading at the close
-
-    :param Portfolio pf: the portfolio
-    :param Query query: the query condition
-    :param broker: the order broker (dedicated to the order broker synchronizing with the account assets)
-    :param cost_func: the cost function
-    :param other_brokers: the other order brokers)");
-
     m.def("crt_sys_strategy", crtSysStrategy, py::arg("sys"), py::arg("stk_market_code"),
           py::arg("query"), py::arg("broker"), py::arg("cost_func"),
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("name") = "SYSStrategy",
+          py::arg("name") = "SYSStrategy", py::arg("other_brokers") = std::vector<OrderBrokerPtr>(),
           py::arg("config") = "");
 
-    m.def("crt_pf_strategy", crtPFStrategy, py::arg("pf"), py::arg("query"), py::arg("broker"),
-          py::arg("cost_func"), py::arg("name") = "PFStrategy",
-          py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "");
+    m.def(
+      "crt_multi_sys_strategy", crtMultiSysStrategy, py::arg("ms"), py::arg("stk_market_code"),
+      py::arg("query"), py::arg("broker"), py::arg("cost_func"),
+      py::arg("name") = "MultiSYSStrategy",
+      py::arg("other_brokers") = std::vector<OrderBrokerPtr>(), py::arg("config") = "",
+      R"(crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, [other_brokers=[]], [name='MultiSYSStrategy'], [config=''])
+
+    Create the aggregate system strategy (the MultiSystem live trading entry).
+    The parent account uses the BrokerTM synchronized with the broker, the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally by MultiSystem).
+    Currently only the sub-systems with both buy_delay | sell_delay being false are supported, i.e. the trade is executed at the close.
+
+    :param ms: the aggregate trading system MultiSystem
+    :param str stk_market_code: the driving instrument (e.g. 'SH000001', used to align the time axis)
+    :param query: the query condition
+    :param broker: the order broker (the order broker synchronized with the parent account assets)
+    :param cost_func: the cost function
+    :param other_brokers: the other order brokers
+    :param str name: the strategy name
+    :param str config: the config file
+    :return: the strategy runtime instance
+    :rtype: Strategy)");
 }

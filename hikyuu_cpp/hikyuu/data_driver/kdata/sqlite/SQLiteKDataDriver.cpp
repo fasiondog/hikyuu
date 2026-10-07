@@ -351,6 +351,7 @@ KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
     KRecord current;
     uint64_t current_key = 0;
     bool has_current = false;
+    Datetime current_last_bar;
 
     for (const KRecord& bar : candles) {
         uint64_t key = 0;
@@ -376,14 +377,23 @@ KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
         }
 
         if (!has_current || key != current_key) {
-            if (has_current)
+            if (has_current) {
+                // A fully suspended (all-zero) daily phase has no priced bar: fall back to the
+                // last bar's timestamp so the bucket datetime is never left as a Null timestamp
+                if (is_daily && current.datetime.isNull())
+                    current.datetime = current_last_bar;
                 result.push_back(std::move(current));
+            }
             current = KRecord();
             current_key = key;
             has_current = true;
+            current_last_bar = Datetime();
             if (!is_daily)
                 current.datetime = bar_timestamp;
         }
+
+        if (is_daily)
+            current_last_bar = bar.datetime;
 
         current.transCount += bar.transCount;
         current.transAmount += bar.transAmount;
@@ -402,8 +412,11 @@ KRecordList SQLiteKDataDriver::convertToNewInterval(const KRecordList& candles,
         }
     }
 
-    if (has_current)
+    if (has_current) {
+        if (is_daily && current.datetime.isNull())
+            current.datetime = current_last_bar;
         result.push_back(std::move(current));
+    }
     return result;
 }
 

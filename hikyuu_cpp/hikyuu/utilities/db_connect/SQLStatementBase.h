@@ -13,8 +13,14 @@
 #include <type_traits>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include "hikyuu/utilities/config.h"
+#include "hikyuu/utilities/Null.h"
 #include "hikyuu/utilities/datetime/Datetime.h"
+#include "hikyuu/utilities/exception.h"
+#include "hikyuu/utilities/Log.h"
 #include "../../DataType.h"
+#include "DBCondition.h"
+#include "SQLException.h"
 
 namespace hku {
 
@@ -24,10 +30,17 @@ class DBConnectBase;
 typedef std::shared_ptr<DBConnectBase> DBConnectPtr;
 
 /** @ingroup DBConnect */
-class null_blob_exception : public exception {
+class HKU_UTILS_API null_blob_exception : public exception {
 public:
     /** Construct */
     null_blob_exception() : exception("Blob is null!") {}
+
+    // The out-of-line destructor is the key function: it pins the vtable and the typeinfo to a
+    // single translation unit inside the library, so that the type thrown by a driver keeps
+    // matching catch (const null_blob_exception &) written in another binary (e.g. in the
+    // getColumn templates of this header), which otherwise fails with every TU holding its own
+    // private typeinfo
+    ~null_blob_exception() noexcept override;
 };
 
 /**
@@ -97,12 +110,37 @@ public:
     template <typename T, typename... Args>
     void bind(int idx, const T &, const Args &...rest);
 
+    /**
+     * Bind a full set of condition values to the anonymous placeholders of the statement, in order
+     *
+     * The values are bound at index 0, 1, ... so they line up with the ? written left to right by
+     * renumberPlaceholders. It has to be the only binder of the statement: mixing it with the
+     * index-based bind calls shifts every following value silently on the drivers that do not check
+     * the binding order.
+     */
+    void bind_params(const BoundValues &params);
+
     /** Get the rowid of the last record inserted by the INSERT execution, it is not thread safe */
     uint64_t getLastRowid();
 
     /** Get the number of the table columns */
     int getNumColumns() const;
 
+    /**
+     * @name getColumn NULL mapping
+     * A SQL NULL column read is mapped to the type's Null sentinel so it stays distinguishable
+     * from real 0 values:
+     * - signed integers (any width): Null<T>(), i.e. std::numeric_limits<T>::max()
+     * - uint64_t: std::numeric_limits<uint64_t>::max()
+     * - double/float: Null<double>() (quiet NaN)
+     * - Datetime: Null<Datetime>()
+     * - text: an empty string (text has no sentinel, NULL is indistinguishable from empty)
+     * - blob: throws null_blob_exception; an empty (zero-length) blob returns an empty result
+     *         instead, so NULL and empty blobs stay distinguishable
+     *
+     * @note An actually stored maximum value of an integer type is indistinguishable from NULL,
+     *       which is inherent to the Null sentinel scheme
+     */
     /** Get the data given by idx into item */
     void getColumn(int idx, double &item);
 
@@ -136,8 +174,14 @@ public:
     virtual bool sub_moveNext() = 0;          ///< Subclass interface @see moveNext
     virtual uint64_t sub_getLastRowid() = 0;  ///< Subclass interface @see getLastRowid();
 
-    virtual void sub_bindNull(int idx) = 0;                 ///< Subclass interface @see bind
-    virtual void sub_bindInt(int idx, int64_t value) = 0;   ///< Subclass interface @see bind
+    virtual void sub_bindNull(int idx) = 0;                ///< Subclass interface @see bind
+    virtual void sub_bindInt(int idx, int64_t value) = 0;  ///< Subclass interface @see bind
+    virtual void sub_bindUInt64(int idx,
+                                uint64_t value);  ///< Subclass interface @see bind. The default
+                                                  ///< implementation rejects values above
+                                                  ///< INT64_MAX and otherwise forwards to
+                                                  ///< sub_bindInt; drivers with a native unsigned
+                                                  ///< binding channel should override it
     virtual void sub_bindDouble(int idx, double item) = 0;  ///< Subclass interface @see bind
     virtual void sub_bindDatetime(int idx,
                                   const Datetime &item) = 0;  ///< Subclass interface @see bind
@@ -153,6 +197,12 @@ public:
     virtual int sub_getNumColumns() const = 0;  ///< Subclass interface @see getNumColumns
     virtual void sub_getColumnAsInt64(int idx,
                                       int64_t &) = 0;  ///< Subclass interface @see getColumn
+    virtual void sub_getColumnAsUInt64(int idx,
+                                       uint64_t &);  ///< Subclass interface @see getColumn. The
+                                                     ///< default implementation forwards to
+                                                     ///< sub_getColumnAsInt64 and rejects negative
+                                                     ///< values; drivers that expose an unsigned
+                                                     ///< column flag should override it
     virtual void sub_getColumnAsDouble(int idx,
                                        double &) = 0;  ///< Subclass interface @see getColumn
     virtual void sub_getColumnAsDatetime(int idx,
@@ -220,6 +270,12 @@ inline void SQLStatementBase::bind(int idx, const Datetime &item) {
     sub_bindDatetime(idx, item);
 }
 
+inline void SQLStatementBase::sub_bindUInt64(int idx, uint64_t value) {
+    SQL_CHECK(value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()), -1,
+              "The driver cannot bind uint64 value {} above INT64_MAX at index {}", value, idx);
+    sub_bindInt(idx, static_cast<int64_t>(value));
+}
+
 inline void SQLStatementBase::bindBlob(int idx, const std::string &item) {
     sub_bindBlob(idx, item);
 }
@@ -230,6 +286,19 @@ inline void SQLStatementBase::bindBlob(int idx, const std::vector<char> &item) {
 
 inline uint64_t SQLStatementBase::getLastRowid() {
     return sub_getLastRowid();
+}
+
+inline void SQLStatementBase::sub_getColumnAsUInt64(int idx, uint64_t &item) {
+    int64_t temp;
+    sub_getColumnAsInt64(idx, temp);
+    if (temp == Null<int64_t>()) {
+        // A NULL column read back through the signed channel maps to the uint64 Null sentinel
+        item = (std::numeric_limits<uint64_t>::max)();
+        return;
+    }
+    // A negative int64 is the two's complement image of a uint64 bit pattern (drivers like
+    // SQLite store every integer as int64), so reinterpret the bits instead of rejecting
+    item = static_cast<uint64_t>(temp);
 }
 
 inline int SQLStatementBase::getNumColumns() const {
@@ -261,7 +330,12 @@ inline void SQLStatementBase::bind(int idx, const std::vector<char> &item) {
 template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::bind(
   int idx, const T &item) {
-    sub_bindInt(idx, item);
+    if constexpr (std::is_same_v<T, uint64_t> || std::is_same_v<T, unsigned long long> ||
+                  (std::is_unsigned_v<T> && sizeof(T) == 8)) {
+        sub_bindUInt64(idx, static_cast<uint64_t>(item));
+    } else {
+        sub_bindInt(idx, static_cast<int64_t>(item));
+    }
 }
 
 template <typename T>
@@ -276,9 +350,39 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer>::type SQLStatementB
 template <typename T>
 typename std::enable_if<std::numeric_limits<T>::is_integer>::type SQLStatementBase::getColumn(
   int idx, T &item) {
-    int64_t temp;
-    sub_getColumnAsInt64(idx, temp);
-    item = (T)temp;
+    if constexpr (std::is_same_v<T, uint64_t> || std::is_same_v<T, unsigned long long> ||
+                  (std::is_unsigned_v<T> && sizeof(T) == 8)) {
+        uint64_t temp;
+        sub_getColumnAsUInt64(idx, temp);
+        item = static_cast<T>(temp);
+    } else if constexpr (std::is_signed_v<T> && sizeof(T) < 8) {
+        // Reject silently narrowing an int64 value into a smaller signed type
+        int64_t temp;
+        sub_getColumnAsInt64(idx, temp);
+        if (temp == Null<int64_t>()) {
+            // Map the NULL sentinel onto the target type's own Null sentinel
+            item = (std::numeric_limits<T>::max)();
+            return;
+        }
+        SQL_CHECK(temp >= static_cast<int64_t>(std::numeric_limits<T>::min()) &&
+                    temp <= static_cast<int64_t>(std::numeric_limits<T>::max()),
+                  -1, "Column {} value {} overflows {}", idx, temp, typeid(T).name());
+        item = static_cast<T>(temp);
+    } else if constexpr (std::is_unsigned_v<T>) {
+        // Smaller unsigned types: reject negative values and values above the target range
+        int64_t temp;
+        sub_getColumnAsInt64(idx, temp);
+        if (temp == Null<int64_t>()) {
+            item = (std::numeric_limits<T>::max)();
+            return;
+        }
+        SQL_CHECK(temp >= 0 && static_cast<uint64_t>(temp) <=
+                                 static_cast<uint64_t>(std::numeric_limits<T>::max()),
+                  -1, "Column {} value {} overflows {}", idx, temp, typeid(T).name());
+        item = static_cast<T>(temp);
+    } else {
+        sub_getColumnAsInt64(idx, reinterpret_cast<int64_t &>(item));
+    }
 }
 
 inline void SQLStatementBase::getColumn(int idx, std::vector<char> &item) {
@@ -303,6 +407,21 @@ template <typename T, typename... Args>
 void SQLStatementBase::bind(int idx, const T &item, const Args &...rest) {
     bind(idx, item);
     bind(idx + 1, rest...);
+}
+
+inline void SQLStatementBase::bind_params(const BoundValues &params) {
+    for (size_t i = 0, len = params.size(); i < len; ++i) {
+        std::visit(
+          [&](const auto &value) {
+              using U = std::decay_t<decltype(value)>;
+              if constexpr (std::is_same_v<U, std::nullptr_t>) {
+                  bind(static_cast<int>(i));
+              } else {
+                  bind(static_cast<int>(i), value);
+              }
+          },
+          params[i]);
+    }
 }
 
 template <typename T, typename... Args>

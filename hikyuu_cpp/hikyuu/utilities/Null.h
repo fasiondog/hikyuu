@@ -26,13 +26,26 @@ namespace hku {
 
 /**
  * It provides the Null value of the given type
+ *
+ * The explicit specializations below only cover the types they name, while the width of a
+ * fixed-size alias changes across platforms (uint64_t is unsigned long long on macos/windows
+ * but unsigned long on linux x86_64). So the general case derives the sentinel from the limits
+ * of the type itself, which keeps an integer Null at its maximum and a floating Null at NaN
+ * wherever it lands, instead of silently degrading to a default constructed 0 that cannot be
+ * told apart from a real value.
  */
 template <typename T>
 class Null {
 public:
     Null() {}
     operator T() const {
-        return T();
+        if constexpr (std::numeric_limits<T>::is_integer) {
+            return (std::numeric_limits<T>::max)();
+        } else if constexpr (std::numeric_limits<T>::is_iec559) {
+            return std::numeric_limits<T>::quiet_NaN();
+        } else {
+            return T();
+        }
     }
 };
 
@@ -80,7 +93,7 @@ template <>
 class Null<int64_t> {
 public:
     Null() {}
-    operator int64_t() {
+    operator int64_t() const {
         return (std::numeric_limits<int64_t>::max)();
     }
 };

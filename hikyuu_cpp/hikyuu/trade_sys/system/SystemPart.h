@@ -28,10 +28,18 @@ enum SystemPart {
     PART_PROFITGOAL = 6,   /**< Profit goal strategy */
     PART_SLIPPAGE = 7,     /**< Slippage algorithm */
 
-    PART_ALLOCATEFUNDS = 8, /**< Asset allocation algorithm */
-    PART_PORTFOLIO = 9,     /**< Portfolio */
+    PART_ALLOCATEFUNDS = 8, /**< [Deprecated] Asset allocation algorithm (AF has been removed with
+                             *   the refactoring; the enum value is kept for the compatibility with
+                             *   the old serialized data, do not use it in the new code) */
+    PART_PORTFOLIO = 9,     /**< [Deprecated] Portfolio (PF has been removed with the refactoring;
+                             *   the enum value is kept for the compatibility with the old
+                             *   serialized data, do not use it in the new code) */
 
-    PART_INVALID = 10, /**< Invalid value */
+    PART_SYSTEM = 10,  /**< Aggregate sub-system (added by the recursive combination refactoring)
+                            @note Historical conflict: before the refactoring PART_INVALID=10, the
+                            old serialized data with from=10 will be loaded as PART_SYSTEM and
+                            cannot be distinguished from the new data */
+    PART_INVALID = 11, /**< Invalid value (the sentinel, it must be the last enum item) */
 };
 
 /**

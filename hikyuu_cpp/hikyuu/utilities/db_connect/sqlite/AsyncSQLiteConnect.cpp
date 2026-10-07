@@ -12,6 +12,7 @@
 #include "AsyncSQLiteConnect.h"
 #include <sqlite3.h>
 #include <thread>
+#include <tuple>
 #include "hikyuu/utilities/thread/algorithm.h"
 
 namespace hku {
@@ -28,8 +29,23 @@ struct AsyncSQLiteConnect::Impl {
     sqlite3 *m_db = nullptr;
     std::string m_dbname;
     bool initialized = false;
-    ThreadPool m_thread_pool{
-      1};  // A single thread pool used to run the synchronous SQLite operations
+    // Serializes every sqlite3 C API call on m_db: the handle is opened with NOMUTEX and the
+    // statement layer touches it from the user threads (prepare/bind/getColumn/finalize) while
+    // the step operations run on the pool thread
+    mutable std::mutex m_db_mutex;
+    std::unique_ptr<ThreadPool> m_thread_pool =
+      std::make_unique<ThreadPool>(1);  // A single thread pool used to run the synchronous SQLite
+                                        // operations
+
+    ~Impl() {
+        // Destroy the pool first: its destructor waits for every queued task to finish, so no
+        // sqlite3 call can be in flight while the database handle is closed
+        m_thread_pool.reset();
+        if (m_db) {
+            sqlite3_close_v2(m_db);
+            m_db = nullptr;
+        }
+    }
 };
 
 AsyncSQLiteConnect::AsyncSQLiteConnect(const Parameter &param)
@@ -44,16 +60,18 @@ AsyncSQLiteConnect::AsyncSQLiteConnect(const Parameter &param)
     }
 }
 
-AsyncSQLiteConnect::~AsyncSQLiteConnect() {
-    close();
-}
+AsyncSQLiteConnect::~AsyncSQLiteConnect() = default;
 
 void *AsyncSQLiteConnect::getRawConnection() const noexcept {
     return m_impl->m_db;
 }
 
 ThreadPool::ExecutorWrapper AsyncSQLiteConnect::getThreadPoolExecutor() const noexcept {
-    return m_impl->m_thread_pool.executor();
+    return m_impl->m_thread_pool->executor();
+}
+
+std::mutex &AsyncSQLiteConnect::getDBMutex() const noexcept {
+    return m_impl->m_db_mutex;
 }
 
 net::awaitable<void> AsyncSQLiteConnect::connect() {
@@ -71,7 +89,7 @@ net::awaitable<void> AsyncSQLiteConnect::connect() {
         }
     };
 
-    int rc = co_await co_run(m_impl->m_thread_pool.executor(), init_func);
+    int rc = co_await co_run(m_impl->m_thread_pool->executor(), init_func);
 
     SQL_CHECK(rc == SQLITE_OK, rc, "{}",
               m_impl->m_db ? sqlite3_errmsg(m_impl->m_db) : "Failed to open database");
@@ -80,6 +98,18 @@ net::awaitable<void> AsyncSQLiteConnect::connect() {
 void AsyncSQLiteConnect::_connect() {
     if (m_impl->initialized) {
         return;
+    }
+
+    std::lock_guard<std::mutex> lock(m_impl->m_db_mutex);
+    if (m_impl->initialized) {
+        return;
+    }
+
+    // A previously failed open may have left a half-initialized handle behind, close it before
+    // reopening so the retry does not leak it
+    if (m_impl->m_db) {
+        sqlite3_close_v2(m_impl->m_db);
+        m_impl->m_db = nullptr;
     }
 
     int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
@@ -118,14 +148,6 @@ void AsyncSQLiteConnect::_connect() {
     m_impl->initialized = true;
 }
 
-void AsyncSQLiteConnect::close() {
-    if (m_impl && m_impl->m_db) {
-        sqlite3_close(m_impl->m_db);
-        m_impl->m_db = nullptr;
-        m_impl->initialized = false;
-    }
-}
-
 net::awaitable<bool> AsyncSQLiteConnect::ping() {
     if (!m_impl || !m_impl->m_db) {
         try {
@@ -139,10 +161,11 @@ net::awaitable<bool> AsyncSQLiteConnect::ping() {
     // When sqlite opens a file it does not check whether the file is a valid sqlite file,
     // the SQLITE_NOTADB(26) error is reported only when an sql statement is executed
     auto ping_func = [this]() -> int {
+        std::lock_guard<std::mutex> lock(m_impl->m_db_mutex);
         return sqlite3_exec(m_impl->m_db, "PRAGMA synchronous;", NULL, NULL, NULL);
     };
 
-    int rc = co_await co_run(m_impl->m_thread_pool.executor(), ping_func);
+    int rc = co_await co_run(m_impl->m_thread_pool->executor(), ping_func);
     co_return (rc == SQLITE_OK);
 }
 
@@ -155,16 +178,17 @@ net::awaitable<int64_t> AsyncSQLiteConnect::exec(const std::string &sql_string) 
         co_await connect();
     }
 
-    auto exec_func = [this, &sql_string]() -> std::pair<int, int> {
+    auto exec_func = [this, &sql_string]() -> std::tuple<int, int64_t, std::string> {
+        std::lock_guard<std::mutex> lock(m_impl->m_db_mutex);
         int rc = sqlite3_exec(m_impl->m_db, sql_string.c_str(), NULL, NULL, NULL);
-        int affect_rows = sqlite3_changes(m_impl->m_db);
-        return {rc, affect_rows};
+        int64_t affect_rows = (rc == SQLITE_OK) ? sqlite3_changes(m_impl->m_db) : 0;
+        // The error message must be read while the mutex is still held
+        return {rc, affect_rows, rc != SQLITE_OK ? sqlite3_errmsg(m_impl->m_db) : ""};
     };
 
-    auto [rc, affect_rows] = co_await co_run(m_impl->m_thread_pool.executor(), exec_func);
+    auto [rc, affect_rows, errmsg] = co_await co_run(m_impl->m_thread_pool->executor(), exec_func);
 
-    SQL_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})",
-              m_impl->m_db ? sqlite3_errmsg(m_impl->m_db) : "Unknown error", sql_string);
+    SQL_CHECK(rc == SQLITE_OK, rc, "SQL error: {}! ({})", errmsg, sql_string);
 
     co_return (affect_rows < 0 ? 0 : affect_rows);
 }
@@ -181,8 +205,8 @@ net::awaitable<AsyncSQLStatementPtr> AsyncSQLiteConnect::getStatement(
 net::awaitable<bool> AsyncSQLiteConnect::tableExist(const std::string &tablename) {
     bool result = false;
     try {
-        auto st = co_await getStatement(
-          fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
+        auto st = co_await getStatement("select count(1) from sqlite_master where name=?");
+        st->bind(0, tablename);
         co_await st->exec();
         if (co_await st->moveNext()) {
             int tmp;
@@ -198,11 +222,13 @@ net::awaitable<bool> AsyncSQLiteConnect::tableExist(const std::string &tablename
 }
 
 net::awaitable<void> AsyncSQLiteConnect::resetAutoIncrement(const std::string &tablename) {
-    int64_t count =
-      co_await queryNumber<int64_t>(fmt::format("select count(1) from {}", tablename));
+    int64_t count = co_await queryNumber<int64_t>(
+      fmt::format("select count(1) from {}", sqlIdentifier(tablename)));
     SQL_CHECK(count == 0, -1, "The ID cannot be reset when data is present in table({})",
               tablename);
-    co_await exec(fmt::format("UPDATE sqlite_sequence SET seq=0 WHERE name='{}'", tablename));
+    auto seq_stmt = co_await getStatement("UPDATE sqlite_sequence SET seq=0 WHERE name=?");
+    seq_stmt->bind(0, tablename);
+    co_await seq_stmt->exec();
 }
 
 net::awaitable<void> AsyncSQLiteConnect::transaction() {
@@ -231,6 +257,7 @@ net::awaitable<bool> AsyncSQLiteConnect::check(bool quick) {
     std::string check_pragma(quick ? "PRAGMA quick_check;" : "PRAGMA integrity_check;");
 
     auto check_func = [this, &check_pragma]() -> bool {
+        std::lock_guard<std::mutex> lock(m_impl->m_db_mutex);
         bool good = false;
         sqlite3_stmt *integrity = NULL;
 
@@ -249,7 +276,7 @@ net::awaitable<bool> AsyncSQLiteConnect::check(bool quick) {
         return good;
     };
 
-    bool result = co_await co_run(m_impl->m_thread_pool.executor(), check_func);
+    bool result = co_await co_run(m_impl->m_thread_pool->executor(), check_func);
     co_return result;
 }
 
@@ -259,6 +286,7 @@ net::awaitable<bool> AsyncSQLiteConnect::backup(const char *zFilename, int n_pag
     }
 
     auto backup_func = [this, zFilename, n_page, step_sleep]() -> bool {
+        std::lock_guard<std::mutex> lock(m_impl->m_db_mutex);
         sqlite3 *pFile;
         int rc = sqlite3_open(zFilename, &pFile);
         if (rc == SQLITE_OK) {
@@ -283,11 +311,11 @@ net::awaitable<bool> AsyncSQLiteConnect::backup(const char *zFilename, int n_pag
             rc = sqlite3_errcode(pFile);
         }
 
-        sqlite3_close(pFile);
+        sqlite3_close_v2(pFile);
         return rc == SQLITE_OK;
     };
 
-    bool result = co_await co_run(m_impl->m_thread_pool.executor(), backup_func);
+    bool result = co_await co_run(m_impl->m_thread_pool->executor(), backup_func);
     co_return result;
 }
 

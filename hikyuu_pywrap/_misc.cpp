@@ -23,21 +23,8 @@ void export_misc(py::module& m) {
   :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
   :param bool reset_all: forcibly reset all the parts)");
 
-    m.def(
-      "parallel_run_pf",
-      [](const vector<PFPtr>& pf_list, const KQuery& query, bool force) {
-          OStreamToPython guard(false);
-          py::gil_scoped_release release;
-          return parallel_run_pf(pf_list, query, force);
-      },
-      py::arg("pf_list"), py::arg("query"), py::arg("force") = false,
-      R"(parallel_run_pf(pf_list, query[, force=False])
 
-    Execute multiple portfolio strategies in parallel, and return a list of FundsList, the assets of each account (within the query time range)
 
-    :param list pf_list: the portfolio list
-    :param Query query: the query condition
-    :param bool force: force recalculating)");
 
     m.def("get_funds_list", &getFundsList,
           R"(parallel_get_funds_list(tm_list: list, ref_dates: DatetimeList) -> list[Funds])

@@ -1,13 +1,19 @@
 /*
- * AllocateMoney.cpp
+ * AllocateFundsBase.cpp
  *
+ *  Copyright (c) 2025 hikyuu.org
+ *
+ *  Implementation of the portfolio-level fund allocation (AF) base class. The default
+ *  implementations of the three algorithm parts L1/L2/L3 are migrated from the portfolio-level
+ *  implementation of MoneyManagerBase.
  *  Created on: 2018-1-30
  *      Author: fasiondog
  */
 
-#include <unordered_set>
-#include <functional>
 #include "AllocateFundsBase.h"
+
+#include <map>
+#include <sstream>
 
 namespace hku {
 
@@ -16,77 +22,45 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsBase& af) 
     return os;
 }
 
-HKU_API std::ostream& operator<<(std::ostream& os, const AFPtr& af) {
+HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsPtr& af) {
     if (af) {
         os << *af;
     } else {
         os << "AllocateFunds(NULL)";
     }
-
     return os;
 }
 
-AllocateFundsBase::AllocateFundsBase() : m_name("AllocateMoneyBase") {
-    initParam();
+AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
+    setParam<double>("max-single-position", 1.0);
+    // The portfolio-level allocation parameters: weight-list fixed weights (L1), fixed-amount fixed
+    // amount (L2)
+    setParam<string>("weight-list", "");
+    setParam<double>("fixed-amount", 0.0);
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
-    initParam();
+    setParam<double>("max-single-position", 1.0);
+    setParam<string>("weight-list", "");
+    setParam<double>("fixed-amount", 0.0);
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
 
-void AllocateFundsBase::initParam() {
-    // Whether to adjust the positions of the strategies already held; when not, only the current
-    // remaining funds of the total account are allocated, otherwise the total market value is
-    // allocated Note: whether or not the held strategies are adjusted, the weight ratios are
-    // relative to the total assets rather than to the remaining cash balance
-    //       adjusting against the remaining cash ratio only is meaningless, and the allocation may
-    //       not even complete a real trade due to the trade cost
-    //  adjust_running_sys: True - actively increase or reduce the positions of the held strategies
-    //  according to the asset allocation adjust_running_sys: False - the held strategies are not
-    //  forcibly increased or reduced according to the current allocation weights
-    setParam<bool>("adjust_running_sys", true);
-
-    // Automatically adjust the weights; in this case the passed weights are regarded as the mutual
-    // ratios of the securities (see the ignore_zero_weight description) otherwise the passed
-    // weights are taken as the given weights without adjustment (in this case every passed weight
-    // must be less than 1)
-    setParam<bool>("auto_adjust_weight", true);
-
-    // This parameter takes effect when auto_adjust_weight is used
-    // Whether to filter out the 0 values (including the negative ones) and the nan values in the
-    // ratio weight list returned by the subclass For example, when the subclass returns the weight
-    // ratio list [6, 2, 0, 0, 0]:
-    //   with the 0 values filtered out, the actually adjusted weights are Xi / sum(Xi): [6/8, 2/8]
-    //   without filtering, m is the number of the non-zero elements and n is the number of all the
-    //   elements, (Xi / Sum(Xi)) * (m / n):
-    //           [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0]
-    //          i.e. the total is divided into 5 parts and the relative ratio is kept within the 2
-    //          parts only
-    setParam<bool>("ignore_zero_weight", false);
-
-    // Ignore the systems whose score is null in the selected system list,
-    // Note: some SEs (such as SE_MultiFactor) may have a similar control themselves
-    setParam<bool>("ignore_se_score_is_null", false);
-
-    // Ignore the systems whose score is not greater than 0 in the selected system list
-    setParam<bool>("ignore_se_score_lt_zero", false);
-
-    setParam<double>("reserve_percent", 0.0);  // Ratio of the assets reserved from the reallocation
-    setParam<bool>("trace", false);            // Print the trace
-}
-
 void AllocateFundsBase::baseCheckParam(const string& name) const {
-    if ("reserve_percent" == name) {
-        double reserve_percent = getParam<double>(name);
-        HKU_ASSERT(reserve_percent >= 0.0 && reserve_percent < 1.0);
+    if ("max-single-position" == name) {
+        HKU_ASSERT(getParam<double>("max-single-position") >= 0.0);
+    }
+    if ("fixed-amount" == name) {
+        HKU_ASSERT(getParam<double>("fixed-amount") >= 0.0);
     }
 }
 
 void AllocateFundsBase::paramChanged() {}
 
 void AllocateFundsBase::reset() {
+    m_query = Null<KQuery>();
+    m_tm.reset();
     _reset();
 }
 
@@ -98,462 +72,257 @@ AFPtr AllocateFundsBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
+    p->m_tm = m_tm;
     p->m_query = m_query;
-
-    /* m_tm and m_cash_tm are given by PF at runtime, no clone is needed
-    if (m_tm)
-        p->m_tm = m_tm->clone();
-    if (m_cash_tm)
-        p->m_cash_tm = m_cash_tm->clone();*/
+    p->m_mode = m_mode;
     return p;
 }
 
-SystemWeightList AllocateFundsBase::adjustFunds(const Datetime& date,
-                                                const SystemWeightList& se_list,
-                                                const std::unordered_set<SYSPtr>& running_list) {
-    bool ignore_se_score_is_null = getParam<bool>("ignore_se_score_is_null");
-    bool ignore_se_score_lt_zero = getParam<bool>("ignore_se_score_lt_zero");
-    SystemWeightList filtered_se_list;
-    for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        if (ignore_se_score_is_null && std::isnan(iter->weight)) {
-            continue;
-        }
-        if (ignore_se_score_lt_zero && iter->weight <= 0.0) {
-            continue;
-        }
-        filtered_se_list.emplace_back(*iter);
-    }
+//============================================================================
+// The portfolio-level fund allocation (AF L1/L2/L3), called by the aggregate System (MultiSystem)
+//============================================================================
 
-    SystemWeightList result;
-    if (getParam<bool>("adjust_running_sys")) {
-        result = _adjust_with_running(date, filtered_se_list, running_list);
-    } else {
-        _adjust_without_running(date, filtered_se_list, running_list);
+void AllocateFundsBase::allocate(const Datetime& date, const TradeManagerPtr& tm,
+                                 TradeSuggestionList& suggestions, SubSystemContextList& contexts,
+                                 const KQuery& query) {
+    auto weights = allocateQuota(date, tm, contexts, query);
+    allocateTargets(date, tm, suggestions, weights, query);
+}
+
+AllocateFundsBase::Weights AllocateFundsBase::allocateQuota(const Datetime& date,
+                                                            const TradeManagerPtr& tm,
+                                                            SubSystemContextList& contexts,
+                                                            const KQuery& query) {
+    return _allocate(date, tm, contexts, query);
+}
+
+void AllocateFundsBase::allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
+                                        TradeSuggestionList& suggestions, const Weights& sys_weight,
+                                        const KQuery& query) {
+    _toTargets(date, tm, suggestions, sys_weight, query);
+    _checkRisk(date, tm, suggestions, query);
+}
+
+AllocateFundsBase::Weights AllocateFundsBase::_allocate(const Datetime& date,
+                                                        const TradeManagerPtr& tm,
+                                                        SubSystemContextList& contexts,
+                                                        const KQuery& query) {
+    if (contexts.empty()) {
+        return Weights();
+    }
+    // The L1 weight source:
+    //   1) the parameter weight-list is not empty: parse it into the fixed weights of every
+    //   sub-system in order and normalize them (the AF_FixedWeightList semantics); 2) otherwise the
+    //   equal weight 1/N (AF_EqualWeight, the default).
+    std::vector<double> weights = _parseWeightList(contexts.size());
+    if (weights.size() != contexts.size()) {
+        weights.assign(contexts.size(), 1.0 / contexts.size());
+    }
+    return _applyWeights(date, tm, contexts, query, weights);
+}
+
+AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
+  const Datetime& date, const TradeManagerPtr& tm, SubSystemContextList& contexts,
+  const KQuery& query, const std::vector<double>& weights) const {
+    Weights result;
+    if (contexts.empty()) {
+        return result;
+    }
+    // The mode B quota: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount),
+    // otherwise weight x the parent total assets.
+    double fixed_amount = getParam<double>("fixed-amount");
+    double total_assets = tm ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
+    double eq = 1.0 / contexts.size();
+    for (size_t i = 0; i < contexts.size(); ++i) {
+        auto& ctx = contexts[i];
+        double w = (i < weights.size()) ? weights[i] : eq;
+        result[ctx.sys] = w;
+        // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
+        // MM working directly on the shared real account.
+        if (m_mode == "B" && tm) {
+            // Mode B: L1 produces the "real quota" and writes it into contexts[i].quota, the parent
+            // writes it back to the sub-system on the rebalancing day (for the next period, the
+            // quota lags one period behind).
+            ctx.quota = (fixed_amount > 0.0) ? fixed_amount : (w * total_assets);
+        }
     }
     return result;
 }
 
-/*
- * Sort the SystemWeightList in the descending order
- * can_allocate_weight - the remaining total weight available for the allocation
- * auto_adjust - whether to adjust automatically by ratio, making the total weight 1
- */
-void AllocateFundsBase::adjustWeight(SystemWeightList& sw_list, double can_allocate_weight,
-                                     bool auto_adjust, bool ignore_zero) {
-    // Sort in the descending order, keeping the nan at the end
-    std::sort(sw_list.begin(), sw_list.end(), [](const SystemWeight& a, const SystemWeight& b) {
-        if (std::isnan(a.weight) && std::isnan(b.weight)) {
-            return false;
-        } else if (!std::isnan(a.weight) && std::isnan(b.weight)) {
-            return true;
-        } else if (std::isnan(a.weight) && !std::isnan(b.weight)) {
-            return false;
-        }
-        return a.weight > b.weight;
-    });
-
-    SystemWeightList new_list;
-    new_list.reserve(sw_list.size());
-    price_t sum = 0.0;
-    for (size_t i = 0, total = sw_list.size(); i < total; i++) {
-        const auto& item = sw_list[i];
-        if (std::isnan(item.weight) || item.weight <= 0.0) {
-            break;
-        }
-        sum += item.weight;
-        new_list.emplace_back(item);
+std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
+    std::vector<double> result;
+    string wl = getParam<string>("weight-list");
+    if (wl.empty()) {
+        return result;  // Empty -> the caller falls back to the equal weight
     }
-
-    if (auto_adjust) {
-        //   with the 0 values filtered out, the actually adjusted weights are Xi / sum(Xi): [6/8,
-        //   2/8] without filtering, m is the number of the non-zero elements and n is the number of
-        //   all the elements, (Xi / Sum(Xi)) * (m / n):
-        //           [(6/8)*(2/5), (2/8)*(2/5), 0, 0, 0]
-        //          i.e. the total is divided into 5 parts and the relative ratio is kept within the
-        //          2 parts only
-        double per_weight = ignore_zero
-                              ? 1.0 / sum * can_allocate_weight
-                              : (new_list.size() * can_allocate_weight) / (sum * sw_list.size());
-        for (size_t i = 0, total = new_list.size(); i < total; i++) {
-            new_list[i].weight = new_list[i].weight * per_weight;
+    std::stringstream ss(wl);
+    string item;
+    double sum = 0.0;
+    while (std::getline(ss, item, ',')) {
+        size_t b = item.find_first_not_of(" \t\r\n");
+        if (b == string::npos) {
+            continue;  // Skip the pure blank items
         }
+        size_t e = item.find_last_not_of(" \t\r\n");
+        item = item.substr(b, e - b + 1);
+        double v = 0.0;
+        try {
+            v = std::stod(item);
+        } catch (...) {
+            HKU_WARN("weight-list contains invalid item '{}', treated as 0!", item);
+            v = 0.0;
+        }
+        if (v < 0.0) {
+            v = 0.0;  // The negative weights are treated as 0 (the short quota allocation is not
+                      // supported)
+        }
+        result.push_back(v);
+        sum += v;
     }
-
-    sw_list.swap(new_list);
+    // The quantity must match the sub-systems and the sum must be > 0, otherwise it is invalid and
+    // falls back to the equal weight
+    if (result.size() != expect_n || sum <= 0.0) {
+        HKU_WARN_IF(result.size() != expect_n,
+                    "weight-list size({}) != subsystems({}), fallback to equal weight!",
+                    result.size(), expect_n);
+        result.clear();
+        return result;
+    }
+    for (auto& v : result) {
+        v /= sum;  // Normalize so that the weight sum is 1
+    }
+    return result;
 }
 
-// All the weight allocations are relative to the total assets rather than to the remaining cash
-// The held strategies are not forcibly increased or reduced according to the current weights
-void AllocateFundsBase::_adjust_without_running(const Datetime& date,
-                                                const SystemWeightList& se_list,
-                                                const std::unordered_set<SYSPtr>& running_set) {
-    bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "[AF] {} _adjust_without_running", date);
-
-    // Get the planned asset allocation weights from the allocation algorithm
-    SystemWeightList sw_list = _allocateWeight(date, se_list);
-    HKU_IF_RETURN(sw_list.size() == 0, void());
-
-    // Get the current total assets market value and calculate the remaining allocatable weight and
-    // cash
-    int precision = m_tm->getParam<int>("precision");
-    FundsRecord funds =
-      m_tm->getFunds(date, m_query.kType());  // The total assets come from the total account
-    price_t total_funds = funds.total_assets();
-    double reserve_percent = getParam<double>("reserve_percent");
-    price_t reserve_funds = roundEx(total_funds * reserve_percent, precision);
-    // The reserved funds are subtracted from the cash pool, keeping the same convention as
-    // _adjust_with_running; otherwise the reserved part would be allocated away when the pool cash
-    // is less than (total_funds - reserve_funds) (ISS-091)
-    price_t can_allocate_cash =
-      roundDown(m_cash_tm->currentCash() - reserve_funds,
-                precision);  // The allocatable funds come from the cash account
-    double can_allocate_weight = 1.0 - reserve_percent;
-    HKU_INFO_IF(trace,
-                "can_allocate_weight: {:<.4f}, can_allocate_cash: {:<.2f}, current cash: {:<.2f}, "
-                "total funds: {:<.2f}, "
-                "reserved funds: {:<.2f}",
-                can_allocate_weight, can_allocate_cash, funds.cash, total_funds, reserve_funds);
-    HKU_IF_RETURN(can_allocate_cash <= 1.0, void());
-
-    // Adjust the weights (accumulate and normalize them), sort them in the descending order and
-    // filter out the 0 and NaN values
-    adjustWeight(sw_list, can_allocate_weight, getParam<bool>("auto_adjust_weight"),
-                 getParam<bool>("ignore_zero_weight"));
-
-    // Traverse the selected subsystem list and transfer the remaining cash into the sub accounts by
-    // the weight ratios
-    double sum_weight =
-      0.0;  // The running systems are not adjusted, so their actual ratio may differ
-    for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
-        if (can_allocate_cash <= 1.0 || sum_weight >= can_allocate_weight) {
-            break;
+void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& tm,
+                                   TradeSuggestionList& suggestions, const Weights& sys_weight,
+                                   const KQuery& query) {
+    KQuery::KType ktype = query.kType();
+    if (m_mode == "B" || m_mode == "C") {
+        // Mode B / C: pass through the real instruction of the sub-system (number is the order
+        // quantity of the sub-manager), the parent does not convert it. Only the SELL suggestions
+        // are defensively clipped to not exceed the current position of the parent.
+        for (auto& s : suggestions) {
+            if (s.type == SuggestionType::SELL) {
+                double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+                if (s.number > current) {
+                    s.number = current;
+                }
+            }
         }
+        return;
+    }
 
-        if (!iter->sys) {
+    FundsRecord funds = tm->getFunds(date, ktype);
+    double total_assets = funds.total_assets();
+    // Mode A + fixed-amount>0: the target market value of every instrument takes the fixed amount
+    // (the AF_FixedAmount behavior-level semantics), it takes precedence over the conversion by
+    // proportion.
+    double fixed_amount = getParam<double>("fixed-amount");
+
+    // Multiple sub-systems may trade the same instrument: aggregate the BUY target market value
+    // by instrument first, to avoid per-suggestion deltas computed against the same position
+    struct StockTarget {
+        double value{0.0};   // The aggregated target market value
+        price_t price{0.0};  // The plan price of the first suggestion of this instrument
+        size_t first_index{0};
+    };
+    std::map<Stock, StockTarget> buy_targets;
+    for (size_t i = 0; i < suggestions.size(); ++i) {
+        const auto& s = suggestions[i];
+        if (s.type != SuggestionType::BUY || s.plan_price <= 0.0) {
             continue;
         }
-
-        // For a running system the calculated weight is not used; the accumulated occupied weight
-        // is updated with the actual assets of the subsystem Note: sub_tm must be used rather than
-        // the total account m_tm (otherwise every running system would raise sum_weight to about 1)
-        // kType uses the unified m_query of AF, guaranteeing the same valuation context as
-        // total_funds
-        if (running_set.find(iter->sys) != running_set.cend()) {
-            TMPtr sub_tm = iter->sys->getTM();
-            FundsRecord sub_funds = sub_tm->getFunds(date, m_query.kType());
-            sum_weight += sub_funds.total_assets() / total_funds;
-            continue;
+        double weight = 1.0;
+        auto it = sys_weight.find(s.sys);
+        if (it != sys_weight.end()) {
+            weight = it->second;
         }
-
-        // Calculate the actually available weight
-        price_t current_weight = iter->weight + sum_weight > can_allocate_weight
-                                   ? can_allocate_weight - sum_weight
-                                   : iter->weight;
-
-        // The funds this system expects to be allocated
-        price_t will_cash = roundUp(total_funds * current_weight, precision);
-        if (will_cash <= 0.0) {
-            continue;
-        }
-
-        // Calculate the funds the sub account can actually get
-        price_t need_cash = will_cash <= can_allocate_cash ? will_cash : can_allocate_cash;
-
-        // Skip it when the needed funds cannot buy even one lot
-        KRecord krecord =
-          iter->sys->getStock().getKRecord(date, iter->sys->getTO().getQuery().kType());
-        if (krecord.isValid() &&
-            need_cash < (krecord.closePrice * iter->sys->getStock().minTradeNumber())) {
-            continue;
-        }
-
-        // Try to withdraw the funds from the total account and deposit them into the sub account
-        TMPtr sub_tm = iter->sys->getTM();
-        if (m_cash_tm->checkout(date, need_cash)) {
-            sub_tm->checkin(date, need_cash);
-            HKU_INFO_IF(trace, "[AF] ({}, {}, weight: {:<.4f}) fetched cash: {}", iter->sys->name(),
-                        iter->sys->getStock().market_code(), current_weight, need_cash);
-
-            // Calculate the remaining funds available for the allocation
-            can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
-            sum_weight += current_weight;
-
+        double v;
+        if (fixed_amount > 0.0) {
+            v = fixed_amount;
         } else {
-            HKU_DEBUG_IF(trace, "[AF] {} failed to fetch cash from total account ({})!",
-                         iter->sys->name(), m_cash_tm->currentCash());
+            // Mode A (the default): target position market value = sub-system weight x the
+            // sub-suggestion position ratio x the parent total assets.
+            //   - assets_ratio>0: respect the internal position ratio submitted by the sub-system
+            //   (e.g. the parent is mapped by half position when the sub-system is at half
+            //   position);
+            //   - assets_ratio<=0 (no ratio information): fall back to the full position (ratio=1)
+            //   equal weight to position.
+            double ratio = (s.assets_ratio > 0.0) ? s.assets_ratio : 1.0;
+            v = weight * ratio * total_assets;
+        }
+        auto& t = buy_targets[s.stock];
+        t.value += v;
+        if (t.price == 0.0) {
+            t.price = s.plan_price;
+            t.first_index = i;
+        }
+    }
+
+    for (size_t i = 0; i < suggestions.size(); ++i) {
+        auto& s = suggestions[i];
+        if (s.plan_price <= 0.0) {
+            s.number = 0.0;
+            continue;
+        }
+        double current = tm->getPosition(date, s.stock).number;
+        if (s.type == SuggestionType::BUY) {
+            auto it = buy_targets.find(s.stock);
+            if (it == buy_targets.end() || i != it->second.first_index) {
+                // A non-first suggestion of the same instrument, merged into the first one
+                s.number = 0.0;
+                continue;
+            }
+            // The net rebalancing quantity = (target - current); when it is negative (the
+            // current position is over-allocated), turn to SELL to reduce to the target.
+            price_t unit = s.stock.unit();
+            double target_shares =
+              (unit > 0.0) ? it->second.value / (it->second.price * unit) : 0.0;
+            double delta = target_shares - current;
+            if (delta < 0.0) {
+                s.type = SuggestionType::SELL;
+                s.number = -delta;  // The position-reducing quantity (a positive number), sold by
+                                    // SELL at the execution stage
+            } else {
+                s.number = delta;
+            }
+        } else {
+            // SELL / CLEAR: exit the instrument (sell all the current holdings)
+            s.number = -current;
         }
     }
 }
 
-SystemWeightList AllocateFundsBase::_adjust_with_running(
-  const Datetime& date, const SystemWeightList& se_list,
-  const std::unordered_set<SYSPtr>& running_set) {
-    SystemWeightList delay_list;
-
-    bool trace = getParam<bool>("trace");
-    HKU_INFO_IF(trace, "[AF] {} _adjust_with_running", date);
-
-    // When the selected list is empty everything must be liquidated, so it must not return here
-    // HKU_IF_RETURN(se_list.size() == 0, delay_list);
-
-    //-----------------------------------------------------------------
-    // Recall the remaining funds of all the running systems for the reallocation
-    //-----------------------------------------------------------------
-    for (const auto& sys : running_set) {
-        if (sys) {
-            auto sub_tm = sys->getTM();
-            auto sub_cash = sub_tm->currentCash();
-            if (sub_cash > 0.0 && sub_tm->checkout(date, sub_cash)) {
-                m_cash_tm->checkin(date, sub_cash);
-                HKU_INFO_IF(trace, "[AF] Recycle cash: {:<.2f} from {}", sub_cash, sys->name());
-            }
-        }
+void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
+                                   TradeSuggestionList& suggestions, const KQuery& query) {
+    // L3 portfolio risk control (enabled by default in mode A; mode B and mode C respect the
+    // autonomy of the sub-strategy, only the total amount check is performed = no clipping).
+    if (m_mode == "B" || m_mode == "C") {
+        return;
     }
-
-    // Get the planned asset allocation weights
-    SystemWeightList sw_list = _allocateWeight(date, se_list);
-    HKU_IF_RETURN(sw_list.size() == 0, delay_list);
-
-    // Sort in the descending weight order
-    double reserve_percent = getParam<double>("reserve_percent");
-    double can_allocate_weight = 1.0 - reserve_percent;
-    adjustWeight(sw_list, can_allocate_weight, getParam<bool>("auto_adjust_weight"),
-                 getParam<bool>("ignore_zero_weight"));
-
-    //-----------------------------------------------------------------
-    // Force a liquidation of the running systems no longer in sw_list first, recalling the
-    // allocatable funds The delayed buy systems need no distinction; whatever the type, the
-    // liquidation is done immediately with the close price
-    //-----------------------------------------------------------------
-    std::unordered_set<SYSPtr> running_in_sw_set;
-    for (const auto& sw : sw_list) {
-        if (running_set.find(sw.sys) != running_set.cend()) {
-            running_in_sw_set.insert(sw.sys);
-        }
+    // The concentration upper limit: the target position market value of a single instrument <=
+    // total assets x max-single-position (<=0 or >=1 means no limit).
+    double max_ratio = getParam<double>("max-single-position");
+    if (max_ratio <= 0.0 || max_ratio >= 1.0) {
+        return;
     }
-
-    for (const auto& sys : running_set) {
-        if (running_in_sw_set.find(sys) == running_in_sw_set.cend()) {
-            PositionRecord position = sys->getTM()->getPosition(date, sys->getStock());
-            if (position.takeDatetime >= date) {
-                // When the buy date of the position is today, it is delayed to the open of the next
-                // day
-                delay_list.emplace_back(sys, position.number);
-            } else {
-                auto tr = sys->sellForceOnClose(date, position.number, PART_ALLOCATEFUNDS);
-                if (!tr.isNull()) {
-                    auto sub_tm = sys->getTM();
-                    auto sub_cash = sub_tm->currentCash();
-                    if (sub_tm->checkout(date, sub_cash)) {
-                        m_cash_tm->checkin(date, sub_cash);
-                        m_tm->addTradeRecord(tr);  // Add the trade record into the total account
-                        HKU_INFO_IF(trace, "[AF] Clean position sell: {}, recycle cash: {:<.2f}",
-                                    sys->name(), sub_cash);
-                    }
-                } else {
-                    // A failed liquidation sell is also added into the delayed sell list so that it
-                    // can be executed on the next trading day
-                    if (position.number > 0.0) {
-                        delay_list.emplace_back(sys, position.number);
-                        HKU_INFO_IF(trace, "[AF] Clean delay {}", sys->name());
-                    }
-                }
-            }
-        }
-    }
-
-    //-----------------------------------------------------------------
-    // For the running systems still in the selected system, reduce their positions according to
-    // their weights and recall the allocatable funds
-    //-----------------------------------------------------------------
-    // Get the current total assets market value and calculate the assets to be reserved
-    int precision = m_cash_tm->getParam<int>("precision");
-    FundsRecord funds = m_tm->getFunds(date, m_query.kType());
-    price_t total_funds = funds.total_assets();
-    price_t reserve_funds = roundEx(total_funds * reserve_percent, precision);
-
-    std::unordered_set<SYSPtr> reduced_running_set;  // Cache the running systems already reduced
-    for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
-        if (!iter->sys) {
+    KQuery::KType ktype = query.kType();
+    double total_assets = tm ? tm->getFunds(date, ktype).total_assets() : 0.0;
+    double cap = total_assets * max_ratio;
+    for (auto& s : suggestions) {
+        if (s.type != SuggestionType::BUY || s.number <= 0.0 || s.plan_price <= 0.0) {
             continue;
         }
-
-        // If the current system is a running system
-        if (running_set.find(iter->sys) != running_set.cend()) {
-            TMPtr sub_tm = iter->sys->getTM();
-            const KQuery& query = iter->sys->getTO().getQuery();
-            FundsRecord sub_funds = sub_tm->getFunds(date, query.kType());
-            price_t sub_total_funds = sub_funds.total_assets();
-            price_t sub_will_funds = total_funds * iter->weight;
-
-            // If the position reduction needs to be executed
-            if (sub_total_funds > sub_will_funds) {
-                reduced_running_set.insert(
-                  iter->sys);  // Cache the system whose position was reduced
-                price_t need_back_funds = sub_total_funds - sub_will_funds;
-                Stock stock = iter->sys->getStock();
-
-                // Get the current last close price
-                price_t last_close_price = stock.getMarketValue(date, query.kType());
-                if (last_close_price <= 0.0) {
-                    // The security is invalid and cannot be processed, all the assets are lost
-                    HKU_WARN_IF(trace, "{} has been delisted!", iter->sys->name());
-                    continue;
-                }
-
-                PositionRecord position = sub_tm->getPosition(date, stock);
-                double hold_num = position.number;
-                if (hold_num <= 0.0) {
-                    // There is actually no position
-                    continue;
-                }
-
-                // The quantity expected to be sold
-                double min_num = stock.minTradeNumber();
-                if (min_num <= 0.0) {
-                    // Guard against a division by zero from abnormal stock data (ISS-087)
-                    HKU_WARN_IF(trace, "{} invalid min trade number: {}", stock.market_code(),
-                                min_num);
-                    continue;
-                }
-                double need_back_num =
-                  static_cast<int64_t>(need_back_funds / last_close_price / min_num) * min_num;
-                if (hold_num - need_back_num < min_num) {
-                    need_back_num = hold_num;
-                }
-
-                if (need_back_num == 0.0) {
-                    continue;
-                }
-
-                if (position.takeDatetime >= date) {
-                    // A trade bought today needs a delayed position adjustment
-                    delay_list.emplace_back(iter->sys, need_back_num);
-                    HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
-                                iter->sys->name(), need_back_num);
-                } else {
-                    auto tr = iter->sys->sellForceOnClose(date, need_back_num, PART_ALLOCATEFUNDS);
-                    if (!tr.isNull()) {
-                        auto sub_cash = sub_tm->currentCash();
-                        if (sub_tm->checkout(date, sub_cash)) {
-                            m_cash_tm->checkin(date, sub_cash);
-                            m_tm->addTradeRecord(
-                              tr);  // Add the trade record into the total account
-                            HKU_INFO_IF(trace,
-                                        "[AF] Deduce position {}, sell num: {}, recycle cash: {}",
-                                        iter->sys->name(), need_back_num, sub_cash);
-                        }
-                    } else {
-                        // A failed sell is also added into the delayed trade list
-                        delay_list.emplace_back(iter->sys, need_back_num);
-                        HKU_INFO_IF(trace, "[AF] Delay deduce position {}, need sell num: {}",
-                                    iter->sys->name(), need_back_num);
-                    }
-                }
-            }
+        double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+        price_t unit = s.stock.unit();
+        double target_value = (current + s.number) * s.plan_price * (unit > 0.0 ? unit : 1.0);
+        if (target_value > cap) {
+            double max_shares =
+              (s.plan_price > 0.0) ? cap / (s.plan_price * (unit > 0.0 ? unit : 1.0)) : 0.0;
+            s.number = max_shares > current ? max_shares - current : 0.0;
         }
     }
-
-    //-----------------------------------------------------------------
-    // Traverse the currently selected systems and allocate the funds by the given weights
-    //-----------------------------------------------------------------
-    // Calculate the cash available for the allocation; return directly when it is not greater than
-    // the assets to be reserved
-    price_t current_cash = m_cash_tm->currentCash();
-    price_t can_allocate_cash = roundDown(current_cash - reserve_funds, precision);
-
-    HKU_INFO_IF(trace,
-                "can_allocate_weight: {:<.4f}, can_allocate_cash: {:<.2f}, current cash: {:<.2f}, "
-                "total funds: {:<.2f}, "
-                "reserved funds: {:<.2f}",
-                can_allocate_weight, can_allocate_cash, funds.cash, total_funds, reserve_funds);
-
-    HKU_IF_RETURN(can_allocate_cash < 1.0, delay_list);
-
-    // Traverse the selected subsystem list and adjust the assets
-    price_t sum_weight = 0.0;
-    for (auto iter = sw_list.begin(), end_iter = sw_list.end(); iter != end_iter; ++iter) {
-        if (sum_weight >= can_allocate_weight || can_allocate_cash < 1.0) {
-            break;
-        }
-
-        if (!iter->sys) {
-            continue;
-        }
-
-        // The asset amount the system expects to be allocated
-        price_t will_funds = roundUp(total_funds * iter->weight, precision);
-
-        // If this system is a currently running system
-        if (running_set.find(iter->sys) != running_set.cend()) {
-            auto sub_tm = iter->sys->getTM();
-            const KQuery& query = iter->sys->getTO().getQuery();
-            FundsRecord sub_funds = sub_tm->getFunds(date, query.kType());
-            price_t sub_total_funds = sub_funds.cash + sub_funds.market_value +
-                                      sub_funds.borrow_asset - sub_funds.short_market_value;
-
-            // If the position of this system has already been reduced
-            if (reduced_running_set.find(iter->sys) != reduced_running_set.cend()) {
-                // The remaining allocatable funds stay unchanged and the occupied weight is
-                // accumulated with the actual weight
-                sum_weight += sub_total_funds / total_funds;
-
-            } else {
-                // A system whose position has not been reduced needs the corresponding funds
-                // allocation
-                if (sub_total_funds >= will_funds) {
-                    sum_weight += sub_total_funds / total_funds;
-
-                } else {
-                    price_t need_cash = will_funds - sub_total_funds;
-                    if (need_cash > can_allocate_cash) {
-                        need_cash = can_allocate_cash;
-                    }
-
-                    // Skip it when the expected funds cannot buy even one lot (including a
-                    // delisting)
-                    auto last_price = iter->sys->getStock().getMarketValue(date, query.kType());
-                    if (need_cash < last_price * iter->sys->getStock().minTradeNumber()) {
-                        continue;
-                    }
-
-                    if (m_cash_tm->checkout(date, need_cash)) {
-                        sub_tm->checkin(date, need_cash);
-                        HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(),
-                                    need_cash);
-
-                        can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
-                        // Update the accumulated allocated weight
-                        sum_weight += (sub_total_funds + need_cash) / total_funds;
-                    }
-                }
-            }
-        } else {
-            // A system that is not running
-            // Calculate the funds the sub account can actually get
-            price_t need_cash = will_funds <= can_allocate_cash ? will_funds : can_allocate_cash;
-
-            // Try to withdraw the funds from the cash account and deposit them into the sub account
-            TMPtr sub_tm = iter->sys->getTM();
-            if (m_cash_tm->checkout(date, need_cash)) {
-                sub_tm->checkin(date, need_cash);
-                HKU_INFO_IF(trace, "[AF] {} fetched cash: {}", iter->sys->name(), need_cash);
-
-                // Update the remaining allocatable funds
-                can_allocate_cash = roundDown(can_allocate_cash - need_cash, precision);
-
-                // Update the accumulated allocated weight
-                sum_weight += iter->weight;
-
-            } else {
-                HKU_DEBUG_IF(trace, "[AF] {} failed to fetch cash from total account!",
-                             iter->sys->name());
-            }
-        }
-    }
-
-    return delay_list;
 }
 
 } /* namespace hku */

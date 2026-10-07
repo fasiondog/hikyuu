@@ -32,6 +32,7 @@
 */
 
 #include "base64.h"
+#include <algorithm>
 #include "Log.h"
 
 namespace hku {
@@ -75,22 +76,29 @@ static unsigned int pos_of_char(const unsigned char chr) {
         throw std::runtime_error("Input is not valid base64-encoded data.");
 }
 
-static std::string insert_linebreaks(std::string str, size_t distance) {
+static std::string insert_linebreaks(const std::string& str, size_t distance) {
     //
-    // Provided by https://github.com/JomaCorpFX, adapted by me.
+    // Builds the result in a single pass. Repeated std::string::insert would shift the whole
+    // tail on every call and degrade to O(n^2) for large inputs.
     //
-    if (!str.length()) {
-        return "";
+    if (!str.length() || distance == 0) {
+        return str;
     }
 
-    size_t pos = distance;
+    std::string ret;
+    ret.reserve(str.size() + str.size() / distance + 1);
 
+    size_t pos = 0;
     while (pos < str.size()) {
-        str.insert(pos, "\n");
-        pos += distance + 1;
+        size_t next = std::min(pos + distance, str.size());
+        ret.append(str, pos, next - pos);
+        if (next < str.size()) {
+            ret.push_back('\n');
+        }
+        pos = next;
     }
 
-    return str;
+    return ret;
 }
 
 template <typename String, unsigned int line_length>
@@ -209,6 +217,13 @@ static std::string decode(String encoded_string, bool remove_linebreaks) {
         //
         // The last chunk produces at least one and up to three bytes.
         //
+
+        // A trailing chunk of a single character cannot produce any output byte. The guard also
+        // keeps the reads below within the string data: for string_view, operator[] at size()
+        // (relying on a null terminator like std::string) is undefined behavior.
+        if (pos + 1 >= length_of_string) {
+            throw std::runtime_error("Input is not valid base64-encoded data.");
+        }
 
         size_t pos_of_char_1 = pos_of_char(encoded_string[pos + 1]);
 

@@ -10,6 +10,7 @@
 
 #include "../../../KQuery.h"
 #include "../../../KRecord.h"
+#include "../../../utilities/Log.h"
 #include "../../../utilities/db_connect/SQLStatementBase.h"
 
 namespace hku {
@@ -29,7 +30,9 @@ public:
       m_close(0.0),
       m_amount(0.0),
       m_count(0.0) {
-        // m_db_name = fmt::format("{}_{}", market, KQuery::getKTypeName(ktype));
+        HKU_CHECK(market.find('`') == string::npos && market.find('\0') == string::npos &&
+                    code.find('`') == string::npos && code.find('\0') == string::npos,
+                  "Invalid market or code! market: '{}', code: '{}'", market, code);
         to_lower(m_db_name);
     };
 
@@ -139,7 +142,7 @@ public:
     }
 
     void update(const SQLStatementPtr& st) const {
-        st->bind(0, m_open, m_high, m_low, m_close, m_amount, m_count);
+        st->bind(0, m_open, m_high, m_low, m_close, m_amount, m_count, m_date);
     }
 
     void load(const SQLStatementPtr& st) {

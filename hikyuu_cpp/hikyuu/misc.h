@@ -10,7 +10,7 @@
 #pragma once
 
 #include "trade_sys/system/System.h"
-#include "trade_sys/portfolio/Portfolio.h"
+
 #include "hikyuu/trade_manage/Performance.h"
 
 namespace hku {
@@ -27,15 +27,6 @@ namespace hku {
 vector<FundsList> HKU_API parallel_run_sys(const SystemList& system_list, const KQuery& query,
                                            bool reset = true, bool resetAll = false);
 
-/**
- * @brief Run the portfolios in parallel
- * @param pf_list portfolio list
- * @param query query condition for running the portfolios
- * @param force force reset
- * @return vector<FundsList>
- */
-vector<FundsList> HKU_API parallel_run_pf(const vector<PFPtr>& pf_list, const KQuery& query,
-                                          bool force = false);
 
 /**
  * Get the funds list of the account list at once

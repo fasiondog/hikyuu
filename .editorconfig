@@ -1,0 +1,23 @@
+# EditorConfig: cross-IDE baseline.
+# Authoritative formatters remain clang-format (C++) and autopep8 + flake8 (Python),
+# per AGENTS.md §5. This file only pins shared basics so editors do not silently deviate.
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+max_line_length = 120
+
+[*.{c,cpp,h,hpp,cc}]
+max_line_length = 100
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

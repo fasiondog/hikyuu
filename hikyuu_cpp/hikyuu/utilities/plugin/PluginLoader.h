@@ -102,6 +102,7 @@ private:
 #else
             dlclose(m_handle);
 #endif
+            m_handle = nullptr;
         }
     }
 

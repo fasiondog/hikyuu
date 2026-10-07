@@ -63,6 +63,7 @@ MoneyManagerPtr MoneyManagerBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
+    p->m_support_mult_buy_sell = m_support_mult_buy_sell;
     p->m_tm = m_tm;
     p->m_query = m_query;
     p->m_buy_sell_counts = m_buy_sell_counts;
@@ -100,7 +101,7 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
     HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
     // Protects all the money managers from a division by zero or an invalid price propagated by
-    // dirty data, so that no inf/nan position count can be produced (ISS-094)
+    // dirty data, so that no inf/nan position count can be produced
     HKU_ERROR_IF_RETURN(
       !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
       datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
@@ -234,7 +235,7 @@ size_t MoneyManagerBase::currentSellCount(const Stock& stk) const {
 
 void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
     // Only the long-side opening updates the consecutive trade counters; the short-side trades
-    // (BUSINESS_BUY_SHORT etc.) must not pollute the long tranches (ISS-093)
+    // (BUSINESS_BUY_SHORT etc.) must not pollute the long tranches
     if (tr.business == BUSINESS_BUY) {
         auto iter = m_buy_sell_counts.find(tr.stock);
         if (iter == m_buy_sell_counts.end()) {
@@ -249,7 +250,7 @@ void MoneyManagerBase::buyNotify(const TradeRecord& tr) {
 
 void MoneyManagerBase::sellNotify(const TradeRecord& tr) {
     // Only the long-side closing updates the consecutive trade counters; the short-side trades
-    // (BUSINESS_SELL_SHORT etc.) must not pollute the long tranches (ISS-093)
+    // (BUSINESS_SELL_SHORT etc.) must not pollute the long tranches
     if (tr.business == BUSINESS_SELL) {
         auto iter = m_buy_sell_counts.find(tr.stock);
         if (iter == m_buy_sell_counts.end()) {

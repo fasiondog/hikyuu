@@ -384,8 +384,10 @@ public:
     virtual FundsRecord getFunds(KQuery::KType ktype = KQuery::DAY) const override;
 
     /**
-     * Get the asset market value detail at the given moment
-     * @param datetime it must be greater than the account creation date, or Null<Datetime>()
+     * Get the asset detail at the given moment: the cash and the position quantities come from
+     * the broker snapshot, the market value is revalued at `datetime` by that moment's market
+     * price (the snapshot only records the quantities; their value drifts with the price)
+     * @param datetime the queried moment, or Null<Datetime>() for the current snapshot time
      * @param ktype the type of the date
      * @return asset detail
      * @note When datetime equals Null<Datetime>() it is the same as getFunds(KType)

@@ -59,9 +59,7 @@ public:
         return c_ret;
     }
 
-    bool isMatchAF(const AFPtr& af) override {
-        PYBIND11_OVERLOAD_PURE_NAME(bool, SelectorBase, "is_match_af", isMatchAF, af);
-    }
+
 
     string str() const override {
         PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
@@ -299,11 +297,8 @@ void export_Selector(py::module& m) {
       .def("_reset", &SelectorBase::_reset, "The subclass reset operation implementation")
       .def("_calculate", &SelectorBase::_calculate, "[Overload interface] The subclass calculation interface")
 
-      .def("is_match_af", &SelectorBase::isMatchAF, R"(is_match_af(self)
 
-    [Overload interface] Judge whether it matches the AF
 
-    :param AllocateFundsBase af: the asset allocation algorithm)")
 
       .def("get_selected", &SelectorBase::getSelected,
            R"(get_selected(self, datetime)

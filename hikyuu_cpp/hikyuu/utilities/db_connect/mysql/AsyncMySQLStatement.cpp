@@ -151,8 +151,10 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
         m_impl->current_row = 0;
         m_impl->total_rows_read = 0;
 
-        // Read the first batch of data when the result set needs to be read
-        if (m_impl->exec_state.should_read_rows()) {
+        // Read the first batch of data when the result set needs to be read;
+        // async_read_some_rows may return an empty batch while more rows are still pending,
+        // so loop until a non-empty batch is obtained or the stream is complete
+        while (m_impl->exec_state.should_read_rows()) {
             boost::mysql::diagnostics read_diag;
             boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
               m_impl->exec_state, read_diag, boost::asio::use_awaitable);
@@ -160,13 +162,19 @@ net::awaitable<void> AsyncMySQLStatement::sub_exec() {
             // Convert rows_view into vector<row> to own the data
             m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
             m_impl->total_rows_read += m_impl->current_batch.size();
+
+            if (!m_impl->current_batch.empty()) {
+                break;
+            }
         }
     } catch (const boost::mysql::error_with_diagnostics& e) {
+        m_impl->params.clear();
         HKU_ERROR("Execute failed! Error code: {}, Server message: {}, Client message: {}",
                   e.code().value(), e.get_diagnostics().server_message(),
                   e.get_diagnostics().client_message());
         SQL_THROW(e.code().value(), "Failed execute sql: {}! {}", m_sql_string, e.code().message());
     } catch (const boost::system::system_error& e) {
+        m_impl->params.clear();
         HKU_ERROR("Execute failed! Error code: {}, Message: {}", e.code().value(),
                   e.code().message());
         SQL_THROW(e.code().value(), "Failed execute sql: {}! {}", m_sql_string, e.code().message());
@@ -196,8 +204,10 @@ net::awaitable<bool> AsyncMySQLStatement::sub_moveNext() {
             co_return true;
         }
 
-        // The current batch has been read, try to read the next batch
-        if (m_impl->exec_state.should_read_rows()) {
+        // The current batch has been read, read on until a non-empty batch arrives:
+        // async_read_some_rows may return an empty batch while more rows are still pending,
+        // ending the iteration there would silently drop the remaining rows
+        while (m_impl->exec_state.should_read_rows()) {
             try {
                 boost::mysql::diagnostics diag;
                 boost::mysql::rows_view batch_view = co_await conn->async_read_some_rows(
@@ -206,19 +216,21 @@ net::awaitable<bool> AsyncMySQLStatement::sub_moveNext() {
                 // Convert rows_view into vector<row>
                 m_impl->current_batch.assign(batch_view.begin(), batch_view.end());
                 m_impl->total_rows_read += m_impl->current_batch.size();
-                m_impl->current_row = 1;  // Reset to the first row of the first batch
 
-                co_return !m_impl->current_batch.empty();
+                if (!m_impl->current_batch.empty()) {
+                    m_impl->current_row = 1;  // Reset to the first row of the new batch
+                    co_return true;
+                }
             } catch (...) {
                 // The reading failed, end the iteration
                 _reset();
                 co_return false;
             }
-        } else {
-            // There is no more data
-            _reset();
-            co_return false;
         }
+
+        // There is no more data
+        _reset();
+        co_return false;
     } else {
         // The non-streaming mode
         const auto& rows = m_impl->results.rows();
@@ -268,6 +280,13 @@ void AsyncMySQLStatement::sub_bindInt(int idx, int64_t value) {
               "Parameter index must be sequential! Expected index: {}, but got: {}",
               m_impl->params.size(), idx);
     m_impl->params.push_back(boost::mysql::field(static_cast<std::int64_t>(value)));
+}
+
+void AsyncMySQLStatement::sub_bindUInt64(int idx, uint64_t value) {
+    SQL_CHECK(idx == static_cast<int>(m_impl->params.size()), -1,
+              "Parameter index must be sequential! Expected index: {}, but got: {}",
+              m_impl->params.size(), idx);
+    m_impl->params.push_back(boost::mysql::field(static_cast<std::uint64_t>(value)));
 }
 
 void AsyncMySQLStatement::sub_bindDouble(int idx, double item) {
@@ -349,7 +368,7 @@ void AsyncMySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
 
     const auto& value = m_impl->getField(idx);
     if (value.is_null()) {
-        item = 0;
+        item = Null<int64_t>();
         return;
     }
 
@@ -370,12 +389,42 @@ void AsyncMySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     }
 }
 
+void AsyncMySQLStatement::sub_getColumnAsUInt64(int idx, uint64_t& item) {
+    SQL_CHECK(m_impl->has_result, -1, "No result available!");
+
+    const auto& value = m_impl->getField(idx);
+    if (value.is_null()) {
+        item = (std::numeric_limits<uint64_t>::max)();
+        return;
+    }
+
+    try {
+        item = value.as_uint64();
+    } catch (...) {
+        try {
+            int64_t s = value.as_int64();
+            SQL_CHECK(s >= 0, -1, "Column {} holds negative value {}, cannot be read as uint64",
+                      idx, s);
+            item = static_cast<uint64_t>(s);
+        } catch (const hku::exception&) {
+            throw;
+        } catch (...) {
+            try {
+                std::string str = value.as_string();
+                item = std::stoull(str);
+            } catch (const std::exception& e) {
+                SQL_THROW(-1, "Failed to convert column {} to uint64: {}", idx, e.what());
+            }
+        }
+    }
+}
+
 void AsyncMySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     SQL_CHECK(m_impl->has_result, -1, "No result available!");
 
     const auto& value = m_impl->getField(idx);
     if (value.is_null()) {
-        item = 0.0;
+        item = Null<double>();
         return;
     }
 
@@ -453,8 +502,7 @@ void AsyncMySQLStatement::sub_getColumnAsBlob(int idx, std::string& item) {
 
     const auto& value = m_impl->getField(idx);
     if (value.is_null()) {
-        item.clear();
-        return;
+        throw null_blob_exception();
     }
 
     try {
@@ -470,8 +518,7 @@ void AsyncMySQLStatement::sub_getColumnAsBlob(int idx, std::vector<char>& item) 
 
     const auto& value = m_impl->getField(idx);
     if (value.is_null()) {
-        item.clear();
-        return;
+        throw null_blob_exception();
     }
 
     try {

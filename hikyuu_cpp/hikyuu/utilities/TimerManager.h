@@ -20,6 +20,8 @@ namespace hku {
 /**
  * Timer management and scheduling
  * @ingroup Utilities
+ * @note Not fully thread-safe: start/stop (and the destruction) must be called from a single
+ * thread or serialized externally, while addFunc/removeTimer are thread-safe at runtime
  */
 class TimerManager {
 public:
@@ -64,7 +66,8 @@ public:
         }
     }
 
-    /** Start the scheduling, it can be restarted after a stop */
+    /** Start the scheduling, it can be restarted after a stop; not thread-safe, see the class note
+     */
     void start() {
         // It is already in the executing state, return directly
         HKU_IF_RETURN(!m_stop, void());
@@ -150,7 +153,7 @@ public:
         m_detect_thread = std::thread([this]() { detectThread(); });
     }
 
-    /** Terminate the scheduling */
+    /** Terminate the scheduling; not thread-safe, see the class note */
     void stop() {
         if (!m_stop) {
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -285,8 +288,9 @@ public:
      * fails
      * @tparam F the task type
      * @tparam Args the task parameters
-     * @param start_date the start date allowed to be executed
-     * @param end_date the end date allowed to be executed
+     * @param start_date the start date of the allowed range, validation only
+     * @param end_date the end date of the allowed range, validation only
+     * @note The date range is not used to filter the executions; the task runs at `time` every day
      * @param time the given running time within the day
      * @param f the delayed task to be executed
      * @param args the concrete task parameters
@@ -341,79 +345,97 @@ private:
     }
 
     void detectThread() {
-        while (!m_stop) {
-            Datetime now = Datetime::now();
-            std::unique_lock<std::mutex> lock(m_mutex);
-            if (m_queue.empty()) {
-                m_cond.wait(lock);
-                continue;
-            }
-
-            IntervalS s = m_queue.top();
-            if (s.m_time_point == Datetime::min()) {
-                break;  // End the detection thread so that the dll can exit safely, because the
-                        // atomic may be invalid when the dll exits
-            }
-
-            TimeDelta diff = s.m_time_point - now;
-            if (diff > TimeDelta()) {
-                m_cond.wait_for(lock, std::chrono::duration<int64_t, std::micro>(diff.ticks()));
-                continue;
-            }
-
-            m_queue.pop();
-
-            // Get the current time again
-            now = Datetime::now();
-
-            auto timer_iter = m_timers.find(s.m_timer_id);
-            if (timer_iter == m_timers.end()) {
-                continue;
-            }
-
-            auto timer = timer_iter->second;
-            m_tg->submit(timer->m_func);
-
-            if (timer->m_repeat_num != std::numeric_limits<int>::max()) {
-                timer->m_repeat_num--;
-            }
-
-            if (timer->m_repeat_num <= 0) {
-                _removeTimer(s.m_timer_id);
-                continue;
-            }
-
-            // Calculate the time point of the next execution
-            Datetime today = now.startOfDay();
-            if (timer->m_start_time >= TimeDelta()) {
-                // The timer not executed at the given moment
-                s.m_time_point = s.m_time_point + timer->m_duration;
-                if (s.m_time_point < now) {
-                    // The system time is adjusted forward
-                    s.m_time_point = now;
+        try {
+            while (!m_stop) {
+                Datetime now = Datetime::now();
+                std::unique_lock<std::mutex> lock(m_mutex);
+                if (m_queue.empty()) {
+                    m_cond.wait(lock);
+                    continue;
                 }
 
-                // If the executable time range of the day is limited and the next execution moment
-                // exceeds the limit of the day
-                if (timer->m_start_time != timer->m_end_time &&
-                    s.m_time_point > today + timer->m_end_time) {
-                    s.m_time_point = today + timer->m_start_time + TimeDelta(1);
+                IntervalS s = m_queue.top();
+                if (s.m_time_point == Datetime::min()) {
+                    break;  // End the detection thread so that the dll can exit safely, because the
+                            // atomic may be invalid when the dll exits
                 }
 
-            } else {
-                // The timer with the given daily running time
-                s.m_time_point =
-                  s.m_time_point + (today - s.m_time_point.startOfDay() + TimeDelta(1));
-            }
+                TimeDelta diff = s.m_time_point - now;
+                if (diff > TimeDelta()) {
+                    m_cond.wait_for(lock, std::chrono::duration<int64_t, std::micro>(diff.ticks()));
+                    continue;
+                }
 
-            if (timer->m_end_date != Datetime::max() &&
-                s.m_time_point > timer->m_end_date + timer->m_end_time) {
-                _removeTimer(s.m_timer_id);
-                continue;
-            }
+                m_queue.pop();
 
-            // Push the next running time into the queue
-            m_queue.push(s);
+                // Get the current time again
+                now = Datetime::now();
+
+                auto timer_iter = m_timers.find(s.m_timer_id);
+                if (timer_iter == m_timers.end()) {
+                    continue;
+                }
+
+                auto timer = timer_iter->second;
+                try {
+                    m_tg->submit(timer->m_func);
+                } catch (const std::exception& e) {
+                    // The worker pool may have been stopped already (e.g. an externally
+                    // supplied pool shut down first). Letting the exception escape the
+                    // detection thread would call std::terminate, so drop this timer and
+                    // keep draining the queue instead.
+                    HKU_WARN("Failed to submit timer task (id={}): {}", s.m_timer_id, e.what());
+                    _removeTimer(s.m_timer_id);
+                    continue;
+                }
+
+                if (timer->m_repeat_num != std::numeric_limits<int>::max()) {
+                    timer->m_repeat_num--;
+                }
+
+                if (timer->m_repeat_num <= 0) {
+                    _removeTimer(s.m_timer_id);
+                    continue;
+                }
+
+                // Calculate the time point of the next execution
+                Datetime today = now.startOfDay();
+                if (timer->m_start_time >= TimeDelta()) {
+                    // The timer not executed at the given moment
+                    s.m_time_point = s.m_time_point + timer->m_duration;
+                    if (s.m_time_point < now) {
+                        // The system time is adjusted forward
+                        s.m_time_point = now;
+                    }
+
+                    // If the executable time range of the day is limited and the next execution
+                    // moment exceeds the limit of the day
+                    if (timer->m_start_time != timer->m_end_time &&
+                        s.m_time_point > today + timer->m_end_time) {
+                        s.m_time_point = today + timer->m_start_time + TimeDelta(1);
+                    }
+
+                } else {
+                    // The timer with the given daily running time
+                    s.m_time_point =
+                      s.m_time_point + (today - s.m_time_point.startOfDay() + TimeDelta(1));
+                }
+
+                if (timer->m_end_date != Datetime::max() &&
+                    s.m_time_point > timer->m_end_date + timer->m_end_time) {
+                    _removeTimer(s.m_timer_id);
+                    continue;
+                }
+
+                // Push the next running time into the queue
+                m_queue.push(s);
+            }
+        } catch (const std::exception& e) {
+            // Last-resort guard: any uncaught exception in the detection thread would
+            // terminate the process. Log and let the thread exit cleanly.
+            HKU_ERROR("Unexpected exception in TimerManager detection thread: {}", e.what());
+        } catch (...) {
+            HKU_ERROR("Unknown exception in TimerManager detection thread");
         }
     }
 
@@ -451,12 +473,11 @@ private:
 
         Datetime m_start_date = Datetime::min().startOfDay();  // The start date allowed to be
                                                                // executed (inclusive)
-        Datetime m_end_date = Datetime::max().startOfDay();  // The end date allowed to be executed
-                                                             // (inclusive)
+        Datetime m_end_date = Datetime::max().startOfDay();    // The end date allowed to be
+                                                               // executed (inclusive)
         /*
-         * Note: if m_start_time < TimeDelta(0), m_end_time represents the given daily running time,
-         *       and
-         * m_duration
+         * Note: if m_start_time < TimeDelta(0), m_end_time represents the given daily running
+         * time, and m_duration
          */
         TimeDelta m_start_time;  // The start time of the day allowed to be executed (inclusive)
         TimeDelta m_end_time;    // The end time of the day allowed to be executed (inclusive)

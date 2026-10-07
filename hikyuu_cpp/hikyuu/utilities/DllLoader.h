@@ -154,10 +154,11 @@ private:
                 }
             }
         }
+        // DYLD_FRAMEWORK_PATH and DYLD_LIBRARY_PATH are colon-separated path lists
         path = getenv("DYLD_FRAMEWORK_PATH");
         if (path) {
             std::string pathstr(path);
-            auto items = split(pathstr, ";");
+            auto items = split(pathstr, ":");
             for (auto& item : items) {
                 std::string nitem(item);
                 trim(nitem);
@@ -169,7 +170,7 @@ private:
         path = getenv("DYLD_LIBRARY_PATH");
         if (path) {
             std::string pathstr(path);
-            auto items = split(pathstr, ";");
+            auto items = split(pathstr, ":");
             for (auto& item : items) {
                 std::string nitem(item);
                 trim(nitem);
@@ -186,10 +187,11 @@ private:
         m_search_paths.emplace_back("/lib");
 
 #else
+        // LD_LIBRARY_PATH is a colon-separated path list
         const char* path = getenv("LD_LIBRARY_PATH");
         if (path) {
             std::string pathstr(path);
-            auto items = split(pathstr, ";");
+            auto items = split(pathstr, ":");
             for (auto& item : items) {
                 std::string nitem(item);
                 trim(nitem);

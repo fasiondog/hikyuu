@@ -47,7 +47,7 @@ void NormQuantileUniform::_checkParam(const string &name) const {
 
 PriceList NormQuantileUniform::normalize(const PriceList &src) {
     // The positions without value remain nan, consistent with NormMinMax and NormZScore, so that
-    // the downstream can ignore them via the nan check (ISS-082)
+    // the downstream can ignore them via the nan check
     PriceList result(src.size(), Null<price_t>());
     HKU_IF_RETURN(src.empty(), result);
 

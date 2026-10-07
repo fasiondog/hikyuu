@@ -68,6 +68,18 @@ public:
             }
         } catch (...) {
             m_done = true;
+            // Wake up and join the already started worker threads before the members are
+            // destroyed, otherwise the workers would access the destroyed members
+            size_t started = m_threads.size();
+            for (size_t i = 0; i < started; i++) {
+                m_thread_need_stop[i].set();
+                m_queues[i]->push(FuncWrapper());
+            }
+            for (size_t i = 0; i < started; i++) {
+                if (m_threads[i].joinable()) {
+                    m_threads[i].join();
+                }
+            }
             throw;
         }
     }

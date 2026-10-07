@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2019 hikyuu.org
+ * FixedWeightAllocateFunds.cpp
  *
+ *  Copyright (c) 2025 hikyuu.org
  *  Created on: 2018-2-8
  *      Author: fasiondog
  */
@@ -16,37 +17,24 @@ namespace hku {
 FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_FixedWeight") {
     setParam<double>("weight", 0.1);
 
-    // The common parameter must be set to false, the automatic weight adjustment is forbidden
-    setParam<bool>("auto_adjust_weight", false);
 }
 
 FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
 
 void FixedWeightAllocateFunds::_checkParam(const string& name) const {
     if ("weight" == name) {
-        double weight = getParam<double>("weight");
-        HKU_ASSERT(weight > 0.0 && weight <= 1.);
-    } else if ("auto_adjust_weight" == name) {
-        bool auto_adjust_weight = getParam<bool>("auto_adjust_weight");
-        HKU_CHECK(!auto_adjust_weight, R"(param "auto_adjust_weight" must be false!)");
+        double w = getParam<double>("weight");
+        HKU_ASSERT(w > 0.0 && w <= 1.0);
     }
 }
 
-SystemWeightList FixedWeightAllocateFunds ::_allocateWeight(const Datetime& date,
-                                                            const SystemWeightList& se_list) {
-    SystemWeightList result;
-    price_t weight = getParam<double>("weight");
-    for (auto iter = se_list.begin(); iter != se_list.end(); ++iter) {
-        result.emplace_back(iter->sys, weight);
-    }
-
-    return result;
+AllocateFundsBase::Weights FixedWeightAllocateFunds::_allocate(const Datetime& date,
+                                                               const TradeManagerPtr& tm,
+                                                               SubSystemContextList& contexts,
+                                                               const KQuery& query) {
+    double weight = getParam<double>("weight");
+    // Without normalization: every selected sub-system only accounts for a fixed proportion of the parent total assets (equivalent to master auto_adjust_weight=false)
+    return _applyWeights(date, tm, contexts, query, std::vector<double>(contexts.size(), weight));
 }
 
-AFPtr HKU_API AF_FixedWeight(double weight) {
-    auto p = make_shared<FixedWeightAllocateFunds>();
-    p->setParam<double>("weight", weight);
-    return p;
-}
-
-} /* namespace hku */
+}  // namespace hku

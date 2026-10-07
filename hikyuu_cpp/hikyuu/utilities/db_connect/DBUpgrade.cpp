@@ -97,8 +97,8 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
     int version = 0;
     try {
         version = driver->queryInt(
-          fmt::format("select `version` from `module_version` where module=\"{}\" limit 1",
-                      module_name),
+          fmt::format("select `version` from `module_version` where module={} limit 1",
+                      sqlStringLiteral(module_name)),
           0);
     } catch (...) {
         // Do noting
@@ -113,8 +113,8 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
 
         // Create the database and set the module database version to 1
         driver->exec(create_script);
-        driver->exec(fmt::format(
-          "INSERT INTO `module_version` (module, version) VALUES (\"{}\", 1);", module_name));
+        driver->exec(fmt::format("INSERT INTO `module_version` (module, version) VALUES ({}, 1);",
+                                 sqlStringLiteral(module_name)));
         version = 1;
     }
 
@@ -153,8 +153,8 @@ void HKU_UTILS_API DBUpgrade(const DBConnectPtr &driver, const char *module_name
         driver->exec(upgrade_scripts[i]);
     }
 
-    driver->exec(fmt::format("UPDATE module_version SET `version`={} where `module`=\"{}\"",
-                             to_version, module_name));
+    driver->exec(fmt::format("UPDATE module_version SET `version`={} where `module`={}", to_version,
+                             sqlStringLiteral(module_name)));
 }
 
 /*
@@ -202,8 +202,8 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
     int version = 0;
     try {
         version = co_await driver->queryInt(
-          fmt::format("select `version` from `module_version` where module=\"{}\" limit 1",
-                      module_name),
+          fmt::format("select `version` from `module_version` where module={} limit 1",
+                      sqlStringLiteral(module_name)),
           0);
     } catch (...) {
         // Do noting
@@ -218,8 +218,9 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
 
         // Create the database and set the module database version to 1
         co_await driver->exec(create_script);
-        co_await driver->exec(fmt::format(
-          "INSERT INTO `module_version` (module, version) VALUES (\"{}\", 1);", module_name));
+        co_await driver->exec(
+          fmt::format("INSERT INTO `module_version` (module, version) VALUES ({}, 1);",
+                      sqlStringLiteral(module_name)));
         version = 1;
     }
 
@@ -258,8 +259,8 @@ net::awaitable<void> HKU_UTILS_API DBUpgrade(const AsyncDBConnectPtr &driver,
         co_await driver->exec(upgrade_scripts[i]);
     }
 
-    co_await driver->exec(fmt::format(
-      "UPDATE module_version SET `version`={} where `module`=\"{}\"", to_version, module_name));
+    co_await driver->exec(fmt::format("UPDATE module_version SET `version`={} where `module`={}",
+                                      to_version, sqlStringLiteral(module_name)));
 }
 
 }  // namespace hku

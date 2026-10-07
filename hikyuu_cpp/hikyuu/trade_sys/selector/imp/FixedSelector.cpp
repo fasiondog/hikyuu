@@ -23,9 +23,7 @@ FixedSelector::FixedSelector(double weight) : SelectorBase("SE_Fixed") {
 
 FixedSelector::~FixedSelector() {}
 
-bool FixedSelector::isMatchAF(const AFPtr& af) {
-    return true;
-}
+
 
 SystemWeightList FixedSelector::_getSelected(Datetime date) {
     auto weight = getParam<double>("weight");

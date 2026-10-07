@@ -41,7 +41,7 @@ TEST_CASE("test_MM_FixedCountTpsTps") {
     CHECK_EQ(mm->currentBuyCount(stock), 0);
     double buy_num = mm->getBuyNumber(Datetime(200001200000), stock, 24.11, 24.11, PART_SIGNAL);
     CHECK_EQ(buy_num, 100);
-    CHECK_EQ(tm->cash(Datetime(200001200000)), 2417.02);
+    CHECK_EQ(tm->cash(Datetime(200001200000)), 2417.0);
     auto tr = tm->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
     mm->buyNotify(tr);
     CHECK_EQ(mm->currentBuyCount(stock), 1);

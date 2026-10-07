@@ -58,6 +58,26 @@ class MoneyManagerTest(unittest.TestCase):
         self.assertEqual(p.get_param("n"), 1)
         self.assertEqual(p_clone.get_param("n"), 3)
 
+    def test_support_mult_buy_sell(self):
+        # @arg defaults to not supporting multi-trading
+        p = MoneyManagerPython()
+        self.assertEqual(p.support_mult_buy_sell, False)
+
+        # @arg a Python custom MM can declare the multi-trading capability
+        p.support_mult_buy_sell = True
+        self.assertEqual(p.support_mult_buy_sell, True)
+
+        # @arg a C++ built-in MM must not rewrite the capability flag via the property
+        mm = MM_FixedCount()
+        self.assertEqual(mm.support_mult_buy_sell, False)
+        with self.assertRaises(HKUException):
+            mm.support_mult_buy_sell = True
+        self.assertEqual(mm.support_mult_buy_sell, False)
+
+        # @arg the clone keeps the declared capability flag
+        p_clone = p.clone()
+        self.assertEqual(p_clone.support_mult_buy_sell, True)
+
 
 def testCrtMM(self):
     pass

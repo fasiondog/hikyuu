@@ -42,6 +42,13 @@
     :rtype: pandas.DataFrame
 
 
+.. py:function:: initLogger(not_use_color=False, filename="")
+
+    初始化日志输出
+
+    :param bool not_use_color: 是否不使用彩色输出
+    :param str filename: 日志文件名，为空时默认输出到当前目录下的 ./hikyuu.log，需保证目录存在且可写
+
 .. py:function:: get_log_level()
 
     获取当前日志打印级别

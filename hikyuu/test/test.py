@@ -25,7 +25,9 @@ import Signal
 import Stoploss
 import ProfitGoal
 import Slippage
+import SystemWeight
 import AllocateFunds
+import MultiSystem
 import test_common_sql
 
 if __name__ == "__main__":
@@ -58,7 +60,9 @@ if __name__ == "__main__":
     suite.addTest(Slippage.suite())
     suite.addTest(Slippage.suiteTestCrtSL())
 
+    suite.addTest(SystemWeight.suite())
     suite.addTest(AllocateFunds.suite())
+    suite.addTest(MultiSystem.suite())
     suite.addTest(test_common_sql.suite())
 
     unittest.TextTestRunner(verbosity=2).run(suite)

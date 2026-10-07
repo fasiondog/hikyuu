@@ -90,6 +90,10 @@ Common parameters:
 
         :param func: a callable that must accept two parameters: func(stg: Strategy, revTime: Datetime)
 
+    .. py:method:: stop(self)
+
+        Stop the strategy event loop; registered market-data / timed callbacks become no-ops and queued callbacks are dropped, so start() returns. Destroy the object on the same thread after start() has returned.
+
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
 
         Register a callback that runs repeatedly throughout the trading day. If market open/close hours are ignored, it loops from the start moment at the given interval;
@@ -177,7 +181,8 @@ Common parameters:
 
         - When buying, if the order quantity exceeds the maximum tradable quantity, it is filled at the maximum tradable quantity.
         - When selling, if the order quantity exceeds the maximum tradable quantity and is not equal to MAX_DOUBLE, it is filled at the maximum tradable quantity.
-        - When selling, if the order quantity is below the minimum tradable quantity, the entire position is sold.
+        - When selling, if the order quantity is below the minimum tradable quantity, the sell order is ignored with a warning (the position is not cleared).
+        - When support_short is enabled, the part of a sell order beyond the current long position is opened short via stock borrowing (close-long-then-open-short).
 
         :param Stock stock: the specified security
         :param float num: the order quantity
@@ -225,6 +230,35 @@ Common parameters:
         :param str remark: the remark
         :return: the trade record
         :rtype: TradeRecord
+
+    .. py:method:: sell_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+        Open a short position (borrow and sell the security); requires the account to support borrowing stock. Normally invoked by order() in a close-long-then-open-short manner when support_short is on.
+
+        :param Stock stock: the specified security
+        :param price_t price: the open-short price
+        :param float num: the quantity to open short
+        :param price_t stoploss: the stop-loss price; defaults to 0
+        :param price_t goal_price: the take-profit target price; defaults to 0
+        :param SystemPart part: the system part; defaults to PART_SIGNAL
+        :param str remark: the remark
+        :return: the trade record
+        :rtype: TradeRecord
+
+    .. py:method:: buy_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+        Close (cover) a short position (buy back and return the borrowed security).
+
+        :param Stock stock: the specified security
+        :param price_t price: the cover price
+        :param float num: the quantity to cover
+        :param price_t stoploss: the stop-loss price; defaults to 0
+        :param price_t goal_price: the take-profit target price; defaults to 0
+        :param SystemPart part: the system part; defaults to PART_SIGNAL
+        :param str remark: the remark
+        :return: the trade record
+        :rtype: TradeRecord
+
 
 
 .. py:function:: start_spot_agent(print=False, worker_num=1, addr="")
@@ -280,16 +314,6 @@ Common parameters:
     :param cost_func: the cost function
     :param list other_brokers: the other order brokers; defaults to an empty list
 
-    Form 2: run the portfolio strategy PF within the strategy runtime.
-
-    Currently, only systems with both buy_delay and sell_delay set to false are supported, i.e. trades are executed at the close.
-
-    :param Portfolio pf: the portfolio
-    :param Query query: the query condition
-    :param broker: the order broker (the order broker dedicated to synchronizing with the account assets)
-    :param cost_func: the cost function
-    :param list other_brokers: the other order brokers; defaults to an empty list
-
 
 .. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")
 
@@ -305,14 +329,64 @@ Common parameters:
     :param str config: the configuration file path; defaults to an empty string
 
 
-.. py:function:: crt_pf_strategy(pf, query, broker, cost_func, other_brokers=[], name="PFStrategy", config="")
+.. py:function:: crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, name="MultiSYSStrategy", other_brokers=[], config="")
 
-    Create a strategy from a portfolio.
+    Create an aggregate system strategy (the MultiSystem live-trading entry point).
 
-    :param pf: the portfolio
+    The parent account uses the ``BrokerTM`` synchronized with the broker, while the sub-systems use their own shadow/virtual accounts (mode A/B is decided internally by MultiSystem).
+    Currently, only sub-systems with both buy_delay and sell_delay set to false are supported, i.e. trades are executed at the close.
+
+    :param MultiSystem ms: the aggregate trading system
+    :param str stk_market_code: the driving instrument (e.g. "SH000001"), used to align the time axis; it should cover the trading days of every sub-system
     :param query: the query condition
-    :param broker: the order broker
+    :param broker: the order broker (synchronized with the parent account's assets)
     :param cost_func: the cost function
+    :param str name: the strategy name; defaults to "MultiSYSStrategy"
     :param list other_brokers: the other order brokers; defaults to an empty list
-    :param str name: the strategy name; defaults to "PFStrategy"
     :param str config: the configuration file path; defaults to an empty string
+
+
+Portfolio Strategy Migration Guide (PF -> MultiSystem)
+------------------------------------------------------
+
+Since 2.8.x, the original portfolio backtest building blocks ``Portfolio`` / ``AllocateFunds`` have been removed; :class:`MultiSystem` now uniformly handles both portfolio backtesting and live trading.
+
+**Backtest migration**
+
+.. code-block:: python
+
+    # Old approach (PF + AF, removed)
+    # pf = crtPF(tm, mm, se, af, adjust_cycle=10)
+    # pf.run(query)
+
+    # New approach (MultiSystem)
+    sys1 = SYS_Simple(tm=tm1, sg=sg1, mm=mm1)   # each holds its own SG/MM
+    sys2 = SYS_Simple(tm=tm2, sg=sg2, mm=mm2)
+    ms = MultiSystem()          # or MultiSystem(name="Combo")
+    ms.tm = crtTM(init_cash=1000000)
+    ms.set_mode("A")            # the default is fine: A = signal aggregation; B = fund allocation (FOF-MOM)
+    ms.set_adjust_cycle(10)     # the rebalancing cycle (days); 1 by default means rebalancing on every close day
+    ms.add(sys1)
+    ms.add(sys2)
+    ms.run(sh000001.get_kdata(Query(-200)))   # drive with a time axis covering the trading days of every sub-system
+
+    # Mode B: the parent allocates equal-weight quotas to the sub-systems, which trade autonomously within their quotas (L2 pass-through)
+    ms.set_mode("B")
+
+**Live trading migration**
+
+.. code-block:: python
+
+    # Old approach (removed)
+    # stg = crt_pf_strategy(pf, query, broker, cost_func)
+
+    # New approach
+    stg = crt_multi_sys_strategy(ms, "SH000001", query, broker, cost_func)
+    stg.start()
+
+**Notes**
+
+- Each sub-system must hold independent SG/MM instances (different securities need to compute their signals separately; sharing the same SG causes signals to overwrite each other).
+- Mode A: the parent uniformly allocates and places orders by weight (equal weight by default), and the sub-systems are pure signal sources; Mode B: the parent allocates real quotas, and the sub-systems decide autonomously.
+- SE (trading object selection) is optional: after ``ms.set_se(se)``, only the selected sub-systems run on the rebalancing day, while the unselected ones can be force-liquidated (``ms.set_sell_at_not_selected(True)``).
+- Portfolio risk control (the concentration limit) is controlled by the parent MM parameter ``max-single-position`` (1.0 by default, which means no limit).

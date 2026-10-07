@@ -20,14 +20,14 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 .. py:class:: Strategy
 
     策略运行时
-    
+
     创建策略运行时有以下几种方式：
-    
+
     .. code-block:: python
-    
+
         # 方式 1：使用默认参数创建
         stg = Strategy()
-        
+
         # 方式 2：指定证券代码列表和 K 线类型
         stg = Strategy(
             code_list=["sz000001", "sz000002"],
@@ -36,39 +36,39 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
             name="MyStrategy",
             config=""  # 配置文件路径，为空时使用默认的 hikyuu 配置文件
         )
-        
+
         # 方式 3：使用上下文创建
         context = StrategyContext(stock_list=["sz000001"], ktype_list=["day"])
         stg = Strategy(context, name="MyStrategy", config="")
 
     .. py:attribute:: name
-        
+
         策略名称，可读可写
-        
+
     .. py:attribute:: context
-        
+
         策略上下文，只读属性，包含证券代码列表、K 线类型等信息
-        
+
     .. py:attribute:: tm
-        
+
         关联的交易管理实例，可读可写，用于管理账户资产和订单
-        
+
     .. py:attribute:: sp
-        
+
         移滑价差算法，可读可写，仅在回测状态下使用
-        
+
     .. py:attribute:: running
-        
+
         获取当前运行状态，只读属性，返回 True 或 False
-        
+
     .. py:attribute:: is_backtesting
-        
+
         获取回测状态，只读属性
 
     .. py:method:: start(self, auto_recieve_spot=True)
 
         启动策略执行，请在完成相关回调设置后执行。
-        
+
         注意：在 Python 交互模式下无法启动策略。
 
         :param bool auto_recieve_spot: 是否自动接收行情数据，默认为 True
@@ -76,7 +76,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     .. py:method:: on_change(self, func)
 
         设置证券数据更新回调通知
-        
+
         当行情数据发生变化时触发该回调，通常用于调试。只要收到行情采集消息就会触发，不受开、闭市时间限制。
 
         :param func: 可调用对象，需接收三个参数：func(stg: Strategy, stock: Stock, spot: SpotRecord)
@@ -84,14 +84,18 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     .. py:method:: on_received_spot(self, func)
 
         设置证券数据更新通知回调
-        
+
         在一批行情数据接受完毕后通知，通常仅用于调试打印。该批行情数据中不一定含有上下文中包含的 stock，
         且只要收到行情采集消息就会触发，不受开、闭市时间限制。
 
         :param func: 可调用对象，需接收两个参数：func(stg: Strategy, revTime: Datetime)
 
+    .. py:method:: stop(self)
+
+        停止策略事件循环；已注册的市场数据/定时回调转为空操作并丢弃队列中未执行的回调，start() 随之返回。建议在 start() 返回后的同一线程销毁对象。
+
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
-        
+
         设置日内循环执行回调。如果忽略市场开闭市，则自启动时刻开始按间隔时间循环，
         否则第一次执行时将开盘时间对齐时间间隔，且在非开市时间停止执行。
 
@@ -107,7 +111,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
         :param func: 可调用对象，需接收一个参数：func(stg: Strategy)
         :param TimeDelta time: 执行时刻，如每日 15 点：TimeDelta(0, 15)，必须小于 1 天
         :param ignore_holiday: 节假日不执行，默认为 True
-       
+
         .. note:: 同一时刻只能注册一个任务，重复注册将抛出异常
 
     .. py:method:: today(self)
@@ -117,7 +121,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
         :return: 当前交易日日期
         :rtype: Datetime
 
-    .. py:method:: now(self)   
+    .. py:method:: now(self)
 
         获取当前时间（使用该方法而不是 Datetime.now(), 以便回测和实盘一致）
 
@@ -127,14 +131,14 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     .. py:method:: next_datetime(self)
 
         下一交易时间点（回测使用）
-        
+
         :return: 下一交易时间点，实盘时返回 Null<Datetime>()
         :rtype: Datetime
 
     .. py:method:: get_current_price(self, stk, ktype)
-    
+
         获取当前价格
-        
+
         :param Stock stk: 指定的证券
         :param KQuery.KType ktype: K 线类型
         :return: 当前价格，无效时返回 constant.null_price
@@ -172,12 +176,13 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     .. py:method:: order(self, stock, num, remark='')
 
         按数量下单（正数为买入，负数为卖出）
-        
+
         实际交易数量会受到证券的最小/最大交易数量限制：
-        
+
         - 买入时，如果下单数量超过最大交易数量，则按最大交易数量成交
         - 卖出时，如果下单数量超过最大交易数量且不等于 MAX_DOUBLE，则按最大交易数量成交
-        - 卖出时，如果下单数量小于最小交易数量，则全部卖出
+        - 卖出时，如果下单数量小于最小交易数量，则忽略该笔卖出并告警（不会清仓）
+        - 开启 support_short 时，卖出数量超过当前多头持仓的部分将融券开空（先平后开）
 
         :param Stock stock: 指定的证券
         :param float num: 下单数量
@@ -188,7 +193,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     .. py:method:: order_value(self, stock, value, remark='')
 
         按预期的证劵市值下单，即希望买入多少钱的证券（正数为买入，负数为卖出）
-        
+
         该方法会根据当前价格计算需要买入的数量，并考虑手续费等因素，确保不会超出可用资金。
         如果资金不足，会自动减少买入数量，如果连最小交易数量都无法买入，则不会下单。
 
@@ -197,11 +202,11 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
         :param str remark: 下单备注
         :return: 交易记录
         :rtype: TradeRecord
-        
+
     .. py:method:: buy(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
-    
+
         买入操作
-        
+
         :param Stock stock: 指定的证券
         :param price_t price: 买入价格，0 表示使用当前市场价格
         :param float num: 买入数量
@@ -211,11 +216,11 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
         :param str remark: 备注信息
         :return: 交易记录
         :rtype: TradeRecord
-        
+
     .. py:method:: sell(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
-    
+
         卖出操作
-        
+
         :param Stock stock: 指定的证券
         :param price_t price: 卖出价格，0 表示使用当前市场价格
         :param float num: 卖出数量
@@ -226,11 +231,40 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
         :return: 交易记录
         :rtype: TradeRecord
 
+    .. py:method:: sell_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+        开空操作（借入证券并卖出），需账户支持融券。通常由 order 在 support_short 下先平后开自动调用。
+
+        :param Stock stock: 指定的证券
+        :param price_t price: 开空价格
+        :param float num: 开空数量
+        :param price_t stoploss: 止损价，默认为 0
+        :param price_t goal_price: 目标价，默认为 0
+        :param SystemPart part: 系统部分，默认为 PART_SIGNAL
+        :param str remark: 备注信息
+        :return: 交易记录
+        :rtype: TradeRecord
+
+    .. py:method:: buy_short(self, stock, price, num, stoploss=0.0, goal_price=0.0, part=SystemPart.PART_SIGNAL, remark='')
+
+        平空操作（买回证券并归还借入），用于关闭空头持仓。
+
+        :param Stock stock: 指定的证券
+        :param price_t price: 平空价格
+        :param float num: 平空数量
+        :param price_t stoploss: 止损价，默认为 0
+        :param price_t goal_price: 目标价，默认为 0
+        :param SystemPart part: 系统部分，默认为 PART_SIGNAL
+        :param str remark: 备注信息
+        :return: 交易记录
+        :rtype: TradeRecord
+
+
 
 .. py:function:: start_spot_agent(print=False, worker_num=1, addr="")
-    
+
     启动行情数据接收代理
-    
+
     如果之前已经处于运行状态，将抛出异常。
 
     :param bool print: 是否打印日志，默认为 False
@@ -257,7 +291,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 .. py:function:: crtBrokerTM(broker, cost_func=TC_Zero(), name="SYS", other_brokers=[])
 
     创建券商交易管理器
-    
+
     :param broker: 券商实例
     :param TradeCost cost_func: 交易成本函数，默认为 TC_Zero()
     :param str name: 名称，默认为"SYS"
@@ -267,12 +301,12 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 
 
 .. py:function:: run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])
-          
+
     方式1：在策略运行时执行系统交易 SYS
 
-    run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])   
+    run_in_strategy(sys, stock, query, broker, cost_func, other_brokers=[])
     目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
-     
+
     :param sys: 交易系统
     :param stock: 交易对象
     :param query: 查询条件
@@ -280,39 +314,79 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     :param cost_func: 成本函数
     :param list other_brokers: 其他的订单代理，默认为空列表
 
-    方式2: 在策略运行时执行组合策略 PF
-    
-    目前仅支持 buy_delay|sell_delay 均为 false 的系统，即 close 时执行交易
 
-    :param Portfolio pf: 资产组合
-    :param Query query: 查询条件
-    :param broker: 订单代理（专用与和账户资产同步的订单代理）
-    :param cost_func: 成本函数
-    :param list other_brokers: 其他的订单代理，默认为空列表
+.. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, name="SYSStrategy", other_brokers=[], config="")
 
+    创建系统策略（单证券实盘入口）
 
-.. py:function:: crt_sys_strategy(sys, stk_market_code, query, broker, cost_func, other_brokers=[], name="SYSStrategy", config="")
-
-    创建系统策略
-    
     :param sys: 交易系统
     :param str stk_market_code: 证券市场代码
     :param query: 查询条件
     :param broker: 订单代理
     :param cost_func: 成本函数
-    :param list other_brokers: 其他订单代理，默认为空列表
     :param str name: 策略名称，默认为"SYSStrategy"
-    :param str config: 配置文件路径，默认为空
-
-
-.. py:function:: crt_pf_strategy(pf, query, broker, cost_func, other_brokers=[], name="PFStrategy", config="")
-
-    创建组合策略
-    
-    :param pf: 资产组合
-    :param query: 查询条件
-    :param broker: 订单代理
-    :param cost_func: 成本函数
     :param list other_brokers: 其他订单代理，默认为空列表
-    :param str name: 策略名称，默认为"PFStrategy"
     :param str config: 配置文件路径，默认为空
+
+
+.. py:function:: crt_multi_sys_strategy(ms, stk_market_code, query, broker, cost_func, name="MultiSYSStrategy", other_brokers=[], config="")
+
+    创建聚合系统策略（MultiSystem 实盘入口）
+
+    父账户使用与券商同步的 ``BrokerTM``，子系统使用各自的影子/虚拟账户（模式 A/B 由 MultiSystem 内部决定）。
+    目前仅支持 buy_delay|sell_delay 均为 false 的子系统，即 close 时执行交易。
+
+    :param MultiSystem ms: 聚合交易系统
+    :param str stk_market_code: 驱动标的（如 "SH000001"，作为对齐时间轴，应覆盖各子系统交易日）
+    :param query: 查询条件
+    :param broker: 订单代理（与父账户资产同步的订单代理）
+    :param cost_func: 成本函数
+    :param str name: 策略名称，默认为"MultiSYSStrategy"
+    :param list other_brokers: 其他订单代理，默认为空列表
+    :param str config: 配置文件路径，默认为空
+
+
+组合策略迁移指南（PF → MultiSystem）
+--------------------------------------
+
+自 2.8.x 起，原组合回测组件 ``Portfolio`` / ``AllocateFunds`` 已移除，统一由 :class:`MultiSystem` 承接组合回测与实盘。
+
+**回测迁移**
+
+.. code-block:: python
+
+    # 旧写法（PF + AF，已移除）
+    # pf = crtPF(tm, mm, se, af, adjust_cycle=10)
+    # pf.run(query)
+
+    # 新写法（MultiSystem）
+    sys1 = SYS_Simple(tm=tm1, sg=sg1, mm=mm1)   # 各自独立 SG/MM
+    sys2 = SYS_Simple(tm=tm2, sg=sg2, mm=mm2)
+    ms = MultiSystem()          # 或 MultiSystem(name="Combo")
+    ms.tm = crtTM(init_cash=1000000)
+    ms.set_mode("A")            # 默认即可：A=信号汇总；B=资金划拨（FOF-MOM）
+    ms.set_adjust_cycle(10)     # 调仓周期（天），默认 1=每个收盘日再平衡
+    ms.add(sys1)
+    ms.add(sys2)
+    ms.run(sh000001.get_kdata(Query(-200)))   # 以覆盖各子系统交易日的时间轴驱动
+
+    # 模式 B：父按等权分配额度给子系统，子系统在额度内自主交易（L2 透传）
+    ms.set_mode("B")
+
+**实盘迁移**
+
+.. code-block:: python
+
+    # 旧写法（已移除）
+    # stg = crt_pf_strategy(pf, query, broker, cost_func)
+
+    # 新写法
+    stg = crt_multi_sys_strategy(ms, "SH000001", query, broker, cost_func)
+    stg.start()
+
+**说明**
+
+- 子系统必须各自持有独立的 SG/MM 实例（不同证券需各自计算信号，共享同一 SG 会被互相覆盖）。
+- 模式 A：父按权重（默认等权）统一分配并下单，子系统为纯信号源；模式 B：父分配真实额度，子系统自主决策。
+- SE（交易对象选择）可选：``ms.set_se(se)`` 后仅在调仓日运行选中子系统，未选中可强制清仓（``ms.set_sell_at_not_selected(True)``）。
+- 组合风控（集中度上限）由父 MM 参数 ``max-single-position`` 控制（默认 1.0 不限制）。

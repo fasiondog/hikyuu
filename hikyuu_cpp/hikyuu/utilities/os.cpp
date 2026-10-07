@@ -115,6 +115,9 @@ bool HKU_UTILS_API removeFile(const std::string &filename) noexcept {
 #ifdef _WIN32
 // Delete the directory and the files and subdirectories it contains
 bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
+    if (path.empty()) {
+        return false;
+    }
     std::string strPath = HKU_PATH(path);
     struct _finddata_t fb;  // The structure storing the found files of the same attribute
     // Create it for the path regularization
@@ -136,8 +139,17 @@ bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
                 // Build the complete path
                 pathTemp.clear();
                 pathTemp = strPath + std::string(fb.name);
+                // A reparse point (symlink/junction) is always removed as the link itself and
+                // never recursed into, to avoid deleting files outside the removed directory
+                if (fb.attrib & FILE_ATTRIBUTE_REPARSE_POINT) {
+                    if (fb.attrib & _A_SUBDIR) {
+                        _rmdir(pathTemp.c_str());
+                    } else {
+                        remove(pathTemp.c_str());
+                    }
+                }
                 // An attribute value of 16 means it is a folder, iterate
-                if (fb.attrib == _A_SUBDIR)  //_A_SUBDIR=16
+                else if (fb.attrib == _A_SUBDIR)  //_A_SUBDIR=16
                 {
                     removeDir(GBToUTF8(pathTemp));
                 }
@@ -160,6 +172,9 @@ bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
 #else   // #ifdef _WIN32
 // Delete the directory and the files and subdirectories it contains
 bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
+    if (path.empty()) {
+        return false;
+    }
     std::string strPath(path);
     if (strPath.at(strPath.length() - 1) != '\\' && strPath.at(strPath.length() - 1) != '/') {
         strPath.append("/");
@@ -175,7 +190,12 @@ bool HKU_UTILS_API removeDir(const std::string &path) noexcept {
                 struct stat st;        // The file information
                 std::string fileName;  // The file name inside the folder
                 fileName = strPath + std::string(dt->d_name);
-                stat(fileName.c_str(), &st);
+                // Use lstat so that symlinks are never followed: a symlink (even one pointing to
+                // a directory) is removed as the link itself instead of recursing into its target,
+                // which could delete files outside the removed directory
+                if (lstat(fileName.c_str(), &st) != 0) {
+                    continue;
+                }
                 if (S_ISDIR(st.st_mode)) {
                     removeDir(fileName);
                 } else {
@@ -193,12 +213,28 @@ bool HKU_UTILS_API copyFile(const std::string &src, const std::string &dst, bool
     bool success = false;
     try {
         std::ifstream srcio(HKU_PATH(src), std::ios::binary);
+        if (!srcio.is_open()) {
+            HKU_WARN("Failed to open source file for copy: {}", src);
+            return false;
+        }
+        // Open the destination only after the source is readable, so a missing source leaves no
+        // empty target behind
         std::ofstream dstio(HKU_PATH(dst), std::ios::binary);
+        if (!dstio.is_open()) {
+            HKU_WARN("Failed to open destination file for copy: {}", dst);
+            return false;
+        }
         dstio << srcio.rdbuf();
         if (flush) {
             dstio.flush();
         }
-        success = true;
+        // failbit is also set for a valid empty source (nothing inserted); badbit is the real error
+        success = !srcio.bad() && !dstio.bad();
+        if (!success) {
+            HKU_WARN("Failed to copy file: {} -> {}", src, dst);
+            dstio.close();
+            std::remove(HKU_PATH(dst).c_str());
+        }
     } catch (...) {
         success = false;
     }
@@ -207,18 +243,60 @@ bool HKU_UTILS_API copyFile(const std::string &src, const std::string &dst, bool
 
 bool HKU_UTILS_API renameFile(const std::string &oldname, const std::string &newname,
                               bool overlay) noexcept {
-    // Judge the file existence first, ensuring the std::rename behavior is system independent
+#ifdef _WIN32
     if (overlay) {
-        HKU_ERROR_IF_RETURN(existFile(newname) && !removeFile(newname), false,
-                            "Error renaming file! The new file is occupied");
-    } else {
-        HKU_ERROR_IF_RETURN(existFile(newname), false,
-                            "Error renaming file! The new file is occupied");
+        // MoveFileExA replaces the existing target in one atomic call, so no check-then-act race
+        if (!MoveFileExA(HKU_PATH(oldname).c_str(), HKU_PATH(newname).c_str(),
+                         MOVEFILE_REPLACE_EXISTING)) {
+            HKU_ERROR("Error renaming file! GetLastError: {}", GetLastError());
+            return false;
+        }
+        return true;
     }
-    int result = std::rename(HKU_PATH(oldname).c_str(), HKU_PATH(newname).c_str());
-    HKU_ERROR_IF_RETURN(result != 0, false, "Error renaming file! errno: {}, errmsg: {}", errno,
-                        strerror(errno));
+
+    // MoveFileA fails by itself when the target exists, so no pre-check is needed
+    if (!MoveFileA(HKU_PATH(oldname).c_str(), HKU_PATH(newname).c_str())) {
+        HKU_ERROR("Error renaming file! GetLastError: {}", GetLastError());
+        return false;
+    }
     return true;
+#else
+    if (overlay) {
+        // POSIX rename() replaces the existing target atomically, so no check-then-act race
+        if (std::rename(HKU_PATH(oldname).c_str(), HKU_PATH(newname).c_str()) != 0) {
+            HKU_ERROR("Error renaming file! errno: {}, errmsg: {}", errno, strerror(errno));
+            return false;
+        }
+        return true;
+    }
+
+    // link() creates newname atomically and fails with EEXIST when it already exists, which
+    // removes the check-then-rename race window. Directories cannot be hard-linked, and some
+    // filesystems do not support hard links at all, so fall back to the legacy path for them.
+    if (link(HKU_PATH(oldname).c_str(), HKU_PATH(newname).c_str()) == 0) {
+        // The content is already reachable via newname; only the old directory entry remains
+        if (unlink(HKU_PATH(oldname).c_str()) != 0) {
+            HKU_ERROR("Error unlinking old file after rename! errno: {}, errmsg: {}", errno,
+                      strerror(errno));
+            return false;
+        }
+        return true;
+    }
+
+    if (errno == EEXIST) {
+        HKU_ERROR("Error renaming file! The new file is occupied");
+        return false;
+    }
+
+    // Fallback for directories and filesystems without hard link support. A residual race
+    // between the existence check and rename remains only in this path.
+    HKU_ERROR_IF_RETURN(existFile(newname), false, "Error renaming file! The new file is occupied");
+    if (std::rename(HKU_PATH(oldname).c_str(), HKU_PATH(newname).c_str()) != 0) {
+        HKU_ERROR("Error renaming file! errno: {}, errmsg: {}", errno, strerror(errno));
+        return false;
+    }
+    return true;
+#endif
 }
 
 /*
@@ -240,7 +318,7 @@ static std::string _getUserDir() {
         return std::string(hdrive) + std::string(hpath);
     }
 
-    printf("Can't get user's path");
+    HKU_WARN("Can't get user's path!");
     return std::string();
 }
 
@@ -255,7 +333,7 @@ std::string HKU_UTILS_API getUserDir() {
 std::string HKU_UTILS_API getCurrentDir() {
     std::string ret;
     char *buffer = NULL;
-#if HKU_OS_WINSOWS
+#if HKU_OS_WINDOWS
     buffer = _getcwd(buffer, 0);
 #else
     buffer = getcwd(buffer, 0);
@@ -279,7 +357,10 @@ std::string HKU_UTILS_API getDllSelfDir() {
     char buffer[MAX_PATH];
     HMODULE hModule = GetModuleHandle(NULL);
     if (hModule != NULL) {
-        if (GetModuleFileNameA(hModule, buffer, MAX_PATH) > 0) {
+        DWORD len = GetModuleFileNameA(hModule, buffer, MAX_PATH);
+        // A return equal to the buffer size may mean truncation; only GetLastError can tell.
+        // A truncated path must not be treated as success.
+        if (len > 0 && (len < MAX_PATH || GetLastError() != ERROR_INSUFFICIENT_BUFFER)) {
             libraryPath = buffer;
         }
     }
@@ -485,7 +566,12 @@ uint64_t HKU_UTILS_API getMemoryIdleSize() {
     vm_statistics_data_t vmstat;
     mach_port_t hostPort = mach_host_self();
 
-    if (host_statistics(hostPort, HOST_VM_INFO, (host_info_t)&vmstat, &count) == KERN_SUCCESS) {
+    kern_return_t kr = host_statistics(hostPort, HOST_VM_INFO, (host_info_t)&vmstat, &count);
+    // mach_host_self returns a send right that must be deallocated, otherwise it leaks on every
+    // call
+    mach_port_deallocate(mach_task_self(), hostPort);
+
+    if (kr == KERN_SUCCESS) {
         // Calculate the free memory: the free pages + the inactive pages
         uint64_t pageSize = static_cast<uint64_t>(vm_page_size);
         uint64_t freeMemory =

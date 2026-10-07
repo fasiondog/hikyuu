@@ -32,7 +32,7 @@ option("sqlite", {description = "Enable sqlite kdata engine.", default = true})
 option("tdx", {description = "Enable tdx kdata engine.", default = true})
 option("sql_trace", {description = "trace print sql", default = false})
 
--- 注意：stacktrace 在 windows 下会严重影响性能
+-- Note: stacktrace seriously impacts the performance on Windows
 option("stacktrace", {description = "Enable check/assert with stack trace info.", default = false})
 option("spend_time", {description = "Enable spend time.", default = true})
 option("feedback", {description = "Enable send feedback.", default = true})
@@ -41,15 +41,17 @@ option("log_level", {description = "set log level.", default = 2, values = {1, 2
 option("async_log", {description = "Use async log.", default = false})
 option("leak_check", {description = "Enable leak check for test", default = false})
 
--- openmp 默认关闭，omp容易在数据不是全部在内存中时容易CPU占满空等，建议调测时使用
+-- openmp is disabled by default: when the data is not fully in memory the OMP threads tend
+-- to spin-wait and saturate the CPU; suggested for the debugging/profiling scenarios only
 option("omp", {description = "Enable openmp support.", default = false})
 
--- 不再直接包含 arrow, 此处保留仅作编译兼容，实际不再使用
+-- arrow is no longer included directly; kept only for the build compatibility, actually unused
 option("arrow", {description = "Enable arrow support.(Obsolete, kept only for compatibility)", default = false})
 
--- 使用 serialize 时，建议使用静态库方式编译，boost serializasion 对 dll 的方式支持不好
--- windows下如果使用 serialize 且希望使用动态库，需要设置 runtimes 参数为 "MD"
--- "MT" 方式下，serialize 会挂
+-- When serialize is enabled, building as a static library is recommended: boost serialization
+-- supports the DLL mode poorly
+-- On Windows, serialize with a dynamic library requires the runtimes option set to "MD"
+-- the "MT" mode makes serialize crash
 option("serialize", {description = "Enable support serialize object and pickle in python", default = true})
 
 -- option("http_client", {description = "use http client", default = true})
@@ -57,7 +59,8 @@ option("http_client_ssl", {description = "enable https support for http client",
 option("http_client_zip", {description = "enable http support gzip", default = false})
 -- option("node", {description = "enable node reqrep server/client", default = true})
 
--- boost mysql 同步模式下大数据量批量获取比 libmysqlclient 慢很多，可根据场景自行配置
+-- In the synchronous mode, boost.mysql is much slower than libmysqlclient for the bulk fetch
+-- of large data; configure it by the actual scenario
 option("disable_libmysqlclient", {description = "Disable use libmysqlclient", default = false})
 option("local", {description = "Enhance local vectorized compilation", default = false})
 
@@ -67,7 +70,7 @@ option("ta_lib")
     set_showmenu(true)
     set_category("hikyuu")
     set_description("Enable ta-lib support.")
-    -- low_precision 时，需禁用，ta-lib不支持输出为 float
+    -- must be disabled with low_precision: ta-lib does not support the float output
     after_check(function (option)
       if option:dep("low_precision"):enabled() then
           cprint('${red}[warning] "low_precision" is enabled, ta-lib will be disabled')
@@ -77,7 +80,7 @@ option("ta_lib")
 option_end()
 
 
--- SPDLOG_ACTIVE_LEVEL 需要单独加
+-- SPDLOG_ACTIVE_LEVEL must be added separately
 local log_level = get_config("log_level")
 if log_level == nil then
     log_level = 2
@@ -165,7 +168,7 @@ local boost_config = {
             serialization = true, --get_config("serialize"),
             system = true,
             python = false,
-            -- 以下为兼容 arrow 等其他组件
+            -- the following is kept for the compatibility with arrow and the other components
             thread = true,   -- parquet need
             chrono = true,   -- parquet need
             charconv = true, -- parquet, boost.mysql need
@@ -177,7 +180,7 @@ local boost_config = {
             regex = true,
             random = true,
             thread = true,
-            -- asio = true,  -- 1.92 boost asio仅少量需要编译的部分合并入了beast
+            -- asio = true,  -- since boost 1.92 only a small compilable part of asio is merged into beast
             openssl = has_config("mysql"),
             mysql = has_config("mysql"),            
             cmake = false,
@@ -221,7 +224,7 @@ if has_config("ta_lib") then
     add_requires("ta-lib", {system = false})
 end
 
-add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- 禁用 spdlog 默认ogger
+add_defines("SPDLOG_DISABLE_DEFAULT_LOGGER") -- disable the default spdlog logger
 add_defines("BOOST_ASIO_DISABLE_DEPRECATED")
 
 set_objectdir("$(builddir)/$(mode)/$(plat)/$(arch)/.objs")

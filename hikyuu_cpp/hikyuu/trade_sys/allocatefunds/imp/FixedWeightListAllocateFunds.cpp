@@ -1,11 +1,12 @@
 /*
- *  Copyright (c) 2025 hikyuu.org
+ * FixedWeightListAllocateFunds.cpp
  *
- *  Created on: 2025-02-07
- *      Author: fasiondog
+ *  Copyright (c) 2025 hikyuu.org
  */
 
 #include "FixedWeightListAllocateFunds.h"
+
+#include <algorithm>
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedWeightListAllocateFunds)
@@ -13,47 +14,37 @@ BOOST_CLASS_EXPORT(hku::FixedWeightListAllocateFunds)
 
 namespace hku {
 
-FixedWeightListAllocateFunds::FixedWeightListAllocateFunds()
-: AllocateFundsBase("AF_FixedWeightList") {
+FixedWeightListAllocateFunds::FixedWeightListAllocateFunds() : AllocateFundsBase("AF_FixedWeightList") {
     setParam<PriceList>("weights", PriceList());
-    // The common parameter must be set to false, the automatic weight adjustment is forbidden
-    setParam<bool>("auto_adjust_weight", false);
-}
 
-FixedWeightListAllocateFunds::FixedWeightListAllocateFunds(const PriceList& weights)
-: AllocateFundsBase("AF_FixedWeightList") {
-    setParam<PriceList>("weights", weights);
-    // The common parameter must be set to false, the automatic weight adjustment is forbidden
-    setParam<bool>("auto_adjust_weight", false);
 }
 
 FixedWeightListAllocateFunds::~FixedWeightListAllocateFunds() {}
 
 void FixedWeightListAllocateFunds::_checkParam(const string& name) const {
-    if ("auto_adjust_weight" == name) {
-        bool auto_adjust_weight = getParam<bool>("auto_adjust_weight");
-        HKU_CHECK(!auto_adjust_weight, R"(param "auto_adjust_weight" must be false!)");
+    if ("weights" == name) {
+        PriceList ws = getParam<PriceList>("weights");
+        for (auto w : ws) {
+            HKU_ASSERT(w >= 0.0);
+        }
     }
 }
 
-SystemWeightList FixedWeightListAllocateFunds ::_allocateWeight(const Datetime& date,
-                                                                const SystemWeightList& se_list) {
-    SystemWeightList result;
-    const PriceList& weights = getParam<const PriceList&>("weights");
-    size_t w_total = weights.size();
-    size_t wi = 0;
-    for (auto iter = se_list.begin(); iter != se_list.end() && wi < w_total; ++iter) {
-        result.emplace_back(iter->sys, weights[wi++]);
+AllocateFundsBase::Weights FixedWeightListAllocateFunds::_allocate(const Datetime& date,
+                                                                   const TradeManagerPtr& tm,
+                                                                   SubSystemContextList& contexts,
+                                                                   const KQuery& query) {
+    PriceList ws = getParam<PriceList>("weights");
+    if (ws.size() != contexts.size()) {
+        HKU_WARN_IF(!ws.empty(),
+                    "weights size({}) != subsystems({}), fallback to equal weight! [{}]", ws.size(),
+                    contexts.size(), name());
+        return _applyWeights(
+          date, tm, contexts, query,
+          std::vector<double>(contexts.size(), 1.0 / std::max<size_t>(contexts.size(), 1)));
     }
-
-    return result;
+    // Without normalization: take the fixed proportions one by one in order
+    return _applyWeights(date, tm, contexts, query, std::vector<double>(ws.begin(), ws.end()));
 }
 
-AFPtr HKU_API AF_FixedWeightList(const PriceList& weights) {
-    HKU_ERROR_IF(weights.empty(), "Input weights is empty!");
-    auto p = make_shared<FixedWeightListAllocateFunds>(weights);
-    p->setParam<PriceList>("weights", weights);
-    return p;
-}
-
-} /* namespace hku */
+}  // namespace hku

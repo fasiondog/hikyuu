@@ -516,8 +516,8 @@ TEST_CASE("test_FactorSet_block_check") {
 
         // Create a factor with an empty Block
         Block empty_block;
-        Factor factor_empty("EMPTY", ma5, KQuery::DAY, "empty Block factor", "", false, Datetime::min(),
-                            empty_block);
+        Factor factor_empty("EMPTY", ma5, KQuery::DAY, "empty Block factor", "", false,
+                            Datetime::min(), empty_block);
 
         // A factor with an empty Block should be added normally
         CHECK_NOTHROW(fs.add(factor_empty));
@@ -1696,8 +1696,8 @@ TEST_CASE("test_FactorSet_serialization") {
     // Create the Block for the test
     Block test_block("industry", "test sector");
 
-    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor", "test 5-day MA", false, Datetime::min(),
-                   test_block);
+    Factor factor1("MA5", ma5, KQuery::DAY, "5-day MA factor", "test 5-day MA", false,
+                   Datetime::min(), test_block);
     Factor factor2("MA10", ma10, KQuery::DAY, "10-day MA factor", "test 10-day MA", false,
                    Datetime::min(), test_block);
 

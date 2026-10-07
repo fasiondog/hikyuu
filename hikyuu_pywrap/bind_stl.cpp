@@ -12,8 +12,8 @@
 using namespace hku;
 namespace py = pybind11;
 
-// pybind converts between the vector and the list by default, which affects the performance when the data volume is too large
-// Only consider exporting the types that may affect the performance
+// pybind converts between the vector and the list by default, which affects the performance when
+// the data volume is too large Only consider exporting the types that may affect the performance
 
 void export_bind_stl(py::module& m) {
     // py::bind_vector<PriceList>(m, "PriceList");
@@ -33,4 +33,7 @@ void export_bind_stl(py::module& m) {
     py::bind_vector<SystemWeightList>(m, "SystemWeightList");
     // py::bind_vector<SystemList>(m, "SystemList");
     py::bind_vector<ScoreRecordList>(m, "ScoreRecordList");
+    // The AF virtual functions rewrite the suggestions/contexts in place (opaque, see bind_stl.h)
+    py::bind_vector<TradeSuggestionList>(m, "TradeSuggestionList");
+    py::bind_vector<SubSystemContextList>(m, "SubSystemContextList");
 }

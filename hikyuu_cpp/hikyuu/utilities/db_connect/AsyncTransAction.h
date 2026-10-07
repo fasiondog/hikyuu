@@ -20,8 +20,12 @@ namespace hku {
  * block and commits it automatically after the code block exits
  * @note When there are multiple data changes, an exception thrown in the middle of the program
  *       processing may cause the data to be partially committed
- * @details It rolls back automatically when commit() fails, and rolls back automatically in the
- *          destructor if it has not been committed (using a detached coroutine)
+ * @details The commit is performed in the destructor (using a detached coroutine); it rolls back
+ *          automatically when the commit fails
+ * @note The io_context that runs the create() coroutine must outlive this object, for the
+ *       destructor spawns the commit coroutine on it. If the io_context has been stopped before
+ *       the destruction, the commit cannot be performed anymore and is skipped with a warning
+ *       logged; the transaction is then rolled back when the connection is closed.
  * @ingroup DBConnect
  */
 class AsyncAutoTransAction final {
@@ -49,36 +53,46 @@ public:
         return m_driver;
     }
 
-    /** Destructor: it rolls back automatically if it has not been committed */
+    /** Destructor: it commits the transaction automatically (rolls back if the commit fails) */
     ~AsyncAutoTransAction() {
-        if (!m_committed && m_driver && m_io_context) {
-            // Start a detached coroutine to roll back (fire and forget)
-            net::asio::co_spawn(
-              *m_io_context,
-              [driver = m_driver]() -> net::awaitable<void> {
-                  try {
-                      co_await driver->commit();
-                      co_return;
-                  } catch (const std::exception& e) {
-                      HKU_ERROR("Failed to commit transaction! {}", e.what());
-                  } catch (...) {
-                      HKU_ERROR("Failed to commit! Unknown exception!");
-                  }
-                  try {
-                      co_await driver->rollback();
-                      HKU_INFO("Transaction rolled back successfully!");
-                  } catch (...) {
-                      HKU_ERROR("Failed to rollback transaction! Unknown exception!");
-                  }
-              },
-              net::asio::detached);
+        if (!m_started || !m_driver || !m_io_context) {
+            return;
         }
+
+        if (m_io_context->stopped()) {
+            HKU_WARN(
+              "AsyncAutoTransAction: io_context stopped, the transaction cannot be committed "
+              "and will be rolled back when the connection is closed!");
+            return;
+        }
+
+        // Start a detached coroutine to commit (fire and forget); it rolls back automatically
+        // when the commit fails
+        net::asio::co_spawn(
+          *m_io_context,
+          [driver = m_driver]() -> net::awaitable<void> {
+              try {
+                  co_await driver->commit();
+                  co_return;
+              } catch (const std::exception& e) {
+                  HKU_ERROR("Failed to commit transaction! {}", e.what());
+              } catch (...) {
+                  HKU_ERROR("Failed to commit! Unknown exception!");
+              }
+              try {
+                  co_await driver->rollback();
+                  HKU_INFO("Transaction rolled back successfully!");
+              } catch (...) {
+                  HKU_ERROR("Failed to rollback transaction! Unknown exception!");
+              }
+          },
+          net::asio::detached);
     }
 
 private:
     /* Private constructor */
     explicit AsyncAutoTransAction(const AsyncDBConnectPtr& driver)
-    : m_driver(driver), m_io_context(nullptr), m_committed(false) {
+    : m_driver(driver), m_io_context(nullptr), m_started(false) {
         HKU_CHECK(m_driver, "Null AsyncDBConnectPtr!");
     }
 
@@ -90,12 +104,13 @@ private:
 
         // Start the transaction
         co_await m_driver->transaction();
+        m_started = true;
     }
 
 private:
     AsyncDBConnectPtr m_driver;
     boost::asio::io_context* m_io_context = nullptr;
-    bool m_committed = false;
+    bool m_started = false;
 };
 
 /**

@@ -12,7 +12,7 @@
 #include "../system/System.h"
 #include "../../KData.h"
 #include "../../utilities/Parameter.h"
-#include "hikyuu/trade_sys/allocatefunds/AllocateFundsBase.h"
+
 #include "hikyuu/trade_sys/multifactor/MultiFactorBase.h"
 #include "SystemWeight.h"
 
@@ -126,7 +126,7 @@ public:
     /** Subclass interface to get the targets selected at the close of the given moment */
     virtual SystemWeightList _getSelected(Datetime date) = 0;
 
-    virtual bool isMatchAF(const AFPtr& af) = 0;
+
 
     /** Add a prototype system in the subclass used for the logical operations; it generally does
      *  not need to be implemented by the subclass */
@@ -265,7 +265,6 @@ public:                                                            \
         return std::make_shared<classname>();                      \
     }                                                              \
     virtual SystemWeightList _getSelected(Datetime date) override; \
-    virtual bool isMatchAF(const AFPtr& af) override;              \
     virtual void _calculate() override;
 
 /**

@@ -35,7 +35,7 @@
     :param Query.KType ktype: K线类型(按该类型逐 Bar 执行测试)
     :param str ref_market: 所属市场
     :param int mode: 0 - 当前bar收盘价执行买卖操作; 1 - 下一bar开盘价执行买卖操作
-    :param support_short: 是否支持卖空
+    :param support_short: 是否支持卖空；为 True 时，卖单中超过当前多头持仓的部分将通过融券做空（先平后开），需账户支持融券
     :param Slippage sp: 滑点算法
 
 

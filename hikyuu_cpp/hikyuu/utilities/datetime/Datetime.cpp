@@ -306,31 +306,31 @@ uint64_t Datetime::ticks() const noexcept {
     }
 }
 
-uint64_t Datetime::timestamp() const noexcept {
+int64_t Datetime::timestamp() const noexcept {
     try {
-        HKU_IF_RETURN(isNull(), Null<uint64_t>());
+        HKU_IF_RETURN(isNull(), Null<int64_t>());
         TimeDelta d = (*this) - Datetime(1970, 1, 1);
         return d.ticks();
     } catch (const std::exception &e) {
         HKU_ERROR(e.what());
-        return Null<uint64_t>();
+        return Null<int64_t>();
     } catch (...) {
         HKU_ERROR("Unknown error!");
-        return Null<uint64_t>();
+        return Null<int64_t>();
     }
 }
 
-uint64_t Datetime::timestampUTC() const noexcept {
+int64_t Datetime::timestampUTC() const noexcept {
     try {
-        HKU_IF_RETURN(isNull(), Null<uint64_t>());
+        HKU_IF_RETURN(isNull(), Null<int64_t>());
         TimeDelta d = (*this) - Datetime(1970, 1, 1) - UTCOffset();
         return d.ticks();
     } catch (const std::exception &e) {
         HKU_ERROR(e.what());
-        return Null<uint64_t>();
+        return Null<int64_t>();
     } catch (...) {
         HKU_ERROR("Unknown error!");
-        return Null<uint64_t>();
+        return Null<int64_t>();
     }
 }
 

@@ -111,7 +111,7 @@ from hikyuu.interactive import *
 # Create a simulated trading account for backtesting, with initial capital of 300,000
 my_tm = crtTM(init_cash=300000)
 
-# Create a signal indicator (fast line: 5-day EMA; slow line: 10-day EMA)
+# Create a signal generator (fast line: 5-day EMA; slow line: 10-day EMA)
 # Buy when the fast line crosses above the slow line, sell otherwise
 my_sg = SG_Flex(EMA(CLOSE(), n=5), slow_n=10)
 

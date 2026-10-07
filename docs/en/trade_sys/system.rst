@@ -6,7 +6,20 @@ System Strategy|SYS
 
 A System is a complete trading strategy for a single instrument. It bundles together the market environment, the system validity condition, money management, the stop-loss, the take-profit, the profit goal, and the slippage parts, and is used to run backtests.
 
-To trade multiple instruments, use a portfolio in Hikyuu; see :ref:`portfolio`.
+For multiple instruments (multiple securities), :class:`MultiSystem` can be used to aggregate multiple System instances (each for a single security, or even a nested :class:`MultiSystem`) into a portfolio that is backtested uniformly under the same trading account (TM). Sub-systems are added to :class:`MultiSystem` through ``add(subsystem)``; it supports **arbitrary nesting** and circular-reference detection. Each sub-system keeps its own SG/MM/EV/CN/ST/TP/PG/SP strategies, and only the parent keeps the books and places orders uniformly.
+
+:class:`MultiSystem` supports two run modes (``set_mode``; the mode is held by the AF and can also be set through the AF factories passed to ``set_af``):
+
+- **Mode A "Signal Aggregation" (the default)**: each sub-system holds a signal "shadow account" (the signal cash set via ``set_sub_init_cash``, **reset on every rebalancing day**) and acts as a pure signal source submitting its position intent; the parent converts the suggestions into the target market value by the AF L2 (weight x position ratio x the parent total assets) and places all orders uniformly. The shadow bookkeeping never touches the real funds.
+- **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: on every rebalancing day the AF allocates the quota to each selected sub-system first (L1); each selected sub-system is calibrated to its quota BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through), while the L3 risk control is skipped (the sub-manager autonomy is respected). The shadow accounts start from zero and follow the cost function of the parent account, keeping in step with the parent trades.
+
+Aggregated backtesting also supports:
+
+- **AF L1/L2/L3 layering** (see :doc:`../trade_portfolio/allocate_funds` for details): L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B; e.g. equal weight 1/N, fixed weights, weighted by the SE score), L2 performs behavior-level conversion (in A the target market value = weight x position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta; in B the instructions pass through), and L3 provides portfolio risk control (the concentration limit ``max-single-position``, which defaults to 1.0, meaning no limit; skipped in mode B).
+- **Rebalancing cycle** (``set_adjust_cycle``): by default, rebalancing happens on every close day; once the number of days is set to a value greater than 1, rebalancing occurs only on the cycle days.
+- **Instrument selection (SE)** (``set_se``): optional; on a rebalance day, only the selected sub-systems run, and the unselected ones can be force-liquidated (``set_sell_at_not_selected``).
+- **Turnover rate** (``get_adjust_turnover``): on each rebalance day, records the ratio of the traded amount to the total assets before rebalancing.
+- **Delisting/suspension**: the parent uniformly force-sells the positions in delisted instruments during the open stage; the sub-systems automatically skip the suspended bars.
 
 Common parameters:
 
@@ -107,7 +120,7 @@ Create a System and Run the Backtest
     
     :param TradeManager tm: the trade manager instance 
     :param MoneyManager mm: the money management strategy
-    :param EnvironmentBase ev: the market environment strategy
+    :param EnvironmentBase ev: the environment judgment strategy
     :param ConditionBase cn: the system validity condition
     :param SignalBase sg: the signal generator
     :param StoplossBase st: the stop-loss strategy
@@ -126,7 +139,7 @@ System Part Enum Definitions
     
     In practice, the shorthand System.ENVIRONMENT can be used in place of System.Part.ENVIRONMENT, and similarly for the others.
 
-    - System.Part.ENVIRONMENT  - Market environment strategy
+    - System.Part.ENVIRONMENT  - Environment judgment strategy
     - System.Part.CONDITION    - System validity condition
     - System.Part.SIGNAL       - Signal generator
     - System.Part.STOPLOSS     - Stop-loss strategy
@@ -185,7 +198,7 @@ System Base Class Definition
         
     .. py:attribute:: ev  
     
-        The market environment strategy
+        The environment judgment strategy
         
     .. py:attribute:: cn  
     
@@ -240,17 +253,17 @@ System Base Class Definition
         
         :rtype: TradeRecordList
         
-    .. py:method:: get_buy_trade_request(self)
+    .. py:method:: get_buy_trade_request_list(self)
 
-        Get the pending buy request; in "delay" mode, use this to check whether a buy operation will occur on the next bar
+        Get the list of buy requests; in "delay" mode, use this to check whether a buy operation will occur on the next bar
 
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
 
-    .. py:method:: get_sell_trade_request(self)
+    .. py:method:: get_sell_trade_request_list(self)
 
-        Get the pending sell request; in "delay" mode, use this to check whether a sell operation will occur on the next bar
+        Get the list of sell requests; in "delay" mode, use this to check whether a sell operation will occur on the next bar
 
-        :rtype: TradeRequest
+        :rtype: list[TradeRequest]
                 
     .. py:function:: run(self, stock, query[, reset=True])
     
@@ -263,11 +276,11 @@ System Base Class Definition
 
     .. py:method:: reset(self)
     
-        Reset the system, excluding the existing trading object and the shared parts
-        
+        Reset the system, excluding the current instrument and the shared parts
+
     .. py:method:: force_reset_all(self)
 
-        Force-reset all parts and clear the existing trading object, ignoring the shared attributes of the parts
+        Force-reset all parts and clear the existing instrument, ignoring the shared attributes of the parts
 
     .. py:method:: clone(self)
     
@@ -280,7 +293,7 @@ Trade Request Records
 
 .. py:class:: TradeRequest
 
-    A trade request record. It holds the trade request information registered inside the system when delayed operations are performed. This structure is exposed mainly for use in "delay" mode (where the trade is delayed to the open of the next bar): in this case the system already knows that a trade will happen on the next bar, and :py:meth:`System.getBuyTradeRequest` and :py:meth:`System.getSellTradeRequest` can be used to find out whether the next bar needs a buy or a sell. It is mainly used for alerting on or printing the operations needed on the next bar. It has no effect on the running of the system itself.
+    A trade request record. It holds the trade request information registered inside the system when delayed operations are performed. This structure is exposed mainly for use in "delay" mode (where the trade is delayed to the open of the next bar): in this case the system already knows that a trade will happen on the next bar, and :py:meth:`System.getBuyTradeRequestList` and :py:meth:`System.getSellTradeRequestList` can be used to find out whether the next bar needs a buy or a sell. It is mainly used for alerting on or printing the operations needed on the next bar. It has no effect on the running of the system itself.
     
     .. py:attribute:: valid 
         

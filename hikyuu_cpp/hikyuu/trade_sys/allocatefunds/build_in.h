@@ -1,18 +1,21 @@
 /*
  * build_in.h
  *
+ *  AF has an independent class hierarchy (AllocateFundsBase)
  *  Created on: 2018-2-1
  *      Author: fasiondog
  */
 
 #pragma once
-#ifndef TRADE_SYS_ALLOCATEFUNDS_BUILD_IN_H_
-#define TRADE_SYS_ALLOCATEFUNDS_BUILD_IN_H_
+#ifndef ALLOCATEFUNDS_BUILD_IN_H_
+#define ALLOCATEFUNDS_BUILD_IN_H_
 
+#include "AllocateFundsBase.h"
+#include "imp/build_in.h"
 #include "crt/AF_EqualWeight.h"
 #include "crt/AF_FixedWeight.h"
 #include "crt/AF_FixedWeightList.h"
-#include "crt/AF_MultiFactor.h"
 #include "crt/AF_FixedAmount.h"
+#include "crt/AF_MultiFactor.h"
 
-#endif /* TRADE_SYS_ALLOCATEFUNDS_BUILD_IN_H_ */
+#endif /* ALLOCATEFUNDS_BUILD_IN_H_ */

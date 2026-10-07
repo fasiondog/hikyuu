@@ -118,9 +118,7 @@ void OperatorSelector::_reset() {
     m_real_to_proto.clear();
 }
 
-bool OperatorSelector::isMatchAF(const AFPtr& af) {
-    return true;
-}
+
 
 void OperatorSelector::_addSystem(const SYSPtr& sys) {
     if (m_se1) {

@@ -22,14 +22,13 @@
 #include "../slippage/SlippageBase.h"
 #include "TradeRequest.h"
 #include "SystemPart.h"
+#include "MomentResult.h"
 #include "../../serialization/KData_serialization.h"
 
 namespace hku {
 
 using json = nlohmann::json;
 
-class HKU_API Portfolio;
-class HKU_API AllocateFundsBase;
 class HKU_API WalkForwardSystem;
 
 /**
@@ -38,8 +37,6 @@ class HKU_API WalkForwardSystem;
  */
 class HKU_API System : public enable_shared_from_this<System> {
     PARAMETER_SUPPORT_WITH_CHECK
-    friend class HKU_API Portfolio;
-    friend class HKU_API AllocateFundsBase;
     friend class HKU_API WalkForwardSystem;
 
 public:
@@ -81,7 +78,7 @@ public:
     /** Set the name */
     void name(const string& name);
 
-    /** Get the trading object */
+    /** Get the traded K-line data (TO) */
     KData getTO() const;
 
     /** Get the managed account */
@@ -150,16 +147,16 @@ public:
      *  equity/dividend adjustment are not included */
     const TradeRecordList& getTradeRecordList() const;
 
-    /** Get the buy request; in "delay" mode it shows whether a buy operation exists at the next
-     *  moment */
-    const TradeRequest& getBuyTradeRequest() const;
+    /** Get the buy request list; in "delay" mode it shows whether a buy operation exists at the
+     *  next moment */
+    const std::vector<TradeRequest>& getBuyTradeRequestList() const;
 
-    /** Get the sell request; in "delay" mode it shows whether a sell operation exists at the next
-     *  moment */
-    const TradeRequest& getSellTradeRequest() const;
+    /** Get the sell request list; in "delay" mode it shows whether a sell operation exists at the
+     *  next moment */
+    const std::vector<TradeRequest>& getSellTradeRequestList() const;
 
-    const TradeRequest& getSellShortTradeRequest() const;
-    const TradeRequest& getBuyShortTradeRequest() const;
+    const std::vector<TradeRequest>& getSellShortTradeRequestList() const;
+    const std::vector<TradeRequest>& getBuyShortTradeRequestList() const;
 
     /** Mark all the parts as not shared */
     void setNotSharedAll();
@@ -182,7 +179,7 @@ public:
     SystemPtr clone();
 
     /**
-     * Set the trading object
+     * Set the traded K-line data (TO)
      * @note tm and ev have no setTO interface
      */
     void setTO(const KData& kdata);
@@ -214,7 +211,7 @@ public:
 
     /**
      * @brief Run the system
-     * @param kdata the given trading object
+     * @param kdata the given traded K-line data (TO)
      * @param reset whether to reset according to the shared attribute of the system parts before
      *              execution
      * @param resetAll force resetting all the parts
@@ -222,14 +219,53 @@ public:
     virtual void run(const KData& kdata, bool reset = true, bool resetAll = false);
 
     /**
-     * @brief Execute one step on the given date, called by PF only
+     * @brief Execute one step on the given date, called by the aggregate system (MultiSystem) or
+     *        the live trading driver
      * @param datetime the given date
-     * @return TradeRecord
+     * @return MomentResult
      */
-    virtual TradeRecord runMoment(const Datetime& datetime);
+    virtual MomentResult runMoment(const Datetime& datetime);
 
-    virtual TradeRecord runMomentOnOpen(const Datetime& datetime);
-    virtual TradeRecord runMomentOnClose(const Datetime& datetime);
+    virtual MomentResult runMomentOnOpen(const Datetime& datetime);
+    virtual MomentResult runMomentOnClose(const Datetime& datetime);
+
+    //========================================
+    // The aggregate form (MultiSystem) interface, the single-security form returns the default
+    // value
+    //========================================
+
+    /** Whether it is the aggregate form (holding sub-systems). The single-security form returns
+     * false. */
+    virtual bool isComposite() const {
+        return false;
+    }
+
+    /** Get the direct sub-system list, overridden by the aggregate form. The single-security form
+     * returns an empty list. */
+    virtual const std::vector<std::shared_ptr<System>>& getSubSystemList() const;
+
+    /** The hierarchy path (e.g. I/D/A), used by trace and debugging. Maintained by the aggregate
+     * form at readyForRun. */
+    virtual const string& getPath() const {
+        return m_path;
+    }
+
+    /** Set the hierarchy path (the aggregate form writes it into the sub-systems recursively at
+     * readyForRun) */
+    void setPath(const string& path) {
+        m_path = path;
+    }
+
+    /** [Mode B] The parent writes the allocation quota back to the sub-system (on the rebalancing
+     * day only). It is a no-op for the single-security form. */
+    virtual void setSubSystemQuota(const std::shared_ptr<System>& sub_sys, const Datetime& date,
+                                   price_t quota) {}
+
+    /** Translate the trade of this moment into the parent suggestion (overridden by the aggregate
+     * form). The single-security form returns empty. */
+    virtual TradeSuggestionList toSuggestions() const {
+        return TradeSuggestionList{};
+    }
 
     // Preparation before running; an exception is thrown on failure
     virtual void readyForRun();
@@ -252,37 +288,39 @@ public:
 
 public:
     //-------------------------
-    // For internal use by PF/AF only
+    // For internal use by the aggregate system (MultiSystem) only
     //-------------------------
 
-    // Force selling at the open price, for internal use by PF/AF only
+    // Force selling at the open price, for internal use by the aggregate system only
+    // @note from allows PART_SYSTEM; PART_PORTFOLIO is a historical compatibility value of the
+    //       deprecated PF (kept for the compatibility with the old serialized data)
     virtual TradeRecord sellForceOnOpen(const Datetime& date, double num, Part from) {
-        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        HKU_ASSERT(from == PART_PORTFOLIO || from == PART_SYSTEM);
         return _sellForce(date, num, from, true);
     }
 
-    // Force selling at the close price, for internal use by PF/AF only
+    // Force selling at the close price, for internal use by the aggregate system only
     virtual TradeRecord sellForceOnClose(const Datetime& date, double num, Part from) {
-        HKU_ASSERT(from == PART_ALLOCATEFUNDS || from == PART_PORTFOLIO);
+        HKU_ASSERT(from == PART_PORTFOLIO || from == PART_SYSTEM);
         return _sellForce(date, num, from, false);
     }
 
-    // Clear the existing trade requests, used by Portfolio
+    // Clear the existing trade requests, used by the aggregate system
     virtual void clearDelayBuyRequest();
 
-    // Whether a delayed operation request currently exists, used by Portfolio
+    // Whether a delayed operation request currently exists, used by the aggregate system
     bool haveDelaySellRequest() const {
-        return m_sellRequest.valid;
+        return !m_sellRequestList.empty();
     }
 
     bool haveDelayBuyRequest() const {
-        return m_buyRequest.valid;
+        return !m_buyRequestList.empty();
     }
 
-    // Process the delayed sell request, called by PF only
+    // Process the delayed sell request, called by the aggregate system only
     virtual TradeRecord pfProcessDelaySellRequest(const Datetime& date);
 
-    // Process the delayed buy request, called by PF only
+    // Process the delayed buy request, called by the aggregate system only
     virtual TradeRecord pfProcessDelayBuyRequest(const Datetime& date);
 
     bool isPythonObject() const noexcept {
@@ -348,13 +386,14 @@ private:
     TradeRecord _runMomentOnOpen(const KRecord& today, const KRecord& src_today);
     TradeRecord _runMomentOnClose(const KRecord& today, const KRecord& src_today);
 
-    // Portfolio | AllocateFunds instructs an immediate forced sell, so that the funds of the
-    // buy_delay system can be adjusted
+    // The aggregate system (MultiSystem) instructs an immediate forced sell, so that the funds of
+    // the buy_delay system can be adjusted
     TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);
 
 protected:
     TradeManagerPtr m_tm;
     MoneyManagerPtr m_mm;
+    string m_path;  // The hierarchy path (used by the aggregate form)
     EnvironmentPtr m_ev;
     ConditionPtr m_cn;
     SignalPtr m_sg;
@@ -381,10 +420,10 @@ protected:
                                     // take-profit price increases monotonically
     price_t m_lastShortTakeProfit;  // The last short take-profit price
 
-    TradeRequest m_buyRequest;
-    TradeRequest m_sellRequest;
-    TradeRequest m_sellShortRequest;
-    TradeRequest m_buyShortRequest;
+    std::vector<TradeRequest> m_buyRequestList;
+    std::vector<TradeRequest> m_sellRequestList;
+    std::vector<TradeRequest> m_sellShortRequestList;
+    std::vector<TradeRequest> m_buyShortRequestList;
 
 private:
     void initParam();  // Initialize the parameters and their default values
@@ -424,10 +463,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
 
-        ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequestList);
     }
 
     template <class Archive>
@@ -459,10 +498,10 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
         ar& BOOST_SERIALIZATION_NVP(m_lastShortTakeProfit);
 
-        ar& BOOST_SERIALIZATION_NVP(m_buyRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequest);
-        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequest);
+        ar& BOOST_SERIALIZATION_NVP(m_buyRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_sellShortRequestList);
+        ar& BOOST_SERIALIZATION_NVP(m_buyShortRequestList);
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -610,20 +649,20 @@ inline const TradeRecordList& System::getTradeRecordList() const {
     return m_trade_list;
 }
 
-inline const TradeRequest& System::getBuyTradeRequest() const {
-    return m_buyRequest;
+inline const std::vector<TradeRequest>& System::getBuyTradeRequestList() const {
+    return m_buyRequestList;
 }
 
-inline const TradeRequest& System::getSellTradeRequest() const {
-    return m_sellRequest;
+inline const std::vector<TradeRequest>& System::getSellTradeRequestList() const {
+    return m_sellRequestList;
 }
 
-inline const TradeRequest& System::getSellShortTradeRequest() const {
-    return m_sellShortRequest;
+inline const std::vector<TradeRequest>& System::getSellShortTradeRequestList() const {
+    return m_sellShortRequestList;
 }
 
-inline const TradeRequest& System::getBuyShortTradeRequest() const {
-    return m_buyShortRequest;
+inline const std::vector<TradeRequest>& System::getBuyShortTradeRequestList() const {
+    return m_buyShortRequestList;
 }
 
 inline bool System::_environmentIsValid(const Datetime& datetime) {

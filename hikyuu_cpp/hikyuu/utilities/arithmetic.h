@@ -151,9 +151,9 @@ ValueT roundUp(ValueT number, int ndigits = 0) {
     }
 
     if (number >= 0.0) {
-        number = std::floor(number + 1.0);
+        number = std::ceil(number);
     } else {
-        number = std::ceil(number - 1.0);
+        number = std::floor(number);
     }
 
     if (ndigits < 0) {
@@ -233,16 +233,14 @@ bool HKU_UTILS_API utf8_fold_equal(const std::string &s1, const std::string &s2)
 /** Whether a UTF-8 string contains a substring */
 bool HKU_UTILS_API utf8_contains(const std::string &s, const std::string &sub) noexcept;
 
-/** Remove the spaces at both ends of a string */
+/** Remove the blanks (spaces, tabs and CRLF) at both ends of a string */
 inline void trim(std::string &s) {
     if (s.empty()) {
         return;
     }
 
-    s.erase(0, s.find_first_not_of(" "));
-    s.erase(s.find_last_not_of(" ") + 1);
-    s.erase(s.find_last_not_of("\r") + 1);
-    s.erase(s.find_last_not_of("\n") + 1);
+    s.erase(0, s.find_first_not_of(" \t\r\n"));
+    s.erase(s.find_last_not_of(" \t\r\n") + 1);
 }
 
 #if CPP_STANDARD >= CPP_STANDARD_17
@@ -362,20 +360,17 @@ inline std::string byteToHexStr(const char *bytes, size_t in_len) {
         return hexstr;
     }
 
-    char *buf = new char[2 * in_len + 1];
+    // build directly into the returned string instead of a raw new[]/delete[] buffer, whose
+    // std::string copy could throw bad_alloc before the delete and leak it
+    hexstr.resize(2 * in_len);
     size_t buf_ix = 0;
-
     for (size_t i = 0; i < in_len; ++i) {
         unsigned char high = in_byte[i] >> 4;
         unsigned char low = in_byte[i] & 0x0F;
 
-        buf[buf_ix++] = high <= 9 ? high + 0x30 : high + 87;
-        buf[buf_ix++] = low <= 9 ? low + 0x30 : low + 87;
+        hexstr[buf_ix++] = high <= 9 ? high + 0x30 : high + 87;
+        hexstr[buf_ix++] = low <= 9 ? low + 0x30 : low + 87;
     }
-
-    buf[buf_ix++] = '\0';
-    hexstr = std::string(buf);
-    delete[] buf;
     return hexstr;
 }
 
@@ -395,31 +390,26 @@ inline std::string byteToHexStr(const std::string &bytes) {
 inline std::string byteToHexStrForPrint(const char *bytes, size_t in_len) {
     std::string hexstr;
     const unsigned char *in_byte = (const unsigned char *)bytes;
-    if (in_byte == nullptr) {
+    if (in_byte == nullptr || in_len == 0) {
         return hexstr;
     }
 
-    char *buf = new char[5 * in_len + 1];
-    size_t buf_ix = 0;
-
+    // build directly into the returned string instead of a raw new[]/delete[] buffer, whose
+    // std::string copy could throw bad_alloc before the delete and leak it
+    hexstr.reserve(5 * in_len);
     for (size_t i = 0; i < in_len; ++i) {
-        buf[buf_ix++] = '0';
-        buf[buf_ix++] = 'x';
         unsigned char high = in_byte[i] >> 4;
         unsigned char low = in_byte[i] & 0x0F;
 
-        buf[buf_ix++] = high <= 9 ? high + 0x30 : high + 87;
-        buf[buf_ix++] = low <= 9 ? low + 0x30 : low + 87;
-        buf[buf_ix++] = ' ';
+        hexstr.push_back('0');
+        hexstr.push_back('x');
+        hexstr.push_back(static_cast<char>(high <= 9 ? high + 0x30 : high + 87));
+        hexstr.push_back(static_cast<char>(low <= 9 ? low + 0x30 : low + 87));
+        hexstr.push_back(' ');
     }
 
-    if (buf_ix == 0) {
-        buf[buf_ix] = '\0';
-    } else {
-        buf[--buf_ix] = '\0';
-    }
-    hexstr = std::string(buf);
-    delete[] buf;
+    // drop the separator of the last byte, matching the original trailing-space removal
+    hexstr.pop_back();
     return hexstr;
 }
 

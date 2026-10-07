@@ -67,8 +67,21 @@ void IniParser::read(const std::string& filename) {
     std::string value;
     std::string line_str;
 
+    // a UTF-8 BOM (EF BB BF) can only appear at the very start of the file (the first line);
+    // Windows editors often prepend it while others do not, so both cases must be accepted.
+    // trim does not strip the BOM bytes, and leaving them makes a leading "[section]" fail the
+    // '[' check and abort the whole parse, so it is removed once, up front
+    bool first_line = true;
+
     while (std::getline(inifile, line_str)) {
         line_no++;
+        if (first_line) {
+            static const std::string UTF8_BOM = "\xEF\xBB\xBF";
+            if (line_str.compare(0, UTF8_BOM.size(), UTF8_BOM) == 0) {
+                line_str.erase(0, UTF8_BOM.size());
+            }
+            first_line = false;
+        }
         trim(line_str);
 
         // Skip the empty or the comment lines

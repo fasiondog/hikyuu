@@ -158,6 +158,8 @@ void MySQLStatement::sub_exec() {
     }
 
     if (ec) [[unlikely]] {
+        // Discard the bound params, otherwise the next bind would hit the sequential index check
+        m_impl->params.clear();
         SQL_THROW(ec.value(), "Failed execute sql: {}! {}", m_sql_string, ec.message());
     }
 
@@ -193,6 +195,13 @@ void MySQLStatement::sub_bindInt(int idx, int64_t value) {
               "Parameter index must be sequential! Expected index: {}, but got: {}",
               m_impl->params.size(), idx);
     m_impl->params.push_back(boost::mysql::field(static_cast<std::int64_t>(value)));
+}
+
+void MySQLStatement::sub_bindUInt64(int idx, uint64_t value) {
+    SQL_CHECK(idx == static_cast<int>(m_impl->params.size()), -1,
+              "Parameter index must be sequential! Expected index: {}, but got: {}",
+              m_impl->params.size(), idx);
+    m_impl->params.push_back(boost::mysql::field(static_cast<std::uint64_t>(value)));
 }
 
 void MySQLStatement::sub_bindDouble(int idx, double item) {
@@ -271,7 +280,7 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
 
     const auto& value = row[idx];
     if (value.is_null()) {
-        item = 0;
+        item = Null<int64_t>();
         return;
     }
 
@@ -295,6 +304,46 @@ void MySQLStatement::sub_getColumnAsInt64(int idx, int64_t& item) {
     }
 }
 
+void MySQLStatement::sub_getColumnAsUInt64(int idx, uint64_t& item) {
+    SQL_CHECK(m_impl->has_result, -1, "No result available!");
+
+    const auto& rows = m_impl->results.rows();
+    SQL_CHECK(m_impl->current_row > 0 && m_impl->current_row <= rows.size(), -1,
+              "Invalid row index!");
+
+    const auto& row = rows[m_impl->current_row - 1];
+    SQL_CHECK(idx < static_cast<int>(row.size()), -1, "Column index out of range!");
+
+    const auto& value = row[idx];
+    if (value.is_null()) {
+        item = (std::numeric_limits<uint64_t>::max)();
+        return;
+    }
+
+    try {
+        // Try to convert it into uint64 directly
+        item = value.as_uint64();
+    } catch (...) {
+        try {
+            // Signed values that fit non-negative range are accepted
+            int64_t s = value.as_int64();
+            SQL_CHECK(s >= 0, -1, "Column {} holds negative value {}, cannot be read as uint64",
+                      idx, s);
+            item = static_cast<uint64_t>(s);
+        } catch (const hku::exception&) {
+            throw;
+        } catch (...) {
+            try {
+                // Finally try to parse it as a string
+                std::string str = value.as_string();
+                item = std::stoull(str);
+            } catch (const std::exception& e) {
+                SQL_THROW(-1, "Failed to convert column {} to uint64: {}", idx, e.what());
+            }
+        }
+    }
+}
+
 void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
     SQL_CHECK(m_impl->has_result, -1, "No result available!");
 
@@ -307,7 +356,7 @@ void MySQLStatement::sub_getColumnAsDouble(int idx, double& item) {
 
     const auto& value = row[idx];
     if (value.is_null()) {
-        item = 0.0;
+        item = Null<double>();
         return;
     }
 
@@ -442,8 +491,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::string& item) {
 
     const auto& value = row[idx];
     if (value.is_null()) {
-        item.clear();
-        return;
+        throw null_blob_exception();
     }
 
     try {
@@ -467,8 +515,7 @@ void MySQLStatement::sub_getColumnAsBlob(int idx, std::vector<char>& item) {
 
     const auto& value = row[idx];
     if (value.is_null()) {
-        item.clear();
-        return;
+        throw null_blob_exception();
     }
 
     try {

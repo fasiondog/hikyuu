@@ -974,7 +974,7 @@ def sys_performance(sys, ref_stk=None, ext=True, log=False):
     """
     Draw the system performance, i.e. the account cumulative return curve
 
-    :param SystemBase | PortfolioBase sys: the SYS or PF instance
+    :param SystemBase sys: the SYS instance
     :param Stock ref_stk: the reference stock, sh000300 (the CSI 300) by default; the return curve
         of the reference object is drawn
     :param bool ext: whether to calculate the extended information (for the donators; otherwise the

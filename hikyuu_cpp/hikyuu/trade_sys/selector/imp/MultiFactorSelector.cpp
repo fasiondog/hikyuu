@@ -81,13 +81,9 @@ SelectorPtr MultiFactorSelector::_clone() {
     if (m_mf) {
         p->m_mf = m_mf->clone();
     }
-    p->m_stk_sys_dict = m_stk_sys_dict;
+    // m_stk_sys_dict references the original system instances, do not carry it into the clone
     p->m_factorset = m_factorset;
     return p;
-}
-
-bool MultiFactorSelector::isMatchAF(const AFPtr& af) {
-    return true;
 }
 
 ScoreRecordList MultiFactorSelector::filterOnlyShouldBuy(Datetime date,

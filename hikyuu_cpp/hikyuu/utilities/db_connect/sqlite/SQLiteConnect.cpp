@@ -86,7 +86,11 @@ bool SQLiteConnect::ping() {
 
 void SQLiteConnect::close() {
     if (m_db) {
-        sqlite3_close(m_db);
+        // sqlite3_close refuses to release the connection (SQLITE_BUSY) when statements are
+        // still outstanding, which would leak it since m_db is dropped right after. close_v2
+        // turns the handle into a harmless zombie that is freed automatically when the last
+        // outstanding statement is finalized
+        sqlite3_close_v2(m_db);
         m_db = nullptr;
     }
 }
@@ -124,8 +128,8 @@ SQLStatementPtr SQLiteConnect::getStatement(const std::string &sql_statement) {
 }
 
 bool SQLiteConnect::tableExist(const std::string &tablename) {
-    SQLStatementPtr st =
-      getStatement(fmt::format("select count(1) from sqlite_master where name='{}'", tablename));
+    SQLStatementPtr st = getStatement("select count(1) from sqlite_master where name=?");
+    st->bind(0, tablename);
     st->exec();
     bool result = false;
     if (st->moveNext()) {
@@ -139,9 +143,12 @@ bool SQLiteConnect::tableExist(const std::string &tablename) {
 }
 
 void SQLiteConnect::resetAutoIncrement(const std::string &tablename) {
-    int64_t count = queryNumber<int64_t>(fmt::format("select count(1) from {}", tablename));
+    int64_t count =
+      queryNumber<int64_t>(fmt::format("select count(1) from {}", sqlIdentifier(tablename)));
     HKU_CHECK(count == 0, "The ID cannot be reset when data is present in table({})", tablename);
-    exec(fmt::format("UPDATE sqlite_sequence SET seq=0 WHERE name='{}'", tablename));
+    SQLStatementPtr seq_stmt = getStatement("UPDATE sqlite_sequence SET seq=0 WHERE name=?");
+    seq_stmt->bind(0, tablename);
+    seq_stmt->exec();
 }
 
 bool SQLiteConnect::check(bool quick) noexcept {
@@ -186,7 +193,7 @@ bool SQLiteConnect::backup(const char *zFilename, int n_page, int step_sleep) no
         rc = sqlite3_errcode(pFile);
     }
 
-    sqlite3_close(pFile);
+    sqlite3_close_v2(pFile);
     return rc == SQLITE_OK;
 }
 
