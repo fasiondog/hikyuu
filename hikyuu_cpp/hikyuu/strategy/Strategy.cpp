@@ -453,16 +453,12 @@ KData Strategy::getKData(const Stock& stk, const Datetime& start_date, const Dat
 price_t Strategy::getPriceByTime(const Stock& stk, const TimeDelta& time,
                                  const KQuery::KType& ktype) const {
     Datetime start = today() + time;
-    Datetime end = start + time;
-    if ((now() - today()) != TimeDelta()) {
-        // For a non-daily level such as the minute line, the price after the current time is
-        // clamped to the current time
-        if (end > now()) {
-            end = now();
-        }
+    Datetime end = start;
+    if (end > now()) {
+        end = now();
     }
     end = end + Seconds(KQuery::getKTypeInSeconds(ktype));
-    KData k = stk.getKData(KQueryByDate(start, end, ktype));
+    KData k = getKData(stk, start, end, ktype, KQuery::NO_RECOVER);
     return k.empty() ? Null<price_t>() : k.back().closePrice;
 }
 
@@ -593,33 +589,31 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
         // Convert it into an integer multiple of the minimum trade quantity
         // (consistent with the MoneyManagerBase::getBuyNumber convention)
         double n = int64_t(value / price / min_trade) * min_trade;
-        CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
-
-        // The cash needed by the actual trade = the trade quantity * the actual trade price
-        // * the unit of the stock + the total trade cost (consistent with TradeManager::buy)
-        price_t need_cash = n * price * stk.unit() + cost.total;
-        price_t current_cash = m_tm->currentCash();
-        if (need_cash > current_cash) {
-            // need_cash(k) is monotonically increasing in k, so binary search the largest
-            // affordable multiple of min_trade — O(log(n/min_trade)) cost evaluations instead of
-            // decrementing lot by lot (consistent with MoneyManagerBase::getBuyNumber)
-            double low = min_trade, high = n;
-            while (high - low > min_trade) {
-                double mid = int64_t((low + high) / (2.0 * min_trade)) * min_trade;
-                if (mid <= low || mid >= high) {
-                    break;
+        if (!m_tm->getParam<bool>("support_borrow_cash")) {
+            CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
+            // The cash needed by the actual trade = the trade quantity * the actual trade price
+            // * the unit of the stock + the total trade cost (consistent with TradeManager::buy)
+            price_t need_cash = n * price * stk.unit() + cost.total;
+            price_t current_cash = m_tm->currentCash();
+            if (need_cash > current_cash) {
+                double low = min_trade, high = n;
+                while (high - low > min_trade) {
+                    double mid = int64_t((low + high) / (2.0 * min_trade)) * min_trade;
+                    if (mid <= low || mid >= high) {
+                        break;
+                    }
+                    cost = m_tm->getBuyCost(now(), stk, price, mid);
+                    if (mid * price * stk.unit() + cost.total <= current_cash) {
+                        low = mid;
+                    } else {
+                        high = mid;
+                    }
                 }
-                cost = m_tm->getBuyCost(now(), stk, price, mid);
-                if (mid * price * stk.unit() + cost.total <= current_cash) {
-                    low = mid;
-                } else {
-                    high = mid;
+                n = low;
+                cost = m_tm->getBuyCost(now(), stk, price, n);
+                if (n * price * stk.unit() + cost.total > current_cash) {
+                    n = 0.0;
                 }
-            }
-            n = low;
-            cost = m_tm->getBuyCost(now(), stk, price, n);
-            if (n * price * stk.unit() + cost.total > current_cash) {
-                n = 0.0;
             }
         }
         if (n == 0.0) {
