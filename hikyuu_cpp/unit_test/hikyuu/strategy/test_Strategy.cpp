@@ -50,12 +50,12 @@ TEST_CASE("test_Strategy_order") {
     CHECK_EQ(tr.number, 200);
     CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), stock.maxTradeNumber() + 100);
 
-    /** @arg The sell request containing an odd lot (a non-integer multiple of minTradeNumber)
-     * sells all the remaining position to carry the odd lot away */
+    /** @arg The sell request containing an odd lot on a clean lot-aligned position is truncated to
+     * the lot multiple instead of liquidating */
     tr = strategy.order(stock, -150);
     CHECK_EQ(tr.business, BUSINESS_SELL);
-    CHECK_EQ(tr.number, stock.maxTradeNumber() + 100);
-    CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), 0);
+    CHECK_EQ(tr.number, 100);
+    CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), stock.maxTradeNumber());
 
     /** @arg num == -MAX_DOUBLE explicitly liquidates the whole position */
     tr = strategy.order(stock, 500);
@@ -63,7 +63,19 @@ TEST_CASE("test_Strategy_order") {
     CHECK_EQ(tr.number, 500);
     tr = strategy.order(stock, -MAX_DOUBLE);
     CHECK_EQ(tr.business, BUSINESS_SELL);
-    CHECK_EQ(tr.number, 500);
+    CHECK_EQ(tr.number, stock.maxTradeNumber() + 500);
+    CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), 0);
+
+    /** @arg A sell request below the min trade number is rejected */
+    tr = strategy.order(stock, -50);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+
+    /** @arg The sell request covering a position with an odd lot sells the whole position to carry
+     * the odd lot away */
+    REQUIRE_UNARY(tm->checkinStock(Datetime::now(), stock, 10.0, 150));
+    tr = strategy.order(stock, -150);
+    CHECK_EQ(tr.business, BUSINESS_SELL);
+    CHECK_EQ(tr.number, 150);
     CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), 0);
 }
 
