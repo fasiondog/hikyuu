@@ -86,9 +86,7 @@ Strategy::Strategy(const StrategyContext& context, const string& name, const str
 }
 
 Strategy::~Strategy() {
-    // ms_keep_running is used for the global ctrl-c termination; it must not be released on the
-    // release, otherwise a newly created strategy object would run ms_keep_running = false;
-    event([]() {});
+    stop();
 }
 
 void Strategy::_initParam() {
@@ -146,17 +144,33 @@ void Strategy::start(bool autoRecieveSpot) {
                   m_run_daily_at_funcs.empty(),
                 "No any process function is set!");
 
+    // Fresh alive token + running flag per run; stop()/~Strategy flip them so cross-thread
+    // callbacks registered below become no-ops instead of touching a freed object.
+    m_token = std::make_shared<RunToken>();
+    m_running = true;
+
     _init();
 
     _runDailyAt();
 
     if (autoRecieveSpot) {
+        auto token = m_token;
         auto& agent = *getGlobalSpotAgent();
-        agent.addProcess([this](const SpotRecord& spot) { _receivedSpot(spot); });
-        agent.addPostProcess([this](Datetime revTime) {
-            if (m_on_recieved_spot) {
-                event([this, revTime]() { m_on_recieved_spot(this, revTime); });
+        agent.addProcess([this, token](const SpotRecord& spot) {
+            if (!token->alive) {
+                return;
             }
+            _receivedSpot(spot);
+        });
+        agent.addPostProcess([this, token](Datetime revTime) {
+            if (!token->alive || !m_on_recieved_spot) {
+                return;
+            }
+            event([this, token, revTime]() {
+                if (token->alive) {
+                    m_on_recieved_spot(this, revTime);
+                }
+            });
         });
         startSpotAgent(true, getParam<int>("spot_worker_num"),
                        getParam<string>("quotation_server"));
@@ -166,6 +180,15 @@ void Strategy::start(bool autoRecieveSpot) {
 
     CLS_INFO("{} start even loop ...", name());
     _startEventLoop();
+}
+
+void Strategy::stop() {
+    m_running = false;
+    if (m_token) {
+        m_token->alive = false;
+    }
+    // Push a null task to wake the loop out of wait_and_pop so start() can return.
+    m_event_queue.push(FuncWrapper());
 }
 
 void Strategy::onChange(
@@ -230,88 +253,88 @@ void Strategy::_runDaily() {
     HKU_IF_RETURN(m_run_daily_at_list.empty(), void());
 
     auto* scheduler = getScheduler();
+    auto token = m_token;
 
-    for (auto& run_at : m_run_daily_at_list) {
-        if (run_at.ignoreMarket) {
-            scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, run_at.func);
-
-        } else {
-            try {
-                const auto& sm = StockManager::instance();
-                auto market_info = sm.getMarketInfo(run_at.market);
-                HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
-                                    "market {} not found! The run daily func is discard!",
-                                    run_at.market);
-
-                auto today = Datetime::today();
-                auto now = Datetime::now();
-                TimeDelta now_time = now - today;
-                if (now_time >= market_info.closeTime2()) {
-                    scheduler->addFuncAtTime(
-                      today.nextDay() + market_info.openTime1(), [&run_at]() {
-                          run_at.func();
-                          auto* sched = getScheduler();
-                          sched->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                                 run_at.func);
-                      });
-
-                } else if (now_time >= market_info.openTime2()) {
-                    int64_t ticks = now_time.ticks() - market_info.openTime2().ticks();
-                    int64_t delta_ticks = run_at.delta.ticks();
-                    if (ticks % delta_ticks == 0) {
-                        scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                                   run_at.func);
-                    } else {
-                        auto delay =
-                          TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
-                        scheduler->addFuncAtTime(now + delay, [&run_at]() {
-                            run_at.func();
-                            auto* sched = getScheduler();
-                            sched->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                                   run_at.func);
-                        });
-                    }
-
-                } else if (now_time >= market_info.closeTime1()) {
-                    scheduler->addFuncAtTime(today + market_info.openTime2(), [&run_at]() {
-                        run_at.func();
-                        auto* sched = getScheduler();
-                        sched->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                               run_at.func);
-                    });
-
-                } else if (now_time < market_info.closeTime1() &&
-                           now_time >= market_info.openTime1()) {
-                    int64_t ticks = now_time.ticks() - market_info.openTime1().ticks();
-                    int64_t delta_ticks = run_at.delta.ticks();
-                    if (ticks % delta_ticks == 0) {
-                        scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                                   run_at.func);
-                    } else {
-                        auto delay =
-                          TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
-                        scheduler->addFuncAtTime(now + delay, [&run_at]() {
-                            run_at.func();
-                            auto* sched = getScheduler();
-                            sched->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                                   run_at.func);
-                        });
-                    }
-
-                } else if (now_time < market_info.openTime1()) {
-                    scheduler->addFuncAtTime(today + market_info.openTime1(), [&run_at]() {
-                        run_at.func();
-                        auto* sched = getScheduler();
-                        sched->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta,
-                                               run_at.func);
-                    });
-
-                } else {
-                    CLS_ERROR("Unknown process! now_time: {}", now_time);
-                }
-            } catch (const std::exception& e) {
-                CLS_THROW("{}", e.what());
+    for (const auto& run_at : m_run_daily_at_list) {
+        // Guarded job (captured by value): skip when the strategy has been stopped/destroyed,
+        // so a timer armed before stop() can never touch a freed object.
+        auto job = [token, f = run_at.func]() {
+            if (!token->alive) {
+                return;
             }
+            f();
+        };
+        // Periodic re-arm keeps using the guarded job, so once stopped it no-ops.
+        auto arm_duration = [scheduler, job, delta = run_at.delta]() {
+            scheduler->addDurationFunc(std::numeric_limits<int>::max(), delta, job);
+        };
+
+        if (run_at.ignoreMarket) {
+            scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+            continue;
+        }
+        try {
+            const auto& sm = StockManager::instance();
+            auto market_info = sm.getMarketInfo(run_at.market);
+            HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+                                "market {} not found! The run daily func is discard!",
+                                run_at.market);
+
+            auto today = Datetime::today();
+            auto now = Datetime::now();
+            TimeDelta now_time = now - today;
+            if (now_time >= market_info.closeTime2()) {
+                scheduler->addFuncAtTime(today.nextDay() + market_info.openTime1(),
+                                         [job, arm_duration]() {
+                                             job();
+                                             arm_duration();
+                                         });
+
+            } else if (now_time >= market_info.openTime2()) {
+                int64_t ticks = now_time.ticks() - market_info.openTime2().ticks();
+                int64_t delta_ticks = run_at.delta.ticks();
+                if (ticks % delta_ticks == 0) {
+                    scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+                } else {
+                    auto delay =
+                      TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
+                    scheduler->addFuncAtTime(now + delay, [job, arm_duration]() {
+                        job();
+                        arm_duration();
+                    });
+                }
+
+            } else if (now_time >= market_info.closeTime1()) {
+                scheduler->addFuncAtTime(today + market_info.openTime2(), [job, arm_duration]() {
+                    job();
+                    arm_duration();
+                });
+
+            } else if (now_time < market_info.closeTime1() && now_time >= market_info.openTime1()) {
+                int64_t ticks = now_time.ticks() - market_info.openTime1().ticks();
+                int64_t delta_ticks = run_at.delta.ticks();
+                if (ticks % delta_ticks == 0) {
+                    scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+                } else {
+                    auto delay =
+                      TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
+                    scheduler->addFuncAtTime(now + delay, [job, arm_duration]() {
+                        job();
+                        arm_duration();
+                    });
+                }
+
+            } else if (now_time < market_info.openTime1()) {
+                scheduler->addFuncAtTime(today + market_info.openTime1(), [job, arm_duration]() {
+                    job();
+                    arm_duration();
+                });
+
+            } else {
+                CLS_ERROR("Unknown process! now_time: {}", now_time);
+            }
+        } catch (const std::exception& e) {
+            CLS_THROW("{}", e.what());
         }
     }
 }
@@ -343,8 +366,14 @@ void Strategy::runDailyAt(const std::function<void(Strategy*)>& func, const Time
 
 void Strategy::_runDailyAt() {
     auto* scheduler = getScheduler();
+    auto token = m_token;
     for (const auto& [time, func] : m_run_daily_at_funcs) {
-        scheduler->addFuncAtTimeEveryDay(time, func);
+        scheduler->addFuncAtTimeEveryDay(time, [token, func]() {
+            if (!token->alive) {
+                return;
+            }
+            func();
+        });
     }
     m_run_daily_at_funcs.clear();
 }
@@ -353,11 +382,11 @@ void Strategy::_runDailyAt() {
  * Process the event queue in the main thread, avoiding the python GIL
  */
 void Strategy::_startEventLoop() {
-    while (ms_keep_running) {
+    while (ms_keep_running && m_running) {
         event_type task;
         m_event_queue.wait_and_pop(task);
         if (task.isNullTask()) {
-            ms_keep_running = false;
+            m_running = false;
         } else {
             try {
                 task();

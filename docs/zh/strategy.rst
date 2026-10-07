@@ -90,6 +90,10 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
 
         :param func: 可调用对象，需接收两个参数：func(stg: Strategy, revTime: Datetime)
 
+    .. py:method:: stop(self)
+
+        停止策略事件循环；已注册的市场数据/定时回调转为空操作，start() 随之返回，对象可安全销毁。
+
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
 
         设置日内循环执行回调。如果忽略市场开闭市，则自启动时刻开始按间隔时间循环，

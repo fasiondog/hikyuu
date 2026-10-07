@@ -7,8 +7,10 @@
 
 #pragma once
 
+#include <atomic>
 #include <future>
 #include <forward_list>
+#include <memory>
 #include "hikyuu/DataType.h"
 #include "hikyuu/StrategyContext.h"
 #include "hikyuu/global/SpotRecord.h"
@@ -29,6 +31,14 @@ namespace hku {
 
 /**
  * @brief Strategy runtime
+ *
+ * Design notes / limitations:
+ * - One process shares a single global context: when StockManager is already initialized,
+ *   _init() adopts the process-wide context, so a context passed to the constructor is
+ *   intentionally overridden (by design, not a bug).
+ * - _init() calls stopSpotAgent() before handlers are (re)registered, so a second live
+ *   strategy cannot register on an already-running agent without restarting it. Running
+ *   multiple strategies in one process is best-effort only; prefer one strategy per process.
  */
 class HKU_API Strategy {
     CLASS_LOGGER_IMP(Strategy)
@@ -107,6 +117,9 @@ public:
      * registered
      */
     void start(bool autoRecieveSpot = true);
+
+    /** Stop the event loop and invalidate callbacks; safe to call when not started */
+    void stop();
 
     //==========================================================================
     // The following is the external interface of the strategy runtime; it is recommended to use
@@ -216,6 +229,15 @@ protected:
     StrategyContext m_context;
     TradeManagerPtr m_tm;
     SlippagePtr m_sp;
+
+    // Cross-thread callbacks (spot agent / scheduler) capture this token and no-op once
+    // alive is false, so a stopped/destroyed strategy is never touched through a stale
+    // registration. Recreated on each start().
+    struct RunToken {
+        std::atomic_bool alive{true};
+    };
+    std::shared_ptr<RunToken> m_token;
+    std::atomic_bool m_running{false};
 
     std::function<void(Strategy*, const Datetime&)> m_on_recieved_spot;
     std::function<void(Strategy*, const Stock&, const SpotRecord& spot)> m_on_change;

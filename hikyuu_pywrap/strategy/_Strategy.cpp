@@ -87,6 +87,10 @@ void export_Strategy(py::module& m) {
 
     :param bool auto_recieve_spot: whether to receive the market data automatically)")
 
+      .def("stop", &Strategy::stop, R"(stop(self)
+
+    Stop the strategy event loop; registered market-data / timed callbacks become no-ops, so start() returns and the object can be safely destroyed.)")
+
       .def(
         "on_change",
         [](Strategy& self, py::object func) {

@@ -90,6 +90,10 @@ Common parameters:
 
         :param func: a callable that must accept two parameters: func(stg: Strategy, revTime: Datetime)
 
+    .. py:method:: stop(self)
+
+        Stop the strategy event loop; registered market-data / timed callbacks become no-ops so start() returns and the object can be safely destroyed.
+
     .. py:method:: run_daily(self, func, time, market="SH", ignore_market=False)
 
         Register a callback that runs repeatedly throughout the trading day. If market open/close hours are ignored, it loops from the start moment at the given interval;
