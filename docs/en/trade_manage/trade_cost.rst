@@ -80,6 +80,10 @@ The custom trade cost algorithm interface:
 
 * :py:meth:`TradeCostBase.getBuyCost` - [Required] Get the buy cost
 * :py:meth:`TradeCostBase.getSellCost` - [Required] Get the sell cost
+* :py:meth:`TradeCostBase.getBorrowCashCost` - [Optional] Get the cost of borrowing cash (margin financing)
+* :py:meth:`TradeCostBase.getReturnCashCost` - [Optional] Get the cost of returning the borrowed cash
+* :py:meth:`TradeCostBase.getBorrowStockCost` - [Optional] Get the cost of borrowing stock (short selling)
+* :py:meth:`TradeCostBase.getReturnStockCost` - [Optional] Get the cost of returning the borrowed stock
 * :py:meth:`TradeCostBase._clone` - [Required] The subclass clone interface
 
 
@@ -133,6 +137,48 @@ Trade Cost Algorithm Base Class
         :param Stock stock: the security sold
         :param float price: the sell price
         :param int num: the number of shares sold
+        :return: the trade cost record
+        :rtype: CostRecord
+    
+    .. py:method:: get_borrow_cash_cost(self, datetime, cash)
+    
+        [Override hook] Compute the cost of borrowing cash
+        
+        :param Datetime datetime: the borrow moment
+        :param float cash: the borrowed cash
+        :return: the trade cost record
+        :rtype: CostRecord
+    
+    .. py:method:: get_return_cash_cost(self, borrow_datetime, return_datetime, cash)
+    
+        [Override hook] Compute the cost of returning the borrowed cash
+        
+        :param Datetime borrow_datetime: the borrow moment
+        :param Datetime return_datetime: the return moment
+        :param float cash: the returned cash
+        :return: the trade cost record
+        :rtype: CostRecord
+    
+    .. py:method:: get_borrow_stock_cost(self, datetime, stock, price, num)
+    
+        [Override hook] Compute the cost of borrowing stock
+        
+        :param Datetime datetime: the borrow moment
+        :param Stock stock: the borrowed security
+        :param float price: the borrow price
+        :param int num: the borrowed quantity
+        :return: the trade cost record
+        :rtype: CostRecord
+    
+    .. py:method:: get_return_stock_cost(self, borrow_datetime, return_datetime, stock, price, num)
+    
+        [Override hook] Compute the cost of returning the borrowed stock
+        
+        :param Datetime borrow_datetime: the borrow moment
+        :param Datetime return_datetime: the return moment
+        :param Stock stock: the returned security
+        :param float price: the return price
+        :param int num: the returned quantity
         :return: the trade cost record
         :rtype: CostRecord
         

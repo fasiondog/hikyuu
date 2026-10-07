@@ -25,17 +25,22 @@ void export_PositionRecord(py::module& m) {
       .def("__repr__", &PositionRecord::str)
 
       .def_readwrite("stock", &PositionRecord::stock, "The trading object (Stock)")
-      .def_readwrite("take_datetime", &PositionRecord::takeDatetime, "The initial position building moment (Datetime)")
-      .def_readwrite("clean_datetime", &PositionRecord::cleanDatetime,
-                     "The closing date; in the current position records it is constant.null_datetime")
+      .def_readwrite("take_datetime", &PositionRecord::takeDatetime,
+                     "The initial position building moment (Datetime)")
+      .def_readwrite(
+        "clean_datetime", &PositionRecord::cleanDatetime,
+        "The closing date; in the current position records it is constant.null_datetime")
       .def_readwrite("number", &PositionRecord::number, "The current position quantity (float)")
       .def_readwrite("stoploss", &PositionRecord::stoploss, "The current stop-loss price (float)")
       .def_readwrite("goal_price", &PositionRecord::goalPrice, "The current target price (float)")
-      .def_readwrite("total_number", &PositionRecord::totalNumber, "The cumulative position quantity (float)")
+      .def_readwrite("total_number", &PositionRecord::totalNumber,
+                     "The cumulative position quantity (float)")
       .def_readwrite("buy_money", &PositionRecord::buyMoney, "The cumulative buy funds (float)")
-      .def_readwrite("total_cost", &PositionRecord::totalCost, "The cumulative total trading cost (float)")
+      .def_readwrite("total_cost", &PositionRecord::totalCost,
+                     "The cumulative total trading cost (float)")
       .def_readwrite("total_risk", &PositionRecord::totalRisk,
-                     "The cumulative trading risk = each (the buy price - the stop-loss) * the buy quantity, excluding the trading costs")
+                     "The cumulative trading risk = each (the buy price - the stop-loss) * the buy "
+                     "quantity, excluding the trading costs")
       .def_readwrite("sell_money", &PositionRecord::sellMoney, "The cumulative sell funds (float)")
       .def_readwrite("buy_count", &PositionRecord::buyCount, "The cumulative buy count (size_t)")
       .def_readwrite("sell_count", &PositionRecord::sellCount, "The cumulative sell count (size_t)")
@@ -52,30 +57,48 @@ void export_PositionRecord(py::module& m) {
       .def_readwrite("position", &PositionExtInfo::position, "PositionRecord")
       .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice,
                      "The current close price (float)")
-      .def_readwrite("max_high_price", &PositionExtInfo::maxHighPrice, "The maximum of the highest prices in the period")
-      .def_readwrite("min_low_price", &PositionExtInfo::minLowPrice, "The minimum of the lowest prices in the period")
-      .def_readwrite("max_close_price", &PositionExtInfo::maxClosePrice, "The highest close price in the period")
-      .def_readwrite("min_close_price", &PositionExtInfo::minClosePrice, "The lowest close price in the period")
-      .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice, "The current close price")
+      .def_readwrite("max_high_price", &PositionExtInfo::maxHighPrice,
+                     "The maximum of the highest prices in the period")
+      .def_readwrite("min_low_price", &PositionExtInfo::minLowPrice,
+                     "The minimum of the lowest prices in the period")
+      .def_readwrite("max_close_price", &PositionExtInfo::maxClosePrice,
+                     "The highest close price in the period")
+      .def_readwrite("min_close_price", &PositionExtInfo::minClosePrice,
+                     "The lowest close price in the period")
+      .def_readwrite("current_close_price", &PositionExtInfo::currentClosePrice,
+                     "The current close price")
       .def_readwrite("max_pull_back1", &PositionExtInfo::maxPullBack1,
-                     "The maximum drawdown ratio 1 (calculated only with the maximum close price and the lowest close price) (a negative number)")
-      .def_readwrite("max_pull_back2", &PositionExtInfo::maxPullBack2,
-                     "The maximum drawdown ratio 2 (calculated with the maximum of the highest prices and the minimum of the lowest prices in the period) (a negative number)")
+                     "The maximum drawdown ratio 1 (calculated only with the maximum close price "
+                     "and the lowest close price) (a negative number)")
+      .def_readwrite(
+        "max_pull_back2", &PositionExtInfo::maxPullBack2,
+        "The maximum drawdown ratio 2 (calculated with the maximum of the highest prices and the "
+        "minimum of the lowest prices in the period) (a negative number)")
       .def_readwrite("current_profit", &PositionExtInfo::currentProfit,
                      "The current floating profit and loss (excluding the estimated sell cost)")
 
       .def("current_pull_back1", &PositionExtInfo::currentPullBack1,
-           "The current drawdown percentage 1 (calculated only with the maximum close price and the current close price)")
+           "The current drawdown percentage 1 (calculated only with the maximum close price and "
+           "the current close price)")
       .def("current_pull_back2", &PositionExtInfo::currentPullBack2,
-           "The current drawdown percentage 2 (calculated with the maximum of the highest prices in the period and the current close price)")
+           "The current drawdown percentage 2 (calculated with the maximum of the highest prices "
+           "in the period and the current close price)")
       .def("max_floating_profit1", &PositionExtInfo::maxFloatingProfit1,
-           "The maximum floating profit 1 in the period (a positive number, calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
+           "The maximum floating profit 1 in the period (a positive number, calculated only with "
+           "the close price, excluding the estimated sell cost; the statistics are inaccurate when "
+           "buying and selling multiple times)")
       .def("max_floating_profit2", &PositionExtInfo::maxFloatingProfit2,
-           "The maximum floating profit 2 in the period (a positive number, calculated with the maximum of the highest prices, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
+           "The maximum floating profit 2 in the period (a positive number, calculated with the "
+           "maximum of the highest prices, excluding the estimated sell cost; the statistics are "
+           "inaccurate when buying and selling multiple times)")
       .def("min_loss_profit1", &PositionExtInfo::minLossProfit1,
-           "The maximum floating loss 1 in the period (a negative number, calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
+           "The maximum floating loss 1 in the period (a negative number, calculated only with the "
+           "close price, excluding the estimated sell cost; the statistics are inaccurate when "
+           "buying and selling multiple times)")
       .def("min_loss_profit2", &PositionExtInfo::minLossProfit2,
-           "The maximum floating loss 2 in the period (a negative number, calculated only with the lowest price in the period, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)")
+           "The maximum floating loss 2 in the period (a negative number, calculated only with the "
+           "lowest price in the period, excluding the estimated sell cost; the statistics are "
+           "inaccurate when buying and selling multiple times)")
 
         DEF_PICKLE(PositionExtInfo);
 
@@ -100,16 +123,23 @@ void export_PositionRecord(py::module& m) {
               int64_t clean_datetime;       // The sell date
               double total_number;          // The cumulative position quantity
               double total_cost;            // The cumulative trading cost
-              double total_risk;  // The cumulative trading risk = each (the buy price - the stop-loss) * the buy quantity, excluding the trading costs
+              double total_risk;  // The cumulative trading risk = each (the buy price - the
+                                  // stop-loss) * the buy quantity, excluding the trading costs
               double buy_money;   // The cumulative invested amount
               double sell_money;  // The cumulative sell funds
           };
 
           RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+          HKU_CHECK(data != nullptr, "positions_to_np: malloc failed!");
           for (size_t i = 0, total = positions.size(); i < total; i++) {
               const PositionRecord& p = positions[i];
-              utf8_to_utf32(p.stock.market_code(), data[i].code, 10);
-              utf8_to_utf32(p.stock.name(), data[i].name, 20);
+              if (!p.stock.isNull()) {
+                  utf8_to_utf32(p.stock.market_code(), data[i].code, 10);
+                  utf8_to_utf32(p.stock.name(), data[i].name, 20);
+              } else {
+                  memset(data[i].code, 0, 10 * sizeof(int32_t));
+                  memset(data[i].name, 0, 20 * sizeof(int32_t));
+              }
               data[i].take_datetime = p.takeDatetime.timestamp() * 1000LL;
               data[i].number = p.number;
               data[i].invest = p.buyMoney - p.sellMoney + p.totalCost;
@@ -155,7 +185,7 @@ void export_PositionRecord(py::module& m) {
                            py::capsule(data, [](void* p) { std::free(p); }));
       },
       R"(Convert the position list to Numpy
-    
+
     Note: the calculated values such as the current market value, the profit and the profit/loss are all calculated by the daily line; when backtesting with a level below the daily line, you need to recalculate the open position records yourself!)");
 
     m.def(

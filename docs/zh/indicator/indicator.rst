@@ -1574,7 +1574,7 @@
 
     :param Indicator x:
     :param Indicator y:
-    :param int n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 

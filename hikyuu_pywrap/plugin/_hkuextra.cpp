@@ -21,10 +21,10 @@ void export_hkuextra(py::module& m) {
           py::overload_cast<const string&, const string&, int32_t>(registerExtraKType),
           py::arg("ktype"), py::arg("basetype"), py::arg("nbars"),
           R"(register_extra_ktype(ktype, basetype, nbars|minutes[, get_phase_end])
-          
+
     Register the extended K-line type, implementing the custom dynamic period K-lines.
 
-    Way 1: compose strictly based on the number of the Bars, e.g.: register_extra_ktype("DAY4, "DAY", 4)
+    Way 1: compose strictly based on the number of the Bars, e.g.: register_extra_ktype("DAY4", "DAY", 4)
     Way 2: compose based on the time periods; you need to define the conversion function that calculates the period end time from the current time, e.g. to define a 7-minute K-line:
 
       def get_min3_phase_end(datetime):
@@ -38,10 +38,10 @@ void export_hkuextra(py::module& m) {
 
     Note:
     1. Hikyuu has built in the DAY3, DAY5, DAY7 based on the number of the Bars, and the MIN3 extended K-line based on the time conversion
-    2. It is recommended to create the custom K-line type period end point calculation conversion function in the way of the hub c++ part, because python has a GIL lock, 
+    2. It is recommended to create the custom K-line type period end point calculation conversion function in the way of the hub c++ part, because python has a GIL lock,
        and creating the conversion function may make it impossible to calculate with multiple threads
     3. Registering the dynamic K-lines is not thread-safe; please perform the other operations after the registration is completed
-    
+
     :param str ktype: the extended K-line type name
     :param str basetype: the basic K-line type name
     :param int nbars|minutes: the number of the basic periods or the minutes corresponding to the basic K-line type
@@ -49,7 +49,7 @@ void export_hkuextra(py::module& m) {
     :return: None)");
 
     m.def("release_extra_ktype", releaseExtraKType, R"(release_ktype_extra()
-        
+
     Release the extended K-line type, used internally. It is called when python exits, preventing the defined python conversion functions from causing an exit crash)");
 
     m.def("enable_kdata_cache", enableKDataCache, py::arg("enable"),

@@ -305,7 +305,7 @@ Common parameters:
       .def_property("broker_last_datetime", &TradeManagerBase::getBrokerLastDatetime,
                     &TradeManagerBase::setBrokerLastDatetime,
                     R"(The moment when the order broker operations actually start.
-        
+
     By default, when the TradeManager executes the buy/sell operations, it calls the order broker to execute the broker's buy/sell actions, but there will be a problem in the live trading operation. Because the system needs to backtrack the historical data to get the latest signal when calculating the signal generator, the TradeManager will execute the buy/sell operations at the historical moments; at this time, if the order broker itself does not control the moment of issuing the buy/sell instructions, it will cause the broker to send the wrong instructions. At this time, it is necessary to specify that only after a certain moment are the buy/sell operations of the order broker allowed to be specified. The attribute brokeLastDatetime is used to specify that moment.))")
 
       .def("get_param", &TradeManagerBase::getParam<boost::any>, R"(get_param(self, name)
@@ -334,9 +334,9 @@ Common parameters:
       .def("clone", &TradeManagerBase::clone, "Clone (deep copy) the instance")
 
       .def("reg_broker", &TradeManagerBase::regBroker, R"(reg_broker(self, broker)
-    
+
     Register the order broker. This command can be executed multiple times to register multiple order brokers.
-        
+
     :param OrderBrokerBase broker: the order broker instance)")
 
       .def("clear_broker", &TradeManagerBase::clearBroker, R"(clear_broker(self)
@@ -363,7 +363,7 @@ Common parameters:
       .def("get_hold_num", &TradeManagerBase::getHoldNumber, R"(get_hold_num(self, datetime, stock)
 
         Get the holding quantity of the specified security at the specified moment
-        
+
         :param Datetime datetime: the specified moment
         :param Stock stock: the specified security
         :rtype: int)")
@@ -456,7 +456,7 @@ Common parameters:
 
       .def("get_funds_list", &TradeManagerBase::getFundsList, py::arg("dates"),
            py::arg("ktype") = KQuery::DAY, R"(get_funds_list(self, dates[, ktype = Query.DAY])
-    
+
     Get the daily asset records of the specified date list
     :param DatetimeList dates:  the specified moments
     :param Query.KType ktype: the K-line type
@@ -610,7 +610,7 @@ Common parameters:
            py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
            py::arg("ext") = true,
            R"(get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> Performance)
-        
+
     Get the account performance at the specified moment of the account
 
     :param Datetime datetime: the specified moment
@@ -621,7 +621,7 @@ Common parameters:
       .def("get_max_pull_back", &TradeManagerBase::getMaxPullBack,
            py::arg("date") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
            R"(get_max_pull_back(self, date, ktype=Query.DAY) -> float
-    
+
     Get the maximum drawdown percentage of the account at the specified moment (a negative number)
 
     :param Datetime date: the specified date (including this moment)
@@ -640,7 +640,7 @@ Common parameters:
         :param Query.KType ktype: the K-line type, defaulting to the daily line
         :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open, defaulting to 0
         :return: the extended position details, containing the following fields:
-        
+
             - position (PositionRecord): the basic position record
             - max_high_price (float): the maximum of the highest prices in the period
             - min_low_price (float): the minimum of the lowest prices in the period
@@ -650,53 +650,57 @@ Common parameters:
             - max_pull_back1 (float): the maximum drawdown percentage 1 (calculated only with the maximum close price and the lowest close price) (a negative number)
             - max_pull_back2 (float): the maximum drawdown percentage 2 (calculated with the maximum of the highest prices and the minimum of the lowest prices in the period) (a negative number)
             - current_profit (float): the current floating profit and loss (excluding the estimated sell cost)
-            
+
             And the following calculation methods:
-            
+
             - current_pull_back1(): the current drawdown percentage 1 (calculated only with the maximum close price and the current close price)
             - current_pull_back2(): the current drawdown percentage 2 (calculated with the maximum of the highest prices in the period and the current close price)
             - max_floating_profit1(): the maximum floating profit percentage 1 in the period (calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
             - max_floating_profit2(): the maximum floating profit percentage 2 in the period (calculated with the maximum of the highest prices, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
             - min_loss_profit1(): the maximum floating loss percentage 1 in the period (calculated only with the close price, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
             - min_loss_profit2(): the maximum floating loss percentage 2 in the period (calculated only with the lowest price in the period, excluding the estimated sell cost; the statistics are inaccurate when buying and selling multiple times)
-            
+
         :note: this function is only suitable for the case of one buy and one sell; for the case of one buy and multiple sells, some statistics may be inaccurate, for reference only
+        :rtype: PositionExtInfo
         )")
 
       .def(
         "get_position_ext_info_list", &TradeManagerBase::getPositionExtInfoList,
         py::arg("current_time"), py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
         R"(get_position_ext_info_list(self, current_time, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
-          
+
     Get the position details (the open position records) of the specified time after the last trading moment of the account
- 
+
     :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)
     :param Query.KType ktype: the K-line type
     :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-    :return: the list of the extended position details)")
+    :return: the list of the extended position details
+    :rtype: list[PositionExtInfo])")
 
       .def(
-        "get_position_ext_info", &TradeManagerBase::getPositionExtInfoDict, py::arg("current_time"),
-        py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
-        R"(get_position_ext_info(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo])
+        "get_position_ext_info_dict", &TradeManagerBase::getPositionExtInfoDict,
+        py::arg("current_time"), py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
+        R"(get_position_ext_info_dict(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo])
 
     Get the position details of the specified time after the last trading moment of the account, returned as a dictionary, with the stock as the key and the PositionExtInfo as the value
 
     :param Datetime current_time: the current moment (it needs to be greater than or equal to the last trading moment)
     :param Query.KType ktype: the K-line type
     :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-    :return: the dict of the extended position details, with the stock as the key and the PositionExtInfo as the value)")
+    :return: the dict of the extended position details, with the stock as the key and the PositionExtInfo as the value
+    :rtype: dict[Stock, PositionExtInfo])")
 
       .def(
         "get_history_position_ext_info_list", &TradeManagerBase::getHistoryPositionExtInfoList,
         py::arg("ktype") = KQuery::DAY, py::arg("trade_mode") = 0,
         R"(get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo])
-          
+
     Get the historical position extended details of the account (the closed records)
- 
+
     :param Query.KType ktype: the K-line type
     :param int trade_mode: the trading mode, affecting some statistics items: 0-trading at the close, 1-trading at the next open
-    :return: the list of the extended position details)")
+    :return: the list of the extended position details
+    :rtype: list[PositionExtInfo])")
 
       .def(
         "get_profit_percent_monthly", &TradeManagerBase::getProfitPercentMonthly,

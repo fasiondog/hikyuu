@@ -125,11 +125,12 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
                                   SystemPtr sys_proto) {
     HKU_CHECK(sys_proto, "sys_proto is null!");
 
-    sys_proto->forceResetAll();
+    auto sys_copy = sys_proto->clone();
+    sys_copy->forceResetAll();
     SystemList sys_list;
     StockList stk_list = get_stock_list_from_python(pystk_list);
     for (size_t i = 0, total = stk_list.size(); i < total; i++) {
-        sys_list.emplace_back(sys_proto->clone());
+        sys_list.emplace_back(sys_copy->clone());
     }
 
     vector<AnalysisSystemOutput> records;
@@ -145,6 +146,9 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
     for (size_t i = 0, total = records.size(); i < total; i++) {
         const auto& record = records[i];
         if (record.values.size() != keys.size()) {
+            HKU_WARN("analysis_sys_list: record values size (" +
+                     std::to_string(record.values.size()) + ") != keys size (" +
+                     std::to_string(keys.size()) + "), skipping " + record.market_code);
             continue;
         }
         tmp[0].append(record.market_code);
@@ -158,9 +162,7 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
     result["证券代码"] = tmp[0];
     result["证券名称"] = tmp[1];
     for (size_t i = 0, total = keys.size(); i < total; i++) {
-        if (!tmp[i + 2].empty()) {
-            result[keys[i].c_str()] = tmp[i + 2];
-        }
+        result[keys[i].c_str()] = tmp[i + 2];
     }
     return result;
 }

@@ -103,6 +103,7 @@ Indicator
         Get the date at the specified position
 
         :param int pos: position index
+        :rtype: Datetime
 
     .. py:method:: get_by_datetime(self, datetime[, result_index=0])
 

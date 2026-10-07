@@ -64,6 +64,10 @@ void export_TradeCost(py::module& m) {
 
     :py:meth:`TradeCostBase.getBuyCost` - [Required] Get the buy cost
     :py:meth:`TradeCostBase.getSellCost` - [Required] Get the sell cost
+    :py:meth:`TradeCostBase.getBorrowCashCost` - [Optional] Get the cost of borrowing cash
+    :py:meth:`TradeCostBase.getReturnCashCost` - [Optional] Get the cost of returning borrowed cash
+    :py:meth:`TradeCostBase.getBorrowStockCost` - [Optional] Get the cost of borrowing stock
+    :py:meth:`TradeCostBase.getReturnStockCost` - [Optional] Get the cost of returning borrowed stock
     :py:meth:`TradeCostBase._clone` - [Required] The subclass clone interface)")
 
       .def(py::init<const string&>())
@@ -98,9 +102,9 @@ void export_TradeCost(py::module& m) {
       .def("get_buy_cost", &TradeCostBase::getBuyCost, py::arg("date"), py::arg("stock"),
            py::arg("price"), py::arg("num"),
            R"(get_buy_cost(self, date, stock, price, num)
-    
+
         [Overload interface] Get the buy cost
-        
+
         :param Datetime date: the buy moment
         :param Stock stock: the buy object
         :param float price: the buy price
@@ -111,9 +115,9 @@ void export_TradeCost(py::module& m) {
       .def("get_sell_cost", &TradeCostBase::getSellCost, py::arg("date"), py::arg("stock"),
            py::arg("price"), py::arg("num"),
            R"(get_sell_cost(self, date, stock, price, num)
-    
+
         [Overload interface] Get the sell cost
-        
+
         :param Datetime date: the sell moment
         :param Stock stock: the sell object
         :param float price: the sell price
@@ -121,15 +125,55 @@ void export_TradeCost(py::module& m) {
         :return: the trade cost record
         :rtype: CostRecord)")
 
-      //.def("getBorrowCashCost", &TradeCostBase::getBorrowCashCost,
-      //     &TradeCostWrap::default_getBorrowCashCost)
+      .def("get_borrow_cash_cost", &TradeCostBase::getBorrowCashCost, py::arg("date"),
+           py::arg("cash"),
+           R"(get_borrow_cash_cost(self, date, cash)
 
-      //.def("getReturnCashCost", &TradeCostBase::getReturnCashCost,
-      //     &TradeCostWrap::default_getReturnCashCost)
+        [Overload interface] Get the cost of borrowing cash (margin financing)
 
-      //.def("getBorrowStockCost", &TradeCostBase::getBorrowStockCost,
-      //&TradeCostWrap::default_getBorrowStockCost) .def("getReturnStockCost",
-      //&TradeCostBase::getReturnStockCost, &TradeCostWrap::default_getReturnStockCost)
+        :param Datetime date: the borrow moment
+        :param float cash: the borrowed cash
+        :return: the trade cost record
+        :rtype: CostRecord)")
 
-      DEF_PICKLE(TradeCostPtr);
+      .def("get_return_cash_cost", &TradeCostBase::getReturnCashCost, py::arg("borrow_date"),
+           py::arg("return_date"), py::arg("cash"),
+           R"(get_return_cash_cost(self, borrow_date, return_date, cash)
+
+        [Overload interface] Get the cost of returning borrowed cash
+
+        :param Datetime borrow_date: the borrow moment
+        :param Datetime return_date: the return moment
+        :param float cash: the returned cash
+        :return: the trade cost record
+        :rtype: CostRecord)")
+
+      .def("get_borrow_stock_cost", &TradeCostBase::getBorrowStockCost, py::arg("date"),
+           py::arg("stock"), py::arg("price"), py::arg("num"),
+           R"(get_borrow_stock_cost(self, date, stock, price, num)
+
+        [Overload interface] Get the cost of borrowing stock (short selling)
+
+        :param Datetime date: the borrow moment
+        :param Stock stock: the borrowed stock
+        :param float price: the borrow price
+        :param int num: the borrowed quantity
+        :return: the trade cost record
+        :rtype: CostRecord)")
+
+      .def("get_return_stock_cost", &TradeCostBase::getReturnStockCost, py::arg("borrow_date"),
+           py::arg("return_date"), py::arg("stock"), py::arg("price"), py::arg("num"),
+           R"(get_return_stock_cost(self, borrow_date, return_date, stock, price, num)
+
+        [Overload interface] Get the cost of returning borrowed stock
+
+        :param Datetime borrow_date: the borrow moment
+        :param Datetime return_date: the return moment
+        :param Stock stock: the returned stock
+        :param float price: the return price
+        :param int num: the returned quantity
+        :return: the trade cost record
+        :rtype: CostRecord)")
+
+        DEF_PICKLE(TradeCostPtr);
 }

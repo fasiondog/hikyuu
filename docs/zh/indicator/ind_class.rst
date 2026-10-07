@@ -103,6 +103,7 @@ Indicator
         获取指定位置的日期
 
         :param int pos: 指定的位置索引
+        :rtype: Datetime
 
     .. py:method:: get_by_datetime(self, datetime[, result_index=0])
 

@@ -6,7 +6,7 @@ Dynamic Period K-lines
           
     Register an extended K-line type to implement custom dynamic period K-lines.
 
-    Way 1: synthesize strictly based on the number of bars, e.g.: register_extra_ktype("DAY4, "DAY", 4)
+    Way 1: synthesize strictly based on the number of bars, e.g.: register_extra_ktype("DAY4", "DAY", 4)
 
     Way 2: synthesize based on time ranges; a conversion function that calculates the end time of the period from the current time needs to be defined, e.g. to define a 7-minute K-line:
 

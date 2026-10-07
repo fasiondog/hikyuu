@@ -1573,7 +1573,7 @@ Built-in Technical Indicators
 
     :param Indicator x:
     :param Indicator y:
-    :param int n: the time window
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 

@@ -80,6 +80,10 @@ ETF交易成本算法
 
 * :py:meth:`TradeCostBase.getBuyCost` - 【必须】获取买入成本
 * :py:meth:`TradeCostBase.getSellCost` - 【必须】获取卖出成本
+* :py:meth:`TradeCostBase.getBorrowCashCost` - 【可选】获取借入资金成本（融资）
+* :py:meth:`TradeCostBase.getReturnCashCost` - 【可选】获取归还借入资金成本
+* :py:meth:`TradeCostBase.getBorrowStockCost` - 【可选】获取借入股票成本（融券做空）
+* :py:meth:`TradeCostBase.getReturnStockCost` - 【可选】获取归还借入股票成本
 * :py:meth:`TradeCostBase._clone` - 【必须】子类克隆接口
 
 
@@ -133,6 +137,48 @@ ETF交易成本算法
         :param Stock stock: 卖出对象
         :param float price: 卖出价格
         :param int num: 卖出数量
+        :return: 交易成本记录
+        :rtype: CostRecord
+    
+    .. py:method:: get_borrow_cash_cost(self, datetime, cash)
+    
+        【重载接口】获取借入资金的成本
+        
+        :param Datetime datetime: 借入时刻
+        :param float cash: 借入的现金额
+        :return: 交易成本记录
+        :rtype: CostRecord
+    
+    .. py:method:: get_return_cash_cost(self, borrow_datetime, return_datetime, cash)
+    
+        【重载接口】获取归还借入资金的成本
+        
+        :param Datetime borrow_datetime: 借入时刻
+        :param Datetime return_datetime: 归还时刻
+        :param float cash: 归还的现金额
+        :return: 交易成本记录
+        :rtype: CostRecord
+    
+    .. py:method:: get_borrow_stock_cost(self, datetime, stock, price, num)
+    
+        【重载接口】获取借入股票的成本
+        
+        :param Datetime datetime: 借入时刻
+        :param Stock stock: 借入对象
+        :param float price: 借入价格
+        :param int num: 借入数量
+        :return: 交易成本记录
+        :rtype: CostRecord
+    
+    .. py:method:: get_return_stock_cost(self, borrow_datetime, return_datetime, stock, price, num)
+    
+        【重载接口】获取归还借入股票的成本
+        
+        :param Datetime borrow_datetime: 借入时刻
+        :param Datetime return_datetime: 归还时刻
+        :param Stock stock: 归还对象
+        :param float price: 归还价格
+        :param int num: 归还数量
         :return: 交易成本记录
         :rtype: CostRecord
         

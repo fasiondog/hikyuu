@@ -38,7 +38,10 @@ void export_TradeRecord(py::module& m) {
     m.def("get_business_name", getBusinessName, R"(get_business_name(business)
 
     :param BUSINESS business: the trade business type
-    :return: the trade business type name ("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
+    :return: the trade business type name
+             ("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"
+              |"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"
+              |"RETURN_STOCK"|"SUOGU"|"UNKNOWN")
     :rtype: string)");
 
     py::class_<TradeRecord>(m, "TradeRecord", "The trade record")
@@ -63,7 +66,8 @@ void export_TradeRecord(py::module& m) {
       .def_readwrite("stoploss", &TradeRecord::stoploss, "The stop-loss price (float)")
       .def_readwrite("cash", &TradeRecord::cash, "The cash balance (float)")
       .def_readwrite("part", &TradeRecord::from,
-                     "The source of the trading instruction, distinguishing which part of the trading system issued the instruction; see: "
+                     "The source of the trading instruction, distinguishing which part of the "
+                     "trading system issued the instruction; see: "
                      ":py:class:`System.Part`")  // The from keyword cannot be used in python
       .def_readwrite("remark", &TradeRecord::remark, "The remark")
 
@@ -76,11 +80,12 @@ void export_TradeRecord(py::module& m) {
         struct alignas(8) RawData {
             int32_t code[10];
             int32_t name[20];
-            int64_t datetime;         // The trading date
-            int32_t business[20];     // The business type
-            double planPrice;         // The planned trading price
-            double realPrice;         // The actual trading price
-            double goalPrice;         // The target price; if it is 0 or Null, it means the goal is not limited
+            int64_t datetime;      // The trading date
+            int32_t business[20];  // The business type
+            double planPrice;      // The planned trading price
+            double realPrice;      // The actual trading price
+            double
+              goalPrice;  // The target price; if it is 0 or Null, it means the goal is not limited
             double number;            // The traded quantity
             double stoploss;          // The stop-loss price
             double cash;              // The cash balance
@@ -94,10 +99,16 @@ void export_TradeRecord(py::module& m) {
         };
 
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        HKU_CHECK(data != nullptr, "trades_to_np: malloc failed!");
         for (size_t i = 0, total = trades.size(); i < total; i++) {
             const TradeRecord& t = trades[i];
-            utf8_to_utf32(t.stock.market_code(), data[i].code, 10);
-            utf8_to_utf32(t.stock.name(), data[i].name, 20);
+            if (!t.stock.isNull()) {
+                utf8_to_utf32(t.stock.market_code(), data[i].code, 10);
+                utf8_to_utf32(t.stock.name(), data[i].name, 20);
+            } else {
+                memset(data[i].code, 0, 10 * sizeof(int32_t));
+                memset(data[i].name, 0, 20 * sizeof(int32_t));
+            }
             data[i].datetime = t.datetime.timestamp() * 1000LL;
             utf8_to_utf32(getBusinessName(t.business), data[i].business, 20);
             data[i].planPrice = t.planPrice;

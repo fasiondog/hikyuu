@@ -10,19 +10,28 @@ Trade Business Types
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: trade business type
-    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "UNKNOWN")
+    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS
 
-    - BUSINESS.INIT     - Initialize the account
-    - BUSINESS.BUY      - Buy
-    - BUSINESS.SELL     - Sell
-    - BUSINESS.GIFT     - Bonus shares (stock dividend)
-    - BUSINESS.BONUS    - Cash dividend
-    - BUSINESS.CHECKIN  - Deposit cash
-    - BUSINESS.CHECKOUT - Withdraw cash
-    - BUSINESS.INVALID  - Invalid type
+    - BUSINESS.INIT           - Initialize the account
+    - BUSINESS.BUY            - Buy
+    - BUSINESS.SELL            - Sell
+    - BUSINESS.BUY_SHORT      - Buy short (return the borrowed stock)
+    - BUSINESS.SELL_SHORT     - Sell short (sell the borrowed stock)
+    - BUSINESS.GIFT           - Bonus shares (stock dividend)
+    - BUSINESS.BONUS          - Cash dividend
+    - BUSINESS.CHECKIN        - Deposit cash
+    - BUSINESS.CHECKOUT       - Withdraw cash
+    - BUSINESS.CHECKIN_STOCK  - Deposit stock
+    - BUSINESS.CHECKOUT_STOCK - Withdraw stock
+    - BUSINESS.BORROW_CASH    - Borrow cash (margin financing)
+    - BUSINESS.RETURN_CASH    - Return the borrowed cash
+    - BUSINESS.BORROW_STOCK   - Borrow stock (securities lending)
+    - BUSINESS.RETURN_STOCK   - Return the borrowed stock
+    - BUSINESS.SUOGU          - Share consolidation (stock squeeze)
+    - BUSINESS.INVALID        - Invalid type
 
 
 

@@ -40,9 +40,8 @@ private:
     py::object m_func;
 };
 
-#define PY_GROUP_IND_DEFINE(group_func, doc)                              \
-    m.def(#group_func,                                                    \
-          py::overload_cast<const Indicator&, const KQuery::KType&>(&group_func), \
+#define PY_GROUP_IND_DEFINE(group_func, doc)                                                   \
+    m.def(#group_func, py::overload_cast<const Indicator&, const KQuery::KType&>(&group_func), \
           py::arg("ind"), py::arg("ktype") = KQuery::DAY, doc);
 
 #if HKU_OS_LINUX
@@ -71,7 +70,8 @@ public:
         HKU_CHECK(ret.shape()[0] == shape[0],
                   "The length of the return value of the Python function is inconsistent with "
                   "the input!");
-        const Indicator::value_t* data = ret.data();  // The data pointer (accessing the underlying memory directly)
+        const Indicator::value_t* data =
+          ret.data();  // The data pointer (accessing the underlying memory directly)
         memcpy(dst + group_start, data, total * sizeof(Indicator::value_t));
     }
 
@@ -297,7 +297,7 @@ void export_extend_Indicator(py::module& m) {
       py::arg("stks"), py::arg("ref_ind"), py::arg("mode") = 0, py::arg("fill_null") = true,
       py::arg("market") = "SH",
       R"(RANK(stks, ref_ind, mode = 0, fill_null = true, market = 'SH')
-      
+
     Calculate the ranking of the indicator value in the specified block
 
     :param stks: the specified security list or Block
@@ -308,12 +308,19 @@ void export_extend_Indicator(py::module& m) {
     :return: the ranking of the indicator value in the specified block
     :rtype: Indicator)");
 
-    PY_AGG_IND_DEFINE(AGG_MEAN, "The aggregation function: the average value, refer to the AGG_STD help")
-    PY_AGG_IND_DEFINE(AGG_COUNT, "The aggregation function: the non-empty value counting, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MEAN,
+                      "The aggregation function: the average value, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(
+      AGG_COUNT,
+      "The aggregation function: the non-empty value counting, refer to the AGG_STD help")
     PY_AGG_IND_DEFINE(AGG_SUM, "The aggregation function: the total sum, refer to the AGG_STD help")
-    PY_AGG_IND_DEFINE(AGG_MAX, "The aggregation function: the maximum value, refer to the AGG_STD help")
-    PY_AGG_IND_DEFINE(AGG_MIN, "The aggregation function: the minimum value, refer to the AGG_STD help")
-    PY_AGG_IND_DEFINE(AGG_MAD, "The aggregation function: the average absolute deviation, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MAX,
+                      "The aggregation function: the maximum value, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(AGG_MIN,
+                      "The aggregation function: the minimum value, refer to the AGG_STD help")
+    PY_AGG_IND_DEFINE(
+      AGG_MAD,
+      "The aggregation function: the average absolute deviation, refer to the AGG_STD help")
     PY_AGG_IND_DEFINE(AGG_MEDIAN, "The aggregation function: the median, refer to the AGG_STD help")
     PY_AGG_IND_DEFINE(AGG_PROD, "The aggregation function: the product, refer to the AGG_STD help")
 
@@ -464,12 +471,12 @@ void export_extend_Indicator(py::module& m) {
           R"(AGG_VWAP([ktype=Query.MIN, fill_null=False, unit=1])
 
     Aggregate the volume weighted average price of the other K-line periods (Volume Weighted Average Price)
-    
+
     VWAP is the volume-weighted average price, calculated by multiplying the volume of each minute (or unit time) by the trading price of that minute,
     then summing all the products, and finally dividing by the total volume.
 
     Usage: AGG_VWAP([ktype, fill_null, unit])
-    
+
     For example: AGG_VWAP(Query.MIN) calculates the VWAP value of the minute lines
 
     :param KQuery.KType ktype: the aggregated K-line period type
@@ -492,9 +499,9 @@ void export_extend_Indicator(py::module& m) {
       py::arg("ind"), py::arg("agg_func"), py::arg("ktype") = KQuery::MIN,
       py::arg("fill_null") = false, py::arg("unit") = 1,
       R"(AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
-      
+
     Aggregate the indicators of the other K-line periods with a custom function.
-    
+
     Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
@@ -520,7 +527,7 @@ void export_extend_Indicator(py::module& m) {
       "GROUP_FUNC",
       [](const Indicator& ind, py::object group_func, const KQuery::KType& ktype) {
           HKU_CHECK(!group_func.is_none(), "group_func is None!");
-          HKU_CHECK(py::hasattr(group_func, "__call__"), "agg_func not callable!");
+          HKU_CHECK(py::hasattr(group_func, "__call__"), "group_func not callable!");
           HKU_CHECK(check_pyfunction_arg_num(group_func, 2),
                     "Number of parameters does not match!");
           PyGroupFunc func_obj(group_func.attr("__call__"));
@@ -529,9 +536,9 @@ void export_extend_Indicator(py::module& m) {
       },
       py::arg("ind"), py::arg("group_func"), py::arg("ktype") = KQuery::DAY,
       R"(GROUP_FUNC(ind, group_func[, ktype=Query.DAY])
-      
+
     The custom group cumulative calculation indicator.
-    
+
     Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))

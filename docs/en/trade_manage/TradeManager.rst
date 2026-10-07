@@ -588,6 +588,16 @@ Common parameters:
             
         :note: this function is only suitable for the case of one buy and one sell; for the case of one buy and multiple sells, some statistics may be inaccurate — for reference only
 
+    .. py:method:: get_position_ext_info_dict(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo]
+    
+        Get the position details at the specified time after the account's last trading moment, returned as a dictionary with the stock as the key and the PositionExtInfo as the value
+    
+        :param Datetime current_time: the current moment (must be greater than or equal to the last trading moment)
+        :param Query.KType ktype: the K-line type
+        :param int trade_mode: the trading mode, affecting some statistics items: 0-trade at the close, 1-trade at the next open
+        :return: the dict of extended position details
+        :rtype: dict[Stock, PositionExtInfo]
+
     .. py:method:: get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo]
           
         Get the historical extended position details of the account (closed records)

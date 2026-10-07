@@ -10,19 +10,28 @@
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: 交易业务类型
-    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"UNKNOWN"
+    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"|"RETURN_STOCK"|"SUOGU"|"UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS    
     
-    - BUSINESS.INIT     - 建立初始账户
-    - BUSINESS.BUY      - 买入
-    - BUSINESS.SELL     - 卖出
-    - BUSINESS.GIFT     - 送股
-    - BUSINESS.BONUS    - 分红
-    - BUSINESS.CHECKIN  - 存入现金
-    - BUSINESS.CHECKOUT - 取出现金
-    - BUSINESS.INVALID  - 无效类型
+    - BUSINESS.INIT           - 建立初始账户
+    - BUSINESS.BUY            - 买入
+    - BUSINESS.SELL           - 卖出
+    - BUSINESS.BUY_SHORT      - 买空（归还借入股票）
+    - BUSINESS.SELL_SHORT     - 卖空（借入股票卖出）
+    - BUSINESS.GIFT           - 送股
+    - BUSINESS.BONUS          - 分红
+    - BUSINESS.CHECKIN        - 存入现金
+    - BUSINESS.CHECKOUT       - 取出现金
+    - BUSINESS.CHECKIN_STOCK  - 存入股票
+    - BUSINESS.CHECKOUT_STOCK - 取出股票
+    - BUSINESS.BORROW_CASH    - 借入资金
+    - BUSINESS.RETURN_CASH    - 归还借入资金
+    - BUSINESS.BORROW_STOCK   - 借入股票
+    - BUSINESS.RETURN_STOCK   - 归还借入股票
+    - BUSINESS.SUOGU          - 缩股
+    - BUSINESS.INVALID        - 无效类型
 
 
 

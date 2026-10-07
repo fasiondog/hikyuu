@@ -588,6 +588,16 @@
             
         :note: 该功能只适合一买一卖的情况，对于一买多卖的情况，部分统计可能不准确，仅供参考
 
+    .. py:method:: get_position_ext_info_dict(self, current_time, ktype=Query.DAY, trade_mode=0) -> dict[Stock, PositionExtInfo]
+    
+        获取账户最后交易时刻之后指定时间的持仓详情，以字典返回，股票为 key，PositionExtInfo 为值
+    
+        :param Datetime current_time: 当前时刻（需大于等于最后交易时刻）
+        :param Query.KType ktype: k 线类型
+        :param int trade_mode: 交易模式，影响部分统计项：0-收盘时交易，1-下一开盘时交易
+        :return: 持仓扩展详情字典
+        :rtype: dict[Stock, PositionExtInfo]
+
     .. py:method:: get_history_position_ext_info_list(self, ktype=Query.DAY, trade_mode=0) -> list[PositionExtInfo]
           
         获取账户历史持仓扩展详情（已平仓记录）
