@@ -248,7 +248,10 @@ protected:
         TimeDelta delta;
         string market;
         bool ignoreMarket{false};
-        bool registered{false};  // guards against duplicated timers across start()/stop() cycles
+        // Two-state tracking: false until the periodic duration func is actually armed; true
+        // once armed. A one-shot alignment suppressed by stop() stays false so start() can
+        // re-schedule it instead of losing the task forever after restart.
+        std::shared_ptr<std::atomic_bool> periodic_armed;
     };
     std::forward_list<RunDailyAt> m_run_daily_at_list;
 

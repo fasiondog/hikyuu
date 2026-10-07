@@ -182,7 +182,7 @@ Common parameters:
         - When buying, if the order quantity exceeds the maximum tradable quantity, it is filled at the maximum tradable quantity.
         - When selling, if the order quantity exceeds the maximum tradable quantity and is not equal to MAX_DOUBLE, it is filled at the maximum tradable quantity.
         - When selling, if the order quantity is below the minimum tradable quantity, the sell order is ignored with a warning (the position is not cleared).
-- When support_short is enabled, the part of a sell order beyond the current long position is opened short via stock borrowing (close-long-then-open-short).
+        - When support_short is enabled, the part of a sell order beyond the current long position is opened short via stock borrowing (close-long-then-open-short).
 
         :param Stock stock: the specified security
         :param float num: the order quantity

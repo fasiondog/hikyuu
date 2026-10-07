@@ -89,7 +89,7 @@ void export_Strategy(py::module& m) {
 
       .def("stop", &Strategy::stop, R"(stop(self)
 
-    Stop the strategy event loop; registered market-data / timed callbacks become no-ops, so start() returns and the object can be safely destroyed.)")
+    Stop the strategy event loop; registered market-data / timed callbacks become no-ops and queued callbacks are dropped, so start() returns. Destroy the object on the same thread after start() has returned.)")
 
       .def(
         "on_change",

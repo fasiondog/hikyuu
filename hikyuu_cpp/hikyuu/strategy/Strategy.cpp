@@ -273,12 +273,15 @@ void Strategy::_runDaily() {
     auto token = m_token;
 
     for (auto& run_at : m_run_daily_at_list) {
-        // Register each run_daily entry only once; the armed timers resume on the next start()
-        // through the shared token, so repeated start() does not duplicate periodic jobs.
-        if (run_at.registered) {
+        if (!run_at.periodic_armed) {
+            run_at.periodic_armed = std::make_shared<std::atomic_bool>(false);
+        }
+        auto flag = run_at.periodic_armed;
+        // Only skip when the periodic duration func is truly armed; a pending one-shot
+        // alignment suppressed during stop() would otherwise be lost forever after restart.
+        if (flag->load()) {
             continue;
         }
-        run_at.registered = true;
         // Guarded job (captured by value): skip when the strategy has been stopped/destroyed,
         // so a timer armed before stop() can never touch a freed object.
         auto job = [token, f = run_at.func]() {
@@ -287,16 +290,22 @@ void Strategy::_runDaily() {
             }
             f();
         };
-        // Periodic re-arm keeps using the guarded job, so once stopped it no-ops.
-        auto arm_duration = [token, scheduler, job, delta = run_at.delta]() {
+        // Periodic re-arm keeps using the guarded job; the flag dedupes when an old pending
+        // one-shot races with a freshly registered one after a stop()/start() cycle.
+        auto arm_duration = [token, scheduler, job, flag, delta = run_at.delta]() {
             if (!token->alive) {
                 return;
             }
+            if (flag->load()) {
+                return;
+            }
             scheduler->addDurationFunc(std::numeric_limits<int>::max(), delta, job);
+            flag->store(true);
         };
 
         if (run_at.ignoreMarket) {
             scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+            flag->store(true);
             continue;
         }
         try {
@@ -311,7 +320,10 @@ void Strategy::_runDaily() {
             TimeDelta now_time = now - today;
             if (now_time >= market_info.closeTime2()) {
                 scheduler->addFuncAtTime(today.nextDay() + market_info.openTime1(),
-                                         [job, arm_duration]() {
+                                         [job, arm_duration, flag]() {
+                                             if (flag->load()) {
+                                                 return;
+                                             }
                                              job();
                                              arm_duration();
                                          });
@@ -321,40 +333,56 @@ void Strategy::_runDaily() {
                 int64_t delta_ticks = run_at.delta.ticks();
                 if (ticks % delta_ticks == 0) {
                     scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+                    flag->store(true);
                 } else {
                     auto delay =
                       TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
-                    scheduler->addFuncAtTime(now + delay, [job, arm_duration]() {
+                    scheduler->addFuncAtTime(now + delay, [job, arm_duration, flag]() {
+                        if (flag->load()) {
+                            return;
+                        }
                         job();
                         arm_duration();
                     });
                 }
 
             } else if (now_time >= market_info.closeTime1()) {
-                scheduler->addFuncAtTime(today + market_info.openTime2(), [job, arm_duration]() {
-                    job();
-                    arm_duration();
-                });
+                scheduler->addFuncAtTime(today + market_info.openTime2(),
+                                         [job, arm_duration, flag]() {
+                                             if (flag->load()) {
+                                                 return;
+                                             }
+                                             job();
+                                             arm_duration();
+                                         });
 
             } else if (now_time < market_info.closeTime1() && now_time >= market_info.openTime1()) {
                 int64_t ticks = now_time.ticks() - market_info.openTime1().ticks();
                 int64_t delta_ticks = run_at.delta.ticks();
                 if (ticks % delta_ticks == 0) {
                     scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
+                    flag->store(true);
                 } else {
                     auto delay =
                       TimeDelta::fromTicks((ticks / delta_ticks + 1) * delta_ticks - ticks);
-                    scheduler->addFuncAtTime(now + delay, [job, arm_duration]() {
+                    scheduler->addFuncAtTime(now + delay, [job, arm_duration, flag]() {
+                        if (flag->load()) {
+                            return;
+                        }
                         job();
                         arm_duration();
                     });
                 }
 
             } else if (now_time < market_info.openTime1()) {
-                scheduler->addFuncAtTime(today + market_info.openTime1(), [job, arm_duration]() {
-                    job();
-                    arm_duration();
-                });
+                scheduler->addFuncAtTime(today + market_info.openTime1(),
+                                         [job, arm_duration, flag]() {
+                                             if (flag->load()) {
+                                                 return;
+                                             }
+                                             job();
+                                             arm_duration();
+                                         });
 
             } else {
                 CLS_ERROR("Unknown process! now_time: {}", now_time);
