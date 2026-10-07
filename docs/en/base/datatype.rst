@@ -397,8 +397,10 @@ K-line Data
     .. py:method:: get(pos)
 
         Get the K-line record at the specified index position
-        
-        :param int pos: the position index
+
+        Fast-path alternative to `kdata[pos]` (`__getitem__`): bounds and negative-index checks are intentionally skipped for performance. In hot loops, the caller must guarantee `0 <= pos < len(kdata)`; otherwise the behavior is undefined (may read arbitrary heap). Prefer `kdata[pos]` when the index is not pre-validated.
+
+        :param int pos: the position index (must be in [0, len(kdata)))
         :rtype: KRecord        
     
     .. py:method:: get_by_datetime(datetime)    

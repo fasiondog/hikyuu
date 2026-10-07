@@ -397,8 +397,10 @@ K线数据
     .. py:method:: get(pos)
 
         获取指定索引位置的K线记录
-        
-        :param int pos: 位置索引
+
+        性能优先的快通道，对比 `kdata[pos]`（`__getitem__`）故意不做边界与负索引检查，热循环中调用方需自行保证 `0 <= pos < len(kdata)`，越界/负值为未定义行为（可能读任意堆内存）。若不确定索引合法性，请优先用 `kdata[pos]`。
+
+        :param int pos: 位置索引（需在 [0, len(kdata)) 区间内）
         :rtype: KRecord        
     
     .. py:method:: get_by_datetime(datetime)    

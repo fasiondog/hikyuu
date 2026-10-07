@@ -62,9 +62,16 @@ void export_KData(py::module& m) {
 
       .def("get", KData_getKRecord1, py::return_value_policy::copy, R"(get(self, pos)
 
-        Get the K-line record at the specified index position
+        Get the K-line record at the specified index position.
 
-        :param int pos: the position index
+        Fast-path alternative to `kdata[pos]` (`__getitem__`): intentionally skips bounds checking
+        and negative-index handling to avoid the extra cost per call. Use this when you find
+        `kdata[pos]` too slow in a hot loop, and you have already verified the index upstream.
+
+        Contract: the caller MUST guarantee `0 <= pos < len(kdata)`. Passing an out-of-range or
+        negative value is undefined behavior (arbitrary heap read).
+
+        :param int pos: the position index (must be within [0, len(kdata)))
         :rtype: KRecord)")
 
       .def("get_by_datetime", KData_getKRecord2, py::return_value_policy::copy,

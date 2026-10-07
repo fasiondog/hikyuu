@@ -41,6 +41,13 @@ KRecordList df_to_krecords(const py::object& df, const StringList& cols) {
     auto volume = volume_array.data();
 
     size_t total = open_array.size();
+    HKU_CHECK(np_dates.request().size == (Py_ssize_t)total && high_array.size() == total &&
+                low_array.size() == total && close_array.size() == total &&
+                amount_array.size() == total && volume_array.size() == total,
+              "df_to_krecords: column length mismatch (open=%zu, date=%zd, high=%zu, low=%zu, "
+              "close=%zu, amount=%zu, volume=%zu)",
+              total, np_dates.request().size, high_array.size(), low_array.size(),
+              close_array.size(), amount_array.size(), volume_array.size());
     ret.resize(total);
     for (size_t i = 0; i < total; i++) {
         ret[i].datetime = Datetime::fromTimestamp(date[i] / 1000LL);

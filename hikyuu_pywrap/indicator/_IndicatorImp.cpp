@@ -63,7 +63,7 @@ void export_IndicatorImp(py::module& m) {
     py::class_<IndicatorImp, IndicatorImpPtr, PyIndicatorImp>(
       m, "IndicatorImp",
       R"(The indicator implementation class; when defining a new indicator, you should inherit from this class
-    
+
     The subclass needs to implement the following interfaces:
 
         - _clone() -> IndicatorImp
@@ -98,7 +98,14 @@ void export_IndicatorImp(py::module& m) {
       .def("set_ind_param", set_ind_param1)
       .def("set_ind_param", set_ind_param2)
       .def("set_discard", &IndicatorImp::setDiscard)
-      .def("_set", &IndicatorImp::_set, py::arg("val"), py::arg("pos"), py::arg("num") = 0)
+      .def(
+        "_set",
+        [](IndicatorImp& self, IndicatorImp::value_t val, int64_t pos, int64_t num) {
+            HKU_CHECK(pos >= 0 && num >= 0,
+                      "_set: pos and num must be non-negative (pos={}, num={})", pos, num);
+            self._set(val, static_cast<size_t>(pos), static_cast<size_t>(num));
+        },
+        py::arg("val"), py::arg("pos"), py::arg("num") = 0)
       .def("_ready_buffer", &IndicatorImp::_readyBuffer)
       .def("get_result_num", &IndicatorImp::getResultNumber)
       .def("get_result_as_price_list", &IndicatorImp::getResultAsPriceList)
