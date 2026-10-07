@@ -73,7 +73,6 @@ Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& 
                    const unordered_map<string, int64_t>& preloadNum, const string& name,
                    const string& config_file)
 : Strategy(name, config_file) {
-    _initParam();
     m_context.setStockCodeList(codeList);
     m_context.setKTypeList(ktypeList);
     m_context.setPreloadNum(preloadNum);
@@ -81,7 +80,6 @@ Strategy::Strategy(const vector<string>& codeList, const vector<KQuery::KType>& 
 
 Strategy::Strategy(const StrategyContext& context, const string& name, const string& config_file)
 : Strategy(name, config_file) {
-    _initParam();
     m_context = context;
 }
 
@@ -214,17 +212,19 @@ void Strategy::onReceivedSpot(const std::function<void(Strategy*, const Datetime
 }
 
 void Strategy::_receivedSpot(const SpotRecord& spot) {
+    if (!m_on_change) {
+        return;
+    }
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
-        if (m_on_change) {
-            auto token = m_token;
-            event([this, token, stk, spot]() {
-                if (!token->alive) {
-                    return;
-                }
-                m_on_change(this, stk, spot);
-            });
-        }
+        auto token = m_token;
+        auto sp = std::make_shared<const SpotRecord>(spot);
+        event([this, token, stk, sp]() {
+            if (!token->alive) {
+                return;
+            }
+            m_on_change(this, stk, *sp);
+        });
     }
 }
 

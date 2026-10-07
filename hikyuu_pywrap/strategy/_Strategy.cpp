@@ -61,11 +61,11 @@ void export_Strategy(py::module& m) {
         [](Strategy& self, bool auto_recieve_spot) {
             // In python, before start, forcibly add an empty function, used to catch
             // KeyboardInterrupt to terminate the strategy
-            py::object func = py::eval("lambda stg: None");
-            HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
+            auto func = make_gil_safe(py::eval("lambda stg: None"));
+            HKU_CHECK(check_pyfunction_arg_num(*func, 1), "Number of parameters does not match!");
             auto new_func = [=](Strategy* stg) {
                 try {
-                    func(stg);
+                    (*func)(stg);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -96,10 +96,10 @@ void export_Strategy(py::module& m) {
         [](Strategy& self, py::object func) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 3), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg, const Stock& stk, const SpotRecord& spot) {
                 try {
-                    c_func(stg, stk, spot);
+                    (*c_func)(stg, stk, spot);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -126,10 +126,10 @@ void export_Strategy(py::module& m) {
         [](Strategy& self, py::object func) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 2), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg, Datetime revTime) {
                 try {
-                    c_func(stg, revTime);
+                    (*c_func)(stg, revTime);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -157,10 +157,10 @@ void export_Strategy(py::module& m) {
            bool ignore_market) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg) {
                 try {
-                    c_func(stg);
+                    (*c_func)(stg);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
@@ -192,10 +192,10 @@ void export_Strategy(py::module& m) {
         [](Strategy& self, py::object func, const TimeDelta& time, bool ignore_holiday) {
             HKU_CHECK(py::hasattr(func, "__call__"), "func is not callable!");
             HKU_CHECK(check_pyfunction_arg_num(func, 1), "Number of parameters does not match!");
-            py::object c_func = func.attr("__call__");
+            auto c_func = make_gil_safe(func.attr("__call__"));
             auto new_func = [=](Strategy* stg) {
                 try {
-                    c_func(stg);
+                    (*c_func)(stg);
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
