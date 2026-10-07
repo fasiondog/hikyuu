@@ -464,6 +464,8 @@ K线数据
     
         转化为pandas的DataFrame
         
+        KData 为空时，返回包含标准列（datetime、open、high、low、close、amount、volume，with_stock 为 True 时另含 market_code、name）的 0 行 DataFrame，与非空路径保持列结构一致。
+        
         :param bool with_stock: 包含Stock的代码与名称
         :rtype: pandas.DataFrame
 

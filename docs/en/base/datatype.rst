@@ -464,6 +464,8 @@ K-line Data
     
         Convert to a pandas DataFrame
         
+        When the KData is empty, a 0-row DataFrame with the standard columns (datetime, open, high, low, close, amount, volume, plus market_code and name when with_stock is True) is returned, keeping the schema consistent with the non-empty path.
+        
         :param bool with_stock: include the code and the name of the Stock
         :rtype: pandas.DataFrame
 
