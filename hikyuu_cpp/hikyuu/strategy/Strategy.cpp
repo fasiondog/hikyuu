@@ -187,7 +187,11 @@ void Strategy::stop() {
     if (m_token) {
         m_token->alive = false;
     }
-    // Push a null task to wake the loop out of wait_and_pop so start() can return.
+    // Discard queued callbacks so they no-op after stop (as documented), then wake the loop
+    // out of wait_and_pop so start() can return.
+    event_type task;
+    while (m_event_queue.try_pop(task)) {
+    }
     m_event_queue.push(FuncWrapper());
 }
 
@@ -206,7 +210,13 @@ void Strategy::_receivedSpot(const SpotRecord& spot) {
     Stock stk = getStock(format("{}{}", spot.market, spot.code));
     if (!stk.isNull()) {
         if (m_on_change) {
-            event([this, stk, spot]() { m_on_change(this, stk, spot); });
+            auto token = m_token;
+            event([this, token, stk, spot]() {
+                if (!token->alive) {
+                    return;
+                }
+                m_on_change(this, stk, spot);
+            });
         }
     }
 }
@@ -488,6 +498,11 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
             double closed = 0.0;
             if (abs_num >= hold && hold > 0.0) {
                 ret = sell(stk, 0.0, MAX_DOUBLE, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+                // A failed close must not fall through to opening a short, otherwise the same
+                // security ends up locked on both sides.
+                HKU_WARN_IF_RETURN(ret.business == BUSINESS_INVALID, ret,
+                                   "{} {} close long failed, abort opening short!",
+                                   stk.market_code(), stk.name());
                 closed = hold;
             } else {
                 double close_num = int64_t(abs_num / min_trade_num) * min_trade_num;
@@ -496,6 +511,9 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
                 }
                 if (close_num > 0.0) {
                     ret = sell(stk, 0.0, close_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
+                    HKU_WARN_IF_RETURN(ret.business == BUSINESS_INVALID, ret,
+                                       "{} {} close long failed, abort opening short!",
+                                       stk.market_code(), stk.name());
                 }
                 closed = close_num;
             }
