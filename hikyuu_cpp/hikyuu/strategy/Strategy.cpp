@@ -5,6 +5,7 @@
  *     Author: fasiondog
  */
 
+#include <cmath>
 #include <csignal>
 #include <cstdlib>
 #include <unordered_set>
@@ -423,11 +424,17 @@ KData Strategy::getLastKData(const Stock& stk, size_t lastnum, const KQuery::KTy
 
 TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) {
     TradeRecord ret;
+    HKU_ASSERT(m_tm);
+    HKU_WARN_IF_RETURN(!std::isfinite(num), ret, "{} {} order num({}) is invalid!",
+                       stk.market_code(), stk.name(), num);
     HKU_WARN_IF_RETURN(num == 0.0, ret, "{} {} order num is zero!", stk.market_code(), stk.name());
 
     double min_trade_num = stk.minTradeNumber();
     double max_trade_num = stk.maxTradeNumber();
+    HKU_ERROR_IF_RETURN(!(min_trade_num > 0.0), ret, "{} {} invalid minTradeNumber({})!",
+                        stk.market_code(), stk.name(), min_trade_num);
     if (num > 0.0) {
+        // 容易打印过多，此处不打印
         // HKU_WARN_IF_RETURN(num < min_trade_num, ret,
         //                    "Ignore! {} {} order num({}) is less than min trade number({})!",
         //                    stk.market_code(), stk.name(), num, min_trade_num);
@@ -445,13 +452,18 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
         }
         double abs_num = std::abs(num);
         double sell_num = int64_t(abs_num / min_trade_num) * min_trade_num;
-        if (sell_num > max_trade_num && sell_num != MAX_DOUBLE) {
+        if (sell_num > max_trade_num) {
             sell_num = max_trade_num;
         } else if (abs_num != sell_num) {
-            // The request contains an odd lot (a non-integer multiple of min_trade_num), which can
-            // never be sold alone; sell all the remaining position to carry the odd lot away
-            sell_num = MAX_DOUBLE;
+            // carry the odd lot only when the position has one and the request closes it
+            double hold = m_tm->getHoldNumber(now(), stk);
+            if (hold > 0.0 && std::fmod(hold, min_trade_num) != 0.0 && abs_num >= hold) {
+                sell_num = MAX_DOUBLE;
+            }
         }
+        HKU_WARN_IF_RETURN(sell_num <= 0.0, ret,
+                           "Ignore! {} {} sell num({}) is less than min trade number({})!",
+                           stk.market_code(), stk.name(), abs_num, min_trade_num);
         ret = sell(stk, 0.0, sell_num, 0.0, 0.0, SystemPart::PART_SIGNAL, remark);
     }
 
@@ -460,6 +472,9 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
 
 TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& remark) {
     TradeRecord ret;
+    HKU_ASSERT(m_tm);
+    HKU_WARN_IF_RETURN(!std::isfinite(value), ret, "{} {} order value({}) is invalid!",
+                       stk.market_code(), stk.name(), value);
     HKU_WARN_IF_RETURN(value == 0.0, ret, "{} {} order value is zero!", stk.market_code(),
                        stk.name());
 
@@ -467,11 +482,15 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
     HKU_IF_RETURN(k.empty() || k[0].datetime.startOfDay() != today(), ret);
 
     price_t price = k[0].closePrice;
+    // an invalid daily price (0/NaN) would cause UB in the number conversion
+    HKU_ERROR_IF_RETURN(!(price > 0.0), ret, "Invalid daily price({}) of {} {}!", price,
+                        stk.market_code(), stk.name());
+    double min_trade = stk.minTradeNumber();
+    HKU_ERROR_IF_RETURN(!(min_trade > 0.0), ret, "{} {} invalid minTradeNumber({})!",
+                        stk.market_code(), stk.name(), min_trade);
     if (value > 0.0) {
-        double min_trade = stk.minTradeNumber();
-
         // Convert it into an integer multiple of the minimum trade quantity
-        // (consistent with the MoneyManagerBase::getBuyNumber convention, ISS-135)
+        // (consistent with the MoneyManagerBase::getBuyNumber convention)
         double n = int64_t(value / price / min_trade) * min_trade;
         CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
 
@@ -542,7 +561,5 @@ void HKU_API runInStrategy(const SYSPtr& sys, const Stock& stk, const KQuery& qu
     sys->setSP(SlippagePtr());  // Clear the slippage algorithm
     sys->run(stk, query);
 }
-
-
 
 }  // namespace hku
