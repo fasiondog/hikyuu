@@ -141,7 +141,8 @@ The custom signal generator interfaces:
       .def("clone", &SignalBase::clone, "The clone operation")
       .def("_calculate", &SignalBase::_calculate, R"(_calculate(self, kdata)
       
-    [Overload interface] The subclass calculation interface)")
+    [Overload interface] The subclass calculation interface.
+    Do not call super()._calculate() in a Python override (causes infinite recursion).)")
 
       .def("_reset", &SignalBase::_reset,
            "[Overload interface] The subclass reset interface, resetting the internal private "

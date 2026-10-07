@@ -21,7 +21,7 @@ void export_System(py::module& m);
 void export_SCFilter(py::module& m);
 void export_Selector(py::module& m);
 
-void export_Normlize(py::module& m);
+void export_Normalize(py::module& m);
 void export_MultiFactor(py::module& m);
 
 void export_trade_sys_main(py::module& m) {
@@ -36,7 +36,7 @@ void export_trade_sys_main(py::module& m) {
     export_SCFilter(m);
     export_Selector(m);
 
-    export_Normlize(m);
+    export_Normalize(m);
     export_MultiFactor(m);
     export_System(m);
 }

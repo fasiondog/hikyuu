@@ -59,8 +59,6 @@ public:
         return c_ret;
     }
 
-
-
     string str() const override {
         PYBIND11_OVERRIDE_NAME(string, SelectorBase, "__str__", str, );
     }
@@ -114,8 +112,10 @@ SEPtr crtSEOptimal(const py::function& evalfunc) {
 }
 
 void export_Selector(py::module& m) {
-    py::class_<SystemWeight>(m, "SystemWeight", py::dynamic_attr(),
-                             "The system weight structure; during the asset allocation, it specifies the asset proportion coefficient of the corresponding system")
+    py::class_<SystemWeight>(
+      m, "SystemWeight", py::dynamic_attr(),
+      "The system weight structure; during the asset allocation, it specifies the asset proportion "
+      "coefficient of the corresponding system")
       .def(py::init<>())
       .def(py::init<const SystemPtr&, price_t>())
       .def("__str__", to_py_str<SystemWeight>)
@@ -137,6 +137,7 @@ void export_Selector(py::module& m) {
         };
 
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        HKU_CHECK(data != nullptr, "systemweights_to_np: malloc failed!");
         for (size_t i = 0, total = swl.size(); i < total; i++) {
             const SystemWeight& sw = swl[i];
             if (sw.sys) {
@@ -155,7 +156,7 @@ void export_Selector(py::module& m) {
           py::dtype(vector_to_python_list<string>(
                       {htr("sys_name"), htr("market_code"), htr("stock_name"), htr("weight")}),
                     vector_to_python_list<string>({"U20", "U10", "U20", "d"}),
-                    vector_to_python_list<int64_t>({0, 80, 120, 200}), 208);
+                    vector_to_python_list<int64_t>({0, 80, 120, 200}), sizeof(RawData));
 
         return py::array(dtype, total, static_cast<RawData*>(data),
                          py::capsule(data, [](void* p) { std::free(p); }));
@@ -231,7 +232,8 @@ void export_Selector(py::module& m) {
       .def_property_readonly("proto_sys_list", &SelectorBase::getProtoSystemList,
                              py::return_value_policy::copy, "The prototype system list")
       .def_property_readonly("real_sys_list", &SelectorBase::getRealSystemList,
-                             py::return_value_policy::copy, "The actual running system list set by the PF at runtime")
+                             py::return_value_policy::copy,
+                             "The actual running system list set by the PF at runtime")
       .def_property_readonly("scfilter", &SelectorBase::getScoresFilter, "Get the ScoresFilter")
 
       .def_property(
@@ -295,10 +297,9 @@ void export_Selector(py::module& m) {
       .def("calculate", &SelectorBase::calculate)
 
       .def("_reset", &SelectorBase::_reset, "The subclass reset operation implementation")
-      .def("_calculate", &SelectorBase::_calculate, "[Overload interface] The subclass calculation interface")
-
-
-
+      .def("_calculate", &SelectorBase::_calculate,
+           "[Overload interface] The subclass calculation interface. Do not call "
+           "super()._calculate() in a Python override (causes infinite recursion).")
 
       .def("get_selected", &SelectorBase::getSelected,
            R"(get_selected(self, datetime)
@@ -532,10 +533,12 @@ void export_Selector(py::module& m) {
 
     :param func: a callable object, receiving the parameters (sys, lastdate) and returning a float value)");
 
-    m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal, "The optimization selector maximizing the account assets");
+    m.def("SE_MaxFundsOptimal", SE_MaxFundsOptimal,
+          "The optimization selector maximizing the account assets");
 
-    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal, py::arg("key") = "Account Avg Annual Return %",
-          py::arg("mode") = 0, R"(SE_PerformanceOptimal(key="Account Avg Annual Return %", mode=0)
+    m.def("SE_PerformanceOptimal", SE_PerformanceOptimal,
+          py::arg("key") = "Account Avg Annual Return %", py::arg("mode") = 0,
+          R"(SE_PerformanceOptimal(key="Account Avg Annual Return %", mode=0)
 
     The selector optimizing by the Performance statistics results
 

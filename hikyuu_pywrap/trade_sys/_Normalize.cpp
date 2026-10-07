@@ -32,7 +32,7 @@ public:
     }
 };
 
-void export_Normlize(py::module& m) {
+void export_Normalize(py::module& m) {
     py::class_<NormalizeBase, NormalizePtr, PyNormalizeBase>(
       m, "NormalizeBase", py::dynamic_attr(),
       R"(The cross-section standardization operation used for the MF)")

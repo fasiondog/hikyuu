@@ -71,7 +71,8 @@ The custom slippage interfaces:
       .def_property("name", py::overload_cast<>(&SlippageBase::name, py::const_),
                     py::overload_cast<const string&>(&SlippageBase::name),
                     py::return_value_policy::copy, "Name")
-      .def_property("to", &SlippageBase::getTO, &SlippageBase::setTO, "The associated trading object")
+      .def_property("to", &SlippageBase::getTO, &SlippageBase::setTO,
+                    "The associated trading object")
 
       .def("get_param", &SlippageBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -116,8 +117,12 @@ The custom slippage interfaces:
 
       .def("reset", &SlippageBase::reset, "The reset operation")
       .def("clone", &SlippageBase::clone, "The clone operation")
-      .def("_calculate", &SlippageBase::_calculate, "[Overload interface] The subclass calculation interface")
-      .def("_reset", &SlippageBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
+      .def("_calculate", &SlippageBase::_calculate,
+           "[Overload interface] The subclass calculation interface. Do not call "
+           "super()._calculate() in a Python override (causes infinite recursion).")
+      .def("_reset", &SlippageBase::_reset,
+           "[Overload interface] The subclass reset interface, resetting the internal private "
+           "variables")
 
         DEF_PICKLE(SPPtr);
 

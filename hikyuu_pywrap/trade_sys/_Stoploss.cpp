@@ -46,8 +46,9 @@ public:
 };
 
 void export_Stoploss(py::module& m) {
-    py::class_<StoplossBase, StoplossPtr, PyStoplossBase>(m, "StoplossBase", py::dynamic_attr(),
-                                                          R"(The stop-loss/take-profit algorithm base class
+    py::class_<StoplossBase, StoplossPtr, PyStoplossBase>(
+      m, "StoplossBase", py::dynamic_attr(),
+      R"(The stop-loss/take-profit algorithm base class
 The custom stop-loss/take-profit strategy interfaces:
 
     - _calculate : [Required] The subclass calculation interface
@@ -65,8 +66,10 @@ The custom stop-loss/take-profit strategy interfaces:
       .def_property("name", py::overload_cast<>(&StoplossBase::name, py::const_),
                     py::overload_cast<const string&>(&StoplossBase::name),
                     py::return_value_policy::copy, "Name")
-      .def_property("tm", &StoplossBase::getTM, &StoplossBase::setTM, "The associated trade manager instance")
-      .def_property("to", &StoplossBase::getTO, &StoplossBase::setTO, "The associated trading object")
+      .def_property("tm", &StoplossBase::getTM, &StoplossBase::setTM,
+                    "The associated trade manager instance")
+      .def_property("to", &StoplossBase::getTO, &StoplossBase::setTO,
+                    "The associated trading object")
 
       .def("get_param", &StoplossBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -105,8 +108,12 @@ The custom stop-loss/take-profit strategy interfaces:
 
       .def("reset", &StoplossBase::reset, "The reset operation")
       .def("clone", &StoplossBase::clone, "The clone operation")
-      .def("_calculate", &StoplossBase::_calculate, "[Overload interface] The subclass calculation interface")
-      .def("_reset", &StoplossBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
+      .def("_calculate", &StoplossBase::_calculate,
+           "[Overload interface] The subclass calculation interface. Do not call "
+           "super()._calculate() in a Python override (causes infinite recursion).")
+      .def("_reset", &StoplossBase::_reset,
+           "[Overload interface] The subclass reset interface, resetting the internal private "
+           "variables")
 
         DEF_PICKLE(StoplossPtr);
 

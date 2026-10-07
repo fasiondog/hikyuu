@@ -84,6 +84,7 @@ void export_MultiFactor(py::module& m) {
 
         // Allocate the memory with malloc
         RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+        HKU_CHECK(data != nullptr, "scorerecords_to_np: malloc failed!");
         std::string ucode, uname;
         for (size_t i = 0, len = scs.size(); i < len; i++) {
             const ScoreRecord& sc = scs[i];

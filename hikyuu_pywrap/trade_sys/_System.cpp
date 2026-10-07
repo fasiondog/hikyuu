@@ -36,6 +36,9 @@ DatetimeList toDatetimeList(const py::object& dates) {
         throw py::type_error(
           "dates must be an iterable sequence of Datetime (list/tuple/DatetimeList)");
     }
+    if (py::isinstance<py::str>(dates) || py::isinstance<py::bytes>(dates)) {
+        throw py::type_error("dates must be an iterable sequence of Datetime, not str/bytes");
+    }
     for (auto item : py::iter(dates)) {
         result.push_back(py::cast<Datetime>(item));
     }

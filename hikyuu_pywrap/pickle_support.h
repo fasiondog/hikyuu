@@ -46,6 +46,8 @@
 
 namespace py = pybind11;
 
+// Limitation: deserializing a Python subclass instance via DEF_PICKLE restores only the C++ base;
+// m_is_python_object is reset to false and any Python-level overrides are lost silently.
 #define DEF_PICKLE(classname)                                                                      \
     .def(py::pickle(                                                                               \
       [](const classname& p) {                                                                     \
