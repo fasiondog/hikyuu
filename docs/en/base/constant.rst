@@ -103,7 +103,7 @@ Null Values and Security Types
     
     .. py:attribute:: STOCKTYPE_GEM Stock type - ChiNext (GEM)
 
-    .. py:attribute:: STOCKTYPE_START Stock type - ChiNext (GEM)
+    .. py:attribute:: STOCKTYPE_START Stock type - STAR Market
 
     .. py:attribute:: STOCKTYPE_A_BJ Stock type - A-share of the Beijing Stock Exchange
     

@@ -103,7 +103,7 @@ Null 值及证券类别
     
     .. py:attribute:: STOCKTYPE_GEM 股票类型-创业板
 
-    .. py:attribute:: STOCKTYPE_START 股票类型-创业板
+    .. py:attribute:: STOCKTYPE_START 股票类型-科创板
 
     .. py:attribute:: STOCKTYPE_A_BJ 股票类型-A股北交所
     

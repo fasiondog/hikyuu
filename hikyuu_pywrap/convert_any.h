@@ -107,6 +107,10 @@ public:
 
         if (PyLong_Check(src)) {
             long long ll_val = PyLong_AsLongLong(src);
+            if (ll_val == -1 && PyErr_Occurred()) {
+                // Overflow (or other conversion error): propagate instead of silently storing -1
+                throw pybind11::error_already_set();
+            }
             value = static_cast<int64_t>(ll_val);
             return true;
         }

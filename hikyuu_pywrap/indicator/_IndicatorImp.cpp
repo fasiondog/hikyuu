@@ -45,7 +45,7 @@ public:
     }
 
     size_t min_increment_start() const override {
-        PYBIND11_OVERLOAD_NAME(bool, IndicatorImp, "min_increment_start", min_increment_start);
+        PYBIND11_OVERLOAD_NAME(size_t, IndicatorImp, "min_increment_start", min_increment_start);
     }
 
     void _increment_calculate(const Indicator& ind, size_t start_pos) override {
@@ -61,7 +61,8 @@ void (IndicatorImp::*set_ind_param2)(const string&, const IndParam&) = &Indicato
 
 void export_IndicatorImp(py::module& m) {
     py::class_<IndicatorImp, IndicatorImpPtr, PyIndicatorImp>(
-      m, "IndicatorImp", R"(The indicator implementation class; when defining a new indicator, you should inherit from this class
+      m, "IndicatorImp",
+      R"(The indicator implementation class; when defining a new indicator, you should inherit from this class
     
     The subclass needs to implement the following interfaces:
 
@@ -80,8 +81,10 @@ void export_IndicatorImp(py::module& m) {
       .def("__str__", to_py_str<IndicatorImp>)
       .def("__repr__", to_py_str<IndicatorImp>)
 
-      .def_property("name", read_name, write_name, py::return_value_policy::copy, "The indicator name")
-      .def_property_readonly("discard", &IndicatorImp::discard, "The number of the points to discard in the result")
+      .def_property("name", read_name, write_name, py::return_value_policy::copy,
+                    "The indicator name")
+      .def_property_readonly("discard", &IndicatorImp::discard,
+                             "The number of the points to discard in the result")
 
       .def("get_parameter", &IndicatorImp::getParameter, py::return_value_policy::copy,
            "Get the internal parameter class object")

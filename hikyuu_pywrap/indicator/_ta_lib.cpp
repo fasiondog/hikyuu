@@ -388,7 +388,7 @@ void export_Indicator_ta_lib(py::module& m) {
     m.def("TA_MAVP",
           py::overload_cast<const Indicator&, const Indicator&, int, int, int, bool>(TA_MAVP),
           py::arg("ind1"), py::arg("ind2"), py::arg("min_n") = 2, py::arg("max_n") = 30,
-          py::arg("fill_null") = true, py::arg("matype") = 0,
+          py::arg("matype") = 0, py::arg("fill_null") = true,
           R"(TA_MAVP - Moving average with variable period
 
 :param Indicator ind1: input1

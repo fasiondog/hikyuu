@@ -146,8 +146,9 @@ void export_Constant(py::module& m) {
       .def_readonly("STOCKTYPE_BOND", &Constant::STOCKTYPE_BOND, "Bond")
       .def_readonly("STOCKTYPE_GEM", &Constant::STOCKTYPE_GEM, "ChiNext")
       .def_readonly("STOCKTYPE_START", &Constant::STOCKTYPE_START, "STAR Market")
-      .def_readonly("STOCKTYPE_CRYPTO", &Constant::STOCKTYPE_START, "Crypto")
-      .def_readonly("STOCKTYPE_A_BJ", &Constant::STOCKTYPE_A_BJ, "A-share of the Beijing Stock Exchange")
+      .def_readonly("STOCKTYPE_CRYPTO", &Constant::STOCKTYPE_CRYPTO, "Crypto")
+      .def_readonly("STOCKTYPE_A_BJ", &Constant::STOCKTYPE_A_BJ,
+                    "A-share of the Beijing Stock Exchange")
       .def_readonly("STOCKTYPE_TMP", &Constant::STOCKTYPE_TMP, "Temporary Stock");
 
     m.attr("constant") = Constant();

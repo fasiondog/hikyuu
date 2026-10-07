@@ -146,7 +146,7 @@ PYBIND11_MODULE(core, m) {
 
     m.def("close_spend_time", close_spend_time,
           "Globally disable the c++ part time-spending printing");
-    m.def("open_spend_time", close_spend_time,
+    m.def("open_spend_time", open_spend_time,
           "Globally enable the c++ part time-spending printing");
 
     m.def("hikyuu_init",
