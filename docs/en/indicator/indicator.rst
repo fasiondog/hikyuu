@@ -1967,6 +1967,7 @@ Built-in Technical Indicators
 
     * The numerator: the maximum absolute residual within the window (guaranteeing that no point is far away from the regression line)
     * The denominator: the average of y within the window (eliminating the price dimension, with the percentage meaning)
+    * When the window mean of y is 0, the ratio is undefined and result(2) returns a null value (Null)
     * The smaller the indicator = all the K-lines of the whole segment are close to the regression line
 
     **The examples of the judgment thresholds**:

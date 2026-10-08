@@ -17,6 +17,7 @@ namespace hku {
 //   result(0): slope
 //   result(1): goodness of fit R²
 //   result(2): relative maximum residual RelMaxRes = max|yi - ŷi| / ȳ
+//              (Null when the window mean of y is 0, as the ratio is undefined)
 class ISlope : public IndicatorImp {
     INDICATOR_IMP(ISlope)
     INDICATOR_IMP_SUPPORT_DYNAMIC_CYCLE
