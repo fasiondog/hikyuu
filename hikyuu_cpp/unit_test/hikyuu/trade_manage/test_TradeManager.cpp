@@ -13,6 +13,7 @@
 #include <hikyuu/trade_manage/crt/crtTM.h>
 
 #include <fstream>
+#include <cmath>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 
@@ -1231,6 +1232,30 @@ TEST_CASE("test_TradeManager_param_guards") {
     /** @arg buyShort with MAX_DOUBLE number to close the short position still succeeds */
     result = tm->buyShort(Datetime(199911180000), stock, 10.0, MAX_DOUBLE);
     CHECK_EQ(result.business, BUSINESS_BUY_SHORT);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_profit_cum_change_curve") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    DatetimeList dates = {Datetime(199911170000), Datetime(199911180000)};
+
+    /** @arg An account that was never invested returns an undefined (NaN) curve, not a fake 0 */
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 0, TC_Zero(), "TEST");
+    PriceList curve = tm->getProfitCumChangeCurve(dates);
+    REQUIRE_EQ(curve.size(), 2);
+    CHECK_UNARY(std::isnan(curve[0]));
+    CHECK_UNARY(std::isnan(curve[1]));
+
+    /** @arg The curve is total assets over the invested base, rounded by the account precision */
+    tm = crtTM(Datetime(199901010000), 100000, TC_Zero(), "TEST");
+    tm->buy(Datetime(199911170000), stock, 10.0, 100);
+    curve = tm->getProfitCumChangeCurve(dates);
+    FundsList funds = tm->getFundsList(dates);
+    REQUIRE_EQ(curve.size(), funds.size());
+    for (size_t i = 0, total = funds.size(); i < total; ++i) {
+        CHECK_EQ(curve[i], roundEx(funds[i].total_assets() / funds[i].total_base(), 2));
+    }
 }
 
 /** @} */

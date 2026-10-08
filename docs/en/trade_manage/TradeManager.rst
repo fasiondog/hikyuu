@@ -467,7 +467,9 @@ Common parameters:
         
     .. py:method:: get_profit_cum_change_curve(self, dates[, ktype = Query.DAY])
     
-        Get the cumulative return curve
+        Get the cumulative return curve, i.e. total assets divided by the invested base, rounded by
+        the account precision; when the invested base is 0 the ratio is undefined and Null (NaN)
+        is returned
         
         :param DatetimeList dates: the date list
         :param Query.KType ktype: the K-line type, which must match the date list

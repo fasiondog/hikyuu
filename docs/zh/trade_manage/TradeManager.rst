@@ -463,7 +463,7 @@
         
     .. py:method:: get_profit_cum_change_curve(self, dates[, ktype = Query.DAY])
     
-        获取累积收益率曲线
+        获取累积收益率曲线，即总资产除以投入本金基准，按账户精度取整；投入本金基准为 0 时比率未定义，返回 Null（NaN）
         
         :param DatetimeList dates: 日期列表
         :param Query.KType ktype: K 线类型，必须与日期列表匹配
