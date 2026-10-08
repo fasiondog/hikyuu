@@ -57,9 +57,23 @@ void ISumBars::_calculate(const Indicator& ind) {
             pos = i;
         }
 
-        if (sum < a) {
+        // a NaN current bar has no valid accumulation: emit null and let the next older bar restart
+        // the window (older bars never accumulate forward through this bar)
+        if (std::isnan(sum)) {
+            pos = null_pos;
+        }
+
+        bool exhausted = false;
+        if (pos != null_pos && sum < a) {
             if (pos > m_discard) {
                 for (size_t j = pos - 1; j >= m_discard; j--) {
+                    // a NaN bar blocks the further backward accumulation: emit null and keep
+                    // scanning (not break), unlike exhaustion which invalidates all older bars
+                    if (std::isnan(src[j])) {
+                        pos = null_pos;
+                        break;
+                    }
+
                     sum += src[j];
                     if (sum >= a) {
                         pos = j;
@@ -68,11 +82,13 @@ void ISumBars::_calculate(const Indicator& ind) {
 
                     if (j == m_discard) {
                         pos = null_pos;
+                        exhausted = true;
                         break;
                     }
                 }
             } else {
                 pos = null_pos;
+                exhausted = true;
             }
         }
 
@@ -80,7 +96,7 @@ void ISumBars::_calculate(const Indicator& ind) {
             dst[i] = i - pos;
         }
 
-        if (i == m_discard || pos == null_pos) {
+        if (i == m_discard || exhausted) {
             last_pos = i;
             break;
         }

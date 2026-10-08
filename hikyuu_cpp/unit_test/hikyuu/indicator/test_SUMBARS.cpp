@@ -188,6 +188,39 @@ TEST_CASE("test_SUMBARS_discard_boundary") {
 }
 
 /** @par Test points */
+TEST_CASE("test_SUMBARS_nan_guard") {
+    double nan = Null<double>();
+
+    /** @arg a NaN current bar emits null while older bars keep accumulating normally
+     *  (the unguarded version emitted a bogus 0 because NaN < a is always false) */
+    Indicator data = PRICELIST(PriceList{5, nan, 4});
+    Indicator s = SUMBARS(data, 4);
+    CHECK_EQ(s[0], 0);
+    CHECK_UNARY(std::isnan(s[1]));
+    CHECK_EQ(s[2], 0);
+
+    /** @arg a NaN met by the backward accumulation blocks it (null output) without poisoning the
+     *  sliding sum of older bars (the unguarded version turned every older bar into a bogus value)
+     */
+    data = PRICELIST(PriceList{1, 2, nan, 3});
+    s = SUMBARS(data, 3);
+    CHECK_UNARY(std::isnan(s[0]));  // only 1 available, never reaches 3
+    CHECK_EQ(s[1], 1);              // 2 + 1 >= 3
+    CHECK_UNARY(std::isnan(s[2]));  // NaN current bar
+    CHECK_EQ(s[3], 0);              // 3 >= 3 at the current bar
+
+    /** @arg the static and dynamic paths agree bar by bar under NaN */
+    Indicator d = SUMBARS(data, CVAL(data, 3));
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (std::isnan(s[i])) {
+            CHECK_UNARY(std::isnan(d[i]));
+        } else {
+            CHECK_EQ(d[i], doctest::Approx(s[i]));
+        }
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));
