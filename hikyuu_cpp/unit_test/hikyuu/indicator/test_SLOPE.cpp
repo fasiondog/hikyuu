@@ -15,6 +15,11 @@
 
 using namespace hku;
 
+// The float buffer of the low precision build caps the accuracy at ~1e-7 relative, so the
+// tolerance there is relaxed to the usual indicator precision (1e-6)
+constexpr double SLOPE_EPS = HKU_USE_LOW_PRECISION ? 1e-6 : 1e-9;
+constexpr double SLOPE_STRICT_EPS = HKU_USE_LOW_PRECISION ? 1e-6 : 1e-12;
+
 /**
  * @defgroup test_indicator_SLOPE test_indicator_SLOPE
  * @ingroup test_hikyuu_indicator_suite
@@ -166,17 +171,17 @@ TEST_CASE("test_SLOPE_linear") {
 
     /** @arg All valid bars have slope == 3.0 */
     for (size_t i = slope.discard(); i < slope.size(); i++) {
-        CHECK_EQ(slope.get(i, 0), doctest::Approx(3.0).epsilon(1e-9));
+        CHECK_EQ(slope.get(i, 0), doctest::Approx(3.0).epsilon(SLOPE_EPS));
     }
 
     /** @arg r2 == 1.0 (perfect fit) */
     for (size_t i = slope.discard(); i < slope.size(); i++) {
-        CHECK_EQ(slope.get(i, 1), doctest::Approx(1.0).epsilon(1e-9));
+        CHECK_EQ(slope.get(i, 1), doctest::Approx(1.0).epsilon(SLOPE_EPS));
     }
 
     /** @arg relmaxres == 0 (no residual) */
     for (size_t i = slope.discard(); i < slope.size(); i++) {
-        CHECK_EQ(slope.get(i, 2), doctest::Approx(0.0).epsilon(1e-9));
+        CHECK_EQ(slope.get(i, 2), doctest::Approx(0.0).epsilon(SLOPE_EPS));
     }
 }
 
@@ -189,7 +194,7 @@ TEST_CASE("test_SLOPE_constant") {
 
     /** @arg slope == 0 for constant series */
     for (size_t i = slope.discard(); i < slope.size(); i++) {
-        CHECK_EQ(slope.get(i, 0), doctest::Approx(0.0).epsilon(1e-9));
+        CHECK_EQ(slope.get(i, 0), doctest::Approx(0.0).epsilon(SLOPE_EPS));
     }
 
     /** @arg r2 == 0 (guard against 0/0), not NaN */
@@ -199,7 +204,7 @@ TEST_CASE("test_SLOPE_constant") {
 
     /** @arg relmaxres == 0 */
     for (size_t i = slope.discard(); i < slope.size(); i++) {
-        CHECK_EQ(slope.get(i, 2), doctest::Approx(0.0).epsilon(1e-9));
+        CHECK_EQ(slope.get(i, 2), doctest::Approx(0.0).epsilon(SLOPE_EPS));
     }
 }
 
@@ -218,8 +223,8 @@ TEST_CASE("test_SLOPE_large_index") {
 
     /** @arg slope is still accurate at large bar indices */
     size_t tail = total - 1;
-    CHECK_EQ(slope.get(tail, 0), doctest::Approx(2.0).epsilon(1e-12));
-    CHECK_EQ(slope.get(tail, 1), doctest::Approx(1.0).epsilon(1e-12));
+    CHECK_EQ(slope.get(tail, 0), doctest::Approx(2.0).epsilon(SLOPE_STRICT_EPS));
+    CHECK_EQ(slope.get(tail, 1), doctest::Approx(1.0).epsilon(SLOPE_STRICT_EPS));
 }
 
 /** @par Test points: verify warmup on an input indicator with non-zero discard */
@@ -253,7 +258,7 @@ TEST_CASE("test_SLOPE_with_discard_input") {
             S_y2 += y * y;
         }
         double ref_slope = (fcnt * S_xy - sum_x * S_y) / denom;
-        CHECK_EQ(expect.get(i, 0), doctest::Approx(ref_slope).epsilon(1e-9));
+        CHECK_EQ(expect.get(i, 0), doctest::Approx(ref_slope).epsilon(SLOPE_EPS));
     }
 }
 

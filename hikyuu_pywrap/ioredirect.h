@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <pybind11/iostream.h>
 #include <hikyuu/DataType.h>
 
@@ -26,28 +27,35 @@ class OStreamToPython final {
     friend void close_ostream_to_python();
 
 public:
-    explicit OStreamToPython(bool open) : m_old_opened(open) {
-        if (open && !ms_opened) {
-            ms_io_redirect.enter();
-        } else if (!open && ms_opened) {
-            ms_io_redirect.exit();
-        }
+    explicit OStreamToPython(bool open) : m_old_opened(ms_opened.load(std::memory_order_acquire)) {
+        _switchRedirect(open);
     }
 
+    OStreamToPython(const OStreamToPython&) = delete;
+    OStreamToPython& operator=(const OStreamToPython&) = delete;
+
     ~OStreamToPython() {
-        if (m_old_opened && !ms_opened) {
-            ms_io_redirect.enter();
-        } else if (!m_old_opened && ms_opened) {
-            ms_io_redirect.exit();
-        }
+        _switchRedirect(m_old_opened);
     }
 
 private:
+    static void _switchRedirect(bool open) {
+        bool expected = !open;
+        if (ms_opened.compare_exchange_strong(expected, open, std::memory_order_acq_rel,
+                                              std::memory_order_acquire)) {
+            if (open) {
+                ms_io_redirect.enter();
+            } else {
+                ms_io_redirect.exit();
+            }
+        }
+    }
+
     bool m_old_opened;
 
 private:
     static pybind11::detail::OstreamRedirect ms_io_redirect;
-    static bool ms_opened;
+    static std::atomic<bool> ms_opened;
 };
 
 }  // namespace hku
