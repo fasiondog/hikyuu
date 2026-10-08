@@ -1094,4 +1094,31 @@ TEST_CASE("test_indicator_execute_mod") {
     CHECK_UNARY(std::isnan(r[5]));
 }
 
+/** @par Test points */
+TEST_CASE("test_indicator_is_same") {
+    PriceList d;
+    for (size_t i = 0; i < 5; ++i) {
+        d.push_back(i + 1);
+    }
+    Indicator a = PRICELIST(d);
+
+    /** @arg an indicator is the same as itself */
+    CHECK_UNARY(a.isSame(a));
+
+    /** @arg a copy shares the underlying imp, so it is the same instance */
+    Indicator copy = a;
+    CHECK_UNARY(a.isSame(copy));
+
+    /** @arg two distinct instances with the same formula are not the same instance */
+    Indicator another = PRICELIST(d);
+    CHECK_UNARY(!a.isSame(another));
+
+    /** @arg a null-imp indicator is never the same instance */
+    IndicatorImpPtr null_imp;
+    Indicator empty(null_imp);
+    CHECK_UNARY(!empty.isSame(a));
+    CHECK_UNARY(!a.isSame(empty));
+    CHECK_UNARY(!empty.isSame(empty));
+}
+
 /** @} */

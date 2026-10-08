@@ -215,7 +215,7 @@ public:
 
     /** Judge whether it is the same instance */
     bool isSame(const Indicator& other) const noexcept {
-        return !m_imp && m_imp == other.m_imp;
+        return m_imp && m_imp == other.m_imp;
     }
 
     /** Judge whether the indicator formula contains the indicator with the given name (for special
