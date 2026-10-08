@@ -34,7 +34,7 @@ void ISqrt::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
     for (size_t i = start_pos, total = data.size(); i < total; ++i) {
-        dst[i] = std::sqrt(src[i]);
+        dst[i] = safe_math(std::sqrt(src[i]));
     }
 }
 

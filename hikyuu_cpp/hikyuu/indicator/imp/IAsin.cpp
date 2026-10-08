@@ -34,7 +34,7 @@ void IAsin::_increment_calculate(const Indicator &data, size_t start_pos) {
     auto const *src = data.data();
     auto *dst = this->data();
     for (size_t i = start_pos, end = data.size(); i < end; ++i) {
-        dst[i] = std::asin(src[i]);
+        dst[i] = safe_math(std::asin(src[i]));
     }
 }
 

@@ -22,6 +22,7 @@ namespace hku {
  * Usage: SQRT(X) is the square root of X
  * For example: SQRT(CLOSE) is the square root of the close price
  * </pre>
+ * @note Undefined domain (X < 0) returns null
  * @ingroup Indicator
  */
 Indicator HKU_API SQRT();

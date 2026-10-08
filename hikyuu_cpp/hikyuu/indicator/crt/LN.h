@@ -17,6 +17,7 @@ namespace hku {
  * Calculate the natural logarithm
  * Usage: LN(X) is the logarithm with the base e
  * For example: LN(CLOSE) gives the logarithm of the close price
+ * @note Undefined domain (X <= 0) returns null
  * @ingroup Indicator
  */
 Indicator HKU_API LN();

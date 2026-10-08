@@ -17,6 +17,7 @@ namespace hku {
 
 /**
  * Cosine value
+ * @note Undefined domain (|X| > 1) returns null
  * @ingroup Indicator
  */
 Indicator HKU_API ACOS();

@@ -45,6 +45,10 @@ TEST_CASE("test_POW") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], std::pow(-11, 3));
+
+    /** @arg overflow result -> null (was +inf, which leaked downstream) */
+    result = POW(1e200, 2);
+    CHECK_UNARY(std::isnan(result[0]));
 }
 
 /** @par Test points */

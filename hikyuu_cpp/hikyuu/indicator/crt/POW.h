@@ -22,6 +22,7 @@ namespace hku {
  * Usage: POW(A,B) returns A to the power of B
  * For example: POW(CLOSE,3) gives the cube of the close price
  * </pre>
+ * @note Undefined domain or overflow returns null
  * @ingroup Indicator
  */
 Indicator HKU_API POW(int n);

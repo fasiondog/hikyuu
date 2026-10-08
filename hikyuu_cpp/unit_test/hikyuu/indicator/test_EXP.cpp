@@ -42,6 +42,10 @@ TEST_CASE("test_EXP") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], doctest::Approx(std::exp(1)));
+
+    /** @arg overflow result -> null (was +inf, which leaked downstream) */
+    result = EXP(1000);
+    CHECK_UNARY(std::isnan(result[0]));
 }
 
 //-----------------------------------------------------------------------------
@@ -75,8 +79,9 @@ TEST_CASE("test_EXP_export") {
     CHECK_EQ(x1.discard(), x2.discard());
     CHECK_EQ(x1.getResultNumber(), x2.getResultNumber());
     for (size_t i = x1.discard(); i < x1.size(); ++i) {
-        if (std::isinf(x1[i])) {
-            CHECK_UNARY(std::isinf(x2[i]));
+        // overflow bars are now null (NaN) instead of +inf
+        if (std::isnan(x1[i])) {
+            CHECK_UNARY(std::isnan(x2[i]));
         } else {
             CHECK_EQ(x1[i], doctest::Approx(x2[i]));
         }

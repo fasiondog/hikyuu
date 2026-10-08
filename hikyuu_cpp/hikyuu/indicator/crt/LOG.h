@@ -16,6 +16,7 @@ namespace hku {
 /**
  * Logarithm with the base 10
  * Usage: LOG(X) gets the logarithm of X
+ * @note Undefined domain (X <= 0) returns null
  * @ingroup Indicator
  */
 Indicator HKU_API LOG();
