@@ -1112,4 +1112,64 @@ TEST_CASE("test_TradeManager_returnCash_multi_loan") {
     CHECK_EQ(tm->getDebtCash(Datetime(199901110000)), 100.0);
 }
 
+/** @par Test points */
+TEST_CASE("test_TradeManager_addPosition") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    Stock stock2 = sm.getStock("sh600004");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
+
+    /** @arg A null stock is rejected */
+    PositionRecord pr(Null<Stock>(), Datetime(199911170000), Null<Datetime>(), 100, 0, 0, 100, 1000,
+                      0, 0, 0);
+    CHECK_EQ(tm->addPosition(pr), false);
+
+    /** @arg A closed position record (cleanDatetime not null) is rejected */
+    pr.stock = stock;
+    pr.cleanDatetime = Datetime(199911180000);
+    CHECK_EQ(tm->addPosition(pr), false);
+
+    /** @arg A take datetime earlier than the account creation date is rejected */
+    pr = PositionRecord(stock, Datetime(199801010000), Null<Datetime>(), 100, 0, 0, 100, 1000, 0, 0,
+                        0);
+    CHECK_EQ(tm->addPosition(pr), false);
+
+    /** @arg A position can be added while the trade list holds only the INIT record */
+    pr = PositionRecord(stock, Datetime(199911170000), Null<Datetime>(), 100, 0, 0, 100, 1000, 0, 0,
+                        0);
+    CHECK_EQ(tm->addPosition(pr), true);
+    CHECK_EQ(tm->have(stock), true);
+    CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
+
+    /** @arg The same stock cannot be added twice */
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911180000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             false);
+
+    /** @arg A later take datetime moves the init datetime and syncs the INIT record datetime */
+    tm = crtTM(Datetime(199901010000), 100000);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911170000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             true);
+    CHECK_EQ(tm->initDatetime(), Datetime(199911170000));
+    CHECK_EQ(tm->getTradeList()[0].datetime, Datetime(199911170000));
+
+    /** @arg Several stocks can be added before any trade record is made */
+    tm = crtTM(Datetime(199901010000), 100000);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911170000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             true);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock2, Datetime(199911170000), Null<Datetime>(), 200,
+                                            0, 0, 200, 2000, 0, 0, 0)),
+             true);
+    CHECK_EQ(tm->getStockNumber(), 2);
+
+    /** @arg Once the trade list holds more than the INIT record, adding a position is rejected */
+    tm = crtTM(Datetime(199901010000), 100000);
+    tm->buy(Datetime(199911170000), stock2, 10.0, 100);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911180000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             false);
+}
+
 /** @} */

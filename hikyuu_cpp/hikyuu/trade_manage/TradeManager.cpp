@@ -2144,9 +2144,9 @@ bool TradeManager::addPosition(const PositionRecord& pr) {
     HKU_ERROR_IF_RETURN(pr.cleanDatetime != Null<Datetime>(), false,
                         "Position cleanDatetime({}) must be Null!", pr.cleanDatetime);
     HKU_ERROR_IF_RETURN(pr.takeDatetime < initDatetime(), false,
-                        "Position takeDatetime({}) > initDatetime({})", pr.takeDatetime,
+                        "Position takeDatetime({}) must be >= initDatetime({})!", pr.takeDatetime,
                         initDatetime());
-    HKU_ERROR_IF_RETURN(!m_trade_list.empty(), false, "Exist trade list!");
+    HKU_ERROR_IF_RETURN(m_trade_list.size() > 1, false, "Exist trade list!");
 
     auto iter = m_position.find(pr.stock.id());
     HKU_ERROR_IF_RETURN(iter != m_position.end(), false, "The stock({}) has position!",
@@ -2155,6 +2155,7 @@ bool TradeManager::addPosition(const PositionRecord& pr) {
     m_position[pr.stock.id()] = pr;
     if (pr.takeDatetime > m_init_datetime) {
         m_init_datetime = pr.takeDatetime;
+        m_trade_list[0].datetime = m_init_datetime;
     }
     return true;
 }
