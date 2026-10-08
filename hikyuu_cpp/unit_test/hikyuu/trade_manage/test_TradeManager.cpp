@@ -1235,6 +1235,58 @@ TEST_CASE("test_TradeManager_param_guards") {
 }
 
 /** @par Test points */
+TEST_CASE("test_TradeManager_stock_ops_guards") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    double nan = std::numeric_limits<double>::quiet_NaN();
+    double inf = std::numeric_limits<double>::infinity();
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "TEST");
+
+    /** @arg checkinStock rejects zero, negative, NaN and infinite numbers */
+    CHECK_UNARY(!tm->checkinStock(Datetime(199911170000), stock, 10.0, 0));
+    CHECK_UNARY(!tm->checkinStock(Datetime(199911170000), stock, 10.0, -100));
+    CHECK_UNARY(!tm->checkinStock(Datetime(199911170000), stock, 10.0, nan));
+    CHECK_UNARY(!tm->checkinStock(Datetime(199911170000), stock, 10.0, inf));
+
+    /** @arg the rejected checkins leave no position behind */
+    CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 0);
+
+    /** @arg a normal checkin succeeds */
+    CHECK_UNARY(tm->checkinStock(Datetime(199911170000), stock, 10.0, 100));
+    CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
+
+    /** @arg checkoutStock rejects negative, NaN and infinite numbers that used to inflate the
+     * position through "number > pos.number" being false */
+    CHECK_UNARY(!tm->checkoutStock(Datetime(199911180000), stock, 10.0, 0));
+    CHECK_UNARY(!tm->checkoutStock(Datetime(199911180000), stock, 10.0, -50));
+    CHECK_UNARY(!tm->checkoutStock(Datetime(199911180000), stock, 10.0, nan));
+    CHECK_UNARY(!tm->checkoutStock(Datetime(199911180000), stock, 10.0, inf));
+    CHECK_EQ(tm->getHoldNumber(Datetime(199911180000), stock), 100);
+
+    /** @arg borrowStock rejects zero, negative, NaN and infinite numbers */
+    CHECK_UNARY(!tm->borrowStock(Datetime(199911180000), stock, 10.0, 0));
+    CHECK_UNARY(!tm->borrowStock(Datetime(199911180000), stock, 10.0, -100));
+    CHECK_UNARY(!tm->borrowStock(Datetime(199911180000), stock, 10.0, nan));
+    CHECK_UNARY(!tm->borrowStock(Datetime(199911180000), stock, 10.0, inf));
+    CHECK_UNARY(tm->getBorrowStockList().empty());
+
+    /** @arg a normal borrow succeeds as the baseline for the return guards */
+    CHECK_UNARY(tm->borrowStock(Datetime(199911180000), stock, 10.0, 100));
+
+    /** @arg returnStock rejects negative, NaN and infinite numbers that used to bypass the
+     * "number > bor.number" guard and increase the debt instead of repaying */
+    CHECK_UNARY(!tm->returnStock(Datetime(199911180000), stock, 10.0, 0));
+    CHECK_UNARY(!tm->returnStock(Datetime(199911180000), stock, 10.0, -100));
+    CHECK_UNARY(!tm->returnStock(Datetime(199911180000), stock, 10.0, nan));
+    CHECK_UNARY(!tm->returnStock(Datetime(199911180000), stock, 10.0, inf));
+    CHECK_EQ(tm->getBorrowStockList()[0].number, 100);
+
+    /** @arg a normal return succeeds and clears the debt */
+    CHECK_UNARY(tm->returnStock(Datetime(199911180000), stock, 10.0, 100));
+    CHECK_UNARY(tm->getBorrowStockList().empty());
+}
+
+/** @par Test points */
 TEST_CASE("test_TradeManager_profit_cum_change_curve") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");

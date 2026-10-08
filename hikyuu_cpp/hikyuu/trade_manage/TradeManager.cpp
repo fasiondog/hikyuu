@@ -480,7 +480,9 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
 bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
                                 double number) {
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkin Null stock!", datetime);
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} number is zero!", datetime, stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} number({}) must be finite and > 0!", datetime, stock.market_code(),
+                        number);
     HKU_ERROR_IF_RETURN(price <= 0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
@@ -524,8 +526,9 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
 bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
                                  double number) {
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} checkout number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} checkout number({}) must be finite and > 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} checkout price({:<.4f}) must be > 0.0! ",
                         datetime, stock.market_code(), price);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
@@ -664,8 +667,9 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} Try to borrow number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} borrow number({}) must be finite and > 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
@@ -708,8 +712,9 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} return stock number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} return number({}) must be finite and > 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
