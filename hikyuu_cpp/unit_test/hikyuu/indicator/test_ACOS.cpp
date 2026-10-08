@@ -11,6 +11,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ACOS.h>
+#include <hikyuu/indicator/crt/COS.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -50,6 +51,47 @@ TEST_CASE("test_ACOS") {
 
     result = ACOS(2.1);
     CHECK_UNARY(std::isnan(result[0]));
+}
+
+/**
+ * @par Test points
+ * Incremental calculate must match a full calculation.
+ *
+ * Background: _increment_calculate looped from m_discard instead of start_pos. The framework resets
+ * m_discard to 0 before the incremental call, so each incremental run recomputed the whole series
+ * from bar 0 (a pure performance defect; results stayed correct). ACOS(COS(CLOSE())) keeps the
+ * input within [-1, 1] so the compared values are finite rather than an all-NaN trivial pass.
+ */
+TEST_CASE("test_ACOS_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 20));
+    CHECK_EQ(k_full.size(), 20);
+
+    Indicator expect = ACOS(COS(CLOSE()));
+    expect.setContext(k_full);
+
+    auto check_with_history = [&](size_t history) {
+        Indicator got = ACOS(COS(CLOSE()));
+        got.setContext(stock.getKData(KQuery(0, history)));  // cache m_old_context
+        got.setContext(k_full);                              // extended at the tail
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            double a = expect[i];
+            double b = got[i];
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    };
+
+    /** @arg The old context holds half the bars, tail extended incrementally */
+    check_with_history(10);
+
+    /** @arg The old context holds most bars, a small tail extension */
+    check_with_history(15);
 }
 
 //-----------------------------------------------------------------------------
