@@ -56,7 +56,7 @@ TEST_CASE("test_round") {
 
 /** @par Test points */
 TEST_CASE("test_roundEx_large_ndigits") {
-    // MA-N02 regression: the epsilon used to be 1e-10 * factor, which reaches 1.0 at ndigits >=
+    // Regression: the epsilon used to be 1e-10 * factor, which reaches 1.0 at ndigits >=
     // 10 and swamps the 0.5 rounding threshold, so a value already within the requested precision
     // got a systematic upward bias. After capping, large ndigits are a no-op for such values.
     /** @arg ndigits beyond the value's own precision returns it unchanged (was 1.0000000001) */
@@ -93,6 +93,14 @@ TEST_CASE("test_roundEx_negative_ndigits") {
     CHECK_EQ(roundEx(0.0, -2), 0.0);
     /** @arg the positive path is unaffected by the negative branch */
     CHECK_EQ(roundEx(1234.0, 2), 1234.0);
+    /** @arg the divide-branch tolerance is a few ULPs of the quotient, not scaled by factor:
+     *  values far below the rounding boundary stay put (they used to be pushed past it) */
+    CHECK_EQ(roundEx(49999.99, -5), 0.0);
+    CHECK_EQ(roundEx(4999.999, -4), 0.0);
+    CHECK_EQ(roundEx(24999999999.0, -10), 2e10);
+    /** @arg the magnitude is clamped, so extreme ndigits (including INT_MIN) stay well-defined */
+    CHECK_EQ(roundEx(1.0, 1000000), 1.0);
+    CHECK_EQ(roundEx(1.0, std::numeric_limits<int>::min()), 0.0);
 }
 
 TEST_CASE("test_string_to_upper") {

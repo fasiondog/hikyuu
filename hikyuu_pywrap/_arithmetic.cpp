@@ -16,11 +16,12 @@ void export_util(py::module& m) {
     m.def("roundEx", roundEx<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundEx(number[, ndigits=0])
 
-    Round half up, with the ROUND_HALF_EVEN banker's rounding
+    Round half away from zero to the given number of decimal places; a negative ndigits rounds to
+    the left of the decimal point (e.g. -2 rounds 1234 to 1200)
 
     :param float number  the data to round
-    :param int ndigits the number of the decimal places to keep
-    :rype: float)");
+    :param int ndigits the number of decimal places to keep
+    :rtype: float)");
 
     m.def("roundUp", roundUp<float>, py::arg("number"), py::arg("ndigits") = 0);
     m.def("roundUp", roundUp<double>, py::arg("number"), py::arg("ndigits") = 0,

@@ -27,12 +27,16 @@ template double HKU_UTILS_API roundEx(double number, int ndigits);
 template <>
 float roundEx(float number, int ndigits) {
     // The traditional round-half-up is generally used in China. See the double roundEx above for
-    // the epsilon rationale; a negative ndigits rounds to the left of the decimal point and scales
-    // by dividing (as roundUp / roundDown do)
-    const bool to_integer_place = ndigits < 0;
-    const float factor = std::pow(10.0, to_integer_place ? -ndigits : ndigits);
-    const float epsilon = std::min(1e-10f * factor, 1e-6f);
+    // the epsilon rationale and the magnitude clamping (the float range ends at 10^38)
+    const int max_digits = std::numeric_limits<float>::max_exponent10;
+    const int mag = std::min(std::max(ndigits, -max_digits), max_digits);
+    const bool to_integer_place = mag < 0;
+    const float factor = std::pow(10.0, to_integer_place ? -mag : mag);
     const float scaled = to_integer_place ? number / factor : number * factor;
+    const float epsilon =
+      to_integer_place
+        ? std::min(std::fabs(scaled) * std::numeric_limits<float>::epsilon() * 4.0f, 0.25f)
+        : std::min(1e-10f * factor, 1e-6f);
 
     const float rounded =
       scaled >= 0.0f ? std::floor(scaled + 0.5f + epsilon) : std::ceil(scaled - 0.5f - epsilon);

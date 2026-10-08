@@ -13,6 +13,7 @@
 
 #include <cmath>
 #include <cctype>
+#include <limits>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -115,16 +116,26 @@ ValueT roundEx(ValueT number, int ndigits = 0) {
     // left of the decimal point (e.g. ndigits = -2 rounds to hundreds), consistent with
     // roundUp / roundDown; there the value is scaled by dividing so the result keeps an exact
     // power-of-ten boundary.
-    const bool to_integer_place = ndigits < 0;
-    const double factor = std::pow(10.0, to_integer_place ? -ndigits : ndigits);
-    // A tiny tolerance, equal to a fixed 1e-10 offset in the original number space, that recovers
-    // a value a binary representation put a hair below an exact .5 boundary. It must stay
-    // negligible against the 1.0 spacing of the scaled grid; the cap keeps large ndigits correct,
-    // because an uncapped 1e-10 * factor reaches 1.0 at ndigits >= 10 and swamps the 0.5 rounding
-    // threshold (ROUND(1.0, 10) used to yield 1.0000000001).
-    const double epsilon = std::min(1e-10 * factor, 1e-6);
+    //
+    // The magnitude is clamped so that 10^|ndigits| stays representable (max_exponent10 is the
+    // largest decimal exponent within the type's range); this also keeps the negation below free
+    // of the INT_MIN UB
+    const int max_digits = std::numeric_limits<ValueT>::max_exponent10;
+    const int mag = std::min(std::max(ndigits, -max_digits), max_digits);
+    const bool to_integer_place = mag < 0;
+    const double factor = std::pow(10.0, to_integer_place ? -mag : mag);
     const double scaled = to_integer_place ? static_cast<double>(number) / factor
                                            : static_cast<double>(number) * factor;
+    // A tiny tolerance that recovers a value a binary representation put a hair below an exact .5
+    // boundary. It must stay negligible against the 1.0 spacing of the scaled grid, and each
+    // branch needs its own scale: the multiply branch loses the decimal tail of the original
+    // number (a fixed 1e-10 offset there, capped, since an uncapped 1e-10 * factor swamps the 0.5
+    // threshold at ndigits >= 10), while the divide branch is exact to within a couple of ULPs of
+    // the quotient
+    const double epsilon =
+      to_integer_place
+        ? std::min(std::fabs(scaled) * std::numeric_limits<double>::epsilon() * 4.0, 0.25)
+        : std::min(1e-10 * factor, 1e-6);
 
     const double rounded =
       scaled >= 0.0 ? std::floor(scaled + 0.5 + epsilon) : std::ceil(scaled - 0.5 - epsilon);
