@@ -79,9 +79,11 @@ std::string HKU_UTILS_API gb_to_utf8(const std::string &szinput);
 #endif
 
 /**
- * Rounding, the ROUND_HALF_EVEN banker's rounding method
+ * Round half away from zero (the Chinese traditional 四舍五入) to the given number of decimal
+ * places
  * @param number  the data to be rounded
- * @param ndigits the number of the decimal places to keep
+ * @param ndigits the number of decimal places to keep; a negative value rounds to the left of the
+ *                decimal point (e.g. -2 rounds to hundreds)
  * @return the processed data
  */
 template <typename ValueT>
@@ -109,18 +111,24 @@ ValueT roundEx(ValueT number, int ndigits = 0) {
     // else
     //     z *= pow1;
 
-    // In China the traditional rounding method is generally used
-    if (ndigits < 0)
-        return number;  // An invalid number of the digits returns the original value directly
+    // In China the traditional rounding method is generally used. A negative ndigits rounds to the
+    // left of the decimal point (e.g. ndigits = -2 rounds to hundreds), consistent with
+    // roundUp / roundDown; there the value is scaled by dividing so the result keeps an exact
+    // power-of-ten boundary.
+    const bool to_integer_place = ndigits < 0;
+    const double factor = std::pow(10.0, to_integer_place ? -ndigits : ndigits);
+    // A tiny tolerance, equal to a fixed 1e-10 offset in the original number space, that recovers
+    // a value a binary representation put a hair below an exact .5 boundary. It must stay
+    // negligible against the 1.0 spacing of the scaled grid; the cap keeps large ndigits correct,
+    // because an uncapped 1e-10 * factor reaches 1.0 at ndigits >= 10 and swamps the 0.5 rounding
+    // threshold (ROUND(1.0, 10) used to yield 1.0000000001).
+    const double epsilon = std::min(1e-10 * factor, 1e-6);
+    const double scaled = to_integer_place ? static_cast<double>(number) / factor
+                                           : static_cast<double>(number) * factor;
 
-    const double factor = std::pow(10.0, ndigits);
-    const double epsilon =
-      1e-10 * factor;  // Adjust epsilon dynamically to avoid the precision error
-
-    if (number >= 0)
-        return static_cast<ValueT>(std::floor(number * factor + 0.5 + epsilon) / factor);
-    else
-        return static_cast<ValueT>(std::ceil(number * factor - 0.5 - epsilon) / factor);
+    const double rounded =
+      scaled >= 0.0 ? std::floor(scaled + 0.5 + epsilon) : std::ceil(scaled - 0.5 - epsilon);
+    return static_cast<ValueT>(to_integer_place ? rounded * factor : rounded / factor);
 }
 
 extern template double HKU_UTILS_API roundEx(double number, int ndigits);

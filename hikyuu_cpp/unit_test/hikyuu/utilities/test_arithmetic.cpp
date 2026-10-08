@@ -54,6 +54,47 @@ TEST_CASE("test_round") {
     CHECK_EQ(roundUp(x, 1), doctest::Approx(-10.6));
 }
 
+/** @par Test points */
+TEST_CASE("test_roundEx_large_ndigits") {
+    // MA-N02 regression: the epsilon used to be 1e-10 * factor, which reaches 1.0 at ndigits >=
+    // 10 and swamps the 0.5 rounding threshold, so a value already within the requested precision
+    // got a systematic upward bias. After capping, large ndigits are a no-op for such values.
+    /** @arg ndigits beyond the value's own precision returns it unchanged (was 1.0000000001) */
+    CHECK_EQ(roundEx(1.0, 10), 1.0);
+    CHECK_EQ(roundEx(0.5, 10), 0.5);
+    CHECK_EQ(roundEx(-1.0, 10), -1.0);
+    CHECK_EQ(roundEx(123.456, 10), doctest::Approx(123.456));
+    /** @arg very large ndigits stay correct (no threshold swamping) */
+    CHECK_EQ(roundEx(1.0, 15), 1.0);
+
+    /** @arg the representation-recovery nudge is preserved for small ndigits: 2.675 -> 2.68 */
+    CHECK_EQ(roundEx(2.675, 2), doctest::Approx(2.68));
+    /** @arg ordinary money-scale rounding is unchanged */
+    CHECK_EQ(roundEx(10.11, 2), doctest::Approx(10.11));
+    CHECK_EQ(roundEx(2.345, 2), doctest::Approx(2.35));
+}
+
+/** @par Test points */
+TEST_CASE("test_roundEx_negative_ndigits") {
+    // A negative ndigits rounds half away from zero to the left of the decimal point (to the
+    // 10^|ndigits| place), matching roundUp / roundDown; it used to be rejected and returned as-is.
+    /** @arg round to hundreds */
+    CHECK_EQ(roundEx(1234.0, -2), 1200.0);
+    CHECK_EQ(roundEx(1499.0, -2), 1500.0);
+    CHECK_EQ(roundEx(1234.567, -2), 1200.0);
+    /** @arg exactly half rounds away from zero (both signs) */
+    CHECK_EQ(roundEx(1250.0, -2), 1300.0);
+    CHECK_EQ(roundEx(-1250.0, -2), -1300.0);
+    CHECK_EQ(roundEx(-1234.0, -2), -1200.0);
+    /** @arg round to tens */
+    CHECK_EQ(roundEx(15.0, -1), 20.0);
+    CHECK_EQ(roundEx(-25.0, -1), -30.0);
+    /** @arg zero is unchanged */
+    CHECK_EQ(roundEx(0.0, -2), 0.0);
+    /** @arg the positive path is unaffected by the negative branch */
+    CHECK_EQ(roundEx(1234.0, 2), 1234.0);
+}
+
 TEST_CASE("test_string_to_upper") {
     std::string x("abcd");
     to_upper(x);
