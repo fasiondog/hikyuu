@@ -160,6 +160,34 @@ TEST_CASE("test_SUMBARS") {
 }
 
 /** @par Test points */
+TEST_CASE("test_SUMBARS_discard_boundary") {
+    // MA yields an input with discard > 0, so the first valid bar index equals m_discard
+    PriceList a;
+    a.push_back(0);
+    a.push_back(5);
+    a.push_back(100);
+    Indicator ma = MA(PRICELIST(a), 2);  // [nan, 2.5, 52.5], discard=1
+    CHECK_EQ(ma.discard(), 1);
+
+    // At i == m_discard (bar1) the single value 2.5 < 10 is unreachable: it must be null and the
+    // discard must advance past it. The old `pos >= 1` guard let the inner loop no-op, emitting 0
+    // and keeping discard=1.
+    Indicator s = SUMBARS(ma, 10);
+    CHECK_EQ(s.size(), 3);
+    CHECK_EQ(s.discard(), 2);
+    CHECK_UNARY(std::isnan(s[0]));
+    /** @arg unreachable first valid bar -> null (was 0 before the fix) */
+    CHECK_UNARY(std::isnan(s[1]));
+    /** @arg 52.5 >= 10 satisfied at the current bar, distance 0 */
+    CHECK_EQ(s[2], 0);
+
+    // Per-bar values agree with the dynamic path (only the discard policy may differ)
+    Indicator d = SUMBARS(ma, CVAL(ma, 10));
+    CHECK_UNARY(std::isnan(d[1]));
+    CHECK_EQ(d[2], 0);
+}
+
+/** @par Test points */
 TEST_CASE("test_SUMBARS_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-30));

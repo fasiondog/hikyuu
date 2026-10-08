@@ -58,7 +58,7 @@ void ISumBars::_calculate(const Indicator& ind) {
         }
 
         if (sum < a) {
-            if (pos >= 1) {
+            if (pos > m_discard) {
                 for (size_t j = pos - 1; j >= m_discard; j--) {
                     sum += src[j];
                     if (sum >= a) {
