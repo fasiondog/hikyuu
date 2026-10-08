@@ -11,20 +11,14 @@
 namespace hku {
 
 pybind11::detail::OstreamRedirect OStreamToPython::ms_io_redirect(true, true);
-bool OStreamToPython::ms_opened{false};
+std::atomic<bool> OStreamToPython::ms_opened{false};
 
 void open_ostream_to_python() {
-    if (!OStreamToPython::ms_opened) {
-        OStreamToPython::ms_io_redirect.enter();
-        OStreamToPython::ms_opened = true;
-    }
+    OStreamToPython::_switchRedirect(true);
 }
 
 void close_ostream_to_python() {
-    if (OStreamToPython::ms_opened) {
-        OStreamToPython::ms_io_redirect.exit();
-        OStreamToPython::ms_opened = false;
-    }
+    OStreamToPython::_switchRedirect(false);
 }
 
 }  // namespace hku
