@@ -50,31 +50,24 @@ void IDevsq::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n = getParam<int>("n");
 
     auto const* src = data.data();
-
-    std::vector<price_t> ma(total);
-    size_t start = start_pos + 1 - n;
-    price_t sum = 0.0;
-    for (size_t i = start; i <= start_pos; ++i) {
-        if (!std::isnan(src[i])) {
-            sum += src[i];
-        }
-    }
-
-    ma[start_pos] = sum / n;
-    for (size_t i = start_pos + 1; i < total; ++i) {
-        if (!std::isnan(src[i]) && !std::isnan(src[i - n])) {
-            sum = src[i] + sum - src[i - n];
-            ma[i] = sum / n;
-        }
-    }
-
-    auto const* mean = ma.data();
     auto* dst = this->data();
+
+    // Two passes per window: the mean, then the squared deviations; NaN inside a window propagates
+    // to the output (same semantics as the dynamic path). A rolling mean update cannot do that:
+    // when a NaN left the window the update was skipped and the value-initialized 0.0 was silently
+    // used as the mean, so the next fully valid window emitted the sum of squares instead of the
+    // sum of squared deviations (the final loop is already O(n) per bar, so this stays O(n) per
+    // bar)
     for (size_t i = start_pos; i < total; ++i) {
+        price_t sum = 0.0;
+        for (size_t j = i + 1 - n; j <= i; ++j) {
+            sum += src[j];
+        }
+        price_t mean = sum / n;
+
         sum = 0.0;
-        start = i + 1 - n;
-        for (size_t j = start; j <= i; ++j) {
-            sum += std::pow(src[j] - mean[i], 2);
+        for (size_t j = i + 1 - n; j <= i; ++j) {
+            sum += std::pow(src[j] - mean, 2);
         }
         dst[i] = sum;
     }
