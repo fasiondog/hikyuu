@@ -75,6 +75,11 @@ public:
 
     virtual ~IndicatorImp();
 
+    // It owns raw result buffers (m_pBuffer), so an implicit copy would be a shallow copy
+    // leading to a double free; copies must go through clone()
+    IndicatorImp(const IndicatorImp&) = delete;
+    IndicatorImp& operator=(const IndicatorImp&) = delete;
+
     typedef shared_ptr<IndicatorImp> IndicatorImpPtr;
     IndicatorImpPtr operator()(const Indicator& ind);
 

@@ -1047,4 +1047,20 @@ TEST_CASE("test_indicator_access_result_num_bound") {
 #endif
 }
 
+/** @par Test points */
+TEST_CASE("test_indicator_imp_not_copyable") {
+    /** @arg IndicatorImp owns raw result buffers, so it must not be copy constructible/assignable
+     *  (an implicit copy would be a shallow copy causing a double free) */
+    static_assert(!std::is_copy_constructible<IndicatorImp>::value,
+                  "IndicatorImp must not be copy constructible");
+    static_assert(!std::is_copy_assignable<IndicatorImp>::value,
+                  "IndicatorImp must not be copy assignable");
+
+    /** @arg the supported copy path is clone(), which yields an independent instance */
+    IndicatorImpPtr imp = Indicator().getImp();
+    IndicatorImpPtr cloned = imp->clone();
+    CHECK_UNARY(cloned != nullptr);
+    CHECK_UNARY(cloned.get() != imp.get());
+}
+
 /** @} */
