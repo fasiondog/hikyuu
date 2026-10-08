@@ -65,6 +65,8 @@ void IAma::_calculate(const Indicator& data) {
         er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
         if (er > 1.0)
             er = 1.0;
+        if (er < -1.0)
+            er = -1.0;
         price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (src[i] - ama);
         dst0[i] = ama;
@@ -138,6 +140,8 @@ void IAma::_increment_calculate(const Indicator& data, size_t start_pos) {
         er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
         if (er > 1.0)
             er = 1.0;
+        if (er < -1.0)
+            er = -1.0;
         price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (src[i] - ama);
         dst0[i] = ama;
@@ -191,6 +195,8 @@ void IAma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_
         er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
         if (er > 1.0)
             er = 1.0;
+        if (er < -1.0)
+            er = -1.0;
         price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
         ama += c * (src[i] - ama);
     }

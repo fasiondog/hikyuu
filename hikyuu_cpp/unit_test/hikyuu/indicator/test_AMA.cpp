@@ -97,6 +97,30 @@ TEST_CASE("test_AMA") {
 }
 
 /** @par Test points */
+TEST_CASE("test_AMA_er_lower_clamp") {
+    // a strictly monotonic series can push the warm-up phase er a hair below -1 through float
+    // summation (the triangle inequality bounds it at -1 mathematically); the ER column must stay
+    // within [-1, 1] exactly like the rolling phase does, and c must not exceed 1
+    PriceList d;
+    d.push_back(108.05521983981556);
+    d.push_back(10.40404090056498);
+    d.push_back(-100.85878258625682);
+    d.push_back(-240.14421907974634);
+    d.push_back(-504.1348659350719);
+    Indicator result = AMA(PRICELIST(d), 4, 2, 30);
+    CHECK_EQ(result.size(), 5);
+
+    /** @arg bar 4 lies in the warm-up phase; its float er is -1.0000000000000002 unclamped */
+    CHECK_UNARY(result.get(4, 1) >= -1.0);
+    CHECK_UNARY(result.get(4, 1) <= 1.0);
+    /** @arg every warm-up bar keeps ER within [-1, 1] */
+    for (size_t i = 1; i < result.size(); ++i) {
+        CHECK_UNARY(result.get(i, 1) >= -1.0);
+        CHECK_UNARY(result.get(i, 1) <= 1.0);
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_AMA_dyn") {
     Stock stock = StockManager::instance().getStock("sh000001");
     KData kdata = stock.getKData(KQuery(-50));
