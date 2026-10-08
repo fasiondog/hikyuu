@@ -537,7 +537,8 @@ Common parameters:
 
     :param Datetime datetime: the buy time
     :param Stock stock:       the security to buy
-    :param float real_price:  the actual buy price
+    :param float real_price:  the actual buy price; 0 is a legal market-order placeholder
+        (the dealing price is decided by the broker)
     :param float num:         the buy quantity
     :param float stoploss:    the stop-loss price
     :param float goal_price:  the target price
@@ -557,7 +558,8 @@ Common parameters:
 
     :param Datetime datetime: the sell time
     :param Stock stock:       the security to sell
-    :param float real_price:  the actual sell price
+    :param float real_price:  the actual sell price; 0 is a legal market-order placeholder
+        (the dealing price is decided by the broker)
     :param float num:         the sell quantity; if it equals constant.max_double, it means selling all
     :param float stoploss:    the new stop-loss price
     :param float goal_price:  the new target price

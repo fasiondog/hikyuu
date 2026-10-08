@@ -185,7 +185,8 @@ Common parameters:
         
         :param Datetime datetime: the buy time
         :param Stock stock:       the security to buy
-        :param float real_price:  the actual buy price
+        :param float real_price:  the actual buy price; 0 is a legal market-order placeholder
+            (the dealing price is decided by the broker)
         :param float number:      the buy quantity
         :param float stoploss:    the stop-loss price
         :param float goal_price:  the target price
@@ -200,7 +201,8 @@ Common parameters:
         
         :param Datetime datetime: the sell time
         :param Stock stock:       the security to sell
-        :param float real_price:  the actual sell price
+        :param float real_price:  the actual sell price; 0 is a legal market-order placeholder
+            (the dealing price is decided by the broker)
         :param float number:      the sell quantity; if it equals constant.max_double, sell all
         :param float stoploss:    the new stop-loss price
         :param float goal_price:  the new target price
@@ -211,30 +213,32 @@ Common parameters:
         
     .. py:method:: buy_short(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
     
-        The short selling operation (sell first, buy back later)
-        
-        :param Datetime datetime: the short selling time
-        :param Stock stock:       the security to short sell
-        :param float real_price:  the actual short selling price
-        :param float number:      the short selling quantity
-        :param float stoploss:    the stop-loss price
-        :param float goal_price:  the target price
-        :param float plan_price:  the planned short selling price
-        :param SystemPart part:   the source of the trading instruction
-        :param str remark:        the remark
-        :rtype: TradeRecord
-        
-    .. py:method:: sell_short(self, datetime, stock, real_price[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
-    
         The short covering operation (buy back to close the position)
         
         :param Datetime datetime: the covering time
         :param Stock stock:       the security to cover
-        :param float real_price:  the actual covering price
+        :param float real_price:  the actual covering price; 0 is a legal market-order placeholder
+            (the dealing price is decided by the broker)
         :param float number:      the covering quantity; if it equals constant.max_double, cover all
         :param float stoploss:    the stop-loss price
         :param float goal_price:  the target price
         :param float plan_price:  the planned covering price
+        :param SystemPart part:   the source of the trading instruction
+        :param str remark:        the remark
+        :rtype: TradeRecord
+        
+    .. py:method:: sell_short(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
+    
+        The short selling operation (sell first, buy back later)
+        
+        :param Datetime datetime: the short selling time
+        :param Stock stock:       the security to short sell
+        :param float real_price:  the actual short selling price; 0 is a legal market-order
+            placeholder (the dealing price is decided by the broker)
+        :param float number:      the short selling quantity
+        :param float stoploss:    the stop-loss price
+        :param float goal_price:  the target price
+        :param float plan_price:  the planned short selling price
         :param SystemPart part:   the source of the trading instruction
         :param str remark:        the remark
         :rtype: TradeRecord

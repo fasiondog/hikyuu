@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <cmath>
 #include <functional>
 #include <numeric>
 #include <boost/lexical_cast.hpp>
@@ -799,8 +800,14 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} numer is zero!", datetime,
-                        stock.market_code());
+    // realPrice 0 is a legal placeholder for the market-order path of Strategy (the dealing
+    // price comes from the broker); only non-finite or negative values are invalid
+    HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
+                        "{} {} Invalid buy real price({})!", datetime, stock.market_code(),
+                        realPrice);
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number == 0.0, result,
+                        "{} {} number({}) must be finite and nonzero!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -922,6 +929,9 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
+    HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
+                        "{} {} Invalid sell real price({})!", datetime, stock.market_code(),
+                        realPrice);
     HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
                         stock.market_code());
 
@@ -1015,8 +1025,12 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} numer is zero! ", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
+                        "{} {} Invalid sell short real price({})!", datetime, stock.market_code(),
+                        realPrice);
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number == 0.0, result,
+                        "{} {} number({}) must be finite and nonzero!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} Buy number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());
@@ -1131,8 +1145,12 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), result,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, result, "{} {} number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
+                        "{} {} Invalid buy short real price({})!", datetime, stock.market_code(),
+                        realPrice);
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number == 0.0, result,
+                        "{} {} number({}) must be finite and nonzero!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(number < stock.minTradeNumber(), result,
                         "{} {} buyShort number({}) must be >= minTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.minTradeNumber());

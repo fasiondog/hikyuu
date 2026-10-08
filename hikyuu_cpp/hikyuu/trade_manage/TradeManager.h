@@ -232,7 +232,8 @@ public:
      * Buy operation
      * @param datetime buy time
      * @param stock the security to buy
-     * @param realPrice actual buy price
+     * @param realPrice actual buy price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number buy quantity
      * @param stoploss stop-loss price
      * @param goalPrice target price
@@ -251,7 +252,8 @@ public:
      * Sell operation
      * @param datetime sell time
      * @param stock the security to sell
-     * @param realPrice actual sell price
+     * @param realPrice actual sell price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number sell quantity; MAX_DOUBLE means selling everything
      * @param stoploss new stop-loss price
      * @param goalPrice new target price
@@ -270,12 +272,13 @@ public:
      * Short sell
      * @param datetime short sell time
      * @param stock the security to short sell
-     * @param realPrice actual short sell price
+     * @param realPrice actual short sell price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number sell quantity
      * @param stoploss stop-loss price
      * @param goalPrice target price
      * @param planPrice planned short sell price
-     * @param from records which system part issued the buy instruction
+     * @param from records which system part issued the sell short instruction
      * @param remark remark
      * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
      *         failed
@@ -289,12 +292,13 @@ public:
      * Cover a short position
      * @param datetime buy time
      * @param stock the security to buy
-     * @param realPrice actual buy price
-     * @param number sell quantity; MAX_DOUBLE means selling everything
+     * @param realPrice actual covering price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
+     * @param number buy quantity; MAX_DOUBLE means covering the entire short position
      * @param stoploss stop-loss price
      * @param goalPrice target price
      * @param planPrice planned buy price
-     * @param from records which system part issued the sell instruction
+     * @param from records which system part issued the buy short instruction
      * @param remark remark
      * @return the corresponding trade record; business equals BUSINESS_INVALID if the operation
      *         failed

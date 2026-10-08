@@ -1172,4 +1172,65 @@ TEST_CASE("test_TradeManager_addPosition") {
              false);
 }
 
+/** @par Test points */
+TEST_CASE("test_TradeManager_param_guards") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    double nan = std::numeric_limits<double>::quiet_NaN();
+    double inf = std::numeric_limits<double>::infinity();
+    TradeManagerPtr tm;
+    TradeRecord result;
+    auto invalid = [](const TradeRecord& r) { return r.business == BUSINESS_INVALID; };
+
+    /** @arg buy rejects negative, NaN and infinite real price */
+    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, inf, 100)));
+
+    /** @arg buy rejects a NaN number, which used to pass all the number comparisons */
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, 10.0, nan)));
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, 10.0, inf)));
+
+    /** @arg the cash stays untouched by the rejected orders and a normal buy still succeeds */
+    CHECK_EQ(tm->cash(Datetime(199911170000)), 1000000.0);
+    result = tm->buy(Datetime(199911170000), stock, 10.0, 100);
+    CHECK_EQ(result.business, BUSINESS_BUY);
+
+    /** @arg a zero real price is the legal market-order placeholder of the Strategy path */
+    result = tm->buy(Datetime(199911170000), stock, 0.0, 100);
+    CHECK_EQ(result.business, BUSINESS_BUY);
+
+    /** @arg sell rejects negative, NaN and infinite real price */
+    CHECK_UNARY(invalid(tm->sell(Datetime(199911180000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->sell(Datetime(199911180000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->sell(Datetime(199911180000), stock, inf, 100)));
+
+    /** @arg a normal sell still succeeds */
+    result = tm->sell(Datetime(199911180000), stock, 10.0, MAX_DOUBLE);
+    CHECK_EQ(result.business, BUSINESS_SELL);
+
+    /** @arg sellShort rejects negative, NaN and infinite real price and a NaN number */
+    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, inf, 100)));
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, 10.0, nan)));
+
+    /** @arg a normal sellShort still succeeds */
+    CHECK_EQ(tm->borrowStock(Datetime(199911170000), stock, 10.0, 100), true);
+    result = tm->sellShort(Datetime(199911170000), stock, 10.0, 100);
+    CHECK_EQ(result.business, BUSINESS_SELL_SHORT);
+
+    /** @arg buyShort rejects negative, NaN and infinite real price and a NaN number */
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, inf, 100)));
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, 10.0, nan)));
+
+    /** @arg buyShort with MAX_DOUBLE number to close the short position still succeeds */
+    result = tm->buyShort(Datetime(199911180000), stock, 10.0, MAX_DOUBLE);
+    CHECK_EQ(result.business, BUSINESS_BUY_SHORT);
+}
+
 /** @} */
