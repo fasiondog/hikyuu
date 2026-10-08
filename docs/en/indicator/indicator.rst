@@ -17,6 +17,8 @@ Built-in Technical Indicators
 
     The arccosine value
 
+    Returns null when |X| > 1
+
     :param Indicator data: the input data
     :rtype: Indicator
 
@@ -383,6 +385,8 @@ Built-in Technical Indicators
 .. py:function:: ASIN([data])
 
     The arcsine value
+
+    Returns null when |X| > 1
 
     :param Indicator data: the input data
     :rtype: Indicator
@@ -928,6 +932,8 @@ Built-in Technical Indicators
 
     EXP(X) is e to the power of X
 
+    Returns null when the result overflows
+
     :param Indicator data: the input data
     :rtype: Indicator
 
@@ -1408,6 +1414,8 @@ Built-in Technical Indicators
 
     Get the natural logarithm; LN(X) is the logarithm with the base e
 
+    Returns null when X <= 0
+
     :param data: the input data
     :rtype: Indicator
 
@@ -1415,6 +1423,8 @@ Built-in Technical Indicators
 .. py:function:: LOG([data])
 
     The logarithm with the base 10
+
+    Returns null when X <= 0
 
     :param data: the input data
     :rtype: Indicator
@@ -1517,6 +1527,8 @@ Built-in Technical Indicators
 
     For example: MOD(26,10) returns 6
 
+    Returns null when the divisor is 0, or an operand is NaN / Inf / out of the integer range
+
     :param Indicator ind1:
     :param Indicator ind2:
     :rtype: Indicator
@@ -1601,6 +1613,8 @@ Built-in Technical Indicators
     
     For example: POW(CLOSE,3) gets the 3rd power of the close price
     
+    Returns null when the result overflows or is undefined
+    
     :param data: the input data
     :param int|Indicator|IndParam n: the power
     :rtype: Indicator
@@ -1613,6 +1627,8 @@ Built-in Technical Indicators
     Usage: SIGNED_POWER(A,B) returns A to the power of B, but keeping the original sign
     
     For example: SIGNED_POWER(CLOSE,3) gets the 3rd power of the close price, keeping the original sign
+    
+    Returns null when the result overflows or is undefined
     
     :param data: the input data
     :param int|Indicator|IndParam n: the power
@@ -1848,7 +1864,7 @@ Built-in Technical Indicators
     Round half up
 
     :param data: the input data
-    :param int ndigits: the number of the decimal places to keep
+    :param int ndigits: the number of the decimal places to keep; a negative value rounds to the left of the decimal point (e.g. -2 rounds to hundreds)
     :rtype: Indicator
 
 
@@ -1857,7 +1873,7 @@ Built-in Technical Indicators
     Round down, e.g. 10.1 becomes 10 after rounding
 
     :param data: the input data
-    :param int ndigits: the number of the decimal places to keep
+    :param int ndigits: the number of the decimal places to keep; a negative value rounds to the left of the decimal point (e.g. -2 rounds to hundreds)
     :rtype: Indicator
 
 
@@ -1866,7 +1882,7 @@ Built-in Technical Indicators
     Round up, e.g. 10.1 becomes 11 after rounding
 
     :param data: the input data
-    :param int ndigits: the number of the decimal places to keep
+    :param int ndigits: the number of the decimal places to keep; a negative value rounds to the left of the decimal point (e.g. -2 rounds to hundreds)
     :rtype: Indicator
 
 
@@ -1994,6 +2010,8 @@ Built-in Technical Indicators
 
     For example: SQRT(CLOSE) is the square root of the close price
 
+    Returns null when X < 0
+
     :param data: the input data
     :rtype: Indicator
 
@@ -2061,6 +2079,8 @@ Built-in Technical Indicators
     Usage: SUMBARS(X,A): accumulate X forward until it is greater than or equal to A, returning the number of the periods of this interval
 
     For example: SUMBARS(VOL,CAPITAL) gets the number of the periods from a complete turnover to now
+
+    Returns null when the forward accumulation can never reach A
 
     :param Indicator data: the input data
     :param float|Indicator|IndParam a: the specified accumulated sum

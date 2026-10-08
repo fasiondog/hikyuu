@@ -17,6 +17,8 @@
 
     反余弦值
 
+    |X| > 1 时返回 null
+
     :param Indicator data: 输入数据
     :rtype: Indicator
 
@@ -383,6 +385,8 @@
 .. py:function:: ASIN([data])
 
     反正弦值
+
+    |X| > 1 时返回 null
 
     :param Indicator data: 输入数据
     :rtype: Indicator
@@ -928,6 +932,8 @@
 
     EXP(X)为e的X次幂
 
+    结果溢出时返回 null
+
     :param Indicator data: 输入数据
     :rtype: Indicator
 
@@ -1409,6 +1415,8 @@
 
     求自然对数, LN(X)以e为底的对数
 
+    X <= 0 时返回 null
+
     :param data: 输入数据
     :rtype: Indicator
 
@@ -1416,6 +1424,8 @@
 .. py:function:: LOG([data])
 
     以10为底的对数
+
+    X <= 0 时返回 null
 
     :param data: 输入数据
     :rtype: Indicator
@@ -1518,6 +1528,8 @@
 
     例如：MOD(26,10) 返回 6
 
+    除数为 0，或操作数为 NaN/Inf/超出整数范围时返回 null
+
     :param Indicator ind1:
     :param Indicator ind2:
     :rtype: Indicator
@@ -1602,6 +1614,8 @@
     
     例如：POW(CLOSE,3)求得收盘价的3次方
     
+    结果溢出或无定义时返回 null
+    
     :param data: 输入数据
     :param int|Indicator|IndParam n: 幂
     :rtype: Indicator
@@ -1614,6 +1628,8 @@
     用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
     
     例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
+    
+    结果溢出或无定义时返回 null
     
     :param data: 输入数据
     :param int|Indicator|IndParam n: 幂
@@ -1849,7 +1865,7 @@
     四舍五入
 
     :param data: 输入数据
-    :param int ndigits: 保留的小数点后位数
+    :param int ndigits: 保留的小数点后位数，支持负数（向小数点左侧取整，如 -2 为取整到百位）
     :rtype: Indicator
 
 
@@ -1858,7 +1874,7 @@
     向下截取，如10.1截取后为10
 
     :param data: 输入数据
-    :param int ndigits: 保留的小数点后位数
+    :param int ndigits: 保留的小数点后位数，支持负数（向小数点左侧取整，如 -2 为取整到百位）
     :rtype: Indicator
 
 
@@ -1867,7 +1883,7 @@
     向上截取，如10.1截取后为11
 
     :param data: 输入数据
-    :param int ndigits: 保留的小数点后位数
+    :param int ndigits: 保留的小数点后位数，支持负数（向小数点左侧取整，如 -2 为取整到百位）
     :rtype: Indicator
 
 
@@ -1995,6 +2011,8 @@
 
     例如：SQRT(CLOSE)收盘价的平方根
 
+    X < 0 时返回 null
+
     :param data: 输入数据
     :rtype: Indicator
 
@@ -2062,6 +2080,8 @@
     用法：SUMBARS(X,A):将X向前累加直到大于等于A,返回这个区间的周期数
 
     例如：SUMBARS(VOL,CAPITAL)求完全换手到现在的周期数
+
+    向前累加始终无法达到 A 时返回 null
 
     :param Indicator data: 输入数据
     :param float|Indicator|IndParam a: 指定累加和
