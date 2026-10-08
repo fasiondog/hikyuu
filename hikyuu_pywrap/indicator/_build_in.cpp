@@ -1904,6 +1904,9 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: ((price / prevPrice)-1)*100
 
+    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    from the start.
+
     :param data: the input data
     :param int n: the time window
     :rtype: Indicator)");
@@ -1915,6 +1918,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("ROCP", ROCP_5, py::arg("data"), py::arg("n") = 10, R"(ROCP([data, n=10])
 
     The rate of change indicator: (price - prevPrice) / prevPrice
+
+    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    from the start.
 
     :param data: the input data
     :param int n: the time window
@@ -1938,6 +1944,9 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price / prevPrice)
 
+    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative return from the
+    start.
+
     :param data: the input data
     :param int n|Indicator|IndParam: the time window
     :rtype: Indicator)");
@@ -1949,6 +1958,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("ROCR100", ROCR100_5, py::arg("data"), py::arg("n") = 10, R"(ROCR100([data, n=10])
 
     The rate of change indicator: (price / prevPrice) * 100
+
+    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    from the start.
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window

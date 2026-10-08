@@ -17,6 +17,8 @@ namespace hku {
 
 /**
  * Rate of change indicator ((price / prevPrice)-1)*100
+ * @note when n = 0, prevPrice is fixed to the first valid bar, i.e. the cumulative rate of
+ *       change from the start
  * @ingroup Indicator
  */
 Indicator HKU_API ROC(int n = 10);

@@ -1746,6 +1746,8 @@
 
     变动率指标: ((price / prevPrice)-1)*100
 
+    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计变动率。
+
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
@@ -1754,6 +1756,8 @@
 .. py:function:: ROCP([data, n=10])
 
     变动率指标: (price - prevPrice) / prevPrice
+
+    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计变动率。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -1764,6 +1768,8 @@
 
     变动率指标: (price / prevPrice)
 
+    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计收益率。
+
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
@@ -1772,6 +1778,8 @@
 .. py:function:: ROCR100([data, n=10])
 
     变动率指标: (price / prevPrice) * 100
+
+    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计变动率。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
