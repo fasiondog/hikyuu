@@ -128,13 +128,15 @@ public:
      *        is off by default. The branches here are only a defensive pass-through for the case
      *        of an AF being invoked in mode C. */
     void setMode(const string& mode) {
+        // Assign from a char: assigning a string literal straight into the member makes gcc
+        // emit a bogus -Wrestrict overlap warning once everything is inlined
+        char parsed = 'A';
         if (mode == "B" || mode == "b") {
-            m_mode = "B";
+            parsed = 'B';
         } else if (mode == "C" || mode == "c") {
-            m_mode = "C";
-        } else {
-            m_mode = "A";
+            parsed = 'C';
         }
+        m_mode.assign(1, parsed);
     }
 
     /** Get the allocation mode */

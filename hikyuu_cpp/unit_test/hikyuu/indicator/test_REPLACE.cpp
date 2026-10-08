@@ -80,6 +80,11 @@ TEST_CASE("test_REPLACE") {
     }
 }
 
+// The relative ULP tolerance is resolved at the storage precision: with the float indicator
+// buffer 100.0000001 == 100.0f and 1e308 overflows to inf, so none of these values stay distinct
+// and the expected literals cannot be represented either
+#if !HKU_USE_LOW_PRECISION
+
 /** @par Test points */
 TEST_CASE("test_REPLACE_nearly_equal") {
     /** @arg a value one ULP away at price magnitude is replaced (an absolute epsilon missed it) */
@@ -107,6 +112,8 @@ TEST_CASE("test_REPLACE_nearly_equal") {
     CHECK_EQ(result[0], 1e308);
     CHECK_EQ(result[1], 6.0);
 }
+
+#endif  // #if !HKU_USE_LOW_PRECISION
 
 //-----------------------------------------------------------------------------
 // test export

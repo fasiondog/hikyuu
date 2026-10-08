@@ -209,6 +209,10 @@ TEST_CASE("test_STDEV_nan_single_valid") {
     }
 }
 
+// A float cannot hold 1e8+1: with the float indicator buffer every value rounds to 1e8 and the
+// variance is 0, so the Welford precision check only makes sense in the double mode
+#if !HKU_USE_LOW_PRECISION
+
 /** @par Test point: a large base with a small variance (the Welford precision check) */
 TEST_CASE("test_STDEV_large_base") {
     PriceList d;
@@ -225,6 +229,8 @@ TEST_CASE("test_STDEV_large_base") {
     CHECK_EQ(dev[3], doctest::Approx(1.0).epsilon(0.0001));
     CHECK_EQ(dev[4], doctest::Approx(1.0).epsilon(0.0001));
 }
+
+#endif  // #if !HKU_USE_LOW_PRECISION
 
 /** @par Test point: an outlier leaving the window triggers a recalculation */
 TEST_CASE("test_STDEV_outlier_leaving_rescan") {

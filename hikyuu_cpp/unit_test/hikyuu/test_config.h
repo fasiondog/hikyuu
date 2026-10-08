@@ -40,6 +40,9 @@ inline void check_indicator(const Indicator& result, const Indicator& expect) {
     for (size_t i = result.discard(), total = result.size(); i < total; ++i) {
         if (std::isnan(expect[i])) {
             CHECK_UNARY(std::isnan(result[i]));
+        } else if (!std::isfinite(expect[i]) || !std::isfinite(result[i])) {
+            // doctest::Approx cannot compare infinities (inf - inf is NaN), compare them exactly
+            CHECK_EQ(result[i], expect[i]);
         } else {
             CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.00001));
         }
