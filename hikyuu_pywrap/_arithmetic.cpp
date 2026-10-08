@@ -12,7 +12,6 @@ using namespace hku;
 namespace py = pybind11;
 
 void export_util(py::module& m) {
-    m.def("roundEx", roundEx<float>, py::arg("number"), py::arg("ndigits") = 0);
     m.def("roundEx", roundEx<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundEx(number[, ndigits=0])
 
@@ -23,7 +22,6 @@ void export_util(py::module& m) {
     :param int ndigits the number of decimal places to keep
     :rtype: float)");
 
-    m.def("roundUp", roundUp<float>, py::arg("number"), py::arg("ndigits") = 0);
     m.def("roundUp", roundUp<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundUp(number[, ndigits=0])
 
@@ -33,7 +31,6 @@ void export_util(py::module& m) {
     :param int ndigits the number of the decimal places to keep
     :rtype: float)");
 
-    m.def("roundDown", roundDown<float>, py::arg("number"), py::arg("ndigits") = 0);
     m.def("roundDown", roundDown<double>, py::arg("number"), py::arg("ndigits") = 0,
           R"(roundDown(number[, ndigits=0])
 
