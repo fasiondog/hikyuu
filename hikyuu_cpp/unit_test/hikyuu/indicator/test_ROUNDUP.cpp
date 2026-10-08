@@ -43,6 +43,12 @@ TEST_CASE("test_ROUNDUP") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], doctest::Approx(-11.2));
+
+    /** @arg negative ndigits rounds away from zero at the 10^|ndigits| place */
+    result = ROUNDUP(1234.0, -2);
+    CHECK_EQ(result[0], doctest::Approx(1300));
+    result = ROUNDUP(-1234.0, -2);
+    CHECK_EQ(result[0], doctest::Approx(-1300));
 }
 
 //-----------------------------------------------------------------------------

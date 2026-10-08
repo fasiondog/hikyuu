@@ -45,6 +45,13 @@ TEST_CASE("test_ROUND") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], doctest::Approx(-11.2));
+
+    /** @arg negative ndigits rounds to the left of the decimal point */
+    result = ROUND(1234.0, -2);
+    CHECK_EQ(result[0], doctest::Approx(1200));
+    /** @arg exactly half rounds away from zero */
+    result = ROUND(1250.0, -2);
+    CHECK_EQ(result[0], doctest::Approx(1300));
 }
 
 //-----------------------------------------------------------------------------

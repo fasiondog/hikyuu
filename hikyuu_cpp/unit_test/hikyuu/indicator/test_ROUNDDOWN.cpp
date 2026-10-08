@@ -43,6 +43,12 @@ TEST_CASE("test_ROUNDDOWN") {
     CHECK_EQ(result.size(), 1);
     CHECK_EQ(result.discard(), 0);
     CHECK_EQ(result[0], doctest::Approx(-11.1));
+
+    /** @arg negative ndigits truncates toward zero at the 10^|ndigits| place */
+    result = ROUNDDOWN(1234.0, -2);
+    CHECK_EQ(result[0], doctest::Approx(1200));
+    result = ROUNDDOWN(-1234.0, -2);
+    CHECK_EQ(result[0], doctest::Approx(-1200));
 }
 
 //-----------------------------------------------------------------------------

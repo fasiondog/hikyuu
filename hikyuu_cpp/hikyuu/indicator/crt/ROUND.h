@@ -16,7 +16,10 @@
 namespace hku {
 
 /**
- * Rounding
+ * Round half away from zero (the Chinese traditional 四舍五入) to the given number of decimal
+ * places
+ * @param ndigits the number of decimal places to keep; a negative value rounds to the left of the
+ *                decimal point (e.g. -2 rounds 1234 to 1200)
  * @ingroup Indicator
  */
 Indicator HKU_API ROUND(int ndigits = 2);

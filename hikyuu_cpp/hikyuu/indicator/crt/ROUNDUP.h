@@ -16,11 +16,12 @@
 namespace hku {
 
 /**
- * Truncate upward, e.g. 10.1 is truncated to 11
+ * Round away from zero, e.g. 10.1 rounds to 11 and -10.1 rounds to -11
+ * @param ndigits the number of decimal places to keep; a negative value rounds to the left of the
+ *                decimal point
  * @ingroup Indicator
  */
 Indicator HKU_API ROUNDUP(int ndigits = 2);
-;
 
 inline Indicator ROUNDUP(const Indicator& ind, int n = 2) {
     return ROUNDUP(n)(ind);

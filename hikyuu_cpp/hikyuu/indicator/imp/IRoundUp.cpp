@@ -23,7 +23,10 @@ IRoundUp::~IRoundUp() {}
 
 void IRoundUp::_checkParam(const string& name) const {
     if ("ndigits" == name) {
-        HKU_ASSERT(getParam<int>("ndigits") >= 0);
+        // ndigits may be negative (round to the left of the decimal point); bound its magnitude so
+        // that 10^|ndigits| stays representable (10^308 < DBL_MAX < 10^309)
+        int n = getParam<int>("ndigits");
+        HKU_CHECK(n >= -308 && n <= 308, "ndigits ({}) must be in [-308, 308]", n);
     }
 }
 
