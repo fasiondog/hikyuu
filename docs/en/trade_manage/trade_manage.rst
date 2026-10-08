@@ -8,3 +8,4 @@ Trade Management
    TradeManager
    OrderBroker
    Performance
+   performance_indicator
