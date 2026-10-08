@@ -136,12 +136,66 @@ public:                                                                         
         return this->_clone();                                                   \
     }
 
-// Used to check whether the number of the function arguments passed as py::object is as expected
+// The `inspect` handles used by check_pyfunction_arg_num, cached because the check runs on every
+// callback registration. Intentionally leaked: the cached objects outlive the interpreter and
+// must not be decref'd during finalization.
+inline const auto& py_inspect_cache() {
+    struct Cache {
+        py::object inspect;
+        py::object empty;           // inspect.Parameter.empty
+        py::object var_positional;  // inspect.Parameter.VAR_POSITIONAL
+        py::object var_keyword;     // inspect.Parameter.VAR_KEYWORD
+        py::object keyword_only;    // inspect.Parameter.KEYWORD_ONLY
+    };
+
+    static const Cache* cache = new Cache{[]() {
+        py::object inspect = py::module_::import("inspect");
+        py::object parameter = inspect.attr("Parameter");
+        return Cache{inspect, parameter.attr("empty"), parameter.attr("VAR_POSITIONAL"),
+                     parameter.attr("VAR_KEYWORD"), parameter.attr("KEYWORD_ONLY")};
+    }()};
+    return *cache;
+}
+
+// Used to check whether the callable passed as py::object accepts the expected number of
+// positional arguments. Following the inspect.signature convention, the implicit `self` of a
+// bound method or of a callable object is not counted. Callables without an introspectable
+// signature (builtins, numpy ufuncs, ...) are accepted, as their arity cannot be determined.
 inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
-    py::module_ inspect = py::module_::import("inspect");
-    py::object sig = inspect.attr("signature")(func);
-    py::object params = sig.attr("parameters");
-    return len(params) == arg_num;
+    const auto& cache = py_inspect_cache();
+    py::object params;
+    try {
+        params = cache.inspect.attr("signature")(func).attr("parameters");
+    } catch (py::error_already_set& e) {
+        // Not introspectable: accept instead of breaking the registration
+        if (e.matches(PyExc_ValueError) || e.matches(PyExc_TypeError)) {
+            return true;
+        }
+        throw;
+    }
+
+    size_t required = 0, positional = 0;
+    for (auto item : params.attr("values")()) {
+        py::object kind = item.attr("kind");
+        if (kind.is(cache.var_positional)) {
+            return true;  // *args accepts any number of positional arguments
+        }
+        if (kind.is(cache.var_keyword)) {
+            continue;  // **kwargs only absorbs keyword arguments
+        }
+        py::object default_value = item.attr("default");
+        bool has_default = !default_value.is(cache.empty);
+        if (kind.is(cache.keyword_only)) {
+            // the caller only passes positional arguments
+            HKU_IF_RETURN(!has_default, false);
+            continue;
+        }
+        positional++;
+        if (!has_default) {
+            required++;
+        }
+    }
+    return arg_num >= required && arg_num <= positional;
 }
 
 /*
