@@ -11,6 +11,7 @@
 #include <hikyuu/trade_manage/crt/TC_TestStub.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/Performance.h>
 
 #include <fstream>
 #include <cmath>
@@ -1284,6 +1285,53 @@ TEST_CASE("test_TradeManager_stock_ops_guards") {
     /** @arg a normal return succeeds and clears the debt */
     CHECK_UNARY(tm->returnStock(Datetime(199911180000), stock, 10.0, 100));
     CHECK_UNARY(tm->getBorrowStockList().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_short_borrow_exrights") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    // sh600000 does 10 turn 3 (bonus shares) on 2006-05-12: the owed quantity must follow
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 1000000, TC_Zero());
+    CHECK_UNARY(tm->borrowStock(Datetime(200605100000), stock, 10.0, 200));
+    CHECK_EQ(tm->sellShort(Datetime(200605100000), stock, 10.0, 200).business, BUSINESS_SELL_SHORT);
+
+    /** @arg the borrowed (owed) quantity grows by 30% after the 10 turn 3 ex-rights */
+    CHECK_EQ(tm->getDebtNumber(Datetime(200605120000), stock), 260.0);
+
+    /** @arg the short position grows by the same ratio so that buyShort can cover it */
+    CHECK_EQ(tm->getShortHoldNumber(Datetime(200605120000), stock), 260.0);
+
+    // sh600000 pays a cash dividend of 1.5 per 10 shares on 2000-07-06: compensated to the lender
+    tm = crtTM(Datetime(199901010000), 1000000, TC_Zero());
+    CHECK_UNARY(tm->borrowStock(Datetime(200007050000), stock, 10.0, 200));
+    CHECK_EQ(tm->sellShort(Datetime(200007050000), stock, 10.0, 200).business, BUSINESS_SELL_SHORT);
+    price_t cash_before = tm->currentCash();
+
+    /** @arg a cash dividend does not change the owed quantity */
+    CHECK_EQ(tm->getDebtNumber(Datetime(200007060000), stock), 200.0);
+
+    /** @arg the cash dividend is compensated to the lender as an account cash outflow */
+    CHECK_EQ(tm->currentCash(), roundEx(cash_before - 200.0 * 1.5 * 0.1, 2));
+
+    /** @arg the compensation is recorded as a dedicated DIVIDEND_COMPENSATION record (a
+     * financing cost) so that the dividend income metric is not polluted by a negative amount */
+    TradeRecordList tr_list = tm->getTradeList(Datetime(200007060000), Datetime(200007070000));
+    bool found_comp = false;
+    for (const auto& record : tr_list) {
+        CHECK_UNARY(record.business != BUSINESS_BONUS);
+        if (record.business == BUSINESS_DIVIDEND_COMPENSATION) {
+            found_comp = true;
+            CHECK_EQ(record.realPrice, 30.0);
+        }
+    }
+    CHECK_UNARY(found_comp);
+
+    /** @arg Total Dividends stays gross: the compensation is a cost, not a negative dividend */
+    Performance perf;
+    perf.statistics(tm, Datetime(200007060000));
+    CHECK_EQ(perf.get("Total Dividends"), 0.0);
 }
 
 /** @par Test points */

@@ -10,7 +10,7 @@
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: 交易业务类型
-    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"|"RETURN_STOCK"|"SUOGU"|"UNKNOWN")
+    :return: 交易业务类型名称("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"|"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"|"RETURN_STOCK"|"SUOGU"|"BORROW_ADJUST"|"SHORT_ADJUST"|"DIVIDEND_COMPENSATION"|"UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS    
@@ -31,6 +31,9 @@
     - BUSINESS.BORROW_STOCK   - 借入股票
     - BUSINESS.RETURN_STOCK   - 归还借入股票
     - BUSINESS.SUOGU          - 缩股
+    - BUSINESS.BORROW_ADJUST  - 借入股票数量调整（除权送股/缩股）
+    - BUSINESS.SHORT_ADJUST   - 卖空持仓数量调整（除权送股/缩股）
+    - BUSINESS.DIVIDEND_COMPENSATION - 红利补偿（卖空向出借方支付的现金）
     - BUSINESS.INVALID        - 无效类型
 
 

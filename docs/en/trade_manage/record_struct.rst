@@ -10,7 +10,7 @@ Trade Business Types
 .. py:function:: get_business_name(business)
 
     :param BUSINESS business: trade business type
-    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "UNKNOWN")
+    :return: name of the trade business type, one of ("INIT" | "BUY" | "SELL" | "BUY_SHORT" | "SELL_SHORT" | "GIFT" | "BONUS" | "CHECKIN" | "CHECKOUT" | "CHECKIN_STOCK" | "CHECKOUT_STOCK" | "BORROW_CASH" | "RETURN_CASH" | "BORROW_STOCK" | "RETURN_STOCK" | "SUOGU" | "BORROW_ADJUST" | "SHORT_ADJUST" | "DIVIDEND_COMPENSATION" | "UNKNOWN")
     :rtype: string
 
 .. py:class:: BUSINESS
@@ -31,6 +31,9 @@ Trade Business Types
     - BUSINESS.BORROW_STOCK   - Borrow stock (securities lending)
     - BUSINESS.RETURN_STOCK   - Return the borrowed stock
     - BUSINESS.SUOGU          - Share consolidation (stock squeeze)
+    - BUSINESS.BORROW_ADJUST  - Borrowed stock quantity adjustment (ex-rights)
+    - BUSINESS.SHORT_ADJUST   - Short position quantity adjustment (ex-rights)
+    - BUSINESS.DIVIDEND_COMPENSATION - Dividend compensation paid to the lender (short)
     - BUSINESS.INVALID        - Invalid type
 
 

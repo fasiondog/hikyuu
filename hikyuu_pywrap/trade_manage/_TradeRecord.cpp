@@ -33,6 +33,9 @@ void export_TradeRecord(py::module& m) {
       .value("BORROW_STOCK", BUSINESS_BORROW_STOCK)
       .value("RETURN_STOCK", BUSINESS_RETURN_STOCK)
       .value("SUOGU", BUSINESS_SUOGU)
+      .value("BORROW_ADJUST", BUSINESS_BORROW_ADJUST)
+      .value("SHORT_ADJUST", BUSINESS_SHORT_ADJUST)
+      .value("DIVIDEND_COMPENSATION", BUSINESS_DIVIDEND_COMPENSATION)
       .value("INVALID", BUSINESS_INVALID);
 
     m.def("get_business_name", getBusinessName, R"(get_business_name(business)
@@ -41,7 +44,7 @@ void export_TradeRecord(py::module& m) {
     :return: the trade business type name
              ("INIT"|"BUY"|"SELL"|"BUY_SHORT"|"SELL_SHORT"|"GIFT"|"BONUS"|"CHECKIN"|"CHECKOUT"
               |"CHECKIN_STOCK"|"CHECKOUT_STOCK"|"BORROW_CASH"|"RETURN_CASH"|"BORROW_STOCK"
-              |"RETURN_STOCK"|"SUOGU"|"UNKNOWN")
+              |"RETURN_STOCK"|"SUOGU"|"BORROW_ADJUST"|"SHORT_ADJUST"|"DIVIDEND_COMPENSATION"|"UNKNOWN")
     :rtype: string)");
 
     py::class_<TradeRecord>(m, "TradeRecord", "The trade record")

@@ -45,6 +45,12 @@ string HKU_API getBusinessName(BUSINESS business) {
             return "BUY_SHORT";
         case BUSINESS_SUOGU:
             return "SUOGU";
+        case BUSINESS_BORROW_ADJUST:
+            return "BORROW_ADJUST";
+        case BUSINESS_SHORT_ADJUST:
+            return "SHORT_ADJUST";
+        case BUSINESS_DIVIDEND_COMPENSATION:
+            return "DIVIDEND_COMPENSATION";
         default:
             return "UNKNOWN";
     }
@@ -86,6 +92,12 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
         return BUSINESS_BUY_SHORT;
     } else if (business_name == "SUOGU") {
         return BUSINESS_SUOGU;
+    } else if (business_name == "BORROW_ADJUST") {
+        return BUSINESS_BORROW_ADJUST;
+    } else if (business_name == "SHORT_ADJUST") {
+        return BUSINESS_SHORT_ADJUST;
+    } else if (business_name == "DIVIDEND_COMPENSATION") {
+        return BUSINESS_DIVIDEND_COMPENSATION;
     } else {
         business = BUSINESS_INVALID;
     }

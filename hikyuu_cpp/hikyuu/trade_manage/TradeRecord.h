@@ -23,23 +23,26 @@ namespace hku {
  * @ingroup TradeManagerClass
  */
 enum BUSINESS {
-    BUSINESS_INIT = 0,           /**< Create the initial account */
-    BUSINESS_BUY = 1,            /**< Buy */
-    BUSINESS_SELL = 2,           /**< Sell */
-    BUSINESS_GIFT = 3,           /**< Bonus share */
-    BUSINESS_BONUS = 4,          /**< Cash dividend */
-    BUSINESS_CHECKIN = 5,        /**< Deposit cash */
-    BUSINESS_CHECKOUT = 6,       /**< Withdraw cash */
-    BUSINESS_CHECKIN_STOCK = 7,  /**< Deposit stock assets */
-    BUSINESS_CHECKOUT_STOCK = 8, /**< Withdraw stock assets */
-    BUSINESS_BORROW_CASH = 9,    /**< Borrow cash */
-    BUSINESS_RETURN_CASH = 10,   /**< Repay borrowed cash */
-    BUSINESS_BORROW_STOCK = 11,  /**< Borrow stock assets */
-    BUSINESS_RETURN_STOCK = 12,  /**< Return borrowed stock assets */
-    BUSINESS_SELL_SHORT = 13,    /**< Short sell */
-    BUSINESS_BUY_SHORT = 14,     /**< Cover a short position */
-    BUSINESS_SUOGU = 15,         /**< Share consolidation / expansion */
-    BUSINESS_INVALID = 16        /**< Invalid type */
+    BUSINESS_INIT = 0,                   /**< Create the initial account */
+    BUSINESS_BUY = 1,                    /**< Buy */
+    BUSINESS_SELL = 2,                   /**< Sell */
+    BUSINESS_GIFT = 3,                   /**< Bonus share */
+    BUSINESS_BONUS = 4,                  /**< Cash dividend */
+    BUSINESS_CHECKIN = 5,                /**< Deposit cash */
+    BUSINESS_CHECKOUT = 6,               /**< Withdraw cash */
+    BUSINESS_CHECKIN_STOCK = 7,          /**< Deposit stock assets */
+    BUSINESS_CHECKOUT_STOCK = 8,         /**< Withdraw stock assets */
+    BUSINESS_BORROW_CASH = 9,            /**< Borrow cash */
+    BUSINESS_RETURN_CASH = 10,           /**< Repay borrowed cash */
+    BUSINESS_BORROW_STOCK = 11,          /**< Borrow stock assets */
+    BUSINESS_RETURN_STOCK = 12,          /**< Return borrowed stock assets */
+    BUSINESS_SELL_SHORT = 13,            /**< Short sell */
+    BUSINESS_BUY_SHORT = 14,             /**< Cover a short position */
+    BUSINESS_SUOGU = 15,                 /**< Share consolidation / expansion */
+    BUSINESS_BORROW_ADJUST = 16,         /**< Borrowed stock quantity adjustment for ex-rights */
+    BUSINESS_SHORT_ADJUST = 17,          /**< Short position quantity adjustment for ex-rights */
+    BUSINESS_DIVIDEND_COMPENSATION = 18, /**< Dividend compensation paid to the lender (short) */
+    BUSINESS_INVALID = 19                /**< Invalid type */
 };
 
 /**

@@ -254,6 +254,9 @@ double TradeManager::getShortHoldNumber(const Datetime& datetime, const Stock& s
             } else if (BUSINESS_BUY_SHORT == iter->business) {
                 number -= iter->number;
 
+            } else if (BUSINESS_SHORT_ADJUST == iter->business) {
+                number += iter->number;
+
             } else {
                 // The other cases are ignored
             }
@@ -288,6 +291,8 @@ double TradeManager::getDebtNumber(const Datetime& datetime, const Stock& stock)
                 debt_n += iter->number;
             } else if (iter->business == BUSINESS_RETURN_STOCK) {
                 debt_n -= iter->number;
+            } else if (iter->business == BUSINESS_BORROW_ADJUST) {
+                debt_n += iter->number;
             }
         }
     }
@@ -1410,7 +1415,40 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 }
                 break;
 
+            case BUSINESS_BORROW_ADJUST: {
+                bor_stock_iter = bor_stock_map.find(iter->stock.id());
+                if (bor_stock_iter != bor_stock_map.end()) {
+                    BorrowRecord& bor = bor_stock_iter->second;
+                    double total = 0.0;
+                    list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
+                    for (; bor_iter != bor.record_list.end(); ++bor_iter) {
+                        total += bor_iter->number;
+                    }
+                    // Scale the entries so that the sum follows the new quantity while the total
+                    // value (price x number) stays invariant (borrow_asset is not touched)
+                    if (total != 0.0) {
+                        double factor = (total + iter->number) / total;
+                        for (bor_iter = bor.record_list.begin(); bor_iter != bor.record_list.end();
+                             ++bor_iter) {
+                            bor_iter->number *= factor;
+                            bor_iter->price /= factor;
+                        }
+                    }
+                }
+                break;
+            }
+
+            case BUSINESS_SHORT_ADJUST:
+                short_stock_iter = short_stock_map.find(iter->stock.id());
+                if (short_stock_iter != short_stock_map.end()) {
+                    short_stock_iter->second.number += iter->number;
+                } else {
+                    short_stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
+                }
+                break;
+
             case BUSINESS_BONUS:
+            case BUSINESS_DIVIDEND_COMPENSATION:
                 break;
 
             case BUSINESS_CHECKIN:
@@ -1701,7 +1739,40 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     break;
                 }
 
+                case BUSINESS_BORROW_ADJUST: {
+                    auto iter = bor_stock_map.find(trade_iter->stock.id());
+                    if (iter != bor_stock_map.end()) {
+                        BorrowRecord& bor = iter->second;
+                        double total = 0.0;
+                        for (auto& entry : bor.record_list) {
+                            total += entry.number;
+                        }
+                        // Scale the entries so that the sum follows the new quantity while the
+                        // total value (price x number) stays invariant
+                        if (total != 0.0) {
+                            double factor = (total + trade_iter->number) / total;
+                            for (auto& entry : bor.record_list) {
+                                entry.number *= factor;
+                                entry.price /= factor;
+                            }
+                        }
+                    }
+                    break;
+                }
+
+                case BUSINESS_SHORT_ADJUST: {
+                    auto iter = short_stock_map.find(trade_iter->stock.id());
+                    if (iter != short_stock_map.end()) {
+                        iter->second.number += trade_iter->number;
+                    } else {
+                        short_stock_map.emplace(trade_iter->stock.id(),
+                                                StockNumber(trade_iter->stock, trade_iter->number));
+                    }
+                    break;
+                }
+
                 case BUSINESS_BONUS:
+                case BUSINESS_DIVIDEND_COMPENSATION:
                     break;
 
                 case BUSINESS_CHECKIN:
@@ -1960,6 +2031,124 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         } /* for weight */
     } /* for position */
 
+    // A-share margin trading: the borrowed stock must follow the ex-rights events as well. The
+    // cash dividend is compensated to the lender (a cash outflow), and the bonus/consolidation
+    // events scale the owed quantity by the same ratio, mirroring the long position above.
+    borrow_stock_map_type::iterator borrow_iter = m_borrow_stock.begin();
+    for (; borrow_iter != m_borrow_stock.end(); ++borrow_iter) {
+        BorrowRecord& borrow = borrow_iter->second;
+        Stock stock = borrow.stock;
+
+        StockWeightList weights = stock.getWeight(start_date, end_date);
+        StockWeightList::const_iterator weight_iter = weights.begin();
+        for (; weight_iter != weights.end(); ++weight_iter) {
+            if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
+                0.0 == weight_iter->increasement() && 0.0 == weight_iter->suogu()) {
+                continue;
+            }
+
+            // The cash dividend is compensated to the lender: a cash outflow from the account
+            // (a financing cost of the short position, not a negative dividend income)
+            if (weight_iter->bonus() != 0.0) {
+                price_t bonus = roundEx(borrow.number * weight_iter->bonus() * 0.1, precision);
+                m_cash -= bonus;
+                TradeRecord record(stock, weight_iter->datetime(), BUSINESS_DIVIDEND_COMPENSATION,
+                                   bonus, bonus, 0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID);
+                new_trade_buffer.push_back(record);
+            }
+
+            double addcount =
+              (borrow.number / 10.0) * (weight_iter->countAsGift() + weight_iter->increasement());
+            if (addcount != 0.0) {
+                double new_number = borrow.number + addcount;
+                double factor = new_number / borrow.number;
+                for (auto& entry : borrow.record_list) {  // keep the sum and the value invariant
+                    entry.number *= factor;
+                    entry.price /= factor;
+                }
+                borrow.number = new_number;
+                TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BORROW_ADJUST, 0.0, 0.0,
+                                   0.0, addcount, CostRecord(), 0.0, m_cash, PART_INVALID);
+                new_trade_buffer.push_back(record);
+            }
+
+            if (weight_iter->suogu() > 0.0) {
+                double suogu_number = borrow.number * weight_iter->suogu();
+                double new_number = borrow.number;
+                if (suogu_number < borrow.number) {
+                    // The share contraction adopts the round-up
+                    new_number = roundUp(suogu_number, 0);
+                } else if (suogu_number > borrow.number) {
+                    // The share expansion adopts the truncation
+                    new_number = roundDown(suogu_number, 0);
+                }
+
+                double change_number = new_number - borrow.number;
+                if (change_number != 0.0) {
+                    double factor = new_number / borrow.number;
+                    for (auto& entry :
+                         borrow.record_list) {  // keep the sum and the value invariant
+                        entry.number *= factor;
+                        entry.price /= factor;
+                    }
+                    borrow.number = new_number;
+                    TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BORROW_ADJUST, 0.0,
+                                       0.0, 0.0, change_number, CostRecord(), 0.0, m_cash,
+                                       PART_INVALID);
+                    new_trade_buffer.push_back(record);
+                }
+            }
+        } /* for weight */
+    } /* for borrow stock */
+
+    // The short position follows the same bonus/consolidation ratio so that it stays in sync
+    // with the borrowed quantity (buyShort covers it by the current position number)
+    position_map_type::iterator short_iter = m_short_position.begin();
+    for (; short_iter != m_short_position.end(); ++short_iter) {
+        PositionRecord& position = short_iter->second;
+        Stock stock = position.stock;
+
+        StockWeightList weights = stock.getWeight(start_date, end_date);
+        StockWeightList::const_iterator weight_iter = weights.begin();
+        for (; weight_iter != weights.end(); ++weight_iter) {
+            if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
+                0.0 == weight_iter->increasement() && 0.0 == weight_iter->suogu()) {
+                continue;
+            }
+
+            double addcount =
+              (position.number / 10.0) * (weight_iter->countAsGift() + weight_iter->increasement());
+            if (addcount != 0.0) {
+                position.number += addcount;
+                position.totalNumber += addcount;
+                TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SHORT_ADJUST, 0.0, 0.0,
+                                   0.0, addcount, CostRecord(), 0.0, m_cash, PART_INVALID);
+                new_trade_buffer.push_back(record);
+            }
+
+            if (weight_iter->suogu() > 0.0) {
+                double suogu_number = position.number * weight_iter->suogu();
+                double change_number = 0.0;
+                if (suogu_number < position.number) {
+                    double old_number = position.number;
+                    position.number = roundUp(suogu_number, 0);
+                    change_number = position.number - old_number;
+                } else if (suogu_number > position.number) {
+                    double old_number = position.number;
+                    position.number = roundDown(suogu_number, 0);
+                    change_number = position.number - old_number;
+                }
+
+                if (change_number != 0.0) {
+                    TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SHORT_ADJUST, 0.0,
+                                       0.0, 0.0, change_number, CostRecord(), 0.0, m_cash,
+                                       PART_INVALID);
+                    new_trade_buffer.push_back(record);
+                }
+            }
+        } /* for weight */
+    } /* for short position */
+
     // Sort by datetime, then replay from cash_base so each record's cash matches its own time.
     // Only BONUS changes cash; stable_sort keeps a bonus ahead of same-date gift records.
     std::stable_sort(
@@ -1972,6 +2161,8 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     for (size_t i = 0; i < total; ++i) {
         if (new_trade_buffer[i].business == BUSINESS_BONUS) {
             running_cash += new_trade_buffer[i].realPrice;
+        } else if (new_trade_buffer[i].business == BUSINESS_DIVIDEND_COMPENSATION) {
+            running_cash -= new_trade_buffer[i].realPrice;
         }
         new_trade_buffer[i].cash = running_cash;
     }
@@ -2202,9 +2393,12 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
 
         case BUSINESS_GIFT:
         case BUSINESS_SUOGU:
+        case BUSINESS_BORROW_ADJUST:
+        case BUSINESS_SHORT_ADJUST:
             return true;
 
         case BUSINESS_BONUS:
+        case BUSINESS_DIVIDEND_COMPENSATION:
             return true;
 
         case BUSINESS_CHECKIN:
