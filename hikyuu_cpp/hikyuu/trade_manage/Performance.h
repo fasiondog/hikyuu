@@ -34,7 +34,7 @@ public:
     /** Whether it is a valid statistics item
      *  @note The legacy Chinese keys (used before the i18n refactoring) are still accepted for
      *        backward compatibility, but they are deprecated */
-    bool exist(const string& key);
+    bool exist(const string& key) const;
 
     /** Reset, clearing the calculated results */
     void reset();
@@ -56,7 +56,7 @@ public:
      *       result got from TM
      * @return
      */
-    string report();
+    string report() const;
 
     /**
      * Count the system performance up to a certain moment according to the trade records; datetime
@@ -86,6 +86,7 @@ public:
     /** Add a new statistics item
      *  @note Since the i18n refactoring, only the English key is supported; a non-English key, such
      *        as a legacy Chinese one, is rejected with an error log
+     *  @note A duplicated or empty key is rejected, so that one key owns exactly one result slot
      *  @param chinese the optional corresponding Chinese name of the key, which is registered into
      *         the unified key name mapping: it is displayed by report in the Chinese environment,
      *         and the Chinese key is also accepted by get/exist like the built-in legacy keys
@@ -95,6 +96,7 @@ public:
     /** Set the value of the given statistics item
      *  @note Since the i18n refactoring, only the English key is supported; a non-English key, such
      *        as a legacy Chinese one, is rejected with an error log
+     *  @note Only a registered key is accepted; setting a not exist key is rejected
      */
     void setValue(const string& key, double value);
 
