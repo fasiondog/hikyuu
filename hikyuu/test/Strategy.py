@@ -9,8 +9,6 @@
 
 import unittest
 
-import time
-
 from test_init import *
 
 
@@ -55,8 +53,7 @@ class StrategyCallbackTest(unittest.TestCase):
         self.stg.run_daily(CallableHandler(), Seconds(1))
 
     def test_run_daily_without_introspectable_signature(self):
-        # builtins have no signature; the registration must not be broken by that
-        self.stg.run_daily(time.time, Seconds(1))
+        self.stg.run_daily(type, Seconds(1))
 
     def test_on_change_expected_arity(self):
         self.stg.on_change(lambda stg, stk, spot: None)

@@ -13,6 +13,7 @@
 #include <hikyuu/trade_manage/crt/crtTM.h>
 
 #include <fstream>
+#include <cmath>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 
@@ -1110,6 +1111,151 @@ TEST_CASE("test_TradeManager_returnCash_multi_loan") {
     tm->borrowCash(Datetime(199901090000), 100.00);
     CHECK_EQ(tm->returnCash(Datetime(199901100000), 100.01), false);
     CHECK_EQ(tm->getDebtCash(Datetime(199901110000)), 100.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_addPosition") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    Stock stock2 = sm.getStock("sh600004");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
+
+    /** @arg A null stock is rejected */
+    PositionRecord pr(Null<Stock>(), Datetime(199911170000), Null<Datetime>(), 100, 0, 0, 100, 1000,
+                      0, 0, 0);
+    CHECK_EQ(tm->addPosition(pr), false);
+
+    /** @arg A closed position record (cleanDatetime not null) is rejected */
+    pr.stock = stock;
+    pr.cleanDatetime = Datetime(199911180000);
+    CHECK_EQ(tm->addPosition(pr), false);
+
+    /** @arg A take datetime earlier than the account creation date is rejected */
+    pr = PositionRecord(stock, Datetime(199801010000), Null<Datetime>(), 100, 0, 0, 100, 1000, 0, 0,
+                        0);
+    CHECK_EQ(tm->addPosition(pr), false);
+
+    /** @arg A position can be added while the trade list holds only the INIT record */
+    pr = PositionRecord(stock, Datetime(199911170000), Null<Datetime>(), 100, 0, 0, 100, 1000, 0, 0,
+                        0);
+    CHECK_EQ(tm->addPosition(pr), true);
+    CHECK_EQ(tm->have(stock), true);
+    CHECK_EQ(tm->getHoldNumber(Datetime(199911170000), stock), 100);
+
+    /** @arg The same stock cannot be added twice */
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911180000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             false);
+
+    /** @arg A later take datetime moves the init datetime and syncs the INIT record datetime */
+    tm = crtTM(Datetime(199901010000), 100000);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911170000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             true);
+    CHECK_EQ(tm->initDatetime(), Datetime(199911170000));
+    CHECK_EQ(tm->getTradeList()[0].datetime, Datetime(199911170000));
+
+    /** @arg Several stocks can be added before any trade record is made */
+    tm = crtTM(Datetime(199901010000), 100000);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911170000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             true);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock2, Datetime(199911170000), Null<Datetime>(), 200,
+                                            0, 0, 200, 2000, 0, 0, 0)),
+             true);
+    CHECK_EQ(tm->getStockNumber(), 2);
+
+    /** @arg Once the trade list holds more than the INIT record, adding a position is rejected */
+    tm = crtTM(Datetime(199901010000), 100000);
+    tm->buy(Datetime(199911170000), stock2, 10.0, 100);
+    CHECK_EQ(tm->addPosition(PositionRecord(stock, Datetime(199911180000), Null<Datetime>(), 100, 0,
+                                            0, 100, 1000, 0, 0, 0)),
+             false);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_param_guards") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    double nan = std::numeric_limits<double>::quiet_NaN();
+    double inf = std::numeric_limits<double>::infinity();
+    TradeManagerPtr tm;
+    TradeRecord result;
+    auto invalid = [](const TradeRecord& r) { return r.business == BUSINESS_INVALID; };
+
+    /** @arg buy rejects negative, NaN and infinite real price */
+    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, inf, 100)));
+
+    /** @arg buy rejects a NaN number, which used to pass all the number comparisons */
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, 10.0, nan)));
+    CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, 10.0, inf)));
+
+    /** @arg the cash stays untouched by the rejected orders and a normal buy still succeeds */
+    CHECK_EQ(tm->cash(Datetime(199911170000)), 1000000.0);
+    result = tm->buy(Datetime(199911170000), stock, 10.0, 100);
+    CHECK_EQ(result.business, BUSINESS_BUY);
+
+    /** @arg a zero real price is the legal market-order placeholder of the Strategy path */
+    result = tm->buy(Datetime(199911170000), stock, 0.0, 100);
+    CHECK_EQ(result.business, BUSINESS_BUY);
+
+    /** @arg sell rejects negative, NaN and infinite real price */
+    CHECK_UNARY(invalid(tm->sell(Datetime(199911180000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->sell(Datetime(199911180000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->sell(Datetime(199911180000), stock, inf, 100)));
+
+    /** @arg a normal sell still succeeds */
+    result = tm->sell(Datetime(199911180000), stock, 10.0, MAX_DOUBLE);
+    CHECK_EQ(result.business, BUSINESS_SELL);
+
+    /** @arg sellShort rejects negative, NaN and infinite real price and a NaN number */
+    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, inf, 100)));
+    CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, 10.0, nan)));
+
+    /** @arg a normal sellShort still succeeds */
+    CHECK_EQ(tm->borrowStock(Datetime(199911170000), stock, 10.0, 100), true);
+    result = tm->sellShort(Datetime(199911170000), stock, 10.0, 100);
+    CHECK_EQ(result.business, BUSINESS_SELL_SHORT);
+
+    /** @arg buyShort rejects negative, NaN and infinite real price and a NaN number */
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, -10.0, 100)));
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, nan, 100)));
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, inf, 100)));
+    CHECK_UNARY(invalid(tm->buyShort(Datetime(199911180000), stock, 10.0, nan)));
+
+    /** @arg buyShort with MAX_DOUBLE number to close the short position still succeeds */
+    result = tm->buyShort(Datetime(199911180000), stock, 10.0, MAX_DOUBLE);
+    CHECK_EQ(result.business, BUSINESS_BUY_SHORT);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_profit_cum_change_curve") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    DatetimeList dates = {Datetime(199911170000), Datetime(199911180000)};
+
+    /** @arg An account that was never invested returns an undefined (NaN) curve, not a fake 0 */
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 0, TC_Zero(), "TEST");
+    PriceList curve = tm->getProfitCumChangeCurve(dates);
+    REQUIRE_EQ(curve.size(), 2);
+    CHECK_UNARY(std::isnan(curve[0]));
+    CHECK_UNARY(std::isnan(curve[1]));
+
+    /** @arg The curve is total assets over the invested base, rounded by the account precision */
+    tm = crtTM(Datetime(199901010000), 100000, TC_Zero(), "TEST");
+    tm->buy(Datetime(199911170000), stock, 10.0, 100);
+    curve = tm->getProfitCumChangeCurve(dates);
+    FundsList funds = tm->getFundsList(dates);
+    REQUIRE_EQ(curve.size(), funds.size());
+    for (size_t i = 0, total = funds.size(); i < total; ++i) {
+        CHECK_EQ(curve[i], roundEx(funds[i].total_assets() / funds[i].total_base(), 2));
+    }
 }
 
 /** @} */

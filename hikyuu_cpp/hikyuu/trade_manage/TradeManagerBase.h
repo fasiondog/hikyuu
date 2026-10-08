@@ -244,6 +244,9 @@ public:
 
     /**
      * Get the cumulative return rate curve
+     * @note The value is total_assets / total_base rounded by the account precision; when the
+     *       invested base is 0 (nothing was ever invested) the ratio is undefined and Null
+     *       (NaN) is returned instead of a fake 0 (which would read as a wiped-out account)
      * @param dates date list
      * @param ktype K-line type, it must match the date list, KQuery::DAY by default
      * @return return rate curve
@@ -252,8 +255,11 @@ public:
                                       const KQuery::KType& ktype = KQuery::DAY) {
         FundsList funds_list = getFundsList(dates, ktype);
         PriceList ret(funds_list.size());
+        int precision = getParam<int>("precision");
         for (size_t i = 0, total = funds_list.size(); i < total; i++) {
-            ret[i] = funds_list[i].total_assets() / funds_list[i].total_base();
+            price_t base = funds_list[i].total_base();
+            ret[i] = base != 0.0 ? roundEx(funds_list[i].total_assets() / base, precision)
+                                 : Null<price_t>();
         }
         return ret;
     }
@@ -543,7 +549,8 @@ public:
      * Buy operation
      * @param datetime buy time
      * @param stock the security to buy
-     * @param realPrice actual buy price
+     * @param realPrice actual buy price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number buy quantity
      * @param stoploss stop-loss price
      * @param goalPrice target price
@@ -565,7 +572,8 @@ public:
      * Sell operation
      * @param datetime sell time
      * @param stock the security to sell
-     * @param realPrice actual sell price
+     * @param realPrice actual sell price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number sell quantity; MAX_DOUBLE means selling everything
      * @param stoploss new stop-loss price
      * @param goalPrice new target price
@@ -587,7 +595,8 @@ public:
      * Short sell
      * @param datetime short sell time
      * @param stock the security to short sell
-     * @param realPrice actual short sell price
+     * @param realPrice actual short sell price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number sell quantity
      * @param stoploss stop-loss price
      * @param goalPrice target price
@@ -609,7 +618,8 @@ public:
      * Cover a short position
      * @param datetime buy time
      * @param stock the security to buy
-     * @param realPrice actual buy price
+     * @param realPrice actual covering price; 0 is a legal market-order placeholder (the dealing
+     *        price is decided by the broker)
      * @param number buy quantity; MAX_DOUBLE means covering the entire short position
      * @param stoploss stop-loss price
      * @param goalPrice target price

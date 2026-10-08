@@ -5,8 +5,9 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
+#include <mutex>
 #include "Performance.h"
-
 #include "hikyuu/utilities/os.h"
 
 namespace hku {
@@ -76,7 +77,9 @@ const std::map<string, string>& legacyKeyMap() {
 
 /** The unified mapping from the English key to the corresponding Chinese name. It is initialized
  *  from the inversion of legacyKeyMap, and the Chinese names registered via addKey are also
- *  stored in it, so that all the methods of Performance share the same key name mapping. */
+ *  stored in it, so that all the methods of Performance share the same key name mapping.
+ *  Access it only through the mutex below, since addKey of one instance may run concurrently
+ *  with the lookups of the others. */
 std::map<string, string>& chineseNameMap() {
     static std::map<string, string> names = [] {
         std::map<string, string> ret;
@@ -88,25 +91,32 @@ std::map<string, string>& chineseNameMap() {
     return names;
 }
 
+std::mutex& chineseNameMapMutex() {
+    static std::mutex m;
+    return m;
+}
+
 /** Get the corresponding Chinese name of the given English key; returns an empty string if it has
- *  not been registered */
-const string& lookupChineseName(const string& key) {
-    static const string empty;
+ *  not been registered. Returned by value so that the string never escapes the lock (the map is
+ *  process-wide and addKey of another instance may rewrite a value in place). */
+string lookupChineseName(const string& key) {
+    std::lock_guard<std::mutex> lock(chineseNameMapMutex());
     const auto& names = chineseNameMap();
     auto iter = names.find(key);
-    return iter == names.end() ? empty : iter->second;
+    return iter == names.end() ? string() : iter->second;
 }
 
 /** Get the current English key of the given legacy Chinese key; it is kept for backward
- *  compatibility only, do not use it in the new code. Returns an empty string if not found. */
-const string& lookupLegacyKey(const string& key) {
-    static const string empty;
+ *  compatibility only, do not use it in the new code. Returns an empty string if not found.
+ *  Returned by value for the same escaping-reference reason as lookupChineseName. */
+string lookupLegacyKey(const string& key) {
+    std::lock_guard<std::mutex> lock(chineseNameMapMutex());
     for (const auto& [english, chinese] : chineseNameMap()) {
         if (chinese == key) {
             return english;
         }
     }
-    return empty;
+    return string();
 }
 
 /** Check whether the given key is an English key, i.e. it consists of the printable ASCII
@@ -114,6 +124,9 @@ const string& lookupLegacyKey(const string& key) {
  *  ones, are not supported any more.
  */
 bool isEnglishKey(const string& key) {
+    if (key.empty()) {
+        return false;
+    }
     for (unsigned char ch : key) {
         if (ch < 0x20 || ch > 0x7E) {
             return false;
@@ -185,12 +198,10 @@ Performance::Performance()
 
 Performance::~Performance() {}
 
-bool Performance::exist(const string& key) {
-    if (m_result.count(key) != 0) {
-        return true;
-    }
-    // Backward compatibility with the legacy Chinese key (deprecated)
-    return !lookupLegacyKey(key).empty();
+bool Performance::exist(const string& key) const {
+    HKU_IF_RETURN(m_result.count(key) != 0, true);
+    const string new_key = lookupLegacyKey(key);
+    return !new_key.empty() && m_result.count(new_key) != 0;
 }
 
 Performance& Performance::operator=(const Performance& other) noexcept {
@@ -222,13 +233,14 @@ double Performance::get(const string& name) const {
         return iter->second;
     }
     // Backward compatibility with the legacy Chinese key (deprecated)
-    const string& new_key = lookupLegacyKey(name);
+    const string new_key = lookupLegacyKey(name);
     if (!new_key.empty()) {
         HKU_WARN(
           "Performance - the legacy Chinese key(\"{}\") is deprecated, please use "
           "\"{}\" instead!",
           name, new_key);
-        return m_result.at(new_key);
+        auto new_iter = m_result.find(new_key);
+        return new_iter != m_result.end() ? new_iter->second : Null<double>();
     }
     HKU_WARN("Performance - key({}) not exist!", name);
     return Null<double>();
@@ -245,10 +257,21 @@ PriceList Performance::values() const {
 
 void Performance::addKey(const string& key, const string& chinese) {
     HKU_ERROR_IF_RETURN(!isEnglishKey(key), void(),
-                        "Performance - addKey: only the English key is supported, but got \"{}\"!",
+                        "Performance - addKey: only a non-empty English key is supported, but got "
+                        "\"{}\"!",
                         key);
+    HKU_ERROR_IF_RETURN(m_result.count(key) != 0, void(),
+                        "Performance - addKey: the key(\"{}\") already exists!", key);
     if (!chinese.empty()) {
-        chineseNameMap()[key] = chinese;
+        std::lock_guard<std::mutex> lock(chineseNameMapMutex());
+        auto& names = chineseNameMap();
+        for (const auto& [eng, cht] : names) {
+            HKU_ERROR_IF_RETURN(cht == chinese && eng != key, void(),
+                                "Performance - addKey: the chinese name(\"{}\") already maps to "
+                                "the key(\"{}\")!",
+                                chinese, eng);
+        }
+        names[key] = chinese;
     }
     m_keys.push_back(key);
     m_result[key] = 0.0;
@@ -258,29 +281,26 @@ void Performance::setValue(const string& key, double value) {
     HKU_ERROR_IF_RETURN(
       !isEnglishKey(key), void(),
       "Performance - setValue: only the English key is supported, but got \"{}\"!", key);
+    HKU_ERROR_IF_RETURN(m_result.count(key) == 0, void(),
+                        "Performance - setValue: the key(\"{}\") not exist!", key);
     m_result[key] = value;
 }
 
-string Performance::report() {
+string Performance::report() const {
     std::stringstream buf;
 
     buf << std::fixed;
     buf.precision(2);
 
-    buf.setf(std::ios_base::fixed);
-    buf.precision(2);
     bool zh_lang = (getSystemLanguage() == "zh_cn");
     for (const auto& key : m_keys) {
-        const string& chinese = lookupChineseName(key);
+        const string chinese = lookupChineseName(key);
         if (zh_lang && !chinese.empty()) {
             buf << chinese << ": " << m_result.at(key) << std::endl;
         } else {
             buf << htr(key.c_str()) << ": " << m_result.at(key) << std::endl;
         }
     }
-
-    buf.unsetf(std::ostream::floatfield);
-    (void)buf.precision();
     return buf.str();
 }
 
@@ -303,12 +323,18 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     m_result["Open Position Net Value"] = funds.market_value;
     m_result["Current Total Assets"] = funds.total_assets();
     price_t total_money = funds.base_cash + funds.base_asset;
+    // The return metrics below are based on the net assets (borrowing excluded) so that a levered
+    // account is not inflated by the borrowed funds
+    price_t net_assets = funds.net_assets();
 
     const TradeRecordList& trade_list = tm->getRefTradeList();
+    // The keys are registered in the constructor and kept one-to-one with the result slots, so
+    // the lookups are hoisted out of the loops below (map references stay valid)
+    double& dividends = m_result["Total Dividends"];
     TradeRecordList::const_iterator trade_iter = trade_list.begin();
     for (; trade_iter != trade_list.end(); ++trade_iter) {
         if (trade_iter->business == BUSINESS_BONUS) {
-            m_result["Total Dividends"] += trade_iter->realPrice;
+            dividends += trade_iter->realPrice;
         }
     }
 
@@ -319,19 +345,37 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
           max_continues(0),
           continues_money(0.0),
           max_continues_money(0.0),
-          total_r(0.0),
-          max_continues_r(0.0) {}
+          continues_r(0.0),
+          max_continues_r(0.0),
+          total_r(0.0) {}
 
         int total_duration;           // Total holding duration
-        int continues;                // Current consecutive holding duration
+        int continues;                // Current consecutive streak length
         int max_continues;            // Maximum number of the consecutive holdings
-        price_t continues_money;      // Current consecutive holding profit or loss
+        price_t continues_money;      // Current consecutive streak profit or loss
         price_t max_continues_money;  // Maximum consecutive holding profit or loss
-        price_t total_r;              // Accumulated R multiple
+        price_t continues_r;          // Current consecutive streak sum of the R multiples
         price_t max_continues_r;  // Sum of the R multiples of the max consecutive profits/losses
+        price_t total_r;          // Accumulated R multiple
     };
 
     CalData earn, loss;
+
+    // Local accumulators and stable references for the keys used inside the closed positions
+    // loop, avoiding a string lookup per trade record
+    double total_cost = 0.0;
+    double net_profit = 0.0;
+    double win_count = 0.0, loss_count = 0.0;
+    double& total_win_profit = m_result["Total Profit of Winning Trades"];
+    double& total_loss_profit = m_result["Total Loss of Losing Trades"];
+    double& largest_win = m_result["Largest Single Win"];
+    double& largest_win_pct = m_result["Largest Single Win %"];
+    double& largest_loss = m_result["Largest Single Loss"];
+    double& largest_loss_pct = m_result["Largest Single Loss %"];
+    double& max_earn_holding = m_result["Max Holding Period of Winning Trades"];
+    double& max_loss_holding = m_result["Max Holding Period of Losing Trades"];
+    double& max_single_win_r = m_result["Max Single Win R-Multiple"];
+    double& max_single_loss_r = m_result["Max Single Loss R-Multiple"];
 
     bool pre_earn = true;
     const PositionRecordList& his_position = tm->getHistoryPositionList();
@@ -340,11 +384,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
     PositionRecordList::const_iterator his_iter = his_position.begin();
     for (; his_iter != his_position.end(); ++his_iter) {
         const PositionRecord& pos = *his_iter;
-        m_result["Total Cost of Closed Trades"] += pos.totalCost;
+        total_cost += pos.totalCost;
 
         price_t profit = roundEx(pos.sellMoney - pos.totalCost - pos.buyMoney, precision);
-        m_result["Total Net Profit of Closed Trades"] =
-          roundEx(m_result["Total Net Profit of Closed Trades"] + profit, precision);
+        net_profit = roundEx(net_profit + profit, precision);
 
         price_t cost_base = pos.buyMoney + pos.totalCost;
         price_t profit_percent = cost_base != 0.0 ? profit / cost_base * 100. : 0.0;
@@ -353,100 +396,101 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         total_r += r;
 
         if (profit > 0.0) {
-            m_result["Number of Winning Trades"]++;
-            m_result["Total Profit of Winning Trades"] =
-              roundEx(profit + m_result["Total Profit of Winning Trades"], precision);
-            if (profit > m_result["Largest Single Win"]) {
-                m_result["Largest Single Win"] = profit;
+            win_count++;
+            total_win_profit = roundEx(profit + total_win_profit, precision);
+            if (profit > largest_win) {
+                largest_win = profit;
             }
 
-            if (profit_percent > m_result["Largest Single Win %"]) {
-                m_result["Largest Single Win %"] = profit_percent;
+            if (profit_percent > largest_win_pct) {
+                largest_win_pct = profit_percent;
             }
 
             int duration = (pos.cleanDatetime.date() - pos.takeDatetime.date()).days();
             earn.total_duration += duration;
-            if (duration > m_result["Max Holding Period of Winning Trades"]) {
-                m_result["Max Holding Period of Winning Trades"] = duration;
+            if (duration > max_earn_holding) {
+                max_earn_holding = duration;
             }
 
             earn.total_r += r;
-            if (r > m_result["Max Single Win R-Multiple"]) {
-                m_result["Max Single Win R-Multiple"] = r;
+            if (r > max_single_win_r) {
+                max_single_win_r = r;
             }
 
-            // The last trade was a profitable trade
+            // The last trade was a profitable trade; the streak counters (length, money and R
+            // sum) are always kept in sync so that the reported max stays one consistent segment
             if (pre_earn) {
                 earn.continues++;
                 earn.continues_money = roundEx(profit + earn.continues_money, precision);
-                if (earn.continues >= earn.max_continues) {
-                    earn.max_continues = earn.continues;
-                    if (earn.continues_money > earn.max_continues_money) {
-                        earn.max_continues_money = earn.continues_money;
-                        earn.max_continues_r += r;
-                    }
-                }
+                earn.continues_r += r;
             } else {
                 earn.continues = 1;
                 earn.continues_money = profit;
-                earn.max_continues = 1;
-                if (profit > earn.max_continues_money) {
-                    earn.max_continues_money = profit;
-                    earn.max_continues_r = r;
-                }
+                earn.continues_r = r;
+            }
+
+            if (earn.continues > earn.max_continues ||
+                (earn.continues == earn.max_continues &&
+                 earn.continues_money > earn.max_continues_money)) {
+                earn.max_continues = earn.continues;
+                earn.max_continues_money = earn.continues_money;
+                earn.max_continues_r = earn.continues_r;
             }
 
             pre_earn = true;
 
         } else {
             // The one that made no money is recorded as a losing trade
-            m_result["Number of Losing Trades"]++;
-            m_result["Total Loss of Losing Trades"] =
-              roundEx(profit + m_result["Total Loss of Losing Trades"], precision);
-            if (profit < m_result["Largest Single Loss"]) {
-                m_result["Largest Single Loss"] = profit;
+            loss_count++;
+            total_loss_profit = roundEx(profit + total_loss_profit, precision);
+            if (profit < largest_loss) {
+                largest_loss = profit;
             }
 
-            if (profit_percent < m_result["Largest Single Loss %"]) {
-                m_result["Largest Single Loss %"] = profit_percent;
+            if (profit_percent < largest_loss_pct) {
+                largest_loss_pct = profit_percent;
             }
 
             int duration = (pos.cleanDatetime.date() - pos.takeDatetime.date()).days();
             loss.total_duration += duration;
-            if (duration > m_result["Max Holding Period of Losing Trades"]) {
-                m_result["Max Holding Period of Losing Trades"] = duration;
+            if (duration > max_loss_holding) {
+                max_loss_holding = duration;
             }
 
             loss.total_r += r;
-            if (r < m_result["Max Single Loss R-Multiple"]) {
-                m_result["Max Single Loss R-Multiple"] = r;
+            if (r < max_single_loss_r) {
+                max_single_loss_r = r;
             }
 
-            // The last one was a losing trade
+            // The last one was a losing trade: for an equal-length streak the one with the
+            // larger loss (i.e. the smaller, more negative amount) is the worst-case segment to
+            // report, which mirrors the winning branch that keeps the larger positive amount
             if (!pre_earn) {
                 loss.continues++;
                 loss.continues_money = roundEx(profit + loss.continues_money, precision);
-                if (loss.continues >= loss.max_continues) {
-                    loss.max_continues = loss.continues;
-                    if (loss.continues_money < loss.max_continues_money) {
-                        loss.max_continues_money = loss.continues_money;
-                        loss.max_continues_r += r;
-                    }
-                }
-
+                loss.continues_r += r;
             } else {
                 loss.continues = 1;
                 loss.continues_money = profit;
-                loss.max_continues = 1;
-                if (profit < loss.max_continues_money) {
-                    loss.max_continues_money = profit;
-                    loss.max_continues_r = r;
-                }
+                loss.continues_r = r;
+            }
+
+            if (loss.continues > loss.max_continues ||
+                (loss.continues == loss.max_continues &&
+                 loss.continues_money < loss.max_continues_money)) {
+                loss.max_continues = loss.continues;
+                loss.max_continues_money = loss.continues_money;
+                loss.max_continues_r = loss.continues_r;
             }
 
             pre_earn = false;
         }
     }
+
+    m_result["Total Cost of Closed Trades"] = total_cost;
+    m_result["Total Net Profit of Closed Trades"] = net_profit;
+    m_result["Number of Winning Trades"] = win_count;
+    m_result["Number of Losing Trades"] = loss_count;
 
     m_result["Max Consecutive Wins"] = earn.max_continues;
     m_result["Max Consecutive Win Amount"] = earn.max_continues_money;
@@ -465,7 +509,7 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
 
     if (m_result["Total Invested Principal"] != 0.0) {
         m_result["Open Position Account Return %"] =
-          100. * (m_result["Current Total Assets"] / m_result["Total Invested Principal"] - 1.);
+          100. * (net_assets / m_result["Total Invested Principal"] - 1.);
         m_result["Closed Trade Account Return %"] = 100. *
                                                     m_result["Total Net Profit of Closed Trades"] /
                                                     m_result["Total Invested Principal"];
@@ -530,13 +574,16 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
           m_result["R-Multiple Expectancy"] * m_result["Trade Opportunities per Year"], precision);
     }
 
-    if (total_money != 0.0 && years != 0.0) {
-        m_result["Account Avg Annual Return %"] =
-          100 * (((m_result["Current Total Assets"] / total_money) - 1) / years);
-        m_result["Account CAGR %"] =
-          100 *
-          ((std::pow(10, (std::log10(m_result["Current Total Assets"] / total_money) / years)) -
-            1));
+    if (total_money > 0.0 && years != 0.0) {
+        m_result["Account Avg Annual Return %"] = 100 * (((net_assets / total_money) - 1) / years);
+        // The geometric annualization is defined only for a positive net asset value; a wiped
+        // out / negative account reports Null instead of polluting the report with NaN
+        if (net_assets > 0.0) {
+            m_result["Account CAGR %"] =
+              100 * (std::pow(net_assets / total_money, 1.0 / years) - 1.0);
+        } else {
+            m_result["Account CAGR %"] = Null<double>();
+        }
     }
 
     double max_percent = 0.0, sum_percent = 0.0;
@@ -562,14 +609,10 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         m_result["Avg Cash Usage per Trade %"] = 100 * sum_percent / trade_number;
     }
 
-    PositionRecordList cur_position = tm->getPositionList();
-    int total_short_days = 0;
-
     if (tm->firstDatetime() != Null<Datetime>()) {
-        int short_number = 0;
-        int short_days = 0;
-        int max_short_days = 0;
-        bool pre_short = false;
+        // Flat time statistics by merging the holding intervals (closed plus currently open
+        // positions) instead of scanning every day, which was O(days * positions)
+        const PositionRecordList& cur_position = tm->getPositionList();
         Datetime end_day;
         if (datetime == Null<Datetime>()) {
             end_day = Datetime(tm->lastDatetime().date() + bd::days(1));
@@ -578,45 +621,77 @@ void Performance::statistics(const TradeManagerPtr& tm, const Datetime& datetime
         }
 
         DatetimeList day_range = getDateRange(tm->firstDatetime(), end_day);
-        DatetimeList::const_iterator day_iter = day_range.begin();
-        for (; day_iter != day_range.end(); ++day_iter) {
-            bool hold = false;
-            his_iter = his_position.begin();
-            for (; his_iter != his_position.end(); ++his_iter) {
-                if (his_iter->takeDatetime <= *day_iter && *day_iter < his_iter->cleanDatetime) {
-                    hold = true;
-                    break;
+        if (!day_range.empty()) {
+            using HoldRange = std::pair<size_t, size_t>;
+            std::vector<HoldRange> ranges;
+            ranges.reserve(his_position.size() + cur_position.size());
+            auto collect = [&ranges, &day_range](const PositionRecord& pos, bool open) {
+                size_t s =
+                  (size_t)(std::lower_bound(day_range.begin(), day_range.end(), pos.takeDatetime) -
+                           day_range.begin());
+                size_t e;
+                if (open) {
+                    // An open position is held through the statistics moment, and day_range
+                    // already ends right before it
+                    e = day_range.size();
+                } else {
+                    e = (size_t)(std::lower_bound(day_range.begin(), day_range.end(),
+                                                  pos.cleanDatetime) -
+                                 day_range.begin());
+                }
+                if (e > s) {
+                    ranges.emplace_back(s, e - 1);
+                }
+            };
+            for (const auto& pos : his_position) {
+                collect(pos, false);
+            }
+            for (const auto& pos : cur_position) {
+                collect(pos, true);
+            }
+            std::sort(ranges.begin(), ranges.end());
+
+            // Merge the overlapping/adjacent holding intervals into ascending blocks
+            std::vector<HoldRange> blocks;
+            for (const auto& range : ranges) {
+                if (!blocks.empty() && range.first <= blocks.back().second + 1) {
+                    if (range.second > blocks.back().second) {
+                        blocks.back().second = range.second;
+                    }
+                } else {
+                    blocks.push_back(range);
                 }
             }
 
-            if (hold) {
-                if (pre_short) {
-                    short_days = 0;
-                    pre_short = false;
-                }
-                continue;
+            size_t day_count = day_range.size();
+            size_t held = 0;
+            for (const auto& block : blocks) {
+                held += block.second - block.first + 1;
             }
+            int64_t total_short_days = (int64_t)(day_count - held);
 
-            // It is currently an empty position
-            total_short_days++;
-            if (pre_short) {
-                short_days++;
-                if (short_days > max_short_days) {
-                    max_short_days = short_days;
+            // The gaps before/between/after the holding blocks are the flat streaks
+            int64_t short_number = 0;
+            int64_t max_short_days = 0;
+            size_t prev = 0;
+            for (const auto& block : blocks) {
+                if (block.first > prev) {
+                    short_number++;
+                    max_short_days = std::max(max_short_days, (int64_t)(block.first - prev));
                 }
-            } else {
+                prev = block.second + 1;
+            }
+            if (prev < day_count) {
                 short_number++;
-                pre_short = true;
+                max_short_days = std::max(max_short_days, (int64_t)(day_count - prev));
             }
-        }
 
-        m_result["Total Time Flat"] = total_short_days;
-        m_result["Max Time Flat"] = max_short_days;
-        if (day_range.size() != 0) {
-            m_result["Time Flat / Total Time %"] = 100 * total_short_days / day_range.size();
-        }
-        if (short_number != 0) {
-            m_result["Avg Time Flat"] = total_short_days / short_number;
+            m_result["Total Time Flat"] = total_short_days;
+            m_result["Max Time Flat"] = max_short_days;
+            m_result["Time Flat / Total Time %"] = 100.0 * total_short_days / day_count;
+            if (short_number != 0) {
+                m_result["Avg Time Flat"] = 1.0 * total_short_days / short_number;
+            }
         }
     }
 }

@@ -250,12 +250,11 @@ TEST_CASE("test_SLOPE_with_discard_input") {
         double fcnt = (double)cnt;
         double sum_x = fcnt * (fcnt - 1.0) / 2.0;
         double denom = fcnt * fcnt * (fcnt * fcnt - 1.0) / 12.0;
-        double S_y = 0.0, S_xy = 0.0, S_y2 = 0.0;
+        double S_y = 0.0, S_xy = 0.0;
         for (size_t k2 = 0; k2 < cnt; k2++) {
             double y = src[wstart + k2];
             S_y += y;
             S_xy += (double)k2 * y;
-            S_y2 += y * y;
         }
         double ref_slope = (fcnt * S_xy - sum_x * S_y) / denom;
         CHECK_EQ(expect.get(i, 0), doctest::Approx(ref_slope).epsilon(SLOPE_EPS));

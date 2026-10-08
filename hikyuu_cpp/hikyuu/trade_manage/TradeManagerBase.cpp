@@ -55,7 +55,7 @@ price_t TradeManagerBase::getMaxPullBack(const Datetime& date, const KQuery::KTy
     return plugin->getMaxPullBack(shared_from_this(), date, ktype);
 }
 
-std::vector<PositionExtInfo> TradeManagerBase::TradeManagerBase::getHistoryPositionExtInfoList(
+std::vector<PositionExtInfo> TradeManagerBase::getHistoryPositionExtInfoList(
   const KQuery::KType& ktype, int trade_mode) {
     std::vector<PositionExtInfo> ret;
     auto& sm = StockManager::instance();

@@ -185,7 +185,7 @@
         
         :param Datetime datetime: 买入时间
         :param Stock stock:       买入的证券
-        :param float real_price:  实际买入价格
+        :param float real_price:  实际买入价格；0 为市价单的合法占位（成交价由券商端确定）
         :param float number:      买入数量
         :param float stoploss:    止损价
         :param float goal_price:  目标价格
@@ -200,7 +200,7 @@
         
         :param Datetime datetime: 卖出时间
         :param Stock stock:       卖出的证券
-        :param float real_price:  实际卖出价格
+        :param float real_price:  实际卖出价格；0 为市价单的合法占位（成交价由券商端确定）
         :param float number:      卖出数量，如果等于 constant.max_double, 表示全部卖出
         :param float stoploss:    新的止损价
         :param float goal_price:  新的目标价格
@@ -211,30 +211,30 @@
         
     .. py:method:: buy_short(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
     
-        卖空操作（先卖后买）
-        
-        :param Datetime datetime: 卖空时间
-        :param Stock stock:       卖空的证券
-        :param float real_price:  实际卖空价格
-        :param float number:      卖空数量
-        :param float stoploss:    止损价
-        :param float goal_price:  目标价格
-        :param float plan_price:  计划卖空价格
-        :param SystemPart part:   交易指示来源
-        :param str remark:        备注信息
-        :rtype: TradeRecord
-        
-    .. py:method:: sell_short(self, datetime, stock, real_price[, number=constant.max_double, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
-    
         卖空回补操作（买回平仓）
         
         :param Datetime datetime: 回补时间
         :param Stock stock:       回补的证券
-        :param float real_price:  实际回补价格
+        :param float real_price:  实际回补价格；0 为市价单的合法占位（成交价由券商端确定）
         :param float number:      回补数量，如果等于 constant.max_double, 表示全部回补
         :param float stoploss:    止损价
         :param float goal_price:  目标价格
         :param float plan_price:  计划回补价格
+        :param SystemPart part:   交易指示来源
+        :param str remark:        备注信息
+        :rtype: TradeRecord
+        
+    .. py:method:: sell_short(self, datetime, stock, real_price, number[, stoploss=0.0, goal_price=0.0, plan_price=0.0, part=System.INVALID, remark=""])
+    
+        卖空操作（先卖后买）
+        
+        :param Datetime datetime: 卖空时间
+        :param Stock stock:       卖空的证券
+        :param float real_price:  实际卖空价格；0 为市价单的合法占位（成交价由券商端确定）
+        :param float number:      卖空数量
+        :param float stoploss:    止损价
+        :param float goal_price:  目标价格
+        :param float plan_price:  计划卖空价格
         :param SystemPart part:   交易指示来源
         :param str remark:        备注信息
         :rtype: TradeRecord
@@ -463,7 +463,7 @@
         
     .. py:method:: get_profit_cum_change_curve(self, dates[, ktype = Query.DAY])
     
-        获取累积收益率曲线
+        获取累积收益率曲线，即总资产除以投入本金基准，按账户精度取整；投入本金基准为 0 时比率未定义，返回 Null（NaN）
         
         :param DatetimeList dates: 日期列表
         :param Query.KType ktype: K 线类型，必须与日期列表匹配
