@@ -6,7 +6,9 @@
  */
 
 #include "../test_config.h"
+#include <cmath>
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/REPLACE.h>
@@ -76,6 +78,34 @@ TEST_CASE("test_REPLACE") {
     for (int i = result.discard(); i < result.size(); ++i) {
         CHECK_EQ(result[i], expect[i]);
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_REPLACE_nearly_equal") {
+    /** @arg a value one ULP away at price magnitude is replaced (an absolute epsilon missed it) */
+    Indicator input = PRICELIST(PriceList{std::nextafter(100.0, 101.0), 100.0, 100.0000001});
+    Indicator result = REPLACE(input, 100.0, 1.0);
+    CHECK_EQ(result[0], 1.0);
+    CHECK_EQ(result[1], 1.0);
+    CHECK_EQ(result[2], 100.0000001);
+
+    /** @arg values differing only by decimal representation error are replaced */
+    input = PRICELIST(PriceList{0.3 - 0.2, 0.10000001});
+    result = REPLACE(input, 0.1, 2.0);
+    CHECK_EQ(result[0], 2.0);
+    CHECK_EQ(result[1], 0.10000001);
+
+    /** @arg tiny non-zero values are no longer falsely matched against 0 (old epsilon bug) */
+    input = PRICELIST(PriceList{1e-17, 0.0});
+    result = REPLACE(input, 0.0, 5.0);
+    CHECK_EQ(result[0], 1e-17);
+    CHECK_EQ(result[1], 5.0);
+
+    /** @arg infinity matches only via equality; huge finite values are kept */
+    input = PRICELIST(PriceList{1e308, std::numeric_limits<double>::infinity()});
+    result = REPLACE(input, std::numeric_limits<double>::infinity(), 6.0);
+    CHECK_EQ(result[0], 1e308);
+    CHECK_EQ(result[1], 6.0);
 }
 
 //-----------------------------------------------------------------------------

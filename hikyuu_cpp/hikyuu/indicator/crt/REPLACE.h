@@ -13,6 +13,8 @@ namespace hku {
 
 /**
  * Replace the given value, it is usually used to replace the Nan values
+ * @note old_val is matched with a relative tolerance of a few ULPs, so values that are equal by
+ * intent but differ by floating-point representation also get replaced; NaN matches NaN
  * @param old_val the value to be replaced
  * @param new_val the replaced value
  * @param ignore_discard ignore discard; if the nan values are replaced, the new discard is set to 0

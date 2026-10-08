@@ -13,6 +13,25 @@ BOOST_CLASS_EXPORT(hku::IReplace)
 
 namespace hku {
 
+namespace {
+
+/**
+ * Compare two values within a relative tolerance of a few ULPs. An absolute epsilon (e.g.
+ * numeric_limits::epsilon()) is scale-sensitive: it misses equal-by-intent values at price
+ * magnitudes (ULP of 100.0 is ~1.4e-14) while falsely matching tiny non-zero values near 0
+ */
+inline bool nearly_equal(Indicator::value_t a, Indicator::value_t b) {
+    if (a == b)
+        return true;  // bitwise equal, including +0.0 == -0.0
+    // NaN never matches; infinities match only via ==, otherwise the tolerance band becomes inf
+    if (std::isnan(a) || std::isnan(b) || std::isinf(a) || std::isinf(b))
+        return false;
+    Indicator::value_t scale = std::max(std::fabs(a), std::fabs(b));
+    return std::fabs(a - b) <= 8 * std::numeric_limits<Indicator::value_t>::epsilon() * scale;
+}
+
+}  // namespace
+
 IReplace::IReplace() : IndicatorImp("REPLACE", 1) {
     setParam<double>("old_value", Null<double>());
     setParam<double>("new_value", 0.0);
@@ -48,9 +67,8 @@ void IReplace::_calculate(const Indicator &data) {
             dst[i] = std::isnan(src[i]) ? new_value : src[i];
         }
     } else {
-        value_t epsilon = std::numeric_limits<value_t>::epsilon();
         for (size_t i = m_discard; i < total; ++i) {
-            dst[i] = (std::fabs(src[i] - old_value) < epsilon) ? new_value : src[i];
+            dst[i] = nearly_equal(src[i], old_value) ? new_value : src[i];
         }
     }
 
@@ -59,8 +77,7 @@ void IReplace::_calculate(const Indicator &data) {
 }
 
 Indicator HKU_API REPLACE(double old_value, double new_value, bool ignore_discard) {
-    Indicator::value_t epsilon = std::numeric_limits<Indicator::value_t>::epsilon();
-    HKU_WARN_IF(std::fabs(old_value - new_value) < epsilon,
+    HKU_WARN_IF(nearly_equal(old_value, new_value),
                 "The value to be replaced is equal to the replacement value! Are you sure?");
     auto p = make_shared<IReplace>();
     p->setParam<double>("old_value", old_value);

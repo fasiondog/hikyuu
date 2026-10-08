@@ -1716,6 +1716,8 @@
           
     替换指标中指定值，默认为替换 nan 值为 0.0。
 
+    old_value 按数个 ULP 的相对容差匹配，浮点表示误差内的同值也会被替换；nan 与 nan 匹配。
+
     :param Indicator ind: 指定指标
     :param double old_value: 指定值
     :param double new_value: 替换值

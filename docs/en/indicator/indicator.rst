@@ -1715,6 +1715,9 @@ Built-in Technical Indicators
           
     Replace the specified values in the indicator, defaulting to replacing the nan values with 0.0.
 
+    old_value is matched with a relative tolerance of a few ULPs, so values equal within
+    floating-point representation error also get replaced; nan matches nan.
+
     :param Indicator ind: the specified indicator
     :param double old_value: the specified value
     :param double new_value: the replacement value
