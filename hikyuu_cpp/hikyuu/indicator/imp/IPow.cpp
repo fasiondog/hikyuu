@@ -38,7 +38,7 @@ void IPow::_increment_calculate(const Indicator& data, size_t start_pos) {
     int n = getParam<int>("n");
     auto const* src = data.data();
     auto* dst = this->data();
-    for (size_t i = start_pos; i < data.size(); ++i) {
+    for (size_t i = start_pos, end = data.size(); i < end; ++i) {
         dst[i] = safe_math(std::pow(src[i], n));
     }
 }
