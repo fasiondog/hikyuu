@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "IIntpart.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -34,7 +35,8 @@ void IIntpart::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
     for (size_t i = start_pos, end = data.size(); i < end; ++i) {
-        dst[i] = int(src[i]);
+        value_t v = src[i];
+        dst[i] = std::isfinite(v) ? std::trunc(v) : Null<value_t>();
     }
 }
 
