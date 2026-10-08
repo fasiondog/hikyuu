@@ -73,7 +73,7 @@ void IAma::_calculate(const Indicator& data) {
 
     prevol = vol;
     for (size_t i = first_end; i < total; ++i) {
-        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i + 1 - n] - src[i - n]);
+        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i - n] - src[i - n - 1]);
         er = (vol == 0.0) ? 1.0 : (src[i] - src[i - n]) / vol;
         if (er > 1.0)
             er = 1.0;
@@ -108,21 +108,45 @@ void IAma::_increment_calculate(const Indicator& data, size_t start_pos) {
     price_t slowest = 2.0 / (slow_n + 1);
     price_t delta = fastest - slowest;
 
-    price_t prevol = 0.0, vol = 0.0, er = 1.0;
-    for (size_t i = start_pos + 1 - n; i < start_pos; ++i) {
-        vol += std::fabs(src[i] - src[i - 1]);
+    size_t start = data.discard();
+    if (start >= total) {
+        return;
+    }
+    size_t first_end = start + n + 1 >= total ? total : start + n + 1;
+
+    // Rebuild the (vol, ama) state at bar start_pos - 1.
+    size_t begin = start_pos;
+    price_t vol = 0.0;
+    price_t ama = 0.0;
+    if (start_pos <= start) {
+        begin = start + 1;
+        ama = src[start];
+        dst0[start] = ama;
+        dst1[start] = 1.0;
+    } else {
+        size_t win_begin = start_pos >= start + n + 1 ? start_pos - n : start + 1;
+        for (size_t i = win_begin; i < start_pos; ++i) {
+            vol += std::fabs(src[i] - src[i - 1]);
+        }
+        ama = dst0[start_pos - 1];
     }
 
-    price_t ama = dst0[start_pos - 1];
-    er = (vol == 0.0) ? 1.0 : (src[start_pos - 1] - src[start_pos - 1 - n]) / vol;
-    if (er > 1.0)
-        er = 1.0;
-    if (er < -1.0)
-        er = -1.0;
+    // resume the warm-up phase while the n-window is not full yet
+    price_t er = 1.0;
+    for (size_t i = begin; i < first_end; ++i) {
+        vol += std::fabs(src[i] - src[i - 1]);
+        er = (vol == 0.0) ? 1.0 : (src[i] - src[start]) / vol;
+        if (er > 1.0)
+            er = 1.0;
+        price_t c = std::pow((std::fabs(er) * delta + slowest), 2);
+        ama += c * (src[i] - ama);
+        dst0[i] = ama;
+        dst1[i] = er;
+    }
 
-    prevol = vol;
-    for (size_t i = start_pos; i < total; ++i) {
-        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i + 1 - n] - src[i - n]);
+    price_t prevol = vol;
+    for (size_t i = std::max(begin, first_end); i < total; ++i) {
+        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i - n] - src[i - n - 1]);
         er = (vol == 0.0) ? 1.0 : (src[i] - src[i - n]) / vol;
         if (er > 1.0)
             er = 1.0;
@@ -173,7 +197,7 @@ void IAma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, int fast_
 
     prevol = vol;
     for (size_t i = first_end; i < total; ++i) {
-        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i + 1 - n] - src[i - n]);
+        vol = prevol + std::fabs(src[i] - src[i - 1]) - std::fabs(src[i - n] - src[i - n - 1]);
         er = (vol == 0.0) ? 1.0 : (src[i] - src[i - n]) / vol;
         if (er > 1.0)
             er = 1.0;

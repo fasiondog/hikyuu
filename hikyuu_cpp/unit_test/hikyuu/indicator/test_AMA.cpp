@@ -11,6 +11,7 @@
 #include <hikyuu/indicator/crt/AMA.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/indicator/crt/SLICE.h>
 
@@ -61,15 +62,16 @@ TEST_CASE("test_AMA") {
     CHECK_EQ(result[0], 6063);
     CHECK_EQ(result[9], doctest::Approx(6103.6781));
     CHECK_EQ(result[10], doctest::Approx(6120.760197));
-    CHECK_EQ(result[18], doctest::Approx(6216.376893));
-    CHECK_EQ(result[19], doctest::Approx(6239.100742));
+    /** @arg rolling-window phase values follow the corrected n-difference window */
+    CHECK_EQ(result[18], doctest::Approx(6214.068219657));
+    CHECK_EQ(result[19], doctest::Approx(6236.688732964));
 
     CHECK_EQ(result.get(0, 1), 1.0);
     CHECK_EQ(result.get(9, 1), doctest::Approx(0.557895));
     CHECK_EQ(result.get(10, 1), doctest::Approx(0.611111));
-    CHECK_EQ(result.get(11, 1), doctest::Approx(0.826484));
-    CHECK_EQ(result.get(18, 1), doctest::Approx(0.517799));
-    CHECK_EQ(result.get(19, 1), doctest::Approx(0.585526));
+    CHECK_EQ(result.get(11, 1), doctest::Approx(0.819004525));
+    CHECK_EQ(result.get(18, 1), doctest::Approx(0.551724138));
+    CHECK_EQ(result.get(19, 1), doctest::Approx(0.577922078));
 
     /** @arg operator() */
     Indicator ama = AMA(10, 2, 30);
@@ -157,6 +159,131 @@ TEST_CASE("test_AMA_dyn") {
         Indicator expect_prefix = AMA(SLICE(src, 0, i + 1), i < 4 ? 1 : 2, 0, i < 4 ? 0 : 4);
         CHECK_EQ(expect_prefix.get(i, 0), doctest::Approx(result.get(i, 0)));
         CHECK_EQ(expect_prefix.get(i, 1), doctest::Approx(result.get(i, 1)));
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_AMA_increment_equivalence") {
+    // After fixing the sliding n-difference window, the incremental path must match a full
+    // calculation bar by bar on both result sets (AMA and ER)
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 30));
+    CHECK_EQ(k_full.size(), 30);
+
+    Indicator expect = AMA(CLOSE(), 10, 2, 30);
+    expect.setContext(k_full);
+
+    auto check_with_history = [&](size_t history) {
+        Indicator got = AMA(CLOSE(), 10, 2, 30);
+        got.setContext(stock.getKData(KQuery(0, history)));  // cache m_old_context
+        got.setContext(k_full);                              // extended at the tail
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            for (size_t r = 0; r < 2; ++r) {
+                double a = expect.get(i, r);
+                double b = got.get(i, r);
+                if (std::isnan(a) && std::isnan(b)) {
+                    continue;
+                }
+                CHECK_EQ(b, doctest::Approx(a));
+            }
+        }
+    };
+
+    /** @arg the boundary falls inside the rolling phase (start_pos > n + 1) */
+    check_with_history(20);
+
+    /** @arg a small tail extension */
+    check_with_history(29);
+
+    /** @arg the phase-1 / rolling switch point (start_pos == n + 1) */
+    check_with_history(12);
+
+    /** @arg below the increment threshold: falls back to a full recalculation, still equal */
+    check_with_history(11);
+
+    /** @arg a discard-carrying input close to the discard edge: the incremental path must resume
+     *  with the truncated warm-up window of the full computation instead of seeding from the NaN
+     *  region before discard */
+    {
+        Indicator expect_ma = AMA(MA(CLOSE(), 5), 10, 2, 30);
+        expect_ma.setContext(k_full);
+        Indicator got = AMA(MA(CLOSE(), 5), 10, 2, 30);
+        got.setContext(stock.getKData(KQuery(0, 13)));  // start_pos=12 < discard(4)+n+1
+        got.setContext(k_full);
+        CHECK_EQ(got.size(), expect_ma.size());
+        CHECK_EQ(got.discard(), expect_ma.discard());
+        for (size_t i = 0; i < expect_ma.size(); ++i) {
+            for (size_t r = 0; r < 2; ++r) {
+                double a = expect_ma.get(i, r);
+                double b = got.get(i, r);
+                if (std::isnan(a) && std::isnan(b)) {
+                    continue;
+                }
+                CHECK_EQ(b, doctest::Approx(a));
+            }
+        }
+    }
+
+    /** @arg input discard >= n: the extension boundary lands at start_pos == start (no seed in the
+     *  old buffer); must restart the warm-up exactly like the full computation */
+    {
+        Indicator expect_ma = AMA(MA(CLOSE(), 12), 10, 2, 30);
+        expect_ma.setContext(k_full);
+        Indicator got = AMA(MA(CLOSE(), 12), 10, 2, 30);
+        got.setContext(stock.getKData(KQuery(0, 12)));  // start_pos = 11 == start(11)
+        got.setContext(k_full);
+        CHECK_EQ(got.size(), expect_ma.size());
+        CHECK_EQ(got.discard(), expect_ma.discard());
+        for (size_t i = 0; i < expect_ma.size(); ++i) {
+            for (size_t r = 0; r < 2; ++r) {
+                double a = expect_ma.get(i, r);
+                double b = got.get(i, r);
+                if (std::isnan(a) && std::isnan(b)) {
+                    continue;
+                }
+                CHECK_EQ(b, doctest::Approx(a));
+            }
+        }
+    }
+
+    /** @arg the input carries no valid bar in the new context (discard >= total): all NaN */
+    {
+        Indicator expect_nan = AMA(MA(CLOSE(), 100), 10, 2, 30);
+        expect_nan.setContext(k_full);
+        Indicator got = AMA(MA(CLOSE(), 100), 10, 2, 30);
+        got.setContext(stock.getKData(KQuery(0, 12)));
+        got.setContext(k_full);
+        CHECK_EQ(got.discard(), 30);
+        CHECK_EQ(expect_nan.discard(), 30);
+        for (size_t i = 0; i < got.size(); ++i) {
+            CHECK_UNARY(std::isnan(got.get(i, 0)));
+            CHECK_UNARY(std::isnan(got.get(i, 1)));
+        }
+    }
+
+    /** @arg chained extensions (an increment on top of a previous increment) */
+    {
+        Indicator expect_ma = AMA(CLOSE(), 10, 2, 30);
+        expect_ma.setContext(k_full);
+        Indicator got = AMA(CLOSE(), 10, 2, 30);
+        got.setContext(stock.getKData(KQuery(0, 15)));
+        got.setContext(stock.getKData(KQuery(0, 22)));
+        got.setContext(k_full);
+        CHECK_EQ(got.size(), expect_ma.size());
+        CHECK_EQ(got.discard(), expect_ma.discard());
+        for (size_t i = 0; i < expect_ma.size(); ++i) {
+            for (size_t r = 0; r < 2; ++r) {
+                double a = expect_ma.get(i, r);
+                double b = got.get(i, r);
+                if (std::isnan(a) && std::isnan(b)) {
+                    continue;
+                }
+                CHECK_EQ(b, doctest::Approx(a));
+            }
+        }
     }
 }
 
