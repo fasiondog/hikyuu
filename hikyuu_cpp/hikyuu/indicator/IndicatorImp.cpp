@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <atomic>
+#include <cmath>
+#include <cstdint>
 #include <forward_list>
 #include <stack>
 #include "hikyuu/utilities/Log.h"
@@ -1405,17 +1407,31 @@ void IndicatorImp::execute_mod() {
     value_t const *left = nullptr;
     value_t const *right = nullptr;
     value_t null_value = Null<value_t>();
+
+    // Integer modulo. Reject NaN / Inf / out-of-int64-range operands (whose double to int64
+    // conversion is UB) and a zero divisor as null; special-case INT64_MIN % -1 which is UB
+    // (SIGFPE on x86) and whose true remainder is 0
+    auto safe_mod = [&](value_t l, value_t r) -> value_t {
+        static constexpr double INT64_BOUND = 9223372036854775808.0;  // 2^63
+        if (!std::isfinite(l) || !std::isfinite(r) || r == 0.0 || l < -INT64_BOUND ||
+            l >= INT64_BOUND || r < -INT64_BOUND || r >= INT64_BOUND) {
+            return null_value;
+        }
+        int64_t li = int64_t(l);
+        int64_t ri = int64_t(r);
+        if (li == INT64_MIN && ri == -1) {
+            return 0.0;
+        }
+        return value_t(li % ri);
+    };
+
     if (m_left->size() > m_right->size()) {
         for (size_t r = 0; r < m_result_num; ++r) {
             dst = this->data(r);
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = start_pos; i < total; ++i) {
-                if (right[i - diff] == 0.0) {
-                    dst[i] = null_value;
-                } else {
-                    dst[i] = int64_t(left[i]) % int64_t(right[i - diff]);
-                }
+                dst[i] = safe_mod(left[i], right[i - diff]);
             }
         }
     } else {
@@ -1424,11 +1440,7 @@ void IndicatorImp::execute_mod() {
             left = m_left->data(r);
             right = m_right->data(r);
             for (size_t i = start_pos; i < total; ++i) {
-                if (right[i] == 0.0) {
-                    dst[i] = null_value;
-                } else {
-                    dst[i] = int64_t(left[i - diff]) % int64_t(right[i]);
-                }
+                dst[i] = safe_mod(left[i - diff], right[i]);
             }
         }
     }

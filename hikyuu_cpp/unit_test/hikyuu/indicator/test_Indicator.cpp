@@ -1063,4 +1063,35 @@ TEST_CASE("test_indicator_imp_not_copyable") {
     CHECK_UNARY(cloned.get() != imp.get());
 }
 
+/** @par Test points */
+TEST_CASE("test_indicator_execute_mod") {
+    const double nan = Null<double>();
+    const double inf = std::numeric_limits<double>::infinity();
+    const double i64_min = -9223372036854775808.0;   // -2^63, exactly INT64_MIN
+    const double over = 9223372036854775808.0;       // 2^63, out of int64 range
+
+    PriceList a, b;
+    for (double v : {7.0, 7.0, nan, inf, i64_min, over}) {
+        a.push_back(v);
+    }
+    for (double v : {3.0, 0.0, 2.0, 2.0, -1.0, 2.0}) {
+        b.push_back(v);
+    }
+    Indicator r = PRICELIST(a) % PRICELIST(b);
+    CHECK_EQ(r.size(), 6);
+
+    /** @arg normal integer modulo */
+    CHECK_EQ(r[0], 1.0);
+    /** @arg zero divisor -> null */
+    CHECK_UNARY(std::isnan(r[1]));
+    /** @arg NaN operand -> null instead of UB in double to int64 conversion */
+    CHECK_UNARY(std::isnan(r[2]));
+    /** @arg Inf operand -> null instead of UB */
+    CHECK_UNARY(std::isnan(r[3]));
+    /** @arg INT64_MIN % -1 -> 0 without SIGFPE */
+    CHECK_EQ(r[4], 0.0);
+    /** @arg operand beyond int64 range -> null */
+    CHECK_UNARY(std::isnan(r[5]));
+}
+
 /** @} */
