@@ -78,6 +78,12 @@ TEST_CASE("test_SIGNED_POWER") {
 
     result = SIGNED_POWER(5, 3);
     CHECK_EQ(result[0], doctest::Approx(125.0));
+
+    /** @arg overflow result -> null (no longer leaks +-inf downstream) */
+    result = SIGNED_POWER(1e200, 3);
+    CHECK_UNARY(std::isnan(result[0]));
+    result = SIGNED_POWER(-1e200, 3);
+    CHECK_UNARY(std::isnan(result[0]));
 }
 
 /** @par Test point: test the dynamic parameter version */

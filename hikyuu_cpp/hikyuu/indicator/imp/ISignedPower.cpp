@@ -37,12 +37,14 @@ void ISignedPower::_increment_calculate(const Indicator& data, size_t start_pos)
     auto const* src = data.data();
     auto* dst = this->data();
     for (size_t i = start_pos; i < data.size(); ++i) {
-        dst[i] = (std::signbit(src[i]) ? -1.0 : 1.0) * std::pow(std::abs(src[i]), n);
+        dst[i] = safe_math((std::signbit(src[i]) ? -1.0 : 1.0) * std::pow(std::abs(src[i]), n));
     }
 }
 
 void ISignedPower::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    _set((std::signbit(ind[curPos]) ? -1.0 : 1.0) * std::pow(std::abs(ind[curPos]), step), curPos);
+    _set(
+      safe_math((std::signbit(ind[curPos]) ? -1.0 : 1.0) * std::pow(std::abs(ind[curPos]), step)),
+      curPos);
 }
 
 Indicator HKU_API SIGNED_POWER(int n) {
