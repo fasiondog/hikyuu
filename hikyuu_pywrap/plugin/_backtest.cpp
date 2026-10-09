@@ -21,10 +21,11 @@ void export_plugin_backtest(py::module& m) {
          const string& ref_market, int mode, bool support_short, SlippagePtr sp) {
           HKU_CHECK(py::hasattr(on_bar, "__call__"), "{}", htr("on_bar is not callable!"));
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
-          py::object c_func = on_bar.attr("__call__");
+          auto c_func = make_gil_safe(on_bar.attr("__call__"));
           auto new_func = [=](Strategy* stg) {
               try {
-                  c_func(stg);
+                  py::gil_scoped_acquire gil;
+                  (*c_func)(stg);
               } catch (py::error_already_set& e) {
                   if (e.matches(PyExc_KeyboardInterrupt)) {
                       printf("KeyboardInterrupt\n");
@@ -52,10 +53,11 @@ void export_plugin_backtest(py::module& m) {
          bool support_short, SlippagePtr sp) {
           HKU_CHECK(py::hasattr(on_bar, "__call__"), "func is not callable!");
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
-          py::object c_func = on_bar.attr("__call__");
+          auto c_func = make_gil_safe(on_bar.attr("__call__"));
           auto new_func = [=](Strategy* stg) {
               try {
-                  c_func(stg);
+                  py::gil_scoped_acquire gil;
+                  (*c_func)(stg);
               } catch (py::error_already_set& e) {
                   if (e.matches(PyExc_KeyboardInterrupt)) {
                       printf("KeyboardInterrupt\n");
