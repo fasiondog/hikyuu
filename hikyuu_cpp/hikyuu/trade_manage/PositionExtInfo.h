@@ -29,6 +29,7 @@ struct HKU_API PositionExtInfo final {
     /** Current drawdown ratio 1 (calculated from the maximum close price and the current close
      *  price only) */
     price_t currentPullBack1() const {
+        HKU_IF_RETURN(maxClosePrice <= 0., 0.);
         price_t ret = (maxClosePrice - currentClosePrice) / maxClosePrice;
         return ret > 0. ? 0. : ret;
     }
@@ -36,6 +37,7 @@ struct HKU_API PositionExtInfo final {
     /** Current drawdown percentage 2 (calculated from the maximum high price in the period and the
      *  current close price) */
     price_t currentPullBack2() const {
+        HKU_IF_RETURN(maxHighPrice <= 0., 0.);
         price_t ret = (maxHighPrice - currentClosePrice) / maxHighPrice;
         return ret > 0. ? 0. : ret;
     }

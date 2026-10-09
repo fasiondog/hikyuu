@@ -95,10 +95,7 @@ string PositionRecord::str() const {
 }
 
 price_t PositionRecord::totalProfit() const {
-    if (cleanDatetime == Null<Datetime>()) {
-        HKU_ERROR("The profit cannot be calculated without cleaned records!");
-        return 0.0;
-    }
+    HKU_IF_RETURN(cleanDatetime == Null<Datetime>(), Null<price_t>());
     return sellMoney - buyMoney - totalCost;
 }
 

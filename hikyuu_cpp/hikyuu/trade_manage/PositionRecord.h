@@ -36,7 +36,8 @@ public:
 
     /**
      * @brief Profit and loss = sell funds - accumulated total trade cost - buy funds
-     * @note It is valid for the closed records only, 0.0 is returned for the ones not yet closed
+     * @note It is valid for the closed records only; Null (NaN) is returned for the ones not yet
+     * closed, so callers can tell "unclosed" apart from a genuine zero profit
      */
     price_t totalProfit() const;
 
