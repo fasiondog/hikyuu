@@ -34,6 +34,15 @@ class StockTest(unittest.TestCase):
         self.assertEqual(stock.get_krecord(0).datetime, Datetime(199012190000))
         self.assertEqual(stock.get_krecord(1, Query.MIN).datetime, Datetime(200001040932))
 
+        # takes a Query, consistent with the core and get_datetime_list
+        ks = stock.get_krecord_list(Query(0, 5))
+        self.assertEqual(len(ks), 5)
+        self.assertEqual(ks[0].datetime, Datetime(199012190000))
+        self.assertEqual(ks[4].datetime, stock.get_krecord(4).datetime)
+        ks_min = stock.get_krecord_list(Query(10, 13, Query.MIN))
+        self.assertEqual(len(ks_min), 3)
+        self.assertEqual(ks_min[0].datetime, stock.get_krecord(10, Query.MIN).datetime)
+
         s1 = sm['sh000001']
         s2 = sm['sh000001']
         self.assertTrue(s1 == s2)

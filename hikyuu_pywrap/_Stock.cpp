@@ -157,14 +157,11 @@ void export_Stock(py::module& m) {
         :return: the K-line record
         :rtype: KRecord)")
 
-      .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, start, end,
-          ktype)
+      .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, query)
 
-        Get the K-line records [start, end); it is generally not used directly.
+        Get the K-line records specified by the query; it is generally not used directly.
 
-        :param int start: the start position
-        :param int end: the end position
-        :param Query.KType ktype: the K-line category
+        :param Query query: the query condition
         :return: the K-line record list
         :rtype: KRecordList)")
 

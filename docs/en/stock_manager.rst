@@ -506,14 +506,12 @@ StockManager/Block/Stock
         :rtype: KRecord
 
 
-    .. py:method:: get_krecord_list(self, start, end, ktype)
+    .. py:method:: get_krecord_list(self, query)
 
-        Return the bar records in the half-open range [start, end). Rarely called directly;
+        Return the bar records specified by the query. Rarely called directly;
         use get_kdata instead
 
-        :param int start: the start position
-        :param int end: the end position
-        :param Query.KType ktype: the bar type
+        :param Query query: the query condition
         :return: the list of bar records
         :rtype: KRecordList
 

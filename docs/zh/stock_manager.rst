@@ -483,13 +483,11 @@ StockManager/Block/Stock
         :rtype: KRecord
     
     
-    .. py:method:: get_krecord_list(self, start, end, ktype)
+    .. py:method:: get_krecord_list(self, query)
     
-        获取K线记录 [start, end)，一般不直接使用，用getKData替代
+        获取查询条件指定的K线记录，一般不直接使用，用getKData替代
         
-        :param int start: 起始位置
-        :param int end: 结束位置
-        :param Query.KType ktype: K线类别
+        :param Query query: 查询条件
         :return: K线记录列表
         :rtype: KRecordList
     
