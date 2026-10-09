@@ -1502,6 +1502,142 @@ TEST_CASE("test_TradeManager_margin_and_borrow_atomicity") {
     }
 }
 
+/** @par Test point: incremental short-circuit must be idempotent — querying many times yields the
+ * same state as querying once at the end (each weight event applied exactly once) */
+TEST_CASE("test_TradeManager_updateWithWeight_incremental_idempotent") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    Datetime buy_dt(199911100000L);
+    Datetime end_dt(200801010000L);
+
+    // Reference: buy once, query cash only at end_dt (single scan covers every weight event)
+    TradeManagerPtr one = crtTM(Datetime(199901010000), 100000, TC_Zero(), "ONE");
+    one->buy(buy_dt, stock, 10.0, 100);
+    one->cash(end_dt);
+
+    // Incremental path: buy the same, then advance the account by many successive monthly queries
+    TradeManagerPtr many = crtTM(Datetime(199901010000), 100000, TC_Zero(), "MANY");
+    many->buy(buy_dt, stock, 10.0, 100);
+    for (int y = 2000; y <= 2007; ++y) {
+        for (int m = 1; m <= 12; ++m) {
+            many->cash(Datetime(y, m, 1));
+        }
+    }
+    many->cash(end_dt);
+
+    /** @arg non-empty guard: the window must actually carry weight events, else this is vacuous */
+    size_t n_weight = 0;
+    for (const auto& t : one->getTradeList()) {
+        if (t.business == BUSINESS_BONUS || t.business == BUSINESS_GIFT)
+            ++n_weight;
+    }
+    CHECK_UNARY(n_weight > 0);
+
+    /** @arg identical record-by-record: no duplicated, skipped or reordered weight events */
+    const TradeRecordList& la = one->getTradeList();
+    const TradeRecordList& lb = many->getTradeList();
+    REQUIRE_EQ(la.size(), lb.size());
+    for (size_t i = 0; i < la.size(); ++i) {
+        CHECK_EQ(lb[i].datetime, la[i].datetime);
+        CHECK_EQ(lb[i].business, la[i].business);
+        CHECK_EQ(lb[i].realPrice, la[i].realPrice);
+        CHECK_EQ(lb[i].number, la[i].number);
+    }
+    /** @arg same cash / holding / net assets after all events */
+    CHECK_EQ(many->currentCash(), one->currentCash());
+    CHECK_EQ(many->getHoldNumber(end_dt, stock), one->getHoldNumber(end_dt, stock));
+    CHECK_EQ(many->getFunds(end_dt).net_assets(), one->getFunds(end_dt).net_assets());
+    /** @arg the last BONUS record matches (same date and amount, not double-counted) */
+    auto last_bonus = [](const TradeManagerPtr& tm) {
+        TradeRecord last;
+        for (const auto& tr : tm->getTradeList()) {
+            if (tr.business == BUSINESS_BONUS)
+                last = tr;
+        }
+        return last;
+    };
+    CHECK_EQ(last_bonus(many).datetime, last_bonus(one).datetime);
+    CHECK_EQ(last_bonus(many).realPrice, last_bonus(one).realPrice);
+}
+
+/** @par Test point: the incremental cache must give long / borrow / short maps of the SAME stock
+ * one shared window per update (pins the delayed write-back after all three loops) */
+TEST_CASE("test_TradeManager_updateWithWeight_incremental_cross_map") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    Datetime buy_dt(199911100000L);
+    Datetime end_dt(200801010000L);
+
+    auto build = [&](TradeManagerPtr& tm) {
+        tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "X");
+        tm->setParam<bool>("support_borrow_stock", true);
+        tm->buy(buy_dt, stock, 10.0, 300);           // long holding
+        tm->borrowStock(buy_dt, stock, 10.0, 1000);  // borrow pool
+        // sells 600 out of the 1000 pool, no extra borrow; short holding = 600
+        tm->sellShort(buy_dt, stock, 10.0, 600);
+    };
+
+    TradeManagerPtr one;
+    build(one);
+    one->cash(end_dt);
+
+    TradeManagerPtr many;
+    build(many);
+    for (int y = 2000; y <= 2007; ++y) {
+        for (int m = 1; m <= 12; ++m) {
+            many->getDebtNumber(Datetime(y, m, 1), stock);
+        }
+    }
+    many->cash(end_dt);
+
+    /** @arg non-empty guard: window carries bonus / gift / borrow / short adjustments */
+    size_t n = 0;
+    for (const auto& t : one->getTradeList()) {
+        switch (t.business) {
+            case BUSINESS_BONUS:
+            case BUSINESS_GIFT:
+            case BUSINESS_BORROW_ADJUST:
+            case BUSINESS_SHORT_ADJUST:
+                ++n;
+                break;
+            default:
+                break;
+        }
+    }
+    CHECK_UNARY(n > 0);
+
+    /** @arg long / borrow / short of the same stock all advance consistently */
+    CHECK_EQ(many->getTradeList().size(), one->getTradeList().size());
+    CHECK_EQ(many->getHoldNumber(end_dt, stock), one->getHoldNumber(end_dt, stock));
+    CHECK_EQ(many->getDebtNumber(end_dt, stock), one->getDebtNumber(end_dt, stock));
+    CHECK_EQ(many->getShortHoldNumber(end_dt, stock), one->getShortHoldNumber(end_dt, stock));
+    /** @arg the whole-account net asset value matches too (TWR/CAGR/XIRR input) */
+    CHECK_EQ(many->getFunds(end_dt).net_assets(), one->getFunds(end_dt).net_assets());
+}
+
+/** @par Test point: _reset clears the short/borrow state and _clone preserves it (regression:
+ * reset left the short tables behind and clone dropped them) */
+TEST_CASE("test_TradeManager_reset_clone_short_state") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "S");
+    tm->borrowStock(Datetime(199911100000L), stock, 10.0, 500);
+    tm->sellShort(Datetime(199911100000L), stock, 10.0, 300);
+
+    /** @arg clone preserves the short position and the borrow debt */
+    TradeManagerPtr cloned = tm->clone();
+    CHECK_EQ(cloned->getShortHoldNumber(Datetime(199911100000L), stock), 300.0);
+    CHECK_EQ(cloned->getDebtNumber(Datetime(199911100000L), stock), 500.0);
+
+    /** @arg reset (via an INIT record) clears the short position and the borrow debt */
+    TradeRecord init(Null<Stock>(), Datetime(199801010000L), BUSINESS_INIT, 777777, 777777, 0, 0,
+                     CostRecord(), 0, 777777, PART_INVALID);
+    CHECK_UNARY(tm->addTradeRecord(init));
+    CHECK_EQ(tm->getShortHoldNumber(Datetime(199911100000L), stock), 0.0);
+    CHECK_EQ(tm->getDebtNumber(Datetime(199911100000L), stock), 0.0);
+}
+
 /** @par Test points */
 TEST_CASE("test_TradeManager_profit_cum_change_curve") {
     StockManager& sm = StockManager::instance();

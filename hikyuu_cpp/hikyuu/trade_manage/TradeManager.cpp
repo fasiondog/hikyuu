@@ -115,6 +115,7 @@ TradeManager::~TradeManager() {}
 
 void TradeManager::_reset() {
     m_last_update_datetime = m_init_datetime;
+    m_tmp_weight_checked_until.clear();
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
     m_checkout_cash = 0.0;
@@ -132,6 +133,8 @@ void TradeManager::_reset() {
 
     m_position.clear();
     m_position_history.clear();
+    m_short_position.clear();
+    m_short_position_history.clear();
     m_actions.clear();
     _saveAction(m_trade_list.back());
 }
@@ -141,6 +144,7 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_init_datetime = m_init_datetime;
     p->m_init_cash = m_init_cash;
     p->m_last_update_datetime = m_last_update_datetime;
+    p->m_tmp_weight_checked_until = m_tmp_weight_checked_until;
 
     p->m_cash = m_cash;
     p->m_checkin_cash = m_checkin_cash;
@@ -153,6 +157,8 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_trade_list = m_trade_list;
     p->m_position = m_position;
     p->m_position_history = m_position_history;
+    p->m_short_position = m_short_position;
+    p->m_short_position_history = m_short_position_history;
     p->m_actions = m_actions;
     return p;
 }
@@ -496,6 +502,8 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The holding grows at this datetime; drop the check frontier for this stock (see buy)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     // Add it to the current positions
     int precision = getParam<int>("precision");
@@ -680,6 +688,8 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The borrow debt grows at this datetime; drop the check frontier for this stock (see buy)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     // Add it to the current positions
     int precision = getParam<int>("precision");
@@ -850,6 +860,9 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The holding grows at this datetime; drop that stock's check frontier so an out-of-order
+    // trade earlier than the cached date still rescans (see updateWithWeight incremental cache)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
@@ -1076,6 +1089,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The short position grows at this datetime; drop the check frontier for this stock (see buy)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     int precision = getParam<int>("precision");
 
@@ -2007,6 +2022,18 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     Datetime start_date(lastDatetime().date() + bd::days(1));
     Datetime end_date(datetime.date() + bd::days(1));
 
+    // Incremental short-circuit: a stock's ex-rights list is only scanned for the date range not
+    // already checked on prior updates. m_tmp_weight_checked_until is only written after all three
+    // loops below complete, so a stock appearing in more than one map still uses the same window
+    auto scan_start = [&](uint64_t stock_id) {
+        unordered_map<uint64_t, Datetime>::const_iterator cached =
+          m_tmp_weight_checked_until.find(stock_id);
+        if (cached != m_tmp_weight_checked_until.end() && cached->second > start_date) {
+            return cached->second;
+        }
+        return start_date;
+    };
+
     int precision = getParam<int>("precision");
     TradeRecordList new_trade_buffer;
 
@@ -2019,7 +2046,10 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         PositionRecord& position = position_iter->second;
         Stock stock = position.stock;
 
-        StockWeightList weights = stock.getWeight(start_date, end_date);
+        Datetime s = scan_start(stock.id());
+        if (s >= end_date)
+            continue;
+        StockWeightList weights = stock.getWeight(s, end_date);
         StockWeightList::const_iterator weight_iter = weights.begin();
         for (; weight_iter != weights.end(); ++weight_iter) {
             // Skip it when there is no dividend and the numbers of the bonus shares and the
@@ -2084,7 +2114,10 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         BorrowRecord& borrow = borrow_iter->second;
         Stock stock = borrow.stock;
 
-        StockWeightList weights = stock.getWeight(start_date, end_date);
+        Datetime s = scan_start(stock.id());
+        if (s >= end_date)
+            continue;
+        StockWeightList weights = stock.getWeight(s, end_date);
         StockWeightList::const_iterator weight_iter = weights.begin();
         for (; weight_iter != weights.end(); ++weight_iter) {
             if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
@@ -2153,7 +2186,10 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         PositionRecord& position = short_iter->second;
         Stock stock = position.stock;
 
-        StockWeightList weights = stock.getWeight(start_date, end_date);
+        Datetime s = scan_start(stock.id());
+        if (s >= end_date)
+            continue;
+        StockWeightList weights = stock.getWeight(s, end_date);
         StockWeightList::const_iterator weight_iter = weights.begin();
         for (; weight_iter != weights.end(); ++weight_iter) {
             if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
@@ -2215,6 +2251,23 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     for (size_t i = 0; i < total; ++i) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
+
+    // Advance the per-stock incremental check pointer for every stock visited this update; the
+    // frontier only ever moves forward so an out-of-order update can never rewind it
+    auto advance_frontier = [&](uint64_t id) {
+        auto it = m_tmp_weight_checked_until.find(id);
+        if (it == m_tmp_weight_checked_until.end()) {
+            m_tmp_weight_checked_until[id] = end_date;
+        } else if (end_date > it->second) {
+            it->second = end_date;  // only ever move forward
+        }
+    };
+    for (const auto& kv : m_position)
+        advance_frontier(kv.first);
+    for (const auto& kv : m_borrow_stock)
+        advance_frontier(kv.first);
+    for (const auto& kv : m_short_position)
+        advance_frontier(kv.first);
 
     m_last_update_datetime = datetime;
 }
@@ -2412,6 +2465,8 @@ bool TradeManager::addPosition(const PositionRecord& pr) {
                         pr.stock.market_code());
 
     m_position[pr.stock.id()] = pr;
+    // A freshly injected holding has never been scanned; drop any stale frontier for this stock
+    m_tmp_weight_checked_until.erase(pr.stock.id());
     if (pr.takeDatetime > m_init_datetime) {
         m_init_datetime = pr.takeDatetime;
         m_trade_list[0].datetime = m_init_datetime;
@@ -2427,6 +2482,15 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
     HKU_ERROR_IF_RETURN(BUSINESS_INVALID == tr.business, false, "tr.business is invalid!");
 
     updateWithWeight(tr.datetime);
+
+    // Rebuilding via addTradeRecord may increase a holding at a datetime earlier than an already
+    // advanced check frontier (a look-ahead query followed by a backfilled record); drop the
+    // frontier for the affected stock so the added shares are rescanned, mirroring the live trades
+    if (!tr.stock.isNull() &&
+        (BUSINESS_BUY == tr.business || BUSINESS_CHECKIN_STOCK == tr.business ||
+         BUSINESS_BORROW_STOCK == tr.business || BUSINESS_SELL_SHORT == tr.business)) {
+        m_tmp_weight_checked_until.erase(tr.stock.id());
+    }
 
     switch (tr.business) {
         case BUSINESS_INIT:
