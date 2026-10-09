@@ -246,6 +246,12 @@ bool IndicatorImp::can_inner_calculate() {
         return false;
     }
 
+    // The shift below works in old context coordinates, which requires the buffers to be exactly
+    // as long as the old context
+    if (!can_shift_old_results(m_old_context.size())) {
+        return false;
+    }
+
     for (size_t r = 0; r < m_result_num; ++r) {
         if (m_pBuffer[r] == nullptr) {
             return false;
@@ -878,6 +884,90 @@ bool IndicatorImp::can_increment_calculate() {
     return true;
 }
 
+bool IndicatorImp::can_shift_old_results(size_t operand_total) const noexcept {
+    size_t old_total = m_old_context.size();
+    if (old_total == 0) {
+        return false;
+    }
+
+    for (size_t r = 0; r < m_result_num; ++r) {
+        HKU_IF_RETURN(m_pBuffer[r] == nullptr, false);
+        HKU_IF_RETURN(m_pBuffer[r]->size() != old_total, false);
+    }
+
+    // An operand of another length is merged with an index offset, and the offset changes with the
+    // context length, so the old results are not placed bar aligned any more. The bindings are
+    // rejected by the checks in prepareBinaryOp and calculate(); this stays as the back stop.
+    // Accepted residual: an operand carrying its own data whose length happens to equal the
+    // context length cannot be told apart by any length comparison, and binding one is a misuse
+    if (m_left && m_left->size() != operand_total) {
+        return false;
+    }
+    if (m_right && m_right->size() != operand_total) {
+        return false;
+    }
+    if (m_three && m_three->size() != operand_total) {
+        return false;
+    }
+
+    return true;
+}
+
+IndicatorImp::BinaryLayout IndicatorImp::prepareBinaryOp(bool weave) {
+    BinaryLayout ly;
+    size_t start_pos = increment_execute();
+    const bool increment = (start_pos != Null<size_t>());
+    if (!increment) {
+        m_right->calculate();
+        m_left->calculate();
+    }
+
+    size_t left_size = m_left->size();
+    size_t right_size = m_right->size();
+
+    // The framework invariant: a node result is as long as its context. Data only indicator trees
+    // have no context at all, then the longest operand keeps the historical anchor
+    size_t ctx_total = m_context.size();
+    ly.total = ctx_total > 0 ? ctx_total : std::max(left_size, right_size);
+    ly.left_offset = (int64_t)ly.total - (int64_t)left_size;
+    ly.right_offset = (int64_t)ly.total - (int64_t)right_size;
+
+    if (weave) {
+        ly.result_num = m_left->getResultNumber() + m_right->getResultNumber();
+        if (ly.result_num > MAX_RESULT_NUM) {
+            ly.result_num = MAX_RESULT_NUM;
+        }
+    } else {
+        ly.result_num = std::min(m_left->getResultNumber(), m_right->getResultNumber());
+    }
+
+    // The leading bars covered by no operand are invalid, so the discard counts the offsets too
+    int64_t discard = std::max(ly.left_offset + (int64_t)m_left->discard(),
+                               ly.right_offset + (int64_t)m_right->discard());
+    ly.discard = discard > 0 ? (size_t)discard : 0;
+
+    // An operand bound to a context must cover every bar of it: an indicator carrying its own
+    // data (a sliced or filtered one) has no meaning per context date. Data only trees have no
+    // context, then the longest operand is the anchor and the others align at its right end
+    HKU_CHECK(ctx_total == 0 || (left_size == 0 || left_size == ctx_total),
+              "The left operand of {} must be as long as its context ({} vs {})!", name(),
+              ctx_total, left_size);
+    HKU_CHECK(ctx_total == 0 || (right_size == 0 || right_size == ctx_total),
+              "The right operand of {} must be as long as its context ({} vs {})!", name(),
+              ctx_total, right_size);
+
+    if (!increment) {
+        _readyBuffer(ly.total, ly.result_num);
+        start_pos = ly.discard;
+    } else if (start_pos < ly.discard) {
+        start_pos = ly.discard;
+    }
+
+    ly.start_pos = start_pos;
+    setDiscard(ly.discard);
+    return ly;
+}
+
 bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
     if (m_param_changed || !ms_enable_increment_calculate || !supportIncrementCalculate() ||
         !can_increment_calculate()) {
@@ -901,6 +991,10 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
     }
 
     if (start_pos < min_increment_start()) {
+        return false;
+    }
+
+    if (!can_shift_old_results(m_context.size())) {
         return false;
     }
 
@@ -963,6 +1057,12 @@ Indicator IndicatorImp::calculate() {
             if (m_ind_params.empty()) {
                 if (!increment_execute_leaf_or_op(Indicator(m_right))) {
                     m_right->calculate();
+                    // The input of a unary indicator must cover every bar of the context, the same
+                    // rule as the operands of a merged node
+                    HKU_CHECK(m_context.empty() || m_right->size() == 0 ||
+                                m_right->size() == m_context.size(),
+                              "The input of {} must be as long as its context ({} vs {})!", name(),
+                              m_context.size(), m_right->size());
                     _readyBuffer(m_right->size(), m_result_num);
                     _calculate(Indicator(m_right));
                     onlySetContext(m_right->getContext());
@@ -1093,6 +1193,10 @@ size_t IndicatorImp::increment_execute() {
         return null_pos;
     }
 
+    if (!can_shift_old_results(m_context.size())) {
+        return null_pos;
+    }
+
     for (size_t r = 0; r < m_result_num; ++r) {
         HKU_ASSERT(m_pBuffer[r] != nullptr);
         m_pBuffer[r]->resize(total, Null<value_t>());
@@ -1104,310 +1208,71 @@ size_t IndicatorImp::increment_execute() {
 }
 
 void IndicatorImp::execute_weave() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    const IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t diff = maxp->size() - minp->size();
-    size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = minp->getResultNumber() + maxp->getResultNumber();
-        if (result_number > MAX_RESULT_NUM) {
-            result_number = MAX_RESULT_NUM;
-        }
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    value_t const *src = nullptr;
-    value_t *dst = nullptr;
-    if (m_left->size() >= m_right->size()) {
-        size_t num = m_left->getResultNumber();
-        for (size_t r = 0; r < num; ++r) {
-            src = m_left->data(r);
-            dst = this->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = src[i];
-            }
-        }
-        for (size_t r = num; r < m_result_num; r++) {
-            src = m_right->data(r - num);
-            dst = this->data(r);
-            for (size_t i = start_pos; i < total; i++) {
-                dst[i] = src[i - diff];
-            }
-        }
-    } else {
-        size_t num = m_left->getResultNumber();
-        for (size_t r = 0; r < num; ++r) {
-            src = m_left->data(r);
-            dst = this->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = src[i - diff];
-            }
-        }
-        for (size_t r = num; r < m_result_num; r++) {
-            src = m_right->data(r - num);
-            dst = this->data(r);
-            for (size_t i = start_pos; i < total; i++) {
-                dst[i] = src[i];
-            }
+    BinaryLayout ly = prepareBinaryOp(true);
+    size_t left_num = m_left->getResultNumber();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        const bool from_left = (r < left_num);
+        auto const *src = from_left ? m_left->data(r) : m_right->data(r - left_num);
+        int64_t offset = from_left ? ly.left_offset : ly.right_offset;
+        auto *dst = this->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = src[i - offset];
         }
     }
 }
 
 void IndicatorImp::execute_add() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    for (size_t r = 0; r < m_result_num; ++r) {
-        auto const *data1 = maxp->data(r);
-        auto const *data2 = minp->data(r);
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
         auto *result = this->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            result[i] = data1[i] + data2[i - diff];
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            result[i] = left[i - ly.left_offset] + right[i - ly.right_offset];
         }
     }
 }
 
 void IndicatorImp::execute_sub() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            auto *data1 = m_left->data(r);
-            auto *data2 = m_right->data(r);
-            auto *result = this->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                result[i] = data1[i] - data2[i - diff];
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            auto *data1 = m_left->data(r);
-            auto *data2 = m_right->data(r);
-            auto *result = this->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                result[i] = data1[i - diff] - data2[i];
-            }
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        auto *result = this->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            result[i] = left[i - ly.left_offset] - right[i - ly.right_offset];
         }
     }
 }
 
 void IndicatorImp::execute_mul() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    for (size_t r = 0; r < m_result_num; ++r) {
-        auto const *data1 = maxp->data(r);
-        auto const *data2 = minp->data(r);
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
         auto *result = this->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            result[i] = data1[i] * data2[i - diff];
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            result[i] = left[i - ly.left_offset] * right[i - ly.right_offset];
         }
     }
 }
 
 void IndicatorImp::execute_div() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            auto const *data1 = m_left->data(r);
-            auto const *data2 = m_right->data(r);
-            auto *result = this->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                result[i] = data1[i] / data2[i - diff];
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            auto const *data1 = m_left->data(r);
-            auto const *data2 = m_right->data(r);
-            auto *result = this->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                result[i] = data1[i - diff] / data2[i];
-            }
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        auto *result = this->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            result[i] = left[i - ly.left_offset] / right[i - ly.right_offset];
         }
     }
 }
 
 void IndicatorImp::execute_mod() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
+    BinaryLayout ly = prepareBinaryOp();
 
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    value_t *dst = nullptr;
-    value_t const *left = nullptr;
-    value_t const *right = nullptr;
     value_t null_value = Null<value_t>();
-
     // Integer modulo. Reject NaN / Inf / out-of-int64-range operands (whose double to int64
     // conversion is UB) and a zero divisor as null; special-case INT64_MIN % -1 which is UB
     // (SIGFPE on x86) and whose true remainder is 0
@@ -1425,423 +1290,110 @@ void IndicatorImp::execute_mod() {
         return value_t(li % ri);
     };
 
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = safe_mod(left[i], right[i - diff]);
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = safe_mod(left[i - diff], right[i]);
-            }
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto *dst = this->data(r);
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = safe_mod(left[i - ly.left_offset], right[i - ly.right_offset]);
         }
     }
 }
 
 void IndicatorImp::execute_eq() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    for (size_t r = 0; r < m_result_num; ++r) {
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
         auto *dst = this->data(r);
-        auto const *maxdata = maxp->data(r);
-        auto const *mindata = minp->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = (maxdata[i] == mindata[i - diff]) ? 1.0 : 0.0;
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = (left[i - ly.left_offset] == right[i - ly.right_offset]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_ne() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    for (size_t r = 0; r < m_result_num; ++r) {
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
         auto *dst = this->data(r);
-        auto const *maxdata = maxp->data(r);
-        auto const *mindata = minp->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = (maxdata[i] != mindata[i - diff]) ? 1.0 : 0.0;
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = (left[i - ly.left_offset] != right[i - ly.right_offset]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_gt() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    value_t *dst = nullptr;
-    value_t const *left = nullptr;
-    value_t const *right = nullptr;
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = (left[i] > right[i - diff]) ? 1.0 : 0.0;
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = (left[i - diff] > right[i]) ? 1.0 : 0.0;
-            }
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto *dst = this->data(r);
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = (left[i - ly.left_offset] > right[i - ly.right_offset]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_lt() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    value_t *dst = nullptr;
-    value_t const *left = nullptr;
-    value_t const *right = nullptr;
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = (left[i] < right[i - diff]) ? 1.0 : 0.0;
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = left[i - diff] < right[i] ? 1.0 : 0.0;
-            }
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto *dst = this->data(r);
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = (left[i - ly.left_offset] < right[i - ly.right_offset]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_ge() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    value_t *dst = nullptr;
-    value_t const *left = nullptr;
-    value_t const *right = nullptr;
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = left[i] >= right[i - diff] ? 1.0 : 0.0;
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = left[i - diff] >= right[i] ? 1.0 : 0.0;
-            }
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto *dst = this->data(r);
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = (left[i - ly.left_offset] >= right[i - ly.right_offset]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_le() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    value_t *dst = nullptr;
-    value_t const *left = nullptr;
-    value_t const *right = nullptr;
-    if (m_left->size() > m_right->size()) {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = left[i] <= right[i - diff] ? 1.0 : 0.0;
-            }
-        }
-    } else {
-        for (size_t r = 0; r < m_result_num; ++r) {
-            dst = this->data(r);
-            left = m_left->data(r);
-            right = m_right->data(r);
-            for (size_t i = start_pos; i < total; ++i) {
-                dst[i] = left[i - diff] <= right[i] ? 1.0 : 0.0;
-            }
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
+        auto *dst = this->data(r);
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] = (left[i - ly.left_offset] <= right[i - ly.right_offset]) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_and() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    for (size_t r = 0; r < m_result_num; ++r) {
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
         auto *dst = this->data(r);
-        auto const *maxdata = maxp->data(r);
-        auto const *mindata = minp->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = (maxdata[i] > 0.0) && (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] =
+              (left[i - ly.left_offset] > 0.0) && (right[i - ly.right_offset] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
 
 void IndicatorImp::execute_or() {
-    size_t start_pos = increment_execute();
-    if (start_pos == Null<size_t>()) {
-        m_right->calculate();
-        m_left->calculate();
-    }
-
-    IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
-
-    size_t total = maxp->size();
-    size_t diff = maxp->size() - minp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
-        _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
-    }
-
-    setDiscard(discard);
-
-    for (size_t r = 0; r < m_result_num; ++r) {
+    BinaryLayout ly = prepareBinaryOp();
+    for (size_t r = 0; r < ly.result_num; ++r) {
         auto *dst = this->data(r);
-        auto const *maxdata = maxp->data(r);
-        auto const *mindata = minp->data(r);
-        for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = (maxdata[i] > 0.0) || (mindata[i - diff] > 0.0) ? 1.0 : 0.0;
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
+        for (size_t i = ly.start_pos; i < ly.total; ++i) {
+            dst[i] =
+              (left[i - ly.left_offset] > 0.0) || (right[i - ly.right_offset] > 0.0) ? 1.0 : 0.0;
         }
     }
 }
@@ -1873,6 +1425,10 @@ size_t IndicatorImp::increment_execute_if() {
         return null_pos;
     }
 
+    if (!can_shift_old_results(m_context.size())) {
+        return null_pos;
+    }
+
     for (size_t r = 0; r < m_result_num; ++r) {
         HKU_ASSERT(m_pBuffer[r]);
         m_pBuffer[r]->resize(total, Null<value_t>());
@@ -1885,62 +1441,59 @@ size_t IndicatorImp::increment_execute_if() {
 
 void IndicatorImp::execute_if() {
     size_t start_pos = increment_execute_if();
-    if (start_pos == Null<size_t>()) {
+    const bool increment = (start_pos != Null<size_t>());
+    if (!increment) {
         m_three->calculate();
         m_right->calculate();
         m_left->calculate();
     }
 
-    const IndicatorImp *maxp, *minp;
-    if (m_right->size() > m_left->size()) {
-        maxp = m_right.get();
-        minp = m_left.get();
-    } else {
-        maxp = m_left.get();
-        minp = m_right.get();
-    }
+    size_t cond_size = m_three->size();
+    size_t left_size = m_left->size();
+    size_t right_size = m_right->size();
 
-    size_t total = maxp->size();
-    size_t discard = maxp->size() - minp->size() + minp->discard();
-    if (discard < maxp->discard()) {
-        discard = maxp->discard();
-    }
-    if (discard < m_three->discard()) {
-        discard = m_three->discard();
-    }
+    // The same anchor as prepareBinaryOp: the result is as long as the context, or as the longest
+    // operand when the indicator tree has no context at all
+    size_t ctx_total = m_context.size();
+    size_t total = ctx_total > 0 ? ctx_total : std::max(cond_size, std::max(left_size, right_size));
+    int64_t cond_offset = (int64_t)total - (int64_t)cond_size;
+    int64_t left_offset = (int64_t)total - (int64_t)left_size;
+    int64_t right_offset = (int64_t)total - (int64_t)right_size;
 
-    if (m_three->size() >= maxp->size()) {
-        total = m_three->size();
-        discard = total + discard - maxp->size();
-    } else {
-        discard = total - m_three->size();
-    }
+    size_t result_number = std::min(m_left->getResultNumber(), m_right->getResultNumber());
 
-    size_t diff_right = total - m_right->size();
-    size_t diff_left = total - m_left->size();
-    size_t diff_cond = total - m_three->size();
+    int64_t discard = std::max(cond_offset + (int64_t)m_three->discard(),
+                               std::max(left_offset + (int64_t)m_left->discard(),
+                                        right_offset + (int64_t)m_right->discard()));
+    size_t discard_num = discard > 0 ? (size_t)discard : 0;
 
-    if (start_pos == Null<size_t>()) {
-        size_t result_number = std::min(minp->getResultNumber(), maxp->getResultNumber());
+    // The same binding rule as prepareBinaryOp, over the three operands
+    HKU_CHECK(ctx_total == 0 || (cond_size == 0 || cond_size == ctx_total),
+              "The condition of {} must be as long as its context ({} vs {})!", name(), ctx_total,
+              cond_size);
+    HKU_CHECK(ctx_total == 0 || (left_size == 0 || left_size == ctx_total),
+              "The left operand of {} must be as long as its context ({} vs {})!", name(),
+              ctx_total, left_size);
+    HKU_CHECK(ctx_total == 0 || (right_size == 0 || right_size == ctx_total),
+              "The right operand of {} must be as long as its context ({} vs {})!", name(),
+              ctx_total, right_size);
+
+    if (!increment) {
         _readyBuffer(total, result_number);
-        start_pos = discard;
-    } else if (start_pos < discard) {
-        start_pos = discard;
+        start_pos = discard_num;
+    } else if (start_pos < discard_num) {
+        start_pos = discard_num;
     }
 
-    setDiscard(discard);
+    setDiscard(discard_num);
 
-    auto *three = m_three->data(0);
-    for (size_t r = 0; r < m_result_num; ++r) {
+    auto const *three = m_three->data(0);
+    for (size_t r = 0; r < result_number; ++r) {
         auto *dst = this->data(r);
-        auto *left = m_left->data(r);
-        auto *right = m_right->data(r);
+        auto const *left = m_left->data(r);
+        auto const *right = m_right->data(r);
         for (size_t i = start_pos; i < total; ++i) {
-            if (three[i - diff_cond] > 0.0) {
-                dst[i] = left[i - diff_left];
-            } else {
-                dst[i] = right[i - diff_right];
-            }
+            dst[i] = three[i - cond_offset] > 0.0 ? left[i - left_offset] : right[i - right_offset];
         }
     }
 }

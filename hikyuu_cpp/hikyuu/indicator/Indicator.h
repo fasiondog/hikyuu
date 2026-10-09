@@ -414,6 +414,11 @@ inline bool Indicator::isPythonObject() const noexcept {
 
 //--------------------------------------------------------------
 // Indicator operations
+//
+// The result of an operation is as long as its context, so every operand must cover each bar of
+// it. An operand carrying its own data length (a sliced or filtered indicator) is rejected with an
+// exception once the tree is bound to a context. A data only tree, which has no context, merges
+// its operands with the longest one as the anchor and the others aligned at its right end
 //-------------------------------------------------------------
 HKU_API Indicator operator+(const Indicator&, const Indicator&);
 HKU_API Indicator operator-(const Indicator&, const Indicator&);
@@ -475,6 +480,8 @@ HKU_API Indicator operator|(Indicator::value_t, const Indicator&);
 /**
  * Combine the results of ind1 and ind2 into one Indicator. For example, for ind = WEAVE(ind1, ind2)
  * the ind contains multiple results at this time, stored in the order of ind1 and ind2
+ * @note Every operand must be as long as the context, otherwise an exception is thrown; a data
+ * only tree, which has no context, merges its operands at the right end of the longest one
  * @param ind1 indicator 1
  * @param ind2 indicator 2
  * @ingroup Indicator
@@ -496,6 +503,7 @@ inline Indicator WEAVE(const Indicator& ind1, const Indicator& ind2, const Args&
  * For example: IF(CLOSE>OPEN,HIGH,LOW) returns the high price if the period closes up, otherwise
  * it returns the low price
  * </pre>
+ * @note Every operand must be as long as the context, otherwise an exception is thrown
  * @param x condition indicator
  * @param a candidate indicator a
  * @param b candidate indicator b

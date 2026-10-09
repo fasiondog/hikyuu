@@ -1163,6 +1163,8 @@ Built-in Technical Indicators
     
     For example: IF(CLOSE>OPEN,HIGH,LOW) means that if this period closes bullish, return the highest value, otherwise return the lowest value
     
+    Note: every operand must be as long as the context, otherwise an exception is thrown
+    
     :param Indicator x: the condition indicator
     :param Indicator a: the candidate indicator a
     :param Indicator b: the candidate indicator b
@@ -2213,6 +2215,8 @@ Built-in Technical Indicators
 .. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
     Combine the results of at most 6 Indicators together in one Indicator. E.g. ind = WEAVE(ind1, ind2), then ind contains the multiple results at this time, stored in the order of ind1 and ind2.
+    
+    Note: every operand must be as long as the context, otherwise an exception is thrown. A data only tree, which has no context, merges its operands at the right end of the longest one.
     
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2

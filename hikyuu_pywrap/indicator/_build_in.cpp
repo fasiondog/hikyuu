@@ -1105,6 +1105,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Combine the results of at most 6 Indicators together in one Indicator. E.g. ind = WEAVE(ind1, ind2), then ind contains the multiple results at this time, stored in the order of ind1 and ind2.
     
+    Note: every operand must be as long as the context, otherwise an exception is thrown. A data only tree, which has no context, merges its operands at the right end of the longest one.
+    
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
     :param Indicator ind3: the indicator 3, which can be omitted
@@ -1212,6 +1214,8 @@ void export_Indicator_build_in(py::module& m) {
     Usage: IF(X,A,B); if X is not 0, return A, otherwise return B
 
     For example: IF(CLOSE>OPEN,HIGH,LOW) means that if this period closes bullish, return the highest value, otherwise return the lowest value
+
+    Note: every operand must be as long as the context, otherwise an exception is thrown
 
     :param Indicator x: the condition indicator
     :param Indicator a: the candidate indicator a

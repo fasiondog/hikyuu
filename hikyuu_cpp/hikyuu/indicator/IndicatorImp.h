@@ -10,6 +10,7 @@
 #define INDICATORIMP_H_
 
 #include <cmath>
+#include <cstdint>
 
 #include "hikyuu/config.h"
 #include "hikyuu/KData.h"
@@ -315,9 +316,36 @@ public:
     virtual void getSeparateKTypeLeafSubNodes(vector<IndicatorImpPtr>& nodes) const {}
 
 private:
+    // The layout of a node that merges two operands: the result length, the invalid leading count,
+    // the first position to (re)calculate, the result set count, and the index offset of each
+    // operand, i.e. the value of node index i is kept at operand index i - offset
+    struct BinaryLayout {
+        size_t total = 0;
+        size_t discard = 0;
+        size_t start_pos = 0;
+        size_t result_num = 1;
+        int64_t left_offset = 0;
+        int64_t right_offset = 0;
+    };
+
     bool needCalculate();
     bool can_inner_calculate();
     bool can_increment_calculate();
+
+    // Precondition of shifting the old results in place: every result buffer must be laid out
+    // exactly as the old context, i.e. buffer index i holds the value of m_old_context[i], and
+    // every operand must be long enough to keep that layout bar aligned (operand_total is the
+    // context length the operands are currently bound to). Nodes mixing inputs of another length
+    // do not satisfy it and must fall back to a full recalculation, otherwise the shift reads or
+    // writes out of the buffer.
+    bool can_shift_old_results(size_t operand_total) const noexcept;
+
+    // Prepare a two-operand node: bind the context to the operands, calculate them when the
+    // incremental path was refused, align the operands onto the context length and prepare the
+    // result buffer. When weave is true, the result sets of both operands are kept instead of the
+    // common ones
+    BinaryLayout prepareBinaryOp(bool weave = false);
+
     bool increment_execute_leaf_or_op(const Indicator& ind);
     size_t increment_execute();
     void execute_add();

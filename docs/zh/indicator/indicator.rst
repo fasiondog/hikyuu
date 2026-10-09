@@ -1164,6 +1164,8 @@
     
     例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
     
+    注意：各操作数必须与上下文等长，否则抛出异常。
+    
     :param Indicator x: 条件指标
     :param Indicator a: 待选指标 a
     :param Indicator b: 待选指标 b
@@ -2209,6 +2211,8 @@
 .. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
     将最多6个Indicator的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
+    
+    注意：各操作数必须与上下文等长，否则抛出异常；纯数据指标树（无上下文）以最长操作数为基准右端对齐合并。
     
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
