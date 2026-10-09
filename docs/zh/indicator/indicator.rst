@@ -884,6 +884,8 @@
 
     删除 nan 值
 
+    注意：某一结果在某行为 nan 时，整行被删除，各结果保留相同的行。
+
     :param Indicator data: 输入数据
     :rtype: Indicator
 

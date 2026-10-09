@@ -17,6 +17,8 @@ namespace hku {
 
 /**
  * Remove the nan values
+ * @note A row is removed once any of its result sets is nan, so every result set keeps the same
+ * rows and the same length
  * @ingroup Indicator
  */
 Indicator HKU_API DROPNA();

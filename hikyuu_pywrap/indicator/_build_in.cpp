@@ -2246,6 +2246,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Remove the nan values
 
+    Note: a row is removed once any of its results is nan, and all the results keep the same rows
+
     :param Indicator data: the input data
     :rtype: Indicator)");
 
