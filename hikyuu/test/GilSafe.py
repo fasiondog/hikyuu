@@ -25,20 +25,75 @@ EXIT_PROBE = (
     "stg.run_daily(lambda stg: None, Seconds(1))\n"
 ).format(root=REPO_ROOT)
 
+# The C++ system holds the Python custom parts only through pybind11 shared_ptr holders
+# (the former explicit reference leaks were removed), so dropping every Python-side
+# reference and forcing GC must not invalidate the parts still used by the system.
+KEEP_ALIVE_PROBE = (
+    "import sys; sys.path.insert(0, r'{root}')\n"
+    "import gc\n"
+    "from hikyuu import *\n"
+    "set_log_level(LOG_LEVEL.OFF)\n"
+    "hikyuu_init('test_data/hikyuu_win.ini')\n"
+    "class MySG(SignalBase):\n"
+    "    def __init__(self):\n"
+    "        super().__init__('MySG')\n"
+    "    def _clone(self):\n"
+    "        return MySG()\n"
+    "    def _calculate(self, kdata):\n"
+    "        self._add_buy_signal(Datetime(201201190000))\n"
+    "        self._add_sell_signal(Datetime(201201300000))\n"
+    "s = SYS_Simple()\n"
+    "s.tm = crtTM()\n"
+    "s.sg = MySG()\n"
+    "s.mm = MM_FixedCount(100)\n"
+    "gc.collect()  # the only remaining reference lives in the C++ system\n"
+    "k = StockManager.instance()['sh000001'].get_kdata(\n"
+    "    Query(Datetime(20120101), Datetime(20120201), Query.DAY, Query.FORWARD))\n"
+    "s.to = k\n"
+    "s.run(k, False, False)\n"
+    "assert len(s.tm.get_trade_list()) > 0, 'no trades: the Python signal part was destroyed'\n"
+    "# Repeated reassignment must release the previous part instead of leaking it\n"
+    "s.sg = MySG()\n"
+    "gc.collect()\n"
+    "s.run(k, True, False)\n"
+    "assert len(s.tm.get_trade_list()) > 0\n"
+    "# A clone of the system keeps its Python parts alive as well\n"
+    "s2 = s.clone()\n"
+    "s2.run(k, True, False)\n"
+    "assert len(s2.tm.get_trade_list()) > 0\n"
+    "print('OK')\n"
+).format(root=REPO_ROOT)
+
 
 class GilSafeTest(unittest.TestCase):
     def test_exit_clean_after_gil_safe_use(self):
         proc = subprocess.run(
-          [sys.executable, "-c", EXIT_PROBE],
-          capture_output=True,
-          text=True,
-          encoding="utf-8",
-          errors="replace",
-          timeout=180,
+            [sys.executable, "-c", EXIT_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=180,
         )
         self.assertEqual(
-          proc.returncode, 0, "interpreter exit crashed:\n%s" % proc.stderr[-2000:]
+            proc.returncode, 0, "interpreter exit crashed:\n%s" % proc.stderr[-2000:]
         )
+
+    def test_system_python_parts_keep_alive(self):
+        # Removing the explicit reference leaks in the set_* bindings means the Python
+        # custom parts are kept alive only by the pybind11 shared_ptr holders. Dropping
+        # every Python-side reference and forcing GC must leave the parts usable, and the
+        # holder destructors (possibly on non-Python threads) must not crash.
+        proc = subprocess.run(
+            [sys.executable, "-c", KEEP_ALIVE_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
+        )
+        self.assertEqual(proc.returncode, 0, "keep-alive probe crashed:\n%s" % proc.stderr[-2000:])
+        self.assertIn("OK", proc.stdout)
 
 
 def suite():

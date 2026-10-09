@@ -49,18 +49,14 @@ public:
 public:
     void set_norm(py::object norm) {
         py::gil_scoped_acquire gil;
-        auto tmp = norm;
         setNormalize(norm.cast<NormPtr>());
-        tmp.release();
     }
 
     void add_special_norm(const string& name, py::object norm, const string& category,
                           const IndicatorList& style_inds) {
         py::gil_scoped_acquire gil;
         HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
-        auto tmp = norm;
         addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
-        tmp.release();
     }
 };
 
@@ -248,7 +244,11 @@ The custom multi-factor model override hooks:
     :return: [factor1, factor2, ...] in the same order as the reference securities)")
 
       .def(
-        "set_normalize", [](PyMultiFactor& self, py::object norm) { self.set_norm(norm); },
+        "set_normalize",
+        [](PyMultiFactor& self, py::object norm) {
+            self.set_norm(norm);
+            keep_python_part_alive(py::cast(self), norm);
+        },
         py::arg("norm"),
         R"(set_normalize(self, norm)
 
@@ -261,6 +261,7 @@ The custom multi-factor model override hooks:
         [](PyMultiFactor& self, const string& name, py::object norm, const string& category,
            const IndicatorList& style_inds) {
             self.add_special_norm(name, norm, category, style_inds);
+            keep_python_part_alive(py::cast(self), norm);
         },
         py::arg("name"), py::arg("norm") = NormPtr(), py::arg("category") = "",
         py::arg("style_inds") = IndicatorList(),
