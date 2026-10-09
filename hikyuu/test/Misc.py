@@ -77,7 +77,7 @@ class MiscTest(unittest.TestCase):
 
     def test_parallel_run_sys_releases_gil(self):
         sys_list = [_make_sys(self.stock, self.kdata) for _ in range(20)]
-        probe = lambda: parallel_run_sys(sys_list, Query(0, 10000), reset=True)
+        def probe(): return parallel_run_sys(sys_list, Query(0, 10000), reset=True)
         work = _calibrated_work(None, probe)
         progress = _measure_progress(work)
         self.assertGreater(progress, 100)
@@ -91,7 +91,7 @@ class MiscTest(unittest.TestCase):
 
     def test_get_funds_list_releases_gil(self):
         tm_list = [crtTM() for _ in range(50)]
-        probe = lambda: get_funds_list(tm_list, self.ref_dates)
+        def probe(): return get_funds_list(tm_list, self.ref_dates)
         work = _calibrated_work(None, probe)
         progress = _measure_progress(work)
         self.assertGreater(progress, 100)
@@ -105,10 +105,25 @@ class MiscTest(unittest.TestCase):
 
     def test_get_performance_list_releases_gil(self):
         tm_list = [crtTM() for _ in range(50)]
-        probe = lambda: get_performance_list(tm_list, Datetime(2024, 12, 31))
+        def probe(): return get_performance_list(tm_list, Datetime(2024, 12, 31))
         work = _calibrated_work(None, probe)
         progress = _measure_progress(work)
         self.assertGreater(progress, 100)
+
+    def test_now_default_args_not_frozen_at_import(self):
+        # The "current time" defaults used to be evaluated once at import time and frozen
+        # for the whole process life; they must stay None in the signatures and resolve to
+        # the real current time on each call.
+        tm_cls = type(crtTM())
+        self.assertIn("datetime=None", tm_cls.get_performance.__doc__)
+        self.assertIn("date=None", tm_cls.get_max_pull_back.__doc__)
+        self.assertIn("datetime=None", tm_cls.get_profit_percent_monthly.__doc__)
+        self.assertIn("datetime=None", tm_cls.get_profit_percent_yearly.__doc__)
+        self.assertIn("datetime: Datetime = None", get_performance_list.__doc__)
+        # Calling without the datetime argument must work (resolving to now internally)
+        tm = crtTM()
+        self.assertIsInstance(tm.get_performance(), Performance)
+        self.assertIsInstance(tm.get_max_pull_back(), float)
 
 
 def suite():
