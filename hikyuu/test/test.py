@@ -37,6 +37,7 @@ import Misc
 import Block
 import PositionRecord
 import Selector
+import MultiFactor
 import test_common_sql
 
 if __name__ == "__main__":
@@ -78,6 +79,7 @@ if __name__ == "__main__":
     suite.addTest(Pickle.suite())
     suite.addTest(GilSafe.suite())
     suite.addTest(Selector.suite())
+    suite.addTest(MultiFactor.suite())
     suite.addTest(Misc.suite())
     suite.addTest(Block.suite())
     suite.addTest(PositionRecord.suite())

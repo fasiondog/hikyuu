@@ -303,20 +303,15 @@ The custom multi-factor model override hooks:
                 return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
             }
             HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
-            py::object filter_func = filter.attr("__call__");
-            ScoreRecord sc;
-            try {
-                filter_func(sc);
-                return self.getScores(date, start, cend, [&](const ScoreRecord& score_) {
-                    return filter_func(score_).cast<bool>();
+            if (check_pyfunction_arg_num(filter, 1)) {
+                return self.getScores(date, start, cend, [filter](const ScoreRecord& score_) {
+                    return filter(score_).cast<bool>();
                 });
-            } catch (...) {
-                filter_func(date, sc);
-                return self.getScores(date, start, cend,
-                                      [&](const Datetime& date_, const ScoreRecord& score_) {
-                                          return filter_func(date_, score_).cast<bool>();
-                                      });
             }
+            return self.getScores(date, start, cend,
+                                  [filter](const Datetime& date_, const ScoreRecord& score_) {
+                                      return filter(date_, score_).cast<bool>();
+                                  });
         },
         py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
         py::arg("filter") = py::none(),
