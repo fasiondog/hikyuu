@@ -220,87 +220,32 @@ public:
             return Py_BuildValue("s", s.c_str());
 
         } else if (x.type() == typeid(Datetime)) {
-            Datetime d = boost::any_cast<Datetime>(x);
-            std::stringstream cmd;
-            if (d.isNull()) {
-                cmd << "Datetime()";
-            } else {
-                cmd << "Datetime(" << d.year() << "," << d.month() << "," << d.day() << ","
-                    << d.hour() << "," << d.minute() << "," << d.second() << "," << d.millisecond()
-                    << "," << d.microsecond() << ")";
-            }
-            object o = eval(cmd.str());
+            const Datetime& d = boost::any_cast<const Datetime&>(x);
+            object o = pybind11::cast(d);
             o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(KData)) {
-            const KData& k = boost::any_cast<KData>(x);
-            std::stringstream cmd;
-            if (k == Null<KData>()) {
-                cmd << "KData()";
-            } else {
-                auto stk = k.getStock();
-                auto query = k.getQuery();
-                std::stringstream q_cmd;
-                if (query.queryType() == KQuery::INDEX) {
-                    q_cmd << "Query(" << query.start() << "," << query.end() << ", Query."
-                          << KQuery::getKTypeName(query.kType()) << ", Query."
-                          << KQuery::getRecoverTypeName(query.recoverType()) << ")";
-                } else {
-                    q_cmd << "Query(Datetime('" << query.startDatetime() << "'), Datetime('"
-                          << query.endDatetime() << "'), " << "Query."
-                          << KQuery::getKTypeName(query.kType()) << ", Query."
-                          << KQuery::getRecoverTypeName(query.recoverType()) << ")";
-                }
-                cmd << "KData(get_stock('" << stk.market_code() << "'), " << q_cmd.str() << ")";
-            }
-            object o = eval(cmd.str());
+            const KData& k = boost::any_cast<const KData&>(x);
+            object o = pybind11::cast(k);
             o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(Stock)) {
             const Stock& stk = boost::any_cast<const Stock&>(x);
-            std::stringstream cmd;
-            if (stk.isNull()) {
-                cmd << "Stock()";
-            } else {
-                cmd << "get_stock('" << stk.market_code() << "')";
-            }
-            object o = eval(cmd.str());
+            object o = pybind11::cast(stk);
             o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(Block)) {
             const Block& blk = boost::any_cast<const Block&>(x);
-            std::stringstream cmd;
-            object o;
-            if (blk == Null<Block>()) {
-                cmd << "Block()";
-                o = eval(cmd.str());
-                o.inc_ref();
-            } else {
-                cmd << "Block('" << blk.category() << "','" << blk.name() << "')";
-                o = eval(cmd.str());
-                o.inc_ref();
-                Block out = o.cast<Block>();
-                out.add(blk.getStockList());
-            }
+            object o = pybind11::cast(blk);
+            o.inc_ref();
             return o;
 
         } else if (x.type() == typeid(KQuery)) {
-            const KQuery& query = boost::any_cast<KQuery>(x);
-            std::stringstream cmd;
-            if (query.queryType() == KQuery::INDEX) {
-                cmd << "Query(" << query.start() << "," << query.end() << ", Query."
-                    << KQuery::getKTypeName(query.kType()) << ", Query."
-                    << KQuery::getRecoverTypeName(query.recoverType()) << ")";
-            } else {
-                cmd << "Query(Datetime('" << query.startDatetime() << "'), Datetime('"
-                    << query.endDatetime() << "'), " << "Query."
-                    << KQuery::getKTypeName(query.kType()) << ", Query."
-                    << KQuery::getRecoverTypeName(query.recoverType()) << ")";
-            }
-            object o = eval(cmd.str());
+            const KQuery& query = boost::any_cast<const KQuery&>(x);
+            object o = pybind11::cast(query);
             o.inc_ref();
             return o;
 
