@@ -11,7 +11,9 @@
 
 #include <hikyuu/config.h>
 #include <hikyuu/Stock.h>
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <type_traits>
 #include <pybind11/pybind11.h>
 
@@ -28,19 +30,28 @@ namespace py = pybind11;
 
 namespace hku {
 
-// Wrap a py::object so its lifetime can safely cross worker threads (e.g. TimerManager
-// entries). The deleter acquires the GIL before releasing; if the interpreter is going
-// down, skip decref (leak; process is exiting). Reusable across pybind bindings.
+// Wrap a py::object so its lifetime can safely cross worker threads (e.g. Strategy
+// Python callbacks). The deleter acquires the GIL before releasing; if the interpreter
+// is finalizing, skip decref (leak; process is exiting). Finalization is detected via a
+// Py_AtExit flag set at shutdown start, so it is correct on Python <3.13 too (where
+// Py_IsFinalizing is not public). Reusable across pybind bindings.
+inline std::atomic<bool>& g_interpreter_finalizing() {
+    static std::atomic<bool> f{false};
+    return f;
+}
+
+inline void register_finalizing_flag() {
+    static std::once_flag once;
+    std::call_once(once, []() {
+        Py_AtExit([]() { g_interpreter_finalizing().store(true, std::memory_order_release); });
+    });
+}
+
 inline std::shared_ptr<py::object> make_gil_safe(py::object obj) {
+    register_finalizing_flag();
     return std::shared_ptr<py::object>(new py::object(std::move(obj)), [](py::object* p) {
-        bool finalizing =
-#if PY_VERSION_HEX >= 0x030D0000
-          Py_IsFinalizing() != 0;
-#else
-            !Py_IsInitialized();
-#endif
-        if (finalizing) {
-            return;
+        if (g_interpreter_finalizing().load(std::memory_order_acquire)) {
+            return;  // leak; process is exiting
         }
         py::gil_scoped_acquire gil;
         delete p;
