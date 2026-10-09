@@ -2344,9 +2344,9 @@ void export_Indicator_build_in(py::module& m) {
     :rtype: Indicator)");
 
     m.def("MRR", py::overload_cast<int>(&MRR), py::arg("n") = 0);
-    m.def("MRR", py::overload_cast<const Indicator&, int>(&MRR), py::arg("data"), py::arg("n"),
-          R"(MRR([data])
-    
+    m.def("MRR", py::overload_cast<const Indicator&, int>(&MRR), py::arg("data"), py::arg("n") = 0,
+          R"(MRR([data, n=0])
+
     The maximum profit percentage (calculated in the opposite direction corresponding to MDD)
 
     :param Indicator data: the input data
