@@ -86,8 +86,9 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& s
         result.commission = lowestCommission;
     }
 
-    // The A-shares and the ChiNext have the stamp duty, the others do not
-    if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM) {
+    // Stamp duty applies to sells of A-shares, ChiNext, STAR and Beijing Stock Exchange stocks
+    if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM ||
+        stock.type() == STOCKTYPE_START || stock.type() == STOCKTYPE_A_BJ) {
         result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"), precision);
     } else {
         result.stamptax = 0.0;

@@ -6,6 +6,7 @@
  */
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
+#include <hikyuu/StockTypeInfo.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
 
 #include <hikyuu/config.h>
@@ -133,6 +134,62 @@ TEST_CASE("test_TC_FixedA") {
     expect.stamptax = 21;
     expect.transferfee = 0.0;
     expect.total = 58.8;
+    CHECK_EQ(result, expect);
+}
+
+/** @par Test points */
+TEST_CASE("test_TC_FixedA_stamptax_type") {
+    // sell-side stamp duty applies to A/GEM/STAR/BSE; B-shares are not taxed
+    StockManager& sm = StockManager::instance();
+    CostRecord result, expect;
+    TradeCostPtr cost_func = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    const Datetime dt(200101010000);
+    // borrow a real stock's data driver so the synthetic typed stocks are not null
+    auto driver = sm.getStock("sh600004").getKDataDirver();
+    auto makeStock = [&](const string& market, const string& code, uint32_t type) {
+        Stock s(market, code, code, type, true, dt, dt);
+        s.setKDataDriver(driver);
+        return s;
+    };
+
+    /** @arg GEM (Shenzhen) sell: stamp duty charged, no transfer fee */
+    Stock gem = makeStock("SZ", "300001", STOCKTYPE_GEM);
+    result = cost_func->getSellCost(dt, gem, 10.0, 1000);
+    expect = CostRecord();
+    expect.commission = 18.0;
+    expect.stamptax = 10.0;
+    expect.transferfee = 0.0;
+    expect.total = 28.0;
+    CHECK_EQ(result, expect);
+
+    /** @arg STAR (Shanghai) sell: stamp duty charged plus Shanghai transfer fee */
+    Stock star = makeStock("SH", "688001", STOCKTYPE_START);
+    result = cost_func->getSellCost(dt, star, 10.0, 1000);
+    expect = CostRecord();
+    expect.commission = 18.0;
+    expect.stamptax = 10.0;
+    expect.transferfee = 1.0;
+    expect.total = 29.0;
+    CHECK_EQ(result, expect);
+
+    /** @arg Beijing Stock Exchange (BJ) sell: stamp duty charged, no transfer fee */
+    Stock bj = makeStock("BJ", "830001", STOCKTYPE_A_BJ);
+    result = cost_func->getSellCost(dt, bj, 10.0, 1000);
+    expect = CostRecord();
+    expect.commission = 18.0;
+    expect.stamptax = 10.0;
+    expect.transferfee = 0.0;
+    expect.total = 28.0;
+    CHECK_EQ(result, expect);
+
+    /** @arg B-share (Shanghai) sell: no stamp duty, only Shanghai transfer fee */
+    Stock b = makeStock("SH", "900001", STOCKTYPE_B);
+    result = cost_func->getSellCost(dt, b, 10.0, 1000);
+    expect = CostRecord();
+    expect.commission = 18.0;
+    expect.stamptax = 0.0;
+    expect.transferfee = 1.0;
+    expect.total = 19.0;
     CHECK_EQ(result, expect);
 }
 
