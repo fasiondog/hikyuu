@@ -239,7 +239,15 @@ inline StockList get_stock_list_from_python(const py::object& stks) {
         const auto& sm = stks.cast<StockManager&>();
         ret = sm.getStockList();
     } else if (py::isinstance<py::sequence>(stks)) {
-        ret = python_list_to_vector<Stock>(stks);
+        ret.reserve(len(stks));
+        const StockManager& sm = StockManager::instance();
+        for (auto item : stks) {
+            if (py::isinstance<py::str>(item)) {
+                ret.emplace_back(sm.getStock(item.cast<string>()));
+            } else {
+                ret.emplace_back(item.cast<Stock>());
+            }
+        }
     } else {
         HKU_THROW("Failed get StockList! Input stks must be Block, sm or sequenc(Stock)!");
     }

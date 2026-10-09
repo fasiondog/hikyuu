@@ -34,6 +34,7 @@ import ConvertAny
 import Pickle
 import GilSafe
 import Misc
+import Block
 import test_common_sql
 
 if __name__ == "__main__":
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     suite.addTest(Pickle.suite())
     suite.addTest(GilSafe.suite())
     suite.addTest(Misc.suite())
+    suite.addTest(Block.suite())
     suite.addTest(test_common_sql.suite())
 
     unittest.TextTestRunner(verbosity=2).run(suite)
