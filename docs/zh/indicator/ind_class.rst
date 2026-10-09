@@ -86,7 +86,8 @@ Indicator
 
     .. py:method:: get(self, pos[, result_index=0])
 
-        获取指定位置的值
+        获取指定位置的值。为提升速度，pos 不做边界检查，必须为有效的非负索引，
+        负值或越界访问行为未定义；需要安全索引（支持负数）请使用 [] 运算符
 
         :param int pos: 指定的位置索引
         :param int result_index: 指定的结果集

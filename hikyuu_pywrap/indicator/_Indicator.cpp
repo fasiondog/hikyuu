@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/indicator/Indicator.h>
+#include <cstring>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -108,7 +109,10 @@ void export_Indicator(py::module& m) {
       .def("get", &Indicator::get, py::arg("pos"), py::arg("result_index") = 0,
            R"(get(self, pos[, result_index=0])
 
-    Get the value at the specified position
+    Get the value at the specified position. For speed, pos is passed to the core
+    unchecked: it must be a valid non-negative index; negative values or out-of-range
+    access are undefined. Use the [] operator for safe indexing with negative-value
+    support.
 
     :param int pos: the specified index position
     :param int result_index: the specified result set
@@ -280,14 +284,20 @@ set_context(self, stock, query)
             auto imp = self.getImp();
             HKU_IF_RETURN(!imp, ret);
             size_t ret_num = imp->getResultNumber();
+            size_t total = imp->size();
 
-            uint64_t* buffer = new uint64_t[self.size() * (ret_num + 1)];
+            auto dates = imp->getDatetimeList();
+            HKU_CHECK(dates.empty() || total == 0 || dates.size() == total,
+                      "The length of the datetime list ({}) does not match the indicator size "
+                      "({})!",
+                      dates.size(), total);
+
+            std::unique_ptr<uint64_t[]> buffer(new uint64_t[total * (ret_num + 1)]);
 
             std::vector<string> names;
             std::vector<string> fields;
             std::vector<int64_t> offsets;
 
-            auto dates = imp->getDatetimeList();
             size_t bytes_size;
             if (!dates.empty()) {
                 names.push_back("datetime");
@@ -298,7 +308,7 @@ set_context(self, stock, query)
                     fields.push_back("d");
                     offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
                 }
-                bytes_size = sizeof(Datetime) + ret_num * sizeof(Indicator::value_t);
+                bytes_size = sizeof(int64_t) + ret_num * sizeof(Indicator::value_t);
             } else {
                 for (size_t i = 0; i < ret_num; i++) {
                     names.push_back(fmt::format("value{}", i));
@@ -319,29 +329,33 @@ set_context(self, stock, query)
             std::vector<const Indicator::value_t*> src(ret_num);
             for (size_t i = 0; i < ret_num; i++) {
                 src[i] = imp->data(i);
+                HKU_CHECK(total == 0 || src[i] != nullptr, "The result {} is not ready!", i);
             }
 
-            uint64_t* data = buffer;
-            double* val = (double*)buffer;
+            uint64_t* data = buffer.get();
+            double* val = (double*)buffer.get();
             if (!dates.empty()) {
                 size_t x = ret_num + 1;
-                for (size_t i = 0, total = imp->size(); i < total; i++) {
+                for (size_t i = 0; i < total; i++) {
                     data[i * x] = dates[i].timestamp() * 1000LL;
                     for (size_t j = 0; j < ret_num; j++) {
                         val[i * x + j + 1] = src[j][i];
                     }
                 }
+            } else if (ret_num == 1) {
+                // contiguous layout, bulk copy
+                std::memcpy(val, src[0], total * sizeof(double));
             } else {
-                for (size_t i = 0, total = imp->size(); i < total; i++) {
+                for (size_t i = 0; i < total; i++) {
                     for (size_t j = 0; j < ret_num; j++) {
                         val[i * ret_num + j] = src[j][i];
                     }
                 }
             }
 
-            auto capsule =
-              py::capsule(buffer, [](void* ptr) { delete[] static_cast<uint64_t*>(ptr); });
-            ret = py::array(dtype, self.size(), data, capsule);
+            auto capsule = py::capsule(buffer.release(),
+                                       [](void* ptr) { delete[] static_cast<uint64_t*>(ptr); });
+            ret = py::array(dtype, total, data, capsule);
             return ret;
         },
         "Convert to np.array; if it is a time series, the datetime date column will be included")
@@ -377,12 +391,19 @@ set_context(self, stock, query)
             std::vector<const Indicator::value_t*> src(ret_num);
             for (size_t i = 0; i < ret_num; i++) {
                 src[i] = self.data(i);
+                HKU_CHECK(self.size() == 0 || src[i] != nullptr, "The result {} is not ready!", i);
             }
 
             // Fill the data into the buffer of the array_t
-            for (size_t i = 0, total = self.size(); i < total; i++) {
-                for (size_t j = 0; j < ret_num; j++) {
-                    buffer[i * ret_num + j] = src[j][i];
+            size_t total = self.size();
+            if (ret_num == 1) {
+                // contiguous layout, bulk copy
+                std::memcpy(buffer, src[0], total * sizeof(double));
+            } else {
+                for (size_t i = 0; i < total; i++) {
+                    for (size_t j = 0; j < ret_num; j++) {
+                        buffer[i * ret_num + j] = src[j][i];
+                    }
                 }
             }
 
@@ -398,9 +419,9 @@ set_context(self, stock, query)
             auto buf = ret.request();
             double* ptr = static_cast<double*>(buf.ptr);
             const auto* src = self.data(result_index);
-            for (size_t i = 0; i < self.size(); i++) {
-                ptr[i] = src[i];
-            }
+            HKU_CHECK(self.size() == 0 || src != nullptr, "The result {} is not ready!",
+                      result_index);
+            std::memcpy(ptr, src, self.size() * sizeof(double));
             return ret;
         },
         py::arg("result_index") = 0, "Convert the specified result set to numpy.array")
@@ -415,6 +436,10 @@ set_context(self, stock, query)
 
             py::dict columns;
             auto dates = self.getDatetimeList();
+            HKU_CHECK(dates.empty() || dates.size() == total,
+                      "The length of the datetime list ({}) does not match the indicator size "
+                      "({})!",
+                      dates.size(), total);
             if (!dates.empty()) {
                 std::vector<int64_t> datetime(total);
                 for (size_t i = 0; i < total; i++) {
@@ -430,9 +455,8 @@ set_context(self, stock, query)
                 auto buf = arr.request();
                 double* dst = static_cast<double*>(buf.ptr);
                 const auto* src = self.data(i);
-                for (size_t j = 0; j < total; j++) {
-                    dst[j] = src[j];
-                }
+                HKU_CHECK(src != nullptr, "The result {} is not ready!", i);
+                std::memcpy(dst, src, total * sizeof(double));
                 columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
@@ -456,9 +480,8 @@ set_context(self, stock, query)
                 auto buf = arr.request();
                 double* dst = static_cast<double*>(buf.ptr);
                 const auto* src = self.data(i);
-                for (size_t j = 0; j < total; j++) {
-                    dst[j] = src[j];
-                }
+                HKU_CHECK(src != nullptr, "The result {} is not ready!", i);
+                std::memcpy(dst, src, total * sizeof(double));
                 columns[fmt::format("value{}", i).c_str()] = arr;
             }
 

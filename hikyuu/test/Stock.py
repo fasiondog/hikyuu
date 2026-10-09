@@ -7,6 +7,8 @@
 # History: 1)20120928, Added by fasiondog
 # ===============================================================================
 
+import threading
+import time
 import unittest
 
 from test_init import *
@@ -34,6 +36,15 @@ class StockTest(unittest.TestCase):
         self.assertEqual(stock.get_krecord(0).datetime, Datetime(199012190000))
         self.assertEqual(stock.get_krecord(1, Query.MIN).datetime, Datetime(200001040932))
 
+        # takes a Query, consistent with the core and get_datetime_list
+        ks = stock.get_krecord_list(Query(0, 5))
+        self.assertEqual(len(ks), 5)
+        self.assertEqual(ks[0].datetime, Datetime(199012190000))
+        self.assertEqual(ks[4].datetime, stock.get_krecord(4).datetime)
+        ks_min = stock.get_krecord_list(Query(10, 13, Query.MIN))
+        self.assertEqual(len(ks_min), 3)
+        self.assertEqual(ks_min[0].datetime, stock.get_krecord(10, Query.MIN).datetime)
+
         s1 = sm['sh000001']
         s2 = sm['sh000001']
         self.assertTrue(s1 == s2)
@@ -42,6 +53,30 @@ class StockTest(unittest.TestCase):
         s2 = sm['sz000001']
         self.assertTrue(not (s1 == s2))
         self.assertTrue(s1 != s2)
+
+        # the whole-series disk load releases the GIL, so other Python threads keep running
+        calendar = stock.get_trading_calendar(Query(0, 10))
+        self.assertGreater(len(calendar), 0)
+
+        stock.release_kdata_buffer(Query.WEEK)
+        counter = [0]
+        stop = threading.Event()
+
+        def spin():
+            while not stop.is_set():
+                counter[0] += 1
+                time.sleep(0)
+
+        thread = threading.Thread(target=spin)
+        thread.start()
+        time.sleep(0.05)
+        before = counter[0]
+        stock.load_kdata_to_buffer(Query.WEEK)
+        progress = counter[0] - before
+        stop.set()
+        thread.join()
+        stock.release_kdata_buffer(Query.WEEK)  # restore the pre-test buffer state
+        self.assertGreater(progress, 50)
 
     def test_pickle(self):
         if not constant.pickle_support:

@@ -29,6 +29,20 @@ class AddIndicator(IndicatorImp):
             self._set(ind[i] + 1, i)
 
 
+class PartialReadyIndicator(IndicatorImp):
+    """Claims two result sets but never allocates their buffers, so data(i) is nullptr"""
+
+    def __init__(self, indicator):
+        super(PartialReadyIndicator, self).__init__("PartialReadyIndicator", 2)
+        self.set_discard(0)
+
+    def _clone(self):
+        return PartialReadyIndicator(Indicator())
+
+    def _calculate(self, ind):
+        pass
+
+
 class IndicatorTest(unittest.TestCase):
     def test_PRICELIST(self):
         a = toPriceList([0, 1, 2, 3])
@@ -453,6 +467,44 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(len(result), len(k))
         for i in range(len(result)):
             self.assertEqual(result[i], 1.0)
+
+    def test_to_np_to_df_datetime_length_mismatch(self):
+        # a datetime list shorter than the indicator must raise instead of reading
+        # out of bounds in to_np/to_df
+        k = sm['sh000001'].get_kdata(Query(-20))
+        ind = CLOSE(k)
+        self.assertEqual(len(ind), 20)
+        ind.set_param("align_date_list", DatetimeList([Datetime(2024, 1, 1), Datetime(2024, 1, 2)]))
+        with self.assertRaises(Exception):
+            ind.to_np()
+        with self.assertRaises(Exception):
+            ind.to_df()
+
+        # a consistent indicator keeps working
+        ind2 = CLOSE(k)
+        self.assertEqual(len(ind2.to_np()), 20)
+        df = ind2.to_df()
+        self.assertEqual(len(df), 20)
+
+        # an empty indicator returns an empty table even with a stale align param
+        k_empty = sm['sh000001'].get_kdata(Query(0, 0))
+        ind3 = CLOSE(k_empty)
+        self.assertEqual(len(ind3), 0)
+        ind3.set_param("align_date_list", DatetimeList([Datetime(2024, 1, 1)]))
+        self.assertEqual(len(ind3.to_np()), 0)
+        self.assertEqual(len(ind3.to_df()), 0)
+
+    def test_result_buffer_not_ready(self):
+        # the result buffers are never allocated (size 0): all converters must return
+        # empty results instead of crashing on the null buffers
+        x = sm['sh000001'].get_kdata(Query(-10))
+        ind = Indicator(PartialReadyIndicator(CLOSE(x)))
+        self.assertEqual(ind.get_result_num(), 2)
+        self.assertEqual(len(ind.to_np()), 0)
+        self.assertEqual(len(ind.value_to_np()), 0)
+        self.assertEqual(len(ind.to_df()), 0)
+        self.assertEqual(len(ind.value_to_df()), 0)
+        self.assertEqual(len(ind.to_array(0)), 0)
 
 
 def suite():

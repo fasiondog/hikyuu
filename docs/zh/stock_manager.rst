@@ -294,6 +294,8 @@ StockManager/Block/Stock
         获取证券列表
         
         :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数
+
+        filter 在列表快照上执行，允许在 filter 内增删证券
         
     .. py:method:: __getitem__
 
@@ -483,13 +485,11 @@ StockManager/Block/Stock
         :rtype: KRecord
     
     
-    .. py:method:: get_krecord_list(self, start, end, ktype)
+    .. py:method:: get_krecord_list(self, query)
     
-        获取K线记录 [start, end)，一般不直接使用，用getKData替代
+        获取查询条件指定的K线记录，一般不直接使用，用getKData替代
         
-        :param int start: 起始位置
-        :param int end: 结束位置
-        :param Query.KType ktype: K线类别
+        :param Query query: 查询条件
         :return: K线记录列表
         :rtype: KRecordList
     

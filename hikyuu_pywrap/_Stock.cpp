@@ -157,14 +157,11 @@ void export_Stock(py::module& m) {
         :return: the K-line record
         :rtype: KRecord)")
 
-      .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, start, end,
-          ktype)
+      .def("get_krecord_list", &Stock::getKRecordList, R"(get_krecord_list(self, query)
 
-        Get the K-line records [start, end); it is generally not used directly.
+        Get the K-line records specified by the query; it is generally not used directly.
 
-        :param int start: the start position
-        :param int end: the end position
-        :param Query.KType ktype: the K-line category
+        :param Query query: the query condition
         :return: the K-line record list
         :rtype: KRecordList)")
 
@@ -241,6 +238,7 @@ void export_Stock(py::module& m) {
         For the daily use, it is recommended to use the FINANCE indicator directly to get the finance data)")
 
       .def("get_trading_calendar", &Stock::getTradingCalendar, py::arg("query"),
+           py::call_guard<py::gil_scoped_release>(),
            R"(get_trading_calendar(self, query)
 
         Get the trading calendar of its own market (not its own trading dates)
@@ -249,7 +247,9 @@ void export_Stock(py::module& m) {
         :return: the date list
         :rtype: DatetimeList)")
 
-      .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer, R"(load_kdata_to_buffer(self,
+      .def("load_kdata_to_buffer", &Stock::loadKDataToBuffer,
+           py::call_guard<py::gil_scoped_release>(),
+           R"(load_kdata_to_buffer(self,
           ktype)
 
         Load the K-line data of the specified category into the memory cache; if the cache already exists, you need to release_kdata_buffer first

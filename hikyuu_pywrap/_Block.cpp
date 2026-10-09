@@ -21,7 +21,8 @@ string (Block::*getName)() const = &Block::name;
 void (Block::*setName)(const string&) = &Block::name;
 
 void export_Block(py::module& m) {
-    py::class_<Block>(m, "Block", "The block class, which can be regarded as a container of the securities")
+    py::class_<Block>(m, "Block",
+                      "The block class, which can be regarded as a container of the securities")
       .def(py::init<>())
       .def(py::init<const string&, const string&>(), py::arg("category"), py::arg("name"))
       .def(py::init<const string&, const string&, const string&>(), py::arg("category"),
@@ -119,16 +120,25 @@ void export_Block(py::module& m) {
             } else {
                 HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
                 py::object filter_func = filter.attr("__call__");
-                ret = self.getStockList(
-                  [&](const Stock& stk) { return filter_func(stk).cast<bool>(); });
+                // snapshot first: the Python filter must never run while the block dict is
+                // iterated, it may add or remove stocks
+                StockList all = self.getStockList();
+                ret.reserve(all.size());
+                for (const auto& stk : all) {
+                    if (filter_func(stk).cast<bool>()) {
+                        ret.emplace_back(stk);
+                    }
+                }
             }
             return ret;
         },
         py::arg("filter") = py::none(), R"(get_stock_list(self[, filter=None])
-        
+
     Get the security list
 
-    :param func filter: a filter function whose input parameter is the stock and which returns True | False)")
+    :param func filter: a filter function whose input parameter is the stock and which returns True | False
+
+    The filter runs on a snapshot of the list, so it may add or remove stocks.)")
 
       .def(py::hash(py::self))
       .def(py::self == py::self)

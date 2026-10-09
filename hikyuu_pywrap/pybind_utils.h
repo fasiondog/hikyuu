@@ -11,7 +11,9 @@
 
 #include <hikyuu/config.h>
 #include <hikyuu/Stock.h>
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <type_traits>
 #include <pybind11/pybind11.h>
 
@@ -28,19 +30,28 @@ namespace py = pybind11;
 
 namespace hku {
 
-// Wrap a py::object so its lifetime can safely cross worker threads (e.g. TimerManager
-// entries). The deleter acquires the GIL before releasing; if the interpreter is going
-// down, skip decref (leak; process is exiting). Reusable across pybind bindings.
+// Wrap a py::object so its lifetime can safely cross worker threads (e.g. Strategy
+// Python callbacks). The deleter acquires the GIL before releasing; if the interpreter
+// is finalizing, skip decref (leak; process is exiting). Finalization is detected via a
+// Py_AtExit flag set at shutdown start, so it is correct on Python <3.13 too (where
+// Py_IsFinalizing is not public). Reusable across pybind bindings.
+inline std::atomic<bool>& g_interpreter_finalizing() {
+    static std::atomic<bool> f{false};
+    return f;
+}
+
+inline void register_finalizing_flag() {
+    static std::once_flag once;
+    std::call_once(once, []() {
+        Py_AtExit([]() { g_interpreter_finalizing().store(true, std::memory_order_release); });
+    });
+}
+
 inline std::shared_ptr<py::object> make_gil_safe(py::object obj) {
+    register_finalizing_flag();
     return std::shared_ptr<py::object>(new py::object(std::move(obj)), [](py::object* p) {
-        bool finalizing =
-#if PY_VERSION_HEX >= 0x030D0000
-          Py_IsFinalizing() != 0;
-#else
-            !Py_IsInitialized();
-#endif
-        if (finalizing) {
-            return;
+        if (g_interpreter_finalizing().load(std::memory_order_acquire)) {
+            return;  // leak; process is exiting
         }
         py::gil_scoped_acquire gil;
         delete p;
@@ -137,22 +148,27 @@ public:                                                                         
     }
 
 // The `inspect` handles used by check_pyfunction_arg_num, cached because the check runs on every
-// callback registration. Intentionally leaked: the cached objects outlive the interpreter and
-// must not be decref'd during finalization.
+// callback registration. Held as raw PyObject* to keep pybind11 types out of the struct (they are
+// compiled with hidden visibility). The references are intentionally leaked: the cache outlives
+// the interpreter and must not be decref'd during finalization.
 inline const auto& py_inspect_cache() {
     struct Cache {
-        py::object inspect;
-        py::object empty;           // inspect.Parameter.empty
-        py::object var_positional;  // inspect.Parameter.VAR_POSITIONAL
-        py::object var_keyword;     // inspect.Parameter.VAR_KEYWORD
-        py::object keyword_only;    // inspect.Parameter.KEYWORD_ONLY
+        PyObject* inspect;
+        PyObject* empty;           // inspect.Parameter.empty
+        PyObject* var_positional;  // inspect.Parameter.VAR_POSITIONAL
+        PyObject* var_keyword;     // inspect.Parameter.VAR_KEYWORD
+        PyObject* keyword_only;    // inspect.Parameter.KEYWORD_ONLY
     };
 
     static const Cache* cache = new Cache{[]() {
         py::object inspect = py::module_::import("inspect");
         py::object parameter = inspect.attr("Parameter");
-        return Cache{inspect, parameter.attr("empty"), parameter.attr("VAR_POSITIONAL"),
-                     parameter.attr("VAR_KEYWORD"), parameter.attr("KEYWORD_ONLY")};
+        py::object empty = parameter.attr("empty");
+        py::object var_positional = parameter.attr("VAR_POSITIONAL");
+        py::object var_keyword = parameter.attr("VAR_KEYWORD");
+        py::object keyword_only = parameter.attr("KEYWORD_ONLY");
+        return Cache{inspect.release().ptr(), empty.release().ptr(), var_positional.release().ptr(),
+                     var_keyword.release().ptr(), keyword_only.release().ptr()};
     }()};
     return *cache;
 }
@@ -165,7 +181,7 @@ inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
     const auto& cache = py_inspect_cache();
     py::object params;
     try {
-        params = cache.inspect.attr("signature")(func).attr("parameters");
+        params = py::handle(cache.inspect).attr("signature")(func).attr("parameters");
     } catch (py::error_already_set& e) {
         // Not introspectable: accept instead of breaking the registration
         if (e.matches(PyExc_ValueError) || e.matches(PyExc_TypeError)) {
@@ -176,16 +192,17 @@ inline bool check_pyfunction_arg_num(const py::object& func, size_t arg_num) {
 
     size_t required = 0, positional = 0;
     for (auto item : params.attr("values")()) {
-        py::object kind = item.attr("kind");
-        if (kind.is(cache.var_positional)) {
+        py::object kind_obj = item.attr("kind");
+        PyObject* kind = kind_obj.ptr();
+        if (kind == cache.var_positional) {
             return true;  // *args accepts any number of positional arguments
         }
-        if (kind.is(cache.var_keyword)) {
+        if (kind == cache.var_keyword) {
             continue;  // **kwargs only absorbs keyword arguments
         }
         py::object default_value = item.attr("default");
-        bool has_default = !default_value.is(cache.empty);
-        if (kind.is(cache.keyword_only)) {
+        bool has_default = default_value.ptr() != cache.empty;
+        if (kind == cache.keyword_only) {
             // the caller only passes positional arguments
             HKU_IF_RETURN(!has_default, false);
             continue;
@@ -222,7 +239,15 @@ inline StockList get_stock_list_from_python(const py::object& stks) {
         const auto& sm = stks.cast<StockManager&>();
         ret = sm.getStockList();
     } else if (py::isinstance<py::sequence>(stks)) {
-        ret = python_list_to_vector<Stock>(stks);
+        ret.reserve(len(stks));
+        const StockManager& sm = StockManager::instance();
+        for (auto item : stks) {
+            if (py::isinstance<py::str>(item)) {
+                ret.emplace_back(sm.getStock(item.cast<string>()));
+            } else {
+                ret.emplace_back(item.cast<Stock>());
+            }
+        }
     } else {
         HKU_THROW("Failed get StockList! Input stks must be Block, sm or sequenc(Stock)!");
     }
