@@ -463,8 +463,7 @@ TEST_CASE("test_TradeManager_checkoutStock_base_asset") {
     FundsRecord funds = tm->getFunds(Datetime(199901020000));
     CHECK_EQ(funds.base_asset, 1000.0);
 
-    /** @arg After withdrawing the stock the base asset must be zero (ISS-040: the checkout
-     * subtracted the value so the base asset was doubled by the checkin + checkout) */
+    /** @arg After withdrawing the stock the base asset must be zero */
     CHECK_EQ(tm->checkoutStock(Datetime(199901030000), stock, 10.0, 100), true);
     funds = tm->getFunds(Datetime(199901030000));
     CHECK_EQ(funds.base_asset, 0.0);
@@ -477,7 +476,7 @@ TEST_CASE("test_TradeManager_getFunds_fractional_stock") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
 
     /** @arg The fractional shares produced by the dividend replay must not be truncated in
-     * getFunds (ISS-041: depositing 1000 + 151.5 shares) */
+     * getFunds */
     CHECK_EQ(tm->checkinStock(Datetime(200001040000), stock, 10.0, 1000), true);
     CHECK_EQ(tm->checkinStock(Datetime(200001050000), stock, 10.0, 151.5), true);
 
@@ -540,20 +539,18 @@ TEST_CASE("test_TradeManager_buy_margin") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 6000, TC_Zero());
     tm->setParam<bool>("support_borrow_cash", true);
 
-    /** @arg Enough own cash: no borrowing at all (ISS-045: the full amount was borrowed
-     * unconditionally) */
+    /** @arg Enough own cash: no borrowing at all */
     TradeRecord tr = tm->buy(Datetime(199901020000), stock, 10.0, 100);
     CHECK_EQ(tr.business, BUSINESS_BUY);
     CHECK_EQ(tm->getDebtCash(Datetime(199901020000)), 0.0);
 
-    /** @arg Insufficient cash: borrow only the shortfall (ISS-045) */
+    /** @arg Insufficient cash: borrow only the shortfall */
     tr = tm->buy(Datetime(199901030000), stock, 10.0, 600);
     CHECK_EQ(tr.business, BUSINESS_BUY);
     CHECK_EQ(tr.number, 600);
     CHECK_EQ(tm->getDebtCash(Datetime(199901030000)), 1000);
 
-    /** @arg Insufficient buying power: fail cleanly without any residue (ISS-045: the validation
-     * ran after the auto checkin and the full borrowing) */
+    /** @arg Insufficient buying power: fail cleanly without any residue */
     tr = tm->buy(Datetime(199901040000), stock, 10.0, 5000);
     CHECK_EQ(tr.business, BUSINESS_INVALID);
     CHECK_EQ(tm->getDebtCash(Datetime(199901040000)), 1000);
@@ -569,7 +566,7 @@ TEST_CASE("test_TradeManager_buyShort_cash_check") {
     CHECK_EQ(tm->borrowStock(Datetime(199901020000), stock, 10.0, 100), true);
     CHECK_EQ(tm->sellShort(Datetime(199901030000), stock, 10.0, 100).business, BUSINESS_SELL_SHORT);
 
-    /** @arg The cash is insufficient to buy back: reject without overdrawing (ISS-046) */
+    /** @arg The cash is insufficient to buy back: reject without overdrawing */
     CHECK_EQ(tm->checkout(Datetime(199901040000), 101000), true);
     CHECK_EQ(tm->currentCash(), 0.0);
     TradeRecord tr = tm->buyShort(Datetime(199901050000), stock, 10.0, 100);
@@ -1126,7 +1123,7 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
 }
 
 /** @par Test point: rebuild an account from a full trade list covering every reconstructable
- * business type (TM-107) */
+ * business type */
 TEST_CASE("test_TradeManager_addTradeRecord_roundtrip") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -1198,13 +1195,12 @@ TEST_CASE("test_TradeManager_returnCash_multi_loan") {
     CHECK_EQ(tm->returnCash(Datetime(199901040000), 100.30), true);
     CHECK_EQ(tm->getDebtCash(Datetime(199901050000)), 0.0);
 
-    /** @arg Returning more than the debt but within the grid unit is treated as fully repaid
-     * (ISS-127) */
+    /** @arg Returning more than the debt but within the grid unit is treated as fully repaid */
     tm->borrowCash(Datetime(199901060000), 100.00);
     CHECK_EQ(tm->returnCash(Datetime(199901070000), 100.004), true);
     CHECK_EQ(tm->getDebtCash(Datetime(199901080000)), 0.0);
 
-    /** @arg Returning more than the debt beyond the grid unit is rejected (ISS-127) */
+    /** @arg Returning more than the debt beyond the grid unit is rejected */
     tm->borrowCash(Datetime(199901090000), 100.00);
     CHECK_EQ(tm->returnCash(Datetime(199901100000), 100.01), false);
     CHECK_EQ(tm->getDebtCash(Datetime(199901110000)), 100.0);
@@ -1435,7 +1431,7 @@ TEST_CASE("test_TradeManager_margin_and_borrow_atomicity") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
 
-    // TM-105: insufficient margin must reject instead of injecting cash via checkin
+    // insufficient margin must reject instead of injecting cash via checkin
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100, TC_Zero());
     tm->setParam<bool>("support_borrow_stock", true);
     TradeRecord result = tm->sellShort(Datetime(199911170000), stock, 10.0, 1000);
@@ -1465,7 +1461,7 @@ TEST_CASE("test_TradeManager_margin_and_borrow_atomicity") {
     CHECK_EQ(tm->getDebtNumber(Datetime(199911180000), stock), 400.0);
     CHECK_EQ(tm->getShortHoldNumber(Datetime(199911180000), stock), 400.0);
 
-    // TM-115: the auto financing borrow covers exactly the shortfall (zero-cost case)
+    // the auto financing borrow covers exactly the shortfall (zero-cost case)
     tm = crtTM(Datetime(199901010000), 5000, TC_Zero());
     tm->setParam<bool>("support_borrow_cash", true);
     result = tm->buy(Datetime(199911170000), stock, 10.0, 600);
@@ -1500,6 +1496,190 @@ TEST_CASE("test_TradeManager_margin_and_borrow_atomicity") {
     for (const auto& tr : tm->getRefTradeList()) {
         CHECK_UNARY(tr.business != BUSINESS_BORROW_CASH);
     }
+}
+
+/** @par Test points: getFunds-before-init guard, sell NaN-number contract, getPosition
+ * open-holding fallback, and short totalRisk on stoploss=0 / partial cover */
+TEST_CASE("test_TradeManager_m3_guards") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
+    /** @arg getFunds before the account creation date returns an empty record */
+    TradeManagerPtr tm = crtTM(Datetime(199901100000), 100000, TC_Zero());
+    FundsRecord before = tm->getFunds(Datetime(199901010000));
+    CHECK_EQ(before.cash, 0.0);
+    CHECK_EQ(before.base_cash, 0.0);
+
+    /** @arg a NaN number returns INVALID instead of throwing */
+    TradeRecord r;
+    CHECK_NOTHROW(r = tm->sell(Datetime(199911170000), stock, 10.0, nan));
+    CHECK_EQ(r.business, BUSINESS_INVALID);
+
+    /** @arg getPosition on a date strictly before lastDatetime, for a holding still open
+     * then, falls back to the live record (not a null-stock default with a positive number) */
+    tm->buy(Datetime(199911150000), stock, 10.0, 100);
+    tm->buy(Datetime(199911180000), stock, 10.0, 100);  // pushes lastDatetime past the query
+    PositionRecord pr = tm->getPosition(Datetime(199911160000), stock);
+    CHECK_UNARY(pr.stock == stock);
+    CHECK_EQ(pr.number, 100.0);  // replayed quantity at the query date
+    CHECK_UNARY(pr.takeDatetime <= Datetime(199911160000));
+
+    /** @arg sellShort with stoploss==0 accumulates no (negative) risk */
+    TradeManagerPtr tm0 = crtTM(Datetime(199901010000), 1000000, TC_Zero());
+    tm0->setParam<bool>("support_borrow_stock", true);
+    tm0->borrowStock(Datetime(199911100000), stock, 10.0, 500);
+    tm0->sellShort(Datetime(199911100000), stock, 10.0, 400, 0.0);
+    CHECK_EQ(tm0->getShortPosition(stock).totalRisk, 0.0);
+
+    /** @arg buyShort partial cover scales totalRisk by the remaining fraction */
+    TradeManagerPtr tm1 = crtTM(Datetime(199901010000), 1000000, TC_Zero());
+    tm1->setParam<bool>("support_borrow_stock", true);
+    tm1->borrowStock(Datetime(199911100000), stock, 10.0, 400);
+    double full_risk = roundEx((12.0 - 10.0) * 400 * stock.unit(), 2);
+    tm1->sellShort(Datetime(199911100000), stock, 10.0, 400, 12.0);
+    CHECK_EQ(tm1->getShortPosition(stock).totalRisk, full_risk);
+    /** @arg the live path books gross proceeds too, with no open fee folded into buyMoney */
+    CHECK_EQ(tm1->getShortPosition(stock).sellMoney, roundEx(10.0 * 400 * stock.unit(), 2));
+    CHECK_EQ(tm1->getShortPosition(stock).buyMoney, 0.0);
+    tm1->buyShort(Datetime(199911110000), stock, 11.0, 100);
+    CHECK_EQ(tm1->getShortPosition(stock).totalRisk, roundEx(full_risk * 300.0 / 400.0, 2));
+    /** @arg the live buyShort records the gross buy-back amount on buyMoney */
+    CHECK_EQ(tm1->getShortPosition(stock).buyMoney, roundEx(11.0 * 100 * stock.unit(), 2));
+}
+
+#if HKU_SUPPORT_SERIALIZATION
+/** @par Test point: right after load, a historical cash query must not return the current cash */
+TEST_CASE("test_TradeManager_cash_after_load") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero(), "TM109");
+    tm->buy(Datetime(199911170000), stock, 10.0, 100);  // spend 1000 -> current cash 99000
+    tm->cash(Datetime(199912010000));                   // advance the (unstrored) update cursor
+
+    string file = sm.tmpdir() + "/tm109_cash.xml";
+    {
+        std::ofstream ofs(file);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(tm);
+    }
+    TradeManagerPtr tm2;
+    {
+        std::ifstream ifs(file);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(tm2);
+    }
+
+    /** @arg a pre-buy historical query returns the historical cash, not the current 99000 */
+    CHECK_EQ(tm2->cash(Datetime(199901150000)), 100000.0);
+    CHECK_EQ(tm2->currentCash(), 99000.0);
+}
+#endif /* HKU_SUPPORT_SERIALIZATION */
+
+/** @par Test point: tocsv runs without throwing even when the account name contains
+ * path separators (the name is sanitized, so the export cannot escape the target directory) */
+TEST_CASE("test_TradeManager_tocsv") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero(), "../evil/name");
+    tm->buy(Datetime(199911170000), stock, 10.0, 100);
+    tm->setParam<bool>("support_borrow_stock", true);
+    tm->borrowStock(Datetime(199911170000), stock, 10.0, 200);
+    tm->sellShort(Datetime(199911170000), stock, 10.0, 100);
+
+    // tocsv never throws; the existence check is what pins the sanitization
+    CHECK_NOTHROW(tm->tocsv(sm.tmpdir()));
+    std::ifstream f(sm.tmpdir() + "/___evil_name_actions.txt");
+    CHECK_UNARY(f.good());
+}
+
+/** @par Test points: short cost caliber (gross proceeds, fees only in totalCost), rebuild/live
+ * parity, and totalRisk rules */
+TEST_CASE("test_TradeManager_short_cost_caliber") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    double u = stock.unit();
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 1000000, TC_Zero());
+
+    CostRecord c1;
+    c1.commission = 10.0;
+    c1.total = 10.0;
+    TradeRecord o(stock, Datetime(199911100000), BUSINESS_SELL_SHORT, 10.0, 10.0, 0.0, 100, c1,
+                  12.0, tm->currentCash(), PART_INVALID);
+    CHECK_UNARY(tm->addTradeRecord(o));
+
+    /** @arg gross sellMoney, fees only in totalCost, no open fee folded into buyMoney */
+    PositionRecord p = tm->getShortPosition(stock);
+    CHECK_EQ(p.sellMoney, roundEx(10.0 * 100 * u, 2));
+    CHECK_EQ(p.buyMoney, 0.0);
+    CHECK_EQ(p.totalCost, 10.0);
+    /** @arg stoploss=12>0 -> totalRisk from the rebuild path too */
+    CHECK_EQ(p.totalRisk, roundEx((12.0 - 10.0) * 100 * u, 2));
+
+    /** @arg a partial cover records gross buyMoney and scales totalRisk by the remaining fraction
+     */
+    CostRecord c2;
+    c2.commission = 8.0;
+    c2.total = 8.0;
+    TradeRecord cl(stock, Datetime(199911110000), BUSINESS_BUY_SHORT, 12.0, 12.0, 0.0, 40, c2, 12.0,
+                   tm->currentCash(), PART_INVALID);
+    CHECK_UNARY(tm->addTradeRecord(cl));
+    p = tm->getShortPosition(stock);
+    CHECK_EQ(p.number, 60.0);
+    CHECK_EQ(p.buyMoney, roundEx(12.0 * 40 * u, 2));
+    CHECK_EQ(p.totalCost, 18.0);
+    CHECK_EQ(p.totalRisk, roundEx((12.0 - 10.0) * 100 * u * 60.0 / 100.0, 2));
+
+    /** @arg after a full close totalProfit() = P1*N - P2*N - all fees is exact (no double count) */
+    CostRecord c3;
+    c3.commission = 6.0;
+    c3.total = 6.0;
+    TradeRecord cl2(stock, Datetime(199911120000), BUSINESS_BUY_SHORT, 11.0, 11.0, 0.0, 60, c3,
+                    12.0, tm->currentCash(), PART_INVALID);
+    CHECK_UNARY(tm->addTradeRecord(cl2));
+    CHECK_EQ(tm->getShortPositionList().empty(), true);
+    PositionRecordList hist = tm->getShortHistoryPositionList();
+    REQUIRE_EQ(hist.size(), 1);
+    price_t exp_profit = roundEx(10.0 * 100 * u, 2) -
+                         roundEx(roundEx(12.0 * 40 * u, 2) + roundEx(11.0 * 60 * u, 2), 2) - 24.0;
+    CHECK_EQ(hist[0].totalProfit(), exp_profit);
+}
+
+/** @par Test point: a full checkoutStock marks the closed position with a cleanDatetime and stores
+ * it into the history (previously left Null, so totalProfit() errored and returned 0) */
+TEST_CASE("test_TradeManager_checkout_clean_datetime") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero());
+    tm->buy(Datetime(199911150000), stock, 10.0, 100);
+    CHECK_UNARY(tm->checkoutStock(Datetime(199911170000), stock, 11.0, 100));
+
+    CHECK_EQ(tm->getPositionList().empty(), true);
+    PositionRecordList hist = tm->getHistoryPositionList();
+    REQUIRE_EQ(hist.size(), 1);
+    /** @arg the closed record carries the checkout date, so totalProfit() computes normally */
+    CHECK_EQ(hist[0].cleanDatetime, Datetime(199911170000));
+    CHECK_EQ(hist[0].totalProfit(),
+             roundEx(11.0 * 100 * stock.unit() - 10.0 * 100 * stock.unit(), 2));
+}
+
+/** @par Test point: getFundsList for a date before the account creation date yields an empty
+ * record, consistent with getFunds */
+TEST_CASE("test_TradeManager_getFundsList_before_init") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    TradeManagerPtr tm = crtTM(Datetime(199901100000), 100000, TC_Zero());
+    tm->buy(Datetime(199911170000), stock, 10.0, 100);  // ensures the batch replay path is taken
+
+    DatetimeList dates;
+    dates.push_back(Datetime(199901010000));  // before init
+    dates.push_back(Datetime(199911180000));  // after the buy
+    FundsList fl = tm->getFundsList(dates);
+    CHECK_EQ(fl[0].cash, 0.0);
+    CHECK_EQ(fl[0].base_cash, 0.0);
+    /** @arg matches getFunds on the same historical date */
+    CHECK_EQ(fl[0].cash, tm->getFunds(Datetime(199901010000)).cash);
+    CHECK_EQ(fl[1].cash, tm->getFunds(Datetime(199911180000)).cash);
 }
 
 /** @par Test point: incremental short-circuit must be idempotent — querying many times yields the
