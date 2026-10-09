@@ -33,6 +33,11 @@ void IIsLimitDown::_calculate(const Indicator& ind) {
     _increment_calculate(ind, 1);
 }
 
+size_t IIsLimitDown::min_increment_start() const {
+    // ks[i - 1] is read, so the first bar of the context cannot be judged
+    return 1;
+}
+
 void IIsLimitDown::_increment_calculate(const Indicator& data, size_t start_pos) {
     const KData& kdata = getContext();
     size_t total = kdata.size();
