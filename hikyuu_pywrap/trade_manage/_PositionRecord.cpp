@@ -48,7 +48,7 @@ void export_PositionRecord(py::module& m) {
                              R"(total_profit(self):
 
     The cumulative profit = the cumulative sell funds - the cumulative buy funds - the cumulative trading cost
-    Note: it is only valid for the closed records; the open records return 0  )")
+    Note: it is only valid for the closed records; the open records return nan (float('nan'))  )")
 
         DEF_PICKLE(PositionRecord);
 

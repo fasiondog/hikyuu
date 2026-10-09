@@ -57,14 +57,14 @@ string TradeManager::str() const {
     for (; iter != position.end(); ++iter) {
         price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
         KData k = iter->stock.getKData(query);
-        price_t cur_val = k[0].closePrice * iter->number;
+        price_t cur_val = k.size() > 0 ? k[0].closePrice * iter->number : 0.0;
         price_t bonus = cur_val - invest;
         DatetimeList date_list =
           sm.getTradingCalendar(KQueryByDate(Datetime(iter->takeDatetime.date())));
         os << "    " << iter->stock.market_code() << " " << iter->stock.name() << " "
            << iter->takeDatetime << " " << date_list.size() << " " << iter->number << " " << invest
-           << " " << cur_val << " " << bonus << " " << 100 * bonus / invest << "% "
-           << 100 * bonus / m_init_cash << "%\n";
+           << " " << cur_val << " " << bonus << " " << (invest != 0.0 ? 100 * bonus / invest : 0.0)
+           << "% " << (m_init_cash != 0.0 ? 100 * bonus / m_init_cash : 0.0) << "%\n";
     }
 
     os << "  Short Position: \n";
@@ -115,6 +115,7 @@ TradeManager::~TradeManager() {}
 
 void TradeManager::_reset() {
     m_last_update_datetime = m_init_datetime;
+    m_tmp_weight_checked_until.clear();
     m_cash = m_init_cash;
     m_checkin_cash = m_init_cash;
     m_checkout_cash = 0.0;
@@ -132,6 +133,8 @@ void TradeManager::_reset() {
 
     m_position.clear();
     m_position_history.clear();
+    m_short_position.clear();
+    m_short_position_history.clear();
     m_actions.clear();
     _saveAction(m_trade_list.back());
 }
@@ -141,6 +144,7 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_init_datetime = m_init_datetime;
     p->m_init_cash = m_init_cash;
     p->m_last_update_datetime = m_last_update_datetime;
+    p->m_tmp_weight_checked_until = m_tmp_weight_checked_until;
 
     p->m_cash = m_cash;
     p->m_checkin_cash = m_checkin_cash;
@@ -153,6 +157,8 @@ TradeManagerPtr TradeManager::_clone() {
     p->m_trade_list = m_trade_list;
     p->m_position = m_position;
     p->m_position_history = m_position_history;
+    p->m_short_position = m_short_position;
+    p->m_short_position_history = m_short_position_history;
     p->m_actions = m_actions;
     return p;
 }
@@ -254,6 +260,9 @@ double TradeManager::getShortHoldNumber(const Datetime& datetime, const Stock& s
             } else if (BUSINESS_BUY_SHORT == iter->business) {
                 number -= iter->number;
 
+            } else if (BUSINESS_SHORT_ADJUST == iter->business) {
+                number += iter->number;
+
             } else {
                 // The other cases are ignored
             }
@@ -288,6 +297,8 @@ double TradeManager::getDebtNumber(const Datetime& datetime, const Stock& stock)
                 debt_n += iter->number;
             } else if (iter->business == BUSINESS_RETURN_STOCK) {
                 debt_n -= iter->number;
+            } else if (iter->business == BUSINESS_BORROW_ADJUST) {
+                debt_n += iter->number;
             }
         }
     }
@@ -410,14 +421,20 @@ PositionRecord TradeManager::getPosition(const Datetime& datetime, const Stock& 
     for (auto iter = m_position_history.rbegin(); iter != m_position_history.rend(); ++iter) {
         if (iter->stock == stock) {
             result = *iter;
-            break;
+            result.number = number;
+            return result;
         }
     }
 
-    HKU_WARN_IF(result.stock != stock, "Not found in the history positions, maybe exists error! {}",
-                stock);
-    result.number = number;
-    return result;
+    // Not closed by the query date: fall back to the currently open position so the returned
+    // record carries a real stock and economic fields (not an inconsistent default with a
+    // positive number and a null stock)
+    position_map_type::const_iterator open = m_position.find(stock.id());
+    HKU_ERROR_IF_RETURN(open == m_position.end(), Null<PositionRecord>(),
+                        "{} Not found in the history positions, maybe exists error!", stock);
+    PositionRecord cur = open->second;
+    cur.number = number;
+    return cur;
 }
 
 PositionRecord TradeManager::getShortPosition(const Stock& stock) const {
@@ -480,7 +497,9 @@ bool TradeManager::checkout(const Datetime& datetime, price_t cash) {
 bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, price_t price,
                                 double number) {
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkin Null stock!", datetime);
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} number is zero!", datetime, stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} number({}) must be finite and > 0!", datetime, stock.market_code(),
+                        number);
     HKU_ERROR_IF_RETURN(price <= 0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
@@ -489,6 +508,8 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The holding grows at this datetime; drop the check frontier for this stock (see buy)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     // Add it to the current positions
     int precision = getParam<int>("precision");
@@ -524,8 +545,9 @@ bool TradeManager::checkinStock(const Datetime& datetime, const Stock& stock, pr
 bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, price_t price,
                                  double number) {
     HKU_ERROR_IF_RETURN(stock.isNull(), false, "{} Try checkout Null stock!", datetime);
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} checkout number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} checkout number({}) must be finite and > 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} checkout price({:<.4f}) must be > 0.0! ",
                         datetime, stock.market_code(), price);
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
@@ -553,6 +575,7 @@ bool TradeManager::checkoutStock(const Datetime& datetime, const Stock& stock, p
     // After the withdrawal all the current position quantities become 0, clear the current position
     // and store it into the historical positions
     if (0 == pos.number) {
+        pos.cleanDatetime = datetime;
         m_position_history.push_back(pos);
         m_position.erase(stock.id());
     }
@@ -664,13 +687,16 @@ bool TradeManager::borrowStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} Try to borrow number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} borrow number({}) must be finite and > 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The borrow debt grows at this datetime; drop the check frontier for this stock (see buy)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     // Add it to the current positions
     int precision = getParam<int>("precision");
@@ -708,8 +734,9 @@ bool TradeManager::returnStock(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(datetime < lastDatetime(), false,
                         "{} {} datetime must be >= lastDatetime({})!", datetime,
                         stock.market_code(), lastDatetime());
-    HKU_ERROR_IF_RETURN(number == 0, false, "{} {} return stock number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number <= 0, false,
+                        "{} {} return number({}) must be finite and > 0!", datetime,
+                        stock.market_code(), number);
     HKU_ERROR_IF_RETURN(price <= 0.0, false, "{} {} price({:<.4f}) must be > 0!", datetime,
                         stock.market_code(), price);
 
@@ -840,6 +867,9 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The holding grows at this datetime; drop that stock's check frontier so an out-of-order
+    // trade earlier than the cached date still rescans (see updateWithWeight incremental cache)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
 
@@ -856,15 +886,37 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
         price_t x = roundEx(m_cash / rate + cost.total + bor_cost.total, precision);
         price_t need_cash = roundEx(money + cost.total, precision);
 
-        // The buying power must be validated before any side effect (ISS-045)
+        // The buying power must be validated before any side effect
         HKU_WARN_IF_RETURN(x < need_cash, result,
                            "{} {} Can't buy, need cash({:<.4f}) > buying power({:<.4f})!", datetime,
                            stock.market_code(), need_cash, x);
 
-        // Borrow only the cash shortfall (including the estimated borrow cost); use the own cash
-        // first (ISS-045)
-        price_t gap = roundEx(need_cash - m_cash + bor_cost.total, precision);
+        // Borrow on demand, including the cost of the borrow itself: the buy cost is computed on
+        // the real borrow amount (not on the full trade money), and the post-borrow cash is
+        // simulated with the same formula borrowCash uses before creating any debt, so a failed
+        // buy never leaves a loan record behind
+        price_t gap = roundEx(need_cash - m_cash, precision);
         if (gap > 0.0) {
+            bool covered = false;
+            for (int i = 0; i < 32 && !covered; ++i) {
+                price_t after =
+                  roundEx(m_cash + gap - getBorrowCashCost(datetime, gap).total, precision);
+                covered = after >= need_cash;
+                if (!covered) {
+                    price_t next = roundEx(gap + roundEx(need_cash - after, precision), precision);
+                    // The cost rate must stay well below 100%; a non-increasing gap means the
+                    // sequence stalled and the cost can never be covered
+                    HKU_WARN_IF_RETURN(
+                      next <= gap, result,
+                      "{} {} Can't buy, the borrow cost can not be covered by gap({:<.4f})!",
+                      datetime, stock.market_code(), gap);
+                    gap = next;
+                }
+            }
+            HKU_WARN_IF_RETURN(
+              !covered, result,
+              "{} {} Can't buy, the borrow cost can not be covered by gap({:<.4f})!", datetime,
+              stock.market_code(), gap);
             borrowCash(datetime, gap);
         }
     }
@@ -922,7 +974,6 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
 TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, price_t realPrice,
                                double number, price_t stoploss, price_t goalPrice,
                                price_t planPrice, SystemPart from, const string& remark) {
-    HKU_CHECK(!std::isnan(number), "sell number should be a valid double!");
     TradeRecord result;
 
     HKU_ERROR_IF_RETURN(stock.isNull(), result, "{} Stock is Null!", datetime);
@@ -932,8 +983,9 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
     HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
                         "{} {} Invalid sell real price({})!", datetime, stock.market_code(),
                         realPrice);
-    HKU_ERROR_IF_RETURN(number == 0.0, result, "{} {} number is zero!", datetime,
-                        stock.market_code());
+    HKU_ERROR_IF_RETURN(!std::isfinite(number) || number == 0.0, result,
+                        "{} {} number({}) must be finite and nonzero!", datetime,
+                        stock.market_code(), number);
 
     // For the case where the dividend and the capital increase make the quantity not an integer
     // multiple of the minimum trade quantity, the whole position can only be sold with
@@ -995,7 +1047,10 @@ TradeRecord TradeManager::sell(const Datetime& datetime, const Stock& stock, pri
 
     // Return the loan if there is one
     if (getParam<bool>("support_borrow_cash") && m_borrow_cash > 0.0 && m_cash > 0.0) {
-        returnCash(datetime, m_borrow_cash < m_cash ? m_borrow_cash : m_cash);
+        price_t repay = m_borrow_cash < m_cash ? m_borrow_cash : m_cash;
+        HKU_WARN_IF(!returnCash(datetime, repay),
+                    "{} {} Failed to auto repay the borrowed cash({:<.4f})!", datetime,
+                    stock.market_code(), repay);
     }
 
     if (datetime > m_broker_last_datetime) {
@@ -1044,6 +1099,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
 
     // Adjust the current position according to the ex-rights/ex-dividend information
     updateWithWeight(datetime);
+    // The short position grows at this datetime; drop the check frontier for this stock (see buy)
+    m_tmp_weight_checked_until.erase(stock.id());
 
     int precision = getParam<int>("precision");
 
@@ -1051,11 +1108,34 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         CostRecord cost = getSellCost(datetime, stock, realPrice, number);
         price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
         price_t x = roundEx(m_cash / getMarginRate(datetime, stock), precision);
-        if (x < money) {
-            checkin(datetime, roundEx(money - x, precision));
-        }
+        // A-share margin trading: insufficient collateral rejects the order; injecting cash through
+        // checkin would create external funds out of thin air and pollute base_cash (the return
+        // denominator)
+        HKU_WARN_IF_RETURN(x < money, result,
+                           "{} {} Can't sellShort, need margin({:<.4f}) > buying power({:<.4f})!",
+                           datetime, stock.market_code(), money, x);
 
-        borrowStock(datetime, stock, realPrice, number);
+        // Borrow on demand: the unsold stock already in the pool is used first, only the
+        // shortfall creates new debt
+        double borrow_num = number;
+        borrow_stock_map_type::const_iterator pool_iter = m_borrow_stock.find(stock.id());
+        if (pool_iter != m_borrow_stock.end()) {
+            double unsold = pool_iter->second.number;
+            position_map_type::const_iterator old_pos = m_short_position.find(stock.id());
+            if (old_pos != m_short_position.end()) {
+                unsold -= old_pos->second.number;
+            }
+            // The short position must not exceed the borrowed quantity (an inconsistent account);
+            // reject before borrowing so that no debt residue is left behind
+            HKU_WARN_IF_RETURN(unsold < 0.0, result, "{} {} Borrowed Stock had all selled!",
+                               datetime, stock.market_code());
+            if (unsold > 0.0) {
+                borrow_num = number > unsold ? number - unsold : 0.0;
+            }
+        }
+        if (borrow_num > 0.0) {
+            borrowStock(datetime, stock, realPrice, borrow_num);
+        }
     }
 
     // Judge whether there is a borrowed stock and its quantity
@@ -1090,6 +1170,8 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     CostRecord cost = getSellCost(datetime, stock, realPrice, sell_num);
 
     price_t money = roundEx(realPrice * sell_num * stock.unit() - cost.total, precision);
+    // Gross proceeds on the position; fees only in totalCost (keeps totalProfit() exact)
+    price_t gross = roundEx(realPrice * sell_num * stock.unit(), precision);
 
     // Update the cash
     m_cash = roundEx(m_cash + money, precision);
@@ -1100,11 +1182,12 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
     m_trade_list.push_back(result);
 
     // Update the current short position record
-    price_t risk = roundEx((stoploss - realPrice) * sell_num * stock.unit(), precision);
+    price_t risk =
+      stoploss > 0.0 ? roundEx((stoploss - realPrice) * sell_num * stock.unit(), precision) : 0.0;
 
     if (pos_iter == m_short_position.end()) {
         PositionRecord position(stock, datetime, Null<Datetime>(), sell_num, stoploss, goalPrice,
-                                sell_num, cost.total, cost.total, risk, money);
+                                sell_num, 0.0, cost.total, risk, gross);
         position.sellCount = 1;
         m_short_position[stock.id()] = position;
     } else {
@@ -1113,10 +1196,9 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         position.stoploss = stoploss;
         position.goalPrice = goalPrice;
         position.totalNumber += sell_num;
-        position.buyMoney = roundEx(position.buyMoney + cost.total, precision);
         position.totalCost = roundEx(cost.total + position.totalCost, precision);
         position.totalRisk = roundEx(position.totalRisk + risk, precision);
-        position.sellMoney = roundEx(position.sellMoney + money, precision);
+        position.sellMoney = roundEx(position.sellMoney + gross, precision);
         position.sellCount++;
     }
 
@@ -1178,7 +1260,7 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
 
-    // The cash must cover the buyback and its cost (ISS-046: the cash could be overdrawn)
+    // The cash must cover the buyback and its cost (the cash could be overdrawn)
     HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
                        "{} {} Can't buyShort, need cash({:<.4f}) > current cash({:<.4f})!",
                        datetime, stock.market_code(), roundEx(money + cost.total, precision),
@@ -1192,9 +1274,14 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
                          real_number, cost, stoploss, m_cash, from, remark);
     m_trade_list.push_back(result);
 
-    // Update the current short position
+    // Scale the risk to the remaining quantity; a full close keeps the booked value for history
+    double pre_number = position.number;
     position.number -= real_number;
-    position.buyMoney = roundEx(position.buyMoney + money + cost.total, precision);
+    if (position.number > 0.0 && pre_number > 0.0) {
+        position.totalRisk =
+          roundEx(position.totalRisk * (position.number / pre_number), precision);
+    }
+    position.buyMoney = roundEx(position.buyMoney + money, precision);
     position.totalCost = roundEx(position.totalCost + cost.total, precision);
     // position.sellMoney = roundEx(position.sellMoney, precision);
     position.buyCount++;
@@ -1228,19 +1315,16 @@ TradeRecord TradeManager::buyShort(const Datetime& datetime, const Stock& stock,
 }
 
 price_t TradeManager::cash(const Datetime& datetime, KQuery::KType ktype) {
-    // If the given time is later than the last ex-rights/ex-dividend update time, update the
-    // ex-rights/ex-dividend data first
-    if (datetime > m_last_update_datetime) {
+    // Gate on the persisted lastDatetime: m_last_update_datetime is not restored on load
+    if (datetime == Null<Datetime>() || datetime == lastDatetime()) {
+        return m_cash;
+    }
+
+    if (datetime > lastDatetime()) {
         updateWithWeight(datetime);
         return m_cash;
     }
 
-    // If the given time equals the last ex-rights/ex-dividend update time, return the current cash
-    // directly
-    HKU_IF_RETURN(datetime == m_last_update_datetime, m_cash);
-
-    // If the given time is earlier than the last ex-rights/ex-dividend update time, get the funds
-    // balance by calculating the assets at the given moment
     FundsRecord funds = getFunds(datetime, ktype);
     return funds.cash;
 }
@@ -1285,6 +1369,9 @@ FundsRecord TradeManager::getFunds(KQuery::KType inktype) const {
 FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType ktype) {
     FundsRecord funds;
     int precision = getParam<int>("precision");
+
+    // Nothing to report before the account exists
+    HKU_IF_RETURN(indatetime < m_init_datetime, funds);
 
     // When datetime is Null, return the cash in the current account and the funds occupied at the
     // buy, as well as the accumulated deposit and withdrawal funds
@@ -1405,7 +1492,40 @@ FundsRecord TradeManager::getFunds(const Datetime& indatetime, KQuery::KType kty
                 }
                 break;
 
+            case BUSINESS_BORROW_ADJUST: {
+                bor_stock_iter = bor_stock_map.find(iter->stock.id());
+                if (bor_stock_iter != bor_stock_map.end()) {
+                    BorrowRecord& bor = bor_stock_iter->second;
+                    double total = 0.0;
+                    list<BorrowRecord::Data>::iterator bor_iter = bor.record_list.begin();
+                    for (; bor_iter != bor.record_list.end(); ++bor_iter) {
+                        total += bor_iter->number;
+                    }
+                    // Scale the entries so that the sum follows the new quantity while the total
+                    // value (price x number) stays invariant (borrow_asset is not touched)
+                    if (total != 0.0) {
+                        double factor = (total + iter->number) / total;
+                        for (bor_iter = bor.record_list.begin(); bor_iter != bor.record_list.end();
+                             ++bor_iter) {
+                            bor_iter->number *= factor;
+                            bor_iter->price /= factor;
+                        }
+                    }
+                }
+                break;
+            }
+
+            case BUSINESS_SHORT_ADJUST:
+                short_stock_iter = short_stock_map.find(iter->stock.id());
+                if (short_stock_iter != short_stock_map.end()) {
+                    short_stock_iter->second.number += iter->number;
+                } else {
+                    short_stock_map[iter->stock.id()] = Stock_Number(iter->stock, iter->number);
+                }
+                break;
+
             case BUSINESS_BONUS:
+            case BUSINESS_DIVIDEND_COMPENSATION:
                 break;
 
             case BUSINESS_CHECKIN:
@@ -1583,7 +1703,7 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
         }
 
         const Datetime& d = dates[pos];
-        if (d == Null<Datetime>() || d == last_dt) {
+        if (d == Null<Datetime>() || d == last_dt || d < m_init_datetime) {
             result[pos] = getFunds(d, ktype);
             continue;
         }
@@ -1696,7 +1816,40 @@ FundsList TradeManager::getFundsList(const DatetimeList& dates, const KQuery::KT
                     break;
                 }
 
+                case BUSINESS_BORROW_ADJUST: {
+                    auto iter = bor_stock_map.find(trade_iter->stock.id());
+                    if (iter != bor_stock_map.end()) {
+                        BorrowRecord& bor = iter->second;
+                        double total = 0.0;
+                        for (auto& entry : bor.record_list) {
+                            total += entry.number;
+                        }
+                        // Scale the entries so that the sum follows the new quantity while the
+                        // total value (price x number) stays invariant
+                        if (total != 0.0) {
+                            double factor = (total + trade_iter->number) / total;
+                            for (auto& entry : bor.record_list) {
+                                entry.number *= factor;
+                                entry.price /= factor;
+                            }
+                        }
+                    }
+                    break;
+                }
+
+                case BUSINESS_SHORT_ADJUST: {
+                    auto iter = short_stock_map.find(trade_iter->stock.id());
+                    if (iter != short_stock_map.end()) {
+                        iter->second.number += trade_iter->number;
+                    } else {
+                        short_stock_map.emplace(trade_iter->stock.id(),
+                                                StockNumber(trade_iter->stock, trade_iter->number));
+                    }
+                    break;
+                }
+
                 case BUSINESS_BONUS:
+                case BUSINESS_DIVIDEND_COMPENSATION:
                     break;
 
                 case BUSINESS_CHECKIN:
@@ -1886,6 +2039,18 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     Datetime start_date(lastDatetime().date() + bd::days(1));
     Datetime end_date(datetime.date() + bd::days(1));
 
+    // Incremental short-circuit: a stock's ex-rights list is only scanned for the date range not
+    // already checked on prior updates. m_tmp_weight_checked_until is only written after all three
+    // loops below complete, so a stock appearing in more than one map still uses the same window
+    auto scan_start = [&](uint64_t stock_id) {
+        unordered_map<uint64_t, Datetime>::const_iterator cached =
+          m_tmp_weight_checked_until.find(stock_id);
+        if (cached != m_tmp_weight_checked_until.end() && cached->second > start_date) {
+            return cached->second;
+        }
+        return start_date;
+    };
+
     int precision = getParam<int>("precision");
     TradeRecordList new_trade_buffer;
 
@@ -1898,7 +2063,10 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         PositionRecord& position = position_iter->second;
         Stock stock = position.stock;
 
-        StockWeightList weights = stock.getWeight(start_date, end_date);
+        Datetime s = scan_start(stock.id());
+        if (s >= end_date)
+            continue;
+        StockWeightList weights = stock.getWeight(s, end_date);
         StockWeightList::const_iterator weight_iter = weights.begin();
         for (; weight_iter != weights.end(); ++weight_iter) {
             // Skip it when there is no dividend and the numbers of the bonus shares and the
@@ -1912,8 +2080,8 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
             // the position quantity
             if (weight_iter->bonus() != 0.0) {
                 price_t bonus = roundEx(position.number * weight_iter->bonus() * 0.1, precision);
-                position.sellMoney += bonus;
-                m_cash += bonus;
+                position.sellMoney = roundEx(position.sellMoney + bonus, precision);
+                m_cash = roundEx(m_cash + bonus, precision);
 
                 TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BONUS, bonus, bonus,
                                    0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID);
@@ -1955,6 +2123,130 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
         } /* for weight */
     } /* for position */
 
+    // A-share margin trading: the borrowed stock must follow the ex-rights events as well. The
+    // cash dividend is compensated to the lender (a cash outflow), and the bonus/consolidation
+    // events scale the owed quantity by the same ratio, mirroring the long position above.
+    borrow_stock_map_type::iterator borrow_iter = m_borrow_stock.begin();
+    for (; borrow_iter != m_borrow_stock.end(); ++borrow_iter) {
+        BorrowRecord& borrow = borrow_iter->second;
+        Stock stock = borrow.stock;
+
+        Datetime s = scan_start(stock.id());
+        if (s >= end_date)
+            continue;
+        StockWeightList weights = stock.getWeight(s, end_date);
+        StockWeightList::const_iterator weight_iter = weights.begin();
+        for (; weight_iter != weights.end(); ++weight_iter) {
+            if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
+                0.0 == weight_iter->increasement() && 0.0 == weight_iter->suogu()) {
+                continue;
+            }
+
+            // The cash dividend is compensated to the lender: a cash outflow from the account
+            // (a financing cost of the short position, not a negative dividend income)
+            if (weight_iter->bonus() != 0.0) {
+                price_t bonus = roundEx(borrow.number * weight_iter->bonus() * 0.1, precision);
+                m_cash = roundEx(m_cash - bonus, precision);
+                TradeRecord record(stock, weight_iter->datetime(), BUSINESS_DIVIDEND_COMPENSATION,
+                                   bonus, bonus, 0.0, 0, CostRecord(), 0.0, m_cash, PART_INVALID);
+                new_trade_buffer.push_back(record);
+            }
+
+            double addcount =
+              (borrow.number / 10.0) * (weight_iter->countAsGift() + weight_iter->increasement());
+            if (addcount != 0.0) {
+                double new_number = borrow.number + addcount;
+                double factor = new_number / borrow.number;
+                for (auto& entry : borrow.record_list) {  // keep the sum and the value invariant
+                    entry.number *= factor;
+                    entry.price /= factor;
+                }
+                borrow.number = new_number;
+                TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BORROW_ADJUST, 0.0, 0.0,
+                                   0.0, addcount, CostRecord(), 0.0, m_cash, PART_INVALID);
+                new_trade_buffer.push_back(record);
+            }
+
+            if (weight_iter->suogu() > 0.0) {
+                double suogu_number = borrow.number * weight_iter->suogu();
+                double new_number = borrow.number;
+                if (suogu_number < borrow.number) {
+                    // The share contraction adopts the round-up
+                    new_number = roundUp(suogu_number, 0);
+                } else if (suogu_number > borrow.number) {
+                    // The share expansion adopts the truncation
+                    new_number = roundDown(suogu_number, 0);
+                }
+
+                double change_number = new_number - borrow.number;
+                if (change_number != 0.0) {
+                    double factor = new_number / borrow.number;
+                    for (auto& entry :
+                         borrow.record_list) {  // keep the sum and the value invariant
+                        entry.number *= factor;
+                        entry.price /= factor;
+                    }
+                    borrow.number = new_number;
+                    TradeRecord record(stock, weight_iter->datetime(), BUSINESS_BORROW_ADJUST, 0.0,
+                                       0.0, 0.0, change_number, CostRecord(), 0.0, m_cash,
+                                       PART_INVALID);
+                    new_trade_buffer.push_back(record);
+                }
+            }
+        } /* for weight */
+    } /* for borrow stock */
+
+    // The short position follows the same bonus/consolidation ratio so that it stays in sync
+    // with the borrowed quantity (buyShort covers it by the current position number)
+    position_map_type::iterator short_iter = m_short_position.begin();
+    for (; short_iter != m_short_position.end(); ++short_iter) {
+        PositionRecord& position = short_iter->second;
+        Stock stock = position.stock;
+
+        Datetime s = scan_start(stock.id());
+        if (s >= end_date)
+            continue;
+        StockWeightList weights = stock.getWeight(s, end_date);
+        StockWeightList::const_iterator weight_iter = weights.begin();
+        for (; weight_iter != weights.end(); ++weight_iter) {
+            if (0.0 == weight_iter->bonus() && 0.0 == weight_iter->countAsGift() &&
+                0.0 == weight_iter->increasement() && 0.0 == weight_iter->suogu()) {
+                continue;
+            }
+
+            double addcount =
+              (position.number / 10.0) * (weight_iter->countAsGift() + weight_iter->increasement());
+            if (addcount != 0.0) {
+                position.number += addcount;
+                position.totalNumber += addcount;
+                TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SHORT_ADJUST, 0.0, 0.0,
+                                   0.0, addcount, CostRecord(), 0.0, m_cash, PART_INVALID);
+                new_trade_buffer.push_back(record);
+            }
+
+            if (weight_iter->suogu() > 0.0) {
+                double suogu_number = position.number * weight_iter->suogu();
+                double change_number = 0.0;
+                if (suogu_number < position.number) {
+                    double old_number = position.number;
+                    position.number = roundUp(suogu_number, 0);
+                    change_number = position.number - old_number;
+                } else if (suogu_number > position.number) {
+                    double old_number = position.number;
+                    position.number = roundDown(suogu_number, 0);
+                    change_number = position.number - old_number;
+                }
+
+                if (change_number != 0.0) {
+                    TradeRecord record(stock, weight_iter->datetime(), BUSINESS_SHORT_ADJUST, 0.0,
+                                       0.0, 0.0, change_number, CostRecord(), 0.0, m_cash,
+                                       PART_INVALID);
+                    new_trade_buffer.push_back(record);
+                }
+            }
+        } /* for weight */
+    } /* for short position */
+
     // Sort by datetime, then replay from cash_base so each record's cash matches its own time.
     // Only BONUS changes cash; stable_sort keeps a bonus ahead of same-date gift records.
     std::stable_sort(
@@ -1966,7 +2258,9 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     price_t running_cash = cash_base;
     for (size_t i = 0; i < total; ++i) {
         if (new_trade_buffer[i].business == BUSINESS_BONUS) {
-            running_cash += new_trade_buffer[i].realPrice;
+            running_cash = roundEx(running_cash + new_trade_buffer[i].realPrice, precision);
+        } else if (new_trade_buffer[i].business == BUSINESS_DIVIDEND_COMPENSATION) {
+            running_cash = roundEx(running_cash - new_trade_buffer[i].realPrice, precision);
         }
         new_trade_buffer[i].cash = running_cash;
     }
@@ -1974,6 +2268,23 @@ void TradeManager::updateWithWeight(const Datetime& datetime) {
     for (size_t i = 0; i < total; ++i) {
         m_trade_list.push_back(new_trade_buffer[i]);
     }
+
+    // Advance the per-stock incremental check pointer for every stock visited this update; the
+    // frontier only ever moves forward so an out-of-order update can never rewind it
+    auto advance_frontier = [&](uint64_t id) {
+        auto it = m_tmp_weight_checked_until.find(id);
+        if (it == m_tmp_weight_checked_until.end()) {
+            m_tmp_weight_checked_until[id] = end_date;
+        } else if (end_date > it->second) {
+            it->second = end_date;  // only ever move forward
+        }
+    };
+    for (const auto& kv : m_position)
+        advance_frontier(kv.first);
+    for (const auto& kv : m_borrow_stock)
+        advance_frontier(kv.first);
+    for (const auto& kv : m_short_position)
+        advance_frontier(kv.first);
 
     m_last_update_datetime = datetime;
 }
@@ -1983,6 +2294,33 @@ void TradeManager::_saveAction(const TradeRecord& record) {
     std::stringstream buf(std::stringstream::out);
     string my_tm("td = my_tm.");
     string sep(", ");
+    // Escape characters that would break the regenerated script
+    auto esc_remark = [](const string& s) {
+        string out;
+        out.reserve(s.size());
+        for (char c : s) {
+            switch (c) {
+                case '"':
+                    out += "\\\"";
+                    break;
+                case '\\':
+                    out += "\\\\";
+                    break;
+                case '\n':
+                    out += "\\n";
+                    break;
+                case '\r':
+                    out += "\\r";
+                    break;
+                case '\t':
+                    out += "\\t";
+                    break;
+                default:
+                    out.push_back(c);
+            }
+        }
+        return out;
+    };
     switch (record.business) {
         case BUSINESS_INIT:
             buf << "my_tm = crtTM(datetime=Datetime('" << record.datetime.str() << "'), "
@@ -2009,18 +2347,18 @@ void TradeManager::_saveAction(const TradeRecord& record) {
             buf << my_tm << "buy(Datetime('" << record.datetime.str() << "'), " << "sm['"
                 << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
                 << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
-                << sep << record.from << sep << "\"" << record.remark << "\")";
+                << sep << record.from << sep << "\"" << esc_remark(record.remark) << "\")";
             break;
 
         case BUSINESS_SELL:
             buf << my_tm << "sell(Datetime('" << record.datetime.str() << "')," << "sm['"
                 << record.stock.market_code() << "'], " << record.realPrice << sep << record.number
                 << sep << record.stoploss << sep << record.goalPrice << sep << record.planPrice
-                << sep << record.from << sep << "\"" << record.remark << "\")";
+                << sep << record.from << sep << "\"" << esc_remark(record.remark) << "\")";
             break;
 
         default:
-            break;
+            return;
     }
 
     m_actions.push_back(buf.str());
@@ -2028,17 +2366,35 @@ void TradeManager::_saveAction(const TradeRecord& record) {
 
 void TradeManager::tocsv(const string& path) {
     string date = m_init_datetime.str();
-    string prefix = m_name.empty() ? date : m_name;
+    // Sanitize the account name so it cannot escape the target directory
+    auto safe = [](const string& s) {
+        string out;
+        out.reserve(s.size());
+        for (unsigned char c : s) {
+            if (c < 0x20 || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' ||
+                c == '<' || c == '>' || c == '|' || c == '.') {
+                out.push_back('_');
+            } else {
+                out.push_back(c);
+            }
+        }
+        return out;
+    };
+    string prefix = m_name.empty() ? date : safe(m_name);
     string filename1 = path + "/" + prefix + "_" + lang_htr("trade_records") + ".csv";
     string filename2 = path + "/" + prefix + "_" + lang_htr("closed_positions") + ".csv";
     string filename3 = path + "/" + prefix + "_" + lang_htr("open_positions") + ".csv";
     string filename4 = path + "/" + prefix + "_actions.txt";
+    string filename5 = path + "/" + prefix + "_" + lang_htr("short_positions") + ".csv";
+    string filename6 = path + "/" + prefix + "_" + lang_htr("borrow_stock") + ".csv";
 
 #if defined(_MSC_VER)
     filename1 = utf8_to_gb(filename1);
     filename2 = utf8_to_gb(filename2);
     filename3 = utf8_to_gb(filename3);
     filename4 = utf8_to_gb(filename4);
+    filename5 = utf8_to_gb(filename5);
+    filename6 = utf8_to_gb(filename6);
 #endif
 
     string sep(",");
@@ -2109,9 +2465,11 @@ void TradeManager::tocsv(const string& path) {
              << record.totalNumber << sep << record.buyMoney << sep << record.totalCost << sep
              << record.sellMoney << sep << record.sellMoney - record.totalCost - record.buyMoney
              << sep << record.totalRisk << sep
-             << record.totalProfit() / (record.buyMoney + record.totalCost) << sep
-             << (record.cleanDatetime - record.takeDatetime).days() << sep << record.buyCount << sep
-             << record.sellCount << std::endl;
+             << (record.buyMoney + record.totalCost != 0.0
+                   ? record.totalProfit() / (record.buyMoney + record.totalCost)
+                   : 0.0)
+             << sep << (record.cleanDatetime - record.takeDatetime).days() << sep << record.buyCount
+             << sep << record.sellCount << std::endl;
     }
     file.close();
 
@@ -2134,14 +2492,18 @@ void TradeManager::tocsv(const string& path) {
         size_t pos = record.stock.getCount(KQuery::DAY);
         if (pos != 0) {
             KRecord krecord = record.stock.getKRecord(pos - 1, KQuery::DAY);
-            price_t bonus = record.buyMoney - record.sellMoney - record.totalCost;
+            price_t bonus = record.buyMoney - record.sellMoney + record.totalCost;
             auto sellCost =
               getSellCost(krecord.datetime, record.stock, krecord.closePrice, record.number);
             price_t profit = record.number * krecord.closePrice + record.sellMoney -
                              record.buyMoney - record.totalCost - sellCost.total;
-            file << record.number * krecord.closePrice - bonus << sep << bonus / record.number
-                 << sep << profit / (record.buyMoney + record.totalCost + sellCost.total)
-                 << std::endl;
+            price_t cost_base = record.buyMoney + record.totalCost + sellCost.total;
+            file << record.number * krecord.closePrice - bonus << sep
+                 << (record.number != 0.0 ? bonus / record.number : 0.0) << sep
+                 << (cost_base != 0.0 ? profit / cost_base : 0.0) << std::endl;
+        } else {
+            // No day data yet: still terminate the row so the next record does not concatenate
+            file << sep << sep << std::endl;
         }
     }
     file.close();
@@ -2153,6 +2515,36 @@ void TradeManager::tocsv(const string& path) {
     list<string>::const_iterator action_iter = m_actions.begin();
     for (; action_iter != m_actions.end(); ++action_iter) {
         file << *action_iter << std::endl;
+    }
+    file.close();
+
+    // Export the short positions (open + closed)
+    file.open(filename5.c_str());
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename5);
+    file << "#" << col("kind") << col("entry_date") << col("exit_date") << col("market_code")
+         << col("stock_name") << col("number") << col("total_number") << col("buy_money")
+         << col("total_cost") << col("sell_money") << col("total_risk") << std::endl;
+    auto writeShort = [&](const char* kind, const PositionRecord& r) {
+        file << kind << sep << r.takeDatetime << sep << r.cleanDatetime << sep
+             << r.stock.market_code() << sep << r.stock.name() << sep << r.number << sep
+             << r.totalNumber << sep << r.buyMoney << sep << r.totalCost << sep << r.sellMoney
+             << sep << r.totalRisk << std::endl;
+    };
+    for (const auto& kv : m_short_position)
+        writeShort("open", kv.second);
+    for (const auto& r : m_short_position_history)
+        writeShort("closed", r);
+    file.close();
+
+    // Export the current borrow stock
+    file.open(filename6.c_str());
+    HKU_ERROR_IF_RETURN(!file, void(), "Can't create file {}!", filename6);
+    file << "#" << col("market_code") << col("stock_name") << col("number") << col("value")
+         << std::endl;
+    for (const auto& kv : m_borrow_stock) {
+        const BorrowRecord& r = kv.second;
+        file << r.stock.market_code() << sep << r.stock.name() << sep << r.number << sep << r.value
+             << std::endl;
     }
     file.close();
 }
@@ -2171,6 +2563,8 @@ bool TradeManager::addPosition(const PositionRecord& pr) {
                         pr.stock.market_code());
 
     m_position[pr.stock.id()] = pr;
+    // A freshly injected holding has never been scanned; drop any stale frontier for this stock
+    m_tmp_weight_checked_until.erase(pr.stock.id());
     if (pr.takeDatetime > m_init_datetime) {
         m_init_datetime = pr.takeDatetime;
         m_trade_list[0].datetime = m_init_datetime;
@@ -2182,8 +2576,18 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
     HKU_IF_RETURN(BUSINESS_INIT == tr.business, _add_init_tr(tr));
     HKU_ERROR_IF_RETURN(tr.datetime < lastDatetime(), false,
                         "tr.datetime must be >= lastDatetime({})!", lastDatetime());
+    // An invalid record must not advance the account (updateWithWeight) before it is rejected
+    HKU_ERROR_IF_RETURN(BUSINESS_INVALID == tr.business, false, "tr.business is invalid!");
 
     updateWithWeight(tr.datetime);
+
+    // A backfilled record may increase a holding earlier than an already advanced check frontier;
+    // drop the frontier so the added shares get rescanned (mirrors the live trade entries)
+    if (!tr.stock.isNull() &&
+        (BUSINESS_BUY == tr.business || BUSINESS_CHECKIN_STOCK == tr.business ||
+         BUSINESS_BORROW_STOCK == tr.business || BUSINESS_SELL_SHORT == tr.business)) {
+        m_tmp_weight_checked_until.erase(tr.stock.id());
+    }
 
     switch (tr.business) {
         case BUSINESS_INIT:
@@ -2195,11 +2599,17 @@ bool TradeManager::addTradeRecord(const TradeRecord& tr) {
         case BUSINESS_SELL:
             return _add_sell_tr(tr);
 
+        // The ex-rights derived records (bonus share / consolidation / dividend / compensation and
+        // the short/borrow quantity adjustments) are regenerated by updateWithWeight as the
+        // primary records advance the account, so replaying them directly is a no-op
         case BUSINESS_GIFT:
         case BUSINESS_SUOGU:
+        case BUSINESS_BORROW_ADJUST:
+        case BUSINESS_SHORT_ADJUST:
             return true;
 
         case BUSINESS_BONUS:
+        case BUSINESS_DIVIDEND_COMPENSATION:
             return true;
 
         case BUSINESS_CHECKIN:
@@ -2372,36 +2782,282 @@ bool TradeManager::_add_checkout_tr(const TradeRecord& tr) {
 }
 
 bool TradeManager::_add_checkin_stock_tr(const TradeRecord& tr) {
-    // TODO: TradeManager::_add_checkin_stock_tr
-    return false;
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(!std::isfinite(tr.number) || tr.number <= 0, false,
+                        "tr.number({}) must be finite and > 0!", tr.number);
+
+    int precision = getParam<int>("precision");
+    price_t market_value = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
+    if (pos_iter == m_position.end()) {
+        PositionRecord pos(tr.stock, tr.datetime, Null<Datetime>(), tr.number, 0.0, 0.0, tr.number,
+                           market_value, 0.0, 0.0, 0.0);
+        pos.buyCount = 1;
+        m_position[tr.stock.id()] = pos;
+    } else {
+        PositionRecord& pos = pos_iter->second;
+        pos.number += tr.number;
+        pos.totalNumber += tr.number;
+        pos.buyMoney = roundEx(pos.buyMoney + market_value, precision);
+        pos.buyCount++;
+    }
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    m_checkin_stock = roundEx(m_checkin_stock + market_value, precision);
+    return true;
 }
 
 bool TradeManager::_add_checkout_stock_tr(const TradeRecord& tr) {
-    return false;
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(!std::isfinite(tr.number) || tr.number <= 0, false,
+                        "tr.number({}) must be finite and > 0!", tr.number);
+
+    position_map_type::iterator pos_iter = m_position.find(tr.stock.id());
+    HKU_ERROR_IF_RETURN(pos_iter == m_position.end(), false, "Try to checkout nonexistent stock!");
+
+    int precision = getParam<int>("precision");
+    PositionRecord& pos = pos_iter->second;
+    HKU_ERROR_IF_RETURN(tr.number > pos.number, false, "Try to checkout beyond position number!");
+
+    price_t market_value = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+    pos.number -= tr.number;
+    pos.sellMoney = roundEx(pos.sellMoney + market_value, precision);
+    pos.sellCount++;
+    if (0 == pos.number) {
+        pos.cleanDatetime = tr.datetime;
+        m_position_history.push_back(pos);
+        m_position.erase(tr.stock.id());
+    }
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    m_checkout_stock = roundEx(m_checkout_stock + market_value, precision);
+    return true;
 }
 
 bool TradeManager::_add_borrow_cash_tr(const TradeRecord& tr) {
-    return false;
+    int precision = getParam<int>("precision");
+    price_t in_cash = roundEx(tr.realPrice, precision);
+    HKU_ERROR_IF_RETURN(in_cash <= 0.0, false, "tr.realPrice({:<.4f}) must be > 0!", tr.realPrice);
+
+    m_cash = roundEx(m_cash + in_cash - tr.cost.total, precision);
+    m_borrow_cash = roundEx(m_borrow_cash + in_cash, precision);
+    m_loan_list.push_back(LoanRecord(tr.datetime, in_cash));
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    return true;
 }
 
 bool TradeManager::_add_return_cash_tr(const TradeRecord& tr) {
-    return false;
+    int precision = getParam<int>("precision");
+    price_t in_cash = roundEx(tr.realPrice, precision);
+    HKU_ERROR_IF_RETURN(in_cash <= 0.0, false, "tr.realPrice({:<.4f}) must be > 0!", tr.realPrice);
+    HKU_ERROR_IF_RETURN(m_loan_list.empty(), false, "No borrow cash to return!");
+
+    price_t out_cash = roundEx(in_cash + tr.cost.total, precision);
+    HKU_ERROR_IF_RETURN(out_cash > m_cash, false, "Return cash({:<.4f}) > current cash({:<.4f})!",
+                        out_cash, m_cash);
+
+    // Reject repaying more than the outstanding debt before draining the loan list (matching the
+    // live returnCash: validate first, then mutate; grid residual treated as fully repaid)
+    price_t epsilon = 0.5 * std::pow(10.0, -double(precision));
+    price_t total_loan = 0.0;
+    for (const auto& loan : m_loan_list) {
+        total_loan = roundEx(total_loan + loan.value, precision);
+    }
+    HKU_ERROR_IF_RETURN(in_cash - total_loan > epsilon, false,
+                        "{} return cash({:<.4f}) > borrowed cash({:<.4f})!", tr.datetime, in_cash,
+                        total_loan);
+
+    // Consume the loan list in FIFO order using the record's principal
+    price_t remain = in_cash;
+    do {
+        list<LoanRecord>::iterator iter = m_loan_list.begin();
+        if (remain >= iter->value - epsilon) {
+            remain = roundEx(remain - iter->value, precision);
+            m_loan_list.pop_front();
+        } else {
+            iter->value = roundEx(iter->value - remain, precision);
+            break;
+        }
+    } while (!m_loan_list.empty() && remain > epsilon);
+
+    m_cash = roundEx(m_cash - out_cash, precision);
+    m_borrow_cash = roundEx(m_borrow_cash - in_cash, precision);
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    return true;
 }
 
 bool TradeManager::_add_borrow_stock_tr(const TradeRecord& tr) {
-    return false;
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(!std::isfinite(tr.number) || tr.number <= 0, false,
+                        "tr.number({}) must be finite and > 0!", tr.number);
+
+    int precision = getParam<int>("precision");
+    price_t market_value = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+    m_cash = roundEx(m_cash - tr.cost.total, precision);
+
+    borrow_stock_map_type::iterator iter = m_borrow_stock.find(tr.stock.id());
+    if (iter == m_borrow_stock.end()) {
+        BorrowRecord record(tr.stock, tr.number, market_value);
+        record.record_list.push_back(BorrowRecord::Data(tr.datetime, tr.realPrice, tr.number));
+        m_borrow_stock[tr.stock.id()] = record;
+    } else {
+        iter->second.number += tr.number;
+        iter->second.value = roundEx(iter->second.value + market_value, precision);
+        iter->second.record_list.push_back(
+          BorrowRecord::Data(tr.datetime, tr.realPrice, tr.number));
+    }
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    return true;
 }
 
 bool TradeManager::_add_return_stock_tr(const TradeRecord& tr) {
-    return false;
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(!std::isfinite(tr.number) || tr.number <= 0, false,
+                        "tr.number({}) must be finite and > 0!", tr.number);
+
+    borrow_stock_map_type::iterator bor_iter = m_borrow_stock.find(tr.stock.id());
+    HKU_ERROR_IF_RETURN(bor_iter == m_borrow_stock.end(), false,
+                        "Try to return nonborrowed stock!");
+
+    int precision = getParam<int>("precision");
+    BorrowRecord& bor = bor_iter->second;
+    HKU_ERROR_IF_RETURN(tr.number > bor.number, false, "Try to return beyond borrow number!");
+
+    // The returned market value comes from the consumed entries' borrow prices (same as the live
+    // returnStock path)
+    price_t market_value = 0.0;
+    double remain = tr.number;
+    list<BorrowRecord::Data>::iterator iter = bor.record_list.begin();
+    for (; iter != bor.record_list.end(); ++iter) {
+        double take = (remain <= iter->number) ? remain : iter->number;
+        market_value = roundEx(market_value + iter->price * take * tr.stock.unit(), precision);
+        remain -= take;
+        if (remain <= 0.0) {
+            break;
+        }
+    }
+
+    remain = tr.number;
+    do {
+        iter = bor.record_list.begin();
+        if (remain >= iter->number) {
+            remain = roundEx(remain - iter->number, precision);
+            bor.record_list.pop_front();
+        } else {
+            iter->number = roundEx(iter->number - remain, precision);
+            break;
+        }
+    } while (!bor.record_list.empty() && remain > 0.0);
+
+    bor.number -= tr.number;
+    bor.value = roundEx(bor.value - market_value, precision);
+    if (bor.record_list.empty()) {
+        m_borrow_stock.erase(bor_iter);
+    }
+
+    m_cash = roundEx(m_cash - tr.cost.total, precision);
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+    return true;
 }
 
 bool TradeManager::_add_sell_short_tr(const TradeRecord& tr) {
-    return false;
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(!std::isfinite(tr.number) || tr.number <= 0, false,
+                        "tr.number({}) must be finite and > 0!", tr.number);
+
+    int precision = getParam<int>("precision");
+    // net proceeds, mirroring the live sellShort cash formula
+    price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit() - tr.cost.total, precision);
+    m_cash = roundEx(m_cash + money, precision);
+    // Gross proceeds on the position; fees only in totalCost (mirrors the live sellShort)
+    price_t gross = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+
+    price_t risk =
+      tr.stoploss > 0.0
+        ? roundEx((tr.stoploss - tr.realPrice) * tr.number * tr.stock.unit(), precision)
+        : 0.0;
+    position_map_type::iterator pos_iter = m_short_position.find(tr.stock.id());
+    if (pos_iter == m_short_position.end()) {
+        PositionRecord position(tr.stock, tr.datetime, Null<Datetime>(), tr.number, tr.stoploss,
+                                tr.goalPrice, tr.number, 0.0, tr.cost.total, risk, gross);
+        position.sellCount = 1;
+        m_short_position[tr.stock.id()] = position;
+    } else {
+        PositionRecord& position = pos_iter->second;
+        position.number += tr.number;
+        position.stoploss = tr.stoploss;
+        position.goalPrice = tr.goalPrice;
+        position.totalNumber += tr.number;
+        position.totalCost = roundEx(tr.cost.total + position.totalCost, precision);
+        position.totalRisk = roundEx(position.totalRisk + risk, precision);
+        position.sellMoney = roundEx(position.sellMoney + gross, precision);
+        position.sellCount++;
+    }
+
+    _saveAction(new_tr);
+    return true;
 }
 
 bool TradeManager::_add_buy_short_tr(const TradeRecord& tr) {
-    return false;
+    HKU_ERROR_IF_RETURN(tr.stock.isNull(), false, "tr.stock is null!");
+    HKU_ERROR_IF_RETURN(!std::isfinite(tr.number) || tr.number <= 0, false,
+                        "tr.number({}) must be finite and > 0!", tr.number);
+
+    position_map_type::iterator pos_iter = m_short_position.find(tr.stock.id());
+    HKU_WARN_IF_RETURN(pos_iter == m_short_position.end(), false, "No short position to cover!");
+    PositionRecord& position = pos_iter->second;
+
+    // The record's number is the executed cover quantity (the live path already resolved
+    // MAX_DOUBLE / clamp), and the separate RETURN_STOCK record handles the borrow pool
+    HKU_ERROR_IF_RETURN(tr.number > position.number, false, "Cover number beyond short position!");
+
+    int precision = getParam<int>("precision");
+    price_t money = roundEx(tr.realPrice * tr.number * tr.stock.unit(), precision);
+    HKU_WARN_IF_RETURN(m_cash < roundEx(money + tr.cost.total, precision), false,
+                       "Can't buyShort, need cash({:<.4f}) > current cash({:<.4f})!",
+                       roundEx(money + tr.cost.total, precision), m_cash);
+    m_cash = roundEx(m_cash - money - tr.cost.total, precision);
+
+    TradeRecord new_tr(tr);
+    new_tr.cash = m_cash;
+    m_trade_list.push_back(new_tr);
+
+    double pre_number = position.number;
+    position.number -= tr.number;
+    if (position.number > 0.0 && pre_number > 0.0) {
+        position.totalRisk =
+          roundEx(position.totalRisk * (position.number / pre_number), precision);
+    }
+    position.buyMoney = roundEx(position.buyMoney + money, precision);
+    position.totalCost = roundEx(position.totalCost + tr.cost.total, precision);
+    position.buyCount++;
+    if (position.number == 0) {
+        position.cleanDatetime = tr.datetime;
+        m_short_position_history.push_back(position);
+        m_short_position.erase(tr.stock.id());
+    }
+
+    _saveAction(new_tr);
+    return true;
 }
 
 } /* namespace hku */

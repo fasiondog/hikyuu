@@ -6,6 +6,7 @@
  */
 
 #include "CostRecord.h"
+#include "RecordCompare.h"
 
 namespace hku {
 
@@ -37,10 +38,9 @@ std::string CostRecord::toString() const {
 }
 
 bool HKU_API operator==(const CostRecord& d1, const CostRecord& d2) {
-    return (std::fabs(d1.commission - d2.commission) < 0.0001 &&
-            std::fabs(d1.stamptax - d2.stamptax) < 0.0001 &&
-            std::fabs(d1.transferfee - d2.transferfee) < 0.0001 &&
-            std::fabs(d1.others - d2.others) < 0.0001 && std::fabs(d1.total - d2.total) < 0.0001);
+    return (recordNear(d1.commission, d2.commission) && recordNear(d1.stamptax, d2.stamptax) &&
+            recordNear(d1.transferfee, d2.transferfee) && recordNear(d1.others, d2.others) &&
+            recordNear(d1.total, d2.total));
 }
 
 } /* namespace hku */

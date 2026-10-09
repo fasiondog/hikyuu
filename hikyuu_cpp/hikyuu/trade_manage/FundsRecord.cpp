@@ -6,6 +6,7 @@
  */
 
 #include "FundsRecord.h"
+#include "RecordCompare.h"
 
 namespace hku {
 
@@ -58,13 +59,11 @@ FundsRecord& FundsRecord::operator+=(const FundsRecord& other) {
 }
 
 bool HKU_API operator==(const FundsRecord& d1, const FundsRecord& d2) {
-    return (std::fabs(d1.cash - d2.cash) < 0.0001 &&
-            std::fabs(d1.market_value - d2.market_value) < 0.0001 &&
-            std::fabs(d1.short_market_value - d2.short_market_value) < 0.0001 &&
-            std::fabs(d1.base_cash - d2.base_cash) < 0.0001 &&
-            std::fabs(d1.base_asset - d2.base_asset) < 0.0001 &&
-            std::fabs(d1.borrow_cash - d2.borrow_cash) < 0.0001 &&
-            std::fabs(d1.borrow_asset - d2.borrow_asset) < 0.0001);
+    return (recordNear(d1.cash, d2.cash) && recordNear(d1.market_value, d2.market_value) &&
+            recordNear(d1.short_market_value, d2.short_market_value) &&
+            recordNear(d1.base_cash, d2.base_cash) && recordNear(d1.base_asset, d2.base_asset) &&
+            recordNear(d1.borrow_cash, d2.borrow_cash) &&
+            recordNear(d1.borrow_asset, d2.borrow_asset));
 }
 
 } /* namespace hku */

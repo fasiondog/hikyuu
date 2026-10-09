@@ -48,7 +48,11 @@ HKU_API std::ostream& operator<<(std::ostream& os, const OrderBrokerBase& broker
 }
 
 HKU_API std::ostream& operator<<(std::ostream& os, const OrderBrokerPtr& broker) {
-    os << "OrderBroker(" << broker->name() << ")";
+    if (broker) {
+        os << *broker;
+    } else {
+        os << "OrderBroker(NULL)";
+    }
     return os;
 }
 

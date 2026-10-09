@@ -53,6 +53,8 @@ SystemPart HKU_API getSystemPartEnum(const string& arg) {
     HKU_IF_RETURN("AF" == name, PART_ALLOCATEFUNDS);
     HKU_IF_RETURN("PF" == name, PART_PORTFOLIO);
     HKU_IF_RETURN("SYS" == name, PART_SYSTEM);
+    HKU_WARN_IF(!name.empty() && name != "--",
+                "Unknown system part name: {}, mapped to PART_INVALID", arg);
     return PART_INVALID;
 }
 

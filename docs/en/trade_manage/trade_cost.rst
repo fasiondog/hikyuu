@@ -18,19 +18,18 @@ Zero Trade Cost Algorithm
 Shanghai-Shenzhen A-share Trade Cost Algorithm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* Before August 1, 2015, the Shanghai transfer fee was 0.1% of the traded share quantity, with a minimum of 1 yuan.
-* Since August 1, 2015, the Shanghai transfer fee has been 0.002% (0.02‰) of turnover.
+* TC_FixedA is the rolling default cost model and always reflects the latest-year rates; the year-named models (TC_FixedAPre2015 / 2015 / 2017) stay frozen for historical backtests.
+* Since 2022-04-29 the transfer fee is 0.01‰ of turnover (both directions, Shanghai, Shenzhen and Beijing); since 2023-08-28 the sell-side stamp duty is 0.5‰.
 
-The calculation rules are as follows:: python
+.. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.0005, transferfee=0.00001])
 
-    1) Shanghai Stock Exchange
-        Buy: commission + transfer fee
-        Sell: commission + transfer fee + stamp duty
-    2) Shenzhen Stock Exchange:
-        Buy: commission
-        Sell: commission + stamp duty
+    The current A-share trade cost algorithm (rolling default, always the latest rates): transfer fee 0.01‰ of turnover charged in both directions on all markets, sell-side stamp duty 0.5‰
 
-    Among them, the minimum commission is 5 yuan.
+    :param float commission: the commission rate
+    :param float lowestCommission: the minimum commission
+    :param float stamptax: the stamp duty rate
+    :param float transferfee: the transfer fee rate
+    :return: an instance of a :py:class:`TradeCostBase` subclass
 
 .. py:function:: TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
 
@@ -41,10 +40,20 @@ The calculation rules are as follows:: python
     :param float stamptax: the stamp duty rate
     :param float transferfee: the transfer fee rate
     :return: an instance of a :py:class:`TradeCostBase` subclass
-    
-.. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
 
-    The A-share trade cost algorithm before August 1, 2015
+.. py:function:: TC_FixedA2017([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+
+    The A-share trade cost algorithm for January 1, 2017 and later; the Shenzhen transfer fee is listed separately and both markets are charged 0.02‰ of turnover in both directions
+
+    :param float commission: the commission rate
+    :param float lowestCommission: the minimum commission
+    :param float stamptax: the stamp duty rate
+    :param float transferfee: the transfer fee rate
+    :return: an instance of a :py:class:`TradeCostBase` subclass
+
+.. py:function:: TC_FixedAPre2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
+
+    The A-share trade cost algorithm before August 1, 2015: the Shanghai transfer fee was 0.1% of the traded share quantity (1 yuan per 1000 shares, minimum 1 yuan), and the Shenzhen market charged no transfer fee
 
     :param float commission: the commission rate
     :param float lowestCommission: the minimum commission

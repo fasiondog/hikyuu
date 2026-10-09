@@ -31,6 +31,7 @@ CostRecord FixedETFTradeCost::getBuyCost(const Datetime& datetime, const Stock& 
     HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
     int precision = stock.precision();
     price_t value = price * num;
+    HKU_IF_RETURN(value <= 0, result);
     result.commission = roundEx(value * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {
@@ -47,6 +48,7 @@ CostRecord FixedETFTradeCost::getSellCost(const Datetime& datetime, const Stock&
     HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
     int precision = stock.precision();
     price_t value = price * num;
+    HKU_IF_RETURN(value <= 0, result);
     result.commission = roundEx(value * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {

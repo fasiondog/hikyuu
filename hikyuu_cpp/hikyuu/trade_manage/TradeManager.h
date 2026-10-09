@@ -457,6 +457,15 @@ private:
     list<string> m_actions;  // Records the trade actions, so that the trades of a live account can
                              // be modified or calibrated
 
+    // Transient incremental short-circuit cache for updateWithWeight: the exclusive upper bound
+    // of the ex-rights date already checked for that stock. Only point lookups/assigns (never
+    // iterated), so an unordered_map is used. Derived (rebuildable) state, intentionally NOT
+    // serialized and reset on _reset; the m_tmp_ prefix marks non-persistent derived state.
+    // Assumes the ex-rights data is final before the account advances: within a process lifetime it
+    // is immutable (a live refresh is done by the nightly restart/reload, which rebuilds the
+    // state), so an already-checked range never needs to be rescanned for late-arriving data.
+    unordered_map<uint64_t, Datetime> m_tmp_weight_checked_until;
+
 //==================================================
 // Serialization support
 //==================================================

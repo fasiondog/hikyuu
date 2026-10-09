@@ -6,6 +6,7 @@
  */
 
 #include "PositionRecord.h"
+#include "RecordCompare.h"
 
 namespace hku {
 
@@ -94,21 +95,17 @@ string PositionRecord::str() const {
 }
 
 price_t PositionRecord::totalProfit() const {
-    if (cleanDatetime == Null<Datetime>()) {
-        HKU_ERROR("The profit cannot be calculated without cleaned records!");
-        return 0.0;
-    }
+    HKU_IF_RETURN(cleanDatetime == Null<Datetime>(), Null<price_t>());
     return sellMoney - buyMoney - totalCost;
 }
 
 bool HKU_API operator==(const PositionRecord& d1, const PositionRecord& d2) {
     return d1.stock == d2.stock && d1.takeDatetime == d2.takeDatetime &&
-           d1.cleanDatetime == d2.cleanDatetime && fabs(d1.number - d2.number) < 0.00001 &&
-           fabs(d1.stoploss - d2.stoploss) < 0.0001 && fabs(d1.goalPrice - d2.goalPrice) < 0.0001 &&
-           fabs(d1.totalNumber - d2.totalNumber) < 0.00001 &&
-           fabs(d1.buyMoney - d2.buyMoney) < 0.0001 && fabs(d1.totalCost - d2.totalCost) < 0.0001 &&
-           fabs(d1.sellMoney - d2.sellMoney) < 0.0001 && d1.buyCount == d2.buyCount &&
-           d1.sellCount == d2.sellCount;
+           d1.cleanDatetime == d2.cleanDatetime && recordNear(d1.number, d2.number) &&
+           recordNear(d1.stoploss, d2.stoploss) && recordNear(d1.goalPrice, d2.goalPrice) &&
+           recordNear(d1.totalNumber, d2.totalNumber) && recordNear(d1.buyMoney, d2.buyMoney) &&
+           recordNear(d1.totalCost, d2.totalCost) && recordNear(d1.sellMoney, d2.sellMoney) &&
+           d1.buyCount == d2.buyCount && d1.sellCount == d2.sellCount;
 }
 
 } /* namespace hku */

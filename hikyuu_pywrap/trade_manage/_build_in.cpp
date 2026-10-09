@@ -29,17 +29,15 @@ void export_build_in(py::module& m) {
 
     m.def(
       "TC_FixedA", TC_FixedA, py::arg("commission") = 0.0018, py::arg("lowest_commission") = 5.0,
-      py::arg("stamptax") = 0.001, py::arg("transferfee") = 0.001,
-      py::arg("lowest_transferfee") = 1.0,
-      R"(TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.001, lowest_transferfee=1.0])
+      py::arg("stamptax") = 0.0005, py::arg("transferfee") = 0.00001,
+      R"(TC_FixedA([commission=0.0018, lowest_commission=5.0, stamptax=0.0005, transferfee=0.00001])
 
-    The A-share trade cost algorithm before August 1, 2015
+    The A-share trade cost algorithm at the current rates (rolling default): transfer fee 0.01 per mille of the amount in both directions on all markets (since 2022-04-29), and stamp duty 0.5 per mille on sells (since 2023-08-28).
 
     :param float commission: the commission ratio
     :param float lowest_commission: the lowest commission value
     :param float stamptax: the stamp tax
     :param float transferfee: the transfer fee
-    :param float lowest_transferfee: the lowest transfer fee
     :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def(
@@ -68,6 +66,21 @@ void export_build_in(py::module& m) {
     :param float lowest_commission: the lowest commission value
     :param float stamptax: the stamp tax
     :param float transferfee: the transfer fee
+    :return: a subclass instance of :py:class:`TradeCostBase`)");
+
+    m.def(
+      "TC_FixedAPre2015", TC_FixedAPre2015, py::arg("commission") = 0.0018,
+      py::arg("lowest_commission") = 5.0, py::arg("stamptax") = 0.001,
+      py::arg("transferfee") = 0.001, py::arg("lowest_transferfee") = 1.0,
+      R"(TC_FixedAPre2015([commission=0.0018, lowest_commission=5.0, stamptax=0.001, transferfee=0.001, lowest_transferfee=1.0])
+
+    The A-share trade cost algorithm before August 1, 2015; the Shanghai transfer fee is charged by traded quantity (1 yuan per 1000 shares, minimum 1 yuan), and the Shenzhen market charges no transfer fee.
+
+    :param float commission: the commission ratio
+    :param float lowest_commission: the lowest commission value
+    :param float stamptax: the stamp tax
+    :param float transferfee: the transfer fee (per share)
+    :param float lowest_transferfee: the lowest transfer fee
     :return: a subclass instance of :py:class:`TradeCostBase`)");
 
     m.def("TC_FixedETF", TC_FixedETF, py::arg("commission") = 0.0001,

@@ -15,6 +15,7 @@
 #include <hikyuu/trade_manage/TradeManager.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
 
 using namespace hku;
 
@@ -131,7 +132,7 @@ TEST_CASE("test_TradeManager_export") {
     filename += "/TradeManager.xml";
 
     Stock stock = sm.getStock("sh600000");
-    TradeCostPtr costfunc = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr costfunc = TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0);
 
     TradeManagerPtr tm1 = crtTM(Datetime(199901010000), 100000, costfunc);
     tm1->buy(Datetime(199911170000), stock, 27.18, 100, 27.18, 27.18, 0);
