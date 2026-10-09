@@ -79,6 +79,34 @@ TEST_CASE("test_ISLASTBAR") {
     CHECK_EQ(result[9], 1.);
 }
 
+/** @par Test points */
+TEST_CASE("test_ISLASTBAR_discard_offset") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 20));
+    CHECK_EQ(k_full.size(), 20);
+
+    /** @arg a non-leaf input with a discard marks the last bar of the whole series */
+    Indicator r = ISLASTBAR()(MA(CLOSE(), 5));
+    r.setContext(k_full);
+    CHECK_EQ(r.size(), 20);
+    CHECK_EQ(r.discard(), 4);
+    for (size_t i = r.discard(); i < 19; ++i) {
+        CHECK_EQ(r[i], 0.0);
+    }
+    CHECK_EQ(r[19], 1.0);
+
+    /** @arg a non-leaf input without a discard keeps the whole series valid */
+    Indicator r0 = ISLASTBAR()(CLOSE());
+    r0.setContext(k_full);
+    CHECK_EQ(r0.size(), 20);
+    CHECK_EQ(r0.discard(), 0);
+    for (size_t i = 0; i < 19; ++i) {
+        CHECK_EQ(r0[i], 0.0);
+    }
+    CHECK_EQ(r0[19], 1.0);
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------
