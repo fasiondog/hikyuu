@@ -42,6 +42,7 @@ CostRecord FixedA2015TradeCost::getBuyCost(const Datetime& datetime, const Stock
 
     int precision = stock.precision();
     price_t value = price * num;
+    HKU_IF_RETURN(value <= 0, result);
     result.commission = roundEx(value * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {
@@ -64,6 +65,7 @@ CostRecord FixedA2015TradeCost::getSellCost(const Datetime& datetime, const Stoc
 
     int precision = stock.precision();
     price_t value = price * num;
+    HKU_IF_RETURN(value <= 0, result);
     result.commission = roundEx(value * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {

@@ -53,8 +53,10 @@ CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& st
                                        double num) const {
     CostRecord result;
     HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
+    price_t value = price * num;
+    HKU_IF_RETURN(value <= 0, result);
     int precision = stock.precision();
-    result.commission = roundEx(price * num * getParam<price_t>("commission"), precision);
+    result.commission = roundEx(value * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {
         result.commission = lowestCommission;
@@ -79,8 +81,10 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& s
         return result;
     }
 
+    price_t value = price * num;
+    HKU_IF_RETURN(value <= 0, result);
     int precision = stock.precision();
-    result.commission = roundEx(price * num * getParam<price_t>("commission"), precision);
+    result.commission = roundEx(value * getParam<price_t>("commission"), precision);
     price_t lowestCommission = getParam<price_t>("lowest_commission");
     if (result.commission < lowestCommission) {
         result.commission = lowestCommission;
@@ -89,7 +93,7 @@ CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& s
     // Stamp duty applies to sells of A-shares, ChiNext, STAR and Beijing Stock Exchange stocks
     if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM ||
         stock.type() == STOCKTYPE_START || stock.type() == STOCKTYPE_A_BJ) {
-        result.stamptax = roundEx(price * num * getParam<price_t>("stamptax"), precision);
+        result.stamptax = roundEx(value * getParam<price_t>("stamptax"), precision);
     } else {
         result.stamptax = 0.0;
     }

@@ -193,6 +193,33 @@ TEST_CASE("test_TC_FixedA_stamptax_type") {
     CHECK_EQ(result, expect);
 }
 
+/** @par Test points */
+TEST_CASE("test_TC_FixedA_zero_value") {
+    // a zero transaction value (e.g. realPrice=0 market-order placeholder) yields zero cost,
+    // instead of being floored to the lowest commission
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600004");
+    CostRecord result, expect;
+    TradeCostPtr cost_func = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    const Datetime dt(200101010000);
+
+    /** @arg Buy with price 0: zero cost */
+    result = cost_func->getBuyCost(dt, stock, 0.0, 1000);
+    CHECK_EQ(result, expect);
+
+    /** @arg Sell with price 0: zero cost */
+    result = cost_func->getSellCost(dt, stock, 0.0, 1000);
+    CHECK_EQ(result, expect);
+
+    /** @arg Buy with num 0: zero cost */
+    result = cost_func->getBuyCost(dt, stock, 10.0, 0);
+    CHECK_EQ(result, expect);
+
+    /** @arg Sell with num 0: zero cost */
+    result = cost_func->getSellCost(dt, stock, 10.0, 0);
+    CHECK_EQ(result, expect);
+}
+
 #if HKU_SUPPORT_SERIALIZATION
 /** @par Test points */
 TEST_CASE("test_FixedATC_export") {
