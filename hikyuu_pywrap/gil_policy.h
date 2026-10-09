@@ -45,7 +45,13 @@ inline bool tm_list_has_python_part(const vector<TMPtr>& tm_list) {
 
 // Keep the C++ logging off the Python streams and release the GIL for the current scope when
 // the inputs are python-free; otherwise keep the GIL held (pybind trampolines require it).
+// pybind11 types are compiled with hidden visibility, so the class holding them must be marked
+// the same way, otherwise GCC warns that it is declared with greater visibility than its fields.
+#if HKU_OS_LINUX
+class __attribute__((visibility("hidden"))) ScopeGilRelease {
+#else
 class ScopeGilRelease {
+#endif
 public:
     explicit ScopeGilRelease(bool python_free) {
         if (python_free) {
