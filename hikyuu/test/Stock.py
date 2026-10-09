@@ -7,6 +7,8 @@
 # History: 1)20120928, Added by fasiondog
 # ===============================================================================
 
+import threading
+import time
 import unittest
 
 from test_init import *
@@ -51,6 +53,30 @@ class StockTest(unittest.TestCase):
         s2 = sm['sz000001']
         self.assertTrue(not (s1 == s2))
         self.assertTrue(s1 != s2)
+
+        # the whole-series disk load releases the GIL, so other Python threads keep running
+        calendar = stock.get_trading_calendar(Query(0, 10))
+        self.assertGreater(len(calendar), 0)
+
+        stock.release_kdata_buffer(Query.WEEK)
+        counter = [0]
+        stop = threading.Event()
+
+        def spin():
+            while not stop.is_set():
+                counter[0] += 1
+                time.sleep(0)
+
+        thread = threading.Thread(target=spin)
+        thread.start()
+        time.sleep(0.05)
+        before = counter[0]
+        stock.load_kdata_to_buffer(Query.WEEK)
+        progress = counter[0] - before
+        stop.set()
+        thread.join()
+        stock.release_kdata_buffer(Query.WEEK)  # restore the pre-test buffer state
+        self.assertGreater(progress, 50)
 
     def test_pickle(self):
         if not constant.pickle_support:
