@@ -294,6 +294,8 @@ StockManager/Block/Stock
         获取证券列表
         
         :param func filter: 输入参数为 stock, 返回 True | False 的过滤函数
+
+        filter 在列表快照上执行，允许在 filter 内增删证券
         
     .. py:method:: __getitem__
 

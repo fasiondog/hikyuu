@@ -310,6 +310,8 @@ StockManager/Block/Stock
         :param func filter: predicate function that takes a stock as its argument and returns
                             True | False
 
+        The filter is applied to a snapshot of the list, so it may add or remove securities
+
     .. py:method:: __getitem__
 
         Equivalent to get_stock

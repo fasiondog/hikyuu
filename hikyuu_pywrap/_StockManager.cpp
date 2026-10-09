@@ -210,16 +210,25 @@ void export_StockManager(py::module& m) {
             } else {
                 HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
                 py::object filter_func = filter.attr("__call__");
-                ret = self.getStockList(
-                  [&](const Stock& stk) { return filter_func(stk).cast<bool>(); });
+                // snapshot first: the Python filter must never run while the core stock table
+                // is locked/iterated, it may add or remove securities
+                StockList all = self.getStockList();
+                ret.reserve(all.size());
+                for (const auto& stk : all) {
+                    if (filter_func(stk).cast<bool>()) {
+                        ret.emplace_back(stk);
+                    }
+                }
             }
             return ret;
         },
         py::arg("filter") = py::none(), R"(get_stock_list(self[, filter=None])
-        
+
     Get the security list
 
-    :param func filter: a filter function whose input parameter is the stock and which returns True | False)")
+    :param func filter: a filter function whose input parameter is the stock and which returns True | False
+
+    The filter runs on a snapshot of the list, so it may add or remove securities.)")
 
       .def("get_category_list", &StockManager::getAllCategory, R"(get_category_list(self)
 
