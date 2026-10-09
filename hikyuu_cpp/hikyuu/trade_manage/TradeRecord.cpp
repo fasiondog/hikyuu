@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include "hikyuu/global/sysinfo.h"
 #include "TradeRecord.h"
+#include "RecordCompare.h"
 
 namespace hku {
 
@@ -99,6 +100,8 @@ BUSINESS HKU_API getBusinessEnum(const string& arg) {
     } else if (business_name == "DIVIDEND_COMPENSATION") {
         return BUSINESS_DIVIDEND_COMPENSATION;
     } else {
+        HKU_WARN_IF(!business_name.empty() && business_name != "UNKNOWN",
+                    "Unknown business name: {}, mapped to BUSINESS_INVALID", arg);
         business = BUSINESS_INVALID;
     }
     return business;
@@ -190,12 +193,11 @@ bool TradeRecord::isNull() const {
 
 bool HKU_API operator==(const TradeRecord& d1, const TradeRecord& d2) {
     return d1.business == d2.business && d1.stock == d2.stock && d1.datetime == d2.datetime &&
-           fabs(d1.planPrice - d2.planPrice) < 0.0001 &&
-           fabs(d1.realPrice - d2.realPrice) < 0.0001 &&
+           recordNear(d1.planPrice, d2.planPrice) && recordNear(d1.realPrice, d2.realPrice) &&
            ((std::isnan(d1.goalPrice) && std::isnan(d2.goalPrice)) ||
-            (fabs(d1.goalPrice - d2.goalPrice) < 0.0001)) &&
-           fabs(d1.number - d2.number) < 0.000001 && d1.cost == d2.cost &&
-           fabs(d1.stoploss - d2.stoploss) < 0.0001 && fabs(d1.cash - d2.cash) < 0.0001 &&
+            recordNear(d1.goalPrice, d2.goalPrice)) &&
+           recordNear(d1.number, d2.number) && d1.cost == d2.cost &&
+           recordNear(d1.stoploss, d2.stoploss) && recordNear(d1.cash, d2.cash) &&
            d1.from == d2.from;
 }
 

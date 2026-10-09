@@ -11,7 +11,7 @@ namespace hku {
 
 HKU_API std::ostream& operator<<(std::ostream& os, const BorrowRecord& bor) {
     string strip(", ");
-    os << "BorrowRecord(" << bor.stock << strip << bor.number << strip << bor.value << strip << ")";
+    os << "BorrowRecord(" << bor.stock << strip << bor.number << strip << bor.value << ")";
     return os;
 }
 
