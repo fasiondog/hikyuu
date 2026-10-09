@@ -86,7 +86,10 @@ Indicator
 
     .. py:method:: get(self, pos[, result_index=0])
 
-        Get the value at the specified position
+        Get the value at the specified position. For speed, pos is passed to the core
+        unchecked: it must be a valid non-negative index; negative values or out-of-range
+        access are undefined. Use the [] operator for safe indexing with negative-value
+        support
 
         :param int pos: position index
         :param int result_index: index of the result set

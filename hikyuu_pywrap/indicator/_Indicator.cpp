@@ -108,7 +108,10 @@ void export_Indicator(py::module& m) {
       .def("get", &Indicator::get, py::arg("pos"), py::arg("result_index") = 0,
            R"(get(self, pos[, result_index=0])
 
-    Get the value at the specified position
+    Get the value at the specified position. For speed, pos is passed to the core
+    unchecked: it must be a valid non-negative index; negative values or out-of-range
+    access are undefined. Use the [] operator for safe indexing with negative-value
+    support.
 
     :param int pos: the specified index position
     :param int result_index: the specified result set
