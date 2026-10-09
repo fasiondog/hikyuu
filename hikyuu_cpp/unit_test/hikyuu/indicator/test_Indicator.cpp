@@ -1353,4 +1353,37 @@ TEST_CASE("test_indicator_is_same") {
     CHECK_UNARY(!empty.isSame(empty));
 }
 
+/**
+ * @par Test points
+ * A context driven indicator used as an operation with a non empty input only warns, it must not
+ * die inside the warning itself.
+ *
+ * Background: the warning text of STKTYPE / ISLIMITUP / ISLIMITDOWN read a "kpart" parameter they
+ * never define, so Parameter::get threw out_of_range instead of the intended notice.
+ */
+TEST_CASE("test_context_leaf_warning_with_input") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    REQUIRE_FALSE(stock.isNull());
+    KData k = stock.getKData(KQuery(0, 20));
+
+    // A calculated input, so that the "input is ignored" warning branch is really reached
+    Indicator input = CLOSE();
+    input.setContext(k);
+    REQUIRE_FALSE(input.empty());
+
+    Indicator ctx_leaf = STKTYPE();
+    Indicator limit_up = ISLIMITUP();
+    Indicator limit_down = ISLIMITDOWN();
+
+    /** @arg each of them warns and keeps calculating instead of throwing */
+    CHECK_NOTHROW(ctx_leaf(input));
+    CHECK_NOTHROW(limit_up(input));
+    CHECK_NOTHROW(limit_down(input));
+
+    /** @arg the warning does not stop the indicator from producing the context values */
+    Indicator r = ctx_leaf(k);
+    CHECK_EQ(r.size(), 20);
+}
+
 /** @} */

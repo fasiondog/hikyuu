@@ -17,12 +17,14 @@ BOOST_CLASS_EXPORT(hku::IIndex)
 namespace hku {
 
 IIndex::IIndex() : IndicatorImp("INDEX", 1) {
+    m_need_context = true;
     setParam<bool>("fill_null", true);
     setParam<string>("kpart", "CLOSE");
     setParam<string>("market_code", "SH000001");
 }
 
 IIndex::IIndex(const string& kpart, bool fill_null) : IndicatorImp("INDEX", 1) {
+    m_need_context = true;
     setParam<bool>("fill_null", fill_null);
     string part_name(kpart);
     to_upper(part_name);
@@ -66,9 +68,6 @@ void IIndex::_calculate(const Indicator& ind) {
     } else {
         HKU_WARN("Not known the index code, will use {} as default.", market_code);
     }
-
-    // Adjust the market_code parameter to the market_code of the current index
-    setParam<string>("market_code", market_code);
 
     KQuery query = k.getQuery();
     auto secs = KQuery::getKTypeInSeconds(query.kType());
