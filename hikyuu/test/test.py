@@ -31,6 +31,7 @@ import AllocateFunds
 import MultiSystem
 import Strategy
 import ConvertAny
+import Pickle
 import test_common_sql
 
 if __name__ == "__main__":
@@ -69,6 +70,7 @@ if __name__ == "__main__":
     suite.addTest(MultiSystem.suite())
     suite.addTest(Strategy.suite())
     suite.addTest(ConvertAny.suite())
+    suite.addTest(Pickle.suite())
     suite.addTest(test_common_sql.suite())
 
     unittest.TextTestRunner(verbosity=2).run(suite)

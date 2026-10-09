@@ -46,8 +46,8 @@
 
 namespace py = pybind11;
 
-// Limitation: deserializing a Python subclass instance via DEF_PICKLE restores only the C++ base;
-// m_is_python_object is reset to false and any Python-level overrides are lost silently.
+// State must be bytes; a str is rejected because UTF-8 reinterpretation corrupts the archive.
+// boost::serialization is unsafe for untrusted input.
 #define DEF_PICKLE(classname)                                                                      \
     .def(py::pickle(                                                                               \
       [](const classname& p) {                                                                     \
@@ -66,21 +66,15 @@ namespace py = pybind11;
               throw py::error_already_set();                                                       \
           }                                                                                        \
           py::object obj = t[0];                                                                   \
-          if (py::isinstance<py::str>(obj)) {                                                      \
-              std::string st = obj.cast<py::str>();                                                \
-              std::istringstream is(st);                                                           \
-              INPUT_ARCHIVE ia(is);                                                                \
-              ia >> result;                                                                        \
-          } else if (PyBytes_Check(py::object(t[0]).ptr())) {                                      \
-              py::object obj = t[0];                                                               \
+          if (PyBytes_Check(obj.ptr())) {                                                          \
               char* data = PyBytes_AsString(obj.ptr());                                            \
               auto num = PyBytes_Size(obj.ptr());                                                  \
               std::istringstream sin(std::string(data, num));                                      \
               INPUT_ARCHIVE ia(sin);                                                               \
               ia >> result;                                                                        \
-              return result;                                                                       \
           } else {                                                                                 \
-              throw std::runtime_error("Unable to unpickle, error in input file.");                \
+              throw std::runtime_error(                                                            \
+                "Unable to unpickle: state must be bytes, not str (untrusted input is unsafe).");  \
           }                                                                                        \
           return result;                                                                           \
       }))
