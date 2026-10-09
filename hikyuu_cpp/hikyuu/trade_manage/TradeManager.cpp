@@ -871,10 +871,32 @@ TradeRecord TradeManager::buy(const Datetime& datetime, const Stock& stock, pric
                            "{} {} Can't buy, need cash({:<.4f}) > buying power({:<.4f})!", datetime,
                            stock.market_code(), need_cash, x);
 
-        // Borrow only the cash shortfall (including the estimated borrow cost); use the own cash
-        // first (ISS-045)
-        price_t gap = roundEx(need_cash - m_cash + bor_cost.total, precision);
+        // Borrow on demand, including the cost of the borrow itself: the buy cost is computed on
+        // the real borrow amount (not on the full trade money), and the post-borrow cash is
+        // simulated with the same formula borrowCash uses before creating any debt, so a failed
+        // buy never leaves a loan record behind
+        price_t gap = roundEx(need_cash - m_cash, precision);
         if (gap > 0.0) {
+            bool covered = false;
+            for (int i = 0; i < 32 && !covered; ++i) {
+                price_t after =
+                  roundEx(m_cash + gap - getBorrowCashCost(datetime, gap).total, precision);
+                covered = after >= need_cash;
+                if (!covered) {
+                    price_t next = roundEx(gap + roundEx(need_cash - after, precision), precision);
+                    // The cost rate must stay well below 100%; a non-increasing gap means the
+                    // sequence stalled and the cost can never be covered
+                    HKU_WARN_IF_RETURN(
+                      next <= gap, result,
+                      "{} {} Can't buy, the borrow cost can not be covered by gap({:<.4f})!",
+                      datetime, stock.market_code(), gap);
+                    gap = next;
+                }
+            }
+            HKU_WARN_IF_RETURN(
+              !covered, result,
+              "{} {} Can't buy, the borrow cost can not be covered by gap({:<.4f})!", datetime,
+              stock.market_code(), gap);
             borrowCash(datetime, gap);
         }
     }
@@ -1061,11 +1083,34 @@ TradeRecord TradeManager::sellShort(const Datetime& datetime, const Stock& stock
         CostRecord cost = getSellCost(datetime, stock, realPrice, number);
         price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
         price_t x = roundEx(m_cash / getMarginRate(datetime, stock), precision);
-        if (x < money) {
-            checkin(datetime, roundEx(money - x, precision));
-        }
+        // A-share margin trading: insufficient collateral rejects the order; injecting cash through
+        // checkin would create external funds out of thin air and pollute base_cash (the return
+        // denominator)
+        HKU_WARN_IF_RETURN(x < money, result,
+                           "{} {} Can't sellShort, need margin({:<.4f}) > buying power({:<.4f})!",
+                           datetime, stock.market_code(), money, x);
 
-        borrowStock(datetime, stock, realPrice, number);
+        // Borrow on demand: the unsold stock already in the pool is used first, only the
+        // shortfall creates new debt
+        double borrow_num = number;
+        borrow_stock_map_type::const_iterator pool_iter = m_borrow_stock.find(stock.id());
+        if (pool_iter != m_borrow_stock.end()) {
+            double unsold = pool_iter->second.number;
+            position_map_type::const_iterator old_pos = m_short_position.find(stock.id());
+            if (old_pos != m_short_position.end()) {
+                unsold -= old_pos->second.number;
+            }
+            // The short position must not exceed the borrowed quantity (an inconsistent account);
+            // reject before borrowing so that no debt residue is left behind
+            HKU_WARN_IF_RETURN(unsold < 0.0, result, "{} {} Borrowed Stock had all selled!",
+                               datetime, stock.market_code());
+            if (unsold > 0.0) {
+                borrow_num = number > unsold ? number - unsold : 0.0;
+            }
+        }
+        if (borrow_num > 0.0) {
+            borrowStock(datetime, stock, realPrice, borrow_num);
+        }
     }
 
     // Judge whether there is a borrowed stock and its quantity

@@ -42,6 +42,39 @@ public:
     size_t sell_count{0};
 };
 
+// A test cost function with a controllable margin financing cost, used to exercise the
+// auto-financing caliber of buy
+class TestBorrowCost final : public TradeCostBase {
+public:
+    TestBorrowCost(price_t rate, price_t fixed)
+    : TradeCostBase("TestBorrowCost"), m_rate(rate), m_fixed(fixed) {}
+
+    CostRecord getBuyCost(const Datetime&, const Stock&, price_t, double) const override {
+        return CostRecord();
+    }
+
+    CostRecord getSellCost(const Datetime&, const Stock&, price_t, double) const override {
+        return CostRecord();
+    }
+
+    CostRecord getBorrowCashCost(const Datetime&, price_t cash) const override {
+        CostRecord ret;
+        price_t fee = roundEx(m_rate * cash + m_fixed, 2);
+        ret.commission = fee;
+        ret.total = fee;
+        return ret;
+    }
+
+protected:
+    TradeCostPtr _clone() override {
+        return std::make_shared<TestBorrowCost>(m_rate, m_fixed);
+    }
+
+private:
+    price_t m_rate{0.0};
+    price_t m_fixed{0.0};
+};
+
 }  // namespace
 
 /**
@@ -1332,6 +1365,78 @@ TEST_CASE("test_TradeManager_short_borrow_exrights") {
     Performance perf;
     perf.statistics(tm, Datetime(200007060000));
     CHECK_EQ(perf.get("Total Dividends"), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_TradeManager_margin_and_borrow_atomicity") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    // TM-105: insufficient margin must reject instead of injecting cash via checkin
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100, TC_Zero());
+    tm->setParam<bool>("support_borrow_stock", true);
+    TradeRecord result = tm->sellShort(Datetime(199911170000), stock, 10.0, 1000);
+    /** @arg the order is rejected (100 / 0.6 < 10000) */
+    CHECK_EQ(result.business, BUSINESS_INVALID);
+
+    /** @arg no CHECKIN injection and no borrow debt residue */
+    for (const auto& tr : tm->getRefTradeList()) {
+        CHECK_UNARY(tr.business != BUSINESS_CHECKIN);
+        CHECK_UNARY(tr.business != BUSINESS_BORROW_STOCK);
+    }
+    CHECK_EQ(tm->getDebtNumber(Datetime(199911170000), stock), 0.0);
+    CHECK_EQ(tm->currentCash(), 100.0);
+
+    /** @arg borrow on demand: the unsold pool is used first, only the shortfall creates debt */
+    tm = crtTM(Datetime(199901010000), 1000000, TC_Zero());
+    tm->setParam<bool>("support_borrow_stock", true);
+    CHECK_UNARY(tm->borrowStock(Datetime(199911100000), stock, 10.0, 300));
+    result = tm->sellShort(Datetime(199911170000), stock, 10.0, 100);
+    CHECK_EQ(result.business, BUSINESS_SELL_SHORT);
+    CHECK_EQ(result.number, 100.0);
+    CHECK_EQ(tm->getDebtNumber(Datetime(199911170000), stock), 300.0);
+
+    /** @arg the second sell borrows only the remaining shortfall (300 - 200 unsold) */
+    result = tm->sellShort(Datetime(199911180000), stock, 10.0, 300);
+    CHECK_EQ(result.business, BUSINESS_SELL_SHORT);
+    CHECK_EQ(tm->getDebtNumber(Datetime(199911180000), stock), 400.0);
+    CHECK_EQ(tm->getShortHoldNumber(Datetime(199911180000), stock), 400.0);
+
+    // TM-115: the auto financing borrow covers exactly the shortfall (zero-cost case)
+    tm = crtTM(Datetime(199901010000), 5000, TC_Zero());
+    tm->setParam<bool>("support_borrow_cash", true);
+    result = tm->buy(Datetime(199911170000), stock, 10.0, 600);
+    /** @arg debt equals the cash shortfall and the buy succeeds */
+    CHECK_EQ(result.business, BUSINESS_BUY);
+    CHECK_EQ(tm->getDebtCash(Datetime(199911170000)), 1000.0);
+    CHECK_EQ(tm->currentCash(), 0.0);
+
+    /** @arg the financing gap includes the cost of the borrow itself (fixed fee: 1000 + 30) */
+    tm = crtTM(Datetime(199901010000), 5000, std::make_shared<TestBorrowCost>(0.0, 30.0));
+    tm->setParam<bool>("support_borrow_cash", true);
+    result = tm->buy(Datetime(199911170000), stock, 10.0, 600);
+    CHECK_EQ(result.business, BUSINESS_BUY);
+    CHECK_EQ(tm->getDebtCash(Datetime(199911170000)), 1030.0);
+    CHECK_EQ(tm->currentCash(), 0.0);
+
+    /** @arg a proportional borrow fee converges to the self-consistent gap (0.9*gap = 1000),
+     * i.e. the buy is not wrongly rejected (the old fixed 4-step solver would give up) */
+    tm = crtTM(Datetime(199901010000), 5000, std::make_shared<TestBorrowCost>(0.1, 0.0));
+    tm->setParam<bool>("support_borrow_cash", true);
+    result = tm->buy(Datetime(199911170000), stock, 10.0, 600);
+    CHECK_EQ(result.business, BUSINESS_BUY);
+    CHECK_EQ(tm->getDebtCash(Datetime(199911170000)), 1111.11);
+    CHECK_EQ(tm->currentCash(), 0.0);
+
+    /** @arg a rejected buy leaves no loan record behind (atomic) */
+    tm = crtTM(Datetime(199901010000), 100, TC_Zero());
+    tm->setParam<bool>("support_borrow_cash", true);
+    result = tm->buy(Datetime(199911170000), stock, 10.0, 1000);
+    CHECK_EQ(result.business, BUSINESS_INVALID);
+    CHECK_EQ(tm->getDebtCash(Datetime(199911170000)), 0.0);
+    for (const auto& tr : tm->getRefTradeList()) {
+        CHECK_UNARY(tr.business != BUSINESS_BORROW_CASH);
+    }
 }
 
 /** @par Test points */
