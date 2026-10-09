@@ -10,6 +10,7 @@
 #include <hikyuu/trade_manage/OrderBrokerBase.h>
 #include <hikyuu/trade_manage/crt/TC_TestStub.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_manage/Performance.h>
 
@@ -95,7 +96,7 @@ TEST_CASE("test_TradeManager_init") {
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
     TradeManagerPtr tm =
-      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+      crtTM(Datetime(199901010000), 100000, TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
     CHECK_EQ(tm->name(), "TEST");
     CHECK_EQ(tm->initCash(), 100000.0);
@@ -124,7 +125,7 @@ TEST_CASE("test_TradeManager_getBuyCost") {
     Stock stock = sm.getStock("sh600000");
     CostRecord result, expect;
     TradeManagerPtr tm =
-      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+      crtTM(Datetime(199901010000), 100000, TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
 
     /** @arg Whether calling CostFunc works */
     result = tm->getBuyCost(Datetime(200101010000), stock, 10.0, 1000);
@@ -141,7 +142,7 @@ TEST_CASE("test_TradeManager_getSellCost") {
     Stock stock = sm.getStock("sh600004");
     CostRecord result, expect;
     TradeManagerPtr tm =
-      crtTM(Datetime(199901010000), 100000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0));
+      crtTM(Datetime(199901010000), 100000, TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0));
 
     /** @arg Whether calling CostFunc works */
     result = tm->getSellCost(Datetime(200101010000), stock, 10.0, 100);
@@ -156,7 +157,7 @@ TEST_CASE("test_TradeManager_getSellCost") {
 TEST_CASE("test_TradeManager_can_not_buy") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    TradeCostPtr costfunc = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr costfunc = TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0);
     TradeManagerPtr tm;
     TradeRecord result;
     CostRecord cost;
@@ -248,7 +249,7 @@ TEST_CASE("test_TradeManager_can_not_buy") {
 TEST_CASE("test_TradeManager_can_not_sell") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    TradeCostPtr costfunc = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr costfunc = TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0);
     TradeManagerPtr tm;
     TradeRecord result;
     CostRecord cost;
@@ -1277,7 +1278,8 @@ TEST_CASE("test_TradeManager_param_guards") {
     auto invalid = [](const TradeRecord& r) { return r.business == BUSINESS_INVALID; };
 
     /** @arg buy rejects negative, NaN and infinite real price */
-    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0),
+               "TEST");
     CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, -10.0, 100)));
     CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, nan, 100)));
     CHECK_UNARY(invalid(tm->buy(Datetime(199911170000), stock, inf, 100)));
@@ -1305,7 +1307,8 @@ TEST_CASE("test_TradeManager_param_guards") {
     CHECK_EQ(result.business, BUSINESS_SELL);
 
     /** @arg sellShort rejects negative, NaN and infinite real price and a NaN number */
-    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0), "TEST");
+    tm = crtTM(Datetime(199901010000), 1000000, TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0),
+               "TEST");
     CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, -10.0, 100)));
     CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, nan, 100)));
     CHECK_UNARY(invalid(tm->sellShort(Datetime(199911170000), stock, inf, 100)));

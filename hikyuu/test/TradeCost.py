@@ -52,9 +52,9 @@ class TradeCostTest(unittest.TestCase):
         cost = clone_tc.get_sell_cost(Datetime(201001010000), stock, 10.0, 100)
         self.assertEqual(cost, CostRecord(0, 0, 0, 0, 0))
 
-    def test_FixedATC(self):
+    def test_FixedAPre2015TC(self):
         stock = sm['sh000001']
-        tc = TC_FixedA()
+        tc = TC_FixedAPre2015()
         cost = tc.get_sell_cost(Datetime(200101010000), stock, 10.0, 2100)
         self.assertEqual(cost, CostRecord(37.8, 0, 2.1, 0, 39.9))
         cost = tc.get_sell_cost(Datetime(200101010000), stock, 10.0, 2100)

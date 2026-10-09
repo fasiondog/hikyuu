@@ -34,7 +34,7 @@ namespace hku {
  * @param commission commission ratio, 1.8 per mille by default, i.e. 0.0018
  * @param lowestCommission minimum commission value, 5 yuan by default
  * @param stamptax stamp duty, 1 per mille by default, i.e. 0.001
- * @param transferfee transfer fee, 0.2 per mille by default, i.e. 0.00002
+ * @param transferfee transfer fee, 0.02 per mille by default, i.e. 0.00002
  * @see FixedATradeCost
  * @ingroup TradeCost
  */

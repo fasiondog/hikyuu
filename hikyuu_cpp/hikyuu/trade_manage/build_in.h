@@ -13,6 +13,7 @@
 #include "crt/TC_TestStub.h"
 #include "crt/TC_Zero.h"
 #include "crt/TC_FixedA.h"
+#include "crt/TC_FixedAPre2015.h"
 #include "crt/TC_FixedA2015.h"
 #include "crt/TC_FixedA2017.h"
 #include "crt/TC_FixedETF.h"

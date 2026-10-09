@@ -7,7 +7,7 @@
 #include "doctest/doctest.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/StockTypeInfo.h>
-#include <hikyuu/trade_manage/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
 
 #include <hikyuu/config.h>
 #if HKU_SUPPORT_SERIALIZATION
@@ -19,17 +19,17 @@
 using namespace hku;
 
 /**
- * @defgroup test_TC_FixedA test_TC_FixedA
+ * @defgroup test_TC_FixedAPre2015 test_TC_FixedAPre2015
  * @ingroup test_hikyuu_trade_manage_suite
  * @{
  */
 
 /** @par Test points */
-TEST_CASE("test_TC_FixedA") {
+TEST_CASE("test_TC_FixedAPre2015") {
     StockManager& sm = StockManager::instance();
     Stock stock;
     CostRecord result, expect;
-    TradeCostPtr cost_func = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr cost_func = TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0);
 
     /** @arg Stock is Null */
     result = cost_func->getBuyCost(Datetime(200101010000), stock, 10.0, 100);
@@ -138,11 +138,11 @@ TEST_CASE("test_TC_FixedA") {
 }
 
 /** @par Test points */
-TEST_CASE("test_TC_FixedA_stamptax_type") {
+TEST_CASE("test_TC_FixedAPre2015_stamptax_type") {
     // sell-side stamp duty applies to A/GEM/STAR/BSE; B-shares are not taxed
     StockManager& sm = StockManager::instance();
     CostRecord result, expect;
-    TradeCostPtr cost_func = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr cost_func = TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0);
     const Datetime dt(200101010000);
     // borrow a real stock's data driver so the synthetic typed stocks are not null
     auto driver = sm.getStock("sh600004").getKDataDirver();
@@ -194,13 +194,13 @@ TEST_CASE("test_TC_FixedA_stamptax_type") {
 }
 
 /** @par Test points */
-TEST_CASE("test_TC_FixedA_zero_value") {
+TEST_CASE("test_TC_FixedAPre2015_zero_value") {
     // a zero transaction value (e.g. realPrice=0 market-order placeholder) yields zero cost,
     // instead of being floored to the lowest commission
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600004");
     CostRecord result, expect;
-    TradeCostPtr cost_func = TC_FixedA(0.0018, 5, 0.001, 0.001, 1.0);
+    TradeCostPtr cost_func = TC_FixedAPre2015(0.0018, 5, 0.001, 0.001, 1.0);
     const Datetime dt(200101010000);
 
     /** @arg Buy with price 0: zero cost */
@@ -228,7 +228,7 @@ TEST_CASE("test_FixedATC_export") {
     string filename(sm.tmpdir());
     filename += "/TC_FixedA.xml";
 
-    TradeCostPtr func1 = TC_FixedA();
+    TradeCostPtr func1 = TC_FixedAPre2015();
     {
         std::ofstream ofs(filename);
         boost::archive::xml_oarchive oa(ofs);
@@ -242,7 +242,7 @@ TEST_CASE("test_FixedATC_export") {
         ia >> BOOST_SERIALIZATION_NVP(func2);
     }
 
-    CHECK_EQ(func2->name(), "FixedATradeCost");
+    CHECK_EQ(func2->name(), "FixedAPre2015TradeCost");
 
     CostRecord result, expect;
     Stock stock = sm.getStock("sh600004");

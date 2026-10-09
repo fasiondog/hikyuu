@@ -18,19 +18,18 @@
 沪深A股交易成本算法
 ^^^^^^^^^^^^^^^^^^^
 
-* 2015年8月1日之前，上证过户费为交易数量的千分之一，不足1元，按1元计。
-* 2015年8月1日之后，上证过户费为成交金额的千分之0.02
+* TC_FixedA 为滚动默认成本模型，始终对应最新年份的费率；各年份模型（TC_FixedAPre2015 / 2015 / 2017）保持冻结，用于历史回测。
+* 2022年4月29日起过户费降为成交金额的千分之0.01（沪深京双向收取）；2023年8月28日起卖出印花税降为千分之0.5。
 
-计算规则如下:: python
+.. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.0005, transferfee=0.00001])
 
-    1）上证交易所
-        买入：佣金＋过户费
-        卖出：佣金＋过户费＋印花税
-    2）深证交易所：
-        买入：佣金
-        卖出：佣金＋印花税
+    当前最新A股交易成本算法（滚动默认，始终对应当前费率）：过户费按成交金额的千分之0.01全市场双向收取，卖出印花税千分之0.5
 
-    其中，佣金最低5元
+    :param float commission: 佣金比例
+    :param float lowestCommission: 最低佣金值
+    :param float stamptax: 印花税
+    :param float transferfee: 过户费
+    :return: :py:class:`TradeCostBase` 子类实例
 
 .. py:function:: TC_FixedA2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
 
@@ -41,10 +40,20 @@
     :param float stamptax: 印花税
     :param float transferfee: 过户费
     :return: :py:class:`TradeCostBase` 子类实例
-    
-.. py:function:: TC_FixedA([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
 
-    2015年8月1日之前的A股交易成本算法
+.. py:function:: TC_FixedA2017([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.00002])
+
+    2017年1月1日及之后的A股交易成本算法，深证过户费单列，沪深均按成交金额的千分之0.02双向收取
+
+    :param float commission: 佣金比例
+    :param float lowestCommission: 最低佣金值
+    :param float stamptax: 印花税
+    :param float transferfee: 过户费
+    :return: :py:class:`TradeCostBase` 子类实例
+
+.. py:function:: TC_FixedAPre2015([commission=0.0018, lowestCommission=5.0, stamptax=0.001, transferfee=0.001, lowestTransferfee=1.0])
+
+    2015年8月1日之前的A股交易成本算法：上证过户费按交易数量千分之一（每1000股1元），不足1元按1元计；深证不收过户费
 
     :param float commission: 佣金比例
     :param float lowestCommission: 最低佣金值

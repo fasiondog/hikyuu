@@ -6,8 +6,7 @@
  */
 
 #include "FixedATradeCost.h"
-#include "hikyuu/utilities/Log.h"
-#include "../../StockTypeInfo.h"
+#include "hikyuu/utilities/arithmetic.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedATradeCost)
@@ -15,96 +14,27 @@ BOOST_CLASS_EXPORT(hku::FixedATradeCost)
 
 namespace hku {
 
-FixedATradeCost::FixedATradeCost() : TradeCostBase("TC_FixedA") {
+FixedATradeCost::FixedATradeCost() : FixedATradeCostBase("TC_FixedA") {
     setParam<price_t>("commission", 0.0018);
     setParam<price_t>("lowest_commission", 5.0);
-    setParam<price_t>("stamptax", 0.001);
-    setParam<price_t>("transferfee", 0.001);
-    setParam<price_t>("lowest_transferfee", 1.0);
+    setParam<price_t>("stamptax", 0.0005);
+    setParam<price_t>("transferfee", 0.00001);
 }
 
 FixedATradeCost::FixedATradeCost(price_t commission, price_t lowestCommission, price_t stamptax,
-                                 price_t transferfee, price_t lowestTransferfee)
-: TradeCostBase("FixedATradeCost") {
+                                 price_t transferfee)
+: FixedATradeCostBase("FixedATradeCost") {
     setParam<price_t>("commission", commission);
     setParam<price_t>("lowest_commission", lowestCommission);
     setParam<price_t>("stamptax", stamptax);
     setParam<price_t>("transferfee", transferfee);
-    setParam<price_t>("lowest_transferfee", lowestTransferfee);
 }
 
 FixedATradeCost::~FixedATradeCost() {}
 
-void FixedATradeCost::_checkParam(const string& name) const {
-    if ("commission" == name) {
-        HKU_ASSERT(getParam<price_t>("commission") >= 0.0);
-    } else if ("lowest_commission" == name) {
-        HKU_ASSERT(getParam<price_t>("lowest_commission") >= 0.0);
-    } else if ("stamptax" == name) {
-        HKU_ASSERT(getParam<price_t>("stamptax") >= 0.0);
-    } else if ("transferfee" == name) {
-        HKU_ASSERT(getParam<price_t>("transferfee") >= 0.0);
-    } else if ("lowest_transferfee" == name) {
-        HKU_ASSERT(getParam<price_t>("lowest_transferfee") >= 0.0);
-    }
-}
-
-CostRecord FixedATradeCost::getBuyCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                       double num) const {
-    CostRecord result;
-    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
-    price_t value = price * num;
-    HKU_IF_RETURN(value <= 0, result);
-    int precision = stock.precision();
-    result.commission = roundEx(value * getParam<price_t>("commission"), precision);
-    price_t lowestCommission = getParam<price_t>("lowest_commission");
-    if (result.commission < lowestCommission) {
-        result.commission = lowestCommission;
-    }
-
-    // The Shanghai Stock Exchange charges a transfer fee on a buy
-    if (stock.market() == "SH") {
-        result.transferfee = num > 1000 ? roundEx(getParam<price_t>("transferfee") * num, precision)
-                                        : getParam<price_t>("lowest_transferfee");
-    }
-
-    result.total = result.commission + result.transferfee;
-
-    return result;
-}
-
-CostRecord FixedATradeCost::getSellCost(const Datetime& datetime, const Stock& stock, price_t price,
-                                        double num) const {
-    CostRecord result;
-    if (stock.isNull()) {
-        HKU_WARN("Stock is NULL!");
-        return result;
-    }
-
-    price_t value = price * num;
-    HKU_IF_RETURN(value <= 0, result);
-    int precision = stock.precision();
-    result.commission = roundEx(value * getParam<price_t>("commission"), precision);
-    price_t lowestCommission = getParam<price_t>("lowest_commission");
-    if (result.commission < lowestCommission) {
-        result.commission = lowestCommission;
-    }
-
-    // Stamp duty applies to sells of A-shares, ChiNext, STAR and Beijing Stock Exchange stocks
-    if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM ||
-        stock.type() == STOCKTYPE_START || stock.type() == STOCKTYPE_A_BJ) {
-        result.stamptax = roundEx(value * getParam<price_t>("stamptax"), precision);
-    } else {
-        result.stamptax = 0.0;
-    }
-    result.transferfee = 0.0;
-    if (stock.market() == "SH") {
-        result.transferfee = num > 1000 ? roundEx(getParam<price_t>("transferfee") * num, precision)
-                                        : getParam<price_t>("lowest_transferfee");
-    }
-    result.others = 0.0;
-    result.total = result.commission + result.stamptax + result.transferfee;
-    return result;
+price_t FixedATradeCost::_calcTransferFee(const Stock& stock, price_t value, double) const {
+    // Transfer fee by turnover value, charged on all markets in both directions
+    return roundEx(value * getParam<price_t>("transferfee"), stock.precision());
 }
 
 TradeCostPtr FixedATradeCost::_clone() {
@@ -112,9 +42,8 @@ TradeCostPtr FixedATradeCost::_clone() {
 }
 
 TradeCostPtr HKU_API TC_FixedA(price_t commission, price_t lowestCommission, price_t stamptax,
-                               price_t transferfee, price_t lowestTransferfee) {
-    return make_shared<FixedATradeCost>(commission, lowestCommission, stamptax, transferfee,
-                                        lowestTransferfee);
+                               price_t transferfee) {
+    return make_shared<FixedATradeCost>(commission, lowestCommission, stamptax, transferfee);
 }
 
 } /* namespace hku */

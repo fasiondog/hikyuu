@@ -9,6 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
+#include <hikyuu/trade_manage/crt/TC_FixedAPre2015.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCountTps.h>
 
 using namespace hku;
@@ -23,7 +24,7 @@ using namespace hku;
 TEST_CASE("test_MM_FixedCountTpsTps") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    TradeManagerPtr tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
+    TradeManagerPtr tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedAPre2015());
 
     /** @arg The buy / sell quantity contains a value less than 0 */
     CHECK_THROWS_AS(MM_FixedCountTps({100., -1}, {100., 100.}), std::exception);
@@ -33,7 +34,7 @@ TEST_CASE("test_MM_FixedCountTpsTps") {
     auto _ = MM_FixedCountTps({100., 100.}, {200., 200.});
 
     /** @arg n = 100; a trade account with the initial capital 0 auto-fills and can buy */
-    tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedA());
+    tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedAPre2015());
     CHECK_EQ(tm->initCash(), 0.0);
     auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
     mm->setTM(tm);
@@ -94,7 +95,7 @@ TEST_CASE("test_MM_FixedCountTps_mult_sell_guard") {
 TEST_CASE("test_MM_FixedCountTps_short_trade_immunity") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
-    auto tm = crtTM(Datetime(199001010000LL), 100000.0, TC_FixedA());
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0, TC_FixedAPre2015());
     tm->setParam<bool>("support_borrow_stock", true);
     auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
     mm->setTM(tm);

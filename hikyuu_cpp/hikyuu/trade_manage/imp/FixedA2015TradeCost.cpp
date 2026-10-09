@@ -1,12 +1,12 @@
 /*
- * AShareTradeCost.cpp
+ * FixedA2015TradeCost.cpp
  *
  *  Created on: 2016-5-4
  *      Author: Administrator
  */
 
-#include "../../StockTypeInfo.h"
 #include "FixedA2015TradeCost.h"
+#include "hikyuu/utilities/arithmetic.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::FixedA2015TradeCost)
@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::FixedA2015TradeCost)
 
 namespace hku {
 
-FixedA2015TradeCost::FixedA2015TradeCost() : TradeCostBase("TC_FixedA2015") {
+FixedA2015TradeCost::FixedA2015TradeCost() : FixedATradeCostBase("TC_FixedA2015") {
     setParam<price_t>("commission", 0.0018);
     setParam<price_t>("lowest_commission", 5.0);
     setParam<price_t>("stamptax", 0.001);
@@ -23,69 +23,12 @@ FixedA2015TradeCost::FixedA2015TradeCost() : TradeCostBase("TC_FixedA2015") {
 
 FixedA2015TradeCost::~FixedA2015TradeCost() {}
 
-void FixedA2015TradeCost::_checkParam(const string& name) const {
-    if ("commission" == name) {
-        HKU_ASSERT(getParam<price_t>("commission") >= 0.0);
-    } else if ("lowest_commission" == name) {
-        HKU_ASSERT(getParam<price_t>("lowest_commission") >= 0.0);
-    } else if ("stamptax" == name) {
-        HKU_ASSERT(getParam<price_t>("stamptax") >= 0.0);
-    } else if ("transferfee" == name) {
-        HKU_ASSERT(getParam<price_t>("transferfee") >= 0.0);
+price_t FixedA2015TradeCost::_calcTransferFee(const Stock& stock, price_t value, double) const {
+    // Before 2017 only the Shanghai market charges the transfer fee (by turnover value)
+    if (stock.market() != "SH") {
+        return 0.0;
     }
-}
-
-CostRecord FixedA2015TradeCost::getBuyCost(const Datetime& datetime, const Stock& stock,
-                                           price_t price, double num) const {
-    CostRecord result;
-    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
-
-    int precision = stock.precision();
-    price_t value = price * num;
-    HKU_IF_RETURN(value <= 0, result);
-    result.commission = roundEx(value * getParam<price_t>("commission"), precision);
-    price_t lowestCommission = getParam<price_t>("lowest_commission");
-    if (result.commission < lowestCommission) {
-        result.commission = lowestCommission;
-    }
-
-    if (stock.market() == "SH") {
-        result.transferfee = roundEx(value * getParam<price_t>("transferfee"), precision);
-    }
-
-    result.total = result.commission + result.transferfee;
-
-    return result;
-}
-
-CostRecord FixedA2015TradeCost::getSellCost(const Datetime& datetime, const Stock& stock,
-                                            price_t price, double num) const {
-    CostRecord result;
-    HKU_WARN_IF_RETURN(stock.isNull(), result, "Stock is Null!");
-
-    int precision = stock.precision();
-    price_t value = price * num;
-    HKU_IF_RETURN(value <= 0, result);
-    result.commission = roundEx(value * getParam<price_t>("commission"), precision);
-    price_t lowestCommission = getParam<price_t>("lowest_commission");
-    if (result.commission < lowestCommission) {
-        result.commission = lowestCommission;
-    }
-
-    // Stamp duty applies to sells of A-shares, ChiNext, STAR and Beijing Stock Exchange stocks
-    if (stock.type() == STOCKTYPE_A || stock.type() == STOCKTYPE_GEM ||
-        stock.type() == STOCKTYPE_START || stock.type() == STOCKTYPE_A_BJ) {
-        result.stamptax = roundEx(value * getParam<price_t>("stamptax"), precision);
-    } else {
-        result.stamptax = 0.0;
-    }
-    result.transferfee = 0.0;
-    if (stock.market() == "SH") {
-        result.transferfee = roundEx(value * getParam<price_t>("transferfee"), precision);
-    }
-    result.others = 0.0;
-    result.total = result.commission + result.stamptax + result.transferfee;
-    return result;
+    return roundEx(value * getParam<price_t>("transferfee"), stock.precision());
 }
 
 TradeCostPtr FixedA2015TradeCost::_clone() {
