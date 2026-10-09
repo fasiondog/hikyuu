@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/indicator/Indicator.h>
+#include <cstring>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -341,6 +342,9 @@ set_context(self, stock, query)
                         val[i * x + j + 1] = src[j][i];
                     }
                 }
+            } else if (ret_num == 1) {
+                // contiguous layout, bulk copy
+                std::memcpy(val, src[0], total * sizeof(double));
             } else {
                 for (size_t i = 0; i < total; i++) {
                     for (size_t j = 0; j < ret_num; j++) {
@@ -391,9 +395,15 @@ set_context(self, stock, query)
             }
 
             // Fill the data into the buffer of the array_t
-            for (size_t i = 0, total = self.size(); i < total; i++) {
-                for (size_t j = 0; j < ret_num; j++) {
-                    buffer[i * ret_num + j] = src[j][i];
+            size_t total = self.size();
+            if (ret_num == 1) {
+                // contiguous layout, bulk copy
+                std::memcpy(buffer, src[0], total * sizeof(double));
+            } else {
+                for (size_t i = 0; i < total; i++) {
+                    for (size_t j = 0; j < ret_num; j++) {
+                        buffer[i * ret_num + j] = src[j][i];
+                    }
                 }
             }
 
@@ -411,9 +421,7 @@ set_context(self, stock, query)
             const auto* src = self.data(result_index);
             HKU_CHECK(self.size() == 0 || src != nullptr, "The result {} is not ready!",
                       result_index);
-            for (size_t i = 0; i < self.size(); i++) {
-                ptr[i] = src[i];
-            }
+            std::memcpy(ptr, src, self.size() * sizeof(double));
             return ret;
         },
         py::arg("result_index") = 0, "Convert the specified result set to numpy.array")
@@ -448,9 +456,7 @@ set_context(self, stock, query)
                 double* dst = static_cast<double*>(buf.ptr);
                 const auto* src = self.data(i);
                 HKU_CHECK(src != nullptr, "The result {} is not ready!", i);
-                for (size_t j = 0; j < total; j++) {
-                    dst[j] = src[j];
-                }
+                std::memcpy(dst, src, total * sizeof(double));
                 columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
@@ -475,9 +481,7 @@ set_context(self, stock, query)
                 double* dst = static_cast<double*>(buf.ptr);
                 const auto* src = self.data(i);
                 HKU_CHECK(src != nullptr, "The result {} is not ready!", i);
-                for (size_t j = 0; j < total; j++) {
-                    dst[j] = src[j];
-                }
+                std::memcpy(dst, src, total * sizeof(double));
                 columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
