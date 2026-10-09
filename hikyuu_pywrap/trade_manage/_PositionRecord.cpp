@@ -129,7 +129,9 @@ void export_PositionRecord(py::module& m) {
               double sell_money;  // The cumulative sell funds
           };
 
-          RawData* data = static_cast<RawData*>(std::malloc(total * sizeof(RawData)));
+          auto free_deleter = [](RawData* p) { std::free(p); };
+          std::unique_ptr<RawData[], decltype(free_deleter)> data(
+            static_cast<RawData*>(std::malloc(total * sizeof(RawData))), free_deleter);
           HKU_CHECK(data != nullptr, "positions_to_np: malloc failed!");
           for (size_t i = 0, total = positions.size(); i < total; i++) {
               const PositionRecord& p = positions[i];
@@ -181,8 +183,9 @@ void export_PositionRecord(py::module& m) {
                                                       184, 192, 200, 208, 216, 224, 232}),
                       240);
 
-          return py::array(dtype, total, static_cast<RawData*>(data),
-                           py::capsule(data, [](void* p) { std::free(p); }));
+          RawData* raw = data.release();
+          return py::array(dtype, total, raw,
+                           py::capsule(raw, [](void* p) { std::free(p); }));
       },
       R"(Convert the position list to Numpy
 
