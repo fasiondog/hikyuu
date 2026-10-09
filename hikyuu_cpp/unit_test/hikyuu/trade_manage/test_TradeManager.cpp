@@ -1125,6 +1125,69 @@ TEST_CASE("test_TradeManager_addTradeRecord") {
                                      cost, 0, 90142.50, PART_INVALID));
 }
 
+/** @par Test point: rebuild an account from a full trade list covering every reconstructable
+ * business type (TM-107) */
+TEST_CASE("test_TradeManager_addTradeRecord_roundtrip") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    // Use a window without any ex-rights event so no derived record is generated and the source
+    // and the rebuilt lists match one-to-one
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 1000000, TC_Zero(), "SRC");
+    tm->setParam<bool>("support_borrow_cash", true);
+    tm->setParam<bool>("support_borrow_stock", true);
+
+    CHECK_UNARY(tm->checkinStock(Datetime(199902010000), stock, 10.0, 500));
+    CHECK_UNARY(tm->borrowCash(Datetime(199902020000), 5000));
+    CHECK_EQ(tm->buy(Datetime(199902030000), stock, 10.0, 300).business, BUSINESS_BUY);
+    CHECK_UNARY(tm->borrowStock(Datetime(199902040000), stock, 10.0, 400));
+    CHECK_EQ(tm->sellShort(Datetime(199902040000), stock, 10.0, 300).business, BUSINESS_SELL_SHORT);
+    CHECK_UNARY(tm->returnStock(Datetime(199902050000), stock, 10.0, 100));
+    CHECK_EQ(tm->sell(Datetime(199902060000), stock, 12.0, 200).business, BUSINESS_SELL);
+    CHECK_EQ(tm->buyShort(Datetime(199902070000), stock, 11.0, 200).business, BUSINESS_BUY_SHORT);
+    CHECK_UNARY(tm->checkoutStock(Datetime(199902090000), stock, 11.0, 100));
+    CHECK_UNARY(tm->checkout(Datetime(199902100000), 1000));
+
+    TradeRecordList src = tm->getTradeList();
+    TradeManagerPtr tm2 = crtTM(Datetime(199001010000), 0, TC_Zero(), "DST");
+    for (const auto& tr : src) {
+        /** @arg every reconstructable record is accepted */
+        CHECK_UNARY(tm2->addTradeRecord(tr));
+    }
+
+    /** @arg the rebuilt account matches the source on every queried dimension */
+    CHECK_EQ(tm2->getTradeList().size(), src.size());
+    CHECK_EQ(tm2->currentCash(), tm->currentCash());
+    CHECK_EQ(tm2->lastDatetime(), tm->lastDatetime());
+    CHECK_EQ(tm2->getDebtCash(Datetime(199902100000)), tm->getDebtCash(Datetime(199902100000)));
+    CHECK_EQ(tm2->getHoldNumber(Datetime(199902100000), stock),
+             tm->getHoldNumber(Datetime(199902100000), stock));
+    CHECK_EQ(tm2->getShortHoldNumber(Datetime(199902100000), stock),
+             tm->getShortHoldNumber(Datetime(199902100000), stock));
+    CHECK_EQ(tm2->getDebtNumber(Datetime(199902100000), stock),
+             tm->getDebtNumber(Datetime(199902100000), stock));
+}
+
+/** @par Test point: an over-repayment RETURN_CASH record is rejected without draining the loan list
+ */
+TEST_CASE("test_TradeManager_addTradeRecord_return_cash_beyond_debt") {
+    TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000, TC_Zero(), "SRC");
+    CHECK_UNARY(tm->borrowCash(Datetime(199902010000), 3000));
+
+    TradeManagerPtr tm2 = crtTM(Datetime(199901010000), 100000, TC_Zero(), "DST");
+    for (const auto& tr : tm->getTradeList()) {
+        CHECK_UNARY(tm2->addTradeRecord(tr));
+    }
+    CHECK_EQ(tm2->getDebtCash(Datetime(199902010000)), 3000.0);
+
+    CostRecord cost;
+    TradeRecord over(Null<Stock>(), Datetime(199902020000), BUSINESS_RETURN_CASH, 5000, 5000, 0.0,
+                     0, cost, 0.0, 0, PART_INVALID);
+    /** @arg rejected, and the loan list / debt stay untouched (atomic) */
+    CHECK_UNARY(!tm2->addTradeRecord(over));
+    CHECK_EQ(tm2->getDebtCash(Datetime(199902020000)), 3000.0);
+}
+
 /** @par Test points */
 TEST_CASE("test_TradeManager_returnCash_multi_loan") {
     TradeManagerPtr tm = crtTM(Datetime(199901010000), 100000);
