@@ -29,7 +29,12 @@ EXIT_PROBE = (
 class GilSafeTest(unittest.TestCase):
     def test_exit_clean_after_gil_safe_use(self):
         proc = subprocess.run(
-          [sys.executable, "-c", EXIT_PROBE], capture_output=True, text=True, timeout=180
+          [sys.executable, "-c", EXIT_PROBE],
+          capture_output=True,
+          text=True,
+          encoding="utf-8",
+          errors="replace",
+          timeout=180,
         )
         self.assertEqual(
           proc.returncode, 0, "interpreter exit crashed:\n%s" % proc.stderr[-2000:]

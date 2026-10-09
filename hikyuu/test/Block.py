@@ -84,7 +84,12 @@ class BlockTest(unittest.TestCase):
             "assert len(blk) == 2\n"
         ).format(root=root, config=config)
         proc = subprocess.run(
-          [sys.executable, "-c", probe], capture_output=True, text=True, timeout=120
+          [sys.executable, "-c", probe],
+          capture_output=True,
+          text=True,
+          encoding="utf-8",
+          errors="replace",
+          timeout=120,
         )
         self.assertEqual(
           proc.returncode, 0, "mutating filter probe failed:\n%s" % proc.stderr[-2000:]
