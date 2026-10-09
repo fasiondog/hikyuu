@@ -1088,6 +1088,36 @@ TEST_CASE("test_MultiSystem_clone_with_se_recalculate") {
     CHECK_EQ(cloned->getTM()->getTradeList().size(), trades.size());
 }
 
+/** @par Check point (regression): the mode A shadow book is a pure signal source and must be reset
+ * by bookkeeping, never accumulate (the old reset used a market sell that is rejected on a sub-lot
+ * holding, so the cash piled up across rebalancing days and distorted the parent allocation). */
+TEST_CASE("test_MultiSystem_shadow_book_not_accumulated") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 2);
+
+    auto ms = std::make_shared<MultiSystem>("ms");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    auto sys = create_alway_buy_sys();
+    sys->setTO(kdata);
+    ms->add(sys);
+    ms->setSE(SE_Fixed());
+    ms->run(kdata);
+
+    /** @arg the shadow book stays around the initial signal cash instead of piling up */
+    price_t init_cash = ms->getSubInitCash();
+    REQUIRE_GT(init_cash, 0.0);
+    price_t sub_total =
+      ms->getSystemList()[0]->getTM()->getFunds(kdata[kdata.size() - 1].datetime, query.kType())
+        .total_assets();
+    CHECK_LT(sub_total, init_cash * 1.5);
+
+    /** @arg an always-buy / hold sub-system produces no parent churn: INIT + the first-day buy only */
+    CHECK_EQ(ms->getTM()->getTradeList().size(), 2);
+}
+
 /** @par Check point: the shadow account is created only the first time (repeated readyForRun must
  * not rebuild the sub-system account) */
 TEST_CASE("test_MultiSystem_shadow_tm_reuse") {
@@ -1843,13 +1873,14 @@ TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
     auto subs = pf->getSystemList();
     REQUIRE_EQ(subs.size(), 2);
 
-    // The shadow is reset to the initial signal cash on every rebalancing day and the sub-system
-    // rebuilds its position intent with it, so the sub book total assets stay around the init
-    // cash (without the reset the shadow would only hold the first position worth of assets)
+    // The shadow is reset to the initial signal cash on every rebalancing day, so the sub book stays
+    // around the init cash; the upper bound is the real invariant (the shadow must never accumulate
+    // -- a buggy reset used to inflate one leg to millions).
     Datetime last_date(20000224);
     for (auto& sub : subs) {
         price_t sub_total = sub->getTM()->getFunds(last_date, query.kType()).total_assets();
         CHECK_GT(sub_total, 90000.0);
+        CHECK_LT(sub_total, 150000.0);
     }
 
     // The portfolio runs (nearly) fully invested instead of leaving the parent cash idle

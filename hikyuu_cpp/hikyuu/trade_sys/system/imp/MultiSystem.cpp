@@ -447,12 +447,20 @@ void MultiSystem::_resetSubSystemSignalCash(const SystemPtr& sys, const Datetime
     TMPtr sub_tm = sys->getTM();
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
-    // Clear the shadow holding and the cash (bookkeeping only: the parent account position is
-    // managed by the L2 target conversion, the shadow is a pure signal source), then inject the
-    // initial signal cash again, so the sub-system can submit a fresh position intent
-    _clearSubSystem(sys, date, ktype);
+    // Bookkeeping reset of the pure-signal shadow (clear the position, restore the initial signal
+    // cash). Not a market sell: the virtual book is not bound by the board-lot rule, and an
+    // uncleared sub-lot holding would pile up the re-injected cash across rebalancing days.
+    sub_tm->reset();
+
+    // reset() restores the build-time cash; re-sync in case setSubInitCash changed it afterwards.
     if (m_sub_init_cash > 0.0) {
-        sub_tm->checkin(date, m_sub_init_cash);
+        price_t cur_cash = sub_tm->getFunds(date, ktype).cash;
+        if (!iszero(cur_cash - m_sub_init_cash)) {
+            if (cur_cash > 0.0) {
+                sub_tm->checkout(date, cur_cash);
+            }
+            sub_tm->checkin(date, m_sub_init_cash);
+        }
     }
 }
 
@@ -714,10 +722,25 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
         // The three ratios: the sub-system before-trade funds are used as the denominator. The
         // parent MM maps them into the parent real assets by the ratios (mode A).
         if (base_assets > 0.0) {
-            s.assets_ratio = s.plan_cash / base_assets;
-            s.target_position_ratio =
-              s.assets_ratio;  // Approximation: the target position ratio when a single trade
-                               // builds the position from 0
+            // Guard (mode A): the cash-funded shadow book should stay near the initial signal cash;
+            // a large deviation means an inconsistent shadow, warn once.
+            if (getMode() == "A" && m_sub_init_cash > 0.0 && base_assets > m_sub_init_cash * 2.0) {
+                static std::once_flag g_sub_book_warned;
+                std::call_once(g_sub_book_warned, [&] {
+                    HKU_WARN(
+                      "The sub-system before-trade assets({:.2f}) are far above the initial signal "
+                      "cash({:.2f}), the shadow book may be inconsistent! [{}]",
+                      base_assets, m_sub_init_cash, name());
+                });
+            }
+            double ratio = s.plan_cash / base_assets;
+            // Long-only shadow: clamp the position ratio to [0, 1].
+            if (ratio > 1.0) {
+                ratio = 1.0;
+            }
+            s.assets_ratio = ratio;
+            s.target_position_ratio = ratio;  // Approximation: the target position ratio when a
+                                              // single trade builds the position from 0
         }
         if (base_cash > 0.0) {
             s.cash_ratio = s.plan_cash / base_cash;
