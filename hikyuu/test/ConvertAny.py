@@ -4,9 +4,9 @@
 
 # ===============================================================================
 # Author: fasiondog
-# History: INF-004 回归测试 —— boost::any C++→Python 转换（convert_any.h）
-#          验证改用 py::cast 后 Stock/Block/Datetime/KQuery/KData 往返正确，
-#          且不依赖 __main__ 命名空间、无字符串注入风险。
+# History: regression test for boost::any C++->Python conversion (convert_any.h).
+#          Verify that after switching to py::cast, Stock/Block/Datetime/KQuery/KData
+#          round-trip correctly, without relying on the __main__ namespace or code injection.
 # ===============================================================================
 
 import unittest
@@ -34,7 +34,7 @@ class ConvertAnyTest(unittest.TestCase):
         self.assertTrue(out.is_null())
 
     def test_block(self):
-        blk = Block('test', '测试板块')
+        blk = Block('test', 'test_block')
         blk.add(sm['sh000001'])
         blk.add(sm['sz000001'])
         out = self._roundtrip(blk)
