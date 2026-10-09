@@ -84,12 +84,13 @@ public:
 
 public:
     virtual SelectorPtr _clone() override {
-        return std::make_shared<PyOptimalSelector>();
+        return std::make_shared<PyOptimalSelector>(m_evaluate);
     }
 
     virtual double evaluate(const SYSPtr& sys, const Datetime& lastDate) noexcept override {
         double ret = Null<double>();
         try {
+            py::gil_scoped_acquire gil;
             ret = m_evaluate(sys, lastDate).cast<double>();
         } catch (const std::exception& e) {
             HKU_ERROR(e.what());
@@ -548,6 +549,7 @@ void export_Selector(py::module& m) {
           py::object pyfunc = evalulate_func.attr("__call__");
           check_pyfunction_arg_num(pyfunc, 2);
           return SE_EvaluateOptimal([=](const SystemPtr& sys, const Datetime& enddate) {
+              py::gil_scoped_acquire gil;
               py::object pyfunc = evalulate_func.attr("__call__");
               return pyfunc(sys, enddate).cast<double>();
           });
