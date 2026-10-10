@@ -7,6 +7,7 @@
 
 #include <hikyuu/trade_manage/build_in.h>
 #include <hikyuu/trade_manage/Performance.h>
+#include <optional>
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -610,25 +611,33 @@ Common parameters:
       :param broker the order broker instance
       :param date when synchronizing, it is usually the current time (Null); it can also be forced to a specified time point)")
 
-      .def("get_performance", &TradeManagerBase::getPerformance,
-           py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-           py::arg("ext") = true,
-           R"(get_performance(self[, datetime=Datetime.now(), ktype=Query.DAY]) -> Performance)
+      .def(
+        "get_performance",
+        [](TradeManagerBase& self, std::optional<Datetime> datetime, const KQuery::KType& ktype,
+           bool ext) {
+            return self.getPerformance(datetime.value_or(Datetime::now()), ktype, ext);
+        },
+        py::arg("datetime") = py::none(), py::arg("ktype") = KQuery::DAY, py::arg("ext") = true,
+        R"(get_performance(self[, datetime=None, ktype=Query.DAY]) -> Performance)
 
     Get the account performance at the specified moment of the account
 
-    :param Datetime datetime: the specified moment
+    :param Datetime datetime: the specified moment (defaults to the current time)
     :param Query.KType ktype: the K-line type
     :param bool ext: whether to get the extended statistics items (the donating user); otherwise, they are still the basic statistics items
     :return: the account performance)")
 
-      .def("get_max_pull_back", &TradeManagerBase::getMaxPullBack,
-           py::arg("date") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
-           R"(get_max_pull_back(self, date, ktype=Query.DAY) -> float
+      .def(
+        "get_max_pull_back",
+        [](TradeManagerBase& self, std::optional<Datetime> date, const KQuery::KType& ktype) {
+            return self.getMaxPullBack(date.value_or(Datetime::now()), ktype);
+        },
+        py::arg("date") = py::none(), py::arg("ktype") = KQuery::DAY,
+        R"(get_max_pull_back(self, date=None, ktype=Query.DAY) -> float
 
     Get the maximum drawdown percentage of the account at the specified moment (a negative number)
 
-    :param Datetime date: the specified date (including this moment)
+    :param Datetime date: the specified date (including this moment; defaults to the current time)
     :param Query.KType ktype: the K-line type
     :return: the maximum drawdown percentage)")
 
@@ -707,23 +716,29 @@ Common parameters:
     :rtype: list[PositionExtInfo])")
 
       .def(
-        "get_profit_percent_monthly", &TradeManagerBase::getProfitPercentMonthly,
-        py::arg("datetime") = Datetime::now(),
-        R"(get_profit_percent_monthly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+        "get_profit_percent_monthly",
+        [](TradeManagerBase& self, std::optional<Datetime> datetime) {
+            return self.getProfitPercentMonthly(datetime.value_or(Datetime::now()));
+        },
+        py::arg("datetime") = py::none(),
+        R"(get_profit_percent_monthly(self, datetime=None) -> list[tuple[Datetime, double]]
 
     Get the account profit percentage (monthly) of the account at the specified deadline
 
-    :param Datetime datetime: the specified deadline
+    :param Datetime datetime: the specified deadline (defaults to the current time)
     :return: the account profit percentage (monthly))")
 
       .def(
-        "get_profit_percent_yearly", &TradeManagerBase::getProfitPercentYearly,
-        py::arg("datetime") = Datetime::now(),
-        R"(get_profit_percent_yearly(self, datetime=Datetime.now()) -> list[tuple[Datetime, double]])
+        "get_profit_percent_yearly",
+        [](TradeManagerBase& self, std::optional<Datetime> datetime) {
+            return self.getProfitPercentYearly(datetime.value_or(Datetime::now()));
+        },
+        py::arg("datetime") = py::none(),
+        R"(get_profit_percent_yearly(self, datetime=None) -> list[tuple[Datetime, double]]
 
     Get the account profit percentage (yearly) of the account at the specified deadline
 
-    :param Datetime datetime: the specified deadline
+    :param Datetime datetime: the specified deadline (defaults to the current time)
     :return: the account profit percentage (yearly))")
 
         DEF_PICKLE(TradeManagerPtr);

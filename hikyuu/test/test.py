@@ -36,6 +36,10 @@ import GilSafe
 import Misc
 import Block
 import PositionRecord
+import Selector
+import MultiFactor
+import ExtInd
+import ExtraKType
 import test_common_sql
 
 if __name__ == "__main__":
@@ -76,6 +80,10 @@ if __name__ == "__main__":
     suite.addTest(ConvertAny.suite())
     suite.addTest(Pickle.suite())
     suite.addTest(GilSafe.suite())
+    suite.addTest(Selector.suite())
+    suite.addTest(MultiFactor.suite())
+    suite.addTest(ExtInd.suite())
+    suite.addTest(ExtraKType.suite())
     suite.addTest(Misc.suite())
     suite.addTest(Block.suite())
     suite.addTest(PositionRecord.suite())

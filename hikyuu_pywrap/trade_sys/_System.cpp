@@ -87,67 +87,98 @@ string PySystem::str() const {
     PYBIND11_OVERLOAD(string, System, str);
 }
 
-void PySystem::set_mm(py::object mm) {
+namespace {
+
+// Set the system parts from the wrapped Python objects; usable on any System instance
+// (including plain System objects that are not PySystem instances). pybind11 keeps the
+// source Python object alive as long as the C++ side holds the converted shared_ptr, so
+// the Python objects must NOT be leaked here.
+void system_set_mm(System& sys, py::object mm) {
     py::gil_scoped_acquire gil;
-    auto tmp_mm = mm;
-    setMM(mm.cast<MMPtr>());
-    tmp_mm.release();
+    sys.setMM(mm.cast<MMPtr>());
+}
+
+void system_set_ev(System& sys, py::object ev) {
+    py::gil_scoped_acquire gil;
+    sys.setEV(ev.cast<EnvironmentPtr>());
+}
+
+void system_set_cn(System& sys, py::object cn) {
+    py::gil_scoped_acquire gil;
+    sys.setCN(cn.cast<CNPtr>());
+}
+
+void system_set_sg(System& sys, py::object sg) {
+    py::gil_scoped_acquire gil;
+    sys.setSG(sg.cast<SGPtr>());
+}
+
+void system_set_st(System& sys, py::object st) {
+    py::gil_scoped_acquire gil;
+    sys.setST(st.cast<StoplossPtr>());
+}
+
+void system_set_tp(System& sys, py::object tp) {
+    py::gil_scoped_acquire gil;
+    sys.setTP(tp.cast<StoplossPtr>());
+}
+
+void system_set_pg(System& sys, py::object pg) {
+    py::gil_scoped_acquire gil;
+    sys.setPG(pg.cast<PGPtr>());
+}
+
+void system_set_sp(System& sys, py::object sp) {
+    py::gil_scoped_acquire gil;
+    sys.setSP(sp.cast<SlippagePtr>());
+}
+
+void system_set_tm(System& sys, py::object tm) {
+    py::gil_scoped_acquire gil;
+    sys.setTM(tm.cast<TradeManagerPtr>());
+}
+
+void system_set_af(MultiSystem& sys, py::object af) {
+    py::gil_scoped_acquire gil;
+    sys.setAF(af.cast<AFPtr>());
+}
+
+}  // namespace
+
+void PySystem::set_mm(py::object mm) {
+    system_set_mm(*this, mm);
 }
 
 void PySystem::set_ev(py::object ev) {
-    py::gil_scoped_acquire gil;
-    auto tmp_ev = ev;
-    setEV(ev.cast<EnvironmentPtr>());
-    tmp_ev.release();
+    system_set_ev(*this, ev);
 }
 
 void PySystem::set_cn(py::object cn) {
-    py::gil_scoped_acquire gil;
-    auto tmp_cn = cn;
-    setCN(cn.cast<CNPtr>());
-    tmp_cn.release();
+    system_set_cn(*this, cn);
 }
 
 void PySystem::set_sg(py::object sg) {
-    py::gil_scoped_acquire gil;
-    auto tmp_sg = sg;
-    setSG(sg.cast<SGPtr>());
-    tmp_sg.release();
+    system_set_sg(*this, sg);
 }
 
 void PySystem::set_st(py::object st) {
-    py::gil_scoped_acquire gil;
-    auto tmp_st = st;
-    setST(st.cast<StoplossPtr>());
-    tmp_st.release();
+    system_set_st(*this, st);
 }
 
 void PySystem::set_tp(py::object tp) {
-    py::gil_scoped_acquire gil;
-    auto tmp_tp = tp;
-    setTP(tp.cast<StoplossPtr>());
-    tmp_tp.release();
+    system_set_tp(*this, tp);
 }
 
 void PySystem::set_pg(py::object pg) {
-    py::gil_scoped_acquire gil;
-    auto tmp_pg = pg;
-    setPG(pg.cast<PGPtr>());
-    tmp_pg.release();
+    system_set_pg(*this, pg);
 }
 
 void PySystem::set_sp(py::object sp) {
-    py::gil_scoped_acquire gil;
-    auto tmp_sp = sp;
-    setSP(sp.cast<SlippagePtr>());
-    tmp_sp.release();
+    system_set_sp(*this, sp);
 }
 
 void PySystem::set_tm(py::object tm) {
-    py::gil_scoped_acquire gil;
-    auto tmp_tm = tm;
-    setTM(tm.cast<TradeManagerPtr>());
-    tmp_tm.release();
+    system_set_tm(*this, tm);
 }
 
 PyMultiSystem::PyMultiSystem(const MultiSystem& base) : MultiSystem(base) {}
@@ -187,66 +218,39 @@ string PyMultiSystem::str() const {
 }
 
 void PyMultiSystem::set_mm(py::object mm) {
-    py::gil_scoped_acquire gil;
-    auto tmp_mm = mm;
-    setMM(mm.cast<MMPtr>());
-    tmp_mm.release();
+    system_set_mm(*this, mm);
 }
 
 void PyMultiSystem::set_ev(py::object ev) {
-    py::gil_scoped_acquire gil;
-    auto tmp_ev = ev;
-    setEV(ev.cast<EnvironmentPtr>());
-    tmp_ev.release();
+    system_set_ev(*this, ev);
 }
 
 void PyMultiSystem::set_cn(py::object cn) {
-    py::gil_scoped_acquire gil;
-    auto tmp_cn = cn;
-    setCN(cn.cast<CNPtr>());
-    tmp_cn.release();
+    system_set_cn(*this, cn);
 }
 
 void PyMultiSystem::set_sg(py::object sg) {
-    py::gil_scoped_acquire gil;
-    auto tmp_sg = sg;
-    setSG(sg.cast<SGPtr>());
-    tmp_sg.release();
+    system_set_sg(*this, sg);
 }
 
 void PyMultiSystem::set_st(py::object st) {
-    py::gil_scoped_acquire gil;
-    auto tmp_st = st;
-    setST(st.cast<StoplossPtr>());
-    tmp_st.release();
+    system_set_st(*this, st);
 }
 
 void PyMultiSystem::set_tp(py::object tp) {
-    py::gil_scoped_acquire gil;
-    auto tmp_tp = tp;
-    setTP(tp.cast<StoplossPtr>());
-    tmp_tp.release();
+    system_set_tp(*this, tp);
 }
 
 void PyMultiSystem::set_pg(py::object pg) {
-    py::gil_scoped_acquire gil;
-    auto tmp_pg = pg;
-    setPG(pg.cast<PGPtr>());
-    tmp_pg.release();
+    system_set_pg(*this, pg);
 }
 
 void PyMultiSystem::set_sp(py::object sp) {
-    py::gil_scoped_acquire gil;
-    auto tmp_sp = sp;
-    setSP(sp.cast<SlippagePtr>());
-    tmp_sp.release();
+    system_set_sp(*this, sp);
 }
 
 void PyMultiSystem::set_tm(py::object tm) {
-    py::gil_scoped_acquire gil;
-    auto tmp_tm = tm;
-    setTM(tm.cast<TradeManagerPtr>());
-    tmp_tm.release();
+    system_set_tm(*this, tm);
 }
 
 void export_System(py::module& m) {
@@ -396,31 +400,67 @@ Common parameters:
       //   instance")
 
       .def_property(
-        "tm", &System::getTM, [](PySystem& self, py::object py_tm) { self.set_tm(py_tm); },
+        "tm", &System::getTM,
+        [](PySystem& self, py::object py_tm) {
+            self.set_tm(py_tm);
+            keep_python_part_alive(py::cast(self), py_tm);
+        },
         "The associated trade manager instance")
       .def_property(
-        "mm", &System::getMM, [](PySystem& self, py::object py_mm) { self.set_mm(py_mm); },
+        "mm", &System::getMM,
+        [](PySystem& self, py::object py_mm) {
+            self.set_mm(py_mm);
+            keep_python_part_alive(py::cast(self), py_mm);
+        },
         "The money management strategy")
       .def_property(
-        "ev", &System::getEV, [](PySystem& self, py::object py_ev) { self.set_ev(py_ev); },
+        "ev", &System::getEV,
+        [](PySystem& self, py::object py_ev) {
+            self.set_ev(py_ev);
+            keep_python_part_alive(py::cast(self), py_ev);
+        },
         "The market environment strategy")
       .def_property(
-        "cn", &System::getCN, [](PySystem& self, py::object py_tm) { self.set_cn(py_tm); },
+        "cn", &System::getCN,
+        [](PySystem& self, py::object py_tm) {
+            self.set_cn(py_tm);
+            keep_python_part_alive(py::cast(self), py_tm);
+        },
         "The system valid condition")
       .def_property(
-        "sg", &System::getSG, [](PySystem& self, py::object py_sig) { self.set_sg(py_sig); },
+        "sg", &System::getSG,
+        [](PySystem& self, py::object py_sig) {
+            self.set_sg(py_sig);
+            keep_python_part_alive(py::cast(self), py_sig);
+        },
         "The signal generator")
       .def_property(
-        "st", &System::getST, [](PySystem& self, py::object py_st) { self.set_st(py_st); },
+        "st", &System::getST,
+        [](PySystem& self, py::object py_st) {
+            self.set_st(py_st);
+            keep_python_part_alive(py::cast(self), py_st);
+        },
         "The stop-loss strategy")
       .def_property(
-        "tp", &System::getTP, [](PySystem& self, py::object py_tp) { self.set_tp(py_tp); },
+        "tp", &System::getTP,
+        [](PySystem& self, py::object py_tp) {
+            self.set_tp(py_tp);
+            keep_python_part_alive(py::cast(self), py_tp);
+        },
         "The take-profit strategy")
       .def_property(
-        "pg", &System::getPG, [](PySystem& self, py::object py_pg) { self.set_pg(py_pg); },
+        "pg", &System::getPG,
+        [](PySystem& self, py::object py_pg) {
+            self.set_pg(py_pg);
+            keep_python_part_alive(py::cast(self), py_pg);
+        },
         "The profit goal strategy")
       .def_property(
-        "sp", &System::getSP, [](PySystem& self, py::object py_sp) { self.set_sp(py_sp); },
+        "sp", &System::getSP,
+        [](PySystem& self, py::object py_sp) {
+            self.set_sp(py_sp);
+            keep_python_part_alive(py::cast(self), py_sp);
+        },
         "The slippage algorithm")
 
       .def("get_param", &System::getParam<boost::any>, R"(get_param(self, name)
@@ -681,97 +721,76 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
            "Get the turnover rate of every rebalancing day (a list of (date, turnover amount / "
            "total assets))")
-      // Consistent with the set_* of PySystem: hold the GIL and release() to keep it alive when
-      // setting the Python custom parts, to prevent the Python-side parts (e.g. the custom MM/SG)
-      // from being GC'd early causing the C++ side to hold a dangling pointer (use-after-free).
+      // The setters delegate to the shared system_set_* free functions (same behavior as the
+      // PySystem set_* methods); the Python parts are kept alive via the keep-alive registry.
       .def_property(
         "tm", &MultiSystem::getTM,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setTM(o.cast<TradeManagerPtr>());
-            tmp.release();
+            system_set_tm(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The associated trade management instance")
       .def_property(
         "mm", &MultiSystem::getMM,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setMM(o.cast<MMPtr>());
-            tmp.release();
+            system_set_mm(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The money management strategy")
       .def_property(
         "ev", &MultiSystem::getEV,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setEV(o.cast<EnvironmentPtr>());
-            tmp.release();
+            system_set_ev(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The market environment judgment strategy")
       .def_property(
         "cn", &MultiSystem::getCN,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setCN(o.cast<CNPtr>());
-            tmp.release();
+            system_set_cn(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The system precondition")
       .def_property(
         "sg", &MultiSystem::getSG,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setSG(o.cast<SGPtr>());
-            tmp.release();
+            system_set_sg(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The signal generator")
       .def_property(
         "st", &MultiSystem::getST,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setST(o.cast<StoplossPtr>());
-            tmp.release();
+            system_set_st(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The stop-loss strategy")
       .def_property(
         "tp", &MultiSystem::getTP,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setTP(o.cast<StoplossPtr>());
-            tmp.release();
+            system_set_tp(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The take-profit strategy")
       .def_property(
         "pg", &MultiSystem::getPG,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setPG(o.cast<PGPtr>());
-            tmp.release();
+            system_set_pg(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The profit goal strategy")
       .def_property(
         "sp", &MultiSystem::getSP,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setSP(o.cast<SlippagePtr>());
-            tmp.release();
+            system_set_sp(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The slippage algorithm")
       .def_property(
         "af", &MultiSystem::getAF,
         [](MultiSystem& self, py::object o) {
-            py::gil_scoped_acquire gil;
-            auto tmp = o;
-            self.setAF(o.cast<AllocateFundsPtr>());
-            tmp.release();
+            system_set_af(self, o);
+            keep_python_part_alive(py::cast(self), o);
         },
         "The portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3; used by the "
         "aggregate system only)")
@@ -780,11 +799,12 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     //--------------------------------------------------------------------------------------
     // The PF factories pass through to MultiSystem, keeping the master call style unchanged
     // (the return type changes from PortfolioPtr to MultiSystem)
-    m.def("PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-          py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
-          R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    m.def(
+      "PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
     Create a multi-instrument, single-system-strategy portfolio (returns MultiSystem running in mode B "Fund Allocation").
 
@@ -937,16 +957,15 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
          py::object cn = py::none(), py::object sg = py::none(), py::object st = py::none(),
          py::object tp = py::none(), py::object pg = py::none(), py::object sp = py::none()) {
           auto sys = make_shared<System>("SYS_Simple");
-          auto* sys_ptr = (PySystem*)sys.get();
-          sys_ptr->set_tm(tm);
-          sys_ptr->set_mm(mm);
-          sys_ptr->set_ev(ev);
-          sys_ptr->set_cn(cn);
-          sys_ptr->set_sg(sg);
-          sys_ptr->set_st(st);
-          sys_ptr->set_tp(tp);
-          sys_ptr->set_pg(pg);
-          sys_ptr->set_sp(sp);
+          system_set_tm(*sys, tm);
+          system_set_mm(*sys, mm);
+          system_set_ev(*sys, ev);
+          system_set_cn(*sys, cn);
+          system_set_sg(*sys, sg);
+          system_set_st(*sys, st);
+          system_set_tp(*sys, tp);
+          system_set_pg(*sys, pg);
+          system_set_sp(*sys, sp);
           return sys;
       },
       py::arg("tm") = py::none(), py::arg("mm") = py::none(), py::arg("ev") = py::none(),

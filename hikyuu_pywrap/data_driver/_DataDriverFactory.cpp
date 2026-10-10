@@ -24,7 +24,9 @@ void export_DataDriverFactory(py::module& m) {
 
       .def_static("regBaseInfoDriver",
                   [](py::object pydriver) {
-                      auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+                      // The driver may be destroyed on a background thread (e.g. reload or factory
+                      // release); the owner must acquire the GIL before the final decref.
+                      auto keep_python_state_alive = make_gil_safe(pydriver);
                       auto ptr = pydriver.cast<PyBaseInfoDriver*>();
                       auto driver = BaseInfoDriverPtr(keep_python_state_alive, ptr);
                       DataDriverFactory::regBaseInfoDriver(driver);
@@ -32,7 +34,7 @@ void export_DataDriverFactory(py::module& m) {
 
       .def_static("regBlockDriver",
                   [](py::object pydriver) {
-                      auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+                      auto keep_python_state_alive = make_gil_safe(pydriver);
                       auto ptr = pydriver.cast<PyBlockInfoDriver*>();
                       auto driver = BlockInfoDriverPtr(keep_python_state_alive, ptr);
                       DataDriverFactory::regBlockDriver(driver);
@@ -40,7 +42,7 @@ void export_DataDriverFactory(py::module& m) {
 
       .def_static("regKDataDriver",
                   [](py::object pydriver) {
-                      auto keep_python_state_alive = std::make_shared<py::object>(pydriver);
+                      auto keep_python_state_alive = make_gil_safe(pydriver);
                       auto ptr = pydriver.cast<PyKDataDriver*>();
                       auto driver = KDataDriverPtr(keep_python_state_alive, ptr);
                       DataDriverFactory::regKDataDriver(driver);
@@ -48,5 +50,6 @@ void export_DataDriverFactory(py::module& m) {
 
       .def_static("init", &DataDriverFactory::init, "Initialize the supported default drivers")
       .def_static("release", &DataDriverFactory::release,
-                  "Actively release the resources, mainly used for the memory leak detection; clean up actively at the exit to avoid false positives");
+                  "Actively release the resources, mainly used for the memory leak detection; "
+                  "clean up actively at the exit to avoid false positives");
 }

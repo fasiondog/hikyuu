@@ -12,7 +12,7 @@ Common parameters (in addition to those inherited from SYS):
     * **train_len=100** *(int)* : the length of the rolling in-sample window over which system performance is evaluated
     * **test_len=20** *(int)* : the length of the out-of-sample period traded with the best system selected during train_len
     * **clean_hold_when_select_changed=True** *(bool)* : when the newly selected system differs from the previous one, liquidate the existing position at the open
-    * **parallel=False** *(bool)* : enable parallel evaluation; this may not work when the evaluation function is a pure Python function, as the GIL can cause a crash
+    * **parallel=False** *(bool)* : enable parallel evaluation. Parallel evaluation is safe with a Python evaluation function (the GIL is handled internally), but the evaluate calls are serialized by the GIL; prefer the built-in C++ selectors when the evaluation is expensive
     * **se_trace=False** *(bool)* : trace and print the SE log output
 
 
@@ -58,3 +58,7 @@ The SE in a PF (portfolio), in contrast, ranks and scores all candidate systems 
     Selector that performs the optimization using a custom function.
 
     :param func: a callable taking the parameters (sys, lastdate) and returning a float
+
+    .. note::
+
+        The custom evaluation function runs on a thread-pool worker. Each call acquires and releases the GIL automatically, so the evaluate calls are serialized with a small per-call overhead; keep the evaluation function lightweight. When the evaluation is expensive, prefer the built-in C++ selectors (such as :py:func:`SE_PerformanceOptimal` and :py:func:`SE_MaxFundsOptimal`), which run without any GIL involvement and are fully parallel. This limitation disappears when running on a free-threaded CPython build (3.13t and later, PEP 703).

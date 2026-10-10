@@ -49,18 +49,14 @@ public:
 public:
     void set_norm(py::object norm) {
         py::gil_scoped_acquire gil;
-        auto tmp = norm;
         setNormalize(norm.cast<NormPtr>());
-        tmp.release();
     }
 
     void add_special_norm(const string& name, py::object norm, const string& category,
                           const IndicatorList& style_inds) {
         py::gil_scoped_acquire gil;
         HKU_INFO_IF_RETURN(!norm || norm.is_none(), void(), "norm is None");
-        auto tmp = norm;
         addSpecialNormalize(name, norm.cast<NormPtr>(), category, style_inds);
-        tmp.release();
     }
 };
 
@@ -248,7 +244,11 @@ The custom multi-factor model override hooks:
     :return: [factor1, factor2, ...] in the same order as the reference securities)")
 
       .def(
-        "set_normalize", [](PyMultiFactor& self, py::object norm) { self.set_norm(norm); },
+        "set_normalize",
+        [](PyMultiFactor& self, py::object norm) {
+            self.set_norm(norm);
+            keep_python_part_alive(py::cast(self), norm);
+        },
         py::arg("norm"),
         R"(set_normalize(self, norm)
 
@@ -261,6 +261,7 @@ The custom multi-factor model override hooks:
         [](PyMultiFactor& self, const string& name, py::object norm, const string& category,
            const IndicatorList& style_inds) {
             self.add_special_norm(name, norm, category, style_inds);
+            keep_python_part_alive(py::cast(self), norm);
         },
         py::arg("name"), py::arg("norm") = NormPtr(), py::arg("category") = "",
         py::arg("style_inds") = IndicatorList(),
@@ -302,20 +303,15 @@ The custom multi-factor model override hooks:
                 return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
             }
             HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
-            py::object filter_func = filter.attr("__call__");
-            ScoreRecord sc;
-            try {
-                filter_func(sc);
-                return self.getScores(date, start, cend, [&](const ScoreRecord& score_) {
-                    return filter_func(score_).cast<bool>();
+            if (check_pyfunction_arg_num(filter, 1)) {
+                return self.getScores(date, start, cend, [filter](const ScoreRecord& score_) {
+                    return filter(score_).cast<bool>();
                 });
-            } catch (...) {
-                filter_func(date, sc);
-                return self.getScores(date, start, cend,
-                                      [&](const Datetime& date_, const ScoreRecord& score_) {
-                                          return filter_func(date_, score_).cast<bool>();
-                                      });
             }
+            return self.getScores(date, start, cend,
+                                  [filter](const Datetime& date_, const ScoreRecord& score_) {
+                                      return filter(date_, score_).cast<bool>();
+                                  });
         },
         py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
         py::arg("filter") = py::none(),

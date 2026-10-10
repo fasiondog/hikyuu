@@ -12,14 +12,17 @@
 namespace hku {
 
 class OptimalEvaluateSelector : public OptimalSelectorBase {
-    OPTIMAL_SELECTOR_IMP(OptimalEvaluateSelector)
     OPTIMAL_SELECTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
     OptimalEvaluateSelector();
-    OptimalEvaluateSelector(std::function<double(const SystemPtr&, const Datetime&)>&& evaluate);
+    OptimalEvaluateSelector(std::function<double(const SystemPtr&, const Datetime&)> evaluate);
 
     virtual ~OptimalEvaluateSelector();
+
+    virtual SelectorPtr _clone() override;
+
+    virtual double evaluate(const SYSPtr&, const Datetime& endDate) noexcept override;
 
 private:
     std::function<double(const SystemPtr&, const Datetime&)> m_evaluate;

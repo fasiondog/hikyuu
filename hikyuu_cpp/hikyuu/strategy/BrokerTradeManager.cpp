@@ -37,27 +37,37 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
                                                   const Datetime& datetime) {
     HKU_CHECK(broker, "broker is null!");
 
-    auto brk_asset = broker->getAssetInfo();
+    // A failed fetch must NOT wipe the local account: keep the last known state and skip the
+    // synchronization. Otherwise a single network hiccup would zero the cash and drop all
+    // positions.
+    string brk_asset;
+    try {
+        brk_asset = broker->getAssetInfo();
+    } catch (const std::exception& e) {
+        HKU_WARN(
+          "Failed fetch asset info from the broker (error: \"{}\")! Keep the last known "
+          "account state and skip the synchronization",
+          e.what());
+        return;
+    }
     if (brk_asset.empty()) {
-        HKU_WARN("Failed fetch asset info from broker!");
-        m_datetime = firstDatetime().isNull() && !datetime.isNull() ? datetime : Datetime::now();
-        m_cash = 0.0;
-        m_position.clear();
+        HKU_WARN(
+          "The broker returned an empty asset info! Keep the last known account state "
+          "and skip the synchronization");
         return;
     }
 
     try {
         json asset = json::parse(brk_asset);
-        m_datetime = asset.contains("datetime")
-                       ? m_datetime = Datetime(asset["datetime"].get<string>())
-                       : m_datetime = Datetime::now();
+        Datetime new_datetime =
+          asset.contains("datetime") ? Datetime(asset["datetime"].get<string>()) : Datetime::now();
         if (firstDatetime().isNull() && !datetime.isNull()) {
-            m_datetime = datetime;
+            new_datetime = datetime;
         }
-        m_cash = asset["cash"].get<price_t>();
+        price_t new_cash = asset["cash"].get<price_t>();
 
-        m_position.clear();
         int precision = getParam<int>("precision");
+        position_map_type new_position;
         auto& positions = asset["positions"];
         for (auto iter = positions.cbegin(); iter != positions.cend(); ++iter) {
             try {
@@ -72,7 +82,7 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
 
                 PositionRecord pos;
                 pos.stock = stock;
-                pos.takeDatetime = m_datetime;
+                pos.takeDatetime = new_datetime;
                 pos.number = jpos["number"].get<double>();
                 pos.stoploss = jpos["stoploss"].get<price_t>();
                 pos.goalPrice = jpos["goal_price"].get<price_t>();
@@ -81,16 +91,22 @@ void BrokerTradeManager::fetchAssetInfoFromBroker(const OrderBrokerPtr& broker,
                 pos.buyMoney = roundEx(pos.number * cost_price * stock.unit(), precision);
                 pos.totalRisk =
                   roundEx((cost_price - pos.stoploss) * pos.number * stock.unit(), precision);
-                m_position[stock.id()] = pos;
+                new_position[stock.id()] = pos;
             } catch (const std::exception& e) {
                 HKU_ERROR(e.what());
             }
         }
-    } catch (const std::exception& e) {
-        HKU_ERROR(e.what());
-    }
 
-    m_broker_last_datetime = m_datetime;
+        m_datetime = new_datetime;
+        m_cash = new_cash;
+        m_position = std::move(new_position);
+        m_broker_last_datetime = m_datetime;
+    } catch (const std::exception& e) {
+        HKU_ERROR(
+          "Failed parse the asset info from the broker (error: \"{}\")! Keep the last "
+          "known account state and skip the synchronization",
+          e.what());
+    }
 }
 
 PositionRecordList BrokerTradeManager::getPositionList() const {

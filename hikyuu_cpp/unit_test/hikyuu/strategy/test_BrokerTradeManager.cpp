@@ -82,12 +82,83 @@ TEST_CASE("test_BrokerTradeManager_fetchAssetInfoFromBroker_risk") {
     /** @arg buyMoney scales by stock.unit() (regression for the missing unit) */
     CHECK_EQ(pos.buyMoney, roundEx(number * cost_price * unit, precision));
 
-    /** @arg empty asset info resets cash and clears all positions */
+    /** @arg a failed (empty) fetch on a fresh instance keeps the initial (empty) state */
     OrderBrokerPtr empty_broker = make_shared<AssetOrderBroker>("");
     BrokerTradeManager tm2(empty_broker);
     tm2.fetchAssetInfoFromBroker(empty_broker);
     CHECK_EQ(tm2.getStockNumber(), 0);
     CHECK_EQ(tm2.currentCash(), 0.0);
+}
+
+/** @par Test points: a failed fetch must NOT wipe the local account (TM-004 regression: the old
+ * code zeroed the cash and dropped all positions on any empty/failed broker response) */
+TEST_CASE("test_BrokerTradeManager_fetchAssetInfoFromBroker_keep_state_on_failure") {
+    Stock stock = StockManager::instance().getStock("sh600000");
+    REQUIRE_UNARY(!stock.isNull());
+
+    string asset = R"({
+        "cash": 100000.0,
+        "positions": [
+            {"market": "SH", "code": "600000", "number": 10.0,
+             "stoploss": 5.0, "goal_price": 0.0, "cost_price": 10.0}
+        ]
+    })";
+
+    class MockBroker final : public OrderBrokerBase {
+    public:
+        string _getAssetInfo() override {
+            if (m_throw) {
+                throw std::runtime_error("network timeout");
+            }
+            return m_asset;
+        }
+
+        void _buy(Datetime, const string&, const string&, price_t, double, price_t, price_t,
+                  SystemPart, const string&) override {}
+        void _sell(Datetime, const string&, const string&, price_t, double, price_t, price_t,
+                   SystemPart, const string&) override {}
+
+        string m_asset;
+        bool m_throw = false;
+    };
+
+    auto broker = make_shared<MockBroker>();
+    broker->m_asset = asset;
+    BrokerTradeManager tm(broker);
+
+    /** @arg a successful sync imports the account state */
+    tm.fetchAssetInfoFromBroker(broker);
+    CHECK_EQ(tm.currentCash(), 100000.0);
+    CHECK_EQ(tm.getStockNumber(), 1);
+    CHECK_UNARY(broker->getLastError().empty());
+
+    /** @arg an exception from the broker keeps the last known state; getAssetInfo no longer
+     * swallows it, so the caller sees the real error */
+    broker->m_throw = true;
+    CHECK_THROWS_AS(broker->getAssetInfo(), std::runtime_error);
+    tm.fetchAssetInfoFromBroker(broker);
+    CHECK_EQ(tm.currentCash(), 100000.0);
+    CHECK_EQ(tm.getStockNumber(), 1);
+
+    /** @arg an empty (failed) response keeps the last known state as well */
+    broker->m_throw = false;
+    broker->m_asset.clear();
+    tm.fetchAssetInfoFromBroker(broker);
+    CHECK_EQ(tm.currentCash(), 100000.0);
+    CHECK_EQ(tm.getStockNumber(), 1);
+
+    /** @arg a malformed json response keeps the last known state */
+    broker->m_asset = "{not a json";
+    tm.fetchAssetInfoFromBroker(broker);
+    CHECK_EQ(tm.currentCash(), 100000.0);
+    CHECK_EQ(tm.getStockNumber(), 1);
+
+    /** @arg the state is refreshable again once the broker recovers */
+    broker->m_asset = asset;
+    tm.fetchAssetInfoFromBroker(broker);
+    CHECK_EQ(tm.currentCash(), 100000.0);
+    CHECK_EQ(tm.getStockNumber(), 1);
+    CHECK_UNARY(broker->getLastError().empty());
 }
 
 /** @par Test points: getFunds(datetime) revalues the snapshot holdings at the queried moment (the

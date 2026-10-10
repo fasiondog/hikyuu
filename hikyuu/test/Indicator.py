@@ -7,6 +7,9 @@
 # History: 1)20130220, Added by fasiondog
 # ===============================================================================
 
+import os
+import subprocess
+import sys
 import unittest
 
 from test_init import *
@@ -505,6 +508,58 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(len(ind.to_df()), 0)
         self.assertEqual(len(ind.value_to_df()), 0)
         self.assertEqual(len(ind.to_array(0)), 0)
+
+    def test_batch_calculate_inds_python(self):
+        # Python custom indicators run inside the thread-pool workers of
+        # batch_calculate_inds; the GIL must be released by the calling thread and
+        # re-acquired per Python indicator, otherwise the workers deadlock waiting
+        # for the GIL held by the blocked caller. The probe uses a timeout so a
+        # regression (deadlock) fails the test instead of hanging the suite.
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        config = "test_data/hikyuu_win.ini" if sys.platform == "win32" else "test_data/hikyuu_linux.ini"
+        probe = (
+            "import sys; sys.path.insert(0, r'{root}')\n"
+            "import os; os.chdir(r'{root}')\n"
+            "from hikyuu import *\n"
+            "hikyuu_init(r'{config}')\n"
+            "assert len(sm) > 0\n"
+            "class PyAdd(IndicatorImp):\n"
+            "    def __init__(self, indicator):\n"
+            "        super().__init__('PyAdd')\n"
+            "        self._ready_buffer(len(indicator), 1)\n"
+            "        self.set_discard(0)\n"
+            "        for i in range(len(indicator)):\n"
+            "            self._set(indicator[i] + 1.0, i)\n"
+            "    def _clone(self):\n"
+            "        return PyAdd(Indicator())\n"
+            "    def _calculate(self, ind):\n"
+            "        self.set_discard(0)\n"
+            "        for i in range(len(ind)):\n"
+            "            self._set(ind[i] + 1.0, i)\n"
+            "k = sm['sh000001'].get_kdata(Query(-10))\n"
+            "assert len(k) > 0\n"
+            "m1 = Indicator(PyAdd(PRICELIST(toPriceList([0, 1, 2, 3]))))\n"
+            "m2 = Indicator(PyAdd(PRICELIST(toPriceList([10, 20, 30, 40]))))\n"
+            "m3 = Indicator(PyAdd(PRICELIST(toPriceList([100, 200, 300, 400]))))\n"
+            "res = batch_calculate_inds([m1, m2, m3], k)\n"
+            "assert len(res) == 3\n"
+            "expect = [[1, 2, 3, 4], [11, 21, 31, 41], [101, 201, 301, 401]]\n"
+            "for j in range(3):\n"
+            "    assert len(res[j]) == 4, (j, len(res[j]))\n"
+            "    for i in range(4):\n"
+            "        assert abs(res[j][i] - expect[j][i]) < 1e-9, (j, i, res[j][i])\n"
+        ).format(root=root, config=config)
+        proc = subprocess.run(
+          [sys.executable, "-c", probe],
+          capture_output=True,
+          text=True,
+          encoding="utf-8",
+          errors="replace",
+          timeout=120,
+        )
+        self.assertEqual(
+          proc.returncode, 0, "batch_calculate_inds deadlocked/hung:\n%s" % proc.stderr[-2000:]
+        )
 
 
 def suite():

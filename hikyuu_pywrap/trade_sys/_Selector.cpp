@@ -76,7 +76,7 @@ public:
     }
 
     explicit PyOptimalSelector(const py::function& evalfunc)
-    : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(evalfunc) {
+    : OptimalSelectorBase("SE_PyOptimal"), m_evaluate(make_gil_safe(evalfunc)) {
         m_is_python_object = false;
     }
 
@@ -84,13 +84,14 @@ public:
 
 public:
     virtual SelectorPtr _clone() override {
-        return std::make_shared<PyOptimalSelector>();
+        return std::make_shared<PyOptimalSelector>(*m_evaluate);
     }
 
     virtual double evaluate(const SYSPtr& sys, const Datetime& lastDate) noexcept override {
         double ret = Null<double>();
         try {
-            ret = m_evaluate(sys, lastDate).cast<double>();
+            py::gil_scoped_acquire gil;
+            ret = (*m_evaluate)(sys, lastDate).cast<double>();
         } catch (const std::exception& e) {
             HKU_ERROR(e.what());
         } catch (...) {
@@ -100,8 +101,9 @@ public:
     }
 
 private:
-    // Cannot be serialized currently
-    py::function m_evaluate;
+    // Cannot be serialized currently. The held Python object may be destroyed on a thread
+    // without the GIL, so its lifetime is managed via make_gil_safe.
+    std::shared_ptr<py::function> m_evaluate;
 };
 #ifdef __GNUC__
 #pragma GCC visibility pop
@@ -237,9 +239,8 @@ void export_Selector(py::module& m) {
         "mf", &SelectorBase::getMF,
         [](SelectorBase& self, py::object mf) {
             py::gil_scoped_acquire gil;
-            auto tmp = mf;
             self.setMF(mf.cast<MFPtr>());
-            tmp.release();
+            keep_python_part_alive(py::cast(self), mf);
         },
         "Get the associated MF")
 
@@ -314,9 +315,8 @@ void export_Selector(py::module& m) {
         "set_scores_filter",
         [](SelectorBase& self, py::object filter) {
             py::gil_scoped_acquire gil;
-            auto tmp = filter;
             self.setScoresFilter(filter.cast<ScoresFilterPtr>());
-            tmp.release();
+            keep_python_part_alive(py::cast(self), filter);
         },
         R"(set_scores_filter(self, filter)
            
@@ -328,9 +328,8 @@ void export_Selector(py::module& m) {
         "add_scores_filter",
         [](SelectorBase& self, py::object filter) {
             py::gil_scoped_acquire gil;
-            auto tmp = filter;
             self.addScoresFilter(filter.cast<ScoresFilterPtr>());
-            tmp.release();
+            keep_python_part_alive(py::cast(self), filter);
         },
         R"(add_scores_filter(self, filter)
         
@@ -547,8 +546,12 @@ void export_Selector(py::module& m) {
       [](py::object evalulate_func) {
           py::object pyfunc = evalulate_func.attr("__call__");
           check_pyfunction_arg_num(pyfunc, 2);
-          return SE_EvaluateOptimal([=](const SystemPtr& sys, const Datetime& enddate) {
-              py::object pyfunc = evalulate_func.attr("__call__");
+          // The std::function stored in the C++ core may be destroyed on a thread without the
+          // GIL; keep the captured Python object gil-safe.
+          auto safe_func = make_gil_safe(evalulate_func);
+          return SE_EvaluateOptimal([safe_func](const SystemPtr& sys, const Datetime& enddate) {
+              py::gil_scoped_acquire gil;
+              py::object pyfunc = safe_func->attr("__call__");
               return pyfunc(sys, enddate).cast<double>();
           });
       },
