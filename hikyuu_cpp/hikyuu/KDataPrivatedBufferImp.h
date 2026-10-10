@@ -38,15 +38,15 @@ public:
     virtual size_t getPos(const Datetime& datetime) const noexcept override;
 
     virtual const KRecord& getKRecord(size_t pos) const noexcept override {
-        return m_buffer[pos];
+        return pos < m_buffer.size() ? m_buffer[pos] : KRecord::NullKRecord;
     }
 
     virtual const KRecord& front() const override {
-        return m_buffer.front();
+        return m_buffer.empty() ? KRecord::NullKRecord : m_buffer.front();
     }
 
     virtual const KRecord& back() const override {
-        return m_buffer.back();
+        return m_buffer.empty() ? KRecord::NullKRecord : m_buffer.back();
     }
 
     virtual const KRecord* data() const noexcept override {

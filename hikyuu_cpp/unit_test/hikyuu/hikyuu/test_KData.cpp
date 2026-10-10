@@ -2181,6 +2181,32 @@ TEST_CASE("test_KData_recover_unsupported_ktype") {
     }
 }
 
+/** @par Test point - BASE-305: an empty KData follows the "empty returns the null record" contract
+ * of the base class: front()/back()/getKRecord() return the null record, and the ktype/date
+ * conversions return an empty KData instead of crashing. */
+TEST_CASE("test_KData_empty_record_access") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg an empty daily KData (a range without any bar) */
+    KData empty =
+      stock.getKData(KQueryByDate(Datetime(190001010000), Datetime(190101010000), KQuery::DAY));
+    REQUIRE_UNARY(empty.empty());
+
+    /** @arg front()/back()/getKRecord() return the null record */
+    CHECK_EQ(empty.front(), KRecord::NullKRecord);
+    CHECK_EQ(empty.back(), KRecord::NullKRecord);
+    CHECK_EQ(empty.getKRecord(0), KRecord::NullKRecord);
+    CHECK_EQ(empty.getKRecord(10), KRecord::NullKRecord);
+
+    /** @arg converting an empty KData to another ktype returns an empty KData without crashing */
+    CHECK_UNARY(empty.getKData(KQuery::MIN).empty());
+    CHECK_UNARY(empty.getKData(KQuery::DAY).empty());
+
+    /** @arg the by-date sub query of an empty KData stays empty */
+    CHECK_UNARY(empty.getKData(Datetime(190001010000), Datetime(190101010000)).empty());
+}
+
 /** @par Test points */
 TEST_CASE("test_KData_getKData") {
     KData k1, k2;

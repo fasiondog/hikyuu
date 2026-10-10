@@ -183,9 +183,8 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         return KQueryByDate(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
     }
 
-    if (empty() && query.queryType() == KQuery::INDEX) {
-        return KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
-    }
+    HKU_IF_RETURN(
+      empty(), KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType()));
 
     Datetime end_;
     if ((query.queryType() == KQuery::INDEX && query.end() == Null<int64_t>()) ||
@@ -228,6 +227,8 @@ KData KData::getKData(const KQuery::KType& ktype) const {
     if (ktype == getQuery().kType()) {
         return KData(m_imp);
     }
+ 
+    HKU_IF_RETURN(empty(), KData(stk, KQuery(0, 0, ktype, getQuery().recoverType())));
     ret = stk.getKData(getOtherQueryByDate(front().datetime, back().datetime, ktype));
     return ret;
 }

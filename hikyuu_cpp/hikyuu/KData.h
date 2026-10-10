@@ -42,7 +42,7 @@ public:
 
     DatetimeList getDatetimeList() const;
 
-    /** Get the KRecord at the given position, no bounds check is performed */
+    /** Get the KRecord at the given position, the null record is returned when it is out of range */
     const KRecord& getKRecord(size_t pos) const noexcept;
 
     /** Query the KRecord by date */
