@@ -39,8 +39,10 @@ void IMddCurrent::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     for (size_t i = start_pos; i < total; ++i) {
         value_t current = src[i];
-        if (std::isnan(current)) {
-            dst[i] = 0.0;
+        // The drawdown is only defined for a positive value: nan and non positive inputs are
+        // returned as null, as the header documents
+        if (std::isnan(current) || current <= 0.0) {
+            dst[i] = Null<value_t>();
             continue;
         }
         if (current > run_max) {

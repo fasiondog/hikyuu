@@ -101,10 +101,36 @@ TEST_CASE("test_MDD_CURRENT_with_nan") {
     PriceList data{100.0, 105.0, 90.0, std::numeric_limits<double>::quiet_NaN(), -5.0, 90.0, 110.0};
     Indicator mdd = MDD_CURRENT(PRICELIST(data));
     CHECK_EQ(mdd.size(), 7);
-    CHECK_EQ(mdd[3], 0.0);                                        // NaN is filled with 0
-    CHECK_EQ(mdd[4], doctest::Approx(104.7619).epsilon(0.0001));  // -5, high 105 -> 104.7619%
-    CHECK_EQ(mdd[5], doctest::Approx(14.2857).epsilon(0.0001));   // 90, high 105 -> 14.2857%
-    CHECK_EQ(mdd[6], 0.0);                                        // 110, a new historical high
+    /** @arg a nan input gives a nan, as the header documents */
+    CHECK_UNARY(std::isnan(mdd[3]));
+    /** @arg a non positive input gives a nan instead of a ratio above 100% */
+    CHECK_UNARY(std::isnan(mdd[4]));
+    CHECK_EQ(mdd[5], doctest::Approx(14.2857).epsilon(0.0001));  // 90, high 105 -> 14.2857%
+    CHECK_EQ(mdd[6], 0.0);                                       // 110, a new historical high
+}
+
+/** @par Test points */
+TEST_CASE("test_MDD_CURRENT_leading_nan_discard") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData kdata = stock.getKData(KQuery(0, 20));
+    CHECK_EQ(kdata.size(), 20);
+
+    // The input starts with null values, which must stay null so that the discard can skip them
+    Indicator mdd = MDD_CURRENT(MA(CLOSE(), 5));
+    mdd.setContext(kdata);
+
+    /** @arg the null values of the input are not turned into zeros */
+    CHECK_EQ(mdd.size(), 20);
+    CHECK_EQ(mdd.discard(), 4);
+    for (size_t i = 0; i < 4; ++i) {
+        CHECK_UNARY(std::isnan(mdd[i]));
+    }
+    /** @arg the values from the discard on are valid and non negative */
+    for (size_t i = 4; i < 20; ++i) {
+        CHECK_UNARY(!std::isnan(mdd[i]));
+        CHECK_UNARY(mdd[i] >= 0.0);
+    }
 }
 
 /** @par Test point: the incremental calculation */

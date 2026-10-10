@@ -1493,6 +1493,8 @@ Built-in Technical Indicators
 
     The maximum drawdown percentage (when n=0, there is no time window limit), which is a positive value by the industry convention
 
+    Note: a value which is not positive, or nan, gives back nan.
+
 
 .. py:function:: MDD_CURRENT([data])
 
@@ -1501,6 +1503,8 @@ Built-in Technical Indicators
     The calculation formula: (the historical highest point - the current value) / the historical highest point * 100%
     
     The difference from MDD: what the MDD calculates is the drawdown to the highest point within the specified window, while what the MDD_CURRENT calculates is the drawdown to the historical highest point from the start point of the sequence to the current point, without a time window limit.
+    
+    Note: a value which is not positive, or nan, gives back nan.
     
     :param Indicator data: the input data
     :rtype: Indicator

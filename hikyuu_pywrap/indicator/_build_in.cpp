@@ -2336,6 +2336,8 @@ void export_Indicator_build_in(py::module& m) {
     
     The maximum drawdown percentage (when n=0, there is no time window limit), which is a positive value by the industry convention
     
+    Note: a value which is not positive, or nan, gives back nan.
+    
     :param Indicator data: the input data
     :param int n: the time window
     :rtype: Indicator)");
@@ -2345,6 +2347,8 @@ void export_Indicator_build_in(py::module& m) {
           R"(MDD_CURRENT([data])
     
     The drawdown percentage from the current point to the historical highest point, which is a positive value by the industry convention
+    
+    Note: a value which is not positive, or nan, gives back nan.
     
     :param Indicator data: the input data
     :rtype: Indicator)");
