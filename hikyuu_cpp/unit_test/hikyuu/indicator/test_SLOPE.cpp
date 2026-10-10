@@ -70,10 +70,10 @@ TEST_CASE("test_SLOPE") {
 
     /** @arg n = 3 */
     slope = SLOPE(c, 3);
-    CHECK_EQ(slope.discard(), 1);
+    CHECK_EQ(slope.discard(), 2);
     CHECK_EQ(slope.size(), c.size());
     CHECK_UNARY(std::isnan(slope[0]));
-    CHECK_EQ(slope[1], doctest::Approx(40.894).epsilon(0.0001));
+    CHECK_UNARY(std::isnan(slope[1]));
     CHECK_EQ(slope[2], doctest::Approx(27.931).epsilon(0.0001));
     CHECK_EQ(slope[3], doctest::Approx(12.347).epsilon(0.0001));
 }
@@ -86,7 +86,6 @@ TEST_CASE("test_SLOPE_dyn") {
     Indicator expect = SLOPE(c, 10);
     Indicator result = SLOPE(c, CVAL(c, 10));
     CHECK_EQ(expect.size(), result.size());
-    CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
@@ -96,7 +95,6 @@ TEST_CASE("test_SLOPE_dyn") {
 
     result = SLOPE(c, IndParam(CVAL(c, 10)));
     CHECK_EQ(expect.size(), result.size());
-    CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
@@ -316,5 +314,26 @@ TEST_CASE("test_SLOPE_export") {
 }
 
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
+
+/** @par Test points */
+TEST_CASE("test_SLOPE_warm_up_discard") {
+    PriceList px{1., 2., 3., 4., 5., 6., 7., 8., 9., 10.};
+    Indicator r = SLOPE(PRICELIST(px), 5);
+    REQUIRE_EQ(r.size(), 10);
+
+    /** @arg the bars without a full window are discarded */
+    CHECK_EQ(r.discard(), 4);
+    for (size_t i = 0; i < 4; ++i) {
+        CHECK_UNARY(std::isnan(r.get(i, 0)));
+        CHECK_UNARY(std::isnan(r.get(i, 1)));
+        CHECK_UNARY(std::isnan(r.get(i, 2)));
+    }
+
+    /** @arg every kept bar is the exact slope of the line */
+    for (size_t i = 4; i < 10; ++i) {
+        CHECK_EQ(r.get(i, 0), doctest::Approx(1.0).epsilon(0.00001));
+        CHECK_EQ(r.get(i, 1), doctest::Approx(1.0).epsilon(0.00001));
+    }
+}
 
 /** @} */
