@@ -935,80 +935,24 @@ TEST_CASE("test_indicator_increment_calculate") {
 }
 
 /** @par Test points */
-TEST_CASE("test_combineCalculateIndicators") {
+TEST_CASE("test_indicator_get_result_snapshot") {
     StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-    KQuery query(0, 20);
-    KData kdata = stock.getKData(query);
+    KData kdata = sm.getStock("sh600000").getKData(KQuery(0, 20));
 
-    /** @arg An empty indicator list */
-    IndicatorList empty_indicators;
-    IndicatorList result = combineCalculateIndicators(empty_indicators, kdata);
-    CHECK_EQ(result.size(), 0);
+    Indicator src = MA(CLOSE(kdata), 5);
+    Indicator snapshot = src.getResult(0);
 
-    /** @arg A single simple indicator */
-    Indicator close_ind = CLOSE();
-    IndicatorList single_indicator{close_ind};
-    result = combineCalculateIndicators(single_indicator, kdata);
-    check_indicator(result[0], CLOSE(kdata));
+    /** @arg the snapshot carries the source context */
+    CHECK_EQ(snapshot.getContext(), kdata);
+    CHECK_EQ(snapshot.getDatetime(0), kdata[0].datetime);
+    CHECK_EQ(snapshot.getByDate(kdata[kdata.size() - 1].datetime), src[kdata.size() - 1]);
 
-    /** @arg Multiple simple indicators */
-    Indicator open_ind = OPEN();
-    Indicator high_ind = HIGH();
-    Indicator low_ind = LOW();
-    IndicatorList multi_indicators{close_ind, open_ind, high_ind, low_ind};
-    result = combineCalculateIndicators(multi_indicators, kdata);
-    CHECK_EQ(result.size(), 4);
-    check_indicator(result[0], CLOSE(kdata));
-    check_indicator(result[1], OPEN(kdata));
-    check_indicator(result[2], HIGH(kdata));
-    check_indicator(result[3], LOW(kdata));
-
-    /** @arg It contains a composite indicator */
-    Indicator ma_close = MA(CLOSE(), 5);
-    Indicator rsi_close = RSI(CLOSE(), 14);
-    IndicatorList complex_indicators{ma_close, rsi_close};
-    result = combineCalculateIndicators(complex_indicators, kdata);
-    check_indicator(result[0], MA(CLOSE(kdata), 5));
-    check_indicator(result[1], RSI(CLOSE(kdata), 14));
-
-    /** @arg Test the tovalue parameter being true */
-    result = combineCalculateIndicators(complex_indicators, kdata, true);
-    CHECK_EQ(result.size(), 2);
-    // When tovalue is true only the first result column should be returned
-    CHECK_EQ(result[0].getResultNumber(), 1);
-    CHECK_EQ(result[1].getResultNumber(), 1);
-    CHECK_UNARY(result[0].equal(MA(CLOSE(kdata), 5)));
-    CHECK_UNARY(result[1].equal(RSI(CLOSE(kdata), 14)));
-    /** @arg the extracted single-result indicator still carries the source context */
-    CHECK_EQ(result[0].getContext(), kdata);
-    CHECK_EQ(result[0].getDatetime(0), kdata[0].datetime);
-    CHECK_EQ(result[0].getByDate(kdata[kdata.size() - 1].datetime),
-             MA(CLOSE(kdata), 5)[kdata.size() - 1]);
     /** @arg the snapshot still participates in downstream computation */
-    Indicator snapshot = result[0];
     check_indicator(MA(snapshot, 3), MA(MA(CLOSE(kdata), 5), 3));
-    check_indicator(snapshot + snapshot, MA(CLOSE(kdata), 5) + MA(CLOSE(kdata), 5));
+    check_indicator(snapshot + snapshot, src + src);
 
-    /** @arg Test the different KData contexts */
-    KQuery query2(10, 30);
-    KData kdata2 = stock.getKData(query2);
-    result = combineCalculateIndicators(multi_indicators, kdata2);
-    check_indicator(result[0], CLOSE(kdata2));
-    check_indicator(result[1], OPEN(kdata2));
-    check_indicator(result[2], HIGH(kdata2));
-    check_indicator(result[3], LOW(kdata2));
-
-    /** @arg Test the indicators containing the same child node (they should be deduplicated) */
-    Indicator close1 = CLOSE();
-    Indicator close2 = CLOSE();  // The same indicator
-    IndicatorList duplicate_indicators{close1, close2};
-    result = combineCalculateIndicators(duplicate_indicators, kdata);
-    CHECK_EQ(result.size(), 2);
-    // Although they are the same indicator, they are cloned into different instances
-    CHECK_NE(result[0].getImp().get(), result[1].getImp().get());
-    check_indicator(result[0], CLOSE(kdata));
-    check_indicator(result[1], CLOSE(kdata));
+    /** @arg an out-of-range result index yields an empty indicator */
+    CHECK_UNARY(src.getResult(1).empty());
 }
 
 /** @par Test points */

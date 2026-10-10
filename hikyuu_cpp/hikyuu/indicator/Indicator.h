@@ -513,34 +513,6 @@ Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& 
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b);
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
 
-/**
- * Combine and calculate multiple indicators
- * @details
- * Combine multiple indicators for a unified calculation, the dependency between the indicators and
- * the context settings are handled automatically. This function gets all the child nodes of all the
- * input indicators and removes the duplicates, then sets the given K-line data context for every
- * indicator, and finally performs the calculation and returns the result.
- *
- * <pre>
- * Usage example:
- * IndicatorList inds = {MA(CLOSE(), 5), MA(CLOSE(), 10), MACD(CLOSE())};
- * IndicatorList results = combineCalculateIndicators(inds, kdata);
- * // results contains all the calculated indicator results
- *
- * // Get the first result column only
- * IndicatorList first_results = combineCalculateIndicators(inds, kdata, true);
- * </pre>
- *
- * @param indicators indicator list, the indicator set to be calculated in combination
- * @param kdata K-line data context, used to set the environment of the indicator calculation
- * @param tovalue whether to return the first result column only, false by default (all the result
- *                columns are returned)
- * @return IndicatorList the calculated indicator result list
- * @ingroup Indicator
- */
-IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
-                                                 const KData& kdata, bool tovalue = false);
-
 } /* namespace hku */
 
 namespace std {

@@ -31,9 +31,6 @@ namespace detail {
 class CompiledFactorPlan;
 }
 
-vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& indicators,
-                                                     const KData& kdata, bool tovalue);
-
 /**
  * Indicator implementation class; when defining a new indicator, this class should be inherited
  *
@@ -57,10 +54,6 @@ class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT_WITH_CHECK
     friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
     friend class detail::CompiledFactorPlan;
-
-    typedef vector<Indicator> IndicatorList;
-    friend IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
-                                                            const KData& kdata, bool tovalue);
 
 public:
     enum OPType : uint8_t {

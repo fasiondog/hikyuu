@@ -367,38 +367,4 @@ Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_
     return IF(x, CVAL(x, a), CVAL(x, b));
 }
 
-IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
-                                                 const KData& kdata, bool tovalue) {
-    IndicatorList ret;
-    ret.reserve(indicators.size());
-    for (const auto& ind : indicators) {
-        ret.push_back(ind.clone());
-    }
-
-    vector<IndicatorImpPtr> sub_nodes;
-    for (const auto& ind : ret) {
-        vector<IndicatorImpPtr> nodes;
-        ind.getImp()->getAllSubNodes(nodes);
-        sub_nodes.insert(sub_nodes.end(), nodes.begin(), nodes.end());
-    }
-
-    IndicatorImp::inner_repeatALikeNodes(sub_nodes);
-    for (const auto& ind : ret) {
-        ind.getImp()->repeatSeparateKTypeLeafALikeNodes();
-    }
-
-    if (tovalue) {
-        for (auto& ind : ret) {
-            ind.setContext(kdata);
-            ind = ind.getResult(0);
-        }
-    } else {
-        for (auto& ind : ret) {
-            ind.setContext(kdata);
-        }
-    }
-
-    return ret;
-}
-
 } /* namespace hku */
