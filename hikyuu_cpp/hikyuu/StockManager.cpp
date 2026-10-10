@@ -178,6 +178,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     // Get the block driver
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
+    HKU_CHECK(m_blockDriver, "Failed get block driver!");
 
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     HKU_CHECK(driver, "driver is null!");
