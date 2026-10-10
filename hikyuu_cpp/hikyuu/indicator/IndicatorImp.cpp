@@ -951,6 +951,8 @@ IndicatorImp::BinaryLayout IndicatorImp::prepareBinaryOp(bool weave) {
     if (weave) {
         ly.result_num = m_left->getResultNumber() + m_right->getResultNumber();
         if (ly.result_num > MAX_RESULT_NUM) {
+            HKU_WARN("{}: weave result_num {} exceeds MAX_RESULT_NUM {}, right operands truncated!",
+                     name(), ly.result_num, MAX_RESULT_NUM);
             ly.result_num = MAX_RESULT_NUM;
         }
     } else {

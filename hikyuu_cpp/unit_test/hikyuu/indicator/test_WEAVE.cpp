@@ -13,7 +13,7 @@ using namespace hku;
  */
 
 /** @par Test points */
-TEST_CASE("test_WAEVE_export") {
+TEST_CASE("test_WAEVE") {
     KData k = getKData("sh000001", KQuery(-20));
     auto c = k.close();
     auto h = k.high();
@@ -44,6 +44,18 @@ TEST_CASE("test_WAEVE_export") {
         CHECK_EQ(ret.get(i, 4), v[i]);
         CHECK_EQ(ret.get(i, 5), a[i]);
     }
+}
+
+/** @par Test points: weaving beyond MAX_RESULT_NUM truncates to 6 sets */
+TEST_CASE("test_weave_truncate_over_max_result") {
+    KData k = getKData("sh000001", KQuery(-20));
+    Indicator six = WEAVE(k.open(), k.close(), k.high(), k.low(), k.vol(), k.amo());
+    REQUIRE_EQ(six.getResultNumber(), 6u);
+
+    Indicator w = WEAVE(six, k.open());
+    w.get(0, 0);
+    CHECK_EQ(w.getResultNumber(), 6u);
+    CHECK_EQ(w.size(), k.size());
 }
 
 #if HKU_SUPPORT_SERIALIZATION
