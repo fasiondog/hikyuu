@@ -27,7 +27,9 @@ void ISlope::_checkParam(const string& name) const {
 
 void ISlope::_calculate(const Indicator& ind) {
     size_t total = ind.size();
-    m_discard = ind.discard() + 1;
+
+    int n = getParam<int>("n");
+    m_discard = ind.discard() + (n > 1 ? (size_t)n - 1 : 1);
     if (m_discard >= total) {
         m_discard = total;
         return;
@@ -38,7 +40,6 @@ void ISlope::_calculate(const Indicator& ind) {
     auto* dst_r2 = this->data(1);
     auto* dst_relmaxres = this->data(2);
 
-    int n = getParam<int>("n");
     if (n <= 1) {
         for (size_t i = m_discard; i < total; i++) {
             dst_slope[i] = 0.0;
@@ -48,7 +49,8 @@ void ISlope::_calculate(const Indicator& ind) {
         return;
     }
 
-    size_t startPos = m_discard - 1;
+    // the rolling sums start at the first valid input value, whatever the declared discard is
+    size_t startPos = ind.discard();
     price_t fn = (price_t)n;
     price_t S_y = src[startPos];
     price_t S_xy = 0.0;
@@ -73,6 +75,10 @@ void ISlope::_calculate(const Indicator& ind) {
         price_t ss_yy = fcnt * S_y2 - S_y * S_y;
 
         price_t slope = ss_xy / denom;
+        if (i < m_discard) {
+            continue;
+        }
+
         dst_slope[i] = slope;
         dst_r2[i] = (ss_yy != 0.0) ? (ss_xy * ss_xy / (denom * ss_yy)) : 0.0;
 
@@ -197,6 +203,13 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
         _set(0, curPos);
         _set(0, curPos, 1);
         _set(0, curPos, 2);
+        return;
+    }
+
+    if (step != 0 && curPos - start + 1 < step) {
+        _set(Null<price_t>(), curPos);
+        _set(Null<price_t>(), curPos, 1);
+        _set(Null<price_t>(), curPos, 2);
         return;
     }
 

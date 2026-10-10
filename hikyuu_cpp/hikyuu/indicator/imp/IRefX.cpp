@@ -43,19 +43,19 @@ void IRefX::_calculate(const Indicator &data) {
         return;
 
     } else {
-        size_t absn = std::abs(n);
-        if (absn >= total) {
+        int64_t absn = -static_cast<int64_t>(n);
+        if (absn >= static_cast<int64_t>(total)) {
             m_discard = total;
             return;
         }
 
-        int64_t startix = data.discard() - absn;
+        int64_t startix = static_cast<int64_t>(data.discard()) - absn;
         size_t len = total - data.discard();
         if (startix < 0) {
             m_discard = 0;
-            len = total - absn;
+            len = total - static_cast<size_t>(absn);
         } else {
-            m_discard = startix;
+            m_discard = static_cast<size_t>(startix);
         }
 
         const auto *src = data.data() + total - len;

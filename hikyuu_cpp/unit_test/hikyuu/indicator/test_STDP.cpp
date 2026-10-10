@@ -37,10 +37,13 @@ TEST_CASE("test_STDP") {
     CHECK_EQ(dev.name(), "STDP");
     CHECK_EQ(dev.size(), 15);
 
-    vector<price_t> expected{0,      0.5,     0.816497, 1.11803, 1.41421, 1.34371, 1.82946, 1.71391,
-                             2.3094, 2.77308, 2.98161,  2.68514, 3.1,     3.46554, 3.79605};
-    for (size_t i = 0; i < dev.size(); i++) {
-        CHECK_EQ(dev[i], doctest::Approx(expected[i]).epsilon(0.0001));
+    CHECK_EQ(dev.discard(), 9);
+    for (size_t i = 0; i < 9; ++i) {
+        CHECK_UNARY(std::isnan(dev[i]));
+    }
+    vector<price_t> expected{2.77308, 2.98161, 2.68514, 3.1, 3.46554, 3.79605};
+    for (size_t i = 0; i < expected.size(); ++i) {
+        CHECK_EQ(dev[9 + i], doctest::Approx(expected[i]).epsilon(0.0001));
     }
 
     /** @arg When n = 1 */
@@ -64,7 +67,7 @@ TEST_CASE("test_STDP_dyn") {
     Indicator c = CLOSE(kdata);
     Indicator expect = STDP(c, 10);
     Indicator result = STDP(c, CVAL(c, 10));
-    // CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.discard(), result.discard());
     CHECK_EQ(expect.size(), result.size());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
@@ -74,7 +77,7 @@ TEST_CASE("test_STDP_dyn") {
     }
 
     result = STDP(c, IndParam(CVAL(c, 10)));
-    // CHECK_EQ(expect.discard(), result.discard());
+    CHECK_EQ(expect.discard(), result.discard());
     CHECK_EQ(expect.size(), result.size());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
@@ -123,5 +126,32 @@ TEST_CASE("test_STDP_export") {
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
+
+/** @par Test points */
+TEST_CASE("test_STDP_warm_up_discard") {
+    PriceList px{10., 12., 9., 11., 8., 13., 10., 12., 7., 11.};
+    Indicator src = PRICELIST(px);
+
+    Indicator r = STDP(src, 5);
+    CHECK_EQ(r.size(), 10);
+
+    /** @arg the bars without a full window are discarded */
+    CHECK_EQ(r.discard(), 4);
+
+    /** @arg the first kept value is the population std of the first full window */
+    price_t mean = (10. + 12. + 9. + 11. + 8.) / 5.;
+    price_t var = 0.0;
+    for (price_t v : {10., 12., 9., 11., 8.}) {
+        var += (v - mean) * (v - mean);
+    }
+    CHECK_EQ(r[4], doctest::Approx(std::sqrt(var / 5.)).epsilon(0.00001));
+    /** @arg a later kept value is the population std of its own window */
+    price_t mean2 = (13. + 10. + 12. + 7. + 11.) / 5.;
+    price_t var2 = 0.0;
+    for (price_t v : {13., 10., 12., 7., 11.}) {
+        var2 += (v - mean2) * (v - mean2);
+    }
+    CHECK_EQ(r[9], doctest::Approx(std::sqrt(var2 / 5.)).epsilon(0.00001));
+}
 
 /** @} */

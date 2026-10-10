@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef VIGOR_H_
-#define VIGOR_H_
+#ifndef INDICATOR_CRT_VIGOR_H_
+#define INDICATOR_CRT_VIGOR_H_
 
 #include "../Indicator.h"
 
@@ -37,4 +37,4 @@ Indicator HKU_API VIGOR(int n = 2);
 
 }  // namespace hku
 
-#endif /* VIGOR_H_ */
+#endif /* INDICATOR_CRT_VIGOR_H_ */

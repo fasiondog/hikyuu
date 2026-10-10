@@ -87,12 +87,7 @@ bool Indicator::equal(const Indicator& other) const noexcept {
         auto const* d1 = this->data(r);
         auto const* d2 = other.data(r);
         for (size_t i = 0, total = size(); i < total; i++) {
-            HKU_IF_RETURN((std::isnan(d1[i]) && !std::isnan(d2[i])) ||
-                            (!std::isnan(d1[i]) && std::isnan(d2[i])),
-                          false);
-            HKU_IF_RETURN(
-              (!std::isnan(d1[i]) && !std::isnan(d2[i])) && (std::abs(d1[i] - d2[i]) >= 0.0001),
-              false);
+            HKU_IF_RETURN(!IndicatorImp::equalValue(d1[i], d2[i]), false);
         }
     }
     return true;
@@ -370,40 +365,6 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t 
 
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b) {
     return IF(x, CVAL(x, a), CVAL(x, b));
-}
-
-IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
-                                                 const KData& kdata, bool tovalue) {
-    IndicatorList ret;
-    ret.reserve(indicators.size());
-    for (const auto& ind : indicators) {
-        ret.push_back(ind.clone());
-    }
-
-    vector<IndicatorImpPtr> sub_nodes;
-    for (const auto& ind : ret) {
-        vector<IndicatorImpPtr> nodes;
-        ind.getImp()->getAllSubNodes(nodes);
-        sub_nodes.insert(sub_nodes.end(), nodes.begin(), nodes.end());
-    }
-
-    IndicatorImp::inner_repeatALikeNodes(sub_nodes);
-    for (const auto& ind : ret) {
-        ind.getImp()->repeatSeparateKTypeLeafALikeNodes();
-    }
-
-    if (tovalue) {
-        for (auto& ind : ret) {
-            ind.setContext(kdata);
-            ind = ind.getResult(0);
-        }
-    } else {
-        for (auto& ind : ret) {
-            ind.setContext(kdata);
-        }
-    }
-
-    return ret;
 }
 
 } /* namespace hku */

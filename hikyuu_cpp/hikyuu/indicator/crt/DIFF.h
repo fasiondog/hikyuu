@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef DIFF_H_
-#define DIFF_H_
+#ifndef INDICATOR_CRT_DIFF_H_
+#define INDICATOR_CRT_DIFF_H_
 
 #include "../Indicator.h"
 
@@ -30,4 +30,4 @@ Indicator HKU_API DIFF(const Indicator& data, int n = 1);
 
 }  // namespace hku
 
-#endif /* DIFF_H_ */
+#endif /* INDICATOR_CRT_DIFF_H_ */

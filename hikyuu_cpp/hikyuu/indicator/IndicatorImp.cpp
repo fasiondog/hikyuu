@@ -33,7 +33,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
-bool IndicatorImp::ms_enable_increment_calculate{true};
+std::atomic<bool> IndicatorImp::ms_enable_increment_calculate{true};
 
 void IndicatorImp::initEngine() {
 #if HKU_ENABLE_MIMALLOC
@@ -198,11 +198,15 @@ void IndicatorImp::setIndParam(const string &name, const IndParam &ind) {
 }
 
 IndParam IndicatorImp::getIndParam(const string &name) const {
-    return IndParam(m_ind_params.at(name));
+    auto it = m_ind_params.find(name);
+    HKU_CHECK(it != m_ind_params.end(), "Invalid dynamic parameter name: {}!", name);
+    return IndParam(it->second);
 }
 
 const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
-    return m_ind_params.at(name);
+    auto it = m_ind_params.find(name);
+    HKU_CHECK(it != m_ind_params.end(), "Invalid dynamic parameter name: {}!", name);
+    return it->second;
 }
 
 bool IndicatorImp::supportIncrementCalculate() const {
@@ -446,15 +450,15 @@ IndicatorImpPtr IndicatorImp::clone() {
 
     if (m_left) {
         p->m_left = m_left->clone();
-        p->m_left->m_parent = this;
+        p->m_left->m_parent = p.get();
     }
     if (m_right) {
         p->m_right = m_right->clone();
-        p->m_right->m_parent = this;
+        p->m_right->m_parent = p.get();
     }
     if (m_three) {
         p->m_three = m_three->clone();
-        p->m_three->m_parent = this;
+        p->m_three->m_parent = p.get();
     }
 
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
@@ -489,7 +493,7 @@ IndicatorImpPtr IndicatorImp::clone() {
 }
 
 IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
-    HKU_INFO("This indicator not support operator()! {}", *this);
+    HKU_DEBUG("This indicator not support operator()! {}", *this);
     // Guarantee the alignment
     IndicatorImpPtr result = make_shared<IndicatorImp>();
     size_t total = ind.size();
@@ -538,11 +542,18 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     imp->_readyBuffer(total, 1);
     imp->setDiscard(discard());
     imp->name(name());
+    imp->onlySetContext(getContext());
+    if (haveParam("align_date_list")) {
+        imp->setParam<DatetimeList>("align_date_list",
+                                    getParam<const DatetimeList &>("align_date_list"));
+    }
     auto const *src = this->data(result_num);
     auto *dst = imp->data(0);
     for (size_t i = imp->discard(); i < total; ++i) {
         dst[i] = src[i];
     }
+    // without this, a later clone recomputes through the base _calculate and wipes the buffer
+    imp->setCalculateFlag(false);
     return imp;
 }
 
@@ -621,6 +632,7 @@ size_t IndicatorImp::getPos(Datetime date) const {
 bool IndicatorImp::existNan(size_t result_idx) const {
     HKU_CHECK(result_idx < m_result_num, "result_idx: {}", result_idx);
     const value_t *src = data(result_idx);
+    HKU_IF_RETURN(!src, false);
     for (size_t i = m_discard, total = size(); i < total; i++) {
         if (std::isnan(src[i])) {
             return true;
@@ -939,6 +951,8 @@ IndicatorImp::BinaryLayout IndicatorImp::prepareBinaryOp(bool weave) {
     if (weave) {
         ly.result_num = m_left->getResultNumber() + m_right->getResultNumber();
         if (ly.result_num > MAX_RESULT_NUM) {
+            HKU_WARN("{}: weave result_num {} exceeds MAX_RESULT_NUM {}, right operands truncated!",
+                     name(), ly.result_num, MAX_RESULT_NUM);
             ly.result_num = MAX_RESULT_NUM;
         }
     } else {
@@ -1276,12 +1290,14 @@ void IndicatorImp::execute_mul() {
 
 void IndicatorImp::execute_div() {
     BinaryLayout ly = prepareBinaryOp();
+    value_t null_value = Null<value_t>();
     for (size_t r = 0; r < ly.result_num; ++r) {
         auto const *left = m_left->data(r);
         auto const *right = m_right->data(r);
         auto *result = this->data(r);
         for (size_t i = ly.start_pos; i < ly.total; ++i) {
-            result[i] = left[i - ly.left_offset] / right[i - ly.right_offset];
+            value_t rv = right[i - ly.right_offset];
+            result[i] = rv == 0.0 ? null_value : left[i - ly.left_offset] / rv;
         }
     }
 }
@@ -1527,14 +1543,22 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     const value_t *param_data = ind_param->data();
 
+    // A non-finite / negative / fractional / oversized value would make size_t(v) UB or silently
+    // truncate; those bars fall into the same Null slot the NaN branch already emits, rather than
+    // aborting the whole series
+    static constexpr value_t STEP_UPPER_BOUND = value_t(1ull << 53);
+    auto is_valid_step = [](value_t v) {
+        return std::isfinite(v) && v >= 0.0 && v < STEP_UPPER_BOUND && v == std::floor(v);
+    };
+
     static constexpr size_t minCircleLength = 400;
     if (total < minCircleLength || isSerial()) {
         for (size_t i = ind.discard(); i < total; i++) {
-            if (std::isnan(param_data[i])) {
-                _set(Null<value_t>(), i);
+            value_t v = param_data[i];
+            if (is_valid_step(v)) {
+                _dyn_run_one_step(ind, i, size_t(v));
             } else {
-                size_t step = size_t(param_data[i]);
-                _dyn_run_one_step(ind, i, step);
+                _set(Null<value_t>(), i);
             }
         }
         updateDiscard();
@@ -1543,12 +1567,12 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     global_parallel_for_index_void(
       ind.discard(), total,
-      [&ind, param_data, this](size_t i) {
-          if (std::isnan(param_data[i])) {
-              _set(Null<value_t>(), i);
+      [&ind, param_data, is_valid_step, this](size_t i) {
+          value_t v = param_data[i];
+          if (is_valid_step(v)) {
+              _dyn_run_one_step(ind, i, size_t(v));
           } else {
-              size_t step = size_t(param_data[i]);
-              _dyn_run_one_step(ind, i, step);
+              _set(Null<value_t>(), i);
           }
       },
       minCircleLength);
@@ -1564,6 +1588,10 @@ void IndicatorImp::updateDiscard(bool force) noexcept {
     for (size_t result_index = 0; result_index < m_result_num; result_index++) {
         size_t discard = m_discard;
         const auto *dst = this->data(result_index);
+        // a cleared / partially swapped-out slot cannot be scanned from this result
+        if (!dst) {
+            continue;
+        }
         for (size_t i = m_discard; i < total; i++) {
             if (!std::isnan(dst[i])) {
                 break;
@@ -1605,13 +1633,10 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         HKU_IF_RETURN(this->size() != other.size(), false);
         auto const *d1 = this->data();
         auto const *d2 = other.data();
-        bool eq = true;
         for (size_t i = 0, len = this->size(); i < len; i++) {
-            if (d1[i] != d2[i]) {
-                eq = false;
-            }
+            HKU_IF_RETURN(!equalValue(d1[i], d2[i]), false);
         }
-        return eq;
+        return true;
     }
 
     HKU_IF_RETURN(bool(m_three) != bool(other.m_three) || bool(m_left) != bool(other.m_left) ||

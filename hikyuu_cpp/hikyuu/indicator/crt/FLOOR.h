@@ -33,4 +33,4 @@ inline Indicator FLOOR(Indicator::value_t val) {
 
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_ROUNDUP_H_ */
+#endif /* INDICATOR_CRT_FLOOR_H_ */
