@@ -486,6 +486,25 @@ TEST_CASE("test_Stock_getKRecord") {
 }
 
 /** @par Test points */
+TEST_CASE("test_Stock_getKRecord_lowercase_ktype") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KRecord record, expect;
+
+    /** @arg Lowercase ktype through the in-memory buffer path must equal the upper-cased result
+     * (regression for BASE-101: an un-normalized ktype reached pMutex[ktype] and dereferenced a null
+     * shared_mutex inserted by operator[]) */
+    expect = stock.getKRecord(0, KQuery::DAY);
+    record = stock.getKRecord(0, "day");
+    CHECK_EQ(record, expect);
+
+    /** @arg Lowercase ktype via the datetime overload hits the same in-memory buffer path */
+    record = stock.getKRecord(expect.datetime(), "day");
+    CHECK_EQ(record, expect);
+}
+
+
+/** @par Test points */
 TEST_CASE("test_Stock_getIndexRange") {
     StockManager& sm = StockManager::instance();
     Stock stock;
