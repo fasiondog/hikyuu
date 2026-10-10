@@ -70,6 +70,11 @@ void ICost::_calculate(const Indicator& data) {
     value_t percent = getParam<double>("percent") * 0.01;
     size_t pos = 0;
     value_t x, a;
+    // The recurrence needs the previous valid cost, kept apart from the buffer: the first ex-rights
+    // record usually is not at the first bar, and reading the buffer slot before it gives null,
+    // which then poisons every later bar
+    bool has_pre_cost = false;
+    value_t pre_cost = 0.0;
     for (; sw_iter != sw_list.end(); ++sw_iter) {
         price_t free_count = sw_iter->freeCount();
         Datetime cur_sw_date = sw_iter->datetime();
@@ -84,7 +89,9 @@ void ICost::_calculate(const Indicator& data) {
                 // transCount is in lots and the outstanding shares are in units of 10 thousand
                 // shares
                 a = krecord.transCount / pre_free_count * 0.01;
-                dst[pos] = pos > 0 ? a * x + (1 - a) * dst[pos - 1] : x;
+                dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
+                has_pre_cost = true;
+                pre_cost = dst[pos];
             }
             pos++;
         }
@@ -100,6 +107,8 @@ void ICost::_calculate(const Indicator& data) {
         const KRecord& krecord = kdata[pos];
         x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
         dst[pos] = x;
+        has_pre_cost = true;
+        pre_cost = dst[pos];
         pos++;
     }
 
@@ -107,7 +116,9 @@ void ICost::_calculate(const Indicator& data) {
         const KRecord& krecord = kdata[pos];
         x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
         a = krecord.transCount / pre_free_count * 0.01;
-        dst[pos] = a * x + (1 - a) * dst[pos - 1];
+        dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
+        has_pre_cost = true;
+        pre_cost = dst[pos];
     }
 
     // Update the discard
