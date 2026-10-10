@@ -31,6 +31,14 @@ class HKU_API Parameter;
 class HKU_API Block;
 class HKU_API KDataSharedBufferImp;
 
+/** The price multiplier of one effective ex-rights record for the proportional adjustment: the
+ *  adjusted price is the raw price times the cumulative product of price_k, anchored by the caller
+ *  at the fixed baseline (the factor = the previous close / the ex-rights reference price) */
+struct HKU_API EqualRecoverFactor {
+    Datetime date;
+    price_t price_k{1.0};
+};
+
 /**
  * Base class of a security (Stock). Applications usually operate on it through StockPtr.
  * @ingroup StockManage
@@ -165,6 +173,16 @@ public:
      */
     StockWeightList getWeight(const Datetime& start = Datetime::min(),
                               const Datetime& end = Null<Datetime>()) const;
+
+    /**
+     * Get the equal-ratio adjustment multipliers of the effective ex-rights records
+     * @return the (date, price factor, volume factor) list, built lazily from the weight cache and
+     *         the daily line
+     * @note The reference close of a record date is the daily close of the previous trading day, so
+     *       the result does not depend on the query ktype. The list is cached together with the
+     *       weight cache and is released by StockManager::releaseShmServerBaseInfoCache().
+     */
+    vector<EqualRecoverFactor> getEqualRecoverFactors() const;
 
     /** Get the number of K-line (candlestick) bars of the given type */
     size_t getCount(KQuery::KType dataType = KQuery::DAY) const;
@@ -340,6 +358,12 @@ struct HKU_API Stock::Data {
     // An empty result sets it as well, so securities without weight data do not hit the driver
     // again on every query.
     mutable std::atomic_bool m_weight_ready{false};
+
+    // The equal-ratio adjustment multipliers of the effective ex-rights records, built lazily from
+    // m_weightList (the reference close of a record date comes from the daily line) and guarded by
+    // m_weight_mutex; released together with the weight cache.
+    mutable vector<EqualRecoverFactor> m_recover_factors;
+    mutable std::atomic_bool m_recover_ready{false};
 
     mutable vector<HistoryFinanceInfo>
       m_history_finance;  // Historical financial info [report date, field 1, field 2, ...]

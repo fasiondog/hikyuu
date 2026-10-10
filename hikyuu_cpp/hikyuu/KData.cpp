@@ -130,10 +130,12 @@ KData KData::getKData(const KQuery& query) const {
         return ret;
     }
 
+    // The sub-range fast path reuses the already adjusted buffer of self; it applies to every type
+    // because the adjustment is anchored at a fixed baseline (a sub-range equals the corresponding
+    // slice of the whole series)
     const auto& self_query = getQuery();
     if (empty() || self_query.recoverType() != query.recoverType() ||
-        query.kType() != self_query.kType() || self_query.recoverType() == KQuery::FORWARD ||
-        self_query.recoverType() == KQuery::EQUAL_FORWARD) {
+        query.kType() != self_query.kType()) {
         ret = KData(stk, query);
         return ret;
     }
@@ -181,9 +183,8 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
         return KQueryByDate(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
     }
 
-    if (empty() && query.queryType() == KQuery::INDEX) {
-        return KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType());
-    }
+    HKU_IF_RETURN(
+      empty(), KQuery(Null<Datetime>(), Null<Datetime>(), ktype, query.recoverType()));
 
     Datetime end_;
     if ((query.queryType() == KQuery::INDEX && query.end() == Null<int64_t>()) ||
@@ -226,6 +227,8 @@ KData KData::getKData(const KQuery::KType& ktype) const {
     if (ktype == getQuery().kType()) {
         return KData(m_imp);
     }
+ 
+    HKU_IF_RETURN(empty(), KData(stk, KQuery(0, 0, ktype, getQuery().recoverType())));
     ret = stk.getKData(getOtherQueryByDate(front().datetime, back().datetime, ktype));
     return ret;
 }

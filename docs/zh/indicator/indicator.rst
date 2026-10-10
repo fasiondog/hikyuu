@@ -49,8 +49,8 @@
        
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
+       - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
     
     **使用示例**::
     
@@ -70,7 +70,7 @@
     * :py:func:`ADJ_LOW` - 复权最低价
     * :py:func:`ADJ_CLOSE` - 复权收盘价
     * :py:func:`ADJ_VOL` - 复权成交量
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
 
 .. py:function:: ADJ_OPEN()
@@ -87,13 +87,13 @@
        
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
+       - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
     
     **相关指标**：
     
     * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
 
 .. py:function:: ADJ_HIGH()
@@ -110,13 +110,13 @@
        
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
+       - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
     
     **相关指标**：
     
     * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
 
 .. py:function:: ADJ_LOW()
@@ -133,13 +133,13 @@
        
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
+       - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
     
     **相关指标**：
     
     * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
 
 .. py:function:: ADJ_CLOSE()
@@ -156,23 +156,25 @@
        
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
+       - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
     
     **相关指标**：
     
     * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
 
 .. py:function:: ADJ_VOL()
 
     计算复权成交量指标
     
-    将成交量按复权因子进行后复权处理，得到复权后的成交量序列。
+    将成交量除以与复权价格相同的因子，得到复权后的成交量序列。
     计算公式：ADJ_VOL = VOL / ADJ_FACTOR
     
-    注意：成交量复权使用除法，与价格复权使用乘法相反。这是因为当股本增加时，每股对应的成交量应该相应减少。
+    注意：量的方向与价格相反（因子取倒数），因此复权价 × 复权量保持原始成交额不变。
+    这是因子管理体系下的量口径，与“仅按股本比例（送转配）调整量”的口径不同（现金分红改变价格但不改变股数）。
+    K 线复权（Query 的复权类型）只调整价格、量与额保持原始值（与 Wind / 聚宽等主流数据源一致），需要与复权价配套的成交量时使用本指标。
     
     :rtype: Indicator
     
@@ -181,16 +183,16 @@
        
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
-       - **与 RECOVER_EQUAL_FORWARD 的关系**：本指标与 RECOVER_EQUAL_FORWARD 本质相同，若非因子管理场景，建议直接使用 RECOVER_EQUAL_FORWARD
-       - **计算起点**：两者均不从上市日期开始计算，而是从当前查询的K线数据起始点开始计算
+       - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值；复权价与 RECOVER_EQUAL_BACKWARD 的价格一致，而复权 K 线数据的量保持原始值（复权只作用于价格）
+       - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
     
-    **相关指标**：
+       **相关指标**：
     
-    * :py:func:`ADJ_FACTOR` - 复权因子
-    * :py:func:`RECOVER_EQUAL_FORWARD` - 等比前复权
+       * :py:func:`ADJ_FACTOR` - 复权因子
+       * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
 
-.. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+       .. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     上涨家数。当存在指定上下文且 ignore_context 为 false 时，将忽略 query, market, stk_type 参数。
 
