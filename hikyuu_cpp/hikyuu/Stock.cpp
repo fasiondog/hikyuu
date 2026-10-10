@@ -639,7 +639,9 @@ size_t Stock::getCount(KQuery::KType ktype) const {
 
         if (isBuffer(ktype)) {
             std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-            return m_data->pKData[ktype]->size();
+            if (auto* buf = m_data->pKData[ktype]) {
+                return buf->size();
+            }
         }
 
         return m_kdataDriver->getConnect()->getCount(market(), code(), ktype);
@@ -867,7 +869,9 @@ bool Stock::_getIndexRangeByIndexFromBuffer(const KQuery& query, size_t& out_sta
     out_start = 0;
     out_end = 0;
 
-    size_t total = m_data->pKData[query.kType()]->size();
+    auto* buf = m_data->pKData[query.kType()];
+    HKU_IF_RETURN(!buf, false);
+    size_t total = buf->size();
     HKU_IF_RETURN(0 == total, false);
 
     int64_t startix, endix;
@@ -920,7 +924,9 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     out_start = 0;
     out_end = 0;
 
-    const KRecordList& kdata = *(m_data->pKData[query.kType()]);
+    auto* buf = m_data->pKData[query.kType()];
+    HKU_IF_RETURN(!buf, false);
+    const KRecordList& kdata = *buf;
     size_t total = kdata.size();
     HKU_IF_RETURN(0 == total, false);
 
@@ -985,8 +991,9 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
 
 const KRecord& Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-    const auto& buf = *(m_data->pKData[ktype]);
-    return pos >= buf.size() ? KRecord::NullKRecord : buf[pos];
+    auto* buf = m_data->pKData[ktype];
+    HKU_IF_RETURN(!buf, KRecord::NullKRecord);
+    return pos >= buf->size() ? KRecord::NullKRecord : (*buf)[pos];
 }
 
 KRecord Stock::getKRecord(size_t pos, const KQuery::KType& kType) const {
@@ -1068,15 +1075,15 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                              KQuery::KType ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     KRecordList result;
-    size_t total = m_data->pKData[ktype]->size();
-    HKU_IF_RETURN(total == 0, result);
+    auto* buf = m_data->pKData[ktype];
+    HKU_IF_RETURN(!buf || buf->empty(), result);
+    size_t total = buf->size();
     HKU_WARN_IF_RETURN(start_ix >= end_ix || start_ix >= total, result,
                        "Invalid param (start_ix: {}, end_ix: {})! current total: {} | {} | {}",
                        start_ix, end_ix, total, name(), ktype);
     size_t length = end_ix > total ? total - start_ix : end_ix - start_ix;
     result.resize(length);
-    memcpy((void*)&(result.front()), &((*m_data->pKData[ktype])[start_ix]),
-           sizeof(KRecord) * length);
+    memcpy((void*)&(result.front()), &((*buf)[start_ix]), sizeof(KRecord) * length);
     return result;
 }
 

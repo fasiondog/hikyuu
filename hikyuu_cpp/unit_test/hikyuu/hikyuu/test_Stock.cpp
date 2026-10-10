@@ -7,6 +7,9 @@
 
 #include "doctest/doctest.h"
 #include <cmath>
+#include <thread>
+#include <atomic>
+#include <vector>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/KQuery.h>
 #include <hikyuu/KData.h>
@@ -2071,6 +2074,64 @@ TEST_CASE("test_Stock_getMarketValue_before_first_record") {
 
     /** @arg Query time after the last K-line record still returns the latest known close price */
     CHECK_EQ(stock.getMarketValue(Datetime(201201010000), KQuery::DAY), 2325.905);
+}
+
+/** @par Test points */
+TEST_CASE("test_Stock_buffer_release_safe_query") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+
+    /** @arg Buffer the day K-line and read through the in-memory path */
+    stock.loadKDataToBuffer(KQuery::DAY);
+    CHECK_EQ(stock.isBuffer(KQuery::DAY), true);
+    CHECK(stock.getCount(KQuery::DAY) > 0);
+    CHECK(stock.getKRecord(0, KQuery::DAY).datetime == Datetime(199012190000));
+    CHECK(stock.getKRecordList(KQuery(0, Null<size_t>(), KQuery::DAY)).size() > 0);
+
+    /** @arg After releaseKDataBuffer, queries fall back to the driver without null dereference */
+    stock.releaseKDataBuffer(KQuery::DAY);
+    CHECK_EQ(stock.isBuffer(KQuery::DAY), false);
+    CHECK(stock.getCount(KQuery::DAY) > 0);
+    CHECK(stock.getKRecord(0, KQuery::DAY).datetime == Datetime(199012190000));
+    CHECK(stock.getKRecordList(KQuery(0, Null<size_t>(), KQuery::DAY)).size() > 0);
+    CHECK_EQ(stock.getMarketValue(Datetime(200001010000), KQuery::DAY) > 0.0, true);
+}
+
+/** @par Test points
+ * Reader threads query the buffer path while a writer thread repeatedly releaseKDataBuffer +
+ * loadKDataToBuffer; must survive without crash/UAF. */
+TEST_CASE("test_Stock_concurrent_buffer_release_query") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    stock.loadKDataToBuffer(KQuery::DAY);
+
+    std::atomic<bool> stop{false};
+    std::thread writer([&]() {
+        while (!stop) {
+            stock.releaseKDataBuffer(KQuery::DAY);
+            stock.loadKDataToBuffer(KQuery::DAY);
+        }
+    });
+
+    std::vector<std::thread> readers;
+    for (int i = 0; i < 4; ++i) {
+        readers.emplace_back([&]() {
+            for (int n = 0; n < 5000 && !stop; ++n) {
+                stock.getCount(KQuery::DAY);
+                stock.getKRecord(0, KQuery::DAY);
+                stock.getKRecord(Datetime(200001010000), KQuery::DAY);
+                stock.getKRecordList(KQuery(0, Null<size_t>(), KQuery::DAY));
+                stock.getMarketValue(Datetime(200001010000), KQuery::DAY);
+            }
+        });
+    }
+
+    for (auto& t : readers) {
+        t.join();
+    }
+    stop = true;
+    writer.join();
+    CHECK(true);  // survived without crash/UAF
 }
 
 /** @par Test points */
