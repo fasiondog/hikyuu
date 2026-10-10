@@ -83,8 +83,15 @@ void KDataPrivatedBufferImp::_recover() {
     if (m_buffer.empty() || m_query.recoverType() == KQuery::NO_RECOVER)
         return;
 
-    // The adjustment handling for the daily line and above
+    if (KQuery::isExtraKType(m_query.kType()))
+        return;
+
     int64_t secs = KQuery::getKTypeInSeconds(m_query.kType());
+    HKU_WARN_IF_RETURN(
+      secs <= 0, void(),
+      "Can't get the seconds of the ktype {}, the recovery is skipped and the raw data is kept",
+      m_query.kType());
+
     if (secs > KQuery::getKTypeInSeconds(KQuery::DAY)) {
         _recoverForUpDay();
         return;
@@ -131,6 +138,14 @@ void KDataPrivatedBufferImp::_recoverForUpDay() {
     } else if (m_query.kType() == KQuery::YEAR) {
         startOfPhase = &Datetime::startOfYear;
     }
+
+    // An extra ktype above the daily line (e.g. DAY3/DAY7) has no phase start rule; keep the raw
+    // data instead of calling the empty function (std::bad_function_call)
+    HKU_WARN_IF_RETURN(
+      !startOfPhase, void(),
+      "The ktype {} is above the daily line but has no phase start rule, the recovery is skipped "
+      "and the raw data is kept",
+      m_query.kType());
 
     Datetime startDate = startOfPhase(m_buffer.front().datetime);
     Datetime endDate = m_buffer.back().datetime.nextDay();

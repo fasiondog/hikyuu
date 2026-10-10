@@ -2158,6 +2158,29 @@ TEST_CASE("test_KData_recover_vendor_convention") {
     }
 }
 
+/** @par Test point - BASE-304/327: an extra ktype above the daily line (e.g. DAY3) has no phase
+ * start rule, and its seconds are unknown without the extra plugin; the recovery is skipped and the
+ * raw data is returned instead of throwing std::bad_function_call or applying the daily formula. */
+TEST_CASE("test_KData_recover_unsupported_ktype") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg an EQUAL_BACKWARD query on the DAY3 extra ktype keeps the raw data without throwing */
+    KData k3 = stock.getKData(KQuery(0, 20, KQuery::DAY3, KQuery::EQUAL_BACKWARD));
+    KData raw3 = stock.getKData(KQuery(0, 20, KQuery::DAY3, KQuery::NO_RECOVER));
+    REQUIRE_EQ(k3.size(), raw3.size());
+    for (size_t i = 0; i < k3.size(); i++) {
+        CHECK_EQ(k3[i], raw3[i]);
+    }
+
+    /** @arg the same for BACKWARD */
+    KData k3b = stock.getKData(KQuery(0, 20, KQuery::DAY3, KQuery::BACKWARD));
+    REQUIRE_EQ(k3b.size(), raw3.size());
+    for (size_t i = 0; i < k3b.size(); i++) {
+        CHECK_EQ(k3b[i], raw3[i]);
+    }
+}
+
 /** @par Test points */
 TEST_CASE("test_KData_getKData") {
     KData k1, k2;
