@@ -58,6 +58,8 @@ public:
 
 private:
     void _getPosInStock() const;
+    // All the types are anchored at a fixed baseline: backward at the stock's data start, forward
+    // at its last data day. The equal-ratio multipliers come from the cached factor table of Stock.
     void _recover();
     void _recoverForward();
     void _recoverBackward();

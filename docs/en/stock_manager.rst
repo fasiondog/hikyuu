@@ -105,6 +105,34 @@ Building Bar (Candlestick) Query Conditions
         - EQUAL_FORWARD   - proportional forward adjustment
         - EQUAL_BACKWARD  - proportional backward adjustment
 
+    .. note::
+
+        **Adjustment convention** (aligned with the mainstream data sources, for cross platform
+        comparison)
+
+        - The non-proportional adjustment (FORWARD / BACKWARD) uses the ex-rights formula of the
+          TDX-like clients:
+
+          - forward: adjusted = [(raw - the cash dividend) + the rights price x the share change
+            ratio] / (1 + the share change ratio)
+          - backward: adjusted = raw x (1 + the share change ratio) - the rights price x the share
+            change ratio + the cash dividend
+
+        - The proportional adjustment (EQUAL_FORWARD / EQUAL_BACKWARD) uses the cumulative adjustment
+          factor of the factor based data sources (Wind / tushare / JoinQuant):
+          factor = the previous close / the ex-rights reference price; the backward price is the raw
+          price times the accumulated factor and the forward price is divided by the latest factor
+        - **Fixed baseline**: the forward adjustment is anchored at the last data day and the backward
+          one at the data start (the listing); both are independent of the queried range, so the same
+          date always gets the same value (a point-in-time adjustment is just a slice)
+        - **The price only is adjusted**: the volume and the turnover amount keep their raw values
+          (the same as Wind / JoinQuant), so the turnover rate and the amount based analysis stay
+          correct on the adjusted data; use :py:func:`ADJ_VOL` (= VOL / ADJ_FACTOR, the volume uses
+          the same factor as the price, so the amount is preserved) when a volume consistent with the
+          adjusted price is required
+        - **Weekly and above**: the daily bars are adjusted first and then aggregated (more accurate
+          for the periods containing an ex-rights day)
+
     .. py:method:: is_right_opening(self)
 
         Return whether the query covers a right-open interval, i.e. whether no end time is

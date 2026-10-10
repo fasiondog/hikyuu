@@ -628,6 +628,74 @@ KData Stock::getKData(const KQuery& query) const {
     return KData(*this, query);
 }
 
+vector<EqualRecoverFactor> Stock::getEqualRecoverFactors() const {
+    HKU_IF_RETURN(!m_data, vector<EqualRecoverFactor>());
+    {
+        std::shared_lock<std::shared_mutex> lock(m_data->m_weight_mutex);
+        if (m_data->m_recover_ready.load(std::memory_order_relaxed)) {
+            return m_data->m_recover_factors;
+        }
+    }
+
+    // getWeight also handles the lazy loading / the release window; the daily line provides the
+    // reference close of every record date and the last data day
+    StockWeightList weights = getWeight(Datetime::min(), Null<Datetime>());
+    KRecordList days = getKRecordList(KQueryByDate(Datetime::min(), Null<Datetime>(), KQuery::DAY));
+
+    std::unique_lock<std::shared_mutex> lock(m_data->m_weight_mutex);
+    if (!m_data->m_recover_ready.load(std::memory_order_relaxed)) {
+        vector<EqualRecoverFactor>& factors = m_data->m_recover_factors;
+        factors.clear();
+
+        const Datetime last_day = days.empty() ? Null<Datetime>() : days.back().datetime;
+        price_t close = 0.0;
+        size_t day_pos = 0;
+        for (const auto& weight : weights) {
+            const Datetime& date = weight.datetime();
+            // The ex-rights beyond the last data day cannot affect any bar
+            if (!last_day.isNull() && date > last_day) {
+                break;
+            }
+            if (weight.countAsGift() == 0.0 && weight.countForSell() == 0.0 &&
+                weight.priceForSell() == 0.0 && weight.bonus() == 0.0 &&
+                weight.increasement() == 0.0 && weight.suogu() == 0.0) {
+                continue;
+            }
+
+            // The close of the record date: the daily close of the previous trading day
+            while (day_pos < days.size() && days[day_pos].datetime < date) {
+                close = days[day_pos].closePrice;
+                day_pos++;
+            }
+            if (close == 0.0) {
+                continue;
+            }
+
+            price_t denominator = 0.0, temp = close;
+            if (weight.suogu() != 0.0) {
+                denominator = weight.suogu();
+            } else {
+                price_t change = 0.1 * (weight.countAsGift() + weight.countForSell() +
+                                        weight.increasement());
+                denominator = 1.0 + change;
+                temp = close + weight.priceForSell() * change - 0.1 * weight.bonus();
+            }
+            if (temp == 0.0 || denominator == 0.0) {
+                continue;
+            }
+
+            EqualRecoverFactor factor;
+            factor.date = date;
+            factor.price_k = (denominator * close) / temp;
+            factors.push_back(factor);
+        }
+
+        factors.shrink_to_fit();
+        m_data->m_recover_ready.store(true, std::memory_order_release);
+    }
+    return m_data->m_recover_factors;
+}
+
 size_t Stock::getCount(KQuery::KType ktype) const {
     HKU_IF_RETURN(isNull(), 0);
     to_upper(ktype);

@@ -1226,9 +1226,11 @@ void StockManager::releaseShmServerBaseInfoCache() {
         {
             std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
             StockWeightList().swap(stock.m_data->m_weightList);
+            vector<EqualRecoverFactor>().swap(stock.m_data->m_recover_factors);
             // Set it to false: the next Stock::getWeight re-reads it through the driver lazy
             // loading (the server role has the lazy loading fallback)
             stock.m_data->m_weight_ready.store(false, std::memory_order_release);
+            stock.m_data->m_recover_ready.store(false, std::memory_order_release);
         }
         {
             std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_history_finance_mutex);

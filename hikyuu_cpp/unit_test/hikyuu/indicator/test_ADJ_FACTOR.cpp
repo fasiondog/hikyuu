@@ -6,6 +6,7 @@
  */
 
 #include "../test_config.h"
+#include <cmath>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ADJ_FACTOR.h>
 
@@ -56,6 +57,17 @@ TEST_CASE("test_ADJ_FACTOR") {
     CHECK_EQ(adj_factor.size(), adj_factor2.size());
     for (size_t i = 0; i < adj_factor.size(); ++i) {
         CHECK_EQ(adj_factor[i], doctest::Approx(adj_factor2[i]).epsilon(0.0001));
+    }
+
+    /** @arg The adjusted close must equal the equal-backward recovery of the same range */
+    KData k_range = stk.getKData(KQuery(-100));
+    REQUIRE(k_range.size() > 0);
+    Indicator adj_close = ADJ_CLOSE(k_range);
+    KData recover = stk.getKData(KQueryByDate(k_range[0].datetime, Null<Datetime>(), KQuery::DAY,
+                                             KQuery::EQUAL_BACKWARD));
+    REQUIRE_EQ(recover.size(), k_range.size());
+    for (size_t i = 0; i < recover.size(); ++i) {
+        CHECK_EQ(adj_close[i], doctest::Approx(recover[i].closePrice).epsilon(0.0001));
     }
 
     /** @arg Test a stock without ex-rights/ex-dividend data (such as an index) */
@@ -140,6 +152,45 @@ TEST_CASE("test_ADJ_FACTOR_increment_equivalence") {
     for (size_t i = 0; i < expect.size(); ++i) {
         CHECK_EQ(got[i], doctest::Approx(expect[i]).epsilon(0.0001));
     }
+}
+
+/** @par Test points - ADJ_VOL is the reciprocal form of ADJ_FACTOR, so the adjusted price times the
+ * adjusted volume keeps the raw amount, and the recovered K-line data (which adjusts the price only)
+ * needs this indicator to work with a volume consistent with the adjusted price. */
+TEST_CASE("test_ADJ_VOL") {
+    Stock stk = getStock("SH600000");
+    REQUIRE(!stk.isNull());
+
+    KData k = stk.getKData(KQuery(-800));
+    REQUIRE(k.size() > 0);
+
+    Indicator adj_vol = ADJ_VOL(k);
+    Indicator adj_factor = ADJ_FACTOR(k);
+    Indicator vol = VOL(k);
+    Indicator adj_close = ADJ_CLOSE(k);
+    REQUIRE_EQ(adj_vol.size(), k.size());
+    REQUIRE_EQ(adj_factor.size(), k.size());
+
+    KData raw = stk.getKData(
+      KQueryByDate(k[0].datetime, Null<Datetime>(), KQuery::DAY, KQuery::NO_RECOVER));
+    REQUIRE_EQ(raw.size(), k.size());
+
+    bool factor_changed = false;
+    for (size_t i = 0; i < k.size(); ++i) {
+        /** @arg the adjusted volume is the raw volume divided by the adjustment factor */
+        CHECK_EQ(adj_vol[i], doctest::Approx(vol[i] / adj_factor[i]).epsilon(0.0001));
+
+        /** @arg the adjusted price x the adjusted volume keeps the raw amount */
+        CHECK_EQ(adj_close[i] * adj_vol[i],
+                 doctest::Approx(raw[i].closePrice * raw[i].transCount).epsilon(0.0001));
+
+        if (adj_factor[i] != doctest::Approx(1.0)) {
+            factor_changed = true;
+        }
+    }
+
+    /** @arg the range contains ex-rights/ex-dividend events, so the factor is really applied */
+    CHECK_UNARY(factor_changed);
 }
 
 //-----------------------------------------------------------------------------

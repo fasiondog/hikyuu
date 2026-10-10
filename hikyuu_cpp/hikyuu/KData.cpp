@@ -130,10 +130,12 @@ KData KData::getKData(const KQuery& query) const {
         return ret;
     }
 
+    // The sub-range fast path reuses the already adjusted buffer of self; it applies to every type
+    // because the adjustment is anchored at a fixed baseline (a sub-range equals the corresponding
+    // slice of the whole series)
     const auto& self_query = getQuery();
     if (empty() || self_query.recoverType() != query.recoverType() ||
-        query.kType() != self_query.kType() || self_query.recoverType() == KQuery::FORWARD ||
-        self_query.recoverType() == KQuery::EQUAL_FORWARD) {
+        query.kType() != self_query.kType()) {
         ret = KData(stk, query);
         return ret;
     }

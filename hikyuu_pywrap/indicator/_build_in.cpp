@@ -1979,11 +1979,21 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the recovery factor indicator
 
-    Calculate the backward recovery factor sequence based on the stock's dividend data (the stock sends, the allotments, the conversions, the cash dividends, etc.).
+    Calculate the backward recovery factor sequence based on the stock's ex-rights/ex-dividend data (the stock sends, the allotments, the conversions, the cash dividends, etc.).
     The recovery factor indicates how many shares are held now if 1 share was held at the listing, after all the stock sends, the allotments and the conversions.
-    It is calculated in a cumulative multiplication way, ensuring the consistency of the recovery processing of the price, the volume and the amount.
+    It is calculated in a cumulative multiplication way and anchored at a fixed baseline, so the factor of a given date is always the same and the recovered prices match RECOVER_EQUAL_BACKWARD.
 
-    This indicator needs to set the KData context to work properly, set through the setContext() method.
+    **The design purpose of the ADJ_ series**:
+    The ADJ_ series indicators are mainly designed to work with the factor management system to calculate the backward equal-ratio recovery factors quickly.
+    In the factor management scenarios, the recovery calculation can be performed efficiently by updating and storing the factor values incrementally every day.
+
+    **Important restrictions of the ADJ_ series**:
+    - **Period restriction**: the ADJ_ series indicators are only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
+    - **Depends on the factor management**: they need to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
+    - **The fixed baseline**: the factor is accumulated from the beginning of the stock's ex-rights/ex-dividend data, not from the start point of the K-line data of the current query
+    - **The K-line recovery adjusts the price only**: the volume and the turnover amount of the recovered K-line data keep their raw values (the same convention as the mainstream data sources such as Wind and JoinQuant); ADJ_VOL provides a volume consistent with the recovered price
+
+    This indicator needs to set the KData context to work properly, set through the set_context() method.
 
     :return: the recovery factor indicator object
     :rtype: Indicator
@@ -2003,6 +2013,7 @@ void export_Indicator_build_in(py::module& m) {
         - `ADJ_LOW` - the recovered low price
         - `ADJ_CLOSE` - the recovered close price
         - `ADJ_VOL` - the recovered volume
+        - `RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
     )");
 
     m.def("ADJ_OPEN", py::overload_cast<const KData&>(&ADJ_OPEN));
@@ -2010,40 +2021,18 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the recovered open price indicator
 
-    Recover the open price backward by the recovery factor, obtaining the recovered open price sequence.
-    The calculation formula: ADJ_OPEN = ADJ_FACTOR * OPEN
+    The calculation formula: ADJ_OPEN = ADJ_FACTOR * OPEN; the recovered sequence matches RECOVER_EQUAL_BACKWARD.
+    See ADJ_FACTOR for the design purpose, the restrictions and the adjustment convention of the ADJ_ series.
 
-    **The design purpose**:
-    The ADJ_ series indicators are mainly designed to work with the factor management system to calculate the backward equal-ratio recovery factors quickly.
-    In the factor management scenarios, the recovery calculation can be performed efficiently by updating and storing the factor values incrementally every day.
-
-    **Important restrictions**:
-    - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
-    - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-    - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-    - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
-
-    This indicator needs to set the KData context to work properly, set through the setContext() method.
+    This indicator needs to set the KData context to work properly, set through the set_context() method (or pass the KData directly: ADJ_OPEN(kdata)).
 
     :return: the recovered open price indicator object
     :rtype: Indicator
 
-    .. code-block:: python
-
-        # Get the recovered open price of a stock (the factor management scenario)
-        stock = sm['sh000001']
-        kdata = stock.get_kdata(Query(-100))
-        adj_open = ADJ_OPEN()
-        adj_open.set_context(kdata)
-
     .. seealso::
 
         - `ADJ_FACTOR` - the recovery factor
-        - `ADJ_HIGH` - the recovered high price
-        - `ADJ_LOW` - the recovered low price
-        - `ADJ_CLOSE` - the recovered close price
-        - `ADJ_VOL` - the recovered volume
-        - `RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery (recommended for the non-factor-management scenarios)
+        - `RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
     )");
 
     m.def("ADJ_HIGH", py::overload_cast<const KData&>(&ADJ_HIGH));
@@ -2051,40 +2040,18 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the recovered high price indicator
 
-    Recover the high price backward by the recovery factor, obtaining the recovered high price sequence.
-    The calculation formula: ADJ_HIGH = ADJ_FACTOR * HIGH
+    The calculation formula: ADJ_HIGH = ADJ_FACTOR * HIGH; the recovered sequence matches RECOVER_EQUAL_BACKWARD.
+    See ADJ_FACTOR for the design purpose, the restrictions and the adjustment convention of the ADJ_ series.
 
-    **The design purpose**:
-    The ADJ_ series indicators are mainly designed to work with the factor management system to calculate the backward equal-ratio recovery factors quickly.
-    In the factor management scenarios, the recovery calculation can be performed efficiently by updating and storing the factor values incrementally every day.
-
-    **Important restrictions**:
-    - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
-    - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-    - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-    - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
-
-    This indicator needs to set the KData context to work properly, set through the setContext() method.
+    This indicator needs to set the KData context to work properly, set through the set_context() method (or pass the KData directly: ADJ_HIGH(kdata)).
 
     :return: the recovered high price indicator object
     :rtype: Indicator
 
-    .. code-block:: python
-
-        # Get the recovered high price of a stock (the factor management scenario)
-        stock = sm['sh000001']
-        kdata = stock.get_kdata(Query(-100))
-        adj_high = ADJ_HIGH()
-        adj_high.set_context(kdata)
-
     .. seealso::
 
         - `ADJ_FACTOR` - the recovery factor
-        - `ADJ_OPEN` - the recovered open price
-        - `ADJ_LOW` - the recovered low price
-        - `ADJ_CLOSE` - the recovered close price
-        - `ADJ_VOL` - the recovered volume
-        - `RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery (recommended for the non-factor-management scenarios)
+        - `RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
     )");
 
     m.def("ADJ_LOW", py::overload_cast<const KData&>(&ADJ_LOW));
@@ -2092,40 +2059,18 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the recovered low price indicator
 
-    Recover the low price backward by the recovery factor, obtaining the recovered low price sequence.
-    The calculation formula: ADJ_LOW = ADJ_FACTOR * LOW
+    The calculation formula: ADJ_LOW = ADJ_FACTOR * LOW; the recovered sequence matches RECOVER_EQUAL_BACKWARD.
+    See ADJ_FACTOR for the design purpose, the restrictions and the adjustment convention of the ADJ_ series.
 
-    **The design purpose**:
-    The ADJ_ series indicators are mainly designed to work with the factor management system to calculate the backward equal-ratio recovery factors quickly.
-    In the factor management scenarios, the recovery calculation can be performed efficiently by updating and storing the factor values incrementally every day.
-
-    **Important restrictions**:
-    - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
-    - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-    - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-    - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
-
-    This indicator needs to set the KData context to work properly, set through the setContext() method.
+    This indicator needs to set the KData context to work properly, set through the set_context() method (or pass the KData directly: ADJ_LOW(kdata)).
 
     :return: the recovered low price indicator object
     :rtype: Indicator
 
-    .. code-block:: python
-
-        # Get the recovered low price of a stock (the factor management scenario)
-        stock = sm['sh000001']
-        kdata = stock.get_kdata(Query(-100))
-        adj_low = ADJ_LOW()
-        adj_low.set_context(kdata)
-
     .. seealso::
 
         - `ADJ_FACTOR` - the recovery factor
-        - `ADJ_OPEN` - the recovered open price
-        - `ADJ_HIGH` - the recovered high price
-        - `ADJ_CLOSE` - the recovered close price
-        - `ADJ_VOL` - the recovered volume
-        - `RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery (recommended for the non-factor-management scenarios)
+        - `RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
     )");
 
     m.def("ADJ_CLOSE", py::overload_cast<const KData&>(&ADJ_CLOSE));
@@ -2133,40 +2078,18 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the recovered close price indicator
 
-    Recover the close price backward by the recovery factor, obtaining the recovered close price sequence.
-    The calculation formula: ADJ_CLOSE = ADJ_FACTOR * CLOSE
+    The calculation formula: ADJ_CLOSE = ADJ_FACTOR * CLOSE; the recovered sequence matches RECOVER_EQUAL_BACKWARD.
+    See ADJ_FACTOR for the design purpose, the restrictions and the adjustment convention of the ADJ_ series.
 
-    **The design purpose**:
-    The ADJ_ series indicators are mainly designed to work with the factor management system to calculate the backward equal-ratio recovery factors quickly.
-    In the factor management scenarios, the recovery calculation can be performed efficiently by updating and storing the factor values incrementally every day.
-
-    **Important restrictions**:
-    - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
-    - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-    - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-    - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
-
-    This indicator needs to set the KData context to work properly, set through the setContext() method.
+    This indicator needs to set the KData context to work properly, set through the set_context() method (or pass the KData directly: ADJ_CLOSE(kdata)).
 
     :return: the recovered close price indicator object
     :rtype: Indicator
 
-    .. code-block:: python
-
-        # Get the recovered close price of a stock (the factor management scenario)
-        stock = sm['sh000001']
-        kdata = stock.get_kdata(Query(-100))
-        adj_close = ADJ_CLOSE()
-        adj_close.set_context(kdata)
-
     .. seealso::
 
         - `ADJ_FACTOR` - the recovery factor
-        - `ADJ_OPEN` - the recovered open price
-        - `ADJ_HIGH` - the recovered high price
-        - `ADJ_LOW` - the recovered low price
-        - `ADJ_VOL` - the recovered volume
-        - `RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery (recommended for the non-factor-management scenarios)
+        - `RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
     )");
 
     m.def("ADJ_VOL", py::overload_cast<const KData&>(&ADJ_VOL));
@@ -2174,43 +2097,22 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the recovered volume indicator
 
-    Recover the volume backward by the recovery factor, obtaining the recovered volume sequence.
-    The calculation formula: ADJ_VOL = VOL / ADJ_FACTOR
+    The calculation formula: ADJ_VOL = VOL / ADJ_FACTOR, so that the recovered price x the recovered volume keeps the raw turnover amount.
 
-    **The design purpose**:
-    The ADJ_ series indicators are mainly designed to work with the factor management system to calculate the backward equal-ratio recovery factors quickly.
-    In the factor management scenarios, the recovery calculation can be performed efficiently by updating and storing the factor values incrementally every day.
+    **Note**: the volume moves in the direction opposite to the price (the factor is the reciprocal).
+    This is the volume convention of the factor management system and differs from a volume re-expressed in the share terms only (which ignores the cash dividend, because a cash dividend changes the price but not the share count).
+    The K-line recovery (the recover_type of the query) adjusts the price only and leaves the volume and the turnover amount untouched, which follows the mainstream data sources (Wind, JoinQuant, ...); use this indicator when a volume consistent with the recovered price is required.
+    See ADJ_FACTOR for the design purpose, the restrictions and the adjustment convention of the ADJ_ series.
 
-    **Note**: the volume recovery uses division, which is opposite to the price recovery using multiplication.
-    This is because when the share capital increases, the volume corresponding to each share should be reduced accordingly.
-
-    **Important restrictions**:
-    - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
-    - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-    - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-    - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
-
-    This indicator needs to set the KData context to work properly, set through the setContext() method.
+    This indicator needs to set the KData context to work properly, set through the set_context() method (or pass the KData directly: ADJ_VOL(kdata)).
 
     :return: the recovered volume indicator object
     :rtype: Indicator
 
-    .. code-block:: python
-
-        # Get the recovered volume of a stock (the factor management scenario)
-        stock = sm['sh000001']
-        kdata = stock.get_kdata(Query(-100))
-        adj_vol = ADJ_VOL()
-        adj_vol.set_context(kdata)
-
     .. seealso::
 
         - `ADJ_FACTOR` - the recovery factor
-        - `ADJ_OPEN` - the recovered open price
-        - `ADJ_HIGH` - the recovered high price
-        - `ADJ_LOW` - the recovered low price
-        - `ADJ_CLOSE` - the recovered close price
-        - `RECOVER_EQUAL_FORWARD` - the equal-ratio forward recovery (recommended for the non-factor-management scenarios)
+        - `RECOVER_EQUAL_BACKWARD` - the equal-ratio backward recovery
     )");
 
     m.def("COST", COST_1, py::arg("x") = 10.0);
