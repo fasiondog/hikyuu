@@ -70,9 +70,6 @@ void ICost::_calculate(const Indicator& data) {
     value_t percent = getParam<double>("percent") * 0.01;
     size_t pos = 0;
     value_t x, a;
-    // The recurrence needs the previous valid cost, kept apart from the buffer: the first ex-rights
-    // record usually is not at the first bar, and reading the buffer slot before it gives null,
-    // which then poisons every later bar
     bool has_pre_cost = false;
     value_t pre_cost = 0.0;
     for (; sw_iter != sw_list.end(); ++sw_iter) {
