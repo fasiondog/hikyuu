@@ -18,6 +18,7 @@ import sys
 import unittest
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+CONFIG = "test_data/hikyuu_win.ini" if sys.platform == "win32" else "test_data/hikyuu_linux.ini"
 
 # Drives the parallel Python evaluate through the product GIL-releasing entry
 # (analysis_sys_list_multi -> inner_analysis_sys_list, which pairs
@@ -25,12 +26,13 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 # so the test can tell "evaluate fired" from "evaluate never ran".
 PARALLEL_EVAL_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
     "import faulthandler; faulthandler.enable()\n"
     "import os\n"
     "from hikyuu import *\n"
     "from hikyuu.analysis import analysis_sys_list_multi\n"
     "set_log_level(LOG_LEVEL.OFF)\n"
-    "hikyuu_init('test_data/hikyuu_win.ini')\n"
+    "hikyuu_init('{config}')\n"
     "sm = StockManager.instance()\n"
     "stk = sm['sh000001']\n"
     "sg = SG_Cross(MA(CLOSE(), n=5), MA(CLOSE(), n=10))\n"
@@ -64,7 +66,7 @@ PARALLEL_EVAL_PROBE = (
     "count = sum(1 for _ in open(flag)) if os.path.exists(flag) else 0\n"
     "print('EVAL_COUNT', count)\n"
     "print('OK')\n"
-).format(root=REPO_ROOT)
+).format(root=REPO_ROOT, config=CONFIG)
 
 
 class SelectorTest(unittest.TestCase):

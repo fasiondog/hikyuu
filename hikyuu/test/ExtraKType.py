@@ -17,15 +17,17 @@ import sys
 import unittest
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+CONFIG = "test_data/hikyuu_win.ini" if sys.platform == "win32" else "test_data/hikyuu_linux.ini"
 
 # Register a python-defined phase-end conversion and compute the extended K-line, which
 # invokes the callback from the core (the gil_scoped_acquire wrapper must not crash), then
 # release it (the make_gil_safe deleter must not crash on destruction).
 EXTRA_KTYPE_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
     "from hikyuu import *\n"
     "set_log_level(LOG_LEVEL.OFF)\n"
-    "hikyuu_init('test_data/hikyuu_win.ini')\n"
+    "hikyuu_init('{config}')\n"
     "def get_min9_phase_end(d):\n"
     "    m = d.minute\n"
     "    end = ((m // 9) + 1) * 9\n"
@@ -40,7 +42,7 @@ EXTRA_KTYPE_PROBE = (
     "assert len(k) > 0, 'no MIN9 data: the python phase-end callback was not invoked'\n"
     "release_extra_ktype()  # destructor-safety path for the python callback\n"
     "print('OK')\n"
-).format(root=REPO_ROOT)
+).format(root=REPO_ROOT, config=CONFIG)
 
 
 class ExtraKTypeTest(unittest.TestCase):

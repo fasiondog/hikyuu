@@ -18,6 +18,7 @@ import unittest
 # Py_AtExit finalization flag. Tearing the strategy down during interpreter exit
 # must not crash: the finalizing path skips decref instead of touching the GIL.
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+CONFIG = "test_data/hikyuu_win.ini" if sys.platform == "win32" else "test_data/hikyuu_linux.ini"
 EXIT_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
     "from hikyuu import *\n"
@@ -30,10 +31,11 @@ EXIT_PROBE = (
 # reference and forcing GC must not invalidate the parts still used by the system.
 KEEP_ALIVE_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
     "import gc\n"
     "from hikyuu import *\n"
     "set_log_level(LOG_LEVEL.OFF)\n"
-    "hikyuu_init('test_data/hikyuu_win.ini')\n"
+    "hikyuu_init('{config}')\n"
     "class MySG(SignalBase):\n"
     "    def __init__(self):\n"
     "        super().__init__('MySG')\n"
@@ -64,7 +66,7 @@ KEEP_ALIVE_PROBE = (
     "s2.run(k, True, False)\n"
     "assert len(s2.tm.get_trade_list()) > 1\n"
     "print('OK')\n"
-).format(root=REPO_ROOT)
+).format(root=REPO_ROOT, config=CONFIG)
 
 # The analyze interfaces release the GIL before running the systems. Python-subclass
 # components (SG/MM/ST, ...) called from the released context rely on pybind11 >= 3.0
@@ -72,11 +74,12 @@ KEEP_ALIVE_PROBE = (
 # trampoline without it would crash the interpreter here.
 ANALYZE_PY_PARTS_PROBE = (
     "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
     "import faulthandler; faulthandler.enable()\n"
     "from hikyuu import *\n"
     "from hikyuu.analysis import analysis_sys_list_multi\n"
     "set_log_level(LOG_LEVEL.OFF)\n"
-    "hikyuu_init('test_data/hikyuu_win.ini')\n"
+    "hikyuu_init('{config}')\n"
     "class MySG(SignalBase):\n"
     "    def __init__(self):\n"
     "        super().__init__('MySG')\n"
@@ -109,7 +112,7 @@ ANALYZE_PY_PARTS_PROBE = (
     "analysis_sys_list_multi([stk], q, proto)\n"
     "analysis_sys_list_multi([stk, stk], q, proto)\n"
     "print('OK')\n"
-).format(root=REPO_ROOT)
+).format(root=REPO_ROOT, config=CONFIG)
 
 
 class GilSafeTest(unittest.TestCase):
