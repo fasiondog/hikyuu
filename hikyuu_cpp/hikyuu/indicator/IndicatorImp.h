@@ -9,6 +9,7 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 
@@ -442,7 +443,7 @@ public:
     static void releaseEngine();
 
 protected:
-    static bool ms_enable_increment_calculate;
+    static std::atomic<bool> ms_enable_increment_calculate;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
