@@ -971,6 +971,15 @@ TEST_CASE("test_combineCalculateIndicators") {
     CHECK_EQ(result[1].getResultNumber(), 1);
     CHECK_UNARY(result[0].equal(MA(CLOSE(kdata), 5)));
     CHECK_UNARY(result[1].equal(RSI(CLOSE(kdata), 14)));
+    /** @arg the extracted single-result indicator still carries the source context */
+    CHECK_EQ(result[0].getContext(), kdata);
+    CHECK_EQ(result[0].getDatetime(0), kdata[0].datetime);
+    CHECK_EQ(result[0].getByDate(kdata[kdata.size() - 1].datetime),
+             MA(CLOSE(kdata), 5)[kdata.size() - 1]);
+    /** @arg the snapshot still participates in downstream computation */
+    Indicator snapshot = result[0];
+    check_indicator(MA(snapshot, 3), MA(MA(CLOSE(kdata), 5), 3));
+    check_indicator(snapshot + snapshot, MA(CLOSE(kdata), 5) + MA(CLOSE(kdata), 5));
 
     /** @arg Test the different KData contexts */
     KQuery query2(10, 30);

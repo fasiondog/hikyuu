@@ -538,11 +538,14 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     imp->_readyBuffer(total, 1);
     imp->setDiscard(discard());
     imp->name(name());
+    imp->onlySetContext(getContext());
     auto const *src = this->data(result_num);
     auto *dst = imp->data(0);
     for (size_t i = imp->discard(); i < total; ++i) {
         dst[i] = src[i];
     }
+    // without this, a later clone recomputes through the base _calculate and wipes the buffer
+    imp->setCalculateFlag(false);
     return imp;
 }
 
