@@ -679,6 +679,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
                     k = _getKRecordFromBuffer(out_start - 1, ktype);
                     return k.closePrice;
                 }
+                return 0.0;
             }
 
         } else if (m_kdataDriver->getConnect()->isIndexFirst()) {
@@ -694,6 +695,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
                     k = getKRecord(out_start - 1, ktype);
                     return k.closePrice;
                 }
+                return 0.0;
             }
 
         } else {
@@ -706,11 +708,16 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
                 return k_list[0].closePrice;
             }
 
+            if (datetime < startDatetime()) {
+                return 0.0;
+            }
+
             query = KQueryByDate(startDatetime(), datetime, ktype);
             k_list = getKRecordList(query);
             if (k_list.size() > 0) {
                 return k_list[k_list.size() - 1].closePrice;
             }
+            return 0.0;
         }
 
         // If it is not found, take the last record
@@ -736,6 +743,10 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
                 k = getKRecord(out_start - 1, ktype);
                 return k.closePrice;
             }
+            // out_start == 0 yet the first record is already after datetime: the query time
+            // precedes the first K-line record, so no market value exists yet. Return 0 rather
+            // than the latest close, which would leak future data into valuation (BASE-102).
+            return 0.0;
         }
 
         // If it is not found, take the last record

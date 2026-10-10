@@ -499,7 +499,7 @@ TEST_CASE("test_Stock_getKRecord_lowercase_ktype") {
     CHECK_EQ(record, expect);
 
     /** @arg Lowercase ktype via the datetime overload hits the same in-memory buffer path */
-    record = stock.getKRecord(expect.datetime(), "day");
+    record = stock.getKRecord(expect.datetime, "day");
     CHECK_EQ(record, expect);
 }
 
@@ -2050,6 +2050,27 @@ TEST_CASE("test_Stock_getMarketValue") {
     CHECK_LT(std::fabs(result - 8.70), 0.001);
 
     MEMORY_CHECK;
+}
+
+/** @par Test points */
+TEST_CASE("test_Stock_getMarketValue_before_first_record") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+
+    // Force the in-memory buffer path (the path TradeManager actually uses for valuation)
+    stock.loadKDataToBuffer(KQuery::DAY);
+    CHECK_EQ(stock.isBuffer(KQuery::DAY), true);
+
+    /** @arg Exact match on the first record still returns its own close price */
+    CHECK_EQ(stock.getMarketValue(Datetime(199012190000), KQuery::DAY), 99.98);
+
+    /** @arg Query time before the first K-line record must return 0, not the latest close price
+     * (regression for BASE-102: the un-guarded "take the last record" fallback leaked future data
+     * into TradeManager valuation when datetime precedes the first K-line record) */
+    CHECK_EQ(stock.getMarketValue(Datetime(199001010000), KQuery::DAY), 0.0);
+
+    /** @arg Query time after the last K-line record still returns the latest known close price */
+    CHECK_EQ(stock.getMarketValue(Datetime(201201010000), KQuery::DAY), 2325.905);
 }
 
 /** @par Test points */
