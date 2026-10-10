@@ -22,7 +22,63 @@ using namespace hku;
  * @{
  */
 
-/** @par Test points */
+/**
+ * @par Test points
+ * A window which holds no valid point at all has no stop loss line: zero would claim that none is
+ * needed.
+ *
+ * A window which keeps some valid points leaves the missing ones out, the same way as HHV, LLV and
+ * MA do.
+ */
+TEST_CASE("test_SAFTYLOSS_missing_points") {
+    PriceList px;
+    for (size_t i = 0; i < 30; ++i) {
+        px.push_back(i < 18 ? Null<price_t>() : price_t(10. + i * 0.1));
+    }
+    Indicator src = PRICELIST(px);
+
+    Indicator result = SAFTYLOSS(src, 10, 3, 2.0);
+    REQUIRE_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 11);
+
+    /** @arg the bars whose window is all missing give null, not zero */
+    for (size_t i = 11; i < 18; ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    /** @arg the valid part is not touched */
+    for (size_t i = 18; i < 30; ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+
+    /** @arg a window with some valid points keeps its value, the missing bar is left out */
+    PriceList mixed;
+    for (size_t i = 0; i < 24; ++i) {
+        mixed.push_back(price_t(10. + (i % 5)));
+    }
+    mixed[20] = Null<price_t>();
+    Indicator mixed_src = PRICELIST(mixed);
+    Indicator mixed_result = SAFTYLOSS(mixed_src, 10, 3, 2.0);
+    for (size_t i = mixed_result.discard(); i < mixed_result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(mixed_result[i]));
+    }
+
+    /** @arg the dynamic path agrees with the static one */
+    Indicator dyn = SAFTYLOSS(src, CVAL(src, 10), CVAL(src, 3), CVAL(src, 2.0));
+    CHECK_EQ(dyn.size(), result.size());
+    for (size_t i = 0; i < dyn.size(); ++i) {
+        if (std::isnan(result[i])) {
+            CHECK_UNARY(std::isnan(dyn[i]));
+        } else {
+            CHECK_EQ(dyn[i], doctest::Approx(result[i]));
+        }
+    }
+    Indicator mixed_dyn =
+      SAFTYLOSS(mixed_src, CVAL(mixed_src, 10), CVAL(mixed_src, 3), CVAL(mixed_src, 2.0));
+    for (size_t i = mixed_dyn.discard(); i < mixed_dyn.size(); ++i) {
+        CHECK_UNARY(!std::isnan(mixed_dyn[i]));
+    }
+}
+
 TEST_CASE("test_SAFTYLOSS") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");

@@ -964,6 +964,8 @@ void export_Indicator_build_in(py::module& m) {
 
     The calculation description: within the lookback period (generally 10 to 20 days), sum all the lengths of the downward penetrations and divide by the number of the downward penetrations to get the average noise (i.e. the total length of all the lowest prices below the lowest price of the previous day within the lookback period divided by the number of the times), and subtract (the average noise of the previous day multiplied by a multiple) from the lowest price of today to get the stop line. To offset the fluctuation and ensure the upward movement of the stop line, take the highest value within the N days (generally 3 days) on the basis of the above result
 
+    Note: the calculation reads the input as the low price series, so pass LOW(); a missing value is left out of the window (like HHV and LLV), and a window of nothing but missing values gives back nan.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n1: the lookback time window for calculating the average noise
     :param int|Indicator|IndParam n2: take the highest value within the n2 days for the preliminary stop line
