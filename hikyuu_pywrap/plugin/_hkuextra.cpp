@@ -14,8 +14,18 @@ namespace py = pybind11;
 
 void export_hkuextra(py::module& m) {
     m.def("register_extra_ktype",
-          py::overload_cast<const string&, const string&, int32_t,
-                            std::function<Datetime(const Datetime&)>>(registerExtraKType),
+          [](const string& ktype, const string& basetype, int32_t minutes,
+             py::function get_phase_end) {
+              // Wrap the Python phase-end callback so it is safe to call from the core's worker
+              // threads (which run without the GIL) and safe to destroy when the registry is
+              // released (release_extra_ktype, possibly at interpreter exit without the GIL).
+              std::function<Datetime(const Datetime&)> safe =
+                [cb = make_gil_safe(std::move(get_phase_end))](const Datetime& d) -> Datetime {
+                    py::gil_scoped_acquire gil;
+                    return cb->operator()(d).cast<Datetime>();
+                };
+              registerExtraKType(ktype, basetype, minutes, safe);
+          },
           py::arg("ktype"), py::arg("basetype"), py::arg("minutes"), py::arg("get_phase_end"));
     m.def("register_extra_ktype",
           py::overload_cast<const string&, const string&, int32_t>(registerExtraKType),
@@ -38,8 +48,7 @@ void export_hkuextra(py::module& m) {
 
     Note:
     1. Hikyuu has built in the DAY3, DAY5, DAY7 based on the number of the Bars, and the MIN3 extended K-line based on the time conversion
-    2. It is recommended to create the custom K-line type period end point calculation conversion function in the way of the hub c++ part, because python has a GIL lock,
-       and creating the conversion function may make it impossible to calculate with multiple threads
+    2. The python-defined phase end conversion function is wrapped with the GIL by the binding, so it is safe to call from the core's worker threads; however, the call serializes on the GIL, so a C++ implementation scales better under multithreading
     3. Registering the dynamic K-lines is not thread-safe; please perform the other operations after the registration is completed
 
     :param str ktype: the extended K-line type name
