@@ -182,9 +182,7 @@ public:
 
     template <typename ValueType>
     ValueType getParam(const string& name) const {
-        if (!m_imp) {
-            throw std::out_of_range("out_of_range in Parameter::get : " + name);
-        }
+        HKU_CHECK(m_imp, "The indicator has no implementation, parameter: {}", name);
         return m_imp->getParam<ValueType>(name);
     }
 

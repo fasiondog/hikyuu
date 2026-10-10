@@ -1502,4 +1502,37 @@ TEST_CASE("test_indicator_alike_null_imp") {
     CHECK_UNARY(kept.alike(kept_c));
 }
 
+/**
+ * @par Test points
+ * Reading a parameter of an indicator without an implementation must not be reported as a missing
+ * parameter.
+ *
+ * Background: both notices were worded the same, so a moved away or explicitly empty indicator made
+ * a reader look for a parameter name which was never the problem.
+ */
+TEST_CASE("test_indicator_get_param_without_imp") {
+    Indicator empty{IndicatorImpPtr{}};
+
+    /** @arg the notice says the indicator has no implementation */
+    string message;
+    try {
+        empty.getParam<double>("n");
+    } catch (const std::exception& e) {
+        message = e.what();
+    }
+    CHECK_FALSE(message.empty());
+    CHECK_UNARY(message.find("no implementation") != string::npos);
+
+    /** @arg a missing parameter of a real indicator keeps the parameter notice */
+    Indicator ind = MA(CLOSE(), 5);
+    string param_message;
+    try {
+        ind.getParam<double>("no_such_param");
+    } catch (const std::out_of_range& e) {
+        param_message = e.what();
+    }
+    CHECK_FALSE(param_message.empty());
+    CHECK_UNARY(param_message.find("out_of_range in Parameter::get") != string::npos);
+}
+
 /** @} */
