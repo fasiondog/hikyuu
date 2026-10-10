@@ -6,6 +6,7 @@
  */
 
 #include "../test_config.h"
+#include <cmath>
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/FACTOR.h>
@@ -28,7 +29,8 @@ TEST_CASE("test_FACTOR") {
 
     // Create a simple MA factor for the test
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "test factor", "used to test the FACTOR indicator");
+    Factor factor("TEST_FACTOR", ma5, KQuery::DAY, "test factor",
+                  "used to test the FACTOR indicator");
 
     /** @arg Test the basic functionality of FACTOR */
     Indicator result = FACTOR(factor);
@@ -57,6 +59,63 @@ TEST_CASE("test_FACTOR") {
     check_indicator(direct_result, result);
 }
 
+/**
+ * @par Test points
+ * A factor which has no formula (an unknown name which cannot be loaded from the database) must
+ * give a null result, not crash.
+ *
+ * Background: an empty formula gives back an indicator without an implementation, and the
+ * calculation dereferenced it to swap the values in.
+ */
+TEST_CASE("test_FACTOR_without_formula") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    REQUIRE_EQ(kdata.size(), 20);
+
+    Factor unknown("NO_SUCH_FACTOR_FOR_THIS_TEST", KQuery::DAY);
+    CHECK_UNARY(unknown.formula().empty());
+
+    Indicator result = FACTOR(unknown);
+    result.setContext(kdata);
+
+    /** @arg the result keeps the context length, with nothing valid in it */
+    CHECK_EQ(result.name(), "FACTOR");
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+    CHECK_UNARY(std::isnan(result[19]));
+}
+
+/**
+ * @par Test points
+ * A factor whose formula keeps its own data length cannot be laid onto the context: the values
+ * must not be swapped into the indicator buffer behind the context length.
+ *
+ * Background: the calculation swapped in whatever the factor gave back, without checking its
+ * length against the context it had already prepared the buffer for.
+ */
+TEST_CASE("test_FACTOR_formula_length_mismatch") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-20));
+    REQUIRE_EQ(kdata.size(), 20);
+
+    PriceList px;
+    for (size_t i = 0; i < 40; ++i) {
+        px.push_back(double(i + 1));
+    }
+
+    Factor sliced("SLICED_FORMULA_FACTOR", SLICE(px, 0, 10), KQuery::DAY, "test factor",
+                  "used to test the factor value length");
+    REQUIRE_EQ(sliced.getValue(kdata).size(), 10);
+
+    Indicator result = FACTOR(sliced);
+    result.setContext(kdata);
+
+    /** @arg the result keeps the context length, with nothing valid in it */
+    CHECK_EQ(result.size(), 20);
+    CHECK_EQ(result.discard(), 20);
+    CHECK_UNARY(std::isnan(result[19]));
+}
+
 /** @par Test point: test the different types of factors */
 TEST_CASE("test_FACTOR_different_factors") {
     Stock stock = getStock("sz000001");
@@ -64,7 +123,8 @@ TEST_CASE("test_FACTOR_different_factors") {
 
     // Test the moving average factors with different parameters
     Indicator ma10 = MA(CLOSE(), 10);
-    Factor factor_ma10("MA10_FACTOR", ma10, KQuery::DAY, "10-day MA factor", "10-day moving average factor");
+    Factor factor_ma10("MA10_FACTOR", ma10, KQuery::DAY, "10-day MA factor",
+                       "10-day moving average factor");
 
     Indicator result = FACTOR(factor_ma10);
     result.setContext(kdata);
@@ -119,7 +179,8 @@ TEST_CASE("test_FACTOR_export") {
 
     // Create the test factor
     Indicator ma5 = MA(CLOSE(), 5);
-    Factor factor("EXPORT_TEST_FACTOR", ma5, KQuery::DAY, "export test factor", "used for serialization testing");
+    Factor factor("EXPORT_TEST_FACTOR", ma5, KQuery::DAY, "export test factor",
+                  "used for serialization testing");
 
     Indicator x1 = FACTOR(factor);
     x1.setContext(kdata);

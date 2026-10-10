@@ -1094,6 +1094,238 @@ TEST_CASE("test_indicator_execute_mod") {
     CHECK_UNARY(std::isnan(r[5]));
 }
 
+namespace {
+
+/** Compare the result of an incremental context switch with a plain full calculation */
+template <typename Factory>
+void checkIncrementEqualsFull(const Factory& make, const KData& first, const KData& then) {
+    Indicator expect = make();
+    expect.setContext(then);
+
+    Indicator got = make();
+    got.setContext(first);
+    got.setContext(then);
+
+    // One aggregated assertion per call: the runner stops after a few failed asserts, so counting
+    // the mismatched points keeps every scenario observable in a single run
+    bool same_shape =
+      got.size() == expect.size() && got.getResultNumber() == expect.getResultNumber();
+    size_t diff = same_shape ? 0 : expect.size() + 1;
+    if (same_shape) {
+        if (got.discard() != expect.discard()) {
+            ++diff;
+        }
+        for (size_t r = 0; r < expect.getResultNumber(); ++r) {
+            for (size_t i = 0; i < expect.size(); ++i) {
+                double a = expect.get(i, r);
+                double b = got.get(i, r);
+                if (std::isnan(a) && std::isnan(b)) {
+                    continue;
+                }
+                if (!(b == doctest::Approx(a).epsilon(0.0001))) {
+                    ++diff;
+                }
+            }
+        }
+    }
+    CHECK_MESSAGE(diff == 0, "mismatched points " << diff);
+}
+
+}  // namespace
+
+/** @par Test points */
+TEST_CASE("test_indicator_operand_length_must_match_context") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 20));
+    CHECK_EQ(k_full.size(), 20);
+
+    PriceList px;
+    for (size_t i = 0; i < 40; ++i) {
+        px.push_back(double(i + 1));
+    }
+
+    // An indicator carrying its own data length (SLICE, DROPNA) has no value per bar of a context,
+    // so binding it to a context node is rejected instead of being guessed by position
+    auto bind = [&](const Indicator& ind) {
+        Indicator x = ind;
+        x.setContext(k_full);
+        return x[0];
+    };
+
+    /** @arg a binary node rejects an operand of another length */
+    CHECK_THROWS(bind(CLOSE() + SLICE(px, 0, 12)));
+    /** @arg a weave node rejects an operand of another length */
+    CHECK_THROWS(bind(WEAVE(CLOSE(), SLICE(px, 0, 12))));
+    /** @arg a condition node rejects an operand of another length */
+    CHECK_THROWS(bind(IF(CLOSE(), OPEN(), SLICE(px, 0, 12))));
+    /** @arg a unary node rejects an input of another length */
+    CHECK_THROWS(bind(EMA(SLICE(px, 0, 12), 3)));
+
+    // A data only tree has no context to disagree with, so the longest operand stays the anchor and
+    // the others are merged at its right end
+    Indicator data = PRICELIST(px) + SLICE(px, 0, 12);
+
+    /** @arg a data only tree still merges at the right end, with a null leading part */
+    CHECK_EQ(data.size(), 40);
+    CHECK_EQ(data.discard(), 28);
+    CHECK_UNARY(std::isnan(data[0]));
+    CHECK_EQ(data[28], doctest::Approx(px[0] + px[28]));
+    CHECK_EQ(data[39], doctest::Approx(px[11] + px[39]));
+
+    /** @arg a unary node over plain data keeps the length of its input */
+    CHECK_EQ(EMA(SLICE(px, 0, 12), 3).size(), 12);
+}
+/** @par Test points */
+TEST_CASE("test_indicator_cval_if_and_context_padding") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 20));
+    Indicator closes = k_full.close();
+    Indicator opens = k_full.open();
+
+    PriceList px12;
+    for (size_t i = 0; i < 12; ++i) {
+        px12.push_back(double(i + 1));
+    }
+
+    // IF takes a scalar branch by wrapping it into CVAL over the other branch, which follows its
+    // length, so every form keeps the context length
+    Indicator i1 = IF(CLOSE() > OPEN(), HIGH(), LOW());
+    Indicator i2 = IF(CLOSE() > OPEN(), 1.0, 0.0);
+    Indicator i3 = IF(CLOSE() > OPEN(), CLOSE(), 1.0);
+    Indicator i4 = IF(CLOSE() > OPEN(), 1.0, CLOSE());
+    i1.setContext(k_full);
+    i2.setContext(k_full);
+    i3.setContext(k_full);
+    i4.setContext(k_full);
+
+    /** @arg every IF form with scalar branches keeps the context length and its values */
+    for (size_t i = 0; i < 20; ++i) {
+        bool up = closes[i] > opens[i];
+        CHECK_UNARY(!std::isnan(i2[i]));
+        CHECK_EQ(i2[i], up ? 1.0 : 0.0);
+        CHECK_EQ(i3[i], up ? closes[i] : 1.0);
+        CHECK_EQ(i4[i], up ? 1.0 : closes[i]);
+    }
+    CHECK_EQ(i1.size(), 20);
+
+    /** @arg a bare CVAL leaf takes the context length once bound */
+    Indicator c1 = CVAL(2.0);
+    c1.setContext(k_full);
+    CHECK_EQ(c1.size(), 20);
+    CHECK_EQ(c1[0], 2.0);
+
+    // CONTEXT and the two-input indicators pad a dateless reference series with CVAL plus an
+    // addition; the padding subtree is built without a context of its own, so the binding check
+    // does not apply to it and the merged length still matches the context
+    Indicator padded = CONTEXT(PRICELIST(px12));
+    padded.setContext(k_full);
+
+    /** @arg a dateless context reference keeps the context length, its leading part stays null (the
+     *  zero filled CVAL is never written below the discard of the addition) */
+    CHECK_EQ(padded.size(), 20);
+    CHECK_EQ(padded.discard(), 8);
+    CHECK_UNARY(std::isnan(padded[0]));
+    CHECK_EQ(padded[8], doctest::Approx(px12[0]));
+    CHECK_EQ(padded[19], doctest::Approx(px12[11]));
+
+    // An outer addition skips the invalid leading part of its operands
+    Indicator ctx1 = CLOSE() + CONTEXT(PRICELIST(px12));
+    ctx1.setContext(k_full);
+
+    /** @arg the addition of a padded reference keeps the context length from its discard on */
+    CHECK_EQ(ctx1.size(), 20);
+    for (size_t i = ctx1.discard(); i < 20; ++i) {
+        CHECK_EQ(ctx1[i], doctest::Approx(closes[i] + px12[i - 8]));
+    }
+
+    /** @arg a dateless reference of a two-input indicator keeps the context length as well */
+    Indicator corr1 = CORR(CLOSE(), PRICELIST(px12), 5);
+    corr1.setContext(k_full);
+    CHECK_EQ(corr1.size(), 20);
+    Indicator beta1 = BETA(CLOSE(), PRICELIST(px12), 5);
+    beta1.setContext(k_full);
+    CHECK_EQ(beta1.size(), 20);
+
+    /** @arg an independent context of another stock aligns by date and keeps the context length */
+    Indicator cross = CLOSE() + CONTEXT(SMA(CLOSE(), 5), sm.getStock("sh000001"), true);
+    cross.setContext(k_full);
+    CHECK_EQ(cross.size(), 20);
+}
+
+/** @par Test points */
+TEST_CASE("test_indicator_increment_shift_length_match") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 20));
+    KData k_inner = stock.getKData(KQuery(10, 20));
+    KData k_append = stock.getKData(KQuery(0, 30));  // the same start, more bars at the tail
+    KData k_move = stock.getKData(KQuery(10, 30));   // shifted front and extended tail
+
+    // CLOSE() is a context leaf, so every node of these trees is laid out as the context and the
+    // old results may be shifted in place; the guards must not disable the incremental path
+    auto normal_unary = [&]() { return EMA(CLOSE(), 3); };
+    auto normal_binary = [&]() { return CLOSE() + OPEN(); };
+    auto normal_if = [&]() { return IF(CLOSE(), OPEN(), HIGH()); };
+    auto normal_abs = [&]() { return ABS(CLOSE()); };
+    auto normal_weave = [&]() { return WEAVE(CLOSE(), OPEN()); };
+
+    /** @arg a context-length unary node still matches the full result on a tail append */
+    checkIncrementEqualsFull(normal_unary, k_full, k_append);
+
+    /** @arg a context-length binary node still matches the full result on a tail append */
+    checkIncrementEqualsFull(normal_binary, k_full, k_append);
+
+    /** @arg a context-length condition node still matches the full result on a tail append */
+    checkIncrementEqualsFull(normal_if, k_full, k_append);
+
+    // Element-wise nodes do not depend on where the recurrence starts, so they are compared under
+    // a shifted window too. A recursive one is not: a full recalculation seeds the recurrence at
+    // the first bar of the new window while the incremental path continues the previous one, which
+    // is a separate semantic issue, not the buffer length premise
+    /** @arg an element-wise binary node still matches the full result when the window is shifted
+     *  and appended */
+    checkIncrementEqualsFull(normal_binary, k_full, k_move);
+
+    /** @arg an element-wise condition node still matches the full result when the window is
+     *  shifted and appended */
+    checkIncrementEqualsFull(normal_if, k_full, k_move);
+
+    /** @arg the shift path still runs: a recursive node continues its recurrence on a shifted
+     *  window instead of being reseeded, so its incremental result legitimately differs from a
+     *  fresh full calculation. This guards against a too strict guard silently disabling the
+     *  incremental mechanism, which the equality checks above could not detect */
+    Indicator shifted = EMA(CLOSE(), 3);
+    shifted.setContext(k_full);
+    shifted.setContext(k_move);
+    Indicator reseeded = EMA(CLOSE(), 3);
+    reseeded.setContext(k_move);
+    CHECK_EQ(shifted.size(), reseeded.size());
+    size_t recalc_points = 0;
+    for (size_t i = 0; i < reseeded.size(); ++i) {
+        double a = reseeded[i];
+        double b = shifted[i];
+        if (std::isnan(a) && std::isnan(b)) {
+            continue;
+        }
+        if (!(b == doctest::Approx(a).epsilon(0.0001))) {
+            ++recalc_points;
+        }
+    }
+    CHECK_MESSAGE(recalc_points > 0,
+                  "the incremental shift path did not run, every point was recalculated");
+
+    // The renew path (can_inner_calculate) never recalculates the children, so it is only asserted
+    // with an element-wise node
+    /** @arg an element-wise node still matches the full result when the context shrinks into the
+     *  old window (renew fast path) */
+    checkIncrementEqualsFull(normal_abs, k_full, k_inner);
+
+    /** @arg an aligned weave node still matches the full result on a tail append */
+    checkIncrementEqualsFull(normal_weave, k_full, k_append);
+}
+
 /** @par Test points */
 TEST_CASE("test_indicator_is_same") {
     PriceList d;
@@ -1119,6 +1351,188 @@ TEST_CASE("test_indicator_is_same") {
     CHECK_UNARY(!empty.isSame(a));
     CHECK_UNARY(!a.isSame(empty));
     CHECK_UNARY(!empty.isSame(empty));
+}
+
+/**
+ * @par Test points
+ * A context driven indicator used as an operation with a non empty input only warns, it must not
+ * die inside the warning itself.
+ *
+ * Background: the warning text of STKTYPE / ISLIMITUP / ISLIMITDOWN read a "kpart" parameter they
+ * never define, so Parameter::get threw out_of_range instead of the intended notice.
+ */
+TEST_CASE("test_context_leaf_warning_with_input") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    REQUIRE_FALSE(stock.isNull());
+    KData k = stock.getKData(KQuery(0, 20));
+
+    // A calculated input, so that the "input is ignored" warning branch is really reached
+    Indicator input = CLOSE();
+    input.setContext(k);
+    REQUIRE_FALSE(input.empty());
+
+    Indicator ctx_leaf = STKTYPE();
+    Indicator limit_up = ISLIMITUP();
+    Indicator limit_down = ISLIMITDOWN();
+
+    /** @arg each of them warns and keeps calculating instead of throwing */
+    CHECK_NOTHROW(ctx_leaf(input));
+    CHECK_NOTHROW(limit_up(input));
+    CHECK_NOTHROW(limit_down(input));
+
+    /** @arg the warning does not stop the indicator from producing the context values */
+    Indicator r = ctx_leaf(k);
+    CHECK_EQ(r.size(), 20);
+}
+
+namespace {
+
+// An indicator which deliberately leaves one of the bars it is asked to compute untouched, to pin
+// the contract of the incremental path: every bar the copy did not cover starts as null, so an
+// implementation may simply skip an invalid point
+class SkipOneBarIndicatorImp : public IndicatorImp {
+public:
+    SkipOneBarIndicatorImp() : IndicatorImp("SKIP_ONE_BAR", 1) {
+        m_need_context = true;
+    }
+
+    void _calculate(const Indicator&) override {
+        const KData& k = getContext();
+        HKU_IF_RETURN(k.empty(), void());
+        _readyBuffer(k.size(), 1);
+        m_discard = 0;
+        auto* dst = data();
+        for (size_t i = 0; i < k.size(); ++i) {
+            dst[i] = value_t(i);
+        }
+    }
+
+    void _increment_calculate(const Indicator&, size_t start_pos) override {
+        size_t total = getContext().size();
+        auto* dst = data();
+        for (size_t i = start_pos; i < total; ++i) {
+            if (i == m_skip_pos) {
+                continue;
+            }
+            dst[i] = value_t(i);
+        }
+    }
+
+    bool supportIncrementCalculate() const override {
+        return true;
+    }
+
+    size_t min_increment_start() const override {
+        return 1;
+    }
+
+    void skipPos(size_t pos) {
+        m_skip_pos = pos;
+    }
+
+    IndicatorImpPtr _clone() override {
+        return make_shared<SkipOneBarIndicatorImp>();
+    }
+
+private:
+    size_t m_skip_pos = std::numeric_limits<size_t>::max();
+};
+
+}  // namespace
+
+/** @par Test points */
+TEST_CASE("test_indicator_increment_clears_unwritten_bars") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k1 = stock.getKData(KQuery(0, 30));
+    KData k2 = stock.getKData(KQuery(10, 40));  // shifted by ten bars and extended
+    CHECK_EQ(k1.size(), 30);
+    CHECK_EQ(k2.size(), 30);
+
+    auto imp = make_shared<SkipOneBarIndicatorImp>();
+    imp->skipPos(25);
+    Indicator ind(imp);
+
+    ind.setContext(k1);
+    /** @arg the full calculation writes every bar */
+    CHECK_EQ(ind[25], 25.0);
+
+    ind.setContext(k2);
+
+    /** @arg the incremental path leaves the skipped bar null instead of a stale value */
+    CHECK_EQ(ind.size(), 30);
+    CHECK_UNARY(std::isnan(ind[25]));
+    /** @arg the bars it does write keep their values */
+    CHECK_EQ(ind[19], 19.0);
+    CHECK_EQ(ind[24], 24.0);
+    CHECK_EQ(ind[26], 26.0);
+    CHECK_EQ(ind[29], 29.0);
+}
+
+/**
+ * @par Test points
+ * Comparing the formula of an indicator without an implementation must answer falsely instead of
+ * crashing.
+ *
+ * Background: alike dereferenced both implementations; an indicator left over after a move keeps no
+ * implementation at all, so any comparison touching it crashed the process.
+ */
+TEST_CASE("test_indicator_alike_null_imp") {
+    PriceList d;
+    for (size_t i = 0; i < 5; ++i) {
+        d.push_back(double(i + 1));
+    }
+
+    Indicator a = PRICELIST(d);
+    Indicator kept = std::move(a);  // a holds no implementation any more
+
+    /** @arg a moved-from indicator is not alike another indicator */
+    CHECK_UNARY(!a.alike(PRICELIST(d)));
+    /** @arg a moved-from indicator at the other side is not alike either */
+    Indicator b = PRICELIST(d);
+    CHECK_UNARY(!b.alike(a));
+    /** @arg a moved-from indicator is not alike itself either, the same rule as isSame */
+    CHECK_UNARY(!a.alike(a));
+    /** @arg two moved-from indicators are not alike */
+    Indicator c = PRICELIST(d);
+    Indicator kept_c = std::move(c);
+    CHECK_UNARY(!a.alike(c));
+    /** @arg the indicator which took over the implementation keeps comparing normally */
+    CHECK_UNARY(kept.alike(kept_c));
+}
+
+/**
+ * @par Test points
+ * Reading a parameter of an indicator without an implementation must not be reported as a missing
+ * parameter.
+ *
+ * Background: both notices were worded the same, so a moved away or explicitly empty indicator made
+ * a reader look for a parameter name which was never the problem.
+ */
+TEST_CASE("test_indicator_get_param_without_imp") {
+    Indicator empty{IndicatorImpPtr{}};
+
+    /** @arg the notice says the indicator has no implementation */
+    string message;
+    try {
+        empty.getParam<double>("n");
+    } catch (const std::exception& e) {
+        message = e.what();
+    }
+    CHECK_FALSE(message.empty());
+    CHECK_UNARY(message.find("no implementation") != string::npos);
+
+    /** @arg a missing parameter of a real indicator keeps the parameter notice */
+    Indicator ind = MA(CLOSE(), 5);
+    string param_message;
+    try {
+        ind.getParam<double>("no_such_param");
+    } catch (const std::out_of_range& e) {
+        param_message = e.what();
+    }
+    CHECK_FALSE(param_message.empty());
+    CHECK_UNARY(param_message.find("out_of_range in Parameter::get") != string::npos);
 }
 
 /** @} */

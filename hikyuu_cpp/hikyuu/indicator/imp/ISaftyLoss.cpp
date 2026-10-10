@@ -44,12 +44,52 @@ void ISaftyLoss::_calculate(const Indicator& data) {
         return;
     }
 
-    _increment_calculate(data, m_discard);
+    double p = getParam<double>("p");
+    auto const* src = data.data();
+    auto* dst = this->data();
+    global_parallel_for_index_void(
+      m_discard, total, [&](size_t i) { dst[i] = _calcOneBar(src, i, n1, n2, p); },
+      MIN_PARALLEL_WORK / std::max(1, n1 * n2));
 }
 
 size_t ISaftyLoss::min_increment_start() const {
     // The inner loop reads src[k - 1] from j == start_pos + 1 - n2 with k starting at j + 2 - n1.
     return getParam<int>("n1") + getParam<int>("n2") - 2;
+}
+
+Indicator::value_t ISaftyLoss::_calcOneBar(const Indicator::value_t* src, size_t i, int n1, int n2,
+                                           double p) {
+    value_t result = 0.0;
+    bool has_valid = false;
+    for (size_t j = i + 1 - n2; j <= i; ++j) {
+        value_t sum = 0.0;
+        size_t num = 0;
+        for (size_t k = j + 2 - n1; k <= j; ++k) {
+            value_t pre = src[k - 1];
+            value_t cur = src[k];
+            if (pre > cur) {
+                sum += pre - cur;
+                ++num;
+            }
+        }
+
+        value_t temp = src[j];
+        if (num != 0) {
+            temp = temp - (p * sum / num);
+        }
+
+        if (std::isnan(temp)) {
+            continue;
+        }
+
+        if (!has_valid || temp > result) {
+            result = temp;
+            has_valid = true;
+        }
+    }
+
+    // A zero line would claim that no stop loss is needed
+    return has_valid ? result : Null<value_t>();
 }
 
 void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
@@ -62,37 +102,13 @@ void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    size_t start = start_pos;
-    for (size_t i = start; i < total; ++i) {
-        price_t result = 0.0;
-        for (size_t j = i + 1 - n2; j <= i; ++j) {
-            price_t sum = 0.0;
-            size_t num = 0;
-            for (size_t k = j + 2 - n1; k <= j; ++k) {
-                price_t pre = src[k - 1];
-                price_t cur = src[k];
-                if (pre > cur) {
-                    sum += pre - cur;
-                    ++num;
-                }
-            }
-
-            price_t temp = src[j];
-            if (num != 0) {
-                temp = temp - (p * sum / num);
-            }
-
-            if (temp > result) {
-                result = temp;
-            }
-        }
-
-        dst[i] = result;
+    for (size_t i = start_pos; i < total; ++i) {
+        dst[i] = _calcOneBar(src, i, n1, n2, p);
     }
 }
 
 void ISaftyLoss::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, double p) {
-    HKU_IF_RETURN(n1 < 2 || n2 < 2, void());
+    HKU_IF_RETURN(n1 < 2 || n2 < 1, void());
     // Intentional: the result at curPos only depends on the trailing [curPos + 2 - n1 - n2, curPos]
     // window, so compute it directly from ind instead of rebuilding the whole prefix. The value is
     // bitwise identical to SAFTYLOSS(SLICE(ind, 0, curPos + 1)) and drops from O(curPos) to
@@ -104,31 +120,7 @@ void ISaftyLoss::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, in
         return;
     }
 
-    auto const* src = ind.data();
-    price_t result = 0.0;
-    for (size_t j = curPos + 1 - n2; j <= curPos; ++j) {
-        price_t sum = 0.0;
-        size_t num = 0;
-        for (size_t k = j + 2 - n1; k <= j; ++k) {
-            price_t pre = src[k - 1];
-            price_t cur = src[k];
-            if (pre > cur) {
-                sum += pre - cur;
-                ++num;
-            }
-        }
-
-        price_t temp = src[j];
-        if (num != 0) {
-            temp = temp - (p * sum / num);
-        }
-
-        if (temp > result) {
-            result = temp;
-        }
-    }
-
-    _set(result, curPos);
+    _set(_calcOneBar(ind.data(), curPos, n1, n2, p), curPos);
 }
 
 void ISaftyLoss::_dyn_calculate(const Indicator& ind) {

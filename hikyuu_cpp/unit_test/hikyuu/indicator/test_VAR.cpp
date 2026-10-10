@@ -156,4 +156,36 @@ TEST_CASE("test_VAR_export") {
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
+/**
+ * @par Test points
+ * The bars read backwards as the seed of a rolling statistic must lie inside the valid part of the
+ * input, otherwise the null prefix poisons the whole result.
+ */
+TEST_CASE("test_VAR_increment_seed_into_discard") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_old = stock.getKData(KQuery(0, 30));
+    KData k_new = stock.getKData(KQuery(0, 40));
+    CHECK_EQ(k_old.size(), 30);
+    CHECK_EQ(k_new.size(), 40);
+
+    // The long warm up makes the node discard end exactly at the last cached bar: resuming from it
+    // would read the first bar before the valid part of the input as the seed
+    auto make = []() { return VAR(MA(CLOSE(), 21), 10); };
+
+    Indicator expect = make();
+    expect.setContext(k_new);
+
+    Indicator got = make();
+    got.setContext(k_old);
+    got.setContext(k_new);
+
+    /** @arg the resumed calculation keeps the same values as a fresh one */
+    CHECK_EQ(got.size(), expect.size());
+    CHECK_EQ(got.discard(), expect.discard());
+    for (size_t i = expect.discard(); i < expect.size(); ++i) {
+        CHECK_EQ(got[i], doctest::Approx(expect[i]).epsilon(0.00001));
+    }
+}
+
 /** @} */

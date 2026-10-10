@@ -19,6 +19,9 @@ class IIsLimitUp : public IndicatorImp {
 public:
     IIsLimitUp();
     virtual ~IIsLimitUp() override;
+
+    // ks[i - 1] is read, so the first bar of the context cannot be judged
+    virtual size_t min_increment_start() const override;
 };
 
 } /* namespace hku */

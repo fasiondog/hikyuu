@@ -964,6 +964,8 @@ void export_Indicator_build_in(py::module& m) {
 
     The calculation description: within the lookback period (generally 10 to 20 days), sum all the lengths of the downward penetrations and divide by the number of the downward penetrations to get the average noise (i.e. the total length of all the lowest prices below the lowest price of the previous day within the lookback period divided by the number of the times), and subtract (the average noise of the previous day multiplied by a multiple) from the lowest price of today to get the stop line. To offset the fluctuation and ensure the upward movement of the stop line, take the highest value within the N days (generally 3 days) on the basis of the above result
 
+    Note: the calculation reads the input as the low price series, so pass LOW(); a missing value is left out of the window (like HHV and LLV), and a window of nothing but missing values gives back nan.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n1: the lookback time window for calculating the average noise
     :param int|Indicator|IndParam n2: take the highest value within the n2 days for the preliminary stop line
@@ -1105,6 +1107,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Combine the results of at most 6 Indicators together in one Indicator. E.g. ind = WEAVE(ind1, ind2), then ind contains the multiple results at this time, stored in the order of ind1 and ind2.
     
+    Note: every operand must be as long as the context, otherwise an exception is thrown. A data only tree, which has no context, merges its operands at the right end of the longest one.
+    
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
     :param Indicator ind3: the indicator 3, which can be omitted
@@ -1212,6 +1216,8 @@ void export_Indicator_build_in(py::module& m) {
     Usage: IF(X,A,B); if X is not 0, return A, otherwise return B
 
     For example: IF(CLOSE>OPEN,HIGH,LOW) means that if this period closes bullish, return the highest value, otherwise return the lowest value
+
+    Note: every operand must be as long as the context, otherwise an exception is thrown
 
     :param Indicator x: the condition indicator
     :param Indicator a: the candidate indicator a
@@ -2242,6 +2248,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Remove the nan values
 
+    Note: a row is removed once any of its results is nan, and all the results keep the same rows
+
     :param Indicator data: the input data
     :rtype: Indicator)");
 
@@ -2330,6 +2338,8 @@ void export_Indicator_build_in(py::module& m) {
     
     The maximum drawdown percentage (when n=0, there is no time window limit), which is a positive value by the industry convention
     
+    Note: a value which is not positive, or nan, gives back nan.
+    
     :param Indicator data: the input data
     :param int n: the time window
     :rtype: Indicator)");
@@ -2339,6 +2349,8 @@ void export_Indicator_build_in(py::module& m) {
           R"(MDD_CURRENT([data])
     
     The drawdown percentage from the current point to the historical highest point, which is a positive value by the industry convention
+    
+    Note: a value which is not positive, or nan, gives back nan.
     
     :param Indicator data: the input data
     :rtype: Indicator)");
@@ -2873,6 +2885,8 @@ void export_Indicator_build_in(py::module& m) {
 
     The limit-up judgment logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
 
+    Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
+
     :rtype: Indicator)");
 
     m.def("ISLIMITUP", ISLIMITUP2, py::arg("kdata"), R"(ISLIMITUP(kdata)
@@ -2894,6 +2908,8 @@ void export_Indicator_build_in(py::module& m) {
     - The ST stocks have a limit-down range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
     The limit-down judgment logic: the close price of the day <= the close price of the previous day × (1 - the limit-down range)
+
+    Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
 
     :rtype: Indicator)");
 

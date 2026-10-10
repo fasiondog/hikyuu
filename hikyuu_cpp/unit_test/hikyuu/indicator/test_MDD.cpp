@@ -237,4 +237,50 @@ TEST_CASE("test_MDD_export") {
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
+/**
+ * @par Test points
+ * The whole MDD family returns null for a nan or non positive input, the same rule as MDD_CURRENT,
+ * instead of filling zeros or a ratio above 100%.
+ */
+TEST_CASE("test_MDD_nan_and_non_positive") {
+    const double nan = std::numeric_limits<double>::quiet_NaN();
+    PriceList data{100.0, 105.0, 90.0, nan, -5.0, 90.0, 110.0};
+    Indicator ind = PRICELIST(data);
+
+    /** @arg the whole series form gives null at the invalid points */
+    Indicator mdd_all = MDD(ind, 0);
+    CHECK_EQ(mdd_all.size(), 7);
+    CHECK_EQ(mdd_all[0], 0.0);
+    CHECK_EQ(mdd_all[1], 0.0);
+    CHECK_EQ(mdd_all[2], doctest::Approx(14.2857).epsilon(0.0001));
+    CHECK_UNARY(std::isnan(mdd_all[3]));
+    CHECK_UNARY(std::isnan(mdd_all[4]));
+    CHECK_EQ(mdd_all[5], doctest::Approx(14.2857).epsilon(0.0001));
+    CHECK_EQ(mdd_all[6], doctest::Approx(14.2857).epsilon(0.0001));
+
+    /** @arg the single bar window gives zero for a valid bar and null for an invalid one */
+    Indicator mdd_one = MDD(ind, 1);
+    CHECK_EQ(mdd_one[0], 0.0);
+    CHECK_EQ(mdd_one[1], 0.0);
+    CHECK_EQ(mdd_one[2], 0.0);
+    CHECK_UNARY(std::isnan(mdd_one[3]));
+    CHECK_UNARY(std::isnan(mdd_one[4]));
+    CHECK_EQ(mdd_one[5], 0.0);
+    CHECK_EQ(mdd_one[6], 0.0);
+
+    /** @arg a leading invalid point does not spoil the following one */
+    PriceList lead{nan, 100.0, 90.0};
+    Indicator mdd_lead = MDD(PRICELIST(lead), 0);
+    CHECK_UNARY(std::isnan(mdd_lead[0]));
+    CHECK_EQ(mdd_lead[1], 0.0);
+    CHECK_EQ(mdd_lead[2], doctest::Approx(10.0).epsilon(0.0001));
+
+    /** @arg a series of non positive values has no defined drawdown at all */
+    PriceList zeros{0.0, 0.0, 0.0};
+    Indicator mdd_zeros = MDD(PRICELIST(zeros), 0);
+    for (size_t i = 0; i < mdd_zeros.size(); ++i) {
+        CHECK_UNARY(std::isnan(mdd_zeros[i]));
+    }
+}
+
 /** @} */

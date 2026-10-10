@@ -7,12 +7,51 @@
 
 #include "../test_config.h"
 #include <fstream>
+#include <cmath>
+#include <hikyuu/KDataPrivatedBufferImp.h>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/RSRS_BULL.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 
 using namespace hku;
 using value_t = Indicator::value_t;
+
+/** @par Test points */
+TEST_CASE("test_RSRS_BULL_invalid_head") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    REQUIRE_FALSE(stock.isNull());
+
+    // The first four bars have no range at all, so every beta of the first z window is invalid
+    KRecordList records;
+    Datetime date(2010, 1, 1);
+    for (size_t i = 0; i < 4; ++i) {
+        records.push_back(KRecord(date + Days(i), 10., 10., 10., 10., 1000., 100.));
+    }
+    // The following bars move, so the later windows do hold valid betas
+    for (size_t i = 4; i < 14; ++i) {
+        price_t low = 10. + (i % 3);
+        price_t high = 12. + (i % 5);
+        records.push_back(KRecord(date + Days(i), low, high, low, high, 1000., 100.));
+    }
+
+    KData kdata =
+      KData(make_shared<KDataPrivatedBufferImp>(stock, KQuery(0, records.size()), records));
+    REQUIRE_EQ(kdata.size(), 14);
+
+    Indicator result = RSRS_BULL(kdata, 2, 3);
+    REQUIRE_EQ(result.size(), 14);
+
+    /** @arg the invalid head stays null, the discard is not moved */
+    CHECK_EQ(result.discard(), 3);
+    for (size_t i = 0; i < result.discard(); ++i) {
+        CHECK_UNARY(std::isnan(result.get(i, 0)));
+    }
+
+    /** @arg the later windows are still calculated, instead of a whole null series */
+    CHECK_UNARY(!std::isnan(result.get(5, 0)));
+    CHECK_UNARY(!std::isnan(result.get(13, 0)));
+    CHECK_UNARY(!std::isnan(result.get(13, 3)));
+}
 
 TEST_CASE("test_RSRS_BULL") {
     // Test the parameter validation

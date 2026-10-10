@@ -42,7 +42,7 @@ void IIsLastBar::_calculate(const Indicator &data) {
 
     auto *dst = this->data() + m_discard;
     memset(dst, 0, sizeof(value_t) * len);
-    dst[total - 1] = 1.;
+    dst[len - 1] = 1.;
 }
 
 Indicator HKU_API ISLASTBAR() {

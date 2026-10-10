@@ -59,6 +59,15 @@ void IFactor::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
 
     auto value = m_factor.getValue(k);
+    if (!value.getImp() || value.size() != total) {
+        HKU_WARN(
+          "The factor [{}] gives no value of the context length ({} vs {}), the result is "
+          "null!",
+          m_factor.name(), value.size(), total);
+        m_discard = total;
+        return;
+    }
+
     value.setContext(k);
     m_discard = value.discard();
     value.getImp()->swap(this);

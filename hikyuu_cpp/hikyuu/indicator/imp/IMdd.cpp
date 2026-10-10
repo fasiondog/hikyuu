@@ -40,19 +40,24 @@ void IMdd::_calculate(const Indicator& ind) {
 
     if (n == 1) {
         for (size_t i = m_discard; i < total; ++i) {
-            dst[i] = 0.0;
+            dst[i] = (std::isnan(src[i]) || src[i] <= 0.0) ? Null<value_t>() : 0.0;
         }
         return;
     }
 
     if (n == total - m_discard) {
-        value_t pre_max = src[m_discard];
+        value_t pre_max = 0.0;
         value_t min_dd = 0.0;
         for (size_t i = m_discard; i < total; i++) {
-            if (src[i] > pre_max) {
-                pre_max = src[i];
+            value_t cur = src[i];
+            if (std::isnan(cur) || cur <= 0.0) {
+                dst[i] = Null<value_t>();
+                continue;
             }
-            value_t dd = (src[i] >= pre_max || pre_max == 0.) ? 0.0 : (src[i] - pre_max) / pre_max;
+            if (cur > pre_max) {
+                pre_max = cur;
+            }
+            value_t dd = (cur - pre_max) / pre_max;  // pre_max >= cur > 0 here
             if (dd < min_dd) {
                 min_dd = dd;
             }
@@ -61,13 +66,18 @@ void IMdd::_calculate(const Indicator& ind) {
         return;
     }
 
-    value_t pre_max = src[m_discard];
+    value_t pre_max = 0.0;
     value_t min_dd = 0.0;
     for (size_t i = m_discard; i < m_discard + n; ++i) {
-        if (src[i] > pre_max) {
-            pre_max = src[i];
+        value_t cur = src[i];
+        if (std::isnan(cur) || cur <= 0.0) {
+            dst[i] = Null<value_t>();
+            continue;
         }
-        value_t dd = (src[i] >= pre_max || pre_max == 0.) ? 0.0 : (src[i] - pre_max) / pre_max;
+        if (cur > pre_max) {
+            pre_max = cur;
+        }
+        value_t dd = (cur - pre_max) / pre_max;  // pre_max >= cur > 0 here
         if (dd < min_dd) {
             min_dd = dd;
         }
@@ -105,8 +115,7 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
     for (size_t i = start_pos; i < total; ++i) {
         Indicator::value_t current_nav = src[i];
         if (std::isnan(current_nav) || current_nav <= 0.0) {
-            // An invalid point does not write dst[i] and keeps the original value, the same as the
-            // original semantics
+            dst[i] = Null<value_t>();
             continue;
         }
 

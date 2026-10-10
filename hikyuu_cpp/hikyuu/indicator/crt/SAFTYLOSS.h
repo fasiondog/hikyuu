@@ -52,7 +52,8 @@ Indicator HKU_API SAFTYLOSS(const IndParam& n1, const IndParam& n2, const IndPar
  * </pre>
  * @note: the first (lookback period width + the width for taking the highest value) points in the
  *        returned result are invalid
- * @param data the input data, a single input
+ * @param data the input data, a single input; the calculation reads it as the low price series, so
+ *             pass LOW()
  * @param n1 the lookback time window for calculating the average noise, 10 days by default
  * @param n2 take the highest value within n2 days for the preliminary stop-loss line, 3 by default
  * @param p the noise coefficient, 2 by default

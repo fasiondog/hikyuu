@@ -65,7 +65,7 @@ void IPriceList::_calculate(const Indicator& data) {
         auto tmp = ALIGN(PRICELIST(x, std::move(align_dates), x_discard), k);
         HKU_ASSERT(tmp.size() == total);
         auto* dst = this->data();
-        auto* src = x.data();
+        auto const* src = tmp.data();
         for (size_t i = tmp.discard(); i < total; ++i) {
             dst[i] = src[i];
         }

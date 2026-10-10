@@ -15,7 +15,8 @@ namespace hku {
  * Maximum drawdown percentage (there is no time window limit when n=0); it is a positive value as
  * per the industry convention
 
- * @note the values less than or equal to 0 and the nan values are not handled
+ * @note the values less than or equal to 0 and the nan values are not handled, nan is returned at
+ *       those positions
 
  * @param n time window size
 

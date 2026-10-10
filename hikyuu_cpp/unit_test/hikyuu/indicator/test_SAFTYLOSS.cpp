@@ -22,7 +22,63 @@ using namespace hku;
  * @{
  */
 
-/** @par Test points */
+/**
+ * @par Test points
+ * A window which holds no valid point at all has no stop loss line: zero would claim that none is
+ * needed.
+ *
+ * A window which keeps some valid points leaves the missing ones out, the same way as HHV, LLV and
+ * MA do.
+ */
+TEST_CASE("test_SAFTYLOSS_missing_points") {
+    PriceList px;
+    for (size_t i = 0; i < 30; ++i) {
+        px.push_back(i < 18 ? Null<price_t>() : price_t(10. + i * 0.1));
+    }
+    Indicator src = PRICELIST(px);
+
+    Indicator result = SAFTYLOSS(src, 10, 3, 2.0);
+    REQUIRE_EQ(result.size(), 30);
+    CHECK_EQ(result.discard(), 11);
+
+    /** @arg the bars whose window is all missing give null, not zero */
+    for (size_t i = 11; i < 18; ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    /** @arg the valid part is not touched */
+    for (size_t i = 18; i < 30; ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+
+    /** @arg a window with some valid points keeps its value, the missing bar is left out */
+    PriceList mixed;
+    for (size_t i = 0; i < 24; ++i) {
+        mixed.push_back(price_t(10. + (i % 5)));
+    }
+    mixed[20] = Null<price_t>();
+    Indicator mixed_src = PRICELIST(mixed);
+    Indicator mixed_result = SAFTYLOSS(mixed_src, 10, 3, 2.0);
+    for (size_t i = mixed_result.discard(); i < mixed_result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(mixed_result[i]));
+    }
+
+    /** @arg the dynamic path agrees with the static one */
+    Indicator dyn = SAFTYLOSS(src, CVAL(src, 10), CVAL(src, 3), CVAL(src, 2.0));
+    CHECK_EQ(dyn.size(), result.size());
+    for (size_t i = 0; i < dyn.size(); ++i) {
+        if (std::isnan(result[i])) {
+            CHECK_UNARY(std::isnan(dyn[i]));
+        } else {
+            CHECK_EQ(dyn[i], doctest::Approx(result[i]));
+        }
+    }
+    Indicator mixed_dyn =
+      SAFTYLOSS(mixed_src, CVAL(mixed_src, 10), CVAL(mixed_src, 3), CVAL(mixed_src, 2.0));
+    for (size_t i = mixed_dyn.discard(); i < mixed_dyn.size(); ++i) {
+        CHECK_UNARY(!std::isnan(mixed_dyn[i]));
+    }
+}
+
 TEST_CASE("test_SAFTYLOSS") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
@@ -176,7 +232,7 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
         }
     }
 
-    /** @arg The dynamic n1 below 2 or n2 below 2 yield Null at those bars */
+    /** @arg The dynamic n1 below 2 yields Null at those bars */
     PriceList bad1, bad2;
     for (int i = 0; i < 16; ++i) {
         bad1.push_back(i < 3 ? 1.0 : 3.0);
@@ -186,10 +242,22 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
     for (size_t i = 0; i < 3; ++i) {
         CHECK_UNARY(std::isnan(result[i]));
     }
-    CHECK_UNARY(std::isnan(result[4]));
+    /** @arg a dynamic n2 of 1 is a window of one bar, calculated like the static path does */
+    Indicator n2_one = SAFTYLOSS(SLICE(src, 0, 5), 3, 1, 2.0);
+    REQUIRE_UNARY(!std::isnan(n2_one[n2_one.size() - 1]));
+    CHECK_EQ(n2_one[n2_one.size() - 1], doctest::Approx(result[4]));
     for (size_t i = 5; i < src.size(); ++i) {
         Indicator expect_prefix = SAFTYLOSS(SLICE(src, 0, i + 1), 3, 2, 2.0);
         CHECK_EQ(expect_prefix[expect_prefix.size() - 1], doctest::Approx(result[i]));
+    }
+
+    /** @arg a whole dynamic n2 of 1 matches the static path, instead of a null series */
+    Indicator dyn_one = SAFTYLOSS(src, CVAL(src, 3), CVAL(src, 1), CVAL(src, 2.0));
+    Indicator static_one = SAFTYLOSS(src, 3, 1, 2.0);
+    CHECK_EQ(dyn_one.size(), static_one.size());
+    CHECK_EQ(dyn_one.discard(), static_one.discard());
+    for (size_t i = dyn_one.discard(); i < dyn_one.size(); ++i) {
+        CHECK_EQ(dyn_one[i], doctest::Approx(static_one[i]));
     }
 }
 

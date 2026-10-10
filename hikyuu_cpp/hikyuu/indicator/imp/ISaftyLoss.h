@@ -41,7 +41,12 @@ public:
     virtual void _dyn_calculate(const Indicator&) override;
 
 private:
+    // Measured on macOS arm64 release; below this the dispatch costs more than it saves
+    static constexpr size_t MIN_PARALLEL_WORK = 250000;
+
     void _dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, double p);
+
+    static value_t _calcOneBar(const value_t* src, size_t i, int n1, int n2, double p);
 };
 
 } /* namespace hku */

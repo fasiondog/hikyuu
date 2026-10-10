@@ -22,8 +22,7 @@ IIsLimitUp::~IIsLimitUp() {}
 
 void IIsLimitUp::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
-                "The input is ignored because {} depends on the context!",
-                getParam<string>("kpart"));
+                "The input is ignored because {} depends on the context!", name());
 
     size_t total = getContext().size();
     HKU_IF_RETURN(total == 0, void());
@@ -31,6 +30,11 @@ void IIsLimitUp::_calculate(const Indicator& ind) {
     _readyBuffer(total, 1);
     m_discard = 1;  // No previous K-line, so the limit up cannot be judged; discard it
     _increment_calculate(ind, 1);
+}
+
+size_t IIsLimitUp::min_increment_start() const {
+    // ks[i - 1] is read, so the first bar of the context cannot be judged
+    return 1;
 }
 
 void IIsLimitUp::_increment_calculate(const Indicator& data, size_t start_pos) {

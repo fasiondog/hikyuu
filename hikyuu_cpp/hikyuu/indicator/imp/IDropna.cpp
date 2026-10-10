@@ -55,19 +55,19 @@ void IDropna::_calculate(const Indicator& ind) {
         if (!has_nan) {
             dates.push_back(ind.getDatetime(i));
             for (size_t r = 0; r < m_result_num; r++) {
-                buf[pos + r * m_result_num] = ind.get(i, r);
+                buf[pos * m_result_num + r] = ind.get(i, r);
             }
             pos++;
         }
     }
 
-    _readyBuffer(pos / m_result_num, m_result_num);
+    // pos counts the kept rows, one row holds m_result_num values
+    _readyBuffer(pos, m_result_num);
 
     for (size_t r = 0; r < m_result_num; r++) {
         auto* dst = this->data(r);
-        int start = r * m_result_num;
         for (size_t i = 0; i < pos; i++) {
-            dst[i] = buf[start + i];
+            dst[i] = buf[i * m_result_num + r];
         }
     }
 

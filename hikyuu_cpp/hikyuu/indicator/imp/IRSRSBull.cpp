@@ -112,42 +112,45 @@ void IRSRSBull::_calculate(const Indicator&) {
         }
     }
 
+    // Each window judges its own valid betas: a first window without enough of them must not skip
+    // every following one
+    value_t mean_beta = 0.0, var_beta = 0.0, std_beta = 0.0;
     if (valid_count >= 2) {
-        value_t mean_beta = sum_beta / valid_count;
-        value_t var_beta = (sum_beta2 - sum_beta * sum_beta / valid_count) / (valid_count - 1);
-        value_t std_beta = std::sqrt(var_beta);
+        mean_beta = sum_beta / valid_count;
+        var_beta = (sum_beta2 - sum_beta * sum_beta / valid_count) / (valid_count - 1);
+        std_beta = std::sqrt(var_beta);
 
         if (std_beta > 0.0 && !std::isnan(beta[z_start])) {
             z[z_start] = (beta[z_start] - mean_beta) / std_beta;
             bull[z_start] = z[z_start] * r2[z_start] * beta[z_start];
         }
+    }
 
-        // Calculate the following Z-scores and the level 4 correction values in a rolling way
-        for (size_t i = z_start + 1; i < total; i++) {
-            // Remove the oldest beta
-            size_t oldest_idx = i - m;
-            if (oldest_idx >= start_idx && !std::isnan(beta[oldest_idx])) {
-                sum_beta -= beta[oldest_idx];
-                sum_beta2 -= beta[oldest_idx] * beta[oldest_idx];
-                valid_count--;
-            }
+    // Calculate the following Z-scores and the level 4 correction values in a rolling way
+    for (size_t i = z_start + 1; i < total; i++) {
+        // Remove the oldest beta
+        size_t oldest_idx = i - m;
+        if (oldest_idx >= start_idx && !std::isnan(beta[oldest_idx])) {
+            sum_beta -= beta[oldest_idx];
+            sum_beta2 -= beta[oldest_idx] * beta[oldest_idx];
+            valid_count--;
+        }
 
-            // Add the new beta
-            if (!std::isnan(beta[i])) {
-                sum_beta += beta[i];
-                sum_beta2 += beta[i] * beta[i];
-                valid_count++;
-            }
+        // Add the new beta
+        if (!std::isnan(beta[i])) {
+            sum_beta += beta[i];
+            sum_beta2 += beta[i] * beta[i];
+            valid_count++;
+        }
 
-            if (valid_count >= 2) {
-                mean_beta = sum_beta / valid_count;
-                var_beta = (sum_beta2 - sum_beta * sum_beta / valid_count) / (valid_count - 1);
-                std_beta = std::sqrt(var_beta);
+        if (valid_count >= 2) {
+            mean_beta = sum_beta / valid_count;
+            var_beta = (sum_beta2 - sum_beta * sum_beta / valid_count) / (valid_count - 1);
+            std_beta = std::sqrt(var_beta);
 
-                if (std_beta > 0.0 && !std::isnan(beta[i])) {
-                    z[i] = (beta[i] - mean_beta) / std_beta;
-                    bull[i] = z[i] * r2[i] * beta[i];
-                }
+            if (std_beta > 0.0 && !std::isnan(beta[i])) {
+                z[i] = (beta[i] - mean_beta) / std_beta;
+                bull[i] = z[i] * r2[i] * beta[i];
             }
         }
     }

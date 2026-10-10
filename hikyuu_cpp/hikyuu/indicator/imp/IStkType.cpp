@@ -22,8 +22,7 @@ IStkType::~IStkType() {}
 
 void IStkType::_calculate(const Indicator& ind) {
     HKU_WARN_IF(!isLeaf() && !ind.empty(),
-                "The input is ignored because {} depends on the context!",
-                getParam<string>("kpart"));
+                "The input is ignored because {} depends on the context!", name());
 
     size_t total = getContext().size();
     HKU_IF_RETURN(total == 0, void());
