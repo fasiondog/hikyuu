@@ -15,7 +15,12 @@ class HKU_API KDataPrivatedBufferImp : public KDataImp {
 public:
     KDataPrivatedBufferImp();
     KDataPrivatedBufferImp(const Stock& stock, const KQuery& query);
+    
+    // Used by the affiliated projects: the krecords are taken as-is, the recovery is NOT applied,
+    // and startPos/endPos are recomputed from the query, so the caller must ensure krecords
+    // correspond to the query range.
     KDataPrivatedBufferImp(const Stock& stock, const KQuery& query, const KRecordList& krecords);
+    
     virtual ~KDataPrivatedBufferImp() override;
 
     virtual bool empty() const noexcept override {
