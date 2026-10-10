@@ -1029,8 +1029,8 @@ TEST_CASE("test_indicator_imp_not_copyable") {
 TEST_CASE("test_indicator_execute_mod") {
     const double nan = Null<double>();
     const double inf = std::numeric_limits<double>::infinity();
-    const double i64_min = -9223372036854775808.0;   // -2^63, exactly INT64_MIN
-    const double over = 9223372036854775808.0;       // 2^63, out of int64 range
+    const double i64_min = -9223372036854775808.0;  // -2^63, exactly INT64_MIN
+    const double over = 9223372036854775808.0;      // 2^63, out of int64 range
 
     PriceList a, b;
     for (double v : {7.0, 7.0, nan, inf, i64_min, over}) {
@@ -1624,6 +1624,17 @@ TEST_CASE("test_indicator_cleared_buffer_accessors") {
     child->updateDiscard();
     child->updateDiscard(true);
     CHECK_EQ(child->discard(), 0u);
+}
+
+/** @par Test points */
+TEST_CASE("test_indicator_accessors_without_imp") {
+    Indicator empty{IndicatorImpPtr{}};
+
+    /** @arg reading a value of an indicator without an implementation gives null */
+    CHECK_UNARY(std::isnan(empty.get(0, 0)));
+    CHECK_UNARY(std::isnan(empty[0]));
+    CHECK_UNARY(std::isnan(empty.front()));
+    CHECK_UNARY(std::isnan(empty.back()));
 }
 
 /** @} */

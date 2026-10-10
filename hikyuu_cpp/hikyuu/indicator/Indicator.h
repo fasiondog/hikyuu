@@ -360,15 +360,15 @@ inline Indicator::value_t Indicator::operator[](size_t pos) const {
 }
 
 inline Indicator::value_t Indicator::get(size_t pos, size_t num) const {
-    return m_imp->get(pos, num);
+    return m_imp ? m_imp->get(pos, num) : Null<value_t>();
 }
 
 inline Indicator::value_t Indicator::front(size_t num) const {
-    return m_imp->front(num);
+    return m_imp ? m_imp->front(num) : Null<value_t>();
 }
 
 inline Indicator::value_t Indicator::back(size_t num) const {
-    return m_imp->back(num);
+    return m_imp ? m_imp->back(num) : Null<value_t>();
 }
 
 inline Datetime Indicator::getDatetime(size_t pos) const {
