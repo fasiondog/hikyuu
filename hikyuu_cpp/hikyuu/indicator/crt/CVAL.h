@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef CVAL_H_
-#define CVAL_H_
+#ifndef INDICATOR_CRT_CVAL_H_
+#define INDICATOR_CRT_CVAL_H_
 
 #include "../Indicator.h"
 
@@ -40,4 +40,4 @@ Indicator HKU_API CVAL(const Indicator& ind, double value = 0.0, int discard = 0
 
 } /* namespace */
 
-#endif /* CVAL_H_ */
+#endif /* INDICATOR_CRT_CVAL_H_ */

@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef INDICATOR_CRT_LASTBAR_H_
-#define INDICATOR_CRT_LASTBAR_H_
+#ifndef INDICATOR_CRT_ISLASTBAR_H_
+#define INDICATOR_CRT_ISLASTBAR_H_
 
 #include "../Indicator.h"
 
@@ -26,4 +26,4 @@ inline Indicator ISLASTBAR(const Indicator& ind) {
 
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_LASTBAR_H_ */
+#endif /* INDICATOR_CRT_ISLASTBAR_H_ */

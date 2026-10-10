@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef EMA_H_
-#define EMA_H_
+#ifndef INDICATOR_CRT_EMA_H_
+#define INDICATOR_CRT_EMA_H_
 
 #include "../Indicator.h"
 
@@ -41,4 +41,4 @@ inline Indicator EMA(const Indicator& data, const Indicator& n) {
 
 }  // namespace hku
 
-#endif /* EMA_H_ */
+#endif /* INDICATOR_CRT_EMA_H_ */

@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef WMA_H_
-#define WMA_H_
+#ifndef INDICATOR_CRT_WMA_H_
+#define INDICATOR_CRT_WMA_H_
 
 #include "../Indicator.h"
 
@@ -50,4 +50,4 @@ inline Indicator WMA(const Indicator& ind, const Indicator& n) {
 
 }  // namespace hku
 
-#endif /* MA_H_ */
+#endif /* INDICATOR_CRT_WMA_H_ */

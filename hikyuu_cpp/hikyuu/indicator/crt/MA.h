@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef MA_H_
-#define MA_H_
+#ifndef INDICATOR_CRT_MA_H_
+#define INDICATOR_CRT_MA_H_
 
 #include "../Indicator.h"
 
@@ -43,4 +43,4 @@ inline Indicator MA(const Indicator& ind, const Indicator& n) {
 
 }  // namespace hku
 
-#endif /* MA_H_ */
+#endif /* INDICATOR_CRT_MA_H_ */

@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef MACD_H_
-#define MACD_H_
+#ifndef INDICATOR_CRT_MACD_H_
+#define INDICATOR_CRT_MACD_H_
 
 #include "../Indicator.h"
 
@@ -59,4 +59,4 @@ inline Indicator MACD(const Indicator& data, const Indicator& n1, const Indicato
 
 }  // namespace hku
 
-#endif /* MACD_H_ */
+#endif /* INDICATOR_CRT_MACD_H_ */
