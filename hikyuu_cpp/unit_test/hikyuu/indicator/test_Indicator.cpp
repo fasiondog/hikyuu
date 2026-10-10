@@ -1535,4 +1535,52 @@ TEST_CASE("test_indicator_get_param_without_imp") {
     CHECK_UNARY(param_message.find("out_of_range in Parameter::get") != string::npos);
 }
 
+/**
+ * @par Test points
+ * IndicatorImp::_dyn_calculate maps a per-bar dynamic parameter value whose size_t cast would be
+ * UB or silently truncate (NaN / ±Inf / negative / fractional / oversized) to a Null result slot,
+ * matching the previous NaN behavior; valid integer bars still compute normally.
+ */
+TEST_CASE("test_indicator_dyn_step_invalid_bar") {
+    PriceList src;
+    for (int i = 0; i < 12; ++i) {
+        src.push_back(10.0 + i);
+    }
+    Indicator x = PRICELIST(src);
+    const double inf = std::numeric_limits<double>::infinity();
+
+    auto bad_bar_is_null = [&](const PriceList& n_values, size_t bad_idx, const string& tag) {
+        Indicator r = MA(x, IndParam(PRICELIST(n_values)));
+        INFO(tag);
+        CHECK_EQ(r.size(), src.size());
+        CHECK_UNARY(std::isnan(r[bad_idx]));
+        // neighboring valid bars must still be computed
+        CHECK_UNARY(!std::isnan(r[r.discard()]));
+    };
+
+    /** @arg negative step yields Null at that bar */
+    bad_bar_is_null(PriceList{5.0, 4.0, -1.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2,
+                    "negative");
+    /** @arg fractional step yields Null at that bar */
+    bad_bar_is_null(PriceList{5.0, 4.0, 3.5, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2,
+                    "fractional");
+    /** @arg +Inf step yields Null at that bar */
+    bad_bar_is_null(PriceList{5.0, 4.0, inf, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2,
+                    "inf");
+    /** @arg NaN step still yields Null at that bar (regression guard for the original behavior) */
+    bad_bar_is_null(
+      PriceList{5.0, 4.0, Null<double>(), 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2, "nan");
+
+    /** @arg an all-integer series computes normally (no bad bar) */
+    PriceList ok;
+    for (int i = 0; i < 12; ++i) {
+        ok.push_back(3.0);
+    }
+    Indicator r_ok = MA(x, IndParam(PRICELIST(ok)));
+    CHECK_FALSE(r_ok.empty());
+    for (size_t i = r_ok.discard(); i < r_ok.size(); ++i) {
+        CHECK_UNARY(!std::isnan(r_ok[i]));
+    }
+}
+
 /** @} */

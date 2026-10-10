@@ -1527,14 +1527,22 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     const value_t *param_data = ind_param->data();
 
+    // A non-finite / negative / fractional / oversized value would make size_t(v) UB or silently
+    // truncate; those bars fall into the same Null slot the NaN branch already emits, rather than
+    // aborting the whole series
+    static constexpr value_t STEP_UPPER_BOUND = value_t(1ull << 53);
+    auto is_valid_step = [](value_t v) {
+        return std::isfinite(v) && v >= 0.0 && v < STEP_UPPER_BOUND && v == std::floor(v);
+    };
+
     static constexpr size_t minCircleLength = 400;
     if (total < minCircleLength || isSerial()) {
         for (size_t i = ind.discard(); i < total; i++) {
-            if (std::isnan(param_data[i])) {
-                _set(Null<value_t>(), i);
+            value_t v = param_data[i];
+            if (is_valid_step(v)) {
+                _dyn_run_one_step(ind, i, size_t(v));
             } else {
-                size_t step = size_t(param_data[i]);
-                _dyn_run_one_step(ind, i, step);
+                _set(Null<value_t>(), i);
             }
         }
         updateDiscard();
@@ -1543,12 +1551,12 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     global_parallel_for_index_void(
       ind.discard(), total,
-      [&ind, param_data, this](size_t i) {
-          if (std::isnan(param_data[i])) {
-              _set(Null<value_t>(), i);
+      [&ind, param_data, is_valid_step, this](size_t i) {
+          value_t v = param_data[i];
+          if (is_valid_step(v)) {
+              _dyn_run_one_step(ind, i, size_t(v));
           } else {
-              size_t step = size_t(param_data[i]);
-              _dyn_run_one_step(ind, i, step);
+              _set(Null<value_t>(), i);
           }
       },
       minCircleLength);
