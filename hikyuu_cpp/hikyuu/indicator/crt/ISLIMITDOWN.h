@@ -27,6 +27,9 @@ namespace hku {
  * - The first K-line data is marked as discard because the previous day data is missing
  * - An unsupported stock type returns the non-limit-down state by default
  * - The calculation result is a boolean value: 1 means limit down, 0 means not limit down
+ * - The ranges follow the current rules of each board, without date segmentation: the ChiNext
+ *   stocks were limited to 10% before 2020-08-24 and a new listing has no range limit in its
+ *   first days, both of which are judged by the current range
  *
  * <pre>
  * Example:

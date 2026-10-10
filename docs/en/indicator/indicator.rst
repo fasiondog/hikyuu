@@ -1271,6 +1271,8 @@ Built-in Technical Indicators
 
     The limit-down judgment logic: the close price of the day <= the close price of the previous day × (1 - the limit-down range)
 
+    Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
+
     :param KData kdata: the K-line data
     :rtype: Indicator
 
@@ -1287,6 +1289,8 @@ Built-in Technical Indicators
     - The ST stocks have a limit-up range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
     The limit-up judgment logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
+
+    Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
 
     :param KData kdata: the K-line data
     :rtype: Indicator
