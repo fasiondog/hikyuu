@@ -1279,12 +1279,14 @@ void IndicatorImp::execute_mul() {
 
 void IndicatorImp::execute_div() {
     BinaryLayout ly = prepareBinaryOp();
+    value_t null_value = Null<value_t>();
     for (size_t r = 0; r < ly.result_num; ++r) {
         auto const *left = m_left->data(r);
         auto const *right = m_right->data(r);
         auto *result = this->data(r);
         for (size_t i = ly.start_pos; i < ly.total; ++i) {
-            result[i] = left[i - ly.left_offset] / right[i - ly.right_offset];
+            value_t rv = right[i - ly.right_offset];
+            result[i] = rv == 0.0 ? null_value : left[i - ly.left_offset] / rv;
         }
     }
 }

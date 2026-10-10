@@ -307,7 +307,7 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.discard(), 0);
     for (size_t i = 0; i < 10; ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY((std::isinf(result[i]) || std::isnan(result[i])));
+            CHECK_UNARY(std::isnan(result[i]));
         } else {
             CHECK_EQ(result[i], doctest::Approx(data2[i] / data1[i]));
         }
@@ -330,11 +330,20 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.size(), k.size());
     for (size_t i = 0; i < result.size(); ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY(std::isinf(result[i]) || std::isnan(result[i]));
+            CHECK_UNARY(std::isnan(result[i]));
         } else {
             CHECK_EQ(result[i], doctest::Approx(k[i] / data1[i]));
         }
     }
+
+    /** @arg 0/0 and x/0 yield null, a NaN divisor still propagates NaN */
+    const double nan = Null<double>();
+    Indicator z1 = PRICELIST(PriceList{0.0, 1.0, 2.0});
+    Indicator z2 = PRICELIST(PriceList{0.0, 0.0, nan});
+    Indicator zr = z1 / z2;
+    CHECK_UNARY(std::isnan(zr[0]));
+    CHECK_UNARY(std::isnan(zr[1]));
+    CHECK_UNARY(std::isnan(zr[2]));
 }
 
 #if ENABLE_BENCHMARK_TEST

@@ -36,15 +36,20 @@ vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& in
 /**
  * Indicator implementation class; when defining a new indicator, this class should be inherited
  *
- * @note The invalid prefix of a result is declared by the implementation itself (m_discard /
- * setDiscard); it is never derived by scanning the produced values, and the framework does not
- * adjust it for the full calculation. Two kinds of formulas declare it differently:
- * - window based (MA, SUM, STD, VAR, STDEV, HHV, LLV, WMA, SLOPE, CORR ...): a result of a window
- *   that is not full has no meaning, so declare data.discard() + window - 1
- * - recursive (EMA, SMA, DMA, MACD, AMA, KALMAN, Wilder ATR): seeded from the first bar by
- *   definition, so declare what the seeding rule needs, which is not the window rule
- * An indicator whose window is documented as unlimited when its size is 0 (MDD, MRR) computes over
- * the available history on purpose, which is not a warm up value to discard
+ * @note Conventions on declaring and producing results:
+ * 1. The invalid prefix of a result is declared by the implementation itself (m_discard /
+ *    setDiscard); it is never derived by scanning the produced values, and the framework does
+ *    not adjust it for the full calculation.
+ * 2. Window based formulas (MA, SUM, STD, VAR, STDEV, HHV, LLV, WMA, SLOPE, CORR ...): a result
+ *    of a window that is not full has no meaning, so declare data.discard() + window - 1.
+ * 3. Recursive formulas (EMA, SMA, DMA, MACD, AMA, KALMAN, Wilder ATR): seeded from the first bar
+ *    by definition, so declare what the seeding rule needs, which is not the window rule.
+ * 4. An indicator whose window is documented as unlimited when its size is 0 (MDD, MRR) computes
+ *    over the available history on purpose, which is not a warm up value to discard.
+ * 5. An undefined financial state yields Null, never 0.0 or infinity: zero divisor (operators div
+ *    and mod), zero variance (BETA, CORR, SLOPE), all-missing window (SAFTYLOSS), zero baseline
+ *    (the cumulative profit curve). 0.0 collides with legitimate zero values, inf poisons every
+ *    downstream window aggregate; Null (NaN) is the no-data marker that propagates on purpose.
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {

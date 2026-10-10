@@ -141,7 +141,7 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 6)
 
         a = x2 / x1
-        self.assertTrue(isinf(a[0]))
+        self.assertTrue(isnan(a[0]))
         self.assertEqual(a[1], 2)
         self.assertEqual(a[2], 1.5)
         self.assertTrue(abs(a[3] - 4.0 / 3.0) < 0.0001)
@@ -153,7 +153,7 @@ class IndicatorTest(unittest.TestCase):
         self.assertEqual(a[3], 6)
 
         a = 2. / x1
-        self.assertTrue(isinf(a[0]))
+        self.assertTrue(isnan(a[0]))
         self.assertEqual(a[1], 2.0)
         self.assertEqual(a[2], 1.)
         self.assertTrue(abs(a[3] - 2.0/3.0) < 0.0001)
