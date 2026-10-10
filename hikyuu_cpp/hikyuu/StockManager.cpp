@@ -98,7 +98,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_thread_id = std::this_thread::get_id();
     // Roll back the init flags on any exception so a failed init can be retried
     struct Guard {
-        bool& initializing;
+        std::atomic_bool& initializing;
         std::thread::id& thread_id;
         bool committed{false};
         ~Guard() {
@@ -670,11 +670,12 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 }
 
 void StockManager::reload() {
+    std::lock_guard<std::mutex> lock(m_init_mutex);
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
     // Reset the flag even if loadData throws, so reload is not permanently gated out
     struct Guard {
-        bool& initializing;
+        std::atomic_bool& initializing;
         ~Guard() {
             initializing = false;
         }
@@ -689,11 +690,12 @@ void StockManager::reload() {
 }
 
 void StockManager::reloadWith(const StrategyContext& context) {
+    std::lock_guard<std::mutex> lock(m_init_mutex);
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
     // Reset the flag even if loadData throws, so reload is not permanently gated out
     struct Guard {
-        bool& initializing;
+        std::atomic_bool& initializing;
         ~Guard() {
             initializing = false;
         }
