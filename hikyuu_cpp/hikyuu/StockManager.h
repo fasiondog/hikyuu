@@ -420,7 +420,7 @@ private:
 private:
     static StockManager* m_sm;
     std::mutex m_init_mutex;
-    bool m_initializing{false};
+    std::atomic_bool m_initializing{false};
     std::atomic_bool m_cancel_load{false};  // Cancel the loading, used as the exit indicator
     std::atomic_bool m_data_ready{true};    // Indicates whether all the data is ready; true when it
                                             // has not been initialized

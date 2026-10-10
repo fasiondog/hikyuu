@@ -1289,19 +1289,21 @@ TEST_CASE("test_getKData_recover") {
     KQuery query;
     KData kdata;
 
-    /** @arg The forward adjustment */
+    /** @arg The forward adjustment: only the price is adjusted; the volume and the turnover amount
+     * are the quantities really traded that day and stay unchanged (the same convention as the
+     * mainstream data sources) */
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::FORWARD);
     kdata = stock.getKData(query);
     CHECK_EQ(kdata[2710],
              KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
     CHECK_EQ(kdata[2709], KRecord(Datetime(20110602000000), 10.3385, 10.3769, 9.9308, 10.0385,
-                                  6027269.9112, 600417.6923));
+                                  103909.3000, 780543.0000));
     CHECK_EQ(kdata[2554], KRecord(Datetime(20101014000000), 11.0385, 11.4154, 10.9077, 10.9462,
-                                  18482210.2840, 1688466.1538));
+                                  322428.8000, 2195006.0000));
     CHECK_EQ(kdata[2548], KRecord(Datetime(20100929000000), 9.2615, 9.6385, 9.2000, 9.4846,
-                                  5830594.3491, 614742.3077));
+                                  99719.8000, 799165.0000));
     CHECK_EQ(kdata[2547], KRecord(Datetime(20100928000000), 9.8154, 9.8154, 9.5462, 9.5538,
-                                  4702564.7574, 492216.9231));
+                                  81241.5000, 639882.0000));
 
     /** @arg The backward adjustment */
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::BACKWARD);
@@ -1310,11 +1312,11 @@ TEST_CASE("test_getKData_recover") {
     CHECK_EQ(kdata[151],
              KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
     CHECK_EQ(kdata[152],
-             KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 306636., 13200.0));
+             KRecord(Datetime(200007060000), 23.30, 23.42, 23.16, 23.23, 3049.5, 13200.0));
     CHECK_EQ(kdata[657],
-             KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 3666222., 197640.0));
+             KRecord(Datetime(200208210000), 18.35, 18.75, 18.18, 18.55, 36409.8, 197640.0));
     CHECK_EQ(kdata[658], KRecord(Datetime(20020822000000), 18.7700, 18.8900, 18.6200, 18.8150,
-                                 1340531.1200, 71248.0000));
+                                 13101.3000, 106872.0000));
 
     /** @arg The proportional forward adjustment */
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_FORWARD);
@@ -1322,13 +1324,13 @@ TEST_CASE("test_getKData_recover") {
     CHECK_EQ(kdata[2710],
              KRecord(Datetime(201106030000), 10.02, 10.14, 10.0, 10.09, 38726.1, 384820));
     CHECK_EQ(kdata[2709], KRecord(Datetime(20110602000000), 10.3348, 10.3728, 9.9321, 10.0385,
-                                  6027269.9112, 600417.6923));
+                                  103909.3000, 780543.0000));
     CHECK_EQ(kdata[2554], KRecord(Datetime(20101014000000), 11.0263, 11.3987, 10.8972, 10.9352,
-                                  18463647.2834, 1688466.1538));
+                                  322428.8000, 2195006.0000));
     CHECK_EQ(kdata[2548], KRecord(Datetime(20100929000000), 9.2709, 9.6433, 9.2102, 9.4913,
-                                  5834718.1664, 614742.3077));
+                                  99719.8000, 799165.0000));
     CHECK_EQ(kdata[2547], KRecord(Datetime(20100928000000), 9.8181, 9.8181, 9.5521, 9.5597,
-                                  4705453.9128, 492216.9231));
+                                  81241.5000, 639882.0000));
 
     /** @arg The proportional backward adjustment */
     query = KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_BACKWARD);
@@ -1337,11 +1339,11 @@ TEST_CASE("test_getKData_recover") {
     CHECK_EQ(kdata[151],
              KRecord(Datetime(200007050000), 23.25, 23.47, 23.15, 23.22, 3298.8, 14218));
     CHECK_EQ(kdata[152], KRecord(Datetime(20000706000000), 23.3005, 23.4213, 23.1596, 23.2301,
-                                 306636.8583, 13200.0000));
+                                 3049.5000, 13200.0000));
     CHECK_EQ(kdata[657], KRecord(Datetime(20020821000000), 18.3183, 18.7209, 18.1472, 18.5196,
-                                 3660220.8375, 197640.0000));
+                                 36409.8000, 197640.0000));
     CHECK_EQ(kdata[658], KRecord(Datetime(20020822000000), 18.7435, 18.8656, 18.5909, 18.7893,
-                                 3012073.4901, 160308.0000));
+                                 13101.3000, 106872.0000));
 }
 
 /** @} */
@@ -1863,6 +1865,346 @@ TEST_CASE("test_KData_getOtherFromSelf_subfunctions") {
     KData kdata_idx_from_date = kdata_date_orig.getKData(idx_from_date);
     CHECK_EQ(kdata_idx_from_date.getStock(), kdata_date_orig.getStock());
     CHECK_EQ(kdata_idx_from_date.getQuery().kType(), KQuery::DAY);
+}
+
+/** @par Test point - except FORWARD/EQUAL_FORWARD (excluded by the fast path gate), a sub-range
+ * query of a loaded KData reuses the already-recovered buffer without re-applying the adjustment:
+ * a within-range sub-query must equal the corresponding slice of the base series, and a
+ * beyond-range sub-query must keep the base series' values on the overlap and continue the same
+ * adjusted series on the tail. */
+TEST_CASE("test_KData_backward_subrange_no_double_recover") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg BACKWARD index sub-range within the loaded range equals the base series slice */
+    KData base = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::BACKWARD));
+    REQUIRE_FALSE(base.empty());
+
+    KQuery sub(100, 200, KQuery::DAY, KQuery::BACKWARD);
+    KData sub_kdata = base.getKData(sub);
+    REQUIRE_EQ(sub_kdata.size(), 100);
+    for (size_t i = 0; i < sub_kdata.size(); i++) {
+        CHECK_EQ(sub_kdata[i], base[100 + i]);
+    }
+
+    /** @arg EQUAL_BACKWARD index sub-range within the loaded range equals the base series slice */
+    KData base_eq = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_BACKWARD));
+    REQUIRE_FALSE(base_eq.empty());
+
+    KQuery sub_eq(100, 200, KQuery::DAY, KQuery::EQUAL_BACKWARD);
+    KData sub_eq_kdata = base_eq.getKData(sub_eq);
+    REQUIRE_EQ(sub_eq_kdata.size(), 100);
+    for (size_t i = 0; i < sub_eq_kdata.size(); i++) {
+        CHECK_EQ(sub_eq_kdata[i], base_eq[100 + i]);
+    }
+
+    /** @arg BACKWARD by-date sub-range within the loaded range equals the base series slice */
+    KQuery sub_date(Datetime(200501040000), Datetime(200507010000), KQuery::DAY, KQuery::BACKWARD);
+    KData sub_date_kdata = base.getKData(sub_date);
+    REQUIRE_FALSE(sub_date_kdata.empty());
+    size_t base_pos = base.getPos(sub_date_kdata.front().datetime);
+    REQUIRE(base_pos != Null<size_t>());
+    for (size_t i = 0; i < sub_date_kdata.size(); i++) {
+        CHECK_EQ(sub_date_kdata[i], base[base_pos + i]);
+    }
+
+    /** @arg BACKWARD sub-range extending beyond the loaded range: the overlap keeps the base
+     * series' values and the tail continues the same series */
+    KData base_short = stock.getKData(KQuery(0, 500, KQuery::DAY, KQuery::BACKWARD));
+    REQUIRE_FALSE(base_short.empty());
+
+    KQuery sub_ext(400, 600, KQuery::DAY, KQuery::BACKWARD);
+    KData sub_ext_kdata = base_short.getKData(sub_ext);
+    KData expect_ext = stock.getKData(sub_ext);
+    REQUIRE_EQ(sub_ext_kdata.size(), expect_ext.size());
+    for (size_t i = 0; i < 100; i++) {  // the overlap [400, 500)
+        CHECK_EQ(sub_ext_kdata[i], base_short[400 + i]);
+    }
+    for (size_t i = 100; i < sub_ext_kdata.size(); i++) {  // the tail [500, 600)
+        CHECK_EQ(sub_ext_kdata[i].datetime, expect_ext[i].datetime);
+    }
+
+    /** @arg the extended tail must be recovered, i.e. differ from the raw data */
+    KData raw_ext = stock.getKData(KQuery(400, 600, KQuery::DAY, KQuery::NO_RECOVER));
+    REQUIRE_EQ(raw_ext.size(), sub_ext_kdata.size());
+    CHECK_NE(sub_ext_kdata[100].closePrice, raw_ext[100].closePrice);
+
+    /** @arg NO_RECOVER by-index sub-range extending beyond a non-buffered ktype's loaded range
+     * equals a fresh query */
+    size_t total = stock.getCount(KQuery::MIN);
+    REQUIRE(total > 400);
+    KData min_base = stock.getKData(KQuery(0, 240, KQuery::MIN));
+    REQUIRE_FALSE(min_base.empty());
+
+    KQuery min_sub(100, 340, KQuery::MIN);
+    CHECK_KDATA_EQUAL(min_base.getKData(min_sub), stock.getKData(min_sub));
+}
+
+/** @par Test point - the price adjustment is anchored at a fixed baseline (the stock's data start
+ * for backward, its last data day for forward), so a sub-range query must equal the corresponding
+ * slice of the whole-series data; a minute buffer that begins exactly on an ex-rights day must
+ * adjust its first bar like the rest of that day. */
+TEST_CASE("test_KData_recover_window_independent") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg BACKWARD: an index sub-range query equals the whole-series slice */
+    KData full = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::BACKWARD));
+    REQUIRE_FALSE(full.empty());
+
+    KQuery sub(400, 600, KQuery::DAY, KQuery::BACKWARD);
+    KData sub_kdata = stock.getKData(sub);
+    REQUIRE_EQ(sub_kdata.size(), 200);
+    for (size_t i = 0; i < sub_kdata.size(); i++) {
+        CHECK_EQ(sub_kdata[i], full[400 + i]);
+    }
+
+    /** @arg BACKWARD: a by-date sub-range query equals the whole-series slice */
+    KQuery sub_date(Datetime(200501040000), Datetime(200507010000), KQuery::DAY, KQuery::BACKWARD);
+    KData sub_date_kdata = stock.getKData(sub_date);
+    REQUIRE_FALSE(sub_date_kdata.empty());
+    size_t full_pos = full.getPos(sub_date_kdata.front().datetime);
+    REQUIRE(full_pos != Null<size_t>());
+    for (size_t i = 0; i < sub_date_kdata.size(); i++) {
+        CHECK_EQ(sub_date_kdata[i], full[full_pos + i]);
+    }
+
+    /** @arg FORWARD: an index sub-range query equals the whole-series slice */
+    KData full_forward = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::FORWARD));
+    REQUIRE_FALSE(full_forward.empty());
+
+    KQuery sub_forward(400, 600, KQuery::DAY, KQuery::FORWARD);
+    KData sub_forward_kdata = stock.getKData(sub_forward);
+    REQUIRE_EQ(sub_forward_kdata.size(), 200);
+    for (size_t i = 0; i < sub_forward_kdata.size(); i++) {
+        CHECK_EQ(sub_forward_kdata[i], full_forward[400 + i]);
+    }
+
+    /** @arg EQUAL_BACKWARD: an index sub-range query equals the whole-series slice */
+    KData full_equal =
+      stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_BACKWARD));
+    REQUIRE_FALSE(full_equal.empty());
+
+    KQuery sub_equal(400, 600, KQuery::DAY, KQuery::EQUAL_BACKWARD);
+    KData sub_equal_kdata = stock.getKData(sub_equal);
+    REQUIRE_EQ(sub_equal_kdata.size(), 200);
+    for (size_t i = 0; i < sub_equal_kdata.size(); i++) {
+        CHECK_EQ(sub_equal_kdata[i], full_equal[400 + i]);
+    }
+
+    /** @arg EQUAL_FORWARD: an index sub-range query equals the whole-series slice */
+    KData full_equal_forward =
+      stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_FORWARD));
+    REQUIRE_FALSE(full_equal_forward.empty());
+
+    KQuery sub_equal_forward(400, 600, KQuery::DAY, KQuery::EQUAL_FORWARD);
+    KData sub_equal_forward_kdata = stock.getKData(sub_equal_forward);
+    REQUIRE_EQ(sub_equal_forward_kdata.size(), 200);
+    for (size_t i = 0; i < sub_equal_forward_kdata.size(); i++) {
+        CHECK_EQ(sub_equal_forward_kdata[i], full_equal_forward[400 + i]);
+    }
+
+    /** @arg a minute buffer that begins in the middle of a day must adjust its first bar like the
+     * rest of that day: its slice equals the corresponding slice of a full-day window */
+    KData minute_wide = stock.getKData(
+      KQueryByDate(Datetime(201112060930), Datetime(201112061500), KQuery::MIN, KQuery::BACKWARD));
+    REQUIRE_FALSE(minute_wide.empty());
+    KData minute_late = stock.getKData(
+      KQueryByDate(Datetime(201112061000), Datetime(201112061500), KQuery::MIN, KQuery::BACKWARD));
+    REQUIRE_FALSE(minute_late.empty());
+
+    size_t pos = minute_wide.getPos(minute_late.front().datetime);
+    REQUIRE(pos != Null<size_t>());
+    for (size_t i = 0; i < minute_late.size(); i++) {
+        CHECK_EQ(minute_late[i], minute_wide[pos + i]);
+    }
+}
+
+/** @par Test point - the recovery adjusts the price only: the volume and the turnover amount are the
+ * quantities really traded that day and are left unchanged, which is the convention of the
+ * mainstream data sources (Wind, JoinQuant, ...) and keeps the share-capital based indicators (e.g.
+ * the turnover rate) meaningful on the recovered data. */
+TEST_CASE("test_KData_recover_price_only") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    const Datetime start(200201010000);
+    const Datetime end(200212310000);
+    KData raw = stock.getKData(KQuery(start, end, KQuery::DAY, KQuery::NO_RECOVER));
+    REQUIRE_FALSE(raw.empty());
+
+    const int types[] = {KQuery::FORWARD, KQuery::BACKWARD, KQuery::EQUAL_FORWARD,
+                         KQuery::EQUAL_BACKWARD};
+    bool price_changed = false;
+    for (int t : types) {
+        KData rec = stock.getKData(KQuery(start, end, KQuery::DAY, (KQuery::RecoverType)t));
+        REQUIRE_EQ(rec.size(), raw.size());
+        for (size_t i = 0; i < raw.size(); i++) {
+            /** @arg the volume and the turnover amount never change */
+            CHECK_EQ(rec[i].transCount, doctest::Approx(raw[i].transCount).epsilon(0.0001));
+            CHECK_EQ(rec[i].transAmount, doctest::Approx(raw[i].transAmount).epsilon(0.0001));
+
+            /** @arg the price of the bars affected by an ex-rights/ex-dividend event is adjusted */
+            if (std::fabs(rec[i].closePrice - raw[i].closePrice) > 0.0001) {
+                price_changed = true;
+            }
+        }
+    }
+
+    /** @arg the range crosses an ex-rights/ex-dividend event, so the price is really adjusted */
+    CHECK_UNARY(price_changed);
+}
+
+/** @par Test point - the recovered prices must follow the mainstream definitions:
+ * - the cumulative adjustment factor used by the factor based data sources (Wind / tushare /
+ *   JoinQuant): the factor of a record date is `the previous close / the ex-rights reference price`,
+ *   the backward (forward) price is the raw price times the product of the factors of the events at
+ *   and before (after) that bar;
+ * - the adjustment formula used by the TDX-like clients, applied step by step. */
+TEST_CASE("test_KData_recover_vendor_convention") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    KData raw = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::NO_RECOVER));
+    REQUIRE(raw.size() > 2700);
+
+    KData bwd = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::BACKWARD));
+    KData fwd = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::FORWARD));
+    KData eqb = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_BACKWARD));
+    KData eqf = stock.getKData(KQuery(0, Null<int64_t>(), KQuery::DAY, KQuery::EQUAL_FORWARD));
+    REQUIRE_EQ(bwd.size(), raw.size());
+    REQUIRE_EQ(fwd.size(), raw.size());
+    REQUIRE_EQ(eqb.size(), raw.size());
+    REQUIRE_EQ(eqf.size(), raw.size());
+
+    // The effective ex-rights/ex-dividend records, each with the close of the previous trading day
+    struct Event {
+        Datetime date;
+        price_t denominator;  // 1 + the change ratio of the outstanding shares
+        price_t temp;         // the cash dividend and the rights (new) share term
+        price_t price_k;      // the previous close / the ex-rights reference price
+    };
+    vector<Event> events;
+    size_t pos = 0;
+    for (const auto& w : stock.getWeight()) {
+        if (w.countAsGift() == 0.0 && w.countForSell() == 0.0 && w.priceForSell() == 0.0 &&
+            w.bonus() == 0.0 && w.increasement() == 0.0 && w.suogu() == 0.0) {
+            continue;
+        }
+        if (w.datetime() > raw.back().datetime) {
+            break;
+        }
+        while (pos < raw.size() && raw[pos].datetime < w.datetime()) {
+            pos++;
+        }
+        REQUIRE(pos > 0);
+        const price_t close = raw[pos - 1].closePrice;  // the close of the record date
+
+        Event e;
+        e.date = w.datetime().startOfDay();
+        if (w.suogu() != 0.0) {
+            e.denominator = w.suogu();
+            e.temp = 0.0;
+        } else {
+            const price_t change = 0.1 * (w.countAsGift() + w.countForSell() + w.increasement());
+            e.denominator = 1.0 + change;
+            // the cash dividend less the rights (new) share term: the backward formula adds it while
+            // the forward formula subtracts it
+            e.temp = 0.1 * w.bonus() - w.priceForSell() * change;
+        }
+        // The ex-rights reference price = (the previous close - the cash dividend + the rights share
+        // term) / (1 + the change ratio); the factor is the previous close over the reference price
+        e.price_k = close / ((close - e.temp) / e.denominator);
+        events.push_back(e);
+    }
+    REQUIRE_FALSE(events.empty());
+
+    for (size_t i = 0; i < raw.size(); i++) {
+        const price_t close = raw[i].closePrice;
+
+        // The factor method: the products of the factors around the bar
+        price_t factor_at_and_before = 1.0;
+        price_t factor_after = 1.0;
+        // The forward formula method: the events after the bar are applied from the earliest one on
+        price_t price_after = close;
+        for (const auto& e : events) {
+            if (e.date <= raw[i].datetime) {
+                factor_at_and_before *= e.price_k;
+            } else {
+                factor_after *= e.price_k;
+                price_after = (price_after - e.temp) / e.denominator;
+            }
+        }
+
+        // The backward formula method converts the price back event by event: it starts from the
+        // latest ex-rights and goes backward day by day (the same as the TDX-like clients)
+        price_t price_at_and_before = close;
+        for (auto it = events.rbegin(); it != events.rend(); ++it) {
+            if (it->date <= raw[i].datetime) {
+                price_at_and_before = price_at_and_before * it->denominator + it->temp;
+            }
+        }
+
+        /** @arg the backward price of the factor method (the events up to this bar) */
+        CHECK_EQ(eqb[i].closePrice,
+                 doctest::Approx(close * factor_at_and_before).epsilon(0.0001));
+        /** @arg the backward price of the adjustment formula method */
+        CHECK_EQ(bwd[i].closePrice, doctest::Approx(price_at_and_before).epsilon(0.0001));
+
+        /** @arg the forward price of the factor method (the events after this bar) */
+        CHECK_EQ(eqf[i].closePrice, doctest::Approx(close / factor_after).epsilon(0.0001));
+        /** @arg the forward price of the adjustment formula method */
+        CHECK_EQ(fwd[i].closePrice, doctest::Approx(price_after).epsilon(0.0001));
+    }
+}
+
+/** @par Test point - BASE-304/327: an extra ktype above the daily line (e.g. DAY3) has no phase
+ * start rule, and its seconds are unknown without the extra plugin; the recovery is skipped and the
+ * raw data is returned instead of throwing std::bad_function_call or applying the daily formula. */
+TEST_CASE("test_KData_recover_unsupported_ktype") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg an EQUAL_BACKWARD query on the DAY3 extra ktype keeps the raw data without throwing */
+    KData k3 = stock.getKData(KQuery(0, 20, KQuery::DAY3, KQuery::EQUAL_BACKWARD));
+    KData raw3 = stock.getKData(KQuery(0, 20, KQuery::DAY3, KQuery::NO_RECOVER));
+    REQUIRE_EQ(k3.size(), raw3.size());
+    for (size_t i = 0; i < k3.size(); i++) {
+        CHECK_EQ(k3[i], raw3[i]);
+    }
+
+    /** @arg the same for BACKWARD */
+    KData k3b = stock.getKData(KQuery(0, 20, KQuery::DAY3, KQuery::BACKWARD));
+    REQUIRE_EQ(k3b.size(), raw3.size());
+    for (size_t i = 0; i < k3b.size(); i++) {
+        CHECK_EQ(k3b[i], raw3[i]);
+    }
+}
+
+/** @par Test point - BASE-305: an empty KData follows the "empty returns the null record" contract
+ * of the base class: front()/back()/getKRecord() return the null record, and the ktype/date
+ * conversions return an empty KData instead of crashing. */
+TEST_CASE("test_KData_empty_record_access") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    /** @arg an empty daily KData (a range without any bar) */
+    KData empty =
+      stock.getKData(KQueryByDate(Datetime(190001010000), Datetime(190101010000), KQuery::DAY));
+    REQUIRE_UNARY(empty.empty());
+
+    /** @arg front()/back()/getKRecord() return the null record */
+    CHECK_EQ(empty.front(), KRecord::NullKRecord);
+    CHECK_EQ(empty.back(), KRecord::NullKRecord);
+    CHECK_EQ(empty.getKRecord(0), KRecord::NullKRecord);
+    CHECK_EQ(empty.getKRecord(10), KRecord::NullKRecord);
+
+    /** @arg converting an empty KData to another ktype returns an empty KData without crashing */
+    CHECK_UNARY(empty.getKData(KQuery::MIN).empty());
+    CHECK_UNARY(empty.getKData(KQuery::DAY).empty());
+
+    /** @arg the by-date sub query of an empty KData stays empty */
+    CHECK_UNARY(empty.getKData(Datetime(190001010000), Datetime(190101010000)).empty());
 }
 
 /** @par Test points */

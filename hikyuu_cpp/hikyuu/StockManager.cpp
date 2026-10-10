@@ -98,7 +98,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     m_thread_id = std::this_thread::get_id();
     // Roll back the init flags on any exception so a failed init can be retried
     struct Guard {
-        bool& initializing;
+        std::atomic_bool& initializing;
         std::thread::id& thread_id;
         bool committed{false};
         ~Guard() {
@@ -178,6 +178,7 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 
     // Get the block driver
     m_blockDriver = DataDriverFactory::getBlockDriver(blockParam);
+    HKU_CHECK(m_blockDriver, "Failed get block driver!");
 
     auto driver = DataDriverFactory::getKDataDriverPool(m_kdataDriverParam);
     HKU_CHECK(driver, "driver is null!");
@@ -669,11 +670,12 @@ std::unordered_set<string> StockManager::tryLoadAllKDataFromColumnFirst(
 }
 
 void StockManager::reload() {
+    std::lock_guard<std::mutex> lock(m_init_mutex);
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
     // Reset the flag even if loadData throws, so reload is not permanently gated out
     struct Guard {
-        bool& initializing;
+        std::atomic_bool& initializing;
         ~Guard() {
             initializing = false;
         }
@@ -688,11 +690,12 @@ void StockManager::reload() {
 }
 
 void StockManager::reloadWith(const StrategyContext& context) {
+    std::lock_guard<std::mutex> lock(m_init_mutex);
     HKU_IF_RETURN(m_initializing, void());
     m_initializing = true;
     // Reset the flag even if loadData throws, so reload is not permanently gated out
     struct Guard {
-        bool& initializing;
+        std::atomic_bool& initializing;
         ~Guard() {
             initializing = false;
         }
@@ -1223,9 +1226,11 @@ void StockManager::releaseShmServerBaseInfoCache() {
         {
             std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
             StockWeightList().swap(stock.m_data->m_weightList);
+            vector<EqualRecoverFactor>().swap(stock.m_data->m_recover_factors);
             // Set it to false: the next Stock::getWeight re-reads it through the driver lazy
             // loading (the server role has the lazy loading fallback)
             stock.m_data->m_weight_ready.store(false, std::memory_order_release);
+            stock.m_data->m_recover_ready.store(false, std::memory_order_release);
         }
         {
             std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_history_finance_mutex);

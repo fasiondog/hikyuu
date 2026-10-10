@@ -49,8 +49,8 @@ Built-in Technical Indicators
        
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
+       - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
+       - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
     
     **Usage example**::
     
@@ -70,7 +70,7 @@ Built-in Technical Indicators
     * :py:func:`ADJ_LOW` - the adjusted low price
     * :py:func:`ADJ_CLOSE` - the adjusted close price
     * :py:func:`ADJ_VOL` - the adjusted volume
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
 
 .. py:function:: ADJ_OPEN()
@@ -87,13 +87,13 @@ Built-in Technical Indicators
        
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
+       - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
+       - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
     
     **Related indicators**:
     
     * :py:func:`ADJ_FACTOR` - the adjustment factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
 
 .. py:function:: ADJ_HIGH()
@@ -110,13 +110,13 @@ Built-in Technical Indicators
        
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
+       - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
+       - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
     
     **Related indicators**:
     
     * :py:func:`ADJ_FACTOR` - the adjustment factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
 
 .. py:function:: ADJ_LOW()
@@ -133,13 +133,13 @@ Built-in Technical Indicators
        
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
+       - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
+       - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
     
     **Related indicators**:
     
     * :py:func:`ADJ_FACTOR` - the adjustment factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
 
 .. py:function:: ADJ_CLOSE()
@@ -156,23 +156,23 @@ Built-in Technical Indicators
        
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
+       - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
+       - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
     
     **Related indicators**:
     
     * :py:func:`ADJ_FACTOR` - the adjustment factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+    * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
 
 .. py:function:: ADJ_VOL()
 
     Calculate the adjusted volume indicator
     
-    Recover the volume backward by the adjustment factor, obtaining the adjusted volume sequence.
+    Recover the volume by the reciprocal of the same factor used by the adjusted price, obtaining the adjusted volume sequence.
     The calculation formula: ADJ_VOL = VOL / ADJ_FACTOR
     
-    Note: the volume adjustment uses division, which is opposite to the price adjustment using multiplication. This is because when the share capital increases, the volume corresponding to each share should be reduced accordingly.
+    Note: the volume moves in the direction opposite to the price (the factor is the reciprocal), so the adjusted price x adjusted volume keeps the raw amount. This is the volume convention of the factor management system and differs from a volume re-expressed in the share terms only (a cash dividend changes the price but not the share count). The K-line recovery adjusts the price only and leaves the volume and the amount untouched (the same as Wind / JoinQuant), so use this indicator when a volume consistent with the adjusted price is required.
     
     :rtype: Indicator
     
@@ -181,16 +181,16 @@ Built-in Technical Indicators
        
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
-       - **The relationship with RECOVER_EQUAL_FORWARD**: this indicator is essentially the same as RECOVER_EQUAL_FORWARD; in the non-factor-management scenarios, it is recommended to use RECOVER_EQUAL_FORWARD directly
-       - **The calculation start point**: neither of them calculates from the listing date, but from the start point of the K-line data of the current query
+       - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value; the adjusted price matches the RECOVER_EQUAL_BACKWARD price, while the volume of the recovered K-line data keeps its raw value (the recovery adjusts the price only)
+       - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
     
-    **Related indicators**:
+       **Related indicators**:
     
-    * :py:func:`ADJ_FACTOR` - the adjustment factor
-    * :py:func:`RECOVER_EQUAL_FORWARD` - the equal-ratio forward adjustment
+       * :py:func:`ADJ_FACTOR` - the adjustment factor
+       * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
 
-.. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
+       .. py:function:: ADVANCE([query=Query(-100), market='SH', stk_type='constant.STOCKTYPE_A'])
 
     The number of the rising stocks. When a specified context exists and ignore_context is false, the query, market, stk_type parameters will be ignored.
 

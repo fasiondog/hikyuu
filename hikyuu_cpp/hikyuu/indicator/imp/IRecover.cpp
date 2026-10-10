@@ -96,67 +96,6 @@ void IRecover::_calculate(const Indicator& ind) {
     }
 }
 
-#if 0
-// It is meaningful only when the back adjustment is in the full mode, but the full back adjustment is too slow
-bool IRecover::supportIncrementCalculate() const {
-    KQuery::RecoverType recover_type =
-      static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
-    return !(recover_type == KQuery::FORWARD || recover_type == KQuery::EQUAL_FORWARD);
-}
-
-void IRecover::_increment_calculate(const Indicator& ind, size_t start_pos) {
-    auto kdata = ind.getContext();
-    auto query = kdata.getQuery();
-
-    KQuery::RecoverType recover_type =
-      static_cast<KQuery::RecoverType>(getParam<int>("recover_type"));
-
-    // Guarantee that the data from the old context start to the new context end are all calculated
-    query = KQueryByDate(m_old_context.front().datetime,
-                         kdata.back().datetime + Seconds(KQuery::getKTypeInSeconds(query.kType())),
-                         query.kType(), recover_type);
-    KData new_k = m_old_context.getKData(query);
-
-    size_t pos = new_k.getPos(kdata[start_pos].datetime);
-    HKU_ASSERT(new_k.size() == (pos + ind.size() - start_pos));
-
-    size_t total = ind.size();
-
-    string part_name = ind.getParam<string>("kpart");
-    const auto* data = new_k.data();
-    auto* dst = this->data();
-    if ("CLOSE" == part_name) {
-        for (size_t i = start_pos; i < total; i++) {
-            dst[i] = data[pos++].closePrice;
-        }
-
-    } else if ("OPEN" == part_name) {
-        for (size_t i = start_pos; i < total; i++) {
-            dst[i] = data[pos++].openPrice;
-        }
-
-    } else if ("HIGH" == part_name) {
-        for (size_t i = start_pos; i < total; i++) {
-            dst[i] = data[pos++].highPrice;
-        }
-
-    } else if ("LOW" == part_name) {
-        for (size_t i = start_pos; i < total; i++) {
-            dst[i] = data[pos++].lowPrice;
-        }
-    } else if ("AMO" == part_name) {
-        for (size_t i = start_pos; i < total; i++) {
-            dst[i] = data[pos++].transAmount;
-        }
-
-    } else if ("VOL" == part_name) {
-        for (size_t i = start_pos; i < total; i++) {
-            dst[i] = data[pos++].transCount;
-        }
-    }
-}
-#endif
-
 Indicator HKU_API RECOVER_FORWARD() {
     return Indicator(make_shared<IRecover>(KQuery::FORWARD));
 }
