@@ -1660,4 +1660,26 @@ TEST_CASE("test_indicator_clone_subtree_isolation") {
     check_indicator(full, sub + OPEN(k));
 }
 
+/**
+ * @par Test points
+ * A child node whose buffer was cleared by the root's setContext cleanup must stay safe to query:
+ * existNan answers false and updateDiscard is a no-op instead of dereferencing a null slot.
+ */
+TEST_CASE("test_indicator_cleared_buffer_accessors") {
+    StockManager& sm = StockManager::instance();
+    KData k1 = sm.getStock("sh000001").getKData(KQuery(-20));
+
+    Indicator f = PRICELIST(PriceList(20, 1.0)) + CLOSE(k1);
+    f.setContext(k1);
+
+    IndicatorImpPtr child = f.getImp()->getLeftNode();
+    REQUIRE_UNARY(child != nullptr);
+    // the root's post-calculation cleanup emptied the data-only child's buffers
+    CHECK_EQ(child->size(), 0u);
+    CHECK_UNARY(!child->existNan(0));
+    child->updateDiscard();
+    child->updateDiscard(true);
+    CHECK_EQ(child->discard(), 0u);
+}
+
 /** @} */

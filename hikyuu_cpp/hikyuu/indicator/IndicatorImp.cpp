@@ -624,6 +624,7 @@ size_t IndicatorImp::getPos(Datetime date) const {
 bool IndicatorImp::existNan(size_t result_idx) const {
     HKU_CHECK(result_idx < m_result_num, "result_idx: {}", result_idx);
     const value_t *src = data(result_idx);
+    HKU_IF_RETURN(!src, false);
     for (size_t i = m_discard, total = size(); i < total; i++) {
         if (std::isnan(src[i])) {
             return true;
@@ -1577,6 +1578,10 @@ void IndicatorImp::updateDiscard(bool force) noexcept {
     for (size_t result_index = 0; result_index < m_result_num; result_index++) {
         size_t discard = m_discard;
         const auto *dst = this->data(result_index);
+        // a cleared / partially swapped-out slot cannot be scanned from this result
+        if (!dst) {
+            continue;
+        }
         for (size_t i = m_discard; i < total; i++) {
             if (!std::isnan(dst[i])) {
                 break;
