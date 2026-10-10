@@ -1024,7 +1024,8 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
     if (start_pos < total) {
         // [start_pos, copy_len) keeps the shifted old values, which a recursive implementation may
         // read as its seed; every bar of [copy_len, total) is computed by this call, so it starts
-        // as null and an implementation may simply skip an invalid point
+        // as null and an implementation may simply skip an invalid point. Both contexts cover the
+        // same securities and calendar, so copy_len is start_pos + 1 and never exceeds total
         for (size_t r = 0; r < m_result_num; ++r) {
             HKU_ASSERT(m_pBuffer[r]);
             auto *dst = this->data(r);

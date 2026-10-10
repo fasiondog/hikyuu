@@ -131,6 +131,17 @@ TEST_CASE("test_MDD_CURRENT_leading_nan_discard") {
         CHECK_UNARY(!std::isnan(mdd[i]));
         CHECK_UNARY(mdd[i] >= 0.0);
     }
+
+    /** @arg a null head inside the calculated range stays null, instead of a zero which would
+     *  claim the historical high */
+    PriceList head_nan{std::numeric_limits<double>::quiet_NaN(),
+                       std::numeric_limits<double>::quiet_NaN(), 100.0, 105.0, 90.0};
+    Indicator mdd_head = MDD_CURRENT(PRICELIST(head_nan));
+    CHECK_EQ(mdd_head.discard(), 0);
+    CHECK_UNARY(std::isnan(mdd_head[0]));
+    CHECK_UNARY(std::isnan(mdd_head[1]));
+    CHECK_EQ(mdd_head[2], 0.0);
+    CHECK_EQ(mdd_head[4], doctest::Approx(14.2857).epsilon(0.0001));
 }
 
 /** @par Test point: the incremental calculation */

@@ -78,8 +78,7 @@ TEST_CASE("test_INDEXO") {
  * calculation which falls back to the parameter.
  *
  * Note: the companion fix declares INDEX as a context dependent indicator (m_need_context), which
- * keeps a compiled factor plan from reusing one template node across securities; that flag has no
- * public accessor to assert on.
+ * keeps a compiled factor plan from reusing one template node across securities.
  */
 TEST_CASE("test_INDEX_market_code_not_permanent") {
     StockManager& sm = StockManager::instance();
@@ -93,6 +92,9 @@ TEST_CASE("test_INDEX_market_code_not_permanent") {
     Indicator ind = INDEXC();
     ind.getImp()->setParam<string>("market_code", "SH000001");
     ind.setContext(k);
+
+    /** @arg the indicator is context dependent, so a plan cannot reuse it across securities */
+    CHECK_UNARY(ind.getImp()->isNeedContext());
 
     /** @arg the calculation keeps the parameter as it was given */
     CHECK_EQ(ind.getImp()->getParam<string>("market_code"), string("SH000001"));
