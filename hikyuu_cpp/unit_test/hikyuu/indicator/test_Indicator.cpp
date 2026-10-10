@@ -1386,4 +1386,88 @@ TEST_CASE("test_context_leaf_warning_with_input") {
     CHECK_EQ(r.size(), 20);
 }
 
+namespace {
+
+// An indicator which deliberately leaves one of the bars it is asked to compute untouched, to pin
+// the contract of the incremental path: every bar the copy did not cover starts as null, so an
+// implementation may simply skip an invalid point
+class SkipOneBarIndicatorImp : public IndicatorImp {
+public:
+    SkipOneBarIndicatorImp() : IndicatorImp("SKIP_ONE_BAR", 1) {
+        m_need_context = true;
+    }
+
+    void _calculate(const Indicator&) override {
+        const KData& k = getContext();
+        HKU_IF_RETURN(k.empty(), void());
+        _readyBuffer(k.size(), 1);
+        m_discard = 0;
+        auto* dst = data();
+        for (size_t i = 0; i < k.size(); ++i) {
+            dst[i] = value_t(i);
+        }
+    }
+
+    void _increment_calculate(const Indicator&, size_t start_pos) override {
+        size_t total = getContext().size();
+        auto* dst = data();
+        for (size_t i = start_pos; i < total; ++i) {
+            if (i == m_skip_pos) {
+                continue;
+            }
+            dst[i] = value_t(i);
+        }
+    }
+
+    bool supportIncrementCalculate() const override {
+        return true;
+    }
+
+    size_t min_increment_start() const override {
+        return 1;
+    }
+
+    void skipPos(size_t pos) {
+        m_skip_pos = pos;
+    }
+
+    IndicatorImpPtr _clone() override {
+        return make_shared<SkipOneBarIndicatorImp>();
+    }
+
+private:
+    size_t m_skip_pos = std::numeric_limits<size_t>::max();
+};
+
+}  // namespace
+
+/** @par Test points */
+TEST_CASE("test_indicator_increment_clears_unwritten_bars") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k1 = stock.getKData(KQuery(0, 30));
+    KData k2 = stock.getKData(KQuery(10, 40));  // shifted by ten bars and extended
+    CHECK_EQ(k1.size(), 30);
+    CHECK_EQ(k2.size(), 30);
+
+    auto imp = make_shared<SkipOneBarIndicatorImp>();
+    imp->skipPos(25);
+    Indicator ind(imp);
+
+    ind.setContext(k1);
+    /** @arg the full calculation writes every bar */
+    CHECK_EQ(ind[25], 25.0);
+
+    ind.setContext(k2);
+
+    /** @arg the incremental path leaves the skipped bar null instead of a stale value */
+    CHECK_EQ(ind.size(), 30);
+    CHECK_UNARY(std::isnan(ind[25]));
+    /** @arg the bars it does write keep their values */
+    CHECK_EQ(ind[19], 19.0);
+    CHECK_EQ(ind[24], 24.0);
+    CHECK_EQ(ind[26], 26.0);
+    CHECK_EQ(ind[29], 29.0);
+}
+
 /** @} */
