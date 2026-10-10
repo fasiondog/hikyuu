@@ -87,12 +87,7 @@ bool Indicator::equal(const Indicator& other) const noexcept {
         auto const* d1 = this->data(r);
         auto const* d2 = other.data(r);
         for (size_t i = 0, total = size(); i < total; i++) {
-            HKU_IF_RETURN((std::isnan(d1[i]) && !std::isnan(d2[i])) ||
-                            (!std::isnan(d1[i]) && std::isnan(d2[i])),
-                          false);
-            HKU_IF_RETURN(
-              (!std::isnan(d1[i]) && !std::isnan(d2[i])) && (std::abs(d1[i] - d2[i]) >= 0.0001),
-              false);
+            HKU_IF_RETURN(!IndicatorImp::equalValue(d1[i], d2[i]), false);
         }
     }
     return true;

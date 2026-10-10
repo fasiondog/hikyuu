@@ -21,6 +21,7 @@
 namespace hku {
 
 #define MAX_RESULT_NUM 6
+#define IND_EQ_THRESHOLD 0.000001  ///< Threshold for judging float equality
 
 class HKU_API Indicator;
 class HKU_API IndParam;
@@ -87,6 +88,10 @@ public:
     IndicatorImp(const string& name, size_t result_num);
 
     virtual ~IndicatorImp();
+
+    /** Whether two result values are equal: two NaNs match, infinities match exactly, finite
+     *  values within a relative threshold (absolute below magnitude 1) */
+    static bool equalValue(value_t v1, value_t v2) noexcept;
 
     // It owns raw result buffers (m_pBuffer), so an implicit copy would be a shallow copy
     // leading to a double free; copies must go through clone()
@@ -643,6 +648,20 @@ inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const 
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
     return step == 0 || pos < discard + step ? discard : pos + 1 - step;
+}
+
+inline bool IndicatorImp::equalValue(value_t v1, value_t v2) noexcept {
+    if (v1 == v2)
+        return true;
+    bool nan1 = std::isnan(v1);
+    if (nan1 || std::isnan(v2))
+        return nan1 == std::isnan(v2);
+    if (std::isinf(v1) || std::isinf(v2))
+        return false;
+    double a1 = std::abs(v1);
+    double a2 = std::abs(v2);
+    double scale = a1 > a2 ? a1 : a2;
+    return std::abs(v1 - v2) <= IND_EQ_THRESHOLD * (scale > 1.0 ? scale : 1.0);
 }
 
 inline bool IndicatorImp::isPythonObject() const noexcept {

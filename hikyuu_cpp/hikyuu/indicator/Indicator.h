@@ -14,8 +14,6 @@
 
 namespace hku {
 
-#define IND_EQ_THRESHOLD 0.000001  ///< Threshold for judging float equality
-
 /**
  * Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,
  * IndicatorImp should be inherited

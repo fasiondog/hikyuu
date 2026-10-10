@@ -1592,4 +1592,43 @@ TEST_CASE("test_indicator_dyn_step_invalid_bar") {
     }
 }
 
+/**
+ * @par Test points
+ * equalValue (shared by alike's leaf branch and Indicator::equal): two NaNs match, infinities
+ * match exactly, finite values compare within a relative threshold (absolute below magnitude 1).
+ */
+TEST_CASE("test_indicator_value_equal_threshold") {
+    const double nan = Null<double>();
+    const double inf = std::numeric_limits<double>::infinity();
+
+    /** @arg NaN same-side: equal buffers holding NaN compare equal */
+    Indicator a = PRICELIST(PriceList{nan, 1.0, 2.0});
+    Indicator b = PRICELIST(PriceList{nan, 1.0, 2.0});
+    CHECK_UNARY(a.equal(b));
+
+    /** @arg NaN vs number is not equal */
+    Indicator c = PRICELIST(PriceList{0.0, 1.0, 2.0});
+    CHECK_UNARY(!a.equal(c));
+
+    /** @arg infinities match exactly, opposite signs do not */
+    Indicator i1 = PRICELIST(PriceList{inf, -inf});
+    Indicator i2 = PRICELIST(PriceList{inf, -inf});
+    Indicator i3 = PRICELIST(PriceList{inf, inf});
+    CHECK_UNARY(i1.equal(i2));
+    CHECK_UNARY(!i1.equal(i3));
+
+    /** @arg relative tolerance scales with magnitude */
+    CHECK_UNARY(PRICELIST(PriceList{100000.0}).equal(PRICELIST(PriceList{100000.05})));
+    CHECK_UNARY(!PRICELIST(PriceList{100000.0}).equal(PRICELIST(PriceList{100000.2})));
+
+    /** @arg below magnitude 1 the threshold is absolute (the old hardcoded 1e-4 was looser) */
+    CHECK_UNARY(!PRICELIST(PriceList{0.5}).equal(PRICELIST(PriceList{0.50001})));
+
+    /** @arg alike's leaf branch compares snapshots with NaN / near values */
+    Indicator sn1 = a.getResult(0);
+    CHECK_UNARY(sn1.alike(b.getResult(0)));
+    CHECK_UNARY(sn1.alike(PRICELIST(PriceList{nan, 1.0, 2.0 + 5e-7}).getResult(0)));
+    CHECK_UNARY(!sn1.alike(c.getResult(0)));
+}
+
 /** @} */

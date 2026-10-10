@@ -1616,13 +1616,10 @@ bool IndicatorImp::alike(const IndicatorImp &other) const {
         HKU_IF_RETURN(this->size() != other.size(), false);
         auto const *d1 = this->data();
         auto const *d2 = other.data();
-        bool eq = true;
         for (size_t i = 0, len = this->size(); i < len; i++) {
-            if (d1[i] != d2[i]) {
-                eq = false;
-            }
+            HKU_IF_RETURN(!equalValue(d1[i], d2[i]), false);
         }
-        return eq;
+        return true;
     }
 
     HKU_IF_RETURN(bool(m_three) != bool(other.m_three) || bool(m_left) != bool(other.m_left) ||
