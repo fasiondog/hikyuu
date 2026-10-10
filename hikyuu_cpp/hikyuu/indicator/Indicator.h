@@ -93,7 +93,10 @@ public:
     /** Number of the values that need to be discarded in the result */
     size_t discard() const noexcept;
 
-    /** Set the number to discard; it has no effect if it is less than the original discard */
+    /** Set the number to discard; the value is clamped to size(). When it grows, the extended
+     *  leading slots are filled with Null; when it shrinks, the previously discarded slots become
+     *  part of the valid region, so the caller must ensure the data there reflects the current
+     *  calculation (e.g. by going through _readyBuffer or a fresh _calculate beforehand) */
     void setDiscard(size_t discard) noexcept;
 
     /** Update the discard number according to its own values; force=true forces the update,
