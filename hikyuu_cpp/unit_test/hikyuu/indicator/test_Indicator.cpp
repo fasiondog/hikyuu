@@ -1470,4 +1470,36 @@ TEST_CASE("test_indicator_increment_clears_unwritten_bars") {
     CHECK_EQ(ind[29], 29.0);
 }
 
+/**
+ * @par Test points
+ * Comparing the formula of an indicator without an implementation must answer falsely instead of
+ * crashing.
+ *
+ * Background: alike dereferenced both implementations; an indicator left over after a move keeps no
+ * implementation at all, so any comparison touching it crashed the process.
+ */
+TEST_CASE("test_indicator_alike_null_imp") {
+    PriceList d;
+    for (size_t i = 0; i < 5; ++i) {
+        d.push_back(double(i + 1));
+    }
+
+    Indicator a = PRICELIST(d);
+    Indicator kept = std::move(a);  // a holds no implementation any more
+
+    /** @arg a moved-from indicator is not alike another indicator */
+    CHECK_UNARY(!a.alike(PRICELIST(d)));
+    /** @arg a moved-from indicator at the other side is not alike either */
+    Indicator b = PRICELIST(d);
+    CHECK_UNARY(!b.alike(a));
+    /** @arg a moved-from indicator is not alike itself either, the same rule as isSame */
+    CHECK_UNARY(!a.alike(a));
+    /** @arg two moved-from indicators are not alike */
+    Indicator c = PRICELIST(d);
+    Indicator kept_c = std::move(c);
+    CHECK_UNARY(!a.alike(c));
+    /** @arg the indicator which took over the implementation keeps comparing normally */
+    CHECK_UNARY(kept.alike(kept_c));
+}
+
 /** @} */

@@ -72,6 +72,7 @@ KData Indicator::getContext() const {
 }
 
 bool Indicator::alike(const Indicator& other) const {
+    HKU_IF_RETURN(!m_imp || !other.m_imp, false);
     HKU_IF_RETURN(m_imp == other.m_imp, true);
     return m_imp->alike(*other.m_imp);
 }
