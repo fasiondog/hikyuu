@@ -31,13 +31,15 @@ void IStdp::_checkParam(const string& name) const {
 
 void IStdp::_calculate(const Indicator& data) {
     size_t total = data.size();
-    m_discard = data.discard();
+
+    int n = getParam<int>("n");
+    // n of 0 asks for the whole series, which has no warm up window to drop
+    m_discard = data.discard() + (0 == n ? 0 : n - 1);
     if (m_discard >= total) {
         m_discard = total;
         return;
     }
 
-    int n = getParam<int>("n");
     if (0 == n) {
         n = total;
     }
@@ -48,7 +50,8 @@ void IStdp::_calculate(const Indicator& data) {
     vector<price_t> pow_buf(data.size());
     price_t ex = 0.0, ex2 = 0.0;
     size_t num = 0;
-    size_t start_pos = m_discard;
+    // the accumulation starts at the first valid input value, whatever the declared discard is
+    size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
     price_t k = src[start_pos];
     for (size_t i = start_pos; i < first_end; i++) {
@@ -58,7 +61,10 @@ void IStdp::_calculate(const Indicator& data) {
         price_t d_pow = std::pow(d, 2);
         pow_buf[i] = d_pow;
         ex2 += d_pow;
-        dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / num);
+        // a window that is not full only accumulates, so the declared prefix stays untouched
+        if (i >= m_discard) {
+            dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / num);
+        }
     }
 
     for (size_t i = first_end; i < total; i++) {
