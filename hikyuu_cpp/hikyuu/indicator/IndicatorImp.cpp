@@ -998,6 +998,19 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         return false;
     }
 
+    // The implementations read backwards from start_pos to seed their recursion; those bars must
+    // lie inside the valid part of the input, otherwise a null poisons the rolling sums and the
+    // whole tail stays invalid, while a full calculation gives values from the first full window on
+    if (start_pos < ind.discard() + min_increment_start()) {
+        return false;
+    }
+
+    // The value at start_pos seeds the recursion: below the discard of the previous calculation it
+    // was never computed, so the increment cannot start from there
+    if (start_pos < m_discard) {
+        return false;
+    }
+
     if (!can_shift_old_results(m_context.size())) {
         return false;
     }
@@ -1009,10 +1022,6 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
             auto *dst = this->data(r);
             memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
         }
-    }
-
-    if (start_pos < m_discard) {
-        start_pos = m_discard;
     }
 
     m_discard = 0;

@@ -184,4 +184,32 @@ TEST_CASE("test_EMA_export") {
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
+/** @par Test points */
+TEST_CASE("test_EMA_increment_shift_boundary") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_old = stock.getKData(KQuery(0, 20));
+    KData k_new = stock.getKData(KQuery(16, 26));  // the window moves on, keeping four old bars
+    CHECK_EQ(k_old.size(), 20);
+    CHECK_EQ(k_new.size(), 10);
+
+    // EMA over an input with a discard: the cached valid region of the node ends exactly at the
+    // last bar the shift may keep, so the incremental path has no computed value to seed from
+    auto make = []() { return EMA(MA(CLOSE(), 5), 3); };
+
+    Indicator expect = make();
+    expect.setContext(k_new);
+
+    Indicator got = make();
+    got.setContext(k_old);
+    got.setContext(k_new);
+
+    /** @arg the shifted window keeps the same values as a fresh calculation */
+    CHECK_EQ(got.size(), expect.size());
+    CHECK_EQ(got.discard(), expect.discard());
+    for (size_t i = expect.discard(); i < expect.size(); ++i) {
+        CHECK_EQ(got[i], doctest::Approx(expect[i]).epsilon(0.00001));
+    }
+}
+
 /** @} */
