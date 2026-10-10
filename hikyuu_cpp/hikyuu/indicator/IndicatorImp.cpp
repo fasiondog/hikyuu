@@ -539,6 +539,10 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
     imp->setDiscard(discard());
     imp->name(name());
     imp->onlySetContext(getContext());
+    if (haveParam("align_date_list")) {
+        imp->setParam<DatetimeList>("align_date_list",
+                                    getParam<const DatetimeList &>("align_date_list"));
+    }
     auto const *src = this->data(result_num);
     auto *dst = imp->data(0);
     for (size_t i = imp->discard(); i < total; ++i) {

@@ -45,9 +45,13 @@ class CompiledFactorPlan;
  * 4. An indicator whose window is documented as unlimited when its size is 0 (MDD, MRR) computes
  *    over the available history on purpose, which is not a warm up value to discard.
  * 5. An undefined financial state yields Null, never 0.0 or infinity: zero divisor (operators div
- *    and mod), zero variance (BETA, CORR, SLOPE), all-missing window (SAFTYLOSS), zero baseline
- *    (the cumulative profit curve). 0.0 collides with legitimate zero values, inf poisons every
+ *    and mod), zero variance (BETA, CORR), all-missing window (SAFTYLOSS), zero baseline (the
+ *    cumulative profit curve). 0.0 collides with legitimate zero values, inf poisons every
  *    downstream window aggregate; Null (NaN) is the no-data marker that propagates on purpose.
+ *    By convention the r2 result of SLOPE over a constant window is 0.0, a perfect fit.
+ * 6. An implementation whose invalid prefix cannot be derived from its formula may declare it by
+ *    scanning its own output once, e.g. the trailing updateDiscard of ALIGN / REPLACE / BARSSINCE
+ *    / BARSLASTS / IC; the framework never derives it on their behalf.
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {

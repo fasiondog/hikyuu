@@ -117,6 +117,10 @@ void IStdp::_increment_calculate(const Indicator& data, size_t start_pos) {
 
 void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
+    if (step != 0 && curPos - start + 1 < step) {
+        _set(Null<price_t>(), curPos);
+        return;
+    }
     size_t num = 0;
     price_t ex = 0.0, ex2 = 0.0;
     price_t k = ind[start];

@@ -206,6 +206,13 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
         return;
     }
 
+    if (step != 0 && curPos - start + 1 < step) {
+        _set(Null<price_t>(), curPos);
+        _set(Null<price_t>(), curPos, 1);
+        _set(Null<price_t>(), curPos, 2);
+        return;
+    }
+
     size_t cnt = curPos - start + 1;
     price_t fcnt = (price_t)cnt;
     price_t sum_x = fcnt * (fcnt - 1.0) / 2.0;

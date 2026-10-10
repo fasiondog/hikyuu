@@ -16,6 +16,30 @@
  */
 
 /** @par Test points */
+/** @par Test points */
+TEST_CASE("test_indicator_get_result_date_semantics") {
+    PriceList px;
+    DatetimeList dates;
+    Datetime d0(2020, 1, 1);
+    for (size_t i = 0; i < 6; ++i) {
+        px.push_back(10.0 + i);
+        dates.push_back(d0 + Days(i * 2));
+    }
+    Indicator src = PRICELIST(px, dates);
+    REQUIRE_EQ(src.size(), 6);
+    REQUIRE_EQ(src.getByDate(dates[3]), 13.0);
+
+    Indicator snap = src.getResult(0);
+    REQUIRE_EQ(snap.size(), 6);
+
+    /** @arg the snapshot answers by the reference dates of the source, as the source does */
+    CHECK_EQ(snap.getDatetime(0), src.getDatetime(0));
+    CHECK_EQ(snap.getDatetime(5), src.getDatetime(5));
+    CHECK_EQ(snap.getByDate(dates[3]), src.getByDate(dates[3]));
+    /** @arg the snapshot keeps the values of the source */
+    CHECK_EQ(snap[5], src[5]);
+}
+
 TEST_CASE("test_indicator_other") {
     double dx = Null<double>();
     size_t ix = size_t(dx);
@@ -1516,8 +1540,9 @@ TEST_CASE("test_indicator_dyn_step_invalid_bar") {
         INFO(tag);
         CHECK_EQ(r.size(), src.size());
         CHECK_UNARY(std::isnan(r[bad_idx]));
-        // neighboring valid bars must still be computed
-        CHECK_UNARY(!std::isnan(r[r.discard()]));
+        // a later bar with a full window must still be computed (the bars right after the start
+        // have an incomplete window and stay null by design)
+        CHECK_UNARY(!std::isnan(r[5]));
     };
 
     /** @arg negative step yields Null at that bar */
@@ -1593,15 +1618,20 @@ TEST_CASE("test_indicator_clone_subtree_isolation") {
     StockManager& sm = StockManager::instance();
     KData k = sm.getStock("sh000001").getKData(KQuery(-20));
 
-    Indicator formula = MA(CLOSE(), 5) + OPEN();
-    IndicatorImpPtr subtree = formula.getImp()->getLeftNode()->clone();
+    Indicator expect = MA(CLOSE(k), 5);
+
+    IndicatorImpPtr subtree;
+    {
+        Indicator formula = MA(CLOSE(), 5) + OPEN();
+        subtree = formula.getImp()->getLeftNode()->clone();
+    }
+    // the source tree is dropped before the clone is used, so a child of the clone that still
+    // points at it is read through a dangling parent link
     Indicator sub(subtree);
     sub.setContext(k);
-    check_indicator(sub, MA(CLOSE(k), 5));
+    check_indicator(sub, expect);
 
-    Indicator full = formula(k);
-    check_indicator(full, MA(CLOSE(k), 5) + OPEN(k));
-    check_indicator(full, sub + OPEN(k));
+    check_indicator(sub + OPEN(k), expect + OPEN(k));
 }
 
 /**

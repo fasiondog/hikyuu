@@ -86,6 +86,7 @@ TEST_CASE("test_SLOPE_dyn") {
     Indicator expect = SLOPE(c, 10);
     Indicator result = SLOPE(c, CVAL(c, 10));
     CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
@@ -95,6 +96,7 @@ TEST_CASE("test_SLOPE_dyn") {
 
     result = SLOPE(c, IndParam(CVAL(c, 10)));
     CHECK_EQ(expect.size(), result.size());
+    CHECK_EQ(expect.discard(), result.discard());
     for (size_t i = 0; i < result.discard(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
     }
