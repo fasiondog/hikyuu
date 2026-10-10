@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_manage/Performance.h>
+#include <optional>
 #include "../pybind_utils.h"
 
 using namespace hku;
@@ -28,11 +29,15 @@ void export_Performance(py::module& m) {
 
         :rtype: str)")
 
-      .def("statistics", &Performance::statistics, py::arg("tm"),
-           py::arg("datetime") = Datetime::now(),
-           R"(statistics(self, tm[, datetime=Datetime.now()])
+      .def(
+        "statistics",
+        [](Performance& self, const TradeManagerPtr& tm, std::optional<Datetime> datetime) {
+            self.statistics(tm, datetime.value_or(Datetime::now()));
+        },
+        py::arg("tm"), py::arg("datetime") = py::none(),
+        R"(statistics(self, tm[, datetime=None])
 
-        According to the trade records, count the system performance up to a certain moment; datetime must be greater than or equal to lastDatetime
+        According to the trade records, count the system performance up to a certain moment; datetime must be greater than or equal to lastDatetime (defaults to the current time)
 
         :param TradeManager tm: the specified trade manager instance
         :param Datetime datetime: the statistics deadline)")
@@ -55,8 +60,9 @@ void export_Performance(py::module& m) {
                return result;
            })
 
-      .def("__getitem__", &Performance::get,
-           R"(Get the indicator value by the indicator name; it takes effect only after running statistics or report
+      .def(
+        "__getitem__", &Performance::get,
+        R"(Get the indicator value by the indicator name; it takes effect only after running statistics or report
         
         :param str name: the indicator name
         :rtype: float))");

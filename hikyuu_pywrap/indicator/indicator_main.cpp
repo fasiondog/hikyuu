@@ -32,8 +32,18 @@ void export_indicator_main(py::module& m) {
           py::list ret;
           HKU_IF_RETURN(len(inds) == 0, ret);
           IndicatorList cinds = python_list_to_vector<Indicator>(inds);
-          ret = vector_to_python_list(
-            global_parallel_for_index(0, cinds.size(), [&](size_t i) { return cinds[i](kdata); }));
+          std::vector<Indicator> results;
+          {
+              py::gil_scoped_release release;
+              results = global_parallel_for_index(0, cinds.size(), [&](size_t i) {
+                  if (cinds[i].isPythonObject()) {
+                      py::gil_scoped_acquire gil;
+                      return cinds[i](kdata);
+                  }
+                  return cinds[i](kdata);
+              });
+          }
+          ret = vector_to_python_list(results);
           return ret;
       },
       R"(batch_calculate_inds(inds, kdata) -> list)

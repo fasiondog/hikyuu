@@ -47,15 +47,27 @@ inline void register_finalizing_flag() {
     });
 }
 
-inline std::shared_ptr<py::object> make_gil_safe(py::object obj) {
+template <typename T = py::object>
+std::shared_ptr<T> make_gil_safe(T obj) {
     register_finalizing_flag();
-    return std::shared_ptr<py::object>(new py::object(std::move(obj)), [](py::object* p) {
+    return std::shared_ptr<T>(new T(std::move(obj)), [](T* p) {
         if (g_interpreter_finalizing().load(std::memory_order_acquire)) {
             return;  // leak; process is exiting
         }
         py::gil_scoped_acquire gil;
         delete p;
     });
+}
+
+// Keep a Python custom part (e.g. the SG/MM assigned to a system) alive while the owner's
+// Python wrapper lives. This restores the semantics of the former explicit reference leaks
+// (the C++ side holds only the converted shared_ptr, whose holder does not keep the source
+// Python object alive) without leaking: the part is released when the owner is collected.
+// Both arguments must be pybind-registered instances.
+inline void keep_python_part_alive(const py::object& owner, const py::object& part) {
+    if (part) {
+        py::detail::keep_alive_impl(owner, part);
+    }
 }
 
 template <typename T>
@@ -133,18 +145,18 @@ std::string to_py_str(const T& item) {
 // Using the pybind11 overload of _clone directly would lose the python type in C++
 // Refer to https://github.com/pybind/pybind11/issues/1049 for the modification
 // PYBIND11_OVERLOAD(IndicatorImpPtr, IndicatorImp, _clone, );
-#define PY_CLONE(pyclassname, classname)                                         \
-public:                                                                          \
-    std::shared_ptr<classname> _clone() override {                               \
-        if (isPythonObject()) {                                                  \
-            py::gil_scoped_acquire acquire;                                      \
-            auto self = py::cast(this);                                          \
-            auto cloned = self.attr("_clone")();                                 \
-            auto keep_python_state_alive = std::make_shared<py::object>(cloned); \
-            auto ptr = cloned.cast<pyclassname*>();                              \
-            return std::shared_ptr<classname>(keep_python_state_alive, ptr);     \
-        }                                                                        \
-        return this->_clone();                                                   \
+#define PY_CLONE(pyclassname, classname)                                     \
+public:                                                                      \
+    std::shared_ptr<classname> _clone() override {                           \
+        if (isPythonObject()) {                                              \
+            py::gil_scoped_acquire acquire;                                  \
+            auto self = py::cast(this);                                      \
+            auto cloned = self.attr("_clone")();                             \
+            auto keep_python_state_alive = make_gil_safe(cloned);            \
+            auto ptr = cloned.cast<pyclassname*>();                          \
+            return std::shared_ptr<classname>(keep_python_state_alive, ptr); \
+        }                                                                    \
+        return this->_clone();                                               \
     }
 
 // The `inspect` handles used by check_pyfunction_arg_num, cached because the check runs on every

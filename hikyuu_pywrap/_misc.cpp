@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/misc.h>
+#include <optional>
 #include "gil_policy.h"
 
 using namespace hku;
@@ -63,18 +64,18 @@ void export_misc(py::module& m) {
 
     m.def(
       "get_performance_list",
-      [](const vector<TMPtr>& tm_list, const Datetime& datetime, const KQuery::KType& ktype,
+      [](const vector<TMPtr>& tm_list, std::optional<Datetime> datetime, const KQuery::KType& ktype,
          bool ext) {
           vector<Performance> result;
           {
               ScopeGilRelease gil(!tm_list_has_python_part(tm_list));
-              result = getPerformanceList(tm_list, datetime, ktype, ext);
+              result = getPerformanceList(tm_list, datetime.value_or(Datetime::now()), ktype, ext);
           }
           return result;
       },
-      py::arg("tm_list"), py::arg("datetime") = Datetime::now(), py::arg("ktype") = KQuery::DAY,
+      py::arg("tm_list"), py::arg("datetime") = py::none(), py::arg("ktype") = KQuery::DAY,
       py::arg("ext") = true,
-      R"(get_performance_list(tm_list: list, datetime: Datetime = now(), ktype: KType = DAY, ext: bool = True) -> list[Performance]
+      R"(get_performance_list(tm_list: list, datetime: Datetime = None, ktype: KType = DAY, ext: bool = True) -> list[Performance]
     
     Get the account performance of multiple accounts at the specified moment at once
 

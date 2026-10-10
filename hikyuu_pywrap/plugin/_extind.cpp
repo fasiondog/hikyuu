@@ -21,7 +21,7 @@ class PyAggFunc {
 #endif
 public:
     PyAggFunc() = default;
-    explicit PyAggFunc(py::object func) : m_func(func) {}
+    explicit PyAggFunc(py::object func) : m_func(make_gil_safe(std::move(func))) {}
 
     Indicator::value_t operator()(const DatetimeList& src_ds, const Indicator::value_t* src,
                                   size_t group_start, size_t group_last) const {
@@ -32,12 +32,12 @@ public:
 
         std::vector<size_t> shape = {total};
         py::array_t<Indicator::value_t> arr(shape, src + group_start);
-        py::object ret = m_func(ds, arr);
+        py::object ret = (*m_func)(ds, arr);
         return ret.cast<Indicator::value_t>();
     }
 
 private:
-    py::object m_func;
+    std::shared_ptr<py::object> m_func;
 };
 
 #define PY_GROUP_IND_DEFINE(group_func, doc)                                                   \
@@ -51,7 +51,7 @@ class PyGroupFunc {
 #endif
 public:
     PyGroupFunc() = default;
-    explicit PyGroupFunc(py::object func) : m_func(func) {}
+    explicit PyGroupFunc(py::object func) : m_func(make_gil_safe(std::move(func))) {}
 
     void operator()(Indicator::value_t* dst, const DatetimeList& src_ds,
                     const Indicator::value_t* src, size_t group_start, size_t group_last) const {
@@ -63,7 +63,11 @@ public:
 
         std::vector<size_t> shape = {total};
         py::array_t<Indicator::value_t> arr(shape, src + group_start);
-        py::array_t<Indicator::value_t> ret = m_func(ds, arr);
+        // Force a contiguous C-order array of the element type: the user may return a
+        // sliced/transposed/strided view or a castable dtype, and the flat copy below
+        // would silently read the wrong values otherwise.
+        py::array_t<Indicator::value_t, py::array::c_style | py::array::forcecast> ret =
+          (*m_func)(ds, arr);
         auto dim = ret.ndim();
         HKU_CHECK(dim == 1,
                   "The return value of a Python function must be a one-dimensional array!");
@@ -76,7 +80,7 @@ public:
     }
 
 private:
-    py::object m_func;
+    std::shared_ptr<py::object> m_func;
 };
 
 void export_extend_Indicator(py::module& m) {

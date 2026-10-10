@@ -16,10 +16,14 @@ namespace hku {
 OptimalEvaluateSelector::OptimalEvaluateSelector() : OptimalSelectorBase("SE_EvaluateOptimal") {}
 
 OptimalEvaluateSelector::OptimalEvaluateSelector(
-  std::function<double(const SystemPtr&, const Datetime&)>&& evaluate)
+  std::function<double(const SystemPtr&, const Datetime&)> evaluate)
 : OptimalSelectorBase("SE_EvaluateOptimal"), m_evaluate(std::move(evaluate)) {}
 
 OptimalEvaluateSelector::~OptimalEvaluateSelector() {}
+
+SelectorPtr OptimalEvaluateSelector::_clone() {
+    return std::make_shared<OptimalEvaluateSelector>(m_evaluate);
+}
 
 double OptimalEvaluateSelector::evaluate(const SYSPtr& sys, const Datetime& endDate) noexcept {
     double ret = Null<double>();

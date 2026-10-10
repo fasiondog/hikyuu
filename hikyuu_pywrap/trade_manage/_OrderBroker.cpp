@@ -62,9 +62,25 @@ void export_OrderBroker(py::module& m) {
                     py::overload_cast<const string&>(&OrderBrokerBase::name),
                     py::return_value_policy::copy, "The name (readable and writable)")
 
-      .def("buy", &OrderBrokerBase::buy, "For the details, see the subclass implementation interface: _buy")
-      .def("sell", &OrderBrokerBase::sell, "For the details, see the subclass implementation interface: _sell")
-      .def("get_asset_info", &OrderBrokerBase::getAssetInfo, "For the details, see the subclass implementation interface: _get_asset_info")
+      .def("buy", &OrderBrokerBase::buy,
+           "For the details, see the subclass implementation interface: _buy")
+      .def("sell", &OrderBrokerBase::sell,
+           "For the details, see the subclass implementation interface: _sell")
+      .def("get_asset_info", &OrderBrokerBase::getAssetInfo,
+           R"(get_asset_info(self) -> str
+
+    For the details, see the subclass implementation interface: _get_asset_info. May raise the
+    exception of the subclass implementation (it is no longer swallowed by a noexcept wrapper).
+
+    :rtype: str)")
+      .def("get_last_error", &OrderBrokerBase::getLastError,
+           R"(get_last_error(self) -> str
+
+    Get the error message of the last failed buy/sell call (the exceptions are swallowed by
+    the noexcept wrappers, so this is the error-status channel for the live trading paths).
+    Returns an empty string when the last call succeeded.
+
+    :rtype: str)")
 
       .def(
         "_buy", &OrderBrokerBase::_buy,
