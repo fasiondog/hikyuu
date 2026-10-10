@@ -176,7 +176,7 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
         }
     }
 
-    /** @arg The dynamic n1 below 2 or n2 below 2 yield Null at those bars */
+    /** @arg The dynamic n1 below 2 yields Null at those bars */
     PriceList bad1, bad2;
     for (int i = 0; i < 16; ++i) {
         bad1.push_back(i < 3 ? 1.0 : 3.0);
@@ -186,10 +186,22 @@ TEST_CASE("test_SAFTYLOSS_dyn") {
     for (size_t i = 0; i < 3; ++i) {
         CHECK_UNARY(std::isnan(result[i]));
     }
-    CHECK_UNARY(std::isnan(result[4]));
+    /** @arg a dynamic n2 of 1 is a window of one bar, calculated like the static path does */
+    Indicator n2_one = SAFTYLOSS(SLICE(src, 0, 5), 3, 1, 2.0);
+    REQUIRE_UNARY(!std::isnan(n2_one[n2_one.size() - 1]));
+    CHECK_EQ(n2_one[n2_one.size() - 1], doctest::Approx(result[4]));
     for (size_t i = 5; i < src.size(); ++i) {
         Indicator expect_prefix = SAFTYLOSS(SLICE(src, 0, i + 1), 3, 2, 2.0);
         CHECK_EQ(expect_prefix[expect_prefix.size() - 1], doctest::Approx(result[i]));
+    }
+
+    /** @arg a whole dynamic n2 of 1 matches the static path, instead of a null series */
+    Indicator dyn_one = SAFTYLOSS(src, CVAL(src, 3), CVAL(src, 1), CVAL(src, 2.0));
+    Indicator static_one = SAFTYLOSS(src, 3, 1, 2.0);
+    CHECK_EQ(dyn_one.size(), static_one.size());
+    CHECK_EQ(dyn_one.discard(), static_one.discard());
+    for (size_t i = dyn_one.discard(); i < dyn_one.size(); ++i) {
+        CHECK_EQ(dyn_one[i], doctest::Approx(static_one[i]));
     }
 }
 

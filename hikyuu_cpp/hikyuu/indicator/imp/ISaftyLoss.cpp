@@ -92,7 +92,7 @@ void ISaftyLoss::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 void ISaftyLoss::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2, double p) {
-    HKU_IF_RETURN(n1 < 2 || n2 < 2, void());
+    HKU_IF_RETURN(n1 < 2 || n2 < 1, void());
     // Intentional: the result at curPos only depends on the trailing [curPos + 2 - n1 - n2, curPos]
     // window, so compute it directly from ind instead of rebuilding the whole prefix. The value is
     // bitwise identical to SAFTYLOSS(SLICE(ind, 0, curPos + 1)) and drops from O(curPos) to
