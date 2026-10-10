@@ -118,8 +118,19 @@ public:
      * number should be: the existing positions + the ones being bought - the ones being sold
      * cost_price: the buy cost price per share
      * </pre>
+     *
+     * May throw whatever _getAssetInfo throws; the callers decide how to handle the failure
+     * (e.g. the BrokerTradeManager keeps the last known account state).
      */
-    string getAssetInfo() noexcept;
+    string getAssetInfo();
+
+    /**
+     * Get the error message of the last failed buy/sell call (the exceptions are swallowed
+     * by the noexcept wrappers); empty when the last call succeeded. This is the error-status
+     * channel for the live trading paths, where exceptions cannot cross the noexcept boundary.
+     * @return string the last error message, empty when there is none
+     */
+    string getLastError() const;
 
     /**
      * Interface implemented by the subclass, it executes the actual buy operation
@@ -159,6 +170,7 @@ public:
 
 protected:
     string m_name;
+    string m_last_error;  // the message of the last failed call, cleared on success
 
 //============================================
 // Serialization support
