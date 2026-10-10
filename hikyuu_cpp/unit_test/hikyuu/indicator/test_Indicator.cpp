@@ -1640,4 +1640,24 @@ TEST_CASE("test_indicator_value_equal_threshold") {
     CHECK_UNARY(!sn1.alike(c.getResult(0)));
 }
 
+/**
+ * @par Test points
+ * A cloned subtree computes independently of its source tree: binding a context to the clone must
+ * not disturb the source, and both must match the direct calculation.
+ */
+TEST_CASE("test_indicator_clone_subtree_isolation") {
+    StockManager& sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(-20));
+
+    Indicator formula = MA(CLOSE(), 5) + OPEN();
+    IndicatorImpPtr subtree = formula.getImp()->getLeftNode()->clone();
+    Indicator sub(subtree);
+    sub.setContext(k);
+    check_indicator(sub, MA(CLOSE(k), 5));
+
+    Indicator full = formula(k);
+    check_indicator(full, MA(CLOSE(k), 5) + OPEN(k));
+    check_indicator(full, sub + OPEN(k));
+}
+
 /** @} */

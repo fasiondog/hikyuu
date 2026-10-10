@@ -446,15 +446,15 @@ IndicatorImpPtr IndicatorImp::clone() {
 
     if (m_left) {
         p->m_left = m_left->clone();
-        p->m_left->m_parent = this;
+        p->m_left->m_parent = p.get();
     }
     if (m_right) {
         p->m_right = m_right->clone();
-        p->m_right->m_parent = this;
+        p->m_right->m_parent = p.get();
     }
     if (m_three) {
         p->m_three = m_three->clone();
-        p->m_three->m_parent = this;
+        p->m_three->m_parent = p.get();
     }
 
     for (auto iter = m_ind_params.begin(); iter != m_ind_params.end(); ++iter) {
