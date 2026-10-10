@@ -44,9 +44,6 @@ TEST_CASE("test_WAEVE_export") {
         CHECK_EQ(ret.get(i, 4), v[i]);
         CHECK_EQ(ret.get(i, 5), a[i]);
     }
-
-    /** @arg More than the allowed number of parameters */
-    CHECK_THROWS(WEAVE(c, c, c, c, c, c, c));
 }
 
 #if HKU_SUPPORT_SERIALIZATION

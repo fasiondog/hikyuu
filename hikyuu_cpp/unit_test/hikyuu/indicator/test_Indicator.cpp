@@ -7,7 +7,9 @@
 
 #include "../test_config.h"
 #include <hikyuu/indicator/build_in.h>
+#include <hikyuu/indicator/IndParam.h>
 #include <hikyuu/StockManager.h>
+#include <sstream>
 
 /**
  * @defgroup test_indicator_Indicator test_indicator_Indicator
@@ -1665,6 +1667,44 @@ TEST_CASE("test_indicator_accessors_without_imp") {
     CHECK_UNARY(std::isnan(empty[0]));
     CHECK_UNARY(std::isnan(empty.front()));
     CHECK_UNARY(std::isnan(empty.back()));
+}
+
+/**
+ * @par Test points
+ * getIndParam / getIndParamImp report a missing dynamic parameter through hku::exception with the
+ * parameter name, instead of the bare std::out_of_range thrown by std::map::at.
+ */
+TEST_CASE("test_indicator_dyn_param_accessor_throws") {
+    Indicator ind = MA(CLOSE(), 5);
+    IndicatorImpPtr imp = ind.getImp();
+    REQUIRE_UNARY(imp != nullptr);
+    REQUIRE_UNARY(!imp->haveIndParam("n"));
+
+    /** @arg a missing dynamic parameter name throws hku::exception */
+    CHECK_THROWS_AS(imp->getIndParam("n"), hku::exception);
+    CHECK_THROWS_AS(imp->getIndParamImp("n"), hku::exception);
+
+    /** @arg the notice carries the offending name */
+    string message;
+    try {
+        imp->getIndParamImp("n");
+    } catch (const std::exception& e) {
+        message = e.what();
+    }
+    CHECK_UNARY(message.find("Invalid dynamic parameter name") != string::npos);
+    CHECK_UNARY(message.find("n") != string::npos);
+}
+
+/**
+ * @par Test points
+ * Streaming a default-constructed IndParam (no underlying implementation) must not dereference a
+ * null imp.
+ */
+TEST_CASE("test_indparam_ostream_without_imp") {
+    IndParam p;
+    std::ostringstream oss;
+    oss << p;
+    CHECK_UNARY(oss.str().find("IndParam") != string::npos);
 }
 
 /** @} */

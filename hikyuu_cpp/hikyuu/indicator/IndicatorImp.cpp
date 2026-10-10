@@ -198,11 +198,15 @@ void IndicatorImp::setIndParam(const string &name, const IndParam &ind) {
 }
 
 IndParam IndicatorImp::getIndParam(const string &name) const {
-    return IndParam(m_ind_params.at(name));
+    auto it = m_ind_params.find(name);
+    HKU_CHECK(it != m_ind_params.end(), "Invalid dynamic parameter name: {}!", name);
+    return IndParam(it->second);
 }
 
 const IndicatorImpPtr &IndicatorImp::getIndParamImp(const string &name) const {
-    return m_ind_params.at(name);
+    auto it = m_ind_params.find(name);
+    HKU_CHECK(it != m_ind_params.end(), "Invalid dynamic parameter name: {}!", name);
+    return it->second;
 }
 
 bool IndicatorImp::supportIncrementCalculate() const {
@@ -489,7 +493,7 @@ IndicatorImpPtr IndicatorImp::clone() {
 }
 
 IndicatorImpPtr IndicatorImp::operator()(const Indicator &ind) {
-    HKU_INFO("This indicator not support operator()! {}", *this);
+    HKU_DEBUG("This indicator not support operator()! {}", *this);
     // Guarantee the alignment
     IndicatorImpPtr result = make_shared<IndicatorImp>();
     size_t total = ind.size();
