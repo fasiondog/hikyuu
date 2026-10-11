@@ -55,7 +55,7 @@ public:
      * @return true
      * @return false
      */
-    bool isAll() const noexcept;
+    bool isAll() const;
 
     bool empty() const noexcept {
         return m_stockCodeList.empty();
@@ -102,7 +102,7 @@ public:
      * and the default must-load security list)
      * @return vector<string>
      */
-    vector<string> getAllNeedLoadStockCodeList() const noexcept;
+    vector<string> getAllNeedLoadStockCodeList() const;
 
     string str() const;
 

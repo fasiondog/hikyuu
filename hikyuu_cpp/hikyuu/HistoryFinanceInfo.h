@@ -28,7 +28,7 @@ struct HKU_API HistoryFinanceInfo {
       reportDate(std::move(rv.reportDate)),
       values(std::move(rv.values)) {}
 
-    HistoryFinanceInfo& operator=(const HistoryFinanceInfo&) noexcept;
+    HistoryFinanceInfo& operator=(const HistoryFinanceInfo&);
     HistoryFinanceInfo& operator=(HistoryFinanceInfo&&) noexcept;
 };
 

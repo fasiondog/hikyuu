@@ -99,14 +99,14 @@ void StrategyContext::_checkAndRemoveDuplicateKType(const vector<KQuery::KType>&
     }
 }
 
-bool StrategyContext::isAll() const noexcept {
+bool StrategyContext::isAll() const {
     return std::find_if(m_stockCodeList.begin(), m_stockCodeList.end(), [](string val) {
                to_upper(val);
                return val == "ALL";
            }) != m_stockCodeList.end();
 }
 
-vector<string> StrategyContext::getAllNeedLoadStockCodeList() const noexcept {
+vector<string> StrategyContext::getAllNeedLoadStockCodeList() const {
     vector<string> ret;
     std::set<string> code_set;
     for (const auto& code : m_mustLoad) {

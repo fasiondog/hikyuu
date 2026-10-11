@@ -6,6 +6,8 @@
  */
 
 #include "../test_config.h"
+#include <type_traits>
+#include <utility>
 #include "hikyuu/StrategyContext.h"
 
 /**
@@ -26,6 +28,15 @@ TEST_CASE("test_StrategyContext") {
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         CHECK_EQ(ktypes[i], expect[i]);
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_StrategyContext_noexcept_contract") {
+    /** @arg isAll and getAllNeedLoadStockCodeList may allocate, so they must not be noexcept */
+    static_assert(!noexcept(std::declval<const StrategyContext&>().isAll()),
+                  "isAll must not be noexcept");
+    static_assert(!noexcept(std::declval<const StrategyContext&>().getAllNeedLoadStockCodeList()),
+                  "getAllNeedLoadStockCodeList must not be noexcept");
 }
 
 /** @par Test points */
