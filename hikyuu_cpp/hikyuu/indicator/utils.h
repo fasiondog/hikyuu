@@ -112,16 +112,6 @@ std::vector<double> multi_regression_full(const Stock& stk, const KQuery& query,
 namespace detail {
 
 /**
- * Reusable scratch buffers for cross_section_spearman; callers hold one per thread/task
- * to avoid per-call heap allocation. Not thread-safe by design: each concurrent caller owns
- * its own instance.
- */
-struct SpearmanScratch {
-    std::vector<Indicator::value_t> tmpa, tmpb, levela, levelb;
-    std::vector<std::pair<Indicator::value_t, size_t>> idx_a, idx_b;
-};
-
-/**
  * Cross-section Spearman rank correlation over one day's factor and return values.
  *
  * Non-finite pairs (NaN or ±Inf) are dropped before ranking (a stock with a missing factor
@@ -129,13 +119,7 @@ struct SpearmanScratch {
  * 0.0 when a valid cross-section collapses to zero variance ("no discrimination means no
  * predictive power"), so a downstream MA does not spread NaN. Null is returned when fewer
  * than two valid pairs remain.
- *
- * Overload with caller-owned scratch avoids per-call allocation (V3 pattern).
  */
-HKU_API Indicator::value_t cross_section_spearman(const Indicator::value_t* a,
-                                                  const Indicator::value_t* b, size_t n,
-                                                  SpearmanScratch& scratch);
-
 HKU_API Indicator::value_t cross_section_spearman(const Indicator::value_t* a,
                                                   const Indicator::value_t* b, size_t n);
 

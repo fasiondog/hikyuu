@@ -76,6 +76,7 @@ void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
     dst2[start_pos - 1] = dea;
 
     size_t total = data.size();
+    bool seeded = false;
     for (size_t i = start_pos; i < total; ++i) {
         if (std::isfinite(src[i])) {
             if (!std::isfinite(ema1)) {
@@ -91,11 +92,17 @@ void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
             diff = ema1 - ema2;
             dea = diff * m3 + dea - dea * m3;
             bar = diff - dea;
+            seeded = true;
+            dst0[i] = bar;
+            dst1[i] = diff;
+            dst2[i] = dea;
+        } else if (seeded) {
+            // non-finite after first valid observation: hold previous outputs, states frozen
+            dst0[i] = bar;
+            dst1[i] = diff;
+            dst2[i] = dea;
         }
-        // non-finite input: hold the previous outputs, states stay frozen
-        dst0[i] = bar;
-        dst1[i] = diff;
-        dst2[i] = dea;
+        // leading non-finite (before any finite src): leave dst as Null from _readyBuffer
     }
 }
 
@@ -113,6 +120,7 @@ void IMacd::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2,
     price_t diff = 0.0;
     price_t dea = 0.0;
     price_t bar = 0.0;
+    bool seeded = false;
     for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
         if (std::isfinite(src[i])) {
             if (!std::isfinite(ema1)) {
@@ -128,7 +136,16 @@ void IMacd::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2,
             diff = ema1 - ema2;
             dea = diff * m3 + dea - dea * m3;
             bar = diff - dea;
+            seeded = true;
         }
+        // leading non-finite: keep scanning; hold the previous outputs once seeded
+    }
+    if (curPos > ind.discard() && !seeded) {
+        // whole prefix is non-finite after the seed bar: no valid output yet
+        _set(Null<price_t>(), curPos, 0);
+        _set(Null<price_t>(), curPos, 1);
+        _set(Null<price_t>(), curPos, 2);
+        return;
     }
     _set(bar, curPos, 0);
     _set(diff, curPos, 1);

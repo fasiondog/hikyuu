@@ -62,6 +62,21 @@ TEST_CASE("test_CORR_inf_input_yields_null") {
     }
 }
 
+/** @par Test points: ST-N14 — non-finite anchor at rolling-window seed position falls back to 0.0,
+ * does not force whole output to Null */
+TEST_CASE("test_CORR_anchor_non_finite") {
+    price_t nan = Null<price_t>();
+    // leading NaN at index 0; n=3 rolling; anchor kx/ky at discard=0 would be NaN without fallback
+    Indicator x = PRICELIST({nan, 1.0, 2.0, 3.0, 4.0});
+    Indicator y = PRICELIST({nan, 2.0, 4.0, 6.0, 8.0});
+    Indicator r = CORR(x, y, 3);
+    /** @arg anchor fallback keeps the windows computable; perfect linear y=2x gives corr = 1 */
+    CHECK_EQ(r.discard(), 2);
+    CHECK_EQ(r[2], doctest::Approx(1.0));
+    CHECK_EQ(r[3], doctest::Approx(1.0));
+    CHECK_EQ(r[4], doctest::Approx(1.0));
+}
+
 TEST_CASE("test_CORR") {
     Indicator result;
 

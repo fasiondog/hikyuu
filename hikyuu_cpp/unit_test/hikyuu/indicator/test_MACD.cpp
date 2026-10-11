@@ -255,6 +255,44 @@ TEST_CASE("test_MACD_dyn") {
  * the tail diverged. Incremental calculate is now disabled; this case guards that re-enabling it
  * means carrying the EMA state, not inferring it from the results.
  */
+/** @par Test points: ST-N15 — leading non-finite yields Null (never a fake 0/0/0 line) until
+ * the first finite observation seeds the internal EMAs; dynamic path must match the static prefix
+ */
+TEST_CASE("test_MACD_leading_nan_null") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, nan, nan, nan, 5.0, 6.0});
+    Indicator r = MACD(data, 2, 3, 2);
+    // bars 2,3 have no valid post-seed observation yet: must be Null (not fake 0/0/0)
+    CHECK_UNARY(std::isnan(r[2]));
+    CHECK_UNARY(std::isnan(r.get(2, 1)));
+    CHECK_UNARY(std::isnan(r.get(3, 2)));
+    // bar 4 (first finite after gap) resumes recursion, outputs finite
+    CHECK_UNARY(std::isfinite(r[4]));
+    CHECK_UNARY(std::isfinite(r.get(4, 1)));
+    CHECK_UNARY(std::isfinite(r.get(4, 2)));
+
+    /** @arg Dynamic path: every bar must equal the static MACD of the [0, i] prefix (bitwise
+     * identical, including the leading-NaN Null region). Regression guard for _dyn_one_circle
+     * bailing out early on the first non-finite bar. */
+    Indicator dyn =
+      MACD(data, IndParam(CVAL(data, 2)), IndParam(CVAL(data, 3)), IndParam(CVAL(data, 2)));
+    auto same = [](price_t a, price_t b) {
+        if (std::isnan(a) || std::isnan(b))
+            return std::isnan(a) && std::isnan(b);
+        return std::abs(a - b) < 1e-9 * std::max(1.0, std::abs(a));
+    };
+    for (size_t i = 0; i < data.size(); ++i) {
+        Indicator prefix = MACD(SLICE(data, 0, i + 1), 2, 3, 2);
+        for (size_t col = 0; col < 3; ++col) {
+            CHECK_UNARY(same(prefix.get(i, col), dyn.get(i, col)));
+        }
+    }
+    // the resumption bar must be finite in the dynamic path too (not Null from early return)
+    CHECK_UNARY(std::isfinite(dyn.get(4, 0)));
+    CHECK_UNARY(std::isfinite(dyn.get(4, 1)));
+    CHECK_UNARY(std::isfinite(dyn.get(4, 2)));
+}
+
 /** @par Test points: NaN input holds the previous three outputs instead of permanently poisoning
  * the tail */
 TEST_CASE("test_MACD_nan_hold") {
