@@ -24,7 +24,7 @@ TEST_CASE("test_KRecord_operator_eq_amount_tolerance") {
     CHECK(base == same);
     CHECK_FALSE(base != same);
 
-    /** @arg large-magnitude amount/count differing by a tiny absolute amount are equal (BASE-324) */
+    /** @arg large-magnitude amount/count differing by a tiny absolute amount are equal */
     KRecord approx = base;
     approx.transAmount = 1000000.0 + 0.5;
     approx.transCount = 800000.0 + 0.5;

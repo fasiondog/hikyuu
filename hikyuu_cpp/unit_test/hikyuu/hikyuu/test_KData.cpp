@@ -2024,8 +2024,8 @@ TEST_CASE("test_KData_recover_window_independent") {
     }
 }
 
-/** @par Test point - the recovery adjusts the price only: the volume and the turnover amount are the
- * quantities really traded that day and are left unchanged, which is the convention of the
+/** @par Test point - the recovery adjusts the price only: the volume and the turnover amount are
+ * the quantities really traded that day and are left unchanged, which is the convention of the
  * mainstream data sources (Wind, JoinQuant, ...) and keeps the share-capital based indicators (e.g.
  * the turnover rate) meaningful on the recovered data. */
 TEST_CASE("test_KData_recover_price_only") {
@@ -2061,9 +2061,9 @@ TEST_CASE("test_KData_recover_price_only") {
 
 /** @par Test point - the recovered prices must follow the mainstream definitions:
  * - the cumulative adjustment factor used by the factor based data sources (Wind / tushare /
- *   JoinQuant): the factor of a record date is `the previous close / the ex-rights reference price`,
- *   the backward (forward) price is the raw price times the product of the factors of the events at
- *   and before (after) that bar;
+ *   JoinQuant): the factor of a record date is `the previous close / the ex-rights reference
+ * price`, the backward (forward) price is the raw price times the product of the factors of the
+ * events at and before (after) that bar;
  * - the adjustment formula used by the TDX-like clients, applied step by step. */
 TEST_CASE("test_KData_recover_vendor_convention") {
     StockManager& sm = StockManager::instance();
@@ -2112,12 +2112,13 @@ TEST_CASE("test_KData_recover_vendor_convention") {
         } else {
             const price_t change = 0.1 * (w.countAsGift() + w.countForSell() + w.increasement());
             e.denominator = 1.0 + change;
-            // the cash dividend less the rights (new) share term: the backward formula adds it while
-            // the forward formula subtracts it
+            // the cash dividend less the rights (new) share term: the backward formula adds it
+            // while the forward formula subtracts it
             e.temp = 0.1 * w.bonus() - w.priceForSell() * change;
         }
-        // The ex-rights reference price = (the previous close - the cash dividend + the rights share
-        // term) / (1 + the change ratio); the factor is the previous close over the reference price
+        // The ex-rights reference price = (the previous close - the cash dividend + the rights
+        // share term) / (1 + the change ratio); the factor is the previous close over the reference
+        // price
         e.price_k = close / ((close - e.temp) / e.denominator);
         events.push_back(e);
     }
@@ -2150,8 +2151,7 @@ TEST_CASE("test_KData_recover_vendor_convention") {
         }
 
         /** @arg the backward price of the factor method (the events up to this bar) */
-        CHECK_EQ(eqb[i].closePrice,
-                 doctest::Approx(close * factor_at_and_before).epsilon(0.0001));
+        CHECK_EQ(eqb[i].closePrice, doctest::Approx(close * factor_at_and_before).epsilon(0.0001));
         /** @arg the backward price of the adjustment formula method */
         CHECK_EQ(bwd[i].closePrice, doctest::Approx(price_at_and_before).epsilon(0.0001));
 
@@ -2162,7 +2162,7 @@ TEST_CASE("test_KData_recover_vendor_convention") {
     }
 }
 
-/** @par Test point - BASE-304/327: an extra ktype above the daily line (e.g. DAY3) has no phase
+/** @par Test point: an extra ktype above the daily line (e.g. DAY3) has no phase
  * start rule, and its seconds are unknown without the extra plugin; the recovery is skipped and the
  * raw data is returned instead of throwing std::bad_function_call or applying the daily formula. */
 TEST_CASE("test_KData_recover_unsupported_ktype") {
@@ -2185,7 +2185,7 @@ TEST_CASE("test_KData_recover_unsupported_ktype") {
     }
 }
 
-/** @par Test point - BASE-305: an empty KData follows the "empty returns the null record" contract
+/** @par Test point: an empty KData follows the "empty returns the null record" contract
  * of the base class: front()/back()/getKRecord() return the null record, and the ktype/date
  * conversions return an empty KData instead of crashing. */
 TEST_CASE("test_KData_empty_record_access") {
@@ -2475,7 +2475,7 @@ TEST_CASE("test_KData_const_iterator_robustness") {
     KData k1 = getKData("sh000001", 0, 5);
     KData k2 = k1;  // copy shares the same imp via shared_ptr
 
-    /** @arg iterators from a value-copied KData compare equal (BASE-319) */
+    /** @arg iterators from a value-copied KData compare equal */
     CHECK(k1.begin() == k2.begin());
     CHECK(k1.end() == k2.end());
     CHECK(k1.begin() != k1.end());
@@ -2489,7 +2489,7 @@ TEST_CASE("test_KData_const_iterator_robustness") {
     CHECK_EQ(count, k1.size());
 
     /** @arg iterator of a temporary KData survives after the temporary is destroyed
-     *  (BASE-319: imp held by shared_ptr, no dangling reference) */
+     *  (the imp is held by shared_ptr, no dangling reference) */
     KData::const_iterator tmp_iter;
     KData::const_iterator tmp_end;
     {
@@ -2512,7 +2512,7 @@ TEST_CASE("test_KData_getOtherQueryByDate_null_start") {
     KData k1 = getKData("sh000001", 0, 5);
 
     /** @arg Null start_datetime is an open lower bound, not pos_infin: start stays at the first
-     *  record (BASE-320) */
+     *  record */
     KQuery q = k1.getOtherQueryByDate(Null<Datetime>(), Null<Datetime>(), KQuery::MIN);
     CHECK_FALSE(q.startDatetime().isNull());
     CHECK_EQ(q.startDatetime(), k1.front().datetime);
@@ -2527,7 +2527,7 @@ TEST_CASE("test_KData_getOtherQueryByDate_null_start") {
 TEST_CASE("test_KData_getKData_lowercase_ktype") {
     KData k1 = getKData("sh000001", 0, 5);  // DAY
 
-    /** @arg lowercase ktype still hits the shared-imp fast path (BASE-325) */
+    /** @arg lowercase ktype still hits the shared-imp fast path */
     KData k2 = k1.getKData("day");
     CHECK(k2.getImp() == k1.getImp());
     CHECK_EQ(k2.size(), k1.size());
@@ -2564,8 +2564,7 @@ TEST_CASE("test_KData_start_pos_concurrent") {
         threads.emplace_back([&]() {
             for (int n = 0; n < 2000; ++n) {
                 KData copy = kdata;
-                if (copy.startPos() != start || copy.endPos() != end ||
-                    copy.lastPos() != end - 1 ||
+                if (copy.startPos() != start || copy.endPos() != end || copy.lastPos() != end - 1 ||
                     copy.getPosInStock(copy[0].datetime) != start) {
                     ++mismatch;
                 }
@@ -2583,7 +2582,7 @@ TEST_CASE("test_KData_start_pos_concurrent") {
     CHECK_EQ(mismatch.load(), 0);
 }
 
-/** @par Test point - cover BASE-322: the base KDataImp::getOtherFromSelf default must rebuild a
+/** @par Test point: the base KDataImp::getOtherFromSelf default must rebuild a
  * real PrivatedBufferImp (with data) instead of silently returning an empty base KDataImp. This
  * is the fallback used by plugin custom Imps that do not override getOtherFromSelf. */
 TEST_CASE("test_KDataImp_getOtherFromSelf_default_rebuild") {
