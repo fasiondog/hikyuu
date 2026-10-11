@@ -38,7 +38,8 @@ void IKurtosis::_calculate(const Indicator& data) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    // n == 0: expanding-window excess kurtosis, dst[i] uses [data.discard(), i]; num >= 4
+    // n == 0: expanding-window excess kurtosis over [data.discard(), i], skipping non-finite
+    // points; moment denominators use the running finite count.
     if (0 == n) {
         m_discard = data.discard() + 3;
         if (m_discard >= total) {
@@ -48,27 +49,37 @@ void IKurtosis::_calculate(const Indicator& data) {
         size_t start_pos = data.discard();
         value_t k = src[start_pos];
         value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+        size_t valid = 0;
+        value_t d0 = src[start_pos] - k;
+        if (std::isfinite(d0)) {
+            value_t d02 = d0 * d0;
+            ex += d0;
+            ex2 += d02;
+            ex3 += d02 * d0;
+            ex4 += d02 * d02;
+            valid++;
+        }
         for (size_t i = start_pos + 1; i < total; ++i) {
             value_t d = src[i] - k;
-            ex += d;
-            value_t d2 = d * d;
-            ex2 += d2;
-            value_t d3 = d2 * d;
-            ex3 += d3;
-            ex4 += d2 * d2;
-            if (i < m_discard) {
-                continue;
+            if (std::isfinite(d)) {
+                value_t d2 = d * d;
+                ex += d;
+                ex2 += d2;
+                ex3 += d2 * d;
+                ex4 += d2 * d2;
+                valid++;
             }
-            value_t num = (value_t)(i - start_pos + 1);
-            value_t var = std::max(0.0, ex2 / num - ex * ex / (num * num));
-            value_t std_dev = std::sqrt(var);
+            if (i < m_discard || valid == 0)
+                continue;
+            value_t nv = (value_t)valid;
+            value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
             value_t std_dev_pow4 = var * var;
-            if (std_dev == 0) {
+            if (var == 0) {
                 dst[i] = -3.0;
             } else {
-                value_t ex_over_n = ex / num;
-                value_t ex2_over_n = ex2 / num;
-                value_t fourth_moment = ex4 / num - 4 * (ex3 / num) * ex_over_n +
+                value_t ex_over_n = ex / nv;
+                value_t ex2_over_n = ex2 / nv;
+                value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
                                         6 * ex2_over_n * ex_over_n * ex_over_n -
                                         3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
                 dst[i] = fourth_moment / std_dev_pow4 - 3.0;
@@ -83,85 +94,63 @@ void IKurtosis::_calculate(const Indicator& data) {
         return;
     }
 
-    vector<price_t> pow2_ring(n);
-    vector<price_t> pow3_ring(n);
-    vector<price_t> pow4_ring(n);
-
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
-    size_t ring_ix = start_pos % n;
-
     value_t k = src[start_pos];
+    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+    size_t valid = 0;
+
     for (size_t i = start_pos; i < first_end; i++) {
         value_t d = src[i] - k;
-        ex += d;
-        value_t d2 = d * d;
-        pow2_ring[ring_ix] = d2;
-        ex2 += d2;
-        value_t d3 = d2 * d;
-        pow3_ring[ring_ix] = d3;
-        ex3 += d3;
-        value_t d4 = d3 * d;
-        pow4_ring[ring_ix] = d4;
-        ex4 += d4;
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        if (std::isfinite(d)) {
+            value_t d2 = d * d;
+            ex += d;
+            ex2 += d2;
+            ex3 += d2 * d;
+            ex4 += d2 * d2;
+            valid++;
         }
     }
 
-    value_t var = std::max(0.0, ex2 / n - ex * ex / ((value_t)n * n));
-    value_t std_dev = sqrt(var);
-    value_t std_dev_pow4 = var * var;
-
-    if (std_dev == 0) {
-        dst[first_end - 1] = -3.0;
-    } else {
-        value_t ex_over_n = ex / n;
-        value_t ex2_over_n = ex2 / n;
-        value_t fourth_moment = ex4 / n - 4 * (ex3 / n) * ex_over_n +
+    auto emit = [&](size_t i) {
+        if (valid == 0)
+            return;
+        value_t nv = (value_t)valid;
+        value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
+        if (var == 0) {
+            dst[i] = -3.0;
+            return;
+        }
+        value_t std_dev_pow4 = var * var;
+        value_t ex_over_n = ex / nv;
+        value_t ex2_over_n = ex2 / nv;
+        value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
                                 6 * ex2_over_n * ex_over_n * ex_over_n -
                                 3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
-        value_t kurtosis = fourth_moment / std_dev_pow4;
-        dst[first_end - 1] = kurtosis - 3.0;
-    }
+        dst[i] = fourth_moment / std_dev_pow4 - 3.0;
+    };
+    emit(first_end - 1);
 
     for (size_t i = first_end; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow2_ring[ring_ix];
-        ex3 -= pow3_ring[ring_ix];
-        ex4 -= pow4_ring[ring_ix];
-
+        value_t d_pre = src[i - n] - k;
+        if (std::isfinite(d_pre)) {
+            value_t dp2 = d_pre * d_pre;
+            ex -= d_pre;
+            ex2 -= dp2;
+            ex3 -= dp2 * d_pre;
+            ex4 -= dp2 * dp2;
+            valid--;
+        }
         value_t d = src[i] - k;
-        ex += d;
-        value_t d2 = d * d;
-        pow2_ring[ring_ix] = d2;
-        ex2 += d2;
-        value_t d3 = d2 * d;
-        pow3_ring[ring_ix] = d3;
-        ex3 += d3;
-        value_t d4 = d3 * d;
-        pow4_ring[ring_ix] = d4;
-        ex4 += d4;
-
-        var = std::max(0.0, ex2 / n - ex * ex / ((value_t)n * n));
-        std_dev = sqrt(var);
-        std_dev_pow4 = var * var;
-
-        if (std_dev == 0) {
-            dst[i] = -3.0;
-        } else {
-            value_t ex_over_n = ex / n;
-            value_t ex2_over_n = ex2 / n;
-            value_t fourth_moment = ex4 / n - 4 * (ex3 / n) * ex_over_n +
-                                    6 * ex2_over_n * ex_over_n * ex_over_n -
-                                    3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
-            value_t kurtosis = fourth_moment / std_dev_pow4;
-            dst[i] = kurtosis - 3.0;
+        if (std::isfinite(d)) {
+            value_t d2 = d * d;
+            ex += d;
+            ex2 += d2;
+            ex3 += d2 * d;
+            ex4 += d2 * d2;
+            valid++;
         }
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
-        }
+        emit(i);
     }
 }
 
@@ -179,66 +168,55 @@ void IKurtosis::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    vector<price_t> pow2_ring(n);
-    vector<price_t> pow3_ring(n);
-    vector<price_t> pow4_ring(n);
-
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     value_t k = src[start_pos];
-    size_t ring_ix = start_pos % n;
+    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+    size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
         value_t d = src[i] - k;
-        ex += d;
-        value_t d2 = d * d;
-        pow2_ring[ring_ix] = d2;
-        ex2 += d2;
-        value_t d3 = d2 * d;
-        pow3_ring[ring_ix] = d3;
-        ex3 += d3;
-        value_t d4 = d3 * d;
-        pow4_ring[ring_ix] = d4;
-        ex4 += d4;
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        if (std::isfinite(d)) {
+            value_t d2 = d * d;
+            ex += d;
+            ex2 += d2;
+            ex3 += d2 * d;
+            ex4 += d2 * d2;
+            valid++;
         }
     }
 
     for (size_t i = start_pos; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow2_ring[ring_ix];
-        ex3 -= pow3_ring[ring_ix];
-        ex4 -= pow4_ring[ring_ix];
-
+        value_t d_pre = src[i - n] - k;
+        if (std::isfinite(d_pre)) {
+            value_t dp2 = d_pre * d_pre;
+            ex -= d_pre;
+            ex2 -= dp2;
+            ex3 -= dp2 * d_pre;
+            ex4 -= dp2 * dp2;
+            valid--;
+        }
         value_t d = src[i] - k;
-        ex += d;
-        value_t d2 = d * d;
-        pow2_ring[ring_ix] = d2;
-        ex2 += d2;
-        value_t d3 = d2 * d;
-        pow3_ring[ring_ix] = d3;
-        ex3 += d3;
-        value_t d4 = d3 * d;
-        pow4_ring[ring_ix] = d4;
-        ex4 += d4;
-
-        value_t var = std::max(0.0, ex2 / n - ex * ex / ((value_t)n * n));
-        value_t std_dev = sqrt(var);
-        value_t std_dev_pow4 = var * var;
-
-        if (std_dev == 0) {
+        if (std::isfinite(d)) {
+            value_t d2 = d * d;
+            ex += d;
+            ex2 += d2;
+            ex3 += d2 * d;
+            ex4 += d2 * d2;
+            valid++;
+        }
+        if (valid == 0)
+            continue;
+        value_t nv = (value_t)valid;
+        value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
+        if (var == 0) {
             dst[i] = -3.0;
-        } else {
-            value_t ex_over_n = ex / n;
-            value_t ex2_over_n = ex2 / n;
-            value_t fourth_moment = ex4 / n - 4 * (ex3 / n) * ex_over_n +
-                                    6 * ex2_over_n * ex_over_n * ex_over_n -
-                                    3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
-            value_t kurtosis = fourth_moment / std_dev_pow4;
-            dst[i] = kurtosis - 3.0;
+            continue;
         }
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
-        }
+        value_t std_dev_pow4 = var * var;
+        value_t ex_over_n = ex / nv;
+        value_t ex2_over_n = ex2 / nv;
+        value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
+                                6 * ex2_over_n * ex_over_n * ex_over_n -
+                                3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
+        dst[i] = fourth_moment / std_dev_pow4 - 3.0;
     }
 }
 
@@ -248,32 +226,37 @@ void IKurtosis::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
     size_t start = _get_step_start(curPos, step, ind.discard());
     HKU_IF_RETURN(start != curPos + 1 - step, void());
 
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     value_t k = ind[start];
+    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+    size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
         value_t d = ind[i] - k;
-        ex += d;
-        value_t d2 = d * d;
-        ex2 += d2;
-        ex3 += d2 * d;
-        ex4 += d2 * d2;
+        if (std::isfinite(d)) {
+            value_t d2 = d * d;
+            ex += d;
+            ex2 += d2;
+            ex3 += d2 * d;
+            ex4 += d2 * d2;
+            valid++;
+        }
     }
-
-    value_t var = std::max(0.0, ex2 / step - ex * ex / ((value_t)step * step));
-    value_t std_dev = sqrt(var);
-    value_t std_dev_pow4 = var * var;
-
-    if (std_dev == 0) {
+    if (valid == 0) {
+        _set(Null<value_t>(), curPos);
+        return;
+    }
+    value_t nv = (value_t)valid;
+    value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
+    if (var == 0) {
         _set(-3.0, curPos);
-    } else {
-        value_t ex_over_step = ex / step;
-        value_t ex2_over_step = ex2 / step;
-        value_t fourth_moment = ex4 / step - 4 * (ex3 / step) * ex_over_step +
-                                6 * ex2_over_step * ex_over_step * ex_over_step -
-                                3 * ex_over_step * ex_over_step * ex_over_step * ex_over_step;
-        value_t kurtosis = fourth_moment / std_dev_pow4;
-        _set(kurtosis - 3.0, curPos);
+        return;
     }
+    value_t std_dev_pow4 = var * var;
+    value_t ex_over_n = ex / nv;
+    value_t ex2_over_n = ex2 / nv;
+    value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
+                            6 * ex2_over_n * ex_over_n * ex_over_n -
+                            3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
+    _set(fourth_moment / std_dev_pow4 - 3.0, curPos);
 }
 
 Indicator HKU_API KURT(int n) {

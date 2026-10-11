@@ -168,6 +168,20 @@ TEST_CASE("test_VAR_dyn") {
     }
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN slides out of the window, subsequent bars
+ * recover to finite */
+TEST_CASE("test_VAR_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
+    Indicator r = VAR(data, 3);
+    // i=3 window [1,2,NaN]: valid=2 = {2,3}, sample var = 0.5
+    CHECK_EQ(r[3], doctest::Approx(0.5));
+    // i=4 window [2,NaN,5]: valid=2 = {3,5}, sample var = 2
+    CHECK_EQ(r[4], doctest::Approx(2.0));
+    // i=5 window [NaN,5,6]: valid=2 = {5,6}, sample var = 0.5 (NaN slides out, full recovery)
+    CHECK_EQ(r[5], doctest::Approx(0.5));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

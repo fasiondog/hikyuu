@@ -39,7 +39,8 @@ void IVar::_calculate(const Indicator& data) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    // n == 0: expanding-window sample variance, dst[i] = sample var of [data.discard(), i]
+    // n == 0: expanding-window sample variance over [data.discard(), i], skipping non-finite
+    // points; sample size is the running count of finite points, not the raw index distance.
     if (0 == n) {
         m_discard = data.discard() + 1;
         if (m_discard >= total) {
@@ -49,12 +50,25 @@ void IVar::_calculate(const Indicator& data) {
         size_t start_pos = data.discard();
         value_t k = src[start_pos];
         value_t ex = 0.0, ex2 = 0.0;
+        size_t valid = 0;
+        value_t d0 = src[start_pos] - k;
+        if (std::isfinite(d0)) {
+            ex += d0;
+            ex2 += d0 * d0;
+            valid++;
+        }
         for (size_t i = start_pos + 1; i < total; ++i) {
             value_t d = src[i] - k;
-            ex += d;
-            ex2 += d * d;
-            value_t num = (value_t)(i - start_pos + 1);
-            dst[i] = std::max(0.0, ex2 / (num - 1) - ex * ex / (num * (num - 1)));
+            if (std::isfinite(d)) {
+                ex += d;
+                ex2 += d * d;
+                valid++;
+            }
+            if (valid < 2) {
+                continue;  // dst stays Null from _readyBuffer
+            }
+            value_t nv = (value_t)valid;
+            dst[i] = std::max(0.0, ex2 / (nv - 1) - ex * ex / (nv * (nv - 1)));
         }
         return;
     }
@@ -65,41 +79,43 @@ void IVar::_calculate(const Indicator& data) {
         return;
     }
 
-    vector<price_t> pow_ring(n);
-
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    value_t ex = 0.0, ex2 = 0.0;
-    size_t ring_ix = start_pos % n;
-
     value_t k = src[start_pos];
+    value_t ex = 0.0, ex2 = 0.0;
+    size_t valid = 0;
+
     for (size_t i = start_pos; i < first_end; i++) {
         value_t d = src[i] - k;
-        ex += d;
-        value_t d_pow = d * d;
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
         }
     }
 
-    value_t p1 = 1. / (n - 1);
-    value_t p2 = 1. / (n * (n - 1.));
-    dst[first_end - 1] = std::max(0.0, ex2 * p1 - ex * ex * p2);
+    auto emit = [&](size_t i) {
+        if (valid < 2)
+            return;  // dst stays Null from _readyBuffer
+        value_t nv = (value_t)valid;
+        dst[i] = std::max(0.0, ex2 / (nv - 1) - ex * ex / (nv * (nv - 1)));
+    };
+    emit(first_end - 1);
 
     for (size_t i = first_end; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow_ring[ring_ix];
-        value_t d = src[i] - k;
-        ex += d;
-        value_t d_pow = d * d;
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        dst[i] = std::max(0.0, ex2 * p1 - ex * ex * p2);
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        value_t d_pre = src[i - n] - k;
+        if (std::isfinite(d_pre)) {
+            ex -= d_pre;
+            ex2 -= d_pre * d_pre;
+            valid--;
         }
+        value_t d = src[i] - k;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
+        }
+        emit(i);
     }
 }
 
@@ -117,38 +133,35 @@ void IVar::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    vector<price_t> pow_ring(n);
-
-    value_t ex = 0.0, ex2 = 0.0;
     value_t k = src[start_pos];
-    size_t ring_ix = start_pos % n;
+    value_t ex = 0.0, ex2 = 0.0;
+    size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
         value_t d = src[i] - k;
-        ex += d;
-        value_t d_pow = d * d;
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
         }
     }
 
-    value_t p1 = 1. / (n - 1);
-    value_t p2 = 1. / (n * (n - 1.));
-    // dst[first_end - 1] = ex2 * p1 - ex * ex * p2;
-
     for (size_t i = start_pos; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow_ring[ring_ix];
-        value_t d = src[i] - k;
-        ex += d;
-        value_t d_pow = d * d;
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        dst[i] = std::max(0.0, ex2 * p1 - ex * ex * p2);
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        value_t d_pre = src[i - n] - k;
+        if (std::isfinite(d_pre)) {
+            ex -= d_pre;
+            ex2 -= d_pre * d_pre;
+            valid--;
         }
+        value_t d = src[i] - k;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
+        }
+        if (valid < 2)
+            continue;
+        value_t nv = (value_t)valid;
+        dst[i] = std::max(0.0, ex2 / (nv - 1) - ex * ex / (nv * (nv - 1)));
     }
 }
 
@@ -158,14 +171,23 @@ void IVar::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t start = _get_step_start(curPos, step, ind.discard());
     HKU_IF_RETURN(start != curPos + 1 - step, void());
 
-    price_t ex = 0.0, ex2 = 0.0;
     price_t k = ind[start];
+    price_t ex = 0.0, ex2 = 0.0;
+    size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
         price_t d = ind[i] - k;
-        ex += d;
-        ex2 += d * d;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
+        }
     }
-    _set(std::max(0.0, (ex2 - ex * ex / step) / (step - 1)), curPos);
+    if (valid < 2) {
+        _set(Null<price_t>(), curPos);
+        return;
+    }
+    price_t nv = (price_t)valid;
+    _set(std::max(0.0, (ex2 - ex * ex / nv) / (nv - 1)), curPos);
 }
 
 Indicator HKU_API VAR(int n) {

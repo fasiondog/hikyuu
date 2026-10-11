@@ -106,6 +106,23 @@ TEST_CASE("test_WMA_dyn") {
     }
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN slides out of the window, WMA recovers */
+TEST_CASE("test_WMA_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
+    Indicator r = WMA(data, 3);
+    // i=3 window [1,2,NaN]: bad>0, output stays Null
+    CHECK_UNARY(std::isnan(r[3]));
+    // NaN slides out by i=6 (window [4,5,6] no longer contains it)
+    Indicator clean = PRICELIST({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0});
+    Indicator dirty = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0, 7.0});
+    Indicator rc = WMA(clean, 3);
+    Indicator rd = WMA(dirty, 3);
+    // Once NaN slides fully out at i=6, results should match clean
+    CHECK_UNARY(std::isfinite(rd[6]));
+    CHECK(rd[6] == doctest::Approx(rc[6]));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

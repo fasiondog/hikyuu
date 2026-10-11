@@ -134,6 +134,17 @@ TEST_CASE("test_VARP_increment_equivalence") {
     check(13);
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN slides out of the window, subsequent bars
+ * recover to finite */
+TEST_CASE("test_VARP_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
+    Indicator r = VARP(data, 3);
+    for (size_t i = 3; i < 6; i++) {
+        CHECK_UNARY(std::isfinite(r[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

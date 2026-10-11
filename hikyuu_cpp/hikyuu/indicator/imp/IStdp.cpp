@@ -48,44 +48,45 @@ void IStdp::_calculate(const Indicator& data) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    vector<price_t> pow_ring(n);
-    price_t ex = 0.0, ex2 = 0.0;
-    size_t num = 0;
-    // the accumulation starts at the first valid input value, whatever the declared discard is
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
     price_t k = src[start_pos];
-    size_t ring_ix = start_pos % n;
+    price_t ex = 0.0, ex2 = 0.0;
+    size_t valid = 0;
+
     for (size_t i = start_pos; i < first_end; i++) {
-        num++;
         price_t d = src[i] - k;
-        ex += d;
-        price_t d_pow = std::pow(d, 2);
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        // a window that is not full only accumulates, so the declared prefix stays untouched
-        if (i >= m_discard) {
-            dst[i] = std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / num) / num));
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
         }
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
-        }
+        if (i < m_discard || valid == 0)
+            continue;
+        price_t nv = (price_t)valid;
+        dst[i] = std::sqrt(std::max(0.0, (ex2 - ex * ex / nv) / nv));
     }
 
     for (size_t i = first_end; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow_ring[ring_ix];
-        price_t d = src[i] - k;
-        ex += d;
-        price_t d_pow = std::pow(d, 2);
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        dst[i] = std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / n) / n));
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        price_t d_pre = src[i - n] - k;
+        if (std::isfinite(d_pre)) {
+            ex -= d_pre;
+            ex2 -= d_pre * d_pre;
+            valid--;
         }
+        price_t d = src[i] - k;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
+        }
+        if (valid == 0)
+            continue;
+        price_t nv = (price_t)valid;
+        dst[i] = std::sqrt(std::max(0.0, (ex2 - ex * ex / nv) / nv));
     }
 }
+
 bool IStdp::supportIncrementCalculate() const {
     return getParam<int>("n") != 0;
 }
@@ -100,33 +101,35 @@ void IStdp::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    vector<price_t> pow_ring(n);
-    price_t ex = 0.0, ex2 = 0.0;
     price_t k = src[start_pos - n];
-    size_t ring_ix = start_pos % n;
+    price_t ex = 0.0, ex2 = 0.0;
+    size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
         price_t d = src[i] - k;
-        ex += d;
-        price_t d_pow = std::pow(d, 2);
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
         }
     }
 
     for (size_t i = start_pos; i < total; i++) {
-        ex -= src[i - n] - k;
-        ex2 -= pow_ring[ring_ix];
-        price_t d = src[i] - k;
-        ex += d;
-        price_t d_pow = std::pow(d, 2);
-        pow_ring[ring_ix] = d_pow;
-        ex2 += d_pow;
-        dst[i] = std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / n) / n));
-        if (++ring_ix == (size_t)n) {
-            ring_ix = 0;
+        price_t d_pre = src[i - n] - k;
+        if (std::isfinite(d_pre)) {
+            ex -= d_pre;
+            ex2 -= d_pre * d_pre;
+            valid--;
         }
+        price_t d = src[i] - k;
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
+        }
+        if (valid == 0)
+            continue;
+        price_t nv = (price_t)valid;
+        dst[i] = std::sqrt(std::max(0.0, (ex2 - ex * ex / nv) / nv));
     }
 }
 
@@ -136,16 +139,23 @@ void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) 
         _set(Null<price_t>(), curPos);
         return;
     }
-    size_t num = 0;
-    price_t ex = 0.0, ex2 = 0.0;
     price_t k = ind[start];
+    price_t ex = 0.0, ex2 = 0.0;
+    size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
-        num++;
         price_t d = ind[i] - k;
-        ex += d;
-        ex2 += std::pow(d, 2);
+        if (std::isfinite(d)) {
+            ex += d;
+            ex2 += d * d;
+            valid++;
+        }
     }
-    _set(num == 0 ? 0.0 : std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / num) / num)), curPos);
+    if (valid == 0) {
+        _set(0.0, curPos);
+        return;
+    }
+    price_t nv = (price_t)valid;
+    _set(std::sqrt(std::max(0.0, (ex2 - ex * ex / nv) / nv)), curPos);
 }
 
 Indicator HKU_API STDP(int n) {

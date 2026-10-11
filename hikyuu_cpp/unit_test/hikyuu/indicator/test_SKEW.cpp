@@ -136,6 +136,17 @@ TEST_CASE("test_SKEW_increment_equivalence") {
     check(13);
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN slides out of the window, subsequent bars
+ * recover to finite */
+TEST_CASE("test_SKEW_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, 4.0, nan, 6.0, 7.0, 8.0, 9.0});
+    Indicator r = SKEW(data, 4);
+    for (size_t i = 6; i < 9; i++) {
+        CHECK_UNARY(std::isfinite(r[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

@@ -129,6 +129,21 @@ TEST_CASE("test_CORR") {
     }
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN pair slides out of the window, corr recovers
+ */
+TEST_CASE("test_CORR_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator x = PRICELIST({1.0, 2.0, 3.0, 4.0, nan, 6.0, 7.0, 8.0, 9.0});
+    Indicator y = PRICELIST({2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0});
+    Indicator r = CORR(x, y, 3);
+    // Perfect linear relation on finite points keeps corr at 1.0 once NaN slides through
+    for (size_t i = 6; i < 9; i++) {
+        CHECK_UNARY(std::isnan(r[i]) || r[i] == doctest::Approx(1.0));
+    }
+    // At least the post-NaN window [6,7,8] is perfectly finite (NaN fully slid out)
+    CHECK_EQ(r[8], doctest::Approx(1.0));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

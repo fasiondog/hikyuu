@@ -86,6 +86,17 @@ TEST_CASE("test_COV") {
     }
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN pair slides out, sample cov recovers to finite
+ */
+TEST_CASE("test_COV_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator x = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
+    Indicator y = PRICELIST({2.0, 4.0, 6.0, 8.0, 10.0, 12.0});
+    Indicator r = COV(x, y, 3);
+    CHECK_UNARY(std::isfinite(r[4]));
+    CHECK_UNARY(std::isfinite(r[5]));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

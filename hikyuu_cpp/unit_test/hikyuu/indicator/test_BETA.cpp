@@ -118,6 +118,20 @@ TEST_CASE("test_BETA_stock") {
     CHECK_EQ(result[99], doctest::Approx(0.924).epsilon(0.001));
 }
 
+/** @par Test points: ST-N03 — after a mid-series NaN pair slides out of the window, beta recovers
+ */
+TEST_CASE("test_BETA_nan_recovery") {
+    price_t nan = Null<price_t>();
+    Indicator x = PRICELIST({1.0, 2.0, 3.0, 4.0, nan, 6.0, 7.0, 8.0, 9.0});
+    Indicator y = PRICELIST({2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0});
+    // beta = cov(x,y) / var(y); with y=2x, expected beta = 0.5
+    Indicator r = BETA(x, y, 3);
+    for (size_t i = 6; i < 9; i++) {
+        CHECK_UNARY(std::isfinite(r[i]));
+    }
+    CHECK_EQ(r[8], doctest::Approx(0.5));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------
