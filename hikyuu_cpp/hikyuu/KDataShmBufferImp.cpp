@@ -100,35 +100,7 @@ KDataImpPtr KDataShmBufferImp::create(const Stock& stock, const KQuery& query) {
 }
 
 size_t KDataShmBufferImp::getPos(const Datetime& datetime) const noexcept {
-    if (empty()) {
-        return Null<size_t>();
-    }
-
-    size_t mid, low = 0, high = size() - 1;
-    while (low <= high) {
-        if (datetime > m_data[high].datetime) {
-            mid = high + 1;
-            break;
-        }
-
-        if (m_data[low].datetime >= datetime) {
-            mid = low;
-            break;
-        }
-
-        mid = (low + high) / 2;
-        if (datetime > m_data[mid].datetime) {
-            low = mid + 1;
-        } else {
-            high = mid - 1;
-        }
-    }
-
-    if (mid >= size()) {
-        return Null<size_t>();
-    }
-
-    return m_data[mid].datetime == datetime ? mid : Null<size_t>();
+    return getKRecordPosByDatetime(m_data, size(), datetime);
 }
 
 DatetimeList KDataShmBufferImp::getDatetimeList() const {

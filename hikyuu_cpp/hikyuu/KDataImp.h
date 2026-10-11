@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include "Stock.h"
 
 namespace hku {
@@ -76,6 +77,22 @@ public:
     typedef shared_ptr<KDataImp> KDataImpPtr;
     virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const {
         return std::make_shared<KDataImp>(m_stock, query);
+    }
+
+protected:
+    // Find the index of the KRecord whose datetime equals `datetime` within the contiguous
+    // [first, first + count) range, or return Null<size_t>() when absent. The range must be
+    // sorted ascending by datetime.
+    static size_t getKRecordPosByDatetime(const KRecord* first, size_t count,
+                                          const Datetime& datetime) noexcept {
+        const KRecord* last = first + count;
+        const KRecord* it = std::lower_bound(
+          first, last, datetime,
+          [](const KRecord& record, const Datetime& dt) { return record.datetime < dt; });
+        if (it == last || it->datetime != datetime) {
+            return Null<size_t>();
+        }
+        return static_cast<size_t>(it - first);
     }
 
 protected:

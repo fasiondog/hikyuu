@@ -44,37 +44,7 @@ KDataSharedBufferImp::KDataSharedBufferImp(const Stock& stock, const KQuery& que
 KDataSharedBufferImp::~KDataSharedBufferImp() {}
 
 size_t KDataSharedBufferImp::getPos(const Datetime& datetime) const noexcept {
-    KRecord null_record;
-    if (empty()) {
-        return Null<size_t>();
-    }
-
-    const KRecord* p = dataptr();
-    size_t mid, low = 0, high = size() - 1;
-    while (low <= high) {
-        if (datetime > p[high].datetime) {
-            mid = high + 1;
-            break;
-        }
-
-        if (p[low].datetime >= datetime) {
-            mid = low;
-            break;
-        }
-
-        mid = (low + high) / 2;
-        if (datetime > p[mid].datetime) {
-            low = mid + 1;
-        } else {
-            high = mid - 1;
-        }
-    }
-
-    if (mid >= size()) {
-        return Null<size_t>();
-    }
-
-    return p[mid].datetime == datetime ? mid : Null<size_t>();
+    return getKRecordPosByDatetime(dataptr(), size(), datetime);
 }
 
 const KRecord& KDataSharedBufferImp::getKRecord(size_t pos) const noexcept {

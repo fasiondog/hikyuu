@@ -57,18 +57,7 @@ void KDataPrivatedBufferImp::_getPosInStock() const {
 }
 
 size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const noexcept {
-    KRecordList::const_iterator iter;
-    KRecord comp_record;
-    comp_record.datetime = datetime;
-    iter = lower_bound(
-      m_buffer.cbegin(), m_buffer.cend(), comp_record,
-      std::bind(std::less<Datetime>(), std::bind(&KRecord::datetime, std::placeholders::_1),
-                std::bind(&KRecord::datetime, std::placeholders::_2)));
-    if (iter == m_buffer.cend() || iter->datetime != datetime) {
-        return Null<size_t>();
-    }
-
-    return (iter - m_buffer.cbegin());
+    return getKRecordPosByDatetime(m_buffer.data(), m_buffer.size(), datetime);
 }
 
 void KDataPrivatedBufferImp::_recover() {
