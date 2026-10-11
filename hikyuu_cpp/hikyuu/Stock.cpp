@@ -608,9 +608,7 @@ StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) con
 
     end_iter = lower_bound(start_iter, (StockWeightList::const_iterator)m_data->m_weightList.end(),
                            StockWeight(end), std::less<StockWeight>());
-    for (; start_iter != end_iter; ++start_iter) {
-        result.push_back(*start_iter);
-    }
+    result.assign(start_iter, end_iter);
 
     return result;
 }
