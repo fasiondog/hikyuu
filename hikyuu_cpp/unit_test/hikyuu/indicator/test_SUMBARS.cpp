@@ -487,6 +487,48 @@ TEST_CASE("test_SUMBARS_dyn_varying_param") {
     CHECK_EQ(d[4], 1);              // a=3, j=4 sum=1, j=3 sum=3>=3 -> i-j=1
 }
 
+/** @par Test points: ST-N11 (ISumBars) — non-finite src/a handled as missing, Inf never
+ * accumulates as a valid value */
+TEST_CASE("test_SUMBARS_inf_input") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+
+    /** @arg +Inf in the src blocks any window whose back-scan crosses it */
+    {
+        Indicator data = PRICELIST({1.0, 2.0, inf_v, 4.0, 5.0});
+        Indicator r = SUMBARS(data, 3.0);
+        for (size_t i = 0; i < r.size(); i++) {
+            /** @arg every output is finite or Null, never poisoned */
+            CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+        }
+        // bar 2 (Inf src) itself is invalid; its window must not succeed via Inf >= 3
+        CHECK_UNARY(std::isnan(r[2]));
+        // bars 3/4 alone already satisfy a=3, back-scan never reaches the Inf
+        CHECK_EQ(r[3], 0);
+        CHECK_EQ(r[4], 0);
+    }
+
+    /** @arg non-finite `a` param treats the whole indicator as invalid */
+    {
+        PriceList d{1.0, 2.0, 3.0, 4.0, 5.0};
+        Indicator r = SUMBARS(PRICELIST(d), inf_v);
+        for (size_t i = 0; i < r.size(); i++) {
+            CHECK_UNARY(std::isnan(r[i]));
+        }
+    }
+
+    /** @arg dynamic path (per-bar `a`) also rejects non-finite a / src, matching static */
+    {
+        Indicator src = PRICELIST({1.0, 2.0, inf_v, 4.0, 5.0});
+        Indicator dyn = SUMBARS(src, CVAL(src, 3.0));
+        for (size_t i = 0; i < dyn.size(); i++) {
+            CHECK_UNARY(std::isnan(dyn[i]) || std::isfinite(dyn[i]));
+        }
+        CHECK_UNARY(std::isnan(dyn[2]));
+        CHECK_EQ(dyn[3], 0);
+        CHECK_EQ(dyn[4], 0);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
