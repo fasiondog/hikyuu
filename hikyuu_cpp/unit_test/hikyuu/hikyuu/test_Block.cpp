@@ -177,4 +177,42 @@ TEST_CASE("test_Block_add_list_all_of") {
     CHECK_EQ(blk5.size(), 2u);
 }
 
+/** @par Test points */
+TEST_CASE("test_Block_eq_and_hash_order_independent") {
+    StockManager& sm = StockManager::instance();
+
+    Stock a = sm["sh000001"];
+    Stock b = sm["sz000002"];
+    Stock c = sm["sh000002"];
+
+    /** @arg Two blocks with the same stocks added in different order are equal
+     *      (equality must not depend on unordered_map iteration order) */
+    Block blk1;
+    blk1.add(a);
+    blk1.add(b);
+    Block blk2;
+    blk2.add(b);  // reversed insertion order
+    blk2.add(a);
+    CHECK(blk1 == blk2);
+    CHECK_UNARY_FALSE(blk1 != blk2);
+
+    /** @arg strongHash is order-independent for the same stock set */
+    CHECK_EQ(blk1.strongHash(), blk2.strongHash());
+
+    /** @arg A block with a different stock set is not equal and hashes differently */
+    Block blk3;
+    blk3.add(a);
+    blk3.add(c);
+    CHECK_UNARY_FALSE(blk1 == blk3);
+    CHECK(blk1.strongHash() != blk3.strongHash());
+
+    /** @arg A block with an extra stock is not equal and hashes differently */
+    Block blk4;
+    blk4.add(a);
+    blk4.add(b);
+    blk4.add(c);
+    CHECK_UNARY_FALSE(blk1 == blk4);
+    CHECK(blk1.strongHash() != blk4.strongHash());
+}
+
 /** @} */
