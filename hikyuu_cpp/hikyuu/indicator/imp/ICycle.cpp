@@ -229,7 +229,10 @@ void ICycle::_calculate(const Indicator& data) {
     _readyBuffer(total, 1);
 
     DatetimeList datelist = k.getStock().getTradingCalendar(k.getQuery());
-    HKU_IF_RETURN(datelist.empty(), void());
+    if (datelist.empty()) {
+        m_discard = total;
+        return;
+    }
 
     int adjust_cycle = getParam<int>("adjust_cycle");
     string adjust_mode = getParam<string>("adjust_mode");
