@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "ILowLineBars.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,7 +24,7 @@ ILowLineBars::~ILowLineBars() {}
 
 void ILowLineBars::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 0);
+        HKU_ASSERT(getParam<int>("n") >= 0 && getParam<int>("n") < INT_MAX);
     }
 }
 

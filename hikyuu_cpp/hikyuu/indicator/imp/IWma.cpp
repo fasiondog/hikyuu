@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IWma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -21,7 +22,8 @@ IWma::~IWma() {}
 
 void IWma::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_CHECK(getParam<int>("n") >= 1, "WMA n must >= 1!");
+        HKU_CHECK(getParam<int>("n") >= 1 && getParam<int>("n") < INT_MAX,
+                  "WMA n must >= 1 and < INT_MAX!");
     }
 }
 
@@ -50,7 +52,7 @@ void IWma::_calculate(const Indicator& ind) {
         sum += src[i] * count;
     }
 
-    value_t divider = n * (n + 1) / 2.0;
+    value_t divider = value_t(n) * (n + 1) / 2.0;
     dst[m_discard] = sum / divider;
 
     size_t trailingIdx = ind.discard();
@@ -85,7 +87,7 @@ void IWma::_increment_calculate(const Indicator& ind, size_t start_pos) {
         sum += src[i] * count;
     }
 
-    value_t divider = n * (n + 1) / 2.0;
+    value_t divider = value_t(n) * (n + 1) / 2.0;
     size_t trailingIdx = start_pos - n;
     for (size_t i = start_pos; i < total; i++) {
         value_t tmp = src[i];

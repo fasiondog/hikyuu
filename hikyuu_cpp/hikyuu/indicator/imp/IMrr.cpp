@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IMrr.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -56,7 +57,7 @@ IMrr::~IMrr() {}
 
 void IMrr::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 0);
+        HKU_ASSERT(getParam<int>("n") >= 0 && getParam<int>("n") < INT_MAX);
     }
 }
 

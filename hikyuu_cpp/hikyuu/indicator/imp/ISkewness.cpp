@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "ISkewness.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -24,7 +25,7 @@ ISkewness::~ISkewness() {}
 void ISkewness::_checkParam(const string& name) const {
     if ("n" == name) {
         int n = getParam<int>(name);
-        HKU_ASSERT(n >= 3 || n == 0);
+        HKU_ASSERT((n == 0 || n >= 3) && n < INT_MAX);
     }
 }
 

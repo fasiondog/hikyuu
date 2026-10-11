@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IDevsq.h"
 #include "../crt/MA.h"
 
@@ -24,7 +25,7 @@ IDevsq::~IDevsq() {}
 
 void IDevsq::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 2);
+        HKU_ASSERT(getParam<int>("n") >= 2 && getParam<int>("n") < INT_MAX);
     }
 }
 

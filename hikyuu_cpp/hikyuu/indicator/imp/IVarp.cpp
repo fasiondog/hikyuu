@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IVarp.h"
 #include "../crt/MA.h"
 
@@ -25,7 +26,7 @@ IVarp::~IVarp() {}
 void IVarp::_checkParam(const string& name) const {
     if ("n" == name) {
         int n = getParam<int>(name);
-        HKU_ASSERT(n >= 2 || n == 0);
+        HKU_ASSERT((n == 0 || n >= 2) && n < INT_MAX);
     }
 }
 

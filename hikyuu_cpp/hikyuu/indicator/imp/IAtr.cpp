@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#include <climits>
 #include "../crt/ATR.h"
 #include "IAtr.h"
 
@@ -23,7 +24,7 @@ IAtr::~IAtr() {}
 
 void IAtr::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 1);
+        HKU_ASSERT(getParam<int>("n") >= 1 && getParam<int>("n") < INT_MAX);
     }
 }
 

@@ -5,6 +5,7 @@
  *  Author: fasiondog
  */
 
+#include <climits>
 #include "IRSRSBeta.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -22,7 +23,7 @@ IRSRSBeta::~IRSRSBeta() {}
 
 void IRSRSBeta::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 2);
+        HKU_ASSERT(getParam<int>("n") >= 2 && getParam<int>("n") < INT_MAX);
     }
 }
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IMacd.h"
 #include "../crt/CVAL.h"
 
@@ -24,11 +25,14 @@ IMacd::~IMacd() {}
 
 void IMacd::_checkParam(const string& name) const {
     if ("n1" == name) {
-        HKU_ASSERT(getParam<int>("n1") >= 1);
+        int v = getParam<int>("n1");
+        HKU_ASSERT(v >= 1 && v < INT_MAX);
     } else if ("n2" == name) {
-        HKU_ASSERT(getParam<int>("n2") >= 1);
+        int v = getParam<int>("n2");
+        HKU_ASSERT(v >= 1 && v < INT_MAX);
     } else if ("n3" == name) {
-        HKU_ASSERT(getParam<int>("n3") >= 1);
+        int v = getParam<int>("n3");
+        HKU_ASSERT(v >= 1 && v < INT_MAX);
     }
 }
 

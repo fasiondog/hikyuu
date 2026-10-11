@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IBackset.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -24,7 +25,7 @@ IBackset::~IBackset() {}
 
 void IBackset::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 1);
+        HKU_ASSERT(getParam<int>("n") >= 1 && getParam<int>("n") < INT_MAX);
     }
 }
 

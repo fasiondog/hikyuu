@@ -1,3 +1,11 @@
+/*
+ *  Copyright (c) 2026 hikyuu.org
+ *
+ *  Created on: 2026-07-12
+ *      Author: fasiondog
+ */
+
+#include <climits>
 #include "IAdx2.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -15,7 +23,7 @@ IAdx2::~IAdx2() {}
 
 void IAdx2::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 2);
+        HKU_ASSERT(getParam<int>("n") >= 2 && getParam<int>("n") < INT_MAX);
     }
 }
 

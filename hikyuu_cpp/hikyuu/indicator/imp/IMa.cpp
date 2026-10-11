@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IMa.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -21,7 +22,7 @@ IMa::~IMa() {}
 
 void IMa::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 0);
+        HKU_ASSERT(getParam<int>("n") >= 0 && getParam<int>("n") < INT_MAX);
     }
 }
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include <cmath>
 #include "../crt/CVAL.h"
 #include "IAma.h"
@@ -25,11 +26,11 @@ IAma::~IAma() {}
 
 void IAma::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 1);
+        HKU_ASSERT(getParam<int>("n") >= 1 && getParam<int>("n") < INT_MAX);
     } else if ("fast_n" == name) {
-        HKU_ASSERT(getParam<int>("fast_n") >= 0);
+        HKU_ASSERT(getParam<int>("fast_n") >= 0 && getParam<int>("fast_n") < INT_MAX);
     } else if ("slow_n" == name) {
-        HKU_ASSERT(getParam<int>("slow_n") >= 0);
+        HKU_ASSERT(getParam<int>("slow_n") >= 0 && getParam<int>("slow_n") < INT_MAX);
     }
 }
 

@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IHighLine.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,7 +24,7 @@ IHighLine::~IHighLine() {}
 
 void IHighLine::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 0);
+        HKU_ASSERT(getParam<int>("n") >= 0 && getParam<int>("n") < INT_MAX);
     }
 }
 

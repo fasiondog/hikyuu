@@ -5,6 +5,7 @@
  *  Author: fasiondog
  */
 
+#include <climits>
 #include "IRSRSBull.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,9 +24,9 @@ IRSRSBull::~IRSRSBull() {}
 
 void IRSRSBull::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 2);
+        HKU_ASSERT(getParam<int>("n") >= 2 && getParam<int>("n") < INT_MAX);
     } else if ("m" == name) {
-        HKU_ASSERT(getParam<int>("m") >= 2);
+        HKU_ASSERT(getParam<int>("m") >= 2 && getParam<int>("m") < INT_MAX);
     }
 }
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "hikyuu/Block.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/REF.h"
@@ -48,7 +49,7 @@ IIc::~IIc() {}
 
 void IIc::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") >= 1);
+        HKU_ASSERT(getParam<int>("n") >= 1 && getParam<int>("n") < INT_MAX);
     }
 }
 

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IQuantileTrunc.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,7 +24,7 @@ IQuantileTrunc::~IQuantileTrunc() {}
 
 void IQuantileTrunc::_checkParam(const string &name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") > 0);
+        HKU_ASSERT(getParam<int>("n") > 0 && getParam<int>("n") < INT_MAX);
     } else if ("quantile_min" == name) {
         double quantile_min = getParam<double>("quantile_min");
         HKU_ASSERT(quantile_min >= 0.0 && quantile_min <= 1.0);

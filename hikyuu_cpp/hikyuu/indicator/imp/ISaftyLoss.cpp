@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "../crt/CVAL.h"
 #include "ISaftyLoss.h"
 
@@ -24,9 +25,9 @@ ISaftyLoss::~ISaftyLoss() {}
 
 void ISaftyLoss::_checkParam(const string& name) const {
     if ("n1" == name) {
-        HKU_ASSERT(getParam<int>("n1") >= 2);
+        HKU_ASSERT(getParam<int>("n1") >= 2 && getParam<int>("n1") < INT_MAX);
     } else if ("n2" == name) {
-        HKU_ASSERT(getParam<int>("n2") >= 1);
+        HKU_ASSERT(getParam<int>("n2") >= 1 && getParam<int>("n2") < INT_MAX);
     }
 }
 
@@ -49,12 +50,12 @@ void ISaftyLoss::_calculate(const Indicator& data) {
     auto* dst = this->data();
     global_parallel_for_index_void(
       m_discard, total, [&](size_t i) { dst[i] = _calcOneBar(src, i, n1, n2, p); },
-      MIN_PARALLEL_WORK / std::max(1, n1 * n2));
+      MIN_PARALLEL_WORK / std::max<size_t>(1, size_t(n1) * n2));
 }
 
 size_t ISaftyLoss::min_increment_start() const {
     // The inner loop reads src[k - 1] from j == start_pos + 1 - n2 with k starting at j + 2 - n1.
-    return getParam<int>("n1") + getParam<int>("n2") - 2;
+    return size_t(getParam<int>("n1")) + getParam<int>("n2") - 2;
 }
 
 Indicator::value_t ISaftyLoss::_calcOneBar(const Indicator::value_t* src, size_t i, int n1, int n2,

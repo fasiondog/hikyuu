@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IStdev.h"
 #include "../crt/MA.h"
 
@@ -23,7 +24,7 @@ IStdev::~IStdev() {}
 void IStdev::_checkParam(const string& name) const {
     if ("n" == name) {
         int n = getParam<int>("n");
-        HKU_ASSERT(n == 0 || n >= 2);
+        HKU_ASSERT(n == 0 || (n >= 2 && n < INT_MAX));
     }
 }
 

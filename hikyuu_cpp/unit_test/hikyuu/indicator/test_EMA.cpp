@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "../test_config.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
@@ -30,6 +31,9 @@ TEST_CASE("test_EMA") {
         d.push_back(i);
     }
 
+    /** @arg n = INT_MAX is rejected (would overflow the 2.0 / (n + 1) expression) */
+    CHECK_THROWS_AS(EMA(INT_MAX), std::exception);
+    CHECK_THROWS_AS(EMA(0), std::exception);
     /** @arg n = 1 */
     Indicator data = PRICELIST(d);
     Indicator ema = EMA(data, 1);

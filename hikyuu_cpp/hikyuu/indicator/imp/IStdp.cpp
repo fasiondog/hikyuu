@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IStdp.h"
 #include "../crt/MA.h"
 
@@ -25,7 +26,7 @@ IStdp::~IStdp() {}
 void IStdp::_checkParam(const string& name) const {
     if ("n" == name) {
         int n = getParam<int>("n");
-        HKU_ASSERT(n == 0 || n >= 2);
+        HKU_ASSERT(n == 0 || (n >= 2 && n < INT_MAX));
     }
 }
 

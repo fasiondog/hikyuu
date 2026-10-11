@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IBarsSince.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,7 +24,8 @@ IBarsSince::~IBarsSince() {}
 
 void IBarsSince::_checkParam(const string &name) const {
     if (name == "n") {
-        HKU_CHECK(getParam<int>("n") >= 0, "n must >= 0!");
+        HKU_CHECK(getParam<int>("n") >= 0 && getParam<int>("n") < INT_MAX,
+                  "n must >= 0 and < INT_MAX!");
     }
 }
 

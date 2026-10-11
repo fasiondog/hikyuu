@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "doctest/doctest.h"
 #include <fstream>
 #include <hikyuu/StockManager.h>
@@ -44,6 +45,11 @@ TEST_CASE("test_MACD") {
     CHECK_THROWS_AS(MACD(12, 0, 9), std::exception);
     CHECK_THROWS_AS(MACD(12, 26, 0), std::exception);
     CHECK_THROWS_AS(MACD(-1, 26, 9), std::exception);
+
+    /** @arg n1 / n2 / n3 < INT_MAX (would overflow the 2.0 / (n + 1) expression) */
+    CHECK_THROWS_AS(MACD(INT_MAX, 26, 9), std::exception);
+    CHECK_THROWS_AS(MACD(12, INT_MAX, 9), std::exception);
+    CHECK_THROWS_AS(MACD(12, 26, INT_MAX), std::exception);
 
     /** @arg n1 = n2 = n3 = 1*/
     macd = MACD(ind, 1, 1, 1);

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <climits>
 #include "IEma.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -21,7 +22,8 @@ IEma::~IEma() {}
 
 void IEma::_checkParam(const string& name) const {
     if ("n" == name) {
-        HKU_ASSERT(getParam<int>("n") > 0);
+        int n = getParam<int>("n");
+        HKU_ASSERT(n > 0 && n < INT_MAX);
     }
 }
 
