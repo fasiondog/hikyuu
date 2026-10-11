@@ -182,6 +182,31 @@ TEST_CASE("test_VAR_nan_recovery") {
     CHECK_EQ(r[5], doctest::Approx(0.5));
 }
 
+/** @par Test points: ST-N14 — non-finite anchor falls back to 0.0 instead of poisoning the whole
+ * run */
+TEST_CASE("test_VAR_anchor_non_finite") {
+    price_t nan = Null<price_t>();
+    // leading NaN with discard=0: anchor src[0] is NaN, fallback k=0 keeps finite points usable
+    Indicator data = PRICELIST({nan, 1.0, 2.0, 3.0});
+    Indicator r = VAR(data, 3);
+    // i=2 window [NaN,1,2]: valid=2, sample var of {1,2} = 0.5
+    CHECK_EQ(r[2], doctest::Approx(0.5));
+    // i=3 window [1,2,3]: fully finite, sample var = 1.0
+    CHECK_EQ(r[3], doctest::Approx(1.0));
+}
+
+/** @par Test points: ST-N13 — dynamic path returns Null when the window holds non-finite values,
+ * matching the static semantics */
+TEST_CASE("test_VAR_dynamic_non_finite_window") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, nan, 4.0, 5.0});
+    Indicator dyn = VAR(data, CVAL(data, 3));
+    Indicator stat = VAR(data, 3);
+    for (size_t i = 2; i < data.size(); i++) {
+        CHECK_UNARY(std::isnan(dyn[i]) == std::isnan(stat[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

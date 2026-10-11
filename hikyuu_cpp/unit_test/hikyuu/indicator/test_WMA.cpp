@@ -123,6 +123,18 @@ TEST_CASE("test_WMA_nan_recovery") {
     CHECK(rd[6] == doctest::Approx(rc[6]));
 }
 
+/** @par Test points: ST-N13 — dynamic path returns Null when the window holds non-finite values,
+ * matching the static semantics */
+TEST_CASE("test_WMA_dynamic_non_finite_window") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
+    Indicator dyn = WMA(data, CVAL(data, 3));
+    Indicator stat = WMA(data, 3);
+    for (size_t i = 2; i < data.size(); i++) {
+        CHECK_UNARY(std::isnan(dyn[i]) == std::isnan(stat[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

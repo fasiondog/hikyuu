@@ -158,11 +158,17 @@ void IWma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     }
 
     value_t sum = 0.0;
-    size_t n = 1;
+    size_t bad = 0, n = 1;
     for (size_t i = start; i <= curPos; i++, n++) {
         if (std::isfinite(ind[i])) {
             sum += ind[i] * n;
+        } else {
+            ++bad;
         }
+    }
+    if (bad > 0) {
+        _set(Null<value_t>(), curPos);
+        return;
     }
     _set(sum / (step * (step + 1) / 2.0), curPos);
 }

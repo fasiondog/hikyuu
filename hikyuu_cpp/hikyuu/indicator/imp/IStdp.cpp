@@ -50,7 +50,7 @@ void IStdp::_calculate(const Indicator& data) {
 
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    price_t k = src[start_pos];
+    price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
     price_t ex = 0.0, ex2 = 0.0;
     size_t valid = 0;
 
@@ -101,7 +101,7 @@ void IStdp::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    price_t k = src[start_pos - n];
+    price_t k = std::isfinite(src[start_pos - n]) ? src[start_pos - n] : 0.0;
     price_t ex = 0.0, ex2 = 0.0;
     size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
@@ -139,7 +139,7 @@ void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) 
         _set(Null<price_t>(), curPos);
         return;
     }
-    price_t k = ind[start];
+    price_t k = std::isfinite(ind[start]) ? ind[start] : 0.0;
     price_t ex = 0.0, ex2 = 0.0;
     size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
@@ -151,7 +151,7 @@ void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) 
         }
     }
     if (valid == 0) {
-        _set(0.0, curPos);
+        _set(Null<price_t>(), curPos);
         return;
     }
     price_t nv = (price_t)valid;

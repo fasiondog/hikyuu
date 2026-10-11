@@ -156,6 +156,27 @@ TEST_CASE("test_STDP_nan_recovery") {
     }
 }
 
+/** @par Test points: ST-N13 — dynamic path returns Null (never a fake 0.0) for an all-non-finite
+ * window */
+TEST_CASE("test_STDP_dynamic_all_nan_window") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({nan, nan, nan, nan});
+    Indicator dyn = STDP(data, CVAL(data, 3));
+    for (size_t i = 0; i < data.size(); i++) {
+        CHECK_UNARY(std::isnan(dyn[i]));
+    }
+}
+
+/** @par Test points: ST-N14 — non-finite anchor falls back to 0.0 instead of poisoning the whole
+ * run */
+TEST_CASE("test_STDP_anchor_non_finite") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({nan, 1.0, 2.0, 3.0});
+    Indicator r = STDP(data, 3);
+    // i=2 window [NaN,1,2]: valid=2, population std of {1,2} = 0.5
+    CHECK_EQ(r[2], doctest::Approx(0.5));
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

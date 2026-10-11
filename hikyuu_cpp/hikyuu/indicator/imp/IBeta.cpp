@@ -54,10 +54,10 @@ void IBeta::_calculate(const Indicator& ind) {
         auto const* datay = ref.data();
         value_t kx = datax[startPos];
         value_t ky = datay[startPos];
-        if (!std::isfinite(kx) || !std::isfinite(ky)) {
-            m_discard = total;
-            return;
-        }
+        if (!std::isfinite(kx))
+            kx = 0.0;
+        if (!std::isfinite(ky))
+            ky = 0.0;
         value_t ex = 0.0, ey = 0.0, ey2 = 0.0, exy = 0.0;
         size_t valid = 0;
         if (std::isfinite(datax[startPos]) && std::isfinite(datay[startPos]))
@@ -174,8 +174,10 @@ void IBeta::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto const* datay = ref.data();
     value_t kx = datax[startPos];
     value_t ky = datay[startPos];
-    if (!std::isfinite(kx) || !std::isfinite(ky))
-        return;
+    if (!std::isfinite(kx))
+        kx = 0.0;
+    if (!std::isfinite(ky))
+        ky = 0.0;
     value_t ex = 0.0, ey = 0.0, exy = 0.0, ey2 = 0.0;
     size_t valid = 0;
     if (std::isfinite(datax[startPos]) && std::isfinite(datay[startPos]))

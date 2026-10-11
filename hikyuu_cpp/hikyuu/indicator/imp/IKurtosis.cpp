@@ -47,7 +47,7 @@ void IKurtosis::_calculate(const Indicator& data) {
             return;
         }
         size_t start_pos = data.discard();
-        value_t k = src[start_pos];
+        value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
         value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
         size_t valid = 0;
         value_t d0 = src[start_pos] - k;
@@ -96,7 +96,7 @@ void IKurtosis::_calculate(const Indicator& data) {
 
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    value_t k = src[start_pos];
+    value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
     value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     size_t valid = 0;
 
@@ -168,7 +168,7 @@ void IKurtosis::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    value_t k = src[start_pos];
+    value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
     value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
@@ -226,7 +226,7 @@ void IKurtosis::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
     size_t start = _get_step_start(curPos, step, ind.discard());
     HKU_IF_RETURN(start != curPos + 1 - step, void());
 
-    value_t k = ind[start];
+    value_t k = std::isfinite(ind[start]) ? ind[start] : 0.0;
     value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
