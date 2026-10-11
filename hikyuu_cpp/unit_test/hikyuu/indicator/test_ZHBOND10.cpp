@@ -67,6 +67,10 @@ TEST_CASE("test_ZHBOND10") {
     CHECK_EQ(result[5], doctest::Approx(3.2003));
     CHECK_EQ(result[6], doctest::Approx(3.4532));
 
+    /** @arg The input date list is not in ascending order */
+    DatetimeList unsorted = {Datetime(20020107), Datetime(20020104)};
+    CHECK_THROWS_AS(ZHBOND10(unsorted), hku::exception);
+
     /** @arg The input kdata is empty */
     KData k;
     result = ZHBOND10(k);

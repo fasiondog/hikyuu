@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include "hikyuu/StockManager.h"
 #include "IZhBond10.h"
 
@@ -44,6 +45,8 @@ void IZhBond10::_calculate(const Indicator& data) {
 
     size_t total = dates.size();
     HKU_IF_RETURN(0 == total, void());
+    HKU_CHECK(std::is_sorted(dates.begin(), dates.end()),
+              "IZhBond10 requires the dates to be sorted in ascending order!");
 
     _readyBuffer(total, 1);
 
@@ -61,25 +64,14 @@ void IZhBond10::_calculate(const Indicator& data) {
         return;
     }
 
+    // dates is ascending, so the matched bond index only moves forward; each step binary-searches
+    // the remaining records for the first one later than dates[i]
     size_t bondix = 0;
     for (size_t i = 0; i < total; i++) {
-        bool found = false;
-        for (size_t j = bondix; j < bonds_size; j++) {
-            if (bonds[j].date > dates[i]) {
-                found = true;
-                bondix = j;
-                break;
-            }
-        }
-        if (found) {
-            if (bondix != 0) {
-                dst[i] = bonds[bondix - 1].value;
-            } else {
-                dst[i] = default_val;
-            }
-        } else {
-            dst[i] = bonds[bonds_size - 1].value;
-        }
+        bondix = std::upper_bound(bonds.begin() + bondix, bonds.end(), dates[i],
+                                  [](const Datetime& d, const ZhBond10& b) { return d < b.date; }) -
+                 bonds.begin();
+        dst[i] = bondix > 0 ? bonds[bondix - 1].value : default_val;
     }
 }
 
