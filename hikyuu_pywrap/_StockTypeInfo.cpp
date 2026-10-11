@@ -21,16 +21,20 @@ void export_StockTypeInfo(py::module& m) {
 
       .def_property_readonly("type", &StockTypeInfo::type, "The security type")
 
-      .def_property_readonly(
-        "description", py::overload_cast<>(&StockTypeInfo::description, py::const_), "The description information")
+      .def_property_readonly("description",
+                             py::overload_cast<>(&StockTypeInfo::description, py::const_),
+                             "The description information")
 
       .def_property_readonly("tick", &StockTypeInfo::tick, "The minimum tick")
       .def_property_readonly("tick_value", &StockTypeInfo::tickValue, "The price of each tick")
       .def_property_readonly("unit", &StockTypeInfo::unit,
-                             "The price of each minimum change, i.e. the unit price = tick_value/tick")
+                             "The price of each minimum change, i.e. unit = tick_value / tick "
+                             "(when tick == 0, defaults to 1.0)")
       .def_property_readonly("precision", &StockTypeInfo::precision, "The price precision")
-      .def_property_readonly("min_trade_num", &StockTypeInfo::minTradeNumber, "The minimum trading quantity per order")
-      .def_property_readonly("max_trade_num", &StockTypeInfo::maxTradeNumber, "The maximum trading quantity per order")
+      .def_property_readonly("min_trade_num", &StockTypeInfo::minTradeNumber,
+                             "The minimum trading quantity per order")
+      .def_property_readonly("max_trade_num", &StockTypeInfo::maxTradeNumber,
+                             "The maximum trading quantity per order")
 
         DEF_PICKLE(StockTypeInfo);
 }

@@ -488,7 +488,7 @@ StockManager/Block/Stock
     .. py:attribute:: last_datetime : the last date for which data is available
     .. py:attribute:: tick : the minimum price tick
     .. py:attribute:: tick_value : the monetary value of one tick
-    .. py:attribute:: unit : value per unit = tickValue / tick
+    .. py:attribute:: unit : value per unit = tickValue / tick (when tick == 0, defaults to 1.0)
     .. py:attribute:: precision : the price precision
     .. py:attribute:: atom : the minimum tradable quantity; the same as minTradeNumber
     .. py:attribute:: min_trade_number : the minimum tradable quantity
@@ -789,7 +789,7 @@ Other Security Information Definitions
     .. py:attribute:: description : descriptive information
     .. py:attribute:: tick : the minimum price tick
     .. py:attribute:: tick_value : the price of one tick
-    .. py:attribute:: unit : the price per minimum increment, i.e. the unit price = tickValue/tick
+    .. py:attribute:: unit : the price per minimum increment, i.e. unit = tickValue / tick (when tick == 0, defaults to 1.0)
     .. py:attribute:: precision : the price precision
     .. py:attribute:: min_trade_num : the minimum order quantity
     .. py:attribute:: max_trade_num : the maximum order quantity

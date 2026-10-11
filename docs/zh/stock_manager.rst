@@ -456,7 +456,7 @@ StockManager/Block/Stock
     .. py:attribute:: last_datetime : 证券最后日期
     .. py:attribute:: tick : 最小跳动量
     .. py:attribute:: tick_value : 最小跳动量价值
-    .. py:attribute:: unit : 每单位价值 = tickValue / tick
+    .. py:attribute:: unit : 每单位价值 = tickValue / tick（tick 为 0 时默认 1.0）
     .. py:attribute:: precision : 价格精度
     .. py:attribute:: atom : 最小交易数量，同minTradeNumber
     .. py:attribute:: min_trade_number : 最小交易数量
@@ -735,7 +735,7 @@ StockManager/Block/Stock
     .. py:attribute:: description : 描述信息
     .. py:attribute:: tick : 最小跳动量
     .. py:attribute:: tick_value : 每一个tick价格
-    .. py:attribute:: unit : 每最小变动量价格，即单位价格 = tickValue/tick
+    .. py:attribute:: unit : 每最小变动量价格，即单位价格 = tickValue / tick（tick 为 0 时默认 1.0）
     .. py:attribute:: precision : 价格精度
     .. py:attribute:: min_trade_num : 每笔最小交易量
     .. py:attribute:: max_trade_num : 每笔最大交易量
