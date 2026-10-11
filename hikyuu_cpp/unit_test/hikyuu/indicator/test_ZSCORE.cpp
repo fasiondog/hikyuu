@@ -66,6 +66,15 @@ TEST_CASE("test_ZSCORE") {
     }
     CHECK_EQ(result[16], doctest::Approx(-0.95994));
     CHECK_EQ(result2[16], doctest::Approx(-0.95996));
+
+    /** @arg A constant series makes sigma=0, z-score is undefined -> all NaN (ST-018) */
+    PriceList flat{5.0, 5.0, 5.0, 5.0, 5.0};
+    Indicator zflat = ZSCORE(PRICELIST(flat));
+    CHECK_EQ(zflat.size(), flat.size());
+    CHECK_EQ(zflat.discard(), flat.size());
+    for (size_t i = 0; i < zflat.size(); ++i) {
+        CHECK_UNARY(std::isnan(zflat[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

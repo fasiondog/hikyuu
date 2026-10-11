@@ -58,6 +58,7 @@ static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src,
     }
 
     IndicatorImp::value_t sigma = std::sqrt(sum / (count - 1));
+    HKU_IF_RETURN(sigma == 0.0, void());
     for (size_t i = 0; i < total; i++) {
         if (!std::isnan(src[i])) {
             dst[i] = (src[i] - mean) / sigma;
@@ -102,11 +103,9 @@ void IZScore::_calculate(const Indicator &data) {
     auto *dst = this->data() + m_discard;
     normalize(dst, src, total - m_discard, outExtreme, nsigma, recursive);
 
-    for (size_t i = m_discard; i < total; i++) {
-        if (!std::isnan(dst[i])) {
-            m_discard = i;
-            break;
-        }
+    auto *full = this->data();
+    while (m_discard < total && std::isnan(full[m_discard])) {
+        ++m_discard;
     }
 }
 
