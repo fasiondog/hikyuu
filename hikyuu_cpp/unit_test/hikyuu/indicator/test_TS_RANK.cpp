@@ -62,6 +62,21 @@ TEST_CASE("test_TS_RANK_with_nan") {
 
     CHECK_EQ(ret.size(), 6);
     CHECK_EQ(ret.discard(), 3);
+
+    /** @arg ST-019: current is NaN inside the loop range -> dst is NaN, not 0 (fake lowest rank) */
+    Indicator ind2 = PRICELIST({3.0, 5.0, nan, 4.0, 6.0, 2.0}, 0);
+    Indicator ret2 = TS_RANK(ind2, 3);
+    CHECK_EQ(ret2.size(), 6);
+    CHECK_UNARY(std::isnan(ret2[0]));
+    CHECK_UNARY(std::isnan(ret2[1]));
+    CHECK_UNARY(std::isnan(ret2[2]));  // src[2] NaN in the valid region
+    // i=3 window [1..3]={5.0, nan, 4.0}: NaN skipped, valid count for current=4.0 is 1
+    // (only 4.0 <= 4.0 counts; 5.0 not) -> 1/3
+    CHECK_EQ(ret2[3], doctest::Approx(1.0 / 3.0));
+    // i=4 window [2..4]={nan, 4.0, 6.0}: current=6.0, valid <= 6.0 are 4.0, 6.0 -> 2/3
+    CHECK_EQ(ret2[4], doctest::Approx(2.0 / 3.0));
+    // i=5 window [3..5]={4.0, 6.0, 2.0}: current=2.0, valid <= 2.0 is just 2.0 -> 1/3
+    CHECK_EQ(ret2[5], doctest::Approx(1.0 / 3.0));
 }
 
 /** @par Test point: TS_RANK handling the empty data */

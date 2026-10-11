@@ -43,9 +43,13 @@ void ITsRank::_calculate(const Indicator& ind) {
     }
 
     global_parallel_for_index_void(m_discard, total, [&, n, src, dst](size_t i) {
+        value_t current = src[i];
+        if (std::isnan(current)) {
+            dst[i] = Null<price_t>();
+            return;
+        }
         int count = 0;
         size_t start = i + 1 - n;
-        value_t current = src[i];
         for (size_t j = start; j <= i; ++j) {
             if (src[j] <= current) {
                 count++;
@@ -66,9 +70,13 @@ void ITsRank::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     int n = getParam<int>("n");
     for (size_t i = start_pos; i < total; ++i) {
+        value_t current = src[i];
+        if (std::isnan(current)) {
+            dst[i] = Null<price_t>();
+            continue;
+        }
         int count = 0;
         size_t start = i + 1 - n;
-        value_t current = src[i];
         for (size_t j = start; j <= i; ++j) {
             if (src[j] <= current) {
                 count++;
@@ -82,10 +90,15 @@ void ITsRank::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step
     if (curPos < ind.discard() + step - 1) {
         return;
     }
+    value_t current = ind[curPos];
+    if (std::isnan(current)) {
+        _set(Null<price_t>(), curPos);
+        return;
+    }
     size_t start = curPos + 1 - step;
     int count = 0;
     for (size_t j = start; j <= curPos; ++j) {
-        if (ind[j] <= ind[curPos]) {
+        if (ind[j] <= current) {
             count++;
         }
     }
