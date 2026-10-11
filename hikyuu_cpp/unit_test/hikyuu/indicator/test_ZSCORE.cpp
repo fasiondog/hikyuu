@@ -77,6 +77,21 @@ TEST_CASE("test_ZSCORE") {
     }
 }
 
+/** @par Test points: ST-034 — non-finite inputs (NaN or ±Inf) are excluded from mean/sigma */
+TEST_CASE("test_ZSCORE_inf_input_excluded") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data = PRICELIST({1.0, 2.0, inf_v, 4.0, 5.0});
+    Indicator result = ZSCORE(data);
+    // Inf slot is excluded from mean/sigma; its own output stays Null (NaN)
+    CHECK_UNARY(std::isnan(result[2]));
+    // Every output must be non-Inf (either NaN or finite) — AGENTS.md L247 contract
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]) || std::isfinite(result[i]));
+    }
+    // Finite outputs are standardized over the 4 valid points (mean=3, sample sigma=sqrt(10/3))
+    CHECK_EQ(result[0], doctest::Approx((1.0 - 3.0) / std::sqrt(10.0 / 3.0)));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

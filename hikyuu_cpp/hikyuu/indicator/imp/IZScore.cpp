@@ -38,7 +38,7 @@ static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src,
     IndicatorImp::value_t sum = 0.0;
     size_t count = 0;
     for (size_t i = 0; i < total; i++) {
-        if (!std::isnan(src[i])) {
+        if (std::isfinite(src[i])) {
             sum += src[i];
             count++;
         }
@@ -51,16 +51,16 @@ static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src,
     vector<IndicatorImp::value_t> tmp(total, Null<IndicatorImp::value_t>());
     sum = 0.0;
     for (size_t i = 0; i < total; i++) {
-        if (!std::isnan(src[i])) {
+        if (std::isfinite(src[i])) {
             tmp[i] = src[i] - mean;
             sum += tmp[i] * tmp[i];
         }
     }
 
     IndicatorImp::value_t sigma = std::sqrt(sum / (count - 1));
-    HKU_IF_RETURN(sigma == 0.0, void());
+    HKU_IF_RETURN(!std::isfinite(sigma) || sigma == 0.0, void());
     for (size_t i = 0; i < total; i++) {
-        if (!std::isnan(src[i])) {
+        if (std::isfinite(src[i])) {
             dst[i] = (src[i] - mean) / sigma;
         }
     }
@@ -71,7 +71,7 @@ static void normalize(IndicatorImp::value_t *dst, Indicator::value_t const *src,
 
         bool found = false;
         for (size_t i = 0; i < total; i++) {
-            if (!std::isnan(dst[i])) {
+            if (std::isfinite(dst[i])) {
                 if (dst[i] > ulimit) {
                     dst[i] = ulimit;
                     found = true;
@@ -104,7 +104,7 @@ void IZScore::_calculate(const Indicator &data) {
     normalize(dst, src, total - m_discard, outExtreme, nsigma, recursive);
 
     auto *full = this->data();
-    while (m_discard < total && std::isnan(full[m_discard])) {
+    while (m_discard < total && !std::isfinite(full[m_discard])) {
         ++m_discard;
     }
 }

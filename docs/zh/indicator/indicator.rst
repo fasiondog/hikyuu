@@ -605,6 +605,8 @@
     .. note:: BETA本身不会对输入数据进行收益率转换(pct_change)处理，
               输入的指标应为已经计算好的收益率数据。
 
+    非有限值（NaN 或 ±Inf）导致方差/协方差非有限时，输出为 Null。
+
     :param Indicator ind: 输入指标，如股票收益率指标
     :param Indicator ref_ind: 对照指标，如市场收益率指标
     :param int n: 滚动窗口大小（>=2），默认10。为0时使用扩展窗口：dst[i] 取 [discard(), i] 上的 beta，discard 置为 1，首根为 nan
@@ -711,6 +713,8 @@
 .. py:function:: CORR(ind1, ind2, n)
 
     计算 ind1 和 ind2 的样本相关系数与协方差。返回中存在两个结果，第一个为相关系数，第二个为协方差。
+
+    非有限值（NaN 或 ±Inf）导致方差/协方差非有限时，result(0)（相关系数）为 Null；result(1)（协方差）仍走原始算术。
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
@@ -2017,6 +2021,8 @@
 
     Spearman 相关系数
 
+    非有限值（NaN 或 ±Inf）在窗口内从截面剔除后才参与排名，与“极值/均值忽略缺失”库内约定一致。
+
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
     :param int n: 滚动窗口(>=2)，为0时使用扩展窗口：dst[i] 取 [max(ind.discard(), ref.discard()), i] 上的秩相关，discard 置为 1，首根为 nan
@@ -2311,6 +2317,8 @@
 
     注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
     
+    非有限值（NaN 或 ±Inf）不参与 mean 与 sigma 计算，对应输出为 Null。
+
     :param Indicator data: 待剔除异常值的数据
     :param bool outExtreme: 指示剔除极值，默认 False
     :param float nsigma: 剔除极值时使用的 nsigma 倍 sigma ,默认 3.0

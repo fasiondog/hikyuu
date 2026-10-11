@@ -229,6 +229,21 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result[4], doctest::Approx(-1.0));
 }
 
+/** @par Test points: ST-034 — Inf inputs are excluded from the cross-section, output stays
+ * finite/Null */
+TEST_CASE("test_SPEARMAN_inf_input_excluded") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    PriceList x, y;
+    for (size_t i = 0; i < 8; ++i) {
+        x.push_back(1.0 + i);
+        y.push_back(i == 3 ? inf_v : (2.0 + i));
+    }
+    Indicator r = SPEARMAN(PRICELIST(x), PRICELIST(y), 3);
+    for (size_t i = r.discard(); i < 8; ++i) {
+        CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+    }
+}
+
 /** @par Test points */
 TEST_CASE("test_SPEARMAN_with_ties") {
     // The tie-handling regression: when the input has equal values (the average rank) the

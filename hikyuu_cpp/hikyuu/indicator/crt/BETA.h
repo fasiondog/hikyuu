@@ -17,6 +17,9 @@ namespace hku {
 
  * Beta = Cov(stock_return, market_return) / Var(market_return)
  *
+ * @note Non-finite inputs (NaN or ±Inf) that make vary or cov non-finite yield Null output,
+ *       matching the library's "no non-finite value flows downstream" contract.
+ *
  * @note BETA itself does not perform the return conversion (pct_change) on the input data,
 
  *       the input indicators should be the already calculated return data.

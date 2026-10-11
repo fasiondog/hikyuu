@@ -603,6 +603,8 @@ Built-in Technical Indicators
     .. note:: BETA itself does not convert the input data to the return rate (pct_change);
               the input indicator should be the already calculated return rate data.
 
+    Non-finite inputs (NaN or ±Inf) that make the variance or covariance non-finite yield Null output.
+
     :param Indicator ind: the input indicator, such as the stock return indicator
     :param Indicator ref_ind: the reference indicator, such as the market return indicator
     :param int n: the rolling window size (>= 2), defaulting to 10. When it is 0 an expanding window is used: dst[i] is the beta over [discard(), i] (discard becomes 1, bar 0 is nan)
@@ -709,6 +711,8 @@ Built-in Technical Indicators
 .. py:function:: CORR(ind1, ind2, n)
 
     Calculate the sample correlation coefficient and the covariance of ind1 and ind2. There are two results in the return; the first is the correlation coefficient, and the second is the covariance.
+
+    Non-finite inputs (NaN or ±Inf) that make the variance or covariance non-finite yield Null for result(0); result(1) still follows the raw covariance arithmetic.
 
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
@@ -2025,6 +2029,8 @@ Built-in Technical Indicators
 
     The Spearman correlation coefficient
 
+    Non-finite inputs (NaN or ±Inf) are excluded from the window before ranking, aligned with the library's "extremes / means ignore missing points" convention.
+
     :param Indicator ind1: the input parameter 1
     :param Indicator ind2: the input parameter 2
     :param int n: the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the rank corr over [max(ind.discard(), ref.discard()), i] (discard becomes 1, bar 0 is nan)
@@ -2319,6 +2325,8 @@ Built-in Technical Indicators
 
     Note: it is not a window rolling; if the standardization with the window rolling is needed, just use (x - MA(x, n)) / STDEV(x, n).
     
+    Non-finite inputs (NaN or ±Inf) are excluded from both the mean and sigma; the corresponding outputs are Null.
+
     :param Indicator data: the data from which the outliers are to be removed
     :param bool outExtreme: indicate removing the extreme values, defaulting to False
     :param float nsigma: the multiple of sigma used when removing the extreme values, defaulting to 3.0

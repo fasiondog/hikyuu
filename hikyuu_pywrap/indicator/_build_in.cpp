@@ -1129,6 +1129,8 @@ void export_Indicator_build_in(py::module& m) {
     Calculate the correlation coefficient of ind and ref_ind. There are two results in the return; the first is the correlation coefficient, and the second is the covariance.
     Equivalent to CORR(ref_ind, n)(ind).
 
+    Non-finite inputs (NaN or ±Inf) that make the variance or covariance non-finite yield Null for result(0), aligning with the library's "no non-finite value flows downstream" contract.
+
     :param Indicator ind: the indicator1
     :param Indicator ref_ind: the indicator 2
     :param int n: calculate the correlation coefficient of the data between the two inds by the specified length n. If it is 0, use the length of the input ind.
@@ -1160,6 +1162,8 @@ void export_Indicator_build_in(py::module& m) {
 
     .. note:: BETA itself does not convert the input data to the return rate (pct_change);
               the input indicator should be the already calculated return rate data.
+
+    Non-finite inputs (NaN or ±Inf) that make the variance or covariance non-finite yield Null output.
 
     :param Indicator ind: the input indicator, such as the stock return indicator
     :param Indicator ref_ind: the reference indicator, such as the market return indicator
@@ -2292,6 +2296,8 @@ void export_Indicator_build_in(py::module& m) {
 
     The Spearman correlation coefficient. Equivalent to SPEARMAN(ref_ind, n)(ind).
 
+    Non-finite inputs (NaN or ±Inf) are excluded from the cross-section before ranking, aligned with the library's "ignore missing points" mean-class convention.
+
     :param Indicator ind: the input parameter 1
     :param Indicator ref_ind: the input parameter 2
     :param int n: the rolling window (greater than 2 or equal to 0); when it is equal to 0, it means that n actually uses the length of the ind
@@ -2403,6 +2409,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Note: it is not a window rolling; if the standardization with the window rolling is needed, just use (x - MA(x, n)) / STDEV(x, n).
     
+    Non-finite inputs (NaN or ±Inf) are excluded from both the mean and sigma, aligning with the library's "no non-finite value flows downstream" contract.
+
     :param Indicator data: the data from which the outliers are to be removed
     :param bool out_extreme: indicate removing the extreme values, defaulting to False
     :param float nsigma: the multiple of sigma used when removing the extreme values, defaulting to 3.0

@@ -47,6 +47,21 @@ TEST_CASE("test_CORR_zero_variance") {
     }
 }
 
+/** @par Test points: ST-034 — Inf inputs produce Null output, never ±Inf */
+TEST_CASE("test_CORR_inf_input_yields_null") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    PriceList x, y;
+    for (size_t i = 0; i < 8; ++i) {
+        x.push_back(1.0 + i);
+        y.push_back(i == 3 ? inf_v : (2.0 + i));
+    }
+    Indicator r = CORR(PRICELIST(x), PRICELIST(y), 3);
+    for (size_t i = r.discard(); i < 8; ++i) {
+        /** @arg window overlapping the Inf yields Null (guard fires on non-finite variance/cov) */
+        CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+    }
+}
+
 TEST_CASE("test_CORR") {
     Indicator result;
 

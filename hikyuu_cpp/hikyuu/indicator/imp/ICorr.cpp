@@ -68,7 +68,10 @@ void ICorr::_calculate(const Indicator& ind) {
             value_t varx = ex2 - ex * ex / num;
             value_t vary = ey2 - ey * ey / num;
             value_t cov = exy - ex * ey / num;
-            dst0[i] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
+            dst0[i] = !(varx > 0.0 && vary > 0.0 && std::isfinite(varx) && std::isfinite(vary) &&
+                        std::isfinite(cov))
+                        ? null_price
+                        : cov / std::sqrt(varx * vary);
             dst1[i] = cov / (num - 1);
         }
         return;
@@ -106,7 +109,10 @@ void ICorr::_calculate(const Indicator& ind) {
     varx = ex2 - ex * ex / n;
     vary = ey2 - ey * ey / n;
     cov = exy - ex * ey / n;
-    dst0[first_end - 1] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
+    dst0[first_end - 1] = !(varx > 0.0 && vary > 0.0 && std::isfinite(varx) &&
+                            std::isfinite(vary) && std::isfinite(cov))
+                            ? null_price
+                            : cov / std::sqrt(varx * vary);
     dst1[first_end - 1] = cov / (n - 1);
 
     for (size_t i = first_end; i < total; i++) {
@@ -122,7 +128,10 @@ void ICorr::_calculate(const Indicator& ind) {
         varx = (ex2 - ex * ex / n);
         vary = (ey2 - ey * ey / n);
         cov = (exy - ex * ey / n);
-        dst0[i] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
+        dst0[i] = !(varx > 0.0 && vary > 0.0 && std::isfinite(varx) && std::isfinite(vary) &&
+                    std::isfinite(cov))
+                    ? null_price
+                    : cov / std::sqrt(varx * vary);
         dst1[i] = cov / (n - 1);
     }
 }
@@ -186,7 +195,10 @@ void ICorr::_increment_calculate(const Indicator& ind, size_t start_pos) {
         varx = (ex2 - ex * ex / n);
         vary = (ey2 - ey * ey / n);
         cov = (exy - ex * ey / n);
-        dst0[i] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
+        dst0[i] = !(varx > 0.0 && vary > 0.0 && std::isfinite(varx) && std::isfinite(vary) &&
+                    std::isfinite(cov))
+                    ? null_price
+                    : cov / std::sqrt(varx * vary);
         dst1[i] = cov / (n - 1);
     }
 }

@@ -15,6 +15,8 @@ namespace hku {
  * Perform a ZScore standardization (3sigma) on the data for the extreme value handling
  * @note It is not a window rolling one; for a window rolling standardization, just use
  *       (x - MA(x, n)) / STDEV(x, n)
+ * @note Non-finite inputs (NaN or ±Inf) are excluded from both the mean and sigma (aligned with
+ *       AGENTS.md L247 "inf poisons every downstream window aggregate").
  * @param outExtreme indicates the removal of the extreme values (i.e. truncating the extreme
  *                    values, the ones exceeding the limit are replaced with the limit value)
  * @param nsigma the nsigma multiple of sigma used when removing the extreme values

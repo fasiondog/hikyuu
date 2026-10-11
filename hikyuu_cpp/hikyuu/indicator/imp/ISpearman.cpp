@@ -96,7 +96,7 @@ void ISpearman::_calculate(const Indicator &ind) {
               for (size_t j = 0; j < win; ++j) {
                   IndicatorImp::value_t a = srca_full[startPos + j];
                   IndicatorImp::value_t b = srcb_full[startPos + j];
-                  if (!std::isnan(a) && !std::isnan(b)) {
+                  if (std::isfinite(a) && std::isfinite(b)) {
                       tmpa.push_back(a);
                       tmpb.push_back(b);
                   }
@@ -170,7 +170,7 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
           tmpa.reserve(n);
           tmpb.reserve(n);
           for (int j = 0; j < n; j++) {
-              if (!std::isnan(a[j]) && !std::isnan(b[j])) {
+              if (std::isfinite(a[j]) && std::isfinite(b[j])) {
                   tmpa.push_back(a[j]);
                   tmpb.push_back(b[j]);
               }
