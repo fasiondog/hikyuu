@@ -94,7 +94,7 @@ void KData::tocsv(const string& filename) {
     std::ofstream file(filename.c_str());
     HKU_ERROR_IF_RETURN(!file, void(), "Can't open file! ({})", filename);
 
-    file << "date, open, high, low, close, amount, count" << std::endl;
+    file << "date, open, high, low, close, amount, count\n";
     file.setf(std::ios_base::fixed);
     file.precision(4);
     string sep = ",";
@@ -103,7 +103,7 @@ void KData::tocsv(const string& filename) {
         record = getKRecord(i);
         file << record.datetime << sep << record.openPrice << sep << record.highPrice << sep
              << record.lowPrice << sep << record.closePrice << sep << record.transAmount << sep
-             << record.transCount << std::endl;
+             << record.transCount << '\n';
     }
 
     file.close();
@@ -196,7 +196,7 @@ KQuery KData::getOtherQueryByDate(const Datetime& start_datetime, const Datetime
     }
 
     Datetime start = this->front().datetime;
-    if (start_datetime > start) {
+    if (start_datetime != Null<Datetime>() && start_datetime > start) {
         start = start_datetime;
     }
 
@@ -222,7 +222,9 @@ KData KData::getKData(const KQuery::KType& ktype) const {
     KData ret;
     const Stock& stk = getStock();
     HKU_IF_RETURN(stk.isNull(), ret);
-    if (ktype == getQuery().kType()) {
+    std::string ktype_upper = ktype;
+    to_upper(ktype_upper);
+    if (ktype_upper == getQuery().kType()) {
         return KData(m_imp);
     }
  

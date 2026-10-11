@@ -2506,6 +2506,36 @@ TEST_CASE("test_KData_const_iterator_robustness") {
     CHECK_EQ(n, k1.size());
 }
 
+/** @par Other supplementary coverage tests */
+TEST_CASE("test_KData_getOtherQueryByDate_null_start") {
+    KData k1 = getKData("sh000001", 0, 5);
+
+    /** @arg Null start_datetime is an open lower bound, not pos_infin: start stays at the first
+     *  record (BASE-320) */
+    KQuery q = k1.getOtherQueryByDate(Null<Datetime>(), Null<Datetime>(), KQuery::MIN);
+    CHECK_FALSE(q.startDatetime().isNull());
+    CHECK_EQ(q.startDatetime(), k1.front().datetime);
+
+    /** @arg a finite start still tightens the lower bound as before */
+    Datetime s = k1[2].datetime;
+    KQuery q2 = k1.getOtherQueryByDate(s, Null<Datetime>(), KQuery::MIN);
+    CHECK_EQ(q2.startDatetime(), s);
+}
+
+/** @par Other supplementary coverage tests */
+TEST_CASE("test_KData_getKData_lowercase_ktype") {
+    KData k1 = getKData("sh000001", 0, 5);  // DAY
+
+    /** @arg lowercase ktype still hits the shared-imp fast path (BASE-325) */
+    KData k2 = k1.getKData("day");
+    CHECK(k2.getImp() == k1.getImp());
+    CHECK_EQ(k2.size(), k1.size());
+
+    /** @arg uppercase ktype keeps hitting the same fast path */
+    KData k3 = k1.getKData("DAY");
+    CHECK(k3.getImp() == k1.getImp());
+}
+
 /** @par Test points
  * The position in the stock is computed lazily once: concurrent access from copies sharing the same
  * imp must return the reference values */
