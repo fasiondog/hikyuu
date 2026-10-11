@@ -2311,4 +2311,48 @@ TEST_CASE("test_Stock_setKRecordList_null_safe") {
     CHECK_EQ(temp.getKRecord(0, KQuery::DAY).datetime, Datetime(202001010000));
 }
 
+/** @par Test points */
+TEST_CASE("test_Stock_getLastUpdateTime_null_safe") {
+    /** @arg A default-constructed (Null) Stock must not dereference null m_data */
+    Stock null_stock;
+    CHECK(null_stock.isNull());
+    CHECK_EQ(null_stock.getLastUpdateTime(KQuery::DAY), Datetime::min());
+    CHECK_EQ(null_stock.getLastUpdateTime(KQuery::MIN), Datetime::min());
+
+    /** @arg A temporary Stock populated via setKRecordList records its last update time,
+     *      which must be readable without a lock-induced data race for extra k-types */
+    KRecord bar(Datetime(202001010000));
+    bar.openPrice = bar.highPrice = bar.lowPrice = bar.closePrice = 10.0;
+    KRecordList ks{bar};
+    Stock temp("TEST", "BASE105", "Base105 regression stock");
+    temp.setKRecordList(ks, KQuery::DAY);
+    CHECK(temp.getLastUpdateTime(KQuery::DAY) != Datetime::min());
+    CHECK_EQ(temp.getLastUpdateTime(KQuery::MIN), Datetime::min());
+}
+
+/** @par Test points */
+TEST_CASE("test_Stock_getLastUpdateTime_concurrent") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    Stock null_stock;
+
+    std::atomic<bool> stop{false};
+    std::vector<std::thread> readers;
+    for (int i = 0; i < 4; ++i) {
+        readers.emplace_back([&]() {
+            for (int n = 0; n < 5000 && !stop; ++n) {
+                stock.getLastUpdateTime(KQuery::DAY);
+                stock.getLastUpdateTime(KQuery::WEEK);
+                stock.getLastUpdateTime(KQuery::MIN);
+                stock.getLastUpdateTime(KQuery::MIN5);
+                null_stock.getLastUpdateTime(KQuery::DAY);
+            }
+        });
+    }
+    for (auto& t : readers) {
+        t.join();
+    }
+    CHECK(true);  // survived without crash / data race
+}
+
 /** @} */

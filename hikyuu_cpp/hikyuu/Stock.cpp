@@ -1404,6 +1404,7 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 }
 
 Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
+    HKU_IF_RETURN(!m_data, Datetime::min());
     auto ktype = inktype;
     to_upper(ktype);
     // The client mode without a local buffer (an ordinary proxy security): m_lastUpdate is always
@@ -1416,19 +1417,13 @@ Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     if (StockManager::instance().isIpcClientMode() && !isBuffer(ktype)) {
         return ipc::forwardGetLastUpdateTime(market_code(), ktype);
     }
-    if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {
+    auto pmutex_iter = m_data->pMutex.find(ktype);
+    if (pmutex_iter == m_data->pMutex.end()) {
         auto iter = m_data->m_lastUpdate.find(ktype);
-        if (iter == m_data->m_lastUpdate.end()) {
-            // The possibly newly added extended K-line type
-            if (KQuery::isExtraKType(ktype)) {
-                m_data->m_lastUpdate[ktype] = Datetime::min();
-            }
-            return Datetime::min();
-        }
-        return iter->second;
+        return iter == m_data->m_lastUpdate.end() ? Datetime::min() : iter->second;
     }
 
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::shared_lock<std::shared_mutex> lock(*(pmutex_iter->second));
     auto iter = m_data->m_lastUpdate.find(ktype);
     return iter == m_data->m_lastUpdate.end() ? Datetime::min() : iter->second;
 }
