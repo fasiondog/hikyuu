@@ -100,6 +100,7 @@ void ICost::_calculate(const Indicator& data) {
         }
     }
 
+    // DMA seed: no prior cost exists, use x directly (same as has_pre_cost==false elsewhere)
     if (pos == 0) {
         const KRecord& krecord = kdata[pos];
         x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
