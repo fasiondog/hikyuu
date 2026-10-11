@@ -55,7 +55,7 @@ void ISma::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto* dst = this->data();
 
     double p = n - m;
-    for (size_t i = m_discard + 1; i < total; i++) {
+    for (size_t i = start_pos + 1; i < total; i++) {
         dst[i] = (m * src[i] + p * dst[i - 1]) / n;
     }
 }

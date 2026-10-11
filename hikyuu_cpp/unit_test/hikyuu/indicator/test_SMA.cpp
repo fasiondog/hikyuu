@@ -147,6 +147,37 @@ TEST_CASE("test_SMA_dyn") {
     }
 }
 
+/** @par Test points: reusing one indicator across setContext extension must match full calc */
+TEST_CASE("test_SMA_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sh600000");
+    KData k_full = stk.getKData(KQuery(0, 30));
+    KData k_partial = stk.getKData(KQuery(0, 15));
+
+    Indicator expect = SMA(22, 2.0);
+    expect.setContext(k_full);
+
+    Indicator got = SMA(22, 2.0);
+    got.setContext(k_partial);
+    got.setContext(k_full);
+
+    CHECK_EQ(got.size(), expect.size());
+    CHECK_EQ(got.discard(), expect.discard());
+    for (size_t i = got.discard(); i < got.size(); ++i) {
+        CHECK_EQ(got[i], doctest::Approx(expect[i]).epsilon(0.0001));
+    }
+
+    // Chain: partial -> shorter -> full, still matches a single full calculation
+    Indicator chained = SMA(22, 2.0);
+    chained.setContext(stk.getKData(KQuery(0, 10)));
+    chained.setContext(k_partial);
+    chained.setContext(k_full);
+    CHECK_EQ(chained.size(), expect.size());
+    for (size_t i = chained.discard(); i < chained.size(); ++i) {
+        CHECK_EQ(chained[i], doctest::Approx(expect[i]).epsilon(0.0001));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------
