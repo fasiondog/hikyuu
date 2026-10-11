@@ -178,6 +178,10 @@ StockManager/Block/Stock
     
         是否所有数据已准备就绪（加载完毕）
         
+    .. py:attribute:: load_failed
+    
+        最近一次数据加载是否失败（预加载仅为缓存预热，加载失败后查询仍由数据驱动实时取数，只是预加载部分可能不完整）
+        
     .. py:staticmethod:: instance()
     
         获取StockManager单例实例
@@ -195,7 +199,7 @@ StockManager/Block/Stock
         
     .. py:method:: wait_data_ready(self)
     
-        简单阻塞，等待所有数据准备就绪（加载完毕）
+        简单阻塞，等待所有数据准备就绪（加载完毕）；加载失败时提前返回
         
     .. py:method:: cancel_load(self)
     
@@ -329,7 +333,7 @@ StockManager/Block/Stock
         
     .. py:method:: get_category_list(self)
     
-        获取所有板块分类
+        获取所有板块分类（含内部板块分类 A/G/START/ETF）
         
         :return: 所有板块分类
         :rtype: StringList
@@ -363,7 +367,7 @@ StockManager/Block/Stock
         
     .. py:method:: get_block_list(self[, category])
     
-        获取指定分类的板块列表
+        获取指定分类的板块列表（含该分类下的内部板块）
         
         :param str category: 板块分类
         :return: 板块列表
@@ -456,7 +460,7 @@ StockManager/Block/Stock
     .. py:attribute:: last_datetime : 证券最后日期
     .. py:attribute:: tick : 最小跳动量
     .. py:attribute:: tick_value : 最小跳动量价值
-    .. py:attribute:: unit : 每单位价值 = tickValue / tick
+    .. py:attribute:: unit : 每单位价值 = tickValue / tick（tick 为 0 时默认 1.0）
     .. py:attribute:: precision : 价格精度
     .. py:attribute:: atom : 最小交易数量，同minTradeNumber
     .. py:attribute:: min_trade_number : 最小交易数量
@@ -735,7 +739,7 @@ StockManager/Block/Stock
     .. py:attribute:: description : 描述信息
     .. py:attribute:: tick : 最小跳动量
     .. py:attribute:: tick_value : 每一个tick价格
-    .. py:attribute:: unit : 每最小变动量价格，即单位价格 = tickValue/tick
+    .. py:attribute:: unit : 每最小变动量价格，即单位价格 = tickValue / tick（tick 为 0 时默认 1.0）
     .. py:attribute:: precision : 价格精度
     .. py:attribute:: min_trade_num : 每笔最小交易量
     .. py:attribute:: max_trade_num : 每笔最大交易量

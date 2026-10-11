@@ -251,6 +251,11 @@ public:
 
     /**
      * Add a Stock; only for special Stocks that are added temporarily
+     *
+     * Note: the added security is out of the startup loadAllStockWeights scope and does not get
+     * its ex-rights/ex-dividend data materialized: in the standalone main process getWeight
+     * returns empty for it (only the client / shm server roles would lazily load it on demand).
+     * This is intentional for the temporary special stocks this API targets.
      * @param stock
      * @return true on success | false on failure
      */
@@ -266,7 +271,10 @@ public:
     /** Whether all the data is ready */
     bool dataReady() const;
 
-    /** Simply block until all the data is ready */
+    /** Whether the last data loading failed (the preload result may be incomplete) */
+    bool loadFailed() const;
+
+    /** Simply block until all the data is ready; it returns early when the loading has failed */
     void waitDataReady() const;
 
     /** Whether it is being initialized */
@@ -380,13 +388,15 @@ private:
      */
     void _loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes);
 
+    /* Run the preload body inside a catch-all: an escaping exception would call std::terminate */
+    void _loadAllKDataSafely(vector<KQuery::KType> ktypes, vector<string> low_ktypes,
+                             bool parallel);
+
     /*
      * Dispatch the data loading event to the registered plugin callbacks (declared unconditionally;
      * called by loadData and the two loading functions). The core library no longer perceives the
      * existence of the server, it only notifies in order; there is no overhead when no callback is
      * registered.
-     * @note Calling register/unregisterLoadEventCallback inside a callback is forbidden (it
-     * deadlocks)
      */
     void _fireLoadEvent(LoadEvent event);
 
@@ -424,6 +434,7 @@ private:
     std::atomic_bool m_cancel_load{false};  // Cancel the loading, used as the exit indicator
     std::atomic_bool m_data_ready{true};    // Indicates whether all the data is ready; true when it
                                             // has not been initialized
+    std::atomic_bool m_load_error{false};   // Set when the loading failed; it releases the waiters
     std::thread::id m_thread_id;  // Records the thread id, used to tell whether a Strategy runs as
                                   // a separate process or as a thread
     string m_tmpdir;
@@ -502,6 +513,10 @@ inline size_t StockManager::size() const noexcept {
 
 inline bool StockManager::dataReady() const {
     return m_data_ready.load(std::memory_order_acquire);
+}
+
+inline bool StockManager::loadFailed() const {
+    return m_load_error.load(std::memory_order_acquire);
 }
 
 inline bool StockManager::initializing() const {

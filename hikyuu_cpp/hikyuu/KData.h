@@ -167,14 +167,14 @@ public:
         using pointer = const KRecord*;
         using reference = const KRecord&;
 
-        const_iterator(const KData& container, size_t index)
-        : container_(container), index_(index) {}
+        const_iterator(KDataImpPtr imp, size_t index) : imp_(std::move(imp)), index_(index) {}
+        const_iterator() = default;  // Default placeholder; imp_ is a null shared_ptr
 
         reference operator*() const {
-            return container_[index_];
+            return imp_->getKRecord(index_);
         }
         pointer operator->() const {
-            return &(container_[index_]);
+            return &(imp_->getKRecord(index_));
         }
 
         const_iterator& operator++() {
@@ -189,7 +189,7 @@ public:
         }
 
         bool operator==(const const_iterator& other) const {
-            return &container_ == &other.container_ && index_ == other.index_;
+            return imp_ == other.imp_ && index_ == other.index_;
         }
 
         bool operator!=(const const_iterator& other) const {
@@ -197,24 +197,24 @@ public:
         }
 
     private:
-        const KData& container_;  // Const reference to the container
-        size_t index_;            // Current index
+        KDataImpPtr imp_;
+        size_t index_;
     };
 
     using iterator = const_iterator;
 
     const_iterator begin() const {
-        return const_iterator(*this, 0);
+        return const_iterator(m_imp, 0);
     }
     const_iterator end() const {
-        return const_iterator(*this, size());
+        return const_iterator(m_imp, size());
     }
 
     const_iterator cbegin() const {
-        return const_iterator(*this, 0);
+        return const_iterator(m_imp, 0);
     }
     const_iterator cend() const {
-        return const_iterator(*this, size());
+        return const_iterator(m_imp, size());
     }
 
 private:

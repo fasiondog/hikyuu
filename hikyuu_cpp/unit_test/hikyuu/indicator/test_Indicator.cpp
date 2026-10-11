@@ -1207,7 +1207,7 @@ TEST_CASE("test_indicator_cval_if_and_context_padding") {
     // CONTEXT and the two-input indicators pad a dateless reference series with CVAL plus an
     // addition; the padding subtree is built without a context of its own, so the binding check
     // does not apply to it and the merged length still matches the context
-    Indicator padded = CONTEXT(PRICELIST(px12));
+    Indicator padded = hku::CONTEXT(PRICELIST(px12));
     padded.setContext(k_full);
 
     /** @arg a dateless context reference keeps the context length, its leading part stays null (the
@@ -1219,7 +1219,7 @@ TEST_CASE("test_indicator_cval_if_and_context_padding") {
     CHECK_EQ(padded[19], doctest::Approx(px12[11]));
 
     // An outer addition skips the invalid leading part of its operands
-    Indicator ctx1 = CLOSE() + CONTEXT(PRICELIST(px12));
+    Indicator ctx1 = CLOSE() + hku::CONTEXT(PRICELIST(px12));
     ctx1.setContext(k_full);
 
     /** @arg the addition of a padded reference keeps the context length from its discard on */
@@ -1237,7 +1237,7 @@ TEST_CASE("test_indicator_cval_if_and_context_padding") {
     CHECK_EQ(beta1.size(), 20);
 
     /** @arg an independent context of another stock aligns by date and keeps the context length */
-    Indicator cross = CLOSE() + CONTEXT(SMA(CLOSE(), 5), sm.getStock("sh000001"), true);
+    Indicator cross = CLOSE() + hku::CONTEXT(SMA(CLOSE(), 5), sm.getStock("sh000001"), true);
     cross.setContext(k_full);
     CHECK_EQ(cross.size(), 20);
 }

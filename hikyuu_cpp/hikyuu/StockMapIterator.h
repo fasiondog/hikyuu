@@ -18,10 +18,10 @@ class StockMapIterator {
 public:
     typedef unordered_map<string, Stock> stock_map_t;
     typedef Stock value_type;
-    typedef Stock* pointer;
+    typedef const Stock* pointer;
     typedef const Stock& reference;
     typedef stock_map_t::const_iterator::difference_type difference_type;
-    typedef std::input_iterator_tag iterator_category;
+    typedef std::forward_iterator_tag iterator_category;
 
     StockMapIterator() {}
 
@@ -41,7 +41,7 @@ public:
         return *this;
     }
 
-    const StockMapIterator operator++(int) {
+    StockMapIterator operator++(int) {
         auto old_iter = m_iter;
         ++m_iter;
         return StockMapIterator(old_iter);

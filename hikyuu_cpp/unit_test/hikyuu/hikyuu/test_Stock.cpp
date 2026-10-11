@@ -495,8 +495,8 @@ TEST_CASE("test_Stock_getKRecord_lowercase_ktype") {
     KRecord record, expect;
 
     /** @arg Lowercase ktype through the in-memory buffer path must equal the upper-cased result
-     * (regression for BASE-101: an un-normalized ktype reached pMutex[ktype] and dereferenced a null
-     * shared_mutex inserted by operator[]) */
+     * (an un-normalized ktype would reach pMutex[ktype] and dereference a null shared_mutex
+     * inserted by operator[]) */
     expect = stock.getKRecord(0, KQuery::DAY);
     record = stock.getKRecord(0, "day");
     CHECK_EQ(record, expect);
@@ -505,7 +505,6 @@ TEST_CASE("test_Stock_getKRecord_lowercase_ktype") {
     record = stock.getKRecord(expect.datetime, "day");
     CHECK_EQ(record, expect);
 }
-
 
 /** @par Test points */
 TEST_CASE("test_Stock_getIndexRange") {
@@ -2068,8 +2067,8 @@ TEST_CASE("test_Stock_getMarketValue_before_first_record") {
     CHECK_EQ(stock.getMarketValue(Datetime(199012190000), KQuery::DAY), 99.98);
 
     /** @arg Query time before the first K-line record must return 0, not the latest close price
-     * (regression for BASE-102: the un-guarded "take the last record" fallback leaked future data
-     * into TradeManager valuation when datetime precedes the first K-line record) */
+     * (the un-guarded "take the last record" fallback leaked future data into TradeManager
+     * valuation when datetime precedes the first K-line record) */
     CHECK_EQ(stock.getMarketValue(Datetime(199001010000), KQuery::DAY), 0.0);
 
     /** @arg Query time after the last K-line record still returns the latest known close price */
@@ -2122,6 +2121,79 @@ TEST_CASE("test_Stock_concurrent_buffer_release_query") {
                 stock.getKRecord(Datetime(200001010000), KQuery::DAY);
                 stock.getKRecordList(KQuery(0, Null<size_t>(), KQuery::DAY));
                 stock.getMarketValue(Datetime(200001010000), KQuery::DAY);
+            }
+        });
+    }
+
+    for (auto& t : readers) {
+        t.join();
+    }
+    stop = true;
+    writer.join();
+    CHECK(true);  // survived without crash/UAF
+}
+
+/** @par Test points
+ * The zero-copy KData view holds a shared_ptr copy of the buffer, so it stays valid (a snapshot)
+ * after a concurrent releaseKDataBuffer. */
+TEST_CASE("test_Stock_kdata_view_survives_buffer_release") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+
+    /** @arg Create KData views on the buffered day K-line, then release the buffer */
+    stock.loadKDataToBuffer(KQuery::DAY);
+    KData k1 = stock.getKData(KQuery(0, 10, KQuery::DAY));
+    KData k2 =
+      stock.getKData(KQueryByDate(Datetime(200001010000), Datetime(200012310000), KQuery::DAY));
+    REQUIRE(k1.size() == 10);
+    REQUIRE(k2.size() > 0);
+
+    auto capture = [](const KData& k) {
+        vector<KRecord> ref(k.size());
+        for (size_t i = 0; i < k.size(); ++i) {
+            ref[i] = k.getKRecord(i);
+        }
+        return ref;
+    };
+    auto check_same_as_ref = [](const KData& k, const vector<KRecord>& ref) {
+        REQUIRE(k.size() == ref.size());
+        for (size_t i = 0; i < ref.size(); ++i) {
+            CHECK(k.getKRecord(i) == ref[i]);
+        }
+    };
+    vector<KRecord> ref1 = capture(k1), ref2 = capture(k2);
+
+    stock.releaseKDataBuffer(KQuery::DAY);
+    CHECK_EQ(stock.isBuffer(KQuery::DAY), false);
+
+    /** @arg The released views remain readable and identical (snapshot) */
+    check_same_as_ref(k1, ref1);
+    check_same_as_ref(k2, ref2);
+
+    /** @arg Reload the buffer; the old views are not affected by the new buffer */
+    stock.loadKDataToBuffer(KQuery::DAY);
+    check_same_as_ref(k1, ref1);
+    check_same_as_ref(k2, ref2);
+
+    /** @arg Concurrent buffer release while KData views are created and read */
+    std::atomic<bool> stop{false};
+    std::thread writer([&]() {
+        while (!stop) {
+            stock.releaseKDataBuffer(KQuery::DAY);
+            stock.loadKDataToBuffer(KQuery::DAY);
+        }
+    });
+
+    std::vector<std::thread> readers;
+    for (int i = 0; i < 4; ++i) {
+        readers.emplace_back([&]() {
+            for (int n = 0; n < 5000 && !stop; ++n) {
+                KData k = stock.getKData(KQuery(-30, Null<size_t>(), KQuery::DAY));
+                size_t sz = k.size();
+                for (size_t j = 0; j < sz; ++j) {
+                    KRecord r = k.getKRecord(j);
+                    CHECK(!r.datetime.isNull());
+                }
             }
         });
     }
@@ -2213,6 +2285,73 @@ TEST_CASE("test_Stock_getFinanceInfo") {
     CHECK_EQ(f.get<price_t>("baoliu2"), doctest::Approx(12.0).epsilon(0.00001));
 
     MEMORY_CHECK;
+}
+
+/** @par Test points */
+TEST_CASE("test_Stock_setKRecordList_null_safe") {
+    KRecord bar(Datetime(202001010000));
+    bar.openPrice = bar.highPrice = bar.lowPrice = bar.closePrice = 10.0;
+    KRecordList ks{bar};
+
+    /** @arg setKRecordList on a null Stock must throw a clear exception instead of
+     *      dereferencing the null m_data (the guard was inverted before the fix) */
+    Stock null_stock;
+    CHECK(null_stock.isNull());
+    CHECK_THROWS(null_stock.setKRecordList(ks, KQuery::DAY));
+
+    /** @arg A temporary Stock (constructed but not loaded, no kdata driver yet) has null
+     *      m_kdataDriver so isNull() is true, but its m_data is present; setKRecordList must
+     *      populate the buffer instead of crashing */
+    Stock temp("TEST", "BASE104", "Base104 regression stock");
+    CHECK(temp.isNull());
+    temp.setKRecordList(ks, KQuery::DAY);
+    CHECK(temp.isBuffer(KQuery::DAY));
+    CHECK_EQ(temp.getCount(KQuery::DAY), 1u);
+    CHECK_EQ(temp.getKRecord(0, KQuery::DAY).datetime, Datetime(202001010000));
+}
+
+/** @par Test points */
+TEST_CASE("test_Stock_getLastUpdateTime_null_safe") {
+    /** @arg A default-constructed (Null) Stock must not dereference null m_data */
+    Stock null_stock;
+    CHECK(null_stock.isNull());
+    CHECK_EQ(null_stock.getLastUpdateTime(KQuery::DAY), Datetime::min());
+    CHECK_EQ(null_stock.getLastUpdateTime(KQuery::MIN), Datetime::min());
+
+    /** @arg A temporary Stock populated via setKRecordList records its last update time,
+     *      which must be readable without a lock-induced data race for extra k-types */
+    KRecord bar(Datetime(202001010000));
+    bar.openPrice = bar.highPrice = bar.lowPrice = bar.closePrice = 10.0;
+    KRecordList ks{bar};
+    Stock temp("TEST", "BASE105", "Base105 regression stock");
+    temp.setKRecordList(ks, KQuery::DAY);
+    CHECK(temp.getLastUpdateTime(KQuery::DAY) != Datetime::min());
+    CHECK_EQ(temp.getLastUpdateTime(KQuery::MIN), Datetime::min());
+}
+
+/** @par Test points */
+TEST_CASE("test_Stock_getLastUpdateTime_concurrent") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    Stock null_stock;
+
+    std::atomic<bool> stop{false};
+    std::vector<std::thread> readers;
+    for (int i = 0; i < 4; ++i) {
+        readers.emplace_back([&]() {
+            for (int n = 0; n < 5000 && !stop; ++n) {
+                stock.getLastUpdateTime(KQuery::DAY);
+                stock.getLastUpdateTime(KQuery::WEEK);
+                stock.getLastUpdateTime(KQuery::MIN);
+                stock.getLastUpdateTime(KQuery::MIN5);
+                null_stock.getLastUpdateTime(KQuery::DAY);
+            }
+        });
+    }
+    for (auto& t : readers) {
+        t.join();
+    }
+    CHECK(true);  // survived without crash / data race
 }
 
 /** @} */

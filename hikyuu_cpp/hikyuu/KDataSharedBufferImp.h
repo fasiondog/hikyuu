@@ -11,6 +11,11 @@
 
 namespace hku {
 
+/**
+ * Zero-copy KData view over the buffer cached by the Stock (NO_RECOVER only).
+ * @note Holds a shared_ptr copy of the buffer (a snapshot), safe against a concurrent release;
+ *       the data pointer is resolved on every access
+ */
 class HKU_API KDataSharedBufferImp : public KDataImp {
 public:
     KDataSharedBufferImp() = default;
@@ -42,19 +47,19 @@ public:
     virtual const KRecord& getKRecord(size_t pos) const noexcept override;
 
     virtual const KRecord& front() const override {
-        return (m_size == 0 || m_data == nullptr) ? KRecord::NullKRecord : m_data[0];
+        return (m_size == 0 || !m_buf) ? KRecord::NullKRecord : m_buf->data()[m_start];
     }
 
     virtual const KRecord& back() const override {
-        return (m_size == 0 || m_data == nullptr) ? KRecord::NullKRecord : m_data[m_size - 1];
+        return (m_size == 0 || !m_buf) ? KRecord::NullKRecord : m_buf->data()[m_end - 1];
     }
 
     virtual const KRecord* data() const noexcept override {
-        return m_data;
+        return dataptr();
     }
 
     virtual KRecord* data() noexcept override {
-        return m_data;
+        return dataptr();
     }
 
     virtual DatetimeList getDatetimeList() const override;
@@ -62,10 +67,15 @@ public:
     virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const override;
 
 private:
+    KRecord* dataptr() const noexcept {
+        return m_buf ? m_buf->data() + m_start : nullptr;
+    }
+
+private:
     size_t m_start{0};
     size_t m_end{0};
     size_t m_size{0};
-    KRecord* m_data{nullptr};
+    std::shared_ptr<KRecordList> m_buf{nullptr};  // Pins the stock buffer snapshot
 };
 
 } /* namespace hku */

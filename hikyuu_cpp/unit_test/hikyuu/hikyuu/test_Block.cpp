@@ -123,4 +123,96 @@ TEST_CASE("test_Block_2") {
     CHECK(blk.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_Block_getStockList_null_safe") {
+    /** @arg The default-constructed (Null) Block must not dereference a null m_data */
+    Block blk;
+    CHECK(blk.isNull());
+
+    StockList all = blk.getStockList();
+    CHECK(all.empty());
+
+    StockList filtered = blk.getStockList([](const Stock&) { return true; });
+    CHECK(filtered.empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_Block_add_list_all_of") {
+    StockManager& sm = StockManager::instance();
+
+    /** @arg A middle failure is not overwritten by later successes (StockList) */
+    Block blk;
+    CHECK_UNARY_FALSE(blk.add(StockList{sm["sh000001"], Stock(), sm["sz000002"]}));
+    CHECK_EQ(blk.size(), 2u);
+
+    /** @arg All succeed (StockList) */
+    Block blk2;
+    CHECK_UNARY(blk2.add(StockList{sm["sh000001"], sm["sz000002"]}));
+    CHECK_EQ(blk2.size(), 2u);
+
+    /** @arg Empty list returns true */
+    CHECK_UNARY(blk2.add(StockList{}));
+
+    /** @arg A middle failure is not overwritten by later successes (StringList) */
+    Block blk3;
+    CHECK_UNARY_FALSE(blk3.add(StringList{"sh000001", "invalid_code", "sz000002"}));
+    CHECK_EQ(blk3.size(), 2u);
+
+    /** @arg All succeed (StringList) */
+    Block blk4;
+    CHECK_UNARY(blk4.add(StringList{"sh000001", "sz000002"}));
+
+    /** @arg Adding an already contained stock is an idempotent success */
+    CHECK_UNARY(blk.add(sm["sh000001"]));
+    CHECK_EQ(blk.size(), 2u);
+    CHECK_UNARY(blk.add("sh000001"));
+    CHECK_EQ(blk.size(), 2u);
+
+    /** @arg An invalid code still fails */
+    CHECK_UNARY_FALSE(blk.add("invalid_code"));
+
+    /** @arg Duplicates within one list are also idempotent successes */
+    Block blk5;
+    CHECK_UNARY(blk5.add(StringList{"sh000001", "sh000001", "sz000002"}));
+    CHECK_EQ(blk5.size(), 2u);
+}
+
+/** @par Test points */
+TEST_CASE("test_Block_eq_and_hash_order_independent") {
+    StockManager& sm = StockManager::instance();
+
+    Stock a = sm["sh000001"];
+    Stock b = sm["sz000002"];
+    Stock c = sm["sh000002"];
+
+    /** @arg Two blocks with the same stocks added in different order are equal
+     *      (equality must not depend on unordered_map iteration order) */
+    Block blk1;
+    blk1.add(a);
+    blk1.add(b);
+    Block blk2;
+    blk2.add(b);  // reversed insertion order
+    blk2.add(a);
+    CHECK(blk1 == blk2);
+    CHECK_UNARY_FALSE(blk1 != blk2);
+
+    /** @arg strongHash is order-independent for the same stock set */
+    CHECK_EQ(blk1.strongHash(), blk2.strongHash());
+
+    /** @arg A block with a different stock set is not equal and hashes differently */
+    Block blk3;
+    blk3.add(a);
+    blk3.add(c);
+    CHECK_UNARY_FALSE(blk1 == blk3);
+    CHECK(blk1.strongHash() != blk3.strongHash());
+
+    /** @arg A block with an extra stock is not equal and hashes differently */
+    Block blk4;
+    blk4.add(a);
+    blk4.add(b);
+    blk4.add(c);
+    CHECK_UNARY_FALSE(blk1 == blk4);
+    CHECK(blk1.strongHash() != blk4.strongHash());
+}
+
 /** @} */

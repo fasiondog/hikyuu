@@ -133,6 +133,9 @@ public:
     /** Get the maximum trade quantity */
     double maxTradeNumber() const noexcept;
 
+    /** @note Mutate m_data's scalar fields WITHOUT a lock; call only during init /
+     *  loadAllStocks reload (no concurrent readers), else a data race with market()/code()
+     *  readers. */
     void market(const string& market_);
     void code(const string& code_);
     void name(const string& name_);
@@ -311,7 +314,7 @@ private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
 
     // The following functions are basic operations guarded by a read lock
-    const KRecord& _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
+    KRecord _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
 
@@ -383,7 +386,7 @@ struct HKU_API Stock::Data {
 
     std::unordered_set<string> m_ktype_preload;  // Records whether the K-line data of this security
                                                  // needs to be preloaded
-    unordered_map<string, KRecordList*> pKData;
+    unordered_map<string, std::shared_ptr<KRecordList>> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
     unordered_map<string, Datetime> m_lastUpdate;  // Last update time of each K-line data type
 

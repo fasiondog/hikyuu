@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <mutex>
 #include "KDataImp.h"
 
 namespace hku {
@@ -79,7 +80,7 @@ private:
     KRecordList m_buffer;
     mutable size_t m_start{0};
     mutable size_t m_end{0};
-    mutable bool m_have_pos_in_stock{false};
+    mutable std::once_flag m_pos_once;
 };
 
 // typedef shared_ptr<KDataPrivatedBufferImp> KDataPrivatedBufferImpPtr;

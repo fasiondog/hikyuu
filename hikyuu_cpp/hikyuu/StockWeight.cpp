@@ -19,7 +19,6 @@ HKU_API std::ostream& operator<<(std::ostream& os, const StockWeight& record) {
        << record.countForSell() << ", " << record.priceForSell() << ", " << record.bonus() << ", "
        << record.increasement() << ", " << record.totalCount() << ", " << record.freeCount() << ", "
        << record.suogu() << ")";
-    (void)os.precision(6);
     return os;
 }
 

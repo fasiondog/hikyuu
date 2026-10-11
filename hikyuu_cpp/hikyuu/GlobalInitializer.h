@@ -21,7 +21,12 @@ class HKU_API GlobalInitializer {
 public:
     GlobalInitializer() {
         if (m_count++ == 0) {
-            init();
+            try {
+                init();
+            } catch (...) {
+                --m_count;
+                throw;
+            }
         }
     }
 

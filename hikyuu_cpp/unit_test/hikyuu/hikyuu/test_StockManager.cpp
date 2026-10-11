@@ -6,12 +6,68 @@
  */
 
 #include "doctest/doctest.h"
+#include <atomic>
+#include <chrono>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <thread>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/utilities/Log.h>
 #include "../plugin_valid.h"
 
 using namespace hku;
+
+namespace {
+// waitDataReady() is expected to return promptly once the loading has failed; it is run in a
+// detached thread with a deadline, so that a regression is reported as a failure instead of
+// blocking the whole test run
+bool waitDataReadyReleased(StockManager& sm) {
+    auto done = std::make_shared<std::atomic_bool>(false);
+    std::thread([&sm, done]() {
+        sm.waitDataReady();
+        done->store(true);
+    }).detach();
+    for (int i = 0; i < 100 && !done->load(); i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    return done->load();
+}
+
+// Only used by the disabled deadlock case at the end of this file
+#if 0
+// Runs the given function in a detached thread with a deadline. A deadlock leaves the worker
+// holding the lock, which would hang the static destruction as well, so on a timeout the process is
+// left without running the destructors: the failure stays visible instead of hanging forever
+template <typename Func>
+void runWithDeadline(Func&& func, int seconds = 10) {
+    auto done = std::make_shared<std::atomic_bool>(false);
+    std::thread([func = std::forward<Func>(func), done]() {
+        func();
+        done->store(true);
+    }).detach();
+    for (int i = 0; i < seconds * 10 && !done->load(); i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    if (!done->load()) {
+        std::cerr << "runWithDeadline: the operation did not finish within " << seconds
+                  << "s (deadlock?)" << std::endl;
+        std::quick_exit(1);
+    }
+}
+#endif
+
+bool hasBlock(const BlockList& blocks, const string& category, const string& name) {
+    for (const auto& blk : blocks) {
+        if (blk.category() == category && blk.name() == name) {
+            return true;
+        }
+    }
+    return false;
+}
+}  // namespace
 
 /**
  * @defgroup test_hikyuu_StockManager test_hikyuu_StockManager
@@ -161,6 +217,47 @@ TEST_CASE("test_StockManager_getBlock") {
 }
 
 /** @par Test points */
+TEST_CASE("test_StockManager_getBlockList_inner_block") {
+    auto& sm = StockManager::instance();
+
+    /** @arg Filtering by the category of the inner blocks returns them (their keys are
+     * "category_name", which never equals a bare category) */
+    BlockList blocks_a = sm.getBlockList("A");
+    CHECK_UNARY(hasBlock(blocks_a, "A", "ALL"));
+    CHECK_UNARY(hasBlock(blocks_a, "A", "沪深"));
+    CHECK_UNARY(hasBlock(blocks_a, "A", "SH"));
+    CHECK_UNARY(hasBlock(blocks_a, "A", "SZ"));
+    for (const auto& blk : blocks_a) {
+        CHECK_EQ(blk.category(), "A");
+    }
+
+    /** @arg The other inner categories are matched as well */
+    CHECK_UNARY(hasBlock(sm.getBlockList("G"), "G", "创业板"));
+    CHECK_UNARY(hasBlock(sm.getBlockList("START"), "START", "科创板"));
+    CHECK_UNARY(hasBlock(sm.getBlockList("ETF"), "ETF", "ALL"));
+
+    /** @arg An unknown category matches neither a driver block nor an inner block */
+    CHECK_EQ(sm.getBlockList("__no_such_category__").size(), 0);
+
+    /** @arg getBlock of the same category+name is a non-empty inner block, and the unfiltered list
+     * contains it as well */
+    CHECK_NE(sm.getBlock("A", "ALL").size(), 0);
+    CHECK_UNARY(hasBlock(sm.getBlockList(), "A", "ALL"));
+
+    /** @arg getAllCategory lists the inner categories too, so they can be discovered */
+    StringList categories = sm.getAllCategory();
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "A") != categories.end());
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "G") != categories.end());
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "START") != categories.end());
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "ETF") != categories.end());
+
+    /** @arg getStockBelongs finds the inner block of the given category */
+    Stock stk = sm.getStock("sz000001");
+    CHECK_UNARY(!stk.isNull());
+    CHECK_UNARY(hasBlock(sm.getStockBelongs(stk, "A"), "A", "ALL"));
+}
+
+/** @par Test points */
 TEST_CASE("test_StockManager_isHoliday") {
     auto& sm = StockManager::instance();
     CHECK_THROWS(sm.isHoliday(Datetime()));
@@ -245,5 +342,111 @@ TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
     }
     setShmServerRole(org_role);
 }
+
+/** @par Test points */
+TEST_CASE("test_StockManager_loadAllStocks_by_context") {
+    auto& sm = StockManager::instance();
+    const StrategyContext org_context = sm.getStrategyContext();
+
+    StrategyContext context({"sh000001", "sz000001", "sh999999", "xx000001", "xsh000001"});
+    // The stock dictionary is never cleared by the load, so the two valid codes are removed first:
+    // only the context-driven loading below can bring them back (sh000001 also via the must-load
+    // list, sz000001 only via the context)
+    sm.removeStock("SH000001");
+    sm.removeStock("SZ000001");
+    sm.reloadWith(context);
+    sm.joinPreloadThread();
+
+    /** @arg The codes given by the context are loaded */
+    CHECK_UNARY(!sm.getStock("sh000001").isNull());
+    CHECK_UNARY(!sm.getStock("sz000001").isNull());
+
+    /** @arg A driver miss is skipped: it would otherwise be loaded as a garbage security with an
+     * empty market_code */
+    CHECK_UNARY(sm.getStock("sh999999").isNull());
+    bool has_empty_market_code = false;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        if (stk.market_code().empty()) {
+            has_empty_market_code = true;
+            break;
+        }
+    }
+    CHECK_UNARY_FALSE(has_empty_market_code);
+
+    /** @arg A code whose market abbreviation does not lead the string is rejected (the market is
+     * matched at position 0 only) */
+    CHECK_UNARY(sm.getStock("xsh000001").isNull());
+    CHECK_UNARY(sm.getStock("xx000001").isNull());
+
+    // Restore the full load for the following cases
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_EQ(sm.size(), 4729);
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_load_failed") {
+    auto& sm = StockManager::instance();
+    sm.joinPreloadThread();
+
+    /** @arg A load that finishes normally leaves the failure flag unset */
+    CHECK_UNARY(!sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+
+    /** @arg An exception thrown before the preload thread is started is published as a failure:
+     * nothing would ever set the readiness flag, so the waiters must be released explicitly */
+    size_t early_id = registerLoadEventCallback([](LoadEvent event) {
+        HKU_IF_RETURN(event != LoadEvent::BASE_DATA_READY, void());
+        throw std::runtime_error("injected failure before the preload is started");
+    });
+    CHECK_THROWS_AS(sm.reload(), std::runtime_error);
+    unregisterLoadEventCallback(early_id);
+    CHECK_UNARY(sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+    CHECK_UNARY(waitDataReadyReleased(sm));
+
+    /** @arg An exception escaping the preload thread body is caught: it no longer terminates the
+     * process, and the failure (together with the readiness) is published */
+    size_t preload_id = registerLoadEventCallback([](LoadEvent event) {
+        HKU_IF_RETURN(event != LoadEvent::KDATA_PRELOAD_FINISHED, void());
+        throw std::runtime_error("injected failure in the preload thread");
+    });
+    sm.reload();
+    sm.joinPreloadThread();
+    unregisterLoadEventCallback(preload_id);
+    CHECK_UNARY(sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+    CHECK_UNARY(waitDataReadyReleased(sm));
+
+    // Restore the state for the following cases: a clean reload clears the failure flag and refills
+    // the preload buffer
+    sm.reload();
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+}
+
+// Disabled by default: it costs a full reload on every run and it can only fail when the dispatch
+// path regresses into a deadlock. Enable it when _fireLoadEvent or the callback registry changes.
+#if 0
+/** @par Test points */
+TEST_CASE("test_StockManager_fireLoadEvent_unregister_in_callback") {
+    auto& sm = StockManager::instance();
+
+    /** @arg A callback unregistering another one does not self-deadlock: the dispatch runs on a
+     * snapshot taken under the lock, so the unregister below may take the same lock */
+    size_t outer_id = registerLoadEventCallback([](LoadEvent) {});
+    size_t inner_id =
+      registerLoadEventCallback([outer_id](LoadEvent) { unregisterLoadEventCallback(outer_id); });
+    runWithDeadline([&sm]() {
+        sm.reload();
+        sm.joinPreloadThread();
+    });
+    unregisterLoadEventCallback(inner_id);
+
+    CHECK_UNARY(!sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+}
+#endif
 
 /** @} */

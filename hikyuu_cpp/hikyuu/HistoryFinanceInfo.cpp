@@ -9,7 +9,7 @@
 
 namespace hku {
 
-HistoryFinanceInfo& HistoryFinanceInfo::operator=(const HistoryFinanceInfo& other) noexcept {
+HistoryFinanceInfo& HistoryFinanceInfo::operator=(const HistoryFinanceInfo& other) {
     HKU_IF_RETURN(this == &other, *this);
     fileDate = other.fileDate;
     reportDate = other.reportDate;

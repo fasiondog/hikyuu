@@ -125,12 +125,6 @@ string Stock::Data::marketCode() const {
 }
 
 Stock::Data::~Data() {
-    for (auto iter = pKData.begin(); iter != pKData.end(); ++iter) {
-        if (iter->second) {
-            delete iter->second;
-        }
-    }
-
     for (auto iter = pMutex.begin(); iter != pMutex.end(); ++iter) {
         if (iter->second) {
             delete iter->second;
@@ -399,7 +393,6 @@ void Stock::setKDataDriver(const KDataDriverConnectPoolPtr& kdataDriver) {
         auto ktype_list = KQuery::getBaseKTypeList();
         for (auto& ktype : ktype_list) {
             std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-            delete m_data->pKData[ktype];
             m_data->pKData[ktype] = nullptr;
         }
     }
@@ -411,11 +404,10 @@ KDataDriverConnectPoolPtr Stock::getKDataDirver() const {
 
 bool Stock::isBuffer(KQuery::KType ktype) const noexcept {
     HKU_IF_RETURN(!m_data, false);
-    string nktype(ktype);
-    to_upper(nktype);
-    HKU_IF_RETURN(m_data->pMutex.find(nktype) == m_data->pMutex.end(), false);
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
-    return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
+    to_upper(ktype);
+    HKU_IF_RETURN(m_data->pMutex.find(ktype) == m_data->pMutex.end(), false);
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    return m_data->pKData.find(ktype) != m_data->pKData.end() && m_data->pKData[ktype];
 }
 
 void Stock::setPreload(const vector<KQuery::KType>& preload_ktypes) {
@@ -443,7 +435,6 @@ void Stock::releaseKDataBuffer(KQuery::KType ktype) const {
         std::unique_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
         auto iter = m_data->pKData.find(ktype);
         if (iter->second) {
-            delete iter->second;
             iter->second = nullptr;
         }
     }
@@ -468,15 +459,13 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     size_t total = driver->getCount(m_data->m_market, m_data->m_code, kType);
 
     // Load the K-line data according to the configured preload parameters
-    KQuery query = KQuery(0, Null<int64_t>(), kType);
-
     const auto& param = StockManager::instance().getPreloadParameter();
     string preload_type = fmt::format("{}_max", kType);
     to_lower(preload_type);
     int64_t max_num = param.tryGet<int64_t>(preload_type, 4096);
     HKU_ERROR_IF_RETURN(max_num < 0, void(), "Invalid preload {} param: {}", preload_type, max_num);
     int64_t start = total <= (size_t)max_num ? 0 : total - max_num;
-    query = KQuery(start, Null<int64_t>(), kType);
+    KQuery query = KQuery(start, Null<int64_t>(), kType);
     if (driver->isColumnFirst() && market_code() != "SH000001") {
         Stock sh000001 = StockManager::instance().getStock("SH000001");
         if (!sh000001.isNull()) {
@@ -498,7 +487,7 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
         if (m_data->pKData.find(kType) != m_data->pKData.end() && m_data->pKData[kType]) {
             return;
         }
-        KRecordList* ptr_klist = new KRecordList;
+        auto ptr_klist = std::make_shared<KRecordList>();
         m_data->pKData[kType] = ptr_klist;
         if (total != 0) {
             (*ptr_klist) = driver->getKRecordList(m_data->m_market, m_data->m_code, query);
@@ -541,7 +530,7 @@ void Stock::loadKDataToBufferFromKRecordList(const KQuery::KType& inkType, KReco
         if (m_data->pKData.find(kType) != m_data->pKData.end() && m_data->pKData[kType]) {
             return;
         }
-        KRecordList* ptr_klist = new KRecordList;
+        auto ptr_klist = std::make_shared<KRecordList>();
         (*ptr_klist) = std::move(ks);
         ptr_klist->shrink_to_fit();
         m_data->pKData[kType] = ptr_klist;
@@ -617,9 +606,7 @@ StockWeightList Stock::getWeight(const Datetime& start, const Datetime& end) con
 
     end_iter = lower_bound(start_iter, (StockWeightList::const_iterator)m_data->m_weightList.end(),
                            StockWeight(end), std::less<StockWeight>());
-    for (; start_iter != end_iter; ++start_iter) {
-        result.push_back(*start_iter);
-    }
+    result.assign(start_iter, end_iter);
 
     return result;
 }
@@ -675,8 +662,8 @@ vector<EqualRecoverFactor> Stock::getEqualRecoverFactors() const {
             if (weight.suogu() != 0.0) {
                 denominator = weight.suogu();
             } else {
-                price_t change = 0.1 * (weight.countAsGift() + weight.countForSell() +
-                                        weight.increasement());
+                price_t change =
+                  0.1 * (weight.countAsGift() + weight.countForSell() + weight.increasement());
                 denominator = 1.0 + change;
                 temp = close + weight.priceForSell() * change - 0.1 * weight.bonus();
             }
@@ -707,7 +694,7 @@ size_t Stock::getCount(KQuery::KType ktype) const {
 
         if (isBuffer(ktype)) {
             std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-            if (auto* buf = m_data->pKData[ktype]) {
+            if (auto* buf = m_data->pKData[ktype].get()) {
                 return buf->size();
             }
         }
@@ -815,7 +802,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             }
             // out_start == 0 yet the first record is already after datetime: the query time
             // precedes the first K-line record, so no market value exists yet. Return 0 rather
-            // than the latest close, which would leak future data into valuation (BASE-102).
+            // than the latest close, which would leak future data into valuation.
             return 0.0;
         }
 
@@ -937,7 +924,7 @@ bool Stock::_getIndexRangeByIndexFromBuffer(const KQuery& query, size_t& out_sta
     out_start = 0;
     out_end = 0;
 
-    auto* buf = m_data->pKData[query.kType()];
+    auto* buf = m_data->pKData[query.kType()].get();
     HKU_IF_RETURN(!buf, false);
     size_t total = buf->size();
     HKU_IF_RETURN(0 == total, false);
@@ -992,7 +979,7 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     out_start = 0;
     out_end = 0;
 
-    auto* buf = m_data->pKData[query.kType()];
+    auto* buf = m_data->pKData[query.kType()].get();
     HKU_IF_RETURN(!buf, false);
     const KRecordList& kdata = *buf;
     size_t total = kdata.size();
@@ -1057,9 +1044,9 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
-const KRecord& Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
+KRecord Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
-    auto* buf = m_data->pKData[ktype];
+    auto* buf = m_data->pKData[ktype].get();
     HKU_IF_RETURN(!buf, KRecord::NullKRecord);
     return pos >= buf->size() ? KRecord::NullKRecord : (*buf)[pos];
 }
@@ -1143,7 +1130,7 @@ KRecordList Stock::_getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                              KQuery::KType ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     KRecordList result;
-    auto* buf = m_data->pKData[ktype];
+    auto* buf = m_data->pKData[ktype].get();
     HKU_IF_RETURN(!buf || buf->empty(), result);
     size_t total = buf->size();
     HKU_WARN_IF_RETURN(start_ix >= end_ix || start_ix >= total, result,
@@ -1279,7 +1266,10 @@ vector<Block> Stock::getBelongToBlockList(const string& category) const {
     return StockManager::instance().getStockBelongs(*this, category);
 }
 
-// Judge whether it is within the trading time range (the date is not judged)
+// Judge whether the given moment falls within the current day's trading session. The window is
+// anchored to today (openTime/closeTime are TimeDelta offsets added to Datetime::today()), so only
+// the intraday time range is checked; the date itself is not validated as a trading day
+// (holidays/weekends are not excluded) and the input is assumed to be today.
 bool Stock::isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());
     HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
@@ -1412,6 +1402,7 @@ void Stock::realtimeUpdate(KRecord record, const KQuery::KType& inktype) {
 }
 
 Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
+    HKU_IF_RETURN(!m_data, Datetime::min());
     auto ktype = inktype;
     to_upper(ktype);
     // The client mode without a local buffer (an ordinary proxy security): m_lastUpdate is always
@@ -1424,26 +1415,20 @@ Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
     if (StockManager::instance().isIpcClientMode() && !isBuffer(ktype)) {
         return ipc::forwardGetLastUpdateTime(market_code(), ktype);
     }
-    if (m_data->pMutex.find(ktype) == m_data->pMutex.end()) {
+    auto pmutex_iter = m_data->pMutex.find(ktype);
+    if (pmutex_iter == m_data->pMutex.end()) {
         auto iter = m_data->m_lastUpdate.find(ktype);
-        if (iter == m_data->m_lastUpdate.end()) {
-            // The possibly newly added extended K-line type
-            if (KQuery::isExtraKType(ktype)) {
-                m_data->m_lastUpdate[ktype] = Datetime::min();
-            }
-            return Datetime::min();
-        }
-        return iter->second;
+        return iter == m_data->m_lastUpdate.end() ? Datetime::min() : iter->second;
     }
 
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    std::shared_lock<std::shared_mutex> lock(*(pmutex_iter->second));
     auto iter = m_data->m_lastUpdate.find(ktype);
     return iter == m_data->m_lastUpdate.end() ? Datetime::min() : iter->second;
 }
 
 void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     HKU_CHECK(
-      isNull(),
+      m_data,
       "The stock is Null, can't set kdata! Please create a stock using the format Stock(market, "
       "code, name)! Calling Stock() will create a special null instance.");
 
@@ -1456,7 +1441,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
     if (!m_data->pKData[nktype]) {
-        m_data->pKData[nktype] = new KRecordList();
+        m_data->pKData[nktype] = std::make_shared<KRecordList>();
     }
 
     (*(m_data->pKData[nktype])) = ks;
@@ -1473,7 +1458,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
 
 void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     HKU_CHECK(
-      isNull(),
+      m_data,
       "The stock is Null, can't set kdata! Please create a stock using the format Stock(market, "
       "code, name)! Calling Stock() will create a special null instance.");
 
@@ -1486,7 +1471,7 @@ void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     HKU_CHECK(m_data->pKData.find(nktype) != m_data->pKData.end(), "Invalid ktype: {}", ktype);
 
     if (!m_data->pKData[nktype]) {
-        m_data->pKData[nktype] = new KRecordList();
+        m_data->pKData[nktype] = std::make_shared<KRecordList>();
     }
 
     (*m_data->pKData[nktype]) = std::move(ks);
@@ -1585,8 +1570,10 @@ void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     history_finance.shrink_to_fit();
     if (!m_data->m_history_finance_ready) {
         std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
-        m_data->m_history_finance = std::move(history_finance);
-        m_data->m_history_finance_ready = true;
+        if (!m_data->m_history_finance_ready) {
+            m_data->m_history_finance = std::move(history_finance);
+            m_data->m_history_finance_ready = true;
+        }
     }
 }
 

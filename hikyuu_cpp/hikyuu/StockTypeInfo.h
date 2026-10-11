@@ -34,7 +34,9 @@ namespace hku {
  */
 class HKU_API StockTypeInfo {
 public:
-    /** Default constructor, returns Null<StockTypeInfo>() */
+    /** Default constructor, returns Null<StockTypeInfo>(). Initializes tick/tickValue/unit to 1.0
+     * (so unit = tickValue / tick holds) and min/max trade number to 1/1000000, so the default
+     * instance is usable instead of an all-zero placeholder that rejects any real order. */
     StockTypeInfo();
     StockTypeInfo(uint32_t, const string&, price_t, price_t, int, double, double);
 
@@ -64,7 +66,7 @@ public:
         return m_tickValue;
     }
 
-    /** Price per unit = tickValue / tick */
+    /** Price per unit, i.e. unit = tickValue / tick (when tick == 0, defaults to 1.0) */
     price_t unit() const noexcept {
         return m_unit;
     }
@@ -92,15 +94,15 @@ private:
     string m_description;     // Description
     price_t m_tick;           // Minimum tick size
     price_t m_tickValue;      // Price of every tick
-    price_t m_unit;           // Price per minimum change, i.e. unit price = tickValue / tick
+    price_t m_unit;           // Price per unit = tickValue / tick (defaults to 1.0 if tick == 0)
     int m_precision;          // Price precision
     double m_minTradeNumber;  // Minimum trade quantity per order
     double m_maxTradeNumber;  // Maximum trade quantity per order
 };
 
 /**
- * Output the security type information, e.g. StockTypeInfo(type, description, tick, precision,
- * minTradeNumber, maxTradeNumber)
+ * Output the security type information, e.g. StockTypeInfo(type, description, tick, tickValue,
+ * unit, precision, minTradeNumber, maxTradeNumber)
  * @ingroup StockManage
  */
 HKU_API std::ostream& operator<<(std::ostream&, const StockTypeInfo&);

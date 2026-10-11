@@ -194,6 +194,10 @@ StockManager/Block/Stock
 
         Whether all data has finished loading and is ready to use
 
+    .. py:attribute:: load_failed
+
+        Whether the last data loading failed; the preload is only a cache warm-up, so the queries afterwards are still served by the driver, only the preloaded part may be incomplete
+
     .. py:staticmethod:: instance()
 
         Return the StockManager singleton instance
@@ -211,7 +215,7 @@ StockManager/Block/Stock
 
     .. py:method:: wait_data_ready(self)
 
-        Block until all data has finished loading and is ready to use
+        Block until all data has finished loading and is ready to use; it returns early when the loading has failed
 
     .. py:method:: cancel_load(self)
 
@@ -354,7 +358,7 @@ StockManager/Block/Stock
 
     .. py:method:: get_category_list(self)
 
-        Return all sector categories
+        Return all sector categories, including the categories of the inner sectors (A/G/START/ETF)
 
         :return: all sector categories
         :rtype: StringList
@@ -390,7 +394,7 @@ StockManager/Block/Stock
 
     .. py:method:: get_block_list(self[, category])
 
-        Return the sectors belonging to the given category
+        Return the sectors belonging to the given category, including the inner sectors of it
 
         :param str category: the sector category
         :return: the sector list
@@ -488,7 +492,7 @@ StockManager/Block/Stock
     .. py:attribute:: last_datetime : the last date for which data is available
     .. py:attribute:: tick : the minimum price tick
     .. py:attribute:: tick_value : the monetary value of one tick
-    .. py:attribute:: unit : value per unit = tickValue / tick
+    .. py:attribute:: unit : value per unit = tickValue / tick (when tick == 0, defaults to 1.0)
     .. py:attribute:: precision : the price precision
     .. py:attribute:: atom : the minimum tradable quantity; the same as minTradeNumber
     .. py:attribute:: min_trade_number : the minimum tradable quantity
@@ -789,7 +793,7 @@ Other Security Information Definitions
     .. py:attribute:: description : descriptive information
     .. py:attribute:: tick : the minimum price tick
     .. py:attribute:: tick_value : the price of one tick
-    .. py:attribute:: unit : the price per minimum increment, i.e. the unit price = tickValue/tick
+    .. py:attribute:: unit : the price per minimum increment, i.e. unit = tickValue / tick (when tick == 0, defaults to 1.0)
     .. py:attribute:: precision : the price precision
     .. py:attribute:: min_trade_num : the minimum order quantity
     .. py:attribute:: max_trade_num : the maximum order quantity
