@@ -75,9 +75,7 @@ public:
     }
 
     typedef shared_ptr<KDataImp> KDataImpPtr;
-    virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const {
-        return std::make_shared<KDataImp>(m_stock, query);
-    }
+    virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const;
 
 protected:
     // Find the index of the KRecord whose datetime equals `datetime` within the contiguous

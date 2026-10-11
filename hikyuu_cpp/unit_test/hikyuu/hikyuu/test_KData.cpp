@@ -14,6 +14,7 @@
 #include <hikyuu/KQuery.h>
 #include <hikyuu/KData.h>
 #include <hikyuu/Stock.h>
+#include <hikyuu/KDataPrivatedBufferImp.h>
 
 using namespace hku;
 
@@ -2580,6 +2581,41 @@ TEST_CASE("test_KData_start_pos_concurrent") {
         t.join();
     }
     CHECK_EQ(mismatch.load(), 0);
+}
+
+/** @par Test point - cover BASE-322: the base KDataImp::getOtherFromSelf default must rebuild a
+ * real PrivatedBufferImp (with data) instead of silently returning an empty base KDataImp. This
+ * is the fallback used by plugin custom Imps that do not override getOtherFromSelf. */
+TEST_CASE("test_KDataImp_getOtherFromSelf_default_rebuild") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    REQUIRE_FALSE(stock.isNull());
+
+    // Mimics a plugin custom Imp that does NOT override getOtherFromSelf. It reports non-empty to
+    // mirror real usage: via KData::getKData an empty self is short-circuited before the fallback
+    // is ever reached.
+    struct CustomImp : public KDataImp {
+        using KDataImp::KDataImp;
+        bool empty() const noexcept override {
+            return false;
+        }
+        size_t size() const noexcept override {
+            return 10;
+        }
+    };
+
+    CustomImp imp(stock, KQuery(0, 10, KQuery::DAY));
+
+    // Sub-query within the reported range; the default must rebuild via PrivatedBufferImp.
+    KDataImpPtr other = imp.getOtherFromSelf(KQuery(0, 5, KQuery::DAY));
+    REQUIRE(other);
+
+    // Must not be an empty base KDataImp: it should carry real data for the new query.
+    CHECK_FALSE(other->empty());
+    CHECK_EQ(other->size(), 5);
+
+    // And it must be the core PrivatedBufferImp implementation.
+    CHECK(dynamic_cast<KDataPrivatedBufferImp*>(other.get()) != nullptr);
 }
 
 /** @} */
