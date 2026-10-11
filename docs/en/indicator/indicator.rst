@@ -2176,7 +2176,7 @@ Built-in Technical Indicators
 
     The time series ranking, calculating the ranking ratio of the current value within the past N periods (Alpha101)
 
-    Usage: TS_RANK(X,N) means the ranking of X within the past N periods (from 1 to N) divided by N.
+    Usage: TS_RANK(X,N) means the ascending rank of X within the past N periods divided by the number of the valid (non-NaN) observations in the window.
     For example: TS_RANK(CLOSE,20) means the ranking ratio of the close price within the past 20 periods.
 
     The definition in Alpha101:
@@ -2184,6 +2184,8 @@ Built-in Technical Indicators
     where the rank is the ascending ranking, i.e. the smaller values are ranked higher, and the output is the percentile value of 0~1.
 
     This indicator is the rolling ranking of a single stock on the time axis, used to measure the relative position of the current value in the historical sequence.
+
+    NaN policy: NaN values inside the window are excluded from both the numerator and the denominator (consistent with MA/HHV/LLV/STDEV). If the current value itself is NaN, TS_RANK returns Null.
 
     :param Indicator data: the data to calculate
     :param int n: the number of the periods, defaulting to 20

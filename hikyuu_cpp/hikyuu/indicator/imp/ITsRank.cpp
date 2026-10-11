@@ -50,13 +50,17 @@ void ITsRank::_calculate(const Indicator& ind) {
             return;
         }
         int count = 0;
+        size_t valid = 0;
         size_t start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
-            if (src[j] <= current) {
-                count++;
+            if (!std::isnan(src[j])) {
+                valid++;
+                if (src[j] <= current) {
+                    count++;
+                }
             }
         }
-        dst[i] = static_cast<price_t>(count) / n;
+        dst[i] = static_cast<price_t>(count) / valid;
     });
 }
 
@@ -77,13 +81,17 @@ void ITsRank::_increment_calculate(const Indicator& ind, size_t start_pos) {
             continue;
         }
         int count = 0;
+        size_t valid = 0;
         size_t start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
-            if (src[j] <= current) {
-                count++;
+            if (!std::isnan(src[j])) {
+                valid++;
+                if (src[j] <= current) {
+                    count++;
+                }
             }
         }
-        dst[i] = static_cast<price_t>(count) / n;
+        dst[i] = static_cast<price_t>(count) / valid;
     }
 }
 
@@ -98,12 +106,17 @@ void ITsRank::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step
     }
     size_t start = curPos + 1 - step;
     int count = 0;
+    size_t valid = 0;
     for (size_t j = start; j <= curPos; ++j) {
-        if (ind[j] <= current) {
-            count++;
+        value_t v = ind[j];
+        if (!std::isnan(v)) {
+            valid++;
+            if (v <= current) {
+                count++;
+            }
         }
     }
-    _set(static_cast<price_t>(count) / step, curPos);
+    _set(static_cast<price_t>(count) / valid, curPos);
 }
 
 Indicator HKU_API TS_RANK(int n) {
