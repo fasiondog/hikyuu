@@ -40,9 +40,15 @@ void export_StockManager(py::module& m) {
       .def_property_readonly("data_ready", &StockManager::dataReady,
                              "Whether all the data is ready (loaded)")
 
+      .def_property_readonly(
+        "load_failed", &StockManager::loadFailed,
+        "Whether the last data loading failed; the preload is only a cache warm-up, so the queries "
+        "afterwards are still served by the driver, only the preloaded part may be incomplete")
+
       .def("wait_data_ready", &StockManager::waitDataReady,
            py::call_guard<py::gil_scoped_release>(),
-           "A simple block, waiting for all the data to be ready (loaded)")
+           "A simple block, waiting for all the data to be ready (loaded); it returns early when "
+           "the loading has failed")
 
       .def("cancel_load", &StockManager::cancelLoad, "Cancel all the data loading")
 

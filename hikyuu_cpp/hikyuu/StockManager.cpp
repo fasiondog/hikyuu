@@ -194,8 +194,8 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
     // Load the data
     loadData();
 
-    // The basic data and the snapshot publishing are now done by the plugin subscribing to
-    // LoadEvent (see design §5.2), the core library no longer notifies the readiness actively.
+    // The basic data and the snapshot publishing are done by the plugin subscribing to LoadEvent;
+    // the core library no longer notifies the readiness actively.
 
     // Initialize the internal scheduled task (reload)
     initInnerTask();
@@ -206,6 +206,19 @@ void StockManager::init(const Parameter& baseInfoParam, const Parameter& blockPa
 void StockManager::loadData() {
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
     m_data_ready.store(false, std::memory_order_release);
+    m_load_error.store(false, std::memory_order_release);
+
+    struct Guard {
+        std::atomic_bool& data_ready;
+        std::atomic_bool& load_error;
+        bool done{false};
+        ~Guard() {
+            if (!done) {
+                load_error.store(true, std::memory_order_release);
+                data_ready.store(true, std::memory_order_release);
+            }
+        }
+    } guard{m_data_ready, m_load_error};
 
     loadAllHolidays();
     loadAllMarketInfos();
@@ -213,12 +226,9 @@ void StockManager::loadData() {
     loadAllStocks();
     loadInnerBlocks();
     loadAllStockWeights();
-    // The ex-rights/ex-dividend data is ready, dispatch the BASE_DATA_READY event: the plugin
-    // publishes a basic information snapshot accordingly (the historical finance is rebuilt after
-    // the preload thread finishes). The two publishes happen in the main thread and the preload
-    // thread respectively; at this moment the historical finance has not been preloaded yet, so the
-    // plugin side must publish with include_finance=false, otherwise the historical finance of
-    // every security would be lazily loaded one by one (see Stock::getHistoryFinance).
+    // The ex-rights/ex-dividend data is ready; the plugin publishes a basic information snapshot
+    // accordingly. The historical finance is not preloaded yet at this moment, so the plugin must
+    // publish with include_finance=false, otherwise it would be lazily loaded security by security.
     _fireLoadEvent(LoadEvent::BASE_DATA_READY);
     loadAllZhBond10();
     loadHistoryFinanceField();
@@ -241,6 +251,8 @@ void StockManager::loadData() {
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start_time;
     auto seconds = sec.count();
     HKU_INFO(htr("{:<.2f}s Loaded Data.", seconds));
+
+    guard.done = true;
 }
 
 KDataDriverConnectPoolPtr StockManager::_getKDataDriverPool() {
@@ -257,17 +269,14 @@ void StockManager::_negotiateShmServer() {
     // client requires enabling it explicitly in the config
     HKU_IF_RETURN(!m_hikyuuParam.tryGet<bool>("use_shm_server", false), void());
     // This process is in the server role: it never enters the client mode (to prevent the
-    // realtimeUpdate self-forwarding loop, see design §5.5)
+    // realtimeUpdate self-forwarding loop)
     HKU_IF_RETURN(isShmServerRole(), void());
 
     // All the client capabilities (detection / connection / waiting for readiness / the proxy
     // driver / the three forwardings) are provided by the shmserver plugin; the core library only
-    // depends on the single contract ShmServerPluginInterface: it does not link any implementation
-    // symbol and degrades directly to the standalone mode (loading all the data by itself) when the
-    // plugin is not installed or not authorized. print=false: the startup log should not produce
-    // noise for the community users without the plugin. The three realtime forwardings are
-    // registered by the plugin itself after a successful connect (ipc::registerShmClient); the core
-    // library no longer holds the client pointer
+    // depends on the single contract ShmServerPluginInterface and degrades to the standalone mode
+    // when the plugin is missing (print=false: no startup noise). The forwardings are registered by
+    // the plugin itself after a successful connect, the core library holds no client pointer
     auto* plugin = getPlugin<ShmServerPluginInterface>(HKU_PLUGIN_SHM_SERVER, false);
     HKU_IF_RETURN(!plugin, void());
 
@@ -304,14 +313,12 @@ bool StockManager::isIpcClientMode() const {
     return m_ipc_client_mode;
 }
 
-// ── LoadEvent event bus (the core library only dispatches and the plugin subscribes; see design
-// §5.2) ─────────────────────────────────────
+// ── LoadEvent event bus (the core library only dispatches and the plugin subscribes) ─────────────
 namespace {
 // The callback container is held with new entirely and never deleted: if its member lock were
 // destroyed during the static destruction, stopShmServer() would throw EINVAL while locking when
-// unregistering the callbacks in clean() (the static destruction period) and the noexcept
-// destruction chain would call std::terminate (the same as constraint 2 of the old §4.7). Therefore
-// the container itself is also placed on the heap and never released.
+// unregistering the callbacks in clean() and the noexcept destruction chain would call
+// std::terminate. Therefore the container itself is also placed on the heap and never released.
 struct LoadEventState {
     std::shared_mutex mutex;
     std::vector<std::pair<size_t, LoadEventCallback>> callbacks;
@@ -423,27 +430,40 @@ void StockManager::loadAllKData() {
         return;
     }
 
-    // The preload thread is now the joinable member m_preload_thread (no longer detached): at the
-    // exit joinPreloadThread() waits for its exit before stopping m_load_tg / destroying the IPC
-    // service, eradicating the concurrent access race (C3). If the previous preload thread still
-    // exists (a duplicated initialization), join it before the new assignment, avoiding terminate
-    // on assigning a joinable thread.
+    // The preload thread is the joinable member m_preload_thread (no longer detached): at the exit
+    // joinPreloadThread() waits for its exit before stopping m_load_tg / destroying the IPC
+    // service, eradicating the concurrent access race. If the previous preload thread still exists
+    // (a duplicated initialization), join it before the new assignment, avoiding terminate on
+    // assigning a joinable thread.
     joinPreloadThread();
-    if (!driver->getPrototype()->canParallelLoad()) {
-        m_preload_thread = std::thread([this, ktypes, low_ktypes]() mutable {
-            _loadAllKDataSerial(std::move(ktypes), std::move(low_ktypes));
-        });
-    } else {
-        // Asynchronous parallel loading
-        m_preload_thread = std::thread([this, ktypes, low_ktypes]() mutable {
+    const bool parallel = driver->getPrototype()->canParallelLoad();
+    m_preload_thread = std::thread([this, ktypes, low_ktypes, parallel]() mutable {
+        _loadAllKDataSafely(std::move(ktypes), std::move(low_ktypes), parallel);
+    });
+}
+
+void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes, vector<string> low_ktypes,
+                                       bool parallel) {
+    try {
+        if (parallel) {
             _loadAllKDataParallel(std::move(ktypes), std::move(low_ktypes));
-        });
+        } else {
+            _loadAllKDataSerial(std::move(ktypes), std::move(low_ktypes));
+        }
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed preload kdata: {}", e.what());
+        m_load_error.store(true, std::memory_order_release);
+        m_data_ready.store(true, std::memory_order_release);
+    } catch (...) {
+        HKU_ERROR("Failed preload kdata with unknown exception!");
+        m_load_error.store(true, std::memory_order_release);
+        m_data_ready.store(true, std::memory_order_release);
     }
 }
 
 void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
-    // The progress reporting has moved to the plugin side (through LoadEvent + its own polling, see
-    // design §5.2); loaded/total is no longer counted here
+    // The progress reporting has moved to the plugin side (through LoadEvent and its own polling);
+    // loaded/total is no longer counted here
 
     for (size_t i = 0, len = ktypes.size(); i < len; i++) {
         if (m_cancel_load) {
@@ -464,9 +484,8 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
         }
     }
 
-    // Dispatch KDATA_PRELOAD_FINISHED before the historical finance is loaded, so that the clients
-    // get the hot K-line data as early as possible; it is not dispatched when the preload is
-    // cancelled (the process exit), avoiding a full serialization that is destroyed immediately
+    // Dispatched before the historical finance is loaded, so that the clients get the hot K-line
+    // data as early as possible; skipped on a cancelled preload (the process exit)
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::KDATA_PRELOAD_FINISHED);
     }
@@ -487,13 +506,9 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
         tg.join();
     }
 
-    // The historical finance is ready, dispatch HISTORY_FINANCE_LOADED: the plugin rebuilds the
-    // basic snapshot as a whole accordingly (the ex-rights/ex-dividend data and the finance are
-    // collected together); The shared memory snapshot of an already connected session is fixed
-    // after the negotiation during the connection and does not switch generation automatically with
-    // a republish at runtime; the new snapshot is visible only to the sessions negotiated
-    // afterwards; it is not dispatched when the preload is cancelled (the process exit): this
-    // avoids both a useless full publish and a pointless serialization in the exit sequence
+    // The historical finance is ready; the plugin rebuilds the basic snapshot as a whole
+    // accordingly (the ex-rights/ex-dividend data and the finance are collected together). Skipped
+    // on a cancelled preload (the process exit), avoiding a publish that is destroyed immediately
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::HISTORY_FINANCE_LOADED);
     }
@@ -502,8 +517,7 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
 }
 
 void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
-    // The progress reporting has moved to the plugin side (see design §5.2); loaded/total is no
-    // longer counted here
+    // The progress reporting has moved to the plugin side; loaded/total is no longer counted here
     auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
 
     // Load the K-lines of the other securities (they may use different K-line drivers)
@@ -537,10 +551,8 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
         }
     }
 
-    // Wait for all the K-line preload tasks to finish and then dispatch KDATA_PRELOAD_FINISHED for
-    // the plugin to publish the shared memory snapshot; note that the dispatch must happen after
-    // the join, otherwise the buffer may not be filled yet; it is not dispatched when the preload
-    // is cancelled (the process exit), avoiding a full serialization that is destroyed immediately
+    // The dispatch must happen after the join, otherwise the buffer may not be filled yet; skipped
+    // on a cancelled preload (the process exit)
     m_load_tg->join();
     m_load_tg.reset();
 
@@ -568,12 +580,9 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
         m_load_tg.reset();
     }
 
-    // The historical finance is ready, dispatch HISTORY_FINANCE_LOADED: the plugin rebuilds the
-    // basic snapshot as a whole accordingly (the ex-rights/ex-dividend data and the finance are
-    // collected together); The snapshot of an already connected session is fixed for the session
-    // lifetime and does not switch generation automatically with a republish at runtime (a new
-    // session maps the latest epoch at the negotiation); it is not dispatched when the preload is
-    // cancelled (the process exit), for the same reason as the serial branch
+    // The historical finance is ready; the plugin rebuilds the basic snapshot as a whole
+    // accordingly (the ex-rights/ex-dividend data and the finance are collected together). Skipped
+    // on a cancelled preload (the process exit), for the same reason as the serial branch
     if (!m_cancel_load) {
         _fireLoadEvent(LoadEvent::HISTORY_FINANCE_LOADED);
     }
@@ -1269,9 +1278,12 @@ vector<std::pair<size_t, string>> StockManager::getHistoryFinanceAllFields() con
 
 void StockManager::waitDataReady() const {
     HKU_INFO_IF(!dataReady(), htr("Waiting for preload data loading to complete..."));
-    while (!dataReady()) {
+    while (!dataReady() && !loadFailed()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    HKU_ERROR_IF(
+      loadFailed(),
+      htr("Stopped waiting for the data: the loading failed, the preload is incomplete!"));
 }
 
 }  // namespace hku

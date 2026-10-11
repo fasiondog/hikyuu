@@ -64,7 +64,7 @@ msgstr "找不到插件： {}"
 msgid "Unable to obtain context. hikyuu may not be initialized. Please check!"
 msgstr "无法获取策略上下文，hikyuu可能未初始化。请检查！"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:124
+#: hikyuu_cpp/hikyuu/StockManager.cpp:135
 #, c++-format
 msgid "Plugin path: {}"
 msgstr "插件路径: {}"
@@ -81,64 +81,68 @@ msgstr "找不到插件"
 msgid "Can not get clickhouse driver! Check your license!"
 msgstr "获取 clickhouse 驱动失败！ 请检查你的授权许可!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:214
+#: hikyuu_cpp/hikyuu/StockManager.cpp:236
 msgid "Loading block..."
 msgstr "加载板块信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:221
+#: hikyuu_cpp/hikyuu/StockManager.cpp:243
 msgid "Loading KData..."
 msgstr "加载K线数据……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:231
+#: hikyuu_cpp/hikyuu/StockManager.cpp:253
 #, c++-format
 msgid "{:<.2f}s Loaded Data."
 msgstr "{:<.2f} 秒数据加载完毕."
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:392
+#: hikyuu_cpp/hikyuu/StockManager.cpp:411
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: no limit)!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: 无限制)!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:395
+#: hikyuu_cpp/hikyuu/StockManager.cpp:414
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr "预加载 {} K线数据至缓存 (最大数量: {})!"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:400
+#: hikyuu_cpp/hikyuu/StockManager.cpp:419
 msgid "Use lazy preload!"
 msgstr "使用懒加载模式进行数据预加载！"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:676
+#: hikyuu_cpp/hikyuu/StockManager.cpp:716
 msgid "The new context is empty, use the original context"
 msgstr "新上下文为空，继续使用原有上下文"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:895
+#: hikyuu_cpp/hikyuu/StockManager.cpp:936
 msgid "Not found market info"
 msgstr "找不到指定的市场信息"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:948
+#: hikyuu_cpp/hikyuu/StockManager.cpp:964
 msgid "Loading stock information..."
 msgstr "加载证券信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1050
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1066
 msgid "Loading market information..."
 msgstr "加载市场信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1067
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1083
 msgid "Loading stock type information..."
 msgstr "加载证券类型信息……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1170
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1186
 msgid "Loading stock weight..."
 msgstr "加载权息数据……"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1215
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1231
 msgid "Release stock weight/finance cache after shm base info published"
 msgstr "共享内存基础信息发布后，释放权息/财务数据缓存"
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1262
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1280
 msgid "Waiting for preload data loading to complete..."
 msgstr "等待预加载数据完毕…"
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1286
+msgid "Stopped waiting for the data: the loading failed, the preload is incomplete!"
+msgstr "停止等待数据：加载失败，预加载数据不完整！"
 
 #: hikyuu_cpp/hikyuu/factor/Factor.cpp:57
 #: hikyuu_cpp/hikyuu/factor/Factor.cpp:65

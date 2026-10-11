@@ -61,7 +61,7 @@ msgstr ""
 msgid "Unable to obtain context. hikyuu may not be initialized. Please check!"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:124
+#: hikyuu_cpp/hikyuu/StockManager.cpp:135
 #, c++-format
 msgid "Plugin path: {}"
 msgstr ""
@@ -78,63 +78,67 @@ msgstr ""
 msgid "Can not get clickhouse driver! Check your license!"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:214
+#: hikyuu_cpp/hikyuu/StockManager.cpp:236
 msgid "Loading block..."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:221
+#: hikyuu_cpp/hikyuu/StockManager.cpp:243
 msgid "Loading KData..."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:231
+#: hikyuu_cpp/hikyuu/StockManager.cpp:253
 #, c++-format
 msgid "{:<.2f}s Loaded Data."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:392
+#: hikyuu_cpp/hikyuu/StockManager.cpp:411
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: no limit)!"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:395
+#: hikyuu_cpp/hikyuu/StockManager.cpp:414
 #, c++-format
 msgid "Preloading {} kdata to buffer (max: {})!"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:400
+#: hikyuu_cpp/hikyuu/StockManager.cpp:419
 msgid "Use lazy preload!"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:676
+#: hikyuu_cpp/hikyuu/StockManager.cpp:716
 msgid "The new context is empty, use the original context"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:895
+#: hikyuu_cpp/hikyuu/StockManager.cpp:936
 msgid "Not found market info"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:948
+#: hikyuu_cpp/hikyuu/StockManager.cpp:964
 msgid "Loading stock information..."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1050
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1066
 msgid "Loading market information..."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1067
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1083
 msgid "Loading stock type information..."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1170
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1186
 msgid "Loading stock weight..."
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1215
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1231
 msgid "Release stock weight/finance cache after shm base info published"
 msgstr ""
 
-#: hikyuu_cpp/hikyuu/StockManager.cpp:1262
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1280
 msgid "Waiting for preload data loading to complete..."
+msgstr ""
+
+#: hikyuu_cpp/hikyuu/StockManager.cpp:1286
+msgid "Stopped waiting for the data: the loading failed, the preload is incomplete!"
 msgstr ""
 
 #: hikyuu_cpp/hikyuu/factor/Factor.cpp:57

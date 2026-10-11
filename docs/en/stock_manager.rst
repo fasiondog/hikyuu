@@ -194,6 +194,10 @@ StockManager/Block/Stock
 
         Whether all data has finished loading and is ready to use
 
+    .. py:attribute:: load_failed
+
+        Whether the last data loading failed; the preload is only a cache warm-up, so the queries afterwards are still served by the driver, only the preloaded part may be incomplete
+
     .. py:staticmethod:: instance()
 
         Return the StockManager singleton instance
@@ -211,7 +215,7 @@ StockManager/Block/Stock
 
     .. py:method:: wait_data_ready(self)
 
-        Block until all data has finished loading and is ready to use
+        Block until all data has finished loading and is ready to use; it returns early when the loading has failed
 
     .. py:method:: cancel_load(self)
 

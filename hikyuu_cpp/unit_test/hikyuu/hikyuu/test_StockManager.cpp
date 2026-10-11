@@ -6,12 +6,34 @@
  */
 
 #include "doctest/doctest.h"
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <stdexcept>
+#include <thread>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/utilities/runtimeinfo.h>
 #include <hikyuu/utilities/Log.h>
 #include "../plugin_valid.h"
 
 using namespace hku;
+
+namespace {
+// waitDataReady() is expected to return promptly once the loading has failed; it is run in a
+// detached thread with a deadline, so that a regression is reported as a failure instead of
+// blocking the whole test run
+bool waitDataReadyReleased(StockManager& sm) {
+    auto done = std::make_shared<std::atomic_bool>(false);
+    std::thread([&sm, done]() {
+        sm.waitDataReady();
+        done->store(true);
+    }).detach();
+    for (int i = 0; i < 100 && !done->load(); i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    return done->load();
+}
+}  // namespace
 
 /**
  * @defgroup test_hikyuu_StockManager test_hikyuu_StockManager
@@ -244,6 +266,48 @@ TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
         stock.getWeight();
     }
     setShmServerRole(org_role);
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_load_failed") {
+    auto& sm = StockManager::instance();
+    sm.joinPreloadThread();
+
+    /** @arg A load that finishes normally leaves the failure flag unset */
+    CHECK_UNARY(!sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+
+    /** @arg An exception thrown before the preload thread is started is published as a failure:
+     * nothing would ever set the readiness flag, so the waiters must be released explicitly */
+    size_t early_id = registerLoadEventCallback([](LoadEvent event) {
+        HKU_IF_RETURN(event != LoadEvent::BASE_DATA_READY, void());
+        throw std::runtime_error("injected failure before the preload is started");
+    });
+    CHECK_THROWS_AS(sm.reload(), std::runtime_error);
+    unregisterLoadEventCallback(early_id);
+    CHECK_UNARY(sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+    CHECK_UNARY(waitDataReadyReleased(sm));
+
+    /** @arg An exception escaping the preload thread body is caught: it no longer terminates the
+     * process, and the failure (together with the readiness) is published */
+    size_t preload_id = registerLoadEventCallback([](LoadEvent event) {
+        HKU_IF_RETURN(event != LoadEvent::KDATA_PRELOAD_FINISHED, void());
+        throw std::runtime_error("injected failure in the preload thread");
+    });
+    sm.reload();
+    sm.joinPreloadThread();
+    unregisterLoadEventCallback(preload_id);
+    CHECK_UNARY(sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+    CHECK_UNARY(waitDataReadyReleased(sm));
+
+    // Restore the state for the following cases: a clean reload clears the failure flag and refills
+    // the preload buffer
+    sm.reload();
+    sm.joinPreloadThread();
+    CHECK_UNARY(!sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
 }
 
 /** @} */

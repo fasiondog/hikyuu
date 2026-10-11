@@ -178,6 +178,10 @@ StockManager/Block/Stock
     
         是否所有数据已准备就绪（加载完毕）
         
+    .. py:attribute:: load_failed
+    
+        最近一次数据加载是否失败（预加载仅为缓存预热，加载失败后查询仍由数据驱动实时取数，只是预加载部分可能不完整）
+        
     .. py:staticmethod:: instance()
     
         获取StockManager单例实例
@@ -195,7 +199,7 @@ StockManager/Block/Stock
         
     .. py:method:: wait_data_ready(self)
     
-        简单阻塞，等待所有数据准备就绪（加载完毕）
+        简单阻塞，等待所有数据准备就绪（加载完毕）；加载失败时提前返回
         
     .. py:method:: cancel_load(self)
     
