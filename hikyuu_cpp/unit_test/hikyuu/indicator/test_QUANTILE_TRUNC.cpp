@@ -63,4 +63,14 @@ TEST_CASE("test_QUANTILE_TRUNC_increment_equivalence") {
     check_with_history(20);
 }
 
+/** @par Test points: ±Inf inputs are excluded from quantile computation */
+TEST_CASE("test_QUANTILE_TRUNC_inf_input") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data = PRICELIST({1.0, 2.0, inf_v, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0});
+    Indicator r = QUANTILE_TRUNC(data, 10, 0.1, 0.9);
+    for (size_t i = 0; i < r.size(); i++) {
+        CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+    }
+}
+
 /** @} */

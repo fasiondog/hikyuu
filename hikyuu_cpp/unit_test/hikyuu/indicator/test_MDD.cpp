@@ -201,6 +201,16 @@ TEST_CASE("test_MDD_with_nan") {
     CHECK_GE(mdd[6], 0.0);
 }
 
+/** @par Test points: ±Inf nav values are treated as invalid, never poisoning MDD output */
+TEST_CASE("test_MDD_inf_input") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    PriceList data{100.0, inf_v, 90.0, 95.0, 80.0};
+    Indicator r = MDD(PRICELIST(data), 3);
+    for (size_t i = 0; i < r.size(); i++) {
+        CHECK_UNARY(std::isnan(r[i]) || (r[i] >= 0.0 && r[i] <= 100.0));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

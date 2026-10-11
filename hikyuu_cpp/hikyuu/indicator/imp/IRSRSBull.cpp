@@ -106,7 +106,7 @@ void IRSRSBull::_calculate(const Indicator&) {
     value_t sum_beta = 0.0, sum_beta2 = 0.0;
     int valid_count = 0;
     for (size_t i = start_idx; i <= z_start; i++) {
-        if (!std::isnan(beta[i])) {
+        if (std::isfinite(beta[i])) {
             sum_beta += beta[i];
             sum_beta2 += beta[i] * beta[i];
             valid_count++;
@@ -121,7 +121,7 @@ void IRSRSBull::_calculate(const Indicator&) {
         var_beta = (sum_beta2 - sum_beta * sum_beta / valid_count) / (valid_count - 1);
         std_beta = std::sqrt(var_beta);
 
-        if (std_beta > 0.0 && !std::isnan(beta[z_start])) {
+        if (std_beta > 0.0 && std::isfinite(beta[z_start])) {
             z[z_start] = (beta[z_start] - mean_beta) / std_beta;
             bull[z_start] = z[z_start] * r2[z_start] * beta[z_start];
         }
@@ -131,14 +131,14 @@ void IRSRSBull::_calculate(const Indicator&) {
     for (size_t i = z_start + 1; i < total; i++) {
         // Remove the oldest beta
         size_t oldest_idx = i - m;
-        if (oldest_idx >= start_idx && !std::isnan(beta[oldest_idx])) {
+        if (oldest_idx >= start_idx && std::isfinite(beta[oldest_idx])) {
             sum_beta -= beta[oldest_idx];
             sum_beta2 -= beta[oldest_idx] * beta[oldest_idx];
             valid_count--;
         }
 
         // Add the new beta
-        if (!std::isnan(beta[i])) {
+        if (std::isfinite(beta[i])) {
             sum_beta += beta[i];
             sum_beta2 += beta[i] * beta[i];
             valid_count++;
@@ -149,7 +149,7 @@ void IRSRSBull::_calculate(const Indicator&) {
             var_beta = (sum_beta2 - sum_beta * sum_beta / valid_count) / (valid_count - 1);
             std_beta = std::sqrt(var_beta);
 
-            if (std_beta > 0.0 && !std::isnan(beta[i])) {
+            if (std_beta > 0.0 && std::isfinite(beta[i])) {
                 z[i] = (beta[i] - mean_beta) / std_beta;
                 bull[i] = z[i] * r2[i] * beta[i];
             }

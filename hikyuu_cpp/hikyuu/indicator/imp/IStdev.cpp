@@ -47,7 +47,7 @@ void IStdev::_calculate(const Indicator& data) {
         price_t mean = 0.0;
         price_t M2 = 0.0;
         for (size_t i = m_discard; i < total; ++i) {
-            if (!std::isnan(src[i])) {
+            if (std::isfinite(src[i])) {
                 valid_count++;
                 if (valid_count == 1) {
                     mean = src[i];
@@ -85,7 +85,7 @@ void IStdev::_calculate(const Indicator& data) {
         // Remove the leaving value
         if (i >= static_cast<size_t>(startPos) + static_cast<size_t>(n)) {
             price_t leaving = src[i - n];
-            if (!std::isnan(leaving)) {
+            if (std::isfinite(leaving)) {
                 if (valid_count > 1) {
                     price_t old_M2 = M2;
                     price_t delta = leaving - mean;
@@ -102,7 +102,7 @@ void IStdev::_calculate(const Indicator& data) {
                         price_t mean_r = 0.0, M2_r = 0.0;
                         size_t lo = i - static_cast<size_t>(n) + 1;
                         for (size_t j = lo; j < i; ++j) {
-                            if (!std::isnan(src[j])) {
+                            if (std::isfinite(src[j])) {
                                 vc_r++;
                                 if (vc_r == 1) {
                                     mean_r = src[j];
@@ -127,7 +127,7 @@ void IStdev::_calculate(const Indicator& data) {
         }
         // Add the entering value
         price_t entering = src[i];
-        if (!std::isnan(entering)) {
+        if (std::isfinite(entering)) {
             valid_count++;
             if (valid_count == 1) {
                 mean = entering;
@@ -170,7 +170,7 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
     for (size_t i = start; i < total; ++i) {
         if (i > start_pos) {
             price_t leaving = src[i - n];
-            if (!std::isnan(leaving)) {
+            if (std::isfinite(leaving)) {
                 if (valid_count > 1) {
                     price_t old_M2 = M2;
                     price_t delta = leaving - mean;
@@ -182,7 +182,7 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
                         price_t mean_r = 0.0, M2_r = 0.0;
                         size_t lo = i - static_cast<size_t>(n) + 1;
                         for (size_t j = lo; j < i; ++j) {
-                            if (!std::isnan(src[j])) {
+                            if (std::isfinite(src[j])) {
                                 vc_r++;
                                 if (vc_r == 1) {
                                     mean_r = src[j];
@@ -205,7 +205,7 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
             }
         }
         price_t entering = src[i];
-        if (!std::isnan(entering)) {
+        if (std::isfinite(entering)) {
             valid_count++;
             if (valid_count == 1) {
                 mean = entering;
@@ -233,7 +233,7 @@ void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
     price_t mean = 0.0;
     price_t M2 = 0.0;
     for (size_t i = start; i <= curPos; i++) {
-        if (!std::isnan(ind[i])) {
+        if (std::isfinite(ind[i])) {
             valid_count++;
             if (valid_count == 1) {
                 mean = ind[i];

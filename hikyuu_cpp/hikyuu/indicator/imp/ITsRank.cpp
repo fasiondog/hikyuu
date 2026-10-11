@@ -45,7 +45,7 @@ void ITsRank::_calculate(const Indicator& ind) {
 
     global_parallel_for_index_void(m_discard, total, [&, n, src, dst](size_t i) {
         value_t current = src[i];
-        if (std::isnan(current)) {
+        if (!std::isfinite(current)) {
             dst[i] = Null<price_t>();
             return;
         }
@@ -53,7 +53,7 @@ void ITsRank::_calculate(const Indicator& ind) {
         size_t valid = 0;
         size_t start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
-            if (!std::isnan(src[j])) {
+            if (std::isfinite(src[j])) {
                 valid++;
                 if (src[j] <= current) {
                     count++;
@@ -76,7 +76,7 @@ void ITsRank::_increment_calculate(const Indicator& ind, size_t start_pos) {
     int n = getParam<int>("n");
     for (size_t i = start_pos; i < total; ++i) {
         value_t current = src[i];
-        if (std::isnan(current)) {
+        if (!std::isfinite(current)) {
             dst[i] = Null<price_t>();
             continue;
         }
@@ -84,7 +84,7 @@ void ITsRank::_increment_calculate(const Indicator& ind, size_t start_pos) {
         size_t valid = 0;
         size_t start = i + 1 - n;
         for (size_t j = start; j <= i; ++j) {
-            if (!std::isnan(src[j])) {
+            if (std::isfinite(src[j])) {
                 valid++;
                 if (src[j] <= current) {
                     count++;
@@ -100,7 +100,7 @@ void ITsRank::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step
         return;
     }
     value_t current = ind[curPos];
-    if (std::isnan(current)) {
+    if (!std::isfinite(current)) {
         _set(Null<price_t>(), curPos);
         return;
     }
@@ -109,7 +109,7 @@ void ITsRank::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step
     size_t valid = 0;
     for (size_t j = start; j <= curPos; ++j) {
         value_t v = ind[j];
-        if (!std::isnan(v)) {
+        if (std::isfinite(v)) {
             valid++;
             if (v <= current) {
                 count++;

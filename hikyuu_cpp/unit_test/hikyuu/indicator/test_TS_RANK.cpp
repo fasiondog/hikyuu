@@ -115,6 +115,16 @@ TEST_CASE("test_TS_RANK_increment_base") {
     check_indicator(result_inc, result_full);
 }
 
+/** @par Test points: ±Inf in the window is excluded from both numerator and denominator */
+TEST_CASE("test_TS_RANK_inf_input") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data = PRICELIST({1.0, 2.0, inf_v, 4.0, 5.0});
+    Indicator r = TS_RANK(data, 3);
+    for (size_t i = 0; i < r.size(); i++) {
+        CHECK_UNARY(std::isnan(r[i]) || (r[i] >= 0.0 && r[i] <= 1.0));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

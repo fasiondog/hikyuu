@@ -51,7 +51,7 @@ static Indicator::value_t quantile_trunc(Indicator::value_t const *src, size_t t
     std::vector<IndicatorImp::value_t> tmp;
     tmp.reserve(total);
     for (size_t i = 0; i < total; i++) {
-        if (!std::isnan(src[i])) {
+        if (std::isfinite(src[i])) {
             tmp.push_back(src[i]);
         }
     }

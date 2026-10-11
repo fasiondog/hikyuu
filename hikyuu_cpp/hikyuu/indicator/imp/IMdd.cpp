@@ -41,7 +41,7 @@ void IMdd::_calculate(const Indicator& ind) {
 
     if (n == 1) {
         for (size_t i = m_discard; i < total; ++i) {
-            dst[i] = (std::isnan(src[i]) || src[i] <= 0.0) ? Null<value_t>() : 0.0;
+            dst[i] = (!std::isfinite(src[i]) || src[i] <= 0.0) ? Null<value_t>() : 0.0;
         }
         return;
     }
@@ -51,7 +51,7 @@ void IMdd::_calculate(const Indicator& ind) {
         value_t min_dd = 0.0;
         for (size_t i = m_discard; i < total; i++) {
             value_t cur = src[i];
-            if (std::isnan(cur) || cur <= 0.0) {
+            if (!std::isfinite(cur) || cur <= 0.0) {
                 dst[i] = Null<value_t>();
                 continue;
             }
@@ -71,7 +71,7 @@ void IMdd::_calculate(const Indicator& ind) {
     value_t min_dd = 0.0;
     for (size_t i = m_discard; i < m_discard + n; ++i) {
         value_t cur = src[i];
-        if (std::isnan(cur) || cur <= 0.0) {
+        if (!std::isfinite(cur) || cur <= 0.0) {
             dst[i] = Null<value_t>();
             continue;
         }
@@ -115,7 +115,7 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
     // O(n) brute force scan per point, using the run_max base to guarantee the correctness.
     for (size_t i = start_pos; i < total; ++i) {
         Indicator::value_t current_nav = src[i];
-        if (std::isnan(current_nav) || current_nav <= 0.0) {
+        if (!std::isfinite(current_nav) || current_nav <= 0.0) {
             dst[i] = Null<value_t>();
             continue;
         }
@@ -127,7 +127,7 @@ void IMdd::_increment_calculate(const Indicator& ind, size_t start_pos) {
         bool has_valid = false;
         for (size_t j = window_left; j <= i; ++j) {
             Indicator::value_t v = src[j];
-            if (std::isnan(v) || v <= 0.0) {
+            if (!std::isfinite(v) || v <= 0.0) {
                 continue;
             }
             has_valid = true;

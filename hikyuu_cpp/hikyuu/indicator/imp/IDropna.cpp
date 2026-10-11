@@ -17,6 +17,7 @@ namespace hku {
 
 IDropna::IDropna() : IndicatorImp("DROPNA", 1) {
     m_need_self_alike_compare = true;
+    setParam<bool>("drop_inf", false);
     setParam<DatetimeList>("align_date_list", DatetimeList());
 }
 
@@ -34,6 +35,7 @@ void IDropna::_calculate(const Indicator& ind) {
 
     m_result_num = ind.getResultNumber();
     size_t row_len = total - ind.discard();
+    bool drop_inf = haveParam("drop_inf") ? getParam<bool>("drop_inf") : false;
 
 #if CPP_STANDARD >= CPP_STANDARD_17
     std::unique_ptr<price_t[]> buf = std::make_unique<price_t[]>(m_result_num * row_len);
@@ -44,15 +46,16 @@ void IDropna::_calculate(const Indicator& ind) {
     DatetimeList dates;
     size_t pos = 0;
     for (size_t i = ind.discard(); i < total; i++) {
-        bool has_nan = false;
+        bool has_invalid = false;
         for (size_t r = 0; r < m_result_num; r++) {
-            if (std::isnan(ind.get(i, r))) {
-                has_nan = true;
+            price_t v = ind.get(i, r);
+            if (drop_inf ? !std::isfinite(v) : std::isnan(v)) {
+                has_invalid = true;
                 break;
             }
         }
 
-        if (!has_nan) {
+        if (!has_invalid) {
             dates.push_back(ind.getDatetime(i));
             for (size_t r = 0; r < m_result_num; r++) {
                 buf[pos * m_result_num + r] = ind.get(i, r);
@@ -75,8 +78,10 @@ void IDropna::_calculate(const Indicator& ind) {
     setParam<DatetimeList>("align_date_list", dates);
 }
 
-Indicator HKU_API DROPNA() {
-    return Indicator(make_shared<IDropna>());
+Indicator HKU_API DROPNA(bool drop_inf) {
+    IndicatorImpPtr p = make_shared<IDropna>();
+    p->setParam<bool>("drop_inf", drop_inf);
+    return Indicator(p);
 }
 
 } /* namespace hku */

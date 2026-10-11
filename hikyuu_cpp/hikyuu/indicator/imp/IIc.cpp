@@ -224,7 +224,7 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
 
     size_t discard = days_total;
     for (size_t i = 0; i < days_total; i++) {
-        if (!std::isnan(dst[i])) {
+        if (std::isfinite(dst[i])) {
             discard = i;
             break;
         }

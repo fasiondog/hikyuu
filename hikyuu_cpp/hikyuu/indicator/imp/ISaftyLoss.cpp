@@ -79,7 +79,7 @@ Indicator::value_t ISaftyLoss::_calcOneBar(const Indicator::value_t* src, size_t
             temp = temp - (p * sum / num);
         }
 
-        if (std::isnan(temp)) {
+        if (!std::isfinite(temp)) {
             continue;
         }
 

@@ -119,13 +119,7 @@ void ICost::_calculate(const Indicator& data) {
         pre_cost = dst[pos];
     }
 
-    // Update the discard
-    for (size_t i = 0; i < total; i++) {
-        if (!std::isnan(dst[i])) {
-            m_discard = i;
-            break;
-        }
-    }
+    updateDiscard(true);
 }
 
 Indicator HKU_API COST(double x) {

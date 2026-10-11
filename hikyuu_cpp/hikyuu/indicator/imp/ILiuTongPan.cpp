@@ -82,13 +82,7 @@ void ILiuTongPan::_calculate(const Indicator& data) {
         dst[pos] = pre_free_count;
     }
 
-    // Update the discard
-    for (size_t i = 0; i < total; i++) {
-        if (!std::isnan(dst[i])) {
-            m_discard = i;
-            break;
-        }
-    }
+    updateDiscard(true);
 }
 
 Indicator HKU_API LIUTONGPAN() {

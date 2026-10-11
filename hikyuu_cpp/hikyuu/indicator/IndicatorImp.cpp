@@ -1593,7 +1593,7 @@ void IndicatorImp::updateDiscard(bool force) noexcept {
             continue;
         }
         for (size_t i = m_discard; i < total; i++) {
-            if (!std::isnan(dst[i])) {
+            if (std::isfinite(dst[i])) {
                 break;
             }
             discard++;

@@ -42,7 +42,7 @@ void IMa::_calculate(const Indicator& indicator) {
         price_t sum = 0.0;
         size_t valid_count = 0;
         for (size_t i = m_discard; i < total; i++) {
-            if (!std::isnan(src[i])) {
+            if (std::isfinite(src[i])) {
                 sum += src[i];
                 valid_count++;
                 dst[i] = sum / valid_count;
@@ -72,7 +72,7 @@ void IMa::_calculate(const Indicator& indicator) {
         // Remove the leaving value (when the window is full)
         if (i >= static_cast<size_t>(startPos) + static_cast<size_t>(n)) {
             price_t leaving = src[i - n];
-            if (!std::isnan(leaving)) {
+            if (std::isfinite(leaving)) {
                 if (valid_count > 1) {
                     price_t delta = leaving - mean;
                     mean -= delta / (valid_count - 1);
@@ -85,7 +85,7 @@ void IMa::_calculate(const Indicator& indicator) {
         }
         // Add the entering value
         price_t entering = src[i];
-        if (!std::isnan(entering)) {
+        if (std::isfinite(entering)) {
             valid_count++;
             if (valid_count == 1) {
                 mean = entering;
@@ -127,7 +127,7 @@ void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
     for (size_t i = start; i < total; ++i) {
         if (i > startPos) {
             price_t leaving = src[i - n];
-            if (!std::isnan(leaving)) {
+            if (std::isfinite(leaving)) {
                 if (valid_count > 1) {
                     price_t delta = leaving - mean;
                     mean -= delta / (valid_count - 1);
@@ -138,7 +138,7 @@ void IMa::_increment_calculate(const Indicator& indicator, size_t startPos) {
             }
         }
         price_t entering = src[i];
-        if (!std::isnan(entering)) {
+        if (std::isfinite(entering)) {
             valid_count++;
             if (valid_count == 1) {
                 mean = entering;
@@ -163,7 +163,7 @@ void IMa::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     size_t valid_count = 0;
     price_t mean = 0.0;
     for (size_t i = start; i <= curPos; i++) {
-        if (!std::isnan(ind[i])) {
+        if (std::isfinite(ind[i])) {
             valid_count++;
             if (valid_count == 1) {
                 mean = ind[i];

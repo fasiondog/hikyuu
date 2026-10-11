@@ -464,8 +464,8 @@ Indicator (*ALIGN_2)(const Indicator&, const DatetimeList&, bool fill_null) = AL
 Indicator (*ALIGN_3)(const Indicator&, const Indicator&, bool fill_null) = ALIGN;
 Indicator (*ALIGN_4)(const Indicator&, const KData&, bool fill_null) = ALIGN;
 
-Indicator (*DROPNA_1)() = DROPNA;
-Indicator (*DROPNA_2)(const Indicator&) = DROPNA;
+Indicator (*DROPNA_1)(bool) = DROPNA;
+Indicator (*DROPNA_2)(const Indicator&, bool) = DROPNA;
 
 Indicator (*AVEDEV_1)(const Indicator&, int) = AVEDEV;
 Indicator (*AVEDEV_2)(const Indicator&, const IndParam&) = AVEDEV;
@@ -2157,14 +2157,17 @@ void export_Indicator_build_in(py::module& m) {
     :param bool fill_null: the missing data is filled with nan; otherwise, use the data less than and closest to the corresponding date
     :retype: Indicator)");
 
-    m.def("DROPNA", DROPNA_1);
-    m.def("DROPNA", DROPNA_2, R"(DROPNA([data])
+    m.def("DROPNA", DROPNA_1, py::arg("drop_inf") = false);
+    m.def("DROPNA", DROPNA_2, py::arg("data"), py::arg("drop_inf") = false,
+          R"(DROPNA([data, drop_inf=False])
 
     Remove the nan values
 
-    Note: a row is removed once any of its results is nan, and all the results keep the same rows
+    Note: a row is removed once any of its results is nan, and all the results keep the same rows.
+    When drop_inf is True, ±Inf is also treated as missing (rows with any non-finite value are removed).
 
     :param Indicator data: the input data
+    :param bool drop_inf: whether to also drop rows containing ±Inf, defaulting to False
     :rtype: Indicator)");
 
     m.def("ADVANCE", ADVANCE, py::arg("query") = KQueryByIndex(-100), py::arg("market") = "SH",

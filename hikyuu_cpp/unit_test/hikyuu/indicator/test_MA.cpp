@@ -206,6 +206,18 @@ TEST_CASE("test_MA_dyn") {
     }
 }
 
+/** @par Test points: ±Inf inputs are treated as missing (never silently poison MA output) */
+TEST_CASE("test_MA_inf_input") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data = PRICELIST({1.0, inf_v, 3.0, 4.0, 5.0});
+    Indicator r = MA(data, 3);
+    for (size_t i = 0; i < r.size(); i++) {
+        CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+    }
+    // window [3,4,5] after Inf slides out: MA = 4.0 exactly
+    CHECK_EQ(r[4], doctest::Approx(4.0));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

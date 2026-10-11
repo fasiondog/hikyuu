@@ -168,6 +168,29 @@ TEST_CASE("test_DROPNA_multi_result_boundary") {
     }
 }
 
+/** @par Test points: drop_inf=true also removes rows with ±Inf; default false preserves NaN-only
+ * behavior */
+TEST_CASE("test_DROPNA_drop_inf_param") {
+    price_t nan = Null<price_t>();
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data = PRICELIST({1.0, nan, 2.0, inf_v, 3.0});
+
+    /** @arg default: only the NaN row is dropped, Inf survives */
+    Indicator r1 = DROPNA(data);
+    CHECK_EQ(r1.size(), 4);
+    CHECK_EQ(r1[0], 1.0);
+    CHECK_EQ(r1[1], 2.0);
+    CHECK_UNARY(std::isinf(r1[2]));
+    CHECK_EQ(r1[3], 3.0);
+
+    /** @arg drop_inf=true: both NaN and Inf rows dropped */
+    Indicator r2 = DROPNA(data, true);
+    CHECK_EQ(r2.size(), 3);
+    CHECK_EQ(r2[0], 1.0);
+    CHECK_EQ(r2[1], 2.0);
+    CHECK_EQ(r2[2], 3.0);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
