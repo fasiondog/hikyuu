@@ -2469,6 +2469,43 @@ TEST_CASE("test_KData_other") {
     CHECK_EQ(p2, nullptr);
 }
 
+/** @par Other supplementary coverage tests */
+TEST_CASE("test_KData_const_iterator_robustness") {
+    KData k1 = getKData("sh000001", 0, 5);
+    KData k2 = k1;  // copy shares the same imp via shared_ptr
+
+    /** @arg iterators from a value-copied KData compare equal (BASE-319) */
+    CHECK(k1.begin() == k2.begin());
+    CHECK(k1.end() == k2.end());
+    CHECK(k1.begin() != k1.end());
+
+    /** @arg range-for over a copied KData yields all records without dangling */
+    size_t count = 0;
+    for (const auto& r : k2) {
+        CHECK_EQ(r.datetime, k1[count].datetime);
+        count++;
+    }
+    CHECK_EQ(count, k1.size());
+
+    /** @arg iterator of a temporary KData survives after the temporary is destroyed
+     *  (BASE-319: imp held by shared_ptr, no dangling reference) */
+    KData::const_iterator tmp_iter;
+    KData::const_iterator tmp_end;
+    {
+        KData tmp = getKData("sh000001", 0, 5);
+        tmp_iter = tmp.begin();
+        tmp_end = tmp.end();
+    }
+    const KRecord& r0 = *tmp_iter;
+    CHECK_EQ(r0.datetime, k1[0].datetime);
+    size_t n = 0;
+    for (auto it = tmp_iter; it != tmp_end; ++it) {
+        CHECK_EQ(it->datetime, k1[n].datetime);
+        n++;
+    }
+    CHECK_EQ(n, k1.size());
+}
+
 /** @par Test points
  * The position in the stock is computed lazily once: concurrent access from copies sharing the same
  * imp must return the reference values */
