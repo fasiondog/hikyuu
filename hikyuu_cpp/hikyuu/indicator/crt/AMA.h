@@ -16,6 +16,10 @@ namespace hku {
 /**
  * Perry J. Kaufman adaptive moving average, see "Smarter Trading" (2006, Guangdong Economy
  * Publishing House)
+ * @note Non-finite src (NaN or ±Inf) holds the previous AMA/ER outputs (the rolling vol window
+ *       stays finite via symmetric zero-fill of invalid Δ terms; the invalidation flag slides out
+ *       with the window); leading non-finite keeps AMA unseeded until the first fully-finite
+ *       window. Aligned with the ST-033 IIR hold contract.
  * @param n the period window for calculating the average, it must be an integer greater than 2,
  *          10 days by default
  * @param fast_n the corresponding fast period N, 2 by default

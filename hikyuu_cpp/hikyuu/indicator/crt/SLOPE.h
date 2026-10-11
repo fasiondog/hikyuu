@@ -16,6 +16,10 @@ namespace hku {
 /**
  * Calculate the linear regression slope, the goodness of fit R² and the relative maximum residual;
  * N supports a variable
+ * @note When any src value inside the regression window is non-finite (NaN or ±Inf), all three
+ *       outputs are Null for that bar (the sums stay finite via symmetric zero-fill and the
+ *       invalidation flag slides out with the window). Aligned with AGENTS.md "inf poisons every
+ *       downstream window aggregate".
  * @param n time window
  * @return Indicator, it contains three result sets:
  *         - result(0): slope

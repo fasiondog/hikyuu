@@ -858,6 +858,8 @@ void export_Indicator_build_in(py::module& m) {
 
     The Perry J. Kaufman adaptive moving average [BOOK1]_
 
+    Non-finite src (NaN or ±Inf) holds the previous AMA/ER outputs; leading non-finite keeps AMA unseeded until the first fully-finite window.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 2
     :param int|Indicator|IndParam fast_n: the corresponding fast period N
@@ -2227,6 +2229,8 @@ void export_Indicator_build_in(py::module& m) {
     m.def("SLOPE", SLOPE5, py::arg("data"), py::arg("n"), R"(SLOPE([data, n=22])
 
     Calculate the linear regression slope, the goodness of fit R² and the relative maximum residual; N supports the variables
+
+    When any src value inside the regression window is non-finite (NaN or ±Inf), all three outputs are Null for that bar.
 
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window

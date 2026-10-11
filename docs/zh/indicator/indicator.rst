@@ -365,7 +365,9 @@
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])
 
     佩里.J 考夫曼（Perry J.Kaufman）自适应移动平均 [BOOK1]_
-    
+
+    NaN 口径：若 src 为非有限值（NaN 或 ±Inf），AMA/ER 保持上一根输出；前导非有限值使 AMA 保持未播种，直到首个完全有限的窗口。滚动 vol 的累加对无效差分对称地填 0，污染不随窗口滑出而持久。
+
     :param Indicator data: 输入数据
     :param int n: 计算均值的周期窗口，必须为大于2的整数
     :param int fast_n: 对应快速周期N
@@ -1982,6 +1984,8 @@
 .. py:function:: SLOPE(data, n=22)
 
     计算线性回归斜率、拟合优度R²和相对最大残差，N支持变量
+
+    NaN 口径：若回归窗口内任一 src 为非有限值（NaN 或 ±Inf），该 bar 的三个输出全为 Null（窗口滑过后自动恢复）。
 
     :param Indicator|sequence data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口

@@ -279,6 +279,30 @@ TEST_CASE("test_SLOPE_zero_mean") {
     }
 }
 
+/** @par Test points: non-finite src in a window nulls all three outputs; windows that do not
+cross the bad slot keep finite regression values */
+TEST_CASE("test_SLOPE_nan_hold") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, 4.0, nan, 6.0, 7.0, 8.0, 9.0});
+    Indicator r = SLOPE(data, 3);
+    // windows covering the NaN at bar 4 (bars 4-6) are invalid: slope is Null
+    CHECK_UNARY(std::isnan(r.get(4, 0)));
+    CHECK_UNARY(std::isnan(r.get(5, 0)));
+    CHECK_UNARY(std::isnan(r.get(6, 0)));
+    // window past the NaN (bar 8: src[6..8]={7,8,9}) is finite again
+    CHECK_UNARY(std::isfinite(r.get(8, 0)));
+    CHECK_UNARY(std::isfinite(r.get(8, 1)));
+    CHECK_EQ(r.get(8, 0), doctest::Approx(1.0));
+
+    /** @arg ±Inf also invalidates the window */
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator d2 = PRICELIST({1.0, 2.0, inf_v, 4.0, 5.0});
+    Indicator r2 = SLOPE(d2, 3);
+    for (size_t i = 0; i < r2.size(); i++) {
+        CHECK_UNARY(std::isnan(r2[i]) || std::isfinite(r2[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

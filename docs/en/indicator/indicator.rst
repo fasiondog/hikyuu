@@ -363,7 +363,9 @@ Built-in Technical Indicators
 .. py:function:: AMA([data, n=10, fast_n=2, slow_n=30])
 
     The Perry J. Kaufman adaptive moving average [BOOK1]_
-    
+
+    NaN/Inf handling: non-finite src holds the previous AMA/ER outputs; leading non-finite keeps AMA unseeded until the first fully-finite window. The rolling vol accumulates zero for invalid Δ terms symmetrically, so contamination does not persist after the window slides past.
+
     :param Indicator data: the input data
     :param int n: the period window for calculating the average, which must be an integer greater than 2
     :param int fast_n: the corresponding fast period N
@@ -1990,6 +1992,8 @@ Built-in Technical Indicators
 .. py:function:: SLOPE(data, n=22)
 
     Calculate the linear regression slope, the goodness of fit R² and the relative maximum residual; N supports the variables
+
+    NaN/Inf handling: when any src value inside the regression window is non-finite (NaN or ±Inf), all three outputs are Null for that bar (resuming once the window slides past the bad slot).
 
     :param Indicator|sequence data: the input data
     :param int|Indicator|IndParam n: the time window

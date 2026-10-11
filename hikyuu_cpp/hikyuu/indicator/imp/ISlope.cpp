@@ -53,9 +53,12 @@ void ISlope::_calculate(const Indicator& ind) {
     // the rolling sums start at the first valid input value, whatever the declared discard is
     size_t startPos = ind.discard();
     price_t fn = (price_t)n;
-    price_t S_y = src[startPos];
+    bool seed_ok = std::isfinite(src[startPos]);
+    price_t y0 = seed_ok ? src[startPos] : 0.0;
+    price_t S_y = y0;
     price_t S_xy = 0.0;
-    price_t S_y2 = src[startPos] * src[startPos];
+    price_t S_y2 = y0 * y0;
+    size_t bad = seed_ok ? 0 : 1;
 
     // Warmup: partial windows of increasing size [startPos, i]
     size_t warmup_end = startPos + (size_t)n;
@@ -65,9 +68,17 @@ void ISlope::_calculate(const Indicator& ind) {
     for (size_t i = startPos + 1; i < warmup_end; i++) {
         size_t cnt = i - startPos + 1;
         price_t x_rel = (price_t)(cnt - 1);
-        S_y += src[i];
-        S_xy += x_rel * src[i];
-        S_y2 += src[i] * src[i];
+        bool yi_ok = std::isfinite(src[i]);
+        price_t yi = yi_ok ? src[i] : 0.0;
+        if (!yi_ok)
+            bad++;
+        S_y += yi;
+        S_xy += x_rel * yi;
+        S_y2 += yi * yi;
+
+        if (i < m_discard || bad > 0) {
+            continue;
+        }
 
         price_t fcnt = (price_t)cnt;
         price_t sum_x = fcnt * (fcnt - 1.0) / 2.0;
@@ -76,10 +87,6 @@ void ISlope::_calculate(const Indicator& ind) {
         price_t ss_yy = fcnt * S_y2 - S_y * S_y;
 
         price_t slope = ss_xy / denom;
-        if (i < m_discard) {
-            continue;
-        }
-
         dst_slope[i] = slope;
         dst_r2[i] = (ss_yy != 0.0) ? (ss_xy * ss_xy / (denom * ss_yy)) : 0.0;
 
@@ -101,13 +108,21 @@ void ISlope::_calculate(const Indicator& ind) {
     price_t full_x_mean = (fn - 1.0) / 2.0;
 
     for (size_t i = warmup_end; i < total; i++) {
-        price_t removed = src[i - n];
-        price_t added = src[i];
+        if (!std::isfinite(src[i - n]))
+            bad--;
+        if (!std::isfinite(src[i]))
+            bad++;
+        price_t removed = std::isfinite(src[i - n]) ? src[i - n] : 0.0;
+        price_t added = std::isfinite(src[i]) ? src[i] : 0.0;
 
         // O(1) rolling update for relative-x sums
         S_xy = S_xy - S_y + removed + (fn - 1.0) * added;
         S_y += added - removed;
         S_y2 += added * added - removed * removed;
+
+        if (bad > 0) {
+            continue;
+        }
 
         price_t ss_xy = fn * S_xy - full_sum_x * S_y;
         price_t ss_yy = fn * S_y2 - S_y * S_y;
@@ -149,11 +164,16 @@ void ISlope::_increment_calculate(const Indicator& ind, size_t start_pos) {
     price_t fn = (price_t)n;
 
     // Initialize rolling sums from seed window [start_pos - n, start_pos - 1]
-    // using relative x = 0, 1, ..., n-1
+    // using relative x = 0, 1, ..., n-1 (zero-fill non-finite)
     price_t S_y = 0.0, S_xy = 0.0, S_y2 = 0.0;
     size_t seed_start = start_pos - (size_t)n;
+    size_t bad = 0;
     for (size_t k = 0; k < (size_t)n; k++) {
-        price_t y = src[seed_start + k];
+        price_t y_raw = src[seed_start + k];
+        bool ok = std::isfinite(y_raw);
+        if (!ok)
+            bad++;
+        price_t y = ok ? y_raw : 0.0;
         S_y += y;
         S_xy += (price_t)k * y;
         S_y2 += y * y;
@@ -164,12 +184,20 @@ void ISlope::_increment_calculate(const Indicator& ind, size_t start_pos) {
     price_t full_x_mean = (fn - 1.0) / 2.0;
 
     for (size_t i = start_pos; i < total; i++) {
-        price_t removed = src[i - n];
-        price_t added = src[i];
+        if (!std::isfinite(src[i - n]))
+            bad--;
+        if (!std::isfinite(src[i]))
+            bad++;
+        price_t removed = std::isfinite(src[i - n]) ? src[i - n] : 0.0;
+        price_t added = std::isfinite(src[i]) ? src[i] : 0.0;
 
         S_xy = S_xy - S_y + removed + (fn - 1.0) * added;
         S_y += added - removed;
         S_y2 += added * added - removed * removed;
+
+        if (bad > 0) {
+            continue;
+        }
 
         price_t ss_xy = fn * S_xy - full_sum_x * S_y;
         price_t ss_yy = fn * S_y2 - S_y * S_y;
@@ -221,6 +249,13 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
 
     price_t S_y = 0.0, S_xy = 0.0, S_y2 = 0.0;
     for (size_t k = 0; k < cnt; k++) {
+        if (!std::isfinite(ind[start + k])) {
+            // any non-finite src in the regression window invalidates all three outputs
+            _set(Null<price_t>(), curPos);
+            _set(Null<price_t>(), curPos, 1);
+            _set(Null<price_t>(), curPos, 2);
+            return;
+        }
         price_t y = ind[start + k];
         S_y += y;
         S_xy += (price_t)k * y;

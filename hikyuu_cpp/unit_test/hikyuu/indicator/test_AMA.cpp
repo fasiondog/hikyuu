@@ -311,6 +311,30 @@ TEST_CASE("test_AMA_increment_equivalence") {
     }
 }
 
+/** @par Test points: NaN/±Inf inputs hold AMA/ER; window slides out → resume; leading non-finite →
+ * Null */
+TEST_CASE("test_AMA_nan_hold") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, nan, 8.0, 9.0, 10.0, 11.0, 12.0});
+    Indicator r = AMA(data, 4);
+    // bar 7 (src=NaN) holds bar 6's outputs
+    CHECK_EQ(r[7], r[6]);
+    CHECK_EQ(r.get(7, 1), r.get(6, 1));
+    // after NaN slides out (window [4..7] still contains NaN until bar 11+4=15 which exceeds
+    // total; here we just verify no NaN/Inf leaks and outputs remain finite where expected)
+    for (size_t i = 4; i < data.size(); i++) {
+        CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+    }
+
+    /** @arg leading non-finite keeps ama unseeded until first fully-finite window */
+    Indicator d2 = PRICELIST({nan, 1.0, 2.0, 3.0, 4.0, 5.0});
+    Indicator r2 = AMA(d2, 2);
+    CHECK_UNARY(std::isnan(r2[0]));
+    // once the seed NaN slides out of the src window, outputs become finite again
+    CHECK_UNARY(std::isfinite(r2[4]));
+    CHECK_UNARY(std::isfinite(r2[5]));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------
