@@ -1435,7 +1435,7 @@ Datetime Stock::getLastUpdateTime(const KQuery::KType& inktype) const {
 
 void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
     HKU_CHECK(
-      isNull(),
+      m_data,
       "The stock is Null, can't set kdata! Please create a stock using the format Stock(market, "
       "code, name)! Calling Stock() will create a special null instance.");
 
@@ -1465,7 +1465,7 @@ void Stock::setKRecordList(const KRecordList& ks, const KQuery::KType& ktype) {
 
 void Stock::setKRecordList(KRecordList&& ks, const KQuery::KType& ktype) {
     HKU_CHECK(
-      isNull(),
+      m_data,
       "The stock is Null, can't set kdata! Please create a stock using the format Stock(market, "
       "code, name)! Calling Stock() will create a special null instance.");
 

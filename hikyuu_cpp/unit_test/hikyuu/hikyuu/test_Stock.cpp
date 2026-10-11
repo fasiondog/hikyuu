@@ -2288,4 +2288,27 @@ TEST_CASE("test_Stock_getFinanceInfo") {
     MEMORY_CHECK;
 }
 
+/** @par Test points */
+TEST_CASE("test_Stock_setKRecordList_null_safe") {
+    KRecord bar(Datetime(202001010000));
+    bar.openPrice = bar.highPrice = bar.lowPrice = bar.closePrice = 10.0;
+    KRecordList ks{bar};
+
+    /** @arg setKRecordList on a null Stock must throw a clear exception instead of
+     *      dereferencing the null m_data (the guard was inverted before the fix) */
+    Stock null_stock;
+    CHECK(null_stock.isNull());
+    CHECK_THROWS(null_stock.setKRecordList(ks, KQuery::DAY));
+
+    /** @arg A temporary Stock (constructed but not loaded, no kdata driver yet) has null
+     *      m_kdataDriver so isNull() is true, but its m_data is present; setKRecordList must
+     *      populate the buffer instead of crashing */
+    Stock temp("TEST", "BASE104", "Base104 regression stock");
+    CHECK(temp.isNull());
+    temp.setKRecordList(ks, KQuery::DAY);
+    CHECK(temp.isBuffer(KQuery::DAY));
+    CHECK_EQ(temp.getCount(KQuery::DAY), 1u);
+    CHECK_EQ(temp.getKRecord(0, KQuery::DAY).datetime, Datetime(202001010000));
+}
+
 /** @} */
