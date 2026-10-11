@@ -120,7 +120,8 @@ StockList Block::getStockList(std::function<bool(const Stock&)>&& filter) const 
 }
 
 bool Block::add(const Stock& stock) {
-    HKU_IF_RETURN(stock.isNull() || have(stock), false);
+    HKU_IF_RETURN(stock.isNull(), false);
+    HKU_IF_RETURN(have(stock), true);
     if (!m_data)
         m_data = make_shared<Data>();
 
@@ -133,7 +134,8 @@ bool Block::add(const string& market_code) {
     Stock stock = sm.getStock(market_code);
     // No log is printed when the stock is empty, to prevent too much printing, especially because
     // some accumulating and unused blocks print a lot of logs during the initialization
-    HKU_IF_RETURN(stock.isNull() || have(stock), false);
+    HKU_IF_RETURN(stock.isNull(), false);
+    HKU_IF_RETURN(have(stock), true);
     if (!m_data) [[unlikely]]
         m_data = make_shared<Data>();
 
@@ -144,7 +146,9 @@ bool Block::add(const string& market_code) {
 bool Block::add(const StockList& stocks) {
     bool success = true;
     for (const auto& stk : stocks) {
-        success = add(stk);
+        if (!add(stk)) {
+            success = false;
+        }
     }
     return success;
 }
@@ -152,7 +156,9 @@ bool Block::add(const StockList& stocks) {
 bool Block::add(const StringList& market_codes) {
     bool success = true;
     for (const auto& code : market_codes) {
-        success = add(code);
+        if (!add(code)) {
+            success = false;
+        }
     }
     return success;
 }

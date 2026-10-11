@@ -136,4 +136,45 @@ TEST_CASE("test_Block_getStockList_null_safe") {
     CHECK(filtered.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_Block_add_list_all_of") {
+    StockManager& sm = StockManager::instance();
+
+    /** @arg A middle failure is not overwritten by later successes (StockList) */
+    Block blk;
+    CHECK_UNARY_FALSE(blk.add(StockList{sm["sh000001"], Stock(), sm["sz000002"]}));
+    CHECK_EQ(blk.size(), 2u);
+
+    /** @arg All succeed (StockList) */
+    Block blk2;
+    CHECK_UNARY(blk2.add(StockList{sm["sh000001"], sm["sz000002"]}));
+    CHECK_EQ(blk2.size(), 2u);
+
+    /** @arg Empty list returns true */
+    CHECK_UNARY(blk2.add(StockList{}));
+
+    /** @arg A middle failure is not overwritten by later successes (StringList) */
+    Block blk3;
+    CHECK_UNARY_FALSE(blk3.add(StringList{"sh000001", "invalid_code", "sz000002"}));
+    CHECK_EQ(blk3.size(), 2u);
+
+    /** @arg All succeed (StringList) */
+    Block blk4;
+    CHECK_UNARY(blk4.add(StringList{"sh000001", "sz000002"}));
+
+    /** @arg Adding an already contained stock is an idempotent success */
+    CHECK_UNARY(blk.add(sm["sh000001"]));
+    CHECK_EQ(blk.size(), 2u);
+    CHECK_UNARY(blk.add("sh000001"));
+    CHECK_EQ(blk.size(), 2u);
+
+    /** @arg An invalid code still fails */
+    CHECK_UNARY_FALSE(blk.add("invalid_code"));
+
+    /** @arg Duplicates within one list are also idempotent successes */
+    Block blk5;
+    CHECK_UNARY(blk5.add(StringList{"sh000001", "sh000001", "sz000002"}));
+    CHECK_EQ(blk5.size(), 2u);
+}
+
 /** @} */
