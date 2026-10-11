@@ -319,6 +319,47 @@ TEST_CASE("test_StockManager_releaseShmServerBaseInfoCache") {
 }
 
 /** @par Test points */
+TEST_CASE("test_StockManager_loadAllStocks_by_context") {
+    auto& sm = StockManager::instance();
+    const StrategyContext org_context = sm.getStrategyContext();
+
+    StrategyContext context({"sh000001", "sz000001", "sh999999", "xx000001", "xsh000001"});
+    // The stock dictionary is never cleared by the load, so the two valid codes are removed first:
+    // only the context-driven loading below can bring them back (sh000001 also via the must-load
+    // list, sz000001 only via the context)
+    sm.removeStock("SH000001");
+    sm.removeStock("SZ000001");
+    sm.reloadWith(context);
+    sm.joinPreloadThread();
+
+    /** @arg The codes given by the context are loaded */
+    CHECK_UNARY(!sm.getStock("sh000001").isNull());
+    CHECK_UNARY(!sm.getStock("sz000001").isNull());
+
+    /** @arg A driver miss is skipped: it would otherwise be loaded as a garbage security with an
+     * empty market_code */
+    CHECK_UNARY(sm.getStock("sh999999").isNull());
+    bool has_empty_market_code = false;
+    for (const auto& stk : sm.getStockList(nullptr)) {
+        if (stk.market_code().empty()) {
+            has_empty_market_code = true;
+            break;
+        }
+    }
+    CHECK_UNARY_FALSE(has_empty_market_code);
+
+    /** @arg A code whose market abbreviation does not lead the string is rejected (the market is
+     * matched at position 0 only) */
+    CHECK_UNARY(sm.getStock("xsh000001").isNull());
+    CHECK_UNARY(sm.getStock("xx000001").isNull());
+
+    // Restore the full load for the following cases
+    sm.reloadWith(org_context);
+    sm.joinPreloadThread();
+    CHECK_EQ(sm.size(), 4729);
+}
+
+/** @par Test points */
 TEST_CASE("test_StockManager_load_failed") {
     auto& sm = StockManager::instance();
     sm.joinPreloadThread();

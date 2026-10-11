@@ -26,31 +26,34 @@ namespace hku {
 
 /**
  * Centralized escaping point for SQL string values: safely wraps any value into
- * a double-quoted string literal.
+ * a quoted string literal, doubling the embedded quote characters.
  *
- * Embedded double quotes are escaped by doubling (SQL standard), preventing
- * values from closing the literal early and breaking out into SQL injection.
+ * The default renders a double-quoted literal. A single-quoted literal (the
+ * portable value form, use quote='\'') is preferred for the WHERE values of the
+ * hand-built statements: with MySQL ANSI_QUOTES enabled, "..." is parsed as an
+ * identifier (doubling still keeps the token intact, no injection, but the
+ * semantics change).
+ *
  * Note: MySQL by default also recognizes backslash escape sequences, which is
- * inconsistent with SQLite; backslashes are not handled here. Also, with
- * MySQL ANSI_QUOTES enabled, "..." is parsed as an identifier (doubling still
- * keeps the token intact, no injection, but the semantics change).
+ * inconsistent with SQLite; backslashes are not handled here.
  *
  * It is now the compatibility renderer used by DBCondition::str() and by the
  * plain string conditions; the parameterized path (sql()/params()) keeps values
  * out of the SQL text altogether.
  */
-inline std::string sqlStringLiteral(const std::string &val) {
+inline std::string sqlStringLiteral(const std::string &val, char quote = '"') {
     std::string escaped;
     escaped.reserve(val.size() + 2);
-    escaped += '"';
+    escaped += quote;
     for (char c : val) {
-        if (c == '"') {
-            escaped += "\"\"";
+        if (c == quote) {
+            escaped += quote;
+            escaped += quote;
         } else {
             escaped += c;
         }
     }
-    escaped += '"';
+    escaped += quote;
     return escaped;
 }
 

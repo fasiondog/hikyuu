@@ -971,15 +971,23 @@ void StockManager::loadAllStocks() {
         auto all_market = getAllMarket();
         for (auto stkcode : load_stock_code_list) {
             to_upper(stkcode);
-            bool find = false;
+            const string* matched_market = nullptr;
             for (auto& market : all_market) {
-                auto pos = stkcode.find(market);
-                if (pos != string::npos && market.size() <= stkcode.size()) {
-                    string stk_market = stkcode.substr(pos, market.size());
-                    string stk_code = stkcode.substr(market.size(), stkcode.size());
-                    stockInfos.push_back(m_baseInfoDriver->getStockInfo(stk_market, stk_code));
+                if (market.empty() || stkcode.size() <= market.size()) {
+                    continue;
+                }
+                if (stkcode.compare(0, market.size(), market) == 0 &&
+                    (!matched_market || market.size() > matched_market->size())) {
+                    matched_market = &market;
+                }
+            }
+            bool find = false;
+            if (matched_market) {
+                auto info = m_baseInfoDriver->getStockInfo(*matched_market,
+                                                           stkcode.substr(matched_market->size()));
+                if (!info.market.empty() && !info.code.empty()) {
+                    stockInfos.push_back(std::move(info));
                     find = true;
-                    break;
                 }
             }
             HKU_WARN_IF(!find, "Invalid stock code: {}", stkcode);

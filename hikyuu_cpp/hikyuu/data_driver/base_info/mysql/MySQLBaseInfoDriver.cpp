@@ -7,6 +7,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <fmt/format.h>
 #include "MySQLBaseInfoDriver.h"
 
 #include "hikyuu/utilities/Log.h"
@@ -198,13 +199,16 @@ vector<StockInfo> MySQLBaseInfoDriver::getAllStockInfo() {
 }
 
 StockInfo MySQLBaseInfoDriver::getStockInfo(string market, const string &code) {
-    HKU_ASSERT(m_pool);
     StockInfo result;
+    HKU_ERROR_IF_RETURN(!m_pool, result, "Connect pool ptr is null!");
     try {
         to_upper(market);
+        // getSelectSQL() already carries the join conditions: the generic load() would append a
+        // second "where" to it, so the filters are appended with "and" directly
         auto con = m_pool->get();
-        con->load(result,
-                  DBCondition::fromFragment("(a.code=?1) and (c.market=?2)", {code, market}));
+        con->loadView(result,
+                      fmt::format("{} and a.code={} and c.market={}", StockInfo::getSelectSQL(),
+                                  sqlStringLiteral(code, '\''), sqlStringLiteral(market, '\'')));
     } catch (...) {
     }
     return result;
