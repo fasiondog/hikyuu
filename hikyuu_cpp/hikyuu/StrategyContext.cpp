@@ -75,10 +75,11 @@ void StrategyContext::_removeDuplicateCode(const vector<string>& stockCodeList) 
     m_stockCodeList.reserve(stockCodeList.size());
     std::set<string> code_set;
     for (const auto& code : stockCodeList) {
-        if (code_set.find(code) == code_set.end()) {
-            m_stockCodeList.push_back(code);
-        } else {
-            code_set.insert(code);
+        string upper_code = code;
+        to_upper(upper_code);
+        if (code_set.find(upper_code) == code_set.end()) {
+            code_set.insert(upper_code);
+            m_stockCodeList.push_back(upper_code);
         }
     }
 }
@@ -92,9 +93,8 @@ void StrategyContext::_checkAndRemoveDuplicateKType(const vector<KQuery::KType>&
         to_upper(upktype);
         HKU_CHECK(KQuery::isBaseKType(upktype), "Invalid ktype: {}", upktype);
         if (ktype_set.find(upktype) == ktype_set.end()) {
-            m_ktypeList.push_back(upktype);
-        } else {
             ktype_set.insert(upktype);
+            m_ktypeList.push_back(upktype);
         }
     }
 }

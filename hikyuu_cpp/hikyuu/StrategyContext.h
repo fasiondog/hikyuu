@@ -112,7 +112,7 @@ private:
 
 private:
     Datetime m_startDatetime{19901219};
-    vector<string> m_mustLoad{"sh000001", "sh000300"};  // The stock that must be loaded by default
+    vector<string> m_mustLoad{"SH000001", "SH000300"};  // The stock that must be loaded by default
     vector<string> m_stockCodeList;
     vector<KQuery::KType> m_ktypeList;
     unordered_map<string, int64_t> m_preloadNum;
