@@ -1477,9 +1477,9 @@
     平滑异同移动平均线
     
     :param Indicator data: 输入数据
-    :param int n1: 短期EMA时间窗
-    :param int n2: 长期EMA时间窗
-    :param int n3: （短期EMA-长期EMA）EMA平滑时间窗
+    :param int n1: 短期EMA时间窗（>=1）
+    :param int n2: 长期EMA时间窗（>=1）
+    :param int n3: （短期EMA-长期EMA）EMA平滑时间窗（>=1）
     :rtype: 具有三个结果集的 Indicator
 
     * result(0): MACD_BAR：MACD直柱，即MACD快线－MACD慢线

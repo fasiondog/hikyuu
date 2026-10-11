@@ -24,11 +24,11 @@ IMacd::~IMacd() {}
 
 void IMacd::_checkParam(const string& name) const {
     if ("n1" == name) {
-        HKU_ASSERT(getParam<int>("n1") >= 0);
+        HKU_ASSERT(getParam<int>("n1") >= 1);
     } else if ("n2" == name) {
-        HKU_ASSERT(getParam<int>("n2") >= 0);
+        HKU_ASSERT(getParam<int>("n2") >= 1);
     } else if ("n3" == name) {
-        HKU_ASSERT(getParam<int>("n3") >= 0);
+        HKU_ASSERT(getParam<int>("n3") >= 1);
     }
 }
 

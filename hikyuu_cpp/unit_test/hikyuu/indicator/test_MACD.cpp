@@ -39,6 +39,12 @@ TEST_CASE("test_MACD") {
     CHECK_EQ(macd.size(), 0);
     CHECK_EQ(macd.empty(), true);
 
+    /** @arg n1 / n2 / n3 must be >= 1 (n == 0 makes the EMA coefficient 2.0 and diverges) */
+    CHECK_THROWS_AS(MACD(0, 26, 9), std::exception);
+    CHECK_THROWS_AS(MACD(12, 0, 9), std::exception);
+    CHECK_THROWS_AS(MACD(12, 26, 0), std::exception);
+    CHECK_THROWS_AS(MACD(-1, 26, 9), std::exception);
+
     /** @arg n1 = n2 = n3 = 1*/
     macd = MACD(ind, 1, 1, 1);
     CHECK_EQ(macd.getResultNumber(), 3);

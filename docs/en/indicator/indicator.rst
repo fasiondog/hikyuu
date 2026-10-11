@@ -1474,9 +1474,9 @@ Built-in Technical Indicators
     The Moving Average Convergence Divergence
     
     :param Indicator data: the input data
-    :param int n1: the short-term EMA time window
-    :param int n2: the long-term EMA time window
-    :param int n3: the EMA smoothing time window of (the short-term EMA - the long-term EMA)
+    :param int n1: the short-term EMA time window (>= 1)
+    :param int n2: the long-term EMA time window (>= 1)
+    :param int n3: the EMA smoothing time window of (the short-term EMA - the long-term EMA) (>= 1)
     :rtype: an Indicator with three result sets
 
     * result(0): MACD_BAR: the MACD bar, i.e. the MACD fast line - the MACD slow line

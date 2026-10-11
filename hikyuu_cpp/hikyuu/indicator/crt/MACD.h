@@ -15,9 +15,9 @@ namespace hku {
 
 /**
  * MACD moving average convergence / divergence
- * @param n1 short-term EMA time window, 12 by default
- * @param n2 long-term EMA time window, 26 by default
- * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA), 9 by default
+ * @param n1 short-term EMA time window (>= 1), 12 by default
+ * @param n2 long-term EMA time window (>= 1), 26 by default
+ * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA) (>= 1), 9 by default
  * @return
  * <pre>
  * MACD BAR: MACD histogram, i.e. MACD fast line - MACD slow line
@@ -32,9 +32,9 @@ Indicator HKU_API MACD(const IndParam& n1, const IndParam& n2, const IndParam& n
 /**
  * MACD moving average convergence / divergence
  * @param data the data to be calculated
- * @param n1 short-term EMA time window, 12 by default
- * @param n2 long-term EMA time window, 26 by default
- * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA), 9 by default
+ * @param n1 short-term EMA time window (>= 1), 12 by default
+ * @param n2 long-term EMA time window (>= 1), 26 by default
+ * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA) (>= 1), 9 by default
  * @return
  * <pre>
  * MACD BAR: MACD histogram, i.e. MACD fast line - MACD slow line

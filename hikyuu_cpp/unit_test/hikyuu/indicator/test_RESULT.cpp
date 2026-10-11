@@ -31,11 +31,11 @@ TEST_CASE("test_RESULT") {
 
     /** @arg The normal getting */
     auto k = getStock("SH000001").getKData(KQuery(-100));
-    auto macd = MACD(CLOSE(), 0);
+    auto macd = MACD(CLOSE());
     auto bar = RESULT(macd, 0);
     auto diff = RESULT(macd, 1);
     auto dea = RESULT(macd, 2);
-    auto expect = MACD(k.close(), 0);
+    auto expect = MACD(k.close());
     CHECK_UNARY(bar(k).equal(expect.getResult(0)));
     CHECK_UNARY(diff(k).equal(expect.getResult(1)));
     CHECK_UNARY(dea(k).equal(expect.getResult(2)));
