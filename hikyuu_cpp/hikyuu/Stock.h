@@ -314,7 +314,7 @@ private:
     bool _getIndexRangeByIndex(const KQuery&, size_t& out_start, size_t& out_end) const;
 
     // The following functions are basic operations guarded by a read lock
-    const KRecord& _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
+    KRecord _getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const;
     KRecordList _getKRecordListFromBuffer(size_t start_ix, size_t end_ix,
                                           KQuery::KType ktype) const;
 

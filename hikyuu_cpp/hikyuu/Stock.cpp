@@ -802,7 +802,7 @@ price_t Stock::getMarketValue(const Datetime& datetime, KQuery::KType ktype) con
             }
             // out_start == 0 yet the first record is already after datetime: the query time
             // precedes the first K-line record, so no market value exists yet. Return 0 rather
-            // than the latest close, which would leak future data into valuation (BASE-102).
+            // than the latest close, which would leak future data into valuation.
             return 0.0;
         }
 
@@ -1044,7 +1044,7 @@ bool Stock::_getIndexRangeByDateFromBuffer(const KQuery& query, size_t& out_star
     return true;
 }
 
-const KRecord& Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
+KRecord Stock::_getKRecordFromBuffer(size_t pos, const KQuery::KType& ktype) const {
     std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
     auto* buf = m_data->pKData[ktype].get();
     HKU_IF_RETURN(!buf, KRecord::NullKRecord);

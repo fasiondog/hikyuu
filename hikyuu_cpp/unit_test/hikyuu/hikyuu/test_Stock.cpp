@@ -495,8 +495,8 @@ TEST_CASE("test_Stock_getKRecord_lowercase_ktype") {
     KRecord record, expect;
 
     /** @arg Lowercase ktype through the in-memory buffer path must equal the upper-cased result
-     * (regression for BASE-101: an un-normalized ktype reached pMutex[ktype] and dereferenced a null
-     * shared_mutex inserted by operator[]) */
+     * (an un-normalized ktype would reach pMutex[ktype] and dereference a null shared_mutex
+     * inserted by operator[]) */
     expect = stock.getKRecord(0, KQuery::DAY);
     record = stock.getKRecord(0, "day");
     CHECK_EQ(record, expect);
@@ -505,7 +505,6 @@ TEST_CASE("test_Stock_getKRecord_lowercase_ktype") {
     record = stock.getKRecord(expect.datetime, "day");
     CHECK_EQ(record, expect);
 }
-
 
 /** @par Test points */
 TEST_CASE("test_Stock_getIndexRange") {
@@ -2068,8 +2067,8 @@ TEST_CASE("test_Stock_getMarketValue_before_first_record") {
     CHECK_EQ(stock.getMarketValue(Datetime(199012190000), KQuery::DAY), 99.98);
 
     /** @arg Query time before the first K-line record must return 0, not the latest close price
-     * (regression for BASE-102: the un-guarded "take the last record" fallback leaked future data
-     * into TradeManager valuation when datetime precedes the first K-line record) */
+     * (the un-guarded "take the last record" fallback leaked future data into TradeManager
+     * valuation when datetime precedes the first K-line record) */
     CHECK_EQ(stock.getMarketValue(Datetime(199001010000), KQuery::DAY), 0.0);
 
     /** @arg Query time after the last K-line record still returns the latest known close price */
@@ -2144,8 +2143,8 @@ TEST_CASE("test_Stock_kdata_view_survives_buffer_release") {
     /** @arg Create KData views on the buffered day K-line, then release the buffer */
     stock.loadKDataToBuffer(KQuery::DAY);
     KData k1 = stock.getKData(KQuery(0, 10, KQuery::DAY));
-    KData k2 = stock.getKData(KQueryByDate(Datetime(200001010000), Datetime(200012310000),
-                                          KQuery::DAY));
+    KData k2 =
+      stock.getKData(KQueryByDate(Datetime(200001010000), Datetime(200012310000), KQuery::DAY));
     REQUIRE(k1.size() == 10);
     REQUIRE(k2.size() > 0);
 
