@@ -66,34 +66,41 @@ void IVarp::_calculate(const Indicator& data) {
         return;
     }
 
-    vector<price_t> pow_buf(data.size());
+    vector<price_t> pow_ring(n);
 
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
     value_t ex = 0.0, ex2 = 0.0;
+    size_t ring_ix = start_pos % n;
 
     value_t k = src[start_pos];
     for (size_t i = start_pos; i < first_end; i++) {
         value_t d = src[i] - k;
         ex += d;
         value_t d_pow = d * d;
-        pow_buf[i] = d_pow;
+        pow_ring[ring_ix] = d_pow;
         ex2 += d_pow;
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
+        }
     }
 
     value_t p1 = 1. / n;
     value_t p2 = 1. / ((value_t)n * n);
     dst[first_end - 1] = std::max(0.0, ex2 * p1 - ex * ex * p2);
 
-    for (size_t i = first_end, pre_ix = first_end - n; i < total; i++, pre_ix++) {
-        ex -= src[pre_ix] - k;
-        ex2 -= pow_buf[pre_ix];
+    for (size_t i = first_end; i < total; i++) {
+        ex -= src[i - n] - k;
+        ex2 -= pow_ring[ring_ix];
         value_t d = src[i] - k;
         ex += d;
         value_t d_pow = d * d;
-        pow_buf[i] = d_pow;
+        pow_ring[ring_ix] = d_pow;
         ex2 += d_pow;
         dst[i] = std::max(0.0, ex2 * p1 - ex * ex * p2);
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
+        }
     }
 }
 
@@ -111,31 +118,38 @@ void IVarp::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    vector<price_t> pow_buf(data.size());
+    vector<price_t> pow_ring(n);
 
     value_t ex = 0.0, ex2 = 0.0;
     value_t k = src[start_pos];
+    size_t ring_ix = start_pos % n;
     for (size_t i = start_pos - n; i < start_pos; i++) {
         value_t d = src[i] - k;
         ex += d;
         value_t d_pow = d * d;
-        pow_buf[i] = d_pow;
+        pow_ring[ring_ix] = d_pow;
         ex2 += d_pow;
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
+        }
     }
 
     value_t p1 = 1. / n;
     value_t p2 = 1. / ((value_t)n * n);
     // dst[first_end - 1] = ex2 * p1 - ex * ex * p2;
 
-    for (size_t i = start_pos, pre_ix = start_pos - n; i < total; i++, pre_ix++) {
-        ex -= src[pre_ix] - k;
-        ex2 -= pow_buf[pre_ix];
+    for (size_t i = start_pos; i < total; i++) {
+        ex -= src[i - n] - k;
+        ex2 -= pow_ring[ring_ix];
         value_t d = src[i] - k;
         ex += d;
         value_t d_pow = d * d;
-        pow_buf[i] = d_pow;
+        pow_ring[ring_ix] = d_pow;
         ex2 += d_pow;
         dst[i] = std::max(0.0, ex2 * p1 - ex * ex * p2);
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
+        }
     }
 }
 

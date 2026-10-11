@@ -78,23 +78,29 @@ void ISkewness::_calculate(const Indicator& data) {
         return;
     }
 
-    vector<price_t> pow2_buf(data.size());
-    vector<price_t> pow3_buf(data.size());
-
+    // Ring of size n: at each rolling step the outgoing slot (i - n) and the incoming
+    // slot (i) share the same index i % n, so a single cursor drives both read and write.
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
+    vector<price_t> pow2_ring(n);
+    vector<price_t> pow3_ring(n);
+
     value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
+    size_t ring_ix = start_pos % n;
 
     value_t k = src[start_pos];
     for (size_t i = start_pos; i < first_end; i++) {
         value_t d = src[i] - k;
         ex += d;
         value_t d2 = d * d;
-        pow2_buf[i] = d2;
+        pow2_ring[ring_ix] = d2;
         ex2 += d2;
         value_t d3 = d2 * d;
-        pow3_buf[i] = d3;
+        pow3_ring[ring_ix] = d3;
         ex3 += d3;
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
+        }
     }
 
     value_t var = std::max(0.0, ex2 / n - ex * ex / ((value_t)n * n));
@@ -110,18 +116,18 @@ void ISkewness::_calculate(const Indicator& data) {
         dst[first_end - 1] = skewness;
     }
 
-    for (size_t i = first_end, pre_ix = first_end - n; i < total; i++, pre_ix++) {
-        ex -= src[pre_ix] - k;
-        ex2 -= pow2_buf[pre_ix];
-        ex3 -= pow3_buf[pre_ix];
+    for (size_t i = first_end; i < total; i++) {
+        ex -= src[i - n] - k;
+        ex2 -= pow2_ring[ring_ix];
+        ex3 -= pow3_ring[ring_ix];
 
         value_t d = src[i] - k;
         ex += d;
         value_t d2 = d * d;
-        pow2_buf[i] = d2;
+        pow2_ring[ring_ix] = d2;
         ex2 += d2;
         value_t d3 = d2 * d;
-        pow3_buf[i] = d3;
+        pow3_ring[ring_ix] = d3;
         ex3 += d3;
 
         var = std::max(0.0, ex2 / n - ex * ex / ((value_t)n * n));
@@ -135,6 +141,9 @@ void ISkewness::_calculate(const Indicator& data) {
               ex3 / n - 3 * (ex2 / n) * ex_over_n + 2 * ex_over_n * ex_over_n * ex_over_n;
             value_t skewness = third_moment / (std_dev * std_dev * std_dev);
             dst[i] = skewness;
+        }
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
         }
     }
 }
@@ -153,34 +162,38 @@ void ISkewness::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    vector<price_t> pow2_buf(data.size());
-    vector<price_t> pow3_buf(data.size());
+    vector<price_t> pow2_ring(n);
+    vector<price_t> pow3_ring(n);
 
     value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
     value_t k = src[start_pos];
+    size_t ring_ix = start_pos % n;
     for (size_t i = start_pos - n; i < start_pos; i++) {
         value_t d = src[i] - k;
         ex += d;
         value_t d2 = d * d;
-        pow2_buf[i] = d2;
+        pow2_ring[ring_ix] = d2;
         ex2 += d2;
         value_t d3 = d2 * d;
-        pow3_buf[i] = d3;
+        pow3_ring[ring_ix] = d3;
         ex3 += d3;
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
+        }
     }
 
-    for (size_t i = start_pos, pre_ix = start_pos - n; i < total; i++, pre_ix++) {
-        ex -= src[pre_ix] - k;
-        ex2 -= pow2_buf[pre_ix];
-        ex3 -= pow3_buf[pre_ix];
+    for (size_t i = start_pos; i < total; i++) {
+        ex -= src[i - n] - k;
+        ex2 -= pow2_ring[ring_ix];
+        ex3 -= pow3_ring[ring_ix];
 
         value_t d = src[i] - k;
         ex += d;
         value_t d2 = d * d;
-        pow2_buf[i] = d2;
+        pow2_ring[ring_ix] = d2;
         ex2 += d2;
         value_t d3 = d2 * d;
-        pow3_buf[i] = d3;
+        pow3_ring[ring_ix] = d3;
         ex3 += d3;
 
         value_t var = std::max(0.0, ex2 / n - ex * ex / ((value_t)n * n));
@@ -194,6 +207,9 @@ void ISkewness::_increment_calculate(const Indicator& data, size_t start_pos) {
               ex3 / n - 3 * (ex2 / n) * ex_over_n + 2 * ex_over_n * ex_over_n * ex_over_n;
             value_t skewness = third_moment / (std_dev * std_dev * std_dev);
             dst[i] = skewness;
+        }
+        if (++ring_ix == (size_t)n) {
+            ring_ix = 0;
         }
     }
 }

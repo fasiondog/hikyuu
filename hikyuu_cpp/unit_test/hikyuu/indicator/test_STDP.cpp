@@ -87,9 +87,68 @@ TEST_CASE("test_STDP_dyn") {
     }
 }
 
+/** @par Test points: static-n full vs incremental equivalence (ring-buffer rewrite) */
+TEST_CASE("test_STDP_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 30));
+    CHECK_EQ(k_full.size(), 30);
+
+    Indicator expect = STDP(CLOSE(), 10);
+    expect.setContext(k_full);
+
+    auto check = [&](size_t history) {
+        Indicator got = STDP(CLOSE(), 10);
+        got.setContext(stock.getKData(KQuery(0, history)));
+        got.setContext(k_full);
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            double a = expect[i];
+            double b = got[i];
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    };
+
+    check(10);
+    check(15);
+    check(13);
+}
+
+/** @par Test points */
+TEST_CASE("test_STDP_warm_up_discard") {
+    PriceList px{10., 12., 9., 11., 8., 13., 10., 12., 7., 11.};
+    Indicator src = PRICELIST(px);
+
+    Indicator r = STDP(src, 5);
+    CHECK_EQ(r.size(), 10);
+
+    /** @arg the bars without a full window are discarded */
+    CHECK_EQ(r.discard(), 4);
+
+    /** @arg the first kept value is the population std of the first full window */
+    price_t mean = (10. + 12. + 9. + 11. + 8.) / 5.;
+    price_t var = 0.0;
+    for (price_t v : {10., 12., 9., 11., 8.}) {
+        var += (v - mean) * (v - mean);
+    }
+    CHECK_EQ(r[4], doctest::Approx(std::sqrt(var / 5.)).epsilon(0.00001));
+    /** @arg a later kept value is the population std of its own window */
+    price_t mean2 = (13. + 10. + 12. + 7. + 11.) / 5.;
+    price_t var2 = 0.0;
+    for (price_t v : {13., 10., 12., 7., 11.}) {
+        var2 += (v - mean2) * (v - mean2);
+    }
+    CHECK_EQ(r[9], doctest::Approx(std::sqrt(var2 / 5.)).epsilon(0.00001));
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
+
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par Test points */
@@ -126,32 +185,5 @@ TEST_CASE("test_STDP_export") {
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
-
-/** @par Test points */
-TEST_CASE("test_STDP_warm_up_discard") {
-    PriceList px{10., 12., 9., 11., 8., 13., 10., 12., 7., 11.};
-    Indicator src = PRICELIST(px);
-
-    Indicator r = STDP(src, 5);
-    CHECK_EQ(r.size(), 10);
-
-    /** @arg the bars without a full window are discarded */
-    CHECK_EQ(r.discard(), 4);
-
-    /** @arg the first kept value is the population std of the first full window */
-    price_t mean = (10. + 12. + 9. + 11. + 8.) / 5.;
-    price_t var = 0.0;
-    for (price_t v : {10., 12., 9., 11., 8.}) {
-        var += (v - mean) * (v - mean);
-    }
-    CHECK_EQ(r[4], doctest::Approx(std::sqrt(var / 5.)).epsilon(0.00001));
-    /** @arg a later kept value is the population std of its own window */
-    price_t mean2 = (13. + 10. + 12. + 7. + 11.) / 5.;
-    price_t var2 = 0.0;
-    for (price_t v : {13., 10., 12., 7., 11.}) {
-        var2 += (v - mean2) * (v - mean2);
-    }
-    CHECK_EQ(r[9], doctest::Approx(std::sqrt(var2 / 5.)).epsilon(0.00001));
-}
 
 /** @} */

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/SKEW.h>
+#include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
@@ -99,9 +100,46 @@ TEST_CASE("test_SKEW") {
     }
 }
 
+/** @par Test points: full vs incremental equivalence after the ring-buffer rewrite */
+TEST_CASE("test_SKEW_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 30));
+    CHECK_EQ(k_full.size(), 30);
+
+    Indicator expect = SKEW(CLOSE(), 10);
+    expect.setContext(k_full);
+
+    auto check = [&](size_t history) {
+        Indicator got = SKEW(CLOSE(), 10);
+        got.setContext(stock.getKData(KQuery(0, history)));
+        got.setContext(k_full);
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            double a = expect[i];
+            double b = got[i];
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    };
+
+    /** @arg start_pos lands exactly at the ring wrap boundary (history == n) */
+    check(10);
+
+    /** @arg ordinary incremental case with history longer than n */
+    check(15);
+
+    /** @arg history not aligned with n, exercising ring_ix = start_pos % n at a non-zero offset */
+    check(13);
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------
+
 #if ENABLE_BENCHMARK_TEST
 TEST_CASE("test_SKEW_benchmark") {
     Stock stock = getStock("sh000001");

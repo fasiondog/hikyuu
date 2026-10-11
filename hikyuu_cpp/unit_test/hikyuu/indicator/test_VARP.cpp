@@ -103,9 +103,41 @@ TEST_CASE("test_VARP_dyn") {
     }
 }
 
+/** @par Test points: static-n full vs incremental equivalence (ring-buffer rewrite) */
+TEST_CASE("test_VARP_increment_equivalence") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k_full = stock.getKData(KQuery(0, 30));
+    CHECK_EQ(k_full.size(), 30);
+
+    Indicator expect = VARP(CLOSE(), 10);
+    expect.setContext(k_full);
+
+    auto check = [&](size_t history) {
+        Indicator got = VARP(CLOSE(), 10);
+        got.setContext(stock.getKData(KQuery(0, history)));
+        got.setContext(k_full);
+        CHECK_EQ(got.size(), expect.size());
+        CHECK_EQ(got.discard(), expect.discard());
+        for (size_t i = 0; i < expect.size(); ++i) {
+            double a = expect[i];
+            double b = got[i];
+            if (std::isnan(a) && std::isnan(b)) {
+                continue;
+            }
+            CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
+        }
+    };
+
+    check(10);
+    check(15);
+    check(13);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
+
 #if HKU_SUPPORT_SERIALIZATION
 
 /** @par Test points */
