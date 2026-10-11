@@ -1114,13 +1114,25 @@ Built-in Technical Indicators
 
     Calculate the IC of the specified factor relative to the reference securities (the RankIC by default)
 
-    The IC originally needs "the factor value at time t → the return at time t+1"; it is changed to calculate "the factor value at time t → the return of the previous N days at time t" (e.g. the return of the past 5 days), and it is called the "current IC". (Otherwise the current values would all be missing NA)
-    If the strict "the factor value at time t → the return at time t+1" calculation is needed, please set strict=True (note that in this mode, the last n positions are NA)
-    
+    Each trading day, the factor values and the n-day return of every stock are collected into a
+    cross-section and their Spearman (default) or Pearson correlation is computed.
+
+    Cross-section alignment: the daily pair is (factor observed at t-n, return over [t-n, t]). By
+    default the result is stored at index t (the observation completion date), so the current value
+    is readable without future data — the "current IC" convention. Set strict=True to re-index the
+    result by the factor observation date (t-n), matching the industry-standard forward IC definition;
+    in that mode the trailing n values are NA because their forward returns are not yet realized.
+
+    Choosing strict: backtests that feed IC into MF_ICWeight / MF_ICIRWeight or any live-decision
+    path should keep the default non-strict mode — strict IC[t] uses returns over [t, t+n] and
+    would introduce look-ahead bias if consumed at t. Use strict=True only for offline factor
+    analysis or when aligning with published (academic / industry) IC numbers indexed by factor
+    date.
+
     :param sequence or Block stks: the securities portfolio
     :param int n: the time window (the corresponding n-day return)
     :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
-    :param bool strict: the strict mode, following the IC definition "the factor value at time t → the return at time t+1"
+    :param bool strict: re-index by factor observation date (forward IC); the last n values are NA
     :rtype: Indicator
 
 
@@ -1132,7 +1144,7 @@ Built-in Technical Indicators
     :param int n: the time window (the corresponding n-day return)
     :param int rolling_n: the rolling period
     :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson  
-    :param bool strict: the strict mode, following the IC definition "the factor value at time t → the return at time t+1"  
+    :param bool strict: re-index IC by factor observation date (see the IC entry)
     :rtype: Indicator
 
 

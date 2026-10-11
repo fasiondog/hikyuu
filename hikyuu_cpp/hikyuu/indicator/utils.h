@@ -109,4 +109,29 @@ std::vector<double> multi_regression_full(const Stock& stk, const KQuery& query,
     return multi_regression_full(stk, query, IndicatorList{ind1, inds...});
 }
 
+namespace detail {
+
+/**
+ * Cross-section Spearman rank correlation over one day's factor and return values.
+ *
+ * NaN pairs are dropped before ranking (a stock with a missing factor or return on day t is
+ * excluded from that day's cross-section), matching ISpearman. Returns 0.0 when a valid
+ * cross-section collapses to zero variance ("no discrimination means no predictive power"),
+ * so a downstream MA does not spread NaN. Null is returned when fewer than two valid pairs
+ * remain.
+ */
+HKU_API Indicator::value_t cross_section_spearman(const Indicator::value_t* a,
+                                                  const Indicator::value_t* b, size_t n);
+
+/**
+ * Cross-section Pearson correlation over one day's factor and return values.
+ *
+ * Matches ICorr's arithmetic (raw rolling sums): any NaN in the input propagates into the
+ * output as NaN, no per-stock filtering is applied. Zero variance yields Null.
+ */
+HKU_API Indicator::value_t cross_section_pearson(const Indicator::value_t* a,
+                                                 const Indicator::value_t* b, size_t n);
+
+}  // namespace detail
+
 }  // namespace hku

@@ -13,17 +13,26 @@
 namespace hku {
 
 /**
- * @brief Calculate the IC of the given factor relative to the reference security (actually RankIC)
- * @note The IC originally needs "the factor value at t -> the return at t+1"; here it is changed to
- *        calculating "the factor value at t -> the return of the N days before t" (such as the
- *        return of the past 5 days), which is called the "current IC". (Otherwise the current
- * values would all be missing NA) If a strict "the factor value at t -> the return at t+1"
- * calculation is needed, please set strict=True (note that in this mode the last n values are NA)
+ * @brief Cross-section information coefficient (IC) of a factor over a stock set.
+ * @details Each trading day, the factor values and the n-day return of every stock are collected
+ *          into a cross-section and their Spearman (default) or Pearson correlation is computed.
+ *
+ * @note Alignment: the daily pair is (factor observed at t - n, return over [t - n, t]). By
+ *       default the result is stored at index t (the observation completion date), so the current
+ *       value is readable without future data — the "current IC" convention. Set
+ *       strict = true to re-index by the factor observation date (t - n), matching the
+ *       industry-standard forward IC definition; in that mode the trailing n values are Null
+ *       because their forward returns are not yet realized.
+ *
+ * @note Choosing strict: backtests that feed IC into MF_ICWeight / MF_ICIRWeight or any
+ *       live-decision path should keep the default non-strict mode — strict IC[t] uses
+ *       returns over [t, t+n] and would introduce look-ahead bias if consumed at t. Use
+ *       strict = true only for offline factor analysis or when aligning with published
+ *       (academic / industry) IC numbers that are indexed by factor date.
  * @param stks the security portfolio
  * @param n time window (corresponding to the n-day return)
  * @param spearman use the spearman correlation coefficient, otherwise pearson
- * @param strict strict mode, it follows the IC definition "the factor value at t -> the return at
- *               t+1"
+ * @param strict re-index by factor observation date; the last n values are Null
  * @return Indicator
  * @ingroup Indicator
  */
@@ -42,16 +51,15 @@ inline Indicator IC(const Indicator& ind, const Block& blk, int n = 1, bool spea
 }
 
 /**
- * @brief Calculate the IC of the given factor list relative to the given return list,
- * where inds and returns are both already calculated and aligned by date. inds does not need to be
- * shifted right by n.
- * @note It is a numeric calculation only, the returned result has no aligned dates
- * @param inds factor list, inds does not need to be shifted right by n.
+ * @brief Cross-section IC of an already-aligned factor/return list pair.
+ * @details inds and returns are both pre-computed and date-aligned by the caller; inds is
+ *          interpreted as the factor at its observation date, no REF shift is applied.
+ * @note Numeric-only result, no datetime alignment on the output.
+ * @param inds factor list (do not pre-shift by n)
  * @param returns return list
  * @param n time window (corresponding to the n-day return)
  * @param use_spearman use the spearman correlation coefficient, otherwise pearson
- * @param strict strict mode, it follows the IC definition "the factor value at t -> the return at
- *               t+1"
+ * @param strict re-index by factor observation date; the last n values are Null
  */
 Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n = 1, bool use_spearman = true,
                      bool strict = false);

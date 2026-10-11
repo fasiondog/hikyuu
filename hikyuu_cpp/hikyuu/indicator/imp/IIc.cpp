@@ -11,9 +11,8 @@
 #include "hikyuu/indicator/crt/REF.h"
 #include "hikyuu/indicator/crt/ROCP.h"
 #include "hikyuu/indicator/crt/PRICELIST.h"
-#include "hikyuu/indicator/crt/SPEARMAN.h"
-#include "hikyuu/indicator/crt/CORR.h"
 #include "hikyuu/indicator/crt/KDATA.h"
+#include "../utils.h"
 #include "IIc.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -111,10 +110,8 @@ void IIc::_calculate(const Indicator& inputInd) {
     global_parallel_for_index_void(
       0, stk_count, [&, n, fill_null, ind = inputInd.clone()](size_t i) {
           auto k = m_stks[i].getKData(query);
-          // Suppose IC originally needs "the factor value at t -> the return at t+1"; it is changed
-          // to calculate "the factor value at t -> the return of the N days before t" (such as the
-          // return of the past 5 days), which is called the "current IC". (Otherwise the current
-          // values would all be missing NA.)
+          // Cross-section pair at index t: factor observed at t-n and the n-day return that
+          // just completed at t. Reading it at t requires no future data.
           all_inds[i] = ALIGN(REF(ind, n), ref_dates, fill_null)(k).getResult(0)();
 
           // Calculate the absolute return
@@ -123,27 +120,25 @@ void IIc::_calculate(const Indicator& inputInd) {
 
     m_discard = n;
 
-    Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
-    if (!getParam<bool>("use_spearman")) {
-        spearman = hku::CORR;
-    }
+    bool use_spearman = getParam<bool>("use_spearman");
 
     auto* dst = this->data();
-    global_parallel_for_index_void(m_discard, days_total, [&, stk_count, dst](size_t i) {
-        // Calculate the daily cross-sectional spearman correlation coefficient, i.e. the IC value
-        PriceList tmp(stk_count, Null<price_t>());
-        PriceList tmp_return(stk_count, Null<price_t>());
-        for (size_t j = 0; j < stk_count; j++) {
-            tmp[j] = all_inds[j][i];
-            tmp_return[j] = all_returns[j][i];
-        }
-        auto a = PRICELIST(tmp);
-        auto b = PRICELIST(tmp_return);
-        auto ic = spearman(a, b, stk_count, true);
-        if (ic.size() > 0) {
-            dst[i] = ic[ic.size() - 1];
-        }
-    });
+    global_parallel_for_index_void(
+      m_discard, days_total, [&, stk_count, dst, use_spearman](size_t i) {
+          // Cross-section rank/Pearson correlation over this day's factor and return values.
+          thread_local std::vector<value_t> buf_a, buf_b;
+          if (buf_a.size() < stk_count) {
+              buf_a.resize(stk_count);
+              buf_b.resize(stk_count);
+          }
+          for (size_t j = 0; j < stk_count; j++) {
+              buf_a[j] = all_inds[j][i];
+              buf_b[j] = all_returns[j][i];
+          }
+          dst[i] = use_spearman
+                     ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
+                     : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
+      });
 
     if (getParam<bool>("strict")) {
         // The strict mode, i.e. the calculation result of the current moment corresponding to the
@@ -194,30 +189,24 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
                   days_total, returns[i].size());
     }
 
-    Indicator (*spearman)(const Indicator&, const Indicator&, int, bool) = hku::SPEARMAN;
-    if (!use_spearman) {
-        spearman = hku::CORR;
-    }
-
     IndicatorList ref_inds(stk_count);
     global_parallel_for_index_void(0, stk_count, [&](size_t i) { ref_inds[i] = REF(inds[i], n); });
 
     PriceList ret(days_total, Null<price_t>());
     auto* dst = ret.data();
-    global_parallel_for_index_void(0, days_total, [&, stk_count, dst](size_t i) {
-        // Calculate the daily cross-sectional spearman correlation coefficient, i.e. the IC value
-        PriceList tmp(stk_count, Null<price_t>());
-        PriceList tmp_return(stk_count, Null<price_t>());
+    global_parallel_for_index_void(0, days_total, [&, stk_count, dst, use_spearman](size_t i) {
+        thread_local std::vector<Indicator::value_t> buf_a, buf_b;
+        if (buf_a.size() < stk_count) {
+            buf_a.resize(stk_count);
+            buf_b.resize(stk_count);
+        }
         for (size_t j = 0; j < stk_count; j++) {
-            tmp[j] = ref_inds[j][i];
-            tmp_return[j] = returns[j][i];
+            buf_a[j] = ref_inds[j][i];
+            buf_b[j] = returns[j][i];
         }
-        auto a = PRICELIST(tmp);
-        auto b = PRICELIST(tmp_return);
-        auto ic = spearman(a, b, stk_count, true);
-        if (ic.size() > 0) {
-            dst[i] = ic[ic.size() - 1];
-        }
+        dst[i] = use_spearman
+                   ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
+                   : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
     });
 
     if (strict) {

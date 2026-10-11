@@ -2344,18 +2344,28 @@ void export_Indicator_build_in(py::module& m) {
       py::arg("strict") = false,
       R"(IC(ind, stks[, n=1, spearman=True, strict=False]) -> Indicator
 
-    Calculate the IC of the specified factor relative to the reference securities (actually the RankIC)
+    Cross-section information coefficient (IC) of a factor over a stock set.
 
-    The IC originally needs "the factor value at time t → the return at time t+1"; here it is changed to calculate "the factor value at time t → the return of the previous N days at time t" (e.g. the return of the past 5 days).
-    (Otherwise the current values would all be missing NA), which is equivalent to shifting the original predicted IC right by n positions.
+    Each trading day, the factor values and the n-day return of every stock are collected into a
+    cross-section and their Spearman (default) or Pearson correlation is computed.
 
-    If the strict "the factor value at time t → the return at time t+1" calculation is needed, please set strict=True (note that in this mode, the last n positions are NA)
-    
+    The daily pair is (factor observed at t-n, return over [t-n, t]). By default the result is
+    stored at index t (the observation completion date), so the current value is readable without
+    future data — the "current IC" convention. Set strict=True to re-index the result by the
+    factor observation date (t-n), matching the industry-standard forward IC definition; in that
+    mode the trailing n values are Null because their forward returns are not yet realized.
+
+    Choosing strict: backtests that feed IC into MF_ICWeight / MF_ICIRWeight or any live-decision
+    path should keep the default non-strict mode — strict IC[t] uses returns over [t, t+n] and
+    would introduce look-ahead bias if consumed at t. Use strict=True only for offline factor
+    analysis or when aligning with published (academic / industry) IC numbers indexed by factor
+    date.
+
     :param Indicator ind: the input factor
     :param sequence(stock)|Block stks the securities portfolio
     :param int n: the time window
     :param bool spearman: use the spearman correlation coefficient, otherwise pearson
-    :param bool strict: the strict mode)");
+    :param bool strict: re-index by factor observation date; the last n values are Null)");
 
     m.def(
       "ICIR",

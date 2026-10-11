@@ -6,6 +6,9 @@
  */
 
 #include <Eigen/Dense>
+#include <algorithm>
+#include <cmath>
+#include <vector>
 #include "hikyuu/utilities/thread/algorithm.h"
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/ROCP.h"
@@ -168,5 +171,94 @@ std::vector<double> multi_regression_full(const Stock& stk, const KQuery& query,
 
     return result;
 }
+
+namespace detail {
+
+namespace {
+
+void spearman_level(const Indicator::value_t* data, Indicator::value_t* level, size_t total) {
+    std::vector<std::pair<Indicator::value_t, size_t>> idx(total);
+    for (size_t i = 0; i < total; i++)
+        idx[i] = {data[i], i};
+    std::sort(idx.begin(), idx.end(),
+              [](const auto& a, const auto& b) { return a.first < b.first; });
+    size_t i = 0;
+    while (i < total) {
+        size_t j = i + 1;
+        while (j < total && idx[i].first == idx[j].first)
+            j++;
+        Indicator::value_t score = ((Indicator::value_t)(i + j + 1)) / 2.0;
+        for (size_t k = i; k < j; k++)
+            level[idx[k].second] = score;
+        i = j;
+    }
+}
+
+}  // namespace
+
+Indicator::value_t cross_section_spearman(const Indicator::value_t* a, const Indicator::value_t* b,
+                                          size_t n) {
+    if (n < 2)
+        return Null<Indicator::value_t>();
+    thread_local std::vector<Indicator::value_t> tmpa, tmpb, levela, levelb;
+    tmpa.clear();
+    tmpb.clear();
+    if (tmpa.capacity() < n) {
+        tmpa.reserve(n);
+        tmpb.reserve(n);
+    }
+    for (size_t j = 0; j < n; j++) {
+        if (!std::isnan(a[j]) && !std::isnan(b[j])) {
+            tmpa.push_back(a[j]);
+            tmpb.push_back(b[j]);
+        }
+    }
+    size_t act = tmpa.size();
+    if (act < 2)
+        return Null<Indicator::value_t>();
+    if (levela.size() < act) {
+        levela.resize(act);
+        levelb.resize(act);
+    }
+    spearman_level(tmpa.data(), levela.data(), act);
+    spearman_level(tmpb.data(), levelb.data(), act);
+    double mean_rank = (act + 1) / 2.0;
+    double var_r = 0.0, var_s = 0.0, cov = 0.0;
+    for (size_t j = 0; j < act; j++) {
+        double dr = levela[j] - mean_rank;
+        double ds = levelb[j] - mean_rank;
+        var_r += dr * dr;
+        var_s += ds * ds;
+        cov += dr * ds;
+    }
+    if (var_r == 0.0 || var_s == 0.0)
+        return 0.0;
+    double rho = cov / std::sqrt(var_r * var_s);
+    return std::max(-1.0, std::min(1.0, rho));
+}
+
+Indicator::value_t cross_section_pearson(const Indicator::value_t* a, const Indicator::value_t* b,
+                                         size_t n) {
+    if (n < 2)
+        return Null<Indicator::value_t>();
+    Indicator::value_t ex = 0.0, ey = 0.0, ex2 = 0.0, ey2 = 0.0, exy = 0.0;
+    for (size_t j = 0; j < n; j++) {
+        Indicator::value_t x = a[j], y = b[j];
+        ex += x;
+        ey += y;
+        ex2 += x * x;
+        ey2 += y * y;
+        exy += x * y;
+    }
+    Indicator::value_t nf = (Indicator::value_t)n;
+    Indicator::value_t varx = ex2 - ex * ex / nf;
+    Indicator::value_t vary = ey2 - ey * ey / nf;
+    Indicator::value_t cov = exy - ex * ey / nf;
+    if (varx <= 0.0 || vary <= 0.0)
+        return Null<Indicator::value_t>();
+    return cov / std::sqrt(varx * vary);
+}
+
+}  // namespace detail
 
 }  // namespace hku

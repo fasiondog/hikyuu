@@ -1114,16 +1114,22 @@
     
 .. py:function:: IC(ind, stks[, n=1, spearman=True, strict=True])
 
-    计算指定的因子相对于参考证券的 IC （默认为 RankIC）
+    计算指定因子相对于参考证券的 IC （默认为 RankIC）
 
-    IC 原本需要 “t 时刻因子值→t+1 时刻收益”，改为计算 “t 时刻因子值→t 时刻之前 N
-    天的收益”（比如过去 5 天的收益），并称之为 “当前 IC”。(否则当前值都会是缺失NA)
-    如需严格“t 时刻因子值→t+1 时刻收益“计算，请设置 strict=True (注意此模式下, 后n位为 NA)
-    
+    每个交易日，将每只股票的因子值与 n 日收益率汇集为截面，计算其 Spearman（默认）或 Pearson 相关系数。
+
+    截面对齐：每日的配对为「t-n 时刻的因子值 ↔ [t-n, t] 的实现收益」。默认将结果落在索引 t 上（观测完成日），
+    因此当前值不依赖未来数据——即“当前 IC”惯例。设置 strict=True 后结果按因子观测日 t-n 重新索引，
+    对齐业界标准前视 IC 定义；该模式下末尾 n 位为 NA（其前视收益尚未实现）。
+
+    strict 选择建议：回测中若将 IC 喂给 MF_ICWeight / MF_ICIRWeight 或任何实时决策路径，应保持默认非独立——
+    独立 IC[t] 用到 [t, t+n] 的未来收益，在 t 时刻直接使用会引入前视偏差。仅在离线因子研究、或需要与
+    学术/业界按因子观测日索引的 IC 数值对齐时，才使用 strict=True。
+
     :param sequence or Block stks: 证券组合
     :param int n: 时间窗口(对应的 n 日收益率)
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
-    :param bool strict: 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”
+    :param bool strict: 按因子观测日重新索引（前视 IC），末尾 n 位为 NA
     :rtype: Indicator
 
 
@@ -1135,7 +1141,7 @@
     :param int n: 时间窗口(对应的 n 日收益率)
     :param int rolling_n: 滚动周期
     :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson  
-    :param bool strict: 严格模式， 遵循IC定义“t 时刻因子值→t+1 时刻收益”  
+    :param bool strict: 按因子观测日重新索引 IC（参见 IC 说明）
     :rtype: Indicator
 
 
