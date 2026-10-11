@@ -14,8 +14,8 @@ namespace hku {
  * Spearman correlation coefficient
  * @param ind indicator 1
  * @param ref_ind indicator 2
- * @param n the rolling window (greater than 2 or equal to 0); when it is 0, n actually uses the
- *          length of ind
+ * @param n the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the
+ *          rank corr over [max(ind.discard(), ref.discard()), i] (discard becomes 1, bar 0 is nan)
  * @param fill_null fill the missing values
  * @ingroup Indicator
  */

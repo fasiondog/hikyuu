@@ -39,17 +39,20 @@ TEST_CASE("test_SKEW") {
     CHECK_THROWS_AS(SKEW(x, 1), std::exception);
     CHECK_THROWS_AS(SKEW(x, 2), std::exception);
 
-    // The normal case, n = 0 (using all the data)
+    // The normal case, n = 0: expanding window, dst[i] = skewness of [0, i], num >= 3
     result = SKEW(x, 0);
     CHECK_EQ(result.name(), "SKEW");
-    CHECK_EQ(result.discard(), symmetric.size() - 1);
+    CHECK_EQ(result.discard(), 2);
     CHECK_EQ(result.size(), symmetric.size());
 
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
 
-    // The skewness of a symmetric distribution should be close to 0
-    CHECK_EQ(result[result.discard()], doctest::Approx(0.0).epsilon(0.001));
+    // The skewness of a symmetric distribution should be close to 0 (full-sample at the last bar)
+    CHECK_EQ(result[result.size() - 1], doctest::Approx(0.0).epsilon(0.001));
 
     // The test data: a right skewed distribution (positive skew) - a long tail on the right
     PriceList right_skewed{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 100.0};
@@ -57,8 +60,8 @@ TEST_CASE("test_SKEW") {
 
     result = SKEW(x_right, 0);
     CHECK_EQ(result.name(), "SKEW");
-    // The skewness of a right skewed distribution should be positive
-    CHECK_GT(result[result.discard()], 0.0);
+    // The full-sample skewness of a right skewed distribution should be positive
+    CHECK_GT(result[result.size() - 1], 0.0);
 
     // The test data: a left skewed distribution (negative skew) - a short tail on the left and the
     // large values on the right
@@ -67,8 +70,8 @@ TEST_CASE("test_SKEW") {
 
     result = SKEW(x_left, 0);
     CHECK_EQ(result.name(), "SKEW");
-    // The skewness of a left skewed distribution should be negative
-    CHECK_LT(result[result.discard()], 0.0);
+    // The full-sample skewness of a left skewed distribution should be negative
+    CHECK_LT(result[result.size() - 1], 0.0);
 
     // Test the fixed window n = 5
     PriceList data{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};

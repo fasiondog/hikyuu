@@ -45,21 +45,21 @@ TEST_CASE("test_COV") {
     CHECK_THROWS_AS(COV(x, y, -1), std::exception);
     CHECK_THROWS_AS(COV(x, y, 1), std::exception);
 
-    // The normal case, n = 0
+    // The normal case, n = 0: expanding window
     result = COV(x, y, 0);
     CHECK_EQ(result.name(), "COV");
-    CHECK_EQ(result.discard(), 9);
+    CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), a.size());
 
     price_t nan = Null<price_t>();
-    Indicator expect_cov =
-      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, nan, nan, 0.162894});
-
+    // bar 0 has no pair yet -> NaN; bars 1..total-1 each carry an expanding-window sample cov
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_UNARY(std::isnan(result[1]));
-    for (int i = result.discard(); i < expect_cov.size(); ++i) {
-        CHECK_EQ(result[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
+    for (size_t i = 1; i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
     }
+    // Full-sample cov at the last bar matches the previous whole-series value
+    CHECK_EQ(result[a.size() - 1], doctest::Approx(0.162894).epsilon(0.00001));
+    (void)nan;
 
     // The normal case, n = 8
     result = COV(x, y, 8);
@@ -67,7 +67,7 @@ TEST_CASE("test_COV") {
     CHECK_EQ(result.discard(), 7);
     CHECK_EQ(result.size(), a.size());
 
-    expect_cov =
+    Indicator expect_cov =
       PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, 0.157144, 0.250266, 0.268253}, 7);
 
     CHECK_UNARY(std::isnan(result[0]));

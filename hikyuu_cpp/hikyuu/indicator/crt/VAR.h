@@ -17,7 +17,8 @@ namespace hku {
 
 /**
  * Calculate the estimated sample variance within N periods
- * @param n N-day time window
+ * @param n N-day time window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is
+ *          the sample var over [discard(), i] (discard becomes discard()+1, the first bar is nan).
  * @ingroup Indicator
  */
 Indicator HKU_API VAR(int n = 10);

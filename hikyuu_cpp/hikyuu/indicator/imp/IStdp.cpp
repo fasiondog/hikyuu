@@ -63,7 +63,7 @@ void IStdp::_calculate(const Indicator& data) {
         ex2 += d_pow;
         // a window that is not full only accumulates, so the declared prefix stays untouched
         if (i >= m_discard) {
-            dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / num) / num);
+            dst[i] = std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / num) / num));
         }
     }
 
@@ -75,7 +75,7 @@ void IStdp::_calculate(const Indicator& data) {
         price_t d_pow = std::pow(d, 2);
         pow_buf[i] = d_pow;
         ex2 += d_pow;
-        dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / n);
+        dst[i] = std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / n) / n));
     }
 }
 bool IStdp::supportIncrementCalculate() const {
@@ -111,7 +111,7 @@ void IStdp::_increment_calculate(const Indicator& data, size_t start_pos) {
         price_t d_pow = std::pow(d, 2);
         pow_buf[i + n - start_pos] = d_pow;
         ex2 += d_pow;
-        dst[i] = std::sqrt((ex2 - std::pow(ex, 2) / n) / n);
+        dst[i] = std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / n) / n));
     }
 }
 
@@ -130,7 +130,7 @@ void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) 
         ex += d;
         ex2 += std::pow(d, 2);
     }
-    _set(num == 0 ? 0.0 : std::sqrt((ex2 - std::pow(ex, 2) / num) / num), curPos);
+    _set(num == 0 ? 0.0 : std::sqrt(std::max(0.0, (ex2 - std::pow(ex, 2) / num) / num)), curPos);
 }
 
 Indicator HKU_API STDP(int n) {

@@ -63,10 +63,15 @@ TEST_CASE("test_VAR") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg When n =0 */
+    /** @arg When n = 0: expanding window, sample var of [0, i], requires at least 2 points */
     dev = VAR(ind, 0);
     CHECK_EQ(dev.size(), 15);
-    CHECK_EQ(dev.discard(), 14);
+    CHECK_EQ(dev.discard(), 1);
+    CHECK_UNARY(std::isnan(dev[0]));
+    for (size_t i = 1; i < dev.size(); ++i) {
+        CHECK_UNARY(!std::isnan(dev[i]));
+    }
+    // Full-sample var at the last bar matches the previous whole-series value
     CHECK_EQ(dev[14], doctest::Approx(20.457143).epsilon(0.0001));
 }
 

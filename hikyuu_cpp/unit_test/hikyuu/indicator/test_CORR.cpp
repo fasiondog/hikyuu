@@ -69,30 +69,25 @@ TEST_CASE("test_CORR") {
     CHECK_THROWS_AS(CORR(x, y, -1), std::exception);
     CHECK_THROWS_AS(CORR(x, y, 1), std::exception);
 
-    // The normal case, n = 0
+    // The normal case, n = 0: expanding window
     result = CORR(x, y, 0);
     CHECK_EQ(result.name(), "CORR");
-    CHECK_EQ(result.discard(), 9);
+    CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result.size(), a.size());
 
     price_t nan = Null<price_t>();
-    Indicator expect_corr =
-      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, nan, nan, 0.385553});
-    Indicator expect_cov =
-      PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, nan, nan, 0.162894});
-
+    // bar 0 has no pair yet -> NaN; bars 1..total-1 each carry an expanding-window Pearson corr
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_UNARY(std::isnan(result[1]));
-    for (int i = result.discard(); i < expect_corr.size(); ++i) {
-        CHECK_EQ(result[i], doctest::Approx(expect_corr[i]).epsilon(0.00001));
+    for (size_t i = 1; i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
     }
+    // Full-sample Pearson corr at the last bar matches the previous whole-series value
+    CHECK_EQ(result[a.size() - 1], doctest::Approx(0.385553).epsilon(0.00001));
 
     Indicator cov = result.getResult(1);
     CHECK_UNARY(std::isnan(cov[0]));
-    CHECK_UNARY(std::isnan(cov[1]));
-    for (int i = cov.discard(); i < expect_cov.size(); ++i) {
-        CHECK_EQ(cov[i], doctest::Approx(expect_cov[i]).epsilon(0.00001));
-    }
+    CHECK_EQ(cov[a.size() - 1], doctest::Approx(0.162894).epsilon(0.00001));
+    (void)nan;
 
     // The normal case, n = 8
     result = CORR(x, y, 8);
@@ -100,9 +95,9 @@ TEST_CASE("test_CORR") {
     CHECK_EQ(result.discard(), 7);
     CHECK_EQ(result.size(), a.size());
 
-    expect_corr =
+    Indicator expect_corr =
       PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, 0.379682, 0.504541, 0.572872}, 7);
-    expect_cov =
+    Indicator expect_cov =
       PRICELIST(PriceList{nan, nan, nan, nan, nan, nan, nan, 0.157144, 0.250266, 0.268253}, 7);
 
     CHECK_UNARY(std::isnan(result[0]));

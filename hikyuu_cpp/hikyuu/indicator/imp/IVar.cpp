@@ -34,8 +34,28 @@ void IVar::_calculate(const Indicator& data) {
     HKU_IF_RETURN(total == 0, void());
 
     int n = getParam<int>("n");
-    if (n == 0) {
-        n = total;
+
+    auto const* src = data.data();
+    auto* dst = this->data();
+
+    // n == 0: expanding-window sample variance, dst[i] = sample var of [data.discard(), i]
+    if (0 == n) {
+        m_discard = data.discard() + 1;
+        if (m_discard >= total) {
+            m_discard = total;
+            return;
+        }
+        size_t start_pos = data.discard();
+        value_t k = src[start_pos];
+        value_t ex = 0.0, ex2 = 0.0;
+        for (size_t i = start_pos + 1; i < total; ++i) {
+            value_t d = src[i] - k;
+            ex += d;
+            ex2 += d * d;
+            value_t num = (value_t)(i - start_pos + 1);
+            dst[i] = std::max(0.0, ex2 / (num - 1) - ex * ex / (num * (num - 1)));
+        }
+        return;
     }
 
     m_discard = data.discard() + n - 1;
@@ -43,9 +63,6 @@ void IVar::_calculate(const Indicator& data) {
         m_discard = total;
         return;
     }
-
-    auto const* src = data.data();
-    auto* dst = this->data();
 
     vector<price_t> pow_buf(data.size());
 
@@ -64,7 +81,7 @@ void IVar::_calculate(const Indicator& data) {
 
     value_t p1 = 1. / (n - 1);
     value_t p2 = 1. / (n * (n - 1.));
-    dst[first_end - 1] = ex2 * p1 - ex * ex * p2;
+    dst[first_end - 1] = std::max(0.0, ex2 * p1 - ex * ex * p2);
 
     for (size_t i = first_end, pre_ix = first_end - n; i < total; i++, pre_ix++) {
         ex -= src[pre_ix] - k;
@@ -74,7 +91,7 @@ void IVar::_calculate(const Indicator& data) {
         value_t d_pow = d * d;
         pow_buf[i] = d_pow;
         ex2 += d_pow;
-        dst[i] = ex2 * p1 - ex * ex * p2;
+        dst[i] = std::max(0.0, ex2 * p1 - ex * ex * p2);
     }
 }
 
@@ -116,7 +133,7 @@ void IVar::_increment_calculate(const Indicator& data, size_t start_pos) {
         value_t d_pow = d * d;
         pow_buf[i] = d_pow;
         ex2 += d_pow;
-        dst[i] = ex2 * p1 - ex * ex * p2;
+        dst[i] = std::max(0.0, ex2 * p1 - ex * ex * p2);
     }
 }
 
@@ -133,7 +150,7 @@ void IVar::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
         ex += d;
         ex2 += d * d;
     }
-    _set((ex2 - ex * ex / step) / (step - 1), curPos);
+    _set(std::max(0.0, (ex2 - ex * ex / step) / (step - 1)), curPos);
 }
 
 Indicator HKU_API VAR(int n) {

@@ -177,11 +177,10 @@ TEST_CASE("test_SPEARMAN") {
 
 /** @par Test points */
 TEST_CASE("test_SPEARMAN_n0_full_window") {
-    // The regression of the n=0 default parameter: _calculate normalizes n to total and delegates
-    // to _increment_calculate, which must normalize it again, otherwise the window length is 0 and
-    // everything is NaN.
+    // n=0 expanding-window semantics: dst[i] = Spearman rank correlation of the prefix
+    // [max(ind.discard(), ref.discard()), i]. The full-sample value stays at the last bar.
 
-    /** @arg n=0 is equivalent to n=total, the whole window */
+    /** @arg n=0 expanding window: discard=1, bars 1..total-1 all valid, last bar matches n=total */
     PriceList a{3., 8., 4., 7., 2.};
     PriceList b{5., 10., 8., 10., 6.};
     Indicator x = PRICELIST(a);
@@ -189,28 +188,29 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     Indicator result = SPEARMAN(x, y, 0);
     CHECK_EQ(result.name(), "SPEARMAN");
     CHECK_EQ(result.size(), a.size());
-    CHECK_EQ(result.discard(), 4);
-    // The hard coded expectation pins down the pre-fix "all NaN" fallback and compares it with an
-    // explicit n=total
+    CHECK_EQ(result.discard(), 1);
+    CHECK_UNARY(std::isnan(result[0]));
+    for (size_t i = 1; i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+    // The last bar matches the whole-series Spearman (equivalent to n=total at the last bar)
     CHECK_EQ(result[4], doctest::Approx(0.872082));
     Indicator full = SPEARMAN(x, y, static_cast<int>(a.size()));
-    CHECK_EQ(result.discard(), full.discard());
     CHECK_EQ(result[4], doctest::Approx(full[4]));
 
     /** @arg An empty sequence with n=0: an empty indicator should be returned safely */
     result = SPEARMAN(Indicator(), Indicator(), 0);
     CHECK_UNARY(result.empty());
 
-    /** @arg A very short sequence total=1 with n=0: n is normalized to 1 and m_discard=0+1-1=0;
-     *  act_count=1<2 so no value is written and result[0] is NaN (the discard is still 0) */
+    /** @arg total=1 with n=0: no 2-point prefix, m_discard clamps to total (all invalid) */
     PriceList short_a{1.};
     PriceList short_b{2.};
     result = SPEARMAN(PRICELIST(short_a), PRICELIST(short_b), 0);
     CHECK_EQ(result.size(), 1);
-    CHECK_EQ(result.discard(), 0);
+    CHECK_EQ(result.discard(), 1);
     CHECK_UNARY(std::isnan(result[0]));
 
-    /** @arg The lower bound trigger total=2 with n=0: n becomes 2 and act_count==2 exactly */
+    /** @arg total=2 with n=0: single expanding prefix at bar 1, act_count==2 */
     PriceList edge_a{1., 2.};
     PriceList edge_b{2., 1.};
     result = SPEARMAN(PRICELIST(edge_a), PRICELIST(edge_b), 0);
@@ -218,14 +218,15 @@ TEST_CASE("test_SPEARMAN_n0_full_window") {
     CHECK_EQ(result.discard(), 1);
     CHECK_EQ(result[1], doctest::Approx(-1.0));
 
-    /** @arg The input has a discard: it is total when the valid data cannot fill the whole window
-     */
-    // total=5, ind.discard=2 → m_discard = 2 + 5 - 1 = 6 > 5 → discard=5
+    /** @arg input.discard=2, total=5: startPos=2, m_discard=3, bars 3..4 each use prefix [2..i] */
     PriceList da{1., 2., 3., 4., 5.};
     PriceList db{5., 4., 3., 2., 1.};
     result = SPEARMAN(PRICELIST(da, 2), PRICELIST(db, 2), 0);
     CHECK_EQ(result.size(), 5);
-    CHECK_EQ(result.discard(), 5);
+    CHECK_EQ(result.discard(), 3);
+    CHECK_UNARY(std::isnan(result[2]));
+    CHECK_EQ(result[3], doctest::Approx(-1.0));
+    CHECK_EQ(result[4], doctest::Approx(-1.0));
 }
 
 /** @par Test points */

@@ -17,8 +17,8 @@ namespace hku {
 
 /**
  * Calculate the unadjusted population skewness within N periods
- * @param n N-day time window (greater than or equal to 3 or equal to 0); when it is 0 the actual
- *          length of the input ind is used
+ * @param n N-day time window (>= 3); when it is 0 an expanding window is used, i.e. dst[i] is the
+ *          skewness over [discard(), i] (discard becomes discard()+2, the first two bars are nan)
  * @ingroup Indicator
  */
 Indicator HKU_API SKEW(int n = 10);

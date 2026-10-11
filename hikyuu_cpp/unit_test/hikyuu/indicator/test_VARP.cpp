@@ -63,10 +63,15 @@ TEST_CASE("test_VARP") {
         CHECK_EQ(result[i], expect[i]);
     }
 
-    /** @arg When n =0 */
+    /** @arg When n = 0: expanding window, population var of [0, i], single point -> 0 */
     dev = VARP(ind, 0);
     CHECK_EQ(dev.size(), 15);
-    CHECK_EQ(dev.discard(), 14);
+    CHECK_EQ(dev.discard(), 0);
+    CHECK_EQ(dev[0], 0.0);
+    for (size_t i = 1; i < dev.size(); ++i) {
+        CHECK_UNARY(!std::isnan(dev[i]));
+    }
+    // Full-sample pop var at the last bar matches the previous whole-series value
     CHECK_EQ(dev[14], doctest::Approx(19.0933).epsilon(0.0001));
 }
 

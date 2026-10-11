@@ -38,11 +38,41 @@ void ICorr::_calculate(const Indicator& ind) {
     Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
-    if (n == 0) {
-        n = total;
+    size_t startPos = std::max(ind.discard(), ref.discard());
+
+    // n == 0: expanding-window Pearson corr & sample cov, window = [startPos, i]
+    if (0 == n) {
+        m_discard = startPos + 1;
+        if (m_discard >= total) {
+            m_discard = total;
+            return;
+        }
+        auto const* datax = ind.data();
+        auto const* datay = ref.data();
+        value_t kx = datax[startPos];
+        value_t ky = datay[startPos];
+        value_t null_price = Null<price_t>();
+        value_t ex = 0.0, ey = 0.0, ex2 = 0.0, ey2 = 0.0, exy = 0.0;
+        auto* dst0 = this->data(0);
+        auto* dst1 = this->data(1);
+        for (size_t i = startPos + 1; i < total; ++i) {
+            value_t ix = datax[i] - kx;
+            value_t iy = datay[i] - ky;
+            ex += ix;
+            ey += iy;
+            ex2 += ix * ix;
+            ey2 += iy * iy;
+            exy += ix * iy;
+            value_t num = (value_t)(i - startPos + 1);
+            value_t varx = ex2 - ex * ex / num;
+            value_t vary = ey2 - ey * ey / num;
+            value_t cov = exy - ex * ey / num;
+            dst0[i] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
+            dst1[i] = cov / (num - 1);
+        }
+        return;
     }
 
-    size_t startPos = std::max(ind.discard(), ref.discard());
     m_discard = startPos + n - 1;
     if (m_discard >= total) {
         m_discard = total;

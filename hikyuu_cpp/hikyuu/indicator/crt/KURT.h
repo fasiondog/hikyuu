@@ -17,8 +17,8 @@ namespace hku {
 
 /**
  * Calculate the excess kurtosis within N periods (unadjusted population kurtosis - 3)
- * @param n N-day time window (greater than or equal to 4 or equal to 0); when it is 0 the actual
- *          length of the input ind is used
+ * @param n N-day time window (>= 4); when it is 0 an expanding window is used, i.e. dst[i] is the
+ *          excess kurtosis over [discard(), i] (discard becomes discard()+3, first three nan)
  * @ingroup Indicator
  */
 Indicator HKU_API KURT(int n = 10);

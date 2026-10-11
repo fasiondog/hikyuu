@@ -605,7 +605,7 @@ Built-in Technical Indicators
 
     :param Indicator ind: the input indicator, such as the stock return indicator
     :param Indicator ref_ind: the reference indicator, such as the market return indicator
-    :param int n: the rolling window size (greater than 2 or equal to 0), defaulting to 10. If it is 0, use the length of the input ind
+    :param int n: the rolling window size (>= 2), defaulting to 10. When it is 0 an expanding window is used: dst[i] is the beta over [discard(), i] (discard becomes 1, bar 0 is nan)
     :param bool fill_null: during the date alignment, whether to fill the missing dates with the nan values, defaulting to true
     :rtype: Indicator
 
@@ -712,7 +712,7 @@ Built-in Technical Indicators
 
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
-    :param int n: calculate the correlation coefficient of the data between the two inds by the specified length n. If it is 0, use the length of the input ind.
+    :param int n: calculate the correlation coefficient of the data between the two inds by the specified length n. n >= 2; when it is 0 an expanding window is used: dst[i] is the Pearson corr & sample cov over [discard(), i] (discard becomes 1, bar 0 is nan).
     :rtype: Indicator    
 
 .. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
@@ -721,7 +721,7 @@ Built-in Technical Indicators
 
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
-    :param int n: the rolling window size (greater than 2 or equal to 0), defaulting to 10. If it is 0, use the length of the input ind.
+    :param int n: the rolling window size (>= 2), defaulting to 10. When it is 0 an expanding window is used: dst[i] is the sample cov over [discard(), i] (discard becomes 1, bar 0 is nan).
     :param bool fill_null: during the date alignment, whether to fill the missing dates with the nan values, defaulting to true
     :rtype: Indicator
 
@@ -2007,7 +2007,7 @@ Built-in Technical Indicators
 
     :param Indicator ind1: the input parameter 1
     :param Indicator ind2: the input parameter 2
-    :param int n: the rolling window (greater than 2 or equal to 0); when it is equal to 0, it means that n actually uses the length of the ind
+    :param int n: the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the rank corr over [max(ind.discard(), ref.discard()), i] (discard becomes 1, bar 0 is nan)
 
 
 .. py:function:: SKEW([data, n=10])
@@ -2015,7 +2015,7 @@ Built-in Technical Indicators
     Calculate the unadjusted population skewness within the N periods
 
     :param Indicator data: the input data
-    :param int n: the N-day time window (greater than or equal to 3 or equal to 0); when it is equal to 0, use the actual length of the input data
+    :param int n: the N-day time window (>= 3); when it is 0 an expanding window is used, i.e. dst[i] is the skewness over [discard(), i] (discard becomes discard()+2, the first two bars are nan)
     :rtype: Indicator
 
 
@@ -2028,7 +2028,7 @@ Built-in Technical Indicators
     and a negative excess kurtosis means that the distribution has a thinner tail than the normal distribution (platykurtic).
 
     :param Indicator data: the input data
-    :param int n: the N-day time window (greater than or equal to 4 or equal to 0); when it is equal to 0, use the actual length of the input data
+    :param int n: the N-day time window (>= 4); when it is 0 an expanding window is used, i.e. dst[i] is the excess kurtosis over [discard(), i] (discard becomes discard()+3, the first three bars are nan)
     :rtype: Indicator
 
 
@@ -2192,7 +2192,7 @@ Built-in Technical Indicators
     The estimated sample variance; VAR(X,N) is the N-day estimated sample variance of X
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>= 2); when it is 0 an expanding window is used: dst[i] is the sample var over [discard(), i] (discard becomes discard()+1, bar 0 is nan)
     :rtype: Indicator
 
 
@@ -2201,7 +2201,7 @@ Built-in Technical Indicators
     The population sample variance; VARP(X,N) is the N-day population sample variance of X
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>= 2); when it is 0 an expanding window is used: dst[i] is the population var over [discard(), i] (single-point var is 0)
     :rtype: Indicator
 
 

@@ -43,15 +43,21 @@ TEST_CASE("test_BETA") {
     CHECK_THROWS_AS(BETA(stock_ind, market_ind, -1), std::exception);
     CHECK_THROWS_AS(BETA(stock_ind, market_ind, 1), std::exception);
 
-    // The normal case, n = 0 (calculated on the whole sample)
+    // The normal case, n = 0: expanding window
     result = BETA(stock_ind, market_ind, 0);
     CHECK_EQ(result.name(), "BETA");
     CHECK_EQ(result.size(), stock_returns.size());
-    CHECK_EQ(result.discard(), 9);
+    CHECK_EQ(result.discard(), 1);
     // Per the IBeta implementation, kx = first_stock_value and ky = first_market_value
     // The accumulation starts from the second data point
     // stock: [0.01, 0.02, -0.01, 0.015, 0.005, -0.02, 0.012, 0.018, -0.008, 0.02]
     // market: [0.008, 0.015, -0.005, 0.012, 0.003, -0.015, 0.008, 0.012, -0.003, 0.015]
+    // bar 0 is dropped (no pair yet); bars 1..total-1 each carry an expanding-window beta
+    CHECK_UNARY(std::isnan(result[0]));
+    for (size_t i = 1; i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
+    // Full-sample beta at the last bar matches the previous whole-series value
     CHECK_EQ(result[9], doctest::Approx(1.41516).epsilon(0.001));
 
     // Test the rolling window n = 8

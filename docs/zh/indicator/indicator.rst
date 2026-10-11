@@ -607,7 +607,7 @@
 
     :param Indicator ind: 输入指标，如股票收益率指标
     :param Indicator ref_ind: 对照指标，如市场收益率指标
-    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度
+    :param int n: 滚动窗口大小（>=2），默认10。为0时使用扩展窗口：dst[i] 取 [discard(), i] 上的 beta，discard 置为 1，首根为 nan
     :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
     :rtype: Indicator
 
@@ -714,7 +714,7 @@
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
-    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。如果为0，使用输入的ind长度。
+    :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。n>=2；为 0 时使用扩展窗口：dst[i] 取 [discard(), i] 上的相关系数与协方差，discard 置为 1，首根为 nan。
     :rtype: Indicator    
 
 .. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
@@ -723,7 +723,7 @@
 
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
-    :param int n: 滚动窗口大小（大于2或等于0），默认10。如果为0，使用输入的ind长度。
+    :param int n: 滚动窗口大小（>=2），默认10。为0时使用扩展窗口：dst[i] 取 [discard(), i] 上的样本协方差，discard 置为 1，首根为 nan。
     :param bool fill_null: 日期对齐时，缺失日期是否填充nan值，默认true
     :rtype: Indicator
 
@@ -2005,7 +2005,7 @@
 
     :param Indicator ind1: 输入参数1
     :param Indicator ind2: 输入参数2
-    :param int n: 滚动窗口(大于2 或 等于0)，等于0时，代表 n 实际使用 ind 的长度
+    :param int n: 滚动窗口(>=2)，为0时使用扩展窗口：dst[i] 取 [max(ind.discard(), ref.discard()), i] 上的秩相关，discard 置为 1，首根为 nan
 
 
 .. py:function:: SKEW([data, n=10])
@@ -2013,7 +2013,7 @@
     计算N周期内未调整的总体偏度
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口（大于等于3或等于0），等于0时使用输入的data实际长度
+    :param int n: N日时间窗口（>=3）；为0时使用扩展窗口：dst[i] 取 [discard(), i] 上的偏度，discard 置为 discard()+2，首两根为 nan
     :rtype: Indicator
 
 
@@ -2026,7 +2026,7 @@
     负的超额峰度表示分布比正态分布有更薄的尾部（平峰薄尾）。
 
     :param Indicator data: 输入数据
-    :param int n: N日时间窗口（大于等于4或等于0），等于0时使用输入的data实际长度
+    :param int n: N日时间窗口（>=4）；为0时使用扩展窗口：dst[i] 取 [discard(), i] 上的超额峰度，discard 置为 discard()+3，首三根为 nan
     :rtype: Indicator
 
 
@@ -2190,7 +2190,7 @@
     估算样本方差, VAR(X,N)为X的N日估算样本方差
 
     :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口（>=2）；为0时使用扩展窗口，dst[i] 取 [discard(), i] 上的样本方差，discard 为 discard()+1，首根为 nan
     :rtype: Indicator
 
 
@@ -2199,7 +2199,7 @@
     总体样本方差, VARP(X,N)为X的N日总体样本方差
 
     :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口（>=2）；为0时使用扩展窗口，dst[i] 取 [discard(), i] 上的总体方差（单点方差为0）
     :rtype: Indicator
 
 

@@ -25,8 +25,8 @@ namespace hku {
 
  * @param ind2 the reference indicator, such as the market return indicator
 
- * @param n the rolling window (greater than 2 or equal to 0); when it is 0 the actual length of the
- *          input ind is used.
+ * @param n the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is
+ *          the beta over [discard(), i] (discard becomes 1, bar 0 is nan).
 
  * @param fill_null fill the missing dates with nan when the dates are aligned
 

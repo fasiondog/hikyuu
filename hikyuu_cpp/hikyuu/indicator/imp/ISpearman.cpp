@@ -72,13 +72,64 @@ void ISpearman::_calculate(const Indicator &ind) {
     Indicator ref = prepare(ind);
 
     int n = getParam<int>("n");
-    if (n == 0) {
-        n = total;
+    size_t startPos = std::max(ind.discard(), ref.discard());
+
+    // n == 0: expanding-window Spearman, dst[i] is the rank corr of the prefix [startPos, i]
+    if (0 == n) {
+        m_discard = startPos + 1;
+        if (m_discard >= total) {
+            m_discard = total;
+            return;
+        }
+        auto *dst = this->data();
+        auto const *srca_full = ind.data();
+        auto const *srcb_full = ref.data();
+        global_parallel_for_index_void(
+          m_discard, total,
+          [=](size_t i) {
+              size_t win = i - startPos + 1;
+              vector<IndicatorImp::value_t> tmpa;
+              vector<IndicatorImp::value_t> tmpb;
+              tmpa.reserve(win);
+              tmpb.reserve(win);
+              for (size_t j = 0; j < win; ++j) {
+                  IndicatorImp::value_t a = srca_full[startPos + j];
+                  IndicatorImp::value_t b = srcb_full[startPos + j];
+                  if (!std::isnan(a) && !std::isnan(b)) {
+                      tmpa.push_back(a);
+                      tmpb.push_back(b);
+                  }
+              }
+              size_t act_count = tmpa.size();
+              if (act_count < 2) {
+                  return;
+              }
+              vector<IndicatorImp::value_t> levela(act_count);
+              vector<IndicatorImp::value_t> levelb(act_count);
+              spearmanLevel(tmpa.data(), levela.data(), act_count);
+              spearmanLevel(tmpb.data(), levelb.data(), act_count);
+              double mean_rank = (act_count + 1) / 2.0;
+              double var_r = 0.0, var_s = 0.0, cov = 0.0;
+              for (size_t j = 0; j < act_count; ++j) {
+                  double dev_r = levela[j] - mean_rank;
+                  double dev_s = levelb[j] - mean_rank;
+                  var_r += dev_r * dev_r;
+                  var_s += dev_s * dev_s;
+                  cov += dev_r * dev_s;
+              }
+              if (var_r == 0.0 || var_s == 0.0) {
+                  dst[i] = 0.0;
+              } else {
+                  double rho = cov / std::sqrt(var_r * var_s);
+                  dst[i] = std::max(-1.0, std::min(1.0, rho));
+              }
+          },
+          100);
+        return;
     }
 
-    m_discard = std::max(ind.discard(), ref.discard());
-    m_discard += n - 1;
-    if (m_discard > total) {
+    m_discard = startPos + n - 1;
+    if (m_discard >= total) {
         m_discard = total;
         return;
     }
@@ -116,7 +167,7 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
           vector<IndicatorImp::value_t> tmpa;
           vector<IndicatorImp::value_t> tmpb;
           tmpa.reserve(n);
-          tmpa.reserve(n);
+          tmpb.reserve(n);
           for (int j = 0; j < n; j++) {
               if (!std::isnan(a[j]) && !std::isnan(b[j])) {
                   tmpa.push_back(a[j]);

@@ -39,18 +39,22 @@ TEST_CASE("test_KURT") {
     CHECK_THROWS_AS(KURT(x, 2), std::exception);
     CHECK_THROWS_AS(KURT(x, 3), std::exception);
 
-    // The normal case, n = 0 (using all the data)
+    // The normal case, n = 0: expanding window, dst[i] = kurtosis of [0, i], num >= 4
     result = KURT(x, 0);
     CHECK_EQ(result.name(), "KURT");
-    CHECK_EQ(result.discard(), uniform.size() - 1);
+    CHECK_EQ(result.discard(), 3);
     CHECK_EQ(result.size(), uniform.size());
 
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
+    CHECK_UNARY(std::isnan(result[2]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_UNARY(!std::isnan(result[i]));
+    }
 
     // The excess kurtosis of a uniform distribution should be close to -1.2 (a finite sample
-    // deviates)
-    CHECK_EQ(result[result.discard()], doctest::Approx(-1.2).epsilon(0.1));
+    // deviates) — full-sample at the last bar
+    CHECK_EQ(result[result.size() - 1], doctest::Approx(-1.2).epsilon(0.1));
 
     // The test data: a sequence of equal values
     // When all the values are equal the excess kurtosis is -3.0
@@ -58,15 +62,15 @@ TEST_CASE("test_KURT") {
     Indicator x_same = PRICELIST(same_values);
     result = KURT(x_same, 0);
     CHECK_EQ(result.name(), "KURT");
-    CHECK_EQ(result[result.discard()], -3.0);
+    CHECK_EQ(result[result.size() - 1], -3.0);
 
     // The test data: a highly concentrated peaked distribution
     PriceList leptokurtic{1.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 10.0};
     Indicator x_lepto = PRICELIST(leptokurtic);
     result = KURT(x_lepto, 0);
     CHECK_EQ(result.name(), "KURT");
-    // A highly concentrated distribution should have a positive excess kurtosis
-    CHECK_GT(result[result.discard()], 0.0);
+    // Full-sample excess kurtosis of a highly concentrated distribution should be positive
+    CHECK_GT(result[result.size() - 1], 0.0);
 
     // Test the fixed window n = 5
     PriceList data{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
