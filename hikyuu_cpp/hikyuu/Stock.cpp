@@ -404,11 +404,10 @@ KDataDriverConnectPoolPtr Stock::getKDataDirver() const {
 
 bool Stock::isBuffer(KQuery::KType ktype) const noexcept {
     HKU_IF_RETURN(!m_data, false);
-    string nktype(ktype);
-    to_upper(nktype);
-    HKU_IF_RETURN(m_data->pMutex.find(nktype) == m_data->pMutex.end(), false);
-    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[nktype]));
-    return m_data->pKData.find(nktype) != m_data->pKData.end() && m_data->pKData[nktype];
+    to_upper(ktype);
+    HKU_IF_RETURN(m_data->pMutex.find(ktype) == m_data->pMutex.end(), false);
+    std::shared_lock<std::shared_mutex> lock(*(m_data->pMutex[ktype]));
+    return m_data->pKData.find(ktype) != m_data->pKData.end() && m_data->pKData[ktype];
 }
 
 void Stock::setPreload(const vector<KQuery::KType>& preload_ktypes) {
