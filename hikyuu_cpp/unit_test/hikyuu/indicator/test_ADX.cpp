@@ -81,6 +81,19 @@ TEST_CASE("test_ADX_result_order") {
     CHECK_FALSE(std::isnan(mdi_val));
 }
 
+/** @par Test point: total<2 early return must declare m_discard=total, not leave the all-NaN
+ * buffer as valid */
+TEST_CASE("test_ADX_short_context_discard") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData k1 = stock.getKData(KQuery(-1));
+    REQUIRE_EQ(k1.size(), 1);
+    auto adx = ADX(k1, 14);
+    CHECK_EQ(adx.size(), 1);
+    CHECK_EQ(adx.discard(), 1);
+    CHECK_UNARY(std::isnan(adx[0]));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

@@ -38,6 +38,7 @@ void IAdx2::_calculate(const Indicator& data) {
     _readyBuffer(total, 3);
 
     if (total < 2) {
+        m_discard = total;
         return;
     }
 
