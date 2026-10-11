@@ -21,7 +21,15 @@ class HKU_API GlobalInitializer {
 public:
     GlobalInitializer() {
         if (m_count++ == 0) {
-            init();
+            try {
+                init();
+            } catch (...) {
+                // The destructor never runs for an object whose construction threw, so the count
+                // has to be rolled back: it would otherwise stay above zero forever and clean()
+                // would never be reached
+                --m_count;
+                throw;
+            }
         }
     }
 
