@@ -27,6 +27,9 @@ namespace hku {
  * For example: DMA(CLOSE,VOL/CAPITAL) gives the average price with the turnover rate as the
  * smoothing factor
 
+ * NaN/Inf handling: if x[i] or a[i] is non-finite (NaN or ±Inf), y[i] holds y[i-1] instead of
+ poisoning the tail.
+
  * </pre>
  * @param x the data to be calculated
 

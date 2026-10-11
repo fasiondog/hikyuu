@@ -44,7 +44,13 @@ void IEma::_calculate(const Indicator& indicator) {
 
     value_t multiplier = 2.0 / (n + 1);
     for (size_t i = startPos + 1; i < total; ++i) {
-        dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
+        if (!std::isfinite(src[i])) {
+            dst[i] = dst[i - 1];
+        } else if (!std::isfinite(dst[i - 1])) {
+            dst[i] = src[i];
+        } else {
+            dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
+        }
     }
 }
 
@@ -57,7 +63,13 @@ void IEma::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     size_t total = data.size();
     for (size_t i = start_pos + 1; i < total; ++i) {
-        dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
+        if (!std::isfinite(src[i])) {
+            dst[i] = dst[i - 1];
+        } else if (!std::isfinite(dst[i - 1])) {
+            dst[i] = src[i];
+        } else {
+            dst[i] = (src[i] - dst[i - 1]) * multiplier + dst[i - 1];
+        }
     }
 }
 
@@ -68,7 +80,13 @@ void IEma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     value_t multiplier = 2.0 / (step + 1.0);
     value_t prev = src[ind.discard()];
     for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
-        prev = (src[i] - prev) * multiplier + prev;
+        if (!std::isfinite(src[i])) {
+            // hold prev (may still be unseeded before the first valid observation)
+        } else if (!std::isfinite(prev)) {
+            prev = src[i];
+        } else {
+            prev = (src[i] - prev) * multiplier + prev;
+        }
     }
     _set(prev, curPos);
 }

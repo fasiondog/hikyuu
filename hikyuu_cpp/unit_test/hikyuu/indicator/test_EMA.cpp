@@ -132,6 +132,38 @@ TEST_CASE("test_EMA_dyn") {
     CHECK_EQ(result[0], doctest::Approx(raw[0]));
 }
 
+/** @par Test points: NaN input at bar i holds the previous EMA (no permanent contamination) */
+TEST_CASE("test_EMA_nan_hold") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, nan, 4.0, 5.0});
+    Indicator ret = EMA(data, 2);
+    // alpha = 2/(2+1) = 2/3; ret[0]=1.0, ret[1]=(2-1)*2/3+1=5/3
+    // ret[2]: src NaN -> hold ret[1]
+    // ret[3]: (4-5/3)*2/3+5/3 = 29/9
+    // ret[4]: (5-29/9)*2/3+29/9 = 119/27
+    CHECK_EQ(ret[0], 1.0);
+    CHECK_EQ(ret[1], doctest::Approx(5.0 / 3.0));
+    CHECK_EQ(ret[2], doctest::Approx(5.0 / 3.0));
+    CHECK_EQ(ret[3], doctest::Approx(29.0 / 9.0));
+    CHECK_EQ(ret[4], doctest::Approx(119.0 / 27.0));
+
+    /** @arg Consecutive NaNs also hold, first valid after them re-seeds from that value */
+    Indicator data2 = PRICELIST({1.0, nan, nan, 4.0});
+    Indicator ret2 = EMA(data2, 2);
+    CHECK_EQ(ret2[0], 1.0);
+    CHECK_EQ(ret2[1], 1.0);                                             // hold
+    CHECK_EQ(ret2[2], 1.0);                                             // hold again
+    CHECK_EQ(ret2[3], doctest::Approx((4.0 - 1.0) * 2.0 / 3.0 + 1.0));  // normal update
+
+    /** @arg Inf input is treated as non-finite and also holds (AGENTS.md contract) */
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data3 = PRICELIST({1.0, inf_v, 4.0});
+    Indicator ret3 = EMA(data3, 2);
+    CHECK_EQ(ret3[0], 1.0);
+    CHECK_EQ(ret3[1], 1.0);                                             // hold on Inf
+    CHECK_EQ(ret3[2], doctest::Approx((4.0 - 1.0) * 2.0 / 3.0 + 1.0));  // normal update resumes
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

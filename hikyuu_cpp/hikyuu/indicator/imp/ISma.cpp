@@ -56,7 +56,13 @@ void ISma::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     double p = n - m;
     for (size_t i = start_pos + 1; i < total; i++) {
-        dst[i] = (m * src[i] + p * dst[i - 1]) / n;
+        if (!std::isfinite(src[i])) {
+            dst[i] = dst[i - 1];
+        } else if (!std::isfinite(dst[i - 1])) {
+            dst[i] = src[i];
+        } else {
+            dst[i] = (m * src[i] + p * dst[i - 1]) / n;
+        }
     }
 }
 
@@ -69,7 +75,13 @@ void ISma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, double m)
     double p = dn - m;
     price_t prev = src[ind.discard()];
     for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
-        prev = (m * src[i] + p * prev) / dn;
+        if (!std::isfinite(src[i])) {
+            // hold prev
+        } else if (!std::isfinite(prev)) {
+            prev = src[i];
+        } else {
+            prev = (m * src[i] + p * prev) / dn;
+        }
     }
     _set(prev, curPos);
 }

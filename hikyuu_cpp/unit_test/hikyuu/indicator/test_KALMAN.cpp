@@ -47,6 +47,30 @@ TEST_CASE("test_KALMAN") {
     CHECK_THROWS_AS(KALMAN(0.01, -0.1), std::exception);
 }
 
+/** @par Test points: NaN input holds state (predict-only), no permanent NaN contamination */
+TEST_CASE("test_KALMAN_nan_hold") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, nan, 4.0, 5.0});
+    Indicator ret = KALMAN(0.01, 0.1)(data);
+    CHECK_EQ(ret.size(), 5);
+    /** @arg ret[2] holds ret[1] when src[2] is NaN */
+    CHECK_EQ(ret[2], ret[1]);
+    /** @arg all outputs remain finite after an interior NaN */
+    for (size_t i = 0; i < ret.size(); i++) {
+        CHECK_UNARY(!std::isnan(ret[i]));
+    }
+    /** @arg subsequent valid observation still moves the estimate toward it */
+    CHECK_UNARY(ret[3] > ret[2]);
+
+    /** @arg Inf input is also held (AGENTS.md contract: no Inf poisoning downstream) */
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data2 = PRICELIST({1.0, 2.0, inf_v, 4.0});
+    Indicator ret2 = KALMAN(0.01, 0.1)(data2);
+    for (size_t i = 0; i < ret2.size(); i++) {
+        CHECK_UNARY(std::isfinite(ret2[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

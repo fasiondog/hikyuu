@@ -875,6 +875,8 @@ Built-in Technical Indicators
 
     For example: DMA(CLOSE,VOL/CAPITAL) means getting the average price with the turnover rate as the smoothing factor
 
+    NaN/Inf handling: if x[i] or a[i] is non-finite (NaN or ±Inf), y[i] holds y[i-1] instead of poisoning the tail.
+
     :param Indicator ind: the input data
     :param Indicator a: the dynamic coefficient
     :rtype: Indicator
@@ -902,6 +904,8 @@ Built-in Technical Indicators
 .. py:function:: EMA([data, n=22])
 
     The Exponential Moving Average
+
+    NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), EMA[i] holds EMA[i-1]; there is no permanent contamination.
 
     :param data: the input data
     :param int|Indciator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
@@ -1343,6 +1347,8 @@ Built-in Technical Indicators
 .. py:function:: KALMAN(ind, [q=0.01], [r=0.1])
 
     The Kalman filter, used to smooth the indicator; the smoothing coefficients q and r can be set, defaulting to q=0.01, r=0.1
+
+    NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), the filter takes a predict-only step (state held, uncertainty grows by q); there is no permanent contamination. Leading non-finite values leave the filter unseeded until the first finite observation, which becomes the initial state.
 
     :param Indicator ind: the indicator
     :param float q: the smoothing coefficient (must be > 0)
@@ -2007,6 +2013,8 @@ Built-in Technical Indicators
 
     Usage: if Y=SMA(X,N,M), then Y=[M*X+(N-M)*Y')/N, where Y' represents the Y value of the previous period
     
+    NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), SMA[i] holds SMA[i-1]; there is no permanent contamination.
+
     :param Indicator data: the input data
     :param int n: the time window
     :param float m: the coefficient

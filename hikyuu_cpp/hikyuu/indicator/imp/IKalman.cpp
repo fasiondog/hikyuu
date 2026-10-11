@@ -47,11 +47,22 @@ void IKalman::_calculate(const Indicator &data) {
 
     dst[m_discard] = x;
     for (size_t i = m_discard + 1; i < total; ++i) {
-        p = p + q;
-        value_t k = p / (p + r);
-        x = x + k * (src[i] - x);
-        p = (1 - k) * p;
-        dst[i] = x;
+        if (!std::isfinite(x)) {
+            // Not yet seeded (leading src was non-finite): wait for the first valid observation
+            x = src[i];
+            p = 1.0;
+            dst[i] = x;
+        } else if (!std::isfinite(src[i])) {
+            // Missing observation: predict-only (uncertainty grows, state held)
+            p = p + q;
+            dst[i] = x;
+        } else {
+            p = p + q;
+            value_t k = p / (p + r);
+            x = x + k * (src[i] - x);
+            p = (1 - k) * p;
+            dst[i] = x;
+        }
     }
 }
 

@@ -178,6 +178,30 @@ TEST_CASE("test_SMA_increment_equivalence") {
     }
 }
 
+/** @par Test points: NaN input at bar i holds the previous SMA (no permanent contamination) */
+TEST_CASE("test_SMA_nan_hold") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, nan, 4.0, 5.0});
+    Indicator ret = SMA(data, 3, 1.0);
+    // p = n - m = 2; ret[0]=1.0, ret[1] = (1*2 + 2*1)/3 = 4/3
+    // ret[2]: src NaN -> hold -> 4/3
+    // ret[3]: (1*4 + 2*4/3)/3 = 20/9
+    // ret[4]: (1*5 + 2*20/9)/3 = 85/27
+    CHECK_EQ(ret[0], 1.0);
+    CHECK_EQ(ret[1], doctest::Approx(4.0 / 3.0));
+    CHECK_EQ(ret[2], doctest::Approx(4.0 / 3.0));
+    CHECK_EQ(ret[3], doctest::Approx(20.0 / 9.0));
+    CHECK_EQ(ret[4], doctest::Approx(85.0 / 27.0));
+
+    /** @arg Inf input is treated as non-finite and also holds (AGENTS.md contract) */
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    Indicator data2 = PRICELIST({1.0, inf_v, 4.0});
+    Indicator ret2 = SMA(data2, 3, 1.0);
+    CHECK_EQ(ret2[1], 1.0);  // hold on Inf
+    CHECK_UNARY(std::isfinite(ret2[2]));
+    CHECK_EQ(ret2[2], doctest::Approx((1.0 * 4.0 + 2.0 * 1.0) / 3.0));
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

@@ -803,6 +803,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Usage: if Y=SMA(X,N,M), then Y=[M*X+(N-M)*Y')/N, where Y' represents the Y value of the previous period
 
+    NaN/Inf input at bar i holds the previous SMA (yields SMA[i-1]); no permanent contamination.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :param float|Indicator|IndParam m: the coefficient
@@ -815,6 +817,8 @@ void export_Indicator_build_in(py::module& m) {
     m.def("EMA", EMA_5, py::arg("data"), py::arg("n") = 22, R"(EMA([data, n=22])
 
     The Exponential Moving Average
+
+    NaN/Inf input at bar i holds the previous EMA (yields EMA[i-1]); no permanent contamination.
 
     :param data: the input data
     :param int|Indicator|IndParam n n: the period window for calculating the average, which must be an integer greater than 0 
@@ -1875,6 +1879,8 @@ void export_Indicator_build_in(py::module& m) {
 
     For example: DMA(CLOSE,VOL/CAPITAL) means getting the average price with the turnover rate as the smoothing factor
 
+    NaN/Inf handling: if x[i] or a[i] is non-finite (NaN or ±Inf), y[i] holds y[i-1] instead of poisoning the tail.
+
     :param Indicator x: the input data
     :param Indicator a: the dynamic coefficient
     :param bool fill_null: fill the missing data with the nan values during the date alignment.
@@ -2750,6 +2756,8 @@ void export_Indicator_build_in(py::module& m) {
           py::arg("q") = 0.01, py::arg("r") = 0.1, R"(KALMAN(ind, [q=0.01], [r=0.1])
 
     The Kalman filter, used to smooth the indicator; the smoothing coefficients q and r can be set, defaulting to q=0.01, r=0.1
+
+    Non-finite input (NaN or ±Inf) at bar i triggers a predict-only step (state held, uncertainty grows by q); no permanent contamination. Leading non-finite values keep the filter unseeded until the first finite observation.
 
     :param Indicator ind: the indicator
     :param float q: the smoothing coefficient

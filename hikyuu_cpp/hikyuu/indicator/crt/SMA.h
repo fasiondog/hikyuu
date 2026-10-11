@@ -19,6 +19,8 @@ namespace hku {
  * <pre>
  * Usage: if Y=SMA(X,N,M) then Y=[M*X+(N-M)*Y')/N, where Y' is the Y value of the previous period
  * </pre>
+ * @note Non-finite input (NaN or ±Inf) at bar i holds the previous SMA (yields SMA[i-1]); no
+ * permanent contamination.
  * @param n the period window for calculating the average, it must be an integer greater than 0
  * @param m coefficient
  * @ingroup Indicator
@@ -34,6 +36,8 @@ Indicator HKU_API SMA(const IndParam& n, const IndParam& m);
  * <pre>
  * Usage: if Y=SMA(X,N,M) then Y=[M*X+(N-M)*Y')/N, where Y' is the Y value of the previous period
  * </pre>
+ * @note Non-finite input (NaN or ±Inf) at bar i holds the previous SMA (yields SMA[i-1]); no
+ * permanent contamination.
  * @param ind the data to be calculated
  * @param n the period window for calculating the average, it must be an integer greater than 0
  * @param m coefficient

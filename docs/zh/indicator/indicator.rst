@@ -877,6 +877,8 @@
 
     例如：DMA(CLOSE,VOL/CAPITAL)表示求以换手率作平滑因子的平均价
 
+    NaN 口径：若 x[i] 或 a[i] 为非有限值（NaN 或 ±Inf），y[i] 保持 y[i-1]，不污染尾部。
+
     :param Indicator ind: 输入数据
     :param Indicator a: 动态系数
     :rtype: Indicator
@@ -904,6 +906,8 @@
 .. py:function:: EMA([data, n=22])
 
     指数移动平均线(Exponential Moving Average)
+
+    NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），EMA[i] 保持 EMA[i-1]，不会一 NaN/Inf 就污染尾部。
 
     :param data: 输入数据
     :param int|Indciator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
@@ -1340,6 +1344,8 @@
 .. py:function:: KALMAN(ind, [q=0.01], [r=0.1])
 
     Kalman滤波器, 用于平滑指标, 可设置平滑系数q和r, 默认q=0.01, r=0.1
+
+    NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），滤波器仅执行预测步（状态保持，不确定性 p 递推 q），不会一 NaN/Inf 就污染尾部。前导非有限值使滤波器保持未播种，直到首个有限观测作为初始状态。
 
     :param Indicator ind: 指标
     :param float q: 平滑系数（必须 > 0）
@@ -1999,6 +2005,8 @@
 
     用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
     
+    NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），SMA[i] 保持 SMA[i-1]，不会一 NaN/Inf 就污染尾部。
+
     :param Indicator data: 输入数据
     :param int n: 时间窗口
     :param float m: 系数

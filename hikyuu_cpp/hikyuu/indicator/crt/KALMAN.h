@@ -15,6 +15,9 @@ namespace hku {
 
 /**
  * Kalman filter
+ * @note Non-finite input (NaN or ±Inf) at bar i triggers a predict-only step (state held,
+ * uncertainty grows by q); no permanent contamination. Leading non-finite values keep the filter
+ * unseeded until the first finite observation, which then becomes the initial state.
  * @param q noise variance, must be > 0
  * @param r measurement noise variance, must be > 0
  * @ingroup Indicator
