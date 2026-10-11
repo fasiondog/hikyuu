@@ -353,12 +353,13 @@ bool isShmServerRole() noexcept {
 }
 
 void StockManager::_fireLoadEvent(LoadEvent event) {
-    // There are very few callbacks (the plugin registers them once each at start / stop) and they
-    // are triggered synchronously only in the loading sequence; with no registration the traversal
-    // is empty and the cost is negligible
-    std::shared_lock<std::shared_mutex> lock(g_load_event->mutex);
-    for (const auto& [id, cb] : g_load_event->callbacks) {
-        cb(event);
+    std::vector<std::pair<size_t, LoadEventCallback>> callbacks;
+    {
+        std::shared_lock<std::shared_mutex> lock(g_load_event->mutex);
+        callbacks = g_load_event->callbacks;
+    }
+    for (const auto& cb : callbacks) {
+        cb.second(event);
     }
 }
 

@@ -397,8 +397,6 @@ private:
      * called by loadData and the two loading functions). The core library no longer perceives the
      * existence of the server, it only notifies in order; there is no overhead when no callback is
      * registered.
-     * @note Calling register/unregisterLoadEventCallback inside a callback is forbidden (it
-     * deadlocks)
      */
     void _fireLoadEvent(LoadEvent event);
 

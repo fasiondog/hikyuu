@@ -8,6 +8,8 @@
 #include "doctest/doctest.h"
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <thread>
@@ -33,6 +35,29 @@ bool waitDataReadyReleased(StockManager& sm) {
     }
     return done->load();
 }
+
+// Only used by the disabled deadlock case at the end of this file
+#if 0
+// Runs the given function in a detached thread with a deadline. A deadlock leaves the worker
+// holding the lock, which would hang the static destruction as well, so on a timeout the process is
+// left without running the destructors: the failure stays visible instead of hanging forever
+template <typename Func>
+void runWithDeadline(Func&& func, int seconds = 10) {
+    auto done = std::make_shared<std::atomic_bool>(false);
+    std::thread([func = std::forward<Func>(func), done]() {
+        func();
+        done->store(true);
+    }).detach();
+    for (int i = 0; i < seconds * 10 && !done->load(); i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    if (!done->load()) {
+        std::cerr << "runWithDeadline: the operation did not finish within " << seconds
+                  << "s (deadlock?)" << std::endl;
+        std::quick_exit(1);
+    }
+}
+#endif
 
 bool hasBlock(const BlockList& blocks, const string& category, const string& name) {
     for (const auto& blk : blocks) {
@@ -400,5 +425,28 @@ TEST_CASE("test_StockManager_load_failed") {
     CHECK_UNARY(!sm.loadFailed());
     CHECK_UNARY(sm.dataReady());
 }
+
+// Disabled by default: it costs a full reload on every run and it can only fail when the dispatch
+// path regresses into a deadlock. Enable it when _fireLoadEvent or the callback registry changes.
+#if 0
+/** @par Test points */
+TEST_CASE("test_StockManager_fireLoadEvent_unregister_in_callback") {
+    auto& sm = StockManager::instance();
+
+    /** @arg A callback unregistering another one does not self-deadlock: the dispatch runs on a
+     * snapshot taken under the lock, so the unregister below may take the same lock */
+    size_t outer_id = registerLoadEventCallback([](LoadEvent) {});
+    size_t inner_id =
+      registerLoadEventCallback([outer_id](LoadEvent) { unregisterLoadEventCallback(outer_id); });
+    runWithDeadline([&sm]() {
+        sm.reload();
+        sm.joinPreloadThread();
+    });
+    unregisterLoadEventCallback(inner_id);
+
+    CHECK_UNARY(!sm.loadFailed());
+    CHECK_UNARY(sm.dataReady());
+}
+#endif
 
 /** @} */
