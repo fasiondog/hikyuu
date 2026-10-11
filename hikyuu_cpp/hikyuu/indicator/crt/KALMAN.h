@@ -15,8 +15,8 @@ namespace hku {
 
 /**
  * Kalman filter
- * @param q noise variance
- * @param r measurement noise variance
+ * @param q noise variance, must be > 0
+ * @param r measurement noise variance, must be > 0
  * @ingroup Indicator
  */
 Indicator HKU_API KALMAN(double q = 0.01, double r = 0.1);

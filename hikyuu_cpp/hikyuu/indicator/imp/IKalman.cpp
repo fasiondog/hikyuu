@@ -20,6 +20,14 @@ IKalman::IKalman() : IndicatorImp("KALMAN", 1) {
 
 IKalman::~IKalman() {}
 
+void IKalman::_checkParam(const string &name) const {
+    if ("q" == name) {
+        HKU_ASSERT(getParam<double>("q") > 0.);
+    } else if ("r" == name) {
+        HKU_ASSERT(getParam<double>("r") > 0.);
+    }
+}
+
 void IKalman::_calculate(const Indicator &data) {
     size_t total = data.size();
     m_discard = data.discard();

@@ -21,6 +21,8 @@ class IKalman : public IndicatorImp {
 public:
     IKalman();
     virtual ~IKalman() override;
+
+    virtual void _checkParam(const string& name) const override;
 };
 
 } /* namespace hku */

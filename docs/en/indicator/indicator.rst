@@ -1333,8 +1333,8 @@ Built-in Technical Indicators
     The Kalman filter, used to smooth the indicator; the smoothing coefficients q and r can be set, defaulting to q=0.01, r=0.1
 
     :param Indicator ind: the indicator
-    :param float q: the smoothing coefficient
-    :param float r: the noise coefficient
+    :param float q: the smoothing coefficient (must be > 0)
+    :param float r: the noise coefficient (must be > 0)
     :rtype: Indicator
 
     
