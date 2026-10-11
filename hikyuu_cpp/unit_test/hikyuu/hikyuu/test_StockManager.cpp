@@ -33,6 +33,15 @@ bool waitDataReadyReleased(StockManager& sm) {
     }
     return done->load();
 }
+
+bool hasBlock(const BlockList& blocks, const string& category, const string& name) {
+    for (const auto& blk : blocks) {
+        if (blk.category() == category && blk.name() == name) {
+            return true;
+        }
+    }
+    return false;
+}
 }  // namespace
 
 /**
@@ -180,6 +189,47 @@ TEST_CASE("test_StockManager_getBlock") {
         blk_list = sm.getBlockList();
         CHECK_NE(blk_list.size(), 0);
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_getBlockList_inner_block") {
+    auto& sm = StockManager::instance();
+
+    /** @arg Filtering by the category of the inner blocks returns them (their keys are
+     * "category_name", which never equals a bare category) */
+    BlockList blocks_a = sm.getBlockList("A");
+    CHECK_UNARY(hasBlock(blocks_a, "A", "ALL"));
+    CHECK_UNARY(hasBlock(blocks_a, "A", "沪深"));
+    CHECK_UNARY(hasBlock(blocks_a, "A", "SH"));
+    CHECK_UNARY(hasBlock(blocks_a, "A", "SZ"));
+    for (const auto& blk : blocks_a) {
+        CHECK_EQ(blk.category(), "A");
+    }
+
+    /** @arg The other inner categories are matched as well */
+    CHECK_UNARY(hasBlock(sm.getBlockList("G"), "G", "创业板"));
+    CHECK_UNARY(hasBlock(sm.getBlockList("START"), "START", "科创板"));
+    CHECK_UNARY(hasBlock(sm.getBlockList("ETF"), "ETF", "ALL"));
+
+    /** @arg An unknown category matches neither a driver block nor an inner block */
+    CHECK_EQ(sm.getBlockList("__no_such_category__").size(), 0);
+
+    /** @arg getBlock of the same category+name is a non-empty inner block, and the unfiltered list
+     * contains it as well */
+    CHECK_NE(sm.getBlock("A", "ALL").size(), 0);
+    CHECK_UNARY(hasBlock(sm.getBlockList(), "A", "ALL"));
+
+    /** @arg getAllCategory lists the inner categories too, so they can be discovered */
+    StringList categories = sm.getAllCategory();
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "A") != categories.end());
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "G") != categories.end());
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "START") != categories.end());
+    CHECK_UNARY(std::find(categories.begin(), categories.end(), "ETF") != categories.end());
+
+    /** @arg getStockBelongs finds the inner block of the given category */
+    Stock stk = sm.getStock("sz000001");
+    CHECK_UNARY(!stk.isNull());
+    CHECK_UNARY(hasBlock(sm.getStockBelongs(stk, "A"), "A", "ALL"));
 }
 
 /** @par Test points */

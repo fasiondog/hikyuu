@@ -238,7 +238,7 @@ void export_StockManager(py::module& m) {
 
       .def("get_category_list", &StockManager::getAllCategory, R"(get_category_list(self)
 
-    Get all the block categories
+    Get all the block categories, including the categories of the inner blocks (A/G/START/ETF)
 
     :return: all the block categories
     :rtype: StringList)")
@@ -278,7 +278,7 @@ void export_StockManager(py::module& m) {
            py::arg("category") = "",
            R"(get_block_list(self[, category])
 
-    Get the block list of the specified category
+    Get the block list of the specified category, including the inner blocks of that category
 
     :param str category: the block category; when it is an empty string, return all the block lists
     :return: the block list

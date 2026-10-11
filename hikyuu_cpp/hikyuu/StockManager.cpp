@@ -820,7 +820,14 @@ StringList StockManager::getAllMarket() const {
 }
 
 StringList StockManager::getAllCategory() {
-    return m_blockDriver ? m_blockDriver->getAllCategory() : StringList();
+    StringList result = m_blockDriver ? m_blockDriver->getAllCategory() : StringList();
+    for (const auto& iter : m_innerBlocks) {
+        const auto& category = iter.second.category();
+        if (std::find(result.begin(), result.end(), category) == result.end()) {
+            result.push_back(category);
+        }
+    }
+    return result;
 }
 
 Block StockManager::getBlock(const string& category, const string& name) {
@@ -852,16 +859,10 @@ BlockList StockManager::getBlockList(const string& category) {
     HKU_IF_RETURN(!m_blockDriver, BlockList());
     result =
       category.empty() ? m_blockDriver->getBlockList() : m_blockDriver->getBlockList(category);
-    auto iter = m_innerBlocks.begin();
-    if (category.empty()) {
-        for (; iter != m_innerBlocks.end(); ++iter) {
-            result.push_back(iter->second);
-        }
-    } else {
-        for (; iter != m_innerBlocks.end(); ++iter) {
-            if (iter->first == category) {
-                result.push_back(iter->second);
-            }
+    for (const auto& iter : m_innerBlocks) {
+        const auto& blk = iter.second;
+        if (category.empty() || blk.category() == category) {
+            result.push_back(blk);
         }
     }
     return result;

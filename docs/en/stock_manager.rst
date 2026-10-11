@@ -358,7 +358,7 @@ StockManager/Block/Stock
 
     .. py:method:: get_category_list(self)
 
-        Return all sector categories
+        Return all sector categories, including the categories of the inner sectors (A/G/START/ETF)
 
         :return: all sector categories
         :rtype: StringList
@@ -394,7 +394,7 @@ StockManager/Block/Stock
 
     .. py:method:: get_block_list(self[, category])
 
-        Return the sectors belonging to the given category
+        Return the sectors belonging to the given category, including the inner sectors of it
 
         :param str category: the sector category
         :return: the sector list

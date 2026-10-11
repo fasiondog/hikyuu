@@ -333,7 +333,7 @@ StockManager/Block/Stock
         
     .. py:method:: get_category_list(self)
     
-        获取所有板块分类
+        获取所有板块分类（含内部板块分类 A/G/START/ETF）
         
         :return: 所有板块分类
         :rtype: StringList
@@ -367,7 +367,7 @@ StockManager/Block/Stock
         
     .. py:method:: get_block_list(self[, category])
     
-        获取指定分类的板块列表
+        获取指定分类的板块列表（含该分类下的内部板块）
         
         :param str category: 板块分类
         :return: 板块列表
