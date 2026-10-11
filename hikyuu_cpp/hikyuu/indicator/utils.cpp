@@ -176,8 +176,10 @@ namespace detail {
 
 namespace {
 
-void spearman_level(const Indicator::value_t* data, Indicator::value_t* level, size_t total) {
-    std::vector<std::pair<Indicator::value_t, size_t>> idx(total);
+void spearman_level(const Indicator::value_t* data, Indicator::value_t* level, size_t total,
+                    std::vector<std::pair<Indicator::value_t, size_t>>& idx) {
+    if (idx.size() != total)
+        idx.resize(total);
     for (size_t i = 0; i < total; i++)
         idx[i] = {data[i], i};
     std::sort(idx.begin(), idx.end(),
@@ -197,36 +199,35 @@ void spearman_level(const Indicator::value_t* data, Indicator::value_t* level, s
 }  // namespace
 
 Indicator::value_t cross_section_spearman(const Indicator::value_t* a, const Indicator::value_t* b,
-                                          size_t n) {
+                                          size_t n, SpearmanScratch& s) {
     if (n < 2)
         return Null<Indicator::value_t>();
-    thread_local std::vector<Indicator::value_t> tmpa, tmpb, levela, levelb;
-    tmpa.clear();
-    tmpb.clear();
-    if (tmpa.capacity() < n) {
-        tmpa.reserve(n);
-        tmpb.reserve(n);
+    s.tmpa.clear();
+    s.tmpb.clear();
+    if (s.tmpa.capacity() < n) {
+        s.tmpa.reserve(n);
+        s.tmpb.reserve(n);
     }
     for (size_t j = 0; j < n; j++) {
-        if (!std::isnan(a[j]) && !std::isnan(b[j])) {
-            tmpa.push_back(a[j]);
-            tmpb.push_back(b[j]);
+        if (std::isfinite(a[j]) && std::isfinite(b[j])) {
+            s.tmpa.push_back(a[j]);
+            s.tmpb.push_back(b[j]);
         }
     }
-    size_t act = tmpa.size();
+    size_t act = s.tmpa.size();
     if (act < 2)
         return Null<Indicator::value_t>();
-    if (levela.size() < act) {
-        levela.resize(act);
-        levelb.resize(act);
+    if (s.levela.size() < act) {
+        s.levela.resize(act);
+        s.levelb.resize(act);
     }
-    spearman_level(tmpa.data(), levela.data(), act);
-    spearman_level(tmpb.data(), levelb.data(), act);
+    spearman_level(s.tmpa.data(), s.levela.data(), act, s.idx_a);
+    spearman_level(s.tmpb.data(), s.levelb.data(), act, s.idx_b);
     double mean_rank = (act + 1) / 2.0;
     double var_r = 0.0, var_s = 0.0, cov = 0.0;
     for (size_t j = 0; j < act; j++) {
-        double dr = levela[j] - mean_rank;
-        double ds = levelb[j] - mean_rank;
+        double dr = s.levela[j] - mean_rank;
+        double ds = s.levelb[j] - mean_rank;
         var_r += dr * dr;
         var_s += ds * ds;
         cov += dr * ds;
@@ -235,6 +236,12 @@ Indicator::value_t cross_section_spearman(const Indicator::value_t* a, const Ind
         return 0.0;
     double rho = cov / std::sqrt(var_r * var_s);
     return std::max(-1.0, std::min(1.0, rho));
+}
+
+Indicator::value_t cross_section_spearman(const Indicator::value_t* a, const Indicator::value_t* b,
+                                          size_t n) {
+    static thread_local SpearmanScratch scratch;
+    return cross_section_spearman(a, b, n, scratch);
 }
 
 Indicator::value_t cross_section_pearson(const Indicator::value_t* a, const Indicator::value_t* b,
@@ -254,7 +261,8 @@ Indicator::value_t cross_section_pearson(const Indicator::value_t* a, const Indi
     Indicator::value_t varx = ex2 - ex * ex / nf;
     Indicator::value_t vary = ey2 - ey * ey / nf;
     Indicator::value_t cov = exy - ex * ey / nf;
-    if (varx <= 0.0 || vary <= 0.0)
+    if (!(varx > 0.0 && vary > 0.0 && std::isfinite(varx) && std::isfinite(vary) &&
+          std::isfinite(cov)))
         return Null<Indicator::value_t>();
     return cov / std::sqrt(varx * vary);
 }

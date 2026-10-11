@@ -112,22 +112,39 @@ std::vector<double> multi_regression_full(const Stock& stk, const KQuery& query,
 namespace detail {
 
 /**
+ * Reusable scratch buffers for cross_section_spearman; callers hold one per thread/task
+ * to avoid per-call heap allocation. Not thread-safe by design: each concurrent caller owns
+ * its own instance.
+ */
+struct SpearmanScratch {
+    std::vector<Indicator::value_t> tmpa, tmpb, levela, levelb;
+    std::vector<std::pair<Indicator::value_t, size_t>> idx_a, idx_b;
+};
+
+/**
  * Cross-section Spearman rank correlation over one day's factor and return values.
  *
- * NaN pairs are dropped before ranking (a stock with a missing factor or return on day t is
- * excluded from that day's cross-section), matching ISpearman. Returns 0.0 when a valid
- * cross-section collapses to zero variance ("no discrimination means no predictive power"),
- * so a downstream MA does not spread NaN. Null is returned when fewer than two valid pairs
- * remain.
+ * Non-finite pairs (NaN or ±Inf) are dropped before ranking (a stock with a missing factor
+ * or return on day t is excluded from that day's cross-section), matching ISpearman. Returns
+ * 0.0 when a valid cross-section collapses to zero variance ("no discrimination means no
+ * predictive power"), so a downstream MA does not spread NaN. Null is returned when fewer
+ * than two valid pairs remain.
+ *
+ * Overload with caller-owned scratch avoids per-call allocation (V3 pattern).
  */
+HKU_API Indicator::value_t cross_section_spearman(const Indicator::value_t* a,
+                                                  const Indicator::value_t* b, size_t n,
+                                                  SpearmanScratch& scratch);
+
 HKU_API Indicator::value_t cross_section_spearman(const Indicator::value_t* a,
                                                   const Indicator::value_t* b, size_t n);
 
 /**
  * Cross-section Pearson correlation over one day's factor and return values.
  *
- * Matches ICorr's arithmetic (raw rolling sums): any NaN in the input propagates into the
- * output as NaN, no per-stock filtering is applied. Zero variance yields Null.
+ * Matches ICorr's arithmetic (raw rolling sums): any non-finite value in the input propagates
+ * through the sums and yields Null output (via the widened finite-positive variance guard),
+ * with no per-stock filtering step. Zero variance also yields Null.
  */
 HKU_API Indicator::value_t cross_section_pearson(const Indicator::value_t* a,
                                                  const Indicator::value_t* b, size_t n);

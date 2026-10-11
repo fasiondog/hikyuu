@@ -7,6 +7,7 @@
 
 #include <climits>
 #include "ISpearman.h"
+#include "hikyuu/indicator/utils.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ISpearman)
@@ -29,40 +30,6 @@ void ISpearman::_checkParam(const string &name) const {
     if ("n" == name) {
         int n = getParam<int>("n");
         HKU_ASSERT(n == 0 || (n >= 2 && n < INT_MAX));
-    }
-}
-
-static void spearmanLevel(const IndicatorImp::value_t *data, IndicatorImp::value_t *level,
-                          size_t total) {
-    std::vector<std::pair<IndicatorImp::value_t, size_t>> data_index(total);
-    for (size_t i = 0; i < total; i++) {
-        data_index[i].first = data[i];
-        data_index[i].second = i;
-    }
-
-    std::sort(
-      data_index.begin(), data_index.end(),
-      std::bind(
-        std::less<IndicatorImp::value_t>(),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_1),
-        std::bind(&std::pair<IndicatorImp::value_t, size_t>::first, std::placeholders::_2)));
-
-    size_t i = 0;
-    while (i < total) {
-        size_t count = 1;
-        IndicatorImp::value_t score = i + 1.0;
-        for (size_t j = i + 1; j < total; j++) {
-            if (data_index[i].first != data_index[j].first) {
-                break;
-            }
-            count++;
-            score += j + 1;
-        }
-        score = score / count;
-        for (size_t j = 0; j < count; j++) {
-            level[data_index[i + j].second] = score;
-        }
-        i += count;
     }
 }
 
@@ -89,41 +56,8 @@ void ISpearman::_calculate(const Indicator &ind) {
           m_discard, total,
           [=](size_t i) {
               size_t win = i - startPos + 1;
-              vector<IndicatorImp::value_t> tmpa;
-              vector<IndicatorImp::value_t> tmpb;
-              tmpa.reserve(win);
-              tmpb.reserve(win);
-              for (size_t j = 0; j < win; ++j) {
-                  IndicatorImp::value_t a = srca_full[startPos + j];
-                  IndicatorImp::value_t b = srcb_full[startPos + j];
-                  if (std::isfinite(a) && std::isfinite(b)) {
-                      tmpa.push_back(a);
-                      tmpb.push_back(b);
-                  }
-              }
-              size_t act_count = tmpa.size();
-              if (act_count < 2) {
-                  return;
-              }
-              vector<IndicatorImp::value_t> levela(act_count);
-              vector<IndicatorImp::value_t> levelb(act_count);
-              spearmanLevel(tmpa.data(), levela.data(), act_count);
-              spearmanLevel(tmpb.data(), levelb.data(), act_count);
-              double mean_rank = (act_count + 1) / 2.0;
-              double var_r = 0.0, var_s = 0.0, cov = 0.0;
-              for (size_t j = 0; j < act_count; ++j) {
-                  double dev_r = levela[j] - mean_rank;
-                  double dev_s = levelb[j] - mean_rank;
-                  var_r += dev_r * dev_r;
-                  var_s += dev_s * dev_s;
-                  cov += dev_r * dev_s;
-              }
-              if (var_r == 0.0 || var_s == 0.0) {
-                  dst[i] = 0.0;
-              } else {
-                  double rho = cov / std::sqrt(var_r * var_s);
-                  dst[i] = std::max(-1.0, std::min(1.0, rho));
-              }
+              dst[i] =
+                detail::cross_section_spearman(srca_full + startPos, srcb_full + startPos, win);
           },
           100);
         return;
@@ -162,58 +96,7 @@ void ISpearman::_increment_calculate(const Indicator &ind, size_t start_pos) {
     auto const *srcb = ref.data() + 1 - n;
     global_parallel_for_index_void(
       start_pos, total,
-      [=](size_t i) {
-          const auto *a = srca + i;
-          const auto *b = srcb + i;
-          vector<IndicatorImp::value_t> tmpa;
-          vector<IndicatorImp::value_t> tmpb;
-          tmpa.reserve(n);
-          tmpb.reserve(n);
-          for (int j = 0; j < n; j++) {
-              if (std::isfinite(a[j]) && std::isfinite(b[j])) {
-                  tmpa.push_back(a[j]);
-                  tmpb.push_back(b[j]);
-              }
-          }
-          int act_count = tmpa.size();
-          if (act_count < 2) {
-              return;
-          }
-
-          auto levela = std::vector<value_t>(n);
-          auto levelb = std::vector<value_t>(n);
-          auto *ptra = levela.data();
-          auto *ptrb = levelb.data();
-
-          spearmanLevel(tmpa.data(), ptra, act_count);
-          spearmanLevel(tmpb.data(), ptrb, act_count);
-          // Calculate the Pearson correlation coefficient on the ranks directly (tie-safe).
-          // Key property: the average rank does not change the sum of the ranks, so the mean of the
-          // ranks is always the prior constant (act_count+1)/2, which needs no traversal estimation
-          // and eliminates the catastrophic cancellation of subtracting large numbers.
-          double mean_rank = (act_count + 1) / 2.0;
-          double var_r = 0.0, var_s = 0.0, cov = 0.0;
-          for (int j = 0; j < act_count; j++) {
-              double dev_r = ptra[j] - mean_rank;
-              double dev_s = ptrb[j] - mean_rank;
-              var_r += dev_r * dev_r;
-              var_s += dev_s * dev_s;
-              cov += dev_r * dev_s;
-          }
-          // On a zero variance (the factors or the returns are all equal in the cross section) it
-          // returns 0.0: the semantics is "no discrimination means no predictive power". NaN is not
-          // returned, because a downstream MA indicator spreads NaN like "one NaN makes all NaN"
-          // (and a NaN in the first window silently outputs a low wrong value), the weighted
-          // combination has no NaN guard, and NaN would spread and pollute the weights of about
-          // ic_rolling_n days.
-          if (var_r == 0.0 || var_s == 0.0) {
-              dst[i] = 0.0;
-          } else {
-              double rho = cov / std::sqrt(var_r * var_s);
-              // Clamp the out of range caused by the floating point error
-              dst[i] = std::max(-1.0, std::min(1.0, rho));
-          }
-      },
+      [=](size_t i) { dst[i] = detail::cross_section_spearman(srca + i, srcb + i, (size_t)n); },
       100);
 }
 
