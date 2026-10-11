@@ -251,6 +251,11 @@ public:
 
     /**
      * Add a Stock; only for special Stocks that are added temporarily
+     *
+     * Note: the added security is out of the startup loadAllStockWeights scope and does not get
+     * its ex-rights/ex-dividend data materialized: in the standalone main process getWeight
+     * returns empty for it (only the client / shm server roles would lazily load it on demand).
+     * This is intentional for the temporary special stocks this API targets (BASE-107).
      * @param stock
      * @return true on success | false on failure
      */
