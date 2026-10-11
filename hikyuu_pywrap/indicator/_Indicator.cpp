@@ -48,7 +48,9 @@ void export_Indicator(py::module& m) {
 
       .def("set_discard", &Indicator::setDiscard, R"(set_discard(self, discard)
     
-    Set the number to discard; if it is smaller than the original discard, it is invalid
+    Set the number to discard; the value is clamped to the indicator size. When the new value
+    grows, the extended leading slots are filled with Null; when it shrinks, the previously
+    discarded slots become part of the valid region.
     :param int discard: the number of the points to discard, greater than 0)")
 
       .def("get_param", &Indicator::getParam<boost::any>, R"(get_param(self, name)

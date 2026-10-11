@@ -9,6 +9,7 @@
 #ifndef INDICATORIMP_H_
 #define INDICATORIMP_H_
 
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 
@@ -21,6 +22,7 @@
 namespace hku {
 
 #define MAX_RESULT_NUM 6
+#define IND_EQ_THRESHOLD 0.000001  ///< Threshold for judging float equality
 
 class HKU_API Indicator;
 class HKU_API IndParam;
@@ -29,21 +31,33 @@ namespace detail {
 class CompiledFactorPlan;
 }
 
-vector<Indicator> HKU_API combineCalculateIndicators(const vector<Indicator>& indicators,
-                                                     const KData& kdata, bool tovalue);
-
 /**
  * Indicator implementation class; when defining a new indicator, this class should be inherited
+ *
+ * @note Conventions on declaring and producing results:
+ * 1. The invalid prefix of a result is declared by the implementation itself (m_discard /
+ *    setDiscard); it is never derived by scanning the produced values, and the framework does
+ *    not adjust it for the full calculation.
+ * 2. Window based formulas (MA, SUM, STD, VAR, STDEV, HHV, LLV, WMA, SLOPE, CORR ...): a result
+ *    of a window that is not full has no meaning, so declare data.discard() + window - 1.
+ * 3. Recursive formulas (EMA, SMA, DMA, MACD, AMA, KALMAN, Wilder ATR): seeded from the first bar
+ *    by definition, so declare what the seeding rule needs, which is not the window rule.
+ * 4. An indicator whose window is documented as unlimited when its size is 0 (MDD, MRR) computes
+ *    over the available history on purpose, which is not a warm up value to discard.
+ * 5. An undefined financial state yields Null, never 0.0 or infinity: zero divisor (operators div
+ *    and mod), zero variance (BETA, CORR), all-missing window (SAFTYLOSS), zero baseline (the
+ *    cumulative profit curve). 0.0 collides with legitimate zero values, inf poisons every
+ *    downstream window aggregate; Null (NaN) is the no-data marker that propagates on purpose.
+ *    By convention the r2 result of SLOPE over a constant window is 0.0, a perfect fit.
+ * 6. An implementation whose invalid prefix cannot be derived from its formula may declare it by
+ *    scanning its own output once, e.g. the trailing updateDiscard of ALIGN / REPLACE / BARSSINCE
+ *    / BARSLASTS / IC; the framework never derives it on their behalf.
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
     PARAMETER_SUPPORT_WITH_CHECK
     friend HKU_API std::ostream& operator<<(std::ostream& os, const IndicatorImp& imp);
     friend class detail::CompiledFactorPlan;
-
-    typedef vector<Indicator> IndicatorList;
-    friend IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
-                                                            const KData& kdata, bool tovalue);
 
 public:
     enum OPType : uint8_t {
@@ -77,6 +91,10 @@ public:
     IndicatorImp(const string& name, size_t result_num);
 
     virtual ~IndicatorImp();
+
+    /** Whether two result values are equal: two NaNs match, infinities match exactly, finite
+     *  values within a relative threshold (absolute below magnitude 1) */
+    static bool equalValue(value_t v1, value_t v2) noexcept;
 
     // It owns raw result buffers (m_pBuffer), so an implicit copy would be a shallow copy
     // leading to a double free; copies must go through clone()
@@ -422,7 +440,7 @@ public:
     static void releaseEngine();
 
 protected:
-    static bool ms_enable_increment_calculate;
+    static std::atomic<bool> ms_enable_increment_calculate;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
@@ -633,6 +651,20 @@ inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const 
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
     return step == 0 || pos < discard + step ? discard : pos + 1 - step;
+}
+
+inline bool IndicatorImp::equalValue(value_t v1, value_t v2) noexcept {
+    if (v1 == v2)
+        return true;
+    bool nan1 = std::isnan(v1);
+    if (nan1 || std::isnan(v2))
+        return nan1 == std::isnan(v2);
+    if (std::isinf(v1) || std::isinf(v2))
+        return false;
+    double a1 = std::abs(v1);
+    double a2 = std::abs(v2);
+    double scale = a1 > a2 ? a1 : a2;
+    return std::abs(v1 - v2) <= IND_EQ_THRESHOLD * (scale > 1.0 ? scale : 1.0);
 }
 
 inline bool IndicatorImp::isPythonObject() const noexcept {

@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef SAFTYLOSS_H_
-#define SAFTYLOSS_H_
+#ifndef INDICATOR_CRT_SAFTYLOSS_H_
+#define INDICATOR_CRT_SAFTYLOSS_H_
 
 #include "../Indicator.h"
 
@@ -85,4 +85,4 @@ inline Indicator SAFTYLOSS(const Indicator& data, const Indicator& n1, const Ind
 
 }  // namespace hku
 
-#endif /* SAFTYLOSS_H_ */
+#endif /* INDICATOR_CRT_SAFTYLOSS_H_ */

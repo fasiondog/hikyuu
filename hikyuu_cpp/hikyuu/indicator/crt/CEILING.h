@@ -8,8 +8,8 @@
  */
 
 #pragma once
-#ifndef INDICATOR_CRT_CEIL_H_
-#define INDICATOR_CRT_CEIL_H_
+#ifndef INDICATOR_CRT_CEILING_H_
+#define INDICATOR_CRT_CEILING_H_
 
 #include "CVAL.h"
 
@@ -33,4 +33,4 @@ inline Indicator CEILING(Indicator::value_t val) {
 
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_CEIL_H_ */
+#endif /* INDICATOR_CRT_CEILING_H_ */

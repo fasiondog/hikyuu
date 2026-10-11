@@ -7,7 +7,9 @@
 
 #include "../test_config.h"
 #include <hikyuu/indicator/build_in.h>
+#include <hikyuu/indicator/IndParam.h>
 #include <hikyuu/StockManager.h>
+#include <sstream>
 
 /**
  * @defgroup test_indicator_Indicator test_indicator_Indicator
@@ -16,6 +18,30 @@
  */
 
 /** @par Test points */
+/** @par Test points */
+TEST_CASE("test_indicator_get_result_date_semantics") {
+    PriceList px;
+    DatetimeList dates;
+    Datetime d0(2020, 1, 1);
+    for (size_t i = 0; i < 6; ++i) {
+        px.push_back(10.0 + i);
+        dates.push_back(d0 + Days(i * 2));
+    }
+    Indicator src = PRICELIST(px, dates);
+    REQUIRE_EQ(src.size(), 6);
+    REQUIRE_EQ(src.getByDate(dates[3]), 13.0);
+
+    Indicator snap = src.getResult(0);
+    REQUIRE_EQ(snap.size(), 6);
+
+    /** @arg the snapshot answers by the reference dates of the source, as the source does */
+    CHECK_EQ(snap.getDatetime(0), src.getDatetime(0));
+    CHECK_EQ(snap.getDatetime(5), src.getDatetime(5));
+    CHECK_EQ(snap.getByDate(dates[3]), src.getByDate(dates[3]));
+    /** @arg the snapshot keeps the values of the source */
+    CHECK_EQ(snap[5], src[5]);
+}
+
 TEST_CASE("test_indicator_other") {
     double dx = Null<double>();
     size_t ix = size_t(dx);
@@ -307,7 +333,7 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.discard(), 0);
     for (size_t i = 0; i < 10; ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY((std::isinf(result[i]) || std::isnan(result[i])));
+            CHECK_UNARY(std::isnan(result[i]));
         } else {
             CHECK_EQ(result[i], doctest::Approx(data2[i] / data1[i]));
         }
@@ -330,11 +356,20 @@ TEST_CASE("test_operator_division") {
     CHECK_EQ(result.size(), k.size());
     for (size_t i = 0; i < result.size(); ++i) {
         if (data1[i] == 0.0) {
-            CHECK_UNARY(std::isinf(result[i]) || std::isnan(result[i]));
+            CHECK_UNARY(std::isnan(result[i]));
         } else {
             CHECK_EQ(result[i], doctest::Approx(k[i] / data1[i]));
         }
     }
+
+    /** @arg 0/0 and x/0 yield null, a NaN divisor still propagates NaN */
+    const double nan = Null<double>();
+    Indicator z1 = PRICELIST(PriceList{0.0, 1.0, 2.0});
+    Indicator z2 = PRICELIST(PriceList{0.0, 0.0, nan});
+    Indicator zr = z1 / z2;
+    CHECK_UNARY(std::isnan(zr[0]));
+    CHECK_UNARY(std::isnan(zr[1]));
+    CHECK_UNARY(std::isnan(zr[2]));
 }
 
 #if ENABLE_BENCHMARK_TEST
@@ -926,71 +961,24 @@ TEST_CASE("test_indicator_increment_calculate") {
 }
 
 /** @par Test points */
-TEST_CASE("test_combineCalculateIndicators") {
+TEST_CASE("test_indicator_get_result_snapshot") {
     StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-    KQuery query(0, 20);
-    KData kdata = stock.getKData(query);
+    KData kdata = sm.getStock("sh600000").getKData(KQuery(0, 20));
 
-    /** @arg An empty indicator list */
-    IndicatorList empty_indicators;
-    IndicatorList result = combineCalculateIndicators(empty_indicators, kdata);
-    CHECK_EQ(result.size(), 0);
+    Indicator src = MA(CLOSE(kdata), 5);
+    Indicator snapshot = src.getResult(0);
 
-    /** @arg A single simple indicator */
-    Indicator close_ind = CLOSE();
-    IndicatorList single_indicator{close_ind};
-    result = combineCalculateIndicators(single_indicator, kdata);
-    check_indicator(result[0], CLOSE(kdata));
+    /** @arg the snapshot carries the source context */
+    CHECK_EQ(snapshot.getContext(), kdata);
+    CHECK_EQ(snapshot.getDatetime(0), kdata[0].datetime);
+    CHECK_EQ(snapshot.getByDate(kdata[kdata.size() - 1].datetime), src[kdata.size() - 1]);
 
-    /** @arg Multiple simple indicators */
-    Indicator open_ind = OPEN();
-    Indicator high_ind = HIGH();
-    Indicator low_ind = LOW();
-    IndicatorList multi_indicators{close_ind, open_ind, high_ind, low_ind};
-    result = combineCalculateIndicators(multi_indicators, kdata);
-    CHECK_EQ(result.size(), 4);
-    check_indicator(result[0], CLOSE(kdata));
-    check_indicator(result[1], OPEN(kdata));
-    check_indicator(result[2], HIGH(kdata));
-    check_indicator(result[3], LOW(kdata));
+    /** @arg the snapshot still participates in downstream computation */
+    check_indicator(MA(snapshot, 3), MA(MA(CLOSE(kdata), 5), 3));
+    check_indicator(snapshot + snapshot, src + src);
 
-    /** @arg It contains a composite indicator */
-    Indicator ma_close = MA(CLOSE(), 5);
-    Indicator rsi_close = RSI(CLOSE(), 14);
-    IndicatorList complex_indicators{ma_close, rsi_close};
-    result = combineCalculateIndicators(complex_indicators, kdata);
-    check_indicator(result[0], MA(CLOSE(kdata), 5));
-    check_indicator(result[1], RSI(CLOSE(kdata), 14));
-
-    /** @arg Test the tovalue parameter being true */
-    result = combineCalculateIndicators(complex_indicators, kdata, true);
-    CHECK_EQ(result.size(), 2);
-    // When tovalue is true only the first result column should be returned
-    CHECK_EQ(result[0].getResultNumber(), 1);
-    CHECK_EQ(result[1].getResultNumber(), 1);
-    CHECK_UNARY(result[0].equal(MA(CLOSE(kdata), 5)));
-    CHECK_UNARY(result[1].equal(RSI(CLOSE(kdata), 14)));
-
-    /** @arg Test the different KData contexts */
-    KQuery query2(10, 30);
-    KData kdata2 = stock.getKData(query2);
-    result = combineCalculateIndicators(multi_indicators, kdata2);
-    check_indicator(result[0], CLOSE(kdata2));
-    check_indicator(result[1], OPEN(kdata2));
-    check_indicator(result[2], HIGH(kdata2));
-    check_indicator(result[3], LOW(kdata2));
-
-    /** @arg Test the indicators containing the same child node (they should be deduplicated) */
-    Indicator close1 = CLOSE();
-    Indicator close2 = CLOSE();  // The same indicator
-    IndicatorList duplicate_indicators{close1, close2};
-    result = combineCalculateIndicators(duplicate_indicators, kdata);
-    CHECK_EQ(result.size(), 2);
-    // Although they are the same indicator, they are cloned into different instances
-    CHECK_NE(result[0].getImp().get(), result[1].getImp().get());
-    check_indicator(result[0], CLOSE(kdata));
-    check_indicator(result[1], CLOSE(kdata));
+    /** @arg an out-of-range result index yields an empty indicator */
+    CHECK_UNARY(src.getResult(1).empty());
 }
 
 /** @par Test points */
@@ -1067,8 +1055,8 @@ TEST_CASE("test_indicator_imp_not_copyable") {
 TEST_CASE("test_indicator_execute_mod") {
     const double nan = Null<double>();
     const double inf = std::numeric_limits<double>::infinity();
-    const double i64_min = -9223372036854775808.0;   // -2^63, exactly INT64_MIN
-    const double over = 9223372036854775808.0;       // 2^63, out of int64 range
+    const double i64_min = -9223372036854775808.0;  // -2^63, exactly INT64_MIN
+    const double over = 9223372036854775808.0;      // 2^63, out of int64 range
 
     PriceList a, b;
     for (double v : {7.0, 7.0, nan, inf, i64_min, over}) {
@@ -1533,6 +1521,190 @@ TEST_CASE("test_indicator_get_param_without_imp") {
     }
     CHECK_FALSE(param_message.empty());
     CHECK_UNARY(param_message.find("out_of_range in Parameter::get") != string::npos);
+}
+
+/**
+ * @par Test points
+ * IndicatorImp::_dyn_calculate maps a per-bar dynamic parameter value whose size_t cast would be
+ * UB or silently truncate (NaN / ±Inf / negative / fractional / oversized) to a Null result slot,
+ * matching the previous NaN behavior; valid integer bars still compute normally.
+ */
+TEST_CASE("test_indicator_dyn_step_invalid_bar") {
+    PriceList src;
+    for (int i = 0; i < 12; ++i) {
+        src.push_back(10.0 + i);
+    }
+    Indicator x = PRICELIST(src);
+    const double inf = std::numeric_limits<double>::infinity();
+
+    auto bad_bar_is_null = [&](const PriceList& n_values, size_t bad_idx, const string& tag) {
+        Indicator r = MA(x, IndParam(PRICELIST(n_values)));
+        INFO(tag);
+        CHECK_EQ(r.size(), src.size());
+        CHECK_UNARY(std::isnan(r[bad_idx]));
+        // a later bar with a full window must still be computed (the bars right after the start
+        // have an incomplete window and stay null by design)
+        CHECK_UNARY(!std::isnan(r[5]));
+    };
+
+    /** @arg negative step yields Null at that bar */
+    bad_bar_is_null(PriceList{5.0, 4.0, -1.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2,
+                    "negative");
+    /** @arg fractional step yields Null at that bar */
+    bad_bar_is_null(PriceList{5.0, 4.0, 3.5, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2,
+                    "fractional");
+    /** @arg +Inf step yields Null at that bar */
+    bad_bar_is_null(PriceList{5.0, 4.0, inf, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2,
+                    "inf");
+    /** @arg NaN step still yields Null at that bar (regression guard for the original behavior) */
+    bad_bar_is_null(
+      PriceList{5.0, 4.0, Null<double>(), 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, 2, "nan");
+
+    /** @arg an all-integer series computes normally (no bad bar) */
+    PriceList ok;
+    for (int i = 0; i < 12; ++i) {
+        ok.push_back(3.0);
+    }
+    Indicator r_ok = MA(x, IndParam(PRICELIST(ok)));
+    CHECK_FALSE(r_ok.empty());
+    for (size_t i = r_ok.discard(); i < r_ok.size(); ++i) {
+        CHECK_UNARY(!std::isnan(r_ok[i]));
+    }
+}
+
+/**
+ * @par Test points
+ * equalValue (shared by alike's leaf branch and Indicator::equal): two NaNs match, infinities
+ * match exactly, finite values compare within a relative threshold (absolute below magnitude 1).
+ */
+TEST_CASE("test_indicator_value_equal_threshold") {
+    const double nan = Null<double>();
+    const double inf = std::numeric_limits<double>::infinity();
+
+    /** @arg NaN same-side: equal buffers holding NaN compare equal */
+    Indicator a = PRICELIST(PriceList{nan, 1.0, 2.0});
+    Indicator b = PRICELIST(PriceList{nan, 1.0, 2.0});
+    CHECK_UNARY(a.equal(b));
+
+    /** @arg NaN vs number is not equal */
+    Indicator c = PRICELIST(PriceList{0.0, 1.0, 2.0});
+    CHECK_UNARY(!a.equal(c));
+
+    /** @arg infinities match exactly, opposite signs do not */
+    Indicator i1 = PRICELIST(PriceList{inf, -inf});
+    Indicator i2 = PRICELIST(PriceList{inf, -inf});
+    Indicator i3 = PRICELIST(PriceList{inf, inf});
+    CHECK_UNARY(i1.equal(i2));
+    CHECK_UNARY(!i1.equal(i3));
+
+    /** @arg relative tolerance scales with magnitude */
+    CHECK_UNARY(PRICELIST(PriceList{100000.0}).equal(PRICELIST(PriceList{100000.05})));
+    CHECK_UNARY(!PRICELIST(PriceList{100000.0}).equal(PRICELIST(PriceList{100000.2})));
+
+    /** @arg below magnitude 1 the threshold is absolute (the old hardcoded 1e-4 was looser) */
+    CHECK_UNARY(!PRICELIST(PriceList{0.5}).equal(PRICELIST(PriceList{0.50001})));
+
+    /** @arg alike's leaf branch compares snapshots with NaN / near values */
+    Indicator sn1 = a.getResult(0);
+    CHECK_UNARY(sn1.alike(b.getResult(0)));
+    CHECK_UNARY(sn1.alike(PRICELIST(PriceList{nan, 1.0, 2.0 + 5e-7}).getResult(0)));
+    CHECK_UNARY(!sn1.alike(c.getResult(0)));
+}
+
+/**
+ * @par Test points
+ * A cloned subtree computes independently of its source tree: binding a context to the clone must
+ * not disturb the source, and both must match the direct calculation.
+ */
+TEST_CASE("test_indicator_clone_subtree_isolation") {
+    StockManager& sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(-20));
+
+    Indicator expect = MA(CLOSE(k), 5);
+
+    IndicatorImpPtr subtree;
+    {
+        Indicator formula = MA(CLOSE(), 5) + OPEN();
+        subtree = formula.getImp()->getLeftNode()->clone();
+    }
+    // the source tree is dropped before the clone is used, so a child of the clone that still
+    // points at it is read through a dangling parent link
+    Indicator sub(subtree);
+    sub.setContext(k);
+    check_indicator(sub, expect);
+
+    check_indicator(sub + OPEN(k), expect + OPEN(k));
+}
+
+/**
+ * @par Test points
+ * A child node whose buffer was cleared by the root's setContext cleanup must stay safe to query:
+ * existNan answers false and updateDiscard is a no-op instead of dereferencing a null slot.
+ */
+TEST_CASE("test_indicator_cleared_buffer_accessors") {
+    StockManager& sm = StockManager::instance();
+    KData k1 = sm.getStock("sh000001").getKData(KQuery(-20));
+
+    Indicator f = PRICELIST(PriceList(20, 1.0)) + CLOSE(k1);
+    f.setContext(k1);
+
+    IndicatorImpPtr child = f.getImp()->getLeftNode();
+    REQUIRE_UNARY(child != nullptr);
+    // the root's post-calculation cleanup emptied the data-only child's buffers
+    CHECK_EQ(child->size(), 0u);
+    CHECK_UNARY(!child->existNan(0));
+    child->updateDiscard();
+    child->updateDiscard(true);
+    CHECK_EQ(child->discard(), 0u);
+}
+
+/** @par Test points */
+TEST_CASE("test_indicator_accessors_without_imp") {
+    Indicator empty{IndicatorImpPtr{}};
+
+    /** @arg reading a value of an indicator without an implementation gives null */
+    CHECK_UNARY(std::isnan(empty.get(0, 0)));
+    CHECK_UNARY(std::isnan(empty[0]));
+    CHECK_UNARY(std::isnan(empty.front()));
+    CHECK_UNARY(std::isnan(empty.back()));
+}
+
+/**
+ * @par Test points
+ * getIndParam / getIndParamImp report a missing dynamic parameter through hku::exception with the
+ * parameter name, instead of the bare std::out_of_range thrown by std::map::at.
+ */
+TEST_CASE("test_indicator_dyn_param_accessor_throws") {
+    Indicator ind = MA(CLOSE(), 5);
+    IndicatorImpPtr imp = ind.getImp();
+    REQUIRE_UNARY(imp != nullptr);
+    REQUIRE_UNARY(!imp->haveIndParam("n"));
+
+    /** @arg a missing dynamic parameter name throws hku::exception */
+    CHECK_THROWS_AS(imp->getIndParam("n"), hku::exception);
+    CHECK_THROWS_AS(imp->getIndParamImp("n"), hku::exception);
+
+    /** @arg the notice carries the offending name */
+    string message;
+    try {
+        imp->getIndParamImp("n");
+    } catch (const std::exception& e) {
+        message = e.what();
+    }
+    CHECK_UNARY(message.find("Invalid dynamic parameter name") != string::npos);
+    CHECK_UNARY(message.find("n") != string::npos);
+}
+
+/**
+ * @par Test points
+ * Streaming a default-constructed IndParam (no underlying implementation) must not dereference a
+ * null imp.
+ */
+TEST_CASE("test_indparam_ostream_without_imp") {
+    IndParam p;
+    std::ostringstream oss;
+    oss << p;
+    CHECK_UNARY(oss.str().find("IndParam") != string::npos);
 }
 
 /** @} */

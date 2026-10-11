@@ -40,4 +40,4 @@ inline Indicator CROSS(Indicator::value_t x, Indicator::value_t y) {
 
 }  // namespace hku
 
-#endif /* INDICATOR_CRT_NDAY_H_ */
+#endif /* INDICATOR_CRT_CROSS_H_ */

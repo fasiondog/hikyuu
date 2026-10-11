@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef STD_H_
-#define STD_H_
+#ifndef INDICATOR_CRT_STDEV_H_
+#define INDICATOR_CRT_STDEV_H_
 
 #include "../Indicator.h"
 
@@ -41,4 +41,4 @@ inline Indicator STDEV(const Indicator& data, const Indicator& n) {
 
 }  // namespace hku
 
-#endif /* STD_H_ */
+#endif /* INDICATOR_CRT_STDEV_H_ */

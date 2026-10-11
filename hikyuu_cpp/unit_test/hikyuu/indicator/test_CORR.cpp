@@ -23,6 +23,30 @@ using namespace hku;
  */
 
 /** @par Test points */
+/** @par Test points */
+TEST_CASE("test_CORR_zero_variance") {
+    PriceList flat, moving;
+    for (size_t i = 0; i < 8; ++i) {
+        flat.push_back(5.0);
+        moving.push_back(1.0 + i);
+    }
+
+    /** @arg a constant first input has no correlation, whatever the other input does */
+    Indicator r = CORR(PRICELIST(flat), PRICELIST(moving), 3);
+    REQUIRE_EQ(r.size(), 8);
+    for (size_t i = r.discard(); i < 8; ++i) {
+        CHECK_UNARY(std::isnan(r[i]));
+    }
+    /** @arg the covariance result set keeps its own meaningful zero */
+    CHECK_EQ(r.get(5, 1), 0.0);
+
+    /** @arg a constant second input behaves the same */
+    Indicator r2 = CORR(PRICELIST(moving), PRICELIST(flat), 3);
+    for (size_t i = r2.discard(); i < 8; ++i) {
+        CHECK_UNARY(std::isnan(r2[i]));
+    }
+}
+
 TEST_CASE("test_CORR") {
     Indicator result;
 

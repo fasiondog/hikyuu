@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef PRICELIST_H_
-#define PRICELIST_H_
+#ifndef INDICATOR_CRT_PRICELIST_H_
+#define INDICATOR_CRT_PRICELIST_H_
 
 #include "../Indicator.h"
 
@@ -48,4 +48,4 @@ Indicator PRICELIST(ValueT* data, size_t total) {
 
 }  // namespace hku
 
-#endif /* PRICELIST_H_ */
+#endif /* INDICATOR_CRT_PRICELIST_H_ */

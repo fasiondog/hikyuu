@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef AMA_H_
-#define AMA_H_
+#ifndef INDICATOR_CRT_AMA_H_
+#define INDICATOR_CRT_AMA_H_
 
 #include "../Indicator.h"
 
@@ -113,4 +113,4 @@ inline Indicator AMA(const Indicator& ind, const Indicator& n, const Indicator& 
 
 }  // namespace hku
 
-#endif /* AMA_H_ */
+#endif /* INDICATOR_CRT_AMA_H_ */

@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#pragma once
+
 #include "../Indicator.h"
 
 namespace hku {

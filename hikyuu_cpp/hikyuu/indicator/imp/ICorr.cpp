@@ -56,6 +56,7 @@ void ICorr::_calculate(const Indicator& ind) {
     value_t kx = datax[startPos];
     value_t ky = datay[startPos];
     value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
+    value_t null_price = Null<price_t>();
     value_t ex2 = 0.0, ey2 = 0.0;
     value_t ix, iy;
 
@@ -74,7 +75,7 @@ void ICorr::_calculate(const Indicator& ind) {
     varx = ex2 - ex * ex / n;
     vary = ey2 - ey * ey / n;
     cov = exy - ex * ey / n;
-    dst0[first_end - 1] = cov / std::sqrt(varx * vary);
+    dst0[first_end - 1] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
     dst1[first_end - 1] = cov / (n - 1);
 
     for (size_t i = first_end; i < total; i++) {
@@ -90,7 +91,7 @@ void ICorr::_calculate(const Indicator& ind) {
         varx = (ex2 - ex * ex / n);
         vary = (ey2 - ey * ey / n);
         cov = (exy - ex * ey / n);
-        dst0[i] = cov / std::sqrt(varx * vary);
+        dst0[i] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
         dst1[i] = cov / (n - 1);
     }
 }
@@ -119,6 +120,7 @@ void ICorr::_increment_calculate(const Indicator& ind, size_t start_pos) {
     value_t kx = datax[startPos];
     value_t ky = datay[startPos];
     value_t ex = 0.0, ey = 0.0, exy = 0.0, varx = 0.0, vary = 0.0, cov = 0.0;
+    value_t null_price = Null<price_t>();
     value_t ex2 = 0.0, ey2 = 0.0;
     value_t ix, iy;
 
@@ -153,7 +155,7 @@ void ICorr::_increment_calculate(const Indicator& ind, size_t start_pos) {
         varx = (ex2 - ex * ex / n);
         vary = (ey2 - ey * ey / n);
         cov = (exy - ex * ey / n);
-        dst0[i] = cov / std::sqrt(varx * vary);
+        dst0[i] = varx <= 0.0 || vary <= 0.0 ? null_price : cov / std::sqrt(varx * vary);
         dst1[i] = cov / (n - 1);
     }
 }

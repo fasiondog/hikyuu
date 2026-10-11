@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#ifndef INDICATOR_IMP_MOD_H_
-#define INDICATOR_IMP_MOD_H_
+#ifndef INDICATOR_CRT_MOD_H_
+#define INDICATOR_CRT_MOD_H_
 
 #include "CVAL.h"
 
@@ -43,4 +43,4 @@ inline Indicator MOD(Indicator::value_t ind1, Indicator::value_t ind2) {
 
 }  // namespace hku
 
-#endif /* INDICATOR_IMP_MOD_H_ */
+#endif /* INDICATOR_CRT_MOD_H_ */

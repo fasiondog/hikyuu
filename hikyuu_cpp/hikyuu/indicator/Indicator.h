@@ -14,8 +14,6 @@
 
 namespace hku {
 
-#define IND_EQ_THRESHOLD 0.000001  ///< Threshold for judging float equality
-
 /**
  * Indicator class, concretely implemented by IndicatorImp; when implementing a new indicator,
  * IndicatorImp should be inherited
@@ -93,7 +91,10 @@ public:
     /** Number of the values that need to be discarded in the result */
     size_t discard() const noexcept;
 
-    /** Set the number to discard; it has no effect if it is less than the original discard */
+    /** Set the number to discard; the value is clamped to size(). When it grows, the extended
+     *  leading slots are filled with Null; when it shrinks, the previously discarded slots become
+     *  part of the valid region, so the caller must ensure the data there reflects the current
+     *  calculation (e.g. by going through _readyBuffer or a fresh _calculate beforehand) */
     void setDiscard(size_t discard) noexcept;
 
     /** Update the discard number according to its own values; force=true forces the update,
@@ -359,15 +360,15 @@ inline Indicator::value_t Indicator::operator[](size_t pos) const {
 }
 
 inline Indicator::value_t Indicator::get(size_t pos, size_t num) const {
-    return m_imp->get(pos, num);
+    return m_imp ? m_imp->get(pos, num) : Null<value_t>();
 }
 
 inline Indicator::value_t Indicator::front(size_t num) const {
-    return m_imp->front(num);
+    return m_imp ? m_imp->front(num) : Null<value_t>();
 }
 
 inline Indicator::value_t Indicator::back(size_t num) const {
-    return m_imp->back(num);
+    return m_imp ? m_imp->back(num) : Null<value_t>();
 }
 
 inline Datetime Indicator::getDatetime(size_t pos) const {
@@ -488,7 +489,7 @@ Indicator HKU_API WEAVE(const Indicator& ind1, const Indicator& ind2);
 
 template <typename... Args>
 inline Indicator WEAVE(const Indicator& ind1, const Indicator& ind2, const Args&... others) {
-    HKU_CHECK(sizeof...(others) <= 4, "WEAVE() only support 6 Indicator!");
+    static_assert(sizeof...(others) <= 4, "WEAVE() only support 6 Indicator!");
     Indicator tmp = WEAVE(ind1, ind2);
     return WEAVE(std::move(tmp), others...);
 }
@@ -511,34 +512,6 @@ Indicator HKU_API IF(const Indicator& x, const Indicator& a, const Indicator& b)
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, const Indicator& b);
 Indicator HKU_API IF(const Indicator& x, const Indicator& a, Indicator::value_t b);
 Indicator HKU_API IF(const Indicator& x, Indicator::value_t a, Indicator::value_t b);
-
-/**
- * Combine and calculate multiple indicators
- * @details
- * Combine multiple indicators for a unified calculation, the dependency between the indicators and
- * the context settings are handled automatically. This function gets all the child nodes of all the
- * input indicators and removes the duplicates, then sets the given K-line data context for every
- * indicator, and finally performs the calculation and returns the result.
- *
- * <pre>
- * Usage example:
- * IndicatorList inds = {MA(CLOSE(), 5), MA(CLOSE(), 10), MACD(CLOSE())};
- * IndicatorList results = combineCalculateIndicators(inds, kdata);
- * // results contains all the calculated indicator results
- *
- * // Get the first result column only
- * IndicatorList first_results = combineCalculateIndicators(inds, kdata, true);
- * </pre>
- *
- * @param indicators indicator list, the indicator set to be calculated in combination
- * @param kdata K-line data context, used to set the environment of the indicator calculation
- * @param tovalue whether to return the first result column only, false by default (all the result
- *                columns are returned)
- * @return IndicatorList the calculated indicator result list
- * @ingroup Indicator
- */
-IndicatorList HKU_API combineCalculateIndicators(const IndicatorList& indicators,
-                                                 const KData& kdata, bool tovalue = false);
 
 } /* namespace hku */
 
