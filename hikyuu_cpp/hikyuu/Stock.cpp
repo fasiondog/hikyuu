@@ -1268,7 +1268,10 @@ vector<Block> Stock::getBelongToBlockList(const string& category) const {
     return StockManager::instance().getStockBelongs(*this, category);
 }
 
-// Judge whether it is within the trading time range (the date is not judged)
+// Judge whether the given moment falls within the current day's trading session. The window is
+// anchored to today (openTime/closeTime are TimeDelta offsets added to Datetime::today()), so only
+// the intraday time range is checked; the date itself is not validated as a trading day
+// (holidays/weekends are not excluded) and the input is assumed to be today.
 bool Stock::isTransactionTime(Datetime time) {
     MarketInfo market_info = StockManager::instance().getMarketInfo(market());
     HKU_IF_RETURN(market_info == Null<MarketInfo>(), false);
