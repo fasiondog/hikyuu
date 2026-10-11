@@ -25,6 +25,8 @@ KDataShmBufferImp::KDataShmBufferImp(const Stock& stock, const KQuery& query,
 KDataShmBufferImp::~KDataShmBufferImp() {}
 
 KDataImpPtr KDataShmBufferImp::create(const Stock& stock, const KQuery& query) {
+    HKU_IF_RETURN(query.recoverType() != KQuery::NO_RECOVER, nullptr);
+
     // The view is attempted in the client mode only: the preload of the main process uses
     // KDataSharedBufferImp and does not need the driver again
     HKU_IF_RETURN(!StockManager::instance().isIpcClientMode(), nullptr);
