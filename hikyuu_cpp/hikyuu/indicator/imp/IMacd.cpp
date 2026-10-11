@@ -125,7 +125,7 @@ void IMacd::_dyn_calculate(const Indicator& ind) {
     Indicator n3 =
       iter != m_ind_params.end() ? Indicator(iter->second) : CVAL(ind, getParam<int>("n3"));
 
-    HKU_CHECK(n1.size() == ind.size(), "ind_param(n2).size()={}, ind.size()={}!", n2.size(),
+    HKU_CHECK(n1.size() == ind.size(), "ind_param(n1).size()={}, ind.size()={}!", n1.size(),
               ind.size());
     HKU_CHECK(n2.size() == ind.size(), "ind_param(n2).size()={}, ind.size()={}!", n2.size(),
               ind.size());
