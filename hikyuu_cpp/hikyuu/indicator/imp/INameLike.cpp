@@ -23,13 +23,13 @@ INameLike::INameLike() : IndicatorImp("NAMELIKE", 1) {
 INameLike::~INameLike() {}
 
 void INameLike::_calculate(const Indicator& data) {
-    HKU_IF_RETURN(!isLeaf() && !data.empty(), void());
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
 
     const KData& k = getContext();
     size_t total = k.size();
-    HKU_IF_RETURN(total == 0, void());
-
     _readyBuffer(total, 1);
+    HKU_IF_RETURN(total == 0, void());
 
     string pattern = getParam<string>("pattern");
     string name = k.getStock().name();
