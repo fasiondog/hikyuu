@@ -133,6 +133,9 @@ public:
     /** Get the maximum trade quantity */
     double maxTradeNumber() const noexcept;
 
+    /** @note Mutate m_data's scalar fields WITHOUT a lock; call only during init /
+     *  loadAllStocks reload (no concurrent readers), else a data race with market()/code()
+     *  readers. */
     void market(const string& market_);
     void code(const string& code_);
     void name(const string& name_);

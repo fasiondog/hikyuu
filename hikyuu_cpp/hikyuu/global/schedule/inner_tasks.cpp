@@ -56,9 +56,13 @@ void reloadHikyuuTask() {
     //    with the reload;
     // 2. The spot agent is stopped first, so no new spot events arrive during the reload;
     // 3. Concurrent reads from other threads (e.g. a strategy event loop) are safe by
-    //    design: the data layer uses fine-grained locks (per-stock per-ktype kdata buffer
-    //    mutex, stock dict shared_mutex, weight/finance mutexes) and the K-line preload
-    //    always runs in the background with queries served from the driver in real time.
+    //    design for the heavy data (K-line buffer mutexes per stock per ktype, the stock dict
+    //    shared_mutex, weight / finance mutexes): the K-line preload always runs in the
+    //    background with queries served from the driver in real time. The only exception is the
+    //    scalar identity fields (market / code / name / type / valid / ...), which loadAllStocks
+    //    rewrites in place WITHOUT a lock; those must not be read concurrently with this reload:
+    //    in practice the daily reload is the sole writer and these fields are rarely reassigned,
+    //    so the window is negligible, but it is not lock-protected.
     // Stop the market data receiving first
     auto* agent = getGlobalSpotAgent();
     bool agent_running = agent->isRunning();
