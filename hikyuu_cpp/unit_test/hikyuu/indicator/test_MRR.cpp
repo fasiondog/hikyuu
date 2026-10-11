@@ -174,6 +174,50 @@ TEST_CASE("test_MRR_with_nan") {
     CHECK_GE(mrr[6], 0.0);
 }
 
+/** @par Test points: ST-010 three-path consistency on invalid inputs (full window) */
+TEST_CASE("test_MRR_nan_seed_in_full_window") {
+    // n=0 normalizes to total-m_discard (full window). Old static branch seeded
+    // `pre_min = src[m_discard]` without a validity check; NaN at the seed made every IEEE
+    // comparison false, max_rr stuck at 0, silently writing 0.0 downstream. The unified
+    // MrrAccum skip-invalid path is aligned with _increment_calculate / IMdd.
+    PriceList data{std::numeric_limits<double>::quiet_NaN(), 1.0, 2.0, 0.5, 1.5};
+    Indicator mrr = MRR(PRICELIST(data), 0);
+    CHECK_UNARY(std::isnan(mrr[0]));
+    CHECK_EQ(mrr[1], 0.0);
+    CHECK_EQ(mrr[2], 100.0);
+    CHECK_EQ(mrr[3], 100.0);
+    CHECK_EQ(mrr[4], 200.0);
+}
+
+/** @par Test points: ST-010 negative price must not contaminate the running minimum */
+TEST_CASE("test_MRR_nonpositive_in_full_window") {
+    // Old static branch's `src[i] < pre_min` allowed a negative src[i] to overwrite pre_min, then
+    // division flipped the sign of rr downstream. The new branch skips v <= 0 uniformly.
+    PriceList data{-1.0, 2.0, 1.0, 4.0, 2.0};
+    Indicator mrr = MRR(PRICELIST(data), 0);
+    CHECK_UNARY(std::isnan(mrr[0]));
+    CHECK_EQ(mrr[1], 0.0);
+    CHECK_EQ(mrr[2], 0.0);
+    CHECK_EQ(mrr[3], 300.0);
+    CHECK_EQ(mrr[4], 300.0);
+}
+
+/** @par Test points: ST-010 NaN handling is identical in warmup and incremental regions */
+TEST_CASE("test_MRR_nan_in_warmup_and_increment") {
+    // n=4, total=6: warmup covers [0..3], incremental covers [4..5]. Both must write Null when
+    // src[i] itself is invalid, aligned with the IMdd convention.
+    PriceList data{1.0, std::numeric_limits<double>::quiet_NaN(), 2.0,
+                   1.5, std::numeric_limits<double>::quiet_NaN(), 3.0};
+    Indicator mrr = MRR(PRICELIST(data), 4);
+    CHECK_UNARY(std::isnan(mrr[1]));  // warmup NaN -> Null
+    CHECK_UNARY(std::isnan(mrr[4]));  // incremental outer NaN -> Null
+    // i=2 warmup: valid {1.0, 2.0} (j=1 NaN skipped), run_min=1.0, rr=1 -> 100
+    CHECK_EQ(mrr[2], 100.0);
+    // i=5 incremental: window [2..5]={2.0, 1.5, NaN, 3.0}, run_min=1.5, rr at 3.0 = 3/1.5-1=1 ->
+    // 100
+    CHECK_EQ(mrr[5], 100.0);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

@@ -13,6 +13,41 @@ BOOST_CLASS_EXPORT(hku::IMrr)
 
 namespace hku {
 
+namespace {
+// One-pass accumulator for MRR over a window [window_left..i]: run_min is the accumulated
+// minimum of the valid points, max_rr is the maximum of src[j]/run_min_j - 1 within the window.
+// NaN and non-positive values are skipped uniformly across the static warmup, the full-window
+// branch and the incremental scan (ST-010: the three paths previously diverged on how invalid
+// inputs were treated).
+struct MrrAccum {
+    Indicator::value_t run_min = 0.0;
+    Indicator::value_t max_rr = 0.0;
+    bool has_valid = false;
+
+    void feed(Indicator::value_t v) {
+        if (std::isnan(v) || v <= 0.0) {
+            return;
+        }
+        if (!has_valid) {
+            run_min = v;
+            has_valid = true;
+            return;
+        }
+        if (v < run_min) {
+            run_min = v;
+        }
+        Indicator::value_t rr = v / run_min - 1.0;
+        if (rr > max_rr) {
+            max_rr = rr;
+        }
+    }
+
+    Indicator::value_t result() const {
+        return max_rr * 100.0;
+    }
+};
+}  // namespace
+
 IMrr::IMrr() : IndicatorImp("MRR", 1) {
     setParam<int>("n", 0);
 }
@@ -40,42 +75,27 @@ void IMrr::_calculate(const Indicator& ind) {
 
     if (n == 1) {
         for (size_t i = m_discard; i < total; ++i) {
-            dst[i] = 0.0;
+            dst[i] = (std::isnan(src[i]) || src[i] <= 0.0) ? Null<value_t>() : 0.0;
         }
         return;
     }
 
-    if (n == total - m_discard) {
-        value_t pre_min = src[m_discard];
-        value_t max_rr = 0.0;
-        for (size_t i = m_discard; i < total; i++) {
-            if (src[i] < pre_min || pre_min == 0.) {
-                pre_min = src[i];
-            }
-            value_t rr = (src[i] <= pre_min) ? 0.0 : (src[i] / pre_min - 1.0);
-            if (rr > max_rr) {
-                max_rr = rr;
-            }
-            dst[i] = max_rr * 100.0;
+    // Warmup (window_left = m_discard, growing prefix), then delegate the sliding tail to
+    // _increment_calculate. When n == total - m_discard the warmup covers everything and the
+    // incremental call is skipped.
+    MrrAccum acc;
+    size_t warmup_end = m_discard + n;
+    for (size_t i = m_discard; i < warmup_end; ++i) {
+        if (std::isnan(src[i]) || src[i] <= 0.0) {
+            dst[i] = Null<value_t>();
+            continue;
         }
-        return;
+        acc.feed(src[i]);
+        dst[i] = acc.result();
     }
 
-    value_t pre_min = src[m_discard];
-    value_t max_rr = 0.0;
-    for (size_t i = m_discard; i < m_discard + n; ++i) {
-        if (src[i] < pre_min || pre_min == 0.) {
-            pre_min = src[i];
-        }
-        value_t rr = (src[i] <= pre_min) ? 0.0 : (src[i] / pre_min - 1.0);
-        if (rr > max_rr) {
-            max_rr = rr;
-        }
-        dst[i] = max_rr * 100.0;
-    }
-
-    if (m_discard + n < total) {
-        _increment_calculate(ind, m_discard + n);
+    if (warmup_end < total) {
+        _increment_calculate(ind, warmup_end);
     }
 }
 
@@ -103,40 +123,17 @@ void IMrr::_increment_calculate(const Indicator& ind, size_t start_pos) {
     // and it degenerates to an O(n) brute force scan per point, using the run_min base to
     // guarantee the correctness. It is symmetric to the IMdd fix.
     for (size_t i = start_pos; i < total; ++i) {
-        Indicator::value_t current_price = src[i];
-        if (std::isnan(current_price) || current_price <= 0.0) {
-            // An invalid point does not write dst[i] and keeps the original value, the same as the
-            // original semantics
+        if (std::isnan(src[i]) || src[i] <= 0.0) {
+            dst[i] = Null<value_t>();
             continue;
         }
-
         size_t window_left = i + 1 - n;
-        Indicator::value_t run_min =
-          0.0;  // Assigned at the first valid point, avoiding NaN pollution
-        Indicator::value_t window_max_rr = 0.0;
-        bool has_valid = false;
+        MrrAccum acc;
         for (size_t j = window_left; j <= i; ++j) {
-            Indicator::value_t v = src[j];
-            if (std::isnan(v) || v <= 0.0) {
-                continue;
-            }
-            if (!has_valid) {
-                run_min = v;  // Initialize run_min at the first valid point
-                has_valid = true;
-                continue;  // For the first point rr = v/v - 1 = 0, skip it
-            }
-            if (v < run_min) {
-                run_min = v;
-            }
-            // run_min is always > 0 (the data is constrained to be positive), the division is safe
-            Indicator::value_t rr = v / run_min - 1.0;
-            if (rr > window_max_rr) {
-                window_max_rr = rr;
-            }
+            acc.feed(src[j]);
         }
-
-        if (has_valid) {
-            dst[i] = window_max_rr * 100.0;
+        if (acc.has_valid) {
+            dst[i] = acc.result();
         }
     }
 }
