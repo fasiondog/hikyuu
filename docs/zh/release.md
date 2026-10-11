@@ -42,6 +42,12 @@
 * feat(allocatefunds): 恢复 Python `crtAF` 便捷构造（L1 `_allocate`，可选注入 L2 `_to_targets` / L3 `_check_risk`）
 * feat(MultiSystem): 新增 `adjust-mode` / `delay-to-trading-day` 参数，支持将调仓模式内化为调仓日表
 
+**🐞 缺陷修复**
+
+* fix(KData): 复权修复为固定基准口径：前复权锚定数据最后一日、后复权锚定数据起点，复权结果与查询区间无关，`Stock::getKData` 与 `kdata.getKData` 结果一致；修复后复权 KData 子查询二次复权、扩区拼接尾部偏移、周线及以上聚合首日量额双计、相位同日创新高时最高价漏更新、日线缺口越界读、扩展周期误用日线复权公式、分钟线窗口首根漏调整、空 KData 访问 front()/back() 崩溃等问题；复权调整为只对价格复权，成交量与成交额保持原始值（对齐 Wind / 聚宽等主流数据源口径，详见 Query 复权口径说明）
+* fix(indicator): ADJ_FACTOR 系列复权因子指标改为固定基准计算，与 RECOVER_EQUAL_BACKWARD 同区间逐值一致；ADJ_VOL 口径调整为 VOL / ADJ_FACTOR（配合复权只调价，保持成交额不变）
+* fix(stock): 修复小写 K 线类型经预载缓冲取 K 线崩溃、getMarketValue 对早于首根 K 线的查询回退最新价（未来数据泄漏，改为返回 0）、K 线缓冲释放与查询并发竞态、blockDriver 未判空、reload 并发竞争
+
 ## 2.8.3 - 2026年10月1日
 
 **🚀 新增特性**

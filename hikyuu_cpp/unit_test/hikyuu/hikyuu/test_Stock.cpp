@@ -2134,6 +2134,79 @@ TEST_CASE("test_Stock_concurrent_buffer_release_query") {
     CHECK(true);  // survived without crash/UAF
 }
 
+/** @par Test points
+ * The zero-copy KData view holds a shared_ptr copy of the buffer, so it stays valid (a snapshot)
+ * after a concurrent releaseKDataBuffer. */
+TEST_CASE("test_Stock_kdata_view_survives_buffer_release") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+
+    /** @arg Create KData views on the buffered day K-line, then release the buffer */
+    stock.loadKDataToBuffer(KQuery::DAY);
+    KData k1 = stock.getKData(KQuery(0, 10, KQuery::DAY));
+    KData k2 = stock.getKData(KQueryByDate(Datetime(200001010000), Datetime(200012310000),
+                                          KQuery::DAY));
+    REQUIRE(k1.size() == 10);
+    REQUIRE(k2.size() > 0);
+
+    auto capture = [](const KData& k) {
+        vector<KRecord> ref(k.size());
+        for (size_t i = 0; i < k.size(); ++i) {
+            ref[i] = k.getKRecord(i);
+        }
+        return ref;
+    };
+    auto check_same_as_ref = [](const KData& k, const vector<KRecord>& ref) {
+        REQUIRE(k.size() == ref.size());
+        for (size_t i = 0; i < ref.size(); ++i) {
+            CHECK(k.getKRecord(i) == ref[i]);
+        }
+    };
+    vector<KRecord> ref1 = capture(k1), ref2 = capture(k2);
+
+    stock.releaseKDataBuffer(KQuery::DAY);
+    CHECK_EQ(stock.isBuffer(KQuery::DAY), false);
+
+    /** @arg The released views remain readable and identical (snapshot) */
+    check_same_as_ref(k1, ref1);
+    check_same_as_ref(k2, ref2);
+
+    /** @arg Reload the buffer; the old views are not affected by the new buffer */
+    stock.loadKDataToBuffer(KQuery::DAY);
+    check_same_as_ref(k1, ref1);
+    check_same_as_ref(k2, ref2);
+
+    /** @arg Concurrent buffer release while KData views are created and read */
+    std::atomic<bool> stop{false};
+    std::thread writer([&]() {
+        while (!stop) {
+            stock.releaseKDataBuffer(KQuery::DAY);
+            stock.loadKDataToBuffer(KQuery::DAY);
+        }
+    });
+
+    std::vector<std::thread> readers;
+    for (int i = 0; i < 4; ++i) {
+        readers.emplace_back([&]() {
+            for (int n = 0; n < 5000 && !stop; ++n) {
+                KData k = stock.getKData(KQuery(-30, Null<size_t>(), KQuery::DAY));
+                size_t sz = k.size();
+                for (size_t j = 0; j < sz; ++j) {
+                    KRecord r = k.getKRecord(j);
+                    CHECK(!r.datetime.isNull());
+                }
+            }
+        });
+    }
+
+    for (auto& t : readers) {
+        t.join();
+    }
+    stop = true;
+    writer.join();
+    CHECK(true);  // survived without crash/UAF
+}
+
 /** @par Test points */
 TEST_CASE("test_Stock_id_map") {
     /** @arg Two empty stock */

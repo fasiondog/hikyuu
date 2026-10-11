@@ -48,8 +48,6 @@ KData::KData() : m_imp(get_null_kdata_imp()) {}
 KData::KData(KDataImpPtr imp) : m_imp(imp ? imp : get_null_kdata_imp()) {}
 
 KData::KData(const Stock& stock, const KQuery& query) {
-    // On a reload or setKDateList an existing KData risks having invalid data (but there is no
-    // memory access problem)
     if (stock.isNull()) {
         m_imp = get_null_kdata_imp();
         return;

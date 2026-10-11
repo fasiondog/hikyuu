@@ -383,7 +383,7 @@ struct HKU_API Stock::Data {
 
     std::unordered_set<string> m_ktype_preload;  // Records whether the K-line data of this security
                                                  // needs to be preloaded
-    unordered_map<string, KRecordList*> pKData;
+    unordered_map<string, std::shared_ptr<KRecordList>> pKData;
     unordered_map<string, std::shared_mutex*> pMutex;
     unordered_map<string, Datetime> m_lastUpdate;  // Last update time of each K-line data type
 
