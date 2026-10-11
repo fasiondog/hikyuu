@@ -664,8 +664,8 @@ vector<EqualRecoverFactor> Stock::getEqualRecoverFactors() const {
             if (weight.suogu() != 0.0) {
                 denominator = weight.suogu();
             } else {
-                price_t change = 0.1 * (weight.countAsGift() + weight.countForSell() +
-                                        weight.increasement());
+                price_t change =
+                  0.1 * (weight.countAsGift() + weight.countForSell() + weight.increasement());
                 denominator = 1.0 + change;
                 temp = close + weight.priceForSell() * change - 0.1 * weight.bonus();
             }
@@ -1572,8 +1572,10 @@ void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
     history_finance.shrink_to_fit();
     if (!m_data->m_history_finance_ready) {
         std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
-        m_data->m_history_finance = std::move(history_finance);
-        m_data->m_history_finance_ready = true;
+        if (!m_data->m_history_finance_ready) {
+            m_data->m_history_finance = std::move(history_finance);
+            m_data->m_history_finance_ready = true;
+        }
     }
 }
 
