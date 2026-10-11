@@ -15,6 +15,9 @@ namespace hku {
 
 /**
  * MACD moving average convergence / divergence
+ * @note Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA
+ *       stay frozen at the prior values, no permanent contamination); leading non-finite values
+ *       leave the internal EMA states unseeded until the first finite observation.
  * @param n1 short-term EMA time window (>= 1), 12 by default
  * @param n2 long-term EMA time window (>= 1), 26 by default
  * @param n3 EMA smoothing time window of (short-term EMA - long-term EMA) (>= 1), 9 by default

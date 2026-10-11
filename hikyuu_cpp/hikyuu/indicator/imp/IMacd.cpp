@@ -77,11 +77,22 @@ void IMacd::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     size_t total = data.size();
     for (size_t i = start_pos; i < total; ++i) {
-        ema1 = (src[i] - ema1) * m1 + ema1;
-        ema2 = (src[i] - ema2) * m2 + ema2;
-        diff = ema1 - ema2;
-        dea = diff * m3 + dea - dea * m3;
-        bar = diff - dea;
+        if (std::isfinite(src[i])) {
+            if (!std::isfinite(ema1)) {
+                ema1 = src[i];
+            } else {
+                ema1 = (src[i] - ema1) * m1 + ema1;
+            }
+            if (!std::isfinite(ema2)) {
+                ema2 = src[i];
+            } else {
+                ema2 = (src[i] - ema2) * m2 + ema2;
+            }
+            diff = ema1 - ema2;
+            dea = diff * m3 + dea - dea * m3;
+            bar = diff - dea;
+        }
+        // non-finite input: hold the previous outputs, states stay frozen
         dst0[i] = bar;
         dst1[i] = diff;
         dst2[i] = dea;
@@ -103,11 +114,21 @@ void IMacd::_dyn_one_circle(const Indicator& ind, size_t curPos, int n1, int n2,
     price_t dea = 0.0;
     price_t bar = 0.0;
     for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
-        ema1 = (src[i] - ema1) * m1 + ema1;
-        ema2 = (src[i] - ema2) * m2 + ema2;
-        diff = ema1 - ema2;
-        dea = diff * m3 + dea - dea * m3;
-        bar = diff - dea;
+        if (std::isfinite(src[i])) {
+            if (!std::isfinite(ema1)) {
+                ema1 = src[i];
+            } else {
+                ema1 = (src[i] - ema1) * m1 + ema1;
+            }
+            if (!std::isfinite(ema2)) {
+                ema2 = src[i];
+            } else {
+                ema2 = (src[i] - ema2) * m2 + ema2;
+            }
+            diff = ema1 - ema2;
+            dea = diff * m3 + dea - dea * m3;
+            bar = diff - dea;
+        }
     }
     _set(bar, curPos, 0);
     _set(diff, curPos, 1);

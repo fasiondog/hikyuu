@@ -1492,6 +1492,8 @@
 
     平滑异同移动平均线
     
+    NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），三线输出（BAR/DIFF/DEA）保持上一根值不变，不会一 NaN/Inf 就污染尾部；前导非有限值使内部 EMA 保持未播种，直到首个有限观测。
+
     :param Indicator data: 输入数据
     :param int n1: 短期EMA时间窗（>=1）
     :param int n2: 长期EMA时间窗（>=1）

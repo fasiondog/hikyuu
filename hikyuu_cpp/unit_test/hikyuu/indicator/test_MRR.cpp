@@ -132,6 +132,17 @@ TEST_CASE("test_MRR") {
     CHECK_EQ(mrr_lookahead[4], doctest::Approx(140.0).epsilon(0.0001));
 }
 
+/** @par Test point: ±Inf inputs are treated as invalid (no Inf poisoning downstream) */
+TEST_CASE("test_MRR_inf_input") {
+    price_t inf_v = std::numeric_limits<price_t>::infinity();
+    PriceList data{1.0, inf_v, 1.5, 0.5, 1.2};
+    Indicator r = MRR(PRICELIST(data), 3);
+    for (size_t i = 0; i < r.size(); i++) {
+        /** @arg every output is finite or Null, never ±Inf */
+        CHECK_UNARY(std::isnan(r[i]) || std::isfinite(r[i]));
+    }
+}
+
 /** @par Test point: the full calculation equals the incremental one (setContext is called
  * repeatedly on the same instance to trigger _increment_calculate) */
 TEST_CASE("test_MRR_increment_equivalence") {

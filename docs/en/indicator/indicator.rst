@@ -1495,6 +1495,8 @@ Built-in Technical Indicators
 
     The Moving Average Convergence Divergence
     
+    Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA stay frozen at the prior values, no permanent contamination); leading non-finite values leave the internal EMA states unseeded until the first finite observation.
+
     :param Indicator data: the input data
     :param int n1: the short-term EMA time window (>= 1)
     :param int n2: the long-term EMA time window (>= 1)

@@ -255,6 +255,24 @@ TEST_CASE("test_MACD_dyn") {
  * the tail diverged. Incremental calculate is now disabled; this case guards that re-enabling it
  * means carrying the EMA state, not inferring it from the results.
  */
+/** @par Test points: NaN input holds the previous three outputs instead of permanently poisoning
+ * the tail */
+TEST_CASE("test_MACD_nan_hold") {
+    price_t nan = Null<price_t>();
+    Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
+    Indicator r = MACD(data, 2, 3, 2);
+    /** @arg i=3 (NaN input) holds all three outputs at their prior values */
+    CHECK_EQ(r[3], r[2]);
+    CHECK_EQ(r.get(3, 1), r.get(2, 1));
+    CHECK_EQ(r.get(3, 2), r.get(2, 2));
+    /** @arg after the NaN, the recursion resumes from the held states (all finite) */
+    for (size_t i = 4; i < 6; i++) {
+        CHECK_UNARY(std::isfinite(r[i]));
+        CHECK_UNARY(std::isfinite(r.get(i, 1)));
+        CHECK_UNARY(std::isfinite(r.get(i, 2)));
+    }
+}
+
 TEST_CASE("test_MACD_increment_equivalence") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");

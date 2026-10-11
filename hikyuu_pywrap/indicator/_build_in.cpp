@@ -930,6 +930,8 @@ void export_Indicator_build_in(py::module& m) {
 
     The Moving Average Convergence Divergence
 
+    Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA stay frozen at the prior values, no permanent contamination); leading non-finite values leave the internal EMA states unseeded until the first finite observation.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n1: the short-term EMA time window
     :param int|Indicator|IndParam n2: the long-term EMA time window
@@ -1133,7 +1135,7 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: the indicator1
     :param Indicator ref_ind: the indicator 2
-    :param int n: calculate the correlation coefficient of the data between the two inds by the specified length n. If it is 0, use the length of the input ind.
+    :param int n: the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the Pearson corr & sample cov over [discard(), i] (discard becomes 1, bar 0 is nan)
     :param bool fill_null: fill the missing dates with the nan values during the date alignment
     :rtype: Indicator)");
 
@@ -1147,7 +1149,7 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: the indicator1
     :param Indicator ref_ind: the indicator 2
-    :param int n: calculate the covariance of the data between the two inds by the specified length n. If it is 0, use the length of the input ind.
+    :param int n: the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the sample cov over [discard(), i] (discard becomes 1, bar 0 is nan)
     :param bool fill_null: fill the missing dates with the nan values during the date alignment
     :rtype: Indicator)");
 
@@ -1167,7 +1169,7 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: the input indicator, such as the stock return indicator
     :param Indicator ref_ind: the reference indicator, such as the market return indicator
-    :param int n: the rolling window size (greater than 2 or equal to 0). If it is 0, use the length of the input ind.
+    :param int n: the rolling window size (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the beta over [discard(), i] (discard becomes 1, bar 0 is nan)
     :param bool fill_null: fill the missing dates with the nan values during the date alignment
     :rtype: Indicator)");
 
@@ -2300,7 +2302,7 @@ void export_Indicator_build_in(py::module& m) {
 
     :param Indicator ind: the input parameter 1
     :param Indicator ref_ind: the input parameter 2
-    :param int n: the rolling window (greater than 2 or equal to 0); when it is equal to 0, it means that n actually uses the length of the ind
+    :param int n: the rolling window (>= 2); when it is 0 an expanding window is used, i.e. dst[i] is the rank corr over [max(ind.discard(), ref.discard()), i] (discard becomes 1, bar 0 is nan)
     :param bool fill_null: the missing data is filled with nan; otherwise, use the data less than and closest to the corresponding date)");
 
     m.def("SKEW", SKEW_1, py::arg("n") = 10);
@@ -2312,7 +2314,7 @@ void export_Indicator_build_in(py::module& m) {
     Calculate the unadjusted population skewness within the N periods
 
     :param Indicator data: the input data
-    :param int n: the N-day time window (greater than or equal to 3 or equal to 0); when it is equal to 0, use the actual length of the input data
+    :param int n: the N-day time window (>= 3); when it is 0 an expanding window is used, i.e. dst[i] is the skewness over [discard(), i] (discard becomes discard()+2, the first two bars are nan)
     :rtype: Indicator)");
 
     m.def("KURT", KURT_1, py::arg("n") = 10);
@@ -2324,7 +2326,7 @@ void export_Indicator_build_in(py::module& m) {
     Calculate the excess kurtosis within the N periods (the unadjusted population kurtosis - 3)
 
     :param Indicator data: the input data
-    :param int n: the N-day time window (greater than or equal to 4 or equal to 0); when it is equal to 0, use the actual length of the input data
+    :param int n: the N-day time window (>= 4); when it is 0 an expanding window is used, i.e. dst[i] is the kurtosis over [discard(), i] (discard becomes discard()+3, the first three bars are nan)
     :rtype: Indicator)");
 
     // IR(const Indicator& p, const Indicator& b, int n = 100)

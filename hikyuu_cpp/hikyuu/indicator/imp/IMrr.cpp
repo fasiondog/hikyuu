@@ -26,7 +26,7 @@ struct MrrAccum {
     bool has_valid = false;
 
     void feed(Indicator::value_t v) {
-        if (std::isnan(v) || v <= 0.0) {
+        if (!std::isfinite(v) || v <= 0.0) {
             return;
         }
         if (!has_valid) {
@@ -76,7 +76,7 @@ void IMrr::_calculate(const Indicator& ind) {
 
     if (n == 1) {
         for (size_t i = m_discard; i < total; ++i) {
-            dst[i] = (std::isnan(src[i]) || src[i] <= 0.0) ? Null<value_t>() : 0.0;
+            dst[i] = (!std::isfinite(src[i]) || src[i] <= 0.0) ? Null<value_t>() : 0.0;
         }
         return;
     }
@@ -87,7 +87,7 @@ void IMrr::_calculate(const Indicator& ind) {
     MrrAccum acc;
     size_t warmup_end = m_discard + n;
     for (size_t i = m_discard; i < warmup_end; ++i) {
-        if (std::isnan(src[i]) || src[i] <= 0.0) {
+        if (!std::isfinite(src[i]) || src[i] <= 0.0) {
             dst[i] = Null<value_t>();
             continue;
         }
@@ -124,7 +124,7 @@ void IMrr::_increment_calculate(const Indicator& ind, size_t start_pos) {
     // and it degenerates to an O(n) brute force scan per point, using the run_min base to
     // guarantee the correctness. It is symmetric to the IMdd fix.
     for (size_t i = start_pos; i < total; ++i) {
-        if (std::isnan(src[i]) || src[i] <= 0.0) {
+        if (!std::isfinite(src[i]) || src[i] <= 0.0) {
             dst[i] = Null<value_t>();
             continue;
         }
