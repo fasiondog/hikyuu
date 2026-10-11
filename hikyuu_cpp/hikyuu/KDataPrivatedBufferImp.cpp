@@ -246,6 +246,9 @@ void KDataPrivatedBufferImp::_recoverForward() {
             temp = weightIter->priceForSell() * change - 0.1 * weightIter->bonus();
         }
 
+        if (denominator == 0.0)
+            continue;
+
         if (denominator == 1.0 && temp == 0.0)
             continue;
 
@@ -319,6 +322,9 @@ void KDataPrivatedBufferImp::_recoverBackward() {
             denominator = 1.0 + change;  // (1 + the change ratio of the outstanding shares)
             temp = 0.1 * weightIter->bonus() - weightIter->priceForSell() * change;
         }
+
+        if (denominator == 0.0)
+            continue;
 
         if (denominator == 1.0 && temp == 0.0)
             continue;
