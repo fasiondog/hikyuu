@@ -77,7 +77,9 @@ typedef shared_ptr<KRecordList> KRecordListPtr;
 HKU_API std::ostream& operator<<(std::ostream&, const KRecord&);
 
 /**
- * Compare whether two KRecord are equal, generally used in tests only
+ * Compare whether two KRecord are equal, generally used in tests only. The comparison is
+ * approximate: prices use a small absolute tolerance, while transAmount/transCount use a
+ * tolerance scaled to their (potentially very large) magnitude
  * @ingroup StockManage
  */
 bool HKU_API operator==(const KRecord& d1, const KRecord& d2);
