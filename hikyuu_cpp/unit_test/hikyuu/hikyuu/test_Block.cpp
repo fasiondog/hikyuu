@@ -123,4 +123,17 @@ TEST_CASE("test_Block_2") {
     CHECK(blk.empty());
 }
 
+/** @par Test points */
+TEST_CASE("test_Block_getStockList_null_safe") {
+    /** @arg The default-constructed (Null) Block must not dereference a null m_data */
+    Block blk;
+    CHECK(blk.isNull());
+
+    StockList all = blk.getStockList();
+    CHECK(all.empty());
+
+    StockList filtered = blk.getStockList([](const Stock&) { return true; });
+    CHECK(filtered.empty());
+}
+
 /** @} */

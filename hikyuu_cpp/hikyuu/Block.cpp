@@ -102,6 +102,7 @@ Stock Block::get(const string& market_code) const {
 
 StockList Block::getStockList(std::function<bool(const Stock&)>&& filter) const {
     StockList ret;
+    HKU_IF_RETURN(!m_data, ret);
     ret.reserve(size());
     auto iter = m_data->m_stockDict.begin();
     if (filter) {
