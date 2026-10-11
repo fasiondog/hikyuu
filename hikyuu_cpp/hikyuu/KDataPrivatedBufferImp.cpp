@@ -348,8 +348,8 @@ void KDataPrivatedBufferImp::_recoverEqualForward() {
     Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
 
     // The forward multipliers are the reciprocals of the backward ones: the ex-rights after this
-    // buffer lower every bar, the ones inside it apply to the bars before the ex-rights day. Only the
-    // price is adjusted, see the note in _recoverForward
+    // buffer lower every bar, the ones inside it apply to the bars before the ex-rights day. Only
+    // the price is adjusted, see the note in _recoverForward
     price_t seed_price = 1.0;
     size_t pos = 0;
     for (const auto& factor : m_stock.getEqualRecoverFactors()) {
@@ -400,8 +400,8 @@ void KDataPrivatedBufferImp::_recoverEqualBackward() {
     Datetime end_date(m_buffer.back().datetime + m_query.kTypeInSeconds());
 
     // The equal-ratio multipliers are window independent: the ex-rights before the window scale the
-    // whole buffer (the fixed baseline), the ones inside it apply from the ex-rights day on. Only the
-    // price is adjusted, see the note in _recoverForward
+    // whole buffer (the fixed baseline), the ones inside it apply from the ex-rights day on. Only
+    // the price is adjusted, see the note in _recoverForward
     price_t seed_price = 1.0;
     size_t pos = 0;
     for (const auto& factor : m_stock.getEqualRecoverFactors()) {
@@ -490,6 +490,8 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByIndex(const KQuery& query
 }
 
 KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query) const {
+    // Defensive: the upper layer never routes an empty self here; fall back to a full rebuild
+    HKU_IF_RETURN(m_buffer.empty(), std::make_shared<KDataPrivatedBufferImp>(m_stock, query));
     Datetime new_start_date = query.startDatetime();
     Datetime new_end_date = query.endDatetime();
     const auto& old_start_date = m_buffer.front().datetime;
@@ -522,7 +524,8 @@ KDataImpPtr KDataPrivatedBufferImp::_getOtherFromSelfByDate(const KQuery& query)
             p->m_buffer.resize(copy_len);
             std::copy(m_buffer.begin() + new_start_pos_in_old,
                       m_buffer.begin() + new_end_pos_in_old, p->m_buffer.begin());
-            // The copied slice is already recovered with the same anchor as self, never recover again
+            // The copied slice is already recovered with the same anchor as self, never recover
+            // again
             return KDataImpPtr(p);
         }
     }
