@@ -34,23 +34,17 @@ DatetimeList KDataPrivatedBufferImp::getDatetimeList() const {
 }
 
 size_t KDataPrivatedBufferImp::startPos() const {
-    if (!m_have_pos_in_stock) {
-        _getPosInStock();
-    }
+    std::call_once(m_pos_once, [this] { _getPosInStock(); });
     return m_start;
 }
 
 size_t KDataPrivatedBufferImp::endPos() const {
-    if (!m_have_pos_in_stock) {
-        _getPosInStock();
-    }
+    std::call_once(m_pos_once, [this] { _getPosInStock(); });
     return m_end;
 }
 
 size_t KDataPrivatedBufferImp::lastPos() const {
-    if (!m_have_pos_in_stock) {
-        _getPosInStock();
-    }
+    std::call_once(m_pos_once, [this] { _getPosInStock(); });
     return m_end == 0 ? 0 : m_end - 1;
 }
 
@@ -60,7 +54,6 @@ void KDataPrivatedBufferImp::_getPosInStock() const {
         m_start = 0;
         m_end = 0;
     }
-    m_have_pos_in_stock = true;
 }
 
 size_t KDataPrivatedBufferImp::getPos(const Datetime& datetime) const noexcept {

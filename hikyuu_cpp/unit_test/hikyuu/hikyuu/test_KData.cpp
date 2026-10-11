@@ -7,6 +7,9 @@
 
 #include "doctest/doctest.h"
 #include <cmath>
+#include <atomic>
+#include <thread>
+#include <vector>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/KQuery.h>
 #include <hikyuu/KData.h>
@@ -2464,6 +2467,52 @@ TEST_CASE("test_KData_other") {
     CHECK_EQ(p1, nullptr);
     p2 = k1.data();
     CHECK_EQ(p2, nullptr);
+}
+
+/** @par Test points
+ * The position in the stock is computed lazily once: concurrent access from copies sharing the same
+ * imp must return the reference values */
+TEST_CASE("test_KData_start_pos_concurrent") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+
+    KData kdata = stock.getKData(KQuery(100, 200, KQuery::DAY, KQuery::BACKWARD));
+    KData kweek = stock.getKData(KQuery(0, 20, KQuery::WEEK));
+    REQUIRE(kdata.size() == 100);
+    REQUIRE(kweek.size() == 20);
+
+    /** @arg The reference values come from independent imps, never touched by the threads */
+    KData ref = stock.getKData(KQuery(100, 200, KQuery::DAY, KQuery::BACKWARD));
+    KData ref_week = stock.getKData(KQuery(0, 20, KQuery::WEEK));
+    size_t start = ref.startPos(), end = ref.endPos();
+    size_t week_start = ref_week.startPos(), week_end = ref_week.endPos();
+    CHECK_EQ(start, 100);
+    CHECK_EQ(end, 200);
+
+    /** @arg Concurrent lazy initialization from copies sharing the imp */
+    std::atomic<size_t> mismatch{0};
+    std::vector<std::thread> threads;
+    for (int i = 0; i < 4; ++i) {
+        threads.emplace_back([&]() {
+            for (int n = 0; n < 2000; ++n) {
+                KData copy = kdata;
+                if (copy.startPos() != start || copy.endPos() != end ||
+                    copy.lastPos() != end - 1 ||
+                    copy.getPosInStock(copy[0].datetime) != start) {
+                    ++mismatch;
+                }
+                if (kweek.startPos() != week_start || kweek.endPos() != week_end ||
+                    kweek.lastPos() != week_end - 1) {
+                    ++mismatch;
+                }
+            }
+        });
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
+    CHECK_EQ(mismatch.load(), 0);
 }
 
 /** @} */
