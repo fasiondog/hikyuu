@@ -39,8 +39,7 @@ void IAtr::_calculate(const Indicator& data) {
 
     int n = getParam<int>("n");
 
-    // Use n+1 instead of n, to avoid the inconsistency between the first values of MA(TR) and ATR
-    m_discard = n + 1;
+    m_discard = n;
     if (m_discard >= total) {
         m_discard = total;
         return;
@@ -80,9 +79,7 @@ void IAtr::_increment_calculate(const Indicator& data, size_t start_pos) {
 
     int n = getParam<int>("n");
 
-    // Same convention as _calculate: hide the first value to stay consistent with MA(TR). The
-    // framework zeroes m_discard before calling, and updateDiscard would otherwise stop at dst[n].
-    m_discard = n + 1;
+    m_discard = n;
 
     auto* k = kdata.data();
     vector<value_t> buf(total);

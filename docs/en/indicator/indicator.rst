@@ -405,7 +405,7 @@ Built-in Technical Indicators
     The Average True Range, the simple moving average of the true range TR
 
     :param KData kdata: the source data to calculate
-    :param int n: the period window for calculating the average, which must be an integer greater than 1
+    :param int n: the period window for calculating the average (>= 1)
     :rtype: Indicator
 
 

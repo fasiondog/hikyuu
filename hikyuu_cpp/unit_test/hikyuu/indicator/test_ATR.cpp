@@ -13,7 +13,6 @@
 #include <hikyuu/indicator/crt/ATR.h>
 #include <hikyuu/indicator/crt/TR.h>
 #include <hikyuu/indicator/crt/MA.h>
-#include <hikyuu/indicator/crt/DISCARD.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 
 using namespace hku;
@@ -31,9 +30,9 @@ TEST_CASE("test_ATR") {
     auto atr = ATR(k, 10);
     CHECK_EQ(atr.name(), "ATR");
     CHECK_EQ(atr.size(), k.size());
-    CHECK_EQ(atr.discard(), 11);
+    CHECK_EQ(atr.discard(), 10);
 
-    auto expect = DISCARD(MA(TR(), 10), 11)(k);
+    auto expect = MA(TR(), 10)(k);
     for (size_t i = atr.discard(); i < atr.size(); ++i) {
         CHECK_EQ(atr[i], doctest::Approx(expect[i]));
     }
