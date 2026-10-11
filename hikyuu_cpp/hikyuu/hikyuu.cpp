@@ -57,7 +57,7 @@ void HKU_API getConfigFromIni(const string& config_file_name, Parameter& basePar
                          config.get("hikyuu", "quotation_server", "ipc:///tmp/hikyuu_real.ipc"));
 
     hkuParam.set<string>("reload_time", config.get("hikyuu", "reload_time", "00:00"));
-    hkuParam.set<string>("lazy_preload", config.get("hikyuu", "lazy_preload", "False"));
+    hkuParam.set<bool>("lazy_preload", config.getBool("hikyuu", "lazy_preload", "False"));
 
     // Load the ex-rights/ex-dividend data
     hkuParam.set<bool>("load_stock_weight", config.getBool("hikyuu", "load_stock_weight", "True"));
