@@ -352,6 +352,9 @@ public:
 
 public:
     typedef StockMapIterator const_iterator;
+    /** Iterate over the loaded securities. The iterators point into the internal dictionary and
+     * are invalidated by a concurrent reload (loadAllStocks rehashes it under the write lock):
+     * iterate only while no reload is in progress, or take a snapshot via getStockList instead */
     const_iterator begin() const {
         return m_stockDict.begin();
     }
