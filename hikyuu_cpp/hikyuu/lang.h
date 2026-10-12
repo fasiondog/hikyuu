@@ -25,6 +25,8 @@ std::string HKU_API lang_htr(const char *id);
 // Get the translation by context
 std::string HKU_API lang_hctr(const char *ctx, const char *id);
 
+// On a formatting error (placeholder mismatch) both htr and chtr fall back to the untranslated key
+
 template <typename... Args>
 std::string htr(const char *key, Args &&...args) {
     std::string fmt_str = lang_htr(key);

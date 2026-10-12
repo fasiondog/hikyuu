@@ -1133,7 +1133,7 @@ void export_Indicator_build_in(py::module& m) {
     Calculate the correlation coefficient of ind and ref_ind. There are two results in the return; the first is the correlation coefficient, and the second is the covariance.
     Equivalent to CORR(ref_ind, n)(ind).
 
-    Non-finite inputs (NaN or ±Inf) that make the variance or covariance non-finite yield Null for result(0), aligning with the library's "no non-finite value flows downstream" contract.
+    Non-finite inputs (NaN or ±Inf) that make the variance or covariance non-finite yield Null for result(0), aligning with the library's "no non-finite value flows downstream" contract; result(1) still follows the raw covariance arithmetic and may be non-finite.
 
     :param Indicator ind: the indicator1
     :param Indicator ref_ind: the indicator 2

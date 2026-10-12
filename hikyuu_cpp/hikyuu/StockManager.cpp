@@ -1321,7 +1321,7 @@ void StockManager::loadHistoryFinanceField() {
     auto fields = m_baseInfoDriver->getHistoryFinanceField();
     for (const auto& field : fields) {
         if (field.first < 1) {
-            HKU_WARN("Invalid history finance field index (must be >= 1), skipped: {},",
+            HKU_WARN("Invalid history finance field index (must be >= 1), skipped: {}",
                      field.first);
             continue;
         }
