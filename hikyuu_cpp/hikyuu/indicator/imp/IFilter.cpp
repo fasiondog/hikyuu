@@ -43,7 +43,7 @@ void IFilter::_calculate(const Indicator& ind) {
     int n = getParam<int>("n");
     if (0 == n) {
         for (size_t i = m_discard; i < total; i++) {
-            dst[i] = (!std::isnan(src[i]) && src[i] != 0.0) ? 1.0 : 0.0;
+            dst[i] = (std::isfinite(src[i]) && src[i] != 0.0) ? 1.0 : 0.0;
         }
         return;
     }
@@ -63,7 +63,7 @@ void IFilter::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     size_t i = start_pos;
     while (i < total) {
-        if (std::isnan(src[i]) || src[i] == 0.0) {
+        if (!std::isfinite(src[i]) || src[i] == 0.0) {
             dst[i] = 0.0;
             i++;
         } else {
@@ -82,8 +82,8 @@ void IFilter::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
 void IFilter::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     price_t val = get(curPos);
-    HKU_IF_RETURN(!std::isnan(val) && val == 0.0, void());
-    if (std::isnan(ind[curPos]) || ind[curPos] == 0.0) {
+    HKU_IF_RETURN(std::isfinite(val) && val == 0.0, void());
+    if (!std::isfinite(ind[curPos]) || ind[curPos] == 0.0) {
         _set(0.0, curPos);
     } else {
         _set(1.0, curPos);

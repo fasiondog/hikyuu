@@ -9,6 +9,7 @@
 
 #include "doctest/doctest.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BARSLAST.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -105,6 +106,18 @@ TEST_CASE("test_BARSLAST_nan_is_not_a_condition") {
     Indicator x = PRICELIST(a);
     Indicator result = BARSLAST(x);
     CHECK_EQ(result.size(), 5);
+    CHECK_EQ(result.discard(), 5);
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_BARSLAST_inf_is_not_a_condition") {
+    double inf = std::numeric_limits<double>::infinity();
+    PriceList a{0, 0, inf, 0, 0};
+    Indicator x = PRICELIST(a);
+    Indicator result = BARSLAST(x);
     CHECK_EQ(result.discard(), 5);
     for (size_t i = 0; i < result.size(); ++i) {
         CHECK_UNARY(std::isnan(result[i]));

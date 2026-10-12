@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
@@ -113,6 +114,18 @@ TEST_CASE("test_COUNT_nan_is_not_a_condition") {
     CHECK_EQ(result.discard(), 2);
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_COUNT_inf_is_not_a_condition") {
+    double inf = std::numeric_limits<double>::infinity();
+    PriceList a{0, 0, inf, 0, 0};
+    Indicator x = PRICELIST(a);
+    Indicator result = COUNT(x, 3);
+    CHECK_EQ(result.discard(), 2);
     for (size_t i = result.discard(); i < result.size(); ++i) {
         CHECK_EQ(result[i], 0);
     }

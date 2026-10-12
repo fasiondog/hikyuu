@@ -48,7 +48,7 @@ void IBarsSince::_calculate(const Indicator &ind) {
             if (found) {
                 dst[i] = i - pos;
             } else {
-                if (!std::isnan(src[i]) && src[i] != 0.0) {
+                if (std::isfinite(src[i]) && src[i] != 0.0) {
                     found = true;
                     pos = i;
                     dst[i] = 0.0;
@@ -62,7 +62,7 @@ void IBarsSince::_calculate(const Indicator &ind) {
 
     if (1 == n) {
         for (size_t i = m_discard; i < total; ++i) {
-            if (!std::isnan(src[i]) && src[i] != 0.0) {
+            if (std::isfinite(src[i]) && src[i] != 0.0) {
                 dst[i] = 0.0;
             } else {
                 dst[i] = Null<value_t>();
@@ -77,7 +77,7 @@ void IBarsSince::_calculate(const Indicator &ind) {
         size_t pos = 0;
         bool found = false;
         for (size_t j = i + 1 - n; j <= i; j++) {
-            if (!std::isnan(src[j]) && src[j] != 0.0) {
+            if (std::isfinite(src[j]) && src[j] != 0.0) {
                 pos = i - j;
                 found = true;
                 break;

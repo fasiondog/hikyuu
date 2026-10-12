@@ -45,7 +45,7 @@ void IBackset::_calculate(const Indicator& ind) {
     // below the n-th bar is not overwritten afterwards.
     size_t fill = 0;
     for (size_t i = total; i-- > m_discard;) {
-        if (!std::isnan(src[i]) && src[i] != 0.0) {
+        if (std::isfinite(src[i]) && src[i] != 0.0) {
             fill = n;
         }
         dst[i] = fill > 0 ? 1.0 : 0.0;
@@ -64,7 +64,7 @@ void IBackset::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t ste
 
     bool found = false;
     for (size_t i = curPos; i < end; i++) {
-        if (!std::isnan(ind[i]) && ind[i] != 0.0) {
+        if (std::isfinite(ind[i]) && ind[i] != 0.0) {
             found = true;
             break;
         }

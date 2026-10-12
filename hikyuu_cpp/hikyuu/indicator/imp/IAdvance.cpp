@@ -96,7 +96,7 @@ void IAdvance::_calculate(const Indicator& ind) {
                 break;
             }
 
-            if (!std::isnan(xdata[i]) && xdata[i] > 0.0) {
+            if (std::isfinite(xdata[i]) && xdata[i] > 0.0) {
                 dst[i] = std::isnan(dst[i]) ? 1 : dst[i] + 1;
             }
         }
@@ -153,7 +153,7 @@ void IAdvance::_increment_calculate(const Indicator& data, size_t start_pos) {
                 break;
             }
 
-            if (!std::isnan(xdata[i]) && xdata[i] > 0.0) {
+            if (std::isfinite(xdata[i]) && xdata[i] > 0.0) {
                 dst[i + start_pos - 1] =
                   std::isnan(dst[i + start_pos - 1]) ? 1 : dst[i + start_pos - 1] + 1;
             }

@@ -6,6 +6,7 @@
  */
 #include "doctest/doctest.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/EXIST.h>
@@ -200,6 +201,18 @@ TEST_CASE("test_EXIST_nan_is_not_a_condition") {
     CHECK_EQ(result.discard(), 2);
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
+    for (size_t i = result.discard(); i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0);
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_EXIST_inf_is_not_a_condition") {
+    double inf = std::numeric_limits<double>::infinity();
+    PriceList a{0, 0, inf, 0, 0};
+    Indicator x = PRICELIST(a);
+    Indicator result = EXIST(x, 3);
+    CHECK_EQ(result.discard(), 2);
     for (size_t i = result.discard(); i < result.size(); ++i) {
         CHECK_EQ(result[i], 0);
     }
