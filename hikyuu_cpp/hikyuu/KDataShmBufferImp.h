@@ -68,11 +68,11 @@ public:
     }
 
     virtual const KRecord& front() const override {
-        return m_data[0];
+        return (m_size == 0 || !m_data) ? KRecord::NullKRecord : m_data[0];
     }
 
     virtual const KRecord& back() const override {
-        return m_data[m_size - 1];
+        return (m_size == 0 || !m_data) ? KRecord::NullKRecord : m_data[m_size - 1];
     }
 
     virtual const KRecord* data() const noexcept override {
