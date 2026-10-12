@@ -7,6 +7,7 @@
  *      Author: hikyuu
  */
 
+#include <climits>
 #include "IBarsLasts.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -43,7 +44,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
 
     // Special case: there is only one valid data point
     if (total == ind_discard + 1) {
-        if (!std::isnan(src[ind_discard]) && src[ind_discard] != 0.0 && n == 1) {
+        if (std::isfinite(src[ind_discard]) && src[ind_discard] != 0.0 && n == 1) {
             dst[ind_discard] = 0.0;
             m_discard = ind_discard;
         } else {
@@ -55,7 +56,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
     // Record the positions where the condition holds
     std::vector<size_t> true_positions;
     for (size_t i = ind_discard; i < total; i++) {
-        if (!std::isnan(src[i]) && src[i] != 0.0) {
+        if (std::isfinite(src[i]) && src[i] != 0.0) {
             true_positions.push_back(i);
         }
     }
@@ -74,7 +75,7 @@ void IBarsLasts::_calculate(const Indicator& ind) {
     size_t count = 0;  // Records how many times the condition has held
 
     for (size_t i = total - 1; i >= first_valid_pos; i--) {
-        if (!std::isnan(src[i]) && src[i] != 0.0) {
+        if (std::isfinite(src[i]) && src[i] != 0.0) {
             count++;
             size_t target_idx = true_positions.size() - count;
 
@@ -116,41 +117,28 @@ void IBarsLasts::_dyn_calculate(const Indicator& ind) {
     auto* dst = this->data();
     auto const* n_data = ind_param.data();
 
+    std::vector<size_t> true_positions;
+    for (size_t j = ind_discard; j < m_discard; j++) {
+        if (std::isfinite(src[j]) && src[j] != 0.0) {
+            true_positions.push_back(j);
+        }
+    }
+
     // Calculate for every position separately
     for (size_t i = m_discard; i < total; i++) {
-        int n = static_cast<int>(n_data[i]);
+        if (std::isfinite(src[i]) && src[i] != 0.0) {
+            true_positions.push_back(i);
+        }
 
-        // Parameter validation: if n <= 0, return NaN
-        if (n <= 0) {
+        double nv = n_data[i];
+        if (!std::isfinite(nv) || nv < 1.0 || nv > static_cast<double>(INT_MAX)) {
             dst[i] = Null<price_t>();
             continue;
         }
-
-        // Search backward from the current position for the position where the condition holds for
-        // the n-th time
-        int count = 0;
-        size_t target_pos = Null<size_t>();
-
-        for (size_t j = i; j >= ind_discard; j--) {
-            if (!std::isnan(src[j]) && src[j] != 0.0) {
-                count++;
-                if (count == n) {
-                    target_pos = j;
-                    break;
-                }
-            }
-            if (j == ind_discard) {
-                break;
-            }
-        }
-
-        // If the position where the condition holds for the n-th time is found, calculate the
-        // distance
-        if (target_pos != Null<size_t>()) {
-            dst[i] = static_cast<price_t>(i - target_pos);
-        } else {
-            dst[i] = Null<price_t>();
-        }
+        size_t n = static_cast<size_t>(nv);
+        dst[i] = true_positions.size() >= n
+                   ? static_cast<price_t>(i - true_positions[true_positions.size() - n])
+                   : Null<price_t>();
     }
 
     updateDiscard();

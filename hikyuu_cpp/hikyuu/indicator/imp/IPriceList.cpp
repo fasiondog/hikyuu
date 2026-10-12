@@ -30,7 +30,7 @@ IPriceList::IPriceList(PriceList&& data, int in_discard) : IndicatorImp("PRICELI
     setParam<int>("discard", in_discard);
 }
 
-IPriceList::IPriceList(size_t size, double value, int discard) {
+IPriceList::IPriceList(size_t size, double value, int discard) : IndicatorImp("PRICELIST", 1) {
     setParam<PriceList>("data", PriceList(size, value));
     setParam<int>("discard", discard);
 }

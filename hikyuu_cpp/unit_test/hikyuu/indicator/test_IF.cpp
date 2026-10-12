@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/CVAL.h>
@@ -124,6 +125,21 @@ TEST_CASE("test_IF_multi_result") {
             }
             CHECK_EQ(b, doctest::Approx(a).epsilon(0.0001));
         }
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_IF_non_finite_condition") {
+    KData kdata = getStock("SH600000").getKData(KQuery(-10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    /** @arg a non-finite condition takes the false branch instead of firing */
+    Indicator x = IF(CVAL(std::numeric_limits<double>::infinity()), CVAL(1), CVAL(0));
+    x.setContext(kdata);
+    for (size_t i = 0; i < x.size(); ++i) {
+        CHECK_EQ(x[i], 0);
     }
 }
 

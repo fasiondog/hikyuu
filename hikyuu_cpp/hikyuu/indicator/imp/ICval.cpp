@@ -58,13 +58,11 @@ void ICval::_calculate(const Indicator& data) {
         }
 
         total = k.size();
-        if (0 == total) {
-            return;
-        }
-
+        m_discard = (size_t)discard > total ? total : (size_t)discard;
         _readyBuffer(total, 1);
+        HKU_IF_RETURN(0 == total, void());
         auto* dst = this->data(0);
-        for (size_t i = 0; i < total; ++i) {
+        for (size_t i = m_discard; i < total; ++i) {
             dst[i] = value;
         }
         return;
@@ -81,6 +79,7 @@ void ICval::_calculate(const Indicator& data) {
     if (ret_num == 0) {
         ret_num = 1;
     }
+    m_result_num = ret_num;
     _readyBuffer(total, ret_num);
 
     for (size_t r = 0; r < ret_num; ++r) {

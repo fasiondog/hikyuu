@@ -25,6 +25,10 @@ public:
     ITime();
     virtual ~ITime() override;
     virtual void _checkParam(const string& name) const override;
+
+private:
+    DatetimeList _getDatetimeList(const Indicator& data) const;
+    void _doCalculate(const DatetimeList& ds, size_t start_pos);
 };
 
 }  // namespace hku

@@ -18,6 +18,7 @@ namespace hku {
  * It always trades with the minimum trade quantity of the stock and calculates the op value of the
  * equity curve; the system is valid when the equity curve is higher than op, otherwise it is
  * invalid.
+ * @note A non-finite op value is treated as invalid
  * @param op
  * @return
  */

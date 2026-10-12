@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "ConditionBase.h"
 
@@ -86,13 +87,13 @@ void ConditionBase::_addValid(const Datetime& datetime, price_t value) {
 bool ConditionBase::isValid(const Datetime& datetime) {
     auto iter = m_date_index.find(datetime);
     HKU_IF_RETURN(iter == m_date_index.end(), false);
-    return m_values[iter->second] > 0.;
+    return std::isfinite(m_values[iter->second]) && m_values[iter->second] > 0.;
 }
 
 DatetimeList ConditionBase::getDatetimeList() const {
     DatetimeList result;
     for (const auto& d : m_date_index) {
-        if (m_values[d.second] > 0.0) {
+        if (std::isfinite(m_values[d.second]) && m_values[d.second] > 0.0) {
             result.emplace_back(d.first);
         }
     }

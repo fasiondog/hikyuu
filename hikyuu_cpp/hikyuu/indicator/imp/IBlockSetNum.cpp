@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include "IBlockSetNum.h"
 #include "../Indicator.h"
 #include "../../StockManager.h"
@@ -62,10 +63,10 @@ void IBlockSetNum::_calculate(const Indicator& ind) {
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
         const Datetime& start_date = iter->startDatetime();
         Datetime last_date = iter->lastDatetime().isNull() ? Datetime::max() : iter->lastDatetime();
-        for (size_t i = 0; i < total; i++) {
-            if (dates[i] >= start_date && dates[i] <= last_date) {
-                dst[i]++;
-            }
+        size_t lo = std::lower_bound(dates.begin(), dates.end(), start_date) - dates.begin();
+        size_t hi = std::upper_bound(dates.begin(), dates.end(), last_date) - dates.begin();
+        for (size_t i = lo; i < hi; i++) {
+            dst[i]++;
         }
     }
 }
@@ -90,10 +91,12 @@ void IBlockSetNum::_increment_calculate(const Indicator& ind, size_t start_pos) 
     for (auto iter = block.begin(); iter != block.end(); ++iter) {
         const Datetime& start_date = iter->startDatetime();
         Datetime last_date = iter->lastDatetime().isNull() ? Datetime::max() : iter->lastDatetime();
-        for (size_t i = start_pos; i < total; i++) {
-            if (dates[i] >= start_date && dates[i] <= last_date) {
-                dst[i]++;
-            }
+        size_t lo =
+          std::lower_bound(dates.begin() + start_pos, dates.end(), start_date) - dates.begin();
+        size_t hi =
+          std::upper_bound(dates.begin() + start_pos, dates.end(), last_date) - dates.begin();
+        for (size_t i = lo; i < hi; i++) {
+            dst[i]++;
         }
     }
 }

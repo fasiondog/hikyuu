@@ -65,6 +65,8 @@ void IBarsCount::_calculate(const Indicator& ind) {
         for (size_t i = m_discard; i < total; i++) {
             dst[i] = 1 + k_start_pos + i;
         }
+    } else {
+        m_discard = total;
     }
 
     return;

@@ -37,15 +37,12 @@ void IEvery::_calculate(const Indicator& ind) {
         auto const* src = ind.data();
         auto* dst = this->data();
         m_discard = ind.discard();
+        bool any_false = false;
         for (size_t i = m_discard; i < total; i++) {
-            price_t every = 1.0;
-            for (size_t j = m_discard; j <= i; j++) {
-                if (std::isnan(src[j]) || src[j] == 0.0) {
-                    every = 0.0;
-                    break;
-                }
+            if (!any_false && (!std::isfinite(src[i]) || src[i] == 0.0)) {
+                any_false = true;
             }
-            dst[i] = every;
+            dst[i] = any_false ? 0.0 : 1.0;
         }
         return;
     }
@@ -76,7 +73,7 @@ void IEvery::_increment_calculate(const Indicator& ind, size_t start_pos) {
     price_t every = 1;
     size_t pre_pos = start_pos + n - 1;
     for (size_t i = start_pos + 1 - n; i <= start_pos; i++) {
-        if (std::isnan(src[i]) || src[i] == 0) {
+        if (!std::isfinite(src[i]) || src[i] == 0) {
             pre_pos = i;
             every = 0;
         }
@@ -87,9 +84,9 @@ void IEvery::_increment_calculate(const Indicator& ind, size_t start_pos) {
         size_t j = i + 1 - n;
         if (pre_pos < j) {
             pre_pos = j;
-            every = (std::isnan(src[j]) || src[j] == 0) ? 0 : 1;
+            every = (!std::isfinite(src[j]) || src[j] == 0) ? 0 : 1;
         }
-        if (std::isnan(src[i]) || src[i] == 0) {
+        if (!std::isfinite(src[i]) || src[i] == 0) {
             pre_pos = i;
             every = 0;
         }
@@ -98,7 +95,7 @@ void IEvery::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     every = 1;
     for (size_t i = total - n; i < total; i++) {
-        if (std::isnan(src[i]) || src[i] == 0) {
+        if (!std::isfinite(src[i]) || src[i] == 0) {
             every = 0;
             break;
         }
@@ -118,7 +115,7 @@ void IEvery::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
 
     price_t every = 1.0;
     for (size_t i = start; i <= curPos; i++) {
-        if (std::isnan(ind[i]) || ind[i] == 0.0) {
+        if (!std::isfinite(ind[i]) || ind[i] == 0.0) {
             every = 0.0;
             break;
         }

@@ -94,6 +94,61 @@ TEST_CASE("test_CVAL") {
 }
 
 /** @par Test points */
+TEST_CASE("test_CVAL_leaf_context_discard") {
+    KData k = StockManager::instance().getStock("sh600004").getKData(KQuery(-10));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg leaf CVAL with discard honors the param once bound to a context */
+    Indicator c = CVAL(100, 2)(k);
+    CHECK_EQ(c.size(), 10);
+    CHECK_EQ(c.discard(), 2);
+    CHECK_UNARY(std::isnan(c[0]));
+    CHECK_UNARY(std::isnan(c[1]));
+    for (size_t i = 2; i < c.size(); ++i) {
+        CHECK_EQ(c[i], 100);
+    }
+
+    /** @arg discard beyond the context length: fully discarded */
+    c = CVAL(100, 20)(k);
+    CHECK_EQ(c.size(), 10);
+    CHECK_EQ(c.discard(), 10);
+
+    /** @arg default discard keeps the whole context constant */
+    c = CVAL(100)(k);
+    CHECK_EQ(c.size(), 10);
+    CHECK_EQ(c.discard(), 0);
+    for (size_t i = 0; i < c.size(); ++i) {
+        CHECK_EQ(c[i], 100);
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_CVAL_leaf_if_scalar_branch") {
+    KData k = StockManager::instance().getStock("sh600004").getKData(KQuery(-10));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg the IF scalar branch degenerates to a bare CVAL leaf covering the context */
+    Indicator cond = CLOSE() > OPEN();
+    cond.setContext(k);
+    Indicator high = HIGH();
+    high.setContext(k);
+    Indicator r = IF(cond, HIGH(), 1.0)(k);
+    CHECK_EQ(r.size(), k.size());
+    CHECK_EQ(r.discard(), 0);
+    for (size_t i = 0; i < r.size(); ++i) {
+        if (cond[i] > 0.0) {
+            CHECK_EQ(r[i], high[i]);
+        } else {
+            CHECK_EQ(r[i], 1.0);
+        }
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_CVAL_nested_size_propagation") {
     // Before the fix: one=CVAL(10) inside CVAL(one, 10) -> goes through Indicator::operator()
     //   alike (a new empty shell ICval and the calculated CVAL10) is true -> short-circuits and
@@ -186,5 +241,34 @@ TEST_CASE("test_CVAL_export") {
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
+
+/** @par Test points */
+TEST_CASE("test_CVAL_empty_context_clears_stale") {
+    KData k10 = StockManager::instance().getStock("sh600004").getKData(KQuery(-10));
+    KData k_empty = StockManager::instance()
+                      .getStock("sh600004")
+                      .getKData(KQueryByDate(Datetime(2077, 1, 1), Datetime(2078, 1, 1)));
+    if (k10.empty() || !k_empty.empty()) {
+        return;
+    }
+
+    /** @arg the context-less factory form keeps the scalar size-1 shape */
+    Indicator c = CVAL(100);
+    CHECK_EQ(c.size(), 1);
+    CHECK_EQ(c.discard(), 0);
+    CHECK_EQ(c[0], 100);
+
+    /** @arg binding an empty context yields an empty result instead of the stale buffer */
+    Indicator r = c(k_empty);
+    CHECK_EQ(r.size(), 0);
+    CHECK_EQ(r.discard(), 0);
+
+    /** @arg rebinding from a real context to an empty one clears the old data */
+    c = CVAL(100)(k10);
+    CHECK_EQ(c.size(), 10);
+    r = c(k_empty);
+    CHECK_EQ(r.size(), 0);
+    CHECK_EQ(r.discard(), 0);
+}
 
 /** @} */

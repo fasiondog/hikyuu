@@ -6,6 +6,7 @@
  */
 
 #include "doctest/doctest.h"
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/condition/crt/CN_OPLine.h>
@@ -100,6 +101,23 @@ TEST_CASE("test_OPLineCondition_op_with_discard") {
     CHECK_NOTHROW(cn->setTO(kdata));
     CHECK_EQ(cn->size(), kdata.size());
     CHECK_EQ(std::dynamic_pointer_cast<CountingSG>(sg)->calculateCount(), 1);
+}
+
+/** @par Test point: a non-finite OP line value is not a valid condition day */
+TEST_CASE("test_OPLineCondition_non_finite") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    REQUIRE_FALSE(stock.isNull());
+    KData kdata = stock.getKData(KQuery(0, 60, KQuery::DAY));
+    REQUIRE_EQ(kdata.size(), 60);
+
+    SGPtr sg = make_shared<CountingSG>();
+    /** @arg profit - (-inf) = +inf, so no bar is a valid condition day */
+    CNPtr cn = CN_OPLine(PRICELIST(kdata.size(), -std::numeric_limits<double>::infinity()));
+    cn->setSG(sg);
+    cn->setTO(kdata);
+    CHECK_EQ(cn->size(), kdata.size());
+    CHECK_EQ(cn->getDatetimeList().size(), 0);
 }
 
 /** @} */

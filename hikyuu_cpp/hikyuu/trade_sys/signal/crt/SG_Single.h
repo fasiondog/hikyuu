@@ -26,6 +26,7 @@ namespace hku {
  *     or Buy When AMA - AMA[2] > filter
  *     or Buy When AMA - AMA[3] > filter
  * </pre>
+ * @note A non-finite input value fires no signal
  * @param ind
  * @param filter_n N-day period
  * @param filter_p filter percentage
@@ -45,6 +46,7 @@ SignalPtr HKU_API SG_Single(const Indicator& ind, int filter_n = 20, double filt
  *     Buy  When AMA - lowest(AMA,n) > filter
  *     Sell When highest(AMA, n) - AMA > filter
  * </pre>
+ * @note A non-finite input value fires no signal
  * @param ind
  * @param filter_n N-day period
  * @param filter_p filter percentage

@@ -28,6 +28,7 @@ TEST_CASE("test_VIGOR") {
     /** @arg When kdata is empty */
     vigor = VIGOR(kdata, 1);
     CHECK_EQ(vigor.size(), 0);
+    CHECK_EQ(vigor.discard(), 0);
     CHECK_EQ(vigor.empty(), true);
 
     /** @arg The normal case */

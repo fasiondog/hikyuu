@@ -17,6 +17,8 @@ namespace hku {
 /**
  * Calculate the sum. SUM(X,N) sums up X within N periods; when N=0 it starts from the first valid
  * value.
+ * @note As a pure accumulator, a non-finite value in the window propagates through the result by
+ * contract (AGENTS.md), unlike the mean/extreme family which ignores missing points.
 
  * @param n N-day time window
 
@@ -28,6 +30,8 @@ Indicator HKU_API SUM(const IndParam& n);
 /**
  * Calculate the sum. SUM(X,N) sums up X within N periods; when N=0 it starts from the first valid
  * value.
+ * @note As a pure accumulator, a non-finite value in the window propagates through the result by
+ * contract (AGENTS.md), unlike the mean/extreme family which ignores missing points.
 
  * @param ind the data to be calculated
 

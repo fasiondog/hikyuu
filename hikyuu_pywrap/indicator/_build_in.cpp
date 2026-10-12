@@ -647,6 +647,9 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the year-month-day of this period since 1900. Usage: DATE, e.g. the function returns 1000101, which means January 1, 2000.
 
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
+
     :param data: the input data KData
     :rtype: Indicator)");
 
@@ -654,6 +657,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("TIME", TIME2, R"(TIME([data])
 
     Get the hour-minute-second of this period. Usage: TIME, the valid value range returned by the function is (000000-235959).
+
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
 
     :param data: the input data KData
     :rtype: Indicator)");
@@ -663,6 +669,9 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the year of this period.
 
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
+
     :param data: the input data KData
     :rtype: Indicator)");
 
@@ -670,6 +679,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("MONTH", MONTH2, R"(MONTH([data])
 
     Get the month of this period. Usage: MONTH, the valid value range returned by the function is (1-12).
+
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
 
     :param data: the input data KData
     :rtype: Indicator)");
@@ -679,6 +691,9 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the day of the week of this period. Usage: WEEK, the valid value range returned by the function is (0-6), and 0 means Sunday.
 
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
+
     :param data: the input data KData
     :rtype: Indicator)");
 
@@ -686,6 +701,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("DAY", DAY2, R"(DAY([data])
 
     Get the date of this period. Usage: DAY, the valid value range returned by the function is (1-31).
+
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
 
     :param data: the input data KData
     :rtype: Indicator)");
@@ -695,6 +713,9 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the number of the hours of this period. Usage: HOUR, the valid value range returned by the function is (0-23), and the value is 0 for the daily and the longer analysis periods.
 
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
+
     :param data: the input data KData
     :rtype: Indicator)");
 
@@ -702,6 +723,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("MINUTE", MINUTE2, R"(MINUTE([data])
 
     Get the number of the minutes of this period. Usage: MINUTE, the valid value range returned by the function is (0-59), and the value is 0 for the daily and the longer analysis periods.
+
+    @note The dates come from the input indicator when used as a non-leaf, otherwise from the
+    bound context KData.
 
     :param data: the input data KData
     :rtype: Indicator)");
@@ -1260,6 +1284,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the total sum. SUM(X,N), counting the total sum of X within the N periods; when N=0, start from the first valid value.
 
+    As a pure accumulator, a non-finite value in the window propagates through the result by contract, unlike the mean/extreme family which ignores missing points.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator)");
@@ -1375,6 +1401,8 @@ void export_Indicator_build_in(py::module& m) {
 
     For example: HHVBARS(HIGH,0) gets the number of the periods from the historical new high to the current
 
+    Note: When multiple values in the window tie for the extreme, the most recent occurrence is used
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator)");
@@ -1390,6 +1418,8 @@ void export_Indicator_build_in(py::module& m) {
     Usage: LLVBARS(X,N): getting the number of the periods from the lowest value of X within the N periods to the current; N=0 means counting from the first valid value
 
     For example: LLVBARS(HIGH,20) gets the number of the periods from the 20-day lowest point to the current
+
+    Note: When multiple values in the window tie for the extreme, the most recent occurrence is used
 
     :param data: the input data
     :param int|Indicator|IndParam n: the N-day time window
@@ -1865,6 +1895,11 @@ void export_Indicator_build_in(py::module& m) {
 
     The time-line price data
 
+    @note Leaf-only indicator: bind a context and read the series directly (e.g. for plotting).
+    The result length follows the time-line data instead of the context bar count, so do not feed
+    it into other indicators; its date accessors return the context K-line dates, not the
+    time-line point timestamps.
+
     :param KData k: the context
     :rtype: Indicator)");
 
@@ -1872,6 +1907,11 @@ void export_Indicator_build_in(py::module& m) {
     m.def("TIMELINEVOL", TIMELINEVOL_2, R"(TIMELINEVOL([k])
 
     The time-line volume data
+
+    @note Leaf-only indicator: bind a context and read the series directly (e.g. for plotting).
+    The result length follows the time-line data instead of the context bar count, so do not feed
+    it into other indicators; its date accessors return the context K-line dates, not the
+    time-line point timestamps.
 
     :param KData k: the context
     :rtype: Indicator)");

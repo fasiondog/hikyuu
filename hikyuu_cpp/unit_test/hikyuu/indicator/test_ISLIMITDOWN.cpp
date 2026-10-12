@@ -78,4 +78,31 @@ TEST_CASE("test_ISLIMITDOWN_window_shift_chain") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_ISLIMITDOWN_ex_right") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sz000001");
+    KData k = stock.getKData(KQuery(0, 120));
+    REQUIRE_EQ(k.size(), 120);
+
+    /** @arg a no-recover context judges on recovered closes: no Null anywhere */
+    auto weights = stock.getWeight(k[0].datetime, k[119].datetime);
+    REQUIRE_UNARY(!weights.empty());
+    Indicator r = ISLIMITDOWN(k);
+    for (size_t i = r.discard(); i < r.size(); ++i) {
+        CHECK_UNARY(r[i] == 0.0 || r[i] == 1.0);
+    }
+
+    /** @arg the no-recover context judgment equals the backward-recovered one */
+    KQuery bq = k.getQuery();
+    bq.recoverType(KQuery::BACKWARD);
+    KData kb = k.getKData(bq);
+    REQUIRE_EQ(kb.size(), k.size());
+    Indicator rb = ISLIMITDOWN(kb);
+    CHECK_EQ(r.size(), rb.size());
+    for (size_t i = r.discard(); i < r.size(); ++i) {
+        CHECK_EQ(r[i], rb[i]);
+    }
+}
+
 /** @} */

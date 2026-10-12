@@ -19,6 +19,8 @@
 
     布尔信号指标系统有效条件, 指标中相应位置>0则代表系统有效，否则无效
 
+    注意：非有限值（NaN/±Inf）视为无效。
+
     :param Indicator ind: bool型指标，输入为 KData
     :return: 系统有效条件实例
     :rtype: ConditionBase

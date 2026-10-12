@@ -41,10 +41,11 @@ void IVigor::_calculate(const Indicator& ind) {
 
     int n = getParam<int>("n");
 
-    m_discard = 1;
     if (0 == total) {
+        m_discard = 0;
         return;
     }
+    m_discard = 1;
 
     auto const* ks = kdata.data();
     PriceList tmp(total, Null<price_t>());

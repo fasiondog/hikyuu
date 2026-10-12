@@ -18,7 +18,7 @@ IRecover::IRecover() : IndicatorImp("RECOVER") {
     setParam<int>("recover_type", KQuery::NO_RECOVER);
 }
 
-IRecover::IRecover(int recoverType) {
+IRecover::IRecover(int recoverType) : IndicatorImp("RECOVER") {
     setParam<int>("recover_type", recoverType);
 }
 

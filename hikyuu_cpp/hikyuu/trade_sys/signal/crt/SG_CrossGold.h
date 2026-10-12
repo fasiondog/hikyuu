@@ -19,6 +19,7 @@ namespace hku {
  * upward from below and both the fast line and the slow line are directed upward;
  * it is a death cross and a sell when the fast line crosses the slow line downward from above and
  * both the fast line and the slow line are directed downward.
+ * @note A non-finite fast/slow value fires no signal
  * @param fast fast line
  * @param slow slow line
  * @return signal generator

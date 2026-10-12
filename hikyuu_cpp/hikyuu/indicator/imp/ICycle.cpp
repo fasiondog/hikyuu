@@ -59,56 +59,20 @@ void ICycle::_checkParam(const string& name) const {
 static void calculate_no_delay(const DatetimeList& datelist, int adjust_cycle, const string& mode,
                                PriceList& buf) {
     if ("week" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextWeek();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.dayOfWeek() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextWeek();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            buf[i] = adjust;
+            buf[i] = datelist[i].dayOfWeek() == adjust_cycle;
         }
     } else if ("month" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextMonth();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.day() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextMonth();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            buf[i] = adjust;
+            buf[i] = datelist[i].day() == adjust_cycle;
         }
     } else if ("quarter" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextQuarter();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.day() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextQuarter();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            buf[i] = adjust;
+            buf[i] = datelist[i] == datelist[i].startOfQuarter() + Days(adjust_cycle - 1);
         }
     } else if ("year" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextYear();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
-            const auto& date = datelist[i];
-            bool adjust = (date.dayOfYear() == adjust_cycle);
-            if (adjust) {
-                cur_cycle_end = date.nextYear();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-            buf[i] = adjust;
+            buf[i] = datelist[i].dayOfYear() == adjust_cycle;
         }
     }
 }
@@ -117,7 +81,6 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                             PriceList& buf) {
     std::set<Datetime> adjust_date_set;
     if ("week" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextWeek();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
             Datetime adjust_date = date.startOfWeek() + Days(adjust_cycle - 1);
@@ -130,19 +93,10 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 adjust = true;
                 adjust_date_set.emplace(adjust_date);
             }
-
-            if (adjust) {
-                cur_cycle_end = date.nextWeek();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
             buf[i] = adjust;
         }
 
     } else if ("month" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextMonth();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
             Datetime adjust_date = date.startOfMonth() + Days(adjust_cycle - 1);
@@ -155,19 +109,10 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 adjust = true;
                 adjust_date_set.emplace(adjust_date);
             }
-
-            if (adjust) {
-                cur_cycle_end = date.nextMonth();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
             buf[i] = adjust;
         }
 
     } else if ("quarter" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextQuarter();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
             Datetime adjust_date = date.startOfQuarter() + Days(adjust_cycle - 1);
@@ -180,19 +125,10 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 adjust = true;
                 adjust_date_set.emplace(adjust_date);
             }
-
-            if (adjust) {
-                cur_cycle_end = date.nextQuarter();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
             buf[i] = adjust;
         }
 
     } else if ("year" == mode) {
-        Datetime cur_cycle_end = datelist.front().nextYear();
         for (size_t i = 0, total = datelist.size(); i < total; i++) {
             const auto& date = datelist[i];
             Datetime adjust_date = date.startOfYear() + Days(adjust_cycle - 1);
@@ -205,14 +141,6 @@ static void calculate_delay(const DatetimeList& datelist, int adjust_cycle, cons
                 adjust = true;
                 adjust_date_set.emplace(adjust_date);
             }
-
-            if (adjust) {
-                cur_cycle_end = date.nextYear();
-            }
-            if (cur_cycle_end >= datelist.back()) {
-                cur_cycle_end = datelist.back() + Minutes(1);
-            }
-
             buf[i] = adjust;
         }
     }
@@ -236,6 +164,7 @@ void ICycle::_calculate(const Indicator& data) {
 
     int adjust_cycle = getParam<int>("adjust_cycle");
     string adjust_mode = getParam<string>("adjust_mode");
+    to_lower(adjust_mode);
     bool delay_to_trading_day = getParam<bool>("delay_to_trading_day");
 
     PriceList buf(datelist.size());

@@ -9,6 +9,7 @@
 
 #include "../test_config.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BARSLASTS.h>
 #include <hikyuu/indicator/crt/BARSLAST.h>
@@ -217,6 +218,22 @@ TEST_CASE("test_BARSLASTS_nan_is_not_a_condition") {
     for (size_t i = 0; i < result.size(); ++i) {
         CHECK_UNARY(std::isnan(result[i]));
     }
+}
+
+TEST_CASE("test_BARSLASTS_dyn_invalid_param") {
+    double inf = std::numeric_limits<double>::infinity();
+    PriceList a{1, 0, 1, 0, 1};
+    Indicator data = PRICELIST(a);
+
+    /** @arg NaN / Inf / non-positive / out-of-range dynamic n all yield Null (no UB cast) */
+    PriceList nvs{Null<price_t>(), inf, 0.0, 3.0e9, 1.0};
+    Indicator n_param = PRICELIST(nvs);
+    Indicator result = BARSLASTS(data, n_param);
+    CHECK_EQ(result.size(), 5);
+    for (size_t i = 0; i < 4; ++i) {
+        CHECK_UNARY(std::isnan(result[i]));
+    }
+    CHECK_EQ(result[4], 0);
 }
 
 //-----------------------------------------------------------------------------

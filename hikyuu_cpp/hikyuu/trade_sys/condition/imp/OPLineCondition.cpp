@@ -5,6 +5,7 @@
  *      Author: Administrator
  */
 
+#include <cmath>
 #include "OPLineCondition.h"
 #include "../../../trade_manage/crt/crtTM.h"
 #include "../../../trade_manage/crt/TC_Zero.h"
@@ -55,7 +56,7 @@ void OPLineCondition::_calculate() {
               x.size(), dates.size());
     auto const* xdata = x.data();
     for (size_t i = 0; i < x.size(); i++) {
-        if (xdata[i] > 0) {
+        if (std::isfinite(xdata[i]) && xdata[i] > 0) {
             _addValid(dates[i]);
         }
     }

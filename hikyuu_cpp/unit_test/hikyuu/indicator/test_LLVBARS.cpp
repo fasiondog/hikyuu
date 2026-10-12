@@ -171,6 +171,18 @@ TEST_CASE("test_HHVBARS_dyn") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_LLVBARS_tied_min_dyn") {
+    /** @arg tied extrema: dynamic path picks the most recent occurrence (TDX) */
+    Indicator c = PRICELIST(PriceList{3.0, 2.0, 2.0, 1.0, 1.0});
+    Indicator expect = LLVBARS(c, 2);
+    Indicator result = LLVBARS(c, IndParam(CVAL(c, 2)));
+    CHECK_EQ(result.discard(), expect.discard());
+    for (size_t i = expect.discard(); i < expect.size(); ++i) {
+        CHECK_EQ(result[i], expect[i]);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

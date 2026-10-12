@@ -7,6 +7,7 @@
 
 #include "../test_config.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/BARSLASTCOUNT.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -27,6 +28,19 @@ TEST_CASE("test_BARSLASTCOUNT") {
     CHECK_EQ(ret.name(), "BARSLASTCOUNT");
 
     auto expect = PRICELIST(PriceList{1, 0, 1, 2, 0, 1, 0, 0, 1, 2});
+    check_indicator(ret, expect);
+}
+
+/** @par Test points */
+TEST_CASE("test_BARSLASTCOUNT_negative_and_nan") {
+    double nan = Null<price_t>();
+    double inf = std::numeric_limits<double>::infinity();
+
+    /** @arg Negative values count as true; NaN and +-Inf are not true and reset the streak */
+    Indicator x = PRICELIST(PriceList{nan, 1, 2, nan, -3, 5, 0, 7, inf});
+    Indicator ret = BARSLASTCOUNT()(x);
+    CHECK_EQ(ret.name(), "BARSLASTCOUNT");
+    Indicator expect = PRICELIST(PriceList{0, 1, 2, 0, 1, 2, 0, 1, 0});
     check_indicator(ret, expect);
 }
 

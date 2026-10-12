@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "../../../indicator/crt/KDATA.h"
 #include "../../../indicator/crt/DIFF.h"
 #include "../../../indicator/crt/STDEV.h"
@@ -62,6 +63,10 @@ void SingleSignal::_calculate(const KData& kdata) {
         double dama2 = inddata[i] - inddata[i - 2];
         double dama3 = inddata[i] - inddata[i - 3];
         double sdama = devdata[i] * filter_p;
+        if (!std::isfinite(dama) || !std::isfinite(dama2) || !std::isfinite(dama3) ||
+            !std::isfinite(sdama)) {
+            continue;
+        }
         if (dama > 0 && (dama > sdama || dama2 > sdama || dama3 > sdama)) {
             _addBuySignal(ks[i].datetime);
         } else if (dama < 0 && (dama < sdama || dama2 < sdama || dama3 < sdama)) {

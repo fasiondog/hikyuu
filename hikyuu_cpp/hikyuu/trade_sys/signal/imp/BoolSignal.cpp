@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "BoolSignal.h"
@@ -40,9 +41,9 @@ void BoolSignal::_calculate(const KData& kdata) {
     auto const* selldata = sell.data();
     auto const* ks = kdata.data();
     for (size_t i = discard; i < total; ++i) {
-        if (buydata[i] > 0.0)
+        if (std::isfinite(buydata[i]) && buydata[i] > 0.0)
             _addBuySignal(ks[i].datetime);
-        if (selldata[i] > 0.0)
+        if (std::isfinite(selldata[i]) && selldata[i] > 0.0)
             _addSellSignal(ks[i].datetime);
     }
 }

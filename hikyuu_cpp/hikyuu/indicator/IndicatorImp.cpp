@@ -1526,7 +1526,9 @@ void IndicatorImp::execute_if() {
         auto const *left = m_left->data(r);
         auto const *right = m_right->data(r);
         for (size_t i = start_pos; i < total; ++i) {
-            dst[i] = three[i - cond_offset] > 0.0 ? left[i - left_offset] : right[i - right_offset];
+            value_t cond = three[i - cond_offset];
+            dst[i] =
+              std::isfinite(cond) && cond > 0.0 ? left[i - left_offset] : right[i - right_offset];
         }
     }
 }
