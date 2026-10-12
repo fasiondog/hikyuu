@@ -102,7 +102,6 @@ size_t IHighLine::min_increment_start() const {
 
 void IHighLine::_increment_calculate(const Indicator& ind, size_t start_pos) {
     size_t total = ind.size();
-    m_discard = ind.discard();
     if (1 == total) {
         if (0 == m_discard) {
             _set(ind[0], 0);
@@ -121,6 +120,7 @@ void IHighLine::_increment_calculate(const Indicator& ind, size_t start_pos) {
                 dst[i] = src[i];
             }
         }
+        return;
     }
 
     price_t max = src[start_pos];

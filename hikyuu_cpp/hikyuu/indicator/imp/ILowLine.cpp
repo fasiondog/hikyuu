@@ -113,6 +113,7 @@ void ILowLine::_increment_calculate(const Indicator& ind, size_t start_pos) {
                 dst[i] = src[i];
             }
         }
+        return;
     }
 
     price_t min = src[start_pos - n];
