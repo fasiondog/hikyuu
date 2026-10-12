@@ -23,7 +23,8 @@ IInBlock::IInBlock() : IndicatorImp("INBLOCK", 1) {
 IInBlock::~IInBlock() {}
 
 void IInBlock::_calculate(const Indicator& data) {
-    HKU_IF_RETURN(!isLeaf() && !data.empty(), void());
+    HKU_WARN_IF(!isLeaf() && !data.empty(),
+                "The input is ignored because {} depends on the context!", m_name);
 
     const KData& k = getContext();
     size_t total = k.size();
