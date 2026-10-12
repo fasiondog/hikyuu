@@ -61,11 +61,7 @@ Strategy::Strategy(const string& name, const string& config_file)
     if (m_config_file.empty()) {
         string home = getUserDir();
         HKU_ERROR_IF(home == "", "Failed get user home path!");
-#if HKU_OS_WINOWS
-        m_config_file = format("{}\\{}", home, ".hikyuu\\hikyuu.ini");
-#else
         m_config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
-#endif
     }
 }
 
