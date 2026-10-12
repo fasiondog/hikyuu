@@ -527,6 +527,47 @@ TEST_CASE("test_StockManager_fireLoadEvent_unregister_in_callback") {
     CHECK_UNARY(!sm.loadFailed());
     CHECK_UNARY(sm.dataReady());
 }
+
+/** @par Test points */
+TEST_CASE("test_StockManager_fireLoadEvent_unregister_waits_inflight") {
+    auto& sm = StockManager::instance();
+
+    /** @arg unregisterLoadEventCallback waits for the in-flight dispatch holding this callback:
+     * when it returns no dispatch is running any more, so the callback context may be destroyed
+     * right after (the plugin stop sequence: unregister then destroy) */
+    std::atomic<bool> in_callback{false};
+    std::atomic<bool> unreg_entered{false};
+    std::atomic<bool> context_alive_at_callback{true};
+    std::atomic<bool> in_callback_at_unreg_return{true};
+    auto ctx = std::make_shared<int>(42);
+    std::weak_ptr<int> watcher = ctx;
+    size_t slow_id = registerLoadEventCallback([&](LoadEvent event) {
+        HKU_IF_RETURN(event != LoadEvent::BASE_DATA_READY, void());
+        in_callback.store(true, std::memory_order_release);
+        while (!unreg_entered.load(std::memory_order_acquire)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        context_alive_at_callback.store(!watcher.expired(), std::memory_order_release);
+        in_callback.store(false, std::memory_order_release);
+    });
+    std::thread unreg_thread([&]() {
+        while (!in_callback.load(std::memory_order_acquire)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        unreg_entered.store(true, std::memory_order_release);
+        unregisterLoadEventCallback(slow_id);
+        in_callback_at_unreg_return.store(in_callback.load(std::memory_order_acquire),
+                                          std::memory_order_release);
+        ctx.reset();  // destroy the context right after unregistering (the plugin stop sequence)
+    });
+    runWithDeadline([&sm]() { sm.reload(); });
+    unreg_thread.join();
+    sm.joinPreloadThread();
+
+    CHECK_UNARY(context_alive_at_callback.load());
+    CHECK_UNARY_FALSE(in_callback_at_unreg_return.load());
+    CHECK_UNARY(watcher.expired());
+}
 #endif
 
 /** @} */

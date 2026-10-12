@@ -11,7 +11,9 @@
 
 #include "GlobalInitializer.h"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstdlib>
 #include <fmt/format.h>
 #include <boost/lexical_cast.hpp>
@@ -323,9 +325,12 @@ struct LoadEventState {
     std::shared_mutex mutex;
     std::vector<std::pair<size_t, LoadEventCallback>> callbacks;
     size_t next_id{1};
+    std::atomic<size_t> in_flight{0};  // dispatches running on their snapshots
+    std::condition_variable_any cv;
 };
 LoadEventState* g_load_event = new LoadEventState;
 std::atomic<bool> g_shm_server_role{false};
+thread_local size_t t_dispatch_depth{0};  // unregistering inside a callback must not wait for itself
 }  // namespace
 
 size_t registerLoadEventCallback(LoadEventCallback&& cb) {
@@ -336,12 +341,21 @@ size_t registerLoadEventCallback(LoadEventCallback&& cb) {
 }
 
 void unregisterLoadEventCallback(size_t id) {
+    {
+        std::unique_lock<std::shared_mutex> lock(g_load_event->mutex);
+        auto& v = g_load_event->callbacks;
+        v.erase(
+          std::remove_if(v.begin(), v.end(),
+                         [id](const std::pair<size_t, LoadEventCallback>& p) {
+                             return p.first == id;
+                         }),
+          v.end());
+    }
+    if (t_dispatch_depth > 0) {
+        return;
+    }
     std::unique_lock<std::shared_mutex> lock(g_load_event->mutex);
-    auto& v = g_load_event->callbacks;
-    v.erase(
-      std::remove_if(v.begin(), v.end(),
-                     [id](const std::pair<size_t, LoadEventCallback>& p) { return p.first == id; }),
-      v.end());
+    g_load_event->cv.wait(lock, [] { return g_load_event->in_flight.load() == 0; });
 }
 
 void setShmServerRole(bool role) noexcept {
@@ -357,7 +371,18 @@ void StockManager::_fireLoadEvent(LoadEvent event) {
     {
         std::shared_lock<std::shared_mutex> lock(g_load_event->mutex);
         callbacks = g_load_event->callbacks;
+        g_load_event->in_flight.fetch_add(1);
     }
+    ++t_dispatch_depth;
+    struct DispatchGuard {
+        ~DispatchGuard() {
+            --t_dispatch_depth;
+            if (g_load_event->in_flight.fetch_sub(1) == 1) {
+                std::unique_lock<std::shared_mutex> lock(g_load_event->mutex);
+                g_load_event->cv.notify_all();
+            }
+        }
+    } guard;
     for (const auto& cb : callbacks) {
         cb.second(event);
     }

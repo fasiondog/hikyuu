@@ -495,7 +495,8 @@ using LoadEventCallback = std::function<void(LoadEvent)>;
 HKU_API size_t registerLoadEventCallback(LoadEventCallback&& cb);
 
 /** Unregister a data loading event callback (called when a plugin stop()s); a no-op when the id
- * does not exist */
+ * does not exist. It waits for the in-flight dispatches to drain before returning (unless called
+ * from inside a callback), so destroying the callback context right after it is safe */
 HKU_API void unregisterLoadEventCallback(size_t id);
 
 /**
