@@ -517,9 +517,11 @@ DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const strin
                 adjust =
                   (date.dayOfWeek() ==
                    cycle);  // The cycle-th day of every week (0=Sunday, 1=Monday ... 6=Saturday)
-            } else if (m == "month" || m == "quarter") {
-                adjust = (date.day() == cycle);        // The cycle-th day of every month/quarter
-            } else {                                   // year
+            } else if (m == "month") {
+                adjust = (date.day() == cycle);  // The cycle-th day of every month
+            } else if (m == "quarter") {
+                adjust = (date == date.startOfQuarter() + Days(cycle - 1));  // The cycle-th day
+            } else {                                                         // year
                 adjust = (date.dayOfYear() == cycle);  // The cycle-th day of every year
             }
             if (adjust) {

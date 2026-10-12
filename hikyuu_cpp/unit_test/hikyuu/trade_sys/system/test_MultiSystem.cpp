@@ -861,6 +861,17 @@ TEST_CASE("test_MultiSystem_calc_adjust_dates") {
         CHECK_EQ(ry[0], Datetime(2025, 1, 1));
     }
 
+    /** @arg quarter/1 without deferral on a cross-month axis: only the 1st day of the quarter
+     * hits (Jan 1); Feb 1 is not a quarter day (Feb 2 is not the 2nd quarter day either) */
+    {
+        DatetimeList qaxis{Datetime(2025, 1, 1), Datetime(2025, 2, 1), Datetime(2025, 2, 2)};
+        auto rq = MultiSystem::calcAdjustDates(qaxis, "quarter", 1, false);
+        REQUIRE_EQ(rq.size(), 1);
+        CHECK_EQ(rq[0], Datetime(2025, 1, 1));
+        auto rq2 = MultiSystem::calcAdjustDates(qaxis, "quarter", 2, false);
+        REQUIRE_EQ(rq2.size(), 0);
+    }
+
     /** @arg adjust_cycle<=0 is treated as 1 (boundary: 0 and negative values) */
     {
         auto r0 = MultiSystem::calcAdjustDates(jan, "week", 0, false);
