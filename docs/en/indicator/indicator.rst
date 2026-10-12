@@ -2169,6 +2169,13 @@ Built-in Technical Indicators
 
     The time-line price data
 
+    .. note::
+
+        Leaf-only indicator: bind a context and read the series directly (e.g. for plotting); the
+        result length follows the time-line data instead of the context K-line bar count, so it must
+        not feed other indicators; its date accessors return the context K-line dates, not the
+        time-line point timestamps
+
     :param KData k: the context
     :rtype: Indicator
     
@@ -2176,6 +2183,13 @@ Built-in Technical Indicators
 .. py:function:: TIMELINEVOL([k])
 
     The time-line volume data
+
+    .. note::
+
+        Leaf-only indicator: bind a context and read the series directly (e.g. for plotting); the
+        result length follows the time-line data instead of the context K-line bar count, so it must
+        not feed other indicators; its date accessors return the context K-line dates, not the
+        time-line point timestamps
 
     :param KData k: the context
     :rtype: Indicator

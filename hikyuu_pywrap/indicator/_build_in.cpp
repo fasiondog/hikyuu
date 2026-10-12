@@ -1865,6 +1865,11 @@ void export_Indicator_build_in(py::module& m) {
 
     The time-line price data
 
+    @note Leaf-only indicator: bind a context and read the series directly (e.g. for plotting).
+    The result length follows the time-line data instead of the context bar count, so do not feed
+    it into other indicators; its date accessors return the context K-line dates, not the
+    time-line point timestamps.
+
     :param KData k: the context
     :rtype: Indicator)");
 
@@ -1872,6 +1877,11 @@ void export_Indicator_build_in(py::module& m) {
     m.def("TIMELINEVOL", TIMELINEVOL_2, R"(TIMELINEVOL([k])
 
     The time-line volume data
+
+    @note Leaf-only indicator: bind a context and read the series directly (e.g. for plotting).
+    The result length follows the time-line data instead of the context bar count, so do not feed
+    it into other indicators; its date accessors return the context K-line dates, not the
+    time-line point timestamps.
 
     :param KData k: the context
     :rtype: Indicator)");
