@@ -58,10 +58,6 @@ public:
         return dataptr();
     }
 
-    virtual KRecord* data() noexcept override {
-        return dataptr();
-    }
-
     virtual DatetimeList getDatetimeList() const override;
 
     virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const override;

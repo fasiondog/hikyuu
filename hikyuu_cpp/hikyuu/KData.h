@@ -154,7 +154,6 @@ public:
 
 public:
     const KRecord* data() const noexcept;
-    KRecord* data() noexcept;  // Use with care (intended for forcibly adjusting the data)
 
     KDataImpPtr getImp() const noexcept;
 
@@ -354,10 +353,6 @@ inline bool KData::operator!=(const KData& other) const noexcept {
 }
 
 inline const KRecord* KData::data() const noexcept {
-    return m_imp->data();
-}
-
-inline KRecord* KData::data() noexcept {
     return m_imp->data();
 }
 

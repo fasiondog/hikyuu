@@ -54,10 +54,6 @@ public:
         return m_buffer.data();
     }
 
-    virtual KRecord* data() noexcept override {
-        return m_buffer.data();
-    }
-
     virtual DatetimeList getDatetimeList() const override;
 
     virtual KDataImpPtr getOtherFromSelf(const KQuery& query) const override;

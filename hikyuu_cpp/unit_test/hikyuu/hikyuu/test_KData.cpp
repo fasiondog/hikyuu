@@ -2455,7 +2455,7 @@ TEST_CASE("test_KData_other") {
     k2 = getKData("sh000001", k1[0].datetime, k1[1].datetime + Days(1));
     CHECK_EQ(k1.size(), k2.size());
     const KRecord* p1 = k1.data();
-    KRecord* p2 = k2.data();
+    const KRecord* p2 = k2.data();
     for (size_t i = 0; i < k1.size(); i++) {
         CHECK_EQ(p1[i], p2[i]);
     }

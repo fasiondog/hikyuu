@@ -66,10 +66,6 @@ public:
         return nullptr;
     }
 
-    virtual KRecord* data() noexcept {
-        return nullptr;
-    }
-
     virtual DatetimeList getDatetimeList() const {
         return DatetimeList();
     }
