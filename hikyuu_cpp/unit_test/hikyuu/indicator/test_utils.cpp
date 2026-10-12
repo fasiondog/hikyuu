@@ -171,6 +171,25 @@ TEST_CASE("test_multi_regression_full") {
     }
 }
 
+/** @par Test points: exact collinearity is rejected as rank-deficient */
+TEST_CASE("test_multi_regression_collinear") {
+    Stock stock = getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(-200));
+    REQUIRE(!kdata.empty());
+
+    Indicator f = MA(CLOSE(), 5);
+
+    /** @arg two identical factors make the design matrix rank-deficient -> empty result */
+    CHECK(multi_regression(stock, KQuery(-200), IndicatorList{f, f}).empty());
+
+    /** @arg the full version rejects the same rank-deficient input */
+    CHECK(multi_regression_full(stock, KQuery(-200), IndicatorList{f, f}).empty());
+
+    /** @arg control: distinct factors still produce a full coefficient vector */
+    auto ok = multi_regression(stock, KQuery(-200), MA(CLOSE(), 5), MA(CLOSE(), 10));
+    CHECK_EQ(ok.size(), 3);
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------
