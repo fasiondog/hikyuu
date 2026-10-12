@@ -748,19 +748,22 @@ Stock StockManager::getStock(const string& querystr) const {
 }
 
 StockList StockManager::getStockList(std::function<bool(const Stock&)>&& filter) const {
-    StockList ret;
-    std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
-    ret.reserve(m_stockDict.size());
-    auto iter = m_stockDict.begin();
-    if (filter) {
-        for (; iter != m_stockDict.end(); ++iter) {
-            if (filter(iter->second)) {
-                ret.emplace_back(iter->second);
-            }
+    StockList snapshot;
+    {
+        std::shared_lock<std::shared_mutex> lock(*m_stockDict_mutex);
+        snapshot.reserve(m_stockDict.size());
+        for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
+            snapshot.emplace_back(iter->second);
         }
-    } else {
-        for (; iter != m_stockDict.end(); ++iter) {
-            ret.emplace_back(iter->second);
+    }
+    if (!filter) {
+        return snapshot;
+    }
+    StockList ret;
+    ret.reserve(snapshot.size());
+    for (const auto& stock : snapshot) {
+        if (filter(stock)) {
+            ret.emplace_back(stock);
         }
     }
     return ret;

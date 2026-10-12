@@ -409,6 +409,57 @@ TEST_CASE("test_StockManager_loadAllStocks_by_context") {
     CHECK_EQ(sm.size(), 4729);
 }
 
+/** @par Test points */
+TEST_CASE("test_StockManager_getStockList") {
+    StockManager& sm = StockManager::instance();
+
+    /** @arg No filter returns every loaded stock */
+    StockList all = sm.getStockList(nullptr);
+    CHECK_EQ(all.size(), sm.size());
+
+    /** @arg A filter that always returns true returns every stock */
+    StockList all_true = sm.getStockList([](const Stock&) { return true; });
+    CHECK_EQ(all_true.size(), sm.size());
+
+    /** @arg A filter that always returns false returns an empty list */
+    StockList none = sm.getStockList([](const Stock&) { return false; });
+    CHECK_EQ(none.size(), 0);
+
+    /** @arg A filter selecting by market keeps only that market's stocks */
+    StockList sh = sm.getStockList([](const Stock& s) { return s.market() == "SH"; });
+    CHECK_GT(sh.size(), 0);
+    for (const auto& s : sh) {
+        CHECK_EQ(s.market(), "SH");
+    }
+
+    /** @arg The user filter may re-enter the manager (getStock) without deadlock,
+     * because the dictionary lock is released before the filter runs */
+    StockList reentrant = sm.getStockList([&sm](const Stock& s) {
+        return !sm.getStock(s.market_code()).isNull();
+    });
+    CHECK_EQ(reentrant.size(), sm.size());
+
+    /** @arg Regression guard: a filter that requests the unique lock (addStock)
+     * must not self-deadlock; run under a watchdog so a regression fails loudly
+     * instead of hanging the whole test process */
+    bool tried = false;
+    auto done = std::make_shared<std::atomic_bool>(false);
+    std::thread([&sm, done, &tried]() {
+        sm.getStockList([&sm, &tried](const Stock&) {
+            if (!tried) {
+                tried = true;
+                sm.addStock(sm.getStock("sh000001"));
+            }
+            return true;
+        });
+        done->store(true);
+    }).detach();
+    for (int i = 0; i < 100 && !done->load(); i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    CHECK_UNARY(done->load());
+}
+
 // Disabled by default: it performs several full reloads and exercises injected
 // failure paths; enable it when load-failure handling or the callback registry changes.
 #if 0
