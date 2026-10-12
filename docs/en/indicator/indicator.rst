@@ -25,7 +25,8 @@ Built-in Technical Indicators
 
 .. py:function:: AD(kdata)
 
-   The accumulation/distribution line
+   The accumulation/distribution line, accumulated from the turnover amount, so the result is in the
+   same unit as the amount: 10 thousand yuan
 
    Bars with a non-finite (High - Low) are skipped, so the accumulator never gets poisoned by a single bad bar.
 

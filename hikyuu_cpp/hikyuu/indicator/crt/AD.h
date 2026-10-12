@@ -16,7 +16,8 @@
 namespace hku {
 
 /**
- * Accumulation / distribution line
+ * Accumulation / distribution line, accumulated from the turnover amount, so the result is in the
+ * same unit as the amount: 10 thousand yuan
  * @param k the associated KData
  * @note Bars with non-finite (High - Low) are skipped; the accumulator never gets poisoned by
  *       a single bad bar
