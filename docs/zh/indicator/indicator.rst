@@ -26,7 +26,7 @@
 .. py:function:: AD(kdata)
 
    累积/派发线
-   
+
    :param KData kdata: k线数据
    :rtype: Indicator
 
@@ -34,37 +34,37 @@
 .. py:function:: ADJ_FACTOR([kdata])
 
     计算复权因子指标
-    
+
     基于股票的权息数据（送股、配股、转增、现金分红等）计算后复权因子序列。
     复权因子表示如果上市时持有1股，经过所有送股、配股、转增后，现在持有多少股。
     采用累乘方式计算，确保价格、成交量和成交金额的复权处理一致性。
-    
+
     该指标需要设置 KData 上下文才能正常工作，通过 setContext() 方法设置。
-    
+
     :param KData kdata: 可选，直接传入K线数据作为上下文
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **重要限制**：
-       
+
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
        - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
        - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
-    
+
     **使用示例**::
-    
+
         # 获取某只股票的复权因子
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(-100))
         adj_factor = ADJ_FACTOR()
         adj_factor.setContext(kdata)
-        
+
         # 或者直接传入K线数据
         adj_factor = ADJ_FACTOR(kdata)
-    
+
     **相关指标**：
-    
+
     * :py:func:`ADJ_OPEN` - 复权开盘价
     * :py:func:`ADJ_HIGH` - 复权最高价
     * :py:func:`ADJ_LOW` - 复权最低价
@@ -76,22 +76,22 @@
 .. py:function:: ADJ_OPEN()
 
     计算复权开盘价指标
-    
+
     将开盘价按复权因子进行后复权处理，得到复权后的开盘价序列。
     计算公式：ADJ_OPEN = ADJ_FACTOR * OPEN
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **重要限制**：
-       
+
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
        - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
        - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
-    
+
     **相关指标**：
-    
+
     * :py:func:`ADJ_FACTOR` - 复权因子
     * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
@@ -99,22 +99,22 @@
 .. py:function:: ADJ_HIGH()
 
     计算复权最高价指标
-    
+
     将最高价按复权因子进行后复权处理，得到复权后的最高价序列。
     计算公式：ADJ_HIGH = ADJ_FACTOR * HIGH
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **重要限制**：
-       
+
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
        - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
        - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
-    
+
     **相关指标**：
-    
+
     * :py:func:`ADJ_FACTOR` - 复权因子
     * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
@@ -122,22 +122,22 @@
 .. py:function:: ADJ_LOW()
 
     计算复权最低价指标
-    
+
     将最低价按复权因子进行后复权处理，得到复权后的最低价序列。
     计算公式：ADJ_LOW = ADJ_FACTOR * LOW
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **重要限制**：
-       
+
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
        - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
        - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
-    
+
     **相关指标**：
-    
+
     * :py:func:`ADJ_FACTOR` - 复权因子
     * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
@@ -145,22 +145,22 @@
 .. py:function:: ADJ_CLOSE()
 
     计算复权收盘价指标
-    
+
     将收盘价按复权因子进行后复权处理，得到复权后的收盘价序列。
     计算公式：ADJ_CLOSE = ADJ_FACTOR * CLOSE
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **重要限制**：
-       
+
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
        - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值，复权结果与 RECOVER_EQUAL_BACKWARD 一致
        - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
-    
+
     **相关指标**：
-    
+
     * :py:func:`ADJ_FACTOR` - 复权因子
     * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
@@ -168,26 +168,26 @@
 .. py:function:: ADJ_VOL()
 
     计算复权成交量指标
-    
+
     将成交量除以与复权价格相同的因子，得到复权后的成交量序列。
     计算公式：ADJ_VOL = VOL / ADJ_FACTOR
-    
+
     注意：量的方向与价格相反（因子取倒数），因此复权价 × 复权量保持原始成交额不变。
     这是因子管理体系下的量口径，与“仅按股本比例（送转配）调整量”的口径不同（现金分红改变价格但不改变股数）。
     K 线复权（Query 的复权类型）只调整价格、量与额保持原始值（与 Wind / 聚宽等主流数据源一致），需要与复权价配套的成交量时使用本指标。
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **重要限制**：
-       
+
        - **周期限制**：仅适用于日线周期。周线、月线等非日线周期存在对齐问题，结果可能不准确
        - **依赖因子管理**：需要配合因子管理系统的因子值存储使用，每日调用 update_all_factors_values() 更新保存因子值以保证准确性
        - **与 RECOVER_EQUAL_BACKWARD 的关系**：因子锚定于固定基准（股票除权除息数据起点），同一日期恒得同一因子值；复权价与 RECOVER_EQUAL_BACKWARD 的价格一致，而复权 K 线数据的量保持原始值（复权只作用于价格）
        - **计算起点**：因子自固定基准（股票除权除息数据起点）开始累计，而非从当前查询的K线数据起始点开始计算
-    
+
        **相关指标**：
-    
+
        * :py:func:`ADJ_FACTOR` - 复权因子
        * :py:func:`RECOVER_EQUAL_BACKWARD` - 等比后复权
 
@@ -204,7 +204,7 @@
 
 .. py:function:: AGG_COUNT
 
-    聚合函数: 非空值计数, 可参考 :func:`AGG_STD`   
+    聚合函数: 非空值计数, 可参考 :func:`AGG_STD`
 
 .. py:function:: AGG_MAD
 
@@ -220,7 +220,7 @@
 
 .. py:function:: AGG_MEDIAN
 
-    聚合函数: 中位数, 可参考 :func:`AGG_STD`    
+    聚合函数: 中位数, 可参考 :func:`AGG_STD`
 
 .. py:function:: AGG_MIN
 
@@ -228,7 +228,7 @@
 
 .. py:function:: AGG_PROD
 
-    聚合函数: 乘积, 可参考 :func:`AGG_STD` 
+    聚合函数: 乘积, 可参考 :func:`AGG_STD`
 
 .. py:function:: AGG_SAMPLE(ind[, time="9:35", ktype=Query.MIN, fill_null=False, unit=1])
 
@@ -299,7 +299,7 @@
     :param int unit: 聚合周期单位 (上下文K线分组单位, 使用日线计算分钟线聚合时, unit=2代表聚合2天的分钟线)
     :param float quantile: 分位数 (0, 1) 之间
     :return: 指标数据
-    :rtype: Indicator     
+    :rtype: Indicator
 
 .. py:function:: AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
@@ -335,9 +335,9 @@
 
 
 .. py:function:: AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
-      
+
     使用自定函数聚合其他K线周期的指标。
-    
+
     示例, 计算日线时聚合分钟线收盘价的和:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
@@ -373,15 +373,15 @@
     :param int fast_n: 对应快速周期N
     :param int slow_n: 对应慢速EMA线的N值
     :rtype: Indicator
-    
+
     * result(0): AMA
     * result(1): ER
 
-    
+
 .. py:function:: AMO([data])
 
     获取成交金额，包装KData的成交金额成Indicator
-    
+
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
 
@@ -446,10 +446,10 @@
 
         # 获取K线数据
         kdata = get_kdata('sh000001', Query(-200))
-        
+
         # 计算ADX指标
         adx = ADX(kdata, 14)
-        
+
         # 获取ADX值（索引0）、+DI值（索引1）、-DI值（索引2）
         adx_value = adx.get(-1, 0)
         pdi_value = adx.get(-1, 1)
@@ -486,10 +486,10 @@
 
         # 获取K线数据
         kdata = get_kdata('sh000001', Query(-200))
-        
+
         # 计算ADX2指标
         adx2 = ADX2(kdata, 14)
-        
+
         # 获取ADX2值（索引0）、+DI值（索引1）、-DI值（索引2）
         adx2_value = adx2.get(-1, 0)
         pdi_value = adx2.get(-1, 1)
@@ -558,13 +558,13 @@
 
         # 静态参数
         result = BARSLASTS(cond, 2)
-        
+
         # 动态参数 - 使用 CVAL
         result = BARSLASTS(cond, CVAL(cond, 2))
-        
+
         # 动态参数 - 使用 IndParam
         result = BARSLASTS(cond, IndParam(n_indicator))
-        
+
         # 动态参数 - 直接使用 Indicator
         result = BARSLASTS(cond, n_indicator)
 
@@ -636,13 +636,13 @@
     :param Indicator c: C
     :rtype: Indicator
 
-    
+
 .. py:function:: BLOCKSETNUM(block, query)
 
     横向统计（返回板块股个数）, 两种调用方式:
 
         BLOCKSET(block, query)
-        
+
         BLOCKSET(stks, query)
 
     :param Block block | sequence stks: 待统计的板块 或 stock list
@@ -650,40 +650,40 @@
 
 
 .. py:function:: CLOSE([data])
-   
+
     获取收盘价，包装KData的收盘价成Indicator
-    
+
     :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: CAPITAL(kdata)
 
    获取流通盘（单位：万股），同 LIUTONGPAN
-   
+
    :param KData kdata: k线数据
    :rtype: Indicator
-   
+
 
 .. py:function:: CEIL([data])
 
     同  :py:func:`CEILING`
 
-   
+
 .. py:function:: CEILING([data])
 
     向上舍入(向数值增大方向舍入)取整
-   
+
     用法：CEILING(A)返回沿A数值增大方向最接近的整数
-   
+
     例如：CEILING(12.3)求得13；CEILING(-3.5)求得-3
-   
+
     :param data: 输入数据
     :rtype: Indicator
-   
+
 
 .. py:function:: CYCLE(kdata, [adjust_cycle=1], [adjust_mode='query'], [delay_to_trading_day=True])
-          
+
     PF调仓周期指标，主要用于PF调仓日验证，及作为SG
 
     :param KData kdata: K线数据
@@ -694,11 +694,11 @@
 
 
 .. py:function:: CONTEXT([ind, fill_null=False, use_self_ktype=False, use_self_recover_type=False])
-    
+
     独立上下文。使用 ind 自带的上下文。当指定新的上下文时，不会改变已有的上下文。
     例如：ind = CLOSE(k1), 当指定新的上下文 ind = ind(k2) 时，使用的是 k2 的收盘价。如想仍使用 k1 收盘价，
     则需使用 ind = CONTEXT(CLOSE(k1)), 此时 ind(k2) 将仍旧使用 k1 的收盘价。
-    
+
     :param Indicator ind: 指标对象
     :param bool fill_null: 日期对齐时，缺失日期对应填充空值，否则使用前值填充。
     :param bool use_self_ktype: 公式计算时使用自身独立上下文中的KTYPE
@@ -721,7 +721,7 @@
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
     :param int n: 按指定 n 的长度计算两个 ind 直接数据相关系数。n>=2；为 0 时使用扩展窗口：dst[i] 取 [discard(), i] 上的相关系数与协方差，discard 置为 1，首根为 nan。
-    :rtype: Indicator    
+    :rtype: Indicator
 
 .. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
 
@@ -758,26 +758,26 @@
 .. py:function:: CODELIKE([data,] pattern)
 
     证券代码模式匹配
-    
+
     返回当前上下文中的证券代码是否匹配指定的模式。支持通配符匹配：
-    
+
     - ``*`` ：匹配任意长度的任意字符序列（包括空序列）
     - ``?`` ：匹配单个任意字符
-    
+
     返回值：匹配成功返回 1.0，否则返回 0.0。所有周期的返回值相同。
-    
+
     使用示例::
-    
+
         # 匹配以"600"开头的股票代码
         kdata = get_kdata('sh600000', Query(-10))
         result = CODELIKE(kdata, "600*")
-        
+
         # 匹配6位数字的股票代码
         result = CODELIKE(kdata, "??????")
-        
+
         # 匹配以"000"开头且以"1"结尾的代码
         result = CODELIKE(kdata, "000*1")
-        
+
         # 精确匹配特定代码
         result = CODELIKE(kdata, "600000")
 
@@ -790,11 +790,11 @@
 .. py:function:: COUNT([data, n=20])
 
     统计满足条件的周期数。
-    
+
     用法：COUNT(X,N),统计N周期中满足X条件的周期数,若N=0则从第一个有效值开始。
-    
+
     例如：COUNT(CLOSE>OPEN,20)表示统计20周期内收阳的周期数
-    
+
     :param Indicator data: 条件
     :param int|Indicator|IndParam n: 周期
     :rtype: Indicator
@@ -812,12 +812,12 @@
 .. py:function:: CVAL([data, value=0.0, discard=0])
 
     data 为 Indicator 实例，创建和 data 等长的常量指标，其值和为value，抛弃长度discard和data一样
-    
+
     :param Indicator data: Indicator实例
     :param float value: 常数值
     :param int discard: 抛弃数量
     :rtype: Indicator
-    
+
 
 .. py:function:: DATE([data])
 
@@ -866,14 +866,14 @@
 .. py:function:: DIFF([data, n=1])
 
     差分指标，即data[i] - data[i-n]
-    
+
     :param Indicator data: 输入数据
     :param int n: 差分周期，默认1
     :rtype: Indicator
 
 
 .. py:function:: DISCARD(data, discard)
-    
+
     以指标公式的方式设置指标结果的丢弃数据量。
 
     :param Indicator data: 指标
@@ -916,7 +916,7 @@
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
-    
+
 .. py:function:: EMA([data, n=22])
 
     指数移动平均线(Exponential Moving Average)
@@ -924,9 +924,9 @@
     NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），EMA[i] 保持 EMA[i-1]，不会一 NaN/Inf 就污染尾部。
 
     :param data: 输入数据
-    :param int|Indciator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indciator|IndParam n: 计算均值的周期窗口，必须为大于0的整数
     :rtype: Indicator
-    
+
 
 .. py:function:: EVERY([data, n=20])
 
@@ -937,7 +937,7 @@
     例如：EVERY(CLOSE>OPEN,10) 表示前10日内一直是阳线
 
     :param data: 输入数据
-    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数
     :rtype: Indicator
 
 
@@ -946,7 +946,7 @@
     存在, EXIST(X,N) 表示条件X在N周期有存在
 
     :param data: 输入数据
-    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数 
+    :param int|Indicator|IndParam n: 计算均值的周期窗口，必须为大于0的整数
     :rtype: Indicator
 
 
@@ -1022,40 +1022,40 @@
 .. py:function:: FLOOR([data])
 
     向下舍入(向数值减小方向舍入)取整
-    
+
     用法：FLOOR(A)返回沿A数值减小方向最接近的整数
-    
+
     例如：FLOOR(12.3)求得12
 
     :param data: 输入数据
     :rtype: Indicator
 
 .. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY])
-      
+
     自定义分组累积计数
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :rtype: Indicator        
+    :rtype: Indicator
 
 .. py:function:: GROUP_MAX(ind[, ktype=Query.DAY])
-      
+
     自定义分组累积最大值
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :rtype: Indicator        
+    :rtype: Indicator
 
 .. py:function:: GROUP_MIN(ind[, ktype=Query.DAY])
-      
+
     自定义分组累积计录最小值
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :rtype: Indicator        
+    :rtype: Indicator
 
 .. py:function:: GROUP_PROD(ind[, ktype=Query.DAY])
-      
+
     自定义分组累积乘积
 
     :param Indicator ind: 待计算指标
@@ -1063,17 +1063,17 @@
     :rtype: Indicator
 
 .. py:function:: GROUP_SUM(ind[, ktype=Query.DAY])
-      
+
     自定义分组累积和
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
-    :rtype: Indicator    
+    :rtype: Indicator
 
 .. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY])
-      
+
     自定义分组累积计算指标。
-    
+
     示例, 计算日线时聚合分钟线收盘价的和:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
@@ -1083,7 +1083,7 @@
     :param Indicator ind: 待计算指标
     :param callable group_func: 自定义分组累积函数，输入参数为 arg1: datetime list, arg2: numpy array, 返回和输入等长的累积计算结果, 类型同样须为 np.array
     :param KQuery.KType ktype: 分组的K线周期
-    :rtype: Indicator    
+    :rtype: Indicator
 
 
 .. py:function:: HHV([data, n=20])
@@ -1093,7 +1093,7 @@
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
-    
+
 
 .. py:function:: HHVBARS([data, n=20])
 
@@ -1106,15 +1106,15 @@
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
-    
+
 .. py:function:: HIGH([data])
 
     获取最高价，包装KData的最高价成Indicator
 
-    :param data: 输入数据（KData 或 Indicator） 
+    :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: HOUR([data])
 
     取得该周期的小时数。用法：HOUR 函数返回有效值范围为(0-23)，对于日线及更长的分析周期值为0。
@@ -1130,10 +1130,10 @@
 .. py:function:: HSL(kdata)
 
     获取换手率(百分比 x%)，等于 VOL(k) / CAPITAL(k)
-    
+
     :param KData kdata: k线数据
     :rtype: Indicator
-    
+
 .. py:function:: IC(ind, stks[, n=1, spearman=True, strict=True])
 
     计算指定因子相对于参考证券的 IC （默认为 RankIC）
@@ -1162,7 +1162,7 @@
     :param sequence or Block stks: 证券组合
     :param int n: 时间窗口(对应的 n 日收益率)
     :param int rolling_n: 滚动周期
-    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson  
+    :param bool spearman: 默认使用 spearman 计算相关系数，否则为 pearson
     :param bool strict: 按因子观测日重新索引 IC（参见 IC 说明）
     :rtype: Indicator
 
@@ -1187,24 +1187,24 @@
     :param int n: 时间窗口（默认100），如果只想使用最后的值，可以使用 0, 或 len(p),len(b) 指定
     :rtype: Indicator
 
-    
+
 .. py:function:: IF(x, a, b)
 
     条件函数, 根据条件求不同的值。
-    
+
     用法：IF(X,A,B)若X不为0则返回A,否则返回B
-    
+
     例如：IF(CLOSE>OPEN,HIGH,LOW)表示该周期收阳则返回最高值,否则返回最低值
-    
+
     注意：各操作数必须与上下文等长，否则抛出异常。
-    
+
     :param Indicator x: 条件指标
     :param Indicator a: 待选指标 a
     :param Indicator b: 待选指标 b
     :rtype: Indicator
-    
 
-.. py:function:: INBLOCK(data, category, name)        
+
+.. py:function:: INBLOCK(data, category, name)
 
     当前上下文证券是否在指定的板块中。
 
@@ -1215,12 +1215,12 @@
 
 
 .. py:function:: INDEXC([kdata])
-    
+
     返回对应的大盘收盘价,分别是上证指数,深证成指,科创50,创业板指
 
 
 .. py:function:: INDEXH([kdata])
-    
+
     返回对应的大盘最高价,分别是上证指数,深证成指,科创50,创业板指
 
 
@@ -1230,12 +1230,12 @@
 
 
 .. py:function:: INDEXO([kdata])
-    
+
     返回对应的大盘开盘价,分别是上证指数,深证成指,科创50,创业板指
 
 
 .. py:function:: INDEXA([kdata])
-    
+
     返回对应的大盘成交金额,分别是上证指数,深证成指,科创50,创业板指
 
 
@@ -1245,12 +1245,12 @@
 
 
 .. py:function:: INDEXADV([query])
-    
+
     通达信 880005 大盘上涨家数, 可能无法盘中更新!
 
 
 .. py:function:: INDEXDEC([query])
-    
+
     通达信 880005 大盘下跌家数, 可能无法盘中更新!
 
 
@@ -1261,7 +1261,7 @@
     注意: INSUM使用模式4/5时相当于RANK功能, 但不适合在MF中使用, 在 MF 中使用时计算量为 N x N 级别, 计算缓慢。如果希望在 MF 中使用，建议直接使用 RANK[捐赠用户] 指标。
 
     用法:
-    
+
         INSUM(block, query, ind, mode)
 
         INSUM(stks, query, ind, mode)
@@ -1270,13 +1270,13 @@
     :param Query query: 指定范围
     :param Indicator ind: 指定指标
     :param int mode: 计算类型:0-累加,1-平均数,2-最大值,3-最小值,4-降序排名(指标值最高的排名为1), 5-升序排名(指标值越高排名值越高)
-    :rtype: Indicator    
+    :rtype: Indicator
 
 
 .. py:function:: INTPART([data])
 
     取整(绝对值减小取整，即取得数据的整数部分)
-    
+
     :param data: 输入数据
     :rtype: Indicator
 
@@ -1294,16 +1294,16 @@
     判断股票是否跌停指标
 
     根据不同股票类型判断当日收盘价是否达到跌停板价格：
-    
+
     - A股普通股票：跌停幅度为10%
-    - 北交所股票：跌停幅度为30%  
+    - 北交所股票：跌停幅度为30%
     - 创业板/科创板股票：跌停幅度为20%
     - ST股票跌停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
 
     跌停判断逻辑：当日收盘价 <= 前一日收盘价 × (1 - 跌停幅度)
-    
+
     注意：跌停幅度按各板块现行规则取值，不按历史日期分段——2020-08-24 之前的创业板股票实际为 10%、新股上市初期没有涨跌幅限制，这两种情形仍按现行幅度判定。
-    
+
     注意：判定在后复权（BACKWARD）收盘价序列上进行：上下文为未复权时，指标内部按相同查询自动改取后复权数据，除权除息日前后价格比较保持连续、可正常判定。
 
     :param KData kdata: K线数据
@@ -1315,16 +1315,16 @@
     判断股票是否涨停指标
 
     根据不同股票类型判断当日收盘价是否达到涨停板价格：
-    
+
     - A股普通股票：涨停幅度为10%
     - 北交所股票：涨停幅度为30%
     - 创业板/科创板股票：涨停幅度为20%
     - ST股票涨停幅度为5%，但由于缺乏ST标识的历史日期信息，暂未处理
 
     涨停判断逻辑：当日收盘价 >= 前一日收盘价 × (1 + 涨停幅度)
-    
+
     注意：涨跌幅幅度按各板块现行规则取值，不按历史日期分段——2020-08-24 之前的创业板股票实际为 10%、新股上市初期没有涨跌幅限制，这两种情形仍按现行幅度判定。
-    
+
     注意：判定在后复权（BACKWARD）收盘价序列上进行：上下文为未复权时，指标内部按相同查询自动改取后复权数据，除权除息日前后价格比较保持连续、可正常判定。
 
     :param KData kdata: K线数据
@@ -1350,15 +1350,15 @@
 .. py:function:: JUMPDOWN([ind])
 
     边缘跳变，从小于等于0.0，跳变到 > 0.0
-    
+
     :param Indicator ind: 指标
     :rtype: Indicator
 
 
 .. py:function:: JUMPUP([ind])
-    
+
     边缘跳变，从大于0.0，跳变到 <= 0.0
-    
+
     :param Indicator ind: 指标
     :rtype: Indicator
 
@@ -1374,7 +1374,7 @@
     :param float r: 噪声系数（必须 > 0）
     :rtype: Indicator
 
-    
+
 .. py:function:: KDATA([data])
 
     包装KData成Indicator，用于其他指标计算
@@ -1382,12 +1382,12 @@
     :param data: KData 或 具有6个返回结果的Indicator（如KDATA生成的Indicator）
     :rtype: Indicator
 
-    
+
 .. py:function:: KDATA_PART([data, kpart])
 
     根据字符串选择返回指标KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL，如:KDATA_PART("CLOSE")等同于CLOSE()
 
-    :param data: 输入数据（KData 或 Indicator） 
+    :param data: 输入数据（KData 或 Indicator）
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :rtype: Indicator
 
@@ -1405,7 +1405,7 @@
 .. py:function:: LIUTONGPAN(kdata)
 
    获取流通盘（单位：万股），同 CAPITAL
-   
+
    :param KData kdata: k线数据
    :rtype: Indicator
 
@@ -1445,11 +1445,11 @@
 .. py:function:: LLVBARS([data, n=20])
 
     上一低点位置 求上一低点到当前的周期数。
-    
+
     用法：LLVBARS(X,N):求N周期内X最低值到当前周期数N=0表示从第一个有效值开始统计
-    
+
     例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
-    
+
     :param data: 输入数据
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
@@ -1488,28 +1488,28 @@
     :param int n:
     :rtype: Indicator
 
-    
+
 .. py:function:: LOW([data])
 
     获取最低价，包装KData的最低价成Indicator
-    
-    :param data: 输入数据（KData 或 Indicator） 
+
+    :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: MA([data, n=22])
 
     简单移动平均
-    
+
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
-    
+
 .. py:function:: MACD([data, n1=12, n2=26, n3=9])
 
     平滑异同移动平均线
-    
+
     NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），三线输出（BAR/DIFF/DEA）保持上一根值不变，不会一 NaN/Inf 就污染尾部；前导非有限值使内部 EMA 保持未播种，直到首个有限观测。
 
     :param Indicator data: 输入数据
@@ -1526,7 +1526,7 @@
 .. py:function:: MAX(ind1, ind2)
 
     求最大值, MAX(A,B)返回A和B中的较大值。
-    
+
     :param Indicator ind1: A
     :param Indicator ind2: B
     :rtype: Indicator
@@ -1542,13 +1542,13 @@
 .. py:function:: MDD_CURRENT([data])
 
     当前点到历史最高点的回撤百分比，按行业惯例为正值
-    
+
     计算公式：(历史最高点 - 当前值) / 历史最高点 * 100%
-    
+
     与 MDD 的区别：MDD 计算的是到指定窗口内最高点的回撤，而 MDD_CURRENT 计算的是到从序列起始点到当前点的历史最高点的回撤，不设时间窗口限制。
-    
+
     注意：输入值小于等于 0 或为 nan 时，返回 nan。
-    
+
     :param Indicator data: 输入数据
     :rtype: Indicator
 
@@ -1556,11 +1556,11 @@
 .. py:function:: MIN(ind1, ind2)
 
     求最小值, MIN(A,B)返回A和B中的较小值。
-    
+
     :param Indicator ind1: A
     :param Indicator ind2: B
     :rtype: Indicator
-    
+
 
 .. py:function:: MINUTE([data])
 
@@ -1609,26 +1609,26 @@
 .. py:function:: NAMELIKE([data,] pattern)
 
     证券名称模式匹配
-    
+
     返回当前上下文中的证券名称是否匹配指定的模式。支持通配符匹配：
-    
+
     - ``*`` ：匹配任意长度的任意字符序列（包括空序列）
     - ``?`` ：匹配单个任意字符
-    
+
     返回值：匹配成功返回 1.0，否则返回 0.0。所有周期的返回值相同。
-    
+
     使用示例::
-    
+
         # 匹配以"上证"开头的指数名称
         kdata = get_kdata('sh000001', Query(-10))
         result = NAMELIKE(kdata, "上证*")
-        
+
         # 匹配包含"指数"的名称
         result = NAMELIKE(kdata, "*指数*")
-        
+
         # 匹配4个字符的名称
         result = NAMELIKE(kdata, "????")
-        
+
         # 精确匹配特定名称
         result = NAMELIKE(kdata, "上证指数")
 
@@ -1651,29 +1651,29 @@
 .. py:function:: NOT([data])
 
     求逻辑非。NOT(X)返回非X,即当X<=0时返回1，否则返回0。
-    
+
     :param Indicator data: 输入数据
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: OPEN([data])
 
     获取开盘价，包装KData的开盘价成Indicator
-    
-    :param data: 输入数据（KData 或 Indicator） 
+
+    :param data: 输入数据（KData 或 Indicator）
     :rtype: Indicator
 
 
 .. py:function:: POW(data, n)
 
     乘幂
-    
+
     用法：POW(A,B)返回A的B次幂
-    
+
     例如：POW(CLOSE,3)求得收盘价的3次方
-    
+
     结果溢出或无定义时返回 null
-    
+
     :param data: 输入数据
     :param int|Indicator|IndParam n: 幂
     :rtype: Indicator
@@ -1682,22 +1682,22 @@
 .. py:function:: SIGNED_POWER(data, n)
 
     带符号乘幂
-    
+
     用法：SIGNED_POWER(A,B)返回A的B次幂，但保留原始符号
-    
+
     例如：SIGNED_POWER(CLOSE,3)求得收盘价的3次方，保留原始符号
-    
+
     结果溢出或无定义时返回 null
-    
+
     :param data: 输入数据
     :param int|Indicator|IndParam n: 幂
     :rtype: Indicator
 
 
 .. py:function:: PRICELIST([data=None, discard=0, align_dates=None])
-    
+
     将 list、tuple、Indicator 转化为普通的 Indicator
-    
+
     :param sequence data: 输入数据
     :param int discard: 丢弃前多少个数据
     :param sequence align_dates: 对齐日期列表，如果为空则不进行对齐
@@ -1716,13 +1716,13 @@
     :return: 指标值在指定板块中的排名
     :rtype: Indicator
 
- 
+
 .. py:function:: REF([data, n])
 
     向前引用 （即右移），引用若干周期前的数据。
-    
+
     用法：REF(X，A)　引用A周期前的X值。
-    
+
     :param Indicator data: 输入数据
     :param int n: 引用n周期前的值，即右移n位
     :rtype: Indicator
@@ -1735,7 +1735,7 @@
     注意：此函数属于未来函数, 不应被用于回测, 主要用于AI等需要获取未来数据的场景。
 
     :param Indicator ind: 指标
-    :param int n: 周期数    
+    :param int n: 周期数
 
 
 .. py:function:: RECOVER_BACKWARD([data])
@@ -1771,7 +1771,7 @@
 
 
 .. py:function:: REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False])
-          
+
     替换指标中指定值，默认为替换 nan 值为 0.0。
 
     old_value 按数个 ULP 的相对容差匹配，浮点表示误差内的同值也会被替换；nan 与 nan 匹配。
@@ -1851,7 +1851,7 @@
     在修正标准分（Z × R²）基础上再乘一次原始 β，放大多头强势区间的分值、压缩空头弱势分值，专门做多择时用。
 
     **计算层次**：
-    
+
     1. **层次1（β）**：滚动 N 日 OLS 回归计算 β 值，公式：High = α + β · Low
     2. **层次2（Z）**：滚动 M 日 Z-score 标准化，解决不同阶段 β 中枢漂移问题
     3. **层次3（修正标准分）**：Z × R²，R² 为回归拟合优度，过滤拟合差的噪音
@@ -1873,22 +1873,22 @@
 
         # 获取K线数据
         kdata = get_kdata('sh000001', Query(-1000))
-        
+
         # 计算RSRS_BULL指标（默认n=20, m=60）
         bull = RSRS_BULL(kdata)
-        
+
         # 获取层级4修正值（结果集0）
         bull_value = bull.get(-1, 0)
-        
+
         # 获取 β 值（结果集1）
         beta = bull.get(-1, 1)
-        
+
         # 获取 R² 值（结果集2）
         r2 = bull.get(-1, 2)
-        
+
         # 获取 Z 值（结果集3）
         z_score = bull.get(-1, 3)
-        
+
         # 只有当 R² > 0.8 时，指标才有效
         if r2 > 0.8:
             print(f"有效 RSRS_BULL 值: {bull_value}")
@@ -1911,7 +1911,7 @@
     :rtype: Indicator
 
     **计算原理**：
-    
+
     1. 每根K线取自身的最低价 Low[i] 和最高价 High[i]，形成坐标点 (Low[i], High[i])
     2. 使用滚动窗口内的N个点进行OLS线性回归，拟合直线 High = α + β · Low
     3. β 值即为回归斜率，反映支撑阻力的强弱程度
@@ -1920,10 +1920,10 @@
 
         # 获取K线数据
         kdata = get_kdata('sh000001', Query(-200))
-        
+
         # 计算RSRS_BETA指标（默认n=20）
         rsrs_beta = RSRS_BETA(kdata)
-        
+
         # 计算RSRS_BETA指标（自定义窗口大小）
         rsrs_beta = RSRS_BETA(kdata, 10)
 
@@ -1962,12 +1962,12 @@
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
-    
+
 
 .. py:function:: SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
     亚历山大 艾尔德安全地带止损线，参见 [BOOK2]_
-    
+
     计算说明：在回溯周期内（一般为10到20天），将所有向下穿越的长度相加除以向下穿越的次数，得到噪音均值（即回溯期内所有最低价低于前一日最低价的长度除以次数），并用今日最低价减去（前日噪音均值乘以一个倍数）得到该止损线。为了抵消波动并且保证止损线的上移，在上述结果的基础上再取起N日（一般为3天）内的最高值
 
     注意：计算把输入序列当作最低价序列使用，应传入 LOW()；输入无数据的点不参与窗口（与 HHV、LLV 一致），窗口内全部无数据时返回 nan。
@@ -1977,7 +1977,7 @@
     :param int n2: 对初步止损线去n2日内的最高值
     :param float p: 噪音系数
     :rtype: Indicator
-    
+
 
 .. py:function:: SIN([data])
 
@@ -2038,7 +2038,7 @@
     求移动平均
 
     用法：若Y=SMA(X,N,M) 则 Y=[M*X+(N-M)*Y')/N,其中Y'表示上一周期Y值
-    
+
     NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），SMA[i] 保持 SMA[i-1]，不会一 NaN/Inf 就污染尾部。
 
     :param Indicator data: 输入数据
@@ -2097,7 +2097,7 @@
 .. py:function:: STD([data, n=10])
 
     计算N周期内样本标准差
-    
+
     :param Indicator data: 输入数据
     :param int n|Indicator|IndParam: 时间窗口
     :rtype: Indicator
@@ -2106,16 +2106,16 @@
 .. py:function:: STDEV([data, n=10])
 
     计算N周期内样本标准差
-    
+
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
-    
+
 
 .. py:function:: STDP([data, n=10])
 
     总体标准差，STDP(X,N)为X的N日总体标准差
-    
+
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
@@ -2131,7 +2131,7 @@
 
         # 使用默认上下文
         stktype = STKTYPE()
-        
+
         # 指定K线数据
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(0, 100))
@@ -2144,6 +2144,8 @@
 .. py:function:: SUM([data, n=20])
 
     求总和。SUM(X,N),统计N周期中X的总和,N=0则从第一个有效值开始。
+
+    注：SUM 为纯累加器，窗口内出现非有限值时结果按契约向后传播（不同于极值/均值族忽略缺失点的口径）。
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -2196,7 +2198,7 @@
 
     :param KData k: 上下文
     :rtype: Indicator
-    
+
 
 .. py:function:: TIMELINEVOL([k])
 
@@ -2272,14 +2274,14 @@
 .. py:function:: VIGOR([kdata, n=2])
 
     亚历山大.艾尔德力度指数 [BOOK2]_
-    
+
     计算公式：（收盘价今－收盘价昨）＊成交量今
-    
+
     :param KData data: 输入数据
     :param int n: EMA平滑窗口
     :rtype: Indicator
-   
-    
+
+
 .. py:function:: VOL([data])
 
     获取成交量，包装KData的成交量成Indicator
@@ -2291,9 +2293,9 @@
 .. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
     将最多6个Indicator的结果组合在一起放在一个Indicator中。如ind = WEAVE(ind1, ind2), 则此时ind包含多个结果，按ind1、ind2的顺序存放。
-    
+
     注意：各操作数必须与上下文等长，否则抛出异常；纯数据指标树（无上下文）以最长操作数为基准右端对齐合并。
-    
+
     :param Indicator ind1: 指标1
     :param Indicator ind2: 指标2
     :param Indicator ind3: 指标3, 可省略
@@ -2316,7 +2318,7 @@
 
 
 .. py:function:: WINNER([ind])
-    
+
     获利盘比例
 
     用法: WINNER(CLOSE)　表示以当前收市价卖出的获利盘比例。
@@ -2360,7 +2362,7 @@
    获取总股本（单位：万股）
 
    :param KData kdata: k线数据
-   :rtype: Indicator    
+   :rtype: Indicator
 
 
 .. py:function:: ZSCORE([data, out_extreme, nsigma, recursive])
@@ -2368,7 +2370,7 @@
     对数据进行标准化（归一），可选进行极值排除
 
     注：非窗口滚动，如需窗口滚动的标准化，直接 (x - MA(x, n)) / STDEV(x, n) 即可。
-    
+
     非有限值（NaN 或 ±Inf）不参与 mean 与 sigma 计算，对应输出为 Null。
 
     :param Indicator data: 待剔除异常值的数据

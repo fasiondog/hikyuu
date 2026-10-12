@@ -26,7 +26,7 @@ Built-in Technical Indicators
 .. py:function:: AD(kdata)
 
    The accumulation/distribution line
-   
+
    :param KData kdata: the K-line data
    :rtype: Indicator
 
@@ -34,37 +34,37 @@ Built-in Technical Indicators
 .. py:function:: ADJ_FACTOR([kdata])
 
     Calculate the adjustment factor indicator
-    
+
     Calculate the backward adjustment factor sequence based on the stock's dividend data (the stock sends, the allotments, the conversions, the cash dividends, etc.).
     The adjustment factor indicates how many shares are held now if 1 share was held at the listing, after all the stock sends, the allotments and the conversions.
     It is calculated in a cumulative multiplication way, ensuring the consistency of the adjustment processing of the price, the volume and the amount.
-    
+
     This indicator needs to set the KData context to work properly, set through the setContext() method.
-    
+
     :param KData kdata: optional, pass in the K-line data directly as the context
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **Important restrictions**:
-       
+
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
        - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
        - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
-    
+
     **Usage example**::
-    
+
         # Get the adjustment factor of a stock
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(-100))
         adj_factor = ADJ_FACTOR()
         adj_factor.setContext(kdata)
-        
+
         # Or pass in the K-line data directly
         adj_factor = ADJ_FACTOR(kdata)
-    
+
     **Related indicators**:
-    
+
     * :py:func:`ADJ_OPEN` - the adjusted open price
     * :py:func:`ADJ_HIGH` - the adjusted high price
     * :py:func:`ADJ_LOW` - the adjusted low price
@@ -76,22 +76,22 @@ Built-in Technical Indicators
 .. py:function:: ADJ_OPEN()
 
     Calculate the adjusted open price indicator
-    
+
     Recover the open price backward by the adjustment factor, obtaining the adjusted open price sequence.
     The calculation formula: ADJ_OPEN = ADJ_FACTOR * OPEN
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **Important restrictions**:
-       
+
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
        - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
        - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
-    
+
     **Related indicators**:
-    
+
     * :py:func:`ADJ_FACTOR` - the adjustment factor
     * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
@@ -99,22 +99,22 @@ Built-in Technical Indicators
 .. py:function:: ADJ_HIGH()
 
     Calculate the adjusted high price indicator
-    
+
     Recover the high price backward by the adjustment factor, obtaining the adjusted high price sequence.
     The calculation formula: ADJ_HIGH = ADJ_FACTOR * HIGH
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **Important restrictions**:
-       
+
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
        - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
        - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
-    
+
     **Related indicators**:
-    
+
     * :py:func:`ADJ_FACTOR` - the adjustment factor
     * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
@@ -122,22 +122,22 @@ Built-in Technical Indicators
 .. py:function:: ADJ_LOW()
 
     Calculate the adjusted low price indicator
-    
+
     Recover the low price backward by the adjustment factor, obtaining the adjusted low price sequence.
     The calculation formula: ADJ_LOW = ADJ_FACTOR * LOW
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **Important restrictions**:
-       
+
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
        - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
        - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
-    
+
     **Related indicators**:
-    
+
     * :py:func:`ADJ_FACTOR` - the adjustment factor
     * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
@@ -145,22 +145,22 @@ Built-in Technical Indicators
 .. py:function:: ADJ_CLOSE()
 
     Calculate the adjusted close price indicator
-    
+
     Recover the close price backward by the adjustment factor, obtaining the adjusted close price sequence.
     The calculation formula: ADJ_CLOSE = ADJ_FACTOR * CLOSE
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **Important restrictions**:
-       
+
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
        - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value and the adjusted sequence matches RECOVER_EQUAL_BACKWARD
        - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
-    
+
     **Related indicators**:
-    
+
     * :py:func:`ADJ_FACTOR` - the adjustment factor
     * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
@@ -168,24 +168,24 @@ Built-in Technical Indicators
 .. py:function:: ADJ_VOL()
 
     Calculate the adjusted volume indicator
-    
+
     Recover the volume by the reciprocal of the same factor used by the adjusted price, obtaining the adjusted volume sequence.
     The calculation formula: ADJ_VOL = VOL / ADJ_FACTOR
-    
+
     Note: the volume moves in the direction opposite to the price (the factor is the reciprocal), so the adjusted price x adjusted volume keeps the raw amount. This is the volume convention of the factor management system and differs from a volume re-expressed in the share terms only (a cash dividend changes the price but not the share count). The K-line recovery adjusts the price only and leaves the volume and the amount untouched (the same as Wind / JoinQuant), so use this indicator when a volume consistent with the adjusted price is required.
-    
+
     :rtype: Indicator
-    
-    .. warning:: 
+
+    .. warning::
        **Important restrictions**:
-       
+
        - **Period restriction**: it is only applicable to the daily period. The non-daily periods such as the weekly and the monthly lines have the alignment problems, and the results may be inaccurate
        - **Depends on the factor management**: it needs to be used together with the factor value storage of the factor management system; call update_all_factors_values() daily to update and save the factor values to ensure the accuracy
        - **The relationship with RECOVER_EQUAL_BACKWARD**: the factor is anchored at a fixed baseline (the beginning of the stock's ex-rights/ex-dividend data), so a given date always gets the same value; the adjusted price matches the RECOVER_EQUAL_BACKWARD price, while the volume of the recovered K-line data keeps its raw value (the recovery adjusts the price only)
        - **The calculation start point**: the factor is accumulated from the fixed baseline, not from the start point of the K-line data of the current query
-    
+
        **Related indicators**:
-    
+
        * :py:func:`ADJ_FACTOR` - the adjustment factor
        * :py:func:`RECOVER_EQUAL_BACKWARD` - the equal-ratio backward adjustment
 
@@ -202,7 +202,7 @@ Built-in Technical Indicators
 
 .. py:function:: AGG_COUNT
 
-    The aggregation function: the non-empty value counting, refer to :func:`AGG_STD`   
+    The aggregation function: the non-empty value counting, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_MAD
 
@@ -218,7 +218,7 @@ Built-in Technical Indicators
 
 .. py:function:: AGG_MEDIAN
 
-    The aggregation function: the median, refer to :func:`AGG_STD`    
+    The aggregation function: the median, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_MIN
 
@@ -226,7 +226,7 @@ Built-in Technical Indicators
 
 .. py:function:: AGG_PROD
 
-    The aggregation function: the product, refer to :func:`AGG_STD` 
+    The aggregation function: the product, refer to :func:`AGG_STD`
 
 .. py:function:: AGG_SAMPLE(ind[, time="9:35", ktype=Query.MIN, fill_null=False, unit=1])
 
@@ -297,7 +297,7 @@ Built-in Technical Indicators
     :param int unit: the aggregation period unit (the grouping unit of the context K-lines; when using the daily line to calculate the minute-line aggregation, unit=2 means aggregating the minute-lines of 2 days)
     :param float quantile: the quantile, between (0, 1)
     :return: the indicator data
-    :rtype: Indicator     
+    :rtype: Indicator
 
 .. py:function:: AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
@@ -333,9 +333,9 @@ Built-in Technical Indicators
 
 
 .. py:function:: AGG_FUNC(ind, agg_func[, ktype=Query.MIN, fill_null=False, unit=1]
-      
+
     Aggregate the indicators of the other K-line periods with a custom function.
-    
+
     Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
@@ -371,15 +371,15 @@ Built-in Technical Indicators
     :param int fast_n: the corresponding fast period N
     :param int slow_n: the N value corresponding to the slow EMA line
     :rtype: Indicator
-    
+
     * result(0): AMA
     * result(1): ER
 
-    
+
 .. py:function:: AMO([data])
 
     Get the amount; wrap the amount of the KData as an Indicator
-    
+
     :param data: the input data (KData or Indicator)
     :rtype: Indicator
 
@@ -444,10 +444,10 @@ Built-in Technical Indicators
 
         # Get the K-line data
         kdata = get_kdata('sh000001', Query(-200))
-        
+
         # Calculate the ADX indicator
         adx = ADX(kdata, 14)
-        
+
         # Get the ADX value (index 0), the +DI value (index 1), the -DI value (index 2)
         adx_value = adx.get(-1, 0)
         pdi_value = adx.get(-1, 1)
@@ -484,10 +484,10 @@ Built-in Technical Indicators
 
         # Get the K-line data
         kdata = get_kdata('sh000001', Query(-200))
-        
+
         # Calculate the ADX2 indicator
         adx2 = ADX2(kdata, 14)
-        
+
         # Get the ADX2 value (index 0), the +DI value (index 1), the -DI value (index 2)
         adx2_value = adx2.get(-1, 0)
         pdi_value = adx2.get(-1, 1)
@@ -556,13 +556,13 @@ Built-in Technical Indicators
 
         # The static parameter
         result = BARSLASTS(cond, 2)
-        
+
         # The dynamic parameter - using CVAL
         result = BARSLASTS(cond, CVAL(cond, 2))
-        
+
         # The dynamic parameter - using IndParam
         result = BARSLASTS(cond, IndParam(n_indicator))
-        
+
         # The dynamic parameter - using an Indicator directly
         result = BARSLASTS(cond, n_indicator)
 
@@ -634,13 +634,13 @@ Built-in Technical Indicators
     :param Indicator c: C
     :rtype: Indicator
 
-    
+
 .. py:function:: BLOCKSETNUM(block, query)
 
     The cross-sectional statistics (returning the number of the stocks in the block), with two calling ways:
 
         BLOCKSET(block, query)
-        
+
         BLOCKSET(stks, query)
 
     :param Block block | sequence stks: the block to count or a stock list
@@ -648,40 +648,40 @@ Built-in Technical Indicators
 
 
 .. py:function:: CLOSE([data])
-   
+
     Get the close price; wrap the close price of the KData as an Indicator
-    
+
     :param data: the input data (KData or Indicator)
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: CAPITAL(kdata)
 
    Get the circulating share capital (unit: 10,000 shares), the same as LIUTONGPAN
-   
+
    :param KData kdata: the K-line data
    :rtype: Indicator
-   
+
 
 .. py:function:: CEIL([data])
 
     The same as :py:func:`CEILING`
 
-   
+
 .. py:function:: CEILING([data])
 
     Round up (rounding in the direction of increasing the value) to an integer
-   
+
     Usage: CEILING(A) returns the closest integer in the direction of increasing the value of A
-   
+
     For example: CEILING(12.3) gets 13; CEILING(-3.5) gets -3
-   
+
     :param data: the input data
     :rtype: Indicator
-   
+
 
 .. py:function:: CYCLE(kdata, [adjust_cycle=1], [adjust_mode='query'], [delay_to_trading_day=True])
-          
+
     The PF rebalance cycle indicator, mainly used for the PF rebalance day verification, and as an SG
 
     :param KData kdata: the K-line data
@@ -692,11 +692,11 @@ Built-in Technical Indicators
 
 
 .. py:function:: CONTEXT([ind, fill_null=False, use_self_ktype=False, use_self_recover_type=False])
-    
+
     The independent context. It uses the context that the ind comes with. When a new context is specified, it will not change the existing context.
     For example: ind = CLOSE(k1); when a new context ind = ind(k2) is specified, the close price of k2 is used. If you still want to use the close price of k1,
     you need to use ind = CONTEXT(CLOSE(k1)); at this time ind(k2) will still use the close price of k1.
-    
+
     :param Indicator ind: the indicator object
     :param bool fill_null: during the date alignment, the missing dates are filled with the empty values; otherwise, they are filled with the previous values.
     :param bool use_self_ktype: use the KTYPE in its own independent context when calculating the formula
@@ -719,7 +719,7 @@ Built-in Technical Indicators
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
     :param int n: calculate the correlation coefficient of the data between the two inds by the specified length n. n >= 2; when it is 0 an expanding window is used: dst[i] is the Pearson corr & sample cov over [discard(), i] (discard becomes 1, bar 0 is nan).
-    :rtype: Indicator    
+    :rtype: Indicator
 
 .. py:function:: COV(ind1, ind2[, n=10, fill_null=True])
 
@@ -756,26 +756,26 @@ Built-in Technical Indicators
 .. py:function:: CODELIKE([data,] pattern)
 
     The security code pattern matching
-    
+
     Return whether the security code in the current context matches the specified pattern. It supports the wildcard matching:
-    
+
     - ``*``: matches any sequence of any characters of any length (including the empty sequence)
     - ``?``: matches a single arbitrary character
-    
+
     The return value: it returns 1.0 when the match succeeds, otherwise 0.0. The return values of all the periods are the same.
-    
+
     Usage example::
-    
+
         # Match the stock codes starting with "600"
         kdata = get_kdata('sh600000', Query(-10))
         result = CODELIKE(kdata, "600*")
-        
+
         # Match the stock codes of 6 digits
         result = CODELIKE(kdata, "??????")
-        
+
         # Match the codes starting with "000" and ending with "1"
         result = CODELIKE(kdata, "000*1")
-        
+
         # Match a specific code exactly
         result = CODELIKE(kdata, "600000")
 
@@ -788,11 +788,11 @@ Built-in Technical Indicators
 .. py:function:: COUNT([data, n=20])
 
     Count the number of the periods satisfying the condition.
-    
+
     Usage: COUNT(X,N), counting the number of the periods satisfying the condition X within the N periods; if N=0, start from the first valid value.
-    
+
     For example: COUNT(CLOSE>OPEN,20) means counting the number of the periods closing bullish within the 20 periods
-    
+
     :param Indicator data: the condition
     :param int|Indicator|IndParam n: the periods
     :rtype: Indicator
@@ -810,7 +810,7 @@ Built-in Technical Indicators
 .. py:function:: CVAL([data, value=0.0, discard=0])
 
     data is an Indicator instance; create a constant indicator with the same length as data, whose value is value, and the discard length is the same as data
-    
+
     :param Indicator data: the Indicator instance
     :param float value: the constant value
     :param int discard: the discard quantity
@@ -866,14 +866,14 @@ Built-in Technical Indicators
 .. py:function:: DIFF([data, n=1])
 
     The difference indicator, i.e. data[i] - data[i-n]
-    
+
     :param Indicator data: the input data
     :param int n: the difference period, defaulting to 1
     :rtype: Indicator
 
 
 .. py:function:: DISCARD(data, discard)
-    
+
     Set the amount of the discarded data of the indicator result in the way of the indicator formula.
 
     :param Indicator data: the indicator
@@ -916,7 +916,7 @@ Built-in Technical Indicators
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
-    
+
 .. py:function:: EMA([data, n=22])
 
     The Exponential Moving Average
@@ -924,9 +924,9 @@ Built-in Technical Indicators
     NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), EMA[i] holds EMA[i-1]; there is no permanent contamination.
 
     :param data: the input data
-    :param int|Indciator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
+    :param int|Indciator|IndParam n: the period window for calculating the average, which must be an integer greater than 0
     :rtype: Indicator
-    
+
 
 .. py:function:: EVERY([data, n=20])
 
@@ -937,7 +937,7 @@ Built-in Technical Indicators
     For example: EVERY(CLOSE>OPEN,10) means that all the previous 10 days are the bullish candles
 
     :param data: the input data
-    :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
+    :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 0
     :rtype: Indicator
 
 
@@ -946,7 +946,7 @@ Built-in Technical Indicators
     Exists; EXIST(X,N) means that the condition X exists within the N periods
 
     :param data: the input data
-    :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 0 
+    :param int|Indicator|IndParam n: the period window for calculating the average, which must be an integer greater than 0
     :rtype: Indicator
 
 
@@ -1022,40 +1022,40 @@ Built-in Technical Indicators
 .. py:function:: FLOOR([data])
 
     Round down (rounding in the direction of decreasing the value) to an integer
-    
+
     Usage: FLOOR(A) returns the closest integer in the direction of decreasing the value of A
-    
+
     For example: FLOOR(12.3) gets 12
 
     :param data: the input data
     :rtype: Indicator
 
 .. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY])
-      
+
     The custom group cumulative counting
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :rtype: Indicator        
+    :rtype: Indicator
 
 .. py:function:: GROUP_MAX(ind[, ktype=Query.DAY])
-      
+
     The custom group cumulative maximum
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :rtype: Indicator        
+    :rtype: Indicator
 
 .. py:function:: GROUP_MIN(ind[, ktype=Query.DAY])
-      
+
     The custom group cumulative minimum
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :rtype: Indicator        
+    :rtype: Indicator
 
 .. py:function:: GROUP_PROD(ind[, ktype=Query.DAY])
-      
+
     The custom group cumulative product
 
     :param Indicator ind: the indicator to calculate
@@ -1063,17 +1063,17 @@ Built-in Technical Indicators
     :rtype: Indicator
 
 .. py:function:: GROUP_SUM(ind[, ktype=Query.DAY])
-      
+
     The custom group cumulative sum
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
-    :rtype: Indicator    
+    :rtype: Indicator
 
 .. py:function:: GROUP_FUNC(ind, group_func[, ktype=Query.DAY])
-      
+
     The custom group cumulative calculation indicator.
-    
+
     Example, calculating the sum of the minute-line close prices aggregated when calculating the daily line:
 
       >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
@@ -1083,7 +1083,7 @@ Built-in Technical Indicators
     :param Indicator ind: the indicator to calculate
     :param callable group_func: the custom group cumulative function, whose input parameters are arg1: a datetime list, arg2: a numpy array, and which returns the cumulative calculation result with the same length as the input; the type must also be np.array
     :param KQuery.KType ktype: the grouped K-line period
-    :rtype: Indicator    
+    :rtype: Indicator
 
 
 .. py:function:: HHV([data, n=20])
@@ -1093,7 +1093,7 @@ Built-in Technical Indicators
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
-    
+
 
 .. py:function:: HHVBARS([data, n=20])
 
@@ -1106,15 +1106,15 @@ Built-in Technical Indicators
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
-    
+
 .. py:function:: HIGH([data])
 
     Get the high price; wrap the high price of the KData as an Indicator
 
-    :param data: the input data (KData or Indicator) 
+    :param data: the input data (KData or Indicator)
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: HOUR([data])
 
     Get the number of the hours of this period. Usage: HOUR, the valid value range returned by the function is (0-23), and the value is 0 for the daily and the longer analysis periods.
@@ -1131,10 +1131,10 @@ Built-in Technical Indicators
 .. py:function:: HSL(kdata)
 
     Get the turnover rate (the percentage x%), equal to VOL(k) / CAPITAL(k)
-    
+
     :param KData kdata: the K-line data
     :rtype: Indicator
-    
+
 .. py:function:: IC(ind, stks[, n=1, spearman=True, strict=True])
 
     Calculate the IC of the specified factor relative to the reference securities (the RankIC by default)
@@ -1168,7 +1168,7 @@ Built-in Technical Indicators
     :param sequence or Block stks: the securities portfolio
     :param int n: the time window (the corresponding n-day return)
     :param int rolling_n: the rolling period
-    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson  
+    :param bool spearman: use spearman to calculate the correlation coefficient by default, otherwise pearson
     :param bool strict: re-index IC by factor observation date (see the IC entry)
     :rtype: Indicator
 
@@ -1193,24 +1193,24 @@ Built-in Technical Indicators
     :param int n: the time window (defaulting to 100); if you only want to use the last value, you can use 0, or specify len(p), len(b)
     :rtype: Indicator
 
-    
+
 .. py:function:: IF(x, a, b)
 
     The condition function, getting the different values according to the condition.
-    
+
     Usage: IF(X,A,B); if X is not 0, return A, otherwise return B
-    
+
     For example: IF(CLOSE>OPEN,HIGH,LOW) means that if this period closes bullish, return the highest value, otherwise return the lowest value
-    
+
     Note: every operand must be as long as the context, otherwise an exception is thrown
-    
+
     :param Indicator x: the condition indicator
     :param Indicator a: the candidate indicator a
     :param Indicator b: the candidate indicator b
     :rtype: Indicator
-    
 
-.. py:function:: INBLOCK(data, category, name)        
+
+.. py:function:: INBLOCK(data, category, name)
 
     Whether the security of the current context is in the specified block.
 
@@ -1221,12 +1221,12 @@ Built-in Technical Indicators
 
 
 .. py:function:: INDEXC([kdata])
-    
+
     Return the corresponding market close prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXH([kdata])
-    
+
     Return the corresponding market high prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
@@ -1236,12 +1236,12 @@ Built-in Technical Indicators
 
 
 .. py:function:: INDEXO([kdata])
-    
+
     Return the corresponding market open prices, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
 .. py:function:: INDEXA([kdata])
-    
+
     Return the corresponding market amounts, which are the SSE Composite Index, the SZSE Component Index, the STAR 50 and the ChiNext Index
 
 
@@ -1251,12 +1251,12 @@ Built-in Technical Indicators
 
 
 .. py:function:: INDEXADV([query])
-    
+
     The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
 
 
 .. py:function:: INDEXDEC([query])
-    
+
     The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
 
 
@@ -1267,7 +1267,7 @@ Built-in Technical Indicators
     Note: when the INSUM uses the modes 4/5, it is equivalent to the RANK function, but it is not suitable for use in the MF; when used in the MF, the calculation amount is at the N x N level, calculating slowly. If you want to use it in the MF, it is recommended to use the RANK [Donating user] indicator directly.
 
     Usage:
-    
+
         INSUM(block, query, ind, mode)
 
         INSUM(stks, query, ind, mode)
@@ -1276,13 +1276,13 @@ Built-in Technical Indicators
     :param Query query: the specified range
     :param Indicator ind: the specified indicator
     :param int mode: the calculation type: 0-accumulation, 1-average, 2-maximum, 3-minimum, 4-descending ranking (the highest indicator value is ranked 1), 5-ascending ranking (the greater the indicator value, the greater the ranking value)
-    :rtype: Indicator    
+    :rtype: Indicator
 
 
 .. py:function:: INTPART([data])
 
     Take the integer part (rounding by decreasing the absolute value, i.e. getting the integer part of the data)
-    
+
     :param data: the input data
     :rtype: Indicator
 
@@ -1300,9 +1300,9 @@ Built-in Technical Indicators
     The indicator judging whether the stock is the limit down
 
     Judge whether the close price of the day reaches the limit-down price according to the different stock types:
-    
+
     - The ordinary A-share stocks: the limit-down range is 10%
-    - The Beijing Stock Exchange stocks: the limit-down range is 30%  
+    - The Beijing Stock Exchange stocks: the limit-down range is 30%
     - The ChiNext/STAR Market stocks: the limit-down range is 20%
     - The ST stocks have a limit-down range of 5%, but since the historical date information of the ST mark is lacking, it is not handled for now
 
@@ -1321,7 +1321,7 @@ Built-in Technical Indicators
     The indicator judging whether the stock is the limit up
 
     Judge whether the close price of the day reaches the limit-up price according to the different stock types:
-    
+
     - The ordinary A-share stocks: the limit-up range is 10%
     - The Beijing Stock Exchange stocks: the limit-up range is 30%
     - The ChiNext/STAR Market stocks: the limit-up range is 20%
@@ -1356,15 +1356,15 @@ Built-in Technical Indicators
 .. py:function:: JUMPDOWN([ind])
 
     The edge jump, jumping from <= 0.0 to > 0.0
-    
+
     :param Indicator ind: the indicator
     :rtype: Indicator
 
 
 .. py:function:: JUMPUP([ind])
-    
+
     The edge jump, jumping from > 0.0 to <= 0.0
-    
+
     :param Indicator ind: the indicator
     :rtype: Indicator
 
@@ -1380,7 +1380,7 @@ Built-in Technical Indicators
     :param float r: the noise coefficient (must be > 0)
     :rtype: Indicator
 
-    
+
 .. py:function:: KDATA([data])
 
     Wrap the KData as an Indicator, used for the calculation of the other indicators
@@ -1388,12 +1388,12 @@ Built-in Technical Indicators
     :param data: the KData or an Indicator with 6 returned results (such as the Indicator generated by KDATA)
     :rtype: Indicator
 
-    
+
 .. py:function:: KDATA_PART([data, kpart])
 
     Select and return the indicator KDATA/OPEN/HIGH/LOW/CLOSE/AMO/VOL by the string, e.g.: KDATA_PART("CLOSE") is equivalent to CLOSE()
 
-    :param data: the input data (KData or Indicator) 
+    :param data: the input data (KData or Indicator)
     :param string kpart: KDATA|OPEN|HIGH|LOW|CLOSE|AMO|VOL
     :rtype: Indicator
 
@@ -1411,7 +1411,7 @@ Built-in Technical Indicators
 .. py:function:: LIUTONGPAN(kdata)
 
    Get the circulating share capital (unit: 10,000 shares), the same as CAPITAL
-   
+
    :param KData kdata: the K-line data
    :rtype: Indicator
 
@@ -1451,11 +1451,11 @@ Built-in Technical Indicators
 .. py:function:: LLVBARS([data, n=20])
 
     The position of the previous low point, getting the number of the periods from the previous low point to the current.
-    
+
     Usage: LLVBARS(X,N): getting the number of the periods from the lowest value of X within the N periods to the current; N=0 means counting from the first valid value
-    
+
     For example: LLVBARS(HIGH,20) gets the number of the periods from the 20-day lowest point to the current
-    
+
     :param data: the input data
     :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
@@ -1494,28 +1494,28 @@ Built-in Technical Indicators
     :param int n:
     :rtype: Indicator
 
-    
+
 .. py:function:: LOW([data])
 
     Get the low price; wrap the low price of the KData as an Indicator
-    
-    :param data: the input data (KData or Indicator) 
+
+    :param data: the input data (KData or Indicator)
     :rtype: Indicator
 
 
 .. py:function:: MA([data, n=22])
 
     The simple moving average
-    
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
-    
+
 
 .. py:function:: MACD([data, n1=12, n2=26, n3=9])
 
     The Moving Average Convergence Divergence
-    
+
     Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA stay frozen at the prior values, no permanent contamination); leading non-finite values leave the internal EMA states unseeded until the first finite observation.
 
     :param Indicator data: the input data
@@ -1532,7 +1532,7 @@ Built-in Technical Indicators
 .. py:function:: MAX(ind1, ind2)
 
     Get the maximum value; MAX(A,B) returns the greater value of A and B.
-    
+
     :param Indicator ind1: A
     :param Indicator ind2: B
     :rtype: Indicator
@@ -1548,13 +1548,13 @@ Built-in Technical Indicators
 .. py:function:: MDD_CURRENT([data])
 
     The drawdown percentage from the current point to the historical highest point, which is a positive value by the industry convention
-    
+
     The calculation formula: (the historical highest point - the current value) / the historical highest point * 100%
-    
+
     The difference from MDD: what the MDD calculates is the drawdown to the highest point within the specified window, while what the MDD_CURRENT calculates is the drawdown to the historical highest point from the start point of the sequence to the current point, without a time window limit.
-    
+
     Note: a value which is not positive, or nan, gives back nan.
-    
+
     :param Indicator data: the input data
     :rtype: Indicator
 
@@ -1562,11 +1562,11 @@ Built-in Technical Indicators
 .. py:function:: MIN(ind1, ind2)
 
     Get the minimum value; MIN(A,B) returns the smaller value of A and B.
-    
+
     :param Indicator ind1: A
     :param Indicator ind2: B
     :rtype: Indicator
-    
+
 
 .. py:function:: MINUTE([data])
 
@@ -1617,26 +1617,26 @@ Built-in Technical Indicators
 .. py:function:: NAMELIKE([data,] pattern)
 
     The security name pattern matching
-    
+
     Return whether the security name in the current context matches the specified pattern. It supports the wildcard matching:
-    
+
     - ``*``: matches any sequence of any characters of any length (including the empty sequence)
     - ``?``: matches a single arbitrary character
-    
+
     The return value: it returns 1.0 when the match succeeds, otherwise 0.0. The return values of all the periods are the same.
-    
+
     Usage example::
-    
+
         # Match the index names starting with "上证"
         kdata = get_kdata('sh000001', Query(-10))
         result = NAMELIKE(kdata, "上证*")
-        
+
         # Match the names containing "指数"
         result = NAMELIKE(kdata, "*指数*")
-        
+
         # Match the names of 4 characters
         result = NAMELIKE(kdata, "????")
-        
+
         # Match a specific name exactly
         result = NAMELIKE(kdata, "上证指数")
 
@@ -1659,29 +1659,29 @@ Built-in Technical Indicators
 .. py:function:: NOT([data])
 
     Get the logical negation. NOT(X) returns the negation of X, i.e. it returns 1 when X<=0, otherwise 0.
-    
+
     :param Indicator data: the input data
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: OPEN([data])
 
     Get the open price; wrap the open price of the KData as an Indicator
-    
-    :param data: the input data (KData or Indicator) 
+
+    :param data: the input data (KData or Indicator)
     :rtype: Indicator
 
 
 .. py:function:: POW(data, n)
 
     The power
-    
+
     Usage: POW(A,B) returns A to the power of B
-    
+
     For example: POW(CLOSE,3) gets the 3rd power of the close price
-    
+
     Returns null when the result overflows or is undefined
-    
+
     :param data: the input data
     :param int|Indicator|IndParam n: the power
     :rtype: Indicator
@@ -1690,22 +1690,22 @@ Built-in Technical Indicators
 .. py:function:: SIGNED_POWER(data, n)
 
     The signed power
-    
+
     Usage: SIGNED_POWER(A,B) returns A to the power of B, but keeping the original sign
-    
+
     For example: SIGNED_POWER(CLOSE,3) gets the 3rd power of the close price, keeping the original sign
-    
+
     Returns null when the result overflows or is undefined
-    
+
     :param data: the input data
     :param int|Indicator|IndParam n: the power
     :rtype: Indicator
 
 
 .. py:function:: PRICELIST([data=None, discard=0, align_dates=None])
-    
+
     Convert a list, a tuple or an Indicator to an ordinary Indicator
-    
+
     :param sequence data: the input data
     :param int discard: how many data to discard at the front
     :param sequence align_dates: the aligned date list; if it is empty, no alignment is performed
@@ -1723,14 +1723,14 @@ Built-in Technical Indicators
     :param market: the market the block belongs to
     :return: the ranking of the indicator value in the specified block
     :rtype: Indicator
- 
+
 
 .. py:function:: REF([data, n])
 
     The forward reference (i.e. shifting right), referencing the data several periods ago.
-    
+
     Usage: REF(X,A) references the value of X A periods ago.
-    
+
     :param Indicator data: the input data
     :param int n: reference the value n periods ago, i.e. shifting right by n positions
     :rtype: Indicator
@@ -1743,7 +1743,7 @@ Built-in Technical Indicators
     Note: this function belongs to the look-ahead function and should not be used for backtesting; it is mainly used for the scenarios that need to get the future data, such as AI.
 
     :param Indicator ind: the indicator
-    :param int n: the number of the periods    
+    :param int n: the number of the periods
 
 
 .. py:function:: RECOVER_BACKWARD([data])
@@ -1779,7 +1779,7 @@ Built-in Technical Indicators
 
 
 .. py:function:: REPLACE(ind, [old_value=constant.nan, new_value=0.0, ignore_discard=False])
-          
+
     Replace the specified values in the indicator, defaulting to replacing the nan values with 0.0.
 
     old_value is matched with a relative tolerance of a few ULPs, so values equal within
@@ -1864,7 +1864,7 @@ Built-in Technical Indicators
     On the basis of the corrected standard score (Z × R²), it is multiplied by the original β once again, amplifying the scores in the strong bull zone and compressing the scores in the weak bear zone, specifically for the long timing.
 
     **The calculation layers**:
-    
+
     1. **Level 1 (β)**: calculate the β value with the rolling N-day OLS regression, with the formula: High = α + β · Low
     2. **Level 2 (Z)**: the rolling M-day Z-score standardization, solving the problem of the β center drifting in the different stages
     3. **Level 3 (the corrected standard score)**: Z × R², where R² is the regression goodness of fit, filtering the noise with the poor fitting
@@ -1886,22 +1886,22 @@ Built-in Technical Indicators
 
         # Get the K-line data
         kdata = get_kdata('sh000001', Query(-1000))
-        
+
         # Calculate the RSRS_BULL indicator (defaulting to n=20, m=60)
         bull = RSRS_BULL(kdata)
-        
+
         # Get the level 4 corrected value (the result set 0)
         bull_value = bull.get(-1, 0)
-        
+
         # Get the β value (the result set 1)
         beta = bull.get(-1, 1)
-        
+
         # Get the R² value (the result set 2)
         r2 = bull.get(-1, 2)
-        
+
         # Get the Z value (the result set 3)
         z_score = bull.get(-1, 3)
-        
+
         # The indicator is valid only when R² > 0.8
         if r2 > 0.8:
             print(f"Valid RSRS_BULL value: {bull_value}")
@@ -1924,7 +1924,7 @@ Built-in Technical Indicators
     :rtype: Indicator
 
     **The calculation principle**:
-    
+
     1. Take the lowest price Low[i] and the highest price High[i] of each K-line itself, forming the coordinate point (Low[i], High[i])
     2. Use the N points within the rolling window to perform the OLS linear regression, fitting the line High = α + β · Low
     3. The β value is the regression slope, reflecting the strength of the support and the resistance
@@ -1933,10 +1933,10 @@ Built-in Technical Indicators
 
         # Get the K-line data
         kdata = get_kdata('sh000001', Query(-200))
-        
+
         # Calculate the RSRS_BETA indicator (defaulting to n=20)
         rsrs_beta = RSRS_BETA(kdata)
-        
+
         # Calculate the RSRS_BETA indicator (a custom window size)
         rsrs_beta = RSRS_BETA(kdata, 10)
 
@@ -1975,12 +1975,12 @@ Built-in Technical Indicators
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
-    
+
 
 .. py:function:: SAFTYLOSS([data, n1=10, n2=3, p=2.0])
 
     The Alexander Elder safety zone stop line, see [BOOK2]_
-    
+
     The calculation description: within the lookback period (generally 10 to 20 days), sum all the lengths of the downward penetrations and divide by the number of the downward penetrations to get the average noise (i.e. the total length of all the lowest prices below the lowest price of the previous day within the lookback period divided by the number of the times), and subtract (the average noise of the previous day multiplied by a multiple) from the lowest price of today to get the stop line. To offset the fluctuation and ensure the upward movement of the stop line, take the highest value within the N days (generally 3 days) on the basis of the above result
 
     Note: the calculation reads the input as the low price series, so pass LOW(); a missing value is left out of the window (like HHV and LLV), and a window of nothing but missing values gives back nan.
@@ -1990,7 +1990,7 @@ Built-in Technical Indicators
     :param int n2: take the highest value within the n2 days for the preliminary stop line
     :param float p: the noise coefficient
     :rtype: Indicator
-    
+
 
 .. py:function:: SIN([data])
 
@@ -2051,7 +2051,7 @@ Built-in Technical Indicators
     Get the moving average
 
     Usage: if Y=SMA(X,N,M), then Y=[M*X+(N-M)*Y')/N, where Y' represents the Y value of the previous period
-    
+
     NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), SMA[i] holds SMA[i-1]; there is no permanent contamination.
 
     :param Indicator data: the input data
@@ -2110,7 +2110,7 @@ Built-in Technical Indicators
 .. py:function:: STD([data, n=10])
 
     Calculate the sample standard deviation within the N periods
-    
+
     :param Indicator data: the input data
     :param int n|Indicator|IndParam: the time window
     :rtype: Indicator
@@ -2119,16 +2119,16 @@ Built-in Technical Indicators
 .. py:function:: STDEV([data, n=10])
 
     Calculate the sample standard deviation within the N periods
-    
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
-    
+
 
 .. py:function:: STDP([data, n=10])
 
     The population standard deviation; STDP(X,N) is the N-day population standard deviation of X
-    
+
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
@@ -2144,7 +2144,7 @@ Built-in Technical Indicators
 
         # Use the default context
         stktype = STKTYPE()
-        
+
         # Specify the K-line data
         stock = sm.getStock("sh000001")
         kdata = stock.getKData(Query(0, 100))
@@ -2157,6 +2157,8 @@ Built-in Technical Indicators
 .. py:function:: SUM([data, n=20])
 
     Get the total sum. SUM(X,N), counting the total sum of X within the N periods; when N=0, start from the first valid value.
+
+    Note: as a pure accumulator, a non-finite value in the window propagates through the result by contract, unlike the mean/extreme family which ignores missing points.
 
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -2212,7 +2214,7 @@ Built-in Technical Indicators
 
     :param KData k: the context
     :rtype: Indicator
-    
+
 
 .. py:function:: TIMELINEVOL([k])
 
@@ -2290,14 +2292,14 @@ Built-in Technical Indicators
 .. py:function:: VIGOR([kdata, n=2])
 
     The Alexander Elder force index [BOOK2]_
-    
+
     The calculation formula: (the close price today - the close price yesterday) * the volume today
-    
+
     :param KData data: the input data
     :param int n: the EMA smoothing window
     :rtype: Indicator
-    
-    
+
+
 .. py:function:: VOL([data])
 
     Get the volume; wrap the volume of the KData as an Indicator
@@ -2309,9 +2311,9 @@ Built-in Technical Indicators
 .. py:function:: WEAVE(ind1, ind2[, ind3, ind4, ind5, ind6])
 
     Combine the results of at most 6 Indicators together in one Indicator. E.g. ind = WEAVE(ind1, ind2), then ind contains the multiple results at this time, stored in the order of ind1 and ind2.
-    
+
     Note: every operand must be as long as the context, otherwise an exception is thrown. A data only tree, which has no context, merges its operands at the right end of the longest one.
-    
+
     :param Indicator ind1: the indicator 1
     :param Indicator ind2: the indicator 2
     :param Indicator ind3: the indicator 3, which can be omitted
@@ -2335,7 +2337,7 @@ Built-in Technical Indicators
 
 
 .. py:function:: WINNER([ind])
-    
+
     The profitable position ratio
 
     Usage: WINNER(CLOSE) means the ratio of the profitable positions sold at the current closing price.
@@ -2380,7 +2382,7 @@ Built-in Technical Indicators
    Get the total share capital (unit: 10,000 shares)
 
    :param KData kdata: the K-line data
-   :rtype: Indicator    
+   :rtype: Indicator
 
 
 .. py:function:: ZSCORE([data, out_extreme, nsigma, recursive])
@@ -2388,7 +2390,7 @@ Built-in Technical Indicators
     Standardize (normalize) the data, with the optional outlier exclusion
 
     Note: it is not a window rolling; if the standardization with the window rolling is needed, just use (x - MA(x, n)) / STDEV(x, n).
-    
+
     Non-finite inputs (NaN or ±Inf) are excluded from both the mean and sigma; the corresponding outputs are Null.
 
     :param Indicator data: the data from which the outliers are to be removed

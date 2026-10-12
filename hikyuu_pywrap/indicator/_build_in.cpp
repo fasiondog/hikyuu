@@ -1284,6 +1284,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the total sum. SUM(X,N), counting the total sum of X within the N periods; when N=0, start from the first valid value.
 
+    As a pure accumulator, a non-finite value in the window propagates through the result by contract, unlike the mean/extreme family which ignores missing points.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator)");
