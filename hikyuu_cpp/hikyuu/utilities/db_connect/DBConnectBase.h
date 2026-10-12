@@ -169,6 +169,16 @@ PARAMETER_SUPPORT  // NOSONAR
     void loadView(T &item, const std::string &sql);
 
     /**
+     * Load the model data into the given model instance from a select statement carrying numbered
+     * placeholders
+     * @param item the given model instance
+     * @param sql the select sql statement, possibly with numbered placeholders
+     * @param params the values of the placeholders, in placeholder order
+     */
+    template <typename T>
+    void loadView(T &item, const std::string &sql, const BoundValues &params);
+
+    /**
      * Batch load the model data into a container (a container supporting push_back, such as vector
      * and list)
      * @param container the given container
@@ -584,6 +594,15 @@ void DBConnectBase::batchLoad(Container &container, const DBCondition &cond) {
 template <typename T>
 void DBConnectBase::loadView(T &item, const std::string &sql) {
     SQLStatementPtr st = getStatement(sql);
+    st->exec();
+    if (st->moveNext()) {
+        item.load(st);
+    }
+}
+
+template <typename T>
+void DBConnectBase::loadView(T &item, const std::string &sql, const BoundValues &params) {
+    SQLStatementPtr st = getStatementWithParams(sql, params);
     st->exec();
     if (st->moveNext()) {
         item.load(st);

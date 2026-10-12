@@ -110,8 +110,8 @@ StockInfo SQLiteBaseInfoDriver::getStockInfo(string market, const string& code) 
         // second "where" to it, so the filters are appended with "and" directly
         auto con = m_pool->get();
         con->loadView(result,
-                      fmt::format("{} and a.code={} and c.market={}", StockInfo::getSelectSQL(),
-                                  sqlStringLiteral(code, '\''), sqlStringLiteral(market, '\'')));
+                      fmt::format("{} and a.code=?1 and c.market=?2", StockInfo::getSelectSQL()),
+                      {code, market});
     } catch (...) {
     }
     return result;
