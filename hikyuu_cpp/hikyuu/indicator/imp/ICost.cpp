@@ -39,7 +39,9 @@ void ICost::_calculate(const Indicator& data) {
 
     // transCount is in lots on the daily line and above but in shares below it; freeCount is in
     // units of 10 thousand shares. The factor normalizes both to the turnover ratio (x 100 = %).
-    value_t hsl_factor = KQuery::getKTypeInSeconds(k.getQuery().kType()) >= 86400 ? 0.01 : 0.0001;
+    bool day_or_above =
+      KQuery::getKTypeInSeconds(k.getQuery().kType()) >= KQuery::getKTypeInSeconds(KQuery::DAY);
+    value_t hsl_factor = day_or_above ? 0.01 : 0.0001;
 
     _readyBuffer(total, 1);
 
