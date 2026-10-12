@@ -198,7 +198,7 @@ public:
     BlockList getStockBelongs(const Stock& stk, const string& category);
 
     /**
-     * Get the trading calendar; currently only "SH" is supported
+     * Get the trading calendar of the given market 
      * @param query
      * @param market
      * @return DatetimeList

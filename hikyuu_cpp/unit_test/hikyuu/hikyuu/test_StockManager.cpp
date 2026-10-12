@@ -190,7 +190,7 @@ TEST_CASE("test_StockManager_getAllMarket") {
 
     /** @arg Check the Market in the test data */
     StringList result(sm.getAllMarket());
-    std::vector<string> want_list{"TMP", "SH", "SZ"};
+    std::vector<string> want_list{"SH", "SZ"};
     for (auto want : want_list) {
         bool found = false;
         for (auto i = 0; i < result.size(); i++) {
@@ -201,6 +201,29 @@ TEST_CASE("test_StockManager_getAllMarket") {
         }
         CHECK_UNARY(found);
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_StockManager_getTradingCalendar") {
+    StockManager& sm = StockManager::instance();
+
+    /** @arg Unknown market returns an empty list without throwing */
+    DatetimeList unknown = sm.getTradingCalendar(KQuery(), "FOO");
+    CHECK_EQ(unknown.size(), 0);
+
+    /** @arg Known market returns the same datetime list as its representative index stock */
+    MarketInfo sh_info = sm.getMarketInfo("SH");
+    Stock sh_index = sm.getStock(sh_info.market() + sh_info.code());
+    DatetimeList expect = sh_index.getDatetimeList(KQuery());
+    DatetimeList actual = sm.getTradingCalendar(KQuery(), "SH");
+    CHECK_EQ(actual.size(), expect.size());
+
+    /** @arg StockList overload merges multiple markets' trading days */
+    MarketInfo sz_info = sm.getMarketInfo("SZ");
+    StockList stk_list{sm.getStock(sh_info.market() + sh_info.code()),
+                       sm.getStock(sz_info.market() + sz_info.code())};
+    DatetimeList merged = sm.getTradingCalendar(stk_list, KQuery());
+    CHECK_GT(merged.size(), 0);
 }
 
 /** @par Test points */

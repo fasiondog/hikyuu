@@ -893,6 +893,8 @@ BlockList StockManager::getStockBelongs(const Stock& stk, const string& category
 
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
     auto marketinfo = getMarketInfo(market);
+    HKU_WARN_IF_RETURN(marketinfo == Null<MarketInfo>(), DatetimeList(),
+                       "{}: {}!", htr("Not found market info"), market);
     return getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()))
       .getDatetimeList(query);
 }
@@ -1082,11 +1084,6 @@ void StockManager::loadAllMarketInfos() {
         to_upper(market);
         m_marketInfoDict[market] = marketInfo;
     }
-
-    // add special Market, for temp csv file
-    m_marketInfoDict["TMP"] =
-      MarketInfo("TMP", "Temp Csv file", "temp load from csv file", "000001", Null<Datetime>(),
-                 TimeDelta(0), TimeDelta(0), TimeDelta(0), TimeDelta(0));
 }
 
 void StockManager::loadAllStockTypeInfo() {
