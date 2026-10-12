@@ -6,6 +6,7 @@
  */
 
 #include "../test_config.h"
+#include <cmath>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/FINANCE.h>
 
@@ -63,6 +64,35 @@ TEST_CASE("test_FINANCE_valid_field_name") {
     Indicator r = FINANCE(k, name);
     CHECK_EQ(r.size(), k.size());
     CHECK_EQ(r.discard(), r.size());
+}
+
+/** @par Test points: the incremental path matches full calculation */
+TEST_CASE("test_FINANCE_incremental_matches_full") {
+    Stock stk = getStock("SZ000001");
+    REQUIRE(!stk.isNull());
+    REQUIRE(Indicator::enableIncrementCalculate());
+
+    KData k_short = stk.getKData(KQueryByDate(Datetime(200701010000), Datetime(201101010000)));
+    KData k_long = stk.getKData(KQueryByDate(Datetime(200701010000), Datetime(201112050000)));
+    REQUIRE(k_short.size() > 0);
+    REQUIRE(k_long.size() > k_short.size());
+
+    Indicator r = FINANCE(0);
+    r.setContext(k_short);
+    r.setContext(k_long);
+
+    Indicator full = FINANCE(k_long, 0);
+    /** @arg size, discard and every value match the single-shot full calculation */
+    CHECK_EQ(r.size(), full.size());
+    CHECK_EQ(r.discard(), full.discard());
+    for (size_t i = 0; i < r.size(); i++) {
+        if (std::isnan(full[i])) {
+            CHECK_UNARY(std::isnan(r[i]));
+        } else {
+            CHECK_UNARY(!std::isnan(r[i]));
+            CHECK_EQ(r[i], full[i]);
+        }
+    }
 }
 
 /** @} */

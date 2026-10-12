@@ -39,6 +39,7 @@ void IFinance::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
     _increment_calculate(data, 0);
+    updateDiscard(true);
 }
 
 void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
@@ -72,7 +73,6 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
     }
 
     if (finances.empty()) {
-        m_discard = total;
         return;
     }
 
