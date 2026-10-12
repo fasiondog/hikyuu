@@ -66,12 +66,12 @@ void GlobalInitializer::init() {
     HANDLE hHeap = GetProcessHeap();
     if (hHeap == NULL) {
         fmt::print("GetProcessHeap failed: {}\n", GetLastError());
-    }
-
-    // Enable the LFH (key: lfhFlag is fixed to 2)
-    ULONG lfhFlag = 2;
-    if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &lfhFlag, sizeof(lfhFlag))) {
-        fmt::print("Enable LFH failed: {}\n", GetLastError());
+    } else {
+        // Enable the LFH (key: lfhFlag is fixed to 2)
+        ULONG lfhFlag = 2;
+        if (!HeapSetInformation(hHeap, HeapCompatibilityInformation, &lfhFlag, sizeof(lfhFlag))) {
+            fmt::print("Enable LFH failed: {}\n", GetLastError());
+        }
     }
 #endif
 
@@ -98,6 +98,9 @@ void GlobalInitializer::init() {
 #endif
 
     size_t cpu_num = std::thread::hardware_concurrency();
+    if (cpu_num == 0) {
+        cpu_num = 1;  // hardware_concurrency() may return 0; avoid ThreadPool(0)
+    }
     if (cpu_num <= 10) {
         cpu_num = cpu_num * 2;
     } else if (cpu_num <= 64) {
