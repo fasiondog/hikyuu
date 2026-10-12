@@ -23,9 +23,8 @@ struct KRecordView;  // Defined in data_driver/KDataDriver.h
  * create() only when the driver supports the view (a client IPC proxy driver with the snapshot
  * covered and no reverse scaling needed), otherwise a null pointer is returned and the upper layer
  * falls back to the KDataPrivatedBufferImp copy path.
- * @note Read-only mapping: the writable overload of data() returns a const_cast pointer only for
- *       interface compatibility, a write will crash, which is the same kind of risk as the "use
- * with caution (forced data adjustment)" contract of KDataSharedBufferImp in the main process.
+ * @note Read-only mapping: the writable overload of data() is left unoverridden so it resolves to
+ *       the KDataImp default returning nullptr; no writable view of the shared snapshot is exposed.
  * @ingroup StockManage
  */
 class HKU_API KDataShmBufferImp : public KDataImp {
@@ -77,12 +76,6 @@ public:
 
     virtual const KRecord* data() const noexcept override {
         return m_data;
-    }
-
-    virtual KRecord* data() noexcept override {
-        // Read-only shared memory mapping, a write will crash; it exists only for compatibility
-        // with the KDataImp interface (see the class comment)
-        return const_cast<KRecord*>(m_data);
     }
 
     virtual DatetimeList getDatetimeList() const override;
