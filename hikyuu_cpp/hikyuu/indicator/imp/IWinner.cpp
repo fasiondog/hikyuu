@@ -47,9 +47,22 @@ void IWinner::_calculate(const Indicator &data) {
         cost_data[i] = cost_list[i].data();
     });
 
+    // a COST early return leaves a null buffer that the search below would dereference
+    for (size_t j = 1; j < 101; ++j) {
+        if (cost_data[j] == nullptr) {
+            m_discard = total;
+            return;
+        }
+    }
+
     auto const *src = data.data();
     auto *dst = this->data();
     for (size_t i = m_discard; i < total; ++i) {
+        value_t x = src[i];
+        if (!std::isfinite(x)) {
+            dst[i] = Null<value_t>();
+            continue;
+        }
         int high_idx = 100;
         int low_idx = 0;
         while (low_idx <= high_idx) {
@@ -57,18 +70,22 @@ void IWinner::_calculate(const Indicator &data) {
             value_t low = cost_data[low_idx][i];
             int mid_idx = (high_idx + low_idx) / 2;
             value_t mid = cost_data[mid_idx][i];
-            if (src[i] >= high) {
+            if (!std::isfinite(low) || !std::isfinite(mid) || !std::isfinite(high)) {
+                dst[i] = Null<value_t>();
+                break;
+            }
+            if (x >= high) {
                 dst[i] = high_idx * 0.01;
                 break;
-            } else if (src[i] <= low) {
+            } else if (x <= low) {
                 dst[i] = low_idx * 0.01;
                 break;
-            } else if (src[i] == mid) {
+            } else if (x == mid) {
                 dst[i] = mid_idx * 0.01;
                 break;
             }
 
-            if (src[i] > mid) {
+            if (x > mid) {
                 low_idx = mid_idx + 1;
                 if (low_idx >= high_idx) {
                     dst[i] = low_idx * 0.01;
