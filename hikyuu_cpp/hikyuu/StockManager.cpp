@@ -893,8 +893,8 @@ BlockList StockManager::getStockBelongs(const Stock& stk, const string& category
 
 DatetimeList StockManager::getTradingCalendar(const KQuery& query, const string& market) {
     auto marketinfo = getMarketInfo(market);
-    HKU_WARN_IF_RETURN(marketinfo == Null<MarketInfo>(), DatetimeList(),
-                       "{}: {}!", htr("Not found market info"), market);
+    HKU_WARN_IF_RETURN(marketinfo == Null<MarketInfo>(), DatetimeList(), "{}: {}!",
+                       htr("Not found market info"), market);
     return getStock(fmt::format("{}{}", marketinfo.market(), marketinfo.code()))
       .getDatetimeList(query);
 }
@@ -1264,8 +1264,15 @@ void StockManager::loadAllZhBond10() {
 }
 
 void StockManager::loadHistoryFinanceField() {
+    m_field_ix_to_name.clear();
+    m_field_name_to_ix.clear();
     auto fields = m_baseInfoDriver->getHistoryFinanceField();
     for (const auto& field : fields) {
+        if (field.first < 1) {
+            HKU_WARN("Invalid history finance field index (must be >= 1), skipped: {},",
+                     field.first);
+            continue;
+        }
         m_field_ix_to_name[field.first - 1] = field.second;
         m_field_name_to_ix[field.second] = field.first - 1;
     }
