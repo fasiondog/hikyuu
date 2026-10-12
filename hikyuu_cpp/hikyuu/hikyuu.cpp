@@ -36,7 +36,7 @@ void hikyuu_init(const string& config_file_name, bool ignore_preload,
 
 void HKU_API hikyuu_init(const StrategyContext& context, bool ignore_preload) {
     string home = getUserDir();
-    HKU_ERROR_IF(home == "", "Failed get user home path!");
+    HKU_CHECK_THROW(!home.empty(), std::runtime_error, "Failed get user home path!");
     string config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
     hikyuu_init(config_file, ignore_preload, context);
 }
