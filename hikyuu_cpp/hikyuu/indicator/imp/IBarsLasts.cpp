@@ -7,6 +7,7 @@
  *      Author: hikyuu
  */
 
+#include <climits>
 #include "IBarsLasts.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -118,13 +119,12 @@ void IBarsLasts::_dyn_calculate(const Indicator& ind) {
 
     // Calculate for every position separately
     for (size_t i = m_discard; i < total; i++) {
-        int n = static_cast<int>(n_data[i]);
-
-        // Parameter validation: if n <= 0, return NaN
-        if (n <= 0) {
+        double nv = n_data[i];
+        if (!std::isfinite(nv) || nv < 1.0 || nv > static_cast<double>(INT_MAX)) {
             dst[i] = Null<price_t>();
             continue;
         }
+        int n = static_cast<int>(nv);
 
         // Search backward from the current position for the position where the condition holds for
         // the n-th time
