@@ -37,15 +37,12 @@ void IExist::_calculate(const Indicator& ind) {
         auto const* src = ind.data();
         auto* dst = this->data();
         m_discard = ind.discard();
+        bool any_true = false;
         for (size_t i = m_discard; i < total; i++) {
-            price_t exist = 0.0;
-            for (size_t j = m_discard; j <= i; j++) {
-                if (std::isfinite(src[j]) && src[j] != 0.0) {
-                    exist = 1.0;
-                    break;
-                }
+            if (!any_true && std::isfinite(src[i]) && src[i] != 0.0) {
+                any_true = true;
             }
-            dst[i] = exist;
+            dst[i] = any_true ? 1.0 : 0.0;
         }
         return;
     }

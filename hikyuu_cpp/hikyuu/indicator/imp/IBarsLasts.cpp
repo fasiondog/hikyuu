@@ -117,40 +117,28 @@ void IBarsLasts::_dyn_calculate(const Indicator& ind) {
     auto* dst = this->data();
     auto const* n_data = ind_param.data();
 
+    std::vector<size_t> true_positions;
+    for (size_t j = ind_discard; j < m_discard; j++) {
+        if (std::isfinite(src[j]) && src[j] != 0.0) {
+            true_positions.push_back(j);
+        }
+    }
+
     // Calculate for every position separately
     for (size_t i = m_discard; i < total; i++) {
+        if (std::isfinite(src[i]) && src[i] != 0.0) {
+            true_positions.push_back(i);
+        }
+
         double nv = n_data[i];
         if (!std::isfinite(nv) || nv < 1.0 || nv > static_cast<double>(INT_MAX)) {
             dst[i] = Null<price_t>();
             continue;
         }
-        int n = static_cast<int>(nv);
-
-        // Search backward from the current position for the position where the condition holds for
-        // the n-th time
-        int count = 0;
-        size_t target_pos = Null<size_t>();
-
-        for (size_t j = i; j >= ind_discard; j--) {
-            if (std::isfinite(src[j]) && src[j] != 0.0) {
-                count++;
-                if (count == n) {
-                    target_pos = j;
-                    break;
-                }
-            }
-            if (j == ind_discard) {
-                break;
-            }
-        }
-
-        // If the position where the condition holds for the n-th time is found, calculate the
-        // distance
-        if (target_pos != Null<size_t>()) {
-            dst[i] = static_cast<price_t>(i - target_pos);
-        } else {
-            dst[i] = Null<price_t>();
-        }
+        size_t n = static_cast<size_t>(nv);
+        dst[i] = true_positions.size() >= n
+                   ? static_cast<price_t>(i - true_positions[true_positions.size() - n])
+                   : Null<price_t>();
     }
 
     updateDiscard();
