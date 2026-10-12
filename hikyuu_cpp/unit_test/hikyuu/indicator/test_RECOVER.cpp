@@ -26,6 +26,12 @@ TEST_CASE("test_RECOVER") {
     KData kdata;
     KQuery query;
 
+    /** @arg The no-input factories report the base name before calculation */
+    CHECK_EQ(RECOVER_FORWARD().name(), "RECOVER");
+    CHECK_EQ(RECOVER_BACKWARD().name(), "RECOVER");
+    CHECK_EQ(RECOVER_EQUAL_FORWARD().name(), "RECOVER");
+    CHECK_EQ(RECOVER_EQUAL_BACKWARD().name(), "RECOVER");
+
     /** @arg An invalid ind */
     CHECK_THROWS_AS(RECOVER_FORWARD(MA()), std::exception);
     CHECK_THROWS_AS(RECOVER_BACKWARD(MA()), std::exception);

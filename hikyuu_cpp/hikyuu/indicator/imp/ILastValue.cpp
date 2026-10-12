@@ -21,9 +21,9 @@ ILastValue::~ILastValue() {}
 
 void ILastValue::_calculate(const Indicator &data) {
     size_t total = data.size();
+    m_discard = 0;
     HKU_IF_RETURN(total == 0, void());
 
-    m_discard = 0;
     bool ignore_discard = getParam<bool>("ignore_discard");
     if (!ignore_discard) {
         m_discard = data.discard();
