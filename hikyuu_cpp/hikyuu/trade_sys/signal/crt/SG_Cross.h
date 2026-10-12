@@ -17,6 +17,7 @@ namespace hku {
 /**
  * Two line crossing indicator: it buys when the fast line crosses the slow line upward from below,
  * and sells when the fast line crosses the slow line downward from above.
+ * @note A non-finite fast/slow value fires no signal
  * @param fast fast line
  * @param slow slow line
  * @return signal generator

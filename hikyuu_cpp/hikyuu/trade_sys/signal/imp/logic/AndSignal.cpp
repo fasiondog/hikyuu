@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "AndSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -26,9 +27,9 @@ void AndSignal::_calculate(const KData& kdata) {
         double sell_value =
           0.0 - m_sg1->getSellValue(ks[i].datetime) * m_sg2->getSellValue(ks[i].datetime);
         auto value = buy_value + sell_value;
-        if (value > 0.0) {
+        if (std::isfinite(value) && value > 0.0) {
             _addBuySignal(ks[i].datetime);
-        } else if (value < 0.0) {
+        } else if (std::isfinite(value) && value < 0.0) {
             _addSellSignal(ks[i].datetime);
         }
     }

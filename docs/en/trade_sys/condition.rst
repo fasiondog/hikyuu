@@ -17,7 +17,7 @@ Built-in System Validity Conditions
 
 .. py:function:: CN_Bool(ind)
 
-    A system validity condition driven by a boolean indicator: the system is valid where the indicator's value is greater than 0, and invalid elsewhere.
+    A system validity condition driven by a boolean indicator: the system is valid where the indicator's value is greater than 0, and invalid elsewhere (a non-finite value is invalid).
 
     :param Indicator ind: a boolean indicator computed over KData (bar data)
     :return: the system validity condition instance

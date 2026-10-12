@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "BoolCondition.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -28,7 +29,7 @@ void BoolCondition::_calculate() {
     m_ind.setContext(m_kdata);
     auto const* ind_data = m_ind.data();
     for (size_t i = m_ind.discard(), len = m_ind.size(); i < len; i++) {
-        if (!std::isnan(ind_data[i]) && ind_data[i] > 0.) {
+        if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
             _addValid(ds[i]);
         }
     }

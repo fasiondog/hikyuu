@@ -1198,6 +1198,8 @@
 
     注意：各操作数必须与上下文等长，否则抛出异常。
 
+    注意：条件值为非有限值（NaN/±Inf）时视为不成立，返回 b。
+
     :param Indicator x: 条件指标
     :param Indicator a: 待选指标 a
     :param Indicator b: 待选指标 b

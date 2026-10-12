@@ -17,9 +17,9 @@ namespace hku {
 /**
  * Boolean signal generator
  * @param buy the buy indication (a value > 0 at the corresponding position of the result Indicator
- *            means a buy)
+ *            means a buy; a non-finite value means no buy)
  * @param sell the sell indication (a value > 0 at the corresponding position of the result
- * Indicator means a sell)
+ * Indicator means a sell; a non-finite value means no sell)
  * @param alternate whether the buy and sell signals appear alternately, true by default
  * @return signal generator
  * @ingroup Signal

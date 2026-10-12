@@ -17,6 +17,7 @@ namespace hku {
  * Indicator band indicator: buy when the indicator exceeds the upper band, and sell when the
  * indicator is lower than the lower band.
  * @note It is suitable for the RSI-like indicators with an absolute value range
+ * @note A non-finite indicator value fires no signal
  * @param ind indicator
  * @param lower lower band
  * @param upper upper band
@@ -27,6 +28,7 @@ SignalPtr HKU_API SG_Band(const Indicator& ind, price_t lower, price_t upper);
 /**
  * Indicator band indicator: buy when the indicator exceeds the upper band indicator, and sell when
  * the indicator is lower than the lower band indicator.
+ * @note A non-finite indicator/band value fires no signal
  * @param ind indicator
  * @param lower lower band indicator
  * @param upper upper band indicator

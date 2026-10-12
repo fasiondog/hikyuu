@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "hikyuu/indicator/crt/ALIGN.h"
 #include "hikyuu/indicator/crt/KDATA.h"
 #include "OneSideSignal.h"
@@ -51,7 +52,7 @@ void OneSideSignal::_calculate(const KData& kdata) {
     size_t total = ind.size();
 
     for (size_t i = discard; i < total; ++i) {
-        if (src[i] > 0.0) {
+        if (std::isfinite(src[i]) && src[i] > 0.0) {
             if (is_buy) {
                 _addBuySignal(ks[i].datetime);
             } else {

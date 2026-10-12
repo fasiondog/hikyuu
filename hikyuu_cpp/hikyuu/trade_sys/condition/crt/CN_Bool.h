@@ -15,7 +15,7 @@ namespace hku {
 /**
  * System valid condition of the boolean signal
  * @param ind the boolean type indicator; a value > 0 at the corresponding position means the system
- *            is valid, otherwise it is invalid
+ *            is valid, otherwise it is invalid (a non-finite value is treated as invalid)
  * @return
  */
 CNPtr HKU_API CN_Bool(const Indicator& ind);

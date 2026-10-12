@@ -4,6 +4,7 @@
  *   Created on: 2023-09-23
  *       Author: yangrq1018
  */
+#include <cmath>
 #include "../../../indicator/crt/KDATA.h"
 #include "BandSignal2.h"
 
@@ -48,9 +49,10 @@ void BandSignal2::_calculate(const KData& kdata) {
     auto const* lowerdata = lower.data();
     auto const* ks = kdata.data();
     for (size_t i = discard; i < total; ++i) {
-        if (inddata[i] > upperdata[i]) {
+        if (std::isfinite(inddata[i]) && std::isfinite(upperdata[i]) && inddata[i] > upperdata[i]) {
             _addBuySignal(ks[i].datetime);
-        } else if (inddata[i] < lowerdata[i]) {
+        } else if (std::isfinite(inddata[i]) && std::isfinite(lowerdata[i]) &&
+                   inddata[i] < lowerdata[i]) {
             _addSellSignal(ks[i].datetime);
         }
     }

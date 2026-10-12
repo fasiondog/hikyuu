@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "../../../indicator/crt/KDATA.h"
 #include "CrossSignal.h"
 
@@ -39,6 +40,10 @@ void CrossSignal::_calculate(const KData& kdata) {
     auto const* slowdata = slow.data();
     auto const* ks = kdata.data();
     for (size_t i = discard + 1; i < total; ++i) {
+        if (!std::isfinite(fastdata[i - 1]) || !std::isfinite(slowdata[i - 1]) ||
+            !std::isfinite(fastdata[i]) || !std::isfinite(slowdata[i])) {
+            continue;
+        }
         if (fastdata[i - 1] < slowdata[i - 1] && fastdata[i] > slowdata[i]) {
             _addBuySignal(ks[i].datetime);
         } else if (fastdata[i - 1] > slowdata[i - 1] && fastdata[i] < slowdata[i]) {

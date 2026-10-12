@@ -6,9 +6,17 @@
  */
 
 #include "doctest/doctest.h"
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Bool.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Band.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
+#include <hikyuu/trade_sys/signal/crt/SG_CrossGold.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Single.h>
+#include <hikyuu/indicator/crt/CVAL.h>
+#include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/KData.h>
 
 using namespace hku;
@@ -277,6 +285,119 @@ TEST_CASE("test_Signal_setTO_recalculate") {
     CHECK_UNARY(sg->shouldSell(k2.back().datetime));
     CHECK_UNARY(sg->shouldBuy(k2.front().datetime));
     CHECK_UNARY(!sg->holdLong());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Bool_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg a non-finite buy series does not fire any signal */
+    SignalPtr sg = SG_Bool(CVAL(std::numeric_limits<double>::infinity()), CVAL(0.0));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Band_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg a non-finite price-band input fires no signal (the inf bar would exceed the band) */
+    SignalPtr sg = SG_Band(CVAL(std::numeric_limits<double>::infinity()), -1.0, 1.0);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg the indicator-band overload behaves the same */
+    SignalPtr sg2 = SG_Band(CVAL(std::numeric_limits<double>::infinity()), CVAL(-1.0), CVAL(1.0));
+    sg2->setTO(k);
+    CHECK_UNARY(sg2->getBuySignal().empty());
+    CHECK_UNARY(sg2->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Cross_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg an inf point that would cross the slow line fires no signal */
+    DatetimeList dates = k.getDatetimeList();
+    PriceList fast_vals(k.size(), 0.0);
+    fast_vals[1] = std::numeric_limits<double>::infinity();
+    SignalPtr sg =
+      SG_Cross(PRICELIST(fast_vals, dates), PRICELIST(PriceList(k.size(), 0.5), dates));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_CrossGold_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg an inf point that would satisfy the golden cross fires no signal */
+    DatetimeList dates = k.getDatetimeList();
+    PriceList fast_vals(k.size(), 0.0);
+    fast_vals[1] = std::numeric_limits<double>::infinity();
+    PriceList slow_vals(k.size(), 0.0);
+    for (size_t i = 0; i < k.size(); ++i) {
+        slow_vals[i] = 0.5 + 0.001 * static_cast<double>(i);
+    }
+    SignalPtr sg = SG_CrossGold(PRICELIST(fast_vals, dates), PRICELIST(slow_vals, dates));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Single_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg an inf jump fires no signal */
+    DatetimeList dates = k.getDatetimeList();
+    PriceList vals(k.size(), 0.0);
+    vals[20] = std::numeric_limits<double>::infinity();
+    SignalPtr sg = SG_Single(PRICELIST(vals, dates), 10, 0.1);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Single2_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg an inf jump fires no signal */
+    DatetimeList dates = k.getDatetimeList();
+    PriceList vals(k.size(), 0.0);
+    vals[20] = std::numeric_limits<double>::infinity();
+    SignalPtr sg = SG_Single2(PRICELIST(vals, dates), 10, 0.1);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
 }
 
 /** @} */

@@ -1204,6 +1204,8 @@ Built-in Technical Indicators
 
     Note: every operand must be as long as the context, otherwise an exception is thrown
 
+    Note: a non-finite condition value (NaN or ±Inf) is treated as not established, so b is returned
+
     :param Indicator x: the condition indicator
     :param Indicator a: the candidate indicator a
     :param Indicator b: the candidate indicator b

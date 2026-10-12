@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "SignalBase.h"
 
 namespace hku {
@@ -139,10 +140,10 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 }
 
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
-    HKU_IF_RETURN(iszero(value) || std::isnan(value), void());
+    HKU_IF_RETURN(iszero(value) || !std::isfinite(value), void());
 
     double new_value = value + getBuyValue(datetime) + getSellValue(datetime);
-    HKU_IF_RETURN(iszero(new_value), void());
+    HKU_IF_RETURN(iszero(new_value) || !std::isfinite(new_value), void());
 
     if (new_value > 0.0) {
         auto iter = m_buySig.find(datetime);

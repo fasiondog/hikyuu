@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "OrSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -23,9 +24,9 @@ void OrSignal::_calculate(const KData& kdata) {
         sub_sg_calculate(m_sg1, kdata);
         for (size_t i = 0; i < total; ++i) {
             auto value = m_sg1->getValue(ks[i].datetime);
-            if (value > 0.0) {
+            if (std::isfinite(value) && value > 0.0) {
                 _addBuySignal(ks[i].datetime);
-            } else if (value < 0.0) {
+            } else if (std::isfinite(value) && value < 0.0) {
                 _addSellSignal(ks[i].datetime);
             }
         }
@@ -36,9 +37,9 @@ void OrSignal::_calculate(const KData& kdata) {
         sub_sg_calculate(m_sg2, kdata);
         for (size_t i = 0; i < total; i++) {
             auto value = m_sg2->getValue(ks[i].datetime);
-            if (value > 0.0) {
+            if (std::isfinite(value) && value > 0.0) {
                 _addBuySignal(ks[i].datetime);
-            } else if (value < 0.0) {
+            } else if (std::isfinite(value) && value < 0.0) {
                 _addSellSignal(ks[i].datetime);
             }
         }
@@ -49,9 +50,9 @@ void OrSignal::_calculate(const KData& kdata) {
     sub_sg_calculate(m_sg2, kdata);
     for (size_t i = 0; i < total; ++i) {
         double value = m_sg1->getValue(ks[i].datetime) + m_sg2->getValue(ks[i].datetime);
-        if (value > 0.0) {
+        if (std::isfinite(value) && value > 0.0) {
             _addBuySignal(ks[i].datetime);
-        } else if (value < 0.0) {
+        } else if (std::isfinite(value) && value < 0.0) {
             _addSellSignal(ks[i].datetime);
         }
     }

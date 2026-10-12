@@ -6,8 +6,12 @@
  */
 
 #include "doctest/doctest.h"
+#include <cmath>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
+#include <hikyuu/trade_sys/condition/crt/CN_Bool.h>
+#include <hikyuu/indicator/crt/CVAL.h>
 
 using namespace hku;
 
@@ -97,6 +101,23 @@ TEST_CASE("test_Condition") {
     // CHECK_EQ(p_clone->isValid(Datetime(200001010000)) , true);
     p_clone->reset();
     CHECK_EQ(p_clone->isValid(Datetime(200001010000)), false);
+}
+
+/** @par Test points */
+TEST_CASE("test_Condition_bool_non_finite") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    /** @arg a non-finite condition value is not a valid condition day */
+    ConditionPtr p = CN_Bool(CVAL(std::numeric_limits<double>::infinity()));
+    p->setTO(kdata);
+    CHECK_EQ(p->getDatetimeList().size(), 0);
+    for (size_t i = 0; i < kdata.size(); ++i) {
+        CHECK_UNARY_FALSE(p->isValid(kdata[i].datetime));
+    }
 }
 
 /** @} */

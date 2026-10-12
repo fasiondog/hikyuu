@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "AndCondition.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -42,7 +43,10 @@ void AndCondition::_calculate() {
     auto const* data1 = m_cond1->data();
     auto const* data2 = m_cond2->data();
     for (size_t i = 0; i < total; i++) {
-        m_values[i] = (data1[i] > 0.0 && data2[i] > 0.0) ? 1.0 : 0.0;
+        m_values[i] =
+          (std::isfinite(data1[i]) && data1[i] > 0.0 && std::isfinite(data2[i]) && data2[i] > 0.0)
+            ? 1.0
+            : 0.0;
     }
 }
 
