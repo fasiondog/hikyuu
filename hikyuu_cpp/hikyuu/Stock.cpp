@@ -1568,12 +1568,16 @@ void Stock::setHistoryFinance(vector<HistoryFinanceInfo>&& history_finance) {
                      }),
       history_finance.end());
     history_finance.shrink_to_fit();
+    std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
     if (!m_data->m_history_finance_ready) {
-        std::unique_lock<std::shared_mutex> lock(m_data->m_history_finance_mutex);
-        if (!m_data->m_history_finance_ready) {
-            m_data->m_history_finance = std::move(history_finance);
-            m_data->m_history_finance_ready = true;
-        }
+        m_data->m_history_finance = std::move(history_finance);
+        m_data->m_history_finance_ready = true;
+    } else if (m_data->m_history_finance.empty()) {
+        // The lazy read had materialized an empty cache: the batch result is the authoritative fill
+        m_data->m_history_finance = std::move(history_finance);
+    } else {
+        HKU_TRACE("The history finance cache of {} is already materialized, batch import discarded",
+                  market_code());
     }
 }
 
