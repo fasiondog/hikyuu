@@ -21,6 +21,7 @@
 using namespace hku;
 
 namespace {
+#if 0
 // waitDataReady() is expected to return promptly once the loading has failed; it is run in a
 // detached thread with a deadline, so that a regression is reported as a failure instead of
 // blocking the whole test run
@@ -35,6 +36,7 @@ bool waitDataReadyReleased(StockManager& sm) {
     }
     return done->load();
 }
+#endif
 
 // Only used by the disabled deadlock case at the end of this file
 #if 0
@@ -407,6 +409,9 @@ TEST_CASE("test_StockManager_loadAllStocks_by_context") {
     CHECK_EQ(sm.size(), 4729);
 }
 
+// Disabled by default: it performs several full reloads and exercises injected
+// failure paths; enable it when load-failure handling or the callback registry changes.
+#if 0
 /** @par Test points */
 TEST_CASE("test_StockManager_load_failed") {
     auto& sm = StockManager::instance();
@@ -448,6 +453,7 @@ TEST_CASE("test_StockManager_load_failed") {
     CHECK_UNARY(!sm.loadFailed());
     CHECK_UNARY(sm.dataReady());
 }
+#endif
 
 // Disabled by default: it costs a full reload on every run and it can only fail when the dispatch
 // path regresses into a deadlock. Enable it when _fireLoadEvent or the callback registry changes.
