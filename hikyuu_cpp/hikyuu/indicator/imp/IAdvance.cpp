@@ -52,7 +52,7 @@ void IAdvance::_calculate(const Indicator& ind) {
 
     bool ignore_context = getParam<bool>("ignore_context");
     const KData& k = getContext();
-    if (!ignore_context && k.getStock().type() != STOCKTYPE_INDEX) {
+    if (!ignore_context && !k.empty() && k.getStock().type() != STOCKTYPE_INDEX) {
         q = k.getQuery();
         Stock stk = k.getStock();
         market = stk.market();
