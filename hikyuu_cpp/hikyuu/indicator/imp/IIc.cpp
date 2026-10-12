@@ -157,6 +157,28 @@ void IIc::_calculate(const Indicator& inputInd) {
     updateDiscard();
 }
 
+namespace {
+
+/* Extracted from the exported IC function: thread_local locals are not allowed
+   inside a dllexport function body on msvc/clang-cl */
+price_t calc_day_ic(const IndicatorList& ref_inds, const IndicatorList& returns, size_t i,
+                    size_t stk_count, bool use_spearman) {
+    thread_local std::vector<Indicator::value_t> buf_a, buf_b;
+    if (buf_a.size() < stk_count) {
+        buf_a.resize(stk_count);
+        buf_b.resize(stk_count);
+    }
+    for (size_t j = 0; j < stk_count; j++) {
+        buf_a[j] = ref_inds[j][i];
+        buf_b[j] = returns[j][i];
+    }
+    return use_spearman
+             ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
+             : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
+}
+
+}  // namespace
+
 Indicator HKU_API IC(const StockList& stks, int n, bool spearman, bool strict) {
     return Indicator(make_shared<IIc>(stks, n, spearman, strict));
 }
@@ -195,18 +217,7 @@ Indicator HKU_API IC(IndicatorList inds, IndicatorList returns, int n, bool use_
     PriceList ret(days_total, Null<price_t>());
     auto* dst = ret.data();
     global_parallel_for_index_void(0, days_total, [&, stk_count, dst, use_spearman](size_t i) {
-        thread_local std::vector<Indicator::value_t> buf_a, buf_b;
-        if (buf_a.size() < stk_count) {
-            buf_a.resize(stk_count);
-            buf_b.resize(stk_count);
-        }
-        for (size_t j = 0; j < stk_count; j++) {
-            buf_a[j] = ref_inds[j][i];
-            buf_b[j] = returns[j][i];
-        }
-        dst[i] = use_spearman
-                   ? detail::cross_section_spearman(buf_a.data(), buf_b.data(), stk_count)
-                   : detail::cross_section_pearson(buf_a.data(), buf_b.data(), stk_count);
+        dst[i] = calc_day_ic(ref_inds, returns, i, stk_count, use_spearman);
     });
 
     if (strict) {
