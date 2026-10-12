@@ -1263,10 +1263,14 @@ Built-in Technical Indicators
 
     The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
 
+    Note: TDX 880005 encodes the rising count as the close price and the falling count as the open price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).
+
 
 .. py:function:: INDEXDEC([query])
 
     The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
+
+    Note: TDX 880005 encodes the falling count as the open price and the rising count as the close price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).
 
 
 .. py:function:: INSUM(block, query, ind, mode)

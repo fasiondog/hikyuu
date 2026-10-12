@@ -2714,12 +2714,16 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INDEXADV", py::overload_cast<>(INDEXADV));
     m.def("INDEXADV", py::overload_cast<const KQuery&>(INDEXADV), R"(INDEXADV([query])
     
-    The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!)");
+    The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
+
+    Note: TDX 880005 encodes the rising count as the close price and the falling count as the open price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).)");
 
     m.def("INDEXDEC", py::overload_cast<>(INDEXDEC));
     m.def("INDEXDEC", py::overload_cast<const KQuery&>(INDEXDEC), R"(INDEXDEC([query])
     
-    The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!)");
+    The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
+
+    Note: TDX 880005 encodes the falling count as the open price and the rising count as the close price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).)");
 
     m.def("WINNER", py::overload_cast<>(WINNER));
     m.def("WINNER", py::overload_cast<const Indicator&>(WINNER));

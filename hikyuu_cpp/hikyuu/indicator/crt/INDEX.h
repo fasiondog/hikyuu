@@ -55,13 +55,15 @@ inline Indicator INDEXV(const KData& k, bool fill_null = true) {
     return INDEXV(fill_null)(k);
 }
 
-/** Number of the rising stocks in the broad market, using the TDX SH880005, it may not be usable
- *  for live trading */
+/** Number of the rising stocks in the broad market, using the TDX SH880005 (which encodes the
+ *  rising count as close and the falling count as open), it may not be usable for live trading.
+ *  The data is fetched when building the formula, so the engine must be initialized first */
 Indicator HKU_API INDEXADV();
 Indicator HKU_API INDEXADV(const KQuery& query);
 
-/** Number of the falling stocks in the broad market, using the TDX SH880005, it may not be usable
- *  for live trading */
+/** Number of the falling stocks in the broad market, using the TDX SH880005 (which encodes the
+ *  falling count as open and the rising count as close), it may not be usable for live trading.
+ *  The data is fetched when building the formula, so the engine must be initialized first */
 Indicator HKU_API INDEXDEC();
 Indicator HKU_API INDEXDEC(const KQuery& query);
 
