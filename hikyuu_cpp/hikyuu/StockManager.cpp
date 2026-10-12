@@ -500,7 +500,13 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
             }
             tg.submit([stk = iter->second, this]() {
                 HKU_IF_RETURN(m_cancel_load, void());
-                stk.getHistoryFinance();
+                try {
+                    stk.getHistoryFinance();
+                } catch (const std::exception& e) {
+                    HKU_ERROR("Failed load history finance: {}", e.what());
+                } catch (...) {
+                    HKU_ERROR("Failed load history finance with unknown exception!");
+                }
             });
         }
         lock.unlock();
@@ -546,7 +552,13 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
                 // string and the cost is negligible.
                 m_load_tg->submit([this, stk = iter->second, ktype = ktypes[i]]() mutable {
                     HKU_IF_RETURN(m_cancel_load, void());
-                    stk.loadKDataToBuffer(ktype);
+                    try {
+                        stk.loadKDataToBuffer(ktype);
+                    } catch (const std::exception& e) {
+                        HKU_ERROR("Failed load kdata to buffer ({}): {}", ktype, e.what());
+                    } catch (...) {
+                        HKU_ERROR("Failed load kdata to buffer ({}) with unknown exception!", ktype);
+                    }
                 });
             }
         }
@@ -573,7 +585,13 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
             }
             m_load_tg->submit([this, stk = iter->second]() {
                 HKU_IF_RETURN(m_cancel_load, void());
-                stk.getHistoryFinance();
+                try {
+                    stk.getHistoryFinance();
+                } catch (const std::exception& e) {
+                    HKU_ERROR("Failed load history finance: {}", e.what());
+                } catch (...) {
+                    HKU_ERROR("Failed load history finance with unknown exception!");
+                }
             });
         }
         lock.unlock();
