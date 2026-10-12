@@ -1103,6 +1103,8 @@
 
     例如：HHVBARS(HIGH,0)求得历史新高到到当前的周期数
 
+    注：窗口内存在并列极值时，取距今最近的一个。
+
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: N日时间窗口
     :rtype: Indicator
@@ -1451,6 +1453,8 @@
     用法：LLVBARS(X,N):求N周期内X最低值到当前周期数N=0表示从第一个有效值开始统计
 
     例如：LLVBARS(HIGH,20)求得20日最低点到当前的周期数
+
+    注：窗口内存在并列极值时，取距今最近的一个。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: N日时间窗口

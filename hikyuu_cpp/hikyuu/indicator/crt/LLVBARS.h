@@ -23,6 +23,7 @@ namespace hku {
  * N=0 means counting starts from the first valid value
  * For example: LLVBARS(HIGH,20) gives the number of periods from the 20-day lowest point until now
  * </pre>
+ * @note When multiple values in the window tie for the extreme, the most recent occurrence is used
  * @ingroup Indicator
  */
 Indicator HKU_API LLVBARS(int n = 20);

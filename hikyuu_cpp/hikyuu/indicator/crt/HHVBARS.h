@@ -23,6 +23,7 @@ namespace hku {
  * now; N=0 means counting starts from the first valid value
  * For example: HHVBARS(HIGH,0) gives the number of periods from the historical new high until now
  * </pre>
+ * @note When multiple values in the window tie for the extreme, the most recent occurrence is used
  * @ingroup Indicator
  */
 Indicator HKU_API HHVBARS(int n = 20);

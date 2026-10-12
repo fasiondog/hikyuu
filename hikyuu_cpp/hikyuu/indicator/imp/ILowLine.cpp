@@ -142,7 +142,7 @@ void ILowLine::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t ste
     size_t start = _get_step_start(curPos, step, ind.discard());
     price_t min_val = ind[start];
     for (size_t i = start + 1; i <= curPos; i++) {
-        if (ind[i] < min_val) {
+        if (ind[i] <= min_val) {
             min_val = ind[i];
         }
     }

@@ -1103,6 +1103,8 @@ Built-in Technical Indicators
 
     For example: HHVBARS(HIGH,0) gets the number of the periods from the historical new high to the current
 
+    Note: When multiple values in the window tie for the extreme, the most recent occurrence is used
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the N-day time window
     :rtype: Indicator
@@ -1457,6 +1459,8 @@ Built-in Technical Indicators
     Usage: LLVBARS(X,N): getting the number of the periods from the lowest value of X within the N periods to the current; N=0 means counting from the first valid value
 
     For example: LLVBARS(HIGH,20) gets the number of the periods from the 20-day lowest point to the current
+
+    Note: When multiple values in the window tie for the extreme, the most recent occurrence is used
 
     :param data: the input data
     :param int|Indicator|IndParam n: the N-day time window

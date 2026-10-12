@@ -153,7 +153,7 @@ void IHhvbars::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t ste
     price_t maxVal = ind[start];
     size_t maxPos = start;
     for (size_t i = start + 1; i <= curPos; i++) {
-        if (ind[i] > maxVal) {
+        if (ind[i] >= maxVal) {
             maxVal = ind[i];
             maxPos = i;
         }
