@@ -60,7 +60,7 @@ Strategy::Strategy(const string& name, const string& config_file)
     _initParam();
     if (m_config_file.empty()) {
         string home = getUserDir();
-        HKU_ERROR_IF(home == "", "Failed get user home path!");
+        HKU_CHECK_THROW(!home.empty(), std::runtime_error, "Failed get user home path!");
         m_config_file = format("{}/{}", home, ".hikyuu/hikyuu.ini");
     }
 }
