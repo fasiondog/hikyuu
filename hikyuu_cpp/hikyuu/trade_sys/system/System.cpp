@@ -1049,11 +1049,20 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
 
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);
-    // Round the quantity to be sold to an integer multiple of the minimum trade unit; when the
-    // remainder is less than the minimum trade unit, sell everything at once
-    double real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
-    if (position.number - real_sell_num < min_num) {
+    // MAX_DOUBLE is the "sell everything" sentinel of the quantity and must be resolved before the
+    // board-lot rounding below: the double -> int64 conversion of an out-of-range value is undefined
+    // behavior, and its result differs between compilers and platforms (it used to make the sell fail
+    // on MSVC while selling the whole position on clang/arm64)
+    double real_sell_num;
+    if (num >= MAX_DOUBLE || num >= position.number) {
         real_sell_num = position.number;
+    } else {
+        // Round the quantity to be sold to an integer multiple of the minimum trade unit; when the
+        // remainder is less than the minimum trade unit, sell everything at once
+        real_sell_num = static_cast<int64_t>(num / min_num) * min_num;
+        if (position.number - real_sell_num < min_num) {
+            real_sell_num = position.number;
+        }
     }
 
     record =
