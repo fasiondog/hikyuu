@@ -27,7 +27,7 @@ void initInnerTask() {
                   reload_time);
         reload_enable = true;
     } catch (const std::exception& e) {
-        HKU_ERROR("Can't auto reload!", e.what());
+        HKU_ERROR("Can't auto reload: {}", e.what());
     }
 
     if (reload_enable) {
@@ -70,8 +70,14 @@ void reloadHikyuuTask() {
         agent->stop();
     }
 
-    // Reload the data
-    StockManager::instance().reload();
+    // Reload the data; a failed reload keeps the loaded data, restart the agent regardless
+    try {
+        StockManager::instance().reload();
+    } catch (const std::exception& e) {
+        HKU_ERROR("Failed reload hikyuu: {}", e.what());
+    } catch (...) {
+        HKU_ERROR("Failed reload hikyuu with unknown exception!");
+    }
 
     // Restart the market data receiving
     if (agent_running) {
