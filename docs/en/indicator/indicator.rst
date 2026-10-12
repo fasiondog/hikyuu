@@ -1310,6 +1310,8 @@ Built-in Technical Indicators
 
     Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
 
+    Note: the judgment runs on the backward-adjusted (BACKWARD) close series: a no-recover context is re-fetched internally with the same query, so the comparison stays continuous across ex-right dates
+
     :param KData kdata: the K-line data
     :rtype: Indicator
 
@@ -1328,6 +1330,8 @@ Built-in Technical Indicators
     The limit-up judgment logic: the close price of the day >= the close price of the previous day × (1 + the limit-up range)
 
     Note: the ranges follow the current rules of each board without date segmentation, so the ChiNext stocks before 2020-08-24 and the first days of a new listing are still judged by the current range
+
+    Note: the judgment runs on the backward-adjusted (BACKWARD) close series: a no-recover context is re-fetched internally with the same query, so the comparison stays continuous across ex-right dates
 
     :param KData kdata: the K-line data
     :rtype: Indicator

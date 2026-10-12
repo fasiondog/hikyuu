@@ -32,6 +32,9 @@ namespace hku {
  * - The ranges follow the current rules of each board, without date segmentation: the ChiNext
  *   stocks were limited to 10% before 2020-08-24 and a new listing has no range limit in its
  *   first days, both of which are judged by the current range
+ * - The judgment runs on the backward-adjusted (BACKWARD) close series: a no-recover context is
+ *   re-fetched internally with the same query so that the comparison stays continuous across
+ *   ex-right dates
  *
  * <pre>
  * Example:

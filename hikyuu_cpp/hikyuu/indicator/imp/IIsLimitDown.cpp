@@ -53,9 +53,17 @@ void IIsLimitDown::_increment_calculate(const Indicator& data, size_t start_pos)
         limit_down = 0.8;  // 20% for the ChiNext and the STAR Market
     }
 
-    auto const* ks = kdata.data();
     auto* dst = this->data();
     if (limit_down > 0.0) {
+        // judge on backward-adjusted closes: adjacent ratios stay continuous across ex-right dates
+        const KQuery& q = kdata.getQuery();
+        KData recovered;
+        if (q.recoverType() != KQuery::BACKWARD) {
+            KQuery bq = q;
+            bq.recoverType(KQuery::BACKWARD);
+            recovered = kdata.getKData(bq);
+        }
+        auto const* ks = recovered.size() == total ? recovered.data() : kdata.data();
         for (size_t i = start_pos; i < total; ++i) {
             dst[i] = value_t(ks[i].closePrice <=
                              roundEx(ks[i - 1].closePrice * limit_down, stock.precision()));
