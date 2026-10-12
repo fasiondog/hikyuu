@@ -1211,6 +1211,8 @@ void export_Indicator_build_in(py::module& m) {
     β is the most original RSRS slope, representing the strength of the support and the resistance.
     The defect: the β center fluctuates greatly in the different market ranges, and it cannot be compared directly across the time periods.
 
+    Non-finite Low/High (NaN or ±Inf) bars are excluded from the regression; a window with fewer than two finite pairs yields Null; the result never returns ±Inf.
+
     :param KData kdata: the K-line data
     :param int n: the rolling window, defaulting to 20
     :rtype: Indicator)");
@@ -1229,6 +1231,8 @@ void export_Indicator_build_in(py::module& m) {
     2. **Level 2 (Z)**: the rolling M-day Z-score standardization, solving the problem of the β center drifting in the different stages
     3. **Level 3 (the corrected standard score)**: Z × R², where R² is the regression goodness of fit, filtering the noise with the poor fitting
     4. **Level 4 (the right-skewed correction)**: Z × R² × β, amplifying the strong bull zone
+
+    Non-finite Low/High (NaN or ±Inf) bars are excluded from the regression; a window with fewer than two finite pairs yields Null; the result never returns ±Inf.
 
     **The returned results**:
 
@@ -2030,6 +2034,8 @@ void export_Indicator_build_in(py::module& m) {
     m.def("AD", AD_2, R"(AD(kdata)
 
    The accumulation/distribution line
+
+   Bars with a non-finite (High - Low) are skipped, so the accumulator never gets poisoned by a single bad bar.
 
    :param KData kdata: the K-line data
    :rtype: Indicator)");

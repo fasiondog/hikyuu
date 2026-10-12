@@ -27,6 +27,8 @@
 
    累积/派发线
 
+   High-Low 非有限（NaN 或 ±Inf）的K线跳过，累加器不会因单根坏K线被永久污染。
+
    :param KData kdata: k线数据
    :rtype: Indicator
 
@@ -1863,6 +1865,8 @@
     3. **层次3（修正标准分）**：Z × R²，R² 为回归拟合优度，过滤拟合差的噪音
     4. **层次4（右偏修正）**：Z × R² × β，放大多头强势区间
 
+    NaN 口径：Low/High 非有限（NaN 或 ±Inf）的K线被剔除出回归；窗口内有限对不足两根时输出为 Null；结果永不为 ±Inf。
+
     :param KData kdata: K线数据
     :param int n: 回归窗口，默认为20
     :param int m: Z-score窗口，默认为60
@@ -1911,6 +1915,8 @@
 
     β 为最原始的 RSRS 斜率，代表支撑阻力强弱。
     缺陷：不同行情区间 β 中枢波动大，不能跨时段直接对比。
+
+    NaN 口径：Low/High 非有限（NaN 或 ±Inf）的K线被剔除出回归；窗口内有限对不足两根时输出为 Null；结果永不为 ±Inf。
 
     :param KData kdata: K线数据
     :param int n: 滚动窗口，默认为20

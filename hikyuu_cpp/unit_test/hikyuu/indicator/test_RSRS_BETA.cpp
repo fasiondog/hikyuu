@@ -8,7 +8,10 @@
  */
 
 #include "../test_config.h"
+#include <cmath>
 #include <fstream>
+#include <limits>
+#include <hikyuu/KDataPrivatedBufferImp.h>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/RSRS_BETA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -26,6 +29,34 @@ TEST_CASE("test_RSRS_BETA") {
     // The invalid parameter n
     CHECK_THROWS_AS(RSRS_BETA(1), std::exception);
     CHECK_THROWS_AS(RSRS_BETA(0), std::exception);
+}
+
+/** @par Test points: a non-finite bar is excluded from the regression, sums do not get poisoned */
+TEST_CASE("test_RSRS_BETA_inf_middle") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    REQUIRE_FALSE(stock.isNull());
+
+    const price_t inf = std::numeric_limits<price_t>::infinity();
+    Datetime date(2010, 1, 1);
+    KRecordList records;
+    // 6 bars, n = 4: bar 2 has Inf high, so its pair is excluded from every window that contains it
+    for (size_t i = 0; i < 6; ++i) {
+        price_t high = (i == 2) ? inf : (20.0 + i);
+        price_t low = 10.0 + i;
+        records.push_back(KRecord(date + Days(i), low, high, low, high, 1000.0, 100.0));
+    }
+    KData kdata =
+      KData(make_shared<KDataPrivatedBufferImp>(stock, KQuery(0, records.size()), records));
+
+    Indicator result = RSRS_BETA(kdata, 4);
+    REQUIRE_EQ(result.size(), 6);
+
+    /** @arg outputs after the Inf bar rolls in/out stay finite (valid_count drops to 3 then 4) */
+    // Windows covering bar 2 have valid_count == 3 (still >= 2, produces finite beta)
+    CHECK_UNARY(std::isfinite(result[3]));
+    CHECK_UNARY(std::isfinite(result[4]));
+    // Bar 5 window [2..5] contains the Inf bar again -> valid == 3, still finite
+    CHECK_UNARY(std::isfinite(result[5]));
 }
 
 TEST_CASE("test_RSRS_BETA_kdata") {

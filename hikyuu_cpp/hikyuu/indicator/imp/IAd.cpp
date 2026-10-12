@@ -38,7 +38,7 @@ void IAd::_calculate(const Indicator& data) {
     for (size_t i = m_discard + 1; i < total; i++) {
         const KRecord& r = k[i];
         value_t tmp = r.highPrice - r.lowPrice;
-        if (tmp != 0.0) {
+        if (std::isfinite(tmp) && tmp != 0.0) {
             // Bull/bear comparison = [(close - low) - (high - close)] / (high - low)
             ad += ((r.closePrice + r.closePrice - r.highPrice - r.lowPrice) / tmp) * r.transAmount;
         }

@@ -18,6 +18,8 @@ namespace hku {
 /**
  * Accumulation / distribution line
  * @param k the associated KData
+ * @note Bars with non-finite (High - Low) are skipped; the accumulator never gets poisoned by
+ *       a single bad bar
  * @ingroup Indicator
  */
 Indicator HKU_API AD(const KData& k);

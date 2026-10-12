@@ -17,7 +17,8 @@ namespace hku {
  * Formula: High = α + β · Low
 
  *
- * Every K-line contributes a coordinate point (Low[i], High[i]), and the N points within the rolling
+ * Every K-line contributes a coordinate point (Low[i], High[i]), and the N points within the
+ rolling
  * window are used for the OLS regression.
 
  * β is the most original RSRS slope, representing the strength of the support and resistance.
@@ -29,6 +30,9 @@ namespace hku {
  * @param n the rolling window, 20 by default
 
  * @param kdata K-line data
+
+ * @note Bars with non-finite Low/High are excluded from the regression; the whole window is Null
+ *       when fewer than two finite pairs remain, and the result never returns ±Inf
 
  * @ingroup Indicator
  */

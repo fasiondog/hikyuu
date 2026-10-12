@@ -42,34 +42,68 @@ void IRSRSBeta::_calculate(const Indicator&) {
 
     auto* dst = this->data();
     m_discard = n - 1;
+    value_t null_price = Null<price_t>();
 
-    value_t sum_x = 0.0, sum_y = 0.0, sum_xy = 0.0, sum_x2 = 0.0;
+    // Centered accumulation with a valid_count filter (ST-034/ST-N03 contract): non-finite
+    // low/high pairs are excluded from the fit and the anchor is the first finite pair
+    value_t kx = k[0].lowPrice;
+    value_t ky = k[0].highPrice;
+    if (!std::isfinite(kx))
+        kx = 0.0;
+    if (!std::isfinite(ky))
+        ky = 0.0;
+
+    value_t ex = 0.0, ey = 0.0, exx = 0.0, exy = 0.0;
+    size_t valid = 0;
     for (size_t i = 0; i < static_cast<size_t>(n); i++) {
         value_t x = k[i].lowPrice;
         value_t y = k[i].highPrice;
-        sum_x += x;
-        sum_y += y;
-        sum_xy += x * y;
-        sum_x2 += x * x;
+        if (std::isfinite(x) && std::isfinite(y)) {
+            value_t ix = x - kx;
+            value_t iy = y - ky;
+            ex += ix;
+            ey += iy;
+            exx += ix * ix;
+            exy += ix * iy;
+            valid++;
+        }
     }
 
-    value_t null_price = Null<price_t>();
-    value_t denominator = n * sum_x2 - sum_x * sum_x;
-    dst[n - 1] = denominator == 0.0 ? null_price : (n * sum_xy - sum_x * sum_y) / denominator;
+    auto emit = [&](size_t i) {
+        if (valid < 2)
+            return;
+        value_t nv = (value_t)valid;
+        value_t varx = exx - ex * ex / nv;
+        value_t cov = exy - ex * ey / nv;
+        dst[i] =
+          !(varx > 0.0 && std::isfinite(varx) && std::isfinite(cov)) ? null_price : cov / varx;
+    };
+    emit(n - 1);
 
     for (size_t i = n; i < total; i++) {
         value_t old_x = k[i - n].lowPrice;
         value_t old_y = k[i - n].highPrice;
+        if (std::isfinite(old_x) && std::isfinite(old_y)) {
+            value_t pix = old_x - kx;
+            value_t piy = old_y - ky;
+            ex -= pix;
+            ey -= piy;
+            exx -= pix * pix;
+            exy -= pix * piy;
+            valid--;
+        }
         value_t new_x = k[i].lowPrice;
         value_t new_y = k[i].highPrice;
-
-        sum_x += new_x - old_x;
-        sum_y += new_y - old_y;
-        sum_xy += new_x * new_y - old_x * old_y;
-        sum_x2 += new_x * new_x - old_x * old_x;
-
-        denominator = n * sum_x2 - sum_x * sum_x;
-        dst[i] = denominator == 0.0 ? null_price : (n * sum_xy - sum_x * sum_y) / denominator;
+        if (std::isfinite(new_x) && std::isfinite(new_y)) {
+            value_t pix = new_x - kx;
+            value_t piy = new_y - ky;
+            ex += pix;
+            ey += piy;
+            exx += pix * pix;
+            exy += pix * piy;
+            valid++;
+        }
+        emit(i);
     }
 }
 

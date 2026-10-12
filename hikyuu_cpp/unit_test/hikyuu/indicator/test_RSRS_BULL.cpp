@@ -8,6 +8,7 @@
 #include "../test_config.h"
 #include <fstream>
 #include <cmath>
+#include <limits>
 #include <hikyuu/KDataPrivatedBufferImp.h>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/RSRS_BULL.h>
@@ -51,6 +52,42 @@ TEST_CASE("test_RSRS_BULL_invalid_head") {
     CHECK_UNARY(!std::isnan(result.get(5, 0)));
     CHECK_UNARY(!std::isnan(result.get(13, 0)));
     CHECK_UNARY(!std::isnan(result.get(13, 3)));
+}
+
+/** @par Test points: a non-finite bar is excluded from the rolling regression, sums do not poison
+ */
+TEST_CASE("test_RSRS_BULL_inf_middle") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    REQUIRE_FALSE(stock.isNull());
+
+    // n = 3, m = 3 -> start_idx = 2, z_start = 4; 8 bars with an Inf at bar 3
+    const price_t inf = std::numeric_limits<price_t>::infinity();
+    Datetime date(2010, 1, 1);
+    KRecordList records;
+    for (size_t i = 0; i < 8; ++i) {
+        price_t high = (i == 3) ? inf : (20.0 + i);
+        price_t low = 10.0 + i;
+        records.push_back(KRecord(date + Days(i), low, high, low, high, 1000.0, 100.0));
+    }
+    KData kdata =
+      KData(make_shared<KDataPrivatedBufferImp>(stock, KQuery(0, records.size()), records));
+
+    Indicator result = RSRS_BULL(kdata, 3, 3);
+    REQUIRE_EQ(result.size(), 8);
+
+    /** @arg beta/r2 outputs after the Inf bar rolls in stay finite (valid_count drops to 2) */
+    CHECK_UNARY(std::isfinite(result.get(4, 1)));  // beta[4] window [2..4] excludes bar 3
+    CHECK_UNARY(std::isfinite(result.get(6, 1)));  // beta[6] window [4..6] no Inf
+    CHECK_UNARY(std::isfinite(result.get(7, 1)));  // beta[7] window [5..7] no Inf
+
+    /** @arg bull/z/r2 outputs never ±Inf (AGENTS.md L247 contract); they may be Null when the
+     *        betas are constant (var_beta=0) which is the ST-018 zero-variance contract */
+    for (size_t i = 0; i < result.size(); i++) {
+        for (size_t r = 0; r < 4; r++) {
+            value_t v = result.get(i, r);
+            CHECK_UNARY(std::isnan(v) || std::isfinite(v));
+        }
+    }
 }
 
 TEST_CASE("test_RSRS_BULL") {
