@@ -45,7 +45,9 @@ void IRSRSBeta::_calculate(const Indicator&) {
     value_t null_price = Null<price_t>();
 
     // Centered accumulation with a valid_count filter (ST-034/ST-N03 contract): non-finite
-    // low/high pairs are excluded from the fit and the anchor is the first finite pair
+    // low/high pairs are excluded from the fit; the anchor is the first bar's pair, sanitized to
+    // 0.0 when non-finite (the slope is shift-invariant, so any finite anchor gives the same
+    // result)
     value_t kx = k[0].lowPrice;
     value_t ky = k[0].highPrice;
     if (!std::isfinite(kx))

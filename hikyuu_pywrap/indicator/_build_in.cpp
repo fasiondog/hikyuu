@@ -1097,7 +1097,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("ZONGGUBEN", py::overload_cast<>(ZONGGUBEN));
     m.def("ZONGGUBEN", py::overload_cast<const KData&>(ZONGGUBEN), R"(ZONGGUBEN(kdata)
 
-   Get the total share capital (unit: 10,000 shares)
+   Get the total share capital (unit: 10,000 shares), carried over between the ex-rights records
+
+   Needs a KData context; bars before the first valid ex-rights record are null.
 
    :param KData kdata: the K-line data
    :rtype: Indicator)");
@@ -2188,6 +2190,7 @@ void export_Indicator_build_in(py::module& m) {
     m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
     The cost distribution. This function is only valid for the daily analysis period, and invalid for the indexes, the ETFs, etc. that have no circulating share capital dividend data.
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the DMA-style accumulation decay is period-dependent, so the daily period is recommended.
     Usage: COST(k, X) means what the price of the X% profitable positions is
     For example: COST(k, 10) means what the price of the 10% profitable positions is, i.e. 10% of the positions are below this price, and the other 90% are above this price, being the trapped positions
 

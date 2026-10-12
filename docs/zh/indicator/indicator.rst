@@ -752,6 +752,8 @@
 
     例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
 
+    transCount 单位随查询 ktype 自动归一化：日线及以上为「手」（x 100），以下为「股」；DMA 式累加衰减依赖周期，仍建议在日线上使用。
+
     :param KData k: 关联的K线数据
     :param float x: x%获利价格, 0~100
     :rtype: Indicator
@@ -2377,7 +2379,9 @@
 
 .. py:function:: ZONGGUBEN([data])
 
-   获取总股本（单位：万股）
+   获取总股本（单位：万股），在各权息记录之间延续
+
+   需要 KData 上下文；首条有效权息记录之前的 bar 为 null。
 
    :param KData kdata: k线数据
    :rtype: Indicator

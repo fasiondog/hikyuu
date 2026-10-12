@@ -751,6 +751,8 @@ Built-in Technical Indicators
 
     For example: COST(k, 10) means what the price of the 10% profitable positions is, i.e. 10% of the positions are below this price, and the other 90% are above this price, being the trapped positions. This function is only valid for the daily analysis period.
 
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the DMA-style accumulation decay is period-dependent, so the daily period is recommended.
+
     :param KData k: the associated K-line data
     :param float x: the x% profitable price, 0~100
     :rtype: Indicator
@@ -2398,7 +2400,9 @@ Built-in Technical Indicators
 
 .. py:function:: ZONGGUBEN([data])
 
-   Get the total share capital (unit: 10,000 shares)
+   Get the total share capital (unit: 10,000 shares), carried over between the ex-rights records
+
+   Needs a KData context; bars before the first valid ex-rights record are null.
 
    :param KData kdata: the K-line data
    :rtype: Indicator
