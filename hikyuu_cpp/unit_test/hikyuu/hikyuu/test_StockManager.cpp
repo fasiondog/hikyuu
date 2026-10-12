@@ -261,6 +261,10 @@ TEST_CASE("test_StockManager_getBlockList_inner_block") {
     CHECK_UNARY(hasBlock(sm.getBlockList("START"), "START", "科创板"));
     CHECK_UNARY(hasBlock(sm.getBlockList("ETF"), "ETF", "ALL"));
 
+    /** @arg The inner category matching is case-insensitive */
+    CHECK_UNARY(hasBlock(sm.getBlockList("a"), "A", "ALL"));
+    CHECK_UNARY(hasBlock(sm.getBlockList("start"), "START", "科创板"));
+
     /** @arg An unknown category matches neither a driver block nor an inner block */
     CHECK_EQ(sm.getBlockList("__no_such_category__").size(), 0);
 

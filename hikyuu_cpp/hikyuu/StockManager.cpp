@@ -903,12 +903,18 @@ void StockManager::removeBlock(const string& category, const string& name) {
 
 BlockList StockManager::getBlockList(const string& category) {
     BlockList result;
-    HKU_IF_RETURN(!m_blockDriver, BlockList());
-    result =
-      category.empty() ? m_blockDriver->getBlockList() : m_blockDriver->getBlockList(category);
+    string upper_category;
+    if (!category.empty()) {
+        upper_category = category;
+        to_upper(upper_category);
+    }
+    if (m_blockDriver) {
+        result =
+          category.empty() ? m_blockDriver->getBlockList() : m_blockDriver->getBlockList(category);
+    }
     for (const auto& iter : m_innerBlocks) {
         const auto& blk = iter.second;
-        if (category.empty() || blk.category() == category) {
+        if (upper_category.empty() || blk.category() == upper_category) {
             result.push_back(blk);
         }
     }
