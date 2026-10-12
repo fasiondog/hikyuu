@@ -27,14 +27,14 @@ void IBarsLastCount::_calculate(const Indicator& ind) {
 
     auto const* src = ind.data();
     auto* dst = this->data();
-    if (src[m_discard] > 0.0) {
+    if (std::isfinite(src[m_discard]) && src[m_discard] != 0.0) {
         dst[m_discard] = 1.0;
     } else {
         dst[m_discard] = 0;
     }
 
     for (size_t i = m_discard + 1; i < total; ++i) {
-        if (src[i] > 0.0) {
+        if (std::isfinite(src[i]) && src[i] != 0.0) {
             dst[i] = dst[i - 1] + 1.0;
         } else {
             dst[i] = 0.0;
