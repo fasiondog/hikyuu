@@ -30,12 +30,18 @@ void ITime::_checkParam(const string& name) const {
     }
 }
 
-void ITime::_calculate(const Indicator& data) {
-    HKU_WARN_IF(!isLeaf() && !data.empty(),
-                "The input is ignored because {} depends on the context!", m_name);
+DatetimeList ITime::_getDatetimeList(const Indicator& data) const {
+    if (!isLeaf()) {
+        DatetimeList ds = data.getDatetimeList();
+        if (!ds.empty()) {
+            return ds;
+        }
+    }
+    return getContext().getDatetimeList();
+}
 
-    const KData& kdata = getContext();
-    size_t total = kdata.size();
+void ITime::_calculate(const Indicator& data) {
+    size_t total = _getDatetimeList(data).size();
     HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
@@ -43,9 +49,8 @@ void ITime::_calculate(const Indicator& data) {
 }
 
 void ITime::_increment_calculate(const Indicator& data, size_t start_pos) {
-    const KData& kdata = getContext();
-    size_t total = kdata.size();
-    DatetimeList ds = kdata.getDatetimeList();
+    DatetimeList ds = _getDatetimeList(data);
+    size_t total = ds.size();
 
     auto* dst = this->data();
     string type_name = getParam<string>("type");

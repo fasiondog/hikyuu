@@ -821,6 +821,11 @@ Built-in Technical Indicators
 
     Get the year-month-day of this period since 1900. Usage: DATE, e.g. the function returns 1000101, which means January 1, 2000.
 
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
+
     :param data: the input data KData
     :rtype: Indicator
 
@@ -828,6 +833,11 @@ Built-in Technical Indicators
 .. py:function:: DAY([data])
 
     Get the date of this period. Usage: DAY, the valid value range returned by the function is (1-31).
+
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
 
     :param data: the input data KData
     :rtype: Indicator
@@ -1108,6 +1118,11 @@ Built-in Technical Indicators
 .. py:function:: HOUR([data])
 
     Get the number of the hours of this period. Usage: HOUR, the valid value range returned by the function is (0-23), and the value is 0 for the daily and the longer analysis periods.
+
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
 
     :param data: the input data KData
     :rtype: Indicator
@@ -1553,6 +1568,11 @@ Built-in Technical Indicators
 
     Get the number of the minutes of this period. Usage: MINUTE, the valid value range returned by the function is (0-59), and the value is 0 for the daily and the longer analysis periods.
 
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
+
     :param data: the input data KData
     :rtype: Indicator
 
@@ -1575,6 +1595,11 @@ Built-in Technical Indicators
 .. py:function:: MONTH([data])
 
     Get the month of this period. Usage: MONTH, the valid value range returned by the function is (1-12).
+
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
 
     :param data: the input data KData
     :rtype: Indicator
@@ -2161,6 +2186,11 @@ Built-in Technical Indicators
 
     Get the hour-minute-second of this period. Usage: TIME, the valid value range returned by the function is (000000-235959).
 
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
+
     :param data: the input data KData
     :rtype: Indicator
 
@@ -2291,6 +2321,11 @@ Built-in Technical Indicators
 
     Get the day of the week of this period. Usage: WEEK, the valid value range returned by the function is (0-6), and 0 means Sunday.
 
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
+
     :param data: the input data KData
     :rtype: Indicator
 
@@ -2318,6 +2353,11 @@ Built-in Technical Indicators
 .. py:function:: YEAR([data])
 
     Get the year of this period.
+
+    .. note::
+
+        The dates come from the input indicator when used as a non-leaf, otherwise from the
+        bound context KData
 
     :param data: the input data KData
     :rtype: Indicator
