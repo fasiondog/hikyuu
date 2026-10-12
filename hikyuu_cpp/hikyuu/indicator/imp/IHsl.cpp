@@ -27,6 +27,10 @@ void IHsl::_calculate(const Indicator& data) {
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
+    // transCount is in lots on the daily line and above but in shares below it; freeCount is in
+    // units of 10 thousand shares. The factor normalizes both to the turnover ratio (x 100 = %).
+    value_t hsl_factor = KQuery::getKTypeInSeconds(k.getQuery().kType()) >= 86400 ? 0.01 : 0.0001;
+
     _readyBuffer(total, 1);
 
     // Set the discard to everything first, it is updated later
@@ -66,9 +70,7 @@ void IHsl::_calculate(const Indicator& data) {
 
         while (pos < total && kdata[pos].datetime < cur_sw_date) {
             if (kdata[pos].datetime >= pre_sw_date) {
-                // transCount is in lots and the outstanding shares are in units of 10 thousand
-                // shares
-                dst[pos] = kdata[pos].transCount / pre_free_count * 0.01;
+                dst[pos] = kdata[pos].transCount / pre_free_count * hsl_factor;
             }
             pos++;
         }
@@ -81,7 +83,7 @@ void IHsl::_calculate(const Indicator& data) {
     }
 
     for (; pos < total; pos++) {
-        dst[pos] = kdata[pos].transCount / pre_free_count * 0.01;
+        dst[pos] = kdata[pos].transCount / pre_free_count * hsl_factor;
     }
 
     updateDiscard(true);

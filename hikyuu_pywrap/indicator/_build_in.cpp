@@ -1107,6 +1107,8 @@ void export_Indicator_build_in(py::module& m) {
 
     Get the turnover rate; multiplying by 100 gives the percentage, equal to VOL(k) / CAPITAL(k) * 0.01
 
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the result is a consistent turnover ratio across all periods.
+
     :param KData kdata: the K-line data
     :rtype: Indicator)");
 

@@ -1136,6 +1136,8 @@ Built-in Technical Indicators
 
     Get the turnover rate (the percentage x%), equal to VOL(k) / CAPITAL(k)
 
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the result is a consistent turnover ratio across all periods.
+
     :param KData kdata: the K-line data
     :rtype: Indicator
 

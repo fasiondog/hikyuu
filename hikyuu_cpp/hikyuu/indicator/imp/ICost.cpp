@@ -37,6 +37,10 @@ void ICost::_calculate(const Indicator& data) {
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
+    // transCount is in lots on the daily line and above but in shares below it; freeCount is in
+    // units of 10 thousand shares. The factor normalizes both to the turnover ratio (x 100 = %).
+    value_t hsl_factor = KQuery::getKTypeInSeconds(k.getQuery().kType()) >= 86400 ? 0.01 : 0.0001;
+
     _readyBuffer(total, 1);
 
     // Set the discard to everything first, it is updated later
@@ -83,9 +87,7 @@ void ICost::_calculate(const Indicator& data) {
             const KRecord& krecord = kdata[pos];
             if (krecord.datetime >= pre_sw_date) {
                 x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-                // transCount is in lots and the outstanding shares are in units of 10 thousand
-                // shares
-                a = krecord.transCount / pre_free_count * 0.01;
+                a = krecord.transCount / pre_free_count * hsl_factor;
                 dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
                 has_pre_cost = true;
                 pre_cost = dst[pos];
@@ -113,7 +115,7 @@ void ICost::_calculate(const Indicator& data) {
     for (; pos < total; pos++) {
         const KRecord& krecord = kdata[pos];
         x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-        a = krecord.transCount / pre_free_count * 0.01;
+        a = krecord.transCount / pre_free_count * hsl_factor;
         dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
         has_pre_cost = true;
         pre_cost = dst[pos];

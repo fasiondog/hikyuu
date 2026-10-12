@@ -1135,6 +1135,8 @@
 
     获取换手率(百分比 x%)，等于 VOL(k) / CAPITAL(k)
 
+    transCount 单位随查询 ktype 自动归一化：日线及以上为「手」（x 100），以下为「股」；结果在任何周期下均为一致的换手率。
+
     :param KData kdata: k线数据
     :rtype: Indicator
 
