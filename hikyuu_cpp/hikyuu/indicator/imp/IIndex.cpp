@@ -70,9 +70,8 @@ void IIndex::_calculate(const Indicator& ind) {
     }
 
     KQuery query = k.getQuery();
-    auto secs = KQuery::getKTypeInSeconds(query.kType());
-    query = KQueryByDate(k[0].datetime, k[total - 1].datetime + Seconds(secs), query.kType(),
-                         query.recoverType());
+    query = KQueryByDate(k[0].datetime, k[total - 1].datetime + query.kTypeInSeconds(),
+                         query.kType(), query.recoverType());
 
     KData index_k = getKData(market_code, query);
     Indicator index =

@@ -6,6 +6,7 @@
  */
 
 #include "IZongGuBen.h"
+#include "StockWeightFill.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::IZongGuBen)
@@ -30,43 +31,19 @@ void IZongGuBen::_calculate(const Indicator& data) {
     }
 
     _readyBuffer(total, 1);
-
     _increment_calculate(data, 0);
+    updateDiscard(true);
 }
 
 void IZongGuBen::_increment_calculate(const Indicator& data, size_t start_pos) {
     const KData& k = getContext();
-    Stock stock = k.getStock();
     size_t total = k.size();
-    StockWeightList sw_list = stock.getWeight();
-    if (sw_list.size() == 0) {
-        return;
-    }
+    HKU_IF_RETURN(total == 0 || start_pos >= total, void());
 
     auto* dst = this->data();
-    size_t pos = start_pos;
-    auto sw_iter = sw_list.begin();
-    price_t pre_total_count = sw_iter->totalCount();
-    for (; sw_iter != sw_list.end(); ++sw_iter) {
-        price_t total_count = sw_iter->totalCount();
-        if (total_count == 0) {
-            continue;  // Ignore the ex-rights/ex-dividend record whose outstanding shares are 0
-        }
-
-        while (pos < total && k[pos].datetime < sw_iter->datetime()) {
-            dst[pos] = pre_total_count;
-            pos++;
-        }
-
-        pre_total_count = total_count;
-        if (pos >= total) {
-            break;
-        }
-    }
-
-    for (; pos < total; pos++) {
-        dst[pos] = pre_total_count;
-    }
+    fill_by_weight_series(
+      k, start_pos, [](const StockWeight& w) { return w.totalCount(); },
+      [dst](size_t pos, const KRecord&, price_t pre_total_count) { dst[pos] = pre_total_count; });
 }
 
 Indicator HKU_API ZONGGUBEN() {

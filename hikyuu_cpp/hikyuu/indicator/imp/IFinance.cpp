@@ -39,11 +39,27 @@ void IFinance::_calculate(const Indicator& data) {
 
     _readyBuffer(total, 1);
     _increment_calculate(data, 0);
+    updateDiscard(true);
 }
 
 void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
     const KData& kdata = getContext();
     size_t total = kdata.size();
+
+    // Resolve the field before reading the records: bad names fail fast even without finance data
+    int field_ix = getParam<int>("field_ix");
+    string field_name = getParam<string>("field_name");
+    try {
+        if (field_ix < 0 && !field_name.empty()) {
+            field_ix =
+              static_cast<int>(StockManager::instance().getHistoryFinanceFieldIndex(field_name));
+        }
+    } catch (const std::exception& e) {
+        HKU_THROW("FINANCE: failed to resolve field name '{}'! {}", field_name, e.what());
+    } catch (...) {
+        HKU_THROW("FINANCE: failed to resolve field name '{}'! unknown error", field_name);
+    }
+
     auto finances = kdata.getStock().getHistoryFinance();
 
     if (getParam<bool>("only_year_report")) {
@@ -57,15 +73,7 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
     }
 
     if (finances.empty()) {
-        m_discard = total;
         return;
-    }
-
-    int field_ix = getParam<int>("field_ix");
-    string field_name = getParam<string>("field_name");
-    if (field_ix < 0 && !field_name.empty()) {
-        field_ix = static_cast<int>(
-          StockManager::instance().getHistoryFinanceFieldIndex(getParam<string>("field_name")));
     }
 
     bool dynamic = getParam<bool>("dynamic");
@@ -83,57 +91,64 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
         }
     }
 
+    // Rely on values.at to fail fast (a per-record data property); only enrich the message
     size_t cur_kix = start_pos;
     size_t pos = 0;
-    while (pos < finances_total && cur_kix < total) {
-        auto value = finances[pos].values.at(field_ix);
-        if (pos + 1 == finances_total) {
-            while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime) {
-                if (dynamic) {
-                    long month = finances[pos].fileDate.month();
-                    if (3L == month) {
-                        // Q1 report
-                        dst[cur_kix] = value * 4;
-                    } else if (6L == month) {
-                        // Half-year report
-                        dst[cur_kix] = value * 2;
-                    } else if (9L == month) {
-                        // Q3 report
-                        dst[cur_kix] = value / 3.0 * 4.0;
+    try {
+        while (pos < finances_total && cur_kix < total) {
+            auto value = finances[pos].values.at(field_ix);
+            if (pos + 1 == finances_total) {
+                while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime) {
+                    if (dynamic) {
+                        long month = finances[pos].fileDate.month();
+                        if (3L == month) {
+                            // Q1 report
+                            dst[cur_kix] = value * 4;
+                        } else if (6L == month) {
+                            // Half-year report
+                            dst[cur_kix] = value * 2;
+                        } else if (9L == month) {
+                            // Q3 report
+                            dst[cur_kix] = value / 3.0 * 4.0;
+                        } else {
+                            // Annual report
+                            dst[cur_kix] = value;
+                        }
                     } else {
-                        // Annual report
                         dst[cur_kix] = value;
                     }
-                } else {
-                    dst[cur_kix] = value;
+                    cur_kix++;
                 }
-                cur_kix++;
-            }
-        } else {
-            while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime &&
-                   finances[pos + 1].reportDate > k[cur_kix].datetime) {
-                if (dynamic) {
-                    long month = finances[pos].fileDate.month();
-                    if (3L == month) {
-                        // Q1 report
-                        dst[cur_kix] = value * 4;
-                    } else if (6L == month) {
-                        // Half-year report
-                        dst[cur_kix] = value * 2;
-                    } else if (9L == month) {
-                        // Q3 report
-                        dst[cur_kix] = value / 3.0 * 4.0;
+            } else {
+                while (cur_kix < total && finances[pos].reportDate <= k[cur_kix].datetime &&
+                       finances[pos + 1].reportDate > k[cur_kix].datetime) {
+                    if (dynamic) {
+                        long month = finances[pos].fileDate.month();
+                        if (3L == month) {
+                            // Q1 report
+                            dst[cur_kix] = value * 4;
+                        } else if (6L == month) {
+                            // Half-year report
+                            dst[cur_kix] = value * 2;
+                        } else if (9L == month) {
+                            // Q3 report
+                            dst[cur_kix] = value / 3.0 * 4.0;
+                        } else {
+                            // Annual report
+                            dst[cur_kix] = value;
+                        }
                     } else {
-                        // Annual report
                         dst[cur_kix] = value;
                     }
-                } else {
-                    dst[cur_kix] = value;
+                    cur_kix++;
                 }
-                cur_kix++;
             }
+            pos++;
         }
-        pos++;
+    } catch (const std::exception& e) {
+        HKU_THROW("FINANCE: failed to read field index {}! {}", field_ix, e.what());
+    } catch (...) {
+        HKU_THROW("FINANCE: failed to read field index {}! unknown error", field_ix);
     }
 }
 

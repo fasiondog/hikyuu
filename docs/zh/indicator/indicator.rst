@@ -25,7 +25,9 @@
 
 .. py:function:: AD(kdata)
 
-   累积/派发线
+   累积/派发线，由成交金额（单位：万元）累加，结果同为万元。
+
+   High-Low 非有限（NaN 或 ±Inf）的K线跳过，累加器不会因单根坏K线被永久污染。
 
    :param KData kdata: k线数据
    :rtype: Indicator
@@ -750,6 +752,8 @@
 
     例如：COST(k, 10),表示10%获利盘的价格是多少，即有10%的持仓量在该价格以下，其余90%在该价格以上，为套牢盘 该函数仅对日线分析周期有效
 
+    transCount 单位随查询 ktype 自动归一化：日线及以上为「手」（x 100），以下为「股」；DMA 式累加衰减依赖周期，仍建议在日线上使用。
+
     :param KData k: 关联的K线数据
     :param float x: x%获利价格, 0~100
     :rtype: Indicator
@@ -1133,6 +1137,8 @@
 
     获取换手率(百分比 x%)，等于 VOL(k) / CAPITAL(k)
 
+    transCount 单位随查询 ktype 自动归一化：日线及以上为「手」（x 100），以下为「股」；结果在任何周期下均为一致的换手率。
+
     :param KData kdata: k线数据
     :rtype: Indicator
 
@@ -1252,10 +1258,14 @@
 
     通达信 880005 大盘上涨家数, 可能无法盘中更新!
 
+    注意: 通达信 880005 以上涨家数为收盘价、下跌家数为开盘价编码。构建公式时即获取 SH880005 数据，需引擎已完成初始化，否则结果为空并输出告警。
+
 
 .. py:function:: INDEXDEC([query])
 
     通达信 880005 大盘下跌家数, 可能无法盘中更新!
+
+    注意: 通达信 880005 以下跌家数为开盘价、上涨家数为收盘价编码。构建公式时即获取 SH880005 数据，需引擎已完成初始化，否则结果为空并输出告警。
 
 
 .. py:function:: INSUM(block, query, ind, mode)
@@ -1863,6 +1873,8 @@
     3. **层次3（修正标准分）**：Z × R²，R² 为回归拟合优度，过滤拟合差的噪音
     4. **层次4（右偏修正）**：Z × R² × β，放大多头强势区间
 
+    NaN 口径：Low/High 非有限（NaN 或 ±Inf）的K线被剔除出回归；窗口内有限对不足两根时输出为 Null；结果永不为 ±Inf。
+
     :param KData kdata: K线数据
     :param int n: 回归窗口，默认为20
     :param int m: Z-score窗口，默认为60
@@ -1911,6 +1923,8 @@
 
     β 为最原始的 RSRS 斜率，代表支撑阻力强弱。
     缺陷：不同行情区间 β 中枢波动大，不能跨时段直接对比。
+
+    NaN 口径：Low/High 非有限（NaN 或 ±Inf）的K线被剔除出回归；窗口内有限对不足两根时输出为 Null；结果永不为 ±Inf。
 
     :param KData kdata: K线数据
     :param int n: 滚动窗口，默认为20
@@ -2365,7 +2379,9 @@
 
 .. py:function:: ZONGGUBEN([data])
 
-   获取总股本（单位：万股）
+   获取总股本（单位：万股），在各权息记录之间延续
+
+   需要 KData 上下文；首条有效权息记录之前的 bar 为 null。
 
    :param KData kdata: k线数据
    :rtype: Indicator

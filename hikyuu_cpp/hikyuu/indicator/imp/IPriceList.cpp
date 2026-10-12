@@ -89,7 +89,6 @@ void IPriceList::_calculate(const Indicator& data) {
         dst = dst - x_start;
         if (x_discard > x_start) {
             x_start = x_discard;
-            dst = dst + x_discard - x_start;
         }
     }
 

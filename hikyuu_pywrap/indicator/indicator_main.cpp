@@ -68,6 +68,8 @@ void export_indicator_main(py::module& m) {
     
     Perform a multiple linear regression analysis on the stock, using the return of the stock close price as the dependent variable
     
+    Note: a time point whose return or any factor is non-finite (NaN or ±Inf) is dropped; an empty list is returned when the sample is insufficient or the design matrix is rank-deficient (exact factor collinearity).
+    
     :param Stock stk: the stock object
     :param KQuery query: the K-line query condition
     :param Indicator *inds: one or more indicators as the independent variables
@@ -95,6 +97,8 @@ void export_indicator_main(py::module& m) {
       R"(multi_regression_full(stk, query, *inds) -> list)
     
     Perform a multiple linear regression analysis on the stock (the full version), returning the complete regression result
+    
+    Note: a time point whose return or any factor is non-finite (NaN or ±Inf) is dropped; an empty list is returned when the sample is insufficient or the design matrix is rank-deficient (exact factor collinearity).
     
     :param Stock stk: the stock object
     :param KQuery query: the K-line query condition

@@ -10,24 +10,29 @@
 
 namespace hku {
 
+static KData get_advance_decline_kdata(const KQuery& query) {
+    KData k = getKData("SH880005", query);
+    HKU_WARN_IF(k.empty(),
+                "TDX advance/decline index SH880005 has no data! Check whether the data package "
+                "contains it and whether the engine is initialized before building the formula.");
+    return k;
+}
+
+// TDX SH880005 encodes the rising stock count as close and the falling stock count as open
 Indicator HKU_API INDEXADV() {
-    KData k = getKData("SH880005", KQueryByIndex(-1));
-    return CONTEXT(k.close());
+    return CONTEXT(get_advance_decline_kdata(KQueryByIndex(-1)).close());
 }
 
 Indicator HKU_API INDEXADV(const KQuery& query) {
-    KData k = getKData("SH880005", query);
-    return CONTEXT(k.close());
+    return CONTEXT(get_advance_decline_kdata(query).close());
 }
 
 Indicator HKU_API INDEXDEC() {
-    KData k = getKData("SH880005", KQueryByIndex(-1));
-    return CONTEXT(k.open());
+    return CONTEXT(get_advance_decline_kdata(KQueryByIndex(-1)).open());
 }
 
 Indicator HKU_API INDEXDEC(const KQuery& query) {
-    KData k = getKData("SH880005", query);
-    return CONTEXT(k.open());
+    return CONTEXT(get_advance_decline_kdata(query).open());
 }
 
 }  // namespace hku

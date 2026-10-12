@@ -6,7 +6,10 @@
  */
 
 #include "../test_config.h"
+#include <cmath>
 #include <fstream>
+#include <limits>
+#include <hikyuu/KDataPrivatedBufferImp.h>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/AD.h>
 
@@ -32,6 +35,32 @@ TEST_CASE("test_AD") {
     CHECK_EQ(ad[1], doctest::Approx(458.65).epsilon(0.1));
     CHECK_EQ(ad[2], doctest::Approx(63.99).epsilon(0.1));
     CHECK_EQ(ad[5], doctest::Approx(30.77).epsilon(0.1));
+}
+
+/** @par Test points: a NaN high/low bar is skipped and does not poison the AD accumulator */
+TEST_CASE("test_AD_nan_middle") {
+    Stock stock = StockManager::instance().getStock("sh000001");
+    REQUIRE_FALSE(stock.isNull());
+
+    // Bars 0/1/2 valid; bar 3 has NaN high; bars 4/5 valid again. The old impl read
+    // `if (tmp != 0.0)` and let a NaN tmp through (NaN != 0 is true) -> ad became NaN forever.
+    const price_t nan = std::numeric_limits<price_t>::quiet_NaN();
+    Datetime date(2010, 1, 1);
+    KRecordList records;
+    for (size_t i = 0; i < 6; ++i) {
+        price_t high = (i == 3) ? nan : 12.0;
+        records.push_back(KRecord(date + Days(i), 10.0, high, 9.0, 11.0, 1000.0, 100.0));
+    }
+    KData kdata =
+      KData(make_shared<KDataPrivatedBufferImp>(stock, KQuery(0, records.size()), records));
+
+    Indicator ad = AD(kdata);
+    REQUIRE_EQ(ad.size(), 6);
+
+    /** @arg every output bar stays finite; the NaN bar is skipped, accumulator does not poison */
+    for (size_t i = 0; i < ad.size(); ++i) {
+        CHECK_UNARY(std::isfinite(ad[i]));
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -18,9 +18,11 @@ namespace hku {
  * indicators are used as the independent variables for the multiple linear regression.
  * The regression model is: Y = alpha + beta1*X1 + beta2*X2 + ... + betan*Xn
  *
- * @note NaN handling strategy: if any factor or the return at a time point is NaN, the data at that
- *       time point is discarded, but it does not affect the data at the other time points or the
- *       other factors.
+ * @note Non-finite handling strategy: if any factor or the return at a time point is non-finite
+ *       (NaN or ±Inf), the data at that time point is discarded, but it does not affect the data at
+ *       the other time points or the other factors. A rank-deficient design matrix (exact factor
+ *       collinearity, which leaves no unique least-squares solution) makes the whole regression
+ * fail and returns an empty vector.
  *
  * @param stk the stock object
  * @param query K-line query condition, used to get the time range and data type needed by the

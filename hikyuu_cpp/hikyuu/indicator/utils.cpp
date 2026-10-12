@@ -16,21 +16,18 @@
 
 namespace hku {
 
-/**
- * The multiple linear regression implementation
- *
- * @param stk the stock object
- * @param query the K-line query condition
- * @param inds the indicator list (the independent variables)
- * @return the regression coefficient vector [alpha, beta1, beta2, ...]
- */
-std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
-                                     const IndicatorList& inds) {
+namespace {
+
+// Assemble the design matrix (a leading ones column plus one column per factor) and the target
+// return vector, dropping every time point where the return or any factor is non-finite. Returns
+// false when the sample is empty, has no factor, or has no more valid rows than coefficients.
+bool build_regression_dataset(const Stock& stk, const KQuery& query, const IndicatorList& inds,
+                              Eigen::MatrixXd& X, Eigen::VectorXd& Y) {
     KData kdata = stk.getKData(query);
-    HKU_IF_RETURN(kdata.empty(), {});
+    HKU_IF_RETURN(kdata.empty(), false);
 
     size_t factor_count = inds.size();
-    HKU_IF_RETURN(factor_count == 0, {});
+    HKU_IF_RETURN(factor_count == 0, false);
 
     IndicatorList all_inds(factor_count);
     global_parallel_for_index_void(0, factor_count, [&](size_t i) {
@@ -39,16 +36,16 @@ std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
 
     Indicator returns = ROCP(kdata.close(), 1);
     size_t n = returns.size();
-    HKU_IF_RETURN(n <= factor_count, {});
+    HKU_IF_RETURN(n <= factor_count, false);
 
     std::vector<size_t> valid_indices;
     valid_indices.reserve(n);
     for (size_t i = 0; i < n; ++i) {
-        if (std::isnan(returns[i]))
+        if (!std::isfinite(returns[i]))
             continue;
         bool valid = true;
         for (const auto& ind : all_inds) {
-            if (std::isnan(ind[i])) {
+            if (!std::isfinite(ind[i])) {
                 valid = false;
                 break;
             }
@@ -59,11 +56,10 @@ std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
     }
 
     size_t valid_count = valid_indices.size();
-    HKU_IF_RETURN(valid_count <= factor_count, {});
+    HKU_IF_RETURN(valid_count <= factor_count, false);
 
-    Eigen::MatrixXd X(valid_count, factor_count + 1);
-    Eigen::VectorXd Y(valid_count);
-
+    X.resize(valid_count, factor_count + 1);
+    Y.resize(valid_count);
     X.col(0).setOnes();
     for (size_t j = 0; j < factor_count; ++j) {
         for (size_t k = 0; k < valid_count; ++k) {
@@ -73,15 +69,42 @@ std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
     for (size_t k = 0; k < valid_count; ++k) {
         Y(k) = returns[valid_indices[k]];
     }
+    return true;
+}
 
-    Eigen::VectorXd beta = X.colPivHouseholderQr().solve(Y);
-    HKU_IF_RETURN(beta.hasNaN(), {});
+// Solve the least-squares coefficients with one shared column-pivoted Householder QR. Returns false
+// on a rank-deficient design matrix (exact collinearity leaves no unique solution, and the QR basic
+// solution would be an arbitrary one that hasNaN() cannot catch) or a non-finite result.
+bool solve_regression(const Eigen::MatrixXd& X, const Eigen::VectorXd& Y, Eigen::VectorXd& beta) {
+    Eigen::ColPivHouseholderQR<Eigen::MatrixXd> qr(X);
+    HKU_IF_RETURN(qr.rank() < X.cols(), false);
+    beta = qr.solve(Y);
+    return !beta.hasNaN();
+}
+
+}  // namespace
+
+/**
+ * The multiple linear regression implementation
+ *
+ * @param stk the stock object
+ * @param query the K-line query condition
+ * @param inds the indicator list (the independent variables)
+ * @return the regression coefficient vector [alpha, beta1, beta2, ...]
+ */
+std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
+                                     const IndicatorList& inds) {
+    Eigen::MatrixXd X;
+    Eigen::VectorXd Y;
+    HKU_IF_RETURN(!build_regression_dataset(stk, query, inds, X, Y), {});
+
+    Eigen::VectorXd beta;
+    HKU_IF_RETURN(!solve_regression(X, Y, beta), {});
 
     std::vector<double> result(beta.size());
     for (size_t i = 0; i < beta.size(); ++i) {
         result[i] = beta(i);
     }
-
     return result;
 }
 
@@ -95,77 +118,29 @@ std::vector<double> multi_regression(const Stock& stk, const KQuery& query,
  */
 std::vector<double> multi_regression_full(const Stock& stk, const KQuery& query,
                                           const IndicatorList& inds) {
-    KData kdata = stk.getKData(query);
-    HKU_IF_RETURN(kdata.empty(), {});
+    Eigen::MatrixXd X;
+    Eigen::VectorXd Y;
+    HKU_IF_RETURN(!build_regression_dataset(stk, query, inds, X, Y), {});
 
-    size_t factor_count = inds.size();
-    HKU_IF_RETURN(factor_count == 0, {});
+    Eigen::VectorXd beta;
+    HKU_IF_RETURN(!solve_regression(X, Y, beta), {});
 
-    IndicatorList all_inds;
-    all_inds.reserve(factor_count);
-    for (auto& ind : inds) {
-        all_inds.emplace_back(ALIGN(ind, kdata, false)(kdata).getResult(0));
-    }
-
-    Indicator returns = ROCP(kdata.close(), 1);
-    size_t n = returns.size();
-    HKU_IF_RETURN(n <= factor_count, {});
-
-    std::vector<size_t> valid_indices;
-    valid_indices.reserve(n);
-    for (size_t i = 0; i < n; ++i) {
-        if (std::isnan(returns[i]))
-            continue;
-        bool valid = true;
-        for (const auto& ind : all_inds) {
-            if (std::isnan(ind[i])) {
-                valid = false;
-                break;
-            }
-        }
-        if (valid) {
-            valid_indices.push_back(i);
-        }
-    }
-
-    size_t valid_count = valid_indices.size();
-    HKU_IF_RETURN(valid_count <= factor_count, {});
-
-    Eigen::MatrixXd X(valid_count, factor_count + 1);
-    Eigen::VectorXd Y(valid_count);
-
-    X.col(0).setOnes();
-    for (size_t j = 0; j < factor_count; ++j) {
-        for (size_t k = 0; k < valid_count; ++k) {
-            X(k, j + 1) = all_inds[j][valid_indices[k]];
-        }
-    }
-    for (size_t k = 0; k < valid_count; ++k) {
-        Y(k) = returns[valid_indices[k]];
-    }
-
-    Eigen::VectorXd beta = X.colPivHouseholderQr().solve(Y);
-    HKU_IF_RETURN(beta.hasNaN(), {});
-
-    Eigen::VectorXd Y_hat = X * beta;
-    Eigen::VectorXd residuals = Y - Y_hat;
-
+    Eigen::VectorXd residuals = Y - X * beta;
     double RSS = residuals.squaredNorm();
     double Y_mean = Y.mean();
     double TSS = (Y.array() - Y_mean).square().sum();
     double R_squared = TSS > 1e-10 ? (1.0 - RSS / TSS) : 0.0;
 
+    size_t valid_count = static_cast<size_t>(Y.size());
     size_t result_size = beta.size() + valid_count + 2;
     std::vector<double> result(result_size);
 
     for (size_t i = 0; i < beta.size(); ++i) {
         result[i] = beta(i);
     }
-
     for (size_t i = 0; i < valid_count; ++i) {
         result[beta.size() + i] = residuals(i);
     }
-
     result[beta.size() + valid_count] = RSS;
     result[beta.size() + valid_count + 1] = R_squared;
 

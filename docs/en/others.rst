@@ -194,7 +194,7 @@ Miscellaneous Functions
 
     .. note::
 
-        NaN handling strategy: if any factor or the return at a time point is NaN, the data at that time point is discarded, but it does not affect the data at the other time points and the other factors.
+        Non-finite handling strategy: if any factor or the return at a time point is non-finite (NaN or ±Inf), the data at that time point is discarded, but it does not affect the data at the other time points and the other factors. An empty list is returned when the sample is insufficient or the design matrix is rank-deficient (exact factor collinearity, which leaves no unique least-squares solution).
 
     :param Stock stk: the stock object
     :param KQuery query: the K-line query condition, used to get the time range and the data type needed for the regression analysis
@@ -215,6 +215,10 @@ Miscellaneous Functions
 .. py:function:: multi_regression_full(stk, query, \*inds) -> list
 
     Perform a multiple linear regression analysis on the stock (the full version), returning the complete regression result, including the coefficients, the residual sequence, the residual sum of squares and the R² value
+
+    .. note::
+
+        Non-finite handling strategy: if any factor or the return at a time point is non-finite (NaN or ±Inf), the data at that time point is discarded, but it does not affect the data at the other time points and the other factors. An empty list is returned when the sample is insufficient or the design matrix is rank-deficient (exact factor collinearity, which leaves no unique least-squares solution).
 
     :param Stock stk: the stock object
     :param KQuery query: the K-line query condition

@@ -25,7 +25,10 @@ Built-in Technical Indicators
 
 .. py:function:: AD(kdata)
 
-   The accumulation/distribution line
+   The accumulation/distribution line, accumulated from the turnover amount, so the result is in the
+   same unit as the amount: 10 thousand yuan
+
+   Bars with a non-finite (High - Low) are skipped, so the accumulator never gets poisoned by a single bad bar.
 
    :param KData kdata: the K-line data
    :rtype: Indicator
@@ -748,6 +751,8 @@ Built-in Technical Indicators
 
     For example: COST(k, 10) means what the price of the 10% profitable positions is, i.e. 10% of the positions are below this price, and the other 90% are above this price, being the trapped positions. This function is only valid for the daily analysis period.
 
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the DMA-style accumulation decay is period-dependent, so the daily period is recommended.
+
     :param KData k: the associated K-line data
     :param float x: the x% profitable price, 0~100
     :rtype: Indicator
@@ -1134,6 +1139,8 @@ Built-in Technical Indicators
 
     Get the turnover rate (the percentage x%), equal to VOL(k) / CAPITAL(k)
 
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the result is a consistent turnover ratio across all periods.
+
     :param KData kdata: the K-line data
     :rtype: Indicator
 
@@ -1258,10 +1265,14 @@ Built-in Technical Indicators
 
     The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
 
+    Note: TDX 880005 encodes the rising count as the close price and the falling count as the open price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).
+
 
 .. py:function:: INDEXDEC([query])
 
     The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
+
+    Note: TDX 880005 encodes the falling count as the open price and the rising count as the close price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).
 
 
 .. py:function:: INSUM(block, query, ind, mode)
@@ -1876,6 +1887,8 @@ Built-in Technical Indicators
     3. **Level 3 (the corrected standard score)**: Z × R², where R² is the regression goodness of fit, filtering the noise with the poor fitting
     4. **Level 4 (the right-skewed correction)**: Z × R² × β, amplifying the strong bull zone
 
+    NaN/Inf handling: bars with a non-finite Low/High (NaN or ±Inf) are excluded from the regression; a window with fewer than two finite pairs yields Null; the result never returns ±Inf.
+
     :param KData kdata: the K-line data
     :param int n: the regression window, defaulting to 20
     :param int m: the Z-score window, defaulting to 60
@@ -1924,6 +1937,8 @@ Built-in Technical Indicators
 
     β is the most original RSRS slope, representing the strength of the support and the resistance.
     The defect: the β center fluctuates greatly in the different market ranges, and it cannot be compared directly across the time periods.
+
+    NaN/Inf handling: bars with a non-finite Low/High (NaN or ±Inf) are excluded from the regression; a window with fewer than two finite pairs yields Null; the result never returns ±Inf.
 
     :param KData kdata: the K-line data
     :param int n: the rolling window, defaulting to 20
@@ -2385,7 +2400,9 @@ Built-in Technical Indicators
 
 .. py:function:: ZONGGUBEN([data])
 
-   Get the total share capital (unit: 10,000 shares)
+   Get the total share capital (unit: 10,000 shares), carried over between the ex-rights records
+
+   Needs a KData context; bars before the first valid ex-rights record are null.
 
    :param KData kdata: the K-line data
    :rtype: Indicator

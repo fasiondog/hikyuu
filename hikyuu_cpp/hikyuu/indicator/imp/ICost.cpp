@@ -6,6 +6,7 @@
  */
 
 #include "ICost.h"
+#include "StockWeightFill.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::ICost)
@@ -37,87 +38,28 @@ void ICost::_calculate(const Indicator& data) {
     size_t total = k.size();
     HKU_IF_RETURN(total == 0, void());
 
+    // transCount is in lots on the daily line and above but in shares below it; freeCount is in
+    // units of 10 thousand shares. The factor normalizes both to the turnover ratio (x 100 = %).
+    bool day_or_above =
+      KQuery::getKTypeInSeconds(k.getQuery().kType()) >= KQuery::getKTypeInSeconds(KQuery::DAY);
+    value_t hsl_factor = day_or_above ? 0.01 : 0.0001;
+
     _readyBuffer(total, 1);
 
-    // Set the discard to everything first, it is updated later
-    m_discard = total;
-
-    Stock stock = k.getStock();
-    auto* kdata = k.data();
-    Datetime lastdate = kdata[total - 1].datetime.startOfDay();
-
-    StockWeightList sw_list = stock.getWeight(Datetime::min(), lastdate + Days(1));
-    HKU_IF_RETURN(sw_list.empty(), void());
-
-    // Find the first ex-rights/ex-dividend record whose outstanding shares are not 0
-    price_t pre_free_count = 0.0;
-    Datetime pre_sw_date;
-    auto sw_iter = sw_list.begin();
-    for (; sw_iter != sw_list.end(); ++sw_iter) {
-        if (sw_iter->freeCount() > 0) {
-            pre_free_count = sw_iter->freeCount();
-            pre_sw_date = sw_iter->datetime();
-            break;
-        }
-    }
-
-    // Return directly when there is no ex-rights/ex-dividend data with outstanding shares, or when
-    // the date of that record is later than the last K-line date
-    HKU_IF_RETURN(sw_iter == sw_list.end() || pre_sw_date > lastdate, void());
-
-    auto* dst = this->data();
-
     value_t percent = getParam<double>("percent") * 0.01;
-    size_t pos = 0;
-    value_t x, a;
+    auto* dst = this->data();
+    // DMA state decoupled from the buffer: seed with x until the first recursive value exists
     bool has_pre_cost = false;
     value_t pre_cost = 0.0;
-    for (; sw_iter != sw_list.end(); ++sw_iter) {
-        price_t free_count = sw_iter->freeCount();
-        Datetime cur_sw_date = sw_iter->datetime();
-        if (free_count <= 0.0) {
-            continue;  // Ignore the ex-rights/ex-dividend record whose outstanding shares are 0
-        }
-
-        while (pos < total && kdata[pos].datetime < cur_sw_date) {
-            const KRecord& krecord = kdata[pos];
-            if (krecord.datetime >= pre_sw_date) {
-                x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-                // transCount is in lots and the outstanding shares are in units of 10 thousand
-                // shares
-                a = krecord.transCount / pre_free_count * 0.01;
-                dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
-                has_pre_cost = true;
-                pre_cost = dst[pos];
-            }
-            pos++;
-        }
-
-        pre_free_count = free_count;
-        pre_sw_date = cur_sw_date;
-        if (pos >= total) {
-            break;
-        }
-    }
-
-    // DMA seed: no prior cost exists, use x directly (same as has_pre_cost==false elsewhere)
-    if (pos == 0) {
-        const KRecord& krecord = kdata[pos];
-        x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-        dst[pos] = x;
-        has_pre_cost = true;
-        pre_cost = dst[pos];
-        pos++;
-    }
-
-    for (; pos < total; pos++) {
-        const KRecord& krecord = kdata[pos];
-        x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
-        a = krecord.transCount / pre_free_count * 0.01;
-        dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
-        has_pre_cost = true;
-        pre_cost = dst[pos];
-    }
+    fill_by_weight_series(
+      k, 0, [](const StockWeight& w) { return w.freeCount(); },
+      [&](size_t pos, const KRecord& krecord, price_t pre_free_count) {
+          value_t x = krecord.closePrice + (krecord.highPrice - krecord.lowPrice) * percent;
+          value_t a = krecord.transCount / pre_free_count * hsl_factor;
+          dst[pos] = has_pre_cost ? a * x + (1 - a) * pre_cost : x;
+          has_pre_cost = true;
+          pre_cost = dst[pos];
+      });
 
     updateDiscard(true);
 }

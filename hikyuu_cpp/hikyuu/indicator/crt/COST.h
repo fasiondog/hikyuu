@@ -32,8 +32,5 @@ namespace hku {
 Indicator HKU_API COST(const KData& k, double x = 10.0);
 Indicator HKU_API COST(double x = 10.0);
 
-Indicator HKU_API COST2(const KData& k, double x = 10.0);
-Indicator HKU_API COST2(double x = 10.0);
-
 }  // namespace hku
 #endif /* INDICATOR_CRT_COST_H_ */

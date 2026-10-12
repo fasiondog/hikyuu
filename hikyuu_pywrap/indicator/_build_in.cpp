@@ -1097,7 +1097,9 @@ void export_Indicator_build_in(py::module& m) {
     m.def("ZONGGUBEN", py::overload_cast<>(ZONGGUBEN));
     m.def("ZONGGUBEN", py::overload_cast<const KData&>(ZONGGUBEN), R"(ZONGGUBEN(kdata)
 
-   Get the total share capital (unit: 10,000 shares)
+   Get the total share capital (unit: 10,000 shares), carried over between the ex-rights records
+
+   Needs a KData context; bars before the first valid ex-rights record are null.
 
    :param KData kdata: the K-line data
    :rtype: Indicator)");
@@ -1106,6 +1108,8 @@ void export_Indicator_build_in(py::module& m) {
     m.def("HSL", HSL_2, R"(HSL(kdata)
 
     Get the turnover rate; multiplying by 100 gives the percentage, equal to VOL(k) / CAPITAL(k) * 0.01
+
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the result is a consistent turnover ratio across all periods.
 
     :param KData kdata: the K-line data
     :rtype: Indicator)");
@@ -1211,6 +1215,8 @@ void export_Indicator_build_in(py::module& m) {
     β is the most original RSRS slope, representing the strength of the support and the resistance.
     The defect: the β center fluctuates greatly in the different market ranges, and it cannot be compared directly across the time periods.
 
+    Non-finite Low/High (NaN or ±Inf) bars are excluded from the regression; a window with fewer than two finite pairs yields Null; the result never returns ±Inf.
+
     :param KData kdata: the K-line data
     :param int n: the rolling window, defaulting to 20
     :rtype: Indicator)");
@@ -1229,6 +1235,8 @@ void export_Indicator_build_in(py::module& m) {
     2. **Level 2 (Z)**: the rolling M-day Z-score standardization, solving the problem of the β center drifting in the different stages
     3. **Level 3 (the corrected standard score)**: Z × R², where R² is the regression goodness of fit, filtering the noise with the poor fitting
     4. **Level 4 (the right-skewed correction)**: Z × R² × β, amplifying the strong bull zone
+
+    Non-finite Low/High (NaN or ±Inf) bars are excluded from the regression; a window with fewer than two finite pairs yields Null; the result never returns ±Inf.
 
     **The returned results**:
 
@@ -2029,7 +2037,10 @@ void export_Indicator_build_in(py::module& m) {
     m.def("AD", AD_1);
     m.def("AD", AD_2, R"(AD(kdata)
 
-   The accumulation/distribution line
+   The accumulation/distribution line, accumulated from the turnover amount, so the result is in the
+   same unit as the amount: 10 thousand yuan
+
+   Bars with a non-finite (High - Low) are skipped, so the accumulator never gets poisoned by a single bad bar.
 
    :param KData kdata: the K-line data
    :rtype: Indicator)");
@@ -2179,6 +2190,7 @@ void export_Indicator_build_in(py::module& m) {
     m.def("COST", COST_2, py::arg("k"), py::arg("x") = 10.0, R"(COST(k[, x=10.0])
 
     The cost distribution. This function is only valid for the daily analysis period, and invalid for the indexes, the ETFs, etc. that have no circulating share capital dividend data.
+    The transCount unit is normalized by the query ktype: lots (x 100) on the daily line and above, shares below it; the DMA-style accumulation decay is period-dependent, so the daily period is recommended.
     Usage: COST(k, X) means what the price of the X% profitable positions is
     For example: COST(k, 10) means what the price of the 10% profitable positions is, i.e. 10% of the positions are below this price, and the other 90% are above this price, being the trapped positions
 
@@ -2705,12 +2717,16 @@ void export_Indicator_build_in(py::module& m) {
     m.def("INDEXADV", py::overload_cast<>(INDEXADV));
     m.def("INDEXADV", py::overload_cast<const KQuery&>(INDEXADV), R"(INDEXADV([query])
     
-    The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!)");
+    The TDX 880005 market-wide number of the rising stocks, which may not be updated intraday!
+
+    Note: TDX 880005 encodes the rising count as the close price and the falling count as the open price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).)");
 
     m.def("INDEXDEC", py::overload_cast<>(INDEXDEC));
     m.def("INDEXDEC", py::overload_cast<const KQuery&>(INDEXDEC), R"(INDEXDEC([query])
     
-    The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!)");
+    The TDX 880005 market-wide number of the falling stocks, which may not be updated intraday!
+
+    Note: TDX 880005 encodes the falling count as the open price and the rising count as the close price. The data of SH880005 is fetched when building the formula, so the engine must be initialized first, otherwise the result stays empty (a warning is logged).)");
 
     m.def("WINNER", py::overload_cast<>(WINNER));
     m.def("WINNER", py::overload_cast<const Indicator&>(WINNER));
