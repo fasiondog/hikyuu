@@ -236,12 +236,9 @@ void IInSum::_calculate(const Indicator& ind) {
     HKU_IF_RETURN(total == 0, void());
 
     int mode = getParam<int>("mode");
-    // Modes 4/5 depend on the context
-    if (mode == 4 || mode == 5) {
-        if (ind.size() == 0) {
-            m_discard = total;
-            return;
-        }
+    if (ind.size() == 0) {
+        m_discard = total;
+        return;
     }
 
     auto inds = getAllIndicators(block, q, dates, ind, getParam<bool>("fill_null"));

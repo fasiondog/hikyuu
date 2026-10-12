@@ -58,6 +58,24 @@ TEST_CASE("test_INSUM_inf_input") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_INSUM_no_input") {
+    StockManager& sm = StockManager::instance();
+    Block blk;
+    blk.add(sm["sh600004"]);
+    blk.add(sm["sh600005"]);
+    KData ref_k = sm["sh000001"].getKData(KQuery(-10));
+    if (ref_k.empty()) {
+        return;
+    }
+
+    /** @arg no input indicator (leaf mode): result fully discarded */
+    Indicator ret = INSUM(blk, 0, true)(ref_k);
+    CHECK_EQ(ret.name(), "INSUM");
+    CHECK_EQ(ret.size(), ref_k.size());
+    CHECK_EQ(ret.discard(), ret.size());
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
