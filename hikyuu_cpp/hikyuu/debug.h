@@ -20,7 +20,7 @@
 // MSVC memory leak detection
 #ifdef MSVC_LEAKER_DETECT
     #define _CRTDBG_MAP_ALLOC
-    #include "crtdbg.h"
+    #include <crtdbg.h>
 
     #ifndef DEBUG_CLIENTBLOCK
     #define DEBUG_CLIENTBLOCK new (_CLIENT_BLOCK, __FILE__, __LINE__)

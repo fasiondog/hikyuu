@@ -127,7 +127,7 @@ using std::uint32_t;
 using std::uint64_t;
 using std::uint8_t;
 
-#endif /* #if defined(_MSC_VER) || __cplusplus < 201103L */
+#endif /* #if CPP_STANDARD < CPP_STANDARD_11 */
 
 #ifndef MAX_DOUBLE
 #define MAX_DOUBLE std::numeric_limits<double>::max()
@@ -156,7 +156,8 @@ using std::isinf;
 using std::isnan;
 
 inline bool iszero(price_t num) {
-    return std::abs(num) < std::numeric_limits<price_t>::epsilon();
+    return num == 0.0 ||
+           std::abs(num) < (std::numeric_limits<price_t>::epsilon() * std::abs(num));
 }
 
 using fmt::format;
