@@ -64,11 +64,11 @@ static void insum_cum(const IndicatorList& inds, Indicator::value_t* dst, size_t
         }
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
-            if (!std::isnan(data[i])) {
-                if (std::isnan(dst[i])) {
-                    dst[i] = data[i];
-                } else {
+            if (std::isfinite(data[i])) {
+                if (std::isfinite(dst[i])) {
                     dst[i] += data[i];
+                } else {
+                    dst[i] = data[i];
                 }
             }
         }
@@ -88,11 +88,11 @@ static void insum_mean(const IndicatorList& inds, Indicator::value_t* dst, size_
         }
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
-            if (!std::isnan(data[i])) {
-                if (std::isnan(dst[i])) {
-                    dst[i] = data[i];
-                } else {
+            if (std::isfinite(data[i])) {
+                if (std::isfinite(dst[i])) {
                     dst[i] += data[i];
+                } else {
+                    dst[i] = data[i];
                 }
                 count[i]++;
             }
@@ -100,7 +100,7 @@ static void insum_mean(const IndicatorList& inds, Indicator::value_t* dst, size_
     }
 
     for (size_t i = 0; i < len; i++) {
-        if (!std::isnan(dst[i])) {
+        if (std::isfinite(dst[i])) {
             dst[i] = dst[i] / count[i];
         }
     }
@@ -118,10 +118,8 @@ static void insum_max(const IndicatorList& inds, Indicator::value_t* dst, size_t
         }
         const auto* data = value.data();
         for (size_t i = 0; i < len; i++) {
-            if (!std::isnan(data[i])) {
-                if (std::isnan(dst[i])) {
-                    dst[i] = data[i];
-                } else if (data[i] > dst[i]) {
+            if (std::isfinite(data[i])) {
+                if (!std::isfinite(dst[i]) || data[i] > dst[i]) {
                     dst[i] = data[i];
                 }
             }
@@ -143,10 +141,8 @@ static void insum_min(const IndicatorList& inds, Indicator::value_t* dst, size_t
         // Traverse all the data; dst is set to data[i] when it is empty, and to data[i] when
         // data[i] is smaller than the original value
         for (size_t i = 0; i < len; i++) {
-            if (!std::isnan(data[i])) {
-                if (std::isnan(dst[i])) {
-                    dst[i] = data[i];
-                } else if (data[i] < dst[i]) {
+            if (std::isfinite(data[i])) {
+                if (!std::isfinite(dst[i]) || data[i] < dst[i]) {
                     dst[i] = data[i];
                 }
             }
@@ -159,7 +155,7 @@ static void insum_rank_desc(const IndicatorList& inds, Indicator::value_t* dst,
                             const Indicator& ind, size_t len) {
     size_t discard = ind.discard();
     for (size_t i = discard; i < len; i++) {
-        if (std::isnan(dst[i])) {
+        if (!std::isfinite(dst[i])) {
             dst[i] = 1;  // It is equivalent to the initialization
         }
     }
@@ -176,7 +172,7 @@ static void insum_rank_desc(const IndicatorList& inds, Indicator::value_t* dst,
         const auto* data_ind = ind.data();  // The data of this stock
 
         for (size_t i = discard; i < len; i++) {
-            if (!std::isnan(data[i])) {
+            if (std::isfinite(data[i])) {
                 if (data[i] > data_ind[i]) {
                     dst[i]++;
                 }
@@ -191,7 +187,7 @@ static void insum_rank_asc(const IndicatorList& inds, Indicator::value_t* dst, c
                            size_t len) {
     size_t discard = ind.discard();
     for (size_t i = discard; i < len; i++) {
-        if (std::isnan(dst[i])) {
+        if (!std::isfinite(dst[i])) {
             dst[i] = 1;  // It is equivalent to the initialization
         }
     }
@@ -208,7 +204,7 @@ static void insum_rank_asc(const IndicatorList& inds, Indicator::value_t* dst, c
         const auto* data_ind = ind.data();  // The data of this stock
 
         for (size_t i = discard; i < len; i++) {
-            if (!std::isnan(data[i])) {
+            if (std::isfinite(data[i])) {
                 if (data[i] <
                     data_ind[i]) {  // Rank + 1 when it is smaller than dst_tmp, unchanged otherwise
                     dst[i]++;
@@ -281,12 +277,7 @@ void IInSum::_calculate(const Indicator& ind) {
         HKU_ERROR("Not support mode: {}", mode);
     }
 
-    for (size_t i = m_discard; i < total; i++) {
-        if (!std::isnan(dst[i])) {
-            break;
-        }
-        m_discard++;
-    }
+    updateDiscard();
 }
 
 Indicator HKU_API INSUM(const Block& block, int mode, bool fill_null) {
