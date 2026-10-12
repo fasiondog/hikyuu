@@ -289,7 +289,7 @@ void StockManager::_negotiateShmServer() {
 
     // Switch to the client mode: install the proxy driver provided by the plugin and turn off the
     // local preload (an in-memory override only, the config file is not modified)
-    m_ipc_client_mode = true;
+    m_ipc_client_mode.store(true, std::memory_order_release);
     m_baseInfoDriver = plugin->createBaseInfoDriver(m_baseInfoDriver);
     m_blockDriver = plugin->createBlockDriver(m_blockDriver);
     // The whole local driver connection pool is passed in (instead of its prototype): the types not
@@ -310,7 +310,7 @@ void StockManager::_negotiateShmServer() {
 }
 
 bool StockManager::isIpcClientMode() const {
-    return m_ipc_client_mode;
+    return m_ipc_client_mode.load(std::memory_order_acquire);
 }
 
 // ── LoadEvent event bus (the core library only dispatches and the plugin subscribes) ─────────────

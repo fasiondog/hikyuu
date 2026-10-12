@@ -76,7 +76,7 @@ public:
     /// call it. The caller has to reset it when the test case ends, so that other cases in the same
     /// process are not polluted.
     void _testingSetIpcClientMode(bool mode) {
-        m_ipc_client_mode = mode;
+        m_ipc_client_mode.store(mode, std::memory_order_release);
     }
 
     /** Get the base info driver parameter */
@@ -479,7 +479,7 @@ private:
     // connection and the assembly of the proxy driver). The forwarding callback is registered by
     // the plugin itself after a successful connect and unregistered on disconnect; the core library
     // does not hold any plugin type pointer
-    bool m_ipc_client_mode{false};
+    std::atomic_bool m_ipc_client_mode{false};
     KDataDriverConnectPoolPtr m_ipc_kdata_pool;  // IPC K-line driver pool in client mode
 };
 
