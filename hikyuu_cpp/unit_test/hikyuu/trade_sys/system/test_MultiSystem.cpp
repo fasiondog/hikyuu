@@ -1900,4 +1900,33 @@ TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
     CHECK_LT(pf_funds.cash, pf_funds.total_assets() * 0.1);
 }
 
+/** @par Check point (regression): the forced sell of the aggregate system takes MAX_DOUBLE as the
+ * "sell everything" sentinel (the mode B _clearSubSystem passes it). It has to be resolved before
+ * the board-lot rounding: the double -> int64 conversion of an out-of-range value is undefined
+ * behavior, and it used to leave the position unsold on MSVC while closing it on clang/arm64, so
+ * the sub shadow book never released its position and the results diverged across the platforms. */
+TEST_CASE("test_MultiSystem_force_sell_all_sentinel") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 2);
+
+    auto tm = crtTM(Datetime(199911100000LL), 100000.0);
+    auto sys = create_alway_buy_sys();
+    sys->setTM(tm);
+    sys->setTO(kdata);
+    sys->run(kdata);
+
+    Datetime last_date = kdata[kdata.size() - 1].datetime;
+    double hold = tm->getHoldNumber(last_date, stk);
+    REQUIRE_GT(hold, 0.0);
+
+    /** @arg MAX_DOUBLE closes the whole position whatever the board lot is */
+    TradeRecord tr = sys->sellForceOnClose(last_date, MAX_DOUBLE, PART_PORTFOLIO);
+    CHECK(!tr.isNull());
+    CHECK_EQ(tr.number, hold);
+    CHECK_EQ(tm->getHoldNumber(last_date, stk), 0.0);
+}
+
 /** @} */
