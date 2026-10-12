@@ -28,6 +28,7 @@ public:
 
 private:
     DatetimeList _getDatetimeList(const Indicator& data) const;
+    void _doCalculate(const DatetimeList& ds, size_t start_pos);
 };
 
 }  // namespace hku

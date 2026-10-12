@@ -41,15 +41,20 @@ DatetimeList ITime::_getDatetimeList(const Indicator& data) const {
 }
 
 void ITime::_calculate(const Indicator& data) {
-    size_t total = _getDatetimeList(data).size();
+    DatetimeList ds = _getDatetimeList(data);
+    size_t total = ds.size();
     HKU_IF_RETURN(total == 0, void());
 
     _readyBuffer(total, 1);
-    _increment_calculate(data, 0);
+    _doCalculate(ds, 0);
 }
 
 void ITime::_increment_calculate(const Indicator& data, size_t start_pos) {
     DatetimeList ds = _getDatetimeList(data);
+    _doCalculate(ds, start_pos);
+}
+
+void ITime::_doCalculate(const DatetimeList& ds, size_t start_pos) {
     size_t total = ds.size();
 
     auto* dst = this->data();
