@@ -129,8 +129,8 @@ void IContext::_calculate(const Indicator& ind) {
     }
 
     size_t total = ref.size();
-    size_t rtotal = ref.getResultNumber();
-    _readyBuffer(total, rtotal);
+    m_result_num = ref.getResultNumber();
+    _readyBuffer(total, m_result_num);
 
     m_discard = ref.discard();
     if (m_discard >= total) {
@@ -139,7 +139,7 @@ void IContext::_calculate(const Indicator& ind) {
     }
 
     size_t len = sizeof(value_t) * (total - m_discard);
-    for (size_t r = 0; r < rtotal; ++r) {
+    for (size_t r = 0; r < m_result_num; ++r) {
         const auto* src = ref.data(r) + m_discard;
         auto* dst = this->data(r) + m_discard;
         memcpy(dst, src, len);

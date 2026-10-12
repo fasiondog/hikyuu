@@ -79,6 +79,7 @@ void ICval::_calculate(const Indicator& data) {
     if (ret_num == 0) {
         ret_num = 1;
     }
+    m_result_num = ret_num;
     _readyBuffer(total, ret_num);
 
     for (size_t r = 0; r < ret_num; ++r) {

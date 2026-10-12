@@ -38,13 +38,10 @@ void IKData::_calculate(const Indicator& ind) {
     m_name = getParam<string>("kpart");
     const KData& kdata = getContext();
     size_t total = kdata.size();
+    m_result_num = ("KDATA" == m_name) ? 6 : 1;
     HKU_IF_RETURN(total == 0, void());
 
-    if ("KDATA" == m_name) {
-        _readyBuffer(total, 6);
-    } else {
-        _readyBuffer(total, 1);
-    }
+    _readyBuffer(total, m_result_num);
     _increment_calculate(ind, 0);
 }
 
