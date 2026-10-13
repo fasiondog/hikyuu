@@ -87,6 +87,42 @@ public:
      */
     Indicator getValues() const;
 
+    /**
+     * Get the raw value storage; for each date d in dateIndexRef(), the element
+     * valuesRef()[dateIndexRef()[d]] is the value of d. The vector itself is NOT guaranteed
+     * to be stored in date-ascending order (only dateIndexRef() iterates ascending).
+     * @note Read-only reference. Use this inside combination operators to avoid the
+     *       Indicator/PRICELIST copy produced by getValues(). Valid only while the query is
+     *       stable (no concurrent setQuery on this object).
+     */
+    const vector<price_t>& valuesRef() const {
+        return m_values;
+    }
+
+    /**
+     * Get the date->index ordered map; iterating it yields dates in ascending order.
+     * @note Read-only reference, for internal combination without copying.
+     */
+    const map<Datetime, size_t>& dateIndexRef() const {
+        return m_date_index;
+    }
+
+    /**
+     * Combination operators intentionally use different strategies over these refs, driven by
+     * their result semantics:
+     *  - And / Multi / Div (intersection): two-pointer merge over the two ordered date_index
+     *    maps; the output is the date intersection only, so there is no base side to pre-fill.
+     *  - Add / Sub (ev1 base + ev2 align): every date (valid or not) of ev1 and ev2 belongs to
+     *    the result, so ev1 is laid down as the base and ev2 is aligned against it; ev1-only
+     *    dates need no work and ev2-only dates go through _addValid.
+     *  - Or (union of valid): a date is emitted iff it is valid on at least one side, so both
+     *    maps are walked and the date is pushed only when a side is valid.
+     * Do NOT "unify" these: a laydown for Or would add ev1's invalid dates as 0.0 to the output
+     * date set; an intersection for Add/Sub would drop ev1-only/ev2-only dates; a laydown for
+     * And/Multi/Div would wrongly keep ev1-only dates. Each file's _calculate spells out its own
+     * branch.
+     */
+
     /** Subclass calculation interface */
     virtual void _calculate() = 0;
 

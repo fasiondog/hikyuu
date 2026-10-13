@@ -27,31 +27,32 @@ AndEnvironment::AndEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& 
 
 AndEnvironment::~AndEnvironment() {}
 
+// two-pointer merge strategy (intersection only).
+// Do NOT convert to the ev1-base-laydown style (Add/Sub/Or): that would wrongly keep ev1-only.
 void AndEnvironment::_calculate() {
     HKU_IF_RETURN(!m_ev1 || !m_ev2, void());
 
     m_ev1->setQuery(m_query);
     m_ev2->setQuery(m_query);
 
-    auto values1 = m_ev1->getValues();
-    auto dates1 = values1.getDatetimeList();
-    unordered_map<Datetime, price_t> value1_map;
-    const auto* src1 = values1.data();
-    for (size_t i = 0, total = dates1.size(); i < total; i++) {
-        if (src1[i] > 0.0) {
-            value1_map[dates1[i]] = 1.0;
-        }
-    }
+    const auto& idx1 = m_ev1->dateIndexRef();
+    const auto& val1 = m_ev1->valuesRef();
+    const auto& idx2 = m_ev2->dateIndexRef();
+    const auto& val2 = m_ev2->valuesRef();
 
-    auto value2 = m_ev2->getValues();
-    auto dates2 = value2.getDatetimeList();
-    const auto* src2 = value2.data();
-    for (size_t i = 0, total = dates2.size(); i < total; i++) {
-        if (src2[i] > 0.0) {
-            auto iter = value1_map.find(dates2[i]);
-            if (iter != value1_map.end()) {
-                _addValid(iter->first, 1.0);
+    auto it1 = idx1.begin(), it2 = idx2.begin();
+    while (it1 != idx1.end() && it2 != idx2.end()) {
+        if (it1->first < it2->first) {
+            ++it1;
+        } else if (it2->first < it1->first) {
+            ++it2;
+        } else {
+            if (val1[it1->second] > 0.0 && val2[it2->second] > 0.0) {
+                m_date_index[it1->first] = m_values.size();
+                m_values.push_back(1.0);
             }
+            ++it1;
+            ++it2;
         }
     }
 }
@@ -77,6 +78,7 @@ EnvironmentPtr AndEnvironment::_clone() {
 }
 
 HKU_API EnvironmentPtr operator&(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2) {
+    HKU_WARN_IF(!ev1 || !ev2, "AndEnvironment: one side is null, the result is always invalid.");
     return make_shared<AndEnvironment>(ev1, ev2);
 }
 

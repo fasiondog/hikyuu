@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "EnvironmentBase.h"
 
@@ -31,7 +32,8 @@ EnvironmentBase::EnvironmentBase(const EnvironmentBase& base)
   m_name(base.m_name),
   m_query(base.m_query),
   m_date_index(base.m_date_index),
-  m_values(base.m_values) {}
+  m_values(base.m_values),
+  m_is_python_object(base.m_is_python_object) {}
 
 EnvironmentBase::EnvironmentBase(const string& name) : m_name(name) {}
 
@@ -49,6 +51,7 @@ void EnvironmentBase::reset() {
 }
 
 EnvironmentPtr EnvironmentBase::clone() {
+    std::shared_lock<std::shared_mutex> lock(m_mutex);
     EnvironmentPtr p = _clone();
     HKU_CHECK(p && p.get() != this,
               "Failed clone! The subclass _clone of {} must return a new object!", m_name);
@@ -70,11 +73,17 @@ void EnvironmentBase::setQuery(const KQuery& query) {
         m_values.clear();
         _reset();
         m_query = query;
-        _calculate();
+        try {
+            _calculate();
+        } catch (...) {
+            m_query = Null<KQuery>();
+            throw;
+        }
     }
 }
 
 void EnvironmentBase::_addValid(const Datetime& datetime, price_t value) {
+    HKU_IF_RETURN(!std::isfinite(value), void());
     auto iter = m_date_index.find(datetime);
     if (iter == m_date_index.end()) {
         m_date_index[datetime] = m_values.size();
@@ -101,13 +110,11 @@ Indicator EnvironmentBase::getValues() const {
     std::shared_lock<std::shared_mutex> lock(m_mutex);
     DatetimeList dates;
     PriceList values;
-    for (const auto& d : m_date_index) {
-        dates.emplace_back(d.first);
-    }
-
-    values.reserve(dates.size());
-    for (const auto& d : dates) {
-        values.emplace_back(m_values[m_date_index.at(d)]);
+    dates.reserve(m_date_index.size());
+    values.reserve(m_date_index.size());
+    for (const auto& [d, idx] : m_date_index) {
+        dates.emplace_back(d);
+        values.emplace_back(m_values[idx]);
     }
 
     return PRICELIST(values, dates);
