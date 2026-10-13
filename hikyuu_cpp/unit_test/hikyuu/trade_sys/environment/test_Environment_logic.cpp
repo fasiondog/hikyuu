@@ -373,7 +373,7 @@ TEST_CASE("test_Environment_or") {
 
 /** @par Test points */
 TEST_CASE("test_Environment_nested") {
-    /** @arg Nested combination reuses the reference-based path on child combinators (EV-010) */
+    /** @arg Nested combination reuses the reference-based path on child combinators */
     EVPtr ev1 = std::make_shared<EnvironmentTest1>();
     EVPtr ev2 = std::make_shared<EnvironmentTest2>();
     KQuery query(Datetime(20010101), Datetime(20010105));
@@ -404,11 +404,10 @@ TEST_CASE("test_Environment_out_of_order") {
     /** @arg Add with a child appending dates in non-ascending order */
     EVPtr ret = ev1 + ev2;
     ret->setQuery(query);
-    std::vector<std::pair<Datetime, price_t>> expect{
-      {Datetime(20010101), 5.0},
-      {Datetime(20010102), 3.0},
-      {Datetime(20010103), -6.0},
-      {Datetime(20010104), -5.0}};
+    std::vector<std::pair<Datetime, price_t>> expect{{Datetime(20010101), 5.0},
+                                                     {Datetime(20010102), 3.0},
+                                                     {Datetime(20010103), -6.0},
+                                                     {Datetime(20010104), -5.0}};
     check_expect(ret, expect);
 
     /** @arg Sub with a child appending dates in non-ascending order */
@@ -432,7 +431,8 @@ TEST_CASE("test_Environment_out_of_order") {
 TEST_CASE("test_Environment_or_valid_only") {
     KQuery query(Datetime(20010101), Datetime(20010105));
 
-    /** @arg Or emits only dates valid on at least one side (an invalid ev1 date is not kept as 0) */
+    /** @arg Or emits only dates valid on at least one side (an invalid ev1 date is not kept as 0)
+     */
     EVPtr ev1 = std::make_shared<EnvironmentTestOutOfOrder>();  // d1:5, d2:3 valid; d3:-2 invalid
     EVPtr ev2 = std::make_shared<EnvironmentTest2>();           // d3:-4, d4:-5 all invalid
     EVPtr ret = ev1 | ev2;

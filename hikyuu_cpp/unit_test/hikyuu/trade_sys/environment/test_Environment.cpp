@@ -67,7 +67,7 @@ TEST_CASE("test_Environment") {
 
 /** @par Test points */
 TEST_CASE("test_Environment_copy_ctor_keeps_python_flag") {
-    /** @arg The copy constructor copies m_is_python_object (EV-007) */
+    /** @arg The copy constructor copies m_is_python_object */
     EnvironmentTest base;
     base.setPythonObject(true);
     EnvironmentTest copy(base);
@@ -94,7 +94,7 @@ public:
 
 /** @par Test points */
 TEST_CASE("test_Environment_reject_non_finite_value") {
-    /** @arg _addValid rejects +inf / NaN; isValid requires isfinite (EV-009) */
+    /** @arg _addValid rejects +inf / NaN; isValid requires isfinite */
     auto p = make_shared<EnvironmentInfTest>();
     p->setQuery(KQuery(-100));
     CHECK_FALSE(p->isValid(Datetime(200001010000LL)));
@@ -119,7 +119,7 @@ public:
 
 /** @par Test points */
 TEST_CASE("test_Environment_setQuery_retry_after_failure") {
-    /** @arg A failed _calculate leaves m_query unchanged so the same query is retryable (EV-012) */
+    /** @arg A failed _calculate leaves m_query unchanged so the same query is retryable */
     auto p = make_shared<EnvironmentCalcFailTest>();
     KQuery q(-100);
     CHECK_THROWS(p->setQuery(q));
