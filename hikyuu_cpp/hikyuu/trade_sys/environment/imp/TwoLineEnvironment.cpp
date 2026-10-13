@@ -5,6 +5,8 @@
  *      Author: Administrator
  */
 
+#include <cmath>
+
 #include "../../../StockManager.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "TwoLineEnvironment.h"
@@ -59,7 +61,8 @@ void TwoLineEnvironment::_calculate() {
     auto const* slow_data = slow.data();
     auto const* ks = kdata.data();
     for (size_t i = start; i < total; i++) {
-        if (fast_data[i] > slow_data[i]) {
+        if (std::isfinite(fast_data[i]) && std::isfinite(slow_data[i]) &&
+            fast_data[i] > slow_data[i]) {
             _addValid(ks[i].datetime);
         }
     }

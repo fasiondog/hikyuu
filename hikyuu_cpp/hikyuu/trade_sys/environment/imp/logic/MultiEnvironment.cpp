@@ -77,6 +77,7 @@ EnvironmentPtr MultiEnvironment::_clone() {
 }
 
 HKU_API EnvironmentPtr operator*(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2) {
+    HKU_WARN_IF(!ev1 || !ev2, "MultiEnvironment: one side is null, the result is always invalid.");
     return make_shared<MultiEnvironment>(ev1, ev2);
 }
 

@@ -101,6 +101,7 @@ EnvironmentPtr SubEnvironment::_clone() {
 }
 
 HKU_API EnvironmentPtr operator-(const EnvironmentPtr& ev1, const EnvironmentPtr& ev2) {
+    HKU_WARN_IF(!ev1 || !ev2, "SubEnvironment: one side is null, the single-side mode will be used.");
     return make_shared<SubEnvironment>(ev1, ev2);
 }
 
