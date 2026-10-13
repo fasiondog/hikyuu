@@ -389,4 +389,4 @@ Since 2.8.x, the original portfolio backtest building blocks ``Portfolio`` / ``A
 - Each sub-system must hold independent SG/MM instances (different securities need to compute their signals separately; sharing the same SG causes signals to overwrite each other).
 - Mode A: the parent uniformly allocates and places orders by weight (equal weight by default), and the sub-systems are pure signal sources; Mode B: the parent allocates real quotas, and the sub-systems decide autonomously.
 - SE (trading object selection) is optional: after ``ms.set_se(se)``, only the selected sub-systems run on the rebalancing day, while the unselected ones can be force-liquidated (``ms.set_sell_at_not_selected(True)``).
-- Portfolio risk control (the concentration limit) is controlled by the parent MM parameter ``max-single-position`` (1.0 by default, which means no limit).
+- Portfolio risk control (the concentration limit) is controlled by the parent AF parameter ``max-single-position`` (<=0 means no limit; the default 1.0 caps a single instrument at the total assets).

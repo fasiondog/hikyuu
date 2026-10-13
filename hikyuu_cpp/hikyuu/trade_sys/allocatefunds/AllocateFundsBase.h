@@ -206,11 +206,12 @@ public:
                           SubSystemContextList& contexts, const KQuery& query,
                           const std::vector<double>& weights) const;
 
-    /** L2 behavior-level conversion: in mode A it is converted into the parent account quantity by
-     *  assets_ratio / weight; in mode B the sub-system number is passed through.
-     *  @note The default implementation is mode A (equal weight to position): the number of every
-     *        suggestion is rewritten into the target share quantity "weight x the parent total
-     *        assets / the planned price"; the SELL/CLEAR flags are fully closed (MAX_DOUBLE). */
+    /** L2 behavior-level conversion: in mode A it converts the parent account quantity by the
+     *  budget (weight / assets_ratio / fixed-amount, capped by max-total-position) and rewrites
+     *  the number of every suggestion (a positive magnitude, the direction expressed by the
+     *  type); in mode B the sub-system number is passed through.
+     *  @note The number is always positive; a short suggestion is turned into a SELL to reduce
+     *        to its target, a SELL/CLEAR closes the current holding. */
     virtual void _toTargets(const Datetime& date, const TradeManagerPtr& tm,
                             TradeSuggestionList& suggestions, const Weights& sys_weight,
                             const KQuery& query);
@@ -218,8 +219,9 @@ public:
     /** L3 portfolio risk control clipping: mode A performs the portfolio dimension risk control
      *  (concentration / turnover, etc.); mode B can be disabled or only performs the total amount
      *  check.
-     *  @note The single instrument concentration is limited by the parameter max-single-position by
-     *        default. */
+     *  @note The single instrument concentration is limited by the parameter max-single-position
+     *        (<=0 means no limit, >1 is clamped to 1, so the default 1.0 caps a single instrument
+     *        at the total assets). */
     virtual void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
                             TradeSuggestionList& suggestions, const KQuery& query);
 

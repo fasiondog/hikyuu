@@ -781,14 +781,14 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.type == SuggestionType::BUY) {
             continue;
         }
-        // SELL: sell the suggested quantity (in mode A it is rewritten to "-the parent current
-        // position" = full close; in mode B the sub-instruction is passed through) CLEAR: exit the
-        // whole position
+        // SELL: sell the suggested quantity (in mode A it is rewritten to the parent account
+        // quantity; in mode B the sub-instruction is passed through) CLEAR: exit the whole
+        // position. The number is always positive, the direction is expressed by the type
         double num = s.number;
         if (s.type == SuggestionType::CLEAR || num >= MAX_DOUBLE) {
             num = MAX_DOUBLE;
         } else if (num < 0.0) {
-            num = -num;
+            num = -num;  // Defensive: legacy custom AF may still emit a negative number
         }
         if (num <= 0.0) {
             continue;

@@ -26,6 +26,7 @@
  */
 
 #include "../../test_config.h"
+#include <limits>
 #include <unordered_map>
 #include <type_traits>
 #include <hikyuu/StockManager.h>
@@ -353,6 +354,14 @@ TEST_CASE("test_AllocateFunds_L1_equal_weight") {
     /** @arg mode A does not write quota (quota is produced only in mode B) */
     CHECK_EQ(contexts[0].quota, doctest::Approx(0.0));
     CHECK_EQ(contexts[1].quota, doctest::Approx(0.0));
+
+    /** @arg a context without a system is skipped (no empty key in the weight table) */
+    SubSystemContextList ctx_null(2);
+    ctx_null[0].sys = nullptr;
+    ctx_null[1].sys = sys1;
+    auto w_null = af->_allocate(date, tm, ctx_null, KQuery());
+    CHECK_EQ(w_null.size(), 1);
+    CHECK_EQ(w_null[sys1], doctest::Approx(0.5));
 }
 
 /** @par Check point: L1 weight-list fixed weights (an AF base-class parameter with
@@ -525,6 +534,20 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
     CHECK_EQ(w[sys1], doctest::Approx(0.7));
     CHECK_EQ(w[sys2], doctest::Approx(0.0));
 
+    /** @arg a non-finite score (NaN / inf) is treated as 0 like the unselected */
+    contexts[0].score = std::numeric_limits<double>::quiet_NaN();
+    contexts[1].score = 0.3;
+    w = af->_allocate(date, tm, contexts, KQuery());
+    CHECK_EQ(w[sys1], doctest::Approx(0.0));
+    CHECK_EQ(w[sys2], doctest::Approx(0.3));
+
+    /** @arg an overflowing score sum (1e308 x 2) falls back to equal weight */
+    contexts[0].score = 1e308;
+    contexts[1].score = 1e308;
+    w = af->_allocate(date, tm, contexts, KQuery());
+    CHECK_EQ(w[sys1], doctest::Approx(0.5));
+    CHECK_EQ(w[sys2], doctest::Approx(0.5));
+
     /** @arg all scores are 0 (no SE / not a rebalancing day): falls back to equal weight, to
      * avoid zero weights that cannot be allocated */
     contexts[0].score = 0.0;
@@ -590,6 +613,13 @@ TEST_CASE("test_AllocateFunds_L2_modeA_by_ratio") {
     suggestions[0] = s;
     af->_toTargets(date, tm, suggestions, weights, KQuery());
     CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
+
+    /** @arg a non-finite target value (assets_ratio=inf) is skipped: number=0 */
+    s.plan_price = 10.0;
+    s.assets_ratio = std::numeric_limits<double>::infinity();
+    suggestions[0] = s;
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
 }
 
 /** @par Check point: L2 mode A over-allocation converted to position reduction (delta<0 →
@@ -632,7 +662,8 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
     tm->buy(date, stk, 10.0, 1000.0);  // build a position of 1000 shares
 
-    /** @arg SELL: number = -current (close the whole position), the original number is rewritten */
+    /** @arg SELL: number = current (positive, the direction is expressed by the type), the
+     * original number is rewritten */
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
@@ -641,15 +672,15 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     s.number = 999;
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(-1000.0));
+    CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
 
     /** @arg CLEAR: also closes the whole position */
     s.type = SuggestionType::CLEAR;
     suggestions[0] = s;
     af->_toTargets(date, tm, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(-1000.0));
+    CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
 
-    /** @arg SELL with an empty position: number = -0 = 0 (boundary) */
+    /** @arg SELL with an empty position: number = current = 0 (boundary) */
     auto tm2 = crtTM(Datetime(200001010000LL), 100000.0);
     s.type = SuggestionType::SELL;
     s.number = 500;
@@ -740,11 +771,18 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
     af->_checkRisk(date, tm, suggestions, KQuery());
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 
-    /** @arg max-single-position>=1.0: no limit (number unchanged) */
+    /** @arg max-single-position=1.0: takes effect as the 100% cap, target 200000 > 100000 is
+     * clipped to 10000 shares */
     af->setParam<double>("max-single-position", 1.0);
     suggestions[0] = s;
     af->_checkRisk(date, tm, suggestions, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
+    CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
+
+    /** @arg max-single-position>1.0: clamped to 1.0 */
+    af->setParam<double>("max-single-position", 3.0);
+    suggestions[0] = s;
+    af->_checkRisk(date, tm, suggestions, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
     /** @arg mode B: risk control is skipped (respecting sub-manager autonomy, number unchanged) */
     af->setMode("B");
@@ -752,6 +790,153 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
     suggestions[0] = s;
     af->_checkRisk(date, tm, suggestions, KQuery());
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
+}
+
+/** @par Check point: L2 total budget cap (max-total-position proportional scaling) */
+TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sys;
+    s.type = SuggestionType::BUY;
+    s.plan_price = 10.0;
+    s.assets_ratio = 1.0;
+
+    /** @arg the aggregated target (2 x 100000) exceeds the default cap (100000): scaled down
+     * proportionally to 10000 shares, the second suggestion merged */
+    TradeSuggestionList suggestions{s, s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
+    CHECK_EQ(suggestions[1].number, doctest::Approx(0.0));
+
+    /** @arg max-total-position=0 disables the cap: the full 20000 shares */
+    af->setParam<double>("max-total-position", 0.0);
+    suggestions = TradeSuggestionList{s, s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
+
+    /** @arg within the budget: no scaling */
+    af->setParam<double>("max-total-position", 1.0);
+    s.assets_ratio = 0.5;
+    suggestions = TradeSuggestionList{s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+}
+
+/** @par Check point: L2 rewrite syncs plan_cash / cash_ratio / assets_ratio with the rewritten
+ * parent-account number */
+TEST_CASE("test_AllocateFunds_L2_plan_cash_sync") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    af->setParam<double>("fixed-amount", 5000.0);
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+    tm->buy(date, stk, 10.0, 1000.0);  // total assets: 10000 market value + 90000 cash = 100000
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sys;
+    s.type = SuggestionType::BUY;
+    s.plan_price = 10.0;
+    s.plan_cash = 999999.0;  // stale sub-account value
+    s.assets_ratio = 0.9;
+    s.cash_ratio = 0.8;
+    TradeSuggestionList suggestions{s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+
+    /** @arg the BUY rewritten to SELL(500) carries the recomputed parent-account cash and ratios */
+    CHECK(suggestions[0].type == SuggestionType::SELL);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(500.0));
+    CHECK_EQ(suggestions[0].plan_cash, doctest::Approx(5000.0));
+    double ta = tm->getFunds(date, KQuery().kType()).total_assets();
+    CHECK_EQ(suggestions[0].assets_ratio, doctest::Approx(5000.0 / ta));
+    CHECK_EQ(suggestions[0].cash_ratio, doctest::Approx(5000.0 / 90000.0));
+}
+
+/** @par Check point: L2 aggregated shares converted at each suggestion's own plan price */
+TEST_CASE("test_AllocateFunds_L2_mixed_plan_price") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    af->setParam<double>("max-total-position", 0.0);  // isolate from the budget cap
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sys;
+    s.type = SuggestionType::BUY;
+    s.plan_price = 10.0;
+    s.assets_ratio = 0.25;
+    TradeSuggestionList suggestions{s, s};
+    suggestions[1].plan_price = 20.0;
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+
+    /** @arg two plan prices (10/20), each contributes 25000: shares = 2500 + 1250 = 3750 */
+    CHECK_EQ(suggestions[0].number, doctest::Approx(3750.0));
+    CHECK_EQ(suggestions[1].number, doctest::Approx(0.0));
+}
+
+/** @par Check point: L2 missing weight falls back to 1/N instead of the full position */
+TEST_CASE("test_AllocateFunds_L2_missing_weight_fallback") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sysA = create_test_sys(3, 5);
+    auto sysB = create_test_sys(5, 10);
+    auto sysC = create_test_sys(7, 15);
+    std::unordered_map<SYSPtr, double> weights{{sysA, 0.5}, {sysB, 0.5}};
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sysC;  // not in the weight table
+    s.type = SuggestionType::BUY;
+    s.plan_price = 10.0;
+    s.assets_ratio = 1.0;
+    TradeSuggestionList suggestions{s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+
+    /** @arg the missing weight falls back to 1/2 (not the full position): 50000 -> 5000 shares */
+    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+}
+
+/** @par Check point: L2 with a null tm does not crash (defensive skip) */
+TEST_CASE("test_AllocateFunds_L2_null_tm") {
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.stock = getStock("sz000001");
+    s.sys = sys;
+    s.type = SuggestionType::BUY;
+    s.plan_price = 10.0;
+    s.number = 100.0;
+    TradeSuggestionList suggestions{s};
+
+    /** @arg a null tm returns without touching the suggestions */
+    CHECK_NOTHROW(
+      af->_toTargets(Datetime(200001010000LL), nullptr, suggestions, weights, KQuery()));
+    CHECK_EQ(suggestions[0].number, doctest::Approx(100.0));
 }
 
 // ============================================================================
@@ -1120,12 +1305,14 @@ TEST_CASE("test_MultiSystem_shadow_book_not_accumulated") {
     /** @arg the shadow book stays around the initial signal cash instead of piling up */
     price_t init_cash = ms->getSubInitCash();
     REQUIRE_GT(init_cash, 0.0);
-    price_t sub_total =
-      ms->getSystemList()[0]->getTM()->getFunds(kdata[kdata.size() - 1].datetime, query.kType())
-        .total_assets();
+    price_t sub_total = ms->getSystemList()[0]
+                          ->getTM()
+                          ->getFunds(kdata[kdata.size() - 1].datetime, query.kType())
+                          .total_assets();
     CHECK_LT(sub_total, init_cash * 1.5);
 
-    /** @arg an always-buy / hold sub-system produces no parent churn: INIT + the first-day buy only */
+    /** @arg an always-buy / hold sub-system produces no parent churn: INIT + the first-day buy only
+     */
     CHECK_EQ(ms->getTM()->getTradeList().size(), 2);
 }
 
@@ -1884,8 +2071,9 @@ TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
     auto subs = pf->getSystemList();
     REQUIRE_EQ(subs.size(), 2);
 
-    // The shadow is reset to the initial signal cash on every rebalancing day, so the sub book stays
-    // around the init cash; the upper bound is the real invariant (the shadow must never accumulate
+    // The shadow is reset to the initial signal cash on every rebalancing day, so the sub book
+    // stays around the init cash; the upper bound is the real invariant (the shadow must never
+    // accumulate
     // -- a buggy reset used to inflate one leg to millions).
     Datetime last_date(20000224);
     for (auto& sub : subs) {

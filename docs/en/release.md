@@ -10,6 +10,8 @@
 * fix(block): Fix the null-pointer dereference when calling getStockList on a null Block; add is now idempotent (adding an already-present security returns true, only a null stock or an unknown code returns false) and the list overloads return an all-of result
 * fix(strategy): Fix the inverted dedup logic of StrategyContext that made the stock code and ktype deduplication ineffective; stock codes are normalized to uppercase before dedup and stored uppercased (stock_list reads back normalized values and dedups correctly against the default must-load codes)
 
+**⚠️ AF risk control now active by default**: `max-single-position` defaults to 1.0, i.e. a single instrument position value <= the total assets (`<=0` disables the limit, `>1` takes effect as 1.0); the new `max-total-position` defaults to 1.0, i.e. in mode A the aggregated target market value of all instruments <= the total assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`.
+
 ## 2.8.3 - October 1, 2026
 
 **🚀 New Features**

@@ -52,9 +52,10 @@ Common parameters (portfolio-level)
 
     * **weight-list** *(string|"")* : the L1 fixed-weight list (comma-separated); when it is non-empty and its length matches the number of sub-systems, the entries are applied in order,
       otherwise AF falls back to equal weights, and the weights are normalized automatically when their sum is not 1; a list containing a non-finite value (``nan`` / ``inf``) or with an overflowing sum is judged invalid as a whole and falls back to equal weights.
-    * **fixed-amount** *(float|0.0)* : the L2 fixed amount: in mode A it is the target market value per instrument, in mode B the fixed quota per sub-system.
-    * **max-single-position** *(float|1.0)* : the L3 per-instrument concentration cap: the target market value of a position must not exceed total assets multiplied by this value
-      (<=0 or >=1 disables the limit).
+    * **fixed-amount** *(float|0.0)* : the L2 fixed amount: in mode A it is the target market value per instrument (still subject to the max-total-position proportional scaling after aggregation), in mode B the fixed quota per sub-system.
+    * **max-single-position** *(float|1.0)* : the L3 per-instrument concentration cap (mode A only): the target market value of a position must not exceed total assets multiplied by this value
+      (<=0 disables the limit; a value above 1 takes effect as 1.0).
+    * **max-total-position** *(float|1.0)* : the L2 total budget cap (mode A only), the aggregated target market value of all instruments <= the total assets x this value, scaled down proportionally with a warning when exceeded (<=0 disables the cap).
 
 .. note::
 
@@ -106,7 +107,7 @@ Built-in Asset Allocation Algorithms
 .. py:function:: AF_MultiFactor()
 
     Creates a MultiFactor score-weighted fund allocation algorithm instance, i.e. one that uses the scores returned by the selector
-    (SE; ``SubSystemContext.score``) directly as the weights.
+    (SE; ``SubSystemContext.score``) directly as the weights (without normalization; a non-finite score is treated as 0, an all-zero or non-finite sum falls back to the equal weight).
 
     :return: the fund allocation algorithm instance (``AFPtr``)
 

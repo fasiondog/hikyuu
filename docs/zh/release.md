@@ -33,6 +33,11 @@
 * `sys_use_self_tm` 等在新体系无对应语义的参数将被忽略并告警；AF 的 `auto_adjust_weight` 语义由
   `AF_FixedWeight` / `AF_FixedWeightList` 的「不归一化」直接承载。
 
+**⚠️ AF 风控默认生效**：`max-single-position` 默认 1.0，即单标的持仓市值 ≤ 总资产
+（`<=0` 不限制，`>1` 按 1.0 生效）；新增 `max-total-position` 默认 1.0，即模式 A 下所有标的
+聚合目标市值 ≤ 总资产，超出按比例等比缩减并告警（`<=0` 不限制）。若需超配或杠杆场景，请下调
+该参数或设为 `<=0`。
+
 详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
 
 **🚀 新增特性**

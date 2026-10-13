@@ -12,6 +12,7 @@
 
 #include "AllocateFundsBase.h"
 
+#include <algorithm>
 #include <cmath>
 #include <map>
 #include <sstream>
@@ -33,15 +34,25 @@ HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsPtr& af) {
 }
 
 AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
+    // L3 single instrument concentration cap: the target market value <= total assets x this
+    // value (<=0 means no limit, >1 is clamped to 1)
     setParam<double>("max-single-position", 1.0);
-    // The portfolio-level allocation parameters: weight-list fixed weights (L1), fixed-amount fixed
-    // amount (L2)
+
+    // L2 total budget cap: the aggregated target market value of all instruments <= total assets
+    // x this value, scaled down proportionally when exceeded (<=0 disables the cap)
+    setParam<double>("max-total-position", 1.0);
+
+    // L1 fixed weights (comma separated, normalized); empty means the equal weight 1/N
     setParam<string>("weight-list", "");
+
+    // L2 fixed amount: the target market value per instrument in mode A, the quota per sub-system
+    // in mode B
     setParam<double>("fixed-amount", 0.0);
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     setParam<double>("max-single-position", 1.0);
+    setParam<double>("max-total-position", 1.0);
     setParam<string>("weight-list", "");
     setParam<double>("fixed-amount", 0.0);
 }
@@ -51,6 +62,9 @@ AllocateFundsBase::~AllocateFundsBase() {}
 void AllocateFundsBase::baseCheckParam(const string& name) const {
     if ("max-single-position" == name) {
         HKU_ASSERT(getParam<double>("max-single-position") >= 0.0);
+    }
+    if ("max-total-position" == name) {
+        HKU_ASSERT(getParam<double>("max-total-position") >= 0.0);
     }
     if ("fixed-amount" == name) {
         HKU_ASSERT(getParam<double>("fixed-amount") >= 0.0);
@@ -136,6 +150,11 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
     double eq = 1.0 / contexts.size();
     for (size_t i = 0; i < contexts.size(); ++i) {
         auto& ctx = contexts[i];
+        if (!ctx.sys) {
+            // A missing key would be silently looked up as the full position downstream
+            HKU_WARN("The context[{}] has no sub-system, skipped in the allocation!", i);
+            continue;
+        }
         double w = (i < weights.size()) ? weights[i] : eq;
         result[ctx.sys] = w;
         // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
@@ -220,6 +239,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         return;
     }
 
+    // The mode A conversion works on the parent account, it is undefined without it
+    HKU_WARN_IF_RETURN(!tm, void(), "{}::_toTargets: the trade manager is null, skip!", m_name);
+
     FundsRecord funds = tm->getFunds(date, ktype);
     double total_assets = funds.total_assets();
     // Mode A + fixed-amount>0: the target market value of every instrument takes the fixed amount
@@ -227,14 +249,16 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // proportion.
     double fixed_amount = getParam<double>("fixed-amount");
 
-    // Multiple sub-systems may trade the same instrument: aggregate the BUY target market value
-    // by instrument first, to avoid per-suggestion deltas computed against the same position
+    // Multiple sub-systems may trade the same instrument: aggregate the BUY target shares by
+    // instrument first, to avoid per-suggestion deltas computed against the same position
     struct StockTarget {
-        double value{0.0};   // The aggregated target market value
+        double shares{0.0};  // The aggregated target shares, every contribution converted at its
+                             // own plan price (the plan prices may differ between sub-systems)
         price_t price{0.0};  // The plan price of the first suggestion of this instrument
         size_t first_index{0};
     };
     std::map<Stock, StockTarget> buy_targets;
+    double total_target_value = 0.0;
     for (size_t i = 0; i < suggestions.size(); ++i) {
         const auto& s = suggestions[i];
         if (s.type != SuggestionType::BUY || s.plan_price <= 0.0) {
@@ -244,6 +268,9 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         auto it = sys_weight.find(s.sys);
         if (it != sys_weight.end()) {
             weight = it->second;
+        } else if (!sys_weight.empty()) {
+            // A missing weight silently amplified to the full position before
+            weight = 1.0 / sys_weight.size();
         }
         double v;
         if (fixed_amount > 0.0) {
@@ -259,11 +286,35 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             double ratio = (s.assets_ratio > 0.0) ? s.assets_ratio : 1.0;
             v = weight * ratio * total_assets;
         }
+        if (!std::isfinite(v)) {
+            HKU_WARN("{}::_toTargets: non-finite target value of {}, skipped!", m_name,
+                     s.stock.market_code());
+            continue;
+        }
         auto& t = buy_targets[s.stock];
-        t.value += v;
+        price_t unit = s.stock.unit();
+        if (unit > 0.0) {
+            t.shares += v / (s.plan_price * unit);
+        }
         if (t.price == 0.0) {
             t.price = s.plan_price;
             t.first_index = i;
+        }
+        total_target_value += v;
+    }
+
+    // The total budget cap: the aggregated target market value of all instruments <= total assets
+    // x max-total-position, scaled down proportionally (<=0 disables the cap)
+    double max_total = getParam<double>("max-total-position");
+    if (max_total > 0.0 && total_assets > 0.0 && std::isfinite(total_target_value) &&
+        total_target_value > total_assets * max_total) {
+        double scale = total_assets * max_total / total_target_value;
+        HKU_WARN(
+          "{}::_toTargets: the aggregated target({:.2f}) exceeds max-total-position({}) x "
+          "total assets({:.2f}), scaled by {:.4f}!",
+          m_name, total_target_value, max_total, total_assets, scale);
+        for (auto& kv : buy_targets) {
+            kv.second.shares *= scale;
         }
     }
 
@@ -271,6 +322,7 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         auto& s = suggestions[i];
         if (s.plan_price <= 0.0) {
             s.number = 0.0;
+            s.plan_cash = 0.0;
             continue;
         }
         double current = tm->getPosition(date, s.stock).number;
@@ -279,25 +331,27 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             if (it == buy_targets.end() || i != it->second.first_index) {
                 // A non-first suggestion of the same instrument, merged into the first one
                 s.number = 0.0;
+                s.plan_cash = 0.0;
                 continue;
             }
             // The net rebalancing quantity = (target - current); when it is negative (the
             // current position is over-allocated), turn to SELL to reduce to the target.
-            price_t unit = s.stock.unit();
-            double target_shares =
-              (unit > 0.0) ? it->second.value / (it->second.price * unit) : 0.0;
-            double delta = target_shares - current;
+            double delta = it->second.shares - current;
             if (delta < 0.0) {
                 s.type = SuggestionType::SELL;
-                s.number = -delta;  // The position-reducing quantity (a positive number), sold by
-                                    // SELL at the execution stage
+                s.number = -delta;
             } else {
                 s.number = delta;
             }
         } else {
             // SELL / CLEAR: exit the instrument (sell all the current holdings)
-            s.number = -current;
+            s.number = current;
         }
+        // The number is rewritten to the parent account quantity above, the pre-computed
+        // sub-account cash and ratios are stale now
+        s.plan_cash = s.number * s.plan_price * s.stock.unit();
+        s.assets_ratio = (total_assets > 0.0) ? std::min(s.plan_cash / total_assets, 1.0) : 0.0;
+        s.cash_ratio = (funds.cash > 0.0) ? s.plan_cash / funds.cash : 0.0;
     }
 }
 
@@ -309,10 +363,13 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
         return;
     }
     // The concentration upper limit: the target position market value of a single instrument <=
-    // total assets x max-single-position (<=0 or >=1 means no limit).
+    // total assets x max-single-position (<=0 means no limit; >1 is clamped to 1)
     double max_ratio = getParam<double>("max-single-position");
-    if (max_ratio <= 0.0 || max_ratio >= 1.0) {
+    if (max_ratio <= 0.0) {
         return;
+    }
+    if (max_ratio > 1.0) {
+        max_ratio = 1.0;
     }
     KQuery::KType ktype = query.kType();
     double total_assets = tm ? tm->getFunds(date, ktype).total_assets() : 0.0;

@@ -92,7 +92,8 @@ description of the three modes.
 
 Common parameters:
 
-    - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the total assets); <=0 or >=1 means no limit
+    - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the total assets); <=0 means no limit, >1 is clamped to 1
+    - max-total-position=1.0 (float) : the L2 total budget cap, the aggregated target market value of all instruments <= the total assets x this value, scaled down proportionally when exceeded; <=0 disables the cap
     - weight-list="" (str) : the L1 fixed weight list (comma separated); when it is not empty it overrides the equal weight default in order; a list containing a non-finite value (nan / inf) is judged invalid as a whole and falls back to the equal weight
     - fixed-amount=0.0 (float) : the L2 fixed amount; in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system)")
       .def(py::init<>())
@@ -220,5 +221,5 @@ Common parameters:
 
     m.def("AF_MultiFactor", AF_MultiFactor, R"(AF_MultiFactor()
 
-    Create a MultiFactor scoring weight asset allocation algorithm instance, i.e. directly using the scores returned by the SE as the weights.)");
+    Create a MultiFactor scoring weight asset allocation algorithm instance, i.e. directly using the scores returned by the SE as the weights (without normalization; a non-finite score is treated as 0, an all-zero or non-finite sum falls back to the equal weight).)");
 }
