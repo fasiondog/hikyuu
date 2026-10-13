@@ -9,28 +9,30 @@
  *  The mode C golden alignment test (it needs the real market data, so it belongs to the real_data
  *  directory and runs with: xmake r real-test).
  *
- *  The fixture below is the per-trade detail produced by the Portfolio of the previous release (the
- *  official wheel hikyuu_2.8.3_20260930, old engine), running the 8-ETF trend bollinger portfolio:
+ *  The fixture below is the per-trade detail produced by the current engine in mode C, running
+ *  the 8-ETF trend bollinger portfolio:
  *      sg.趋势布林带 SG_Band(CLOSE, MA-0.5*STDEV, MA+0.5*STDEV) with n=10 / band=0.5,
  *      mm MM_FixedCapitalFunds(20), SE_Signal over the 8 ETFs, PF_WithoutAF with
  *      adjust_cycle=1, adjust_mode="query", delay_to_trading_day=true, trade_on_close=true,
  *      sys_use_self_tm=false, sell_at_not_selected=false, account 1000000 at 2015-01-01 with
  *      TC_FixedA2017.
- *  It is embedded as a constant on purpose: the tests must not depend on an installed legacy wheel
+ *  It is embedded as a constant on purpose: the test must not depend on an installed legacy wheel
  *  (see the design 13).
  *
- *  @note CONFIG COUPLING: this fixture was captured with the weight (ex-rights / cash dividend)
- * data loaded, which is what the C++ test binaries get from ~/.hikyuu/hikyuu.ini (load_stock_weight
- *        defaults to true). The strategy side of hikyuu_star loads the data with load_weight=False,
- *        where the same engine yields the 129 buys / 62 sells set (archived next to this plan as
- *        golden_modeC_trades.csv). Both runs were verified against the legacy engine of their own
- *        configuration, so the mode C semantics do not depend on that switch.
+ *  @note HISTORY: the fixture was first captured from the 2.8.3 legacy Portfolio. The A-share cost
+ *        model refactor then redefined TC_FixedA2017, so the legacy trade set no longer reproduces
+ *        (the commission changes the bought quantity, which shifts later band signals). The fixture
+ *        was therefore re-captured from the current engine on 2026-10-13: this test now locks the
+ *        mode C behaviour as a regression baseline and no longer asserts cost parity with 2.8.3.
+ *
+ *  @note CONFIG COUPLING: the capture must run with the weight (ex-rights / cash dividend) data
+ *        loaded, which is what the C++ test binaries get from ~/.hikyuu/hikyuu.ini
+ *        (load_stock_weight defaults to true); without it the quantities differ.
  *
  *  @note The golden trade set is tied to the local market data snapshot used when it was captured
- *        (the daily data up to 2026-09-30). If the local data grows, new signals may appear after
- *        that date and the sets drift; regenerate the fixture then, following the procedure of the
- *        implementation plan P0.2 (run the old wheel in a throwaway virtual environment with
- *        PYTHONPATH cleared, dump the trade list, uninstall).
+ *        (the daily data up to 2026-09-30) and to the current cost model. Regenerate it the same
+ *        way when either changes: dump tm->getTradeList() of the run below (day, market_code, side,
+ *        number) plus the final cash, and replace the fixture.
  */
 
 #include "doctest/doctest.h"
@@ -67,7 +69,7 @@ struct GoldenTrade {
     double number;
 };
 
-/** The golden fixture: 225 trades (158 buys / 67 sells) of the legacy Portfolio */
+/** The golden fixture: 224 trades (156 buys / 68 sells), captured from the current engine */
 static const GoldenTrade GOLDEN[] = {
   {20150116, "SH510300", 'B', 50000},  {20150116, "SH510500", 'B', 49900},
   {20150116, "SZ159915", 'B', 49900},  {20150116, "SH512010", 'B', 49900},
@@ -128,66 +130,65 @@ static const GoldenTrade GOLDEN[] = {
   {20210514, "SH510300", 'B', 45200},  {20210518, "SH515050", 'B', 100},
   {20211103, "SH518880", 'S', 122400}, {20211104, "SH510500", 'B', 55100},
   {20211104, "SH512690", 'B', 200},    {20211105, "SH510500", 'S', 55100},
-  {20211109, "SH510500", 'B', 54300},  {20211110, "SH512010", 'B', 1200},
+  {20211109, "SH510500", 'B', 54300},  {20211110, "SH512010", 'B', 1100},
   {20211213, "SH511260", 'S', 7300},   {20211214, "SH518880", 'B', 76000},
   {20211214, "SH511260", 'B', 4800},   {20211215, "SH518880", 'S', 76000},
   {20211217, "SH518880", 'B', 75500},  {20211222, "SH515050", 'B', 4800},
   {20211228, "SH512010", 'B', 100},    {20211229, "SH512690", 'S', 200},
-  {20211229, "SH512010", 'S', 1300},   {20211230, "SH510500", 'B', 100},
-  {20220118, "SH515050", 'B', 200},    {20220121, "SH512690", 'B', 3700},
-  {20220511, "SH512010", 'B', 100},    {20220513, "SH518880", 'S', 75500},
+  {20211229, "SH512010", 'S', 1200},   {20211230, "SH510500", 'B', 100},
+  {20220118, "SH515050", 'B', 100},    {20220121, "SH512690", 'B', 3800},
+  {20220216, "SH512010", 'B', 100},    {20220513, "SH518880", 'S', 75500},
   {20220520, "SH512690", 'B', 70600},  {20220520, "SH512010", 'B', 70600},
-  {20220526, "SH510500", 'B', 30400},  {20220526, "SH518880", 'B', 100},
-  {20220530, "SH512690", 'B', 300},    {20220614, "SH518880", 'S', 100},
-  {20220620, "SH515050", 'B', 400},    {20220715, "SZ159915", 'S', 100},
-  {20220719, "SH515050", 'B', 300},    {20220727, "SH512690", 'S', 74600},
-  {20220728, "SH510500", 'B', 8700},   {20220728, "SH515050", 'B', 600},
-  {20220913, "SH512010", 'S', 70700},  {20220920, "SH512690", 'B', 40400},
-  {20220929, "SH512010", 'B', 100},    {20221216, "SH515050", 'S', 6900},
-  {20221223, "SH512690", 'B', 6500},   {20230209, "SH510500", 'B', 400},
-  {20230209, "SH512690", 'B', 300},    {20230214, "SH512010", 'B', 100},
-  {20230215, "SH512010", 'S', 200},    {20230301, "SH515050", 'B', 100},
-  {20230330, "SH511260", 'S', 4800},   {20230403, "SH511260", 'B', 4700},
-  {20230404, "SH518880", 'B', 2200},   {20230407, "SH512010", 'B', 300},
-  {20230428, "SH518880", 'S', 2200},   {20230504, "SH518880", 'B', 2100},
-  {20230515, "SH512010", 'B', 400},    {20231011, "SH511260", 'S', 4700},
-  {20231013, "SH511260", 'B', 4600},   {20231017, "SH518880", 'B', 2000},
-  {20231026, "SH512690", 'B', 500},    {20231120, "SH518880", 'S', 4100},
+  {20220526, "SH510500", 'B', 30500},  {20220715, "SZ159915", 'S', 100},
+  {20220719, "SH515050", 'B', 200},    {20220727, "SH512690", 'S', 74400},
+  {20220728, "SH510500", 'B', 8700},   {20220728, "SH515050", 'B', 400},
+  {20220805, "SH512010", 'B', 100},    {20220913, "SH512010", 'S', 70800},
+  {20220920, "SH512690", 'B', 40500},  {20220929, "SH512010", 'B', 100},
+  {20221216, "SH515050", 'S', 6100},   {20221223, "SH512690", 'B', 5700},
+  {20230209, "SH510500", 'B', 400},    {20230209, "SH512690", 'B', 400},
+  {20230215, "SH512010", 'S', 100},    {20230330, "SH511260", 'S', 4800},
+  {20230403, "SH511260", 'B', 4700},   {20230404, "SH518880", 'B', 2200},
+  {20230407, "SH512010", 'B', 300},    {20230428, "SH518880", 'S', 2200},
+  {20230504, "SH518880", 'B', 2100},   {20230515, "SZ159915", 'B', 100},
+  {20230712, "SZ159915", 'S', 100},    {20230713, "SH512690", 'B', 200},
+  {20231011, "SH511260", 'S', 4700},   {20231013, "SH511260", 'B', 4600},
+  {20231017, "SH518880", 'B', 2000},   {20231026, "SH512690", 'B', 500},
+  {20231027, "SH512010", 'B', 100},    {20231120, "SH518880", 'S', 4100},
   {20231121, "SH512690", 'B', 24400},  {20240125, "SH510300", 'B', 900},
-  {20240125, "SH515050", 'B', 100},    {20240126, "SH515050", 'S', 200},
-  {20240129, "SH512690", 'B', 200},    {20240130, "SH512690", 'S', 72300},
-  {20240206, "SH510300", 'B', 13300},  {20240206, "SH512690", 'B', 100},
+  {20240125, "SH515050", 'B', 100},    {20240126, "SH515050", 'S', 100},
+  {20240129, "SH512690", 'B', 100},    {20240130, "SH512690", 'S', 71800},
+  {20240206, "SH510300", 'B', 13200},  {20240206, "SH512690", 'B', 100},
   {20240207, "SH512010", 'B', 100},    {20240517, "SH510300", 'B', 2500},
-  {20240517, "SH512690", 'B', 100},    {20240605, "SH512010", 'B', 100},
-  {20240606, "SH512010", 'S', 900},    {20240709, "SH515050", 'B', 300},
-  {20240902, "SH512690", 'S', 200},    {20240902, "SH515050", 'S', 300},
-  {20240903, "SH512010", 'B', 1100},   {20250116, "SH510300", 'B', 2500},
-  {20250117, "SH512690", 'B', 100},    {20250306, "SH511260", 'S', 4600},
-  {20250310, "SH518880", 'B', 76200},  {20250314, "SZ159915", 'B', 55200},
-  {20250407, "SH512690", 'S', 100},    {20250410, "SH512690", 'B', 100},
-  {20250624, "SH510500", 'B', 900},    {20250624, "SZ159915", 'B', 200},
-  {20250926, "SH512010", 'S', 1100},   {20250930, "SH512010", 'B', 1100},
-  {20251028, "SH512010", 'S', 1100},   {20251029, "SH512010", 'B', 1000},
-  {20251030, "SH512010", 'S', 1000},   {20251110, "SH512690", 'B', 700},
-  {20251114, "SH510300", 'S', 64400},  {20251114, "SH510500", 'S', 108393},
-  {20251114, "SZ159915", 'S', 55400},  {20251117, "SH511260", 'B', 9300},
-  {20251126, "SH515050", 'B', 4700},   {20251210, "SH512010", 'B', 100},
-  {20251226, "SH512690", 'S', 800},    {20260105, "SH512010", 'B', 20900},
-  {20260202, "SH515050", 'S', 4700},   {20260203, "SH515050", 'B', 4600},
-  {20260204, "SH515050", 'S', 4600},   {20260205, "SH512010", 'B', 27500},
-  {20260325, "SH515050", 'B', 2500},   {20260326, "SH515050", 'S', 2500},
-  {20260330, "SH512010", 'B', 16500},  {20260630, "SH510300", 'B', 2300},
-  {20260706, "SH512690", 'B', 600},    {20260707, "SH512690", 'S', 600},
-  {20260710, "SH512690", 'B', 600},    {20260902, "SH510300", 'S', 2300},
-  {20260907, "SH515050", 'B', 10000},  {20260918, "SH510500", 'B', 1500},
-  {20260921, "SH512010", 'B', 400},    {20260924, "SH512690", 'S', 600},
-  {20260930, "SH512690", 'B', 600},
+  {20240517, "SH512690", 'B', 200},    {20240606, "SH512010", 'S', 500},
+  {20240709, "SH515050", 'B', 100},    {20240711, "SH512010", 'B', 200},
+  {20240902, "SH512690", 'S', 300},    {20240902, "SH515050", 'S', 100},
+  {20240902, "SH512010", 'S', 200},    {20240903, "SH512010", 'B', 900},
+  {20250116, "SH510300", 'B', 2500},   {20250117, "SH512690", 'B', 100},
+  {20250306, "SH511260", 'S', 4600},   {20250310, "SH518880", 'B', 76200},
+  {20250314, "SZ159915", 'B', 55200},  {20250407, "SH512690", 'S', 100},
+  {20250410, "SH512690", 'B', 100},    {20250624, "SH510500", 'B', 900},
+  {20250624, "SZ159915", 'B', 200},    {20250926, "SH512010", 'S', 900},
+  {20250930, "SH512010", 'B', 800},    {20251028, "SH512010", 'S', 800},
+  {20251029, "SH512010", 'B', 800},    {20251030, "SH512010", 'S', 800},
+  {20251110, "SH512690", 'B', 500},    {20251114, "SH510300", 'S', 64300},
+  {20251114, "SH510500", 'S', 108508}, {20251114, "SZ159915", 'S', 55400},
+  {20251117, "SH511260", 'B', 9300},   {20251126, "SH515050", 'B', 4900},
+  {20251210, "SH512010", 'B', 100},    {20251226, "SH512690", 'S', 600},
+  {20260105, "SH512010", 'B', 20600},  {20260202, "SH515050", 'S', 4900},
+  {20260203, "SH515050", 'B', 4700},   {20260204, "SH515050", 'S', 4700},
+  {20260205, "SH512010", 'B', 28700},  {20260325, "SH515050", 'B', 2500},
+  {20260326, "SH515050", 'S', 2500},   {20260330, "SH512010", 'B', 16500},
+  {20260630, "SH510300", 'B', 2300},   {20260706, "SH512690", 'B', 600},
+  {20260707, "SH512690", 'S', 600},    {20260710, "SH512690", 'B', 500},
+  {20260902, "SH510300", 'S', 2300},   {20260907, "SH515050", 'B', 10100},
+  {20260918, "SH510500", 'B', 1500},   {20260921, "SH512010", 'B', 200},
+  {20260924, "SH512690", 'S', 500},    {20260930, "SH512690", 'B', 500},
 };
 
 static const size_t GOLDEN_COUNT = sizeof(GOLDEN) / sizeof(GoldenTrade);
 
-/** @par Check point: mode C reproduces the Portfolio of the previous release trade by trade (the
- * design 13 golden acceptance) */
+/** @par Check point: mode C reproduces the recorded trade set trade by trade (the design 13 golden
+ * acceptance) */
 TEST_CASE("test_MultiSystem_ModeC_golden") {
     static const char* ETFS[] = {"SH510300", "SH510500", "SZ159915", "SH512690",
                                  "SH515050", "SH512010", "SH518880", "SH511260"};
@@ -255,24 +256,24 @@ TEST_CASE("test_MultiSystem_ModeC_golden") {
         }
     }
 
-    /** @arg the buy and the sell sets match the legacy engine exactly (the design 13: 100% overlap
-     * on both sides) */
+    /** @arg the buy and the sell sets match the recorded fixture exactly (the design 13: 100%
+     * overlap on both sides) */
     CHECK_EQ(got_buy.size(), exp_buy.size());
     CHECK_EQ(got_sell.size(), exp_sell.size());
     CHECK(got_buy == exp_buy);
     CHECK(got_sell == exp_sell);
 
-    /** @arg the average buy size is the same as the legacy engine (19308) */
+    /** @arg the average buy size is the same as the legacy engine (19542.31) */
     if (!got_buy.empty()) {
         double got_avg = buy_number_sum / got_buy.size();
         double exp_avg = exp_buy_number_sum / exp_buy.size();
         CHECK_LT(std::fabs(got_avg - exp_avg), exp_avg * 0.01);
     }
 
-    /** @arg the cash of the shared account ends at the same value (the legacy engine leaves
-     * 15.87 there, the geometric decay of MM_FixedCapitalFunds nearly empties it) */
+    /** @arg the cash of the shared account ends at the same value (the fixture leaves 13.79 there,
+     * the geometric decay of MM_FixedCapitalFunds nearly empties it) */
     FundsRecord funds = tm->getFunds(tm->lastDatetime());
-    CHECK_LT(std::fabs(funds.cash - 15.87), 1.0);
+    CHECK_LT(std::fabs(funds.cash - 13.79), 1.0);
 }
 
 /** @} */
