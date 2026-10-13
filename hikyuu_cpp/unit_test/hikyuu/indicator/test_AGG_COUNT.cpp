@@ -8,6 +8,9 @@
 #include "../test_config.h"
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/CVAL.h>
+#include <cmath>
+#include <limits>
 #include <hikyuu/plugin/interface/plugins.h>
 #include <hikyuu/plugin/extind.h>
 #include <hikyuu/plugin/device.h>
@@ -86,6 +89,21 @@ TEST_CASE("test_AGG_COUNT") {
     CHECK_EQ(result.size(), k.size());
     CHECK_EQ(result[0], 3);
     CHECK_EQ(result[1], 3);
+}
+
+/** @par Test points */
+TEST_CASE("test_AGG_COUNT_inf_as_missing") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
+    auto k = getKData("sh000001", KQueryByDate(Datetime(20111115)));
+
+    // Inf is not a valid observation, so it is excluded and the count is 0
+    Indicator::value_t inf = std::numeric_limits<Indicator::value_t>::infinity();
+    Indicator result = AGG_COUNT(CVAL(inf)(k), KQuery::MIN)(k);
+    CHECK_EQ(result.size(), k.size());
+    for (size_t i = 0; i < result.size(); ++i) {
+        CHECK_EQ(result[i], 0.0);
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -120,6 +120,15 @@ TEST_CASE("test_WITHKTYPE_sample") {
     check_indicator(ret, expect);
 }
 
+/** @par Test points */
+TEST_CASE("test_WITHKTYPE_single_input_factory") {
+    HKU_IF_RETURN(!pluginValid(), void());
+
+    Indicator maker = WITHDAY();
+    CHECK_EQ(maker.name(), "WITHKTYPE");
+    CHECK_UNARY(maker.getImp() != nullptr);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
