@@ -305,6 +305,7 @@ Built-in Technical Indicators
 .. py:function:: AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
     Aggregate the standard deviation of the other K-line periods, e.g. calculating the standard deviation of the minute-line close prices aggregated when calculating the daily line
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
 
         >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
         >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
@@ -1038,6 +1039,7 @@ Built-in Technical Indicators
 .. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY])
 
     The custom group cumulative counting
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
@@ -1046,6 +1048,7 @@ Built-in Technical Indicators
 .. py:function:: GROUP_MAX(ind[, ktype=Query.DAY])
 
     The custom group cumulative maximum
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
@@ -1054,6 +1057,7 @@ Built-in Technical Indicators
 .. py:function:: GROUP_MIN(ind[, ktype=Query.DAY])
 
     The custom group cumulative minimum
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
@@ -1062,6 +1066,7 @@ Built-in Technical Indicators
 .. py:function:: GROUP_PROD(ind[, ktype=Query.DAY])
 
     The custom group cumulative product
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period
@@ -1070,6 +1075,7 @@ Built-in Technical Indicators
 .. py:function:: GROUP_SUM(ind[, ktype=Query.DAY])
 
     The custom group cumulative sum
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
 
     :param Indicator ind: the indicator to calculate
     :param KQuery.KType ktype: the grouped K-line period

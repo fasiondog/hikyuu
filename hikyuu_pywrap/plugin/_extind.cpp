@@ -418,6 +418,8 @@ void export_extend_Indicator(py::module& m) {
 
     Aggregate the standard deviation of the other K-line periods, e.g. calculating the standard deviation of the minute-line close prices aggregated when calculating the daily line
 
+    Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).
+
         >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
         >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
         >>> ind(k)
@@ -520,12 +522,12 @@ void export_extend_Indicator(py::module& m) {
     :return: the aggregation result
     :rtype: Indicator)");
 
-    PY_GROUP_IND_DEFINE(GROUP_COUNT, "The group cumulative counting")
-    PY_GROUP_IND_DEFINE(GROUP_SUM, "The group cumulative sum")
-    PY_GROUP_IND_DEFINE(GROUP_PROD, "The group cumulative product")
-    PY_GROUP_IND_DEFINE(GROUP_MEAN, "The group cumulative average")
-    PY_GROUP_IND_DEFINE(GROUP_MAX, "The group cumulative maximum")
-    PY_GROUP_IND_DEFINE(GROUP_MIN, "The group cumulative minimum")
+    PY_GROUP_IND_DEFINE(GROUP_COUNT, "The group cumulative counting. Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).")
+    PY_GROUP_IND_DEFINE(GROUP_SUM, "The group cumulative sum. Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).")
+    PY_GROUP_IND_DEFINE(GROUP_PROD, "The group cumulative product. Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).")
+    PY_GROUP_IND_DEFINE(GROUP_MEAN, "The group cumulative average. Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).")
+    PY_GROUP_IND_DEFINE(GROUP_MAX, "The group cumulative maximum. Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).")
+    PY_GROUP_IND_DEFINE(GROUP_MIN, "The group cumulative minimum. Invalid values (NaN and ±Inf) are treated as missing: they are skipped during aggregation/cumulative calculation, and when no valid data is available the result is Null (not 0.0 or Inf).")
 
     m.def(
       "GROUP_FUNC",

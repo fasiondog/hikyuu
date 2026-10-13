@@ -306,6 +306,7 @@
 .. py:function:: AGG_STD(ind[, ktype=Query.MIN, fill_null=False, unit=1, ddof=1])
 
     聚合其他K线周期的标准差, 如计算日线时聚合分钟线收盘价的标准差
+    无效值（NaN 与 ±Inf）一律视为缺失：聚合/累积计算会跳过这些点；当无有效数据可计算时结果为 Null（而非 0.0 或 Inf）。
 
         >>> kdata = get_kdata('sh600000', Query(Datetime(20250101), ktype=Query.DAY))
         >>> ind = AGG_STD(CLOSE(), ktype=Query.MIN, fill_null=False, unit=1, ddof=1)
@@ -1037,6 +1038,7 @@
 .. py:function:: GROUP_COUNT(ind[, ktype=Query.DAY])
 
     自定义分组累积计数
+    无效值（NaN 与 ±Inf）一律视为缺失：聚合/累积计算会跳过这些点；当无有效数据可计算时结果为 Null（而非 0.0 或 Inf）。
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
@@ -1045,6 +1047,7 @@
 .. py:function:: GROUP_MAX(ind[, ktype=Query.DAY])
 
     自定义分组累积最大值
+    无效值（NaN 与 ±Inf）一律视为缺失：聚合/累积计算会跳过这些点；当无有效数据可计算时结果为 Null（而非 0.0 或 Inf）。
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
@@ -1053,6 +1056,7 @@
 .. py:function:: GROUP_MIN(ind[, ktype=Query.DAY])
 
     自定义分组累积计录最小值
+    无效值（NaN 与 ±Inf）一律视为缺失：聚合/累积计算会跳过这些点；当无有效数据可计算时结果为 Null（而非 0.0 或 Inf）。
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
@@ -1061,6 +1065,7 @@
 .. py:function:: GROUP_PROD(ind[, ktype=Query.DAY])
 
     自定义分组累积乘积
+    无效值（NaN 与 ±Inf）一律视为缺失：聚合/累积计算会跳过这些点；当无有效数据可计算时结果为 Null（而非 0.0 或 Inf）。
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
@@ -1069,6 +1074,7 @@
 .. py:function:: GROUP_SUM(ind[, ktype=Query.DAY])
 
     自定义分组累积和
+    无效值（NaN 与 ±Inf）一律视为缺失：聚合/累积计算会跳过这些点；当无有效数据可计算时结果为 Null（而非 0.0 或 Inf）。
 
     :param Indicator ind: 待计算指标
     :param KQuery.KType ktype: 分组的K线周期
