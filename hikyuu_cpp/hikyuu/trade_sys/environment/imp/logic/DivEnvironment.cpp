@@ -27,31 +27,34 @@ DivEnvironment::DivEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& 
 
 DivEnvironment::~DivEnvironment() {}
 
+// two-pointer merge strategy (intersection only, ratio of both sides).
+// Do NOT convert to the ev1-base-laydown style (Add/Sub/Or): that would wrongly keep ev1-only.
 void DivEnvironment::_calculate() {
     HKU_IF_RETURN(!m_ev1 || !m_ev2, void());
 
     m_ev1->setQuery(m_query);
     m_ev2->setQuery(m_query);
 
-    auto values1 = m_ev1->getValues();
-    auto dates1 = values1.getDatetimeList();
-    unordered_map<Datetime, price_t> value1_map;
-    const auto* src1 = values1.data();
-    for (size_t i = 0, total = dates1.size(); i < total; i++) {
-        if (src1[i] != 0.0) {
-            value1_map[dates1[i]] = src1[i];
-        }
-    }
+    const auto& idx1 = m_ev1->dateIndexRef();
+    const auto& val1 = m_ev1->valuesRef();
+    const auto& idx2 = m_ev2->dateIndexRef();
+    const auto& val2 = m_ev2->valuesRef();
 
-    auto value2 = m_ev2->getValues();
-    auto dates2 = value2.getDatetimeList();
-    const auto* src2 = value2.data();
-    for (size_t i = 0, total = dates2.size(); i < total; i++) {
-        if (src2[i] != 0.0) {
-            auto iter = value1_map.find(dates2[i]);
-            if (iter != value1_map.end()) {
-                _addValid(iter->first, iter->second / src2[i]);
+    auto it1 = idx1.begin(), it2 = idx2.begin();
+    while (it1 != idx1.end() && it2 != idx2.end()) {
+        if (it1->first < it2->first) {
+            ++it1;
+        } else if (it2->first < it1->first) {
+            ++it2;
+        } else {
+            price_t v1 = val1[it1->second];
+            price_t v2 = val2[it2->second];
+            if (v1 != 0.0 && v2 != 0.0) {
+                m_date_index[it1->first] = m_values.size();
+                m_values.push_back(v1 / v2);
             }
+            ++it1;
+            ++it2;
         }
     }
 }
