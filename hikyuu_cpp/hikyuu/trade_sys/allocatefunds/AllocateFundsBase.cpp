@@ -144,10 +144,11 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
         return result;
     }
     // The mode B quota: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount),
-    // otherwise weight x the parent total assets.
+    // otherwise weight x the parent total assets (the parent valuation is needed only there).
     double fixed_amount = getParam<double>("fixed-amount");
-    double total_assets = tm ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
     double eq = 1.0 / contexts.size();
+    double total_assets =
+      (m_mode == "B" && tm) ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
     for (size_t i = 0; i < contexts.size(); ++i) {
         auto& ctx = contexts[i];
         if (!ctx.sys) {
