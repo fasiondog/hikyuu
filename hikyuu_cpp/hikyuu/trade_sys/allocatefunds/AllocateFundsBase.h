@@ -191,8 +191,9 @@ public:
 
     /** Parse the parameter weight-list (the comma separated fixed weights) into a normalized weight
      *  vector; an empty vector is returned when it is empty, when its size does not match the
-     *  sub-systems or when the sum is <= 0 (the caller falls back to the equal weight). Migrated
-     *  from AF_FixedWeight / AF_FixedWeightList. */
+     *  sub-systems, when the sum is <= 0 or when it contains a non-finite value (nan / inf) (the
+     *  caller falls back to the equal weight). Migrated from AF_FixedWeight / AF_FixedWeightList.
+     */
     std::vector<double> _parseWeightList(size_t expect_n) const;
 
     /** L1 skeleton: fill the L1 result by "sub-system index -> weight", and in mode B write

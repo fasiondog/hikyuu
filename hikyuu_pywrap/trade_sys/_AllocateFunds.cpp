@@ -93,7 +93,7 @@ description of the three modes.
 Common parameters:
 
     - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the total assets); <=0 or >=1 means no limit
-    - weight-list="" (str) : the L1 fixed weight list (comma separated); when it is not empty it overrides the equal weight default in order
+    - weight-list="" (str) : the L1 fixed weight list (comma separated); when it is not empty it overrides the equal weight default in order; a list containing a non-finite value (nan / inf) is judged invalid as a whole and falls back to the equal weight
     - fixed-amount=0.0 (float) : the L2 fixed amount; in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system)")
       .def(py::init<>())
       .def(py::init<const AllocateFundsBase&>())
@@ -213,6 +213,8 @@ Common parameters:
           R"(AF_FixedWeightList(weights)
 
     The fixed proportion list asset allocation (L1 takes weights[i] in order, without normalization)
+
+    The weights must be finite, non-negative and not all zero (an all-zero list would set every target market value to 0 and drive the parent to actively clear the holdings, so the parameter check throws)
 
     :param list weights: the specified asset proportion list)");
 

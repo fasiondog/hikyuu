@@ -51,7 +51,7 @@ Common parameters (portfolio-level)
 -----------------------------------
 
     * **weight-list** *(string|"")* : the L1 fixed-weight list (comma-separated); when it is non-empty and its length matches the number of sub-systems, the entries are applied in order,
-      otherwise AF falls back to equal weights, and the weights are normalized automatically when their sum is not 1.
+      otherwise AF falls back to equal weights, and the weights are normalized automatically when their sum is not 1; a list containing a non-finite value (``nan`` / ``inf``) or with an overflowing sum is judged invalid as a whole and falls back to equal weights.
     * **fixed-amount** *(float|0.0)* : the L2 fixed amount: in mode A it is the target market value per instrument, in mode B the fixed quota per sub-system.
     * **max-single-position** *(float|1.0)* : the L3 per-instrument concentration cap: the target market value of a position must not exceed total assets multiplied by this value
       (<=0 or >=1 disables the limit).
@@ -86,6 +86,7 @@ Built-in Asset Allocation Algorithms
     Fixed-weight-list fund allocation: allocates capital to the selected sub-systems according to the specified weight list.
 
     L1 takes ``weights[i]`` in sub-system order, **without normalization**; when the length does not match, it falls back to equal weights.
+    The weights must be finite, non-negative and not all zero (an all-zero list sets every sub-system target market value to 0 and drives the parent to actively clear the existing holdings on every rebalance, so the parameter check throws).
 
     :param list weights: the specified list of weight proportions
     :return: the fund allocation algorithm instance (``AFPtr``)

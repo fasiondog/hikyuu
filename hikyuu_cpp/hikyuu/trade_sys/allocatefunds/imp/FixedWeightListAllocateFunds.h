@@ -3,7 +3,8 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  The semantic carrier of AF_FixedWeightList: L1 takes the fixed proportion list in order (without normalization).
+ *  The semantic carrier of AF_FixedWeightList: L1 takes the fixed proportion list in order (without
+ * normalization).
  */
 
 #pragma once
@@ -16,8 +17,10 @@ namespace hku {
 
 /**
  * The fixed proportion list asset allocation.
- * @details The L1 system-level allocation **takes weights[i] one by one in the sub-system order, without normalization**; when the quantity does not match it falls back to the equal weight.
- *          Equivalent to master FixedWeightListAllocateFunds with auto_adjust_weight=false.
+ * @details The L1 system-level allocation **takes weights[i] one by one in the sub-system order,
+ * without normalization**; when the quantity does not match it falls back to the equal weight. The
+ * weights must be non-negative and not all zero (otherwise the parameter check throws).
+ * Equivalent to master FixedWeightListAllocateFunds with auto_adjust_weight=false.
  * @param weights the fixed proportion list of every sub-system
  * @ingroup AllocateFunds
  */

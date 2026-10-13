@@ -12,6 +12,7 @@
 
 #include "AllocateFundsBase.h"
 
+#include <cmath>
 #include <map>
 #include <sstream>
 
@@ -172,6 +173,12 @@ std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
             HKU_WARN("weight-list contains invalid item '{}', treated as 0!", item);
             v = 0.0;
         }
+        // Reject the whole list on a non-finite value (std::stod parses "nan" / "inf" without
+        // throwing and they poison every downstream quota)
+        if (!std::isfinite(v)) {
+            HKU_WARN("weight-list contains non-finite item '{}', fallback to equal weight!", item);
+            return std::vector<double>();
+        }
         if (v < 0.0) {
             v = 0.0;  // The negative weights are treated as 0 (the short quota allocation is not
                       // supported)
@@ -179,9 +186,9 @@ std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
         result.push_back(v);
         sum += v;
     }
-    // The quantity must match the sub-systems and the sum must be > 0, otherwise it is invalid and
-    // falls back to the equal weight
-    if (result.size() != expect_n || sum <= 0.0) {
+    // The quantity must match the sub-systems and the sum must be finite and > 0 (an overflowing
+    // sum normalizes every weight to 0), otherwise it is invalid and falls back to the equal weight
+    if (result.size() != expect_n || !(sum > 0.0) || !std::isfinite(sum)) {
         HKU_WARN_IF(result.size() != expect_n,
                     "weight-list size({}) != subsystems({}), fallback to equal weight!",
                     result.size(), expect_n);

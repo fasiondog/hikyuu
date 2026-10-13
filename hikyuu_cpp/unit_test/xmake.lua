@@ -124,6 +124,7 @@ target("unit-test")
     add_files("./hikyuu/trade_sys/condition/**.cpp", {unity_group="condition"})
     add_files("./hikyuu/trade_sys/environment/**.cpp", {unity_group="environment"})
     add_files("./hikyuu/trade_sys/moneymanager/**.cpp", {unity_group="moneymanager"})
+    add_files("./hikyuu/trade_sys/allocatefunds/**.cpp", {unity_group="allocatefunds"})
     add_files("./hikyuu/trade_sys/multifactor/**.cpp|test_style_regression.cpp", {unity_group="multifactor"})
     -- The test includes the Eigen headers, compile it separately to avoid the unity build leaking the Eigen inline implementations
     add_files("./hikyuu/trade_sys/multifactor/test_style_regression.cpp", {unity_group = false})
