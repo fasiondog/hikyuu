@@ -47,12 +47,12 @@ ProfitGoalPtr ProfitGoalBase::clone() {
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
     p->m_tm = m_tm;
-    p->m_kdata = m_kdata;
+    p->m_kdata = Null<KData>();
     return p;
 }
 
 void ProfitGoalBase::setTO(const KData& kdata) {
-    HKU_IF_RETURN(m_kdata == kdata, void());
+    HKU_IF_RETURN(kdata == m_kdata, void());
     m_kdata = kdata;
     _reset();
     if (!kdata.empty()) {

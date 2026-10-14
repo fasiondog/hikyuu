@@ -14,7 +14,9 @@
 namespace hku {
 
 /**
- * Fixed percentage profit goal, target price = buy price * (1 + p)
+ * Fixed percentage profit goal: the target price is the average cost (with the current price when
+ * there is no position yet) multiplied by (1 + p) for a long or (1 - p) for a short, rounded to the
+ * price precision
  * @param p percentage
  * @return PGPtr
  */

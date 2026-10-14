@@ -46,7 +46,7 @@
 （与 `_reset` / `_clone` / `_calculate` 的 `_xxx` 风格一致）：
 
 * C++ 自定义子类：`PROFITGOAL_IMP` 宏已同步，需将 `getGoal` 实现改名为 `_getGoal`；`getShortGoal` 可选，
-  默认返回 0 表示未设置空头目标；
+  默认返回 `constant.null_price` 表示未设置空头目标；
 * Python 自定义盈利目标策略：重载接口 `get_goal(self, datetime, price)` 改名为 `_get_goal(self, datetime, price)`，
   可选空头接口为 `_get_short_goal`；公开查询方法 `get_goal` / `get_short_goal` 保留；
 * `crtPG(get_goal, ...)` 参数与用法不变，内部回调契约由 `get_goal` 更新为 `_get_goal`。
@@ -65,6 +65,9 @@
 * fix(stock): 修复小写 K 线类型经预载缓冲取 K 线崩溃、getMarketValue 对早于首根 K 线的查询回退最新价（未来数据泄漏，改为返回 0）、K 线缓冲释放与查询并发竞态、blockDriver 未判空、reload 并发竞争
 * fix(block): 修复 Null Block 调 getStockList 空指针解引用崩溃；add 改为幂等语义（重复添加已存在的证券返回 true，仅 Null Stock 或无效代码返回 false），列表版 add 返回值改为 all-of（任一失败即为 false 且不短路）
 * fix(strategy): 修复 StrategyContext 股票代码与 K 线类型去重逻辑写反导致去重完全失效的问题；股票代码归一化为大写后去重并存储，stock_list 读回值为大写归一化值（混合大小写重复也能去除，并与默认必载代码正确合流）
+* fix(trade_sys): PG_FixedPercent 止盈目标价改用 buyMoney / totalNumber 计算平均成本，修复部分减仓后目标价被按比例抬高、止盈永不触发；目标价按标的价格精度取整（多头向上、空头向下，取整前先归化浮点噪声），不再返回不可成交价；补充空头目标实现；未设置账户时返回未限定目标而非空指针崩溃
+* fix(trade_sys): PG_FixedHoldDays 持有天数改为按交易对象自身的交易日统计，并在 setTO 时预建日期表，持仓每根 K 线的日线驱动查询（整轮 O(n²)、带锁与 IO）降为两次二分；标的无日线数据时不再静默失效
+* fix(trade_sys): ProfitGoalBase::clone 不再传播交易对象，克隆体经 setTO 重新计算（原先预计算型自定义子类在克隆体上静默失效）；_get_short_goal「未设置目标」的哨兵由 0 统一为 constant.null_price，与多头口径一致
 
 ## 2.8.3 - 2026年10月1日
 

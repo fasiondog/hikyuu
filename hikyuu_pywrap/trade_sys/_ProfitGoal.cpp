@@ -61,7 +61,7 @@ void export_ProfitGoal(py::module& m) {
 The custom profit goal strategy interfaces:
 
 - _get_goal : [Required] Get the target price
-- _get_short_goal : [Optional] Get the short target price; 0 is returned, meaning no target is set
+- _get_short_goal : [Optional] Get the short target price; returning constant.null_price means no short target is set
 - _calculate : [Required] The subclass calculation interface
 - _clone : [Required] The clone interface
 - _reset : [Optional] Reload the private variables
@@ -130,7 +130,7 @@ The custom profit goal strategy interfaces:
       .def("get_short_goal", &ProfitGoalBase::getShortGoal,
            R"(get_short_goal(self, datetime, price)
 
-    Get the short profit goal price; returning 0 means no short goal is set
+    Get the short profit goal price; returning constant.null_price means no short goal is set
 
     :param Datetime datetime: the current time
     :param float price: the current price
@@ -141,8 +141,10 @@ The custom profit goal strategy interfaces:
       .def("clone", &ProfitGoalBase::clone, "The clone operation")
       .def("_calculate", &ProfitGoalBase::_calculate, "[Overload interface] The subclass calculation interface")
       .def("_reset", &ProfitGoalBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
-      .def("_get_goal", &ProfitGoalBase::_getGoal, "[Overload interface] The subclass goal price interface")
-      .def("_get_short_goal", &ProfitGoalBase::_getShortGoal, "[Overload interface] The subclass short goal price interface")
+      .def("_get_goal", &ProfitGoalBase::_getGoal,
+           "[Overload interface] The subclass goal price interface")
+      .def("_get_short_goal", &ProfitGoalBase::_getShortGoal,
+           "[Overload interface] The subclass short goal price interface")
 
         DEF_PICKLE(PGPtr);
 
@@ -154,7 +156,7 @@ The custom profit goal strategy interfaces:
 
     m.def("PG_FixedPercent", PG_FixedPercent, py::arg("p") = 0.2, R"(PG_FixedPercent([p = 0.2])
 
-    The fixed percentage profit goal; the target price = the buy price * (1 + p)
+    The fixed percentage profit goal; the target price is the average cost (with the current price when there is no position yet) multiplied by (1 + p) for a long or (1 - p) for a short, rounded to the price precision
     
     :param float p: the percentage
     :return: the profit goal strategy instance)");

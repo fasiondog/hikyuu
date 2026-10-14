@@ -21,6 +21,7 @@ public:
     FixedPercentProfitGoal();
     virtual ~FixedPercentProfitGoal();
     virtual void _checkParam(const string& name) const override;
+    virtual price_t _getShortGoal(const Datetime& datetime, price_t price) override;
 };
 
 } /* namespace hku */

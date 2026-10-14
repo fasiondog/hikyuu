@@ -11,6 +11,8 @@
 
 #include "../ProfitGoalBase.h"
 
+#include <vector>
+
 namespace hku {
 
 class FixedHoldDays : public ProfitGoalBase {
@@ -22,6 +24,11 @@ public:
     virtual ~FixedHoldDays();
 
     virtual void _checkParam(const string& name) const override;
+    virtual void _reset() override;
+    virtual void _calculate() override;
+
+private:
+    std::vector<Datetime> m_trading_days;
 };
 
 } /* namespace hku */

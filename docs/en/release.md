@@ -8,7 +8,7 @@
 as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / `_clone` / `_calculate`):
 
 * C++ custom subclasses: the `PROFITGOAL_IMP` macro is updated accordingly; rename the `getGoal` implementation
-  to `_getGoal`; `_getShortGoal` is optional and returns 0 by default (no short goal set);
+  to `_getGoal`; `_getShortGoal` is optional and returns constant.null_price by default (no short goal set);
 * Python custom profit goal strategies: the override hook `get_goal(self, datetime, price)` is renamed to
   `_get_goal(self, datetime, price)`, with the optional `_get_short_goal`; the public query methods
   `get_goal` / `get_short_goal` remain;
@@ -22,6 +22,9 @@ as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / 
 * fix(stock): Fix the crash when fetching K-records through the preloaded buffer with a lowercase ktype, getMarketValue falling back to the latest price for queries earlier than the first record (future data leakage; now returns 0), the race between buffer release and queries, the unchecked blockDriver, and the reload concurrency race
 * fix(block): Fix the null-pointer dereference when calling getStockList on a null Block; add is now idempotent (adding an already-present security returns true, only a null stock or an unknown code returns false) and the list overloads return an all-of result
 * fix(strategy): Fix the inverted dedup logic of StrategyContext that made the stock code and ktype deduplication ineffective; stock codes are normalized to uppercase before dedup and stored uppercased (stock_list reads back normalized values and dedups correctly against the default must-load codes)
+* fix(trade_sys): PG_FixedPercent now computes the average cost as buyMoney / totalNumber, so a partial sell no longer inflates the goal price and disables the take-profit; the goal price is rounded to the stock price precision (up for a long, down for a short, after sanitizing the float noise) instead of returning an intransactable price; implement the short goal; return no goal instead of dereferencing a null trade manager
+* fix(trade_sys): PG_FixedHoldDays now counts the held trading days of the traded object itself with a day table built at setTO, replacing the per-bar daily driver query (O(n²) over a run, with locks and IO) by two binary searches; it no longer fails silently when the stock has no daily data
+* fix(trade_sys): ProfitGoalBase::clone no longer carries the traded object, so a clone always re-calculates at setTO (a pre-computing custom subclass used to stay silently stale on the clone); the "no short goal" sentinel of _get_short_goal is unified to constant.null_price, matching the long side
 
 **⚠️ AF risk control now active by default**: `max-single-position` defaults to 1.0, i.e. a single instrument position value <= the total assets (`<=0` disables the limit, `>1` takes effect as 1.0); the new `max-total-position` defaults to 1.0, i.e. in mode A the aggregated target market value of all instruments <= the total assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`.
 

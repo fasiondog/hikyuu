@@ -61,12 +61,13 @@ public:
     /** Clone interface */
     ProfitGoalPtr clone();
 
-    /** Calculate the target price when buying; see the _getGoal interface for the return semantics */
+    /** Calculate the target price when buying; see the _getGoal interface for the return semantics
+     */
     price_t getGoal(const Datetime& datetime, price_t price) {
         return _getGoal(datetime, price);
     }
 
-    /** 0 is returned, meaning no target is set */
+    /** Null<price_t> is returned, meaning no short goal is set */
     price_t getShortGoal(const Datetime& datetime, price_t price) {
         return _getShortGoal(datetime, price);
     }
@@ -91,9 +92,15 @@ public:
      */
     virtual price_t _getGoal(const Datetime& datetime, price_t price) = 0;
 
-    /** Subclass short goal interface; 0 is returned, meaning no goal is set */
+    /**
+     * Subclass short goal interface, calculate the target price when selling short
+     * @param datetime the current time
+     * @param price the current price
+     * @return Null<price_t> means no short goal is set; the short position is closed when the
+     * current price is <= the returned target price
+     */
     virtual price_t _getShortGoal(const Datetime&, price_t) {
-        return 0.0;
+        return Null<price_t>();
     }
 
     bool isPythonObject() const noexcept {

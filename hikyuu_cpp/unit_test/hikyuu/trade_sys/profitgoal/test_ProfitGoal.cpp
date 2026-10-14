@@ -43,6 +43,31 @@ private:
     int m_x;
 };
 
+class ProfitGoalCalcTest : public ProfitGoalBase {
+public:
+    ProfitGoalCalcTest() : ProfitGoalBase("ProfitGoalCalcTest") {}
+    virtual ~ProfitGoalCalcTest() {}
+
+    virtual price_t _getGoal(const Datetime &, price_t) {
+        return Null<price_t>();
+    }
+
+    virtual ProfitGoalPtr _clone() {
+        return ProfitGoalPtr(new ProfitGoalCalcTest);
+    }
+
+    virtual void _calculate() {
+        m_calc_count++;
+    }
+
+    int getCalcCount() const {
+        return m_calc_count;
+    }
+
+private:
+    int m_calc_count{0};
+};
+
 /**
  * @defgroup test_ProfitGoal test_ProfitGoal
  * @ingroup test_hikyuu_trade_sys_suite
@@ -71,6 +96,52 @@ TEST_CASE("test_ProfitGoal") {
     p_src = (ProfitGoalTest *)p_clone.get();
     CHECK_EQ(p_src->getX(), 10);
     CHECK_NE(p, p_clone);
+
+    /** @arg The default short goal interface sets no target */
+    CHECK_UNARY(std::isnan(p->getShortGoal(Datetime(200101010000), 1.0)));
+}
+
+/** @par Test points */
+TEST_CASE("test_ProfitGoal_setTO") {
+    StockManager &sm = StockManager::instance();
+    Stock stk = sm.getStock("sh600000");
+    KData k =
+      stk.getKData(KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY));
+    KData other =
+      stk.getKData(KQueryByDate(Datetime(199911100000LL), Datetime(200001250000LL), KQuery::DAY));
+
+    ProfitGoalPtr p(new ProfitGoalCalcTest);
+    ProfitGoalCalcTest *p_src = (ProfitGoalCalcTest *)p.get();
+
+    /** @arg setTO calls the subclass calculation once for the same trading object */
+    p->setTO(k);
+    CHECK_EQ(p_src->getCalcCount(), 1);
+    p->setTO(k);
+    CHECK_EQ(p_src->getCalcCount(), 1);
+
+    /** @arg another trading object is calculated again */
+    p->setTO(other);
+    CHECK_EQ(p_src->getCalcCount(), 2);
+
+    /** @arg a null trading object is not calculated, and reset releases the calculation state */
+    p->setTO(Null<KData>());
+    CHECK_EQ(p_src->getCalcCount(), 2);
+    p->reset();
+    CHECK_UNARY(p->getTO().empty());
+    p->setTO(k);
+    CHECK_EQ(p_src->getCalcCount(), 3);
+
+    /** @arg the same trading object is not calculated again, even after a parameter change */
+    p->setParam<double>("n", 2.0);
+    p->setTO(k);
+    CHECK_EQ(p_src->getCalcCount(), 3);
+
+    /** @arg the clone is not calculated until setTO */
+    ProfitGoalPtr p_clone = p->clone();
+    ProfitGoalCalcTest *c_src = (ProfitGoalCalcTest *)p_clone.get();
+    CHECK_EQ(c_src->getCalcCount(), 0);
+    c_src->setTO(k);
+    CHECK_EQ(c_src->getCalcCount(), 1);
 }
 
 /** @} */

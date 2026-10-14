@@ -95,4 +95,37 @@ TEST_CASE("test_PG_FixedHoldDays") {
     CHECK_EQ(pg->getGoal(Datetime(199911230000LL), 0.0), 0.0);
 }
 
+/** @par Test points */
+TEST_CASE("test_PG_FixedHoldDays_clone") {
+    StockManager& sm = StockManager::instance();
+    TMPtr tm = crtTM(Datetime(199001010000LL), 100000);
+
+    Datetime start_date(199911100000LL);  // Test start date
+    Datetime end_date(200002250000LL);    // Test end date
+    KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
+
+    Stock stk = sm.getStock("sh600000");
+    KData k = stk.getKData(query);
+
+    tm->buy(Datetime(199911110000LL), stk, 29.51, 100, 0.0, 0.0, 0.0, PART_SIGNAL);
+
+    PGPtr pg = PG_FixedHoldDays();
+    pg->setTM(tm);
+    pg->setTO(k);
+    pg->setParam<int>("days", 1);
+
+    PGPtr cloned = pg->clone();
+
+    /** @arg the clone does not carry the TO of the original */
+    CHECK_UNARY(cloned->getTO().empty());
+
+    /** @arg setTO on the clone re-runs the calculation, the goal is available */
+    cloned->setTO(k);
+    CHECK_EQ(cloned->getGoal(Datetime(199911120000LL), 0.0), 0.0);
+
+    /** @arg the tm is released by reset, no goal is set */
+    pg->reset();
+    CHECK_UNARY(std::isnan(pg->getGoal(Datetime(199911120000LL), 0.0)));
+}
+
 /** @} */

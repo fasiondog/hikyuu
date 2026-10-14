@@ -73,7 +73,7 @@ TEST_CASE("test_SYS_Simple_for_pg") {
     CHECK_EQ(tr_list[1].business, BUSINESS_BUY);
     CHECK_LT(std::fabs(tr_list[1].planPrice - 26.45), 0.00001);
     CHECK_LT(std::fabs(tr_list[1].realPrice - 26.45), 0.00001);
-    CHECK_LT(std::fabs(tr_list[1].goalPrice - 26.45 * 1.01), 0.00001);
+    CHECK_LT(std::fabs(tr_list[1].goalPrice - 26.72), 0.00001);
     CHECK_EQ(tr_list[1].number, 100);
     CHECK_LT(std::fabs(tr_list[1].cost.total - 0), 0.00001);
     CHECK_LT(std::fabs(tr_list[1].stoploss - 26.19), 0.00001);

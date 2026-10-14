@@ -9,7 +9,7 @@
 
 .. py:function:: PG_FixedPercent([p = 0.2])
 
-    固定百分比盈利目标，目标价格 = 买入价格 * (1 + p)
+    固定百分比盈利目标，目标价格 = 平均成本 × (1 + p)（空头为 × (1 - p)），并按标的价格精度取整；尚无持仓时以当前价格作为成本
     
     :param float p: 百分比
     :return: 盈利目标策略实例
@@ -34,7 +34,7 @@
 自定义盈利目标策略接口：
 
 * :py:meth:`ProfitGoalBase._get_goal` - 【必须】获取目标价格
-* :py:meth:`ProfitGoalBase._get_short_goal` - 【可选】获取空头目标价格，返回0表示未设置目标
+* :py:meth:`ProfitGoalBase._get_short_goal` - 【可选】获取空头目标价格，返回constant.null_price表示未设置空头目标
 * :py:meth:`ProfitGoalBase._calculate` - 【必须】子类计算接口
 * :py:meth:`ProfitGoalBase._clone` - 【必须】克隆接口
 * :py:meth:`ProfitGoalBase._reset` - 【可选】重载私有变量
@@ -93,6 +93,15 @@
         :return: 目标价格
         :rtype: float
         
+    .. py:method:: get_short_goal(self, datetime, price)
+    
+        获取空头盈利目标价格，返回constant.null_price时，表示未设置空头目标
+        
+        :param Datetime datetime: 当前时间
+        :param float price: 当前价格
+        :return: 空头目标价格
+        :rtype: float
+        
     .. py:method:: _get_goal(self, datetime, price)
     
         【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
@@ -104,7 +113,7 @@
         
     .. py:method:: _get_short_goal(self, datetime, price)
     
-        【重载接口】获取空头盈利目标价格，返回0表示未设置空头目标
+        【重载接口】获取空头盈利目标价格，返回constant.null_price时，表示未设置空头目标；当前价格 <= 目标价时买入平仓；空头成本按当前空头持仓计算
         
         :param Datetime datetime: 当前时间
         :param float price: 当前价格
