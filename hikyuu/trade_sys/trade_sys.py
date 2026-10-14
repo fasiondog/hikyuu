@@ -279,11 +279,11 @@ def crtST(get_price, params={}, name='crtST', calculate=None, get_short_price=No
     :return: the stop-loss/take-profit strategy instance
     """
     meta_x = type(name, (StoplossBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x.get_price = get_price
+    meta_x._get_price = get_price
     if calculate is not None:
         meta_x._calculate = calculate
     if get_short_price is not None:
-        meta_x.get_short_price = get_short_price
+        meta_x._get_short_price = get_short_price
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret

@@ -20,7 +20,7 @@ public:
     explicit IndicatorStoploss(const Indicator& ind);
     virtual ~IndicatorStoploss();
 
-    virtual price_t getPrice(const Datetime& datetime, price_t price) override;
+    virtual price_t _getPrice(const Datetime& datetime, price_t price) override;
     virtual void _reset() override;
     virtual StoplossPtr _clone() override;
     virtual void _calculate() override;

@@ -21,7 +21,7 @@ IndicatorStoploss::IndicatorStoploss(const Indicator& op)
 
 IndicatorStoploss::~IndicatorStoploss() {}
 
-price_t IndicatorStoploss::getPrice(const Datetime& datetime, price_t price) {
+price_t IndicatorStoploss::_getPrice(const Datetime& datetime, price_t price) {
     return m_result.count(datetime) ? m_result[datetime] : 0.0;
 }
 

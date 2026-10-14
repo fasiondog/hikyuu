@@ -103,7 +103,7 @@ ANALYZE_PY_PARTS_PROBE = (
     "        super().__init__('MyST')\n"
     "    def _clone(self):\n"
     "        return MyST()\n"
-    "    def get_price(self, datetime, price):\n"
+    "    def _get_price(self, datetime, price):\n"
     "        return price * 0.95\n"
     "stk = StockManager.instance()['sh000001']\n"
     "q = Query(Datetime(20111101), Datetime(20111206), Query.DAY, Query.FORWARD)\n"

@@ -60,4 +60,12 @@ void StoplossBase::setTO(const KData& kdata) {
     }
 }
 
+price_t StoplossBase::getPrice(const Datetime& datetime, price_t price) {
+    return _getPrice(datetime, price);
+}
+
+price_t StoplossBase::getShortPrice(const Datetime& datetime, price_t price) {
+    return _getShortPrice(datetime, price);
+}
+
 } /* namespace hku */

@@ -35,12 +35,12 @@ public:
         PYBIND11_OVERLOAD(void, StoplossBase, _reset, );
     }
 
-    price_t getPrice(const Datetime& datetime, price_t price) override {
-        PYBIND11_OVERLOAD_PURE_NAME(price_t, StoplossBase, "get_price", getPrice, datetime, price);
+    price_t _getPrice(const Datetime& datetime, price_t price) override {
+        PYBIND11_OVERLOAD_PURE_NAME(price_t, StoplossBase, "_get_price", _getPrice, datetime, price);
     }
 
-    price_t getShortPrice(const Datetime& datetime, price_t price) override {
-        PYBIND11_OVERLOAD_NAME(price_t, StoplossBase, "get_short_price", getShortPrice, datetime,
+    price_t _getShortPrice(const Datetime& datetime, price_t price) override {
+        PYBIND11_OVERLOAD_NAME(price_t, StoplossBase, "_get_short_price", _getShortPrice, datetime,
                                price);
     }
 };
@@ -51,6 +51,8 @@ void export_Stoploss(py::module& m) {
       R"(The stop-loss/take-profit algorithm base class
 The custom stop-loss/take-profit strategy interfaces:
 
+    - _get_price : [Required] Compute the raw long stop-loss price
+    - _get_short_price : [Required] Compute the raw short stop-loss price (default returns 0; a short stop-loss must be above the planned trade price)
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
     - _reset : [Optional] Reload the private variables)")
@@ -94,17 +96,44 @@ The custom stop-loss/take-profit strategy interfaces:
 
       .def("get_price", &StoplossBase::getPrice, R"(get_price(self, datetime, price)
 
-    [Overload interface] Get the planned stop-loss price of this expected trade (buy); if there is no stop-loss price, return 0. It is used by the system to query the planned stop-loss price of this trade from the stop-loss strategy module before executing the trade.
-
-    .. note::
-        Generally, the stop-loss and the take-profit algorithms can be interchanged, but the getPrice of the stop-loss can be passed the planned trading price, e.g. using 30% of the buy price as the stop-loss. The take-profit does not consider the passed price parameter, i.e. it considers the price to be 0.0. In fact, even for the stop-loss, it is not recommended to use the price parameter; e.g. if 30% of the previous day's lowest price can be used as the stop-loss, the price parameter does not need to be considered.
+    [Public method] Get the planned stop-loss price of this expected trade (a buy); return 0 if none. It calls the subclass hook _get_price. Do not override this method; override _get_price instead.
 
     :param Datetime datetime: the trading time
     :param float price: the planned buy price
     :return: the stop-loss price
     :rtype: float)")
 
-      .def("get_short_price", &StoplossBase::getShortPrice)
+      .def("get_short_price", &StoplossBase::getShortPrice, R"(get_short_price(self, datetime, price)
+
+    [Public method] Get the planned stop-loss price of this expected trade (a short sell); return 0 if none. It calls the subclass hook _get_short_price. Do not override this method; override _get_short_price instead.
+
+    :param Datetime datetime: the trading time
+    :param float price: the planned trade price
+    :return: the short stop-loss price
+    :rtype: float)")
+
+      .def("_get_price", &StoplossBase::_getPrice,
+           R"(_get_price(self, datetime, price)
+
+    [Override hook] Compute the raw long stop-loss price; the public get_price delegates to this hook. The base class does no extra processing, so just return the planned stop-loss price (0 means no stop-loss).
+
+    .. note::
+        In general, stop-loss and take-profit algorithms are interchangeable. The difference is that a stop-loss implementation may use the planned trade price—for example, setting the stop 30% below the buy price—whereas a take-profit ignores the price argument and treats it as 0.0. In practice, even stop-loss implementations are better off ignoring price: a stop based on, say, a level relative to the previous day's low does not need it.
+
+    :param Datetime datetime: the trading time
+    :param float price: the planned buy price
+    :return: the stop-loss price
+    :rtype: float)")
+
+      .def("_get_short_price", &StoplossBase::_getShortPrice,
+           R"(_get_short_price(self, datetime, price)
+
+    [Override hook] Compute the raw short stop-loss price; the public get_short_price delegates to this hook. Default returns 0 (no short stop-loss). Unlike a long stop-loss, a short one must be above the planned trade price, and must not fall back to the long-side _get_price result.
+
+    :param Datetime datetime: the trading time
+    :param float price: the planned trade price
+    :return: the short stop-loss price
+    :rtype: float)")
 
       .def("reset", &StoplossBase::reset, "The reset operation")
       .def("clone", &StoplossBase::clone, "The clone operation")

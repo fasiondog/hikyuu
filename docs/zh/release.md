@@ -54,6 +54,12 @@
 * 若此前自定义滑点已在内部做区间钳制，移除该逻辑即可（基类已统一处理）；
 * `SP_FixedPercent` 移除对计划价的有效性告警（`HKU_WARN`），与其余 5 个内置滑点实现保持一致。
 
+**⚠️ 破坏性变更：StoplossBase 接口调整（子类仅实现 _getPrice / _getShortPrice）**
+
+自定义止损/止赢基类 `StoplossBase` 的派生类原先需重载公有虚函数 `getPrice` / `getShortPrice`；现改为**重载受保护虚函数 `_getPrice` / `_getShortPrice` 仅计算原始止损价**，公有 `getPrice` / `getShortPrice` 作为非虚包装直接委托给子类钩子（与 `reset` / `_reset` 形式一致）。
+
+* C++ 自定义止损/止赢需将实现从 `getPrice` / `getShortPrice` 迁移至 `_getPrice` / `_getShortPrice`；Python 侧自定义止损/止赢亦需将重写方法从 `get_price` / `get_short_price` 改为 `_get_price` / `_get_short_price`（`crtST` 已同步）。
+
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 A）

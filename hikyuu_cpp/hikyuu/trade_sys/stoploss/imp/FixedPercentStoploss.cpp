@@ -26,7 +26,7 @@ void FixedPercentStoploss::_checkParam(const string& name) const {
     }
 }
 
-price_t FixedPercentStoploss ::getPrice(const Datetime& datetime, price_t price) {
+price_t FixedPercentStoploss ::_getPrice(const Datetime& datetime, price_t price) {
     Stock stock = m_kdata.getStock();
     int precision = stock.isNull() ? 2 : stock.precision();
     return roundEx(price * (1 - getParam<double>("p")), precision);

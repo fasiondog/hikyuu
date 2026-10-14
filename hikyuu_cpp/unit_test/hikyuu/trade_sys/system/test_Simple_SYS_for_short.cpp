@@ -43,12 +43,12 @@ public:
         return make_shared<Iss029PercentST>(getParam<double>("p"), m_reverse);
     }
 
-    virtual price_t getPrice(const Datetime&, price_t price) override {
+    virtual price_t _getPrice(const Datetime&, price_t price) override {
         double p = getParam<double>("p");
         return roundEx(price * (m_reverse ? 1.0 + p : 1.0 - p), 2);
     }
 
-    virtual price_t getShortPrice(const Datetime&, price_t price) override {
+    virtual price_t _getShortPrice(const Datetime&, price_t price) override {
         double p = getParam<double>("p");
         return roundEx(price * (m_reverse ? 1.0 - p : 1.0 + p), 2);
     }
@@ -144,11 +144,11 @@ public:
         return make_shared<Iss029ScriptedTP>();
     }
 
-    virtual price_t getPrice(const Datetime&, price_t) override {
+    virtual price_t _getPrice(const Datetime&, price_t) override {
         return 0.0;
     }
 
-    virtual price_t getShortPrice(const Datetime& datetime, price_t) override {
+    virtual price_t _getShortPrice(const Datetime& datetime, price_t) override {
         auto iter = m_script.find(datetime);
         return iter != m_script.end() ? iter->second : 30.0;
     }

@@ -16,7 +16,7 @@ public:
     StoplossTest() : StoplossBase("StoplossTest"), m_x(0) {}
     virtual ~StoplossTest() {}
 
-    virtual price_t getPrice(const Datetime &datetime, price_t price) {
+    virtual price_t _getPrice(const Datetime &datetime, price_t price) {
         return m_x < 10 ? 0.0 : 1.0;
     }
 
@@ -48,7 +48,7 @@ public:
     StoplossAccum() : StoplossBase("StoplossAccum") {}
     virtual ~StoplossAccum() {}
 
-    virtual price_t getPrice(const Datetime &, price_t) override {
+    virtual price_t _getPrice(const Datetime &, price_t) override {
         return 0.0;
     }
     virtual void _reset() override {

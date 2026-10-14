@@ -58,6 +58,8 @@ Custom Stop-loss/Take-profit Strategy
 
 The custom stop-loss/take-profit strategy interface:
 
+* :py:meth:`StoplossBase._get_price` - [Required] Compute the raw long stop-loss price
+* :py:meth:`StoplossBase._get_short_price` - [Required] Compute the raw short stop-loss price (default returns 0; a short stop-loss must be above the planned trade price)
 * :py:meth:`StoplossBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`StoplossBase._clone` - [Required] The clone interface
 * :py:meth:`StoplossBase._reset` - [Optional] Reset the internal member variables
@@ -104,7 +106,25 @@ Stop-loss/Take-profit Strategy Base Class
 
     .. py:method:: get_price(self, datetime, price)
     
-        [Override hook] Return the planned stop-loss price for an anticipated trade (a buy); return 0 if no stop-loss price applies. The system calls this method before execution to query the strategy for this trade's planned stop-loss level.
+        [Public method] Return the planned stop-loss price for an anticipated trade (a buy); return 0 if none. It calls the subclass hook _get_price. Python subclasses should override _get_price instead of this method.
+        
+        :param Datetime datetime: the trade time
+        :param float price: the planned buy price
+        :return: the stop-loss price
+        :rtype: float
+        
+    .. py:method:: get_short_price(self, datetime, price)
+    
+        [Public method] Return the planned stop-loss price for an anticipated trade (a short sell); return 0 if none. It calls the subclass hook _get_short_price. Python subclasses should override _get_short_price instead of this method.
+        
+        :param Datetime datetime: the trade time
+        :param float price: the planned trade price
+        :return: the short stop-loss price
+        :rtype: float
+        
+    .. py:method:: _get_price(self, datetime, price)
+    
+        [Override hook] Compute the raw long stop-loss price; the public get_price delegates to this hook. The base class does no extra processing, so just return the planned stop-loss price (0 means no stop-loss).
         
         .. note::
             In general, stop-loss and take-profit algorithms are interchangeable. The difference is that a stop-loss implementation may use the planned trade price—for example, setting the stop 30% below the buy price—whereas a take-profit ignores the price argument and treats it as 0.0. In practice, even stop-loss implementations are better off ignoring price: a stop based on, say, a level relative to the previous day's low does not need it.
@@ -112,6 +132,15 @@ Stop-loss/Take-profit Strategy Base Class
         :param Datetime datetime: the trade time
         :param float price: the planned buy price
         :return: the stop-loss price
+        :rtype: float
+        
+    .. py:method:: _get_short_price(self, datetime, price)
+    
+        [Override hook] Compute the raw short stop-loss price; the public get_short_price delegates to this hook. Default returns 0 (no short stop-loss). Unlike a long stop-loss, a short one must be above the planned trade price, and must not fall back to the long-side _get_price result.
+        
+        :param Datetime datetime: the trade time
+        :param float price: the planned trade price
+        :return: the short stop-loss price
         :rtype: float
         
     .. py:method:: _calculate(self)
