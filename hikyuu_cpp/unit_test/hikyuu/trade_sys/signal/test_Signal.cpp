@@ -72,6 +72,28 @@ public:
     }
 };
 
+// A leaf indicator whose result length does not follow the KData context, used to build the
+// ind.size() != kdata.size() input
+class FixedLenInd : public IndicatorImp {
+public:
+    FixedLenInd(size_t len) : IndicatorImp("FIXEDLEN", 1), m_len(len) {}
+
+    virtual void _calculate(const Indicator &) override {
+        _readyBuffer(m_len, 1);
+        for (size_t i = 0; i < m_len; ++i) {
+            _set(1.0, i, 0);
+        }
+        m_discard = 0;
+    }
+
+    virtual IndicatorImpPtr _clone() override {
+        return make_shared<FixedLenInd>(m_len);
+    }
+
+private:
+    size_t m_len;
+};
+
 /**
  * @defgroup test_Signal test_Signal
  * @ingroup test_hikyuu_trade_sys_suite
@@ -395,6 +417,57 @@ TEST_CASE("test_SG_Single2_non_finite") {
     PriceList vals(k.size(), 0.0);
     vals[20] = std::numeric_limits<double>::infinity();
     SignalPtr sg = SG_Single2(PRICELIST(vals, dates), 10, 0.1);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_kdata_size_mismatch") {
+    // Mismatched inputs are salvaged via ALIGN by dates; the aligned constant series fires no
+    // signal, and a failed alignment (defensive) also yields an empty signal without OOB access
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg SG_Cross with an indicator longer than the KData fires no signal */
+    SignalPtr sg = SG_Cross(Indicator(make_shared<FixedLenInd>(k.size() + 10)),
+                            Indicator(make_shared<FixedLenInd>(k.size() + 10)));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_CrossGold with an indicator shorter than the KData fires no signal */
+    sg =
+      SG_CrossGold(Indicator(make_shared<FixedLenInd>(5)), Indicator(make_shared<FixedLenInd>(5)));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Band with an indicator longer than the KData fires no signal */
+    sg = SG_Band(Indicator(make_shared<FixedLenInd>(k.size() + 10)), -1.0, 1.0);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Band (indicator overload) with an indicator shorter than the KData fires no signal
+     */
+    sg = SG_Band(Indicator(make_shared<FixedLenInd>(5)), Indicator(make_shared<FixedLenInd>(5)),
+                 Indicator(make_shared<FixedLenInd>(5)));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Single with an indicator longer than the KData fires no signal */
+    sg = SG_Single(Indicator(make_shared<FixedLenInd>(k.size() + 10)), 10, 0.1);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Single2 with an indicator shorter than the KData fires no signal */
+    sg = SG_Single2(Indicator(make_shared<FixedLenInd>(5)), 10, 0.1);
     sg->setTO(k);
     CHECK_UNARY(sg->getBuySignal().empty());
     CHECK_UNARY(sg->getSellSignal().empty());

@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "CrossSignal.h"
 
@@ -31,8 +32,16 @@ SignalPtr CrossSignal::_clone() {
 
 void CrossSignal::_calculate(const KData& kdata) {
     Indicator fast = m_fast(kdata);
+    if (fast.size() != kdata.size()) {
+        fast = ALIGN(fast, kdata);
+    }
     Indicator slow = m_slow(kdata);
-    HKU_ERROR_IF_RETURN(fast.size() != slow.size(), void(), "fast.size() != slow.size()");
+    if (slow.size() != kdata.size()) {
+        slow = ALIGN(slow, kdata);
+    }
+    HKU_WARN_IF_RETURN(fast.size() != slow.size() || fast.size() != kdata.size(), void(),
+                       "Failed to align! fast.size()({}), slow.size()({}), kdata.size()({})!",
+                       fast.size(), slow.size(), kdata.size());
 
     size_t discard = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
     size_t total = fast.size();

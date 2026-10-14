@@ -5,6 +5,7 @@
  *       Author: yangrq1018
  */
 #include <cmath>
+#include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "BandSignal2.h"
 
@@ -31,9 +32,23 @@ SignalPtr BandSignal2::_clone() {
 
 void BandSignal2::_calculate(const KData& kdata) {
     Indicator ind = m_ind(kdata);
+    if (ind.size() != kdata.size()) {
+        ind = ALIGN(ind, kdata);
+    }
     Indicator upper = m_upper(kdata);
+    if (upper.size() != kdata.size()) {
+        upper = ALIGN(upper, kdata);
+    }
     Indicator lower = m_lower(kdata);
-    HKU_ASSERT(ind.size() == upper.size() && ind.size() == lower.size());
+    if (lower.size() != kdata.size()) {
+        lower = ALIGN(lower, kdata);
+    }
+    HKU_WARN_IF_RETURN(
+      ind.size() != kdata.size() || upper.size() != kdata.size() || lower.size() != kdata.size(),
+      void(),
+      "Failed to align! ind.size()({}), upper.size()({}), lower.size()({}), "
+      "kdata.size()({})!",
+      ind.size(), upper.size(), lower.size(), kdata.size());
 
     size_t discard = ind.discard();
     if (discard < upper.discard()) {
