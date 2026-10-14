@@ -28,6 +28,26 @@ as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / 
 
 **⚠️ AF risk control now active by default**: `max-single-position` defaults to 1.0, i.e. a single instrument position value <= the total assets (`<=0` disables the limit, `>1` takes effect as 1.0); the new `max-total-position` defaults to 1.0, i.e. in mode A the aggregated target market value of all instruments <= the total assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`.
 
+**⚠️ Breaking Changes: Slippage interface reworked (subclass computes only the raw price; the base class applies day-range clamping)**
+
+A custom `SlippageBase` subclass (C++/Python) previously overrode `get_real_buy_price` / `get_real_sell_price` to return the final trade price directly. It must now override `_get_real_buy_price` / `_get_real_sell_price` to compute only the **raw** price; the base class then applies day-range clamping and returns the clamped value:
+
+* the buy price is clamped to **not exceed the day's high** (`min(raw, high)`);
+* the sell price is clamped to **not fall below the day's low** (`max(raw, low)`, falling back to the tick floor when no day data is available).
+
+Migration:
+
+* Python custom slippage (`crtSP` subclasses): rename `get_real_buy_price` / `get_real_sell_price` to `_get_real_buy_price` / `_get_real_sell_price` (raw price only); `get_real_buy_price` / `get_real_sell_price` now return the clamped actual trade price.
+* C++ custom slippage: move the implementation from `getRealBuyPrice` / `getRealSellPrice` into the protected virtuals `_getRealBuyPrice` / `_getRealSellPrice`.
+* If your custom slippage already clamped to the day range internally, drop that logic (the base class does it now).
+* `SP_FixedPercent` no longer emits the invalid-plan-price warning (`HKU_WARN`), matching the other five built-in slippage implementations.
+
+**⚠️ Breaking Changes: StoplossBase interface reworked (subclass implements only _getPrice / _getShortPrice)**
+
+A custom `StoplossBase` subclass previously overrode the public virtuals `getPrice` / `getShortPrice`. It must now override the protected virtuals `_getPrice` / `_getShortPrice` to compute only the raw stop-loss price; the public `getPrice` / `getShortPrice` become non-virtual wrappers that delegate to the subclass hooks (same form as `reset` / `_reset`).
+
+* C++ custom stop-loss / take-profit: move the implementation from `getPrice` / `getShortPrice` to `_getPrice` / `_getShortPrice`. Python custom stop-loss / take-profit: rename the override methods from `get_price` / `get_short_price` to `_get_price` / `_get_short_price` (the `crtST` helper is updated accordingly).
+
 ## 2.8.3 - October 1, 2026
 
 **🚀 New Features**

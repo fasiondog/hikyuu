@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
+#include <cmath>
 #include <random>
 #include "TruncNormalSlippage.h"
 
@@ -13,6 +15,74 @@ BOOST_CLASS_EXPORT(hku::TruncNormalSlippage)
 #endif
 
 namespace hku {
+
+namespace {
+// Standard normal CDF via the error function
+double normCdf(double x) {
+    return 0.5 * (1.0 + std::erf(x / std::sqrt(2.0)));
+}
+
+// Inverse standard normal CDF (Acklam's rational approximation)
+double normInvCdf(double p) {
+    const double lo = 1e-12, hi = 1.0 - 1e-12;
+    if (p < lo) {
+        p = lo;
+    } else if (p > hi) {
+        p = hi;
+    }
+    static const double a[] = {-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+                               1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00};
+    static const double b[] = {-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+                               6.680131188771972e+01, -1.328068155288572e+01};
+    static const double c[] = {-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+                               -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00};
+    static const double d[] = {7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+                               3.754408661907416e+00};
+    double q, r;
+    if (p < 0.02425) {
+        // Lower tail
+        q = std::sqrt(-2.0 * std::log(p));
+        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+               ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1.0);
+    }
+    if (p <= 0.97575) {
+        // Central region
+        q = p - 0.5;
+        r = q * q;
+        return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+               (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1.0);
+    }
+    // Upper tail
+    q = std::sqrt(-2.0 * std::log(1.0 - p));
+    return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+           ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1.0);
+}
+
+// Draw a truncated-normal sample in [min_v, max_v] via inverse-CDF (O(1))
+double sampleTruncNormal(double mean, double stddev, double min_v, double max_v,
+                         std::mt19937& gen) {
+    if (stddev <= 0.0) {
+        return (min_v + max_v) / 2.0;
+    }
+    double a = (min_v - mean) / stddev;
+    double b = (max_v - mean) / stddev;
+    double pa = normCdf(a);
+    double pb = normCdf(b);
+    double u = std::uniform_real_distribution<double>(0.0, 1.0)(gen);
+    double z;
+    if (pb - pa < 1e-12) {
+        // The truncation interval is a tiny sliver relative to the density: the
+        // conditional density is nearly uniform across it
+        z = a + u * (b - a);
+    } else {
+        z = normInvCdf(pa + u * (pb - pa));
+    }
+    double value = mean + stddev * z;
+    // Guard the sampled value against the inverse-CDF approximation error so the
+    // truncation bound stays exact
+    return std::clamp(value, min_v, max_v);
+}
+}  // namespace
 
 TruncNormalSlippage::TruncNormalSlippage()
 : SlippageBase("SP_TruncNormal"), m_gen(std::random_device{}()) {
@@ -41,6 +111,13 @@ void TruncNormalSlippage::_checkParam(const string& name) const {
         double min_v = getParam<double>("min_value");
         double max_v = getParam<double>("max_value");
         HKU_ASSERT(min_v <= max_v);
+        // The sampled value is folded to a positive amplitude via abs and applied in the
+        // unfavorable direction, so the effective slippage is bounded by max(|min_v|, |max_v|).
+        // Warn on an absurd amplitude that would move the price by more than 100%.
+        HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
+                    "The amplitude of SP_TruncNormal is too large (>{:.2f}), the slippage may "
+                    "move the price by more than 100%",
+                    1.0);
     }
 }
 
@@ -62,58 +139,26 @@ void TruncNormalSlippage::_reset() {
     }
 }
 
-price_t TruncNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t TruncNormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
 
-    std::normal_distribution<double> dis(mean, stddev);
-
-    double value;
-    // Generate a value within the truncated range; clamp to the boundary after a
-    // bounded number of rejections, otherwise a range far from the mean would
-    // practically never terminate
-    int count = 0;
-    do {
-        value = dis(m_gen);
-        ++count;
-    } while ((value < min_v || value > max_v) && count < 128);
-    if (value < min_v) {
-        value = min_v;
-    } else if (value > max_v) {
-        value = max_v;
-    }
-
+    double value = sampleTruncNormal(mean, stddev, min_v, max_v, m_gen);
     // The range is an amplitude range: the sampled value is folded to a positive
     // amplitude via abs and then applied in the unfavorable direction
     // On a buy the price always goes higher (the unfavorable direction)
     return price + std::abs(value);
 }
 
-price_t TruncNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t TruncNormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
 
-    std::normal_distribution<double> dis(mean, stddev);
-
-    double value;
-    // Generate a value within the truncated range; clamp to the boundary after a
-    // bounded number of rejections, otherwise a range far from the mean would
-    // practically never terminate
-    int count = 0;
-    do {
-        value = dis(m_gen);
-        ++count;
-    } while ((value < min_v || value > max_v) && count < 128);
-    if (value < min_v) {
-        value = min_v;
-    } else if (value > max_v) {
-        value = max_v;
-    }
-
+    double value = sampleTruncNormal(mean, stddev, min_v, max_v, m_gen);
     // The range is an amplitude range: the sampled value is folded to a positive
     // amplitude via abs and then applied in the unfavorable direction
     // On a sell the price always goes lower (the unfavorable direction)

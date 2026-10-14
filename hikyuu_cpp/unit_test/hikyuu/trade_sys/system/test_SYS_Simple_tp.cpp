@@ -70,11 +70,11 @@ public:
         return make_shared<Iss081RecoveredGapTP>(m_gap, name());
     }
 
-    virtual price_t getPrice(const Datetime& datetime, price_t) override {
+    virtual price_t _getPrice(const Datetime& datetime, price_t) override {
         return levelOf(datetime);
     }
 
-    virtual price_t getShortPrice(const Datetime& datetime, price_t) override {
+    virtual price_t _getShortPrice(const Datetime& datetime, price_t) override {
         return levelOf(datetime);
     }
 
@@ -102,7 +102,7 @@ public:
         return make_shared<Iss081ScriptedTP>();
     }
 
-    virtual price_t getPrice(const Datetime& datetime, price_t) override {
+    virtual price_t _getPrice(const Datetime& datetime, price_t) override {
         auto iter = m_script.find(datetime);
         return iter == m_script.end() ? 0.0 : iter->second;
     }

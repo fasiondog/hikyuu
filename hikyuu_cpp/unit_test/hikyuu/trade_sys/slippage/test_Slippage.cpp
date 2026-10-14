@@ -16,11 +16,11 @@ public:
     SlippageTest() : SlippageBase("SlippageTest"), m_x(0) {}
     virtual ~SlippageTest() {}
 
-    virtual price_t getRealBuyPrice(const Datetime &datetime, price_t price) {
+    virtual price_t _getRealBuyPrice(const Datetime &datetime, price_t price) override {
         return m_x < 10 ? 0.0 : 1.0;
     }
 
-    virtual price_t getRealSellPrice(const Datetime &datetime, price_t price) {
+    virtual price_t _getRealSellPrice(const Datetime &datetime, price_t price) override {
         return m_x < 10 ? 0.0 : 1.0;
     }
 

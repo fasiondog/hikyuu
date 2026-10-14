@@ -49,7 +49,7 @@ void NormalSlippage::_reset() {
     }
 }
 
-price_t NormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t NormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
 
@@ -59,7 +59,7 @@ price_t NormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price)
     return price + std::abs(value);
 }
 
-price_t NormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t NormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
 

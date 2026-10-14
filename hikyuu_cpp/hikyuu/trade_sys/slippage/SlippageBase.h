@@ -47,20 +47,21 @@ public:
     SlippagePtr clone();
 
     /**
-     * Calculate the actual buy price
+     * Get the actual buy price. This is a non-virtual wrapper that calls the subclass
+     * _getRealBuyPrice and clamps the result to not exceed the day's high.
      * @param datetime buy moment
      * @param planPrice planned buy price
      * @return the actual buy price
      */
-    virtual price_t getRealBuyPrice(const Datetime& datetime, price_t planPrice) = 0;
+    price_t getRealBuyPrice(const Datetime& datetime, price_t planPrice);
 
     /**
-     * Calculate the actual sell price
+     * Get the actual sell price. See getRealBuyPrice.
      * @param datetime sell moment
      * @param planPrice planned sell price
      * @return the actual sell price
      */
-    virtual price_t getRealSellPrice(const Datetime& datetime, price_t planPrice) = 0;
+    price_t getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
     /** Subclass clone interface */
     virtual SlippagePtr _clone() = 0;
@@ -70,6 +71,23 @@ public:
 
     /** Subclass calculation interface, it is called by setTO */
     virtual void _calculate() = 0;
+
+    /**
+     * Subclass interface: compute the raw buy price (without the day-range clamp).
+     * Override this instead of getRealBuyPrice; the base class applies the clamp.
+     * @param datetime buy moment
+     * @param planPrice planned buy price
+     * @return the raw buy price
+     */
+    virtual price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice) = 0;
+
+    /**
+     * Subclass interface: compute the raw sell price (without the day-range clamp).
+     * @param datetime sell moment
+     * @param planPrice planned sell price
+     * @return the raw sell price
+     */
+    virtual price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice) = 0;
 
     bool isPythonObject() const noexcept {
         return m_is_python_object;
@@ -139,8 +157,8 @@ public:                                                                  \
     virtual SlippagePtr _clone() override {                              \
         return std::make_shared<classname>();                            \
     }                                                                    \
-    virtual price_t getRealBuyPrice(const Datetime&, price_t) override;  \
-    virtual price_t getRealSellPrice(const Datetime&, price_t) override; \
+    virtual price_t _getRealBuyPrice(const Datetime&, price_t) override;  \
+    virtual price_t _getRealSellPrice(const Datetime&, price_t) override; \
     virtual void _calculate() override;
 
 /**

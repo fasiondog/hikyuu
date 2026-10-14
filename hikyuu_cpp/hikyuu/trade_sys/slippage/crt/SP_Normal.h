@@ -12,8 +12,9 @@
 namespace hku {
 
 /**
- * Normal distribution random price slippage algorithm: the buy and sell operations are a random
- * price offset based on the normal distribution
+ * Normal distribution random price slippage algorithm: the sampled value is folded to a
+ * non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan
+ * price plus the amplitude and the sell price is the plan price minus the amplitude.
  * @param mean mean of the normal distribution
  * @param stddev standard deviation of the normal distribution
  * @return the slippage object pointer

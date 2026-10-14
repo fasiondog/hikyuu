@@ -5,7 +5,10 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include "SlippageBase.h"
+#include "hikyuu/KRecord.h"
+#include "hikyuu/Stock.h"
 
 namespace hku {
 
@@ -53,6 +56,33 @@ void SlippageBase::setTO(const KData& kdata) {
     if (!kdata.empty()) {
         _calculate();
     }
+}
+
+price_t SlippageBase::getRealBuyPrice(const Datetime& datetime, price_t planPrice) {
+    const price_t price = _getRealBuyPrice(datetime, planPrice);
+    if (m_kdata.empty()) {
+        return price;
+    }
+    const KRecord& k = m_kdata.getKRecord(datetime);
+    if (k == KRecord::NullKRecord) {
+        return price;
+    }
+    return std::min(price, k.highPrice);
+}
+
+price_t SlippageBase::getRealSellPrice(const Datetime& datetime, price_t planPrice) {
+    const price_t price = _getRealSellPrice(datetime, planPrice);
+    if (m_kdata.empty()) {
+        return price;
+    }
+    const KRecord& k = m_kdata.getKRecord(datetime);
+    if (k == KRecord::NullKRecord) {
+        // Without the day's low, at least keep a non-negative, tick-aligned price
+        const Stock& stock = m_kdata.getStock();
+        const price_t floor = stock.isNull() ? 0.0 : stock.tick();
+        return std::max(price, floor);
+    }
+    return std::max(price, k.lowPrice);
 }
 
 } /* namespace hku */

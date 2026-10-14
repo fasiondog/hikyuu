@@ -63,14 +63,14 @@ public:
      * @param datetime trade time
      * @param price the planned buy price
      * @note Generally the algorithms of the stop-loss and the take-profit can be interchanged, but
-     *       the getPrice of the stop-loss can be passed the price of the planned trade, for example
+     *       the stop-loss can be passed the price of the planned trade, for example
      *       taking 30% of the buy price as the stop-loss. The take-profit does not consider the
      *       passed price parameter, i.e. it regards price as 0.0. In fact, even for the stop-loss
      * it is not recommended to use the price parameter; for example 30% of the previous day's low
      *       price can be used as the stop-loss, then the price parameter does not need to be
      *       considered
      */
-    virtual price_t getPrice(const Datetime& datetime, price_t price) = 0;
+    price_t getPrice(const Datetime& datetime, price_t price);
 
     /**
      * Get the planned stop-loss price of the current expected trade (a short sell); 0 is returned
@@ -82,7 +82,18 @@ public:
      *       implementation returns 0 (no short stop-loss is provided), subclasses supporting short
      *       selling must override it; it must not fall back to the long-side getPrice result
      */
-    virtual price_t getShortPrice(const Datetime& datetime, price_t price) {
+    price_t getShortPrice(const Datetime& datetime, price_t price);
+
+    /** Subclass interface: compute the planned stop-loss price of the current expected trade (a buy); 0 means no stop-loss */
+    virtual price_t _getPrice(const Datetime& datetime, price_t price) = 0;
+
+    /**
+     * Subclass interface: compute the planned stop-loss price of a short sell; default 0 (no short
+     * stop-loss is provided).
+     * @note Unlike a long stop-loss, a short one must be above the planned trade price, and must not
+     *       fall back to the long-side _getPrice result
+     */
+    virtual price_t _getShortPrice(const Datetime& datetime, price_t price) {
         return 0.0;
     }
 
@@ -101,6 +112,7 @@ public:
 
 protected:
     bool m_is_python_object{false};
+    bool m_calculated{false};
     string m_name;
     TradeManagerPtr m_tm;
     KData m_kdata;
@@ -169,7 +181,7 @@ public:                                       \
         return std::make_shared<classname>(); \
     }                                         \
     virtual void _calculate() override;       \
-    virtual price_t getPrice(const Datetime&, price_t) override;
+    virtual price_t _getPrice(const Datetime&, price_t) override;
 
 /**
  * Client programs should all use this pointer type to operate the stop-loss strategy instance

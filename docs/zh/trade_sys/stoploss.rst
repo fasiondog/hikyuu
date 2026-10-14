@@ -60,6 +60,8 @@
 
 自定义止损/止赢策略接口：
 
+* :py:meth:`StoplossBase._get_price` - 【必须】计算原始多头止损价格
+* :py:meth:`StoplossBase._get_short_price` - 【必须】计算原始空头止损价格（默认返回0；空头止损价须高于计划交易价）
 * :py:meth:`StoplossBase._calculate` - 【必须】子类计算接口
 * :py:meth:`StoplossBase._clone` - 【必须】克隆接口
 * :py:meth:`StoplossBase._reset` - 【可选】重载私有变量
@@ -106,14 +108,41 @@
 
     .. py:method:: get_price(self, datetime, price)
     
-        【重载接口】获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。用于系统在交易执行前向止损策略模块查询本次交易的计划止损价。
-        
-        .. note::
-            一般情况下，止损/止赢的算法可以互换，但止损的getPrice可以传入计划交易的价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价的30%作为止损，则不需要考虑price参数。
+        【公共方法】获取本次预期交易（买入）时的计划止损价格，如果不存在止损价，则返回0。内部调用子类钩子 _get_price。Python 子类应重写 _get_price，不要重写此方法。
         
         :param Datetime datetime: 交易时间
         :param float price: 计划买入的价格
         :return: 止损价格
+        :rtype: float
+        
+    .. py:method:: get_short_price(self, datetime, price)
+    
+        【公共方法】获取本次预期交易（卖空）时的计划止损价格，如果不存在止损价，则返回0。内部调用子类钩子 _get_short_price。Python 子类应重写 _get_short_price，不要重写此方法。
+        
+        :param Datetime datetime: 交易时间
+        :param float price: 计划交易价格
+        :return: 空头止损价格
+        :rtype: float
+        
+    .. py:method:: _get_price(self, datetime, price)
+    
+        【重载接口】计算原始多头止损价格，公共方法 get_price 会委托给该钩子，基类不做额外处理，直接返回计划止损价（0 表示无止损）。
+        
+        .. note::
+            一般情况下，止损/止赢的算法可以互换，但止损的 _get_price 可以传入计划交易的价格，比如以买入价格的30%做为止损。而止赢则不考虑传入的price参数，即认为price为0.0。实际上，即使止损也不建议使用price参数，如可以使用前日最低价的30%作为止损，则不需要考虑price参数。
+        
+        :param Datetime datetime: 交易时间
+        :param float price: 计划买入的价格
+        :return: 止损价格
+        :rtype: float
+        
+    .. py:method:: _get_short_price(self, datetime, price)
+    
+        【重载接口】计算原始空头止损价格，公共方法 get_short_price 会委托给该钩子，默认返回0（即无空头止损）。与多头止损不同，空头止损价须高于计划交易价，且不得回退到多头的 _get_price 结果。
+        
+        :param Datetime datetime: 交易时间
+        :param float price: 计划交易价格
+        :return: 空头止损价格
         :rtype: float
         
     .. py:method:: _calculate(self)

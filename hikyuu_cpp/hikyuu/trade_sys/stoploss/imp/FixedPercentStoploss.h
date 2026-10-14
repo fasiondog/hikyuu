@@ -25,6 +25,7 @@ public:
     FixedPercentStoploss();
     virtual ~FixedPercentStoploss();
     virtual void _checkParam(const string& name) const override;
+    virtual price_t _getShortPrice(const Datetime& datetime, price_t price) override;
 };
 
 } /* namespace hku */

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include <random>
 #include "LogNormalSlippage.h"
 
@@ -29,6 +30,9 @@ void LogNormalSlippage::_checkParam(const string& name) const {
         HKU_ASSERT(!std::isnan(getParam<double>("mean")));
     } else if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
+        HKU_WARN_IF(getParam<double>("stddev") > 1.0,
+                    "The stddev of SP_LogNormal is too large (>{:.2f}); the slippage may be extreme",
+                    1.0);
     }
 }
 
@@ -50,7 +54,7 @@ void LogNormalSlippage::_reset() {
     }
 }
 
-price_t LogNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t LogNormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
 
@@ -64,7 +68,7 @@ price_t LogNormalSlippage::getRealBuyPrice(const Datetime& datetime, price_t pri
     return price + std::abs(centered_value);
 }
 
-price_t LogNormalSlippage::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t LogNormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
 

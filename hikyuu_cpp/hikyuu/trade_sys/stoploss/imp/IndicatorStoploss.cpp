@@ -5,6 +5,8 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
+#include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "IndicatorStoploss.h"
 
@@ -21,8 +23,9 @@ IndicatorStoploss::IndicatorStoploss(const Indicator& op)
 
 IndicatorStoploss::~IndicatorStoploss() {}
 
-price_t IndicatorStoploss::getPrice(const Datetime& datetime, price_t price) {
-    return m_result.count(datetime) ? m_result[datetime] : 0.0;
+price_t IndicatorStoploss::_getPrice(const Datetime& datetime, price_t price) {
+    auto it = m_result.find(datetime);
+    return it == m_result.end() ? 0.0 : it->second;
 }
 
 void IndicatorStoploss::_reset() {
@@ -31,18 +34,24 @@ void IndicatorStoploss::_reset() {
 
 StoplossPtr IndicatorStoploss::_clone() {
     auto p = make_shared<IndicatorStoploss>();
-    p->m_ind = m_ind;
+    p->m_ind = m_ind.clone();
     p->m_result = m_result;
     return p;
 }
 
 void IndicatorStoploss::_calculate() {
-    Indicator ind = m_ind(m_kdata);
+    // Align the indicator to the trading object so that ind and m_kdata share the same date
+    // range; otherwise an index mismatch would read m_kdata out of bounds.
+    Indicator ind = ALIGN(m_ind(m_kdata), m_kdata);
     size_t total = ind.size();
     auto const* ind_data = ind.data();
     auto const* ks = m_kdata.data();
     for (size_t i = ind.discard(); i < total; ++i) {
-        m_result[ks[i].datetime] = ind_data[i];
+        // Drop non-finite values: a NaN stop price would silently disable the stop-loss (the
+        // system clamps it to 0) or, on a limit-up/down bar, be treated as a real price.
+        if (std::isfinite(ind_data[i])) {
+            m_result[ks[i].datetime] = ind_data[i];
+        }
     }
 }
 
