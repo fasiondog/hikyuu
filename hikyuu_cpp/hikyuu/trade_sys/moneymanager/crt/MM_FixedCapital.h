@@ -16,7 +16,8 @@ namespace hku {
 /**
  * Fixed capital money management strategy
  * Formula: buy quantity = current cash / capital
- * @param capital
+ * @param capital the fixed amount allocated per tranche; does not adapt to price, so it must be
+ *         tuned to the account scale and instrument price range
  * @return MoneyManagerPtr
  */
 MoneyManagerPtr HKU_API MM_FixedCapital(double capital = 10000.00);

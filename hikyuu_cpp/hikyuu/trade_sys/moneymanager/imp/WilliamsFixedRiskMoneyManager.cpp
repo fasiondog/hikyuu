@@ -24,7 +24,7 @@ WilliamsFixedRiskMoneyManager::~WilliamsFixedRiskMoneyManager() {}
 void WilliamsFixedRiskMoneyManager::_checkParam(const string& name) const {
     if ("p" == name) {
         double p = getParam<double>("p");
-        HKU_ASSERT(p > 0.0);
+        HKU_ASSERT(p > 0.0 && p <= 1.0);
     } else if ("max_loss" == name) {
         price_t max_loss = getParam<price_t>("max_loss");
         HKU_ASSERT(max_loss > 0.0);

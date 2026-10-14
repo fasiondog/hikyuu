@@ -35,6 +35,8 @@ private:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(MoneyManagerBase);
+        ar& BOOST_SERIALIZATION_NVP(m_buy_counts);
+        ar& BOOST_SERIALIZATION_NVP(m_sell_counts);
     }
 #endif
 };

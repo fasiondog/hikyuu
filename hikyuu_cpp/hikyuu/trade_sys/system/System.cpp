@@ -461,8 +461,8 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
                     HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
                     HKU_INFO("| total       | cash        | profit      | market      | position    | close price | stoploss    | goal price  | total cost  |");
                     HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
-                    HKU_INFO("| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}|", 
-                        funds.total_assets(), funds.cash, funds.profit(), funds.market_value, position.number, src_ks[i].closePrice, 
+                    HKU_INFO("| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}| {:<12.2f}|",
+                        funds.total_assets(), funds.cash, funds.profit(), funds.market_value, position.number, src_ks[i].closePrice,
                         position.stoploss, position.goalPrice, position.totalCost);
                     HKU_INFO("+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+");
                     // clang-format on
@@ -874,7 +874,7 @@ TradeRecord System::_buy(const KRecord& today, const KRecord& src_today, Part fr
     }
 
     // Delay the trade when the volume and the turnover amount are 0
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace, htr("[{}] delay to buy, current amount == 0 or count == 0", name()));
         _submitBuyRequest(today, src_today, from);
         return result;
@@ -905,7 +905,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);
     number = int64_t(number / min_num) * min_num;
-    if (iszero(number) || number > m_stock.maxTradeNumber()) {
+    if (number == 0.0 || number > m_stock.maxTradeNumber()) {
         HKU_INFO_IF(trace, "[{}] {}, number: {} == 0 or > maxTradeNumber: {}, {}", name(),
                     htr("buy failed"), number, m_stock.maxTradeNumber(), m_mm);
         return result;
@@ -935,7 +935,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
     }
 
     // Delay the trade when the volume and the turnover amount are 0
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace, htr("[{}] delay to buy, current amount == 0 or count == 0", name()));
         return result;
     }
@@ -1053,9 +1053,9 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);
     // MAX_DOUBLE is the "sell everything" sentinel of the quantity and must be resolved before the
-    // board-lot rounding below: the double -> int64 conversion of an out-of-range value is undefined
-    // behavior, and its result differs between compilers and platforms (it used to make the sell fail
-    // on MSVC while selling the whole position on clang/arm64)
+    // board-lot rounding below: the double -> int64 conversion of an out-of-range value is
+    // undefined behavior, and its result differs between compilers and platforms (it used to make
+    // the sell fail on MSVC while selling the whole position on clang/arm64)
     double real_sell_num;
     if (num >= MAX_DOUBLE || num >= position.number) {
         real_sell_num = position.number;
@@ -1117,7 +1117,7 @@ TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part f
         }
     }
 
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace, htr("[{}] delay to sell, current amount == 0 or count == 0", name()));
         _submitSellRequest(today, src_today, from);
         return result;
@@ -1171,7 +1171,7 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
         return result;
     }
 
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace, htr("[{}] delay to sell, current amount == 0 or count == 0", name()));
         return result;
     }
@@ -1300,7 +1300,7 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
         }
     }
 
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to buy short, current amount == 0 or count == 0", name()));
         _submitBuyShortRequest(today, src_today, from);
@@ -1366,7 +1366,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         return result;
     }
 
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to buy short, current amount == 0 or count == 0", name()));
         return result;
@@ -1501,7 +1501,7 @@ TradeRecord System::_sellShort(const KRecord& today, const KRecord& src_today, P
         }
     }
 
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to sell short, current amount == 0 or count == 0", name()));
         _submitSellShortRequest(today, src_today, from);
@@ -1556,7 +1556,7 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
         return result;
     }
 
-    if (iszero(today.transAmount) || iszero(today.transCount)) {
+    if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to sell short, current amount == 0 or count == 0", name()));
         return result;

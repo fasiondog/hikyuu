@@ -29,14 +29,20 @@
 .. py:function:: MM_FixedCount([n = 100])
 
     固定交易数量资金管理策略。每次买入固定的数量。
-    
+
     :param float n: 每次买入的数量（应该是交易对象最小交易数量的整数，此处程序没有此进行判断）
     :return: 资金管理策略实例
 
 .. py:function:: MM_FixedCountTps([buy_counts, sell_counts])
-          
+
     连续买入/卖出固定数量资金管理策略。
-    
+
+    止损价被击穿（每股风险 <= 0）、卖出档位用尽或卖出数量超过当前持仓（如除权后）时，卖出全部剩余持仓。
+
+    每档数量必须是有限的严格正数（不得为 NaN/Inf/0/负数），若少一档请使用更短的列表；buy_counts 不能为空（至少需要一档）。
+
+    sell_counts 允许为空：空列表被视为"卖出档位立即用尽"，首笔卖出信号即全部平仓。
+
     :param list buy_counts: 买入数量列表
     :param list sell_counts: 卖出数量列表
     :return: 资金管理策略实例
@@ -51,7 +57,7 @@
 
     :param float risk: 固定风险
     :return: 资金管理策略实例
-    
+
 
 固定资本资金管理策略
 ^^^^^^^^^^^^^^^^^^^^
@@ -68,7 +74,7 @@
     固定资本管理策略。买入数量 = 当前总资产 / capital
 
     :param float capital: 固定资本单位
-    :return: 资金管理策略实例    
+    :return: 资金管理策略实例
 
 
 固定单位资金风险管理策略
@@ -80,30 +86,30 @@
 
     :param int n: n个资金单位
     :return: 资金管理策略实例
-    
+
 
 威廉斯固定风险资金管理策略
-^^^^^^^^^^^^^^^^^^^^^^^^^^  
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
     威廉斯固定风险资金管理策略，买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
-    
+
     :param float p: 风险百分比
     :param float max_loss: 最大损失
     :return: 资金管理策略实例
 
-    
+
 固定百分比资金管理策略
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. py:function:: MM_FixedPercent([p = 0.03])
 
     固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
-    
+
     :param float p: 百分比
     :return: 资金管理策略实例
-    
+
 
 固定波幅资金管理策略
 ^^^^^^^^^^^^^^^^^^^^
@@ -127,50 +133,50 @@
 .. py:class:: MoneyManagerBase
 
     资金管理策略基类
-    
+
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
-    
+
     .. py:method:: __init__(self[, name="MoneyManagerBase])
-    
+
         初始化构造函数
-        
+
         :param str name: 名称
-        
+
     .. py:method:: get_param(self, name)
 
         获取指定的参数
-        
+
         .. note::
 
             所有的资金管理策略具有参数“auto-checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
-    
+
         :param str name: 参数名称
         :return: 参数值
         :raises out_of_range: 无此参数
-        
+
     .. py:method:: set_param(self, name, value)
-    
+
         设置参数
-        
+
         :param str name: 参数名称
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-        
+
     .. py:method:: reset(self)
-    
+
         复位操作
-    
+
     .. py:method:: clone(self)
-    
+
         克隆操作
-        
+
     .. py:method:: get_buy_num(self, datetime, stock, price, risk, part_from)
-    
+
         获取指定交易对象可买入的数量
-        
+
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格
@@ -178,11 +184,11 @@
         :param System.Part part_from: 来源系统组件
         :return: 可买入数量
         :rtype: float
-        
+
     .. py:method:: get_sell_num(self, datetime, stock, price, risk, part_from)
-    
+
         获取指定交易对象可卖出的数量
-        
+
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格
@@ -198,23 +204,23 @@
     .. py:method:: current_sell_count(self, stock)
 
         当前连续卖出计数
-        
+
     .. py:method:: _buy_notify(self, trade_record)
-    
+
         【重载接口】交易系统发生实际买入操作时，通知交易变化情况，一般存在多次增减仓的情况才需要重载
-        
+
         :param TradeRecord trade_record: 发生实际买入时的实际买入交易记录
-        
+
     .. py:method:: _sell_notify(self, trade_record)
-    
+
         【重载接口】交易系统发生实际卖出操作时，通知实际交易变化情况，一般存在多次增减仓的情况才需要重载
-        
+
         :param TradeRecord trade_record: 发生实际卖出时的实际卖出交易记录
-    
+
     .. py:method:: _get_buy_num(self, datetime, stock, price, risk, part_from)
 
         【重载接口】获取指定交易对象可买入的数量
-        
+
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格
@@ -224,9 +230,9 @@
         :rtype: float
 
     .. py:method:: _get_sell_num(self, datetime, stock, price, risk, part_from)
-    
+
         【重载接口】获取指定交易对象可卖出的数量。如未重载，默认为卖出全部已持仓数量。
-        
+
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格
@@ -234,11 +240,11 @@
         :param System.Part part_from: 来源系统组件
         :return: 可卖出数量
         :rtype: float
-        
+
     .. py:method:: _reset(self)
-    
+
         【重载接口】子类复位接口，复位内部私有变量
-    
+
     .. py:method:: _clone(self)
-    
+
         【重载接口】子类克隆接口

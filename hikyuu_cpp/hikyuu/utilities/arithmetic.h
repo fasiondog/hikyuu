@@ -18,6 +18,7 @@
 #include <string>
 #include <algorithm>
 
+#include "Null.h"
 #include "string_view.h"
 
 #ifndef HKU_UTILS_API
@@ -229,6 +230,37 @@ extern template float HKU_UTILS_API roundDown(float number, int ndigits);
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
+/**
+ * Compare two floating-point values within a relative tolerance of a few ULPs. An absolute
+ * epsilon is scale-sensitive: it misses equal-by-intent values at large magnitudes (the ULP of
+ * 1e20 is much larger than 1e-9) while falsely matching tiny non-zero values near 0. NaN never
+ * matches; infinities are equal only via ==, otherwise the tolerance band becomes inf.
+ */
+template <typename ValueT>
+inline bool nearly_equal(ValueT a, ValueT b) {
+    static_assert(std::numeric_limits<ValueT>::is_iec559,
+                  "nearly_equal requires a floating-point type");
+    if (a == b)
+        return true;  // bitwise equal, including +0.0 == -0.0
+    if (std::isnan(a) || std::isnan(b) || std::isinf(a) || std::isinf(b))
+        return false;
+    ValueT scale = std::max(std::fabs(a), std::fabs(b));
+    return std::fabs(a - b) <= 8 * std::numeric_limits<ValueT>::epsilon() * scale;
+}
+
+/**
+ * Guard an element-wise math result for math indicators (LN/LOG/SQRT/ACOS/ASIN/EXP/POW, etc.):
+ * a non-finite value (NaN / +-inf) is mapped to the framework null, so that -inf from LN(0)/LOG(0)
+ * or +inf from EXP/POW overflow is not leaked downstream and does not pollute later bars; NaN is
+ * already the framework's null representation.
+ */
+template <typename ValueT>
+inline ValueT safe_math(ValueT v) {
+    static_assert(std::numeric_limits<ValueT>::is_iec559,
+                  "safe_math requires a floating-point type");
+    return std::isfinite(v) ? v : Null<ValueT>();
+}
 
 /** Convert an ASCII string to lowercase */
 inline void to_lower(std::string &s) noexcept {

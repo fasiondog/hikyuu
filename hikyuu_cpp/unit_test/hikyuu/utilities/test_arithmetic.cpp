@@ -200,4 +200,61 @@ TEST_CASE("test_split_by_string") {
     CHECK_EQ(splits[2], "");
 }
 
+/** @par Test points */
+TEST_CASE("test_nearly_equal") {
+    using limits = std::numeric_limits<double>;
+
+    /** @arg Bitwise equal values match, incl. +0 == -0 */
+    CHECK_UNARY(nearly_equal(1.0, 1.0));
+    CHECK_UNARY(nearly_equal(0.0, -0.0));
+
+    /** @arg NaN never matches, even itself */
+    double nan = limits::quiet_NaN();
+    CHECK_UNARY(!nearly_equal(nan, nan));
+    CHECK_UNARY(!nearly_equal(nan, 1.0));
+
+    /** @arg Infinities match only via == (same sign); opposite signs or inf-vs-largest-finite do
+     *  not, otherwise the tolerance band would be inf */
+    double inf = limits::infinity();
+    CHECK_UNARY(nearly_equal(inf, inf));
+    CHECK_UNARY(nearly_equal(-inf, -inf));
+    CHECK_UNARY(!nearly_equal(inf, -inf));
+    CHECK_UNARY(!nearly_equal(inf, limits::max()));
+
+    /** @arg One ULP apart matches at price and large magnitudes (an absolute 1e-9 epsilon would
+     *  miss the 1e20 case) */
+    CHECK_UNARY(nearly_equal(100.0, std::nextafter(100.0, 101.0)));
+    CHECK_UNARY(nearly_equal(1e20, std::nextafter(1e20, 1e21)));
+
+    /** @arg A tiny non-zero value does not falsely match 0 (relative scale of 0 is 0) */
+    CHECK_UNARY(!nearly_equal(0.0, 1e-20));
+
+    /** @arg Clearly different values never match */
+    CHECK_UNARY(!nearly_equal(1.0, 2.0));
+
+    /** @arg Float version behaves the same */
+    CHECK_UNARY(nearly_equal(100.0f, std::nextafter(100.0f, 101.0f)));
+    CHECK_UNARY(!nearly_equal(1.0f, 2.0f));
+}
+
+/** @par Test points */
+TEST_CASE("test_safe_math") {
+    using limits = std::numeric_limits<double>;
+
+    /** @arg A finite value passes through unchanged */
+    CHECK_EQ(safe_math(1.5), 1.5);
+    CHECK_EQ(safe_math(-3.0), -3.0);
+
+    /** @arg NaN passes through as NaN (framework null already uses NaN) */
+    CHECK_UNARY(std::isnan(safe_math(limits::quiet_NaN())));
+
+    /** @arg +-Inf is folded to Null (NaN) so it does not leak downstream */
+    CHECK_UNARY(std::isnan(safe_math(limits::infinity())));
+    CHECK_UNARY(std::isnan(safe_math(-limits::infinity())));
+
+    /** @arg Zero and -0 are finite and pass through (not folded to Null) */
+    CHECK_EQ(safe_math(0.0), 0.0);
+    CHECK_UNARY(!std::isnan(safe_math(-0.0)));
+}
+
 /** @} */
