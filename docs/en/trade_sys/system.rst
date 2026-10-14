@@ -45,6 +45,13 @@ Common parameters:
     * **shared_pg=False** *(bool)*: Whether the pg part is shared
     * **shared_sp=False** *(bool)*: Whether the sp part is shared
 
+    .. note::
+        Currently, except for the ev (market environment) part, all other shared parts (tm, cn, mm, sg,
+        st, tp, pg, sp) have no internal lock; sharing them across concurrently-run systems would be a
+        data race. Therefore, systems running in parallel should not share these parts — each system
+        should use its own clone (i.e. keep the corresponding ``shared_*=False``). This is the current
+        implementation and may be extended to support thread-safe sharing in the future.
+
 
 .. raw:: html
 
