@@ -77,8 +77,8 @@ void StrategyContext::_removeDuplicateCode(const vector<string>& stockCodeList) 
     for (const auto& code : stockCodeList) {
         string upper_code = code;
         to_upper(upper_code);
-        if (code_set.find(upper_code) == code_set.end()) {
-            code_set.insert(upper_code);
+        auto [it, inserted] = code_set.insert(upper_code);
+        if (inserted) {
             m_stockCodeList.push_back(upper_code);
         }
     }

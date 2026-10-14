@@ -63,7 +63,7 @@ void HKU_API stopShmServer() noexcept {
 }
 
 bool HKU_API isShmServerRunning() noexcept {
-    ShmServerPluginInterface* plugin = g_shm_server_plugin.load(std::memory_order_acquire);
+    const ShmServerPluginInterface* plugin = g_shm_server_plugin.load(std::memory_order_acquire);
     return plugin ? plugin->running() : false;
 }
 

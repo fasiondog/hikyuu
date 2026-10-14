@@ -132,19 +132,17 @@ void IAdx::_calculate(const Indicator& data) {
 
     m_discard = adx_start;
 
-    if (adx_start < total) {
-        value_t dx_sum = 0.0;
-        for (size_t i = period; i < adx_start; i++) {
-            value_t sum = pdi[i] + mdi[i];
-            dx_sum += (sum != 0.0) ? 100.0 * std::abs(pdi[i] - mdi[i]) / sum : 0.0;
-        }
-        adx[adx_start] = dx_sum / (n - 1);
+    value_t dx_sum = 0.0;
+    for (size_t i = period; i < adx_start; i++) {
+        value_t sum = pdi[i] + mdi[i];
+        dx_sum += (sum != 0.0) ? 100.0 * std::abs(pdi[i] - mdi[i]) / sum : 0.0;
+    }
+    adx[adx_start] = dx_sum / (n - 1);
 
-        for (size_t i = adx_start + 1; i < total; i++) {
-            value_t sum = pdi[i] + mdi[i];
-            value_t dx = (sum != 0.0) ? 100.0 * std::abs(pdi[i] - mdi[i]) / sum : 0.0;
-            adx[i] = adx[i - 1] * prev_factor + dx * smooth_factor;
-        }
+    for (size_t i = adx_start + 1; i < total; i++) {
+        value_t sum = pdi[i] + mdi[i];
+        value_t dx = (sum != 0.0) ? 100.0 * std::abs(pdi[i] - mdi[i]) / sum : 0.0;
+        adx[i] = adx[i - 1] * prev_factor + dx * smooth_factor;
     }
 
     for (size_t i = 0; i < period; i++) {

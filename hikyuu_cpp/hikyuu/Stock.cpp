@@ -503,7 +503,7 @@ void Stock::loadKDataToBuffer(KQuery::KType kType) const {
     }
 }
 
-KRecordList Stock::getKRecordListFromBuffer(KQuery::KType inkType) const {
+KRecordList Stock::getKRecordListFromBuffer(const KQuery::KType& inkType) const {
     KRecordList result;
     HKU_IF_RETURN(!m_data, result);
     string kType(inkType);

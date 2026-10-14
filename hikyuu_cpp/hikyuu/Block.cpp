@@ -201,8 +201,8 @@ uint64_t Block::strongHash() const {
         ids.push_back(kv.second.id());
     }
     std::sort(ids.begin(), ids.end());
-    for (uint64_t id : ids) {
-        XXH64_update(state, &id, sizeof(id));
+    for (uint64_t idx : ids) {
+        XXH64_update(state, &idx, sizeof(idx));
     }
 
     // Get the final hash value

@@ -235,7 +235,7 @@ void ISlope::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step)
         return;
     }
 
-    if (step != 0 && curPos - start + 1 < step) {
+    if (curPos - start + 1 < step) {
         _set(Null<price_t>(), curPos);
         _set(Null<price_t>(), curPos, 1);
         _set(Null<price_t>(), curPos, 2);

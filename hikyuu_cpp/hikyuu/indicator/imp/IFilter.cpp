@@ -37,11 +37,10 @@ void IFilter::_calculate(const Indicator& ind) {
         return;
     }
 
-    auto const* src = ind.data();
-    auto* dst = this->data();
-
     int n = getParam<int>("n");
     if (0 == n) {
+        auto const* src = ind.data();
+        auto* dst = this->data();
         for (size_t i = m_discard; i < total; i++) {
             dst[i] = (std::isfinite(src[i]) && src[i] != 0.0) ? 1.0 : 0.0;
         }

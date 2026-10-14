@@ -281,7 +281,7 @@ public:
     void loadKDataToBuffer(KQuery::KType) const;
 
     /** Get a full copy of the cached K-line data of the given type; empty if not cached */
-    KRecordList getKRecordListFromBuffer(KQuery::KType) const;
+    KRecordList getKRecordListFromBuffer(const KQuery::KType& ktype) const;
 
     /** Release the K-line cache of the given type */
     void releaseKDataBuffer(KQuery::KType) const;

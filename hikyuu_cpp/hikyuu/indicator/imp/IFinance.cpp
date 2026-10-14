@@ -92,9 +92,9 @@ void IFinance::_increment_calculate(const Indicator& data, size_t start_pos) {
     }
 
     // Rely on values.at to fail fast (a per-record data property); only enrich the message
-    size_t cur_kix = start_pos;
-    size_t pos = 0;
     try {
+        size_t cur_kix = start_pos;
+        size_t pos = 0;
         while (pos < finances_total && cur_kix < total) {
             auto value = finances[pos].values.at(field_ix);
             if (pos + 1 == finances_total) {

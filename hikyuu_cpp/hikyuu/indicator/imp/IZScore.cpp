@@ -103,7 +103,7 @@ void IZScore::_calculate(const Indicator &data) {
     auto *dst = this->data() + m_discard;
     normalize(dst, src, total - m_discard, outExtreme, nsigma, recursive);
 
-    auto *full = this->data();
+    const auto *full = this->data();
     while (m_discard < total && !std::isfinite(full[m_discard])) {
         ++m_discard;
     }

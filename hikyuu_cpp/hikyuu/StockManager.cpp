@@ -330,7 +330,8 @@ struct LoadEventState {
 };
 LoadEventState* g_load_event = new LoadEventState;
 std::atomic<bool> g_shm_server_role{false};
-thread_local size_t t_dispatch_depth{0};  // unregistering inside a callback must not wait for itself
+thread_local size_t t_dispatch_depth{
+  0};  // unregistering inside a callback must not wait for itself
 }  // namespace
 
 size_t registerLoadEventCallback(LoadEventCallback&& cb) {
@@ -344,12 +345,10 @@ void unregisterLoadEventCallback(size_t id) {
     {
         std::unique_lock<std::shared_mutex> lock(g_load_event->mutex);
         auto& v = g_load_event->callbacks;
-        v.erase(
-          std::remove_if(v.begin(), v.end(),
-                         [id](const std::pair<size_t, LoadEventCallback>& p) {
-                             return p.first == id;
-                         }),
-          v.end());
+        v.erase(std::remove_if(
+                  v.begin(), v.end(),
+                  [id](const std::pair<size_t, LoadEventCallback>& p) { return p.first == id; }),
+                v.end());
     }
     if (t_dispatch_depth > 0) {
         return;
@@ -468,13 +467,13 @@ void StockManager::loadAllKData() {
     });
 }
 
-void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes, vector<string> low_ktypes,
-                                       bool parallel) {
+void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes,
+                                       const vector<string>& low_ktypes, bool parallel) {
     try {
         if (parallel) {
-            _loadAllKDataParallel(std::move(ktypes), std::move(low_ktypes));
+            _loadAllKDataParallel(std::move(ktypes), low_ktypes);
         } else {
-            _loadAllKDataSerial(std::move(ktypes), std::move(low_ktypes));
+            _loadAllKDataSerial(std::move(ktypes), low_ktypes);
         }
     } catch (const std::exception& e) {
         HKU_ERROR("Failed preload kdata: {}", e.what());
@@ -487,7 +486,8 @@ void StockManager::_loadAllKDataSafely(vector<KQuery::KType> ktypes, vector<stri
     }
 }
 
-void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
+void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes,
+                                       const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side (through LoadEvent and its own polling);
     // loaded/total is no longer counted here
 
@@ -548,7 +548,8 @@ void StockManager::_loadAllKDataSerial(vector<KQuery::KType> ktypes, vector<stri
     m_data_ready.store(true, std::memory_order_release);
 }
 
-void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<string> low_ktypes) {
+void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes,
+                                         const vector<string>& low_ktypes) {
     // The progress reporting has moved to the plugin side; loaded/total is no longer counted here
     auto loaded_codes = tryLoadAllKDataFromColumnFirst(ktypes);
 
@@ -582,7 +583,8 @@ void StockManager::_loadAllKDataParallel(vector<KQuery::KType> ktypes, vector<st
                     } catch (const std::exception& e) {
                         HKU_ERROR("Failed load kdata to buffer ({}): {}", ktype, e.what());
                     } catch (...) {
-                        HKU_ERROR("Failed load kdata to buffer ({}) with unknown exception!", ktype);
+                        HKU_ERROR("Failed load kdata to buffer ({}) with unknown exception!",
+                                  ktype);
                     }
                 });
             }
@@ -1251,8 +1253,8 @@ void StockManager::loadAllStockWeights() {
         std::shared_lock<std::shared_mutex> lock1(*m_stockDict_mutex);
         for (auto iter = m_stockDict.begin(); iter != m_stockDict.end(); ++iter) {
             auto weight_iter = all_stkweight_dict.find(iter->first);
-            Stock& stock = iter->second;
             {
+                Stock& stock = iter->second;
                 std::unique_lock<std::shared_mutex> lock2(stock.m_data->m_weight_mutex);
                 if (weight_iter != all_stkweight_dict.end()) {
                     stock.m_data->m_weightList.swap(weight_iter->second);
