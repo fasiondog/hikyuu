@@ -30,7 +30,9 @@ StoplossBase::StoplossBase(const string& name) : m_name(name) {}
 StoplossBase::~StoplossBase() {}
 
 void StoplossBase::baseCheckParam(const string& name) const {}
-void StoplossBase::paramChanged() {}
+void StoplossBase::paramChanged() {
+    m_calculated = false;
+}
 
 void StoplossBase::reset() {
     m_kdata = Null<KData>();
@@ -46,17 +48,20 @@ StoplossPtr StoplossBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_name = m_name;
     p->m_params = m_params;
-    // p->m_tm = m_tm;
+    p->m_tm = m_tm;
     p->m_kdata = m_kdata;
+    p->m_calculated = m_calculated;
     return p;
 }
 
 void StoplossBase::setTO(const KData& kdata) {
-    HKU_IF_RETURN(m_kdata == kdata, void());
+    HKU_IF_RETURN(m_calculated && m_kdata == kdata, void());
     m_kdata = kdata;
     _reset();
+    m_calculated = false;
     if (!kdata.empty()) {
         _calculate();
+        m_calculated = true;
     }
 }
 

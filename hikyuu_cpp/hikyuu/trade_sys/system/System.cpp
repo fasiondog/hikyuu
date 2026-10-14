@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "hikyuu/global/sysinfo.h"
 #include "System.h"
 
@@ -25,6 +26,8 @@ price_t mapAdjustedToOriginal(const KRecord& today, const KRecord& src_today, pr
     price_t adjust = (price - today.lowPrice) / (today.highPrice - today.lowPrice) *
                        (src_today.highPrice - src_today.lowPrice) +
                      src_today.lowPrice;
+    HKU_WARN_IF(!std::isfinite(adjust),
+                "mapAdjustedToOriginal: non-finite adjusted price, treated as no stop-loss");
     return adjust >= 0.0 ? adjust : 0.0;
 }
 }  // namespace
@@ -1666,13 +1669,19 @@ TradeRecord System::pfProcessDelayBuyRequest(const Datetime& date) {
 
 price_t System::_getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
-    return mapAdjustedToOriginal(today, src_today, m_st->getPrice(today.datetime, price));
+    price_t level = m_st->getPrice(today.datetime, price);
+    // Zero means no stop-loss on this bar and must not be turned into a real level by the mapping
+    // (e.g. into the low price of a one-price board)
+    HKU_IF_RETURN(level == 0.0, 0.0);
+    return mapAdjustedToOriginal(today, src_today, level);
 }
 
 price_t System ::_getShortStoplossPrice(const KRecord& today, const KRecord& src_today,
                                         price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
-    return mapAdjustedToOriginal(today, src_today, m_st->getShortPrice(today.datetime, price));
+    price_t level = m_st->getShortPrice(today.datetime, price);
+    HKU_IF_RETURN(level == 0.0, 0.0);
+    return mapAdjustedToOriginal(today, src_today, level);
 }
 
 price_t System::_getTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price) {

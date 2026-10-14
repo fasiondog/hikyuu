@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "FixedPercentStoploss.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -26,10 +27,25 @@ void FixedPercentStoploss::_checkParam(const string& name) const {
     }
 }
 
-price_t FixedPercentStoploss ::_getPrice(const Datetime& datetime, price_t price) {
+price_t FixedPercentStoploss::_getPrice(const Datetime& datetime, price_t price) {
+    HKU_IF_RETURN(!std::isfinite(price) || price <= 0.0, 0.0);
     Stock stock = m_kdata.getStock();
     int precision = stock.isNull() ? 2 : stock.precision();
-    return roundEx(price * (1 - getParam<double>("p")), precision);
+    double factor = std::pow(10.0, precision);
+    // Round to the minimum price tick, then clamp down by one tick if it would reach or exceed the
+    // buy price, so the stop-loss is never rounded back up to the entry price.
+    price_t result = roundEx(price * (1 - getParam<double>("p")), precision);
+    if (result >= price) {
+        result = price - 1.0 / factor;
+    }
+    return result;
+}
+
+price_t FixedPercentStoploss::_getShortPrice(const Datetime& datetime, price_t price) {
+    HKU_IF_RETURN(!std::isfinite(price) || price <= 0.0, 0.0);
+    Stock stock = m_kdata.getStock();
+    int precision = stock.isNull() ? 2 : stock.precision();
+    return roundUp(price * (1 + getParam<double>("p")), precision);
 }
 
 void FixedPercentStoploss::_calculate() {}

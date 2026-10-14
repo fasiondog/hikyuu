@@ -241,10 +241,19 @@ TEST_CASE("test_MM_short_risk_guards") {
     CHECK_EQ(mm->getBuyShortNumber(datetime, stk, 26.45, 0.5, PART_CONDITION), MAX_DOUBLE);
 }
 
+// A long-only stop-loss: it does not override _getShortPrice, so it must fall back to the base
+// default (0 = no short stop-loss), per StoplossBase's documented contract.
+class Iss029LongOnlyST : public StoplossBase {
+public:
+    Iss029LongOnlyST() : StoplossBase("ISS029_LongOnlyST") {}
+    virtual StoplossPtr _clone() override { return make_shared<Iss029LongOnlyST>(); }
+    virtual price_t _getPrice(const Datetime&, price_t price) override { return price * 0.9; }
+};
+
 /** @par Test points (the default short stop-loss contract, ISS-029) */
 TEST_CASE("test_StoplossBase_default_getShortPrice_is_zero") {
     /** @arg a stop-loss without a short-side override returns 0, i.e. no short stop-loss */
-    STPtr st = ST_FixedPercent(0.03);
+    STPtr st = make_shared<Iss029LongOnlyST>();
     CHECK_EQ(st->getShortPrice(Datetime(199912150000LL), 26.45), 0.0);
 }
 

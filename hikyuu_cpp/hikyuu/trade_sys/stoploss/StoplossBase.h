@@ -112,6 +112,7 @@ public:
 
 protected:
     bool m_is_python_object{false};
+    bool m_calculated{false};
     string m_name;
     TradeManagerPtr m_tm;
     KData m_kdata;
