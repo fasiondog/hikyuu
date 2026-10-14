@@ -161,6 +161,20 @@ public:                                                                  \
     virtual price_t _getRealSellPrice(const Datetime&, price_t) override; \
     virtual void _calculate() override;
 
+// For RNG-based slippages: copy the source (so the cloned params/seed are carried over),
+// then reset() to reseed the RNG from the (copied) seed. The base clone() then copies the
+// common members including m_kdata, so the clone carries the source's kdata.
+#define SLIPPAGE_IMP_RNG(classname)                                       \
+public:                                                                  \
+    virtual SlippagePtr _clone() override {                              \
+        auto p = std::make_shared<classname>(*this);                      \
+        p->reset();                                                      \
+        return p;                                                        \
+    }                                                                    \
+    virtual price_t _getRealBuyPrice(const Datetime&, price_t) override;  \
+    virtual price_t _getRealSellPrice(const Datetime&, price_t) override; \
+    virtual void _calculate() override;
+
 /**
  * Client programs should all use this pointer type to operate the slippage algorithm
  * @ingroup Slippage

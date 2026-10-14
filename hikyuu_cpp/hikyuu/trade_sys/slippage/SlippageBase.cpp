@@ -59,6 +59,7 @@ void SlippageBase::setTO(const KData& kdata) {
 }
 
 price_t SlippageBase::getRealBuyPrice(const Datetime& datetime, price_t planPrice) {
+    HKU_WARN_IF_RETURN(!(planPrice > 0.0), planPrice, "plan price must be positive");
     const price_t price = _getRealBuyPrice(datetime, planPrice);
     if (m_kdata.empty()) {
         return price;
@@ -71,6 +72,7 @@ price_t SlippageBase::getRealBuyPrice(const Datetime& datetime, price_t planPric
 }
 
 price_t SlippageBase::getRealSellPrice(const Datetime& datetime, price_t planPrice) {
+    HKU_WARN_IF_RETURN(!(planPrice > 0.0), planPrice, "plan price must be positive");
     const price_t price = _getRealSellPrice(datetime, planPrice);
     if (m_kdata.empty()) {
         return price;

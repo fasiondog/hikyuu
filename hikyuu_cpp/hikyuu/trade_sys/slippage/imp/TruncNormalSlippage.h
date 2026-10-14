@@ -13,7 +13,7 @@
 namespace hku {
 
 class TruncNormalSlippage : public SlippageBase {
-    SLIPPAGE_IMP(TruncNormalSlippage)
+    SLIPPAGE_IMP_RNG(TruncNormalSlippage)
     SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

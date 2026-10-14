@@ -171,8 +171,8 @@ SlippagePtr HKU_API SP_TruncNormal(double mean, double stddev, double min_value,
     SlippagePtr ptr = make_shared<TruncNormalSlippage>();
     ptr->setParam("mean", mean);
     ptr->setParam("stddev", stddev);
-    ptr->setParam("min_value", min_value);
     ptr->setParam("max_value", max_value);
+    ptr->setParam("min_value", min_value);
     return ptr;
 }
 
