@@ -33,7 +33,7 @@ void FixedPercentProfitGoal::_checkParam(const string& name) const {
     }
 }
 
-price_t FixedPercentProfitGoal::getGoal(const Datetime& datetime, price_t price) {
+price_t FixedPercentProfitGoal::_getGoal(const Datetime& datetime, price_t price) {
     Stock stock = getTO().getStock();
     PositionRecord position = getTM()->getPosition(datetime, stock);
     return position.number != 0

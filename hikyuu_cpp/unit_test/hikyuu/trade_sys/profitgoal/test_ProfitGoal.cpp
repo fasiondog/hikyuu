@@ -16,7 +16,7 @@ public:
     ProfitGoalTest() : ProfitGoalBase("ProfitGoalTest"), m_x(0) {}
     virtual ~ProfitGoalTest() {}
 
-    virtual price_t getGoal(const Datetime &datetime, price_t price) {
+    virtual price_t _getGoal(const Datetime &datetime, price_t price) {
         return m_x < 10 ? 0.0 : 1.0;
     }
 

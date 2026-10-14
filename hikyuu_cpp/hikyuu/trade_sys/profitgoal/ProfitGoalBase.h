@@ -61,20 +61,14 @@ public:
     /** Clone interface */
     ProfitGoalPtr clone();
 
-    /**
-     * Calculate the target price when buying
-     * @param datetime the current time
-     * @param price the current price
-     * @return Null<price_t> means no target is set; 0 means a sell is needed. Note: when there
-     * is no position yet (e.g. at the buy moment), returning a pre-calculated target price based
-     * on the current price is also a valid semantic, which will be recorded as the goalPrice of
-     * the trade record
-     */
-    virtual price_t getGoal(const Datetime& datetime, price_t price) = 0;
+    /** Calculate the target price when buying; see the _getGoal interface for the return semantics */
+    price_t getGoal(const Datetime& datetime, price_t price) {
+        return _getGoal(datetime, price);
+    }
 
     /** 0 is returned, meaning no target is set */
-    virtual price_t getShortGoal(const Datetime&, price_t) {
-        return 0.0;
+    price_t getShortGoal(const Datetime& datetime, price_t price) {
+        return _getShortGoal(datetime, price);
     }
 
     /** Subclass reset interface */
@@ -85,6 +79,22 @@ public:
 
     /** Subclass calculation interface, it is called by setTO */
     virtual void _calculate() {}
+
+    /**
+     * Subclass goal interface, calculate the goal price when buying
+     * @param datetime the current time
+     * @param price the current price
+     * @return Null<price_t> means no goal is set; 0 means a sell is needed. Note: when there
+     * is no position yet (e.g. at the buy moment), returning a pre-calculated goal price based
+     * on the current price is also a valid semantic, which will be recorded as the goalPrice of
+     * the trade record
+     */
+    virtual price_t _getGoal(const Datetime& datetime, price_t price) = 0;
+
+    /** Subclass short goal interface; 0 is returned, meaning no goal is set */
+    virtual price_t _getShortGoal(const Datetime&, price_t) {
+        return 0.0;
+    }
 
     bool isPythonObject() const noexcept {
         return m_is_python_object;
@@ -154,7 +164,7 @@ public:                                       \
     virtual ProfitGoalPtr _clone() override { \
         return std::make_shared<classname>(); \
     }                                         \
-    virtual price_t getGoal(const Datetime&, price_t) override;
+    virtual price_t _getGoal(const Datetime&, price_t) override;
 
 /**
  * Client programs should all use this pointer type

@@ -33,7 +33,8 @@
 
 自定义盈利目标策略接口：
 
-* :py:meth:`ProfitGoalBase.getGoal` - 【必须】获取目标价格
+* :py:meth:`ProfitGoalBase._get_goal` - 【必须】获取目标价格
+* :py:meth:`ProfitGoalBase._get_short_goal` - 【可选】获取空头目标价格，返回0表示未设置目标
 * :py:meth:`ProfitGoalBase._calculate` - 【必须】子类计算接口
 * :py:meth:`ProfitGoalBase._clone` - 【必须】克隆接口
 * :py:meth:`ProfitGoalBase._reset` - 【可选】重载私有变量
@@ -85,11 +86,29 @@
         
     .. py:method:: get_goal(self, datetime, price)
     
+        获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
+        
+        :param Datetime datetime: 当前时间
+        :param float price: 当前价格
+        :return: 目标价格
+        :rtype: float
+        
+    .. py:method:: _get_goal(self, datetime, price)
+    
         【重载接口】获取盈利目标价格，返回constant.null_price时，表示未限定目标；返回0意味着需要卖出
         
         :param Datetime datetime: 当前时间
         :param float price: 当前价格
         :return: 目标价格
+        :rtype: float
+        
+    .. py:method:: _get_short_goal(self, datetime, price)
+    
+        【重载接口】获取空头盈利目标价格，返回0表示未设置空头目标
+        
+        :param Datetime datetime: 当前时间
+        :param float price: 当前价格
+        :return: 空头目标价格
         :rtype: float
         
     .. py:method:: buy_notify(self, trade_record)

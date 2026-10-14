@@ -131,7 +131,7 @@ def crtPG(get_goal, calculate=None, params={}, name='crtPG', buy_notify=None, se
     :return: the profit goal strategy instance
     """
     meta_x = type(name, (ProfitGoalBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x.get_goal = get_goal
+    meta_x._get_goal = get_goal
     if calculate is not None:
         meta_x._calculate = calculate
     if buy_notify is not None:

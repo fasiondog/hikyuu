@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+**⚠️ Breaking change: profit goal strategy (PG) subclass interface normalization**
+
+`ProfitGoalBase::getGoal` / `getShortGoal` are now non-virtual public interfaces; the subclass hooks are unified
+as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / `_clone` / `_calculate`):
+
+* C++ custom subclasses: the `PROFITGOAL_IMP` macro is updated accordingly; rename the `getGoal` implementation
+  to `_getGoal`; `_getShortGoal` is optional and returns 0 by default (no short goal set);
+* Python custom profit goal strategies: the override hook `get_goal(self, datetime, price)` is renamed to
+  `_get_goal(self, datetime, price)`, with the optional `_get_short_goal`; the public query methods
+  `get_goal` / `get_short_goal` remain;
+* `crtPG(get_goal, ...)` keeps its signature and usage; the internal callback contract is renamed from
+  `get_goal` to `_get_goal`.
+
 **🐞 Bug Fixes**
 
 * fix(KData): Adjustment fixed to a fixed-baseline convention: the forward adjustment is anchored at the last data day and the backward one at the data start, so adjusted values no longer depend on the queried range and `Stock::getKData` matches `kdata.getKData`; fix the double adjustment of the backward-adjusted KData sub-queries, the tail offset of the extended-range splicing, the doubled first-day volume/amount in weekly-and-above aggregation, the missed high update when a phase day makes both a new low and a new high, the out-of-bounds read on daily gaps, the extended ktypes wrongly using the daily adjustment formula, the missed first-bar adjustment of minute windows and the crash of front()/back() on an empty KData; adjustment is now price-only, the volume and the turnover amount keep their raw values (aligned with mainstream data sources such as Wind / JoinQuant; see the adjustment convention note of Query)

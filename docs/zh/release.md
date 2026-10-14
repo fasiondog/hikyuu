@@ -40,6 +40,17 @@
 
 详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
 
+**⚠️ 破坏性变更：盈利目标策略（PG）子类接口规范化**
+
+`ProfitGoalBase::getGoal` / `getShortGoal` 改为非虚公开接口，子类计算接口统一为 `_getGoal` / `_getShortGoal`
+（与 `_reset` / `_clone` / `_calculate` 的 `_xxx` 风格一致）：
+
+* C++ 自定义子类：`PROFITGOAL_IMP` 宏已同步，需将 `getGoal` 实现改名为 `_getGoal`；`getShortGoal` 可选，
+  默认返回 0 表示未设置空头目标；
+* Python 自定义盈利目标策略：重载接口 `get_goal(self, datetime, price)` 改名为 `_get_goal(self, datetime, price)`，
+  可选空头接口为 `_get_short_goal`；公开查询方法 `get_goal` / `get_short_goal` 保留；
+* `crtPG(get_goal, ...)` 参数与用法不变，内部回调契约由 `get_goal` 更新为 `_get_goal`。
+
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 A）

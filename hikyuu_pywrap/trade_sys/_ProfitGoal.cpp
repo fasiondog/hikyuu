@@ -35,12 +35,13 @@ public:
         PYBIND11_OVERLOAD_NAME(void, ProfitGoalBase, "sell_notify", sellNotify, tr);
     }
 
-    price_t getGoal(const Datetime& datetime, price_t price) override {
-        PYBIND11_OVERLOAD_PURE_NAME(price_t, ProfitGoalBase, "get_goal", getGoal, datetime, price);
+    price_t _getGoal(const Datetime& datetime, price_t price) override {
+        PYBIND11_OVERLOAD_PURE_NAME(price_t, ProfitGoalBase, "_get_goal", _getGoal, datetime,
+                                    price);
     }
 
-    price_t getShortGoal(const Datetime& date, price_t price) override {
-        PYBIND11_OVERLOAD_NAME(price_t, ProfitGoalBase, "get_short_goal", getShortGoal, date,
+    price_t _getShortGoal(const Datetime& date, price_t price) override {
+        PYBIND11_OVERLOAD_NAME(price_t, ProfitGoalBase, "_get_short_goal", _getShortGoal, date,
                                price);
     }
 
@@ -59,7 +60,8 @@ void export_ProfitGoal(py::module& m) {
     
 The custom profit goal strategy interfaces:
 
-- getGoal : [Required] Get the target price
+- _get_goal : [Required] Get the target price
+- _get_short_goal : [Optional] Get the short target price; 0 is returned, meaning no target is set
 - _calculate : [Required] The subclass calculation interface
 - _clone : [Required] The clone interface
 - _reset : [Optional] Reload the private variables
@@ -118,19 +120,29 @@ The custom profit goal strategy interfaces:
 
       .def("get_goal", &ProfitGoalBase::getGoal, R"(get_goal(self, datetime, price)
 
-    [Overload interface] Get the profit goal price; returning constant.null_price means the goal is not limited; returning 0 means it needs to be sold
+    Get the profit goal price; returning constant.null_price means the goal is not limited; returning 0 means it needs to be sold
 
     :param Datetime datetime: the current time
     :param float price: the current price
     :return: the target price
     :rtype: float)")
 
-      //.def("getShortGoal", &ProfitGoalBase::getShortGoal, &ProfitGoalWrap::default_getShortGoal)
+      .def("get_short_goal", &ProfitGoalBase::getShortGoal,
+           R"(get_short_goal(self, datetime, price)
+
+    Get the short profit goal price; returning 0 means no short goal is set
+
+    :param Datetime datetime: the current time
+    :param float price: the current price
+    :return: the short goal price
+    :rtype: float)")
 
       .def("reset", &ProfitGoalBase::reset, "The reset operation")
       .def("clone", &ProfitGoalBase::clone, "The clone operation")
       .def("_calculate", &ProfitGoalBase::_calculate, "[Overload interface] The subclass calculation interface")
       .def("_reset", &ProfitGoalBase::_reset, "[Overload interface] The subclass reset interface, resetting the internal private variables")
+      .def("_get_goal", &ProfitGoalBase::_getGoal, "[Overload interface] The subclass goal price interface")
+      .def("_get_short_goal", &ProfitGoalBase::_getShortGoal, "[Overload interface] The subclass short goal price interface")
 
         DEF_PICKLE(PGPtr);
 

@@ -17,7 +17,7 @@ NoGoalProfitGoal::NoGoalProfitGoal() : ProfitGoalBase("PG_NoGoal") {}
 
 NoGoalProfitGoal::~NoGoalProfitGoal() {}
 
-price_t NoGoalProfitGoal::getGoal(const Datetime& datetime, price_t price) {
+price_t NoGoalProfitGoal::_getGoal(const Datetime& datetime, price_t price) {
     return Null<price_t>();
 }
 

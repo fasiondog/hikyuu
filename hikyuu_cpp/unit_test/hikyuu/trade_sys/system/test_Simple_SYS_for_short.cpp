@@ -68,11 +68,11 @@ public:
         return make_shared<Iss029PercentPG>(getParam<double>("p"));
     }
 
-    virtual price_t getGoal(const Datetime&, price_t price) override {
+    virtual price_t _getGoal(const Datetime&, price_t price) override {
         return roundEx(price * (1.0 + getParam<double>("p")), 2);
     }
 
-    virtual price_t getShortGoal(const Datetime&, price_t price) override {
+    virtual price_t _getShortGoal(const Datetime&, price_t price) override {
         Stock stock = getTO().getStock();
         PositionRecord pos = getTM()->getShortPosition(stock);
         // At the moment the short is opened the position does not exist yet, use the planned price

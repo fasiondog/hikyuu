@@ -33,7 +33,8 @@ Custom Profit Goal Strategy
 
 A custom profit goal strategy implements the following interface:
 
-* :py:meth:`ProfitGoalBase.getGoal` - [Required] Return the goal price
+* :py:meth:`ProfitGoalBase._get_goal` - [Required] Return the goal price
+* :py:meth:`ProfitGoalBase._get_short_goal` - [Optional] Return the short goal price; 0 is returned, meaning no goal is set
 * :py:meth:`ProfitGoalBase._calculate` - [Required] Subclass calculation hook
 * :py:meth:`ProfitGoalBase._clone` - [Required] Subclass clone hook
 * :py:meth:`ProfitGoalBase._reset` - [Optional] Reset internal member variables
@@ -85,11 +86,29 @@ Profit Goal Strategy Base Class
 
     .. py:method:: get_goal(self, datetime, price)
 
+        Return the profit goal price. Returning constant.null_price means no goal is set; returning 0 means the position should be sold.
+
+        :param Datetime datetime: the current time
+        :param float price: the current price
+        :return: the goal price
+        :rtype: float
+
+    .. py:method:: _get_goal(self, datetime, price)
+
         [Override hook] Return the profit goal price. Returning constant.null_price means no goal is set; returning 0 means the position should be sold.
 
         :param Datetime datetime: the current time
         :param float price: the current price
         :return: the goal price
+        :rtype: float
+
+    .. py:method:: _get_short_goal(self, datetime, price)
+
+        [Override hook] Return the short profit goal price; returning 0 means no short goal is set.
+
+        :param Datetime datetime: the current time
+        :param float price: the current price
+        :return: the short goal price
         :rtype: float
 
     .. py:method:: buy_notify(self, trade_record)
