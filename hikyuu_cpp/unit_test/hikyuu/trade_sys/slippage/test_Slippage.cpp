@@ -24,17 +24,17 @@ public:
         return m_x < 10 ? 0.0 : 1.0;
     }
 
-    virtual void _reset() {
+    virtual void _reset() override {
         m_x = 0;
     }
 
-    virtual SlippagePtr _clone() {
+    virtual SlippagePtr _clone() override {
         SlippagePtr p = std::make_shared<SlippageTest>();
         p->reset();
         return p;
     }
 
-    virtual void _calculate() {}
+    virtual void _calculate() override {}
 
     int getX() const {
         return m_x;
