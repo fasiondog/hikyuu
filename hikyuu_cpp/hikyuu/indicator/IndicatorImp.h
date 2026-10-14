@@ -713,16 +713,6 @@ inline std::ostream& operator<<(std::ostream& os, const IndicatorImp::buffer_t& 
     return os;
 }
 
-/**
- * Guard an element-wise math result for math indicators (LN/LOG/SQRT/ACOS/ASIN/EXP/POW, etc.): a
- * non-finite value (NaN / +-inf) is mapped to the framework null, so that -inf from LN(0)/LOG(0)
- * or +inf from EXP/POW overflow is not leaked downstream and pollute later bars; NaN is already the
- * framework's null representation.
- */
-inline IndicatorImp::value_t safe_math(IndicatorImp::value_t v) {
-    return std::isfinite(v) ? v : Null<IndicatorImp::value_t>();
-}
-
 } /* namespace hku */
 
 #if FMT_VERSION >= 90000

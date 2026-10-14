@@ -99,9 +99,10 @@ public:
      * @param from signal source
      * @note The default implementation returns MAX_DOUBLE, i.e. selling everything; this interface
      * is needed only for the multiple position reductions
-     * @note When the risk is not greater than 0 (the price has reached or fallen below the stop
-     * loss price), the MMs which do not support multi-trading will liquidate the whole position
-     * directly (return MAX_DOUBLE), otherwise the subclass _getSellNumber is left to decide
+     * @note When the risk is not positive (NaN included, i.e. the price has reached or fallen
+     * below the stop loss price), the MMs which do not support multi-trading will liquidate the
+     * whole position directly (return MAX_DOUBLE), otherwise the subclass _getSellNumber is left
+     * to decide
      */
     double getSellNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                          SystemPart from);
@@ -114,8 +115,8 @@ public:
      * @param risk the per-share risk (stop-loss price - trade price); the short stop-loss is above
      *             the entry, so a valid risk is positive
      * @param from signal source
-     * @note When the risk is not greater than 0 (the price has reached or risen above the stop
-     * loss price), the order is rejected and 0 is returned, otherwise the subclass
+     * @note When the risk is not positive (NaN included, i.e. the price has reached or risen
+     * above the stop loss price), the order is rejected and 0 is returned, otherwise the subclass
      * _getSellShortNumber is left to decide
      */
     double getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
@@ -128,9 +129,10 @@ public:
      * @param price trade price
      * @param risk the per-share risk (stop-loss price - trade price)
      * @param from signal source
-     * @note When the risk is not greater than 0 (the price has reached or risen above the stop
-     * loss price), the MMs which do not support multi-trading will cover the whole position
-     * directly (return MAX_DOUBLE), otherwise the subclass _getBuyShortNumber is left to decide
+     * @note When the risk is not positive (NaN included, i.e. the price has reached or risen
+     * above the stop loss price), the MMs which do not support multi-trading will cover the whole
+     * position directly (return MAX_DOUBLE), otherwise the subclass _getBuyShortNumber is left
+     * to decide
      */
     double getBuyShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
                              price_t risk, SystemPart from);
@@ -188,6 +190,7 @@ protected:
     KQuery m_query;
     TradeManagerPtr m_tm;
     unordered_map<Stock, std::pair<size_t, size_t>> m_buy_sell_counts;
+    // Not thread-safe when shared_mm=true (multiple Systems mutate the same map concurrently)
     // Whether the subclass supports multi-trading (multiple position building/reducing); it is a
     // class capability which is assigned directly by the subclass constructor and not serialized
     bool m_support_mult_buy_sell{false};

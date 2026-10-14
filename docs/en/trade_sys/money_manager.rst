@@ -40,6 +40,12 @@ Fixed Share-Quantity Position Sizing
 
     Position sizing that buys or sells a fixed share quantity on each consecutive order in a scale-in/scale-out sequence.
 
+    When the stop-loss is breached (the per-share risk is <= 0), the sell tiers are exhausted, or the sell quantity exceeds the current position (e.g. after an ex-rights adjustment), the whole remaining position is sold.
+
+    Each tier quantity must be a finite, strictly positive number (NaN, Inf, 0 and negative values are all rejected); to trade fewer tiers, use a shorter list. buy_counts must not be empty (at least one tier is required).
+
+    sell_counts may be empty: an empty list is treated as "sell tiers already exhausted", so the first sell signal liquidates the whole position.
+
     :param list buy_counts: the list of share quantities for consecutive buys (scaling in)
     :param list sell_counts: the list of share quantities for consecutive sells (scaling out)
     :return: the money management strategy instance

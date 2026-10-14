@@ -455,7 +455,7 @@ void MultiSystem::_resetSubSystemSignalCash(const SystemPtr& sys, const Datetime
     // reset() restores the build-time cash; re-sync in case setSubInitCash changed it afterwards.
     if (m_sub_init_cash > 0.0) {
         price_t cur_cash = sub_tm->getFunds(date, ktype).cash;
-        if (!iszero(cur_cash - m_sub_init_cash)) {
+        if (!nearly_equal(cur_cash, m_sub_init_cash)) {
             if (cur_cash > 0.0) {
                 sub_tm->checkout(date, cur_cash);
             }

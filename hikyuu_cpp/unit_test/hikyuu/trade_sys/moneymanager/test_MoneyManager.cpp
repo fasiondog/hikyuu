@@ -6,6 +6,8 @@
  */
 
 #include "doctest/doctest.h"
+#include <cmath>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/data_driver/DataDriverFactory.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
@@ -22,6 +24,9 @@ public:
 
     TradeManagerPtr getTM() const {
         return m_tm;
+    }
+    const KQuery &getQuery() const {
+        return m_query;
     }
     int getX() const {
         return m_x;
@@ -65,6 +70,20 @@ public:
     virtual double _getSellNumber(const Datetime &datetime, const Stock &stock, price_t price,
                                   price_t risk, SystemPart from) {
         return 100.0;
+    }
+
+    // Return a fixed value distinguishable from the base default (0) so that the input guards of
+    // getSellShortNumber can be pinned
+    virtual double _getSellShortNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                       price_t risk, SystemPart from) {
+        return 200.0;
+    }
+
+    // Same as above: distinguishable from the base default (MAX_DOUBLE) so that the NaN risk
+    // guard of getBuyShortNumber is a strong pin
+    virtual double _getBuyShortNumber(const Datetime &datetime, const Stock &stock, price_t price,
+                                      price_t risk, SystemPart from) {
+        return 300.0;
     }
 
     virtual MoneyManagerPtr _clone() {
@@ -190,6 +209,17 @@ TEST_CASE("test_MoneyManager_getSellNumber_risk_guard") {
     CHECK_UNARY(
       (p->getSellNumber(Datetime(200001010000), stock, 10.0, -1.0, PART_SIGNAL) == MAX_DOUBLE));
 
+    /** @arg A NaN risk is treated as breached (the guard uses !(risk > 0.0) for NaN-safety) */
+    double nan = std::numeric_limits<double>::quiet_NaN();
+    CHECK_UNARY(
+      (p->getSellNumber(Datetime(200001010000), stock, 10.0, nan, PART_SIGNAL) == MAX_DOUBLE));
+
+    /** @arg The sibling entries share the same NaN-safe guard: getSellShortNumber rejects to 0
+     *  and getBuyShortNumber liquidates the whole short position (MAX_DOUBLE) */
+    CHECK_EQ(p->getSellShortNumber(Datetime(200001010000), stock, 10.0, nan, PART_SIGNAL), 0.0);
+    CHECK_UNARY(
+      (p->getBuyShortNumber(Datetime(200001010000), stock, 10.0, nan, PART_SIGNAL) == MAX_DOUBLE));
+
     /** @arg MM which does not support multi-trading: risk > 0 is sized by the subclass */
     CHECK_EQ(p->getSellNumber(Datetime(200001010000), stock, 10.0, 10.0, PART_SIGNAL), 100.0);
 
@@ -283,6 +313,183 @@ TEST_CASE("test_MoneyManager_getBuyNumber_cash_shortage_binary_search") {
     MoneyManagerPtr mm4(new ConfigurableBuyNumberMMTest(10000.0));
     mm4->setTM(crtTM(Datetime(200001010000), 9.0));
     CHECK_EQ(mm4->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_risk_guard") {
+    // tick == tickValue keeps stock.unit() at 1; minTradeNumber == 100 matches the fixed size
+    Stock stock("TEST", "MMRISK", "MM Risk Guard", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 1.0, 1.0, 2, 100, 100000);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!stock.isNull());
+
+    constexpr double nan{std::numeric_limits<double>::quiet_NaN()};
+    constexpr double inf{std::numeric_limits<double>::infinity()};
+
+    // A non-zero result can only come from the subclass, so 0.0 proves the guard rejected it
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(100.0));
+    mm->setTM(crtTM(Datetime(200001010000), 100000.0));
+    Datetime dt(200001010000);
+
+    /** @arg risk > 0: the size comes from the subclass */
+    CHECK_EQ(mm->getBuyNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 100.0);
+
+    /** @arg risk == 0 and risk < 0: rejected before the subclass */
+    CHECK_EQ(mm->getBuyNumber(dt, stock, 10.0, 0.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getBuyNumber(dt, stock, 10.0, -1.0, PART_SIGNAL), 0.0);
+
+    /** @arg A NaN risk fails the "risk <= 0.0" test and is rejected by !(risk > 0.0) */
+    CHECK_EQ(mm->getBuyNumber(dt, stock, 10.0, nan, PART_SIGNAL), 0.0);
+
+    /** @arg An infinite risk is a positive risk: not rejected by the guard */
+    CHECK_EQ(mm->getBuyNumber(dt, stock, 10.0, inf, PART_SIGNAL), 100.0);
+
+    /** @arg A NaN price is rejected by the price guard */
+    CHECK_EQ(mm->getBuyNumber(dt, stock, nan, 1.0, PART_SIGNAL), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_nonfinite_number") {
+    Stock stock("TEST", "MMNUMBER", "MM Number Guard", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 1.0, 1.0, 2, 1, 1000000);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!stock.isNull());
+
+    // minTradeNumber == 1 makes the lot quotient equal to the raw number, so the int64_t cast
+    // boundary of 9.0e18 is exercised exactly
+    constexpr double nan{std::numeric_limits<double>::quiet_NaN()};
+    constexpr double inf{std::numeric_limits<double>::infinity()};
+    constexpr double cast_limit{9.0e18};
+
+    auto buyNumber = [&](double number) {
+        MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(number));
+        mm->setTM(crtTM(Datetime(200001010000), 100000.0));
+        return mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL);
+    };
+
+    /** @arg A NaN size is rejected before the int64_t cast (undefined behaviour before) */
+    CHECK_EQ(buyNumber(nan), 0.0);
+
+    /** @arg A +/-inf size is rejected */
+    CHECK_EQ(buyNumber(inf), 0.0);
+    CHECK_EQ(buyNumber(-inf), 0.0);
+
+    /** @arg A finite size out of the int64_t range is rejected */
+    CHECK_EQ(buyNumber(1.0e30), 0.0);
+
+    /** @arg The boundary itself is accepted: the size falls through to the maxTradeNumber clamp */
+    CHECK_EQ(buyNumber(cast_limit), stock.maxTradeNumber());
+
+    /** @arg One representable double above the boundary is rejected */
+    CHECK_EQ(buyNumber(std::nextafter(cast_limit, inf)), 0.0);
+
+    /** @arg Zero and a negative finite size stay below minTradeNumber and are ignored */
+    CHECK_EQ(buyNumber(0.0), 0.0);
+    CHECK_EQ(buyNumber(-100.0), 0.0);
+
+    /** @arg A dirty minTradeNumber == 0 makes the quotient +inf, rejected before the cast */
+    Stock zero_stock("TEST", "MMZERO", "MM Zero Min Trade", 1, true, Datetime(199001010000),
+                     Datetime(209901010000), 1.0, 1.0, 2, 0, 1000000);
+    zero_stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!zero_stock.isNull());
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(100.0));
+    mm->setTM(crtTM(Datetime(200001010000), 100000.0));
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), zero_stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg A negative minTradeNumber makes the quotient negative, rejected before the cast */
+    Stock neg_min_stock("TEST", "MMNEGMIN", "MM Negative Min Trade", 1, true,
+                        Datetime(199001010000), Datetime(209901010000), 1.0, 1.0, 2, 1, 1000000);
+    neg_min_stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    neg_min_stock.minTradeNumber(-100.0);
+    MoneyManagerPtr mm2(new ConfigurableBuyNumberMMTest(100.0));
+    mm2->setTM(crtTM(Datetime(200001010000), 100000.0));
+    CHECK_EQ(mm2->getBuyNumber(Datetime(200001010000), neg_min_stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg A negative maxTradeNumber is rejected in the clamp instead of casting a negative
+     * out-of-range quotient */
+    Stock neg_max_stock("TEST", "MMNEGMAX", "MM Negative Max Trade", 1, true,
+                        Datetime(199001010000), Datetime(209901010000), 1.0, 1.0, 2, 1, 1000000);
+    neg_max_stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    neg_max_stock.maxTradeNumber(-100.0);
+    MoneyManagerPtr mm3(new ConfigurableBuyNumberMMTest(100.0));
+    mm3->setTM(crtTM(Datetime(200001010000), 100000.0));
+    CHECK_EQ(mm3->getBuyNumber(Datetime(200001010000), neg_max_stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_max_trade_clamp") {
+    // minTradeNumber == 100 with a maxTradeNumber of 550 (not a whole number of lots)
+    Stock stock("TEST", "MMODDMAX", "MM Odd Max Trade", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 1.0, 1.0, 2, 100, 550);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg The clamp returns stock.maxTradeNumber directly (no lot-floor adjustment) */
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(1000.0));
+    mm->setTM(crtTM(Datetime(200001010000), 1000000.0));
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 550.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_sell_entries_input_guard") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+    constexpr double nan{std::numeric_limits<double>::quiet_NaN()};
+    Datetime dt(200001010000);
+
+    /** @arg getSellNumber rejects a null stock and a non-positive price like getBuyNumber does */
+    MoneyManagerPtr mm(new MultSellMoneyManagerTest(false));
+    mm->setTM(crtTM());
+    CHECK_EQ(mm->getSellNumber(dt, Stock(), 10.0, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getSellNumber(dt, stock, nan, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getSellNumber(dt, stock, 0.0, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getSellNumber(dt, stock, 10.0, 10.0, PART_SIGNAL), 100.0);
+
+    /** @arg getSellShortNumber applies the same guards before reaching the subclass */
+    CHECK_EQ(mm->getSellShortNumber(dt, Stock(), 10.0, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getSellShortNumber(dt, stock, nan, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getSellShortNumber(dt, stock, 10.0, 10.0, PART_SIGNAL), 200.0);
+
+    /** @arg getBuyShortNumber applies the same guards before the force-cover branches */
+    CHECK_EQ(mm->getBuyShortNumber(dt, Stock(), 10.0, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getBuyShortNumber(dt, stock, nan, 10.0, PART_SIGNAL), 0.0);
+    CHECK_EQ(mm->getBuyShortNumber(dt, stock, 10.0, 10.0, PART_SIGNAL), 300.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_clone_and_reset_state") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    auto tm = crtTM(Datetime(200001010000), 100000.0);
+
+    /** @arg A clone carries over the runtime tranche counters from the source instance */
+    MoneyManagerPtr mm(new MoneyManagerTest);
+    mm->setTM(tm);
+    auto tr = tm->buy(Datetime(200001010000), stock, 10.0, 100, 0, 0, 10.0, PART_SIGNAL);
+    REQUIRE_UNARY(!tr.isNull());
+    mm->buyNotify(tr);
+    CHECK_EQ(mm->currentBuyCount(stock), 1);
+
+    MoneyManagerPtr cloned = mm->clone();
+    CHECK_EQ(cloned->currentBuyCount(stock), 1);
+    CHECK_EQ(mm->currentBuyCount(stock), 1);
+
+    /** @arg reset leaves a valid day query instead of a null one, so the cash lookup of a
+     * standalone MM keeps a consistent ktype */
+    MoneyManagerPtr p(new MoneyManagerTest);
+    MoneyManagerTest *raw = (MoneyManagerTest *)p.get();
+    p->setTM(tm);
+    p->setQuery(KQuery(-10, Null<int64_t>(), KQuery::MIN));
+    CHECK_EQ(raw->getQuery().kType(), KQuery::MIN);
+    p->reset();
+    CHECK_EQ(raw->getQuery().kType(), KQuery::DAY);
 }
 
 /** @} */

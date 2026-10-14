@@ -6,6 +6,7 @@
  */
 
 #include "doctest/doctest.h"
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_manage/crt/TC_FixedA.h>
@@ -83,12 +84,48 @@ TEST_CASE("test_MM_FixedCountTps_mult_sell_guard") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
 
-    /** @arg FixedCountTpsMM supports multi-trading: risk <= 0 skips the guard and is delegated to
-     * the subclass tranche logic (returns the current tranche quantity instead of liquidating) */
+    /** @arg risk <= 0 liquidates the whole position (returns MAX_DOUBLE) */
     auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
     mm->setTM(crtTM());
-    CHECK_EQ(mm->getSellNumber(Datetime(200001210000), stock, 24.11, 0.0, PART_SIGNAL), 200);
-    CHECK_EQ(mm->getSellNumber(Datetime(200001210000), stock, 24.11, -1.0, PART_SIGNAL), 200);
+    CHECK_UNARY(mm->getSellNumber(Datetime(200001210000), stock, 24.11, 0.0, PART_SIGNAL) ==
+                MAX_DOUBLE);
+    CHECK_UNARY(mm->getSellNumber(Datetime(200001210000), stock, 24.11, -1.0, PART_SIGNAL) ==
+                MAX_DOUBLE);
+
+    /** @arg tier exhausted also returns MAX_DOUBLE to avoid orphan shares */
+    auto mm1 = MM_FixedCountTps({100.}, {100.});
+    auto tm1 = crtTM(Datetime(199001010000LL), 1000000.0);
+    mm1->setTM(tm1);
+    auto buy_tr = tm1->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm1->buyNotify(buy_tr);
+    auto sell_tr = tm1->sell(Datetime(200001210000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm1->sellNotify(sell_tr);  // Advances sell count to 1, exhausting sell_counts.size()==1
+    CHECK_UNARY(mm1->getSellNumber(Datetime(200001210000), stock, 24.11, 24.11, PART_SIGNAL) ==
+                MAX_DOUBLE);
+
+    /** @arg tier == holdNumber returns tier (strict `>` in the clamp, not `>=`) */
+    auto mm2 = MM_FixedCountTps({100.}, {100.});
+    auto tm2 = crtTM(Datetime(199001010000LL), 1000000.0);
+    mm2->setTM(tm2);
+    auto buy_tr2 = tm2->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm2->buyNotify(buy_tr2);
+    CHECK_EQ(mm2->getSellNumber(Datetime(200001210000), stock, 24.11, 24.11, PART_SIGNAL), 100.0);
+
+    /** @arg Advancing through every sell tier to exhaustion still returns MAX_DOUBLE on the next
+     *  signal (multi-tier counterpart of the single-tier case above) */
+    auto mm3 = MM_FixedCountTps({100., 200.}, {100., 200.});
+    auto tm3 = crtTM(Datetime(199001010000LL), 1000000.0);
+    mm3->setTM(tm3);
+    auto b1 = tm3->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm3->buyNotify(b1);
+    auto b2 = tm3->buy(Datetime(200001200000), stock, 24.11, 200, 0, 0, 24.11, PART_SIGNAL);
+    mm3->buyNotify(b2);
+    auto s1 = tm3->sell(Datetime(200001210000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
+    mm3->sellNotify(s1);
+    auto s2 = tm3->sell(Datetime(200001210000), stock, 24.11, 200, 0, 0, 24.11, PART_SIGNAL);
+    mm3->sellNotify(s2);  // Advances sell count to 2, exhausting sell_counts.size()==2
+    CHECK_UNARY(mm3->getSellNumber(Datetime(200001220000), stock, 24.11, 24.11, PART_SIGNAL) ==
+                MAX_DOUBLE);
 }
 
 /** @par Test points */
@@ -128,6 +165,42 @@ TEST_CASE("test_MM_FixedCountTps_short_trade_immunity") {
     mm->sellNotify(tr);
     CHECK_EQ(mm->currentBuyCount(stock), 0);
     CHECK_EQ(mm->currentSellCount(stock), 1);
+}
+
+/** @par Test points */
+TEST_CASE("test_MM_FixedCountTps_param_check") {
+    /** @arg A negative tier is rejected */
+    CHECK_THROWS_AS(MM_FixedCountTps({100., -1}, {100., 100.}), std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({100., 100.}, {100., -100.}), std::exception);
+
+    /** @arg A zero tier is rejected: it would stall the tranche counter forever */
+    CHECK_THROWS_AS(MM_FixedCountTps({0., 100.}, {100., 100.}), std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({100., 100.}, {0., 100.}), std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({100., 0.}, {100., 100.}), std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({100., 100.}, {0., 200.}), std::exception);
+
+    /** @arg A non-finite tier (NaN / +-Inf) is rejected before it can poison the order */
+    CHECK_THROWS_AS(MM_FixedCountTps({std::numeric_limits<double>::quiet_NaN()}, {100.}),
+                    std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({100.}, {std::numeric_limits<double>::quiet_NaN()}),
+                    std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({std::numeric_limits<double>::infinity()}, {100.}),
+                    std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({100.}, {-std::numeric_limits<double>::infinity()}),
+                    std::exception);
+
+    /** @arg An empty buy list is rejected: it would never open a position */
+    CHECK_THROWS_AS(MM_FixedCountTps({}, {100.}), std::exception);
+
+    /** @arg Finite tiers whose sum overflows to +inf are rejected before the comparison NaNs out */
+    CHECK_THROWS_AS(MM_FixedCountTps({1e308, 1e308}, {1e308, 1e308}), std::exception);
+    CHECK_THROWS_AS(MM_FixedCountTps({1e308}, {1e308, 1e308}), std::exception);
+
+    /** @arg The total comparison uses a tolerance, so a reordered sum of the same tiers is fine */
+    CHECK_NOTHROW(MM_FixedCountTps({0.1, 0.2, 0.3}, {0.3, 0.3}));
+
+    /** @arg A genuinely inconsistent total only warns */
+    CHECK_NOTHROW(MM_FixedCountTps({100., 100.}, {200., 200.}));
 }
 
 /** @} */

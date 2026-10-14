@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::FixedPercentMoneyManager)
 namespace hku {
 
 FixedPercentMoneyManager::FixedPercentMoneyManager() : MoneyManagerBase("MM_FixedPercent") {
-    setParam<double>("p", 0.02);  // Percentage of the total assets
+    setParam<double>("p", 0.02);  // Fraction of available cash risked per trade
 }
 
 FixedPercentMoneyManager::~FixedPercentMoneyManager() {}

@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include "hikyuu/utilities/arithmetic.h"
 #include "IReplace.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -12,25 +13,6 @@ BOOST_CLASS_EXPORT(hku::IReplace)
 #endif
 
 namespace hku {
-
-namespace {
-
-/**
- * Compare two values within a relative tolerance of a few ULPs. An absolute epsilon (e.g.
- * numeric_limits::epsilon()) is scale-sensitive: it misses equal-by-intent values at price
- * magnitudes (ULP of 100.0 is ~1.4e-14) while falsely matching tiny non-zero values near 0
- */
-inline bool nearly_equal(Indicator::value_t a, Indicator::value_t b) {
-    if (a == b)
-        return true;  // bitwise equal, including +0.0 == -0.0
-    // NaN never matches; infinities match only via ==, otherwise the tolerance band becomes inf
-    if (std::isnan(a) || std::isnan(b) || std::isinf(a) || std::isinf(b))
-        return false;
-    Indicator::value_t scale = std::max(std::fabs(a), std::fabs(b));
-    return std::fabs(a - b) <= 8 * std::numeric_limits<Indicator::value_t>::epsilon() * scale;
-}
-
-}  // namespace
 
 IReplace::IReplace() : IndicatorImp("REPLACE", 1) {
     setParam<double>("old_value", Null<double>());

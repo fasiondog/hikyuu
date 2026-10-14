@@ -94,7 +94,7 @@ The custom money management strategy interfaces:
       .def(py::init<>())
       .def(py::init<const MoneyManagerBase&>())
       .def(py::init<const string&>(), R"(The initialization constructor
-        
+
     :param str name: the name)")
 
       .def("__str__", to_py_str<MoneyManagerBase>)
@@ -118,10 +118,10 @@ The custom money management strategy interfaces:
         },
         R"(Whether the MM supports multiple position building/reducing (default False)
 
-    A Python custom MM which handles the risk<=0 liquidation itself in _getSellNumber /
+    A Python custom MM which handles the non-positive risk liquidation itself in _getSellNumber /
     _getBuyShortNumber should declare this capability by setting it to True in its constructor,
     otherwise the base class will force liquidating the whole position when the risk is not
-    greater than 0)")
+    positive (NaN included))")
 
       .def("current_buy_count", &MoneyManagerBase::currentBuyCount,
            "The current consecutive buy count")
@@ -183,7 +183,7 @@ The custom money management strategy interfaces:
            R"(get_sell_num(self, datetime, stock, price, risk, part_from)
 
     Get the quantity that can be sold of the specified trading object
-    
+
     :param Datetime datetime: the trading time
     :param Stock stock: the trading object
     :param float price: the trading price
@@ -250,24 +250,24 @@ The custom money management strategy interfaces:
     :return: the money management strategy instance)");
 
     m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
-          R"(MM_FixedCapitalFunds([capital = 10000.0]) 
+          R"(MM_FixedCapitalFunds([capital = 10000.0])
 
     The fixed total capital money management strategy. The buy quantity = the current total assets / capital
-  
+
     :param float capital: the fixed capital unit
     :return: the money management strategy instance)");
 
     m.def("MM_FixedCount", MM_FixedCount, py::arg("n") = 100, R"(MM_FixedCount([n = 100])
 
     The fixed trading quantity money management strategy. Buy a fixed quantity each time.
-    
+
     :param float n: the quantity to buy each time (it should be an integer multiple of the minimum trading quantity of the trading object; the program does not check this here)
     :return: the money management strategy instance)");
 
     m.def("MM_FixedPercent", MM_FixedPercent, py::arg("p") = 0.03, R"(MM_FixedPercent([p = 0.03])
 
     The fixed percentage risk model. The formula: P (the position size) = the account balance * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
-    
+
     :param float p: the percentage
     :return: the money management strategy instance)");
 
@@ -290,9 +290,18 @@ The custom money management strategy interfaces:
 
     m.def("MM_FixedCountTps", MM_FixedCountTps, py::arg("buy_counts"), py::arg("sell_counts"),
           R"(MM_FixedCountTps([buy_counts, sell_counts])
-          
+
     The consecutive buy/sell fixed quantity money management strategy.
-    
+
+    When the stop-loss is breached (the per-share risk is <= 0), the sell tiers are exhausted, or
+    the sell quantity exceeds the current position (e.g. after an ex-rights adjustment), the whole
+    remaining position is sold.
+
+    Each tier quantity must be a finite, strictly positive number (NaN, Inf, 0 and negative values
+    are all rejected); to trade fewer tiers, use a shorter list. buy_counts must not be empty (at
+    least one tier is required). sell_counts may be empty: an empty list is treated as "sell tiers
+    already exhausted", so the first sell signal liquidates the whole position.
+
     :param list buy_counts: the buy quantity list
     :param list sell_counts: the sell quantity list
     :return: the money management strategy instance)");

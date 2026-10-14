@@ -5,9 +5,14 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "MoneyManagerBase.h"
 
 namespace hku {
+
+// Values above this cannot be cast to int64_t: INT64_MAX is 9.22e18 and the cast of anything
+// beyond it (or of NaN/inf) is undefined behaviour
+constexpr double MAX_INT64_CAST_VALUE{9.0e18};
 
 HKU_API std::ostream& operator<<(std::ostream& os, const MoneyManagerBase& mm) {
     os << "MoneyManager(" << mm.name() << ", " << mm.getParameter() << ")";
@@ -49,7 +54,7 @@ void MoneyManagerBase::baseCheckParam(const string& name) const {
 void MoneyManagerBase::paramChanged() {}
 
 void MoneyManagerBase::reset() {
-    m_query = Null<KQuery>();
+    m_query = KQuery();
     m_tm.reset();
     m_buy_sell_counts.clear();
     _reset();
@@ -72,9 +77,8 @@ MoneyManagerPtr MoneyManagerBase::clone() {
 
 double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                        price_t risk, SystemPart from) {
-    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.4f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0, "m_tm is null! Datetime({}) price({:<.4f}) risk({:<.2f})",
+                        datetime, price, risk);
 
     if (PART_ENVIRONMENT == from) {
         // Force selling everything
@@ -85,19 +89,23 @@ double MoneyManagerBase::getSellNumber(const Datetime& datetime, const Stock& st
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    // When the risk is not greater than 0, the price has reached or fallen below the stop loss
-    // price. The MMs which do not support multi-trading liquidate the whole position directly,
-    // otherwise the subclass _getSellNumber is left to decide
-    HKU_IF_RETURN(risk <= 0.0 && !m_support_mult_buy_sell, MAX_DOUBLE);
+    HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
+    HKU_ERROR_IF_RETURN(
+      !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
+      datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
+
+    // When the risk is not positive (NaN included, i.e. the price has reached or fallen below
+    // the stop loss price), the MMs which do not support multi-trading liquidate the whole
+    // position directly, otherwise the subclass _getSellNumber is left to decide
+    HKU_IF_RETURN(!(risk > 0.0) && !m_support_mult_buy_sell, MAX_DOUBLE);
 
     return _getSellNumber(datetime, stock, price, risk, from);
 }
 
 double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price,
                                       price_t risk, SystemPart from) {
-    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0, "m_tm is null! Datetime({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, price, risk);
     HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
 
     // Protects all the money managers from a division by zero or an invalid price propagated by
@@ -106,8 +114,10 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
       !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
       datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
 
-    HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
-                       "risk less zero (Maybe single-line price board, can ignored)! "
+    // A NaN risk (e.g. from a NaN stop-loss price) fails the "risk <= 0.0" test and would be
+    // propagated down to the int64_t cast of the trade quantity
+    HKU_INFO_IF_RETURN(!(risk > 0.0), 0.0,
+                       "risk not positive (Maybe single-line price board, can ignored)! "
                        "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
                        datetime, stock.market_code(), stock.name(), price, risk,
                        getSystemPartName(from));
@@ -121,12 +131,28 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                         "Ignore! Is less than the minimum number of transactions({:<.4f}<{}) {}", n,
                         min_trade, stock.market_code());
 
+    // A non-finite quotient (NaN, or a division by a dirty minTradeNumber) and an out-of-range
+    // one both make the int64_t cast below undefined behaviour
+    double lot_count = n / min_trade;
+    HKU_WARN_IF_RETURN(
+      !std::isfinite(lot_count) || !(lot_count >= 0.0) || lot_count > MAX_INT64_CAST_VALUE, 0.0,
+      "Invalid buy number! Datetime({}) Stock({} {}) price({:<.3f}) number({}) "
+      "minTradeNumber({:<.4f})",
+      datetime, stock.market_code(), stock.name(), price, n, min_trade);
+
     // Convert it into an integer multiple of the minimum trade quantity
-    n = int64_t(n / min_trade) * min_trade;
+    n = int64_t(lot_count) * min_trade;
 
     double max_trade = stock.maxTradeNumber();
-    HKU_WARN_IF_RETURN(n > max_trade, max_trade,
-                       "Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
+    if (n > max_trade) {
+        // Reject a dirty maxTradeNumber (NaN / +-Inf / negative) instead of returning an illegal
+        // size; a valid one falls back to it directly
+        HKU_WARN_IF_RETURN(!std::isfinite(max_trade) || !(max_trade > 0.0), 0.0,
+                           "Invalid stock.maxTradeNumber({})! Stock({} {})", max_trade,
+                           stock.market_code(), stock.name());
+        HKU_WARN("Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
+        return max_trade;
+    }
 
     // Automatically deposit more cash when the cash is not enough
     if (getParam<bool>("auto-checkin")) {
@@ -171,12 +197,16 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
 
 double MoneyManagerBase::getSellShortNumber(const Datetime& datetime, const Stock& stock,
                                             price_t price, price_t risk, SystemPart from) {
-    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0, "m_tm is null! Datetime({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, price, risk);
+    HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
+    HKU_ERROR_IF_RETURN(
+      !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
+      datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
     // For a short sell the stop-loss is above the entry, so the per-share risk (stoploss - price)
-    // must be positive; a non-positive risk means the price has already reached the stop-loss
-    HKU_INFO_IF_RETURN(risk <= 0.0, 0.0,
+    // must be positive; a non-positive risk (NaN included) means the price has already reached
+    // the stop-loss
+    HKU_INFO_IF_RETURN(!(risk > 0.0), 0.0,
                        "risk not positive (Maybe single-line price board, can ignored)! "
                        "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
                        datetime, stock.market_code(), stock.name(), price, risk,
@@ -186,9 +216,8 @@ double MoneyManagerBase::getSellShortNumber(const Datetime& datetime, const Stoc
 
 double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
                                             price_t price, price_t risk, SystemPart from) {
-    HKU_ERROR_IF_RETURN(!m_tm, 0.0,
-                        "m_tm is null! Datetime({}) Stock({}) price({:<.3f}) risk({:<.2f})",
-                        datetime, stock.market_code(), price, risk);
+    HKU_ERROR_IF_RETURN(!m_tm, 0.0, "m_tm is null! Datetime({}) price({:<.3f}) risk({:<.2f})",
+                        datetime, price, risk);
 
     if (PART_ENVIRONMENT == from) {
         // Force covering the whole short position
@@ -199,9 +228,14 @@ double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stoc
         HKU_IF_RETURN(!getParam<bool>("disable_cn_force_clean_position"), MAX_DOUBLE);
     }
 
-    // When the risk is not greater than 0, the price has risen to or above the stop-loss price;
-    // the MMs which do not support multi-trading cover the whole position directly
-    HKU_IF_RETURN(risk <= 0.0 && !m_support_mult_buy_sell, MAX_DOUBLE);
+    HKU_ERROR_IF_RETURN(stock.isNull(), 0.0, "stock is Null!");
+    HKU_ERROR_IF_RETURN(
+      !(price > 0.0), 0.0, "Invalid price! Datetime({}) Stock({} {}) price({:<.3f}) Part({})",
+      datetime, stock.market_code(), stock.name(), price, getSystemPartName(from));
+
+    // When the risk is not positive (NaN included, i.e. the price has risen to or above the
+    // stop-loss price), the MMs which do not support multi-trading cover the whole position
+    HKU_IF_RETURN(!(risk > 0.0) && !m_support_mult_buy_sell, MAX_DOUBLE);
 
     return _getBuyShortNumber(datetime, stock, price, risk, from);
 }

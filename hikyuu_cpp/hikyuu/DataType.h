@@ -155,11 +155,6 @@ using std::isfinite;
 using std::isinf;
 using std::isnan;
 
-inline bool iszero(price_t num) {
-    return num == 0.0 ||
-           std::abs(num) < (std::numeric_limits<price_t>::epsilon() * std::abs(num));
-}
-
 using fmt::format;
 
 /** @} */

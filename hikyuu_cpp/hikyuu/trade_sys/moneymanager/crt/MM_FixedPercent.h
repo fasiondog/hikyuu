@@ -19,8 +19,8 @@ namespace hku {
  *          by Van K. Tharp, P312
  *          Formula: P (position size) = C (total risk) / R (risk per share) [here C, the cash, is
  * the total risk]
- * @param p the percentage of the total risk of every trade in the total assets, e.g. 0.02 means 2%
- *          of the total assets
+ * @param p the percentage of the available cash risked on every trade, e.g. 0.02 means 2%
+ *          of the available cash
  * @ingroup MoneyManager
  */
 MoneyManagerPtr HKU_API MM_FixedPercent(double p);
