@@ -12,8 +12,10 @@
 namespace hku {
 
 /**
- * Truncated normal distribution random price slippage algorithm: the buy and sell operations are a
- * random price offset based on the truncated normal distribution
+ * Truncated normal distribution random price slippage algorithm: the sampled value is folded to a
+ * non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan
+ * price plus the amplitude and the sell price is the plan price minus the amplitude. The sample is
+ * drawn from the truncated normal distribution over [min_value, max_value].
  * @param mean mean of the normal distribution
  * @param stddev standard deviation of the normal distribution
  * @param min_value the truncation minimum

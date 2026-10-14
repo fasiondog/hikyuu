@@ -36,14 +36,14 @@ public:
         PYBIND11_OVERLOAD(void, SlippageBase, _reset, );
     }
 
-    price_t getRealBuyPrice(const Datetime& datetime, price_t planPrice) override {
-        PYBIND11_OVERLOAD_PURE_NAME(price_t, SlippageBase, "get_real_buy_price", getRealBuyPrice,
+    price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice) override {
+        PYBIND11_OVERLOAD_PURE_NAME(price_t, SlippageBase, "_get_real_buy_price", _getRealBuyPrice,
                                     datetime, planPrice);
     }
 
-    price_t getRealSellPrice(const Datetime& datetime, price_t planPrice) override {
-        PYBIND11_OVERLOAD_PURE_NAME(price_t, SlippageBase, "get_real_sell_price", getRealSellPrice,
-                                    datetime, planPrice);
+    price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice) override {
+        PYBIND11_OVERLOAD_PURE_NAME(price_t, SlippageBase, "_get_real_sell_price",
+                                    _getRealSellPrice, datetime, planPrice);
     }
 };
 
@@ -53,8 +53,8 @@ void export_Slippage(py::module& m) {
 
 The custom slippage interfaces:
 
-    - getRealBuyPrice : [Required] Calculate the actual buy price
-    - getRealSellPrice : [Required] Calculate the actual sell price
+    - _get_real_buy_price : [Required] Compute the raw buy price (the base class clamps it to not exceed the day's high)
+    - _get_real_sell_price : [Required] Compute the raw sell price (the base class clamps it to not fall below the day's low)
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
     - _reset : [Optional] Reload the private variables)")
@@ -98,21 +98,47 @@ The custom slippage interfaces:
       .def("get_real_buy_price", &SlippageBase::getRealBuyPrice,
            R"(get_real_buy_price(self, datetime, price)
 
-    [Overload interface] Calculate the actual buy price
+    [Public method] Return the actual buy price. It calls the subclass hook _get_real_buy_price
+    and clamps the result to not exceed the day's high. Do not override this method; override
+    _get_real_buy_price instead.
 
     :param Datetime datetime: the buy time
     :param float price: the planned buy price
-    :return: the actual buy price
+    :return: the actual buy price, clamped to not exceed the day's high
     :rtype: float)")
 
       .def("get_real_sell_price", &SlippageBase::getRealSellPrice,
            R"(get_real_sell_price(self, datetime, price)
 
-    [Overload interface] Calculate the actual sell price
+    [Public method] Return the actual sell price. It calls the subclass hook _get_real_sell_price
+    and clamps the result to not fall below the day's low. Do not override this method; override
+    _get_real_sell_price instead.
 
     :param Datetime datetime: the sell time
     :param float price: the planned sell price
-    :return: the actual sell price
+    :return: the actual sell price, clamped to not fall below the day's low
+    :rtype: float)")
+
+      .def("_get_real_buy_price", &SlippageBase::_getRealBuyPrice,
+           R"(_get_real_buy_price(self, datetime, price)
+
+    [Override hook] Compute the raw buy price. The base class clamps the returned value to not
+    exceed the day's high before returning the actual trade price.
+
+    :param Datetime datetime: the buy time
+    :param float price: the planned buy price
+    :return: the raw buy price (clamped by the base class)
+    :rtype: float)")
+
+      .def("_get_real_sell_price", &SlippageBase::_getRealSellPrice,
+           R"(_get_real_sell_price(self, datetime, price)
+
+    [Override hook] Compute the raw sell price. The base class clamps the returned value to not
+    fall below the day's low before returning the actual trade price.
+
+    :param Datetime datetime: the sell time
+    :param float price: the planned sell price
+    :return: the raw sell price (clamped by the base class)
     :rtype: float)")
 
       .def("reset", &SlippageBase::reset, "The reset operation")
@@ -129,7 +155,7 @@ The custom slippage interfaces:
     m.def("SP_FixedPercent", &SP_FixedPercent, py::arg("p") = 0.001,
           R"(SP_FixedPercent([p=0.001])
 
-    The fixed percentage slippage algorithm; the actual buy price = the planned buy price * (1 + p), and the actual sell price = the planned sell price * (1 - p)
+    The fixed percentage slippage algorithm; the actual buy price = the planned buy price * (1 + p), and the actual sell price = the planned sell price * (1 - p). p must be in [0, 0.1).
 
     :param float p: the fixed percentage of the offset
     :return: the slippage algorithm instance)");
@@ -144,17 +170,17 @@ The custom slippage interfaces:
     m.def("SP_Uniform", &SP_Uniform, py::arg("min_value") = -0.05, py::arg("max_value") = 0.05,
           R"(SP_Uniform([min_value=-0.05, max_value=0.05])
 
-    The uniform distribution random price slippage algorithm; the buy and the sell operations are the random price offsets uniformly distributed within the range [min_value, max_value]
-    
-    :param float min_value: the minimum offset price
-    :param float max_value: the maximum offset price
+    The uniform distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude. [min_value, max_value] is the amplitude range (the sign of the sample is ignored), not a symmetric +/- offset.
+
+    :param float min_value: the minimum of the offset amplitude range
+    :param float max_value: the maximum of the offset amplitude range
     :return: the slippage algorithm instance)");
 
     m.def("SP_Normal", &SP_Normal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
           R"(SP_Normal([mean=0.0, stddev=0.05])
 
-    The normal distribution random price slippage algorithm; the buy and the sell operations are the random price offsets within the normal distribution [mean, stddev] range
-    
+    The normal distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude.
+
     :param float mean: the mean of the normal distribution
     :param float stddev: the standard deviation of the normal distribution
     :return: the slippage algorithm instance)");
@@ -162,18 +188,18 @@ The custom slippage interfaces:
     m.def("SP_LogNormal", &SP_LogNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
           R"(SP_LogNormal([mean=0.0, stddev=0.05])
 
-    The log-normal distribution random price slippage algorithm; the buy and the sell operations are the random price offsets within the log-normal distribution [mean, stddev] range
+    The log-normal distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude.
 
     :param float mean: the mean of the log-normal distribution
     :param float stddev: the standard deviation of the log-normal distribution
     :return: the slippage algorithm instance)");
 
     m.def("SP_TruncNormal", &SP_TruncNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
-          py::arg("min_value") = -0.11, py::arg("max_value") = 0.1,
+          py::arg("min_value") = -0.1, py::arg("max_value") = 0.1,
           R"(SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
-         
-    The truncated normal distribution random price slippage algorithm; the buy and the sell operations are the random price offsets within the truncated normal distribution [mean, stddev, min_value, max_value] range
-    
+
+    The truncated normal distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude. The sample is drawn from the truncated normal distribution over [min_value, max_value].
+
     :param float mean: the mean of the truncated normal distribution
     :param float stddev: the standard deviation of the truncated normal distribution
     :param float min_value: the minimum truncation value

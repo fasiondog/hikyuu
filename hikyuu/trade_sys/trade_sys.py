@@ -247,16 +247,16 @@ def crtSP(get_real_buy_price, get_real_sell_price, params={}, name='crtSP', calc
     """
     Quickly create a slippage algorithm
 
-    :param get_real_buy_price: the slippage algorithm interface to calculate the actual buy price
-    :param get_real_sell_price: the slippage algorithm interface to calculate the actual sell price
+    :param get_real_buy_price: the slippage algorithm interface to calculate the raw buy price (the base class clamps it to not exceed the day's high)
+    :param get_real_sell_price: the slippage algorithm interface to calculate the raw sell price (the base class clamps it to not fall below the day's low)
     :param {} params: the parameter dictionary
     :param str name: the custom name
     :param calculate: the pre-processing function
     :return: the slippage algorithm instance
     """
     meta_x = type(name, (SlippageBase, ), {'__init__': part_init, '_clone': part_clone})
-    meta_x.get_real_buy_price = get_real_buy_price
-    meta_x.get_real_sell_price = get_real_sell_price
+    meta_x._get_real_buy_price = get_real_buy_price
+    meta_x._get_real_sell_price = get_real_sell_price
     if calculate is not None:
         meta_x._calculate = calculate
     ret = meta_x(name, params)

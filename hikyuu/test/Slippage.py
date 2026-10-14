@@ -17,12 +17,12 @@ class SlippagePython(SlippageBase):
         super(SlippagePython, self).__init__("SlippagePython")
         self._x = 0
 
-    def get_real_buy_price(self, datetime, price):
+    def _get_real_buy_price(self, datetime, price):
         if self._x < 10:
             return 0.0
         return 1.0
 
-    def get_real_sell_price(self, datetime, price):
+    def _get_real_sell_price(self, datetime, price):
         if self._x < 10:
             return 0.0
         return 1.0

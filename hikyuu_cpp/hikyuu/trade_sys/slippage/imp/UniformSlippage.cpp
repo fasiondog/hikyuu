@@ -5,6 +5,9 @@
  *      Author: Administrator
  */
 
+#include <algorithm>
+#include <cmath>
+
 #include "UniformSlippage.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -33,6 +36,13 @@ void UniformSlippage::_checkParam(const string& name) const {
         double min_v = getParam<double>("min_value");
         double max_v = getParam<double>("max_value");
         HKU_ASSERT(min_v <= max_v);
+        // The sampled value is folded to a positive amplitude via abs and applied in the
+        // unfavorable direction, so the effective slippage is bounded by max(|min_v|, |max_v|).
+        // Warn on an absurd amplitude that would move the price by more than 100%.
+        HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
+                    "The amplitude of SP_Uniform is too large (>{:.2f}), the slippage may "
+                    "move the price by more than 100%",
+                    1.0);
     }
 }
 
@@ -54,7 +64,7 @@ void UniformSlippage::_reset() {
     }
 }
 
-price_t UniformSlippage ::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t UniformSlippage ::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
     std::uniform_real_distribution<double> dis(min_v, max_v);
@@ -64,7 +74,7 @@ price_t UniformSlippage ::getRealBuyPrice(const Datetime& datetime, price_t pric
     return price + std::abs(value);
 }
 
-price_t UniformSlippage ::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t UniformSlippage ::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
     std::uniform_real_distribution<double> dis(min_v, max_v);

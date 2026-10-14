@@ -25,11 +25,11 @@ void FixedValueSlippage::_checkParam(const string& name) const {
     }
 }
 
-price_t FixedValueSlippage ::getRealBuyPrice(const Datetime& datetime, price_t price) {
+price_t FixedValueSlippage ::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     return price + getParam<double>("value");
 }
 
-price_t FixedValueSlippage ::getRealSellPrice(const Datetime& datetime, price_t price) {
+price_t FixedValueSlippage ::_getRealSellPrice(const Datetime& datetime, price_t price) {
     return price - getParam<double>("value");
 }
 

@@ -40,6 +40,20 @@
 
 详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
 
+**⚠️ 破坏性变更：Slippage 接口调整（滑点子类只算原始价，基类统一做当日区间钳制）**
+
+自定义滑点基类 `SlippageBase` 的派生类（C++ / Python）原先需重载 `get_real_buy_price` / `get_real_sell_price` 直接给出实际成交价；现改为**重载 `_get_real_buy_price` / `_get_real_sell_price` 仅计算原始价**，由基类统一套用当日区间钳制后作为实际成交价返回：
+
+* 买入价被钳制为**不高于当日最高价**（`min(raw, high)`）；
+* 卖出价被钳制为**不低于当日最低价**（`max(raw, low)`，无当日数据时按 tick 下限兜底）。
+
+迁移要点：
+
+* Python 自定义滑点（`crtSP` 子类）需将 `get_real_buy_price` / `get_real_sell_price` 重命名为 `_get_real_buy_price` / `_get_real_sell_price`（仅算原始价，不再自行钳制）；`get_real_buy_price` / `get_real_sell_price` 现返回已钳制的实际成交价；
+* C++ 自定义滑点需将实现从 `getRealBuyPrice` / `getRealSellPrice` 迁移至 protected 虚函数 `_getRealBuyPrice` / `_getRealSellPrice`；
+* 若此前自定义滑点已在内部做区间钳制，移除该逻辑即可（基类已统一处理）；
+* `SP_FixedPercent` 移除对计划价的有效性告警（`HKU_WARN`），与其余 5 个内置滑点实现保持一致。
+
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 A）

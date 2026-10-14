@@ -9,38 +9,38 @@
 
 .. py:function:: SP_FixedPercent([p=0.001])
 
-    固定百分比移滑价差算法，买入实际价格 = 计划买入价格 * (1 + p)，卖出实际价格 = 计划卖出价格 * (1 - p)
+    固定百分比移滑价差算法，买入实际价格 = 计划买入价格 * (1 + p)，卖出实际价格 = 计划卖出价格 * (1 - p)。p 须为 [0, 0.1) 之间的值
     
     :param float p: 偏移的固定百分比
     :return: 移滑价差算法实例
 
 
-.. py:function:: SP_FixedValuet([p=0.001])
+.. py:function:: SP_FixedValue([value=0.01])
 
     固定价格移滑价差算法，买入实际价格 = 计划买入价格 + 偏移价格，卖出实际价格 = 计划卖出价格 - 偏移价格
     
-    :param float p: 偏移价格
+    :param float value: 偏移价格
     :return: 移滑价差算法实例
 
 .. py:function:: SP_Uniform([min_value=-0.05, max_value=0.05])
 
-    均匀分布随机价格移滑价差算法, 买入和卖出操作是价格在[min_value, max_value]范围内的均匀分布随机偏移
+    均匀分布随机价格移滑价差算法。[min_value, max_value] 是偏移“幅度区间”：采样值取绝对值后只往不利方向（买入加、卖出减）叠加，因此并非对称的 ± 偏移。买入实际价格 = 计划买入价格 + 幅度，卖出实际价格 = 计划卖出价格 - 幅度
     
-    :param float min_value: 最小偏移价格
-    :param float max_value: 最大偏移价格
+    :param float min_value: 偏移幅度区间下界
+    :param float max_value: 偏移幅度区间上界
     :return: 移滑价差算法实例
 
 .. py:function:: SP_Normal([mean=0.0, stddev=0.05])
 
-    正态分布随机价格移滑价差算法, 买入和卖出操作是价格在正态分布[mean, stddev]范围内的随机偏移
-    
+    正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加
+
     :param float mean: 正态分布的均值
     :param float stddev: 正态分布的标准差
     :return: 移滑价差算法实例
 
 .. py:function:: SP_LogNormal([mean=0.0, stddev=0.05])
 
-    对数正态分布随机价格移滑价差算法, 买入和卖出操作是价格在对数正态分布[mean, stddev]范围内的随机偏移
+    对数正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加
 
     :param float mean: 对数正态分布的均值
     :param float stddev: 对数正态分布的标准差
@@ -48,22 +48,26 @@
 
 .. py:function:: SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
          
-    截断正态分布随机价格移滑价差算法, 买入和卖出操作是价格在截断正态分布[mean, stddev, min_value, max_value]范围内的随机偏移
+    截断正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加，样本从 [min_value, max_value] 上的截断正态分布中解析采样（逆 CDF）
     
     :param float mean: 截断正态分布的均值
     :param float stddev: 截断正态分布的标准差
     :param float min_value: 最小截断值
     :param float max_value: 最大截断值
     :return: 移滑价差算法实例
-    
+
+.. note::
+
+    随机移滑价差（SP_Uniform / SP_Normal / SP_LogNormal / SP_TruncNormal）内部持有随机数引擎，并非线程安全。并发回测（批量回测、WalkForward 等）必须各自克隆实例，不要将 ``shared_sp`` 设为 ``True`` 在多个 System 间共享同一实例。
+
 
 自定义移滑价差算法
 ------------------
 
 自定义移滑价差接口：
 
-* :py:meth:`SlippageBase.get_real_buy_price` - 【必须】计算实际买入价格
-* :py:meth:`SlippageBase.get_real_sell_price` - 【必须】计算实际卖出价格
+* :py:meth:`SlippageBase._getRealBuyPrice` - 【必须】计算原始买入价格（基类会将其钳制为不高于当日最高价）
+* :py:meth:`SlippageBase._getRealSellPrice` - 【必须】计算原始卖出价格（基类会将其钳制为不低于当日最低价）
 * :py:meth:`SlippageBase._calculate` - 【必须】子类计算接口
 * :py:meth:`SlippageBase._clone` - 【必须】克隆接口
 * :py:meth:`SlippageBase._reset` - 【可选】重载私有变量
@@ -103,20 +107,38 @@
         
     .. py:method:: get_real_buy_price(self, datetime, price)
 
-        【重载接口】计算实际买入价格
-        
+        公共方法，返回实际买入价格。内部调用子类钩子 _get_real_buy_price，并将其钳制为不高于当日最高价后返回。Python 子类应重写 _get_real_buy_price，不要重写此方法。
+
         :param Datetime datetime: 买入时间
         :param float price: 计划买入价格
-        :return: 实际买入价格
+        :return: 实际买入价格（由基类钳制为不高于当日最高价）
         :rtype: float
-        
+
     .. py:method:: get_real_sell_price(self, datetime, price)
 
-        【重载接口】计算实际卖出价格
-        
+        公共方法，返回实际卖出价格。内部调用子类钩子 _get_real_sell_price，并将其钳制为不低于当日最低价后返回。Python 子类应重写 _get_real_sell_price，不要重写此方法。
+
         :param Datetime datetime: 卖出时间
         :param float price: 计划卖出价格
-        :return: 实际卖出价格
+        :return: 实际卖出价格（由基类钳制为不低于当日最低价）
+        :rtype: float
+
+    .. py:method:: _get_real_buy_price(self, datetime, price)
+
+        【重载接口】计算原始买入价格，基类会将其钳制为不高于当日最高价后作为实际成交价返回
+
+        :param Datetime datetime: 买入时间
+        :param float price: 计划买入价格
+        :return: 原始买入价格（实际成交价由基类钳制后返回）
+        :rtype: float
+
+    .. py:method:: _get_real_sell_price(self, datetime, price)
+
+        【重载接口】计算原始卖出价格，基类会将其钳制为不低于当日最低价后作为实际成交价返回
+
+        :param Datetime datetime: 卖出时间
+        :param float price: 计划卖出价格
+        :return: 原始卖出价格（实际成交价由基类钳制后返回）
         :rtype: float        
 
     .. py:method:: reset(self)
