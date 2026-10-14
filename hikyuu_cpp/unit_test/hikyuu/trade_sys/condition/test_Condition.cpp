@@ -7,19 +7,36 @@
 
 #include "doctest/doctest.h"
 #include <cmath>
+#include <fstream>
 #include <limits>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
 #include <hikyuu/trade_sys/condition/crt/CN_Bool.h>
+#include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 
 using namespace hku;
+
+namespace {
+// A trivial signal generator used only to verify the dirty-flag behavior of setSG
+class DummySG : public SignalBase {
+public:
+    DummySG() : SignalBase("TEST_DUMMY_SG") {}
+    void _calculate(const KData&) override {}
+    SignalPtr _clone() override {
+        return std::make_shared<DummySG>();
+    }
+};
+}  // namespace
 
 class ConditionTest : public ConditionBase {
 public:
     ConditionTest() : ConditionBase("TEST") {
         setParam<int>("n", 10);
         m_flag = false;
+        m_calc_count = 0;
     }
 
     ~ConditionTest() {}
@@ -28,7 +45,12 @@ public:
         return m_kdata;
     }
 
+    int calcCount() const {
+        return m_calc_count;
+    }
+
     virtual void _calculate() {
+        m_calc_count++;
         _addValid(m_kdata[2].datetime, 2.0);
         _addValid(m_kdata[3].datetime, 1.5);
     }
@@ -44,11 +66,15 @@ public:
     virtual ConditionPtr _clone() {
         ConditionTest *p = new ConditionTest;
         p->m_flag = m_flag;
+        p->m_calc_count = m_calc_count;
         return ConditionPtr(p);
     }
 
 private:
     bool m_flag;
+    int m_calc_count{0};
+
+    CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
 };
 
 /**
@@ -119,5 +145,87 @@ TEST_CASE("test_Condition_bool_non_finite") {
         CHECK_UNARY_FALSE(p->isValid(kdata[i].datetime));
     }
 }
+
+/** @par Test points */
+TEST_CASE("test_Condition_dirty_on_setSG") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0, 10));
+
+    /** @arg the first setTO triggers a single calculation */
+    ConditionPtr p(new ConditionTest);
+    p->setTO(kdata);
+    ConditionTest *pt = (ConditionTest *)p.get();
+    int n = pt->calcCount();
+    CHECK(n >= 1);
+
+    /** @arg the same KData without a signal generator change does not recalculate */
+    p->setTO(kdata);
+    CHECK_EQ(pt->calcCount(), n);
+
+    /** @arg changing the SG marks the condition dirty, so the next setTO recalculates even with
+     *      the unchanged KData (CN-008) */
+    p->setSG(std::make_shared<DummySG>());
+    p->setTO(kdata);
+    CHECK_EQ(pt->calcCount(), n + 1);
+
+    /** @arg setting the same SG object again does not mark dirty, so no extra recalculation */
+    p->setTO(kdata);
+    CHECK_EQ(pt->calcCount(), n + 1);
+}
+
+/** @par Test points */
+TEST_CASE("test_Condition_getValues_single_pass") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    /** @arg getValues yields one value per KData bar, in ascending date order, with no extra
+     *      map traversal (CN-010) */
+    ConditionPtr p = CN_Bool(CVAL(1.0));
+    p->setTO(kdata);
+    Indicator v = p->getValues();
+    CHECK_EQ(v.size(), kdata.size());
+    for (size_t i = 0; i < v.size(); ++i) {
+        CHECK(v.getDatetime(i) == kdata[i].datetime);
+        CHECK(v[i] > 0.0);
+    }
+}
+
+#if HKU_SUPPORT_SERIALIZATION
+/** @par Test points */
+TEST_CASE("test_Condition_serialize") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0, 10));
+
+    ConditionTest src;
+    src.setTO(kdata);
+
+    string filename(sm.tmpdir());
+    filename += "/ConditionTest.xml";
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(src);
+    }
+
+    /** @arg the date index and values survive the round trip */
+    ConditionTest dst;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(dst);
+    }
+    CHECK_EQ(dst.size(), src.size());
+    CHECK_EQ(dst.getDatetimeList().size(), src.getDatetimeList().size());
+    CHECK_UNARY(dst.isValid(Datetime(19901221)));
+    CHECK_UNARY(dst.isValid(Datetime(19901224)));
+    CHECK_UNARY_FALSE(dst.isValid(Datetime(19901219)));
+}
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

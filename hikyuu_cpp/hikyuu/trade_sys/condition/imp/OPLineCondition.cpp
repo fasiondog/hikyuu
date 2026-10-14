@@ -30,8 +30,23 @@ ConditionPtr OPLineCondition::_clone() {
 }
 
 void OPLineCondition::_calculate() {
+    HKU_CHECK(m_sg, "CN_OPLine requires a signal generator; set it via setSG() before use");
     Stock stock = m_kdata.getStock();
     KQuery query = m_kdata.getQuery();
+
+    // Reuse the previous embedded-backtest result when the inputs are unchanged; the backtest is the
+    // dominant cost and is run in full on every setTO otherwise
+    if (!m_last_x.empty() && m_last_stock == stock && m_last_query == query && m_last_sg == m_sg) {
+        DatetimeList dates = m_kdata.getDatetimeList();
+        auto const* xdata = m_last_x.data();
+        for (size_t i = 0; i < m_last_x.size(); i++) {
+            if (std::isfinite(xdata[i]) && xdata[i] > 0) {
+                _addValid(dates[i]);
+            }
+        }
+        return;
+    }
+
     SYSPtr sys = SYS_Simple();
 
     TMPtr tm = crtTM(m_kdata[0].datetime, 0.0, TC_Zero());
@@ -60,6 +75,11 @@ void OPLineCondition::_calculate() {
             _addValid(dates[i]);
         }
     }
+
+    m_last_stock = stock;
+    m_last_query = query;
+    m_last_sg = m_sg;
+    m_last_x = x;
 }
 
 CNPtr HKU_API CN_OPLine(const Indicator& op) {

@@ -120,4 +120,17 @@ TEST_CASE("test_OPLineCondition_non_finite") {
     CHECK_EQ(cn->getDatetimeList().size(), 0);
 }
 
+/** @par Test point: a missing signal generator must fail fast instead of dereferencing null */
+TEST_CASE("test_OPLineCondition_requires_sg") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    REQUIRE_FALSE(stock.isNull());
+    KData kdata = stock.getKData(KQuery(0, 60, KQuery::DAY));
+    REQUIRE_EQ(kdata.size(), 60);
+
+    /** @arg setTO without a signal generator (CN-001) throws */
+    CNPtr cn = CN_OPLine(PRICELIST(kdata.size(), 0.0));
+    CHECK_THROWS(cn->setTO(kdata));
+}
+
 /** @} */

@@ -236,7 +236,10 @@ inline SGPtr ConditionBase::getSG() const {
 }
 
 inline void ConditionBase::setSG(const SGPtr& sg) {
-    m_sg = sg;
+    if (m_sg != sg) {
+        m_sg = sg;
+        m_kdata = Null<KData>();
+    }
 }
 
 inline TradeManagerPtr ConditionBase::getTM() const {

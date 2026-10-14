@@ -25,12 +25,23 @@ ConditionPtr BoolCondition::_clone() {
 }
 
 void BoolCondition::_calculate() {
-    auto ds = m_kdata.getDatetimeList();
     m_ind.setContext(m_kdata);
     auto const* ind_data = m_ind.data();
-    for (size_t i = m_ind.discard(), len = m_ind.size(); i < len; i++) {
-        if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
-            _addValid(ds[i]);
+    size_t discard = m_ind.discard();
+    size_t total = m_ind.size();
+    if (total == m_kdata.size()) {
+        const auto* kdata_ptr = m_kdata.data();
+        for (size_t i = discard; i < total; i++) {
+            if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
+                _addValid(kdata_ptr[i].datetime);
+            }
+        }
+    } else {
+        DatetimeList dates = m_ind.getDatetimeList();
+        for (size_t i = discard; i < total; i++) {
+            if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
+                _addValid(dates[i]);
+            }
         }
     }
 }

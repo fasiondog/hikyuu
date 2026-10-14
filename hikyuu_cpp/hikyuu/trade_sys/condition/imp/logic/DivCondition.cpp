@@ -52,7 +52,8 @@ void DivCondition::_calculate() {
     auto const* data1 = m_cond1->data();
     auto const* data2 = m_cond2->data();
     for (size_t i = 0; i < total; i++) {
-        m_values[i] = data2[i] == 0.0 || std::isnan(data2[i]) ? null_price : data1[i] / data2[i];
+        m_values[i] = (std::isfinite(data1[i]) && std::isfinite(data2[i]) && data2[i] != 0.0)
+                        ? data1[i] / data2[i] : null_price;
     }
 }
 
@@ -77,6 +78,7 @@ ConditionPtr DivCondition::_clone() {
 }
 
 HKU_API ConditionPtr operator/(const ConditionPtr& cond1, const ConditionPtr& cond2) {
+    HKU_WARN_IF(!cond1 || !cond2, "DivCondition: one side is null, the result is always invalid.");
     return make_shared<DivCondition>(cond1, cond2);
 }
 

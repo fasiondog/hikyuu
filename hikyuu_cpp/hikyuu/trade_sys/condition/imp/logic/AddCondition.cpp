@@ -5,6 +5,7 @@
  *    1. 20240223 added by fasiondog
  */
 
+#include <cmath>
 #include "AddCondition.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -61,10 +62,13 @@ void AddCondition::_calculate() {
     size_t total = m_kdata.size();
     HKU_ASSERT(m_cond1->size() == total && m_cond2->size() == total);
 
+    price_t null_price = Null<price_t>();
     auto const* data1 = m_cond1->data();
     auto const* data2 = m_cond2->data();
     for (size_t i = 0; i < total; i++) {
-        m_values[i] = data1[i] + data2[i];
+        m_values[i] = (std::isfinite(data1[i]) && std::isfinite(data2[i]))
+                        ? data1[i] + data2[i]
+                        : null_price;
     }
 }
 
@@ -89,6 +93,7 @@ ConditionPtr AddCondition::_clone() {
 }
 
 HKU_API ConditionPtr operator+(const ConditionPtr& cond1, const ConditionPtr& cond2) {
+    HKU_WARN_IF(!cond1 || !cond2, "AddCondition: one side is null, the single-side mode will be used.");
     return make_shared<AddCondition>(cond1, cond2);
 }
 

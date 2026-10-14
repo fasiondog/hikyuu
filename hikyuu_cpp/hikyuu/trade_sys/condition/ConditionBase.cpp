@@ -103,13 +103,11 @@ DatetimeList ConditionBase::getDatetimeList() const {
 Indicator ConditionBase::getValues() const {
     DatetimeList dates;
     PriceList values;
-    for (const auto& d : m_date_index) {
-        dates.push_back(d.first);
-    }
-
-    values.reserve(dates.size());
-    for (const auto& d : dates) {
-        values.push_back(m_values[m_date_index.at(d)]);
+    dates.reserve(m_date_index.size());
+    values.reserve(m_date_index.size());
+    for (const auto& [d, idx] : m_date_index) {
+        dates.emplace_back(d);
+        values.emplace_back(m_values[idx]);
     }
 
     return PRICELIST(values, dates);
