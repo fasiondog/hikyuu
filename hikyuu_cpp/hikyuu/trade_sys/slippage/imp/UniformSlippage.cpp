@@ -88,8 +88,8 @@ void UniformSlippage::_calculate() {}
 
 SlippagePtr HKU_API SP_Uniform(double min_value, double max_value) {
     SlippagePtr ptr = make_shared<UniformSlippage>();
-    ptr->setParam("min_value", min_value);
     ptr->setParam("max_value", max_value);
+    ptr->setParam("min_value", min_value);
     return ptr;
 }
 

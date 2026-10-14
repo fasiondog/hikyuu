@@ -13,7 +13,7 @@
 namespace hku {
 
 class LogNormalSlippage : public SlippageBase {
-    SLIPPAGE_IMP(LogNormalSlippage)
+    SLIPPAGE_IMP_RNG(LogNormalSlippage)
     SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

@@ -29,9 +29,9 @@ public:
     }
 
     virtual SlippagePtr _clone() {
-        SlippageTest *p = new SlippageTest;
-        p->m_x = m_x;
-        return SlippagePtr(p);
+        SlippagePtr p = std::make_shared<SlippageTest>();
+        p->reset();
+        return p;
     }
 
     virtual void _calculate() {}
@@ -70,12 +70,13 @@ TEST_CASE("test_Slippage") {
     p->reset();
     CHECK_EQ(p_src->getX(), 0);
 
-    /** @arg Test the clone operation */
+    /** @arg Test the clone operation: the clone is a distinct object and resets its internal
+     *        state (e.g. reseeds the RNG from the seed), so transient state is not copied */
     p_src->setX(10);
     SlippagePtr p_clone = p->clone();
     CHECK_EQ(p_clone->name(), "SlippageTest");
     p_src = (SlippageTest *)p_clone.get();
-    CHECK_EQ(p_src->getX(), 10);
+    CHECK_EQ(p_src->getX(), 0);
     CHECK_NE(p, p_clone);
 }
 

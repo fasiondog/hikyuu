@@ -13,7 +13,7 @@
 namespace hku {
 
 class UniformSlippage : public SlippageBase {
-    SLIPPAGE_IMP(UniformSlippage)
+    SLIPPAGE_IMP_RNG(UniformSlippage)
     SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:

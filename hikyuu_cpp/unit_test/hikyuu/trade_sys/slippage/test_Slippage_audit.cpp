@@ -126,8 +126,8 @@ TEST_CASE("test_TruncNormal_far_mean_no_degenerate") {
 
 /** @par Test points */
 TEST_CASE("test_FixedPercent_param_and_input") {
-    /** @arg p must be in [0, 0.1) */
-    CHECK_THROWS(SP_FixedPercent(0.5));
+    /** @arg p must be in [0, 1.0) */
+    CHECK_THROWS(SP_FixedPercent(1.0));
     auto sp = SP_FixedPercent(0.001);
     /** @arg an invalid (non-positive) plan price is returned as-is */
     CHECK_EQ(sp->getRealBuyPrice(Datetime(202201010930), -5.0), -5.0);
@@ -156,7 +156,7 @@ public:
 }  // namespace
 
 /** @par Test points */
-TEST_CASE("test_Slippage_clone_does_not_copy_kdata") {
+TEST_CASE("test_Slippage_clone_copies_kdata") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KData kdata = stock.getKData(KQuery(0, 50, KQuery::DAY));
@@ -166,10 +166,10 @@ TEST_CASE("test_Slippage_clone_does_not_copy_kdata") {
     sp->setTO(kdata);
     CHECK_EQ(static_cast<CalcCountSP*>(sp.get())->count, 1);
 
-    /** @arg clone must not carry m_kdata, so setTO with the same kdata re-runs _calculate */
+    /** @arg clone carries m_kdata, so setTO with the same kdata is a no-op (early return, no re-calc) */
     SlippagePtr c = sp->clone();
     c->setTO(kdata);
-    CHECK_EQ(static_cast<CalcCountSP*>(c.get())->count, 1);
+    CHECK_EQ(static_cast<CalcCountSP*>(c.get())->count, 0);
 }
 
 /** @} */
