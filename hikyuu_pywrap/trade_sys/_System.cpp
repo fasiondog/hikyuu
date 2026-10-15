@@ -320,6 +320,7 @@ void export_System(py::module& m) {
       .def_readwrite("tradesOnClose", &MomentResult::tradesOnClose)
       .def_readwrite("delayOnNextOpen", &MomentResult::delayOnNextOpen)
       .def_readwrite("suggestions", &MomentResult::suggestions)
+      .def_readwrite("pendingOnNextOpen", &MomentResult::pendingOnNextOpen)
       .def("allTrades", &MomentResult::allTrades)
       .def("empty", &MomentResult::empty);
 

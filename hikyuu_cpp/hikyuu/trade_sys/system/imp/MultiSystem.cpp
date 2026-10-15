@@ -879,6 +879,9 @@ MomentResult MultiSystem::runMoment(const Datetime& datetime) {
         m_trade_list.push_back(tr);
     }
 
+    // The aggregate target orders queued for the next open (trade_on_close=false)
+    result.pendingOnNextOpen = m_open_pending_suggestions;
+
     result.funds = m_tm->getFunds(datetime, ktype);
 
     // Mirror the base composite contract: surface the parent account's current holdings so that an
@@ -1018,6 +1021,9 @@ MomentResult MultiSystem::runMomentOnClose(const Datetime& datetime) {
         result.tradesOnClose.push_back(tr);
         m_trade_list.push_back(tr);
     }
+
+    // The aggregate target orders queued for the next open (trade_on_close=false)
+    result.pendingOnNextOpen = m_open_pending_suggestions;
 
     result.funds = m_tm->getFunds(datetime, ktype);
     return result;

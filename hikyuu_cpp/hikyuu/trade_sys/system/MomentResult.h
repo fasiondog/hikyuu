@@ -39,6 +39,9 @@ struct HKU_API MomentResult {
     TradeRecordList tradesOnClose;      // The trades executed at the [close] stage
     std::vector<TradeRequest> delayOnNextOpen;  // The requests delayed to the open of the next moment
     TradeSuggestionList suggestions;    // The suggestion instructions produced at this moment (the complete semantics)
+    TradeSuggestionList pendingOnNextOpen;  // The aggregate target orders to execute at the next
+                                            // open (trade_on_close=false); the multi-instrument
+                                            // counterpart of delayOnNextOpen
 
     json ext;                           // The extensible area (lazily constructed, an empty object by default)
 

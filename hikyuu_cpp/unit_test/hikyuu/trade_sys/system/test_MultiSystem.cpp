@@ -1805,6 +1805,34 @@ TEST_CASE("test_MultiSystem_trade_on_close_false") {
     CHECK_GE(ms->getTM()->getTradeList().size(), 2);
 }
 
+/** @par Check point: with trade_on_close=false the aggregate surfaces its next-open target orders
+ * in MomentResult.pendingOnNextOpen (previously the field was always empty for the aggregate) */
+TEST_CASE("test_MultiSystem_pending_on_next_open") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 2);
+
+    auto ms = std::make_shared<MultiSystem>("ms");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    ms->setTradeOnClose(false);
+    auto sys = create_alway_buy_sys();
+    sys->setTO(kdata);
+    ms->add(sys);
+    ms->setTO(kdata);
+    ms->readyForRun();
+
+    Datetime d0 = kdata.getDatetimeList()[0];
+    ms->runMomentOnOpen(d0);
+    /** @arg the rebalancing close queues the target orders for the next open */
+    MomentResult r0 = ms->runMomentOnClose(d0);
+    CHECK_UNARY(!r0.pendingOnNextOpen.empty());
+    /** @arg the queued orders are executed at the next open */
+    ms->runMomentOnOpen(kdata.getDatetimeList()[1]);
+    CHECK_UNARY(ms->getTM()->have(stk));
+}
+
 /** @par Check point: suggestions on non-rebalancing days accumulate to the next rebalancing
  * day (previously sub-system suggestions were dropped on non-rebalancing days) */
 TEST_CASE("test_MultiSystem_adjust_cycle_accumulate") {
