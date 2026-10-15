@@ -51,7 +51,14 @@ PriceList normalizeOnce(const PriceList& data, bool outExtreme, double nsigma) {
     }
 
     if (count <= 1) {
-        std::copy(data.begin(), data.end(), ret.begin());
+        // Fewer than two valid points is a degenerate cross-section (no dispersion): give the valid
+        // position the neutral 0 instead of leaking its raw magnitude, consistent with the sigma
+        // guard below and with NormMinMax / NormQuantile
+        for (size_t i = 0; i < total; i++) {
+            if (!std::isnan(data[i])) {
+                ret[i] = 0.0;
+            }
+        }
         return ret;
     }
 
@@ -65,9 +72,12 @@ PriceList normalizeOnce(const PriceList& data, bool outExtreme, double nsigma) {
     }
 
     price_t sigma = std::sqrt(sum / (count - 1));
+    // A zero-variance cross-section has no dispersion to scale; the z-score convention maps every
+    // value to the neutral 0 (SPSS / statsmodels: std == 0 -> all 0) instead of the 0 / 0 nan
+    bool zero_sigma = !(sigma > 0.0) || !std::isfinite(sigma);
     for (size_t i = 0; i < total; i++) {
         if (!std::isnan(data[i])) {
-            ret[i] = (data[i] - mean) / sigma;
+            ret[i] = zero_sigma ? 0.0 : (data[i] - mean) / sigma;
         }
     }
 

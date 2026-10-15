@@ -57,3 +57,30 @@ TEST_CASE("test_NormZScore") {
     REQUIRE_EQ(ret.size(), 1);
     CHECK(ret[0] == doctest::Approx(7.0));
 }
+
+/** @par Test points */
+TEST_CASE("test_NormZScore_zero_variance") {
+    NormPtr norm = NORM_Zscore();
+
+    /** @arg a zero-variance cross-section returns 0 for the valid positions instead of 0/0 nan */
+    PriceList ret = norm->normalize(PriceList{2.0, 2.0, 2.0, 2.0});
+    REQUIRE_EQ(ret.size(), 4);
+    for (size_t i = 0; i < ret.size(); i++) {
+        CHECK_UNARY(!std::isnan(ret[i]));
+        CHECK(ret[i] == doctest::Approx(0.0));
+    }
+
+    /** @arg a zero-variance cross-section keeps nan as nan and the valid ones 0 */
+    ret = norm->normalize(PriceList{7.0, Null<price_t>(), 7.0});
+    REQUIRE_EQ(ret.size(), 3);
+    CHECK(ret[0] == doctest::Approx(0.0));
+    CHECK_UNARY(std::isnan(ret[1]));
+    CHECK(ret[2] == doctest::Approx(0.0));
+
+    /** @arg a cross-section with a single valid point must not leak its raw magnitude: 0 */
+    ret = norm->normalize(PriceList{5.0, Null<price_t>(), Null<price_t>()});
+    REQUIRE_EQ(ret.size(), 3);
+    CHECK(ret[0] == doctest::Approx(0.0));
+    CHECK_UNARY(std::isnan(ret[1]));
+    CHECK_UNARY(std::isnan(ret[2]));
+}

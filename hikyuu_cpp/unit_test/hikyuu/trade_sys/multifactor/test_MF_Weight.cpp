@@ -123,7 +123,9 @@ TEST_CASE("test_MF_Weight") {
     ind2 = AMA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ind3 = EMA(ROCR(CLOSE(stk.getKData(query)), ndays));
     auto ind4 = mf->getFactor(stk);
-    CHECK_EQ(ind4.discard(), 0);
+    // the warm-up days where every factor is still nan are Null now (not a fake 0.0), so the
+    // discard reflects the warm-up instead of collapsing to 0
+    CHECK_EQ(ind4.discard(), 3);
     for (size_t i = 0; i < ind4.discard(); i++) {
         CHECK_UNARY(std::isnan(ind4[i]));
     }
@@ -165,7 +167,13 @@ TEST_CASE("test_MF_Weight_clone") {
     REQUIRE_EQ(scores1.size(), scores2.size());
     for (size_t i = 0, len = scores1.size(); i < len; i++) {
         CHECK_EQ(scores1[i].stock, scores2[i].stock);
-        CHECK_EQ(scores1[i].value, doctest::Approx(scores2[i].value).epsilon(0.0001));
+        // a warm-up day with every factor missing scores as nan; Approx(nan) never matches, so
+        // compare nan positions explicitly
+        if (std::isnan(scores1[i].value)) {
+            CHECK_UNARY(std::isnan(scores2[i].value));
+        } else {
+            CHECK(scores1[i].value == doctest::Approx(scores2[i].value).epsilon(0.0001));
+        }
     }
 
     for (const auto& stk : stks) {

@@ -101,11 +101,27 @@ MultiFactorBase::MultiFactorBase(const string& name) : m_name(name) {
 
 MultiFactorBase::MultiFactorBase(const MultiFactorBase& base)
 : m_params(base.m_params),
+  m_is_python_object(base.m_is_python_object),
   m_name(base.m_name),
   m_factorset(base.m_factorset),
   m_stks(base.m_stks),
   m_ref_stk(base.m_ref_stk),
-  m_query(base.m_query) {}
+  m_query(base.m_query) {
+    if (base.m_norm) {
+        m_norm = base.m_norm->clone();
+    }
+    for (const auto& [norm_name, norm] : base.m_special_norms) {
+        m_special_norms[norm_name] = norm->clone();
+    }
+    m_special_category = base.m_special_category;
+    for (const auto& [style_name, style_inds] : base.m_special_style_inds) {
+        IndicatorList& dst = m_special_style_inds[style_name];
+        dst.reserve(style_inds.size());
+        for (const auto& ind : style_inds) {
+            dst.emplace_back(ind.clone());
+        }
+    }
+}
 
 MultiFactorBase::MultiFactorBase(const StockList& stks, const KQuery& query, const Stock& ref_stk,
                                  const string& name, int ic_n, bool spearman, int mode,
@@ -209,6 +225,14 @@ MultiFactorPtr MultiFactorBase::clone() {
     }
 
     p->m_special_category = m_special_category;
+
+    for (const auto& [style_name, style_inds] : m_special_style_inds) {
+        IndicatorList& dst = p->m_special_style_inds[style_name];
+        dst.reserve(style_inds.size());
+        for (const auto& ind : style_inds) {
+            dst.emplace_back(ind.clone());
+        }
+    }
 
     p->m_calculated.store(false, std::memory_order_relaxed);
     // Force a recalculation without cloning the following caches, to avoid the thread unsafety
@@ -320,20 +344,25 @@ const IndicatorList& MultiFactorBase::getAllFactors() {
     return m_all_factors;
 }
 
-ScoreRecordList MultiFactorBase::getScores(const Datetime& d) {
+const ScoreRecordList& MultiFactorBase::getScoresRef(const Datetime& date) {
     calculate();
-    ScoreRecordList ret;
-    const auto iter = m_date_index.find(d);
-    HKU_IF_RETURN(iter == m_date_index.cend(), ret);
-    ret = m_stk_factor_by_date[iter->second];
-    return ret;
+    const auto iter = m_date_index.find(date);
+    if (iter == m_date_index.cend()) {
+        static const ScoreRecordList empty_scores;
+        return empty_scores;
+    }
+    return m_stk_factor_by_date[iter->second];
+}
+
+ScoreRecordList MultiFactorBase::getScores(const Datetime& d) {
+    return getScoresRef(d);
 }
 
 ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, size_t end) {
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    auto cross = getScores(date);
+    const auto& cross = getScoresRef(date);
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
@@ -351,7 +380,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    auto cross = getScores(date);
+    const auto& cross = getScoresRef(date);
     HKU_IF_RETURN(cross.empty(), ret);
 
     if (end == Null<size_t>() || end > cross.size()) {
@@ -359,16 +388,20 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     }
 
     ret.reserve(end - start);
+    for (size_t i = start; i < end; i++) {
+        ret.emplace_back(cross[i]);
+    }
+    // copy the slice out first: the external filter callback may trigger a recalculation that would
+    // otherwise leave cross dangling
     if (filter) {
-        for (size_t i = start; i < end; i++) {
-            if (filter(cross[i])) {
-                ret.emplace_back(cross[i]);
+        ScoreRecordList kept;
+        kept.reserve(ret.size());
+        for (const auto& r : ret) {
+            if (filter(r)) {
+                kept.emplace_back(r);
             }
         }
-    } else {
-        for (size_t i = start; i < end; i++) {
-            ret.emplace_back(cross[i]);
-        }
+        ret = std::move(kept);
     }
 
     return ret;
@@ -380,7 +413,7 @@ ScoreRecordList MultiFactorBase::getScores(
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    auto cross = getScores(date);
+    const auto& cross = getScoresRef(date);
     HKU_IF_RETURN(cross.empty(), ret);
 
     if (end == Null<size_t>() || end > cross.size()) {
@@ -388,16 +421,20 @@ ScoreRecordList MultiFactorBase::getScores(
     }
 
     ret.reserve(end - start);
+    for (size_t i = start; i < end; i++) {
+        ret.emplace_back(cross[i]);
+    }
+    // copy the slice out first: the external filter callback may trigger a recalculation that would
+    // otherwise leave cross dangling
     if (filter) {
-        for (size_t i = start; i < end; i++) {
-            if (filter(date, cross[i])) {
-                ret.emplace_back(cross[i]);
+        ScoreRecordList kept;
+        kept.reserve(ret.size());
+        for (const auto& r : ret) {
+            if (filter(date, r)) {
+                kept.emplace_back(r);
             }
         }
-    } else {
-        for (size_t i = start; i < end; i++) {
-            ret.emplace_back(cross[i]);
-        }
+        ret = std::move(kept);
     }
 
     return ret;
@@ -408,7 +445,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     ScoreRecordList ret;
     HKU_IF_RETURN(start >= end, ret);
 
-    auto cross = getScores(date);
+    const auto& cross = getScoresRef(date);
     HKU_IF_RETURN(cross.empty(), ret);
 
     if (end == Null<size_t>() || end > cross.size()) {
@@ -598,7 +635,8 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     }
 
     // The time cross-sectional standardization / normalization
-    if (m_norm || !m_special_category.empty() || !m_special_style_inds.empty()) {
+    if (m_norm || !m_special_norms.empty() || !m_special_category.empty() ||
+        !m_special_style_inds.empty()) {
         // The residual regression of the style factor neutralization has been extracted as a serial
         // kernel (StyleRegression.cpp), it no longer modifies the process level Eigen::setNbThreads
         // at runtime, avoiding the concurrent MFs polluting the global config mutually; the outer

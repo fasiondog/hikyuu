@@ -51,3 +51,22 @@ TEST_CASE("test_NormMinMax") {
     ret = norm->normalize(PriceList());
     CHECK_UNARY(ret.empty());
 }
+
+/** @par Test points */
+TEST_CASE("test_NormMinMax_zero_variance") {
+    NormPtr norm = NORM_MinMax();
+
+    /** @arg a zero-range cross-section returns the neutral 0 for the valid positions */
+    PriceList ret = norm->normalize(PriceList{3.0, 3.0, 3.0, 3.0});
+    REQUIRE_EQ(ret.size(), 4);
+    for (size_t i = 0; i < ret.size(); i++) {
+        CHECK(ret[i] == doctest::Approx(0.0));
+    }
+
+    /** @arg the nan positions stay nan while the equal valid positions become 0 */
+    ret = norm->normalize(PriceList{5.0, Null<price_t>(), 5.0});
+    REQUIRE_EQ(ret.size(), 3);
+    CHECK(ret[0] == doctest::Approx(0.0));
+    CHECK_UNARY(std::isnan(ret[1]));
+    CHECK(ret[2] == doctest::Approx(0.0));
+}

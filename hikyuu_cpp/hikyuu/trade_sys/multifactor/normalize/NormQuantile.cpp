@@ -67,6 +67,15 @@ PriceList NormQuantile::normalize(const PriceList &src) {
     // Sort by value (ascending)
     std::sort(valueIndices.begin(), valueIndices.end());
 
+    // A zero-dispersion cross-section has no ranks to spread; return the neutral 0 for the valid
+    // positions, consistent with NormZScore and NormMinMax (the shared zero-variance convention)
+    if (!valueIndices.empty() && valueIndices.front().first == valueIndices.back().first) {
+        for (const auto &item : valueIndices) {
+            result[item.second] = 0.0;
+        }
+        return result;
+    }
+
     boost::math::normal_distribution<> stdNormal(0.0, 1.0);
 
     // Calculate the average rank (handling the duplicate values)

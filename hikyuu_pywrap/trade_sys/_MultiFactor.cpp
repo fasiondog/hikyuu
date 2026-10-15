@@ -336,6 +336,8 @@ The custom multi-factor model override hooks:
 
     Get the list of all the original factors (if the standardization or the industry neutralization is specified, the returned list is the processed factor list)
 
+    :note: it must be called after a calculation has been triggered (e.g. get_scores / calculate); on an uncalculated instance the normalization / neutralization is skipped and the raw aligned factors are returned
+
     :rtype: list
     :return: list IndicatorList stks x inds)")
 

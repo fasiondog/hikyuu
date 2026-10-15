@@ -40,7 +40,13 @@ PriceList NormMinMax::normalize(const PriceList& data) {
     }
 
     if (min_value == max_value) {
-        std::copy(data.begin(), data.end(), result.begin());
+        // A zero-range cross-section has no dispersion to scale; return the neutral 0 for the valid
+        // positions instead of leaking the raw values (the shared zero-variance convention)
+        for (size_t i = 0; i < data.size(); ++i) {
+            if (!std::isnan(data[i])) {
+                result[i] = 0.0;
+            }
+        }
         return result;
     }
 

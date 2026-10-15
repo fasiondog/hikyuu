@@ -66,21 +66,29 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
     return global_parallel_for_index(0, stk_count, [&, ind_count, days_total, discard](size_t si) {
         PriceList new_values(days_total, 0.0);
         PriceList sum_weight(days_total, 0.0);
+        vector<size_t> countByDate(days_total, 0);
         for (size_t di = 0; di < discard; di++) {
             new_values[di] = Null<price_t>();
         }
 
+        // Only accumulate the factors that have a value, consistent with the equal weight and the
+        // given weight models: a missing factor no longer drops the whole score of the stock
         for (size_t ii = 0; ii < ind_count; ii++) {
             const auto* ind_data = all_stk_inds[si][ii].data();
             const auto* ic_data = ic[ii].data();
             for (size_t di = discard; di < days_total; di++) {
-                new_values[di] += ind_data[di] * ic_data[di];
-                sum_weight[di] += std::abs(ic_data[di]);
+                if (!std::isnan(ind_data[di]) && !std::isnan(ic_data[di])) {
+                    new_values[di] += ind_data[di] * ic_data[di];
+                    sum_weight[di] += std::abs(ic_data[di]);
+                    countByDate[di] += 1;
+                }
             }
         }
 
         for (size_t di = discard; di < days_total; di++) {
-            if (!std::isnan(new_values[di]) && sum_weight[di] != 0.0) {
+            if (countByDate[di] == 0) {
+                new_values[di] = Null<price_t>();
+            } else if (sum_weight[di] != 0.0) {
                 new_values[di] = new_values[di] / sum_weight[di];
             }
         }

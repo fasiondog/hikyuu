@@ -51,6 +51,33 @@ TEST_CASE("test_NormQuantile_nan_preserved") {
 }
 
 /** @par Test points */
+TEST_CASE("test_NormQuantile_zero_dispersion") {
+    /** @arg a zero-dispersion cross-section returns the neutral 0 for the valid positions */
+    NormPtr norm = NORM_Quantile();
+    PriceList ret = norm->normalize(PriceList{4.0, 4.0, 4.0, 4.0});
+    REQUIRE_EQ(ret.size(), 4);
+    for (size_t i = 0; i < ret.size(); ++i) {
+        CHECK_UNARY(!std::isnan(ret[i]));
+        CHECK(ret[i] == doctest::Approx(0.0));
+    }
+
+    /** @arg nan positions stay nan while the equal valid positions become 0 */
+    ret = norm->normalize(PriceList{4.0, Null<price_t>(), 4.0});
+    REQUIRE_EQ(ret.size(), 3);
+    CHECK(ret[0] == doctest::Approx(0.0));
+    CHECK_UNARY(std::isnan(ret[1]));
+    CHECK(ret[2] == doctest::Approx(0.0));
+
+    /** @arg the uniform variant returns the midpoint 0.5 (its (0,1) neutral), not the lowest 0 */
+    NormPtr un = NORM_Quantile_Uniform();
+    ret = un->normalize(PriceList{9.0, 9.0, 9.0});
+    REQUIRE_EQ(ret.size(), 3);
+    for (size_t i = 0; i < ret.size(); ++i) {
+        CHECK(ret[i] == doctest::Approx(0.5));
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_NormQuantileUniform_nan_preserved") {
     NormPtr norm = NORM_Quantile_Uniform();
 

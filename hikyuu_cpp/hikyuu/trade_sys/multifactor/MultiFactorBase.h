@@ -142,6 +142,10 @@ public:
      * every time.
      * @note Considering the memory usage, this data is not cached; it is generally used for the
      *       testing or when you want to view the processed original factor values
+     * @note It must be called after a calculation has been triggered (e.g. getScores /
+     *       getAllScores / calculate); on an uncalculated instance the reference date list is still
+     *       empty, so the normalization / neutralization is skipped and the raw aligned factors are
+     *       returned
      * @return vector<IndicatorList>  stks x inds
      */
     vector<IndicatorList> getAllSrcFactors();
@@ -215,6 +219,10 @@ private:
     unordered_map<string, std::pair<PriceList, size_t>> _buildDummyIndex();
 
     void _buildIndex();  // Create the cross-section index after the calculation is finished
+
+    // Return the whole cross-section of the given date by reference, so the range / filter getters
+    // do not copy the full cross-section (with the Stock shared_ptr refcount) on every call
+    const ScoreRecordList& getScoresRef(const Datetime& date);
 
     void _checkData();
 

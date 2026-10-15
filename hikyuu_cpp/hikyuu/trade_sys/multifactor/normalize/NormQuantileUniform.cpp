@@ -66,6 +66,16 @@ PriceList NormQuantileUniform::normalize(const PriceList &src) {
     // Sort by value (ascending)
     std::sort(valueIndices.begin(), valueIndices.end());
 
+    // A zero-dispersion cross-section has no ranks to spread; the output domain here is the uniform
+    // (0, 1) quantile, so the neutral value is its midpoint 0.5 (what the all-equal ranking already
+    // yields), not 0 which would be the lowest score
+    if (!valueIndices.empty() && valueIndices.front().first == valueIndices.back().first) {
+        for (const auto &item : valueIndices) {
+            result[item.second] = 0.5;
+        }
+        return result;
+    }
+
     // Calculate the average rank (handling the duplicate values)
     int64_t i = 0;
     int64_t n = static_cast<int64_t>(valueIndices.size());
