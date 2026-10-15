@@ -6,6 +6,7 @@
  */
 
 #include "doctest/doctest.h"
+#include <chrono>
 #include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
@@ -660,6 +661,117 @@ TEST_CASE("test_SG_kdata_size_mismatch") {
     sg->setTO(k);
     CHECK_UNARY(sg->getBuySignal().empty());
     CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+// A step signal generator for the SG-008 operator benchmark: emits buy/sell signals at fixed bar
+// steps so the logic operator _calculate cost can be measured against real KData
+class BenchStepSig : public SignalBase {
+public:
+    BenchStepSig(size_t buy_step, size_t sell_step)
+    : SignalBase("BenchStepSig"), m_buy_step(buy_step), m_sell_step(sell_step) {}
+    virtual ~BenchStepSig() {}
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new BenchStepSig(m_buy_step, m_sell_step));
+    }
+
+    virtual void _calculate(const KData &kdata) override {
+        size_t total = kdata.size();
+        for (size_t i = 0; i < total; ++i) {
+            if (i % m_buy_step == 0) {
+                _addBuySignal(kdata[i].datetime);
+            }
+            if (i % m_sell_step == 0) {
+                _addSellSignal(kdata[i].datetime);
+            }
+        }
+    }
+
+private:
+    size_t m_buy_step;
+    size_t m_sell_step;
+};
+
+/** @par Test points (benchmark: prints the cost only, no time assertion) */
+TEST_CASE("bench_SG_logic_operator") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    if (kdata.size() < 100) {
+        return;
+    }
+    std::cout << "bench_SG_logic_operator: kdata size: " << kdata.size() << std::endl;
+
+    const int runs = 100;
+    struct BenchCase {
+        const char *density;
+        size_t buy_step;
+        size_t sell_step;
+    };
+    BenchCase cases[] = {
+      {"dense", 3, 5},
+      {"sparse", 20, 15},
+    };
+
+    for (const auto &bench_case : cases) {
+        for (int op = 0; op < 3; ++op) {
+            // Add represents the additive family (Add/Sub); Mul the multiplicative family
+            // (Mul/Div/And); Or the branch family
+            auto sg1 = make_shared<BenchStepSig>(bench_case.buy_step, bench_case.sell_step);
+            auto sg2 = make_shared<BenchStepSig>(bench_case.buy_step, bench_case.sell_step);
+            SignalPtr sg;
+            const char *op_name = "Add";
+            switch (op) {
+                case 0:
+                    sg = sg1 + sg2;
+                    op_name = "Add";
+                    break;
+                case 1:
+                    sg = sg1 * sg2;
+                    op_name = "Mul";
+                    break;
+                case 2:
+                    sg = sg1 | sg2;
+                    op_name = "Or";
+                    break;
+            }
+            REQUIRE_UNARY(sg);
+
+            sg->setTO(kdata);
+            size_t expect_buy = sg->getBuySignal().size();
+            size_t expect_sell = sg->getSellSignal().size();
+            CHECK_UNARY(expect_buy + expect_sell > 0);
+
+            // warm: flip a no-op param to invalidate only the operator itself, keeping the
+            // sub-signals warm, so the loop measures the operator _calculate alone
+            auto t0 = std::chrono::steady_clock::now();
+            for (int i = 0; i < runs; ++i) {
+                sg->setParam<bool>("support_borrow_stock", false);
+                sg->setTO(kdata);
+            }
+            auto t1 = std::chrono::steady_clock::now();
+            double warm_ms =
+              std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;
+
+            // cold: reset propagates to the sub-signals, so each run includes their recalculation
+            t0 = std::chrono::steady_clock::now();
+            for (int i = 0; i < runs; ++i) {
+                sg->reset();
+                sg->setTO(kdata);
+            }
+            t1 = std::chrono::steady_clock::now();
+            double cold_ms =
+              std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;
+
+            CHECK_UNARY(sg->getBuySignal().size() == expect_buy &&
+                        sg->getSellSignal().size() == expect_sell);
+
+            std::cout << "  [" << bench_case.density << "] " << op_name << " x" << runs
+                      << " setTO: warm(operator only) " << warm_ms << " ms (" << warm_ms * 10.0
+                      << " us/run), cold(with sub calc) " << cold_ms << " ms (" << cold_ms * 10.0
+                      << " us/run)" << std::endl;
+        }
+    }
 }
 
 /** @} */

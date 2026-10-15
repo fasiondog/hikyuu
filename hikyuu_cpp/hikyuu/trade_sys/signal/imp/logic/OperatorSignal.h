@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "hikyuu/trade_sys/signal/SignalBase.h"
 
 namespace hku {
@@ -25,6 +27,17 @@ public:
 
 protected:
     void sub_sg_calculate(SignalPtr& sg, const KData& kdata);
+
+    typedef std::function<void(const Datetime&, double, double, double, double)> MergedEmitFunc;
+
+    /**
+     * Merge-join calculation over the sub-signal tables: the emit callback is called only at the
+     * datetimes where any sub-signal table has an entry and only for real bars of kdata
+     * @param kdata the trading object
+     * @param emit the combine callback as (datetime, buy1, sell1, buy2, sell2); a value is 0.0
+     *             when the table has no entry there or the sub-signal is null
+     */
+    void sub_merged_calculate(const KData& kdata, const MergedEmitFunc& emit);
 
 protected:
     SignalPtr m_sg1;

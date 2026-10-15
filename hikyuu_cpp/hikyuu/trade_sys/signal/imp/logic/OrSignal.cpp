@@ -17,45 +17,31 @@ namespace hku {
 void OrSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg1 && !m_sg2, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
+    auto emit = [this](const Datetime& datetime, double buy1, double sell1, double buy2,
+                       double sell2) {
+        double value = buy1 + sell1 + buy2 + sell2;
+        if (std::isfinite(value) && value > 0.0) {
+            _addBuySignal(datetime);
+        } else if (std::isfinite(value) && value < 0.0) {
+            _addSellSignal(datetime);
+        }
+    };
 
     if (m_sg1 && !m_sg2) {
         sub_sg_calculate(m_sg1, kdata);
-        for (size_t i = 0; i < total; ++i) {
-            auto value = m_sg1->getValue(ks[i].datetime);
-            if (std::isfinite(value) && value > 0.0) {
-                _addBuySignal(ks[i].datetime);
-            } else if (std::isfinite(value) && value < 0.0) {
-                _addSellSignal(ks[i].datetime);
-            }
-        }
+        sub_merged_calculate(kdata, emit);
         return;
     }
 
     if (!m_sg1 && m_sg2) {
         sub_sg_calculate(m_sg2, kdata);
-        for (size_t i = 0; i < total; i++) {
-            auto value = m_sg2->getValue(ks[i].datetime);
-            if (std::isfinite(value) && value > 0.0) {
-                _addBuySignal(ks[i].datetime);
-            } else if (std::isfinite(value) && value < 0.0) {
-                _addSellSignal(ks[i].datetime);
-            }
-        }
+        sub_merged_calculate(kdata, emit);
         return;
     }
 
     sub_sg_calculate(m_sg1, kdata);
     sub_sg_calculate(m_sg2, kdata);
-    for (size_t i = 0; i < total; ++i) {
-        double value = m_sg1->getValue(ks[i].datetime) + m_sg2->getValue(ks[i].datetime);
-        if (std::isfinite(value) && value > 0.0) {
-            _addBuySignal(ks[i].datetime);
-        } else if (std::isfinite(value) && value < 0.0) {
-            _addSellSignal(ks[i].datetime);
-        }
-    }
+    sub_merged_calculate(kdata, emit);
 }
 
 HKU_API SignalPtr operator|(const SignalPtr& sg1, const SignalPtr& sg2) {

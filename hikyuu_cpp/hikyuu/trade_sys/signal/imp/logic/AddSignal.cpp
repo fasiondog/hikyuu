@@ -16,31 +16,25 @@ namespace hku {
 void AddSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg1 && !m_sg2, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
-
     if (m_sg1 && !m_sg2) {
         sub_sg_calculate(m_sg1, kdata);
-        for (size_t i = 0; i < total; ++i) {
-            _addSignal(ks[i].datetime, m_sg1->getValue(ks[i].datetime));
-        }
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy1, double sell1,
+                                           double, double) { _addSignal(datetime, buy1 + sell1); });
         return;
     }
 
     if (!m_sg1 && m_sg2) {
         sub_sg_calculate(m_sg2, kdata);
-        for (size_t i = 0; i < total; i++) {
-            _addSignal(ks[i].datetime, m_sg2->getValue(ks[i].datetime));
-        }
+        sub_merged_calculate(kdata, [this](const Datetime& datetime, double, double, double buy2,
+                                           double sell2) { _addSignal(datetime, buy2 + sell2); });
         return;
     }
 
     sub_sg_calculate(m_sg1, kdata);
     sub_sg_calculate(m_sg2, kdata);
-    for (size_t i = 0; i < total; ++i) {
-        double value = m_sg1->getValue(ks[i].datetime) + m_sg2->getValue(ks[i].datetime);
-        _addSignal(ks[i].datetime, value);
-    }
+    sub_merged_calculate(
+      kdata, [this](const Datetime& datetime, double buy1, double sell1, double buy2,
+                    double sell2) { _addSignal(datetime, buy1 + sell1 + buy2 + sell2); });
 }
 
 HKU_API SignalPtr operator+(const SignalPtr& sg1, const SignalPtr& sg2) {

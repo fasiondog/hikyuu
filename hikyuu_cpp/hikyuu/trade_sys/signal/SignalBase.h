@@ -80,6 +80,16 @@ public:
     /** Get the date list of all the sell indications */
     DatetimeList getSellSignal() const;
 
+    /** Get the buy signal table, for the C++ operator signals to iterate directly */
+    const std::map<Datetime, double>& getBuySignalMap() const {
+        return m_buySig;
+    }
+
+    /** Get the sell signal table, for the C++ operator signals to iterate directly */
+    const std::map<Datetime, double>& getSellSignalMap() const {
+        return m_sellSig;
+    }
+
     void _addSignal(const Datetime& datetime, double value);
 
     /**

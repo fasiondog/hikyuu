@@ -144,14 +144,19 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
     HKU_IF_RETURN(!std::isfinite(value) || value == 0.0, void());
 
-    double new_value = value + getBuyValue(datetime) + getSellValue(datetime);
+    // A single find per map is reused by both the value merge and the later insert/accumulate
+    auto buy_iter = m_buySig.find(datetime);
+    auto sell_iter = m_sellSig.find(datetime);
+    double buy_value = buy_iter != m_buySig.end() ? buy_iter->second : 0.0;
+    double sell_value = sell_iter != m_sellSig.end() ? sell_iter->second : 0.0;
+    double new_value = value + buy_value + sell_value;
     HKU_IF_RETURN(!std::isfinite(new_value) || new_value == 0.0, void());
 
+    bool alternate = getParam<bool>("alternate");
     if (new_value > 0.0) {
-        auto iter = m_buySig.find(datetime);
-        if (!getParam<bool>("alternate")) {
-            if (iter != m_buySig.end()) {
-                iter->second += new_value;
+        if (!alternate) {
+            if (buy_iter != m_buySig.end()) {
+                buy_iter->second += new_value;
             } else {
                 m_buySig.insert({datetime, new_value});
             }
@@ -159,8 +164,8 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
         }
 
         if (!m_hold_long) {
-            if (iter != m_buySig.end()) {
-                iter->second += new_value;
+            if (buy_iter != m_buySig.end()) {
+                buy_iter->second += new_value;
             } else {
                 m_buySig.insert({datetime, new_value});
             }
@@ -172,10 +177,9 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
         }
 
     } else {
-        auto iter = m_sellSig.find(datetime);
-        if (!getParam<bool>("alternate")) {
-            if (iter != m_sellSig.end()) {
-                iter->second += new_value;
+        if (!alternate) {
+            if (sell_iter != m_sellSig.end()) {
+                sell_iter->second += new_value;
             } else {
                 m_sellSig.insert({datetime, new_value});
             }
@@ -184,15 +188,15 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
 
         if (!m_hold_short) {
             if (m_hold_long) {
-                if (iter != m_sellSig.end()) {
-                    iter->second += new_value;
+                if (sell_iter != m_sellSig.end()) {
+                    sell_iter->second += new_value;
                 } else {
                     m_sellSig.insert({datetime, new_value});
                 }
                 m_hold_long = false;
             } else if (getParam<bool>("support_borrow_stock")) {
-                if (iter != m_sellSig.end()) {
-                    iter->second += new_value;
+                if (sell_iter != m_sellSig.end()) {
+                    sell_iter->second += new_value;
                 } else {
                     m_sellSig.insert({datetime, new_value});
                 }
