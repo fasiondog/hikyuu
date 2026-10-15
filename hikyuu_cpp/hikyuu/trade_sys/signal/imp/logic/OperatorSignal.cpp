@@ -39,9 +39,12 @@ void OperatorSignal::_reset() {
 
 void OperatorSignal::sub_sg_calculate(SignalPtr& sg, const KData& kdata) {
     HKU_IF_RETURN(!sg, void());
-    bool cycle = sg->getParam<bool>("cycle");
-    if (cycle) {
+    if (sg->getParam<bool>("cycle")) {
+        // A cycle sub-signal is driven by startCycle within its own cycle window only
+        HKU_IF_RETURN(m_cycle_end.isNull(), void());
+        sg->setTO(m_kdata);
         sg->startCycle(m_cycle_start, m_cycle_end);
+        return;
     }
     sg->_calculate(kdata);
 }

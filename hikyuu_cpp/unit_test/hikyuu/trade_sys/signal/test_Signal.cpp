@@ -428,6 +428,34 @@ TEST_CASE("test_SG_OperatorValue_clone_mode") {
 }
 
 /** @par Test points */
+TEST_CASE("test_SG_Operator_cycle_sub") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    Datetime first = k.front().datetime;
+    Datetime last = k.back().datetime;
+
+    /** @arg a cycle sub-signal in a normal combined signal does not throw and stays silent */
+    SignalPtr or_sg = SG_Cycle() | make_shared<SignalCalcTest>();
+    or_sg->setTO(k);
+    CHECK_UNARY(or_sg->getBuySignal().size() == 1 && or_sg->getBuySignal()[0] == first);
+    CHECK_UNARY(or_sg->getSellSignal().size() == 1 && or_sg->getSellSignal()[0] == last);
+
+    /** @arg the cycle sub-signals are driven by startCycle */
+    SignalPtr or_cycle = SG_Cycle() | SG_Cycle();
+    or_cycle->setParam<bool>("cycle", true);
+    or_cycle->setTO(k);
+    Datetime start = k[5].datetime;
+    Datetime close = k[10].datetime;
+    or_cycle->startCycle(start, close);
+    CHECK_UNARY(or_cycle->getBuySignal().size() == 1 && or_cycle->getBuySignal()[0] == start);
+    CHECK_UNARY(or_cycle->getBuyValue(start) == 1.0);
+}
+
+/** @par Test points */
 TEST_CASE("test_SG_Cross_non_finite") {
     StockManager &sm = StockManager::instance();
     KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
