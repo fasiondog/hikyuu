@@ -29,6 +29,7 @@ ScoresFilterPtr HKU_API SCFilter_TopN(int topn = 10);
  * It is related to the order of the passed cross-section score list: if it is in the descending
  * order, the system score records with a smaller turnover amount are filtered; otherwise the ones
  * with a larger amount are filtered
+ * @note At least one record is always kept, so a limit of 1.0 still keeps the best one
  * @param min_amount_percent_limit the minimum turnover amount percentage limit
  * @return ScoresFilterPtr
  */

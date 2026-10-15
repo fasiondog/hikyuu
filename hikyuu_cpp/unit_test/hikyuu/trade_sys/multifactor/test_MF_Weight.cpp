@@ -197,6 +197,28 @@ TEST_CASE("test_MF_Weight_empty_weights") {
     CHECK_THROWS_AS(mf->calculate(), std::exception);
 }
 
+/** @par Test points */
+TEST_CASE("test_MF_Weight_scores_range_overflow") {
+    StockManager& sm = StockManager::instance();
+    IndicatorList src_inds = {MA(CLOSE())};
+    StockList stks = {sm["sh600004"], sm["sh600005"]};
+    KQuery query = KQuery(-30);
+    Stock ref_stk = sm["sh000001"];
+    auto mf = MF_EqualWeight(src_inds, stks, query, ref_stk);
+    auto dates = mf->getDatetimeList();
+    auto cross = mf->getScores(dates.back());
+    REQUIRE_GT(cross.size(), (size_t)0);
+
+    /** @arg a start beyond the cross-section size returns empty instead of a reserve underflow */
+    auto ret = mf->getScores(dates.back(), 1000);
+    CHECK_UNARY(ret.empty());
+
+    /** @arg a filtered range with a start beyond the cross-section size returns empty */
+    auto ret2 =
+      mf->getScores(dates.back(), 1000, Null<size_t>(), [](const ScoreRecord&) { return true; });
+    CHECK_UNARY(ret2.empty());
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

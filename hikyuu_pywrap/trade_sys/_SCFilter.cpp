@@ -35,7 +35,8 @@ public:
 
 void export_SCFilter(py::module& m) {
     py::class_<ScoresFilterBase, ScoresFilterPtr, PyScoresFilterBase>(
-      m, "ScoresFilterBase", py::dynamic_attr(), R"(The cross-section standardization operation used for the MF)")
+      m, "ScoresFilterBase", py::dynamic_attr(),
+      R"(The cross-section standardization operation used for the MF)")
       .def(py::init<>())
       .def(py::init<const ScoresFilterBase&>())
       .def(py::init<const string&>(), R"(The initialization constructor
@@ -81,7 +82,8 @@ void export_SCFilter(py::module& m) {
     :return: the cross-section data
     :rtype: ScoreRecordList)")
 
-      .def("_filter", &ScoresFilterBase::_filter, "[Overload interface] The subclass calculation interface")
+      .def("_filter", &ScoresFilterBase::_filter,
+           "[Overload interface] The subclass calculation interface")
 
       .def("__or__",
            [](const ScoresFilterPtr& self, const ScoresFilterPtr& other) { return self | other; })
@@ -119,6 +121,8 @@ void export_SCFilter(py::module& m) {
     Filter out the cross-sections whose amount is within the percentage range at the end of the score list
     
     Note: it is related to the order of the passed cross-section score list; if it is descending, the system score records with the smaller amounts are filtered; otherwise, the records with the larger amounts
+
+    Note: at least one record is always kept, so a limit of 1.0 still keeps the best one
 
     :param double min_amount_percent_limit: the minimum amount percentage limit
     :return: the cross-section filter

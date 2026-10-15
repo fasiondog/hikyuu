@@ -149,8 +149,6 @@ void MultiFactorBase::initParam() {
 void MultiFactorBase::baseCheckParam(const string& name) const {
     if ("ic_n" == name) {
         HKU_ASSERT(getParam<int>("ic_n") >= 1);
-    } else if ("zscore_nsigma" == name) {
-        HKU_ASSERT(getParam<double>("zscore_nsigma") > 0.0);
     } else if ("mode" == name) {
         int mode = getParam<int>("mode");
         HKU_ASSERT(mode == 0 || mode == 1 || mode == 2);
@@ -366,6 +364,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
+    HKU_IF_RETURN(start >= end, ret);
 
     ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
@@ -386,6 +385,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
+    HKU_IF_RETURN(start >= end, ret);
 
     ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
@@ -419,6 +419,7 @@ ScoreRecordList MultiFactorBase::getScores(
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
+    HKU_IF_RETURN(start >= end, ret);
 
     ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
@@ -451,6 +452,7 @@ ScoreRecordList MultiFactorBase::getScores(const Datetime& date, size_t start, s
     if (end == Null<size_t>() || end > cross.size()) {
         end = cross.size();
     }
+    HKU_IF_RETURN(start >= end, ret);
 
     ret.reserve(end - start);
     for (size_t i = start; i < end; i++) {
@@ -517,17 +519,17 @@ unordered_map<string, std::pair<PriceList, size_t>> MultiFactorBase::_buildDummy
     // membership labels
     unordered_map<string, std::pair<PriceList, size_t>> stock_dummy_index;
     for (const auto& [ind_name, catefory] : m_special_category) {
-        stock_dummy_index[ind_name] = {PriceList(m_stks.size(), Null<price_t>()), 0};
         auto blks = StockManager::instance().getBlockList(catefory);
         if (blks.empty()) {
             HKU_WARN("Block list ({}) is empty, please check your block category!", catefory);
             continue;
         }
 
-        auto iter = stock_dummy_index.find(ind_name);
-        auto& dummy = iter->second.first;
+        auto& entry = stock_dummy_index[ind_name];
         size_t blk_count = blks.size();
-        iter->second.second = blk_count;
+        entry.second = blk_count;
+        auto& dummy = entry.first;
+        dummy.resize(m_stks.size(), Null<price_t>());
 
         for (size_t i = 0; i < m_stks.size(); i++) {
             bool found = false;
@@ -569,13 +571,11 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
     vector<IndicatorList> all_stk_inds;
     size_t stk_count = m_stks.size();
     HKU_IF_RETURN(stk_count == 0, all_stk_inds);
-    all_stk_inds.resize(stk_count);
 
     size_t ind_count = m_factorset.size();
     HKU_IF_RETURN(ind_count == 0, all_stk_inds);
 
     size_t days_total = m_ref_dates.size();
-    auto null_ind = PRICELIST(PriceList(days_total, Null<price_t>()), m_ref_dates);
 
     bool fill_null = getParam<bool>("fill_null");
 
@@ -614,14 +614,18 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         }
     }
     if (!m_special_style_inds.empty()) {
+        auto null_ind = PRICELIST(PriceList(days_total, Null<price_t>()), m_ref_dates);
         global_parallel_for_index_void(0, stk_count, [&](size_t si) {
             const auto& stk = m_stks[si];
             auto kdata = stk.getKData(m_query);
             for (auto& [style_ind_name, styles] : m_special_style_inds) {
-                auto& per_factor = use_style_inds[style_ind_name];
+                auto pf_iter = use_style_inds.find(style_ind_name);
+                auto& per_factor = pf_iter->second;
                 for (size_t j = 0; j < styles.size(); j++) {
                     if (kdata.size() == 0) {
-                        per_factor[j][si] = null_ind;
+                        // A fresh clone per slot: sharing one Indicator would leak the name() below
+                        // across the slots
+                        per_factor[j][si] = null_ind.clone();
                     } else {
                         // An independent clone per thread: calculate writes the buffer of the
                         // thread copy only

@@ -94,14 +94,8 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
         }
 
         Indicator ret = PRICELIST(new_values);
+        ret.updateDiscard(true);
         ret.name("IC");
-
-        const auto* data = ret.data();
-        for (size_t di = discard; di < days_total; di++) {
-            if (!std::isnan(data[di])) {
-                ret.setDiscard(discard);
-            }
-        }
 
         return ret;
     });

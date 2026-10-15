@@ -83,13 +83,13 @@ PriceList NormQuantileUniform::normalize(const PriceList &src) {
         // For a large sample use (k - 0.5) / n
         while (i < n) {
             double currentValue = valueIndices[i].first;
-            size_t start = i;
+            int64_t start = i;
 
             // Find the range of all the equal values
             while (i < n && valueIndices[i].first == currentValue) {
                 ++i;
             }
-            int end = i - 1;  // The last index of the equal values
+            int64_t end = i - 1;  // The last index of the equal values
 
             // Calculate the average rank: (start+1 + end+1) / 2 (the rank starts from 1)
             double avgRank = (start + 1 + end + 1) / 2.0;
@@ -108,13 +108,13 @@ PriceList NormQuantileUniform::normalize(const PriceList &src) {
         double denominator = n + 1.0;
         while (i < n) {
             double currentValue = valueIndices[i].first;
-            size_t start = i;
+            int64_t start = i;
 
             // Find the range of all the equal values
             while (i < n && valueIndices[i].first == currentValue) {
                 ++i;
             }
-            int end = i - 1;  // The last index of the equal values
+            int64_t end = i - 1;  // The last index of the equal values
 
             // Calculate the average rank: (start+1 + end+1) / 2 (the rank starts from 1)
             double avgRank = (start + 1 + end + 1) / 2.0;
