@@ -184,7 +184,7 @@ void MultiSystem::_reset() {
     m_running_set.clear();
     m_running_order.clear();
     m_force_sell_list.clear();
-    m_signal_reset_date = Null<Datetime>();
+    m_signal_reset_dates.clear();
     // The rebalancing cycle restarts with a fresh run; kept across the live reset=false replays
     m_close_day_index = 0;
 }
@@ -209,7 +209,7 @@ void MultiSystem::_forceResetAll() {
     m_running_set.clear();
     m_running_order.clear();
     m_force_sell_list.clear();
-    m_signal_reset_date = Null<Datetime>();
+    m_signal_reset_dates.clear();
     // The rebalancing cycle restarts with a fresh run; kept across the live reset=false replays
     m_close_day_index = 0;
 }
@@ -880,6 +880,13 @@ MomentResult MultiSystem::runMoment(const Datetime& datetime) {
     }
 
     result.funds = m_tm->getFunds(datetime, ktype);
+
+    // Mirror the base composite contract: surface the parent account's current holdings so that an
+    // upper aggregate or the live driver sees the aggregate positions rather than an empty list
+    PositionRecordList positions = m_tm->getPositionList();
+    result.positions.insert(result.positions.end(), positions.begin(), positions.end());
+    PositionRecordList short_positions = m_tm->getShortPositionList();
+    result.positions.insert(result.positions.end(), short_positions.begin(), short_positions.end());
     return result;
 }
 
@@ -1207,15 +1214,16 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         //       while mode C did not exist): mode C has no shadow account (its sub_tm IS the real
         //       account of the parent), so clearing/injecting the signal cash there would wipe the
         //       parent positions and mint phantom cash.
-        if (is_adjust && getMode() == "A" &&
-            (m_signal_reset_date.isNull() || datetime > m_signal_reset_date)) {
+        if (is_adjust && getMode() == "A") {
             bool reset_this = m_se ? (selected.count(sys.get()) > 0) : true;
-            if (reset_this) {
+            auto reset_it = m_signal_reset_dates.find(sys.get());
+            if (reset_this &&
+                (reset_it == m_signal_reset_dates.end() || datetime > reset_it->second)) {
                 _resetSubSystemSignalCash(sys, datetime, ktype);
                 if (i < m_sub_funds_before.size() && sys->getTM()) {
                     m_sub_funds_before[i] = sys->getTM()->getFunds(datetime, ktype);
                 }
-                m_signal_reset_date = datetime;
+                m_signal_reset_dates[sys.get()] = datetime;
             }
         }
 
@@ -1265,15 +1273,27 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
 
     // Rebalancing day: merge the pending suggestions; the unselected sub-systems' ones are
     // dropped (their parent holdings have been cleared as the unselected above)
+    // A pending suggestion carries the plan price of its accumulation day, which is several bars
+    // old by now; re-price it to the current rebalancing-day close, otherwise the merge would
+    // execute at that stale price
+    auto reprices = [&](TradeSuggestion& s) {
+        price_t cur = _getClosePrice(datetime, s.stock);
+        if (cur > 0.0) {
+            s.plan_price = cur;
+        }
+    };
     if (m_se) {
         for (auto& s : m_pending_suggestions) {
             if (s.sys && selected.count(s.sys.get()) > 0) {
+                reprices(s);
                 suggestions.push_back(s);
             }
         }
     } else {
-        suggestions.insert(suggestions.end(), m_pending_suggestions.begin(),
-                           m_pending_suggestions.end());
+        for (auto& s : m_pending_suggestions) {
+            reprices(s);
+            suggestions.push_back(s);
+        }
     }
     m_pending_suggestions.clear();
 

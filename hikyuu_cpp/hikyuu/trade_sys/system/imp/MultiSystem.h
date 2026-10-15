@@ -516,11 +516,11 @@ private:
     Datetime m_open_trades_date;   // The trading day to which m_open_trades/m_sub_funds_before
                                    // belong; the close stage uses it to prevent out-of-bounds and
                                    // cross-day residue (runtime state, not serialized)
-    Datetime m_signal_reset_date;  // The last day when the mode A (Signal Aggregation) signal
-                                   // cash reset ran; it
-                                   // prevents multiple resets within the same trading day (the
-                                   // close stage may be driven several times a day) (runtime
-                                   // state, not serialized)
+    std::unordered_map<System*, Datetime>
+      m_signal_reset_dates;  // The per-subsystem last day when the mode A (Signal Aggregation)
+                             // signal cash reset ran; it prevents multiple resets of the same
+                             // subsystem within the same trading day (the close stage may be driven
+                             // several times a day) (runtime state, not serialized)
     TradeSuggestionList m_pending_suggestions;  // The suggestions accumulated on the
                                                 // non-rebalancing days (runtime, not serialized)
     TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at

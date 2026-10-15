@@ -702,7 +702,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     }
 
     // Issue a sell signal
-    if (m_sg->shouldSell(today.datetime)) {
+    if (!getParam<bool>("ignore_sell_sg") && m_sg->shouldSell(today.datetime)) {
         TradeRecord tr;
         if (m_tm->have(m_stock)) {
             HKU_INFO_IF(trace, htr("[{}] SG to sell", name()));
@@ -1035,7 +1035,7 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
     req.valid = true;
     req.business = BUSINESS_BUY;
     req.from = from;
-    req.count = 1;
+    req.count = 0;
     req.datetime = today.datetime;
     req.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
     req.goal = _getGoalPrice(today.datetime, src_today.closePrice);
@@ -1269,7 +1269,7 @@ void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, 
     TradeRequest req;
     req.valid = true;
     req.business = BUSINESS_SELL;
-    req.count = 1;
+    req.count = 0;
     req.from = from;
     req.datetime = today.datetime;
     req.stoploss = _getStoplossPrice(today, src_today, today.closePrice);
@@ -1476,7 +1476,7 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
     req.valid = true;
     req.business = BUSINESS_BUY_SHORT;
     req.from = from;
-    req.count = 1;
+    req.count = 0;
     req.datetime = today.datetime;
     req.stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
     req.goal = _getShortGoalPrice(today.datetime, src_today.closePrice);
@@ -1650,7 +1650,7 @@ void System::_submitSellShortRequest(const KRecord& today, const KRecord& src_to
     req.valid = true;
     req.business = BUSINESS_SELL_SHORT;
     req.from = from;
-    req.count = 1;
+    req.count = 0;
     req.datetime = today.datetime;
     req.stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
     req.goal = _getShortGoalPrice(today.datetime, src_today.closePrice);
