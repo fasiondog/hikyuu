@@ -412,8 +412,6 @@ protected:
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 
-    int m_buy_days;                 // Cleared on every buy and increased by one on every
-                                    // calculation, i.e. the number of days after the buy
     int m_sell_short_days;          // Cleared on every short sell
     TradeRecordList m_trade_list;   // Saves the actually executed trade records
     price_t m_lastTakeProfit;       // The last long take-profit price, used to guarantee that the
@@ -457,7 +455,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar& BOOST_SERIALIZATION_NVP(m_buy_days);
         ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
@@ -492,7 +489,6 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_pre_ev_valid);
         ar& BOOST_SERIALIZATION_NVP(m_pre_cn_valid);
 
-        ar& BOOST_SERIALIZATION_NVP(m_buy_days);
         ar& BOOST_SERIALIZATION_NVP(m_sell_short_days);
         ar& BOOST_SERIALIZATION_NVP(m_trade_list);
         ar& BOOST_SERIALIZATION_NVP(m_lastTakeProfit);
@@ -710,7 +706,7 @@ inline price_t System ::_getGoalPrice(const Datetime& datetime, price_t price) {
 }
 
 inline price_t System ::_getShortGoalPrice(const Datetime& datetime, price_t price) {
-    return m_pg ? m_pg->getShortGoal(datetime, price) : 0.0;
+    return m_pg ? m_pg->getShortGoal(datetime, price) : Null<price_t>();
 }
 
 } /* namespace hku */

@@ -23,6 +23,9 @@ price_t mapAdjustedToOriginal(const KRecord& today, const KRecord& src_today, pr
     if (today.highPrice == today.lowPrice) {
         return src_today.lowPrice;
     }
+    if (src_today.highPrice == src_today.lowPrice) {
+        return src_today.lowPrice;
+    }
     price_t adjust = (price - today.lowPrice) / (today.highPrice - today.lowPrice) *
                        (src_today.highPrice - src_today.lowPrice) +
                      src_today.lowPrice;
@@ -64,7 +67,6 @@ System::System()
   m_calculated(false),
   m_pre_ev_valid(true),  // must true
   m_pre_cn_valid(true),  // must true
-  m_buy_days(0),
   m_sell_short_days(0),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
@@ -76,7 +78,6 @@ System::System(const string& name)
   m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
-  m_buy_days(0),
   m_sell_short_days(0),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
@@ -100,7 +101,6 @@ System::System(const TradeManagerPtr& tm, const MoneyManagerPtr& mm, const Envir
   m_calculated(false),
   m_pre_ev_valid(true),
   m_pre_cn_valid(true),
-  m_buy_days(0),
   m_sell_short_days(0),
   m_lastTakeProfit(0.0),
   m_lastShortTakeProfit(0.0) {
@@ -213,7 +213,6 @@ void System::reset() {
     m_pre_ev_valid = m_ev ? false : true;
     m_pre_cn_valid = m_cn ? false : true;
 
-    m_buy_days = 0;
     m_sell_short_days = 0;
     m_trade_list.clear();
     m_lastTakeProfit = 0.0;
@@ -256,7 +255,6 @@ void System::forceResetAll() {
     m_pre_ev_valid = m_ev ? false : true;
     m_pre_cn_valid = m_cn ? false : true;
 
-    m_buy_days = 0;
     m_sell_short_days = 0;
     m_trade_list.clear();
     m_lastTakeProfit = 0.0;
@@ -351,7 +349,6 @@ SystemPtr System::clone() {
     p->m_pre_ev_valid = m_pre_ev_valid;
     p->m_pre_cn_valid = m_pre_cn_valid;
 
-    p->m_buy_days = m_buy_days;
     p->m_sell_short_days = m_sell_short_days;
     p->m_trade_list = m_trade_list;
     p->m_lastTakeProfit = m_lastTakeProfit;
@@ -484,6 +481,7 @@ const std::vector<std::shared_ptr<System>>& System::getSubSystemList() const {
 
 MomentResult System::runMoment(const Datetime& datetime) {
     MomentResult result;
+    HKU_IF_RETURN(!m_tm, result);
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), result);
 
@@ -543,6 +541,7 @@ MomentResult System::runMoment(const Datetime& datetime) {
 
 MomentResult System::runMomentOnOpen(const Datetime& datetime) {
     MomentResult result;
+    HKU_IF_RETURN(!m_tm, result);
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), result);
 
@@ -557,6 +556,7 @@ MomentResult System::runMomentOnOpen(const Datetime& datetime) {
 
 MomentResult System::runMomentOnClose(const Datetime& datetime) {
     MomentResult result;
+    HKU_IF_RETURN(!m_tm, result);
     size_t pos = m_kdata.getPos(datetime);
     HKU_IF_RETURN(pos == Null<size_t>(), result);
 
@@ -583,7 +583,6 @@ TradeRecord System::_runMomentOnOpen(const KRecord& today, const KRecord& src_to
                     htr("[{}] raw today {}", name(), src_today));
     }
 
-    m_buy_days++;
     m_sell_short_days++;
     TradeRecord result;
 
@@ -1010,6 +1009,10 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
         number = int64_t(number / min_num) * min_num;
+        if (number <= 0.0) {
+            m_buyRequestList.erase(m_buyRequestList.begin());
+            continue;
+        }
 
         price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
         TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
@@ -1019,7 +1022,6 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        m_buy_days = 0;
         m_lastTakeProfit = record.realPrice;
         m_trade_list.push_back(record);
         _buyNotifyAll(record);
@@ -1065,8 +1067,8 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
       _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
     // A stale out-of-range src_krecord yields NullKRecord whose price is 0.0; selling at 0 would
     // clear the position and evaporate the funds, so reject it here
-    HKU_WARN_IF_RETURN(realPrice <= 0.0, record, "[{}] {}: invalid sell price!", m_stock.market_code(),
-                       date);
+    HKU_WARN_IF_RETURN(realPrice <= 0.0, record, "[{}] {}: invalid sell price!",
+                       m_stock.market_code(), date);
 
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);

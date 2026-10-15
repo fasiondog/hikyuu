@@ -605,6 +605,7 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
     _adoptSEProtos();
     HKU_WARN_IF_RETURN(m_sys_list.empty(), void(), "No subsystem specified!");
     m_kdata = kdata;
+    m_stock = m_kdata.getStock();
     // The KData cache is rebuilt with each run
     m_kdata_cache.clear();
 
@@ -832,7 +833,10 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
     if (needed_cash > 0.0) {
         double available = m_tm->getFunds(date, ktype).cash;
         if (needed_cash > available) {
-            cash_scale = available / needed_cash;
+            // Leave a margin for the buy commission and transfer fees: needed_cash counts only the
+            // trade amount, so scaling to exactly `available` would make the TM reject the orders
+            constexpr double CASH_FEE_MARGIN = 0.995;
+            cash_scale = available / needed_cash * CASH_FEE_MARGIN;
             HKU_WARN(
               "The BUY suggestions need {:.2f} cash but only {:.2f} available, scale down "
               "by {:.2f}!",
@@ -847,7 +851,12 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.type != SuggestionType::BUY) {
             continue;
         }
-        if (s.number <= 0.0 || s.plan_price <= 0.0) {
+        if (s.number <= 0.0) {
+            continue;
+        }
+        if (s.plan_price <= 0.0) {
+            HKU_WARN("Skip the BUY suggestion, {} has no quote on {}!", s.stock.market_code(),
+                     date);
             continue;
         }
         double min_trade = s.stock.minTradeNumber();
@@ -869,6 +878,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
 
 MomentResult MultiSystem::runMoment(const Datetime& datetime) {
     MomentResult result;
+    HKU_IF_RETURN(!m_tm, result);
     result.datetime = datetime;
     KQuery::KType ktype = m_kdata.getQuery().kType();
 
@@ -905,6 +915,7 @@ MomentResult MultiSystem::runMoment(const Datetime& datetime) {
 
 MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     MomentResult result;
+    HKU_IF_RETURN(!m_tm, result);
     result.datetime = datetime;
     // The parent handles the delisted instruments uniformly at the open stage: force selling the
     // parent holdings
@@ -1022,6 +1033,7 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
 
 MomentResult MultiSystem::runMomentOnClose(const Datetime& datetime) {
     MomentResult result;
+    HKU_IF_RETURN(!m_tm, result);
     result.datetime = datetime;
     KQuery::KType ktype = m_kdata.getQuery().kType();
     result.funds_before_close = m_tm->getFunds(datetime, ktype);
@@ -1268,7 +1280,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         }
         SubSystemContext ctx;
         ctx.sys = sys;
-        ctx.funds = sys->getTM()->getFunds(datetime, ktype);
+        if (sys->getTM()) {
+            ctx.funds = sys->getTM()->getFunds(datetime, ktype);
+        }
         // Backfill the SE score (0 on the non-rebalancing days / for the unselected ones), used
         // by AF_MultiFactor etc. to take the scores as the weights
         auto score_it = se_scores.find(sys.get());
