@@ -69,8 +69,7 @@ TEST_CASE("test_SG_OneSide") {
     }
 
     /** @arg Try to change the alternate parameter */
-    sg_sell->setParam<bool>("alternate", false);
-    CHECK_THROWS(sg_sell->setParam<bool>("alternate", true));
+    CHECK_THROWS(SG_OneSide(CLOSE() < REF(CLOSE(), 1), false)->setParam<bool>("alternate", true));
 
     /** @arg A one-sided buy + a one-sided sell */
     sg = sg_buy + sg_sell;
@@ -78,6 +77,16 @@ TEST_CASE("test_SG_OneSide") {
     sg->setTO(k);
     auto sg_expect = SG_Bool(CLOSE() > REF(CLOSE(), 1), CLOSE() < REF(CLOSE(), 1));
     sg_expect->setTO(k);
+    for (size_t i = 0; i < k.size(); i++) {
+        CHECK_EQ(sg->shouldBuy(k[i].datetime), sg_expect->shouldBuy(k[i].datetime));
+        CHECK_EQ(sg->shouldSell(k[i].datetime), sg_expect->shouldSell(k[i].datetime));
+    }
+
+    /** @arg A one-sided buy + an uncalculated one-sided sell, the sub-signal is recalculated
+     * inside the composed signal */
+    auto sg_sell2 = SG_OneSide(CLOSE() < REF(CLOSE(), 1), false);
+    sg = sg_buy + sg_sell2;
+    sg->setTO(k);
     for (size_t i = 0; i < k.size(); i++) {
         CHECK_EQ(sg->shouldBuy(k[i].datetime), sg_expect->shouldBuy(k[i].datetime));
         CHECK_EQ(sg->shouldSell(k[i].datetime), sg_expect->shouldSell(k[i].datetime));

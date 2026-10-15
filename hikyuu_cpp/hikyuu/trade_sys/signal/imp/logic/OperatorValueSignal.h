@@ -23,6 +23,9 @@ public:
     virtual void _calculate(const KData& kdata) override {}
 
 protected:
+    void sub_sg_calculate(const KData& kdata);
+
+protected:
     double m_value{0.0};
     SignalPtr m_sg;
     int m_mode{0};  // Operand order for - and /: 0: sg op value, 1: value op sg

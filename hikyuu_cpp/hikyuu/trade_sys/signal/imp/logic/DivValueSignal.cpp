@@ -22,7 +22,7 @@ void DivValueSignal::_calculate(const KData& kdata) {
     auto const* ks = kdata.data();
     size_t total = kdata.size();
 
-    m_sg->_calculate(kdata);
+    sub_sg_calculate(kdata);
     if (m_mode == 0) {
         for (size_t i = 0; i < total; ++i) {
             _addSignal(ks[i].datetime, m_sg->getValue(ks[i].datetime) / m_value);

@@ -6,6 +6,7 @@
  */
 
 #include "OperatorSignal.h"
+#include "../ManualSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::OperatorSignal)
@@ -46,7 +47,12 @@ void OperatorSignal::sub_sg_calculate(SignalPtr& sg, const KData& kdata) {
         sg->startCycle(m_cycle_start, m_cycle_end);
         return;
     }
-    sg->_calculate(kdata);
+    if (dynamic_cast<ManualSignal*>(sg.get())) {
+        // A manual sub-signal holds pre-seeded signals; its empty _calculate keeps them intact
+        sg->_calculate(kdata);
+        return;
+    }
+    sg->setTO(kdata);
 }
 
 SignalPtr OperatorSignal::_clone() {
