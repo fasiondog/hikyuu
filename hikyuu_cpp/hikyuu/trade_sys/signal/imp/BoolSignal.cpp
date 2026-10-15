@@ -41,10 +41,12 @@ void BoolSignal::_calculate(const KData& kdata) {
     auto const* selldata = sell.data();
     auto const* ks = kdata.data();
     for (size_t i = discard; i < total; ++i) {
-        if (std::isfinite(buydata[i]) && buydata[i] > 0.0)
-            _addBuySignal(ks[i].datetime);
-        if (std::isfinite(selldata[i]) && selldata[i] > 0.0)
+        // Same-bar opposite conflict: sell wins (risk-first contract)
+        if (std::isfinite(selldata[i]) && selldata[i] > 0.0) {
             _addSellSignal(ks[i].datetime);
+        } else if (std::isfinite(buydata[i]) && buydata[i] > 0.0) {
+            _addBuySignal(ks[i].datetime);
+        }
     }
 }
 

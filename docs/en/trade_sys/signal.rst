@@ -131,7 +131,7 @@ Golden Cross Signal Generator
 Single-line Inflection Point Signal Generator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1])
+.. py:function:: SG_Single(ind[, filter_n = 20, filter_p = 0.1])
 
     Creates a single-line inflection-point signal generator. It judges the trend of the curve with the inflection-point algorithm given in the book "Smarter Trading" [BOOK1]_. The rules are as follows::
 
@@ -146,7 +146,7 @@ Single-line Inflection Point Signal Generator
     :param float filter_p: the filter percentage
     :return: the signal generator
 
-.. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
+.. py:function:: SG_Single2(ind[, filter_n = 20, filter_p = 0.1])
 
     Creates the second variant of the single-line inflection-point signal generator [BOOK1]_::
 

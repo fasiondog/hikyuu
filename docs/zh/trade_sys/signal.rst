@@ -131,7 +131,7 @@
 单线拐点信号指示器
 ^^^^^^^^^^^^^^^^^^
 
-.. py:function:: SG_Single(ind[, filter_n = 10, filter_p = 0.1])
+.. py:function:: SG_Single(ind[, filter_n = 20, filter_p = 0.1])
     
     生成单线拐点信号指示器。使用《精明交易者》 [BOOK1]_ 中给出的曲线拐点算法判断曲线趋势，公式见下::
 
@@ -146,7 +146,7 @@
     :param float filter_p: 过滤器百分比
     :return: 信号指示器
     
-.. py:function:: SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
+.. py:function:: SG_Single2(ind[, filter_n = 20, filter_p = 0.1])
     
     生成单线拐点信号指示器2 [BOOK1]_::
 

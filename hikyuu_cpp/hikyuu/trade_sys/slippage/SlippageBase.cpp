@@ -35,6 +35,7 @@ void SlippageBase::paramChanged() {}
 
 void SlippageBase::reset() {
     m_kdata = Null<KData>();
+    m_calculated = false;
     _reset();
 }
 
@@ -47,14 +48,19 @@ SlippagePtr SlippageBase::clone() {
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
     p->m_kdata = m_kdata;
+    // The clone recalculates lazily so its runtime state is rebuilt on the next setTO instead of
+    // keeping the stale snapshot
+    p->m_calculated = false;
     return p;
 }
 
 void SlippageBase::setTO(const KData& kdata) {
-    HKU_IF_RETURN(m_kdata == kdata, void());
+    HKU_IF_RETURN(m_calculated && m_kdata == kdata, void());
     m_kdata = kdata;
+    m_calculated = false;
     if (!kdata.empty()) {
         _calculate();
+        m_calculated = true;
     }
 }
 

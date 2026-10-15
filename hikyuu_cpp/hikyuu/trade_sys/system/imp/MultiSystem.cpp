@@ -220,9 +220,36 @@ void MultiSystem::_forceResetAll() {
 
 SystemPtr MultiSystem::_clone() {
     auto ret = make_shared<MultiSystem>(name());
-    for (auto& sys : m_sys_list) {
-        ret->add(sys->clone());
+
+    // The prototypes adopted from the SE are the running systems themselves. The clone re-adopts
+    // the prototypes of the cloned SE (the same instances, keeping the identity real==proto
+    // binding), cloning the running list separately would create a second disjoint instance set
+    // and the logical selector would silently select nothing on the clone
+    std::unordered_map<System*, SYSPtr> cloned_protos;
+    if (m_se) {
+        ret->m_se = m_se->clone();
+        const auto& old_protos = m_se->getProtoSystemList();
+        const auto& new_protos = ret->m_se->getProtoSystemList();
+        if (old_protos.size() == new_protos.size()) {
+            for (size_t i = 0, total = old_protos.size(); i < total; i++) {
+                cloned_protos[old_protos[i].get()] = new_protos[i];
+            }
+        } else {
+            HKU_WARN("The prototype count of the cloned SE is inconsistent: {} != {}",
+                     old_protos.size(), new_protos.size());
+        }
     }
+
+    for (auto& sys : m_sys_list) {
+        auto iter = cloned_protos.find(sys.get());
+        if (iter != cloned_protos.end()) {
+            ret->m_se->bindRealToProto(iter->second, iter->second);
+            ret->add(iter->second);
+        } else {
+            ret->add(sys->clone());
+        }
+    }
+
     ret->m_sub_init_cash = m_sub_init_cash;
     ret->m_adjust_cycle = m_adjust_cycle;
     ret->m_trade_on_close = m_trade_on_close;
@@ -238,9 +265,6 @@ SystemPtr MultiSystem::_clone() {
     // The AF clone has already copied m_mode, no additional mode synchronization is needed
     if (m_af) {
         ret->setAF(m_af->clone());
-    }
-    if (m_se) {
-        ret->m_se = m_se->clone();
     }
     // m_shadow_sys / m_running_set / m_running_order / m_force_sell_list / m_sub_index /
     // m_pending_suggestions / m_open_pending_suggestions / m_kdata_cache are the runtime states,
@@ -1433,6 +1457,10 @@ void MultiSystem::_adoptSEProtos() {
         return;
     }
     for (const auto& proto : m_se->getProtoSystemList()) {
+        // The adopted prototypes are the running systems themselves, so record the identity
+        // mapping: a logical selector (OperatorSelector) relies on it to tell which operand side
+        // each running system belongs to, otherwise every combination would select nothing.
+        m_se->bindRealToProto(proto, proto);
         add(proto);
     }
 }

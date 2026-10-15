@@ -87,7 +87,9 @@ public:
     virtual price_t _getPrice(const Datetime &, price_t) override {
         return static_cast<price_t>(m_calc);
     }
-    virtual void _reset() override { m_calc = -1; }
+    virtual void _reset() override {
+        m_calc = -1;
+    }
     virtual void _calculate() override {
         m_calc = static_cast<int>(m_kdata.size()) + getParam<int>("offset");
     }
@@ -148,8 +150,8 @@ TEST_CASE("test_Stoploss_setTO_reset_before_calculate") {
     CHECK_EQ(p->count(), static_cast<int>(k2.size()));
 }
 
-/** @arg clone copies m_kdata and the subclass cache, so the clone is immediately usable; a different
- * KData triggers a fresh calculation (EV/CN convention, ST-002) */
+/** @arg clone copies m_kdata and the subclass cache, so the clone is directly usable; setTO always
+ * recalculates (lazy recalculation), with the same or a different KData alike */
 TEST_CASE("test_Stoploss_clone_preserves_cache") {
     StockManager &sm = StockManager::instance();
     KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 10));
@@ -162,7 +164,11 @@ TEST_CASE("test_Stoploss_clone_preserves_cache") {
     CHECK_EQ(p->getPrice(Datetime(200101010000), 0.0), static_cast<price_t>(k1.size()));
 
     StoplossPtr pc = p->clone();
-    // The clone carries the cached result; setTO with the same KData short-circuits
+    // The clone carries the cached result and is usable before setTO
+    CHECK_EQ(pc->getPrice(Datetime(200101010000), 0.0), static_cast<price_t>(k1.size()));
+
+    // setTO with the same KData recalculates instead of short-circuiting
+    pc->setTO(k1);
     CHECK_EQ(pc->getPrice(Datetime(200101010000), 0.0), static_cast<price_t>(k1.size()));
 
     // A different KData triggers a fresh calculation
@@ -170,7 +176,8 @@ TEST_CASE("test_Stoploss_clone_preserves_cache") {
     CHECK_EQ(pc->getPrice(Datetime(200101010000), 0.0), static_cast<price_t>(k2.size()));
 }
 
-/** @arg stop-loss is floored to the price tick and never rounds back up to the buy price (ST-001) */
+/** @arg stop-loss is floored to the price tick and never rounds back up to the buy price (ST-001)
+ */
 TEST_CASE("test_Stoploss_fixedpercent_rounding") {
     auto st = ST_FixedPercent(0.002);
     // empty kdata -> precision 2; 2.50*(1-0.002)=2.495 -> floor -> 2.49 (roundEx would give 2.50)
@@ -182,7 +189,8 @@ TEST_CASE("test_Stoploss_fixedpercent_rounding") {
     CHECK_LT(st2->getPrice(Datetime(200101010000), 10.0), 10.0);
 }
 
-/** @arg short stop-loss is above the planned price and invalid input yields no stop-loss (ST-006) */
+/** @arg short stop-loss is above the planned price and invalid input yields no stop-loss (ST-006)
+ */
 TEST_CASE("test_Stoploss_fixedpercent_short_and_validation") {
     auto st = ST_FixedPercent(0.03);
     // empty kdata -> precision 2; 10*(1+0.03)=10.3 -> roundUp -> 10.3 (above 10)

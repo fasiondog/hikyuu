@@ -16,21 +16,14 @@ namespace hku {
 void DivSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg1 || !m_sg2, void());
 
-    auto const* ks = kdata.data();
-    size_t total = kdata.size();
-
     sub_sg_calculate(m_sg1, kdata);
     sub_sg_calculate(m_sg2, kdata);
-    for (size_t i = 0; i < total; ++i) {
-        double buy_value1 = m_sg1->getBuyValue(ks[i].datetime);
-        double buy_value2 = m_sg2->getBuyValue(ks[i].datetime);
-        double buy_value = (buy_value2 != 0.0) ? buy_value1 / buy_value2 : 0.0;
-        double sell_value1 = m_sg1->getSellValue(ks[i].datetime);
-        double sell_value2 = m_sg2->getSellValue(ks[i].datetime);
-        double sell_value = (sell_value2 != 0.0) ? sell_value1 / sell_value2 : 0.0;
-        double value = buy_value - sell_value;
-        _addSignal(ks[i].datetime, value);
-    }
+    sub_merged_calculate(kdata, [this](const Datetime& datetime, double buy1, double sell1,
+                                       double buy2, double sell2) {
+        double buy_value = (buy2 != 0.0) ? buy1 / buy2 : 0.0;
+        double sell_value = (sell2 != 0.0) ? sell1 / sell2 : 0.0;
+        _addSignal(datetime, buy_value - sell_value);
+    });
 }
 
 HKU_API SignalPtr operator/(const SignalPtr& sg1, const SignalPtr& sg2) {

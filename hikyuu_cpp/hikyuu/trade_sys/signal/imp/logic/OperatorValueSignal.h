@@ -23,9 +23,12 @@ public:
     virtual void _calculate(const KData& kdata) override {}
 
 protected:
+    void sub_sg_calculate(const KData& kdata);
+
+protected:
     double m_value{0.0};
     SignalPtr m_sg;
-    int m_mode{0};  // It is valid for - and / only: 0: (sg, value), 1: (value, sg)
+    int m_mode{0};  // Operand order for - and /: 0: sg op value, 1: value op sg
 
 //============================================
 // Serialization support
@@ -46,9 +49,11 @@ protected:
 public:                                                                                    \
     classname() : OperatorValueSignal(name) {}                                             \
     classname(const SignalPtr& sg, double value) : OperatorValueSignal(name, sg, value) {} \
+    classname(const SignalPtr& sg, double value, int mode)                                 \
+    : OperatorValueSignal(name, sg, value, mode) {}                                        \
     virtual ~classname() override {}                                                       \
     virtual SignalPtr _clone() override {                                                  \
-        return make_shared<classname>(m_sg, m_value);                                      \
+        return make_shared<classname>(m_sg, m_value, m_mode);                              \
     }                                                                                      \
     virtual void _calculate(const KData&) override;
 

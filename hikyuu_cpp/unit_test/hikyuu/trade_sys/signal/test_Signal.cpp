@@ -6,6 +6,7 @@
  */
 
 #include "doctest/doctest.h"
+#include <chrono>
 #include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
@@ -15,6 +16,7 @@
 #include <hikyuu/trade_sys/signal/crt/SG_CrossGold.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Single.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Logic.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/KData.h>
@@ -55,6 +57,7 @@ public:
     virtual ~SignalCalcTest() {}
 
     virtual void _calculate(const KData &kdata) override {
+        m_calc_count++;
         _addBuySignal(kdata.front().datetime);
         _addSellSignal(kdata.back().datetime);
     }
@@ -69,6 +72,63 @@ public:
 
     void setHoldLong(bool hold) {
         m_hold_long = hold;
+    }
+
+    int calcCount() const {
+        return m_calc_count;
+    }
+
+private:
+    int m_calc_count{0};
+};
+
+// A leaf indicator whose result length does not follow the KData context, used to build the
+// ind.size() != kdata.size() input
+class FixedLenInd : public IndicatorImp {
+public:
+    FixedLenInd(size_t len) : IndicatorImp("FIXEDLEN", 1), m_len(len) {}
+
+    virtual void _calculate(const Indicator &) override {
+        _readyBuffer(m_len, 1);
+        for (size_t i = 0; i < m_len; ++i) {
+            _set(1.0, i, 0);
+        }
+        m_discard = 0;
+    }
+
+    virtual IndicatorImpPtr _clone() override {
+        return make_shared<FixedLenInd>(m_len);
+    }
+
+private:
+    size_t m_len;
+};
+
+class BuyAtFirstSig : public SignalBase {
+public:
+    BuyAtFirstSig() : SignalBase("BuyAtFirstSig") {}
+    virtual ~BuyAtFirstSig() {}
+
+    virtual void _calculate(const KData &kdata) override {
+        _addBuySignal(kdata.front().datetime);
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new BuyAtFirstSig);
+    }
+};
+
+class SellAtFirstSig : public SignalBase {
+public:
+    SellAtFirstSig() : SignalBase("SellAtFirstSig") {}
+    virtual ~SellAtFirstSig() {}
+
+    virtual void _calculate(const KData &kdata) override {
+        _addSellSignal(kdata.front().datetime);
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new SellAtFirstSig);
     }
 };
 
@@ -258,6 +318,37 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
 }
 
 /** @par Test points */
+TEST_CASE("test_Signal_clone_lazy_recalculate") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData k = stock.getKData(KQuery(-30));
+    REQUIRE(k.size() >= 15);
+
+    auto p = make_shared<SignalCalcTest>();
+    p->setTO(k);
+    Datetime t0 = k[0].datetime;
+    Datetime tN = k[k.size() - 1].datetime;
+    CHECK_EQ(p->getBuyValue(t0), 1.0);
+    CHECK_EQ(p->getSellValue(tN), -1.0);
+
+    /** @arg the clone keeps the copied signal table, so queries work before any recalculation */
+    SignalPtr c = p->clone();
+    CHECK_NE(p, c);
+    CHECK_EQ(c->getBuyValue(t0), 1.0);
+    CHECK_EQ(c->getSellValue(tN), -1.0);
+
+    /** @arg the clone recalculates lazily: setTO with the same KData must re-run _calculate
+     * instead of short-circuiting, so the subclass runtime state is rebuilt */
+    auto *cloned = static_cast<SignalCalcTest *>(c.get());
+    CHECK_EQ(cloned->calcCount(), 0);
+    c->setTO(k);
+    CHECK_EQ(cloned->calcCount(), 1);
+    CHECK_EQ(cloned->getBuyValue(t0), 1.0);
+    CHECK_EQ(cloned->getSellValue(tN), -1.0);
+    CHECK_EQ(static_cast<SignalCalcTest *>(p.get())->calcCount(), 1);
+}
+
+/** @par Test points */
 TEST_CASE("test_Signal_setTO_recalculate") {
     StockManager &sm = StockManager::instance();
     Stock stock = sm.getStock("sh000001");
@@ -320,6 +411,232 @@ TEST_CASE("test_SG_Band_non_finite") {
     SignalPtr sg2 = SG_Band(CVAL(std::numeric_limits<double>::infinity()), CVAL(-1.0), CVAL(1.0));
     sg2->setTO(k);
     CHECK_UNARY(sg2->getBuySignal().empty());
+    CHECK_UNARY(sg2->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Single_sell_threshold") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    DatetimeList dates = k.getDatetimeList();
+    PriceList vals(k.size(), 10.98);
+    vals[0] = 10.0;
+    vals[1] = 10.2;
+    vals[2] = 10.4;
+    vals[3] = 10.6;
+    vals[4] = 10.8;
+    vals[5] = 11.5;
+    vals[6] = 11.48;
+    vals[7] = 10.98;
+    SignalPtr sg = SG_Single(PRICELIST(vals, dates), 5, 0.5);
+    sg->setTO(k);
+
+    /** @arg a large rise exceeding the noise threshold fires a buy signal */
+    DatetimeList buy = sg->getBuySignal();
+    CHECK_UNARY(buy.size() == 1 && buy[0] == dates[5]);
+
+    /** @arg a small decline below the noise threshold fires no sell signal */
+    DatetimeList sell = sg->getSellSignal();
+    CHECK_UNARY(sell.size() == 1 && sell[0] == dates[7]);
+
+    /** @arg a large decline exceeding the noise threshold fires a sell signal */
+    CHECK_UNARY(sell.size() == 1 && sell[0] == dates[7]);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_OperatorValue_clone_mode") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    Datetime first = k.front().datetime;
+    Datetime last = k.back().datetime;
+    SignalPtr base = make_shared<SignalCalcTest>();
+
+    /** @arg the clone of (sg - 2.0) keeps mode 0 and yields the same signals */
+    SignalPtr sub0 = base - 2.0;
+    sub0->setParam<bool>("alternate", false);
+    sub0->setTO(k);
+    SignalPtr sub0_clone = sub0->clone();
+    sub0_clone->setTO(k);
+    CHECK_UNARY(sub0_clone->getBuySignal().empty());
+    CHECK_UNARY(sub0_clone->getSellSignal().size() == 2 &&
+                sub0_clone->getSellSignal()[0] == first && sub0_clone->getSellSignal()[1] == last);
+    CHECK_UNARY(sub0_clone->getSellValue(first) == sub0->getSellValue(first));
+    CHECK_UNARY(sub0_clone->getSellValue(last) == sub0->getSellValue(last));
+
+    /** @arg the clone of (2.0 - sg) keeps mode 1 and does not flip the buy/sell direction */
+    SignalPtr sub1 = 2.0 - base;
+    sub1->setParam<bool>("alternate", false);
+    sub1->setTO(k);
+    SignalPtr sub1_clone = sub1->clone();
+    sub1_clone->setTO(k);
+    CHECK_UNARY(sub1_clone->getSellSignal().empty());
+    CHECK_UNARY(sub1_clone->getBuySignal().size() == 2 && sub1_clone->getBuySignal()[0] == first &&
+                sub1_clone->getBuySignal()[1] == last);
+    CHECK_UNARY(sub1_clone->getBuyValue(first) == sub1->getBuyValue(first));
+    CHECK_UNARY(sub1_clone->getBuyValue(last) == sub1->getBuyValue(last));
+
+    /** @arg the clone of (2.0 / sg) keeps mode 1 and yields the same signal values */
+    SignalPtr div1 = 2.0 / base;
+    div1->setParam<bool>("alternate", false);
+    div1->setTO(k);
+    SignalPtr div1_clone = div1->clone();
+    div1_clone->setTO(k);
+    CHECK_UNARY(div1_clone->getBuyValue(first) == div1->getBuyValue(first));
+    CHECK_UNARY(div1_clone->getSellValue(last) == div1->getSellValue(last));
+    CHECK_UNARY(div1_clone->getBuyValue(first) == 2.0);
+    CHECK_UNARY(div1_clone->getSellValue(last) == -2.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Operator_cycle_sub") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    Datetime start = k[5].datetime;
+    Datetime close = k[10].datetime;
+
+    /** @arg a combined signal with one cycle child inherits the cycle attribute and stays silent
+     * until startCycle drives it */
+    SignalPtr or_mixed = SG_Cycle() | make_shared<SignalCalcTest>();
+    CHECK_UNARY(or_mixed->getParam<bool>("cycle"));
+    or_mixed->setTO(k);
+    CHECK_UNARY(or_mixed->getBuySignal().empty());
+    CHECK_UNARY(or_mixed->getSellSignal().empty());
+
+    /** @arg startCycle drives both children within the cycle window: the cycle child buys at the
+     * start, and the normal child also buys at the start and sells at the window's last bar */
+    or_mixed->startCycle(start, close);
+    CHECK_UNARY(or_mixed->getBuySignal().size() == 1 && or_mixed->getBuySignal()[0] == start);
+    // getKData(start, close) is a half-open range, so the last bar the children see is k[9]
+    CHECK_UNARY(or_mixed->getSellSignal().size() == 1 &&
+                or_mixed->getSellSignal()[0] == k[9].datetime);
+    CHECK_EQ(or_mixed->getBuyValue(start), 1.0);
+
+    /** @arg a combined signal whose both children are cycle-driven is driven by startCycle too */
+    SignalPtr or_cycle = SG_Cycle() | SG_Cycle();
+    CHECK_UNARY(or_cycle->getParam<bool>("cycle"));
+    or_cycle->setTO(k);
+    CHECK_UNARY(or_cycle->getBuySignal().empty());
+    CHECK_UNARY(or_cycle->getSellSignal().empty());
+
+    or_cycle->startCycle(start, close);
+    CHECK_UNARY(or_cycle->getBuySignal().size() == 1 && or_cycle->getBuySignal()[0] == start);
+    CHECK_EQ(or_cycle->getBuyValue(start), 1.0);
+    CHECK_UNARY(or_cycle->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_ValueSignal_cycle_sub") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg a cycle sub-signal in a value combined signal is driven by startCycle */
+    SignalPtr mul = SG_Cycle() * 2.0;
+    mul->setTO(k);
+    Datetime start = k[5].datetime;
+    Datetime close = k[10].datetime;
+    mul->startCycle(start, close);
+    CHECK_UNARY(mul->getBuySignal().size() == 1 && mul->getBuySignal()[0] == start);
+    CHECK_UNARY(mul->getBuyValue(start) == 2.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Operator_sub_recalculated_on_new_kdata") {
+    StockManager &sm = StockManager::instance();
+    KData k1 = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    KData k2 = sm.getStock("sh000001").getKData(KQuery(10, 40));
+    if (k1.size() < 25 || k2.size() < 25) {
+        return;
+    }
+
+    /** @arg the sub-signals are cleared and recalculated when the KData changes */
+    SignalPtr or_sg = make_shared<SignalCalcTest>() | make_shared<SignalCalcTest>();
+    or_sg->setTO(k1);
+    CHECK_UNARY(or_sg->getBuySignal().size() == 1 &&
+                or_sg->getBuySignal()[0] == k1.front().datetime);
+
+    or_sg->setTO(k2);
+    CHECK_UNARY(or_sg->getBuySignal().size() == 1 &&
+                or_sg->getBuySignal()[0] == k2.front().datetime);
+    CHECK_UNARY(or_sg->getSellSignal().size() == 1 &&
+                or_sg->getSellSignal()[0] == k2.back().datetime);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_zero_residual_filtered") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg a ~1e-16 float residual from value operations fires no signal */
+    SignalPtr sg = make_shared<SignalCalcTest>();
+    SignalPtr residual = (sg * 0.1) + (sg * 0.2) - (sg * 0.3);
+    residual->setTO(k);
+    CHECK_UNARY(residual->getBuySignal().empty());
+    CHECK_UNARY(residual->getSellSignal().empty());
+
+    /** @arg real values above the zero tolerance still fire */
+    SignalPtr exact = (sg * 0.1) + (sg * 0.2) - (sg * 0.2);
+    exact->setTO(k);
+    CHECK_UNARY(exact->getBuySignal().size() == 1);
+    CHECK_UNARY(exact->getSellSignal().size() == 1);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Or_same_bar_conflict_sell_first") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg same-bar opposite signals: sell wins and no buy is emitted on the conflict bar */
+    auto buy_sig = make_shared<BuyAtFirstSig>();
+    auto sell_sig = make_shared<SellAtFirstSig>();
+    buy_sig->setParam<bool>("alternate", false);
+    sell_sig->setParam<bool>("alternate", false);
+    auto conflict = buy_sig | sell_sig;
+    conflict->setParam<bool>("alternate", false);
+    conflict->setTO(k);
+    CHECK_UNARY(conflict->getBuySignal().empty());
+    CHECK_UNARY(conflict->getSellSignal().size() == 1);
+    CHECK_UNARY(conflict->getSellSignal()[0] == k.front().datetime);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Bool_same_bar_conflict_sell_first") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg buy and sell both true on every bar: only sell signals are recorded */
+    auto sg = SG_Bool(CVAL(1.0), CVAL(1.0), false);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().size() == k.size());
+
+    /** @arg mutually exclusive conditions keep their own signals */
+    auto sg2 = SG_Bool(CVAL(1.0), CVAL(0.0), false);
+    sg2->setTO(k);
+    CHECK_UNARY(sg2->getBuySignal().size() == k.size());
     CHECK_UNARY(sg2->getSellSignal().empty());
 }
 
@@ -398,6 +715,168 @@ TEST_CASE("test_SG_Single2_non_finite") {
     sg->setTO(k);
     CHECK_UNARY(sg->getBuySignal().empty());
     CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_kdata_size_mismatch") {
+    // Mismatched inputs are salvaged via ALIGN by dates; the aligned constant series fires no
+    // signal, and a failed alignment (defensive) also yields an empty signal without OOB access
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
+    if (k.empty()) {
+        return;
+    }
+
+    /** @arg SG_Cross with an indicator longer than the KData fires no signal */
+    SignalPtr sg = SG_Cross(Indicator(make_shared<FixedLenInd>(k.size() + 10)),
+                            Indicator(make_shared<FixedLenInd>(k.size() + 10)));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_CrossGold with an indicator shorter than the KData fires no signal */
+    sg =
+      SG_CrossGold(Indicator(make_shared<FixedLenInd>(5)), Indicator(make_shared<FixedLenInd>(5)));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Band with an indicator longer than the KData fires no signal */
+    sg = SG_Band(Indicator(make_shared<FixedLenInd>(k.size() + 10)), -1.0, 1.0);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Band (indicator overload) with an indicator shorter than the KData fires no signal
+     */
+    sg = SG_Band(Indicator(make_shared<FixedLenInd>(5)), Indicator(make_shared<FixedLenInd>(5)),
+                 Indicator(make_shared<FixedLenInd>(5)));
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Single with an indicator longer than the KData fires no signal */
+    sg = SG_Single(Indicator(make_shared<FixedLenInd>(k.size() + 10)), 10, 0.1);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+
+    /** @arg SG_Single2 with an indicator shorter than the KData fires no signal */
+    sg = SG_Single2(Indicator(make_shared<FixedLenInd>(5)), 10, 0.1);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().empty());
+}
+
+// A step signal generator for the SG-008 operator benchmark: emits buy/sell signals at fixed bar
+// steps so the logic operator _calculate cost can be measured against real KData
+class BenchStepSig : public SignalBase {
+public:
+    BenchStepSig(size_t buy_step, size_t sell_step)
+    : SignalBase("BenchStepSig"), m_buy_step(buy_step), m_sell_step(sell_step) {}
+    virtual ~BenchStepSig() {}
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new BenchStepSig(m_buy_step, m_sell_step));
+    }
+
+    virtual void _calculate(const KData &kdata) override {
+        size_t total = kdata.size();
+        for (size_t i = 0; i < total; ++i) {
+            if (i % m_buy_step == 0) {
+                _addBuySignal(kdata[i].datetime);
+            }
+            if (i % m_sell_step == 0) {
+                _addSellSignal(kdata[i].datetime);
+            }
+        }
+    }
+
+private:
+    size_t m_buy_step;
+    size_t m_sell_step;
+};
+
+/** @par Test points (benchmark: prints the cost only, no time assertion) */
+TEST_CASE("bench_SG_logic_operator") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0));
+    if (kdata.size() < 100) {
+        return;
+    }
+    std::cout << "bench_SG_logic_operator: kdata size: " << kdata.size() << std::endl;
+
+    const int runs = 100;
+    struct BenchCase {
+        const char *density;
+        size_t buy_step;
+        size_t sell_step;
+    };
+    BenchCase cases[] = {
+      {"dense", 3, 5},
+      {"sparse", 20, 15},
+    };
+
+    for (const auto &bench_case : cases) {
+        for (int op = 0; op < 3; ++op) {
+            // Add represents the additive family (Add/Sub); Mul the multiplicative family
+            // (Mul/Div/And); Or the branch family
+            auto sg1 = make_shared<BenchStepSig>(bench_case.buy_step, bench_case.sell_step);
+            auto sg2 = make_shared<BenchStepSig>(bench_case.buy_step, bench_case.sell_step);
+            SignalPtr sg;
+            const char *op_name = "Add";
+            switch (op) {
+                case 0:
+                    sg = sg1 + sg2;
+                    op_name = "Add";
+                    break;
+                case 1:
+                    sg = sg1 * sg2;
+                    op_name = "Mul";
+                    break;
+                case 2:
+                    sg = sg1 | sg2;
+                    op_name = "Or";
+                    break;
+            }
+            REQUIRE_UNARY(sg);
+
+            sg->setTO(kdata);
+            size_t expect_buy = sg->getBuySignal().size();
+            size_t expect_sell = sg->getSellSignal().size();
+            CHECK_UNARY(expect_buy + expect_sell > 0);
+
+            // warm: flip a no-op param to invalidate only the operator itself, keeping the
+            // sub-signals warm, so the loop measures the operator _calculate alone
+            auto t0 = std::chrono::steady_clock::now();
+            for (int i = 0; i < runs; ++i) {
+                sg->setParam<bool>("support_borrow_stock", false);
+                sg->setTO(kdata);
+            }
+            auto t1 = std::chrono::steady_clock::now();
+            double warm_ms =
+              std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;
+
+            // cold: reset propagates to the sub-signals, so each run includes their recalculation
+            t0 = std::chrono::steady_clock::now();
+            for (int i = 0; i < runs; ++i) {
+                sg->reset();
+                sg->setTO(kdata);
+            }
+            t1 = std::chrono::steady_clock::now();
+            double cold_ms =
+              std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;
+
+            CHECK_UNARY(sg->getBuySignal().size() == expect_buy &&
+                        sg->getSellSignal().size() == expect_sell);
+
+            std::cout << "  [" << bench_case.density << "] " << op_name << " x" << runs
+                      << " setTO: warm(operator only) " << warm_ms << " ms (" << warm_ms * 10.0
+                      << " us/run), cold(with sub calc) " << cold_ms << " ms (" << cold_ms * 10.0
+                      << " us/run)" << std::endl;
+        }
+    }
 }
 
 /** @} */

@@ -93,8 +93,9 @@ ScoreRecordList MultiFactorSelector::filterOnlyShouldBuy(Datetime date,
     size_t i = 0, cnt = 0, total = scores.size();
     while (i < total && cnt < topn) {
         auto const& sc = scores[i];
-        auto sys = m_stk_sys_dict[sc.stock];
-        if (sys->getSG()->shouldBuy(date)) {
+        auto iter = m_stk_sys_dict.find(sc.stock);
+        if (iter != m_stk_sys_dict.end() && iter->second &&
+            iter->second->getSG()->shouldBuy(date)) {
             ret.emplace_back(sc);
             cnt++;
         }
@@ -107,9 +108,24 @@ ScoreRecordList MultiFactorSelector::filterTopNReverse(Datetime date,
                                                        const ScoreRecordList& raw_scores,
                                                        size_t topn, bool only_should_buy,
                                                        bool ignore_null) {
+    // Filter before the truncation, so that the filtered-out ones do not consume the topn quota
+    ScoreRecordList candidates;
+    if (only_should_buy) {
+        candidates.reserve(raw_scores.size());
+        for (const auto& sc : raw_scores) {
+            auto iter = m_stk_sys_dict.find(sc.stock);
+            if (iter != m_stk_sys_dict.end() && iter->second &&
+                iter->second->getSG()->shouldBuy(date)) {
+                candidates.emplace_back(sc);
+            }
+        }
+    } else {
+        candidates = raw_scores;
+    }
+
     ScoreRecordList scores;
-    auto iter = raw_scores.rbegin();
-    for (size_t count = 0; count < topn && iter != raw_scores.rend(); ++iter) {
+    auto iter = candidates.rbegin();
+    for (size_t count = 0; count < topn && iter != candidates.rend(); ++iter) {
         if (!std::isnan(iter->value)) {
             scores.emplace_back(*iter);
             count++;
@@ -117,8 +133,8 @@ ScoreRecordList MultiFactorSelector::filterTopNReverse(Datetime date,
     }
     if (scores.size() < topn && !ignore_null) {
         size_t lack = topn - scores.size();
-        iter = raw_scores.rbegin();
-        for (size_t count = 0; count < lack && iter != raw_scores.rend(); ++iter) {
+        iter = candidates.rbegin();
+        for (size_t count = 0; count < lack && iter != candidates.rend(); ++iter) {
             if (std::isnan(iter->value)) {
                 scores.emplace_back(*iter);
                 count++;
@@ -127,10 +143,6 @@ ScoreRecordList MultiFactorSelector::filterTopNReverse(Datetime date,
             }
         }
     }
-    if (only_should_buy) {
-        scores = filterOnlyShouldBuy(date, scores, topn);
-    }
-
     return scores;
 }
 
@@ -146,6 +158,8 @@ ScoreRecordList MultiFactorSelector::filterTopN(Datetime date, const ScoreRecord
 }
 
 SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
+    HKU_CHECK(m_mf, "MF is not set or the selector has not been calculated!");
+
     bool ignore_null = getParam<bool>("ignore_null");
     bool ignore_le_zero = getParam<bool>("ignore_le_zero");
     bool only_should_buy = getParam<bool>("only_should_buy");
@@ -180,12 +194,20 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
 
     SystemWeightList ret;
     for (const auto& sc : scores) {
-        ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
+        auto iter = m_stk_sys_dict.find(sc.stock);
+        if (iter == m_stk_sys_dict.end() || !iter->second) {
+            continue;
+        }
+        ret.emplace_back(iter->second, sc.value);
     }
     return ret;
 }
 
 void MultiFactorSelector::_calculate() {
+    // Drop the previous mapping first: a second calculate (a new query, a new stock pool, a
+    // portfolio re-run) must not keep the systems of the earlier run
+    m_stk_sys_dict.clear();
+
     Stock ref_stk = getParam<Stock>("ref_stk");
 
     StockList stks;
@@ -235,7 +257,7 @@ void MultiFactorSelector::_calculate() {
     m_mf->calculate();
 
     for (const auto& sys : m_real_sys_list) {
-        m_stk_sys_dict.insert({sys->getStock(), sys});
+        m_stk_sys_dict.insert_or_assign(sys->getStock(), sys);
     }
 }
 

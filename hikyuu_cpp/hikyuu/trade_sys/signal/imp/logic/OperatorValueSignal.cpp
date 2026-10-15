@@ -6,6 +6,7 @@
  */
 
 #include "OperatorValueSignal.h"
+#include "../ManualSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::OperatorValueSignal)
@@ -37,8 +38,25 @@ void OperatorValueSignal::_reset() {
     }
 }
 
+void OperatorValueSignal::sub_sg_calculate(const KData& kdata) {
+    HKU_IF_RETURN(!m_sg, void());
+    if (m_sg->getParam<bool>("cycle")) {
+        // A cycle sub-signal is driven by startCycle within its own cycle window only
+        HKU_IF_RETURN(m_cycle_end.isNull(), void());
+        m_sg->setTO(m_kdata);
+        m_sg->startCycle(m_cycle_start, m_cycle_end);
+        return;
+    }
+    if (dynamic_cast<ManualSignal*>(m_sg.get())) {
+        // A manual sub-signal holds pre-seeded signals; its empty _calculate keeps them intact
+        m_sg->_calculate(kdata);
+        return;
+    }
+    m_sg->setTO(kdata);
+}
+
 SignalPtr OperatorValueSignal::_clone() {
-    return make_shared<OperatorValueSignal>(m_name, m_sg, m_value);
+    return make_shared<OperatorValueSignal>(m_name, m_sg, m_value, m_mode);
 }
 
 } /* namespace hku */

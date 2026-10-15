@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::SubValueSignal)
 namespace hku {
 
 SubValueSignal::SubValueSignal(double value, const SignalPtr& sg)
-: OperatorValueSignal("SG_SubVlaue", sg, value, 1) {}
+: OperatorValueSignal("SG_SubValue", sg, value, 1) {}
 
 void SubValueSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg || std::isnan(m_value), void());
@@ -22,7 +22,7 @@ void SubValueSignal::_calculate(const KData& kdata) {
     auto const* ks = kdata.data();
     size_t total = kdata.size();
 
-    m_sg->_calculate(kdata);
+    sub_sg_calculate(kdata);
     if (m_value == 0.0) {
         if (m_mode == 0) {
             for (size_t i = 0; i < total; ++i) {

@@ -6,6 +6,7 @@
  */
 
 #include "OperatorSignal.h"
+#include "../ManualSignal.h"
 
 #if HKU_SUPPORT_SERIALIZATION
 BOOST_CLASS_EXPORT(hku::OperatorSignal)
@@ -24,6 +25,11 @@ OperatorSignal::OperatorSignal(const string& name, const SignalPtr& sg1, const S
     if (sg2) {
         m_sg2 = sg2->clone();
     }
+    // The cycle attribute stays consistent with the child signals: if either side is cycle-driven,
+    // the combined signal must itself be driven by startCycle
+    if ((m_sg1 && m_sg1->getParam<bool>("cycle")) || (m_sg2 && m_sg2->getParam<bool>("cycle"))) {
+        setParam<bool>("cycle", true);
+    }
 }
 
 OperatorSignal::~OperatorSignal() {}
@@ -39,11 +45,92 @@ void OperatorSignal::_reset() {
 
 void OperatorSignal::sub_sg_calculate(SignalPtr& sg, const KData& kdata) {
     HKU_IF_RETURN(!sg, void());
-    bool cycle = sg->getParam<bool>("cycle");
-    if (cycle) {
+    if (sg->getParam<bool>("cycle")) {
+        // A cycle sub-signal is driven by startCycle within its own cycle window only
+        HKU_IF_RETURN(m_cycle_end.isNull(), void());
+        sg->setTO(m_kdata);
         sg->startCycle(m_cycle_start, m_cycle_end);
+        return;
     }
-    sg->_calculate(kdata);
+    if (dynamic_cast<ManualSignal*>(sg.get())) {
+        // A manual sub-signal holds pre-seeded signals; its empty _calculate keeps them intact
+        sg->_calculate(kdata);
+        return;
+    }
+    sg->setTO(kdata);
+}
+
+void OperatorSignal::sub_merged_calculate(const KData& kdata, const MergedEmitFunc& emit) {
+    auto const* ks = kdata.data();
+    size_t total = kdata.size();
+    HKU_IF_RETURN(total == 0, void());
+
+    typedef std::map<Datetime, double> SigMap;
+    // Up to four ordered candidate sources: the buy/sell tables of the two sub-signals
+    const SigMap* maps[4] = {nullptr, nullptr, nullptr, nullptr};  // buy1, sell1, buy2, sell2
+    if (m_sg1) {
+        maps[0] = &m_sg1->getBuySignalMap();
+        maps[1] = &m_sg1->getSellSignalMap();
+    }
+    if (m_sg2) {
+        maps[2] = &m_sg2->getBuySignalMap();
+        maps[3] = &m_sg2->getSellSignalMap();
+    }
+
+    SigMap::const_iterator its[4];
+    SigMap::const_iterator ends[4];
+    for (int i = 0; i < 4; ++i) {
+        if (maps[i]) {
+            its[i] = maps[i]->cbegin();
+            ends[i] = maps[i]->cend();
+        }
+    }
+
+    size_t bar_pos = 0;
+    while (true) {
+        // The next candidate datetime is the minimum head of the active tables
+        bool has_candidate = false;
+        Datetime candidate;
+        for (int i = 0; i < 4; ++i) {
+            if (maps[i] && its[i] != ends[i] && (!has_candidate || its[i]->first < candidate)) {
+                candidate = its[i]->first;
+                has_candidate = true;
+            }
+        }
+        if (!has_candidate) {
+            break;
+        }
+
+        double buy1 = 0.0, sell1 = 0.0, buy2 = 0.0, sell2 = 0.0;
+        for (int i = 0; i < 4; ++i) {
+            if (maps[i] && its[i] != ends[i] && its[i]->first == candidate) {
+                switch (i) {
+                    case 0:
+                        buy1 = its[i]->second;
+                        break;
+                    case 1:
+                        sell1 = its[i]->second;
+                        break;
+                    case 2:
+                        buy2 = its[i]->second;
+                        break;
+                    case 3:
+                        sell2 = its[i]->second;
+                        break;
+                }
+                ++its[i];
+            }
+        }
+
+        // The old per-bar loop only touches real bars; a manual pre-seeded entry may sit at a
+        // non-bar datetime or outside the current window, it must be dropped the same way
+        while (bar_pos < total && ks[bar_pos].datetime < candidate) {
+            ++bar_pos;
+        }
+        if (bar_pos < total && ks[bar_pos].datetime == candidate) {
+            emit(candidate, buy1, sell1, buy2, sell2);
+        }
+    }
 }
 
 SignalPtr OperatorSignal::_clone() {

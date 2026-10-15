@@ -6,10 +6,12 @@
  */
 
 #include "../../test_config.h"
+#include <stdexcept>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
+#include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include "../system/create_test_sys.h"
 
 using namespace hku;
@@ -248,6 +250,153 @@ TEST_CASE("test_SE_PerformanceOptimal_calculate_deterministic") {
     }
 }
 
+// A candidate signal whose calculation always throws, used to verify that a single failing
+// candidate does not abort the whole parallel training
+class ThrowingSignal : public SignalBase {
+public:
+    ThrowingSignal() : SignalBase("SE_ThrowingSignal") {}
+    virtual ~ThrowingSignal() = default;
+
+    virtual void _calculate(const KData&) override {
+        throw std::runtime_error("signal calculate failed");
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new ThrowingSignal);
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_candidate_throw") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+
+    auto good1 = create_test_sys(3, 5);
+    good1->setStock(stk);
+    auto good2 = create_test_sys(5, 20);
+    good2->setStock(stk);
+    auto bad = create_test_sys(3, 10);
+    bad->setStock(stk);
+    bad->setSG(SignalPtr(new ThrowingSignal));
+
+    se->addSystemList({good1, bad, good2});
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+
+    /** @arg A candidate throwing during the training run must not abort the whole calculation */
+    CHECK_NOTHROW(se->calculate(SystemList(), query));
+
+    /** @arg The healthy candidates are still evaluated and selected for the test windows */
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    size_t selected_count = 0;
+    for (size_t i = 30; i < dates.size(); i++) {
+        auto sw = se->getSelected(dates[i]);
+        if (!sw.empty()) {
+            selected_count++;
+            CHECK_UNARY(sw[0].sys->name() == good1->name() || sw[0].sys->name() == good2->name());
+        }
+    }
+    CHECK_UNARY(selected_count > 0);
+}
+
+// A minimal environment that only records its query, used to check that the walk-forward training
+// windows of the candidates do not overwrite the environment shared by the prototypes
+class QuerySpyEnvironment : public EnvironmentBase {
+public:
+    QuerySpyEnvironment() : EnvironmentBase("SE_QuerySpyEnvironment") {}
+    virtual ~QuerySpyEnvironment() = default;
+
+    virtual void _calculate() override {}
+
+    virtual EnvironmentPtr _clone() override {
+        return EnvironmentPtr(new QuerySpyEnvironment);
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_shared_ev") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    auto ev = EnvironmentPtr(new QuerySpyEnvironment);
+    KQuery origin = KQueryByIndex(-5);
+    ev->setQuery(origin);
+
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        sys->setEV(ev);
+        se->addSystem(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+
+    /** @arg the per-window training queries of the candidates must not be written into the EV
+     *  shared by the prototypes (SE-003) */
+    CHECK_NOTHROW(se->calculate(SystemList(), query));
+    CHECK_UNARY(ev->getQuery() == origin);
+}
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_invalid_key") {
+    auto se = SE_PerformanceOptimal("Unknown Performance Key");
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+
+    /** @arg an unknown statistic key yields Null (NaN) for every candidate, so none is selected
+     *  and the calculation still completes without crashing (SE-N02) */
+    CHECK_NOTHROW(se->calculate(SystemList(), query));
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    for (const auto& date : dates) {
+        CHECK_UNARY(se->getSelected(date).empty());
+    }
+}
+
+/** @par Test points
+ *  @note A behavior lock for the m_sys_dict unification (the derived member was folded into the
+ *  base). The pre-fix shadowing was self-consistent (the derived _getSelected read the derived
+ *  map), so no observable behavior difference exists and no discriminating black-box test can be
+ *  constructed; this test only pins the unified behavior against regressions.
+ */
+TEST_CASE("test_SE_PerformanceOptimal_index_single") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    se->calculate(SystemList(), query);
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    auto base = se->getSelected(dates[40]);
+    REQUIRE_UNARY(base.size() == 1);
+
+    /** @arg Each date stores a single selected system, so any index takes that same system */
+    se->setParam<int>("index", 100);
+    auto after = se->getSelected(dates[40]);
+    CHECK_EQ(after.size(), 1);
+    CHECK_EQ(after[0].sys->name(), base[0].sys->name());
+    CHECK_EQ(after[0].weight, base[0].weight);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
@@ -314,5 +463,31 @@ TEST_CASE("test_SE_PerformanceOptimal_export") {
     }
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_recalculate") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    KQuery query(-125);
+    se->calculate(SystemList(), query);
+    OptimalSelectorBase* raw_se = dynamic_cast<OptimalSelectorBase*>(se.get());
+    REQUIRE_UNARY(raw_se);
+    size_t ranges = raw_se->getRunRanges().size();
+    REQUIRE_UNARY(ranges > 0);
+
+    /** @arg A second calculate after an invalidation must not accumulate the run ranges */
+    se->setParam<int>("test_len", 20);
+    se->calculate(SystemList(), query);
+    CHECK_EQ(raw_se->getRunRanges().size(), ranges);
+}
 
 /** @} */

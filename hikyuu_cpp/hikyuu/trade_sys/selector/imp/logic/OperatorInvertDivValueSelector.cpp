@@ -19,7 +19,10 @@ SystemWeightList OperatorInvertDivValueSelector::_getSelected(Datetime date) {
 
     ret = m_se->getSelected(date);
     for (auto& sw : ret) {
-        sw.weight = m_value / sw.weight;
+        // A zero / non-finite divisor leaves the weight undefined, report it as Null so that the
+        // downstream allocation ignores it instead of producing inf / NaN
+        sw.weight =
+          (sw.weight == 0.0 || !std::isfinite(sw.weight)) ? Null<double>() : m_value / sw.weight;
     }
 
     return ret;

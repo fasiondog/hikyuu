@@ -26,6 +26,12 @@ public:
         return SystemWeightList();
     }
 
+    // Forward to the wrapped selector, otherwise a nested logical selector (e.g. (a + b) + 2.0)
+    // would never learn its prototypes and select nothing
+    virtual void _addSystem(const SYSPtr& sys) override;
+    virtual void _removeAll() override;
+    virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override;
+
 protected:
     SelectorPtr m_se;
     double m_value{0.0};
@@ -74,6 +80,7 @@ public:                                                                         
         auto p = std::make_shared<classname>();                                                \
         if (m_se) {                                                                            \
             p->m_se = m_se->clone();                                                           \
+            p->m_pro_sys_list = p->m_se->getProtoSystemList();                                 \
         }                                                                                      \
         p->m_value = m_value;                                                                  \
         return p;                                                                              \

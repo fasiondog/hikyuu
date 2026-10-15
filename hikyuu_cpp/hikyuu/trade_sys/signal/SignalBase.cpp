@@ -10,6 +10,11 @@
 
 namespace hku {
 
+namespace {
+// Signals below this magnitude are float residuals (e.g. sg*0.5 - sg/2), not real intents
+constexpr double ZERO_SIGNAL_THRESHOLD = 1e-10;
+}  // namespace
+
 HKU_API std::ostream& operator<<(std::ostream& os, const SignalBase& sg) {
     os << "Signal(" << sg.name() << ", " << sg.getParameter() << ")";
     return os;
@@ -55,7 +60,9 @@ SignalPtr SignalBase::clone() {
     p->m_params = m_params;
     p->m_is_python_object = m_is_python_object;
     p->m_kdata = m_kdata;
-    p->m_calculated = m_calculated;
+    // The clone recalculates lazily so the subclass runtime state (e.g. the Python subclass
+    // cache) is rebuilt on the next setTO instead of keeping the stale snapshot
+    p->m_calculated = false;
     p->m_hold_long = m_hold_long;
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;
@@ -140,16 +147,21 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 }
 
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
-    HKU_IF_RETURN(!std::isfinite(value) || value == 0.0, void());
+    HKU_IF_RETURN(!std::isfinite(value) || std::abs(value) < ZERO_SIGNAL_THRESHOLD, void());
 
-    double new_value = value + getBuyValue(datetime) + getSellValue(datetime);
-    HKU_IF_RETURN(!std::isfinite(new_value) || new_value == 0.0, void());
+    // A single find per map is reused by both the value merge and the later insert/accumulate
+    auto buy_iter = m_buySig.find(datetime);
+    auto sell_iter = m_sellSig.find(datetime);
+    double buy_value = buy_iter != m_buySig.end() ? buy_iter->second : 0.0;
+    double sell_value = sell_iter != m_sellSig.end() ? sell_iter->second : 0.0;
+    double new_value = value + buy_value + sell_value;
+    HKU_IF_RETURN(!std::isfinite(new_value) || std::abs(new_value) < ZERO_SIGNAL_THRESHOLD, void());
 
+    bool alternate = getParam<bool>("alternate");
     if (new_value > 0.0) {
-        auto iter = m_buySig.find(datetime);
-        if (!getParam<bool>("alternate")) {
-            if (iter != m_buySig.end()) {
-                iter->second += new_value;
+        if (!alternate) {
+            if (buy_iter != m_buySig.end()) {
+                buy_iter->second += new_value;
             } else {
                 m_buySig.insert({datetime, new_value});
             }
@@ -157,8 +169,8 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
         }
 
         if (!m_hold_long) {
-            if (iter != m_buySig.end()) {
-                iter->second += new_value;
+            if (buy_iter != m_buySig.end()) {
+                buy_iter->second += new_value;
             } else {
                 m_buySig.insert({datetime, new_value});
             }
@@ -170,10 +182,9 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
         }
 
     } else {
-        auto iter = m_sellSig.find(datetime);
-        if (!getParam<bool>("alternate")) {
-            if (iter != m_sellSig.end()) {
-                iter->second += new_value;
+        if (!alternate) {
+            if (sell_iter != m_sellSig.end()) {
+                sell_iter->second += new_value;
             } else {
                 m_sellSig.insert({datetime, new_value});
             }
@@ -182,15 +193,15 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
 
         if (!m_hold_short) {
             if (m_hold_long) {
-                if (iter != m_sellSig.end()) {
-                    iter->second += new_value;
+                if (sell_iter != m_sellSig.end()) {
+                    sell_iter->second += new_value;
                 } else {
                     m_sellSig.insert({datetime, new_value});
                 }
                 m_hold_long = false;
             } else if (getParam<bool>("support_borrow_stock")) {
-                if (iter != m_sellSig.end()) {
-                    iter->second += new_value;
+                if (sell_iter != m_sellSig.end()) {
+                    sell_iter->second += new_value;
                 } else {
                     m_sellSig.insert({datetime, new_value});
                 }

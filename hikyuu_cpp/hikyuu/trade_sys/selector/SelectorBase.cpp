@@ -94,9 +94,13 @@ SelectorPtr SelectorBase::clone() {
         p->m_real_sys_list.emplace_back(sys->clone());
     }
 
-    p->m_pro_sys_list.reserve(m_pro_sys_list.size());
-    for (const auto& sys : m_pro_sys_list) {
-        p->m_pro_sys_list.emplace_back(sys->clone());
+    // A subclass may have already filled the prototype list in _clone (sharing its inner
+    // selector's instances); only clone the prototypes here when the list is still empty
+    if (p->m_pro_sys_list.empty()) {
+        p->m_pro_sys_list.reserve(m_pro_sys_list.size());
+        for (const auto& sys : m_pro_sys_list) {
+            p->m_pro_sys_list.emplace_back(sys->clone());
+        }
     }
 
     if (m_sc_filter) {
@@ -168,9 +172,10 @@ void SelectorBase::addStock(const Stock& stock, const SystemPtr& protoSys) {
                   "Scenarios that depend on prototype systems need to specify a TM!");
     }
 
-    auto proto = protoSys;
-    proto->forceResetAll();
-    SYSPtr sys = proto->clone();
+    // Reset a clone instead of the caller's prototype, so that reusing the same protoSys does not
+    // silently drop the state of the caller's object
+    SYSPtr sys = protoSys->clone();
+    sys->forceResetAll();
     sys->reset();
     sys->setStock(stock);
     _addSystem(sys);
@@ -187,13 +192,14 @@ void SelectorBase::addStockList(const StockList& stkList, const SystemPtr& proto
 }
 
 SystemWeightList SelectorBase::getSelected(Datetime date) {
-    if (getParam<int>("get_n") <= 0) {
+    int n = getParam<int>("get_n");
+    if (n <= 0) {
         return _getSelected(date);
     }
 
     SystemWeightList ret = _getSelected(date);
-    if (ret.size() > getParam<int>("get_n")) {
-        ret.resize(getParam<int>("get_n"));
+    if (ret.size() > static_cast<size_t>(n)) {
+        ret.resize(static_cast<size_t>(n));
     }
     return ret;
 }

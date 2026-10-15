@@ -29,6 +29,8 @@ void CycleSignal::_checkParam(const string& name) const {
 }
 
 void CycleSignal::_calculate(const KData& kdata) {
+    // A cycle signal is driven by startCycle only; without a valid cycle window it emits nothing
+    HKU_IF_RETURN(getCycleStart().isNull() || getCycleEnd().isNull(), void());
     _addBuySignal(getCycleStart());
 }
 

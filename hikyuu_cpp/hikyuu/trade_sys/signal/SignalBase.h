@@ -144,6 +144,18 @@ private:
     void initParam();
 
 protected:
+    friend class OperatorSignal;
+
+    /** Get the buy signal table, for the composed operator signals to iterate directly */
+    const std::map<Datetime, double>& getBuySignalMap() const {
+        return m_buySig;
+    }
+
+    /** Get the sell signal table, for the composed operator signals to iterate directly */
+    const std::map<Datetime, double>& getSellSignalMap() const {
+        return m_sellSig;
+    }
+
     string m_name;
     KData m_kdata;
     bool m_is_python_object{false};

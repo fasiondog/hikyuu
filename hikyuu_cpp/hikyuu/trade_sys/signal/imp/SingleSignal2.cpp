@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "../../../indicator/crt/DIFF.h"
 #include "../../../indicator/crt/STDEV.h"
@@ -21,12 +22,12 @@ BOOST_CLASS_EXPORT(hku::SingleSignal2)
 namespace hku {
 
 SingleSignal2::SingleSignal2() : SignalBase("SG_Single2") {
-    setParam<int>("filter_n", 10);
+    setParam<int>("filter_n", 20);
     setParam<double>("filter_p", 0.1);
 }
 
 SingleSignal2::SingleSignal2(const Indicator& ind) : SignalBase("SG_Single2"), m_ind(ind) {
-    setParam<int>("filter_n", 10);
+    setParam<int>("filter_n", 20);
     setParam<double>("filter_p", 0.1);
 }
 
@@ -52,6 +53,12 @@ void SingleSignal2::_calculate(const KData& kdata) {
     double filter_p = getParam<double>("filter_p");
 
     Indicator ind = m_ind(kdata);
+    if (ind.size() != kdata.size()) {
+        ind = ALIGN(ind, kdata);
+        HKU_WARN_IF_RETURN(ind.size() != kdata.size(), void(),
+                           "Failed to align ind.size()({}) to kdata.size()({})!", ind.size(),
+                           kdata.size());
+    }
     Indicator dev = REF(STDEV(DIFF(ind), filter_n), 1);
 
     size_t start = dev.discard();

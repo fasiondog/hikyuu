@@ -176,9 +176,9 @@ The custom signal generator interfaces:
     :param bool alternate: whether to buy and sell alternately, defaulting to True
     :return: the signal generator)");
 
-    m.def("SG_Single", SG_Single, py::arg("ind"), py::arg("filter_n") = 10,
+    m.def("SG_Single", SG_Single, py::arg("ind"), py::arg("filter_n") = 20,
           py::arg("filter_p") = 0.1,
-          R"(SG_Single(ind[, filter_n = 10, filter_p = 0.1])
+          R"(SG_Single(ind[, filter_n = 20, filter_p = 0.1])
     
     Generate the single-line inflection point signal generator. It uses the curve inflection point algorithm given in Trade Your Way to Financial Freedom [BOOK1]_ to judge the curve trend; the formula is as follows::
 
@@ -193,9 +193,9 @@ The custom signal generator interfaces:
     :param float filter_p: the filter percentage
     :return: the signal generator)");
 
-    m.def("SG_Single2", SG_Single2, py::arg("ind"), py::arg("filter_n") = 10,
+    m.def("SG_Single2", SG_Single2, py::arg("ind"), py::arg("filter_n") = 20,
           py::arg("filter_p") = 0.1,
-          R"(SG_Single2(ind[, filter_n = 10, filter_p = 0.1])
+          R"(SG_Single2(ind[, filter_n = 20, filter_p = 0.1])
     
     Generate the single-line inflection point signal generator 2 [BOOK1]_::
 
