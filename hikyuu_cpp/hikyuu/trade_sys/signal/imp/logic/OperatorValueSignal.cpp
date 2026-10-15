@@ -38,7 +38,7 @@ void OperatorValueSignal::_reset() {
 }
 
 SignalPtr OperatorValueSignal::_clone() {
-    return make_shared<OperatorValueSignal>(m_name, m_sg, m_value);
+    return make_shared<OperatorValueSignal>(m_name, m_sg, m_value, m_mode);
 }
 
 } /* namespace hku */

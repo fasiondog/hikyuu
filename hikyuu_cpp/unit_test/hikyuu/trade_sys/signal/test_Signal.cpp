@@ -15,6 +15,7 @@
 #include <hikyuu/trade_sys/signal/crt/SG_CrossGold.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Single.h>
+#include <hikyuu/trade_sys/signal/crt/SG_Logic.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 #include <hikyuu/KData.h>
@@ -376,6 +377,54 @@ TEST_CASE("test_SG_Single_sell_threshold") {
 
     /** @arg a large decline exceeding the noise threshold fires a sell signal */
     CHECK_UNARY(sell.size() == 1 && sell[0] == dates[7]);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_OperatorValue_clone_mode") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    Datetime first = k.front().datetime;
+    Datetime last = k.back().datetime;
+    SignalPtr base = make_shared<SignalCalcTest>();
+
+    /** @arg the clone of (sg - 2.0) keeps mode 0 and yields the same signals */
+    SignalPtr sub0 = base - 2.0;
+    sub0->setParam<bool>("alternate", false);
+    sub0->setTO(k);
+    SignalPtr sub0_clone = sub0->clone();
+    sub0_clone->setTO(k);
+    CHECK_UNARY(sub0_clone->getBuySignal().empty());
+    CHECK_UNARY(sub0_clone->getSellSignal().size() == 2 &&
+                sub0_clone->getSellSignal()[0] == first && sub0_clone->getSellSignal()[1] == last);
+    CHECK_UNARY(sub0_clone->getSellValue(first) == sub0->getSellValue(first));
+    CHECK_UNARY(sub0_clone->getSellValue(last) == sub0->getSellValue(last));
+
+    /** @arg the clone of (2.0 - sg) keeps mode 1 and does not flip the buy/sell direction */
+    SignalPtr sub1 = 2.0 - base;
+    sub1->setParam<bool>("alternate", false);
+    sub1->setTO(k);
+    SignalPtr sub1_clone = sub1->clone();
+    sub1_clone->setTO(k);
+    CHECK_UNARY(sub1_clone->getSellSignal().empty());
+    CHECK_UNARY(sub1_clone->getBuySignal().size() == 2 && sub1_clone->getBuySignal()[0] == first &&
+                sub1_clone->getBuySignal()[1] == last);
+    CHECK_UNARY(sub1_clone->getBuyValue(first) == sub1->getBuyValue(first));
+    CHECK_UNARY(sub1_clone->getBuyValue(last) == sub1->getBuyValue(last));
+
+    /** @arg the clone of (2.0 / sg) keeps mode 1 and yields the same signal values */
+    SignalPtr div1 = 2.0 / base;
+    div1->setParam<bool>("alternate", false);
+    div1->setTO(k);
+    SignalPtr div1_clone = div1->clone();
+    div1_clone->setTO(k);
+    CHECK_UNARY(div1_clone->getBuyValue(first) == div1->getBuyValue(first));
+    CHECK_UNARY(div1_clone->getSellValue(last) == div1->getSellValue(last));
+    CHECK_UNARY(div1_clone->getBuyValue(first) == 2.0);
+    CHECK_UNARY(div1_clone->getSellValue(last) == -2.0);
 }
 
 /** @par Test points */
