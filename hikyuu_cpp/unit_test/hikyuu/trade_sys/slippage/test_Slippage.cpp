@@ -6,8 +6,10 @@
  */
 
 #include "doctest/doctest.h"
+#include <algorithm>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
+#include <hikyuu/trade_sys/slippage/crt/SP_FixedPercent.h>
 
 using namespace hku;
 
@@ -78,6 +80,31 @@ TEST_CASE("test_Slippage") {
     p_src = (SlippageTest *)p_clone.get();
     CHECK_EQ(p_src->getX(), 0);
     CHECK_NE(p, p_clone);
+}
+
+/** @par Test points */
+TEST_CASE("test_Slippage_clone_lazy_recalculate") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sz000001").getKData(KQuery(0, 10));
+    CHECK_UNARY(!k.empty());
+    Datetime d0 = k[0].datetime;
+    price_t plan = 10.0;
+    price_t slipped = plan * 1.001;
+
+    auto sp = SP_FixedPercent(0.001);
+    sp->setTO(k);
+    price_t bounded = std::min(slipped, k[0].highPrice);
+    CHECK_EQ(sp->getRealBuyPrice(d0, plan), bounded);
+
+    /** @arg the clone carries no TO, so queries before setTO skip the daily-bar constraint */
+    SlippagePtr c = sp->clone();
+    CHECK_NE(sp, c);
+    CHECK_UNARY(c->getTO().empty());
+    CHECK_EQ(c->getRealBuyPrice(d0, plan), slipped);
+
+    /** @arg setTO rebinds the clone and restores the same constrained result */
+    c->setTO(k);
+    CHECK_EQ(c->getRealBuyPrice(d0, plan), bounded);
 }
 
 /** @} */

@@ -55,7 +55,9 @@ SignalPtr SignalBase::clone() {
     p->m_params = m_params;
     p->m_is_python_object = m_is_python_object;
     p->m_kdata = m_kdata;
-    p->m_calculated = m_calculated;
+    // The clone recalculates lazily so the subclass runtime state (e.g. the Python subclass
+    // cache) is rebuilt on the next setTO instead of keeping the stale snapshot
+    p->m_calculated = false;
     p->m_hold_long = m_hold_long;
     p->m_hold_short = m_hold_short;
     p->m_buySig = m_buySig;

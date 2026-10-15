@@ -46,7 +46,8 @@ SlippagePtr SlippageBase::clone() {
     p->m_params = m_params;
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
-    p->m_kdata = m_kdata;
+    // The clone has no TO bound, so the next setTO always recalculates
+    p->m_kdata = Null<KData>();
     return p;
 }
 

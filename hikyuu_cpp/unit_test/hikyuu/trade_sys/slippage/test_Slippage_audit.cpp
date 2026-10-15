@@ -156,7 +156,7 @@ public:
 }  // namespace
 
 /** @par Test points */
-TEST_CASE("test_Slippage_clone_copies_kdata") {
+TEST_CASE("test_Slippage_clone_recalculates") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KData kdata = stock.getKData(KQuery(0, 50, KQuery::DAY));
@@ -166,10 +166,11 @@ TEST_CASE("test_Slippage_clone_copies_kdata") {
     sp->setTO(kdata);
     CHECK_EQ(static_cast<CalcCountSP*>(sp.get())->count, 1);
 
-    /** @arg clone carries m_kdata, so setTO with the same kdata is a no-op (early return, no re-calc) */
+    /** @arg the clone carries no TO, so the next setTO always recalculates (lazy recalculation) */
     SlippagePtr c = sp->clone();
+    CHECK_UNARY(c->getTO().empty());
     c->setTO(kdata);
-    CHECK_EQ(static_cast<CalcCountSP*>(c.get())->count, 0);
+    CHECK_EQ(static_cast<CalcCountSP*>(c.get())->count, 1);
 }
 
 /** @} */

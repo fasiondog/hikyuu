@@ -50,7 +50,8 @@ StoplossPtr StoplossBase::clone() {
     p->m_params = m_params;
     p->m_tm = m_tm;
     p->m_kdata = m_kdata;
-    p->m_calculated = m_calculated;
+    // The clone recalculates lazily so the subclass runtime state is rebuilt on the next setTO
+    p->m_calculated = false;
     return p;
 }
 

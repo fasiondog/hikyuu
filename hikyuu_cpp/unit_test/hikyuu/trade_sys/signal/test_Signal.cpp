@@ -56,6 +56,7 @@ public:
     virtual ~SignalCalcTest() {}
 
     virtual void _calculate(const KData &kdata) override {
+        m_calc_count++;
         _addBuySignal(kdata.front().datetime);
         _addSellSignal(kdata.back().datetime);
     }
@@ -71,6 +72,13 @@ public:
     void setHoldLong(bool hold) {
         m_hold_long = hold;
     }
+
+    int calcCount() const {
+        return m_calc_count;
+    }
+
+private:
+    int m_calc_count{0};
 };
 
 // A leaf indicator whose result length does not follow the KData context, used to build the
@@ -278,6 +286,37 @@ TEST_CASE("test_Signal_clone_operator_behavior") {
     CHECK_EQ(child->getCycleStart(), t0);
     CHECK_EQ(child->getCycleEnd(), t1);
     CHECK_EQ(child->getBuyValue(t0), 1.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_Signal_clone_lazy_recalculate") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData k = stock.getKData(KQuery(-30));
+    REQUIRE(k.size() >= 15);
+
+    auto p = make_shared<SignalCalcTest>();
+    p->setTO(k);
+    Datetime t0 = k[0].datetime;
+    Datetime tN = k[k.size() - 1].datetime;
+    CHECK_EQ(p->getBuyValue(t0), 1.0);
+    CHECK_EQ(p->getSellValue(tN), -1.0);
+
+    /** @arg the clone keeps the copied signal table, so queries work before any recalculation */
+    SignalPtr c = p->clone();
+    CHECK_NE(p, c);
+    CHECK_EQ(c->getBuyValue(t0), 1.0);
+    CHECK_EQ(c->getSellValue(tN), -1.0);
+
+    /** @arg the clone recalculates lazily: setTO with the same KData must re-run _calculate
+     * instead of short-circuiting, so the subclass runtime state is rebuilt */
+    auto *cloned = static_cast<SignalCalcTest *>(c.get());
+    CHECK_EQ(cloned->calcCount(), 0);
+    c->setTO(k);
+    CHECK_EQ(cloned->calcCount(), 1);
+    CHECK_EQ(cloned->getBuyValue(t0), 1.0);
+    CHECK_EQ(cloned->getSellValue(tN), -1.0);
+    CHECK_EQ(static_cast<SignalCalcTest *>(p.get())->calcCount(), 1);
 }
 
 /** @par Test points */
