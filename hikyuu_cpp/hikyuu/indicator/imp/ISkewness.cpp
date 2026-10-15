@@ -47,10 +47,10 @@ void ISkewness::_calculate(const Indicator& data) {
             return;
         }
         size_t start_pos = data.discard();
-        value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
-        value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
+        price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
+        price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
         size_t valid = 0;
-        value_t d0 = src[start_pos] - k;
+        price_t d0 = src[start_pos] - k;
         if (std::isfinite(d0)) {
             ex += d0;
             ex2 += d0 * d0;
@@ -58,9 +58,9 @@ void ISkewness::_calculate(const Indicator& data) {
             valid++;
         }
         for (size_t i = start_pos + 1; i < total; ++i) {
-            value_t d = src[i] - k;
+            price_t d = src[i] - k;
             if (std::isfinite(d)) {
-                value_t d2 = d * d;
+                price_t d2 = d * d;
                 ex += d;
                 ex2 += d2;
                 ex3 += d2 * d;
@@ -68,14 +68,14 @@ void ISkewness::_calculate(const Indicator& data) {
             }
             if (i < m_discard || valid == 0)
                 continue;
-            value_t nv = (value_t)valid;
-            value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
-            value_t std_dev = std::sqrt(var);
+            price_t nv = (price_t)valid;
+            price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
+            price_t std_dev = std::sqrt(var);
             if (std_dev == 0) {
                 dst[i] = 0.0;
             } else {
-                value_t ex_over_n = ex / nv;
-                value_t third_moment =
+                price_t ex_over_n = ex / nv;
+                price_t third_moment =
                   ex3 / nv - 3 * (ex2 / nv) * ex_over_n + 2 * ex_over_n * ex_over_n * ex_over_n;
                 dst[i] = third_moment / (std_dev * std_dev * std_dev);
             }
@@ -91,14 +91,14 @@ void ISkewness::_calculate(const Indicator& data) {
 
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
+    price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
+    price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
     size_t valid = 0;
 
     for (size_t i = start_pos; i < first_end; i++) {
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -109,32 +109,32 @@ void ISkewness::_calculate(const Indicator& data) {
     auto emit = [&](size_t i) {
         if (valid == 0)
             return;
-        value_t nv = (value_t)valid;
-        value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
-        value_t std_dev = std::sqrt(var);
+        price_t nv = (price_t)valid;
+        price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
+        price_t std_dev = std::sqrt(var);
         if (std_dev == 0) {
             dst[i] = 0.0;
             return;
         }
-        value_t ex_over_n = ex / nv;
-        value_t third_moment =
+        price_t ex_over_n = ex / nv;
+        price_t third_moment =
           ex3 / nv - 3 * (ex2 / nv) * ex_over_n + 2 * ex_over_n * ex_over_n * ex_over_n;
         dst[i] = third_moment / (std_dev * std_dev * std_dev);
     };
     emit(first_end - 1);
 
     for (size_t i = first_end; i < total; i++) {
-        value_t d_pre = src[i - n] - k;
+        price_t d_pre = src[i - n] - k;
         if (std::isfinite(d_pre)) {
-            value_t dp2 = d_pre * d_pre;
+            price_t dp2 = d_pre * d_pre;
             ex -= d_pre;
             ex2 -= dp2;
             ex3 -= dp2 * d_pre;
             valid--;
         }
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -158,13 +158,13 @@ void ISkewness::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
+    price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
+    price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
     size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -173,17 +173,17 @@ void ISkewness::_increment_calculate(const Indicator& data, size_t start_pos) {
     }
 
     for (size_t i = start_pos; i < total; i++) {
-        value_t d_pre = src[i - n] - k;
+        price_t d_pre = src[i - n] - k;
         if (std::isfinite(d_pre)) {
-            value_t dp2 = d_pre * d_pre;
+            price_t dp2 = d_pre * d_pre;
             ex -= d_pre;
             ex2 -= dp2;
             ex3 -= dp2 * d_pre;
             valid--;
         }
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -191,14 +191,14 @@ void ISkewness::_increment_calculate(const Indicator& data, size_t start_pos) {
         }
         if (valid == 0)
             continue;
-        value_t nv = (value_t)valid;
-        value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
-        value_t std_dev = std::sqrt(var);
+        price_t nv = (price_t)valid;
+        price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
+        price_t std_dev = std::sqrt(var);
         if (std_dev == 0) {
             dst[i] = 0.0;
         } else {
-            value_t ex_over_n = ex / nv;
-            value_t third_moment =
+            price_t ex_over_n = ex / nv;
+            price_t third_moment =
               ex3 / nv - 3 * (ex2 / nv) * ex_over_n + 2 * ex_over_n * ex_over_n * ex_over_n;
             dst[i] = third_moment / (std_dev * std_dev * std_dev);
         }
@@ -211,13 +211,13 @@ void ISkewness::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
     size_t start = _get_step_start(curPos, step, ind.discard());
     HKU_IF_RETURN(start != curPos + 1 - step, void());
 
-    value_t k = std::isfinite(ind[start]) ? ind[start] : 0.0;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
+    price_t k = std::isfinite(ind[start]) ? ind[start] : 0.0;
+    price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0;
     size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
-        value_t d = ind[i] - k;
+        price_t d = ind[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -228,15 +228,15 @@ void ISkewness::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
         _set(Null<value_t>(), curPos);
         return;
     }
-    value_t nv = (value_t)valid;
-    value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
-    value_t std_dev = std::sqrt(var);
+    price_t nv = (price_t)valid;
+    price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
+    price_t std_dev = std::sqrt(var);
     if (std_dev == 0) {
         _set(0.0, curPos);
         return;
     }
-    value_t ex_over_n = ex / nv;
-    value_t third_moment =
+    price_t ex_over_n = ex / nv;
+    price_t third_moment =
       ex3 / nv - 3 * (ex2 / nv) * ex_over_n + 2 * ex_over_n * ex_over_n * ex_over_n;
     _set(third_moment / (std_dev * std_dev * std_dev), curPos);
 }

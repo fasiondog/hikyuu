@@ -36,8 +36,8 @@ TEST_CASE("test_TIMELINE") {
     CHECK_EQ(t.size(), tl.size());
     CHECK_EQ(t.discard(), 0);
     if (!tl.empty()) {
-        CHECK_EQ(t[0], tl[0].price);
-        CHECK_EQ(t[tl.size() - 1], tl[tl.size() - 1].price);
+        CHECK_EQ(t[0], doctest::Approx(tl[0].price));
+        CHECK_EQ(t[tl.size() - 1], doctest::Approx(tl[tl.size() - 1].price));
     }
 
     /** @arg TIMELINEVOL reads the same series with the vol part */

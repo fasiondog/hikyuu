@@ -649,7 +649,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();
         // Cache the raw factor buffers once (stk x ind) so the hot cross-sectional loop reads and
         // writes through the buffer instead of Indicator::operator[] (a virtual get per element)
-        vector<price_t*> ind_data_ptrs(stk_count * ind_count);
+        vector<value_t*> ind_data_ptrs(stk_count * ind_count);
         for (size_t si = 0; si < stk_count; si++) {
             for (size_t ii = 0; ii < ind_count; ii++) {
                 ind_data_ptrs[si * ind_count + ii] = all_stk_inds[si][ii].data();

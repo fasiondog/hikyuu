@@ -229,7 +229,7 @@ TEST_CASE("test_Stoploss_indicator_clone_independent") {
     StoplossPtr st_clone = st->clone();
     st->setTO(k2);
     for (size_t i = 0; i < k1.size(); ++i) {
-        CHECK_EQ(st_clone->getPrice(k1[i].datetime, 0.0), k1[i].closePrice);
+        CHECK_EQ(st_clone->getPrice(k1[i].datetime, 0.0), doctest::Approx(k1[i].closePrice));
     }
 }
 

@@ -47,12 +47,12 @@ void IKurtosis::_calculate(const Indicator& data) {
             return;
         }
         size_t start_pos = data.discard();
-        value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
-        value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+        price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
+        price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
         size_t valid = 0;
-        value_t d0 = src[start_pos] - k;
+        price_t d0 = src[start_pos] - k;
         if (std::isfinite(d0)) {
-            value_t d02 = d0 * d0;
+            price_t d02 = d0 * d0;
             ex += d0;
             ex2 += d02;
             ex3 += d02 * d0;
@@ -60,9 +60,9 @@ void IKurtosis::_calculate(const Indicator& data) {
             valid++;
         }
         for (size_t i = start_pos + 1; i < total; ++i) {
-            value_t d = src[i] - k;
+            price_t d = src[i] - k;
             if (std::isfinite(d)) {
-                value_t d2 = d * d;
+                price_t d2 = d * d;
                 ex += d;
                 ex2 += d2;
                 ex3 += d2 * d;
@@ -71,15 +71,15 @@ void IKurtosis::_calculate(const Indicator& data) {
             }
             if (i < m_discard || valid == 0)
                 continue;
-            value_t nv = (value_t)valid;
-            value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
-            value_t std_dev_pow4 = var * var;
+            price_t nv = (price_t)valid;
+            price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
+            price_t std_dev_pow4 = var * var;
             if (var == 0) {
                 dst[i] = -3.0;
             } else {
-                value_t ex_over_n = ex / nv;
-                value_t ex2_over_n = ex2 / nv;
-                value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
+                price_t ex_over_n = ex / nv;
+                price_t ex2_over_n = ex2 / nv;
+                price_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
                                         6 * ex2_over_n * ex_over_n * ex_over_n -
                                         3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
                 dst[i] = fourth_moment / std_dev_pow4 - 3.0;
@@ -96,14 +96,14 @@ void IKurtosis::_calculate(const Indicator& data) {
 
     size_t start_pos = data.discard();
     size_t first_end = start_pos + n >= total ? total : start_pos + n;
-    value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+    price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
+    price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     size_t valid = 0;
 
     for (size_t i = start_pos; i < first_end; i++) {
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -115,16 +115,16 @@ void IKurtosis::_calculate(const Indicator& data) {
     auto emit = [&](size_t i) {
         if (valid == 0)
             return;
-        value_t nv = (value_t)valid;
-        value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
+        price_t nv = (price_t)valid;
+        price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
         if (var == 0) {
             dst[i] = -3.0;
             return;
         }
-        value_t std_dev_pow4 = var * var;
-        value_t ex_over_n = ex / nv;
-        value_t ex2_over_n = ex2 / nv;
-        value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
+        price_t std_dev_pow4 = var * var;
+        price_t ex_over_n = ex / nv;
+        price_t ex2_over_n = ex2 / nv;
+        price_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
                                 6 * ex2_over_n * ex_over_n * ex_over_n -
                                 3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
         dst[i] = fourth_moment / std_dev_pow4 - 3.0;
@@ -132,18 +132,18 @@ void IKurtosis::_calculate(const Indicator& data) {
     emit(first_end - 1);
 
     for (size_t i = first_end; i < total; i++) {
-        value_t d_pre = src[i - n] - k;
+        price_t d_pre = src[i - n] - k;
         if (std::isfinite(d_pre)) {
-            value_t dp2 = d_pre * d_pre;
+            price_t dp2 = d_pre * d_pre;
             ex -= d_pre;
             ex2 -= dp2;
             ex3 -= dp2 * d_pre;
             ex4 -= dp2 * dp2;
             valid--;
         }
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -168,13 +168,13 @@ void IKurtosis::_increment_calculate(const Indicator& data, size_t start_pos) {
     auto const* src = data.data();
     auto* dst = this->data();
 
-    value_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+    price_t k = std::isfinite(src[start_pos]) ? src[start_pos] : 0.0;
+    price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     size_t valid = 0;
     for (size_t i = start_pos - n; i < start_pos; i++) {
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -184,18 +184,18 @@ void IKurtosis::_increment_calculate(const Indicator& data, size_t start_pos) {
     }
 
     for (size_t i = start_pos; i < total; i++) {
-        value_t d_pre = src[i - n] - k;
+        price_t d_pre = src[i - n] - k;
         if (std::isfinite(d_pre)) {
-            value_t dp2 = d_pre * d_pre;
+            price_t dp2 = d_pre * d_pre;
             ex -= d_pre;
             ex2 -= dp2;
             ex3 -= dp2 * d_pre;
             ex4 -= dp2 * dp2;
             valid--;
         }
-        value_t d = src[i] - k;
+        price_t d = src[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -204,16 +204,16 @@ void IKurtosis::_increment_calculate(const Indicator& data, size_t start_pos) {
         }
         if (valid == 0)
             continue;
-        value_t nv = (value_t)valid;
-        value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
+        price_t nv = (price_t)valid;
+        price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
         if (var == 0) {
             dst[i] = -3.0;
             continue;
         }
-        value_t std_dev_pow4 = var * var;
-        value_t ex_over_n = ex / nv;
-        value_t ex2_over_n = ex2 / nv;
-        value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
+        price_t std_dev_pow4 = var * var;
+        price_t ex_over_n = ex / nv;
+        price_t ex2_over_n = ex2 / nv;
+        price_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
                                 6 * ex2_over_n * ex_over_n * ex_over_n -
                                 3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
         dst[i] = fourth_moment / std_dev_pow4 - 3.0;
@@ -226,13 +226,13 @@ void IKurtosis::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
     size_t start = _get_step_start(curPos, step, ind.discard());
     HKU_IF_RETURN(start != curPos + 1 - step, void());
 
-    value_t k = std::isfinite(ind[start]) ? ind[start] : 0.0;
-    value_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
+    price_t k = std::isfinite(ind[start]) ? ind[start] : 0.0;
+    price_t ex = 0.0, ex2 = 0.0, ex3 = 0.0, ex4 = 0.0;
     size_t valid = 0;
     for (size_t i = start; i <= curPos; i++) {
-        value_t d = ind[i] - k;
+        price_t d = ind[i] - k;
         if (std::isfinite(d)) {
-            value_t d2 = d * d;
+            price_t d2 = d * d;
             ex += d;
             ex2 += d2;
             ex3 += d2 * d;
@@ -244,16 +244,16 @@ void IKurtosis::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t st
         _set(Null<value_t>(), curPos);
         return;
     }
-    value_t nv = (value_t)valid;
-    value_t var = std::max(0.0, ex2 / nv - ex * ex / (nv * nv));
+    price_t nv = (price_t)valid;
+    price_t var = std::max<price_t>(0.0, ex2 / nv - ex * ex / (nv * nv));
     if (var == 0) {
         _set(-3.0, curPos);
         return;
     }
-    value_t std_dev_pow4 = var * var;
-    value_t ex_over_n = ex / nv;
-    value_t ex2_over_n = ex2 / nv;
-    value_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
+    price_t std_dev_pow4 = var * var;
+    price_t ex_over_n = ex / nv;
+    price_t ex2_over_n = ex2 / nv;
+    price_t fourth_moment = ex4 / nv - 4 * (ex3 / nv) * ex_over_n +
                             6 * ex2_over_n * ex_over_n * ex_over_n -
                             3 * ex_over_n * ex_over_n * ex_over_n * ex_over_n;
     _set(fourth_moment / std_dev_pow4 - 3.0, curPos);

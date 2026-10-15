@@ -145,7 +145,8 @@ void IRSRSBull::_calculate(const Indicator&) {
         value_t mean_beta = sum_beta / nv;
         // clamp to 0.0 to guard against the tiny negative caused by float rounding on a
         // near-constant beta sequence (ST-014 pattern)
-        value_t var_beta = std::max(0.0, (sum_beta2 - sum_beta * sum_beta / nv) / (nv - 1.0));
+        value_t var_beta =
+          std::max<value_t>(0.0, (sum_beta2 - sum_beta * sum_beta / nv) / (nv - 1.0));
         value_t std_beta = std::sqrt(var_beta);
         if (std_beta > 0.0) {
             z[i] = (beta[i] - mean_beta) / std_beta;
