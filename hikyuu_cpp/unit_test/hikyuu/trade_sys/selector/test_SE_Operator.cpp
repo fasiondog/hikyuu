@@ -768,4 +768,43 @@ TEST_CASE("test_SE_Div") {
     CHECK_THROWS(se->clone());
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_ValueSelector_clone") {
+    StockManager& sm = StockManager::instance();
+
+    SYSPtr sys = SYS_Simple();
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    sys->setMM(MM_FixedCount(100));
+
+    SEPtr se1 = SE_Fixed();
+    SEPtr se = se1 + 2.0;
+    CHECK_EQ(se->name(), "SE_AddValue");
+
+    /** @arg The prototypes appended to the outer selector are kept in the clone */
+    se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
+    auto proto_sys_list = se->getProtoSystemList();
+    CHECK_EQ(proto_sys_list.size(), 3);
+
+    SEPtr clone = se->clone();
+    CHECK_EQ(clone->name(), "SE_AddValue");
+    const auto& clone_proto_list = clone->getProtoSystemList();
+    CHECK_EQ(clone_proto_list.size(), 3);
+    for (size_t i = 0; i < clone_proto_list.size(); i++) {
+        CHECK_EQ(clone_proto_list[i]->getStock(), proto_sys_list[i]->getStock());
+        /** @arg The clone holds its own prototype instances */
+        CHECK_UNARY(clone_proto_list[i] != proto_sys_list[i]);
+    }
+
+    /** @arg The clone still selects the same targets with the same weight */
+    clone->calculate(clone_proto_list, KQuery(-20));
+    auto result = clone->getSelected(Datetime(200001010000L));
+    CHECK_EQ(result.size(), 3);
+    CHECK_EQ(sm["sh600000"], result[0].sys->getStock());
+    CHECK_EQ(sm["sz000001"], result[1].sys->getStock());
+    CHECK_EQ(sm["sz000002"], result[2].sys->getStock());
+    CHECK_EQ(result[0].weight, 3.0);
+    CHECK_EQ(result[1].weight, 3.0);
+    CHECK_EQ(result[2].weight, 3.0);
+}
+
 /** @} */

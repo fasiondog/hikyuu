@@ -33,12 +33,13 @@ void OperatorValueSelector::_reset() {
     }
 }
 
-
-
 SelectorPtr OperatorValueSelector::_clone() {
     auto p = make_shared<OperatorValueSelector>();
     if (m_se) {
         p->m_se = m_se->clone();
+        // Keep the exposed prototype list on the same instances as the inner selector, otherwise
+        // the clone would carry two different prototype instance sets
+        p->m_pro_sys_list = p->m_se->getProtoSystemList();
     }
     p->m_value = m_value;
     return p;

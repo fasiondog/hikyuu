@@ -94,9 +94,13 @@ SelectorPtr SelectorBase::clone() {
         p->m_real_sys_list.emplace_back(sys->clone());
     }
 
-    p->m_pro_sys_list.reserve(m_pro_sys_list.size());
-    for (const auto& sys : m_pro_sys_list) {
-        p->m_pro_sys_list.emplace_back(sys->clone());
+    // A subclass may have already filled the prototype list in _clone (sharing its inner
+    // selector's instances); only clone the prototypes here when the list is still empty
+    if (p->m_pro_sys_list.empty()) {
+        p->m_pro_sys_list.reserve(m_pro_sys_list.size());
+        for (const auto& sys : m_pro_sys_list) {
+            p->m_pro_sys_list.emplace_back(sys->clone());
+        }
     }
 
     if (m_sc_filter) {

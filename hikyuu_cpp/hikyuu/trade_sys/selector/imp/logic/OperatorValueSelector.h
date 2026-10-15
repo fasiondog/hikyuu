@@ -74,6 +74,7 @@ public:                                                                         
         auto p = std::make_shared<classname>();                                                \
         if (m_se) {                                                                            \
             p->m_se = m_se->clone();                                                           \
+            p->m_pro_sys_list = p->m_se->getProtoSystemList();                                 \
         }                                                                                      \
         p->m_value = m_value;                                                                  \
         return p;                                                                              \
