@@ -15,10 +15,10 @@ BOOST_CLASS_EXPORT(hku::BandSignal2)
 
 namespace hku {
 
-BandSignal2::BandSignal2() : SignalBase("SG_Band") {}
+BandSignal2::BandSignal2() : SignalBase("SG_Band2") {}
 
 BandSignal2::BandSignal2(const Indicator& ind, const Indicator& lower, const Indicator& upper)
-: SignalBase("SG_Band"), m_ind(ind.clone()), m_lower(lower.clone()), m_upper(upper.clone()) {}
+: SignalBase("SG_Band2"), m_ind(ind.clone()), m_lower(lower.clone()), m_upper(upper.clone()) {}
 
 BandSignal2::~BandSignal2() {}
 

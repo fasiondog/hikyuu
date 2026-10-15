@@ -14,7 +14,7 @@ BOOST_CLASS_EXPORT(hku::DivValueSignal)
 namespace hku {
 
 DivValueSignal::DivValueSignal(double value, const SignalPtr& sg)
-: OperatorValueSignal("SG_DivVlaue", sg, value, 1) {}
+: OperatorValueSignal("SG_DivValue", sg, value, 1) {}
 
 void DivValueSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg || m_value == 0.0 || std::isnan(m_value), void());

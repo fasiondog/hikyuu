@@ -19,12 +19,12 @@ BOOST_CLASS_EXPORT(hku::SingleSignal)
 namespace hku {
 
 SingleSignal::SingleSignal() : SignalBase("SG_Single") {
-    setParam<int>("filter_n", 10);
+    setParam<int>("filter_n", 20);
     setParam<double>("filter_p", 0.1);
 }
 
 SingleSignal::SingleSignal(const Indicator& ind) : SignalBase("SG_Single"), m_ind(ind) {
-    setParam<int>("filter_n", 10);
+    setParam<int>("filter_n", 20);
     setParam<double>("filter_p", 0.1);
 }
 

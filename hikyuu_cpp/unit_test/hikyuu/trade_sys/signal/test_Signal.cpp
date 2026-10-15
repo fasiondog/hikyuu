@@ -104,6 +104,34 @@ private:
     size_t m_len;
 };
 
+class BuyAtFirstSig : public SignalBase {
+public:
+    BuyAtFirstSig() : SignalBase("BuyAtFirstSig") {}
+    virtual ~BuyAtFirstSig() {}
+
+    virtual void _calculate(const KData &kdata) override {
+        _addBuySignal(kdata.front().datetime);
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new BuyAtFirstSig);
+    }
+};
+
+class SellAtFirstSig : public SignalBase {
+public:
+    SellAtFirstSig() : SignalBase("SellAtFirstSig") {}
+    virtual ~SellAtFirstSig() {}
+
+    virtual void _calculate(const KData &kdata) override {
+        _addSellSignal(kdata.front().datetime);
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new SellAtFirstSig);
+    }
+};
+
 /**
  * @defgroup test_Signal test_Signal
  * @ingroup test_hikyuu_trade_sys_suite
@@ -555,6 +583,48 @@ TEST_CASE("test_SG_zero_residual_filtered") {
     exact->setTO(k);
     CHECK_UNARY(exact->getBuySignal().size() == 1);
     CHECK_UNARY(exact->getSellSignal().size() == 1);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Or_same_bar_conflict_sell_first") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg same-bar opposite signals: sell wins and no buy is emitted on the conflict bar */
+    auto buy_sig = make_shared<BuyAtFirstSig>();
+    auto sell_sig = make_shared<SellAtFirstSig>();
+    buy_sig->setParam<bool>("alternate", false);
+    sell_sig->setParam<bool>("alternate", false);
+    auto conflict = buy_sig | sell_sig;
+    conflict->setParam<bool>("alternate", false);
+    conflict->setTO(k);
+    CHECK_UNARY(conflict->getBuySignal().empty());
+    CHECK_UNARY(conflict->getSellSignal().size() == 1);
+    CHECK_UNARY(conflict->getSellSignal()[0] == k.front().datetime);
+}
+
+/** @par Test points */
+TEST_CASE("test_SG_Bool_same_bar_conflict_sell_first") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg buy and sell both true on every bar: only sell signals are recorded */
+    auto sg = SG_Bool(CVAL(1.0), CVAL(1.0), false);
+    sg->setTO(k);
+    CHECK_UNARY(sg->getBuySignal().empty());
+    CHECK_UNARY(sg->getSellSignal().size() == k.size());
+
+    /** @arg mutually exclusive conditions keep their own signals */
+    auto sg2 = SG_Bool(CVAL(1.0), CVAL(0.0), false);
+    sg2->setTO(k);
+    CHECK_UNARY(sg2->getBuySignal().size() == k.size());
+    CHECK_UNARY(sg2->getSellSignal().empty());
 }
 
 /** @par Test points */

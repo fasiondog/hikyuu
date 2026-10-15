@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include <cmath>
 #include "OrSignal.h"
 
@@ -17,13 +18,16 @@ namespace hku {
 void OrSignal::_calculate(const KData& kdata) {
     HKU_IF_RETURN(!m_sg1 && !m_sg2, void());
 
+    // Or holds if either side holds; on the same-bar opposite conflict sell wins (risk-first:
+    // the exit action is never swallowed by the entry)
     auto emit = [this](const Datetime& datetime, double buy1, double sell1, double buy2,
                        double sell2) {
-        double value = buy1 + sell1 + buy2 + sell2;
-        if (std::isfinite(value) && value > 0.0) {
-            _addBuySignal(datetime);
-        } else if (std::isfinite(value) && value < 0.0) {
+        double buy = std::max(buy1, buy2);
+        double sell = std::min(sell1, sell2);
+        if (sell < 0.0) {
             _addSellSignal(datetime);
+        } else if (buy > 0.0) {
+            _addBuySignal(datetime);
         }
     };
 

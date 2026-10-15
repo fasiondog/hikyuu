@@ -871,8 +871,8 @@ TEST_CASE("test_SG_Or") {
 
     reset_expect(expect);
     expect[Datetime(20111110)] = 1.0;
-    expect[Datetime(20111114)] = 0.0;
-    expect[Datetime(20111115)] = -1.0;
+    expect[Datetime(20111114)] = -1.0;
+    expect[Datetime(20111115)] = 0.0;
     expect[Datetime(20111116)] = 0.0;
 
     ret = sg1 | sg2;
@@ -896,7 +896,7 @@ TEST_CASE("test_SG_Or") {
 
     reset_expect(expect);
     expect[Datetime(20111110)] = 1.0;
-    expect[Datetime(20111114)] = 0.0;
+    expect[Datetime(20111114)] = -1.0;
     expect[Datetime(20111115)] = -1.0;
     expect[Datetime(20111116)] = -1.0;
 

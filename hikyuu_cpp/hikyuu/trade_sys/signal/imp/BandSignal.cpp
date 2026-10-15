@@ -33,6 +33,8 @@ SignalPtr BandSignal::_clone() {
 }
 
 void BandSignal::_calculate(const KData& kdata) {
+    // deserialization bypasses the ctor check
+    HKU_IF_RETURN(m_lower >= m_upper, void());
     Indicator ind = m_ind(kdata);
     if (ind.size() != kdata.size()) {
         ind = ALIGN(ind, kdata);
