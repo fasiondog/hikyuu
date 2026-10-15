@@ -52,10 +52,10 @@ TEST_CASE("test_NormZScore") {
         CHECK_UNARY(ret[i] >= -1.0 - 1e-9);
     }
 
-    /** @arg the single-element input is returned as is */
+    /** @arg a degenerate single-element cross-section returns the neutral 0, not the raw value */
     ret = norm->normalize(PriceList{7.0});
     REQUIRE_EQ(ret.size(), 1);
-    CHECK(ret[0] == doctest::Approx(7.0));
+    CHECK(ret[0] == doctest::Approx(0.0));
 }
 
 /** @par Test points */

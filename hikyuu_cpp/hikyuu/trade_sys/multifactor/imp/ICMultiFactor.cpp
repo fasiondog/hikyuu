@@ -71,8 +71,8 @@ IndicatorList ICMultiFactor::_calculate(const vector<IndicatorList>& all_stk_ind
             new_values[di] = Null<price_t>();
         }
 
-        // Only accumulate the factors that have a value, consistent with the equal weight and the
-        // given weight models: a missing factor no longer drops the whole score of the stock
+        // A missing factor is skipped instead of dropping the whole score of the stock, matching
+        // the other models' missing-value handling
         for (size_t ii = 0; ii < ind_count; ii++) {
             const auto* ind_data = all_stk_inds[si][ii].data();
             const auto* ic_data = ic[ii].data();

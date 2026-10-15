@@ -36,8 +36,12 @@ void NormZScore::_checkParam(const string& name) const {
 
 namespace {
 
-// A full z-score + optional extreme clipping pass, recomputing mean/sigma from data
-PriceList normalizeOnce(const PriceList& data, bool outExtreme, double nsigma) {
+// A full z-score + optional extreme clipping pass, recomputing mean/sigma from data.
+// clipped is set to true when at least one value is cut to the +/- nsigma limit.
+PriceList normalizeOnce(const PriceList& data, bool outExtreme, double nsigma, bool* clipped) {
+    if (clipped) {
+        *clipped = false;
+    }
     size_t total = data.size();
     PriceList ret(total, Null<price_t>());
 
@@ -88,35 +92,20 @@ PriceList normalizeOnce(const PriceList& data, bool outExtreme, double nsigma) {
             if (!std::isnan(ret[i])) {
                 if (ret[i] > ulimit) {
                     ret[i] = ulimit;
+                    if (clipped) {
+                        *clipped = true;
+                    }
                 } else if (ret[i] < llimit) {
                     ret[i] = llimit;
+                    if (clipped) {
+                        *clipped = true;
+                    }
                 }
             }
         }
     }
 
     return ret;
-}
-
-// Treat two results as equal when every position is equal, counting nan == nan as equal
-bool normalizeStable(const PriceList& a, const PriceList& b) {
-    if (a.size() != b.size()) {
-        return false;
-    }
-    for (size_t i = 0; i < a.size(); i++) {
-        bool an = std::isnan(a[i]);
-        bool bn = std::isnan(b[i]);
-        if (an || bn) {
-            if (an != bn) {
-                return false;
-            }
-            continue;
-        }
-        if (a[i] != b[i]) {
-            return false;
-        }
-    }
-    return true;
 }
 
 constexpr size_t MAX_RECURSION_DEPTH = 10;
@@ -127,7 +116,11 @@ PriceList NormZScore::normalize(const PriceList& data) {
     size_t total = data.size();
     if (total <= 1) {
         PriceList ret(total, Null<price_t>());
-        std::copy(data.begin(), data.end(), ret.begin());
+        for (size_t i = 0; i < total; i++) {
+            if (!std::isnan(data[i])) {
+                ret[i] = 0.0;
+            }
+        }
         return ret;
     }
 
@@ -135,16 +128,18 @@ PriceList NormZScore::normalize(const PriceList& data) {
     double nsigma = getParam<double>("nsigma");
     bool recursive = getParam<bool>("recursive");
 
-    PriceList cur = normalizeOnce(data, outExtreme, nsigma);
-    if (!recursive) {
+    PriceList cur = normalizeOnce(data, outExtreme, nsigma, nullptr);
+    // Recursion only has meaning when the outliers are being clipped
+    if (!recursive || !outExtreme) {
         return cur;
     }
 
-    // Recurse only while a pass still changes the result; the depth cap bounds the loop even when
-    // the clipped outliers keep re-normalizing (a fixed point need not exist)
+    // Keep re-normalizing while a pass actually clips at least one value; the depth cap bounds the
+    // loop because a fixed point need not exist
     for (size_t depth = 0; depth < MAX_RECURSION_DEPTH; depth++) {
-        PriceList next = normalizeOnce(cur, outExtreme, nsigma);
-        if (normalizeStable(next, cur)) {
+        bool clipped = false;
+        PriceList next = normalizeOnce(cur, outExtreme, nsigma, &clipped);
+        if (!clipped) {
             break;
         }
         cur = std::move(next);
