@@ -365,6 +365,33 @@ TEST_CASE("test_SE_PerformanceOptimal_invalid_key") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_index_single") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    se->calculate(SystemList(), query);
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    auto base = se->getSelected(dates[40]);
+    REQUIRE_UNARY(base.size() == 1);
+
+    /** @arg Each date stores a single selected system, so any index takes that same system */
+    se->setParam<int>("index", 100);
+    auto after = se->getSelected(dates[40]);
+    CHECK_EQ(after.size(), 1);
+    CHECK_EQ(after[0].sys->name(), base[0].sys->name());
+    CHECK_EQ(after[0].weight, base[0].weight);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

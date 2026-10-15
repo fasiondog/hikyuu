@@ -28,22 +28,8 @@ void PerformanceOptimalSelector::_checkParam(const string& name) const {
     }
 }
 
-SystemWeightList PerformanceOptimalSelector::_getSelected(Datetime date) {
-    SystemWeightList ret;
-    auto iter = this->m_sys_dict.find(date);
-    if (iter != this->m_sys_dict.end()) {
-        ret.emplace_back(SystemWeight(iter->second, 1.0));
-    }
-    return ret;
-}
-
 SelectorPtr PerformanceOptimalSelector::_clone() {
     return std::make_shared<PerformanceOptimalSelector>();
-}
-
-void PerformanceOptimalSelector::_reset() {
-    OptimalSelectorBase::_reset();
-    m_sys_dict.clear();
 }
 
 void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, const KQuery& query) {
@@ -160,7 +146,8 @@ void PerformanceOptimalSelector::_calculate_parallel(
             }
 
             for (size_t pos = test_start; pos < test_end; pos++) {
-                m_sys_dict[dates[pos]] = selected_sys;
+                m_sys_dict[dates[pos]] =
+                  std::make_shared<SystemWeightList>(1, SystemWeight(selected_sys, 1.0));
             }
 
             if (test_end < dates_len) {
