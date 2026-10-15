@@ -96,13 +96,13 @@ TEST_CASE("test_Slippage_clone_lazy_recalculate") {
     price_t bounded = std::min(slipped, k[0].highPrice);
     CHECK_EQ(sp->getRealBuyPrice(d0, plan), bounded);
 
-    /** @arg the clone carries no TO, so queries before setTO skip the daily-bar constraint */
+    /** @arg the clone carries the source TO, so its prices are already constrained */
     SlippagePtr c = sp->clone();
     CHECK_NE(sp, c);
-    CHECK_UNARY(c->getTO().empty());
-    CHECK_EQ(c->getRealBuyPrice(d0, plan), slipped);
+    CHECK_UNARY(!c->getTO().empty());
+    CHECK_EQ(c->getRealBuyPrice(d0, plan), bounded);
 
-    /** @arg setTO rebinds the clone and restores the same constrained result */
+    /** @arg setTO rebinds the clone and keeps the same constrained result */
     c->setTO(k);
     CHECK_EQ(c->getRealBuyPrice(d0, plan), bounded);
 }

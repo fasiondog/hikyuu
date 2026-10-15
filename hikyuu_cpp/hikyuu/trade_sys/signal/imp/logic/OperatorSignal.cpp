@@ -25,6 +25,11 @@ OperatorSignal::OperatorSignal(const string& name, const SignalPtr& sg1, const S
     if (sg2) {
         m_sg2 = sg2->clone();
     }
+    // The cycle attribute stays consistent with the child signals: if either side is cycle-driven,
+    // the combined signal must itself be driven by startCycle
+    if ((m_sg1 && m_sg1->getParam<bool>("cycle")) || (m_sg2 && m_sg2->getParam<bool>("cycle"))) {
+        setParam<bool>("cycle", true);
+    }
 }
 
 OperatorSignal::~OperatorSignal() {}

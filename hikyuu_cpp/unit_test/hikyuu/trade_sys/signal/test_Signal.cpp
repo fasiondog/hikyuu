@@ -503,24 +503,37 @@ TEST_CASE("test_SG_Operator_cycle_sub") {
         return;
     }
 
-    Datetime first = k.front().datetime;
-    Datetime last = k.back().datetime;
-
-    /** @arg a cycle sub-signal in a normal combined signal does not throw and stays silent */
-    SignalPtr or_sg = SG_Cycle() | make_shared<SignalCalcTest>();
-    or_sg->setTO(k);
-    CHECK_UNARY(or_sg->getBuySignal().size() == 1 && or_sg->getBuySignal()[0] == first);
-    CHECK_UNARY(or_sg->getSellSignal().size() == 1 && or_sg->getSellSignal()[0] == last);
-
-    /** @arg the cycle sub-signals are driven by startCycle */
-    SignalPtr or_cycle = SG_Cycle() | SG_Cycle();
-    or_cycle->setParam<bool>("cycle", true);
-    or_cycle->setTO(k);
     Datetime start = k[5].datetime;
     Datetime close = k[10].datetime;
+
+    /** @arg a combined signal with one cycle child inherits the cycle attribute and stays silent
+     * until startCycle drives it */
+    SignalPtr or_mixed = SG_Cycle() | make_shared<SignalCalcTest>();
+    CHECK_UNARY(or_mixed->getParam<bool>("cycle"));
+    or_mixed->setTO(k);
+    CHECK_UNARY(or_mixed->getBuySignal().empty());
+    CHECK_UNARY(or_mixed->getSellSignal().empty());
+
+    /** @arg startCycle drives both children within the cycle window: the cycle child buys at the
+     * start, and the normal child also buys at the start and sells at the window's last bar */
+    or_mixed->startCycle(start, close);
+    CHECK_UNARY(or_mixed->getBuySignal().size() == 1 && or_mixed->getBuySignal()[0] == start);
+    // getKData(start, close) is a half-open range, so the last bar the children see is k[9]
+    CHECK_UNARY(or_mixed->getSellSignal().size() == 1 &&
+                or_mixed->getSellSignal()[0] == k[9].datetime);
+    CHECK_EQ(or_mixed->getBuyValue(start), 1.0);
+
+    /** @arg a combined signal whose both children are cycle-driven is driven by startCycle too */
+    SignalPtr or_cycle = SG_Cycle() | SG_Cycle();
+    CHECK_UNARY(or_cycle->getParam<bool>("cycle"));
+    or_cycle->setTO(k);
+    CHECK_UNARY(or_cycle->getBuySignal().empty());
+    CHECK_UNARY(or_cycle->getSellSignal().empty());
+
     or_cycle->startCycle(start, close);
     CHECK_UNARY(or_cycle->getBuySignal().size() == 1 && or_cycle->getBuySignal()[0] == start);
-    CHECK_UNARY(or_cycle->getBuyValue(start) == 1.0);
+    CHECK_EQ(or_cycle->getBuyValue(start), 1.0);
+    CHECK_UNARY(or_cycle->getSellSignal().empty());
 }
 
 /** @par Test points */

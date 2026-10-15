@@ -166,9 +166,9 @@ TEST_CASE("test_Slippage_clone_recalculates") {
     sp->setTO(kdata);
     CHECK_EQ(static_cast<CalcCountSP*>(sp.get())->count, 1);
 
-    /** @arg the clone carries no TO, so the next setTO always recalculates (lazy recalculation) */
+    /** @arg the clone carries the source TO but is marked stale, so the next setTO recalculates */
     SlippagePtr c = sp->clone();
-    CHECK_UNARY(c->getTO().empty());
+    CHECK_UNARY(!c->getTO().empty());
     c->setTO(kdata);
     CHECK_EQ(static_cast<CalcCountSP*>(c.get())->count, 1);
 }

@@ -97,6 +97,7 @@ protected:
     string m_name;
     KData m_kdata;
     bool m_is_python_object{false};
+    bool m_calculated{false};  // It is for the calculation at setTO only
 
 //============================================
 // Serialization support
@@ -152,25 +153,26 @@ private:                                                       \
 #define SLIPPAGE_NO_PRIVATE_MEMBER_SERIALIZATION
 #endif
 
-#define SLIPPAGE_IMP(classname)                                          \
-public:                                                                  \
-    virtual SlippagePtr _clone() override {                              \
-        return std::make_shared<classname>();                            \
-    }                                                                    \
+#define SLIPPAGE_IMP(classname)                                           \
+public:                                                                   \
+    virtual SlippagePtr _clone() override {                               \
+        return std::make_shared<classname>();                             \
+    }                                                                     \
     virtual price_t _getRealBuyPrice(const Datetime&, price_t) override;  \
     virtual price_t _getRealSellPrice(const Datetime&, price_t) override; \
     virtual void _calculate() override;
 
-// For RNG-based slippages: copy the source (so the cloned params/seed are carried over),
-// then reset() to reseed the RNG from the (copied) seed. The base clone() then copies the
-// common members including m_kdata, so the clone carries the source's kdata.
+// For RNG-based slippages: copy the source (so the cloned params/seed are carried over), then
+// reset() to reseed the RNG from the (copied) seed. The base clone() then restores the common
+// members including m_kdata and clears m_calculated, so the clone keeps the source's kdata and
+// recalculates on the next setTO.
 #define SLIPPAGE_IMP_RNG(classname)                                       \
-public:                                                                  \
-    virtual SlippagePtr _clone() override {                              \
+public:                                                                   \
+    virtual SlippagePtr _clone() override {                               \
         auto p = std::make_shared<classname>(*this);                      \
-        p->reset();                                                      \
-        return p;                                                        \
-    }                                                                    \
+        p->reset();                                                       \
+        return p;                                                         \
+    }                                                                     \
     virtual price_t _getRealBuyPrice(const Datetime&, price_t) override;  \
     virtual price_t _getRealSellPrice(const Datetime&, price_t) override; \
     virtual void _calculate() override;
