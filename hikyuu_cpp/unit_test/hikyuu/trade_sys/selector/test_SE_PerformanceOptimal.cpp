@@ -6,6 +6,7 @@
  */
 
 #include "../../test_config.h"
+#include <stdexcept>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
@@ -246,6 +247,57 @@ TEST_CASE("test_SE_PerformanceOptimal_calculate_deterministic") {
             }
         }
     }
+}
+
+// A candidate signal whose calculation always throws, used to verify that a single failing
+// candidate does not abort the whole parallel training
+class ThrowingSignal : public SignalBase {
+public:
+    ThrowingSignal() : SignalBase("SE_ThrowingSignal") {}
+    virtual ~ThrowingSignal() = default;
+
+    virtual void _calculate(const KData&) override {
+        throw std::runtime_error("signal calculate failed");
+    }
+
+    virtual SignalPtr _clone() override {
+        return SignalPtr(new ThrowingSignal);
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_candidate_throw") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+
+    auto good1 = create_test_sys(3, 5);
+    good1->setStock(stk);
+    auto good2 = create_test_sys(5, 20);
+    good2->setStock(stk);
+    auto bad = create_test_sys(3, 10);
+    bad->setStock(stk);
+    bad->setSG(SignalPtr(new ThrowingSignal));
+
+    se->addSystemList({good1, bad, good2});
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+
+    /** @arg A candidate throwing during the training run must not abort the whole calculation */
+    CHECK_NOTHROW(se->calculate(SystemList(), query));
+
+    /** @arg The healthy candidates are still evaluated and selected for the test windows */
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    size_t selected_count = 0;
+    for (size_t i = 30; i < dates.size(); i++) {
+        auto sw = se->getSelected(dates[i]);
+        if (!sw.empty()) {
+            selected_count++;
+            CHECK_UNARY(sw[0].sys->name() == good1->name() || sw[0].sys->name() == good2->name());
+        }
+    }
+    CHECK_UNARY(selected_count > 0);
 }
 
 //-----------------------------------------------------------------------------

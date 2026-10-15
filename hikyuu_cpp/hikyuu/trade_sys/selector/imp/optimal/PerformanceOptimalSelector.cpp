@@ -112,28 +112,40 @@ void PerformanceOptimalSelector::_calculate_parallel(
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
               for (const auto& sys : m_pro_sys_list) {
-                  // Cut off all the shared parts to avoid a parallel conflict
-                  auto new_sys = sys->clone();
-                  new_sys->run(q, true);
-                  per.statistics(new_sys->getTM(), end_date);
-                  double value = per.get(key);
-                  CLS_TRACE_IF(trace, "value: {}, sys: {}", value, new_sys->name());
-                  if (value > max_value) {
-                      max_value = value;
-                      selected_sys = new_sys;
+                  try {
+                      // Cut off all the shared parts to avoid a parallel conflict
+                      auto new_sys = sys->clone();
+                      new_sys->run(q, true);
+                      per.statistics(new_sys->getTM(), end_date);
+                      double value = per.get(key);
+                      CLS_TRACE_IF(trace, "value: {}, sys: {}", value, new_sys->name());
+                      if (value > max_value) {
+                          max_value = value;
+                          selected_sys = new_sys;
+                      }
+                  } catch (const std::exception& e) {
+                      CLS_ERROR("{}! {}", e.what(), sys->name());
+                  } catch (...) {
+                      CLS_ERROR("Unknown error! {}", sys->name());
                   }
               }
           } else if (1 == mode) {
               double min_value = std::numeric_limits<double>::max();
               for (const auto& sys : m_pro_sys_list) {
-                  auto new_sys = sys->clone();
-                  new_sys->run(q, true);
-                  per.statistics(new_sys->getTM(), end_date);
-                  double value = per.get(key);
-                  CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
-                  if (value < min_value) {
-                      min_value = value;
-                      selected_sys = new_sys;
+                  try {
+                      auto new_sys = sys->clone();
+                      new_sys->run(q, true);
+                      per.statistics(new_sys->getTM(), end_date);
+                      double value = per.get(key);
+                      CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
+                      if (value < min_value) {
+                          min_value = value;
+                          selected_sys = new_sys;
+                      }
+                  } catch (const std::exception& e) {
+                      CLS_ERROR("{}! {}", e.what(), sys->name());
+                  } catch (...) {
+                      CLS_ERROR("Unknown error! {}", sys->name());
                   }
               }
           }
