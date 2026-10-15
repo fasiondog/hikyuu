@@ -130,11 +130,6 @@ public:
     virtual void _forceResetAll() override;
     virtual SystemPtr _clone() override;
 
-    /** The hierarchy path */
-    virtual const string& getPath() const override {
-        return m_path;
-    }
-
     /** Set the fund allocation instance (the portfolio-level fund allocation AF, carrying the three
      * algorithm parts L1/L2/L3) */
     void setAF(const AllocateFundsPtr& af) {
@@ -475,14 +470,14 @@ private:
 
     /** Get the close price of the specified instrument on the specified date (used to price the
      * liquidation suggestion of the unselected sub-system); return 0 when there is no data */
-    price_t _getClosePrice(const Datetime& date, const Stock& stock) const;
+    price_t _getClosePrice(const Datetime& date, const Stock& stock);
 
     /** Get the open price of the specified instrument on the specified date; return 0 when there
      * is no data */
-    price_t _getOpenPrice(const Datetime& date, const Stock& stock) const;
+    price_t _getOpenPrice(const Datetime& date, const Stock& stock);
 
     /** Get the KData of the instrument within the run query (with the per-run cache) */
-    KData _getStockKData(const Stock& stock) const;
+    KData _getStockKData(const Stock& stock);
 
     /** Force selling the parent holdings of the delisted instrument at the open stage (delisting =
      * the last trading day of the instrument is earlier than the current running date) */
@@ -490,7 +485,6 @@ private:
 
 private:
     SystemList m_sys_list;
-    string m_path;                // The hierarchy path, e.g. I/D/A
     size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment
     price_t m_sub_init_cash{100000.0};  // The signal cash of the sub-system shadow account (mode A,
                                         // reset on every rebalancing day; unused in mode B)
@@ -538,7 +532,7 @@ private:
     // The slot of every sub-system inside m_sys_list (the O(1) backing of _subIndex). Runtime
     // state: maintained by add(), rebuilt by readyForRun, neither serialized nor copied by clone.
     std::unordered_map<System*, size_t> m_sub_index;
-    mutable std::unordered_map<string, KData>
+    std::unordered_map<string, KData>
       m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
     DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
                                         // axis-mode="calendar" (runtime state, not serialized)
@@ -562,7 +556,6 @@ private:
     void serialize(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
         ar& BOOST_SERIALIZATION_NVP(m_sys_list);
-        ar& BOOST_SERIALIZATION_NVP(m_path);
         ar& BOOST_SERIALIZATION_NVP(m_sub_init_cash);
         ar& BOOST_SERIALIZATION_NVP(m_adjust_cycle);
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);

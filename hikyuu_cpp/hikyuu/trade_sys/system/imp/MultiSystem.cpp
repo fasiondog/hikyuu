@@ -65,6 +65,10 @@ void MultiSystem::add(const SystemPtr& sys) {
 
 void MultiSystem::readyForRun() {
     HKU_CHECK(m_tm, "Not setTradeManager! {}", name());
+    // MultiSystem overrides readyForRun without delegating to System::readyForRun, so the two
+    // margin-trading switches have to be applied to the parent TM here
+    m_tm->setParam<bool>("support_borrow_cash", getParam<bool>("support_borrow_cash"));
+    m_tm->setParam<bool>("support_borrow_stock", getParam<bool>("support_borrow_stock"));
     // The SE-provided prototypes are materialized here as well, so that an aggregate configured
     // only with an SE can be prepared for running (the legacy Portfolio usage and the live trading
     // entry, which calls readyForRun before the first run)
@@ -740,9 +744,15 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
             if (ratio > 1.0) {
                 ratio = 1.0;
             }
-            s.assets_ratio = ratio;
-            s.target_position_ratio = ratio;  // Approximation: the target position ratio when a
-                                              // single trade builds the position from 0
+            // Encode the trade direction in the sign of assets_ratio (BUY positive, SELL/CLEAR
+            // negative); target_position_ratio is only defined for building a position from 0
+            if (s.type == SuggestionType::BUY) {
+                s.assets_ratio = ratio;
+                s.target_position_ratio = ratio;
+            } else {
+                s.assets_ratio = -ratio;
+                s.target_position_ratio = 0.0;
+            }
         }
         if (base_cash > 0.0) {
             s.cash_ratio = s.plan_cash / base_cash;
@@ -1187,6 +1197,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         return executed;
     }
 
+    double parent_total_assets = m_tm->getFunds(datetime, ktype).total_assets();
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         SystemPtr sys = m_sys_list[i];
         const bool is_selected = (selected.count(sys.get()) > 0);
@@ -1263,6 +1274,12 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         auto score_it = se_scores.find(sys.get());
         if (score_it != se_scores.end()) {
             ctx.score = score_it->second;
+        }
+        if (parent_total_assets > 0.0) {
+            ctx.current_weight = ctx.funds.total_assets() / parent_total_assets;
+        }
+        if (getMode() == "A" && m_sub_init_cash > 0.0) {
+            ctx.total_return = (ctx.funds.total_assets() - m_sub_init_cash) / m_sub_init_cash;
         }
         contexts.push_back(ctx);
     }
@@ -1583,7 +1600,7 @@ void MultiSystem::_closePhaseModeC(const Datetime& datetime, bool is_adjust,
     }
 }
 
-KData MultiSystem::_getStockKData(const Stock& stock) const {
+KData MultiSystem::_getStockKData(const Stock& stock) {
     // The KData of the instrument within the run query is cached (rebuilding it per bar is an
     // obvious overhead in the large-combination minute-line scenario); the cache is cleared with
     // each run (_runAxis) and reset
@@ -1596,7 +1613,7 @@ KData MultiSystem::_getStockKData(const Stock& stock) const {
     return kdata;
 }
 
-price_t MultiSystem::_getClosePrice(const Datetime& date, const Stock& stock) const {
+price_t MultiSystem::_getClosePrice(const Datetime& date, const Stock& stock) {
     if (stock.isNull()) {
         return 0.0;
     }
@@ -1605,7 +1622,7 @@ price_t MultiSystem::_getClosePrice(const Datetime& date, const Stock& stock) co
     return pos == Null<size_t>() ? 0.0 : kdata.getKRecord(pos).closePrice;
 }
 
-price_t MultiSystem::_getOpenPrice(const Datetime& date, const Stock& stock) const {
+price_t MultiSystem::_getOpenPrice(const Datetime& date, const Stock& stock) {
     if (stock.isNull()) {
         return 0.0;
     }

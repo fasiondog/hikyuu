@@ -2145,4 +2145,39 @@ TEST_CASE("test_MultiSystem_force_sell_all_sentinel") {
     CHECK_EQ(tm->getHoldNumber(last_date, stk), 0.0);
 }
 
+/** @par Check point: MultiSystem uses the inherited System::m_path (no shadow member); setPath on
+ * a nested aggregate propagates through the base member and getPath reads it back */
+TEST_CASE("test_MultiSystem_path_no_shadow") {
+    auto inner = std::make_shared<MultiSystem>("inner");
+    inner->setPath("outer/inner");
+    CHECK_EQ(inner->System::getPath(), std::string("outer/inner"));
+    CHECK_EQ(inner->getPath(), std::string("outer/inner"));
+}
+
+/** @par Check point: MultiSystem::readyForRun propagates support_borrow_cash / support_borrow_stock
+ * to its own TM (the base System::readyForRun does that for leaf systems; the aggregate overrides
+ * without delegating) */
+TEST_CASE("test_MultiSystem_ready_for_run_syncs_margin_params") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KData kdata = stk.getKData(KQueryByDate(Datetime(19991110), Datetime(20000225)));
+    REQUIRE(!kdata.empty());
+
+    auto ms = std::make_shared<MultiSystem>("ms");
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    ms->setTM(tm);
+    ms->setParam<bool>("support_borrow_cash", true);
+    ms->setParam<bool>("support_borrow_stock", true);
+    auto sys = SYS_Simple(crtTM(Datetime(199001010000LL), 100000.0), MM_Nothing(), EnvironmentPtr(),
+                          ConditionPtr(), SG_AllwaysBuy());
+    sys->setTO(kdata);
+    ms->add(sys);
+    ms->setTO(kdata);
+    ms->readyForRun();
+
+    /** @arg the two switches reach the aggregate's own TM */
+    CHECK_UNARY(ms->getTM()->getParam<bool>("support_borrow_cash"));
+    CHECK_UNARY(ms->getTM()->getParam<bool>("support_borrow_stock"));
+}
+
 /** @} */

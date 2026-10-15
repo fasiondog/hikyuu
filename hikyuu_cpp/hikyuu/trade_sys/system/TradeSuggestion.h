@@ -37,9 +37,11 @@ struct HKU_API TradeSuggestion {
     price_t plan_price{0.0};
     price_t plan_cash{0.0};   // = number * plan_price
 
-    double cash_ratio{0.0};            // plan_cash / the cash balance before this stage's trade
-    double assets_ratio{0.0};          // plan_cash / the total assets before this stage's trade
-    double target_position_ratio{0.0}; // The target position market value after the trade / the total assets
+    double cash_ratio{0.0};            // plan_cash / the cash balance before this stage's trade (magnitude)
+    double assets_ratio{0.0};          // plan_cash / the total assets before this stage's trade; the
+                                       // sign encodes direction: > 0 for BUY, < 0 for SELL/CLEAR
+    double target_position_ratio{0.0}; // The target position market value after the trade / the total
+                                       // assets; defined only for BUY, 0 for SELL/CLEAR
 
     price_t stoploss{0.0};
     price_t goalPrice{0.0};
