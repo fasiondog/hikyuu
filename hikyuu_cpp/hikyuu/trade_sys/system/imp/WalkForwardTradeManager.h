@@ -26,9 +26,9 @@ public:
 
     virtual ~WalkForwardTradeManager() {}
 
-    virtual void _reset() override {
-        m_tm->_reset();
-    }
+    // The view must never reset the wrapped real account: it filters by run_start, it does not
+    // own the account (the host WalkForwardSystem resets through its own m_tm)
+    virtual void _reset() override {}
 
     virtual shared_ptr<TradeManagerBase> _clone() override {
         WalkForwardTradeManager* p = new WalkForwardTradeManager();
@@ -468,12 +468,17 @@ private:
 //============================================
 // Serialization support
 //============================================
+// A runtime-only view over the host account, rebuilt by WalkForwardSystem on every run; it is
+// never part of an archive. Reaching the throw means a view instance leaked into a serialized
+// object graph (a bug), and loading such an archive could silently break the run_start filter
 #if HKU_SUPPORT_SERIALIZATION
+private:
     friend class boost::serialization::access;
     template <class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(TradeManagerBase);
-        ar& BOOST_SERIALIZATION_NVP(m_tm);
+        (void)ar;
+        (void)version;
+        HKU_THROW("WalkForwardTradeManager is a runtime-only view and cannot be serialized");
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };

@@ -141,6 +141,124 @@ TEST_CASE("test_SYS_WalkForword_SE_PerformanceOptimal_parallel") {
     }
 }
 
+/** @par Check point: runMoment uses the first run window (the window cursor was advanced before
+ * use, so window 0 was never set up) and drives the same trades as run() */
+TEST_CASE("test_SYS_WalkForward_runMoment_uses_first_window") {
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByIndex(-125);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 60);
+
+    auto make_sys = []() {
+        auto sys =
+          SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, SE_MaxFundsOptimal());
+        sys->setParam<bool>("clean_hold_when_select_changed", false);
+        return sys;
+    };
+
+    auto sys1 = make_sys();
+    sys1->run(stk, query);
+    auto bt_trades = sys1->getTradeRecordList();
+    REQUIRE(bt_trades.size() > 1);
+
+    auto sys2 = make_sys();
+    sys2->setTO(kdata);
+    sys2->readyForRun();
+    for (size_t i = 0; i < kdata.size(); ++i) {
+        sys2->runMoment(kdata[i].datetime);
+    }
+    auto mo_trades = sys2->getTradeRecordList();
+
+    /** @arg the moment-by-moment driving reproduces the run() trade sequence */
+    REQUIRE_EQ(mo_trades.size(), bt_trades.size());
+    for (size_t i = 0, total = mo_trades.size(); i < total; ++i) {
+        CHECK_EQ(mo_trades[i].datetime, bt_trades[i].datetime);
+        CHECK_EQ(mo_trades[i].business, bt_trades[i].business);
+        CHECK_EQ(mo_trades[i].number, bt_trades[i].number);
+    }
+    CHECK_UNARY(mo_trades.empty() || mo_trades[0].datetime < kdata[60].datetime);
+}
+
+/** @par Check point: runMomentOnOpen / runMomentOnClose reproduce the run() trade sequence
+ * (the intraday driving entry) */
+TEST_CASE("test_SYS_WalkForward_runMoment_on_open_close") {
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByIndex(-125);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 60);
+
+    auto sys =
+      SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, SE_MaxFundsOptimal());
+    sys->setParam<bool>("clean_hold_when_select_changed", false);
+    sys->run(stk, query);
+    auto bt_trades = sys->getTradeRecordList();
+    REQUIRE(bt_trades.size() > 1);
+
+    auto sys2 =
+      SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, SE_MaxFundsOptimal());
+    sys2->setParam<bool>("clean_hold_when_select_changed", false);
+    sys2->setTO(kdata);
+    sys2->readyForRun();
+    for (size_t i = 0; i < kdata.size(); ++i) {
+        sys2->runMomentOnOpen(kdata[i].datetime);
+        sys2->runMomentOnClose(kdata[i].datetime);
+    }
+    auto mo_trades = sys2->getTradeRecordList();
+    REQUIRE_EQ(mo_trades.size(), bt_trades.size());
+    for (size_t i = 0, total = mo_trades.size(); i < total; ++i) {
+        CHECK_EQ(mo_trades[i].datetime, bt_trades[i].datetime);
+        CHECK_EQ(mo_trades[i].business, bt_trades[i].business);
+        CHECK_EQ(mo_trades[i].number, bt_trades[i].number);
+    }
+}
+
+/** @par Check point: clean_hold_when_select_changed also takes effect on the moment-driven window
+ * switches (the backtest-only handling made live and backtest diverge) */
+TEST_CASE("test_SYS_WalkForward_runMoment_clean_hold_on_switch") {
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByIndex(-125);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 60);
+
+    auto drive = [&](bool clean_hold) {
+        auto sys =
+          SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, SE_MaxFundsOptimal());
+        sys->setParam<bool>("clean_hold_when_select_changed", clean_hold);
+        sys->setTO(kdata);
+        sys->readyForRun();
+        for (size_t i = 0; i < kdata.size(); ++i) {
+            sys->runMomentOnOpen(kdata[i].datetime);
+            sys->runMomentOnClose(kdata[i].datetime);
+        }
+        return sys->getTradeRecordList();
+    };
+
+    auto without = drive(false);
+    auto with_hold = drive(true);
+    REQUIRE(without.size() > 1);
+    /** @arg the first divergent trade must be the switch clean-hold sell */
+    size_t i = 0;
+    while (
+      i < with_hold.size() && i < without.size() && with_hold[i].datetime == without[i].datetime &&
+      with_hold[i].business == without[i].business && with_hold[i].number == without[i].number) {
+        ++i;
+    }
+    REQUIRE(i < with_hold.size());
+    CHECK_EQ(with_hold[i].business, BUSINESS_SELL);
+}
+
+/** @par Check point: runMoment without a prior calculation fails loudly instead of trading
+ * silently nothing */
+TEST_CASE("test_SYS_WalkForward_runMoment_without_calculation_throws") {
+    auto sys =
+      SYS_WalkForward(SystemList{create_test_sys(3, 5)}, crtTM(), 30, 20, SE_MaxFundsOptimal());
+    sys->setStock(getStock("sz000001"));
+    CHECK_THROWS_AS(sys->runMoment(Datetime(201112050000LL)), std::exception);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
