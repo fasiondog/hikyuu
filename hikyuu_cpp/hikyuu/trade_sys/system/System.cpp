@@ -904,10 +904,16 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     double number = _getBuyNumber(today.datetime, planPrice, planPrice - stoploss, from);
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);
+    // Guard the int64 cast below: a NaN/inf or out-of-range raw number makes it undefined
+    // behaviour, so the upper bound must be checked before the truncation
+    if (!std::isfinite(number) || number <= 0.0 || number > m_stock.maxTradeNumber()) {
+        HKU_INFO_IF(trace, "[{}] {}, invalid number: {}", name(), htr("buy failed"), number);
+        return result;
+    }
     number = int64_t(number / min_num) * min_num;
-    if (number == 0.0 || number > m_stock.maxTradeNumber()) {
-        HKU_INFO_IF(trace, "[{}] {}, number: {} == 0 or > maxTradeNumber: {}, {}", name(),
-                    htr("buy failed"), number, m_stock.maxTradeNumber(), m_mm);
+    if (number == 0.0) {
+        HKU_INFO_IF(trace, "[{}] {}, number < minTradeNumber: {}", name(), htr("buy failed"),
+                    min_num);
         return result;
     }
 
@@ -995,6 +1001,14 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
 
         double min_num = m_stock.minTradeNumber();
         HKU_ASSERT(min_num != 0.0);
+        // Guard the int64 cast below: a NaN/inf or out-of-range raw number makes it undefined
+        // behaviour, so the upper bound must be checked before the truncation
+        if (!std::isfinite(number) || number > m_stock.maxTradeNumber()) {
+            HKU_INFO_IF(trace, "[{}] {}, invalid number: {}", name(), htr("delay buy failed"),
+                        number);
+            m_buyRequestList.erase(m_buyRequestList.begin());
+            continue;
+        }
         number = int64_t(number / min_num) * min_num;
 
         price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
@@ -1049,6 +1063,10 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
 
     price_t realPrice =
       _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
+    // A stale out-of-range src_krecord yields NullKRecord whose price is 0.0; selling at 0 would
+    // clear the position and evaporate the funds, so reject it here
+    HKU_WARN_IF_RETURN(realPrice <= 0.0, record, "[{}] {}: invalid sell price!", m_stock.market_code(),
+                       date);
 
     double min_num = m_stock.minTradeNumber();
     HKU_ASSERT(min_num != 0.0);
