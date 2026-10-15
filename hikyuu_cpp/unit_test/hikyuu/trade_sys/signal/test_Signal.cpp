@@ -346,6 +346,39 @@ TEST_CASE("test_SG_Band_non_finite") {
 }
 
 /** @par Test points */
+TEST_CASE("test_SG_Single_sell_threshold") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    DatetimeList dates = k.getDatetimeList();
+    PriceList vals(k.size(), 10.98);
+    vals[0] = 10.0;
+    vals[1] = 10.2;
+    vals[2] = 10.4;
+    vals[3] = 10.6;
+    vals[4] = 10.8;
+    vals[5] = 11.5;
+    vals[6] = 11.48;
+    vals[7] = 10.98;
+    SignalPtr sg = SG_Single(PRICELIST(vals, dates), 5, 0.5);
+    sg->setTO(k);
+
+    /** @arg a large rise exceeding the noise threshold fires a buy signal */
+    DatetimeList buy = sg->getBuySignal();
+    CHECK_UNARY(buy.size() == 1 && buy[0] == dates[5]);
+
+    /** @arg a small decline below the noise threshold fires no sell signal */
+    DatetimeList sell = sg->getSellSignal();
+    CHECK_UNARY(sell.size() == 1 && sell[0] == dates[7]);
+
+    /** @arg a large decline exceeding the noise threshold fires a sell signal */
+    CHECK_UNARY(sell.size() == 1 && sell[0] == dates[7]);
+}
+
+/** @par Test points */
 TEST_CASE("test_SG_Cross_non_finite") {
     StockManager &sm = StockManager::instance();
     KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));

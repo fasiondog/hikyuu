@@ -76,7 +76,7 @@ void SingleSignal::_calculate(const KData& kdata) {
         }
         if (dama > 0 && (dama > sdama || dama2 > sdama || dama3 > sdama)) {
             _addBuySignal(ks[i].datetime);
-        } else if (dama < 0 && (dama < sdama || dama2 < sdama || dama3 < sdama)) {
+        } else if (dama < 0 && (dama < -sdama || dama2 < -sdama || dama3 < -sdama)) {
             _addSellSignal(ks[i].datetime);
         }
     }
