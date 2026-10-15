@@ -643,9 +643,18 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         // day-by-day parallelism is naturally reentrant and the regression internals are all stack
         // local objects.
         unordered_map<string, std::pair<PriceList, size_t>> ind_dummy_dict = _buildDummyIndex();
+        // Cache the raw factor buffers once (stk x ind) so the hot cross-sectional loop reads and
+        // writes through the buffer instead of Indicator::operator[] (a virtual get per element)
+        vector<price_t*> ind_data_ptrs(stk_count * ind_count);
+        for (size_t si = 0; si < stk_count; si++) {
+            for (size_t ii = 0; ii < ind_count; ii++) {
+                ind_data_ptrs[si * ind_count + ii] = all_stk_inds[si][ii].data();
+            }
+        }
         global_parallel_for_index_void(
           0, days_total,
-          [this, stk_count, ind_count, &all_stk_inds, &ind_dummy_dict, &use_style_inds](size_t di) {
+          [this, stk_count, ind_count, &all_stk_inds, &ind_dummy_dict, &use_style_inds,
+           &ind_data_ptrs](size_t di) {
               auto sub_norm = m_norm ? m_norm->clone() : m_norm;
               NormPtr special_norm;
               PriceList one_day(stk_count, Null<price_t>());
@@ -653,7 +662,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
               for (size_t ii = 0; ii < ind_count; ii++) {
                   auto* one_day_data = one_day.data();
                   for (size_t si = 0; si < stk_count; si++) {
-                      one_day_data[si] = all_stk_inds[si][ii][di];
+                      one_day_data[si] = ind_data_ptrs[si * ind_count + ii][di];
                   }
 
                   // Note: the all_stk_inds[*][ii] produced by m_factorset.getValues(align=true)
@@ -710,8 +719,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                   }
 
                   for (size_t si = 0; si < stk_count; si++) {
-                      auto* dst = all_stk_inds[si][ii].data();
-                      dst[di] = new_value[si];
+                      ind_data_ptrs[si * ind_count + ii][di] = new_value[si];
                   }
               }
           });
@@ -734,7 +742,9 @@ void MultiFactorBase::_buildIndex() {
           stk_count);  // Pre-allocate one slot per stock for every date
     }
 
-    // Traverse the stock j first and then the date i, no sorting by default
+    // Traverse the stock j first and then the date i: each thread reads one whole factor buffer
+    // sequentially. (A date-first order was measured slower: it trades the per-date false sharing
+    // for scattered reads across every factor buffer at one index, a worse trade.)
     global_parallel_for_index_void(0, stk_count, [this, days_total](size_t j) {
         const auto& stk = m_stks[j];
         const auto* data = m_all_factors[j].data();
