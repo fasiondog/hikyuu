@@ -10,6 +10,11 @@
 
 namespace hku {
 
+namespace {
+// Signals below this magnitude are float residuals (e.g. sg*0.5 - sg/2), not real intents
+constexpr double ZERO_SIGNAL_THRESHOLD = 1e-10;
+}  // namespace
+
 HKU_API std::ostream& operator<<(std::ostream& os, const SignalBase& sg) {
     os << "Signal(" << sg.name() << ", " << sg.getParameter() << ")";
     return os;
@@ -142,7 +147,7 @@ double SignalBase::getSellValue(const Datetime& datetime) const {
 }
 
 void SignalBase::_addSignal(const Datetime& datetime, double value) {
-    HKU_IF_RETURN(!std::isfinite(value) || value == 0.0, void());
+    HKU_IF_RETURN(!std::isfinite(value) || std::abs(value) < ZERO_SIGNAL_THRESHOLD, void());
 
     // A single find per map is reused by both the value merge and the later insert/accumulate
     auto buy_iter = m_buySig.find(datetime);
@@ -150,7 +155,7 @@ void SignalBase::_addSignal(const Datetime& datetime, double value) {
     double buy_value = buy_iter != m_buySig.end() ? buy_iter->second : 0.0;
     double sell_value = sell_iter != m_sellSig.end() ? sell_iter->second : 0.0;
     double new_value = value + buy_value + sell_value;
-    HKU_IF_RETURN(!std::isfinite(new_value) || new_value == 0.0, void());
+    HKU_IF_RETURN(!std::isfinite(new_value) || std::abs(new_value) < ZERO_SIGNAL_THRESHOLD, void());
 
     bool alternate = getParam<bool>("alternate");
     if (new_value > 0.0) {

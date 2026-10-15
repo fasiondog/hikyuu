@@ -536,6 +536,28 @@ TEST_CASE("test_SG_Operator_sub_recalculated_on_new_kdata") {
 }
 
 /** @par Test points */
+TEST_CASE("test_SG_zero_residual_filtered") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sh000001").getKData(KQuery(0, 30));
+    if (k.size() < 25) {
+        return;
+    }
+
+    /** @arg a ~1e-16 float residual from value operations fires no signal */
+    SignalPtr sg = make_shared<SignalCalcTest>();
+    SignalPtr residual = (sg * 0.1) + (sg * 0.2) - (sg * 0.3);
+    residual->setTO(k);
+    CHECK_UNARY(residual->getBuySignal().empty());
+    CHECK_UNARY(residual->getSellSignal().empty());
+
+    /** @arg real values above the zero tolerance still fire */
+    SignalPtr exact = (sg * 0.1) + (sg * 0.2) - (sg * 0.2);
+    exact->setTO(k);
+    CHECK_UNARY(exact->getBuySignal().size() == 1);
+    CHECK_UNARY(exact->getSellSignal().size() == 1);
+}
+
+/** @par Test points */
 TEST_CASE("test_SG_Cross_non_finite") {
     StockManager &sm = StockManager::instance();
     KData k = sm.getStock("sh000001").getKData(KQuery(0, 20));
