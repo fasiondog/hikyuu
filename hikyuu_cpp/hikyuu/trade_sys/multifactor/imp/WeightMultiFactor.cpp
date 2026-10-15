@@ -34,6 +34,11 @@ vector<Indicator> WeightMultiFactor::_calculate(const vector<IndicatorList>& all
     size_t stk_count = m_stks.size();
     size_t ind_count = m_factorset.size();
 
+    HKU_CHECK(m_weights.size() == ind_count,
+              "The size of weight is not equal to the number of the factors! weights.size()={}, "
+              "ind_count={}",
+              m_weights.size(), ind_count);
+
     return global_parallel_for_index(0, stk_count, [&](size_t si) {
         vector<price_t> sumByDate(days_total, 0.0);
         const auto& curStkInds = all_stk_inds[si];

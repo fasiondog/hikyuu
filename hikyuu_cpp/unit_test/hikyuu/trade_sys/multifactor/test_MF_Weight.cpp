@@ -173,6 +173,22 @@ TEST_CASE("test_MF_Weight_clone") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_MF_Weight_empty_weights") {
+    StockManager& sm = StockManager::instance();
+    StockList stks = {sm["sh600004"], sm["sh600005"], sm["sz000001"]};
+    KQuery query = KQuery(-20);
+    IndicatorList src_inds = {MA(CLOSE()), EMA(CLOSE())};
+
+    /** @arg the no-arg factory carries no weights; calculating a multi-factor set must throw
+     * instead of indexing the empty weight list out of bounds */
+    auto mf = MF_Weight();
+    mf->setQuery(query);
+    mf->setStockList(stks);
+    mf->setRefFactorSet(FactorSet(src_inds, query.kType()));
+    CHECK_THROWS_AS(mf->calculate(), std::exception);
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

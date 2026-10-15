@@ -34,17 +34,12 @@ void NormZScore::_checkParam(const string& name) const {
     }
 }
 
-PriceList NormZScore::normalize(const PriceList& data) {
+namespace {
+
+// A full z-score + optional extreme clipping pass, recomputing mean/sigma from data
+PriceList normalizeOnce(const PriceList& data, bool outExtreme, double nsigma) {
     size_t total = data.size();
     PriceList ret(total, Null<price_t>());
-    if (total <= 1) {
-        std::copy(data.begin(), data.end(), ret.begin());
-        return ret;
-    }
-
-    bool outExtreme = getParam<bool>("out-extreme");
-    double nsigma = getParam<double>("nsigma");
-    bool recursive = getParam<bool>("recursive");
 
     price_t sum = 0.0;
     size_t count = 0;
@@ -61,13 +56,11 @@ PriceList NormZScore::normalize(const PriceList& data) {
     }
 
     price_t mean = sum / count;
-
-    PriceList tmp(total, Null<price_t>());
     sum = 0.0;
     for (size_t i = 0; i < total; i++) {
         if (!std::isnan(data[i])) {
-            tmp[i] = data[i] - mean;
-            sum += tmp[i] * tmp[i];
+            price_t diff = data[i] - mean;
+            sum += diff * diff;
         }
     }
 
@@ -81,26 +74,72 @@ PriceList NormZScore::normalize(const PriceList& data) {
     if (outExtreme) {
         price_t ulimit = nsigma;
         price_t llimit = -nsigma;
-
-        bool found = false;
         for (size_t i = 0; i < total; i++) {
             if (!std::isnan(ret[i])) {
                 if (ret[i] > ulimit) {
                     ret[i] = ulimit;
-                    found = true;
                 } else if (ret[i] < llimit) {
                     ret[i] = llimit;
-                    found = true;
                 }
             }
-        }
-
-        if (found && recursive) {
-            ret = normalize(ret);
         }
     }
 
     return ret;
+}
+
+// Treat two results as equal when every position is equal, counting nan == nan as equal
+bool normalizeStable(const PriceList& a, const PriceList& b) {
+    if (a.size() != b.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < a.size(); i++) {
+        bool an = std::isnan(a[i]);
+        bool bn = std::isnan(b[i]);
+        if (an || bn) {
+            if (an != bn) {
+                return false;
+            }
+            continue;
+        }
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+constexpr size_t MAX_RECURSION_DEPTH = 10;
+
+}  // namespace
+
+PriceList NormZScore::normalize(const PriceList& data) {
+    size_t total = data.size();
+    if (total <= 1) {
+        PriceList ret(total, Null<price_t>());
+        std::copy(data.begin(), data.end(), ret.begin());
+        return ret;
+    }
+
+    bool outExtreme = getParam<bool>("out-extreme");
+    double nsigma = getParam<double>("nsigma");
+    bool recursive = getParam<bool>("recursive");
+
+    PriceList cur = normalizeOnce(data, outExtreme, nsigma);
+    if (!recursive) {
+        return cur;
+    }
+
+    // Recurse only while a pass still changes the result; the depth cap bounds the loop even when
+    // the clipped outliers keep re-normalizing (a fixed point need not exist)
+    for (size_t depth = 0; depth < MAX_RECURSION_DEPTH; depth++) {
+        PriceList next = normalizeOnce(cur, outExtreme, nsigma);
+        if (normalizeStable(next, cur)) {
+            break;
+        }
+        cur = std::move(next);
+    }
+    return cur;
 }
 
 NormPtr HKU_API NORM_Zscore(bool outExtreme, double nsigma, bool recursive) {
