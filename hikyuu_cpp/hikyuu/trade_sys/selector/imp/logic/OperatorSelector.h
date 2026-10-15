@@ -32,6 +32,14 @@ public:
 protected:
     virtual void bindRealToProto(const SYSPtr& real, const SYSPtr& proto) override {
         m_real_to_proto[real] = proto;
+        // The operand may be a logical selector itself (e.g. (a + b) + c), the binding must reach
+        // it, otherwise the nested level would never learn its prototypes and select nothing
+        if (m_se1) {
+            m_se1->bindRealToProto(real, proto);
+        }
+        if (m_se2) {
+            m_se2->bindRealToProto(real, proto);
+        }
     }
 
     SystemWeightList getUnionSelected(Datetime date,
@@ -90,7 +98,9 @@ public:                                                            \
     virtual SystemWeightList _getSelected(Datetime date) override; \
                                                                    \
     virtual SelectorPtr _clone() override {                        \
-        HKU_THROW("OperatorSelector Could't support clone!");      \
+        auto p = std::make_shared<classname>();                    \
+        p->cloneRebuild(m_se1, m_se2);                             \
+        return p;                                                  \
     }
 
 #if HKU_SUPPORT_SERIALIZATION

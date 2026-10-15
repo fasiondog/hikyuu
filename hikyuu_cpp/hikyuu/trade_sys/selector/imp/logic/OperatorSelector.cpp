@@ -133,19 +133,20 @@ void OperatorSelector::_removeAll() {
     m_se1_set.clear();
     m_se2_set.clear();
     m_real_to_proto.clear();
+    // A nested logical selector (e.g. (a + b) - c) must clear its own operands too, otherwise the
+    // sub-operands would keep their stale prototypes after removeAll
+    if (m_se1) {
+        m_se1->removeAll();
+    }
+    if (m_se2) {
+        m_se2->removeAll();
+    }
 }
 
 SelectorPtr OperatorSelector::_clone() {
-    HKU_THROW("OperatorSelector Could't support clone!");
-#if 0    
-    // OperatorSelector does not support the clone operation
-    // Implementing clone would require a whole mechanism similar to the indicator one
-    // it would need to find the most underlying system strategy instance and, after creating the
-    // clone object, the original system instance would also have to use that clone
     auto p = make_shared<OperatorSelector>();
     p->cloneRebuild(m_se1, m_se2);
     return p;
-#endif
 }
 
 void OperatorSelector::cloneRebuild(const SelectorPtr& se1, const SelectorPtr& se2) {
@@ -169,17 +170,20 @@ void OperatorSelector::cloneRebuild(const SelectorPtr& se1, const SelectorPtr& s
         }
 
         const auto& raw_sys_list2 = se2->getProtoSystemList();
-        for (size_t i = 0, total = raw_sys_list2.size(); i < total; i++) {
-            const auto& sys = raw_sys_list2[i];
-            auto tmpsys = sys->clone();
+        for (const auto& sys : raw_sys_list2) {
             auto iter = inter.find(sys.get());
             if (iter == inter.end()) {
+                auto tmpsys = sys->clone();
                 m_pro_sys_list.emplace_back(tmpsys);
                 m_se2_set.insert(tmpsys);
+                m_se2->addSystem(tmpsys);
             } else {
-                m_se2_set.insert(tmpdict[*iter]);
+                // The shared prototype must be the very instance adopted on the se1 side, otherwise
+                // the clone loses the intersection and a later reset would split the two sets
+                const SYSPtr& tmpsys = tmpdict[*iter];
+                m_se2_set.insert(tmpsys);
+                m_se2->addSystem(tmpsys);
             }
-            m_se2->addSystem(tmpsys);
         }
 
     } else if (se1) {

@@ -365,7 +365,12 @@ TEST_CASE("test_SE_PerformanceOptimal_invalid_key") {
     }
 }
 
-/** @par Test points */
+/** @par Test points
+ *  @note A behavior lock for the m_sys_dict unification (the derived member was folded into the
+ *  base). The pre-fix shadowing was self-consistent (the derived _getSelected read the derived
+ *  map), so no observable behavior difference exists and no discriminating black-box test can be
+ *  constructed; this test only pins the unified behavior against regressions.
+ */
 TEST_CASE("test_SE_PerformanceOptimal_index_single") {
     auto se = SE_PerformanceOptimal();
     Stock stk = getStock("sz000001");

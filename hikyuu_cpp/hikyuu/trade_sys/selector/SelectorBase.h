@@ -58,6 +58,8 @@ public:
 
     /**
      * Add a candidate stock and its trading strategy prototype
+     * @note The prototype is cloned and the clone is adopted (bound to the stock), the caller's
+     *       instance keeps its own state; use addSystem to adopt a ready-made instance as is
      * @param stock candidate stock
      * @param protoSys trading system strategy prototype
      */
@@ -65,21 +67,25 @@ public:
 
     /**
      * Add a group of stocks with the same trading strategy
-     * @note An invalid stock is ignored automatically, false is not returned
+     * @note An invalid stock is ignored automatically, false is not returned. Like addStock, the
+     *       prototype is cloned for every stock
      * @param stkList candidate stock list
      * @param protoSys trading system strategy prototype
      */
     void addStockList(const StockList& stkList, const SystemPtr& protoSys);
 
     /**
-     * Add an existing system strategy instance directly
-     * @note The stock should already be bound
+     * Add an existing system strategy instance directly, the very instance is adopted (no clone)
+     * @note The stock should already be bound. The instance identity is preserved on purpose: the
+     *       operator-combined selectors (e.g. SE_Add) resolve their prototype intersection by it,
+     *       and the adopted instances are reused by MultiSystem; use addStock to bind a prototype
+     *       to new securities instead
      * @param sys
      */
     void addSystem(const SYSPtr& sys);
 
     /**
-     * Add an existing system strategy instance directly
+     * Add existing system strategy instances directly (no clone, see addSystem)
      * @note The stock should already be bound
      * @param sys
      */
@@ -125,8 +131,6 @@ public:
 
     /** Subclass interface to get the targets selected at the close of the given moment */
     virtual SystemWeightList _getSelected(Datetime date) = 0;
-
-
 
     /** Add a prototype system in the subclass used for the logical operations; it generally does
      *  not need to be implemented by the subclass */

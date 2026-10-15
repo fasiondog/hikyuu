@@ -98,7 +98,8 @@ void PerformanceOptimalSelector::_calculate_parallel(
                       if (std::isnan(value)) {
                           continue;
                       }
-                      CLS_TRACE_IF(trace, "value: {}, sys: {}", value, new_sys->name());
+                      CLS_TRACE_IF(trace, "value: {}, stock: {}", value,
+                                   sys->getStock().market_code());
                       if (value > max_value) {
                           max_value = value;
                           selected_sys = new_sys;
@@ -120,7 +121,8 @@ void PerformanceOptimalSelector::_calculate_parallel(
                       if (std::isnan(value)) {
                           continue;
                       }
-                      CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
+                      CLS_TRACE_IF(trace, "value: {}, stock: {}", value,
+                                   sys->getStock().market_code());
                       if (value < min_value) {
                           min_value = value;
                           selected_sys = new_sys;
@@ -162,7 +164,8 @@ void PerformanceOptimalSelector::_calculate_parallel(
                                                     dates[test_end - 1] + Minutes(1)));
             }
 
-            CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1, selected_sys->name());
+            CLS_INFO_IF(trace, "iteration: {}, selected_sys: {}", i + 1,
+                        selected_sys->getStock().market_code());
         }
     }
 }

@@ -45,6 +45,24 @@ SelectorPtr OperatorValueSelector::_clone() {
     return p;
 }
 
+void OperatorValueSelector::_addSystem(const SYSPtr& sys) {
+    if (m_se) {
+        m_se->addSystem(sys);
+    }
+}
+
+void OperatorValueSelector::_removeAll() {
+    if (m_se) {
+        m_se->removeAll();
+    }
+}
+
+void OperatorValueSelector::bindRealToProto(const SYSPtr& real, const SYSPtr& proto) {
+    if (m_se) {
+        m_se->bindRealToProto(real, proto);
+    }
+}
+
 void OperatorValueSelector::_calculate() {
     if (m_se) {
         m_se->calculate(m_real_sys_list, m_query);
