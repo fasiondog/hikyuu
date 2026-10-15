@@ -67,8 +67,6 @@ SystemWeightList OptimalSelectorBase::_getSelected(Datetime date) {
     return ret;
 }
 
-
-
 void OptimalSelectorBase::_reset() {
     m_sys_dict.clear();
     m_run_ranges.clear();
@@ -76,31 +74,30 @@ void OptimalSelectorBase::_reset() {
 
 void OptimalSelectorBase::_calculate() {}
 
-void OptimalSelectorBase::calculate(const SystemList& pf_realSysList, const KQuery& query) {
-    SPEND_TIME(OptimalSelectorBase_calculate);
-    HKU_IF_RETURN(m_calculated && m_query == query, void());
-
-    m_query = query;
-    m_real_sys_list = pf_realSysList;
-
+bool OptimalSelectorBase::_prepareCalculate(const KQuery& query, DatetimeList& dates,
+                                            vector<std::pair<size_t, size_t>>& train_ranges) const {
     bool trace = getParam<bool>("trace");
     CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
-    CLS_WARN_IF_RETURN(m_pro_sys_list.empty(), void(), "candidate sys list is empty!");
+    if (m_pro_sys_list.empty()) {
+        CLS_WARN("candidate sys list is empty!");
+        return false;
+    }
 
     // The check is done at runtime rather than in addSystem, so that WalkForwardSystem can add the
     // system list without a given security directly
     for (const auto& sys : m_pro_sys_list) {
-        CLS_ERROR_IF_RETURN(sys->getStock().isNull(), void(),
-                            "The candidate sys ({}) was specified stock!", sys->name());
+        if (sys->getStock().isNull()) {
+            CLS_ERROR("The candidate sys ({}) was specified stock!", sys->name());
+            return false;
+        }
     }
 
     size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
     size_t test_len = static_cast<size_t>(getParam<int>("test_len"));
 
-    auto dates = StockManager::instance().getTradingCalendar(query, getParam<string>("market"));
+    dates = StockManager::instance().getTradingCalendar(query, getParam<string>("market"));
     size_t dates_len = dates.size();
 
-    vector<std::pair<size_t, size_t>> train_ranges;
     size_t start = 0, end = train_len;
     if (end < dates_len) {
         train_ranges.emplace_back(std::make_pair(start, end));
@@ -112,8 +109,22 @@ void OptimalSelectorBase::calculate(const SystemList& pf_realSysList, const KQue
         start += test_len;
         end += test_len;
     }
+    return true;
+}
 
-    _calculate_parallel(train_ranges, dates, test_len, trace);
+void OptimalSelectorBase::calculate(const SystemList& pf_realSysList, const KQuery& query) {
+    SPEND_TIME(OptimalSelectorBase_calculate);
+    HKU_IF_RETURN(m_calculated && m_query == query, void());
+
+    m_query = query;
+    m_real_sys_list = pf_realSysList;
+
+    DatetimeList dates;
+    vector<std::pair<size_t, size_t>> train_ranges;
+    HKU_IF_RETURN(!_prepareCalculate(query, dates, train_ranges), void());
+
+    _calculate_parallel(train_ranges, dates, static_cast<size_t>(getParam<int>("test_len")),
+                        getParam<bool>("trace"));
 
     m_calculated = true;
 }

@@ -186,6 +186,10 @@ SystemWeightList MultiFactorSelector::_getSelected(Datetime date) {
 }
 
 void MultiFactorSelector::_calculate() {
+    // Drop the previous mapping first: a second calculate (a new query, a new stock pool, a
+    // portfolio re-run) must not keep the systems of the earlier run
+    m_stk_sys_dict.clear();
+
     Stock ref_stk = getParam<Stock>("ref_stk");
 
     StockList stks;
@@ -235,7 +239,7 @@ void MultiFactorSelector::_calculate() {
     m_mf->calculate();
 
     for (const auto& sys : m_real_sys_list) {
-        m_stk_sys_dict.insert({sys->getStock(), sys});
+        m_stk_sys_dict.insert_or_assign(sys->getStock(), sys);
     }
 }
 

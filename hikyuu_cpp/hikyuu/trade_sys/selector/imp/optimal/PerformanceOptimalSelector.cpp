@@ -53,42 +53,17 @@ void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, con
     m_query = query;
     m_real_sys_list = pf_realSysList;
 
-    bool trace = getParam<bool>("trace");
-    CLS_INFO_IF(trace, "candidate sys list size: {}", m_pro_sys_list.size());
-    CLS_WARN_IF_RETURN(m_pro_sys_list.empty(), void(), "candidate sys list is empty!");
-
-    // The check is done at runtime rather than in addSystem, so that WalkForwardSystem can add the
-    // system list without a given security directly
-    for (const auto& sys : m_pro_sys_list) {
-        CLS_ERROR_IF_RETURN(sys->getStock().isNull(), void(),
-                            "The candidate sys ({}) was specified stock!", sys->name());
-    }
-
-    size_t train_len = static_cast<size_t>(getParam<int>("train_len"));
-    size_t test_len = static_cast<size_t>(getParam<int>("test_len"));
-
-    auto dates = StockManager::instance().getTradingCalendar(query, getParam<string>("market"));
-    size_t dates_len = dates.size();
-
+    DatetimeList dates;
     vector<std::pair<size_t, size_t>> train_ranges;
-    size_t start = 0, end = train_len;
-    if (end < dates_len) {
-        train_ranges.emplace_back(std::make_pair(start, end));
-    }
-    start += test_len;
-    end += test_len;
-    while (end < dates_len) {
-        train_ranges.emplace_back(std::make_pair(start, end));
-        start += test_len;
-        end += test_len;
-    }
+    HKU_IF_RETURN(!_prepareCalculate(query, dates, train_ranges), void());
 
     string key = getParam<string>("key");
     int mode = getParam<int>("mode");
-    CLS_INFO_IF(trace, "statistic key: {}, mode: {}", getParam<string>("key"),
-                getParam<int>("mode"));
+    bool trace = getParam<bool>("trace");
+    CLS_INFO_IF(trace, "statistic key: {}, mode: {}", key, mode);
 
-    _calculate_parallel(train_ranges, dates, key, mode, test_len, trace);
+    _calculate_parallel(train_ranges, dates, key, mode,
+                        static_cast<size_t>(getParam<int>("test_len")), trace);
 
     m_calculated = true;
 }
@@ -97,9 +72,21 @@ void PerformanceOptimalSelector::_calculate_parallel(
   const vector<std::pair<size_t, size_t>>& train_ranges, const DatetimeList& dates,
   const string& key, int mode, size_t test_len, bool trace) {
     // SPEND_TIME(OptimalSelector_calculate_parallel);
+    // The training runs the candidate clones concurrently and each range has its own query, so the
+    // candidates must not share their EV (shared_ev defaults to true), otherwise the racing
+    // setQuery calls with different queries would cross-clobber the EV state. The local
+    // protos take effect from the next clone level on, leaving the user prototypes untouched.
+    SystemList pro_list;
+    pro_list.reserve(m_pro_sys_list.size());
+    for (const auto& sys : m_pro_sys_list) {
+        auto local = sys->clone();
+        local->setParam<bool>("shared_ev", false);
+        pro_list.emplace_back(local);
+    }
+
     auto sys_list = global_parallel_for_index(
       0, train_ranges.size(),
-      [this, &train_ranges, &dates, query = m_query, trace, key, mode](size_t i) {
+      [&pro_list, &train_ranges, &dates, query = m_query, trace, key, mode](size_t i) {
           Datetime start_date = dates[train_ranges[i].first];
           Datetime end_date = dates[train_ranges[i].second];
           KQuery q = KQueryByDate(start_date, end_date, query.kType(), query.recoverType());
@@ -107,17 +94,20 @@ void PerformanceOptimalSelector::_calculate_parallel(
 
           Performance per;
           SYSPtr selected_sys;
-          if (m_pro_sys_list.size() == 1) {
-              selected_sys = m_pro_sys_list.back()->clone();
+          if (pro_list.size() == 1) {
+              selected_sys = pro_list.back()->clone();
           } else if (0 == mode) {
               double max_value = std::numeric_limits<double>::lowest();
-              for (const auto& sys : m_pro_sys_list) {
+              for (const auto& sys : pro_list) {
                   try {
                       // Cut off all the shared parts to avoid a parallel conflict
                       auto new_sys = sys->clone();
                       new_sys->run(q, true);
                       per.statistics(new_sys->getTM(), end_date);
                       double value = per.get(key);
+                      if (std::isnan(value)) {
+                          continue;
+                      }
                       CLS_TRACE_IF(trace, "value: {}, sys: {}", value, new_sys->name());
                       if (value > max_value) {
                           max_value = value;
@@ -131,12 +121,15 @@ void PerformanceOptimalSelector::_calculate_parallel(
               }
           } else if (1 == mode) {
               double min_value = std::numeric_limits<double>::max();
-              for (const auto& sys : m_pro_sys_list) {
+              for (const auto& sys : pro_list) {
                   try {
                       auto new_sys = sys->clone();
                       new_sys->run(q, true);
                       per.statistics(new_sys->getTM(), end_date);
                       double value = per.get(key);
+                      if (std::isnan(value)) {
+                          continue;
+                      }
                       CLS_TRACE_IF(trace, "value: {}, sys: {}", value, sys->name());
                       if (value < min_value) {
                           min_value = value;

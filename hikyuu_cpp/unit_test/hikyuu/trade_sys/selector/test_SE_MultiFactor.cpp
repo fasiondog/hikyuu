@@ -18,6 +18,7 @@
 #include <hikyuu/indicator/crt/AMA.h>
 #include <hikyuu/indicator/crt/EMA.h>
 #include <hikyuu/trade_sys/multifactor/crt/MF_EqualWeight.h>
+#include <set>
 
 using namespace hku;
 
@@ -202,6 +203,90 @@ TEST_CASE("test_SE_MultiFactor_clone_without_mf") {
     SelectorPtr se4;
     CHECK_NOTHROW(se4 = se3->clone());
     CHECK_UNARY(se4);
+}
+
+/** @par Check point: a second calculation of the same selector replaces the mapping from the
+ *  instruments to the running systems instead of keeping it (the systems of the earlier run must
+ *  not survive into the next one) */
+TEST_CASE("test_SE_MultiFactor_recalculate_mapping") {
+    StockManager& sm = StockManager::instance();
+    StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    Stock ref_stk = sm["sh000001"];
+    IndicatorList src_inds{MA(CLOSE())};
+
+    auto sys = SYS_Simple(crtTM(), MM_Nothing());
+    sys->setSG(SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+
+    auto se = SE_MultiFactor(src_inds, 10, 5, 120, ref_stk, "MF_EqualWeight");
+    se->addStockList(stks, sys);
+    auto proto_list = se->getProtoSystemList();
+
+    KQuery query1 = KQueryByDate(Datetime(20110712) - Days(30), Datetime(20111206));
+    se->calculate(proto_list, query1);
+    auto sel1 = se->getSelected(Datetime(20110712));
+    REQUIRE_UNARY(!sel1.empty());
+
+    // The second run passes a different real system list (the same instruments, new instances) and
+    // a different query
+    SystemList real2;
+    for (const auto& proto : proto_list) {
+        real2.emplace_back(proto->clone());
+    }
+    std::set<System*> new_set;
+    for (const auto& s : real2) {
+        new_set.insert(s.get());
+    }
+
+    KQuery query2 = KQueryByDate(Datetime(20110712) - Days(30), Datetime(20111207));
+    se->calculate(real2, query2);
+
+    auto sel2 = se->getSelected(Datetime(20111206));
+    REQUIRE_UNARY(!sel2.empty());
+    for (const auto& sw : sel2) {
+        /** @arg The systems selected after the recalculation are the new running instances */
+        CHECK_EQ(new_set.count(sw.sys.get()), 1);
+    }
+}
+
+/** @par Check point: a cloned MF selector must not carry over the mapping of the original running
+ *  systems; after the recalculation it selects its own instances */
+TEST_CASE("test_SE_MultiFactor2_clone_mapping") {
+    StockManager& sm = StockManager::instance();
+    StockList stks{sm["sh600004"], sm["sh600005"], sm["sz000001"], sm["sz000002"]};
+    Stock ref_stk = sm["sh000001"];
+    IndicatorList src_inds{MA(CLOSE())};
+
+    auto sys = SYS_Simple(crtTM(), MM_Nothing());
+    sys->setSG(SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+
+    auto se = SE_MultiFactor2(src_inds, 5, 120, ref_stk, true, "MF_EqualWeight");
+    se->addStockList(stks, sys);
+    auto proto_list = se->getProtoSystemList();
+
+    KQuery query = KQueryByDate(Datetime(20110712) - Days(30), Datetime(20111206));
+    se->calculate(proto_list, query);
+    auto sel1 = se->getSelected(Datetime(20110712));
+    REQUIRE_UNARY(!sel1.empty());
+    REQUIRE_UNARY(sel1[0].sys);
+
+    std::set<System*> orig_set;
+    for (const auto& s : proto_list) {
+        orig_set.insert(s.get());
+    }
+
+    auto cloned = se->clone();
+    REQUIRE_UNARY(cloned);
+    cloned->calculate(cloned->getProtoSystemList(), query);
+    auto sel2 = cloned->getSelected(Datetime(20110712));
+    REQUIRE_UNARY(!sel2.empty());
+
+    /** @arg The clone selects its own running instances, not the ones of the original selector */
+    for (const auto& sw : sel2) {
+        REQUIRE_UNARY(sw.sys);
+        CHECK_EQ(orig_set.count(sw.sys.get()), 0);
+    }
 }
 
 /** @} */

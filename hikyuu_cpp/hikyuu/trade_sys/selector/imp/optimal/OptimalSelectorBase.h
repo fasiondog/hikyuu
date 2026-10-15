@@ -59,6 +59,18 @@ private:
                              const DatetimeList& dates, size_t test_len, bool trace);
 
 protected:
+    /**
+     * Validate the candidate list and split the back-test range into the walk-forward train/test
+     * windows. Shared by the optimal selectors so that the two implementations cannot drift apart.
+     * @param query the back-test query
+     * @param dates [out] the trading calendar of the query
+     * @param train_ranges [out] the [train_start, train_end) index pairs
+     * @return false when the calculation must stop (empty candidate list or a candidate bound to a
+     *         security of its own)
+     */
+    bool _prepareCalculate(const KQuery& query, DatetimeList& dates,
+                           vector<std::pair<size_t, size_t>>& train_ranges) const;
+
     unordered_map<Datetime, std::shared_ptr<SystemWeightList>> m_sys_dict;
     vector<RunRanges> m_run_ranges;
 };

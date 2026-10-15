@@ -72,12 +72,11 @@ SelectorPtr MultiFactorSelector2::_clone() {
     if (m_mf) {
         p->m_mf = m_mf->clone();
     }
-    p->m_stk_sys_dict = m_stk_sys_dict;
+    // m_stk_sys_dict references the original running systems, do not carry it into the clone;
+    // the clone rebuilds it in _calculate from its own m_real_sys_list
     p->m_factorset = m_factorset;
     return p;
 }
-
-
 
 SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
     ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);
@@ -89,6 +88,10 @@ SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
 }
 
 void MultiFactorSelector2::_calculate() {
+    // Drop the previous mapping first: a second calculate (a new query, a new stock pool, a
+    // portfolio re-run) must not keep the systems of the earlier run
+    m_stk_sys_dict.clear();
+
     Stock ref_stk = getParam<Stock>("ref_stk");
     StockList stks;
     for (const auto& sys : m_pro_sys_list) {
@@ -130,7 +133,7 @@ void MultiFactorSelector2::_calculate() {
     m_mf->calculate();
 
     for (const auto& sys : m_real_sys_list) {
-        m_stk_sys_dict.insert({sys->getStock(), sys});
+        m_stk_sys_dict.insert_or_assign(sys->getStock(), sys);
     }
 }
 

@@ -1376,6 +1376,10 @@ void MultiSystem::_adoptSEProtos() {
         return;
     }
     for (const auto& proto : m_se->getProtoSystemList()) {
+        // The adopted prototypes are the running systems themselves, so record the identity
+        // mapping: a logical selector (OperatorSelector) relies on it to tell which operand side
+        // each running system belongs to, otherwise every combination would select nothing.
+        m_se->bindRealToProto(proto, proto);
         add(proto);
     }
 }

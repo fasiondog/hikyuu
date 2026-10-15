@@ -11,6 +11,7 @@
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Optimal.h>
 #include <hikyuu/trade_sys/selector/imp/optimal/OptimalSelectorBase.h>
+#include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include "../system/create_test_sys.h"
 
 using namespace hku;
@@ -298,6 +299,70 @@ TEST_CASE("test_SE_PerformanceOptimal_candidate_throw") {
         }
     }
     CHECK_UNARY(selected_count > 0);
+}
+
+// A minimal environment that only records its query, used to check that the walk-forward training
+// windows of the candidates do not overwrite the environment shared by the prototypes
+class QuerySpyEnvironment : public EnvironmentBase {
+public:
+    QuerySpyEnvironment() : EnvironmentBase("SE_QuerySpyEnvironment") {}
+    virtual ~QuerySpyEnvironment() = default;
+
+    virtual void _calculate() override {}
+
+    virtual EnvironmentPtr _clone() override {
+        return EnvironmentPtr(new QuerySpyEnvironment);
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_shared_ev") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    auto ev = EnvironmentPtr(new QuerySpyEnvironment);
+    KQuery origin = KQueryByIndex(-5);
+    ev->setQuery(origin);
+
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        sys->setEV(ev);
+        se->addSystem(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+
+    /** @arg the per-window training queries of the candidates must not be written into the EV
+     *  shared by the prototypes (SE-003) */
+    CHECK_NOTHROW(se->calculate(SystemList(), query));
+    CHECK_UNARY(ev->getQuery() == origin);
+}
+
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_invalid_key") {
+    auto se = SE_PerformanceOptimal("Unknown Performance Key");
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    KQuery query(-125);
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+
+    /** @arg an unknown statistic key yields Null (NaN) for every candidate, so none is selected
+     *  and the calculation still completes without crashing (SE-N02) */
+    CHECK_NOTHROW(se->calculate(SystemList(), query));
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    for (const auto& date : dates) {
+        CHECK_UNARY(se->getSelected(date).empty());
+    }
 }
 
 //-----------------------------------------------------------------------------

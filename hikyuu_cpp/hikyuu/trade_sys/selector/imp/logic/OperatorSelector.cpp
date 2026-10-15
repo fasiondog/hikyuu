@@ -118,8 +118,6 @@ void OperatorSelector::_reset() {
     m_real_to_proto.clear();
 }
 
-
-
 void OperatorSelector::_addSystem(const SYSPtr& sys) {
     if (m_se1) {
         m_se1->addSystem(sys);
@@ -205,7 +203,12 @@ void OperatorSelector::cloneRebuild(const SelectorPtr& se1, const SelectorPtr& s
 void OperatorSelector::_calculate() {
     SystemList se1_list, se2_list;
     for (const auto& sys : m_real_sys_list) {
-        const auto& protoSys = m_real_to_proto[sys];
+        auto iter = m_real_to_proto.find(sys);
+        if (iter == m_real_to_proto.end() || !iter->second) {
+            HKU_WARN("The system({}) is not bound to a prototype, ignored!", sys->name());
+            continue;
+        }
+        const auto& protoSys = iter->second;
         if (m_se1_set.find(protoSys) != m_se1_set.end()) {
             se1_list.emplace_back(sys);
         }

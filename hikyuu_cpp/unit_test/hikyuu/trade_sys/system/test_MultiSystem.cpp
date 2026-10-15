@@ -36,6 +36,7 @@
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Signal.h>
+#include <hikyuu/trade_sys/selector/crt/SE_Logic.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
@@ -1431,6 +1432,37 @@ TEST_CASE("test_MultiSystem_ready_for_run_adopt_se_protos") {
     ms2->add(sys);
     ms2->readyForRun();
     CHECK_EQ(ms2->getSystemList().size(), 1);
+}
+
+/** @par Check point: the prototypes adopted from an SE are bound to themselves, so an
+ *  operator-combined selector can still resolve every running system to its operand side and
+ *  select the intended instruments (SE-004) */
+TEST_CASE("test_MultiSystem_combined_se_adopt") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se1 = SE_Fixed();
+    se1->addStockList({stk1}, create_alway_buy_sys());
+    auto se2 = SE_Fixed();
+    se2->addStockList({stk2}, create_alway_buy_sys());
+    auto se = se1 + se2;
+
+    auto ms = std::make_shared<MultiSystem>("ms_combined_se");
+    ms->setTM(crtTM(Datetime(199001010000LL), 100000.0));
+    ms->setSE(se);
+    ms->run(query);
+
+    /** @arg the two operand prototypes are adopted as the running systems */
+    CHECK_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg the combination resolved both running systems to their operand side: both are
+     *  admitted instead of every one being dropped as "not bound to a prototype" */
+    auto dates = StockManager::instance().getTradingCalendar(query);
+    REQUIRE_UNARY(!dates.empty());
+    CHECK_EQ(se->getSelected(dates.back()).size(), 2);
 }
 
 /** @par Check point: mode C converges sys_use_self_tm onto the shared account of the parent
