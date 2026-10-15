@@ -289,4 +289,15 @@ TEST_CASE("test_SE_MultiFactor2_clone_mapping") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_MultiFactor_getSelected_without_mf") {
+    /** @arg getSelected on a selector without an MF throws instead of dereferencing a null MF */
+    auto se = SE_MultiFactor();
+    CHECK_THROWS_AS(se->getSelected(Datetime(202001010000L)), std::exception);
+
+    /** @arg The same applies to SE_MultiFactor2 */
+    auto se2 = SE_MultiFactor2();
+    CHECK_THROWS_AS(se2->getSelected(Datetime(202001010000L)), std::exception);
+}
+
 /** @} */

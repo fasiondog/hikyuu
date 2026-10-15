@@ -109,6 +109,12 @@ bool OptimalSelectorBase::_prepareCalculate(const KQuery& query, DatetimeList& d
         start += test_len;
         end += test_len;
     }
+    if (train_ranges.empty()) {
+        CLS_WARN(
+          "No available train range, nothing will be selected! train_len: {}, test_len: {}, "
+          "dates size: {}",
+          train_len, test_len, dates_len);
+    }
     return true;
 }
 
@@ -118,6 +124,10 @@ void OptimalSelectorBase::calculate(const SystemList& pf_realSysList, const KQue
 
     m_query = query;
     m_real_sys_list = pf_realSysList;
+    // Drop the previous selection first: a second calculate (a new query, a portfolio re-run) must
+    // not append duplicate entries
+    m_sys_dict.clear();
+    m_run_ranges.clear();
 
     DatetimeList dates;
     vector<std::pair<size_t, size_t>> train_ranges;

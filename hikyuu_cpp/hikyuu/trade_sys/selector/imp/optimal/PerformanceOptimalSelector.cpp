@@ -38,6 +38,10 @@ void PerformanceOptimalSelector::calculate(const SystemList& pf_realSysList, con
 
     m_query = query;
     m_real_sys_list = pf_realSysList;
+    // Drop the previous selection first: a second calculate (a new query, a portfolio re-run) must
+    // not append duplicate entries
+    m_sys_dict.clear();
+    m_run_ranges.clear();
 
     DatetimeList dates;
     vector<std::pair<size_t, size_t>> train_ranges;

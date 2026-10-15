@@ -19,7 +19,10 @@ SystemWeightList OperatorDivValueSelector::_getSelected(Datetime date) {
 
     ret = m_se->getSelected(date);
     for (auto& sw : ret) {
-        sw.weight /= m_value;
+        // A zero / non-finite divisor leaves the weight undefined, report it as Null so that the
+        // downstream allocation ignores it instead of producing inf / NaN
+        sw.weight =
+          (m_value == 0.0 || !std::isfinite(m_value)) ? Null<double>() : sw.weight / m_value;
     }
 
     return ret;

@@ -79,10 +79,16 @@ SelectorPtr MultiFactorSelector2::_clone() {
 }
 
 SystemWeightList MultiFactorSelector2::_getSelected(Datetime date) {
+    HKU_CHECK(m_mf, "MF is not set or the selector has not been calculated!");
+
     ScoreRecordList scores = m_mf->getScores(date, 0, Null<size_t>(), m_sc_filter);
     SystemWeightList ret;
     for (const auto& sc : scores) {
-        ret.emplace_back(m_stk_sys_dict[sc.stock], sc.value);
+        auto iter = m_stk_sys_dict.find(sc.stock);
+        if (iter == m_stk_sys_dict.end() || !iter->second) {
+            continue;
+        }
+        ret.emplace_back(iter->second, sc.value);
     }
     return ret;
 }

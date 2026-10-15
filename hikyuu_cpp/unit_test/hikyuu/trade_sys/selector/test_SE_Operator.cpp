@@ -807,4 +807,34 @@ TEST_CASE("test_SE_ValueSelector_clone") {
     CHECK_EQ(result[2].weight, 3.0);
 }
 
+/** @par Test points */
+TEST_CASE("test_SE_DivValue_byZero") {
+    StockManager& sm = StockManager::instance();
+
+    SYSPtr sys = SYS_Simple();
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    sys->setMM(MM_FixedCount(100));
+
+    /** @arg A zero divisor yields an undefined weight, reported as Null instead of inf / NaN */
+    SEPtr se = SE_Fixed() / 0.0;
+    se->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
+    auto proto_sys_list = se->getProtoSystemList();
+    CHECK_EQ(proto_sys_list.size(), 3);
+    se->calculate(proto_sys_list, KQuery(-20));
+    auto result = se->getSelected(Datetime(200001010000L));
+    CHECK_EQ(result.size(), 3);
+    for (const auto& sw : result) {
+        CHECK_UNARY(std::isnan(sw.weight));
+    }
+
+    /** @arg A non-zero divisor keeps the normal quotient */
+    SEPtr se2 = SE_Fixed() / 2.0;
+    se2->addStockList({sm["sh600000"], sm["sz000001"], sm["sz000002"]}, sys);
+    auto proto_sys_list2 = se2->getProtoSystemList();
+    se2->calculate(proto_sys_list2, KQuery(-20));
+    auto result2 = se2->getSelected(Datetime(200001010000L));
+    CHECK_EQ(result2.size(), 3);
+    CHECK_EQ(result2[0].weight, 0.5);
+}
+
 /** @} */

@@ -17,14 +17,16 @@ SignalSelector::SignalSelector() : SelectorBase("SE_Sigal") {}
 
 SignalSelector::~SignalSelector() {}
 
-
-
 SystemWeightList SignalSelector::_getSelected(Datetime date) {
     auto iter = m_sys_dict.find(date);
     return iter != m_sys_dict.end() ? iter->second : SystemWeightList();
 }
 
 void SignalSelector::_calculate() {
+    // Drop the previous selection first: a second calculate must not duplicate the systems of
+    // the same day
+    m_sys_dict.clear();
+
     size_t total = m_real_sys_list.size();
     for (size_t i = 0; i < total; i++) {
         auto& sys = m_real_sys_list[i];

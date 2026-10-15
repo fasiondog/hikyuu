@@ -459,4 +459,30 @@ TEST_CASE("test_SE_PerformanceOptimal_export") {
 }
 #endif /* #if HKU_SUPPORT_SERIALIZATION */
 
+/** @par Test points */
+TEST_CASE("test_SE_PerformanceOptimal_recalculate") {
+    auto se = SE_PerformanceOptimal();
+    Stock stk = getStock("sz000001");
+    vector<std::pair<int, int>> params{{3, 5}, {3, 10}, {5, 10}, {5, 20}};
+    for (const auto& param : params) {
+        auto sys = create_test_sys(param.first, param.second);
+        sys->setStock(stk);
+        se->addSystem(sys);
+    }
+
+    se->setParam<int>("train_len", 30);
+    se->setParam<int>("test_len", 20);
+    KQuery query(-125);
+    se->calculate(SystemList(), query);
+    OptimalSelectorBase* raw_se = dynamic_cast<OptimalSelectorBase*>(se.get());
+    REQUIRE_UNARY(raw_se);
+    size_t ranges = raw_se->getRunRanges().size();
+    REQUIRE_UNARY(ranges > 0);
+
+    /** @arg A second calculate after an invalidation must not accumulate the run ranges */
+    se->setParam<int>("test_len", 20);
+    se->calculate(SystemList(), query);
+    CHECK_EQ(raw_se->getRunRanges().size(), ranges);
+}
+
 /** @} */
