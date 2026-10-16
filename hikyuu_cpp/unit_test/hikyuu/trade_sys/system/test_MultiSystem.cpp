@@ -2854,6 +2854,109 @@ TEST_CASE("test_MultiSystem_mode_a_nested_pending_intent") {
     }
 }
 
+/** Selector test double: admits every running system on the first consultation only, then nothing
+ *  (used to drive the "no longer selected" path of mode C) */
+class SelectOnceSE : public SelectorBase {
+public:
+    SelectOnceSE() : SelectorBase("SelectOnceSE") {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectOnceSE>();
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        if (call_count++ == 0) {
+            for (auto& sys : getRealSystemList()) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    int call_count{0};
+};
+
+/** @par Check point: a nested aggregate under mode C shares the real account of the parent and
+ * its synthesized orders land on it directly (the parent neither converts nor orders again) */
+TEST_CASE("test_MultiSystem_mode_c_nested_aggregate_child") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    // The inner aggregate: mode A over one always-buy leaf
+    auto inner_se = SE_Fixed();
+    inner_se->addStockList({stk}, create_alway_buy_sys());
+    auto inner = PF_SignalAggregate(crtTM(Datetime(199001010000LL), 100000.0), inner_se,
+                                    AF_EqualWeight(), 1, "query", true, true, false, 100000.0);
+    REQUIRE_EQ(inner->getMode(), "A");
+
+    // The outer aggregate: mode C, the inner one is its only sub-system
+    auto parent_tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto outer = std::make_shared<MultiSystem>("outer_mode_c_nested");
+    outer->setTM(parent_tm);
+    outer->setMode("C");
+    outer->setSellAtNotSelected(false);
+    outer->add(inner);
+    outer->run(query);
+
+    /** @arg the inner aggregate shares the real account of the parent */
+    CHECK(inner->getTM() == parent_tm);
+    CHECK_UNARY(inner->getParam<bool>("shared_tm"));
+
+    /** @arg the orders synthesized by the inner mode A layer land on the shared account */
+    REQUIRE_UNARY(parent_tm->getTradeList().size() > 1);
+    double hold = parent_tm->getHoldNumber(Datetime(200002250000LL), stk);
+    CHECK_GT(hold, 0.0);
+
+    /** @arg the parent does not order again: the holding stays within a single full position of
+     *  the account (a duplicated parent order would roughly double it) */
+    auto k = stk.getKData(query);
+    REQUIRE_UNARY(k.size() > 0);
+    double price = k.getKRecord(k.size() - 1).closePrice;
+    CHECK_LE(hold * price, 100000.0 * 1.05);
+}
+
+/** @par Check point: mode C force-liquidates a nested aggregate that left the running pool while
+ * still holding on the shared account (the holding judgement must look through the sub-tree: a
+ * nested aggregate carries no stock of its own) */
+TEST_CASE("test_MultiSystem_mode_c_nested_aggregate_force_sell") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto inner_se = SE_Fixed();
+    inner_se->addStockList({stk}, create_alway_buy_sys());
+    auto inner = PF_SignalAggregate(crtTM(Datetime(199001010000LL), 100000.0), inner_se,
+                                    AF_EqualWeight(), 1, "query", true, true, false, 100000.0);
+
+    auto parent_tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto outer = std::make_shared<MultiSystem>("outer_mode_c_nested_drop");
+    outer->setTM(parent_tm);
+    outer->setMode("C");
+    outer->setSellAtNotSelected(true);  // force liquidation of the unselected
+    outer->setSE(std::make_shared<SelectOnceSE>());  // admitted on the first day only
+    outer->add(inner);
+    outer->run(query);
+
+    /** @arg the sub-system was admitted on the first day and holds on the shared account */
+    CHECK_GT(parent_tm->getTradeList().size(), 1);
+
+    /** @arg once it is no longer selected, the parent force-liquidates the holding of the whole
+     *  sub-tree (the inner aggregate has no stock of its own, so the check must reach the leaves) */
+    CHECK_EQ(parent_tm->getHoldNumber(Datetime(200002250000LL), stk), doctest::Approx(0.0));
+    bool has_sell = false;
+    for (auto& tr : parent_tm->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            has_sell = true;
+            break;
+        }
+    }
+    CHECK_UNARY(has_sell);
+}
+
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------

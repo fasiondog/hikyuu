@@ -471,6 +471,23 @@ private:
      *  searched recursively over the nested aggregates (a nested layer's pools are its own). */
     void _removeStockFromPoolsRecursive(const Stock& stock);
 
+    /** Collect the instruments of the leaf systems of a sub-tree (a nested aggregate carries no
+     *  instrument of its own) */
+    static void _collectLeafStocks(const SystemPtr& sys, std::set<Stock>& out);
+
+    /** Find the leaf system of a sub-tree trading the given instrument (an empty pointer when the
+     *  sub-tree does not trade it) */
+    static SystemPtr _findLeafByStock(const SystemPtr& sys, const Stock& stock);
+
+    /** The holding quantity of a sub-tree on the shared account of the parent: the pools of mode C
+     *  must judge through the sub-tree, because a nested aggregate has no stock of its own */
+    double _subTreeHoldNumber(const SystemPtr& sys, const Datetime& date) const;
+
+    /** Force-liquidate everything a sub-tree holds on the shared account (each instrument is sold
+     *  once, by its leaf system) */
+    void _forceSellSubTree(const SystemPtr& sys, const Datetime& date, bool on_open,
+                           TradeRecordList& out);
+
     /** The slot of a sub-system inside m_sys_list (the open trade buffer and the before-trade fund
      *  snapshot are addressed by it); O(1) via m_sub_index. */
     size_t _subIndex(const SystemPtr& sys) const;

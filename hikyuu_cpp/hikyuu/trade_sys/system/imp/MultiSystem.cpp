@@ -1224,15 +1224,14 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         // first. A sub-system whose holding reached zero leaves the pool; while the forced
         // liquidation is on, the still held ones are sold at the open.
         for (auto iter = m_force_sell_list.begin(); iter != m_force_sell_list.end();) {
-            Stock stk = (*iter)->getStock();
-            double num = stk.isNull() ? 0.0 : m_tm->getHoldNumber(datetime, stk);
-            if (num <= 0.0) {
+            if (_subTreeHoldNumber(*iter, datetime) <= 0.0) {
                 iter = m_force_sell_list.erase(iter);
                 continue;
             }
             if (m_sell_at_not_selected) {
-                TradeRecord tr = (*iter)->sellForceOnOpen(datetime, num, PART_PORTFOLIO);
-                if (!tr.isNull()) {
+                TradeRecordList sold;
+                _forceSellSubTree(*iter, datetime, true, sold);
+                for (auto& tr : sold) {
                     result.tradesOnOpen.push_back(tr);
                     m_trade_list.push_back(tr);
                 }
@@ -1983,6 +1982,79 @@ void MultiSystem::_removeStockFromPoolsRecursive(const Stock& stock) {
     }
 }
 
+void MultiSystem::_collectLeafStocks(const SystemPtr& sys, std::set<Stock>& out) {
+    if (!sys) {
+        return;
+    }
+    const Stock& stk = sys->getStock();
+    if (!stk.isNull()) {
+        out.insert(stk);
+        return;
+    }
+    for (auto& sub : sys->getSubSystemList()) {
+        _collectLeafStocks(sub, out);
+    }
+}
+
+SystemPtr MultiSystem::_findLeafByStock(const SystemPtr& sys, const Stock& stock) {
+    if (!sys) {
+        return SystemPtr();
+    }
+    if (sys->getStock() == stock) {
+        return sys;
+    }
+    for (auto& sub : sys->getSubSystemList()) {
+        auto found = _findLeafByStock(sub, stock);
+        if (found) {
+            return found;
+        }
+    }
+    return SystemPtr();
+}
+
+double MultiSystem::_subTreeHoldNumber(const SystemPtr& sys, const Datetime& date) const {
+    std::set<Stock> stocks;
+    _collectLeafStocks(sys, stocks);
+    double total = 0.0;
+    for (auto& stk : stocks) {
+        total += m_tm->getHoldNumber(date, stk);
+    }
+    return total;
+}
+
+void MultiSystem::_forceSellSubTree(const SystemPtr& sys, const Datetime& date, bool on_open,
+                                    TradeRecordList& out) {
+    std::set<Stock> stocks;
+    _collectLeafStocks(sys, stocks);
+    for (auto& stk : stocks) {
+        double num = m_tm->getHoldNumber(date, stk);
+        if (num <= 0.0) {
+            continue;
+        }
+        // A leaf trading directly on the shared account books the sale itself (the quantity is
+        // sold once); a leaf sitting on the shadow account of an intermediate aggregate cannot
+        // touch the real account, so the parent sells on its own account instead
+        SystemPtr holder = _findLeafByStock(sys, stk);
+        if (holder && holder->getTM() == m_tm) {
+            TradeRecord tr = on_open ? holder->sellForceOnOpen(date, num, PART_PORTFOLIO)
+                                     : holder->sellForceOnClose(date, num, PART_PORTFOLIO);
+            if (!tr.isNull()) {
+                out.push_back(tr);
+            }
+            continue;
+        }
+        price_t price = on_open ? _getOpenPrice(date, stk) : _getClosePrice(date, stk);
+        if (price <= 0.0) {
+            continue;  // No quote (suspended): the liquidation is left to the next session
+        }
+        TradeRecord tr = m_tm->sell(date, stk, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
+                                    "MultiSystem");
+        if (!tr.isNull()) {
+            out.push_back(tr);
+        }
+    }
+}
+
 void MultiSystem::_runModeCClose(const SystemPtr& sys, const Datetime& datetime,
                                  TradeSuggestionList& suggestions, TradeRecordList& executed) {
     size_t i = _subIndex(sys);
@@ -2086,20 +2158,17 @@ void MultiSystem::_closePhaseModeC(const Datetime& datetime, bool is_adjust,
     // sell signal of that very day is still realized); whatever still holds afterwards goes to the
     // force-sell pool, where it stops being watched when the forced liquidation is off.
     for (auto& sys : will_remove) {
-        Stock stk = sys->getStock();
-        double num = stk.isNull() ? 0.0 : m_tm->getHoldNumber(datetime, stk);
-        if (num <= 0.0) {
+        // A nested aggregate carries no stock of its own: its holding lives on the shared account
+        // under the leaf instruments, so the judgement looks through the sub-tree
+        if (_subTreeHoldNumber(sys, datetime) <= 0.0) {
             continue;
         }
         if (m_sell_at_not_selected) {
-            TradeRecord tr = sys->sellForceOnClose(datetime, num, PART_PORTFOLIO);
-            if (!tr.isNull()) {
-                executed.push_back(tr);
-            }
+            _forceSellSubTree(sys, datetime, false, executed);
         } else {
             _runModeCClose(sys, datetime, suggestions, executed);
         }
-        if (!stk.isNull() && m_tm->have(stk)) {
+        if (_subTreeHoldNumber(sys, datetime) > 0.0) {
             bool already = false;
             for (auto& held : m_force_sell_list) {
                 if (held.get() == sys.get()) {
