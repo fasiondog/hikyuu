@@ -777,6 +777,38 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
 }
 
+/** @par Check point: L3 clips an open short (a SELL that grows the short exposure) too */
+TEST_CASE("test_AllocateFunds_L3_short_concentration") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    af->setParam<double>("max-single-position", 0.5);  // cap 50000
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.plan_price = 10.0;
+    s.type = SuggestionType::SELL;
+    s.short_side = true;  // open a short
+    s.number = 20000.0;   // 200000 > cap 50000
+
+    /** @arg an open short that exceeds the cap is clipped to 5000 shares */
+    TradeSuggestionList suggestions{s};
+    af->_checkRisk(date, tm, suggestions, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+
+    /** @arg a cover (a BUY that reduces the short) is not clipped */
+    TradeSuggestion c = s;
+    c.type = SuggestionType::BUY;
+    c.short_side = true;
+    c.number = 20000.0;
+    TradeSuggestionList suggestions2{c};
+    af->_checkRisk(date, tm, suggestions2, KQuery());
+    CHECK_EQ(suggestions2[0].number, doctest::Approx(20000.0));
+}
+
 /** @par Check point: L2 total budget cap (max-total-position proportional scaling) */
 TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);

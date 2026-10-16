@@ -371,15 +371,24 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
     double total_assets = tm ? tm->getFunds(date, ktype).total_assets() : 0.0;
     double cap = total_assets * max_ratio;
     for (auto& s : suggestions) {
-        if (s.type != SuggestionType::BUY || s.number <= 0.0 || s.plan_price <= 0.0) {
+        if (s.number <= 0.0 || s.plan_price <= 0.0 || s.stock.isNull()) {
             continue;
         }
-        double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+        // Only an order that GROWS the absolute exposure can breach the cap: a long buy or an open
+        // short; a long sell or a cover reduces it
+        const bool grows = (s.type == SuggestionType::BUY && !s.short_side) ||
+                           (s.type == SuggestionType::SELL && s.short_side);
+        if (!grows) {
+            continue;
+        }
+        double current = tm ? (s.short_side ? tm->getShortPosition(s.stock).number
+                                            : tm->getPosition(date, s.stock).number)
+                            : 0.0;
         price_t unit = s.stock.unit();
-        double target_value = (current + s.number) * s.plan_price * (unit > 0.0 ? unit : 1.0);
+        double u = (unit > 0.0) ? unit : 1.0;
+        double target_value = (current + s.number) * s.plan_price * u;
         if (target_value > cap) {
-            double max_shares =
-              (s.plan_price > 0.0) ? cap / (s.plan_price * (unit > 0.0 ? unit : 1.0)) : 0.0;
+            double max_shares = (s.plan_price > 0.0) ? cap / (s.plan_price * u) : 0.0;
             s.number = max_shares > current ? max_shares - current : 0.0;
         }
     }
