@@ -54,8 +54,7 @@
 
 namespace hku {
 
-class System;       // Forward declaration, to avoid a circular include with System.h
-class MultiSystem;  // Forward declaration: the friend that migrates the legacy mode on load
+class System;  // Forward declaration, to avoid a circular include with System.h
 using SYSPtr = std::shared_ptr<System>;
 
 class AllocateFundsBase;
@@ -219,11 +218,6 @@ protected:
     KQuery m_query;
     TradeManagerPtr m_tm;
     bool m_is_python_object{false};
-    // Legacy archive migration buffer: the running mode lived here up to archive version 1 (it is
-    // now owned by MultiSystem). Loading an old archive records it here so that the owner
-    // (MultiSystem) can migrate it; it carries no runtime meaning and is never serialized.
-    string m_legacy_mode;
-    friend class MultiSystem;
 
 //============================================
 // Serialization support
@@ -231,30 +225,14 @@ protected:
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
+    // The current schema only; no compatibility with the older archives. m_query and m_tm are set
+    // temporarily when the system runs, they do not need to be serialized
     template <class Archive>
-    void save(Archive& ar, const unsigned int version) const {
+    void serialize(Archive& ar, const unsigned int) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // The running mode is no longer saved here (it is owned by MultiSystem).
-        // m_query and m_tm are set temporarily when the system runs, they do not need to be
-        // serialized
     }
-
-    template <class Archive>
-    void load(Archive& ar, const unsigned int version) {
-        ar& BOOST_SERIALIZATION_NVP(m_name);
-        ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        if (version < 1) {
-            // The running mode was at this position in the old archives; keep it in m_legacy_mode
-            // so that MultiSystem can migrate it.
-            m_legacy_mode = "A";
-            ar& boost::serialization::make_nvp("m_mode", m_legacy_mode);
-        }
-    }
-
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
 
@@ -298,10 +276,6 @@ HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsPtr&);
 
 } /* namespace hku */
-
-#if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_VERSION(::hku::AllocateFundsBase, 1)
-#endif
 
 #if FMT_VERSION >= 90000
 template <>

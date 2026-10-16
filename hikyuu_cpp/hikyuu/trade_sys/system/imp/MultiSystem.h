@@ -578,32 +578,18 @@ private:
 private:
     friend class boost::serialization::access;
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
+    void serialize(Archive& ar, const unsigned int) {
+        // The current schema only; no compatibility with the older archives
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
         ar& BOOST_SERIALIZATION_NVP(m_sys_list);
         ar& BOOST_SERIALIZATION_NVP(m_sub_init_cash);
         ar& BOOST_SERIALIZATION_NVP(m_adjust_cycle);
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);
         ar& BOOST_SERIALIZATION_NVP(m_sell_at_not_selected);
-        if (version >= 2) {
-            // The running mode is owned by the aggregate system itself again; the AF no longer
-            // holds it (AllocateFundsBase version 1 dropped the field).
-            ar& BOOST_SERIALIZATION_NVP(m_mode);
-            ar& BOOST_SERIALIZATION_NVP(m_af);
-        } else if (version == 1) {
-            // Archive version 1: the mode was held by the AF. The AF load path stashes it in its
-            // legacy buffer (AllocateFundsBase version < 1), migrate it after the AF is loaded.
-            ar& BOOST_SERIALIZATION_NVP(m_af);
-            if (m_af && !m_af->m_legacy_mode.empty()) {
-                m_mode = m_af->m_legacy_mode;
-            }
-        } else {
-            // Archive version 0: the mode was stored here as m_mode before it migrated to the AF.
-            string legacy_mode = "A";
-            ar& boost::serialization::make_nvp("m_mode", legacy_mode);
-            m_mode = legacy_mode;
-        }
+        ar& BOOST_SERIALIZATION_NVP(m_mode);
+        ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_se);
+        ar& BOOST_SERIALIZATION_NVP(m_path);
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
@@ -621,7 +607,3 @@ using PortfolioPtr = MultiSystemPtr;
 using PFPtr = MultiSystemPtr;
 
 }  // namespace hku
-
-#if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_VERSION(::hku::MultiSystem, 2)
-#endif

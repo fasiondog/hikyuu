@@ -577,7 +577,7 @@ Common parameters:
 
 Running modes (held by the aggregate system itself, set via set_mode or the preset PF factories):
 
-- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is reset on every rebalancing day); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
+- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is never reset, the shadows run continuously); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
 
 - Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account.
 
@@ -632,10 +632,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
       .def_property_readonly("mode", &MultiSystem::getMode,
                              "The current running mode: \"A\" Signal Aggregation / \"B\" Fund "
                              "Allocation / \"C\" Shared Account Compatibility")
-      .def("set_sub_init_cash", &MultiSystem::setSubInitCash, py::arg("cash"),
-           "Set the signal cash of the sub-system shadow account, reset on every rebalancing day "
-           "in mode A. In mode B the shadow accounts start from zero and the quota comes from the "
-           "L1 allocation, so this value is unused")
+      .def(
+        "set_sub_init_cash", &MultiSystem::setSubInitCash, py::arg("cash"),
+        "Set the signal cash of the sub-system shadow account; in mode A the shadow is created "
+        "once and runs continuously (never reset). In mode B the shadow accounts start from zero "
+        "and the quota comes from the L1 allocation, so this value is unused")
       .def("set_adjust_cycle", &MultiSystem::setAdjustCycle, py::arg("days"),
            "Set the rebalancing cycle (days), <=1 means rebalancing on every close day")
       .def("set_axis_mode", &MultiSystem::setAxisMode, py::arg("mode"),
@@ -894,10 +895,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     Create a portfolio running in mode A "Signal Aggregation" (the signal sources + the parent uniform ordering).
 
     Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
-    accounts (the signal cash is reset on every rebalancing day); the parent converts the suggestions
-    into the target positions of the parent account by the AF L2 (target market value = weight x
-    position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta
-    against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
+    accounts (the signal cash is never reset, the shadows run continuously); the parent converts the
+    suggestions into the target positions of the parent account by the AF L2 (target market value =
+    weight x position ratio x the parent net assets, aggregated per instrument and rebalanced by the
+    delta against the current position) and the L3 portfolio risk control applies (e.g.
+    max-single-position).
     The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
 
     This is the preset that PF_WithoutAF carried during the beginning of the three-mode
@@ -912,7 +914,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     :param bool delay_to_trading_day: when that day is not a trading day, it is postponed to the first trading day within the current cycle
     :param bool trade_on_close: whether the trade is executed at the close
     :param bool sell_at_not_selected: whether to force selling the stocks not selected on the rebalancing day
-    :param float sub_init_cash: the signal cash of every sub-system shadow account, reset on every rebalancing day
+    :param float sub_init_cash: the signal cash of every sub-system shadow account (never reset)
     :rtype: MultiSystem)");
 
     //--------------------------------------------------------------------------------------

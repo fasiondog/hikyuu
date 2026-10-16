@@ -6,10 +6,10 @@
  *  Created on: 2026-10-06
  *      Author: fasiondog
  *
- *  PF is a preset configuration of MultiSystem, so this factory directly returns MultiSystemPtr,
+ * PF is a preset configuration of MultiSystem, so this factory directly returns MultiSystemPtr,
  *  no shell class is introduced. The returned aggregate system runs in
  *  **mode A "Signal Aggregation"**: the sub-systems are pure signal sources on their shadow
- *  accounts (the signal cash is reset on every rebalancing day), the parent converts the
+ *  accounts (the signal cash is never reset, the shadows run continuously), the parent converts the
  *  suggestions into the executable quantity by the L2 target conversion and orders uniformly on
  *  the parent account (see the MultiSystem class comment for the full semantics).
  *
@@ -46,8 +46,9 @@ namespace hku {
  * @note The sub-systems always use their own shadow accounts (TM_SUB, shared_tm=false), so the real
  *       account of the parent is only touched by the orders of the parent itself. The suggestions
  *       are converted into the target positions by the AF L2 (weight x position ratio x the parent
- *       total assets, aggregated per instrument) and the L3 portfolio risk control applies. On a
- *       rebalancing day the sub-systems that the SE does not admit are skipped.
+ *       net assets, aggregated per instrument) and the L3 portfolio risk control applies. On a
+ *       rebalancing day a sub-system the SE does not admit contributes a zero signal (its
+ *       instruments drop out of the parent target); the shadow itself keeps running.
  * @param tm trade account
  * @param se system selector
  * @param af the portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3), equal weight by
@@ -60,8 +61,8 @@ namespace hku {
  * @param trade_on_close execute the trade at the close
  * @param sell_at_not_selected whether to force selling the stocks not selected on the rebalancing
  *                             day, false by default
- * @param sub_init_cash the signal cash of every sub-system shadow account, reset on every
- *                      rebalancing day
+ * @param sub_init_cash the signal cash of every sub-system shadow account (never reset, the shadow
+ *                      runs continuously)
  * @return the portfolio instance (MultiSystemPtr)
  * @ingroup Portfolio
  */

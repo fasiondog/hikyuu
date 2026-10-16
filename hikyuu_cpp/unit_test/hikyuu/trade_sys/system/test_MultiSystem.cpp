@@ -16,10 +16,11 @@
  *                        AF_FixedWeightList subclasses) / mode B real quota (including
  *                        fixed-amount migrated from AF_FixedAmount) / max-total-position
  *                        budget cap;
- *       - L2 behavior-level conversion: mode A conversion by assets_ratio (full semantics
- *                        pass-through of design 8.3) / fixed-amount / SELL-CLEAR closing the
- *                        whole position / over-allocation converted to position reduction /
- *                        mode B pass-through clipping;
+ *       - L2 behavior-level conversion: mode A synthesis of the signed net target from the
+ *                        sub-system intent state (target_position_ratio) and trade-the-delta /
+ *                        fixed-amount / SELL-CLEAR closing the whole position / over-allocation
+ *                        converted to position reduction / the short clamp without a securities-
+ *                        lending facility / mode B pass-through clipping;
  *       - L3 portfolio risk control: max-single-position concentration clipping / skipped
  *                        in mode B.
  *  @note MM has been restricted to the single-system form; the portfolio-level allocation
@@ -2661,6 +2662,89 @@ TEST_CASE("test_MultiSystem_ready_for_run_syncs_margin_params") {
     /** @arg the two switches reach the aggregate's own TM */
     CHECK_UNARY(ms->getTM()->getParam<bool>("support_borrow_cash"));
     CHECK_UNARY(ms->getTM()->getParam<bool>("support_borrow_stock"));
+}
+
+/** @par Check point: mode A clamps the negative net target to zero when the parent account cannot
+ * borrow securities (otherwise the short order is silently rejected by the TM); with borrowing
+ * supported the short target is kept as a short-side SELL. */
+TEST_CASE("test_AllocateFunds_L2_modeA_short_clamp_without_borrow") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // support_borrow_stock defaults to false
+    REQUIRE_UNARY(!tm->getParam<bool>("support_borrow_stock"));
+    auto af = AF_EqualWeight();
+    Datetime date(200001010000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sys;
+    s.plan_price = 10.0;
+    s.target_position_ratio = -0.5;  // a net short target
+
+    /** @arg without borrow the negative target is clamped to zero: no order is emitted */
+    TradeSuggestionList suggestions{s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    CHECK_UNARY(suggestions.empty());
+
+    /** @arg with borrow the short target is kept: a short-side SELL opens the short */
+    tm->setParam<bool>("support_borrow_stock", true);
+    suggestions.assign(1, s);
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK(suggestions[0].type == SuggestionType::SELL);
+    CHECK_UNARY(suggestions[0].short_side);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+}
+
+/** Recording AF: keeps the last L1 context list so the test can inspect what MultiSystem filled */
+class RecordingContextAF : public AllocateFundsBase {
+public:
+    RecordingContextAF() : AllocateFundsBase("RecordingContextAF") {}
+
+    AllocateFundsPtr _clone() override {
+        return std::make_shared<RecordingContextAF>();
+    }
+
+    Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
+                      SubSystemContextList& contexts, const KQuery& query,
+                      const string& mode) override {
+        last_contexts = contexts;
+        return AllocateFundsBase::_allocate(date, tm, contexts, query, mode);
+    }
+
+    SubSystemContextList last_contexts;
+};
+
+/** @par Check point: mode A fills the L1 context fields -- current_weight (the sub account scale
+ * over the parent real account) and total_return (the shadow return over the initial signal cash).
+ * They used to be filled only by the mode B path, so a mode A AF always saw zeros. */
+TEST_CASE("test_MultiSystem_mode_a_context_fields") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, create_alway_buy_sys());
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = make_shared<RecordingContextAF>();
+    price_t sub_init_cash = 100000.0;
+    auto pf =
+      PF_SignalAggregate(tm, se, af, 1, "query", true, true, false, sub_init_cash);  // mode A
+    REQUIRE_EQ(pf->getMode(), "A");
+    pf->run(query);
+
+    REQUIRE_EQ(af->last_contexts.size(), 1);
+    const auto& ctx = af->last_contexts[0];
+
+    /** @arg the sub account scale over the parent real account is filled (previously always 0) */
+    CHECK_UNARY(ctx.current_weight > 0.0);
+
+    /** @arg the shadow return over the initial signal cash is filled with the documented formula */
+    CHECK_UNARY(std::isfinite(ctx.total_return));
+    CHECK_EQ(ctx.total_return,
+             doctest::Approx((ctx.funds.total_assets() - sub_init_cash) / sub_init_cash));
 }
 
 /** @} */

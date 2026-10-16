@@ -20,8 +20,8 @@ MultiSystemPtr HKU_API PF_SignalAggregate(const TMPtr& tm, const SEPtr& se, cons
                                           bool sell_at_not_selected, price_t sub_init_cash) {
     auto sys = std::make_shared<MultiSystem>("PF_SignalAggregate");
     // The preset: MultiSystem mode A "Signal Aggregation" (the signal sources + the parent uniform
-    // ordering). The shadow account of every sub-system is funded with sub_init_cash and reset on
-    // every rebalancing day, so a sub-system keeps submitting a fresh position intent.
+    // ordering). The shadow account of every sub-system is funded with sub_init_cash and runs
+    // continuously (never reset), so a sub-system keeps submitting its current position intent.
     sys->setAF(af == nullptr ? AF_EqualWeight() : af);
     sys->setMode("A");
     sys->setTM(tm);

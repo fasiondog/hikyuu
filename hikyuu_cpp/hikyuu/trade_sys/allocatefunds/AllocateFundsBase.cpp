@@ -23,6 +23,10 @@ namespace hku {
 // surprise is worth exactly one log line per process instead of one per rebalance
 static std::once_flag g_fixed_amount_warn_flag;
 
+// The one-shot notice flag of the mode A short clamp: a parent account without a securities-lending
+// facility cannot run the negative net targets, they are clamped to zero (once per process)
+static std::once_flag g_short_unsupported_warn_flag;
+
 HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsBase& af) {
     os << "AllocateFunds(" << af.name() << ", " << af.getParameter() << ")";
     return os;
@@ -294,6 +298,28 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             target_value[kv.first] = target;
             gross += std::fabs(target);
         }
+    }
+
+    // The parent cannot run a short book without a securities-lending facility: clamp the negative
+    // net targets to zero and warn, so a short order is never silently rejected by the TM
+    const bool support_borrow =
+      tm->haveParam("support_borrow_stock") && tm->getParam<bool>("support_borrow_stock");
+    if (!support_borrow) {
+        double gross_clamped = 0.0;
+        for (auto& kv : target_value) {
+            if (kv.second < 0.0) {
+                std::call_once(g_short_unsupported_warn_flag, [this]() {
+                    HKU_WARN(
+                      "{}::_toTargets: the parent account does not support borrowing securities, "
+                      "the negative net targets are clamped to zero! Set support_borrow_stock=true "
+                      "on the system to allow shorting.",
+                      m_name);
+                });
+                kv.second = 0.0;
+            }
+            gross_clamped += std::fabs(kv.second);
+        }
+        gross = gross_clamped;
     }
 
     // The total budget cap: the aggregated gross target market value <= net assets x
