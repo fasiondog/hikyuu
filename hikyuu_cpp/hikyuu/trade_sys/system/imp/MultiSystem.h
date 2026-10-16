@@ -490,6 +490,11 @@ private:
      * the last trading day of the instrument is earlier than the current running date) */
     TradeRecordList _forceSellDelisted(const Datetime& date);
 
+    /** Queue the close-stage suggestions for the execution at the next open (trade_on_close=false).
+     *  Appends to the still un-executed pending list (with a warning) instead of overwriting it, so
+     *  that a double-driven close of the same day cannot silently drop the earlier batch. */
+    void _queueOpenPending(const TradeSuggestionList& suggestions);
+
 private:
     SystemList m_sys_list;
     size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment

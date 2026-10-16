@@ -10,6 +10,7 @@
 
 #include "MultiSystem.h"
 
+#include <algorithm>
 #include <map>
 #include <cmath>
 #include <set>
@@ -698,77 +699,113 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
     // short book keeps a meaningful ratio.
     double base_assets = funds_before.net_assets();
     double base_cash = funds_before.cash;
-    std::map<Stock, double> net;     // The signed net exposure delta (shares; long +, short -)
-    std::map<Stock, price_t> price;  // The planned price (the traded price)
 
-    // Both sides fold into one signed net exposure delta per instrument: a cover raises the net
-    // exposure, a short sale lowers it.
+    // One suggestion per executed leg (per instrument and TM primitive), never folded into one
+    // signed net delta: the leg structure is the only thing the parent can mirror 1:1. A folded
+    // net delta that crosses zero (e.g. a nested aggregate selling its long leg and opening a
+    // short leg on the same instrument in one bar) is not expressible by any single TM primitive
+    // -- the reconstructed one-leg order would sell more than the parent holds and be rejected.
+    enum LegAction { LEG_BUY = 0, LEG_SELL, LEG_COVER, LEG_OPENSHORT };
+    struct LegAcc {
+        double number{0.0};
+        price_t price{0.0};
+    };
+    std::map<std::pair<Stock, int>, LegAcc> legs;
+    std::set<Stock> stocks;
     for (const auto& tr : trades) {
-        if (tr.business == BUSINESS_INVALID) {
+        int action;
+        switch (tr.business) {
+            case BUSINESS_BUY:
+                action = LEG_BUY;
+                break;
+            case BUSINESS_SELL:
+                action = LEG_SELL;
+                break;
+            case BUSINESS_BUY_SHORT:
+                action = LEG_COVER;
+                break;
+            case BUSINESS_SELL_SHORT:
+                action = LEG_OPENSHORT;
+                break;
+            default:
+                continue;
+        }
+        if (tr.stock.isNull() || tr.number == 0.0) {
             continue;
         }
-        if (tr.business == BUSINESS_BUY) {
-            net[tr.stock] += tr.number;
-        } else if (tr.business == BUSINESS_SELL) {
-            net[tr.stock] -= tr.number;
-        } else if (tr.business == BUSINESS_BUY_SHORT) {
-            net[tr.stock] += tr.number;
-        } else if (tr.business == BUSINESS_SELL_SHORT) {
-            net[tr.stock] -= tr.number;
-        }
+        LegAcc& acc = legs[{tr.stock, action}];
+        acc.number += tr.number;
         if (tr.realPrice > 0.0) {
-            price[tr.stock] = tr.realPrice;
+            acc.price = tr.realPrice;
+        }
+        stocks.insert(tr.stock);
+    }
+
+    // The post-trade book of every traded instrument (getPosition already reflects the just
+    // executed trades), used for the CLEAR detection
+    std::map<Stock, std::pair<double, double>> post_book;  // stock -> (long, short)
+    if (sys->getTM()) {
+        for (const auto& stock : stocks) {
+            post_book[stock] = {sys->getTM()->getPosition(datetime, stock).number,
+                                sys->getTM()->getShortPosition(stock).number};
         }
     }
 
-    for (auto& kv : net) {
-        const Stock& stock = kv.first;
-        double n = kv.second;
-        if (stock.isNull() || n == 0.0) {
+    for (const auto& kv : legs) {
+        const Stock& stock = kv.first.first;
+        int action = kv.first.second;
+        const LegAcc& acc = kv.second;
+        if (stock.isNull() || acc.number == 0.0) {
             continue;
         }
         TradeSuggestion s;
         s.stock = stock;
         s.sys = sys;
-        s.number = std::fabs(n);
-        s.plan_price = price[stock];
+        s.number = std::fabs(acc.number);
+        s.plan_price = acc.price;
         s.plan_cash = s.number * s.plan_price * stock.unit();
         s.from = PART_SYSTEM;
-        // The side is decided by the PRE-trade net position: getPosition/getShortPosition already
-        // reflect the just-executed trades, so back out the signed delta n to recover the state
-        // before them. Reading the post-trade state misclassifies a full cover (the short book
-        // flattened) as opening a long.
-        double long_pos = 0.0;
-        double short_pos = 0.0;
-        if (sys->getTM()) {
-            long_pos = sys->getTM()->getPosition(datetime, stock).number;
-            short_pos = sys->getTM()->getShortPosition(stock).number;
+        bool flattens = false;
+        switch (action) {
+            case LEG_BUY:
+                s.type = SuggestionType::BUY;
+                s.short_side = false;
+                break;
+            case LEG_SELL:
+                s.short_side = false;
+                flattens = post_book.count(stock) && post_book[stock].first == 0.0;
+                s.type = flattens ? SuggestionType::CLEAR : SuggestionType::SELL;
+                break;
+            case LEG_COVER:
+                s.short_side = true;
+                flattens = post_book.count(stock) && post_book[stock].second == 0.0;
+                s.type = flattens ? SuggestionType::CLEAR : SuggestionType::BUY;
+                break;
+            case LEG_OPENSHORT:
+                s.type = SuggestionType::SELL;
+                s.short_side = true;
+                break;
         }
-        double net_pos = long_pos - short_pos;
-        double pre_net = net_pos - n;
-        // Growing the net exposure covers a short only when the book was short before; shrinking
-        // it opens a short when the book was flat or short before
-        s.short_side = (n > 0.0) ? (pre_net < 0.0) : (pre_net <= 0.0);
-        if (n > 0.0) {
-            // A full cover flattens the short book: emit a CLEAR so the executor exits the whole
-            // remaining short position
-            s.type =
-              (pre_net < 0.0 && net_pos == 0.0) ? SuggestionType::CLEAR : SuggestionType::BUY;
-        } else {
-            // A full flat empties the long book: emit a CLEAR to exit the whole position
-            s.type = (net_pos == 0.0) ? SuggestionType::CLEAR : SuggestionType::SELL;
-        }
-        // The three ratios: the sub-system before-trade net assets are the denominator. The sign of
-        // assets_ratio encodes the direction (> 0 buy/cover, < 0 sell/open-short) and the
-        // target_position_ratio carries the signed net target level
-        if (base_assets > 0.0) {
+        // The three ratios: the sub-system before-trade net assets are the denominator. The sign
+        // of assets_ratio encodes the direction (> 0 buy/cover, < 0 sell/open-short);
+        // target_position_ratio carries the signed net target level of the instrument -- attached
+        // to the first leg of the stock only, so that a per-suggestion summation does not double
+        // the level of a two-leg crossing
+        if (base_assets > 0.0 && s.plan_price > 0.0) {
             double ratio = s.plan_cash / base_assets;
             if (ratio > 1.0) {
                 ratio = 1.0;
             }
-            s.assets_ratio = (n > 0.0) ? ratio : -ratio;
-            s.target_position_ratio =
-              (s.plan_price > 0.0) ? net_pos * s.plan_price * stock.unit() / base_assets : 0.0;
+            s.assets_ratio = (action == LEG_BUY || action == LEG_COVER) ? ratio : -ratio;
+            bool first_leg_of_stock =
+              std::none_of(result.begin(), result.end(),
+                           [&stock](const TradeSuggestion& x) { return x.stock == stock; });
+            if (first_leg_of_stock) {
+                double long_pos = post_book.count(stock) ? post_book[stock].first : 0.0;
+                double short_pos = post_book.count(stock) ? post_book[stock].second : 0.0;
+                s.target_position_ratio =
+                  (long_pos - short_pos) * s.plan_price * stock.unit() / base_assets;
+            }
         }
         if (base_cash > 0.0) {
             s.cash_ratio = s.plan_cash / base_cash;
@@ -776,6 +813,18 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
         result.push_back(s);
     }
     return result;
+}
+
+void MultiSystem::_queueOpenPending(const TradeSuggestionList& suggestions) {
+    HKU_WARN_IF_RETURN(suggestions.empty(), void(), "Empty suggestions!");
+    // Append rather than overwrite: if this close is driven twice on the same day (a double-driven
+    // live session or a user misuse), overwriting would silently drop the still un-executed
+    // earlier batch queued before the next open
+    HKU_WARN_IF(!m_open_pending_suggestions.empty(),
+                "{}: {} un-executed open pending suggestions exist, appending {} new ones!", name(),
+                m_open_pending_suggestions.size(), suggestions.size());
+    m_open_pending_suggestions.insert(m_open_pending_suggestions.end(), suggestions.begin(),
+                                      suggestions.end());
 }
 
 bool MultiSystem::_isAdjustDate(const Datetime& date) const {
@@ -1338,7 +1387,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             if (m_trade_on_close) {
                 _executeSuggestions(datetime, suggestions, ktype, executed);
             } else {
-                m_open_pending_suggestions = suggestions;
+                _queueOpenPending(suggestions);
             }
         }
         m_last_suggestions = suggestions;
@@ -1357,7 +1406,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                     _executeSuggestions(datetime, suggestions, ktype, executed);
                 } else {
                     // trade_on_close=false: convert first, execute uniformly at the next open
-                    m_open_pending_suggestions = suggestions;
+                    _queueOpenPending(suggestions);
                 }
             }
         } else {
@@ -1385,7 +1434,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                     _executeSuggestions(datetime, suggestions, ktype, executed);
                 } else {
                     // trade_on_close=false: convert first, execute uniformly at the next open
-                    m_open_pending_suggestions = suggestions;
+                    _queueOpenPending(suggestions);
                 }
             }
             for (auto& ctx : contexts) {
@@ -1401,7 +1450,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             _executeSuggestions(datetime, suggestions, ktype, executed);
         } else {
             // trade_on_close=false: convert first, execute uniformly at the next open
-            m_open_pending_suggestions = suggestions;
+            _queueOpenPending(suggestions);
         }
     }
 
@@ -1497,7 +1546,7 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
         if (m_trade_on_close) {
             _executeSuggestions(datetime, suggestions, ktype, executed);
         } else {
-            m_open_pending_suggestions = suggestions;
+            _queueOpenPending(suggestions);
         }
     }
 

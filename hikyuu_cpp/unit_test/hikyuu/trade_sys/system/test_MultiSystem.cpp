@@ -2327,6 +2327,91 @@ TEST_CASE("test_MultiSystem_mode_b_mirror_cover_short_side") {
     CHECK_EQ(tm->getShortPosition(stk).number, 0.0);
 }
 
+/** @par Check point: mode B mirror of a zero-crossing sub book -- a nested aggregate that sells its
+ * long leg and opens a short leg on the same instrument in one bar must reach the parent as TWO
+ * legs (a long-side CLEAR + a short-side SELL). The old net-delta folding reconstructed a single
+ * one-leg order (sell ~300 with only 100 held) that the TM rejected, dropping the whole mirror. */
+TEST_CASE("test_MultiSystem_mode_b_mirror_zero_crossing") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 4);
+
+    // d0: the mode B quota is injected into the aggregate only AFTER the first close, so the
+    // aggregate can trade from d1 on
+    Datetime d1 = kdata[1].datetime;
+    Datetime d2 = kdata[2].datetime;
+
+    // child1 (long leg): buy 200 on d1, sell all on d2 -- reuses ScriptedShortSG with the dates
+    // swapped (sell signal on d2, buy signal on d1). The short child must OUTWEIGH the long child
+    // at the aggregate (the L2 target is sum(weight x ratio), equal weights 0.5), otherwise the
+    // net target stays positive and no zero-crossing happens: the short 600 maps to the ratio
+    // -0.168 while the long 200 maps to +0.056, so the aggregate net target goes negative
+    auto sg1 = make_shared<ScriptedShortSG>(d2, d1);
+    auto sys1 = SYS_Simple(crtTM(), MM_FixedCount(200), EnvironmentPtr(), ConditionPtr(), sg1);
+    sys1->setParam<bool>("buy_delay", false);
+    sys1->setParam<bool>("sell_delay", false);
+    sys1->setStock(stk);
+
+    // child2 (short leg): open a short of 600 on d2 only (the cover date is out of the window)
+    auto sg2 = make_shared<ScriptedShortSG>(d2, Datetime(299901010000LL));
+    sg2->setParam<bool>("support_borrow_stock", true);
+    auto sys2 = SYS_Simple(crtTM(), MM_FixedCount(600), EnvironmentPtr(), ConditionPtr(), sg2);
+    sys2->setParam<bool>("buy_delay", false);
+    sys2->setParam<bool>("sell_delay", false);
+    sys2->setParam<bool>("support_borrow_stock", true);
+    sys2->setStock(stk);
+
+    // The nested mode A aggregate: its own account buys 100 shares on d1 and flips to a short book
+    // on d2 (sell the 100 long + open ~200 short in the same bar)
+    auto agg = PF_SignalAggregate(crtTM(), SE_Fixed(), AF_EqualWeight(), 1, "query", true);
+    agg->add(sys1);
+    agg->add(sys2);
+    agg->setParam<bool>("support_borrow_stock", true);  // the aggregate account opens the short
+
+    // The grandparent mirrors the aggregate account (mode B, no SE: an aggregate proto carries no
+    // MM/SG and cannot be bound as an SE prototype, so it is added directly)
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto pf = PF_Simple(tm, SelectorPtr(), AF_EqualWeight(), 1, "query", true);  // mode B
+    REQUIRE_EQ(pf->getMode(), "B");
+    pf->add(agg);
+    pf->setParam<bool>("support_borrow_stock", true);
+    pf->run(query);
+
+    size_t buy_count = 0;
+    size_t sell_count = 0;
+    size_t sell_short_count = 0;
+    size_t buy_short_count = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock != stk) {
+            continue;
+        }
+        if (tr.business == BUSINESS_BUY) {
+            buy_count++;
+        } else if (tr.business == BUSINESS_SELL) {
+            sell_count++;
+        } else if (tr.business == BUSINESS_SELL_SHORT) {
+            sell_short_count++;
+        } else if (tr.business == BUSINESS_BUY_SHORT) {
+            buy_short_count++;
+        }
+    }
+
+    /** @arg d1: the long leg is mirrored as one buy */
+    CHECK_EQ(buy_count, 1);
+
+    /** @arg d2: the crossing reaches the parent as both legs -- the long-side exit (the CLEAR sell)
+     * AND the short-side opening; the folded one-leg order would have been rejected (sell 300 with
+     * only 200 held) and left both counts at 0 */
+    CHECK_EQ(sell_count, 1);
+    CHECK_EQ(sell_short_count, 1);
+    CHECK_EQ(buy_short_count, 0);
+
+    /** @arg the parent ends with the mirrored short book */
+    CHECK_GT(tm->getShortPosition(stk).number, 0.0);
+}
+
 /** @par Check point: mode A (signal aggregation) -- the sub shadow signal cash stays bounded.
  * The shadows run continuously and are never reset (the old per-rebalancing-day reset was
  * removed): the sub book keeps submitting intents around the initial signal cash instead of
