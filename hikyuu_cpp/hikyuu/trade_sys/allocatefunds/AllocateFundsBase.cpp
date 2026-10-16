@@ -75,19 +75,7 @@ AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
 
 AllocateFundsBase::~AllocateFundsBase() {}
 
-void AllocateFundsBase::baseCheckParam(const string& name) const {
-    // The legacy base-class weight-list parameter has been removed (the fixed weights now go
-    // through AF_FixedWeightList / its "weights" parameter); setting it would otherwise be
-    // silently accepted and ignored, so it is called out explicitly.
-    if ("weight-list" == name) {
-        HKU_WARN(
-          "{}: the parameter \"weight-list\" has been removed and is ignored; use "
-          "AF_FixedWeightList (its \"weights\" parameter) instead!",
-          m_name);
-    }
-    // max-single-position / max-total-position / fixed-amount: <=0 means no limit (or no fixed
-    // pricing), so negative values are allowed and none of them is bounded from below.
-}
+void AllocateFundsBase::baseCheckParam(const string&) const {}
 
 void AllocateFundsBase::paramChanged() {}
 

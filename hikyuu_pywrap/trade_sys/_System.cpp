@@ -850,9 +850,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
     Mode C semantics (shared account): no shadow account is created, every sub-system trades DIRECTLY
     on the single real account of the parent (shared_tm) and is sized by its own MM, so the
-    sub-systems compete for the same cash in the pool admission order. The parent only gates the entry
-    with the SE, keeps the running pool driven and performs no L2 conversion; the AF is only the mode
-    carrier here (L1 takes no quota, L3 is off by default).
+    sub-systems compete for the same cash in the pool admission order. The parent keeps the legacy
+    DUAL-POOL driving: the running pool (admitted by the SE) and the force-sell pool (the ones that
+    left the running pool while still holding, driven on the non-rebalancing days only when
+    sell_at_not_selected is on); the two pools stay mutually exclusive. No L2 conversion is done; the
+    AF is only the mode carrier here (L1 takes no quota, L3 is off by default).
 
     On a rebalancing day a sub-system that the SE stops admitting leaves the running pool no matter
     whether it still holds: sell_at_not_selected=True liquidates it at once, while the default False

@@ -13,5 +13,6 @@
 #include "crt/PF_Simple.h"
 #include "crt/PF_SignalAggregate.h"
 #include "crt/PF_WithoutAF.h"
+#include "crt/PF_Mode.h"
 
 #endif /* PORTFOLIO_BUILD_IN_H_ */

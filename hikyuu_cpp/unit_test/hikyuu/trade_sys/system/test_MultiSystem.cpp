@@ -38,6 +38,11 @@
 #include <hikyuu/trade_sys/allocatefunds/build_in.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Fixed.h>
 #include <hikyuu/trade_sys/selector/crt/SE_Signal.h>
+#if HKU_SUPPORT_SERIALIZATION
+#include <fstream>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#endif
 #include <hikyuu/trade_sys/selector/crt/SE_Logic.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/MA.h>
@@ -2746,5 +2751,148 @@ TEST_CASE("test_MultiSystem_mode_a_context_fields") {
     CHECK_EQ(ctx.total_return,
              doctest::Approx((ctx.funds.total_assets() - sub_init_cash) / sub_init_cash));
 }
+
+/** @par Check point: the alphabetical alias factories map to the same modes and
+ * presets as the semantic-name factories */
+TEST_CASE("test_MultiSystem_pf_mode_aliases") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+
+    /** @arg PF_ModeA behaves as PF_SignalAggregate (mode A) */
+    auto se_a = SE_Fixed();
+    se_a->addStockList({stk}, create_alway_buy_sys());
+    auto a = PF_ModeA(tm, se_a, AF_EqualWeight(), 2, "query", true, true, false, 100000.0);
+    REQUIRE(a != nullptr);
+    CHECK_EQ(a->getMode(), "A");
+    CHECK_EQ(a->getSubInitCash(), doctest::Approx(100000.0));
+
+    /** @arg PF_ModeB behaves as PF_Simple (mode B, trade_on_close=true, sell_at_not_selected=true)
+     */
+    auto se_b = SE_Fixed();
+    se_b->addStockList({stk}, create_alway_buy_sys());
+    auto b = PF_ModeB(tm, se_b, AF_EqualWeight(), 2);
+    REQUIRE(b != nullptr);
+    CHECK_EQ(b->getMode(), "B");
+    CHECK_UNARY(b->getTradeOnClose());
+    CHECK_UNARY(b->getSellAtNotSelected());
+
+    /** @arg PF_ModeC behaves as PF_WithoutAF (mode C, sell_at_not_selected=false by default) */
+    auto c = PF_ModeC(tm, se_b);
+    REQUIRE(c != nullptr);
+    CHECK_EQ(c->getMode(), "C");
+    CHECK_UNARY(!c->getSellAtNotSelected());
+}
+
+/** @par Check point: the intent state of a nested aggregate child includes its already-converted
+ * but not yet executed open pending suggestions (the intent state = the net exposure + the
+ * unfilled requests; the parent snapshot must not miss the target the child has queued for its
+ * own next open) */
+TEST_CASE("test_MultiSystem_mode_a_nested_pending_intent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    // The leaf keeps the default buy_delay=true, so its first signal is a delayed request only
+    auto se_inner = SE_Fixed();
+    se_inner->addStockList(
+      {stk}, SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_AllwaysBuy()));
+    auto inner = PF_SignalAggregate(crtTM(Datetime(199001010000LL), 100000.0), se_inner,
+                                    AF_EqualWeight(), 1, "query", true, false, false, 100000.0);
+    REQUIRE_EQ(inner->getMode(), "A");
+    CHECK_UNARY(!inner->getTradeOnClose());
+
+    auto outer_tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto outer = std::make_shared<MultiSystem>("outer_mode_a");
+    outer->setTM(outer_tm);
+    outer->setMode("A");
+    outer->setAdjustCycle(1);
+    outer->setTradeOnClose(true);
+    outer->add(inner);
+    outer->run(query);
+
+    const auto& outer_trades = outer_tm->getTradeList();
+    REQUIRE_UNARY(outer_trades.size() > 0);
+
+    // The trade list starts with the BUSINESS_INIT record; take the first real trade
+    TradeRecord first;
+    for (auto& tr : outer_trades) {
+        if (tr.business != BUSINESS_INIT) {
+            first = tr;
+            break;
+        }
+    }
+    REQUIRE_UNARY(first.business != BUSINESS_INIT);
+    KData k = stk.getKData(query);
+    REQUIRE_UNARY(k.size() > 0);
+
+    /** @arg the outer layer buys on the very first close day: the queued intent of the inner
+     * aggregate is folded into the snapshot (without the folding the parent would see a zero
+     * exposure and would only start buying one day later, after the inner queue is executed) */
+    CHECK_EQ(first.business, BUSINESS_BUY);
+    CHECK_EQ(first.datetime, k.getKRecord(0).datetime);
+
+    /** @arg the inner aggregate executes its own queued target later than the outer order (its
+     * pending runs at the next open of the inner layer, while the outer layer already bought at
+     * the first close from the folded intent) */
+    TradeRecord inner_first;
+    for (auto& tr : inner->getTM()->getTradeList()) {
+        if (tr.business != BUSINESS_INIT) {
+            inner_first = tr;
+            break;
+        }
+    }
+    if (inner_first.business != BUSINESS_INIT) {
+        CHECK_GT(inner_first.datetime, first.datetime);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// test export
+//-----------------------------------------------------------------------------
+#if HKU_SUPPORT_SERIALIZATION
+/** @par Check point: the current-schema (straight-line) serialization round-trip of MultiSystem
+ * keeps the mode and the preset configuration */
+TEST_CASE("test_MultiSystem_serialize_round_trip") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    auto se = SE_Fixed();
+    se->addStockList({stk}, create_alway_buy_sys());
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto pf1 =
+      PF_SignalAggregate(tm, se, AF_FixedWeight(0.6), 3, "week", false, true, false, 50000.0);
+    pf1->name("pf_roundtrip");
+
+    StockManager& sm = StockManager::instance();
+    string filename(sm.tmpdir());
+    filename += "/MultiSystem_roundtrip.xml";
+    {
+        std::ofstream ofs(filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << BOOST_SERIALIZATION_NVP(pf1);
+    }
+
+    MultiSystemPtr pf2;
+    {
+        std::ifstream ifs(filename);
+        boost::archive::xml_iarchive ia(ifs);
+        ia >> BOOST_SERIALIZATION_NVP(pf2);
+    }
+    REQUIRE(pf2 != nullptr);
+
+    /** @arg the running mode and the preset fields survive the round-trip */
+    CHECK_EQ(pf2->getMode(), pf1->getMode());
+    CHECK_EQ(pf2->getSubInitCash(), pf1->getSubInitCash());
+    CHECK_EQ(pf2->getAdjustCycle(), pf1->getAdjustCycle());
+    CHECK_EQ(pf2->getTradeOnClose(), pf1->getTradeOnClose());
+    CHECK_EQ(pf2->getSellAtNotSelected(), pf1->getSellAtNotSelected());
+
+    /** @arg the sub-system list and the AF parameters survive the round-trip */
+    CHECK_EQ(pf2->getSystemList().size(), pf1->getSystemList().size());
+    REQUIRE(pf2->getAF() != nullptr);
+    CHECK_EQ(pf2->getAF()->getParam<double>("weight"), doctest::Approx(0.6));
+    CHECK_UNARY(pf2->getSE() != nullptr);
+}
+#endif /* HKU_SUPPORT_SERIALIZATION */
 
 /** @} */

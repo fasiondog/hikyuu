@@ -835,6 +835,8 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
             double ratio = s.plan_cash / base_assets;
             if (ratio > 1.0) {
                 ratio = 1.0;
+            } else if (ratio < -1.0) {
+                ratio = -1.0;
             }
             s.assets_ratio = (action == LEG_BUY || action == LEG_COVER) ? ratio : -ratio;
             bool first_leg_of_stock =
@@ -1405,7 +1407,6 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
 
     if (mode_c) {
         _closePhaseModeC(datetime, is_adjust, se_selected, suggestions, executed);
-        m_close_day_index++;
         // Mode C: nothing is accumulated as pending and the parent does not order again (the trades
         // have already landed on the shared real account). The translated suggestions are still
         // kept in m_last_suggestions, so that this system can serve as a sub-system of an upper
@@ -1499,8 +1500,6 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         // a mode B sub account starts from zero (no fixed initial cash)
         contexts.push_back(ctx);
     }
-
-    m_close_day_index++;
 
     if (!is_adjust) {
         // Continuous mirror (mode B): the parent mirrors the sub-system trades of this bar at once
@@ -1617,7 +1616,6 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
         }
         sub_results[i] = sys->runMomentOnClose(datetime);
     }
-    m_close_day_index++;
 
     if (!is_adjust) {
         // Non-rebalancing day: the parent does nothing (it holds the previous target)
@@ -1751,6 +1749,35 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
             }
         }
     }
+    // Fold a nested aggregate child's queued (converted but unexecuted) orders into the intent
+    for (const auto& sug : sub.pendingOnNextOpen) {
+        if (sug.stock.isNull() || sug.plan_price <= 0.0 || sug.number <= 0.0) {
+            continue;
+        }
+        // A CLEAR order number is capped at the current holding of its side (the queued orders
+        // are already converted, but stay defensive against a MAX_DOUBLE full-close number)
+        double num = sug.number;
+        if (sug.type == SuggestionType::CLEAR) {
+            double held = sug.short_side
+                            ? sub_tm->getShortPosition(sug.stock).number
+                            : sub_tm->getPosition(datetime, sug.stock).number;
+            num = std::min(num, held);
+        }
+        if (num <= 0.0) {
+            continue;
+        }
+        double v = num * sug.plan_price * sug.stock.unit() / base;
+        // The signed net exposure delta (long minus short):
+        //   + : buy a long / cover a short (BUY any side, or a short-side CLEAR)
+        //   - : sell a long / open a short (SELL any side, or a long-side CLEAR)
+        if (sug.type == SuggestionType::BUY ||
+            (sug.type == SuggestionType::CLEAR && sug.short_side)) {
+            ratio[sug.stock] += v;
+        } else if (sug.type == SuggestionType::SELL ||
+                   (sug.type == SuggestionType::CLEAR && !sug.short_side)) {
+            ratio[sug.stock] -= v;
+        }
+    }
     for (auto& kv : ratio) {
         if (kv.first.isNull() || kv.second == 0.0) {
             continue;
@@ -1762,7 +1789,7 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
         s.type =
           SuggestionType::HOLD;  // A snapshot carrier, the direction is the sign of the ratio
         s.plan_price = price_of(kv.first, 0.0);
-        s.target_position_ratio = kv.second;  // The signed net target level of this instrument
+        s.target_position_ratio = std::clamp(kv.second, -1.0, 1.0);
         s.short_side = (kv.second < 0.0);
         out.push_back(s);
     }
@@ -1772,6 +1799,8 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
                                     const TradeSuggestionList& suggestions,
                                     const TradeRecordList& executed, bool is_adjust) {
     KQuery::KType ktype = m_kdata.getQuery().kType();
+
+    m_close_day_index++;  // Every close-stage path (A/B/C) ends here exactly once
 
     // The rebalancing turnover rate: the turnover amount / the total assets before rebalancing
     // (only recorded on the rebalancing days with actual rebalancing trades)
