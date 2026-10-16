@@ -28,14 +28,16 @@ Migration points:
   the query interfaces such as `getRunningDates/getCycleEndDates/getRealSystemList` are no longer provided;
 * Custom fund allocation: build quickly with `crtAF(allocate_func[, to_targets_func, check_risk_func])`, or subclass
   `AllocateFundsBase` and override `_allocate` (L1) / `_to_targets` (L2) / `_check_risk` (L3);
-* The portfolio allocation modes (A/B) have their single source in the AF: `MultiSystem.set_mode` forwards to
-  `set_af`; serialization stays backward compatible (the `m_mode` in the old archives migrates to the AF automatically);
+* The portfolio allocation modes (A/B/C) are owned by the aggregate `MultiSystem` itself (`set_mode` / the
+  read-only `mode` attribute) and are passed into the AF hooks as the trailing `mode` argument; serialization
+  stays backward compatible (the `m_mode` in the old archives, previously held by the AF, migrates to
+  `MultiSystem` automatically);
 * The parameters without a corresponding semantic in the new system, such as `sys_use_self_tm`, are ignored with a
   warning; `AF_MultiFactor` provides the `auto_adjust_weight` parameter (default `True`, the scores are normalized
   to sum 1 before allocating, and a score sum below 1 also allocates fully; with `False` the score itself is the
   final weight).
 
-**⚠️ AF risk control is active by default**: `max-single-position` defaults to 1.0, i.e. a single instrument position value <= the total assets (`<=0` disables the limit, `>1` takes effect as 1.0); `max-total-position` defaults to 1.0, in mode A the aggregated target market value of all instruments <= the total assets, in mode B the sum of the sub-system quotas <= the total assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`. The base class also carries the `fixed-amount` parameter (when >0 it overrides the weight pricing with a warning) and `adjust_running_sys` (default `True`, mode B only; when `False` the running sub-systems keep their holdings and only the new sub-systems get the remaining cash).
+**⚠️ AF risk control is active by default**: `max-single-position` defaults to 1.0, i.e. a single instrument position value <= the net assets (`<=0` disables the limit, `>1` takes effect as 1.0); `max-total-position` defaults to 1.0, in mode A the aggregated target market value of all instruments <= the net assets, in mode B the sum of the sub-system quotas <= the net assets, scaled down proportionally with a warning when exceeded (`<=0` disables the cap). For over-allocation or leverage, lower the parameter or set it to `<=0`. The base class also carries the `fixed-amount` parameter (when >0 it overrides the weight pricing with a warning) and `adjust_running_sys` (default `True`, mode B only; when `False` the running sub-systems keep their holdings and only the new sub-systems get the remaining cash).
 
 See the docs: `trade_portfolio/portfolio` and `trade_portfolio/allocate_funds`.
 
@@ -74,7 +76,7 @@ A custom `StoplossBase` subclass previously overrode the public virtuals `getPri
 
 **🚀 New Features**
 
-* feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode A)
+* feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)
 * feat(allocatefunds): the standalone `AllocateFundsBase` base class with the `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` factories (carrying the portfolio-level L1/L2/L3)
 * feat(allocatefunds): restore the Python `crtAF` quick construction (L1 `_allocate`, with the optional L2 `_to_targets` / L3 `_check_risk` injection)
 * feat(MultiSystem): new `adjust-mode` / `delay-to-trading-day` parameters, supporting internalizing the adjust mode into an adjust-date table

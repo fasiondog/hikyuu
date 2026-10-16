@@ -26,8 +26,10 @@ for the sub-systems selected by the aggregate system :class:`MultiSystem`. AF op
 Allocation modes (A / B / C)
 ----------------------------
 
-AF selects the allocation mode through the :attr:`AllocateFundsBase.mode` attribute, which determines the overall
-running form of the aggregate system. The mode is owned by the AF (the mode query of ``MultiSystem`` is delegated to it):
+The allocation mode determines the overall running form of the aggregate system. It is owned by
+:class:`MultiSystem` itself (set via ``set_mode``, read via the read-only ``mode`` attribute) and is
+passed explicitly into every AF hook (L1/L2/L3) as the trailing ``mode`` argument; the AF itself does
+not hold it (see :doc:`../trade_sys/system`):
 
 .. list-table::
     :header-rows: 1
@@ -54,7 +56,7 @@ running form of the aggregate system. The mode is owned by the AF (the mode quer
       - Shared Account Compatibility
       - No shadow accounts; the sub-systems trade directly on the parent real account
       - Compatible with the old ``Portfolio`` semantics (the driven set is decided by the SE semantics); the parent
-        performs no L2 conversion and the AF acts only as the mode carrier
+        performs no L2 conversion and the AF provides only L1/L2/L3 no-ops (the mode is held by the aggregate system)
 
 Mode x algorithm-part mapping:
 
@@ -92,13 +94,13 @@ and :meth:`AllocateFundsBase.allocate` chains them together into a pipeline:
       - Override hook
       - Semantics
     * - L1 system-level allocation
-      - ``_allocate(date, tm, contexts, query)``
+      - ``_allocate(date, tm, contexts, query, mode)``
       - Sub-system context -> weight ``{System: weight}``; in mode B it writes the actual quota back to ``contexts[i].quota`` in place
     * - L2 behavior-level conversion
-      - ``_to_targets(date, tm, suggestions, sys_weight, query)``
+      - ``_to_targets(date, tm, suggestions, sys_weight, query, mode)``
       - Weights -> executable quantities for the parent account (in mode A, order quantities are converted proportionally; in mode B, sub-system instructions are passed through)
     * - L3 portfolio risk control
-      - ``_check_risk(date, tm, suggestions, query)``
+      - ``_check_risk(date, tm, suggestions, query, mode)``
       - Portfolio-level risk-control clipping (e.g. the ``max-single-position`` concentration cap)
 
 Both ``_to_targets`` and ``_check_risk`` come with default implementations, so usually only ``_allocate`` needs to be overridden.
@@ -119,13 +121,13 @@ The base class :class:`AllocateFundsBase` carries the following common parameter
       - float, 1.0
       - A only
       - The L3 per-instrument concentration cap: the target market value of one instrument must not exceed
-        the total assets x this value. <=0 disables the limit; a value above 1 takes effect as 1.0
+        the net assets x this value. <=0 disables the limit; a value above 1 takes effect as 1.0
     * - ``max-total-position``
       - float, 1.0
       - A / B
       - The total budget cap: in mode A it bounds the aggregated target market value of all instruments (L2)
-        by the total assets x this value; in mode B it bounds the **sum of the sub-system quotas** (L1) by
-        the total assets x this value. Scaled down proportionally with a warning when exceeded.
+        by the net assets x this value; in mode B it bounds the **sum of the sub-system quotas** (L1) by
+        the net assets x this value. Scaled down proportionally with a warning when exceeded.
         <=0 disables the cap
     * - ``fixed-amount``
       - float, 0.0
@@ -159,10 +161,19 @@ Notes:
         and the part exceeding the total budget relies on ``max-total-position`` to scale down
     * - Constant weights never trigger a reduction
       - The constant-weight AFs (e.g. ``AF_FixedWeightList``) recompute the quota from the **current** parent
-        total assets on every period, so the sub value and the quota grow in the same proportion and the
+        net assets on every period, so the sub value and the quota grow in the same proportion and the
         reduction is never triggered by the normal market movement; the force reduction only happens on a
         real cross-period shrink of the weights or the funds (and never happens when
         ``adjust_running_sys=False``)
+    * - ``fixed-amount`` is exempt from the total budget cap
+      - In mode B, when ``fixed-amount>0`` the sum of the sub-system quotas is **not** scaled down by
+        ``max-total-position``: the fixed amount is the absolute quota the caller asked for, not a proportion
+        to be scaled. The mode A gross-target cap of ``max-total-position`` applies to all instruments alike
+    * - ``fixed-amount`` is applied once per instrument in mode A
+      - In mode A the fixed amount is priced **per instrument**, not per suggestion: when the same instrument
+        is held by N sub-systems, only the aggregated signed direction is taken and one ``±fixed-amount``
+        target is applied per instrument (it is not multiplied by N). Conflicting directions cancel out, so a
+        flat aggregate drives the instrument to zero
 
 
 Built-in Asset Allocation Algorithms
@@ -224,12 +235,12 @@ Custom Asset Allocation Algorithm
 
     Quickly creates a fund allocation algorithm
 
-    :param allocate_func: the L1 system-level allocation callback ``func(self, date, tm, contexts, query)``,
-        returning ``{System: weight}``; in mode B it writes the quota back to ``contexts[i].quota`` in place and returns an empty table
+    :param allocate_func: the L1 system-level allocation callback ``func(self, date, tm, contexts, query, mode)``,
+        returning ``{System: weight}``; in mode B it writes the quota back to ``contexts[i].quota`` in place and returns an empty table. ``mode`` is the running mode ("A"/"B"/"C") passed down by the aggregate system, which owns it
     :param {} params: the parameter dictionary
     :param str name: the custom name
-    :param to_targets_func: the L2 behavior-level conversion callback ``func(self, date, tm, suggestions, sys_weight, query)``, optional
-    :param check_risk_func: the L3 portfolio risk-control callback ``func(self, date, tm, suggestions, query)``, optional
+    :param to_targets_func: the L2 behavior-level conversion callback ``func(self, date, tm, suggestions, sys_weight, query, mode)``, optional
+    :param check_risk_func: the L3 portfolio risk-control callback ``func(self, date, tm, suggestions, query, mode)``, optional
     :return: the custom fund allocation algorithm instance (``AFPtr``)
 
 The following ``my_allocate`` demonstrates both mode A (returning the weight table) and mode B (writing back the quota):
@@ -238,11 +249,12 @@ The following ``my_allocate`` demonstrates both mode A (returning the weight tab
 
     from hikyuu import *
 
-    def my_allocate(self, date, tm, contexts, query):
+    def my_allocate(self, date, tm, contexts, query, mode):
         # L1 [Required]: sub-system context -> weight
         #   Mode A: return {ctx.sys: weight}
         #   Mode B: write ctx.quota directly and return an empty table
-        if self.mode == "B":
+        #   mode is the running mode ("A"/"B"/"C") passed down by the aggregate system
+        if mode == "B":
             quota = tm.get_funds(date, query).total_assets / max(len(contexts), 1)
             for ctx in contexts:
                 ctx.quota = quota
@@ -268,7 +280,6 @@ Asset Allocation Algorithm Base Class
     .. py:attribute:: name  Name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
-    .. py:attribute:: mode  The allocation mode: ``"A"`` Signal Aggregation (the default; the parent reads the sub-systems' current intent state, synthesizes the net target and orders uniformly), ``"B"`` Fund Allocation (on the rebalancing day the selected sub-systems are calibrated to their quota before being driven, and the parent mirrors their real instructions continuously) or ``"C"`` Shared Account Compatibility (the sub-systems trade on the parent real account, no L2 conversion)
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 
@@ -309,7 +320,7 @@ Asset Allocation Algorithm Base Class
 
         Returns a clone of the instance.
 
-    .. py:method:: allocate(self, date, tm, suggestions, contexts, query)
+    .. py:method:: allocate(self, date, tm, suggestions, contexts, query, mode)
 
         The unified entry point for L1/L2/L3 (usually called internally by :class:`MultiSystem`): it first runs ``_allocate`` to obtain the weights,
         then converts them into executable quantities via ``_to_targets``, and finally applies risk-control clipping via ``_check_risk``.
@@ -319,28 +330,34 @@ Asset Allocation Algorithm Base Class
         :param TradeSuggestionList suggestions: the sub-system trade suggestions (rewritten in place)
         :param list contexts: the sub-system contexts (``SubSystemContext``; in mode B their ``quota`` field is written back in place)
         :param KQuery query: the query conditions
+        :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
 
-    .. py:method:: _allocate(self, date, tm, contexts, query)
+    .. py:method:: _allocate(self, date, tm, contexts, query, mode)
 
         [Override hook] L1 system-level allocation: determines the weight of each sub-system from the sub-system contexts.
 
         Mode A returns ``{System: weight}``; mode B writes the quota back to ``contexts[i].quota`` in place and returns an empty table.
 
+        :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
         :return: the weight table (``{System: weight}``)
 
-    .. py:method:: _to_targets(self, date, tm, suggestions, sys_weight, query)
+    .. py:method:: _to_targets(self, date, tm, suggestions, sys_weight, query, mode)
 
         [Override hook] L2 behavior-level conversion: converts the weights into executable quantities for the parent account, rewriting ``suggestions`` in place.
 
         In mode A it converts the order quantities by ``assets_ratio`` (overallocation is turned into position reduction; SELL/CLEAR close the full position);
         in mode B it passes the sub-system instructions through and applies defensive clipping. The base class default implementation is used when this hook is not overridden.
 
-    .. py:method:: _check_risk(self, date, tm, suggestions, query)
+        :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
+
+    .. py:method:: _check_risk(self, date, tm, suggestions, query, mode)
 
         [Override hook] L3 portfolio risk-control clipping: rewrites the quantities in ``suggestions`` in place.
 
         The default base-class implementation caps the per-instrument concentration by ``max-single-position`` (skipped in mode B).
         It is used when this hook is not overridden.
+
+        :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
 
     .. py:method:: _reset(self)
 

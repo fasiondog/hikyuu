@@ -16,8 +16,8 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    **preset factories**; they **return** :class:`MultiSystem`, rather than a ``Portfolio`` object. New
    projects may also use :class:`MultiSystem` directly (see :doc:`../trade_sys/system`).
 
-   The execution paradigm of a portfolio is decided by the **running mode** held by the AF, and the three
-   factories map onto the three modes:
+   The execution paradigm of a portfolio is decided by the **running mode** owned by the
+   :class:`MultiSystem` (set via ``set_mode``), and the three factories map onto the three modes:
 
    .. list-table::
       :header-rows: 1
@@ -116,8 +116,9 @@ Built-in Portfolios
     Mode C semantics (shared account): no shadow account is created, every sub-system trades **directly
     on the real account of the parent** (``shared_tm``) and is sized by its own MM, so the sub-systems
     compete for the same cash (in the pool admission order). The parent only gates the entry with the SE
-    and keeps the pool driven; it performs **no L2 conversion and never orders again**, and the AF is
-    only the mode carrier here (L1 takes no quota, L3 is off by default).
+    and keeps the pool driven; it performs **no L2 conversion and never orders again**, and the mode is
+    held by the aggregate system itself -- the AF only provides the L1/L2/L3 no-ops here (L1 takes no
+    quota, L2 needs no conversion, L3 is off by default).
 
     The driven set follows the SE semantics (the SE is freely replaceable): a sub-system admitted by the
     SE on the rebalancing day enters the running pool, and it **leaves as soon as it is not selected
@@ -166,4 +167,3 @@ Built-in Portfolios
     :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold
     :param float sub_init_cash: the signal cash of every sub-system shadow account (reset on every rebalancing day)
     :rtype: MultiSystem
-

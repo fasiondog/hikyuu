@@ -24,8 +24,9 @@
 分配模式（A / B / C）
 ---------------------
 
-AF 通过 :attr:`AllocateFundsBase.mode` 属性选择分配模式，决定聚合系统的整体运行形态。
-模式由 AF 持有（``MultiSystem`` 的模式查询委托给 AF）：
+分配模式决定聚合系统的整体运行形态。模式由 :class:`MultiSystem` 自身持有（经 ``set_mode`` 设定、
+经只读属性 ``mode`` 读取），并以末尾的 ``mode`` 形参显式传入 AF 的每个 L1/L2/L3 钩子；
+AF 自身不持有该模式（见 :doc:`../trade_sys/system`）：
 
 .. list-table::
     :header-rows: 1
@@ -48,7 +49,7 @@ AF 通过 :attr:`AllocateFundsBase.mode` 属性选择分配模式，决定聚合
     * - ``"C"``
       - 共享账户兼容（Shared Account Compatibility）
       - 无影子账户，子系统直接在父真实账户交易
-      - 兼容旧 ``Portfolio`` 语义（驱动集由 SE 语义决定）；父不做 L2 换算，AF 仅充当模式载体
+      - 兼容旧 ``Portfolio`` 语义（驱动集由 SE 语义决定）；父不做 L2 换算，AF 仅提供 L1/L2/L3 空操作（模式由聚合系统自身持有）
 
 模式 × 算法部件对照：
 
@@ -85,13 +86,13 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
       - 重载接口
       - 语义
     * - L1 系统级分配
-      - ``_allocate(date, tm, contexts, query)``
+      - ``_allocate(date, tm, contexts, query, mode)``
       - 子系统上下文 → 权重 ``{System: weight}``；模式 B 下就地回写 ``contexts[i].quota``（真实额度）
     * - L2 行为级换算
-      - ``_to_targets(date, tm, suggestions, sys_weight, query)``
+      - ``_to_targets(date, tm, suggestions, sys_weight, query, mode)``
       - 权重 → 父账户可执行数量（模式 A 按比重换算下单数量；模式 B 透传子系统指令）
     * - L3 组合风控
-      - ``_check_risk(date, tm, suggestions, query)``
+      - ``_check_risk(date, tm, suggestions, query, mode)``
       - 组合级风控裁剪（如 ``max-single-position`` 集中度上限）
 
 ``_to_targets`` 与 ``_check_risk`` 均有默认实现，通常只需重载 ``_allocate``。
@@ -111,12 +112,12 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     * - ``max-single-position``
       - float，1.0
       - 仅 A
-      - L3 单标的集中度上限：单标的目标持仓市值 ≤ 总资产 × 该值。≤0 表示不限制；大于 1 时按 1.0 生效
+      - L3 单标的集中度上限：单标的目标持仓市值 ≤ 净资产 × 该值。≤0 表示不限制；大于 1 时按 1.0 生效
     * - ``max-total-position``
       - float，1.0
       - A / B
-      - 总预算上限：模式 A 下限定 L2 全部标的聚合目标市值 ≤ 总资产 × 该值；
-        模式 B 下限定 L1 各子系统**配额总和** ≤ 总资产 × 该值。
+      - 总预算上限：模式 A 下限定 L2 全部标的聚合目标市值 ≤ 净资产 × 该值；
+        模式 B 下限定 L1 各子系统**配额总和** ≤ 净资产 × 该值。
         超出时按比例等比缩减并告警。≤0 表示不限制
     * - ``fixed-amount``
       - float，0.0
@@ -144,9 +145,17 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
         因此**评分总和小于 1 时也会满仓分配**（评分仅表达子系统间的相对比例）。
         设为 ``False`` 时评分即最终权重，超出总预算的部分依赖 ``max-total-position`` 等比缩减
     * - 恒定权重不触发减仓
-      - 恒定权重类 AF（如 ``AF_FixedWeightList``）每期按**当期父总资产**重算配额，
+      - 恒定权重类 AF（如 ``AF_FixedWeightList``）每期按**当期父净资产**重算配额，
         子账户净值与配额同比例增长，正常行情下不会触发减仓；
         强制减仓只在权重或资金**跨期收缩**时发生（或 ``adjust_running_sys=False`` 时完全不发生）
+    * - ``fixed-amount`` 豁免总预算上限
+      - 模式 B 下 ``fixed-amount>0`` 时，各子系统配额总和不参与 ``max-total-position`` 的等比缩减：
+        固定额是调用方要求的绝对额度，而非待缩放的比例。模式 A 的 ``max-total-position`` 聚合总目标市值上限
+        对全部标的同等生效
+    * - 模式 A 下 ``fixed-amount`` 按标的只应用一次
+      - 模式 A 的固定额**按标的**定价而非按建议条数：同一标的被 N 个子持有时只取聚合后的带符号方向，
+        每个标的仅应用一次 ``±fixed-amount`` 目标（不会放大成 N 倍）。方向冲突时相消，
+        净额为零则驱动该标的平仓
 
 
 内建资产分配算法
@@ -208,12 +217,12 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
     快速创建资产分配算法
 
-    :param allocate_func: L1 系统级分配接口 ``func(self, date, tm, contexts, query)``，
-        返回 ``{System: weight}``；模式 B 下就地回写 ``contexts[i].quota`` 并返回空表
+    :param allocate_func: L1 系统级分配接口 ``func(self, date, tm, contexts, query, mode)``，
+        返回 ``{System: weight}``；模式 B 下就地回写 ``contexts[i].quota`` 并返回空表。``mode`` 为聚合系统下传的运行模式（"A"/"B"/"C"），模式由聚合系统持有
     :param {} params: 参数字典
     :param str name: 自定义名称
-    :param to_targets_func: L2 行为级换算接口 ``func(self, date, tm, suggestions, sys_weight, query)``，可选
-    :param check_risk_func: L3 组合风控接口 ``func(self, date, tm, suggestions, query)``，可选
+    :param to_targets_func: L2 行为级换算接口 ``func(self, date, tm, suggestions, sys_weight, query, mode)``，可选
+    :param check_risk_func: L3 组合风控接口 ``func(self, date, tm, suggestions, query, mode)``，可选
     :return: 自定义资产分配算法实例（``AFPtr``）
 
 下例的 ``my_allocate`` 同时演示模式 A（返回权重表）与模式 B（回写额度）：
@@ -222,11 +231,12 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
     from hikyuu import *
 
-    def my_allocate(self, date, tm, contexts, query):
+    def my_allocate(self, date, tm, contexts, query, mode):
         # L1【必须】：子系统上下文 → 权重
         #   模式 A：返回 {ctx.sys: weight}
         #   模式 B：直接写 ctx.quota，并返回空表
-        if self.mode == "B":
+        #   mode 为聚合系统下传的运行模式（"A"/"B"/"C"）
+        if mode == "B":
             quota = tm.get_funds(date, query).total_assets / max(len(contexts), 1)
             for ctx in contexts:
                 ctx.quota = quota
@@ -252,7 +262,6 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
-    .. py:attribute:: mode  分配模式：``"A"`` 信号汇总（Signal Aggregation，默认；父读子当前意图态、合成每标的带符号净目标后统一下单）、``"B"`` 资金配置（Fund Allocation；调仓日先按额度校准选中子系统再驱动，父连续镜像其真实指令）或 ``"C"`` 共享账户兼容（子系统直接在父真实账户交易，父不做 L2 换算）
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 
@@ -293,7 +302,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
         克隆操作
 
-    .. py:method:: allocate(self, date, tm, suggestions, contexts, query)
+    .. py:method:: allocate(self, date, tm, suggestions, contexts, query, mode)
 
         L1/L2/L3 统一入口（通常由 :class:`MultiSystem` 内部调用）：先执行 ``_allocate`` 得到权重，
         再经 ``_to_targets`` 换算为可执行数量，最后经 ``_check_risk`` 组合风控裁剪。
@@ -303,28 +312,34 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
         :param TradeSuggestionList suggestions: 子系统交易建议（就地改写）
         :param list contexts: 子系统上下文（``SubSystemContext``；模式 B 下就地回写 ``quota``）
         :param KQuery query: 查询条件
+        :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有
 
-    .. py:method:: _allocate(self, date, tm, contexts, query)
+    .. py:method:: _allocate(self, date, tm, contexts, query, mode)
 
         【重载接口】L1 系统级分配：由子系统上下文决定各子系统权重。
 
         模式 A 返回 ``{System: weight}``；模式 B 就地回写 ``contexts[i].quota`` 并返回空表。
 
+        :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有
         :return: 权重表（``{System: weight}``）
 
-    .. py:method:: _to_targets(self, date, tm, suggestions, sys_weight, query)
+    .. py:method:: _to_targets(self, date, tm, suggestions, sys_weight, query, mode)
 
         【重载接口】L2 行为级换算：将权重换算为父账户可执行数量，就地改写 ``suggestions``。
 
         模式 A 按 ``assets_ratio`` 换算下单数量（超配转减仓、SELL/CLEAR 全平）；
         模式 B 透传子系统指令并做防御性裁剪。未重载时使用基类默认实现。
 
-    .. py:method:: _check_risk(self, date, tm, suggestions, query)
+        :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有
+
+    .. py:method:: _check_risk(self, date, tm, suggestions, query, mode)
 
         【重载接口】L3 组合风控裁剪，就地改写 ``suggestions`` 数量。
 
         基类默认实现按 ``max-single-position`` 限制单标的集中度（模式 B 下跳过）。
         未重载时使用基类默认实现。
+
+        :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有
 
     .. py:method:: _reset(self)
 

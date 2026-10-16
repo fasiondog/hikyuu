@@ -28,14 +28,15 @@
   `getRunningDates/getCycleEndDates/getRealSystemList` 等查询接口不再提供；
 * 自定义资产分配：`crtAF(allocate_func[, to_targets_func, check_risk_func])` 快速构建，或继承
   `AllocateFundsBase` 并重载 `_allocate`（L1）/ `_to_targets`（L2）/ `_check_risk`（L3）；
-* 组合级分配模式（A/B）唯一来源在 AF：`MultiSystem.set_mode` 转发至 `set_af`；序列化向后兼容
-  （旧档案中的 `m_mode` 自动迁移至 AF）；
+* 组合级分配模式（A/B/C）由聚合系统 `MultiSystem` 自身持有（`set_mode` / 只读属性 `mode`），
+  并作为末尾的 `mode` 形参传入 AF 各钩子；序列化向后兼容（旧档案中的 `m_mode` 原由 AF 持有，
+  现自动迁移至 `MultiSystem`）；
 * `sys_use_self_tm` 等在新体系无对应语义的参数将被忽略并告警；`AF_MultiFactor` 提供 `auto_adjust_weight`
   参数（默认 `True`，评分归一化为和为 1 后分配，评分总和小于 1 也满仓分配；`False` 时评分即最终权重）。
 
-**⚠️ AF 风控默认生效**：`max-single-position` 默认 1.0，即单标的持仓市值 ≤ 总资产
-（`<=0` 不限制，`>1` 按 1.0 生效）；`max-total-position` 默认 1.0，模式 A 下所有标的聚合目标市值 ≤ 总资产、
-模式 B 下各子系统配额总和 ≤ 总资产，超出按比例等比缩减并告警（`<=0` 不限制）。若需超配或杠杆场景，请下调
+**⚠️ AF 风控默认生效**：`max-single-position` 默认 1.0，即单标的持仓市值 ≤ 净资产
+（`<=0` 不限制，`>1` 按 1.0 生效）；`max-total-position` 默认 1.0，模式 A 下所有标的聚合目标市值 ≤ 净资产、
+模式 B 下各子系统配额总和 ≤ 净资产，超出按比例等比缩减并告警（`<=0` 不限制）。若需超配或杠杆场景，请下调
 该参数或设为 `<=0`。基类另含 `fixed-amount`（大于 0 时覆盖权重定价并告警）与 `adjust_running_sys`
 （默认 `True`，仅模式 B 生效；`False` 时已运行子系统保持现状、仅新子系统获配剩余现金）参数。
 
@@ -74,7 +75,7 @@
 
 **🚀 新增特性**
 
-* feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 A）
+* feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 C）
 * feat(allocatefunds): 独立 `AllocateFundsBase` 基类与 `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` 工厂（承载组合级 L1/L2/L3）
 * feat(allocatefunds): 恢复 Python `crtAF` 便捷构造（L1 `_allocate`，可选注入 L2 `_to_targets` / L3 `_check_risk`）
 * feat(MultiSystem): 新增 `adjust-mode` / `delay-to-trading-day` 参数，支持将调仓模式内化为调仓日表
@@ -519,7 +520,7 @@
   In [3]: df = get_inds_view(blocka, [CLOSE(), OPEN(), MA(CLOSE()), AMA(CLOSE()), MA(CLOSE(),n=30)], Datetime(20250822))
 
   In [4]: df
-  Out[4]: 
+  Out[4]:
         证券代码  证券名称   交易时间  CLOSE   OPEN         MA        AMA         MA
   0     SH600229  城市传媒 2025-08-22   5.89   7.23   7.087273   7.060143   7.034000
   1     SH601121  宝地矿业 2025-08-22   7.21   6.01   2.482273   2.486140   6.544000
@@ -555,7 +556,7 @@
   In [29]: k = s.get_kdata(Query(-100, ktype=Query.TRANS))
 
   In [30]: MA(CLOSE())(k).to_df()
-  Out[30]: 
+  Out[30]:
                 datetime     value0
   0  2025-09-04 14:52:08  11.750000
   1  2025-09-04 14:52:11  11.750000
