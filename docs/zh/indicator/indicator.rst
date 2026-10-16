@@ -17,7 +17,7 @@
 
     反余弦值
 
-    |X| > 1 时返回 null
+    输入绝对值大于 1 时返回 null
 
     :param Indicator data: 输入数据
     :rtype: Indicator
@@ -393,7 +393,7 @@
 
     反正弦值
 
-    |X| > 1 时返回 null
+    输入绝对值大于 1 时返回 null
 
     :param Indicator data: 输入数据
     :rtype: Indicator

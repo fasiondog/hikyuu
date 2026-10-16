@@ -10,11 +10,11 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
 
 .. note::
 
-   Since ``feature/next``, the former standalone ``Portfolio`` (``SimplePortfolio`` / ``WithoutAFPortfolio``) has been taken over by
-   :class:`MultiSystem`: **PF is essentially a preset configuration of MultiSystem**.
+   ``SimplePortfolio`` / ``WithoutAFPortfolio`` map to :class:`MultiSystem`: **a PF is essentially a
+   preset configuration of MultiSystem**.
    The ``PF_Simple`` / ``PF_WithoutAF`` / ``PF_SignalAggregate`` factories described on this page are
-   **preset factories**; they **return** :class:`MultiSystem`, rather than a ``Portfolio`` object. New
-   projects may also use :class:`MultiSystem` directly (see :doc:`../trade_sys/system`).
+   **preset factories**; they **return** :class:`MultiSystem`. Projects may also use
+   :class:`MultiSystem` directly (see :doc:`../trade_sys/system`).
 
    The execution paradigm of a portfolio is decided by the **running mode** owned by the
    :class:`MultiSystem` (set via ``set_mode``), and the three factories map onto the three modes:
@@ -72,7 +72,7 @@ The PF parts:
             <tr>
                 <td>AF_Xxx</td>
                 <td>Asset allocation algorithm</td>
-                <td>Allocates assets to the systems selected on each cross-section.<br>Since ``feature/next``, AF is a standalone base class, :class:`AllocateFundsBase`, that carries the portfolio-level L1/L2/L3; see :doc:`allocate_funds`.</td>
+                <td>Allocates assets to the systems selected on each cross-section.<br>AF is a standalone base class, :class:`AllocateFundsBase`, that carries the portfolio-level L1/L2/L3; see :doc:`allocate_funds`.</td>
             </tr>
         </tbody>
     </table>

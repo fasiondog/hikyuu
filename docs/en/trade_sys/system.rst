@@ -14,6 +14,16 @@ For multiple instruments (multiple securities), :class:`MultiSystem` can be used
 - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: on every rebalancing day the AF allocates the quota (target total assets) to each selected sub-system first (L1); each selected sub-system is calibrated to its quota BEFORE it is driven (recycle the cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems continuously (L2 pass-through).
 - **Mode C "Shared Account Compatibility"**: no shadow account is created; the sub-systems trade DIRECTLY on the single real account of the parent (``shared_tm``) and are sized by their own MM, running continuously and exiting on the signal day; the parent only gates the entry (SE) + records + optionally risk-controls, and does no L2 conversion. It keeps the compatibility with the ``Portfolio`` before the refactoring.
 
+.. note::
+
+   Mode C is not a parameter special case of mode B: it cannot be reproduced by any parameter
+   setting of mode B (any ``adjust_running_sys`` value, an AF that performs no allocation, turning
+   off the parent proportional scaling, and so on). The two are **two different account topologies**
+   -- in mode B the sub-systems run in **isolated shadow accounts** and the parent mirrors their
+   trades continuously, while in mode C the sub-systems **share the parent real account** directly
+   (a deliberate exception). With a shared account the sub-systems **compete for the same cash pool**
+   (whoever is driven and fills first takes the cash), which mode B does not exhibit.
+
 Aggregated backtesting also supports:
 
 - **AF L1/L2/L3 layering** (see :doc:`../trade_portfolio/allocate_funds` for details): L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B; e.g. equal weight 1/N, fixed weights, weighted by the SE score), L2 performs behavior-level conversion (in A it reads the sub-system's current intent state and synthesizes the **signed net target** per instrument as weight x net ratio x the parent net assets, rebalancing by the delta with the long/short netting out; in B the instructions pass through), and L3 provides portfolio risk control (the concentration limit ``max-single-position``, <=0 means no limit, the default 1.0 caps a single instrument at the total assets; skipped in mode B/C).
@@ -35,10 +45,10 @@ Common parameters:
 
     * **ev_open_position=False** *(bool)*: Whether to apply the market environment to the initial position opening
     * **cn_open_position=False** *(bool)*: Whether to apply the system validity condition to the initial position opening
-    
+
     * **shared_tm=False** *(bool)*: Whether the tm part is shared
     * **shared_ev=True** *(bool)*: Whether the ev part is shared
-    * **shared_cn=False** *(bool)*: Whether the cn part is shared    
+    * **shared_cn=False** *(bool)*: Whether the cn part is shared
     * **shared_mm=False** *(bool)*: Whether the mm part is shared
     * **shared_sg=False** *(bool)*: Whether the sg part is shared
     * **shared_st=False** *(bool)*: Whether the st part is shared
@@ -79,7 +89,7 @@ Common parameters:
                 <td>SG_Xxx</td>
                 <td>Signal generator</td>
                 <td>Generates the buy and sell signals.</td>
-            </tr>            
+            </tr>
             <tr>
                 <td>ST_Xxx</td>
                 <td>Stop-loss/take-profit strategy</td>
@@ -89,7 +99,7 @@ Common parameters:
                 <td>MM_Xxx</td>
                 <td>Money management strategy</td>
                 <td>Used to control trading risk, deciding the buy/sell quantity of each trade</td>
-            </tr>            
+            </tr>
             <tr>
                 <td>PG_Xxx</td>
                 <td>Profit goal strategy</td>
@@ -99,12 +109,12 @@ Common parameters:
                 <td>SP_Xxx</td>
                 <td>Slippage algorithm</td>
                 <td>Used only in backtests; simulates the difference between the planned price and the actual fill price that would occur in live trading</td>
-            </tr>              
+            </tr>
         </tbody>
     </table>
     <p></p>
 
-    
+
 Create a System and Run the Backtest
 ------------------------------------
 
@@ -112,7 +122,7 @@ Create a System and Run the Backtest
 
     Create a simple system instance (a trade is not scaled in or out repeatedly: after each buy, the whole position is sold in one go when selling). When the system instance runs (by calling the run method), it requires at least one matching trade manager instance, one money management strategy
     and one signal generator, which can also be specified after the system instance is created. If calling run produces no output and no correct result, tm, sg, or mm may not have been set. To run a backtest, use the run method, e.g.::
-    
+
         # Create a simulated trading account for the backtest, with an initial capital of 300,000
         my_tm = crtTM(init_cash = 300000)
 
@@ -125,8 +135,8 @@ Create a System and Run the Backtest
         # Create the system and run it
         sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
         sys.run(sm['sz000001'], Query(-150))
-    
-    :param TradeManager tm: the trade manager instance 
+
+    :param TradeManager tm: the trade manager instance
     :param MoneyManager mm: the money management strategy
     :param EnvironmentBase ev: the environment judgment strategy
     :param ConditionBase cn: the system validity condition
@@ -136,15 +146,15 @@ Create a System and Run the Backtest
     :param ProfitGoalBase pg: the profit goal strategy
     :param SlippageBase sp: the slippage algorithm
     :return: the system instance
-    
-    
+
+
 System Part Enum Definitions
 ----------------------------
 
 .. py:class:: System.Part
 
     The system part enumeration values. The system's buy/sell and other operations can be triggered by these parts, and the enumeration is used to identify the source of an actual trade instruction; see :py:class:`TradeRecord`.
-    
+
     In practice, the shorthand System.ENVIRONMENT can be used in place of System.Part.ENVIRONMENT, and similarly for the others.
 
     - System.Part.ENVIRONMENT  - Environment judgment strategy
@@ -157,11 +167,11 @@ System Part Enum Definitions
     - System.Part.SLIPPAGE     - Slippage algorithm
     - System.Part.INVALID      - The invalid-value boundary; any value greater than or equal to this value denotes an invalid part
 
-    
+
 .. py:function:: get_system_part_name(part)
 
     Get the string name of a part
-    
+
         - System.Part.ENVIRONMENT  - "EV"
         - System.Part.CONDITION    - "CN"
         - System.Part.SIGNAL       - "SG"
@@ -174,7 +184,7 @@ System Part Enum Definitions
 
     :param int part: the System.Part enumeration value
     :rtype: str
-    
+
 
 .. py:function:: get_system_part_enum(part_name)
 
@@ -184,83 +194,83 @@ System Part Enum Definitions
     :rtype: System.Part
 
 
-    
+
 System Base Class Definition
 ----------------------------
 
 .. py:class:: System
 
     The system base class. To extend it or implement more complex systematic trading behavior, inherit from this class.
-    
-    .. py:attribute:: name  
-    
+
+    .. py:attribute:: name
+
         The system name
-    
-    .. py:attribute:: tm  
-    
+
+    .. py:attribute:: tm
+
         The associated trade manager instance
-        
-    .. py:attribute:: mm  
-    
+
+    .. py:attribute:: mm
+
         The money management strategy
-        
-    .. py:attribute:: ev  
-    
+
+    .. py:attribute:: ev
+
         The environment judgment strategy
-        
-    .. py:attribute:: cn  
-    
+
+    .. py:attribute:: cn
+
         The system validity condition
-        
+
     .. py:attribute:: sg
 
         The signal generator
-        
+
     .. py:attribute:: st
-    
+
         The stop-loss strategy
-        
+
     .. py:attribute:: tp
-    
+
         The take-profit strategy
-        
+
     .. py:attribute:: pg
-    
+
         The profit goal strategy
-        
+
     .. py:attribute:: sp
-    
+
         The slippage algorithm
 
     .. py:method:: get_param(self, name)
 
         Get the value of the specified parameter
-    
+
         :param str name: the parameter name
         :return: the parameter value
         :raises out_of_range: no such parameter
-        
+
     .. py:method:: set_param(self, name, value)
-    
+
         Set the value of a parameter
-        
+
         :param str name: the parameter name
         :param value: the parameter value
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! The parameter type is not supported
-                
+
     .. py:method:: get_stock(self)
-    
+
         Get the associated security
-        
+
         :rtype: Stock
-        
+
     .. py:method:: get_trade_record_list(self)
-    
+
         Get the records of trades actually executed; unlike TM, this does not include the trade records caused by rights/dividend adjustments
-        
+
         :rtype: TradeRecordList
-        
+
     .. py:method:: get_buy_trade_request_list(self)
 
         Get the list of buy requests; in "delay" mode, use this to check whether a buy operation will occur on the next bar
@@ -272,18 +282,18 @@ System Base Class Definition
         Get the list of sell requests; in "delay" mode, use this to check whether a sell operation will occur on the next bar
 
         :rtype: list[TradeRequest]
-                
+
     .. py:function:: run(self, stock, query[, reset=True])
-    
+
         Run the system and execute the backtest
-        
+
         :param Stock stock: the security to trade
         :param Query query: the bar data query conditions
         :param bool reset: whether to reset according to the shared attributes of the system parts before execution
         :param bool reset_all: force a reset of all parts
 
     .. py:method:: reset(self)
-    
+
         Reset the system, excluding the current instrument and the shared parts
 
     .. py:method:: force_reset_all(self)
@@ -291,38 +301,38 @@ System Base Class Definition
         Force-reset all parts and clear the existing instrument, ignoring the shared attributes of the parts
 
     .. py:method:: clone(self)
-    
+
         Clone the system according to the shared attributes of the parts; the shared parts are not actually duplicated and remain shared
-        
-        
-        
+
+
+
 Trade Request Records
 ---------------------
 
 .. py:class:: TradeRequest
 
     A trade request record. It holds the trade request information registered inside the system when delayed operations are performed. This structure is exposed mainly for use in "delay" mode (where the trade is delayed to the open of the next bar): in this case the system already knows that a trade will happen on the next bar, and :py:meth:`System.getBuyTradeRequestList` and :py:meth:`System.getSellTradeRequestList` can be used to find out whether the next bar needs a buy or a sell. It is mainly used for alerting on or printing the operations needed on the next bar. It has no effect on the running of the system itself.
-    
-    .. py:attribute:: valid 
-        
+
+    .. py:attribute:: valid
+
         Whether this trade request record is valid (True | False)
-    
+
     .. py:attribute:: business
-    
+
         The trade business type; see :py:class:`hikyuu.trade_manage.BUSINESS`
-    
+
     .. py:attribute:: datetime
-    
+
         The time at which the trade request was issued
-    
+
     .. py:attribute:: stoploss
-    
+
         The stop-loss price at the time the trade request was issued
-    
+
     .. py:attribute:: part
-    
+
         The source part of the trade request; see :py:class:`System.Part`
-    
+
     .. py:attribute:: count
-    
+
         The number of consecutive delays caused by failed operations

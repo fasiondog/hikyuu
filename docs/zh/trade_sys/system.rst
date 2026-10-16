@@ -14,6 +14,13 @@
 - **模式 B「资金配置」（Fund Allocation，配额划拨，FOF/MOM 风格）**：调仓日先由 AF L1 为每个选中子系统分配额度（目标总资产），并在驱动子系统**之前**将其账户校准到该额度（回收现金 → 清未选中 → 减持超配 → 注资低配），子系统以精确额度自主交易；父**连续镜像**其真实指令（L2 透传）。
 - **模式 C「共享账户兼容」（Shared Account Compatibility）**：不建影子账户，子系统直接在父真实账户（``shared_tm``）上按自身 MM 交易、持续运行、按信号当日退出；父仅准入（SE）+ 记录 + 可选风控，不做 L2 换算。用于向后兼容重构前的 ``Portfolio``。
 
+.. note::
+
+   模式 C 不是模式 B 的参数特例：无法通过模式 B 的任意参数档（``adjust_running_sys`` 取任意值、
+   AF 不作分配、关闭父等比缩减等）等效得到。二者是**两种账户拓扑**——模式 B 的子系统运行在**隔离的
+   影子账户**内、由父连续镜像其成交；模式 C 的子系统**直接共享父真实账户**（有意为之的例外）。
+   共享账户下多个子系统**竞争同一现金池**（谁先驱动、先成交，谁先占住现金），这是模式 B 不具备的行为。
+
 聚合回测还支持：
 
 - **AF L1/L2/L3 分层**（详见 :doc:`../trade_portfolio/allocate_funds`）：L1 系统级分配（模式 A 名义权重 / 模式 B 真实额度，例：等权 1/N、固定权重、按 SE 得分加权）、L2 行为级换算（A 读子当前意图态、按「权重 × 净敞口比重 × 父净值」合成每标的**带符号净目标**并按差额再平衡，多空净额相互抵消 / B 透传）、L3 组合风控（集中度上限 ``max-single-position``，≤0 不限制；默认 1.0 即单标的不超过总资产；模式 B/C 跳过）。
@@ -35,10 +42,10 @@
 
     * **ev_open_position=False** *(bool)*: 是否使用市场环境判定进行初始建仓
     * **cn_open_position=False** *(bool)*: 是否使用系统有效性条件进行初始建仓
-    
+
     * **shared_tm=False** *(bool)*: tm 部件是否为共享部件
     * **shared_ev=True** *(bool)*: ev 部件是否为共享部件
-    * **shared_cn=False** *(bool)*: cv 部件是否为共享部件    
+    * **shared_cn=False** *(bool)*: cv 部件是否为共享部件
     * **shared_mm=False** *(bool)*: mm 部件是否为共享部件
     * **shared_sg=False** *(bool)*: sg 部件是否为共享部件
     * **shared_st=False** *(bool)*: st 部件是否为共享部件
@@ -77,7 +84,7 @@
                 <td>SG_Xxx</td>
                 <td>信号指示器</td>
                 <td>负责产生买入、卖出信号。</td>
-            </tr>            
+            </tr>
             <tr>
                 <td>ST_Xxx</td>
                 <td>止损/止盈策略</td>
@@ -87,7 +94,7 @@
                 <td>MM_Xxx</td>
                 <td>资金管理策略</td>
                 <td>用于控制交易风险，决定交易每次的买卖数量</td>
-            </tr>            
+            </tr>
             <tr>
                 <td>PG_Xxx</td>
                 <td>盈利目标策略</td>
@@ -97,12 +104,12 @@
                 <td>SP_Xxx</td>
                 <td>移滑价差算法</td>
                 <td>仅用于回测，在回测时模拟实际交易时发生的计划价格和实际价格差异</td>
-            </tr>              
+            </tr>
         </tbody>
     </table>
     <p></p>
 
-    
+
 创建系统并执行回测
 -----------------------
 
@@ -111,7 +118,7 @@
     创建简单系统实例（每次交易不进行多次加仓或减仓，即每次买入后在卖出时全部卖出），  系统实例在运行时(调用run方法），至少需要一个配套的交易管理实例、一个资金管理策略
     和一个信号指示器），可以在创建系统实例后进行指定。如果出现调用run时没有任何输出，
     且没有正确结果的时候，可能是未设置tm、sg、mm。进行回测时，使用 run 方法，如::
-    
+
         #创建模拟交易账户进行回测，初始资金30万
         my_tm = crtTM(init_cash = 300000)
 
@@ -124,8 +131,8 @@
         #创建交易系统并运行
         sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
         sys.run(sm['sz000001'], Query(-150))
-    
-    :param TradeManager tm: 交易管理实例 
+
+    :param TradeManager tm: 交易管理实例
     :param MoneyManager mm: 资金管理策略
     :param EnvironmentBase ev: 市场环境判断策略
     :param ConditionBase cn: 系统有效条件
@@ -136,15 +143,15 @@
     :param SlippageBase sp: 移滑价差算法
     :return: system实例
 
-    
-    
+
+
 系统部件枚举定义
 ------------------
 
 .. py:class:: System.Part
 
     系统部件枚举值，系统的买入/卖出等操作可由这些部件触发，用于标识实际交易指令的来源，参见：:py:class:`TradeRecord`。
-    
+
     实际使用中，可使用 System.ENVIRONMENT 的简化方式 代替 System.Part.ENVIRONMENT，其他与此类似。
 
     - System.Part.ENVIRONMENT  - 市场环境判断策略
@@ -157,11 +164,11 @@
     - System.Part.SLIPPAGE     - 移滑价差算法
     - System.Part.INVALID      - 无效值边界，大于等于该值时为无效部件
 
-    
+
 .. py:function:: get_system_part_name(part)
 
     获取部件的字符串名称
-    
+
         - System.Part.ENVIRONMENT  - "EV"
         - System.Part.CONDITION    - "CN"
         - System.Part.SIGNAL       - "SG"
@@ -174,7 +181,7 @@
 
     :param int part: System.Part 枚举值
     :rtype: str
-    
+
 
 .. py:function:: get_system_part_enum(part_name)
 
@@ -184,145 +191,145 @@
     :rtype: System.Part
 
 
-    
+
 系统基类定义
 -------------
 
 .. py:class:: System
 
     系统基类。需要扩展或实现更复杂的系统交易行为，可从此类继承。
-    
-    .. py:attribute:: name  
-    
+
+    .. py:attribute:: name
+
         系统名称
-    
-    .. py:attribute:: tm  
-    
+
+    .. py:attribute:: tm
+
         关联的交易管理实例
-        
-    .. py:attribute:: mm  
-    
+
+    .. py:attribute:: mm
+
         资金管理策略
-        
-    .. py:attribute:: ev  
-    
+
+    .. py:attribute:: ev
+
         市场环境判断策略
-        
-    .. py:attribute:: cn  
-    
+
+    .. py:attribute:: cn
+
         系统有效条件
-        
+
     .. py:attribute:: sg
 
         信号指示器
-        
+
     .. py:attribute:: st
-    
+
         止损策略
-        
+
     .. py:attribute:: tp
-    
+
         止盈策略
-        
+
     .. py:attribute:: pg
-    
+
         盈利目标策略
-        
+
     .. py:attribute:: sp
-    
+
         移滑价差算法
 
     .. py:method:: get_param(self, name)
 
         获取指定的参数
-    
+
         :param str name: 参数名称
         :return: 参数值
         :raises out_of_range: 无此参数
-        
+
     .. py:method:: set_param(self, name, value)
-    
+
         设置参数
-        
+
         :param str name: 参数名称
         :param value: 参数值
         :type value: int | bool | float | string
         :raises logic_error: Unsupported type! 不支持的参数类型
-                
+
     .. py:method:: get_stock(self)
-    
+
         获取关联的证券
-        
+
         :rtype: Stock
-        
+
     .. py:method:: get_trade_record_list(self)
-    
+
         获取实际执行的交易记录，和 TM 的区别是不包含权息调整带来的交易记录
-        
+
         :rtype: TradeRecordList
-        
+
     .. py:method:: get_buy_trade_request_list(self)
-    
+
         获取买入请求列表，“delay”模式下查看下一时刻是否存在买入操作
-        
+
         :rtype: list[TradeRequest]
 
     .. py:method:: get_sell_trade_request_list(self)
-    
+
         获取卖出请求列表，“delay”模式下查看下一时刻是否存在卖出操作
-        
+
         :rtype: list[TradeRequest]
-                
+
     .. py:function:: run(self, stock, query[, reset=True])
-    
+
         运行系统，执行回测
-        
+
         :param Stock stock: 交易的证券
         :param Query query: K线数据查询条件
         :param bool reset: 执行前是否依据系统部件共享属性复位
         :param bool reset_all: 强制复位所有部件
 
     .. py:method:: reset(self)
-    
+
         复位，但不包括已有的交易对象，以及共享的部件
-        
+
     .. py:method:: force_reset_all(self)
 
         强制复位所有组件以及清空已有的交易对象，忽略组件的共享属性
 
     .. py:method:: clone(self)
-    
+
         克隆操作，会依据部件的共享特性进行克隆，共享部件不进行实际的克隆操作，保持共享
 
-        
-        
+
+
 交易请求记录
 --------------
 
 .. py:class:: TradeRequest
 
     交易请求记录。系统内部在实现延迟操作时登记的交易请求信息。暴露该结构的主要目的是用于在“delay”模式（延迟到下一个bar开盘时进行交易）的情况下，系统实际已知下一个Bar将要进行交易，此时可通过 :py:meth:`System.getBuyTradeRequestList` 、 :py:meth:`System.getSellTradeRequestList` 来获知下一个BAR是否需要买入/卖出。主要用于提醒或打印下一个Bar需要进行操作。对于系统本身的运行没有影响。
-    
-    .. py:attribute:: valid 
-        
+
+    .. py:attribute:: valid
+
         该交易请求记录是否有效（True | False）
-    
+
     .. py:attribute:: business
-    
+
         交易业务类型，参见：:py:class:`hikyuu.trade_manage.BUSINESS`
-    
+
     .. py:attribute:: datetime
-    
+
         发出交易请求的时刻
-    
+
     .. py:attribute:: stoploss
-    
+
         发出交易请求时刻的止损价
-    
+
     .. py:attribute:: part
-    
+
         发出交易请求的来源，参见：:py:class:`System.Part`
-    
+
     .. py:attribute:: count
-    
+
         因操作失败，连续延迟的次数

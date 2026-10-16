@@ -13,15 +13,14 @@ for the sub-systems selected by the aggregate system :class:`MultiSystem`. AF op
 
 .. note::
 
-   Starting with ``feature/next``, the **responsibilities of money management (MM) and fund allocation (AF) are separated**:
+   **The responsibilities of money management (MM) and fund allocation (AF) are separated**:
 
-   * :class:`MoneyManagerBase` is restricted to the **single-system / single-security** scope (it operates on a single ``Stock``),
-     handling single-system position sizing and no longer carrying the portfolio-level allocation;
-   * the portfolio-level allocation (L1 system-level weights / L2 behavior-level conversion / L3 portfolio risk control) has been migrated in its entirety to
+   * :class:`MoneyManagerBase` is restricted to the **single-system / single-security** scope (it operates on a single ``Stock``)
+     and handles the single-system position sizing;
+   * the portfolio-level allocation (L1 system-level weights / L2 behavior-level conversion / L3 portfolio risk control) is carried by
      :class:`AllocateFundsBase`.
 
-   In other words, the fund allocation logic previously carried by the portfolio-level MMs and the standalone
-   ``Portfolio`` is now handled by ``AF_*``.
+   The portfolio-level fund allocation is handled by ``AF_*``.
 
 Allocation modes (A / B / C)
 ----------------------------
@@ -80,6 +79,16 @@ Mode x algorithm-part mapping:
       - Portfolio risk-control clipping (e.g. the ``max-single-position`` concentration cap)
       - Off or total-only (the ``max-total-position`` quota-sum cap is carried at L1)
       - Off and cannot be enabled
+
+.. note::
+
+   Mode C is not a parameter special case of mode B: it cannot be reproduced by any parameter
+   setting of mode B (any ``adjust_running_sys`` value, an AF that performs no allocation, turning
+   off the parent proportional scaling, and so on). The two are **two different account topologies**
+   -- in mode B the sub-systems run in **isolated shadow accounts** and the parent mirrors their
+   trades continuously, while in mode C the sub-systems **share the parent real account** directly
+   (a deliberate exception). With a shared account the sub-systems **compete for the same cash
+   pool**, which mode B does not exhibit.
 
 The three replaceable algorithm parts of AF
 -------------------------------------------

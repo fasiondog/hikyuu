@@ -17,7 +17,7 @@ Built-in Technical Indicators
 
     The arccosine value
 
-    Returns null when |X| > 1
+    Returns null when the absolute value of the input is greater than 1
 
     :param Indicator data: the input data
     :rtype: Indicator
@@ -392,7 +392,7 @@ Built-in Technical Indicators
 
     The arcsine value
 
-    Returns null when |X| > 1
+    Returns null when the absolute value of the input is greater than 1
 
     :param Indicator data: the input data
     :rtype: Indicator

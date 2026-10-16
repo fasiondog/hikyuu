@@ -10,11 +10,10 @@
 
 .. note::
 
-   自 ``feature/next`` 起，原独立的 ``Portfolio``（``SimplePortfolio`` / ``WithoutAFPortfolio``）已由
-   :class:`MultiSystem` 承接：**PF 本质就是 MultiSystem 的一个预置配置**。
+   ``SimplePortfolio`` / ``WithoutAFPortfolio`` 对应 :class:`MultiSystem`：**PF 本质就是 MultiSystem
+   的一个预置配置**。
    本页描述的 ``PF_Simple`` / ``PF_WithoutAF`` / ``PF_SignalAggregate`` 是**预置工厂**，其**返回值为**
-   :class:`MultiSystem`，不再是 ``Portfolio`` 对象。新项目也可直接使用 :class:`MultiSystem`
-   （见 :doc:`../trade_sys/system`）。
+   :class:`MultiSystem`。也可直接使用 :class:`MultiSystem`（见 :doc:`../trade_sys/system`）。
 
    组合的执行范式由 :class:`MultiSystem` 自身持有的**运行模式**决定（经 ``set_mode`` 设定），三个工厂对应三种模式：
 
@@ -70,7 +69,7 @@ PF 部件说明:
             <tr>
                 <td>AF_Xxx</td>
                 <td>资产分配算法</td>
-                <td>用于对时间截面上选中的系统进行资产分配。<br>自 ``feature/next`` 起，AF 为独立基类 :class:`AllocateFundsBase`，承载组合级 L1/L2/L3，见 :doc:`allocate_funds`。</td>
+                <td>用于对时间截面上选中的系统进行资产分配。<br>AF 为独立基类 :class:`AllocateFundsBase`，承载组合级 L1/L2/L3，见 :doc:`allocate_funds`。</td>
             </tr>
         </tbody>
     </table>
