@@ -364,7 +364,7 @@ Since 2.8.x, the original portfolio backtest building blocks ``Portfolio`` / ``A
     sys2 = SYS_Simple(tm=tm2, sg=sg2, mm=mm2)
     ms = MultiSystem()          # or MultiSystem(name="Combo")
     ms.tm = crtTM(init_cash=1000000)
-    ms.set_mode("A")            # the default is fine: A = signal aggregation; B = fund allocation (FOF-MOM)
+    ms.set_mode("A")            # the default is fine: A = signal aggregation; B = fund allocation (FOF-MOM); C = shared account compatibility
     ms.set_adjust_cycle(10)     # the rebalancing cycle (days); 1 by default means rebalancing on every close day
     ms.add(sys1)
     ms.add(sys2)

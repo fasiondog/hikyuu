@@ -364,7 +364,7 @@ Hikyuu 主要聚焦于快速策略分析，本身不提供实盘交易，Strateg
     sys2 = SYS_Simple(tm=tm2, sg=sg2, mm=mm2)
     ms = MultiSystem()          # 或 MultiSystem(name="Combo")
     ms.tm = crtTM(init_cash=1000000)
-    ms.set_mode("A")            # 默认即可：A=信号汇总；B=资金划拨（FOF-MOM）
+    ms.set_mode("A")            # 默认即可：A=信号汇总；B=资金划拨（FOF-MOM）；C=共享账户兼容
     ms.set_adjust_cycle(10)     # 调仓周期（天），默认 1=每个收盘日再平衡
     ms.add(sys1)
     ms.add(sys2)
