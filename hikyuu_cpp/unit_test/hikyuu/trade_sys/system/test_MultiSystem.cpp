@@ -576,9 +576,8 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
 // Portfolio allocation engine L2: behavior-level conversion (mode A ratio / mode B pass-through)
 // ============================================================================
 
-/** @par Check point: L2 mode A conversion by assets_ratio (full semantics pass-through of
- * design 8.3, F2) */
-TEST_CASE("test_AllocateFunds_L2_modeA_by_ratio") {
+/** @par Check point: L2 mode A synthesizes the parent net target from the signed net ratio */
+TEST_CASE("test_AllocateFunds_L2_modeA_net_target") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no position yet: all cash, predictable
     auto af = AF_EqualWeight();
     af->setMode("A");
@@ -588,49 +587,40 @@ TEST_CASE("test_AllocateFunds_L2_modeA_by_ratio") {
     auto sys = create_test_sys(3, 5);
     std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
 
-    /** @arg assets_ratio>0: target value = weight(1.0) × ratio(0.5) × parent total assets(100000)
-     * = 50000 → 5000 shares */
+    /** @arg the signed net target ratio maps to the parent net: weight(1.0) x ratio(0.5) x
+     * net(100000) = 50000 -> 5000 shares */
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
-    s.number = 100;  // the original number should be rewritten
-    s.assets_ratio = 0.5;
+    s.target_position_ratio = 0.5;
+    s.number = 100;  // the original number is ignored, the parent re-derives the net delta
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::BUY);
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 
-    /** @arg assets_ratio<=0: falls back to full position (ratio=1) → 100000/10 = 10000 shares */
-    s.assets_ratio = 0.0;
-    suggestions[0] = s;
+    /** @arg a zero net target means flat: no order (the instrument drops out) */
+    s.target_position_ratio = 0.0;
+    suggestions.assign(1, s);
     af->_toTargets(date, tm, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
+    CHECK_UNARY(suggestions.empty());
 
-    /** @arg plan_price<=0: number set to 0 (division-by-zero boundary) */
-    s.plan_price = 0.0;
-    s.assets_ratio = 0.5;
-    suggestions[0] = s;
+    /** @arg a non-finite net target is skipped */
+    s.target_position_ratio = std::numeric_limits<double>::infinity();
+    suggestions.assign(1, s);
     af->_toTargets(date, tm, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
-
-    /** @arg a non-finite target value (assets_ratio=inf) is skipped: number=0 */
-    s.plan_price = 10.0;
-    s.assets_ratio = std::numeric_limits<double>::infinity();
-    suggestions[0] = s;
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
+    CHECK_UNARY(suggestions.empty());
 }
 
-/** @par Check point: L2 mode A over-allocation converted to position reduction (delta<0 →
- * SELL, the F2 rebalancing branch) */
+/** @par Check point: L2 mode A over-allocation converted to position reduction (delta<0 ->
+ * SELL) */
 TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
     af->setMode("A");
-    // use fixed-amount to pin the target value, so total_assets is not affected by market moves
-    af->setParam<double>("fixed-amount", 5000.0);
+    af->setParam<double>("fixed-amount", 5000.0);  // pin the target value (independent of the marks)
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -639,19 +629,20 @@ TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     tm->buy(date, stk, 10.0, 1000.0);  // build a position of 1000 shares (deterministic)
     REQUIRE_EQ(tm->getPosition(date, stk).number, doctest::Approx(1000.0));
 
-    /** @arg target(5000/10=500 shares) < current(1000 shares): converted to SELL of 500 shares */
+    /** @arg the fixed target(500) < current(1000): a SELL of the delta */
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
+    s.target_position_ratio = 0.9;  // positive => the fixed-amount target (500)
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::SELL);
     CHECK_EQ(suggestions[0].number, doctest::Approx(500.0));
 }
 
-/** @par Check point: L2 mode A SELL/CLEAR closes the whole current position */
+/** @par Check point: L2 mode A zero net target flattens the current position */
 TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
@@ -663,34 +654,27 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
     tm->buy(date, stk, 10.0, 1000.0);  // build a position of 1000 shares
 
-    /** @arg SELL: number = current (positive, the direction is expressed by the type), the
-     * original number is rewritten */
+    /** @arg a zero net target flattens the whole position (SELL the current 1000) */
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::SELL;
     s.plan_price = 10.0;
-    s.number = 999;
+    s.target_position_ratio = 0.0;
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK(suggestions[0].type == SuggestionType::SELL);
     CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
 
-    /** @arg CLEAR: also closes the whole position */
-    s.type = SuggestionType::CLEAR;
-    suggestions[0] = s;
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
-
-    /** @arg SELL with an empty position: number = current = 0 (boundary) */
+    /** @arg a zero target on an empty position: no order (boundary) */
     auto tm2 = crtTM(Datetime(200001010000LL), 100000.0);
-    s.type = SuggestionType::SELL;
-    s.number = 500;
-    suggestions[0] = s;
+    suggestions.assign(1, s);
     af->_toTargets(date, tm2, suggestions, weights, KQuery());
-    CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
+    CHECK_UNARY(suggestions.empty());
 }
 
-/** @par Check point: L2 fixed-amount per instrument (migrated from AF_FixedAmount, F4) */
+/** @par Check point: L2 fixed-amount per instrument (the sign decides the side, the value is the
+ * fixed market value) */
 TEST_CASE("test_AllocateFunds_L2_fixed_amount") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
@@ -702,15 +686,15 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount") {
     auto sys = create_test_sys(3, 5);
     std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
 
-    /** @arg fixed-amount takes precedence over assets_ratio: target value = 20000 → 2000 shares */
+    /** @arg a positive net target maps to the fixed market value: 20000 / 10 = 2000 shares */
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
-    s.assets_ratio = 0.9;  // should be overridden by fixed-amount
+    s.target_position_ratio = 0.9;
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(2000.0));
 }
 
@@ -807,34 +791,34 @@ TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
-    s.assets_ratio = 1.0;
+    s.target_position_ratio = 1.0;
 
-    /** @arg the aggregated target (2 x 100000) exceeds the default cap (100000): scaled down
-     * proportionally to 10000 shares, the second suggestion merged */
+    /** @arg the aggregated gross target (2 x 100000) exceeds the default cap (100000): scaled down
+     * proportionally to 10000 shares */
     TradeSuggestionList suggestions{s, s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
-    CHECK_EQ(suggestions[1].number, doctest::Approx(0.0));
 
     /** @arg max-total-position=0 disables the cap: the full 20000 shares */
     af->setParam<double>("max-total-position", 0.0);
     suggestions = TradeSuggestionList{s, s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
 
     /** @arg within the budget: no scaling */
     af->setParam<double>("max-total-position", 1.0);
-    s.assets_ratio = 0.5;
+    s.target_position_ratio = 0.5;
     suggestions = TradeSuggestionList{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 }
 
-/** @par Check point: L2 rewrite syncs plan_cash / cash_ratio / assets_ratio with the rewritten
- * parent-account number */
-TEST_CASE("test_AllocateFunds_L2_plan_cash_sync") {
+/** @par Check point: L2 fixed-amount target below the current position reduces it (SELL delta) */
+TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
     af->setMode("A");
@@ -849,25 +833,21 @@ TEST_CASE("test_AllocateFunds_L2_plan_cash_sync") {
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
-    s.plan_cash = 999999.0;  // stale sub-account value
-    s.assets_ratio = 0.9;
-    s.cash_ratio = 0.8;
+    s.target_position_ratio = 0.9;  // positive => the fixed-amount target (5000)
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
 
-    /** @arg the BUY rewritten to SELL(500) carries the recomputed parent-account cash and ratios */
+    /** @arg the fixed target(500) < current(1000): a SELL(500) carrying the parent-account cash */
+    REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::SELL);
     CHECK_EQ(suggestions[0].number, doctest::Approx(500.0));
     CHECK_EQ(suggestions[0].plan_cash, doctest::Approx(5000.0));
-    double ta = tm->getFunds(date, KQuery().kType()).total_assets();
-    CHECK_EQ(suggestions[0].assets_ratio, doctest::Approx(5000.0 / ta));
-    CHECK_EQ(suggestions[0].cash_ratio, doctest::Approx(5000.0 / 90000.0));
 }
 
-/** @par Check point: L2 aggregated shares converted at each suggestion's own plan price */
-TEST_CASE("test_AllocateFunds_L2_mixed_plan_price") {
+/** @par Check point: L2 aggregates the signed net target of the same instrument across
+ * sub-systems */
+TEST_CASE("test_AllocateFunds_L2_multi_contrib") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
     af->setMode("A");
@@ -881,16 +861,14 @@ TEST_CASE("test_AllocateFunds_L2_mixed_plan_price") {
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sys;
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
-    s.assets_ratio = 0.25;
+    s.target_position_ratio = 0.25;
     TradeSuggestionList suggestions{s, s};
-    suggestions[1].plan_price = 20.0;
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
 
-    /** @arg two plan prices (10/20), each contributes 25000: shares = 2500 + 1250 = 3750 */
-    CHECK_EQ(suggestions[0].number, doctest::Approx(3750.0));
-    CHECK_EQ(suggestions[1].number, doctest::Approx(0.0));
+    /** @arg the same instrument sums the net target: 0.25 x 100000 x 2 = 50000 -> 5000 shares */
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 }
 
 /** @par Check point: L2 missing weight falls back to 1/N instead of the full position */
@@ -909,11 +887,11 @@ TEST_CASE("test_AllocateFunds_L2_missing_weight_fallback") {
     TradeSuggestion s;
     s.stock = stk;
     s.sys = sysC;  // not in the weight table
-    s.type = SuggestionType::BUY;
     s.plan_price = 10.0;
-    s.assets_ratio = 1.0;
+    s.target_position_ratio = 1.0;
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
 
     /** @arg the missing weight falls back to 1/2 (not the full position): 50000 -> 5000 shares */
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
@@ -1573,7 +1551,8 @@ TEST_CASE("test_MultiSystem_mode_c_nested_under_mode_a") {
      * translated suggestions are not empty (otherwise the outer layer would aggregate nothing) */
     CHECK_GT(inner_tm->getTradeList().size(), 1);
     CHECK_GT(inner->getRunningSet().size(), 0);
-    CHECK_GT(inner->toSuggestions().size(), 0);
+    // The outer aggregate (mode A) reads the inner's position snapshot, its translated suggestions
+    // are no longer the aggregation source
 
     /** @arg the outer layer converted them into its own orders on the real account */
     CHECK_GT(outer_tm->getTradeList().size(), 1);
@@ -2011,8 +1990,7 @@ TEST_CASE("test_MultiSystem_clone_path") {
     CHECK_EQ(sys->clone()->getPath(), "I/A");
 }
 
-/** @par Check point: L2 aggregates multiple BUYs on the same instrument before conversion
- * (previously each computed its delta against the same position) */
+/** @par Check point: L2 aggregates the same instrument across sub-systems before conversion */
 TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
@@ -2028,26 +2006,23 @@ TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     TradeSuggestion s1;
     s1.stock = stk;
     s1.sys = sys1;
-    s1.type = SuggestionType::BUY;
     s1.plan_price = 10.0;
+    s1.target_position_ratio = 0.9;  // positive => the fixed-amount per contribution
     TradeSuggestion s2 = s1;
     s2.sys = sys2;
 
-    /** @arg no position: aggregated target value 5000+5000=10000 → the first gets 1000 shares,
-     * and the second is merged into the first as 0 */
+    /** @arg no position: aggregated target value 5000+5000=10000 -> a BUY of 1000 shares */
     TradeSuggestionList suggestions{s1, s2};
     af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK(suggestions[0].type == SuggestionType::BUY);
     CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
-    CHECK_EQ(suggestions[1].number, doctest::Approx(0.0));
 
-    /** @arg already holding 1000 shares (exactly the aggregated target): no more trading
-     * (before the fix, each turned into SELL 500, repeatedly closing) */
+    /** @arg already holding 1000 shares (exactly the aggregated target): no more trading */
     tm->buy(date, stk, 10.0, 1000.0);
     TradeSuggestionList suggestions2{s1, s2};
     af->_toTargets(date, tm, suggestions2, weights, KQuery());
-    CHECK(suggestions2[0].type == SuggestionType::BUY);
-    CHECK_EQ(suggestions2[0].number, doctest::Approx(0.0));
-    CHECK_EQ(suggestions2[1].number, doctest::Approx(0.0));
+    CHECK_UNARY(suggestions2.empty());
 }
 
 /** @par Check point: master compatibility (the hub/legacy style) -- no sub-system added explicitly:

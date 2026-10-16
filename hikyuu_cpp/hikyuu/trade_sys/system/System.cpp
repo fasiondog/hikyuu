@@ -1057,6 +1057,12 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
                         date);
 
     PositionRecord position = m_tm->getPosition(date, m_stock);
+    // A short-only book (the mode C shared account) has no long position: the force-flatten covers
+    // the short instead of selling
+    const bool cover_short = (position.number <= 0.0);
+    if (cover_short) {
+        position = m_tm->getShortPosition(m_stock);
+    }
     HKU_IF_RETURN(position.number <= 0.0, record);
 
     const auto& krecord = m_kdata.getKRecord(pos);
@@ -1088,9 +1094,13 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
         }
     }
 
+    price_t plan_price = on_open ? src_krecord.openPrice : src_krecord.closePrice;
     record =
-      m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss, position.goalPrice,
-                 on_open ? src_krecord.openPrice : src_krecord.closePrice, from);
+      cover_short
+        ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num, position.stoploss,
+                         position.goalPrice, plan_price, from)
+        : m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss,
+                     position.goalPrice, plan_price, from);
     HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record, "[{}] {}: {} by {}", name(),
                        htr("Failed force sell"), num, getSystemPartName(from));
 

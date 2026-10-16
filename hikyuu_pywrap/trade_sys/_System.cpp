@@ -295,6 +295,7 @@ void export_System(py::module& m) {
       .def_readwrite("sys", &TradeSuggestion::sys)
       .def_readwrite("type", &TradeSuggestion::type)
       .def_readwrite("number", &TradeSuggestion::number)
+      .def_readwrite("short_side", &TradeSuggestion::short_side)
       .def_readwrite("plan_price", &TradeSuggestion::plan_price)
       .def_readwrite("plan_cash", &TradeSuggestion::plan_cash)
       .def_readwrite("cash_ratio", &TradeSuggestion::cash_ratio)

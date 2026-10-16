@@ -37,11 +37,18 @@ struct HKU_API TradeSuggestion {
     price_t plan_price{0.0};
     price_t plan_cash{0.0};   // = number * plan_price
 
+    // false: the long side (BUY opens, SELL reduces, CLEAR closes all); true: the short side
+    // (SELL opens a short, BUY covers, CLEAR closes the whole short). The number stays positive
+    // and the type carries the direction.
+    bool short_side{false};
+
     double cash_ratio{0.0};            // plan_cash / the cash balance before this stage's trade (magnitude)
-    double assets_ratio{0.0};          // plan_cash / the total assets before this stage's trade; the
-                                       // sign encodes direction: > 0 for BUY, < 0 for SELL/CLEAR
-    double target_position_ratio{0.0}; // The target position market value after the trade / the total
-                                       // assets; defined only for BUY, 0 for SELL/CLEAR
+    double assets_ratio{0.0};          // The increment ratio: plan_cash / the net assets before this
+                                       // stage's trade; the sign encodes direction (> 0 buy/cover,
+                                       // < 0 sell/open-short)
+    double target_position_ratio{0.0}; // The signed net target level: the target net position market
+                                       // value after the trade / the net assets; defined for all types
+                                       // (0 means flat), the sign encodes long/short
 
     price_t stoploss{0.0};
     price_t goalPrice{0.0};

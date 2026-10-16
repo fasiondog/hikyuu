@@ -415,16 +415,22 @@ private:
      * cleared by the CLEAR suggestion submitted by the caller */
     void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
-    /** Mode A (Signal Aggregation): reset the sub-system shadow account on the rebalancing day
-     * (force selling its holdings, recycling the cash and injecting the initial signal cash
-     * again). The shadow account is a pure signal source: without the reset it runs out of cash
-     * after its first position and can never submit a new buy signal, which leaves the parent
-     * cash idle and makes the re-entered stocks impossible to buy back. */
-    void _resetSubSystemSignalCash(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
-
     /** Execute the converted suggestions on the parent real account (sell first then buy) */
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                              KQuery::KType ktype, TradeRecordList& out_trades);
+
+    /** Mode A (Signal Aggregation): the whole close stage of the signal synthesis -- drive every
+     *  sub-system (the shadows run continuously) and, on the sampling day, read the selected ones'
+     *  current net exposure snapshot and let the AF synthesize the parent net target. */
+    TradeRecordList _closePhaseModeA(const Datetime& datetime, bool is_adjust,
+                                     const std::set<System*>& selected,
+                                     const std::unordered_map<System*, double>& se_scores,
+                                     KQuery::KType ktype);
+
+    /** Mode A (Signal Aggregation): append the per-instrument signed net target suggestions of one
+     *  sub-system (its current holdings plus the unfilled requests) for the L2 synthesis. */
+    void _fillNetRatioSuggestions(const SystemPtr& sys, const MomentResult& sub,
+                                  const Datetime& datetime, TradeSuggestionList& out);
 
     /** The close stage: drive every sub-system to generate signals, merge the "open+close" trades
      * and translate them into the parent suggestions, after the MM allocation the parent orders
@@ -510,11 +516,6 @@ private:
     Datetime m_open_trades_date;   // The trading day to which m_open_trades/m_sub_funds_before
                                    // belong; the close stage uses it to prevent out-of-bounds and
                                    // cross-day residue (runtime state, not serialized)
-    std::unordered_map<System*, Datetime>
-      m_signal_reset_dates;  // The per-subsystem last day when the mode A (Signal Aggregation)
-                             // signal cash reset ran; it prevents multiple resets of the same
-                             // subsystem within the same trading day (the close stage may be driven
-                             // several times a day) (runtime state, not serialized)
     TradeSuggestionList m_pending_suggestions;  // The suggestions accumulated on the
                                                 // non-rebalancing days (runtime, not serialized)
     TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at

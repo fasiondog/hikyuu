@@ -243,26 +243,17 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     // The mode A conversion works on the parent account, it is undefined without it
     HKU_WARN_IF_RETURN(!tm, void(), "{}::_toTargets: the trade manager is null, skip!", m_name);
 
-    FundsRecord funds = tm->getFunds(date, ktype);
-    double total_assets = funds.total_assets();
-    // Mode A + fixed-amount>0: the target market value of every instrument takes the fixed amount
-    // (the AF_FixedAmount behavior-level semantics), it takes precedence over the conversion by
-    // proportion.
+    // Mode A: the parent synthesizes one net target per instrument from the sub-system snapshots.
+    // Each suggestion carries the signed net exposure ratio (target_position_ratio) of one
+    // sub-system for one instrument; the parent target value = sum(weight x ratio) x parent net.
+    double parent_net = tm->getFunds(date, ktype).net_assets();
     double fixed_amount = getParam<double>("fixed-amount");
 
-    // Multiple sub-systems may trade the same instrument: aggregate the BUY target shares by
-    // instrument first, to avoid per-suggestion deltas computed against the same position
-    struct StockTarget {
-        double shares{0.0};  // The aggregated target shares, every contribution converted at its
-                             // own plan price (the plan prices may differ between sub-systems)
-        price_t price{0.0};  // The plan price of the first suggestion of this instrument
-        size_t first_index{0};
-    };
-    std::map<Stock, StockTarget> buy_targets;
-    double total_target_value = 0.0;
-    for (size_t i = 0; i < suggestions.size(); ++i) {
-        const auto& s = suggestions[i];
-        if (s.type != SuggestionType::BUY || s.plan_price <= 0.0) {
+    std::map<Stock, double> target_value;  // instrument -> signed net target market value
+    std::map<Stock, price_t> price;        // instrument -> the close price used for the shares
+    double gross = 0.0;
+    for (const auto& s : suggestions) {
+        if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
         }
         double weight = 1.0;
@@ -270,90 +261,94 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         if (it != sys_weight.end()) {
             weight = it->second;
         } else if (!sys_weight.empty()) {
-            // A missing weight silently amplified to the full position before
             weight = 1.0 / sys_weight.size();
         }
         double v;
         if (fixed_amount > 0.0) {
-            v = fixed_amount;
+            // fixed-amount: the per-instrument target is the fixed amount on its own side
+            v = (s.target_position_ratio > 0.0)
+                  ? fixed_amount
+                  : (s.target_position_ratio < 0.0 ? -fixed_amount : 0.0);
         } else {
-            // Mode A (the default): target position market value = sub-system weight x the
-            // sub-suggestion position ratio x the parent total assets.
-            //   - assets_ratio>0: respect the internal position ratio submitted by the sub-system
-            //   (e.g. the parent is mapped by half position when the sub-system is at half
-            //   position);
-            //   - assets_ratio<=0 (no ratio information): fall back to the full position (ratio=1)
-            //   equal weight to position.
-            double ratio = (s.assets_ratio > 0.0) ? s.assets_ratio : 1.0;
-            v = weight * ratio * total_assets;
+            v = weight * s.target_position_ratio * parent_net;
         }
         if (!std::isfinite(v)) {
             HKU_WARN("{}::_toTargets: non-finite target value of {}, skipped!", m_name,
                      s.stock.market_code());
             continue;
         }
-        auto& t = buy_targets[s.stock];
-        price_t unit = s.stock.unit();
-        if (unit > 0.0) {
-            t.shares += v / (s.plan_price * unit);
-        }
-        if (t.price == 0.0) {
-            t.price = s.plan_price;
-            t.first_index = i;
-        }
-        total_target_value += v;
+        target_value[s.stock] += v;
+        price[s.stock] = s.plan_price;
+        gross += std::fabs(v);
     }
 
-    // The total budget cap: the aggregated target market value of all instruments <= total assets
-    // x max-total-position, scaled down proportionally (<=0 disables the cap)
+    // The total budget cap: the aggregated gross target market value <= net assets x
+    // max-total-position, scaled down proportionally (<=0 disables the cap)
     double max_total = getParam<double>("max-total-position");
-    if (max_total > 0.0 && total_assets > 0.0 && std::isfinite(total_target_value) &&
-        total_target_value > total_assets * max_total) {
-        double scale = total_assets * max_total / total_target_value;
+    if (max_total > 0.0 && parent_net > 0.0 && gross > parent_net * max_total) {
+        double scale = parent_net * max_total / gross;
         HKU_WARN(
-          "{}::_toTargets: the aggregated target({:.2f}) exceeds max-total-position({}) x "
-          "total assets({:.2f}), scaled by {:.4f}!",
-          m_name, total_target_value, max_total, total_assets, scale);
-        for (auto& kv : buy_targets) {
-            kv.second.shares *= scale;
+          "{}::_toTargets: the aggregated gross target({:.2f}) exceeds max-total-position({}) x "
+          "net assets({:.2f}), scaled by {:.4f}!",
+          m_name, gross, max_total, parent_net, scale);
+        for (auto& kv : target_value) {
+            kv.second *= scale;
         }
     }
 
-    for (size_t i = 0; i < suggestions.size(); ++i) {
-        auto& s = suggestions[i];
-        if (s.plan_price <= 0.0) {
-            s.number = 0.0;
-            s.plan_cash = 0.0;
+    // Rebuild into the net delta orders of the parent account (one or two legs per instrument:
+    // close the current side first, then open the target side)
+    TradeSuggestionList orders;
+    for (const auto& kv : target_value) {
+        const Stock& stock = kv.first;
+        price_t p = price[stock];
+        double unit = stock.unit();
+        if (p <= 0.0 || unit <= 0.0) {
             continue;
         }
-        double current = tm->getPosition(date, s.stock).number;
-        if (s.type == SuggestionType::BUY) {
-            auto it = buy_targets.find(s.stock);
-            if (it == buy_targets.end() || i != it->second.first_index) {
-                // A non-first suggestion of the same instrument, merged into the first one
-                s.number = 0.0;
-                s.plan_cash = 0.0;
-                continue;
-            }
-            // The net rebalancing quantity = (target - current); when it is negative (the
-            // current position is over-allocated), turn to SELL to reduce to the target.
-            double delta = it->second.shares - current;
-            if (delta < 0.0) {
-                s.type = SuggestionType::SELL;
-                s.number = -delta;
-            } else {
-                s.number = delta;
-            }
-        } else {
-            // SELL / CLEAR: exit the instrument (sell all the current holdings)
-            s.number = current;
+        double target_shares = kv.second / (p * unit);
+        double cur_long = tm->getPosition(date, stock).number;
+        double cur_short = tm->getShortPosition(stock).number;
+        double cur_net = cur_long - cur_short;
+        double delta = target_shares - cur_net;
+        double min_trade = stock.minTradeNumber();
+        if (min_trade > 0.0 && std::fabs(delta) < min_trade) {
+            continue;  // Below one lot, no trade
         }
-        // The number is rewritten to the parent account quantity above, the pre-computed
-        // sub-account cash and ratios are stale now
-        s.plan_cash = s.number * s.plan_price * s.stock.unit();
-        s.assets_ratio = (total_assets > 0.0) ? std::min(s.plan_cash / total_assets, 1.0) : 0.0;
-        s.cash_ratio = (funds.cash > 0.0) ? s.plan_cash / funds.cash : 0.0;
+        auto make = [&](SuggestionType type, double number, bool short_side) {
+            TradeSuggestion o;
+            o.stock = stock;
+            o.from = PART_PORTFOLIO;
+            o.type = type;
+            o.number = number;
+            o.short_side = short_side;
+            o.plan_price = p;
+            o.plan_cash = number * p * unit;
+            return o;
+        };
+        if (cur_net >= 0.0 && target_shares >= 0.0) {
+            if (delta > 0.0) {
+                orders.push_back(make(SuggestionType::BUY, delta, false));
+            } else {
+                orders.push_back(make(SuggestionType::SELL, -delta, false));
+            }
+        } else if (cur_net <= 0.0 && target_shares <= 0.0) {
+            if (delta > 0.0) {
+                orders.push_back(make(SuggestionType::BUY, delta, true));  // cover
+            } else {
+                orders.push_back(make(SuggestionType::SELL, -delta, true));  // add short
+            }
+        } else if (cur_net > 0.0 && target_shares < 0.0) {
+            // Long -> short: sell the long, then open the short
+            orders.push_back(make(SuggestionType::SELL, cur_long, false));
+            orders.push_back(make(SuggestionType::SELL, -target_shares, true));
+        } else {
+            // Short -> long: cover the short, then buy the long
+            orders.push_back(make(SuggestionType::BUY, cur_short, true));
+            orders.push_back(make(SuggestionType::BUY, target_shares, false));
+        }
     }
+    suggestions = orders;
 }
 
 void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
