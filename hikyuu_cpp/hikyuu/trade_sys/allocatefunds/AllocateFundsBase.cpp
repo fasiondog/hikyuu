@@ -227,10 +227,11 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     KQuery::KType ktype = query.kType();
     if (m_mode == "B" || m_mode == "C") {
         // Mode B / C: pass through the real instruction of the sub-system (number is the order
-        // quantity of the sub-manager), the parent does not convert it. Only the SELL suggestions
-        // are defensively clipped to not exceed the current position of the parent.
+        // quantity of the sub-manager), the parent does not convert it. Only the long-side SELL
+        // suggestions are defensively clipped to not exceed the current position of the parent; a
+        // short-side SELL opens/increases a short and has no long position to clip against.
         for (auto& s : suggestions) {
-            if (s.type == SuggestionType::SELL) {
+            if (s.type == SuggestionType::SELL && !s.short_side) {
                 double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
                 if (s.number > current) {
                     s.number = current;
@@ -312,9 +313,6 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         double cur_net = cur_long - cur_short;
         double delta = target_shares - cur_net;
         double min_trade = stock.minTradeNumber();
-        if (min_trade > 0.0 && std::fabs(delta) < min_trade) {
-            continue;  // Below one lot, no trade
-        }
         auto make = [&](SuggestionType type, double number, bool short_side) {
             TradeSuggestion o;
             o.stock = stock;
@@ -326,6 +324,19 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             o.plan_cash = number * p * unit;
             return o;
         };
+        if (min_trade > 0.0 && std::fabs(delta) < min_trade) {
+            // Below one lot: no trade — except a clearance (a flat target), otherwise a residual
+            // position below one lot would stay untradable forever (the skip would always fire)
+            if (delta == 0.0 || target_shares != 0.0) {
+                continue;
+            }
+            if (cur_net > 0.0) {
+                orders.push_back(make(SuggestionType::CLEAR, cur_long, false));
+            } else if (cur_net < 0.0) {
+                orders.push_back(make(SuggestionType::CLEAR, cur_short, true));
+            }
+            continue;
+        }
         if (cur_net >= 0.0 && target_shares >= 0.0) {
             if (delta > 0.0) {
                 orders.push_back(make(SuggestionType::BUY, delta, false));
@@ -359,7 +370,9 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
         return;
     }
     // The concentration upper limit: the target position market value of a single instrument <=
-    // total assets x max-single-position (<=0 means no limit; >1 is clamped to 1)
+    // net assets x max-single-position (<=0 means no limit; >1 is clamped to 1). The net assets
+    // are the denominator so that a levered account is not granted a larger cap by the borrowed
+    // funds.
     double max_ratio = getParam<double>("max-single-position");
     if (max_ratio <= 0.0) {
         return;
@@ -368,8 +381,8 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
         max_ratio = 1.0;
     }
     KQuery::KType ktype = query.kType();
-    double total_assets = tm ? tm->getFunds(date, ktype).total_assets() : 0.0;
-    double cap = total_assets * max_ratio;
+    double net_assets = tm ? tm->getFunds(date, ktype).net_assets() : 0.0;
+    double cap = net_assets * max_ratio;
     for (auto& s : suggestions) {
         if (s.number <= 0.0 || s.plan_price <= 0.0 || s.stock.isNull()) {
             continue;

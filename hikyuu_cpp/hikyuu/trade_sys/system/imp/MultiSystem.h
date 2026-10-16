@@ -15,11 +15,12 @@
  *  Running modes (the mode is held by the AF, set via setMode / the AF factories):
  *
  *  - **Mode A "Signal Aggregation" (the default)**: every sub-system gets a shadow account
- *    funded with `m_sub_init_cash` as a pure signal source. On the rebalancing day the shadow
- *    signal cash is reset, so every sub-system keeps submitting its position intent; the parent
- *    converts the suggestions into the executable quantity by the L2 target conversion
- *    (weight x position ratio x the parent total assets) and orders uniformly on its own account.
- *    The shadow bookkeeping never touches the real funds.
+ *    funded with `m_sub_init_cash` as a pure signal source. The shadows run continuously and are
+ *    never reset, so every sub-system keeps submitting its position intent; on the sampling day
+ *    the parent reads the selected ones' current net exposure snapshot and synthesizes one
+ *    per-instrument signed net target by the L2 conversion (weight x target ratio x the parent
+ *    net assets), then orders uniformly on its own account. The shadow bookkeeping never touches
+ *    the real funds.
  *
  *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
  *    calibrated to its quota on the rebalancing day BEFORE it is driven (recycle the shadow cash,
@@ -179,9 +180,9 @@ public:
         return m_force_sell_list;
     }
 
-    /** Set the signal cash of the sub-system shadow account, reset on every rebalancing day in
-     * mode A (Signal Aggregation). In mode B (Fund Allocation) the shadow accounts start from
-     * zero and the quota comes from the L1 allocation, so this value is unused. */
+    /** Set the initial signal cash of the sub-system shadow account (mode A Signal Aggregation).
+     *  In mode B (Fund Allocation) the shadow accounts start from zero and the quota comes from
+     *  the L1 allocation, so this value is unused. */
     void setSubInitCash(price_t cash) {
         m_sub_init_cash = cash > 0.0 ? cash : m_sub_init_cash;
     }
@@ -492,8 +493,8 @@ private:
 private:
     SystemList m_sys_list;
     size_t m_close_day_index{0};  // The close-day counter, used for the rebalancing cycle judgment
-    price_t m_sub_init_cash{100000.0};  // The signal cash of the sub-system shadow account (mode A,
-                                        // reset on every rebalancing day; unused in mode B)
+    price_t m_sub_init_cash{100000.0};  // The initial signal cash of the sub-system shadow account
+                                        // (mode A; unused in mode B)
     int m_adjust_cycle{
       1};  // The rebalancing cycle (days); <=1 means rebalancing on every close day
     bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
@@ -513,9 +514,9 @@ private:
       m_sub_funds_before;  // The "before-trade" fund snapshot of every sub-system on that day, used
                            // by _toSuggestions to calculate the three ratios (runtime state, not
                            // serialized)
-    Datetime m_open_trades_date;   // The trading day to which m_open_trades/m_sub_funds_before
-                                   // belong; the close stage uses it to prevent out-of-bounds and
-                                   // cross-day residue (runtime state, not serialized)
+    Datetime m_open_trades_date;  // The trading day to which m_open_trades/m_sub_funds_before
+                                  // belong; the close stage uses it to prevent out-of-bounds and
+                                  // cross-day residue (runtime state, not serialized)
     TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at
                                                      // the next open when trade_on_close=false
     std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
@@ -544,6 +545,13 @@ private:
     std::map<Datetime, Datetime>
       m_cycle_ends;  // The rebalancing-day -> cycle-end (the next rebalancing day) mapping, used by
                      // the cycle-type signal driving (runtime state, rebuilt with each run)
+    AllocateFundsBase::Weights
+      m_last_af_weights;  // The L1 weight table of the last rebalancing day, reused by the mode B
+                          // non-rebalancing-day mirror (runtime state, not serialized)
+    bool m_short_reduce_warned{false};  // The once-per-instance flag of the net-short quota
+                                        // reduction skip warning (runtime state, not serialized)
+    bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota
+                                        // injection skip warning (runtime state, not serialized)
 
 //========================================
 // Serialization support

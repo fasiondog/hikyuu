@@ -386,6 +386,10 @@ private:
     TradeRecord _runMomentOnOpen(const KRecord& today, const KRecord& src_today);
     TradeRecord _runMomentOnClose(const KRecord& today, const KRecord& src_today);
 
+    // Fold the valid pending delayed requests into result.delayOnNextOpen (shared by runMoment /
+    // runMomentOnClose)
+    void _collectDelayRequests(MomentResult& result) const;
+
     // The aggregate system (MultiSystem) instructs an immediate forced sell, so that the funds of
     // the buy_delay system can be adjusted
     TradeRecord _sellForce(const Datetime& date, double num, Part from, bool on_open);

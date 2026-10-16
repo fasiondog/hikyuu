@@ -516,26 +516,7 @@ MomentResult System::runMoment(const Datetime& datetime) {
     }
     // Collect the pending delayed requests, for the upper layer to perceive the requests
     // fulfilled at the next open
-    for (const auto& req : m_buyRequestList) {
-        if (req.valid) {
-            result.delayOnNextOpen.push_back(req);
-        }
-    }
-    for (const auto& req : m_sellRequestList) {
-        if (req.valid) {
-            result.delayOnNextOpen.push_back(req);
-        }
-    }
-    for (const auto& req : m_sellShortRequestList) {
-        if (req.valid) {
-            result.delayOnNextOpen.push_back(req);
-        }
-    }
-    for (const auto& req : m_buyShortRequestList) {
-        if (req.valid) {
-            result.delayOnNextOpen.push_back(req);
-        }
-    }
+    _collectDelayRequests(result);
     return result;
 }
 
@@ -566,7 +547,34 @@ MomentResult System::runMomentOnClose(const Datetime& datetime) {
     if (!tr.isNull()) {
         result.tradesOnClose.push_back(tr);
     }
+    // Aligned with runMoment: the close stage may also submit the delayed requests (e.g. a delayed
+    // buy), surface them so that the upper layer (e.g. the mode A snapshot synthesis) perceives
+    // the intent state
+    _collectDelayRequests(result);
     return result;
+}
+
+void System::_collectDelayRequests(MomentResult& result) const {
+    for (const auto& req : m_buyRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
+    for (const auto& req : m_sellRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
+    for (const auto& req : m_sellShortRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
+    for (const auto& req : m_buyShortRequestList) {
+        if (req.valid) {
+            result.delayOnNextOpen.push_back(req);
+        }
+    }
 }
 
 TradeRecord System::_runMoment(const KRecord& today, const KRecord& src_today) {
@@ -1095,12 +1103,10 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     }
 
     price_t plan_price = on_open ? src_krecord.openPrice : src_krecord.closePrice;
-    record =
-      cover_short
-        ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num, position.stoploss,
-                         position.goalPrice, plan_price, from)
-        : m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss,
-                     position.goalPrice, plan_price, from);
+    record = cover_short ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num,
+                                          position.stoploss, position.goalPrice, plan_price, from)
+                         : m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss,
+                                      position.goalPrice, plan_price, from);
     HKU_WARN_IF_RETURN(record == Null<TradeRecord>(), record, "[{}] {}: {} by {}", name(),
                        htr("Failed force sell"), num, getSystemPartName(from));
 

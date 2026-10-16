@@ -12,7 +12,6 @@
 
 #include <map>
 #include <cmath>
-#include <mutex>
 #include <set>
 #include <unordered_map>
 
@@ -183,6 +182,7 @@ void MultiSystem::_reset() {
     m_adjust_turnover.clear();
     m_open_pending_suggestions.clear();
     m_kdata_cache.clear();
+    m_last_af_weights.clear();
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
     m_running_set.clear();
     m_running_order.clear();
@@ -206,6 +206,7 @@ void MultiSystem::_forceResetAll() {
     m_adjust_turnover.clear();
     m_open_pending_suggestions.clear();
     m_kdata_cache.clear();
+    m_last_af_weights.clear();
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
     m_running_set.clear();
     m_running_order.clear();
@@ -369,20 +370,20 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
     // Scaling a net-short book is not supported yet: covering consumes cash, which the
-    // recycle-first order already withdrew, and the total_assets metric is inflated by the short
-    // proceeds. Warn and skip instead of mis-calibrating.
+    // recycle-first order already withdrew. Warn and skip instead of mis-calibrating.
     if (sub_tm->getShortPosition(sys->getStock()).number > 0.0) {
-        static std::once_flag g_short_reduce_warned;
-        std::call_once(g_short_reduce_warned, [&] {
+        if (!m_short_reduce_warned) {
+            m_short_reduce_warned = true;
             HKU_WARN("Net-short quota reduction is not supported yet (sub {}), skipped!",
                      sys->name());
-        });
+        }
         return;
     }
 
-    // The sub cash has been recycled before, so the sub total here is the holding market value
+    // The sub cash has been recycled before, so the net assets here measure the holding value;
+    // the net_assets metric keeps the calibration from being inflated by the short book
     FundsRecord funds = sub_tm->getFunds(date, ktype);
-    price_t sub_total = funds.total_assets() - funds.cash;
+    price_t sub_total = funds.net_assets();
     if (sub_total <= quota || quota <= 0.0) {
         return;
     }
@@ -445,16 +446,16 @@ void MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& date
 
     // Injecting into a net-short book is not supported yet: warn and skip
     if (sub_tm->getShortPosition(sys->getStock()).number > 0.0) {
-        static std::once_flag g_short_inject_warned;
-        std::call_once(g_short_inject_warned, [&] {
+        if (!m_short_inject_warned) {
+            m_short_inject_warned = true;
             HKU_WARN("Net-short quota injection is not supported yet (sub {}), skipped!",
                      sys->name());
-        });
+        }
         return;
     }
 
     FundsRecord funds = sub_tm->getFunds(date, ktype);
-    price_t sub_total = funds.total_assets() - funds.cash;
+    price_t sub_total = funds.net_assets();
     if (sub_total >= quota || quota <= 0.0) {
         return;
     }
@@ -733,8 +734,10 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
         s.plan_price = price[stock];
         s.plan_cash = s.number * s.plan_price * stock.unit();
         s.from = PART_SYSTEM;
-        // The sub-system net position after the trade decides the side and the clearance: a flat
-        // book is a CLEAR, a negative net position is a short-side action
+        // The side is decided by the PRE-trade net position: getPosition/getShortPosition already
+        // reflect the just-executed trades, so back out the signed delta n to recover the state
+        // before them. Reading the post-trade state misclassifies a full cover (the short book
+        // flattened) as opening a long.
         double long_pos = 0.0;
         double short_pos = 0.0;
         if (sys->getTM()) {
@@ -742,10 +745,17 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
             short_pos = sys->getTM()->getShortPosition(stock).number;
         }
         double net_pos = long_pos - short_pos;
-        s.short_side = (net_pos < 0.0);
+        double pre_net = net_pos - n;
+        // Growing the net exposure covers a short only when the book was short before; shrinking
+        // it opens a short when the book was flat or short before
+        s.short_side = (n > 0.0) ? (pre_net < 0.0) : (pre_net <= 0.0);
         if (n > 0.0) {
-            s.type = SuggestionType::BUY;
+            // A full cover flattens the short book: emit a CLEAR so the executor exits the whole
+            // remaining short position
+            s.type =
+              (pre_net < 0.0 && net_pos == 0.0) ? SuggestionType::CLEAR : SuggestionType::BUY;
         } else {
+            // A full flat empties the long book: emit a CLEAR to exit the whole position
             s.type = (net_pos == 0.0) ? SuggestionType::CLEAR : SuggestionType::SELL;
         }
         // The three ratios: the sub-system before-trade net assets are the denominator. The sign of
@@ -757,9 +767,8 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
                 ratio = 1.0;
             }
             s.assets_ratio = (n > 0.0) ? ratio : -ratio;
-            s.target_position_ratio = (s.plan_price > 0.0)
-                                        ? net_pos * s.plan_price * stock.unit() / base_assets
-                                        : 0.0;
+            s.target_position_ratio =
+              (s.plan_price > 0.0) ? net_pos * s.plan_price * stock.unit() / base_assets : 0.0;
         }
         if (base_cash > 0.0) {
             s.cash_ratio = s.plan_cash / base_cash;
@@ -802,7 +811,9 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         // SELL: sell the suggested quantity (in mode A it is rewritten to the parent account
         // quantity; in mode B the sub-instruction is passed through) CLEAR: exit the whole
         // position. The number is always positive; the direction is the type and the side is the
-        // short_side flag
+        // short_side flag. A short-side SELL opens/increases a short (sellShort); a short-side
+        // CLEAR covers the whole short book (buyShort, MAX_DOUBLE is capped by the TM at the
+        // actual short position)
         double num = s.number;
         if (s.type == SuggestionType::CLEAR || num >= MAX_DOUBLE) {
             num = MAX_DOUBLE;
@@ -819,12 +830,17 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
                      date);
             continue;
         }
-        TradeRecord tr =
-          s.short_side
-            ? m_tm->sellShort(date, s.stock, s.plan_price, num, 0.0, 0.0, s.plan_price,
-                              PART_SYSTEM, "MultiSystem")
-            : m_tm->sell(date, s.stock, s.plan_price, num, 0.0, 0.0, s.plan_price, PART_SYSTEM,
-                         "MultiSystem");
+        TradeRecord tr;
+        if (s.short_side && s.type == SuggestionType::CLEAR) {
+            tr = m_tm->buyShort(date, s.stock, s.plan_price, num, 0.0, 0.0, s.plan_price,
+                                PART_SYSTEM, "MultiSystem");
+        } else if (s.short_side) {
+            tr = m_tm->sellShort(date, s.stock, s.plan_price, num, 0.0, 0.0, s.plan_price,
+                                 PART_SYSTEM, "MultiSystem");
+        } else {
+            tr = m_tm->sell(date, s.stock, s.plan_price, num, 0.0, 0.0, s.plan_price, PART_SYSTEM,
+                            "MultiSystem");
+        }
         if (!tr.isNull()) {
             out_trades.push_back(tr);
         }
@@ -835,7 +851,11 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
     // being silently rejected by the TM
     double needed_cash = 0.0;
     for (const auto& s : suggestions) {
-        if (s.type != SuggestionType::BUY || s.number <= 0.0 || s.plan_price <= 0.0) {
+        // Cash-consuming legs: buying a long (a plain BUY), covering a short (a short-side BUY or
+        // a short-side CLEAR full cover)
+        const bool consumes =
+          (s.type == SuggestionType::BUY) || (s.type == SuggestionType::CLEAR && s.short_side);
+        if (!consumes || s.number <= 0.0 || s.plan_price <= 0.0) {
             continue;
         }
         double min_trade = s.stock.minTradeNumber();
@@ -880,12 +900,11 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         }
         double qty = std::floor(s.number * cash_scale / min_trade) * min_trade;
         if (qty >= min_trade) {
-            TradeRecord tr =
-              s.short_side
-                ? m_tm->buyShort(date, s.stock, s.plan_price, qty, 0.0, 0.0, s.plan_price,
-                                 PART_SYSTEM, "MultiSystem")
-                : m_tm->buy(date, s.stock, s.plan_price, qty, 0.0, 0.0, s.plan_price, PART_SYSTEM,
-                            "MultiSystem");
+            TradeRecord tr = s.short_side
+                               ? m_tm->buyShort(date, s.stock, s.plan_price, qty, 0.0, 0.0,
+                                                s.plan_price, PART_SYSTEM, "MultiSystem")
+                               : m_tm->buy(date, s.stock, s.plan_price, qty, 0.0, 0.0, s.plan_price,
+                                           PART_SYSTEM, "MultiSystem");
             if (!tr.isNull()) {
                 out_trades.push_back(tr);
             }
@@ -1154,6 +1173,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         }
         if (!quota_ctxs.empty()) {
             af_weights = m_af->allocateQuota(datetime, m_tm, quota_ctxs, m_kdata.getQuery());
+            // Cache the L1 weights so that the non-rebalancing-day mirror (which runs no L1)
+            // reuses the latest allocation instead of falling back to an equal split
+            m_last_af_weights = af_weights;
             for (auto& ctx : quota_ctxs) {
                 quota_map[ctx.sys.get()] = ctx.quota;
             }
@@ -1305,10 +1327,12 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     if (!is_adjust) {
         // Continuous mirror (mode B): the parent mirrors the sub-system trades of this bar at once
         // (mode A returns earlier and mode C trades on the shared account, so only mode B reaches
-        // here); the quota calibration stays on the rebalancing day only
+        // here); the quota calibration stays on the rebalancing day only. The L1 weights of the
+        // last rebalancing day are reused: the local af_weights is empty here, and passing it
+        // empty would let the L2 fall back to weight 1.0 per suggestion and inflate the targets.
         if (!suggestions.empty()) {
             if (getMode() == "B") {
-                getAF()->allocateTargets(datetime, m_tm, suggestions, af_weights,
+                getAF()->allocateTargets(datetime, m_tm, suggestions, m_last_af_weights,
                                          m_kdata.getQuery());
             }
             if (m_trade_on_close) {
@@ -1386,9 +1410,10 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     return executed;
 }
 
-TradeRecordList MultiSystem::_closePhaseModeA(
-  const Datetime& datetime, bool is_adjust, const std::set<System*>& selected,
-  const std::unordered_map<System*, double>& se_scores, KQuery::KType ktype) {
+TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_adjust,
+                                              const std::set<System*>& selected,
+                                              const std::unordered_map<System*, double>& se_scores,
+                                              KQuery::KType ktype) {
     TradeSuggestionList suggestions;
     TradeRecordList executed;
 
@@ -1537,7 +1562,8 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
         s.stock = kv.first;
         s.sys = sys;
         s.from = PART_SYSTEM;
-        s.type = SuggestionType::HOLD;  // A snapshot carrier, the direction is the sign of the ratio
+        s.type =
+          SuggestionType::HOLD;  // A snapshot carrier, the direction is the sign of the ratio
         s.plan_price = price_of(kv.first, 0.0);
         s.target_position_ratio = kv.second;  // The signed net target level of this instrument
         s.short_side = (kv.second < 0.0);
@@ -1860,18 +1886,18 @@ void MultiSystem::setSubSystemQuota(const SYSPtr& sub_sys, const Datetime& date,
     HKU_WARN_IF_RETURN(quota <= 0.0, void(), "Invalid quota {} for subsystem {}!", quota,
                        sub_sys->name());
 
-    // Adjust the "total assets" of the sub-system to the target quota:
+    // Adjust the net assets of the sub-system to the target quota:
     //   - Quota increase: deposit the cash (checkin the difference)
     //   - Quota decrease: withdraw the cash (checkout the difference; when the cash is insufficient
     //   the sub-system reduces the position itself, a warning is recorded here)
     // The aggregate sub-system (nested) also triggers its internal allocation by adjusting the
-    // total assets of its virtual account (quota penetration).
+    // net assets of its virtual account (quota penetration).
     KQuery::KType ktype = m_kdata.getQuery().kType();
     if (ktype.empty()) {
         ktype = KQuery::DAY;
     }
     FundsRecord funds = sub_tm->getFunds(date, ktype);
-    price_t diff = quota - funds.total_assets();
+    price_t diff = quota - funds.net_assets();
     if (diff > 0.0) {
         sub_tm->checkin(date, diff);
     } else if (diff < 0.0) {

@@ -42,7 +42,9 @@
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Manual.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cycle.h>
+#include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include "create_test_sys.h"
 
@@ -620,7 +622,8 @@ TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
     af->setMode("A");
-    af->setParam<double>("fixed-amount", 5000.0);  // pin the target value (independent of the marks)
+    af->setParam<double>("fixed-amount",
+                         5000.0);  // pin the target value (independent of the marks)
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -727,6 +730,55 @@ TEST_CASE("test_AllocateFunds_L2_modeB_passthrough") {
     suggestions[0] = s;
     af->_toTargets(date, tm, suggestions, weights, KQuery());
     CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
+
+    /** @arg a short-side SELL (open/increase a short) is NOT clipped by the long position
+     * (current=0): the old code clamped it to 0 and silently dropped the short instruction */
+    s.type = SuggestionType::SELL;
+    s.short_side = true;
+    s.number = 1000;
+    suggestions[0] = s;
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
+}
+
+/** @par Check point: L2 mode A -- a residual position below one lot is still cleared when the
+ * target is flat (the below-lot skip must not leave it untradable forever) */
+TEST_CASE("test_AllocateFunds_L2_below_lot_clearance") {
+    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+    auto af = AF_EqualWeight();
+    af->setMode("A");
+    Datetime date(200001040000LL);
+    Stock stk = getStock("sz000001");
+    REQUIRE(!stk.isNull());
+    auto sys = create_test_sys(3, 5);
+    std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
+
+    // A sub-lot residual position: buy 150 then sell 100, leaving 50 shares (below one lot)
+    TradeRecord tr = tm->buy(date, stk, 10.0, 150.0);
+    REQUIRE(!tr.isNull());
+    tr = tm->sell(date, stk, 10.0, 100.0);
+    REQUIRE(!tr.isNull());
+    REQUIRE_EQ(tm->getPosition(date, stk).number, 50.0);
+
+    TradeSuggestion s;
+    s.stock = stk;
+    s.sys = sys;
+    s.plan_price = 10.0;
+
+    /** @arg a below-lot nonzero target stays skipped (no trade) */
+    s.target_position_ratio = 0.0005;  // far below one lot of 100 shares
+    TradeSuggestionList suggestions{s};
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    CHECK_UNARY(suggestions.empty());
+
+    /** @arg a flat target emits a CLEAR of the residual 50 shares instead of skipping it */
+    s.target_position_ratio = 0.0;
+    suggestions.assign(1, s);
+    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    REQUIRE_EQ(suggestions.size(), 1);
+    CHECK(suggestions[0].type == SuggestionType::CLEAR);
+    CHECK_UNARY(!suggestions[0].short_side);
+    CHECK_EQ(suggestions[0].number, doctest::Approx(50.0));
 }
 
 // ============================================================================
@@ -2189,10 +2241,98 @@ TEST_CASE("test_MultiSystem_mode_b_continuous_mirror") {
     CHECK_GT(n2, n1 / 2);
 }
 
-/** @par Check point: mode A (signal aggregation) -- the sub shadow signal cash is reset on every
- * rebalancing day, so the sub-systems can keep submitting buy intents after their first position
- * (before the fix the shadow ran out of cash and the portfolio stopped rebalancing) */
-TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
+// Scripted short signals: one sell signal (open a short) on open_date, one buy signal (cover the
+// short) on cover_date
+class ScriptedShortSG : public SignalBase {
+public:
+    ScriptedShortSG(Datetime open_date, Datetime cover_date)
+    : SignalBase("ScriptedShortSG"), m_open_date(open_date), m_cover_date(cover_date) {}
+
+    SignalPtr _clone() override {
+        return make_shared<ScriptedShortSG>(m_open_date, m_cover_date);
+    }
+
+    void _calculate(const KData& kdata) override {
+        if (kdata.getPos(m_open_date) != Null<size_t>()) {
+            _addSellSignal(m_open_date);
+        }
+        if (kdata.getPos(m_cover_date) != Null<size_t>()) {
+            _addBuySignal(m_cover_date);
+        }
+    }
+
+private:
+    Datetime m_open_date;
+    Datetime m_cover_date;
+};
+
+/** @par Check point: mode B mirror of a short book -- the full cover of the sub-system short must
+ * reach the parent as a short-side CLEAR (buyShort), not as opening a long. The old code read the
+ * POST-trade net position (a flat book) and misclassified the full cover as a long BUY. */
+TEST_CASE("test_MultiSystem_mode_b_mirror_cover_short_side") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    // The first close (close-day index 0) is a rebalancing day with adjust_cycle=2, the second
+    // close is not: the sub opens the short on the rebalancing day and covers it on the mirror day
+    Datetime open_date = kdata[0].datetime;
+    Datetime cover_date = kdata[1].datetime;
+
+    auto sg = make_shared<ScriptedShortSG>(open_date, cover_date);
+    sg->setParam<bool>("support_borrow_stock", true);
+    auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setParam<bool>("support_borrow_stock", true);
+    sys->setStock(stk);
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, sys);
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto pf = PF_Simple(tm, se, AF_EqualWeight(), 2, "query", true);  // mode B
+    REQUIRE_EQ(pf->getMode(), "B");
+    // readyForRun syncs this switch to the parent TM; without it the parent's sellShort is
+    // rejected ("Non borrowed, can't sell short")
+    pf->setParam<bool>("support_borrow_stock", true);
+    pf->run(query);
+
+    size_t sell_short_count = 0;
+    size_t buy_short_count = 0;
+    size_t buy_count = 0;
+    for (const auto& tr : tm->getTradeList()) {
+        if (tr.stock != stk) {
+            continue;
+        }
+        if (tr.business == BUSINESS_SELL_SHORT) {
+            sell_short_count++;
+        } else if (tr.business == BUSINESS_BUY_SHORT) {
+            buy_short_count++;
+        } else if (tr.business == BUSINESS_BUY) {
+            buy_count++;
+        }
+    }
+
+    /** @arg the parent mirrored the short opening (sellShort) and the full cover (buyShort) */
+    CHECK_EQ(sell_short_count, 1);
+    CHECK_EQ(buy_short_count, 1);
+
+    /** @arg the full cover did NOT open a long (the regression discriminator of the side misjudge)
+     */
+    CHECK_EQ(buy_count, 0);
+
+    /** @arg the parent short book is flat after the cover */
+    CHECK_EQ(tm->getShortPosition(stk).number, 0.0);
+}
+
+/** @par Check point: mode A (signal aggregation) -- the sub shadow signal cash stays bounded.
+ * The shadows run continuously and are never reset (the old per-rebalancing-day reset was
+ * removed): the sub book keeps submitting intents around the initial signal cash instead of
+ * piling up, and the parent keeps rebalancing (before the fix the shadow ran out of cash and the
+ * portfolio stopped rebalancing). */
+TEST_CASE("test_MultiSystem_mode_a_shadow_cash_bounded") {
     Stock stk1 = getStock("sh600000");
     Stock stk2 = getStock("sz000001");
     REQUIRE(!stk1.isNull());
@@ -2208,10 +2348,8 @@ TEST_CASE("test_MultiSystem_mode_a_signal_cash_reset") {
     auto subs = pf->getSystemList();
     REQUIRE_EQ(subs.size(), 2);
 
-    // The shadow is reset to the initial signal cash on every rebalancing day, so the sub book
-    // stays around the init cash; the upper bound is the real invariant (the shadow must never
-    // accumulate
-    // -- a buggy reset used to inflate one leg to millions).
+    // The upper bound is the real invariant (the shadow must never accumulate -- a buggy book
+    // used to inflate one leg to millions)
     Datetime last_date(20000224);
     for (auto& sub : subs) {
         price_t sub_total = sub->getTM()->getFunds(last_date, query.kType()).total_assets();
