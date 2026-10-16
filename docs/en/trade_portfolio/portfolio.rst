@@ -146,9 +146,9 @@ Built-in Portfolios
     Create a portfolio running in **mode A "Signal Aggregation"** (returns MultiSystem).
 
     Mode A semantics (signal aggregation): the sub-systems are pure signal sources on their shadow
-    accounts (the signal cash is reset on every rebalancing day); the parent converts the suggestions
-    into the target positions of the parent account by the AF L2 (target market value = weight x
-    position ratio x the parent total assets, aggregated per instrument and rebalanced by the delta
+    accounts (the signal cash is never reset, the shadows run continuously); the parent converts the
+    suggestions into the target positions of the parent account by the AF L2 (target market value =
+    weight x net ratio x the parent net assets, aggregated per instrument and rebalanced by the delta
     against the current position) and the L3 portfolio risk control applies (e.g. max-single-position).
     The unselected sub-systems are not force cleared by default (sell_at_not_selected=False).
 
@@ -165,5 +165,5 @@ Built-in Portfolios
     :param bool delay_to_trading_day: if the scheduled day is not a trading day, defer the rebalance to the first trading day within the current cycle
     :param bool trade_on_close: whether the trades are executed at the close
     :param bool sell_at_not_selected: whether instruments not selected on the rebalancing day are force-sold
-    :param float sub_init_cash: the signal cash of every sub-system shadow account (reset on every rebalancing day)
+    :param float sub_init_cash: the signal cash of every sub-system shadow account (never reset)
     :rtype: MultiSystem

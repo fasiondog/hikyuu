@@ -107,7 +107,7 @@ and :meth:`AllocateFundsBase.allocate` chains them together into a pipeline:
       - Sub-system context -> weight ``{System: weight}``; in mode B it writes the actual quota back to ``contexts[i].quota`` in place
     * - L2 behavior-level conversion
       - ``_to_targets(date, tm, suggestions, sys_weight, query, mode)``
-      - Weights -> executable quantities for the parent account (in mode A, order quantities are converted proportionally; in mode B, sub-system instructions are passed through)
+      - Weights -> executable quantities for the parent account (in mode A, the per-instrument net target is synthesized by ``weight x signed net ratio x the parent net assets`` and traded by the delta; in mode B, sub-system instructions are passed through)
     * - L3 portfolio risk control
       - ``_check_risk(date, tm, suggestions, query, mode)``
       - Portfolio-level risk-control clipping (e.g. the ``max-single-position`` concentration cap)
@@ -354,7 +354,7 @@ Asset Allocation Algorithm Base Class
 
         [Override hook] L2 behavior-level conversion: converts the weights into executable quantities for the parent account, rewriting ``suggestions`` in place.
 
-        In mode A it converts the order quantities by ``assets_ratio`` (overallocation is turned into position reduction; SELL/CLEAR close the full position);
+        In mode A it reads the sub-system current intent state (``target_position_ratio``, the signed net target), synthesizes the per-instrument net target by ``w x ratio x the parent net assets`` and trades the delta on the parent account;
         in mode B it passes the sub-system instructions through and applies defensive clipping. The base class default implementation is used when this hook is not overridden.
 
         :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system

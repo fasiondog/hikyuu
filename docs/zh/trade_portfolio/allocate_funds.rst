@@ -97,7 +97,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
       - 子系统上下文 → 权重 ``{System: weight}``；模式 B 下就地回写 ``contexts[i].quota``（真实额度）
     * - L2 行为级换算
       - ``_to_targets(date, tm, suggestions, sys_weight, query, mode)``
-      - 权重 → 父账户可执行数量（模式 A 按比重换算下单数量；模式 B 透传子系统指令）
+      - 权重 → 父账户可执行数量（模式 A 按「权重 × 带符号净目标比重 × 父净值」合成每标的净目标并 trade-the-delta；模式 B 透传子系统指令）
     * - L3 组合风控
       - ``_check_risk(date, tm, suggestions, query, mode)``
       - 组合级风控裁剪（如 ``max-single-position`` 集中度上限）
@@ -334,7 +334,8 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
         【重载接口】L2 行为级换算：将权重换算为父账户可执行数量，就地改写 ``suggestions``。
 
-        模式 A 按 ``assets_ratio`` 换算下单数量（超配转减仓、SELL/CLEAR 全平）；
+        模式 A 读取子系统当前意图态（``target_position_ratio`` 带符号净目标），按
+        ``w × ratio × 父净值`` 合成每标的净目标并对父账户按差额（trade-the-delta）下单；
         模式 B 透传子系统指令并做防御性裁剪。未重载时使用基类默认实现。
 
         :param str mode: 运行模式（"A"/"B"/"C"），由聚合系统持有

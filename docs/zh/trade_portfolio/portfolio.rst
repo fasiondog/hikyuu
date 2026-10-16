@@ -132,8 +132,8 @@ PF 部件说明:
 
     创建运行于**模式 A「信号汇总」（Signal Aggregation）**的投资组合（返回 MultiSystem）。
 
-    模式 A 语义（信号汇总）：子系统在信号「影子账户」上作为纯信号源（信号资金每调仓日重置）；
-    父通过 AF L2 把建议换算为父账户目标持仓（目标市值 = 权重 × 仓位意图 × 父总资产，按标的聚合后
+    模式 A 语义（信号汇总）：子系统在信号「影子账户」上作为纯信号源（信号资金**恒运行、不重置**）；
+    父通过 AF L2 把建议换算为父账户目标持仓（目标市值 = 权重 × 净敞口比重 × 父净值，按标的聚合后
     对当前持仓取差额再平衡），并应用 L3 组合风控（如 ``max-single-position``）。
     未选中的子系统默认不清仓（``sell_at_not_selected=False``）。
 
@@ -149,5 +149,5 @@ PF 部件说明:
     :param bool delay_to_trading_day: 如果当日不是交易日将会被顺延至当前周期内的第一个交易日
     :param bool trade_on_close: 交易是否在收盘时进行
     :param bool sell_at_not_selected: 调仓日未选中的标的是否强制卖出
-    :param float sub_init_cash: 子系统影子账户的信号资金（每调仓日重置）
+    :param float sub_init_cash: 子系统影子账户的信号资金（恒运行、不重置）
     :rtype: MultiSystem
