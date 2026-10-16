@@ -368,6 +368,18 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     TMPtr sub_tm = sys->getTM();
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
+    // Scaling a net-short book is not supported yet: covering consumes cash, which the
+    // recycle-first order already withdrew, and the total_assets metric is inflated by the short
+    // proceeds. Warn and skip instead of mis-calibrating.
+    if (sub_tm->getShortPosition(sys->getStock()).number > 0.0) {
+        static std::once_flag g_short_reduce_warned;
+        std::call_once(g_short_reduce_warned, [&] {
+            HKU_WARN("Net-short quota reduction is not supported yet (sub {}), skipped!",
+                     sys->name());
+        });
+        return;
+    }
+
     // The sub cash has been recycled before, so the sub total here is the holding market value
     FundsRecord funds = sub_tm->getFunds(date, ktype);
     price_t sub_total = funds.total_assets() - funds.cash;
@@ -431,6 +443,16 @@ void MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& date
     TMPtr sub_tm = sys->getTM();
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
+    // Injecting into a net-short book is not supported yet: warn and skip
+    if (sub_tm->getShortPosition(sys->getStock()).number > 0.0) {
+        static std::once_flag g_short_inject_warned;
+        std::call_once(g_short_inject_warned, [&] {
+            HKU_WARN("Net-short quota injection is not supported yet (sub {}), skipped!",
+                     sys->name());
+        });
+        return;
+    }
+
     FundsRecord funds = sub_tm->getFunds(date, ktype);
     price_t sub_total = funds.total_assets() - funds.cash;
     if (sub_total >= quota || quota <= 0.0) {
@@ -453,9 +475,10 @@ void MultiSystem::_clearSubSystem(const SystemPtr& sys, const Datetime& date, KQ
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
     Stock stock = sys->getStock();
-    if (!stock.isNull()) {
+    if (!stock.isNull() && _getClosePrice(date, stock) > 0.0) {
         PositionRecord position = sub_tm->getPosition(date, stock);
-        if (position.number > 0.0 && _getClosePrice(date, stock) > 0.0) {
+        // A long is sold and a short is covered (System::_sellForce flattens whichever side holds)
+        if (position.number > 0.0 || sub_tm->getShortPosition(stock).number > 0.0) {
             sys->sellForceOnClose(date, MAX_DOUBLE, PART_PORTFOLIO);
         }
     }
