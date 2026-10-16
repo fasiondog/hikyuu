@@ -2128,6 +2128,35 @@ TEST_CASE("test_MultiSystem_mode_b_quota_calibration") {
     CHECK_LT(pf_funds.cash, pf_funds.total_assets() * 0.1);
 }
 
+/** @par Check point: mode B mirrors the sub-system trades on every bar (continuous mirror), so a
+ * longer rebalancing cycle does not cut the parent trades down to the rebalancing days only */
+TEST_CASE("test_MultiSystem_mode_b_continuous_mirror") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto run_pf = [&](int cycle) {
+        auto se = SE_Fixed();
+        se->addStockList({stk1, stk2}, create_alway_buy_sys());
+        auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+        auto pf = PF_Simple(tm, se, AF_EqualWeight(), cycle, "query", true);
+        pf->run(query);
+        return tm;
+    };
+
+    auto tm1 = run_pf(1);  // every day is a rebalancing day
+    auto tm2 = run_pf(2);  // half of the days are non-rebalancing days
+    size_t n1 = tm1->getTradeList().size();
+    size_t n2 = tm2->getTradeList().size();
+
+    /** @arg the parent mirrors continuously: the cycle-2 parent trades on about as many bars as the
+     * cycle-1 parent (a batched engine would drop it to roughly n1/2, only the rebalancing days) */
+    REQUIRE_GT(n1, 0);
+    CHECK_GT(n2, n1 / 2);
+}
+
 /** @par Check point: mode A (signal aggregation) -- the sub shadow signal cash is reset on every
  * rebalancing day, so the sub-systems can keep submitting buy intents after their first position
  * (before the fix the shadow ran out of cash and the portfolio stopped rebalancing) */

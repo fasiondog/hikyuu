@@ -181,7 +181,6 @@ void MultiSystem::_reset() {
     m_open_trades.clear();
     m_sub_funds_before.clear();
     m_adjust_turnover.clear();
-    m_pending_suggestions.clear();
     m_open_pending_suggestions.clear();
     m_kdata_cache.clear();
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
@@ -205,7 +204,6 @@ void MultiSystem::_forceResetAll() {
     m_open_trades.clear();
     m_sub_funds_before.clear();
     m_adjust_turnover.clear();
-    m_pending_suggestions.clear();
     m_open_pending_suggestions.clear();
     m_kdata_cache.clear();
     // mode C: the running pool and the force-sell pool are runtime states, dropped on reset
@@ -265,8 +263,7 @@ SystemPtr MultiSystem::_clone() {
         ret->setAF(m_af->clone());
     }
     // m_shadow_sys / m_running_set / m_running_order / m_force_sell_list / m_sub_index /
-    // m_pending_suggestions / m_open_pending_suggestions / m_kdata_cache are the runtime states,
-    // not copied
+    // m_open_pending_suggestions / m_kdata_cache are the runtime states, not copied
     return ret;
 }
 
@@ -1283,38 +1280,24 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     m_close_day_index++;
 
     if (!is_adjust) {
-        // Non-rebalancing day: accumulate the suggestions to the next rebalancing day
-        m_pending_suggestions.insert(m_pending_suggestions.end(), suggestions.begin(),
-                                     suggestions.end());
-        m_last_suggestions = suggestions;
-        return TradeRecordList();
-    }
-
-    // Rebalancing day: merge the pending suggestions; the unselected sub-systems' ones are
-    // dropped (their parent holdings have been cleared as the unselected above)
-    // A pending suggestion carries the plan price of its accumulation day, which is several bars
-    // old by now; re-price it to the current rebalancing-day close, otherwise the merge would
-    // execute at that stale price
-    auto reprices = [&](TradeSuggestion& s) {
-        price_t cur = _getClosePrice(datetime, s.stock);
-        if (cur > 0.0) {
-            s.plan_price = cur;
-        }
-    };
-    if (m_se) {
-        for (auto& s : m_pending_suggestions) {
-            if (s.sys && selected.count(s.sys.get()) > 0) {
-                reprices(s);
-                suggestions.push_back(s);
+        // Continuous mirror (mode B): the parent mirrors the sub-system trades of this bar at once
+        // (mode A returns earlier and mode C trades on the shared account, so only mode B reaches
+        // here); the quota calibration stays on the rebalancing day only
+        if (!suggestions.empty()) {
+            if (getMode() == "B") {
+                getAF()->allocateTargets(datetime, m_tm, suggestions, af_weights,
+                                         m_kdata.getQuery());
+            }
+            if (m_trade_on_close) {
+                _executeSuggestions(datetime, suggestions, ktype, executed);
+            } else {
+                m_open_pending_suggestions = suggestions;
             }
         }
-    } else {
-        for (auto& s : m_pending_suggestions) {
-            reprices(s);
-            suggestions.push_back(s);
-        }
+        m_last_suggestions = suggestions;
+        _finishClosePhase(datetime, suggestions, executed, is_adjust);
+        return executed;
     }
-    m_pending_suggestions.clear();
 
     if (getMode() == "B") {
         if (quota_calibrated) {
