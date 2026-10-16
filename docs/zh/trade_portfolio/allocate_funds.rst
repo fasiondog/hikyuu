@@ -185,7 +185,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
-    .. py:attribute:: mode  分配模式：``"A"`` 信号汇总（Signal Aggregation，默认；父统一下单）或 ``"B"`` 资金配置（Fund Allocation；调仓日先按额度校准选中子系统再驱动，父透传其真实指令）
+    .. py:attribute:: mode  分配模式：``"A"`` 信号汇总（Signal Aggregation，默认；父读子当前意图态、合成每标的带符号净目标后统一下单）、``"B"`` 资金配置（Fund Allocation；调仓日先按额度校准选中子系统再驱动，父连续镜像其真实指令）或 ``"C"`` 共享账户兼容（子系统直接在父真实账户交易，父不做 L2 换算）
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 

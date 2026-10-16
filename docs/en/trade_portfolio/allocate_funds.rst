@@ -183,7 +183,7 @@ Asset Allocation Algorithm Base Class
     .. py:attribute:: name  Name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
-    .. py:attribute:: mode  The allocation mode: ``"A"`` Signal Aggregation (the default; the parent orders uniformly) or ``"B"`` Fund Allocation (on the rebalancing day the selected sub-systems are calibrated to their quota before being driven, and the parent mirrors their real instructions)
+    .. py:attribute:: mode  The allocation mode: ``"A"`` Signal Aggregation (the default; the parent reads the sub-systems' current intent state, synthesizes the net target and orders uniformly), ``"B"`` Fund Allocation (on the rebalancing day the selected sub-systems are calibrated to their quota before being driven, and the parent mirrors their real instructions continuously) or ``"C"`` Shared Account Compatibility (the sub-systems trade on the parent real account, no L2 conversion)
 
     .. py:method:: __init__(self[, name="AllocateFundsBase"])
 
