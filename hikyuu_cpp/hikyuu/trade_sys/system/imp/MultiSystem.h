@@ -12,7 +12,8 @@
  *  detection) and a rebalancing cycle, and carries the portfolio-level fund allocation (AF,
  *  see AllocateFundsBase for the L1/L2/L3 layers).
  *
- *  Running modes (the mode is held by the AF, set via setMode / the AF factories):
+ *  Running modes (the mode is held by the aggregate system itself, set via setMode; the preset
+ *  factories PF_Simple / PF_WithoutAF / PF_SignalAggregate configure it):
  *
  *  - **Mode A "Signal Aggregation" (the default)**: every sub-system gets a shadow account
  *    funded with `m_sub_init_cash` as a pure signal source. The shadows run continuously and are
@@ -144,23 +145,23 @@ public:
         return m_af;
     }
 
-    /** Set the running mode (the mode is held by the AF, the only source):
+    /** Set the running mode (owned by the aggregate system itself):
      *  - "A" **Signal Aggregation** (the default): the sub-systems are pure signal sources on
      *    their shadow accounts, the parent converts the suggestions by the L2 target conversion
      *    and orders uniformly on its own account;
      *  - "B" **Fund Allocation** (quota allocation, FOF/MOM style): every selected sub-system is
      *    calibrated to the quota allocated by L1 on the rebalancing day and trades with the exact
-     *    quota, the parent mirrors its real instructions (L2 pass-through).
+     *    quota, the parent mirrors its real instructions (L2 pass-through);
+     *  - "C" **Shared Account Compatibility** (the legacy Portfolio behavior).
+     *  The case is ignored; an invalid value is warned and normalized to "A".
      *  See the class comment and AllocateFundsBase for the full semantics. */
-    void setMode(const string& mode) {
-        if (m_af) {
-            m_af->setMode(mode);
-        }
-    }
+    void setMode(const string& mode);
 
     /** Get the running mode: "A" Signal Aggregation / "B" Fund Allocation / "C" Shared Account
-     *  Compatibility (from the AF) */
-    const string& getMode() const;
+     *  Compatibility */
+    const string& getMode() const {
+        return m_mode;
+    }
 
     /** Mode C only: the running pool, i.e. the sub-systems admitted by the SE on the last
      *  rebalancing day. A sub-system leaves the pool as soon as it is no longer selected (no matter
@@ -351,6 +352,12 @@ private:
      * return an empty Stock when not found */
     static Stock _findStock(const SystemPtr& sys);
 
+    /** Recursively judge whether the sub-system subtree (including itself) currently holds a
+     *  net-short position. A nested aggregate has an empty getStock(), so the direct
+     *  getShortPosition(stock) check would never fire on it; the recursion reaches the leaves.
+     *  Used by the mode B net-short calibration guard. */
+    static bool _subtreeHasNetShort(const SystemPtr& sys);
+
     // Check whether the candidate subtree (including itself) contains target (used for the circular
     // reference detection)
     static bool _subtreeContains(const SystemPtr& candidate, System* target);
@@ -491,9 +498,10 @@ private:
     TradeRecordList _forceSellDelisted(const Datetime& date);
 
     /** Queue the close-stage suggestions for the execution at the next open (trade_on_close=false).
-     *  Appends to the still un-executed pending list (with a warning) instead of overwriting it, so
-     *  that a double-driven close of the same day cannot silently drop the earlier batch. */
-    void _queueOpenPending(const TradeSuggestionList& suggestions);
+     *  It is keyed by the driving day: a repeat drive of the same day replaces the queued batch
+     *  (idempotent), and a batch left over from an earlier day (a session that only drives close)
+     *  is dropped with a single warning, keeping only the latest batch. */
+    void _queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions);
 
 private:
     SystemList m_sys_list;
@@ -504,10 +512,11 @@ private:
       1};  // The rebalancing cycle (days); <=1 means rebalancing on every close day
     bool m_trade_on_close{true};  // Whether to execute the rebalancing orders at the close stage
     AllocateFundsPtr m_af{AF_EqualWeight()};  // The portfolio-level fund allocation (AF, including
-                                              // L1/L2/L3); the running mode is held by it
-    std::shared_ptr<SelectorBase> m_se;       // The trading object selector (optional)
-    bool m_sell_at_not_selected{true};  // Whether to force liquidating the unselected sub-systems
-                                        // (it takes effect only after SE is set)
+                                              // L1/L2/L3), owned by the aggregate system
+    string m_mode{"A"};  // The running mode ("A"/"B"/"C"), owned by the aggregate system itself
+    std::shared_ptr<SelectorBase> m_se;  // The trading object selector (optional)
+    bool m_sell_at_not_selected{true};   // Whether to force liquidating the unselected sub-systems
+                                         // (it takes effect only after SE is set)
     std::vector<std::pair<Datetime, double>>
       m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
                           // assets before rebalancing)
@@ -524,8 +533,15 @@ private:
                                   // cross-day residue (runtime state, not serialized)
     TradeSuggestionList m_open_pending_suggestions;  // The converted suggestions to be executed at
                                                      // the next open when trade_on_close=false
-    std::set<System*> m_shadow_sys;  // The sub-systems whose shadow account has been created
-                                     // (runtime, not serialized)
+    Datetime m_open_pending_date;  // The close day m_open_pending_suggestions belongs to; makes the
+                                   // same-day re-drive idempotent (runtime state, not serialized)
+    bool m_open_pending_warned{false};      // The once-per-instance flag of the cross-day pending
+                                            // backlog warning (runtime state, not serialized)
+    bool m_inject_truncated_warned{false};  // The once-per-instance flag of the parent-cash
+                                            // truncation warning of the mode B gap injection
+                                            // (runtime state, not serialized)
+    std::set<System*> m_shadow_sys;         // The sub-systems whose shadow account has been created
+                                            // (runtime, not serialized)
     // Mode C: the running pool. m_running_order keeps the legacy insertion order, which decides
     // who gets the shared cash first (the cash competition order of the legacy Portfolio);
     // m_running_set is the membership index of the very same content.
@@ -550,9 +566,6 @@ private:
     std::map<Datetime, Datetime>
       m_cycle_ends;  // The rebalancing-day -> cycle-end (the next rebalancing day) mapping, used by
                      // the cycle-type signal driving (runtime state, rebuilt with each run)
-    AllocateFundsBase::Weights
-      m_last_af_weights;  // The L1 weight table of the last rebalancing day, reused by the mode B
-                          // non-rebalancing-day mirror (runtime state, not serialized)
     bool m_short_reduce_warned{false};  // The once-per-instance flag of the net-short quota
                                         // reduction skip warning (runtime state, not serialized)
     bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota
@@ -572,18 +585,23 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_adjust_cycle);
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);
         ar& BOOST_SERIALIZATION_NVP(m_sell_at_not_selected);
-        if (version < 1) {
-            // Old archives stored the running mode here (it has been migrated to
-            // AllocateFundsBase); write it back into the AF after being read.
-            string legacy_mode = "A";
-            ar& boost::serialization::make_nvp("m_mode", legacy_mode);
-            if (m_af) {
-                m_af->setMode(legacy_mode);
+        if (version >= 2) {
+            // The running mode is owned by the aggregate system itself again; the AF no longer
+            // holds it (AllocateFundsBase version 1 dropped the field).
+            ar& BOOST_SERIALIZATION_NVP(m_mode);
+            ar& BOOST_SERIALIZATION_NVP(m_af);
+        } else if (version == 1) {
+            // Archive version 1: the mode was held by the AF. The AF load path stashes it in its
+            // legacy buffer (AllocateFundsBase version < 1), migrate it after the AF is loaded.
+            ar& BOOST_SERIALIZATION_NVP(m_af);
+            if (m_af && !m_af->m_legacy_mode.empty()) {
+                m_mode = m_af->m_legacy_mode;
             }
         } else {
-            // The fund allocation instance (including L1/L2/L3 and the running mode) is
-            // serialized together with the aggregate system
-            ar& BOOST_SERIALIZATION_NVP(m_af);
+            // Archive version 0: the mode was stored here as m_mode before it migrated to the AF.
+            string legacy_mode = "A";
+            ar& boost::serialization::make_nvp("m_mode", legacy_mode);
+            m_mode = legacy_mode;
         }
         ar& BOOST_SERIALIZATION_NVP(m_se);
     }
@@ -605,5 +623,5 @@ using PFPtr = MultiSystemPtr;
 }  // namespace hku
 
 #if HKU_SUPPORT_SERIALIZATION
-BOOST_CLASS_VERSION(::hku::MultiSystem, 1)
+BOOST_CLASS_VERSION(::hku::MultiSystem, 2)
 #endif

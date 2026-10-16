@@ -28,7 +28,8 @@ MultiFactorAllocateFunds::~MultiFactorAllocateFunds() {}
 AllocateFundsBase::Weights MultiFactorAllocateFunds::_allocate(const Datetime& date,
                                                                const TradeManagerPtr& tm,
                                                                SubSystemContextList& contexts,
-                                                               const KQuery& query) {
+                                                               const KQuery& query,
+                                                               const string& mode) {
     std::vector<double> weights(contexts.size(), 0.0);
     double sum = 0.0;
     for (size_t i = 0; i < contexts.size(); ++i) {
@@ -59,7 +60,7 @@ AllocateFundsBase::Weights MultiFactorAllocateFunds::_allocate(const Datetime& d
             w /= sum;
         }
     }
-    return _applyWeights(date, tm, contexts, query, weights);
+    return _applyWeights(date, tm, contexts, query, weights, mode);
 }
 
 }  // namespace hku

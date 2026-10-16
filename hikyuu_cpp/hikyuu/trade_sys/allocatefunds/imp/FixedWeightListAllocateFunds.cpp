@@ -39,17 +39,19 @@ void FixedWeightListAllocateFunds::_checkParam(const string& name) const {
 AllocateFundsBase::Weights FixedWeightListAllocateFunds::_allocate(const Datetime& date,
                                                                    const TradeManagerPtr& tm,
                                                                    SubSystemContextList& contexts,
-                                                                   const KQuery& query) {
+                                                                   const KQuery& query,
+                                                                   const string& mode) {
     PriceList ws = getParam<PriceList>("weights");
     if (ws.size() != contexts.size()) {
         HKU_WARN("weights size({}) != subsystems({}), fallback to equal weight! [{}]", ws.size(),
                  contexts.size(), name());
         return _applyWeights(
           date, tm, contexts, query,
-          std::vector<double>(contexts.size(), 1.0 / std::max<size_t>(contexts.size(), 1)));
+          std::vector<double>(contexts.size(), 1.0 / std::max<size_t>(contexts.size(), 1)), mode);
     }
     // Without normalization: take the fixed proportions one by one in order
-    return _applyWeights(date, tm, contexts, query, std::vector<double>(ws.begin(), ws.end()));
+    return _applyWeights(date, tm, contexts, query, std::vector<double>(ws.begin(), ws.end()),
+                         mode);
 }
 
 }  // namespace hku

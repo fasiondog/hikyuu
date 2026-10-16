@@ -72,15 +72,17 @@ AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
 AllocateFundsBase::~AllocateFundsBase() {}
 
 void AllocateFundsBase::baseCheckParam(const string& name) const {
-    if ("max-single-position" == name) {
-        HKU_ASSERT(getParam<double>("max-single-position") >= 0.0);
+    // The legacy base-class weight-list parameter has been removed (the fixed weights now go
+    // through AF_FixedWeightList / its "weights" parameter); setting it would otherwise be
+    // silently accepted and ignored, so it is called out explicitly.
+    if ("weight-list" == name) {
+        HKU_WARN(
+          "{}: the parameter \"weight-list\" has been removed and is ignored; use "
+          "AF_FixedWeightList (its \"weights\" parameter) instead!",
+          m_name);
     }
-    if ("max-total-position" == name) {
-        HKU_ASSERT(getParam<double>("max-total-position") >= 0.0);
-    }
-    if ("fixed-amount" == name) {
-        HKU_ASSERT(getParam<double>("fixed-amount") >= 0.0);
-    }
+    // max-single-position / max-total-position / fixed-amount: <=0 means no limit (or no fixed
+    // pricing), so negative values are allowed and none of them is bounded from below.
 }
 
 void AllocateFundsBase::paramChanged() {}
@@ -101,7 +103,6 @@ AFPtr AllocateFundsBase::clone() {
     p->m_is_python_object = m_is_python_object;
     p->m_tm = m_tm;
     p->m_query = m_query;
-    p->m_mode = m_mode;
     return p;
 }
 
@@ -111,29 +112,30 @@ AFPtr AllocateFundsBase::clone() {
 
 void AllocateFundsBase::allocate(const Datetime& date, const TradeManagerPtr& tm,
                                  TradeSuggestionList& suggestions, SubSystemContextList& contexts,
-                                 const KQuery& query) {
-    auto weights = allocateQuota(date, tm, contexts, query);
-    allocateTargets(date, tm, suggestions, weights, query);
+                                 const KQuery& query, const string& mode) {
+    auto weights = allocateQuota(date, tm, contexts, query, mode);
+    allocateTargets(date, tm, suggestions, weights, query, mode);
 }
 
 AllocateFundsBase::Weights AllocateFundsBase::allocateQuota(const Datetime& date,
                                                             const TradeManagerPtr& tm,
                                                             SubSystemContextList& contexts,
-                                                            const KQuery& query) {
-    return _allocate(date, tm, contexts, query);
+                                                            const KQuery& query,
+                                                            const string& mode) {
+    return _allocate(date, tm, contexts, query, mode);
 }
 
 void AllocateFundsBase::allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
                                         TradeSuggestionList& suggestions, const Weights& sys_weight,
-                                        const KQuery& query) {
-    _toTargets(date, tm, suggestions, sys_weight, query);
-    _checkRisk(date, tm, suggestions, query);
+                                        const KQuery& query, const string& mode) {
+    _toTargets(date, tm, suggestions, sys_weight, query, mode);
+    _checkRisk(date, tm, suggestions, query, mode);
 }
 
 AllocateFundsBase::Weights AllocateFundsBase::_allocate(const Datetime& date,
                                                         const TradeManagerPtr& tm,
                                                         SubSystemContextList& contexts,
-                                                        const KQuery& query) {
+                                                        const KQuery& query, const string& mode) {
     if (contexts.empty()) {
         return Weights();
     }
@@ -142,18 +144,18 @@ AllocateFundsBase::Weights AllocateFundsBase::_allocate(const Datetime& date,
     // legacy base-class weight-list parameter has been removed, the fixed weights go through
     // AF_FixedWeightList.
     std::vector<double> weights(contexts.size(), 1.0 / contexts.size());
-    return _applyWeights(date, tm, contexts, query, weights);
+    return _applyWeights(date, tm, contexts, query, weights, mode);
 }
 
 AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
   const Datetime& date, const TradeManagerPtr& tm, SubSystemContextList& contexts,
-  const KQuery& query, const std::vector<double>& weights) const {
+  const KQuery& query, const std::vector<double>& weights, const string& mode) const {
     Weights result;
     if (contexts.empty()) {
         return result;
     }
     // The pricing policy: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount),
-    // otherwise weight x the parent total assets (the parent valuation is needed only there).
+    // otherwise weight x the parent net assets (the parent valuation is needed only there).
     double fixed_amount = getParam<double>("fixed-amount");
     if (fixed_amount > 0.0) {
         std::call_once(g_fixed_amount_warn_flag, [this]() {
@@ -162,8 +164,7 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
         });
     }
     double eq = 1.0 / contexts.size();
-    double total_assets =
-      (m_mode == "B" && tm) ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
+    double net_assets = (mode == "B" && tm) ? tm->getFunds(date, query.kType()).net_assets() : 0.0;
     double sum_w = 0.0;
     for (size_t i = 0; i < contexts.size(); ++i) {
         auto& ctx = contexts[i];
@@ -173,18 +174,28 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
             continue;
         }
         double w = (i < weights.size()) ? weights[i] : eq;
+        // A non-finite weight (e.g. a broken score chain) must not reach the quota, where it would
+        // poison the downstream calculation; it is skipped like a missing context.
+        if (!std::isfinite(w)) {
+            HKU_WARN("{}::_applyWeights: the non-finite weight of the context[{}] is skipped!",
+                     name(), i);
+            continue;
+        }
         result[ctx.sys] = w;
         sum_w += w;
     }
     // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
     // MM working directly on the shared real account.
-    if (m_mode == "B" && tm) {
-        // The mode B budget cap: the sum of the quotas <= total assets x max-total-position,
+    if (mode == "B" && tm) {
+        // The mode B budget cap: the sum of the quotas <= net assets x max-total-position,
         // scaled down proportionally when exceeded (<=0 disables the cap). The fixed-amount
         // pricing is exempt: the quota there is the absolute amount the user asked for, not a
         // proportion to be scaled.
         double max_total = getParam<double>("max-total-position");
-        if (fixed_amount <= 0.0 && max_total > 0.0 && std::isfinite(sum_w) && sum_w > max_total) {
+        // The relative epsilon absorbs the floating-point noise of a legitimate full allocation
+        // (a sum of normalized weights worth 1.0 + 2.2e-16 must not trigger a spurious scaling)
+        if (fixed_amount <= 0.0 && max_total > 0.0 && std::isfinite(sum_w) &&
+            sum_w > max_total * (1.0 + 1e-9)) {
             double scale = max_total / sum_w;
             HKU_WARN(
               "{}: the aggregated quota weights({:.4f}) exceed max-total-position({}), scaled by "
@@ -203,7 +214,7 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
             // quota lags one period behind).
             auto it = result.find(ctx.sys);
             double w = (it != result.end()) ? it->second : 0.0;
-            ctx.quota = (fixed_amount > 0.0) ? fixed_amount : (w * total_assets);
+            ctx.quota = (fixed_amount > 0.0) ? fixed_amount : (w * net_assets);
         }
     }
     return result;
@@ -211,9 +222,9 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
 
 void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& tm,
                                    TradeSuggestionList& suggestions, const Weights& sys_weight,
-                                   const KQuery& query) {
+                                   const KQuery& query, const string& mode) {
     KQuery::KType ktype = query.kType();
-    if (m_mode == "B" || m_mode == "C") {
+    if (mode == "B" || mode == "C") {
         // Mode B / C: pass through the real instruction of the sub-system (number is the order
         // quantity of the sub-manager), the parent does not convert it. Only the long-side SELL
         // suggestions are defensively clipped to not exceed the current position of the parent; a
@@ -239,10 +250,21 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     double fixed_amount = getParam<double>("fixed-amount");
 
     std::map<Stock, double> target_value;  // instrument -> signed net target market value
-    std::map<Stock, price_t> price;        // instrument -> the close price used for the shares
+    std::map<Stock, double> fixed_dir;  // instrument -> aggregated signed direction (fixed-amount)
+    std::map<Stock, price_t> price;     // instrument -> the close price used for the shares
     double gross = 0.0;
     for (const auto& s : suggestions) {
         if (s.stock.isNull() || s.plan_price <= 0.0) {
+            continue;
+        }
+        price[s.stock] = s.plan_price;
+        if (fixed_amount > 0.0) {
+            // fixed-amount: the pricing is per instrument, not per suggestion. The same instrument
+            // held by N sub-systems must not be scaled to N x fixed-amount, so only the aggregate
+            // signed direction is accumulated here and the ±fixed-amount target is applied once
+            // per instrument below.
+            fixed_dir[s.stock] +=
+              (s.target_position_ratio > 0.0) ? 1.0 : (s.target_position_ratio < 0.0 ? -1.0 : 0.0);
             continue;
         }
         double weight = 1.0;
@@ -252,23 +274,26 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         } else if (!sys_weight.empty()) {
             weight = 1.0 / sys_weight.size();
         }
-        double v;
-        if (fixed_amount > 0.0) {
-            // fixed-amount: the per-instrument target is the fixed amount on its own side
-            v = (s.target_position_ratio > 0.0)
-                  ? fixed_amount
-                  : (s.target_position_ratio < 0.0 ? -fixed_amount : 0.0);
-        } else {
-            v = weight * s.target_position_ratio * parent_net;
-        }
+        double v = weight * s.target_position_ratio * parent_net;
         if (!std::isfinite(v)) {
             HKU_WARN("{}::_toTargets: non-finite target value of {}, skipped!", m_name,
                      s.stock.market_code());
             continue;
         }
         target_value[s.stock] += v;
-        price[s.stock] = s.plan_price;
         gross += std::fabs(v);
+    }
+    if (fixed_amount > 0.0) {
+        // The aggregate-then-apply step: one ±fixed-amount target per instrument (a flat aggregate
+        // means the conflicting intents cancel out, so the instrument is driven to zero)
+        for (const auto& kv : fixed_dir) {
+            if (kv.second == 0.0) {
+                continue;
+            }
+            double target = (kv.second > 0.0) ? fixed_amount : -fixed_amount;
+            target_value[kv.first] = target;
+            gross += std::fabs(target);
+        }
     }
 
     // The total budget cap: the aggregated gross target market value <= net assets x
@@ -351,10 +376,11 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
 }
 
 void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
-                                   TradeSuggestionList& suggestions, const KQuery& query) {
+                                   TradeSuggestionList& suggestions, const KQuery& query,
+                                   const string& mode) {
     // L3 portfolio risk control (enabled by default in mode A; mode B and mode C respect the
     // autonomy of the sub-strategy, only the total amount check is performed = no clipping).
-    if (m_mode == "B" || m_mode == "C") {
+    if (mode == "B" || mode == "C") {
         return;
     }
     // The concentration upper limit: the target position market value of a single instrument <=

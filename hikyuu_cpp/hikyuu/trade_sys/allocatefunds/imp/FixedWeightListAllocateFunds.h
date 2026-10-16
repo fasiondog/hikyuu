@@ -35,7 +35,8 @@ public:
     virtual void _checkParam(const string& name) const override;
 
     virtual Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
-                              SubSystemContextList& contexts, const KQuery& query) override;
+                              SubSystemContextList& contexts, const KQuery& query,
+                              const string& mode) override;
 };
 
 }  // namespace hku

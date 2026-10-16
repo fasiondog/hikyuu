@@ -16,7 +16,6 @@ namespace hku {
 
 FixedWeightAllocateFunds::FixedWeightAllocateFunds() : AllocateFundsBase("AF_FixedWeight") {
     setParam<double>("weight", 0.1);
-
 }
 
 FixedWeightAllocateFunds::~FixedWeightAllocateFunds() {}
@@ -31,10 +30,13 @@ void FixedWeightAllocateFunds::_checkParam(const string& name) const {
 AllocateFundsBase::Weights FixedWeightAllocateFunds::_allocate(const Datetime& date,
                                                                const TradeManagerPtr& tm,
                                                                SubSystemContextList& contexts,
-                                                               const KQuery& query) {
+                                                               const KQuery& query,
+                                                               const string& mode) {
     double weight = getParam<double>("weight");
-    // Without normalization: every selected sub-system only accounts for a fixed proportion of the parent total assets (equivalent to master auto_adjust_weight=false)
-    return _applyWeights(date, tm, contexts, query, std::vector<double>(contexts.size(), weight));
+    // Without normalization: every selected sub-system only accounts for a fixed proportion of the
+    // parent total assets (equivalent to master auto_adjust_weight=false)
+    return _applyWeights(date, tm, contexts, query, std::vector<double>(contexts.size(), weight),
+                         mode);
 }
 
 }  // namespace hku

@@ -12,13 +12,13 @@
  *  - **L1 system-level allocation** `_allocate`: decide "how much each sub-system may manage".
  *    Input is the sub-system context list, output is the weight table; in mode B (Fund
  *    Allocation) it also writes the real cash quota into `contexts[i].quota` (weight x the parent
- *    total assets, or the fixed amount). Examples: AF_EqualWeight (1/N), AF_FixedWeight,
+ *    net assets, or the fixed amount). Examples: AF_EqualWeight (1/N), AF_FixedWeight,
  *    AF_MultiFactor (weighted by the SE score).
  *
  *  - **L2 behavior-level conversion** `_toTargets`: convert the sub-system suggestions into the
  *    executable quantity of the parent account (the folding point from the sub-system space to
  *    the individual instrument space). In mode A (Signal Aggregation) the target position market
- *    value = weight x position ratio x the parent total assets, aggregated per instrument and
+ *    value = weight x position ratio x the parent net assets, aggregated per instrument and
  *    rebalanced by the delta to the current position; in mode B the real instruction of the
  *    sub-system passes through unchanged.
  *
@@ -29,8 +29,10 @@
  *  The overall entry is `allocate()` = L1 -> L2 -> L3. When the quota is needed before driving
  *  the sub-systems (the mode B calibration), use `allocateQuota()` (L1 only) and
  *  `allocateTargets()` (L2 -> L3) separately.
- *  The mode is held here (`setMode`): "A" Signal Aggregation / "B" Fund Allocation / "C" Shared
- *  Account Compatibility, see the MultiSystem class comment for the three modes.
+ *  The running mode ("A" Signal Aggregation / "B" Fund Allocation / "C" Shared Account
+ *  Compatibility) is **owned by MultiSystem** and is passed explicitly into every L1/L2/L3 hook
+ *  as the trailing `mode` argument; AF itself does not hold it. See the MultiSystem class comment
+ *  for the three modes.
  *  The single-security form uses MoneyManagerBase (MM); the two no longer share the class
  *  hierarchy, the parameter family or the allocation mode.
  *  Created on: 2018-1-30
@@ -52,7 +54,8 @@
 
 namespace hku {
 
-class System;  // Forward declaration, to avoid a circular include with System.h
+class System;       // Forward declaration, to avoid a circular include with System.h
+class MultiSystem;  // Forward declaration: the friend that migrates the legacy mode on load
 using SYSPtr = std::shared_ptr<System>;
 
 class AllocateFundsBase;
@@ -69,8 +72,8 @@ using AFPtr = AllocateFundsPtr;
  * parts: L1 system-level allocation / L2 behavior-level conversion / L3 portfolio risk control
  * (see the file comment for the details).
  * @note It is used by the aggregate form (MultiSystem) only; the single-security form never calls
- *       this class. The running mode is held here: "A" Signal Aggregation / "B" Fund Allocation
- *       / "C" Shared Account Compatibility.
+ *       this class. The running mode ("A" Signal Aggregation / "B" Fund Allocation / "C" Shared
+ *       Account Compatibility) is owned by MultiSystem and passed into the hooks.
  * @ingroup AllocateFunds
  */
 class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
@@ -119,30 +122,11 @@ public:
         return m_query;
     }
 
-    /** Set the allocation mode: A (signal aggregation, the default), B (fund allocation /
-     *  FOF-MOM) or C (shared account, the legacy Portfolio compatibility).
-     *  @note This field is the **only source** of the allocation mode; the aggregate system does
-     *        not keep one of its own any more.
-     *  @note In mode C the aggregate system drives the sub-systems directly on its own real
-     *        account and never calls allocate(): L1 takes no quota, L2 needs no conversion and L3
-     *        is off by default. The branches here are only a defensive pass-through for the case
-     *        of an AF being invoked in mode C. */
-    void setMode(const string& mode) {
-        // Assign from a char: assigning a string literal straight into the member makes gcc
-        // emit a bogus -Wrestrict overlap warning once everything is inlined
-        char parsed = 'A';
-        if (mode == "B" || mode == "b") {
-            parsed = 'B';
-        } else if (mode == "C" || mode == "c") {
-            parsed = 'C';
-        }
-        m_mode.assign(1, parsed);
-    }
-
-    /** Get the allocation mode */
-    const string& getMode() const {
-        return m_mode;
-    }
+    // @note The running mode is no longer held here: it is owned by MultiSystem and passed into
+    //       every L1/L2/L3 hook through the trailing `mode` argument. In mode C the aggregate
+    //       system drives the sub-systems directly on its own real account and never calls
+    //       allocate(); the mode checks inside the hooks are only a defensive pass-through for an
+    //       AF invoked in mode C.
 
     /** Weight table: sub-system -> weight (the L1 output and the L2 input) */
     using Weights = std::unordered_map<SYSPtr, double>;
@@ -159,9 +143,10 @@ public:
      * @param contexts the context of every sub-system (the virtual account funds / the mode B
      *        quota, etc.), used by L1 for the allocation
      * @param query the query condition (the K-line type, etc.)
+     * @param mode the running mode ("A"/"B"/"C"), owned by MultiSystem and passed to L1/L2/L3
      */
     void allocate(const Datetime& date, const TradeManagerPtr& tm, TradeSuggestionList& suggestions,
-                  SubSystemContextList& contexts, const KQuery& query);
+                  SubSystemContextList& contexts, const KQuery& query, const string& mode);
 
     /**
      * L1 only: calculate the weights and (in mode B) write the real quota into contexts[i].quota,
@@ -170,7 +155,7 @@ public:
      * @return the L1 weight table (the input of allocateTargets)
      */
     Weights allocateQuota(const Datetime& date, const TradeManagerPtr& tm,
-                          SubSystemContextList& contexts, const KQuery& query);
+                          SubSystemContextList& contexts, const KQuery& query, const string& mode);
 
     /**
      * L2 + L3 only: convert the suggestions into the executable quantity of the parent account and
@@ -179,24 +164,25 @@ public:
      */
     void allocateTargets(const Datetime& date, const TradeManagerPtr& tm,
                          TradeSuggestionList& suggestions, const Weights& sys_weight,
-                         const KQuery& query);
+                         const KQuery& query, const string& mode);
 
     /** L1 system-level allocation: mode A returns the nominal weight (suggested weight), mode B
      *  returns the real quota (written into contexts[i].quota).
      *  @note It returns the equal weight (1/N) by default; the other weight sources are the
      *        subclasses overriding this (AF_FixedWeight / AF_FixedWeightList / AF_MultiFactor). */
     virtual Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
-                              SubSystemContextList& contexts, const KQuery& query);
+                              SubSystemContextList& contexts, const KQuery& query,
+                              const string& mode);
 
     /** L1 skeleton: fill the L1 result by "sub-system index -> weight", and in mode B write
      *  contexts[i].quota (when fixed-amount>0 the fixed quota takes precedence, otherwise
-     *  weight x the parent total assets).
+     *  weight x the parent net assets).
      *  @note **No normalization is performed**, the weight semantics is fully decided by the
      *        subclass; the missing index (weights shorter than contexts) falls back to the equal
      *        weight. */
     Weights _applyWeights(const Datetime& date, const TradeManagerPtr& tm,
                           SubSystemContextList& contexts, const KQuery& query,
-                          const std::vector<double>& weights) const;
+                          const std::vector<double>& weights, const string& mode) const;
 
     /** L2 behavior-level conversion: in mode A it converts the parent account quantity by the
      *  budget (weight / assets_ratio / fixed-amount, capped by max-total-position) and rewrites
@@ -206,16 +192,17 @@ public:
      *        to its target, a SELL/CLEAR closes the current holding. */
     virtual void _toTargets(const Datetime& date, const TradeManagerPtr& tm,
                             TradeSuggestionList& suggestions, const Weights& sys_weight,
-                            const KQuery& query);
+                            const KQuery& query, const string& mode);
 
     /** L3 portfolio risk control clipping: mode A performs the portfolio dimension risk control
      *  (concentration / turnover, etc.); mode B can be disabled or only performs the total amount
      *  check.
      *  @note The single instrument concentration is limited by the parameter max-single-position
      *        (<=0 means no limit, >1 is clamped to 1, so the default 1.0 caps a single instrument
-     *        at the total assets). */
+     *        at the net assets). */
     virtual void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
-                            TradeSuggestionList& suggestions, const KQuery& query);
+                            TradeSuggestionList& suggestions, const KQuery& query,
+                            const string& mode);
 
     /** Subclass reset interface */
     virtual void _reset() {}
@@ -229,12 +216,14 @@ public:
 
 protected:
     string m_name;
-    // The allocation mode: A=signal aggregation (default) / B=fund allocation (FOF-MOM)
-    // / C=shared account (the legacy Portfolio compatibility)
-    string m_mode{"A"};
     KQuery m_query;
     TradeManagerPtr m_tm;
     bool m_is_python_object{false};
+    // Legacy archive migration buffer: the running mode lived here up to archive version 1 (it is
+    // now owned by MultiSystem). Loading an old archive records it here so that the owner
+    // (MultiSystem) can migrate it; it carries no runtime meaning and is never serialized.
+    string m_legacy_mode;
+    friend class MultiSystem;
 
 //============================================
 // Serialization support
@@ -247,7 +236,7 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        ar& BOOST_SERIALIZATION_NVP(m_mode);
+        // The running mode is no longer saved here (it is owned by MultiSystem).
         // m_query and m_tm are set temporarily when the system runs, they do not need to be
         // serialized
     }
@@ -257,7 +246,12 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        ar& BOOST_SERIALIZATION_NVP(m_mode);
+        if (version < 1) {
+            // The running mode was at this position in the old archives; keep it in m_legacy_mode
+            // so that MultiSystem can migrate it.
+            m_legacy_mode = "A";
+            ar& boost::serialization::make_nvp("m_mode", m_legacy_mode);
+        }
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -304,6 +298,10 @@ HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsBase&);
 HKU_API std::ostream& operator<<(std::ostream&, const AllocateFundsPtr&);
 
 } /* namespace hku */
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_VERSION(::hku::AllocateFundsBase, 1)
+#endif
 
 #if FMT_VERSION >= 90000
 template <>

@@ -21,8 +21,9 @@ MultiSystemPtr HKU_API PF_WithoutAF(const TMPtr& tm, const SEPtr& se, int adjust
                                     bool sell_at_not_selected) {
     auto sys = std::make_shared<MultiSystem>("PF_WithoutAF");
     // The preset: MultiSystem mode C "Shared Account Compatibility" (the legacy Portfolio: the
-    // sub-systems trade on the shared real account and are sized by their own MM). The AF is only
-    // the mode carrier here: L1 takes no quota, L2 needs no conversion, L3 is off by default.
+    // sub-systems trade on the shared real account and are sized by their own MM). The mode is
+    // held by the aggregate system; the AF only provides the L1/L2/L3 no-ops here: L1 takes no
+    // quota, L2 needs no conversion, L3 is off by default.
     sys->setAF(AF_EqualWeight());
     sys->setMode("C");
     sys->setTM(tm);

@@ -32,10 +32,23 @@ TEST_CASE("test_AllocateFunds_base_params") {
 
     /** @arg the legacy base-class weight-list parameter has been removed (the fixed weights go
      * through AF_FixedWeightList) */
-    CHECK_THROWS_AS(af->getParam<string>("weight-list"), std::exception);
+    CHECK_UNARY(!af->haveParam("weight-list"));
 
-    /** @arg the mode defaults to A */
-    CHECK_EQ(af->getMode(), "A");
+    /** @arg non-default values are accepted and read back unchanged */
+    af->setParam<double>("max-single-position", 0.5);
+    af->setParam<double>("max-total-position", 0.8);
+    af->setParam<double>("fixed-amount", 30000.0);
+    af->setParam<bool>("adjust_running_sys", false);
+    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(0.5));
+    CHECK_EQ(af->getParam<double>("max-total-position"), doctest::Approx(0.8));
+    CHECK_EQ(af->getParam<double>("fixed-amount"), doctest::Approx(30000.0));
+    CHECK_EQ(af->getParam<bool>("adjust_running_sys"), false);
+
+    /** @arg max-single-position is not bounded from below (<=0 means no limit, no clamp on set) */
+    CHECK_NOTHROW(af->setParam<double>("max-single-position", 0.0));
+    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(0.0));
+    CHECK_NOTHROW(af->setParam<double>("max-single-position", -1.0));
+    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(-1.0));
 }
 
 /** @par Test points */
@@ -58,7 +71,7 @@ TEST_CASE("test_AF_FixedWeightList_checkParam") {
     CHECK_THROWS_AS(AF_FixedWeightList(vector<double>{1e308, 1e308}), std::exception);
 
     /** @arg an empty weight list returns the equal weight (does not construct a fixed-list AF) */
-    CHECK_NOTHROW(AF_FixedWeightList(vector<double>{}));
+    CHECK_EQ(AF_FixedWeightList(PriceList{})->name(), "AF_EqualWeight");
 }
 
 /** @} */

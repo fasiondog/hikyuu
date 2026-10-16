@@ -16,8 +16,8 @@ MultiSystemPtr HKU_API PF_Simple(const TMPtr& tm, const SEPtr& se, const AFPtr& 
                                  int adjust_cycle, const string& adjust_mode,
                                  bool delay_to_trading_day) {
     auto sys = std::make_shared<MultiSystem>("PF_Simple");
-    // The preset: MultiSystem mode B "Fund Allocation" (the quota-first calibration on the rebalancing day)
-    // Note: call setAF first then setMode, so that setMode takes effect on the current AF.
+    // The preset: MultiSystem mode B "Fund Allocation" (the quota-first calibration on the
+    // rebalancing day)
     sys->setAF(af ? af : AF_EqualWeight());
     sys->setMode("B");
     sys->setTM(tm);

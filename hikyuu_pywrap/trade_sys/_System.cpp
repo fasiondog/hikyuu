@@ -257,7 +257,7 @@ void export_System(py::module& m) {
     m.def("get_system_part_name", getSystemPartName, R"(get_system_part_name(part)
 
     Get the string name of the part
-    
+
         - System.Part.ENVIRONMENT  - "EV"
         - System.Part.CONDITION    - "CN"
         - System.Part.SIGNAL       - "SG"
@@ -503,7 +503,7 @@ Common parameters:
       .def("get_buy_trade_request_list", &System::getBuyTradeRequestList,
            py::return_value_policy::copy,
            R"(get_buy_trade_request_list(self)
-  
+
     Get the buy request list; in the "delay" mode, check whether there is a buy operation at the next moment
 
     :rtype: list[TradeRequest])")
@@ -544,7 +544,7 @@ Common parameters:
            py::arg("stock"), py::arg("query"), py::arg("reset") = true,
            py::arg("reset_all") = false,
            R"(run(self, stock, query[, reset=True])
-  
+
     Run the system, performing the backtest
 
     :param Stock stock: the security to trade
@@ -575,9 +575,9 @@ Common parameters:
       m, "MultiSystem", py::dynamic_attr(),
       R"(The aggregate trading system (portfolio backtesting). It holds multiple sub-systems (single-security or nested aggregate), drives them on the open/close stages of a fully aligned time axis, and places the orders on the single real account of the top layer. Arbitrary nesting and a rebalancing cycle are supported; the portfolio-level fund allocation lives in the AF (L1/L2/L3, see AllocateFundsBase).
 
-Running modes (held by the AF, set via set_mode or the AF factories):
+Running modes (held by the aggregate system itself, set via set_mode or the preset PF factories):
 
-- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is reset on every rebalancing day); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent total assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
+- Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is reset on every rebalancing day); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
 
 - Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account.
 
@@ -586,7 +586,7 @@ Running modes (held by the AF, set via set_mode or the AF factories):
 Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for details):
 
 - L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);
-- L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x position ratio x the parent total assets, aggregated per instrument; mode B: the sub-system instruction passes through);
+- L2 behavior-level conversion: turn the sub-system suggestions into the executable quantity of the parent account (mode A: target market value = weight x position ratio x the parent net assets, aggregated per instrument; mode B: the sub-system instruction passes through);
 - L3 portfolio risk control: clip the suggestions at the portfolio dimension (e.g. max-single-position); mode B skips the clipping.)")
       .def(py::init<>())
       .def(py::init<const string&>(), py::arg("name") = "MultiSystem")
@@ -801,12 +801,11 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
     //--------------------------------------------------------------------------------------
     // The PF factories pass through to MultiSystem, keeping the master call style unchanged
     // (the return type changes from PortfolioPtr to MultiSystem)
-    m.def(
-      "PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
-      py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
-      py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
-      py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
-      R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
+    m.def("PF_Simple", &PF_Simple, py::arg("tm") = TradeManagerPtr(), py::arg("se") = SE_Fixed(),
+          py::arg("af") = AF_EqualWeight(), py::arg("adjust_cycle") = 1,
+          py::arg("adjust_mode") = "query", py::arg("delay_to_trading_day") = true,
+          py::keep_alive<0, 1>(), py::keep_alive<0, 2>(), py::keep_alive<0, 3>(),
+          R"(PF_Simple([tm, se, af, adjust_cycle=1, adjust_mode="query", delay_to_trading_day=True])
 
     Create a multi-instrument, single-system-strategy portfolio (returns MultiSystem running in mode B "Fund Allocation").
 
@@ -978,7 +977,7 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
   Create a simple system instance (no multiple position increases or decreases per trade, i.e. after each buy, sell all when selling); when the system instance runs (calling the run method), it needs at least a matching trade manager instance, a money management strategy
   and a signal generator), which can be specified after creating the system instance. If there is no output when calling run,
   and no correct results, it may be that tm, sg, mm are not set. For the backtest, use the run method, e.g.::
-    
+
         # Create a simulated trading account for the backtest, with an initial capital of 300,000
         my_tm = crtTM(init_cash = 300000)
 
@@ -991,8 +990,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         # Create the trading system and run it
         sys = SYS_Simple(tm = my_tm, sg = my_sg, mm = my_mm)
         sys.run(sm['sz000001'], Query(-150))
-    
-    :param TradeManager tm: the trade manager instance 
+
+    :param TradeManager tm: the trade manager instance
     :param MoneyManager mm: the money management strategy
     :param EnvironmentBase ev: the market environment strategy
     :param ConditionBase cn: the system valid condition

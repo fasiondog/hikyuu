@@ -335,13 +335,12 @@ TEST_CASE("test_MultiSystem_setSubSystemQuota") {
 TEST_CASE("test_AllocateFunds_L1_equal_weight") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001010000LL);
 
     /** @arg empty contexts returns an empty weight table (boundary: 0 sub-systems) */
     {
         SubSystemContextList empty;
-        auto w = af->_allocate(date, tm, empty, KQuery());
+        auto w = af->_allocate(date, tm, empty, KQuery(), "A");
         CHECK_EQ(w.size(), 0);
     }
 
@@ -351,7 +350,7 @@ TEST_CASE("test_AllocateFunds_L1_equal_weight") {
     SubSystemContextList contexts(2);
     contexts[0].sys = sys1;
     contexts[1].sys = sys2;
-    auto w = af->_allocate(date, tm, contexts, KQuery());
+    auto w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
@@ -363,7 +362,7 @@ TEST_CASE("test_AllocateFunds_L1_equal_weight") {
     SubSystemContextList ctx_null(2);
     ctx_null[0].sys = nullptr;
     ctx_null[1].sys = sys1;
-    auto w_null = af->_allocate(date, tm, ctx_null, KQuery());
+    auto w_null = af->_allocate(date, tm, ctx_null, KQuery(), "A");
     CHECK_EQ(w_null.size(), 1);
     CHECK_EQ(w_null[sys1], doctest::Approx(0.5));
 }
@@ -372,7 +371,6 @@ TEST_CASE("test_AllocateFunds_L1_equal_weight") {
 TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("B");
     Datetime date(200001010000LL);
     auto sys1 = create_test_sys(3, 5);
     auto sys2 = create_test_sys(5, 10);
@@ -380,32 +378,43 @@ TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     /** @arg single sub-system equal weight: quota = weight(1.0) × parent total assets(100000) */
     SubSystemContextList contexts(1);
     contexts[0].sys = sys1;
-    af->_allocate(date, tm, contexts, KQuery());
+    af->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(100000.0));
 
     /** @arg fixed-amount>0: quota = the fixed amount (migrated from AF_FixedAmount) */
     af->setParam<double>("fixed-amount", 30000.0);
-    af->_allocate(date, tm, contexts, KQuery());
+    af->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(30000.0));
     af->setParam<double>("fixed-amount", 0.0);
 
     /** @arg max-total-position caps the quota sum (AF_FixedWeight 0.7 x2, sum 1.4 > 0.5 ->
      * scaled to 0.25 each, the sum equals 0.5 x 100000) */
     auto af_cap = AF_FixedWeight(0.7);
-    af_cap->setMode("B");
     af_cap->setParam<double>("max-total-position", 0.5);
     SubSystemContextList ctx3(2);
     ctx3[0].sys = sys1;
     ctx3[1].sys = sys2;
-    af_cap->_allocate(date, tm, ctx3, KQuery());
+    af_cap->_allocate(date, tm, ctx3, KQuery(), "B");
     CHECK_EQ(ctx3[0].quota, doctest::Approx(25000.0));
     CHECK_EQ(ctx3[1].quota, doctest::Approx(25000.0));
 
     /** @arg max-total-position=0 disables the cap (sum 1.4 stays uncapped) */
     af_cap->setParam<double>("max-total-position", 0.0);
-    af_cap->_allocate(date, tm, ctx3, KQuery());
+    af_cap->_allocate(date, tm, ctx3, KQuery(), "B");
     CHECK_EQ(ctx3[0].quota, doctest::Approx(70000.0));
     CHECK_EQ(ctx3[1].quota, doctest::Approx(70000.0));
+
+    /** @arg fixed-amount>0 exempts the budget cap: even when the fixed quotas would exceed a
+     * small max-total-position (2 x 30000 > 0.4 x 100000), no proportional scaling happens and
+     * the quota stays the fixed amount */
+    af_cap->setParam<double>("max-total-position", 0.4);
+    af_cap->setParam<double>("fixed-amount", 30000.0);
+    SubSystemContextList ctx_fa(2);
+    ctx_fa[0].sys = sys1;
+    ctx_fa[1].sys = sys2;
+    af_cap->_allocate(date, tm, ctx_fa, KQuery(), "B");
+    CHECK_EQ(ctx_fa[0].quota, doctest::Approx(30000.0));
+    CHECK_EQ(ctx_fa[1].quota, doctest::Approx(30000.0));
 }
 
 /** @par Check point: L1 fixed weights (AF_FixedWeight / AF_FixedWeightList, no normalization) */
@@ -420,50 +429,44 @@ TEST_CASE("test_AllocateFunds_L1_fixed_weight") {
 
     /** @arg AF_FixedWeight(0.3): each sub-system gets 0.3, **no normalization** */
     auto af = AF_FixedWeight(0.3);
-    af->setMode("A");
-    auto w = af->_allocate(date, tm, contexts, KQuery());
+    auto w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.3));
     CHECK_EQ(w[sys2], doctest::Approx(0.3));
 
     /** @arg mode B: quota = 0.3 × parent total assets(100000) = 30000 */
-    af->setMode("B");
-    af->_allocate(date, tm, contexts, KQuery());
+    af->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(30000.0));
     CHECK_EQ(contexts[1].quota, doctest::Approx(30000.0));
 
     /** @arg empty contexts returns an empty table (boundary: 0 sub-systems) */
     {
         SubSystemContextList empty;
-        auto we = af->_allocate(date, tm, empty, KQuery());
+        auto we = af->_allocate(date, tm, empty, KQuery(), "B");
         CHECK_EQ(we.size(), 0);
     }
 
     /** @arg AF_FixedWeightList takes weights in order, no normalization */
     auto afl = AF_FixedWeightList({0.4, 0.2});
-    afl->setMode("A");
-    w = afl->_allocate(date, tm, contexts, KQuery());
+    w = afl->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.4));
     CHECK_EQ(w[sys2], doctest::Approx(0.2));
 
     /** @arg count mismatch (3 items vs 2 sub-systems): falls back to equal weight */
     auto afl3 = AF_FixedWeightList({0.4, 0.2, 0.1});
-    afl3->setMode("A");
-    w = afl3->_allocate(date, tm, contexts, KQuery());
+    w = afl3->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
     /** @arg an empty weight list falls back to equal weight (boundary) */
     auto afl0 = AF_FixedWeightList(PriceList{});
-    afl0->setMode("A");
-    w = afl0->_allocate(date, tm, contexts, KQuery());
+    w = afl0->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
     /** @arg mode B with AF_FixedWeightList: quota = the given weight x parent total assets
      * (0.7/0.3 → 70000/30000) */
     auto aflb = AF_FixedWeightList({0.7, 0.3});
-    aflb->setMode("B");
-    aflb->_allocate(date, tm, contexts, KQuery());
+    aflb->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(70000.0));
     CHECK_EQ(contexts[1].quota, doctest::Approx(30000.0));
 }
@@ -482,24 +485,33 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
     contexts[1].score = 0.3;
 
     auto af = AF_MultiFactor();
-    af->setMode("A");
 
     /** @arg auto_adjust_weight defaults to true: the scores are the mutual ratios and are
      * normalized to sum 1 (a score sum of 1 is a no-op) */
-    auto w = af->_allocate(date, tm, contexts, KQuery());
+    auto w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.7));
     CHECK_EQ(w[sys2], doctest::Approx(0.3));
 
     /** @arg raw scores not summing to 1 (5:3) are normalized to 0.625/0.375 (full-scale) */
     contexts[0].score = 5.0;
     contexts[1].score = 3.0;
-    w = af->_allocate(date, tm, contexts, KQuery());
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.625));
     CHECK_EQ(w[sys2], doctest::Approx(0.375));
 
+    /** @arg a positive score sum below 1 (0.2/0.3) is still normalized to 0.4/0.6 (full-scale
+     * allocation, not the raw 0.2/0.3) */
+    contexts[0].score = 0.2;
+    contexts[1].score = 0.3;
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
+    CHECK_EQ(w[sys1], doctest::Approx(0.4));
+    CHECK_EQ(w[sys2], doctest::Approx(0.6));
+
     /** @arg auto_adjust_weight=false: the score itself is the final weight (no normalization) */
     af->setParam<bool>("auto_adjust_weight", false);
-    w = af->_allocate(date, tm, contexts, KQuery());
+    contexts[0].score = 5.0;
+    contexts[1].score = 3.0;
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(5.0));
     CHECK_EQ(w[sys2], doctest::Approx(3.0));
     af->setParam<bool>("auto_adjust_weight", true);
@@ -507,21 +519,21 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
     /** @arg negative scores are treated as 0 and the rest is re-normalized (0.7,-1 → 1.0/0.0) */
     contexts[0].score = 0.7;
     contexts[1].score = -1.0;
-    w = af->_allocate(date, tm, contexts, KQuery());
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(1.0));
     CHECK_EQ(w[sys2], doctest::Approx(0.0));
 
     /** @arg a non-finite score (NaN / inf) is treated as 0 like the unselected */
     contexts[0].score = std::numeric_limits<double>::quiet_NaN();
     contexts[1].score = 0.3;
-    w = af->_allocate(date, tm, contexts, KQuery());
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.0));
     CHECK_EQ(w[sys2], doctest::Approx(1.0));
 
     /** @arg an overflowing score sum (1e308 x 2) falls back to equal weight */
     contexts[0].score = 1e308;
     contexts[1].score = 1e308;
-    w = af->_allocate(date, tm, contexts, KQuery());
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
@@ -529,22 +541,21 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
      * avoid zero weights that cannot be allocated */
     contexts[0].score = 0.0;
     contexts[1].score = 0.0;
-    w = af->_allocate(date, tm, contexts, KQuery());
+    w = af->_allocate(date, tm, contexts, KQuery(), "A");
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
     /** @arg mode B: quota = the normalized weight x parent total assets */
     contexts[0].score = 0.6;
     contexts[1].score = 0.4;
-    af->setMode("B");
-    af->_allocate(date, tm, contexts, KQuery());
+    af->_allocate(date, tm, contexts, KQuery(), "B");
     CHECK_EQ(contexts[0].quota, doctest::Approx(60000.0));
     CHECK_EQ(contexts[1].quota, doctest::Approx(40000.0));
 
     /** @arg empty contexts returns an empty table (boundary) */
     {
         SubSystemContextList empty;
-        CHECK_EQ(af->_allocate(date, tm, empty, KQuery()).size(), 0);
+        CHECK_EQ(af->_allocate(date, tm, empty, KQuery(), "B").size(), 0);
     }
 }
 
@@ -556,7 +567,6 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
 TEST_CASE("test_AllocateFunds_L2_modeA_net_target") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no position yet: all cash, predictable
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -572,7 +582,7 @@ TEST_CASE("test_AllocateFunds_L2_modeA_net_target") {
     s.target_position_ratio = 0.5;
     s.number = 100;  // the original number is ignored, the parent re-derives the net delta
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::BUY);
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
@@ -580,13 +590,13 @@ TEST_CASE("test_AllocateFunds_L2_modeA_net_target") {
     /** @arg a zero net target means flat: no order (the instrument drops out) */
     s.target_position_ratio = 0.0;
     suggestions.assign(1, s);
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     CHECK_UNARY(suggestions.empty());
 
     /** @arg a non-finite net target is skipped */
     s.target_position_ratio = std::numeric_limits<double>::infinity();
     suggestions.assign(1, s);
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     CHECK_UNARY(suggestions.empty());
 }
 
@@ -595,7 +605,6 @@ TEST_CASE("test_AllocateFunds_L2_modeA_net_target") {
 TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     af->setParam<double>("fixed-amount",
                          5000.0);  // pin the target value (independent of the marks)
     Datetime date(200001010000LL);
@@ -613,7 +622,7 @@ TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
     s.plan_price = 10.0;
     s.target_position_ratio = 0.9;  // positive => the fixed-amount target (500)
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::SELL);
     CHECK_EQ(suggestions[0].number, doctest::Approx(500.0));
@@ -623,7 +632,6 @@ TEST_CASE("test_AllocateFunds_L2_overweight_to_sell") {
 TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -638,7 +646,7 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     s.plan_price = 10.0;
     s.target_position_ratio = 0.0;
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::SELL);
     CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
@@ -646,7 +654,7 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
     /** @arg a zero target on an empty position: no order (boundary) */
     auto tm2 = crtTM(Datetime(200001010000LL), 100000.0);
     suggestions.assign(1, s);
-    af->_toTargets(date, tm2, suggestions, weights, KQuery());
+    af->_toTargets(date, tm2, suggestions, weights, KQuery(), "A");
     CHECK_UNARY(suggestions.empty());
 }
 
@@ -655,7 +663,6 @@ TEST_CASE("test_AllocateFunds_L2_sell_clear") {
 TEST_CASE("test_AllocateFunds_L2_fixed_amount") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     af->setParam<double>("fixed-amount", 20000.0);
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
@@ -670,7 +677,7 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount") {
     s.plan_price = 10.0;
     s.target_position_ratio = 0.9;
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(2000.0));
 }
@@ -680,7 +687,6 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount") {
 TEST_CASE("test_AllocateFunds_L2_modeB_passthrough") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("B");
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -695,14 +701,14 @@ TEST_CASE("test_AllocateFunds_L2_modeB_passthrough") {
     s.plan_price = 10.0;
     s.number = 888;
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "B");
     CHECK_EQ(suggestions[0].number, doctest::Approx(888.0));
 
     /** @arg SELL clipped to not exceed the parent's current position (current=0 → clipped to 0) */
     s.type = SuggestionType::SELL;
     s.number = 1000;
     suggestions[0] = s;
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "B");
     CHECK_EQ(suggestions[0].number, doctest::Approx(0.0));
 
     /** @arg a short-side SELL (open/increase a short) is NOT clipped by the long position
@@ -711,7 +717,7 @@ TEST_CASE("test_AllocateFunds_L2_modeB_passthrough") {
     s.short_side = true;
     s.number = 1000;
     suggestions[0] = s;
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "B");
     CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
 }
 
@@ -720,7 +726,6 @@ TEST_CASE("test_AllocateFunds_L2_modeB_passthrough") {
 TEST_CASE("test_AllocateFunds_L2_below_lot_clearance") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001040000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -742,13 +747,13 @@ TEST_CASE("test_AllocateFunds_L2_below_lot_clearance") {
     /** @arg a below-lot nonzero target stays skipped (no trade) */
     s.target_position_ratio = 0.0005;  // far below one lot of 100 shares
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     CHECK_UNARY(suggestions.empty());
 
     /** @arg a flat target emits a CLEAR of the residual 50 shares instead of skipping it */
     s.target_position_ratio = 0.0;
     suggestions.assign(1, s);
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::CLEAR);
     CHECK_UNARY(!suggestions[0].short_side);
@@ -764,7 +769,6 @@ TEST_CASE("test_AllocateFunds_L2_below_lot_clearance") {
 TEST_CASE("test_AllocateFunds_L3_check_risk") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);  // no position yet, total_assets=100000
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -779,27 +783,26 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
     /** @arg max-single-position=0.5: clipped to a value of 50000 = 5000 shares */
     af->setParam<double>("max-single-position", 0.5);
     TradeSuggestionList suggestions{s};
-    af->_checkRisk(date, tm, suggestions, KQuery());
+    af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 
     /** @arg max-single-position=1.0: takes effect as the 100% cap, target 200000 > 100000 is
      * clipped to 10000 shares */
     af->setParam<double>("max-single-position", 1.0);
     suggestions[0] = s;
-    af->_checkRisk(date, tm, suggestions, KQuery());
+    af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
     /** @arg max-single-position>1.0: clamped to 1.0 */
     af->setParam<double>("max-single-position", 3.0);
     suggestions[0] = s;
-    af->_checkRisk(date, tm, suggestions, KQuery());
+    af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
     /** @arg mode B: risk control is skipped (respecting sub-manager autonomy, number unchanged) */
-    af->setMode("B");
     af->setParam<double>("max-single-position", 0.5);
     suggestions[0] = s;
-    af->_checkRisk(date, tm, suggestions, KQuery());
+    af->_checkRisk(date, tm, suggestions, KQuery(), "B");
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
 }
 
@@ -807,7 +810,6 @@ TEST_CASE("test_AllocateFunds_L3_check_risk") {
 TEST_CASE("test_AllocateFunds_L3_short_concentration") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     af->setParam<double>("max-single-position", 0.5);  // cap 50000
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
@@ -822,7 +824,7 @@ TEST_CASE("test_AllocateFunds_L3_short_concentration") {
 
     /** @arg an open short that exceeds the cap is clipped to 5000 shares */
     TradeSuggestionList suggestions{s};
-    af->_checkRisk(date, tm, suggestions, KQuery());
+    af->_checkRisk(date, tm, suggestions, KQuery(), "A");
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 
     /** @arg a cover (a BUY that reduces the short) is not clipped */
@@ -831,7 +833,7 @@ TEST_CASE("test_AllocateFunds_L3_short_concentration") {
     c.short_side = true;
     c.number = 20000.0;
     TradeSuggestionList suggestions2{c};
-    af->_checkRisk(date, tm, suggestions2, KQuery());
+    af->_checkRisk(date, tm, suggestions2, KQuery(), "A");
     CHECK_EQ(suggestions2[0].number, doctest::Approx(20000.0));
 }
 
@@ -839,7 +841,6 @@ TEST_CASE("test_AllocateFunds_L3_short_concentration") {
 TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -855,14 +856,14 @@ TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     /** @arg the aggregated gross target (2 x 100000) exceeds the default cap (100000): scaled down
      * proportionally to 10000 shares */
     TradeSuggestionList suggestions{s, s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(10000.0));
 
     /** @arg max-total-position=0 disables the cap: the full 20000 shares */
     af->setParam<double>("max-total-position", 0.0);
     suggestions = TradeSuggestionList{s, s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(20000.0));
 
@@ -870,7 +871,7 @@ TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
     af->setParam<double>("max-total-position", 1.0);
     s.target_position_ratio = 0.5;
     suggestions = TradeSuggestionList{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 }
@@ -879,7 +880,6 @@ TEST_CASE("test_AllocateFunds_L2_total_position_cap") {
 TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     af->setParam<double>("fixed-amount", 5000.0);
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
@@ -894,7 +894,7 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
     s.plan_price = 10.0;
     s.target_position_ratio = 0.9;  // positive => the fixed-amount target (5000)
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
 
     /** @arg the fixed target(500) < current(1000): a SELL(500) carrying the parent-account cash */
     REQUIRE_EQ(suggestions.size(), 1);
@@ -908,7 +908,6 @@ TEST_CASE("test_AllocateFunds_L2_fixed_amount_delta") {
 TEST_CASE("test_AllocateFunds_L2_multi_contrib") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     af->setParam<double>("max-total-position", 0.0);  // isolate from the budget cap
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
@@ -924,7 +923,7 @@ TEST_CASE("test_AllocateFunds_L2_multi_contrib") {
     TradeSuggestionList suggestions{s, s};
 
     /** @arg the same instrument sums the net target: 0.25 x 100000 x 2 = 50000 -> 5000 shares */
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
 }
@@ -933,7 +932,6 @@ TEST_CASE("test_AllocateFunds_L2_multi_contrib") {
 TEST_CASE("test_AllocateFunds_L2_missing_weight_fallback") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
     REQUIRE(!stk.isNull());
@@ -948,7 +946,7 @@ TEST_CASE("test_AllocateFunds_L2_missing_weight_fallback") {
     s.plan_price = 10.0;
     s.target_position_ratio = 1.0;
     TradeSuggestionList suggestions{s};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
 
     /** @arg the missing weight falls back to 1/2 (not the full position): 50000 -> 5000 shares */
@@ -958,7 +956,6 @@ TEST_CASE("test_AllocateFunds_L2_missing_weight_fallback") {
 /** @par Check point: L2 with a null tm does not crash (defensive skip) */
 TEST_CASE("test_AllocateFunds_L2_null_tm") {
     auto af = AF_EqualWeight();
-    af->setMode("A");
     auto sys = create_test_sys(3, 5);
     std::unordered_map<SYSPtr, double> weights{{sys, 1.0}};
 
@@ -972,7 +969,7 @@ TEST_CASE("test_AllocateFunds_L2_null_tm") {
 
     /** @arg a null tm returns without touching the suggestions */
     CHECK_NOTHROW(
-      af->_toTargets(Datetime(200001010000LL), nullptr, suggestions, weights, KQuery()));
+      af->_toTargets(Datetime(200001010000LL), nullptr, suggestions, weights, KQuery(), "A"));
     CHECK_EQ(suggestions[0].number, doctest::Approx(100.0));
 }
 
@@ -1605,12 +1602,11 @@ TEST_CASE("test_MultiSystem_mode_c_nested_under_mode_a") {
         CHECK(sys->getParam<bool>("shared_tm"));
     }
 
-    /** @arg the inner aggregate traded on the shadow account and kept its running pool, and the
-     * translated suggestions are not empty (otherwise the outer layer would aggregate nothing) */
+    /** @arg the inner aggregate traded on the shadow account and kept its running pool; the outer
+     * mode A layer reads the inner's position snapshot as its aggregation source (the translated
+     * suggestions are not used any more) */
     CHECK_GT(inner_tm->getTradeList().size(), 1);
     CHECK_GT(inner->getRunningSet().size(), 0);
-    // The outer aggregate (mode A) reads the inner's position snapshot, its translated suggestions
-    // are no longer the aggregation source
 
     /** @arg the outer layer converted them into its own orders on the real account */
     CHECK_GT(outer_tm->getTradeList().size(), 1);
@@ -2052,7 +2048,6 @@ TEST_CASE("test_MultiSystem_clone_path") {
 TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
-    af->setMode("A");
     af->setParam<double>("fixed-amount", 5000.0);
     Datetime date(200001010000LL);
     Stock stk = getStock("sz000001");
@@ -2065,21 +2060,22 @@ TEST_CASE("test_AllocateFunds_L2_same_stock_aggregate") {
     s1.stock = stk;
     s1.sys = sys1;
     s1.plan_price = 10.0;
-    s1.target_position_ratio = 0.9;  // positive => the fixed-amount per contribution
+    s1.target_position_ratio = 0.9;  // positive => the fixed-amount direction
     TradeSuggestion s2 = s1;
     s2.sys = sys2;
 
-    /** @arg no position: aggregated target value 5000+5000=10000 -> a BUY of 1000 shares */
+    /** @arg no position: the aggregate signed direction is positive, so the +/-fixed-amount target
+     * is applied ONCE per instrument (not summed per contribution): 5000 -> a BUY of 500 shares */
     TradeSuggestionList suggestions{s1, s2};
-    af->_toTargets(date, tm, suggestions, weights, KQuery());
+    af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
     REQUIRE_EQ(suggestions.size(), 1);
     CHECK(suggestions[0].type == SuggestionType::BUY);
-    CHECK_EQ(suggestions[0].number, doctest::Approx(1000.0));
+    CHECK_EQ(suggestions[0].number, doctest::Approx(500.0));
 
-    /** @arg already holding 1000 shares (exactly the aggregated target): no more trading */
-    tm->buy(date, stk, 10.0, 1000.0);
+    /** @arg already holding 500 shares (exactly the aggregated target): no more trading */
+    tm->buy(date, stk, 10.0, 500.0);
     TradeSuggestionList suggestions2{s1, s2};
-    af->_toTargets(date, tm, suggestions2, weights, KQuery());
+    af->_toTargets(date, tm, suggestions2, weights, KQuery(), "A");
     CHECK_UNARY(suggestions2.empty());
 }
 
@@ -2201,12 +2197,11 @@ class TestShiftWeightAF : public AllocateFundsBase {
     ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
 
 public:
-    TestShiftWeightAF() : AllocateFundsBase("TestShiftWeightAF") {
-        setMode("B");  // the mode is held by the AF (MultiSystem::getMode delegates to it)
-    }
+    TestShiftWeightAF() : AllocateFundsBase("TestShiftWeightAF") {}
 
     Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
-                      SubSystemContextList& contexts, const KQuery& query) override {
+                      SubSystemContextList& contexts, const KQuery& query,
+                      const string& mode) override {
         std::vector<double> weights(contexts.size(), 0.0);
         for (size_t i = 0; i < contexts.size(); ++i) {
             if (m_calls == 0) {
@@ -2216,7 +2211,7 @@ public:
             }
         }
         m_calls++;
-        return _applyWeights(date, tm, contexts, query, weights);
+        return _applyWeights(date, tm, contexts, query, weights, mode);
     }
 
     void _reset() override {
@@ -2234,8 +2229,11 @@ TEST_CASE("test_MultiSystem_mode_b_adjust_running_sys") {
     REQUIRE(!stk1.isNull());
     REQUIRE(!stk2.isNull());
     KQuery query(Datetime(19991208), Datetime(20000324));
-    KData kdata = stk1.getKData(query);
-    REQUIRE(kdata.size() > 3);
+    KData kd1 = stk1.getKData(query);
+    KData kd2 = stk2.getKData(query);
+    REQUIRE(kd1.size() > 6);
+    REQUIRE(kd2.size() > 6);
+    const DatetimeList dates = kd1.getDatetimeList();
 
     auto count_sells = [](const TMPtr& tm) {
         size_t n = 0;
@@ -2247,56 +2245,151 @@ TEST_CASE("test_MultiSystem_mode_b_adjust_running_sys") {
         return n;
     };
 
-    auto run_pf = [&](bool adjust_running) {
+    // The SELL records executed on the very first trade day (the initial allocation day)
+    auto first_day_sells = [](const TMPtr& tm) {
+        Datetime first;
+        for (const auto& tr : tm->getTradeList()) {
+            if (first.isNull() || tr.datetime < first) {
+                first = tr.datetime;
+            }
+        }
+        size_t n = 0;
+        for (const auto& tr : tm->getTradeList()) {
+            if (tr.business == BUSINESS_SELL && tr.datetime == first) {
+                n++;
+            }
+        }
+        return n;
+    };
+
+    /** @arg adjust_running_sys=true: the first (initial allocation) day has no SELL (the subs are
+     * only injected and buy); a later rebalancing day force-reduces the over-quota running
+     * sub-system, so SELL records exist beyond the first day */
+    auto run_true = [&]() {
         auto se = SE_Fixed();
         se->addStockList({stk1, stk2}, create_alway_buy_sys());
         auto tm = crtTM(Datetime(200001010000LL), 100000.0);
         auto af = std::make_shared<TestShiftWeightAF>();
-        af->setParam<bool>("adjust_running_sys", adjust_running);
+        af->setParam<bool>("adjust_running_sys", true);
         auto pf = PF_Simple(tm, se, af, 2, "query", true);
         pf->run(query);
-        return tm;
+        return std::make_pair(pf, tm);
     };
+    auto true_pair = run_true();
+    CHECK_EQ(first_day_sells(true_pair.second), 0);
+    CHECK_GT(count_sells(true_pair.second), 0);
 
-    /** @arg adjust_running_sys=true: the over-quota running sub-system is force-reduced (the
-     * parent SELL trades exist beyond the first day) */
-    auto tm_true = run_pf(true);
-    CHECK_GT(count_sells(tm_true), 0);
+    /** @arg the over-quota running sub-system (index 0, funded with the {0.9} first-period weight)
+     * is force-reduced back towards its later {0.4} quota */
+    auto subs = true_pair.first->getSystemList();
+    REQUIRE_EQ(subs.size(), 2);
+    Datetime last_date = true_pair.second->lastDatetime();
+    price_t parent_net = true_pair.second->getFunds(last_date, query.kType()).net_assets();
+    REQUIRE_GT(parent_net, 0.0);
+    price_t sub0 = subs[0]->getTM()->getFunds(last_date, query.kType()).net_assets();
+    CHECK_LT(sub0, 0.5 * parent_net);
 
-    /** @arg adjust_running_sys=false: the running sub-systems keep their holdings, the parent
-     * only carries the first-day BUY trades (no SELL at all) */
-    auto tm_false = run_pf(false);
-    CHECK_EQ(count_sells(tm_false), 0);
-    CHECK_GT(tm_false->getTradeList().size(), 0);
+    /** @arg adjust_running_sys=false: sysA runs first (funded in a previous period) while sysB is
+     * added later on a non-rebalancing day; the running sub-system keeps its cash and position and
+     * the new sub-system (whose net assets were zero at admission = the boundary of the "already
+     * running" predicate) receives the remaining parent cash */
+    auto run_false = [&]() {
+        auto se = std::make_shared<CountingSE>();
+        auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+        auto ms = std::make_shared<MultiSystem>("ms_no_adjust_running");
+        ms->setTM(tm);
+        ms->setMode("B");
+        ms->setSE(se);
+        ms->getAF()->setParam<double>("fixed-amount", 30000.0);
+        ms->getAF()->setParam<bool>("adjust_running_sys", false);
+        ms->setAdjustCycle(2);
+        ms->setTradeOnClose(true);
+        auto sysA = create_alway_buy_sys();
+        sysA->setTO(kd1);
+        ms->add(sysA);
+        auto sysB = create_alway_buy_sys();
+        sysB->setTO(kd2);
+
+        price_t a_cash_before = 0.0;
+        double a_num_before = 0.0;
+        const size_t add_index =
+          3;  // a non-rebalancing day (adjust_cycle=2): the next reb day is 4
+        for (size_t i = 0; i < dates.size(); ++i) {
+            if (i == add_index) {
+                a_cash_before = sysA->getTM()->currentCash();
+                a_num_before = sysA->getTM()->getPosition(dates[i], stk1).number;
+                ms->add(sysB);
+            }
+            KData day_kd = stk1.getKData(KQuery(dates[i], dates[i] + Days(1), query.kType()));
+            ms->run(day_kd, false);
+        }
+        CHECK_EQ(sysA->getTM()->currentCash(), doctest::Approx(a_cash_before));
+        CHECK_EQ(sysA->getTM()->getPosition(tm->lastDatetime(), stk1).number,
+                 doctest::Approx(a_num_before));
+        CHECK_GT(sysB->getTM()->getFunds(tm->lastDatetime(), query.kType()).net_assets(), 0.0);
+    };
+    run_false();
 }
 
-/** @par Check point: mode B mirrors the sub-system trades on every bar (continuous mirror), so a
- * longer rebalancing cycle does not cut the parent trades down to the rebalancing days only */
+/** @par Check point: mode B mirrors the sub-system trades on every bar (continuous mirror), so the
+ * parent trades on the non-rebalancing days as well instead of only on the rebalancing days */
 TEST_CASE("test_MultiSystem_mode_b_continuous_mirror") {
     Stock stk1 = getStock("sh600000");
     Stock stk2 = getStock("sz000001");
     REQUIRE(!stk1.isNull());
     REQUIRE(!stk2.isNull());
     KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kd1 = stk1.getKData(query);
+    KData kd2 = stk2.getKData(query);
+    REQUIRE(kd1.size() > 6);
+    const DatetimeList dates = kd1.getDatetimeList();
 
-    auto run_pf = [&](int cycle) {
-        auto se = SE_Fixed();
-        se->addStockList({stk1, stk2}, create_alway_buy_sys());
-        auto tm = crtTM(Datetime(200001010000LL), 100000.0);
-        auto pf = PF_Simple(tm, se, AF_EqualWeight(), cycle, "query", true);
-        pf->run(query);
-        return tm;
+    // The subs buy a fixed lot on every bar (as long as cash allows), so they keep trading on the
+    // non-rebalancing days and the mirrored parent book does too
+    auto mk_sys = [&](const KData& kd) {
+        auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(),
+                              SG_AllwaysBuy());
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setTO(kd);
+        return sys;
     };
 
-    auto tm1 = run_pf(1);  // every day is a rebalancing day
-    auto tm2 = run_pf(2);  // half of the days are non-rebalancing days
-    size_t n1 = tm1->getTradeList().size();
-    size_t n2 = tm2->getTradeList().size();
+    // Drive day by day with adjust_cycle=2: the close-day index equals the driven-day index, so the
+    // even indices are the rebalancing days and the odd ones are not
+    auto se = std::make_shared<CountingSE>();
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto ms = std::make_shared<MultiSystem>("ms_continuous_mirror");
+    ms->setTM(tm);
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setAdjustCycle(2);
+    ms->setTradeOnClose(true);
+    ms->add(mk_sys(kd1));
+    ms->add(mk_sys(kd2));
+    for (const auto& d : dates) {
+        KData day_kd = stk1.getKData(KQuery(d, d + Days(1), query.kType()));
+        ms->run(day_kd, false);
+    }
 
-    /** @arg the parent mirrors continuously: the cycle-2 parent trades on about as many bars as the
-     * cycle-1 parent (a batched engine would drop it to roughly n1/2, only the rebalancing days) */
-    REQUIRE_GT(n1, 0);
-    CHECK_GT(n2, n1 / 2);
+    size_t matched = 0;
+    bool trade_on_non_reb = false;
+    for (const auto& tr : tm->getTradeList()) {
+        for (size_t i = 0; i < dates.size(); ++i) {
+            if (dates[i] == tr.datetime) {
+                matched++;
+                if (i % 2 != 0) {
+                    trade_on_non_reb = true;
+                }
+                break;
+            }
+        }
+    }
+
+    /** @arg there is at least one trade on a NON-rebalancing day (an odd index with
+     * adjust_cycle=2); a reb-day-only (batched) engine would never produce one */
+    CHECK_GT(matched, 0);
+    CHECK_UNARY(trade_on_non_reb);
 }
 
 // Scripted short signals: one sell signal (open a short) on open_date, one buy signal (cover the

@@ -41,24 +41,26 @@ public:
 
     // L1: sub-system context -> weight
     Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
-                      SubSystemContextList& contexts, const KQuery& query) override {
+                      SubSystemContextList& contexts, const KQuery& query,
+                      const string& mode) override {
         PYBIND11_OVERLOAD_NAME(Weights, AllocateFundsBase, "_allocate", _allocate, date, tm,
-                               contexts, query);
+                               contexts, query, mode);
     }
 
     // L2: weight -> the executable quantity of the parent account
     void _toTargets(const Datetime& date, const TradeManagerPtr& tm,
                     TradeSuggestionList& suggestions, const Weights& sys_weight,
-                    const KQuery& query) override {
+                    const KQuery& query, const string& mode) override {
         PYBIND11_OVERLOAD_NAME(void, AllocateFundsBase, "_to_targets", _toTargets, date, tm,
-                               suggestions, sys_weight, query);
+                               suggestions, sys_weight, query, mode);
     }
 
     // L3: portfolio risk control clipping
     void _checkRisk(const Datetime& date, const TradeManagerPtr& tm,
-                    TradeSuggestionList& suggestions, const KQuery& query) override {
+                    TradeSuggestionList& suggestions, const KQuery& query,
+                    const string& mode) override {
         PYBIND11_OVERLOAD_NAME(void, AllocateFundsBase, "_check_risk", _checkRisk, date, tm,
-                               suggestions, query);
+                               suggestions, query, mode);
     }
 };
 
@@ -73,27 +75,27 @@ executed by allocate() in the L1 -> L2 -> L3 order:
     - _allocate   [Required] L1 system-level allocation: decide "how much each sub-system may manage".
                   The input is the sub-system context list, the output is the weight table
                   {System: weight}; in mode B ("Fund Allocation") it also writes the real cash quota
-                  into contexts[i].quota (the weight x the parent total assets, or the fixed amount).
+                  into contexts[i].quota (the weight x the parent net assets, or the fixed amount).
                   Examples: AF_EqualWeight (1/N), AF_FixedWeight, AF_MultiFactor (weighted by the SE score).
     - _to_targets [Optional] L2 behavior-level conversion: convert the sub-system suggestions into the
                   executable quantity of the parent account (the folding point from the sub-system space
                   to the individual instrument space). In mode A ("Signal Aggregation") the target
-                  position market value = weight x position ratio x the parent total assets, aggregated
+                  position market value = weight x position ratio x the parent net assets, aggregated
                   per instrument and rebalanced by the delta against the current position; in mode B
                   or mode C the real instruction of the sub-system passes through unchanged.
     - _check_risk [Optional] L3 portfolio risk control: clip the suggestions at the portfolio dimension
                   (e.g. the single instrument concentration cap max-single-position); mode B and mode C
                   respect the sub-strategy autonomy and skip the clipping.
 
-The running mode is held by the AF (the mode property): "A" Signal Aggregation (the default) / "B"
-Fund Allocation / "C" Shared Account Compatibility (the legacy Portfolio behavior, the sub-systems
-trade directly on the real account of the parent); see the MultiSystem class docstring for the full
-description of the three modes.
+The running mode is held by the aggregate system (MultiSystem::set_mode): "A" Signal Aggregation (the
+default) / "B" Fund Allocation / "C" Shared Account Compatibility (the legacy Portfolio behavior, the
+sub-systems trade directly on the real account of the parent); it is passed into every hook as the
+trailing mode argument; see the MultiSystem class docstring for the full description.
 
 Common parameters:
 
-    - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the total assets); <=0 means no limit, >1 is clamped to 1
-    - max-total-position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= total assets x this value, scaled down proportionally when exceeded; <=0 disables the cap
+    - max-single-position=1.0 (float) : the L3 single instrument concentration upper limit (the proportion of the net assets); <=0 means no limit, >1 is clamped to 1
+    - max-total-position=1.0 (float) : the total budget cap; in mode A the aggregated target market value of all instruments <= net assets x this value, in mode B the sum of the sub-system quotas <= net assets x this value, scaled down proportionally when exceeded; <=0 disables the cap
     - fixed-amount=0.0 (float) : the pricing switch; when >0 it takes precedence over the weights -- in mode A it is the target market value of every instrument, in mode B it is the quota of every sub-system
     - adjust_running_sys=True (bool) : whether to force-adjust the running sub-systems to the new quota on the rebalancing day; only effective in mode B (mode A always adjusts, mode C never adjusts); when False the running sub-systems keep their holdings and only the new sub-systems get the remaining cash)")
 
@@ -114,10 +116,6 @@ Common parameters:
       .def_property("query", py::overload_cast<>(&AllocateFundsBase::getQuery, py::const_),
                     py::overload_cast<const KQuery&>(&AllocateFundsBase::setQuery),
                     py::return_value_policy::copy, "Set or get the query condition")
-      .def_property("mode", &AllocateFundsBase::getMode, &AllocateFundsBase::setMode,
-                    py::return_value_policy::copy,
-                    "The allocation mode: \"A\" Signal Aggregation (the default) / \"B\" Fund "
-                    "Allocation / \"C\" Shared Account Compatibility")
 
       .def("get_param", &AllocateFundsBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -143,8 +141,8 @@ Common parameters:
       .def("clone", &AllocateFundsBase::clone, "The clone operation")
 
       .def("allocate", &AllocateFundsBase::allocate, py::arg("date"), py::arg("tm"),
-           py::arg("suggestions"), py::arg("contexts"), py::arg("query"),
-           R"(allocate(self, date, tm, suggestions, contexts, query)
+           py::arg("suggestions"), py::arg("contexts"), py::arg("query"), py::arg("mode"),
+           R"(allocate(self, date, tm, suggestions, contexts, query, mode)
 
     The unified entry of the L1/L2/L3 pipeline (L1 _allocate -> L2 _to_targets -> L3 _check_risk),
     called by MultiSystem internally on the rebalancing day after the sub-system suggestions are
@@ -154,11 +152,12 @@ Common parameters:
     :param TradeManager tm: the real trade account of the parent (aggregate) system
     :param TradeSuggestionList suggestions: [in/out] the suggestions submitted by every sub-system; L2/L3 rewrite them in place
     :param SubSystemContextList contexts: the context of every sub-system (the virtual account funds / the mode B quota)
-    :param Query query: the query condition (the k-line type, etc.))")
+    :param Query query: the query condition (the k-line type, etc.)
+    :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system)")
 
       .def("_allocate", &AllocateFundsBase::_allocate, py::arg("date"), py::arg("tm"),
-           py::arg("contexts"), py::arg("query"),
-           R"(_allocate(self, date, tm, contexts, query)
+           py::arg("contexts"), py::arg("query"), py::arg("mode"),
+           R"(_allocate(self, date, tm, contexts, query, mode)
 
     [Overload interface] L1 system-level allocation: decide "how much each sub-system may manage" by the
     sub-system context list. In mode B it also writes the real quota into contexts[i].quota.
@@ -167,20 +166,21 @@ Common parameters:
     :param TradeManager tm: the real trade account of the parent (aggregate) system
     :param SubSystemContextList contexts: the context of every sub-system (the virtual account funds / the mode B quota)
     :param Query query: the query condition (the k-line type, etc.)
+    :param str mode: the running mode ("A"/"B"/"C") owned by the aggregate system
     :return: the weight table { System: weight })")
 
       .def("_to_targets", &AllocateFundsBase::_toTargets, py::arg("date"), py::arg("tm"),
-           py::arg("suggestions"), py::arg("sys_weight"), py::arg("query"),
-           R"(_to_targets(self, date, tm, suggestions, sys_weight, query)
+           py::arg("suggestions"), py::arg("sys_weight"), py::arg("query"), py::arg("mode"),
+           R"(_to_targets(self, date, tm, suggestions, sys_weight, query, mode)
 
     [Overload interface] L2 behavior-level conversion: convert the sub-system suggestions into the
     executable quantity of the parent account (mode A: target market value = weight x position ratio x
-    the parent total assets, aggregated per instrument and rebalanced by the delta against the current
+    the parent net assets, aggregated per instrument and rebalanced by the delta against the current
     position; mode B: pass the real instruction through), rewrite suggestions in place)")
 
       .def("_check_risk", &AllocateFundsBase::_checkRisk, py::arg("date"), py::arg("tm"),
-           py::arg("suggestions"), py::arg("query"),
-           R"(_check_risk(self, date, tm, suggestions, query)
+           py::arg("suggestions"), py::arg("query"), py::arg("mode"),
+           R"(_check_risk(self, date, tm, suggestions, query, mode)
 
     [Overload interface] L3 portfolio risk control: clip the suggestions at the portfolio dimension
     (e.g. the single instrument concentration cap max-single-position); mode B skips the clipping
@@ -220,7 +220,10 @@ Common parameters:
 
     :param list weights: the specified asset proportion list)");
 
-    m.def("AF_MultiFactor", AF_MultiFactor, R"(AF_MultiFactor()
+    m.def("AF_MultiFactor", AF_MultiFactor, py::arg("auto_adjust_weight") = true,
+          R"(AF_MultiFactor(auto_adjust_weight=True)
 
-    Create a MultiFactor scoring weight asset allocation algorithm instance. The scores are treated as the mutual ratios of the sub-systems and normalized to sum 1 by default (the parameter auto_adjust_weight=True; a score sum less than 1 also allocates fully), when False the score itself is the final weight. A non-finite score is treated as 0, an all-zero or non-finite sum falls back to the equal weight.)");
+    Create a MultiFactor scoring weight asset allocation algorithm instance. The scores are treated as the mutual ratios of the sub-systems and normalized to sum 1 by default (the parameter auto_adjust_weight=True; a score sum less than 1 also allocates fully), when False the score itself is the final weight. A non-finite score is treated as 0, an all-zero or non-finite sum falls back to the equal weight.
+
+    :param bool auto_adjust_weight: when True the scores are normalized to sum 1; when False the score itself is the final weight)");
 }

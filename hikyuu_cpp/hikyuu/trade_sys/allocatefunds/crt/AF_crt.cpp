@@ -3,7 +3,8 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  The AF factory implementation: assemble the concrete implementations of AllocateFundsBase (the three parts L1/L2/L3).
+ *  The AF factory implementation: assemble the concrete implementations of AllocateFundsBase (the
+ * three parts L1/L2/L3).
  */
 
 #include "AF_EqualWeight.h"
@@ -21,7 +22,8 @@
 namespace hku {
 
 AFPtr HKU_API AF_EqualWeight() {
-    // The equal weight = the L1 default 1/N (equivalent to the normalized equal-proportion semantics of master EqualWeightAllocateFunds)
+    // The equal weight = the L1 default 1/N (equivalent to the normalized equal-proportion
+    // semantics of master EqualWeightAllocateFunds)
     return std::make_shared<EqualWeightAllocateFunds>();
 }
 
@@ -44,8 +46,10 @@ AFPtr HKU_API AF_FixedAmount(double amount) {
     return p;
 }
 
-AFPtr HKU_API AF_MultiFactor() {
-    return std::make_shared<MultiFactorAllocateFunds>();
+AFPtr HKU_API AF_MultiFactor(bool auto_adjust_weight) {
+    auto p = std::make_shared<MultiFactorAllocateFunds>();
+    p->setParam<bool>("auto_adjust_weight", auto_adjust_weight);
+    return p;
 }
 
 }  // namespace hku

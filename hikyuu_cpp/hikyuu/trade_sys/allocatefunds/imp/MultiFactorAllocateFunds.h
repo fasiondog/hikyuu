@@ -39,7 +39,8 @@ public:
     virtual ~MultiFactorAllocateFunds();
 
     virtual Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
-                              SubSystemContextList& contexts, const KQuery& query) override;
+                              SubSystemContextList& contexts, const KQuery& query,
+                              const string& mode) override;
 };
 
 }  // namespace hku
