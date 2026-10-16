@@ -657,7 +657,7 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
         }
         global_parallel_for_index_void(
           0, days_total,
-          [this, stk_count, ind_count, &all_stk_inds, &ind_dummy_dict, &use_style_inds,
+          [this, stk_count, ind_count, &ind_dummy_dict, &use_style_inds,
            &ind_data_ptrs](size_t di) {
               auto sub_norm = m_norm ? m_norm->clone() : m_norm;
               NormPtr special_norm;
