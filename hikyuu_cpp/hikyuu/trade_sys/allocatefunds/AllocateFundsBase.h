@@ -183,18 +183,10 @@ public:
 
     /** L1 system-level allocation: mode A returns the nominal weight (suggested weight), mode B
      *  returns the real quota (written into contexts[i].quota).
-     *  @note It returns the equal weight (1/N) by default; when the parameter weight-list is not
-     *        empty the fixed weights are used instead (migrated from AF_FixedWeight /
-     *        AF_FixedWeightList). */
+     *  @note It returns the equal weight (1/N) by default; the other weight sources are the
+     *        subclasses overriding this (AF_FixedWeight / AF_FixedWeightList / AF_MultiFactor). */
     virtual Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
                               SubSystemContextList& contexts, const KQuery& query);
-
-    /** Parse the parameter weight-list (the comma separated fixed weights) into a normalized weight
-     *  vector; an empty vector is returned when it is empty, when its size does not match the
-     *  sub-systems, when the sum is <= 0 or when it contains a non-finite value (nan / inf) (the
-     *  caller falls back to the equal weight). Migrated from AF_FixedWeight / AF_FixedWeightList.
-     */
-    std::vector<double> _parseWeightList(size_t expect_n) const;
 
     /** L1 skeleton: fill the L1 result by "sub-system index -> weight", and in mode B write
      *  contexts[i].quota (when fixed-amount>0 the fixed quota takes precedence, otherwise

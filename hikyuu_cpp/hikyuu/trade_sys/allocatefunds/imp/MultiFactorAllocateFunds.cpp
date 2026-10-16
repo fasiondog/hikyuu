@@ -15,7 +15,13 @@ BOOST_CLASS_EXPORT(hku::MultiFactorAllocateFunds)
 
 namespace hku {
 
-MultiFactorAllocateFunds::MultiFactorAllocateFunds() : AllocateFundsBase("AF_MultiFactor") {}
+MultiFactorAllocateFunds::MultiFactorAllocateFunds() : AllocateFundsBase("AF_MultiFactor") {
+    // The scores are treated as the mutual ratios of the sub-systems and normalized to sum 1 by
+    // default (the 2.8.3 auto_adjust_weight semantics, so the allocation is full-scale whatever
+    // the raw score range is); when false the score itself is taken as the final weight and the
+    // over-quota part relies on max-total-position to scale down
+    setParam<bool>("auto_adjust_weight", true);
+}
 
 MultiFactorAllocateFunds::~MultiFactorAllocateFunds() {}
 
@@ -46,9 +52,13 @@ AllocateFundsBase::Weights MultiFactorAllocateFunds::_allocate(const Datetime& d
         if (!contexts.empty()) {
             weights.assign(contexts.size(), 1.0 / contexts.size());
         }
+    } else if (getParam<bool>("auto_adjust_weight")) {
+        // Normalize to sum 1: the relative ratios are kept, the total allocation becomes
+        // full-scale (when the score sum is less than 1 the master 2.8.3 also allocated fully)
+        for (auto& w : weights) {
+            w /= sum;
+        }
     }
-    // Without normalization: the score is the weight (equivalent to master
-    // MultiFactorAllocaterFunds returning se_list as is)
     return _applyWeights(date, tm, contexts, query, weights);
 }
 

@@ -12,9 +12,10 @@
  *       compatible overload (master Portfolio::run(query) semantics), and external
  *       rebalancing date table injection (normalize & dedupe / overwrite / clear);
  *    2. Portfolio-level funds allocation engine AllocateFundsBase (AF L1/L2/L3):
- *       - L1 system-level allocation: equal weight / weight-list fixed weights (migrated
- *                        from AF_FixedWeight/FixedWeightList) / mode B real quota (including
- *                        fixed-amount migrated from AF_FixedAmount);
+ *       - L1 system-level allocation: equal weight / fixed weights (AF_FixedWeight /
+ *                        AF_FixedWeightList subclasses) / mode B real quota (including
+ *                        fixed-amount migrated from AF_FixedAmount) / max-total-position
+ *                        budget cap;
  *       - L2 behavior-level conversion: mode A conversion by assets_ratio (full semantics
  *                        pass-through of design 8.3) / fixed-amount / SELL-CLEAR closing the
  *                        whole position / over-allocation converted to position reduction /
@@ -367,57 +368,7 @@ TEST_CASE("test_AllocateFunds_L1_equal_weight") {
     CHECK_EQ(w_null[sys1], doctest::Approx(0.5));
 }
 
-/** @par Check point: L1 weight-list fixed weights (an AF base-class parameter with
- * normalization semantics) */
-TEST_CASE("test_AllocateFunds_L1_weight_list") {
-    auto tm = crtTM(Datetime(200001010000LL), 100000.0);
-    auto af = AF_EqualWeight();
-    af->setMode("A");
-    Datetime date(200001010000LL);
-    auto sys1 = create_test_sys(3, 5);
-    auto sys2 = create_test_sys(5, 10);
-    SubSystemContextList contexts(2);
-    contexts[0].sys = sys1;
-    contexts[1].sys = sys2;
-
-    /** @arg weights summing to 1 are adopted as is */
-    af->setParam<string>("weight-list", "0.6,0.4");
-    auto w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(0.6));
-    CHECK_EQ(w[sys2], doctest::Approx(0.4));
-
-    /** @arg weights not summing to 1 are normalized automatically (3:7 → 0.3/0.7) */
-    af->setParam<string>("weight-list", "3,7");
-    w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(0.3));
-    CHECK_EQ(w[sys2], doctest::Approx(0.7));
-
-    /** @arg count mismatch (3 items vs 2 sub-systems): falls back to equal weight */
-    af->setParam<string>("weight-list", "0.5,0.3,0.2");
-    w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(0.5));
-    CHECK_EQ(w[sys2], doctest::Approx(0.5));
-
-    /** @arg negative weights are treated as 0 and then normalized (0.5,-0.5 → 1.0/0.0) */
-    af->setParam<string>("weight-list", "0.5,-0.5");
-    w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(1.0));
-    CHECK_EQ(w[sys2], doctest::Approx(0.0));
-
-    /** @arg all items invalid (parsed sum is 0), falls back to equal weight */
-    af->setParam<string>("weight-list", "abc,def");
-    w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(0.5));
-    CHECK_EQ(w[sys2], doctest::Approx(0.5));
-
-    /** @arg an empty string falls back to equal weight */
-    af->setParam<string>("weight-list", "");
-    w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(0.5));
-    CHECK_EQ(w[sys2], doctest::Approx(0.5));
-}
-
-/** @par Check point: L1 mode B real quota (equal weight / weight-list / fixed-amount) */
+/** @par Check point: L1 mode B real quota (equal weight / fixed-amount / budget cap) */
 TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     auto af = AF_EqualWeight();
@@ -436,16 +387,25 @@ TEST_CASE("test_AllocateFunds_L1_modeB_quota") {
     af->setParam<double>("fixed-amount", 30000.0);
     af->_allocate(date, tm, contexts, KQuery());
     CHECK_EQ(contexts[0].quota, doctest::Approx(30000.0));
-
-    /** @arg weight-list affects quota allocation (0.7/0.3 → 70000/30000) */
     af->setParam<double>("fixed-amount", 0.0);
-    af->setParam<string>("weight-list", "0.7,0.3");
-    SubSystemContextList ctx2(2);
-    ctx2[0].sys = sys1;
-    ctx2[1].sys = sys2;
-    af->_allocate(date, tm, ctx2, KQuery());
-    CHECK_EQ(ctx2[0].quota, doctest::Approx(70000.0));
-    CHECK_EQ(ctx2[1].quota, doctest::Approx(30000.0));
+
+    /** @arg max-total-position caps the quota sum (AF_FixedWeight 0.7 x2, sum 1.4 > 0.5 ->
+     * scaled to 0.25 each, the sum equals 0.5 x 100000) */
+    auto af_cap = AF_FixedWeight(0.7);
+    af_cap->setMode("B");
+    af_cap->setParam<double>("max-total-position", 0.5);
+    SubSystemContextList ctx3(2);
+    ctx3[0].sys = sys1;
+    ctx3[1].sys = sys2;
+    af_cap->_allocate(date, tm, ctx3, KQuery());
+    CHECK_EQ(ctx3[0].quota, doctest::Approx(25000.0));
+    CHECK_EQ(ctx3[1].quota, doctest::Approx(25000.0));
+
+    /** @arg max-total-position=0 disables the cap (sum 1.4 stays uncapped) */
+    af_cap->setParam<double>("max-total-position", 0.0);
+    af_cap->_allocate(date, tm, ctx3, KQuery());
+    CHECK_EQ(ctx3[0].quota, doctest::Approx(70000.0));
+    CHECK_EQ(ctx3[1].quota, doctest::Approx(70000.0));
 }
 
 /** @par Check point: L1 fixed weights (AF_FixedWeight / AF_FixedWeightList, no normalization) */
@@ -458,22 +418,12 @@ TEST_CASE("test_AllocateFunds_L1_fixed_weight") {
     contexts[0].sys = sys1;
     contexts[1].sys = sys2;
 
-    /** @arg AF_FixedWeight(0.3): each sub-system gets 0.3, **no normalization** (vs. weight-list)
-     */
+    /** @arg AF_FixedWeight(0.3): each sub-system gets 0.3, **no normalization** */
     auto af = AF_FixedWeight(0.3);
     af->setMode("A");
     auto w = af->_allocate(date, tm, contexts, KQuery());
     CHECK_EQ(w[sys1], doctest::Approx(0.3));
     CHECK_EQ(w[sys2], doctest::Approx(0.3));
-
-    /** @arg contrast with the weight-list normalization semantics (0.3,0.3 → 0.5,0.5),
-     * confirming AF_FixedWeight does not normalize */
-    auto af_norm = AF_EqualWeight();
-    af_norm->setMode("A");
-    af_norm->setParam<string>("weight-list", "0.3,0.3");
-    auto w_norm = af_norm->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w_norm[sys1], doctest::Approx(0.5));
-    CHECK_EQ(w_norm[sys2], doctest::Approx(0.5));
 
     /** @arg mode B: quota = 0.3 × parent total assets(100000) = 30000 */
     af->setMode("B");
@@ -508,10 +458,18 @@ TEST_CASE("test_AllocateFunds_L1_fixed_weight") {
     w = afl0->_allocate(date, tm, contexts, KQuery());
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
+
+    /** @arg mode B with AF_FixedWeightList: quota = the given weight x parent total assets
+     * (0.7/0.3 → 70000/30000) */
+    auto aflb = AF_FixedWeightList({0.7, 0.3});
+    aflb->setMode("B");
+    aflb->_allocate(date, tm, contexts, KQuery());
+    CHECK_EQ(contexts[0].quota, doctest::Approx(70000.0));
+    CHECK_EQ(contexts[1].quota, doctest::Approx(30000.0));
 }
 
 /** @par Check point: L1 multi-factor score weights (AF_MultiFactor: SubSystemContext::score
- * as the weight) */
+ * as the weight, normalized to sum 1 by default) */
 TEST_CASE("test_AllocateFunds_L1_multifactor") {
     auto tm = crtTM(Datetime(200001010000LL), 100000.0);
     Datetime date(200001010000LL);
@@ -526,15 +484,31 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
     auto af = AF_MultiFactor();
     af->setMode("A");
 
-    /** @arg scores are used directly as weights (no normalization) */
+    /** @arg auto_adjust_weight defaults to true: the scores are the mutual ratios and are
+     * normalized to sum 1 (a score sum of 1 is a no-op) */
     auto w = af->_allocate(date, tm, contexts, KQuery());
     CHECK_EQ(w[sys1], doctest::Approx(0.7));
     CHECK_EQ(w[sys2], doctest::Approx(0.3));
 
-    /** @arg negative scores are treated as 0 */
+    /** @arg raw scores not summing to 1 (5:3) are normalized to 0.625/0.375 (full-scale) */
+    contexts[0].score = 5.0;
+    contexts[1].score = 3.0;
+    w = af->_allocate(date, tm, contexts, KQuery());
+    CHECK_EQ(w[sys1], doctest::Approx(0.625));
+    CHECK_EQ(w[sys2], doctest::Approx(0.375));
+
+    /** @arg auto_adjust_weight=false: the score itself is the final weight (no normalization) */
+    af->setParam<bool>("auto_adjust_weight", false);
+    w = af->_allocate(date, tm, contexts, KQuery());
+    CHECK_EQ(w[sys1], doctest::Approx(5.0));
+    CHECK_EQ(w[sys2], doctest::Approx(3.0));
+    af->setParam<bool>("auto_adjust_weight", true);
+
+    /** @arg negative scores are treated as 0 and the rest is re-normalized (0.7,-1 → 1.0/0.0) */
+    contexts[0].score = 0.7;
     contexts[1].score = -1.0;
     w = af->_allocate(date, tm, contexts, KQuery());
-    CHECK_EQ(w[sys1], doctest::Approx(0.7));
+    CHECK_EQ(w[sys1], doctest::Approx(1.0));
     CHECK_EQ(w[sys2], doctest::Approx(0.0));
 
     /** @arg a non-finite score (NaN / inf) is treated as 0 like the unselected */
@@ -542,7 +516,7 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
     contexts[1].score = 0.3;
     w = af->_allocate(date, tm, contexts, KQuery());
     CHECK_EQ(w[sys1], doctest::Approx(0.0));
-    CHECK_EQ(w[sys2], doctest::Approx(0.3));
+    CHECK_EQ(w[sys2], doctest::Approx(1.0));
 
     /** @arg an overflowing score sum (1e308 x 2) falls back to equal weight */
     contexts[0].score = 1e308;
@@ -559,7 +533,7 @@ TEST_CASE("test_AllocateFunds_L1_multifactor") {
     CHECK_EQ(w[sys1], doctest::Approx(0.5));
     CHECK_EQ(w[sys2], doctest::Approx(0.5));
 
-    /** @arg mode B: quota = score × parent total assets */
+    /** @arg mode B: quota = the normalized weight x parent total assets */
     contexts[0].score = 0.6;
     contexts[1].score = 0.4;
     af->setMode("B");
@@ -2210,6 +2184,90 @@ TEST_CASE("test_MultiSystem_mode_b_quota_calibration") {
     // The portfolio runs (nearly) fully invested: the idle cash stays a small part of the total
     // assets (the sub cash is recycled on every rebalancing day)
     CHECK_LT(pf_funds.cash, pf_funds.total_assets() * 0.1);
+}
+
+/** @par Check point: mode B adjust_running_sys -- true force-reduces the over-quota running
+ * sub-system back to its quota on the later rebalancing days; false leaves the running
+ * sub-systems untouched (the master _adjust_without_running semantics).
+ *  @note A constant-weight AF recomputes the quota from the current parent total assets, so the
+ * sub value and the quota grow in the same proportion and never diverge (the reduction only fires
+ * on real weight/fund shrink). The test AF shifts the weights across periods to force a
+ * deterministic over-quota state on the second rebalancing day. */
+namespace {
+// The test AF: mode B, the first allocation uses the weights {0.9, 0.1}, every later allocation
+// uses {0.4, 0.6}, so the first sub-system becomes over quota on the second rebalancing day
+class TestShiftWeightAF : public AllocateFundsBase {
+    ALLOCATE_FUNDS_IMP(TestShiftWeightAF)
+    ALLOCATE_FUNDS_NO_PRIVATE_MEMBER_SERIALIZATION
+
+public:
+    TestShiftWeightAF() : AllocateFundsBase("TestShiftWeightAF") {
+        setMode("B");  // the mode is held by the AF (MultiSystem::getMode delegates to it)
+    }
+
+    Weights _allocate(const Datetime& date, const TradeManagerPtr& tm,
+                      SubSystemContextList& contexts, const KQuery& query) override {
+        std::vector<double> weights(contexts.size(), 0.0);
+        for (size_t i = 0; i < contexts.size(); ++i) {
+            if (m_calls == 0) {
+                weights[i] = (i == 0) ? 0.9 : 0.1;
+            } else {
+                weights[i] = (i == 0) ? 0.4 : 0.6;
+            }
+        }
+        m_calls++;
+        return _applyWeights(date, tm, contexts, query, weights);
+    }
+
+    void _reset() override {
+        m_calls = 0;
+    }
+
+private:
+    int m_calls{0};
+};
+}  // namespace
+
+TEST_CASE("test_MultiSystem_mode_b_adjust_running_sys") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991208), Datetime(20000324));
+    KData kdata = stk1.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto count_sells = [](const TMPtr& tm) {
+        size_t n = 0;
+        for (const auto& tr : tm->getTradeList()) {
+            if (tr.business == BUSINESS_SELL) {
+                n++;
+            }
+        }
+        return n;
+    };
+
+    auto run_pf = [&](bool adjust_running) {
+        auto se = SE_Fixed();
+        se->addStockList({stk1, stk2}, create_alway_buy_sys());
+        auto tm = crtTM(Datetime(200001010000LL), 100000.0);
+        auto af = std::make_shared<TestShiftWeightAF>();
+        af->setParam<bool>("adjust_running_sys", adjust_running);
+        auto pf = PF_Simple(tm, se, af, 2, "query", true);
+        pf->run(query);
+        return tm;
+    };
+
+    /** @arg adjust_running_sys=true: the over-quota running sub-system is force-reduced (the
+     * parent SELL trades exist beyond the first day) */
+    auto tm_true = run_pf(true);
+    CHECK_GT(count_sells(tm_true), 0);
+
+    /** @arg adjust_running_sys=false: the running sub-systems keep their holdings, the parent
+     * only carries the first-day BUY trades (no SELL at all) */
+    auto tm_false = run_pf(false);
+    CHECK_EQ(count_sells(tm_false), 0);
+    CHECK_GT(tm_false->getTradeList().size(), 0);
 }
 
 /** @par Check point: mode B mirrors the sub-system trades on every bar (continuous mirror), so a

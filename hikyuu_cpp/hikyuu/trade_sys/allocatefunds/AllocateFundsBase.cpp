@@ -15,9 +15,13 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
-#include <sstream>
+#include <mutex>
 
 namespace hku {
+
+// The one-shot notice flag: the fixed-amount pricing silently overrides the weights, so the
+// surprise is worth exactly one log line per process instead of one per rebalance
+static std::once_flag g_fixed_amount_warn_flag;
 
 HKU_API std::ostream& operator<<(std::ostream& os, const AllocateFundsBase& af) {
     os << "AllocateFunds(" << af.name() << ", " << af.getParameter() << ")";
@@ -38,23 +42,31 @@ AllocateFundsBase::AllocateFundsBase() : m_name("AllocateFundsBase") {
     // value (<=0 means no limit, >1 is clamped to 1)
     setParam<double>("max-single-position", 1.0);
 
-    // L2 total budget cap: the aggregated target market value of all instruments <= total assets
-    // x this value, scaled down proportionally when exceeded (<=0 disables the cap)
+    // The total budget cap: in mode A the aggregated gross target market value of all instruments
+    // <= net assets x this value, scaled down proportionally when exceeded; in mode B the sum of
+    // the sub-system quotas <= total assets x this value (<=0 disables the cap). The reserved /
+    // unallocated asset ratio of the master reserve_percent is expressed by setting it to 1 - r.
     setParam<double>("max-total-position", 1.0);
 
-    // L1 fixed weights (comma separated, normalized); empty means the equal weight 1/N
-    setParam<string>("weight-list", "");
-
-    // L2 fixed amount: the target market value per instrument in mode A, the quota per sub-system
-    // in mode B
+    // The pricing policy switch: when >0 the fixed amount takes precedence over the weights --
+    // the per-instrument target in mode A / the per sub-system quota in mode B are both this
+    // absolute value, and the L1 weights are ignored in the pricing
     setParam<double>("fixed-amount", 0.0);
+
+    // Whether to force-adjust the running sub-systems (the ones still holding value funded in a
+    // previous period) to the new quota on the rebalancing day. Only effective in mode B: mode A
+    // re-targets every bar by design (always adjusts) and mode C has no quota at all (never
+    // adjusts). true - the full calibration (reduce the over quota / inject the gap); false - the
+    // running sub-systems keep their current holdings, only the new sub-systems get the remaining
+    // parent cash
+    setParam<bool>("adjust_running_sys", true);
 }
 
 AllocateFundsBase::AllocateFundsBase(const string& name) : m_name(name) {
     setParam<double>("max-single-position", 1.0);
     setParam<double>("max-total-position", 1.0);
-    setParam<string>("weight-list", "");
     setParam<double>("fixed-amount", 0.0);
+    setParam<bool>("adjust_running_sys", true);
 }
 
 AllocateFundsBase::~AllocateFundsBase() {}
@@ -125,14 +137,11 @@ AllocateFundsBase::Weights AllocateFundsBase::_allocate(const Datetime& date,
     if (contexts.empty()) {
         return Weights();
     }
-    // The L1 weight source:
-    //   1) the parameter weight-list is not empty: parse it into the fixed weights of every
-    //   sub-system in order and normalize them (the AF_FixedWeightList semantics); 2) otherwise the
-    //   equal weight 1/N (AF_EqualWeight, the default).
-    std::vector<double> weights = _parseWeightList(contexts.size());
-    if (weights.size() != contexts.size()) {
-        weights.assign(contexts.size(), 1.0 / contexts.size());
-    }
+    // The L1 default: the equal weight 1/N (AF_EqualWeight). The other weight sources are the
+    // subclasses overriding _allocate (AF_FixedWeight / AF_FixedWeightList / AF_MultiFactor); the
+    // legacy base-class weight-list parameter has been removed, the fixed weights go through
+    // AF_FixedWeightList.
+    std::vector<double> weights(contexts.size(), 1.0 / contexts.size());
     return _applyWeights(date, tm, contexts, query, weights);
 }
 
@@ -143,12 +152,19 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
     if (contexts.empty()) {
         return result;
     }
-    // The mode B quota: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount),
+    // The pricing policy: a fixed quota per sub-system when fixed-amount>0 (AF_FixedAmount),
     // otherwise weight x the parent total assets (the parent valuation is needed only there).
     double fixed_amount = getParam<double>("fixed-amount");
+    if (fixed_amount > 0.0) {
+        std::call_once(g_fixed_amount_warn_flag, [this]() {
+            HKU_WARN("{}: fixed-amount > 0 takes precedence over the weights in the pricing!",
+                     m_name);
+        });
+    }
     double eq = 1.0 / contexts.size();
     double total_assets =
       (m_mode == "B" && tm) ? tm->getFunds(date, query.kType()).total_assets() : 0.0;
+    double sum_w = 0.0;
     for (size_t i = 0; i < contexts.size(); ++i) {
         auto& ctx = contexts[i];
         if (!ctx.sys) {
@@ -158,65 +174,37 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
         }
         double w = (i < weights.size()) ? weights[i] : eq;
         result[ctx.sys] = w;
-        // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
-        // MM working directly on the shared real account.
-        if (m_mode == "B" && tm) {
+        sum_w += w;
+    }
+    // Mode C takes no quota at all: the order quantity of every sub-system comes from its own
+    // MM working directly on the shared real account.
+    if (m_mode == "B" && tm) {
+        // The mode B budget cap: the sum of the quotas <= total assets x max-total-position,
+        // scaled down proportionally when exceeded (<=0 disables the cap). The fixed-amount
+        // pricing is exempt: the quota there is the absolute amount the user asked for, not a
+        // proportion to be scaled.
+        double max_total = getParam<double>("max-total-position");
+        if (fixed_amount <= 0.0 && max_total > 0.0 && std::isfinite(sum_w) && sum_w > max_total) {
+            double scale = max_total / sum_w;
+            HKU_WARN(
+              "{}: the aggregated quota weights({:.4f}) exceed max-total-position({}), scaled by "
+              "{:.4f}!",
+              m_name, sum_w, max_total, scale);
+            for (auto& kv : result) {
+                kv.second *= scale;
+            }
+        }
+        for (auto& ctx : contexts) {
+            if (!ctx.sys) {
+                continue;
+            }
             // Mode B: L1 produces the "real quota" and writes it into contexts[i].quota, the parent
             // writes it back to the sub-system on the rebalancing day (for the next period, the
             // quota lags one period behind).
+            auto it = result.find(ctx.sys);
+            double w = (it != result.end()) ? it->second : 0.0;
             ctx.quota = (fixed_amount > 0.0) ? fixed_amount : (w * total_assets);
         }
-    }
-    return result;
-}
-
-std::vector<double> AllocateFundsBase::_parseWeightList(size_t expect_n) const {
-    std::vector<double> result;
-    string wl = getParam<string>("weight-list");
-    if (wl.empty()) {
-        return result;  // Empty -> the caller falls back to the equal weight
-    }
-    std::stringstream ss(wl);
-    string item;
-    double sum = 0.0;
-    while (std::getline(ss, item, ',')) {
-        size_t b = item.find_first_not_of(" \t\r\n");
-        if (b == string::npos) {
-            continue;  // Skip the pure blank items
-        }
-        size_t e = item.find_last_not_of(" \t\r\n");
-        item = item.substr(b, e - b + 1);
-        double v = 0.0;
-        try {
-            v = std::stod(item);
-        } catch (...) {
-            HKU_WARN("weight-list contains invalid item '{}', treated as 0!", item);
-            v = 0.0;
-        }
-        // Reject the whole list on a non-finite value (std::stod parses "nan" / "inf" without
-        // throwing and they poison every downstream quota)
-        if (!std::isfinite(v)) {
-            HKU_WARN("weight-list contains non-finite item '{}', fallback to equal weight!", item);
-            return std::vector<double>();
-        }
-        if (v < 0.0) {
-            v = 0.0;  // The negative weights are treated as 0 (the short quota allocation is not
-                      // supported)
-        }
-        result.push_back(v);
-        sum += v;
-    }
-    // The quantity must match the sub-systems and the sum must be finite and > 0 (an overflowing
-    // sum normalizes every weight to 0), otherwise it is invalid and falls back to the equal weight
-    if (result.size() != expect_n || !(sum > 0.0) || !std::isfinite(sum)) {
-        HKU_WARN_IF(result.size() != expect_n,
-                    "weight-list size({}) != subsystems({}), fallback to equal weight!",
-                    result.size(), expect_n);
-        result.clear();
-        return result;
-    }
-    for (auto& v : result) {
-        v /= sum;  // Normalize so that the weight sum is 1
     }
     return result;
 }

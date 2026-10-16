@@ -15,12 +15,16 @@
 namespace hku {
 
 /**
- * The multi-factor scoring weight asset allocation, i.e. directly taking the scores returned by SE
- * as the weights.
+ * The multi-factor scoring weight asset allocation, taking the scores returned by SE as the
+ * weights.
  * @details The L1 system-level allocation takes SubSystemContext::score (the SE score backfilled by
- * MultiSystem) as the weight, without normalization. A non-finite score (NaN / inf) is treated as
- * 0, like the unselected sub-systems. When all the scores are 0 (or the sum is non-finite) it falls
- * back to the equal weight, to avoid the zero weight causing the failure to allocate.
+ * MultiSystem) as the weight. A non-finite score (NaN / inf) is treated as 0, like the unselected
+ * sub-systems. When all the scores are 0 (or the sum is non-finite) it falls back to the equal
+ * weight, to avoid the zero weight causing the failure to allocate.
+ * @param auto_adjust_weight when true (the default) the scores are treated as the mutual ratios
+ * and normalized to sum 1, so the total allocation is full-scale whatever the raw score range is
+ * (the 2.8.3 semantics: a score sum less than 1 also allocates fully); when false the score itself
+ * is the final weight and the part exceeding the budget relies on max-total-position to scale down.
  * @note It depends on MultiSystem backfilling score with the result of SelectorBase::getSelected()
  * before L1
  *

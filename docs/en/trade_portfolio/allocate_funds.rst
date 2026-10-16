@@ -20,8 +20,64 @@ for the sub-systems selected by the aggregate system :class:`MultiSystem`. AF op
    * the portfolio-level allocation (L1 system-level weights / L2 behavior-level conversion / L3 portfolio risk control) has been migrated in its entirety to
      :class:`AllocateFundsBase`.
 
-   In other words, the portfolio-level MMs in master, such as `MM_FixedWeight` / `MM_FixedWeightList` / `MM_MultiFactor`,
-   together with the fund allocation logic of the standalone ``Portfolio``, are now handled by ``AF_*``.
+   In other words, the fund allocation logic previously carried by the portfolio-level MMs and the standalone
+   ``Portfolio`` is now handled by ``AF_*``.
+
+Allocation modes (A / B / C)
+----------------------------
+
+AF selects the allocation mode through the :attr:`AllocateFundsBase.mode` attribute, which determines the overall
+running form of the aggregate system. The mode is owned by the AF (the mode query of ``MultiSystem`` is delegated to it):
+
+.. list-table::
+    :header-rows: 1
+
+    * - Mode
+      - Name
+      - Sub-account form
+      - Rebalancing and execution semantics
+    * - ``"A"``
+      - Signal Aggregation (**the default**)
+      - Independent shadow accounts per sub-system, always running, non-overlapping
+      - The parent account is the **sole decision maker**: on the rebalancing day it reads the **current intent state**
+        of the selected sub-systems (net exposure + unfulfilled signals), synthesizes a **signed net target** per
+        instrument by the L1 weights (long and short net amounts cancel out), and places the delta orders on the
+        parent account
+    * - ``"B"``
+      - Fund Allocation
+      - Independent shadow accounts per sub-system, starting from zero and funded only by quotas
+      - The parent account is the **fund allocator**: on the rebalancing day L1 computes each sub-system **quota**
+        (target total assets) and calibrates (recycle the unselected -> liquidate -> reduce the over quota ->
+        inject the gap); the sub-systems trade autonomously within their quotas and the parent **mirrors
+        continuously** their real instructions (the main account = the sum of the sub-system positions)
+    * - ``"C"``
+      - Shared Account Compatibility
+      - No shadow accounts; the sub-systems trade directly on the parent real account
+      - Compatible with the old ``Portfolio`` semantics (the driven set is decided by the SE semantics); the parent
+        performs no L2 conversion and the AF acts only as the mode carrier
+
+Mode x algorithm-part mapping:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Part
+      - Mode A
+      - Mode B
+      - Mode C
+    * - L1 system-level allocation
+      - Produces the nominal weights ``{System: weight}`` (signal weights)
+      - Produces the real quotas: writes ``contexts[i].quota`` (the target total assets) back in place, through nesting
+      - Pass-through, no allocation
+    * - L2 behavior-level conversion
+      - Synthesizes a net target per instrument by ``w × ratio × parent net value`` and converts the order
+        quantities (signed; the cash-releasing group first, the cash-consuming group second)
+      - Passes the sub-system instructions through (both long and short)
+      - Pass-through, no conversion
+    * - L3 portfolio risk control
+      - Portfolio risk-control clipping (e.g. the ``max-single-position`` concentration cap)
+      - Off or total-only (the ``max-total-position`` quota-sum cap is carried at L1)
+      - Off and cannot be enabled
 
 The three replaceable algorithm parts of AF
 -------------------------------------------
@@ -50,18 +106,63 @@ Both ``_to_targets`` and ``_check_risk`` come with default implementations, so u
 Common parameters (portfolio-level)
 -----------------------------------
 
-    * **weight-list** *(string|"")* : the L1 fixed-weight list (comma-separated); when it is non-empty and its length matches the number of sub-systems, the entries are applied in order,
-      otherwise AF falls back to equal weights, and the weights are normalized automatically when their sum is not 1; a list containing a non-finite value (``nan`` / ``inf``) or with an overflowing sum is judged invalid as a whole and falls back to equal weights.
-    * **fixed-amount** *(float|0.0)* : the L2 fixed amount: in mode A it is the target market value per instrument (still subject to the max-total-position proportional scaling after aggregation), in mode B the fixed quota per sub-system.
-    * **max-single-position** *(float|1.0)* : the L3 per-instrument concentration cap (mode A only): the target market value of a position must not exceed total assets multiplied by this value
-      (<=0 disables the limit; a value above 1 takes effect as 1.0).
-    * **max-total-position** *(float|1.0)* : the L2 total budget cap (mode A only), the aggregated target market value of all instruments <= the total assets x this value, scaled down proportionally with a warning when exceeded (<=0 disables the cap).
+The base class :class:`AllocateFundsBase` carries the following common parameters:
 
-.. note::
+.. list-table::
+    :header-rows: 1
 
-   The master parameters ``adjust_running_sys`` / ``auto_adjust_weight`` / ``ignore_zero_weight`` / ``reserve_percent``
-   have **no dedicated switches** in the current implementation: the semantics of ``auto_adjust_weight`` are carried directly by the "**no normalization**" behavior of ``AF_FixedWeight`` /
-   ``AF_FixedWeightList``; the remaining parameters have no counterparts and must be handled by the user.
+    * - Parameter
+      - Type and default
+      - Effective modes
+      - Description
+    * - ``max-single-position``
+      - float, 1.0
+      - A only
+      - The L3 per-instrument concentration cap: the target market value of one instrument must not exceed
+        the total assets x this value. <=0 disables the limit; a value above 1 takes effect as 1.0
+    * - ``max-total-position``
+      - float, 1.0
+      - A / B
+      - The total budget cap: in mode A it bounds the aggregated target market value of all instruments (L2)
+        by the total assets x this value; in mode B it bounds the **sum of the sub-system quotas** (L1) by
+        the total assets x this value. Scaled down proportionally with a warning when exceeded.
+        <=0 disables the cap
+    * - ``fixed-amount``
+      - float, 0.0
+      - A / B
+      - The pricing switch: when >0 it **takes precedence over the weight pricing** with a warning.
+        In mode A it is the target market value per instrument; in mode B the fixed quota per sub-system.
+        The L1 weights then carry only the ranking meaning and take no part in the pricing
+    * - ``adjust_running_sys``
+      - bool, True
+      - B only
+      - Whether to force-adjust the **running sub-systems** to the new quota on the rebalancing day.
+        A running sub-system = one that was funded in a previous period and still holds assets at the
+        calibration time. ``True``: runs the full calibration (recycle the unselected -> liquidate ->
+        reduce the over quota -> inject the gap); ``False``: leaves the running sub-systems untouched
+        (no recycle, no reduction, no injection) and only the new sub-systems get the remaining parent
+        cash (limited by the parent balance, may be underfunded).
+        Mode A re-targets every bar and always adjusts; mode C has no quota and never adjusts --
+        neither is affected by this parameter
+
+Notes:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Item
+      - Description
+    * - Full allocation after score normalization
+      - ``AF_MultiFactor`` by default (``auto_adjust_weight=True``) **normalizes the scores to sum 1**
+        before allocating, so **a score sum less than 1 also allocates fully** (the scores only express
+        the relative ratios between the sub-systems). When ``False`` the score itself is the final weight
+        and the part exceeding the total budget relies on ``max-total-position`` to scale down
+    * - Constant weights never trigger a reduction
+      - The constant-weight AFs (e.g. ``AF_FixedWeightList``) recompute the quota from the **current** parent
+        total assets on every period, so the sub value and the quota grow in the same proportion and the
+        reduction is never triggered by the normal market movement; the force reduction only happens on a
+        real cross-period shrink of the weights or the funds (and never happens when
+        ``adjust_running_sys=False``)
 
 
 Built-in Asset Allocation Algorithms
@@ -77,7 +178,8 @@ Built-in Asset Allocation Algorithms
 
     Fixed-weight fund allocation: each selected instrument accounts for a fixed proportion of total assets.
 
-    L1 returns the fixed ``weight`` directly, **without normalization** (equivalent to master's ``auto_adjust_weight=False``).
+    L1 returns the fixed ``weight`` directly, **without normalization** (for the score-as-final-weight usage,
+    see ``auto_adjust_weight=False`` of ``AF_MultiFactor``).
 
     :param float weight: the specified weight as a proportion of total assets (0, 1]
     :return: the fund allocation algorithm instance (``AFPtr``)
@@ -96,19 +198,20 @@ Built-in Asset Allocation Algorithms
 
     Fixed-amount fund allocation (L1 equal weight + L2 fixed amount): allocates an equal amount of capital to each selected instrument.
 
-    .. note::
-
-       The old master implementation asserts ``amount > 500`` and stops once the remaining cash drops below ``0.6 x amount``;
-       the current implementation requires ``fixed-amount >= 0`` and rebalances by the net amount, so the **boundary behavior differs**.
+    The current implementation requires ``fixed-amount >= 0`` and rebalances by the net amount.
 
     :param float amount: the maximum trade amount
     :return: the fund allocation algorithm instance (``AFPtr``)
 
-.. py:function:: AF_MultiFactor()
+.. py:function:: AF_MultiFactor([auto_adjust_weight = True])
 
     Creates a MultiFactor score-weighted fund allocation algorithm instance, i.e. one that uses the scores returned by the selector
-    (SE; ``SubSystemContext.score``) directly as the weights (without normalization; a non-finite score is treated as 0, an all-zero or non-finite sum falls back to the equal weight).
+    (SE; ``SubSystemContext.score``) as the weights (a non-finite score is treated as 0, an all-zero or non-finite sum falls back to the equal weight).
 
+    :param bool auto_adjust_weight: the score normalization switch (default ``True``). When ``True`` the scores are
+        normalized to sum 1 before allocating (a score sum less than 1 also allocates fully; see the notes above);
+        when ``False`` the score itself is the final weight (no normalization) and
+        the part exceeding the total budget relies on ``max-total-position`` to scale down
     :return: the fund allocation algorithm instance (``AFPtr``)
 
 
@@ -136,7 +239,7 @@ The following ``my_allocate`` demonstrates both mode A (returning the weight tab
     from hikyuu import *
 
     def my_allocate(self, date, tm, contexts, query):
-        # L1 [Required]: sub-system context -> weight (corresponds to master's _allocateWeight)
+        # L1 [Required]: sub-system context -> weight
         #   Mode A: return {ctx.sys: weight}
         #   Mode B: write ctx.quota directly and return an empty table
         if self.mode == "B":
@@ -153,24 +256,6 @@ The following ``my_allocate`` demonstrates both mode A (returning the weight tab
 
 The equivalent approach is to subclass :class:`AllocateFundsBase` directly, implement ``_clone``, and override
 ``_allocate`` / ``_to_targets`` / ``_check_risk`` as needed.
-
-Migration mapping:
-
-.. list-table::
-    :header-rows: 1
-
-    * - master
-      - The current implementation
-    * - ``class MyAF(AllocateFundsBase)``
-      - ``class MyAF(AllocateFundsBase)`` (the class of the same name is retained, with unchanged semantics)
-    * - ``_allocateWeight(date, se_list)``
-      - ``_allocate(date, tm, contexts, query)`` (L1, system-level weights / quotas)
-    * - (normalization is performed afterward by the framework)
-      - ``_to_targets(...)`` (L2: in mode A it converts the quantities for the parent account; in mode B it passes instructions through)
-    * - —
-      - ``_check_risk(...)`` (L3, portfolio risk-control clipping, e.g. ``max-single-position``)
-    * - ``crtAF(func)``
-      - ``crtAF(func)`` (only the callback signature is updated to ``_allocate(date, tm, contexts, query)``; ``to_targets_func`` / ``check_risk_func`` can be added)
 
 
 Asset Allocation Algorithm Base Class

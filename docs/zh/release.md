@@ -30,13 +30,14 @@
   `AllocateFundsBase` 并重载 `_allocate`（L1）/ `_to_targets`（L2）/ `_check_risk`（L3）；
 * 组合级分配模式（A/B）唯一来源在 AF：`MultiSystem.set_mode` 转发至 `set_af`；序列化向后兼容
   （旧档案中的 `m_mode` 自动迁移至 AF）；
-* `sys_use_self_tm` 等在新体系无对应语义的参数将被忽略并告警；AF 的 `auto_adjust_weight` 语义由
-  `AF_FixedWeight` / `AF_FixedWeightList` 的「不归一化」直接承载。
+* `sys_use_self_tm` 等在新体系无对应语义的参数将被忽略并告警；`AF_MultiFactor` 提供 `auto_adjust_weight`
+  参数（默认 `True`，评分归一化为和为 1 后分配，评分总和小于 1 也满仓分配；`False` 时评分即最终权重）。
 
 **⚠️ AF 风控默认生效**：`max-single-position` 默认 1.0，即单标的持仓市值 ≤ 总资产
-（`<=0` 不限制，`>1` 按 1.0 生效）；新增 `max-total-position` 默认 1.0，即模式 A 下所有标的
-聚合目标市值 ≤ 总资产，超出按比例等比缩减并告警（`<=0` 不限制）。若需超配或杠杆场景，请下调
-该参数或设为 `<=0`。
+（`<=0` 不限制，`>1` 按 1.0 生效）；`max-total-position` 默认 1.0，模式 A 下所有标的聚合目标市值 ≤ 总资产、
+模式 B 下各子系统配额总和 ≤ 总资产，超出按比例等比缩减并告警（`<=0` 不限制）。若需超配或杠杆场景，请下调
+该参数或设为 `<=0`。基类另含 `fixed-amount`（大于 0 时覆盖权重定价并告警）与 `adjust_running_sys`
+（默认 `True`，仅模式 B 生效；`False` 时已运行子系统保持现状、仅新子系统获配剩余现金）参数。
 
 详见文档：`trade_portfolio/portfolio`、`trade_portfolio/allocate_funds`。
 

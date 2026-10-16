@@ -3,7 +3,7 @@
  *
  *  Copyright (c) 2025 hikyuu.org
  *
- *  Unit tests for the portfolio-level fund allocation (AF) weight-list parsing and the
+ *  Unit tests for the portfolio-level fund allocation (AF) base parameters and the
  *  fixed-weight-list parameter validation.
  */
 
@@ -21,50 +21,21 @@ using namespace hku;
  */
 
 /** @par Test points */
-TEST_CASE("test_AllocateFunds_parseWeightList") {
+TEST_CASE("test_AllocateFunds_base_params") {
     AFPtr af = AF_EqualWeight();
 
-    /** @arg an empty weight-list returns an empty vector (the caller falls back to the equal
-     * weight) */
-    af->setParam<string>("weight-list", "");
-    CHECK_EQ(af->_parseWeightList(3).size(), 0);
+    /** @arg the base parameter family and their defaults */
+    CHECK_EQ(af->getParam<double>("max-single-position"), doctest::Approx(1.0));
+    CHECK_EQ(af->getParam<double>("max-total-position"), doctest::Approx(1.0));
+    CHECK_EQ(af->getParam<double>("fixed-amount"), doctest::Approx(0.0));
+    CHECK_EQ(af->getParam<bool>("adjust_running_sys"), true);
 
-    /** @arg a normal list is parsed and normalized to a sum of 1 */
-    af->setParam<string>("weight-list", "1,2,1");
-    auto w = af->_parseWeightList(3);
-    REQUIRE_EQ(w.size(), 3);
-    CHECK_EQ(w[0], doctest::Approx(0.25));
-    CHECK_EQ(w[1], doctest::Approx(0.5));
-    CHECK_EQ(w[2], doctest::Approx(0.25));
+    /** @arg the legacy base-class weight-list parameter has been removed (the fixed weights go
+     * through AF_FixedWeightList) */
+    CHECK_THROWS_AS(af->getParam<string>("weight-list"), std::exception);
 
-    /** @arg a size mismatch falls back to the equal weight (empty result) */
-    af->setParam<string>("weight-list", "1,2");
-    CHECK_EQ(af->_parseWeightList(3).size(), 0);
-
-    /** @arg "nan" is rejected (no longer bypasses the sum validation) -> empty result */
-    af->setParam<string>("weight-list", "nan,1");
-    CHECK_EQ(af->_parseWeightList(2).size(), 0);
-
-    /** @arg "inf" is rejected -> empty result */
-    af->setParam<string>("weight-list", "inf,1");
-    CHECK_EQ(af->_parseWeightList(2).size(), 0);
-
-    /** @arg an overflow literal "1e999" makes std::stod throw out_of_range, treated as 0 (never
-     *  becoming inf); the remaining item keeps the list valid and finite */
-    af->setParam<string>("weight-list", "1e999,1");
-    auto ov = af->_parseWeightList(2);
-    REQUIRE_EQ(ov.size(), 2);
-    CHECK_EQ(ov[0], 0.0);
-    CHECK_EQ(ov[1], doctest::Approx(1.0));
-
-    /** @arg all-zero weights have a sum of 0 -> invalid, falls back to the equal weight */
-    af->setParam<string>("weight-list", "0,0,0");
-    CHECK_EQ(af->_parseWeightList(3).size(), 0);
-
-    /** @arg an overflowing sum (each item finite but the sum is inf) normalizes every weight to 0
-     *  and would clear the holdings, so the whole list is rejected */
-    af->setParam<string>("weight-list", "1e308,1e308");
-    CHECK_EQ(af->_parseWeightList(2).size(), 0);
+    /** @arg the mode defaults to A */
+    CHECK_EQ(af->getMode(), "A");
 }
 
 /** @par Test points */

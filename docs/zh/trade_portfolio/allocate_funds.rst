@@ -16,11 +16,61 @@
 
    * :class:`MoneyManagerBase` 限定为**单系统 / 单证券**形态（操作域为单个 ``Stock``），
      负责单系统 sizing，不再承载组合级分配；
-   * 组合级分配（L1 系统级权重 / L2 行为级换算 / L3 组合风控）整体迁移至本研究主题
+   * 组合级分配（L1 系统级权重 / L2 行为级换算 / L3 组合风控）整体迁移至
      :class:`AllocateFundsBase`。
 
-   即 master 中 `MM_FixedWeight` / `MM_FixedWeightList` / `MM_MultiFactor` 等组合级 MM、
-   以及独立的 ``Portfolio`` 资金调拨逻辑，现由 ``AF_*`` 承接。
+   即原先由组合级 MM 及独立的 ``Portfolio`` 承载的资金调拨逻辑，现统一由 ``AF_*`` 承接。
+
+分配模式（A / B / C）
+---------------------
+
+AF 通过 :attr:`AllocateFundsBase.mode` 属性选择分配模式，决定聚合系统的整体运行形态。
+模式由 AF 持有（``MultiSystem`` 的模式查询委托给 AF）：
+
+.. list-table::
+    :header-rows: 1
+
+    * - 模式
+      - 名称
+      - 子账户形态
+      - 调仓与执行语义
+    * - ``"A"``
+      - 信号汇总（Signal Aggregation，**默认**）
+      - 各子系统独立影子账户，恒运行、互不重叠
+      - 父账户是**唯一决策者**：调仓日读取被选中子系统的**当前意图态**（净敞口 + 未兑现信号），
+        按 L1 权重合成每标的**带符号净目标**（多空净额相互抵消），对父账户按差额统一下单
+    * - ``"B"``
+      - 资金配置（Fund Allocation）
+      - 各子系统独立影子账户，从 0 起步、仅靠配额注资
+      - 父账户是**资金分配者**：调仓日由 L1 计算各子系统**配额**（目标总资产）并校准
+        （回收未选中 → 清算 → 减超额 → 注缺口）；子系统在各自配额内自主交易，
+        父**连续镜像**其真实指令（主账户 = 各子系统头寸之和）
+    * - ``"C"``
+      - 共享账户兼容（Shared Account Compatibility）
+      - 无影子账户，子系统直接在父真实账户交易
+      - 兼容旧 ``Portfolio`` 语义（驱动集由 SE 语义决定）；父不做 L2 换算，AF 仅充当模式载体
+
+模式 × 算法部件对照：
+
+.. list-table::
+    :header-rows: 1
+
+    * - 部件
+      - 模式 A
+      - 模式 B
+      - 模式 C
+    * - L1 系统级分配
+      - 产名义权重 ``{System: weight}``（信号权重）
+      - 产真实额度：就地回写 ``contexts[i].quota``（目标总资产），可穿透嵌套
+      - 直通，不分配
+    * - L2 行为级换算
+      - 按 ``w × ratio × 父净值`` 合成每标的净目标并换算下单数量（带符号，先吐现金组后吃现金组）
+      - 透传子系统指令（多空均透传）
+      - 直通，免换算
+    * - L3 组合风控
+      - 组合风控裁剪（``max-single-position`` 集中度上限等）
+      - 关闭或仅总量（``max-total-position`` 配额总和上限在 L1 承载）
+      - 关闭且不可启用
 
 AF 的三个可替换算法部件
 -----------------------
@@ -49,19 +99,54 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 公共参数（组合级）
 ------------------
 
-    * **weight-list** *(string|"")* : L1 固定权重列表（逗号分隔）；非空且数量与子系统数一致时按序采用，
-      否则回退等权，权重和不为 1 时自动归一化；含 ``nan`` / ``inf`` 等非有限值或求和溢出时整表判无效回退等权。
-    * **fixed-amount** *(float|0.0)* : L2 固定金额；模式 A 下为每标的目标市值（聚合后仍受 ``max-total-position`` 等比缩减约束），模式 B 下为每子系统固定额度。
-    * **max-single-position** *(float|1.0)* : L3 单标的集中度上限（仅模式 A 生效），目标持仓市值 ≤ 总资产 × 该值
-      （≤0 表示不限制；大于 1 时按 1.0 生效）。
-    * **max-total-position** *(float|1.0)* : L2 总目标市值上限（仅模式 A 生效），所有标的聚合目标市值 ≤ 总资产 × 该值，
-      超出时按比例等比缩减并告警（≤0 表示不限制）。
+基类 :class:`AllocateFundsBase` 内置以下公共参数：
 
-.. note::
+.. list-table::
+    :header-rows: 1
 
-   master 的 ``adjust_running_sys`` / ``auto_adjust_weight`` / ``ignore_zero_weight`` / ``reserve_percent``
-   等参数在**当前实现无独立开关**：其中 ``auto_adjust_weight`` 的语义由 ``AF_FixedWeight`` /
-   ``AF_FixedWeightList`` 的「**不归一化**」直接承载；其余参数无对应，需由使用方自行处理。
+    * - 参数
+      - 类型与默认值
+      - 生效模式
+      - 说明
+    * - ``max-single-position``
+      - float，1.0
+      - 仅 A
+      - L3 单标的集中度上限：单标的目标持仓市值 ≤ 总资产 × 该值。≤0 表示不限制；大于 1 时按 1.0 生效
+    * - ``max-total-position``
+      - float，1.0
+      - A / B
+      - 总预算上限：模式 A 下限定 L2 全部标的聚合目标市值 ≤ 总资产 × 该值；
+        模式 B 下限定 L1 各子系统**配额总和** ≤ 总资产 × 该值。
+        超出时按比例等比缩减并告警。≤0 表示不限制
+    * - ``fixed-amount``
+      - float，0.0
+      - A / B
+      - 定价开关：大于 0 时**优先于权重定价**并告警。模式 A 下为每标的目标市值；
+        模式 B 下为每子系统固定额度。此时 L1 权重仅保留排序含义、不参与定价
+    * - ``adjust_running_sys``
+      - bool，True
+      - 仅 B
+      - 调仓日是否将**已运行子系统**强制调整到新配额。已运行子系统 = 上期已获注资、
+        校准时刻仍持有资产的子系统。``True``：执行完整校准（回收未选中 → 清算 → 减超额 → 注缺口）；
+        ``False``：已运行子系统保持现状（不回收、不减持、不注资），
+        仅新子系统获配剩余父账户现金（受父账户余额限制，可能不足额）。
+        模式 A 每 bar 重定目标、恒调整；模式 C 无配额、恒不调整——两者均不受该参数影响
+
+注意事项：
+
+.. list-table::
+    :header-rows: 1
+
+    * - 事项
+      - 说明
+    * - 评分归一化后**满仓分配**
+      - ``AF_MultiFactor`` 默认（``auto_adjust_weight=True``）将评分**归一化为和为 1** 后再分配，
+        因此**评分总和小于 1 时也会满仓分配**（评分仅表达子系统间的相对比例）。
+        设为 ``False`` 时评分即最终权重，超出总预算的部分依赖 ``max-total-position`` 等比缩减
+    * - 恒定权重不触发减仓
+      - 恒定权重类 AF（如 ``AF_FixedWeightList``）每期按**当期父总资产**重算配额，
+        子账户净值与配额同比例增长，正常行情下不会触发减仓；
+        强制减仓只在权重或资金**跨期收缩**时发生（或 ``adjust_running_sys=False`` 时完全不发生）
 
 
 内建资产分配算法
@@ -77,7 +162,8 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
     固定比例资产分配，每个选中的资产都只占总资产固定的比例。
 
-    L1 直接返回固定 ``weight``，**不归一化**（等价 master ``auto_adjust_weight=False``）。
+    L1 直接返回固定 ``weight``，**不归一化**（评分即最终权重的用法见 ``AF_MultiFactor`` 的
+    ``auto_adjust_weight=False``）。
 
     :param float weight: 指定的资产比例 (0, 1]
     :return: 资产分配算法实例（``AFPtr``）
@@ -97,20 +183,19 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
     固定金额资产分配（L1 等权 + L2 固定金额），对选中的资产进行等金额分配。
 
-    .. note::
-
-       master 旧实现断言 ``amount > 500`` 且剩余现金 ``< 0.6 × amount`` 时停止；
-       当前实现要求 ``fixed-amount >= 0``，且按净额调仓，**边界行为不同**。
+    当前实现要求 ``fixed-amount >= 0``，且按净额调仓。
 
     :param float amount: 交易最大金额
     :return: 资产分配算法实例（``AFPtr``）
 
-.. py:function:: AF_MultiFactor()
+.. py:function:: AF_MultiFactor([auto_adjust_weight = True])
 
-    创建 MultiFactor 评分权重的资产分配算法实例，即直接以 SE 返回的评分
-    （``SubSystemContext.score``）作为权重（不归一化；非有限评分按 0 处理，全 0 或求和
-    非有限时回退等权）。
+    创建 MultiFactor 评分权重的资产分配算法实例，即以 SE 返回的评分
+    （``SubSystemContext.score``）作为权重（非有限评分按 0 处理，全 0 或求和非有限时回退等权）。
 
+    :param bool auto_adjust_weight: 评分归一化开关（默认 ``True``）。``True`` 时将评分归一化为
+        和为 1 再分配（评分总和小于 1 时同样满仓分配，见上文注意事项）；
+        ``False`` 时评分即最终权重（不归一化），超出总预算的部分依赖 ``max-total-position`` 缩减
     :return: 资产分配算法实例（``AFPtr``）
 
 
@@ -138,7 +223,7 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
     from hikyuu import *
 
     def my_allocate(self, date, tm, contexts, query):
-        # L1【必须】：子系统上下文 → 权重（对应 master 的 _allocateWeight）
+        # L1【必须】：子系统上下文 → 权重
         #   模式 A：返回 {ctx.sys: weight}
         #   模式 B：直接写 ctx.quota，并返回空表
         if self.mode == "B":
@@ -155,24 +240,6 @@ AF 把组合级分配拆成三个**可独立替换**的算法部件（各自对�
 
 等效写法是直接继承 :class:`AllocateFundsBase`，实现 ``_clone`` 并按需重载
 ``_allocate`` / ``_to_targets`` / ``_check_risk``。
-
-迁移对照：
-
-.. list-table::
-    :header-rows: 1
-
-    * - master
-      - 当前实现
-    * - ``class MyAF(AllocateFundsBase)``
-      - ``class MyAF(AllocateFundsBase)``（同名类保留，语义不变）
-    * - ``_allocateWeight(date, se_list)``
-      - ``_allocate(date, tm, contexts, query)``（L1，系统级权重 / 额度）
-    * - （由框架后处理归一化）
-      - ``_to_targets(...)``（L2，模式 A 换算父账户数量；模式 B 透传）
-    * - —
-      - ``_check_risk(...)``（L3，组合风控裁剪，如 ``max-single-position``）
-    * - ``crtAF(func)``
-      - ``crtAF(func)``（仅回调签名更新为 ``_allocate(date, tm, contexts, query)``，可另加 ``to_targets_func`` / ``check_risk_func``）
 
 
 资产分配算法基类

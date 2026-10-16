@@ -1204,9 +1204,19 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     // allocated BEFORE driving the sub-systems, so every selected sub-system trades with its exact
     // allocated quota (the master AF adjusted the funds first and ran the systems afterwards)
     bool quota_calibrated = false;
+    bool adjust_running_sys = true;
     AllocateFundsBase::Weights af_weights;
     std::unordered_map<System*, price_t> quota_map;
+    // The running sub-systems for adjust_running_sys=false. Mode B keeps no running pool of its
+    // own (m_running_set is mode C-only), and a mode B sub-account starts from zero and is funded
+    // only by the quota injection, so a context still holding value at the calibration time was
+    // funded in a previous period, i.e. it is a running sub-system
+    std::set<System*> running_subs;
     if (is_adjust && getMode() == "B" && m_se && getAF()) {
+        // adjust_running_sys=false: the running sub-systems keep their current holdings on the
+        // rebalancing day; only the new sub-systems get the remaining parent cash (the master
+        // _adjust_without_running semantics)
+        adjust_running_sys = m_af->getParam<bool>("adjust_running_sys");
         SubSystemContextList quota_ctxs;
         for (size_t i = 0; i < m_sys_list.size(); ++i) {
             SystemPtr& sys = m_sys_list[i];
@@ -1217,6 +1227,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             ctx.sys = sys;
             if (sys->getTM()) {
                 ctx.funds = sys->getTM()->getFunds(datetime, ktype);
+                if (ctx.funds.total_assets() > 0.0) {
+                    running_subs.insert(sys.get());
+                }
             }
             quota_ctxs.push_back(ctx);
         }
@@ -1256,7 +1269,12 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 }
                 _clearSubSystem(sys, datetime, ktype);
             } else {
-                // The selected: recycle the sub cash first (bookkeeping)
+                // The selected: recycle the sub cash first (bookkeeping). With
+                // adjust_running_sys=false the running sub-system is left untouched (its idle
+                // cash stays in the sub account); only a new sub-system goes through here.
+                if (!adjust_running_sys && running_subs.count(sys.get()) > 0) {
+                    continue;
+                }
                 TMPtr sub_tm = sys->getTM();
                 if (sub_tm) {
                     FundsRecord funds = sub_tm->getFunds(datetime, ktype);
@@ -1273,6 +1291,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             if (selected.count(sys.get()) == 0) {
                 continue;
             }
+            if (!adjust_running_sys && running_subs.count(sys.get()) > 0) {
+                continue;  // adjust_running_sys=false: the running sub-system is not force-reduced
+            }
             auto qit = quota_map.find(sys.get());
             if (qit != quota_map.end()) {
                 _reduceSubSystemToQuota(sys, datetime, qit->second, ktype, executed);
@@ -1282,6 +1303,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             SystemPtr& sys = m_sys_list[i];
             if (selected.count(sys.get()) == 0) {
                 continue;
+            }
+            if (!adjust_running_sys && running_subs.count(sys.get()) > 0) {
+                continue;  // adjust_running_sys=false: the running sub-system is not force-injected
             }
             auto qit = quota_map.find(sys.get());
             if (qit != quota_map.end()) {
