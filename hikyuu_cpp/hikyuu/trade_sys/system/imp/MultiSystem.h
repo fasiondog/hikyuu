@@ -433,7 +433,7 @@ private:
     TradeRecordList _closePhaseModeA(const Datetime& datetime, bool is_adjust,
                                      const std::set<System*>& selected,
                                      const std::unordered_map<System*, double>& se_scores,
-                                     KQuery::KType ktype);
+                                     KQuery::KType ktype, double assets_before);
 
     /** Mode A (Signal Aggregation): append the per-instrument signed net target suggestions of one
      *  sub-system (its current holdings plus the unfilled requests) for the L2 synthesis. */
@@ -448,7 +448,7 @@ private:
     /** The common tail of the close stage: record the rebalancing-day turnover and the trace
      *  output. Shared by the mode A/B tail and the mode C early return. */
     void _finishClosePhase(const Datetime& datetime, const TradeSuggestionList& suggestions,
-                           const TradeRecordList& executed, bool is_adjust);
+                           const TradeRecordList& executed, bool is_adjust, double assets_before);
 
     /** Mode C: the whole close stage of the shared-account mode, i.e. the dual pools of the legacy
      *  Portfolio without AF (running pool + force-sell pool), driven in the pool order and with no
@@ -497,6 +497,11 @@ private:
      * the last trading day of the instrument is earlier than the current running date) */
     TradeRecordList _forceSellDelisted(const Datetime& date);
 
+    /** Flatten the delisted instrument recursively over the sub-system books (a dead instrument
+     *  can never be traded again and would keep distorting the quota calibration) */
+    void _clearDelistedInSubTree(const SystemPtr& sys, const Stock& stock, const Datetime& date,
+                                 price_t price);
+
     /** Queue the close-stage suggestions for the execution at the next open (trade_on_close=false).
      *  It is keyed by the driving day: a repeat drive of the same day replaces the queued batch
      *  (idempotent), and a batch left over from an earlier day (a session that only drives close)
@@ -515,7 +520,7 @@ private:
                                               // L1/L2/L3), owned by the aggregate system
     string m_mode{"A"};  // The running mode ("A"/"B"/"C"), owned by the aggregate system itself
     std::shared_ptr<SelectorBase> m_se;  // The trading object selector (optional)
-    bool m_sell_at_not_selected{true};   // Whether to force liquidating the unselected sub-systems
+    bool m_sell_at_not_selected{false};  // Whether to force liquidating the unselected sub-systems
                                          // (it takes effect only after SE is set)
     std::vector<std::pair<Datetime, double>>
       m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
@@ -555,6 +560,9 @@ private:
     std::unordered_map<System*, size_t> m_sub_index;
     std::unordered_map<string, KData>
       m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
+    Datetime m_kdata_cache_mark;  // The last-bar datetime the cache was built for: the cache is
+                                  // dropped as soon as the driving KData advances (live sessions
+                                  // reuse the same query while the data grows daily)
     DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
                                         // axis-mode="calendar" (runtime state, not serialized)
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the

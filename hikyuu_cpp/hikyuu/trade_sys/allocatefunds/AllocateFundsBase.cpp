@@ -23,6 +23,10 @@ namespace hku {
 // surprise is worth exactly one log line per process instead of one per rebalance
 static std::once_flag g_fixed_amount_warn_flag;
 
+// The one-shot notice of the exempted fixed-amount budget cap (the absolute targets can exceed
+// the max-total-position budget: the user asked for absolute amounts, warned once per process)
+static std::once_flag g_fixed_amount_cap_warn_flag;
+
 // The one-shot notice flag of the mode A short clamp: a parent account without a securities-lending
 // facility cannot run the negative net targets, they are clamped to zero (once per process)
 static std::once_flag g_short_unsupported_warn_flag;
@@ -196,6 +200,15 @@ AllocateFundsBase::Weights AllocateFundsBase::_applyWeights(
             for (auto& kv : result) {
                 kv.second *= scale;
             }
+        } else if (fixed_amount > 0.0 && max_total > 0.0 && net_assets > 0.0 &&
+                   fixed_amount * static_cast<double>(result.size()) > net_assets * max_total) {
+            // The fixed quotas are absolute amounts and stay exempt from the cap; the user is told
+            // because the sum of the quotas can exceed what the parent account can fund
+            std::call_once(g_fixed_amount_cap_warn_flag, [this]() {
+                HKU_WARN("{}: the fixed-amount quotas exceed max-total-position x net assets, "
+                         "they are kept as absolute amounts!",
+                         m_name);
+            });
         }
         for (auto& ctx : contexts) {
             if (!ctx.sys) {
@@ -264,7 +277,12 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         if (it != sys_weight.end()) {
             weight = it->second;
         } else if (!sys_weight.empty()) {
-            weight = 1.0 / sys_weight.size();
+            // The sub-system got no weight (the AF skipped it, e.g. a non-finite weight): never
+            // scale its intent by a fabricated equal weight
+            HKU_WARN("{}::_toTargets: no weight for the sub-system of {}, the suggestion is "
+                     "skipped!",
+                     m_name, s.stock.market_code());
+            continue;
         }
         double v = weight * s.target_position_ratio * parent_net;
         if (!std::isfinite(v)) {
@@ -311,9 +329,20 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
     }
 
     // The total budget cap: the aggregated gross target market value <= net assets x
-    // max-total-position, scaled down proportionally (<=0 disables the cap)
+    // max-total-position, scaled down proportionally (<=0 disables the cap). The fixed-amount
+    // pricing is exempt exactly as in the L1 quota pricing: an absolute amount asked by the user
+    // must not be silently scaled (a notice is logged when it exceeds the budget)
     double max_total = getParam<double>("max-total-position");
-    if (max_total > 0.0 && parent_net > 0.0 && gross > parent_net * max_total) {
+    if (fixed_amount > 0.0 && max_total > 0.0 && parent_net > 0.0 &&
+        gross > parent_net * max_total) {
+        std::call_once(g_fixed_amount_cap_warn_flag, [this]() {
+            HKU_WARN("{}::_toTargets: the fixed-amount targets exceed max-total-position x net "
+                     "assets, they are kept as absolute amounts!",
+                     m_name);
+        });
+    }
+    if (fixed_amount <= 0.0 && max_total > 0.0 && parent_net > 0.0 &&
+        gross > parent_net * max_total) {
         double scale = parent_net * max_total / gross;
         HKU_WARN(
           "{}::_toTargets: the aggregated gross target({:.2f}) exceeds max-total-position({}) x "
@@ -332,6 +361,8 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         price_t p = price[stock];
         double unit = stock.unit();
         if (p <= 0.0 || unit <= 0.0) {
+            HKU_WARN("{}::_toTargets: skip {}, no quote or no contract unit!", m_name,
+                     stock.market_code());
             continue;
         }
         double target_shares = kv.second / (p * unit);
@@ -386,7 +417,23 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
             orders.push_back(make(SuggestionType::BUY, target_shares, false));
         }
     }
-    suggestions = orders;
+    // The exchange rules: an opening order (a long buy / a short sell / a short cover) must be a
+    // whole board lot while a long sell may be an odd lot; drop the sub-lot opening legs (the TM
+    // would refuse them anyway) instead of leaving a silent hole
+    TradeSuggestionList filtered;
+    filtered.reserve(orders.size());
+    for (auto& o : orders) {
+        const bool needs_lot = (o.type == SuggestionType::BUY) ||
+                               (o.type == SuggestionType::SELL && o.short_side);
+        double min_trade = o.stock.minTradeNumber();
+        if (needs_lot && min_trade > 0.0 && o.number < min_trade) {
+            HKU_WARN("Skip the opening leg of {} ({:.0f}), it is below one lot!",
+                     o.stock.market_code(), o.number);
+            continue;
+        }
+        filtered.push_back(o);
+    }
+    suggestions = filtered;
 }
 
 void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& tm,
@@ -431,6 +478,7 @@ void AllocateFundsBase::_checkRisk(const Datetime& date, const TradeManagerPtr& 
         if (target_value > cap) {
             double max_shares = (s.plan_price > 0.0) ? cap / (s.plan_price * u) : 0.0;
             s.number = max_shares > current ? max_shares - current : 0.0;
+            s.plan_cash = s.number * s.plan_price * u;  // Keep the exposed suggestion consistent
         }
     }
 }

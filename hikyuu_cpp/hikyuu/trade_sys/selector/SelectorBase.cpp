@@ -77,6 +77,11 @@ void SelectorBase::reset() {
     m_proto_calculated = false;
 }
 
+void SelectorBase::invalidateCache() {
+    m_real_sys_list.clear();
+    m_calculated = false;
+}
+
 SelectorPtr SelectorBase::clone() {
     SelectorPtr p = _clone();
     p->m_params = m_params;

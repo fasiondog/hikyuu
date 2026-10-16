@@ -113,6 +113,14 @@ public:
     void reset();
 
     /**
+     * Drop the cached selection result only, keeping the prototypes and their real-to-prototype
+     * bindings: the next calculate re-runs against the current running systems. The aggregate
+     * system uses it on reset, because a full reset would also drop the bindings it cannot
+     * rebuild afterwards
+     */
+    void invalidateCache();
+
+    /**
      * Clear the existing system prototypes
      */
     void removeAll();

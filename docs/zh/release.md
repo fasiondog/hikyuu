@@ -24,7 +24,8 @@
 * 位置传参调用 `PF_*` / `AF_*` 无需修改（提供 `PortfolioPtr` → `MultiSystemPtr`、
   `AFPtr` → `AllocateFundsPtr` 兼容别名）；
 * `Portfolio` 类方法改用 `MultiSystem` 等价接口：驱动时间轴用 `set_axis_mode("calendar")` +
-  `set_date_axis(...)`；`lastSuggestion()` → `System.to_suggestions()`；
+  `set_date_axis(...)`；`lastSuggestion()` → `last_suggestion`（返回最后一天的交易记录与延迟请求，
+  聚合系统另提供 `to_suggestions()` 返回本层转换后的 `TradeSuggestion` 列表）；
   `getRunningDates/getCycleEndDates/getRealSystemList` 等查询接口不再提供；
 * 自定义资产分配：`crtAF(allocate_func[, to_targets_func, check_risk_func])` 快速构建，或继承
   `AllocateFundsBase` 并重载 `_allocate`（L1）/ `_to_targets`（L2）/ `_check_risk`（L3）；

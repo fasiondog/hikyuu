@@ -24,7 +24,9 @@ Migration points:
 * Calls of `PF_*` / `AF_*` with positional arguments need no change (the `PortfolioPtr` → `MultiSystemPtr` and
   `AFPtr` → `AllocateFundsPtr` compatibility aliases are provided);
 * The `Portfolio` class methods are replaced by the `MultiSystem` equivalents: use `set_axis_mode("calendar")` +
-  `set_date_axis(...)` for the driving time axis; `lastSuggestion()` → `System.to_suggestions()`;
+  `set_date_axis(...)` for the driving time axis; `lastSuggestion()` → `last_suggestion` (the trade records
+  of the last day plus the delayed requests; an aggregate system also offers `to_suggestions()` returning
+  the `TradeSuggestion` list it converted);
   the query interfaces such as `getRunningDates/getCycleEndDates/getRealSystemList` are no longer provided;
 * Custom fund allocation: build quickly with `crtAF(allocate_func[, to_targets_func, check_risk_func])`, or subclass
   `AllocateFundsBase` and override `_allocate` (L1) / `_to_targets` (L2) / `_check_risk` (L3);

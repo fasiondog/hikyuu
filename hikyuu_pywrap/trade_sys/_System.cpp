@@ -565,6 +565,10 @@ Common parameters:
         "After the backtest is completed, return the trade records of the last day, and the "
         "delayed buy and sell requests that need to be delayed")
 
+      .def("to_suggestions", &System::toSuggestions,
+           "The suggestions produced by the last close stage (an aggregate system returns the "
+           "parent suggestions it converted)")
+
         DEF_PICKLE(System);
 
     //--------------------------------------------------------------------------------------

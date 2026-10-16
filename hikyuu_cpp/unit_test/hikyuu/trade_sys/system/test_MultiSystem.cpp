@@ -953,10 +953,17 @@ TEST_CASE("test_AllocateFunds_L2_missing_weight_fallback") {
     s.target_position_ratio = 1.0;
     TradeSuggestionList suggestions{s};
     af->_toTargets(date, tm, suggestions, weights, KQuery(), "A");
-    REQUIRE_EQ(suggestions.size(), 1);
 
-    /** @arg the missing weight falls back to 1/2 (not the full position): 50000 -> 5000 shares */
-    CHECK_EQ(suggestions[0].number, doctest::Approx(5000.0));
+    /** @arg a sub-system that got no weight is skipped: its intent never gets a fabricated
+     *  equal weight, which would silently scale it beyond the allocation the AF decided */
+    CHECK_UNARY(suggestions.empty());
+
+    /** @arg an empty weight table keeps the plain conversion (weight 1.0): 100000 -> 10000 */
+    s.sys = SystemPtr();
+    TradeSuggestionList suggestions2{s};
+    af->_toTargets(date, tm, suggestions2, AllocateFundsBase::Weights(), KQuery(), "A");
+    REQUIRE_EQ(suggestions2.size(), 1);
+    CHECK_EQ(suggestions2[0].number, doctest::Approx(10000.0));
 }
 
 /** @par Check point: L2 with a null tm does not crash (defensive skip) */
@@ -2850,6 +2857,81 @@ TEST_CASE("test_MultiSystem_mode_a_nested_pending_intent") {
 //-----------------------------------------------------------------------------
 // test export
 //-----------------------------------------------------------------------------
+/** @par Check point: a run with resetAll keeps the instruments of the sub-systems (the full reset
+ * wipes them, but they are the topology handed over by the parent / the SE and must survive, or
+ * the aggregate would silently degrade into "no trades" on the second run) */
+TEST_CASE("test_MultiSystem_reset_all_keeps_instruments") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, create_alway_buy_sys());
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto pf = PF_SignalAggregate(tm, se, AF_EqualWeight(), 1, "query", true, true, false, 100000.0);
+
+    pf->run(query, true, false);
+    const size_t first_trades = tm->getTradeList().size();
+    REQUIRE_UNARY(first_trades > 1);
+
+    /** @arg the second run with resetAll still trades (the instruments survived the reset) */
+    pf->run(query, true, true);
+    CHECK_UNARY(tm->getTradeList().size() > 1);
+
+    /** @arg the sub-systems still carry their instruments after the resetAll run */
+    for (auto& sys : pf->getSystemList()) {
+        CHECK_UNARY(!sys->getStock().isNull());
+        CHECK_UNARY(!sys->getTO().empty());
+    }
+}
+
+/** @par Check point: a mode change rebuilds the account form of the sub-systems (switching back
+ * to A after C must give them shadow accounts again instead of the shared real account) */
+TEST_CASE("test_MultiSystem_mode_switch_rebuilds_accounts") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+
+    auto se = SE_Fixed();
+    se->addStockList({stk}, create_alway_buy_sys());
+    auto parent_tm = crtTM(Datetime(199001010000LL), 100000.0);
+    auto ms = std::make_shared<MultiSystem>("ms_mode_switch");
+    ms->setTM(parent_tm);
+    ms->setSE(se);
+    ms->setSellAtNotSelected(false);
+
+    ms->setMode("A");
+    ms->run(query);
+    SystemPtr sub = ms->getSystemList()[0];
+    REQUIRE_UNARY(sub->getTM() != parent_tm);
+    CHECK_UNARY(!sub->getParam<bool>("shared_tm"));
+
+    /** @arg in mode C the sub-system trades on the shared real account */
+    ms->setMode("C");
+    ms->run(query);
+    CHECK_UNARY(sub->getTM() == parent_tm);
+    CHECK_UNARY(sub->getParam<bool>("shared_tm"));
+
+    /** @arg switching back to A gives the sub-system a fresh shadow account again */
+    ms->setMode("A");
+    ms->run(query);
+    CHECK_UNARY(sub->getTM() != parent_tm);
+    CHECK_UNARY(!sub->getParam<bool>("shared_tm"));
+}
+
+/** @par Check point: the SE refuses a prototype that carries shared_tm (the shared account is an
+ * aggregate-side decision, a prototype must stay an isolated account) */
+TEST_CASE("test_PF_WithoutAF_rejects_shared_tm_proto") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    auto proto = create_alway_buy_sys();
+    proto->setParam<bool>("shared_tm", true);
+    auto se = SE_Fixed();
+
+    /** @arg adding a shared_tm prototype throws */
+    CHECK_THROWS_AS(se->addStockList({stk}, proto), hku::exception);
+}
+
 #if HKU_SUPPORT_SERIALIZATION
 /** @par Check point: the current-schema (straight-line) serialization round-trip of MultiSystem
  * keeps the mode and the preset configuration */
