@@ -35,9 +35,10 @@ def combinate_ind_analysis(
     :param list keys: the Performance statistics items to output
     :rtype: pd.DataFrame
     '''
-    if not keys:
+    if keys:
+        per = Performance()
         for key in keys:
-            if not Performance.exist(key):
+            if not per.exist(key):
                 raise Exception(f'Invalid key: {key}')
 
     pers = inner_combinate_ind_analysis(stk, query, tm, sys, buy_inds, sell_inds, n)
@@ -88,9 +89,10 @@ def combinate_ind_analysis_multi(
     :param int n: the period when combining the buy signals
     :param list keys: the Performance statistics items to output
     '''
-    if not keys:
+    if keys:
+        per = Performance()
         for key in keys:
-            if not Performance.exist(key):
+            if not per.exist(key):
                 raise Exception(f'Invalid key: {key}')
 
     if isinstance(stks, Block):
@@ -113,13 +115,14 @@ def combinate_ind_analysis_multi(
 
 
 def analysis_sys_list(stks, query, sys_proto, keys=[
-        "Total Invested Principal", "Current Total Assets", "Cash Balance",
-        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
-        "Number of Losing Trades"
-    ]):
-    if not keys:
+    "Total Invested Principal", "Current Total Assets", "Cash Balance",
+    "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
+    "Number of Losing Trades"
+]):
+    if keys:
+        per = Performance()
         for key in keys:
-            if not Performance.exist(key):
+            if not per.exist(key):
                 raise Exception(f'Invalid key: {key}')
 
     names = ["证券代码", "证券名称"]
@@ -146,13 +149,14 @@ def analysis_sys_list(stks, query, sys_proto, keys=[
 
 
 def analysis_sys_list_multi(stks, query, sys_proto, keys=[
-        "Total Invested Principal", "Current Total Assets", "Cash Balance",
-        "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
-        "Number of Losing Trades"
-    ]):
-    if not keys:
+    "Total Invested Principal", "Current Total Assets", "Cash Balance",
+    "Open Position Net Value", "Win Rate %", "Number of Winning Trades",
+    "Number of Losing Trades"
+]):
+    if keys:
+        per = Performance()
         for key in keys:
-            if not Performance.exist(key):
+            if not per.exist(key):
                 raise Exception(f'Invalid key: {key}')
 
     out = inner_analysis_sys_list(stks, query, sys_proto)
