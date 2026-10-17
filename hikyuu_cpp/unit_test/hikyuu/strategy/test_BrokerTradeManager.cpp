@@ -229,4 +229,52 @@ TEST_CASE("test_BrokerTradeManager_getFunds_by_datetime") {
                 tm.getFunds(db, KQuery::DAY).market_value);
 }
 
+/** @par Test points: market orders (realPrice == 0) are accounted at the latest close as the
+ * estimated fill price; the cash flow is only applied when the fill price is known */
+TEST_CASE("test_BrokerTradeManager_market_order_accounting") {
+    Stock stock = StockManager::instance().getStock("sh600000");
+    REQUIRE_UNARY(!stock.isNull());
+
+    const price_t unit = stock.unit();
+    const int precision = 2;
+
+    KData last_k = stock.getKData(KQuery(-1));
+    REQUIRE_UNARY(!last_k.empty());
+    const price_t ref_price = last_k.back().closePrice;
+    REQUIRE_UNARY(ref_price > 0.0);
+
+    OrderBrokerPtr broker = make_shared<AssetOrderBroker>("");
+    BrokerTradeManager tm(broker);
+    tm.checkin(Datetime::now(), 1000000.0);
+
+    /** @arg a market-order buy accounts the position cost at the latest close and leaves the cash
+     * untouched */
+    TradeRecord tr = tm.buy(Datetime::now(), stock, 0.0, 100.0);
+    CHECK_UNARY(tr.business == BUSINESS_BUY);
+    PositionRecord pos = tm.getPosition(Null<Datetime>(), stock);
+    CHECK_EQ(pos.buyMoney, roundEx(ref_price * 100.0 * unit, precision));
+    CHECK_EQ(tm.currentCash(), 1000000.0);
+
+    /** @arg a market-order sell accounts sellMoney at the latest close and leaves the cash
+     * untouched */
+    TradeRecord tr_sell = tm.sell(Datetime::now(), stock, 0.0, 100.0);
+    CHECK_UNARY(tr_sell.business == BUSINESS_SELL);
+    CHECK_EQ(tm.currentCash(), 1000000.0);
+    CHECK_UNARY(!tm.have(stock));
+
+    /** @arg a known-price buy still deducts the cash */
+    TradeRecord tr_limit = tm.buy(Datetime::now(), stock, ref_price, 100.0);
+    CHECK_UNARY(tr_limit.business == BUSINESS_BUY);
+    CHECK_UNARY(tm.currentCash() < 1000000.0);
+    pos = tm.getPosition(Null<Datetime>(), stock);
+    CHECK_EQ(pos.buyMoney, roundEx(ref_price * 100.0 * unit, precision));
+
+    /** @arg an invalid (negative) price is rejected */
+    TradeRecord tr_neg = tm.buy(Datetime::now(), stock, -1.0, 100.0);
+    CHECK_UNARY(tr_neg.business == BUSINESS_INVALID);
+
+    /** @arg str() prints positions without a valuation error after market-order accounting */
+    CHECK_UNARY(!tm.str().empty());
+}
+
 /** @} */  // end of test_BrokerTradeManager

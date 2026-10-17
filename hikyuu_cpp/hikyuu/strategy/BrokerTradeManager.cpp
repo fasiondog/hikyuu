@@ -6,12 +6,21 @@
  */
 
 #include <nlohmann/json.hpp>
+#include <cmath>
 #include "hikyuu/trade_manage/crt/TC_Zero.h"
 #include "BrokerTradeManager.h"
 
 namespace hku {
 
 using json = nlohmann::json;
+
+namespace {
+// The accounting reference for market orders; the true fill price is known broker-side only
+price_t getLatestClosePrice(const Stock& stock) {
+    KData k = stock.getKData(KQuery(-1));
+    return k.empty() ? 0.0 : k.back().closePrice;
+}
+}  // namespace
 
 BrokerTradeManager::BrokerTradeManager(const OrderBrokerPtr& broker, const TradeCostPtr& costfunc,
                                        const string& name)
@@ -144,21 +153,35 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
     HKU_ERROR_IF_RETURN(number > stock.maxTradeNumber(), result,
                         "{} {} Buy number({}) must be <= maxTradeNumber({})!", datetime,
                         stock.market_code(), number, stock.maxTradeNumber());
+    HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
+                        "{} {} Buy price({}) is invalid!", datetime, stock.market_code(),
+                        realPrice);
 
-    CostRecord cost = getBuyCost(datetime, stock, realPrice, number);
+    price_t acc_price = realPrice;
+    if (acc_price == 0.0) {
+        acc_price = getLatestClosePrice(stock);
+        HKU_WARN_IF_RETURN(acc_price <= 0.0, result,
+                           "{} {} No available reference price for the market order buy!", datetime,
+                           stock.market_code());
+    }
+
+    CostRecord cost = getBuyCost(datetime, stock, acc_price, number);
 
     // The cash needed by the actual trade = the trade quantity * the actual trade price + the total
     // trade cost
     int precision = getParam<int>("precision");
     // price_t money = roundEx(realPrice * number * stock.unit() + cost.total, precision);
     price_t money = roundEx(realPrice * number * stock.unit(), precision);
+    price_t acc_money = roundEx(acc_price * number * stock.unit(), precision);
 
     HKU_WARN_IF_RETURN(m_cash < roundEx(money + cost.total, precision), result,
                        "{} {} Can't buy, need cash({:<.4f}) > current cash({:<.4f})!", datetime,
                        stock.market_code(), roundEx(money + cost.total, precision), m_cash);
 
-    // Update the cash
-    m_cash = roundEx(m_cash - money - cost.total, precision);
+    // Update the cash; market orders sync the real cash flow from the broker
+    if (realPrice > 0.0) {
+        m_cash = roundEx(m_cash - money - cost.total, precision);
+    }
 
     // Add it to the trade records
     result = TradeRecord(stock, datetime, BUSINESS_BUY, planPrice, realPrice, goalPrice, number,
@@ -168,18 +191,18 @@ TradeRecord BrokerTradeManager::buy(const Datetime& datetime, const Stock& stock
     position_map_type::iterator pos_iter = m_position.find(stock.id());
     if (pos_iter == m_position.end()) {
         m_position[stock.id()] = PositionRecord(
-          stock, datetime, Null<Datetime>(), number, stoploss, goalPrice, number, money, cost.total,
-          roundEx((realPrice - stoploss) * number * stock.unit(), precision), 0.0);
+          stock, datetime, Null<Datetime>(), number, stoploss, goalPrice, number, acc_money,
+          cost.total, roundEx((acc_price - stoploss) * number * stock.unit(), precision), 0.0);
     } else {
         PositionRecord& position = pos_iter->second;
         position.number += number;
         position.stoploss = stoploss;
         position.goalPrice = goalPrice;
         position.totalNumber += number;
-        position.buyMoney = roundEx(money + position.buyMoney, precision);
+        position.buyMoney = roundEx(acc_money + position.buyMoney, precision);
         position.totalCost = roundEx(cost.total + position.totalCost, precision);
         position.totalRisk =
-          roundEx(position.totalRisk + (realPrice - stoploss) * number * stock.unit(), precision);
+          roundEx(position.totalRisk + (acc_price - stoploss) * number * stock.unit(), precision);
     }
 
     list<OrderBrokerPtr>::const_iterator broker_iter = m_broker_list.begin();
@@ -231,14 +254,28 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     HKU_ERROR_IF_RETURN(position.number < real_number, result,
                         "{} {} Try to sell number({}) > number of position({})!", datetime,
                         stock.market_code(), real_number, position.number);
+    HKU_ERROR_IF_RETURN(!std::isfinite(realPrice) || realPrice < 0.0, result,
+                        "{} {} Sell price({}) is invalid!", datetime, stock.market_code(),
+                        realPrice);
 
-    CostRecord cost = getSellCost(datetime, stock, realPrice, real_number);
+    price_t acc_price = realPrice;
+    if (acc_price == 0.0) {
+        acc_price = getLatestClosePrice(stock);
+        HKU_WARN_IF_RETURN(acc_price <= 0.0, result,
+                           "{} {} No available reference price for the market order sell!", datetime,
+                           stock.market_code());
+    }
+
+    CostRecord cost = getSellCost(datetime, stock, acc_price, real_number);
 
     int precision = getParam<int>("precision");
     price_t money = roundEx(realPrice * real_number * stock.unit(), precision);
+    price_t acc_money = roundEx(acc_price * real_number * stock.unit(), precision);
 
-    // Update the cash balance
-    m_cash = roundEx(m_cash + money - cost.total, precision);
+    // Update the cash balance; market orders sync the real cash flow from the broker
+    if (realPrice > 0.0) {
+        m_cash = roundEx(m_cash + money - cost.total, precision);
+    }
 
     // Update the trade records
     result = TradeRecord(stock, datetime, BUSINESS_SELL, planPrice, realPrice, goalPrice,
@@ -250,7 +287,7 @@ TradeRecord BrokerTradeManager::sell(const Datetime& datetime, const Stock& stoc
     position.goalPrice = goalPrice;
     // position.buyMoney = position.buyMoney;
     position.totalCost = roundEx(position.totalCost + cost.total, precision);
-    position.sellMoney = roundEx(position.sellMoney + money, precision);
+    position.sellMoney = roundEx(position.sellMoney + acc_money, precision);
 
     if (position.number == 0) {
         // Delete the current position
@@ -348,6 +385,11 @@ string BrokerTradeManager::str() const {
     for (; iter != position.end(); ++iter) {
         price_t invest = iter->buyMoney - iter->sellMoney + iter->totalCost;
         KData k = iter->stock.getKData(query);
+        if (k.empty() || invest == 0.0) {
+            os << "    " << iter->stock.market_code() << " " << iter->stock.name() << " "
+               << iter->number << " invest(" << invest << ")\n";
+            continue;
+        }
         price_t cur_val = k[0].closePrice * iter->number;
         price_t bonus = cur_val - invest;
         DatetimeList date_list =
