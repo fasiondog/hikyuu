@@ -25,7 +25,7 @@ DatetimeList getAnalysisCalendar(const StockList& stk_list, const KQuery& query)
 
 struct HKU_API AnalysisSystemOutput {
     string market_code;  ///< Security code
-    string name;         ///< Security name
+    string name;         ///< Security name (list overload) or system name (single stock overload)
     PriceList values;    ///< The values of every statistics item
 
     AnalysisSystemOutput() = default;
