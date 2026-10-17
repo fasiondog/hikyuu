@@ -30,6 +30,11 @@ void HKU_API stopSpotAgent();
 
 HKU_API SpotAgent* getGlobalSpotAgent();
 
+/**
+ * Delete the global spot agent, for use in the program exit sequence ONLY. Callers holding the
+ * raw pointer from getGlobalSpotAgent must not access it afterwards.
+ * @ingroup Agent
+ */
 void HKU_API releaseGlobalSpotAgent();
 
 inline bool spotAgentIsRunning() {
