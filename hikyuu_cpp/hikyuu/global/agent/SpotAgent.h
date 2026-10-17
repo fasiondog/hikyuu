@@ -117,8 +117,6 @@ private:
     static const size_t ms_endTagLength;     // Length of the batch receiving end marker
     static const size_t ms_spotTopicLength;  // Length of the subscribed topic marker
 
-    static Datetime ms_start_rev_time;  // Start time of the batch data receiving
-
 private:
     SpotAgent(const SpotAgent&) = delete;
     SpotAgent(SpotAgent&&) = delete;
@@ -126,7 +124,7 @@ private:
     SpotAgent& operator=(SpotAgent&&) = delete;
 
     unique_ptr<SpotRecord> parseFlatSpot(const hikyuu::flat::Spot* spot);
-    void parseSpotData(const void* buf, size_t buf_len);
+    void parseSpotData(const void* buf, size_t buf_len, const Datetime& revTime);
 
     void work_thread();
 

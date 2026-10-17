@@ -25,8 +25,6 @@ const size_t SpotAgent::ms_spotTopicLength = strlen(SpotAgent::ms_spotTopic);
 const size_t SpotAgent::ms_startTagLength = strlen(SpotAgent::ms_startTag);
 const size_t SpotAgent::ms_endTagLength = strlen(SpotAgent::ms_endTag);
 
-Datetime SpotAgent::ms_start_rev_time;
-
 SpotAgent::~SpotAgent() {
     stop();
 }
@@ -156,7 +154,7 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
     return result;
 }
 
-void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
+void SpotAgent::parseSpotData(const void* buf, size_t buf_len, const Datetime& revTime) {
     // SPEND_TIME(receive_data);
     // The message is the topic prefix (":spot:") followed by the SpotList flatbuffer;
     // the verifier must only cover the flatbuffer part, otherwise its upper bound extends
@@ -196,7 +194,7 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     HKU_DEBUG("received count: {}", total);
     for (const auto& postProcess : m_postProcessList) {
         try {
-            postProcess(ms_start_rev_time);
+            postProcess(revTime);
         } catch (const std::exception& e) {
             HKU_ERROR(e.what());
         } catch (...) {
@@ -248,7 +246,6 @@ void SpotAgent::work_thread() {
                 case WAITING:
                     if (length >= ms_startTagLength &&
                         memcmp(buf, ms_startTag, ms_startTagLength) == 0) {
-                        ms_start_rev_time = Datetime::now();
                         m_status = RECEIVING;
                     }
                     break;
@@ -259,9 +256,10 @@ void SpotAgent::work_thread() {
                                memcmp(buf, ms_startTag, ms_startTagLength) != 0) {
                         std::shared_ptr<char[]> data_buf(new char[length]);
                         memcpy(data_buf.get(), buf, length);
-                        m_receive_data_tg->submit([this, length, new_buf = std::move(data_buf)]() {
+                        m_receive_data_tg->submit([this, length, rev_time = Datetime::now(),
+                                                   new_buf = std::move(data_buf)]() {
                             try {
-                                this->parseSpotData(new_buf.get(), length);
+                                this->parseSpotData(new_buf.get(), length, rev_time);
                             } catch (const std::exception& e) {
                                 HKU_ERROR(e.what());
                             } catch (...) {
