@@ -11,7 +11,7 @@
 
 namespace hku {
 
-class EqualWeightMultiFactor : public MultiFactorBase {
+class HKU_API EqualWeightMultiFactor : public MultiFactorBase {
     MULTIFACTOR_IMP(EqualWeightMultiFactor)
     MULTIFACTOR_NO_PRIVATE_MEMBER_SERIALIZATION
 
