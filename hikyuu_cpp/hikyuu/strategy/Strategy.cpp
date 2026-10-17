@@ -188,8 +188,10 @@ void Strategy::stop() {
     if (m_token) {
         m_token->alive = false;
     }
-    // Discard queued callbacks so they no-op after stop (as documented), then wake the loop
-    // out of wait_and_pop so start() can return.
+    // Invalidate the tasks queued around this stop() (they capture the previous generation and
+    // self-drop on a later restart), discard the queued ones, then wake the loop out of
+    // wait_and_pop so start() can return.
+    m_event_generation.fetch_add(1, std::memory_order_acq_rel);
     event_type task;
     while (m_event_queue.try_pop(task)) {
     }

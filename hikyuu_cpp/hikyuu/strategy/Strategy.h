@@ -296,6 +296,10 @@ private:
     std::function<void()> m_pre_wait_hook;
     std::function<void()> m_post_wait_hook;
 
+    // Incremented on each stop(); a queued event task captures it and self-drops when stale,
+    // so a one-shot callback suppressed by stop() cannot run once after a restart
+    std::atomic<uint64_t> m_event_generation{0};
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -305,7 +309,14 @@ private:
     template <typename FunctionType>
     auto event(FunctionType f) {
         typedef typename std::invoke_result<FunctionType>::type result_type;
-        std::packaged_task<result_type()> task(f);
+        uint64_t gen = m_event_generation.load(std::memory_order_acquire);
+        auto guarded = [this, gen, f = std::move(f)]() -> result_type {
+            if (gen != m_event_generation.load(std::memory_order_acquire)) {
+                return result_type();
+            }
+            return f();
+        };
+        std::packaged_task<result_type()> task(std::move(guarded));
         event_handle<result_type> res(task.get_future());
         m_event_queue.push(std::move(task));
         return res;
