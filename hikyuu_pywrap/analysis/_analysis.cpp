@@ -103,11 +103,16 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
 
     for (size_t i = 0, total = records.size(); i < total; i++) {
         CombinateAnalysisOutput& record = records[i];
+        if (names.size() != record.values.size() + 3) {
+            HKU_WARN(
+              "combinate_ind_analysis_with_block: record values size ({}) != keys size ({}), "
+              "skipping {}",
+              record.values.size(), names.size() - 3, record.market_code);
+            continue;
+        }
         tmp[0].append(record.combinateName);
         tmp[1].append(record.market_code);
         tmp[2].append(record.name);
-        HKU_WARN_IF(names.size() != record.values.size() + 3, "lenght invalid: {} {}", names.size(),
-                    record.values.size());
         for (size_t j = 3, len = names.size(); j < len; j++) {
             tmp[j].append(record.values[j - 3]);
         }
