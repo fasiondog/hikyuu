@@ -130,6 +130,7 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystem(const SystemList& sys_list, 
                                                     const KQuery& query, const string& sort_key,
                                                     int sort_mode) {
     SPEND_TIME(findOptimalSystem);
+    HKU_CHECK(Performance().exist(sort_key), "Invalid sort_key: {}!", sort_key);
     double init_val =
       sort_mode == 0 ? std::numeric_limits<double>::lowest() : std::numeric_limits<double>::max();
     std::pair<double, SYSPtr> result{init_val, SYSPtr()};
@@ -177,6 +178,7 @@ std::pair<double, SYSPtr> HKU_API findOptimalSystemMulti(const SystemList& sys_l
                                                          const Stock& stk, const KQuery& query,
                                                          const string& sort_key, int sort_mode) {
     SPEND_TIME(findOptimalSystemMulti);
+    HKU_CHECK(Performance().exist(sort_key), "Invalid sort_key: {}!", sort_key);
     double init_val =
       sort_mode == 0 ? std::numeric_limits<double>::lowest() : std::numeric_limits<double>::max();
     std::pair<double, SYSPtr> result{init_val, SYSPtr()};
