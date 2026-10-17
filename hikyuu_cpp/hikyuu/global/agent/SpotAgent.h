@@ -123,7 +123,7 @@ private:
     SpotAgent& operator=(const SpotAgent&) = delete;
     SpotAgent& operator=(SpotAgent&&) = delete;
 
-    unique_ptr<SpotRecord> parseFlatSpot(const hikyuu::flat::Spot* spot);
+    std::shared_ptr<const SpotRecord> parseFlatSpot(const hikyuu::flat::Spot* spot);
     void parseSpotData(const void* buf, size_t buf_len, const Datetime& revTime);
 
     void work_thread();

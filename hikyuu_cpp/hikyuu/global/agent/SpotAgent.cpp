@@ -69,12 +69,13 @@ void SpotAgent::stop() {
 
 class ProcessTask {
 public:
-    ProcessTask(const std::function<void(const SpotRecord&)>& func, const SpotRecord& spot)
-    : m_func(func), m_spot(spot) {}
+    ProcessTask(const std::function<void(const SpotRecord&)>& func,
+                std::shared_ptr<const SpotRecord> spot)
+    : m_func(func), m_spot(std::move(spot)) {}
 
     void operator()() {
         try {
-            m_func(m_spot);
+            m_func(*m_spot);
         } catch (const std::exception& e) {
             HKU_ERROR(e.what());
         } catch (...) {
@@ -84,13 +85,13 @@ public:
 
 private:
     std::function<void(const SpotRecord&)> m_func;
-    SpotRecord m_spot;
+    std::shared_ptr<const SpotRecord> m_spot;
 };
 
-unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) {
-    std::unique_ptr<SpotRecord> result;
+std::shared_ptr<const SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) {
+    std::shared_ptr<SpotRecord> result;
     try {
-        result = std::make_unique<SpotRecord>();
+        result = std::make_shared<SpotRecord>();
         if (!spot->market() || !spot->code() || !spot->datetime()) {
             result.reset();
             return result;
@@ -180,10 +181,10 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len, const Datetime& r
     vector<std::future<void>> tasks;
     for (size_t i = 0; i < total; i++) {
         auto* spot = spots->Get(i);
-        auto spot_record = parseFlatSpot(spot);
-        if (spot_record) {
+        auto record = parseFlatSpot(spot);
+        if (record) {
             for (const auto& process : m_processList) {
-                tasks.emplace_back(m_tg->submit(ProcessTask(process, *spot_record)));
+                tasks.emplace_back(m_tg->submit(ProcessTask(process, record)));
             }
         }
     }
