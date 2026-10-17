@@ -195,7 +195,13 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     }
     HKU_DEBUG("received count: {}", total);
     for (const auto& postProcess : m_postProcessList) {
-        postProcess(ms_start_rev_time);
+        try {
+            postProcess(ms_start_rev_time);
+        } catch (const std::exception& e) {
+            HKU_ERROR(e.what());
+        } catch (...) {
+            HKU_ERROR_UNKNOWN;
+        }
     }
 
 #if defined(_MSC_VER)
