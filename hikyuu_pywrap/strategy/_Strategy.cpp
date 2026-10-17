@@ -59,24 +59,30 @@ void export_Strategy(py::module& m) {
         "start",
         [](Strategy& self, bool auto_recieve_spot) {
             // In python, before start, forcibly add an empty function, used to catch
-            // KeyboardInterrupt to terminate the strategy
-            auto func = make_gil_safe(py::eval("lambda stg: None"));
-            HKU_CHECK(check_pyfunction_arg_num(*func, 1), "Number of parameters does not match!");
-            auto new_func = [=](Strategy* stg) {
-                try {
-                    (*func)(stg);
-                } catch (py::error_already_set& e) {
-                    if (e.matches(PyExc_KeyboardInterrupt)) {
-                        printf("KeyboardInterrupt\n");
-                        stg->stop();
-                    } else {
-                        HKU_ERROR(e.what());
+            // KeyboardInterrupt to terminate the strategy. Install it only once, so repeated
+            // start/stop cycles do not accumulate heartbeat timers.
+            py::object py_self = py::cast(self);
+            if (!py::hasattr(py_self, "_hku_heartbeat_installed")) {
+                auto func = make_gil_safe(py::eval("lambda stg: None"));
+                HKU_CHECK(check_pyfunction_arg_num(*func, 1),
+                          "Number of parameters does not match!");
+                auto new_func = [=](Strategy* stg) {
+                    try {
+                        (*func)(stg);
+                    } catch (py::error_already_set& e) {
+                        if (e.matches(PyExc_KeyboardInterrupt)) {
+                            printf("KeyboardInterrupt\n");
+                            stg->stop();
+                        } else {
+                            HKU_ERROR(e.what());
+                        }
+                    } catch (...) {
+                        // do nothing
                     }
-                } catch (...) {
-                    // do nothing
-                }
-            };
-            self.runDaily(new_func, Seconds(1), "SH", true);
+                };
+                self.runDaily(new_func, Seconds(1), "SH", true);
+                py::setattr(py_self, "_hku_heartbeat_installed", py::bool_(true));
+            }
 
             // Release the GIL while the event loop waits; the loop thread is the caller of
             // start(), so a thread_local slot suffices
