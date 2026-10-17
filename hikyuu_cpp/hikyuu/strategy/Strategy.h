@@ -300,6 +300,10 @@ private:
     // so a one-shot callback suppressed by stop() cannot run once after a restart
     std::atomic<uint64_t> m_event_generation{0};
 
+    // Whether the event loop is actually running; stop() only wakes the loop when it is, so a
+    // stop() before start() (or during a backtest) leaves no stale wake-up task behind
+    std::atomic_bool m_event_loop_running{false};
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)

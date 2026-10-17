@@ -184,18 +184,21 @@ void Strategy::start(bool autoRecieveSpot) {
 }
 
 void Strategy::stop() {
-    m_running = false;
+    bool was_running = m_running.exchange(false);
     if (m_token) {
         m_token->alive = false;
     }
     // Invalidate the tasks queued around this stop() (they capture the previous generation and
     // self-drop on a later restart), discard the queued ones, then wake the loop out of
-    // wait_and_pop so start() can return.
+    // wait_and_pop so start() can return. Only a running loop consumes the wake-up task;
+    // pushing it unconditionally would abort the next start().
     m_event_generation.fetch_add(1, std::memory_order_acq_rel);
     event_type task;
     while (m_event_queue.try_pop(task)) {
     }
-    m_event_queue.push(FuncWrapper());
+    if (was_running && m_event_loop_running.load(std::memory_order_acquire)) {
+        m_event_queue.push(FuncWrapper());
+    }
 }
 
 void Strategy::onChange(
@@ -450,6 +453,7 @@ void Strategy::_runDailyAt() {
  * Process the event queue in the main thread, avoiding the python GIL
  */
 void Strategy::_startEventLoop() {
+    m_event_loop_running = true;
     while (ms_keep_running && m_running) {
         event_type task;
         // Release the GIL during the blocking wait (Python binding); wait_and_pop never throws,
@@ -473,6 +477,7 @@ void Strategy::_startEventLoop() {
             }
         }
     }
+    m_event_loop_running = false;
 }
 
 price_t Strategy::getCurrentPrice(const Stock& stk, const KQuery::KType& ktype) const {
