@@ -77,6 +77,10 @@ TEST_CASE("test_Strategy_order") {
     CHECK_EQ(tr.business, BUSINESS_SELL);
     CHECK_EQ(tr.number, 150);
     CHECK_EQ(tm->getHoldNumber(Datetime::now(), stock), 0);
+
+    /** @arg An astronomically large buy request is rejected instead of becoming a max-size order */
+    tr = strategy.order(stock, 1e30);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
 }
 
 /** @par Test points */
@@ -131,6 +135,27 @@ TEST_CASE("test_Strategy_orderValue_unit_cash_estimate") {
     auto tm4 = crtTM(Datetime(200001010000), 15.0, TC_Zero());
     strategy4.setTM(tm4);
     tr = strategy4.orderValue(unit2_stock, 1500.0);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+}
+
+/** @par Test points */
+TEST_CASE("test_Strategy_orderValue_overflow") {
+    // value/price beyond the int64 range must not hit the int64 lot conversion UB; the buy is
+    // bounded by the affordable cash instead
+    KRecord today_bar(Datetime::now());
+    today_bar.openPrice = today_bar.highPrice = today_bar.lowPrice = today_bar.closePrice = 10.0;
+
+    Stock stock("TEST", "OVOF", "OrderValue Overflow Test", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 0.01, 0.01, 2, 100, 1000000);
+    stock.setKRecordList({today_bar}, KQuery::DAY);
+    REQUIRE_UNARY(!stock.isNull());
+
+    Strategy strategy("test_Strategy_orderValue_overflow");
+    auto tm = crtTM(Datetime(200001010000), 1000000.0, TC_Zero());
+    strategy.setTM(tm);
+
+    /** @arg value 1e300 at price 10 is rejected: the lot conversion is not representable */
+    TradeRecord tr = strategy.orderValue(stock, 1e300);
     CHECK_EQ(tr.business, BUSINESS_INVALID);
 }
 

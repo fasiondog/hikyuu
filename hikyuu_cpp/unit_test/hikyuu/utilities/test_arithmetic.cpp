@@ -257,4 +257,21 @@ TEST_CASE("test_safe_math") {
     CHECK_UNARY(!std::isnan(safe_math(-0.0)));
 }
 
+/** @par Test points */
+TEST_CASE("test_truncToMultiple") {
+    /** @arg ordinary truncation to the lot multiple (toward zero) */
+    CHECK_EQ(truncToMultiple(333.0, 100.0), 300.0);
+    CHECK_EQ(truncToMultiple(200.0, 100.0), 200.0);
+    CHECK_EQ(truncToMultiple(99.0, 100.0), 0.0);
+    CHECK_EQ(truncToMultiple(0.5, 100.0), 0.0);
+    CHECK_EQ(truncToMultiple(-250.0, 100.0), -200.0);
+
+    /** @arg a quotient beyond the int64 range returns NaN, so the caller rejects the order */
+    CHECK_UNARY(std::isnan(truncToMultiple(1e30, 100.0)));
+    CHECK_UNARY(std::isnan(truncToMultiple(std::numeric_limits<double>::infinity(), 100.0)));
+
+    /** @arg a NaN input returns NaN */
+    CHECK_UNARY(std::isnan(truncToMultiple(std::numeric_limits<double>::quiet_NaN(), 100.0)));
+}
+
 /** @} */

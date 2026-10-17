@@ -13,6 +13,7 @@
 
 #include <cmath>
 #include <cctype>
+#include <cstdint>
 #include <limits>
 #include <vector>
 #include <string>
@@ -260,6 +261,19 @@ inline ValueT safe_math(ValueT v) {
     static_assert(std::numeric_limits<ValueT>::is_iec559,
                   "safe_math requires a floating-point type");
     return std::isfinite(v) ? v : Null<ValueT>();
+}
+
+/**
+ * Truncate a number to an integer multiple of the given unit (toward zero). Returns NaN when the
+ * result is not representable (a NaN input, or the quotient beyond the int64 range); callers must
+ * reject the order then, instead of clamping a garbage number into a max-size trade.
+ */
+inline double truncToMultiple(double number, double unit) {
+    double quotient = number / unit;
+    if (!(quotient < static_cast<double>(std::numeric_limits<int64_t>::max()))) [[unlikely]] {
+        return Null<double>();
+    }
+    return static_cast<int64_t>(quotient) * unit;
 }
 
 /** Convert an ASCII string to lowercase */

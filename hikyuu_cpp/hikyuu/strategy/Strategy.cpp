@@ -528,7 +528,10 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
         //                    "Ignore! {} {} order num({}) is less than min trade number({})!",
         //                    stk.market_code(), stk.name(), num, min_trade_num);
         HKU_IF_RETURN(num < min_trade_num, ret);
-        double buy_num = int64_t(num / min_trade_num) * min_trade_num;
+        double buy_num = truncToMultiple(num, min_trade_num);
+        HKU_WARN_IF_RETURN(!std::isfinite(buy_num), ret,
+                           "{} {} order num({}) is not representable!", stk.market_code(),
+                           stk.name(), num);
         if (buy_num > max_trade_num) {
             buy_num = max_trade_num;
         }
@@ -554,7 +557,10 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
                                    stk.market_code(), stk.name());
                 closed = hold;
             } else {
-                double close_num = int64_t(abs_num / min_trade_num) * min_trade_num;
+                double close_num = truncToMultiple(abs_num, min_trade_num);
+                HKU_WARN_IF_RETURN(!std::isfinite(close_num), ret,
+                                   "{} {} order num({}) is not representable!", stk.market_code(),
+                                   stk.name(), abs_num);
                 if (close_num > max_trade_num) {
                     close_num = max_trade_num;
                 }
@@ -566,7 +572,10 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
                 }
                 closed = close_num;
             }
-            double short_num = int64_t((abs_num - closed) / min_trade_num) * min_trade_num;
+            double short_num = truncToMultiple(abs_num - closed, min_trade_num);
+            HKU_WARN_IF_RETURN(!std::isfinite(short_num), ret,
+                               "{} {} order num({}) is not representable!", stk.market_code(),
+                               stk.name(), abs_num);
             if (short_num > max_trade_num) {
                 short_num = max_trade_num;
             }
@@ -580,7 +589,10 @@ TradeRecord Strategy::order(const Stock& stk, double num, const string& remark) 
             }
             return ret;
         }
-        double sell_num = int64_t(abs_num / min_trade_num) * min_trade_num;
+        double sell_num = truncToMultiple(abs_num, min_trade_num);
+        HKU_WARN_IF_RETURN(!std::isfinite(sell_num), ret,
+                           "{} {} order num({}) is not representable!", stk.market_code(),
+                           stk.name(), abs_num);
         if (sell_num > max_trade_num) {
             sell_num = max_trade_num;
         } else if (abs_num != sell_num) {
@@ -620,7 +632,10 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
     if (value > 0.0) {
         // Convert it into an integer multiple of the minimum trade quantity
         // (consistent with the MoneyManagerBase::getBuyNumber convention)
-        double n = int64_t(value / price / min_trade) * min_trade;
+        double n = truncToMultiple(value / price, min_trade);
+        HKU_WARN_IF_RETURN(!std::isfinite(n), ret,
+                           "{} {} order value({}) is not representable at price({})!",
+                           stk.market_code(), stk.name(), value, price);
         if (!m_tm->getParam<bool>("support_borrow_cash")) {
             CostRecord cost = m_tm->getBuyCost(now(), stk, price, n);
             // The cash needed by the actual trade = the trade quantity * the actual trade price
