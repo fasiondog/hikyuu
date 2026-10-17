@@ -196,6 +196,7 @@ void sendFeedback() {
             req["arch"] = getCpuArch();
             auto res = client.post("/hku/visit", req);
             json r = res.json();
+            HKU_IF_RETURN(!r.contains("data") || !r["data"].contains("last_version"), void());
             const json& data = r["data"];
 
             if (!g_sys_info || StockManager::instance().hasCancelLoad()) {
@@ -205,7 +206,7 @@ void sendFeedback() {
             if (g_sys_info) {
                 std::unique_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
                 g_sys_info->latest_version_info.version = data["last_version"].get<int>();
-                if (data.contains("remark")) {
+                if (data.contains("remark") && data.contains("release_date")) {
                     g_sys_info->latest_version_info.remark = data["remark"].get<std::string>();
                     g_sys_info->latest_version_info.release_date =
                       Datetime(data["release_date"].get<std::string>());
