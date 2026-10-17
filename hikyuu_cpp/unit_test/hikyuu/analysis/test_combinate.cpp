@@ -286,4 +286,51 @@ TEST_CASE("test_combinateIndicatorAnalysis_duplicate_name") {
     CHECK_UNARY(combinate.count("GT 2 + LT") == 1);
 }
 
+/**
+ * @par Test points
+ * A system carrying shared_tm=true must give the same statistics as the default one, instead of
+ * accumulating the account across the combinations: the analysis evaluates every combination on
+ * its own account, it does not rely on System::reset to clear the passed tm.
+ */
+TEST_CASE("test_combinateIndicatorAnalysis_shared_tm") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL));
+
+    // Two buy conditions sharing the short name produce three combinations
+    Indicator buy1 = CLOSE() > OPEN();
+    Indicator buy2 = CLOSE() > MA(10);
+    Indicator sell = CLOSE() < 0;
+
+    auto run = [&](bool shared_tm) {
+        auto tm = crtTM();
+        auto sys =
+          SYS_Simple(tm, MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Bool(buy1, sell));
+        if (shared_tm) {
+            sys->setParam<bool>("shared_tm", true);
+        }
+        return combinateIndicatorAnalysis(stk, query, tm, sys, {buy1, buy2}, {sell}, 1);
+    };
+
+    auto plain = run(false);
+    auto shared = run(true);
+    REQUIRE(plain.size() == 3);
+    REQUIRE(shared.size() == plain.size());
+
+    /** @arg the shared_tm system gives the same statistics as the default system */
+    for (const auto& item : plain) {
+        REQUIRE(shared.count(item.first) == 1);
+        PriceList got = item.second.values();
+        PriceList expect = shared.at(item.first).values();
+        const StringList& names = item.second.names();
+        REQUIRE(got.size() == expect.size());
+        for (size_t i = 0, len = got.size(); i < len; i++) {
+            if (std::isnan(got[i]) && std::isnan(expect[i])) {
+                continue;
+            }
+            CHECK_MESSAGE(got[i] == doctest::Approx(expect[i]).epsilon(0.0001), names[i]);
+        }
+    }
+}
+
 /** @} */

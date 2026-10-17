@@ -58,12 +58,15 @@ std::map<std::string, Performance> HKU_API combinateIndicatorAnalysis(
     HKU_IF_RETURN(date_list.empty(), result);
     Datetime last_datetime = date_list.back();
 
+    auto analysis_tm = tm->clone();
+    auto analysis_sys = sys->clone();
     for (const auto& sg : sgs) {
-        sys->setSG(sg);
-        sys->setTM(tm);
-        sys->run(stk, query);
+        analysis_tm->reset();
+        analysis_sys->setSG(sg);
+        analysis_sys->setTM(analysis_tm);
+        analysis_sys->run(stk, query);
         Performance per;
-        per.statistics(tm, last_datetime);
+        per.statistics(analysis_tm, last_datetime);
         result[sg->name()] = std::move(per);
     }
 
@@ -117,6 +120,7 @@ vector<CombinateAnalysisOutput> HKU_API combinateIndicatorAnalysisWithBlock(
                 const Stock& n_stk = stks[i];
                 for (const auto& sg : sgs) {
                     try {
+                        n_tm->reset();
                         auto n_sg = sg->clone();
                         n_sys->setSG(n_sg);
                         n_sys->setTM(n_tm);
