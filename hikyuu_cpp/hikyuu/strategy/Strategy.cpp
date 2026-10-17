@@ -316,7 +316,18 @@ void Strategy::_runDaily() {
             auto today = Datetime::today();
             auto now = Datetime::now();
             TimeDelta now_time = now - today;
-            if (now_time >= market_info.closeTime2()) {
+            auto open1 = market_info.openTime1();
+            auto close1 = market_info.closeTime1();
+            auto open2 = market_info.openTime2();
+            auto close2 = market_info.closeTime2();
+            // A single-session market leaves session 2 unset (00:00), which would make the
+            // "after close2" branch below always true; anchor session 2 at close1 so the
+            // branch logic degenerates to session 1 only
+            if (close2 <= close1) {
+                open2 = close1;
+                close2 = close1;
+            }
+            if (now_time >= close2) {
                 scheduler->addFuncAtTime(today.nextDay() + market_info.openTime1(),
                                          [job, arm_duration, flag]() {
                                              if (flag->load()) {
@@ -326,8 +337,8 @@ void Strategy::_runDaily() {
                                              arm_duration();
                                          });
 
-            } else if (now_time >= market_info.openTime2()) {
-                int64_t ticks = now_time.ticks() - market_info.openTime2().ticks();
+            } else if (now_time >= open2) {
+                int64_t ticks = now_time.ticks() - open2.ticks();
                 int64_t delta_ticks = run_at.delta.ticks();
                 if (ticks % delta_ticks == 0) {
                     scheduler->addDurationFunc(std::numeric_limits<int>::max(), run_at.delta, job);
@@ -344,8 +355,8 @@ void Strategy::_runDaily() {
                     });
                 }
 
-            } else if (now_time >= market_info.closeTime1()) {
-                scheduler->addFuncAtTime(today + market_info.openTime2(),
+            } else if (now_time >= close1) {
+                scheduler->addFuncAtTime(today + open2,
                                          [job, arm_duration, flag]() {
                                              if (flag->load()) {
                                                  return;
@@ -354,7 +365,7 @@ void Strategy::_runDaily() {
                                              arm_duration();
                                          });
 
-            } else if (now_time < market_info.closeTime1() && now_time >= market_info.openTime1()) {
+            } else if (now_time < close1 && now_time >= open1) {
                 int64_t ticks = now_time.ticks() - market_info.openTime1().ticks();
                 int64_t delta_ticks = run_at.delta.ticks();
                 if (ticks % delta_ticks == 0) {
