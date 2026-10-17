@@ -64,6 +64,8 @@ void RunMultiSystemInStrategy::_refreshSubKDataRecursive(const std::shared_ptr<M
 void RunMultiSystemInStrategy::run() {
     _refreshSubKData();
     KData k = m_driver_stock.getKData(m_query);
+    HKU_WARN_IF_RETURN(k.empty(), void(), "Skip run, {} has no loaded data!",
+                       m_driver_stock.market_code());
     m_ms->getTM()->fetchAssetInfoFromBroker(m_broker);
     // reset=false: the live daily replay must not clear the sub-system state (the pending delayed
     // requests, the mode B quota, and in mode C the running pool plus the force-sell pool, which is
