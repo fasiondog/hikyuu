@@ -139,6 +139,27 @@ TEST_CASE("test_Strategy_orderValue_unit_cash_estimate") {
 }
 
 /** @par Test points */
+TEST_CASE("test_Strategy_orderValue_missing_daily_bar") {
+    // Only yesterday's bar exists: the order is ignored instead of using a stale price
+    KRecord yesterday_bar(Datetime::now() - TimeDelta(1));
+    yesterday_bar.openPrice = yesterday_bar.highPrice = yesterday_bar.lowPrice =
+      yesterday_bar.closePrice = 10.0;
+
+    Stock stock("TEST", "OVMD", "OrderValue Missing Daily Test", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 0.01, 0.01, 2, 100, 1000000);
+    stock.setKRecordList({yesterday_bar}, KQuery::DAY);
+    REQUIRE_UNARY(!stock.isNull());
+
+    Strategy strategy("test_Strategy_orderValue_missing_daily_bar");
+    auto tm = crtTM(Datetime(200001010000), 1000000.0, TC_Zero());
+    strategy.setTM(tm);
+
+    /** @arg the order is rejected when the current daily bar is missing */
+    TradeRecord tr = strategy.orderValue(stock, 10000.0);
+    CHECK_EQ(tr.business, BUSINESS_INVALID);
+}
+
+/** @par Test points */
 TEST_CASE("test_Strategy_orderValue_overflow") {
     // value/price beyond the int64 range must not hit the int64 lot conversion UB; the buy is
     // bounded by the affordable cash instead

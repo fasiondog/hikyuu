@@ -620,7 +620,9 @@ TradeRecord Strategy::orderValue(const Stock& stk, price_t value, const string& 
                        stk.name());
 
     auto k = getLastKData(stk, 1, KQuery::DAY, KQuery::NO_RECOVER);  // The current daily-line price
-    HKU_IF_RETURN(k.empty() || k[0].datetime.startOfDay() != today(), ret);
+    HKU_WARN_IF_RETURN(k.empty() || k[0].datetime.startOfDay() != today(), ret,
+                       "{} {} can't order value! The current daily bar is missing!",
+                       stk.market_code(), stk.name());
 
     price_t price = k[0].closePrice;
     // an invalid daily price (0/NaN) would cause UB in the number conversion
