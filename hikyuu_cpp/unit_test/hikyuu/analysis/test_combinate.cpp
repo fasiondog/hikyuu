@@ -12,6 +12,7 @@
 #include <hikyuu/analysis/analysis_sys.h>
 #include <hikyuu/analysis/combinate.h>
 #include <hikyuu/indicator/crt/KDATA.h>
+#include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Bool.h>
@@ -245,6 +246,44 @@ TEST_CASE("test_combinateIndicatorAnalysis_null_tm_sys") {
     CHECK_THROWS_AS(
       combinateIndicatorAnalysisWithBlock(Block(), query, tm, SystemPtr(), {buy}, {sell}, 1),
       hku::exception);
+}
+
+/**
+ * @par Test points
+ * The comparison operators share the same short name (GT, LT ...), so a buy list carrying several
+ * conditions of a kind produces colliding combination names. The combinations must be deduplicated
+ * with a suffix when they are generated, so that the map result keeps one entry per combination
+ * instead of silently overwriting the earlier ones.
+ */
+TEST_CASE("test_combinateIndicatorAnalysis_duplicate_name") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL));
+
+    // Two different buy conditions that both carry the short name "GT"
+    Indicator buy1 = CLOSE() > OPEN();
+    Indicator buy2 = CLOSE() > MA(10);
+    /** @arg the two buy conditions do share the same short name */
+    REQUIRE(buy1.name() == "GT");
+    REQUIRE(buy2.name() == buy1.name());
+
+    /** @arg the colliding names are deduplicated when the combinations are generated */
+    auto inds = combinateIndicator({buy1, buy2}, 1);
+    REQUIRE(inds.size() == 3);
+    CHECK_UNARY(inds[0].name() == "GT");
+    CHECK_UNARY(inds[1].name() == "GT & GT");
+    CHECK_UNARY(inds[2].name() == "GT 2");
+
+    Indicator sell = CLOSE() < 0;
+    auto tm = crtTM();
+    auto sys = SYS_Simple(tm, MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Bool(buy1, sell));
+    auto combinate = combinateIndicatorAnalysis(stk, query, tm, sys, {buy1, buy2}, {sell}, 1);
+
+    /** @arg every combination is kept instead of being overwritten by its name twin */
+    REQUIRE(combinate.size() == 3);
+    CHECK_UNARY(combinate.count("GT + LT") == 1);
+    CHECK_UNARY(combinate.count("GT & GT + LT") == 1);
+    CHECK_UNARY(combinate.count("GT 2 + LT") == 1);
 }
 
 /** @} */

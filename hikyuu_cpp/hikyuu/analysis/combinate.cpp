@@ -17,13 +17,17 @@ namespace hku {
 std::vector<Indicator> HKU_API combinateIndicator(const std::vector<Indicator>& inputs, int n) {
     std::vector<Indicator> ret;
     auto indexs = combinateIndex(inputs);
+    std::map<std::string, int> name_counts;
     for (size_t i = 0, len = indexs.size(); i < len; i++) {
         size_t count = indexs[i].size();
-        Indicator tmp = EXIST(inputs[indexs[i][0]], n);
+        Indicator tmp = EXIST(inputs[indexs[i][0]].clone(), n);
         std::string name = inputs[indexs[i][0]].name();
         for (size_t j = 1; j < count; j++) {
-            tmp = tmp & EXIST(inputs[indexs[i][j]], n);
+            tmp = tmp & EXIST(inputs[indexs[i][j]].clone(), n);
             name = fmt::format("{} & {}", name, inputs[indexs[i][j]].name());
+        }
+        if (++name_counts[name] > 1) {
+            name = fmt::format("{} {}", name, name_counts[name]);
         }
         tmp.name(name);
         ret.emplace_back(tmp);
