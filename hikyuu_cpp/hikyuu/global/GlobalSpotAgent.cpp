@@ -6,6 +6,7 @@
  */
 
 #include <atomic>
+#include <mutex>
 #include <typeinfo>
 
 #include <hikyuu/GlobalInitializer.h>
@@ -181,6 +182,9 @@ static void updateStockMinData(const SpotRecord& spot, KQuery::KType ktype) {
 }
 
 void HKU_API startSpotAgent(bool print, size_t worker_num, const string& addr) {
+    static std::mutex g_start_mutex;
+    std::lock_guard<std::mutex> lock(g_start_mutex);
+
     StockManager& sm = StockManager::instance();
     auto& agent = *getGlobalSpotAgent();
     HKU_CHECK(!agent.isRunning(), "The agent is running, please stop first!");
@@ -198,9 +202,7 @@ void HKU_API startSpotAgent(bool print, size_t worker_num, const string& addr) {
 
     // Prevent adding the handler repeatedly when startSpotAgent is called again after stopSpotAgent
     static std::atomic_bool g_init_spot_agent{false};
-    if (!g_init_spot_agent) {
-        g_init_spot_agent = true;
-
+    if (!g_init_spot_agent.exchange(true)) {
         const auto& preloadParam = sm.getPreloadParameter();
         if (preloadParam.tryGet<bool>("min", false)) {
             agent.addProcess(std::bind(updateStockMinData, std::placeholders::_1, KQuery::MIN));
