@@ -5,7 +5,6 @@
  *     Author: fasiondog
  */
 
-#include <csignal>
 #include <hikyuu/strategy/Strategy.h>
 #include <hikyuu/strategy/BrokerTradeManager.h>
 #include <hikyuu/strategy/RunSystemInStrategy.h>
@@ -69,7 +68,7 @@ void export_Strategy(py::module& m) {
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
-                        raise(SIGTERM);
+                        stg->stop();
                     } else {
                         HKU_ERROR(e.what());
                     }
@@ -113,7 +112,7 @@ void export_Strategy(py::module& m) {
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
-                        raise(SIGTERM);
+                        stg->stop();
                     } else {
                         HKU_ERROR(e.what());
                     }
@@ -143,7 +142,7 @@ void export_Strategy(py::module& m) {
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
-                        raise(SIGTERM);
+                        stg->stop();
                     } else {
                         HKU_ERROR(e.what());
                     }
@@ -174,7 +173,7 @@ void export_Strategy(py::module& m) {
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
-                        raise(SIGTERM);
+                        stg->stop();
                     } else {
                         HKU_ERROR(e.what());
                     }
@@ -209,7 +208,7 @@ void export_Strategy(py::module& m) {
                 } catch (py::error_already_set& e) {
                     if (e.matches(PyExc_KeyboardInterrupt)) {
                         printf("KeyboardInterrupt\n");
-                        raise(SIGTERM);
+                        stg->stop();
                     } else {
                         HKU_ERROR(e.what());
                     }

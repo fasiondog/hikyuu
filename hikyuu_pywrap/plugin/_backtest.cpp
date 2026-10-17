@@ -5,7 +5,6 @@
  *      Author: fasiondog
  */
 
-#include <csignal>
 #include <hikyuu/plugin/backtest.h>
 #include "../pybind_utils.h"
 
@@ -29,7 +28,7 @@ void export_plugin_backtest(py::module& m) {
               } catch (py::error_already_set& e) {
                   if (e.matches(PyExc_KeyboardInterrupt)) {
                       printf("KeyboardInterrupt\n");
-                      raise(SIGTERM);
+                      stg->stop();
                   } else {
                       HKU_ERROR(e.what());
                   }
@@ -61,7 +60,7 @@ void export_plugin_backtest(py::module& m) {
               } catch (py::error_already_set& e) {
                   if (e.matches(PyExc_KeyboardInterrupt)) {
                       printf("KeyboardInterrupt\n");
-                      raise(SIGTERM);
+                      stg->stop();
                   } else {
                       HKU_ERROR(e.what());
                   }
