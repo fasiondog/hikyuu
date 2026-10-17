@@ -44,9 +44,7 @@ void releaseGlobalSpotAgent() {
 }
 
 static string getSpotMarketCode(const SpotRecord& spot) {
-    std::stringstream market_code_buf;
-    market_code_buf << spot.market << spot.code;
-    return market_code_buf.str();
+    return spot.market + spot.code;
 }
 
 static void updateStockDayData(const SpotRecord& spot) {
