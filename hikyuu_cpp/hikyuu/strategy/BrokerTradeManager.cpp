@@ -134,7 +134,22 @@ PositionRecord BrokerTradeManager::getPosition(const Datetime& date, const Stock
 }
 
 bool BrokerTradeManager::checkin(const Datetime& datetime, price_t cash) {
+    HKU_WARN_IF_RETURN(!std::isfinite(cash) || cash <= 0.0, false,
+                       "{} Invalid checkin cash({})!", datetime, cash);
     m_cash += cash;
+    return true;
+}
+
+bool BrokerTradeManager::checkout(const Datetime& datetime, price_t cash) {
+    HKU_WARN_IF_RETURN(!std::isfinite(cash) || cash <= 0.0, false,
+                       "{} Invalid checkout cash({})!", datetime, cash);
+    if (cash > m_cash) {
+        HKU_WARN("{} {} checkout cash({}) exceeds the current cash({}), clamped!",
+                 datetime, name(), cash, m_cash);
+        m_cash = 0.0;
+    } else {
+        m_cash -= cash;
+    }
     return true;
 }
 

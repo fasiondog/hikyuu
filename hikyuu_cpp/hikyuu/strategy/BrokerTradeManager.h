@@ -213,10 +213,7 @@ public:
      * @param cash withdrawn amount
      * @return true | false
      */
-    virtual bool checkout(const Datetime& datetime, price_t cash) override {
-        m_cash = (cash > m_cash) ? 0.0 : m_cash - cash;
-        return true;
-    }
+    virtual bool checkout(const Datetime& datetime, price_t cash) override;
 
     /**
      * Deposit assets

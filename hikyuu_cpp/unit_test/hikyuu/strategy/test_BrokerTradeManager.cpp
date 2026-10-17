@@ -277,4 +277,36 @@ TEST_CASE("test_BrokerTradeManager_market_order_accounting") {
     CHECK_UNARY(!tm.str().empty());
 }
 
+/** @par Test points: checkin/checkout cash validation (a negative checkin must not bypass the
+ * checkout clamp, and an over-amount checkout is clamped with a warning) */
+TEST_CASE("test_BrokerTradeManager_checkin_checkout") {
+    OrderBrokerPtr broker = make_shared<AssetOrderBroker>("");
+    BrokerTradeManager tm(broker);
+
+    /** @arg checkin rejects a non-positive or non-finite cash */
+    CHECK_UNARY(!tm.checkin(Datetime::now(), -1000.0));
+    CHECK_UNARY(!tm.checkin(Datetime::now(), 0.0));
+    CHECK_UNARY(!tm.checkin(Datetime::now(), std::numeric_limits<double>::quiet_NaN()));
+    CHECK_EQ(tm.currentCash(), 0.0);
+
+    /** @arg a valid checkin adds the cash */
+    CHECK_UNARY(tm.checkin(Datetime::now(), 100000.0));
+    CHECK_EQ(tm.currentCash(), 100000.0);
+
+    /** @arg checkout rejects a non-positive or non-finite cash */
+    CHECK_UNARY(!tm.checkout(Datetime::now(), -1.0));
+    CHECK_UNARY(!tm.checkout(Datetime::now(), 0.0));
+    CHECK_UNARY(!tm.checkout(Datetime::now(), std::numeric_limits<double>::infinity()));
+    CHECK_EQ(tm.currentCash(), 100000.0);
+
+    /** @arg a checkout exceeding the current cash is clamped to 0 */
+    CHECK_UNARY(tm.checkout(Datetime::now(), 200000.0));
+    CHECK_EQ(tm.currentCash(), 0.0);
+
+    /** @arg a normal checkout deducts the cash */
+    CHECK_UNARY(tm.checkin(Datetime::now(), 50000.0));
+    CHECK_UNARY(tm.checkout(Datetime::now(), 20000.0));
+    CHECK_EQ(tm.currentCash(), 30000.0);
+}
+
 /** @} */  // end of test_BrokerTradeManager
