@@ -7,6 +7,7 @@
 
 #include <hikyuu/analysis/combinate.h>
 #include <hikyuu/analysis/analysis_sys.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 using namespace hku;
@@ -54,8 +55,7 @@ static py::dict combinate_ind_analysis(const Stock& stk, const KQuery& query, Tr
 
     std::map<std::string, Performance> pers;
     {
-        OStreamToPython guard(false);
-        py::gil_scoped_release release;
+        ScopeGilRelease gil(!system_has_python_part(sys));
         pers = combinateIndicatorAnalysis(stk, query, tm, sys, c_buy_inds, c_sell_inds, n);
     }
 
@@ -82,8 +82,7 @@ static py::dict combinate_ind_analysis_with_block(const Block& blk, const KQuery
 
     vector<CombinateAnalysisOutput> records;
     {
-        OStreamToPython guard(false);
-        py::gil_scoped_release release;
+        ScopeGilRelease gil(!system_has_python_part(sys));
         records =
           combinateIndicatorAnalysisWithBlock(blk, query, tm, sys, c_buy_inds, c_sell_inds, n);
     }
@@ -140,8 +139,7 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
 
     vector<AnalysisSystemOutput> records;
     {
-        OStreamToPython guard(false);
-        py::gil_scoped_release release;
+        ScopeGilRelease gil(!sys_list_has_python_part(sys_list));
         records = analysisSystemList(sys_list, stk_list, query);
     }
 
@@ -172,6 +170,28 @@ static py::dict analysis_sys_list(const py::object& pystk_list, const KQuery& qu
     return result;
 }
 
+static std::pair<double, SYSPtr> find_optimal_system(const SystemList& sys_list, const Stock& stk,
+                                                     const KQuery& query, const string& sort_key,
+                                                     int sort_mode) {
+    std::pair<double, SYSPtr> result;
+    {
+        ScopeGilRelease gil(!sys_list_has_python_part(sys_list));
+        result = findOptimalSystem(sys_list, stk, query, sort_key, sort_mode);
+    }
+    return result;
+}
+
+static std::pair<double, SYSPtr> find_optimal_system_multi(const SystemList& sys_list,
+                                                           const Stock& stk, const KQuery& query,
+                                                           const string& sort_key, int sort_mode) {
+    std::pair<double, SYSPtr> result;
+    {
+        ScopeGilRelease gil(!sys_list_has_python_part(sys_list));
+        result = findOptimalSystemMulti(sys_list, stk, query, sort_key, sort_mode);
+    }
+    return result;
+}
+
 void export_analysis(py::module& m) {
     m.def("combinate_index", combinate_index, R"(combinate_index(seq)
 
@@ -197,9 +217,9 @@ void export_analysis(py::module& m) {
 
     m.def("inner_analysis_sys_list", analysis_sys_list);
 
-    m.def("find_optimal_system", findOptimalSystem, py::arg("sys_list"), py::arg("stock"),
+    m.def("find_optimal_system", find_optimal_system, py::arg("sys_list"), py::arg("stock"),
           py::arg("query"), py::arg("sort_key") = string(), py::arg("sort_mode") = 0);
-    m.def("find_optimal_system_multi", findOptimalSystemMulti, py::arg("sys_list"),
+    m.def("find_optimal_system_multi", find_optimal_system_multi, py::arg("sys_list"),
           py::arg("stock"), py::arg("query"), py::arg("sort_key") = string(),
           py::arg("sort_mode") = 0);
 }

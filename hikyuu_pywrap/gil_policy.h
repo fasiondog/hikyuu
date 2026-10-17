@@ -34,6 +34,15 @@ inline bool system_has_python_part(const SystemPtr& sys) {
                            sys->getSP(), sys->getCN(), sys->getEV(), sys->getTM());
 }
 
+inline bool sys_list_has_python_part(const vector<SystemPtr>& sys_list) {
+    for (const auto& sys : sys_list) {
+        if (system_has_python_part(sys)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 inline bool tm_list_has_python_part(const vector<TMPtr>& tm_list) {
     for (const auto& tm : tm_list) {
         if (tm && tm->isPythonObject()) {
@@ -56,7 +65,7 @@ public:
     explicit ScopeGilRelease(bool python_free) {
         if (python_free) {
             m_stream_guard = std::make_unique<OStreamToPython>(false);
-            m_gil_guard = std::make_unique<py::gil_scoped_release>();
+            m_gil_guard = std::make_unique<pybind11::gil_scoped_release>();
         }
     }
 
@@ -65,7 +74,7 @@ public:
 
 private:
     std::unique_ptr<OStreamToPython> m_stream_guard;
-    std::unique_ptr<py::gil_scoped_release> m_gil_guard;
+    std::unique_ptr<pybind11::gil_scoped_release> m_gil_guard;
 };
 
 }  // namespace hku
