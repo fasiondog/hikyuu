@@ -115,7 +115,7 @@ static boost::uuids::uuid readUUID() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
 #endif
-    boost::uuids::uuid uid;
+    boost::uuids::uuid uid = boost::uuids::nil_uuid();
     std::string dir = fmt::format("{}/.hikyuu", getUserDir());
     createDir(dir);
 
