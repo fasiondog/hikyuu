@@ -241,7 +241,7 @@ void SpotAgent::work_thread() {
 
     HKU_INFO_IF(!m_stop && m_print, "Ready to receive quotation from {} ...", ms_pubUrl);
 
-    m_connected = true;
+    m_connected = !m_stop;
     while (!m_stop) {
         char* buf = nullptr;
         size_t length = 0;

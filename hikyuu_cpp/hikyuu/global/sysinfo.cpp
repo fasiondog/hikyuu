@@ -39,10 +39,13 @@ struct InnerSysInfo {
 
 static InnerSysInfo* g_sys_info;
 
+static int getCurrentVersionNumber() {
+    return HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
+}
+
 void sysinfo_init() {
     g_sys_info = new InnerSysInfo;
-    g_sys_info->latest_version_info.version =
-      HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
+    g_sys_info->latest_version_info.version = getCurrentVersionNumber();
 }
 void sysinfo_clean() {
     // Intentional: the detached feedback thread in sendFeedback() may still touch g_sys_info
@@ -86,8 +89,7 @@ void HKU_API setPythonInJupyter(bool injupyter) {
 }
 
 bool HKU_API CanUpgrade() {
-    int current_version =
-      HKU_VERSION_MAJOR * 1000000 + HKU_VERSION_MINOR * 1000 + HKU_VERSION_ALTER;
+    int current_version = getCurrentVersionNumber();
     std::shared_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
     return g_sys_info->latest_version_info.version > current_version;
 }
@@ -203,18 +205,16 @@ void sendFeedback() {
                 return;
             }
 
-            if (g_sys_info) {
-                std::unique_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
-                g_sys_info->latest_version_info.version = data["last_version"].get<int>();
-                if (data.contains("remark") && data.contains("release_date")) {
-                    g_sys_info->latest_version_info.remark = data["remark"].get<std::string>();
-                    g_sys_info->latest_version_info.release_date =
-                      Datetime(data["release_date"].get<std::string>());
-                } else {
-                    g_sys_info->latest_version_info.remark =
-                      "release note: https://hikyuu.readthedocs.io/zh-cn/latest/release.html";
-                    g_sys_info->latest_version_info.release_date = Datetime();
-                }
+            std::unique_lock<std::shared_mutex> lock(g_sys_info->latest_version_mutex);
+            g_sys_info->latest_version_info.version = data["last_version"].get<int>();
+            if (data.contains("remark") && data.contains("release_date")) {
+                g_sys_info->latest_version_info.remark = data["remark"].get<std::string>();
+                g_sys_info->latest_version_info.release_date =
+                  Datetime(data["release_date"].get<std::string>());
+            } else {
+                g_sys_info->latest_version_info.remark =
+                  "release note: https://hikyuu.readthedocs.io/zh-cn/latest/release.html";
+                g_sys_info->latest_version_info.release_date = Datetime();
             }
 
         } catch (...) {
