@@ -214,10 +214,18 @@ void SpotAgent::work_thread() {
     HKU_ERROR_IF_RETURN(rv != 0, void(), "Can't open nng sub0! {}", nng_strerror(rv));
 
     rv = nng_socket_set(sock, NNG_OPT_SUB_SUBSCRIBE, ms_spotTopic, ms_spotTopicLength);
-    HKU_ERROR_IF_RETURN(rv != 0, void(), "Failed set nng socket option! {}", nng_strerror(rv));
+    if (rv != 0) {
+        HKU_ERROR("Failed set nng socket option! {}", nng_strerror(rv));
+        nng_close(sock);
+        return;
+    }
 
     rv = nng_socket_set_ms(sock, NNG_OPT_RECVTIMEO, m_revTimeout);
-    HKU_ERROR_IF_RETURN(rv != 0, void(), "Failed set receive timeout option!");
+    if (rv != 0) {
+        HKU_ERROR("Failed set receive timeout option!");
+        nng_close(sock);
+        return;
+    }
 
     rv = -1;
     Datetime pretime = Datetime::now();
