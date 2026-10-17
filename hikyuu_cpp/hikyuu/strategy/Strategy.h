@@ -122,6 +122,15 @@ public:
     /** Stop the event loop and invalidate callbacks; safe to call when not started */
     void stop();
 
+    /**
+     * Install hooks around the event-loop blocking wait; used by the Python binding to release
+     * the GIL while waiting (no-op when unset). pre_wait drops the GIL, post_wait restores it.
+     */
+    void setEventWaitHooks(std::function<void()> pre_wait, std::function<void()> post_wait) {
+        m_pre_wait_hook = std::move(pre_wait);
+        m_post_wait_hook = std::move(post_wait);
+    }
+
     //==========================================================================
     // The following is the external interface of the strategy runtime; it is recommended to use
     // these interfaces instead of the other functions with the same names, so that the backtest and
@@ -282,6 +291,10 @@ private:
      */
     template <typename ResultType>
     using event_handle = std::future<ResultType>;
+
+    // Event-loop wait hooks (see setEventWaitHooks); empty in non-Python runtimes
+    std::function<void()> m_pre_wait_hook;
+    std::function<void()> m_post_wait_hook;
 
 #ifdef _MSC_VER
 #pragma warning(push)

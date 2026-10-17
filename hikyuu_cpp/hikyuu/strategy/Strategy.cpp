@@ -439,7 +439,15 @@ void Strategy::_runDailyAt() {
 void Strategy::_startEventLoop() {
     while (ms_keep_running && m_running) {
         event_type task;
+        // Release the GIL during the blocking wait (Python binding); wait_and_pop never throws,
+        // so the pre/post hooks stay balanced
+        if (m_pre_wait_hook) {
+            m_pre_wait_hook();
+        }
         m_event_queue.wait_and_pop(task);
+        if (m_post_wait_hook) {
+            m_post_wait_hook();
+        }
         if (task.isNullTask()) {
             m_running = false;
         } else {

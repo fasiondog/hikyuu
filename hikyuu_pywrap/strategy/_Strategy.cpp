@@ -79,6 +79,16 @@ void export_Strategy(py::module& m) {
             };
             self.runDaily(new_func, Seconds(1), "SH", true);
 
+            // Release the GIL while the event loop waits; the loop thread is the caller of
+            // start(), so a thread_local slot suffices
+            static thread_local PyThreadState* t_event_loop_state = nullptr;
+            self.setEventWaitHooks(
+              []() { t_event_loop_state = PyEval_SaveThread(); },
+              []() {
+                  PyEval_RestoreThread(t_event_loop_state);
+                  t_event_loop_state = nullptr;
+              });
+
             self.start();
         },
         py::arg("auto_recieve_spot") = true, R"(start(self)
