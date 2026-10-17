@@ -22,8 +22,9 @@ void export_plugin_backtest(py::module& m) {
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
           auto c_func = make_gil_safe(on_bar.attr("__call__"));
           auto new_func = [=](Strategy* stg) {
+              // Outside the try: the catches also need the GIL
+              py::gil_scoped_acquire gil;
               try {
-                  py::gil_scoped_acquire gil;
                   (*c_func)(stg);
               } catch (py::error_already_set& e) {
                   if (e.matches(PyExc_KeyboardInterrupt)) {
@@ -38,6 +39,8 @@ void export_plugin_backtest(py::module& m) {
                   HKU_ERROR("Unknown error!");
               }
           };
+          // Other threads can run during the C++ part; on_bar reacquires the GIL per callback
+          py::gil_scoped_release release;
           backtest(context, new_func, tm, start_date, end_date, ktype, ref_market, mode,
                    support_short, sp);
       },
@@ -54,8 +57,9 @@ void export_plugin_backtest(py::module& m) {
           HKU_CHECK(check_pyfunction_arg_num(on_bar, 1), "Number of parameters does not match!");
           auto c_func = make_gil_safe(on_bar.attr("__call__"));
           auto new_func = [=](Strategy* stg) {
+              // Outside the try: the catches also need the GIL
+              py::gil_scoped_acquire gil;
               try {
-                  py::gil_scoped_acquire gil;
                   (*c_func)(stg);
               } catch (py::error_already_set& e) {
                   if (e.matches(PyExc_KeyboardInterrupt)) {
@@ -70,6 +74,8 @@ void export_plugin_backtest(py::module& m) {
                   HKU_ERROR("Unknown error!");
               }
           };
+          // Other threads can run during the C++ part; on_bar reacquires the GIL per callback
+          py::gil_scoped_release release;
           backtest(new_func, tm, start_date, end_date, ktype, ref_market, mode, support_short, sp);
       },
       py::arg("on_bar"), py::arg("tm"), py::arg("start_date"), py::arg("end_date") = null_date,

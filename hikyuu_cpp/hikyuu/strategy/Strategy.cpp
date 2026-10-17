@@ -128,7 +128,9 @@ void Strategy::_init() {
     CLS_CHECK(!m_context.getStockCodeList().empty(), "The context does not contain any stocks!");
 
     // Stop the market data receiving agent first, so that the handlers can be added later
-    stopSpotAgent();
+    if (!isBacktesting()) {
+        stopSpotAgent();
+    }
 }
 
 void Strategy::start(bool autoRecieveSpot) {
