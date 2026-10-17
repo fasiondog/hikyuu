@@ -93,10 +93,12 @@ unique_ptr<SpotRecord> SpotAgent::parseFlatSpot(const hikyuu::flat::Spot* spot) 
     std::unique_ptr<SpotRecord> result;
     try {
         result = std::make_unique<SpotRecord>();
-        if (spot->market())
-            result->market = spot->market()->str();
-        if (spot->code())
-            result->code = spot->code()->str();
+        if (!spot->market() || !spot->code() || !spot->datetime()) {
+            result.reset();
+            return result;
+        }
+        result->market = spot->market()->str();
+        result->code = spot->code()->str();
         if (spot->name())
             result->name = spot->name()->str();
         result->datetime = Datetime(spot->datetime()->str());
@@ -174,6 +176,8 @@ void SpotAgent::parseSpotData(const void* buf, size_t buf_len) {
     // Update the K-line data
     auto* spot_list = GetSpotList(spot_list_buf);
     auto* spots = spot_list->spot();
+    HKU_DEBUG_IF_RETURN(!spots, void(), "Received SpotList without spot field!");
+
     size_t total = spots->size();
     vector<std::future<void>> tasks;
     for (size_t i = 0; i < total; i++) {
