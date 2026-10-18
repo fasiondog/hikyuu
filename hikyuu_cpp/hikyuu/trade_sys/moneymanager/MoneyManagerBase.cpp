@@ -154,16 +154,9 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
         return max_trade;
     }
 
-    // Automatically deposit more cash when the cash is not enough
-    if (getParam<bool>("auto-checkin")) {
-        price_t cash = m_tm->cash(datetime, m_query.kType());
-        CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-        int precision = m_tm->precision();
-        price_t money = roundUp(price * n * stock.unit() + cost.total, precision);
-        if (money > cash) {
-            m_tm->checkin(datetime, roundUp(money - cash, precision));
-        }
-    } else {
+    // With auto-checkin System deposits the cash at the actual trade, so the number is not
+    // constrained by the current cash here
+    if (!getParam<bool>("auto-checkin")) {
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
         price_t need_cash = n * price * stock.unit() + cost.total;
         price_t current_cash = m_tm->cash(datetime, m_query.kType());

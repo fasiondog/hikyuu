@@ -926,6 +926,7 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
 
     price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
+    _autoCheckin(today.datetime, realPrice, number);
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
@@ -1023,6 +1024,7 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
         }
 
         price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+        _autoCheckin(today.datetime, realPrice, number);
         TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
                                        goalPrice, planPrice, req.from);
         if (BUSINESS_BUY != record.business) {
@@ -1052,6 +1054,22 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
     req.number = _getBuyNumber(today.datetime, src_today.closePrice,
                                src_today.closePrice - req.stoploss, from);
     m_buyRequestList.push_back(req);
+}
+
+void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number) {
+    HKU_IF_RETURN(!m_mm->getParam<bool>("auto-checkin"), void());
+    HKU_IF_RETURN(datetime < m_tm->lastDatetime(), void());
+
+    // Deposit once per trade with the affordability formula of TradeManager::buy; the gap is
+    // rounded up so the following buy always passes its cash check
+    int precision = m_tm->precision();
+    CostRecord cost = m_tm->getBuyCost(datetime, m_stock, realPrice, number);
+    price_t needed =
+      roundEx(roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
+    price_t cash = m_tm->cash(datetime, m_kdata.getQuery().kType());
+    if (cash < needed) {
+        m_tm->checkin(datetime, roundUp(needed - cash, precision));
+    }
 }
 
 TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {

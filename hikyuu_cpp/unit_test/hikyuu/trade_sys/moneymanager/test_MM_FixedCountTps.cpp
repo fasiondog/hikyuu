@@ -34,7 +34,8 @@ TEST_CASE("test_MM_FixedCountTpsTps") {
     /** @arg The total buy and sell quantities differ (a warning is printed only) */
     auto _ = MM_FixedCountTps({100., 100.}, {200., 200.});
 
-    /** @arg n = 100; a trade account with the initial capital 0 auto-fills and can buy */
+    /** @arg n = {100, 200}; the query deposits nothing and the tier sizes ignore the cash; the
+     * account is funded explicitly for the tier-flow assertions */
     tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedAPre2015());
     CHECK_EQ(tm->initCash(), 0.0);
     auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
@@ -43,7 +44,8 @@ TEST_CASE("test_MM_FixedCountTpsTps") {
     CHECK_EQ(mm->currentBuyCount(stock), 0);
     double buy_num = mm->getBuyNumber(Datetime(200001200000), stock, 24.11, 24.11, PART_SIGNAL);
     CHECK_EQ(buy_num, 100);
-    CHECK_EQ(tm->cash(Datetime(200001200000)), 2417.0);
+    CHECK_EQ(tm->cash(Datetime(200001200000)), 0.0);
+    tm->checkin(Datetime(200001200000), 1000000.0);
     auto tr = tm->buy(Datetime(200001200000), stock, 24.11, 100, 0, 0, 24.11, PART_SIGNAL);
     mm->buyNotify(tr);
     CHECK_EQ(mm->currentBuyCount(stock), 1);
