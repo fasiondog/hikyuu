@@ -61,6 +61,7 @@ as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / 
 A custom `SlippageBase` subclass (C++/Python) previously overrode `get_real_buy_price` / `get_real_sell_price` to return the final trade price directly. It must now override `_get_real_buy_price` / `_get_real_sell_price` to compute only the **raw** price. The System part - the only caller in the framework, which already holds the original (unadjusted) record of the bar - then validates the result and clamps it into the bar's range:
 
 * an invalid result (non-finite or non-positive) falls back to the plan price: 0 is accepted by the trade manager as the market-order placeholder, so it must never come from the slippage path;
+* the model price is rounded to the market's minimum price tick, so a fill never lands between two ticks (the plan price and the bar bounds are raw market prices and are used as they are);
 * both sides are clamped into the bar's `[low, high]` range.
 
 Migration:

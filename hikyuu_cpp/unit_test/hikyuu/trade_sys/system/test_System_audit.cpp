@@ -8,6 +8,7 @@
  */
 
 #include "../../test_config.h"
+#include <cmath>
 #include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
@@ -126,6 +127,7 @@ TEST_CASE("test_System_slippage_price_fixup") {
     raw_query.recoverType(KQuery::NO_RECOVER);
     KData raw_kdata = stk.getKData(raw_query);
     REQUIRE_UNARY(!raw_kdata.empty());
+    const double price_factor = std::pow(10.0, stk.precision());
 
     auto run_with_raw = [&](double raw) {
         auto sp = std::make_shared<FixedRawPriceSP>();
@@ -153,6 +155,11 @@ TEST_CASE("test_System_slippage_price_fixup") {
             }
             const KRecord& k = raw_kdata.getKRecord(tr.datetime);
             REQUIRE_UNARY(k.isValid());
+            /** @arg the fill price always lands on the minimum price tick of the market (the
+             *  tolerance only absorbs the last-bit noise of the stored doubles) */
+            CHECK_LE(
+              std::abs(tr.realPrice * price_factor - std::round(tr.realPrice * price_factor)),
+              1e-9);
             ++count;
             check_trade(tr, k);
         }

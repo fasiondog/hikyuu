@@ -53,8 +53,8 @@ void export_Slippage(py::module& m) {
 
 The custom slippage interfaces:
 
-    - _get_real_buy_price : [Required] Compute the raw buy price (the System part validates it and clamps it into the bar's [low, high] range)
-    - _get_real_sell_price : [Required] Compute the raw sell price (the System part validates it and clamps it into the bar's [low, high] range)
+    - _get_real_buy_price : [Required] Compute the raw buy price (the System part validates it, snaps it to the market's minimum price tick and clamps it into the bar's [low, high] range)
+    - _get_real_sell_price : [Required] Compute the raw sell price (the System part validates it, snaps it to the market's minimum price tick and clamps it into the bar's [low, high] range)
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
     - _reset : [Optional] Reload the private variables)")
@@ -100,9 +100,9 @@ The custom slippage interfaces:
 
     [Public method] Return the raw buy price of the slippage model by calling the subclass hook
     _get_real_buy_price. The System part is the only caller in the framework: it validates the
-    result (an invalid value falls back to the plan price) and clamps it into the bar's
-    [low, high] range before the trade. Do not override this method; override
-    _get_real_buy_price instead.
+    result (an invalid value falls back to the plan price), snaps it to the market's minimum
+    price tick and clamps it into the bar's [low, high] range before the trade. Do not override
+    this method; override _get_real_buy_price instead.
 
     :param Datetime datetime: the buy time
     :param float price: the planned buy price
@@ -114,9 +114,9 @@ The custom slippage interfaces:
 
     [Public method] Return the raw sell price of the slippage model by calling the subclass hook
     _get_real_sell_price. The System part is the only caller in the framework: it validates the
-    result (an invalid value falls back to the plan price) and clamps it into the bar's
-    [low, high] range before the trade. Do not override this method; override
-    _get_real_sell_price instead.
+    result (an invalid value falls back to the plan price), snaps it to the market's minimum
+    price tick and clamps it into the bar's [low, high] range before the trade. Do not override
+    this method; override _get_real_sell_price instead.
 
     :param Datetime datetime: the sell time
     :param float price: the planned sell price

@@ -74,8 +74,8 @@
 
 自定义移滑价差接口：
 
-* :py:meth:`SlippageBase._getRealBuyPrice` - 【必须】计算原始买入价格（由 System 层校验并钳制到当日 [最低价, 最高价] 区间）
-* :py:meth:`SlippageBase._getRealSellPrice` - 【必须】计算原始卖出价格（由 System 层校验并钳制到当日 [最低价, 最高价] 区间）
+* :py:meth:`SlippageBase._getRealBuyPrice` - 【必须】计算原始买入价格（由 System 层校验、按最小变动单位取整并钳制到当日 [最低价, 最高价] 区间）
+* :py:meth:`SlippageBase._getRealSellPrice` - 【必须】计算原始卖出价格（由 System 层校验、按最小变动单位取整并钳制到当日 [最低价, 最高价] 区间）
 * :py:meth:`SlippageBase._calculate` - 【必须】子类计算接口
 * :py:meth:`SlippageBase._clone` - 【必须】克隆接口
 * :py:meth:`SlippageBase._reset` - 【可选】重载私有变量
@@ -115,7 +115,7 @@
 
     .. py:method:: get_real_buy_price(self, datetime, price)
 
-        公共方法，返回滑点模型的原始买入价格：内部调用子类钩子 _get_real_buy_price。框架内唯一的调用方 System 会校验该返回值（非法时回退计划价）并钳制到当日 [最低价, 最高价] 区间后成交。Python 子类应重写 _get_real_buy_price，不要重写此方法。
+        公共方法，返回滑点模型的原始买入价格：内部调用子类钩子 _get_real_buy_price。框架内唯一的调用方 System 会校验该返回值（非法时回退计划价）、按最小变动单位取整并钳制到当日 [最低价, 最高价] 区间后成交。Python 子类应重写 _get_real_buy_price，不要重写此方法。
 
         :param Datetime datetime: 买入时间
         :param float price: 计划买入价格
@@ -124,7 +124,7 @@
 
     .. py:method:: get_real_sell_price(self, datetime, price)
 
-        公共方法，返回滑点模型的原始卖出价格：内部调用子类钩子 _get_real_sell_price。框架内唯一的调用方 System 会校验该返回值（非法时回退计划价）并钳制到当日 [最低价, 最高价] 区间后成交。Python 子类应重写 _get_real_sell_price，不要重写此方法。
+        公共方法，返回滑点模型的原始卖出价格：内部调用子类钩子 _get_real_sell_price。框架内唯一的调用方 System 会校验该返回值（非法时回退计划价）、按最小变动单位取整并钳制到当日 [最低价, 最高价] 区间后成交。Python 子类应重写 _get_real_sell_price，不要重写此方法。
 
         :param Datetime datetime: 卖出时间
         :param float price: 计划卖出价格

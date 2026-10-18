@@ -74,8 +74,8 @@ Custom Slippage Algorithm
 
 A custom slippage algorithm implements the following interface:
 
-* :py:meth:`SlippageBase._getRealBuyPrice` - [Required] Compute the raw buy price (the System part validates it and clamps it into the bar's [low, high] range)
-* :py:meth:`SlippageBase._getRealSellPrice` - [Required] Compute the raw sell price (the System part validates it and clamps it into the bar's [low, high] range)
+* :py:meth:`SlippageBase._getRealBuyPrice` - [Required] Compute the raw buy price (the System part validates it, snaps it to the market's minimum price tick and clamps it into the bar's [low, high] range)
+* :py:meth:`SlippageBase._getRealSellPrice` - [Required] Compute the raw sell price (the System part validates it, snaps it to the market's minimum price tick and clamps it into the bar's [low, high] range)
 * :py:meth:`SlippageBase._calculate` - [Required] Subclass calculation hook
 * :py:meth:`SlippageBase._clone` - [Required] Subclass clone hook
 * :py:meth:`SlippageBase._reset` - [Optional] Reset internal member variables
@@ -115,7 +115,7 @@ Slippage Algorithm Base Class
 
     .. py:method:: get_real_buy_price(self, datetime, price)
 
-        [Public method] Return the raw buy price of the slippage model by calling the subclass hook _get_real_buy_price. The System part is the only caller in the framework: it validates the result (an invalid value falls back to the plan price) and clamps it into the bar's [low, high] range before the trade. Python subclasses should override _get_real_buy_price instead of this method.
+        [Public method] Return the raw buy price of the slippage model by calling the subclass hook _get_real_buy_price. The System part is the only caller in the framework: it validates the result (an invalid value falls back to the plan price), snaps it to the market's minimum price tick and clamps it into the bar's [low, high] range before the trade. Python subclasses should override _get_real_buy_price instead of this method.
 
         :param Datetime datetime: the buy timestamp
         :param float price: the planned buy price
@@ -124,7 +124,7 @@ Slippage Algorithm Base Class
 
     .. py:method:: get_real_sell_price(self, datetime, price)
 
-        [Public method] Return the raw sell price of the slippage model by calling the subclass hook _get_real_sell_price. The System part is the only caller in the framework: it validates the result (an invalid value falls back to the plan price) and clamps it into the bar's [low, high] range before the trade. Python subclasses should override _get_real_sell_price instead of this method.
+        [Public method] Return the raw sell price of the slippage model by calling the subclass hook _get_real_sell_price. The System part is the only caller in the framework: it validates the result (an invalid value falls back to the plan price), snaps it to the market's minimum price tick and clamps it into the bar's [low, high] range before the trade. Python subclasses should override _get_real_sell_price instead of this method.
 
         :param Datetime datetime: the sell timestamp
         :param float price: the planned sell price

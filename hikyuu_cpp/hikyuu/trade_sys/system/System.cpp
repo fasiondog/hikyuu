@@ -1758,12 +1758,17 @@ price_t System::_getShortTakeProfitPrice(const KRecord& today, const KRecord& sr
 // market-order placeholder, so an invalid value must never be passed through; and a fill outside
 // the current bar's range is impossible, so both sides are clamped. The original (unadjusted)
 // record of the same bar is already at hand and shares the coordinate of the plan price.
-static price_t fixupSlippagePrice(const string& sys_name, const KRecord& src_today,
-                                  price_t planPrice, price_t price, const char* side) {
+static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
+                                  const KRecord& src_today, price_t planPrice, price_t price,
+                                  const char* side) {
     if (!std::isfinite(price) || price <= 0.0) {
         HKU_WARN("[{}] invalid slippage {} price({}), fallback to the plan price({})", sys_name,
                  side, price, planPrice);
         price = planPrice;
+    } else {
+        // The model price is snapped to the market's minimum price tick; the plan price and the bar
+        // bounds are raw market prices, already tick aligned, and are used as they are
+        price = roundEx(price, stock.isNull() ? 2 : stock.precision());
     }
     if (src_today.isValid() && (price < src_today.lowPrice || price > src_today.highPrice)) {
         HKU_WARN("[{}] slippage {} price({}) is out of the bar range [{}, {}], clamp it", sys_name,
@@ -1775,12 +1780,12 @@ static price_t fixupSlippagePrice(const string& sys_name, const KRecord& src_tod
 
 price_t System::_getRealBuyPrice(const KRecord& src_today, price_t planPrice) {
     price_t price = m_sp ? m_sp->getRealBuyPrice(src_today.datetime, planPrice) : planPrice;
-    return fixupSlippagePrice(name(), src_today, planPrice, price, "buy");
+    return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "buy");
 }
 
 price_t System::_getRealSellPrice(const KRecord& src_today, price_t planPrice) {
     price_t price = m_sp ? m_sp->getRealSellPrice(src_today.datetime, planPrice) : planPrice;
-    return fixupSlippagePrice(name(), src_today, planPrice, price, "sell");
+    return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "sell");
 }
 
 json System::lastSuggestion() const {
