@@ -11,7 +11,9 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/data_driver/DataDriverFactory.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_manage/crt/TC_Zero.h>
 #include <hikyuu/trade_sys/moneymanager/MoneyManagerBase.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCapital.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 
@@ -538,6 +540,36 @@ TEST_CASE("test_MoneyManager_short_side_defaults") {
     CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
     CHECK_UNARY(
       (mm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_getSellShortNumber_lot_align") {
+    StockManager& sm = StockManager::instance();
+
+    /** @arg sh600000 has minTradeNumber == 100: a fractional size is aligned down to the lot
+     * size (cash 10000 / capital 7 = 1428.57 -> 1400) */
+    Stock stock = sm["sh600000"];
+    REQUIRE_UNARY(!stock.isNull());
+    auto mm = MM_FixedCapital(7.0);
+    mm->setTM(crtTM(Datetime(200001010000), 10000.0, TC_Zero()));
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 1400.0);
+
+    /** @arg the size is clamped to maxTradeNumber: a stock with maxTradeNumber == 150 */
+    Stock small_stock("TEST", "MMSHORT", "MM Short Align", 1, true, Datetime(199001010000),
+                      Datetime(209901010000), 1.0, 1.0, 2, 1, 150);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    small_stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!small_stock.isNull());
+    auto mm2 = MM_FixedCapital(1.0);
+    mm2->setTM(crtTM(Datetime(200001010000), 10000.0, TC_Zero()));
+    CHECK_EQ(mm2->getSellShortNumber(Datetime(200001010000), small_stock, 10.0, 1.0, PART_SIGNAL),
+             150.0);
+
+    /** @arg below the lot size: rejected */
+    auto mm3 = MM_FixedCapital(10000.0);
+    mm3->setTM(crtTM(Datetime(200001010000), 100.0, TC_Zero()));
+    CHECK_EQ(mm3->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
 }
 
 /** @par Test points */

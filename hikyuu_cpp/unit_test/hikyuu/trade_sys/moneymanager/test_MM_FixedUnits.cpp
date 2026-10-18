@@ -51,6 +51,25 @@ TEST_CASE("test_MM_FixedUnits") {
 }
 
 /** @par Test points */
+TEST_CASE("test_MM_FixedUnits_short") {
+    // sh000001: minTradeNumber == 1, unit == 1
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg the short entry uses the same formula as the long buy: max(cash, initCash) / n /
+     * risk with the short per-share risk (the stop-loss price minus the short entry price) */
+    auto tm = crtTM(Datetime(200001010000), 10000.0, TC_Zero());
+    auto mm = MM_FixedUnits(2);
+    mm->setTM(tm);
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 2.0, 2.0, PART_SIGNAL), 2500.0);
+
+    /** @arg the short cover liquidates the entire position */
+    CHECK_UNARY(
+      (mm->getBuyShortNumber(Datetime(200001010000), stock, 2.0, 2.0, PART_SIGNAL) == MAX_DOUBLE));
+}
+
+/** @par Test points */
 TEST_CASE("test_MM_FixedUnits_query_no_side_effect") {
     // The quantity query is read-only: repeated queries neither append trade records nor change
     // the cash

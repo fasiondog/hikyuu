@@ -53,4 +53,25 @@ TEST_CASE("test_MM_WilliamsFixedRisk_getBuyNumber") {
     CHECK_EQ(mm2->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 50.0);
 }
 
+/** @par Test points */
+TEST_CASE("test_MM_WilliamsFixedRisk_short") {
+    Stock stock("TEST", "MMWFR", "MM Williams Fixed Risk", 1, true, Datetime(199001010000),
+                Datetime(209901010000), 1.0, 1.0, 2, 1, 1000000);
+    Parameter driver_param;
+    driver_param.set<string>("type", "DoNothing");
+    stock.setKDataDriver(DataDriverFactory::getKDataDriverPool(driver_param));
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg The short entry uses the same sizing as the long buy: 100000 * 0.1 / 1000 = 10, and
+     * the per-share risk is not used */
+    auto mm = MM_WilliamsFixedRisk(0.1, 1000.0);
+    mm->setTM(crtTM(Datetime(200001010000), 100000.0));
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10.0);
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 5.0, PART_SIGNAL), 10.0);
+
+    /** @arg The short cover liquidates the entire position */
+    CHECK_UNARY(
+      (mm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
+}
+
 /** @} */
