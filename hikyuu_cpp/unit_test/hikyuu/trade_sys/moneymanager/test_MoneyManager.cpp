@@ -12,6 +12,8 @@
 #include <hikyuu/data_driver/DataDriverFactory.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/MoneyManagerBase.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 
 using namespace hku;
 
@@ -513,6 +515,28 @@ TEST_CASE("test_MoneyManager_clone_and_reset_state") {
     CHECK_EQ(raw->getQuery().kType(), KQuery::MIN);
     p->reset();
     CHECK_EQ(raw->getQuery().kType(), KQuery::DAY);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_short_side_defaults") {
+    // The built-in MMs can cover a short but cannot open one, except MM_FixedCount which sizes
+    // the short entry by n; the matrix is documented in the money_manager docs
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh600000"];
+
+    /** @arg MM_FixedCount: the only built-in MM that opens shorts, sized by n; cover all */
+    auto fcm = MM_FixedCount(300);
+    fcm->setTM(crtTM());
+    CHECK_EQ(fcm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 300.0);
+    CHECK_UNARY(
+      (fcm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
+
+    /** @arg the other built-in MMs fall back to the base defaults: no short entry, cover all */
+    auto mm = MM_Nothing();
+    mm->setTM(crtTM());
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+    CHECK_UNARY(
+      (mm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
 }
 
 /** @} */

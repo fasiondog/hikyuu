@@ -122,6 +122,31 @@ Fixed-Percentage Risk Position Sizing
     :return: the money management strategy instance
 
 
+Long/Short Trading Capability
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The long side (buy to open, sell to close) is supported by every strategy. The short side
+defaults to "can cover but cannot open":
+
+.. list-table::
+   :header-rows: 1
+
+   * - Strategy
+     - Short entry (``_get_sell_short_num``)
+     - Short cover (``_get_buy_short_num``)
+   * - MM_FixedCount
+     - sells in tranches of n
+     - covers the entire position
+   * - the other built-in strategies (MM_FixedCountTps included)
+     - 0 (no short entry)
+     - covers the entire position
+
+.. note::
+
+    To open shorts, use MM_FixedCount, or override ``_get_sell_short_num`` /
+    ``_get_buy_short_num`` in a Python custom money management strategy.
+
+
 Custom Money Management Strategies
 ----------------------------------
 

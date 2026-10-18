@@ -117,6 +117,29 @@
     :return: 资金管理策略实例
 
 
+多空交易能力
+^^^^^^^^^^^^^^^^^^^^
+
+多头方向（买入建仓、卖出平仓）各策略均支持。空头方向默认"能平不能开"：
+
+.. list-table::
+   :header-rows: 1
+
+   * - 策略
+     - 开空（_get_sell_short_num）
+     - 平空（_get_buy_short_num）
+   * - MM_FixedCount
+     - 按 n 分批卖出
+     - 全部平空
+   * - 其余内建策略（含 MM_FixedCountTps）
+     - 0（禁止开空）
+     - 全部平空
+
+.. note::
+
+    需要开空能力时，可使用 MM_FixedCount，或以 Python 自定义资金管理策略重载 _get_sell_short_num / _get_buy_short_num。
+
+
 自定义资金管理策略
 --------------------
 
