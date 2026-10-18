@@ -108,7 +108,8 @@ public:
     }
 };
 
-class SelfCloneMoneyManagerTest : public MoneyManagerBase {
+class SelfCloneMoneyManagerTest : public MoneyManagerBase,
+                                  public std::enable_shared_from_this<SelfCloneMoneyManagerTest> {
 public:
     SelfCloneMoneyManagerTest() : MoneyManagerBase("SelfCloneMoneyManagerTest") {}
     virtual ~SelfCloneMoneyManagerTest() {}
