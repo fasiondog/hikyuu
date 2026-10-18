@@ -116,6 +116,33 @@ TEST_CASE("test_Slippage_clone_reseed") {
 }
 
 /** @par Test points */
+TEST_CASE("test_Slippage_seed_takes_effect_on_reset") {
+    // The seed is only read in reset(): setting it through set_param does not reseed by itself
+    auto sp1 = SP_Uniform(-0.05, 0.05);
+    auto sp2 = SP_Uniform(-0.05, 0.05);
+    sp1->setParam<int64_t>("seed", 42);
+    sp2->setParam<int64_t>("seed", 42);
+
+    /** @arg before reset() the two instances do not share a sequence */
+    bool same = true;
+    for (int i = 0; i < 5; ++i) {
+        same = same && (sp1->getRealBuyPrice(Datetime(202201010930), 10.0) ==
+                        sp2->getRealBuyPrice(Datetime(202201010930), 10.0));
+    }
+    CHECK_UNARY(!same);
+
+    /** @arg after reset() both replay the same sequence */
+    sp1->reset();
+    sp2->reset();
+    for (int i = 0; i < 5; ++i) {
+        CHECK_EQ(sp1->getRealBuyPrice(Datetime(202201010930), 10.0),
+                 sp2->getRealBuyPrice(Datetime(202201010930), 10.0));
+        CHECK_EQ(sp1->getRealSellPrice(Datetime(202201010930), 10.0),
+                 sp2->getRealSellPrice(Datetime(202201010930), 10.0));
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_TruncNormal_inverse_cdf") {
     auto sp = SP_TruncNormal(0.0, 0.05, -0.1, 0.1);
     double minv = 1e9, maxv = -1e9;
