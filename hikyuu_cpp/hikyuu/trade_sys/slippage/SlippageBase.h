@@ -18,7 +18,7 @@ namespace hku {
  * Base class of the slippage algorithm
  * @ingroup Slippage
  */
-class HKU_API SlippageBase : public enable_shared_from_this<SlippageBase> {
+class HKU_API SlippageBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
