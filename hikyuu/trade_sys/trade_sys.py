@@ -15,11 +15,11 @@ def part_iter(self):
 ConditionBase.__iter__ = part_iter
 
 
-def part_init(self, name='', params={}):
+def part_init(self, name='', params=None):
     super(self.__class__, self).__init__(name)
     self._name = name
-    self._params = params
-    for k, v in params.items():
+    self._params = params or {}
+    for k, v in self._params.items():
         self.set_param(k, v)
 
 
@@ -51,7 +51,7 @@ Portfolio = MultiSystem
 # ------------------------------------------------------------------
 # condition
 # ------------------------------------------------------------------
-def crtCN(func, params={}, name='crtCN'):
+def crtCN(func, params=None, name='crtCN'):
     """
     Quickly create a system validity condition
 
@@ -71,7 +71,7 @@ def crtCN(func, params={}, name='crtCN'):
 # ------------------------------------------------------------------
 # environment
 # ------------------------------------------------------------------
-def crtEV(func, params={}, name='crtEV'):
+def crtEV(func, params=None, name='crtEV'):
     """
     Quickly create a market environment strategy
 
@@ -90,7 +90,7 @@ def crtEV(func, params={}, name='crtEV'):
 # ------------------------------------------------------------------
 # moneymanager
 # ------------------------------------------------------------------
-def crtMM(get_buy_num, get_sell_num=None, params={}, name='crtMM', buy_notify=None, sell_notify=None):
+def crtMM(get_buy_num, get_sell_num=None, params=None, name='crtMM', buy_notify=None, sell_notify=None):
     """
     Quickly create a money management strategy
 
@@ -118,7 +118,7 @@ def crtMM(get_buy_num, get_sell_num=None, params={}, name='crtMM', buy_notify=No
 # ------------------------------------------------------------------
 # profitgoal
 # ------------------------------------------------------------------
-def crtPG(get_goal, calculate=None, params={}, name='crtPG', buy_notify=None, sell_notify=None):
+def crtPG(get_goal, calculate=None, params=None, name='crtPG', buy_notify=None, sell_notify=None):
     """
     Quickly create a profit goal strategy
 
@@ -146,7 +146,7 @@ def crtPG(get_goal, calculate=None, params={}, name='crtPG', buy_notify=None, se
 # ------------------------------------------------------------------
 # signal
 # ------------------------------------------------------------------
-def crtSG(func, params={}, name='crtSG'):
+def crtSG(func, params=None, name='crtSG'):
     """
     Quickly create a signal generator
 
@@ -165,7 +165,7 @@ def crtSG(func, params={}, name='crtSG'):
 # ------------------------------------------------------------------
 # Selector
 # ------------------------------------------------------------------
-def crtSE(calculate, get_selected, params={}, name='crtSE'):
+def crtSE(calculate, get_selected, params=None, name='crtSE'):
     """
     Quickly create a trading object selection algorithm
 
@@ -187,7 +187,7 @@ def crtSE(calculate, get_selected, params={}, name='crtSE'):
 # ------------------------------------------------------------------
 # allocate_funds
 # ------------------------------------------------------------------
-def crtAF(allocate_func, params={}, name='crtAF', to_targets_func=None, check_risk_func=None):
+def crtAF(allocate_func, params=None, name='crtAF', to_targets_func=None, check_risk_func=None):
     """
     Quickly create an asset allocation algorithm (AF), used by the aggregate system
     (MultiSystem) only. The three callbacks correspond to the L1/L2/L3 layers and are executed
@@ -225,7 +225,7 @@ def crtAF(allocate_func, params={}, name='crtAF', to_targets_func=None, check_ri
 # ------------------------------------------------------------------
 # multi_factor
 # ------------------------------------------------------------------
-def crtMF(calculate_func, params={}, name='crtMF'):
+def crtMF(calculate_func, params=None, name='crtMF'):
     """
     Quickly create a multi-factor composition algorithm
 
@@ -244,7 +244,7 @@ def crtMF(calculate_func, params={}, name='crtMF'):
 # ------------------------------------------------------------------
 # slippage
 # ------------------------------------------------------------------
-def crtSP(get_real_buy_price, get_real_sell_price, params={}, name='crtSP', calculate=None):
+def crtSP(get_real_buy_price, get_real_sell_price, params=None, name='crtSP', calculate=None):
     """
     Quickly create a slippage algorithm
 
@@ -270,7 +270,7 @@ def crtSP(get_real_buy_price, get_real_sell_price, params={}, name='crtSP', calc
 # ------------------------------------------------------------------
 # stoploss
 # ------------------------------------------------------------------
-def crtST(get_price, params={}, name='crtST', calculate=None, get_short_price=None):
+def crtST(get_price, params=None, name='crtST', calculate=None, get_short_price=None):
     """
     Quickly create a stop-loss/take-profit strategy
 
@@ -295,7 +295,7 @@ def crtST(get_price, params={}, name='crtST', calculate=None, get_short_price=No
 # ------------------------------------------------------------------
 # SCFilter
 # ------------------------------------------------------------------
-def crtSCFilter(filter_func, params={}, name='crtSCFilter'):
+def crtSCFilter(filter_func, params=None, name='crtSCFilter'):
     """
     Quickly create a score filter
 
@@ -314,7 +314,7 @@ def crtSCFilter(filter_func, params={}, name='crtSCFilter'):
 # ------------------------------------------------------------------
 # Normalize
 # ------------------------------------------------------------------
-def crtNorm(normalize_func, params={}, name='crtNorm'):
+def crtNorm(normalize_func, params=None, name='crtNorm'):
     """
     Quickly create algorithm functions such as standardization/normalization
 
