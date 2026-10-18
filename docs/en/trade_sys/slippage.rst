@@ -64,6 +64,10 @@ Built-in Slippage Algorithms
 
     The random slippage algorithms (SP_Uniform / SP_Normal / SP_LogNormal / SP_TruncNormal) hold an internal random engine that is not thread-safe. For concurrent backtests (batch backtests, WalkForward, etc.) each instance must be cloned; do not set ``shared_sp`` to ``True`` to share one instance across multiple Systems.
 
+.. note::
+
+    The reproducibility of the random slippage algorithms has a boundary: ``seed`` guarantees an identical sequence only within the same platform and the same standard library implementation. SP_Normal / SP_LogNormal / SP_Uniform rely on the standard library distributions (``std::normal_distribution`` / ``std::lognormal_distribution`` / ``std::uniform_real_distribution``), whose sampling algorithm is left to the implementation, so the same ``seed`` does not give the same sequence on libstdc++ / libc++ / MSVC; SP_TruncNormal samples through its own inverse CDF and is not affected by that. The sequence of one instance also depends on how many times and in which order the hooks are called. Cross-platform and cross-standard-library reproducibility is not promised.
+
 
 Custom Slippage Algorithm
 -------------------------

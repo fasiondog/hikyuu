@@ -64,6 +64,10 @@
 
     随机移滑价差（SP_Uniform / SP_Normal / SP_LogNormal / SP_TruncNormal）内部持有随机数引擎，并非线程安全。并发回测（批量回测、WalkForward 等）必须各自克隆实例，不要将 ``shared_sp`` 设为 ``True`` 在多个 System 间共享同一实例。
 
+.. note::
+
+    随机移滑价差的可复现性有边界：``seed`` 仅在**同一平台、同一标准库实现**下保证相同序列。SP_Normal / SP_LogNormal / SP_Uniform 依赖标准库分布（``std::normal_distribution`` / ``std::lognormal_distribution`` / ``std::uniform_real_distribution``），其抽取算法由标准库实现自行决定，同一 ``seed`` 在 libstdc++ / libc++ / MSVC 上并不相同；SP_TruncNormal 使用自带的逆 CDF 采样，不受该项影响。此外，同一实例的序列还取决于钩子的调用次数与顺序。跨平台、跨标准库的复现不在承诺范围内。
+
 
 自定义移滑价差算法
 ------------------
