@@ -218,12 +218,44 @@ TEST_CASE("test_Environment_multi") {
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg Neither ev is empty */
-    ev1 = std::make_shared<EnvironmentTest1>();
-    ev2 = std::make_shared<EnvironmentTest2>();
-    REQUIRE((ev1 & ev2));
+    /** @arg Neither ev is empty and both sides are valid on the common dates */
+    ev1 = std::make_shared<EnvironmentTest1>();                  // d1:2, d2:3, d3:2 (all valid)
+    EVPtr ev3 = std::make_shared<EnvironmentTestOutOfOrder2>();  // d1:1, d3:2 (all valid)
+    REQUIRE((ev1 && ev3));
+    ret->reset();
+    ret = ev1 * ev3;
+    ret->setQuery(query);
+    ind = ret->getValues();
+    CHECK_EQ(ind.size(), 2);
+
+    expect = {
+      {Datetime(20010101), 2.0},
+      {Datetime(20010103), 4.0},
+    };
+    check_expect(ret, expect);
+    CHECK(ret->isValid(Datetime(20010101)));
+    CHECK(ret->isValid(Datetime(20010103)));
+
+    /** @arg One side is valid and the other is invalid on the common date: a disagreement carries
+     * no combined strength, so the day is left out and stays invalid */
+    ev1 = std::make_shared<EnvironmentTest1>();  // d3: 2.0 valid
+    ev2 = std::make_shared<EnvironmentTest2>();  // d3: -4.0 invalid
+    REQUIRE((ev1 && ev2));
     ret->reset();
     ret = ev1 * ev2;
+    ret->setQuery(query);
+    ind = ret->getValues();
+    CHECK_EQ(ind.size(), 0);
+    CHECK_FALSE(ret->isValid(Datetime(20010103)));
+
+    /** @arg Both sides are invalid (negative) on the common date: the raw product would be
+     * positive (+8.0), so the value is forced to -(abs(-2) * abs(-4)) = -8.0 and the day stays
+     * invalid */
+    EVPtr evNeg = std::make_shared<EnvironmentTestOutOfOrder>();  // d3: -2.0 invalid
+    ev2 = std::make_shared<EnvironmentTest2>();                   // d3: -4.0 invalid
+    REQUIRE((evNeg && ev2));
+    ret->reset();
+    ret = evNeg * ev2;
     ret->setQuery(query);
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 1);
@@ -232,6 +264,7 @@ TEST_CASE("test_Environment_multi") {
       {Datetime(20010103), -8.0},
     };
     check_expect(ret, expect);
+    CHECK_FALSE(ret->isValid(Datetime(20010103)));
 }
 
 /** @par Test points */
@@ -265,12 +298,43 @@ TEST_CASE("test_Environment_div") {
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 0);
 
-    /** @arg Neither ev is empty */
-    ev1 = std::make_shared<EnvironmentTest1>();
-    ev2 = std::make_shared<EnvironmentTest2>();
-    REQUIRE((ev1 & ev2));
+    /** @arg Neither ev is empty and both sides are valid on the common dates */
+    ev1 = std::make_shared<EnvironmentTest1>();                  // d1:2, d2:3, d3:2 (all valid)
+    EVPtr ev3 = std::make_shared<EnvironmentTestOutOfOrder2>();  // d1:1, d3:2 (all valid)
+    REQUIRE((ev1 && ev3));
+    ret->reset();
+    ret = ev1 / ev3;
+    ret->setQuery(query);
+    ind = ret->getValues();
+    CHECK_EQ(ind.size(), 2);
+
+    expect = {
+      {Datetime(20010101), 2.0},
+      {Datetime(20010103), 1.0},
+    };
+    check_expect(ret, expect);
+    CHECK(ret->isValid(Datetime(20010101)));
+    CHECK(ret->isValid(Datetime(20010103)));
+
+    /** @arg One side is valid and the other is invalid on the common date: a disagreement carries
+     * no combined strength, so the day is left out and stays invalid */
+    ev1 = std::make_shared<EnvironmentTest1>();  // d3: 2.0 valid
+    ev2 = std::make_shared<EnvironmentTest2>();  // d3: -4.0 invalid
+    REQUIRE((ev1 && ev2));
     ret->reset();
     ret = ev1 / ev2;
+    ret->setQuery(query);
+    ind = ret->getValues();
+    CHECK_EQ(ind.size(), 0);
+    CHECK_FALSE(ret->isValid(Datetime(20010103)));
+
+    /** @arg Both sides are invalid (negative) on the common date: the raw ratio would be positive
+     * (+0.5), so the value is forced to -(abs(-2) / abs(-4)) = -0.5 and the day stays invalid */
+    EVPtr evNeg = std::make_shared<EnvironmentTestOutOfOrder>();  // d3: -2.0 invalid
+    ev2 = std::make_shared<EnvironmentTest2>();                   // d3: -4.0 invalid
+    REQUIRE((evNeg && ev2));
+    ret->reset();
+    ret = evNeg / ev2;
     ret->setQuery(query);
     ind = ret->getValues();
     CHECK_EQ(ind.size(), 1);
@@ -279,6 +343,7 @@ TEST_CASE("test_Environment_div") {
       {Datetime(20010103), -0.5},
     };
     check_expect(ret, expect);
+    CHECK_FALSE(ret->isValid(Datetime(20010103)));
 }
 
 /** @par Test points */

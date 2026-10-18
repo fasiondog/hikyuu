@@ -68,6 +68,8 @@ public:
      * @param datetime the valid date of the system
      * @param value 1.0 by default; greater than 0 means valid and less than or equal to 0 means
      *              invalid
+     * @note A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates
+     *       the value instead of replacing it
      */
     void _addValid(const Datetime& datetime, price_t value = 1.0);
 
@@ -75,15 +77,25 @@ public:
      * Judge whether the external environment of the given date is valid
      * @param datetime the given date
      * @return true valid | false invalid
+     * @note The validity is exactly "the stored value of the date is > 0"; a date that was never
+     *       added is invalid
      */
     bool isValid(const Datetime& datetime) const;
 
+    /**
+     * Get the stored value of the given date
+     * @param datetime the given date
+     * @return the stored value, or 0.0 for a date that was never added
+     * @note 0.0 is returned both for an invalid date and for an absent one; use isValid to tell
+     *       the validity
+     */
     price_t getValue(const Datetime& datetime) const;
 
     /**
-     * Get the actual value in the form of an indicator, it is as long as the trading object; <=0
-     * means invalid and >0 means the system is valid
-     * @note A time series indicator with the dates
+     * Get the values as a time-series indicator: one record per date registered through _addValid,
+     * ordered by date; <= 0 means invalid and > 0 means valid
+     * @note The date set and the meaning of the value depend on the operator that produced this
+     *       object, see the operator notes above
      */
     Indicator getValues() const;
 
@@ -111,12 +123,17 @@ public:
      * Combination operators intentionally use different strategies over these refs, driven by
      * their result semantics:
      *  - And / Multi / Div (intersection): two-pointer merge over the two ordered date_index
-     *    maps; the output is the date intersection only, so there is no base side to pre-fill.
+     *    maps, so there is no base side to pre-fill. And keeps only the dates valid (> 0) on both
+     *    sides, with the value fixed to 1.0. Multi / Div keep only the dates where both sides
+     *    agree: both valid (> 0) gives the product / ratio, both invalid (< 0) gives its negation
+     *    (kept negative so that the day stays invalid) - a disagreement (mixed sign) or a zero
+     *    side carries no combined strength and is left out.
      *  - Add / Sub (ev1 base + ev2 align): every date (valid or not) of ev1 and ev2 belongs to
      *    the result, so ev1 is laid down as the base and ev2 is aligned against it; ev1-only
-     *    dates need no work and ev2-only dates go through _addValid.
-     *  - Or (union of valid): a date is emitted iff it is valid on at least one side, so both
-     *    maps are walked and the date is pushed only when a side is valid.
+     *    dates need no work and ev2-only dates go through _addValid. The value is the sum (Add) /
+     *    the difference (Sub), an ev2-only date contributing -ev2 to Sub.
+     *  - Or (union of valid): a date is kept iff it is valid on at least one side, with the value
+     *    fixed to 1.0, so both maps are walked and the date is pushed only when a side is valid.
      * Do NOT "unify" these: a laydown for Or would add ev1's invalid dates as 0.0 to the output
      * date set; an intersection for Add/Sub would drop ev1-only/ev2-only dates; a laydown for
      * And/Multi/Div would wrongly keep ev1-only dates. Each file's _calculate spells out its own

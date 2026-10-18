@@ -49,6 +49,12 @@ void export_Environment(py::module& m) {
       m, "EnvironmentBase", py::dynamic_attr(),
       R"(The market environment strategy base class
 
+A market environment is a series of dates with values; a date is valid when its stored value is
+greater than 0, which is exactly what is_valid tests.
+
+The strategies can be combined with the operators &, |, +, -, * and /, and the result is itself
+an EnvironmentBase that can be combined further (see the operator docstrings, e.g. __mul__).
+
 The custom market environment strategy interfaces:
 
     - _calculate : [Required] The subclass calculation interface
@@ -93,15 +99,21 @@ The custom market environment strategy interfaces:
     Whether the system is valid at the specified time
 
     :param Datetime datetime: the specified time
-    :return: True valid | False invalid)")
+    :return: True valid | False invalid
+
+    The validity is exactly "the stored value of the date is greater than 0"; a date that was
+    never registered through _add_valid is invalid.)")
 
       .def("_add_valid", &EnvironmentBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
-           R"(_add_valid(self, datetime)
+           R"(_add_valid(self, datetime[, value=1.0])
 
     Add a valid time, called in _calculate
 
     :param Datetime datetime: the valid time
-    :param float value: defaulting to 1.0; greater than 0 means valid, and less than or equal to 0 means invalid)")
+    :param float value: defaulting to 1.0; greater than 0 means valid, and less than or equal to 0 means invalid
+
+    A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the
+    value instead of replacing it.)")
 
       .def("reset", &EnvironmentBase::reset, "The reset operation")
       .def("clone", &EnvironmentBase::clone, "The clone operation")
@@ -111,23 +123,69 @@ The custom market environment strategy interfaces:
       .def("_calculate", &EnvironmentBase::_calculate,
            "[Overload interface] The subclass calculation interface")
 
-      .def("__and__",
-           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self & other; })
+      .def(
+        "__and__",
+        [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self & other; },
+        R"(__and__(self, other)
 
-      .def("__or__",
-           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self | other; })
+    And (self & other): the day is valid only where both sides are valid (> 0), with the value
+    fixed to 1.0. Both sides must be present, otherwise the result is always invalid.)")
 
-      .def("__add__",
-           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self + other; })
+      .def(
+        "__or__",
+        [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self | other; },
+        R"(__or__(self, other)
 
-      .def("__sub__",
-           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self - other; })
+    Or (self | other): the day is valid where at least one side is valid (> 0), with the value
+    fixed to 1.0. When one side is empty, the single-side mode is used.)")
 
-      .def("__mul__",
-           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self * other; })
+      .def(
+        "__add__",
+        [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self + other; },
+        R"(__add__(self, other)
 
-      .def("__truediv__",
-           [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self / other; })
+    Add (self + other): every date of both sides is kept, valid or not; the value is the sum, and
+    a date present on only one side takes that side's value. When one side is empty, the
+    single-side mode is used.)")
+
+      .def(
+        "__sub__",
+        [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self - other; },
+        R"(__sub__(self, other)
+
+    Sub (self - other): every date of both sides is kept, valid or not; the value is the
+    difference, and a date present only on the right side takes -other. When one side is empty,
+    the single-side mode is used.)")
+
+      .def(
+        "__mul__",
+        [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self * other; },
+        R"(__mul__(self, other)
+
+    Multi (self * other): only the dates where both sides agree are kept, and the signs of the two
+    sides decide the result:
+
+        left > 0 and right > 0 : self * other (valid)
+        left < 0 and right < 0 : -(abs(self) * abs(other)) (invalid)
+        mixed sign             : not output (disagreement, no combined strength)
+        either side is 0       : not output (that side has no value)
+
+    Both sides must be present, otherwise the result is always invalid.)")
+
+      .def(
+        "__truediv__",
+        [](const EnvironmentPtr& self, const EnvironmentPtr& other) { return self / other; },
+        R"(__truediv__(self, other)
+
+    Div (self / other): only the dates where both sides agree are kept, and the signs of the two
+    sides decide the result:
+
+        left > 0 and right > 0 : self / other (valid)
+        left < 0 and right < 0 : -(abs(self) / abs(other)) (invalid)
+        mixed sign             : not output (disagreement, no combined strength)
+        either side is 0       : not output (that side has no value)
+
+    Both sides must be present, otherwise the result is always invalid.)")
 
         DEF_PICKLE(EnvironmentPtr);
 
