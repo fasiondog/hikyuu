@@ -186,7 +186,7 @@
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格
-        :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+        :param float risk: 交易承担的每股风险，必须大于 0；非正值或 NaN 时被拒绝，返回 0
         :param System.Part part_from: 来源系统组件
         :return: 可买入数量
         :rtype: float
@@ -230,7 +230,7 @@
         :param Datetime datetime: 交易时间
         :param Stock stock: 交易对象
         :param float price: 交易价格
-        :param float risk: 交易承担的风险，如果为0，表示全部损失，即市值跌至0元
+        :param float risk: 交易承担的每股风险，必须大于 0；非正值或 NaN 时被拒绝，返回 0
         :param System.Part part_from: 来源系统组件
         :return: 可买入数量
         :rtype: float

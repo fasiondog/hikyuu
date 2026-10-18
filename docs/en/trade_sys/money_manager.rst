@@ -192,7 +192,7 @@ Money Management Strategy Base Class
         :param Datetime datetime: the trade time
         :param Stock stock: the instrument (security)
         :param float price: the trade price
-        :param float risk: the per-share risk assumed by the trade; a value of 0 denotes a total loss, i.e. the market value falling to zero
+        :param float risk: the per-share risk taken by the trade; it must be positive, a non-positive value (NaN included) is rejected and 0 is returned
         :param System.Part part_from: the originating system part
         :return: the buyable share quantity
         :rtype: float
@@ -236,7 +236,7 @@ Money Management Strategy Base Class
         :param Datetime datetime: the trade time
         :param Stock stock: the instrument (security)
         :param float price: the trade price
-        :param float risk: the per-share risk assumed by the trade; a value of 0 denotes a total loss, i.e. the market value falling to zero
+        :param float risk: the per-share risk taken by the trade; it must be positive, a non-positive value (NaN included) is rejected and 0 is returned
         :param System.Part part_from: the originating system part
         :return: the buyable share quantity
         :rtype: float
