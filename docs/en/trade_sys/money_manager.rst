@@ -14,6 +14,14 @@ Common parameters:
     * **disable_ev_force_clean_position=False** *(bool)* : Disable forced liquidation when the market environment (EV) becomes invalid
     * **disable_cn_force_clean_position=False** *(bool)* : Disable forced liquidation when the system validity condition (CN) becomes invalid
 
+    .. note::
+        A money management instance keeps the consecutive buy/sell counters of every security
+        (``current_buy_count`` / ``current_sell_count``, which the tier-based strategies such as
+        :func:`MM_FixedCountTps` use to advance the tranche) and these counters are not locked. With
+        ``shared_mm=True`` of the ``System``, multiple systems write the same instance concurrently,
+        so a parallel backtest has a data race and corrupts the tranches; keep an instance per system
+        (``shared_mm=False``, the default).
+
 
 Built-in Money Management Strategies
 ------------------------------------

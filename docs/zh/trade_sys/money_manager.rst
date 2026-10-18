@@ -11,6 +11,12 @@
     * **disable_ev_force_clean_position=False** *(bool)* : 禁用市场环境失效时强制清仓
     * **disable_cn_force_clean_position=False** *(bool)* : 禁用系统有效条件失效时强制清仓
 
+    .. note::
+       资金管理策略实例内部保存每个标的的连续买入/卖出计数（``current_buy_count`` / ``current_sell_count``，
+       档位型策略如 :func:`MM_FixedCountTps` 依赖它推进档位），该计数无锁。``System`` 的 ``shared_mm=True``
+       会让多个系统并发写同一实例，并行回测时产生数据竞争、档位错乱；请为每个系统保留独立实例
+       （``shared_mm=False``，默认值）。
+
 
 内建资金管理策略
 ----------------
