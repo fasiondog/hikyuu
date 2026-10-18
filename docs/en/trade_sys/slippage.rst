@@ -19,7 +19,7 @@ Built-in Slippage Algorithms
 
     Fixed absolute-price slippage: the actual buy price equals the planned buy price plus the offset, and the actual sell price equals the planned sell price minus the offset.
 
-    :param float value: the absolute price offset
+    :param float value: the absolute price offset, must be >= 0
     :return: the slippage algorithm instance
 
 .. py:function:: SP_Uniform([min_value=-0.05, max_value=0.05])
@@ -27,7 +27,7 @@ Built-in Slippage Algorithms
     Random slippage with a uniform distribution. [min_value, max_value] is the offset *amplitude range*: the sampled value is folded to a non-negative amplitude and applied only in the unfavorable direction (added on buys, subtracted on sells), so it is a one-sided offset rather than a symmetric +/- offset.
 
     :param float min_value: the lower bound of the offset amplitude range
-    :param float max_value: the upper bound of the offset amplitude range
+    :param float max_value: the upper bound of the offset amplitude range, must be >= min_value
     :return: the slippage algorithm instance
 
 .. py:function:: SP_Normal([mean=0.0, stddev=0.05])
@@ -39,7 +39,7 @@ Built-in Slippage Algorithms
     With ``mean`` = 0, ``E|X| = stddev * sqrt(2/pi)``, i.e. about ``0.7979 * stddev``: ``SP_Normal(0.0, 0.05)`` gives an expected slippage of about 4%. The ``mean`` only becomes visible when it is comparable to ``stddev`` (``SP_Normal(0.05, 0.05)`` gives about 5.8%); as it grows far beyond ``stddev``, ``E|X|`` approaches ``mean`` - ``mean`` only shifts the center of the distribution before folding and is not the expected slippage itself
 
     :param float mean: the mean of the normal distribution (the center before folding; not the actual expected slippage)
-    :param float stddev: the standard deviation of the normal distribution
+    :param float stddev: the standard deviation of the normal distribution, must be >= 0
     :return: the slippage algorithm instance
 
 .. py:function:: SP_LogNormal([mean=0.0, stddev=0.05])
@@ -47,7 +47,7 @@ Built-in Slippage Algorithms
     Random slippage with a log-normal distribution. The sampled value is folded to a non-negative amplitude and applied only in the unfavorable direction (added on buys, subtracted on sells).
 
     :param float mean: the mean of the log-normal distribution
-    :param float stddev: the standard deviation of the log-normal distribution
+    :param float stddev: the standard deviation of the log-normal distribution, must be >= 0
     :return: the slippage algorithm instance
 
 .. py:function:: SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
@@ -55,14 +55,18 @@ Built-in Slippage Algorithms
     Random slippage with a truncated normal distribution. The sampled value is folded to a non-negative amplitude and applied only in the unfavorable direction, and the sample is drawn analytically (inverse-CDF) from N(mean, stddev^2) truncated to [min_value, max_value].
 
     :param float mean: the mean of the underlying normal distribution
-    :param float stddev: the standard deviation of the underlying normal distribution
+    :param float stddev: the standard deviation of the underlying normal distribution, must be >= 0
     :param float min_value: the lower truncation bound
-    :param float max_value: the upper truncation bound
+    :param float max_value: the upper truncation bound, must be >= min_value
     :return: the slippage algorithm instance
 
 .. note::
 
     The random slippage algorithms (SP_Uniform / SP_Normal / SP_LogNormal / SP_TruncNormal) hold an internal random engine that is not thread-safe. For concurrent backtests (batch backtests, WalkForward, etc.) each instance must be cloned; do not set ``shared_sp`` to ``True`` to share one instance across multiple Systems.
+
+.. note::
+
+    Each random slippage carries a ``seed`` parameter (int64, default 0 = a random seed). A non-zero value makes the sequence of one instance reproducible after ``reset()``; ``seed`` is read only in ``reset()``, so setting it via ``set_param("seed", ...)`` takes effect only after an explicit ``reset()`` (inside the framework, ``System`` calls ``reset()`` before each ``run()``).
 
 .. note::
 

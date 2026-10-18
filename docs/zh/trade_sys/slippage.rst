@@ -19,7 +19,7 @@
 
     固定价格移滑价差算法，买入实际价格 = 计划买入价格 + 偏移价格，卖出实际价格 = 计划卖出价格 - 偏移价格
 
-    :param float value: 偏移价格
+    :param float value: 偏移价格，须 >= 0
     :return: 移滑价差算法实例
 
 .. py:function:: SP_Uniform([min_value=-0.05, max_value=0.05])
@@ -27,7 +27,7 @@
     均匀分布随机价格移滑价差算法。[min_value, max_value] 是偏移“幅度区间”：采样值取绝对值后只往不利方向（买入加、卖出减）叠加，因此并非对称的 ± 偏移。买入实际价格 = 计划买入价格 + 幅度，卖出实际价格 = 计划卖出价格 - 幅度
 
     :param float min_value: 偏移幅度区间下界
-    :param float max_value: 偏移幅度区间上界
+    :param float max_value: 偏移幅度区间上界，须 >= min_value
     :return: 移滑价差算法实例
 
 .. py:function:: SP_Normal([mean=0.0, stddev=0.05])
@@ -39,7 +39,7 @@
     ``mean`` = 0 时 ``E|X| = stddev * sqrt(2/pi)``，即约为 ``0.7979 * stddev``：``SP_Normal(0.0, 0.05)`` 的期望滑点约 4%。``mean`` 只有与 ``stddev`` 同量级时才明显（``SP_Normal(0.05, 0.05)`` 约 5.8%）；``mean`` 远大于 ``stddev`` 时 ``E|X|`` 趋近 ``mean`` —— ``mean`` 只决定折叠前分布的中心，不直接等于期望滑点
 
     :param float mean: 正态分布的均值（折叠前分布的中心，不是实际期望滑点）
-    :param float stddev: 正态分布的标准差
+    :param float stddev: 正态分布的标准差，须 >= 0
     :return: 移滑价差算法实例
 
 .. py:function:: SP_LogNormal([mean=0.0, stddev=0.05])
@@ -47,7 +47,7 @@
     对数正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加
 
     :param float mean: 对数正态分布的均值
-    :param float stddev: 对数正态分布的标准差
+    :param float stddev: 对数正态分布的标准差，须 >= 0
     :return: 移滑价差算法实例
 
 .. py:function:: SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
@@ -55,14 +55,18 @@
     截断正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加，样本从 [min_value, max_value] 上的截断正态分布中解析采样（逆 CDF）
 
     :param float mean: 截断正态分布的均值
-    :param float stddev: 截断正态分布的标准差
+    :param float stddev: 截断正态分布的标准差，须 >= 0
     :param float min_value: 最小截断值
-    :param float max_value: 最大截断值
+    :param float max_value: 最大截断值，须 >= min_value
     :return: 移滑价差算法实例
 
 .. note::
 
     随机移滑价差（SP_Uniform / SP_Normal / SP_LogNormal / SP_TruncNormal）内部持有随机数引擎，并非线程安全。并发回测（批量回测、WalkForward 等）必须各自克隆实例，不要将 ``shared_sp`` 设为 ``True`` 在多个 System 间共享同一实例。
+
+.. note::
+
+    四个随机移滑价差均带有 ``seed`` 参数（int64，默认 0 表示随机种子）。设为非 0 值后，同一实例在 ``reset()`` 后的序列可复现；``seed`` 只在 ``reset()`` 中被读取，因此 ``set_param("seed", ...)`` 后须显式调用 ``reset()`` 才生效（框架内 ``System`` 会在每次 ``run()`` 前调用 ``reset()``）。
 
 .. note::
 
