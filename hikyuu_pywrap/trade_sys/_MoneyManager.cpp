@@ -116,7 +116,9 @@ The custom money management strategy interfaces:
         [](MoneyManagerBase& mm, bool support) {
             HKU_CHECK(mm.isPythonObject(),
                       "Only a Python custom money manager can set support_mult_buy_sell!");
-            static_cast<PyMoneyManagerBase&>(mm).pySetSupportMultBuySell(support);
+            auto* py_mm = dynamic_cast<PyMoneyManagerBase*>(&mm);
+            HKU_CHECK(py_mm, "The python object wrapper of {} is missing!", mm.name());
+            py_mm->pySetSupportMultBuySell(support);
         },
         R"(Whether the MM supports multiple position building/reducing (default False)
 
