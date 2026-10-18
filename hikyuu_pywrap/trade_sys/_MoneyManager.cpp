@@ -256,7 +256,7 @@ The custom money management strategy interfaces:
     m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
           R"(MM_FixedCapitalFunds([capital = 10000.0])
 
-    The fixed total capital money management strategy. The buy quantity = the current total assets / capital. The base is the account total assets (including the market value of the held positions) instead of the available cash.
+    The fixed total capital money management strategy. The buy quantity = the current net assets / capital. The base is the account net assets (cash + market value of the held positions - short market value - borrowed cash) instead of the available cash.
 
     :param float capital: the fixed capital unit
     :return: the money management strategy instance)");

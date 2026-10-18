@@ -21,6 +21,8 @@ public:
     WilliamsFixedRiskMoneyManager();
     virtual ~WilliamsFixedRiskMoneyManager();
     virtual void _checkParam(const string& name) const override;
+    virtual double _getSellShortNumber(const Datetime& datetime, const Stock& stock, price_t price,
+                                       price_t risk, SystemPart from) override;
 };
 
 } /* namespace hku */

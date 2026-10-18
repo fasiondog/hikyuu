@@ -18,6 +18,7 @@
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_FixedPercent.h>
 #include <hikyuu/trade_sys/profitgoal/ProfitGoalBase.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/stoploss/StoplossBase.h>
@@ -206,6 +207,26 @@ const TradeRecord* findFirstTrade(const TradeRecordList& trs, BUSINESS business)
                              [&](const TradeRecord& tr) { return tr.business == business; });
     return iter == trs.end() ? nullptr : &(*iter);
 }
+
+// Emits scripted long/short signals on one account: buy -> sell (close the long) -> sell (open
+// the short) -> buy (cover the short)
+class Iss029MixedSG : public SignalBase {
+public:
+    Iss029MixedSG() : SignalBase("ISS029_MixedSG") {
+        setParam<bool>("support_borrow_stock", true);
+    }
+
+    virtual SignalPtr _clone() override {
+        return make_shared<Iss029MixedSG>();
+    }
+
+    virtual void _calculate(const KData& kdata) override {
+        _addBuySignal(Datetime(199912150000LL));
+        _addSellSignal(Datetime(199912220000LL));
+        _addSellSignal(Datetime(200001050000LL));
+        _addBuySignal(Datetime(200001060000LL));
+    }
+};
 
 }  // namespace
 
@@ -474,6 +495,55 @@ TEST_CASE("test_SYS_Simple_short_for_cn_force_cover") {
     CHECK_EQ(cover_tr->from, PART_CONDITION);
     CHECK_GT(cover_tr->datetime, OPEN_DATE);
     CHECK_UNARY_FALSE(sys->getTM()->haveShort(stk));
+}
+
+/** @par Test points (one account interleaving the long and the short sides) */
+TEST_CASE("test_SYS_Simple_mixed_long_short") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k = getQueryData(stock);
+    REQUIRE(k.size() > 0);
+
+    auto sys = makeShortSys(make_shared<Iss029MixedSG>());
+    auto tm = sys->getTM();
+    tm->setParam<bool>("support_borrow_stock", true);
+    sys->setMM(MM_FixedPercent(0.03));
+
+    sys->run(k);
+
+    TradeRecordList tr_list = tm->getTradeList();
+
+    /** @arg the long buy is sized by the MM and aligned to the lot size: 100000 * 0.03 / 26.45
+     * = 113.4 -> 100 shares */
+    CHECK_EQ(tr_list[1].business, BUSINESS_BUY);
+    CHECK_EQ(tr_list[1].datetime, Datetime(199912150000LL));
+    CHECK_EQ(tr_list[1].number, 100.0);
+    CHECK_EQ(tr_list[1].realPrice, 26.45);
+
+    /** @arg the long sell liquidates the entire position */
+    CHECK_EQ(tr_list[2].business, BUSINESS_SELL);
+    CHECK_EQ(tr_list[2].datetime, Datetime(199912220000LL));
+    CHECK_EQ(tr_list[2].number, 100.0);
+
+    /** @arg the short entry uses the same formula as the long buy and is aligned to the lot
+     * size: 99870 * 0.03 / 25.28 = 118.5 -> 100 shares, with the borrowed stock recorded */
+    CHECK_EQ(tr_list[3].business, BUSINESS_BORROW_STOCK);
+    CHECK_EQ(tr_list[3].datetime, Datetime(200001050000LL));
+    CHECK_EQ(tr_list[3].number, 100.0);
+    CHECK_EQ(tr_list[4].business, BUSINESS_SELL_SHORT);
+    CHECK_EQ(tr_list[4].datetime, Datetime(200001050000LL));
+    CHECK_EQ(tr_list[4].number, 100.0);
+    CHECK_EQ(tr_list[4].realPrice, 25.28);
+
+    /** @arg the short cover liquidates the entire position and returns the borrowed stock */
+    CHECK_EQ(tr_list[5].business, BUSINESS_BUY_SHORT);
+    CHECK_EQ(tr_list[5].datetime, Datetime(200001060000LL));
+    CHECK_EQ(tr_list[5].number, 100.0);
+    CHECK_EQ(tr_list[6].business, BUSINESS_RETURN_STOCK);
+    CHECK_EQ(tr_list[6].number, 100.0);
+
+    /** @arg no other trades: exactly one long round trip and one short round trip */
+    CHECK_EQ(tr_list.size(), 7);
 }
 
 /** @} */
