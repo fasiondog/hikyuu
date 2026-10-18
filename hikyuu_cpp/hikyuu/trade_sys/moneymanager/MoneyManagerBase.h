@@ -23,7 +23,7 @@ namespace hku {
  * class hierarchy, the parameter family or the allocation mode.
  * @ingroup MoneyManager
  */
-class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase> {
+class HKU_API MoneyManagerBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

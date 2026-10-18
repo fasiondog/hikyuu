@@ -1057,7 +1057,7 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
 }
 
 void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number) {
-    HKU_IF_RETURN(!m_mm->getParam<bool>("auto-checkin"), void());
+    HKU_IF_RETURN(!m_mm->getParam<bool>("auto_checkin"), void());
     HKU_IF_RETURN(datetime < m_tm->lastDatetime(), void());
 
     // Deposit once per trade with the affordability formula of TradeManager::buy; the gap is

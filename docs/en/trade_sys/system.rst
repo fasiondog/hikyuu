@@ -64,7 +64,7 @@ Common parameters:
         implementation and may be extended to support thread-safe sharing in the future.
 
     .. note::
-        The ``auto-checkin`` parameter of the money management strategy takes effect in the trade stage
+        The ``auto_checkin`` parameter of the money management strategy takes effect in the trade stage
         of the System: when the account cash is insufficient to buy the quantity indicated by the money
         management strategy, the System deposits the missing amount once, right before the actual buy,
         based on the real trade price and quantity. A delayed buy sizes the quantity twice (the signal-day

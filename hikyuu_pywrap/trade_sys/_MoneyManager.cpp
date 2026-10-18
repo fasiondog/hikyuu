@@ -78,17 +78,19 @@ void export_MoneyManager(py::module& m) {
 
 Common parameters:
 
-    - auto-checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money management strategy, automatically deposit (checkin) enough cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
-    - max-stock=20000 (int): the maximum number of the kinds of the held securities (i.e. how many stocks are held, not the position size of each stock)
+    - auto_checkin=False (bool): when the account cash is insufficient to buy the quantity indicated by the money management strategy, automatically deposit (checkin) enough cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
+    - max_stock=20000 (int): the maximum number of the kinds of the held securities (i.e. how many stocks are held, not the position size of each stock)
     - disable_ev_force_clean_position=False (bool): disable forcibly clearing the positions when the market environment becomes invalid
     - disable_cn_force_clean_position=False (bool): disable forcibly clearing the positions when the system valid condition becomes invalid
 
 The custom money management strategy interfaces:
 
-    - _buyNotify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
-    - _sellNotify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing
-    - _getBuyNumber : [Required] Get the quantity that can be bought of the specified trading object
-    - _getSellNumber : [Optional] Get the quantity that can be sold of the specified trading object; if it is not overloaded, default to selling all the held quantity
+    - _buy_notify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
+    - _sell_notify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing
+    - _get_buy_num : [Required] Get the quantity that can be bought of the specified trading object
+    - _get_sell_num : [Optional] Get the quantity that can be sold of the specified trading object; if it is not overloaded, default to selling all the held quantity
+    - _get_sell_short_num : [Optional] Get the quantity that can be short sold of the specified trading object; if it is not overloaded, default to 0 (no short entry)
+    - _get_buy_short_num : [Optional] Get the quantity that covers the short position of the specified trading object; if it is not overloaded, default to covering the entire short position
     - _reset : [Optional] Reset the private attributes
     - _clone : [Required] The clone interface)")
       .def(py::init<>())
@@ -114,7 +116,9 @@ The custom money management strategy interfaces:
         [](MoneyManagerBase& mm, bool support) {
             HKU_CHECK(mm.isPythonObject(),
                       "Only a Python custom money manager can set support_mult_buy_sell!");
-            static_cast<PyMoneyManagerBase&>(mm).pySetSupportMultBuySell(support);
+            auto* py_mm = dynamic_cast<PyMoneyManagerBase*>(&mm);
+            HKU_CHECK(py_mm, "The python object wrapper of {} is missing!", mm.name());
+            py_mm->pySetSupportMultBuySell(support);
         },
         R"(Whether the MM supports multiple position building/reducing (default False)
 
@@ -244,7 +248,7 @@ The custom money management strategy interfaces:
     m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
           R"(MM_FixedCapital([capital = 10000.0])
 
-    The fixed capital money management strategy. The buy quantity = the current cash / capital
+    The fixed capital money management strategy. The buy quantity = the available cash / capital
 
     :param float capital: the fixed capital unit
     :return: the money management strategy instance)");
@@ -252,7 +256,7 @@ The custom money management strategy interfaces:
     m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
           R"(MM_FixedCapitalFunds([capital = 10000.0])
 
-    The fixed total capital money management strategy. The buy quantity = the current total assets / capital
+    The fixed total capital money management strategy. The buy quantity = the current total assets / capital. The base is the account total assets (including the market value of the held positions) instead of the available cash.
 
     :param float capital: the fixed capital unit
     :return: the money management strategy instance)");
@@ -266,14 +270,14 @@ The custom money management strategy interfaces:
 
     m.def("MM_FixedPercent", MM_FixedPercent, py::arg("p") = 0.03, R"(MM_FixedPercent([p = 0.03])
 
-    The fixed percentage risk model. The formula: P (the position size) = the account balance * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
+    The fixed percentage risk model. The formula: P (the position size) = the available cash * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
 
     :param float p: the percentage
     :return: the money management strategy instance)");
 
     m.def("MM_FixedUnits", MM_FixedUnits, py::arg("n") = 33, R"(MM_FixedUnits([n = 33])
 
-    The fixed unit money management strategy. The formula: the buy quantity = the current cash / n / the current risk
+    The fixed unit money management strategy. The formula: the buy quantity = max(the current cash, the initial capital) / n / the current risk, i.e. the initial capital is used when the cash falls below it
 
     :param int n: n capital units
     :return: the money management strategy instance)");
@@ -282,7 +286,7 @@ The custom money management strategy interfaces:
           py::arg("max_loss") = 1000.0,
           R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    The Williams fixed risk money management strategy. The buy quantity = (the account balance × the risk percentage p) ÷ the maximum loss (max_loss)
+    The Williams fixed risk money management strategy. The buy quantity = (the available cash × the risk percentage p) ÷ the maximum loss (max_loss)
 
     :param float p: the risk percentage
     :param float max_loss: the maximum loss

@@ -77,6 +77,14 @@ A custom `StoplossBase` subclass previously overrode the public virtuals `getPri
 
 * C++ custom stop-loss / take-profit: move the implementation from `getPrice` / `getShortPrice` to `_getPrice` / `_getShortPrice`. Python custom stop-loss / take-profit: rename the override methods from `get_price` / `get_short_price` to `_get_price` / `_get_short_price` (the `crtST` helper is updated accordingly).
 
+**⚠️ Breaking change: the money manager common parameters renamed (unified to the lowercase-underscore style)**
+
+The money management base-class common parameters `auto-checkin` → `auto_checkin` and `max-stock` → `max_stock` are renamed to match the lowercase-underscore naming style of the per-strategy parameters (`max_loss`, `risk`, `capital`, ...):
+
+* Calling `set_param` / `get_param` with the old hyphenated names raises an out-of-range exception; use the new names instead;
+* Only these two common parameters are affected, the per-strategy parameter names are unchanged;
+* Examples: `mm.set_param("auto_checkin", True)`, `mm.get_param("max_stock")`.
+
 **🚀 New Features**
 
 * feat(portfolio): the `PF_Simple` / `PF_WithoutAF` compatibility factories (passing through to `MultiSystem`, mode B / mode C)

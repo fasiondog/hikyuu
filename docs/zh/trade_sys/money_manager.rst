@@ -6,10 +6,15 @@
 
 公共参数：
 
-    * **auto-checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金；注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
-    * **max-stock=20000** *(int)* : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
+    * **auto_checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金；注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
+    * **max_stock=20000** *(int)* : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
     * **disable_ev_force_clean_position=False** *(bool)* : 禁用市场环境失效时强制清仓
     * **disable_cn_force_clean_position=False** *(bool)* : 禁用系统有效条件失效时强制清仓
+
+    .. note::
+
+        所有参数命名统一为小写下划线风格（如 ``auto_checkin``、``max_stock``、``max_loss``）。
+        早期版本的连字符参数名（``auto-checkin``、``max-stock``）已更名，使用旧名称将抛出异常。
 
     .. note::
        资金管理策略实例内部保存每个标的的连续买入/卖出计数（``current_buy_count`` / ``current_sell_count``，
@@ -70,14 +75,14 @@
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    固定资金管理策略, 即控制每次买入投入的总资金。买入数量 = 当前现金 / capital
+    固定资金管理策略, 即控制每次买入投入的总资金。买入数量 = 当前可用现金 / capital
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    固定资本管理策略。买入数量 = 当前总资产 / capital
+    固定资本管理策略。买入数量 = 当前总资产 / capital。基数为账户总资产（含持仓市值）而非可用现金，适用于按总资产等比加仓的场景
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例
@@ -88,7 +93,7 @@
 
 .. py:function:: MM_FixedUnits([n = 33])
 
-    固定单位资金管理策略。公式: 买入数量 = 当前现金 / n / 当前风险risk
+    固定单位资金管理策略。公式: 买入数量 = max(当前现金, 初始资金) / n / 当前风险risk，即现金低于初始资金时按初始资金计算
 
     :param int n: n个资金单位
     :return: 资金管理策略实例
@@ -99,7 +104,7 @@
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    威廉斯固定风险资金管理策略，买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
+    威廉斯固定风险资金管理策略，买入数量 =（当前可用现金 × 风险百分比p）÷ 最大损失(max_loss)
 
     :param float p: 风险百分比
     :param float max_loss: 最大损失
@@ -111,14 +116,33 @@
 
 .. py:function:: MM_FixedPercent([p = 0.03])
 
-    固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
+    固定百分比风险模型。公式：P（头寸规模）＝ 当前可用现金 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
 
     :param float p: 百分比
     :return: 资金管理策略实例
 
 
-固定波幅资金管理策略
+多空交易能力
 ^^^^^^^^^^^^^^^^^^^^
+
+多头方向（买入建仓、卖出平仓）各策略均支持。空头方向默认"能平不能开"：
+
+.. list-table::
+   :header-rows: 1
+
+   * - 策略
+     - 开空（_get_sell_short_num）
+     - 平空（_get_buy_short_num）
+   * - MM_FixedCount
+     - 按 n 分批卖出
+     - 全部平空
+   * - 其余内建策略（含 MM_FixedCountTps）
+     - 0（禁止开空）
+     - 全部平空
+
+.. note::
+
+    需要开空能力时，可使用 MM_FixedCount，或以 Python 自定义资金管理策略重载 _get_sell_short_num / _get_buy_short_num。
 
 
 自定义资金管理策略
@@ -126,10 +150,12 @@
 
 自定义资金管理策略接口：
 
-* :py:meth:`MoneyManagerBase.buyNotify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
-* :py:meth:`MoneyManagerBase.sellNotify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
-* :py:meth:`MoneyManagerBase._getBuyNumber` - 【必须】获取指定交易对象可买入的数量
-* :py:meth:`MoneyManagerBase._getSellNumber` - 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
+* :py:meth:`MoneyManagerBase._buy_notify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
+* :py:meth:`MoneyManagerBase._sell_notify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
+* :py:meth:`MoneyManagerBase._get_buy_num` - 【必须】获取指定交易对象可买入的数量
+* :py:meth:`MoneyManagerBase._get_sell_num` - 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
+* :py:meth:`MoneyManagerBase._get_sell_short_num` - 【可选】获取指定交易对象可卖空（开空）的数量，如未重载，默认为 0（禁止开空）
+* :py:meth:`MoneyManagerBase._get_buy_short_num` - 【可选】获取指定交易对象买入平空的数量，如未重载，默认为全部平空
 * :py:meth:`MoneyManagerBase._reset` - 【可选】重置私有属性
 * :py:meth:`MoneyManagerBase._clone` - 【必须】克隆接口
 
@@ -144,6 +170,10 @@
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
 
+    .. py:attribute:: support_mult_buy_sell 是否支持多次增减仓（默认 False）
+
+        仅 Python 自定义资金管理策略可改写该属性（内建策略赋值将抛出异常），克隆时保留。为 False（默认）时，卖出与买入平空遇到非正风险（含 NaN，即价格已触及止损）直接强制全平；为 True 时交由子类的 _get_sell_num / _get_buy_short_num 自行处理。
+
     .. py:method:: __init__(self[, name="MoneyManagerBase])
 
         初始化构造函数
@@ -156,7 +186,7 @@
 
         .. note::
 
-            所有的资金管理策略具有参数“auto-checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
+            所有的资金管理策略具有参数“auto_checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
 
         :param str name: 参数名称
         :return: 参数值
