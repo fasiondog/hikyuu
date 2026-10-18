@@ -18,7 +18,7 @@ namespace hku {
  * Base class of the slippage algorithm
  * @ingroup Slippage
  */
-class HKU_API SlippageBase : public enable_shared_from_this<SlippageBase> {
+class HKU_API SlippageBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
@@ -47,19 +47,20 @@ public:
     SlippagePtr clone();
 
     /**
-     * Get the actual buy price. This is a non-virtual wrapper that calls the subclass
-     * _getRealBuyPrice and clamps the result to not exceed the day's high.
+     * Get the buy price of the slippage model. This is a non-virtual wrapper that only calls the
+     * subclass _getRealBuyPrice; the System part owns the price authority and validates the result
+     * and clamps it into the current bar's [low, high] range before the trade.
      * @param datetime buy moment
      * @param planPrice planned buy price
-     * @return the actual buy price
+     * @return the buy price of the slippage model
      */
     price_t getRealBuyPrice(const Datetime& datetime, price_t planPrice);
 
     /**
-     * Get the actual sell price. See getRealBuyPrice.
+     * Get the sell price of the slippage model. See getRealBuyPrice.
      * @param datetime sell moment
      * @param planPrice planned sell price
-     * @return the actual sell price
+     * @return the sell price of the slippage model
      */
     price_t getRealSellPrice(const Datetime& datetime, price_t planPrice);
 

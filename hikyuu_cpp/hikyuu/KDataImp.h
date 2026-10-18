@@ -12,7 +12,7 @@
 
 namespace hku {
 
-class HKU_API KDataImp : public enable_shared_from_this<KDataImp> {
+class HKU_API KDataImp {
 public:
     KDataImp() = default;
     KDataImp(const Stock& stock, const KQuery& query);

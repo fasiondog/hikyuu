@@ -26,12 +26,13 @@ void FixedUnitsMoneyManager::_checkParam(const string& name) const {
     }
 }
 
-double FixedUnitsMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-                                              price_t price, price_t risk, SystemPart from) {
+double FixedUnitsMoneyManager::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                             price_t price, price_t risk, SystemPart from) {
     int n = getParam<int>("n");
-    m_tm->updateWithWeight(datetime);
-    price_t fixed_risk =
-      (m_tm->currentCash() > m_tm->initCash()) ? m_tm->currentCash() / n : m_tm->initCash() / n;
+    // Read the weight-updated cash through the standard read API of the trade manager; the query
+    // itself must not mutate the account
+    price_t cash = m_tm->cash(datetime, m_query.kType());
+    price_t fixed_risk = (cash > m_tm->initCash()) ? cash / n : m_tm->initCash() / n;
 
     return fixed_risk / risk;
 }

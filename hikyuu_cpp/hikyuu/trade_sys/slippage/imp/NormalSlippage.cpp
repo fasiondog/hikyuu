@@ -28,6 +28,9 @@ void NormalSlippage::_checkParam(const string& name) const {
         HKU_ASSERT(!std::isnan(getParam<double>("mean")));
     } else if ("stddev" == name) {
         HKU_ASSERT(getParam<double>("stddev") >= 0.0);
+        HKU_WARN_IF(getParam<double>("stddev") > 1.0,
+                    "The stddev of SP_Normal is too large (>{:.2f}); the slippage may be extreme",
+                    1.0);
     }
 }
 

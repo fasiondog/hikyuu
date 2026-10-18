@@ -17,8 +17,7 @@
 
 namespace hku {
 
-// pybind trampolines call Python overrides without acquiring the GIL, so the GIL may only be
-// released when no Python-implemented part is involved.
+// Whether any of the parts is implemented in Python
 template <typename... Parts>
 inline bool any_python_part(const Parts&... parts) {
     return ((parts && parts->isPythonObject()) || ...);
@@ -52,8 +51,12 @@ inline bool tm_list_has_python_part(const vector<TMPtr>& tm_list) {
     return false;
 }
 
-// Keep the C++ logging off the Python streams and release the GIL for the current scope when
-// the inputs are python-free; otherwise keep the GIL held (pybind trampolines require it).
+// Keep the C++ logging off the Python streams and release the GIL for the current scope.
+// The GIL is always released: the callees may run the tasks on the pool workers, and the
+// pybind11 (>= 3.0) trampolines acquire the GIL per callback, so the calling thread holding it
+// would deadlock the workers against itself. The log streams are redirected to Python only for
+// the python-free inputs: with Python parts the worker threads may log without holding the GIL,
+// and the logs stay on the native streams.
 // pybind11 types are compiled with hidden visibility, so the class holding them must be marked
 // the same way, otherwise GCC warns that it is declared with greater visibility than its fields.
 #if HKU_OS_LINUX
@@ -65,8 +68,8 @@ public:
     explicit ScopeGilRelease(bool python_free) {
         if (python_free) {
             m_stream_guard = std::make_unique<OStreamToPython>(false);
-            m_gil_guard = std::make_unique<pybind11::gil_scoped_release>();
         }
+        m_gil_guard = std::make_unique<pybind11::gil_scoped_release>();
     }
 
     ScopeGilRelease(const ScopeGilRelease&) = delete;

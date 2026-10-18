@@ -35,7 +35,7 @@ class HKU_API WalkForwardSystem;
  * Base class of the trading system
  * @ingroup System
  */
-class HKU_API System : public enable_shared_from_this<System> {
+class HKU_API System {
     PARAMETER_SUPPORT_WITH_CHECK
     friend class HKU_API WalkForwardSystem;
 
@@ -357,13 +357,14 @@ private:
     price_t _getGoalPrice(const Datetime& datetime, price_t price);
     price_t _getShortGoalPrice(const Datetime&, price_t price);
 
-    price_t _getRealBuyPrice(const Datetime& datetime, price_t planPrice);
-    price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice);
+    price_t _getRealBuyPrice(const KRecord& src_today, price_t planPrice);
+    price_t _getRealSellPrice(const KRecord& src_today, price_t planPrice);
 
     TradeRecord _buy(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyDelay(const KRecord& today, const KRecord& src_today);
     void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
+    void _autoCheckin(const Datetime& datetime, price_t realPrice, double number);
 
     TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);
@@ -691,14 +692,6 @@ inline double System ::_getSellShortNumber(const Datetime& datetime, price_t pri
 inline double System ::_getBuyShortNumber(const Datetime& datetime, price_t price, price_t risk,
                                           Part from) {
     return m_mm ? m_mm->getBuyShortNumber(datetime, m_stock, price, risk, from) : 0;
-}
-
-inline price_t System ::_getRealBuyPrice(const Datetime& datetime, price_t planPrice) {
-    return m_sp ? m_sp->getRealBuyPrice(datetime, planPrice) : planPrice;
-}
-
-inline price_t System ::_getRealSellPrice(const Datetime& datetime, price_t planPrice) {
-    return m_sp ? m_sp->getRealSellPrice(datetime, planPrice) : planPrice;
 }
 
 inline price_t System ::_getShortOpenRisk(price_t stoploss, price_t price) {

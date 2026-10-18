@@ -23,7 +23,7 @@ namespace hku {
  * class hierarchy, the parameter family or the allocation mode.
  * @ingroup MoneyManager
  */
-class HKU_API MoneyManagerBase : public enable_shared_from_this<MoneyManagerBase> {
+class HKU_API MoneyManagerBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
@@ -143,8 +143,8 @@ public:
      * @param stock the trading object
      * @param price trade price
      * @param from signal source
-     * @param risk the risk taken by the trade; if it is 0, it means the whole loss, i.e. the market
-     *             value drops to 0 yuan
+     * @param risk the per-share risk taken by the trade; it must be positive, a non-positive value
+     *             (NaN included) is rejected and 0 is returned
      */
     double getBuyNumber(const Datetime& datetime, const Stock& stock, price_t price, price_t risk,
                         SystemPart from);

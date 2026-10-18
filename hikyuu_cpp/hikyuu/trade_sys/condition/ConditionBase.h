@@ -22,7 +22,7 @@ namespace hku {
  *       setTradeObj interface is kept
  * @ingroup Condition
  */
-class HKU_API ConditionBase : public enable_shared_from_this<ConditionBase> {
+class HKU_API ConditionBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

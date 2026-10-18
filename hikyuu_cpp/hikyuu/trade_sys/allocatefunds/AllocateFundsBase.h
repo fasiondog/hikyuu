@@ -75,7 +75,7 @@ using AFPtr = AllocateFundsPtr;
  *       Account Compatibility) is owned by MultiSystem and passed into the hooks.
  * @ingroup AllocateFunds
  */
-class HKU_API AllocateFundsBase : public enable_shared_from_this<AllocateFundsBase> {
+class HKU_API AllocateFundsBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

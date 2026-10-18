@@ -9,10 +9,24 @@ sell signal, it decides the share quantity (position size) to trade.
 
 Common parameters:
 
-    * **auto-checkin=False** *(bool)* : When the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account.
-    * **max-stock=20000** *(int)* : Maximum number of distinct securities held simultaneously (i.e. how many instruments are held, not the share quantity of any single position)
+    * **auto_checkin=False** *(bool)* : When the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
+    * **max_stock=20000** *(int)* : Maximum number of distinct securities held simultaneously (i.e. how many instruments are held, not the share quantity of any single position)
     * **disable_ev_force_clean_position=False** *(bool)* : Disable forced liquidation when the market environment (EV) becomes invalid
     * **disable_cn_force_clean_position=False** *(bool)* : Disable forced liquidation when the system validity condition (CN) becomes invalid
+
+    .. note::
+
+        All the parameter names are unified to the lowercase-underscore style (e.g. ``auto_checkin``,
+        ``max_stock``, ``max_loss``). The early hyphenated names (``auto-checkin``, ``max-stock``)
+        have been renamed; using an old name raises an exception.
+
+    .. note::
+        A money management instance keeps the consecutive buy/sell counters of every security
+        (``current_buy_count`` / ``current_sell_count``, which the tier-based strategies such as
+        :func:`MM_FixedCountTps` use to advance the tranche) and these counters are not locked. With
+        ``shared_mm=True`` of the ``System``, multiple systems write the same instance concurrently,
+        so a parallel backtest has a data race and corrupts the tranches; keep an instance per system
+        (``shared_mm=False``, the default).
 
 
 Built-in Money Management Strategies
@@ -67,14 +81,14 @@ Fixed-Capital Position Sizing
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    Fixed-capital position sizing, i.e. controlling the total capital committed to each buy. Position size = current cash ÷ capital.
+    Fixed-capital position sizing, i.e. controlling the total capital committed to each buy. Position size = the available cash ÷ capital.
 
     :param float capital: the fixed capital unit per buy
     :return: the money management strategy instance
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    Fixed-capital position sizing based on total assets. Position size = current total assets ÷ capital.
+    Fixed-capital position sizing based on total assets. Position size = the current total assets ÷ capital. The base is the account total assets (including the market value of the held positions) instead of the available cash, suiting the proportional-to-equity position adding.
 
     :param float capital: the fixed capital unit per buy
     :return: the money management strategy instance
@@ -85,7 +99,7 @@ Fixed-Units Risk Position Sizing
 
 .. py:function:: MM_FixedUnits([n = 33])
 
-    Fixed-units position sizing. Formula: position size = current cash ÷ n ÷ current per-share risk.
+    Fixed-units position sizing. Formula: position size = max(the current cash, the initial capital) ÷ n ÷ the current per-share risk, i.e. the initial capital is used when the cash falls below it.
 
     :param int n: the number of equal capital units the cash is divided into
     :return: the money management strategy instance
@@ -96,9 +110,9 @@ Williams Fixed-Risk Position Sizing
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    Williams' fixed-risk position sizing; position size = (account balance × risk fraction p) ÷ maximum per-share loss (max_loss)
+    Williams' fixed-risk position sizing; position size = (the available cash × risk fraction p) ÷ maximum per-share loss (max_loss)
 
-    :param float p: the risk fraction of the account balance
+    :param float p: the risk fraction of the available cash
     :param float max_loss: the maximum permissible per-share loss
     :return: the money management strategy instance
 
@@ -108,15 +122,35 @@ Fixed-Percentage Risk Position Sizing
 
 .. py:function:: MM_FixedPercent([p = 0.03])
 
-    The fixed-percentage risk model. Formula: P (position size) = account balance × percentage ÷ R (the per-share trade risk). [BOOK3]_, [BOOK4]_ .
+    The fixed-percentage risk model. Formula: P (position size) = the available cash × percentage ÷ R (the per-share trade risk). [BOOK3]_, [BOOK4]_ .
 
-    :param float p: the fraction of the account balance risked per trade
+    :param float p: the fraction of the available cash risked per trade
     :return: the money management strategy instance
 
 
-Fixed-Volatility Position Sizing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Long/Short Trading Capability
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+The long side (buy to open, sell to close) is supported by every strategy. The short side
+defaults to "can cover but cannot open":
+
+.. list-table::
+   :header-rows: 1
+
+   * - Strategy
+     - Short entry (``_get_sell_short_num``)
+     - Short cover (``_get_buy_short_num``)
+   * - MM_FixedCount
+     - sells in tranches of n
+     - covers the entire position
+   * - the other built-in strategies (MM_FixedCountTps included)
+     - 0 (no short entry)
+     - covers the entire position
+
+.. note::
+
+    To open shorts, use MM_FixedCount, or override ``_get_sell_short_num`` /
+    ``_get_buy_short_num`` in a Python custom money management strategy.
 
 
 Custom Money Management Strategies
@@ -124,10 +158,12 @@ Custom Money Management Strategies
 
 The custom money management strategy interface:
 
-* :py:meth:`MoneyManagerBase.buyNotify` - [Optional] Receive notification of an actual buy fill; reserved for strategies that handle repeated scaling in/out
-* :py:meth:`MoneyManagerBase.sellNotify` - [Optional] Receive notification of an actual sell fill; reserved for strategies that handle repeated scaling in/out
-* :py:meth:`MoneyManagerBase._getBuyNumber` - [Required] Return the share quantity that can be bought for the specified instrument
-* :py:meth:`MoneyManagerBase._getSellNumber` - [Optional] Return the share quantity that can be sold for the specified instrument; if not overridden, it defaults to liquidating the entire held position
+* :py:meth:`MoneyManagerBase._buy_notify` - [Optional] Receive notification of an actual buy fill; reserved for strategies that handle repeated scaling in/out
+* :py:meth:`MoneyManagerBase._sell_notify` - [Optional] Receive notification of an actual sell fill; reserved for strategies that handle repeated scaling in/out
+* :py:meth:`MoneyManagerBase._get_buy_num` - [Required] Return the share quantity that can be bought for the specified instrument
+* :py:meth:`MoneyManagerBase._get_sell_num` - [Optional] Return the share quantity that can be sold for the specified instrument; if not overridden, it defaults to liquidating the entire held position
+* :py:meth:`MoneyManagerBase._get_sell_short_num` - [Optional] Return the quantity that can be short sold for the specified instrument; if not overridden, it defaults to 0 (no short entry)
+* :py:meth:`MoneyManagerBase._get_buy_short_num` - [Optional] Return the quantity that covers the short position of the specified instrument; if not overridden, it defaults to covering the entire short position
 * :py:meth:`MoneyManagerBase._reset` - [Optional] Reset private attributes
 * :py:meth:`MoneyManagerBase._clone` - [Required] The clone interface
 
@@ -142,6 +178,10 @@ Money Management Strategy Base Class
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
 
+    .. py:attribute:: support_mult_buy_sell  Whether the strategy supports repeated scaling in/out (defaults to False)
+
+        Only a Python custom money management strategy may set this property (assigning it on a built-in strategy raises an exception); the flag survives cloning. When False (the default), a non-positive risk (NaN included, i.e. the price has reached the stop loss) liquidates the whole position on the sell and the short cover directly; when True, the situation is left to the subclass hooks ``_get_sell_num`` / ``_get_buy_short_num``.
+
     .. py:method:: __init__(self[, name="MoneyManagerBase])
 
         Initialization constructor.
@@ -154,7 +194,7 @@ Money Management Strategy Base Class
 
         .. note::
 
-            Every money management strategy has the "auto-checkin" parameter (bool, defaults to False), which means "when the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account."
+            Every money management strategy has the "auto_checkin" parameter (bool, defaults to False), which means "when the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account. The deposit happens once at the actual trade made by the System, the quantity query itself never changes the account."
 
         :param str name: the parameter name
         :return: the parameter value
@@ -184,7 +224,7 @@ Money Management Strategy Base Class
         :param Datetime datetime: the trade time
         :param Stock stock: the instrument (security)
         :param float price: the trade price
-        :param float risk: the per-share risk assumed by the trade; a value of 0 denotes a total loss, i.e. the market value falling to zero
+        :param float risk: the per-share risk taken by the trade; it must be positive, a non-positive value (NaN included) is rejected and 0 is returned
         :param System.Part part_from: the originating system part
         :return: the buyable share quantity
         :rtype: float
@@ -228,7 +268,7 @@ Money Management Strategy Base Class
         :param Datetime datetime: the trade time
         :param Stock stock: the instrument (security)
         :param float price: the trade price
-        :param float risk: the per-share risk assumed by the trade; a value of 0 denotes a total loss, i.e. the market value falling to zero
+        :param float risk: the per-share risk taken by the trade; it must be positive, a non-positive value (NaN included) is rejected and 0 is returned
         :param System.Part part_from: the originating system part
         :return: the buyable share quantity
         :rtype: float

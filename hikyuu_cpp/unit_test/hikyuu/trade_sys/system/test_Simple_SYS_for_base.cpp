@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include "test_sys.h"
+#include <map>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
@@ -170,6 +171,53 @@ TEST_CASE("test_SYS_Simple_for_base") {
     /*for (auto iter = tr_list.begin(); iter != tr_list.end(); ++iter) {
         std::cout ,, *iter ,, std::endl;
     }*/
+}
+
+/** @par Test point (the auto_checkin deposits only at the actual trade of a delayed buy) */
+TEST_CASE("test_SYS_Simple_for_base_auto_checkin") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    REQUIRE_UNARY(!stk.isNull());
+    Datetime start_date(199911100000LL);
+    Datetime end_date(200002250000LL);
+    KQuery query = KQueryByDate(start_date, end_date, KQuery::DAY);
+
+    // A quantity far beyond the initial cash forces a top-up on every buy; a deposit on a date
+    // without a trade is the regression signature of the old query-side deposit
+    SYSPtr sys = SYS_Simple();
+    sys->setParam("buy_delay", true);
+    sys->setParam("sell_delay", true);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    MMPtr mm = MM_FixedCount(100000);
+    mm->setParam<bool>("auto_checkin", true);
+    sys->setMM(mm);
+
+    sys->run(stk, query);
+
+    TradeRecordList tr_list = sys->getTM()->getTradeList();
+    std::map<Datetime, size_t> buy_counts, checkin_counts;
+    for (const auto& tr : tr_list) {
+        if (BUSINESS_BUY == tr.business) {
+            buy_counts[tr.datetime]++;
+        } else if (BUSINESS_CHECKIN == tr.business) {
+            checkin_counts[tr.datetime]++;
+        }
+    }
+
+    /** @arg the scenario really exercised the top-up path */
+    CHECK_UNARY(buy_counts.size() >= 1);
+    CHECK_UNARY(!checkin_counts.empty());
+
+    /** @arg every deposit coincides with an actual buy */
+    for (const auto& kv : checkin_counts) {
+        CHECK_UNARY(buy_counts.count(kv.first) > 0);
+    }
+
+    /** @arg at most one deposit per buy */
+    for (const auto& kv : checkin_counts) {
+        CHECK_LE(kv.second, buy_counts[kv.first]);
+    }
 }
 
 /** @} */

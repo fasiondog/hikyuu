@@ -30,15 +30,15 @@ HKU_API std::ostream& operator<<(std::ostream& os, const MoneyManagerPtr& mm) {
 }
 
 MoneyManagerBase::MoneyManagerBase() : m_name("MoneyManagerBase") {
-    setParam<bool>("auto-checkin", false);
-    setParam<int>("max-stock", 20000);
+    setParam<bool>("auto_checkin", false);
+    setParam<int>("max_stock", 20000);
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
 }
 
 MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
-    setParam<bool>("auto-checkin", false);
-    setParam<int>("max-stock", 20000);
+    setParam<bool>("auto_checkin", false);
+    setParam<int>("max_stock", 20000);
     setParam<bool>("disable_ev_force_clean_position", false);
     setParam<bool>("disable_cn_force_clean_position", false);
 }
@@ -46,8 +46,8 @@ MoneyManagerBase::MoneyManagerBase(const string& name) : m_name(name) {
 MoneyManagerBase::~MoneyManagerBase() {}
 
 void MoneyManagerBase::baseCheckParam(const string& name) const {
-    if ("max-stock" == name) {
-        HKU_ASSERT(getParam<int>("max-stock") >= 1);
+    if ("max_stock" == name) {
+        HKU_ASSERT(getParam<int>("max_stock") >= 1);
     }
 }
 
@@ -122,8 +122,8 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
                        datetime, stock.market_code(), stock.name(), price, risk,
                        getSystemPartName(from));
 
-    HKU_TRACE_IF_RETURN(m_tm->getStockNumber() >= getParam<int>("max-stock"), 0.0,
-                        "Ignore! TM had max-stock number!");
+    HKU_TRACE_IF_RETURN(m_tm->getStockNumber() >= getParam<int>("max_stock"), 0.0,
+                        "Ignore! TM had max_stock number!");
 
     double n = _getBuyNumber(datetime, stock, price, risk, from);
     double min_trade = stock.minTradeNumber();
@@ -154,16 +154,9 @@ double MoneyManagerBase::getBuyNumber(const Datetime& datetime, const Stock& sto
         return max_trade;
     }
 
-    // Automatically deposit more cash when the cash is not enough
-    if (getParam<bool>("auto-checkin")) {
-        price_t cash = m_tm->cash(datetime, m_query.kType());
-        CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
-        int precision = m_tm->precision();
-        price_t money = roundUp(price * n * stock.unit() + cost.total, precision);
-        if (money > cash) {
-            m_tm->checkin(datetime, roundUp(money - cash, precision));
-        }
-    } else {
+    // With auto_checkin System deposits the cash at the actual trade, so the number is not
+    // constrained by the current cash here
+    if (!getParam<bool>("auto_checkin")) {
         CostRecord cost = m_tm->getBuyCost(datetime, stock, price, n);
         price_t need_cash = n * price * stock.unit() + cost.total;
         price_t current_cash = m_tm->cash(datetime, m_query.kType());

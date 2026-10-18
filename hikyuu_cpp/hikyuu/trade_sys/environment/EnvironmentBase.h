@@ -22,7 +22,7 @@ namespace hku {
  * @note The external environment should have nothing to do with the concrete trading object
  * @ingroup Environment
  */
-class HKU_API EnvironmentBase : public enable_shared_from_this<EnvironmentBase> {
+class HKU_API EnvironmentBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

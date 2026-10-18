@@ -12,6 +12,8 @@
 #include <hikyuu/data_driver/DataDriverFactory.h>
 #include <hikyuu/trade_manage/crt/crtTM.h>
 #include <hikyuu/trade_sys/moneymanager/MoneyManagerBase.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_Nothing.h>
 
 using namespace hku;
 
@@ -106,7 +108,8 @@ public:
     }
 };
 
-class SelfCloneMoneyManagerTest : public MoneyManagerBase {
+class SelfCloneMoneyManagerTest : public MoneyManagerBase,
+                                  public std::enable_shared_from_this<SelfCloneMoneyManagerTest> {
 public:
     SelfCloneMoneyManagerTest() : MoneyManagerBase("SelfCloneMoneyManagerTest") {}
     virtual ~SelfCloneMoneyManagerTest() {}
@@ -316,6 +319,29 @@ TEST_CASE("test_MoneyManager_getBuyNumber_cash_shortage_binary_search") {
 }
 
 /** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_auto_checkin_no_side_effect") {
+    // The auto_checkin top-up is done by System at the actual trade: the query stays side-effect
+    // free and the number is not constrained by the current cash
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg auto_checkin=true: the query neither deposits nor reduces the number (cash 55000
+     * affords only 5500 shares) */
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(10000.0));
+    TradeManagerPtr tm = crtTM(Datetime(200001010000), 55000.0);
+    mm->setTM(tm);
+    mm->setParam<bool>("auto_checkin", true);
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+    CHECK_EQ(tm->currentCash(), 55000.0);
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+    CHECK_EQ(tm->currentCash(), 55000.0);
+    for (const auto &tr : tm->getTradeList()) {
+        CHECK_NE(tr.business, BUSINESS_CHECKIN);
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_MoneyManager_getBuyNumber_risk_guard") {
     // tick == tickValue keeps stock.unit() at 1; minTradeNumber == 100 matches the fixed size
     Stock stock("TEST", "MMRISK", "MM Risk Guard", 1, true, Datetime(199001010000),
@@ -490,6 +516,90 @@ TEST_CASE("test_MoneyManager_clone_and_reset_state") {
     CHECK_EQ(raw->getQuery().kType(), KQuery::MIN);
     p->reset();
     CHECK_EQ(raw->getQuery().kType(), KQuery::DAY);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_short_side_defaults") {
+    // The built-in MMs can cover a short but cannot open one, except MM_FixedCount which sizes
+    // the short entry by n; the matrix is documented in the money_manager docs
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh600000"];
+
+    /** @arg MM_FixedCount: the only built-in MM that opens shorts, sized by n; cover all */
+    auto fcm = MM_FixedCount(300);
+    fcm->setTM(crtTM());
+    CHECK_EQ(fcm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 300.0);
+    CHECK_UNARY((fcm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) ==
+                 MAX_DOUBLE));
+
+    /** @arg the other built-in MMs fall back to the base defaults: no short entry, cover all */
+    auto mm = MM_Nothing();
+    mm->setTM(crtTM());
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+    CHECK_UNARY(
+      (mm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_max_stock") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    Stock held = sm["sh600000"];
+    REQUIRE_UNARY(!stock.isNull());
+    REQUIRE_UNARY(!held.isNull());
+
+    auto tm = crtTM(Datetime(200001010000), 100000.0);
+    REQUIRE_UNARY(
+      tm->buy(Datetime(200001010000), held, 10.0, 100, 0.0, 0.0, 10.0, PART_SIGNAL).business ==
+      BUSINESS_BUY);
+    CHECK_EQ(tm->getStockNumber(), 1);
+
+    MoneyManagerPtr mm(new FixedBuyNumberMMTest);
+    mm->setTM(tm);
+
+    /** @arg max_stock=0 is rejected by the parameter check */
+    CHECK_THROWS_AS(mm->setParam<int>("max_stock", 0), std::exception);
+
+    /** @arg the held kinds reach the limit: the new buy is rejected */
+    mm->setParam<int>("max_stock", 1);
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg below the limit: allowed */
+    mm->setParam<int>("max_stock", 2);
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 100.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_MoneyManager_ev_cn_force_clean_position") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    MoneyManagerPtr mm(new MultSellMoneyManagerTest(false));
+    mm->setTM(crtTM(Datetime(200001010000), 100000.0));
+    Datetime dt(200001010000);
+
+    /** @arg PART_ENVIRONMENT force-liquidates unless disabled (the subclass sizes 100 / 300) */
+    CHECK_UNARY((mm->getSellNumber(dt, stock, 10.0, 1.0, PART_ENVIRONMENT) == MAX_DOUBLE));
+    CHECK_UNARY((mm->getBuyShortNumber(dt, stock, 10.0, 1.0, PART_ENVIRONMENT) == MAX_DOUBLE));
+
+    /** @arg PART_CONDITION force-liquidates unless disabled */
+    CHECK_UNARY((mm->getSellNumber(dt, stock, 10.0, 1.0, PART_CONDITION) == MAX_DOUBLE));
+    CHECK_UNARY((mm->getBuyShortNumber(dt, stock, 10.0, 1.0, PART_CONDITION) == MAX_DOUBLE));
+
+    /** @arg disabling the EV clean position delegates to the subclass */
+    mm->setParam<bool>("disable_ev_force_clean_position", true);
+    CHECK_EQ(mm->getSellNumber(dt, stock, 10.0, 1.0, PART_ENVIRONMENT), 100.0);
+    CHECK_EQ(mm->getBuyShortNumber(dt, stock, 10.0, 1.0, PART_ENVIRONMENT), 300.0);
+
+    /** @arg disabling the CN clean position delegates to the subclass */
+    mm->setParam<bool>("disable_cn_force_clean_position", true);
+    CHECK_EQ(mm->getSellNumber(dt, stock, 10.0, 1.0, PART_CONDITION), 100.0);
+    CHECK_EQ(mm->getBuyShortNumber(dt, stock, 10.0, 1.0, PART_CONDITION), 300.0);
+
+    /** @arg PART_SIGNAL is never affected by the flags */
+    mm->setParam<bool>("disable_ev_force_clean_position", false);
+    mm->setParam<bool>("disable_cn_force_clean_position", false);
+    CHECK_EQ(mm->getSellNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 100.0);
+    CHECK_EQ(mm->getBuyShortNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 300.0);
 }
 
 /** @} */

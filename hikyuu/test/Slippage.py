@@ -61,6 +61,21 @@ class SlippageTest(unittest.TestCase):
         self.assertEqual(p._x, 0)
         self.assertEqual(p_clone._x, 10)
 
+    def test_pickle(self):
+        """The name and the parameters survive a pickle round-trip"""
+        if not constant.pickle_support:
+            return
+
+        import pickle as pl
+        p = SP_Uniform(-0.05, 0.05)
+        p.set_param("seed", 42)
+
+        b = pl.loads(pl.dumps(p))
+        self.assertEqual(p.name, b.name)
+        self.assertEqual(b.get_param("min_value"), -0.05)
+        self.assertEqual(b.get_param("max_value"), 0.05)
+        self.assertEqual(b.get_param("seed"), 42)
+
 
 def test_crtSL_func(self):
     pass

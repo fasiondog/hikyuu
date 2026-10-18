@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include <cmath>
 #include "hikyuu/global/sysinfo.h"
 #include "System.h"
@@ -15,11 +16,11 @@ BOOST_CLASS_EXPORT(hku::System)
 
 namespace hku {
 
-namespace {
 // Map a price in the adjusted KData coordinate of the current bar back to the original
 // (unadjusted) coordinate through the affine transformation determined by the bar range;
 // on a one-price board fall back to the original low price
-price_t mapAdjustedToOriginal(const KRecord& today, const KRecord& src_today, price_t price) {
+static price_t mapAdjustedToOriginal(const KRecord& today, const KRecord& src_today,
+                                     price_t price) {
     if (today.highPrice == today.lowPrice) {
         return src_today.lowPrice;
     }
@@ -33,7 +34,6 @@ price_t mapAdjustedToOriginal(const KRecord& today, const KRecord& src_today, pr
                 "mapAdjustedToOriginal: non-finite adjusted price, treated as no stop-loss");
     return adjust >= 0.0 ? adjust : 0.0;
 }
-}  // namespace
 
 HKU_API std::ostream& operator<<(std::ostream& os, const System& sys) {
     os << sys.str();
@@ -924,8 +924,9 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
         return result;
     }
 
-    price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+    price_t realPrice = _getRealBuyPrice(src_today, planPrice);
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
+    _autoCheckin(today.datetime, realPrice, number);
     TradeRecord record =
       m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_BUY != record.business) {
@@ -1022,7 +1023,8 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+        price_t realPrice = _getRealBuyPrice(src_today, planPrice);
+        _autoCheckin(today.datetime, realPrice, number);
         TradeRecord record = m_tm->buy(today.datetime, m_stock, realPrice, number, stoploss,
                                        goalPrice, planPrice, req.from);
         if (BUSINESS_BUY != record.business) {
@@ -1054,6 +1056,22 @@ void System::_submitBuyRequest(const KRecord& today, const KRecord& src_today, P
     m_buyRequestList.push_back(req);
 }
 
+void System::_autoCheckin(const Datetime& datetime, price_t realPrice, double number) {
+    HKU_IF_RETURN(!m_mm->getParam<bool>("auto_checkin"), void());
+    HKU_IF_RETURN(datetime < m_tm->lastDatetime(), void());
+
+    // Deposit once per trade with the affordability formula of TradeManager::buy; the gap is
+    // rounded up so the following buy always passes its cash check
+    int precision = m_tm->precision();
+    CostRecord cost = m_tm->getBuyCost(datetime, m_stock, realPrice, number);
+    price_t needed =
+      roundEx(roundEx(realPrice * number * m_stock.unit(), precision) + cost.total, precision);
+    price_t cash = m_tm->cash(datetime, m_kdata.getQuery().kType());
+    if (cash < needed) {
+        m_tm->checkin(datetime, roundUp(needed - cash, precision));
+    }
+}
+
 TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool on_open) {
     bool trace = getParam<bool>("trace");
     HKU_INFO_IF(trace, "[{}] {} {} by {}", name(), htr("force sell"), num, getSystemPartName(from));
@@ -1073,12 +1091,11 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     }
     HKU_IF_RETURN(position.number <= 0.0, record);
 
-    const auto& krecord = m_kdata.getKRecord(pos);
     const auto& src_krecord =
       m_stock.getKRecord(m_kdata.startPos() + pos, m_kdata.getQuery().kType());
 
     price_t realPrice =
-      _getRealSellPrice(krecord.datetime, on_open ? src_krecord.openPrice : src_krecord.closePrice);
+      _getRealSellPrice(src_krecord, on_open ? src_krecord.openPrice : src_krecord.closePrice);
     // A stale out-of-range src_krecord yields NullKRecord whose price is 0.0; selling at 0 would
     // clear the position and evaporate the funds, so reject it here
     HKU_WARN_IF_RETURN(realPrice <= 0.0, record, "[{}] {}: invalid sell price!",
@@ -1180,7 +1197,7 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
     }
 
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
+    price_t realPrice = _getRealSellPrice(src_today, planPrice);
     TradeRecord record =
       m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_SELL != record.business) {
@@ -1259,7 +1276,7 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
             continue;
         }
 
-        price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
+        price_t realPrice = _getRealSellPrice(src_today, planPrice);
         TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, req.from);
         if (BUSINESS_SELL != record.business) {
@@ -1372,7 +1389,7 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     }
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+    price_t realPrice = _getRealBuyPrice(src_today, planPrice);
 
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
@@ -1465,7 +1482,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             number = pos.number;
         }
 
-        price_t realPrice = _getRealBuyPrice(today.datetime, planPrice);
+        price_t realPrice = _getRealBuyPrice(src_today, planPrice);
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {
@@ -1568,7 +1585,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     }
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
+    price_t realPrice = _getRealSellPrice(src_today, planPrice);
     TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                          goalPrice, planPrice, from);
     if (BUSINESS_SELL_SHORT != record.business) {
@@ -1643,7 +1660,7 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
             continue;
         }
 
-        price_t realPrice = _getRealSellPrice(today.datetime, planPrice);
+        price_t realPrice = _getRealSellPrice(src_today, planPrice);
 
         TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                              goalPrice, planPrice, req.from);
@@ -1729,12 +1746,46 @@ price_t System::_getTakeProfitPrice(const KRecord& today, const KRecord& src_tod
     return mapAdjustedToOriginal(today, src_today, level);
 }
 
-price_t System ::_getShortTakeProfitPrice(const KRecord& today, const KRecord& src_today,
-                                          price_t price) {
+price_t System::_getShortTakeProfitPrice(const KRecord& today, const KRecord& src_today,
+                                         price_t price) {
     HKU_IF_RETURN(!m_tp, 0.0);
     price_t level = m_tp->getShortPrice(today.datetime, price);
     HKU_IF_RETURN(level == 0.0, 0.0);
     return mapAdjustedToOriginal(today, src_today, level);
+}
+
+// The slippage result is the last price seen before the trade manager, which accepts 0 as the
+// market-order placeholder, so an invalid value must never be passed through; and a fill outside
+// the current bar's range is impossible, so both sides are clamped. The original (unadjusted)
+// record of the same bar is already at hand and shares the coordinate of the plan price.
+static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
+                                  const KRecord& src_today, price_t planPrice, price_t price,
+                                  const char* side) {
+    if (!std::isfinite(price) || price <= 0.0) {
+        HKU_WARN("[{}] invalid slippage {} price({}), fallback to the plan price({})", sys_name,
+                 side, price, planPrice);
+        price = planPrice;
+    } else {
+        // The model price is snapped to the market's minimum price tick; the plan price and the bar
+        // bounds are raw market prices, already tick aligned, and are used as they are
+        price = roundEx(price, stock.isNull() ? 2 : stock.precision());
+    }
+    if (src_today.isValid() && (price < src_today.lowPrice || price > src_today.highPrice)) {
+        HKU_WARN("[{}] slippage {} price({}) is out of the bar range [{}, {}], clamp it", sys_name,
+                 side, price, src_today.lowPrice, src_today.highPrice);
+        price = std::min(std::max(price, src_today.lowPrice), src_today.highPrice);
+    }
+    return price;
+}
+
+price_t System::_getRealBuyPrice(const KRecord& src_today, price_t planPrice) {
+    price_t price = m_sp ? m_sp->getRealBuyPrice(src_today.datetime, planPrice) : planPrice;
+    return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "buy");
+}
+
+price_t System::_getRealSellPrice(const KRecord& src_today, price_t planPrice) {
+    price_t price = m_sp ? m_sp->getRealSellPrice(src_today.datetime, planPrice) : planPrice;
+    return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "sell");
 }
 
 json System::lastSuggestion() const {

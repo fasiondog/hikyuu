@@ -51,7 +51,7 @@ void OPLineCondition::_calculate() {
 
     TMPtr tm = crtTM(m_kdata[0].datetime, 0.0, TC_Zero());
     MMPtr mm = MM_FixedCount(stock.minTradeNumber());
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
 
     sys->setTM(tm);
     sys->setMM(mm);
