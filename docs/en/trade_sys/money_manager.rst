@@ -93,7 +93,7 @@ Fixed-Units Risk Position Sizing
 
 .. py:function:: MM_FixedUnits([n = 33])
 
-    Fixed-units position sizing. Formula: position size = current cash ÷ n ÷ current per-share risk.
+    Fixed-units position sizing. Formula: position size = max(the current cash, the initial capital) ÷ n ÷ the current per-share risk, i.e. the initial capital is used when the cash falls below it.
 
     :param int n: the number of equal capital units the cash is divided into
     :return: the money management strategy instance

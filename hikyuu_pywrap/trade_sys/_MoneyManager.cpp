@@ -275,7 +275,7 @@ The custom money management strategy interfaces:
 
     m.def("MM_FixedUnits", MM_FixedUnits, py::arg("n") = 33, R"(MM_FixedUnits([n = 33])
 
-    The fixed unit money management strategy. The formula: the buy quantity = the current cash / n / the current risk
+    The fixed unit money management strategy. The formula: the buy quantity = max(the current cash, the initial capital) / n / the current risk, i.e. the initial capital is used when the cash falls below it
 
     :param int n: n capital units
     :return: the money management strategy instance)");
