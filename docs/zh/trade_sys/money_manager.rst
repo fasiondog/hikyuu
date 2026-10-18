@@ -6,7 +6,7 @@
 
 公共参数：
 
-    * **auto-checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
+    * **auto-checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金；注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
     * **max-stock=20000** *(int)* : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
     * **disable_ev_force_clean_position=False** *(bool)* : 禁用市场环境失效时强制清仓
     * **disable_cn_force_clean_position=False** *(bool)* : 禁用系统有效条件失效时强制清仓
@@ -150,7 +150,7 @@
 
         .. note::
 
-            所有的资金管理策略具有参数“auto-checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。
+            所有的资金管理策略具有参数“auto-checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
 
         :param str name: 参数名称
         :return: 参数值

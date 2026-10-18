@@ -364,6 +364,7 @@ private:
     TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyDelay(const KRecord& today, const KRecord& src_today);
     void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
+    void _autoCheckin(const Datetime& datetime, price_t realPrice, double number);
 
     TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);

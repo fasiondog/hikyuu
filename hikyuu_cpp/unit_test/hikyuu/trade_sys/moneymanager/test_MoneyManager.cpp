@@ -316,6 +316,29 @@ TEST_CASE("test_MoneyManager_getBuyNumber_cash_shortage_binary_search") {
 }
 
 /** @par Test points */
+TEST_CASE("test_MoneyManager_getBuyNumber_auto_checkin_no_side_effect") {
+    // The auto-checkin top-up is done by System at the actual trade: the query stays side-effect
+    // free and the number is not constrained by the current cash
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg auto-checkin=true: the query neither deposits nor reduces the number (cash 55000
+     * affords only 5500 shares) */
+    MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(10000.0));
+    TradeManagerPtr tm = crtTM(Datetime(200001010000), 55000.0);
+    mm->setTM(tm);
+    mm->setParam<bool>("auto-checkin", true);
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+    CHECK_EQ(tm->currentCash(), 55000.0);
+    CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+    CHECK_EQ(tm->currentCash(), 55000.0);
+    for (const auto &tr : tm->getTradeList()) {
+        CHECK_NE(tr.business, BUSINESS_CHECKIN);
+    }
+}
+
+/** @par Test points */
 TEST_CASE("test_MoneyManager_getBuyNumber_risk_guard") {
     // tick == tickValue keeps stock.unit() at 1; minTradeNumber == 100 matches the fixed size
     Stock stock("TEST", "MMRISK", "MM Risk Guard", 1, true, Datetime(199001010000),
