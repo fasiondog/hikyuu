@@ -117,19 +117,17 @@
     :return: 资金管理策略实例
 
 
-固定波幅资金管理策略
-^^^^^^^^^^^^^^^^^^^^
-
-
 自定义资金管理策略
 --------------------
 
 自定义资金管理策略接口：
 
-* :py:meth:`MoneyManagerBase.buyNotify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
-* :py:meth:`MoneyManagerBase.sellNotify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
-* :py:meth:`MoneyManagerBase._getBuyNumber` - 【必须】获取指定交易对象可买入的数量
-* :py:meth:`MoneyManagerBase._getSellNumber` - 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
+* :py:meth:`MoneyManagerBase._buy_notify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
+* :py:meth:`MoneyManagerBase._sell_notify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
+* :py:meth:`MoneyManagerBase._get_buy_num` - 【必须】获取指定交易对象可买入的数量
+* :py:meth:`MoneyManagerBase._get_sell_num` - 【可选】获取指定交易对象可卖出的数量，如未重载，默认为卖出全部已持仓数量
+* :py:meth:`MoneyManagerBase._get_sell_short_num` - 【可选】获取指定交易对象可卖空（开空）的数量，如未重载，默认为 0（禁止开空）
+* :py:meth:`MoneyManagerBase._get_buy_short_num` - 【可选】获取指定交易对象买入平空的数量，如未重载，默认为全部平空
 * :py:meth:`MoneyManagerBase._reset` - 【可选】重置私有属性
 * :py:meth:`MoneyManagerBase._clone` - 【必须】克隆接口
 
@@ -143,6 +141,10 @@
     .. py:attribute:: name  名称
     .. py:attribute:: tm    设置或获取交易管理对象
     .. py:attribute:: query 设置或获取查询条件
+
+    .. py:attribute:: support_mult_buy_sell 是否支持多次增减仓（默认 False）
+
+        仅 Python 自定义资金管理策略可改写该属性（内建策略赋值将抛出异常），克隆时保留。为 False（默认）时，卖出与买入平空遇到非正风险（含 NaN，即价格已触及止损）直接强制全平；为 True 时交由子类的 _get_sell_num / _get_buy_short_num 自行处理。
 
     .. py:method:: __init__(self[, name="MoneyManagerBase])
 

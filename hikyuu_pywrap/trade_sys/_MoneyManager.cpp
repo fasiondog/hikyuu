@@ -85,10 +85,12 @@ Common parameters:
 
 The custom money management strategy interfaces:
 
-    - _buyNotify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
-    - _sellNotify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing
-    - _getBuyNumber : [Required] Get the quantity that can be bought of the specified trading object
-    - _getSellNumber : [Optional] Get the quantity that can be sold of the specified trading object; if it is not overloaded, default to selling all the held quantity
+    - _buy_notify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
+    - _sell_notify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing
+    - _get_buy_num : [Required] Get the quantity that can be bought of the specified trading object
+    - _get_sell_num : [Optional] Get the quantity that can be sold of the specified trading object; if it is not overloaded, default to selling all the held quantity
+    - _get_sell_short_num : [Optional] Get the quantity that can be short sold of the specified trading object; if it is not overloaded, default to 0 (no short entry)
+    - _get_buy_short_num : [Optional] Get the quantity that covers the short position of the specified trading object; if it is not overloaded, default to covering the entire short position
     - _reset : [Optional] Reset the private attributes
     - _clone : [Required] The clone interface)")
       .def(py::init<>())

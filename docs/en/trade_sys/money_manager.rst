@@ -122,20 +122,17 @@ Fixed-Percentage Risk Position Sizing
     :return: the money management strategy instance
 
 
-Fixed-Volatility Position Sizing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
 Custom Money Management Strategies
 ----------------------------------
 
 The custom money management strategy interface:
 
-* :py:meth:`MoneyManagerBase.buyNotify` - [Optional] Receive notification of an actual buy fill; reserved for strategies that handle repeated scaling in/out
-* :py:meth:`MoneyManagerBase.sellNotify` - [Optional] Receive notification of an actual sell fill; reserved for strategies that handle repeated scaling in/out
-* :py:meth:`MoneyManagerBase._getBuyNumber` - [Required] Return the share quantity that can be bought for the specified instrument
-* :py:meth:`MoneyManagerBase._getSellNumber` - [Optional] Return the share quantity that can be sold for the specified instrument; if not overridden, it defaults to liquidating the entire held position
+* :py:meth:`MoneyManagerBase._buy_notify` - [Optional] Receive notification of an actual buy fill; reserved for strategies that handle repeated scaling in/out
+* :py:meth:`MoneyManagerBase._sell_notify` - [Optional] Receive notification of an actual sell fill; reserved for strategies that handle repeated scaling in/out
+* :py:meth:`MoneyManagerBase._get_buy_num` - [Required] Return the share quantity that can be bought for the specified instrument
+* :py:meth:`MoneyManagerBase._get_sell_num` - [Optional] Return the share quantity that can be sold for the specified instrument; if not overridden, it defaults to liquidating the entire held position
+* :py:meth:`MoneyManagerBase._get_sell_short_num` - [Optional] Return the quantity that can be short sold for the specified instrument; if not overridden, it defaults to 0 (no short entry)
+* :py:meth:`MoneyManagerBase._get_buy_short_num` - [Optional] Return the quantity that covers the short position of the specified instrument; if not overridden, it defaults to covering the entire short position
 * :py:meth:`MoneyManagerBase._reset` - [Optional] Reset private attributes
 * :py:meth:`MoneyManagerBase._clone` - [Required] The clone interface
 
@@ -149,6 +146,10 @@ Money Management Strategy Base Class
     .. py:attribute:: name  The strategy name
     .. py:attribute:: tm    Set or get the trade manager instance
     .. py:attribute:: query Set or get the query conditions
+
+    .. py:attribute:: support_mult_buy_sell  Whether the strategy supports repeated scaling in/out (defaults to False)
+
+        Only a Python custom money management strategy may set this property (assigning it on a built-in strategy raises an exception); the flag survives cloning. When False (the default), a non-positive risk (NaN included, i.e. the price has reached the stop loss) liquidates the whole position on the sell and the short cover directly; when True, the situation is left to the subclass hooks ``_get_sell_num`` / ``_get_buy_short_num``.
 
     .. py:method:: __init__(self[, name="MoneyManagerBase])
 
