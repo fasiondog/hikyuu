@@ -26,7 +26,9 @@ double NotMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& st
         m_tm->getHoldNumber(datetime, stock) > 0.) {
         return 0.0;
     }
-    return m_tm->currentCash() / (price * stock.unit());
+    // The cash of the query datetime instead of the latest one, so a historical query does not
+    // see the cash of the future trades
+    return m_tm->cash(datetime, m_query.kType()) / (price * stock.unit());
 }
 
 MoneyManagerPtr HKU_API MM_Nothing() {
