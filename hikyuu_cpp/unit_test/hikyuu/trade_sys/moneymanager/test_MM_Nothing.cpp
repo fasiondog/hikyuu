@@ -38,7 +38,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 1292, TC_Zero());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", false);
+    mm->setParam<bool>("auto_checkin", false);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 100);
 
@@ -46,7 +46,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 1292, TC_FixedA());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", false);
+    mm->setParam<bool>("auto_checkin", false);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 0);
 
@@ -54,7 +54,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 1292 * 2, TC_Zero());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", false);
+    mm->setParam<bool>("auto_checkin", false);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 200);
 
@@ -62,7 +62,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 1292 * 2, TC_FixedA());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", false);
+    mm->setParam<bool>("auto_checkin", false);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 100);
 
@@ -70,7 +70,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 1292 * 2, TC_FixedA());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 200);
 
@@ -79,7 +79,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 12.92 * 2000000LL, TC_Zero());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", false);
+    mm->setParam<bool>("auto_checkin", false);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 1000000L);
 
@@ -88,7 +88,7 @@ TEST_CASE("test_MM_Nothing") {
     tm = crtTM(Datetime(199001010000LL), 12.92 * 2000000LL, TC_Zero());
     mm = MM_Nothing();
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     result = mm->getBuyNumber(Datetime(200304160000), stock, 12.92, 12.92, PART_SIGNAL);
     CHECK_EQ(result, 1000000L);
 }

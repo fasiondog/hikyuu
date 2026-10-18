@@ -6,10 +6,15 @@
 
 公共参数：
 
-    * **auto-checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金；注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
-    * **max-stock=20000** *(int)* : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
+    * **auto_checkin=False** *(bool)* : 当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金；注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
+    * **max_stock=20000** *(int)* : 最大持有的证券种类数量（即持有几只股票，而非各个股票的持仓数）
     * **disable_ev_force_clean_position=False** *(bool)* : 禁用市场环境失效时强制清仓
     * **disable_cn_force_clean_position=False** *(bool)* : 禁用系统有效条件失效时强制清仓
+
+    .. note::
+
+        所有参数命名统一为小写下划线风格（如 ``auto_checkin``、``max_stock``、``max_loss``）。
+        早期版本的连字符参数名（``auto-checkin``、``max-stock``）已更名，使用旧名称将抛出异常。
 
     .. note::
        资金管理策略实例内部保存每个标的的连续买入/卖出计数（``current_buy_count`` / ``current_sell_count``，
@@ -181,7 +186,7 @@
 
         .. note::
 
-            所有的资金管理策略具有参数“auto-checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
+            所有的资金管理策略具有参数“auto_checkin”（bool类型，默认为False），其含义为“当账户现金不足以买入资金管理策略指示的买入数量时，自动向账户中补充存入（checkin）足够的现金。注资由系统在实际成交时一次性完成，数量查询本身不改变账户。
 
         :param str name: 参数名称
         :return: 参数值

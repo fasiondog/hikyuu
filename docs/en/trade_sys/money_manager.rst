@@ -9,10 +9,16 @@ sell signal, it decides the share quantity (position size) to trade.
 
 Common parameters:
 
-    * **auto-checkin=False** *(bool)* : When the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
-    * **max-stock=20000** *(int)* : Maximum number of distinct securities held simultaneously (i.e. how many instruments are held, not the share quantity of any single position)
+    * **auto_checkin=False** *(bool)* : When the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account; the deposit happens once at the actual trade made by the System, the quantity query itself never changes the account.
+    * **max_stock=20000** *(int)* : Maximum number of distinct securities held simultaneously (i.e. how many instruments are held, not the share quantity of any single position)
     * **disable_ev_force_clean_position=False** *(bool)* : Disable forced liquidation when the market environment (EV) becomes invalid
     * **disable_cn_force_clean_position=False** *(bool)* : Disable forced liquidation when the system validity condition (CN) becomes invalid
+
+    .. note::
+
+        All the parameter names are unified to the lowercase-underscore style (e.g. ``auto_checkin``,
+        ``max_stock``, ``max_loss``). The early hyphenated names (``auto-checkin``, ``max-stock``)
+        have been renamed; using an old name raises an exception.
 
     .. note::
         A money management instance keeps the consecutive buy/sell counters of every security
@@ -188,7 +194,7 @@ Money Management Strategy Base Class
 
         .. note::
 
-            Every money management strategy has the "auto-checkin" parameter (bool, defaults to False), which means "when the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account. The deposit happens once at the actual trade made by the System, the quantity query itself never changes the account."
+            Every money management strategy has the "auto_checkin" parameter (bool, defaults to False), which means "when the account does not hold enough cash to cover the share quantity requested by the money management strategy, automatically deposit (check in) sufficient cash into the account. The deposit happens once at the actual trade made by the System, the quantity query itself never changes the account."
 
         :param str name: the parameter name
         :return: the parameter value

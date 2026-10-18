@@ -40,7 +40,7 @@ TEST_CASE("test_MM_FixedCountTpsTps") {
     CHECK_EQ(tm->initCash(), 0.0);
     auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     CHECK_EQ(mm->currentBuyCount(stock), 0);
     double buy_num = mm->getBuyNumber(Datetime(200001200000), stock, 24.11, 24.11, PART_SIGNAL);
     CHECK_EQ(buy_num, 100);

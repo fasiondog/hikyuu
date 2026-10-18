@@ -320,18 +320,18 @@ TEST_CASE("test_MoneyManager_getBuyNumber_cash_shortage_binary_search") {
 
 /** @par Test points */
 TEST_CASE("test_MoneyManager_getBuyNumber_auto_checkin_no_side_effect") {
-    // The auto-checkin top-up is done by System at the actual trade: the query stays side-effect
+    // The auto_checkin top-up is done by System at the actual trade: the query stays side-effect
     // free and the number is not constrained by the current cash
     StockManager &sm = StockManager::instance();
     Stock stock = sm["sh000001"];
     REQUIRE_UNARY(!stock.isNull());
 
-    /** @arg auto-checkin=true: the query neither deposits nor reduces the number (cash 55000
+    /** @arg auto_checkin=true: the query neither deposits nor reduces the number (cash 55000
      * affords only 5500 shares) */
     MoneyManagerPtr mm(new ConfigurableBuyNumberMMTest(10000.0));
     TradeManagerPtr tm = crtTM(Datetime(200001010000), 55000.0);
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
     CHECK_EQ(tm->currentCash(), 55000.0);
     CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
@@ -557,15 +557,15 @@ TEST_CASE("test_MoneyManager_max_stock") {
     MoneyManagerPtr mm(new FixedBuyNumberMMTest);
     mm->setTM(tm);
 
-    /** @arg max-stock=0 is rejected by the parameter check */
-    CHECK_THROWS_AS(mm->setParam<int>("max-stock", 0), std::exception);
+    /** @arg max_stock=0 is rejected by the parameter check */
+    CHECK_THROWS_AS(mm->setParam<int>("max_stock", 0), std::exception);
 
     /** @arg the held kinds reach the limit: the new buy is rejected */
-    mm->setParam<int>("max-stock", 1);
+    mm->setParam<int>("max_stock", 1);
     CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
 
     /** @arg below the limit: allowed */
-    mm->setParam<int>("max-stock", 2);
+    mm->setParam<int>("max_stock", 2);
     CHECK_EQ(mm->getBuyNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 100.0);
 }
 

@@ -173,7 +173,7 @@ TEST_CASE("test_SYS_Simple_for_base") {
     }*/
 }
 
-/** @par Test point (the auto-checkin deposits only at the actual trade of a delayed buy) */
+/** @par Test point (the auto_checkin deposits only at the actual trade of a delayed buy) */
 TEST_CASE("test_SYS_Simple_for_base_auto_checkin") {
     StockManager& sm = StockManager::instance();
     Stock stk = sm["sh600000"];
@@ -190,7 +190,7 @@ TEST_CASE("test_SYS_Simple_for_base_auto_checkin") {
     sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
     sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
     MMPtr mm = MM_FixedCount(100000);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     sys->setMM(mm);
 
     sys->run(stk, query);

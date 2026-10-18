@@ -74,6 +74,14 @@
 
 * C++ 自定义止损/止赢需将实现从 `getPrice` / `getShortPrice` 迁移至 `_getPrice` / `_getShortPrice`；Python 侧自定义止损/止赢亦需将重写方法从 `get_price` / `get_short_price` 改为 `_get_price` / `_get_short_price`（`crtST` 已同步）。
 
+**⚠️ 破坏性变更：资金管理公共参数重命名（统一为小写下划线风格）**
+
+资金管理基类公共参数 `auto-checkin` → `auto_checkin`、`max-stock` → `max_stock`，与各策略自有参数（`max_loss`、`risk`、`capital` 等）的小写下划线命名风格统一：
+
+* 通过 `set_param` / `get_param` 使用旧连字符参数名将抛出参数不存在异常，需改用新名称；
+* 仅上述两个公共参数受影响，各策略自有参数命名不变；
+* 示例：`mm.set_param("auto_checkin", True)`、`mm.get_param("max_stock")`。
+
 **🚀 新增特性**
 
 * feat(portfolio): `PF_Simple` / `PF_WithoutAF` 兼容工厂（直通 `MultiSystem`，模式 B / 模式 C）

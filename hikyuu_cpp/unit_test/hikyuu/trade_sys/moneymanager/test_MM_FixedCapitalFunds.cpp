@@ -34,12 +34,12 @@ TEST_CASE("test_MM_FixedCapitalFunds") {
     Datetime dt(200001040000);  // a trading day, so the market value is available
 
     /** @arg the formula with no position: total assets == cash = 10000 -> 10000 / 100 = 100
-     * shares; auto-checkin keeps the raw total-assets-based size (the cash top-up is done by
+     * shares; auto_checkin keeps the raw total-assets-based size (the cash top-up is done by
      * System at the actual trade) */
     auto tm = crtTM(Datetime(200001040000), 10000.0, TC_Zero());
     auto mm = MM_FixedCapitalFunds(100.0);
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     CHECK_EQ(mm->getBuyNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 100.0);
 
     /** @arg the base is the total assets instead of the cash: after buying 100 shares the cash

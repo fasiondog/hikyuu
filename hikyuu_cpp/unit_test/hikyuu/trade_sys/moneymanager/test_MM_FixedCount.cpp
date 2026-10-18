@@ -29,13 +29,13 @@ TEST_CASE("test_MM_FixedCount") {
     /** @arg n < 1 */
     CHECK_THROWS_AS(MM_FixedCount(0), std::exception);
 
-    /** @arg n = 100; with auto-checkin the query deposits nothing (the top-up is done by System
+    /** @arg n = 100; with auto_checkin the query deposits nothing (the top-up is done by System
      * at the actual trade) */
     tm = crtTM(Datetime(199001010000LL), 0.0, TC_FixedAPre2015());
     CHECK_EQ(tm->initCash(), 0.0);
     auto mm = MM_FixedCount(100);
     mm->setTM(tm);
-    mm->setParam<bool>("auto-checkin", true);
+    mm->setParam<bool>("auto_checkin", true);
     CHECK_EQ(mm->getBuyNumber(Datetime(200001200000), stock, 24.11, 24.11, PART_SIGNAL), 100.0);
     CHECK_EQ(tm->cash(Datetime(200001200000)), 0.0);
 }
