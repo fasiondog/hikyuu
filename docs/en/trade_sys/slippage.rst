@@ -32,9 +32,13 @@ Built-in Slippage Algorithms
 
 .. py:function:: SP_Normal([mean=0.0, stddev=0.05])
 
-    Random slippage with a normal distribution. The sampled value is folded to a non-negative amplitude and applied only in the unfavorable direction (added on buys, subtracted on sells).
+    Random slippage with a normal distribution. The sampled value is folded to a non-negative amplitude and applied only in the unfavorable direction (added on buys, subtracted on sells), so the actual expected slippage is the folded expectation ``E|X|``, not ``mean``:
 
-    :param float mean: the mean of the normal distribution
+        E|X| = stddev * sqrt(2/pi) * exp(-mean^2 / (2 * stddev^2)) + mean * erf(mean / (stddev * sqrt(2)))
+
+    With ``mean`` = 0, ``E|X| = stddev * sqrt(2/pi)``, i.e. about ``0.7979 * stddev``: ``SP_Normal(0.0, 0.05)`` gives an expected slippage of about 4%. The ``mean`` only becomes visible when it is comparable to ``stddev`` (``SP_Normal(0.05, 0.05)`` gives about 5.8%); as it grows far beyond ``stddev``, ``E|X|`` approaches ``mean`` - ``mean`` only shifts the center of the distribution before folding and is not the expected slippage itself
+
+    :param float mean: the mean of the normal distribution (the center before folding; not the actual expected slippage)
     :param float stddev: the standard deviation of the normal distribution
     :return: the slippage algorithm instance
 
