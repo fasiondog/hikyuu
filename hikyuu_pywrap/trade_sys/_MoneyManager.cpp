@@ -174,7 +174,7 @@ The custom money management strategy interfaces:
     :param Datetime datetime: the trading time
     :param Stock stock: the trading object
     :param float price: the trading price
-    :param float risk: the risk taken in the trade; if it is 0, it means a total loss, i.e. the market value falls to 0 yuan
+    :param float risk: the per-share risk taken in the trade; it must be positive, a non-positive value (NaN included) is rejected and 0 is returned
     :param System.Part part_from: the source system part
     :return: the quantity that can be bought
     :rtype: float)")
@@ -200,7 +200,7 @@ The custom money management strategy interfaces:
     :param Datetime datetime: the trading time
     :param Stock stock: the trading object
     :param float price: the trading price
-    :param float risk: the risk taken in the trade; if it is 0, it means a total loss, i.e. the market value falls to 0 yuan
+    :param float risk: the per-share risk taken in the trade; it must be positive, a non-positive value (NaN included) is rejected and 0 is returned
     :param System.Part part_from: the source system part
     :return: the quantity that can be bought
     :rtype: float)")

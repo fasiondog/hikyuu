@@ -40,7 +40,7 @@ void export_misc(py::module& m) {
   :param bool reset: whether to reset according to the sharing attributes of the system parts before executing
   :param bool reset_all: forcibly reset all the parts
 
-  The GIL is released during execution unless a system contains Python-implemented parts.)");
+  The GIL is released during execution.)");
 
     m.def(
       "get_funds_list",
@@ -60,7 +60,7 @@ void export_misc(py::module& m) {
     :param DatetimeList ref_dates: the list of the moments to get
     :return: the list of the account funds
 
-    The GIL is released during execution unless an account is implemented in Python.)");
+    The GIL is released during execution.)");
 
     m.def(
       "get_performance_list",
@@ -84,5 +84,5 @@ void export_misc(py::module& m) {
     :param KType ktype: the specified K-line type
     :param bool ext: whether to count the extended information (requiring the donating user permission; otherwise, they are still the basic statistics items)
 
-    The GIL is released during execution unless an account is implemented in Python.)");
+    The GIL is released during execution.)");
 }
