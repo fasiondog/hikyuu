@@ -13,6 +13,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/KData.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
+#include <hikyuu/trade_sys/slippage/crt/SP_Normal.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_Uniform.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_LogNormal.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_TruncNormal.h>
@@ -83,6 +84,20 @@ TEST_CASE("test_LogNormal_param_check") {
     CHECK_THROWS(SP_LogNormal(0.0, -0.01));
     /** @arg a NaN mean is rejected */
     CHECK_THROWS(SP_LogNormal(std::numeric_limits<double>::quiet_NaN(), 0.05));
+}
+
+/** @par Test points */
+TEST_CASE("test_random_sp_oversize_warn_only") {
+    // The four random slippages share one threshold for an absurd parameter: a stddev or an
+    // amplitude above 1.0 (a price move of more than 100%) only warns, it is never rejected.
+    /** @arg an oversized stddev is accepted (SP_Normal / SP_LogNormal warn above 1.0) */
+    CHECK_NOTHROW(SP_Normal(0.0, 2.0));
+    CHECK_NOTHROW(SP_LogNormal(0.0, 2.0));
+    /** @arg an oversized amplitude is accepted (SP_Uniform / SP_TruncNormal warn above 1.0) */
+    CHECK_NOTHROW(SP_Uniform(-2.0, 2.0));
+    CHECK_NOTHROW(SP_TruncNormal(0.0, 0.05, -2.0, 2.0));
+    /** @arg a negative stddev is still rejected */
+    CHECK_THROWS(SP_Normal(0.0, -0.01));
 }
 
 /** @par Test points */

@@ -72,6 +72,10 @@ Built-in Slippage Algorithms
 
     The reproducibility of the random slippage algorithms has a boundary: ``seed`` guarantees an identical sequence only within the same platform and the same standard library implementation. SP_Normal / SP_LogNormal / SP_Uniform rely on the standard library distributions (``std::normal_distribution`` / ``std::lognormal_distribution`` / ``std::uniform_real_distribution``), whose sampling algorithm is left to the implementation, so the same ``seed`` does not give the same sequence on libstdc++ / libc++ / MSVC; SP_TruncNormal samples through its own inverse CDF and is not affected by that. The sequence of one instance also depends on how many times and in which order the hooks are called. Cross-platform and cross-standard-library reproducibility is not promised.
 
+.. note::
+
+    The four random slippages warn consistently on an absurd parameter (a warning only, the calculation is unchanged): a stddev above 1.0 (SP_Normal / SP_LogNormal) or an amplitude above 1.0 (SP_Uniform / SP_TruncNormal, i.e. the larger of ``|min_value|`` and ``|max_value|``) logs a warning; the parameter itself has no upper bound.
+
 
 Custom Slippage Algorithm
 -------------------------

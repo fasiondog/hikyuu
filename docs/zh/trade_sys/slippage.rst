@@ -72,6 +72,10 @@
 
     随机移滑价差的可复现性有边界：``seed`` 仅在**同一平台、同一标准库实现**下保证相同序列。SP_Normal / SP_LogNormal / SP_Uniform 依赖标准库分布（``std::normal_distribution`` / ``std::lognormal_distribution`` / ``std::uniform_real_distribution``），其抽取算法由标准库实现自行决定，同一 ``seed`` 在 libstdc++ / libc++ / MSVC 上并不相同；SP_TruncNormal 使用自带的逆 CDF 采样，不受该项影响。此外，同一实例的序列还取决于钩子的调用次数与顺序。跨平台、跨标准库的复现不在承诺范围内。
 
+.. note::
+
+    四个随机移滑价差对"过大"的参数给出一致告警（仅告警、不改变计算）：标准差 > 1.0（SP_Normal / SP_LogNormal）或幅度 > 1.0（SP_Uniform / SP_TruncNormal，即 ``|min_value|`` 与 ``|max_value|`` 的较大者）时输出一条告警日志；参数本身不设上界。
+
 
 自定义移滑价差算法
 ------------------
