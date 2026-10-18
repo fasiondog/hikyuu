@@ -161,7 +161,7 @@ The custom slippage interfaces:
     m.def("SP_FixedPercent", &SP_FixedPercent, py::arg("p") = 0.001,
           R"(SP_FixedPercent([p=0.001])
 
-    The fixed percentage slippage algorithm; the actual buy price = the planned buy price * (1 + p), and the actual sell price = the planned sell price * (1 - p). p must be in [0, 0.1).
+    The fixed percentage slippage algorithm; the actual buy price = the planned buy price * (1 + p), and the actual sell price = the planned sell price * (1 - p). p must be in [0, 1).
 
     :param float p: the fixed percentage of the offset
     :return: the slippage algorithm instance)");

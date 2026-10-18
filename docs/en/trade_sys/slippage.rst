@@ -9,7 +9,7 @@ Built-in Slippage Algorithms
 
 .. py:function:: SP_FixedPercent([p=0.001])
 
-    Fixed-percentage slippage: the actual buy price equals the planned buy price multiplied by (1 + p), and the actual sell price equals the planned sell price multiplied by (1 - p). p must be in [0, 0.1).
+    Fixed-percentage slippage: the actual buy price equals the planned buy price multiplied by (1 + p), and the actual sell price equals the planned sell price multiplied by (1 - p). p must be in [0, 1).
 
     :param float p: the fixed percentage offset
     :return: the slippage algorithm instance
