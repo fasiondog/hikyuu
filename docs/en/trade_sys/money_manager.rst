@@ -75,14 +75,14 @@ Fixed-Capital Position Sizing
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    Fixed-capital position sizing, i.e. controlling the total capital committed to each buy. Position size = current cash ÷ capital.
+    Fixed-capital position sizing, i.e. controlling the total capital committed to each buy. Position size = the available cash ÷ capital.
 
     :param float capital: the fixed capital unit per buy
     :return: the money management strategy instance
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    Fixed-capital position sizing based on total assets. Position size = current total assets ÷ capital.
+    Fixed-capital position sizing based on total assets. Position size = the current total assets ÷ capital. The base is the account total assets (including the market value of the held positions) instead of the available cash, suiting the proportional-to-equity position adding.
 
     :param float capital: the fixed capital unit per buy
     :return: the money management strategy instance
@@ -104,9 +104,9 @@ Williams Fixed-Risk Position Sizing
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    Williams' fixed-risk position sizing; position size = (account balance × risk fraction p) ÷ maximum per-share loss (max_loss)
+    Williams' fixed-risk position sizing; position size = (the available cash × risk fraction p) ÷ maximum per-share loss (max_loss)
 
-    :param float p: the risk fraction of the account balance
+    :param float p: the risk fraction of the available cash
     :param float max_loss: the maximum permissible per-share loss
     :return: the money management strategy instance
 
@@ -116,9 +116,9 @@ Fixed-Percentage Risk Position Sizing
 
 .. py:function:: MM_FixedPercent([p = 0.03])
 
-    The fixed-percentage risk model. Formula: P (position size) = account balance × percentage ÷ R (the per-share trade risk). [BOOK3]_, [BOOK4]_ .
+    The fixed-percentage risk model. Formula: P (position size) = the available cash × percentage ÷ R (the per-share trade risk). [BOOK3]_, [BOOK4]_ .
 
-    :param float p: the fraction of the account balance risked per trade
+    :param float p: the fraction of the available cash risked per trade
     :return: the money management strategy instance
 
 

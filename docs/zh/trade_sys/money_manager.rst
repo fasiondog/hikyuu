@@ -70,14 +70,14 @@
 
 .. py:function:: MM_FixedCapital([capital = 10000.0])
 
-    固定资金管理策略, 即控制每次买入投入的总资金。买入数量 = 当前现金 / capital
+    固定资金管理策略, 即控制每次买入投入的总资金。买入数量 = 当前可用现金 / capital
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    固定资本管理策略。买入数量 = 当前总资产 / capital
+    固定资本管理策略。买入数量 = 当前总资产 / capital。基数为账户总资产（含持仓市值）而非可用现金，适用于按总资产等比加仓的场景
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例
@@ -99,7 +99,7 @@
 
 .. py:function:: MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    威廉斯固定风险资金管理策略，买入数量 =（账户余额 × 风险百分比p）÷ 最大损失(max_loss)
+    威廉斯固定风险资金管理策略，买入数量 =（当前可用现金 × 风险百分比p）÷ 最大损失(max_loss)
 
     :param float p: 风险百分比
     :param float max_loss: 最大损失
@@ -111,7 +111,7 @@
 
 .. py:function:: MM_FixedPercent([p = 0.03])
 
-    固定百分比风险模型。公式：P（头寸规模）＝ 账户余额 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
+    固定百分比风险模型。公式：P（头寸规模）＝ 当前可用现金 * 百分比 / R（每股的交易风险）。[BOOK3]_, [BOOK4]_ .
 
     :param float p: 百分比
     :return: 资金管理策略实例

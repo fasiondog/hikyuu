@@ -244,7 +244,7 @@ The custom money management strategy interfaces:
     m.def("MM_FixedCapital", MM_FixedCapital, py::arg("capital") = 10000.00,
           R"(MM_FixedCapital([capital = 10000.0])
 
-    The fixed capital money management strategy. The buy quantity = the current cash / capital
+    The fixed capital money management strategy. The buy quantity = the available cash / capital
 
     :param float capital: the fixed capital unit
     :return: the money management strategy instance)");
@@ -252,7 +252,7 @@ The custom money management strategy interfaces:
     m.def("MM_FixedCapitalFunds", MM_FixedCapitalFunds, py::arg("capital") = 10000.00,
           R"(MM_FixedCapitalFunds([capital = 10000.0])
 
-    The fixed total capital money management strategy. The buy quantity = the current total assets / capital
+    The fixed total capital money management strategy. The buy quantity = the current total assets / capital. The base is the account total assets (including the market value of the held positions) instead of the available cash.
 
     :param float capital: the fixed capital unit
     :return: the money management strategy instance)");
@@ -266,7 +266,7 @@ The custom money management strategy interfaces:
 
     m.def("MM_FixedPercent", MM_FixedPercent, py::arg("p") = 0.03, R"(MM_FixedPercent([p = 0.03])
 
-    The fixed percentage risk model. The formula: P (the position size) = the account balance * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
+    The fixed percentage risk model. The formula: P (the position size) = the available cash * the percentage / R (the trading risk per share). [BOOK3]_, [BOOK4]_ .
 
     :param float p: the percentage
     :return: the money management strategy instance)");
@@ -282,7 +282,7 @@ The custom money management strategy interfaces:
           py::arg("max_loss") = 1000.0,
           R"( MM_WilliamsFixedRisk([p=0.1, max_loss=1000.0])
 
-    The Williams fixed risk money management strategy. The buy quantity = (the account balance × the risk percentage p) ÷ the maximum loss (max_loss)
+    The Williams fixed risk money management strategy. The buy quantity = (the available cash × the risk percentage p) ÷ the maximum loss (max_loss)
 
     :param float p: the risk percentage
     :param float max_loss: the maximum loss
