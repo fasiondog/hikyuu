@@ -35,7 +35,7 @@ class HKU_API WalkForwardSystem;
  * Base class of the trading system
  * @ingroup System
  */
-class HKU_API System : public enable_shared_from_this<System> {
+class HKU_API System {
     PARAMETER_SUPPORT_WITH_CHECK
     friend class HKU_API WalkForwardSystem;
 

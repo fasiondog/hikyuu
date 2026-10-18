@@ -21,7 +21,7 @@ namespace hku {
  * Base class of the signal generator
  * @ingroup Signal
  */
-class HKU_API SignalBase : public enable_shared_from_this<SignalBase> {
+class HKU_API SignalBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

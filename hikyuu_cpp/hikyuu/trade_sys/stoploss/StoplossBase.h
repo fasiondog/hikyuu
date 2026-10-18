@@ -21,7 +21,7 @@ namespace hku {
  * trade to the system
  * @ingroup Stoploss
  */
-class HKU_API StoplossBase : public enable_shared_from_this<StoplossBase> {
+class HKU_API StoplossBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

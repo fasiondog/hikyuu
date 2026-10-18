@@ -19,7 +19,7 @@ namespace hku {
  * Multi-factor synthesis; when there is only one factor it is equivalent to a simple score board
  * @ingroup MultiFactor
  */
-class HKU_API MultiFactorBase : public enable_shared_from_this<MultiFactorBase> {
+class HKU_API MultiFactorBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

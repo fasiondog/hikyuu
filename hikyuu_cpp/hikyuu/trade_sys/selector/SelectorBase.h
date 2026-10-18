@@ -24,7 +24,7 @@ class HKU_API Portfolio;
  * Trading object selection module
  * @ingroup Selector
  */
-class HKU_API SelectorBase : public enable_shared_from_this<SelectorBase> {
+class HKU_API SelectorBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:

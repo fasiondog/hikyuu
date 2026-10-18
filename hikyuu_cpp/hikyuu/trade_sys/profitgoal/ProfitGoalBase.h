@@ -21,7 +21,7 @@ namespace hku {
  * sell when the price reaches the profit goal
  * @ingroup ProfitGoal
  */
-class HKU_API ProfitGoalBase : public enable_shared_from_this<ProfitGoalBase> {
+class HKU_API ProfitGoalBase {
     PARAMETER_SUPPORT_WITH_CHECK
 
 public:
