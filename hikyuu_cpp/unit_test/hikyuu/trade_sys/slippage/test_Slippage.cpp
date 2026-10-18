@@ -6,7 +6,6 @@
  */
 
 #include "doctest/doctest.h"
-#include <algorithm>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_FixedPercent.h>
@@ -93,18 +92,17 @@ TEST_CASE("test_Slippage_clone_lazy_recalculate") {
 
     auto sp = SP_FixedPercent(0.001);
     sp->setTO(k);
-    price_t bounded = std::min(slipped, k[0].highPrice);
-    CHECK_EQ(sp->getRealBuyPrice(d0, plan), bounded);
+    CHECK_EQ(sp->getRealBuyPrice(d0, plan), slipped);
 
     /** @arg the clone carries the source TO, so its prices are already constrained */
     SlippagePtr c = sp->clone();
     CHECK_NE(sp, c);
     CHECK_UNARY(!c->getTO().empty());
-    CHECK_EQ(c->getRealBuyPrice(d0, plan), bounded);
+    CHECK_EQ(c->getRealBuyPrice(d0, plan), slipped);
 
-    /** @arg setTO rebinds the clone and keeps the same constrained result */
+    /** @arg setTO rebinds the clone and keeps the same result */
     c->setTO(k);
-    CHECK_EQ(c->getRealBuyPrice(d0, plan), bounded);
+    CHECK_EQ(c->getRealBuyPrice(d0, plan), slipped);
 }
 
 /** @} */

@@ -17,7 +17,6 @@
 #include <hikyuu/trade_sys/slippage/crt/SP_LogNormal.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_TruncNormal.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_FixedPercent.h>
-#include <hikyuu/trade_sys/slippage/crt/SP_FixedValue.h>
 
 using namespace hku;
 
@@ -27,44 +26,55 @@ using namespace hku;
  * @{
  */
 
+namespace {
+// A slippage that always returns a fixed raw price, ignoring the plan price
+class RawPriceSP : public SlippageBase {
+public:
+    RawPriceSP() : SlippageBase("RawPriceSP") {}
+    virtual ~RawPriceSP() {}
+
+    double raw{0.0};
+
+    virtual price_t _getRealBuyPrice(const Datetime&, price_t) override {
+        return raw;
+    }
+    virtual price_t _getRealSellPrice(const Datetime&, price_t) override {
+        return raw;
+    }
+    virtual void _calculate() override {}
+    virtual SlippagePtr _clone() override {
+        auto p = std::make_shared<RawPriceSP>();
+        p->raw = raw;
+        return p;
+    }
+};
+}  // namespace
+
 /** @par Test points */
-TEST_CASE("test_Slippage_clamp_to_day_range") {
+TEST_CASE("test_Slippage_raw_price_passed_through") {
     StockManager& sm = StockManager::instance();
     Stock stock = sm.getStock("sh600000");
     KData kdata = stock.getKData(KQuery(0, 50, KQuery::DAY));
     REQUIRE_FALSE(kdata.empty());
 
-    // A wide amplitude forces the clamp to actually trigger on most bars
-    auto sp = SP_Uniform(-1.0, 1.0);
-    sp->setTO(kdata);
-
-    for (size_t i = 0, total = kdata.size(); i < total; i++) {
-        const KRecord& k = kdata[i];
-        /** @arg buy price never exceeds the day's high */
-        price_t buy = sp->getRealBuyPrice(k.datetime, k.closePrice);
-        CHECK_LE(buy, k.highPrice + 1e-9);
-        /** @arg sell price never drops below the day's low and stays non-negative */
-        price_t sell = sp->getRealSellPrice(k.datetime, k.closePrice);
-        CHECK_GE(sell, k.lowPrice - 1e-9);
-        CHECK_GE(sell, 0.0);
-    }
-}
-
-/** @par Test points */
-TEST_CASE("test_Slippage_sell_floor_for_low_price") {
-    StockManager& sm = StockManager::instance();
-    Stock stock = sm.getStock("sh600000");
-    KData kdata = stock.getKData(KQuery(0, 1, KQuery::DAY));
-    REQUIRE_FALSE(kdata.empty());
-
-    // A fixed offset larger than the plan price would otherwise yield a negative sell price
-    auto sp = SP_FixedValue(100.0);
+    // SP only produces the price of the model: the validity check and the day-range clamp belong to
+    // the System part, which is the only caller in the framework
+    auto sp = std::make_shared<RawPriceSP>();
     sp->setTO(kdata);
     const KRecord& k = kdata[0];
-    /** @arg a negative raw sell price is clamped up to the day's low, never negative */
-    price_t sell = sp->getRealSellPrice(k.datetime, 10.0);
-    CHECK_GE(sell, k.lowPrice - 1e-9);
-    CHECK_GE(sell, 0.0);
+
+    const price_t raws[] = {0.0, -1.0, 1e9, 0.0001, k.closePrice};
+    for (price_t raw : raws) {
+        sp->raw = raw;
+        /** @arg the model price is returned unchanged, even when it is invalid or out of range */
+        CHECK_EQ(sp->getRealBuyPrice(k.datetime, k.closePrice), raw);
+        CHECK_EQ(sp->getRealSellPrice(k.datetime, k.closePrice), raw);
+    }
+
+    /** @arg a non-finite model price is returned unchanged as well */
+    sp->raw = std::numeric_limits<double>::quiet_NaN();
+    CHECK_UNARY(std::isnan(sp->getRealBuyPrice(k.datetime, k.closePrice)));
+    CHECK_UNARY(std::isnan(sp->getRealSellPrice(k.datetime, k.closePrice)));
 }
 
 /** @par Test points */

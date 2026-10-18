@@ -53,8 +53,8 @@ void export_Slippage(py::module& m) {
 
 The custom slippage interfaces:
 
-    - _get_real_buy_price : [Required] Compute the raw buy price (the base class clamps it to not exceed the day's high)
-    - _get_real_sell_price : [Required] Compute the raw sell price (the base class clamps it to not fall below the day's low)
+    - _get_real_buy_price : [Required] Compute the raw buy price (the System part validates it and clamps it into the bar's [low, high] range)
+    - _get_real_sell_price : [Required] Compute the raw sell price (the System part validates it and clamps it into the bar's [low, high] range)
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
     - _reset : [Optional] Reload the private variables)")
@@ -62,7 +62,7 @@ The custom slippage interfaces:
       .def(py::init<>())
       .def(py::init<const SlippageBase&>())
       .def(py::init<const string&>(), R"(The initialization constructor
-        
+
     :param str name: the name)")
 
       .def("__str__", to_py_str<SlippageBase>)
@@ -98,47 +98,53 @@ The custom slippage interfaces:
       .def("get_real_buy_price", &SlippageBase::getRealBuyPrice,
            R"(get_real_buy_price(self, datetime, price)
 
-    [Public method] Return the actual buy price. It calls the subclass hook _get_real_buy_price
-    and clamps the result to not exceed the day's high. Do not override this method; override
+    [Public method] Return the raw buy price of the slippage model by calling the subclass hook
+    _get_real_buy_price. The System part is the only caller in the framework: it validates the
+    result (an invalid value falls back to the plan price) and clamps it into the bar's
+    [low, high] range before the trade. Do not override this method; override
     _get_real_buy_price instead.
 
     :param Datetime datetime: the buy time
     :param float price: the planned buy price
-    :return: the actual buy price, clamped to not exceed the day's high
+    :return: the raw buy price of the slippage model
     :rtype: float)")
 
       .def("get_real_sell_price", &SlippageBase::getRealSellPrice,
            R"(get_real_sell_price(self, datetime, price)
 
-    [Public method] Return the actual sell price. It calls the subclass hook _get_real_sell_price
-    and clamps the result to not fall below the day's low. Do not override this method; override
+    [Public method] Return the raw sell price of the slippage model by calling the subclass hook
+    _get_real_sell_price. The System part is the only caller in the framework: it validates the
+    result (an invalid value falls back to the plan price) and clamps it into the bar's
+    [low, high] range before the trade. Do not override this method; override
     _get_real_sell_price instead.
 
     :param Datetime datetime: the sell time
     :param float price: the planned sell price
-    :return: the actual sell price, clamped to not fall below the day's low
+    :return: the raw sell price of the slippage model
     :rtype: float)")
 
       .def("_get_real_buy_price", &SlippageBase::_getRealBuyPrice,
            R"(_get_real_buy_price(self, datetime, price)
 
-    [Override hook] Compute the raw buy price. The base class clamps the returned value to not
-    exceed the day's high before returning the actual trade price.
+    [Override hook] Compute the raw buy price. The slippage algorithm only produces the price of
+    the model: the validity check and the day-range clamp are applied by the System part, which
+    is the only caller in the framework.
 
     :param Datetime datetime: the buy time
     :param float price: the planned buy price
-    :return: the raw buy price (clamped by the base class)
+    :return: the raw buy price of the slippage model
     :rtype: float)")
 
       .def("_get_real_sell_price", &SlippageBase::_getRealSellPrice,
            R"(_get_real_sell_price(self, datetime, price)
 
-    [Override hook] Compute the raw sell price. The base class clamps the returned value to not
-    fall below the day's low before returning the actual trade price.
+    [Override hook] Compute the raw sell price. The slippage algorithm only produces the price of
+    the model: the validity check and the day-range clamp are applied by the System part, which
+    is the only caller in the framework.
 
     :param Datetime datetime: the sell time
     :param float price: the planned sell price
-    :return: the raw sell price (clamped by the base class)
+    :return: the raw sell price of the slippage model
     :rtype: float)")
 
       .def("reset", &SlippageBase::reset, "The reset operation")

@@ -56,18 +56,18 @@ as `_getGoal` / `_getShortGoal` (consistent with the `_xxx` style of `_reset` / 
 * `crtPG(get_goal, ...)` keeps its signature and usage; the internal callback contract is renamed from
   `get_goal` to `_get_goal`.
 
-**⚠️ Breaking Changes: Slippage interface reworked (subclass computes only the raw price; the base class applies day-range clamping)**
+**⚠️ Breaking Changes: Slippage interface reworked (the subclass computes only the raw price; the System part validates and clamps it)**
 
-A custom `SlippageBase` subclass (C++/Python) previously overrode `get_real_buy_price` / `get_real_sell_price` to return the final trade price directly. It must now override `_get_real_buy_price` / `_get_real_sell_price` to compute only the **raw** price; the base class then applies day-range clamping and returns the clamped value:
+A custom `SlippageBase` subclass (C++/Python) previously overrode `get_real_buy_price` / `get_real_sell_price` to return the final trade price directly. It must now override `_get_real_buy_price` / `_get_real_sell_price` to compute only the **raw** price. The System part - the only caller in the framework, which already holds the original (unadjusted) record of the bar - then validates the result and clamps it into the bar's range:
 
-* the buy price is clamped to **not exceed the day's high** (`min(raw, high)`);
-* the sell price is clamped to **not fall below the day's low** (`max(raw, low)`, falling back to the tick floor when no day data is available).
+* an invalid result (non-finite or non-positive) falls back to the plan price: 0 is accepted by the trade manager as the market-order placeholder, so it must never come from the slippage path;
+* both sides are clamped into the bar's `[low, high]` range.
 
 Migration:
 
-* Python custom slippage (`crtSP` subclasses): rename `get_real_buy_price` / `get_real_sell_price` to `_get_real_buy_price` / `_get_real_sell_price` (raw price only); `get_real_buy_price` / `get_real_sell_price` now return the clamped actual trade price.
+* Python custom slippage (`crtSP` subclasses): rename `get_real_buy_price` / `get_real_sell_price` to `_get_real_buy_price` / `_get_real_sell_price` (raw price only); `get_real_buy_price` / `get_real_sell_price` now return the raw price of the model, and the price used by the trade is the fixed-up one.
 * C++ custom slippage: move the implementation from `getRealBuyPrice` / `getRealSellPrice` into the protected virtuals `_getRealBuyPrice` / `_getRealSellPrice`.
-* If your custom slippage already clamped to the day range internally, drop that logic (the base class does it now).
+* If your custom slippage clamped to the day range internally, drop that logic (the System part does it now).
 * `SP_FixedPercent` no longer emits the invalid-plan-price warning (`HKU_WARN`), matching the other five built-in slippage implementations.
 
 **⚠️ Breaking Changes: StoplossBase interface reworked (subclass implements only _getPrice / _getShortPrice)**
