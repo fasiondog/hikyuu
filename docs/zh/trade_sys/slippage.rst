@@ -88,6 +88,14 @@
 * :py:meth:`SlippageBase._clone` - 【必须】克隆接口
 * :py:meth:`SlippageBase._reset` - 【可选】重载私有变量
 
+自定义实现的注意事项：
+
+* ``to`` 属性赋值时，若行情非空且与上次已计算的不同，会调用一次 ``_calculate``（重复赋同一行情不会重复调用）；``reset()`` 会清空 ``to`` 并调用 ``_reset()``；``clone()`` 调用 ``_clone()``，克隆体保留 ``to`` 但标记为未计算，下次 ``to`` 赋值时会重新 ``_calculate``。
+* 不要重写 ``get_real_buy_price`` / ``get_real_sell_price``，只实现 ``_get_real_buy_price`` / ``_get_real_sell_price``：基类版本只做转发（计划价非正时直接返回计划价），价格权威在 System 层。
+* 钩子返回值必须是有限正数：非有限值（NaN / Inf）或 ``<= 0`` 视为非法，System 层回退为计划价并告警。
+* System 层会先按最小变动单位取整，再钳制到当日 [最低价, 最高价]：当滑点把价格推出该区间（如买入价高于当日最高价、卖出价低于当日最低价）时，钳制会削弱甚至抵消滑点效果。
+* Python 子类的 ``_calculate`` 不要调用 ``super()._calculate()``，否则会无限递归。
+
 
 移滑价差算法基类
 ----------------

@@ -88,6 +88,14 @@ A custom slippage algorithm implements the following interface:
 * :py:meth:`SlippageBase._clone` - [Required] Subclass clone hook
 * :py:meth:`SlippageBase._reset` - [Optional] Reset internal member variables
 
+Notes on a custom implementation:
+
+* Assigning the ``to`` property calls ``_calculate`` once when the kdata is not empty and differs from the last calculated one (assigning the same kdata again does not call it again); ``reset()`` clears ``to`` and calls ``_reset()``; ``clone()`` calls ``_clone()``, and the clone keeps ``to`` but is marked as not calculated, so the next ``to`` assignment recalculates it.
+* Do not override ``get_real_buy_price`` / ``get_real_sell_price``; implement ``_get_real_buy_price`` / ``_get_real_sell_price`` only: the base versions only forward the call (returning the plan price as-is when it is not positive) and the price authority belongs to the System part.
+* A hook must return a finite positive number: a non-finite value (NaN / Inf) or a value ``<= 0`` is invalid and the System part falls back to the plan price with a warning.
+* The System part first snaps the price to the market's minimum price tick and then clamps it into the bar's [low, high] range: when the slippage pushes the price outside that range (e.g. a buy price above the day's high or a sell price below the day's low), the clamp weakens and can even cancel the slippage.
+* In a Python subclass, ``_calculate`` must not call ``super()._calculate()`` (infinite recursion).
+
 
 Slippage Algorithm Base Class
 -----------------------------
