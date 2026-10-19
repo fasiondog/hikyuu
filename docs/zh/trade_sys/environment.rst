@@ -22,6 +22,14 @@
     :param Indicator ind: bool类型的指标, 指标中相应位置大于0则代表市场有效, 否则无效
     :param str market: 指定的市场，用于获取相应的交易日历
 
+.. py:function:: EV_Manual()
+
+    手工市场环境，有效日期只能通过 :py:meth:`EnvironmentBase._add_valid` 登记，用于测试等场景。
+
+    已登记的日期在 ``query`` 变更前一直有效，因此应先设置 ``query`` 再登记日期。注意组合运算会经
+    ``setQuery`` 重跑各侧的 ``_calculate``（手工侧会被清空），如需手工指定组合结果的有效日期，可直接
+    在组合结果上调用 :py:meth:`EnvironmentBase._add_valid`。
+
 
 组合运算
 ----------------------
@@ -165,6 +173,24 @@
         :return: True 有效 | False 无效
 
         判定规则为"该日期的值为有限值且 > 0"；从未通过 ``_add_valid`` 登记过的日期为无效。
+
+    .. py:method:: get_value(self, datetime)
+
+        获取指定日期的存储值
+
+        :param Datetime datetime: 指定时间
+        :return: 该日期的存储值；从未登记过的日期返回 0.0
+
+        0.0 同时表示"无效"与"未登记"，需用 :py:meth:`is_valid` 判定有效性。
+
+    .. py:method:: get_values(self)
+
+        以时间序列指标的形式获取各日期的值：每个经 ``_add_valid`` 登记的日期一条记录，按日期排序
+
+        :return: Indicator
+
+        日期集合与值的含义取决于产生该对象所用的运算（如 ``Add``/``Sub`` 为两侧并集（含无效日）、
+        ``And``/``Or`` 仅保留有效日）；仅有限值且大于 0 表示有效。
 
     .. py:method:: _add_valid(self, datetime[, value=1.0])
 

@@ -58,6 +58,7 @@ if __name__ == "__main__":
 
     suite.addTest(Environment.suite())
     suite.addTest(Environment.suiteTestCrtEV())
+    suite.addTest(Environment.suiteTestEVManual())
     suite.addTest(Condition.suite())
     suite.addTest(Condition.suiteTestCrtCN())
     suite.addTest(MoneyManager.suite())

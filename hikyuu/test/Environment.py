@@ -100,9 +100,95 @@ class TestCrtEV(unittest.TestCase):
         self.assertEqual(p_clone.get_param("n"), 3)
 
 
+class TestEVManual(unittest.TestCase):
+    def test_ev_manual_get_value_and_get_values(self):
+        ev = EV_Manual()
+        self.assertFalse(ev.is_valid(Datetime(202001010000)))
+        self.assertEqual(ev.get_value(Datetime(202001010000)), 0.0)
+
+        ev._add_valid(Datetime(202001010000), 2.0)
+        ev._add_valid(Datetime(202001030000), 1.0)
+        self.assertTrue(ev.is_valid(Datetime(202001010000)))
+        self.assertTrue(ev.is_valid(Datetime(202001030000)))
+        self.assertEqual(ev.get_value(Datetime(202001010000)), 2.0)
+        self.assertEqual(ev.get_value(Datetime(202001020000)), 0.0)
+
+        # get_values: one record per registered date, ordered by date
+        ind = ev.get_values()
+        self.assertEqual(len(ind), 2)
+        self.assertAlmostEqual(ind[0], 2.0)
+        self.assertAlmostEqual(ind[1], 1.0)
+
+    def test_ev_manual_query_reset(self):
+        # The dates survive an identical setQuery and are cleared by a different one
+        ev = EV_Manual()
+        ev.query = Query(-10)
+        ev._add_valid(Datetime(202001010000))
+        ev.query = Query(-10)
+        self.assertTrue(ev.is_valid(Datetime(202001010000)))
+        ev.query = Query(-20)
+        self.assertFalse(ev.is_valid(Datetime(202001010000)))
+
+
+class TestEVComboGetValues(unittest.TestCase):
+    def test_combo_get_values_consistency(self):
+        # (a*b).get_values() must match the C++ operator semantics; the combination is
+        # query-driven, so both sides register their dates from _calculate
+        def calc_a(self):
+            self._add_valid(Datetime(20010101), 2.0)
+            self._add_valid(Datetime(20010103), 1.0)
+
+        def calc_b(self):
+            self._add_valid(Datetime(20010101), 3.0)
+            self._add_valid(Datetime(20010102), 1.0)
+
+        a = crtEV(calc_a, name='EVA')
+        b = crtEV(calc_b, name='EVB')
+        q = Query(Datetime(20010101), Datetime(20010105))
+        a.query = q
+        b.query = q
+
+        # Multi: both sides valid on 0101 -> positive product; no output elsewhere
+        m = a * b
+        m.query = q
+        self.assertTrue(m.is_valid(Datetime(20010101)))
+        self.assertFalse(m.is_valid(Datetime(20010102)))
+        self.assertFalse(m.is_valid(Datetime(20010103)))
+        self.assertAlmostEqual(m.get_value(Datetime(20010101)), 6.0)
+        ind = m.get_values()
+        self.assertEqual(len(ind), 1)
+        self.assertAlmostEqual(ind[0], 6.0)
+
+        # Add: the union of both sides; a date present on only one side takes that side's value
+        s = a + b
+        s.query = q
+        self.assertAlmostEqual(s.get_value(Datetime(20010101)), 5.0)
+        self.assertAlmostEqual(s.get_value(Datetime(20010102)), 1.0)
+        self.assertAlmostEqual(s.get_value(Datetime(20010103)), 1.0)
+        ind_s = s.get_values()
+        self.assertEqual(len(ind_s), 3)
+        self.assertAlmostEqual(ind_s[0], 5.0)
+        self.assertAlmostEqual(ind_s[1], 1.0)
+        self.assertAlmostEqual(ind_s[2], 1.0)
+
+        # And: only 0101 is valid on both sides, with the value fixed to 1.0
+        both = a & b
+        both.query = q
+        self.assertTrue(both.is_valid(Datetime(20010101)))
+        self.assertFalse(both.is_valid(Datetime(20010102)))
+        self.assertAlmostEqual(both.get_value(Datetime(20010101)), 1.0)
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(EnvironmentTest)
 
 
 def suiteTestCrtEV():
     return unittest.TestLoader().loadTestsFromTestCase(TestCrtEV)
+
+
+def suiteTestEVManual():
+    tests = unittest.TestSuite()
+    tests.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEVManual))
+    tests.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEVComboGetValues))
+    return tests

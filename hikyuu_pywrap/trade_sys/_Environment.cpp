@@ -113,6 +113,27 @@ The custom market environment strategy interfaces:
     The validity is exactly "the stored value of the date is a finite value greater than 0"; a date
     that was never registered through _add_valid is invalid.)")
 
+      .def("get_value", &EnvironmentBase::getValue, R"(get_value(self, datetime)
+
+    Get the stored value of the specified date
+
+    :param Datetime datetime: the specified time
+    :return: the stored value; 0.0 for a date that was never registered
+
+    0.0 is returned both for an invalid date and for an absent one; use is_valid to tell the
+    validity.)")
+
+      .def("get_values", &EnvironmentBase::getValues, R"(get_values(self)
+
+    Get the values as a time-series indicator: one record per date registered through _add_valid,
+    ordered by date
+
+    :return: Indicator
+
+    The date set and the meaning of the value depend on the operator that produced this object
+    (e.g. Add/Sub keep the union of both sides including invalid dates, And/Or keep only the
+    valid dates); only a finite value greater than 0 is valid.)")
+
       .def("_add_valid", &EnvironmentBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
            R"(_add_valid(self, datetime[, value=1.0])
 
@@ -224,4 +245,14 @@ The custom market environment strategy interfaces:
 
     :param Indicator ind: a bool-type indicator; if the corresponding position in the indicator is >0, it means the market is valid, otherwise invalid
     :param str market: the specified market, used to get the corresponding trading calendar)");
+
+    m.def("EV_Manual", EV_Manual,
+          R"(EV_Manual()
+
+    A manual environment whose valid dates can only be registered through _add_valid, used for
+    the testing or other purposes.
+
+    The registered dates live until the query changes, so set the query first and register the
+    dates afterwards. Note that the combination operators re-run each side's _calculate through
+    setQuery, which clears a manual side; a combined result can be registered directly instead.)");
 }

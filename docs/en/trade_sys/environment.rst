@@ -22,6 +22,16 @@ Built-in Market Environment Strategies
     :param Indicator ind: a boolean indicator; values greater than 0 mark the market as valid, all other values mark it as invalid
     :param str market: the market whose trading calendar is used
 
+.. py:function:: EV_Manual()
+
+    A manual environment whose valid dates can only be registered through
+    :py:meth:`EnvironmentBase._add_valid`, used for the testing or other purposes.
+
+    The registered dates live until the query changes, so set the query first and register the
+    dates afterwards. Note that the combination operators re-run each side's ``_calculate``
+    through ``setQuery`` (which clears a manual side); to assign the valid dates of a combined
+    result manually, call :py:meth:`EnvironmentBase._add_valid` on the result directly.
+
 
 Combination Operators
 ---------------------
@@ -175,6 +185,27 @@ Market Environment Strategy Base Class
 
         The validity rule is "the stored value of the date is finite and greater than 0"; a date
         that was never registered through ``_add_valid`` is invalid.
+
+    .. py:method:: get_value(self, datetime)
+
+        Get the stored value of the specified date
+
+        :param Datetime datetime: the specified time
+        :return: the stored value; 0.0 for a date that was never registered
+
+        0.0 is returned both for an invalid date and for an absent one; use :py:meth:`is_valid`
+        to tell the validity.
+
+    .. py:method:: get_values(self)
+
+        Get the values as a time-series indicator: one record per date registered through
+        ``_add_valid``, ordered by date
+
+        :return: Indicator
+
+        The date set and the meaning of the value depend on the operator that produced this
+        object (e.g. ``Add``/``Sub`` keep the union of both sides including invalid dates, while
+        ``And``/``Or`` keep only the valid dates); only a finite value greater than 0 is valid.
 
     .. py:method:: _add_valid(self, datetime[, value=1.0])
 
