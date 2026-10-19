@@ -15,6 +15,7 @@
 #include <hikyuu/indicator/crt/LOG.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
+#include <hikyuu/indicator/crt/POW.h>
 #include <hikyuu/indicator/crt/SLOPE.h>
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -75,7 +76,11 @@ void checkRoundTrip(const Indicator& src, const Indicator& dst) {
 
 // The legacy string format kept 6 decimal places, so every value below the threshold was
 // corrupted on a round trip; they are the regression values of this suite
-PriceList specialValues() {
+// @param includeSubnormal the smallest subnormal cannot be read back from a text archive once it
+//        is embedded in a vector<double> parameter (libc++ reports ERANGE for a subnormal
+//        conversion, which makes the boost text archive fail), so the text cases build it through
+//        a computation instead of a parameter
+PriceList specialValues(bool includeSubnormal = true) {
     const value_t inf = std::numeric_limits<value_t>::infinity();
     PriceList px;
     px.push_back(1e-7);
@@ -83,7 +88,9 @@ PriceList specialValues() {
     px.push_back(2.5e-6);           // the legacy format rounded it to 3e-6
     px.push_back(1.234567890123);   // 16 significant digits
     px.push_back(-0.0);             // the sign bit must survive
-    px.push_back(5e-324);           // the smallest subnormal
+    if (includeSubnormal) {
+        px.push_back(5e-324);  // the smallest subnormal
+    }
     px.push_back(std::numeric_limits<value_t>::max());
     px.push_back(0.0);
     px.push_back(-1.0);
@@ -112,14 +119,17 @@ TEST_CASE("test_indicator_serialization_value_precision") {
 TEST_CASE("test_indicator_serialization_value_precision_text") {
     // A text archive cannot parse "nan" or "inf" back, so the bit patterns are archived as
     // unsigned integers; the values below reach the buffers through computations whose parameters
-    // stay finite (a NaN inside a PRICELIST parameter would hit the pre-existing boost limitation
-    // of vector<double> in text archives, which is out of the scope of the buffer format)
-    Indicator finite = PRICELIST(specialValues());
+    // stay representable (a non-finite or a subnormal value inside a PRICELIST parameter would hit
+    // the pre-existing boost limitation of vector<double> in text archives, which is out of the
+    // scope of the buffer format)
+    Indicator finite = PRICELIST(specialValues(false));
+    Indicator with_subnormal = POW(PRICELIST(PriceList{2.0}), -1074);  // 2^-1074, the smallest
+                                                                       // subnormal
     Indicator with_nan = LOG(PRICELIST(PriceList{-1.0, 2.0, -3.0}));       // NaN, ln2, NaN
     Indicator with_inf = EXP(PRICELIST(PriceList{1000.0, 1.0}));           // +Inf, e
     Indicator with_ninf = LOG(PRICELIST(PriceList{0.0, 1.0}));             // -Inf, 0
 
-    for (const Indicator* x : {&finite, &with_nan, &with_inf, &with_ninf}) {
+    for (const Indicator* x : {&finite, &with_subnormal, &with_nan, &with_inf, &with_ninf}) {
         /** @arg the text archive keeps every bit of the result buffers, NaN and Inf included */
         checkRoundTrip(*x, roundTrip<boost::archive::text_oarchive,
                                       boost::archive::text_iarchive>(*x));
