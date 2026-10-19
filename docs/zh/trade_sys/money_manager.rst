@@ -31,7 +31,12 @@
 
 .. py:function:: MM_Nothing()
 
-    特殊的资金管理策略，相当于不做资金管理，有多少钱买多少。
+    特殊的资金管理策略，相当于不做资金管理，有多少钱买多少；开空时按净权益融多少卖多少。
+
+    参数（通过 ``set_param`` 设置）：
+
+    * ``if_have_a_position_will_not_buy``：已有多头持仓时不再买入，默认 ``False``
+    * ``if_have_short_will_not_sell_short``：已有空头持仓时不再开空，默认 ``False``
 
 
 固定交易数量资金管理策略
@@ -142,13 +147,16 @@
    * - MM_FixedCapital / MM_FixedCapitalFunds / MM_WilliamsFixedRisk
      - 与买入同风险预算语义（不使用 risk，基数为净权益）
      - 全部平空
-   * - MM_Nothing / MM_FixedCountTps
+   * - MM_Nothing
+     - 按净权益开空（净权益 / (价格 × 单位)，不使用 risk）
+     - 全部平空
+   * - MM_FixedCountTps
      - 0（禁止开空）
      - 全部平空
 
 .. note::
 
-    MM_Nothing 无资金管理语义、MM_FixedCountTps 的档位计数为多头专用，二者不支持开空。需要开空能力时使用上述支持开空的策略，或以 Python 自定义资金管理策略重载 _get_sell_short_num / _get_buy_short_num。
+    MM_FixedCountTps 的档位计数为多头专用，不支持开空。需要开空能力时使用上述支持开空的策略，或以 Python 自定义资金管理策略重载 _get_sell_short_num / _get_buy_short_num。
 
     开空需交易管理账户开启 ``support_borrow_stock=True``（融资融券模式），否则开空委托直接失败。开空数量与买入一致做手数对齐并受单笔最大交易数量限制；开空不做保证金约束，保证金（购买力）不足时由交易管理拒绝整单，不做缩量。
 

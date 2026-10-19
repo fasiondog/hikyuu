@@ -91,6 +91,7 @@
 * feat(MultiSystem): 新增 `adjust-mode` / `delay-to-trading-day` 参数，支持将调仓模式内化为调仓日表
 * feat(slippage): 四个随机移滑价差（`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`）新增 `adverse_only` 参数（默认 `true` 保持单向不利成本；`false` 直接使用带符号采样值，实现零均值执行噪声）
 * feat(slippage): 支持多空不对称滑点：`SlippageBase` 新增 `get_real_buy_short_price`（平空）与 `get_real_sell_short_price`（开空）及其可重载钩子（默认分别委托给多头侧钩子，旧实现行为不变）；`SP_FixedPercent` / `SP_FixedValue` 新增 `short_p` / `short_value`，四个随机模型新增 `short_mean` / `short_stddev` / `short_min_value` / `short_max_value`（留空 `None` 时在构造时取对应多头侧参数值）；`crtSP` 新增 `get_real_buy_short_price` / `get_real_sell_short_price` 可选参数（注意：旧版本序列化的档案不含 `short_*` 键，反序列化后空头侧取类默认值而非对应多头侧值，需显式 `set_param` 补齐）
+* feat(moneymanager): `MM_Nothing` 支持开空，开空数量按账户净权益计算（净权益 / (价格 × 单位)），与 `MM_FixedCapital` / `MM_FixedCapitalFunds` / `MM_FixedPercent` 等以净权益为空头基数的策略一致，借券货款不再膨胀开空额度；新增 `if_have_short_will_not_sell_short` 参数（默认 `False`）控制已有空头时是否禁止再次开空（此前基类默认禁止开空，行为变更为静默允许）
 
 **🐞 缺陷修复**
 

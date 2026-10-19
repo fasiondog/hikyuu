@@ -37,7 +37,12 @@ No Money Management
 
 .. py:function:: MM_Nothing()
 
-    A pass-through money management strategy that performs no position sizing: buy as many shares as the available cash allows.
+    A pass-through money management strategy that performs no position sizing: buy as many shares as the available cash allows, and open a short as many shares as the net assets allows.
+
+    Parameters (set via ``set_param``):
+
+    * ``if_have_a_position_will_not_buy``: do not buy again when a long position is already held; default ``False``
+    * ``if_have_short_will_not_sell_short``: do not open another short when a short position is already held; default ``False``
 
 
 Fixed Share-Quantity Position Sizing
@@ -152,14 +157,17 @@ defaults to "can cover but cannot open":
      - the same risk-budget semantics as the long buy (the risk is not used, based on the net
        assets)
      - covers the entire position
-   * - MM_Nothing / MM_FixedCountTps
+   * - MM_Nothing
+     - sized by the net assets (the net assets ÷ (price × unit), the risk is not used)
+     - covers the entire position
+   * - MM_FixedCountTps
      - 0 (no short entry)
      - covers the entire position
 
 .. note::
 
-    MM_Nothing carries no money-management semantics and the MM_FixedCountTps tranches are
-    long-only, so neither opens shorts. To open shorts use the strategies above, or override
+    The MM_FixedCountTps tranches are long-only, so it does not open shorts. To open shorts use
+    the strategies above, or override
     ``_get_sell_short_num`` / ``_get_buy_short_num`` in a Python custom money management strategy.
 
     Opening a short requires the trade manager account with ``support_borrow_stock=True`` (the

@@ -235,7 +235,7 @@ The custom money management strategy interfaces:
 
     m.def("MM_Nothing", MM_Nothing, R"(MM_Nothing()
 
-    A special money management strategy, equivalent to no money management; buy as much as the money available.)");
+    A special money management strategy, equivalent to no money management; buy as much as the money available, and open a short as much as the net assets allows. Set if_have_a_position_will_not_buy / if_have_short_will_not_sell_short to reject a repeat entry in the same direction.)");
 
     m.def("MM_FixedRisk", MM_FixedRisk, py::arg("risk") = 1000.00,
           R"(MM_FixedRisk([risk = 1000.00])

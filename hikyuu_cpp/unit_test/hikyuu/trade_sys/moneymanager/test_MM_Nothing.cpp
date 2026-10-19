@@ -118,4 +118,40 @@ TEST_CASE("test_MM_Nothing_historical_cash") {
     CHECK_EQ(mm->getBuyNumber(Datetime(200201010000), stock, 10.0, 1.0, PART_SIGNAL), 0.0);
 }
 
+/** @par Test points */
+TEST_CASE("test_MM_Nothing_if_have_short_will_not_sell_short") {
+    // sh000001: minTradeNumber == 1, unit == 1
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    Datetime dt(200001040000);
+    price_t close = stock.getMarketValue(dt, KQuery::DAY);
+    REQUIRE_UNARY(close > 0.0);
+    auto tm = crtTM(dt, 100000.0, TC_Zero());
+    tm->setParam<bool>("support_borrow_stock", true);
+    auto mm = MM_Nothing();
+    mm->setTM(tm);
+
+    /** @arg by default an open short does not stop a further short entry: the size follows the
+     * net assets (100000 / 10 = 10000) */
+    CHECK_EQ(mm->getSellShortNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+
+    /** @arg with the guard enabled a short entry is rejected once a short is open */
+    mm->setParam<bool>("if_have_short_will_not_sell_short", true);
+    CHECK_EQ(mm->getSellShortNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 10000.0);
+    REQUIRE_EQ(
+      tm->sellShort(dt, stock, close, 1, 0.0, 0.0, close, PART_SIGNAL).business,
+      BUSINESS_SELL_SHORT);
+    CHECK_EQ(mm->getSellShortNumber(dt, stock, 10.0, 1.0, PART_SIGNAL), 0.0);
+
+    /** @arg a long position alone does not trigger the short guard */
+    auto tm2 = crtTM(dt, 100000.0, TC_Zero());
+    auto mm2 = MM_Nothing();
+    mm2->setTM(tm2);
+    mm2->setParam<bool>("if_have_short_will_not_sell_short", true);
+    REQUIRE_EQ(tm2->buy(dt, stock, 10.0, 100, 0.0, 0.0, 10.0, PART_SIGNAL).business, BUSINESS_BUY);
+    CHECK_UNARY(mm2->getSellShortNumber(dt, stock, 10.0, 1.0, PART_SIGNAL) > 0.0);
+}
+
 /** @} */
