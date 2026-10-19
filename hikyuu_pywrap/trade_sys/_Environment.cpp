@@ -35,6 +35,10 @@ public:
         m_is_python_object = true;
     }
 
+    bool _isValid(const Datetime& datetime, price_t value) const override {
+        PYBIND11_OVERLOAD_NAME(bool, EnvironmentBase, "_is_valid", _isValid, datetime, value);
+    }
+
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, EnvironmentBase, _calculate, );
     }
@@ -50,7 +54,12 @@ void export_Environment(py::module& m) {
       R"(The market environment strategy base class
 
 A market environment is a series of dates with values; a date is valid when its stored value is
-greater than 0, which is exactly what is_valid tests.
+finite and greater than 0, which is exactly what is_valid tests.
+
+The environment is designed to be shared across systems (the System parameter shared_ev defaults
+to True): is_valid takes a shared lock on every call while setting the query and reset take the
+exclusive lock, so all systems sharing one environment must use the same query, otherwise every
+differing query reruns the full calculation under the exclusive lock.
 
 The strategies can be combined with the operators &, |, +, -, * and /, and the result is itself
 an EnvironmentBase that can be combined further (see the operator docstrings, e.g. __mul__).
@@ -59,6 +68,7 @@ The custom market environment strategy interfaces:
 
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
+    - _is_valid : [Optional] The subclass validity rule, by default "finite and > 0"
     - _reset : [Optional] Reload the private variables)")
       .def(py::init<>())
       .def(py::init<const EnvironmentBase&>())
@@ -71,7 +81,11 @@ The custom market environment strategy interfaces:
                     py::overload_cast<const string&>(&EnvironmentBase::name),
                     py::return_value_policy::copy, "Name")
       .def_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,
-                    py::return_value_policy::copy, "Set or get the query condition")
+                    py::return_value_policy::copy,
+                    R"(Set or get the query condition
+
+    For a Python subclass the _calculate callback acquires the GIL while the mutex is held, so
+    setting the query must not run concurrently with the other calls on the same object.)")
 
       .def("get_param", &EnvironmentBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -101,8 +115,45 @@ The custom market environment strategy interfaces:
     :param Datetime datetime: the specified time
     :return: True valid | False invalid
 
-    The validity is exactly "the stored value of the date is greater than 0"; a date that was
-    never registered through _add_valid is invalid.)")
+    The validity is exactly "the stored value of the date is a finite value greater than 0"; a date
+    that was never registered through _add_valid is invalid.)")
+
+      .def("_is_valid", &EnvironmentBase::_isValid, py::arg("datetime"), py::arg("value"),
+           R"(_is_valid(self, datetime, value)
+
+    [Overload hook] The subclass validity rule, called by is_valid for every date registered
+    through _add_valid
+
+    :param Datetime datetime: the queried date
+    :param float value: the stored value of the date
+    :return: True valid | False invalid
+
+    The base implementation treats a date as valid when its value is finite and greater than 0;
+    override it to apply a custom rule based on the concrete value. The System judges the market
+    validity solely through is_valid (one call per bar), so overriding this hook directly changes
+    the trading behavior; note that the combination operators keep using the built-in "> 0" rule
+    on their sides.)")
+
+      .def("get_value", &EnvironmentBase::getValue, R"(get_value(self, datetime)
+
+    Get the stored value of the specified date
+
+    :param Datetime datetime: the specified time
+    :return: the stored value; 0.0 for a date that was never registered
+
+    0.0 is returned both for an invalid date and for an absent one; use is_valid to tell the
+    validity.)")
+
+      .def("get_values", &EnvironmentBase::getValues, R"(get_values(self)
+
+    Get the values as a time-series indicator: one record per date registered through _add_valid,
+    ordered by date
+
+    :return: Indicator
+
+    The date set and the meaning of the value depend on the operator that produced this object
+    (e.g. Add/Sub keep the union of both sides including invalid dates, And/Or keep only the
+    valid dates); only a finite value greater than 0 is valid.)")
 
       .def("_add_valid", &EnvironmentBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
            R"(_add_valid(self, datetime[, value=1.0])
@@ -113,10 +164,20 @@ The custom market environment strategy interfaces:
     :param float value: defaulting to 1.0; greater than 0 means valid, and less than or equal to 0 means invalid
 
     A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the
-    value instead of replacing it.)")
+    value instead of replacing it.
 
-      .def("reset", &EnvironmentBase::reset, "The reset operation")
-      .def("clone", &EnvironmentBase::clone, "The clone operation")
+    It takes no lock itself, so it can only be called from _calculate (which runs while the object
+    is locked); calling it from elsewhere would race with is_valid.)")
+
+      .def("reset", &EnvironmentBase::reset,
+           R"(The reset operation
+
+    For a Python subclass the _reset callback acquires the GIL while the mutex is held, so it must
+    not run concurrently with the other calls on the same object.)")
+      .def("clone", &EnvironmentBase::clone,
+           R"(The clone operation
+
+    The subclass _clone callback is invoked without holding the mutex.)")
       .def("_reset", &EnvironmentBase::_reset,
            "[Overload interface] The subclass reset interface, used to reset the internal private "
            "variables")
@@ -205,4 +266,14 @@ The custom market environment strategy interfaces:
 
     :param Indicator ind: a bool-type indicator; if the corresponding position in the indicator is >0, it means the market is valid, otherwise invalid
     :param str market: the specified market, used to get the corresponding trading calendar)");
+
+    m.def("EV_Manual", EV_Manual,
+          R"(EV_Manual()
+
+    A manual environment whose valid dates can only be registered through _add_valid, used for
+    the testing or other purposes.
+
+    The registered dates live until the query changes, so set the query first and register the
+    dates afterwards. Note that the combination operators re-run each side's _calculate through
+    setQuery, which clears a manual side; a combined result can be registered directly instead.)");
 }

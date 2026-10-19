@@ -27,6 +27,10 @@ public:
         m_is_python_object = true;
     }
 
+    bool _isValid(const Datetime& datetime, price_t value) const override {
+        PYBIND11_OVERLOAD_NAME(bool, ConditionBase, "_is_valid", _isValid, datetime, value);
+    }
+
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, ConditionBase, _calculate, );
     }
@@ -43,6 +47,7 @@ void export_Condition(py::module& m) {
 
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
+    - _is_valid : [Optional] The subclass validity rule, by default "finite and > 0"
     - _reset : [Optional] Reload the private variables)")
       .def(py::init<>())
       .def(py::init<const ConditionBase&>())
@@ -90,7 +95,23 @@ void export_Condition(py::module& m) {
     Whether the system is valid at the specified time
 
     :param Datetime datetime: the specified time
-    :return: True valid | False invalid)")
+    :return: True valid | False invalid
+
+    A date that was never registered through _add_valid is invalid; for a registered date the rule
+    is delegated to the _is_valid hook, whose default is "the stored value is finite and > 0".)")
+
+      .def("_is_valid", &ConditionBase::_isValid, py::arg("datetime"), py::arg("value"),
+           R"(_is_valid(self, datetime, value)
+
+    [Overload hook] The subclass validity rule, called by is_valid for every date registered
+    through _add_valid
+
+    :param Datetime datetime: the queried date
+    :param float value: the stored value of the date
+    :return: True valid | False invalid
+
+    The base implementation treats a date as valid when its value is finite and greater than 0;
+    override it to apply a custom rule based on the concrete value.)")
 
       .def("reset", &ConditionBase::reset, "The reset operation")
       .def("clone", &ConditionBase::clone, "The clone operation")
@@ -104,11 +125,12 @@ void export_Condition(py::module& m) {
     Get the actual values in the form of an indicator, with the same length as the trading object; 0 means invalid, and 1 means the system is valid)")
 
       .def("_add_valid", &ConditionBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
-           R"(_add_valid(self, datetime)
+           R"(_add_valid(self, datetime, value=1.0)
 
-    Add a valid time, called in _calculate
+    Add a valid time, called in _calculate; repeated calls on the same datetime accumulate (+=)
 
-    :param Datetime datetime: the valid time)")
+    :param Datetime datetime: the valid time
+    :param float value: the value to add, default 1.0)")
 
       .def("_calculate", &ConditionBase::_calculate,
            "[Overload interface] The subclass calculation interface. Do not call "
@@ -116,15 +138,6 @@ void export_Condition(py::module& m) {
       .def("_reset", &ConditionBase::_reset,
            "[Overload interface] The subclass reset interface, resetting the internal private "
            "variables")
-
-      .def("__len__", &ConditionBase::size)
-
-      .def("__getitem__",
-           [](const ConditionPtr& self, int64_t i) {
-               size_t total = self->size();
-               int64_t pos = i < 0 ? total + i : i;
-               return self->at(pos);
-           })
 
       .def("__and__",
            [](const ConditionPtr& self, const ConditionPtr& other) { return self & other; })

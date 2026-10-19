@@ -14,6 +14,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
 #include <hikyuu/trade_sys/condition/crt/CN_Bool.h>
+#include <hikyuu/trade_sys/condition/crt/CN_Manual.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 
@@ -74,6 +75,28 @@ private:
     bool m_flag;
     int m_calc_count{0};
 
+    CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
+};
+
+// A condition with a custom validity rule (value >= 2.0), to verify the _isValid hook
+class ThresholdCondition : public ConditionBase {
+public:
+    ThresholdCondition() : ConditionBase("TEST_THRESHOLD") {}
+
+    void _calculate() override {
+        _addValid(m_kdata[2].datetime, 2.0);
+        _addValid(m_kdata[3].datetime, 1.5);
+    }
+
+    bool _isValid(const Datetime& datetime, price_t value) const override {
+        return value >= 2.0;
+    }
+
+    ConditionPtr _clone() override {
+        return make_shared<ThresholdCondition>();
+    }
+
+private:
     CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
 };
 
@@ -195,6 +218,67 @@ TEST_CASE("test_Condition_getValues_single_pass") {
     }
 }
 
+/** @par Test point: isValid returns false for dates outside the trading object */
+TEST_CASE("test_Condition_isValid_outside_TO") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    ConditionPtr p = CN_Bool(CVAL(1.0));
+    p->setTO(kdata);
+    CHECK_EQ(p->getDatetimeList().size(), kdata.size());
+
+    /** @arg dates before and after the TO window are not registered, so they are invalid */
+    CHECK_UNARY_FALSE(p->isValid(Datetime(18000101)));
+    CHECK_UNARY_FALSE(p->isValid(Datetime(29991231)));
+}
+
+/** @par Test point: CN_Manual is valid only for manually added dates (C++-side) */
+TEST_CASE("test_Condition_manual") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    CNPtr cn = CN_Manual();
+    CHECK_EQ(cn->name(), "CN_Manual");
+
+    cn->setTO(kdata);
+    /** @arg nothing is valid until a date is registered manually */
+    CHECK_EQ(cn->getDatetimeList().size(), 0);
+
+    /** @arg a registered date becomes valid; the rest stay invalid */
+    Datetime d = kdata[2].datetime;
+    cn->_addValid(d);
+    CHECK_EQ(cn->getDatetimeList().size(), 1);
+    CHECK_UNARY(cn->isValid(d));
+    CHECK_UNARY_FALSE(cn->isValid(kdata[3].datetime));
+
+    /** @arg _addValid accumulates the value on the same date */
+    cn->_addValid(d, 2.0);
+    CHECK_EQ(cn->at(2), 3.0);
+}
+
+/** @par Test point: a subclass overriding _isValid changes both isValid and getDatetimeList */
+TEST_CASE("test_Condition_isValid_hook") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    ConditionPtr p(new ThresholdCondition);
+    p->setTO(kdata);
+
+    /** @arg 1.5 fails the >=2.0 custom rule while the default >0 would accept it */
+    CHECK_UNARY(p->isValid(kdata[2].datetime));
+    CHECK_UNARY_FALSE(p->isValid(kdata[3].datetime));
+    CHECK_EQ(p->getDatetimeList().size(), 1);
+}
+
 #if HKU_SUPPORT_SERIALIZATION
 /** @par Test points */
 TEST_CASE("test_Condition_serialize") {
@@ -213,13 +297,20 @@ TEST_CASE("test_Condition_serialize") {
         oa << BOOST_SERIALIZATION_NVP(src);
     }
 
-    /** @arg the date index and values survive the round trip */
     ConditionTest dst;
     {
         std::ifstream ifs(filename);
         boost::archive::xml_iarchive ia(ifs);
         ia >> BOOST_SERIALIZATION_NVP(dst);
     }
+
+    /** @arg the configuration survives the round trip */
+    CHECK_EQ(dst.name(), src.name());
+    CHECK_EQ(dst.getParam<int>("n"), src.getParam<int>("n"));
+
+    /** @arg the per-bar cache is no longer persisted; it is rebuilt by setTO */
+    CHECK_EQ(dst.size(), 0);
+    dst.setTO(kdata);
     CHECK_EQ(dst.size(), src.size());
     CHECK_EQ(dst.getDatetimeList().size(), src.getDatetimeList().size());
     CHECK_UNARY(dst.isValid(Datetime(19901221)));

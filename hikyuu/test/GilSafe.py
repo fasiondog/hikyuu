@@ -114,6 +114,30 @@ ANALYZE_PY_PARTS_PROBE = (
     "print('OK')\n"
 ).format(root=REPO_ROOT, config=CONFIG)
 
+# EnvironmentBase.clone() must invoke the subclass _clone hook without holding the base mutex:
+# a hook that re-enters the exclusive lock (here by setting the query on itself) would deadlock
+# while the clone still held the shared lock, which is the lock-order hazard the fix removes.
+CLONE_LOCK_PROBE = (
+    "import sys; sys.path.insert(0, r'{root}')\n"
+    "import os; os.chdir(r'{root}')\n"
+    "from hikyuu import *\n"
+    "set_log_level(LOG_LEVEL.OFF)\n"
+    "hikyuu_init('{config}')\n"
+    "class MyEV(EnvironmentBase):\n"
+    "    def __init__(self):\n"
+    "        super().__init__('MyEV')\n"
+    "    def _calculate(self):\n"
+    "        self._add_valid(Datetime(201111100000))\n"
+    "    def _clone(self):\n"
+    "        self.query = Query(-100)  # would deadlock while clone() holds the shared lock\n"
+    "        return MyEV()\n"
+    "ev = MyEV()\n"
+    "ev.query = Query(-100)\n"
+    "cloned = ev.clone()\n"
+    "assert cloned.is_valid(Datetime(201111100000)), 'the clone lost the valid dates'\n"
+    "print('OK')\n"
+).format(root=REPO_ROOT, config=CONFIG)
+
 
 class GilSafeTest(unittest.TestCase):
     def test_exit_clean_after_gil_safe_use(self):
@@ -158,6 +182,22 @@ class GilSafeTest(unittest.TestCase):
             timeout=120,
         )
         self.assertEqual(proc.returncode, 0, "analyze probe crashed:\n%s" % proc.stderr[-2000:])
+        self.assertIn("OK", proc.stdout)
+
+    def test_clone_hook_runs_without_the_object_lock(self):
+        # clone() must invoke the subclass _clone hook with the base mutex free: a hook that
+        # re-enters the exclusive lock (or reaches the GIL) would otherwise deadlock.
+        proc = subprocess.run(
+            [sys.executable, "-c", CLONE_LOCK_PROBE],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
+        )
+        self.assertEqual(
+            proc.returncode, 0, "clone lock probe crashed:\n%s" % proc.stderr[-2000:]
+        )
         self.assertIn("OK", proc.stdout)
 
 

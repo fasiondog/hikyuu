@@ -89,8 +89,21 @@ public:
      * Whether the system is valid at the given time
      * @param datetime the given time
      * @return true valid | false invalid
+     * @note A date that was never registered is invalid; for a registered date the rule is
+     *       delegated to the _isValid hook, whose default is "the stored value is finite and > 0"
      */
     bool isValid(const Datetime& datetime);
+
+    /**
+     * The subclass validity-rule hook, called by isValid and getDatetimeList for every date
+     * registered through _addValid
+     * @param datetime the queried date
+     * @param value the stored value of the date
+     * @return true valid | false invalid; the default rule is "the value is finite and > 0"
+     * @note Override it to apply a custom rule based on the concrete value; the combination
+     *       operators keep using the built-in "> 0" rule on their sides
+     */
+    virtual bool _isValid(const Datetime& datetime, price_t value) const;
 
     /** Subclass calculation interface */
     virtual void _calculate() = 0;
@@ -134,22 +147,16 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_date_index);
-        ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_kdata/m_tm/m_sg are set temporarily when the system runs, they do not need to be
-        // serialized
+        // m_date_index/m_values are the per-bar cache rebuilt by setTO's _calculate, so they are
+        // no longer persisted (keeps archives small). m_kdata/m_tm/m_sg are runtime-only.
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_date_index);
-        ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_kdata/m_tm/m_sg are set temporarily when the system runs, they do not need to be
-        // serialized
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()

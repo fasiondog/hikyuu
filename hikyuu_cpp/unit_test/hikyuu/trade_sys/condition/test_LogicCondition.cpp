@@ -110,4 +110,82 @@ TEST_CASE("test_LogicCondition_isfinite_filter") {
     CHECK_EQ(mul_ok->at(0), 6.0);
 }
 
+/** @par Test points: per-operator single-side / empty semantics (lock the CN combination matrix) */
+TEST_CASE("test_LogicCondition_single_side") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh000001");
+    KData kdata = stock.getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+    size_t total = kdata.size();
+
+    ConditionPtr null_c;
+    ConditionPtr c2 = std::make_shared<ConstCondition>(2.0);
+    ConditionPtr c3 = std::make_shared<ConstCondition>(3.0);
+    ConditionPtr r;
+
+    /** @arg Add: single side passes through; both null yields all invalid */
+    r = c2 + null_c;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 2.0);
+    CHECK_EQ(r->getDatetimeList().size(), total);
+
+    r = null_c + c3;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 3.0);
+
+    r = null_c + null_c;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 0.0);
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+
+    /** @arg Sub: only cond2 negates (-d2); only cond1 passes d1 through */
+    r = null_c - c3;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), -3.0);
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+
+    r = c2 - null_c;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 2.0);
+
+    /** @arg Or: a single valid side is normalized to 1.0 */
+    r = c2 | null_c;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 1.0);
+    CHECK_EQ(r->getDatetimeList().size(), total);
+
+    r = null_c | c3;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 1.0);
+
+    /** @arg And needs both operands: a null side yields always invalid */
+    r = c2 & null_c;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 0.0);
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+
+    r = null_c & c3;
+    r->setTO(kdata);
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+
+    /** @arg Multi needs both operands: a null side yields always invalid */
+    r = c2 * null_c;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 0.0);
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+
+    /** @arg Div: a null right side yields NaN; a null left side yields all 0 (invalid) */
+    r = c2 / null_c;
+    r->setTO(kdata);
+    CHECK_UNARY(std::isnan(r->at(0)));
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+
+    r = null_c / c3;
+    r->setTO(kdata);
+    CHECK_EQ(r->at(0), 0.0);
+    CHECK_EQ(r->getDatetimeList().size(), 0);
+}
+
 /** @} */

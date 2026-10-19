@@ -20,6 +20,10 @@ namespace hku {
 /**
  * Base class of the market environment strategy
  * @note The external environment should have nothing to do with the concrete trading object
+ * @note The environment is designed to be shared across systems (System shared_ev defaults to
+ *       true): isValid takes a shared lock on every call while setQuery/reset take the exclusive
+ *       lock, so all systems sharing one environment must use the same query, otherwise every
+ *       differing setQuery reruns the full calculation under the exclusive lock
  * @ingroup Environment
  */
 class HKU_API EnvironmentBase {
@@ -43,10 +47,20 @@ public:
         m_name = name;
     }
 
-    /** Reset */
+    /**
+     * Reset
+     * @note For a Python subclass the _reset callback acquires the GIL while the mutex is held, so
+     *       reset must not be invoked concurrently with the other calls on the same object
+     */
     void reset();
 
-    /** Set the query condition */
+    /**
+     * Set the query condition; the calculation is re-run only when the query differs from the
+     * current one
+     * @note For a Python subclass the _calculate callback acquires the GIL while the mutex is
+     *       held, so setQuery must not be invoked concurrently with the other calls on the same
+     *       object
+     */
     void setQuery(const KQuery& query);
 
     /** Get the query condition */
@@ -60,6 +74,8 @@ public:
      * @note Unlike the other trading-system parts, the Environment is not bound to a specific
      *       instrument and can be shared, so essentially the clone operation is not needed
      * here; it exists only for the consistency and the possibly existing special scenarios.
+     * @note The subclass _clone callback is invoked without holding the mutex, so that it may
+     *       reach the GIL (or re-enter this object) without risking a lock-order deadlock.
      */
     EnvironmentPtr clone();
 
@@ -70,6 +86,9 @@ public:
      *              invalid
      * @note A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates
      *       the value instead of replacing it
+     * @note It takes no lock itself, so it must only be called from _calculate (or another hook
+     *       invoked by setQuery / reset while the mutex is held); a call from anywhere else would
+     *       race with the readers
      */
     void _addValid(const Datetime& datetime, price_t value = 1.0);
 
@@ -77,8 +96,11 @@ public:
      * Judge whether the external environment of the given date is valid
      * @param datetime the given date
      * @return true valid | false invalid
-     * @note The validity is exactly "the stored value of the date is > 0"; a date that was never
-     *       added is invalid
+     * @note A date that was never added is invalid; for a registered date the rule is delegated
+     *       to the _isValid hook, whose default is "the stored value is finite and > 0"
+     * @note For a Python subclass that overrides _is_valid, the callback acquires the GIL while
+     *       the shared lock is held, so isValid must not run concurrently with setQuery/reset
+     *       on the same object
      */
     bool isValid(const Datetime& datetime) const;
 
@@ -93,7 +115,7 @@ public:
 
     /**
      * Get the values as a time-series indicator: one record per date registered through _addValid,
-     * ordered by date; <= 0 means invalid and > 0 means valid
+     * ordered by date; only a finite value > 0 means valid, anything else is invalid
      * @note The date set and the meaning of the value depend on the operator that produced this
      *       object, see the operator notes above
      */
@@ -139,6 +161,19 @@ public:
      * And/Multi/Div would wrongly keep ev1-only dates. Each file's _calculate spells out its own
      * branch.
      */
+
+    /**
+     * The subclass validity-rule hook, called by isValid for every date registered through
+     * _addValid
+     * @param datetime the queried date
+     * @param value the stored value of the date
+     * @return true valid | false invalid; the default rule is "the value is finite and > 0"
+     * @note The System judges the market validity solely through isValid (one call per bar), so
+     *       overriding this hook directly changes the trading behavior
+     * @note Override it to apply a custom rule based on the concrete ev value; the combination
+     *       operators keep using the built-in "> 0" rule on their sides
+     */
+    virtual bool _isValid(const Datetime& datetime, price_t value) const;
 
     /** Subclass calculation interface */
     virtual void _calculate() = 0;

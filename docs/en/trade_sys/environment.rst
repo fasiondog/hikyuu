@@ -22,6 +22,16 @@ Built-in Market Environment Strategies
     :param Indicator ind: a boolean indicator; values greater than 0 mark the market as valid, all other values mark it as invalid
     :param str market: the market whose trading calendar is used
 
+.. py:function:: EV_Manual()
+
+    A manual environment whose valid dates can only be registered through
+    :py:meth:`EnvironmentBase._add_valid`, used for the testing or other purposes.
+
+    The registered dates live until the query changes, so set the query first and register the
+    dates afterwards. Note that the combination operators re-run each side's ``_calculate``
+    through ``setQuery`` (which clears a manual side); to assign the valid dates of a combined
+    result manually, call :py:meth:`EnvironmentBase._add_valid` on the result directly.
+
 
 Combination Operators
 ---------------------
@@ -29,7 +39,7 @@ Combination Operators
 Market environment strategies can be combined; the result is itself an ``EnvironmentBase`` and can
 be combined further.
 
-The validity rule is "the date's stored value is greater than 0", which is exactly what
+The validity rule is "the date's stored value is finite and greater than 0", which is exactly what
 ``is_valid`` tests; "not output" in the tables below means the date is absent from the result
 (treated as missing, so ``is_valid`` returns False).
 
@@ -96,6 +106,34 @@ The value of ``Multi`` / ``Div`` is decided by the signs of the two sides on tha
      - not output (that side has no value)
 
 
+Sharing and Concurrency
+-----------------------
+
+The environment is bound to no specific instrument and is shared across systems by default (the
+``System`` parameter ``shared_ev=True``): several systems attach to the same ``EnvironmentBase``
+instance, whose result depends only on the query condition and thus needs to be calculated once.
+
+Internal concurrency semantics:
+
+* The read interfaces (such as ``is_valid``) take a **shared lock** on every call (called once per
+  bar during a system backtest);
+* Setting ``query`` and ``reset`` take the **exclusive lock**: a query different from the current
+  one triggers a full recalculation, an identical one returns immediately;
+* ``_add_valid`` takes no lock itself and can only be called from ``_calculate``.
+
+Usage constraints:
+
+* All systems sharing one environment must use the **same query condition** (the same k-line type,
+  recover type and range), otherwise every differing ``setQuery`` reruns the full calculation
+  under the exclusive lock and the concurrent backtest degrades into serialized recalculations;
+* Concurrent threads sharing one environment contend on the shared lock's cache line; in extremely
+  hot call paths each system can own a cloned environment instead (i.e. ``shared_ev=False`` on the
+  ``System``);
+* For a Python subclass, setting ``query`` and ``reset`` call back into Python while the lock is
+  held (needing the GIL), so they must not run concurrently with the other calls on the same
+  object (see the base class description below).
+
+
 Custom Market Environment Strategy
 -------------------------------------
 
@@ -103,6 +141,7 @@ The custom market environment strategy interface:
 
 * :py:meth:`EnvironmentBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`EnvironmentBase._clone` - [Required] The clone interface
+* :py:meth:`EnvironmentBase._is_valid` - [Optional] The custom validity rule (by default "finite and > 0")
 * :py:meth:`EnvironmentBase._reset` - [Optional] Reset the internal member variables
 
 Market Environment Strategy Base Class
@@ -145,8 +184,47 @@ Market Environment Strategy Base Class
         :param Datetime datetime: the specified time
         :return: True means valid | False means invalid
 
-        The validity rule is "the stored value of the date is greater than 0"; a date that was
-        never registered through ``_add_valid`` is invalid.
+        The validity rule is "the stored value of the date is finite and greater than 0"; a date
+        that was never registered through ``_add_valid`` is invalid.
+
+        The rule is provided by :py:meth:`_is_valid`, which can be overridden for a value-based
+        rule.
+
+    .. py:method:: _is_valid(self, datetime, value)
+
+        [Override hook] The custom validity rule, called by :py:meth:`is_valid` for every date
+        registered through ``_add_valid``
+
+        :param Datetime datetime: the queried date
+        :param float value: the stored value of the date
+        :return: True means valid | False means invalid
+
+        The base implementation is "finite and greater than 0"; subclasses usually need no change
+        and may override it to judge on the concrete value. The System judges the market validity
+        solely through :py:meth:`is_valid` (one call per bar), so overriding this hook directly
+        changes the trading behavior; note that the sides of the combination operators keep using
+        the built-in "> 0" rule.
+
+    .. py:method:: get_value(self, datetime)
+
+        Get the stored value of the specified date
+
+        :param Datetime datetime: the specified time
+        :return: the stored value; 0.0 for a date that was never registered
+
+        0.0 is returned both for an invalid date and for an absent one; use :py:meth:`is_valid`
+        to tell the validity.
+
+    .. py:method:: get_values(self)
+
+        Get the values as a time-series indicator: one record per date registered through
+        ``_add_valid``, ordered by date
+
+        :return: Indicator
+
+        The date set and the meaning of the value depend on the operator that produced this
+        object (e.g. ``Add``/``Sub`` keep the union of both sides including invalid dates, while
+        ``And``/``Or`` keep only the valid dates); only a finite value greater than 0 is valid.
 
     .. py:method:: _add_valid(self, datetime[, value=1.0])
 
@@ -157,6 +235,9 @@ Market Environment Strategy Base Class
 
         A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the
         value instead of replacing it.
+
+        It takes no lock itself, so it can only be called from ``_calculate`` (which runs while the
+        object is locked); calling it from elsewhere would race with ``is_valid``.
 
     .. py:method:: reset(self)
 
@@ -177,3 +258,10 @@ Market Environment Strategy Base Class
     .. py:method:: _clone(self)
 
         [Override hook] The subclass clone interface
+
+    .. note::
+
+        For a Python subclass, setting ``query`` calls back into ``_calculate`` and ``reset`` into
+        ``_reset`` while the mutex is held, and both need the GIL, so they must not run concurrently
+        with the other calls on the same object; the ``_clone`` callback of ``clone`` is invoked
+        without holding the lock and carries no such restriction.

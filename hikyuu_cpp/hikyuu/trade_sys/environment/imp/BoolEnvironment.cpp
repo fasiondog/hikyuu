@@ -40,8 +40,8 @@ void BoolEnvironment::_calculate() {
     string market = getParam<string>("market");
     const StockManager& sm = StockManager::instance();
     MarketInfo market_info = sm.getMarketInfo(market);
-    HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(), "Can't find maket({}) info!",
-                        market);
+    HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+                        "Can't find the market({}) info!", market);
 
     Stock stock = sm.getStock(market + market_info.code());
     KData kdata = stock.getKData(m_query);
@@ -54,14 +54,14 @@ void BoolEnvironment::_calculate() {
     if (total == kdata.size()) {
         const auto* kdata_ptr = kdata.data();
         for (size_t i = discard; i < total; i++) {
-            if (!std::isnan(ind_data[i]) && ind_data[i] > 0.) {
+            if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
                 _addValid(kdata_ptr[i].datetime);
             }
         }
     } else {
         DatetimeList dates = m_ind.getDatetimeList();
         for (size_t i = discard; i < total; i++) {
-            if (!std::isnan(ind_data[i]) && ind_data[i] > 0.) {
+            if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
                 _addValid(dates[i]);
             }
         }

@@ -27,8 +27,8 @@ private:
     Indicator m_op;
 
     // Cache of the last embedded-backtest result, keyed by (stock, query, sg). The backtest is the
-    // dominant cost of this condition, so identical inputs reuse the result. The key ties to the
-    // inputs, so the cached output is identical by construction.
+    // dominant cost of this condition, so identical inputs reuse the result. m_op is the only other
+    // input and is immutable (no setter), so it needs no keying; adding an m_op setter would.
     Stock m_last_stock;
     KQuery m_last_query;
     SGPtr m_last_sg;
