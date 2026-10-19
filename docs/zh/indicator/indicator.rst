@@ -411,6 +411,9 @@
 
     平均真实波幅(Average True Range), 真实波动幅度 TR 的简单移动均值
 
+    口径说明：对 TR 取简单移动平均（通达信/同花顺口径），与 TA-Lib / Wilder 的递归平滑
+    `ATR = (prev*(n-1)+TR)/n` 数值不同；需要 Wilder 口径时可用 `SMA(TR(kdata), n, 1)` 表达。
+
     :param KData kdata: 待计算的源数据
     :param int n: 计算均值的周期窗口（>=1）
     :rtype: Indicator

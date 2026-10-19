@@ -902,6 +902,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The Average True Range, the simple moving average of the true range TR
 
+    It averages TR with a simple moving average (the TDX convention), not with the Wilder recursion
+    of TA-Lib (ATR = (prev*(n-1)+TR)/n); the two differ on the same data. SMA(TR(kdata), n, 1)
+    gives the Wilder smoothing.
+
     :param KData kdata the source data to calculate
     :param int n: the period window for calculating the average, which must be an integer greater than 1
     :rtype: Indicator)");
