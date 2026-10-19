@@ -193,4 +193,36 @@ TEST_CASE("test_EV_Bool_reject_non_finite") {
     CHECK_FALSE(nan->isValid(kdata.front().datetime));
 }
 
+/** @par Test points */
+TEST_CASE("test_EV_TwoLine_reject_size_mismatch") {
+    StockManager& sm = StockManager::instance();
+    KQuery query(-100);
+    KData kdata = sm.getStock("sh000001").getKData(query);
+    REQUIRE(kdata.size() > 10);
+
+    /** @arg A short fast line is aligned to the KData dates by ALIGN; its 5 values carry the
+     *       first 5 KData dates (inherited from its calculation context), so only those dates
+     *       are valid */
+    EVPtr mismatch = EV_TwoLine(PRICELIST(5, 1.0), PRICELIST(kdata.size(), 0.0));
+    mismatch->setQuery(query);
+    for (size_t i = 0; i < 5; ++i) {
+        CHECK(mismatch->isValid(kdata[i].datetime));
+    }
+    for (size_t i = 5; i < kdata.size(); ++i) {
+        CHECK_FALSE(mismatch->isValid(kdata[i].datetime));
+    }
+
+    /** @arg An empty fast line is aligned to an all-null series and marks no date as valid */
+    EVPtr empty = EV_TwoLine(PRICELIST(), PRICELIST(kdata.size(), 0.0));
+    CHECK_NOTHROW(empty->setQuery(query));
+    CHECK_FALSE(empty->isValid(kdata.front().datetime));
+    CHECK_FALSE(empty->isValid(kdata.back().datetime));
+
+    /** @arg Matching lengths keep the normal fast > slow behaviour without any alignment */
+    EVPtr ok = EV_TwoLine(PRICELIST(kdata.size(), 2.0), PRICELIST(kdata.size(), 1.0));
+    ok->setQuery(query);
+    CHECK(ok->isValid(kdata.front().datetime));
+    CHECK(ok->isValid(kdata.back().datetime));
+}
+
 /** @} */

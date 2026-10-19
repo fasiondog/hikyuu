@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "../../../StockManager.h"
+#include "../../../indicator/crt/ALIGN.h"
 #include "../../../indicator/crt/KDATA.h"
 #include "TwoLineEnvironment.h"
 
@@ -51,11 +52,23 @@ void TwoLineEnvironment::_calculate() {
 
     Stock stock = sm.getStock(market + market_info.code());
     KData kdata = stock.getKData(m_query);
+    HKU_IF_RETURN(kdata.empty(), void());
+
     Indicator close = CLOSE(kdata);
     Indicator fast = m_fast(close);
     Indicator slow = m_slow(close);
 
     size_t total = close.size();
+    if (fast.size() != total) {
+        fast = ALIGN(fast, kdata);
+    }
+    if (slow.size() != total) {
+        slow = ALIGN(slow, kdata);
+    }
+    HKU_WARN_IF_RETURN(fast.size() != total || slow.size() != total, void(),
+                       "The fast/slow indicator length must match the KData length ({} vs {}/{})!",
+                       total, fast.size(), slow.size());
+
     size_t start = fast.discard() > slow.discard() ? fast.discard() : slow.discard();
     auto const* fast_data = fast.data();
     auto const* slow_data = slow.data();
