@@ -179,6 +179,35 @@ class TestEVComboGetValues(unittest.TestCase):
         self.assertAlmostEqual(both.get_value(Datetime(20010101)), 1.0)
 
 
+class EnvironmentCustomRule(EnvironmentBase):
+    def __init__(self):
+        super(EnvironmentCustomRule, self).__init__("EnvironmentCustomRule")
+
+    def _calculate(self):
+        self._add_valid(Datetime(202001010000), -1.0)
+        self._add_valid(Datetime(202001020000), 1.0)
+
+    def _is_valid(self, datetime, value):
+        # A custom rule: a negative value is valid, everything else is invalid
+        return value < 0.0
+
+    def _clone(self):
+        return EnvironmentCustomRule()
+
+
+class TestEVCustomRule(unittest.TestCase):
+    def test_custom_is_valid_rule(self):
+        p = EnvironmentCustomRule()
+        p.query = Query(-10)
+        self.assertTrue(p.is_valid(Datetime(202001010000)))
+        self.assertFalse(p.is_valid(Datetime(202001020000)))
+
+        # The clone keeps the custom rule
+        p_clone = p.clone()
+        self.assertTrue(p_clone.is_valid(Datetime(202001010000)))
+        self.assertFalse(p_clone.is_valid(Datetime(202001020000)))
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(EnvironmentTest)
 
@@ -191,4 +220,5 @@ def suiteTestEVManual():
     tests = unittest.TestSuite()
     tests.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEVManual))
     tests.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEVComboGetValues))
+    tests.addTests(unittest.TestLoader().loadTestsFromTestCase(TestEVCustomRule))
     return tests

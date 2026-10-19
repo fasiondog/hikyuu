@@ -99,7 +99,10 @@ bool EnvironmentBase::isValid(const Datetime& datetime) const {
     std::shared_lock<std::shared_mutex> lock(m_mutex);
     auto iter = m_date_index.find(datetime);
     HKU_IF_RETURN(iter == m_date_index.end(), false);
-    price_t value = m_values[iter->second];
+    return _isValid(datetime, m_values[iter->second]);
+}
+
+bool EnvironmentBase::_isValid(const Datetime& datetime, price_t value) const {
     return std::isfinite(value) && value > 0.;
 }
 

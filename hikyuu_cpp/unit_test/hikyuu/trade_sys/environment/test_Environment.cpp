@@ -313,4 +313,37 @@ TEST_CASE("test_EV_invalid_market_check") {
     CHECK_THROWS(ev_two->setParam<string>("market", "XX"));
 }
 
+class EnvironmentCustomRuleTest : public EnvironmentBase {
+public:
+    EnvironmentCustomRuleTest() : EnvironmentBase("TEST_CUSTOM_RULE") {}
+
+    void _calculate() override {
+        _addValid(Datetime(200001010000LL), -1.0);
+        _addValid(Datetime(200001020000LL), 1.0);
+        _addValid(Datetime(200001030000LL), std::numeric_limits<price_t>::quiet_NaN());
+    }
+
+    EnvironmentPtr _clone() override {
+        return make_shared<EnvironmentCustomRuleTest>();
+    }
+
+    // A custom rule: a negative value is valid, everything else is invalid
+    bool _isValid(const Datetime& datetime, price_t value) const override {
+        return value < 0.0;
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_Environment_custom_is_valid_rule") {
+    /** @arg The subclass _isValid hook overrides the default "finite and > 0" rule */
+    auto p = make_shared<EnvironmentCustomRuleTest>();
+    p->setQuery(KQuery(-100));
+    CHECK(p->isValid(Datetime(200001010000LL)));
+    CHECK_FALSE(p->isValid(Datetime(200001020000LL)));
+    CHECK_FALSE(p->isValid(Datetime(200001030000LL)));
+
+    /** @arg A date that was never registered stays invalid regardless of the rule */
+    CHECK_FALSE(p->isValid(Datetime(200001040000LL)));
+}
+
 /** @} */

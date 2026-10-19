@@ -141,6 +141,7 @@ The custom market environment strategy interface:
 
 * :py:meth:`EnvironmentBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`EnvironmentBase._clone` - [Required] The clone interface
+* :py:meth:`EnvironmentBase._is_valid` - [Optional] The custom validity rule (by default "finite and > 0")
 * :py:meth:`EnvironmentBase._reset` - [Optional] Reset the internal member variables
 
 Market Environment Strategy Base Class
@@ -185,6 +186,24 @@ Market Environment Strategy Base Class
 
         The validity rule is "the stored value of the date is finite and greater than 0"; a date
         that was never registered through ``_add_valid`` is invalid.
+
+        The rule is provided by :py:meth:`_is_valid`, which can be overridden for a value-based
+        rule.
+
+    .. py:method:: _is_valid(self, datetime, value)
+
+        [Override hook] The custom validity rule, called by :py:meth:`is_valid` for every date
+        registered through ``_add_valid``
+
+        :param Datetime datetime: the queried date
+        :param float value: the stored value of the date
+        :return: True means valid | False means invalid
+
+        The base implementation is "finite and greater than 0"; subclasses usually need no change
+        and may override it to judge on the concrete value. The System judges the market validity
+        solely through :py:meth:`is_valid` (one call per bar), so overriding this hook directly
+        changes the trading behavior; note that the sides of the combination operators keep using
+        the built-in "> 0" rule.
 
     .. py:method:: get_value(self, datetime)
 

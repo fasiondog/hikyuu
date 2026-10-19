@@ -96,8 +96,11 @@ public:
      * Judge whether the external environment of the given date is valid
      * @param datetime the given date
      * @return true valid | false invalid
-     * @note The validity is exactly "the stored value of the date is finite and > 0"; a date that
-     *       was never added is invalid
+     * @note A date that was never added is invalid; for a registered date the rule is delegated
+     *       to the _isValid hook, whose default is "the stored value is finite and > 0"
+     * @note For a Python subclass that overrides _is_valid, the callback acquires the GIL while
+     *       the shared lock is held, so isValid must not run concurrently with setQuery/reset
+     *       on the same object
      */
     bool isValid(const Datetime& datetime) const;
 
@@ -158,6 +161,19 @@ public:
      * And/Multi/Div would wrongly keep ev1-only dates. Each file's _calculate spells out its own
      * branch.
      */
+
+    /**
+     * The subclass validity-rule hook, called by isValid for every date registered through
+     * _addValid
+     * @param datetime the queried date
+     * @param value the stored value of the date
+     * @return true valid | false invalid; the default rule is "the value is finite and > 0"
+     * @note The System judges the market validity solely through isValid (one call per bar), so
+     *       overriding this hook directly changes the trading behavior
+     * @note Override it to apply a custom rule based on the concrete ev value; the combination
+     *       operators keep using the built-in "> 0" rule on their sides
+     */
+    virtual bool _isValid(const Datetime& datetime, price_t value) const;
 
     /** Subclass calculation interface */
     virtual void _calculate() = 0;

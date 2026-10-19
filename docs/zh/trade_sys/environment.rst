@@ -130,6 +130,7 @@
 
 * :py:meth:`EnvironmentBase._calculate` - 【必须】子类计算接口
 * :py:meth:`EnvironmentBase._clone` - 【必须】克隆接口
+* :py:meth:`EnvironmentBase._is_valid` - 【可选】自定义有效性判定规则（默认为有限值且 > 0）
 * :py:meth:`EnvironmentBase._reset` - 【可选】重载私有变量
 
 市场环境判定策略基类
@@ -173,6 +174,20 @@
         :return: True 有效 | False 无效
 
         判定规则为"该日期的值为有限值且 > 0"；从未通过 ``_add_valid`` 登记过的日期为无效。
+
+        判定规则由 :py:meth:`_is_valid` 提供，需要按具体值判定时可重载之。
+
+    .. py:method:: _is_valid(self, datetime, value)
+
+        【重载接口】自定义有效性判定规则，由 :py:meth:`is_valid` 对每个经 ``_add_valid`` 登记的日期调用
+
+        :param Datetime datetime: 查询日期
+        :param float value: 该日期的存储值
+        :return: True 有效 | False 无效
+
+        基类实现为"有限值且 > 0"，子类通常无需修改；需要根据具体 value 值判定时可重载。System 在回测中
+        每根 bar 仅通过 :py:meth:`is_valid` 判定市场有效与否，重载即直接改变交易行为；注意组合运算的
+        各侧仍使用内建的 "> 0" 规则。
 
     .. py:method:: get_value(self, datetime)
 

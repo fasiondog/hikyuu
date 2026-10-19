@@ -35,6 +35,10 @@ public:
         m_is_python_object = true;
     }
 
+    bool _isValid(const Datetime& datetime, price_t value) const override {
+        PYBIND11_OVERLOAD_NAME(bool, EnvironmentBase, "_is_valid", _isValid, datetime, value);
+    }
+
     void _calculate() override {
         PYBIND11_OVERLOAD_PURE(void, EnvironmentBase, _calculate, );
     }
@@ -64,6 +68,7 @@ The custom market environment strategy interfaces:
 
     - _calculate : [Required] The subclass calculation interface
     - _clone : [Required] The clone interface
+    - _is_valid : [Optional] The subclass validity rule, by default "finite and > 0"
     - _reset : [Optional] Reload the private variables)")
       .def(py::init<>())
       .def(py::init<const EnvironmentBase&>())
@@ -112,6 +117,22 @@ The custom market environment strategy interfaces:
 
     The validity is exactly "the stored value of the date is a finite value greater than 0"; a date
     that was never registered through _add_valid is invalid.)")
+
+      .def("_is_valid", &EnvironmentBase::_isValid, py::arg("datetime"), py::arg("value"),
+           R"(_is_valid(self, datetime, value)
+
+    [Overload hook] The subclass validity rule, called by is_valid for every date registered
+    through _add_valid
+
+    :param Datetime datetime: the queried date
+    :param float value: the stored value of the date
+    :return: True valid | False invalid
+
+    The base implementation treats a date as valid when its value is finite and greater than 0;
+    override it to apply a custom rule based on the concrete value. The System judges the market
+    validity solely through is_valid (one call per bar), so overriding this hook directly changes
+    the trading behavior; note that the combination operators keep using the built-in "> 0" rule
+    on their sides.)")
 
       .def("get_value", &EnvironmentBase::getValue, R"(get_value(self, datetime)
 
