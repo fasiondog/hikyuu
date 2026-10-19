@@ -96,6 +96,34 @@ The value of ``Multi`` / ``Div`` is decided by the signs of the two sides on tha
      - not output (that side has no value)
 
 
+Sharing and Concurrency
+-----------------------
+
+The environment is bound to no specific instrument and is shared across systems by default (the
+``System`` parameter ``shared_ev=True``): several systems attach to the same ``EnvironmentBase``
+instance, whose result depends only on the query condition and thus needs to be calculated once.
+
+Internal concurrency semantics:
+
+* The read interfaces (such as ``is_valid``) take a **shared lock** on every call (called once per
+  bar during a system backtest);
+* Setting ``query`` and ``reset`` take the **exclusive lock**: a query different from the current
+  one triggers a full recalculation, an identical one returns immediately;
+* ``_add_valid`` takes no lock itself and can only be called from ``_calculate``.
+
+Usage constraints:
+
+* All systems sharing one environment must use the **same query condition** (the same k-line type,
+  recover type and range), otherwise every differing ``setQuery`` reruns the full calculation
+  under the exclusive lock and the concurrent backtest degrades into serialized recalculations;
+* Concurrent threads sharing one environment contend on the shared lock's cache line; in extremely
+  hot call paths each system can own a cloned environment instead (i.e. ``shared_ev=False`` on the
+  ``System``);
+* For a Python subclass, setting ``query`` and ``reset`` call back into Python while the lock is
+  held (needing the GIL), so they must not run concurrently with the other calls on the same
+  object (see the base class description below).
+
+
 Custom Market Environment Strategy
 -------------------------------------
 

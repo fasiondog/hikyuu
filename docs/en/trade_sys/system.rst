@@ -63,6 +63,13 @@ Common parameters:
         should use its own clone (i.e. keep the corresponding ``shared_*=False``). This is the current
         implementation and may be extended to support thread-safe sharing in the future.
 
+        The ev part carries an internal read-write lock (see "Sharing and Concurrency" in
+        :doc:`environment`): ``is_valid`` takes a shared lock once per bar, while setting ``query``
+        and ``reset`` take the exclusive lock. All systems sharing one environment must use the same
+        query condition, otherwise every differing ``setQuery`` reruns the full calculation under the
+        exclusive lock; in hot multi-threaded call paths each system can own a cloned environment
+        (``shared_ev=False``).
+
     .. note::
         The ``auto_checkin`` parameter of the money management strategy takes effect in the trade stage
         of the System: when the account cash is insufficient to buy the quantity indicated by the money

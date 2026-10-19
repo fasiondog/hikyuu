@@ -52,6 +52,11 @@ void export_Environment(py::module& m) {
 A market environment is a series of dates with values; a date is valid when its stored value is
 finite and greater than 0, which is exactly what is_valid tests.
 
+The environment is designed to be shared across systems (the System parameter shared_ev defaults
+to True): is_valid takes a shared lock on every call while setting the query and reset take the
+exclusive lock, so all systems sharing one environment must use the same query, otherwise every
+differing query reruns the full calculation under the exclusive lock.
+
 The strategies can be combined with the operators &, |, +, -, * and /, and the result is itself
 an EnvironmentBase that can be combined further (see the operator docstrings, e.g. __mul__).
 

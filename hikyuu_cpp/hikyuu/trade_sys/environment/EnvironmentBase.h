@@ -20,6 +20,10 @@ namespace hku {
 /**
  * Base class of the market environment strategy
  * @note The external environment should have nothing to do with the concrete trading object
+ * @note The environment is designed to be shared across systems (System shared_ev defaults to
+ *       true): isValid takes a shared lock on every call while setQuery/reset take the exclusive
+ *       lock, so all systems sharing one environment must use the same query, otherwise every
+ *       differing setQuery reruns the full calculation under the exclusive lock
  * @ingroup Environment
  */
 class HKU_API EnvironmentBase {
