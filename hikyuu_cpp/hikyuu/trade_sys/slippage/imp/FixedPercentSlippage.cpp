@@ -24,7 +24,8 @@ FixedPercentSlippage::~FixedPercentSlippage() {}
 void FixedPercentSlippage::_checkParam(const string& name) const {
     if ("p" == name || "short_p" == name) {
         double p = getParam<double>(name);
-        HKU_ASSERT(p >= 0.0 && p < 1.0);
+        HKU_CHECK(p >= 0.0 && p < 1.0, "SP_FixedPercent: param {} must be in [0, 1), got {}", name,
+                  p);
     }
 }
 

@@ -32,10 +32,10 @@ UniformSlippage::UniformSlippage() : SlippageBase("SP_Uniform"), m_gen(std::rand
 UniformSlippage::~UniformSlippage() {}
 
 void UniformSlippage::_checkParam(const string& name) const {
-    if ("min_value" == name || "short_min_value" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
-    } else if ("max_value" == name || "short_max_value" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    if ("min_value" == name || "max_value" == name || "short_min_value" == name ||
+        "short_max_value" == name) {
+        HKU_CHECK(!std::isnan(getParam<double>(name)), "SP_Uniform: param {} must not be NaN",
+                  name);
     }
 
     if ("min_value" == name || "max_value" == name) {
@@ -52,7 +52,8 @@ void UniformSlippage::_checkRange(const string& min_name, const string& max_name
     }
     double min_v = getParam<double>(min_name);
     double max_v = getParam<double>(max_name);
-    HKU_ASSERT(min_v <= max_v);
+    HKU_CHECK(min_v <= max_v, "SP_Uniform: param {} must be <= {}, got {} > {}", min_name, max_name,
+              min_v, max_v);
     HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
                 "The amplitude of SP_Uniform is too large (>{:.2f}), the slippage may "
                 "move the price by more than 100%",

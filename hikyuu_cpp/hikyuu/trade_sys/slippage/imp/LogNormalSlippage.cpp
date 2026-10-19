@@ -33,11 +33,13 @@ LogNormalSlippage::~LogNormalSlippage() {}
 
 void LogNormalSlippage::_checkParam(const string& name) const {
     if ("mean" == name || "short_mean" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+        double mean = getParam<double>(name);
+        HKU_CHECK(!std::isnan(mean), "SP_LogNormal: param {} must not be NaN", name);
     } else if ("stddev" == name || "short_stddev" == name) {
-        HKU_ASSERT(getParam<double>(name) >= 0.0);
+        double stddev = getParam<double>(name);
+        HKU_CHECK(stddev >= 0.0, "SP_LogNormal: param {} must be >= 0, got {}", name, stddev);
         HKU_WARN_IF(
-          getParam<double>(name) > 1.0,
+          stddev > 1.0,
           "The stddev of SP_LogNormal is too large (>{:.2f}); the slippage may be extreme", 1.0);
     }
 }

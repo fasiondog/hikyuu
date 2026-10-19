@@ -109,13 +109,15 @@ TruncNormalSlippage::~TruncNormalSlippage() {}
 
 void TruncNormalSlippage::_checkParam(const string& name) const {
     if ("mean" == name || "short_mean" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+        double mean = getParam<double>(name);
+        HKU_CHECK(!std::isnan(mean), "SP_TruncNormal: param {} must not be NaN", name);
     } else if ("stddev" == name || "short_stddev" == name) {
-        HKU_ASSERT(getParam<double>(name) >= 0.0);
-    } else if ("min_value" == name || "short_min_value" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
-    } else if ("max_value" == name || "short_max_value" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+        double stddev = getParam<double>(name);
+        HKU_CHECK(stddev >= 0.0, "SP_TruncNormal: param {} must be >= 0, got {}", name, stddev);
+    } else if ("min_value" == name || "max_value" == name || "short_min_value" == name ||
+               "short_max_value" == name) {
+        HKU_CHECK(!std::isnan(getParam<double>(name)), "SP_TruncNormal: param {} must not be NaN",
+                  name);
     }
 
     if ("min_value" == name || "max_value" == name) {
@@ -132,7 +134,8 @@ void TruncNormalSlippage::_checkRange(const string& min_name, const string& max_
     }
     double min_v = getParam<double>(min_name);
     double max_v = getParam<double>(max_name);
-    HKU_ASSERT(min_v <= max_v);
+    HKU_CHECK(min_v <= max_v, "SP_TruncNormal: param {} must be <= {}, got {} > {}", min_name,
+              max_name, min_v, max_v);
     HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
                 "The amplitude of SP_TruncNormal is too large (>{:.2f}), the slippage may "
                 "move the price by more than 100%",

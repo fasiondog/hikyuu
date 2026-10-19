@@ -23,7 +23,8 @@ FixedValueSlippage::~FixedValueSlippage() {}
 
 void FixedValueSlippage::_checkParam(const string& name) const {
     if ("value" == name || "short_value" == name) {
-        HKU_ASSERT(getParam<double>(name) >= 0.0);
+        double value = getParam<double>(name);
+        HKU_CHECK(value >= 0.0, "SP_FixedValue: param {} must be >= 0, got {}", name, value);
     }
 }
 
