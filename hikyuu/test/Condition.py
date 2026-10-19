@@ -17,21 +17,21 @@ class ConditionPython(ConditionBase):
     def __init__(self):
         super(ConditionPython, self).__init__("ConditionPython")
         self.set_param("n", 10)
-        self._m_flag = False
+        self._m_calculated = False
 
-    def is_valid(self, datetime):
-        return self._m_flag
+    def _calculate(self):
+        # _calculate takes no argument; the KData must be read from self.to
+        self._m_calculated = True
+        k = self.to
+        for i in range(len(k)):
+            if k[i].close > k[i].open:
+                self._add_valid(k[i].datetime)
 
     def _reset(self):
-        if self._m_flag:
-            self._m_flag = False
-        else:
-            self._m_flag = True
+        self._m_calculated = False
 
     def _clone(self):
-        p = ConditionPython()
-        p._m_flag = self._m_flag
-        return p
+        return ConditionPython()
 
 
 class ConditionTest(unittest.TestCase):
@@ -41,19 +41,37 @@ class ConditionTest(unittest.TestCase):
         self.assertEqual(p.get_param("n"), 10)
         p.set_param("n", 20)
         self.assertEqual(p.get_param("n"), 20)
-        self.assertEqual(p.is_valid(Datetime(200101010000)), False)
-        p.reset()
-        self.assertEqual(p.is_valid(Datetime(200101010000)), True)
+
+        k = sm['sh000001'].get_kdata(Query(-100))
+        self.assertEqual(k.empty(), False)
+        expect = [k[i].datetime for i in range(len(k)) if k[i].close > k[i].open]
+        self.assertTrue(len(expect) > 0)
+
+        # setting the trading object must dispatch _calculate; is_valid is no longer overridden
+        p.sg = SignalBase()
+        p.to = k
+        self.assertEqual(p._m_calculated, True)
+        self.assertEqual(len(p.get_datetime_list()), len(expect))
+        for d in expect:
+            self.assertTrue(p.is_valid(d))
+
+        invalid = [k[i].datetime for i in range(len(k)) if k[i].close <= k[i].open]
+        if invalid:
+            self.assertFalse(p.is_valid(invalid[0]))
+        self.assertFalse(p.is_valid(Datetime(200101010000)))
 
         p_clone = p.clone()
         self.assertEqual(p_clone.name, "ConditionPython")
         self.assertEqual(p_clone.get_param("n"), 20)
-        self.assertEqual(p_clone.is_valid(Datetime(200101010000)), True)
+        self.assertEqual(len(p_clone.get_datetime_list()), len(expect))
 
         p.set_param("n", 1)
         p_clone.set_param("n", 3)
         self.assertEqual(p.get_param("n"), 1)
         self.assertEqual(p_clone.get_param("n"), 3)
+
+        p.reset()
+        self.assertEqual(len(p.get_datetime_list()), 0)
 
 
 def testCondition(self):
