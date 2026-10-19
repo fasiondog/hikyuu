@@ -522,6 +522,8 @@ private:
         std::destroy(first, last);
     }
 
+    // Move-assigns [first, last) into dest, which may be uninitialized storage (insert/emplace
+    // shift into freshly reserved capacity); only valid for trivially copyable value_type.
     void move_elements_backward(pointer first, pointer last, pointer dest) {
         // Move the elements backward manually to avoid the complexity of std::move_backward
         difference_type count = last - first;
