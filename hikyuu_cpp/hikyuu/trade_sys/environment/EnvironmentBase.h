@@ -82,6 +82,9 @@ public:
      *              invalid
      * @note A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates
      *       the value instead of replacing it
+     * @note It takes no lock itself, so it must only be called from _calculate (or another hook
+     *       invoked by setQuery / reset while the mutex is held); a call from anywhere else would
+     *       race with the readers
      */
     void _addValid(const Datetime& datetime, price_t value = 1.0);
 

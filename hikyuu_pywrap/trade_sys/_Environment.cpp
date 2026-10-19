@@ -117,7 +117,10 @@ The custom market environment strategy interfaces:
     :param float value: defaulting to 1.0; greater than 0 means valid, and less than or equal to 0 means invalid
 
     A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the
-    value instead of replacing it.)")
+    value instead of replacing it.
+
+    It takes no lock itself, so it can only be called from _calculate (which runs while the object
+    is locked); calling it from elsewhere would race with is_valid.)")
 
       .def("reset", &EnvironmentBase::reset,
            R"(The reset operation

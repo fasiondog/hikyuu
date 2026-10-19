@@ -158,6 +158,9 @@ Market Environment Strategy Base Class
         A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the
         value instead of replacing it.
 
+        It takes no lock itself, so it can only be called from ``_calculate`` (which runs while the
+        object is locked); calling it from elsewhere would race with ``is_valid``.
+
     .. py:method:: reset(self)
 
         The reset operation
