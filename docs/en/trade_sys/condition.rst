@@ -28,6 +28,55 @@ Built-in System Validity Conditions
     :rtype: ConditionBase
 
 
+Combination Operators
+---------------------
+
+System validity conditions support combination operators, merging several conditions into a new one (the result is itself a ``ConditionBase`` and can be combined further). Each condition's values are aligned bar-by-bar with the trading object.
+
+Validity rule: a bar is valid when its value is finite and ``> 0``, otherwise invalid (NaN and ±inf are invalid); ``is_valid`` follows this rule. "all 0 (invalid)" below means the operator sets those bars to ``0.0``.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Operator
+     - Both sides
+     - Only cond1 (right null)
+     - Only cond2 (left null)
+     - Both null
+   * - ``cn1 + cn2`` (Add)
+     - sum of both; NaN if either is non-finite
+     - pass through cond1
+     - pass through cond2
+     - all 0 (invalid)
+   * - ``cn1 - cn2`` (Sub)
+     - difference of both; NaN if either is non-finite
+     - pass through cond1
+     - ``-cond2``
+     - all 0 (invalid)
+   * - ``cn1 | cn2`` (Or)
+     - 1.0 if either side >0, else 0
+     - normalized to 0/1
+     - normalized to 0/1
+     - all 0 (invalid)
+   * - ``cn1 & cn2`` (And)
+     - 1.0 if both sides >0, else 0
+     - all 0 (invalid)
+     - all 0 (invalid)
+     - all 0 (invalid)
+   * - ``cn1 * cn2`` (Multi)
+     - product of both; NaN if either is non-finite
+     - all 0 (invalid)
+     - all 0 (invalid)
+     - all 0 (invalid)
+   * - ``cn1 / cn2`` (Div)
+     - quotient of both; NaN if ``cn2 == 0`` or either is non-finite
+     - all NaN (invalid)
+     - all 0 (invalid)
+     - all 0 (invalid)
+
+Note: when either operand is a null pointer, the factory operator logs a warning (Add/Sub/Or: "the single-side mode will be used"; And/Multi/Div: "the result is always invalid") and still constructs per the matrix above.
+
+
 Custom System Validity Condition
 --------------------------------
 
