@@ -86,10 +86,14 @@ Indicator
 
     .. py:method:: get(self, pos[, result_index=0])
 
-        Get the value at the specified position. For speed, pos is passed to the core
-        unchecked: it must be a valid non-negative index; negative values or out-of-range
-        access are undefined. Use the [] operator for safe indexing with negative-value
-        support
+        Get the value at the specified position.
+
+        Fast-path entry for speed: the binding layer adds no extra check and the value is
+        read straight from the core buffer. Normal code should use the [] operator
+        (``__getitem__``), which validates the index and supports negative values; get is
+        for performance sensitive code (e.g. hot loops) where the caller has already
+        ensured ``0 <= pos < len(ind)`` and ``0 <= result_index < get_result_num()``.
+        Out-of-range and negative access is not guaranteed to behave in any particular way.
 
         :param int pos: position index
         :param int result_index: index of the result set

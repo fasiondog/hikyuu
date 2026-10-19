@@ -558,6 +558,8 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 }
 
 IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
+    // The bounds are only guarded under CHECK_ACCESS_BOUND; the documented contract is that the
+    // caller ensures 0 <= pos < size() and num < getResultNumber() (see Indicator::get)
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
     HKU_CHECK_THROW(
