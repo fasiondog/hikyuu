@@ -9,6 +9,7 @@
 
 #include "doctest/doctest.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ROCR100.h>
 #include <hikyuu/indicator/crt/CVAL.h>
@@ -36,9 +37,9 @@ TEST_CASE("test_ROCR100") {
     result = ROCR100(data, 1);
     CHECK_EQ(result.name(), "ROCR100");
     CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result.discard(), 1);
+    CHECK_EQ(result.discard(), 2);
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], 0);
+    CHECK_UNARY(std::isnan(result[1]));
     CHECK_EQ(result[2], 200);
     CHECK_EQ(result[3], 150);
     CHECK_EQ(result[5], 125);
@@ -47,12 +48,20 @@ TEST_CASE("test_ROCR100") {
     result = ROCR100(data, 2);
     CHECK_EQ(result.name(), "ROCR100");
     CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result.discard(), 2);
+    CHECK_EQ(result.discard(), 3);
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
-    CHECK_EQ(result[2], 0);
+    CHECK_UNARY(std::isnan(result[2]));
     CHECK_EQ(result[3], 300);
     CHECK_EQ(result[4], 200);
+
+    // n = 1 with an infinite reference price
+    a[0] = std::numeric_limits<price_t>::infinity();
+    data = PRICELIST(a);
+    result = ROCR100(data, 1);
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[1]));
+    CHECK_EQ(result[2], 200);
 
     // n = 0
     for (int i = 0; i < 10; ++i) {
@@ -66,6 +75,25 @@ TEST_CASE("test_ROCR100") {
     for (size_t i = 1; i < result.size(); i++) {
         CHECK_EQ(data[i] / data[0] * 100.0, result[i]);
     }
+
+    // n = 0 with leading zeros
+    a[0] = 0.0;
+    a[1] = 0.0;
+    data = PRICELIST(a);
+    result = ROCR100(data, 0);
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[1]));
+    CHECK_EQ(result[2], 100.0);
+    CHECK_EQ(result[3], 4.0 / 3.0 * 100.0);
+
+    // n = 0 with no usable baseline at all
+    for (int i = 0; i < 10; ++i) {
+        a[i] = 0.0;
+    }
+    data = PRICELIST(a);
+    result = ROCR100(data, 0);
+    CHECK_EQ(result.discard(), result.size());
+    CHECK_UNARY(std::isnan(result[9]));
 }
 
 /** @par Test points */

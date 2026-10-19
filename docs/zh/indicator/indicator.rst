@@ -1826,7 +1826,9 @@
 
     变动率指标: ((price / prevPrice)-1)*100
 
-    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计变动率。
+    n=0 时 prevPrice 固定为首个非零值，即相对起点的累计变动率。
+
+    prevPrice 为 0 或非有限值时结果为无效值（nan）。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -1837,7 +1839,9 @@
 
     变动率指标: (price - prevPrice) / prevPrice
 
-    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计变动率。
+    n=0 时 prevPrice 固定为首个非零值，即相对起点的累计变动率。
+
+    prevPrice 为 0 或非有限值时结果为无效值（nan）。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -1848,7 +1852,9 @@
 
     变动率指标: (price / prevPrice)
 
-    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计收益率。
+    n=0 时 prevPrice 固定为首个非零值，即相对起点的累计收益率。
+
+    prevPrice 为 0 或非有限值时结果为无效值（nan）。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口
@@ -1859,7 +1865,9 @@
 
     变动率指标: (price / prevPrice) * 100
 
-    n=0 时 prevPrice 固定为首个有效值，即相对起点的累计变动率。
+    n=0 时 prevPrice 固定为首个非零值，即相对起点的累计变动率。
+
+    prevPrice 为 0 或非有限值时结果为无效值（nan）。
 
     :param data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口

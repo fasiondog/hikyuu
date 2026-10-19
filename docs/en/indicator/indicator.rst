@@ -1836,8 +1836,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: ((price / prevPrice)-1)*100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -1848,8 +1850,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: (price - prevPrice) / prevPrice
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -1860,8 +1864,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: (price / prevPrice)
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative return from the
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative return from the
     start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -1872,8 +1878,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: (price / prevPrice) * 100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window

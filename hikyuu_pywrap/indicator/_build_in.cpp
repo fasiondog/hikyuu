@@ -1972,8 +1972,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: ((price / prevPrice)-1)*100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int n: the time window
@@ -1987,8 +1989,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price - prevPrice) / prevPrice
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int n: the time window
@@ -2012,8 +2016,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price / prevPrice)
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative return from the
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative return from the
     start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int n|Indicator|IndParam: the time window
@@ -2027,8 +2033,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price / prevPrice) * 100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
