@@ -71,7 +71,11 @@ The custom market environment strategy interfaces:
                     py::overload_cast<const string&>(&EnvironmentBase::name),
                     py::return_value_policy::copy, "Name")
       .def_property("query", &EnvironmentBase::getQuery, &EnvironmentBase::setQuery,
-                    py::return_value_policy::copy, "Set or get the query condition")
+                    py::return_value_policy::copy,
+                    R"(Set or get the query condition
+
+    For a Python subclass the _calculate callback acquires the GIL while the mutex is held, so
+    setting the query must not run concurrently with the other calls on the same object.)")
 
       .def("get_param", &EnvironmentBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -115,8 +119,15 @@ The custom market environment strategy interfaces:
     A non-finite value (NaN/inf) is discarded, and adding the same date twice accumulates the
     value instead of replacing it.)")
 
-      .def("reset", &EnvironmentBase::reset, "The reset operation")
-      .def("clone", &EnvironmentBase::clone, "The clone operation")
+      .def("reset", &EnvironmentBase::reset,
+           R"(The reset operation
+
+    For a Python subclass the _reset callback acquires the GIL while the mutex is held, so it must
+    not run concurrently with the other calls on the same object.)")
+      .def("clone", &EnvironmentBase::clone,
+           R"(The clone operation
+
+    The subclass _clone callback is invoked without holding the mutex.)")
       .def("_reset", &EnvironmentBase::_reset,
            "[Overload interface] The subclass reset interface, used to reset the internal private "
            "variables")

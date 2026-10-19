@@ -8,6 +8,7 @@
 #include "doctest/doctest.h"
 #include <cmath>
 #include <limits>
+#include <mutex>
 #include <stdexcept>
 
 #include <hikyuu/StockManager.h>
@@ -79,6 +80,33 @@ TEST_CASE("test_Environment_copy_ctor_keeps_python_flag") {
     base2.setPythonObject(false);
     EnvironmentTest copy2(base2);
     CHECK_FALSE(copy2.isPythonObject());
+}
+
+class EnvironmentCloneLockTest : public EnvironmentBase {
+public:
+    EnvironmentCloneLockTest() : EnvironmentBase("TEST_CLONE_LOCK") {}
+
+    void _calculate() override {}
+
+    EnvironmentPtr _clone() override {
+        // clone() must invoke this hook with the mutex free: an exclusive try_lock fails while a
+        // shared lock is held, which is what the hook would hit without the lock-order fix
+        std::unique_lock<std::shared_mutex> lock(m_mutex, std::try_to_lock);
+        auto p = make_shared<EnvironmentCloneLockTest>();
+        p->m_hook_unlocked = lock.owns_lock();
+        return p;
+    }
+
+    bool m_hook_unlocked{false};
+};
+
+/** @par Test points */
+TEST_CASE("test_Environment_clone_invokes_clone_hook_without_lock") {
+    /** @arg The _clone hook must not be invoked while the mutex is held (GIL lock-order safety) */
+    auto p = make_shared<EnvironmentCloneLockTest>();
+    auto p_clone = std::dynamic_pointer_cast<EnvironmentCloneLockTest>(p->clone());
+    REQUIRE(p_clone);
+    CHECK(p_clone->m_hook_unlocked);
 }
 
 class EnvironmentInfTest : public EnvironmentBase {

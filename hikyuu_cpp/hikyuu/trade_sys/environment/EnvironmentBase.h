@@ -43,10 +43,20 @@ public:
         m_name = name;
     }
 
-    /** Reset */
+    /**
+     * Reset
+     * @note For a Python subclass the _reset callback acquires the GIL while the mutex is held, so
+     *       reset must not be invoked concurrently with the other calls on the same object
+     */
     void reset();
 
-    /** Set the query condition */
+    /**
+     * Set the query condition; the calculation is re-run only when the query differs from the
+     * current one
+     * @note For a Python subclass the _calculate callback acquires the GIL while the mutex is
+     *       held, so setQuery must not be invoked concurrently with the other calls on the same
+     *       object
+     */
     void setQuery(const KQuery& query);
 
     /** Get the query condition */
@@ -60,6 +70,8 @@ public:
      * @note Unlike the other trading-system parts, the Environment is not bound to a specific
      *       instrument and can be shared, so essentially the clone operation is not needed
      * here; it exists only for the consistency and the possibly existing special scenarios.
+     * @note The subclass _clone callback is invoked without holding the mutex, so that it may
+     *       reach the GIL (or re-enter this object) without risking a lock-order deadlock.
      */
     EnvironmentPtr clone();
 

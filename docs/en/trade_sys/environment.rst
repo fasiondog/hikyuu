@@ -177,3 +177,10 @@ Market Environment Strategy Base Class
     .. py:method:: _clone(self)
 
         [Override hook] The subclass clone interface
+
+    .. note::
+
+        For a Python subclass, setting ``query`` calls back into ``_calculate`` and ``reset`` into
+        ``_reset`` while the mutex is held, and both need the GIL, so they must not run concurrently
+        with the other calls on the same object; the ``_clone`` callback of ``clone`` is invoked
+        without holding the lock and carries no such restriction.

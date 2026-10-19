@@ -172,3 +172,9 @@
     .. py:method:: _clone(self)
 
         【重载接口】子类克隆接口
+
+    .. note::
+
+        对 Python 子类，设置 ``query`` 会在持锁期间回调 ``_calculate``、``reset`` 会在持锁期间回调
+        ``_reset``，两者都需要 GIL，因此不可与同一对象的其它调用并发执行；``clone`` 的 ``_clone``
+        回调已在锁外调用，无此限制。

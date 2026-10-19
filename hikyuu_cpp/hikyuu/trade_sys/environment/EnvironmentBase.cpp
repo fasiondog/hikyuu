@@ -51,8 +51,8 @@ void EnvironmentBase::reset() {
 }
 
 EnvironmentPtr EnvironmentBase::clone() {
-    std::shared_lock<std::shared_mutex> lock(m_mutex);
     EnvironmentPtr p = _clone();
+    std::shared_lock<std::shared_mutex> lock(m_mutex);
     HKU_CHECK(p && p.get() != this,
               "Failed clone! The subclass _clone of {} must return a new object!", m_name);
 
