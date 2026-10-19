@@ -78,6 +78,28 @@ private:
     CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
 };
 
+// A condition with a custom validity rule (value >= 2.0), to verify the _isValid hook
+class ThresholdCondition : public ConditionBase {
+public:
+    ThresholdCondition() : ConditionBase("TEST_THRESHOLD") {}
+
+    void _calculate() override {
+        _addValid(m_kdata[2].datetime, 2.0);
+        _addValid(m_kdata[3].datetime, 1.5);
+    }
+
+    bool _isValid(const Datetime& datetime, price_t value) const override {
+        return value >= 2.0;
+    }
+
+    ConditionPtr _clone() override {
+        return make_shared<ThresholdCondition>();
+    }
+
+private:
+    CONDITION_NO_PRIVATE_MEMBER_SERIALIZATION
+};
+
 /**
  * @defgroup test_Condition test_Condition
  * @ingroup test_hikyuu_trade_sys_suite
@@ -238,6 +260,23 @@ TEST_CASE("test_Condition_manual") {
     /** @arg _addValid accumulates the value on the same date */
     cn->_addValid(d, 2.0);
     CHECK_EQ(cn->at(2), 3.0);
+}
+
+/** @par Test point: a subclass overriding _isValid changes both isValid and getDatetimeList */
+TEST_CASE("test_Condition_isValid_hook") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    ConditionPtr p(new ThresholdCondition);
+    p->setTO(kdata);
+
+    /** @arg 1.5 fails the >=2.0 custom rule while the default >0 would accept it */
+    CHECK_UNARY(p->isValid(kdata[2].datetime));
+    CHECK_UNARY_FALSE(p->isValid(kdata[3].datetime));
+    CHECK_EQ(p->getDatetimeList().size(), 1);
 }
 
 #if HKU_SUPPORT_SERIALIZATION

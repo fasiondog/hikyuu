@@ -125,6 +125,34 @@ class TestLogicCondition(unittest.TestCase):
         self.assertEqual(len(ao.get_datetime_list()), len(k))
 
 
+class ConditionValidRule(ConditionBase):
+    def __init__(self):
+        super(ConditionValidRule, self).__init__("ConditionValidRule")
+
+    def _calculate(self):
+        # register a date with value 0.5; the default (>0) rule would mark it valid
+        k = self.to
+        self._add_valid(k[0].datetime, 0.5)
+
+    def _is_valid(self, datetime, value):
+        return value >= 1.0  # custom rule rejects the stored 0.5
+
+    def _clone(self):
+        return ConditionValidRule()
+
+
+class TestCnValidRule(unittest.TestCase):
+    def test_is_valid_hook(self):
+        k = sm['sh000001'].get_kdata(Query(-100))
+        self.assertEqual(k.empty(), False)
+        p = ConditionValidRule()
+        p.sg = SignalBase()
+        p.to = k
+        # the custom _is_valid (value >= 1.0) rejects the stored 0.5, so no valid day
+        self.assertEqual(len(p.get_datetime_list()), 0)
+        self.assertEqual(p.is_valid(k[0].datetime), False)
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(ConditionTest)
 
@@ -135,3 +163,7 @@ def suiteTestCrtCN():
 
 def suiteTestLogicCondition():
     return unittest.TestLoader().loadTestsFromTestCase(TestLogicCondition)
+
+
+def suiteTestCnValidRule():
+    return unittest.TestLoader().loadTestsFromTestCase(TestCnValidRule)

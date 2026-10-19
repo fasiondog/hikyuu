@@ -95,6 +95,7 @@ The custom system validity condition interface:
 
 * :py:meth:`ConditionBase._calculate` - [Required] The subclass calculation interface
 * :py:meth:`ConditionBase._clone` - [Required] The clone interface
+* :py:meth:`ConditionBase._is_valid` - [Optional] The subclass validity rule, by default "finite and > 0"
 * :py:meth:`ConditionBase._reset` - [Optional] Reset the internal member variables
 
 
@@ -166,6 +167,14 @@ System Validity Condition Base Class
     .. py:method:: _calculate(self)
     
         [Override hook] The subclass calculation interface
+    
+    .. py:method:: _is_valid(self, datetime, value)
+    
+        [Override hook] The subclass validity rule; called by is_valid for every date registered through _add_valid; by default a date is valid when its value is finite and ``> 0``
+        
+        :param Datetime datetime: the queried date
+        :param float value: the stored value of the date
+        :return: True means valid | False means invalid
     
     .. py:method:: _reset(self)
     

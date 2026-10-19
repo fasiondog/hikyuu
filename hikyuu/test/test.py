@@ -62,6 +62,7 @@ if __name__ == "__main__":
     suite.addTest(Condition.suite())
     suite.addTest(Condition.suiteTestCrtCN())
     suite.addTest(Condition.suiteTestLogicCondition())
+    suite.addTest(Condition.suiteTestCnValidRule())
     suite.addTest(MoneyManager.suite())
     suite.addTest(MoneyManager.suiteTestCrtMM())
     suite.addTest(Signal.suite())

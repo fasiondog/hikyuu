@@ -97,6 +97,7 @@
 
 * :py:meth:`ConditionBase._calculate` - 【必须】子类计算接口
 * :py:meth:`ConditionBase._clone` - 【必须】克隆接口
+* :py:meth:`ConditionBase._is_valid` - 【可选】子类有效性判定规则，默认"有限且 >0"
 * :py:meth:`ConditionBase._reset` - 【可选】重载私有变量
 
 
@@ -168,6 +169,14 @@
     .. py:method:: _calculate(self)
     
         【重载接口】子类计算接口
+    
+    .. py:method:: _is_valid(self, datetime, value)
+    
+        【重载接口】子类有效性判定规则，由 is_valid 对每个通过 _add_valid 登记的日期调用；默认值有限且 >0
+        
+        :param Datetime datetime: 查询日期
+        :param float value: 该日期存储的值
+        :return: True 有效 | False 无效
     
     .. py:method:: _reset(self)
     
