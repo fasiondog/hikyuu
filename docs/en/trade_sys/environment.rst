@@ -29,7 +29,7 @@ Combination Operators
 Market environment strategies can be combined; the result is itself an ``EnvironmentBase`` and can
 be combined further.
 
-The validity rule is "the date's stored value is greater than 0", which is exactly what
+The validity rule is "the date's stored value is finite and greater than 0", which is exactly what
 ``is_valid`` tests; "not output" in the tables below means the date is absent from the result
 (treated as missing, so ``is_valid`` returns False).
 
@@ -145,8 +145,8 @@ Market Environment Strategy Base Class
         :param Datetime datetime: the specified time
         :return: True means valid | False means invalid
 
-        The validity rule is "the stored value of the date is greater than 0"; a date that was
-        never registered through ``_add_valid`` is invalid.
+        The validity rule is "the stored value of the date is finite and greater than 0"; a date
+        that was never registered through ``_add_valid`` is invalid.
 
     .. py:method:: _add_valid(self, datetime[, value=1.0])
 

@@ -12,6 +12,8 @@
 
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
+#include <hikyuu/trade_sys/environment/build_in.h>
+#include <hikyuu/indicator/crt/PRICELIST.h>
 
 using namespace hku;
 
@@ -86,6 +88,9 @@ public:
         _addValid(Datetime(200001010000LL), std::numeric_limits<price_t>::infinity());
         _addValid(Datetime(200001020000LL), std::nan(""));
         _addValid(Datetime(200001030000LL), 1.0);
+        // Plant a value that overflowed to +inf inside the storage, which _addValid cannot produce
+        m_date_index[Datetime(200001040000LL)] = m_values.size();
+        m_values.push_back(std::numeric_limits<price_t>::infinity());
     }
     EnvironmentPtr _clone() override {
         return make_shared<EnvironmentInfTest>();
@@ -94,12 +99,15 @@ public:
 
 /** @par Test points */
 TEST_CASE("test_Environment_reject_non_finite_value") {
-    /** @arg _addValid rejects +inf / NaN; isValid requires isfinite */
+    /** @arg _addValid rejects +inf / NaN; only a finite value > 0 is valid */
     auto p = make_shared<EnvironmentInfTest>();
     p->setQuery(KQuery(-100));
     CHECK_FALSE(p->isValid(Datetime(200001010000LL)));
     CHECK_FALSE(p->isValid(Datetime(200001020000LL)));
     CHECK(p->isValid(Datetime(200001030000LL)));
+
+    /** @arg A value that overflowed to +inf inside the storage is still invalid */
+    CHECK_FALSE(p->isValid(Datetime(200001040000LL)));
 }
 
 class EnvironmentCalcFailTest : public EnvironmentBase {
@@ -126,6 +134,35 @@ TEST_CASE("test_Environment_setQuery_retry_after_failure") {
     p->fail = false;
     CHECK_NOTHROW(p->setQuery(q));
     CHECK(p->isValid(Datetime(200001010000LL)));
+}
+
+/** @par Test points */
+TEST_CASE("test_EV_Bool_reject_non_finite") {
+    StockManager& sm = StockManager::instance();
+    KQuery query(-100);
+    KData kdata = sm.getStock("sh000001").getKData(query);
+    REQUIRE(!kdata.empty());
+
+    /** @arg A finite value greater than 0 marks every date as valid */
+    EVPtr ok = EV_Bool(PRICELIST(kdata.size(), 1.0));
+    ok->setQuery(query);
+    CHECK(ok->isValid(kdata.front().datetime));
+    CHECK(ok->isValid(kdata.back().datetime));
+
+    /** @arg +inf satisfies the "> 0" test but must not mark any date as valid */
+    EVPtr inf = EV_Bool(PRICELIST(kdata.size(), std::numeric_limits<price_t>::infinity()));
+    inf->setQuery(query);
+    CHECK_FALSE(inf->isValid(kdata.front().datetime));
+    CHECK_FALSE(inf->isValid(kdata.back().datetime));
+
+    /** @arg -inf and NaN stay invalid */
+    EVPtr neg_inf = EV_Bool(PRICELIST(kdata.size(), -std::numeric_limits<price_t>::infinity()));
+    neg_inf->setQuery(query);
+    CHECK_FALSE(neg_inf->isValid(kdata.front().datetime));
+
+    EVPtr nan = EV_Bool(PRICELIST(kdata.size(), std::nan("")));
+    nan->setQuery(query);
+    CHECK_FALSE(nan->isValid(kdata.front().datetime));
 }
 
 /** @} */

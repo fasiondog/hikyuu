@@ -54,14 +54,14 @@ void BoolEnvironment::_calculate() {
     if (total == kdata.size()) {
         const auto* kdata_ptr = kdata.data();
         for (size_t i = discard; i < total; i++) {
-            if (!std::isnan(ind_data[i]) && ind_data[i] > 0.) {
+            if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
                 _addValid(kdata_ptr[i].datetime);
             }
         }
     } else {
         DatetimeList dates = m_ind.getDatetimeList();
         for (size_t i = discard; i < total; i++) {
-            if (!std::isnan(ind_data[i]) && ind_data[i] > 0.) {
+            if (std::isfinite(ind_data[i]) && ind_data[i] > 0.) {
                 _addValid(dates[i]);
             }
         }

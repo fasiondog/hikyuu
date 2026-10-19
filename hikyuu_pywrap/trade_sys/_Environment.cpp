@@ -50,7 +50,7 @@ void export_Environment(py::module& m) {
       R"(The market environment strategy base class
 
 A market environment is a series of dates with values; a date is valid when its stored value is
-greater than 0, which is exactly what is_valid tests.
+finite and greater than 0, which is exactly what is_valid tests.
 
 The strategies can be combined with the operators &, |, +, -, * and /, and the result is itself
 an EnvironmentBase that can be combined further (see the operator docstrings, e.g. __mul__).
@@ -101,8 +101,8 @@ The custom market environment strategy interfaces:
     :param Datetime datetime: the specified time
     :return: True valid | False invalid
 
-    The validity is exactly "the stored value of the date is greater than 0"; a date that was
-    never registered through _add_valid is invalid.)")
+    The validity is exactly "the stored value of the date is a finite value greater than 0"; a date
+    that was never registered through _add_valid is invalid.)")
 
       .def("_add_valid", &EnvironmentBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
            R"(_add_valid(self, datetime[, value=1.0])

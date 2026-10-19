@@ -28,7 +28,7 @@
 
 市场环境判定策略支持组合运算，把多个环境判定合成一个新的环境判定（组合结果本身仍是 ``EnvironmentBase``，可继续参与组合）。
 
-有效性判定规则：日期的值 ``> 0`` 为有效、否则无效，``is_valid`` 即按此判定；下表中的"不输出"表示该日期不出现在结果里（视为缺失，``is_valid`` 为 False）。
+有效性判定规则：日期的值为有限值且 ``> 0`` 时有效、否则无效（含 NaN 与 ±inf），``is_valid`` 即按此判定；下表中的"不输出"表示该日期不出现在结果里（视为缺失，``is_valid`` 为 False）。
 
 .. list-table::
    :header-rows: 1
@@ -142,7 +142,7 @@
         :param Datetime datetime: 指定时间
         :return: True 有效 | False 无效
 
-        判定规则为"该日期的值 > 0"；从未通过 ``_add_valid`` 登记过的日期为无效。
+        判定规则为"该日期的值为有限值且 > 0"；从未通过 ``_add_valid`` 登记过的日期为无效。
 
     .. py:method:: _add_valid(self, datetime[, value=1.0])
 

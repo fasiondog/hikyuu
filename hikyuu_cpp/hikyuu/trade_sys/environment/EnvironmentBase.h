@@ -77,8 +77,8 @@ public:
      * Judge whether the external environment of the given date is valid
      * @param datetime the given date
      * @return true valid | false invalid
-     * @note The validity is exactly "the stored value of the date is > 0"; a date that was never
-     *       added is invalid
+     * @note The validity is exactly "the stored value of the date is finite and > 0"; a date that
+     *       was never added is invalid
      */
     bool isValid(const Datetime& datetime) const;
 
@@ -93,7 +93,7 @@ public:
 
     /**
      * Get the values as a time-series indicator: one record per date registered through _addValid,
-     * ordered by date; <= 0 means invalid and > 0 means valid
+     * ordered by date; only a finite value > 0 means valid, anything else is invalid
      * @note The date set and the meaning of the value depend on the operator that produced this
      *       object, see the operator notes above
      */
