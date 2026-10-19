@@ -1038,6 +1038,10 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the sample standard deviation within the N periods
 
+    When n = 0, the expanding window is used: dst[i] is the sample standard deviation over
+    [discard(), i], which needs at least two observations, so the discard is discard()+1 and the
+    first bar is nan.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator)");

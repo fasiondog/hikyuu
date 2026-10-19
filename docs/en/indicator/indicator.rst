@@ -2156,7 +2156,7 @@ Built-in Technical Indicators
     Calculate the sample standard deviation within the N periods
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=2); when it is 0 the expanding window is used, dst[i] is the sample standard deviation over [discard(), i], the discard is discard()+1 and the first bar is nan
     :rtype: Indicator
 
 
