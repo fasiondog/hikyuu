@@ -24,6 +24,7 @@
 #include <hikyuu/trade_sys/stoploss/StoplossBase.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_FixedPercent.h>
 #include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
+#include <hikyuu/trade_sys/slippage/crt/SP_FixedPercent.h>
 
 using namespace hku;
 
@@ -208,6 +209,12 @@ const TradeRecord* findFirstTrade(const TradeRecordList& trs, BUSINESS business)
     return iter == trs.end() ? nullptr : &(*iter);
 }
 
+// Mirror System::fixupSlippagePrice: round to the market price precision, then clamp into the bar
+price_t expectSlipped(price_t plan, double factor, const KRecord& rec, const Stock& stk) {
+    price_t p = roundEx(plan * factor, stk.precision());
+    return std::min(std::max(p, rec.lowPrice), rec.highPrice);
+}
+
 // Emits scripted long/short signals on one account: buy -> sell (close the long) -> sell (open
 // the short) -> buy (cover the short)
 class Iss029MixedSG : public SignalBase {
@@ -267,8 +274,12 @@ TEST_CASE("test_MM_short_risk_guards") {
 class Iss029LongOnlyST : public StoplossBase {
 public:
     Iss029LongOnlyST() : StoplossBase("ISS029_LongOnlyST") {}
-    virtual StoplossPtr _clone() override { return make_shared<Iss029LongOnlyST>(); }
-    virtual price_t _getPrice(const Datetime&, price_t price) override { return price * 0.9; }
+    virtual StoplossPtr _clone() override {
+        return make_shared<Iss029LongOnlyST>();
+    }
+    virtual price_t _getPrice(const Datetime&, price_t price) override {
+        return price * 0.9;
+    }
 };
 
 /** @par Test points (the default short stop-loss contract, ISS-029) */
@@ -544,6 +555,108 @@ TEST_CASE("test_SYS_Simple_mixed_long_short") {
 
     /** @arg no other trades: exactly one long round trip and one short round trip */
     CHECK_EQ(tr_list.size(), 7);
+}
+
+/** @par Test points (the short-side slippage hooks are used by the short trades) */
+TEST_CASE("test_SYS_Simple_short_for_slippage") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData k = getQueryData(stock);
+    REQUIRE(k.size() > 0);
+
+    auto sys = makeShortSys(make_shared<Iss029MixedSG>());
+    auto tm = sys->getTM();
+    tm->setParam<bool>("support_borrow_stock", true);
+    sys->setMM(MM_FixedPercent(0.03));
+    sys->setSP(SP_FixedPercent(0.001, 0.02));
+    sys->run(k);
+
+    const TradeRecordList& tr_list = tm->getTradeList();
+    const TradeRecord* long_buy = findFirstTrade(tr_list, BUSINESS_BUY);
+    const TradeRecord* short_open = findFirstTrade(tr_list, BUSINESS_SELL_SHORT);
+    const TradeRecord* short_cover = findFirstTrade(tr_list, BUSINESS_BUY_SHORT);
+    REQUIRE_NE(long_buy, nullptr);
+    REQUIRE_NE(short_open, nullptr);
+    REQUIRE_NE(short_cover, nullptr);
+
+    /** @arg the long buy slips by p only, untouched by short_p */
+    CHECK(long_buy->realPrice ==
+          doctest::Approx(
+            expectSlipped(long_buy->planPrice, 1.001, k[k.getPos(long_buy->datetime)], stock)));
+
+    /** @arg opening a short slips by short_p in the sell direction */
+    CHECK(short_open->realPrice < short_open->planPrice);
+    CHECK(short_open->realPrice ==
+          doctest::Approx(
+            expectSlipped(short_open->planPrice, 0.98, k[k.getPos(short_open->datetime)], stock)));
+
+    /** @arg covering a short slips by short_p in the buy direction */
+    CHECK(short_cover->realPrice > short_cover->planPrice);
+    CHECK(short_cover->realPrice ==
+          doctest::Approx(expectSlipped(short_cover->planPrice, 1.02,
+                                        k[k.getPos(short_cover->datetime)], stock)));
+
+    /** @arg the trade structure is unaffected by the slippage */
+    CHECK_EQ(tr_list.size(), 7);
+}
+
+/** @par Test points (the delayed short paths take the short-side slippage hooks too) */
+TEST_CASE("test_SYS_Simple_short_for_slippage_delay") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh600000"];
+    KData src = getQueryData(stock);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+    REQUIRE(open_pos + 1 < src.size());
+
+    SYSPtr sys = makeShortSys(makeShortSG(), make_shared<Iss029PercentST>(0.03));
+    sys->setSP(SP_FixedPercent(0.001, 0.02));
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", true);
+    sys->setParam<bool>("delay_use_current_price", false);
+    sys->run(stock, src.getQuery());
+
+    const TradeRecordList& tr_list = sys->getTM()->getTradeList();
+    const TradeRecord* short_open = findFirstTrade(tr_list, BUSINESS_SELL_SHORT);
+    const TradeRecord* short_cover = findFirstTrade(tr_list, BUSINESS_BUY_SHORT);
+    REQUIRE_NE(short_open, nullptr);
+    REQUIRE_NE(short_cover, nullptr);
+
+    /** @arg the delayed short open still takes the short-side sell price */
+    CHECK_EQ(short_open->datetime, src[open_pos + 1].datetime);
+    CHECK(short_open->realPrice ==
+          doctest::Approx(expectSlipped(short_open->planPrice, 0.98,
+                                        src[src.getPos(short_open->datetime)], stock)));
+
+    /** @arg the delayed cover still takes the short-side buy price */
+    CHECK(short_cover->realPrice ==
+          doctest::Approx(expectSlipped(short_cover->planPrice, 1.02,
+                                        src[src.getPos(short_cover->datetime)], stock)));
+}
+
+/** @par Test points (a forced cover uses the short-side buy price, not the sell price) */
+TEST_CASE("test_SYS_Simple_short_for_force_cover_slippage") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh600000"];
+    KData src = getQueryData(stock);
+    size_t open_pos = src.getPos(OPEN_DATE);
+    REQUIRE_NE(open_pos, Null<size_t>());
+    REQUIRE(open_pos + 1 < src.size());
+
+    // No stop-loss / goal, so the short stays open at the end of the run
+    SYSPtr sys = makeShortSys(makeShortSG());
+    sys->setSP(SP_FixedPercent(0.001, 0.02));
+    sys->run(stock, src.getQuery());
+    REQUIRE_UNARY(sys->getTM()->haveShort(stock));
+
+    const KRecord rec = src[open_pos + 1];
+    TradeRecord force_tr = sys->sellForceOnClose(rec.datetime, MAX_DOUBLE, PART_PORTFOLIO);
+
+    /** @arg the forced flatten covers the short at the short-side buy price (above the plan) */
+    REQUIRE_EQ(force_tr.business, BUSINESS_BUY_SHORT);
+    CHECK(force_tr.realPrice >= rec.closePrice);
+    CHECK(force_tr.realPrice == doctest::Approx(expectSlipped(rec.closePrice, 1.02, rec, stock)));
+    CHECK_UNARY_FALSE(sys->getTM()->haveShort(stock));
 }
 
 /** @} */

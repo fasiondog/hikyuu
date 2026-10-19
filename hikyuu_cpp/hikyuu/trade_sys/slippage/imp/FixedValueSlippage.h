@@ -21,6 +21,8 @@ public:
     FixedValueSlippage();
     virtual ~FixedValueSlippage();
     virtual void _checkParam(const string& name) const override;
+    virtual price_t _getRealBuyShortPrice(const Datetime&, price_t) override;
+    virtual price_t _getRealSellShortPrice(const Datetime&, price_t) override;
 };
 
 } /* namespace hku */

@@ -9,6 +9,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_FixedPercent.h>
+#include <hikyuu/trade_sys/slippage/crt/SP_FixedValue.h>
 
 using namespace hku;
 
@@ -103,6 +104,62 @@ TEST_CASE("test_Slippage_clone_lazy_recalculate") {
     /** @arg setTO rebinds the clone and keeps the same result */
     c->setTO(k);
     CHECK_EQ(c->getRealBuyPrice(d0, plan), slipped);
+}
+
+/** @par Test points */
+TEST_CASE("test_Slippage_short_hook_default_delegate") {
+    SlippagePtr p(new SlippageTest);
+    SlippageTest *p_src = (SlippageTest *)p.get();
+    p_src->setX(10);
+
+    /** @arg a subclass which does not override the short hooks slips the short side as the long one
+     */
+    CHECK_EQ(p->getRealBuyShortPrice(Datetime(200101010000), 1.0), 1.0);
+    CHECK_EQ(p->getRealSellShortPrice(Datetime(200101010000), 1.0), 1.0);
+
+    /** @arg a non-positive plan price is returned as-is by the short wrappers too */
+    CHECK_EQ(p->getRealBuyShortPrice(Datetime(200101010000), -5.0), -5.0);
+    CHECK_EQ(p->getRealSellShortPrice(Datetime(200101010000), 0.0), 0.0);
+}
+
+/** @par Test points */
+TEST_CASE("test_FixedPercent_short_side") {
+    const Datetime dt(202201010930);
+
+    /** @arg without short_p the short side reuses p */
+    auto sp = SP_FixedPercent(0.01);
+    CHECK(sp->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.1));
+    CHECK(sp->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.9));
+
+    /** @arg short_p drives opening and covering a short, leaving the long side untouched */
+    auto sp2 = SP_FixedPercent(0.01, 0.05);
+    CHECK(sp2->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.5));
+    CHECK(sp2->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.5));
+    CHECK(sp2->getRealBuyPrice(dt, 10.0) == doctest::Approx(10.1));
+    CHECK(sp2->getRealSellPrice(dt, 10.0) == doctest::Approx(9.9));
+
+    /** @arg short_p is validated like p */
+    CHECK_THROWS_AS(sp2->setParam("short_p", 1.0), std::exception);
+    CHECK_THROWS_AS(sp2->setParam("short_p", -0.1), std::exception);
+}
+
+/** @par Test points */
+TEST_CASE("test_FixedValue_short_side") {
+    const Datetime dt(202201010930);
+
+    /** @arg without short_value the short side reuses value */
+    auto sp = SP_FixedValue(0.1);
+    CHECK(sp->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.1));
+    CHECK(sp->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.9));
+
+    /** @arg short_value drives the short side alone */
+    auto sp2 = SP_FixedValue(0.1, 0.5);
+    CHECK(sp2->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.5));
+    CHECK(sp2->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.5));
+    CHECK(sp2->getRealBuyPrice(dt, 10.0) == doctest::Approx(10.1));
+
+    /** @arg a negative short_value is rejected */
+    CHECK_THROWS_AS(sp2->setParam("short_value", -0.1), std::exception);
 }
 
 /** @} */

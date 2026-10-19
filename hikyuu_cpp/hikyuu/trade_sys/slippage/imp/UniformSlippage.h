@@ -21,8 +21,11 @@ public:
     virtual ~UniformSlippage();
     virtual void _checkParam(const string& name) const override;
     virtual void _reset() override;
+    virtual price_t _getRealBuyShortPrice(const Datetime&, price_t) override;
+    virtual price_t _getRealSellShortPrice(const Datetime&, price_t) override;
 
 private:
+    void _checkRange(const string& min_name, const string& max_name) const;
     std::mt19937 m_gen;
 };
 

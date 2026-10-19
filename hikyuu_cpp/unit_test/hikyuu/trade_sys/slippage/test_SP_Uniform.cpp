@@ -26,7 +26,6 @@ TEST_CASE("test_SP_Uniform") {
     CHECK_LE(sp->getRealSellPrice(Datetime(202201010930), 10.0), 10.0);
 }
 
-
 TEST_CASE("test_UniformSlippage_seed") {
     /** @arg the same seed produces identical sequences across instances (after reset) */
     auto sp1 = SP_Uniform(-0.05, 0.05);
@@ -58,7 +57,6 @@ TEST_CASE("test_UniformSlippage_seed") {
     CHECK_NE(sp3->getRealBuyPrice(Datetime(202201010930), 10.0), first);
 }
 
-
 TEST_CASE("test_UniformSlippage_adverse_only_false") {
     /** @arg adverse_only=false produces both favorable and unfavorable offsets */
     auto sp = SP_Uniform(-0.05, 0.05, false);
@@ -67,8 +65,10 @@ TEST_CASE("test_UniformSlippage_adverse_only_false") {
     bool has_above = false, has_below = false;
     for (int i = 0; i < 200; ++i) {
         price_t buy = sp->getRealBuyPrice(Datetime(202201010930), 10.0);
-        if (buy > 10.0) has_above = true;
-        if (buy < 10.0) has_below = true;
+        if (buy > 10.0)
+            has_above = true;
+        if (buy < 10.0)
+            has_below = true;
     }
     CHECK_UNARY(has_above);
     CHECK_UNARY(has_below);
@@ -96,5 +96,35 @@ TEST_CASE("test_UniformSlippage_adverse_only_false") {
     }
 }
 
+/** @par Test points */
+TEST_CASE("test_UniformSlippage_short_side") {
+    const Datetime dt(202201010930);
+
+    /** @arg a degenerate short range makes the short draw deterministic */
+    auto sp = SP_Uniform(0.01, 0.02, true, 0.5, 0.5);
+    CHECK(sp->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.5));
+    CHECK(sp->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.5));
+
+    /** @arg without short parameters the short amplitude stays inside the long range */
+    auto sp2 = SP_Uniform(-0.05, 0.05);
+    for (int i = 0; i < 100; ++i) {
+        CHECK_GE(sp2->getRealBuyShortPrice(dt, 10.0), 10.0);
+        CHECK_LE(sp2->getRealBuyShortPrice(dt, 10.0), 10.05);
+        CHECK_LE(sp2->getRealSellShortPrice(dt, 10.0), 10.0);
+    }
+
+    /** @arg an inverted short-side range is rejected */
+    CHECK_THROWS_AS(SP_Uniform(-0.05, 0.05, true, 0.5, 0.1), std::exception);
+
+    /** @arg an all-negative range is legal on both sides (a constant direction with
+     * adverse_only=false) */
+    CHECK_NOTHROW(SP_Uniform(-0.4, -0.2, false));
+    CHECK_NOTHROW(SP_Uniform(0.2, 0.4, true, -0.4, -0.2));
+
+    /** @arg setting one bound alone after construction is still validated against the other */
+    auto sp3 = SP_Uniform(-0.05, 0.05);
+    CHECK_THROWS_AS(sp3->setParam("short_min_value", 0.5), std::exception);
+    CHECK_THROWS_AS(sp3->setParam("min_value", 0.5), std::exception);
+}
 
 /** @} */

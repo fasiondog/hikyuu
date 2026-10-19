@@ -244,7 +244,8 @@ def crtMF(calculate_func, params=None, name='crtMF'):
 # ------------------------------------------------------------------
 # slippage
 # ------------------------------------------------------------------
-def crtSP(get_real_buy_price, get_real_sell_price, params=None, name='crtSP', calculate=None):
+def crtSP(get_real_buy_price, get_real_sell_price, params=None, name='crtSP', calculate=None,
+          get_real_buy_short_price=None, get_real_sell_short_price=None):
     """
     Quickly create a slippage algorithm
 
@@ -255,6 +256,10 @@ def crtSP(get_real_buy_price, get_real_sell_price, params=None, name='crtSP', ca
     :param {} params: the parameter dictionary
     :param str name: the custom name
     :param calculate: the pre-processing function
+    :param get_real_buy_short_price: the interface to calculate the raw price of covering a short,
+        None means falling back to get_real_buy_price
+    :param get_real_sell_short_price: the interface to calculate the raw price of opening a short,
+        None means falling back to get_real_sell_price
     :return: the slippage algorithm instance
     """
     meta_x = type(name, (SlippageBase, ), {'__init__': part_init, '_clone': part_clone})
@@ -262,6 +267,10 @@ def crtSP(get_real_buy_price, get_real_sell_price, params=None, name='crtSP', ca
     meta_x._get_real_sell_price = get_real_sell_price
     if calculate is not None:
         meta_x._calculate = calculate
+    if get_real_buy_short_price is not None:
+        meta_x._get_real_buy_short_price = get_real_buy_short_price
+    if get_real_sell_short_price is not None:
+        meta_x._get_real_sell_short_price = get_real_sell_short_price
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret

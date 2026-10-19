@@ -106,6 +106,17 @@ TEST_CASE("test_SP_TruncNormal_export") {
     CHECK_EQ(sp1->getParameter(), sp2->getParameter());
 }
 
+/** @par Test points */
+TEST_CASE("test_SP_short_param_export") {
+    StockManager& sm = StockManager::instance();
+    SlippagePtr sp1 = SP_Uniform(-0.05, 0.05, true, -0.2, 0.2);
+    SlippagePtr sp2 = roundTrip(sp1, sm.tmpdir() + "/SP_Uniform_short.xml");
+    /** @arg the short-side parameters survive the round-trip */
+    CHECK_EQ(sp1->getParameter(), sp2->getParameter());
+    CHECK_EQ(sp2->getParam<double>("short_min_value"), -0.2);
+    CHECK_EQ(sp2->getParam<double>("short_max_value"), 0.2);
+}
+
 /** @} */
 
 #endif /* HKU_SUPPORT_SERIALIZATION */

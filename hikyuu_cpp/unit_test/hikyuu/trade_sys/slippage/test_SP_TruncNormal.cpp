@@ -26,7 +26,6 @@ TEST_CASE("test_SP_TruncNormal") {
     CHECK_LE(sp->getRealSellPrice(Datetime(202201010930), 10.0), 10.0);
 }
 
-
 TEST_CASE("test_TruncNormalSlippage_seed") {
     /** @arg the same seed produces identical sequences across instances (after reset) */
     auto sp1 = SP_TruncNormal(0.0, 0.05, -0.1, 0.1);
@@ -58,7 +57,6 @@ TEST_CASE("test_TruncNormalSlippage_seed") {
     CHECK_NE(sp3->getRealBuyPrice(Datetime(202201010930), 10.0), first);
 }
 
-
 TEST_CASE("test_TruncNormalSlippage_far_range") {
     /** @arg a truncated range far from the mean terminates and clamps into the range */
     auto sp = SP_TruncNormal(0.0, 0.01, 0.05, 0.08);
@@ -77,8 +75,10 @@ TEST_CASE("test_TruncNormalSlippage_adverse_only_false") {
     bool has_above = false, has_below = false;
     for (int i = 0; i < 200; ++i) {
         price_t buy = sp->getRealBuyPrice(Datetime(202201010930), 10.0);
-        if (buy > 10.0) has_above = true;
-        if (buy < 10.0) has_below = true;
+        if (buy > 10.0)
+            has_above = true;
+        if (buy < 10.0)
+            has_below = true;
     }
     CHECK_UNARY(has_above);
     CHECK_UNARY(has_below);
@@ -104,6 +104,38 @@ TEST_CASE("test_TruncNormalSlippage_adverse_only_false") {
         CHECK_GE(sp2->getRealBuyPrice(Datetime(202201010930), 10.0), 10.0);
         CHECK_LE(sp2->getRealSellPrice(Datetime(202201010930), 10.0), 10.0);
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_TruncNormalSlippage_short_side") {
+    const Datetime dt(202201010930);
+
+    /** @arg a degenerate short truncation interval makes the short draw deterministic */
+    auto sp = SP_TruncNormal(0.0, 0.05, -0.1, 0.1, true, 0.0, 0.05, 0.5, 0.5);
+    CHECK(sp->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.5));
+    CHECK(sp->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.5));
+
+    /** @arg the long side keeps its own interval */
+    for (int i = 0; i < 100; ++i) {
+        price_t off = sp->getRealBuyPrice(dt, 10.0) - 10.0;
+        CHECK_GE(off, 0.0);
+        CHECK_LE(off, 0.1 + 1e-9);
+    }
+
+    /** @arg without short parameters the short amplitude stays inside the long interval */
+    auto sp2 = SP_TruncNormal(0.0, 0.05, 0.0, 0.1);
+    for (int i = 0; i < 100; ++i) {
+        CHECK_GE(sp2->getRealBuyShortPrice(dt, 10.0), 10.0);
+        CHECK_LE(sp2->getRealBuyShortPrice(dt, 10.0), 10.1 + 1e-9);
+    }
+
+    /** @arg an all-negative interval is legal on both sides */
+    CHECK_NOTHROW(SP_TruncNormal(0.0, 0.05, -0.4, -0.2, false));
+    CHECK_NOTHROW(SP_TruncNormal(0.0, 0.05, 0.2, 0.4, true, 0.0, 0.05, -0.4, -0.2));
+
+    /** @arg setting one bound alone after construction is still validated against the other */
+    auto sp3 = SP_TruncNormal(0.0, 0.05, -0.1, 0.1);
+    CHECK_THROWS_AS(sp3->setParam("short_max_value", -0.5), std::exception);
 }
 
 /** @} */

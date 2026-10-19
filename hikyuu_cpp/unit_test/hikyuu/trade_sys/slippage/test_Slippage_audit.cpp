@@ -18,6 +18,7 @@
 #include <hikyuu/trade_sys/slippage/crt/SP_LogNormal.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_TruncNormal.h>
 #include <hikyuu/trade_sys/slippage/crt/SP_FixedPercent.h>
+#include <hikyuu/trade_sys/slippage/crt/SP_FixedValue.h>
 
 using namespace hku;
 
@@ -98,6 +99,19 @@ TEST_CASE("test_random_sp_oversize_warn_only") {
     CHECK_NOTHROW(SP_TruncNormal(0.0, 0.05, -2.0, 2.0));
     /** @arg a negative stddev is still rejected */
     CHECK_THROWS(SP_Normal(0.0, -0.01));
+}
+
+/** @par Test points */
+TEST_CASE("test_Slippage_short_param_clone") {
+    /** @arg the short parameter survives clone */
+    auto sp = SP_FixedPercent(0.01, 0.05);
+    SlippagePtr c = sp->clone();
+    CHECK(c->getRealBuyShortPrice(Datetime(202201010930), 10.0) == doctest::Approx(10.5));
+
+    /** @arg leaving short_value unset takes the value passed for the long side */
+    auto sp2 = SP_FixedValue(0.1);
+    CHECK_EQ(sp2->getParam<double>("short_value"), 0.1);
+    CHECK(sp2->getRealBuyShortPrice(Datetime(202201010930), 10.0) == doctest::Approx(10.1));
 }
 
 /** @par Test points */

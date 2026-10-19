@@ -111,8 +111,10 @@ TEST_CASE("test_NormalSlippage_adverse_only_false") {
     bool has_above = false, has_below = false;
     for (int i = 0; i < 200; ++i) {
         price_t buy = sp->getRealBuyPrice(Datetime(202201010930), 10.0);
-        if (buy > 10.0) has_above = true;
-        if (buy < 10.0) has_below = true;
+        if (buy > 10.0)
+            has_above = true;
+        if (buy < 10.0)
+            has_below = true;
     }
     CHECK_UNARY(has_above);
     CHECK_UNARY(has_below);
@@ -137,6 +139,28 @@ TEST_CASE("test_NormalSlippage_adverse_only_false") {
     for (int i = 0; i < 200; ++i) {
         CHECK_GE(sp2->getRealBuyPrice(Datetime(202201010930), 10.0), 10.0);
     }
+}
+
+/** @par Test points */
+TEST_CASE("test_NormalSlippage_short_side") {
+    const Datetime dt(202201010930);
+
+    /** @arg a zero stddev makes the draw equal to the mean */
+    auto sp = SP_Normal(0.02, 0.0, true, 0.08, 0.0);
+    CHECK(sp->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.08));
+    CHECK(sp->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.92));
+
+    /** @arg the long side is untouched by the short parameters */
+    CHECK(sp->getRealBuyPrice(dt, 10.0) == doctest::Approx(10.02));
+    CHECK(sp->getRealSellPrice(dt, 10.0) == doctest::Approx(9.98));
+
+    /** @arg without short parameters the short side equals the long side */
+    auto sp2 = SP_Normal(0.02, 0.0);
+    CHECK(sp2->getRealBuyShortPrice(dt, 10.0) == doctest::Approx(10.02));
+    CHECK(sp2->getRealSellShortPrice(dt, 10.0) == doctest::Approx(9.98));
+
+    /** @arg a negative short_stddev is rejected */
+    CHECK_THROWS_AS(SP_Normal(0.0, 0.05, true, 0.0, -0.01), std::exception);
 }
 
 /** @} */

@@ -359,6 +359,8 @@ private:
 
     price_t _getRealBuyPrice(const KRecord& src_today, price_t planPrice);
     price_t _getRealSellPrice(const KRecord& src_today, price_t planPrice);
+    price_t _getRealBuyShortPrice(const KRecord& src_today, price_t planPrice);
+    price_t _getRealSellShortPrice(const KRecord& src_today, price_t planPrice);
 
     TradeRecord _buy(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _buyNow(const KRecord& today, const KRecord& src_today, Part from);

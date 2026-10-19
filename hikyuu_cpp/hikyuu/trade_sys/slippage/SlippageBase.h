@@ -64,6 +64,22 @@ public:
      */
     price_t getRealSellPrice(const Datetime& datetime, price_t planPrice);
 
+    /**
+     * Get the price used to cover a short position (buying back). See getRealBuyPrice.
+     * @param datetime buy moment
+     * @param planPrice planned buy price
+     * @return the buy price of the slippage model for covering a short
+     */
+    price_t getRealBuyShortPrice(const Datetime& datetime, price_t planPrice);
+
+    /**
+     * Get the price used to open a short position (short selling). See getRealSellPrice.
+     * @param datetime sell moment
+     * @param planPrice planned sell price
+     * @return the sell price of the slippage model for opening a short
+     */
+    price_t getRealSellShortPrice(const Datetime& datetime, price_t planPrice);
+
     /** Subclass clone interface */
     virtual SlippagePtr _clone() = 0;
 
@@ -89,6 +105,25 @@ public:
      * @return the raw sell price
      */
     virtual price_t _getRealSellPrice(const Datetime& datetime, price_t planPrice) = 0;
+
+    /**
+     * Subclass interface: compute the raw price for covering a short position.
+     * The default delegates to _getRealBuyPrice, so overriding is needed only when the short side
+     * should slip differently from the long side.
+     * @param datetime buy moment
+     * @param planPrice planned buy price
+     * @return the raw buy price for covering a short
+     */
+    virtual price_t _getRealBuyShortPrice(const Datetime& datetime, price_t planPrice);
+
+    /**
+     * Subclass interface: compute the raw price for opening a short position.
+     * The default delegates to _getRealSellPrice.
+     * @param datetime sell moment
+     * @param planPrice planned sell price
+     * @return the raw sell price for opening a short
+     */
+    virtual price_t _getRealSellShortPrice(const Datetime& datetime, price_t planPrice);
 
     bool isPythonObject() const noexcept {
         return m_is_python_object;

@@ -19,6 +19,8 @@ LogNormalSlippage::LogNormalSlippage()
 : SlippageBase("SP_LogNormal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+    setParam<double>("short_mean", 0.0);
+    setParam<double>("short_stddev", 0.05);
 
     // true: unfavorable only; false: symmetric noise
     setParam<bool>("adverse_only", true);
@@ -30,13 +32,13 @@ LogNormalSlippage::LogNormalSlippage()
 LogNormalSlippage::~LogNormalSlippage() {}
 
 void LogNormalSlippage::_checkParam(const string& name) const {
-    if ("mean" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>("mean")));
-    } else if ("stddev" == name) {
-        HKU_ASSERT(getParam<double>("stddev") >= 0.0);
-        HKU_WARN_IF(getParam<double>("stddev") > 1.0,
-                    "The stddev of SP_LogNormal is too large (>{:.2f}); the slippage may be extreme",
-                    1.0);
+    if ("mean" == name || "short_mean" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if ("stddev" == name || "short_stddev" == name) {
+        HKU_ASSERT(getParam<double>(name) >= 0.0);
+        HKU_WARN_IF(
+          getParam<double>(name) > 1.0,
+          "The stddev of SP_LogNormal is too large (>{:.2f}); the slippage may be extreme", 1.0);
     }
 }
 
@@ -63,8 +65,14 @@ price_t LogNormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t pr
     double stddev = getParam<double>("stddev");
     bool adverse_only = getParam<bool>("adverse_only");
 
-    std::lognormal_distribution<double> dis(mean, stddev);
-    double value = dis(m_gen);
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // lognormal_distribution (0 < stddev): pin the draw to exp(mean) instead of relying on what
+    // the library does with a degenerate deviation
+    double value = std::exp(mean);
+    if (stddev > 0.0) {
+        std::lognormal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
     return adverse_only ? price + std::abs(centered_value) : price + centered_value;
 }
@@ -74,19 +82,63 @@ price_t LogNormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t p
     double stddev = getParam<double>("stddev");
     bool adverse_only = getParam<bool>("adverse_only");
 
-    std::lognormal_distribution<double> dis(mean, stddev);
-    double value = dis(m_gen);
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // lognormal_distribution (0 < stddev): pin the draw to exp(mean) instead of relying on what
+    // the library does with a degenerate deviation
+    double value = std::exp(mean);
+    if (stddev > 0.0) {
+        std::lognormal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
     return adverse_only ? price - std::abs(centered_value) : price - centered_value;
 }
 
 void LogNormalSlippage::_calculate() {}
 
-SlippagePtr HKU_API SP_LogNormal(double mean, double stddev, bool adverse_only) {
+price_t LogNormalSlippage::_getRealBuyShortPrice(const Datetime& datetime, price_t price) {
+    double mean = getParam<double>("short_mean");
+    double stddev = getParam<double>("short_stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
+
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // lognormal_distribution (0 < stddev): pin the draw to exp(mean) instead of relying on what
+    // the library does with a degenerate deviation
+    double value = std::exp(mean);
+    if (stddev > 0.0) {
+        std::lognormal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
+    double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
+    return adverse_only ? price + std::abs(centered_value) : price + centered_value;
+}
+
+price_t LogNormalSlippage::_getRealSellShortPrice(const Datetime& datetime, price_t price) {
+    double mean = getParam<double>("short_mean");
+    double stddev = getParam<double>("short_stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
+
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // lognormal_distribution (0 < stddev): pin the draw to exp(mean) instead of relying on what
+    // the library does with a degenerate deviation
+    double value = std::exp(mean);
+    if (stddev > 0.0) {
+        std::lognormal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
+    double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
+    return adverse_only ? price - std::abs(centered_value) : price - centered_value;
+}
+
+SlippagePtr HKU_API SP_LogNormal(double mean, double stddev, bool adverse_only,
+                                 std::optional<double> short_mean,
+                                 std::optional<double> short_stddev) {
     SlippagePtr ptr = make_shared<LogNormalSlippage>();
     ptr->setParam("mean", mean);
     ptr->setParam("stddev", stddev);
     ptr->setParam("adverse_only", adverse_only);
+    ptr->setParam("short_mean", short_mean.value_or(mean));
+    ptr->setParam("short_stddev", short_stddev.value_or(stddev));
     return ptr;
 }
 

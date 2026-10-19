@@ -92,6 +92,7 @@ The money management base-class common parameters `auto-checkin` → `auto_check
 * feat(allocatefunds): restore the Python `crtAF` quick construction (L1 `_allocate`, with the optional L2 `_to_targets` / L3 `_check_risk` injection)
 * feat(MultiSystem): new `adjust-mode` / `delay-to-trading-day` parameters, supporting internalizing the adjust mode into an adjust-date table
 * feat(slippage): the four random slippages (`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`) gain an `adverse_only` parameter (default `true` keeps the one-sided unfavorable cost; `false` applies the raw signed sample as zero-mean execution noise)
+* feat(slippage): asymmetric long/short slippage is now supported: `SlippageBase` gains `get_real_buy_short_price` (covering a short) and `get_real_sell_short_price` (opening a short) with their overridable hooks, which delegate to the long-side hooks by default so an existing implementation keeps its behavior; `SP_FixedPercent` / `SP_FixedValue` gain `short_p` / `short_value`, the four random models gain `short_mean` / `short_stddev` / `short_min_value` / `short_max_value` (each taking its long-side counterpart value at construction when left `None`); `crtSP` gains the optional `get_real_buy_short_price` / `get_real_sell_short_price` arguments (note: an archive serialized by an older version carries no `short_*` key, so after deserialization the short side takes the class default instead of the matching long-side value; call `set_param` explicitly to restore it)
 
 **🐞 Bug Fixes**
 

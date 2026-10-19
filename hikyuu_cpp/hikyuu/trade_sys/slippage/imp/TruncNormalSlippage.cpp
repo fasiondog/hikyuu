@@ -30,12 +30,15 @@ double normInvCdf(double p) {
     } else if (p > hi) {
         p = hi;
     }
-    static const double a[] = {-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
-                               1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00};
-    static const double b[] = {-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
-                               6.680131188771972e+01, -1.328068155288572e+01};
-    static const double c[] = {-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
-                               -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00};
+    static const double a[] = {-3.969683028665376e+01, 2.209460984245205e+02,
+                               -2.759285104469687e+02, 1.383577518672690e+02,
+                               -3.066479806614716e+01, 2.506628277459239e+00};
+    static const double b[] = {-5.447609879822406e+01, 1.615858368580409e+02,
+                               -1.556989798598866e+02, 6.680131188771972e+01,
+                               -1.328068155288572e+01};
+    static const double c[] = {-7.784894002430293e-03, -3.223964580411365e-01,
+                               -2.400758277161838e+00, -2.549732539343734e+00,
+                               4.374664141464968e+00,  2.938163982698783e+00};
     static const double d[] = {7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
                                3.754408661907416e+00};
     double q, r;
@@ -90,6 +93,10 @@ TruncNormalSlippage::TruncNormalSlippage()
     setParam<double>("stddev", 0.05);
     setParam<double>("min_value", -0.1);
     setParam<double>("max_value", 0.1);
+    setParam<double>("short_mean", 0.0);
+    setParam<double>("short_stddev", 0.05);
+    setParam<double>("short_min_value", -0.1);
+    setParam<double>("short_max_value", 0.1);
 
     // true: unfavorable only; false: symmetric noise
     setParam<bool>("adverse_only", true);
@@ -101,25 +108,35 @@ TruncNormalSlippage::TruncNormalSlippage()
 TruncNormalSlippage::~TruncNormalSlippage() {}
 
 void TruncNormalSlippage::_checkParam(const string& name) const {
-    if ("mean" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>("mean")));
-    } else if ("stddev" == name) {
-        HKU_ASSERT(getParam<double>("stddev") >= 0.0);
-    } else if ("min_value" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>("min_value")));
-    } else if ("max_value" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>("max_value")));
+    if ("mean" == name || "short_mean" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if ("stddev" == name || "short_stddev" == name) {
+        HKU_ASSERT(getParam<double>(name) >= 0.0);
+    } else if ("min_value" == name || "short_min_value" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if ("max_value" == name || "short_max_value" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
     }
 
-    if (haveParam("min_value") && haveParam("max_value")) {
-        double min_v = getParam<double>("min_value");
-        double max_v = getParam<double>("max_value");
-        HKU_ASSERT(min_v <= max_v);
-        HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
-                    "The amplitude of SP_TruncNormal is too large (>{:.2f}), the slippage may "
-                    "move the price by more than 100%",
-                    1.0);
+    if ("min_value" == name || "max_value" == name) {
+        _checkRange("min_value", "max_value");
+    } else if ("short_min_value" == name || "short_max_value" == name) {
+        _checkRange("short_min_value", "short_max_value");
     }
+}
+
+void TruncNormalSlippage::_checkRange(const string& min_name, const string& max_name) const {
+    // both bounds of the pair must already be registered; they are not during construction
+    if (!haveParam(min_name) || !haveParam(max_name)) {
+        return;
+    }
+    double min_v = getParam<double>(min_name);
+    double max_v = getParam<double>(max_name);
+    HKU_ASSERT(min_v <= max_v);
+    HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
+                "The amplitude of SP_TruncNormal is too large (>{:.2f}), the slippage may "
+                "move the price by more than 100%",
+                1.0);
 }
 
 void TruncNormalSlippage::_reset() {
@@ -164,14 +181,47 @@ price_t TruncNormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t
 
 void TruncNormalSlippage::_calculate() {}
 
+price_t TruncNormalSlippage::_getRealBuyShortPrice(const Datetime& datetime, price_t price) {
+    double mean = getParam<double>("short_mean");
+    double stddev = getParam<double>("short_stddev");
+    double min_v = getParam<double>("short_min_value");
+    double max_v = getParam<double>("short_max_value");
+    bool adverse_only = getParam<bool>("adverse_only");
+
+    double value = sampleTruncNormal(mean, stddev, min_v, max_v, m_gen);
+    return adverse_only ? price + std::abs(value) : price + value;
+}
+
+price_t TruncNormalSlippage::_getRealSellShortPrice(const Datetime& datetime, price_t price) {
+    double mean = getParam<double>("short_mean");
+    double stddev = getParam<double>("short_stddev");
+    double min_v = getParam<double>("short_min_value");
+    double max_v = getParam<double>("short_max_value");
+    bool adverse_only = getParam<bool>("adverse_only");
+
+    double value = sampleTruncNormal(mean, stddev, min_v, max_v, m_gen);
+    return adverse_only ? price - std::abs(value) : price - value;
+}
+
 SlippagePtr HKU_API SP_TruncNormal(double mean, double stddev, double min_value, double max_value,
-                                   bool adverse_only) {
+                                   bool adverse_only, std::optional<double> short_mean,
+                                   std::optional<double> short_stddev,
+                                   std::optional<double> short_min_value,
+                                   std::optional<double> short_max_value) {
     SlippagePtr ptr = make_shared<TruncNormalSlippage>();
-    ptr->setParam("mean", mean);
-    ptr->setParam("stddev", stddev);
-    ptr->setParam("max_value", max_value);
-    ptr->setParam("min_value", min_value);
-    ptr->setParam("adverse_only", adverse_only);
+    // Assign the whole set at once so each pair is checked on its final state: setting a single
+    // bound would be compared against the other bound's class default mid-way
+    Parameter param = ptr->getParameter();
+    param.set<double>("mean", mean);
+    param.set<double>("stddev", stddev);
+    param.set<double>("min_value", min_value);
+    param.set<double>("max_value", max_value);
+    param.set<bool>("adverse_only", adverse_only);
+    param.set<double>("short_mean", short_mean.value_or(mean));
+    param.set<double>("short_stddev", short_stddev.value_or(stddev));
+    param.set<double>("short_min_value", short_min_value.value_or(min_value));
+    param.set<double>("short_max_value", short_max_value.value_or(max_value));
+    ptr->setParameter(param);
     return ptr;
 }
 

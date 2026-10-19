@@ -1094,11 +1094,13 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     const auto& src_krecord =
       m_stock.getKRecord(m_kdata.startPos() + pos, m_kdata.getQuery().kType());
 
-    price_t realPrice =
-      _getRealSellPrice(src_krecord, on_open ? src_krecord.openPrice : src_krecord.closePrice);
-    // A stale out-of-range src_krecord yields NullKRecord whose price is 0.0; selling at 0 would
+    price_t plan_price = on_open ? src_krecord.openPrice : src_krecord.closePrice;
+    // Covering a short is a buy, so it must take the short-side buy price, not the sell price
+    price_t realPrice = cover_short ? _getRealBuyShortPrice(src_krecord, plan_price)
+                                    : _getRealSellPrice(src_krecord, plan_price);
+    // A stale out-of-range src_krecord yields NullKRecord whose price is 0.0; trading at 0 would
     // clear the position and evaporate the funds, so reject it here
-    HKU_WARN_IF_RETURN(realPrice <= 0.0, record, "[{}] {}: invalid sell price!",
+    HKU_WARN_IF_RETURN(realPrice <= 0.0, record, "[{}] {}: invalid force price!",
                        m_stock.market_code(), date);
 
     double min_num = m_stock.minTradeNumber();
@@ -1119,7 +1121,6 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
         }
     }
 
-    price_t plan_price = on_open ? src_krecord.openPrice : src_krecord.closePrice;
     record = cover_short ? m_tm->buyShort(date, m_stock, realPrice, real_sell_num,
                                           position.stoploss, position.goalPrice, plan_price, from)
                          : m_tm->sell(date, m_stock, realPrice, real_sell_num, position.stoploss,
@@ -1389,7 +1390,7 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
     }
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealBuyPrice(src_today, planPrice);
+    price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
 
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
@@ -1482,7 +1483,7 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
             number = pos.number;
         }
 
-        price_t realPrice = _getRealBuyPrice(src_today, planPrice);
+        price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {
@@ -1585,7 +1586,7 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     }
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
-    price_t realPrice = _getRealSellPrice(src_today, planPrice);
+    price_t realPrice = _getRealSellShortPrice(src_today, planPrice);
     TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                          goalPrice, planPrice, from);
     if (BUSINESS_SELL_SHORT != record.business) {
@@ -1660,7 +1661,7 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
             continue;
         }
 
-        price_t realPrice = _getRealSellPrice(src_today, planPrice);
+        price_t realPrice = _getRealSellShortPrice(src_today, planPrice);
 
         TradeRecord record = m_tm->sellShort(today.datetime, m_stock, realPrice, number, stoploss,
                                              goalPrice, planPrice, req.from);
@@ -1786,6 +1787,16 @@ price_t System::_getRealBuyPrice(const KRecord& src_today, price_t planPrice) {
 price_t System::_getRealSellPrice(const KRecord& src_today, price_t planPrice) {
     price_t price = m_sp ? m_sp->getRealSellPrice(src_today.datetime, planPrice) : planPrice;
     return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "sell");
+}
+
+price_t System::_getRealBuyShortPrice(const KRecord& src_today, price_t planPrice) {
+    price_t price = m_sp ? m_sp->getRealBuyShortPrice(src_today.datetime, planPrice) : planPrice;
+    return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "buy short");
+}
+
+price_t System::_getRealSellShortPrice(const KRecord& src_today, price_t planPrice) {
+    price_t price = m_sp ? m_sp->getRealSellShortPrice(src_today.datetime, planPrice) : planPrice;
+    return fixupSlippagePrice(name(), m_stock, src_today, planPrice, price, "sell short");
 }
 
 json System::lastSuggestion() const {

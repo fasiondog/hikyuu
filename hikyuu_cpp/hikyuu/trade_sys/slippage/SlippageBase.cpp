@@ -71,4 +71,22 @@ price_t SlippageBase::getRealSellPrice(const Datetime& datetime, price_t planPri
     return _getRealSellPrice(datetime, planPrice);
 }
 
+price_t SlippageBase::getRealBuyShortPrice(const Datetime& datetime, price_t planPrice) {
+    HKU_WARN_IF_RETURN(!(planPrice > 0.0), planPrice, "plan price must be positive");
+    return _getRealBuyShortPrice(datetime, planPrice);
+}
+
+price_t SlippageBase::getRealSellShortPrice(const Datetime& datetime, price_t planPrice) {
+    HKU_WARN_IF_RETURN(!(planPrice > 0.0), planPrice, "plan price must be positive");
+    return _getRealSellShortPrice(datetime, planPrice);
+}
+
+price_t SlippageBase::_getRealBuyShortPrice(const Datetime& datetime, price_t planPrice) {
+    return _getRealBuyPrice(datetime, planPrice);
+}
+
+price_t SlippageBase::_getRealSellShortPrice(const Datetime& datetime, price_t planPrice) {
+    return _getRealSellPrice(datetime, planPrice);
+}
+
 } /* namespace hku */

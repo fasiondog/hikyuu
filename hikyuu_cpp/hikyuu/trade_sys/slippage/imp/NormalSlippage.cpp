@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include <random>
 #include "NormalSlippage.h"
 
@@ -17,6 +18,8 @@ namespace hku {
 NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+    setParam<double>("short_mean", 0.0);
+    setParam<double>("short_stddev", 0.05);
 
     // true: unfavorable only; false: symmetric noise
     setParam<bool>("adverse_only", true);
@@ -28,11 +31,11 @@ NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_
 NormalSlippage::~NormalSlippage() {}
 
 void NormalSlippage::_checkParam(const string& name) const {
-    if ("mean" == name) {
-        HKU_ASSERT(!std::isnan(getParam<double>("mean")));
-    } else if ("stddev" == name) {
-        HKU_ASSERT(getParam<double>("stddev") >= 0.0);
-        HKU_WARN_IF(getParam<double>("stddev") > 1.0,
+    if ("mean" == name || "short_mean" == name) {
+        HKU_ASSERT(!std::isnan(getParam<double>(name)));
+    } else if ("stddev" == name || "short_stddev" == name) {
+        HKU_ASSERT(getParam<double>(name) >= 0.0);
+        HKU_WARN_IF(getParam<double>(name) > 1.0,
                     "The stddev of SP_Normal is too large (>{:.2f}); the slippage may be extreme",
                     1.0);
     }
@@ -61,8 +64,14 @@ price_t NormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price
     double stddev = getParam<double>("stddev");
     bool adverse_only = getParam<bool>("adverse_only");
 
-    std::normal_distribution<double> dis(mean, stddev);
-    double value = dis(m_gen);
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // normal_distribution (0 < stddev): pin the draw to the mean instead of relying on what the
+    // library does with a degenerate deviation
+    double value = mean;
+    if (stddev > 0.0) {
+        std::normal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
     return adverse_only ? price + std::abs(value) : price + value;
 }
 
@@ -71,18 +80,60 @@ price_t NormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t pric
     double stddev = getParam<double>("stddev");
     bool adverse_only = getParam<bool>("adverse_only");
 
-    std::normal_distribution<double> dis(mean, stddev);
-    double value = dis(m_gen);
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // normal_distribution (0 < stddev): pin the draw to the mean instead of relying on what the
+    // library does with a degenerate deviation
+    double value = mean;
+    if (stddev > 0.0) {
+        std::normal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
     return adverse_only ? price - std::abs(value) : price - value;
 }
 
 void NormalSlippage::_calculate() {}
 
-SlippagePtr HKU_API SP_Normal(double mean, double stddev, bool adverse_only) {
+price_t NormalSlippage::_getRealBuyShortPrice(const Datetime& datetime, price_t price) {
+    double mean = getParam<double>("short_mean");
+    double stddev = getParam<double>("short_stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
+
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // normal_distribution (0 < stddev): pin the draw to the mean instead of relying on what the
+    // library does with a degenerate deviation
+    double value = mean;
+    if (stddev > 0.0) {
+        std::normal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
+    return adverse_only ? price + std::abs(value) : price + value;
+}
+
+price_t NormalSlippage::_getRealSellShortPrice(const Datetime& datetime, price_t price) {
+    double mean = getParam<double>("short_mean");
+    double stddev = getParam<double>("short_stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
+
+    // A zero stddev is legal in the parameter domain but is outside the standard precondition of
+    // normal_distribution (0 < stddev): pin the draw to the mean instead of relying on what the
+    // library does with a degenerate deviation
+    double value = mean;
+    if (stddev > 0.0) {
+        std::normal_distribution<double> dis(mean, stddev);
+        value = dis(m_gen);
+    }
+    return adverse_only ? price - std::abs(value) : price - value;
+}
+
+SlippagePtr HKU_API SP_Normal(double mean, double stddev, bool adverse_only,
+                              std::optional<double> short_mean,
+                              std::optional<double> short_stddev) {
     SlippagePtr ptr = make_shared<NormalSlippage>();
     ptr->setParam("mean", mean);
     ptr->setParam("stddev", stddev);
     ptr->setParam("adverse_only", adverse_only);
+    ptr->setParam("short_mean", short_mean.value_or(mean));
+    ptr->setParam("short_stddev", short_stddev.value_or(stddev));
     return ptr;
 }
 
