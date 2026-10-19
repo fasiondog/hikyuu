@@ -213,13 +213,20 @@ TEST_CASE("test_Condition_serialize") {
         oa << BOOST_SERIALIZATION_NVP(src);
     }
 
-    /** @arg the date index and values survive the round trip */
     ConditionTest dst;
     {
         std::ifstream ifs(filename);
         boost::archive::xml_iarchive ia(ifs);
         ia >> BOOST_SERIALIZATION_NVP(dst);
     }
+
+    /** @arg the configuration survives the round trip */
+    CHECK_EQ(dst.name(), src.name());
+    CHECK_EQ(dst.getParam<int>("n"), src.getParam<int>("n"));
+
+    /** @arg the per-bar cache is no longer persisted; it is rebuilt by setTO */
+    CHECK_EQ(dst.size(), 0);
+    dst.setTO(kdata);
     CHECK_EQ(dst.size(), src.size());
     CHECK_EQ(dst.getDatetimeList().size(), src.getDatetimeList().size());
     CHECK_UNARY(dst.isValid(Datetime(19901221)));

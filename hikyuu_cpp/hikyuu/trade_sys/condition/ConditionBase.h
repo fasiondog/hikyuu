@@ -134,22 +134,16 @@ private:
     void save(Archive& ar, const unsigned int version) const {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_date_index);
-        ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_kdata/m_tm/m_sg are set temporarily when the system runs, they do not need to be
-        // serialized
+        // m_date_index/m_values are the per-bar cache rebuilt by setTO's _calculate, so they are
+        // no longer persisted (keeps archives small). m_kdata/m_tm/m_sg are runtime-only.
     }
 
     template <class Archive>
     void load(Archive& ar, const unsigned int version) {
         ar& BOOST_SERIALIZATION_NVP(m_name);
         ar& BOOST_SERIALIZATION_NVP(m_params);
-        ar& BOOST_SERIALIZATION_NVP(m_date_index);
-        ar& BOOST_SERIALIZATION_NVP(m_values);
         ar& BOOST_SERIALIZATION_NVP(m_is_python_object);
-        // m_kdata/m_tm/m_sg are set temporarily when the system runs, they do not need to be
-        // serialized
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
