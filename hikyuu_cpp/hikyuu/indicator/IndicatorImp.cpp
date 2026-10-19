@@ -934,21 +934,7 @@ bool IndicatorImp::can_shift_old_results(size_t operand_total) const noexcept {
 IndicatorImp::BinaryLayout IndicatorImp::prepareBinaryOp(bool weave) {
     BinaryLayout ly;
     size_t start_pos = increment_execute();
-    bool increment = (start_pos != Null<size_t>());
-
-    // The incremental path reuses the existing result buffers without reallocating result sets, so
-    // it is only correct when this operation yields exactly the result sets already buffered. A
-    // different count (e.g. a truncation edge near MAX_RESULT_NUM) would leave some data(r) null
-    // and the incremental write would dereference it; abandon the increment and fall back to a full
-    // recalculation in that case
-    if (increment) {
-        size_t expected = weave ? (m_left->getResultNumber() + m_right->getResultNumber())
-                                : std::min(m_left->getResultNumber(), m_right->getResultNumber());
-        if (expected != m_result_num) {
-            increment = false;
-        }
-    }
-
+    const bool increment = (start_pos != Null<size_t>());
     if (!increment) {
         m_right->calculate();
         m_left->calculate();
@@ -1013,15 +999,6 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
         return false;
     }
 
-    // The incremental shift reuses old results by aligning the old window onto the new one; it is
-    // only correct when the new context merely extends the old one at the tail (the front stays
-    // put). A forward-shifted front would carry valid values into the warm-up region that has no
-    // history in the new context, leaving the discard wrong; abandon the increment and fall back to
-    // a full recalculation
-    if (copy_start_pos > 0) {
-        return false;
-    }
-
     size_t total = m_context.size();
     size_t copy_len = m_old_context.size() - copy_start_pos;
     if (copy_len < m_discard) {
@@ -1052,16 +1029,9 @@ bool IndicatorImp::increment_execute_leaf_or_op(const Indicator &ind) {
     if (copy_len > 0) {
         for (size_t r = 0; r < m_result_num; ++r) {
             HKU_ASSERT(m_pBuffer[r]);
-            auto *dst = this->data(r);
-            // Shift the overlapping old results toward the front while the buffer is still at its
-            // old length; resizing afterwards keeps the move correct for any value_type. The
-            // previous order shrank first and relied on a trivially destructible element being a
-            // no-op on shrink, which would read logically destroyed slots for a non-trivial
-            // value_type
-            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
-        }
-        for (size_t r = 0; r < m_result_num; ++r) {
             m_pBuffer[r]->resize(total, Null<value_t>());
+            auto *dst = this->data(r);
+            memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
         }
     }
 
@@ -1245,12 +1215,6 @@ size_t IndicatorImp::increment_execute() {
         return null_pos;
     }
 
-    // Same front-shift guard as increment_execute_leaf_or_op: a forward-shifted front imports
-    // warm-up values with no history in the new context and corrupts the discard
-    if (copy_start_pos > 0) {
-        return null_pos;
-    }
-
     size_t total = m_context.size();
     size_t copy_len = m_old_context.size() - copy_start_pos;
     if (copy_len == 0) {
@@ -1268,11 +1232,9 @@ size_t IndicatorImp::increment_execute() {
 
     for (size_t r = 0; r < m_result_num; ++r) {
         HKU_ASSERT(m_pBuffer[r] != nullptr);
+        m_pBuffer[r]->resize(total, Null<value_t>());
         auto *dst = this->data(r);
         memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
-    }
-    for (size_t r = 0; r < m_result_num; ++r) {
-        m_pBuffer[r]->resize(total, Null<value_t>());
     }
 
     return start_pos;
@@ -1487,12 +1449,6 @@ size_t IndicatorImp::increment_execute_if() {
         return null_pos;
     }
 
-    // Same front-shift guard as increment_execute_leaf_or_op: a forward-shifted front imports
-    // warm-up values with no history in the new context and corrupts the discard
-    if (copy_start_pos > 0) {
-        return null_pos;
-    }
-
     size_t total = m_context.size();
     size_t copy_len = m_old_context.size() - copy_start_pos;
     if (copy_len == 0) {
@@ -1510,11 +1466,9 @@ size_t IndicatorImp::increment_execute_if() {
 
     for (size_t r = 0; r < m_result_num; ++r) {
         HKU_ASSERT(m_pBuffer[r]);
+        m_pBuffer[r]->resize(total, Null<value_t>());
         auto *dst = this->data(r);
         memmove(dst, dst + copy_start_pos, sizeof(value_t) * (copy_len));
-    }
-    for (size_t r = 0; r < m_result_num; ++r) {
-        m_pBuffer[r]->resize(total, Null<value_t>());
     }
 
     return start_pos;
