@@ -24,6 +24,23 @@ Undefined financial states such as a zero divisor or a zero variance always yiel
 0.0 or inf: 0.0 is indistinguishable from a legitimate zero and inf poisons every downstream window
 aggregate.
 
+Parameter domain (n and the window)
+-----------------------------------
+
+* **n = 0 means the expanding window** (accumulated from the first bar of the valid range); it is
+  an intended semantic of about 25 indicators (MA, SMA, STDEV, STDP, VAR, VARP, CORR, COV, BETA,
+  the ROC family, MDD/MRR ...), not an invalid parameter. **It only applies to a static
+  parameter**: a per-bar dynamic parameter gives the window length, so 0 (and any value below the
+  minimum window) means there is no valid window and that bar yields null.
+* **The minimum window follows from the math**: 1 for the mean family (MA / EMA / WMA / SMA), 2
+  for the deviation / correlation family (the sample denominator is n-1), 3 for the skewness and
+  4 for the kurtosis.
+* **When n is below the minimum window**: a static parameter (e.g. ``STDEV(x, 1)``) raises an
+  error, while a per-bar dynamic parameter (e.g. ``STDEV(x, CVAL(x, 1))``) is not validated and
+  simply has no valid value there (the result is null).
+* **Exception**: a few indicators take an n that is not a window length (FILTER counts the bars to
+  mask); their static n = 0 is described per function, and a dynamic 0 is still no valid window.
+
 
 .. py:function:: ABS([data])
 
@@ -1555,7 +1572,7 @@ aggregate.
     The simple moving average
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1); when it is 0 an expanding window is used, i.e. dst[i] is the mean over [discard(), i] (the first bar already has a value)
     :rtype: Indicator
 
 
@@ -2118,7 +2135,7 @@ aggregate.
     NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), SMA[i] holds SMA[i-1]; there is no permanent contamination.
 
     :param Indicator data: the input data
-    :param int n: the time window
+    :param int n: the time window (>=1, 0 is not supported)
     :param float m: the coefficient (within [1, n]; a value outside is clamped with a warning)
     :rtype: Indicator
 
@@ -2193,7 +2210,7 @@ aggregate.
     The population standard deviation; STDP(X,N) is the N-day population standard deviation of X
 
     :param data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=2); when it is 0 an expanding window is used, i.e. dst[i] is the population standard deviation over [discard(), i] (a single point gives 0 and the discard is not extended)
     :rtype: Indicator
 
 
@@ -2360,7 +2377,7 @@ aggregate.
     remaining entries (aligned with MA / STDEV / VAR), a fully missing window gives nan.
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1, the expanding window of 0 is not supported)
     :rtype: Indicator
 
 

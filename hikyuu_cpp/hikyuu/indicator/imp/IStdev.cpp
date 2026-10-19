@@ -225,6 +225,7 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step < 2, void());
     if (curPos + 1 < ind.discard() + step) {
         return;
     }

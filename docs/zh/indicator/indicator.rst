@@ -14,6 +14,14 @@
 
 除零、零方差等未定义金融状态一律输出 null，不会用 0.0 或 inf 顶替：0.0 与真实零值不可区分，inf 会污染后续窗口聚合。
 
+参数定义域（n 与窗口）
+----------------------
+
+* **n = 0 表示扩展窗口**（从进入有效区的第一根开始累计），是 MA、SMA、STDEV、STDP、VAR、VARP、CORR、COV、BETA、ROC 族、MDD/MRR 等约 25 个指标的有意语义，不是非法参数。**该语义只适用于静态参数**：逐 bar 的动态参数给出的是窗口长度，0（以及小于最小窗口的值）表示没有有效窗口，对应 bar 结果为 null。
+* **最小窗口由数学决定**：均值类（MA/EMA/WMA/SMA）为 1；样本方差/标准差、相关系数、协方差与 Beta 为 2（样本口径分母为 n-1）；偏度为 3；峰度为 4。
+* **n 小于最小窗口时**：传入静态参数（如 `STDEV(x, 1)`）直接报错；传入逐 bar 的动态参数（如 `STDEV(x, CVAL(x, 1))`）不做参数校验，该 bar 没有有效值（结果为 null）。
+* **例外**：少数指标的 `n` 不是窗口长度（如 `FILTER` 的 `n` 为屏蔽根数），其静态 `n = 0` 语义见各自函数文档；动态参数下 0 同样不视为有效窗口。
+
 
 .. py:function:: ABS([data])
 
@@ -1537,7 +1545,7 @@
     简单移动平均
 
     :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口（>=1）；为0时使用扩展窗口，dst[i] 取 [discard(), i] 上的均值（从起点累计，首根即有值）
     :rtype: Indicator
 
 
@@ -2091,7 +2099,7 @@
     NaN 口径：若 x[i] 为非有限值（NaN 或 ±Inf），SMA[i] 保持 SMA[i-1]，不会一 NaN/Inf 就污染尾部。
 
     :param Indicator data: 输入数据
-    :param int n: 时间窗口
+    :param int n: 时间窗口（>=1，不支持 0）
     :param float m: 系数（取值应在 [1, n] 内，越界会被钳制到该区间并告警）
     :rtype: Indicator
 
@@ -2166,7 +2174,7 @@
     总体标准差，STDP(X,N)为X的N日总体标准差
 
     :param data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口（>=2）；为0时使用扩展窗口，dst[i] 取 [discard(), i] 上的总体标准差（单点为 0，discard 不额外增加）
     :rtype: Indicator
 
 
@@ -2327,7 +2335,7 @@
     NaN 口径：非有限值不参与权重，输出为窗口内剩余有效值的加权均值（与 MA/STDEV/VAR 同口径）；窗口内全部为非有限值时输出 null。
 
     :param Indicator data: 输入数据
-    :param int|Indicator|IndParam n: 时间窗口
+    :param int|Indicator|IndParam n: 时间窗口（>=1，不支持 0 的扩展窗口）
     :rtype: Indicator
 
 

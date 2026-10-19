@@ -134,8 +134,9 @@ void IStdp::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 void IStdp::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step < 2, void());
     size_t start = _get_step_start(curPos, step, ind.discard());
-    if (step != 0 && curPos - start + 1 < step) {
+    if (curPos - start + 1 < step) {
         _set(Null<price_t>(), curPos);
         return;
     }

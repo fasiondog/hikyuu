@@ -86,14 +86,10 @@ void ICount::_calculate(const Indicator& data) {
 }
 
 void ICount::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    size_t start = 0;
-    if (0 == step) {
-        start = ind.discard();
-    } else if (curPos < ind.discard() + step - 1) {
+    if (curPos < ind.discard() + step - 1) {
         return;
-    } else {
-        start = curPos + 1 - step;
     }
+    size_t start = curPos + 1 - step;
     price_t count = 0;
     for (size_t i = start; i <= curPos; i++) {
         if (std::isfinite(ind[i]) && ind[i] != 0.0) {

@@ -833,7 +833,7 @@ void export_Indicator_build_in(py::module& m) {
     is clamped into that range with a warning.
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1, 0 is not supported)
     :param float|Indicator|IndParam m: the coefficient
     :rtype: Indicator)");
 
@@ -860,7 +860,7 @@ void export_Indicator_build_in(py::module& m) {
     The simple moving average
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1); when it is 0 an expanding window is used, i.e. dst[i] is the mean over [discard(), i] (the first bar already has a value)
     :rtype: Indicator)");
 
     m.def("WMA", WMA_1, py::arg("n") = 22);
@@ -875,7 +875,7 @@ void export_Indicator_build_in(py::module& m) {
     remaining entries (aligned with MA / STDEV / VAR), a fully missing window gives nan.
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1, the expanding window of 0 is not supported)
     :rtype: Indicator)");
 
     m.def("AMA", AMA_1, py::arg("n") = 10, py::arg("fast_n") = 2, py::arg("slow_n") = 30);
@@ -1066,7 +1066,7 @@ void export_Indicator_build_in(py::module& m) {
     The population standard deviation; STDP(X,N) is the N-day population standard deviation of X
 
     :param data: the input data
-    :param int n: the time window
+    :param int n: the time window (>=2); when it is 0 an expanding window is used, i.e. dst[i] is the population standard deviation over [discard(), i] (a single point gives 0 and the discard is not extended)
     :rtype: Indicator)");
 
     m.def("HHV", HHV_1, py::arg("n") = 20);

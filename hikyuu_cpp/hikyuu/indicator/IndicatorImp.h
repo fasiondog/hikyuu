@@ -703,7 +703,7 @@ inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const 
 }
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
-    return step == 0 || pos < discard + step ? discard : pos + 1 - step;
+    return pos < discard + step ? discard : pos + 1 - step;
 }
 
 inline bool IndicatorImp::equalValue(value_t v1, value_t v2) noexcept {
