@@ -443,7 +443,8 @@ public:
     static void releaseEngine();
 
 protected:
-    static std::atomic<bool> ms_enable_increment_calculate;
+    // Process-global switch; set once at startup (not at runtime). Non-atomic for cheap reads.
+    static bool ms_enable_increment_calculate;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:

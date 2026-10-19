@@ -33,7 +33,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
-std::atomic<bool> IndicatorImp::ms_enable_increment_calculate{true};
+bool IndicatorImp::ms_enable_increment_calculate{true};
 
 void IndicatorImp::initEngine() {
 #if HKU_ENABLE_MIMALLOC

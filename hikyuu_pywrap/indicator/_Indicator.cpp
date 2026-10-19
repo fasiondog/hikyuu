@@ -49,7 +49,9 @@ void export_Indicator(py::module& m) {
         "enable_increment_calculate",
         [](py::object) { return Indicator::enableIncrementCalculate(); },
         [](py::object cls, bool flag) { Indicator::enableIncrementCalculate(flag); },
-        "Enable/disable the indicator incremental calculation")
+        "Enable/disable the indicator incremental calculation. NOTE: this is a process-global, "
+        "special-purpose switch; set it once at startup (before any calculation) and do not "
+        "toggle it at runtime")
 
       .def_property("name", ind_read_name, ind_write_name, "The indicator name")
       .def_property_readonly("long_name", &Indicator::long_name,
