@@ -81,7 +81,6 @@ void checkRoundTrip(const Indicator& src, const Indicator& dst) {
 //        conversion, which makes the boost text archive fail), so the text cases build it through
 //        a computation instead of a parameter
 PriceList specialValues(bool includeSubnormal = true) {
-    const value_t inf = std::numeric_limits<value_t>::infinity();
     PriceList px;
     px.push_back(1e-7);
     px.push_back(1e-12);
