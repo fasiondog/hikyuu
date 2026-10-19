@@ -4,6 +4,26 @@
 Built-in Technical Indicators
 =============================
 
+Missing-value (NaN / ±Inf) policy
+---------------------------------
+
+* **Window formulas** (MA, WMA, STDEV, VAR, CORR, COV, HHV, LLV ...): non-finite entries are
+  excluded from the aggregate, and a formula carrying a denominator counts only the valid
+  entries; the window keeps emitting once its minimum valid count is met (1 for the mean /
+  extreme family, 2 for the deviation / correlation family), and a fully missing window yields
+  null.
+* **Recursive formulas** (EMA, SMA, DMA, MACD, AMA, KALMAN ...): a bar holding a non-finite value
+  keeps the previous output (the internal state is frozen, no permanent contamination); a leading
+  non-finite prefix leaves the state unseeded until the first finite observation.
+* **Per-bar transforms and pure accumulators** (ABS, LOG, SQRT, REF, SUM, the ROC family ...):
+  non-finite values propagate downstream by contract (the result is null).
+* **KData-context indicators** (ATR, AD, ADX ...): the input is the K-line data itself, which has
+  no missing-bar concept.
+
+Undefined financial states such as a zero divisor or a zero variance always yield null rather than
+0.0 or inf: 0.0 is indistinguishable from a legitimate zero and inf poisons every downstream window
+aggregate.
+
 
 .. py:function:: ABS([data])
 
@@ -2329,6 +2349,18 @@ Built-in Technical Indicators
 
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window (>= 2); when it is 0 an expanding window is used: dst[i] is the population var over [discard(), i] (single-point var is 0)
+    :rtype: Indicator
+
+
+.. py:function:: WMA([data, n=22])
+
+    The weighted moving average, with the algorithm: Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
+
+    Non-finite entries are excluded from the weights; the output is the weighted mean of the
+    remaining entries (aligned with MA / STDEV / VAR), a fully missing window gives nan.
+
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window
     :rtype: Indicator
 
 

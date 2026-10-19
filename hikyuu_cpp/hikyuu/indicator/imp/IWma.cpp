@@ -46,22 +46,21 @@ void IWma::_calculate(const Indicator& ind) {
         return;
     }
 
-    // Non-finite values contribute 0 to the rolling sums; bad_in_window counts them so the
-    // affected windows can be marked as Null instead of returning a biased result.
+    // Non-finite entries are excluded from the weights; the output is the weighted mean of the
+    // remaining entries (aligned with MA / STDEV / VAR), a fully missing window stays Null.
     value_t subsum = 0.0, sum = 0.0;
-    size_t bad = 0;
+    size_t wsubsum = 0, wsum = 0;
     for (size_t i = ind.discard(), end = m_discard + 1, count = 1; i < end; i++, count++) {
         if (std::isfinite(src[i])) {
             subsum += src[i];
             sum += src[i] * count;
-        } else {
-            bad++;
+            wsubsum += 1;
+            wsum += count;
         }
     }
 
-    value_t divider = value_t(n) * (n + 1) / 2.0;
-    if (bad == 0)
-        dst[m_discard] = sum / divider;
+    if (wsum > 0)
+        dst[m_discard] = sum / wsum;
 
     size_t trailingIdx = ind.discard();
     for (size_t i = m_discard + 1; i < total; i++) {
@@ -70,26 +69,14 @@ void IWma::_calculate(const Indicator& ind) {
         bool in_ok = std::isfinite(tmp);
         bool out_ok = std::isfinite(leaving);
         // shift existing weights by -1 (equivalent to subtracting the current subsum)
-        if (bad == 0 && out_ok && in_ok) {
-            sum -= subsum;
-            subsum += tmp;
-            subsum -= leaving;
-            sum += tmp * n;
-            dst[i] = sum / divider;
-            continue;
-        }
-        // window has (or gains/loses) a non-finite slot: apply incrementally with 0 for bad
-        value_t t = in_ok ? tmp : 0.0;
-        value_t l = out_ok ? leaving : 0.0;
         sum -= subsum;
-        subsum += t - l;
-        sum += t * n;
-        if (in_ok && !out_ok)
-            bad--;
-        else if (!in_ok && out_ok)
-            bad++;
-        if (bad == 0)
-            dst[i] = sum / divider;
+        wsum -= wsubsum;
+        subsum += (in_ok ? tmp : 0.0) - (out_ok ? leaving : 0.0);
+        wsubsum += (in_ok ? 1 : 0) - (out_ok ? 1 : 0);
+        sum += in_ok ? tmp * n : 0.0;
+        wsum += in_ok ? n : 0u;
+        if (wsum > 0)
+            dst[i] = sum / wsum;
     }
 }
 
@@ -109,34 +96,30 @@ void IWma::_increment_calculate(const Indicator& ind, size_t start_pos) {
     auto* dst = this->data();
 
     value_t subsum = 0.0, sum = 0.0;
-    size_t bad = 0;
+    size_t wsubsum = 0, wsum = 0;
     for (size_t i = start_pos - n, end = start_pos, count = 1; i < end; i++, count++) {
         if (std::isfinite(src[i])) {
             subsum += src[i];
             sum += src[i] * count;
-        } else {
-            bad++;
+            wsubsum += 1;
+            wsum += count;
         }
     }
 
-    value_t divider = value_t(n) * (n + 1) / 2.0;
     size_t trailingIdx = start_pos - n;
     for (size_t i = start_pos; i < total; i++) {
         value_t tmp = src[i];
         value_t leaving = src[trailingIdx++];
         bool in_ok = std::isfinite(tmp);
         bool out_ok = std::isfinite(leaving);
-        value_t t = in_ok ? tmp : 0.0;
-        value_t l = out_ok ? leaving : 0.0;
         sum -= subsum;
-        subsum += t - l;
-        sum += t * n;
-        if (in_ok && !out_ok)
-            bad--;
-        else if (!in_ok && out_ok)
-            bad++;
-        if (bad == 0)
-            dst[i] = sum / divider;
+        wsum -= wsubsum;
+        subsum += (in_ok ? tmp : 0.0) - (out_ok ? leaving : 0.0);
+        wsubsum += (in_ok ? 1 : 0) - (out_ok ? 1 : 0);
+        sum += in_ok ? tmp * n : 0.0;
+        wsum += in_ok ? n : 0u;
+        if (wsum > 0)
+            dst[i] = sum / wsum;
     }
 }
 
@@ -158,19 +141,18 @@ void IWma::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
     }
 
     value_t sum = 0.0;
-    size_t bad = 0, n = 1;
+    size_t wsum = 0, n = 1;
     for (size_t i = start; i <= curPos; i++, n++) {
         if (std::isfinite(ind[i])) {
             sum += ind[i] * n;
-        } else {
-            ++bad;
+            wsum += n;
         }
     }
-    if (bad > 0) {
+    if (wsum == 0) {
         _set(Null<value_t>(), curPos);
         return;
     }
-    _set(sum / (step * (step + 1) / 2.0), curPos);
+    _set(sum / wsum, curPos);
 }
 
 Indicator HKU_API WMA(int n) {

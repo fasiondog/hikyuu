@@ -55,6 +55,15 @@ class CompiledFactorPlan;
  * 6. An implementation whose invalid prefix cannot be derived from its formula may declare it by
  *    scanning its own output once, e.g. the trailing updateDiscard of ALIGN / REPLACE / BARSSINCE
  *    / BARSLASTS / IC; the framework never derives it on their behalf.
+ * 7. A window formula excludes non-finite entries (NaN / ±Inf) from its aggregates: a value
+ *    enters the sums only when finite and the denominator counts only the valid entries
+ *    (MA, WMA, STDEV, VAR, CORR, COV, HHV, LLV ...); the window keeps emitting once its minimum
+ *    valid count is met (1 for the mean family, 2 for the deviation family), and a fully missing
+ *    window yields Null.
+ * 8. Recursive formulas (EMA, SMA, DMA, MACD, AMA, KALMAN) hold the previous output at a
+ *    non-finite bar with their state frozen; a leading non-finite prefix leaves the state
+ *    unseeded until the first finite observation. Per-bar transforms and pure accumulators
+ *    (ABS, LOG, REF, SUM, the ROC family ...) propagate non-finite values by contract.
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {

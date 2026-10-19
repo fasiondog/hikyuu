@@ -871,6 +871,9 @@ void export_Indicator_build_in(py::module& m) {
 
     The weighted moving average, with the algorithm: Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
 
+    Non-finite entries are excluded from the weights; the output is the weighted mean of the
+    remaining entries (aligned with MA / STDEV / VAR), a fully missing window gives nan.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator)");

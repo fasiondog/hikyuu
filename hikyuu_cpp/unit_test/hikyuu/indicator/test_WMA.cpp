@@ -106,14 +106,16 @@ TEST_CASE("test_WMA_dyn") {
     }
 }
 
-/** @par Test points: ST-N03 — after a mid-series NaN slides out of the window, WMA recovers */
+/** @par Test points: ST-N03 — a window holding a non-finite value still emits the weighted mean
+ * of the remaining entries, aligned with MA */
 TEST_CASE("test_WMA_nan_recovery") {
     price_t nan = Null<price_t>();
     Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
     Indicator r = WMA(data, 3);
-    // i=3 window [1,2,NaN]: bad>0, output stays Null
-    CHECK_UNARY(std::isnan(r[3]));
-    // NaN slides out by i=6 (window [4,5,6] no longer contains it)
+    // i=3 window [2,3,NaN]: weights (1,2,3) over the valid entries only -> 8/3
+    CHECK_EQ(r[3], doctest::Approx(8. / 3.).epsilon(0.00001));
+    CHECK_EQ(r[4], doctest::Approx(4.5).epsilon(0.00001));
+    CHECK_EQ(r[5], doctest::Approx(5.6).epsilon(0.00001));
     Indicator clean = PRICELIST({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0});
     Indicator dirty = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0, 7.0});
     Indicator rc = WMA(clean, 3);
@@ -123,15 +125,15 @@ TEST_CASE("test_WMA_nan_recovery") {
     CHECK(rd[6] == doctest::Approx(rc[6]));
 }
 
-/** @par Test points: ST-N13 — dynamic path returns Null when the window holds non-finite values,
- * matching the static semantics */
+/** @par Test points: ST-N13 — the dynamic path matches the static semantics on non-finite
+ * windows (both exclude the entries and emit the weighted mean) */
 TEST_CASE("test_WMA_dynamic_non_finite_window") {
     price_t nan = Null<price_t>();
     Indicator data = PRICELIST({1.0, 2.0, 3.0, nan, 5.0, 6.0});
     Indicator dyn = WMA(data, CVAL(data, 3));
     Indicator stat = WMA(data, 3);
     for (size_t i = 2; i < data.size(); i++) {
-        CHECK_UNARY(std::isnan(dyn[i]) == std::isnan(stat[i]));
+        CHECK_EQ(dyn[i], doctest::Approx(stat[i]).epsilon(0.00001));
     }
 }
 

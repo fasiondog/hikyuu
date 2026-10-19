@@ -4,6 +4,16 @@
 内建技术指标
 ============
 
+缺失值（NaN / ±Inf）处理口径
+----------------------------
+
+* **窗口公式**（MA、WMA、STDEV、VAR、CORR、COV、HHV、LLV 等）：非有限值被剔除、不参与聚合，带分母的公式分母只计有效数；窗口满足最小有效数（均值/极值类为 1，方差/相关类为 2）即正常输出，全缺失窗口输出 null。
+* **递归公式**（EMA、SMA、DMA、MACD、AMA、KALMAN 等）：非有限值所在 bar 保持上一根输出（内部状态冻结，不会永久污染）；前导非有限值使状态保持未播种，直到首个有限观测。
+* **逐 bar 变换与累加器**（ABS、LOG、SQRT、REF、SUM、ROC 族等）：非有限值按契约向下游传播（结果为 null）。
+* **K 线上下文指标**（ATR、AD、ADX 等）：输入为 K 线数据本身，无缺失概念。
+
+除零、零方差等未定义金融状态一律输出 null，不会用 0.0 或 inf 顶替：0.0 与真实零值不可区分，inf 会污染后续窗口聚合。
+
 
 .. py:function:: ABS([data])
 
@@ -2307,6 +2317,17 @@
 
     :param Indicator data: 输入数据
     :param int|Indicator|IndParam n: 时间窗口（>=2）；为0时使用扩展窗口，dst[i] 取 [discard(), i] 上的总体方差（单点方差为0）
+    :rtype: Indicator
+
+
+.. py:function:: WMA([data, n=22])
+
+    加权移动平均，算法：Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
+
+    NaN 口径：非有限值不参与权重，输出为窗口内剩余有效值的加权均值（与 MA/STDEV/VAR 同口径）；窗口内全部为非有限值时输出 null。
+
+    :param Indicator data: 输入数据
+    :param int|Indicator|IndParam n: 时间窗口
     :rtype: Indicator
 
 
