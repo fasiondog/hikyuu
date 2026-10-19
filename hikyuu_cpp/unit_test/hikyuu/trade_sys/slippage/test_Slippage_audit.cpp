@@ -101,6 +101,24 @@ TEST_CASE("test_random_sp_oversize_warn_only") {
 }
 
 /** @par Test points */
+TEST_CASE("test_Slippage_adverse_only_param_clone") {
+    auto sp = SP_Uniform(-0.05, 0.05, false);
+    sp->setParam<int64_t>("seed", 42);
+    sp->reset();
+    SlippagePtr c = sp->clone();
+    /** @arg adverse_only=false survives clone and the clone also produces symmetric offsets */
+    CHECK_UNARY(!c->getParam<bool>("adverse_only"));
+    bool has_below = false;
+    for (int i = 0; i < 200; ++i) {
+        if (c->getRealBuyPrice(Datetime(202201010930), 10.0) < 10.0) {
+            has_below = true;
+            break;
+        }
+    }
+    CHECK_UNARY(has_below);
+}
+
+/** @par Test points */
 TEST_CASE("test_Slippage_clone_reseed") {
     auto sp = SP_Uniform(-0.05, 0.05);
     sp->setParam<int64_t>("seed", 42);

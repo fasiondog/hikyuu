@@ -59,4 +59,42 @@ TEST_CASE("test_UniformSlippage_seed") {
 }
 
 
+TEST_CASE("test_UniformSlippage_adverse_only_false") {
+    /** @arg adverse_only=false produces both favorable and unfavorable offsets */
+    auto sp = SP_Uniform(-0.05, 0.05, false);
+    sp->setParam<int64_t>("seed", 42);
+    sp->reset();
+    bool has_above = false, has_below = false;
+    for (int i = 0; i < 200; ++i) {
+        price_t buy = sp->getRealBuyPrice(Datetime(202201010930), 10.0);
+        if (buy > 10.0) has_above = true;
+        if (buy < 10.0) has_below = true;
+    }
+    CHECK_UNARY(has_above);
+    CHECK_UNARY(has_below);
+
+    /** @arg the same draw shifts the buy and the sell by the opposite signed offset */
+    auto a = SP_Uniform(-0.05, 0.05, false);
+    auto b = SP_Uniform(-0.05, 0.05, false);
+    a->setParam<int64_t>("seed", 7);
+    b->setParam<int64_t>("seed", 7);
+    a->reset();
+    b->reset();
+    for (int i = 0; i < 20; ++i) {
+        price_t buy = a->getRealBuyPrice(Datetime(202201010930), 10.0);
+        price_t sell = b->getRealSellPrice(Datetime(202201010930), 10.0);
+        CHECK_LE(std::abs((buy - 10.0) + (sell - 10.0)), 1e-12);
+    }
+
+    /** @arg adverse_only=true (default) only produces unfavorable offsets */
+    auto sp2 = SP_Uniform(-0.05, 0.05);
+    sp2->setParam<int64_t>("seed", 42);
+    sp2->reset();
+    for (int i = 0; i < 200; ++i) {
+        CHECK_GE(sp2->getRealBuyPrice(Datetime(202201010930), 10.0), 10.0);
+        CHECK_LE(sp2->getRealSellPrice(Datetime(202201010930), 10.0), 10.0);
+    }
+}
+
+
 /** @} */

@@ -19,6 +19,10 @@ namespace hku {
 UniformSlippage::UniformSlippage() : SlippageBase("SP_Uniform"), m_gen(std::random_device{}()) {
     setParam<double>("min_value", -0.05);
     setParam<double>("max_value", 0.05);
+
+    // true: unfavorable only; false: symmetric noise
+    setParam<bool>("adverse_only", true);
+
     // 0 means a random seed; a non-zero seed makes the backtest reproducible
     setParam<int64_t>("seed", 0);
 }
@@ -36,9 +40,6 @@ void UniformSlippage::_checkParam(const string& name) const {
         double min_v = getParam<double>("min_value");
         double max_v = getParam<double>("max_value");
         HKU_ASSERT(min_v <= max_v);
-        // The sampled value is folded to a positive amplitude via abs and applied in the
-        // unfavorable direction, so the effective slippage is bounded by max(|min_v|, |max_v|).
-        // Warn on an absurd amplitude that would move the price by more than 100%.
         HKU_WARN_IF(std::max(std::abs(min_v), std::abs(max_v)) > 1.0,
                     "The amplitude of SP_Uniform is too large (>{:.2f}), the slippage may "
                     "move the price by more than 100%",
@@ -67,29 +68,28 @@ void UniformSlippage::_reset() {
 price_t UniformSlippage ::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
+    bool adverse_only = getParam<bool>("adverse_only");
     std::uniform_real_distribution<double> dis(min_v, max_v);
     double value = dis(m_gen);
-    // The range is an amplitude range: the sampled value is folded to a positive
-    // amplitude via abs and then applied in the unfavorable direction
-    return price + std::abs(value);
+    return adverse_only ? price + std::abs(value) : price + value;
 }
 
 price_t UniformSlippage ::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double min_v = getParam<double>("min_value");
     double max_v = getParam<double>("max_value");
+    bool adverse_only = getParam<bool>("adverse_only");
     std::uniform_real_distribution<double> dis(min_v, max_v);
     double value = dis(m_gen);
-    // The range is an amplitude range: the sampled value is folded to a positive
-    // amplitude via abs and then applied in the unfavorable direction
-    return price - std::abs(value);
+    return adverse_only ? price - std::abs(value) : price - value;
 }
 
 void UniformSlippage::_calculate() {}
 
-SlippagePtr HKU_API SP_Uniform(double min_value, double max_value) {
+SlippagePtr HKU_API SP_Uniform(double min_value, double max_value, bool adverse_only) {
     SlippagePtr ptr = make_shared<UniformSlippage>();
     ptr->setParam("max_value", max_value);
     ptr->setParam("min_value", min_value);
+    ptr->setParam("adverse_only", adverse_only);
     return ptr;
 }
 

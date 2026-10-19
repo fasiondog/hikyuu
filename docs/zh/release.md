@@ -89,6 +89,7 @@
 * feat(allocatefunds): 独立 `AllocateFundsBase` 基类与 `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` 工厂（承载组合级 L1/L2/L3）
 * feat(allocatefunds): 恢复 Python `crtAF` 便捷构造（L1 `_allocate`，可选注入 L2 `_to_targets` / L3 `_check_risk`）
 * feat(MultiSystem): 新增 `adjust-mode` / `delay-to-trading-day` 参数，支持将调仓模式内化为调仓日表
+* feat(slippage): 四个随机移滑价差（`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`）新增 `adverse_only` 参数（默认 `true` 保持单向不利成本；`false` 直接使用带符号采样值，实现零均值执行噪声）
 
 **🐞 缺陷修复**
 

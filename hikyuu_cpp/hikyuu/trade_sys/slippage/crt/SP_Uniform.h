@@ -12,15 +12,15 @@
 namespace hku {
 
 /**
- * Uniform distribution random price slippage algorithm: the sampled value is folded to a
- * non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan
- * price plus the amplitude and the sell price is the plan price minus the amplitude. Thus
- * [min_value, max_value] is the amplitude range (the sign of the sample is ignored), not a
- * symmetric +/- offset.
- * @param min_value the lower limit of the offset amplitude range
- * @param max_value the upper limit of the offset amplitude range
- * @return
+ * Uniform distribution random price slippage algorithm.
+ * @param min_value the lower limit of the offset range
+ * @param max_value the upper limit of the offset range
+ * @param adverse_only if true (default), fold sampled value to non-negative amplitude and apply
+ *        in the unfavorable direction; if false, apply the raw signed value (zero-mean execution
+ *        noise, not necessarily symmetric)
+ * @return the slippage object pointer
  */
-SlippagePtr HKU_API SP_Uniform(double min_value = -0.05, double max_value = 0.05);
+SlippagePtr HKU_API SP_Uniform(double min_value = -0.05, double max_value = 0.05,
+                               bool adverse_only = true);
 
 } /* namespace hku */

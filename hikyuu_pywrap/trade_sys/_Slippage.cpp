@@ -174,52 +174,56 @@ The custom slippage interfaces:
     :return: the slippage algorithm instance)");
 
     m.def("SP_Uniform", &SP_Uniform, py::arg("min_value") = -0.05, py::arg("max_value") = 0.05,
-          R"(SP_Uniform([min_value=-0.05, max_value=0.05])
+          py::arg("adverse_only") = true,
+          R"(SP_Uniform([min_value=-0.05, max_value=0.05, adverse_only=True])
 
-    The uniform distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude. [min_value, max_value] is the amplitude range (the sign of the sample is ignored), not a symmetric +/- offset.
+    The uniform distribution random price slippage algorithm. When adverse_only is True (default), the sampled value is folded to a non-negative amplitude and applied in the unfavorable direction (one-sided cost model). When adverse_only is False, the raw signed value is applied directly as zero-mean execution noise (not necessarily symmetric; zero mean when the range is centered at 0).
 
-    :param float min_value: the minimum of the offset amplitude range
-    :param float max_value: the maximum of the offset amplitude range, must be >= min_value
+    :param float min_value: the minimum of the offset range
+    :param float max_value: the maximum of the offset range, must be >= min_value
+    :param bool adverse_only: True (default) folds to unfavorable only; False uses raw signed offset
     :return: the slippage algorithm instance
 
     Besides the arguments above, the instance carries a seed parameter (int64, default 0 = a random seed); a non-zero value makes the sequence reproducible, and it takes effect only after reset().)");
 
     m.def("SP_Normal", &SP_Normal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
-          R"(SP_Normal([mean=0.0, stddev=0.05])
+          py::arg("adverse_only") = true,
+          R"(SP_Normal([mean=0.0, stddev=0.05, adverse_only=True])
 
-    The normal distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude. The actual expected slippage is therefore the folded expectation E|X|, not the mean:
+    The normal distribution random price slippage algorithm. When adverse_only is True (default), the sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the actual expected slippage is the folded expectation E|X|, not the mean. When adverse_only is False, the raw signed value is applied directly as zero-mean execution noise (not necessarily symmetric; its expectation is mean).
 
-        E|X| = stddev * sqrt(2/pi) * exp(-mean^2 / (2 * stddev^2)) + mean * erf(mean / (stddev * sqrt(2)))
-
-    With mean = 0, E|X| = stddev * sqrt(2/pi), i.e. about 0.7979 * stddev: SP_Normal(0.0, 0.05) gives an expected slippage of about 4%. The mean only becomes visible when it is comparable to stddev (SP_Normal(0.05, 0.05) gives about 5.8%); as it grows far beyond stddev, E|X| approaches the mean - the mean only shifts the center of the distribution before folding.
-
-    :param float mean: the mean of the normal distribution (the center before folding; not the actual expected slippage)
+    :param float mean: the mean of the normal distribution
     :param float stddev: the standard deviation of the normal distribution, must be >= 0
+    :param bool adverse_only: True (default) folds to unfavorable only; False uses raw signed offset
     :return: the slippage algorithm instance
 
     Besides the arguments above, the instance carries a seed parameter (int64, default 0 = a random seed); a non-zero value makes the sequence reproducible, and it takes effect only after reset().)");
 
     m.def("SP_LogNormal", &SP_LogNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
-          R"(SP_LogNormal([mean=0.0, stddev=0.05])
+          py::arg("adverse_only") = true,
+          R"(SP_LogNormal([mean=0.0, stddev=0.05, adverse_only=True])
 
-    The log-normal distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude.
+    The log-normal distribution random price slippage algorithm. When adverse_only is True (default), the centered sampled value is folded to a non-negative amplitude and applied in the unfavorable direction. When adverse_only is False, the raw centered value (X - E[X]) is applied directly as zero-mean execution noise: its expectation is exactly 0, but it is right-skewed and not necessarily symmetric, and mean only raises the dispersion without producing a drift (unlike mean in SP_Normal).
 
     :param float mean: the mean of the log-normal distribution
     :param float stddev: the standard deviation of the log-normal distribution, must be >= 0
+    :param bool adverse_only: True (default) folds to unfavorable only; False uses raw signed offset
     :return: the slippage algorithm instance
 
     Besides the arguments above, the instance carries a seed parameter (int64, default 0 = a random seed); a non-zero value makes the sequence reproducible, and it takes effect only after reset().)");
 
     m.def("SP_TruncNormal", &SP_TruncNormal, py::arg("mean") = 0.0, py::arg("stddev") = 0.05,
           py::arg("min_value") = -0.1, py::arg("max_value") = 0.1,
-          R"(SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
+          py::arg("adverse_only") = true,
+          R"(SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1, adverse_only=True])
 
-    The truncated normal distribution random price slippage algorithm. The sampled value is folded to a non-negative amplitude and applied in the unfavorable direction, so the buy price is the plan price plus the amplitude and the sell price is the plan price minus the amplitude. The sample is drawn from the truncated normal distribution over [min_value, max_value].
+    The truncated normal distribution random price slippage algorithm. When adverse_only is True (default), the sampled value is folded to a non-negative amplitude and applied in the unfavorable direction. When adverse_only is False, the raw signed value is applied directly as zero-mean execution noise (not necessarily symmetric; the expectation equals mean only when the truncation interval is centered on it). The sample is drawn from the truncated normal distribution over [min_value, max_value].
 
     :param float mean: the mean of the truncated normal distribution
     :param float stddev: the standard deviation of the truncated normal distribution, must be >= 0
     :param float min_value: the minimum truncation value
     :param float max_value: the maximum truncation value, must be >= min_value
+    :param bool adverse_only: True (default) folds to unfavorable only; False uses raw signed offset
     :return: the slippage algorithm instance
 
     Besides the arguments above, the instance carries a seed parameter (int64, default 0 = a random seed); a non-zero value makes the sequence reproducible, and it takes effect only after reset().)");

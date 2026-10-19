@@ -91,6 +91,7 @@ The money management base-class common parameters `auto-checkin` → `auto_check
 * feat(allocatefunds): the standalone `AllocateFundsBase` base class with the `AF_EqualWeight` / `AF_FixedWeight` / `AF_FixedWeightList` / `AF_FixedAmount` / `AF_MultiFactor` factories (carrying the portfolio-level L1/L2/L3)
 * feat(allocatefunds): restore the Python `crtAF` quick construction (L1 `_allocate`, with the optional L2 `_to_targets` / L3 `_check_risk` injection)
 * feat(MultiSystem): new `adjust-mode` / `delay-to-trading-day` parameters, supporting internalizing the adjust mode into an adjust-date table
+* feat(slippage): the four random slippages (`SP_Uniform` / `SP_Normal` / `SP_LogNormal` / `SP_TruncNormal`) gain an `adverse_only` parameter (default `true` keeps the one-sided unfavorable cost; `false` applies the raw signed sample as zero-mean execution noise)
 
 **🐞 Bug Fixes**
 

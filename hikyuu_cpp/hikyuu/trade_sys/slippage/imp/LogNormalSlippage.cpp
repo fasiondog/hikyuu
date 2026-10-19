@@ -19,6 +19,10 @@ LogNormalSlippage::LogNormalSlippage()
 : SlippageBase("SP_LogNormal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+
+    // true: unfavorable only; false: symmetric noise
+    setParam<bool>("adverse_only", true);
+
     // 0 means a random seed; a non-zero seed makes the backtest reproducible
     setParam<int64_t>("seed", 0);
 }
@@ -57,37 +61,32 @@ void LogNormalSlippage::_reset() {
 price_t LogNormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
 
     std::lognormal_distribution<double> dis(mean, stddev);
-
     double value = dis(m_gen);
-    // To distribute the slippage values around the mean, exp(mean+stddev^2/2) is subtracted to
-    // center them
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
-    // On a buy the price always goes higher (the unfavorable direction)
-    return price + std::abs(centered_value);
+    return adverse_only ? price + std::abs(centered_value) : price + centered_value;
 }
 
 price_t LogNormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
 
     std::lognormal_distribution<double> dis(mean, stddev);
-
     double value = dis(m_gen);
-    // To distribute the slippage values around the mean, exp(mean+stddev^2/2) is subtracted to
-    // center them
     double centered_value = value - std::exp(mean + stddev * stddev / 2.0);
-    // On a sell the price always goes lower (the unfavorable direction)
-    return price - std::abs(centered_value);
+    return adverse_only ? price - std::abs(centered_value) : price - centered_value;
 }
 
 void LogNormalSlippage::_calculate() {}
 
-SlippagePtr HKU_API SP_LogNormal(double mean, double stddev) {
+SlippagePtr HKU_API SP_LogNormal(double mean, double stddev, bool adverse_only) {
     SlippagePtr ptr = make_shared<LogNormalSlippage>();
     ptr->setParam("mean", mean);
     ptr->setParam("stddev", stddev);
+    ptr->setParam("adverse_only", adverse_only);
     return ptr;
 }
 

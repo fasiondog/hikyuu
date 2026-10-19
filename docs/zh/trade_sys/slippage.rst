@@ -22,42 +22,46 @@
     :param float value: 偏移价格，须 >= 0
     :return: 移滑价差算法实例
 
-.. py:function:: SP_Uniform([min_value=-0.05, max_value=0.05])
+.. py:function:: SP_Uniform([min_value=-0.05, max_value=0.05, adverse_only=True])
 
-    均匀分布随机价格移滑价差算法。[min_value, max_value] 是偏移“幅度区间”：采样值取绝对值后只往不利方向（买入加、卖出减）叠加，因此并非对称的 ± 偏移。买入实际价格 = 计划买入价格 + 幅度，卖出实际价格 = 计划卖出价格 - 幅度
+    均匀分布随机价格移滑价差算法。``adverse_only=True``（默认）时，采样值取绝对值后只往不利方向（买入加、卖出减）叠加，即 [min_value, max_value] 为偏移“幅度区间”。``adverse_only=False`` 时，直接使用带符号的采样值作为零均值执行噪声（不保证对称；区间以 0 为中心时期望为 0）
 
-    :param float min_value: 偏移幅度区间下界
-    :param float max_value: 偏移幅度区间上界，须 >= min_value
+    :param float min_value: 偏移区间下界
+    :param float max_value: 偏移区间上界，须 >= min_value
+    :param bool adverse_only: True（默认）折为不利方向；False 直接使用带符号的偏移值
     :return: 移滑价差算法实例
 
-.. py:function:: SP_Normal([mean=0.0, stddev=0.05])
+.. py:function:: SP_Normal([mean=0.0, stddev=0.05, adverse_only=True])
 
-    正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加，因此实际期望滑点是折叠分布的期望 ``E|X|``，不是 ``mean``：
+    正态分布随机价格移滑价差算法。``adverse_only=True``（默认）时，采样值取绝对值后只往不利方向叠加，实际期望滑点是折叠分布的期望 ``E|X|``，不是 ``mean``：
 
         E|X| = stddev * sqrt(2/pi) * exp(-mean^2 / (2 * stddev^2)) + mean * erf(mean / (stddev * sqrt(2)))
 
-    ``mean`` = 0 时 ``E|X| = stddev * sqrt(2/pi)``，即约为 ``0.7979 * stddev``：``SP_Normal(0.0, 0.05)`` 的期望滑点约 4%。``mean`` 只有与 ``stddev`` 同量级时才明显（``SP_Normal(0.05, 0.05)`` 约 5.8%）；``mean`` 远大于 ``stddev`` 时 ``E|X|`` 趋近 ``mean`` —— ``mean`` 只决定折叠前分布的中心，不直接等于期望滑点
+    ``mean`` = 0 时 ``E|X| = stddev * sqrt(2/pi)``，即约为 ``0.7979 * stddev``。``adverse_only=False`` 时，直接使用带符号的采样值作为零均值执行噪声（不保证对称；期望为 ``mean``）
 
-    :param float mean: 正态分布的均值（折叠前分布的中心，不是实际期望滑点）
+    :param float mean: 正态分布的均值
     :param float stddev: 正态分布的标准差，须 >= 0
+    :param bool adverse_only: True（默认）折为不利方向；False 直接使用带符号的偏移值
     :return: 移滑价差算法实例
 
-.. py:function:: SP_LogNormal([mean=0.0, stddev=0.05])
+.. py:function:: SP_LogNormal([mean=0.0, stddev=0.05, adverse_only=True])
 
-    对数正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加
+    对数正态分布随机价格移滑价差算法。``adverse_only=True``（默认）时，采样值取绝对值后只往不利方向叠加。``adverse_only=False`` 时，直接使用中心化后的采样值（``X - E[X]``）作为零均值执行噪声：期望严格为 0，但分布右偏、不保证对称，``mean`` 只放大离散程度、不产生漂移（与 ``SP_Normal`` 中 ``mean`` 即漂移不同）
 
     :param float mean: 对数正态分布的均值
     :param float stddev: 对数正态分布的标准差，须 >= 0
+    :param bool adverse_only: True（默认）折为不利方向；False 直接使用带符号的偏移值
     :return: 移滑价差算法实例
 
-.. py:function:: SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1])
+.. py:function:: SP_TruncNormal([mean=0.0, stddev=0.05, min_value=-0.1, max_value=0.1, adverse_only=True])
 
-    截断正态分布随机价格移滑价差算法。采样值取绝对值后只往不利方向（买入加、卖出减）叠加，样本从 [min_value, max_value] 上的截断正态分布中解析采样（逆 CDF）
+    截断正态分布随机价格移滑价差算法。``adverse_only=True``（默认）时，采样值取绝对值后只往不利方向叠加。``adverse_only=False`` 时，直接使用带符号的采样值作为零均值执行噪声（不保证对称；仅当截断区间以 ``mean`` 为中心时期望等于 ``mean``）。样本从 [min_value, max_value] 上的截断正态分布中解析采样（逆 CDF）
 
     :param float mean: 截断正态分布的均值
     :param float stddev: 截断正态分布的标准差，须 >= 0
     :param float min_value: 最小截断值
     :param float max_value: 最大截断值，须 >= min_value
+    :param bool adverse_only: True（默认）折为不利方向；False 直接使用带符号的偏移值
     :return: 移滑价差算法实例
 
 .. note::

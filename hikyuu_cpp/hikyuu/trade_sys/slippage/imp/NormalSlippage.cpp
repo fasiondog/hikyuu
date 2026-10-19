@@ -17,6 +17,10 @@ namespace hku {
 NormalSlippage::NormalSlippage() : SlippageBase("SP_Normal"), m_gen(std::random_device{}()) {
     setParam<double>("mean", 0.0);
     setParam<double>("stddev", 0.05);
+
+    // true: unfavorable only; false: symmetric noise
+    setParam<bool>("adverse_only", true);
+
     // 0 means a random seed; a non-zero seed makes the backtest reproducible
     setParam<int64_t>("seed", 0);
 }
@@ -55,29 +59,30 @@ void NormalSlippage::_reset() {
 price_t NormalSlippage::_getRealBuyPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
 
     std::normal_distribution<double> dis(mean, stddev);
-
     double value = dis(m_gen);
-    return price + std::abs(value);
+    return adverse_only ? price + std::abs(value) : price + value;
 }
 
 price_t NormalSlippage::_getRealSellPrice(const Datetime& datetime, price_t price) {
     double mean = getParam<double>("mean");
     double stddev = getParam<double>("stddev");
+    bool adverse_only = getParam<bool>("adverse_only");
 
     std::normal_distribution<double> dis(mean, stddev);
-
     double value = dis(m_gen);
-    return price - std::abs(value);
+    return adverse_only ? price - std::abs(value) : price - value;
 }
 
 void NormalSlippage::_calculate() {}
 
-SlippagePtr HKU_API SP_Normal(double mean, double stddev) {
+SlippagePtr HKU_API SP_Normal(double mean, double stddev, bool adverse_only) {
     SlippagePtr ptr = make_shared<NormalSlippage>();
     ptr->setParam("mean", mean);
     ptr->setParam("stddev", stddev);
+    ptr->setParam("adverse_only", adverse_only);
     return ptr;
 }
 

@@ -102,4 +102,41 @@ TEST_CASE("test_NormalSlippage_expected_slippage") {
     CHECK_LE(std::abs(sum2 / total - expected2), expected2 * 0.01);
 }
 
+/** @par Test points */
+TEST_CASE("test_NormalSlippage_adverse_only_false") {
+    /** @arg adverse_only=false produces both favorable and unfavorable offsets */
+    auto sp = SP_Normal(0.0, 0.1, false);
+    sp->setParam<int64_t>("seed", 123);
+    sp->reset();
+    bool has_above = false, has_below = false;
+    for (int i = 0; i < 200; ++i) {
+        price_t buy = sp->getRealBuyPrice(Datetime(202201010930), 10.0);
+        if (buy > 10.0) has_above = true;
+        if (buy < 10.0) has_below = true;
+    }
+    CHECK_UNARY(has_above);
+    CHECK_UNARY(has_below);
+
+    /** @arg the same draw shifts the buy and the sell by the opposite signed offset */
+    auto a = SP_Normal(0.0, 0.1, false);
+    auto b = SP_Normal(0.0, 0.1, false);
+    a->setParam<int64_t>("seed", 7);
+    b->setParam<int64_t>("seed", 7);
+    a->reset();
+    b->reset();
+    for (int i = 0; i < 20; ++i) {
+        price_t buy = a->getRealBuyPrice(Datetime(202201010930), 10.0);
+        price_t sell = b->getRealSellPrice(Datetime(202201010930), 10.0);
+        CHECK_LE(std::abs((buy - 10.0) + (sell - 10.0)), 1e-12);
+    }
+
+    /** @arg adverse_only=true (default) only produces unfavorable offsets on buy */
+    auto sp2 = SP_Normal(0.0, 0.1);
+    sp2->setParam<int64_t>("seed", 123);
+    sp2->reset();
+    for (int i = 0; i < 200; ++i) {
+        CHECK_GE(sp2->getRealBuyPrice(Datetime(202201010930), 10.0), 10.0);
+    }
+}
+
 /** @} */
