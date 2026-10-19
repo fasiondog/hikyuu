@@ -21,7 +21,8 @@ namespace hku {
 
 OPLineCondition::OPLineCondition() : ConditionBase("CN_OPLine") {}
 
-OPLineCondition::OPLineCondition(const Indicator& op) : ConditionBase("CN_OPLine"), m_op(op) {}
+OPLineCondition::OPLineCondition(const Indicator& op)
+: ConditionBase("CN_OPLine"), m_op(op.clone()) {}
 
 OPLineCondition::~OPLineCondition() {}
 
