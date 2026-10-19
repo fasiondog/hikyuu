@@ -150,11 +150,12 @@
 
         以指标形式获取实际值，与交易对象逐 bar 等长。有效性判定为值有限且 ``> 0``（否则无效）。布尔/与/或等条件有效位为 ``1.0``；算术条件（Add/Sub/Multi/Div）为两侧的运算结果，可为任意实数，缺失或非有限时记为 NaN。
 
-    .. py:method:: _add_valid(self, datetime)
+    .. py:method:: _add_valid(self, datetime[, value=1.0])
     
-        加入有效时间，在_calculate中调用
+        加入有效时间，在 _calculate 中调用；同一日期多次调用会累加（+=）
         
         :param Datetime datetime: 有效时间
+        :param float value: 累加值，默认 1.0
       
     .. py:method:: reset(self)
     

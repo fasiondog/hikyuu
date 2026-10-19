@@ -104,11 +104,12 @@ void export_Condition(py::module& m) {
     Get the actual values in the form of an indicator, with the same length as the trading object; 0 means invalid, and 1 means the system is valid)")
 
       .def("_add_valid", &ConditionBase::_addValid, py::arg("datetime"), py::arg("value") = 1.0,
-           R"(_add_valid(self, datetime)
+           R"(_add_valid(self, datetime, value=1.0)
 
-    Add a valid time, called in _calculate
+    Add a valid time, called in _calculate; repeated calls on the same datetime accumulate (+=)
 
-    :param Datetime datetime: the valid time)")
+    :param Datetime datetime: the valid time
+    :param float value: the value to add, default 1.0)")
 
       .def("_calculate", &ConditionBase::_calculate,
            "[Overload interface] The subclass calculation interface. Do not call "

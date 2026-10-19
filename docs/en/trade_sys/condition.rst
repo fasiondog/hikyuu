@@ -148,11 +148,12 @@ System Validity Condition Base Class
 
         Return the actual values as an indicator, aligned bar-by-bar with the trading object (TO). A date is valid when its value is finite and ``> 0``. Boolean/And/Or conditions emit ``1.0`` for valid bars; arithmetic conditions (Add/Sub/Multi/Div) emit the operation result, which can be any real number, and NaN when an operand is missing or non-finite
 
-    .. py:method:: _add_valid(self, datetime)
+    .. py:method:: _add_valid(self, datetime[, value=1.0])
     
-        Register a time as valid; called from _calculate
+        Register a time as valid; called from _calculate; repeated calls on the same date accumulate (+=)
         
         :param Datetime datetime: the valid time
+        :param float value: the value to add, default 1.0
       
     .. py:method:: reset(self)
     
