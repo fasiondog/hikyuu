@@ -47,6 +47,7 @@ void OPLineCondition::_calculate() {
         return;
     }
 
+    // valid range follows SYS_Simple/System default params, intentionally unpinned
     SYSPtr sys = SYS_Simple();
 
     TMPtr tm = crtTM(m_kdata[0].datetime, 0.0, TC_Zero());

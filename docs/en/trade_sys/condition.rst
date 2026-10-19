@@ -15,6 +15,10 @@ Built-in System Validity Conditions
     :return: the system validity condition instance
     :rtype: ConditionBase
 
+    Note: CN_OPLine runs one embedded full backtest per instrument, so its cost is roughly that of a single-instrument backtest; for large portfolios (many subsystems) it nearly doubles the total backtesting cost. Prefer CN_Bool for large portfolios.
+
+    Note: its valid range depends on the SYS_Simple/System default parameters (buy_delay, sell_delay, can_trade_when_high_eq_low, the TC_Zero cost model, no slippage). These defaults are not pinned explicitly, so any change to them silently shifts the valid range.
+
 .. py:function:: CN_Bool(ind)
 
     A system validity condition driven by a boolean indicator: the system is valid where the indicator's value is greater than 0, and invalid elsewhere (a non-finite value is invalid).

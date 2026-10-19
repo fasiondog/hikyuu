@@ -15,6 +15,10 @@
     :return: 系统有效条件实例
     :rtype: ConditionBase
 
+    注意：CN_OPLine 会为每个标的执行一次嵌入完整回测，成本约等于一次单标的回测；大规模组合（多个子系统）下会使整体回测成本接近翻倍，大组合建议改用 CN_Bool。
+
+    注意：其有效区间依赖 SYS_Simple/System 的默认参数（buy_delay、sell_delay、can_trade_when_high_eq_low、成本模型 TC_Zero、无滑点）；这些默认值未被显式固定，若发生变化将静默改变有效区间。
+
 .. py:function:: CN_Bool(ind)
 
     布尔信号指标系统有效条件, 指标中相应位置>0则代表系统有效，否则无效
