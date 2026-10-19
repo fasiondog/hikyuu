@@ -173,13 +173,3 @@ System Validity Condition Base Class
     .. py:method:: _clone(self)
     
         [Override hook] The subclass clone interface
-
-    .. py:method:: __len__(self)
-
-        Return the length of the value sequence (aligned with the trading object)
-
-    .. py:method:: __getitem__(self, index)
-
-        Get the actual value at the given position (negative index supported); out of range raises ``IndexError``
-
-System validity conditions support combination with ``&``, ``|``, ``+``, ``-``, ``*``, ``/``; see the "Combination Operators" section above for the single-side / empty semantics of each operator.

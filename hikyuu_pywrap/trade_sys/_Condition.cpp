@@ -117,15 +117,6 @@ void export_Condition(py::module& m) {
            "[Overload interface] The subclass reset interface, resetting the internal private "
            "variables")
 
-      .def("__len__", &ConditionBase::size)
-
-      .def("__getitem__",
-           [](const ConditionPtr& self, int64_t i) {
-               size_t total = self->size();
-               int64_t pos = i < 0 ? total + i : i;
-               return self->at(pos);
-           })
-
       .def("__and__",
            [](const ConditionPtr& self, const ConditionPtr& other) { return self & other; })
 
