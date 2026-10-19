@@ -48,7 +48,8 @@ void TwoLineEnvironment::_calculate() {
     string market = getParam<string>("market");
     const StockManager& sm = StockManager::instance();
     MarketInfo market_info = sm.getMarketInfo(market);
-    HKU_IF_RETURN(market_info == Null<MarketInfo>(), void());
+    HKU_ERROR_IF_RETURN(market_info == Null<MarketInfo>(), void(),
+                        "Can't find the market({}) info!", market);
 
     Stock stock = sm.getStock(market + market_info.code());
     KData kdata = stock.getKData(m_query);

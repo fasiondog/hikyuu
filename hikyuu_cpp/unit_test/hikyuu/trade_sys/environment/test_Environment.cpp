@@ -9,6 +9,8 @@
 #include <cmath>
 #include <limits>
 #include <mutex>
+#include <atomic>
+#include <thread>
 #include <stdexcept>
 
 #include <hikyuu/StockManager.h>
@@ -245,6 +247,70 @@ TEST_CASE("test_EV_TwoLine_reject_size_mismatch") {
     ok->setQuery(query);
     CHECK(ok->isValid(kdata.front().datetime));
     CHECK(ok->isValid(kdata.back().datetime));
+}
+
+/** @par Test points */
+TEST_CASE("test_Environment_shared_multiple_setQuery") {
+    StockManager& sm = StockManager::instance();
+    KQuery query(-100);
+    KQuery query2(-90);
+    KData kdata = sm.getStock("sh000001").getKData(query);
+    KData kdata2 = sm.getStock("sh000001").getKData(query2);
+    REQUIRE(!kdata.empty());
+    REQUIRE(!kdata2.empty());
+
+    /** @arg Repeated setQuery with the same query (what every shared system does on binding)
+     *       keeps the state intact instead of wiping it */
+    EVPtr ev = EV_Bool(PRICELIST(kdata.size(), 1.0));
+    for (int i = 0; i < 3; ++i) {
+        ev->setQuery(query);
+        CHECK(ev->isValid(kdata.front().datetime));
+        CHECK(ev->isValid(kdata.back().datetime));
+    }
+    CHECK_EQ(ev->getValues().size(), kdata.size());
+
+    /** @arg Concurrent readers while the shared EV is re-bound with the same query stay
+     *       race-free and the results remain consistent */
+    std::atomic<bool> stop{false};
+    std::vector<std::thread> readers;
+    for (int t = 0; t < 4; ++t) {
+        readers.emplace_back([&] {
+            while (!stop.load(std::memory_order_relaxed)) {
+                CHECK(ev->isValid(kdata.front().datetime));
+            }
+        });
+    }
+    for (int i = 0; i < 100; ++i) {
+        ev->setQuery(query);
+    }
+    stop.store(true, std::memory_order_relaxed);
+    for (auto& th : readers) {
+        th.join();
+    }
+    CHECK(ev->isValid(kdata.front().datetime));
+
+    /** @arg Alternating queries on the shared EV recalculate and stay consistent */
+    for (int i = 0; i < 2; ++i) {
+        ev->setQuery(query);
+        CHECK_EQ(ev->getValues().size(), kdata.size());
+        ev->setQuery(query2);
+        CHECK_EQ(ev->getValues().size(), kdata2.size());
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_EV_invalid_market_check") {
+    /** @arg The default market is valid */
+    EVPtr ev_bool = EV_Bool(PRICELIST(10, 1.0));
+    CHECK_EQ(ev_bool->getParam<string>("market"), "SH");
+    EVPtr ev_two = EV_TwoLine(PRICELIST(10, 1.0), PRICELIST(10, 0.0));
+    CHECK_EQ(ev_two->getParam<string>("market"), "SH");
+
+    /** @arg An invalid market is rejected when the parameter is set, on both built-in EVs
+     *       (setParam validates after the assignment, so the invalid value stays in place
+     *       afterwards; only the throw is asserted here) */
+    CHECK_THROWS(ev_bool->setParam<string>("market", "XX"));
+    CHECK_THROWS(ev_two->setParam<string>("market", "XX"));
 }
 
 /** @} */
