@@ -164,6 +164,28 @@ TEST_CASE("test_Environment_setQuery_retry_after_failure") {
     CHECK(p->isValid(Datetime(200001010000LL)));
 }
 
+class EnvironmentPartialCalcTest : public EnvironmentBase {
+public:
+    EnvironmentPartialCalcTest() : EnvironmentBase("TEST_PARTIAL") {}
+    void _calculate() override {
+        _addValid(Datetime(200001010000LL));
+        throw std::runtime_error("calc failed after add");
+    }
+    EnvironmentPtr _clone() override {
+        return make_shared<EnvironmentPartialCalcTest>();
+    }
+};
+
+/** @par Test points */
+TEST_CASE("test_Environment_setQuery_cleans_partial_results_on_failure") {
+    /** @arg A _calculate that fails after _addValid leaves no partial valid dates behind */
+    auto p = make_shared<EnvironmentPartialCalcTest>();
+    KQuery q(-100);
+    CHECK_THROWS(p->setQuery(q));
+    CHECK_FALSE(p->isValid(Datetime(200001010000LL)));
+    CHECK_FALSE(p->isValid(Datetime(200001020000LL)));
+}
+
 /** @par Test points */
 TEST_CASE("test_EV_Bool_reject_non_finite") {
     StockManager& sm = StockManager::instance();

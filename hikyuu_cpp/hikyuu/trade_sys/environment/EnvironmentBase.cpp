@@ -77,6 +77,8 @@ void EnvironmentBase::setQuery(const KQuery& query) {
             _calculate();
         } catch (...) {
             m_query = Null<KQuery>();
+            m_date_index.clear();
+            m_values.clear();
             throw;
         }
     }
