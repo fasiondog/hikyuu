@@ -14,6 +14,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/condition/ConditionBase.h>
 #include <hikyuu/trade_sys/condition/crt/CN_Bool.h>
+#include <hikyuu/trade_sys/condition/crt/CN_Manual.h>
 #include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 
@@ -193,6 +194,50 @@ TEST_CASE("test_Condition_getValues_single_pass") {
         CHECK(v.getDatetime(i) == kdata[i].datetime);
         CHECK(v[i] > 0.0);
     }
+}
+
+/** @par Test point: isValid returns false for dates outside the trading object */
+TEST_CASE("test_Condition_isValid_outside_TO") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    ConditionPtr p = CN_Bool(CVAL(1.0));
+    p->setTO(kdata);
+    CHECK_EQ(p->getDatetimeList().size(), kdata.size());
+
+    /** @arg dates before and after the TO window are not registered, so they are invalid */
+    CHECK_UNARY_FALSE(p->isValid(Datetime(18000101)));
+    CHECK_UNARY_FALSE(p->isValid(Datetime(29991231)));
+}
+
+/** @par Test point: CN_Manual is valid only for manually added dates (C++-side) */
+TEST_CASE("test_Condition_manual") {
+    StockManager &sm = StockManager::instance();
+    KData kdata = sm.getStock("sh000001").getKData(KQuery(0, 10));
+    if (kdata.empty()) {
+        return;
+    }
+
+    CNPtr cn = CN_Manual();
+    CHECK_EQ(cn->name(), "CN_Manual");
+
+    cn->setTO(kdata);
+    /** @arg nothing is valid until a date is registered manually */
+    CHECK_EQ(cn->getDatetimeList().size(), 0);
+
+    /** @arg a registered date becomes valid; the rest stay invalid */
+    Datetime d = kdata[2].datetime;
+    cn->_addValid(d);
+    CHECK_EQ(cn->getDatetimeList().size(), 1);
+    CHECK_UNARY(cn->isValid(d));
+    CHECK_UNARY_FALSE(cn->isValid(kdata[3].datetime));
+
+    /** @arg _addValid accumulates the value on the same date */
+    cn->_addValid(d, 2.0);
+    CHECK_EQ(cn->at(2), 3.0);
 }
 
 #if HKU_SUPPORT_SERIALIZATION

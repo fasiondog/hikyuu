@@ -105,9 +105,33 @@ class TestCrtCN(unittest.TestCase):
         self.assertEqual(p_clone.get_param("n"), 3)
 
 
+class TestLogicCondition(unittest.TestCase):
+    def test_logic_dispatch(self):
+        k = sm['sh000001'].get_kdata(Query(-100))
+        self.assertEqual(k.empty(), False)
+        a = CN_Bool(CVAL(1.0))
+        b = CN_Bool(CVAL(0.0))
+
+        # a & b: b always invalid -> And yields no valid day
+        ab = a & b
+        ab.sg = SignalBase()
+        ab.to = k
+        self.assertEqual(len(ab.get_datetime_list()), 0)
+
+        # a | b: a always valid -> Or yields every bar valid
+        ao = a | b
+        ao.sg = SignalBase()
+        ao.to = k
+        self.assertEqual(len(ao.get_datetime_list()), len(k))
+
+
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(ConditionTest)
 
 
 def suiteTestCrtCN():
     return unittest.TestLoader().loadTestsFromTestCase(TestCrtCN)
+
+
+def suiteTestLogicCondition():
+    return unittest.TestLoader().loadTestsFromTestCase(TestLogicCondition)

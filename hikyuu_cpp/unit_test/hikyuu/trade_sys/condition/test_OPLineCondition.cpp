@@ -48,6 +48,25 @@ private:
     int m_calc_count{0};
 };
 
+// An SG whose calculate count is shared across clones, to observe embedded-backtest runs
+class SharedCountSG : public SignalBase {
+public:
+    SharedCountSG() : SignalBase("TEST_SHARED_COUNT_SG") {}
+    static int count;
+
+    virtual void _calculate(const KData& kdata) override {
+        count++;
+        if (kdata.size() > 0) {
+            _addBuySignal(kdata[0].datetime);
+        }
+    }
+
+    virtual SignalPtr _clone() override {
+        return make_shared<SharedCountSG>();
+    }
+};
+int SharedCountSG::count = 0;
+
 }  // namespace
 
 /**
@@ -131,6 +150,38 @@ TEST_CASE("test_OPLineCondition_requires_sg") {
     /** @arg setTO without a signal generator (CN-001) throws */
     CNPtr cn = CN_OPLine(PRICELIST(kdata.size(), 0.0));
     CHECK_THROWS(cn->setTO(kdata));
+}
+
+/** @par Test point: the embedded-backtest result is cached across reset + setTO */
+TEST_CASE("test_OPLineCondition_cache_hit") {
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    REQUIRE_FALSE(stock.isNull());
+    KData kdata = stock.getKData(KQuery(0, 60, KQuery::DAY));
+    REQUIRE_EQ(kdata.size(), 60);
+
+    SharedCountSG::count = 0;
+    SGPtr sg = make_shared<SharedCountSG>();
+    CNPtr cn = CN_OPLine(EMA(5));
+    cn->setSG(sg);
+
+    /** @arg the first setTO runs the embedded backtest at least once */
+    cn->setTO(kdata);
+    int after_first = SharedCountSG::count;
+    CHECK(after_first >= 1);
+
+    /** @arg reset + setTO with the same inputs reuses the cached result (no extra backtest) */
+    cn->reset();
+    cn->setSG(sg);
+    cn->setTO(kdata);
+    CHECK_EQ(SharedCountSG::count, after_first);
+
+    /** @arg a different query misses the cache and re-runs the embedded backtest */
+    KData kdata2 = stock.getKData(KQuery(0, 40, KQuery::DAY));
+    cn->reset();
+    cn->setSG(sg);
+    cn->setTO(kdata2);
+    CHECK(SharedCountSG::count > after_first);
 }
 
 /** @} */
