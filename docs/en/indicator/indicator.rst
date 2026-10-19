@@ -1543,6 +1543,10 @@ Built-in Technical Indicators
 
     The Moving Average Convergence Divergence
 
+    The BAR is DIFF - DEA (the TA-Lib convention); TDX and the other domestic platforms plot
+    2*(DIFF-DEA), i.e. twice this value. Only the scale differs, the sign, the zero-axis crossings
+    and the divergence shapes are the same, so multiply by 2 to compare with those platforms.
+
     Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA stay frozen at the prior values, no permanent contamination); leading non-finite values leave the internal EMA states unseeded until the first finite observation.
 
     :param Indicator data: the input data
