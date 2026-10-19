@@ -56,4 +56,25 @@ TEST_CASE("test_MM_FixedCapital") {
     CHECK_EQ(tm->currentCash(), cash);
 }
 
+/** @par Test points */
+TEST_CASE("test_MM_FixedCapital_short") {
+    // sh000001: minTradeNumber == 1, unit == 1
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm["sh000001"];
+    REQUIRE_UNARY(!stock.isNull());
+
+    /** @arg the short entry uses the same formula as the long buy: cash / capital, and the
+     * per-share risk is not used */
+    auto tm = crtTM(Datetime(200001010000), 10000.0, TC_Zero());
+    auto mm = MM_FixedCapital(100.0);
+    mm->setTM(tm);
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL), 100.0);
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001010000), stock, 10.0, 100.0, PART_SIGNAL),
+             100.0);
+
+    /** @arg the short cover liquidates the entire position */
+    CHECK_UNARY(
+      (mm->getBuyShortNumber(Datetime(200001010000), stock, 10.0, 1.0, PART_SIGNAL) == MAX_DOUBLE));
+}
+
 /** @} */

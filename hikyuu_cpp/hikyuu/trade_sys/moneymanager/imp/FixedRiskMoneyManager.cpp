@@ -26,8 +26,15 @@ void FixedRiskMoneyManager::_checkParam(const string& name) const {
     }
 }
 
-double FixedRiskMoneyManager ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-                                             price_t price, price_t risk, SystemPart from) {
+double FixedRiskMoneyManager::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                            price_t price, price_t risk, SystemPart from) {
+    return getParam<double>("risk") / risk;
+}
+
+double FixedRiskMoneyManager::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
+                                                  price_t price, price_t risk, SystemPart from) {
+    // The same fixed-risk sizing as the long buy; the short risk is the stop-loss price minus
+    // the short entry price
     return getParam<double>("risk") / risk;
 }
 

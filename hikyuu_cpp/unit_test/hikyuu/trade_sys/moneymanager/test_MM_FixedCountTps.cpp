@@ -205,4 +205,19 @@ TEST_CASE("test_MM_FixedCountTps_param_check") {
     CHECK_NOTHROW(MM_FixedCountTps({100., 100.}, {200., 200.}));
 }
 
+/** @par Test points */
+TEST_CASE("test_MM_FixedCountTps_no_short_entry") {
+    // The tranche counters are long-only (ISS-093), so opening a short stays forbidden
+    StockManager& sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+
+    auto mm = MM_FixedCountTps({100., 200.}, {200., 100.});
+    mm->setTM(crtTM(Datetime(199001010000LL), 1000000.0));
+    CHECK_EQ(mm->getSellShortNumber(Datetime(200001200000), stock, 24.11, 10.0, PART_SIGNAL), 0.0);
+
+    /** @arg the short cover liquidates the entire position */
+    CHECK_UNARY((mm->getBuyShortNumber(Datetime(200001200000), stock, 24.11, 10.0, PART_SIGNAL) ==
+                 MAX_DOUBLE));
+}
+
 /** @} */

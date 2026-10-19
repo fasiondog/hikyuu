@@ -82,7 +82,7 @@
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    固定资本管理策略。买入数量 = 当前总资产 / capital。基数为账户总资产（含持仓市值）而非可用现金，适用于按总资产等比加仓的场景
+    固定资本管理策略。买入数量 = 当前净权益 / capital。基数为账户净权益（现金 + 持仓市值 − 空头市值 − 借券现金）而非可用现金，适用于按权益等比加仓的场景
 
     :param float capital: 固定资本单位
     :return: 资金管理策略实例
@@ -136,13 +136,23 @@
    * - MM_FixedCount
      - 按 n 分批卖出
      - 全部平空
-   * - 其余内建策略（含 MM_FixedCountTps）
+   * - MM_FixedRisk / MM_FixedPercent / MM_FixedUnits
+     - 与买入同风险预算语义（risk 为空头每股风险，即止损价 - 开空价；MM_FixedPercent / MM_FixedUnits 的基数为净权益）
+     - 全部平空
+   * - MM_FixedCapital / MM_FixedCapitalFunds / MM_WilliamsFixedRisk
+     - 与买入同风险预算语义（不使用 risk，基数为净权益）
+     - 全部平空
+   * - MM_Nothing / MM_FixedCountTps
      - 0（禁止开空）
      - 全部平空
 
 .. note::
 
-    需要开空能力时，可使用 MM_FixedCount，或以 Python 自定义资金管理策略重载 _get_sell_short_num / _get_buy_short_num。
+    MM_Nothing 无资金管理语义、MM_FixedCountTps 的档位计数为多头专用，二者不支持开空。需要开空能力时使用上述支持开空的策略，或以 Python 自定义资金管理策略重载 _get_sell_short_num / _get_buy_short_num。
+
+    开空需交易管理账户开启 ``support_borrow_stock=True``（融资融券模式），否则开空委托直接失败。开空数量与买入一致做手数对齐并受单笔最大交易数量限制；开空不做保证金约束，保证金（购买力）不足时由交易管理拒绝整单，不做缩量。
+
+    空头的资金基数为账户净权益（net assets = 现金 + 持仓市值 − 空头市值 − 借券现金，Van Tharp 口径），借券卖出款不计入风险预算；多头仍以可用现金为基数（无持仓时两者相等，有持仓时更保守）。
 
 
 自定义资金管理策略

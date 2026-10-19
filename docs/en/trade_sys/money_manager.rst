@@ -88,7 +88,7 @@ Fixed-Capital Position Sizing
 
 .. py:function:: MM_FixedCapitalFunds([capital = 10000.0])
 
-    Fixed-capital position sizing based on total assets. Position size = the current total assets ÷ capital. The base is the account total assets (including the market value of the held positions) instead of the available cash, suiting the proportional-to-equity position adding.
+    Fixed-capital position sizing based on the net assets. Position size = the current net assets ÷ capital. The base is the account net assets (cash + market value of the held positions - short market value - borrowed cash) instead of the available cash, suiting the proportional-to-equity position adding.
 
     :param float capital: the fixed capital unit per buy
     :return: the money management strategy instance
@@ -143,14 +143,35 @@ defaults to "can cover but cannot open":
    * - MM_FixedCount
      - sells in tranches of n
      - covers the entire position
-   * - the other built-in strategies (MM_FixedCountTps included)
+   * - MM_FixedRisk / MM_FixedPercent / MM_FixedUnits
+     - the same risk-budget semantics as the long buy (the risk is the short per-share risk, i.e.
+       the stop-loss price minus the short entry price; MM_FixedPercent / MM_FixedUnits base it
+       on the net assets)
+     - covers the entire position
+   * - MM_FixedCapital / MM_FixedCapitalFunds / MM_WilliamsFixedRisk
+     - the same risk-budget semantics as the long buy (the risk is not used, based on the net
+       assets)
+     - covers the entire position
+   * - MM_Nothing / MM_FixedCountTps
      - 0 (no short entry)
      - covers the entire position
 
 .. note::
 
-    To open shorts, use MM_FixedCount, or override ``_get_sell_short_num`` /
-    ``_get_buy_short_num`` in a Python custom money management strategy.
+    MM_Nothing carries no money-management semantics and the MM_FixedCountTps tranches are
+    long-only, so neither opens shorts. To open shorts use the strategies above, or override
+    ``_get_sell_short_num`` / ``_get_buy_short_num`` in a Python custom money management strategy.
+
+    Opening a short requires the trade manager account with ``support_borrow_stock=True`` (the
+    margin trading mode), otherwise the short order fails directly. The short quantity is aligned
+    to the lot size and clamped to the maximum trade quantity like the buy; it is not constrained
+    by the collateral — when the buying power is insufficient the trade manager rejects the whole
+    order without scaling it down.
+
+    The short side bases its size on the account net assets (cash + market value of the held
+    positions - short market value - borrowed cash, the Van Tharp equity basis), so the borrowed
+    proceeds never inflate the risk budget; the long side keeps the available cash base (equal to
+    the equity with no position and more conservative otherwise).
 
 
 Custom Money Management Strategies

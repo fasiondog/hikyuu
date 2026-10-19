@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "DivEnvironment.h"
 
 #if HKU_SUPPORT_SERIALIZATION
@@ -27,8 +28,11 @@ DivEnvironment::DivEnvironment(const EnvironmentPtr& ev1, const EnvironmentPtr& 
 
 DivEnvironment::~DivEnvironment() {}
 
-// two-pointer merge strategy (intersection only, ratio of both sides).
-// Do NOT convert to the ev1-base-laydown style (Add/Sub/Or): that would wrongly keep ev1-only.
+// two-pointer merge strategy: only the dates where both sides agree are emitted - both valid
+// (>0) yield the positive ratio and both invalid (<0) yield its negation (kept negative so the
+// day stays invalid, since isValid only tests > 0). A disagreement (mixed sign) or a zero side
+// carries no combined strength and is left out. Do NOT convert to the ev1-base-laydown style
+// (Add/Sub/Or): that would wrongly keep ev1-only.
 void DivEnvironment::_calculate() {
     HKU_IF_RETURN(!m_ev1 || !m_ev2, void());
 
@@ -49,10 +53,16 @@ void DivEnvironment::_calculate() {
         } else {
             price_t v1 = val1[it1->second];
             price_t v2 = val2[it2->second];
-            if (v1 != 0.0 && v2 != 0.0) {
+            if (v1 > 0.0 && v2 > 0.0) {
                 m_date_index[it1->first] = m_values.size();
                 m_values.push_back(v1 / v2);
+            } else if (v1 < 0.0 && v2 < 0.0) {
+                // Both sides invalid: the raw ratio would be positive, so the combined strength is
+                // kept as its negation, which keeps the day invalid (isValid only tests > 0).
+                m_date_index[it1->first] = m_values.size();
+                m_values.push_back(-(std::abs(v1) / std::abs(v2)));
             }
+            // A disagreement (mixed sign) or a zero side carries no combined strength: no output.
             ++it1;
             ++it2;
         }

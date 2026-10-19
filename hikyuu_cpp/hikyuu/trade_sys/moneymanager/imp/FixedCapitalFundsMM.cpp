@@ -26,11 +26,20 @@ void FixedCapitalFundsMM::_checkParam(const string& name) const {
     }
 }
 
-double FixedCapitalFundsMM ::_getBuyNumber(const Datetime& datetime, const Stock& stock,
-                                           price_t price, price_t risk, SystemPart from) {
+double FixedCapitalFundsMM::_getBuyNumber(const Datetime& datetime, const Stock& stock,
+                                          price_t price, price_t risk, SystemPart from) {
+    // The net assets (net liquidation value) rather than the total assets: the borrowed stock
+    // value credited by total_assets() would inflate the size in a margin account
     double capital = getParam<double>("capital");
     FundsRecord funds = m_tm->getFunds(datetime, m_query.kType());
-    return funds.total_assets() / capital;
+    return funds.net_assets() / capital;
+}
+
+double FixedCapitalFundsMM::_getSellShortNumber(const Datetime& datetime, const Stock& stock,
+                                                price_t price, price_t risk, SystemPart from) {
+    double capital = getParam<double>("capital");
+    FundsRecord funds = m_tm->getFunds(datetime, m_query.kType());
+    return funds.net_assets() / capital;
 }
 
 MoneyManagerPtr HKU_API MM_FixedCapitalFunds(double capital) {

@@ -87,14 +87,18 @@ void ConditionBase::_addValid(const Datetime& datetime, price_t value) {
 bool ConditionBase::isValid(const Datetime& datetime) {
     auto iter = m_date_index.find(datetime);
     HKU_IF_RETURN(iter == m_date_index.end(), false);
-    return std::isfinite(m_values[iter->second]) && m_values[iter->second] > 0.;
+    return _isValid(datetime, m_values[iter->second]);
+}
+
+bool ConditionBase::_isValid(const Datetime& datetime, price_t value) const {
+    return std::isfinite(value) && value > 0.;
 }
 
 DatetimeList ConditionBase::getDatetimeList() const {
     DatetimeList result;
-    for (const auto& d : m_date_index) {
-        if (std::isfinite(m_values[d.second]) && m_values[d.second] > 0.0) {
-            result.emplace_back(d.first);
+    for (const auto& [d, idx] : m_date_index) {
+        if (_isValid(d, m_values[idx])) {
+            result.emplace_back(d);
         }
     }
     return result;

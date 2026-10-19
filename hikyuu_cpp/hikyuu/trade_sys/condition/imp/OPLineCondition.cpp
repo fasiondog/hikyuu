@@ -21,7 +21,8 @@ namespace hku {
 
 OPLineCondition::OPLineCondition() : ConditionBase("CN_OPLine") {}
 
-OPLineCondition::OPLineCondition(const Indicator& op) : ConditionBase("CN_OPLine"), m_op(op) {}
+OPLineCondition::OPLineCondition(const Indicator& op)
+: ConditionBase("CN_OPLine"), m_op(op.clone()) {}
 
 OPLineCondition::~OPLineCondition() {}
 
@@ -47,6 +48,7 @@ void OPLineCondition::_calculate() {
         return;
     }
 
+    // valid range follows SYS_Simple/System default params, intentionally unpinned
     SYSPtr sys = SYS_Simple();
 
     TMPtr tm = crtTM(m_kdata[0].datetime, 0.0, TC_Zero());

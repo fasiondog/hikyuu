@@ -71,6 +71,7 @@ ConditionPtr AndCondition::_clone() {
 }
 
 HKU_API ConditionPtr operator&(const ConditionPtr& cond1, const ConditionPtr& cond2) {
+    HKU_WARN_IF(!cond1 || !cond2, "AndCondition: one side is null, the result is always invalid.");
     return make_shared<AndCondition>(cond1, cond2);
 }
 

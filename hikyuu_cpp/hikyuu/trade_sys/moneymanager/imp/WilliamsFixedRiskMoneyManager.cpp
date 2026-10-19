@@ -38,6 +38,16 @@ double WilliamsFixedRiskMoneyManager::_getBuyNumber(const Datetime& datetime, co
     return m_tm->cash(datetime, m_query.kType()) * getParam<double>("p") / max_loss;
 }
 
+double WilliamsFixedRiskMoneyManager::_getSellShortNumber(const Datetime& datetime,
+                                                          const Stock& stock, price_t price,
+                                                          price_t risk, SystemPart from) {
+    // Base the size on the net assets: the borrowed proceeds in cash must not inflate it
+    price_t max_loss = getParam<price_t>("max_loss");
+    HKU_WARN_IF_RETURN(max_loss <= 0.0, 0.0, "max_loss is zero!");
+    return m_tm->getFunds(datetime, m_query.kType()).net_assets() * getParam<double>("p") /
+           max_loss;
+}
+
 MoneyManagerPtr HKU_API MM_WilliamsFixedRisk(double p, price_t max_loss) {
     MoneyManagerPtr ptr = make_shared<WilliamsFixedRiskMoneyManager>();
     ptr->setParam<double>("p", p);

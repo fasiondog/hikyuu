@@ -97,6 +97,7 @@ ConditionPtr OrCondition::_clone() {
 }
 
 HKU_API ConditionPtr operator|(const ConditionPtr& cond1, const ConditionPtr& cond2) {
+    HKU_WARN_IF(!cond1 || !cond2, "OrCondition: one side is null, the single-side mode will be used.");
     return make_shared<OrCondition>(cond1, cond2);
 }
 

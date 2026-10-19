@@ -204,11 +204,39 @@ double MoneyManagerBase::getSellShortNumber(const Datetime& datetime, const Stoc
                        "Datetime({}) Stock({} {}) price({:<.3f}) risk({:<.2f}) Part({})",
                        datetime, stock.market_code(), stock.name(), price, risk,
                        getSystemPartName(from));
-    return _getSellShortNumber(datetime, stock, price, risk, from);
+
+    double n = _getSellShortNumber(datetime, stock, price, risk, from);
+
+    // Align to the lot size and clamp to maxTradeNumber, mirroring getBuyNumber: the trade
+    // manager rejects a fractional or an oversized quantity
+    double min_trade = stock.minTradeNumber();
+    HKU_TRACE_IF_RETURN(n < min_trade, 0.0,
+                        "Ignore! Is less than the minimum number of transactions({:<.4f}<{}) {}", n,
+                        min_trade, stock.market_code());
+
+    double lot_count = n / min_trade;
+    HKU_WARN_IF_RETURN(
+      !std::isfinite(lot_count) || !(lot_count >= 0.0) || lot_count > MAX_INT64_CAST_VALUE, 0.0,
+      "Invalid sell short number! Datetime({}) Stock({} {}) price({:<.3f}) number({}) "
+      "minTradeNumber({:<.4f})",
+      datetime, stock.market_code(), stock.name(), price, n, min_trade);
+
+    n = int64_t(lot_count) * min_trade;
+
+    double max_trade = stock.maxTradeNumber();
+    if (n > max_trade) {
+        HKU_WARN_IF_RETURN(!std::isfinite(max_trade) || !(max_trade > 0.0), 0.0,
+                           "Invalid stock.maxTradeNumber({})! Stock({} {})", max_trade,
+                           stock.market_code(), stock.name());
+        HKU_WARN("Over stock.maxTradeNumber({}), will use maxTradeNumber", max_trade);
+        return max_trade;
+    }
+
+    return n;
 }
 
-double MoneyManagerBase ::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
-                                            price_t price, price_t risk, SystemPart from) {
+double MoneyManagerBase::getBuyShortNumber(const Datetime& datetime, const Stock& stock,
+                                           price_t price, price_t risk, SystemPart from) {
     HKU_ERROR_IF_RETURN(!m_tm, 0.0, "m_tm is null! Datetime({}) price({:<.3f}) risk({:<.2f})",
                         datetime, price, risk);
 
