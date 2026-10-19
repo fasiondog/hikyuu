@@ -66,7 +66,7 @@ void export_Indicator(py::module& m) {
     Set the number to discard; the value is clamped to the indicator size. When the new value
     grows, the extended leading slots are filled with Null; when it shrinks, the previously
     discarded slots become part of the valid region.
-    :param int discard: the number of the points to discard, greater than 0)")
+    :param int discard: the number of the points to discard, greater than or equal to 0)")
 
       .def("get_param", &Indicator::getParam<boost::any>, R"(get_param(self, name)
 
