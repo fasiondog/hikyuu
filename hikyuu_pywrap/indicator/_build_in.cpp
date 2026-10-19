@@ -829,6 +829,9 @@ void export_Indicator_build_in(py::module& m) {
 
     NaN/Inf input at bar i holds the previous SMA (yields SMA[i-1]); no permanent contamination.
 
+    The coefficient m must be within [1, n], the recursion is unstable outside it; a value outside
+    is clamped into that range with a warning.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :param float|Indicator|IndParam m: the coefficient

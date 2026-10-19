@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <algorithm>
 #include <climits>
 #include "../crt/CVAL.h"
 #include "ISma.h"
@@ -27,6 +28,14 @@ ISma::~ISma() {}
 void ISma::_checkParam(const string& name) const {
     if ("n" == name) {
         HKU_ASSERT(getParam<int>("n") >= 1 && getParam<int>("n") < INT_MAX);
+    }
+
+    // the recursion is unstable outside 1 <= m <= n, the calculation clamps m into that range
+    if (haveParam("m")) {
+        double m = getParam<double>("m");
+        int n = getParam<int>("n");
+        HKU_WARN_IF(m < 1.0 || m > n,
+                    "SMA: m({}) is outside [1, n({})], clamped in the calculation!", m, n);
     }
 }
 
@@ -50,6 +59,10 @@ void ISma::_increment_calculate(const Indicator& data, size_t start_pos) {
     size_t total = data.size();
     double n = getParam<int>("n");
     double m = getParam<double>("m");
+    if (m < 1.0 || m > n) {
+        HKU_WARN("SMA: m({}) is outside [1, n({})], clamped in the calculation!", m, n);
+        m = std::clamp(m, 1.0, n);
+    }
 
     auto const* src = data.data();
     auto* dst = this->data();
@@ -72,7 +85,8 @@ void ISma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, double m)
     // bitwise identical to SMA(SLICE(ind, 0, curPos + 1)) but without per-bar allocations.
     auto const* src = ind.data();
     double dn = n;
-    double p = dn - m;
+    double dm = std::clamp(m, 1.0, dn);
+    double p = dn - dm;
     price_t prev = src[ind.discard()];
     for (size_t i = ind.discard() + 1; i <= curPos; ++i) {
         if (!std::isfinite(src[i])) {
@@ -80,7 +94,7 @@ void ISma::_dyn_one_circle(const Indicator& ind, size_t curPos, int n, double m)
         } else if (!std::isfinite(prev)) {
             prev = src[i];
         } else {
-            prev = (m * src[i] + p * prev) / dn;
+            prev = (dm * src[i] + p * prev) / dn;
         }
     }
     _set(prev, curPos);

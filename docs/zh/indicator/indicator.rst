@@ -2077,7 +2077,7 @@
 
     :param Indicator data: 输入数据
     :param int n: 时间窗口
-    :param float m: 系数
+    :param float m: 系数（取值应在 [1, n] 内，越界会被钳制到该区间并告警）
     :rtype: Indicator
 
 

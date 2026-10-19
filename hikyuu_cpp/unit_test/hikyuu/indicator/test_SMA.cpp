@@ -202,6 +202,55 @@ TEST_CASE("test_SMA_nan_hold") {
     CHECK_EQ(ret2[2], doctest::Approx((1.0 * 4.0 + 2.0 * 1.0) / 3.0));
 }
 
+/** @par Test points */
+TEST_CASE("test_SMA_param_domain") {
+    PriceList a;
+    for (int i = 0; i < 10; ++i) {
+        a.push_back(i);
+    }
+    Indicator data = PRICELIST(a);
+
+    /** @arg m below 1 is clamped to 1 */
+    Indicator expect = SMA(data, 5, 1);
+    Indicator result = SMA(data, 5, 0);
+    for (size_t i = 0; i < data.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
+
+    result = SMA(data, 5, -1);
+    for (size_t i = 0; i < data.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(expect[i]));
+    }
+
+    /** @arg m above n is clamped to n, where the recursion is a pass-through */
+    result = SMA(data, 5, 10);
+    for (size_t i = 0; i < data.size(); i++) {
+        CHECK_EQ(result[i], doctest::Approx(data[i]));
+    }
+}
+
+/** @par Test points */
+TEST_CASE("test_SMA_dyn_param_domain") {
+    PriceList raw;
+    for (int i = 0; i < 12; ++i) {
+        raw.push_back(10.0 + i * i * 0.37);
+    }
+    Indicator src = PRICELIST(raw);
+
+    PriceList n_values, m_values;
+    for (int i = 0; i < 12; ++i) {
+        n_values.push_back(5.0);
+        m_values.push_back(i < 3 ? 0.0 : 2.0);
+    }
+
+    /** @arg a per-bar m below 1 is clamped to 1 as well */
+    Indicator result = SMA(src, PRICELIST(n_values), PRICELIST(m_values));
+    for (size_t i = 0; i < src.size(); ++i) {
+        Indicator expect_prefix = SMA(SLICE(src, 0, i + 1), 5, i < 3 ? 1.0 : 2.0);
+        CHECK_EQ(expect_prefix[expect_prefix.size() - 1], doctest::Approx(result[i]));
+    }
+}
+
 //-----------------------------------------------------------------------------
 // benchmark
 //-----------------------------------------------------------------------------

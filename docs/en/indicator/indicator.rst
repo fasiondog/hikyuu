@@ -2091,7 +2091,7 @@ Built-in Technical Indicators
 
     :param Indicator data: the input data
     :param int n: the time window
-    :param float m: the coefficient
+    :param float m: the coefficient (within [1, n]; a value outside is clamped with a warning)
     :rtype: Indicator
 
 
