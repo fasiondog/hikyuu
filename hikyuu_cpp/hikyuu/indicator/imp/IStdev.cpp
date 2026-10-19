@@ -38,7 +38,9 @@ void IStdev::_calculate(const Indicator& data) {
     // n == 0: the full accumulated standard deviation (the expand-all semantics; every position
     // outputs the accumulated std up to the current position)
     if (0 == n) {
-        m_discard = data.discard();
+        // the sample deviation needs at least two observations, the first bar carries no deviation
+        size_t start = data.discard();
+        m_discard = start + 1;
         if (m_discard >= total) {
             m_discard = total;
             return;
@@ -46,7 +48,7 @@ void IStdev::_calculate(const Indicator& data) {
         size_t valid_count = 0;
         price_t mean = 0.0;
         price_t M2 = 0.0;
-        for (size_t i = m_discard; i < total; ++i) {
+        for (size_t i = start; i < total; ++i) {
             if (std::isfinite(src[i])) {
                 valid_count++;
                 if (valid_count == 1) {
@@ -223,6 +225,7 @@ void IStdev::_increment_calculate(const Indicator& data, size_t start_pos) {
 }
 
 void IStdev::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
+    HKU_IF_RETURN(step < 2, void());
     if (curPos + 1 < ind.discard() + step) {
         return;
     }

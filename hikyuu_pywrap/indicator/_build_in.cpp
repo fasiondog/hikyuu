@@ -829,8 +829,11 @@ void export_Indicator_build_in(py::module& m) {
 
     NaN/Inf input at bar i holds the previous SMA (yields SMA[i-1]); no permanent contamination.
 
+    The coefficient m must be within [1, n], the recursion is unstable outside it; a value outside
+    is clamped into that range with a warning.
+
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1, 0 is not supported)
     :param float|Indicator|IndParam m: the coefficient
     :rtype: Indicator)");
 
@@ -857,7 +860,7 @@ void export_Indicator_build_in(py::module& m) {
     The simple moving average
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1); when it is 0 an expanding window is used, i.e. dst[i] is the mean over [discard(), i] (the first bar already has a value)
     :rtype: Indicator)");
 
     m.def("WMA", WMA_1, py::arg("n") = 22);
@@ -868,8 +871,11 @@ void export_Indicator_build_in(py::module& m) {
 
     The weighted moving average, with the algorithm: Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
 
+    Non-finite entries are excluded from the weights; the output is the weighted mean of the
+    remaining entries (aligned with MA / STDEV / VAR), a fully missing window gives nan.
+
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1, the expanding window of 0 is not supported)
     :rtype: Indicator)");
 
     m.def("AMA", AMA_1, py::arg("n") = 10, py::arg("fast_n") = 2, py::arg("slow_n") = 30);
@@ -898,6 +904,10 @@ void export_Indicator_build_in(py::module& m) {
           R"(ATR([kdata, n=14])
 
     The Average True Range, the simple moving average of the true range TR
+
+    It averages TR with a simple moving average (the TDX convention), not with the Wilder recursion
+    of TA-Lib (ATR = (prev*(n-1)+TR)/n); the two differ on the same data. SMA(TR(kdata), n, 1)
+    gives the Wilder smoothing.
 
     :param KData kdata the source data to calculate
     :param int n: the period window for calculating the average, which must be an integer greater than 1
@@ -955,6 +965,10 @@ void export_Indicator_build_in(py::module& m) {
           R"(MACD([data, n1=12, n2=26, n3=9])
 
     The Moving Average Convergence Divergence
+
+    The BAR is DIFF - DEA (the TA-Lib convention); TDX and the other domestic platforms plot
+    2*(DIFF-DEA), i.e. twice this value. Only the scale differs, the sign, the zero-axis crossings
+    and the divergence shapes are the same, so multiply by 2 to compare with those platforms.
 
     Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA stay frozen at the prior values, no permanent contamination); leading non-finite values leave the internal EMA states unseeded until the first finite observation.
 
@@ -1035,6 +1049,10 @@ void export_Indicator_build_in(py::module& m) {
 
     Calculate the sample standard deviation within the N periods
 
+    When n = 0, the expanding window is used: dst[i] is the sample standard deviation over
+    [discard(), i], which needs at least two observations, so the discard is discard()+1 and the
+    first bar is nan.
+
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window
     :rtype: Indicator)");
@@ -1048,7 +1066,7 @@ void export_Indicator_build_in(py::module& m) {
     The population standard deviation; STDP(X,N) is the N-day population standard deviation of X
 
     :param data: the input data
-    :param int n: the time window
+    :param int n: the time window (>=2); when it is 0 an expanding window is used, i.e. dst[i] is the population standard deviation over [discard(), i] (a single point gives 0 and the discard is not extended)
     :rtype: Indicator)");
 
     m.def("HHV", HHV_1, py::arg("n") = 20);
@@ -1972,8 +1990,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: ((price / prevPrice)-1)*100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int n: the time window
@@ -1987,8 +2007,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price - prevPrice) / prevPrice
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int n: the time window
@@ -2012,8 +2034,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price / prevPrice)
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative return from the
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative return from the
     start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int n|Indicator|IndParam: the time window
@@ -2027,8 +2051,10 @@ void export_Indicator_build_in(py::module& m) {
 
     The rate of change indicator: (price / prevPrice) * 100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window

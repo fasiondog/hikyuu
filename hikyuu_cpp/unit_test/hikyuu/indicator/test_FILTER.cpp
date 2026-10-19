@@ -152,15 +152,16 @@ TEST_CASE("test_FILTER_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 
+    /** @arg the static n = 0 masks nothing */
     expect = FILTER(c > o, 0);
+    CHECK_UNARY(std::isfinite(expect[expect.discard()]));
+
+    /** @arg a per-bar step of 0 is no window at all, so every bar is Null */
     result = FILTER(c > o, CVAL(c, 0));
-    CHECK_EQ(expect.discard(), result.discard());
-    CHECK_EQ(expect.size(), result.size());
-    for (size_t i = 0; i < expect.discard(); i++) {
+    CHECK_EQ(result.size(), expect.size());
+    CHECK_EQ(result.discard(), result.size());
+    for (size_t i = 0; i < result.size(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
-    }
-    for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
 

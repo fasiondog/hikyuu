@@ -33,7 +33,7 @@ BOOST_CLASS_EXPORT(hku::IndicatorImp)
 
 namespace hku {
 
-std::atomic<bool> IndicatorImp::ms_enable_increment_calculate{true};
+bool IndicatorImp::ms_enable_increment_calculate{true};
 
 void IndicatorImp::initEngine() {
 #if HKU_ENABLE_MIMALLOC
@@ -558,6 +558,8 @@ IndicatorImpPtr IndicatorImp::getResult(size_t result_num) {
 }
 
 IndicatorImp::value_t IndicatorImp::get(size_t pos, size_t num) const {
+    // The bounds are only guarded under CHECK_ACCESS_BOUND; the documented contract is that the
+    // caller ensures 0 <= pos < size() and num < getResultNumber() (see Indicator::get)
 #if CHECK_ACCESS_BOUND
     // cppcheck-suppress [arrayIndexOutOfBoundsCond]
     HKU_CHECK_THROW(
@@ -1545,12 +1547,13 @@ void IndicatorImp::_dyn_calculate(const Indicator &ind) {
 
     const value_t *param_data = ind_param->data();
 
-    // A non-finite / negative / fractional / oversized value would make size_t(v) UB or silently
-    // truncate; those bars fall into the same Null slot the NaN branch already emits, rather than
-    // aborting the whole series
+    // A step of 0 is no window at all, not the expanding window of a static n=0; a non-finite /
+    // negative / fractional / oversized value would make size_t(v) UB or silently truncate. Those
+    // bars fall into the same Null slot the NaN branch already emits, rather than aborting the
+    // whole series
     static constexpr value_t STEP_UPPER_BOUND = value_t(1ull << 53);
     auto is_valid_step = [](value_t v) {
-        return std::isfinite(v) && v >= 0.0 && v < STEP_UPPER_BOUND && v == std::floor(v);
+        return std::isfinite(v) && v >= 1.0 && v < STEP_UPPER_BOUND && v == std::floor(v);
     };
 
     static constexpr size_t minCircleLength = 400;

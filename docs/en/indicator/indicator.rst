@@ -4,6 +4,43 @@
 Built-in Technical Indicators
 =============================
 
+Missing-value (NaN / ±Inf) policy
+---------------------------------
+
+* **Window formulas** (MA, WMA, STDEV, VAR, CORR, COV, HHV, LLV ...): non-finite entries are
+  excluded from the aggregate, and a formula carrying a denominator counts only the valid
+  entries; the window keeps emitting once its minimum valid count is met (1 for the mean /
+  extreme family, 2 for the deviation / correlation family), and a fully missing window yields
+  null.
+* **Recursive formulas** (EMA, SMA, DMA, MACD, AMA, KALMAN ...): a bar holding a non-finite value
+  keeps the previous output (the internal state is frozen, no permanent contamination); a leading
+  non-finite prefix leaves the state unseeded until the first finite observation.
+* **Per-bar transforms and pure accumulators** (ABS, LOG, SQRT, REF, SUM, the ROC family ...):
+  non-finite values propagate downstream by contract (the result is null).
+* **KData-context indicators** (ATR, AD, ADX ...): the input is the K-line data itself, which has
+  no missing-bar concept.
+
+Undefined financial states such as a zero divisor or a zero variance always yield null rather than
+0.0 or inf: 0.0 is indistinguishable from a legitimate zero and inf poisons every downstream window
+aggregate.
+
+Parameter domain (n and the window)
+-----------------------------------
+
+* **n = 0 means the expanding window** (accumulated from the first bar of the valid range); it is
+  an intended semantic of about 25 indicators (MA, SMA, STDEV, STDP, VAR, VARP, CORR, COV, BETA,
+  the ROC family, MDD/MRR ...), not an invalid parameter. **It only applies to a static
+  parameter**: a per-bar dynamic parameter gives the window length, so 0 (and any value below the
+  minimum window) means there is no valid window and that bar yields null.
+* **The minimum window follows from the math**: 1 for the mean family (MA / EMA / WMA / SMA), 2
+  for the deviation / correlation family (the sample denominator is n-1), 3 for the skewness and
+  4 for the kurtosis.
+* **When n is below the minimum window**: a static parameter (e.g. ``STDEV(x, 1)``) raises an
+  error, while a per-bar dynamic parameter (e.g. ``STDEV(x, CVAL(x, 1))``) is not validated and
+  simply has no valid value there (the result is null).
+* **Exception**: a few indicators take an n that is not a window length (FILTER counts the bars to
+  mask); their static n = 0 is described per function, and a dynamic 0 is still no valid window.
+
 
 .. py:function:: ABS([data])
 
@@ -409,6 +446,10 @@ Built-in Technical Indicators
 .. py:function:: ATR([kdata, n=14])
 
     The Average True Range, the simple moving average of the true range TR
+
+    It averages TR with a simple moving average (the TDX convention), not with the Wilder recursion
+    of TA-Lib (ATR = (prev*(n-1)+TR)/n); the two differ on the same data. SMA(TR(kdata), n, 1)
+    gives the Wilder smoothing.
 
     :param KData kdata: the source data to calculate
     :param int n: the period window for calculating the average (>= 1)
@@ -1531,13 +1572,17 @@ Built-in Technical Indicators
     The simple moving average
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=1); when it is 0 an expanding window is used, i.e. dst[i] is the mean over [discard(), i] (the first bar already has a value)
     :rtype: Indicator
 
 
 .. py:function:: MACD([data, n1=12, n2=26, n3=9])
 
     The Moving Average Convergence Divergence
+
+    The BAR is DIFF - DEA (the TA-Lib convention); TDX and the other domestic platforms plot
+    2*(DIFF-DEA), i.e. twice this value. Only the scale differs, the sign, the zero-axis crossings
+    and the divergence shapes are the same, so multiply by 2 to compare with those platforms.
 
     Non-finite input (NaN or ±Inf) at bar i holds the previous three outputs (BAR/DIFF/DEA stay frozen at the prior values, no permanent contamination); leading non-finite values leave the internal EMA states unseeded until the first finite observation.
 
@@ -1836,8 +1881,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: ((price / prevPrice)-1)*100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -1848,8 +1895,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: (price - prevPrice) / prevPrice
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -1860,8 +1909,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: (price / prevPrice)
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative return from the
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative return from the
     start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -1872,8 +1923,10 @@ Built-in Technical Indicators
 
     The rate of change indicator: (price / prevPrice) * 100
 
-    When n = 0, prevPrice is fixed to the first valid value, i.e. the cumulative rate of change
+    When n = 0, prevPrice is fixed to the first non-zero value, i.e. the cumulative rate of change
     from the start.
+
+    A zero or non-finite prevPrice gives an invalid value (nan).
 
     :param data: the input data
     :param int|Indicator|IndParam n: the time window
@@ -2082,8 +2135,8 @@ Built-in Technical Indicators
     NaN/Inf handling: if x[i] is non-finite (NaN or ±Inf), SMA[i] holds SMA[i-1]; there is no permanent contamination.
 
     :param Indicator data: the input data
-    :param int n: the time window
-    :param float m: the coefficient
+    :param int n: the time window (>=1, 0 is not supported)
+    :param float m: the coefficient (within [1, n]; a value outside is clamped with a warning)
     :rtype: Indicator
 
 
@@ -2148,7 +2201,7 @@ Built-in Technical Indicators
     Calculate the sample standard deviation within the N periods
 
     :param Indicator data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=2); when it is 0 the expanding window is used, dst[i] is the sample standard deviation over [discard(), i], the discard is discard()+1 and the first bar is nan
     :rtype: Indicator
 
 
@@ -2157,7 +2210,7 @@ Built-in Technical Indicators
     The population standard deviation; STDP(X,N) is the N-day population standard deviation of X
 
     :param data: the input data
-    :param int|Indicator|IndParam n: the time window
+    :param int|Indicator|IndParam n: the time window (>=2); when it is 0 an expanding window is used, i.e. dst[i] is the population standard deviation over [discard(), i] (a single point gives 0 and the discard is not extended)
     :rtype: Indicator
 
 
@@ -2313,6 +2366,18 @@ Built-in Technical Indicators
 
     :param Indicator data: the input data
     :param int|Indicator|IndParam n: the time window (>= 2); when it is 0 an expanding window is used: dst[i] is the population var over [discard(), i] (single-point var is 0)
+    :rtype: Indicator
+
+
+.. py:function:: WMA([data, n=22])
+
+    The weighted moving average, with the algorithm: Yn=(1*X1+2*X2+...+n*Xn)/(1+2+...+n)
+
+    Non-finite entries are excluded from the weights; the output is the weighted mean of the
+    remaining entries (aligned with MA / STDEV / VAR), a fully missing window gives nan.
+
+    :param Indicator data: the input data
+    :param int|Indicator|IndParam n: the time window (>=1, the expanding window of 0 is not supported)
     :rtype: Indicator
 
 

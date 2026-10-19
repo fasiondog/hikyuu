@@ -9,6 +9,7 @@
 
 #include "doctest/doctest.h"
 #include <fstream>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/ROCR.h>
 #include <hikyuu/indicator/crt/CVAL.h>
@@ -36,9 +37,9 @@ TEST_CASE("test_ROCR") {
     result = ROCR(data, 1);
     CHECK_EQ(result.name(), "ROCR");
     CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result.discard(), 1);
+    CHECK_EQ(result.discard(), 2);
     CHECK_UNARY(std::isnan(result[0]));
-    CHECK_EQ(result[1], 0);
+    CHECK_UNARY(std::isnan(result[1]));
     CHECK_EQ(result[2], 2);
     CHECK_EQ(result[3], 1.5);
     CHECK_EQ(result[5], 1.25);
@@ -47,12 +48,20 @@ TEST_CASE("test_ROCR") {
     result = ROCR(data, 2);
     CHECK_EQ(result.name(), "ROCR");
     CHECK_EQ(result.size(), data.size());
-    CHECK_EQ(result.discard(), 2);
+    CHECK_EQ(result.discard(), 3);
     CHECK_UNARY(std::isnan(result[0]));
     CHECK_UNARY(std::isnan(result[1]));
-    CHECK_EQ(result[2], 0);
+    CHECK_UNARY(std::isnan(result[2]));
     CHECK_EQ(result[3], 3);
     CHECK_EQ(result[4], 2);
+
+    // n = 1 with an infinite reference price
+    a[0] = std::numeric_limits<price_t>::infinity();
+    data = PRICELIST(a);
+    result = ROCR(data, 1);
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[1]));
+    CHECK_EQ(result[2], 2);
 
     // n = 0
     for (int i = 0; i < 10; ++i) {
@@ -66,6 +75,25 @@ TEST_CASE("test_ROCR") {
     for (size_t i = 1; i < result.size(); i++) {
         CHECK_EQ(data[i] / data[0], result[i]);
     }
+
+    // n = 0 with leading zeros
+    a[0] = 0.0;
+    a[1] = 0.0;
+    data = PRICELIST(a);
+    result = ROCR(data, 0);
+    CHECK_EQ(result.discard(), 2);
+    CHECK_UNARY(std::isnan(result[1]));
+    CHECK_EQ(result[2], 1.0);
+    CHECK_EQ(result[3], 4.0 / 3.0);
+
+    // n = 0 with no usable baseline at all
+    for (int i = 0; i < 10; ++i) {
+        a[i] = 0.0;
+    }
+    data = PRICELIST(a);
+    result = ROCR(data, 0);
+    CHECK_EQ(result.discard(), result.size());
+    CHECK_UNARY(std::isnan(result[9]));
 }
 
 /** @par Test points */
@@ -95,15 +123,16 @@ TEST_CASE("test_ROCR_dyn") {
         CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 
+    /** @arg the static n = 0 keeps the expanding window */
     expect = ROCR(c, 0);
+    CHECK_UNARY(std::isfinite(expect[expect.discard()]));
+
+    /** @arg a per-bar window of 0 is no window at all, so every bar is Null */
     result = ROCR(c, CVAL(c, 0));
-    CHECK_EQ(expect.size(), result.size());
-    // CHECK_EQ(expect.discard(), result.discard());
-    for (size_t i = 0; i < result.discard(); i++) {
+    CHECK_EQ(result.size(), expect.size());
+    CHECK_EQ(result.discard(), result.size());
+    for (size_t i = 0; i < result.size(); i++) {
         CHECK_UNARY(std::isnan(result[i]));
-    }
-    for (size_t i = expect.discard(); i < expect.size(); i++) {
-        CHECK_EQ(expect[i], doctest::Approx(result[i]));
     }
 }
 

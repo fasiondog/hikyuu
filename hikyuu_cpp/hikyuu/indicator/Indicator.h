@@ -120,6 +120,10 @@ public:
 
     /**
      * Get the data at the given position of the num-th result set
+     *
+     * Speed first entry: the bounds are only checked when CHECK_ACCESS_BOUND is on,
+     * so the caller must ensure 0 <= pos < size() and num < getResultNumber()
+     *
      * @param pos the position in the result set
      * @param num the num-th result set
      */

@@ -7,6 +7,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include <climits>
 #include "IRocr100.h"
 
@@ -42,24 +43,28 @@ void IRocr100::_calculate(const Indicator& ind) {
     auto* dst = this->data();
 
     if (0 == n) {
-        price_t pre_price = src[m_discard];
-        if (pre_price != 0.0) {
-            dst[m_discard] = 100.0;
-            for (size_t i = m_discard + 1; i < total; i++) {
-                dst[i] = src[i] / pre_price * 100.0;
-            }
-        } else {
-            for (size_t i = m_discard; i < total; i++) {
-                dst[i] = 0.0;
+        size_t base_pos = m_discard;
+        while (base_pos < total && (!std::isfinite(src[base_pos]) || src[base_pos] == 0.0)) {
+            base_pos++;
+        }
+        if (base_pos < total) {
+            price_t base_price = src[base_pos];
+            dst[base_pos] = 100.0;
+            for (size_t i = base_pos + 1; i < total; i++) {
+                dst[i] = src[i] / base_price * 100.0;
             }
         }
+        updateDiscard();
         return;
     }
 
     for (size_t i = m_discard; i < total; i++) {
         price_t pre_price = src[i - n];
-        dst[i] = (pre_price != 0.0) ? (src[i] / pre_price) * 100.0 : 0.0;
+        bool valid = std::isfinite(pre_price) && pre_price != 0.0;
+        dst[i] = valid ? (src[i] / pre_price) * 100.0 : Null<price_t>();
     }
+    // n alone cannot tell which referenced prices are unusable, scan the output to declare it
+    updateDiscard();
 }
 
 bool IRocr100::supportIncrementCalculate() const {
@@ -75,21 +80,20 @@ void IRocr100::_increment_calculate(const Indicator& ind, size_t start_pos) {
 
     for (size_t i = start_pos; i < total; i++) {
         price_t pre_price = src[i - n];
-        dst[i] = (pre_price != 0.0) ? (src[i] / pre_price) * 100.0 : 0.0;
+        bool valid = std::isfinite(pre_price) && pre_price != 0.0;
+        dst[i] = valid ? (src[i] / pre_price) * 100.0 : Null<price_t>();
     }
 }
 
 void IRocr100::_dyn_run_one_step(const Indicator& ind, size_t curPos, size_t step) {
-    size_t start = 0;
-    if (0 == step) {
-        start = ind.discard();
-    } else if (curPos < ind.discard() + step) {
+    if (curPos < ind.discard() + step) {
         return;
-    } else {
-        start = curPos - step;
     }
+    size_t start = curPos - step;
 
-    _set(ind[start] != 0.0 ? ind[curPos] / ind[start] * 100.0 : 0.0, curPos);
+    price_t pre_price = ind[start];
+    bool valid = std::isfinite(pre_price) && pre_price != 0.0;
+    _set(valid ? ind[curPos] / pre_price * 100.0 : Null<price_t>(), curPos);
 }
 
 Indicator HKU_API ROCR100(int n) {

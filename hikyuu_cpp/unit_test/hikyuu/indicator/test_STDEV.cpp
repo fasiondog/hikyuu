@@ -10,6 +10,7 @@
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/KDATA.h>
 #include <hikyuu/indicator/crt/STDEV.h>
+#include <hikyuu/indicator/crt/VAR.h>
 #include <hikyuu/indicator/crt/CVAL.h>
 #include <hikyuu/indicator/crt/PRICELIST.h>
 
@@ -347,6 +348,29 @@ TEST_CASE("test_STDEV_dyn_nan_equivalence") {
         } else {
             CHECK_EQ(result[i], doctest::Approx(expect[i]).epsilon(0.0001));
         }
+    }
+}
+
+/** @par Test points: the expanding window (n = 0) needs two observations and aligns with VAR */
+TEST_CASE("test_STDEV_expanding_window") {
+    PriceList d;
+    for (int i = 0; i < 5; ++i) {
+        d.push_back(i + 1);
+    }
+    Indicator ind = PRICELIST(d);
+
+    /** @arg n = 0 needs two observations, the discard matches VAR */
+    Indicator dev = STDEV(ind, 0);
+    Indicator var = VAR(ind, 0);
+    CHECK_EQ(dev.discard(), 1);
+    CHECK_EQ(dev.discard(), var.discard());
+    CHECK_UNARY(std::isnan(dev[0]));
+
+    /** @arg the expanding sample std of the prefix [0, i] */
+    CHECK_EQ(dev[1], doctest::Approx(0.707107).epsilon(0.0001));
+    CHECK_EQ(dev[2], doctest::Approx(1.0).epsilon(0.0001));
+    for (size_t i = dev.discard(); i < dev.size(); ++i) {
+        CHECK_EQ(dev[i], doctest::Approx(std::sqrt(var[i])).epsilon(0.0001));
     }
 }
 

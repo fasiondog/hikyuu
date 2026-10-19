@@ -12,6 +12,9 @@
 #include <atomic>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
+#include <type_traits>
+#include <vector>
 
 #include "hikyuu/config.h"
 #include "hikyuu/KData.h"
@@ -52,6 +55,15 @@ class CompiledFactorPlan;
  * 6. An implementation whose invalid prefix cannot be derived from its formula may declare it by
  *    scanning its own output once, e.g. the trailing updateDiscard of ALIGN / REPLACE / BARSSINCE
  *    / BARSLASTS / IC; the framework never derives it on their behalf.
+ * 7. A window formula excludes non-finite entries (NaN / ±Inf) from its aggregates: a value
+ *    enters the sums only when finite and the denominator counts only the valid entries
+ *    (MA, WMA, STDEV, VAR, CORR, COV, HHV, LLV ...); the window keeps emitting once its minimum
+ *    valid count is met (1 for the mean family, 2 for the deviation family), and a fully missing
+ *    window yields Null.
+ * 8. Recursive formulas (EMA, SMA, DMA, MACD, AMA, KALMAN) hold the previous output at a
+ *    non-finite bar with their state frozen; a leading non-finite prefix leaves the state
+ *    unseeded until the first finite observation. Per-bar transforms and pure accumulators
+ *    (ABS, LOG, REF, SUM, the ROC family ...) propagate non-finite values by contract.
  * @ingroup Indicator
  */
 class HKU_API IndicatorImp : public enable_shared_from_this<IndicatorImp> {
@@ -440,11 +452,27 @@ public:
     static void releaseEngine();
 
 protected:
-    static std::atomic<bool> ms_enable_increment_calculate;
+    // Process-global switch; set once at startup (not at runtime). Non-atomic for cheap reads.
+    static bool ms_enable_increment_calculate;
 
 #if HKU_SUPPORT_SERIALIZATION
 private:
     friend class boost::serialization::access;
+
+    /** Serialization view of value_t: the IEEE bit pattern archived as an unsigned integer of the
+     *  same width, so that every archive type round trips NaN / Inf / the sign of zero losslessly
+     *  (a text archive cannot parse "nan" or "inf" back) */
+    using bit_t = std::conditional_t<sizeof(value_t) == sizeof(uint64_t), uint64_t, uint32_t>;
+    static_assert(sizeof(bit_t) == sizeof(value_t), "bit_t must have the width of value_t");
+
+    /** Marks the result buffers as bit pattern blocks instead of the legacy per value strings.
+     *  It is written into the first count field of the values section: a text or xml archive
+     *  matches element names on load, so that field has to keep the name it has in the legacy
+     *  layout, and the tag is told apart from a real count by its value (no buffer ever holds
+     *  that many values). This keeps the format recognizable without relying on the archive class
+     *  version, which a load does not see reliably across DLL boundaries */
+    static constexpr uint64_t BIT_PATTERN_TAG = 0x494E505F42495453ULL;  // "INP_BITS"
+
     template <class Archive>
     void save(Archive& ar, const unsigned int version) const {
         namespace bs = boost::serialization;
@@ -473,23 +501,18 @@ private:
             }
         }
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
-        string nan("nan");
-        string inf;
-        string value;
-        for (size_t i = 0; i < act_result_num; ++i) {
-            size_t count = size();
-            ar& BOOST_SERIALIZATION_NVP(count);
-            const buffer_t& values = *m_pBuffer[i];
-            for (size_t j = 0; j < count; j++) {
-                if (std::isnan(values[j])) {
-                    ar& boost::serialization::make_nvp<string>("item", nan);
-                } else if (std::isinf(values[j])) {
-                    inf = values[j] > 0 ? "+inf" : "-inf";
-                    ar& boost::serialization::make_nvp<string>("item", inf);
-                } else {
-                    value = std::to_string(values[j]);
-                    ar& boost::serialization::make_nvp<string>("item", value);
-                }
+        if (act_result_num > 0) {
+            ar& boost::serialization::make_nvp("count", BIT_PATTERN_TAG);
+            // One raw bit pattern block per result: compact in a binary archive and lossless in
+            // every archive type
+            for (size_t i = 0; i < act_result_num; ++i) {
+                const buffer_t& values = *m_pBuffer[i];
+                size_t count = values.size();
+                ar& BOOST_SERIALIZATION_NVP(count);
+                std::vector<bit_t> bits(count);
+                std::memcpy(bits.data(), values.data(), count * sizeof(value_t));
+                ar& boost::serialization::make_nvp(
+                  "values", boost::serialization::make_array(bits.data(), count));
             }
         }
     }
@@ -518,23 +541,53 @@ private:
         size_t act_result_num = 0;
         ar& BOOST_SERIALIZATION_NVP(act_result_num);
         _readyBuffer(0, act_result_num);
+        if (act_result_num == 0) {
+            return;
+        }
+
+        uint64_t tag = 0;
+        ar& boost::serialization::make_nvp("count", tag);
+        if (tag != BIT_PATTERN_TAG) {
+            // The legacy format stored every value as a string of 6 decimal places, reading it
+            // back loses precision; kept only to open old archives. Its first field is the value
+            // count of the first result, which the read above already consumed
+            _loadLegacyValues(ar, 0, static_cast<size_t>(tag));
+            for (size_t i = 1; i < act_result_num; ++i) {
+                size_t count = 0;
+                ar& BOOST_SERIALIZATION_NVP(count);
+                _loadLegacyValues(ar, i, count);
+            }
+            return;
+        }
+
         for (size_t i = 0; i < act_result_num; ++i) {
             size_t count = 0;
             ar& BOOST_SERIALIZATION_NVP(count);
             buffer_t& values = *m_pBuffer[i];
             values.resize(count);
-            for (size_t j = 0; j < count; j++) {
-                std::string vstr;
-                ar >> boost::serialization::make_nvp<string>("item", vstr);
-                if (vstr == "nan") {
-                    values[j] = std::numeric_limits<double>::quiet_NaN();
-                } else if (vstr == "+inf") {
-                    values[j] = std::numeric_limits<double>::infinity();
-                } else if (vstr == "-inf") {
-                    values[j] = 0.0 - std::numeric_limits<double>::infinity();
-                } else {
-                    values[j] = std::stod(vstr);
-                }
+            std::vector<bit_t> bits(count);
+            ar& boost::serialization::make_nvp(
+              "values", boost::serialization::make_array(bits.data(), count));
+            std::memcpy(values.data(), bits.data(), count * sizeof(value_t));
+        }
+    }
+
+    /** Reads one legacy result block of count values written as strings into buffer result_idx */
+    template <class Archive>
+    void _loadLegacyValues(Archive& ar, size_t result_idx, size_t count) {
+        buffer_t& values = *m_pBuffer[result_idx];
+        values.resize(count);
+        for (size_t j = 0; j < count; j++) {
+            std::string vstr;
+            ar >> boost::serialization::make_nvp<string>("item", vstr);
+            if (vstr == "nan") {
+                values[j] = Null<value_t>();
+            } else if (vstr == "+inf") {
+                values[j] = std::numeric_limits<value_t>::infinity();
+            } else if (vstr == "-inf") {
+                values[j] = 0.0 - std::numeric_limits<value_t>::infinity();
+            } else {
+                values[j] = boost::lexical_cast<value_t>(vstr);
             }
         }
     }
@@ -650,7 +703,7 @@ inline IndicatorImp::value_t const* IndicatorImp::data(size_t result_idx) const 
 }
 
 inline size_t IndicatorImp::_get_step_start(size_t pos, size_t step, size_t discard) {
-    return step == 0 || pos < discard + step ? discard : pos + 1 - step;
+    return pos < discard + step ? discard : pos + 1 - step;
 }
 
 inline bool IndicatorImp::equalValue(value_t v1, value_t v2) noexcept {

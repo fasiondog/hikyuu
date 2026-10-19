@@ -12,6 +12,19 @@
 namespace py = pybind11;
 using namespace hku;
 
+// NumPy format char for the indicator value type: "f" (float32) under a low-precision build,
+// otherwise "d" (float64); keeps the structured dtype consistent with Indicator::value_t.
+template <typename T>
+constexpr const char* indicatorValueNpField();
+template <>
+constexpr const char* indicatorValueNpField<double>() {
+    return "d";
+}
+template <>
+constexpr const char* indicatorValueNpField<float>() {
+    return "f";
+}
+
 string (Indicator::*ind_read_name)() const = &Indicator::name;
 void (Indicator::*ind_write_name)(const string&) = &Indicator::name;
 
@@ -36,7 +49,9 @@ void export_Indicator(py::module& m) {
         "enable_increment_calculate",
         [](py::object) { return Indicator::enableIncrementCalculate(); },
         [](py::object cls, bool flag) { Indicator::enableIncrementCalculate(flag); },
-        "Enable/disable the indicator incremental calculation")
+        "Enable/disable the indicator incremental calculation. NOTE: this is a process-global, "
+        "special-purpose switch; set it once at startup (before any calculation) and do not "
+        "toggle it at runtime")
 
       .def_property("name", ind_read_name, ind_write_name, "The indicator name")
       .def_property_readonly("long_name", &Indicator::long_name,
@@ -51,7 +66,7 @@ void export_Indicator(py::module& m) {
     Set the number to discard; the value is clamped to the indicator size. When the new value
     grows, the extended leading slots are filled with Null; when it shrinks, the previously
     discarded slots become part of the valid region.
-    :param int discard: the number of the points to discard, greater than 0)")
+    :param int discard: the number of the points to discard, greater than or equal to 0)")
 
       .def("get_param", &Indicator::getParam<boost::any>, R"(get_param(self, name)
 
@@ -111,10 +126,15 @@ void export_Indicator(py::module& m) {
       .def("get", &Indicator::get, py::arg("pos"), py::arg("result_index") = 0,
            R"(get(self, pos[, result_index=0])
 
-    Get the value at the specified position. For speed, pos is passed to the core
-    unchecked: it must be a valid non-negative index; negative values or out-of-range
-    access are undefined. Use the [] operator for safe indexing with negative-value
-    support.
+    Get the value at the specified position.
+
+    This is the speed first entry: the value is read straight from the core
+    buffer with no extra work in the binding layer. Normal code should use the
+    [] operator (__getitem__), which validates the index and supports negative
+    values; get is meant for performance sensitive code (e.g. hot loops) where
+    the caller has already ensured 0 <= pos < len(self) and
+    0 <= result_index < get_result_num(). Out of range or negative access is
+    not guaranteed to behave in any particular way.
 
     :param int pos: the specified index position
     :param int result_index: the specified result set
@@ -307,14 +327,14 @@ set_context(self, stock, query)
                 offsets.push_back(0);
                 for (size_t i = 0; i < ret_num; i++) {
                     names.push_back(fmt::format("value{}", i));
-                    fields.push_back("d");
+                    fields.push_back(indicatorValueNpField<Indicator::value_t>());
                     offsets.push_back(offsets.back() + sizeof(Indicator::value_t));
                 }
                 bytes_size = sizeof(int64_t) + ret_num * sizeof(Indicator::value_t);
             } else {
                 for (size_t i = 0; i < ret_num; i++) {
                     names.push_back(fmt::format("value{}", i));
-                    fields.push_back("d");
+                    fields.push_back(indicatorValueNpField<Indicator::value_t>());
                     if (i == 0) {
                         offsets.push_back(0);
                     } else {
@@ -335,7 +355,7 @@ set_context(self, stock, query)
             }
 
             uint64_t* data = buffer.get();
-            double* val = (double*)buffer.get();
+            auto* val = reinterpret_cast<Indicator::value_t*>(buffer.get());
             if (!dates.empty()) {
                 size_t x = ret_num + 1;
                 for (size_t i = 0; i < total; i++) {
@@ -346,7 +366,7 @@ set_context(self, stock, query)
                 }
             } else if (ret_num == 1) {
                 // contiguous layout, bulk copy
-                std::memcpy(val, src[0], total * sizeof(double));
+                std::memcpy(val, src[0], total * sizeof(Indicator::value_t));
             } else {
                 for (size_t i = 0; i < total; i++) {
                     for (size_t j = 0; j < ret_num; j++) {
@@ -367,21 +387,21 @@ set_context(self, stock, query)
         [](const Indicator& self) -> py::array {
             size_t ret_num = self.getResultNumber();
             if (ret_num == 0) {
-                return py::array_t<double>((py::ssize_t)0);
+                return py::array_t<Indicator::value_t>((py::ssize_t)0);
             }
 
             // Initialize the array_t and get its internal buffer
-            py::array_t<double> ret;
+            py::array_t<Indicator::value_t> ret;
             ret.resize({self.size(), ret_num});  // The 2D shape: [size, ret_num]
             auto buf = ret.request();
-            double* buffer = static_cast<double*>(buf.ptr);  // Get the pointer from the array_t
+            auto* buffer = static_cast<Indicator::value_t*>(buf.ptr);  // Get the pointer from the array_t
 
             std::vector<std::string> names;
             std::vector<std::string> fields;
             std::vector<int64_t> offsets;
             for (size_t i = 0; i < ret_num; i++) {
                 names.push_back(fmt::format("value{}", i));
-                fields.push_back("d");
+                fields.push_back(indicatorValueNpField<Indicator::value_t>());
                 offsets.push_back(i *
                                   sizeof(Indicator::value_t));  // Simplify the offset calculation
             }
@@ -400,7 +420,7 @@ set_context(self, stock, query)
             size_t total = self.size();
             if (ret_num == 1) {
                 // contiguous layout, bulk copy
-                std::memcpy(buffer, src[0], total * sizeof(double));
+                std::memcpy(buffer, src[0], total * sizeof(Indicator::value_t));
             } else {
                 for (size_t i = 0; i < total; i++) {
                     for (size_t j = 0; j < ret_num; j++) {
@@ -409,7 +429,7 @@ set_context(self, stock, query)
                 }
             }
 
-            return py::array(dtype, {self.size()}, {ret_num * sizeof(double)}, buf.ptr, ret);
+            return py::array(dtype, {self.size()}, {ret_num * sizeof(Indicator::value_t)}, buf.ptr, ret);
         },
         "Convert only the values to np.array, without the date column")
 
@@ -417,13 +437,13 @@ set_context(self, stock, query)
         "to_array",
         [](const Indicator& self, size_t result_index) {
             HKU_CHECK(result_index < self.getResultNumber(), "result_index out of range");
-            auto ret = py::array_t<double>(self.size());
+            auto ret = py::array_t<Indicator::value_t>(self.size());
             auto buf = ret.request();
-            double* ptr = static_cast<double*>(buf.ptr);
+            auto* ptr = static_cast<Indicator::value_t*>(buf.ptr);
             const auto* src = self.data(result_index);
             HKU_CHECK(self.size() == 0 || src != nullptr, "The result {} is not ready!",
                       result_index);
-            std::memcpy(ptr, src, self.size() * sizeof(double));
+            std::memcpy(ptr, src, self.size() * sizeof(Indicator::value_t));
             return ret;
         },
         py::arg("result_index") = 0, "Convert the specified result set to numpy.array")
@@ -453,12 +473,12 @@ set_context(self, stock, query)
 
             size_t ret_num = self.getResultNumber();
             for (size_t i = 0; i < ret_num; i++) {
-                py::array_t<double> arr(total);
+                py::array_t<Indicator::value_t> arr(total);
                 auto buf = arr.request();
-                double* dst = static_cast<double*>(buf.ptr);
+                auto* dst = static_cast<Indicator::value_t*>(buf.ptr);
                 const auto* src = self.data(i);
                 HKU_CHECK(src != nullptr, "The result {} is not ready!", i);
-                std::memcpy(dst, src, total * sizeof(double));
+                std::memcpy(dst, src, total * sizeof(Indicator::value_t));
                 columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
@@ -478,12 +498,12 @@ set_context(self, stock, query)
             py::dict columns;
             size_t ret_num = self.getResultNumber();
             for (size_t i = 0; i < ret_num; i++) {
-                py::array_t<double> arr(total);
+                py::array_t<Indicator::value_t> arr(total);
                 auto buf = arr.request();
-                double* dst = static_cast<double*>(buf.ptr);
+                auto* dst = static_cast<Indicator::value_t*>(buf.ptr);
                 const auto* src = self.data(i);
                 HKU_CHECK(src != nullptr, "The result {} is not ready!", i);
-                std::memcpy(dst, src, total * sizeof(double));
+                std::memcpy(dst, src, total * sizeof(Indicator::value_t));
                 columns[fmt::format("value{}", i).c_str()] = arr;
             }
 
