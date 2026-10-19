@@ -82,12 +82,12 @@ Custom System Validity Condition
 
 Quickly define a custom system validity condition that holds no private attributes.
 
-.. py:function:: crtCN(func, params={}, name='crtSG')
+.. py:function:: crtCN(func, params=None, name='crtCN')
 
     Quickly create a custom system validity condition that holds no private attributes
     
     :param func: the system validity condition function
-    :param {} params: the parameter dictionary
+    :param dict params: the parameter dictionary
     :param str name: the custom name
     :return: the custom system validity condition instance
 
@@ -146,7 +146,7 @@ System Validity Condition Base Class
 
     .. py:method:: get_values(self)
 
-        Return the validity values as an indicator, aligned in length with the traded KData (TO); 0 means invalid, and 1 means valid
+        Return the actual values as an indicator, aligned bar-by-bar with the trading object (TO). A date is valid when its value is finite and ``> 0``. Boolean/And/Or conditions emit ``1.0`` for valid bars; arithmetic conditions (Add/Sub/Multi/Div) emit the operation result, which can be any real number, and NaN when an operand is missing or non-finite
 
     .. py:method:: _add_valid(self, datetime)
     
@@ -173,3 +173,13 @@ System Validity Condition Base Class
     .. py:method:: _clone(self)
     
         [Override hook] The subclass clone interface
+
+    .. py:method:: __len__(self)
+
+        Return the length of the value sequence (aligned with the trading object)
+
+    .. py:method:: __getitem__(self, index)
+
+        Get the actual value at the given position (negative index supported); out of range raises ``IndexError``
+
+System validity conditions support combination with ``&``, ``|``, ``+``, ``-``, ``*``, ``/``; see the "Combination Operators" section above for the single-side / empty semantics of each operator.

@@ -84,12 +84,12 @@
 
 快速创建不带私有属性的自定义系统有效条件
 
-.. py:function:: crtCN(func, params={}, name='crtSG')
+.. py:function:: crtCN(func, params=None, name='crtCN')
 
     快速创建自定义不带私有属性的系统有效条件
     
     :param func: 系统有效条件函数
-    :param {} params: 参数字典
+    :param dict params: 参数字典
     :param str name: 自定义名称
     :return: 自定义系统有效条件实例
 
@@ -148,7 +148,7 @@
 
     .. py:method:: get_values(self)
 
-        以指标的形式获取实际值，与交易对象等长，0表示无效，1表示系统有效
+        以指标形式获取实际值，与交易对象逐 bar 等长。有效性判定为值有限且 ``> 0``（否则无效）。布尔/与/或等条件有效位为 ``1.0``；算术条件（Add/Sub/Multi/Div）为两侧的运算结果，可为任意实数，缺失或非有限时记为 NaN。
 
     .. py:method:: _add_valid(self, datetime)
     
@@ -175,3 +175,13 @@
     .. py:method:: _clone(self)
     
         【重载接口】子类克隆接口
+
+    .. py:method:: __len__(self)
+
+        返回取值序列长度（与交易对象等长）
+
+    .. py:method:: __getitem__(self, index)
+
+        按下标取该位置的实际值（支持负下标）；越界抛出 ``IndexError``
+
+系统有效条件支持用 ``&``、``|``、``+``、``-``、``*``、``/`` 进行组合运算，各运算的单边/空语义详见上文「组合运算」。
