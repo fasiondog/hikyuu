@@ -433,6 +433,16 @@ private:
      * cleared by the CLEAR suggestion submitted by the caller */
     void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
+    /** Mode B: liquidate the parent holdings of the instruments of the sub-system (a composite
+     * covers all of its leaf instruments) and push the executed trades */
+    void _liquidateParent(const SystemPtr& sys, const Datetime& date, TradeRecordList& out);
+
+    /** Mode B: reduce a composite sub-system above its quota pro rata over its leaf holdings and
+     * mirror the sells on the parent account */
+    void _reduceCompositeToQuota(const SystemPtr& sys, const Datetime& date,
+                                 price_t need_back_funds, KQuery::KType ktype,
+                                 TradeRecordList& out_executed);
+
     /** Execute the converted suggestions on the parent real account (sell first then buy) */
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                              KQuery::KType ktype, TradeRecordList& out_trades);

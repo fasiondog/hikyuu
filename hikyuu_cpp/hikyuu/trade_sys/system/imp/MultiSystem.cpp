@@ -605,6 +605,8 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     price_t need_back_funds = sub_total - quota;
     Stock stock = sys->getStock();
     if (stock.isNull()) {
+        // A composite has no instrument of its own: reduce its leaf holdings pro rata
+        _reduceCompositeToQuota(sys, date, need_back_funds, ktype, out_executed);
         return;
     }
     price_t last_close_price = stock.getMarketValue(date, ktype);
@@ -714,11 +716,121 @@ void MultiSystem::_clearSubSystem(const SystemPtr& sys, const Datetime& date, KQ
     // is liquidated by its own sell (see the unselected handling), so the two books stay matched
 
     Stock stock = sys->getStock();
-    if (!stock.isNull() && _getClosePrice(date, stock) > 0.0) {
+    if (stock.isNull()) {
+        // A composite has no single instrument: sell its leaf holdings directly on the sub ledger
+        std::set<Stock> stocks;
+        _collectLeafStocks(sys, stocks);
+        for (const auto& stk : stocks) {
+            price_t p = _getClosePrice(date, stk);
+            if (p <= 0.0) {
+                continue;
+            }
+            double num = sub_tm->getPosition(date, stk).number;
+            if (num > 0.0) {
+                sub_tm->sell(date, stk, p, num, 0.0, 0.0, p, PART_PORTFOLIO, "MultiSystem");
+            }
+            if (sub_tm->getShortPosition(stk).number > 0.0) {
+                sub_tm->buyShort(date, stk, p, MAX_DOUBLE, 0.0, 0.0, p, PART_PORTFOLIO,
+                                 "MultiSystem");
+            }
+        }
+    } else if (_getClosePrice(date, stock) > 0.0) {
         PositionRecord position = sub_tm->getPosition(date, stock);
         // A long is sold and a short is covered (System::_sellForce flattens whichever side holds)
         if (position.number > 0.0 || sub_tm->getShortPosition(stock).number > 0.0) {
             sys->sellForceOnClose(date, MAX_DOUBLE, PART_PORTFOLIO);
+        }
+    }
+    FundsRecord funds = sub_tm->getFunds(date, ktype);
+    if (funds.cash > 0.0) {
+        sub_tm->checkout(date, funds.cash);
+    }
+}
+
+void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
+                                   TradeRecordList& out) {
+    std::set<Stock> stocks;
+    const Stock& own = sys->getStock();
+    if (own.isNull()) {
+        _collectLeafStocks(sys, stocks);
+    } else {
+        stocks.insert(own);
+    }
+    for (const auto& stk : stocks) {
+        price_t price = _getClosePrice(date, stk);
+        if (price <= 0.0) {
+            continue;
+        }
+        double long_num = m_tm->getPosition(date, stk).number;
+        if (long_num > 0.0) {
+            TradeRecord tr = m_tm->sell(date, stk, price, long_num, 0.0, 0.0, price, PART_PORTFOLIO,
+                                        "MultiSystem");
+            if (!tr.isNull()) {
+                out.push_back(tr);
+            }
+        }
+        if (m_tm->getShortPosition(stk).number > 0.0) {
+            // Cover the whole short book (MAX_DOUBLE is capped at the actual short)
+            TradeRecord tr = m_tm->buyShort(date, stk, price, MAX_DOUBLE, 0.0, 0.0, price,
+                                            PART_PORTFOLIO, "MultiSystem");
+            if (!tr.isNull()) {
+                out.push_back(tr);
+            }
+        }
+    }
+}
+
+void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& date,
+                                          price_t need_back_funds, KQuery::KType ktype,
+                                          TradeRecordList& out_executed) {
+    TMPtr sub_tm = sys->getTM();
+    HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
+    if (need_back_funds <= 0.0) {
+        return;
+    }
+
+    std::set<Stock> stocks;
+    _collectLeafStocks(sys, stocks);
+    std::map<Stock, double> values;
+    double total_value = 0.0;
+    for (const auto& stk : stocks) {
+        double num = sub_tm->getPosition(date, stk).number;
+        price_t p = stk.getMarketValue(date, ktype);
+        if (num <= 0.0 || p <= 0.0) {
+            continue;
+        }
+        double v = num * p * stk.unit();
+        values[stk] = v;
+        total_value += v;
+    }
+    if (total_value <= 0.0) {
+        return;
+    }
+
+    double ratio = std::min(1.0, need_back_funds / total_value);
+    for (const auto& [stk, value] : values) {
+        price_t close_price = _getClosePrice(date, stk);
+        if (close_price <= 0.0) {
+            continue;
+        }
+        double min_num = stk.minTradeNumber();
+        if (min_num <= 0.0) {
+            continue;
+        }
+        double num = std::floor(value * ratio / close_price / min_num) * min_num;
+        num = std::min(num, sub_tm->getPosition(date, stk).number);
+        if (num <= 0.0) {
+            continue;
+        }
+        sub_tm->sell(date, stk, close_price, num, 0.0, 0.0, close_price, PART_PORTFOLIO,
+                     "MultiSystem");
+        double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
+        if (parent_num > 0.0) {
+            TradeRecord tr = m_tm->sell(date, stk, close_price, parent_num, 0.0, 0.0, close_price,
+                                        PART_PORTFOLIO, "MultiSystem");
+            if (!tr.isNull()) {
+                out_executed.push_back(tr);
+            }
         }
     }
     FundsRecord funds = sub_tm->getFunds(date, ktype);
@@ -1579,31 +1691,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 // check -- otherwise a parent short on an unselected instrument would never be
                 // covered.
                 if (m_sell_at_not_selected) {
-                    if (!sys->getStock().isNull()) {
-                        const Stock& stock = sys->getStock();
-                        price_t price = _getClosePrice(datetime, stock);
-                        if (price > 0.0) {
-                            double long_num = m_tm->getPosition(datetime, stock).number;
-                            if (long_num > 0.0) {
-                                TradeRecord tr =
-                                  m_tm->sell(datetime, stock, price, long_num, 0.0, 0.0, price,
-                                             PART_PORTFOLIO, "MultiSystem");
-                                if (!tr.isNull()) {
-                                    executed.push_back(tr);
-                                }
-                            }
-                            if (m_tm->getShortPosition(stock).number > 0.0) {
-                                // Cover the whole short book (MAX_DOUBLE is capped at the actual
-                                // short)
-                                TradeRecord tr =
-                                  m_tm->buyShort(datetime, stock, price, MAX_DOUBLE, 0.0, 0.0,
-                                                 price, PART_PORTFOLIO, "MultiSystem");
-                                if (!tr.isNull()) {
-                                    executed.push_back(tr);
-                                }
-                            }
-                        }
-                    }
+                    // Liquidate the parent holdings and clear the shadow account together: the two
+                    // books must stay matched (a composite covers all of its leaf instruments)
+                    _liquidateParent(sys, datetime, executed);
                     _clearSubSystem(sys, datetime, ktype);
                 }
             } else {
@@ -1676,37 +1766,43 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             // quota was calibrated; in the legacy flow (no SE) the liquidation suggestion is
             // generated here
             if (m_sell_at_not_selected) {
-                if (!quota_calibrated && !sys->getStock().isNull()) {
-                    const Stock& stock = sys->getStock();
-                    price_t plan_price = _getClosePrice(datetime, stock);
-                    double long_num = m_tm->getPosition(datetime, stock).number;
-                    if (long_num > 0.0) {
-                        TradeSuggestion s;
-                        s.stock = stock;
-                        s.sys = sys;
-                        s.type = SuggestionType::CLEAR;
-                        s.plan_price = plan_price;
-                        s.number = long_num;
-                        suggestions.push_back(s);
-                    }
-                    // The parent short on the unselected instrument: a short-side CLEAR covers it
-                    // (a plain CLEAR only touches the long book)
-                    double short_num = m_tm->getShortPosition(stock).number;
-                    if (short_num > 0.0) {
-                        TradeSuggestion s;
-                        s.stock = stock;
-                        s.sys = sys;
-                        s.type = SuggestionType::CLEAR;
-                        s.short_side = true;
-                        s.plan_price = plan_price;
-                        s.number = short_num;
-                        suggestions.push_back(s);
-                    }
-                }
-                // Clear the sub-system shadow account as well (the master AF liquidated the sub
-                // account and recycled all its funds). Gated by sell_at_not_selected together with
-                // the parent liquidation above: in mode B the two books must stay matched
                 if (!quota_calibrated) {
+                    std::set<Stock> stocks;
+                    const Stock& own = sys->getStock();
+                    if (own.isNull()) {
+                        _collectLeafStocks(sys, stocks);
+                    } else {
+                        stocks.insert(own);
+                    }
+                    for (const auto& stock : stocks) {
+                        price_t plan_price = _getClosePrice(datetime, stock);
+                        double long_num = m_tm->getPosition(datetime, stock).number;
+                        if (long_num > 0.0) {
+                            TradeSuggestion s;
+                            s.stock = stock;
+                            s.sys = sys;
+                            s.type = SuggestionType::CLEAR;
+                            s.plan_price = plan_price;
+                            s.number = long_num;
+                            suggestions.push_back(s);
+                        }
+                        // The parent short on the unselected instrument: a short-side CLEAR covers
+                        // it (a plain CLEAR only touches the long book)
+                        double short_num = m_tm->getShortPosition(stock).number;
+                        if (short_num > 0.0) {
+                            TradeSuggestion s;
+                            s.stock = stock;
+                            s.sys = sys;
+                            s.type = SuggestionType::CLEAR;
+                            s.short_side = true;
+                            s.plan_price = plan_price;
+                            s.number = short_num;
+                            suggestions.push_back(s);
+                        }
+                    }
+                    // Clear the sub-system shadow account as well (the master AF liquidated the sub
+                    // account and recycled all its funds). Gated by sell_at_not_selected together
+                    // with the parent liquidation above: in mode B the two books must stay matched
                     _clearSubSystem(sys, datetime, ktype);
                 }
                 continue;

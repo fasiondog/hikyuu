@@ -2731,6 +2731,73 @@ TEST_CASE("test_MultiSystem_mode_c_composite_keeps_sibling_positions") {
     CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
 }
 
+class SelectFirstCallOnlySE : public SelectorBase {
+public:
+    explicit SelectFirstCallOnlySE(const SystemList& list)
+    : SelectorBase("SelectFirstCallOnlySE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectFirstCallOnlySE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        if (call_count++ == 0) {
+            for (auto& sys : m_list) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    int call_count{0};
+};
+
+/** @par Check point: a mode B composite sub-system is cleared together with the parent book when
+ * it is dropped and sell_at_not_selected is on */
+TEST_CASE("test_MultiSystem_mode_b_composite_unselected_clear") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_a_clear");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectFirstCallOnlySE>(SystemList{inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_composite");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->add(inner);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the parent mirrored the entry before the drop */
+    size_t parent_buys = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk) {
+            parent_buys++;
+        }
+    }
+    CHECK_EQ(parent_buys, 1);
+
+    /** @arg the composite shadow book and the parent book are cleared together */
+    CHECK_EQ(inner->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {
