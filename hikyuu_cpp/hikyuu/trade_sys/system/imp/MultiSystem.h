@@ -461,16 +461,23 @@ private:
 
     /** Mode B with trade_on_close=false: the quota calibration legs (sub and parent side) are
      * deferred to the next open, so every leg shares one price basis */
-    enum class CalibrationKind { SUB_SELL, SUB_COVER, SUB_CHECKOUT, PARENT_SELL, PARENT_COVER };
+    enum class CalibrationKind {
+        SUB_SELL,
+        SUB_COVER,
+        SUB_CHECKOUT,
+        PARENT_SELL,
+        PARENT_COVER,
+        INJECT
+    };
     struct CalibrationAction {
         CalibrationKind kind;
         SystemPtr sys;
         Stock stock;
         double number{0.0};
+        price_t quota{0.0};
     };
     void _executePendingCalibration(const Datetime& date, KQuery::KType ktype,
                                     TradeRecordList& out);
-    price_t _pendingCalibrationCash() const;
 
     /** Fold the delayed requests of a composite child's leaf sub-systems into the net exposure
      * ratio (a nested C/leaf queues its own requests, the composite MomentResult does not carry
@@ -616,9 +623,10 @@ private:
       m_pending_calibration;  // The deferred quota calibration legs (trade_on_close=false)
     Datetime m_pending_calibration_date;       // The close day the deferred calibration belongs to
     double m_pending_calibration_assets{0.0};  // The assets before that close stage
-    double m_pending_calibration_cash{0.0};    // The expected net cash of the deferred parent legs
-    bool m_open_pending_warned{false};      // The once-per-instance flag of the cross-day pending
-                                            // backlog warning (runtime state, not serialized)
+    Datetime m_last_sampled_date;       // The last date the mode A sampling ran (a nested sampling
+                                        // already folded the leaf intents that day)
+    bool m_open_pending_warned{false};  // The once-per-instance flag of the cross-day pending
+                                        // backlog warning (runtime state, not serialized)
     bool m_inject_truncated_warned{false};  // The once-per-instance flag of the parent-cash
                                             // truncation warning of the mode B gap injection
                                             // (runtime state, not serialized)
