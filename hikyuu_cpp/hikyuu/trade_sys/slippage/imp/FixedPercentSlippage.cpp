@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <optional>
 #include "FixedPercentSlippage.h"
 
 #if HKU_SUPPORT_SERIALIZATION

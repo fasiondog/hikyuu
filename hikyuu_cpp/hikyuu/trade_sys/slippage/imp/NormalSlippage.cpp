@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <optional>
 #include <random>
 #include "NormalSlippage.h"
 
