@@ -101,17 +101,20 @@ public:
     /**
      * Subclass interface: compute the planned stop-loss price of the current expected trade (a
      * buy); 0 means no stop-loss. A negative or non-finite result is invalid: the public getPrice
-     * returns Null for it and the system opens the trade without stop-loss. It is called once per
-     * bar; the returned level must use the (adjusted) price coordinate of the KData passed to setTO
+     * returns Null for it and the system opens the trade without stop-loss. Used as a stop-loss it
+     * is called on the entry path only (about once or twice per trade, the level is then fixed in
+     * the position record); used as a take-profit it is called once per bar while the position is
+     * held. The returned level must use the (adjusted) price coordinate of the KData passed to setTO
      */
     virtual price_t _getPrice(const Datetime& datetime, price_t price) = 0;
 
     /**
      * Subclass interface: compute the planned stop-loss price of a short sell; default 0 (no short
      * stop-loss is provided). A negative or non-finite result is invalid: the public getShortPrice
-     * returns Null for it and the system opens the short position without stop-loss. It is called
-     * once per bar; the returned level must use the (adjusted) price coordinate of the KData
-     * passed to setTO.
+     * returns Null for it and the system opens the short position without stop-loss. Used as a
+     * short stop-loss it is called on the entry path only; used as a short take-profit it is called
+     * once per bar while the position is held. The returned level must use the (adjusted) price
+     * coordinate of the KData passed to setTO.
      * @note Unlike a long stop-loss, a short one must be above the planned trade price, and must
      * not fall back to the long-side _getPrice result
      */

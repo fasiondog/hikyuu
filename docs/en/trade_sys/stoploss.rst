@@ -73,8 +73,11 @@ The custom stop-loss/take-profit strategy interface:
 Return Value Contract and System Behaviour
 ------------------------------------------
 
-``_get_price`` / ``_get_short_price`` are called once per bar. The meaning of the return value and
-the resulting system behaviour are:
+How often ``_get_price`` / ``_get_short_price`` run depends on the role the instance is used in:
+**as a stop-loss they run on the entry path only** (about once or twice per trade; once the level is
+fixed it is stored in the position record and never queried again while the position is held), while
+**as a take-profit they run once per bar while the position is held**, because the take-profit level
+is trailing. The meaning of the return value and the resulting system behaviour are:
 
 * **> 0**: a valid stop-loss / take-profit level. It must use the same (adjusted) price coordinate
   as the KData passed to ``setTO``; the system maps it back to the original price coordinate

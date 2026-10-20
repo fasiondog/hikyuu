@@ -59,7 +59,9 @@ The custom stop-loss/take-profit strategy interfaces:
     - _clone : [Required] The clone interface
     - _reset : [Optional] Reload the private variables
 
-Return value contract of the hooks (called once per bar):
+How often the hooks run: used as a stop-loss they run on the entry path only (about once or twice per trade, the level is then fixed in the position record); used as a take-profit they run once per bar while the position is held, since the take-profit level is trailing.
+
+Return value contract of the hooks:
     - > 0 : a valid stop-loss level, expressed in the same (adjusted) price coordinate as the KData passed to setTO; the system maps it back to the original price
     - 0 : no stop-loss on this bar; the trade still takes place without stop-loss protection
     - negative / NaN / inf : invalid; the level is reported as Null and the system opens the trade without stop-loss (sized with the full planned price as risk), the entry is not skipped
@@ -131,7 +133,7 @@ The system still skips a long buy when the level is not lower than the planned b
       .def("_get_price", &StoplossBase::_getPrice,
            R"(_get_price(self, datetime, price)
 
-    [Override hook] Compute the raw long stop-loss price; the public get_price delegates to this hook. Called once per bar; return the planned stop-loss price (0 means no stop-loss) in the same (adjusted) price coordinate as the KData passed to setTO. A negative or non-finite result is invalid, and the system opens the trade without stop-loss.
+    [Override hook] Compute the raw long stop-loss price; the public get_price delegates to this hook. Used as a stop-loss it is called on the entry path only; used as a take-profit it is called once per bar while the position is held. Return the planned stop-loss price (0 means no stop-loss) in the same (adjusted) price coordinate as the KData passed to setTO. A negative or non-finite result is invalid, and the system opens the trade without stop-loss.
 
     .. note::
         In general, stop-loss and take-profit algorithms are interchangeable. The difference is that a stop-loss implementation may use the planned trade price—for example, setting the stop 30% below the buy price—whereas a take-profit ignores the price argument and treats it as 0.0. In practice, even stop-loss implementations are better off ignoring price: a stop based on, say, a level relative to the previous day's low does not need it.
@@ -144,7 +146,7 @@ The system still skips a long buy when the level is not lower than the planned b
       .def("_get_short_price", &StoplossBase::_getShortPrice,
            R"(_get_short_price(self, datetime, price)
 
-    [Override hook] Compute the raw short stop-loss price; the public get_short_price delegates to this hook. Called once per bar; return the level in the same (adjusted) price coordinate as the KData passed to setTO. Default returns 0 (no short stop-loss); a negative or non-finite result is invalid, and the system opens the short position without stop-loss. Unlike a long stop-loss, a short one must be above the planned trade price (otherwise the system skips the short entry), and must not fall back to the long-side _get_price result.
+    [Override hook] Compute the raw short stop-loss price; the public get_short_price delegates to this hook. Used as a short stop-loss it is called on the entry path only; used as a short take-profit it is called once per bar while the position is held. Return the level in the same (adjusted) price coordinate as the KData passed to setTO. Default returns 0 (no short stop-loss); a negative or non-finite result is invalid, and the system opens the short position without stop-loss. Unlike a long stop-loss, a short one must be above the planned trade price (otherwise the system skips the short entry), and must not fall back to the long-side _get_price result.
 
     :param Datetime datetime: the trading time
     :param float price: the planned trade price
