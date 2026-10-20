@@ -16,7 +16,7 @@
     
 .. py:function:: PG_FixedHoldDays([days=5])
 
-    固定持仓天数盈利目标策略
+    固定持仓天数盈利目标策略。持有多头或空头仓位达到指定交易日数后，在下一根 K 线强制平仓（与价格无关）；交易日按标的自身 K 线中的交易日计数。使用前必须先 setTO，否则无交易日列表、规则不生效
     
     :param int days: 允许持仓天数（按交易日算）,默认5天
     :return: 盈利目标策略实例
@@ -28,6 +28,42 @@
     :return: 盈利目标策略实例
 
     
+返回值语义与触发方向
+----------------------
+
+``get_goal`` / ``_get_goal`` 与 ``get_short_goal`` / ``_get_short_goal`` 的返回值含义：
+
+.. list-table::
+    :header-rows: 1
+    :widths: 30 70
+
+    * - 返回值
+      - 含义
+    * - ``constant.null_price``
+      - 未设置目标，不触发
+    * - 正有限值
+      - 目标价
+    * - ``0``
+      - 多头：需要卖出（市价强平）；空头：无效果（``price <= 0`` 永不成立）
+    * - 负值、``±inf``
+      - 非法，基类钳制为 ``constant.null_price``（视为未设置目标，不触发、不告警）
+
+触发方向：
+
+.. list-table::
+    :header-rows: 1
+    :widths: 25 75
+
+    * - 方向
+      - 触发条件与动作
+    * - 多头
+      - 当前价 >= 目标价时卖出（交易记录 ``from`` 为 ``PART_PROFITGOAL``）
+    * - 空头
+      - 当前价 <= 目标价时买入平仓（交易记录 ``from`` 为 ``PART_PROFITGOAL``）
+
+.. note::
+    ``PG_FixedHoldDays`` 的到期强平通过返回值哨兵实现（多头返回 0，空头返回当前价），此类强平交易记录中的 ``goalPrice`` 不具目标价含义。
+
 自定义盈利目标策略
 ------------------    
 
@@ -35,11 +71,11 @@
 
 * :py:meth:`ProfitGoalBase._get_goal` - 【必须】获取目标价格
 * :py:meth:`ProfitGoalBase._get_short_goal` - 【可选】获取空头目标价格，返回constant.null_price表示未设置空头目标
-* :py:meth:`ProfitGoalBase._calculate` - 【必须】子类计算接口
+* :py:meth:`ProfitGoalBase._calculate` - 【可选】子类计算接口
 * :py:meth:`ProfitGoalBase._clone` - 【必须】克隆接口
 * :py:meth:`ProfitGoalBase._reset` - 【可选】重载私有变量
-* :py:meth:`ProfitGoalBase.buyNotify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
-* :py:meth:`ProfitGoalBase.sellNotify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
+* :py:meth:`ProfitGoalBase.buy_notify` - 【可选】接收实际买入通知，预留用于多次增减仓处理
+* :py:meth:`ProfitGoalBase.sell_notify` - 【可选】接收实际卖出通知，预留用于多次增减仓处理
     
 
 盈利目标策略基类

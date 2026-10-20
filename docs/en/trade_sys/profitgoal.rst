@@ -16,7 +16,7 @@ Built-in Profit Goal Strategies
 
 .. py:function:: PG_FixedHoldDays([days=5])
 
-    Profit goal based on a fixed number of holding days.
+    Profit goal that forces an exit after a fixed number of holding days. Once a long or short position has been held for the given number of trading days (counted by the days present in the instrument's own K-line), it is closed on the next bar regardless of price. setTO must be called first, otherwise there is no trading-day list and the rule never takes effect.
 
     :param int days: the maximum allowed holding period, counted in trading days; defaults to 5
     :return: the profit goal strategy instance
@@ -28,6 +28,42 @@ Built-in Profit Goal Strategies
     :return: the profit goal strategy instance
 
 
+Return Value Semantics and Trigger Direction
+----------------------------------------------
+
+The meaning of the returned value for ``get_goal`` / ``_get_goal`` and ``get_short_goal`` / ``_get_short_goal``:
+
+.. list-table::
+    :header-rows: 1
+    :widths: 30 70
+
+    * - Return value
+      - Meaning
+    * - ``constant.null_price``
+      - No goal set; never triggers
+    * - finite positive
+      - The goal price
+    * - ``0``
+      - Long: the position should be sold (forced exit); Short: no effect (``price <= 0`` never holds)
+    * - negative, ``±inf``
+      - Invalid; clamped by the base class to ``constant.null_price`` (no goal, no trigger, no warning)
+
+Trigger direction:
+
+.. list-table::
+    :header-rows: 1
+    :widths: 25 75
+
+    * - Side
+      - Trigger condition and action
+    * - Long
+      - Sell when the current price >= the goal price (trade ``from`` is ``PART_PROFITGOAL``)
+    * - Short
+      - Cover when the current price <= the goal price (trade ``from`` is ``PART_PROFITGOAL``)
+
+.. note::
+    ``PG_FixedHoldDays`` implements its hold-days exit through a sentinel return value (0 for a long, the current price for a short), so the ``goalPrice`` of such a forced exit is not a meaningful goal price.
+
 Custom Profit Goal Strategy
 ---------------------------
 
@@ -35,11 +71,11 @@ A custom profit goal strategy implements the following interface:
 
 * :py:meth:`ProfitGoalBase._get_goal` - [Required] Return the goal price
 * :py:meth:`ProfitGoalBase._get_short_goal` - [Optional] Return the short goal price; returning constant.null_price means no short goal is set
-* :py:meth:`ProfitGoalBase._calculate` - [Required] Subclass calculation hook
+* :py:meth:`ProfitGoalBase._calculate` - [Optional] Subclass calculation hook
 * :py:meth:`ProfitGoalBase._clone` - [Required] Subclass clone hook
 * :py:meth:`ProfitGoalBase._reset` - [Optional] Reset internal member variables
-* :py:meth:`ProfitGoalBase.buyNotify` - [Optional] Receive notification of an actual buy; reserved for handling multiple additions to or reductions of a position
-* :py:meth:`ProfitGoalBase.sellNotify` - [Optional] Receive notification of an actual sell; reserved for handling multiple additions to or reductions of a position
+* :py:meth:`ProfitGoalBase.buy_notify` - [Optional] Receive notification of an actual buy; reserved for handling multiple additions to or reductions of a position
+* :py:meth:`ProfitGoalBase.sell_notify` - [Optional] Receive notification of an actual sell; reserved for handling multiple additions to or reductions of a position
 
 
 Profit Goal Strategy Base Class
