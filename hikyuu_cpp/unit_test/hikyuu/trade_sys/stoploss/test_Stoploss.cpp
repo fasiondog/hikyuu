@@ -398,6 +398,29 @@ price_t buyStoploss(const SYSPtr &sys) {
 
 }  // namespace
 
+/** @arg an empty indicator does not crash and yields no stop-loss (SL07) */
+TEST_CASE("test_Stoploss_indicator_empty_input_guard") {
+    StockManager &sm = StockManager::instance();
+    KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 10));
+    CHECK_UNARY(!k1.empty());
+
+    // ST_Indicator(Indicator()) has an empty underlying indicator. setTO must not throw (it used to
+    // throw before the input guard), and every bar must stay invalid (Null) so the trade opens
+    // without stop-loss.
+    auto st = ST_Indicator(Indicator());
+    CHECK_NOTHROW(st->setTO(k1));
+    for (size_t i = 0; i < k1.size(); ++i) {
+        CHECK_UNARY(std::isnan(st->getPrice(k1[i].datetime, 0.0)));
+    }
+
+    // The same must hold when the empty-indicator ST drives a System: the buy opens without
+    // stop-loss instead of crashing or throwing at setTO.
+    Datetime buy_date = k1[0].datetime;
+    auto sys = makeStoplossSys(k1, ST_Indicator(Indicator()), buy_date);
+    CHECK_EQ(countBuy(sys), 1);
+    CHECK_EQ(buyStoploss(sys), 0.0);
+}
+
 /** @arg an invalid stop-loss level does not block the entry: the trade opens without stop-loss,
  * while a valid level keeps its protection */
 TEST_CASE("test_Stoploss_invalid_level_opens_without_stop") {
