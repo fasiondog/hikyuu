@@ -5,6 +5,7 @@
  *      Author: fasiondog
  */
 
+#include <cmath>
 #include "StoplossBase.h"
 
 namespace hku {
@@ -67,11 +68,18 @@ void StoplossBase::setTO(const KData& kdata) {
 }
 
 price_t StoplossBase::getPrice(const Datetime& datetime, price_t price) {
-    return _getPrice(datetime, price);
+    price_t result = _getPrice(datetime, price);
+    // 0 means no stop-loss; any other non-finite or negative value is invalid and marked as Null,
+    // which the system treats as no stop-loss (the trade still takes place)
+    HKU_IF_RETURN(result == 0.0, 0.0);
+    return std::isfinite(result) && result > 0.0 ? result : Null<price_t>();
 }
 
 price_t StoplossBase::getShortPrice(const Datetime& datetime, price_t price) {
-    return _getShortPrice(datetime, price);
+    // Same contract as getPrice: invalid results are marked as Null (no stop-loss for the system)
+    price_t result = _getShortPrice(datetime, price);
+    HKU_IF_RETURN(result == 0.0, 0.0);
+    return std::isfinite(result) && result > 0.0 ? result : Null<price_t>();
 }
 
 } /* namespace hku */

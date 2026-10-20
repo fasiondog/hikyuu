@@ -25,7 +25,9 @@ IndicatorStoploss::~IndicatorStoploss() {}
 
 price_t IndicatorStoploss::_getPrice(const Datetime& datetime, price_t price) {
     auto it = m_result.find(datetime);
-    return it == m_result.end() ? 0.0 : it->second;
+    // A bar without a usable indicator value (warm-up, non-finite or outside the calculated range)
+    // is invalid: the system opens the trade without stop-loss
+    return it == m_result.end() ? Null<price_t>() : it->second;
 }
 
 void IndicatorStoploss::_reset() {
@@ -47,8 +49,8 @@ void IndicatorStoploss::_calculate() {
     auto const* ind_data = ind.data();
     auto const* ks = m_kdata.data();
     for (size_t i = ind.discard(); i < total; ++i) {
-        // Drop non-finite values: a NaN stop price would silently disable the stop-loss (the
-        // system clamps it to 0) or, on a limit-up/down bar, be treated as a real price.
+        // Drop non-finite values: they have no price meaning, so the bar is left without a usable
+        // level and getPrice reports it as invalid
         if (std::isfinite(ind_data[i])) {
             m_result[ks[i].datetime] = ind_data[i];
         }
