@@ -71,6 +71,7 @@ if __name__ == "__main__":
 
     suite.addTest(Stoploss.suite())
     suite.addTest(Stoploss.suiteTestCrtST())
+    suite.addTest(Stoploss.suiteTestDispatch())
     suite.addTest(Stoploss.suiteTestConcurrent())
     suite.addTest(ProfitGoal.suite())
     suite.addTest(ProfitGoal.suiteTestCrtPG())
