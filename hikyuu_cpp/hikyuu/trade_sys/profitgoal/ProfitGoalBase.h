@@ -106,9 +106,8 @@ public:
         return m_is_python_object;
     }
 
-    bool m_is_python_object{false};
-
 protected:
+    bool m_is_python_object{false};
     string m_name;
     KData m_kdata;
     TradeManagerPtr m_tm;
