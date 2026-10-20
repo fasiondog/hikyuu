@@ -194,4 +194,51 @@ TEST_CASE("test_SYS_Simple_for_pg") {
     }*/
 }
 
+/** @par Test points */
+TEST_CASE("test_SYS_Simple_for_pg_profitgoal_sell") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm["sh600000"];
+    Datetime init_date(199001010000LL);
+    price_t init_cash = 100000;
+    TradeCostPtr costfunc = TC_Zero();
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY);
+
+    TMPtr tm = crtTM(init_date, init_cash, costfunc, "TEST_TM");
+    SGPtr sg = SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10));
+    MMPtr mm = MM_FixedCount(100);
+    STPtr st = ST_FixedPercent(0.5);     // wide, never hit before the goal
+    PGPtr pg = PG_FixedPercent(0.0001);  // target sits one tick above the average cost
+
+    SYSPtr sys = SYS_Simple();
+    sys->setParam("buy_delay", false);
+    sys->setParam("sell_delay", false);
+    sys->setParam("ignore_sell_sg", true);  // no TP is set, so exits come from ST or PG
+    sys->setTM(tm->clone());
+    sys->setSG(sg->clone());
+    sys->setMM(mm->clone());
+    sys->setST(st->clone());
+    sys->setPG(pg->clone());
+    sys->run(stk, query);
+
+    TradeRecordList tr_list = sys->getTM()->getTradeList();
+    TradeRecordList sells;
+    for (const auto& tr : tr_list) {
+        if (tr.business == BUSINESS_SELL) {
+            sells.push_back(tr);
+        }
+    }
+
+    /** @arg both exits come from the profit goal, not from the stop-loss */
+    REQUIRE(sells.size() == 2);
+    CHECK_EQ(sells[0].from, PART_PROFITGOAL);
+    CHECK_EQ(sells[1].from, PART_PROFITGOAL);
+
+    /** @arg the goal is the average cost (buyMoney / totalNumber) times (1 + p) rounded up: the
+     *  26.45 and 25.28 buys average to 25.865, so the first goal is 25.87 */
+    CHECK_LT(std::fabs(sells[0].goalPrice - 25.87), 0.00001);
+
+    /** @arg the second exit uses the 24.41 buy cost, so its goal is 24.42 */
+    CHECK_LT(std::fabs(sells[1].goalPrice - 24.42), 0.00001);
+}
+
 /** @} */
