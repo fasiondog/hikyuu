@@ -739,10 +739,10 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                                    src_current_price, position.stoploss));
             tr = _sell(today, src_today, PART_STOPLOSS);
 
-        } else if (src_current_price >= _getGoalPrice(today.datetime, src_current_price)) {
+        } else if (price_t goal = _getGoalPrice(today.datetime, src_current_price);
+                   src_current_price >= goal) {
             HKU_INFO_IF(trace, "[{}] {}: {}, {}: {}", name(), htr("PG to sell, current price"),
-                        src_current_price, htr("goal price"),
-                        _getGoalPrice(today.datetime, src_current_price));
+                        src_current_price, htr("goal price"), goal);
             tr = _sell(today, src_today, PART_PROFITGOAL);
 
         } else {
@@ -793,10 +793,10 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                                    src_current_price, shortPosition.stoploss));
             tr = _buyShort(today, src_today, PART_STOPLOSS);
 
-        } else if (src_current_price <= _getShortGoalPrice(today.datetime, src_current_price)) {
+        } else if (price_t goal = _getShortGoalPrice(today.datetime, src_current_price);
+                   src_current_price <= goal) {
             HKU_INFO_IF(trace, "[{}] {}: {}, {}: {}", name(), htr("PG to buy short, current price"),
-                        src_current_price, htr("goal price"),
-                        _getShortGoalPrice(today.datetime, src_current_price));
+                        src_current_price, htr("goal price"), goal);
             tr = _buyShort(today, src_today, PART_PROFITGOAL);
 
         } else {
