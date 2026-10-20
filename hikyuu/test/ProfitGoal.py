@@ -55,24 +55,24 @@ class ProfitGoalTest(unittest.TestCase):
         self.assertEqual(p_clone._x, 10)
 
 
-def testCrtPG(self):
-    pass
-
-
 def testGetGoal(self, datetime, price):
     return 10.0 if datetime == Datetime(200101010000) else 0.0
 
 
 class TestCrtPG(unittest.TestCase):
     def test_crt_pg(self):
-        p = crtPG(testCrtPG, params={'n': 10}, name="ProfitGoalPython")
-        p._get_goal = testGetGoal
-        self.assertEqual(p.name, "ProfitGoalPython")
-        self.assertEqual(p._get_goal(p, Datetime(200101010000), 1.0), 10.0)
-        self.assertEqual(p._get_goal(p, Datetime(200101020000), 1.0), 0.0)
+        # crtPG assigns testGetGoal to the type's _get_goal, so the C++ trampoline can find it
+        p = crtPG(testGetGoal, params={'n': 10}, name="ProfitGoalCrtPG")
+        self.assertEqual(p.name, "ProfitGoalCrtPG")
+
+        # assert via get_goal to go through the C++ wrapper and the pybind trampoline dispatch
+        self.assertEqual(p.get_goal(Datetime(200101010000), 1.0), 10.0)
+        self.assertEqual(p.get_goal(Datetime(200101020000), 1.0), 0.0)
 
         p_clone = p.clone()
-        self.assertEqual(p_clone.name, "ProfitGoalPython")
+        self.assertEqual(p_clone.name, "ProfitGoalCrtPG")
+        self.assertEqual(p_clone.get_goal(Datetime(200101010000), 1.0), 10.0)
+        self.assertEqual(p_clone.get_goal(Datetime(200101020000), 1.0), 0.0)
 
 
 def suite():
