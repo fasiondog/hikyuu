@@ -3051,6 +3051,46 @@ TEST_CASE("test_MultiSystem_mode_b_trade_on_close_false_defers_calibration") {
     CHECK_UNARY(!ms->getAdjustTurnover().empty());
 }
 
+/** @par Check point: the mode A sampling sees the delayed intent of a nested mode C sub-layer
+ * (the composite MomentResult does not carry its leaves' queued requests) */
+TEST_CASE("test_MultiSystem_mode_a_sees_nested_c_pending") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);  // the entry queues to the next open
+    auto inner = std::make_shared<MultiSystem>("inner_c_pending");
+    inner->setMode("C");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{inner});
+    auto ms = std::make_shared<MultiSystem>("outer_a_pending");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setMode("A");
+    ms->setAdjustCycle(5);
+    ms->setSE(se);
+    ms->add(inner);
+    ms->run(k);
+
+    Datetime first_buy;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            first_buy = tr.datetime;
+            break;
+        }
+    }
+
+    /** @arg the parent buys on the first rebalancing day from the pending intent */
+    CHECK_UNARY(!first_buy.isNull());
+    CHECK_EQ(first_buy, k[0].datetime);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {

@@ -964,6 +964,32 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
     }
 
     double ratio = std::min(1.0, need_back_funds / total_value);
+    double sold_value = 0.0;
+    std::map<Stock, double> sold_num;
+    auto sell_part = [&](const Stock& stk, double num, price_t close_price) {
+        if (num <= 0.0) {
+            return;
+        }
+        sold_num[stk] += num;
+        sold_value += num * close_price * stk.unit();
+        if (!m_trade_on_close) {
+            m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
+            m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, num});
+            m_pending_calibration_cash += num * close_price * stk.unit();
+            return;
+        }
+        sub_tm->sell(date, stk, close_price, num, 0.0, 0.0, close_price, PART_PORTFOLIO,
+                     "MultiSystem");
+        double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
+        if (parent_num > 0.0) {
+            TradeRecord tr = m_tm->sell(date, stk, close_price, parent_num, 0.0, 0.0, close_price,
+                                        PART_PORTFOLIO, "MultiSystem");
+            if (!tr.isNull()) {
+                out_executed.push_back(tr);
+            }
+        }
+    };
+
     for (const auto& [stk, value] : values) {
         price_t close_price = _getClosePrice(date, stk);
         if (close_price <= 0.0) {
@@ -975,23 +1001,35 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         }
         double num = std::floor(value * ratio / close_price / min_num) * min_num;
         num = std::min(num, sub_tm->getPosition(date, stk).number);
-        if (num <= 0.0) {
-            continue;
-        }
-        if (!m_trade_on_close) {
-            m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
-            m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, num});
-            m_pending_calibration_cash += num * close_price * stk.unit();
-            continue;
-        }
-        sub_tm->sell(date, stk, close_price, num, 0.0, 0.0, close_price, PART_PORTFOLIO,
-                     "MultiSystem");
-        double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
-        if (parent_num > 0.0) {
-            TradeRecord tr = m_tm->sell(date, stk, close_price, parent_num, 0.0, 0.0, close_price,
-                                        PART_PORTFOLIO, "MultiSystem");
-            if (!tr.isNull()) {
-                out_executed.push_back(tr);
+        sell_part(stk, num, close_price);
+    }
+
+    // The lot rounding leaves a residual: sell one more lot from the largest remaining holdings
+    // until the excess is covered (or there is nothing left to sell)
+    double residual = need_back_funds - sold_value;
+    bool progressed = true;
+    while (residual > 0.0 && progressed) {
+        progressed = false;
+        std::vector<std::pair<Stock, double>> candidates(values.begin(), values.end());
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const auto& a, const auto& b) { return a.second > b.second; });
+        for (const auto& item : candidates) {
+            const Stock& stk = item.first;
+            price_t close_price = _getClosePrice(date, stk);
+            double min_num = stk.minTradeNumber();
+            if (close_price <= 0.0 || min_num <= 0.0) {
+                continue;
+            }
+            double held = sub_tm->getPosition(date, stk).number - sold_num[stk];
+            if (held < min_num) {
+                continue;
+            }
+            double num = std::min(min_num, held);
+            sell_part(stk, num, close_price);
+            residual -= num * close_price * stk.unit();
+            progressed = true;
+            if (residual <= 0.0) {
+                break;
             }
         }
     }
@@ -2347,6 +2385,40 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
     return executed;
 }
 
+void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date,
+                                              double base, std::map<Stock, double>& ratio) {
+    HKU_IF_RETURN(!sys || base <= 0.0, void());
+    for (const auto& child : sys->getSubSystemList()) {
+        if (!child) {
+            continue;
+        }
+        if (child->isComposite()) {
+            _foldSubtreePendingRequests(child, date, base, ratio);
+            continue;
+        }
+        Stock stk = child->getStock();
+        if (stk.isNull()) {
+            continue;
+        }
+        price_t p = _getClosePrice(date, stk);
+        if (p <= 0.0) {
+            continue;
+        }
+        auto fold = [&](const std::vector<TradeRequest>& reqs, double sign) {
+            for (const auto& r : reqs) {
+                if (!r.valid || r.number <= 0.0) {
+                    continue;
+                }
+                ratio[stk] += sign * r.number * p * stk.unit() / base;
+            }
+        };
+        fold(child->getBuyTradeRequestList(), 1.0);
+        fold(child->getSellTradeRequestList(), -1.0);
+        fold(child->getBuyShortTradeRequestList(), 1.0);
+        fold(child->getSellShortTradeRequestList(), -1.0);
+    }
+}
+
 void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentResult& sub,
                                            const Datetime& datetime, TradeSuggestionList& out) {
     TMPtr sub_tm = sys->getTM();
@@ -2422,6 +2494,9 @@ void MultiSystem::_fillNetRatioSuggestions(const SystemPtr& sys, const MomentRes
                    (sug.type == SuggestionType::CLEAR && !sug.short_side)) {
             ratio[sug.stock] -= v;
         }
+    }
+    if (sys->isComposite()) {
+        _foldSubtreePendingRequests(sys, datetime, base, ratio);
     }
     for (auto& kv : ratio) {
         if (kv.first.isNull() || kv.second == 0.0) {

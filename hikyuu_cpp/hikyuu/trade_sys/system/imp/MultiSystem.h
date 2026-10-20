@@ -472,6 +472,12 @@ private:
                                     TradeRecordList& out);
     price_t _pendingCalibrationCash() const;
 
+    /** Fold the delayed requests of a composite child's leaf sub-systems into the net exposure
+     * ratio (a nested C/leaf queues its own requests, the composite MomentResult does not carry
+     * them) */
+    void _foldSubtreePendingRequests(const SystemPtr& sys, const Datetime& date, double base,
+                                     std::map<Stock, double>& ratio);
+
     /** Mode A (Signal Aggregation): the whole close stage of the signal synthesis -- drive every
      *  sub-system (the shadows run continuously) and, on the sampling day, read the selected ones'
      *  current net exposure snapshot and let the AF synthesize the parent net target. */
