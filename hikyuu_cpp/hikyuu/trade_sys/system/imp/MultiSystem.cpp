@@ -445,28 +445,6 @@ void MultiSystem::setAdjustMode(const string& mode) {
     _clearCycleDates();
 }
 
-void MultiSystem::_expandAdjustDates(const DatetimeList& axis) {
-    m_auto_adjust_dates.clear();
-    // The external explicit injection takes precedence, no auto expansion (to keep the high
-    // priority of setAdjustDates)
-    if (!m_adjust_dates.empty() || axis.empty()) {
-        return;
-    }
-    string mode = getAdjustMode();
-    to_lower(mode);
-    if (mode == "query" || mode == "day") {
-        return;  // Continue the close-day counting judgment of m_adjust_cycle
-    }
-    DatetimeList expanded = calcAdjustDates(axis, mode, m_adjust_cycle, getDelayToTradingDay());
-    for (const auto& d : expanded) {
-        m_auto_adjust_dates.insert(d.startOfDay());
-    }
-    if (getParam<bool>("trace")) {
-        HKU_INFO("[{}] adjust-mode={} expand adjust dates: {} (axis={})", name(), mode,
-                 m_auto_adjust_dates.size(), axis.size());
-    }
-}
-
 Datetime MultiSystem::_periodStart(const Datetime& date) const {
     string mode = getAdjustMode();
     to_lower(mode);
@@ -488,18 +466,23 @@ Datetime MultiSystem::_periodStart(const Datetime& date) const {
 void MultiSystem::_buildCycleDates(const DatetimeList& axis) {
     HKU_IF_RETURN(axis.empty(), void());
 
-    // The rebalancing-day sequence: the explicit (setAdjustDates) or auto-expanded
-    // (adjust-mode) table intersected with the axis takes precedence; otherwise fall back to the
-    // close-day counting of m_adjust_cycle (consistent with _isAdjustDate, the counter offset keeps
-    // the live reset=false replays in step)
+    // The rebalancing-day sequence: the explicit (setAdjustDates) table takes precedence; the
+    // calendar modes use the same period rule as _isAdjustDate (with a local period cursor seeded
+    // from m_last_adjust_period, so a live single-bar replay does not restart the period); the
+    // other modes fall back to the close-day counting of m_adjust_cycle
     DatetimeList adjust_dates;
-    const std::set<Datetime>* table =
-      !m_adjust_dates.empty() ? &m_adjust_dates
-                              : (!m_auto_adjust_dates.empty() ? &m_auto_adjust_dates : nullptr);
-    if (table) {
+    if (!m_adjust_dates.empty()) {
         for (const auto& d : axis) {
-            if (table->find(d.startOfDay()) != table->end()) {
+            if (m_adjust_dates.find(d.startOfDay()) != m_adjust_dates.end()) {
                 adjust_dates.emplace_back(d);
+            }
+        }
+    } else if (!axis.empty() && !_periodStart(axis.front()).isNull()) {
+        Datetime last_period = m_last_adjust_period;
+        for (const auto& d : axis) {
+            if (_isAdjustDateByPeriod(d, last_period)) {
+                adjust_dates.emplace_back(d);
+                last_period = _periodStart(d);
             }
         }
     } else {
@@ -1073,13 +1056,8 @@ void MultiSystem::_runAxis(const KData& kdata, const DatetimeList* axis, bool re
             }
         }
     }
-    // adjust-mode internalization -- when it is not query/day, expand the rebalancing day table on
-    // the driven axis; the external setAdjustDates() injection takes precedence
-    _expandAdjustDates(driven_axis);
-
-    // The declared rebalancing days are the run-level input of the cycle signals: they must be
-    // known before readyForRun() (re)calculates the sub-system trading objects. This must run
-    // AFTER the adjust-mode expansion, which fills m_auto_adjust_dates
+    // The cycle days are declared on the driven axis before the sub-system trading objects are
+    // (re)calculated (the external setAdjustDates table takes precedence, see _buildCycleDates)
     _buildCycleDates(driven_axis);
 
     readyForRun();
@@ -1255,20 +1233,10 @@ bool MultiSystem::_isAdjustDate(const Datetime& date) const {
         if (!m_adjust_dates.empty()) {
             return m_adjust_dates.find(date.startOfDay()) != m_adjust_dates.end();
         }
-        // The rebalancing day table auto-expanded by adjust-mode ∈ {week,month,quarter,year}
-        if (!m_auto_adjust_dates.empty()) {
-            return m_auto_adjust_dates.find(date.startOfDay()) != m_auto_adjust_dates.end();
-        }
-        // The entries without a precomputed table (runMoment* / intraday live / nested) use the
-        // same period rule at runtime: the emitted day is the (adjust_cycle)-th day of the period,
-        // postponed to the first driven day of the period when delay_to_trading_day is on
-        Datetime period_start = _periodStart(date);
-        if (!period_start.isNull()) {
-            Datetime target = period_start + Days(m_adjust_cycle > 0 ? m_adjust_cycle - 1 : 0);
-            if (!getDelayToTradingDay()) {
-                return date.startOfDay() == target;
-            }
-            return date.startOfDay() >= target && m_last_adjust_period != period_start;
+        // The calendar modes use the period rule directly (the bulk run and the live / nested
+        // entries share it, so a single-bar live feed is handled correctly)
+        if (!_periodStart(date).isNull()) {
+            return _isAdjustDateByPeriod(date, m_last_adjust_period);
         }
     }
     // Fallback: rebalance every m_adjust_cycle close days
@@ -1276,6 +1244,16 @@ bool MultiSystem::_isAdjustDate(const Datetime& date) const {
         return true;
     }
     return (m_close_day_index % static_cast<size_t>(m_adjust_cycle)) == 0;
+}
+
+bool MultiSystem::_isAdjustDateByPeriod(const Datetime& date, const Datetime& last_period) const {
+    Datetime period_start = _periodStart(date);
+    HKU_IF_RETURN(period_start.isNull(), false);
+    Datetime target = period_start + Days(m_adjust_cycle > 0 ? m_adjust_cycle - 1 : 0);
+    if (!getDelayToTradingDay()) {
+        return date.startOfDay() == target;
+    }
+    return date.startOfDay() >= target && last_period != period_start;
 }
 
 void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
@@ -1646,8 +1624,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     }
 
     bool is_adjust = _isAdjustDate(datetime);
-    // Remember the period of the runtime rebalancing rule (the entries without a precomputed table)
-    if (is_adjust && m_adjust_dates.empty() && m_auto_adjust_dates.empty()) {
+    // Remember the period of the calendar rule (the external table has its own schedule)
+    if (is_adjust && m_adjust_dates.empty()) {
         m_last_adjust_period = _periodStart(datetime);
     }
     // Declare the rebalancing day before the sub-systems are driven: the runMoment* / intraday live

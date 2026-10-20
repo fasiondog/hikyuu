@@ -379,13 +379,12 @@ private:
 
     /** Judge whether the given date is a rebalancing day (the rebalancing is executed only on the
      * rebalancing day): the external rebalancing day table takes precedence, then the adjust-mode
-     * auto-expanded table, and finally the close-day counting of m_adjust_cycle */
+     * period rule, and finally the close-day counting of m_adjust_cycle */
     bool _isAdjustDate(const Datetime& date) const;
 
-    /** Internalize adjust-mode ∈ {week,month,quarter,year} into the rebalancing day table.
-     * It takes effect only when the external setAdjustDates() is not injected
-     * (m_adjust_dates is empty), the result is written into m_auto_adjust_dates. */
-    void _expandAdjustDates(const DatetimeList& axis);
+    /** The adjust-mode period rule: the adjust_cycle-th calendar day of the period, postponed to
+     * the first driven day of the period when delay_to_trading_day is on (once per period) */
+    bool _isAdjustDateByPeriod(const Datetime& date, const Datetime& last_period) const;
 
     /** Build the rebalancing-day list on the given driving axis and merge it into m_cycle_dates,
      * the run-level input injected into the cycle signals of the sub-systems */
@@ -624,9 +623,6 @@ private:
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
                                         // zero hour of that day; when not empty it takes precedence
                                         // over m_adjust_cycle, runtime state, not serialized)
-    std::set<Datetime>
-      m_auto_adjust_dates;  // The rebalancing day table auto-expanded by adjust-mode (runtime
-                            // state, not serialized, does not override the external injection)
     bool m_short_reduce_warned{false};  // The once-per-instance flag of the net-short quota
                                         // reduction skip warning (runtime state, not serialized)
     bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota

@@ -472,10 +472,12 @@ void System::run(const KData& kdata, bool reset, bool resetAll) {
 
 void System::clearDelayBuyRequest() {
     m_buyRequestList.clear();
+    m_buyShortRequestList.clear();
 }
 
 void System::clearDelaySellRequest() {
     m_sellRequestList.clear();
+    m_sellShortRequestList.clear();
 }
 
 const std::vector<std::shared_ptr<System>>& System::getSubSystemList() const {

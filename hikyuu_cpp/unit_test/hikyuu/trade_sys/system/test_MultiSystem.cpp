@@ -2971,6 +2971,39 @@ TEST_CASE("test_MultiSystem_adjust_mode_run_moment") {
     CHECK_LT(dates.size(), 5);
 }
 
+/** @par Check point: the live single-bar replay honours adjust-mode (one rebalancing day per
+ * period) */
+TEST_CASE("test_MultiSystem_adjust_mode_live_replay") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kd = stk.getKData(query);
+    REQUIRE(kd.size() > 10);
+    const DatetimeList dates = kd.getDatetimeList();
+
+    auto ms = std::make_shared<MultiSystem>("ms_adjust_mode_live");
+    ms->setTM(crtTM(Datetime(199001010000LL), 1000000.0));
+    ms->setAdjustMode("month");
+    ms->setTradeOnClose(true);
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+    sys->setStock(stk);
+    sys->setTO(kd);
+    ms->add(sys);
+    ms->readyForRun();
+
+    for (auto& d : dates) {
+        KData day_kd = stk.getKData(KQuery(d, d + Days(1), query.kType()));
+        REQUIRE(day_kd.size() == 1);
+        ms->run(day_kd, false);
+    }
+
+    /** @arg one rebalancing day per month, not the whole single-bar replay */
+    const auto& cycle_dates = sys->getSG()->getCycleDates();
+    CHECK_GT(cycle_dates.size(), 0);
+    CHECK_LT(cycle_dates.size(), 5);
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {
