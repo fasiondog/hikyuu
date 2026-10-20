@@ -96,4 +96,25 @@ TEST_CASE("test_PG_FixedPercent_short_goal") {
     CHECK_EQ(pg_down->getShortGoal(Datetime(199911160000LL), 0.0), 14.97);
 }
 
+/** @arg the clone drops the TO, so before setTO it holds no position and falls back to using the
+ *  current price as the cost basis */
+TEST_CASE("test_PG_FixedPercent_clone_no_to") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sh600000");
+    KData k =
+      stk.getKData(KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY));
+
+    TMPtr tm = crtTM(Datetime(199001010000LL), 100000);
+    tm->buy(Datetime(199911110000LL), stk, 10.0, 100, 0.0, 0.0, 0.0, PART_SIGNAL);
+
+    PGPtr pg = PG_FixedPercent(0.2);
+    pg->setTM(tm);
+    pg->setTO(k);
+
+    PGPtr cloned = pg->clone();
+    CHECK_UNARY(cloned->getTO().empty());
+    // no TO -> null stock -> no position -> cost = current price -> goal = 10.0 * 1.2 = 12.0
+    CHECK_LT(std::fabs(cloned->getGoal(Datetime(199911160000LL), 10.0) - 12.0), 0.00001);
+}
+
 /** @} */

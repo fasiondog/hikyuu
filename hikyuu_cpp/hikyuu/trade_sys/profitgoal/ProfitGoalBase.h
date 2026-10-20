@@ -58,7 +58,8 @@ public:
     void reset();
 
     typedef shared_ptr<ProfitGoalBase> ProfitGoalPtr;
-    /** Clone interface */
+    /** Clone interface; the clone does not carry the trading object (to), so setTO must be
+     *  called before the clone is used */
     ProfitGoalPtr clone();
 
     /** Calculate the target price when buying; see the _getGoal interface for the return semantics

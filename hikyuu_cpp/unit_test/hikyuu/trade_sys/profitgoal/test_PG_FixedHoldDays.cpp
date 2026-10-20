@@ -157,6 +157,9 @@ TEST_CASE("test_PG_FixedHoldDays_clone") {
     /** @arg the clone does not carry the TO of the original */
     CHECK_UNARY(cloned->getTO().empty());
 
+    /** @arg before setTO there is no trading-day list, so the hold-days rule never triggers */
+    CHECK_UNARY(std::isnan(cloned->getGoal(Datetime(199911120000LL), 30.0)));
+
     /** @arg setTO on the clone re-runs the calculation, the goal is available */
     cloned->setTO(k);
     CHECK_EQ(cloned->getGoal(Datetime(199911120000LL), 0.0), 0.0);

@@ -68,6 +68,8 @@ ProfitGoalPtr ProfitGoalBase::clone() {
     p->m_name = m_name;
     p->m_is_python_object = m_is_python_object;
     p->m_tm = m_tm;
+    // TO is intentionally dropped so the caller must setTO, which re-runs _reset/_calculate and
+    // keeps a precompute subclass (e.g. FixedHoldDays) from reusing state built for the original TO
     p->m_kdata = Null<KData>();
     return p;
 }
