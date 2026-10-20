@@ -206,17 +206,19 @@ TEST_CASE("test_Stoploss_reset_clears_calculated") {
     }
 }
 
-/** @arg clone copies the source's trade manager so subclasses that consume it work standalone;
- * System::readyForRun re-injects the (cloned) system TM (SL11: clone shares the source TM,
- * documented contract) */
-TEST_CASE("test_Stoploss_clone_copies_tm") {
+/** @arg clone carries only the ST's own configuration: the source's trade manager and trading object
+ * are not copied, since the System re-injects them (m_tm via readyForRun, m_kdata via setTO) (SL11) */
+TEST_CASE("test_Stoploss_clone_does_not_copy_tm_kdata") {
     auto st = ST_FixedPercent(0.01);
+    KData k = StockManager::instance().getStock("sz000001").getKData(KQuery(0, 10));
     auto tm = crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM");
+    st->setTO(k);
     st->setTM(tm);
     CHECK_UNARY(st->getTM() != nullptr);
+    CHECK_UNARY(!st->getTO().empty());
     auto st_clone = st->clone();
-    CHECK_UNARY(st_clone->getTM() != nullptr);
-    CHECK_UNARY(st_clone->getTM() == tm);
+    CHECK_UNARY(st_clone->getTM() == nullptr);
+    CHECK_UNARY(st_clone->getTO().empty());
 }
 
 /** @arg clone copies m_kdata and the subclass cache, so the clone is directly usable; setTO always
@@ -456,17 +458,17 @@ TEST_CASE("test_Stoploss_indicator_empty_input_guard") {
     CHECK_EQ(buyStoploss(sys), 0.0);
 }
 
-/** @arg a cloned system's stoploss gets the cloned system's own TM after run (re-injected by
- * System::readyForRun), while before run it carries the source system's TM (documented clone
- * contract, SL11) */
+/** @arg a cloned system's stoploss gets the cloned system's own TM after run, not the source's;
+ * before run neither m_tm nor m_kdata is carried (SL11) */
 TEST_CASE("test_Stoploss_system_clone_injects_own_tm") {
     StockManager &sm = StockManager::instance();
     KData k = sm.getStock("sz000001").getKData(KQuery(0, 10));
     Datetime buy_date = k[0].datetime;
     auto sys = makeStoplossSys(k, ST_FixedPercent(0.01), buy_date);
     auto sys_clone = sys->clone();
-    // Before run the cloned ST carries the source system's TM (documented clone contract).
-    CHECK_UNARY(sys_clone->getST()->getTM() == sys->getTM());
+    // Immediately after clone the ST must not carry the source system's TM or kdata.
+    CHECK_UNARY(sys_clone->getST()->getTM() == nullptr);
+    CHECK_UNARY(sys_clone->getST()->getTO().empty());
     // After the cloned system runs, readyForRun re-injects the cloned system's own TM.
     sys_clone->run(k);
     CHECK_UNARY(sys_clone->getST()->getTM() != nullptr);
