@@ -234,10 +234,19 @@ void AllocateFundsBase::_toTargets(const Datetime& date, const TradeManagerPtr& 
         // Mode B / C: pass through the real instruction of the sub-system (number is the order
         // quantity of the sub-manager), the parent does not convert it. Only the long-side SELL
         // suggestions are defensively clipped to not exceed the current position of the parent; a
-        // short-side SELL opens/increases a short and has no long position to clip against.
+        // short-side SELL opens/increases a short and has no long position to clip against. The
+        // same-batch BUY legs of the instrument are part of the available quantity: the batch is
+        // netted at execution, so a same-bar open fill followed by a close reversal is legal
+        std::map<Stock, double> batch_buy;
+        for (const auto& s : suggestions) {
+            if (s.type == SuggestionType::BUY && !s.short_side) {
+                batch_buy[s.stock] += std::abs(s.number);
+            }
+        }
         for (auto& s : suggestions) {
             if (s.type == SuggestionType::SELL && !s.short_side) {
                 double current = tm ? tm->getPosition(date, s.stock).number : 0.0;
+                current += batch_buy[s.stock];
                 if (s.number > current) {
                     s.number = current;
                 }

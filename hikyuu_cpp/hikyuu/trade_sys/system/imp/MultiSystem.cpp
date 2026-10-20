@@ -240,6 +240,11 @@ void MultiSystem::_reset() {
     m_adjust_turnover.clear();
     m_open_pending_suggestions.clear();
     m_open_pending_date = Datetime();
+    m_open_pending_assets = 0.0;
+    m_pending_calibration.clear();
+    m_pending_calibration_date = Datetime();
+    m_pending_calibration_assets = 0.0;
+    m_pending_calibration_cash = 0.0;
     m_open_trades_date = Datetime();
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
@@ -290,6 +295,11 @@ void MultiSystem::_forceResetAll() {
     m_adjust_turnover.clear();
     m_open_pending_suggestions.clear();
     m_open_pending_date = Datetime();
+    m_open_pending_assets = 0.0;
+    m_pending_calibration.clear();
+    m_pending_calibration_date = Datetime();
+    m_pending_calibration_assets = 0.0;
+    m_pending_calibration_cash = 0.0;
     m_open_trades_date = Datetime();
     m_kdata_cache.clear();
     m_kdata_cache_mark = Datetime();
@@ -614,6 +624,15 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
         return;
     }
 
+    if (!m_trade_on_close) {
+        // Defer the whole reduction (sub and parent side) to the next open
+        m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stock, need_back_num});
+        m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stock, need_back_num});
+        m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+        m_pending_calibration_cash += need_back_num * close_price * stock.unit();
+        return;
+    }
+
     // The sub-system sells on its own book, and the parent sells the same quantity immediately
     // (the master AF executed the reduction inside the sub account and recorded it in the total
     // account), so the freed cash is already in the parent pool when the injection phase runs
@@ -726,6 +745,79 @@ void MultiSystem::_discardOpenPending(const string& reason) {
              m_open_pending_suggestions.size(), reason);
     m_open_pending_suggestions.clear();
     m_open_pending_date = Datetime();
+    m_open_pending_assets = 0.0;
+    m_pending_calibration.clear();
+    m_pending_calibration_date = Datetime();
+    m_pending_calibration_assets = 0.0;
+    m_pending_calibration_cash = 0.0;
+}
+
+price_t MultiSystem::_pendingCalibrationCash() const {
+    return m_pending_calibration_cash;
+}
+
+void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType ktype,
+                                             TradeRecordList& out) {
+    HKU_IF_RETURN(m_pending_calibration.empty(), void());
+    for (const auto& a : m_pending_calibration) {
+        if (a.kind == CalibrationKind::SUB_CHECKOUT) {
+            if (!a.sys || !a.sys->getTM()) {
+                continue;
+            }
+            FundsRecord f = a.sys->getTM()->getFunds(date, ktype);
+            if (f.cash > 0.0) {
+                a.sys->getTM()->checkout(date, f.cash);
+            }
+            continue;
+        }
+        price_t price = _getOpenPrice(date, a.stock);
+        if (price <= 0.0) {
+            continue;  // No quote: the leg is left to the next session
+        }
+        if (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::SUB_COVER) {
+            if (!a.sys || !a.sys->getTM()) {
+                continue;
+            }
+            TMPtr sub_tm = a.sys->getTM();
+            if (a.kind == CalibrationKind::SUB_SELL) {
+                double num = std::min(a.number, sub_tm->getPosition(date, a.stock).number);
+                if (num > 0.0) {
+                    sub_tm->sell(date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
+                                 "MultiSystem");
+                }
+            } else {
+                double num = std::min(a.number, sub_tm->getShortPosition(a.stock).number);
+                if (num > 0.0) {
+                    sub_tm->buyShort(date, a.stock, price, num, 0.0, 0.0, price, PART_PORTFOLIO,
+                                     "MultiSystem");
+                }
+            }
+            continue;
+        }
+        if (a.kind == CalibrationKind::PARENT_SELL) {
+            double num = std::min(a.number, m_tm->getPosition(date, a.stock).number);
+            if (num > 0.0) {
+                TradeRecord tr = m_tm->sell(date, a.stock, price, num, 0.0, 0.0, price,
+                                            PART_PORTFOLIO, "MultiSystem");
+                if (!tr.isNull()) {
+                    out.push_back(tr);
+                }
+            }
+        } else {
+            double num = std::min(a.number, m_tm->getShortPosition(a.stock).number);
+            if (num > 0.0) {
+                TradeRecord tr = m_tm->buyShort(date, a.stock, price, num, 0.0, 0.0, price,
+                                                PART_PORTFOLIO, "MultiSystem");
+                if (!tr.isNull()) {
+                    out.push_back(tr);
+                }
+            }
+        }
+    }
+    m_pending_calibration.clear();
+    m_pending_calibration_date = Datetime();
+    m_pending_calibration_assets = 0.0;
+    m_pending_calibration_cash = 0.0;
 }
 
 void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& date,
@@ -737,6 +829,28 @@ void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& da
     // is liquidated by its own sell (see the unselected handling), so the two books stay matched
 
     Stock stock = sys->getStock();
+    if (!m_trade_on_close) {
+        // Defer to the next open: the legs of the whole rebalancing share one price basis
+        std::set<Stock> stocks;
+        if (stock.isNull()) {
+            _collectLeafStocks(sys, stocks);
+        } else {
+            stocks.insert(stock);
+        }
+        for (const auto& stk : stocks) {
+            double num = sub_tm->getPosition(date, stk).number;
+            if (num > 0.0) {
+                m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
+            }
+            double short_num = sub_tm->getShortPosition(stk).number;
+            if (short_num > 0.0) {
+                m_pending_calibration.push_back({CalibrationKind::SUB_COVER, sys, stk, short_num});
+            }
+        }
+        m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+        return;
+    }
+
     if (stock.isNull()) {
         // A composite has no single instrument: sell its leaf holdings directly on the sub ledger
         std::set<Stock> stocks;
@@ -791,6 +905,18 @@ void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
         if (has_own_book) {
             long_num = std::min(long_num, own_tm->getPosition(date, stk).number);
             short_num = std::min(short_num, own_tm->getShortPosition(stk).number);
+        }
+        if (!m_trade_on_close) {
+            if (long_num > 0.0) {
+                m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, long_num});
+                m_pending_calibration_cash += long_num * price * stk.unit();
+            }
+            if (short_num > 0.0) {
+                m_pending_calibration.push_back(
+                  {CalibrationKind::PARENT_COVER, sys, stk, short_num});
+                m_pending_calibration_cash -= short_num * price * stk.unit();
+            }
+            continue;
         }
         if (long_num > 0.0) {
             TradeRecord tr = m_tm->sell(date, stk, price, long_num, 0.0, 0.0, price, PART_PORTFOLIO,
@@ -852,6 +978,12 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         if (num <= 0.0) {
             continue;
         }
+        if (!m_trade_on_close) {
+            m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
+            m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, num});
+            m_pending_calibration_cash += num * close_price * stk.unit();
+            continue;
+        }
         sub_tm->sell(date, stk, close_price, num, 0.0, 0.0, close_price, PART_PORTFOLIO,
                      "MultiSystem");
         double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
@@ -862,6 +994,10 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
                 out_executed.push_back(tr);
             }
         }
+    }
+    if (!m_trade_on_close) {
+        m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+        return;
     }
     FundsRecord funds = sub_tm->getFunds(date, ktype);
     if (funds.cash > 0.0) {
@@ -1203,6 +1339,8 @@ TradeSuggestionList MultiSystem::_toSuggestions(const SystemPtr& sys, const Trad
 
 void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionList& suggestions) {
     HKU_WARN_IF_RETURN(suggestions.empty(), void(), "Empty suggestions!");
+    m_open_pending_assets =
+      m_tm ? m_tm->getFunds(date, m_kdata.getQuery().kType()).total_assets() : 0.0;
     // Keyed by the driving day: a repeat drive of the same close day replaces the queued batch, so
     // that a double-driven session cannot silently double the orders executed at the next open
     if (!m_open_pending_date.isNull() && date == m_open_pending_date) {
@@ -1256,11 +1394,73 @@ bool MultiSystem::_isAdjustDateByPeriod(const Datetime& date, const Datetime& la
     return date.startOfDay() >= target && last_period != period_start;
 }
 
+TradeSuggestionList MultiSystem::_netSuggestions(const Datetime& date,
+                                                 const TradeSuggestionList& suggestions) const {
+    struct Leg {
+        double buy{0.0};
+        double sell{0.0};
+        bool clear{false};
+        price_t buy_price{0.0};
+        price_t sell_price{0.0};
+        price_t clear_price{0.0};
+    };
+    std::map<std::pair<Stock, bool>, Leg> legs;
+    for (const auto& s : suggestions) {
+        if (s.stock.isNull() || s.plan_price <= 0.0) {
+            continue;
+        }
+        if (s.type != SuggestionType::BUY && s.type != SuggestionType::SELL &&
+            s.type != SuggestionType::CLEAR) {
+            continue;
+        }
+        Leg& leg = legs[std::make_pair(s.stock, s.short_side)];
+        double num = std::abs(s.number);
+        if (s.type == SuggestionType::BUY) {
+            leg.buy += num;
+            leg.buy_price = s.plan_price;
+        } else if (s.type == SuggestionType::SELL) {
+            leg.sell += num;
+            leg.sell_price = s.plan_price;
+        } else {
+            leg.clear = true;
+            leg.clear_price = s.plan_price;
+        }
+    }
+
+    TradeSuggestionList result;
+    HKU_IF_RETURN(!m_tm, result);
+    for (const auto& item : legs) {
+        const Stock& stock = item.first.first;
+        const bool short_side = item.first.second;
+        const Leg& leg = item.second;
+        double current =
+          short_side ? m_tm->getShortPosition(stock).number : m_tm->getPosition(date, stock).number;
+        // net > 0: buy a long / cover a short; net < 0: sell a long / open a short
+        double net = leg.clear ? (short_side ? current : -current) : (leg.buy - leg.sell);
+        if (std::abs(net) < 1e-9) {
+            continue;
+        }
+        price_t price = leg.clear ? leg.clear_price : (net > 0.0 ? leg.buy_price : leg.sell_price);
+        if (price <= 0.0) {
+            continue;
+        }
+        TradeSuggestion s;
+        s.stock = stock;
+        s.short_side = short_side;
+        s.type = net > 0.0 ? SuggestionType::BUY : SuggestionType::SELL;
+        s.number = std::abs(net);
+        s.plan_price = price;
+        result.push_back(s);
+    }
+    return result;
+}
+
 void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                                       KQuery::KType ktype, TradeRecordList& out_trades) {
+    TradeSuggestionList netted = _netSuggestions(date, suggestions);
     // The cash-generating group runs first (sell a long, open a short) so that the freed cash backs
     // the cash-consuming group (cover a short, buy a long) that runs afterwards
-    for (const auto& s : suggestions) {
+    for (const auto& s : netted) {
         if (s.stock.isNull()) {
             continue;
         }
@@ -1306,7 +1506,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
     // buys are scaled down proportionally, with the cash left after the covers as their budget
     double need_cover_cash = 0.0;
     double need_buy_cash = 0.0;
-    for (const auto& s : suggestions) {
+    for (const auto& s : netted) {
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
         }
@@ -1351,7 +1551,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
 
     // The mandatory short covers: a short-side CLEAR covers the whole book (MAX_DOUBLE is capped
     // by the TM at the actual short position), a cover buys back the targeted quantity
-    for (const auto& s : suggestions) {
+    for (const auto& s : netted) {
         if (s.stock.isNull() || !s.short_side) {
             continue;
         }
@@ -1387,7 +1587,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         }
     }
 
-    for (const auto& s : suggestions) {
+    for (const auto& s : netted) {
         if (s.stock.isNull() || s.type != SuggestionType::BUY || s.short_side) {
             continue;  // The short covers have already run above
         }
@@ -1466,8 +1666,24 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         m_trade_list.push_back(tr);
     }
 
+    // The deferred quota calibration of the last rebalancing close executes at this open, before
+    // the queued suggestions, so all legs share one price basis
+    TradeRecordList calibration_trades;
+    Datetime calibration_date = m_pending_calibration_date;
+    double calibration_assets = m_pending_calibration_assets;
+    if (!m_pending_calibration.empty()) {
+        _executePendingCalibration(datetime, m_kdata.getQuery().kType(), calibration_trades);
+        for (auto& tr : calibration_trades) {
+            result.tradesOnOpen.push_back(tr);
+            m_trade_list.push_back(tr);
+        }
+    }
+
     // trade_on_close=false: the suggestions converted on the last rebalancing day are executed
     // uniformly at this open (re-priced by the open price of the day)
+    TradeRecordList executed_open;
+    Datetime pending_date = m_open_pending_date;
+    double pending_assets = m_open_pending_assets;
     if (!m_trade_on_close && !m_open_pending_suggestions.empty()) {
         for (auto& s : m_open_pending_suggestions) {
             price_t op = _getOpenPrice(datetime, s.stock);
@@ -1476,7 +1692,6 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
             }
         }
         KQuery::KType kt = m_kdata.getQuery().kType();
-        TradeRecordList executed_open;
         _executeSuggestions(datetime, m_open_pending_suggestions, kt, executed_open);
         for (auto& tr : executed_open) {
             result.tradesOnOpen.push_back(tr);
@@ -1484,6 +1699,22 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         }
         m_open_pending_suggestions.clear();
         m_open_pending_date = Datetime();
+    }
+
+    // The turnover of the rebalancing close: the deferred calibration legs and the queued batch
+    if (!m_trade_on_close) {
+        double traded = 0.0;
+        for (const auto& tr : calibration_trades) {
+            traded += tr.number * tr.realPrice * tr.stock.unit();
+        }
+        for (const auto& tr : executed_open) {
+            traded += tr.number * tr.realPrice * tr.stock.unit();
+        }
+        Datetime adjust_date = !calibration_date.isNull() ? calibration_date : pending_date;
+        double assets = calibration_assets > 0.0 ? calibration_assets : pending_assets;
+        if (!adjust_date.isNull() && assets > 0.0 && traded > 0.0) {
+            m_adjust_turnover.push_back({adjust_date, traded / assets});
+        }
     }
 
     // A new day: clear and rebuild the open trade buffer of every sub-system (used by the close
@@ -1769,7 +2000,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         }
         // The cash already freed by the reduction phase, shared by the injections: the total must
         // never exceed what the parent can actually fund
-        price_t cash_left = m_tm->getFunds(datetime, ktype).cash;
+        price_t cash_left =
+          m_tm->getFunds(datetime, ktype).cash + std::max(0.0, m_pending_calibration_cash);
         for (size_t i = 0; i < m_sys_list.size(); ++i) {
             SystemPtr& sys = m_sys_list[i];
             if (selected.count(sys.get()) == 0) {
@@ -1993,6 +2225,11 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     }
 
     m_last_suggestions = suggestions;
+    if (!m_trade_on_close && !m_pending_calibration.empty() &&
+        m_pending_calibration_date.isNull()) {
+        m_pending_calibration_date = datetime;
+        m_pending_calibration_assets = assets_before;
+    }
     _finishClosePhase(datetime, suggestions, executed, is_adjust, assets_before);
     return executed;
 }

@@ -454,6 +454,24 @@ private:
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                              KQuery::KType ktype, TradeRecordList& out_trades);
 
+    /** Net the opposite legs of the same instrument in one batch: a same-bar open fill and a close
+     * reversal cancel out instead of leaving a phantom parent position */
+    TradeSuggestionList _netSuggestions(const Datetime& date,
+                                        const TradeSuggestionList& suggestions) const;
+
+    /** Mode B with trade_on_close=false: the quota calibration legs (sub and parent side) are
+     * deferred to the next open, so every leg shares one price basis */
+    enum class CalibrationKind { SUB_SELL, SUB_COVER, SUB_CHECKOUT, PARENT_SELL, PARENT_COVER };
+    struct CalibrationAction {
+        CalibrationKind kind;
+        SystemPtr sys;
+        Stock stock;
+        double number{0.0};
+    };
+    void _executePendingCalibration(const Datetime& date, KQuery::KType ktype,
+                                    TradeRecordList& out);
+    price_t _pendingCalibrationCash() const;
+
     /** Mode A (Signal Aggregation): the whole close stage of the signal synthesis -- drive every
      *  sub-system (the shadows run continuously) and, on the sampling day, read the selected ones'
      *  current net exposure snapshot and let the AF synthesize the parent net target. */
@@ -586,6 +604,13 @@ private:
                                                      // the next open when trade_on_close=false
     Datetime m_open_pending_date;  // The close day m_open_pending_suggestions belongs to; makes the
                                    // same-day re-drive idempotent (runtime state, not serialized)
+    double m_open_pending_assets{0.0};  // The total assets before the close stage that produced the
+                                        // pending suggestions (for the turnover record)
+    std::vector<CalibrationAction>
+      m_pending_calibration;  // The deferred quota calibration legs (trade_on_close=false)
+    Datetime m_pending_calibration_date;       // The close day the deferred calibration belongs to
+    double m_pending_calibration_assets{0.0};  // The assets before that close stage
+    double m_pending_calibration_cash{0.0};    // The expected net cash of the deferred parent legs
     bool m_open_pending_warned{false};      // The once-per-instance flag of the cross-day pending
                                             // backlog warning (runtime state, not serialized)
     bool m_inject_truncated_warned{false};  // The once-per-instance flag of the parent-cash

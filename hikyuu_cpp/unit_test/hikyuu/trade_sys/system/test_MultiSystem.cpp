@@ -3004,6 +3004,53 @@ TEST_CASE("test_MultiSystem_adjust_mode_live_replay") {
     CHECK_LT(cycle_dates.size(), 5);
 }
 
+/** @par Check point: mode B with trade_on_close=false defers the quota calibration legs (sub and
+ * parent side) to the next open, so both books share one price basis and the turnover is recorded
+ */
+TEST_CASE("test_MultiSystem_mode_b_trade_on_close_false_defers_calibration") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto se = std::make_shared<SelectFirstCallOnlySE>(SystemList{leaf});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_defer_calib");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    Datetime sub_sell_date, parent_sell_date;
+    for (const auto& tr : leaf->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            sub_sell_date = tr.datetime;
+        }
+    }
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            parent_sell_date = tr.datetime;
+        }
+    }
+
+    /** @arg the sub and parent sells execute at the same open after the drop day */
+    CHECK_UNARY(!sub_sell_date.isNull());
+    CHECK_EQ(sub_sell_date, parent_sell_date);
+    CHECK_GT(sub_sell_date, k[1].datetime);
+
+    /** @arg both books end flat and the rebalancing turnover is recorded */
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_UNARY(!ms->getAdjustTurnover().empty());
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {
@@ -3353,6 +3400,58 @@ private:
     Datetime m_open_date;
     Datetime m_cover_date;
 };
+
+// Scripted long signals: one buy signal on buy_date, one sell signal on sell_date
+class ScriptedBuySellSG : public SignalBase {
+public:
+    ScriptedBuySellSG(Datetime buy_date, Datetime sell_date)
+    : SignalBase("ScriptedBuySellSG"), m_buy_date(buy_date), m_sell_date(sell_date) {}
+
+    SignalPtr _clone() override {
+        return make_shared<ScriptedBuySellSG>(m_buy_date, m_sell_date);
+    }
+
+    void _calculate(const KData& kdata) override {
+        if (kdata.getPos(m_buy_date) != Null<size_t>()) {
+            _addBuySignal(m_buy_date);
+        }
+        if (kdata.getPos(m_sell_date) != Null<size_t>()) {
+            _addSellSignal(m_sell_date);
+        }
+    }
+
+private:
+    Datetime m_buy_date;
+    Datetime m_sell_date;
+};
+
+/** @par Check point: a same-bar open fill followed by a close reversal is netted in one batch, so
+ * the parent does not keep a phantom position the sub-system already closed */
+TEST_CASE("test_MultiSystem_mode_b_same_bar_netting") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    auto sg = make_shared<ScriptedBuySellSG>(kdata[0].datetime, kdata[1].datetime);
+    auto sys = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    sys->setStock(stk);
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", false);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{sys});
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_netting");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->add(sys);
+    ms->run(kdata);
+
+    /** @arg both books are flat: the open fill and the close reversal cancel out */
+    CHECK_EQ(sys->getTM()->getPosition(kdata.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(kdata.back().datetime, stk).number, 0.0);
+}
 
 /** @par Check point: mode B mirror of a short book -- the full cover of the sub-system short must
  * reach the parent as a short-side CLEAR (buyShort), not as opening a long. The old code read the
