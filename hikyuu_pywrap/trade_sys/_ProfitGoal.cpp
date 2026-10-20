@@ -7,6 +7,7 @@
 
 #include <hikyuu/trade_sys/profitgoal/build_in.h>
 #include "../pybind_utils.h"
+#include "../gil_policy.h"
 
 namespace py = pybind11;
 using namespace hku;
@@ -62,11 +63,11 @@ The custom profit goal strategy interfaces:
 
 - _get_goal : [Required] Get the target price
 - _get_short_goal : [Optional] Get the short target price; returning constant.null_price means no short target is set
-- _calculate : [Required] The subclass calculation interface
+- _calculate : [Optional] The subclass calculation interface (called when the trading object is set)
 - _clone : [Required] The clone interface
 - _reset : [Optional] Reload the private variables
-- buyNotify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
-- sellNotify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing)")
+- buy_notify : [Optional] Receive the actual buy notification, reserved for the multiple position increase/decrease processing
+- sell_notify : [Optional] Receive the actual sell notification, reserved for the multiple position increase/decrease processing)")
 
       .def(py::init<>())
       .def(py::init<const ProfitGoalBase&>())
@@ -80,8 +81,15 @@ The custom profit goal strategy interfaces:
       .def_property("name", py::overload_cast<>(&ProfitGoalBase::name, py::const_),
                     py::overload_cast<const string&>(&ProfitGoalBase::name),
                     py::return_value_policy::copy, "Name")
-      .def_property("to", &ProfitGoalBase::getTO, &ProfitGoalBase::setTO, "Set or get the trading object")
-      .def_property("tm", &ProfitGoalBase::getTM, &ProfitGoalBase::setTM, "Set or get the trade manager account")
+      .def_property(
+        "to", &ProfitGoalBase::getTO,
+        [](ProfitGoalBase* self, const KData& kdata) {
+            ScopeGilRelease gil(!self->isPythonObject());
+            self->setTO(kdata);
+        },
+        "Set or get the trading object")
+      .def_property("tm", &ProfitGoalBase::getTM, &ProfitGoalBase::setTM,
+                    "Set or get the trade manager account")
 
       .def("get_param", &ProfitGoalBase::getParam<boost::any>, R"(get_param(self, name)
 

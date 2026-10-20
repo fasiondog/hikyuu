@@ -135,9 +135,9 @@ def crtPG(get_goal, calculate=None, params=None, name='crtPG', buy_notify=None, 
     if calculate is not None:
         meta_x._calculate = calculate
     if buy_notify is not None:
-        meta_x._buy_notify = buy_notify
+        meta_x.buy_notify = buy_notify
     if sell_notify is not None:
-        meta_x._sell_notify = sell_notify
+        meta_x.sell_notify = sell_notify
     ret = meta_x(name, params)
     globals().update(dict(_=ret))
     return ret

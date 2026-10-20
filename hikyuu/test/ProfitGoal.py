@@ -74,6 +74,23 @@ class TestCrtPG(unittest.TestCase):
         self.assertEqual(p_clone.get_goal(Datetime(200101010000), 1.0), 10.0)
         self.assertEqual(p_clone.get_goal(Datetime(200101020000), 1.0), 0.0)
 
+    def test_crt_pg_notify(self):
+        invoked = []
+
+        def on_buy(self, tr):
+            invoked.append("buy")
+
+        def on_sell(self, tr):
+            invoked.append("sell")
+
+        p = crtPG(testGetGoal, buy_notify=on_buy, sell_notify=on_sell, name="ProfitGoalCrtPGNotify")
+        # the callbacks must sit under the names the C++ trampoline looks up (no leading underscore)
+        self.assertIs(type(p).__dict__.get("buy_notify"), on_buy)
+        self.assertIs(type(p).__dict__.get("sell_notify"), on_sell)
+        p.buy_notify(None)
+        p.sell_notify(None)
+        self.assertEqual(invoked, ["buy", "sell"])
+
 
 def suite():
     return unittest.TestLoader().loadTestsFromTestCase(ProfitGoalTest)
