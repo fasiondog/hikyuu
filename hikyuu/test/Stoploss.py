@@ -2,12 +2,13 @@
 # -*- coding: utf8 -*-
 # gb18030
 
-#===============================================================================
+# ===============================================================================
 # Author: fasiondog
 # History: 1)20130321, Added by fasiondog
-#===============================================================================
+# ===============================================================================
 
 import unittest
+import threading
 
 from test_init import *
 
@@ -84,3 +85,38 @@ def suite():
 
 def suiteTestCrtST():
     return unittest.TestLoader().loadTestsFromTestCase(TestCrtST)
+
+
+def suiteTestConcurrent():
+    return unittest.TestLoader().loadTestsFromTestCase(TestConcurrentSetTO)
+
+
+class TestConcurrentSetTO(unittest.TestCase):
+    def test_concurrent_setTO_clone_reset(self):
+        """Concurrent setTO/clone/reset from Python threads must not crash or deadlock"""
+        kdata = sm["sh000001"].get_kdata(Query(-100))
+        st_cpp = ST_FixedPercent(0.03)
+        st_py = StoplossPython()
+
+        errors = []
+
+        def work(st):
+            try:
+                for _ in range(50):
+                    st.to = kdata
+                    st.clone()
+                    st.reset()
+            except Exception as e:  # noqa: BLE001
+                errors.append(e)
+
+        # A pure C++ ST releases the GIL during setTO/clone/reset, and a Python ST holds it;
+        # both must complete without deadlock
+        threads = [
+            threading.Thread(target=work, args=(st,)) for st in (st_cpp, st_cpp, st_py, st_py)
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=60)
+            self.assertFalse(t.is_alive(), "deadlock detected in setTO/clone/reset")
+        self.assertEqual(errors, [])
