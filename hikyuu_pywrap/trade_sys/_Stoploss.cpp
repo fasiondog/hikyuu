@@ -6,6 +6,7 @@
  */
 
 #include <hikyuu/trade_sys/stoploss/build_in.h>
+#include "../gil_policy.h"
 #include "../pybind_utils.h"
 
 namespace py = pybind11;
@@ -77,8 +78,15 @@ The system still skips a long buy when the level is not lower than the planned b
                     py::return_value_policy::copy, "Name")
       .def_property("tm", &StoplossBase::getTM, &StoplossBase::setTM,
                     "The associated trade manager instance")
-      .def_property("to", &StoplossBase::getTO, &StoplossBase::setTO,
-                    "The associated trading object")
+      // The GIL is always released so other threads can run during the (possibly slow)
+      // calculation; the trampolines of a Python subclass re-acquire the GIL per callback
+      .def_property(
+        "to", &StoplossBase::getTO,
+        [](StoplossBase& self, const KData& kdata) {
+            ScopeGilRelease gil(!self.isPythonObject());
+            self.setTO(kdata);
+        },
+        "The associated trading object")
 
       .def("get_param", &StoplossBase::getParam<boost::any>, R"(get_param(self, name)
 
@@ -143,8 +151,18 @@ The system still skips a long buy when the level is not lower than the planned b
     :return: the short stop-loss price
     :rtype: float)")
 
-      .def("reset", &StoplossBase::reset, "The reset operation")
-      .def("clone", &StoplossBase::clone, "The clone operation")
+      .def("reset",
+           [](StoplossBase& self) {
+               ScopeGilRelease gil(!self.isPythonObject());
+               self.reset();
+           },
+           "The reset operation")
+      .def("clone",
+           [](StoplossBase& self) -> StoplossPtr {
+               ScopeGilRelease gil(!self.isPythonObject());
+               return self.clone();
+           },
+           "The clone operation")
       .def("_calculate", &StoplossBase::_calculate,
            "[Overload interface] The subclass calculation interface. Do not call "
            "super()._calculate() in a Python override (causes infinite recursion).")
