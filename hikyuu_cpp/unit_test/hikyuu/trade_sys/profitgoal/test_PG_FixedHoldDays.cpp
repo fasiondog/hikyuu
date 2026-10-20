@@ -95,6 +95,44 @@ TEST_CASE("test_PG_FixedHoldDays") {
     CHECK_EQ(pg->getGoal(Datetime(199911230000LL), 0.0), 0.0);
 }
 
+/** @arg the short side forces a close by returning the current price once the hold days are
+ *  reached; before that or with no short position there is no goal */
+TEST_CASE("test_PG_FixedHoldDays_short") {
+    StockManager& sm = StockManager::instance();
+    Stock stk = sm.getStock("sh600000");
+    KData k = stk.getKData(
+      KQueryByDate(Datetime(199911100000LL), Datetime(200002250000LL), KQuery::DAY));
+
+    TMPtr tm = crtTM(Datetime(199001010000LL), 100000);
+    tm->setParam<bool>("support_borrow_stock", true);
+    tm->sellShort(Datetime(199911110000LL), stk, 29.51, 100);
+
+    PGPtr pg = PG_FixedHoldDays();
+    pg->setTM(tm);
+    pg->setTO(k);
+    pg->setParam<int>("days", 1);
+
+    /** @arg the take day itself is not counted, no goal yet */
+    CHECK_UNARY(std::isnan(pg->getShortGoal(Datetime(199911110000LL), 30.0)));
+
+    /** @arg one trading day later the close is forced: the goal equals the current price so that
+     *  the system's price <= goal always holds */
+    CHECK_EQ(pg->getShortGoal(Datetime(199911120000LL), 30.0), 30.0);
+    CHECK_EQ(pg->getShortGoal(Datetime(199911130000LL), 25.5), 25.5);
+
+    /** @arg with no short position there is no goal */
+    TMPtr tm_empty = crtTM(Datetime(199001010000LL), 100000);
+    PGPtr pg2 = PG_FixedHoldDays();
+    pg2->setTM(tm_empty);
+    pg2->setTO(k);
+    pg2->setParam<int>("days", 1);
+    CHECK_UNARY(std::isnan(pg2->getShortGoal(Datetime(199911120000LL), 30.0)));
+
+    /** @arg the tm released by reset yields no goal */
+    pg->reset();
+    CHECK_UNARY(std::isnan(pg->getShortGoal(Datetime(199911120000LL), 30.0)));
+}
+
 /** @par Test points */
 TEST_CASE("test_PG_FixedHoldDays_clone") {
     StockManager& sm = StockManager::instance();

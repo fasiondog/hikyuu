@@ -63,14 +63,10 @@ public:
 
     /** Calculate the target price when buying; see the _getGoal interface for the return semantics
      */
-    price_t getGoal(const Datetime& datetime, price_t price) {
-        return _getGoal(datetime, price);
-    }
+    price_t getGoal(const Datetime& datetime, price_t price);
 
     /** Null<price_t> is returned, meaning no short goal is set */
-    price_t getShortGoal(const Datetime& datetime, price_t price) {
-        return _getShortGoal(datetime, price);
-    }
+    price_t getShortGoal(const Datetime& datetime, price_t price);
 
     /** Subclass reset interface */
     virtual void _reset() {}
@@ -97,7 +93,9 @@ public:
      * @param datetime the current time
      * @param price the current price
      * @return Null<price_t> means no short goal is set; the short position is closed when the
-     * current price is <= the returned target price
+     * current price is <= the returned target price. To force a close regardless of price (e.g.
+     * a hold-days rule), return the current price so that price <= price always holds. Note that
+     * 0 has no effect on the short side (price <= 0 never holds)
      */
     virtual price_t _getShortGoal(const Datetime&, price_t) {
         return Null<price_t>();
@@ -113,6 +111,10 @@ protected:
     string m_name;
     KData m_kdata;
     TradeManagerPtr m_tm;
+
+private:
+    /** Clamp a mis-implemented goal (negative or non-finite) to Null, i.e. no goal */
+    price_t _normalizeGoal(price_t goal);
 
 //============================================
 // Serialization support

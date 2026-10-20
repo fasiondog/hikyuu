@@ -120,7 +120,10 @@ The custom profit goal strategy interfaces:
 
       .def("get_goal", &ProfitGoalBase::getGoal, R"(get_goal(self, datetime, price)
 
-    Get the profit goal price; returning constant.null_price means the goal is not limited; returning 0 means it needs to be sold
+    Get the profit goal price. The system sells the long position when the current price >= the
+    goal price. Returning constant.null_price means the goal is not limited; returning 0 means a
+    sell is needed; a positive value is the target price. A negative or non-finite return is
+    clamped to no goal
 
     :param Datetime datetime: the current time
     :param float price: the current price
@@ -130,7 +133,10 @@ The custom profit goal strategy interfaces:
       .def("get_short_goal", &ProfitGoalBase::getShortGoal,
            R"(get_short_goal(self, datetime, price)
 
-    Get the short profit goal price; returning constant.null_price means no short goal is set
+    Get the short profit goal price. The system closes the short position when the current price
+    <= the goal price. Returning constant.null_price means no short goal is set; a positive value
+    is the target price. To force a close regardless of price, return the current price. A negative
+    or non-finite return is clamped to no goal
 
     :param Datetime datetime: the current time
     :param float price: the current price
@@ -163,7 +169,10 @@ The custom profit goal strategy interfaces:
 
     m.def("PG_FixedHoldDays", PG_FixedHoldDays, py::arg("days") = 5, R"(PG_FixedHoldDays([days=5])
 
-    The fixed holding days profit goal strategy
+    The fixed holding days profit goal strategy. Once a long or short position has been held for
+    at least the given trading days, it forces an exit on the next bar regardless of price. The
+    trading object (to) must be set, otherwise there is no trading-day list and the rule never
+    takes effect
     
     :param int days: the allowed holding days (counted by the trading days), defaulting to 5 days
     :return: the profit goal strategy instance)");

@@ -7,7 +7,28 @@
 
 #include "ProfitGoalBase.h"
 
+#include <cmath>
+
 namespace hku {
+
+price_t ProfitGoalBase::_normalizeGoal(price_t goal) {
+    // Keep the valid semantics: Null(NaN) = no goal, 0 = sell now (long side), a finite positive
+    // value = the target price. A negative or non-finite return is never a valid profit target and
+    // would drive the exit comparison wrong (long: exit every bar on a negative value; short:
+    // close every bar on +inf), so it is clamped to Null (no goal).
+    if (std::isnan(goal) || goal == 0.0 || (std::isfinite(goal) && goal > 0.0)) {
+        return goal;
+    }
+    return Null<price_t>();
+}
+
+price_t ProfitGoalBase::getGoal(const Datetime& datetime, price_t price) {
+    return _normalizeGoal(_getGoal(datetime, price));
+}
+
+price_t ProfitGoalBase::getShortGoal(const Datetime& datetime, price_t price) {
+    return _normalizeGoal(_getShortGoal(datetime, price));
+}
 
 HKU_API std::ostream& operator<<(std::ostream& os, const ProfitGoalBase& pg) {
     os << "ProfitGoal(" << pg.name() << ", " << pg.getParameter() << ")";
