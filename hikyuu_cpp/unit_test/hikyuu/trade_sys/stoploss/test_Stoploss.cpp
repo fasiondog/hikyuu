@@ -7,12 +7,19 @@
 
 #include "doctest/doctest.h"
 #include <cmath>
+#include <limits>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/build_in.h>
+#include <hikyuu/trade_manage/crt/TC_Zero.h>
+#include <hikyuu/trade_manage/crt/crtTM.h>
+#include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/signal/SignalBase.h>
 #include <hikyuu/trade_sys/stoploss/StoplossBase.h>
+#include <hikyuu/trade_sys/stoploss/crt/ST_FixedPercent.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_Indicator.h>
 #include <hikyuu/trade_sys/stoploss/imp/FixedPercentStoploss.h>
 #include <hikyuu/trade_sys/stoploss/imp/IndicatorStoploss.h>
+#include <hikyuu/trade_sys/system/crt/SYS_Simple.h>
 
 using namespace hku;
 
@@ -101,6 +108,33 @@ public:
 
 private:
     int m_calc{0};
+};
+
+// A subclass returning an arbitrary raw value, used to verify the base-class normalization
+class StoplossInvalidReturn : public StoplossBase {
+public:
+    StoplossInvalidReturn() : StoplossBase("StoplossInvalidReturn") {}
+    virtual ~StoplossInvalidReturn() {}
+
+    virtual price_t _getPrice(const Datetime &, price_t) override {
+        return m_value;
+    }
+    virtual price_t _getShortPrice(const Datetime &, price_t) override {
+        return m_value;
+    }
+    virtual StoplossPtr _clone() override {
+        auto p = make_shared<StoplossInvalidReturn>();
+        p->m_value = m_value;
+        return p;
+    }
+    virtual void _calculate() override {}
+
+    void setValue(price_t value) {
+        m_value = value;
+    }
+
+private:
+    price_t m_value{0.0};
 };
 
 /**
@@ -199,7 +233,7 @@ TEST_CASE("test_Stoploss_fixedpercent_short_and_validation") {
     CHECK_EQ(st->getShortPrice(Datetime(200101010000), 0.0), 0.0);
 }
 
-/** @arg non-finite indicator values are dropped, so getPrice returns 0 (no stop-loss) (ST-005) */
+/** @arg non-finite indicator values are dropped, so every bar is invalid (Null) (ST-005) */
 TEST_CASE("test_Stoploss_indicator_nan_filtered") {
     StockManager &sm = StockManager::instance();
     KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 10));
@@ -210,10 +244,70 @@ TEST_CASE("test_Stoploss_indicator_nan_filtered") {
     auto st = ST_Indicator(nan_ind);
     st->setTO(k1);
     for (size_t i = 0; i < k1.size(); ++i) {
-        price_t v = st->getPrice(k1[i].datetime, 0.0);
-        CHECK_UNARY(std::isfinite(v));
-        CHECK_EQ(v, 0.0);
+        CHECK_UNARY(std::isnan(st->getPrice(k1[i].datetime, 0.0)));
     }
+}
+
+/** @arg bars before the indicator produces a value (warm-up) are invalid, later bars are valid */
+TEST_CASE("test_Stoploss_indicator_warmup_is_invalid") {
+    StockManager &sm = StockManager::instance();
+    KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 20));
+    CHECK_UNARY(!k1.empty());
+
+    auto st = ST_Indicator(MA(CLOSE(), 5));
+    st->setTO(k1);
+
+    size_t first_valid = Null<size_t>();
+    for (size_t i = 0; i < k1.size(); ++i) {
+        if (std::isfinite(st->getPrice(k1[i].datetime, 0.0))) {
+            first_valid = i;
+            break;
+        }
+    }
+
+    /** @arg the indicator needs several bars, so its warm-up bars must be invalid */
+    CHECK_UNARY(first_valid != Null<size_t>());
+    CHECK_UNARY(first_valid > 0);
+    for (size_t i = 0; i < first_valid; ++i) {
+        CHECK_UNARY(std::isnan(st->getPrice(k1[i].datetime, 0.0)));
+    }
+
+    /** @arg once the indicator has values, every bar keeps a valid level */
+    for (size_t i = first_valid; i < k1.size(); ++i) {
+        CHECK_UNARY(std::isfinite(st->getPrice(k1[i].datetime, 0.0)));
+    }
+}
+
+/** @arg invalid hook results are marked as Null (invalid) so that the system skips the trade,
+ * while 0 keeps meaning "no stop-loss" */
+TEST_CASE("test_Stoploss_invalid_hook_result_is_null") {
+    auto st = make_shared<StoplossInvalidReturn>();
+    Datetime datetime(200101010000);
+
+    /** @arg negative result is invalid */
+    st->setValue(-1.0);
+    CHECK_UNARY(std::isnan(st->getPrice(datetime, 10.0)));
+    CHECK_UNARY(std::isnan(st->getShortPrice(datetime, 10.0)));
+
+    /** @arg NaN (Null) result stays invalid */
+    st->setValue(Null<price_t>());
+    CHECK_UNARY(std::isnan(st->getPrice(datetime, 10.0)));
+    CHECK_UNARY(std::isnan(st->getShortPrice(datetime, 10.0)));
+
+    /** @arg infinity result is invalid */
+    st->setValue(std::numeric_limits<price_t>::infinity());
+    CHECK_UNARY(std::isnan(st->getPrice(datetime, 10.0)));
+    CHECK_UNARY(std::isnan(st->getShortPrice(datetime, 10.0)));
+
+    /** @arg zero still means no stop-loss */
+    st->setValue(0.0);
+    CHECK_EQ(st->getPrice(datetime, 10.0), 0.0);
+    CHECK_EQ(st->getShortPrice(datetime, 10.0), 0.0);
+
+    /** @arg a valid positive result is passed through unchanged */
+    st->setValue(9.5);
+    CHECK_EQ(st->getPrice(datetime, 10.0), 9.5);
+    CHECK_EQ(st->getShortPrice(datetime, 10.0), 9.5);
 }
 
 /** @arg clone keeps its own result cache independent of the source (ST-007) */
@@ -247,6 +341,96 @@ TEST_CASE("test_Stoploss_paramChanged_invalidates_cache") {
     // Same KData, but the parameter changed -> cache must be invalidated and recomputed
     p->setTO(k1);
     CHECK_EQ(p->getPrice(Datetime(200101010000), 0.0), static_cast<price_t>(k1.size() + 7));
+}
+
+namespace {
+
+// Emits one buy signal at a fixed date
+class StoplossBuySG : public SignalBase {
+public:
+    explicit StoplossBuySG(const Datetime &datetime)
+    : SignalBase("Stoploss_BuySG"), m_datetime(datetime) {}
+
+    virtual SignalPtr _clone() override {
+        return make_shared<StoplossBuySG>(m_datetime);
+    }
+
+    virtual void _calculate(const KData &kdata) override {
+        if (kdata.getPos(m_datetime) != Null<size_t>()) {
+            _addBuySignal(m_datetime);
+        }
+    }
+
+private:
+    Datetime m_datetime;
+};
+
+SYSPtr makeStoplossSys(const KData &kdata, const StoplossPtr &st, const Datetime &buy_date) {
+    SYSPtr sys = SYS_Simple();
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000, TC_Zero(), "TEST_TM"));
+    sys->setSG(make_shared<StoplossBuySG>(buy_date));
+    sys->setMM(MM_FixedCount(100));
+    sys->setST(st);
+    sys->run(kdata);
+    return sys;
+}
+
+size_t countBuy(const SYSPtr &sys) {
+    size_t count = 0;
+    for (const auto &tr : sys->getTradeRecordList()) {
+        if (tr.business == BUSINESS_BUY) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+price_t buyStoploss(const SYSPtr &sys) {
+    for (const auto &tr : sys->getTradeRecordList()) {
+        if (tr.business == BUSINESS_BUY) {
+            return tr.stoploss;
+        }
+    }
+    return Null<price_t>();
+}
+
+}  // namespace
+
+/** @arg an invalid stop-loss level does not block the entry: the trade opens without stop-loss,
+ * while a valid level keeps its protection */
+TEST_CASE("test_Stoploss_invalid_level_opens_without_stop") {
+    StockManager &sm = StockManager::instance();
+    Stock stock = sm.getStock("sh600000");
+    KData kdata = stock.getKData(KQueryByDate(Datetime(200006270000LL), Datetime(200007100000LL),
+                                              KQuery::DAY, KQuery::FORWARD));
+    CHECK_UNARY(!kdata.empty());
+    Datetime buy_date(200006270000LL);
+
+    /** @arg a negative stop-loss level is invalid, so the buy opens without stop-loss */
+    auto bad = make_shared<StoplossInvalidReturn>();
+    bad->setValue(-1.0);
+    auto sys_negative = makeStoplossSys(kdata, bad, buy_date);
+    CHECK_EQ(countBuy(sys_negative), 1);
+    CHECK_EQ(buyStoploss(sys_negative), 0.0);
+
+    /** @arg a Null (NaN) stop-loss level is invalid, so the buy opens without stop-loss */
+    bad = make_shared<StoplossInvalidReturn>();
+    bad->setValue(Null<price_t>());
+    auto sys_null = makeStoplossSys(kdata, bad, buy_date);
+    CHECK_EQ(countBuy(sys_null), 1);
+    CHECK_EQ(buyStoploss(sys_null), 0.0);
+
+    /** @arg a valid stop-loss level keeps its protection */
+    auto sys_valid = makeStoplossSys(kdata, ST_FixedPercent(0.03), buy_date);
+    CHECK_EQ(countBuy(sys_valid), 1);
+    CHECK_UNARY(buyStoploss(sys_valid) > 0.0);
+
+    /** @arg an indicator stop-loss during its warm-up also opens the buy without stop-loss */
+    auto sys_warmup = makeStoplossSys(kdata, ST_Indicator(MA(CLOSE(), 5)), buy_date);
+    CHECK_EQ(countBuy(sys_warmup), 1);
+    CHECK_EQ(buyStoploss(sys_warmup), 0.0);
 }
 
 /** @} */

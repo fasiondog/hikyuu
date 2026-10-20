@@ -6,6 +6,7 @@
  */
 
 #include "doctest/doctest.h"
+#include <cmath>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/trade_sys/stoploss/crt/ST_FixedPercent.h>
 
@@ -46,6 +47,28 @@ TEST_CASE("test_FixedPercent_SL") {
     CHECK_THROWS_AS(ST_FixedPercent(0.0), std::exception);
     CHECK_THROWS_AS(ST_FixedPercent(1.01), std::exception);
     CHECK_THROWS_AS(ST_FixedPercent(-1.0), std::exception);
+}
+
+/** @arg a stop-loss that cannot be represented by the price tick is invalid (Null), while a normal
+ * price keeps a valid level and p = 1.0 still means "no stop-loss" */
+TEST_CASE("test_FixedPercent_SL_unrepresentable") {
+    // Without setTO the precision falls back to 2, so the price tick is 0.01
+    auto sp = ST_FixedPercent(0.5);
+
+    /** @arg the level cannot stay below the price tick: 0.01 * 0.5 = 0.005 rounds to the 0.01
+     * tick, which is not below the price, so the one-tick clamp leaves 0 */
+    CHECK_UNARY(std::isnan(sp->getPrice(Datetime(200101010000), 0.01)));
+
+    sp = ST_FixedPercent(0.03);
+    /** @arg the level would be negative after the one-tick clamp (0.006 - 0.01) */
+    CHECK_UNARY(std::isnan(sp->getPrice(Datetime(200101010000), 0.006)));
+
+    /** @arg a regular price still yields the expected level */
+    CHECK_EQ(sp->getPrice(Datetime(200101010000), 10.0), doctest::Approx(9.7));
+
+    /** @arg p = 1.0 stays "no stop-loss" (0), it is not reported as invalid */
+    sp = ST_FixedPercent(1.0);
+    CHECK_EQ(sp->getPrice(Datetime(200101010000), 66.397), doctest::Approx(0.0));
 }
 
 /** @} */

@@ -899,7 +899,8 @@ TradeRecord System::_buyNow(const KRecord& today, const KRecord& src_today, Part
     // Calculate the stop-loss price
     price_t stoploss = _getStoplossPrice(today, src_today, today.closePrice);
 
-    // Give up the trade when the planned price is not higher than the stop-loss price
+    // Give up the trade when the planned price is not higher than the stop-loss price; an invalid
+    // level has already been turned into 0 (no stop-loss) by _getStoplossPrice
     bool trace = getParam<bool>("trace");
     if (planPrice <= stoploss) {
         HKU_INFO_IF(trace, htr("[{}] buy failed, planPrice: {} <= stoploss: {}", name(), planPrice,
@@ -1001,7 +1002,8 @@ TradeRecord System::_buyDelay(const KRecord& today, const KRecord& src_today) {
             goalPrice = req.goal;
         }
 
-        // If the planned buy price is not higher than the stop-loss price or the buy quantity is 0
+        // Drop the request when the planned buy price is not higher than the stop-loss price or
+        // when the buy quantity is 0
         if (planPrice <= stoploss || number <= 0) {
             m_buyRequestList.erase(m_buyRequestList.begin());
             continue;
@@ -1578,6 +1580,16 @@ TradeRecord System::_sellShortNow(const KRecord& today, const KRecord& src_today
     // Calculate the stop-loss price
     price_t stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
 
+    // Give up the trade when the short stop-loss is not above the planned price (the cover would
+    // trigger immediately, symmetric with the long-side planPrice <= stoploss check)
+    bool trace = getParam<bool>("trace");
+    if (stoploss > 0.0 && stoploss <= planPrice) {
+        HKU_INFO_IF(trace, "[{}] sell short failed, stoploss: {} <= planPrice: {}", name(),
+                    stoploss, planPrice);
+        m_sellShortRequestList.clear();
+        return result;
+    }
+
     double number =
       _getSellShortNumber(today.datetime, planPrice, _getShortOpenRisk(stoploss, planPrice), from);
     if (number <= 0) {
@@ -1656,7 +1668,9 @@ TradeRecord System::_sellShortDelay(const KRecord& today, const KRecord& src_tod
             goalPrice = req.goal;
         }
 
-        if (number <= 0) {
+        // Drop the request when the short stop-loss is not above the planned price, symmetric
+        // with the long-side planPrice <= stoploss check
+        if ((stoploss > 0.0 && stoploss <= planPrice) || number <= 0) {
             m_sellShortRequestList.erase(m_sellShortRequestList.begin());
             continue;
         }
@@ -1724,16 +1738,29 @@ TradeRecord System::pfProcessDelayBuyRequest(const Datetime& date) {
 price_t System::_getStoplossPrice(const KRecord& today, const KRecord& src_today, price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
     price_t level = m_st->getPrice(today.datetime, price);
+    // Null (non-finite) means the strategy returned no usable level: the entry still takes place
+    // without stop-loss (sized with the full planned price as risk) instead of being dropped
+    if (!std::isfinite(level)) {
+        HKU_INFO_IF(getParam<bool>("trace"), "[{}] invalid stoploss, open without stop-loss",
+                    name());
+        return 0.0;
+    }
     // Zero means no stop-loss on this bar and must not be turned into a real level by the mapping
     // (e.g. into the low price of a one-price board)
     HKU_IF_RETURN(level == 0.0, 0.0);
     return mapAdjustedToOriginal(today, src_today, level);
 }
 
-price_t System ::_getShortStoplossPrice(const KRecord& today, const KRecord& src_today,
-                                        price_t price) {
+price_t System::_getShortStoplossPrice(const KRecord& today, const KRecord& src_today,
+                                       price_t price) {
     HKU_IF_RETURN(!m_st, 0.0);
     price_t level = m_st->getShortPrice(today.datetime, price);
+    // Null (non-finite) means no usable level: the short entry still takes place without stop-loss
+    if (!std::isfinite(level)) {
+        HKU_INFO_IF(getParam<bool>("trace"), "[{}] invalid stoploss, open short without stop-loss",
+                    name());
+        return 0.0;
+    }
     HKU_IF_RETURN(level == 0.0, 0.0);
     return mapAdjustedToOriginal(today, src_today, level);
 }
@@ -1741,6 +1768,8 @@ price_t System ::_getShortStoplossPrice(const KRecord& today, const KRecord& src
 price_t System::_getTakeProfitPrice(const KRecord& today, const KRecord& src_today, price_t price) {
     HKU_IF_RETURN(!m_tp, 0.0);
     price_t level = m_tp->getPrice(today.datetime, price);
+    // Null means the strategy returned an invalid level: no take-profit on this bar
+    HKU_IF_RETURN(!std::isfinite(level), 0.0);
     // Zero means no take-profit price on this bar and must not be turned into a real level by
     // the mapping (e.g. into the low price of a one-price board)
     HKU_IF_RETURN(level == 0.0, 0.0);
@@ -1751,6 +1780,7 @@ price_t System::_getShortTakeProfitPrice(const KRecord& today, const KRecord& sr
                                          price_t price) {
     HKU_IF_RETURN(!m_tp, 0.0);
     price_t level = m_tp->getShortPrice(today.datetime, price);
+    HKU_IF_RETURN(!std::isfinite(level), 0.0);
     HKU_IF_RETURN(level == 0.0, 0.0);
     return mapAdjustedToOriginal(today, src_today, level);
 }
