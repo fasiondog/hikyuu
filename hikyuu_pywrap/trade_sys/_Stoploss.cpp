@@ -29,20 +29,20 @@ public:
     }
 
     void _calculate() override {
-        PYBIND11_OVERLOAD(void, StoplossBase, _calculate, );
+        PYBIND11_OVERRIDE(void, StoplossBase, _calculate, );
     }
 
     void _reset() override {
-        PYBIND11_OVERLOAD(void, StoplossBase, _reset, );
+        PYBIND11_OVERRIDE(void, StoplossBase, _reset, );
     }
 
     price_t _getPrice(const Datetime& datetime, price_t price) override {
-        PYBIND11_OVERLOAD_PURE_NAME(price_t, StoplossBase, "_get_price", _getPrice, datetime,
+        PYBIND11_OVERRIDE_PURE_NAME(price_t, StoplossBase, "_get_price", _getPrice, datetime,
                                     price);
     }
 
     price_t _getShortPrice(const Datetime& datetime, price_t price) override {
-        PYBIND11_OVERLOAD_NAME(price_t, StoplossBase, "_get_short_price", _getShortPrice, datetime,
+        PYBIND11_OVERRIDE_NAME(price_t, StoplossBase, "_get_short_price", _getShortPrice, datetime,
                                price);
     }
 };
