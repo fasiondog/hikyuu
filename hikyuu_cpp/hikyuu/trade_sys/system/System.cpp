@@ -474,6 +474,10 @@ void System::clearDelayBuyRequest() {
     m_buyRequestList.clear();
 }
 
+void System::clearDelaySellRequest() {
+    m_sellRequestList.clear();
+}
+
 const std::vector<std::shared_ptr<System>>& System::getSubSystemList() const {
     static SystemList empty;
     return empty;

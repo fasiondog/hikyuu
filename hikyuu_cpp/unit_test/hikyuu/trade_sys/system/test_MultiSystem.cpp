@@ -2872,6 +2872,105 @@ TEST_CASE("test_MultiSystem_mode_b_composite_over_quota_reduction") {
     CHECK_EQ(pos2, doctest::Approx(parent2));
 }
 
+class SelectFirstOfGivenSE : public SelectorBase {
+public:
+    explicit SelectFirstOfGivenSE(const SystemList& list)
+    : SelectorBase("SelectFirstOfGivenSE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectFirstOfGivenSE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        const bool first_call = (call_count++ == 0);
+        for (auto& sys : m_list) {
+            ret.emplace_back(sys, 1.0);
+            if (!first_call) {
+                break;
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    int call_count{0};
+};
+
+/** @par Check point: with several mode B children holding the same instrument, dropping one sells
+ * only its own share, the sibling book and the parent mirror stay matched */
+TEST_CASE("test_MultiSystem_mode_b_overlapping_instruments_keep_sibling") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto build_inner = [&](const string& name) {
+        auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+        leaf->setStock(stk);
+        leaf->setParam<bool>("buy_delay", false);
+        auto inner = std::make_shared<MultiSystem>(name);
+        inner->setMode("A");
+        inner->setSubInitCash(50000.0);
+        inner->add(leaf);
+        return inner;
+    };
+    auto inner1 = build_inner("inner1");
+    auto inner2 = build_inner("inner2");
+
+    auto se = std::make_shared<SelectFirstOfGivenSE>(SystemList{inner1, inner2});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_overlap");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->add(inner1);
+    ms->add(inner2);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg the dropped child is flat, the surviving child and the parent hold the same quantity */
+    double p1 = inner1->getTM()->getPosition(k.back().datetime, stk).number;
+    double p2 = inner2->getTM()->getPosition(k.back().datetime, stk).number;
+    double pp = ms->getTM()->getPosition(k.back().datetime, stk).number;
+    CHECK_GT(p1, 0.0);
+    CHECK_EQ(p2, 0.0);
+    CHECK_EQ(pp, doctest::Approx(p1));
+}
+
+/** @par Check point: the runMoment* entry (live) honours adjust-mode without a precomputed table */
+TEST_CASE("test_MultiSystem_adjust_mode_run_moment") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 30);
+
+    auto ms = std::make_shared<MultiSystem>("ms_adjust_mode_moment");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setAdjustMode("month");
+    auto sys = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    sys->setParam<bool>("buy_delay", false);
+    sys->setStock(stk);
+    ms->add(sys);
+    ms->setTO(k);
+    ms->readyForRun();
+
+    for (size_t i = 0; i < k.size(); ++i) {
+        ms->runMomentOnOpen(k[i].datetime);
+        ms->runMomentOnClose(k[i].datetime);
+    }
+
+    /** @arg only the first driven day of each month is declared, not every driven day */
+    const auto& dates = sys->getSG()->getCycleDates();
+    CHECK_GT(dates.size(), 0);
+    CHECK_LT(dates.size(), 5);
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {

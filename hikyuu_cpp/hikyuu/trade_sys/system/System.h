@@ -307,6 +307,7 @@ public:
 
     // Clear the existing trade requests, used by the aggregate system
     virtual void clearDelayBuyRequest();
+    virtual void clearDelaySellRequest();
 
     // Whether a delayed operation request currently exists, used by the aggregate system
     bool haveDelaySellRequest() const {

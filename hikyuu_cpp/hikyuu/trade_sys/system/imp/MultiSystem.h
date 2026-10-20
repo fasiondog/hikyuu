@@ -391,10 +391,8 @@ private:
      * the run-level input injected into the cycle signals of the sub-systems */
     void _buildCycleDates(const DatetimeList& axis);
 
-    /** Expand the adjust-mode table on the trading-object axis when _runAxis did not do it (the
-     * nested aggregate and the runMoment* entries), otherwise _isAdjustDate falls back to the daily
-     * counting and every driven day becomes a rebalancing day */
-    void _ensureAdjustDates();
+    /** The start of the adjust-mode period containing the date (Null for query/day) */
+    Datetime _periodStart(const Datetime& date) const;
 
     /** Declare one rebalancing day at the close stage and push it down to the sub-system signals.
      * It is a no-op for the days already pre-declared by _runAxis (the bulk backtest entry), and it
@@ -609,17 +607,20 @@ private:
     std::unordered_map<System*, size_t> m_sub_index;
     std::unordered_map<string, KData>
       m_kdata_cache;  // The instrument KData cache within the run query (runtime, not serialized)
-    Datetime m_kdata_cache_mark;  // The last-bar datetime the cache was built for: the cache is
-                                  // dropped as soon as the driving KData advances (live sessions
-                                  // reuse the same query while the data grows daily)
-    DatetimeList m_date_axis;     // The fixed time axis: the driving date table when
-                                  // axis-mode="calendar" (runtime state, not serialized)
-    DatetimeList m_cycle_dates;   // The rebalancing days declared so far, the run-level input
-                                  // injected into the sub-system signals (runtime state,
-                                  // not serialized)
-    Datetime m_last_close_date;   // The trading day of the last close-stage drive, used to
-                                  // advance the close-day counter once per day (runtime
-                                  // state, not serialized)
+    Datetime m_kdata_cache_mark;    // The last-bar datetime the cache was built for: the cache is
+                                    // dropped as soon as the driving KData advances (live sessions
+                                    // reuse the same query while the data grows daily)
+    DatetimeList m_date_axis;       // The fixed time axis: the driving date table when
+                                    // axis-mode="calendar" (runtime state, not serialized)
+    DatetimeList m_cycle_dates;     // The rebalancing days declared so far, the run-level input
+                                    // injected into the sub-system signals (runtime state,
+                                    // not serialized)
+    Datetime m_last_close_date;     // The trading day of the last close-stage drive, used to
+                                    // advance the close-day counter once per day (runtime
+                                    // state, not serialized)
+    Datetime m_last_adjust_period;  // The adjust-mode period of the last driven rebalancing day,
+                                    // used by the runtime period rule of the entries without a
+                                    // precomputed table (runtime state, not serialized)
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
                                         // zero hour of that day; when not empty it takes precedence
                                         // over m_adjust_cycle, runtime state, not serialized)
