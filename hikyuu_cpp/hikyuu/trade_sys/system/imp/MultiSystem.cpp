@@ -1908,11 +1908,28 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
     }
 
     // Include the parent's current holdings in the target set: an orphan position (held but no
-    // longer covered by any sub-system) is flattened to zero instead of lingering forever
+    // longer covered by any sub-system) is flattened to zero instead of lingering forever. Only
+    // the instruments of this aggregate's own sub-systems are in scope: under a shared parent
+    // account (mode C) the positions of the other children must not be treated as orphans
     {
         std::set<Stock> covered;
         for (const auto& s : suggestions) {
             covered.insert(s.stock);
+        }
+        std::set<Stock> own_stocks;
+        for (const auto& sys : m_sys_list) {
+            _collectLeafStocks(sys, own_stocks);
+        }
+        std::vector<PositionRecord> zero_targets;
+        for (const auto& stk : own_stocks) {
+            PositionRecord pos = m_tm->getPosition(datetime, stk);
+            if (pos.number > 0.0) {
+                zero_targets.push_back(pos);
+            }
+            PositionRecord short_pos = m_tm->getShortPosition(stk);
+            if (short_pos.number > 0.0) {
+                zero_targets.push_back(short_pos);
+            }
         }
         auto add_zero_target = [&](const PositionRecord& pos) {
             if (pos.stock.isNull() || covered.count(pos.stock) > 0) {
@@ -1931,10 +1948,7 @@ TradeRecordList MultiSystem::_closePhaseModeA(const Datetime& datetime, bool is_
             s.target_position_ratio = 0.0;
             suggestions.push_back(s);
         };
-        for (const auto& pos : m_tm->getPositionList()) {
-            add_zero_target(pos);
-        }
-        for (const auto& pos : m_tm->getShortPositionList()) {
+        for (const auto& pos : zero_targets) {
             add_zero_target(pos);
         }
     }

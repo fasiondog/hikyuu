@@ -2658,6 +2658,79 @@ TEST_CASE("test_MultiSystem_mode_a_partial_selection_orphan") {
     CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
 }
 
+class SelectAllSE : public SelectorBase {
+public:
+    explicit SelectAllSE(const SystemList& list) : SelectorBase("SelectAllSE"), m_list(list) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectAllSE>(m_list);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime) override {
+        SystemWeightList ret;
+        for (auto& sys : m_list) {
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+};
+
+/** @par Check point: the mode C children are mode-agnostic -- a nested mode A child applies its
+ * aggregate signal to the shared account and never flattens the sibling positions */
+TEST_CASE("test_MultiSystem_mode_c_composite_keeps_sibling_positions") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk1.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    // The leaf sibling buys and holds its own instrument on the shared account
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk1);
+    leaf->setParam<bool>("buy_delay", false);
+
+    // The nested mode A child aggregates a different instrument
+    auto inner_leaf =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    inner_leaf->setStock(stk2);
+    inner_leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_a");
+    inner->setMode("A");
+    inner->setSubInitCash(10000.0);
+    inner->add(inner_leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{leaf, inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_c_mixed");
+    ms->setTM(crtTM(Datetime(200001010000LL), 200000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->add(leaf);
+    ms->add(inner);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 2);
+
+    /** @arg the sibling instrument is never sold by the nested aggregate */
+    double sibling_sells = 0.0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.stock == stk1 && tr.business == BUSINESS_SELL) {
+            sibling_sells += tr.number;
+        }
+    }
+    CHECK_EQ(sibling_sells, 0.0);
+
+    /** @arg both the sibling holding and the nested aggregate's target are on the shared account */
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk1).number, 0.0);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk2).number, 0.0);
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {
