@@ -24,6 +24,46 @@ For multiple instruments (multiple securities), :class:`MultiSystem` can be used
    (a deliberate exception). With a shared account the sub-systems **compete for the same cash pool**
    (whoever is driven and fills first takes the cash), which mode B does not exhibit.
 
+Nested and mixed modes
+----------------------
+
+A sub-system may itself be a :class:`MultiSystem` (arbitrary depth). Two rules apply when nesting: the **outer mode decides the account topology** (which account the child gets), and the **inner mode decides how its own sub-systems are scheduled and selected**.
+
+.. list-table:: Outer mode x inner mode
+   :header-rows: 1
+   :widths: 14 30 30 26
+
+   * - Outer \\ Inner
+     - A (Signal Aggregation)
+     - B (Fund Allocation)
+     - C (Shared Account)
+   * - A
+     - The child gets a **dedicated shadow account** (initial ``set_sub_init_cash``); the inner layer runs on it as its parent account and executes its L2 net targets there; its leaves build their own shadows
+     - The child gets a **dedicated shadow account**; the inner layer runs its L1 quota on it (quota = weight x the account net assets) and its leaves build quota accounts
+     - The leaves of the inner C share that **dedicated shadow account** (not the outer real account)
+   * - B
+     - The child gets a **dedicated quota account** (starting from zero); the outer injects the quota first, then the inner executes its L2 net targets on it
+     - The child gets a **dedicated quota account** (starting from zero); after the outer injection the inner runs its own quota allocation for its leaves (nested quotas)
+     - The leaves of the inner C share that **dedicated quota account**
+   * - C
+     - **No dedicated account**: the inner uses the shared account as its parent account and executes "weight x shadow net exposure ratio x the shared net assets" directly on it; the orphan / zero targets are limited to its own subtree instruments
+     - quota = weight x the shared net assets; the injections / reductions act on the shared account; several children compete for the same cash pool and the holdings are not attributable per child
+     - All levels share the same account (a deeper legacy Portfolio)
+
+**Key points**
+
+- **Account ownership**: an A/B aggregate requires an "exclusive book" -- the outer layer creates a dedicated shadow/quota account for it. Mode C hands the parent account directly to the child (shared semantics). Therefore, with A/B under C the child's "parent account" is the shared account: both the A net asset base and the B quota base are the shared net assets, and several children compete for the same cash pool -- control each size explicitly with the SE weights.
+- **The parent only records the mirror**: an A/B outer layer mirrors the **trades** of the inner layer onto its own real account (B also calibrates the quota); the children of a C outer layer trade directly on the shared account, the parent never orders again.
+- **Two-book matching**: the mode B invariant "shadow book = parent book" holds only with a dedicated account; on a shared account (C) the holdings are not attributable per child.
+- **Liquidation semantics**: ``sell_at_not_selected`` only applies to its own layer. In B, when unselected: ``True`` clears both the parent and the shadow book together; ``False`` keeps both books running (only the quota calibration of the round is skipped). In C, when a child leaves the pool: ``True`` recursively clears the internal books of the subtree and drops the queued mirror batch; ``False`` keeps the child books frozen (matching the untracked holding that stays on the shared account).
+- **Cycle and rebalancing cadence**: the outer pre-injection only covers the own SG of the direct sub-systems (a composite has no SG); the inner A/B layers declare the cycle days at runtime on their own rebalancing days. An inner layer counts **driven days**: when the outer B skips it (``False``) or the outer C does not admit it, its counter does not advance, so an inner ``adjust_cycle=N`` means "every N driven days". Without a precomputed table (nested / live) the runtime period rule applies (the N-th calendar day of the period; with ``delay_to_trading_day`` postponed to the first driven day of the period), so a single-bar live feed is handled correctly.
+- **Unadmitted nested aggregates**: not driven, no cycle day declared, no trading (expected).
+- **Overlapping instruments across children**: in B the parent sell of an unselected liquidation/reduction is capped by the **child own book holding**; on the shared account (C) the holdings are not attributable.
+- **SE and warnings**: every layer has its own SE; without an SE in mode C only the **direct** cycle SGs stay silent with a one-time warning (nested aggregates are handled by their own modes).
+- **Cascade example**: ``C -> B -> A`` means a quota sub-portfolio B under a shared account, with a signal-aggregation sub-portfolio A inside; A's shadow only serves the B sampling, the B mirror lands directly on the shared account, and the outer C surfaces it without ordering again.
+
+The SE, ``sell_at_not_selected``, rebalancing cadence and cycle-day declarations of each layer are independent and never inherited.
+
 Aggregated backtesting also supports:
 
 - **AF L1/L2/L3 layering** (see :doc:`../trade_portfolio/allocate_funds` for details): L1 performs system-level allocation (nominal weights in mode A / real quotas in mode B; e.g. equal weight 1/N, fixed weights, weighted by the SE score), L2 performs behavior-level conversion (in A it reads the sub-system's current intent state and synthesizes the **signed net target** per instrument as weight x net ratio x the parent net assets, rebalancing by the delta with the long/short netting out; in B the instructions pass through), and L3 provides portfolio risk control (the concentration limit ``max-single-position``, <=0 means no limit, the default 1.0 caps a single instrument at the total assets; skipped in mode B/C).

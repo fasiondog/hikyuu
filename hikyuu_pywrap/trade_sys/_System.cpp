@@ -587,6 +587,8 @@ Running modes (held by the aggregate system itself, set via set_mode or the pres
 
 - Mode C "Shared Account Compatibility" (the legacy Portfolio behavior): no shadow account is created, every sub-system trades DIRECTLY on the single real account of the top layer (shared_tm) and is sized by its own MM; the parent only gates the entry with the SE, keeps the running set driven day by day so that a sell signal is realized on the very day it occurs, and performs no L2 conversion. It exists to reproduce the results of the Portfolio before the refactoring.
 
+Nested modes: the outer mode decides the account topology of a nested aggregate (A: a dedicated shadow account, B: a dedicated quota account, C: the shared parent account) and the inner mode decides how its own sub-systems are scheduled; the SE, sell_at_not_selected, rebalancing cadence and cycle-day declarations of each layer are independent.
+
 Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for details):
 
 - L1 system-level allocation: decide "how much each sub-system may manage" (the nominal weight in mode A / the real quota written into the context in mode B);

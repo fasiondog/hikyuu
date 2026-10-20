@@ -17,6 +17,8 @@
 
    组合的执行范式由 :class:`MultiSystem` 自身持有的**运行模式**决定（经 ``set_mode`` 设定），三个工厂对应三种模式：
 
+   PF 工厂只设定**顶层**模式；子系统可再嵌套任意模式的 :class:`MultiSystem`。嵌套时的账户拓扑、清仓语义与调仓节拍见 :doc:`../trade_sys/system` 的「模式嵌套与混搭」。
+
    .. list-table::
       :header-rows: 1
 

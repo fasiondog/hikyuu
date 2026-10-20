@@ -19,6 +19,10 @@ In Hikyuu, a portfolio is organized around system strategies as its units; for e
    The execution paradigm of a portfolio is decided by the **running mode** owned by the
    :class:`MultiSystem` (set via ``set_mode``), and the three factories map onto the three modes:
 
+   The PF factories only set the **top-level** mode; a sub-system may nest a :class:`MultiSystem`
+   of any mode. See "Nested and mixed modes" in :doc:`../trade_sys/system` for the account
+   topology, the liquidation semantics and the rebalancing cadence under nesting.
+
    .. list-table::
       :header-rows: 1
 
