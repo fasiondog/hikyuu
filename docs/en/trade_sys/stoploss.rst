@@ -32,7 +32,7 @@ Fixed Percentage Stop-loss
 Technical Indicator Stop-loss
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. py:function:: ST_Indicator(op[, kpart="CLOSE"])
+.. py:function:: ST_Indicator(ind)
 
     Use a technical indicator as the stop-loss level. For example, use the 10-day EMA::
     

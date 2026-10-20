@@ -32,7 +32,7 @@
 技术指标止损
 ^^^^^^^^^^^^
 
-.. py:function:: ST_Indicator(op[, kpart="CLOSE"])
+.. py:function:: ST_Indicator(ind)
 
     使用技术指标作为止损价。如使用10日EMA作为止损：::
     
