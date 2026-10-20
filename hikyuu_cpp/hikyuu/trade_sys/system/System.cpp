@@ -227,7 +227,7 @@ void System::reset() {
 }
 
 void System::forceResetAll() {
-    if (m_tm)
+    if (m_tm && !getParam<bool>("shared_tm"))
         m_tm->reset();
     if (m_ev)
         m_ev->reset();

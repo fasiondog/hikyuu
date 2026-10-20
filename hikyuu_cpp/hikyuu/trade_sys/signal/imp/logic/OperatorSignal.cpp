@@ -25,9 +25,11 @@ OperatorSignal::OperatorSignal(const string& name, const SignalPtr& sg1, const S
     if (sg2) {
         m_sg2 = sg2->clone();
     }
-    // The cycle attribute stays consistent with the child signals: if either side is cycle-driven,
-    // the combined signal must itself be driven by startCycle
+    // A cycle child is a scheduled entry: the combined signal inherits both the cycle marker and
+    // the non-alternating behavior (a cycle signal never alternates), otherwise the later
+    // rebalancing buys would be silently dropped by the alternation of the combination
     if ((m_sg1 && m_sg1->getParam<bool>("cycle")) || (m_sg2 && m_sg2->getParam<bool>("cycle"))) {
+        setParam<bool>("alternate", false);
         setParam<bool>("cycle", true);
     }
 }
@@ -45,19 +47,26 @@ void OperatorSignal::_reset() {
 
 void OperatorSignal::sub_sg_calculate(SignalPtr& sg, const KData& kdata) {
     HKU_IF_RETURN(!sg, void());
-    if (sg->getParam<bool>("cycle")) {
-        // A cycle sub-signal is driven by startCycle within its own cycle window only
-        HKU_IF_RETURN(m_cycle_end.isNull(), void());
-        sg->setTO(m_kdata);
-        sg->startCycle(m_cycle_start, m_cycle_end);
-        return;
-    }
     if (dynamic_cast<ManualSignal*>(sg.get())) {
         // A manual sub-signal holds pre-seeded signals; its empty _calculate keeps them intact
         sg->_calculate(kdata);
         return;
     }
     sg->setTO(kdata);
+}
+
+void OperatorSignal::setCycleDates(const DatetimeList& dates) {
+    // The declared rebalancing days belong to the whole composition: forward them to the cycle
+    // children first, so that a cycle child (e.g. SG_Cycle) takes part in the single full-range
+    // calculation. A manual sub-signal holds the pre-seeded signals, they must not be cleared by a
+    // recalculation; a non-cycle child does not consume the days at all
+    if (m_sg1 && m_sg1->getParam<bool>("cycle") && !dynamic_cast<ManualSignal*>(m_sg1.get())) {
+        m_sg1->setCycleDates(dates);
+    }
+    if (m_sg2 && m_sg2->getParam<bool>("cycle") && !dynamic_cast<ManualSignal*>(m_sg2.get())) {
+        m_sg2->setCycleDates(dates);
+    }
+    SignalBase::setCycleDates(dates);
 }
 
 void OperatorSignal::sub_merged_calculate(const KData& kdata, const MergedEmitFunc& emit) {

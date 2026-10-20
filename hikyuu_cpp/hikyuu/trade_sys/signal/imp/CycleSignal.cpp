@@ -14,24 +14,31 @@ BOOST_CLASS_EXPORT(hku::CycleSignal)
 namespace hku {
 
 CycleSignal::CycleSignal() : SignalBase("SG_Cycle") {
-    setParam<bool>("cycle", true);
     setParam<bool>("alternate", false);
+    setParam<bool>("cycle", true);
 }
 
 void CycleSignal::_checkParam(const string& name) const {
     if ("cycle" == name) {
         bool cycle = getParam<bool>(name);
         HKU_CHECK(cycle, "param cycle must be true!");
-    } else if ("alternate" == name) {
-        bool alternate = getParam<bool>("alternate");
-        HKU_CHECK(!alternate, "param alternate must be false!");
     }
+    // alternate is not validated here: the base class coerces it back to false for any cycle
+    // signal, so the invariant holds without leaving the parameter in a rejected state
 }
 
 void CycleSignal::_calculate(const KData& kdata) {
-    // A cycle signal is driven by startCycle only; without a valid cycle window it emits nothing
-    HKU_IF_RETURN(getCycleStart().isNull() || getCycleEnd().isNull(), void());
-    _addBuySignal(getCycleStart());
+    // A cycle signal only consumes the declared rebalancing days; it never derives them by itself
+    size_t total = kdata.size();
+    HKU_IF_RETURN(total == 0, void());
+
+    const Datetime& first = kdata[0].datetime;
+    const Datetime& last = kdata[total - 1].datetime;
+    for (const auto& date : getCycleDates()) {
+        if (date >= first && date <= last) {
+            _addBuySignal(date);
+        }
+    }
 }
 
 SignalPtr HKU_API SG_Cycle() {

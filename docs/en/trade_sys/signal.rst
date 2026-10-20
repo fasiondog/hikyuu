@@ -9,7 +9,7 @@ A signal generator (SG) produces the buy and sell signals used by a trading syst
 Common parameters:
 
     * **alternate** *(bool|True)* : Whether buy and sell signals must alternate. Single-line generators typically derive their signals from curve inflection points, slope changes, and similar rules, so they can emit several consecutive buy signals or several consecutive sell signals; this parameter forces the two to alternate. Two-line crossover generators already alternate buys and sells by construction, in which case this parameter has no effect.
-    * **cycle** *(bool|False)* : Use together with a PF: signals are evaluated only on the PF rebalance cycle
+    * **cycle** *(bool|False)* : Marks the signal as consuming the rebalancing days injected by a MultiSystem (e.g. SG_Cycle); it no longer changes the calculation range -- the signal is always calculated once over the whole KData, so it stays stable within the backtest. A cycle signal is a scheduled signal: ``cycle=true`` and ``alternate=true`` are mutually exclusive, setting cycle forces alternate to false (with a warning); a combination that contains a cycle child inherits both the cycle marker and ``alternate=False``, so the later cycle buys are not dropped by the alternation rule. Modes A/B inject the whole run before it starts, while mode C declares the start day when a sub-system is admitted (an already running sub-system is not re-declared, keeping the legacy Portfolio semantics). Only the signals with ``cycle=true`` consume the days; the plain signals are neither affected nor recalculated by a declaration. Note that a cycle buy is a scheduled entry / re-entry of the sub-system (the first entry, after its own exit, or after the SE dropped it and its shadow was cleared), not a portfolio-level rebalancing action -- the portfolio rebalancing is done by the SE/AF. When the sub-system already holds, whether a cycle buy adds to the position depends on the MM (e.g. MM_Nothing cannot trade again once the cash is used up)
     * **support_borrow_stock** *(bool|False)* : Allow short-sale signals to be emitted
 
 
@@ -87,7 +87,7 @@ When technical indicators are used to decide entries and exits, the rule almost 
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
                 <td>PF rebalance cycle buy signal generator</td>
-                <td>A special SG for use with a PF, treating the PF rebalance cycle as its buy signals</td>
+                <td>A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run</td>
             </tr>
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
@@ -239,7 +239,8 @@ PF Rebalance Cycle Buy Signal Generator
 
 .. py:function:: SG_Cycle()
 
-    A special SG for use with a PF, treating the PF rebalance cycle as its buy signals.
+    A special SG that emits a buy signal on the rebalancing days injected by a MultiSystem before the run; it stays silent when no day is injected.
+    A custom Python cycle signal can read the injected days in ``_calculate`` via ``get_cycle_dates()``.
 
 
 Custom Signal Generator

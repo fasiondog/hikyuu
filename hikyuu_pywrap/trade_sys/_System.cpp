@@ -583,7 +583,7 @@ Running modes (held by the aggregate system itself, set via set_mode or the pres
 
 - Mode A "Signal Aggregation" (the default): every sub-system gets a shadow account funded with set_sub_init_cash as a pure signal source (the signal cash is never reset, the shadows run continuously); the parent converts the suggestions into the executable quantity by the AF L2 target conversion (weight x position ratio x the parent net assets, aggregated per instrument) and orders uniformly on its own account. The shadow bookkeeping never touches the real funds.
 
-- Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account.
+- Mode B "Fund Allocation" (quota allocation, FOF/MOM style): every selected sub-system is calibrated to the quota allocated by the AF L1 on the rebalancing day BEFORE it is driven (recycle the shadow cash, reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts start from zero and follow the cost function of the parent account. The quota cash is a virtual budget: the injections only credit the sub ledger (the parent TM is never debited), and the injections of one rebalancing day are cumulatively capped by the parent's remaining cash, so the mirrored buys stay fundable and the two books stay matched. With sell_at_not_selected the unselected sub-systems (and the parent holdings) are cleared together; otherwise both books keep running.
 
 - Mode C "Shared Account Compatibility" (the legacy Portfolio behavior): no shadow account is created, every sub-system trades DIRECTLY on the single real account of the top layer (shared_tm) and is sized by its own MM; the parent only gates the entry with the SE, keeps the running set driven day by day so that a sell signal is realized on the very day it occurs, and performs no L2 conversion. It exists to reproduce the results of the Portfolio before the refactoring.
 
@@ -724,7 +724,10 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
            "filtering)")
       .def_property_readonly("se", &MultiSystem::getSE, "The trading object selector")
       .def("set_sell_at_not_selected", &MultiSystem::setSellAtNotSelected, py::arg("on"),
-           "Set whether to force liquidating the unselected sub-systems (SE is required)")
+           "Set whether to force liquidating the unselected sub-systems together with their "
+           "shadow/quota accounts (mode B/C; SE is required). In mode B the two books must stay "
+           "matched, so with the default off the unselected sub-systems keep running and only skip "
+           "the quota calibration")
       .def("get_adjust_turnover", &MultiSystem::getAdjustTurnover,
            "Get the turnover rate of every rebalancing day (a list of (date, turnover amount / "
            "total assets))")

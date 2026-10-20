@@ -194,9 +194,7 @@ public:
     }
 
     /** Set the rebalancing cycle (days); <=1 means rebalancing on every close day */
-    void setAdjustCycle(int cycle) {
-        m_adjust_cycle = cycle > 0 ? cycle : 1;
-    }
+    void setAdjustCycle(int cycle);
 
     /** Get the rebalancing cycle (days) */
     int getAdjustCycle() const {
@@ -224,7 +222,9 @@ public:
         return m_se;
     }
 
-    /** Set whether to force liquidating the unselected sub-systems (sell_at_not_selected) */
+    /** Set whether to force liquidating the unselected sub-systems together with their accounts
+     *  (mode B/C only; mode A flattens the unselected instruments by the zero-target rebalancing)
+     */
     void setSellAtNotSelected(bool v) {
         m_sell_at_not_selected = v;
     }
@@ -268,11 +268,9 @@ public:
     }
 
     /** Set whether to postpone to the first trading day within the current cycle when the
-     * rebalancing day is not a trading day (it takes effect only when week/month/quarter/year are
-     * expanded) */
-    void setDelayToTradingDay(bool v) {
-        setParam<bool>("delay-to-trading-day", v);
-    }
+     *  rebalancing day is not a trading day (it takes effect only when week/month/quarter/year are
+     *  expanded) */
+    void setDelayToTradingDay(bool v);
 
     /** Get whether to postpone to the trading day */
     bool getDelayToTradingDay() const {
@@ -297,9 +295,7 @@ public:
 
     /** Set the fixed time axis (it is used as the driving axis only when axis-mode == "calendar";
      * when the axis is empty it falls back to the kdata axis with a warning) */
-    void setDateAxis(const DatetimeList& dates) {
-        m_date_axis = dates;
-    }
+    void setDateAxis(const DatetimeList& dates);
 
     /** Get the fixed time axis */
     const DatetimeList& getDateAxis() const {
@@ -308,9 +304,7 @@ public:
 
     /** Clear the fixed time axis (after clearing, the calendar mode falls back to the kdata axis)
      */
-    void clearDateAxis() {
-        m_date_axis.clear();
-    }
+    void clearDateAxis();
 
     /** Set the external rebalancing day table (when it is not empty it takes precedence as the
      * rebalancing day criterion, used to map the master adjust_mode =
@@ -325,10 +319,8 @@ public:
     }
 
     /** Clear the external rebalancing day table (after clearing it falls back to the close-day
-     * counting judgment of m_adjust_cycle) */
-    void clearAdjustDates() {
-        m_adjust_dates.clear();
-    }
+     *  counting judgment of m_adjust_cycle) */
+    void clearAdjustDates();
 
     /** The mode B quota write-back (written into the sub-system virtual account for the next
      * period; the aggregate sub-system penetrates automatically) */
@@ -395,14 +387,32 @@ private:
      * (m_adjust_dates is empty), the result is written into m_auto_adjust_dates. */
     void _expandAdjustDates(const DatetimeList& axis);
 
-    /** master compatibility: build the rebalancing-day -> cycle-end (the next rebalancing day)
-     * mapping on the driving axis, used to drive the cycle-type signals (e.g. SG_Cycle) of the
-     * sub-systems on the rebalancing day */
-    void _buildCycleEnds(const DatetimeList& axis);
+    /** Build the rebalancing-day list on the given driving axis and merge it into m_cycle_dates,
+     * the run-level input injected into the cycle signals of the sub-systems */
+    void _buildCycleDates(const DatetimeList& axis);
 
-    /** Get the cycle end (the next rebalancing day) of the given rebalancing day; when the day is
-     * not in the mapping, fall back to the next day */
-    Datetime _getNextCycleEnd(const Datetime& date) const;
+    /** Expand the adjust-mode table on the trading-object axis when _runAxis did not do it (the
+     * nested aggregate and the runMoment* entries), otherwise _isAdjustDate falls back to the daily
+     * counting and every driven day becomes a rebalancing day */
+    void _ensureAdjustDates();
+
+    /** Declare one rebalancing day at the close stage and push it down to the sub-system signals.
+     * It is a no-op for the days already pre-declared by _runAxis (the bulk backtest entry), and it
+     * is what serves the runMoment* / intraday live / nested entries, which have no precomputed
+     * axis */
+    void _declareCycleDate(const Datetime& date);
+
+    /** Clear the declared rebalancing days (a rebalancing configuration changed) and retract them
+     * from the sub-system signals */
+    void _clearCycleDates();
+
+    /** Inject the rebalancing days into the sub-system signals. Modes A/B declare the whole run in
+     * advance; mode C declares the start day on admission instead */
+    void _injectCycleDates();
+
+    /** Get the nominal cycle end (the next rebalancing day) of the given day; when the day is not
+     * in the list, fall back to the next day */
+    Datetime _getCycleEnd(const Datetime& date) const;
 
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): reduce the over quota
      * position of the sub-system (the sub book sells on its own and the parent sells the same
@@ -413,10 +423,10 @@ private:
                                  KQuery::KType ktype, TradeRecordList& out_executed);
 
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): inject the cash gap when the
-     * sub-system is below the quota (limited by the free cash of the parent pool). It runs in the
-     * injection phase after the reduction phase. */
-    void _injectSubSystemGap(const SystemPtr& sys, const Datetime& date, price_t quota,
-                             KQuery::KType ktype);
+     * sub-system is below the quota (limited by the remaining free cash of the parent pool). It
+     * runs in the injection phase after the reduction phase. Returns the injected amount. */
+    price_t _injectSubSystemGap(const SystemPtr& sys, const Datetime& date, price_t quota,
+                                KQuery::KType ktype, price_t parent_cash_limit);
 
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): clear the sub-system shadow
      * account (force selling its holdings and recycling the cash); the parent account holding is
@@ -537,8 +547,10 @@ private:
                                               // L1/L2/L3), owned by the aggregate system
     string m_mode{"A"};  // The running mode ("A"/"B"/"C"), owned by the aggregate system itself
     std::shared_ptr<SelectorBase> m_se;  // The trading object selector (optional)
-    bool m_sell_at_not_selected{false};  // Whether to force liquidating the unselected sub-systems
-                                         // (it takes effect only after SE is set)
+    // Whether to force liquidating the unselected sub-systems together with their accounts (mode
+    // B/C only, requires SE; mode A ignores it -- the unselected instruments are flattened by the
+    // zero-target rebalancing)
+    bool m_sell_at_not_selected{false};
     std::vector<std::pair<Datetime, double>>
       m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
                           // assets before rebalancing)
@@ -580,21 +592,26 @@ private:
     Datetime m_kdata_cache_mark;  // The last-bar datetime the cache was built for: the cache is
                                   // dropped as soon as the driving KData advances (live sessions
                                   // reuse the same query while the data grows daily)
-    DatetimeList m_date_axis;           // The fixed time axis: the driving date table when
-                                        // axis-mode="calendar" (runtime state, not serialized)
+    DatetimeList m_date_axis;     // The fixed time axis: the driving date table when
+                                  // axis-mode="calendar" (runtime state, not serialized)
+    DatetimeList m_cycle_dates;   // The rebalancing days declared so far, the run-level input
+                                  // injected into the sub-system signals (runtime state,
+                                  // not serialized)
+    Datetime m_last_close_date;   // The trading day of the last close-stage drive, used to
+                                  // advance the close-day counter once per day (runtime
+                                  // state, not serialized)
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
                                         // zero hour of that day; when not empty it takes precedence
                                         // over m_adjust_cycle, runtime state, not serialized)
     std::set<Datetime>
       m_auto_adjust_dates;  // The rebalancing day table auto-expanded by adjust-mode (runtime
                             // state, not serialized, does not override the external injection)
-    std::map<Datetime, Datetime>
-      m_cycle_ends;  // The rebalancing-day -> cycle-end (the next rebalancing day) mapping, used by
-                     // the cycle-type signal driving (runtime state, rebuilt with each run)
     bool m_short_reduce_warned{false};  // The once-per-instance flag of the net-short quota
                                         // reduction skip warning (runtime state, not serialized)
     bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota
                                         // injection skip warning (runtime state, not serialized)
+    bool m_no_se_cycle_warned{false};   // The once-per-instance flag of the mode C without SE cycle
+                                        // silence warning (runtime state, not serialized)
 
 //========================================
 // Serialization support

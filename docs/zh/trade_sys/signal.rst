@@ -9,7 +9,7 @@
 公共参数：
 
     * **alternate** *(bool|True)* ：买入和卖出信号是否交替出现。单线型的信号通常通过拐点、斜率等判断信号的产生，此种情况下可能出现连续出现买入信号或连续出现卖出信号的情况，此时可通过该参数控制买入、卖出信号是否交替出现。而双线交叉型的信号通常本身买入和卖出已经是交替出现，此时该参数无效。
-    * **cycle** *(bool|False)* : 配合 PF, 仅在PF调仓周期内计算
+    * **cycle** *(bool|False)* : 标记该信号依赖 MultiSystem 注入的调仓日（如 SG_Cycle），不再改变计算范围：信号始终按完整 K 线数据一次性计算，回测期内结果保持不变。周期信号是计划性信号，``cycle=true`` 与 ``alternate=true`` 互斥，设置 cycle 时 alternate 会被强制为 false（并给出告警）；组合运算中只要包含周期子信号，组合结果同样继承 cycle 标记与 alternate=False，避免后续调仓日的买入被交替规则丢弃。模式 A/B 在运行前注入整段调仓日，模式 C 在子系统入选日声明（已运行的系统不再重复声明，沿用 legacy Portfolio 语义）。仅 ``cycle=true`` 的信号会消费这些调仓日，普通信号不受影响、也不会因声明而重算。注意：周期买入是子系统的“计划入场/再入场”信号（首次建仓、自身平仓后、被 SE 取消选中清仓后再入选），不是组合层调仓动作；组合层调仓由 SE/AF 完成。已持仓时周期买入能否加仓取决于 MM（如 MM_Nothing 在现金用尽后不会再成交）。
     * **support_borrow_stock** *(bool|False)* : 支持发出空头信号
 
 
@@ -87,7 +87,7 @@
             <tr>
                 <td><a href="#target-section">SG_Cycle</a></td>
                 <td>PF调仓周期买入信号指示器</td>
-                <td>一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号</td>
+                <td>一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号</td>
             </tr>
             <tr>
                 <td>SG_Add<br>SG_Mul<br>SG_Sub<br>SG_Div</td>
@@ -239,7 +239,8 @@ PF调仓周期买入信号指示器
 
 .. py:function:: SG_Cycle()
     
-    一个特殊的SG，配合PF使用，以 PF 调仓周期为买入信号
+    一个特殊的SG，在 MultiSystem 运行前注入的调仓日产生买入信号；未注入调仓日时保持静默。
+    Python 自定义周期信号可在 ``_calculate`` 中通过 ``get_cycle_dates()`` 读取注入的调仓日。
 
 
 自定义信号指示器
