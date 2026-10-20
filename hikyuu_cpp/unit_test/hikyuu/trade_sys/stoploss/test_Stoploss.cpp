@@ -184,6 +184,28 @@ TEST_CASE("test_Stoploss_setTO_reset_before_calculate") {
     CHECK_EQ(p->count(), static_cast<int>(k2.size()));
 }
 
+/** @arg reset drops the calculated flag, so a later setTO recomputes instead of early-returning
+ * into a "calculated but no data" state (SL10) */
+TEST_CASE("test_Stoploss_reset_clears_calculated") {
+    StockManager &sm = StockManager::instance();
+    KData k = sm.getStock("sz000001").getKData(KQuery(0, 10));
+    CHECK_UNARY(!k.empty());
+
+    auto st = ST_FixedPercent(0.01);
+    st->setTO(k);
+    CHECK_UNARY(std::isfinite(st->getPrice(k[0].datetime, k[0].closePrice)));
+
+    // reset() must clear the calculated flag. Otherwise setTO(empty) could early-return (KData
+    // equality treats two empty stocks as equal) and leave a stale "calculated but no data" state,
+    // and a following real setTO would be skipped.
+    st->reset();
+    st->setTO(KData());
+    st->setTO(k);
+    for (size_t i = 0; i < k.size(); ++i) {
+        CHECK_UNARY(std::isfinite(st->getPrice(k[i].datetime, k[i].closePrice)));
+    }
+}
+
 /** @arg clone copies m_kdata and the subclass cache, so the clone is directly usable; setTO always
  * recalculates (lazy recalculation), with the same or a different KData alike */
 TEST_CASE("test_Stoploss_clone_preserves_cache") {

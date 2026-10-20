@@ -39,6 +39,7 @@ void StoplossBase::reset() {
     m_kdata = Null<KData>();
     m_tm.reset();
     _reset();
+    m_calculated = false;
 }
 
 StoplossPtr StoplossBase::clone() {
