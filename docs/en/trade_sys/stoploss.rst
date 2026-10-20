@@ -55,7 +55,7 @@ Alexander Elder Safety Zone Stop-loss
 
     :param int n1: the lookback window used to calculate the average noise, defaults to 10 days
     :param int n2: number of days over which the highest preliminary stop-loss value is taken, defaults to 3
-    :param double p: the noise coefficient, defaults to 2
+    :param double p: the noise coefficient, defaults to 2; it must be finite and > 0, otherwise the creation throws (p <= 0 puts the stop-loss line above the price, a NaN p filters out every bar and silently disables the stop-loss)
     :return: the stop-loss/take-profit strategy instance
     
 

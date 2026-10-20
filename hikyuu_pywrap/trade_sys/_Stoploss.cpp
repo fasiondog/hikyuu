@@ -200,6 +200,6 @@ The system still skips a long buy when the level is not lower than the planned b
 
     :param int n1: the lookback time window for calculating the average noise, defaulting to 10 days
     :param int n2: take the highest value within the n2 days for the preliminary stop line, defaulting to 3
-    :param double p: the noise coefficient, defaulting to 2
+    :param double p: the noise coefficient, defaulting to 2; it must be finite and greater than 0, otherwise the creation raises an exception
     :return: the stop-loss/take-profit strategy instance)");
 }
