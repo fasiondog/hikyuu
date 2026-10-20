@@ -437,6 +437,16 @@ private:
      * covers all of its leaf instruments) and push the executed trades */
     void _liquidateParent(const SystemPtr& sys, const Datetime& date, TradeRecordList& out);
 
+    /** Sell the holdings of the sub-system own ledger and recycle its cash (no recursion) */
+    void _clearSubSystemLedger(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
+
+    /** Clear the internal ledgers of a removed sub-system subtree (mode C removal): the accounts
+     * sharing the parent account are skipped, they are cleared by the parent own sells */
+    void _clearSubSystemAccounts(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
+
+    /** Drop the suggestions queued for the next open (the sub-system leaves the driving scope) */
+    void _discardOpenPending(const string& reason);
+
     /** Mode B: reduce a composite sub-system above its quota pro rata over its leaf holdings and
      * mirror the sells on the parent account */
     void _reduceCompositeToQuota(const SystemPtr& sys, const Datetime& date,

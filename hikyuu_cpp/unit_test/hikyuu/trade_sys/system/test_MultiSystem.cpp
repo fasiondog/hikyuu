@@ -2798,6 +2798,80 @@ TEST_CASE("test_MultiSystem_mode_b_composite_unselected_clear") {
     CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
 }
 
+/** @par Check point: the removal of a composite from the mode C running pool clears its internal
+ * ledgers (a nested mode B child) and drops the pending mirror batch */
+TEST_CASE("test_MultiSystem_mode_c_removed_composite_clears_internal_books") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 6);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_b_removed");
+    inner->setMode("B");
+    inner->setParam<bool>("trade_on_close", false);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectFirstCallOnlySE>(SystemList{inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_c_removed");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("C");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->add(inner);
+    ms->run(k);
+    REQUIRE_EQ(ms->getSystemList().size(), 1);
+
+    /** @arg the internal leaf ledger and the shared account are both flat after the removal */
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a composite above its quota is reduced pro rata and the parent mirrors the
+ * sells (the quota is shrunk between the two runs) */
+TEST_CASE("test_MultiSystem_mode_b_composite_over_quota_reduction") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query1(Datetime(19991110), Datetime(20000120));
+    KQuery query2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(query1);
+    KData k2 = stk.getKData(query2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    auto inner = std::make_shared<MultiSystem>("inner_a_reduce");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->add(leaf);
+
+    auto se = std::make_shared<SelectAllSE>(SystemList{inner});
+
+    auto ms = std::make_shared<MultiSystem>("ms_mode_b_reduce");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->add(inner);
+    ms->run(k1);
+
+    double pos1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg a shrunk quota reduces the composite holding and the parent mirrors it */
+    ms->setAF(AF_FixedAmount(1000.0));
+    ms->run(k2, false);
+    double pos2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(pos2, pos1);
+    CHECK_EQ(pos2, doctest::Approx(parent2));
+}
+
 /** @par Check point: a nested aggregate / runMoment* entry expands the adjust-mode table, so the
  * inner rebalancing is not degraded to every driven day */
 TEST_CASE("test_MultiSystem_nested_adjust_mode") {

@@ -709,6 +709,46 @@ price_t MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& d
 }
 
 void MultiSystem::_clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype) {
+    HKU_IF_RETURN(!sys, void());
+    if (sys->isComposite()) {
+        for (const auto& child : sys->getSubSystemList()) {
+            _clearSubSystem(child, date, ktype);
+        }
+    }
+    if (auto* ms = dynamic_cast<MultiSystem*>(sys.get())) {
+        ms->_discardOpenPending("the sub-system is cleared");
+    }
+    _clearSubSystemLedger(sys, date, ktype);
+}
+
+void MultiSystem::_clearSubSystemAccounts(const SystemPtr& sys, const Datetime& date,
+                                          KQuery::KType ktype) {
+    HKU_IF_RETURN(!sys, void());
+    if (sys->isComposite()) {
+        for (const auto& child : sys->getSubSystemList()) {
+            _clearSubSystemAccounts(child, date, ktype);
+        }
+    }
+    if (auto* ms = dynamic_cast<MultiSystem*>(sys.get())) {
+        ms->_discardOpenPending("the sub-system is removed");
+    }
+    TMPtr tm = sys->getTM();
+    if (tm && tm == m_tm) {
+        return;  // the shared account itself is cleared by the parent own sells
+    }
+    _clearSubSystemLedger(sys, date, ktype);
+}
+
+void MultiSystem::_discardOpenPending(const string& reason) {
+    HKU_IF_RETURN(m_open_pending_suggestions.empty(), void());
+    HKU_WARN("{}: discard {} suggestion(s) queued for the next open ({})", name(),
+             m_open_pending_suggestions.size(), reason);
+    m_open_pending_suggestions.clear();
+    m_open_pending_date = Datetime();
+}
+
+void MultiSystem::_clearSubSystemLedger(const SystemPtr& sys, const Datetime& date,
+                                        KQuery::KType ktype) {
     TMPtr sub_tm = sys->getTM();
     HKU_WARN_IF_RETURN(!sub_tm, void(), "Sub system has no trade manager! {}", sys->name());
 
@@ -2407,6 +2447,10 @@ void MultiSystem::_closePhaseModeC(const Datetime& datetime, bool is_adjust,
     }
     for (auto& sys : will_remove) {
         _removeFromRunning(sys);
+        // The internal ledgers of the removed subtree stop being driven: clear them now, otherwise
+        // they would linger with stale positions and a pending batch (the parent shared holding is
+        // handled by the force-sell pool)
+        _clearSubSystemAccounts(sys, datetime, m_kdata.getQuery().kType());
     }
 
     // The admitted ones enter the pool (in the SE order) and ONLY the new ones get the cycle start
