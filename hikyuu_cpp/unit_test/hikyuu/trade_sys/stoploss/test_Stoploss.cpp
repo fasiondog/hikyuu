@@ -347,7 +347,9 @@ TEST_CASE("test_Stoploss_invalid_hook_result_is_null") {
     CHECK_EQ(st->getShortPrice(datetime, 10.0), 9.5);
 }
 
-/** @arg clone keeps its own result cache independent of the source (ST-007) */
+/** @arg clone carries no result cache; after its own setTO it computes an independent result that does
+ * not leak from the source's recomputation (ST-007). A standalone clone must be set before use,
+ * consistent with the "clone copies only configuration" contract (SL11) */
 TEST_CASE("test_Stoploss_indicator_clone_independent") {
     StockManager &sm = StockManager::instance();
     KData k1 = sm.getStock("sz000001").getKData(KQuery(0, 10));
@@ -358,9 +360,15 @@ TEST_CASE("test_Stoploss_indicator_clone_independent") {
     auto st = ST_Indicator(CLOSE());
     st->setTO(k1);
     StoplossPtr st_clone = st->clone();
+    // The clone carries no cached result; it must be set (System::readyForRun / setTO) before use.
     st->setTO(k2);
+    st_clone->setTO(k1);
+    // The clone computes its own result, independent of the source's recomputation.
     for (size_t i = 0; i < k1.size(); ++i) {
         CHECK_EQ(st_clone->getPrice(k1[i].datetime, 0.0), doctest::Approx(k1[i].closePrice));
+    }
+    for (size_t i = 0; i < k2.size(); ++i) {
+        CHECK_EQ(st->getPrice(k2[i].datetime, 0.0), doctest::Approx(k2[i].closePrice));
     }
 }
 

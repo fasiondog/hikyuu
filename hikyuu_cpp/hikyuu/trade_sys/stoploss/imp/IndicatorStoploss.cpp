@@ -37,7 +37,6 @@ void IndicatorStoploss::_reset() {
 StoplossPtr IndicatorStoploss::_clone() {
     auto p = make_shared<IndicatorStoploss>();
     p->m_ind = m_ind.clone();
-    p->m_result = m_result;
     return p;
 }
 
