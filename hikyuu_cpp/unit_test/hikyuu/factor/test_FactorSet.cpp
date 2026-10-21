@@ -1418,6 +1418,48 @@ TEST_CASE("test_FactorSet_compiled_values_match_legacy") {
     }
 }
 
+/** @par Test point: the single-layer slow path (tovalue=false) must match the serial reference, for
+ * both the plain and the aligned variants */
+TEST_CASE("test_FactorSet_getValues_slow_path_match_legacy") {
+    StockManager& sm = StockManager::instance();
+    StockList stocks{sm.getStock("sh000001"), sm.getStock("sz000001")};
+    REQUIRE_FALSE(stocks[0].isNull());
+    REQUIRE_FALSE(stocks[1].isNull());
+
+    KQuery query(0, 120, KQuery::DAY);
+    FactorSet factorset("SLOW_VALUES", KQuery::DAY);
+    factorset.add("MA5", MA(CLOSE(), 5));
+    factorset.add("EMA13", EMA(CLOSE(), 13));
+    factorset.add("STDEV20", STDEV(CLOSE(), 20));
+
+    auto values = factorset.getValues(stocks, query, false, false, false);
+    REQUIRE_EQ(values.size(), stocks.size());
+    for (size_t si = 0; si < stocks.size(); ++si) {
+        KData kdata = stocks[si].getKData(query);
+        REQUIRE_EQ(values[si].size(), factorset.size());
+        for (size_t fi = 0; fi < factorset.size(); ++fi) {
+            CAPTURE(si);
+            CAPTURE(fi);
+            Indicator expected = factorset[fi].formula()(kdata);
+            check_indicator(values[si][fi], expected);
+        }
+    }
+
+    DatetimeList dates = sm.getTradingCalendar(query);
+    REQUIRE_FALSE(dates.empty());
+    auto aligned = factorset.getValues(stocks, query, true, false, false, false, dates);
+    REQUIRE_EQ(aligned.size(), stocks.size());
+    for (size_t si = 0; si < stocks.size(); ++si) {
+        KData kdata = stocks[si].getKData(query);
+        for (size_t fi = 0; fi < factorset.size(); ++fi) {
+            CAPTURE(si);
+            CAPTURE(fi);
+            Indicator expected = ALIGN(factorset[fi].formula(), dates, false)(kdata);
+            check_indicator(aligned[si][fi], expected);
+        }
+    }
+}
+
 TEST_CASE("test_FactorSet_compiled_values_keep_nested_factors_distinct") {
     Stock stock = StockManager::instance().getStock("sh000001");
     REQUIRE_FALSE(stock.isNull());
