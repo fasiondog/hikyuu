@@ -379,20 +379,26 @@ private:
     void _submitBuyRequest(const KRecord& today, const KRecord& src_today, Part from);
     void _autoCheckin(const Datetime& datetime, price_t realPrice, double number);
 
-    TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from);
-    TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _sell(const KRecord& today, const KRecord& src_today, Part from,
+                      price_t goal = Null<price_t>());
+    TradeRecord _sellNow(const KRecord& today, const KRecord& src_today, Part from,
+                         price_t goal = Null<price_t>());
     TradeRecord _sellDelay(const KRecord& today, const KRecord& src_today);
-    void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from);
+    void _submitSellRequest(const KRecord& today, const KRecord& src_today, Part from,
+                            price_t goal = Null<price_t>());
 
     TradeRecord _sellShort(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortNow(const KRecord& today, const KRecord& src_today, Part from);
     TradeRecord _sellShortDelay(const KRecord& today, const KRecord& src_today);
     void _submitSellShortRequest(const KRecord& today, const KRecord& src_today, Part from);
 
-    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from);
-    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from);
+    TradeRecord _buyShort(const KRecord& today, const KRecord& src_today, Part from,
+                          price_t goal = Null<price_t>());
+    TradeRecord _buyShortNow(const KRecord& today, const KRecord& src_today, Part from,
+                             price_t goal = Null<price_t>());
     TradeRecord _buyShortDelay(const KRecord& today, const KRecord& src_today);
-    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from);
+    void _submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from,
+                                price_t goal = Null<price_t>());
 
     TradeRecord _processRequest(const KRecord& today, const KRecord& src_today);
 

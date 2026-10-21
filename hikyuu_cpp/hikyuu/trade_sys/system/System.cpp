@@ -750,7 +750,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                    src_current_price >= goal) {
             HKU_INFO_IF(trace, "[{}] {}: {}, {}: {}", name(), htr("PG to sell, current price"),
                         src_current_price, htr("goal price"), goal);
-            tr = _sell(today, src_today, PART_PROFITGOAL);
+            tr = _sell(today, src_today, PART_PROFITGOAL, goal);
 
         } else {
             // The take-profit indicator runs on the adjusted KData, and the result is mapped back
@@ -804,7 +804,7 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
                    src_current_price <= goal) {
             HKU_INFO_IF(trace, "[{}] {}: {}, {}: {}", name(), htr("PG to buy short, current price"),
                         src_current_price, htr("goal price"), goal);
-            tr = _buyShort(today, src_today, PART_PROFITGOAL);
+            tr = _buyShort(today, src_today, PART_PROFITGOAL, goal);
 
         } else {
             // The take-profit indicator runs on the adjusted KData, and the result is mapped back
@@ -1147,11 +1147,11 @@ TradeRecord System::_sellForce(const Datetime& date, double num, Part from, bool
     return record;
 }
 
-TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from) {
+TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part from, price_t goal) {
     bool trace = getParam<bool>("trace");
     TradeRecord result;
     if (getParam<bool>("sell_delay")) {
-        _submitSellRequest(today, src_today, from);
+        _submitSellRequest(today, src_today, from, goal);
         HKU_INFO_IF(trace, htr("[{}] will be delay to sell", name()));
         return result;
     }
@@ -1160,7 +1160,7 @@ TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part f
     if (today.highPrice == today.lowPrice) {
         if (getParam<bool>("can_trade_when_high_eq_low")) {
             HKU_WARN_IF(trace, htr("[{}] sell one-price board", name()));
-            return _sellNow(today, src_today, from);
+            return _sellNow(today, src_today, from, goal);
         }
 
         // Get yesterday's data and check whether it is a one-line limit down; on a one-line limit
@@ -1168,30 +1168,31 @@ TradeRecord System::_sell(const KRecord& today, const KRecord& src_today, Part f
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
             HKU_INFO_IF(trace, htr("[{}] delay to sell, one-price board", name()));
-            _submitSellRequest(today, src_today, from);
+            _submitSellRequest(today, src_today, from, goal);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice < preday.closePrice) {
             HKU_INFO_IF(trace, htr("[{}] sell delayed: limit-down lock", name()));
-            _submitSellRequest(today, src_today, from);
+            _submitSellRequest(today, src_today, from, goal);
             return result;
         }
     }
 
     if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace, htr("[{}] delay to sell, current amount == 0 or count == 0", name()));
-        _submitSellRequest(today, src_today, from);
+        _submitSellRequest(today, src_today, from, goal);
         return result;
     }
 
-    result = _sellNow(today, src_today, from);
+    result = _sellNow(today, src_today, from, goal);
     HKU_INFO_IF(trace, htr("[{}] sell now: {}", name(), result));
     return result;
 }
 
-TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Part from) {
+TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Part from,
+                             price_t goal) {
     TradeRecord result;
     price_t planPrice = src_today.closePrice;
     double number = 0;
@@ -1206,7 +1207,7 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
         return result;
     }
 
-    price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
+    price_t goalPrice = std::isfinite(goal) ? goal : _getGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealSellPrice(src_today, planPrice);
     HKU_WARN_IF_RETURN(!(realPrice > 0.0), result, "[{}] {}: invalid sell price!", name(),
                        today.datetime);
@@ -1317,7 +1318,8 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
     return result;
 }
 
-void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, Part from) {
+void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, Part from,
+                                price_t goal) {
     TradeRequest req;
     req.valid = true;
     req.business = BUSINESS_SELL;
@@ -1331,18 +1333,19 @@ void System::_submitSellRequest(const KRecord& today, const KRecord& src_today, 
         req.number = _getSellNumber(today.datetime, src_today.closePrice,
                                     src_today.closePrice - req.stoploss, from);
     }
-    req.goal = _getGoalPrice(today.datetime, src_today.closePrice);
+    req.goal = std::isfinite(goal) ? goal : _getGoalPrice(today.datetime, src_today.closePrice);
     m_sellRequestList.push_back(req);
 }
 
-TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Part from) {
+TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Part from,
+                              price_t goal) {
     TradeRecord result;
     if (getParam<bool>("support_borrow_stock") == false)
         return result;
 
     bool trace = getParam<bool>("trace");
     if (getParam<bool>("buy_delay")) {
-        _submitBuyShortRequest(today, src_today, from);
+        _submitBuyShortRequest(today, src_today, from, goal);
         HKU_INFO_IF(trace, htr("[{}] will buy short next bar open", name()));
         return result;
     }
@@ -1351,21 +1354,21 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
     if (today.highPrice == today.lowPrice) {
         if (getParam<bool>("can_trade_when_high_eq_low")) {
             HKU_WARN_IF(trace, htr("[{}] buy short one-price board", name()));
-            return _buyShortNow(today, src_today, from);
+            return _buyShortNow(today, src_today, from, goal);
         }
 
         // Get yesterday's data and check whether it is a one-line limit up,
         size_t pos = m_kdata.getPos(today.datetime);
         if (pos == 0 || pos == Null<size_t>()) {
             HKU_INFO_IF(trace, htr("[{}] delay to buy short, one-price board", name()));
-            _submitBuyShortRequest(today, src_today, from);
+            _submitBuyShortRequest(today, src_today, from, goal);
             return result;
         }
 
         const auto& preday = m_kdata.getKRecord(pos - 1);
         if (today.closePrice > preday.closePrice) {
             HKU_INFO_IF(trace, htr("[{}] short covering delayed: limit-up lock", name()));
-            _submitBuyShortRequest(today, src_today, from);
+            _submitBuyShortRequest(today, src_today, from, goal);
             return result;
         }
     }
@@ -1373,14 +1376,15 @@ TradeRecord System::_buyShort(const KRecord& today, const KRecord& src_today, Pa
     if (today.transAmount == 0.0 || today.transCount == 0.0) {
         HKU_INFO_IF(trace,
                     htr("[{}] delay to buy short, current amount == 0 or count == 0", name()));
-        _submitBuyShortRequest(today, src_today, from);
+        _submitBuyShortRequest(today, src_today, from, goal);
         return result;
     }
 
-    return _buyShortNow(today, src_today, from);
+    return _buyShortNow(today, src_today, from, goal);
 }
 
-TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today, Part from) {
+TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today, Part from,
+                                 price_t goal) {
     TradeRecord result;
     price_t planPrice = src_today.closePrice;  // Take the close price of the current moment
 
@@ -1405,7 +1409,7 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
         number = pos.number;
     }
 
-    price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
+    price_t goalPrice = std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
     if (!(realPrice > 0.0)) {
         HKU_WARN("[{}] {}: invalid short cover price!", name(), today.datetime);
@@ -1533,7 +1537,8 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
     return result;
 }
 
-void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from) {
+void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_today, Part from,
+                                    price_t goal) {
     TradeRequest req;
     req.valid = true;
     req.business = BUSINESS_BUY_SHORT;
@@ -1541,7 +1546,8 @@ void System::_submitBuyShortRequest(const KRecord& today, const KRecord& src_tod
     req.count = 0;
     req.datetime = today.datetime;
     req.stoploss = _getShortStoplossPrice(today, src_today, today.closePrice);
-    req.goal = _getShortGoalPrice(today.datetime, src_today.closePrice);
+    req.goal =
+      std::isfinite(goal) ? goal : _getShortGoalPrice(today.datetime, src_today.closePrice);
     req.number = _getBuyShortNumber(today.datetime, src_today.closePrice,
                                     req.stoploss - src_today.closePrice, from);
     m_buyShortRequestList.push_back(req);

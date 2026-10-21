@@ -10,6 +10,7 @@
 #include "../../test_config.h"
 #include <cmath>
 #include <limits>
+#include <map>
 #include <tuple>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
@@ -20,6 +21,7 @@
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
 #include <hikyuu/trade_sys/environment/EnvironmentBase.h>
+#include <hikyuu/trade_sys/profitgoal/ProfitGoalBase.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
 
 using namespace hku;
@@ -177,6 +179,24 @@ public:
 private:
     Datetime m_buy_date;
     Datetime m_sell_date;
+};
+
+// Counts the goal price queries per bar; the goal always stays below the current price, so every
+// held bar triggers the profit goal
+class CountingPG : public ProfitGoalBase {
+public:
+    CountingPG() : ProfitGoalBase("CountingPG") {}
+
+    std::map<Datetime, int> calls;
+
+    virtual ProfitGoalPtr _clone() override {
+        return std::make_shared<CountingPG>();
+    }
+
+    virtual price_t _getGoal(const Datetime& datetime, price_t price) override {
+        calls[datetime]++;
+        return price * 0.95;
+    }
 };
 }  // namespace
 
@@ -410,6 +430,29 @@ TEST_CASE("test_System_delay_request_priority") {
     REQUIRE_EQ(r2.tradesOnOpen.size(), 1);
     CHECK_EQ(r2.tradesOnOpen[0].business, BUSINESS_BUY);
     CHECK_GT(sys->getTM()->getHoldNumber(kdata[suspended + 2].datetime, stk), 0.0);
+}
+
+/** @par Check point: the profit goal price is queried once per bar even on the bar where it
+ *  triggers - the exit check and the trade record share the same value */
+TEST_CASE("test_System_profit_goal_called_once_per_bar") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+
+    auto pg = std::make_shared<CountingPG>();
+    auto sys = SYS_Simple();
+    sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+    sys->setSG(SG_Cross(MA(CLOSE(), 5), MA(CLOSE(), 10)));
+    sys->setMM(MM_FixedCount(100));
+    sys->setPG(pg);
+    sys->setParam<bool>("buy_delay", false);
+    sys->setParam<bool>("sell_delay", false);
+    sys->run(stk, query);
+
+    REQUIRE_UNARY(!pg->calls.empty());
+    for (const auto& item : pg->calls) {
+        CHECK_EQ(item.second, 1);
+    }
 }
 
 /** @} */
