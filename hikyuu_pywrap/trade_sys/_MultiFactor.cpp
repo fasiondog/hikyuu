@@ -36,14 +36,18 @@ public:
     virtual ~PyMultiFactor() override {}
 
     IndicatorList _calculate(const vector<IndicatorList>& all_stk_inds) override {
-        // Hand-rolled to explicitly convert the C++ nested vector to a Python list of lists before
-        // calling the Python subclass override. Caller path is Python-facing (Selector::select ->
-        // MultiFactorBase::calculate), so the GIL is already held here; no extra acquire needed.
+        // May be driven by a pooled C++ worker that owns no GIL, hence the reentrant acquire.
+        // Hand-rolled instead of the macro: the nested vector needs an explicit conversion.
+        py::gil_scoped_acquire gil;
         auto self = py::cast(this);
         auto func = self.attr("_calculate");
         auto py_all_stk_inds = vector_to_python_list<IndicatorList>(all_stk_inds);
         auto py_ret = func(py_all_stk_inds);
         return py_ret.cast<IndicatorList>();
+    }
+
+    void _reset() override {
+        PYBIND11_OVERLOAD(void, MultiFactorBase, _reset, );
     }
 
 public:
@@ -296,6 +300,8 @@ The custom multi-factor model override hooks:
     :param int ic_n: the n window for calculating the IC (the same as ndays in get_ic))")
 
       .def("clone", &MultiFactorBase::clone, "The clone operation")
+
+      .def("reset", &MultiFactorBase::reset, "The reset operation")
 
       .def(
         "get_scores",

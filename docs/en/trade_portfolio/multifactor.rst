@@ -130,6 +130,8 @@ Custom Multi-factor Composition Algorithm Base Class
 The interface for custom multi-factor composition algorithms:
 
 * :py:meth:`MultiFactorBase._calculate` - [Required] Compute the composed factor
+* :py:meth:`MultiFactorBase._clone` - [Required] Return a new instance of the subclass
+* :py:meth:`MultiFactorBase._reset` - [Optional] Reset the private attributes of the subclass, invoked by :py:meth:`MultiFactorBase.reset`
 
 
 Multi-factor Composition Algorithm Base Class
@@ -168,6 +170,10 @@ Multi-factor Composition Algorithm Base Class
     .. py:method:: clone(self)
 
         Create and return a copy of this instance.
+
+    .. py:method:: reset(self)
+
+        Reset operation; clears the calculated data and invokes the subclass _reset hook.
 
     .. py:method:: get_ref_stock(self)
 
@@ -287,3 +293,19 @@ Multi-factor Composition Algorithm Base Class
 
         :param list stks_inds: the prepared original factor lists of all the securities, in the same order as the security list
         :return: all the newly composed factors, stored in security-list order
+
+    .. py:method:: _clone(self)
+
+        Return a new instance of the subclass; invoked by clone(). The returned object must be an
+        instance of the subclass itself rather than of the base class.
+
+        :rtype: MultiFactorBase
+
+    .. py:method:: _reset(self)
+
+        Reset the private attributes of the subclass; invoked by reset(). This hook may be omitted
+        if the subclass keeps no member state to restore.
+
+        .. note::
+            The hook runs while the base lock is held, so its implementation must not re-enter a
+            method of the same instance that needs the internal lock, otherwise it deadlocks.

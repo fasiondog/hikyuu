@@ -52,6 +52,50 @@ class MultiFactorTest(unittest.TestCase):
         # the filter must run exactly once per invocation.
         self.assertEqual(len(calls), 1)
 
+    def test_python_mf_subclass_synthesizes_factors(self):
+        # A Python subclass must be able to synthesize factors through the trampoline; the
+        # hook runs when get_scores() triggers the calculation.
+        mf, ref_stk, query = self._build_mf()
+
+        class MyMF(MultiFactorBase):
+            def __init__(self):
+                super().__init__()
+
+            def _clone(self):
+                return MyMF()
+
+            def _calculate(self, all_stk_inds):
+                return [inds[0] for inds in all_stk_inds]
+
+        py_mf = MyMF()
+        py_mf.set_stock_list(mf.get_stock_list())
+        py_mf.query = query
+        py_mf.set_ref_stock(ref_stk)
+        py_mf.set_ref_factorset([MA(CLOSE(), n=5), MA(CLOSE(), n=10)], Query.DAY)
+
+        scores = py_mf.get_scores(Datetime(201106010000))
+        self.assertEqual(len(scores), len(mf.get_stock_list()))
+
+    def test_python_mf_subclass_reset_hook_is_forwarded(self):
+        # reset() must forward to the subclass _reset hook through the trampoline.
+        class MyMF(MultiFactorBase):
+            def __init__(self):
+                super().__init__()
+                self.resets = 0
+
+            def _clone(self):
+                return MyMF()
+
+            def _calculate(self, all_stk_inds):
+                return [inds[0] for inds in all_stk_inds]
+
+            def _reset(self):
+                self.resets += 1
+
+        py_mf = MyMF()
+        py_mf.reset()
+        self.assertEqual(py_mf.resets, 1)
+
     def test_python_normalizer_no_deadlock(self):
         # A Python custom normalizer must not deadlock: its clone()/normalize() need the GIL,
         # so the parallel normalization must run serially on the (GIL-holding) caller thread

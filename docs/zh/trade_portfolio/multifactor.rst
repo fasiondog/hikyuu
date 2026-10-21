@@ -130,6 +130,8 @@
 自定义多因子合成算法接口：
 
 * :py:meth:`MultiFactorBase._calculate` - 【必须】计算合成因子
+* :py:meth:`MultiFactorBase._clone` - 【必须】返回当前子类的一个新实例
+* :py:meth:`MultiFactorBase._reset` - 【可选】重置子类的私有成员变量，由 :py:meth:`MultiFactorBase.reset` 调用
 
 
 多因子合成算法基类
@@ -168,6 +170,10 @@
     .. py:method:: clone(self)
     
         克隆操作 
+
+    .. py:method:: reset(self)
+
+        复位操作，清除已计算的结果并调用子类的 _reset 钩子
 
     .. py:method:: get_ref_stock(self)
 
@@ -287,3 +293,16 @@
 
         :param list stks_inds: 与证券列表顺序相同已经计算好的所有证券的原始因子列表
         :return: 按证券列表顺序存放的所有新的因子
+
+    .. py:method:: _clone(self)
+
+        返回当前子类的一个新实例，由 clone() 调用。返回值必须是当前子类的实例，而非基类实例。
+
+        :rtype: MultiFactorBase
+
+    .. py:method:: _reset(self)
+
+        重置子类的私有成员变量，由 reset() 调用。若子类无需复位成员变量，可不实现该接口。
+
+        .. note::
+            该钩子在基类持有内部锁期间被调用，其实现不可再次调用本实例需要该内部锁的其它方法，否则会死锁。
