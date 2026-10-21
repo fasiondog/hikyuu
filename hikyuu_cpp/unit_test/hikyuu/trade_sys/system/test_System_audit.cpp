@@ -10,6 +10,7 @@
 #include "../../test_config.h"
 #include <cmath>
 #include <limits>
+#include <tuple>
 #include <hikyuu/StockManager.h>
 #include <hikyuu/indicator/crt/MA.h>
 #include <hikyuu/indicator/crt/KDATA.h>
@@ -18,6 +19,7 @@
 #include <hikyuu/trade_sys/signal/crt/SG_AllwaysBuy.h>
 #include <hikyuu/trade_sys/signal/crt/SG_Cross.h>
 #include <hikyuu/trade_sys/moneymanager/crt/MM_FixedCount.h>
+#include <hikyuu/trade_sys/environment/EnvironmentBase.h>
 #include <hikyuu/trade_sys/slippage/SlippageBase.h>
 
 using namespace hku;
@@ -112,6 +114,50 @@ public:
         return p;
     }
 };
+
+// Reproduces the state of an archive loaded without setTO: the original kdata is gone, so every
+// plan price taken from it becomes 0
+class StaleSrcSystem : public System {
+public:
+    StaleSrcSystem() : System("StaleSrcSystem") {}
+
+    void clearSrcKData() {
+        m_src_kdata = KData();
+    }
+};
+
+class BuyOnFirstBarSG : public SignalBase {
+public:
+    BuyOnFirstBarSG() : SignalBase("BuyOnFirstBarSG") {}
+
+    virtual SignalPtr _clone() override {
+        return std::make_shared<BuyOnFirstBarSG>();
+    }
+
+    virtual void _calculate(const KData& kdata) override {
+        HKU_IF_RETURN(kdata.empty(), void());
+        _addBuySignal(kdata[0].datetime);
+    }
+};
+
+// Only the given date is valid, so the market environment turns invalid on the next bar and forces
+// a liquidation regardless of the money manager's price check
+class EvFirstBarOnly : public EnvironmentBase {
+public:
+    explicit EvFirstBarOnly(const Datetime& valid_date)
+    : EnvironmentBase("EvFirstBarOnly"), m_valid_date(valid_date) {}
+
+    virtual EnvironmentPtr _clone() override {
+        return std::make_shared<EvFirstBarOnly>(m_valid_date);
+    }
+
+    virtual void _calculate() override {
+        _addValid(m_valid_date);
+    }
+
+private:
+    Datetime m_valid_date;
+};
 }  // namespace
 
 /** @par Check point: System owns the price authority of the slippage result - an invalid value
@@ -185,6 +231,60 @@ TEST_CASE("test_System_slippage_price_fixup") {
             CHECK_LE(tr.realPrice, k.highPrice + 1e-9);
         });
     }
+}
+
+/** @par Check point: a stale or zero-price original kdata (plan price 0) never produces a
+ *  zero-price fill. The forced liquidation asks the money manager for the whole position before it
+ *  looks at the price, so without the closing-entry guard the position would be cleared at price 0
+ *  and the funds would evaporate */
+TEST_CASE("test_System_stale_src_no_zero_price_fill") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 2);
+
+    // Returns: hold after the buy, cash after the buy, sell fills on bar 1, cash after bar 1,
+    // hold after bar 1
+    auto run_bars = [&](bool stale_src) {
+        auto sys = std::make_shared<StaleSrcSystem>();
+        sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+        sys->setEV(std::make_shared<EvFirstBarOnly>(kdata[0].datetime));
+        sys->setSG(std::make_shared<BuyOnFirstBarSG>());
+        sys->setMM(MM_FixedCount(100));
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", false);
+        sys->setTO(kdata);
+        sys->readyForRun();
+
+        sys->runMoment(kdata[0].datetime);
+        const double hold = sys->getTM()->getHoldNumber(kdata[0].datetime, stk);
+        const price_t cash = sys->getTM()->currentCash();
+
+        if (stale_src) {
+            sys->clearSrcKData();
+        }
+
+        MomentResult r1 = sys->runMoment(kdata[1].datetime);
+        return std::make_tuple(hold, cash, r1.tradesOnClose.size(), sys->getTM()->currentCash(),
+                               sys->getTM()->getHoldNumber(kdata[1].datetime, stk));
+    };
+
+    /** @arg control run with the original kdata intact: the environment turns invalid on bar 1 and
+     *  the forced liquidation fills */
+    auto ctrl = run_bars(false);
+    REQUIRE_UNARY(std::get<0>(ctrl) > 0.0);
+    CHECK_EQ(std::get<2>(ctrl), 1);
+    CHECK_GT(std::get<3>(ctrl), std::get<1>(ctrl));
+    CHECK_EQ(std::get<4>(ctrl), 0.0);
+
+    /** @arg stale original kdata (plan price 0): no fill, the position and the cash are left
+     *  untouched */
+    auto stale = run_bars(true);
+    REQUIRE_UNARY(std::get<0>(stale) > 0.0);
+    CHECK_EQ(std::get<2>(stale), 0);
+    CHECK_EQ(std::get<3>(stale), std::get<1>(stale));
+    CHECK_EQ(std::get<4>(stale), std::get<0>(stale));
 }
 
 /** @} */

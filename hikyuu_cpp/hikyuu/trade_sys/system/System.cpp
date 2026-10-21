@@ -1207,6 +1207,8 @@ TradeRecord System::_sellNow(const KRecord& today, const KRecord& src_today, Par
 
     price_t goalPrice = _getGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealSellPrice(src_today, planPrice);
+    HKU_WARN_IF_RETURN(!(realPrice > 0.0), result, "[{}] {}: invalid sell price!", name(),
+                       today.datetime);
     TradeRecord record =
       m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss, goalPrice, planPrice, from);
     if (BUSINESS_SELL != record.business) {
@@ -1286,6 +1288,11 @@ TradeRecord System::_sellDelay(const KRecord& today, const KRecord& src_today) {
         }
 
         price_t realPrice = _getRealSellPrice(src_today, planPrice);
+        if (!(realPrice > 0.0)) {
+            HKU_WARN("[{}] {}: invalid delay sell price!", name(), today.datetime);
+            m_sellRequestList.erase(m_sellRequestList.begin());
+            continue;
+        }
         TradeRecord record = m_tm->sell(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, req.from);
         if (BUSINESS_SELL != record.business) {
@@ -1399,6 +1406,11 @@ TradeRecord System::_buyShortNow(const KRecord& today, const KRecord& src_today,
 
     price_t goalPrice = _getShortGoalPrice(today.datetime, planPrice);
     price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
+    if (!(realPrice > 0.0)) {
+        HKU_WARN("[{}] {}: invalid short cover price!", name(), today.datetime);
+        m_buyShortRequestList.clear();
+        return result;
+    }
 
     TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                         goalPrice, planPrice, from);
@@ -1492,6 +1504,11 @@ TradeRecord System::_buyShortDelay(const KRecord& today, const KRecord& src_toda
         }
 
         price_t realPrice = _getRealBuyShortPrice(src_today, planPrice);
+        if (!(realPrice > 0.0)) {
+            HKU_WARN("[{}] {}: invalid delay short cover price!", name(), today.datetime);
+            m_buyShortRequestList.erase(m_buyShortRequestList.begin());
+            continue;
+        }
         TradeRecord record = m_tm->buyShort(today.datetime, m_stock, realPrice, number, stoploss,
                                             goalPrice, planPrice, req.from);
         if (BUSINESS_BUY_SHORT != record.business) {
@@ -1795,6 +1812,9 @@ price_t System::_getShortTakeProfitPrice(const KRecord& today, const KRecord& sr
 // market-order placeholder, so an invalid value must never be passed through; and a fill outside
 // the current bar's range is impossible, so both sides are clamped. The original (unadjusted)
 // record of the same bar is already at hand and shares the coordinate of the plan price.
+// A stale or zero-price original record still yields a plan price of 0, which is why the position
+// closing entries reject a non-positive real price: a forced liquidation asks the money manager for
+// the whole position before it ever looks at the price, so nothing else stops a zero-price fill.
 static price_t fixupSlippagePrice(const string& sys_name, const Stock& stock,
                                   const KRecord& src_today, price_t planPrice, price_t price,
                                   const char* side) {
