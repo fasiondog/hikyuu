@@ -118,11 +118,11 @@ void export_SCFilter(py::module& m) {
     m.def("SCFilter_AmountLimit", &SCFilter_AmountLimit, py::arg("min_amount_percent_limit") = 0.1,
           R"(SCFilter_AmountLimit([min_amount_percent_limit: float = 0.1])
             
-    Filter out the cross-sections whose amount is within the percentage range at the end of the score list
-    
-    Note: it is related to the order of the passed cross-section score list; if it is descending, the system score records with the smaller amounts are filtered; otherwise, the records with the larger amounts
+    Filter out the given percentage of the cross-section records that have the smallest amount
 
-    Note: at least one record is always kept, so a limit of 1.0 still keeps the best one
+    Note: the selection is unrelated to the order of the passed cross-section score list; the records with the smaller amounts are always the ones filtered out, and the output keeps the score order of the input
+
+    Note: at least one record is always kept, so a limit of 1.0 keeps the one with the largest amount
 
     :param double min_amount_percent_limit: the minimum amount percentage limit
     :return: the cross-section filter
