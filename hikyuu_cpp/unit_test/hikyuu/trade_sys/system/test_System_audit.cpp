@@ -158,6 +158,26 @@ public:
 private:
     Datetime m_valid_date;
 };
+
+// Emits a buy on one date and a sell on another
+class FixedDatesSG : public SignalBase {
+public:
+    FixedDatesSG(const Datetime& buy_date, const Datetime& sell_date)
+    : SignalBase("FixedDatesSG"), m_buy_date(buy_date), m_sell_date(sell_date) {}
+
+    virtual SignalPtr _clone() override {
+        return std::make_shared<FixedDatesSG>(m_buy_date, m_sell_date);
+    }
+
+    virtual void _calculate(const KData&) override {
+        _addBuySignal(m_buy_date);
+        _addSellSignal(m_sell_date);
+    }
+
+private:
+    Datetime m_buy_date;
+    Datetime m_sell_date;
+};
 }  // namespace
 
 /** @par Check point: System owns the price authority of the slippage result - an invalid value
@@ -333,6 +353,63 @@ TEST_CASE("test_System_ev_force_sell_follows_sell_delay") {
     CHECK_EQ(std::get<1>(immediate), 1);
     CHECK_EQ(std::get<2>(immediate), 0);
     CHECK_EQ(std::get<4>(immediate), 0.0);
+}
+
+/** @par Check point: the delayed requests are served cash generating side first - a pending sell is
+ *  executed before a pending buy on the same open */
+TEST_CASE("test_System_delay_request_priority") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(201112060000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 10);
+
+    // A suspended bar (no volume) keeps both pending requests queued: the delayed buy is not
+    // executed there and the sell request raised on its close joins the queue
+    size_t suspended = Null<size_t>();
+    for (size_t i = 2; i + 2 < kdata.size(); i++) {
+        if (kdata[i].transAmount == 0.0 || kdata[i].transCount == 0.0) {
+            suspended = i;
+            break;
+        }
+    }
+    REQUIRE_UNARY(suspended != Null<size_t>());
+
+    auto tm = crtTM(Datetime(199001010000LL), 100000.0, TC_Zero());
+    REQUIRE_UNARY(
+      tm->buy(kdata[suspended - 2].datetime, stk, kdata[suspended - 2].closePrice, 100.0)
+        .business == BUSINESS_BUY);
+
+    auto sys = SYS_Simple();
+    sys->setTM(tm);
+    sys->setSG(
+      std::make_shared<FixedDatesSG>(kdata[suspended - 1].datetime, kdata[suspended].datetime));
+    sys->setMM(MM_FixedCount(100));
+    sys->setParam<bool>("buy_delay", true);
+    sys->setParam<bool>("sell_delay", true);
+    sys->setTO(kdata);
+    sys->readyForRun();
+
+    sys->runMoment(kdata[suspended - 1].datetime);
+    MomentResult rs = sys->runMoment(kdata[suspended].datetime);
+
+    /** @arg the suspended bar fills nothing and leaves both requests pending */
+    CHECK_UNARY(rs.tradesOnOpen.empty());
+    REQUIRE_EQ(rs.delayOnNextOpen.size(), 2);
+
+    MomentResult r1 = sys->runMoment(kdata[suspended + 1].datetime);
+
+    /** @arg the sell is served first: it fills and the buy keeps waiting */
+    REQUIRE_EQ(r1.tradesOnOpen.size(), 1);
+    CHECK_EQ(r1.tradesOnOpen[0].business, BUSINESS_SELL);
+    CHECK_EQ(sys->getTM()->getHoldNumber(kdata[suspended + 1].datetime, stk), 0.0);
+    CHECK_UNARY(!r1.delayOnNextOpen.empty());
+
+    /** @arg the buy fills on the following open */
+    MomentResult r2 = sys->runMoment(kdata[suspended + 2].datetime);
+    REQUIRE_EQ(r2.tradesOnOpen.size(), 1);
+    CHECK_EQ(r2.tradesOnOpen[0].business, BUSINESS_BUY);
+    CHECK_GT(sys->getTM()->getHoldNumber(kdata[suspended + 2].datetime, stk), 0.0);
 }
 
 /** @} */

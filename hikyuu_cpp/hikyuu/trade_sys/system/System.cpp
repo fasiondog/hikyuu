@@ -1734,9 +1734,11 @@ void System::_submitSellShortRequest(const KRecord& today, const KRecord& src_to
 }
 
 TradeRecord System::_processRequest(const KRecord& today, const KRecord& src_today) {
-    HKU_IF_RETURN(!m_buyRequestList.empty(), _buyDelay(today, src_today));
+    // One queue per bar: the cash generating side (sell / sell short) is served before the cash
+    // consuming side, so a pending sell frees the funds a pending buy is waiting for
     HKU_IF_RETURN(!m_sellRequestList.empty(), _sellDelay(today, src_today));
     HKU_IF_RETURN(!m_sellShortRequestList.empty(), _sellShortDelay(today, src_today));
+    HKU_IF_RETURN(!m_buyRequestList.empty(), _buyDelay(today, src_today));
     HKU_IF_RETURN(!m_buyShortRequestList.empty(), _buyShortDelay(today, src_today));
     return TradeRecord();
 }
