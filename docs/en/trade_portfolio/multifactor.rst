@@ -257,7 +257,26 @@ Multi-factor Composition Algorithm Base Class
 
         Get the scores of all dates, with the same length as the reference dates.
 
+        :note: every record becomes a Python object, so the memory grows with stocks x dates; use get_scores_np(date) or iter_scores() for the large results
+
         :return: ScoreRecordList
+
+    .. py:method:: get_scores_np(self, date[, start=0, end=Null])
+
+        Get the cross-section of the specified date as a numpy structured array, already sorted descending. Prefer it over get_scores for the large results: one array is built for the whole cross-section instead of one Python object per record. The field names are market_code, name and score.
+
+        :param Datetime date: the specified date
+        :param int start: the start of the daily ranking to take
+        :param int end: the end of the daily ranking to take (excluded)
+        :rtype: numpy.ndarray
+
+    .. py:method:: iter_scores(self[, start=0, end=Null])
+
+        Iterate the cross-sections of all the dates, yielding one numpy structured array per date in the order of get_datetime_list(). Only the current date is materialized, so the memory stays at one cross-section instead of every date at once.
+
+        :param int start: the start of the date range to iterate
+        :param int end: the end of the date range to iterate (excluded)
+        :rtype: iterator
 
     .. py:method:: get_all_src_factors(self)
 

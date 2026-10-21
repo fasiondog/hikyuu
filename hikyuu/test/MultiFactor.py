@@ -96,6 +96,44 @@ class MultiFactorTest(unittest.TestCase):
         py_mf.reset()
         self.assertEqual(py_mf.resets, 1)
 
+    def test_get_scores_np_and_iter_scores(self):
+        mf, ref_stk, query = self._build_mf()
+        date = Datetime(201106010000)
+
+        # get_scores_np must match get_scores record by record
+        records = mf.get_scores(date)
+        arr = mf.get_scores_np(date)
+        self.assertEqual(len(arr), len(records))
+        for i, rec in enumerate(records):
+            self.assertEqual(arr[i]["market_code"], rec.stock.market_code)
+            self.assertAlmostEqual(float(arr[i]["score"]), float(rec.value))
+
+        # start / end slicing
+        part = mf.get_scores_np(date, 0, 1)
+        self.assertEqual(len(part), 1)
+        self.assertEqual(part[0]["market_code"], records[0].stock.market_code)
+
+        # iter_scores must cover every date, in the reference date order, with the same content
+        dates = mf.get_datetime_list()
+        all_scores = mf.get_all_scores()
+        self.assertEqual(len(dates), len(all_scores))
+        n = 0
+        for one in mf.iter_scores():
+            self.assertEqual(len(one), len(all_scores[n]))
+            for i in range(len(one)):
+                self.assertEqual(one[i]["market_code"], all_scores[n][i].stock.market_code)
+            n += 1
+        self.assertEqual(n, len(dates))
+
+        # range slicing of iter_scores
+        self.assertEqual(len(list(mf.iter_scores(1, 4))), 3)
+
+        # the iterator keeps the model alive even after the python handle is dropped
+        it = mf.iter_scores()
+        next(it)
+        del mf
+        self.assertEqual(sum(1 for _ in it), len(dates) - 1)
+
     def test_python_normalizer_no_deadlock(self):
         # A Python custom normalizer must not deadlock: its clone()/normalize() need the GIL,
         # so the parallel normalization must run serially on the (GIL-holding) caller thread
