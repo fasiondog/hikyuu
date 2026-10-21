@@ -70,8 +70,41 @@ class FactorImmutableTest(unittest.TestCase):
         self.assertEqual(fs[0].brief, "new_brief")
 
 
+class FactorSetIndexTest(unittest.TestCase):
+    def _make_set(self):
+        fs = FactorSet("ft02_index")
+        fs.add("F1", CVAL(1.0))
+        fs.add("F2", CVAL(2.0))
+        return fs
+
+    def test_index_access(self):
+        fs = self._make_set()
+        self.assertEqual(fs[0].name, "F1")
+        self.assertEqual(fs[1].name, "F2")
+
+    def test_negative_index(self):
+        fs = self._make_set()
+        self.assertEqual(fs[-1].name, "F2")
+        self.assertEqual(fs[-2].name, "F1")
+
+    def test_index_out_of_range(self):
+        fs = self._make_set()
+        for i in (2, 5):
+            with self.assertRaises(IndexError):
+                fs[i]
+
+    def test_negative_index_out_of_range(self):
+        fs = self._make_set()
+        with self.assertRaises(IndexError):
+            fs[-3]
+
+
 def suite():
-    return unittest.TestLoader().loadTestsFromTestCase(FactorImmutableTest)
+    loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
+    suite.addTests(loader.loadTestsFromTestCase(FactorImmutableTest))
+    suite.addTests(loader.loadTestsFromTestCase(FactorSetIndexTest))
+    return suite
 
 
 if __name__ == "__main__":

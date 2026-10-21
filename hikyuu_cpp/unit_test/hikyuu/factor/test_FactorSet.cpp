@@ -132,6 +132,32 @@ TEST_CASE("test_FactorSet_basic") {
     CHECK_FALSE(fs.have("MA10"));
 }
 
+/** @par Test point: test that index access is bounds-checked and throws on out-of-range */
+TEST_CASE("test_FactorSet_index_out_of_range") {
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    FactorSet fs("IndexOob");
+    fs.add(Factor("MA5", ma5, KQuery::DAY));
+    fs.add(Factor("MA10", ma10, KQuery::DAY));
+    CHECK_EQ(fs.size(), 2);
+
+    /** @arg in-range index access works for both get(size_t) and operator[] */
+    CHECK_EQ(fs[0].name(), "MA5");
+    CHECK_EQ(fs.get(1).name(), "MA10");
+
+    /** @arg index == size throws std::out_of_range */
+    CHECK_THROWS_AS(fs.get(2), std::out_of_range);
+    CHECK_THROWS_AS(fs[2], std::out_of_range);
+
+    /** @arg a far out-of-range index throws std::out_of_range */
+    CHECK_THROWS_AS(fs.get(100), std::out_of_range);
+
+    /** @arg any index on an empty set throws std::out_of_range */
+    FactorSet empty_fs("EmptyOob");
+    CHECK_THROWS_AS(empty_fs.get(0), std::out_of_range);
+    CHECK_THROWS_AS(empty_fs[0], std::out_of_range);
+}
+
 /** @par Test point: test the ktype match check of FactorSet */
 TEST_CASE("test_FactorSet_ktype_check") {
     // Create the factors of the different periods

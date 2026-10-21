@@ -9,6 +9,7 @@
 
 #include "Factor.h"
 #include "hikyuu/Block.h"
+#include <stdexcept>
 
 namespace hku {
 
@@ -299,6 +300,7 @@ inline bool FactorSet::isNull() const noexcept {
 }
 
 inline const Factor& FactorSet::get(size_t i) const {
+    HKU_CHECK_THROW(i < size(), std::out_of_range, "index {} out of range [0, {})", i, size());
     return m_data->factors[i];
 }
 
@@ -307,7 +309,7 @@ inline const Factor& FactorSet::operator[](const string& name) const {
 }
 
 inline const Factor& FactorSet::operator[](size_t i) const {
-    return m_data->factors[i];
+    return get(i);
 }
 
 inline const FactorList& FactorSet::getAllFactors() const {
