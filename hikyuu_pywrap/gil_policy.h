@@ -24,13 +24,14 @@ inline bool any_python_part(const Parts&... parts) {
 }
 
 // A system may call back into Python via any of its parts, or being a Python subclass itself.
+inline bool system_has_python_part(const System& sys) {
+    return sys.isPythonObject() ||
+           any_python_part(sys.getSG(), sys.getST(), sys.getTP(), sys.getMM(), sys.getPG(),
+                           sys.getSP(), sys.getCN(), sys.getEV(), sys.getTM());
+}
+
 inline bool system_has_python_part(const SystemPtr& sys) {
-    if (!sys) {
-        return false;
-    }
-    return sys->isPythonObject() ||
-           any_python_part(sys->getSG(), sys->getST(), sys->getTP(), sys->getMM(), sys->getPG(),
-                           sys->getSP(), sys->getCN(), sys->getEV(), sys->getTM());
+    return sys ? system_has_python_part(*sys) : false;
 }
 
 inline bool sys_list_has_python_part(const vector<SystemPtr>& sys_list) {

@@ -7,6 +7,8 @@
 # History: regression tests for the batch helpers parallel_run_sys, get_funds_list
 #          and get_performance_list: results stay correct, and the GIL is released
 #          while running pure C++ inputs so other Python threads keep running.
+#          The same holds for the system entries (System/MultiSystem run, runMoment):
+#          the GIL is released there as well, Python parts included.
 # ===============================================================================
 
 import threading
@@ -23,6 +25,14 @@ def _make_sys(stock, kdata):
     sys.sg = SG_Cross(MA(CLOSE(), n=5), MA(CLOSE(), n=20))
     sys.to = kdata
     return sys
+
+
+def _make_ms(stock, kdata, count=1):
+    ms = MultiSystem("MS")
+    ms.tm = crtTM()
+    for _ in range(count):
+        ms.add(_make_sys(stock, kdata))
+    return ms
 
 
 def _measure_progress(work):
@@ -81,6 +91,83 @@ class MiscTest(unittest.TestCase):
         work = _calibrated_work(None, probe)
         progress = _measure_progress(work)
         self.assertGreater(progress, 100)
+
+    def test_sys_run_releases_gil(self):
+        sys = _make_sys(self.stock, self.kdata)
+
+        def probe():
+            return sys.run(self.kdata, True, True)
+
+        progress = _measure_progress(_calibrated_work(None, probe))
+        self.assertGreater(progress, 100)
+
+    def test_sys_run_query_releases_gil(self):
+        sys = _make_sys(self.stock, self.kdata)
+
+        def probe():
+            return sys.run(Query(0, 10000), True, True)
+
+        progress = _measure_progress(_calibrated_work(None, probe))
+        self.assertGreater(progress, 100)
+
+    def test_sys_run_with_python_part(self):
+        # The GIL is released even with Python parts: the trampolines reacquire it per
+        # callback, so a Python part must still be driven and produce trades.
+        class MySG(SignalBase):
+            def __init__(self):
+                super().__init__("MySG")
+
+            def _clone(self):
+                return MySG()
+
+            def _calculate(self, kdata):
+                self._add_buy_signal(kdata[10].datetime)
+                self._add_sell_signal(kdata[len(kdata) // 2].datetime)
+
+        sys = _make_sys(self.stock, self.kdata)
+        sys.sg = MySG()
+        sys.run(self.kdata, True, True)
+        self.assertGreater(len(sys.tm.get_trade_list()), 1)
+
+    def test_multi_system_run_releases_gil(self):
+        ms = _make_ms(self.stock, self.kdata, 3)
+
+        def probe():
+            return ms.run(self.kdata, True, True)
+
+        progress = _measure_progress(_calibrated_work(None, probe))
+        self.assertGreater(progress, 100)
+
+    def test_multi_system_run_moment_releases_gil(self):
+        ms = _make_ms(self.stock, self.kdata)
+        ms.run(self.kdata, True, True)
+        last = self.kdata[-1].datetime
+
+        def probe():
+            return ms.runMoment(last)
+
+        progress = _measure_progress(_calibrated_work(None, probe))
+        self.assertGreater(progress, 100)
+
+    def test_multi_system_run_with_python_part(self):
+        class MySG(SignalBase):
+            def __init__(self):
+                super().__init__("MySG")
+
+            def _clone(self):
+                return MySG()
+
+            def _calculate(self, kdata):
+                self._add_buy_signal(kdata[10].datetime)
+                self._add_sell_signal(kdata[len(kdata) // 2].datetime)
+
+        ms = MultiSystem("MS")
+        ms.tm = crtTM()
+        sub = _make_sys(self.stock, self.kdata)
+        sub.sg = MySG()
+        ms.add(sub)
+        ms.run(self.kdata, True, True)
+        self.assertGreater(len(ms.tm.get_trade_list()), 1)
 
     def test_get_funds_list_result(self):
         tm_list = [crtTM() for _ in range(4)]
