@@ -662,9 +662,13 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     }
 
     if (!m_trade_on_close) {
-        // Defer the whole reduction (sub and parent side) to the next open
+        // Defer the whole reduction (sub and parent side) to the next open, capping the parent
+        // leg by the parent holding (a parent side without shares can never fill)
         m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stock, need_back_num});
-        m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stock, need_back_num});
+        double parent_num = std::min(need_back_num, m_tm->getPosition(date, stock).number);
+        if (parent_num > 0.0) {
+            m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stock, parent_num});
+        }
         m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
         return;
     }
@@ -814,19 +818,21 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             }
             continue;
         }
-        // The leg belongs to the sub-account that initiated it: the parent side must be judged
-        // and capped by that ledger, not by the whole parent book (a sibling may still hold the
-        // same instrument)
+        // A sub leg is judged and capped by the initiating sub book, a parent leg by the parent
+        // book (the parent side can only sell what the parent account actually holds)
         TMPtr own_tm = (a.sys && a.sys->getTM()) ? a.sys->getTM() : m_tm;
         price_t price = _getOpenPrice(date, a.stock);
         if (price <= 0.0) {
             // No quote: the leg is left to the next session -- unless the holding is already gone
             // (e.g. the instrument was delisted and force-cleared while the leg waited): such a
             // dead leg would retry forever and block every future injection
-            const double own =
-              (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::PARENT_SELL)
-                ? own_tm->getPosition(date, a.stock).number
-                : own_tm->getShortPosition(a.stock).number;
+            const bool is_parent =
+              (a.kind == CalibrationKind::PARENT_SELL || a.kind == CalibrationKind::PARENT_COVER);
+            const bool is_long =
+              (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::PARENT_SELL);
+            TMPtr judge_tm = is_parent ? m_tm : own_tm;
+            const double own = is_long ? judge_tm->getPosition(date, a.stock).number
+                                       : judge_tm->getShortPosition(a.stock).number;
             if (own <= 0.0) {
                 continue;
             }
@@ -866,14 +872,11 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                 }
             }
             if (need > num) {
-                // Terminate a residual that can never fill: both the parent and the initiating
-                // sub-account are already flat (e.g. the sub was cleared while the leg waited)
-                if (m_tm->getPosition(date, a.stock).number <= 0.0 &&
-                    own_tm->getPosition(date, a.stock).number <= 0.0) {
+                // The parent has no quantity left: the residual can never fill (keeping it would
+                // later sell shares the parent acquires for somebody else)
+                if (m_tm->getPosition(date, a.stock).number <= 0.0) {
                     continue;
                 }
-                // The parent lacks the shares of this sub-account (a sibling holds them): keep the
-                // residual for the next open instead of selling somebody else's holding
                 CalibrationAction residual = a;
                 residual.number = need - num;
                 retry.push_back(residual);
@@ -889,8 +892,7 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                 }
             }
             if (need > num) {
-                if (m_tm->getShortPosition(a.stock).number <= 0.0 &&
-                    own_tm->getShortPosition(a.stock).number <= 0.0) {
+                if (m_tm->getShortPosition(a.stock).number <= 0.0) {
                     continue;
                 }
                 CalibrationAction residual = a;
@@ -1083,7 +1085,11 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         sold_value += num * close_price * stk.unit();
         if (!m_trade_on_close) {
             m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
-            m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, num});
+            double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
+            if (parent_num > 0.0) {
+                m_pending_calibration.push_back(
+                  {CalibrationKind::PARENT_SELL, sys, stk, parent_num});
+            }
             return;
         }
         sub_tm->sell(date, stk, close_price, num, 0.0, 0.0, close_price, PART_PORTFOLIO,
@@ -2208,6 +2214,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 }
                 auto qit = quota_map.find(sys.get());
                 if (qit != quota_map.end() && qit->second <= 0.0) {
+                    if (!adjust_running_sys && running_subs.count(sys.get()) > 0) {
+                        continue;  // the running sub-system is left untouched
+                    }
                     _liquidateParent(sys, datetime, executed);
                     _clearSubSystem(sys, datetime, ktype);
                     liquidated.insert(sys.get());
@@ -2455,38 +2464,19 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         // here and the next-period quota is written back on the rebalancing day (lagging one
         // period behind, quota penetration).
         getAF()->allocate(datetime, m_tm, suggestions, contexts, m_kdata.getQuery(), getMode());
-        // The selected but zero-quota sub-systems are handled as the unselected ones
+        // A zero quota takes the sub-system out of the allocation: liquidate both books and drop
+        // its same-close fills from the mirror batch (the sub ledger is cleared as a whole, so
+        // mirroring those fills would leave the parent with a phantom position)
         if (m_sell_at_not_selected) {
             for (auto& ctx : contexts) {
-                if (ctx.quota > 0.0 || ctx.sys->getStock().isNull()) {
+                if (ctx.quota > 0.0) {
                     continue;
                 }
-                const Stock& stock = ctx.sys->getStock();
-                price_t plan_price = _getClosePrice(datetime, stock);
-                double long_num = m_tm->getPosition(datetime, stock).number;
-                if (long_num > 0.0) {
-                    TradeSuggestion s;
-                    s.stock = stock;
-                    s.sys = ctx.sys;
-                    s.type = SuggestionType::CLEAR;
-                    s.plan_price = plan_price;
-                    s.number = long_num;
-                    suggestions.push_back(s);
-                }
-                // The parent short on the zero-quota instrument: cover it via a short-side CLEAR
-                double short_num = m_tm->getShortPosition(stock).number;
-                if (short_num > 0.0) {
-                    TradeSuggestion s;
-                    s.stock = stock;
-                    s.sys = ctx.sys;
-                    s.type = SuggestionType::CLEAR;
-                    s.short_side = true;
-                    s.plan_price = plan_price;
-                    s.number = short_num;
-                    suggestions.push_back(s);
-                }
-                // Clear the sub ledger too, matching the calibrated zero-quota liquidation: a zero
-                // quota takes the sub-system out of the allocation for good
+                suggestions.erase(
+                  std::remove_if(suggestions.begin(), suggestions.end(),
+                                 [&](const TradeSuggestion& s) { return s.sys == ctx.sys; }),
+                  suggestions.end());
+                _liquidateParent(ctx.sys, datetime, executed);
                 _clearSubSystem(ctx.sys, datetime, ktype);
             }
         }

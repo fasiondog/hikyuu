@@ -223,8 +223,9 @@ public:
         return m_se;
     }
 
-    /** Set whether to force liquidating the unselected sub-systems together with their accounts
-     *  (mode B/C only; mode A flattens the unselected instruments by the zero-target rebalancing)
+    /** Set whether to force liquidating the unselected sub-systems, and the selected ones with a
+     *  zero L1 quota, together with their accounts (mode B/C only; mode A flattens the unselected
+     *  instruments by the zero-target rebalancing)
      */
     void setSellAtNotSelected(bool v) {
         m_sell_at_not_selected = v;
@@ -464,8 +465,9 @@ private:
 
     /** Mode B with trade_on_close=false: the quota calibration legs (sub/parent sells, covers,
      * checkouts) and the injections are deferred to the next open; the injections wait while any
-     * sell leg still waits for a quote, so every leg shares one price basis. A leg whose holding
-     * is already gone (e.g. force-cleared on a delisting) is dropped instead of waiting */
+     * sell leg still waits for a quote, so every leg shares one price basis. A sub leg is judged
+     * by the initiating sub book, a parent leg by the parent book; a leg without a sellable
+     * quantity left (a dead leg, or a residual the parent can no longer fill) is dropped */
     enum class CalibrationKind {
         SUB_SELL,
         SUB_COVER,
@@ -608,9 +610,9 @@ private:
                                               // L1/L2/L3), owned by the aggregate system
     string m_mode{"A"};  // The running mode ("A"/"B"/"C"), owned by the aggregate system itself
     std::shared_ptr<SelectorBase> m_se;  // The trading object selector (optional)
-    // Whether to force liquidating the unselected sub-systems together with their accounts (mode
-    // B/C only, requires SE; mode A ignores it -- the unselected instruments are flattened by the
-    // zero-target rebalancing)
+    // Whether to force liquidating the unselected sub-systems, and the selected ones with a zero
+    // L1 quota, together with their accounts (mode B/C only, requires SE; mode A ignores it -- the
+    // unselected instruments are flattened by the zero-target rebalancing)
     bool m_sell_at_not_selected{false};
     std::vector<std::pair<Datetime, double>>
       m_adjust_turnover;  // The rebalancing-day turnover rate (the turnover amount / the total
