@@ -59,16 +59,6 @@ Factor::Factor(const string& name, const Indicator& formula, const KQuery::KType
     }
 }
 
-void Factor::name(const string& name) {
-    if (m_data->need_save_value && !name.empty()) {
-        HKU_CHECK(isValidFactorName(name), "{}",
-                  htr("When saving factor values, factor names must consist of English letters, "
-                      "numbers and underscores, and cannot start with a number!"));
-    }
-    m_data->name = utf8_to_upper(name);
-    m_data->formula.name(m_data->name);
-}
-
 void Factor::needSaveValue(bool flag) {
     if (flag && !m_data->name.empty()) {
         // When the factor values are saved the factor name must consist of English letters, digits

@@ -20,6 +20,7 @@ import Indicator
 import TradeCost
 
 import Environment
+import Factor
 import Condition
 import MoneyManager
 import Signal
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     suite.addTest(Environment.suite())
     suite.addTest(Environment.suiteTestCrtEV())
     suite.addTest(Environment.suiteTestEVManual())
+    suite.addTest(Factor.suite())
     suite.addTest(Condition.suite())
     suite.addTest(Condition.suiteTestCrtCN())
     suite.addTest(Condition.suiteTestLogicCondition())
