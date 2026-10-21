@@ -453,7 +453,7 @@ private:
     /** Drop the suggestions queued for the next open (the sub-system leaves the driving scope) */
     void _discardOpenPending(const string& reason);
 
-    /** Queue the cash checkout of the given sub-system unless one is already queued */
+    /** Queue the cash checkout of the given sub-system at the tail (a queued one is moved) */
     void _pushCheckoutOnce(const SystemPtr& sys);
 
     /** Drop the queued suggestions that belong to the given sub-system (it is being cleared) */
@@ -478,9 +478,10 @@ private:
 
     /** The quota calibration legs (sub/parent sells, covers, checkouts) and the injections are
      * deferred to the next open: with trade_on_close=false for the whole rebalancing, with
-     * trade_on_close=true only when the close is suspended. The injections and the cash checkout
-     * wait while a sell leg of the same sub-system still waits for a quote, so every leg shares
-     * one price basis. A sub leg is judged by the initiating sub book, a parent leg by the parent
+     * trade_on_close=true only when the close is suspended. The cash checkout waits while a sell
+     * leg of the same sub-system still waits for a quote; the injections wait while any sell leg
+     * is retried (the freed cash is part of their funding), so every leg shares one price basis.
+     * A sub leg is judged by the initiating sub book, a parent leg by the parent
      * book; a leg without a sellable quantity left (a dead leg, or a residual the parent can no
      * longer fill) is dropped */
     enum class CalibrationKind {
