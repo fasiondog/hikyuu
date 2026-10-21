@@ -7,6 +7,7 @@
 
 #include <hikyuu/trade_sys/multifactor/build_in.h>
 #include "../pybind_utils.h"
+#include "../gil_policy.h"
 
 namespace py = pybind11;
 using namespace hku;
@@ -254,9 +255,15 @@ The custom multi-factor model override hooks:
     
     :param Stock stk: the reference security)")
 
-      .def("get_datetime_list", &MultiFactorBase::getDatetimeList, py::return_value_policy::copy,
-           "Get the reference date list (obtained from the reference security through the query "
-           "condition)")
+      .def(
+        "get_datetime_list",
+        [](MultiFactorBase& self) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getDatetimeList();
+        },
+        py::return_value_policy::copy,
+        "Get the reference date list (obtained from the reference security through the query "
+        "condition)")
 
       .def("get_stock_list", &MultiFactorBase::getStockList, py::return_value_policy::copy,
            "Get the security list specified at the creation")
@@ -300,15 +307,27 @@ The custom multi-factor model override hooks:
     
     :param FactorSet factorset: the new original factor set)")
 
-      .def("get_factor", &MultiFactorBase::getFactor, py::return_value_policy::copy,
-           py::arg("stock"), R"(get_factor(self, stock)
+      .def(
+        "get_factor",
+        [](MultiFactorBase& self, const Stock& stock) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getFactor(stock);
+        },
+        py::return_value_policy::copy, py::arg("stock"),
+        R"(get_factor(self, stock)
 
     Get the new composed factor of the specified security
 
     :param Stock stock: the specified security)")
 
-      .def("get_all_factors", &MultiFactorBase::getAllFactors, py::return_value_policy::copy,
-           R"(get_all_factors(self)
+      .def(
+        "get_all_factors",
+        [](MultiFactorBase& self) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getAllFactors();
+        },
+        py::return_value_policy::copy,
+        R"(get_all_factors(self)
 
     Get the list of the composed factors of all the securities
 
@@ -345,7 +364,13 @@ The custom multi-factor model override hooks:
     :param str category: for the industry neutralization, specify the block category
     :param list[Indicator] style_inds: the list of the style indicators used for the neutralization)")
 
-      .def("get_ic", &MultiFactorBase::getIC, py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
+      .def(
+        "get_ic",
+        [](MultiFactorBase& self, int ndays) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getIC(ndays);
+        },
+        py::arg("ndays") = 0, R"(get_ic(self[, ndays=0])
 
     Get the IC of the composed factor, with the same length as the reference dates
 
@@ -355,8 +380,14 @@ The custom multi-factor model override hooks:
      
     :rtype: Indicator)")
 
-      .def("get_icir", &MultiFactorBase::getICIR, py::arg("ir_n"), py::arg("ic_n") = 0,
-           R"(get_icir(self, ir_n[, ic_n=0])
+      .def(
+        "get_icir",
+        [](MultiFactorBase& self, int ir_n, int ic_n) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getICIR(ir_n, ic_n);
+        },
+        py::arg("ir_n"), py::arg("ic_n") = 0,
+        R"(get_icir(self, ir_n[, ic_n=0])
 
     Get the ICIR of the composed factor
 
@@ -373,6 +404,7 @@ The custom multi-factor model override hooks:
            py::object filter) {
             size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
             if (filter.is_none()) {
+                hku::ScopeGilRelease rel(!self.hasPythonPart());
                 return self.getScores(date, start, cend, std::function<bool(const ScoreRecord&)>());
             }
             HKU_CHECK(py::hasattr(filter, "__call__"), "filter not callable!");
@@ -398,8 +430,14 @@ The custom multi-factor model override hooks:
     :param function filter: a callable object with the prototype (ScoreRecord)->bool or (Datetime, ScoreRecord)->bool
     :rtype: ScoreRecordList)")
 
-      .def("get_all_scores", &MultiFactorBase::getAllScores, py::return_value_policy::copy,
-           R"(get_all_scores(self)
+      .def(
+        "get_all_scores",
+        [](MultiFactorBase& self) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getAllScores();
+        },
+        py::return_value_policy::copy,
+        R"(get_all_scores(self)
 
     Get all the scores of all the dates, with the same length as the reference dates
 
@@ -411,7 +449,12 @@ The custom multi-factor model override hooks:
         "get_scores_np",
         [](MultiFactorBase& self, const Datetime& date, size_t start, py::object end) {
             size_t cend = end.is_none() ? Null<size_t>() : end.cast<size_t>();
-            return score_records_to_np(self.getScores(date, start, cend), kScoreNpFields());
+            ScoreRecordList scs;
+            {
+                hku::ScopeGilRelease rel(!self.hasPythonPart());
+                scs = self.getScores(date, start, cend);
+            }
+            return score_records_to_np(scs, kScoreNpFields());
         },
         py::arg("date"), py::arg("start") = 0, py::arg("end") = py::none(),
         R"(get_scores_np(self, date[, start=0, end=Null])
@@ -428,8 +471,12 @@ The custom multi-factor model override hooks:
       .def(
         "iter_scores",
         [](const MultiFactorPtr& self, size_t start, py::object end) {
-            const auto& all = self->getAllScores();
-            size_t total = all.size();
+            const vector<ScoreRecordList>* p = nullptr;
+            {
+                hku::ScopeGilRelease rel(!self->hasPythonPart());
+                p = &self->getAllScores();
+            }
+            size_t total = p->size();
             size_t cend = end.is_none() ? total : end.cast<size_t>();
             if (cend > total) {
                 cend = total;
@@ -450,7 +497,13 @@ The custom multi-factor model override hooks:
     :param int end: the end of the date range to iterate (excluded)
     :rtype: iterator)")
 
-      .def("get_all_src_factors", &MultiFactorBase::getAllSrcFactors, R"(get_all_src_factors(self)
+      .def(
+        "get_all_src_factors",
+        [](MultiFactorBase& self) {
+            hku::ScopeGilRelease rel(!self.hasPythonPart());
+            return self.getAllSrcFactors();
+        },
+        R"(get_all_src_factors(self)
 
     Get the list of all the original factors (if the standardization or the industry neutralization is specified, the returned list is the processed factor list)
 

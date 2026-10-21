@@ -183,6 +183,22 @@ public:
         return m_is_python_object;
     }
 
+    /** Whether the model itself, the global normalizer, or any special normalizer is Python-implemented. */
+    bool hasPythonPart() const noexcept {
+        if (m_is_python_object) {
+            return true;
+        }
+        if (m_norm && m_norm->isPythonObject()) {
+            return true;
+        }
+        for (const auto& kv : m_special_norms) {
+            if (kv.second && kv.second->isPythonObject()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Execute the calculation. It is calculated automatically when the result is got by default.
      *
