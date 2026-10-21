@@ -814,19 +814,20 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             }
             continue;
         }
+        // The leg belongs to the sub-account that initiated it: the parent side must be judged
+        // and capped by that ledger, not by the whole parent book (a sibling may still hold the
+        // same instrument)
+        TMPtr own_tm = (a.sys && a.sys->getTM()) ? a.sys->getTM() : m_tm;
         price_t price = _getOpenPrice(date, a.stock);
         if (price <= 0.0) {
             // No quote: the leg is left to the next session -- unless the holding is already gone
             // (e.g. the instrument was delisted and force-cleared while the leg waited): such a
             // dead leg would retry forever and block every future injection
-            const bool gone = a.kind == CalibrationKind::SUB_SELL
-                                ? a.sys->getTM()->getPosition(date, a.stock).number <= 0.0
-                              : a.kind == CalibrationKind::SUB_COVER
-                                ? a.sys->getTM()->getShortPosition(a.stock).number <= 0.0
-                              : a.kind == CalibrationKind::PARENT_SELL
-                                ? m_tm->getPosition(date, a.stock).number <= 0.0
-                                : m_tm->getShortPosition(a.stock).number <= 0.0;
-            if (gone) {
+            const double own =
+              (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::PARENT_SELL)
+                ? own_tm->getPosition(date, a.stock).number
+                : own_tm->getShortPosition(a.stock).number;
+            if (own <= 0.0) {
                 continue;
             }
             retry.push_back(a);
@@ -853,7 +854,10 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             continue;
         }
         if (a.kind == CalibrationKind::PARENT_SELL) {
-            double num = std::min(a.number, m_tm->getPosition(date, a.stock).number);
+            // The parent leg carries the sub's intended quantity: cap it by the parent holding
+            // only (the own book already sold its part in the same phase)
+            double need = a.number;
+            double num = std::min(need, m_tm->getPosition(date, a.stock).number);
             if (num > 0.0) {
                 TradeRecord tr = m_tm->sell(date, a.stock, price, num, 0.0, 0.0, price,
                                             PART_PORTFOLIO, "MultiSystem");
@@ -861,14 +865,27 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                     out.push_back(tr);
                 }
             }
+            if (need > num) {
+                // The parent lacks the shares of this sub-account (a sibling holds them): keep the
+                // residual for the next open instead of selling somebody else's holding
+                CalibrationAction residual = a;
+                residual.number = need - num;
+                retry.push_back(residual);
+            }
         } else {
-            double num = std::min(a.number, m_tm->getShortPosition(a.stock).number);
+            double need = a.number;
+            double num = std::min(need, m_tm->getShortPosition(a.stock).number);
             if (num > 0.0) {
                 TradeRecord tr = m_tm->buyShort(date, a.stock, price, num, 0.0, 0.0, price,
                                                 PART_PORTFOLIO, "MultiSystem");
                 if (!tr.isNull()) {
                     out.push_back(tr);
                 }
+            }
+            if (need > num) {
+                CalibrationAction residual = a;
+                residual.number = need - num;
+                retry.push_back(residual);
             }
         }
     }
@@ -2143,10 +2160,47 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         m_external_quota = 0.0;
     }
 
+    // The injections are re-derived from this round's quotas: drop the stale targets of earlier
+    // rounds (a lowered quota must not be re-inflated). This also runs when the SE selected nobody
+    // (quota_calibrated is false in that case), so a stale target cannot survive a full clear.
+    if (is_adjust && m_se && !m_trade_on_close) {
+        m_pending_calibration.erase(
+          std::remove_if(
+            m_pending_calibration.begin(), m_pending_calibration.end(),
+            [](const CalibrationAction& a) { return a.kind == CalibrationKind::INJECT; }),
+          m_pending_calibration.end());
+    }
+
     // Mode B (master SimplePortfolio compatibility): the calibration runs in the master order --
     // recycle the cash -> liquidate the unselected -> reduce the over quota -> inject the gap, so
     // the freed cash is already in the parent pool when the following injection runs
     if (quota_calibrated) {
+        // A same-day re-drive rebuilds the round: the legs pushed by the previous drive of the same
+        // close are replaced instead of duplicated (the retry legs of earlier days are kept)
+        if (!m_trade_on_close && !m_pending_calibration_retry &&
+            !m_pending_calibration_date.isNull() &&
+            m_pending_calibration_date.startOfDay() == datetime.startOfDay()) {
+            m_pending_calibration.clear();
+            m_pending_calibration_date = Datetime();
+            m_pending_calibration_assets = 0.0;
+        }
+        // A selected sub-system with a zero quota is cleared like an unselected one (the legacy
+        // flow already does this, the calibrated flow must not leave it running with no budget)
+        std::set<const void*> liquidated;
+        if (m_sell_at_not_selected) {
+            for (auto& sys : m_sys_list) {
+                if (selected.count(sys.get()) == 0) {
+                    continue;
+                }
+                auto qit = quota_map.find(sys.get());
+                if (qit != quota_map.end() && qit->second <= 0.0) {
+                    _liquidateParent(sys, datetime, executed);
+                    _clearSubSystem(sys, datetime, ktype);
+                    liquidated.insert(sys.get());
+                }
+            }
+        }
+
         for (size_t i = 0; i < m_sys_list.size(); ++i) {
             SystemPtr& sys = m_sys_list[i];
             if (selected.count(sys.get()) == 0) {
@@ -2162,7 +2216,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                     _liquidateParent(sys, datetime, executed);
                     _clearSubSystem(sys, datetime, ktype);
                 }
-            } else {
+            } else if (liquidated.count(sys.get()) == 0) {
                 // The selected: recycle the sub cash first (bookkeeping). With
                 // adjust_running_sys=false the running sub-system is left untouched (its idle
                 // cash stays in the sub account); only a new sub-system goes through here.
@@ -2195,18 +2249,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 continue;  // adjust_running_sys=false: the running sub-system is not force-reduced
             }
             auto qit = quota_map.find(sys.get());
-            if (qit != quota_map.end()) {
+            if (qit != quota_map.end() && liquidated.count(sys.get()) == 0) {
                 _reduceSubSystemToQuota(sys, datetime, qit->second, ktype, executed);
             }
-        }
-        // The injections are re-derived from this round's quotas: drop the stale targets of
-        // earlier rounds (a lowered quota must not be re-inflated)
-        if (!m_trade_on_close) {
-            m_pending_calibration.erase(
-              std::remove_if(
-                m_pending_calibration.begin(), m_pending_calibration.end(),
-                [](const CalibrationAction& a) { return a.kind == CalibrationKind::INJECT; }),
-              m_pending_calibration.end());
         }
         // The cash already freed by the reduction phase, shared by the injections: the total must
         // never exceed what the parent can actually fund
@@ -2220,7 +2265,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 continue;  // adjust_running_sys=false: the running sub-system is not force-injected
             }
             auto qit = quota_map.find(sys.get());
-            if (qit != quota_map.end()) {
+            if (qit != quota_map.end() && liquidated.count(sys.get()) == 0) {
                 if (m_trade_on_close) {
                     if (cash_left <= 0.0) {
                         continue;

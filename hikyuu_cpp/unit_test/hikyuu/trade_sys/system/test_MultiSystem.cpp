@@ -5298,7 +5298,10 @@ TEST_CASE("test_MultiSystem_mode_b_stale_inject_purged") {
     KData k3 = market.getKData(q3);
     REQUIRE(k1.size() > 5);
     REQUIRE_GE(k2.size(), 1);
-    REQUIRE(k3.size() > 5);
+    REQUIRE_GT(k3.size(), 5);
+    // The second run intentionally re-drives the 06-30 close: the next rebalancing round must
+    // happen while the retry of the suspended leg is still pending
+    REQUIRE_EQ(k3.front().datetime, Datetime(200006300000LL));
 
     auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
     leaf1->setStock(stk1);
@@ -5327,19 +5330,137 @@ TEST_CASE("test_MultiSystem_mode_b_stale_inject_purged") {
     REQUIRE_GT(leaf2_before, 0.0);
 
     // The 06-30 close lowers leaf2's quota while leaf1's sell leg still waits: the stale high
-    // injection of leaf2 must be purged, otherwise it re-inflates leaf2 after its own sells
+    // injection of leaf2 must be purged, otherwise it re-inflates leaf2 after its own sells.
+    // The weight list is used as given (no normalization): 45% / 5% of the parent assets
     ms->setAF(AF_FixedWeightList({0.45, 0.05}));
     ms->run(k3, false);
 
     // Measured on the day the stuck sell finally fills (07-03): the stale injection would show
     // up exactly here, re-inflating leaf2 right after its own sells
-    double leaf2_after = leaf2->getTM()->getPosition(k3[1].datetime, stk2).number;
-    double leaf2_nav = leaf2->getTM()->getFunds(k3[1].datetime, KQuery::DAY).net_assets();
+    Datetime retry_day(200007030000LL);
+    double leaf2_after = leaf2->getTM()->getPosition(retry_day, stk2).number;
+    double leaf2_nav = leaf2->getTM()->getFunds(retry_day, KQuery::DAY).net_assets();
 
     /** @arg leaf2 is near its lowered quota on the retry day, not re-inflated by the stale target
      */
     CHECK_LT(leaf2_after, leaf2_before);
     CHECK_LT(leaf2_nav, 100000.0);
+}
+
+/** @par Check point: a selected sub-system with a zero quota is cleared like an unselected one
+ * (the calibrated flow keeps the same liquidation semantics as the legacy flow) */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_clears") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    REQUIRE_GT(leaf2->getTM()->getPosition(k1.back().datetime, stk2).number, 0.0);
+
+    /** @arg a zero quota clears the sub ledger and the parent holdings */
+    ms->setAF(AF_FixedWeightList({1.0, 0.0}));
+    ms->run(k2, false);
+    CHECK_EQ(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_GT(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a pending sell leg whose holding was force-cleared while it waited (a
+ * delisting) is dropped instead of blocking the injections forever */
+TEST_CASE("test_MultiSystem_dead_leg_dropped_after_force_clear") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sz000001");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(20000401), Datetime(20000731));
+    KQuery full2(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000626));
+    KQuery q2(Datetime(20000629), Datetime(20000630));
+    KQuery q3(Datetime(20000630), Datetime(20000701));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    KData k3 = market.getKData(q3);
+    REQUIRE(k1.size() > 5);
+    REQUIRE_GE(k2.size(), 1);
+    REQUIRE_GE(k3.size(), 1);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_dead_leg");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    // The 06-29 close: leaf1 gets a zero quota (a deferred clear), leaf2 stays under quota
+    // (a deferred injection waiting for the sells)
+    ms->setAF(AF_FixedWeightList({0.0, 1.0}));
+    ms->run(k2, false);
+
+    // Simulate the force-clear of a delisting arriving before the suspended open
+    Datetime d = k2.back().datetime;
+    double sub_num = leaf1->getTM()->getPosition(d, stk1).number;
+    double parent_num = ms->getTM()->getPosition(d, stk1).number;
+    REQUIRE_GT(sub_num, 0.0);
+    leaf1->getTM()->sell(d, stk1, 1.0, sub_num, 0.0, 0.0, 1.0, PART_SYSTEM, "force clear");
+    if (parent_num > 0.0) {
+        ms->getTM()->sell(d, stk1, 1.0, parent_num, 0.0, 0.0, 1.0, PART_SYSTEM, "force clear");
+    }
+
+    double pos2_before = leaf2->getTM()->getPosition(d, stk2).number;
+
+    // The 06-30 open: the instrument is suspended and its holding is gone -> the legs are dropped,
+    // the deferred injection is no longer blocked
+    ms->run(k3, false);
+
+    size_t dead_sells = 0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk1 &&
+            tr.datetime == Datetime(200006300000LL)) {
+            dead_sells++;
+        }
+    }
+    CHECK_EQ(dead_sells, 0);
+    // The freed injection reached leaf2: it bought with the injected cash on the same close
+    CHECK_GT(leaf2->getTM()->getPosition(Datetime(200006300000LL), stk2).number, pos2_before);
 }
 
 /** @} */

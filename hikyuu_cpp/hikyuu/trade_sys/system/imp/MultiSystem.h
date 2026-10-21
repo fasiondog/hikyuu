@@ -464,7 +464,8 @@ private:
 
     /** Mode B with trade_on_close=false: the quota calibration legs (sub/parent sells, covers,
      * checkouts) and the injections are deferred to the next open; the injections wait while any
-     * sell leg still waits for a quote, so every leg shares one price basis */
+     * sell leg still waits for a quote, so every leg shares one price basis. A leg whose holding
+     * is already gone (e.g. force-cleared on a delisting) is dropped instead of waiting */
     enum class CalibrationKind {
         SUB_SELL,
         SUB_COVER,
