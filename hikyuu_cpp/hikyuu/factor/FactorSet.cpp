@@ -140,22 +140,13 @@ void FactorSet::remove(const string& name) {
         return;  // The factor does not exist
     }
 
+    // Keep the insertion order and rebuild the shifted indices
     size_t index_to_remove = it->second;
-    size_t last_index = m_data->factors.size() - 1;
-
-    // When the element to delete is not the last one, the index of the following element must be
-    // adjusted
-    if (index_to_remove != last_index) {
-        // Move the last element to the position to be deleted
-        m_data->factors[index_to_remove] = std::move(m_data->factors[last_index]);
-        // Update the index of the moved element in the map
-        const string& moved_factor_name = m_data->factors[index_to_remove].name();
-        m_data->nameIndexMap[moved_factor_name] = index_to_remove;
-    }
-
-    // Delete the last element and the map entry
-    m_data->factors.pop_back();
+    m_data->factors.erase(m_data->factors.begin() + index_to_remove);
     m_data->nameIndexMap.erase(it);
+    for (size_t i = index_to_remove; i < m_data->factors.size(); ++i) {
+        m_data->nameIndexMap[m_data->factors[i].name()] = i;
+    }
 }
 
 bool FactorSet::have(const string& name) const noexcept {

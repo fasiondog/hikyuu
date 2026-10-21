@@ -98,6 +98,24 @@ class FactorSetIndexTest(unittest.TestCase):
         with self.assertRaises(IndexError):
             fs[-3]
 
+    def test_remove_preserves_order(self):
+        fs = FactorSet("ft05_order")
+        fs.add("F1", CVAL(1.0))
+        fs.add("F2", CVAL(2.0))
+        fs.add("F3", CVAL(3.0))
+        fs.add("F4", CVAL(4.0))
+        self.assertEqual(len(fs), 4)
+        self.assertEqual([fs[i].name for i in range(len(fs))], ["F1", "F2", "F3", "F4"])
+        fs.remove("F2")
+        self.assertEqual(len(fs), 3)
+        self.assertEqual([fs[i].name for i in range(len(fs))], ["F1", "F3", "F4"])
+        fs.remove("F4")
+        self.assertEqual(len(fs), 2)
+        self.assertEqual([fs[i].name for i in range(len(fs))], ["F1", "F3"])
+        fs.remove("F1")
+        fs.remove("F3")
+        self.assertTrue(fs.empty())
+
 
 class FactorNameGuardTest(unittest.TestCase):
     def test_name_injection_guard(self):

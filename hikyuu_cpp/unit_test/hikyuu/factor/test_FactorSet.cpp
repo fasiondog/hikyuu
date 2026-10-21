@@ -681,6 +681,55 @@ TEST_CASE("test_FactorSet_order_preservation") {
     }
 }
 
+/** @par Test point: FT05 - remove() must keep the insertion order (not swap the last element into the
+ * hole), so the getValues column order and the serialization order stay stable. */
+TEST_CASE("test_FactorSet_remove_preserves_insertion_order") {
+    Indicator ma5 = MA(CLOSE(), 5);
+    Indicator ma10 = MA(CLOSE(), 10);
+    Indicator ma15 = MA(CLOSE(), 15);
+    Indicator ma20 = MA(CLOSE(), 20);
+
+    FactorSet fs("FT05_ORDER", KQuery::DAY);
+    fs.add(Factor("MA5", ma5, KQuery::DAY));
+    fs.add(Factor("MA10", ma10, KQuery::DAY));
+    fs.add(Factor("MA15", ma15, KQuery::DAY));
+    fs.add(Factor("MA20", ma20, KQuery::DAY));
+    CHECK_EQ(fs.size(), 4);
+
+    /** @arg the initial order matches the addition order */
+    vector<string> order = {"MA5", "MA10", "MA15", "MA20"};
+    size_t i = 0;
+    for (const auto& f : fs) {
+        CHECK_EQ(f.name(), order[i++]);
+    }
+    CHECK_EQ(i, 4);
+
+    /** @arg removing an interior factor keeps the remaining factors in insertion order (not permuted) */
+    fs.remove("MA10");
+    vector<string> after = {"MA5", "MA15", "MA20"};
+    i = 0;
+    for (const auto& f : fs) {
+        CHECK_EQ(f.name(), after[i++]);
+    }
+    CHECK_EQ(i, 3);
+    CHECK_EQ(fs.get("MA15").name(), "MA15");
+    CHECK_EQ(fs.get("MA20").name(), "MA20");
+
+    /** @arg removing another interior factor keeps the order */
+    fs.remove("MA20");
+    vector<string> after2 = {"MA5", "MA15"};
+    i = 0;
+    for (const auto& f : fs) {
+        CHECK_EQ(f.name(), after2[i++]);
+    }
+    CHECK_EQ(i, 2);
+
+    /** @arg removing the rest empties the set */
+    fs.remove("MA5");
+    fs.remove("MA15");
+    CHECK(fs.empty());
+}
+
 /** @par Test point: test the getValues functionality of FactorSet */
 TEST_CASE("test_FactorSet_getValues") {
     HKU_IF_RETURN(!pluginValid(), void());
