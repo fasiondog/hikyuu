@@ -6313,4 +6313,74 @@ TEST_CASE("test_MultiSystem_cascade_a_b_a_suspended_deferred") {
     CHECK_GT(parent2, 0.0);
 }
 
-/** @} */
+/** @par Check point: a trade_on_close=true composite reduction on a suspended close queues the
+ * pro-rata legs (the suspended leaf is valued at its last close) and fills them at the next
+ * quoted open */
+TEST_CASE("test_MultiSystem_composite_reduction_suspended_close") {
+    Stock stk_susp = getStock("sh600005");
+    Stock stk_quote = getStock("sh600000");
+    Stock market = stk_quote;
+    REQUIRE(!stk_susp.isNull());
+    REQUIRE(!stk_quote.isNull());
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000630));
+    KQuery q2(Datetime(20000630), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    REQUIRE(k1.size() > 10);
+    REQUIRE(k2.size() > 2);
+    REQUIRE_UNARY(stk_susp.getKData(KQuery(Datetime(20000630), Datetime(20000701))).empty());
+
+    auto leaf_susp =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf_susp->setStock(stk_susp);
+    leaf_susp->setParam<bool>("buy_delay", false);
+    leaf_susp->setTO(stk_susp.getKData(full));
+    auto leaf_quote =
+      SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf_quote->setStock(stk_quote);
+    leaf_quote->setParam<bool>("buy_delay", false);
+    leaf_quote->setTO(stk_quote.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("comp_red_inner");
+    inner->setMode("A");
+    inner->setSubInitCash(150000.0);
+    inner->add(leaf_susp);
+    inner->add(leaf_quote);
+
+    auto ms = std::make_shared<MultiSystem>("comp_red_outer");
+    ms->setTM(crtTM(Datetime(200005010000LL), 300000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double susp1 = inner->getTM()->getPosition(k1.back().datetime, stk_susp).number;
+    double quote1 = inner->getTM()->getPosition(k1.back().datetime, stk_quote).number;
+    REQUIRE_GT(susp1, 0.0);
+    REQUIRE_GT(quote1, 0.0);
+
+    /** @arg the suspended leaf is valued at its last close: both leaves are reduced pro rata and
+     * the quoted leaf is not liquidated just because its sibling is suspended */
+    ms->setAF(AF_FixedAmount(70000.0));
+    ms->run(k2, false);
+    double susp2 = inner->getTM()->getPosition(k2.back().datetime, stk_susp).number;
+    double quote2 = inner->getTM()->getPosition(k2.back().datetime, stk_quote).number;
+    CHECK_LT(susp2, susp1);
+    CHECK_GT(quote2, 0.0);
+
+    /** @arg the quoted leaf is not fully liquidated at the suspended close: the pro-rata ratio
+     * covers both leaves, so the close-time parent sell stays partial */
+    double sold_quote_at_close = 0.0;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.datetime == Datetime(200006300000LL) && tr.business == BUSINESS_SELL &&
+            tr.stock == stk_quote) {
+            sold_quote_at_close += tr.number;
+        }
+    }
+    CHECK_GT(sold_quote_at_close, 0.0);
+    // The lot rounding alone cannot explain the gap: without the suspended leaf in the value base
+    // the ratio clamps to 1.0 and the quoted leaf is sold in full
+    CHECK_LT(sold_quote_at_close, quote1 - 1000.0);
+}
+
+/** @} */ /** @} */

@@ -1160,6 +1160,11 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
     for (const auto& stk : stocks) {
         double num = sub_tm->getPosition(date, stk).number;
         price_t p = _getClosePrice(date, stk);
+        if (p <= 0.0) {
+            // Suspended: fall back to the last available close, so the pro-rata reduction covers
+            // the whole composite instead of liquidating only the quoted leaves
+            p = stk.getMarketValue(date, ktype);
+        }
         if (num <= 0.0 || p <= 0.0) {
             continue;
         }
@@ -1209,10 +1214,20 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         if (min_num <= 0.0) {
             continue;
         }
+        // A cross-day retry leg may already be planned for this stock: deduct it so the same
+        // excess is not sold twice
+        double planned = 0.0;
+        for (const auto& a : m_pending_calibration) {
+            if (a.sys == sys && a.kind == CalibrationKind::SUB_SELL && a.stock == stk) {
+                planned += a.number;
+            }
+        }
         if (close_price <= 0.0) {
             // Suspended: queue the pro-rata leg so the excess is sold at the next quoted open
             double num = std::floor(hold * ratio / min_num) * min_num;
             num = std::min(num, hold);
+            num = std::max(0.0, num - planned);
+            num = std::floor(num / min_num) * min_num;
             if (num > 0.0) {
                 m_pending_calibration.push_back({CalibrationKind::SUB_SELL, sys, stk, num});
                 double parent_num = std::min(num, m_tm->getPosition(date, stk).number);
@@ -1228,6 +1243,8 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         }
         double num = std::floor(value * ratio / close_price / min_num) * min_num;
         num = std::min(num, hold);
+        num = std::max(0.0, num - planned);
+        num = std::floor(num / min_num) * min_num;
         sell_part(stk, num, close_price);
     }
 
@@ -1958,7 +1975,8 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     TradeRecordList calibration_trades;
     Datetime calibration_date = m_pending_calibration_date;
     double calibration_assets = m_pending_calibration_assets;
-    if (!m_pending_calibration.empty()) {
+    bool had_calibration = !m_pending_calibration.empty();
+    if (had_calibration) {
         _executePendingCalibration(datetime, m_kdata.getQuery().kType(), calibration_trades);
         for (auto& tr : calibration_trades) {
             result.tradesOnOpen.push_back(tr);
@@ -2087,7 +2105,7 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     // toc=false rebalancing or a toc=true suspended close), a batch queued on a rebalancing close
     // and the mode C fills (a continuous-mirror batch of the modes A/B is not rebalancing turnover
     // and is not counted)
-    if (!m_trade_on_close || !m_pending_calibration.empty()) {
+    if (!m_trade_on_close || had_calibration) {
         double traded = 0.0;
         for (const auto& tr : result.tradesOnOpen) {
             traded += tr.number * tr.realPrice * tr.stock.unit();
