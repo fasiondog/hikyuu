@@ -3567,6 +3567,125 @@ TEST_CASE("test_MultiSystem_nested_a_no_double_pending") {
     CHECK_LT(parent_pos, inner_pos * 1.5);
 }
 
+/** @par Check point: a deep nested A (outer A -> middle B -> inner A, trade_on_close=false) is
+ * still visible to the outer sampling through its queued batch */
+TEST_CASE("test_MultiSystem_cascade_a_b_a_deferred_intent") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 3].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+
+    auto inner = std::make_shared<MultiSystem>("inner_a_deferred");
+    inner->setMode("A");
+    inner->setSubInitCash(100000.0);
+    inner->setParam<bool>("trade_on_close", false);
+    inner->add(leaf);
+
+    auto middle = std::make_shared<MultiSystem>("middle_b");
+    middle->setMode("B");
+    middle->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    middle->add(inner);
+
+    auto outer = std::make_shared<MultiSystem>("outer_a_cascade");
+    outer->setTM(crtTM(Datetime(200001010000LL), 1000000.0));
+    outer->setMode("A");
+    outer->setSE(std::make_shared<SelectAllSE>(SystemList{middle}));
+    outer->add(middle);
+    outer->run(k);
+
+    Datetime first_buy;
+    for (const auto& tr : outer->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY) {
+            first_buy = tr.datetime;
+            break;
+        }
+    }
+
+    /** @arg the outer buys on the intent day, not one period later */
+    CHECK_UNARY(!first_buy.isNull());
+    CHECK_EQ(first_buy, buy_date);
+}
+
+/** @par Check point: an outer mode B reducing a nested mode B composite delegates the budget, so
+ * the leaf ledger, the composite account and the outer parent stay matched */
+TEST_CASE("test_MultiSystem_mode_b_nested_b_quota_reduction") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query1(Datetime(19991110), Datetime(20000120));
+    KQuery query2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(query1);
+    KData k2 = stk.getKData(query2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(KQuery(Datetime(19991110), Datetime(20000225))));
+    auto inner = std::make_shared<MultiSystem>("inner_b_nested");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_nested");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+    CHECK_EQ(inner1, doctest::Approx(parent1));
+
+    /** @arg a shrunk outer budget reaches the leaf ledger through the inner calibration */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    double leaf2 = leaf->getTM()->getPosition(k2.back().datetime, stk).number;
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_EQ(leaf2, doctest::Approx(inner2));
+    CHECK_EQ(inner2, doctest::Approx(parent2));
+}
+
+/** @par Check point: mode C with trade_on_close=false records the rebalancing turnover from the
+ * next open fills */
+TEST_CASE("test_MultiSystem_mode_c_turnover_trade_on_close_false") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query(Datetime(19991110), Datetime(20000225));
+    KData k = stk.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date = k[k.size() - 3].datetime;
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(1000), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", true);
+
+    auto ms = std::make_shared<MultiSystem>("ms_c_turnover_false");
+    ms->setTM(crtTM(k[0].datetime, 100000.0));
+    ms->setMode("C");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    /** @arg the open fill is attributed to the rebalancing close */
+    CHECK_UNARY(!ms->getAdjustTurnover().empty());
+    CHECK_EQ(ms->getAdjustTurnover().back().first, buy_date);
+}
+
 /** @par Check point: a same-bar open fill followed by a close reversal is netted in one batch, so
  * the parent does not keep a phantom position the sub-system already closed */
 TEST_CASE("test_MultiSystem_mode_b_same_bar_netting") {

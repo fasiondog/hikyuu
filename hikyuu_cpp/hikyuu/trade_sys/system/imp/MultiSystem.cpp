@@ -263,6 +263,9 @@ void MultiSystem::_reset() {
     m_last_close_date = Datetime();
     m_last_adjust_period = Datetime();
     m_last_sampled_date = Datetime();
+    m_external_quota = 0.0;
+    m_external_quota_set = false;
+    m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
         // Only the cached selection is dropped: a full SE reset would also drop the
@@ -317,6 +320,9 @@ void MultiSystem::_forceResetAll() {
     m_last_close_date = Datetime();
     m_last_adjust_period = Datetime();
     m_last_sampled_date = Datetime();
+    m_external_quota = 0.0;
+    m_external_quota_set = false;
+    m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
         // Only the cached selection is dropped: a full SE reset would also drop the
@@ -581,20 +587,33 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
         return;
     }
 
-    // The sub cash has been recycled before, so the net assets here measure the holding value;
-    // the net_assets metric keeps the calibration from being inflated by the short book
+    // The sub cash has been recycled before (trade_on_close=true), so the net assets measure the
+    // holding value; with trade_on_close=false that recycle is skipped and the idle cash must be
+    // excluded too
     FundsRecord funds = sub_tm->getFunds(date, ktype);
     price_t sub_total = funds.net_assets();
-    if (sub_total <= quota || quota <= 0.0) {
+    price_t reduce_base = m_trade_on_close ? sub_total : (sub_total - funds.cash);
+    if (sys->isComposite()) {
+        auto* inner = dynamic_cast<MultiSystem*>(sys.get());
+        if (inner && inner->getMode() == "B" && quota > 0.0) {
+            // The inner manages its own leaf ledgers: delegate the budget and let it reduce its
+            // leaves (the FOF/MOM semantics, both book levels stay matched)
+            inner->m_external_quota = quota;
+            inner->m_external_quota_set = true;
+        } else if (quota > 0.0 && reduce_base > quota) {
+            // An A/C composite has no quota machinery: reduce its account pro rata
+            _reduceCompositeToQuota(sys, date, reduce_base - quota, ktype, out_executed);
+        }
+        return;
+    }
+    if (reduce_base <= quota || quota <= 0.0) {
         return;
     }
 
     // Above the quota: reduce the position by the over quota market value (the master algorithm)
-    price_t need_back_funds = sub_total - quota;
+    price_t need_back_funds = reduce_base - quota;
     Stock stock = sys->getStock();
     if (stock.isNull()) {
-        // A composite has no instrument of its own: reduce its leaf holdings pro rata
-        _reduceCompositeToQuota(sys, date, need_back_funds, ktype, out_executed);
         return;
     }
     price_t last_close_price = stock.getMarketValue(date, ktype);
@@ -828,10 +847,12 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
 
     if (!retry.empty()) {
         m_pending_calibration = std::move(retry);
+        m_pending_calibration_retry = true;
     } else {
         m_pending_calibration.clear();
         m_pending_calibration_date = Datetime();
         m_pending_calibration_assets = 0.0;
+        m_pending_calibration_retry = false;
     }
 }
 
@@ -1059,7 +1080,6 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         sub_tm->checkout(date, funds.cash);
     }
 }
-
 DatetimeList MultiSystem::calcAdjustDates(const DatetimeList& dates, const string& mode,
                                           int adjust_cycle, bool delay_to_trading_day) {
     std::set<Datetime> result;
@@ -1782,22 +1802,6 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
         m_open_pending_date = Datetime();
     }
 
-    // The turnover of the rebalancing close: the deferred calibration legs and the queued batch
-    if (!m_trade_on_close) {
-        double traded = 0.0;
-        for (const auto& tr : calibration_trades) {
-            traded += tr.number * tr.realPrice * tr.stock.unit();
-        }
-        for (const auto& tr : executed_open) {
-            traded += tr.number * tr.realPrice * tr.stock.unit();
-        }
-        Datetime adjust_date = !calibration_date.isNull() ? calibration_date : pending_date;
-        double assets = calibration_assets > 0.0 ? calibration_assets : pending_assets;
-        if (!adjust_date.isNull() && assets > 0.0 && traded > 0.0) {
-            m_adjust_turnover.push_back({adjust_date, traded / assets});
-        }
-    }
-
     // A new day: clear and rebuild the open trade buffer of every sub-system (used by the close
     // stage of this layer for the aggregation). Note: the open trades of the sub-systems happen on
     // their own (virtual) accounts, they are only cached into m_open_trades for the close merge of
@@ -1881,6 +1885,28 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
             }
         }
     }
+
+    // The turnover of the rebalancing close: every parent-account trade of this open (the
+    // deferred calibration legs, the queued batch and the mode C sub-system open fills)
+    if (!m_trade_on_close) {
+        double traded = 0.0;
+        for (const auto& tr : result.tradesOnOpen) {
+            traded += tr.number * tr.realPrice * tr.stock.unit();
+        }
+        Datetime adjust_date = !calibration_date.isNull() ? calibration_date : pending_date;
+        if (adjust_date.isNull()) {
+            adjust_date = m_open_turnover_date;
+        }
+        double assets = calibration_assets > 0.0 ? calibration_assets : pending_assets;
+        if (assets <= 0.0) {
+            assets = m_open_turnover_assets;
+        }
+        if (!adjust_date.isNull() && assets > 0.0 && traded > 0.0) {
+            m_adjust_turnover.push_back({adjust_date, traded / assets});
+        }
+        m_open_turnover_date = Datetime();
+        m_open_turnover_assets = 0.0;
+    }
     return result;
 }
 
@@ -1912,7 +1938,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
 
     // A calibration batch left over from an earlier close without an open in between is stale:
     // drop it (with a notice), like the queued suggestion batch
-    if (!m_trade_on_close && !m_pending_calibration.empty() &&
+    if (!m_trade_on_close && !m_pending_calibration_retry && !m_pending_calibration.empty() &&
         !m_pending_calibration_date.isNull() &&
         m_pending_calibration_date.startOfDay() != datetime.startOfDay()) {
         HKU_WARN("{}: un-executed deferred calibration legs from {} dropped on {}!", name(),
@@ -2037,8 +2063,24 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             for (auto& ctx : quota_ctxs) {
                 quota_map[ctx.sys.get()] = ctx.quota;
             }
+            // The outer mode B layer may have assigned this aggregate a budget: scale the leaf
+            // quotas to that total (the FOF/MOM budget semantics)
+            if (m_external_quota_set) {
+                price_t total = 0.0;
+                for (const auto& kv : quota_map) {
+                    total += kv.second;
+                }
+                if (total > 0.0 && m_external_quota > 0.0) {
+                    double scale = m_external_quota / total;
+                    for (auto& kv : quota_map) {
+                        kv.second *= scale;
+                    }
+                }
+            }
             quota_calibrated = true;
         }
+        m_external_quota_set = false;
+        m_external_quota = 0.0;
     }
 
     // Mode B (master SimplePortfolio compatibility): the calibration runs in the master order --
@@ -2108,8 +2150,11 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                 continue;  // adjust_running_sys=false: the running sub-system is not force-injected
             }
             auto qit = quota_map.find(sys.get());
-            if (qit != quota_map.end() && cash_left > 0.0) {
+            if (qit != quota_map.end()) {
                 if (m_trade_on_close) {
+                    if (cash_left <= 0.0) {
+                        continue;
+                    }
                     cash_left -= _injectSubSystemGap(sys, datetime, qit->second, ktype, cash_left);
                 } else {
                     // Defer the injection to the next open: the actual cash freed by the deferred
@@ -2462,9 +2507,7 @@ void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Dateti
             continue;
         }
         if (auto* ms = dynamic_cast<MultiSystem*>(child.get())) {
-            if (ms->getMode() == "A" && ms->m_last_sampled_date == date) {
-                continue;  // the nested sampling already covers the leaf intents
-            }
+            const bool sampled_a = (ms->getMode() == "A" && ms->m_last_sampled_date == date);
             for (const auto& sug : ms->m_open_pending_suggestions) {
                 if (sug.stock.isNull() || sug.plan_price <= 0.0 || sug.number <= 0.0) {
                     continue;
@@ -2486,6 +2529,9 @@ void MultiSystem::_foldSubtreePendingRequests(const SystemPtr& sys, const Dateti
                            (sug.type == SuggestionType::CLEAR && !sug.short_side)) {
                     ratio[sug.stock] -= v;
                 }
+            }
+            if (sampled_a) {
+                continue;  // its queued batch (folded above) already carries the leaf intents
             }
             if (ms->getMode() == "A") {
                 if (!ms->m_open_pending_suggestions.empty()) {
@@ -2631,6 +2677,14 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
         m_close_day_index++;
     }
 
+    // The rebalancing close of a trade_on_close=false session records its date/assets here, so
+    // the open stage can attribute every executed leg (including the mode C sub open fills and
+    // the A/B delayed fills) to that rebalancing day
+    if (!m_trade_on_close && is_adjust) {
+        m_open_turnover_date = datetime;
+        m_open_turnover_assets = assets_before;
+    }
+
     // The deferred calibration of the close (trade_on_close=false) records its date/assets here,
     // so the open stage can attribute the executed legs to the rebalancing day (all modes,
     // including the early-returning modes A and C)
@@ -2645,7 +2699,7 @@ void MultiSystem::_finishClosePhase(const Datetime& datetime,
     if (is_adjust && m_trade_on_close && !executed.empty()) {
         double turnover_cash = 0.0;
         for (auto& tr : executed) {
-            turnover_cash += std::fabs(tr.realPrice) * tr.number;
+            turnover_cash += std::fabs(tr.realPrice) * tr.number * tr.stock.unit();
         }
         m_adjust_turnover.emplace_back(datetime,
                                        assets_before > 0.0 ? turnover_cash / assets_before : 0.0);

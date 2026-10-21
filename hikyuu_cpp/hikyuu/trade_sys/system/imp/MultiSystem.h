@@ -444,12 +444,11 @@ private:
     /** Drop the suggestions queued for the next open (the sub-system leaves the driving scope) */
     void _discardOpenPending(const string& reason);
 
-    /** Mode B: reduce a composite sub-system above its quota pro rata over its leaf holdings and
-     * mirror the sells on the parent account */
+    /** Mode B: reduce an A/C composite sub-system above its quota pro rata over its leaf holdings
+     * and mirror the sells on the parent account (a B composite is delegated instead) */
     void _reduceCompositeToQuota(const SystemPtr& sys, const Datetime& date,
                                  price_t need_back_funds, KQuery::KType ktype,
                                  TradeRecordList& out_executed);
-
     /** Execute the converted suggestions on the parent real account (sell first then buy) */
     void _executeSuggestions(const Datetime& date, const TradeSuggestionList& suggestions,
                              KQuery::KType ktype, TradeRecordList& out_trades);
@@ -623,10 +622,18 @@ private:
       m_pending_calibration;  // The deferred quota calibration legs (trade_on_close=false)
     Datetime m_pending_calibration_date;       // The close day the deferred calibration belongs to
     double m_pending_calibration_assets{0.0};  // The assets before that close stage
-    Datetime m_last_sampled_date;       // The last date the mode A sampling ran (a nested sampling
-                                        // already folded the leaf intents that day)
-    bool m_open_pending_warned{false};  // The once-per-instance flag of the cross-day pending
-                                        // backlog warning (runtime state, not serialized)
+    Datetime m_last_sampled_date;   // The last date the mode A sampling ran (a nested sampling
+                                    // already folded the leaf intents that day)
+    price_t m_external_quota{0.0};  // The quota assigned by the outer mode B layer (the
+                                    // inner layer scales its leaf quotas to this total)
+    bool m_external_quota_set{false};
+    bool m_pending_calibration_retry{false};  // The pending calibration is a retry of a previous
+                                              // suspension, exempt from the cross-day drop
+    Datetime m_open_turnover_date;          // The rebalancing close whose open executions carry the
+                                            // turnover (all modes, trade_on_close=false)
+    double m_open_turnover_assets{0.0};     // The assets before that close stage
+    bool m_open_pending_warned{false};      // The once-per-instance flag of the cross-day pending
+                                            // backlog warning (runtime state, not serialized)
     bool m_inject_truncated_warned{false};  // The once-per-instance flag of the parent-cash
                                             // truncation warning of the mode B gap injection
                                             // (runtime state, not serialized)
