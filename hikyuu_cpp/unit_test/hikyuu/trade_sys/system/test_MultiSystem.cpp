@@ -3055,12 +3055,12 @@ TEST_CASE("test_MultiSystem_mode_b_trade_on_close_false_defers_calibration") {
 
     Datetime sub_sell_date, parent_sell_date;
     for (const auto& tr : leaf->getTM()->getTradeList()) {
-        if (tr.business == BUSINESS_SELL) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
             sub_sell_date = tr.datetime;
         }
     }
     for (const auto& tr : ms->getTM()->getTradeList()) {
-        if (tr.business == BUSINESS_SELL) {
+        if (tr.business == BUSINESS_SELL && tr.stock == stk) {
             parent_sell_date = tr.datetime;
         }
     }
@@ -4652,6 +4652,121 @@ TEST_CASE("test_MultiSystem_close_only_live_buffer_fallback") {
 
     /** @arg the parent never trades: the delayed requests need an open drive */
     CHECK_EQ(ms->getTM()->getTradeList().size(), 1);
+}
+
+class SelectExceptDateSE : public SelectorBase {
+public:
+    SelectExceptDateSE(const SystemList& list, Datetime except_date)
+    : SelectorBase("SelectExceptDateSE"), m_list(list), m_except_date(except_date) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectExceptDateSE>(m_list, m_except_date);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime date) override {
+        SystemWeightList ret;
+        if (date.startOfDay() != m_except_date.startOfDay()) {
+            for (auto& sys : m_list) {
+                ret.emplace_back(sys, 1.0);
+            }
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    Datetime m_except_date;
+};
+
+class SelectExceptStockDateSE : public SelectorBase {
+public:
+    SelectExceptStockDateSE(const SystemList& list, const Stock& except_stock, Datetime except_date)
+    : SelectorBase("SelectExceptStockDateSE"),
+      m_list(list),
+      m_except_stock(except_stock),
+      m_except_date(except_date) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectExceptStockDateSE>(m_list, m_except_stock, m_except_date);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime date) override {
+        SystemWeightList ret;
+        const bool drop = (date.startOfDay() == m_except_date.startOfDay());
+        for (auto& sys : m_list) {
+            if (drop && sys->getStock() == m_except_stock) {
+                continue;
+            }
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    Stock m_except_stock;
+    Datetime m_except_date;
+};
+
+/** @par Check point: a deferred calibration sell with no quote at the next open is retried on the
+ * following open (SH600005 has no bar on 2000-06-30) */
+TEST_CASE("test_MultiSystem_pending_calibration_retry_suspension") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    // The run axis comes from a stock that trades on 2000-06-30: the sub's instrument is
+    // suspended that day, so its deferred leg has no quote and must be retried
+    KData k = market.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date(200005100000LL);
+    Datetime drop_date(200006290000LL);
+    Datetime retry_date(200007030000LL);
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    // A second, always selected child keeps the quota calibration active on the drop day
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    auto se = std::make_shared<SelectExceptStockDateSE>(SystemList{leaf, other}, stk, drop_date);
+    auto ms = std::make_shared<MultiSystem>("ms_retry_suspension");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(se);
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->add(other);
+    ms->run(k);
+
+    Datetime sub_sell_date, parent_sell_date;
+    for (const auto& tr : leaf->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            sub_sell_date = tr.datetime;
+        }
+    }
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_SELL) {
+            parent_sell_date = tr.datetime;
+        }
+    }
+
+    /** @arg the leg skipped on the suspended day executes on the next quoted open */
+    CHECK_UNARY(!sub_sell_date.isNull());
+    CHECK_EQ(sub_sell_date, retry_date);
+    CHECK_UNARY(!parent_sell_date.isNull());
+    CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
 }
 
 /** @} */

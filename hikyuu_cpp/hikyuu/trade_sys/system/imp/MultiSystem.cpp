@@ -241,6 +241,7 @@ void MultiSystem::_reset() {
     m_open_pending_suggestions.clear();
     m_open_pending_date = Datetime();
     m_open_pending_assets = 0.0;
+    m_open_pending_retry = false;
     m_pending_calibration.clear();
     m_pending_calibration_date = Datetime();
     m_pending_calibration_assets = 0.0;
@@ -299,6 +300,7 @@ void MultiSystem::_forceResetAll() {
     m_open_pending_suggestions.clear();
     m_open_pending_date = Datetime();
     m_open_pending_assets = 0.0;
+    m_open_pending_retry = false;
     m_pending_calibration.clear();
     m_pending_calibration_date = Datetime();
     m_pending_calibration_assets = 0.0;
@@ -1425,7 +1427,7 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
     // A batch left over from an earlier day was never consumed at an open (a session that only
     // drives the close): drop it, keeping only the latest batch. Warn once instead of on every
     // append, so the log is not flooded.
-    if (!m_open_pending_suggestions.empty()) {
+    if (!m_open_pending_suggestions.empty() && !m_open_pending_retry) {
         if (!m_open_pending_warned) {
             m_open_pending_warned = true;
             HKU_WARN(
@@ -1786,20 +1788,31 @@ MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
     Datetime pending_date = m_open_pending_date;
     double pending_assets = m_open_pending_assets;
     if (!m_trade_on_close && !m_open_pending_suggestions.empty()) {
+        TradeSuggestionList executable;
+        TradeSuggestionList retry;
         for (auto& s : m_open_pending_suggestions) {
             price_t op = _getOpenPrice(datetime, s.stock);
             if (op > 0.0) {
                 s.plan_price = op;
+                executable.push_back(s);
+            } else {
+                retry.push_back(s);  // No quote (suspension): leave it to the next open
             }
         }
         KQuery::KType kt = m_kdata.getQuery().kType();
-        _executeSuggestions(datetime, m_open_pending_suggestions, kt, executed_open);
-        for (auto& tr : executed_open) {
-            result.tradesOnOpen.push_back(tr);
-            m_trade_list.push_back(tr);
+        if (!executable.empty()) {
+            _executeSuggestions(datetime, executable, kt, executed_open);
+            for (auto& tr : executed_open) {
+                result.tradesOnOpen.push_back(tr);
+                m_trade_list.push_back(tr);
+            }
         }
-        m_open_pending_suggestions.clear();
-        m_open_pending_date = Datetime();
+        m_open_pending_suggestions = retry;
+        m_open_pending_retry = !retry.empty();
+        if (retry.empty()) {
+            m_open_pending_date = Datetime();
+            m_open_pending_assets = 0.0;
+        }
     }
 
     // A new day: clear and rebuild the open trade buffer of every sub-system (used by the close
