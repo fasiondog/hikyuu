@@ -76,6 +76,8 @@ Aggregated backtesting also supports:
 - **Turnover rate** (``get_adjust_turnover``): on each rebalance day, records the ratio of the traded amount to the total assets before rebalancing.
 - **Delisting/suspension**: the parent uniformly force-sells the positions in delisted instruments during the open stage (in mode C the shared account is sold by the parent too, the sub-ledger does not sell twice); the sub-systems automatically skip the suspended bars. A liquidation/reduction leg whose close is suspended falls back to the deferred legs of the next open (any ``trade_on_close`` mode) and the holding stays unchanged until a quote appears.
 
+- **Archive and clone** (`save`/`load`, `clone`): the shadow/quota account registry is saved by the child slot index and rebuilt after loading; the scheduling counters (close-day counter, last driven day), the fixed time axis, the external rebalancing day table and the unfilled calibration legs are restored too, so a loaded system can continue with ``run(reset=False)``; the mode C running pools are rebuilt on the next rebalancing day. Price fields that may carry NaN (e.g. ``goalPrice``) are written as strings, because the text/XML archives cannot read NaN back as a number.
+
 Common parameters:
 
     * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar

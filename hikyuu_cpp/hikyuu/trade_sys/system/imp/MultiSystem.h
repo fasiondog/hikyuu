@@ -190,9 +190,7 @@ public:
 
     /** Set the initial signal cash of the sub-system shadow account (mode A Signal Aggregation).
      *  In mode B (Fund Allocation) the shadow accounts start from zero and the quota comes from
-     *  the L1 allocation, so this value is unused. */
-    /** Set the initial fund of the sub-system shadow account (mode A; a non-positive value is
-     *  ignored) */
+     *  the L1 allocation, so this value is unused. A non-positive value is ignored. */
     void setSubInitCash(price_t cash) {
         m_sub_init_cash = cash > 0.0 ? cash : m_sub_init_cash;
     }
@@ -707,7 +705,7 @@ private:
                                     // dropped as soon as the driving KData advances (live sessions
                                     // reuse the same query while the data grows daily)
     DatetimeList m_date_axis;       // The fixed time axis: the driving date table when
-                                    // axis-mode="calendar" (runtime state, not serialized)
+                                    // axis-mode="calendar" (configuration, serialized)
     DatetimeList m_cycle_dates;     // The rebalancing days declared so far, the run-level input
                                     // injected into the sub-system signals (runtime state,
                                     // not serialized)
@@ -719,7 +717,7 @@ private:
                                     // precomputed table (runtime state, not serialized)
     std::set<Datetime> m_adjust_dates;  // The external rebalancing day table (normalized to the
                                         // zero hour of that day; when not empty it takes precedence
-                                        // over m_adjust_cycle, runtime state, not serialized)
+                                        // over m_adjust_cycle; configuration, serialized)
     bool m_short_reduce_warned{false};  // The once-per-instance flag of the net-short quota
                                         // reduction skip warning (runtime state, not serialized)
     bool m_short_inject_warned{false};  // The once-per-instance flag of the net-short quota
@@ -765,6 +763,88 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_af);
         ar& BOOST_SERIALIZATION_NVP(m_se);
         ar& BOOST_SERIALIZATION_NVP(m_path);
+
+        // The scheduling phase must survive, otherwise a loaded system restarts the rebalancing
+        // cycle at zero and the rebalancing days shift
+        uint64_t close_index =
+          static_cast<uint64_t>(Archive::is_saving::value ? m_close_day_index : 0);
+        ar& boost::serialization::make_nvp("close_day_index", close_index);
+        if (Archive::is_loading::value) {
+            m_close_day_index = static_cast<size_t>(close_index);
+        }
+        uint64_t last_close = m_last_close_date.number();
+        ar& boost::serialization::make_nvp("last_close_date", last_close);
+        if (Archive::is_loading::value) {
+            m_last_close_date = Datetime(last_close);
+        }
+
+        // Configuration lists (calendar axis / external rebalancing dates): they drive the
+        // trading days and the rebalancing days, so they must be restored with the system
+        std::vector<uint64_t> axis;
+        std::vector<uint64_t> adjust_days;
+        if (Archive::is_saving::value) {
+            axis.reserve(m_date_axis.size());
+            for (const auto& d : m_date_axis) {
+                axis.push_back(d.number());
+            }
+            adjust_days.reserve(m_adjust_dates.size());
+            for (const auto& d : m_adjust_dates) {
+                adjust_days.push_back(d.number());
+            }
+        }
+        ar& boost::serialization::make_nvp("date_axis", axis);
+        ar& boost::serialization::make_nvp("adjust_dates", adjust_days);
+        if (Archive::is_loading::value) {
+            m_date_axis.clear();
+            for (auto n : axis) {
+                m_date_axis.push_back(Datetime(n));
+            }
+            m_adjust_dates.clear();
+            for (auto n : adjust_days) {
+                m_adjust_dates.insert(Datetime(n));
+            }
+        }
+
+        // The deferred calibration legs: kind / child slot / instrument / number / quota
+        std::vector<int> cal_kind;
+        std::vector<int> cal_sys;
+        std::vector<Stock> cal_stock;
+        std::vector<double> cal_number;
+        std::vector<double> cal_quota;
+        if (Archive::is_saving::value) {
+            for (const auto& a : m_pending_calibration) {
+                int slot = -1;
+                for (size_t i = 0; i < m_sys_list.size(); ++i) {
+                    if (m_sys_list[i] == a.sys) {
+                        slot = static_cast<int>(i);
+                        break;
+                    }
+                }
+                cal_kind.push_back(static_cast<int>(a.kind));
+                cal_sys.push_back(slot);
+                cal_stock.push_back(a.stock);
+                cal_number.push_back(a.number);
+                cal_quota.push_back(a.quota);
+            }
+        }
+        ar& boost::serialization::make_nvp("cal_kind", cal_kind);
+        ar& boost::serialization::make_nvp("cal_sys", cal_sys);
+        ar& boost::serialization::make_nvp("cal_stock", cal_stock);
+        ar& boost::serialization::make_nvp("cal_number", cal_number);
+        ar& boost::serialization::make_nvp("cal_quota", cal_quota);
+        if (Archive::is_loading::value) {
+            m_pending_calibration.clear();
+            for (size_t i = 0; i < cal_kind.size() && i < cal_sys.size() && i < cal_stock.size() &&
+                               i < cal_number.size() && i < cal_quota.size();
+                 ++i) {
+                if (cal_sys[i] < 0 || cal_sys[i] >= static_cast<int>(m_sys_list.size())) {
+                    continue;
+                }
+                m_pending_calibration.push_back({static_cast<CalibrationKind>(cal_kind[i]),
+                                                 m_sys_list[cal_sys[i]], cal_stock[i],
+                                                 cal_number[i], cal_quota[i]});
+            }
+        }
     }
 #endif /* HKU_SUPPORT_SERIALIZATION */
 };
@@ -782,3 +862,7 @@ using PortfolioPtr = MultiSystemPtr;
 using PFPtr = MultiSystemPtr;
 
 }  // namespace hku
+
+#if HKU_SUPPORT_SERIALIZATION
+BOOST_CLASS_VERSION(hku::MultiSystem, 1)
+#endif

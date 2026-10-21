@@ -250,8 +250,6 @@ public:
         return m_path;
     }
 
-    /** Set the hierarchy path (the aggregate form writes it into the sub-systems recursively at
-     * readyForRun) */
     /** The aggregate that currently owns the account of this system (runtime only) */
     void setAggregateOwner(const void* owner) {
         m_aggregate_owner = owner;
@@ -262,6 +260,8 @@ public:
         return m_aggregate_owner;
     }
 
+    /** Set the hierarchy path (the aggregate form writes it into the sub-systems recursively at
+     * readyForRun) */
     void setPath(const string& path) {
         m_path = path;
     }

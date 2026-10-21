@@ -808,7 +808,10 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
         },
         "The portfolio-level fund allocation algorithm (AF, carrying L1/L2/L3; used by the "
         "aggregate system only)")
-      .def("clone", &MultiSystem::clone);
+      .def("clone", &MultiSystem::clone)
+      // The aggregate needs its own pickle: inheriting System.__setstate__ mismatches the dynamic
+      // type and aborts the interpreter on loads
+      DEF_PICKLE(MultiSystem);
 
     //--------------------------------------------------------------------------------------
     // The PF factories pass through to MultiSystem, keeping the master call style unchanged

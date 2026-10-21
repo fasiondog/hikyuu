@@ -280,6 +280,8 @@ void MultiSystem::_reset() {
     m_external_quota_set = false;
     m_external_delegate_warned = false;
     m_external_quota_capped_warned = false;
+    m_multi_parent_warned = false;
+    m_not_ready_warned = false;
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
@@ -341,6 +343,8 @@ void MultiSystem::_forceResetAll() {
     m_external_quota_set = false;
     m_external_delegate_warned = false;
     m_external_quota_capped_warned = false;
+    m_multi_parent_warned = false;
+    m_not_ready_warned = false;
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
@@ -415,7 +419,8 @@ SystemPtr MultiSystem::_clone() {
         ret->setAF(m_af->clone());
     }
     // m_shadow_sys / m_running_set / m_running_order / m_force_sell_list / m_sub_index /
-    // m_open_pending_suggestions / m_kdata_cache are the runtime states, not copied
+    // m_open_pending_suggestions / m_kdata_cache are the runtime states, not copied (the shadow
+    // registry is rebuilt on the cloned children)
     return ret;
 }
 
