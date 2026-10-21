@@ -1177,6 +1177,26 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         return;
     }
 
+    // The already planned legs count as sold: deduct their value so the residual loop does not
+    // chase a gap the queued legs will already cover (a multi-close suspension re-derives the
+    // round while the queued legs wait for a quote)
+    double planned_value = 0.0;
+    for (const auto& [stk, value] : values) {
+        for (const auto& a : m_pending_calibration) {
+            if (a.sys != sys || a.kind != CalibrationKind::SUB_SELL || a.stock != stk) {
+                continue;
+            }
+            price_t p = _getClosePrice(date, stk);
+            if (p <= 0.0) {
+                p = stk.getMarketValue(date, ktype);
+            }
+            if (p > 0.0) {
+                planned_value += a.number * p * stk.unit();
+            }
+        }
+    }
+    need_back_funds = std::max(0.0, need_back_funds - planned_value);
+
     double ratio = std::min(1.0, need_back_funds / total_value);
     double sold_value = 0.0;
     bool deferred = false;
