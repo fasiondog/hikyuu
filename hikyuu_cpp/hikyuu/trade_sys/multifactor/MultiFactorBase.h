@@ -220,6 +220,11 @@ private:
 
     void _buildIndex();  // Create the cross-section index after the calculation is finished
 
+    // Validate the synthesized factors (from _calculate or the single-factor passthrough) against
+    // the stock count and reference date count; an out-of-size result is read by the subscript in
+    // _buildIndex, causing an out of bounds read / null pointer dereference
+    void _validateCalculatedFactors();
+
     // Return the whole cross-section of the given date by reference, so the range / filter getters
     // do not copy the full cross-section (with the Stock shared_ptr refcount) on every call
     const ScoreRecordList& getScoresRef(const Datetime& date);

@@ -722,6 +722,12 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                       new_value = calculate_style_residuals(new_value, style_value_day);
                   }
 
+                  // normalize() is overridable (Python subclass forwarded via pybind); verify the
+                  // size before the writeback so a short result cannot write out of bounds
+                  HKU_CHECK(new_value.size() >= stk_count,
+                            "The normalized result size ({}) of factor \"{}\" on date {} is less "
+                            "than the stock count ({})!",
+                            new_value.size(), ind_name, m_ref_dates[di], stk_count);
                   for (size_t si = 0; si < stk_count; si++) {
                       ind_data_ptrs[si * ind_count + ii][di] = new_value[si];
                   }
@@ -816,6 +822,23 @@ void MultiFactorBase::_buildIndex() {
     }
 }
 
+void MultiFactorBase::_validateCalculatedFactors() {
+    const size_t stk_count = m_stks.size();
+    const size_t days_total = m_ref_dates.size();
+    HKU_CHECK(m_all_factors.size() == stk_count,
+              "The factor count returned by _calculate ({}) does not match the stock count ({})!",
+              m_all_factors.size(), stk_count);
+    for (size_t i = 0; i < stk_count; i++) {
+        const auto& ind = m_all_factors[i];
+        HKU_CHECK(ind.data() != nullptr,
+                  "The factor of the {}-th stock is null, please return a valid indicator!", i);
+        HKU_CHECK(ind.size() >= days_total,
+                  "The factor size of the {}-th stock ({}) is less than the reference date count "
+                  "({})!",
+                  i, ind.size(), days_total);
+    }
+}
+
 void MultiFactorBase::calculate() {
     // Fast path: check whether it is already Ready with a lock-free acquire
     if (m_calculated.load(std::memory_order_acquire)) {
@@ -843,14 +866,22 @@ void MultiFactorBase::calculate() {
             if (factor_count == 1) {
                 // Use the original factors directly
                 size_t stk_count = m_stks.size();
+                HKU_CHECK(
+                  all_stk_inds.size() >= stk_count,
+                  "The aligned factor list size ({}) is less than the stock count ({})!",
+                  all_stk_inds.size(), stk_count);
                 m_all_factors.resize(stk_count);
                 for (size_t i = 0; i < stk_count; i++) {
+                    HKU_CHECK(!all_stk_inds[i].empty(),
+                              "The aligned factor list of the {}-th stock is empty!", i);
                     m_all_factors[i] = std::move(all_stk_inds[i][0]);
                 }
             } else {
                 // Calculate the adjusted composite factor of every security
                 m_all_factors = _calculate(all_stk_inds);
             }
+
+            _validateCalculatedFactors();
         }
 
         // Create the cross-sectional index after the calculation
