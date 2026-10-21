@@ -860,8 +860,9 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
             continue;
         }
         if (a.kind == CalibrationKind::PARENT_SELL) {
-            // The parent leg carries the sub's intended quantity: cap it by the parent holding
-            // only (the own book already sold its part in the same phase)
+            // The parent leg carries the sub's intended quantity, capped by the parent holding
+            // (for a reduction leg the sub book already sold its part in the same phase; for a
+            // liquidation leg this leg runs before the sub legs)
             double need = a.number;
             double num = std::min(need, m_tm->getPosition(date, a.stock).number);
             if (num > 0.0) {

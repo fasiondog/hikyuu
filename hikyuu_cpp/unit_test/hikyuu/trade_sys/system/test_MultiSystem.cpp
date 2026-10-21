@@ -5685,7 +5685,10 @@ TEST_CASE("test_MultiSystem_mode_b_zero_quota_keeps_running") {
     REQUIRE(k1.size() > 5);
     REQUIRE(k2.size() > 5);
 
-    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    // A fixed-count MM keeps cash, so the sub keeps trading while running: the test can tell
+    // "still driven and mirrored" apart from "skipped"
+    auto leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
     leaf->setStock(stk);
     leaf->setParam<bool>("buy_delay", false);
     leaf->setTO(stk.getKData(full));
@@ -5693,7 +5696,8 @@ TEST_CASE("test_MultiSystem_mode_b_zero_quota_keeps_running") {
     other->setStock(getStock("sz000001"));
     other->setParam<bool>("buy_delay", false);
     auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota_running");
-    ms->setTM(crtTM(Datetime(199911010000LL), 100000.0));
+    // A large parent budget keeps the fixed-count sub funded through both runs
+    ms->setTM(crtTM(Datetime(199911010000LL), 300000.0));
     ms->setMode("B");
     ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf, other}));
     ms->setSellAtNotSelected(true);
@@ -5703,13 +5707,17 @@ TEST_CASE("test_MultiSystem_mode_b_zero_quota_keeps_running") {
     double pos1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
     REQUIRE_GT(pos1, 0.0);
 
-    /** @arg the running sub is left untouched despite the zero quota */
+    /** @arg the running sub is left untouched despite the zero quota: not liquidated, still
+     * driven and mirrored */
     auto af = AF_FixedWeightList({0.0, 1.0});
     af->setParam<bool>("adjust_running_sys", false);
     ms->setAF(af);
     ms->run(k2, false);
-    CHECK_EQ(leaf->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
-    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk).number, pos1);
+    double leaf_pos2 = leaf->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent_pos2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_GT(leaf_pos2, pos1);
+    CHECK_GT(parent_pos2, pos1);
+    CHECK_EQ(leaf_pos2, doctest::Approx(parent_pos2));
 }
 
 /** @} */
