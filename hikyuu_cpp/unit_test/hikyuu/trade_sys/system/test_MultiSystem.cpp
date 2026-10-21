@@ -4769,4 +4769,147 @@ TEST_CASE("test_MultiSystem_pending_calibration_retry_suspension") {
     CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
 }
 
+/** @par Check point: a queued suggestion with no quote at the next open is retried on the
+ * following open instead of filling at the stale close price (SH600005 has no bar on 2000-06-30) */
+TEST_CASE("test_MultiSystem_open_pending_retry_suspension") {
+    Stock stk = getStock("sh600005");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    REQUIRE(!market.isNull());
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KData k = market.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    Datetime buy_date(200006290000LL);
+    Datetime retry_date(200007030000LL);
+    auto sg = make_shared<ScriptedBuySellSG>(buy_date, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_open_pending_retry");
+    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf);
+    ms->run(k);
+
+    Datetime parent_buy_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk) {
+            parent_buy_date = tr.datetime;
+        }
+    }
+
+    /** @arg the fill happens on the next quoted open, never on the suspended day */
+    CHECK_EQ(parent_buy_date, retry_date);
+    CHECK_GT(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+}
+
+/** @par Check point: a retry batch survives the next rebalancing close (merged with the new batch,
+ * so the parent mirror of an already filled sub trade is never lost) */
+TEST_CASE("test_MultiSystem_open_pending_retry_merged_with_new_batch") {
+    Stock stk1 = getStock("sh600005");
+    Stock stk2 = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery query(Datetime(20000501), Datetime(20000720));
+    KQuery full(Datetime(20000401), Datetime(20000731));
+    KData k = stk2.getKData(query);
+    REQUIRE(k.size() > 10);
+
+    // stk1 is suspended on 2000-06-30: its queued buy retrains, while stk2 trades and produces a
+    // new batch on that very rebalancing close
+    auto sg1 = make_shared<ScriptedBuySellSG>(Datetime(200006290000LL), Datetime(203001010000LL));
+    auto leaf1 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg1);
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full));
+
+    auto sg2 = make_shared<ScriptedBuySellSG>(Datetime(200006300000LL), Datetime(203001010000LL));
+    auto leaf2 = SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), sg2);
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full));
+
+    auto ms = std::make_shared<MultiSystem>("ms_open_pending_merge");
+    ms->setTM(crtTM(Datetime(200005010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k);
+
+    Datetime parent1_buy_date;
+    for (const auto& tr : ms->getTM()->getTradeList()) {
+        if (tr.business == BUSINESS_BUY && tr.stock == stk1) {
+            parent1_buy_date = tr.datetime;
+        }
+    }
+    double parent1 = ms->getTM()->getPosition(k.back().datetime, stk1).number;
+    double leaf1_pos = leaf1->getTM()->getPosition(k.back().datetime, stk1).number;
+    double parent2 = ms->getTM()->getPosition(k.back().datetime, stk2).number;
+    double leaf2_pos = leaf2->getTM()->getPosition(k.back().datetime, stk2).number;
+
+    /** @arg both the retried leg and the new leg fill on the next quoted open, two books matched */
+    CHECK_EQ(parent1_buy_date, Datetime(200007030000LL));
+    CHECK_GT(leaf1_pos, 0.0);
+    CHECK_EQ(parent1, doctest::Approx(leaf1_pos));
+    CHECK_GT(leaf2_pos, 0.0);
+    CHECK_EQ(parent2, doctest::Approx(leaf2_pos));
+}
+
+/** @par Check point: a nested mode B with trade_on_close=false still matches the three ledgers
+ * when the outer mode B delegates a shrunk budget */
+TEST_CASE("test_MultiSystem_mode_b_nested_b_trade_on_close_false") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery full(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk.getKData(q1);
+    KData k2 = stk.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    // A single scripted buy in the first run: no fresh signals in the second run, so the mirrors
+    // settle and the three ledgers are comparable one for one at the end
+    auto sg = make_shared<ScriptedBuySellSG>(k1[k1.size() - 2].datetime, Datetime(203001010000LL));
+    auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), sg);
+    leaf->setStock(stk);
+    leaf->setParam<bool>("buy_delay", false);
+    leaf->setTO(stk.getKData(full));
+    auto inner = std::make_shared<MultiSystem>("inner_b_nested_deferred");
+    inner->setMode("B");
+    inner->setSE(std::make_shared<SelectAllSE>(SystemList{leaf}));
+    inner->setTradeOnClose(false);
+    inner->add(leaf);
+
+    auto ms = std::make_shared<MultiSystem>("outer_b_nested_deferred");
+    ms->setTM(crtTM(Datetime(200001010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{inner}));
+    ms->add(inner);
+    ms->run(k1);
+
+    double leaf1 = leaf->getTM()->getPosition(k1.back().datetime, stk).number;
+    double inner1 = inner->getTM()->getPosition(k1.back().datetime, stk).number;
+    double parent1 = ms->getTM()->getPosition(k1.back().datetime, stk).number;
+    REQUIRE_GT(leaf1, 0.0);
+
+    /** @arg the delegated budget reaches the leaf through the inner deferred calibration */
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    double leaf2 = leaf->getTM()->getPosition(k2.back().datetime, stk).number;
+    double inner2 = inner->getTM()->getPosition(k2.back().datetime, stk).number;
+    double parent2 = ms->getTM()->getPosition(k2.back().datetime, stk).number;
+    CHECK_LT(inner2, inner1);
+    CHECK_EQ(leaf2, doctest::Approx(inner2));
+    CHECK_EQ(inner2, doctest::Approx(parent2));
+}
+
 /** @} */

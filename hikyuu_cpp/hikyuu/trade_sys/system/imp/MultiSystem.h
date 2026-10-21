@@ -629,6 +629,8 @@ private:
     price_t m_external_quota{0.0};  // The quota assigned by the outer mode B layer (the
                                     // inner layer scales its leaf quotas to this total)
     bool m_external_quota_set{false};
+    bool m_external_delegate_warned{false};   // The once-per-instance flag of the nested B fallback
+                                              // warning when the inner cannot consume the budget
     bool m_pending_calibration_retry{false};  // The pending calibration is a retry of a previous
                                               // suspension, exempt from the cross-day drop
     Datetime m_open_turnover_date;          // The rebalancing close whose open executions carry the

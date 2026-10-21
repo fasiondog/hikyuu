@@ -266,6 +266,7 @@ void MultiSystem::_reset() {
     m_last_sampled_date = Datetime();
     m_external_quota = 0.0;
     m_external_quota_set = false;
+    m_external_delegate_warned = false;
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
@@ -324,6 +325,7 @@ void MultiSystem::_forceResetAll() {
     m_last_sampled_date = Datetime();
     m_external_quota = 0.0;
     m_external_quota_set = false;
+    m_external_delegate_warned = false;
     m_pending_calibration_retry = false;
     m_cycle_dates.clear();
     if (m_se) {
@@ -597,14 +599,25 @@ void MultiSystem::_reduceSubSystemToQuota(const SystemPtr& sys, const Datetime& 
     price_t reduce_base = m_trade_on_close ? sub_total : (sub_total - funds.cash);
     if (sys->isComposite()) {
         auto* inner = dynamic_cast<MultiSystem*>(sys.get());
-        if (inner && inner->getMode() == "B" && quota > 0.0) {
+        const bool delegatable = inner && inner->getMode() == "B" && inner->m_se && inner->getAF();
+        if (delegatable && quota > 0.0) {
             // The inner manages its own leaf ledgers: delegate the budget and let it reduce its
             // leaves (the FOF/MOM semantics, both book levels stay matched)
             inner->m_external_quota = quota;
             inner->m_external_quota_set = true;
-        } else if (quota > 0.0 && reduce_base > quota) {
-            // An A/C composite has no quota machinery: reduce its account pro rata
-            _reduceCompositeToQuota(sys, date, reduce_base - quota, ktype, out_executed);
+        } else {
+            if (!delegatable && inner && inner->getMode() == "B" && quota > 0.0 &&
+                !m_external_delegate_warned) {
+                m_external_delegate_warned = true;
+                HKU_WARN(
+                  "The nested mode B {} has no SE/AF to consume the delegated quota, fall "
+                  "back to the direct pro rata reduction!",
+                  inner->name());
+            }
+            if (quota > 0.0 && reduce_base > quota) {
+                // Reduce the composite account pro rata over its leaf holdings
+                _reduceCompositeToQuota(sys, date, reduce_base - quota, ktype, out_executed);
+            }
         }
         return;
     }
@@ -1426,7 +1439,9 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
     }
     // A batch left over from an earlier day was never consumed at an open (a session that only
     // drives the close): drop it, keeping only the latest batch. Warn once instead of on every
-    // append, so the log is not flooded.
+    // append, so the log is not flooded. A retry batch is exempt: its legs mirror sub-system fills
+    // that already happened, so they are merged into the new batch instead (the prices are re-set
+    // at the next open).
     if (!m_open_pending_suggestions.empty() && !m_open_pending_retry) {
         if (!m_open_pending_warned) {
             m_open_pending_warned = true;
@@ -1438,7 +1453,13 @@ void MultiSystem::_queueOpenPending(const Datetime& date, const TradeSuggestionL
         m_open_pending_suggestions.clear();
     }
     m_open_pending_date = date;
-    m_open_pending_suggestions = suggestions;
+    if (!m_open_pending_suggestions.empty() && m_open_pending_retry) {
+        TradeSuggestionList merged = m_open_pending_suggestions;
+        merged.insert(merged.end(), suggestions.begin(), suggestions.end());
+        m_open_pending_suggestions = merged;
+    } else {
+        m_open_pending_suggestions = suggestions;
+    }
 }
 
 bool MultiSystem::_isAdjustDate(const Datetime& date) const {
