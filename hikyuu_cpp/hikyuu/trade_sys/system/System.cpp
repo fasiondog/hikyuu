@@ -626,12 +626,13 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     if (!current_ev_valid) {
         HKU_INFO_IF(trace, htr("[{}] current EV is invalid", name()));
         TradeRecord tr;
-        // If a long position is held, liquidate and sell immediately
+        // If a long position is held, liquidate it; sell_delay decides the fill timing (this close
+        // or the next open)
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_ENVIRONMENT);
             HKU_INFO_IF(trace, htr("[{}] EV to sell", name()));
         }
-        // If a short position is held, cover and buy back immediately
+        // If a short position is held, cover it; buy_delay decides the fill timing
         else if (m_tm->haveShort(m_stock)) {
             tr = _buyShort(today, src_today, PART_ENVIRONMENT);
             HKU_INFO_IF(trace, htr("[{}] EV to buy short", name()));
@@ -666,12 +667,12 @@ TradeRecord System::_runMomentOnClose(const KRecord& today, const KRecord& src_t
     if (!current_cn_valid) {
         HKU_INFO_IF(trace, htr("[{}] current CN is invalid", name()));
         TradeRecord tr;
-        // If a long position is held, liquidate and sell immediately
+        // If a long position is held, liquidate it (the fill timing follows sell_delay)
         if (m_tm->have(m_stock)) {
             tr = _sell(today, src_today, PART_CONDITION);
             HKU_INFO_IF(trace, htr("[{}] CN to sell", name()));
         }
-        // If a short position is held, cover and buy back immediately
+        // If a short position is held, cover it (the fill timing follows buy_delay)
         else if (m_tm->haveShort(m_stock)) {
             tr = _buyShort(today, src_today, PART_CONDITION);
             HKU_INFO_IF(trace, htr("[{}] CN to buy short", name()));

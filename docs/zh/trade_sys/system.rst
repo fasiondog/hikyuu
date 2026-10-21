@@ -77,8 +77,8 @@
 
 公共参数：
 
-    * **buy_delay=True** *(bool)* : 买入操作是否延迟到下一个bar开盘时进行交易
-    * **sell_delay=True** *(bool)* : 卖出操作是否延迟到下一个bar开盘时进行交易
+    * **buy_delay=True** *(bool)* : 买入操作是否延迟到下一个bar开盘时进行交易；市场环境（ev）或系统有效条件（cn）失效触发的空头强制平仓（买回）同样遵守该参数
+    * **sell_delay=True** *(bool)* : 卖出操作是否延迟到下一个bar开盘时进行交易；市场环境（ev）或系统有效条件（cn）失效触发的多头强制平仓同样遵守该参数（True 时在下一根开盘平仓，而非失效当日收盘）
     * **delay_use_current_price=True** *(bool)* : 延迟操作的情况下，是使用当前交易时bar的价格计算新的止损价/止赢价/目标价还是使用上次计算的结果
     * **max_delay_count=3** *(int)* : 连续延迟交易请求的限制次数，应大于等于0，0表示只允许延迟1次
     * **tp_monotonic=True** *(bool)* : 止赢单调递增

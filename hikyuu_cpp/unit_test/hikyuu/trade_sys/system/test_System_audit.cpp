@@ -287,4 +287,52 @@ TEST_CASE("test_System_stale_src_no_zero_price_fill") {
     CHECK_EQ(std::get<4>(stale), std::get<0>(stale));
 }
 
+/** @par Check point: the forced liquidation on an invalid environment follows sell_delay - delayed
+ *  to the next open when true, filled at the invalidating close when false */
+TEST_CASE("test_System_ev_force_sell_follows_sell_delay") {
+    Stock stk = getStock("sh600000");
+    REQUIRE(!stk.isNull());
+    KQuery query = KQueryByDate(Datetime(199911100000LL), Datetime(200012310000LL), KQuery::DAY);
+    KData kdata = stk.getKData(query);
+    REQUIRE(kdata.size() > 3);
+
+    // Returns: hold after the buy, fills on the invalidating close, pending delays, fills on the
+    // next open, hold after the next bar
+    auto run_bars = [&](bool sell_delay) {
+        auto sys = SYS_Simple();
+        sys->setTM(crtTM(Datetime(199001010000LL), 100000.0, TC_Zero()));
+        sys->setEV(std::make_shared<EvFirstBarOnly>(kdata[0].datetime));
+        sys->setSG(std::make_shared<BuyOnFirstBarSG>());
+        sys->setMM(MM_FixedCount(100));
+        sys->setParam<bool>("buy_delay", false);
+        sys->setParam<bool>("sell_delay", sell_delay);
+        sys->setTO(kdata);
+        sys->readyForRun();
+
+        sys->runMoment(kdata[0].datetime);
+        const double hold = sys->getTM()->getHoldNumber(kdata[0].datetime, stk);
+        MomentResult r1 = sys->runMoment(kdata[1].datetime);
+        MomentResult r2 = sys->runMoment(kdata[2].datetime);
+        return std::make_tuple(hold, r1.tradesOnClose.size(), r1.delayOnNextOpen.size(),
+                               r2.tradesOnOpen.size(),
+                               sys->getTM()->getHoldNumber(kdata[2].datetime, stk));
+    };
+
+    /** @arg sell_delay=true (the default): nothing fills on the invalidating close, the request is
+     *  exposed as pending and fills at the next open */
+    auto delayed = run_bars(true);
+    REQUIRE_UNARY(std::get<0>(delayed) > 0.0);
+    CHECK_EQ(std::get<1>(delayed), 0);
+    CHECK_EQ(std::get<2>(delayed), 1);
+    CHECK_EQ(std::get<3>(delayed), 1);
+    CHECK_EQ(std::get<4>(delayed), 0.0);
+
+    /** @arg sell_delay=false: the liquidation fills at the invalidating close itself */
+    auto immediate = run_bars(false);
+    REQUIRE_UNARY(std::get<0>(immediate) > 0.0);
+    CHECK_EQ(std::get<1>(immediate), 1);
+    CHECK_EQ(std::get<2>(immediate), 0);
+    CHECK_EQ(std::get<4>(immediate), 0.0);
+}
+
 /** @} */

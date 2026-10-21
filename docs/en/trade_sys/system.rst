@@ -80,8 +80,8 @@ Aggregated backtesting also supports:
 
 Common parameters:
 
-    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar
-    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar
+    * **buy_delay=True** *(bool)* : Whether buy operations are delayed to be traded at the open of the next bar; the forced short cover triggered by an invalid environment (ev) or condition (cn) follows the same setting
+    * **sell_delay=True** *(bool)* : Whether sell operations are delayed to be traded at the open of the next bar; the forced long liquidation triggered by an invalid environment (ev) or condition (cn) follows the same setting (liquidated at the next open instead of at the invalidating close)
     * **delay_use_current_price=True** *(bool)* : For a delayed operation, whether to use the price of the bar at the current trading time to calculate the new stop-loss/take-profit/goal price, or to reuse the result calculated previously
     * **max_delay_count=3** *(int)* : The maximum number of consecutive delayed trade requests; must be greater than or equal to 0, and 0 means only one delay is allowed
     * **tp_monotonic=True** *(bool)* : Whether the take-profit level increases monotonically
