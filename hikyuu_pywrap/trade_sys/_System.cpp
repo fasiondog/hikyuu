@@ -823,8 +823,8 @@ Portfolio-level fund allocation (the AF, L1/L2/L3, see AllocateFundsBase for det
 
     Mode B semantics (quota allocation, FOF/MOM style): on every rebalancing day the AF allocates the
     quota to each selected sub-system (L1); each selected sub-system is calibrated to its quota BEFORE
-    it is driven (recycle the shadow cash, clear the unselected, reduce the over-quota part, inject the
-    gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
+    it is driven (zero-quota liquidation, then the unselected liquidation or the selected cash recycle,
+    then reduce the over-quota part, inject the gap) and trades with the exact quota; the parent mirrors the real instructions of the sub-systems
     (L2 pass-through) on its own account; the L3 portfolio risk control is skipped (the sub-manager
     autonomy is respected). ``PF_Simple`` is aligned with the legacy ``SimplePortfolio``:
     ``trade_on_close=True`` and ``sell_at_not_selected=True`` are fixed, so the unselected sub-systems

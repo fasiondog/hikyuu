@@ -5720,6 +5720,38 @@ TEST_CASE("test_MultiSystem_mode_b_zero_quota_keeps_running") {
     CHECK_EQ(leaf_pos2, doctest::Approx(parent_pos2));
 }
 
+class SelectExceptStocksDateSE : public SelectorBase {
+public:
+    SelectExceptStocksDateSE(const SystemList& list, const std::set<Stock>& except_stocks,
+                             Datetime except_date)
+    : SelectorBase("SelectExceptStocksDateSE"),
+      m_list(list),
+      m_except_stocks(except_stocks),
+      m_except_date(except_date) {}
+
+    SelectorPtr _clone() override {
+        return std::make_shared<SelectExceptStocksDateSE>(m_list, m_except_stocks, m_except_date);
+    }
+
+    void _calculate() override {}
+
+    SystemWeightList _getSelected(Datetime date) override {
+        SystemWeightList ret;
+        const bool drop = (date.startOfDay() == m_except_date.startOfDay());
+        for (auto& sys : m_list) {
+            if (drop && m_except_stocks.count(sys->getStock()) > 0) {
+                continue;
+            }
+            ret.emplace_back(sys, 1.0);
+        }
+        return ret;
+    }
+
+    SystemList m_list;
+    std::set<Stock> m_except_stocks;
+    Datetime m_except_date;
+};
+
 class SelectBeforeDateSE : public SelectorBase {
 public:
     SelectBeforeDateSE(const SystemList& list, Datetime stop_date)
@@ -5757,23 +5789,73 @@ TEST_CASE("test_MultiSystem_liquidation_parent_leg_on_suspended_close") {
     KData k = market.getKData(query);
     REQUIRE(k.size() > 10);
 
+    // The clearing close (06-30) is a market day but the instrument is suspended: the parent legs
+    // must be queued before the quote check and retried at the next open
     auto leaf = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
     leaf->setStock(stk);
     leaf->setParam<bool>("buy_delay", false);
     leaf->setTO(stk.getKData(full));
 
+    auto short_leaf =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    short_leaf->setStock(stk);
+    short_leaf->setParam<bool>("buy_delay", false);
+    short_leaf->setParam<bool>("sell_delay", false);
+    short_leaf->setParam<bool>("support_borrow_stock", true);
+    short_leaf->setTO(stk.getKData(full));
+
+    auto other = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    other->setStock(getStock("sz000001"));
+    other->setParam<bool>("buy_delay", false);
+
+    // From the clearing close on, only `other` stays selected: the two cleared subs are out of
+    // the allocation for good (no re-buying after the liquidation legs fill)
+    class SelectOthersAfterSE : public SelectorBase {
+    public:
+        SelectOthersAfterSE(const SystemList& list, const SystemPtr& keep, Datetime stop_date)
+        : SelectorBase("SelectOthersAfterSE"), m_list(list), m_keep(keep), m_stop_date(stop_date) {}
+
+        SelectorPtr _clone() override {
+            return std::make_shared<SelectOthersAfterSE>(m_list, m_keep, m_stop_date);
+        }
+
+        void _calculate() override {}
+
+        SystemWeightList _getSelected(Datetime date) override {
+            SystemWeightList ret;
+            for (auto& sys : m_list) {
+                if (date >= m_stop_date && sys != m_keep) {
+                    continue;
+                }
+                ret.emplace_back(sys, 1.0);
+            }
+            return ret;
+        }
+
+        SystemList m_list;
+        SystemPtr m_keep;
+        Datetime m_stop_date;
+    };
+
     auto ms = std::make_shared<MultiSystem>("ms_liq_suspended");
-    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setTM(crtTM(Datetime(200005010000LL), 300000.0));
     ms->setMode("B");
-    ms->setSE(std::make_shared<SelectBeforeDateSE>(SystemList{leaf}, Datetime(200006300000LL)));
+    ms->setSE(std::make_shared<SelectOthersAfterSE>(SystemList{leaf, short_leaf, other}, other,
+                                                    Datetime(200006300000LL)));
     ms->setSellAtNotSelected(true);
     ms->setTradeOnClose(false);
+    ms->setParam<bool>("support_borrow_stock", true);
     ms->add(leaf);
+    ms->add(short_leaf);
+    ms->add(other);
     ms->run(k);
 
-    /** @arg both books are flat: the parent leg waited for a quote instead of being dropped */
+    /** @arg both books of both cleared subs are flat: the parent legs waited for a quote and
+     * retried instead of being dropped on the suspended close */
     CHECK_EQ(leaf->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
     CHECK_EQ(ms->getTM()->getPosition(k.back().datetime, stk).number, 0.0);
+    CHECK_EQ(short_leaf->getTM()->getShortPosition(stk).number, 0.0);
+    CHECK_EQ(ms->getTM()->getShortPosition(stk).number, 0.0);
 }
 
 /** @par Check point: clearing a sub-system purges its queued retry batch, so no stale buy is
@@ -5908,6 +5990,51 @@ TEST_CASE("test_MultiSystem_liquidation_short_cover_deferred") {
     /** @arg the short books are covered after the clear */
     CHECK_EQ(leaf->getTM()->getShortPosition(stk).number, 0.0);
     CHECK_EQ(ms->getTM()->getShortPosition(stk).number, 0.0);
+}
+
+/** @par Check point: the legacy (no SE) zero-quota path honors adjust_running_sys=false as well:
+ * a running sub with a zero quota is left untouched */
+TEST_CASE("test_MultiSystem_mode_b_legacy_zero_quota_keeps_running") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000120));
+    KQuery q2(Datetime(20000121), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_legacy_zero_quota_running");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+    double pos1 = leaf1->getTM()->getPosition(k1.back().datetime, stk1).number;
+    REQUIRE_GT(pos1, 0.0);
+
+    /** @arg the running zero-quota sub is left untouched in the legacy flow */
+    auto af = AF_FixedWeightList({0.0, 1.0});
+    af->setParam<bool>("adjust_running_sys", false);
+    ms->setAF(af);
+    ms->run(k2, false);
+    CHECK_EQ(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, pos1);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk1).number, pos1);
+    CHECK_GT(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
 }
 
 /** @} */
