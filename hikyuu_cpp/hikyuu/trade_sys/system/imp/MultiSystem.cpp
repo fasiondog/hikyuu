@@ -866,6 +866,12 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                 }
             }
             if (need > num) {
+                // Terminate a residual that can never fill: both the parent and the initiating
+                // sub-account are already flat (e.g. the sub was cleared while the leg waited)
+                if (m_tm->getPosition(date, a.stock).number <= 0.0 &&
+                    own_tm->getPosition(date, a.stock).number <= 0.0) {
+                    continue;
+                }
                 // The parent lacks the shares of this sub-account (a sibling holds them): keep the
                 // residual for the next open instead of selling somebody else's holding
                 CalibrationAction residual = a;
@@ -883,6 +889,10 @@ void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType
                 }
             }
             if (need > num) {
+                if (m_tm->getShortPosition(a.stock).number <= 0.0 &&
+                    own_tm->getShortPosition(a.stock).number <= 0.0) {
+                    continue;
+                }
                 CalibrationAction residual = a;
                 residual.number = need - num;
                 retry.push_back(residual);
@@ -2171,6 +2181,11 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
           m_pending_calibration.end());
     }
 
+    // The sub-systems liquidated by this round (zero quota): they must not be driven afterwards,
+    // and their open-buffer fills must not be mirrored (the parent would buy back what the
+    // liquidation just sold)
+    std::set<const void*> liquidated;
+
     // Mode B (master SimplePortfolio compatibility): the calibration runs in the master order --
     // recycle the cash -> liquidate the unselected -> reduce the over quota -> inject the gap, so
     // the freed cash is already in the parent pool when the following injection runs
@@ -2184,9 +2199,8 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
             m_pending_calibration_date = Datetime();
             m_pending_calibration_assets = 0.0;
         }
-        // A selected sub-system with a zero quota is cleared like an unselected one (the legacy
-        // flow already does this, the calibrated flow must not leave it running with no budget)
-        std::set<const void*> liquidated;
+        // A selected sub-system with a zero quota is cleared like an unselected one: both books
+        // liquidated, the sub not driven any more this close
         if (m_sell_at_not_selected) {
             for (auto& sys : m_sys_list) {
                 if (selected.count(sys.get()) == 0) {
@@ -2297,7 +2311,7 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
     for (size_t i = 0; i < m_sys_list.size(); ++i) {
         SystemPtr sys = m_sys_list[i];
         const bool is_selected = (selected.count(sys.get()) > 0);
-        if (m_se && is_adjust && !is_selected) {
+        if (m_se && is_adjust && (!is_selected || liquidated.count(sys.get()) > 0)) {
             // The unselected sub-system: it has been liquidated (executed immediately) when the
             // quota was calibrated; in the legacy flow (no SE) the liquidation suggestion is
             // generated here
@@ -2471,6 +2485,9 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
                     s.number = short_num;
                     suggestions.push_back(s);
                 }
+                // Clear the sub ledger too, matching the calibrated zero-quota liquidation: a zero
+                // quota takes the sub-system out of the allocation for good
+                _clearSubSystem(ctx.sys, datetime, ktype);
             }
         }
         if (!suggestions.empty()) {

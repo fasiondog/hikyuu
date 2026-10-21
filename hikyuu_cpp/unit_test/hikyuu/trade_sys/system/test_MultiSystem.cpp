@@ -5463,4 +5463,110 @@ TEST_CASE("test_MultiSystem_dead_leg_dropped_after_force_clear") {
     CHECK_GT(leaf2->getTM()->getPosition(Datetime(200006300000LL), stk2).number, pos2_before);
 }
 
+/** @par Check point: a zero-quota liquidation in trade_on_close=true does not mirror the cleared
+ * sub open-buffer fills (the parent would buy back what the liquidation just sold) */
+TEST_CASE("test_MultiSystem_mode_b_zero_quota_no_rebuy") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(19991110), Datetime(20000225));
+    KQuery full2(Datetime(19991110), Datetime(20000225));
+    KQuery q1(Datetime(19991110), Datetime(20000121));
+    KQuery q2(Datetime(20000124), Datetime(20000225));
+    KData k1 = stk1.getKData(q1);
+    KData k2 = stk1.getKData(q2);
+    REQUIRE(k1.size() > 5);
+    REQUIRE(k2.size() > 5);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 =
+      SYS_Simple(crtTM(), MM_FixedCount(100), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", true);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_b_zero_quota_no_rebuy");
+    ms->setTM(crtTM(Datetime(199911010000LL), 200000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    /** @arg the morning fill of the cleared sub is not mirrored after the liquidation sells */
+    ms->setAF(AF_FixedWeightList({1.0, 0.0}));
+    ms->run(k2, false);
+    CHECK_EQ(leaf2->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_EQ(ms->getTM()->getPosition(k2.back().datetime, stk2).number, 0.0);
+    CHECK_GT(leaf1->getTM()->getPosition(k2.back().datetime, stk1).number, 0.0);
+}
+
+/** @par Check point: a parent-side residual that can never fill (both books flat) is dropped, so
+ * the deferred injections of the later rounds are not blocked forever */
+TEST_CASE("test_MultiSystem_mode_b_residual_terminated") {
+    Stock stk1 = getStock("sh600000");
+    Stock stk2 = getStock("sz000001");
+    Stock market = getStock("sh600000");
+    REQUIRE(!stk1.isNull());
+    REQUIRE(!stk2.isNull());
+    KQuery full1(Datetime(20000401), Datetime(20000731));
+    KQuery full2(Datetime(20000401), Datetime(20000731));
+    KQuery q1(Datetime(20000501), Datetime(20000626));
+    KQuery q2(Datetime(20000629), Datetime(20000701));
+    KQuery q3(Datetime(20000703), Datetime(20000707));
+    KData k1 = market.getKData(q1);
+    KData k2 = market.getKData(q2);
+    KData k3 = market.getKData(q3);
+    REQUIRE(k1.size() > 5);
+    REQUIRE_GE(k2.size(), 2);
+    REQUIRE_GE(k3.size(), 2);
+
+    auto leaf1 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf1->setStock(stk1);
+    leaf1->setParam<bool>("buy_delay", false);
+    leaf1->setTO(stk1.getKData(full1));
+    auto leaf2 = SYS_Simple(crtTM(), MM_Nothing(), EnvironmentPtr(), ConditionPtr(), SG_Cycle());
+    leaf2->setStock(stk2);
+    leaf2->setParam<bool>("buy_delay", false);
+    leaf2->setTO(stk2.getKData(full2));
+
+    auto ms = std::make_shared<MultiSystem>("ms_residual");
+    ms->setTM(crtTM(Datetime(200005010000LL), 100000.0));
+    ms->setMode("B");
+    ms->setSE(std::make_shared<SelectAllSE>(SystemList{leaf1, leaf2}));
+    ms->setSellAtNotSelected(true);
+    ms->setTradeOnClose(false);
+    ms->add(leaf1);
+    ms->add(leaf2);
+    ms->run(k1);
+
+    // The 06-29 close queues the reduction legs; drain the parent holding externally so the
+    // parent side can only partially fill and leaves a residual
+    ms->setAF(AF_FixedAmount(30000.0));
+    ms->run(k2, false);
+    Datetime d = k2.front().datetime;
+    double parent_num = ms->getTM()->getPosition(d, stk1).number;
+    if (parent_num > 0.0) {
+        ms->getTM()->sell(d, stk1, 1.0, parent_num, 0.0, 0.0, 1.0, PART_SYSTEM, "drain");
+    }
+
+    // The 07-03/07-04 closes take leaf1's zero quota: its own book empties, the residual dies and
+    // the deferred injection of leaf2 is unblocked
+    ms->setAF(AF_FixedWeightList({0.0, 1.0}));
+    ms->run(k3, false);
+
+    double leaf1_after = leaf1->getTM()->getPosition(k3.back().datetime, stk1).number;
+    double leaf2_before = leaf2->getTM()->getPosition(k2.back().datetime, stk2).number;
+    double leaf2_after = leaf2->getTM()->getPosition(k3.back().datetime, stk2).number;
+
+    /** @arg leaf1 is flat and leaf2 received the unblocked injection */
+    CHECK_EQ(leaf1_after, 0.0);
+    CHECK_GT(leaf2_after, leaf2_before);
+}
+
 /** @} */
