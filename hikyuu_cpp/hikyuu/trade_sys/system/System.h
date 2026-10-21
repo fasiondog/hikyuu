@@ -523,6 +523,9 @@ private:
         ar& BOOST_SERIALIZATION_NVP(m_sellRequestList);
         ar& BOOST_SERIALIZATION_NVP(m_sellShortRequestList);
         ar& BOOST_SERIALIZATION_NVP(m_buyShortRequestList);
+
+        // The original (unadjusted) kdata is not serialized, so the next setTO must rebuild it
+        m_calculated = false;
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
