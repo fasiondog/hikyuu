@@ -252,6 +252,16 @@ public:
 
     /** Set the hierarchy path (the aggregate form writes it into the sub-systems recursively at
      * readyForRun) */
+    /** The aggregate that currently owns the account of this system (runtime only) */
+    void setAggregateOwner(const void* owner) {
+        m_aggregate_owner = owner;
+    }
+
+    /** Get the aggregate that currently owns the account of this system */
+    const void* getAggregateOwner() const {
+        return m_aggregate_owner;
+    }
+
     void setPath(const string& path) {
         m_path = path;
     }
@@ -416,7 +426,8 @@ protected:
     KData m_src_kdata;  // The original K-line data without adjustment
 
     bool m_is_python_object{false};
-    bool m_calculated;  // Controls whether a recalculation is needed
+    const void* m_aggregate_owner{nullptr};  // runtime only, not serialized
+    bool m_calculated;                       // Controls whether a recalculation is needed
     bool m_pre_ev_valid;
     bool m_pre_cn_valid;
 

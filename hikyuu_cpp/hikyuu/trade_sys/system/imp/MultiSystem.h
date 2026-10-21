@@ -17,7 +17,8 @@
  *
  *  - **Mode A "Signal Aggregation" (the default)**: every sub-system gets a shadow account
  *    funded with `m_sub_init_cash` as a pure signal source. The shadows run continuously and are
- *    never reset, so every sub-system keeps submitting its position intent; on the sampling day
+ *    not reset between the bars (run(reset=true) still resets them with the whole system), so
+ *    every sub-system keeps submitting its position intent; on the sampling day
  *    the parent reads the selected ones' current net exposure snapshot and synthesizes one
  *    per-instrument signed net target by the L2 conversion (weight x target ratio x the parent
  *    net assets), then orders uniformly on its own account. The shadow bookkeeping never touches
@@ -38,6 +39,10 @@
  * the very day it occurs; no L2 conversion is done and the parent does not place the order again.
  * For master compatibility, buy_delay/sell_delay are forced to !trade_on_close. It exists to
  * reproduce the results of the Portfolio before the refactoring.
+ *
+ *  Serialization restores the shadow-account registry and the scheduling counters, so a loaded
+ *  system can continue with run(reset=false); the mode C running pools are rebuilt on the next
+ *  rebalancing day.
  *
  *  See the doc comments of AllocateFundsBase for the precise L1/L2/L3 semantics and PF_Simple /
  *  PF_WithoutAF for the preset configurations of the modes.
@@ -186,6 +191,8 @@ public:
     /** Set the initial signal cash of the sub-system shadow account (mode A Signal Aggregation).
      *  In mode B (Fund Allocation) the shadow accounts start from zero and the quota comes from
      *  the L1 allocation, so this value is unused. */
+    /** Set the initial fund of the sub-system shadow account (mode A; a non-positive value is
+     *  ignored) */
     void setSubInitCash(price_t cash) {
         m_sub_init_cash = cash > 0.0 ? cash : m_sub_init_cash;
     }
@@ -666,6 +673,8 @@ private:
     bool m_external_quota_set{false};
     bool m_external_delegate_warned{false};  // The once-per-instance flag of the nested B fallback
                                              // warning when the inner cannot consume the budget
+    bool m_multi_parent_warned{false};       // A child driven by another aggregate is warned once
+    bool m_not_ready_warned{false};          // Driving without readyForRun is warned once
     bool m_external_quota_capped_warned{false};  // The once-per-instance flag of the delegated
                                                  // quota capped by the inner reserve
     bool m_pending_calibration_retry{false};     // The pending calibration is a retry of a previous
@@ -729,6 +738,25 @@ private:
         // The current schema only; no compatibility with the older archives
         ar& BOOST_SERIALIZATION_BASE_OBJECT_NVP(System);
         ar& BOOST_SERIALIZATION_NVP(m_sys_list);
+        // The shadow-account registry is a bare pointer set: save it by the child slot index and
+        // rebuild it after loading, otherwise a continued run would discard the restored child
+        // books and liquidate the parent holdings as orphans in mode A
+        std::vector<int> shadow;
+        if (Archive::is_saving::value) {
+            shadow.resize(m_sys_list.size(), 0);
+            for (size_t i = 0; i < m_sys_list.size(); ++i) {
+                shadow[i] = m_shadow_sys.count(m_sys_list[i].get()) ? 1 : 0;
+            }
+        }
+        ar& BOOST_SERIALIZATION_NVP(shadow);
+        if (Archive::is_loading::value) {
+            m_shadow_sys.clear();
+            for (size_t i = 0; i < shadow.size() && i < m_sys_list.size(); ++i) {
+                if (shadow[i]) {
+                    m_shadow_sys.insert(m_sys_list[i].get());
+                }
+            }
+        }
         ar& BOOST_SERIALIZATION_NVP(m_sub_init_cash);
         ar& BOOST_SERIALIZATION_NVP(m_adjust_cycle);
         ar& BOOST_SERIALIZATION_NVP(m_trade_on_close);

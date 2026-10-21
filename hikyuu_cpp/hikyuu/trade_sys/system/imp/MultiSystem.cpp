@@ -184,6 +184,15 @@ void MultiSystem::readyForRun() {
                 sys->setParam<bool>("shared_tm", false);
             }
         }
+        if (sys->getAggregateOwner() && sys->getAggregateOwner() != this &&
+            !m_multi_parent_warned) {
+            m_multi_parent_warned = true;
+            HKU_WARN(
+              "Sub-system {} is already driven by another aggregate; its account is "
+              "re-parented to {} and the other aggregate will keep driving it too!",
+              sys->name(), name());
+        }
+        sys->setAggregateOwner(this);
         // The hierarchy path is written recursively
         sys->setPath(m_path + "/" + sys->name());
         if (sys->isComposite()) {
@@ -192,8 +201,10 @@ void MultiSystem::readyForRun() {
             // parent: otherwise its price queries and its own SE would be left with no time axis at
             // all and the nested layer could never trade
             auto inner = std::dynamic_pointer_cast<MultiSystem>(sys);
-            if (inner && !m_kdata.empty()) {
+            if (inner && !m_kdata.empty() && inner->m_kdata != m_kdata) {
                 inner->m_kdata = m_kdata;
+                inner->m_kdata_cache.clear();
+                inner->m_kdata_cache_mark = Datetime();
             }
         } else if (sys->getTO().empty()) {
             // master compatibility: when the sub-system has no trading object but its instrument is
@@ -373,11 +384,16 @@ SystemPtr MultiSystem::_clone() {
 
     for (auto& sys : m_sys_list) {
         auto iter = cloned_protos.find(sys.get());
+        SystemPtr new_sys;
         if (iter != cloned_protos.end()) {
-            ret->m_se->bindRealToProto(iter->second, iter->second);
-            ret->add(iter->second);
+            new_sys = iter->second;
+            ret->m_se->bindRealToProto(new_sys, new_sys);
         } else {
-            ret->add(sys->clone());
+            new_sys = sys->clone();
+        }
+        ret->add(new_sys);
+        if (m_shadow_sys.count(sys.get())) {
+            ret->m_shadow_sys.insert(new_sys.get());
         }
     }
 
@@ -2072,6 +2088,11 @@ MomentResult MultiSystem::runMoment(const Datetime& datetime) {
 }
 
 MomentResult MultiSystem::runMomentOnOpen(const Datetime& datetime) {
+    if (m_sub_index.empty() && !m_not_ready_warned) {
+        m_not_ready_warned = true;
+        HKU_WARN("[{}] driven without readyForRun: no sub-system is indexed, nothing will run!",
+                 name());
+    }
     MomentResult result;
     HKU_IF_RETURN(!m_tm, result);
     result.datetime = datetime;
@@ -3499,7 +3520,7 @@ void MultiSystem::_clearDelistedInSubTree(const SystemPtr& sys, const Stock& sto
         return;
     }
     TMPtr tm = sys->getTM();
-    if (tm) {
+    if (tm && tm != m_tm) {
         if (tm->getPosition(date, stock).number > 0.0) {
             tm->sell(date, stock, price, MAX_DOUBLE, 0.0, 0.0, price, PART_PORTFOLIO, "DELIST");
         }
