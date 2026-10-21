@@ -1557,22 +1557,16 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.stock.isNull()) {
             continue;
         }
-        // A long buy / a short cover consumes cash, and a short-side CLEAR is exactly such a cover:
-        // both belong to the cash-consuming group below, never here
-        if (s.type == SuggestionType::BUY) {
-            continue;
-        }
-        if (s.type == SuggestionType::CLEAR && s.short_side) {
+        // The netted list only carries BUY / SELL: the buys and the short covers belong to the
+        // cash-consuming group below
+        if (s.type != SuggestionType::SELL) {
             continue;
         }
         // SELL: sell the suggested quantity (in mode A it is rewritten to the parent account
-        // quantity; in mode B the sub-instruction is passed through) CLEAR: exit the whole
-        // position. The number is always positive; the direction is the type and the side is the
-        // short_side flag. A short-side SELL opens/increases a short (sellShort)
+        // quantity; in mode B the sub-instruction is passed through). The number is always
+        // positive; a short-side SELL opens/increases a short (sellShort)
         double num = s.number;
-        if (s.type == SuggestionType::CLEAR || num >= MAX_DOUBLE) {
-            num = MAX_DOUBLE;
-        } else if (num < 0.0) {
+        if (num < 0.0) {
             num = -num;  // Defensive: legacy custom AF may still emit a negative number
         }
         if (num <= 0.0) {
@@ -1590,8 +1584,7 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         }
         // No quote (e.g. suspended): a 0-price sell would wipe the holding, skip it
         if (s.plan_price <= 0.0) {
-            HKU_WARN("Skip the {} suggestion, {} has no quote on {}!",
-                     s.type == SuggestionType::CLEAR ? "CLEAR" : "SELL", s.stock.market_code(),
+            HKU_WARN("Skip the SELL suggestion, {} has no quote on {}!", s.stock.market_code(),
                      date);
             continue;
         }
@@ -1613,25 +1606,18 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         if (s.stock.isNull() || s.plan_price <= 0.0) {
             continue;
         }
-        const bool clear_short = (s.type == SuggestionType::CLEAR && s.short_side);
-        const bool cover = (s.type == SuggestionType::BUY && s.short_side);
-        if (!clear_short && !cover && s.type != SuggestionType::BUY) {
-            continue;
+        if (s.type != SuggestionType::BUY) {
+            continue;  // SELL legs generate cash
         }
         double min_trade = s.stock.minTradeNumber();
         if (min_trade <= 0.0) {
             continue;
         }
-        double num = s.number;
-        if (clear_short) {
-            // A CLEAR covers at most the current short book (it never needs more cash than that)
-            num = std::min(num, m_tm->getShortPosition(s.stock).number);
-        }
-        double qty = std::floor(num / min_trade) * min_trade;
+        double qty = std::floor(s.number / min_trade) * min_trade;
         if (qty < min_trade) {
             continue;
         }
-        if (clear_short || cover) {
+        if (s.short_side) {
             need_cover_cash += qty * s.plan_price * s.stock.unit();
         } else {
             need_buy_cash += qty * s.plan_price * s.stock.unit();
@@ -1652,33 +1638,26 @@ void MultiSystem::_executeSuggestions(const Datetime& date, const TradeSuggestio
         }
     }
 
-    // The mandatory short covers: a short-side CLEAR covers the whole book (MAX_DOUBLE is capped
-    // by the TM at the actual short position), a cover buys back the targeted quantity
+    // The short covers: a netted cover buys back the targeted quantity (capped at the current
+    // short book)
     for (const auto& s : netted) {
-        if (s.stock.isNull() || !s.short_side) {
-            continue;
-        }
-        const bool clear_short = (s.type == SuggestionType::CLEAR);
-        if (!clear_short && s.type != SuggestionType::BUY) {
+        if (s.stock.isNull() || !s.short_side || s.type != SuggestionType::BUY) {
             continue;
         }
         if (s.plan_price <= 0.0) {
-            HKU_WARN("Skip the {} suggestion, {} has no quote on {}!",
-                     clear_short ? "CLEAR" : "BUY", s.stock.market_code(), date);
+            HKU_WARN("Skip the BUY suggestion, {} has no quote on {}!", s.stock.market_code(),
+                     date);
             continue;
         }
         double short_num = m_tm->getShortPosition(s.stock).number;
         if (short_num <= 0.0) {
             continue;
         }
-        double num = MAX_DOUBLE;
-        if (!clear_short) {
-            double min_trade = s.stock.minTradeNumber();
-            double target = std::min(s.number, short_num);
-            num = min_trade > 0.0 ? std::floor(target / min_trade) * min_trade : target;
-            if (num < min_trade) {
-                num = 0.0;  // Below one lot: the exchange refuses such an order
-            }
+        double min_trade = s.stock.minTradeNumber();
+        double target = std::min(s.number, short_num);
+        double num = min_trade > 0.0 ? std::floor(target / min_trade) * min_trade : target;
+        if (num < min_trade) {
+            num = 0.0;  // Below one lot: the exchange refuses such an order
         }
         if (num <= 0.0) {
             continue;
