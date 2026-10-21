@@ -143,6 +143,9 @@ IndicatorList Factor::getAllValues(const KQuery& query, bool align, bool fill_nu
 }
 
 void Factor::save_to_db(bool update_before) {
+    HKU_CHECK(isValidFactorName(name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     saveFactor(*this, update_before);
 }
 
@@ -157,6 +160,9 @@ void Factor::save_special_values_to_db(const Stock& stock, const Indicator& valu
 }
 
 void Factor::remove_from_db() {
+    HKU_CHECK(isValidFactorName(name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     removeFactor(name(), ktype());
 }
 

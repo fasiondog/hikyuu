@@ -12,6 +12,7 @@
 #include "hikyuu/indicator/crt/PRICELIST.h"
 #include "hikyuu/plugin/factor.h"
 #include "hikyuu/plugin/device.h"
+#include "hikyuu/lang.h"
 #include "FactorSet.h"
 #include "imp/CompiledFactorPlan.h"
 
@@ -168,10 +169,16 @@ const Factor& FactorSet::get(const string& name) const {
 }
 
 void FactorSet::save_to_db() const {
+    HKU_CHECK(isValidFactorName(name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     saveFactorSet(*this);
 }
 
 void FactorSet::remove_from_db() const {
+    HKU_CHECK(isValidFactorName(name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     removeFactorSet(name(), ktype());
 }
 

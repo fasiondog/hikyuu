@@ -11,6 +11,9 @@
 namespace hku {
 
 bool HKU_API hasFactor(const string& name, const KQuery::KType& ktype) {
+    HKU_ERROR_IF_RETURN(!isValidFactorName(name), false,
+                        htr("When saving factor values, factor names must consist of English letters, "
+                            "numbers and underscores, and cannot start with a number!"));
     auto& sm = StockManager::instance();
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
@@ -21,6 +24,9 @@ bool HKU_API hasFactor(const string& name, const KQuery::KType& ktype) {
 }
 
 Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
+    HKU_CHECK(isValidFactorName(name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     Factor ret;
     auto& sm = StockManager::instance();
     const string& driver_type =
@@ -33,6 +39,9 @@ Factor HKU_API getFactor(const string& name, const KQuery::KType& ktype) {
 }
 
 void HKU_API saveFactor(const Factor& factor, bool update_before) {
+    HKU_CHECK(isValidFactorName(factor.name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     auto& sm = StockManager::instance();
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
@@ -57,6 +66,9 @@ void HKU_API saveSpecialFactorValues(const Factor& factor, const Stock& stock,
 }
 
 void HKU_API removeFactor(const string& name, const KQuery::KType& ktype) {
+    HKU_CHECK(isValidFactorName(name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     auto& sm = StockManager::instance();
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
@@ -103,6 +115,9 @@ void HKU_API updateAllFactorsValues(const KQuery::KType& ktype) {
 }
 
 void HKU_API saveFactorSet(const FactorSet& set) {
+    HKU_CHECK(isValidFactorName(set.name()), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     auto& sm = StockManager::instance();
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
@@ -114,6 +129,9 @@ void HKU_API saveFactorSet(const FactorSet& set) {
 }
 
 void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype) {
+    HKU_CHECK(isValidFactorName(name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     auto& sm = StockManager::instance();
     const string& driver_type =
       StockManager::instance().getKDataDriverParameter().get<const string&>("type");
@@ -125,6 +143,9 @@ void HKU_API removeFactorSet(const string& name, const KQuery::KType& ktype) {
 }
 
 FactorSet HKU_API getFactorSet(const string& name, const KQuery::KType& ktype) {
+    HKU_CHECK(isValidFactorName(name), "{}",
+              htr("When saving factor values, factor names must consist of English letters, "
+                  "numbers and underscores, and cannot start with a number!"));
     FactorSet ret;
     auto& sm = StockManager::instance();
     const string& driver_type =

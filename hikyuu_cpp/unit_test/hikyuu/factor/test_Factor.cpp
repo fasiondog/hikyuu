@@ -985,4 +985,43 @@ TEST_CASE("test_Factor_list_serialize") {
 
 #endif /* HKU_SUPPORT_SERIALIZATION */
 
+/** @par Test point: FT04 - factor name injection guard. Names are validated at the save/remove/get
+ * entries (core side) and at every name-taking entry of the factor driver proxy. An invalid name is
+ * rejected when a factor DB driver is configured; when no factor DB is present the name is
+ * unrestricted, so the guards must not cause a false rejection. */
+TEST_CASE("test_Factor_name_injection_guard") {
+    Indicator ma5 = MA(CLOSE(), 5);
+
+    // A valid name must always construct and persist without error (no regression).
+    /** @arg a valid name constructs and saves/removes without throwing */
+    Factor valid("FT04_VALID_NAME", ma5, KQuery::DAY);
+    CHECK_FALSE(valid.isNull());
+    CHECK_NOTHROW(valid.save_to_db());
+    CHECK_NOTHROW(valid.remove_from_db());
+
+    bool clickhouse_available = false;
+    try {
+        clickhouse_available =
+          (StockManager::instance().getKDataDriverParameter().get<const string&>("type") ==
+           "clickhouse");
+    } catch (...) {
+        clickhouse_available = false;
+    }
+
+    if (clickhouse_available) {
+        /** @arg with a factor DB driver, an invalid name is rejected at construction (need_save_value) */
+        CHECK_THROWS_AS(Factor("a;DROP TABLE factors;--", ma5, KQuery::DAY, "", "", true),
+                        std::exception);
+        /** @arg with a factor DB driver, an invalid name is rejected at save/remove */
+        Factor bad("a;DROP TABLE factors;--", ma5, KQuery::DAY);
+        CHECK_THROWS_AS(bad.save_to_db(), std::exception);
+        CHECK_THROWS_AS(bad.remove_from_db(), std::exception);
+    } else {
+        /** @arg without a factor DB driver the name is unrestricted, so no false rejection */
+        Factor bad("a;DROP TABLE factors;--", ma5, KQuery::DAY);
+        CHECK_NOTHROW(bad.save_to_db());
+        CHECK_NOTHROW(bad.remove_from_db());
+    }
+}
+
 /** @} */

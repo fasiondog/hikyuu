@@ -99,11 +99,38 @@ class FactorSetIndexTest(unittest.TestCase):
             fs[-3]
 
 
+class FactorNameGuardTest(unittest.TestCase):
+    def test_name_injection_guard(self):
+        sm = StockManager.instance()
+        try:
+            driver_type = sm.getKDataDriverParameter()["type"]
+        except Exception:
+            driver_type = ""
+
+        f = Factor("FT04_VALID_NAME", CVAL(1.0), "DAY")
+        self.assertFalse(f.is_null())
+        try:
+            f.save_to_db()
+            f.remove_from_db()
+        except Exception as e:
+            self.fail("valid name should not raise in save/remove: %s" % e)
+
+        if driver_type == "clickhouse":
+            bad = Factor("a;DROP TABLE factors;--", CVAL(1.0), "DAY")
+            with self.assertRaises(Exception):
+                bad.save_to_db()
+        else:
+            # no factor DB -> name unrestricted, no false rejection
+            bad = Factor("a;DROP TABLE factors;--", CVAL(1.0), "DAY")
+            self.assertFalse(bad.is_null())
+
+
 def suite():
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     suite.addTests(loader.loadTestsFromTestCase(FactorImmutableTest))
     suite.addTests(loader.loadTestsFromTestCase(FactorSetIndexTest))
+    suite.addTests(loader.loadTestsFromTestCase(FactorNameGuardTest))
     return suite
 
 
