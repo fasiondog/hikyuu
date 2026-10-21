@@ -818,6 +818,15 @@ void MultiSystem::_discardOpenPending(const string& reason) {
     m_open_pending_adjust = false;
 }
 
+void MultiSystem::_pushCheckoutOnce(const SystemPtr& sys) {
+    for (const auto& a : m_pending_calibration) {
+        if (a.sys == sys && a.kind == CalibrationKind::SUB_CHECKOUT) {
+            return;
+        }
+    }
+    m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+}
+
 void MultiSystem::_purgePendingFor(const SystemPtr& sys) {
     std::set<Stock> stocks;
     const Stock& own = sys->getStock();
@@ -1177,26 +1186,61 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         return;
     }
 
-    // The already planned legs count as sold for the residual base only: the pro-rata ratio still
-    // uses the full gap, otherwise the share deduction below would subtract the same legs twice
-    // (the round would undersell when the queued legs cover only part of the gap)
+    // The queued legs of this sub-system count as sold for the residual base only: the pro-rata
+    // ratio still uses the full gap, otherwise the share deduction below would subtract the same
+    // legs twice (the round would undersell when the queued legs cover only part of the gap)
     const price_t need_gap = need_back_funds;
+    std::map<Stock, double> planned_nums;
     double planned_value = 0.0;
     for (const auto& [stk, value] : values) {
         double hold = sub_tm->getPosition(date, stk).number;
+        double sum = 0.0;
         for (const auto& a : m_pending_calibration) {
-            if (a.sys != sys || a.kind != CalibrationKind::SUB_SELL || a.stock != stk) {
-                continue;
-            }
-            price_t p = _getClosePrice(date, stk);
-            if (p <= 0.0) {
-                p = stk.getMarketValue(date, ktype);
-            }
-            if (p > 0.0) {
-                planned_value += std::min(a.number, hold) * p * stk.unit();
+            if (a.sys == sys && a.kind == CalibrationKind::SUB_SELL && a.stock == stk) {
+                sum += a.number;
             }
         }
+        double planned = std::min(sum, hold);
+        if (planned <= 0.0) {
+            continue;
+        }
+        price_t p = _getClosePrice(date, stk);
+        if (p <= 0.0) {
+            p = stk.getMarketValue(date, ktype);
+        }
+        if (p > 0.0) {
+            planned_nums[stk] = planned;
+            planned_value += planned * p * stk.unit();
+        }
     }
+
+    if (planned_value >= need_gap) {
+        // The queued legs already cover the whole gap: trim them to the gap instead of adding
+        // pro-rata sells on top (they would push the sub-system below its quota)
+        double keep_ratio = need_gap / planned_value;
+        for (auto& a : m_pending_calibration) {
+            if (a.sys != sys || a.stock.isNull() ||
+                (a.kind != CalibrationKind::SUB_SELL && a.kind != CalibrationKind::PARENT_SELL)) {
+                continue;
+            }
+            double min_num = a.stock.minTradeNumber();
+            double trimmed = min_num > 0.0 ? std::floor(a.number * keep_ratio / min_num) * min_num
+                                           : a.number * keep_ratio;
+            a.number = std::min(trimmed, a.number);
+        }
+        m_pending_calibration.erase(
+          std::remove_if(m_pending_calibration.begin(), m_pending_calibration.end(),
+                         [&](const CalibrationAction& a) {
+                             return a.sys == sys && !a.stock.isNull() &&
+                                    (a.kind == CalibrationKind::SUB_SELL ||
+                                     a.kind == CalibrationKind::PARENT_SELL) &&
+                                    a.number <= 0.0;
+                         }),
+          m_pending_calibration.end());
+        _pushCheckoutOnce(sys);
+        return;
+    }
+
     need_back_funds = std::max(0.0, need_back_funds - planned_value);
 
     double ratio = std::min(1.0, need_gap / total_value);
@@ -1239,10 +1283,8 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
         // A cross-day retry leg may already be planned for this stock: deduct it so the same
         // excess is not sold twice
         double planned = 0.0;
-        for (const auto& a : m_pending_calibration) {
-            if (a.sys == sys && a.kind == CalibrationKind::SUB_SELL && a.stock == stk) {
-                planned += std::min(a.number, hold);
-            }
+        if (auto it = planned_nums.find(stk); it != planned_nums.end()) {
+            planned = it->second;
         }
         if (close_price <= 0.0) {
             // Suspended: queue the pro-rata leg so the excess is sold at the next quoted open
@@ -1309,7 +1351,7 @@ void MultiSystem::_reduceCompositeToQuota(const SystemPtr& sys, const Datetime& 
                  (a.kind == CalibrationKind::SUB_SELL || a.kind == CalibrationKind::SUB_COVER);
       });
     if (!m_trade_on_close || deferred || has_pending_sell) {
-        m_pending_calibration.push_back({CalibrationKind::SUB_CHECKOUT, sys, Stock(), 0.0});
+        _pushCheckoutOnce(sys);
         return;
     }
     FundsRecord funds = sub_tm->getFunds(date, ktype);

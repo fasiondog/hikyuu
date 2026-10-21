@@ -36,7 +36,8 @@
  *    (`shared_tm`) and is sized by its own MM. The parent only gates the entry with the SE and
  * keeps the running set driven day by day, so that the sell signal of a sub-system is realized on
  * the very day it occurs; no L2 conversion is done and the parent does not place the order again.
- * It exists to reproduce the results of the Portfolio before the refactoring.
+ * For master compatibility, buy_delay/sell_delay are forced to !trade_on_close. It exists to
+ * reproduce the results of the Portfolio before the refactoring.
  *
  *  See the doc comments of AllocateFundsBase for the precise L1/L2/L3 semantics and PF_Simple /
  *  PF_WithoutAF for the preset configurations of the modes.
@@ -452,13 +453,17 @@ private:
     /** Drop the suggestions queued for the next open (the sub-system leaves the driving scope) */
     void _discardOpenPending(const string& reason);
 
+    /** Queue the cash checkout of the given sub-system unless one is already queued */
+    void _pushCheckoutOnce(const SystemPtr& sys);
+
     /** Drop the queued suggestions that belong to the given sub-system (it is being cleared) */
     void _purgePendingFor(const SystemPtr& sys);
 
     /** Mode B: reduce an A/C composite sub-system above its quota pro rata over its leaf holdings
-     *  (a suspended leaf is valued at its last available close, and the legs queued by an earlier
-     *  round are valued out of the residual base, so the round does not sell the same excess twice)
-     * and mirror the sells on the parent account (a B composite is delegated instead) */
+     *  and mirror the sells on the parent account (a B composite is delegated instead). A
+     *  suspended leaf is valued at its last available close; the legs queued by an earlier round
+     *  count as sold (valued out of the residual base, and trimmed to the gap when they already
+     *  cover it) */
     void _reduceCompositeToQuota(const SystemPtr& sys, const Datetime& date,
                                  price_t need_back_funds, KQuery::KType ktype,
                                  TradeRecordList& out_executed);
@@ -473,10 +478,11 @@ private:
 
     /** The quota calibration legs (sub/parent sells, covers, checkouts) and the injections are
      * deferred to the next open: with trade_on_close=false for the whole rebalancing, with
-     * trade_on_close=true only when the close is suspended. The injections wait while any sell leg
-     * still waits for a quote, so every leg shares one price basis. A sub leg is judged by the
-     * initiating sub book, a parent leg by the parent book; a leg without a sellable quantity left
-     * (a dead leg, or a residual the parent can no longer fill) is dropped */
+     * trade_on_close=true only when the close is suspended. The injections and the cash checkout
+     * wait while a sell leg of the same sub-system still waits for a quote, so every leg shares
+     * one price basis. A sub leg is judged by the initiating sub book, a parent leg by the parent
+     * book; a leg without a sellable quantity left (a dead leg, or a residual the parent can no
+     * longer fill) is dropped */
     enum class CalibrationKind {
         SUB_SELL,
         SUB_COVER,
