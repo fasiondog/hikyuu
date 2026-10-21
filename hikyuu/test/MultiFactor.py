@@ -9,6 +9,7 @@
 #          exactly once per candidate and exceptions raised inside it propagate.
 # ===============================================================================
 
+import threading
 import unittest
 
 from test_init import *
@@ -50,6 +51,39 @@ class MultiFactorTest(unittest.TestCase):
         # The old catch(...) probe executed the user's callback a second time;
         # the filter must run exactly once per invocation.
         self.assertEqual(len(calls), 1)
+
+    def test_python_normalizer_no_deadlock(self):
+        # A Python custom normalizer must not deadlock: its clone()/normalize() need the GIL,
+        # so the parallel normalization must run serially on the (GIL-holding) caller thread
+        # instead of on pool workers that would block forever.
+        mf, ref_stk, query = self._build_mf()
+
+        class PyNorm(NormalizeBase):
+            def __init__(self):
+                super().__init__('PyNorm')
+
+            def _clone(self):
+                return PyNorm()
+
+            def normalize(self, data):
+                return data
+
+        mf.set_normalize(PyNorm())
+
+        holder = {}
+
+        def run():
+            try:
+                holder['scores'] = mf.get_scores(Datetime(201106010000))
+            except Exception as e:  # pragma: no cover
+                holder['error'] = e
+
+        t = threading.Thread(target=run)
+        t.start()
+        t.join(timeout=15)
+        self.assertFalse(t.is_alive(), "get_scores deadlocked with a Python custom normalizer")
+        self.assertIn('scores', holder, getattr(holder.get('error'), 'args', None))
+        self.assertGreater(len(holder['scores']), 0)
 
 
 def suite():

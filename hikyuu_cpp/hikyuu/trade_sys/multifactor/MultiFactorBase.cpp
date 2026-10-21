@@ -655,84 +655,92 @@ vector<IndicatorList> MultiFactorBase::getAllSrcFactors() {
                 ind_data_ptrs[si * ind_count + ii] = all_stk_inds[si][ii].data();
             }
         }
-        global_parallel_for_index_void(
-          0, days_total,
-          [this, stk_count, ind_count, &ind_dummy_dict, &use_style_inds,
-           &ind_data_ptrs](size_t di) {
-              auto sub_norm = m_norm ? m_norm->clone() : m_norm;
-              NormPtr special_norm;
-              PriceList one_day(stk_count, Null<price_t>());
-              PriceList new_value;
-              for (size_t ii = 0; ii < ind_count; ii++) {
-                  auto* one_day_data = one_day.data();
-                  for (size_t si = 0; si < stk_count; si++) {
-                      one_day_data[si] = ind_data_ptrs[si * ind_count + ii][di];
-                  }
 
-                  // Note: the all_stk_inds[*][ii] produced by m_factorset.getValues(align=true)
-                  // is renamed to "ALIGN" by the ALIGN wrapper (verified at runtime). But the key
-                  // stored into m_special_norms/m_special_category by addSpecialNormalize is the
-                  // original factor name in the FactorSet (such as "MA"). If
-                  // all_stk_inds[0][ii].name() were taken as the find key it would never hit and
-                  // the industry / style / special standardization would all fail silently.
-                  // Instead, m_factorset[ii].name() is used to trace back the original name by
-                  // index: getValues produces result[j][i] strictly corresponding to factors[i],
-                  // and the index ii corresponds one to one with m_factorset[ii], with no risk of
-                  // an out of order access.
-                  auto ind_name = m_factorset[ii].name();
-                  auto special_norm_iter = m_special_norms.find(ind_name);
-                  if (special_norm_iter != m_special_norms.end()) {
-                      special_norm = special_norm_iter->second->clone();
-                  } else {
-                      special_norm.reset();
-                  }
+        // A Python normalizer's clone()/normalize() need the GIL, which the caller already holds
+        // while spinning on the pool; run serially so the work stays on the calling thread.
+        bool has_python_norm = (m_norm && m_norm->isPythonObject());
+        if (!has_python_norm) {
+            for (const auto& sn : m_special_norms) {
+                if (sn.second && sn.second->isPythonObject()) {
+                    has_python_norm = true;
+                    break;
+                }
+            }
+        }
 
-                  if (special_norm) {
-                      new_value = special_norm->normalize(one_day);
-                  } else if (sub_norm) {
-                      new_value = sub_norm->normalize(one_day);
-                  } else {
-                      new_value = one_day;
-                  }
+        auto normalize_one_day = [this, stk_count, ind_count, &ind_dummy_dict, &use_style_inds,
+                                  &ind_data_ptrs](size_t di) {
+            auto sub_norm = m_norm ? m_norm->clone() : m_norm;
+            NormPtr special_norm;
+            PriceList one_day(stk_count, Null<price_t>());
+            PriceList new_value;
+            for (size_t ii = 0; ii < ind_count; ii++) {
+                auto* one_day_data = one_day.data();
+                for (size_t si = 0; si < stk_count; si++) {
+                    one_day_data[si] = ind_data_ptrs[si * ind_count + ii][di];
+                }
 
-                  auto category_iter = ind_dummy_dict.find(ind_name);
-                  if (category_iter != ind_dummy_dict.end()) {
-                      // The industry neutralization: removing the group mean (O(n), mathematically
-                      // equivalent to a multiple regression without the intercept on the one-hot
-                      // encoding). The original implementation wrongly used the univariate
-                      // calculate_residuals to do a unary regression on the integer block index,
-                      // implying the wrong assumption "the effect of industry j = b0 + b1*j", so
-                      // the result depended on the order of the block list.
-                      const auto& [labels, blk_count] = category_iter->second;
-                      new_value = calculate_industry_residuals(new_value, labels, blk_count);
-                  }
-                  auto style_iter = use_style_inds.find(ind_name);
-                  if (style_iter != use_style_inds.end()) {
-                      auto& per_factor = style_iter->second;  // [style factor][stock]
-                      vector<PriceList> style_value_day(per_factor.size());
-                      for (size_t j = 0; j < per_factor.size(); j++) {
-                          auto& style_value = style_value_day[j];
-                          style_value.resize(stk_count);
-                          for (size_t si = 0; si < stk_count; si++) {
-                              // Take the style factor value of the si-th stock itself (the original
-                              // implementation wrongly took the shared value)
-                              style_value[si] = per_factor[j][si][di];
-                          }
-                      }
-                      new_value = calculate_style_residuals(new_value, style_value_day);
-                  }
+                // getValues wraps every factor in ALIGN, so the returned indicators are named
+                // "ALIGN"; the original FactorSet name must be used as the lookup key, otherwise
+                // the special norm / category lookups never hit.
+                auto ind_name = m_factorset[ii].name();
+                auto special_norm_iter = m_special_norms.find(ind_name);
+                if (special_norm_iter != m_special_norms.end()) {
+                    special_norm = special_norm_iter->second->clone();
+                } else {
+                    special_norm.reset();
+                }
 
-                  // normalize() is overridable (Python subclass forwarded via pybind); verify the
-                  // size before the writeback so a short result cannot write out of bounds
-                  HKU_CHECK(new_value.size() >= stk_count,
-                            "The normalized result size ({}) of factor \"{}\" on date {} is less "
-                            "than the stock count ({})!",
-                            new_value.size(), ind_name, m_ref_dates[di], stk_count);
-                  for (size_t si = 0; si < stk_count; si++) {
-                      ind_data_ptrs[si * ind_count + ii][di] = new_value[si];
-                  }
-              }
-          });
+                if (special_norm) {
+                    new_value = special_norm->normalize(one_day);
+                } else if (sub_norm) {
+                    new_value = sub_norm->normalize(one_day);
+                } else {
+                    new_value = one_day;
+                }
+
+                auto category_iter = ind_dummy_dict.find(ind_name);
+                if (category_iter != ind_dummy_dict.end()) {
+                    // Industry neutralization: removing the group mean, mathematically equivalent
+                    // to a multiple regression without intercept on the one-hot encoding.
+                    const auto& [labels, blk_count] = category_iter->second;
+                    new_value = calculate_industry_residuals(new_value, labels, blk_count);
+                }
+                auto style_iter = use_style_inds.find(ind_name);
+                if (style_iter != use_style_inds.end()) {
+                    auto& per_factor = style_iter->second;  // [style factor][stock]
+                    vector<PriceList> style_value_day(per_factor.size());
+                    for (size_t j = 0; j < per_factor.size(); j++) {
+                        auto& style_value = style_value_day[j];
+                        style_value.resize(stk_count);
+                        for (size_t si = 0; si < stk_count; si++) {
+                            // Take the style factor value of the si-th stock itself (the original
+                            // implementation wrongly took the shared value)
+                            style_value[si] = per_factor[j][si][di];
+                        }
+                    }
+                    new_value = calculate_style_residuals(new_value, style_value_day);
+                }
+
+                // normalize() is overridable (Python subclass forwarded via pybind); verify the
+                // size before the writeback so a short result cannot write out of bounds
+                HKU_CHECK(new_value.size() >= stk_count,
+                          "The normalized result size ({}) of factor \"{}\" on date {} is less "
+                          "than the stock count ({})!",
+                          new_value.size(), ind_name, m_ref_dates[di], stk_count);
+                for (size_t si = 0; si < stk_count; si++) {
+                    ind_data_ptrs[si * ind_count + ii][di] = new_value[si];
+                }
+            }
+        };
+
+        if (has_python_norm) {
+            for (size_t di = 0; di < days_total; ++di) {
+                normalize_one_day(di);
+            }
+        } else {
+            global_parallel_for_index_void(0, days_total, normalize_one_day);
+        }
     }
 
     return all_stk_inds;
