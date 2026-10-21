@@ -48,7 +48,7 @@ not hold it (see :doc:`../trade_sys/system`):
       - Fund Allocation
       - Independent shadow accounts per sub-system, starting from zero and funded only by quotas
       - The parent account is the **fund allocator**: on the rebalancing day L1 computes each sub-system **quota**
-        (target total assets) and calibrates (recycle the unselected -> liquidate -> reduce the over quota ->
+        (target total assets) and calibrates (zero-quota liquidation -> unselected liquidation / selected recycle -> reduce the over quota ->
         inject the gap); the sub-systems trade autonomously within their quotas and the parent **mirrors
         continuously** their real instructions (the main account = the sum of the sub-system positions)
     * - ``"C"``

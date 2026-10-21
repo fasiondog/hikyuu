@@ -746,6 +746,7 @@ price_t MultiSystem::_injectSubSystemGap(const SystemPtr& sys, const Datetime& d
 
 void MultiSystem::_clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype) {
     HKU_IF_RETURN(!sys, void());
+    _purgePendingFor(sys);
     if (sys->isComposite()) {
         for (const auto& child : sys->getSubSystemList()) {
             _clearSubSystem(child, date, ktype);
@@ -797,6 +798,30 @@ void MultiSystem::_discardOpenPending(const string& reason) {
     m_pending_calibration_retry = false;
     m_open_pending_retry = false;
     m_open_pending_adjust = false;
+}
+
+void MultiSystem::_purgePendingFor(const SystemPtr& sys) {
+    std::set<Stock> stocks;
+    const Stock& own = sys->getStock();
+    if (own.isNull()) {
+        _collectLeafStocks(sys, stocks);
+    } else {
+        stocks.insert(own);
+    }
+    auto& v = m_open_pending_suggestions;
+    v.erase(std::remove_if(v.begin(), v.end(),
+                           [&](const TradeSuggestion& s) {
+                               // A mirror suggestion may not carry the owner: fall back to the
+                               // stock set of the cleared sub-system
+                               return s.sys == sys || (!s.sys && stocks.count(s.stock) > 0);
+                           }),
+            v.end());
+    if (v.empty()) {
+        m_open_pending_date = Datetime();
+        m_open_pending_assets = 0.0;
+        m_open_pending_retry = false;
+        m_open_pending_adjust = false;
+    }
 }
 
 void MultiSystem::_executePendingCalibration(const Datetime& date, KQuery::KType ktype,
@@ -1010,9 +1035,6 @@ void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
     const bool has_own_book = own_tm && own_tm != m_tm;
     for (const auto& stk : stocks) {
         price_t price = _getClosePrice(date, stk);
-        if (price <= 0.0) {
-            continue;
-        }
         double long_num = m_tm->getPosition(date, stk).number;
         double short_num = m_tm->getShortPosition(stk).number;
         if (has_own_book) {
@@ -1020,6 +1042,8 @@ void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
             short_num = std::min(short_num, own_tm->getShortPosition(stk).number);
         }
         if (!m_trade_on_close) {
+            // Enqueue before the quote check: the executor re-checks the quote and the holding,
+            // so a suspended close must not drop the parent side while the sub side is queued
             if (long_num > 0.0) {
                 m_pending_calibration.push_back({CalibrationKind::PARENT_SELL, sys, stk, long_num});
             }
@@ -1027,6 +1051,9 @@ void MultiSystem::_liquidateParent(const SystemPtr& sys, const Datetime& date,
                 m_pending_calibration.push_back(
                   {CalibrationKind::PARENT_COVER, sys, stk, short_num});
             }
+            continue;
+        }
+        if (price <= 0.0) {
             continue;
         }
         if (long_num > 0.0) {
@@ -2469,9 +2496,14 @@ TradeRecordList MultiSystem::_closePhase(const Datetime& datetime) {
         // its same-close fills from the mirror batch (the sub ledger is cleared as a whole, so
         // mirroring those fills would leave the parent with a phantom position)
         if (m_sell_at_not_selected) {
+            const bool adjust_running_sys = m_af->getParam<bool>("adjust_running_sys");
             for (auto& ctx : contexts) {
                 if (ctx.quota > 0.0) {
                     continue;
+                }
+                if (!adjust_running_sys && ctx.sys->getTM() &&
+                    ctx.sys->getTM()->getFunds(datetime, ktype).net_assets() > 0.0) {
+                    continue;  // the running sub-system is left untouched
                 }
                 suggestions.erase(
                   std::remove_if(suggestions.begin(), suggestions.end(),

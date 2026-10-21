@@ -24,12 +24,12 @@
  *    the real funds.
  *
  *  - **Mode B "Fund Allocation" (quota allocation, FOF/MOM style)**: every selected sub-system is
- *    calibrated to its quota on the rebalancing day BEFORE it is driven (recycle the shadow cash,
- *    clear the unselected when sell_at_not_selected is on, reduce the over-quota part, inject the
- *    gap), so the sub-system trades with the exact allocated quota; the parent mirrors the real
- *    instructions of the sub-systems (L2 pass-through) on its own account. The shadow accounts
- *    start from zero and follow the cost function of the parent account, keeping in step with the
- *    parent trades.
+ *    calibrated to its quota on the rebalancing day BEFORE it is driven (zero-quota liquidation,
+ *    then per sub the unselected liquidation or the selected cash recycle, then reduce the
+ *    over-quota part, inject the gap), so the sub-system trades with the exact allocated quota; the
+ * parent mirrors the real instructions of the sub-systems (L2 pass-through) on its own account. The
+ * shadow accounts start from zero and follow the cost function of the parent account, keeping in
+ * step with the parent trades.
  *
  *  - **Mode C "Shared Account Compatibility" (the legacy Portfolio behavior)**: no shadow account
  *    is created, every sub-system trades DIRECTLY on the single real account of the parent
@@ -432,11 +432,13 @@ private:
     /** Mode B (Fund Allocation, master SimplePortfolio compatibility): clear the sub-system shadow
      * account (force selling its holdings and recycling the cash); the parent account holding is
      * liquidated by the caller (_liquidateParent in mode B). A nested aggregate also drops its
-     * queued batch and resets the external quota. */
+     * queued batch and resets the external quota; the parent's queued suggestions of this
+     * sub-system are purged. */
     void _clearSubSystem(const SystemPtr& sys, const Datetime& date, KQuery::KType ktype);
 
     /** Mode B: liquidate the parent holdings of the instruments of the sub-system (a composite
-     * covers all of its leaf instruments) and push the executed trades */
+     * covers all of its leaf instruments) and push the executed trades; with trade_on_close=false
+     * the legs are queued before the quote check (the executor retries a suspended day) */
     void _liquidateParent(const SystemPtr& sys, const Datetime& date, TradeRecordList& out);
 
     /** Sell the holdings of the sub-system own ledger and recycle its cash (no recursion) */
@@ -448,6 +450,9 @@ private:
 
     /** Drop the suggestions queued for the next open (the sub-system leaves the driving scope) */
     void _discardOpenPending(const string& reason);
+
+    /** Drop the queued suggestions that belong to the given sub-system (it is being cleared) */
+    void _purgePendingFor(const SystemPtr& sys);
 
     /** Mode B: reduce an A/C composite sub-system above its quota pro rata over its leaf holdings
      * and mirror the sells on the parent account (a B composite is delegated instead) */
